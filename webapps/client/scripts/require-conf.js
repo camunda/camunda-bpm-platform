@@ -71,7 +71,7 @@ define(function() {
                                       'camunda-tasklist-ui/user',
                                       'camunda-tasklist-ui/controls',
                                       'camunda-tasklist-ui/form',
-                                      'camunda-tasklist-ui/pile',
+                                      'camunda-tasklist-ui/filter',
                                       'camunda-tasklist-ui/task',
                                       'camunda-tasklist-ui/process',
 
@@ -117,7 +117,7 @@ define(function() {
         main: 'index'
       },
       {
-        name: 'camunda-tasklist-ui/pile',
+        name: 'camunda-tasklist-ui/filter',
         main: 'index'
       },
       {

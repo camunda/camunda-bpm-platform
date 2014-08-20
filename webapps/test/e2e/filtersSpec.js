@@ -1,43 +1,43 @@
 'use strict';
 /* jshint node:true */
-ddescribe('Piles', function() {
+ddescribe('Filters', function() {
   describe('list', function() {
     it('is accessible', function() {
       browser.get('/');
-      expect(element(by.css('[cam-tasklist-piles]')).isDisplayed()).toBe(true);
+      expect(element(by.css('[cam-tasklist-filters]')).isDisplayed()).toBe(true);
     });
 
 
     describe('add button', function() {
-      var newPileLink = element(by.css('.controls .task-piles a'));
-      var newPileForm = element(by.css('.modal-content form[name="newPile"]'));
+      var newFilterLink = element(by.css('.controls .task-filters a'));
+      var newFilterForm = element(by.css('.modal-content form[name="newFilter"]'));
 
       it('can be found in the controls row', function() {
-        expect(newPileLink.isDisplayed()).toBe(true);
+        expect(newFilterLink.isDisplayed()).toBe(true);
       });
 
 
       it('opens a modal dialog when clicked', function() {
-        newPileLink
+        newFilterLink
         .click().then(function() {
-          expect(newPileForm.isDisplayed()).toBe(true);
+          expect(newFilterForm.isDisplayed()).toBe(true);
         });
       });
 
 
-      describe('the "new pile" modal dialog', function() {
+      describe('the "new filter" modal dialog', function() {
         it('has a "name" field', function() {
-          expect(element(by.css('form[name="newPile"] [id$="-name"]')).isDisplayed()).toBe(true);
+          expect(element(by.css('form[name="newFilter"] [id$="-name"]')).isDisplayed()).toBe(true);
         });
 
 
         it('has a "description" field', function() {
-          expect(element(by.css('form[name="newPile"] [id$="-description"]')).isDisplayed()).toBe(true);
+          expect(element(by.css('form[name="newFilter"] [id$="-description"]')).isDisplayed()).toBe(true);
         });
 
 
         it('has a "color" field', function() {
-          expect(element(by.css('form[name="newPile"] [id$="-color"]')).isDisplayed()).toBe(true);
+          expect(element(by.css('form[name="newFilter"] [id$="-color"]')).isDisplayed()).toBe(true);
         });
 
 

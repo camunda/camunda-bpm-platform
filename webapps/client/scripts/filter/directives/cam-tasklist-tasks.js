@@ -22,14 +22,14 @@ define([
     '$location',
     '$rootScope',
     '$q',
-    'camTasklistPileFilterConversion',
+    'camTasklistFilterFilterConversion',
     'camAPI',
   function(
     $modal,
     $location,
     $rootScope,
     $q,
-    camTasklistPileFilterConversion,
+    camTasklistFilterFilterConversion,
     camAPI
   ) {
     var Task = camAPI.resource('task');
@@ -52,7 +52,7 @@ define([
 
         scope.tasks = scope.tasks || [];
 
-        scope.pile = scope.pile || $rootScope.currentPile;
+        scope.filter = scope.filter || $rootScope.currentFilter;
 
         scope.searchTask = '';
 
@@ -102,8 +102,8 @@ define([
 
         function buildWhere(order, by) {
           var where = {};
-          angular.forEach(scope.pile.filters, function(pair) {
-            where[pair.key] = camTasklistPileFilterConversion(pair.value);
+          angular.forEach(scope.filter.filters, function(pair) {
+            where[pair.key] = camTasklistFilterFilterConversion(pair.value);
             if (dateExp.test(pair.key)) {
               /* jshint evil: true */
               var date = new Date(eval(where[pair.key]) * 1000);
@@ -162,9 +162,9 @@ define([
         };
 
 
-        scope.$on('tasklist.pile.current', function() {
-          if ($rootScope.currentPile) {
-            scope.pile = $rootScope.currentPile;
+        scope.$on('tasklist.filter.current', function() {
+          if ($rootScope.currentFilter) {
+            scope.filter = $rootScope.currentFilter;
             loadTasks();
           }
         });

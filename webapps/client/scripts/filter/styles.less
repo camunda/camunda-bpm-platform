@@ -1,15 +1,15 @@
 
-.task-piles {
-  .task-pile:first-child {
+.task-filters {
+  .task-filter:first-child {
     margin-top: 0;
   }
 }
 
-.task-pile-wrapper {
+.task-filter-wrapper {
   position: relative;
 }
 
-.task-pile {
+.task-filter {
   margin: (@grid-gutter-width / 2) 0;
   padding: (@grid-gutter-width / 2) 0;
 
@@ -85,7 +85,7 @@
     // margin-left: -15px;
   }
 }
-.active > .task-pile:after {
+.active > .task-filter:after {
   margin-top: -(@grid-gutter-width / 3);
   border-top: (@grid-gutter-width / 3) solid transparent;
   border-bottom: (@grid-gutter-width / 3) solid transparent;
@@ -132,7 +132,7 @@
 }
 
 // .display,
-// .pile-form {
+// .filter-form {
 //   position: relative;
 //   // transition: transform 0.218s;
 //   transition: left 0.8s;
@@ -148,26 +148,26 @@
 //   left: 0;
 // }
 
-// .pile-form {
+// .filter-form {
 //   // transform: translateX(100%);
 //   left: 100%;
 // }
 
-// .task-board.pile-edit {
+// .task-board.filter-edit {
 //   .display {
 //     // transform: translateX(-100%);
 //     left: -100%;
 //   }
-//   .pile-form {
+//   .filter-form {
 //     // transform: translateX(0);
 //     left: 0;
 //   }
 // }
 
-form[name="pile"] {
+form[name="filter"] {
   .description-field,
   .filter-add,
-  .pile-filter {
+  .filter-filter {
     margin-top: (@grid-gutter-width / 2);
   }
 

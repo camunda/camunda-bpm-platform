@@ -29,7 +29,7 @@ define('camunda-tasklist-ui', [
 
 
   // converts AMD paths to angular module names
-  // "camunda-tasklist-ui/pile" will be "cam.tasklist.pile"
+  // "camunda-tasklist-ui/filter" will be "cam.tasklist.filter"
   function rj2ngNames(names) {
     var name, translated = [];
     for (var n = 0; n < names.length; n++) {

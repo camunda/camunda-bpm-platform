@@ -1,5 +1,5 @@
 <form class="form form-horizontal"
-      name="newPile"
+      name="newFilter"
       role="form">
 
   <div class="modal-header">
@@ -21,8 +21,8 @@
                  id="form-{{ elUID }}-name"
                  type="text"
                  required
-                 value="{{ pile.name }}"
-                 placeholder="Pile name" />
+                 value="{{ filter.name }}"
+                 placeholder="Filter name" />
         </div>
       </div>
 
@@ -33,7 +33,7 @@
           <input class="form-control minicolors"
                  id="form-{{ elUID }}-color"
                  type="text"
-                 value="{{ pile.color }}"
+                 value="{{ filter.color }}"
                  data-control="wheel" />
         </div>
       </div>
@@ -46,14 +46,14 @@
         <input class="form-control"
                id="form-{{ elUID }}-description"
                type="text"
-               value="{{ pile.description }}"
+               value="{{ filter.description }}"
                placeholder="Description" />
       </div>
     </div>
 
     <div class="row">
-      <fieldset ng-repeat="(delta, filter) in pile.filters"
-                class="pile-filter">
+      <fieldset ng-repeat="(delta, filter) in filter.filters"
+                class="filter-filter">
         <div class="col-xs-4">
           <select class="form-control" id="form-{{ elUID }}-field-{{ delta }}-key">
             <option value="keyName">Key name</option>
@@ -90,6 +90,6 @@
     <button class="btn btn-primary"
             type="submit"
             ng-disabled="$invalid"
-            ng-click="createPile()">Save</button>
+            ng-click="createFilter()">Save</button>
   </div>
 </form>

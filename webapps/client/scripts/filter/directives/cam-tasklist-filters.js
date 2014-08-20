@@ -1,5 +1,5 @@
 define([
-  'text!./cam-tasklist-piles.html'
+  'text!./cam-tasklist-filters.html'
 ], function(
   template
 ) {
@@ -31,18 +31,18 @@ define([
         $rootScope,
         camAPI
       ) {
-        var Pile = camAPI.resource('pile');
+        var Filter = camAPI.resource('filter');
 
-        $scope.piles = [];
+        $scope.filters = [];
         $scope.focusedId = null;
         $scope.loading = true;
 
 
-        $scope.focus = function(pile) {
-          if ($scope.focusedId === pile.id) { return; }
-          $scope.focusedId = pile.id;
-          $rootScope.currentPile = pile;
-          $rootScope.$broadcast('tasklist.pile.current');
+        $scope.focus = function(filter) {
+          if ($scope.focusedId === filter.id) { return; }
+          $scope.focusedId = filter.id;
+          $rootScope.currentFilter = filter;
+          $rootScope.$broadcast('tasklist.filter.current');
         };
 
 
@@ -53,22 +53,22 @@ define([
 
 
 
-        function listPiles() {
+        function listFilters() {
           if (!authed()) { return; }
 
-          Pile.list({}, function(err, res) {
+          Filter.list({}, function(err, res) {
             $scope.loading = false;
             if (err) {
               throw err;
             }
 
-            $scope.piles = res.items;
+            $scope.filters = res.items;
             $scope.focus(res.items[0]);
           });
         }
 
         $rootScope.$watch('authentication', function() {
-          listPiles();
+          listFilters();
         });
       }]
     };

@@ -15,13 +15,13 @@
         <div notifications-panel
              class="cols notifications-panel page-notifications"></div>
 
-        <div class="cols col-sm-2 task-piles"
-             ng-controller="pileCreateCtrl">
+        <div class="cols col-sm-2 task-filters"
+             ng-controller="filterCreateCtrl">
           <div class="inner">
             <h5>
               <a href
-                 ng-click="createPile()">
-                New pile
+                 ng-click="createFilter()">
+                New filter
                 <span class="glyphicon glyphicon-plus-sign"></span>
               </a>
             </h5>
@@ -29,7 +29,7 @@
 
         </div>
 
-        <div class="cols col-sm-4 current-pile">
+        <div class="cols col-sm-4 current-filter">
           <div class="inner">
             <div class="row">
               <div class="col-xs-12">
@@ -55,14 +55,14 @@
       </div>
 
       <div class="row task-board">
-        <div class="cols col-sm-2 task-piles">
+        <div class="cols col-sm-2 task-filters">
           <div class="inner"
-               cam-tasklist-piles></div>
+               cam-tasklist-filters></div>
         </div>
 
         <div class="cols col-sm-4 task-list">
           <div class="inner"
-               cam-tasklist-pile-tasks></div>
+               cam-tasklist-filter-tasks></div>
         </div>
 
         <div class="cols col-sm-6 current-task">

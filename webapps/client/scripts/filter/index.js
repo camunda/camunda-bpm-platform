@@ -3,10 +3,10 @@
 
 
 /**
- * @module  cam.tasklist.pile
+ * @module  cam.tasklist.filter
  * @belongsto cam.tasklist
  *
- * Piles are predefined filters for tasks.
+ * Filters are predefined filters for tasks.
  */
 
 
@@ -15,7 +15,7 @@ define([
   'require',
   'angular',
   'moment',
-  './directives/cam-tasklist-piles',
+  './directives/cam-tasklist-filters',
   './directives/cam-tasklist-tasks',
   'camunda-tasklist-ui/utils',
   'camunda-tasklist-ui/api',
@@ -24,11 +24,11 @@ define([
   require,
   angular,
   moment,
-  camTasklistPiles,
-  camTasklistPileTasks
+  camTasklistFilters,
+  camTasklistFilterTasks
 ) {
 
-  var pileModule = angular.module('cam.tasklist.pile', [
+  var filterModule = angular.module('cam.tasklist.filter', [
     require('camunda-tasklist-ui/utils').name,
     require('camunda-tasklist-ui/api').name,
     'ui.bootstrap',
@@ -37,7 +37,7 @@ define([
   ]);
 
 
-  pileModule.factory('camTasklistPileFilterConversion', [
+  filterModule.factory('camTasklistFilterFilterConversion', [
     '$rootScope',
   function(
     $rootScope
@@ -78,15 +78,15 @@ define([
 
 
 
-  pileModule.controller('pileCreateModalCtrl', [
+  filterModule.controller('filterCreateModalCtrl', [
     '$modalInstance',
     '$scope',
   function(
     $modalInstance,
     $scope
   ) {
-    $scope.createPile = function() {
-      console.info('createPile', arguments);
+    $scope.createFilter = function() {
+      console.info('createFilter', arguments);
     };
 
     $scope.addFilter = function() {
@@ -97,14 +97,14 @@ define([
   }]);
 
 
-  pileModule.controller('pileCreateCtrl', [
+  filterModule.controller('filterCreateCtrl', [
     '$modal',
     '$scope',
   function(
     $modal,
     $scope
   ) {
-    $scope.createPile = function() {
+    $scope.createFilter = function() {
       $modal.open({
         // pass the current scope to the $modalInstance
         scope: $scope,
@@ -113,7 +113,7 @@ define([
 
         template: require('text!./form.html'),
 
-        controller: 'pileCreateModalCtrl'
+        controller: 'filterCreateModalCtrl'
       });
     };
   }]);
@@ -125,9 +125,9 @@ define([
 
 
 
-  pileModule.directive('camTasklistPiles', camTasklistPiles);
+  filterModule.directive('camTasklistFilters', camTasklistFilters);
 
-  pileModule.directive('camTasklistPileTasks', camTasklistPileTasks);
+  filterModule.directive('camTasklistFilterTasks', camTasklistFilterTasks);
 
-  return pileModule;
+  return filterModule;
 });
