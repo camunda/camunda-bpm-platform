@@ -147,7 +147,7 @@
         and PROC_DEF_ID_ = #{parameter.processDefinitionId, jdbcType=VARCHAR}
       </if>
       <if test="parameter.caseInstanceId != null">
-        CASE_INST_ID_ = #{parameter.caseInstanceId, jdbcType=VARCHAR}
+        and CASE_INST_ID_ = #{parameter.caseInstanceId, jdbcType=VARCHAR}
       </if>
       <if test="parameter.caseDefinitionId != null">
         and CASE_DEF_ID_ = #{parameter.caseDefinitionId, jdbcType=VARCHAR}
