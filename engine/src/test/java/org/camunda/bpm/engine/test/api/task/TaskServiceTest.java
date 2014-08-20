@@ -68,6 +68,7 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
     task.setOwner("taskowner");
     Date dueDate = sdf.parse("01/02/2003 04:05:06");
     task.setDueDate(dueDate);
+    task.setCaseInstanceId("taskcaseinstanceid");
     taskService.saveTask(task);
 
     // Fetch the task again and update
@@ -78,6 +79,21 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
     assertEquals("taskowner", task.getOwner());
     assertEquals(dueDate, task.getDueDate());
     assertEquals(0, task.getPriority());
+    assertEquals("taskcaseinstanceid", task.getCaseInstanceId());
+
+    if (processEngineConfiguration.getHistoryLevel()>=ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT) {
+      HistoricTaskInstance historicTaskInstance = historyService
+        .createHistoricTaskInstanceQuery()
+        .taskId(task.getId())
+        .singleResult();
+      assertEquals("taskname", historicTaskInstance.getName());
+      assertEquals("description", historicTaskInstance.getDescription());
+      assertEquals("taskassignee", historicTaskInstance.getAssignee());
+      assertEquals("taskowner", historicTaskInstance.getOwner());
+      assertEquals(dueDate, historicTaskInstance.getDueDate());
+      assertEquals(0, historicTaskInstance.getPriority());
+      assertEquals("taskcaseinstanceid", historicTaskInstance.getCaseInstanceId());
+    }
 
     task.setName("updatedtaskname");
     task.setDescription("updateddescription");
@@ -86,6 +102,7 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
     task.setOwner("updatedowner");
     dueDate = sdf.parse("01/02/2003 04:05:06");
     task.setDueDate(dueDate);
+    task.setCaseInstanceId("updatetaskcaseinstanceid");
     taskService.saveTask(task);
 
     task = taskService.createTaskQuery().taskId(task.getId()).singleResult();
@@ -95,6 +112,7 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
     assertEquals("updatedowner", task.getOwner());
     assertEquals(dueDate, task.getDueDate());
     assertEquals(1, task.getPriority());
+    assertEquals("updatetaskcaseinstanceid", task.getCaseInstanceId());
 
     if (processEngineConfiguration.getHistoryLevel()>=ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT) {
       HistoricTaskInstance historicTaskInstance = historyService
@@ -107,6 +125,7 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
       assertEquals("updatedowner", historicTaskInstance.getOwner());
       assertEquals(dueDate, historicTaskInstance.getDueDate());
       assertEquals(1, historicTaskInstance.getPriority());
+      assertEquals("updatetaskcaseinstanceid", historicTaskInstance.getCaseInstanceId());
     }
 
     // Finally, delete task
@@ -1566,5 +1585,24 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  public void testTaskCaseInstanceId() {
+    Task task = taskService.newTask();
+    task.setCaseInstanceId("aCaseInstanceId");
+    taskService.saveTask(task);
+
+    // Fetch the task again and update
+    task = taskService.createTaskQuery().taskId(task.getId()).singleResult();
+    assertEquals("aCaseInstanceId", task.getCaseInstanceId());
+
+    task.setCaseInstanceId("anotherCaseInstanceId");
+    taskService.saveTask(task);
+
+    task = taskService.createTaskQuery().taskId(task.getId()).singleResult();
+    assertEquals("anotherCaseInstanceId", task.getCaseInstanceId());
+
+    // Finally, delete task
+    taskService.deleteTask(task.getId(), true);
+
+  }
 
 }

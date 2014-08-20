@@ -153,6 +153,10 @@ public class TaskDto {
     return caseInstanceId;
   }
 
+  public void setCaseInstanceId(String caseInstanceId) {
+    this.caseInstanceId = caseInstanceId;
+  }
+
   public boolean isSuspended() {
     return suspended;
   }
@@ -203,6 +207,7 @@ public class TaskDto {
     task.setDueDate(getDue());
     task.setFollowUpDate(getFollowUp());
     task.setParentTaskId(getParentTaskId());
+    task.setCaseInstanceId(getCaseInstanceId());
   }
 
 }

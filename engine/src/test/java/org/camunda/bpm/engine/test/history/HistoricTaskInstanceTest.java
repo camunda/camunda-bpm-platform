@@ -821,4 +821,31 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTestCase {
     assertNull(query.singleResult());
 
   }
+
+  public void testHistoricTaskInstanceCaseInstanceId() {
+    Task task = taskService.newTask();
+    task.setCaseInstanceId("aCaseInstanceId");
+    taskService.saveTask(task);
+
+    HistoricTaskInstance hti = historyService
+        .createHistoricTaskInstanceQuery()
+        .taskId(task.getId())
+        .singleResult();
+
+    assertEquals("aCaseInstanceId", hti.getCaseInstanceId());
+
+    task.setCaseInstanceId("anotherCaseInstanceId");
+    taskService.saveTask(task);
+
+    hti = historyService
+        .createHistoricTaskInstanceQuery()
+        .taskId(task.getId())
+        .singleResult();
+
+    assertEquals("anotherCaseInstanceId", hti.getCaseInstanceId());
+
+    // Finally, delete task
+    taskService.deleteTask(task.getId(), true);
+
+  }
 }

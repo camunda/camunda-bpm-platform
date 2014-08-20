@@ -13,13 +13,26 @@
 package org.camunda.bpm.engine.impl.persistence.entity;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.ProcessEngineServices;
 import org.camunda.bpm.engine.SuspendedEntityInteractionException;
-import org.camunda.bpm.engine.delegate.*;
+import org.camunda.bpm.engine.delegate.DelegateCaseExecution;
+import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.camunda.bpm.engine.delegate.DelegateTask;
+import org.camunda.bpm.engine.delegate.Expression;
+import org.camunda.bpm.engine.delegate.TaskListener;
+import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
 import org.camunda.bpm.engine.impl.context.Context;
@@ -121,6 +134,7 @@ public class TaskEntity extends CoreVariableScope implements Task, DelegateTask,
   public static final String OWNER = "owner";
   public static final String PARENT_TASK = "parentTask";
   public static final String PRIORITY = "priority";
+  public static final String CASE_INSTANCE_ID = "caseInstanceId";
 
   public TaskEntity() {
     this(null);
@@ -155,13 +169,11 @@ public class TaskEntity extends CoreVariableScope implements Task, DelegateTask,
   }
 
   public void update() {
-    setAssignee(this.getAssignee());
+    registerCommandContextCloseListener();
 
     CommandContext commandContext = Context.getCommandContext();
     DbEntityManager dbEntityManger = commandContext.getDbEntityManger();
     dbEntityManger.merge(this);
-
-    commandContext.registerCommandContextListener(this);
   }
 
   /** new task.  Embedded state and create time will be initialized.
@@ -270,6 +282,9 @@ public class TaskEntity extends CoreVariableScope implements Task, DelegateTask,
     }
     if (caseExecutionId != null) {
       persistentState.put("caseExecutionId", this.caseExecutionId);
+    }
+    if (caseInstanceId != null) {
+      persistentState.put("caseInstanceId", this.caseInstanceId);
     }
     if (caseDefinitionId != null) {
       persistentState.put("caseDefinitionId", this.caseDefinitionId);
@@ -464,6 +479,13 @@ public class TaskEntity extends CoreVariableScope implements Task, DelegateTask,
   }
 
   public void setCaseInstanceId(String caseInstanceId) {
+    registerCommandContextCloseListener();
+    propertyChanged(CASE_INSTANCE_ID, this.caseInstanceId, caseInstanceId);
+    this.caseInstanceId = caseInstanceId;
+  }
+
+  /* plain setter for persistence */
+  public void setCaseInstanceIdWithoutCascade(String caseInstanceId) {
     this.caseInstanceId = caseInstanceId;
   }
 
@@ -624,9 +646,7 @@ public class TaskEntity extends CoreVariableScope implements Task, DelegateTask,
     if (assignee==null && this.assignee==null) {
       return;
     }
-//    if (assignee!=null && assignee.equals(this.assignee)) {
-//      return;
-//    }
+
     propertyChanged(ASSIGNEE, this.assignee, assignee);
     this.assignee = assignee;
 
@@ -650,9 +670,7 @@ public class TaskEntity extends CoreVariableScope implements Task, DelegateTask,
     if (owner==null && this.owner==null) {
       return;
     }
-//    if (owner!=null && owner.equals(this.owner)) {
-//      return;
-//    }
+
     propertyChanged(OWNER, this.owner, owner);
     this.owner = owner;
 

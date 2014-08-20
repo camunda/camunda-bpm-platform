@@ -270,6 +270,9 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
       .body("processInstanceId", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID))
       .body("taskDefinitionKey", equalTo(MockProvider.EXAMPLE_TASK_DEFINITION_KEY))
       .body("suspended", equalTo(MockProvider.EXAMPLE_TASK_SUSPENSION_STATE))
+      .body("caseExecutionId", equalTo(MockProvider.EXAMPLE_CASE_EXECUTION_ID))
+      .body("caseInstanceId", equalTo(MockProvider.EXAMPLE_CASE_INSTANCE_ID))
+      .body("caseDefinitionId", equalTo(MockProvider.EXAMPLE_CASE_DEFINITION_ID))
       .when().get(SINGLE_TASK_URL);
   }
 
@@ -312,6 +315,9 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
       .body("processInstanceId", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID))
       .body("taskDefinitionKey", equalTo(MockProvider.EXAMPLE_TASK_DEFINITION_KEY))
       .body("suspended", equalTo(MockProvider.EXAMPLE_TASK_SUSPENSION_STATE))
+      .body("caseExecutionId", equalTo(MockProvider.EXAMPLE_CASE_EXECUTION_ID))
+      .body("caseInstanceId", equalTo(MockProvider.EXAMPLE_CASE_INSTANCE_ID))
+      .body("caseDefinitionId", equalTo(MockProvider.EXAMPLE_CASE_DEFINITION_ID))
 
       // links
       .body("_links.assignee.href", endsWith(EXAMPLE_TASK_ASSIGNEE_NAME))
@@ -2431,6 +2437,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     json.put("due", "2014-01-01T00:00:00");
     json.put("followUp", "2014-01-01T00:00:00");
     json.put("parentTaskId", "aParentTaskId");
+    json.put("caseInstanceId", "aCaseInstanceId");
 
     Task newTask = mock(Task.class);
     when(taskServiceMock.newTask(anyString())).thenReturn(newTask);
@@ -2453,6 +2460,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     verify(newTask).setDueDate(any(Date.class));
     verify(newTask).setFollowUpDate(any(Date.class));
     verify(newTask).setParentTaskId((String) json.get("parentTaskId"));
+    verify(newTask).setCaseInstanceId((String) json.get("caseInstanceId"));
     verify(taskServiceMock).saveTask(newTask);
   }
 
@@ -2488,6 +2496,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     verify(newTask).setDueDate(any(Date.class));
     verify(newTask).setFollowUpDate(null);
     verify(newTask).setParentTaskId((String) json.get("parentTaskId"));
+    verify(newTask).setCaseInstanceId(null);
     verify(taskServiceMock).saveTask(newTask);
   }
 
@@ -2592,6 +2601,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     json.put("due", "2014-01-01T00:00:00");
     json.put("followUp", "2014-01-01T00:00:00");
     json.put("parentTaskId", "aParentTaskId");
+    json.put("caseInstanceId", "aCaseInstanceId");
 
     given()
         .pathParam("id", EXAMPLE_TASK_ID)
@@ -2611,6 +2621,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     verify(mockTask).setDueDate(any(Date.class));
     verify(mockTask).setFollowUpDate(any(Date.class));
     verify(mockTask).setParentTaskId((String) json.get("parentTaskId"));
+    verify(mockTask).setCaseInstanceId((String) json.get("caseInstanceId"));
     verify(taskServiceMock).saveTask(mockTask);
   }
 
@@ -2643,6 +2654,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     verify(mockTask).setDueDate(any(Date.class));
     verify(mockTask).setFollowUpDate(null);
     verify(mockTask).setParentTaskId((String) json.get("parentTaskId"));
+    verify(mockTask).setCaseInstanceId(null);
     verify(taskServiceMock).saveTask(mockTask);
   }
 

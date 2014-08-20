@@ -12,8 +12,18 @@
  */
 package org.camunda.bpm.engine.test.history;
 
-import static org.camunda.bpm.engine.history.UserOperationLogEntry.*;
-import static org.camunda.bpm.engine.impl.persistence.entity.TaskEntity.*;
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_ASSIGN;
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_CLAIM;
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_COMPLETE;
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_DELEGATE;
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_RESOLVE;
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_SET_OWNER;
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_SET_PRIORITY;
+import static org.camunda.bpm.engine.impl.persistence.entity.TaskEntity.ASSIGNEE;
+import static org.camunda.bpm.engine.impl.persistence.entity.TaskEntity.DELEGATION;
+import static org.camunda.bpm.engine.impl.persistence.entity.TaskEntity.DELETE;
+import static org.camunda.bpm.engine.impl.persistence.entity.TaskEntity.OWNER;
+import static org.camunda.bpm.engine.impl.persistence.entity.TaskEntity.PRIORITY;
 
 import java.util.HashMap;
 
@@ -216,6 +226,52 @@ public class OperationLogTaskProcessTest extends PluggableProcessEngineTestCase 
     assertEquals(null, query.property("assignee").singleResult().getNewValue());
 
     completeTestProcess();
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testCompleteCaseExecution() {
+    // given
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    String caseInstanceId = caseService
+        .withCaseDefinition(caseDefinitionId)
+        .create()
+        .getId();
+
+    String humanTaskId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(humanTaskId)
+      .manualStart();
+
+    // when
+    caseService
+      .withCaseExecution(humanTaskId)
+      .complete();
+
+    // then
+    UserOperationLogQuery query = queryOperationDetails(OPERATION_TYPE_COMPLETE);
+
+    assertEquals(1, query.count());
+
+    UserOperationLogEntry entry = query.singleResult();
+    assertNotNull(entry);
+
+    assertEquals(caseDefinitionId, entry.getCaseDefinitionId());
+    assertEquals(caseInstanceId, entry.getCaseInstanceId());
+    assertEquals(humanTaskId, entry.getCaseExecutionId());
+
+    assertFalse(Boolean.valueOf(entry.getOrgValue()));
+    assertTrue(Boolean.valueOf(entry.getNewValue()));
+    assertEquals(DELETE, entry.getProperty());
+
   }
 
   private void startTestProcess() {

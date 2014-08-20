@@ -12,6 +12,26 @@
  */
 package org.camunda.bpm.engine.test.history;
 
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.ENTITY_TYPE_TASK;
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_CREATE;
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_DELETE;
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_UPDATE;
+import static org.camunda.bpm.engine.impl.persistence.entity.TaskEntity.ASSIGNEE;
+import static org.camunda.bpm.engine.impl.persistence.entity.TaskEntity.CASE_INSTANCE_ID;
+import static org.camunda.bpm.engine.impl.persistence.entity.TaskEntity.DELEGATION;
+import static org.camunda.bpm.engine.impl.persistence.entity.TaskEntity.DELETE;
+import static org.camunda.bpm.engine.impl.persistence.entity.TaskEntity.DESCRIPTION;
+import static org.camunda.bpm.engine.impl.persistence.entity.TaskEntity.DUE_DATE;
+import static org.camunda.bpm.engine.impl.persistence.entity.TaskEntity.FOLLOW_UP_DATE;
+import static org.camunda.bpm.engine.impl.persistence.entity.TaskEntity.NAME;
+import static org.camunda.bpm.engine.impl.persistence.entity.TaskEntity.OWNER;
+import static org.camunda.bpm.engine.impl.persistence.entity.TaskEntity.PARENT_TASK;
+import static org.camunda.bpm.engine.impl.persistence.entity.TaskEntity.PRIORITY;
+
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.history.UserOperationLogQuery;
 import org.camunda.bpm.engine.impl.interceptor.Command;
@@ -22,13 +42,6 @@ import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.task.DelegationState;
 import org.camunda.bpm.engine.task.Task;
-
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
-import static org.camunda.bpm.engine.history.UserOperationLogEntry.*;
-import static org.camunda.bpm.engine.impl.persistence.entity.TaskEntity.*;
 
 /**
  * @author Danny Gräf
@@ -256,6 +269,49 @@ public class OperationLogTaskServiceAndBeanTest extends PluggableProcessEngineTe
 
     taskService.deleteTask(task.getId());
     cleanupHistory();
+  }
+
+  public void testCaseInstanceId() {
+    // create new task
+    task = taskService.newTask();
+    taskService.saveTask(task);
+
+    UserOperationLogQuery query = queryOperationDetails(OPERATION_TYPE_UPDATE);
+    assertEquals(0, query.count());
+
+    // set case instance id and save task
+    task.setCaseInstanceId("aCaseInstanceId");
+    taskService.saveTask(task);
+
+    assertEquals(1, query.count());
+
+    UserOperationLogEntry entry = query.singleResult();
+    assertNotNull(entry);
+
+    assertNull(entry.getOrgValue());
+    assertEquals("aCaseInstanceId", entry.getNewValue());
+    assertEquals(CASE_INSTANCE_ID, entry.getProperty());
+
+    // change case instance id and save task
+    task.setCaseInstanceId("anotherCaseInstanceId");
+    taskService.saveTask(task);
+
+    assertEquals(2, query.count());
+
+    List<UserOperationLogEntry> entries = query.list();
+    assertEquals(2, entries.size());
+
+    for (UserOperationLogEntry currentEntry : entries) {
+      if (!currentEntry.getId().equals(entry.getId())) {
+        assertEquals("aCaseInstanceId", currentEntry.getOrgValue());
+        assertEquals("anotherCaseInstanceId", currentEntry.getNewValue());
+        assertEquals(CASE_INSTANCE_ID, currentEntry.getProperty());
+      }
+    }
+
+    taskService.deleteTask(task.getId());
+    cleanupHistory();
+
   }
 
   private UserOperationLogQuery queryOperationDetails(String type) {

@@ -82,7 +82,8 @@
       TASK_DEF_KEY_ = #{taskDefinitionKey ,jdbcType=VARCHAR},
       PRIORITY_ = #{priority, jdbcType=INTEGER},
       DUE_DATE_ = #{dueDate, jdbcType=TIMESTAMP},
-      FOLLOW_UP_DATE_ = #{followUpDate, jdbcType=TIMESTAMP}
+      FOLLOW_UP_DATE_ = #{followUpDate, jdbcType=TIMESTAMP},
+      CASE_INST_ID_ = #{caseInstanceId, jdbcType=VARCHAR}
       <if test="endTime!=null">
         , END_TIME_ = #{endTime, jdbcType=TIMESTAMP}
         , DURATION_ = #{durationInMillis, jdbcType=BIGINT}
