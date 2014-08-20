@@ -36,11 +36,7 @@ define([
     }
 
     return {
-      // scope: {
-      //   task: '='
-      // },
       link: function(scope) {
-
         // function delegated(err) {
         //   if (err) {
         //     return errorNotification('DELEGATE_ERROR', err);
@@ -56,6 +52,7 @@ define([
           }
 
           successNotification('ASSIGNED_OK');
+          $rootScope.$broadcast('tasklist.task.assign');
         }
 
 
@@ -67,6 +64,7 @@ define([
           scope.task.assignee = $rootScope.authentication.name;
 
           successNotification('CLAIM_OK');
+          $rootScope.$broadcast('tasklist.task.claim');
         }
 
 
@@ -78,6 +76,7 @@ define([
           scope.task.assignee = null;
 
           successNotification('UNCLAIM_OK');
+          $rootScope.$broadcast('tasklist.task.unclaim');
         }
 
 

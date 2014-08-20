@@ -4,16 +4,18 @@ define([
   'use strict';
 
   return [
-    '$modal',
     '$rootScope',
     '$location',
     'camUID',
+    'camAPI',
   function(
-    $modal,
     $rootScope,
     $location,
-    camUID
+    camUID,
+    camAPI
   ) {
+    var Task = camAPI.resource('task');
+
     $rootScope.batchActions = {};
     $rootScope.batchActions.selected = [];
 
@@ -28,12 +30,40 @@ define([
         element.find('.nav li').eq(0).addClass('active');
         element.find('.tab-pane').eq(0).addClass('active');
 
-        scope.$on('tasklist.task.current', function() {
-          if (scope.task && $rootScope.currentTask && scope.task.id === $rootScope.currentTask.id) {
-            return;
+        function loadTask(taskId) {
+          // wait for #CAM-2596
+          Task.get(taskId, function(err, task) {
+            if (err) { throw err; }
+            scope.task = $rootScope.currentTask = task;
+          });
+        }
+
+        function setTask(event) {
+          var urlTaskId = $location.search().task;
+
+          if ($rootScope.currentTask) {
+            if (urlTaskId && urlTaskId === $rootScope.currentTask.id) {
+              scope.task = $rootScope.currentTask;
+            }
+            else {
+              loadTask(urlTaskId);
+            }
           }
-          scope.task = $rootScope.currentTask;
-        });
+          else if(urlTaskId) {
+            loadTask(urlTaskId);
+          }
+          else {
+            // should we load the next task?
+            // that would happen here
+            scope.task = null;
+          }
+        }
+
+        scope.$on('tasklist.task.current', setTask);
+
+        $rootScope.$on('$locationChangeSuccess', setTask);
+
+        setTask();
       }
     };
   }];

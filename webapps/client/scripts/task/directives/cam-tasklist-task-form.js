@@ -4,17 +4,19 @@ define([
   'use strict';
 
   return [
+    '$rootScope',
     'camAPI',
     'CamForm',
     '$translate',
     'Notifications',
   function(
+    $rootScope,
     camAPI,
     CamForm,
     $translate,
     Notifications
   ) {
-    // var Task = camAPI.resource('task');
+    var Task = camAPI.resource('task');
 
 
     function errorNotification(src, err) {
@@ -36,28 +38,40 @@ define([
     }
 
     return {
-      // scope: {
-      //   task: '='
-      // },
+      scope: {
+        task: '='
+      },
       link: function(scope, element) {
         var container = element.find('.form-container');
+
         scope.currentTaskId = null;
         scope._camForm = null;
 
+        function submitCb(err) {
+          if (err) {
+            return errorNotification('COMPLETE_ERROR', err);
+          }
+
+          scope.currentTaskId = null;
+          scope._camForm = null;
+          container.html('');
+
+          $rootScope.$broadcast('tasklist.task.complete');
+
+          successNotification('COMPLETE_OK');
+        }
+
         scope.completeTask = function() {
-          scope._camForm.submit(function(err) {
-            if (err) {
-              return errorNotification('COMPLETE_ERROR', err);
-            }
-
-            scope.currentTaskId = null;
-            scope._camForm = null;
-            container.html('');
-
-            scope.$emit('tasklist.task.complete');
-
-            successNotification('COMPLETE_OK');
-          });
+          if (scope._camForm) {
+            scope._camForm.submit(submitCb);
+          }
+          else {
+            var variables = {};
+            Task.submitForm({
+              id: scope.currentTaskId,
+              variables: variables
+            }, submitCb);
+          }
         };
 
         function loadForm() {
@@ -93,11 +107,11 @@ define([
           }
         }
 
-        scope.$watch('task', function() {
+        scope.$watch('task', function(newValue, oldValue) {
           if (!scope.task) {
             scope.currentTaskId = null;
           }
-          else if (scope.currentTaskId !== scope.task.id) {
+          else if (newValue.id !== oldValue.id) {
             scope.currentTaskId = scope.task.id;
 
             loadForm();
