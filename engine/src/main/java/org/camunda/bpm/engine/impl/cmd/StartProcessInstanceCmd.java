@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 import java.io.Serializable;
 import java.util.Map;
 
@@ -23,8 +25,6 @@ import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
-
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 
 /**
@@ -38,11 +38,13 @@ public class StartProcessInstanceCmd implements Command<ProcessInstance>, Serial
   protected String processDefinitionId;
   protected Map<String, Object> variables;
   protected String businessKey;
+  protected String caseInstanceId;
 
-  public StartProcessInstanceCmd(String processDefinitionKey, String processDefinitionId, String businessKey, Map<String, Object> variables) {
+  public StartProcessInstanceCmd(String processDefinitionKey, String processDefinitionId, String businessKey, String caseInstanceId, Map<String, Object> variables) {
     this.processDefinitionKey = processDefinitionKey;
     this.processDefinitionId = processDefinitionId;
     this.businessKey = businessKey;
+    this.caseInstanceId = caseInstanceId;
     this.variables = variables;
   }
 
@@ -64,7 +66,7 @@ public class StartProcessInstanceCmd implements Command<ProcessInstance>, Serial
     }
 
     // Start the process instance
-    ExecutionEntity processInstance = processDefinition.createProcessInstance(businessKey);
+    ExecutionEntity processInstance = processDefinition.createProcessInstance(businessKey, caseInstanceId);
     processInstance.start(variables);
     return processInstance;
   }

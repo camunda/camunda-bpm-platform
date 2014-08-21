@@ -19,6 +19,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -90,11 +91,9 @@ public class ProcessDefinitionResourceImpl implements ProcessDefinitionResource 
     try {
       Map<String, Object> variables = DtoUtil.toMap(parameters.getVariables());
       String businessKey = parameters.getBusinessKey();
-      if (businessKey != null) {
-        instance = runtimeService.startProcessInstanceById(processDefinitionId, businessKey, variables);
-      } else {
-        instance = runtimeService.startProcessInstanceById(processDefinitionId, variables);
-      }
+      String caseInstanceId = parameters.getCaseInstanceId();
+
+      instance = runtimeService.startProcessInstanceById(processDefinitionId, businessKey, caseInstanceId, variables);
 
     } catch (ProcessEngineException e) {
       String errorMessage = String.format("Cannot instantiate process definition %s: %s", processDefinitionId, e.getMessage());

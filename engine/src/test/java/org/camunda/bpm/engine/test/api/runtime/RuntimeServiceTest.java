@@ -1013,5 +1013,81 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
     assertEquals(IntegerType.TYPE_NAME, variableInstance.getTypeName());
   }
 
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
+  public void testStartByKeyWithCaseInstanceId() {
+    String caseInstanceId = "aCaseInstanceId";
+
+    ProcessInstance firstInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", null, caseInstanceId);
+
+    assertEquals(caseInstanceId, firstInstance.getCaseInstanceId());
+
+    // load process instance from db
+    firstInstance = runtimeService
+        .createProcessInstanceQuery()
+        .processInstanceId(firstInstance.getId())
+        .singleResult();
+
+    assertNotNull(firstInstance);
+
+    assertEquals(caseInstanceId, firstInstance.getCaseInstanceId());
+
+    // the second possibility to start a process instance /////////////////////////////////////////////
+
+    ProcessInstance secondInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", null, caseInstanceId, null);
+
+    assertEquals(caseInstanceId, secondInstance.getCaseInstanceId());
+
+    // load process instance from db
+    secondInstance = runtimeService
+        .createProcessInstanceQuery()
+        .processInstanceId(secondInstance.getId())
+        .singleResult();
+
+    assertNotNull(secondInstance);
+
+    assertEquals(caseInstanceId, secondInstance.getCaseInstanceId());
+
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
+  public void testStartByIdWithCaseInstanceId() {
+    String processDefinitionId = repositoryService
+        .createProcessDefinitionQuery()
+        .processDefinitionKey("oneTaskProcess")
+        .singleResult()
+        .getId();
+
+    String caseInstanceId = "aCaseInstanceId";
+    ProcessInstance firstInstance = runtimeService.startProcessInstanceById(processDefinitionId, null, caseInstanceId);
+
+    assertEquals(caseInstanceId, firstInstance.getCaseInstanceId());
+
+    // load process instance from db
+    firstInstance = runtimeService
+        .createProcessInstanceQuery()
+        .processInstanceId(firstInstance.getId())
+        .singleResult();
+
+    assertNotNull(firstInstance);
+
+    assertEquals(caseInstanceId, firstInstance.getCaseInstanceId());
+
+    // the second possibility to start a process instance /////////////////////////////////////////////
+
+    ProcessInstance secondInstance = runtimeService.startProcessInstanceById(processDefinitionId, null, caseInstanceId, null);
+
+    assertEquals(caseInstanceId, secondInstance.getCaseInstanceId());
+
+    // load process instance from db
+    secondInstance = runtimeService
+        .createProcessInstanceQuery()
+        .processInstanceId(secondInstance.getId())
+        .singleResult();
+
+    assertNotNull(secondInstance);
+
+    assertEquals(caseInstanceId, secondInstance.getCaseInstanceId());
+
+  }
 
 }

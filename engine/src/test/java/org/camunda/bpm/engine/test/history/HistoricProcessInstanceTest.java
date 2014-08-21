@@ -586,4 +586,69 @@ public class HistoricProcessInstanceTest extends PluggableProcessEngineTestCase 
     assertEquals("theSubStart", hpi.getStartActivityId());
 
   }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
+  public void testStartByKeyWithCaseInstanceId() {
+    String caseInstanceId = "aCaseInstanceId";
+
+    String processInstanceId = runtimeService.startProcessInstanceByKey("oneTaskProcess", null, caseInstanceId).getId();
+
+    HistoricProcessInstance firstInstance = historyService
+        .createHistoricProcessInstanceQuery()
+        .processInstanceId(processInstanceId)
+        .singleResult();
+
+    assertNotNull(firstInstance);
+
+    assertEquals(caseInstanceId, firstInstance.getCaseInstanceId());
+
+    // the second possibility to start a process instance /////////////////////////////////////////////
+
+    processInstanceId = runtimeService.startProcessInstanceByKey("oneTaskProcess", null, caseInstanceId, null).getId();
+
+    HistoricProcessInstance secondInstance = historyService
+        .createHistoricProcessInstanceQuery()
+        .processInstanceId(processInstanceId)
+        .singleResult();
+
+    assertNotNull(secondInstance);
+
+    assertEquals(caseInstanceId, secondInstance.getCaseInstanceId());
+
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
+  public void testStartByIdWithCaseInstanceId() {
+    String processDefinitionId = repositoryService
+        .createProcessDefinitionQuery()
+        .processDefinitionKey("oneTaskProcess")
+        .singleResult()
+        .getId();
+
+    String caseInstanceId = "aCaseInstanceId";
+    String processInstanceId = runtimeService.startProcessInstanceById(processDefinitionId, null, caseInstanceId).getId();
+
+    HistoricProcessInstance firstInstance = historyService
+        .createHistoricProcessInstanceQuery()
+        .processInstanceId(processInstanceId)
+        .singleResult();
+
+    assertNotNull(firstInstance);
+
+    assertEquals(caseInstanceId, firstInstance.getCaseInstanceId());
+
+    // the second possibility to start a process instance /////////////////////////////////////////////
+
+    processInstanceId = runtimeService.startProcessInstanceById(processDefinitionId, null, caseInstanceId, null).getId();
+
+    HistoricProcessInstance secondInstance = historyService
+        .createHistoricProcessInstanceQuery()
+        .processInstanceId(processInstanceId)
+        .singleResult();
+
+    assertNotNull(secondInstance);
+
+    assertEquals(caseInstanceId, secondInstance.getCaseInstanceId());
+
+  }
 }
