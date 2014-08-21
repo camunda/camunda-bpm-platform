@@ -20,6 +20,7 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.util.List;
 
+import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
 import org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnActivityExecution;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
@@ -123,7 +124,7 @@ public class StageActivityBehavior extends StageOrTaskActivityBehavior implement
         }
       }
 
-    } else { /* autoComplete == false && manualCompletion == true */
+    } else { /* autoComplete == false && manualCompletion == false */
       // ensure that ALL children are DISABLED
       // NOTE: All COMPLETED and TERMINATED children are not
       // available in the case execution tree.
@@ -151,6 +152,12 @@ public class StageActivityBehavior extends StageOrTaskActivityBehavior implement
 
   public void childStateChanged(CmmnExecution execution, CmmnExecution child) {
     if (child.isDisabled() || child.isCompleted() || child.isTerminated()) {
+
+      if (execution instanceof CaseExecutionEntity) {
+        CaseExecutionEntity entity = (CaseExecutionEntity) execution;
+        entity.forceUpdate();
+      }
+
       if (canComplete(execution, false, false)) {
         execution.complete();
       }
