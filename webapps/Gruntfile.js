@@ -86,6 +86,28 @@ module.exports = function(grunt) {
   }
 
   grunt.initConfig({
+    copy: {
+      develop: {
+        files: [
+          {
+            expand: true,
+            cwd: 'webapp/src/main/webapp/',
+            src: ['**/*.html'],
+            dest: 'webapp/target/camunda-webapp/'
+          }
+        ]
+      }
+    },
+
+    watch: {
+      develop: {
+        files: 'webapp/src/main/webapp/**/*.html',
+        tasks: [
+          'copy:develop'
+        ]
+      }
+    },
+
     parallel: {
       clone: {
         options: {
@@ -159,7 +181,12 @@ module.exports = function(grunt) {
           // autoBuild('camunda-commons-ui', verbose, stack),
           autoBuild('camunda-admin-ui', verbose, stack),
           autoBuild('camunda-cockpit-ui', verbose, stack),
-          autoBuild('camunda-tasklist-ui', verbose, stack)
+          autoBuild('camunda-tasklist-ui', verbose, stack),
+          {
+            opts: {},
+            cmd: 'grunt',
+            args: ['watch:develop']
+          }
         ]
       }
     }
