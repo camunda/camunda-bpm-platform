@@ -37,7 +37,7 @@ public abstract class XmlDomMapJavaToXmlScriptTest extends ScriptTest{
     script.execute();
     String xml = script.getVariable("xml");
 
-    assertThat(xml).isEqualTo(EXAMPLE_VALIDATION_XML);
+    assertThat(replaceLineBreaks(xml)).isEqualTo(replaceLineBreaks(EXAMPLE_VALIDATION_XML));
   }
 
   @Test
@@ -56,7 +56,7 @@ public abstract class XmlDomMapJavaToXmlScriptTest extends ScriptTest{
     script.execute();
     String xml = script.getVariable("xml");
 
-    assertThat(xml).isEqualTo(EXAMPLE_VALIDATION_XML);
+    assertThat(replaceLineBreaks(xml)).isEqualTo(replaceLineBreaks(EXAMPLE_VALIDATION_XML));
   }
 
   @Test(expected = SpinXmlDataFormatException.class)

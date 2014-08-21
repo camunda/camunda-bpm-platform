@@ -31,7 +31,7 @@ public class XmlDomMapJavaToXmlTest {
   @Test
   public void shouldMapJavaToXml() {
     Order order = createExampleOrder();
-    assertThat(XML(order).toString()).isEqualTo(EXAMPLE_VALIDATION_XML);
+    assertThat(replaceLineBreaks(XML(order).toString())).isEqualTo(replaceLineBreaks(EXAMPLE_VALIDATION_XML));
   }
 
   @Test
@@ -45,7 +45,7 @@ public class XmlDomMapJavaToXmlTest {
       .done();
 
     String xml = XML(createExampleOrder(), dataFormat).toString();
-    assertThat(xml).isEqualTo(EXAMPLE_VALIDATION_XML);
+    assertThat(replaceLineBreaks(xml)).isEqualTo(replaceLineBreaks(EXAMPLE_VALIDATION_XML));
   }
 
   @Test
