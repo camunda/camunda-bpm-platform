@@ -30,7 +30,7 @@ public class MapValueProvider implements ParameterValueProvider {
     this.providerMap = providerMap;
   }
 
-  public Object getValue(CoreVariableScope variableScope) {
+  public Object getValue(CoreVariableScope<?> variableScope) {
     Map<String, Object> valueMap = new TreeMap<String, Object>();
     for (Entry<String, ParameterValueProvider> entry : providerMap.entrySet()) {
       valueMap.put(entry.getKey(), entry.getValue().getValue(variableScope));

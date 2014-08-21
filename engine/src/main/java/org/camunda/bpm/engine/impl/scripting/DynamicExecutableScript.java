@@ -34,12 +34,12 @@ public abstract class DynamicExecutableScript extends ExecutableScript {
     this.scriptExpression = scriptExpression;
   }
 
-  public Object execute(ScriptEngine scriptEngine, VariableScope variableScope, Bindings bindings) {
+  public Object execute(ScriptEngine scriptEngine, VariableScope<?> variableScope, Bindings bindings) {
     ExecutableScript script = getScript(variableScope);
     return script.execute(scriptEngine, variableScope, bindings);
   }
 
-  public abstract ExecutableScript getScript(VariableScope variableScope);
+  public abstract ExecutableScript getScript(VariableScope<?> variableScope);
 
   protected ExecutableScript compileScript(String scriptSource) {
     return Context.getProcessEngineConfiguration()

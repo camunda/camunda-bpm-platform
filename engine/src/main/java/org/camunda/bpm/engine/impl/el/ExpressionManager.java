@@ -80,29 +80,29 @@ public class ExpressionManager {
     this.expressionFactory = expressionFactory;
   }
 
-  public ELContext getElContext(VariableScope variableScope) {
+  public ELContext getElContext(VariableScope<?> variableScope) {
     ELContext elContext = null;
     if (variableScope instanceof CoreVariableScope) {
-      CoreVariableScope variableScopeImpl = (CoreVariableScope) variableScope;
+      CoreVariableScope<?> variableScopeImpl = (CoreVariableScope<?>) variableScope;
       elContext = variableScopeImpl.getCachedElContext();
     }
 
     if (elContext==null) {
       elContext = createElContext(variableScope);
       if (variableScope instanceof CoreVariableScope) {
-        ((CoreVariableScope)variableScope).setCachedElContext(elContext);
+        ((CoreVariableScope<?>)variableScope).setCachedElContext(elContext);
       }
     }
 
     return elContext;
   }
 
-  protected ProcessEngineElContext createElContext(VariableScope variableScope) {
+  protected ProcessEngineElContext createElContext(VariableScope<?> variableScope) {
     ELResolver elResolver = createElResolver(variableScope);
     return new ProcessEngineElContext(functionMappers, elResolver);
   }
 
-  protected ELResolver createElResolver(VariableScope variableScope) {
+  protected ELResolver createElResolver(VariableScope<?> variableScope) {
     CompositeELResolver elResolver = new CompositeELResolver();
     elResolver.add(new VariableScopeElResolver(variableScope));
 

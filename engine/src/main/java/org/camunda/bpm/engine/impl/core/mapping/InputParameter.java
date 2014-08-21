@@ -38,7 +38,7 @@ public class InputParameter extends IoParameter {
     super(name, valueProvider);
   }
 
-  protected void execute(CoreVariableScope innerScope, CoreVariableScope outerScope) {
+  protected void execute(CoreVariableScope<?> innerScope, CoreVariableScope<?> outerScope) {
 
     // get value from outer scope
     Object value = valueProvider.getValue(outerScope);

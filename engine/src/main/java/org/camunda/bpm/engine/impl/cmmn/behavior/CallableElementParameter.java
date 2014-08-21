@@ -28,7 +28,7 @@ public class CallableElementParameter {
 
   // source ////////////////////////////////////////////////////////
 
-  public Object getSource(CoreVariableScope variableScope) {
+  public Object getSource(CoreVariableScope<?> variableScope) {
     if (sourceValueProvider instanceof ConstantValueProvider) {
       String variableName = (String) sourceValueProvider.getValue(variableScope);
       return variableScope.getVariable(variableName);

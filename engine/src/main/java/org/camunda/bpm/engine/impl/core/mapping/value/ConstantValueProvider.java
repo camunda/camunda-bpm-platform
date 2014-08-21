@@ -28,7 +28,7 @@ public class ConstantValueProvider implements ParameterValueProvider {
     this.value = value;
   }
 
-  public Object getValue(CoreVariableScope scope) {
+  public Object getValue(CoreVariableScope<?> scope) {
     return value;
   }
 

@@ -20,7 +20,7 @@ import org.camunda.bpm.engine.impl.core.variable.CoreVariableScope;
  */
 public class NullValueProvider implements ParameterValueProvider {
 
-  public Object getValue(CoreVariableScope variableScope) {
+  public Object getValue(CoreVariableScope<?> variableScope) {
     return null;
   }
 

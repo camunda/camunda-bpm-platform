@@ -48,8 +48,8 @@ public abstract class ProcessOrCaseTaskActivityBehavior extends TaskActivityBeha
 
   }
 
-  public void transferVariables(VariableScope from, VariableScope to) {
-    CoreVariableScope fromVariableScope = (CoreVariableScope) from;
+  public void transferVariables(VariableScope<?> from, VariableScope<?> to) {
+    CoreVariableScope<?> fromVariableScope = (CoreVariableScope<?>) from;
 
     List<CallableElementParameter> outputs = callableElement.getOutputs();
     Map<String, Object> variables = getVariables(outputs, fromVariableScope);
@@ -57,7 +57,7 @@ public abstract class ProcessOrCaseTaskActivityBehavior extends TaskActivityBeha
     to.setVariables(variables);
   }
 
-  protected Map<String, Object> getVariables(List<CallableElementParameter> params, CoreVariableScope variableScope) {
+  protected Map<String, Object> getVariables(List<CallableElementParameter> params, CoreVariableScope<?> variableScope) {
     Map<String, Object> result = new HashMap<String, Object>();
 
     for (CallableElementParameter param : params) {

@@ -39,7 +39,7 @@ public class SourceExecutableScript extends ExecutableScript {
     scriptSrc = src;
   }
 
-  public Object execute(ScriptEngine engine, VariableScope variableScope, Bindings bindings) {
+  public Object execute(ScriptEngine engine, VariableScope<?> variableScope, Bindings bindings) {
     try {
       LOG.fine("Evaluating un-compiled script using " + language + " script engine ");
       return engine.eval(scriptSrc, bindings);

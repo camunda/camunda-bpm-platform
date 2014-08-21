@@ -31,7 +31,7 @@ public class ScriptValueProvider implements ParameterValueProvider {
     this.script = script;
   }
 
-  public Object getValue(CoreVariableScope variableScope) {
+  public Object getValue(CoreVariableScope<?> variableScope) {
     return Context.getProcessEngineConfiguration()
       .getScriptingEnvironment()
       .execute(script, variableScope);

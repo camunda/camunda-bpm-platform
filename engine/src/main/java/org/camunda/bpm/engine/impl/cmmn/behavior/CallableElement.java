@@ -55,7 +55,7 @@ public class CallableElement {
 
   // definitionKey ////////////////////////////////////////////////////////////////
 
-  public String getDefinitionKey(CoreVariableScope variableScope) {
+  public String getDefinitionKey(CoreVariableScope<?> variableScope) {
     Object result = definitionKeyValueProvider.getValue(variableScope);
 
     if (result != null && !(result instanceof String)) {
@@ -85,7 +85,7 @@ public class CallableElement {
 
   // version //////////////////////////////////////////////////////////////////////
 
-  public Integer getVersion(CoreVariableScope variableScope) {
+  public Integer getVersion(CoreVariableScope<?> variableScope) {
     Object result = versionValueProvider.getValue(variableScope);
 
     if (result != null) {
@@ -111,7 +111,7 @@ public class CallableElement {
 
   // businessKey /////////////////////////////////////////////////////////////////
 
-  public String getBusinessKey(CoreVariableScope variableScope) {
+  public String getBusinessKey(CoreVariableScope<?> variableScope) {
     if (businessKeyValueProvider == null) {
       return null;
     }

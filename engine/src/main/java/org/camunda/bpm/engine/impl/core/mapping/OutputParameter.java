@@ -39,7 +39,7 @@ public class OutputParameter extends IoParameter {
     super(name, valueProvider);
   }
 
-  protected void execute(CoreVariableScope innerScope, CoreVariableScope outerScope) {
+  protected void execute(CoreVariableScope<?> innerScope, CoreVariableScope<?> outerScope) {
 
     // get value from inner scope
     Object value = valueProvider.getValue(innerScope);

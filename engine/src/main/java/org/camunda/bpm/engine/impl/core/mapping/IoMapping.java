@@ -30,13 +30,13 @@ public class IoMapping {
 
   protected List<OutputParameter> outputParameters;
 
-  public void executeInputParameters(CoreVariableScope variableScope) {
+  public void executeInputParameters(CoreVariableScope<?> variableScope) {
     for (InputParameter inputParameter : getInputParameters()) {
       inputParameter.execute(variableScope);
     }
   }
 
-  public void executeOutputParameters(CoreVariableScope variableScope) {
+  public void executeOutputParameters(CoreVariableScope<?> variableScope) {
     for (OutputParameter outputParameter : getOutputParameters()) {
       outputParameter.execute(variableScope);
     }

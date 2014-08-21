@@ -25,6 +25,6 @@ public interface ParameterValueProvider {
    * @param variableScope the scope in which the value is to be resolved.
    * @return the value
    */
-  Object getValue(CoreVariableScope variableScope);
+  Object getValue(CoreVariableScope<?> variableScope);
 
 }

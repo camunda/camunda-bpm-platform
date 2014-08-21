@@ -43,7 +43,7 @@ public abstract class IoParameter {
   /**
    * Execute the parameter in a given variable scope.
    */
-  public void execute(CoreVariableScope scope) {
+  public void execute(CoreVariableScope<?> scope) {
     execute(scope, scope.getParentVariableScope());
   }
 
@@ -51,7 +51,7 @@ public abstract class IoParameter {
    * @param innerScope
    * @param outerScope
    */
-  protected abstract void execute(CoreVariableScope innerScope, CoreVariableScope outerScope);
+  protected abstract void execute(CoreVariableScope<?> innerScope, CoreVariableScope<?> outerScope);
 
   // getters / setters ///////////////////////////
 

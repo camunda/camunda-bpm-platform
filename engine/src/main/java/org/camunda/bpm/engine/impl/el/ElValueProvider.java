@@ -31,7 +31,7 @@ public class ElValueProvider implements ParameterValueProvider {
     this.expression = expression;
   }
 
-  public Object getValue(CoreVariableScope variableScope) {
+  public Object getValue(CoreVariableScope<?> variableScope) {
     return expression.getValue(variableScope);
   }
 

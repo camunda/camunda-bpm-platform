@@ -16,6 +16,7 @@ import org.camunda.bpm.connect.Connector;
 import org.camunda.bpm.connect.ConnectorRequest;
 import org.camunda.bpm.connect.ConnectorResponse;
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.delegate.CoreVariableInstance;
 import org.camunda.bpm.engine.impl.connector.ConnectorVariableScope;
 import org.camunda.bpm.engine.impl.connector.Connectors;
 import org.camunda.bpm.engine.impl.context.Context;
