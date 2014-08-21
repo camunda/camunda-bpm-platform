@@ -48,13 +48,25 @@ public abstract class SpinXmlTreeNode<T extends SpinXmlTreeNode<?>> extends Spin
    * @return true if the node has the same namespace
    */
   public abstract boolean hasNamespace(String namespace);
-  
-  public <C> C mapTo(Class<C> type) {
-   throw LOG.methodNotImplement("mapTo");
-  }
-  
-  public <C> C mapTo(String type) {
-    throw LOG.methodNotImplement("mapTo");
-  }
+
+  /**
+   * Maps XML into specific class
+   *
+   * @param type Class to which the Xml should be mapped
+   * @return mapped Class
+   *
+   * @throws SpinDataFormatException in case the input cannot be mapped to class for several reasons
+   */
+  public abstract <C> C mapTo(Class<C> type);
+
+  /**
+   * Maps Xml into specific class
+   *
+   * @param canonicalName canonical name of the class
+   * @return mapped class
+   *
+   * @throws SpinDataFormatException in case the input cannot be mapped to class for several reasons
+   */
+  public abstract <C> C mapTo(String canonicalName);
   
 }

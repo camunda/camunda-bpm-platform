@@ -1,0 +1,1 @@
+$xml = XML($input).toString()

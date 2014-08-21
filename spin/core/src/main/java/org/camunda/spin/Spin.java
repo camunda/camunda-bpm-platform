@@ -16,6 +16,7 @@ import java.io.OutputStream;
 import java.io.Writer;
 import java.util.Map;
 
+import org.camunda.spin.impl.xml.dom.XmlDomDataFormat;
 import org.camunda.spin.json.SpinJsonNode;
 import org.camunda.spin.spi.DataFormat;
 import org.camunda.spin.spi.SpinDataFormatException;
@@ -62,6 +63,37 @@ public abstract class Spin<T extends Spin<?>> {
    */
   public static SpinXmlTreeElement XML(Object input) {
     return SPIN_FACTORY.createSpin(input, DataFormats.xmlDom());
+  }
+
+  /**
+   *
+   * @param input
+   * @param mapperConfiguration
+   * @return
+   *
+   * @throws SpinDataFormatException in case the input cannot be read as XML
+   * @throws IllegalArgumentException in case an argument of illegal type is provided (such as 'null')
+   */
+  public static SpinXmlTreeElement XML(Object input, Map<String, Object> mapperConfiguration) {
+    DataFormat<SpinXmlTreeElement> configuredFormat =
+      DataFormats.xmlDom()
+        .mapper().config(mapperConfiguration)
+        .done();
+
+    return SPIN_FACTORY.createSpin(input, configuredFormat);
+  }
+
+  /**
+   *
+   * @param input
+   * @param format
+   * @return
+   *
+   * @throws SpinDataFormatException in case the input cannot be read as XML
+   * @throws IllegalArgumentException in case an argument of illegal type is provided (such as 'null')
+   */
+  public static SpinXmlTreeElement XML(Object input, DataFormat<SpinXmlTreeElement> format) {
+    return SPIN_FACTORY.createSpin(input, format);
   }
 
   /**

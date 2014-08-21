@@ -1,0 +1,1 @@
+order = XML(input).mapTo("rubbish");

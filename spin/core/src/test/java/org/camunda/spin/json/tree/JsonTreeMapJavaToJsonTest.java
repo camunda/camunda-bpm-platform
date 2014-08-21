@@ -12,25 +12,9 @@
  */
 package org.camunda.spin.json.tree;
 
-import static net.javacrumbs.jsonunit.fluent.JsonFluentAssert.assertThatJson;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
-import static org.camunda.spin.DataFormats.jsonTree;
-import static org.camunda.spin.Spin.JSON;
-import static org.camunda.spin.json.JsonTestConstants.EXAMPLE_JACKSON_TYPE_JSON;
-import static org.camunda.spin.json.JsonTestConstants.EXAMPLE_JSON;
-import static org.camunda.spin.json.JsonTestConstants.createExampleInvoice;
-import static org.camunda.spin.json.JsonTestConstants.createExampleOrder;
-
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
+import com.fasterxml.jackson.databind.ObjectMapper.DefaultTyping;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import org.camunda.spin.SpinList;
 import org.camunda.spin.json.SpinJsonNode;
 import org.camunda.spin.json.mapping.DateObject;
@@ -40,9 +24,16 @@ import org.camunda.spin.json.mapping.Order;
 import org.camunda.spin.spi.SpinJsonDataFormatException;
 import org.junit.Test;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
-import com.fasterxml.jackson.databind.ObjectMapper.DefaultTyping;
-import com.fasterxml.jackson.databind.SerializationFeature;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
+
+import static net.javacrumbs.jsonunit.fluent.JsonFluentAssert.assertThatJson;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
+import static org.camunda.spin.DataFormats.jsonTree;
+import static org.camunda.spin.Spin.JSON;
+import static org.camunda.spin.json.JsonTestConstants.*;
 
 public class JsonTreeMapJavaToJsonTest {
 
@@ -164,7 +155,6 @@ public class JsonTreeMapJavaToJsonTest {
     assertThat(node.isValue()).isTrue();
     assertThat(node.numberValue()).isEqualTo(42);
   }
-
 
   @Test
   public void shouldMapListOfPrimitiveStrings() {

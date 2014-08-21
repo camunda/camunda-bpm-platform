@@ -16,6 +16,7 @@ package org.camunda.spin.impl.xml.dom;
 import org.camunda.spin.SpinList;
 import org.camunda.spin.impl.SpinListImpl;
 import org.camunda.spin.logging.SpinLogger;
+import org.camunda.spin.spi.DataFormatMapper;
 import org.camunda.spin.xml.tree.SpinXmlTreeAttribute;
 import org.camunda.spin.xml.tree.SpinXmlTreeElement;
 import org.camunda.spin.xml.tree.SpinXmlTreeElementException;
@@ -25,8 +26,9 @@ import org.w3c.dom.*;
 import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import javax.xml.xpath.*;
-
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import java.io.StringWriter;
@@ -415,6 +417,16 @@ public class SpinXmlDomElement extends SpinXmlTreeElement {
       cachedXPathFactory = XPathFactory.newInstance();
     }
     return cachedXPathFactory;
+  }
+
+  public <C> C mapTo(Class<C> javaClass) {
+    DataFormatMapper mapper = dataFormat.getMapper();
+    return mapper.mapInternalToJava(this, javaClass);
+  }
+
+  public <C> C mapTo(String javaClass) {
+    DataFormatMapper mapper = dataFormat.getMapper();
+    return mapper.mapInternalToJava(this, javaClass);
   }
 
 }

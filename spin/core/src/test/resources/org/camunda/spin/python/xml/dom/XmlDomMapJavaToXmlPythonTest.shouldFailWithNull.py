@@ -1,0 +1,1 @@
+xml = XML(None).toString()

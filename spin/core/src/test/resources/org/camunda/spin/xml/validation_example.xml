@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?><customers xmlns="http://camunda.org/example" xmlns:ns2="http://camunda.org/test-example" dueUntil="20150112" order="order1">
+  <customer id="customer1">
+    <contractStartDate>1354539722</contractStartDate>
+    <name>Kermit</name>
+  </customer>
+  <customer id="customer2">
+    <contractStartDate>1320325322</contractStartDate>
+    <name>Waldo</name>
+  </customer>
+  <customer id="customer3">
+    <contractStartDate>1286110922</contractStartDate>
+    <name>Johnny</name>
+  </customer>
+  <order-details>
+    <ns2:date>2015-04-04T00:00:00+02:00</ns2:date>
+    <ns2:id>1234567890</ns2:id>
+    <ns2:product>camunda BPM</ns2:product>
+  </order-details>
+</customers>

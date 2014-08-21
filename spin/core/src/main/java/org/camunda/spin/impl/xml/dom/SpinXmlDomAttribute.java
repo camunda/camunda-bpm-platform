@@ -14,6 +14,7 @@
 package org.camunda.spin.impl.xml.dom;
 
 import org.camunda.spin.logging.SpinLogger;
+import org.camunda.spin.spi.DataFormatMapper;
 import org.camunda.spin.xml.tree.SpinXmlTreeAttribute;
 import org.camunda.spin.xml.tree.SpinXmlTreeElement;
 import org.w3c.dom.Attr;
@@ -118,6 +119,16 @@ public class SpinXmlDomAttribute extends SpinXmlTreeAttribute {
       throw LOG.unableToWriteAttribute(this, e);
     }
     return writer;
+  }
+
+  public <C> C mapTo(Class<C> javaClass) {
+    DataFormatMapper mapper = dataFormat.getMapper();
+    return mapper.mapInternalToJava(this, javaClass);
+  }
+
+  public <C> C mapTo(String javaClass) {
+    DataFormatMapper mapper = dataFormat.getMapper();
+    return mapper.mapInternalToJava(this, javaClass);
   }
 
 }

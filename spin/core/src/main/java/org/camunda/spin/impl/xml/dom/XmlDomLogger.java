@@ -129,4 +129,37 @@ public class XmlDomLogger extends SpinLogger {
   public SpinXmlTreeXPathException unableToCastXPathResultTo(Class<?> castClass, Exception cause) {
     return new SpinXmlTreeXPathException(exceptionMessage("025", "Unable to cast XPath expression to class '{}'", castClass.getName()), cause);
   }
+
+  public SpinXmlDataFormatException unableToDetectCanonicalType(Object parameter) {
+    return new SpinXmlDataFormatException(exceptionMessage("026", "Cannot detect canonical data type for parameter '{}'", parameter));
+  }
+
+  public SpinXmlDataFormatException unableToMapInput(Object parameter, Throwable cause) {
+    return new SpinXmlDataFormatException(exceptionMessage("027", "Unable to map object '{}' to xml element"), cause);
+  }
+
+  public SpinXmlDataFormatException unableToDeserialize(Object node, String canonicalClassName, Throwable cause) {
+    return new SpinXmlDataFormatException(
+      exceptionMessage("028", "Cannot deserialize '{}...' to java class '{}'", node.toString(), canonicalClassName), cause);
+  }
+
+  public SpinXmlDataFormatException unableToCreateMarshaller(Throwable cause) {
+    return new SpinXmlDataFormatException(exceptionMessage("029", "Cannot create marshaller!"), cause);
+  }
+
+  public SpinXmlDataFormatException unableToCreateContext(Throwable cause) {
+    return new SpinXmlDataFormatException(exceptionMessage("030", "Cannot create context!"), cause);
+  }
+
+  public SpinXmlDataFormatException unableToCreateUnmarshaller(Throwable cause) {
+    return new SpinXmlDataFormatException(exceptionMessage("031", "Cannot create unmarshaller!"), cause);
+  }
+
+  public SpinXmlDataFormatException unableToSetEventHandler(String className, Throwable cause) {
+    return new SpinXmlDataFormatException(exceptionMessage("032", "Cannot set event handler to '{}'!", className), cause);
+  }
+
+  public SpinXmlDataFormatException unableToSetProperty(String propertyName, String className, Throwable cause) {
+    return new SpinXmlDataFormatException(exceptionMessage("033", "Cannot set property '{}' to '{}'!", propertyName, className), cause);
+  }
 }
