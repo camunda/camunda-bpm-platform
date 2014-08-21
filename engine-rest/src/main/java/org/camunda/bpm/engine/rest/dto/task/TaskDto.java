@@ -173,7 +173,11 @@ public class TaskDto {
     dto.created = task.getCreateTime();
     dto.due = task.getDueDate();
     dto.followUp = task.getFollowUpDate();
-    dto.delegationState = task.getDelegationState().toString();
+
+    if (task.getDelegationState() != null) {
+      dto.delegationState = task.getDelegationState().toString();
+    }
+
     dto.description = task.getDescription();
     dto.executionId = task.getExecutionId();
     dto.owner = task.getOwner();
