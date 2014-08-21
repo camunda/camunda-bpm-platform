@@ -2617,7 +2617,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
   }
 
   @Test
-  public void testPostCreateTaskDelegationStageResolved() {
+  public void testPostCreateTaskDelegationStateResolved() {
     Map<String, Object> json = new HashMap<String, Object>();
 
     json.put("delegationState", "RESOLVED");
@@ -2640,7 +2640,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
   }
 
   @Test
-  public void testPostCreateTaskDelegationStagePending() {
+  public void testPostCreateTaskDelegationStatePending() {
     Map<String, Object> json = new HashMap<String, Object>();
 
     json.put("delegationState", "PENDING");
@@ -2663,7 +2663,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
   }
 
   @Test
-  public void testPostCreateTaskUnsupportedDelegationStage() {
+  public void testPostCreateTaskUnsupportedDelegationState() {
     Map<String, Object> json = new HashMap<String, Object>();
 
     json.put("delegationState", "unsupported");
@@ -2685,7 +2685,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
   }
 
   @Test
-  public void testPostCreateTaskLowercaseDelegationStage() {
+  public void testPostCreateTaskLowercaseDelegationState() {
     Map<String, Object> json = new HashMap<String, Object>();
 
     json.put("delegationState", "pending");
@@ -2799,7 +2799,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
   }
 
   @Test
-  public void testPutUpdateTaskDelegationStageResolved() {
+  public void testPutUpdateTaskDelegationStateResolved() {
     Map<String, Object> json = new HashMap<String, Object>();
 
     json.put("delegationState", "RESOLVED");
@@ -2819,7 +2819,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
   }
 
   @Test
-  public void testPutUpdateTaskDelegationStagePending() {
+  public void testPutUpdateTaskDelegationStatePending() {
     Map<String, Object> json = new HashMap<String, Object>();
 
     json.put("delegationState", "PENDING");
@@ -2842,7 +2842,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
   }
 
   @Test
-  public void testPutUpdateTaskUnsupportedDelegationStage() {
+  public void testPutUpdateTaskUnsupportedDelegationState() {
     Map<String, Object> json = new HashMap<String, Object>();
 
     json.put("delegationState", "unsupported");
@@ -2865,7 +2865,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
   }
 
   @Test
-  public void testPutUpdateTaskLowercaseDelegationStage() {
+  public void testPutUpdateTaskLowercaseDelegationState() {
     Map<String, Object> json = new HashMap<String, Object>();
 
     json.put("delegationState", "pending");
