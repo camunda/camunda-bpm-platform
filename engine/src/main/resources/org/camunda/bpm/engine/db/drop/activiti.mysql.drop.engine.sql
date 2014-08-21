@@ -88,3 +88,4 @@ drop table if exists ACT_RU_JOBDEF;
 drop table if exists ACT_RU_EVENT_SUBSCR;
 drop table if exists ACT_RU_INCIDENT;
 drop table if exists ACT_RU_AUTHORIZATION;
+drop table if exists ACT_RU_FILTER;

@@ -18,6 +18,7 @@ import java.util.Date;
 
 import junit.framework.TestCase;
 
+import org.camunda.bpm.engine.FilterService;
 import org.camunda.bpm.engine.FormService;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.IdentityService;
@@ -75,6 +76,7 @@ public class ProcessEngineTestCase extends TestCase {
   protected IdentityService identityService;
   protected ManagementService managementService;
   protected FormService formService;
+  protected FilterService filterService;
 
   /** uses 'camunda.cfg.xml' as it's configuration resource */
   public ProcessEngineTestCase() {
@@ -119,6 +121,7 @@ public class ProcessEngineTestCase extends TestCase {
     identityService = processEngine.getIdentityService();
     managementService = processEngine.getManagementService();
     formService = processEngine.getFormService();
+    filterService = processEngine.getFilterService();
   }
 
   @Override
@@ -147,4 +150,3 @@ public class ProcessEngineTestCase extends TestCase {
   }
   
 }
-

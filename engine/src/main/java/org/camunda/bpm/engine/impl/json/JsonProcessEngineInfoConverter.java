@@ -36,4 +36,9 @@ public class JsonProcessEngineInfoConverter extends JsonObjectConverter<ProcessE
   public ProcessEngineInfo toObject(Reader reader) {
     return null;
   }
+
+  public ProcessEngineInfo toObject(String jsonString) {
+    return null;
+  }
+
 }

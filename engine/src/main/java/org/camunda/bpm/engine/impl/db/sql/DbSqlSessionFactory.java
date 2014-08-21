@@ -152,6 +152,8 @@ public class DbSqlSessionFactory implements SessionFactory {
     addDatabaseSpecificStatement(POSTGRES, "selectActivityStatistics", "selectActivityStatistics_postgres");
     addDatabaseSpecificStatement(POSTGRES, "selectActivityStatisticsCount", "selectActivityStatisticsCount_postgres");
     addDatabaseSpecificStatement(POSTGRES, "selectHistoricVariableInstanceByQueryCriteria", "selectHistoricVariableInstanceByQueryCriteria_postgres");
+    addDatabaseSpecificStatement(POSTGRES, "selectFilter", "selectFilter_postgres");
+    addDatabaseSpecificStatement(POSTGRES, "selectFilterByQueryCriteria", "selectFilterByQueryCriteria_postgres");
 
     constants = new HashMap<String, String>();
     constants.put("constant.event", "'event'");

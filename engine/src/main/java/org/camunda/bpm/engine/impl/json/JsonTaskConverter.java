@@ -29,6 +29,10 @@ public class JsonTaskConverter extends JsonObjectConverter<Task> {
     throw new ProcessEngineException("not yet implemented");
   }
 
+  public Task toObject(String jsonString) {
+    throw new ProcessEngineException("not yet implemented");
+  }
+
   public JSONObject toJsonObject(Task task) {
     TaskEntity taskEntity = (TaskEntity) task;
     JSONObject jsonObject = new JSONObject();

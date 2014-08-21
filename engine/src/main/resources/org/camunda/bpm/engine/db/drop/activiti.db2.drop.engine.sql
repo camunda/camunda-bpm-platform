@@ -104,3 +104,4 @@ drop table ACT_RU_JOBDEF;
 drop table ACT_RU_EVENT_SUBSCR;
 drop table ACT_RU_INCIDENT;
 drop table ACT_RU_AUTHORIZATION;
+drop table ACT_RU_FILTER;
