@@ -39,7 +39,9 @@ We can map the following XML object
 ```java
 import static org.camunda.spin.Spin.XML;
 
-Customer customer = XML("<?xml version=\"1.0\" encoding=\"UTF-8\"?><customer xmlns=\"http://camunda.org/example\"><name>Kermit</name></customer>").mapTo(Customer.class);
+String xmlInput = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><customer xmlns=\"http://camunda.org/example\"><name>Kermit</name></customer>";
+
+Customer customer = XML(xmlInput).mapTo(Customer.class);
 ```
 
 ### Mapping Java to XML:
