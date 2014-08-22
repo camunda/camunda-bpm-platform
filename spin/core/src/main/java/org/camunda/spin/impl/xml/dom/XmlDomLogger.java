@@ -144,22 +144,22 @@ public class XmlDomLogger extends SpinLogger {
   }
 
   public SpinXmlDataFormatException unableToCreateMarshaller(Throwable cause) {
-    return new SpinXmlDataFormatException(exceptionMessage("029", "Cannot create marshaller!"), cause);
+    return new SpinXmlDataFormatException(exceptionMessage("029", "Cannot create marshaller"), cause);
   }
 
   public SpinXmlDataFormatException unableToCreateContext(Throwable cause) {
-    return new SpinXmlDataFormatException(exceptionMessage("030", "Cannot create context!"), cause);
+    return new SpinXmlDataFormatException(exceptionMessage("030", "Cannot create context"), cause);
   }
 
   public SpinXmlDataFormatException unableToCreateUnmarshaller(Throwable cause) {
-    return new SpinXmlDataFormatException(exceptionMessage("031", "Cannot create unmarshaller!"), cause);
+    return new SpinXmlDataFormatException(exceptionMessage("031", "Cannot create unmarshaller"), cause);
   }
 
   public SpinXmlDataFormatException unableToSetEventHandler(String className, Throwable cause) {
-    return new SpinXmlDataFormatException(exceptionMessage("032", "Cannot set event handler to '{}'!", className), cause);
+    return new SpinXmlDataFormatException(exceptionMessage("032", "Cannot set event handler to '{}'", className), cause);
   }
 
   public SpinXmlDataFormatException unableToSetProperty(String propertyName, String className, Throwable cause) {
-    return new SpinXmlDataFormatException(exceptionMessage("033", "Cannot set property '{}' to '{}'!", propertyName, className), cause);
+    return new SpinXmlDataFormatException(exceptionMessage("033", "Cannot set property '{}' to '{}'", propertyName, className), cause);
   }
 }
