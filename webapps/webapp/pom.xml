@@ -71,6 +71,11 @@
       <artifactId>camunda-cockpit-plugin-base</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.camunda.bpm.cockpit</groupId>
+      <artifactId>camunda-cockpit-plugin-jobdef</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
     <!-- jee spec -->
     <dependency>
