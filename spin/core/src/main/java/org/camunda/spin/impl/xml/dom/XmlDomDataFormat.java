@@ -37,7 +37,6 @@ import static org.camunda.spin.impl.util.SpinEnsure.ensureNotNull;
  */
 public class XmlDomDataFormat implements DataFormat<SpinXmlTreeElement> {
 
-  public static final XmlDomDataFormat INSTANCE = new XmlDomDataFormat();
   protected static final XmlDomLogger LOG = SpinLogger.XML_DOM_LOGGER;
 
   protected XmlDomMapperConfiguration mapperConfiguration;

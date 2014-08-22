@@ -68,14 +68,40 @@ public class DataFormats {
     }
   }
 
+  /**
+   * Returns a new instance of the spin xml dom data format that
+   * can be configured individually from the the global format.
+   */
   public static XmlDomDataFormat xmlDom() {
     ensureDataformatsInitialized();
     return DEFAULT_XML_DATA_FORMAT.newInstance();
   }
 
+  /**
+   * Returns the global xml data format that can be provided with
+   * configuration that applies to any Spin xml operation.
+   */
+  public static XmlDomDataFormat xmlDomGlobal() {
+    ensureDataformatsInitialized();
+    return DEFAULT_XML_DATA_FORMAT;
+  }
+
+  /**
+   * Returns a new instance of the spin json data format that
+   * can be configured individually from the the global format.
+   */
   public static JsonJacksonTreeDataFormat jsonTree() {
     ensureDataformatsInitialized();
     return DEFAULT_JSON_DATA_FORMAT.newInstance();
+  }
+
+  /**
+   * Returns the global json data format that can be provided with
+   * configuration that applies to any Spin json operation.
+   */
+  public static JsonJacksonTreeDataFormat jsonTreeGlobal() {
+    ensureDataformatsInitialized();
+    return DEFAULT_JSON_DATA_FORMAT;
   }
 
 }
