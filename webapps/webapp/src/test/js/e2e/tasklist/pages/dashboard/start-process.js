@@ -20,8 +20,13 @@ module.exports = Page.extend({
     return this.formElement().element(by.css('[ng-click="close()"]'));
   },
 
-  searchProcessInput: function() {
-    return this.formElement().element(by.model('searchProcess'));
+  searchProcessInput: function(inputValue) {
+    var inputField = this.formElement().element(by.model('searchProcess'));
+
+    if (arguments.length !== 0)
+      inputField.sendKeys(inputValue);
+
+    return inputField;
   },
 
   foundProcesses: function() {

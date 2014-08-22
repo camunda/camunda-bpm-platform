@@ -4,20 +4,40 @@ var Page = require('./start-process');
 
 module.exports = Page.extend({
 
-  creditorInput: function() {
-    return element(by.id('creditor'));
+  creditorInput: function(inputValue) {
+    var inputField = element(by.id('creditor'));
+
+    if (arguments.length !== 0)
+      inputField.sendKeys(inputValue);
+
+    return inputField;
   },
 
-  amountInput: function() {
-    return element(by.id('amount'));
+  amountInput: function(inputValue) {
+    var inputField = element(by.id('amount'));
+
+    if (arguments.length !== 0)
+      inputField.sendKeys(inputValue);
+
+    return inputField;
   },
 
-  invoiceNumberInput: function() {
-    return element(by.id('invoiceNumber'));
+  invoiceNumberInput: function(inputValue) {
+    var inputField = element(by.id('invoiceNumber'));
+
+    if (arguments.length !== 0)
+      inputField.sendKeys(inputValue);
+
+    return inputField;
   },
 
-  approverInput: function() {
-    return element(by.name('approver'));
+  approverInput: function(inputValue) {
+    var inputField = element(by.name('approver'));
+
+    if (arguments.length !== 0)
+      inputField.sendKeys(inputValue);
+
+    return inputField;
   }
 
 });

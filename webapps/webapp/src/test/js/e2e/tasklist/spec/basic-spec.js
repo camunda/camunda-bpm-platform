@@ -58,13 +58,13 @@ describe('tasklist dashboard - ', function() {
     it('should open my tasks', function() {
 
       // when
-      dashboardPage.piles.selectPile(1);
+      dashboardPage.filter.selectFilter(1);
 
       // then
       expect(dashboardPage.tasks.taskList().count()).toBe(1);
     });
 
-  
+
     it('should select a task', function() {
 
       // when

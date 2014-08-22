@@ -1,6 +1,6 @@
 'use strict';
 
-var Page = require('../../page');
+var Page = require('../../commons/pages/page');
 
 var navigationSection = element(by.css('[id="cam-tasklist-navigation"]'));
 
