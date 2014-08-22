@@ -14,18 +14,22 @@ package org.camunda.spin.impl.xml.dom;
 
 import org.camunda.spin.logging.SpinLogger;
 import org.camunda.spin.spi.DataFormatMapper;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-import java.io.StringReader;
-import java.io.StringWriter;
+import javax.xml.transform.dom.DOMResult;
+import javax.xml.transform.dom.DOMSource;
 
-import static org.camunda.spin.Spin.XML;
 import static org.camunda.spin.impl.util.SpinEnsure.ensureNotNull;
 
 /**
+ * {@link DataFormatMapper} using JAXB for mapping Java Objects to XML and vice-versa.
+ *
  * @author Stefan Hentschel.
+ * @author Daniel Meyer
  */
 public class XmlDomDataFormatMapper implements DataFormatMapper {
 
@@ -42,10 +46,12 @@ public class XmlDomDataFormatMapper implements DataFormatMapper {
     try {
       Marshaller marshaller = format.getConfiguredMarshaller(parameter.getClass());
 
-      StringWriter stringWriter = new StringWriter();
-      marshaller.marshal(parameter, stringWriter);
+      DOMResult domResult = new DOMResult();
+      marshaller.marshal(parameter, domResult);
 
-      return XML(stringWriter.toString()).unwrap();
+      Node node = domResult.getNode();
+      return ((Document)node).getDocumentElement();
+
     } catch (JAXBException e) {
       throw LOG.unableToMapInput(parameter, e);
     }
@@ -59,9 +65,8 @@ public class XmlDomDataFormatMapper implements DataFormatMapper {
     SpinXmlDomElement xmlNode = (SpinXmlDomElement) parameter;
     try {
       Unmarshaller unmarshaller = format.getConfiguredUnmarshaller(javaClass);
-      StringReader stringReader = new StringReader(xmlNode.toString());
 
-      return (T) unmarshaller.unmarshal(stringReader);
+      return (T) unmarshaller.unmarshal(new DOMSource(xmlNode.unwrap()));
     } catch (JAXBException e) {
       throw LOG.unableToDeserialize(parameter, javaClass.getCanonicalName(), e);
     }
