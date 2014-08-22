@@ -16,6 +16,18 @@ module.exports = Page.extend({
     var pile = this.filterList().get(item).element(by.css('[class="name ng-binding"]'));
     pile.click();
     return pile;
+  },
+
+  filterStatus: function(item) {
+    return this.filterList().get(item).getAttribute('class');
+  },
+
+  isFilterSelected: function(item) {
+    expect(this.filterStatus(item)).toMatch('active');
+  },
+
+  isFilterNotSelected: function(item) {
+    expect(this.filterStatus(item)).not.toMatch('active');
   }
 
 });

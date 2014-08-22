@@ -19,41 +19,65 @@ describe('tasklist dashboard - ', function() {
   });
 
 
-  describe('Start a process', function() {
+  describe('filter list', function() {
 
-    it('should search and start process', function() {
-
-      // when
-      dashboardPage.selectNavbarItem('Process');
-      dashboardPage.startProcess.searchProcessInput().sendKeys('invoice receipt');
-
-      // then
-      expect(dashboardPage.startProcess.foundProcesses().count()).toBe(2);
-    });
-
-
-    it('should start process', function() {
+    it('should select MINES filter', function() {
 
       // when
-      dashboardPage.startProcess.selectProcessFromSearchResult(1);
+      dashboardPage.filter.selectFilter(1);
 
       // then
-      expect(dashboardPage.startProcess.invoiceStartForm.creditorInput().isDisplayed()).toBe(true);
+      dashboardPage.filter.isFilterSelected(1);
+      dashboardPage.filter.isFilterNotSelected(0);
+      expect(dashboardPage.tasks.taskList().count()).toBe(1);
     });
 
 
-    it('should enter start form data', function() {
+    describe('Start a process', function() {
 
-      dashboardPage.startProcess.invoiceStartForm.creditorInput().sendKeys('Bier');
-      dashboardPage.startProcess.invoiceStartForm.amountInput().sendKeys('85746€');
-      dashboardPage.startProcess.invoiceStartForm.invoiceNumberInput().sendKeys('4711');
-      dashboardPage.startProcess.invoiceStartForm.startButton().click();
+      it('should search and start process', function() {
+
+        // when
+        dashboardPage.selectNavbarItem('Process');
+        dashboardPage.startProcess.searchProcessInput().sendKeys('invoice receipt');
+
+        // then
+        expect(dashboardPage.startProcess.foundProcesses().count()).toBe(2);
+      });
+
+
+      it('should start process', function() {
+
+        // when
+        dashboardPage.startProcess.selectProcessFromSearchResult(1);
+
+        // then
+        expect(dashboardPage.startProcess.invoiceStartForm.creditorInput().isDisplayed()).toBe(true);
+      });
+
+
+      it('should enter start form data', function() {
+
+        dashboardPage.startProcess.invoiceStartForm.creditorInput().sendKeys('Bier');
+        dashboardPage.startProcess.invoiceStartForm.amountInput().sendKeys('85746€');
+        dashboardPage.startProcess.invoiceStartForm.invoiceNumberInput().sendKeys('4711');
+        dashboardPage.startProcess.invoiceStartForm.startButton().click();
+      });
+
     });
+
+
+    it('should check filter refresh', function() {
+
+      // then
+      expect(dashboardPage.tasks.taskList().count()).toBe(2);
+    });
+
 
   });
 
 
-  describe('tasks', function() {
+  xdescribe('tasks', function() {
 
     it('should open my tasks', function() {
 
