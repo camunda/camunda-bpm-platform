@@ -32,7 +32,7 @@ public class CaseTaskPlanItemExecutionListenerHandlerTest extends CmmnElementHan
 
   @Parameters(name = "testListener: {0}")
   public static Iterable<Object[]> data() {
-    return ExecutionListenerCases.ITEM_CASES;
+    return ExecutionListenerCases.TASK_OR_STAGE_CASES;
   }
 
   protected CaseTask caseTask;

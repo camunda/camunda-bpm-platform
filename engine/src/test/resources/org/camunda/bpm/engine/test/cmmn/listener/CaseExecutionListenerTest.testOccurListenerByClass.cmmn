@@ -8,13 +8,22 @@
 
     <casePlanModel id="CasePlanModel_1">
 
-      <planItem id="PI_Milestone_1" definitionRef="Milestone_1" />
+      <planItem id="PI_Milestone_1" definitionRef="Milestone_1" entryCriteriaRefs="Sentry_1" />
+      <planItem id="PI_HumanTask_1" definitionRef="HumanTask_1" />
+
+      <sentry id="Sentry_1">
+        <planItemOnPart sourceRef="PI_HumanTask_1">
+          <standardEvent>complete</standardEvent>
+        </planItemOnPart>
+      </sentry>
 
       <milestone id="Milestone_1" name="A Milestone">
         <extensionElements>
           <camunda:caseExecutionListener event="occur" class="org.camunda.bpm.engine.test.cmmn.listener.MySpecialCaseExecutionListener" />
         </extensionElements>
       </milestone>
+
+      <humanTask id="HumanTask_1" />
 
     </casePlanModel>
   </case>

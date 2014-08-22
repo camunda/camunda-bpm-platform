@@ -73,6 +73,7 @@ public interface CaseExecutionListener extends DelegateListener<DelegateCaseExec
   String PARENT_SUSPEND = "parentSuspend";
   String PARENT_RESUME = "parentResume";
   String CLOSE = "close";
+  String OCCUR = "occur";
 
   void notify(DelegateCaseExecution caseExecution) throws Exception;
 

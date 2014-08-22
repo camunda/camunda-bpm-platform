@@ -85,6 +85,9 @@ public interface CaseExecutionQuery extends Query<CaseExecutionQuery, CaseExecut
    */
   CaseExecutionQuery activityId(String activityId);
 
+  /** Only select case executions which are available. **/
+  CaseExecutionQuery available();
+
   /** Only select case executions which are enabled. **/
   CaseExecutionQuery enabled();
 

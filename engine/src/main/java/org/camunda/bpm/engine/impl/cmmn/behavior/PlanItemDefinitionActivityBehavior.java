@@ -14,6 +14,8 @@ package org.camunda.bpm.engine.impl.cmmn.behavior;
 
 import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.AVAILABLE;
 import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.NEW;
+import static org.camunda.bpm.engine.impl.cmmn.handler.ItemHandler.PROPERTY_REPETITION_RULE;
+import static org.camunda.bpm.engine.impl.cmmn.handler.ItemHandler.PROPERTY_REQUIRED_RULE;
 
 import org.camunda.bpm.engine.exception.cmmn.CaseIllegalStateTransitionException;
 import org.camunda.bpm.engine.impl.cmmn.CaseControlRule;
@@ -96,7 +98,7 @@ public abstract class PlanItemDefinitionActivityBehavior implements CmmnActivity
   protected void evaluateRequiredRule(CmmnActivityExecution execution) {
     CmmnActivity activity = execution.getActivity();
 
-    Object requiredRule = activity.getProperty("requiredRule");
+    Object requiredRule = activity.getProperty(PROPERTY_REQUIRED_RULE);
     if (requiredRule != null) {
       CaseControlRule rule = (CaseControlRule) requiredRule;
       boolean required = rule.evaluate(execution);
@@ -107,7 +109,7 @@ public abstract class PlanItemDefinitionActivityBehavior implements CmmnActivity
   protected void evaluateRepetitionRule(CmmnActivityExecution execution) {
     CmmnActivity activity = execution.getActivity();
 
-    Object repetitionRule = activity.getProperty("repetitionRule");
+    Object repetitionRule = activity.getProperty(PROPERTY_REPETITION_RULE);
     if (repetitionRule != null) {
       CaseControlRule rule = (CaseControlRule) repetitionRule;
       rule.evaluate(execution);

@@ -22,6 +22,7 @@ import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.CaseExecutionQuery;
 import org.camunda.bpm.engine.runtime.CaseInstance;
+import org.camunda.bpm.engine.test.Deployment;
 
 /**
  * @author Roman Smirnov
@@ -301,6 +302,20 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
       query.activityId(null);
       fail();
     } catch (NotValidException e) {}
+
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/cmmn/oneMilestoneCase.cmmn"})
+  public void testQueryByAvailable() {
+    caseService
+      .withCaseDefinitionByKey("oneMilestoneCase")
+      .create();
+
+    CaseExecutionQuery query = caseService.createCaseExecutionQuery();
+
+    query.available();
+
+    verifyQueryResults(query, 1);
 
   }
 

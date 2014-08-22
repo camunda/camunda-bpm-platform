@@ -33,6 +33,10 @@ public class EventListenerItemHandler extends ItemHandler {
     return new EventListenerActivityBehavior();
   }
 
+  protected void initializeEntryCriterias(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context) {
+    // entry criterias are not applicable on event listeners
+  }
+
   protected void initializeRepetitionRule(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context) {
     // repetition rule is not applicable on event listeners
   }

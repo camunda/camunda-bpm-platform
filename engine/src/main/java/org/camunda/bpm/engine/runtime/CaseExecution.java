@@ -55,6 +55,11 @@ public interface CaseExecution {
   String getParentId();
 
   /**
+   * <p>Returns <code>true</code> if the case execution is available.</p>
+   */
+  boolean isAvailable();
+
+  /**
    * <p>Returns <code>true</code> if the case execution is active.</p>
    */
   boolean isActive();

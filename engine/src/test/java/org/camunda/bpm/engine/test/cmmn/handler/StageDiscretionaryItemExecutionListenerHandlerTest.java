@@ -33,7 +33,7 @@ public class StageDiscretionaryItemExecutionListenerHandlerTest extends CmmnElem
 
   @Parameters(name = "testListener: {0}")
   public static Iterable<Object[]> data() {
-    return ExecutionListenerCases.ITEM_CASES;
+    return ExecutionListenerCases.TASK_OR_STAGE_CASES;
   }
 
   protected Stage stage;
@@ -51,7 +51,7 @@ public class StageDiscretionaryItemExecutionListenerHandlerTest extends CmmnElem
   public void setUp() {
     stage = createElement(casePlanModel, "aStage", Stage.class);
 
-    planningTable = createElement(stage, "aPlanningTable", PlanningTable.class);
+    planningTable = createElement(casePlanModel, "aPlanningTable", PlanningTable.class);
 
     discretionaryItem = createElement(planningTable, "DI_aStage", DiscretionaryItem.class);
     discretionaryItem.setDefinition(stage);

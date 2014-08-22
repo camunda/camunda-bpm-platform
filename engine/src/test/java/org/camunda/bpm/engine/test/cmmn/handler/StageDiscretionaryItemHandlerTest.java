@@ -42,7 +42,7 @@ public class StageDiscretionaryItemHandlerTest extends CmmnElementHandlerTest {
   public void setUp() {
     stage = createElement(casePlanModel, "aStage", Stage.class);
 
-    planningTable = createElement(stage, "aPlanningTable", PlanningTable.class);
+    planningTable = createElement(casePlanModel, "aPlanningTable", PlanningTable.class);
 
     discretionaryItem = createElement(planningTable, "DI_aStage", DiscretionaryItem.class);
     discretionaryItem.setDefinition(stage);

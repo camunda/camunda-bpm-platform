@@ -12,20 +12,18 @@
  */
 package org.camunda.bpm.engine.test.cmmn.handler;
 
-import static org.camunda.bpm.engine.impl.cmmn.handler.ItemHandler.PROPERTY_IS_BLOCKING;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import org.camunda.bpm.engine.impl.cmmn.behavior.CmmnActivityBehavior;
-import org.camunda.bpm.engine.impl.cmmn.behavior.TaskActivityBehavior;
-import org.camunda.bpm.engine.impl.cmmn.handler.TaskItemHandler;
+import org.camunda.bpm.engine.impl.cmmn.behavior.MilestoneActivityBehavior;
+import org.camunda.bpm.engine.impl.cmmn.handler.MilestoneItemHandler;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
+import org.camunda.bpm.model.cmmn.instance.Milestone;
 import org.camunda.bpm.model.cmmn.instance.PlanItem;
-import org.camunda.bpm.model.cmmn.instance.Task;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -33,26 +31,27 @@ import org.junit.Test;
  * @author Roman Smirnov
  *
  */
-public class TaskPlanItemHandlerTest extends CmmnElementHandlerTest {
+public class MilestonePlanItemHandlerTest extends CmmnElementHandlerTest {
 
-  protected Task task;
+  protected Milestone milestone;
   protected PlanItem planItem;
-  protected TaskItemHandler handler = new TaskItemHandler();
+  protected MilestoneItemHandler handler = new MilestoneItemHandler();
 
   @Before
   public void setUp() {
-    task = createElement(casePlanModel, "aTask", Task.class);
+    milestone = createElement(casePlanModel, "aMilestone", Milestone.class);
 
-    planItem = createElement(casePlanModel, "PI_aTask", PlanItem.class);
-    planItem.setDefinition(task);
+    planItem = createElement(casePlanModel, "PI_aMilestone", PlanItem.class);
+    planItem.setDefinition(milestone);
+
   }
 
   @Test
-  public void testTaskActivityName() {
+  public void testMilestoneActivityName() {
     // given:
-    // the task has a name "A Task"
-    String name = "A Task";
-    task.setName(name);
+    // the Milestone has a name "A Milestone"
+    String name = "A Milestone";
+    milestone.setName(name);
 
     // when
     CmmnActivity activity = handler.handleElement(planItem, context);
@@ -64,9 +63,9 @@ public class TaskPlanItemHandlerTest extends CmmnElementHandlerTest {
   @Test
   public void testPlanItemActivityName() {
     // given:
-    // the task has a name "A Task"
-    String taskName = "A Task";
-    task.setName(taskName);
+    // the Milestone has a name "A Milestone"
+    String milestoneName = "A Milestone";
+    milestone.setName(milestoneName);
 
     // the planItem has an own name "My LocalName"
     String planItemName = "My LocalName";
@@ -76,7 +75,7 @@ public class TaskPlanItemHandlerTest extends CmmnElementHandlerTest {
     CmmnActivity activity = handler.handleElement(planItem, context);
 
     // then
-    assertNotEquals(taskName, activity.getName());
+    assertNotEquals(milestoneName, activity.getName());
     assertEquals(planItemName, activity.getName());
   }
 
@@ -89,33 +88,7 @@ public class TaskPlanItemHandlerTest extends CmmnElementHandlerTest {
 
     // then
     CmmnActivityBehavior behavior = activity.getActivityBehavior();
-    assertTrue(behavior instanceof TaskActivityBehavior);
-  }
-
-  @Test
-  public void testIsBlockingEqualsTrueProperty() {
-    // given: a task with isBlocking = true (defaultValue)
-
-    // when
-    CmmnActivity activity = handler.handleElement(planItem, context);
-
-    // then
-    Boolean isBlocking = (Boolean) activity.getProperty(PROPERTY_IS_BLOCKING);
-    assertTrue(isBlocking);
-  }
-
-  @Test
-  public void testIsBlockingEqualsFalseProperty() {
-    // given:
-    // a task with isBlocking = false
-    task.setIsBlocking(false);
-
-    // when
-    CmmnActivity activity = handler.handleElement(planItem, context);
-
-    // then
-    Boolean isBlocking = (Boolean) activity.getProperty(PROPERTY_IS_BLOCKING);
-    assertFalse(isBlocking);
+    assertTrue(behavior instanceof MilestoneActivityBehavior);
   }
 
   @Test

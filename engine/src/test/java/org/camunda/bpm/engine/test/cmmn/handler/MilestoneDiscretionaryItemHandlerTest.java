@@ -13,18 +13,17 @@
 package org.camunda.bpm.engine.test.cmmn.handler;
 
 import static org.camunda.bpm.engine.impl.cmmn.handler.ItemHandler.PROPERTY_DISCRETIONARY;
-import static org.camunda.bpm.engine.impl.cmmn.handler.ItemHandler.PROPERTY_IS_BLOCKING;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import org.camunda.bpm.engine.impl.cmmn.behavior.CmmnActivityBehavior;
-import org.camunda.bpm.engine.impl.cmmn.behavior.HumanTaskActivityBehavior;
-import org.camunda.bpm.engine.impl.cmmn.handler.HumanTaskItemHandler;
+import org.camunda.bpm.engine.impl.cmmn.behavior.MilestoneActivityBehavior;
+import org.camunda.bpm.engine.impl.cmmn.handler.MilestoneItemHandler;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
 import org.camunda.bpm.model.cmmn.instance.DiscretionaryItem;
-import org.camunda.bpm.model.cmmn.instance.HumanTask;
+import org.camunda.bpm.model.cmmn.instance.Milestone;
 import org.camunda.bpm.model.cmmn.instance.PlanningTable;
 import org.junit.Before;
 import org.junit.Test;
@@ -33,30 +32,30 @@ import org.junit.Test;
  * @author Roman Smirnov
  *
  */
-public class HumanTaskDicretionaryItemHandlerTest extends CmmnElementHandlerTest {
+public class MilestoneDiscretionaryItemHandlerTest extends CmmnElementHandlerTest {
 
-  protected HumanTask humanTask;
+  protected Milestone milestone;
   protected PlanningTable planningTable;
   protected DiscretionaryItem discretionaryItem;
-  protected HumanTaskItemHandler handler = new HumanTaskItemHandler();
+  protected MilestoneItemHandler handler = new MilestoneItemHandler();
 
   @Before
   public void setUp() {
-    humanTask = createElement(casePlanModel, "aHumanTask", HumanTask.class);
+    milestone = createElement(casePlanModel, "aMilestone", Milestone.class);
 
     planningTable = createElement(casePlanModel, "aPlanningTable", PlanningTable.class);
 
-    discretionaryItem = createElement(planningTable, "DI_aHumanTask", DiscretionaryItem.class);
-    discretionaryItem.setDefinition(humanTask);
+    discretionaryItem = createElement(planningTable, "DI_aMilestone", DiscretionaryItem.class);
+    discretionaryItem.setDefinition(milestone);
 
   }
 
   @Test
-  public void testHumanTaskActivityName() {
+  public void testMilestoneActivityName() {
     // given:
-    // the humanTask has a name "A HumanTask"
-    String name = "A HumanTask";
-    humanTask.setName(name);
+    // the Milestone has a name "A Milestone"
+    String name = "A Milestone";
+    milestone.setName(name);
 
     // when
     CmmnActivity activity = handler.handleElement(discretionaryItem, context);
@@ -67,45 +66,14 @@ public class HumanTaskDicretionaryItemHandlerTest extends CmmnElementHandlerTest
 
   @Test
   public void testActivityBehavior() {
-    // given: a discretionaryItem
+    // given: a planItem
 
     // when
     CmmnActivity activity = handler.handleElement(discretionaryItem, context);
 
     // then
     CmmnActivityBehavior behavior = activity.getActivityBehavior();
-    assertTrue(behavior instanceof HumanTaskActivityBehavior);
-  }
-
-  @Test
-  public void testIsBlockingEqualsTrueProperty() {
-    // given: a humanTask with isBlocking = true (defaultValue)
-
-    // when
-    CmmnActivity activity = handler.handleElement(discretionaryItem, context);
-
-    // then
-    Boolean isBlocking = (Boolean) activity.getProperty(PROPERTY_IS_BLOCKING);
-    assertTrue(isBlocking);
-  }
-
-  @Test
-  public void testIsBlockingEqualsFalseProperty() {
-    // given:
-    // a humanTask with isBlocking = false
-    humanTask.setIsBlocking(false);
-
-    // when
-    CmmnActivity activity = handler.handleElement(discretionaryItem, context);
-
-    // then
-    // According to the specification:
-    // When a HumanTask is not 'blocking'
-    // (isBlocking is 'false'), it can be
-    // considered a 'manual' Task, i.e.,
-    // the Case management system is not
-    // tracking the lifecycle of the HumanTask (instance).
-    assertNull(activity);
+    assertTrue(behavior instanceof MilestoneActivityBehavior);
   }
 
   @Test
@@ -123,7 +91,7 @@ public class HumanTaskDicretionaryItemHandlerTest extends CmmnElementHandlerTest
 
   @Test
   public void testWithoutParent() {
-    // given: a discretionaryItem
+    // given: a planItem
 
     // when
     CmmnActivity activity = handler.handleElement(discretionaryItem, context);

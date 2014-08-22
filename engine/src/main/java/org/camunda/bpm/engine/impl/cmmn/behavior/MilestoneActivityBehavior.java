@@ -13,6 +13,7 @@
 package org.camunda.bpm.engine.impl.cmmn.behavior;
 
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnActivityExecution;
+import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
 
 /**
  * @author Roman Smirnov
@@ -26,11 +27,26 @@ public class MilestoneActivityBehavior extends EventListenerOrMilestoneActivityB
   }
 
   public void created(CmmnActivityExecution execution) {
-    // Check Entry Sentries
     // TODO: Check Entry Sentries, if the entryCriterias
     // are not fulfilled then stay in state AVAILABLE.
     // But if the entryCriterias are already fulfilled
     // then perform transition "occur" on given case execution.
+
+    CmmnActivity activity = execution.getActivity();
+
+    // NOTE: this is only a temporally implementation!!! This will
+    // be exchanged with a proper implementation of sentries!!!
+    boolean hasEntryCriterias = false;
+    Object hasEntryCriteriasProperty = activity.getProperty("hasEntryCriterias");
+    if (hasEntryCriteriasProperty != null && hasEntryCriteriasProperty instanceof Boolean) {
+      hasEntryCriterias = (Boolean) hasEntryCriteriasProperty;
+    }
+
+    if (!hasEntryCriterias) {
+      // A missing entry criteria (Sentry) is considered "true" => occurred
+      execution.occur();
+    }
+
   }
 
   protected String getTypeName() {

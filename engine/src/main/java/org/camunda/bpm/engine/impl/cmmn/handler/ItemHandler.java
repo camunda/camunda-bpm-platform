@@ -61,7 +61,13 @@ import org.camunda.bpm.model.xml.instance.ModelElementInstance;
  */
 public abstract class ItemHandler extends CmmnElementHandler<CmmnElement> {
 
-  protected static List<String> TASK_OR_STAGE_EVENTS = Arrays.asList(
+  public static final String PROPERTY_REQUIRED_RULE = "requiredRule";
+  public static final String PROPERTY_MANUAL_ACTIVATION_RULE = "manualActivationRule";
+  public static final String PROPERTY_REPETITION_RULE = "repetitionRule";
+  public static final String PROPERTY_IS_BLOCKING = "isBlocking";
+  public static final String PROPERTY_DISCRETIONARY = "discretionary";
+
+  public static List<String> TASK_OR_STAGE_EVENTS = Arrays.asList(
       CaseExecutionListener.CREATE,
       CaseExecutionListener.ENABLE,
       CaseExecutionListener.DISABLE,
@@ -77,16 +83,16 @@ public abstract class ItemHandler extends CmmnElementHandler<CmmnElement> {
       CaseExecutionListener.COMPLETE
     );
 
-  protected static List<String> EVENTLISTENER_OR_MILESTONE_EVENTS = Arrays.asList(
+  public static List<String> EVENTLISTENER_OR_MILESTONE_EVENTS = Arrays.asList(
       CaseExecutionListener.CREATE,
       CaseExecutionListener.SUSPEND,
       CaseExecutionListener.RESUME,
       CaseExecutionListener.TERMINATE,
       CaseExecutionListener.PARENT_TERMINATE,
-      "occur"
+      CaseExecutionListener.OCCUR
     );
 
-  protected static List<String> CASE_PLAN_MODEL_EVENTS = Arrays.asList(
+  public static List<String> CASE_PLAN_MODEL_EVENTS = Arrays.asList(
       CaseExecutionListener.CREATE,
       CaseExecutionListener.TERMINATE,
       CaseExecutionListener.SUSPEND,
@@ -109,7 +115,7 @@ public abstract class ItemHandler extends CmmnElementHandler<CmmnElement> {
 
   protected void initializeActivity(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context) {
     if (isDiscretionaryItem(element)) {
-      activity.setProperty("discretionary", true);
+      activity.setProperty(PROPERTY_DISCRETIONARY, true);
     }
 
     String name = getName(element);
@@ -132,6 +138,9 @@ public abstract class ItemHandler extends CmmnElementHandler<CmmnElement> {
     // case execution listeners
     initializeCaseExecutionListeners(element, activity, context);
 
+    // initialize entry criterias
+    initializeEntryCriterias(element, activity, context);
+
   }
 
   protected void initializeRequiredRule(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context) {
@@ -152,7 +161,7 @@ public abstract class ItemHandler extends CmmnElementHandler<CmmnElement> {
       String rule = requiredRule.getCondition().getBody();
       Expression requiredRuleExpression = expressionManager.createExpression(rule);
       CaseControlRule caseRule = new CaseControlRuleImpl(requiredRuleExpression);
-      activity.setProperty("requiredRule", caseRule);
+      activity.setProperty(PROPERTY_REQUIRED_RULE, caseRule);
     }
 
   }
@@ -173,9 +182,9 @@ public abstract class ItemHandler extends CmmnElementHandler<CmmnElement> {
 
     if (manualActivationRule != null) {
       String rule = manualActivationRule.getCondition().getBody();
-      Expression requiredRuleExpression = expressionManager.createExpression(rule);
-      CaseControlRule caseRule = new CaseControlRuleImpl(requiredRuleExpression);
-      activity.setProperty("manualActivationRule", caseRule);
+      Expression manualActivationExpression = expressionManager.createExpression(rule);
+      CaseControlRule caseRule = new CaseControlRuleImpl(manualActivationExpression);
+      activity.setProperty(PROPERTY_MANUAL_ACTIVATION_RULE, caseRule);
     }
 
   }
@@ -196,9 +205,9 @@ public abstract class ItemHandler extends CmmnElementHandler<CmmnElement> {
 
     if (repetitionRule != null) {
       String rule = repetitionRule.getCondition().getBody();
-      Expression requiredRuleExpression = expressionManager.createExpression(rule);
-      CaseControlRule caseRule = new CaseControlRuleImpl(requiredRuleExpression);
-      activity.setProperty("repetitionRule", caseRule);
+      Expression repetitionRuleExpression = expressionManager.createExpression(rule);
+      CaseControlRule caseRule = new CaseControlRuleImpl(repetitionRuleExpression);
+      activity.setProperty(PROPERTY_REPETITION_RULE, caseRule);
     }
 
   }
@@ -371,6 +380,18 @@ public abstract class ItemHandler extends CmmnElementHandler<CmmnElement> {
     return null;
   }
 
+  protected void initializeEntryCriterias(CmmnElement element,  CmmnActivity activity, CmmnHandlerContext context) {
+    // NOTE: this is only a temporally implementation!!! This will
+    // be exchanged with a proper implementation of sentries!!!
+
+    // TODO: implement this!
+
+    Collection<Sentry> entryCriterias = getEntryCriterias(element);
+    if (!entryCriterias.isEmpty()) {
+      activity.setProperty("hasEntryCriterias", true);
+    }
+  }
+
   protected PlanItemControl getDefaultControl(CmmnElement element) {
     PlanItemDefinition definition = getDefinition(element);
 
@@ -436,19 +457,19 @@ public abstract class ItemHandler extends CmmnElementHandler<CmmnElement> {
     return null;
   }
 
-  protected List<Sentry> getEntryCriterias(CmmnElement element) {
+  protected Collection<Sentry> getEntryCriterias(CmmnElement element) {
     if (isPlanItem(element)) {
       PlanItem planItem = (PlanItem) element;
-      return (List<Sentry>) planItem.getEntryCriterias();
+      return planItem.getEntryCriterias();
     }
 
     return new ArrayList<Sentry>();
   }
 
-  protected List<Sentry> getExitCriterias(CmmnElement element) {
+  protected Collection<Sentry> getExitCriterias(CmmnElement element) {
     if (isPlanItem(element)) {
       PlanItem planItem = (PlanItem) element;
-      return (List<Sentry>) planItem.getExitCriterias();
+      return planItem.getExitCriterias();
     }
 
     return new ArrayList<Sentry>();

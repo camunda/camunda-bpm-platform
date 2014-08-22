@@ -12,11 +12,11 @@
  */
 package org.camunda.bpm.engine.test.cmmn.handler;
 
-import org.camunda.bpm.engine.impl.cmmn.handler.HumanTaskItemHandler;
+import org.camunda.bpm.engine.impl.cmmn.handler.MilestoneItemHandler;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
 import org.camunda.bpm.engine.test.cmmn.handler.specification.AbstractExecutionListenerSpec;
 import org.camunda.bpm.model.cmmn.instance.DiscretionaryItem;
-import org.camunda.bpm.model.cmmn.instance.HumanTask;
+import org.camunda.bpm.model.cmmn.instance.Milestone;
 import org.camunda.bpm.model.cmmn.instance.PlanningTable;
 import org.junit.Before;
 import org.junit.Test;
@@ -25,43 +25,43 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
 /**
- * @author Thorben Lindhauer
+ * @author Roman Smirnov
  *
  */
 @RunWith(Parameterized.class)
-public class HumanTaskDicretionaryItemExecutionListenerHandlerTest extends CmmnElementHandlerTest {
+public class MilestoneDiscretionaryItemExecutionListenerTest extends CmmnElementHandlerTest {
 
   @Parameters(name = "testListener: {0}")
   public static Iterable<Object[]> data() {
-    return ExecutionListenerCases.TASK_OR_STAGE_CASES;
+    return ExecutionListenerCases.EVENTLISTENER_OR_MILESTONE_CASES;
   }
 
-  protected HumanTask humanTask;
+  protected Milestone milestone;
   protected PlanningTable planningTable;
   protected DiscretionaryItem discretionaryItem;
-  protected HumanTaskItemHandler handler = new HumanTaskItemHandler();
+  protected MilestoneItemHandler handler = new MilestoneItemHandler();
 
   protected AbstractExecutionListenerSpec testSpecification;
 
-  public HumanTaskDicretionaryItemExecutionListenerHandlerTest(AbstractExecutionListenerSpec testSpecification) {
+  public MilestoneDiscretionaryItemExecutionListenerTest(AbstractExecutionListenerSpec testSpecification) {
     this.testSpecification = testSpecification;
   }
 
   @Before
   public void setUp() {
-    humanTask = createElement(casePlanModel, "aHumanTask", HumanTask.class);
+    milestone = createElement(casePlanModel, "aMilestone", Milestone.class);
 
     planningTable = createElement(casePlanModel, "aPlanningTable", PlanningTable.class);
 
-    discretionaryItem = createElement(planningTable, "DI_aHumanTask", DiscretionaryItem.class);
-    discretionaryItem.setDefinition(humanTask);
+    discretionaryItem = createElement(planningTable, "DI_aMilestone", DiscretionaryItem.class);
+    discretionaryItem.setDefinition(milestone);
 
   }
 
   @Test
   public void testCaseExecutionListener() {
     // given:
-    testSpecification.addListenerToElement(modelInstance, humanTask);
+    testSpecification.addListenerToElement(modelInstance, milestone);
 
     // when
     CmmnActivity activity = handler.handleElement(discretionaryItem, context);

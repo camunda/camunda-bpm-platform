@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.impl.cmmn.behavior;
 
 import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.ACTIVE;
 import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.FAILED;
+import static org.camunda.bpm.engine.impl.cmmn.handler.ItemHandler.PROPERTY_IS_BLOCKING;
 
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnActivityExecution;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
@@ -34,7 +35,7 @@ public class TaskActivityBehavior extends StageOrTaskActivityBehavior {
 
   protected boolean isBlocking(CmmnActivityExecution execution) {
     CmmnActivity activity = execution.getActivity();
-    Object isBlockingProperty = activity.getProperty("isBlocking");
+    Object isBlockingProperty = activity.getProperty(PROPERTY_IS_BLOCKING);
     if (isBlockingProperty != null && isBlockingProperty instanceof Boolean) {
       return (Boolean) isBlockingProperty;
     }

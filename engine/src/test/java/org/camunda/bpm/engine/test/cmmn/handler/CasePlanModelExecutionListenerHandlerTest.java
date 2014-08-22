@@ -29,7 +29,7 @@ public class CasePlanModelExecutionListenerHandlerTest extends CmmnElementHandle
 
   @Parameters(name = "testListener: {0}")
   public static Iterable<Object[]> data() {
-    return ExecutionListenerCases.PLAN_CASES;
+    return ExecutionListenerCases.CASE_PLAN_MODEL_CASES;
   }
 
   protected CasePlanModelHandler handler = new CasePlanModelHandler();

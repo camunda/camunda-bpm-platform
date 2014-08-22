@@ -74,8 +74,8 @@ public abstract class AbstractExecutionListenerSpec {
 
   protected abstract void verifyListener(DelegateListener<? extends BaseDelegateExecution> listener);
 
-  public AbstractExecutionListenerSpec expectRegistrationFor(Set<String> events) {
-    expectedRegisteredEvents = events;
+  public AbstractExecutionListenerSpec expectRegistrationFor(List<String> events) {
+    expectedRegisteredEvents = new HashSet<String>(events);
     return this;
   }
 

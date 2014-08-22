@@ -19,6 +19,7 @@ import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.DISA
 import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.ENABLED;
 import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.SUSPENDED;
 import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.TERMINATED;
+import static org.camunda.bpm.engine.impl.cmmn.handler.ItemHandler.PROPERTY_MANUAL_ACTIVATION_RULE;
 
 import org.camunda.bpm.engine.impl.cmmn.CaseControlRule;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnActivityExecution;
@@ -44,7 +45,7 @@ public abstract class StageOrTaskActivityBehavior extends PlanItemDefinitionActi
 
     // Step 2: Check ManualActiviation
     boolean manualActivation = true;
-    Object manualActivationRule = activity.getProperty("manualActivationRule");
+    Object manualActivationRule = activity.getProperty(PROPERTY_MANUAL_ACTIVATION_RULE);
     if (manualActivationRule != null) {
       CaseControlRule rule = (CaseControlRule) manualActivationRule;
       manualActivation = rule.evaluate(execution);

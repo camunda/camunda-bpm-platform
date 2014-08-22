@@ -82,4 +82,9 @@ public class CaseDefinitionBuilder {
     return this;
   }
 
+  public CaseDefinitionBuilder property(String name, Object value) {
+    activityStack.peek().setProperty(name, value);
+    return this;
+  }
+
 }

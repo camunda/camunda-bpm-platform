@@ -12,6 +12,7 @@
  */
 package org.camunda.bpm.engine.test.cmmn.handler;
 
+import static org.camunda.bpm.engine.impl.cmmn.handler.ItemHandler.PROPERTY_IS_BLOCKING;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
@@ -112,7 +113,7 @@ public class ProcessTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
     CmmnActivity activity = handler.handleElement(planItem, context);
 
     // then
-    Boolean isBlocking = (Boolean) activity.getProperty("isBlocking");
+    Boolean isBlocking = (Boolean) activity.getProperty(PROPERTY_IS_BLOCKING);
     assertTrue(isBlocking);
   }
 
@@ -126,7 +127,7 @@ public class ProcessTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
     CmmnActivity activity = handler.handleElement(planItem, context);
 
     // then
-    Boolean isBlocking = (Boolean) activity.getProperty("isBlocking");
+    Boolean isBlocking = (Boolean) activity.getProperty(PROPERTY_IS_BLOCKING);
     assertFalse(isBlocking);
   }
 

@@ -89,6 +89,11 @@ public class CaseExecutionQueryImpl extends AbstractVariableQueryImpl<CaseExecut
     return this;
   }
 
+  public CaseExecutionQuery available() {
+    state = CaseExecutionState.AVAILABLE;
+    return this;
+  }
+
   public CaseExecutionQuery enabled() {
     state = CaseExecutionState.ENABLED;
     return this;

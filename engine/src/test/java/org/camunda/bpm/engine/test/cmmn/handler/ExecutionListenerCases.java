@@ -13,10 +13,9 @@
 package org.camunda.bpm.engine.test.cmmn.handler;
 
 import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
 
 import org.camunda.bpm.engine.delegate.CaseExecutionListener;
+import org.camunda.bpm.engine.impl.cmmn.handler.ItemHandler;
 import org.camunda.bpm.engine.test.cmmn.handler.specification.AbstractExecutionListenerSpec;
 import org.camunda.bpm.engine.test.cmmn.handler.specification.ClassExecutionListenerSpec;
 import org.camunda.bpm.engine.test.cmmn.handler.specification.DelegateExpressionExecutionListenerSpec;
@@ -25,54 +24,24 @@ import org.camunda.bpm.engine.test.cmmn.handler.specification.ScriptExecutionLis
 
 public class ExecutionListenerCases {
 
-  public static final Set<String> ALL_EXECUTION_EVENTS =
-      new HashSet<String>(Arrays.asList(new String[] {
-          CaseExecutionListener.CREATE,
-          CaseExecutionListener.COMPLETE,
-          CaseExecutionListener.DISABLE,
-          CaseExecutionListener.ENABLE,
-          CaseExecutionListener.EXIT,
-          CaseExecutionListener.MANUAL_START,
-          CaseExecutionListener.PARENT_RESUME,
-          CaseExecutionListener.PARENT_SUSPEND,
-          CaseExecutionListener.RE_ENABLE,
-          CaseExecutionListener.RESUME,
-          CaseExecutionListener.START,
-          CaseExecutionListener.SUSPEND,
-          CaseExecutionListener.TERMINATE
-      }));
-
-  public static final Set<String> PLAN_RELEVANT_EXECUTION_EVENTS =
-      new HashSet<String>(Arrays.asList(new String[] {
-          CaseExecutionListener.CREATE,
-          CaseExecutionListener.CLOSE,
-          CaseExecutionListener.COMPLETE,
-          CaseExecutionListener.RE_ACTIVATE,
-          CaseExecutionListener.SUSPEND,
-          CaseExecutionListener.TERMINATE
-      }));
-
-  public static final Iterable<Object[]> ITEM_CASES =
+  public static final Iterable<Object[]> TASK_OR_STAGE_CASES =
       Arrays.asList(new Object[][] {
           // class delegate
           {new ClassExecutionListenerSpec(CaseExecutionListener.CREATE)},
-          {new ClassExecutionListenerSpec(CaseExecutionListener.CLOSE)},
-          {new ClassExecutionListenerSpec(CaseExecutionListener.COMPLETE)},
-          {new ClassExecutionListenerSpec(CaseExecutionListener.DISABLE)},
           {new ClassExecutionListenerSpec(CaseExecutionListener.ENABLE)},
-          {new ClassExecutionListenerSpec(CaseExecutionListener.EXIT)},
-          {new ClassExecutionListenerSpec(CaseExecutionListener.MANUAL_START)},
-          {new ClassExecutionListenerSpec(CaseExecutionListener.PARENT_RESUME)},
-          {new ClassExecutionListenerSpec(CaseExecutionListener.PARENT_SUSPEND)},
-          {new ClassExecutionListenerSpec(CaseExecutionListener.PARENT_TERMINATE)},
-          {new ClassExecutionListenerSpec(CaseExecutionListener.RE_ACTIVATE)},
+          {new ClassExecutionListenerSpec(CaseExecutionListener.DISABLE)},
           {new ClassExecutionListenerSpec(CaseExecutionListener.RE_ENABLE)},
-          {new ClassExecutionListenerSpec(CaseExecutionListener.RESUME)},
           {new ClassExecutionListenerSpec(CaseExecutionListener.START)},
-          {new ClassExecutionListenerSpec(CaseExecutionListener.SUSPEND)},
+          {new ClassExecutionListenerSpec(CaseExecutionListener.MANUAL_START)},
+          {new ClassExecutionListenerSpec(CaseExecutionListener.COMPLETE)},
           {new ClassExecutionListenerSpec(CaseExecutionListener.TERMINATE)},
+          {new ClassExecutionListenerSpec(CaseExecutionListener.EXIT)},
+          {new ClassExecutionListenerSpec(CaseExecutionListener.SUSPEND)},
+          {new ClassExecutionListenerSpec(CaseExecutionListener.PARENT_SUSPEND)},
+          {new ClassExecutionListenerSpec(CaseExecutionListener.RESUME)},
+          {new ClassExecutionListenerSpec(CaseExecutionListener.PARENT_RESUME)},
           {new ClassExecutionListenerSpec(AbstractExecutionListenerSpec.ANY_EVENT)
-              .expectRegistrationFor(ALL_EXECUTION_EVENTS)},
+              .expectRegistrationFor(ItemHandler.TASK_OR_STAGE_EVENTS)},
 
           {new ClassExecutionListenerSpec(CaseExecutionListener.CREATE)
             .withFieldExpression("firstField", "${myFirstExpression}")
@@ -89,43 +58,37 @@ public class ExecutionListenerCases {
 
           // script
           {new ScriptExecutionListenerSpec(CaseExecutionListener.CREATE)},
-          {new ScriptExecutionListenerSpec(CaseExecutionListener.CLOSE)},
-          {new ScriptExecutionListenerSpec(CaseExecutionListener.COMPLETE)},
-          {new ScriptExecutionListenerSpec(CaseExecutionListener.DISABLE)},
           {new ScriptExecutionListenerSpec(CaseExecutionListener.ENABLE)},
-          {new ScriptExecutionListenerSpec(CaseExecutionListener.EXIT)},
-          {new ScriptExecutionListenerSpec(CaseExecutionListener.MANUAL_START)},
-          {new ScriptExecutionListenerSpec(CaseExecutionListener.PARENT_RESUME)},
-          {new ScriptExecutionListenerSpec(CaseExecutionListener.PARENT_SUSPEND)},
-          {new ScriptExecutionListenerSpec(CaseExecutionListener.PARENT_TERMINATE)},
-          {new ScriptExecutionListenerSpec(CaseExecutionListener.RE_ACTIVATE)},
+          {new ScriptExecutionListenerSpec(CaseExecutionListener.DISABLE)},
           {new ScriptExecutionListenerSpec(CaseExecutionListener.RE_ENABLE)},
-          {new ScriptExecutionListenerSpec(CaseExecutionListener.RESUME)},
           {new ScriptExecutionListenerSpec(CaseExecutionListener.START)},
-          {new ScriptExecutionListenerSpec(CaseExecutionListener.SUSPEND)},
+          {new ScriptExecutionListenerSpec(CaseExecutionListener.MANUAL_START)},
+          {new ScriptExecutionListenerSpec(CaseExecutionListener.COMPLETE)},
           {new ScriptExecutionListenerSpec(CaseExecutionListener.TERMINATE)},
+          {new ScriptExecutionListenerSpec(CaseExecutionListener.EXIT)},
+          {new ScriptExecutionListenerSpec(CaseExecutionListener.SUSPEND)},
+          {new ScriptExecutionListenerSpec(CaseExecutionListener.PARENT_SUSPEND)},
+          {new ScriptExecutionListenerSpec(CaseExecutionListener.RESUME)},
+          {new ScriptExecutionListenerSpec(CaseExecutionListener.PARENT_RESUME)},
           {new ScriptExecutionListenerSpec(AbstractExecutionListenerSpec.ANY_EVENT)
-              .expectRegistrationFor(ALL_EXECUTION_EVENTS)},
+              .expectRegistrationFor(ItemHandler.TASK_OR_STAGE_EVENTS)},
 
           // delegate expression
           {new DelegateExpressionExecutionListenerSpec(CaseExecutionListener.CREATE)},
-          {new DelegateExpressionExecutionListenerSpec(CaseExecutionListener.CLOSE)},
-          {new DelegateExpressionExecutionListenerSpec(CaseExecutionListener.COMPLETE)},
-          {new DelegateExpressionExecutionListenerSpec(CaseExecutionListener.DISABLE)},
           {new DelegateExpressionExecutionListenerSpec(CaseExecutionListener.ENABLE)},
-          {new DelegateExpressionExecutionListenerSpec(CaseExecutionListener.EXIT)},
-          {new DelegateExpressionExecutionListenerSpec(CaseExecutionListener.MANUAL_START)},
-          {new DelegateExpressionExecutionListenerSpec(CaseExecutionListener.PARENT_RESUME)},
-          {new DelegateExpressionExecutionListenerSpec(CaseExecutionListener.PARENT_SUSPEND)},
-          {new DelegateExpressionExecutionListenerSpec(CaseExecutionListener.PARENT_TERMINATE)},
-          {new DelegateExpressionExecutionListenerSpec(CaseExecutionListener.RE_ACTIVATE)},
+          {new DelegateExpressionExecutionListenerSpec(CaseExecutionListener.DISABLE)},
           {new DelegateExpressionExecutionListenerSpec(CaseExecutionListener.RE_ENABLE)},
-          {new DelegateExpressionExecutionListenerSpec(CaseExecutionListener.RESUME)},
           {new DelegateExpressionExecutionListenerSpec(CaseExecutionListener.START)},
-          {new DelegateExpressionExecutionListenerSpec(CaseExecutionListener.SUSPEND)},
+          {new DelegateExpressionExecutionListenerSpec(CaseExecutionListener.MANUAL_START)},
+          {new DelegateExpressionExecutionListenerSpec(CaseExecutionListener.COMPLETE)},
           {new DelegateExpressionExecutionListenerSpec(CaseExecutionListener.TERMINATE)},
+          {new DelegateExpressionExecutionListenerSpec(CaseExecutionListener.EXIT)},
+          {new DelegateExpressionExecutionListenerSpec(CaseExecutionListener.SUSPEND)},
+          {new DelegateExpressionExecutionListenerSpec(CaseExecutionListener.PARENT_SUSPEND)},
+          {new DelegateExpressionExecutionListenerSpec(CaseExecutionListener.RESUME)},
+          {new DelegateExpressionExecutionListenerSpec(CaseExecutionListener.PARENT_RESUME)},
           {new DelegateExpressionExecutionListenerSpec(AbstractExecutionListenerSpec.ANY_EVENT)
-              .expectRegistrationFor(ALL_EXECUTION_EVENTS)},
+              .expectRegistrationFor(ItemHandler.TASK_OR_STAGE_EVENTS)},
 
           {new DelegateExpressionExecutionListenerSpec(CaseExecutionListener.CREATE)
             .withFieldExpression("firstField", "${myFirstExpression}")
@@ -142,36 +105,34 @@ public class ExecutionListenerCases {
 
           // expression
           {new ExpressionExecutionListenerSpec(CaseExecutionListener.CREATE)},
-          {new ExpressionExecutionListenerSpec(CaseExecutionListener.CLOSE)},
-          {new ExpressionExecutionListenerSpec(CaseExecutionListener.COMPLETE)},
-          {new ExpressionExecutionListenerSpec(CaseExecutionListener.DISABLE)},
           {new ExpressionExecutionListenerSpec(CaseExecutionListener.ENABLE)},
-          {new ExpressionExecutionListenerSpec(CaseExecutionListener.EXIT)},
-          {new ExpressionExecutionListenerSpec(CaseExecutionListener.MANUAL_START)},
-          {new ExpressionExecutionListenerSpec(CaseExecutionListener.PARENT_RESUME)},
-          {new ExpressionExecutionListenerSpec(CaseExecutionListener.PARENT_SUSPEND)},
-          {new ExpressionExecutionListenerSpec(CaseExecutionListener.PARENT_TERMINATE)},
-          {new ExpressionExecutionListenerSpec(CaseExecutionListener.RE_ACTIVATE)},
+          {new ExpressionExecutionListenerSpec(CaseExecutionListener.DISABLE)},
           {new ExpressionExecutionListenerSpec(CaseExecutionListener.RE_ENABLE)},
-          {new ExpressionExecutionListenerSpec(CaseExecutionListener.RESUME)},
           {new ExpressionExecutionListenerSpec(CaseExecutionListener.START)},
-          {new ExpressionExecutionListenerSpec(CaseExecutionListener.SUSPEND)},
+          {new ExpressionExecutionListenerSpec(CaseExecutionListener.MANUAL_START)},
+          {new ExpressionExecutionListenerSpec(CaseExecutionListener.COMPLETE)},
           {new ExpressionExecutionListenerSpec(CaseExecutionListener.TERMINATE)},
+          {new ExpressionExecutionListenerSpec(CaseExecutionListener.EXIT)},
+          {new ExpressionExecutionListenerSpec(CaseExecutionListener.SUSPEND)},
+          {new ExpressionExecutionListenerSpec(CaseExecutionListener.PARENT_SUSPEND)},
+          {new ExpressionExecutionListenerSpec(CaseExecutionListener.RESUME)},
+          {new ExpressionExecutionListenerSpec(CaseExecutionListener.PARENT_RESUME)},
           {new ExpressionExecutionListenerSpec(AbstractExecutionListenerSpec.ANY_EVENT)
-              .expectRegistrationFor(ALL_EXECUTION_EVENTS)}
+              .expectRegistrationFor(ItemHandler.TASK_OR_STAGE_EVENTS)}
       });
 
-  public static final Iterable<Object[]> PLAN_CASES =
+
+  public static final Iterable<Object[]> EVENTLISTENER_OR_MILESTONE_CASES =
       Arrays.asList(new Object[][] {
           // class delegate
           {new ClassExecutionListenerSpec(CaseExecutionListener.CREATE)},
-          {new ClassExecutionListenerSpec(CaseExecutionListener.CLOSE)},
-          {new ClassExecutionListenerSpec(CaseExecutionListener.COMPLETE)},
-          {new ClassExecutionListenerSpec(CaseExecutionListener.RE_ACTIVATE)},
           {new ClassExecutionListenerSpec(CaseExecutionListener.SUSPEND)},
+          {new ClassExecutionListenerSpec(CaseExecutionListener.RESUME)},
           {new ClassExecutionListenerSpec(CaseExecutionListener.TERMINATE)},
+          {new ClassExecutionListenerSpec(CaseExecutionListener.PARENT_TERMINATE)},
+          {new ClassExecutionListenerSpec(CaseExecutionListener.OCCUR)},
           {new ClassExecutionListenerSpec(AbstractExecutionListenerSpec.ANY_EVENT)
-              .expectRegistrationFor(PLAN_RELEVANT_EXECUTION_EVENTS)},
+              .expectRegistrationFor(ItemHandler.EVENTLISTENER_OR_MILESTONE_EVENTS)},
 
           {new ClassExecutionListenerSpec(CaseExecutionListener.CREATE)
             .withFieldExpression("firstField", "${myFirstExpression}")
@@ -188,23 +149,23 @@ public class ExecutionListenerCases {
 
           // script
           {new ScriptExecutionListenerSpec(CaseExecutionListener.CREATE)},
-          {new ScriptExecutionListenerSpec(CaseExecutionListener.CLOSE)},
-          {new ScriptExecutionListenerSpec(CaseExecutionListener.COMPLETE)},
-          {new ScriptExecutionListenerSpec(CaseExecutionListener.RE_ACTIVATE)},
           {new ScriptExecutionListenerSpec(CaseExecutionListener.SUSPEND)},
+          {new ScriptExecutionListenerSpec(CaseExecutionListener.RESUME)},
           {new ScriptExecutionListenerSpec(CaseExecutionListener.TERMINATE)},
+          {new ScriptExecutionListenerSpec(CaseExecutionListener.PARENT_TERMINATE)},
+          {new ScriptExecutionListenerSpec(CaseExecutionListener.OCCUR)},
           {new ScriptExecutionListenerSpec(AbstractExecutionListenerSpec.ANY_EVENT)
-              .expectRegistrationFor(PLAN_RELEVANT_EXECUTION_EVENTS)},
+              .expectRegistrationFor(ItemHandler.EVENTLISTENER_OR_MILESTONE_EVENTS)},
 
           // delegate expression
           {new DelegateExpressionExecutionListenerSpec(CaseExecutionListener.CREATE)},
-          {new DelegateExpressionExecutionListenerSpec(CaseExecutionListener.CLOSE)},
-          {new DelegateExpressionExecutionListenerSpec(CaseExecutionListener.COMPLETE)},
-          {new DelegateExpressionExecutionListenerSpec(CaseExecutionListener.RE_ACTIVATE)},
           {new DelegateExpressionExecutionListenerSpec(CaseExecutionListener.SUSPEND)},
+          {new DelegateExpressionExecutionListenerSpec(CaseExecutionListener.RESUME)},
           {new DelegateExpressionExecutionListenerSpec(CaseExecutionListener.TERMINATE)},
+          {new DelegateExpressionExecutionListenerSpec(CaseExecutionListener.PARENT_TERMINATE)},
+          {new DelegateExpressionExecutionListenerSpec(CaseExecutionListener.OCCUR)},
           {new DelegateExpressionExecutionListenerSpec(AbstractExecutionListenerSpec.ANY_EVENT)
-              .expectRegistrationFor(PLAN_RELEVANT_EXECUTION_EVENTS)},
+              .expectRegistrationFor(ItemHandler.EVENTLISTENER_OR_MILESTONE_EVENTS)},
 
           {new DelegateExpressionExecutionListenerSpec(CaseExecutionListener.CREATE)
             .withFieldExpression("firstField", "${myFirstExpression}")
@@ -221,13 +182,82 @@ public class ExecutionListenerCases {
 
           // expression
           {new ExpressionExecutionListenerSpec(CaseExecutionListener.CREATE)},
-          {new ExpressionExecutionListenerSpec(CaseExecutionListener.CLOSE)},
+          {new ExpressionExecutionListenerSpec(CaseExecutionListener.SUSPEND)},
+          {new ExpressionExecutionListenerSpec(CaseExecutionListener.RESUME)},
+          {new ExpressionExecutionListenerSpec(CaseExecutionListener.TERMINATE)},
+          {new ExpressionExecutionListenerSpec(CaseExecutionListener.PARENT_TERMINATE)},
+          {new ExpressionExecutionListenerSpec(CaseExecutionListener.OCCUR)},
+          {new ExpressionExecutionListenerSpec(AbstractExecutionListenerSpec.ANY_EVENT)
+              .expectRegistrationFor(ItemHandler.EVENTLISTENER_OR_MILESTONE_EVENTS)},
+      });
+
+  public static final Iterable<Object[]> CASE_PLAN_MODEL_CASES =
+      Arrays.asList(new Object[][] {
+          // class delegate
+          {new ClassExecutionListenerSpec(CaseExecutionListener.CREATE)},
+          {new ClassExecutionListenerSpec(CaseExecutionListener.COMPLETE)},
+          {new ClassExecutionListenerSpec(CaseExecutionListener.SUSPEND)},
+          {new ClassExecutionListenerSpec(CaseExecutionListener.TERMINATE)},
+          {new ClassExecutionListenerSpec(CaseExecutionListener.RE_ACTIVATE)},
+          {new ClassExecutionListenerSpec(CaseExecutionListener.CLOSE)},
+          {new ClassExecutionListenerSpec(AbstractExecutionListenerSpec.ANY_EVENT)
+              .expectRegistrationFor(ItemHandler.CASE_PLAN_MODEL_EVENTS)},
+
+          {new ClassExecutionListenerSpec(CaseExecutionListener.CREATE)
+            .withFieldExpression("firstField", "${myFirstExpression}")
+            .withFieldExpression("secondField", "${mySecondExpression}")},
+          {new ClassExecutionListenerSpec(CaseExecutionListener.CREATE)
+            .withFieldChildExpression("firstField", "${myFirstExpression}")
+            .withFieldChildExpression("secondField", "${mySecondExpression}")},
+          {new ClassExecutionListenerSpec(CaseExecutionListener.CREATE)
+            .withFieldStringValue("firstField", "aFirstFixedValue")
+            .withFieldStringValue("secondField", "aSecondFixedValue")},
+          {new ClassExecutionListenerSpec(CaseExecutionListener.CREATE)
+            .withFieldChildStringValue("firstField", "aFirstFixedValue")
+            .withFieldChildStringValue("secondField", "aSecondFixedValue")},
+
+          // script
+          {new ScriptExecutionListenerSpec(CaseExecutionListener.CREATE)},
+          {new ScriptExecutionListenerSpec(CaseExecutionListener.COMPLETE)},
+          {new ScriptExecutionListenerSpec(CaseExecutionListener.RE_ACTIVATE)},
+          {new ScriptExecutionListenerSpec(CaseExecutionListener.SUSPEND)},
+          {new ScriptExecutionListenerSpec(CaseExecutionListener.TERMINATE)},
+          {new ScriptExecutionListenerSpec(CaseExecutionListener.CLOSE)},
+          {new ScriptExecutionListenerSpec(AbstractExecutionListenerSpec.ANY_EVENT)
+              .expectRegistrationFor(ItemHandler.CASE_PLAN_MODEL_EVENTS)},
+
+          // delegate expression
+          {new DelegateExpressionExecutionListenerSpec(CaseExecutionListener.CREATE)},
+          {new DelegateExpressionExecutionListenerSpec(CaseExecutionListener.COMPLETE)},
+          {new DelegateExpressionExecutionListenerSpec(CaseExecutionListener.RE_ACTIVATE)},
+          {new DelegateExpressionExecutionListenerSpec(CaseExecutionListener.SUSPEND)},
+          {new DelegateExpressionExecutionListenerSpec(CaseExecutionListener.TERMINATE)},
+          {new DelegateExpressionExecutionListenerSpec(CaseExecutionListener.CLOSE)},
+          {new DelegateExpressionExecutionListenerSpec(AbstractExecutionListenerSpec.ANY_EVENT)
+              .expectRegistrationFor(ItemHandler.CASE_PLAN_MODEL_EVENTS)},
+
+          {new DelegateExpressionExecutionListenerSpec(CaseExecutionListener.CREATE)
+            .withFieldExpression("firstField", "${myFirstExpression}")
+            .withFieldExpression("secondField", "${mySecondExpression}")},
+          {new DelegateExpressionExecutionListenerSpec(CaseExecutionListener.CREATE)
+            .withFieldChildExpression("firstField", "${myFirstExpression}")
+            .withFieldChildExpression("secondField", "${mySecondExpression}")},
+          {new DelegateExpressionExecutionListenerSpec(CaseExecutionListener.CREATE)
+            .withFieldStringValue("firstField", "aFirstFixedValue")
+            .withFieldStringValue("secondField", "aSecondFixedValue")},
+          {new DelegateExpressionExecutionListenerSpec(CaseExecutionListener.CREATE)
+            .withFieldChildStringValue("firstField", "aFirstFixedValue")
+            .withFieldChildStringValue("secondField", "aSecondFixedValue")},
+
+          // expression
+          {new ExpressionExecutionListenerSpec(CaseExecutionListener.CREATE)},
           {new ExpressionExecutionListenerSpec(CaseExecutionListener.COMPLETE)},
           {new ExpressionExecutionListenerSpec(CaseExecutionListener.RE_ACTIVATE)},
           {new ExpressionExecutionListenerSpec(CaseExecutionListener.SUSPEND)},
           {new ExpressionExecutionListenerSpec(CaseExecutionListener.TERMINATE)},
+          {new ExpressionExecutionListenerSpec(CaseExecutionListener.CLOSE)},
           {new ExpressionExecutionListenerSpec(AbstractExecutionListenerSpec.ANY_EVENT)
-              .expectRegistrationFor(PLAN_RELEVANT_EXECUTION_EVENTS)}
+              .expectRegistrationFor(ItemHandler.CASE_PLAN_MODEL_EVENTS)}
       });
 
 
