@@ -28,10 +28,10 @@ public class Customer {
 We can map the following XML object
  
  ```xml 
-  <?xml version="1.0" encoding="UTF-8"?>
-  <customer xmlns="http://camunda.org/example">
-    <name>Kermit</name>
-  </customer>
+<?xml version="1.0" encoding="UTF-8"?>
+<customer xmlns="http://camunda.org/example">
+  <name>Kermit</name>
+</customer>
  ```
  
  to an instance of `Customer` as follows:
