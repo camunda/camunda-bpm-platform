@@ -75,18 +75,23 @@ public class HistoricVariableDataFormatTest extends AbstractProcessEngineTestCas
     SimpleBean bean = new SimpleBean("a String", 42, false);
     runtimeService.setVariable(instance.getId(), "simpleBean", bean);
 
-    HistoricVariableUpdate historicUpdate = (HistoricVariableUpdate)
-        historyService.createHistoricDetailQuery().variableUpdates().singleResult();
-    SerializedVariableValue serializedValue = historicUpdate.getSerializedValue();
-    assertNotNull(serializedValue);
+    if (ProcessEngineConfiguration.HISTORY_FULL.equals(processEngineConfiguration.getHistory())) {
 
-    Map<String, Object> config = serializedValue.getConfig();
-    assertEquals(2, config.size());
-    assertEquals(JSON_FORMAT_NAME, config.get(SerializedVariableTypes.SPIN_TYPE_DATA_FORMAT_ID));
-    assertEquals(bean.getClass().getCanonicalName(), config.get(SerializedVariableTypes.SPIN_TYPE_CONFIG_ROOT_TYPE));
+      HistoricVariableUpdate historicUpdate = (HistoricVariableUpdate)
+          historyService.createHistoricDetailQuery().variableUpdates().singleResult();
+      SerializedVariableValue serializedValue = historicUpdate.getSerializedValue();
+      assertNotNull(serializedValue);
 
-    String variableAsJson = (String) serializedValue.getValue();
-    JSONAssert.assertEquals(bean.toExpectedJsonString(), variableAsJson, true);
+      Map<String, Object> config = serializedValue.getConfig();
+      assertEquals(2, config.size());
+      assertEquals(JSON_FORMAT_NAME, config.get(SerializedVariableTypes.SPIN_TYPE_DATA_FORMAT_ID));
+      assertEquals(bean.getClass().getCanonicalName(), config.get(SerializedVariableTypes.SPIN_TYPE_CONFIG_ROOT_TYPE));
+
+      String variableAsJson = (String) serializedValue.getValue();
+      JSONAssert.assertEquals(bean.toExpectedJsonString(), variableAsJson, true);
+    }
+
+
   }
 
 
