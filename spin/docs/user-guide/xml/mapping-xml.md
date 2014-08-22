@@ -8,7 +8,7 @@ Assume we have a class `Customer` defined as follows:
 
 ```java
 @XmlRootElement(name="customer", namespace="http://camunda.org/test")
-public class  {
+public class Customer {
 
   private String name;
   
@@ -52,7 +52,7 @@ import static org.camunda.spin.Spin.XML;
 String xml = XML(customer).toString();
 ```
 
-### Configure the mapper:
+### Configuring the mapper:
 
 The mapper allows us to append some useful configuration parameters to the JAXB marshaller/unmarshaller. These parameters
 can be configured as a map or simply as a key/value combination. With this you can set one of the following properties:
@@ -65,7 +65,7 @@ An example of a configuration (as a key/value combination) could look like this:
 
 ```java
   SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-  Schema schema = sf.newSchema(new File('your_schema.xsd');
+  Schema schema = sf.newSchema(new File("your_schema.xsd");
   
   XmlDomDataFormat dataFormat = new XmlDomDataFormat()
       .mapper()
@@ -75,4 +75,4 @@ An example of a configuration (as a key/value combination) could look like this:
   String xml = XML(customer, dataFormat).toString();
 ```
 
-This would add `your_schema.xsd` to the marshaller and also activate the validation for this conversation.
+This would add `your_schema.xsd` to the marshaller and also activate the validation for this conversion.
