@@ -41,6 +41,7 @@ public class CaseServiceMilestoneTest extends PluggableProcessEngineTestCase {
       caseService
         .withCaseExecution(caseTaskId)
         .manualStart();
+      fail();
     } catch (NotAllowedException e) {
     }
   }
@@ -58,6 +59,7 @@ public class CaseServiceMilestoneTest extends PluggableProcessEngineTestCase {
       caseService
         .withCaseExecution(caseTaskId)
         .disable();
+      fail();
     } catch (NotAllowedException e) {
     }
   }
@@ -75,6 +77,7 @@ public class CaseServiceMilestoneTest extends PluggableProcessEngineTestCase {
       caseService
         .withCaseExecution(caseTaskId)
         .reenable();
+      fail();
     } catch (NotAllowedException e) {
     }
   }
@@ -92,6 +95,7 @@ public class CaseServiceMilestoneTest extends PluggableProcessEngineTestCase {
       caseService
         .withCaseExecution(caseTaskId)
         .complete();
+      fail();
     } catch (NotAllowedException e) {
     }
   }
