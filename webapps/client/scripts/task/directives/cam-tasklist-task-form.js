@@ -78,7 +78,7 @@ define([
           scope._camForm = null;
 
           var parts = (scope.task.formKey || '').split('embedded:');
-          var ctx = scope.task._embedded.processDefinition.contextPath;
+          var ctx = scope.task._embedded.processDefinition[0].contextPath;
           var formUrl;
 
           if (parts.length > 1) {

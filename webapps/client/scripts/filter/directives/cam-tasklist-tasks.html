@@ -41,8 +41,10 @@
 </div>
 
 <div ng-hide="loading">
-  <div ng-hide="totalItems" class="no-match" translate="NO_MATCHING_TASK">
-    No task macthing filters found.
+  <div ng-hide="totalItems"
+       class="well">
+    <i class="glyphicon glyphicon-info-sign"></i>
+    {{ 'NO_MATCHING_TASK' | translate }}
   </div>
 
   <form ng-show="totalItems"
@@ -58,8 +60,8 @@
                tabindex="{{ (delta + 1) }}">{{ task.name }}</a>
           </h4>
           <h6 class="process-definition"
-              ng-class="{suspended: task._embedded.processDefinition}">
-            {{ task._embedded.processDefinition.name || task._embedded.processDefinition.key }}
+              ng-class="{suspended: task._embedded.processDefinition[0]}">
+            {{ task._embedded.processDefinition[0].name || task._embedded.processDefinition[0].key }}
           </h6>
         </div>
 

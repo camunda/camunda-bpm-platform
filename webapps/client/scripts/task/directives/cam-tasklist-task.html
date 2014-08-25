@@ -24,8 +24,8 @@
       <div class="names">
         <h2 class="task">{{ task.name }}</h2>
         <h4 class="process-definition"
-            ng-class="{suspended: task._embedded.processDefinition}">
-          {{ task._embedded.processDefinition.name || task._embedded.processDefinition.key }}
+            ng-class="{suspended: task._embedded.processDefinition[0]}">
+          {{ task._embedded.processDefinition[0].name || task._embedded.processDefinition[0].key }}
         </h4>
       </div>
 
