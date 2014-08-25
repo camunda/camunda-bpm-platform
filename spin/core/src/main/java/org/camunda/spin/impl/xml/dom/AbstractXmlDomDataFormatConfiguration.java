@@ -17,7 +17,7 @@ import org.camunda.spin.spi.AbstractConfiguration;
 import java.util.Map;
 
 /**
- * @author Stefan Hentschel.
+ * @author Stefan Hentschel
  */
 public abstract class AbstractXmlDomDataFormatConfiguration<R extends AbstractConfiguration<R>>
   extends AbstractConfiguration<R> implements XmlDomConfigurable {
@@ -46,15 +46,24 @@ public abstract class AbstractXmlDomDataFormatConfiguration<R extends AbstractCo
    * Adds a map of parameters to the configuration.
    * The map should contain at least one of the following properties:
    *
-   * -- properties -> A {@link java.util.Map} which contains properties for the marshaller or unmarshaller
-   * -- schema -> a {@link javax.xml.validation.Schema} for validating purpose
-   * -- eventHandler -> a {@link javax.xml.bind.ValidationEventHandler} to
-   *                    fetch all thrown events from the marshaller/unmarshaller
+   * <br />
+   * <p>
+   *   -- properties -> A {@link java.util.Map} which contains properties for the marshaller or unmarshaller
+   * </p>
+   * <p>
+   *   -- schema -> a {@link javax.xml.validation.Schema} for validating purpose
+   * </p>
+   * <p>
+   *   -- eventHandler -> a {@link javax.xml.bind.ValidationEventHandler} to
+   *                      fetch all thrown events from the marshaller/unmarshaller
+   * </p>
+   * <br />
    *
    * If you set schema or the eventHandler to null the marshaller/unmarshaller will set them
    * to their default value.
    *
    * @param config map with configuration
+   *
    * @return current representation of this configuration
    */
   public R config(Map<String, Object> config) {
@@ -66,16 +75,25 @@ public abstract class AbstractXmlDomDataFormatConfiguration<R extends AbstractCo
    * Adds a parameter to the configuration.
    * The parameter should be at least one of the following properties:
    *
-   * -- properties -> A {@link java.util.Map} which contains properties for the marshaller or unmarshaller
-   * -- schema -> a {@link javax.xml.validation.Schema} for validating purpose
-   * -- eventHandler -> a {@link javax.xml.bind.ValidationEventHandler} to
-   *                    fetch all thrown events from the marshaller/unmarshaller
+   * <br />
+   * <p>
+   *   -- properties -> A {@link java.util.Map} which contains properties for the marshaller or unmarshaller
+   * </p>
+   * <p>
+   *   -- schema -> a {@link javax.xml.validation.Schema} for validating purpose
+   * </p>
+   * <p>
+   *   -- eventHandler -> a {@link javax.xml.bind.ValidationEventHandler} to
+   *                      fetch all thrown events from the marshaller/unmarshaller
+   * </p>
+   * <br />
    *
    * If you set schema or the eventHandler to null the marshaller/unmarshaller will set them
    * to their default value.
    *
    * @param key name of the property
    * @param value value of the property
+   *
    * @return current representation of this configuration
    */
   public R config(String key, Object value) {
