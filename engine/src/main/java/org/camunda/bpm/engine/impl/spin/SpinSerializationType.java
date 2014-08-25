@@ -77,7 +77,9 @@ public class SpinSerializationType implements VariableType {
   }
 
   protected void setValue(String serializedValue, String dataFormatId, String valueType, ValueFields valueFields) {
-    if (serializedValue.getBytes().length <= DbSqlSessionFactory.ACT_RU_VARIABLE_TEXT_LENGTH) {
+    if (serializedValue == null) {
+      valueFields.setTextValue(null);
+    } else if (serializedValue.getBytes().length <= DbSqlSessionFactory.ACT_RU_VARIABLE_TEXT_LENGTH) {
       valueFields.setTextValue(serializedValue);
     } else {
       valueFields.setByteArrayValue(serializedValue.getBytes());
@@ -151,7 +153,19 @@ public class SpinSerializationType implements VariableType {
   }
 
   public boolean isAbleToStoreSerializedValue(Object value, Map<String, Object> configuration) {
+    return isValidObjectSerializedInput(value, configuration) || isValidNullInput(value, configuration);
+  }
+
+  protected boolean isValidObjectSerializedInput(Object value, Map<String, Object> configuration) {
     return value instanceof String
+        && configuration != null
+        && configuration.get(CONFIG_DATA_FORMAT) instanceof String
+        && configuration.get(CONFIG_ROOT_TYPE) instanceof String
+        && availableDataFormats.containsKey(configuration.get(CONFIG_DATA_FORMAT));
+  }
+
+  protected boolean isValidNullInput(Object value, Map<String, Object> configuration) {
+    return value == null
         && configuration != null
         && configuration.get(CONFIG_DATA_FORMAT) instanceof String
         && configuration.get(CONFIG_ROOT_TYPE) instanceof String

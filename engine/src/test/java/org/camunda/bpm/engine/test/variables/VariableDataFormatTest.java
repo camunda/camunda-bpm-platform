@@ -391,6 +391,34 @@ public class VariableDataFormatTest extends AbstractProcessEngineTestCase {
     }
   }
 
+  @Deployment(resources = ONE_TASK_PROCESS)
+  public void testSetSerializedVariableNullValue() throws JSONException {
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+    // despite null value, we still require a consistent configuration map
+    Map<String, Object> variableConfig = new HashMap<String, Object>();
+    variableConfig.put(ProcessEngineVariableType.SPIN_TYPE_DATA_FORMAT_ID, JSON_FORMAT_NAME);
+    variableConfig.put(ProcessEngineVariableType.SPIN_TYPE_CONFIG_ROOT_TYPE, "java.lang.Object");
+
+    runtimeService.setVariableFromSerialized(instance.getId(), "simpleBean", null,
+        ProcessEngineVariableType.SPIN.getName(), variableConfig);
+
+    VariableInstance variable = runtimeService.createVariableInstanceQuery().singleResult();
+
+    assertNotNull(variable);
+    assertEquals("simpleBean", variable.getName());
+    assertNull(variable.getValue());
+
+    SerializedVariableValue serializedValue = variable.getSerializedValue();
+    assertNotNull(serializedValue);
+    assertNull(serializedValue.getValue());
+    assertEquals(2, serializedValue.getConfig().size());
+
+    assertEquals(JSON_FORMAT_NAME, serializedValue.getConfig().get(ProcessEngineVariableType.SPIN_TYPE_DATA_FORMAT_ID));
+    assertEquals("java.lang.Object", serializedValue.getConfig().get(ProcessEngineVariableType.SPIN_TYPE_CONFIG_ROOT_TYPE));
+
+  }
+
 
   protected void assertCannotRetrieveVariable(String scopeId, String variableName) {
     try {
