@@ -32,10 +32,8 @@ define([
    * Controller used for the /login route
    */
   userModule.controller('userLoginCtrl', [
-    '$location',
     '$modal',
   function(
-    $location,
     $modal
   ) {
     $modal.open({
@@ -48,12 +46,10 @@ define([
    * controller to be used for the /logout route
    */
   userModule.controller('userLogoutCtrl', [
-    '$rootScope',
     '$translate',
     'AuthenticationService',
     'Notifications',
   function(
-    $rootScope,
     $translate,
     AuthenticationService,
     Notifications
@@ -72,15 +68,11 @@ define([
 
   userModule.controller('userLoginModalFormCtrl', [
     '$scope',
-    '$rootScope',
-    '$location',
     '$translate',
     'AuthenticationService',
     'Notifications',
   function(
     $scope,
-    $rootScope,
-    $location,
     $translate,
     AuthenticationService,
     Notifications
