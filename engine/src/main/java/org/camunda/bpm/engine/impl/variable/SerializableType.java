@@ -23,7 +23,7 @@ import java.io.Serializable;
 import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.delegate.SerializedVariableTypes;
+import org.camunda.bpm.engine.delegate.ProcessEngineVariableType;
 import org.camunda.bpm.engine.delegate.SerializedVariableValue;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.core.variable.SerializedVariableValueImpl;
@@ -37,7 +37,7 @@ import org.camunda.bpm.engine.impl.util.ReflectUtil;
 public class SerializableType extends ByteArrayType {
 
   public String getTypeName() {
-    return SerializedVariableTypes.Serializable.getName();
+    return ProcessEngineVariableType.SERIALIZABLE.getName();
   }
 
   public Object getValue(ValueFields valueFields) {

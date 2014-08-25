@@ -12,7 +12,7 @@
  */
 package org.camunda.bpm.engine.impl.variable;
 
-import org.camunda.bpm.engine.delegate.SerializedVariableTypes;
+import org.camunda.bpm.engine.delegate.ProcessEngineVariableType;
 
 
 
@@ -23,7 +23,7 @@ import org.camunda.bpm.engine.delegate.SerializedVariableTypes;
 public class LongType extends PrimitiveVariableType {
 
   public String getTypeName() {
-    return SerializedVariableTypes.Long.getName();
+    return ProcessEngineVariableType.LONG.getName();
   }
 
   public boolean isCachable() {

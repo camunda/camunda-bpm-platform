@@ -28,7 +28,7 @@ import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.delegate.SerializedVariableTypes;
+import org.camunda.bpm.engine.delegate.ProcessEngineVariableType;
 import org.camunda.bpm.engine.delegate.SerializedVariableValue;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.test.AbstractProcessEngineTestCase;
@@ -490,7 +490,7 @@ public class JPAVariableTest extends AbstractProcessEngineTestCase {
     configuration.put(JPAEntityVariableType.CONFIG_CLASS_NAME, entityToQuery.getClass().getCanonicalName());
     configuration.put(JPAEntityVariableType.CONFIG_ENTITY_ID_STRING, entityToQuery.getId().toString());
     runtimeService.setVariableFromSerialized(instance.getId(), "entity", null,
-        SerializedVariableTypes.JPA.getName(), configuration);
+        ProcessEngineVariableType.JPA.getName(), configuration);
 
     FieldAccessJPAEntity returnedEntity = (FieldAccessJPAEntity) runtimeService.getVariable(instance.getId(), "entity");
     assertNotNull(returnedEntity);
@@ -505,7 +505,7 @@ public class JPAVariableTest extends AbstractProcessEngineTestCase {
 
     try {
       runtimeService.setVariableFromSerialized(instance.getId(), "entity", null,
-          SerializedVariableTypes.JPA.getName(), null);
+          ProcessEngineVariableType.JPA.getName(), null);
       fail();
     } catch (BadUserRequestException e) {
       // expected
@@ -513,7 +513,7 @@ public class JPAVariableTest extends AbstractProcessEngineTestCase {
 
     try {
       runtimeService.setVariableFromSerialized(instance.getId(), "entity", null,
-          SerializedVariableTypes.JPA.getName(), new HashMap<String, Object>());
+          ProcessEngineVariableType.JPA.getName(), new HashMap<String, Object>());
       fail();
     } catch (BadUserRequestException e) {
       // expected
@@ -532,7 +532,7 @@ public class JPAVariableTest extends AbstractProcessEngineTestCase {
 
     try {
       runtimeService.setVariableFromSerialized(instance.getId(), "entity", "a non-sensical value",
-          SerializedVariableTypes.JPA.getName(), configuration);
+          ProcessEngineVariableType.JPA.getName(), configuration);
       fail();
     } catch (BadUserRequestException e) {
       // expected
@@ -551,7 +551,7 @@ public class JPAVariableTest extends AbstractProcessEngineTestCase {
 
     try {
       runtimeService.setVariableFromSerialized(instance.getId(), "entity", null,
-          SerializedVariableTypes.JPA.getName(), configuration);
+          ProcessEngineVariableType.JPA.getName(), configuration);
       fail();
     } catch (BadUserRequestException e) {
       // expected

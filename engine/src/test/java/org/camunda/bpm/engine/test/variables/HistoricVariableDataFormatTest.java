@@ -3,7 +3,7 @@ package org.camunda.bpm.engine.test.variables;
 import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
-import org.camunda.bpm.engine.delegate.SerializedVariableTypes;
+import org.camunda.bpm.engine.delegate.ProcessEngineVariableType;
 import org.camunda.bpm.engine.delegate.SerializedVariableValue;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.history.HistoricVariableUpdate;
@@ -61,8 +61,8 @@ public class HistoricVariableDataFormatTest extends AbstractProcessEngineTestCas
 
     Map<String, Object> config = historicValue.getConfig();
     assertEquals(2, config.size());
-    assertEquals(JSON_FORMAT_NAME, config.get(SerializedVariableTypes.SPIN_TYPE_DATA_FORMAT_ID));
-    assertEquals(bean.getClass().getCanonicalName(), config.get(SerializedVariableTypes.SPIN_TYPE_CONFIG_ROOT_TYPE));
+    assertEquals(JSON_FORMAT_NAME, config.get(ProcessEngineVariableType.SPIN_TYPE_DATA_FORMAT_ID));
+    assertEquals(bean.getClass().getCanonicalName(), config.get(ProcessEngineVariableType.SPIN_TYPE_CONFIG_ROOT_TYPE));
 
     String variableAsJson = (String) historicValue.getValue();
     JSONAssert.assertEquals(bean.toExpectedJsonString(), variableAsJson, true);
@@ -84,8 +84,8 @@ public class HistoricVariableDataFormatTest extends AbstractProcessEngineTestCas
 
       Map<String, Object> config = serializedValue.getConfig();
       assertEquals(2, config.size());
-      assertEquals(JSON_FORMAT_NAME, config.get(SerializedVariableTypes.SPIN_TYPE_DATA_FORMAT_ID));
-      assertEquals(bean.getClass().getCanonicalName(), config.get(SerializedVariableTypes.SPIN_TYPE_CONFIG_ROOT_TYPE));
+      assertEquals(JSON_FORMAT_NAME, config.get(ProcessEngineVariableType.SPIN_TYPE_DATA_FORMAT_ID));
+      assertEquals(bean.getClass().getCanonicalName(), config.get(ProcessEngineVariableType.SPIN_TYPE_CONFIG_ROOT_TYPE));
 
       String variableAsJson = (String) serializedValue.getValue();
       JSONAssert.assertEquals(bean.toExpectedJsonString(), variableAsJson, true);

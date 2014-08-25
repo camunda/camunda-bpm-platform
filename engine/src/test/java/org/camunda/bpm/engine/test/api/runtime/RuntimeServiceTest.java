@@ -22,7 +22,7 @@ import java.util.Map;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.delegate.SerializedVariableTypes;
+import org.camunda.bpm.engine.delegate.ProcessEngineVariableType;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
@@ -1010,7 +1010,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
     VariableInstance variableInstance = runtimeService.createVariableInstanceQuery().singleResult();
 
     assertEquals(47, variableInstance.getValue());
-    assertEquals(SerializedVariableTypes.Integer.getName(), variableInstance.getTypeName());
+    assertEquals(ProcessEngineVariableType.INTEGER.getName(), variableInstance.getTypeName());
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")

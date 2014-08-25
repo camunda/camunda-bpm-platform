@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.camunda.bpm.engine.delegate.SerializedVariableTypes;
+import org.camunda.bpm.engine.delegate.ProcessEngineVariableType;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
@@ -149,7 +149,7 @@ public class VariableInstanceQueryImpl extends AbstractVariableQueryImpl<Variabl
 
       // do not fetch values for byte arrays eagerly (unless requested by the user)
       if (isByteArrayFetchingEnabled
-          || !SerializedVariableTypes.ByteArray.getName().equals(variableInstanceEntity.getType().getTypeName())) {
+          || !ProcessEngineVariableType.BYTES.getName().equals(variableInstanceEntity.getType().getTypeName())) {
 
         try {
           variableInstanceEntity.getValue();

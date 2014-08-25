@@ -12,7 +12,7 @@
  */
 package org.camunda.bpm.engine.rest.dto.runtime;
 
-import org.camunda.bpm.engine.delegate.SerializedVariableTypes;
+import org.camunda.bpm.engine.delegate.ProcessEngineVariableType;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.camunda.bpm.engine.runtime.VariableInstance;
 
@@ -130,7 +130,7 @@ public class VariableInstanceDto {
 
     dto.setTaskId(entity.getTaskId());
     dto.setActivityInstanceId(entity.getActivityInstanceId());
-    if(SerializedVariableTypes.Serializable.getName().equals(entity.getType().getTypeName())) {
+    if(ProcessEngineVariableType.SERIALIZABLE.getName().equals(entity.getType().getTypeName())) {
       if(entity.getValue() != null) {
         dto.setValue(new SerializedObjectDto(entity.getValue()));
       }

@@ -16,7 +16,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.delegate.SerializedVariableTypes;
+import org.camunda.bpm.engine.delegate.ProcessEngineVariableType;
 import org.camunda.bpm.engine.delegate.SerializedVariableValue;
 import org.camunda.bpm.engine.impl.core.variable.SerializedVariableValueImpl;
 import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
@@ -32,15 +32,15 @@ public class SpinSerializationType implements VariableType {
 
   protected DataFormat<?> dataFormat;
 
-  protected static final String CONFIG_DATA_FORMAT = SerializedVariableTypes.SPIN_TYPE_DATA_FORMAT_ID;
-  protected static final String CONFIG_ROOT_TYPE = SerializedVariableTypes.SPIN_TYPE_CONFIG_ROOT_TYPE;
+  protected static final String CONFIG_DATA_FORMAT = ProcessEngineVariableType.SPIN_TYPE_DATA_FORMAT_ID;
+  protected static final String CONFIG_ROOT_TYPE = ProcessEngineVariableType.SPIN_TYPE_CONFIG_ROOT_TYPE;
 
   public SpinSerializationType(DataFormat<?> dataFormat) {
     this.dataFormat = dataFormat;
   }
 
   public String getTypeName() {
-    return SerializedVariableTypes.Spin.getName();
+    return ProcessEngineVariableType.SPIN.getName();
   }
 
   public String getTypeNameForValue(Object value) {

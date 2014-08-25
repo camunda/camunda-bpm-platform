@@ -16,7 +16,7 @@ package org.camunda.bpm.engine.impl.variable;
 import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.delegate.SerializedVariableTypes;
+import org.camunda.bpm.engine.delegate.ProcessEngineVariableType;
 import org.camunda.bpm.engine.delegate.SerializedVariableValue;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.core.variable.SerializedVariableValueImpl;
@@ -30,8 +30,8 @@ import org.camunda.bpm.engine.impl.core.variable.SerializedVariableValueImpl;
  */
 public class JPAEntityVariableType implements VariableType {
 
-  public static final String CONFIG_CLASS_NAME = SerializedVariableTypes.JPA_TYPE_CONFIG_CLASS_NAME;
-  public static final String CONFIG_ENTITY_ID_STRING = SerializedVariableTypes.JPA_TYPE_CONFIG_ENTITY_ID;
+  public static final String CONFIG_CLASS_NAME = ProcessEngineVariableType.JPA_TYPE_CONFIG_CLASS_NAME;
+  public static final String CONFIG_ENTITY_ID_STRING = ProcessEngineVariableType.JPA_TYPE_CONFIG_ENTITY_ID;
 
   private JPAEntityMappings mappings;
 
@@ -40,7 +40,7 @@ public class JPAEntityVariableType implements VariableType {
   }
 
   public String getTypeName() {
-    return SerializedVariableTypes.JPA.getName();
+    return ProcessEngineVariableType.JPA.getName();
   }
 
   public boolean isCachable() {

@@ -523,16 +523,16 @@ public interface RuntimeService {
    * it will be created in the process instance (which is the root execution).</p>
    *
    * <p>
-   * See {@link SerializedVariableTypes} for available variable types and their required
+   * See {@link ProcessEngineVariableType} for available variable types and their required
    * configuration options.
    * </p>
    *
    * @param executionId id of process instance or execution to set variable for, cannot be null.
    * @param variableName name of variable to set, cannot be null
    * @param serializedValue Serialized value of the variable to set; Expected value types are defined
-   * variable-type-specific and defined in {@link SerializedVariableTypes}.
-   * @param variableTypeName Type of the variable to set. Defined in {@link SerializedVariableTypes}.
-   * @param variableConfiguration Variable-type-specific configuration of the serialized value. Defined in {@link SerializedVariableTypes}.
+   * variable-type-specific and defined in {@link ProcessEngineVariableType}.
+   * @param variableTypeName Type of the variable to set. Defined in {@link ProcessEngineVariableType}.
+   * @param variableConfiguration Variable-type-specific configuration of the serialized value. Defined in {@link ProcessEngineVariableType}.
    * @throws ProcessEngineException when no execution is found or the serialized value or its
    * configuration is not consistent with the chosen variable type
    */
@@ -547,16 +547,16 @@ public interface RuntimeService {
    * </p>
    *
    * <p>
-   * See {@link SerializedVariableTypes} for available variable types and their required
+   * See {@link ProcessEngineVariableType} for available variable types and their required
    * configuration options.
    * </p>
    *
    * @param executionId id of process instance or execution to set variable for, cannot be null.
    * @param variableName name of variable to set, cannot be null
    * @param serializedValue Serialized value of the variable to set; Expected value types are defined
-   * variable-type-specific and defined in {@link SerializedVariableTypes}.
-   * @param variableTypeName Type of the variable to set. Defined in {@link SerializedVariableTypes}.
-   * @param variableConfiguration Variable-type-specific configuration of the serialized value. Defined in {@link SerializedVariableTypes}.
+   * variable-type-specific and defined in {@link ProcessEngineVariableType}.
+   * @param variableTypeName Type of the variable to set. Defined in {@link ProcessEngineVariableType}.
+   * @param variableConfiguration Variable-type-specific configuration of the serialized value. Defined in {@link ProcessEngineVariableType}.
    * @throws ProcessEngineException when no execution is found or the serialized value or its
    * configuration is not consistent with the chosen variable type
    */

@@ -20,6 +20,9 @@ import org.camunda.bpm.engine.delegate.PersistentVariableScope;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 
+/**
+ * @author Thorben Lindhauer
+ */
 public class SetExecutionVariableFromSerializedCmd extends SetScopeVariableFromSerializedCmd {
 
   public SetExecutionVariableFromSerializedCmd(String executionId, String variableName, Object serializedVariableValue, String variableType,

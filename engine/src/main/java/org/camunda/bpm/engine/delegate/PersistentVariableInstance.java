@@ -29,8 +29,8 @@ public interface PersistentVariableInstance extends CoreVariableInstance {
   SerializedVariableValue getSerializedValue();
 
   /**
-   * Returns the name of the type of <code>this</code> variable instance
-   * @return
+   * Returns the name of the type of <code>this</code> variable instance;
+   * corresponds to the types defined in {@link ProcessEngineVariableType}.
    */
   String getTypeName();
 }

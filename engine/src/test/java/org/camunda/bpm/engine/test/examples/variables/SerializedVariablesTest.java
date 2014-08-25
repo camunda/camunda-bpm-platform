@@ -23,7 +23,7 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.delegate.SerializedVariableTypes;
+import org.camunda.bpm.engine.delegate.ProcessEngineVariableType;
 import org.camunda.bpm.engine.delegate.SerializedVariableValue;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.IoUtil;
@@ -45,70 +45,70 @@ public class SerializedVariablesTest extends PluggableProcessEngineTestCase {
     .name("booleanVariable")
     .value(true)
     .serializedValue(true)
-    .variableTypeName(SerializedVariableTypes.Boolean.getName())
+    .variableTypeName(ProcessEngineVariableType.BOOLEAN.getName())
     .configuration(new HashMap<String, Object>());
 
   protected static final VariableSpec BYTE_ARRAY_VARIABLE_SPEC = new VariableSpec()
     .name("byteArrayVariable")
     .value(byteArray)
     .serializedValue(byteArray)
-    .variableTypeName(SerializedVariableTypes.ByteArray.getName())
+    .variableTypeName(ProcessEngineVariableType.BYTES.getName())
     .configuration(new HashMap<String, Object>());
 
   protected static final VariableSpec SERIALIZABLE_VARIABLE_SPEC = new VariableSpec()
     .name("serializableVariable")
     .value(serializable)
     .serializedValue(toExpectedBytes(serializable))
-    .variableTypeName(SerializedVariableTypes.Serializable.getName())
+    .variableTypeName(ProcessEngineVariableType.SERIALIZABLE.getName())
     .configuration(new HashMap<String, Object>());
 
   protected static final VariableSpec DATE_VARIABLE_SPEC = new VariableSpec()
     .name("dateVariable")
     .value(new Date(longValue))
     .serializedValue(longValue)
-    .variableTypeName(SerializedVariableTypes.Date.getName())
+    .variableTypeName(ProcessEngineVariableType.DATE.getName())
     .configuration(new HashMap<String, Object>());
 
   protected static final VariableSpec INT_VARIABLE_SPEC = new VariableSpec()
     .name("intVariable")
     .value(42)
     .serializedValue(42)
-    .variableTypeName(SerializedVariableTypes.Integer.getName())
+    .variableTypeName(ProcessEngineVariableType.INTEGER.getName())
     .configuration(new HashMap<String, Object>());
 
   protected static final VariableSpec DOUBLE_VARIABLE_SPEC = new VariableSpec()
     .name("doubleVariable")
     .value(4.2d)
     .serializedValue(4.2d)
-    .variableTypeName(SerializedVariableTypes.Double.getName())
+    .variableTypeName(ProcessEngineVariableType.DOUBLE.getName())
     .configuration(new HashMap<String, Object>());
 
   protected static final VariableSpec SHORT_VARIABLE_SPEC = new VariableSpec()
     .name("shortVariable")
     .value((short) 4)
     .serializedValue((short) 4)
-    .variableTypeName(SerializedVariableTypes.Short.getName())
+    .variableTypeName(ProcessEngineVariableType.SHORT.getName())
     .configuration(new HashMap<String, Object>());
 
   protected static final VariableSpec LONG_VARIABLE_SPEC = new VariableSpec()
     .name("longVariable")
     .value(longValue)
     .serializedValue(longValue)
-    .variableTypeName(SerializedVariableTypes.Long.getName())
+    .variableTypeName(ProcessEngineVariableType.LONG.getName())
     .configuration(new HashMap<String, Object>());
 
   protected static final VariableSpec NULL_VARIABLE_SPEC = new VariableSpec()
     .name("nullVariable")
     .value(null)
     .serializedValue(null)
-    .variableTypeName(SerializedVariableTypes.Null.getName())
+    .variableTypeName(ProcessEngineVariableType.NULL.getName())
     .configuration(new HashMap<String, Object>());
 
   protected static final VariableSpec STRING_VARIABLE_SPEC = new VariableSpec()
     .name("stringVariable")
     .value("a String value")
     .serializedValue("a String value")
-    .variableTypeName(SerializedVariableTypes.String.getName())
+    .variableTypeName(ProcessEngineVariableType.STRING.getName())
     .configuration(new HashMap<String, Object>());
 
   @Deployment(resources= ONE_TASK_PROCESS)
@@ -274,11 +274,11 @@ public class SerializedVariablesTest extends PluggableProcessEngineTestCase {
   public void testSetSerializedNullValue() {
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
     runtimeService.setVariableFromSerialized(instance.getId(), "aName", null,
-        SerializedVariableTypes.String.getName(), null);
+        ProcessEngineVariableType.STRING.getName(), null);
 
     VariableInstance variableInstance = getVariableInstance("aName");
     assertNotNull(variableInstance);
-    assertEquals(SerializedVariableTypes.String.getName(), variableInstance.getTypeName());
+    assertEquals(ProcessEngineVariableType.STRING.getName(), variableInstance.getTypeName());
     assertNull(variableInstance.getValue());
   }
 
@@ -286,7 +286,7 @@ public class SerializedVariablesTest extends PluggableProcessEngineTestCase {
   public void testSetSerializedValueWithNullConfiguration() {
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
     runtimeService.setVariableFromSerialized(instance.getId(), "aName", "a String Value",
-        SerializedVariableTypes.String.getName(), null);
+        ProcessEngineVariableType.STRING.getName(), null);
 
     VariableInstance variableInstance = getVariableInstance("aName");
     assertNotNull(variableInstance);
@@ -297,7 +297,7 @@ public class SerializedVariablesTest extends PluggableProcessEngineTestCase {
   public void testSetSerializedValueForNonExistingExecution() {
     try {
       runtimeService.setVariableFromSerialized("a non existing id", "aName", "aValue",
-          SerializedVariableTypes.String.getName(), null);
+          ProcessEngineVariableType.STRING.getName(), null);
       fail();
     } catch (ProcessEngineException e) {
       // expected
@@ -311,19 +311,19 @@ public class SerializedVariablesTest extends PluggableProcessEngineTestCase {
 
     // update to same type
     runtimeService.setVariableFromSerialized(instance.getId(), "aVariable", "anotherStringValue",
-        SerializedVariableTypes.String.getName(), null);
+        ProcessEngineVariableType.STRING.getName(), null);
     VariableInstance variableInstance = getVariableInstance("aVariable");
     assertNotNull(variableInstance);
     assertEquals("anotherStringValue", variableInstance.getValue());
-    assertEquals(SerializedVariableTypes.String.getName(), variableInstance.getTypeName());
+    assertEquals(ProcessEngineVariableType.STRING.getName(), variableInstance.getTypeName());
 
     // update to another type
     runtimeService.setVariableFromSerialized(instance.getId(), "aVariable", 42,
-        SerializedVariableTypes.Integer.getName(), null);
+        ProcessEngineVariableType.INTEGER.getName(), null);
     variableInstance = getVariableInstance("aVariable");
     assertNotNull(variableInstance);
     assertEquals(42, variableInstance.getValue());
-    assertEquals(SerializedVariableTypes.Integer.getName(), variableInstance.getTypeName());
+    assertEquals(ProcessEngineVariableType.INTEGER.getName(), variableInstance.getTypeName());
   }
 
   @Deployment(resources= ONE_SUB_PROCESS)
@@ -334,13 +334,13 @@ public class SerializedVariablesTest extends PluggableProcessEngineTestCase {
     assertFalse(instance.getId().equals(subprocessExecutionId));
 
     runtimeService.setVariableFromSerialized(subprocessExecutionId, "aVariable", "aValue",
-        SerializedVariableTypes.String.getName(), null);
+        ProcessEngineVariableType.STRING.getName(), null);
     VariableInstance variableInstance = getVariableInstance("aVariable");
     assertNotNull(variableInstance);
     assertEquals(instance.getId(), variableInstance.getExecutionId());
 
     runtimeService.setVariableLocalFromSerialized(subprocessExecutionId, "aLocalVariable", "anothervalue",
-        SerializedVariableTypes.String.getName(), null);
+        ProcessEngineVariableType.STRING.getName(), null);
     variableInstance = getVariableInstance("aLocalVariable");
     assertNotNull(variableInstance);
     assertEquals(subprocessExecutionId, variableInstance.getExecutionId());
@@ -361,7 +361,7 @@ public class SerializedVariablesTest extends PluggableProcessEngineTestCase {
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
     try {
-      runtimeService.setVariableFromSerialized(instance.getId(), "aVar", "a non-null value", SerializedVariableTypes.Null.getName(), null);
+      runtimeService.setVariableFromSerialized(instance.getId(), "aVar", "a non-null value", ProcessEngineVariableType.NULL.getName(), null);
       fail("should fail as non-null value is not allowed for null type");
     } catch (BadUserRequestException e) {
       // expected
@@ -374,7 +374,7 @@ public class SerializedVariablesTest extends PluggableProcessEngineTestCase {
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
     try {
-      runtimeService.setVariableFromSerialized(instance.getId(), null, "value", SerializedVariableTypes.String.getName(), null);
+      runtimeService.setVariableFromSerialized(instance.getId(), null, "value", ProcessEngineVariableType.STRING.getName(), null);
       fail("should fail as null is not allowed as variable name");
     } catch (ProcessEngineException e) {
       // expected

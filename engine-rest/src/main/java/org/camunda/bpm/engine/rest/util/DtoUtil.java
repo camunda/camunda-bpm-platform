@@ -19,7 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.camunda.bpm.engine.delegate.SerializedVariableTypes;
+import org.camunda.bpm.engine.delegate.ProcessEngineVariableType;
 import org.camunda.bpm.engine.rest.dto.runtime.VariableValueDto;
 
 public class DtoUtil {
@@ -48,37 +48,37 @@ public class DtoUtil {
 
     if (type != null && !type.equals("") && value != null) {
       // boolean
-      if (type.equalsIgnoreCase(SerializedVariableTypes.Boolean.getName())) {
+      if (type.equalsIgnoreCase(ProcessEngineVariableType.BOOLEAN.getName())) {
         return Boolean.valueOf(value.toString());
       }
 
       // string
-      if (type.equalsIgnoreCase(SerializedVariableTypes.String.getName())) {
+      if (type.equalsIgnoreCase(ProcessEngineVariableType.STRING.getName())) {
         return String.valueOf(value);
       }
 
       // integer
-      if (type.equalsIgnoreCase(SerializedVariableTypes.Integer.getName())) {
+      if (type.equalsIgnoreCase(ProcessEngineVariableType.INTEGER.getName())) {
         return Integer.valueOf(value.toString());
       }
 
       // short
-      if (type.equalsIgnoreCase(SerializedVariableTypes.Short.getName())) {
+      if (type.equalsIgnoreCase(ProcessEngineVariableType.SHORT.getName())) {
         return Short.valueOf(value.toString());
       }
 
       // long
-      if (type.equalsIgnoreCase(SerializedVariableTypes.Long.getName())) {
+      if (type.equalsIgnoreCase(ProcessEngineVariableType.LONG.getName())) {
         return Long.valueOf(value.toString());
       }
 
       // double
-      if (type.equalsIgnoreCase(SerializedVariableTypes.Double.getName())) {
+      if (type.equalsIgnoreCase(ProcessEngineVariableType.DOUBLE.getName())) {
         return Double.valueOf(value.toString());
       }
 
       // date
-      if (type.equalsIgnoreCase(SerializedVariableTypes.Date.getName())) {
+      if (type.equalsIgnoreCase(ProcessEngineVariableType.DATE.getName())) {
         SimpleDateFormat pattern = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
         Date date = pattern.parse(String.valueOf(value));
         return date;

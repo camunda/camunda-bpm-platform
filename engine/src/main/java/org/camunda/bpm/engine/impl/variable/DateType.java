@@ -15,7 +15,7 @@ package org.camunda.bpm.engine.impl.variable;
 import java.util.Date;
 import java.util.Map;
 
-import org.camunda.bpm.engine.delegate.SerializedVariableTypes;
+import org.camunda.bpm.engine.delegate.ProcessEngineVariableType;
 import org.camunda.bpm.engine.delegate.SerializedVariableValue;
 import org.camunda.bpm.engine.impl.core.variable.SerializedVariableValueImpl;
 
@@ -26,7 +26,7 @@ import org.camunda.bpm.engine.impl.core.variable.SerializedVariableValueImpl;
 public class DateType implements VariableType {
 
   public String getTypeName() {
-    return SerializedVariableTypes.Date.getName();
+    return ProcessEngineVariableType.DATE.getName();
   }
 
   public boolean isCachable() {

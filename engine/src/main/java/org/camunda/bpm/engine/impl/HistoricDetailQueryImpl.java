@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.camunda.bpm.engine.delegate.SerializedVariableTypes;
+import org.camunda.bpm.engine.delegate.ProcessEngineVariableType;
 import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.history.HistoricDetailQuery;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -139,7 +139,7 @@ public class HistoricDetailQueryImpl extends AbstractQuery<HistoricDetailQuery, 
           HistoricDetailVariableInstanceUpdateEntity entity = (HistoricDetailVariableInstanceUpdateEntity) historicDetail;
           // do not fetch values for byte arrays eagerly (unless requested by the user)
           if (isByteArrayFetchingEnabled
-              || !SerializedVariableTypes.ByteArray.getName().equals(entity.getVariableType().getTypeName())) {
+              || !ProcessEngineVariableType.BYTES.getName().equals(entity.getVariableType().getTypeName())) {
 
             try {
               entity.getValue();

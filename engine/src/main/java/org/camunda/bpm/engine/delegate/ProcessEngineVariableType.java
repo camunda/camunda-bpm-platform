@@ -12,6 +12,10 @@
  */
 package org.camunda.bpm.engine.delegate;
 
+import java.io.Serializable;
+
+import org.camunda.bpm.engine.impl.core.variable.DefaultProcessEngineVariableType;
+
 /**
  * <p>
  * This enum provides the variable types that the process engine uses.
@@ -142,82 +146,120 @@ package org.camunda.bpm.engine.delegate;
  *
  * @author Thorben Lindhauer
  */
-public enum SerializedVariableTypes {
+public interface ProcessEngineVariableType {
 
   /**
-   * Requires no configuration.
-   * Value has to be boolean.
+   * <ul>
+   * <li>Name "boolean"</li>
+   * <li>Value is of type Boolean</li>
+   * <li>No configuration</li>
+   * </ul>
    */
-  Boolean("boolean"),
+  public static final ProcessEngineVariableType BOOLEAN = new DefaultProcessEngineVariableType("boolean");
 
   /**
-   * Requires no configuration.
-   * Value has to be a byte array.
+   * <ul>
+   * <li>Name "bytes"</li>
+   * <li>Value is is of type byte[]</li>
+   * <li>No configuration</li>
+   * </ul>
    */
-  ByteArray("bytes"),
+  public static final ProcessEngineVariableType BYTES = new DefaultProcessEngineVariableType("bytes");
 
   /**
-   * Requires no configuration.
-   * Value has to be short.
+   * <ul>
+   * <li>Name "short"</li>
+   * <li>Value is of type Short</li>
+   * <li>No configuration</li>
+   * </ul>
    */
-  Short("short"),
+  public static final ProcessEngineVariableType SHORT = new DefaultProcessEngineVariableType("short");
 
   /**
-   * Requires no configuration.
-   * Value has to be long.
+   * <ul>
+   * <li>Name "long"</li>
+   * <li>Value is of type Long</li>
+   * <li>No configuration</li>
+   * </ul>
    */
-  Long("long"),
+  public static final ProcessEngineVariableType LONG = new DefaultProcessEngineVariableType("long");
 
   /**
-   * Requires no configuration.
+   * <ul>
+   * <li>Name "double"</li>
+   * <li>Value is of type Double</li>
+   * <li>No configuration</li>
+   * </ul>
    */
-  Double("double"),
+  public static final ProcessEngineVariableType DOUBLE = new DefaultProcessEngineVariableType("double");
 
   /**
-   * Requires no configuration.
-   * Value has to be a long timestamp of milliseconds since 1/1/1970.
+   * <ul>
+   * <li>Name "date"</li>
+   * <li>Value is of type Date</li>
+   * <li>No configuration</li>
+   * </ul>
    */
-  Date("date"),
+  public static final ProcessEngineVariableType DATE = new DefaultProcessEngineVariableType("date");
 
   /**
-   * Requires no configuration.
-   * Value has to be a byte array.
+   * <ul>
+   * <li>Name "serializable"</li>
+   * <li>Value is of type that implements {@link Serializable}</li>
+   * <li>No configuration</li>
+   * </ul>
    */
-  Serializable("serializable"),
+  public static final ProcessEngineVariableType SERIALIZABLE = new DefaultProcessEngineVariableType("serializable");
 
   /**
-   * Requires no configuration.
-   * Value has to be <code>null</code>.
+   * <ul>
+   * <li>Name "null"</li>
+   * <li>Value is <code>null</code></li>
+   * <li>No configuration</li>
+   * </ul>
    */
-  Null("null"),
+  public static final ProcessEngineVariableType NULL = new DefaultProcessEngineVariableType("null");
 
   /**
-   * Requires no configuration.
-   * Value has to be String.
+   * <ul>
+   * <li>Name "string"</li>
+   * <li>Value is of type String</li>
+   * <li>No configuration</li>
+   * </ul>
    */
-  String("string"),
+  public static final ProcessEngineVariableType STRING = new DefaultProcessEngineVariableType("string");
 
   /**
-   * Requires no configuration.
-   * Value has to be int.
+   * <ul>
+   * <li>Name "integer"</li>
+   * <li>Value is of type Integer</li>
+   * <li>No configuration</li>
+   * </ul>
    */
-  Integer("integer"),
+  public static final ProcessEngineVariableType INTEGER = new DefaultProcessEngineVariableType("integer");
 
   /**
-   * Required configuration parameters are:
+   * <ul>
+   * <li>Name "jpa-entity"</li>
+   * <li>Value is a JPA Entity</li>
+   * <li>Required configuration parameters are:
    * {@link JPA_TYPE_CONFIG_CLASS_NAME} and
-   * {@link JPA_TYPE_CONFIG_ENTITY_ID}.
-   * Value has to be <code>null</code>.
+   * {@link JPA_TYPE_CONFIG_ENTITY_ID}</li>
+   * </ul>
    */
-  JPA("jpa-entity"),
+  public static final ProcessEngineVariableType JPA = new DefaultProcessEngineVariableType("jpa-entity");
 
   /**
-   * Required configuration parameters are:
+   * <ul>
+   * <li>Name "SpinSerialization"</li>
+   * <li>Value is of type String</li>
+   * <li>Required configuration parameters are:
    * {@link SPIN_TYPE_DATA_FORMAT_ID} and
-   * {@link SPIN_TYPE_CONFIG_ROOT_TYPE}.
-   * Value has to be a String.
+   * {@link SPIN_TYPE_CONFIG_ROOT_TYPE}</li>
+   * </ul>
    */
-  Spin("SpinSerialization");
+  public static final ProcessEngineVariableType SPIN = new DefaultProcessEngineVariableType("SpinSerialization");
+
 
   /**
    * The name of the Spin data format that can handle the serialized input; String.
@@ -241,14 +283,9 @@ public enum SerializedVariableTypes {
    */
   public static final String JPA_TYPE_CONFIG_ENTITY_ID = "id";
 
-  protected String name;
-
-  SerializedVariableTypes(String name) {
-    this.name = name;
-  }
-
-  public String getName() {
-    return name;
-  }
+  /**
+   * Returns the canonical name of the variable type
+   */
+  String getName();
 
 }

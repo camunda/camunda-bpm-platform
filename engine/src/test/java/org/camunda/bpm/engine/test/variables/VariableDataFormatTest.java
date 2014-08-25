@@ -23,7 +23,7 @@ import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.delegate.SerializedVariableTypes;
+import org.camunda.bpm.engine.delegate.ProcessEngineVariableType;
 import org.camunda.bpm.engine.delegate.SerializedVariableValue;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
@@ -67,7 +67,7 @@ public class VariableDataFormatTest extends AbstractProcessEngineTestCase {
 
     VariableInstance beanVariable = runtimeService.createVariableInstanceQuery().singleResult();
     assertNotNull(beanVariable);
-    assertEquals(SerializedVariableTypes.Spin.getName(), beanVariable.getTypeName());
+    assertEquals(ProcessEngineVariableType.SPIN.getName(), beanVariable.getTypeName());
 
     SimpleBean returnedBean = (SimpleBean) beanVariable.getValue();
     assertNotNull(returnedBean);
@@ -96,7 +96,7 @@ public class VariableDataFormatTest extends AbstractProcessEngineTestCase {
 
     VariableInstance beansVariable = runtimeService.createVariableInstanceQuery().singleResult();
     assertNotNull(beansVariable);
-    assertEquals(SerializedVariableTypes.Spin.getName(), beansVariable.getTypeName());
+    assertEquals(ProcessEngineVariableType.SPIN.getName(), beansVariable.getTypeName());
 
     List<SimpleBean> returnedBeans = (List<SimpleBean>) beansVariable.getValue();
     assertNotNull(returnedBeans);
@@ -150,7 +150,7 @@ public class VariableDataFormatTest extends AbstractProcessEngineTestCase {
 
     VariableInstance beansVariable = runtimeService.createVariableInstanceQuery().singleResult();
     assertNotNull(beansVariable);
-    assertEquals(SerializedVariableTypes.Spin.getName(), beansVariable.getTypeName());
+    assertEquals(ProcessEngineVariableType.SPIN.getName(), beansVariable.getTypeName());
 
     List<SimpleBean> returnedBeans = (List<SimpleBean>) beansVariable.getValue();
     assertNotNull(returnedBeans);
@@ -208,7 +208,7 @@ public class VariableDataFormatTest extends AbstractProcessEngineTestCase {
 
     VariableInstance variable = engine.getRuntimeService().createVariableInstanceQuery().singleResult();
 
-    assertEquals(SerializedVariableTypes.Serializable.getName(), variable.getTypeName());
+    assertEquals(ProcessEngineVariableType.SERIALIZABLE.getName(), variable.getTypeName());
 
     engine.getRepositoryService().deleteDeployment(deploymentId, true);
   }
@@ -263,14 +263,14 @@ public class VariableDataFormatTest extends AbstractProcessEngineTestCase {
 
     VariableInstance beanVariable = runtimeService.createVariableInstanceQuery().singleResult();
     assertNotNull(beanVariable);
-    assertEquals(SerializedVariableTypes.Spin.getName(), beanVariable.getTypeName());
+    assertEquals(ProcessEngineVariableType.SPIN.getName(), beanVariable.getTypeName());
 
     SerializedVariableValue serializedVariable = beanVariable.getSerializedValue();
 
     Map<String, Object> config = serializedVariable.getConfig();
     assertEquals(2, config.size());
-    assertEquals(JSON_FORMAT_NAME, config.get(SerializedVariableTypes.SPIN_TYPE_DATA_FORMAT_ID));
-    assertEquals(bean.getClass().getCanonicalName(), config.get(SerializedVariableTypes.SPIN_TYPE_CONFIG_ROOT_TYPE));
+    assertEquals(JSON_FORMAT_NAME, config.get(ProcessEngineVariableType.SPIN_TYPE_DATA_FORMAT_ID));
+    assertEquals(bean.getClass().getCanonicalName(), config.get(ProcessEngineVariableType.SPIN_TYPE_CONFIG_ROOT_TYPE));
 
     String variableAsJson = (String) serializedVariable.getValue();
     JSONAssert.assertEquals(bean.toExpectedJsonString(), variableAsJson, true);
@@ -283,10 +283,10 @@ public class VariableDataFormatTest extends AbstractProcessEngineTestCase {
     String beanAsJson = bean.toExpectedJsonString();
 
     Map<String, Object> variableConfig = new HashMap<String, Object>();
-    variableConfig.put(SerializedVariableTypes.SPIN_TYPE_DATA_FORMAT_ID, JSON_FORMAT_NAME);
-    variableConfig.put(SerializedVariableTypes.SPIN_TYPE_CONFIG_ROOT_TYPE, bean.getClass().getCanonicalName());
+    variableConfig.put(ProcessEngineVariableType.SPIN_TYPE_DATA_FORMAT_ID, JSON_FORMAT_NAME);
+    variableConfig.put(ProcessEngineVariableType.SPIN_TYPE_CONFIG_ROOT_TYPE, bean.getClass().getCanonicalName());
     runtimeService.setVariableFromSerialized(instance.getId(), "simpleBean", beanAsJson,
-        SerializedVariableTypes.Spin.getName(), variableConfig);
+        ProcessEngineVariableType.SPIN.getName(), variableConfig);
 
     VariableInstance variableInstance = runtimeService.createVariableInstanceQuery().singleResult();
 
@@ -305,7 +305,7 @@ public class VariableDataFormatTest extends AbstractProcessEngineTestCase {
 
     try {
       runtimeService.setVariableFromSerialized(instance.getId(), "simpleBean", beanAsJson,
-          SerializedVariableTypes.Spin.getName(), null);
+          ProcessEngineVariableType.SPIN.getName(), null);
       fail();
     } catch (BadUserRequestException e) {
       // expected
@@ -313,7 +313,7 @@ public class VariableDataFormatTest extends AbstractProcessEngineTestCase {
 
     try {
       runtimeService.setVariableFromSerialized(instance.getId(), "simpleBean", beanAsJson,
-          SerializedVariableTypes.Spin.getName(), new HashMap<String, Object>());
+          ProcessEngineVariableType.SPIN.getName(), new HashMap<String, Object>());
       fail();
     } catch (BadUserRequestException e) {
       // expected
@@ -327,11 +327,11 @@ public class VariableDataFormatTest extends AbstractProcessEngineTestCase {
     String beanAsJson = bean.toExpectedJsonString();
 
     Map<String, Object> variableConfig = new HashMap<String, Object>();
-    variableConfig.put(SerializedVariableTypes.SPIN_TYPE_DATA_FORMAT_ID, JSON_FORMAT_NAME);
-    variableConfig.put(SerializedVariableTypes.SPIN_TYPE_CONFIG_ROOT_TYPE, "a non-sensical class name");
+    variableConfig.put(ProcessEngineVariableType.SPIN_TYPE_DATA_FORMAT_ID, JSON_FORMAT_NAME);
+    variableConfig.put(ProcessEngineVariableType.SPIN_TYPE_CONFIG_ROOT_TYPE, "a non-sensical class name");
 
     runtimeService.setVariableFromSerialized(instance.getId(), "simpleBean", beanAsJson,
-        SerializedVariableTypes.Spin.getName(), variableConfig);
+        ProcessEngineVariableType.SPIN.getName(), variableConfig);
 
     assertCannotRetrieveVariable(instance.getId(), "simpleBean");
   }
@@ -343,12 +343,12 @@ public class VariableDataFormatTest extends AbstractProcessEngineTestCase {
     String beanAsJson = bean.toExpectedJsonString();
 
     Map<String, Object> variableConfig = new HashMap<String, Object>();
-    variableConfig.put(SerializedVariableTypes.SPIN_TYPE_DATA_FORMAT_ID, "a non-existing data format");
-    variableConfig.put(SerializedVariableTypes.SPIN_TYPE_CONFIG_ROOT_TYPE, bean.getClass().getCanonicalName());
+    variableConfig.put(ProcessEngineVariableType.SPIN_TYPE_DATA_FORMAT_ID, "a non-existing data format");
+    variableConfig.put(ProcessEngineVariableType.SPIN_TYPE_CONFIG_ROOT_TYPE, bean.getClass().getCanonicalName());
 
     try {
       runtimeService.setVariableFromSerialized(instance.getId(), "simpleBean", beanAsJson,
-          SerializedVariableTypes.Spin.getName(), variableConfig);
+          ProcessEngineVariableType.SPIN.getName(), variableConfig);
       fail();
     } catch (BadUserRequestException e) {
       // expected
@@ -362,11 +362,11 @@ public class VariableDataFormatTest extends AbstractProcessEngineTestCase {
     String beansAsJson = toExpectedJsonArray(lengthExceedingBeans);
 
     Map<String, Object> variableConfig = new HashMap<String, Object>();
-    variableConfig.put(SerializedVariableTypes.SPIN_TYPE_DATA_FORMAT_ID, JSON_FORMAT_NAME);
-    variableConfig.put(SerializedVariableTypes.SPIN_TYPE_CONFIG_ROOT_TYPE, "java.util.ArrayList<" + SimpleBean.class.getCanonicalName() + ">");
+    variableConfig.put(ProcessEngineVariableType.SPIN_TYPE_DATA_FORMAT_ID, JSON_FORMAT_NAME);
+    variableConfig.put(ProcessEngineVariableType.SPIN_TYPE_CONFIG_ROOT_TYPE, "java.util.ArrayList<" + SimpleBean.class.getCanonicalName() + ">");
 
     runtimeService.setVariableFromSerialized(instance.getId(), "simpleBeans", beansAsJson,
-        SerializedVariableTypes.Spin.getName(), variableConfig);
+        ProcessEngineVariableType.SPIN.getName(), variableConfig);
 
     List<SimpleBean> returnedBeans = (List<SimpleBean>) runtimeService.getVariable(instance.getId(), "simpleBeans");
     assertListsEqual(lengthExceedingBeans, returnedBeans);
@@ -379,12 +379,12 @@ public class VariableDataFormatTest extends AbstractProcessEngineTestCase {
     String beanAsJson = bean.toExpectedJsonString();
 
     Map<String, Object> configuration = new HashMap<String, Object>();
-    configuration.put(SerializedVariableTypes.SPIN_TYPE_DATA_FORMAT_ID, 42);
-    configuration.put(SerializedVariableTypes.SPIN_TYPE_CONFIG_ROOT_TYPE, true);
+    configuration.put(ProcessEngineVariableType.SPIN_TYPE_DATA_FORMAT_ID, 42);
+    configuration.put(ProcessEngineVariableType.SPIN_TYPE_CONFIG_ROOT_TYPE, true);
 
     try {
       runtimeService.setVariableFromSerialized(instance.getId(), "simpleBean", beanAsJson,
-          SerializedVariableTypes.Spin.getName(), configuration);
+          ProcessEngineVariableType.SPIN.getName(), configuration);
       fail();
     } catch (BadUserRequestException e) {
       // expected

@@ -12,35 +12,22 @@
  */
 package org.camunda.bpm.engine.impl.core.variable;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.camunda.bpm.engine.delegate.SerializedVariableValue;
+import org.camunda.bpm.engine.delegate.ProcessEngineVariableType;
 
 /**
  * @author Thorben Lindhauer
+ *
  */
-public class SerializedVariableValueImpl implements SerializedVariableValue {
+public class DefaultProcessEngineVariableType implements ProcessEngineVariableType {
 
-  protected Object value;
-  protected Map<String, Object> config = new HashMap<String, Object>();
+  protected String name;
 
-  public Object getValue() {
-    return value;
+  public DefaultProcessEngineVariableType(String name) {
+    this.name = name;
   }
 
-  public Map<String, Object> getConfig() {
-    return config;
+  public String getName() {
+    return name;
   }
-
-  public void setValue(Object value) {
-    this.value = value;
-  }
-
-  public void setConfigValue(String key, Object value) {
-    this.config.put(key, value);
-  }
-
-
 
 }

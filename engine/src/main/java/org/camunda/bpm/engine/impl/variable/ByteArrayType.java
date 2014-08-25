@@ -12,7 +12,7 @@
  */
 package org.camunda.bpm.engine.impl.variable;
 
-import org.camunda.bpm.engine.delegate.SerializedVariableTypes;
+import org.camunda.bpm.engine.delegate.ProcessEngineVariableType;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
 
 /**
@@ -21,7 +21,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
 public class ByteArrayType extends PrimitiveVariableType {
 
   public String getTypeName() {
-    return SerializedVariableTypes.ByteArray.getName();
+    return ProcessEngineVariableType.BYTES.getName();
   }
 
   public boolean isCachable() {
