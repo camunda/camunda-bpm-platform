@@ -13,6 +13,7 @@
 package org.camunda.bpm.engine.test.bpmn.scripttask;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -439,6 +440,71 @@ public class ScriptTaskTest extends PluggableProcessEngineTestCase {
 
     String variableValue = (String) runtimeService.getVariable(pi.getId(), "foo");
     assertEquals("bar", variableValue);
+  }
+
+  public void testJavascriptVariableSerialization() {
+    deployProcess(JAVASCRIPT, "execution.setVariable('date', new java.util.Date(0));");
+
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess");
+
+    Date date = (Date) runtimeService.getVariable(pi.getId(), "date");
+    assertEquals(0, date.getTime());
+
+    deployProcess(JAVASCRIPT, "execution.setVariable('myVar', new org.camunda.bpm.engine.test.bpmn.scripttask.MySerializable('test'));");
+
+    pi = runtimeService.startProcessInstanceByKey("testProcess");
+
+    MySerializable myVar = (MySerializable) runtimeService.getVariable(pi.getId(), "myVar");
+    assertEquals("test", myVar.getName());
+  }
+
+  public void testPythonVariableSerialization() {
+    deployProcess(PYTHON, "import java.util.Date\nexecution.setVariable('date', java.util.Date(0))");
+
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess");
+
+    Date date = (Date) runtimeService.getVariable(pi.getId(), "date");
+    assertEquals(0, date.getTime());
+
+    deployProcess(PYTHON, "import org.camunda.bpm.engine.test.bpmn.scripttask.MySerializable\n" +
+      "execution.setVariable('myVar', org.camunda.bpm.engine.test.bpmn.scripttask.MySerializable('test'));");
+
+    pi = runtimeService.startProcessInstanceByKey("testProcess");
+
+    MySerializable myVar = (MySerializable) runtimeService.getVariable(pi.getId(), "myVar");
+    assertEquals("test", myVar.getName());
+  }
+
+  public void testRubyVariableSerialization() {
+    deployProcess(RUBY, "require 'java'\n$execution.setVariable('date', java.util.Date.new(0))");
+
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess");
+
+    Date date = (Date) runtimeService.getVariable(pi.getId(), "date");
+    assertEquals(0, date.getTime());
+
+    deployProcess(RUBY, "$execution.setVariable('myVar', org.camunda.bpm.engine.test.bpmn.scripttask.MySerializable.new('test'));");
+
+    pi = runtimeService.startProcessInstanceByKey("testProcess");
+
+    MySerializable myVar = (MySerializable) runtimeService.getVariable(pi.getId(), "myVar");
+    assertEquals("test", myVar.getName());
+  }
+
+  public void testGroovyVariableSerialization() {
+    deployProcess(GROOVY, "execution.setVariable('date', new java.util.Date(0))");
+
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess");
+
+    Date date = (Date) runtimeService.getVariable(pi.getId(), "date");
+    assertEquals(0, date.getTime());
+
+    deployProcess(GROOVY, "execution.setVariable('myVar', new org.camunda.bpm.engine.test.bpmn.scripttask.MySerializable('test'));");
+
+    pi = runtimeService.startProcessInstanceByKey("testProcess");
+
+    MySerializable myVar = (MySerializable) runtimeService.getVariable(pi.getId(), "myVar");
+    assertEquals("test", myVar.getName());
   }
 
   protected void deployProcess(String scriptFormat, String scriptText) {
