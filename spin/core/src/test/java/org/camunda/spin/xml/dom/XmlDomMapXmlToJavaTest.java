@@ -13,8 +13,8 @@
 package org.camunda.spin.xml.dom;
 
 import org.camunda.spin.impl.xml.dom.XmlDomDataFormat;
-import org.camunda.spin.json.mapping.Customer;
 import org.camunda.spin.spi.SpinXmlDataFormatException;
+import org.camunda.spin.xml.mapping.Customer;
 import org.camunda.spin.xml.mapping.Order;
 import org.junit.Test;
 
