@@ -430,9 +430,9 @@ public abstract class MockProvider {
     Task mockTask = new MockTaskBuilder()
         .id(EXAMPLE_TASK_ID).name(EXAMPLE_TASK_NAME)
         .assignee(EXAMPLE_TASK_ASSIGNEE_NAME)
-        .createTime(DateTimeUtil.parseDateTime(EXAMPLE_TASK_CREATE_TIME).toDate())
-        .dueDate(DateTimeUtil.parseDateTime(EXAMPLE_TASK_DUE_DATE).toDate())
-        .followUpDate(DateTimeUtil.parseDateTime(EXAMPLE_FOLLOW_UP_DATE).toDate())
+        .createTime(DateTimeUtil.parseDate(EXAMPLE_TASK_CREATE_TIME))
+        .dueDate(DateTimeUtil.parseDate(EXAMPLE_TASK_DUE_DATE))
+        .followUpDate(DateTimeUtil.parseDate(EXAMPLE_FOLLOW_UP_DATE))
         .delegationState(EXAMPLE_TASK_DELEGATION_STATE).description(EXAMPLE_TASK_DESCRIPTION)
         .executionId(EXAMPLE_TASK_EXECUTION_ID).owner(EXAMPLE_TASK_OWNER)
         .parentTaskId(EXAMPLE_TASK_PARENT_TASK_ID)
@@ -502,7 +502,7 @@ public abstract class MockProvider {
     when(mockComment.getId()).thenReturn(EXAMPLE_TASK_COMMENT_ID);
     when(mockComment.getTaskId()).thenReturn(EXAMPLE_TASK_ID);
     when(mockComment.getUserId()).thenReturn(EXAMPLE_USER_ID);
-    when(mockComment.getTime()).thenReturn(DateTimeUtil.parseDateTime(EXAMPLE_TASK_COMMENT_TIME).toDate());
+    when(mockComment.getTime()).thenReturn(DateTimeUtil.parseDate(EXAMPLE_TASK_COMMENT_TIME));
     when(mockComment.getFullMessage()).thenReturn(EXAMPLE_TASK_COMMENT_FULL_MESSAGE);
     return mockComment;
   }
@@ -631,7 +631,7 @@ public abstract class MockProvider {
     when(mock.getExecutionId()).thenReturn(EXAMPLE_EXECUTION_ID);
     when(mock.getProcessInstanceId()).thenReturn(EXAMPLE_PROCESS_INSTANCE_ID);
     when(mock.getActivityId()).thenReturn(EXAMPLE_ACTIVITY_ID);
-    when(mock.getCreated()).thenReturn(DateTimeUtil.parseDateTime(EXAMPLE_EVENT_SUBSCRIPTION_CREATION_DATE).toDate());
+    when(mock.getCreated()).thenReturn(DateTimeUtil.parseDate(EXAMPLE_EVENT_SUBSCRIPTION_CREATION_DATE));
 
     return mock;
   }
@@ -737,7 +737,7 @@ public abstract class MockProvider {
     Deployment mockDeployment = mock(Deployment.class);
     when(mockDeployment.getId()).thenReturn(EXAMPLE_DEPLOYMENT_ID);
     when(mockDeployment.getName()).thenReturn(EXAMPLE_DEPLOYMENT_NAME);
-    when(mockDeployment.getDeploymentTime()).thenReturn(DateTimeUtil.parseDateTime(EXAMPLE_DEPLOYMENT_TIME).toDate());
+    when(mockDeployment.getDeploymentTime()).thenReturn(DateTimeUtil.parseDate(EXAMPLE_DEPLOYMENT_TIME));
 
     return mockDeployment;
   }
@@ -811,7 +811,7 @@ public abstract class MockProvider {
       .processDefinitionKey(EXAMPLE_PROCESS_DEFINITION_KEY)
       .retries(EXAMPLE_JOB_RETRIES)
       .exceptionMessage(EXAMPLE_JOB_NO_EXCEPTION_MESSAGE)
-      .dueDate(DateTimeUtil.parseDateTime(EXAMPLE_DUE_DATE).toDate())
+      .dueDate(DateTimeUtil.parseDate(EXAMPLE_DUE_DATE))
       .suspended(EXAMPLE_JOB_IS_SUSPENDED)
       .build();
     return mock;
@@ -939,8 +939,8 @@ public abstract class MockProvider {
     when(mock.getTaskId()).thenReturn(EXAMPLE_TASK_ID);
     when(mock.getCalledProcessInstanceId()).thenReturn(EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_CALLED_PROCESS_INSTANCE_ID);
     when(mock.getAssignee()).thenReturn(EXAMPLE_TASK_ASSIGNEE_NAME);
-    when(mock.getStartTime()).thenReturn(DateTimeUtil.parseDateTime(EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_START_TIME).toDate());
-    when(mock.getEndTime()).thenReturn(DateTimeUtil.parseDateTime(EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_END_TIME).toDate());
+    when(mock.getStartTime()).thenReturn(DateTimeUtil.parseDate(EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_START_TIME));
+    when(mock.getEndTime()).thenReturn(DateTimeUtil.parseDate(EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_END_TIME));
     when(mock.getDurationInMillis()).thenReturn(EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_DURATION);
     when(mock.isCanceled()).thenReturn(EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_IS_CANCELED);
     when(mock.isCompleteScope()).thenReturn(EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_IS_COMPLETE_SCOPE);
@@ -968,7 +968,7 @@ public abstract class MockProvider {
     when(mock.getTaskId()).thenReturn(EXAMPLE_TASK_ID);
     when(mock.getCalledProcessInstanceId()).thenReturn(EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_CALLED_PROCESS_INSTANCE_ID);
     when(mock.getAssignee()).thenReturn(EXAMPLE_TASK_ASSIGNEE_NAME);
-    when(mock.getStartTime()).thenReturn(DateTimeUtil.parseDateTime(EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_START_TIME).toDate());
+    when(mock.getStartTime()).thenReturn(DateTimeUtil.parseDate(EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_START_TIME));
     when(mock.getEndTime()).thenReturn(null);
     when(mock.getDurationInMillis()).thenReturn(null);
 
@@ -1012,8 +1012,8 @@ public abstract class MockProvider {
     when(mock.getBusinessKey()).thenReturn(EXAMPLE_PROCESS_INSTANCE_BUSINESS_KEY);
     when(mock.getProcessDefinitionId()).thenReturn(EXAMPLE_PROCESS_DEFINITION_ID);
     when(mock.getDeleteReason()).thenReturn(EXAMPLE_HISTORIC_PROCESS_INSTANCE_DELETE_REASON);
-    when(mock.getEndTime()).thenReturn(DateTimeUtil.parseDateTime(EXAMPLE_HISTORIC_PROCESS_INSTANCE_END_TIME).toDate());
-    when(mock.getStartTime()).thenReturn(DateTimeUtil.parseDateTime(EXAMPLE_HISTORIC_PROCESS_INSTANCE_START_TIME).toDate());
+    when(mock.getEndTime()).thenReturn(DateTimeUtil.parseDate(EXAMPLE_HISTORIC_PROCESS_INSTANCE_END_TIME));
+    when(mock.getStartTime()).thenReturn(DateTimeUtil.parseDate(EXAMPLE_HISTORIC_PROCESS_INSTANCE_START_TIME));
     when(mock.getDurationInMillis()).thenReturn(EXAMPLE_HISTORIC_PROCESS_INSTANCE_DURATION_MILLIS);
     when(mock.getStartUserId()).thenReturn(EXAMPLE_HISTORIC_PROCESS_INSTANCE_START_USER_ID);
     when(mock.getStartActivityId()).thenReturn(EXAMPLE_HISTORIC_PROCESS_INSTANCE_START_ACTIVITY_ID);
@@ -1036,7 +1036,7 @@ public abstract class MockProvider {
     when(mock.getProcessDefinitionId()).thenReturn(EXAMPLE_PROCESS_DEFINITION_ID);
     when(mock.getDeleteReason()).thenReturn(EXAMPLE_HISTORIC_PROCESS_INSTANCE_DELETE_REASON);
     when(mock.getEndTime()).thenReturn(null);
-    when(mock.getStartTime()).thenReturn(DateTimeUtil.parseDateTime(EXAMPLE_HISTORIC_PROCESS_INSTANCE_START_TIME).toDate());
+    when(mock.getStartTime()).thenReturn(DateTimeUtil.parseDate(EXAMPLE_HISTORIC_PROCESS_INSTANCE_START_TIME));
     when(mock.getDurationInMillis()).thenReturn(EXAMPLE_HISTORIC_PROCESS_INSTANCE_DURATION_MILLIS);
     return mock;
   }
@@ -1151,7 +1151,7 @@ public abstract class MockProvider {
     when(entry.getCaseExecutionId()).thenReturn(EXAMPLE_CASE_EXECUTION_ID);
     when(entry.getTaskId()).thenReturn(EXAMPLE_TASK_ID);
     when(entry.getUserId()).thenReturn(EXAMPLE_USER_ID);
-    when(entry.getTimestamp()).thenReturn(DateTimeUtil.parseDateTime(EXAMPLE_USER_OPERATION_TIMESTAMP).toDate());
+    when(entry.getTimestamp()).thenReturn(DateTimeUtil.parseDate(EXAMPLE_USER_OPERATION_TIMESTAMP));
     when(entry.getOperationId()).thenReturn(EXAMPLE_USER_OPERATION_ID);
     when(entry.getOperationType()).thenReturn(EXAMPLE_USER_OPERATION_TYPE);
     when(entry.getEntityType()).thenReturn(EXAMPLE_USER_OPERATION_ENTITY);
@@ -1171,7 +1171,7 @@ public abstract class MockProvider {
     when(variableUpdate.getActivityInstanceId()).thenReturn(EXAMPLE_HISTORIC_VAR_UPDATE_ACT_INST_ID);
     when(variableUpdate.getExecutionId()).thenReturn(EXAMPLE_HISTORIC_VAR_UPDATE_EXEC_ID);
     when(variableUpdate.getTaskId()).thenReturn(EXAMPLE_HISTORIC_VAR_UPDATE_TASK_ID);
-    when(variableUpdate.getTime()).thenReturn(DateTimeUtil.parseDateTime(EXAMPLE_HISTORIC_VAR_UPDATE_TIME).toDate());
+    when(variableUpdate.getTime()).thenReturn(DateTimeUtil.parseDate(EXAMPLE_HISTORIC_VAR_UPDATE_TIME));
     when(variableUpdate.getVariableName()).thenReturn(EXAMPLE_HISTORIC_VAR_UPDATE_NAME);
     when(variableUpdate.getVariableTypeName()).thenReturn(EXAMPLE_HISTORIC_VAR_UPDATE_TYPE_NAME);
     when(variableUpdate.getVariableType()).thenReturn(new StringType());
@@ -1228,13 +1228,13 @@ public abstract class MockProvider {
     when(taskInstance.getDeleteReason()).thenReturn(EXAMPLE_HISTORIC_TASK_INST_DELETE_REASON);
     when(taskInstance.getOwner()).thenReturn(EXAMPLE_HISTORIC_TASK_INST_OWNER);
     when(taskInstance.getAssignee()).thenReturn(EXAMPLE_HISTORIC_TASK_INST_ASSIGNEE);
-    when(taskInstance.getStartTime()).thenReturn(DateTimeUtil.parseDateTime(EXAMPLE_HISTORIC_TASK_INST_START_TIME).toDate());
-    when(taskInstance.getEndTime()).thenReturn(DateTimeUtil.parseDateTime(EXAMPLE_HISTORIC_TASK_INST_END_TIME).toDate());
+    when(taskInstance.getStartTime()).thenReturn(DateTimeUtil.parseDate(EXAMPLE_HISTORIC_TASK_INST_START_TIME));
+    when(taskInstance.getEndTime()).thenReturn(DateTimeUtil.parseDate(EXAMPLE_HISTORIC_TASK_INST_END_TIME));
     when(taskInstance.getDurationInMillis()).thenReturn(EXAMPLE_HISTORIC_TASK_INST_DURATION);
     when(taskInstance.getTaskDefinitionKey()).thenReturn(EXAMPLE_HISTORIC_TASK_INST_DEF_KEY);
     when(taskInstance.getPriority()).thenReturn(EXAMPLE_HISTORIC_TASK_INST_PRIORITY);
-    when(taskInstance.getDueDate()).thenReturn(DateTimeUtil.parseDateTime(EXAMPLE_HISTORIC_TASK_INST_DUE_DATE).toDate());
-    when(taskInstance.getFollowUpDate()).thenReturn(DateTimeUtil.parseDateTime(EXAMPLE_HISTORIC_TASK_INST_FOLLOW_UP_DATE).toDate());
+    when(taskInstance.getDueDate()).thenReturn(DateTimeUtil.parseDate(EXAMPLE_HISTORIC_TASK_INST_DUE_DATE));
+    when(taskInstance.getFollowUpDate()).thenReturn(DateTimeUtil.parseDate(EXAMPLE_HISTORIC_TASK_INST_FOLLOW_UP_DATE));
     when(taskInstance.getParentTaskId()).thenReturn(EXAMPLE_HISTORIC_TASK_INST_PARENT_TASK_ID);
     when(taskInstance.getCaseDefinitionId()).thenReturn(EXAMPLE_HISTORIC_TASK_INST_CASE_DEF_ID);
     when(taskInstance.getCaseInstanceId()).thenReturn(EXAMPLE_HISTORIC_TASK_INST_CASE_INST_ID);
@@ -1255,7 +1255,7 @@ public abstract class MockProvider {
     Incident incident = mock(Incident.class);
 
     when(incident.getId()).thenReturn(EXAMPLE_INCIDENT_ID);
-    when(incident.getIncidentTimestamp()).thenReturn(DateTimeUtil.parseDateTime(EXAMPLE_INCIDENT_TIMESTAMP).toDate());
+    when(incident.getIncidentTimestamp()).thenReturn(DateTimeUtil.parseDate(EXAMPLE_INCIDENT_TIMESTAMP));
     when(incident.getIncidentType()).thenReturn(EXAMPLE_INCIDENT_TYPE);
     when(incident.getExecutionId()).thenReturn(EXAMPLE_INCIDENT_EXECUTION_ID);
     when(incident.getActivityId()).thenReturn(EXAMPLE_INCIDENT_ACTIVITY_ID);
@@ -1281,8 +1281,8 @@ public abstract class MockProvider {
     HistoricIncident incident = mock(HistoricIncident.class);
 
     when(incident.getId()).thenReturn(EXAMPLE_HIST_INCIDENT_ID);
-    when(incident.getCreateTime()).thenReturn(DateTimeUtil.parseDateTime(EXAMPLE_HIST_INCIDENT_CREATE_TIME).toDate());
-    when(incident.getEndTime()).thenReturn(DateTimeUtil.parseDateTime(EXAMPLE_HIST_INCIDENT_END_TIME).toDate());
+    when(incident.getCreateTime()).thenReturn(DateTimeUtil.parseDate(EXAMPLE_HIST_INCIDENT_CREATE_TIME));
+    when(incident.getEndTime()).thenReturn(DateTimeUtil.parseDate(EXAMPLE_HIST_INCIDENT_END_TIME));
     when(incident.getIncidentType()).thenReturn(EXAMPLE_HIST_INCIDENT_TYPE);
     when(incident.getExecutionId()).thenReturn(EXAMPLE_HIST_INCIDENT_EXECUTION_ID);
     when(incident.getActivityId()).thenReturn(EXAMPLE_HIST_INCIDENT_ACTIVITY_ID);

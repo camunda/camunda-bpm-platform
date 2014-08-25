@@ -879,7 +879,7 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
     params.put("includeProcessInstances", false);
     params.put("executionDate", MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION);
 
-    Date executionDate = DateTimeUtil.parseDateTime(MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION).toDate();
+    Date executionDate = DateTimeUtil.parseDate(MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION);
 
     given()
       .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
@@ -920,7 +920,7 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
     params.put("includeProcessInstances", true);
     params.put("executionDate", MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION);
 
-    Date executionDate = DateTimeUtil.parseDateTime(MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION).toDate();
+    Date executionDate = DateTimeUtil.parseDate(MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION);
 
     given()
       .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
@@ -1009,7 +1009,7 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
     params.put("includeProcessInstances", false);
     params.put("executionDate", MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION);
 
-    Date executionDate = DateTimeUtil.parseDateTime(MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION).toDate();
+    Date executionDate = DateTimeUtil.parseDate(MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION);
 
     given()
       .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
@@ -1050,7 +1050,7 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
     params.put("includeProcessInstances", true);
     params.put("executionDate", MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION);
 
-    Date executionDate = DateTimeUtil.parseDateTime(MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION).toDate();
+    Date executionDate = DateTimeUtil.parseDate(MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION);
 
     given()
       .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
@@ -1178,7 +1178,7 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
     params.put("processDefinitionKey", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
     params.put("executionDate", MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION);
 
-    Date executionDate = DateTimeUtil.parseDateTime(MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION).toDate();
+    Date executionDate = DateTimeUtil.parseDate(MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION);
 
     given()
       .contentType(ContentType.JSON)
@@ -1200,7 +1200,7 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
     params.put("processDefinitionKey", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
     params.put("executionDate", MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION);
 
-    Date executionDate = DateTimeUtil.parseDateTime(MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION).toDate();
+    Date executionDate = DateTimeUtil.parseDate(MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION);
 
     given()
       .contentType(ContentType.JSON)
@@ -1302,7 +1302,7 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
     params.put("processDefinitionKey", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
     params.put("executionDate", MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION);
 
-    Date executionDate = DateTimeUtil.parseDateTime(MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION).toDate();
+    Date executionDate = DateTimeUtil.parseDate(MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION);
 
     given()
       .contentType(ContentType.JSON)
@@ -1324,7 +1324,7 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
     params.put("processDefinitionKey", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
     params.put("executionDate", MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION);
 
-    Date executionDate = DateTimeUtil.parseDateTime(MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION).toDate();
+    Date executionDate = DateTimeUtil.parseDate(MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION);
 
     given()
       .contentType(ContentType.JSON)
@@ -2072,7 +2072,7 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
     params.put("includeProcessInstances", false);
     params.put("executionDate", MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION);
 
-    Date executionDate = DateTimeUtil.parseDateTime(MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION).toDate();
+    Date executionDate = DateTimeUtil.parseDate(MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION);
 
     given()
       .pathParam("key", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY)
@@ -2113,7 +2113,7 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
     params.put("includeProcessInstances", true);
     params.put("executionDate", MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION);
 
-    Date executionDate = DateTimeUtil.parseDateTime(MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION).toDate();
+    Date executionDate = DateTimeUtil.parseDate(MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION);
 
     given()
       .pathParam("key", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY)
@@ -2202,7 +2202,7 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
     params.put("includeProcessInstances", false);
     params.put("executionDate", MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION);
 
-    Date executionDate = DateTimeUtil.parseDateTime(MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION).toDate();
+    Date executionDate = DateTimeUtil.parseDate(MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION);
 
     given()
       .pathParam("key", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY)
@@ -2245,7 +2245,7 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
     params.put("includeProcessInstances", true);
     params.put("executionDate", MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION);
 
-    Date executionDate = DateTimeUtil.parseDateTime(MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION).toDate();
+    Date executionDate = DateTimeUtil.parseDate(MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION);
 
     given()
       .pathParam("key", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY)

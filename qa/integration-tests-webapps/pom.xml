@@ -82,6 +82,14 @@
     </dependency>
 
     <dependency>
+      <groupId>com.sun.jersey.contribs</groupId>
+      <artifactId>jersey-multipart</artifactId>
+      <version>1.15</version>
+      <scope>test</scope>
+    </dependency>
+
+
+    <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
       <scope>test</scope>
@@ -161,6 +169,7 @@
       <artifactId>postgresql</artifactId>
       <scope>test</scope>
     </dependency>
+
   </dependencies>
 
 

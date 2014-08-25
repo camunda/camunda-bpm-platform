@@ -470,8 +470,8 @@ public abstract class AbstractHistoricProcessInstanceRestServiceQueryTest extend
   private Map<String, Date> getCompleteStartDateQueryParameters() {
     Map<String, Date> parameters = new HashMap<String, Date>();
 
-    parameters.put("startedAfter", DateTimeUtil.parseDateTime(MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_STARTED_AFTER).toDate());
-    parameters.put("startedBefore", DateTimeUtil.parseDateTime(MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_STARTED_BEFORE).toDate());
+    parameters.put("startedAfter", DateTimeUtil.parseDate(MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_STARTED_AFTER));
+    parameters.put("startedBefore", DateTimeUtil.parseDate(MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_STARTED_BEFORE));
 
     return parameters;
   }
@@ -497,8 +497,8 @@ public abstract class AbstractHistoricProcessInstanceRestServiceQueryTest extend
   private void verifyStringStartParameterQueryInvocations() {
     Map<String, String> startDateParameters = getCompleteStartDateAsStringQueryParameters();
 
-    verify(mockedQuery).startedBefore(DateTimeUtil.parseDateTime(startDateParameters.get("startedBefore")).toDate());
-    verify(mockedQuery).startedAfter(DateTimeUtil.parseDateTime(startDateParameters.get("startedAfter")).toDate());
+    verify(mockedQuery).startedBefore(DateTimeUtil.parseDate(startDateParameters.get("startedBefore")));
+    verify(mockedQuery).startedAfter(DateTimeUtil.parseDate(startDateParameters.get("startedAfter")));
 
     verify(mockedQuery).list();
   }
@@ -552,8 +552,8 @@ public abstract class AbstractHistoricProcessInstanceRestServiceQueryTest extend
   private Map<String, Date> getCompleteFinishedDateQueryParameters() {
     Map<String, Date> parameters = new HashMap<String, Date>();
 
-    parameters.put("finishedAfter", DateTimeUtil.parseDateTime(MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_FINISHED_AFTER).toDate());
-    parameters.put("finishedBefore", DateTimeUtil.parseDateTime(MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_FINISHED_BEFORE).toDate());
+    parameters.put("finishedAfter", DateTimeUtil.parseDate(MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_FINISHED_AFTER));
+    parameters.put("finishedBefore", DateTimeUtil.parseDate(MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_FINISHED_BEFORE));
 
     return parameters;
   }
@@ -579,8 +579,8 @@ public abstract class AbstractHistoricProcessInstanceRestServiceQueryTest extend
   private void verifyStringFinishedParameterQueryInvocations() {
     Map<String, String> finishedDateParameters = getCompleteFinishedDateAsStringQueryParameters();
 
-    verify(mockedQuery).finishedAfter(DateTimeUtil.parseDateTime(finishedDateParameters.get("finishedAfter")).toDate());
-    verify(mockedQuery).finishedBefore(DateTimeUtil.parseDateTime(finishedDateParameters.get("finishedBefore")).toDate());
+    verify(mockedQuery).finishedAfter(DateTimeUtil.parseDate(finishedDateParameters.get("finishedAfter")));
+    verify(mockedQuery).finishedBefore(DateTimeUtil.parseDate(finishedDateParameters.get("finishedBefore")));
 
     verify(mockedQuery).list();
   }

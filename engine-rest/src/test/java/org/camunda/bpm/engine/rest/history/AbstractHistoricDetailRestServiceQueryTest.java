@@ -12,23 +12,12 @@
  */
 package org.camunda.bpm.engine.rest.history;
 
-import static com.jayway.restassured.RestAssured.expect;
-import static com.jayway.restassured.RestAssured.given;
-import static com.jayway.restassured.path.json.JsonPath.from;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.equalTo;
-import static org.mockito.Mockito.inOrder;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
-
+import com.jayway.restassured.http.ContentType;
+import com.jayway.restassured.response.Response;
 import java.util.Date;
 import java.util.List;
-
 import javax.ws.rs.core.Response.Status;
 import javax.xml.registry.InvalidRequestException;
-
 import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.history.HistoricDetailQuery;
 import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
@@ -40,8 +29,16 @@ import org.junit.Test;
 import org.mockito.InOrder;
 import org.mockito.Mockito;
 
-import com.jayway.restassured.http.ContentType;
-import com.jayway.restassured.response.Response;
+import static com.jayway.restassured.RestAssured.expect;
+import static com.jayway.restassured.RestAssured.given;
+import static com.jayway.restassured.path.json.JsonPath.from;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.equalTo;
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
 /**
  * @author Roman Smirnov
@@ -266,7 +263,7 @@ public class AbstractHistoricDetailRestServiceQueryTest extends AbstractRestServ
     String returnedActivityInstanceId1 = from(content).getString("[0].activityInstanceId");
     String returnedExecutionId1 = from(content).getString("[0].executionId");
     String returnedTaskId1 = from(content).getString("[0].taskId");
-    Date returnedTime1 = DateTimeUtil.parseDateTime(from(content).getString("[0].time")).toDate();
+    Date returnedTime1 = DateTimeUtil.parseDate(from(content).getString("[0].time"));
     String returnedVariableName = from(content).getString("[0].variableName");
     String returnedVariableTypeName = from(content).getString("[0].variableTypeName");
     String returnedValue = from(content).getString("[0].value");
@@ -277,7 +274,7 @@ public class AbstractHistoricDetailRestServiceQueryTest extends AbstractRestServ
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_VAR_UPDATE_ACT_INST_ID, returnedActivityInstanceId1);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_VAR_UPDATE_EXEC_ID, returnedExecutionId1);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_VAR_UPDATE_TASK_ID, returnedTaskId1);
-    Assert.assertEquals(DateTimeUtil.parseDateTime(MockProvider.EXAMPLE_HISTORIC_VAR_UPDATE_TIME).toDate(), returnedTime1);
+    Assert.assertEquals(DateTimeUtil.parseDate(MockProvider.EXAMPLE_HISTORIC_VAR_UPDATE_TIME), returnedTime1);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_VAR_UPDATE_NAME, returnedVariableName);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_VAR_UPDATE_TYPE_NAME, returnedVariableTypeName);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_VAR_UPDATE_VALUE, returnedValue);
@@ -288,7 +285,7 @@ public class AbstractHistoricDetailRestServiceQueryTest extends AbstractRestServ
     String returnedActivityInstanceId2 = from(content).getString("[1].activityInstanceId");
     String returnedExecutionId2 = from(content).getString("[1].executionId");
     String returnedTaskId2 = from(content).getString("[1].taskId");
-    Date returnedTime2 = DateTimeUtil.parseDateTime(from(content).getString("[1].time")).toDate();
+    Date returnedTime2 = DateTimeUtil.parseDate(from(content).getString("[1].time"));
     String returnedFieldId = from(content).getString("[1].fieldId");
     String returnedFieldValue = from(content).getString("[1].fieldValue");
 
@@ -297,7 +294,7 @@ public class AbstractHistoricDetailRestServiceQueryTest extends AbstractRestServ
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_FORM_FIELD_ACT_INST_ID, returnedActivityInstanceId2);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_FORM_FIELD_EXEC_ID, returnedExecutionId2);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_FORM_FIELD_TASK_ID, returnedTaskId2);
-    Assert.assertEquals(DateTimeUtil.parseDateTime(MockProvider.EXAMPLE_HISTORIC_FORM_FIELD_TIME).toDate(), returnedTime2);
+    Assert.assertEquals(DateTimeUtil.parseDate(MockProvider.EXAMPLE_HISTORIC_FORM_FIELD_TIME), returnedTime2);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_FORM_FIELD_FIELD_ID, returnedFieldId);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_FORM_FIELD_VALUE, returnedFieldValue);
   }

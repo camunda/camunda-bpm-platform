@@ -298,7 +298,7 @@ public abstract class AbstractDeploymentRestServiceInteractionTest extends Abstr
     JsonPath path = from(responseContent);
     String returnedId = path.get("id");
     String returnedName = path.get("name");
-    Date returnedDeploymentTime = DateTimeUtil.parseDateTime(path.<String>get("deploymentTime")).toDate();
+    Date returnedDeploymentTime = DateTimeUtil.parseDate(path.<String>get("deploymentTime"));
 
     assertEquals(mockDeployment.getId(), returnedId);
     assertEquals(mockDeployment.getName(), returnedName);

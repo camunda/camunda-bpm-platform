@@ -132,7 +132,7 @@ public abstract class AbstractJobRestServiceQueryTest extends AbstractRestServic
 		String returnedExecutionId = from(content).getString("[0].executionId");
 		String returnedExceptionMessage = from(content).getString("[0].exceptionMessage");
 		int returnedRetries = from(content).getInt("[0].retries");
-		Date returnedDueDate = DateTimeUtil.parseDateTime(from(content).getString("[0].dueDate")).toDate();
+		Date returnedDueDate = DateTimeUtil.parseDate(from(content).getString("[0].dueDate"));
 		boolean returnedSuspended = from(content).getBoolean("[0].suspended");
 
 		Assert.assertEquals(MockProvider.EXAMPLE_JOB_ID, returnedJobId);
@@ -142,7 +142,7 @@ public abstract class AbstractJobRestServiceQueryTest extends AbstractRestServic
 		Assert.assertEquals(MockProvider.EXAMPLE_EXECUTION_ID, returnedExecutionId);
 		Assert.assertEquals(MockProvider.EXAMPLE_JOB_NO_EXCEPTION_MESSAGE, returnedExceptionMessage);
 		Assert.assertEquals(MockProvider.EXAMPLE_JOB_RETRIES, returnedRetries);
-		Assert.assertEquals(DateTimeUtil.parseDateTime(MockProvider.EXAMPLE_DUE_DATE).toDate(), returnedDueDate);
+		Assert.assertEquals(DateTimeUtil.parseDate(MockProvider.EXAMPLE_DUE_DATE), returnedDueDate);
 		Assert.assertEquals(MockProvider.EXAMPLE_JOB_IS_SUSPENDED, returnedSuspended);
 	}
 

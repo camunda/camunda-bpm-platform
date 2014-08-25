@@ -2947,7 +2947,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     String returnedId = resourceHashMap.get("id");
     String returnedUserId = resourceHashMap.get("userId");
     String returnedTaskId = resourceHashMap.get("taskId");
-    Date returnedTime = DateTimeUtil.parseDateTime(resourceHashMap.get("time")).toDate();
+    Date returnedTime = DateTimeUtil.parseDate(resourceHashMap.get("time"));
     String returnedFullMessage = resourceHashMap.get("message");
 
     Comment mockComment = mockTaskComments.get(0);
@@ -2970,7 +2970,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     String returnedId = path.get("id");
     String returnedUserId = path.get("userId");
     String returnedTaskId = path.get("taskId");
-    Date returnedTime = DateTimeUtil.parseDateTime(path.<String>get("time")).toDate();
+    Date returnedTime = DateTimeUtil.parseDate(path.<String>get("time"));
     String returnedFullMessage = path.get("message");
 
     assertEquals(mockTaskComment.getId(), returnedId);
