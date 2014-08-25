@@ -16,7 +16,6 @@ import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.delegate.PersistentVariableInstance;
 import org.camunda.bpm.engine.delegate.ProcessEngineVariableType;
-import org.camunda.bpm.engine.delegate.SerializedVariableValue;
 import org.junit.Assert;
 
 /**
@@ -34,27 +33,18 @@ public class SetSerializedVariablesDelegate implements JavaDelegate {
 
     PersistentVariableInstance variable = execution.getVariableInstance(variableName);
     Assert.assertEquals(variableName, variable.getName());
-    assertVariableHasValueAndType(variable, "test", ProcessEngineVariableType.STRING.getName());
+    VariableAssertionUtil.assertVariableHasValueAndType(variable, "test", ProcessEngineVariableType.STRING.getName());
 
     // update variable instance to the same type in same transaction
     execution.setVariableFromSerialized(variableName, "another Value", ProcessEngineVariableType.STRING.getName(), null);
     Assert.assertEquals(variableName, variable.getName());
-    assertVariableHasValueAndType(variable, "another Value", ProcessEngineVariableType.STRING.getName());
+    VariableAssertionUtil.assertVariableHasValueAndType(variable, "another Value", ProcessEngineVariableType.STRING.getName());
 
     // update variable instance to another type in same transaction
     execution.setVariableFromSerialized(variableName, 42, ProcessEngineVariableType.INTEGER.getName(), null);
 
     Assert.assertEquals(variableName, variable.getName());
-    assertVariableHasValueAndType(variable, 42, ProcessEngineVariableType.INTEGER.getName());
-  }
-
-  protected void assertVariableHasValueAndType(PersistentVariableInstance variableInstance, Object value, String type) {
-    Assert.assertEquals(type, variableInstance.getTypeName());
-    Assert.assertEquals(value, variableInstance.getValue());
-
-    SerializedVariableValue serializedValue = variableInstance.getSerializedValue();
-    Assert.assertNotNull(serializedValue);
-    Assert.assertEquals(value, serializedValue.getValue());
+    VariableAssertionUtil.assertVariableHasValueAndType(variable, 42, ProcessEngineVariableType.INTEGER.getName());
   }
 
 }

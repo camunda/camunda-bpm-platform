@@ -202,4 +202,15 @@ public class VariablesTest extends PluggableProcessEngineTestCase {
     assertEquals(ProcessEngineVariableType.SERIALIZABLE.getName(), variable.getTypeName());
 
   }
+
+  @Deployment
+  public void testGetVariableInstancesFromVariableScope() {
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("anIntegerVariable", 1234);
+
+    runtimeService.startProcessInstanceByKey("testProcess", variables);
+
+    // assertions are part of the java delegate AssertVariableInstancesDelegate
+    // only there we can access the VariableScope methods
+  }
 }
