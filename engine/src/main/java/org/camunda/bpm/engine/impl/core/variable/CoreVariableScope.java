@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.CoreVariableInstance;
 import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.javax.el.ELContext;
@@ -169,14 +168,6 @@ public abstract class CoreVariableScope<T extends CoreVariableInstance> implemen
     return getVariableStore().getVariableNames();
   }
 
-  protected void createVariablesLocal(Map<String, ? extends Object> variables) {
-    if (variables!=null) {
-      for (Map.Entry<String, ? extends Object> entry: variables.entrySet()) {
-        createVariableLocal(entry.getKey(), entry.getValue());
-      }
-    }
-  }
-
   public void setVariables(Map<String, ? extends Object> variables) {
     if (variables!=null) {
       for (String variableName : variables.keySet()) {
@@ -241,7 +232,7 @@ public abstract class CoreVariableScope<T extends CoreVariableInstance> implemen
       }
       return;
     }
-    createVariableLocal(variableName, value, sourceActivityExecution);
+    setVariableLocal(variableName, value, sourceActivityExecution);
   }
 
   public void setVariableLocal(String variableName, Object value, CoreVariableScope<T> sourceActivityExecution) {
@@ -251,22 +242,6 @@ public abstract class CoreVariableScope<T extends CoreVariableInstance> implemen
   public void setVariableLocal(String variableName, Object value) {
     getVariableStore().createOrUpdateVariable(variableName, value, getSourceActivityVariableScope());
 
-  }
-
-  protected void createVariableLocal(String variableName, Object value) {
-    createVariableLocal(variableName, value, getSourceActivityVariableScope());
-  }
-
-  /** only called when a new variable is created on this variable scope.
-   * This method is also responsible for propagating the creation of this
-   * variable to the history. */
-  protected void createVariableLocal(String variableName, Object value, CoreVariableScope<T> sourceActivityExecution) {
-
-    if (getVariableStore().containsVariableInstance(variableName)) {
-      throw new ProcessEngineException("variable '"+variableName+"' already exists. Use setVariableLocal if you want to overwrite the value");
-    }
-
-    createVariableInstance(variableName, value, sourceActivityExecution);
   }
 
   public void removeVariable(String variableName) {
@@ -298,10 +273,6 @@ public abstract class CoreVariableScope<T extends CoreVariableInstance> implemen
 
   protected void removeVariableLocal(String variableName, CoreVariableScope<T> sourceActivityExecution) {
     getVariableStore().removeVariableInstance(variableName, sourceActivityExecution);
-  }
-
-  protected CoreVariableInstance createVariableInstance(String variableName, Object value, CoreVariableScope<T> sourceActivityExecution) {
-    return getVariableStore().createVariableInstance(variableName, value, sourceActivityExecution);
   }
 
   public ELContext getCachedElContext() {

@@ -38,8 +38,6 @@ public interface CoreVariableStore<T extends CoreVariableInstance> {
 
   T removeVariableInstance(String variableName, CoreVariableScope<T> sourceActivityExecution);
 
-  T createVariableInstance(String variableName, Object value, CoreVariableScope<T> sourceActivityExecution);
-
   Map<String, T> getVariableInstances();
 
   void createOrUpdateVariable(String variableName, Object value, CoreVariableScope<T> sourceActivityExecution);
