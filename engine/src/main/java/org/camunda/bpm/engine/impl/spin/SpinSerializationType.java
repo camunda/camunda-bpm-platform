@@ -13,7 +13,9 @@
 package org.camunda.bpm.engine.impl.spin;
 
 import java.io.UnsupportedEncodingException;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.ProcessEngineVariableType;
@@ -30,13 +32,20 @@ import org.camunda.spin.spi.DataFormat;
 
 public class SpinSerializationType implements VariableType {
 
-  protected DataFormat<?> dataFormat;
+  protected Map<String, DataFormat<?>> availableDataFormats;
+  protected DataFormat<?> defaultDataFormat;
 
   protected static final String CONFIG_DATA_FORMAT = ProcessEngineVariableType.SPIN_TYPE_DATA_FORMAT_ID;
   protected static final String CONFIG_ROOT_TYPE = ProcessEngineVariableType.SPIN_TYPE_CONFIG_ROOT_TYPE;
 
-  public SpinSerializationType(DataFormat<?> dataFormat) {
-    this.dataFormat = dataFormat;
+  public SpinSerializationType(Set<DataFormat<?>> dataFormats, DataFormat<?> defaultDataFormat) {
+    this.availableDataFormats = new HashMap<String, DataFormat<?>>();
+
+    for (DataFormat<?> format : dataFormats) {
+      availableDataFormats.put(format.getName(), format);
+    }
+
+    this.defaultDataFormat = defaultDataFormat;
   }
 
   public String getTypeName() {
@@ -57,11 +66,11 @@ public class SpinSerializationType implements VariableType {
 
   public void setValue(Object value, ValueFields valueFields) {
     try {
-      Spin<?> spin = SpinFactory.getInstance().createSpinFromObject(value, dataFormat);
+      Spin<?> spin = SpinFactory.getInstance().createSpinFromObject(value, defaultDataFormat);
 
       String serializedVariable = spin.toString();
 
-      setValue(serializedVariable, dataFormat.getName(), dataFormat.getCanonicalTypeName(value), valueFields);
+      setValue(serializedVariable, defaultDataFormat.getName(), defaultDataFormat.getCanonicalTypeName(value), valueFields);
     } catch (SpinRuntimeException e) {
       throw new ProcessEngineException("Cannot serialize object of type " + value.getClass() + ": " + value, e);
     }
@@ -82,9 +91,9 @@ public class SpinSerializationType implements VariableType {
 
     try {
       String dataFormatId = valueFields.getDataFormatId();
-      if (!dataFormat.getName().equals(dataFormatId)) {
-        throw new ProcessEngineException("Default serialization format is " + dataFormat.getName() + ". "
-            + "Cannot deserialize variable of type " + dataFormatId);
+      if (!availableDataFormats.containsKey(dataFormatId)) {
+        throw new ProcessEngineException("No data format found that"
+            + "matches the data format " + dataFormatId + " of variable " + valueFields.getName());
       }
 
 
@@ -98,7 +107,7 @@ public class SpinSerializationType implements VariableType {
         variableValue = new String(valueFields.getByteArrayValue().getBytes());
       }
 
-      Spin<?> spinNode = SpinFactory.getInstance().createSpinFromString(variableValue, dataFormat);
+      Spin<?> spinNode = SpinFactory.getInstance().createSpinFromString(variableValue, availableDataFormats.get(dataFormatId));
       Object value = spinNode.mapTo(valueFields.getTextValue2());
       return value;
 
@@ -109,8 +118,8 @@ public class SpinSerializationType implements VariableType {
     }
   }
 
-  public DataFormat<?> getDataFormat() {
-    return dataFormat;
+  public DataFormat<?> getDefaultDataFormat() {
+    return defaultDataFormat;
   }
 
   public SerializedVariableValue getSerializedValue(ValueFields valueFields) {
@@ -146,7 +155,7 @@ public class SpinSerializationType implements VariableType {
         && configuration != null
         && configuration.get(CONFIG_DATA_FORMAT) instanceof String
         && configuration.get(CONFIG_ROOT_TYPE) instanceof String
-        && dataFormat.getName().equals(configuration.get(CONFIG_DATA_FORMAT));
+        && availableDataFormats.containsKey(configuration.get(CONFIG_DATA_FORMAT));
   }
 
 }

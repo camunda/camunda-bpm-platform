@@ -246,7 +246,7 @@ public class VariableDataFormatTest extends AbstractProcessEngineTestCase {
 
     DataFormats.jsonTreeFormat().mapper().config("aKey", null);
 
-    JsonJacksonTreeDataFormat dataFormat = (JsonJacksonTreeDataFormat) variableType.getDataFormat();
+    JsonJacksonTreeDataFormat dataFormat = (JsonJacksonTreeDataFormat) variableType.getDefaultDataFormat();
     assertNotSame("The variable type should not use the global data format instance",
         DataFormats.jsonTreeFormat(), dataFormat);
 

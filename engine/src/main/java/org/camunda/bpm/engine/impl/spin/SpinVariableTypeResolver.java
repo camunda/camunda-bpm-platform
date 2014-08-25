@@ -27,13 +27,22 @@ import org.camunda.spin.spi.DataFormat;
  */
 public class SpinVariableTypeResolver implements SerializationVariableTypeResolver {
 
-  public VariableType getTypeForSerializationFormat(String serializationFormat) {
-    for (DataFormat<?> format : lookupDataFormats()) {
-      if (serializationFormat.equals(format.getName())) {
-        return new SpinSerializationType(format);
+  public VariableType getTypeForSerializationFormat(String defaultSerializationFormat) {
+    Set<DataFormat<?>> availableDataFormats = lookupDataFormats();
+
+    DataFormat<?> defaultFormat = null;
+    for (DataFormat<?> format : availableDataFormats) {
+      if (defaultSerializationFormat.equals(format.getName())) {
+        defaultFormat = format;
+        break;
       }
     }
-    return null;
+
+    if (defaultFormat == null) {
+      return null;
+    }
+
+    return new SpinSerializationType(availableDataFormats, defaultFormat);
 
   }
 
