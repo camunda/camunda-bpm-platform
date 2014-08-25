@@ -33,6 +33,7 @@ import org.camunda.bpm.engine.task.TaskQuery;
  *
  * @author Tom Baeyens
  * @author Joram Barrez
+ * @author Thorben Lindhauer
  */
 public interface TaskService {
 
@@ -320,6 +321,29 @@ public interface TaskService {
    * execution. */
   void setVariable(String taskId, String variableName, Object value);
 
+  /**
+   * <p>Update or create a variable for a task from its serialized representation.
+   * If the variable does not already exist in the upwards scope hierarchy (any execution that
+   * is a parent of the execution responsible for the related human task),
+   * it will be created in the process instance (which is the root execution).</p>
+   *
+   * <p>
+   * See {@link SerializedVariableTypes} for available variable types and their required
+   * configuration options.
+   * </p>
+   *
+   * @param taskId id of the task to set the variable for, cannot be null.
+   * @param variableName name of variable to set, cannot be null
+   * @param serializedValue Serialized value of the variable to set; Expected value types are defined
+   * variable-type-specific and defined in {@link SerializedVariableTypes}.
+   * @param variableTypeName Type of the variable to set. Defined in {@link SerializedVariableTypes}.
+   * @param variableConfiguration Variable-type-specific configuration of the serialized value. Defined in {@link SerializedVariableTypes}.
+   * @throws ProcessEngineException when no task is found or the serialized value or its
+   * configuration is not consistent with the chosen variable type
+   */
+  void setVariableFromSerialized(String taskId, String variableName, Object serializedValue,
+      String variableTypeName, Map<String, Object> variableConfiguration);
+
   /** set variables on a task.  If the variable is not already existing, it will be created in the
    * most outer scope.  This means the process instance in case this task is related to an
    * execution. */
@@ -328,6 +352,28 @@ public interface TaskService {
   /** set variable on a task.  If the variable is not already existing, it will be created in the
    * task.  */
   void setVariableLocal(String taskId, String variableName, Object value);
+
+  /**
+   * <p>Update or create a variable for a task from its serialized representation.
+   * If the variable does not already exist,
+   * it will be created in the given task.</p>
+   *
+   * <p>
+   * See {@link SerializedVariableTypes} for available variable types and their required
+   * configuration options.
+   * </p>
+   *
+   * @param taskId id of the task to set the variable for, cannot be null.
+   * @param variableName name of variable to set, cannot be null
+   * @param serializedValue Serialized value of the variable to set; Expected value types are defined
+   * variable-type-specific and defined in {@link SerializedVariableTypes}.
+   * @param variableTypeName Type of the variable to set. Defined in {@link SerializedVariableTypes}.
+   * @param variableConfiguration Variable-type-specific configuration of the serialized value. Defined in {@link SerializedVariableTypes}.
+   * @throws ProcessEngineException when no task is found or the serialized value or its
+   * configuration is not consistent with the chosen variable type
+   */
+  void setVariableLocalFromSerialized(String taskId, String variableName, Object serializedValue,
+      String variableTypeName, Map<String, Object> variableConfiguration);
 
   /** set variables on a task.  If the variable is not already existing, it will be created in the
    * task.  */

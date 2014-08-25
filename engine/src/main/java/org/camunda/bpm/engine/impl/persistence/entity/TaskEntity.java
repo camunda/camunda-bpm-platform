@@ -38,8 +38,8 @@ import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
-import org.camunda.bpm.engine.impl.core.variable.CoreVariableScope;
-import org.camunda.bpm.engine.impl.core.variable.CoreVariableStore;
+import org.camunda.bpm.engine.impl.core.variable.CorePersistentVariableScope;
+import org.camunda.bpm.engine.impl.core.variable.CorePersistentVariableStore;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.HasDbRevision;
 import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
@@ -63,7 +63,7 @@ import org.camunda.bpm.model.xml.type.ModelElementType;
  * @author Joram Barrez
  * @author Falko Menge
  */
-public class TaskEntity extends CoreVariableScope<PersistentVariableInstance> implements Task, DelegateTask, Serializable, DbEntity, HasDbRevision, CommandContextListener {
+public class TaskEntity extends CorePersistentVariableScope implements Task, DelegateTask, Serializable, DbEntity, HasDbRevision, CommandContextListener {
 
   public static final String DELETE_REASON_COMPLETED = "completed";
   public static final String DELETE_REASON_DELETED = "deleted";
@@ -372,11 +372,11 @@ public class TaskEntity extends CoreVariableScope<PersistentVariableInstance> im
     return new TaskEntityVariableStore(this);
   }
 
-  protected CoreVariableStore<PersistentVariableInstance> getVariableStore() {
+  protected CorePersistentVariableStore getVariableStore() {
     return variableStore;
   }
 
-  public CoreVariableScope<PersistentVariableInstance> getParentVariableScope() {
+  public CorePersistentVariableScope getParentVariableScope() {
     if (getExecution()!=null) {
       return execution;
     }

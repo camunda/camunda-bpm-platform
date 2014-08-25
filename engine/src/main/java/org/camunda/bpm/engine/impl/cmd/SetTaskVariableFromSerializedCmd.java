@@ -18,25 +18,28 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.delegate.PersistentVariableScope;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 
-public class SetExecutionVariableFromSerializedCmd extends SetScopeVariableFromSerializedCmd {
+/**
+ * @author Thorben Lindhauer
+ */
+public class SetTaskVariableFromSerializedCmd extends SetScopeVariableFromSerializedCmd {
 
-  public SetExecutionVariableFromSerializedCmd(String executionId, String variableName, Object serializedVariableValue, String variableType,
+  public SetTaskVariableFromSerializedCmd(String taskId, String variableName, Object serializedVariableValue, String variableType,
       Map<String, Object> configuration, boolean isLocal) {
-    super(executionId, variableName, serializedVariableValue, variableType, configuration, isLocal);
+    super(taskId, variableName, serializedVariableValue, variableType, configuration, isLocal);
   }
 
   protected PersistentVariableScope getPersistentVariableScope(CommandContext commandContext) {
-    ensureNotNull("executionId", scopeId);
+    ensureNotNull("taskId", scopeId);
 
-    ExecutionEntity execution = commandContext
-      .getExecutionManager()
-      .findExecutionById(scopeId);
+    TaskEntity task = commandContext
+      .getTaskManager()
+      .findTaskById(scopeId);
 
-    ensureNotNull("execution " + scopeId + " doesn't exist", "execution", execution);
+    ensureNotNull("task " + scopeId + " doesn't exist", "task", task);
 
-    return execution;
+    return task;
   }
 
 }

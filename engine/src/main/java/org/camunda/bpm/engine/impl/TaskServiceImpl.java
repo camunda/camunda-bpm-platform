@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.impl;
 
 import java.io.InputStream;
 import java.util.*;
+
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.impl.cmd.*;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
@@ -177,11 +178,29 @@ public class TaskServiceImpl extends ServiceImpl implements TaskService {
     commandExecutor.execute(new SetTaskVariablesCmd(executionId, variables, false));
   }
 
+  public void setVariableFromSerialized(String executionId, String variableName, Object serializedValue, String variableTypeName,
+      Map<String, Object> variableConfiguration) {
+    ensureNotNull("variableName", variableName);
+
+    commandExecutor.execute(new SetTaskVariableFromSerializedCmd(executionId, variableName,
+        serializedValue, variableTypeName, variableConfiguration, false));
+
+  }
+
   public void setVariableLocal(String executionId, String variableName, Object value) {
     ensureNotNull("variableName", variableName);
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put(variableName, value);
     commandExecutor.execute(new SetTaskVariablesCmd(executionId, variables, true));
+  }
+
+  public void setVariableLocalFromSerialized(String executionId, String variableName, Object serializedValue, String variableTypeName,
+      Map<String, Object> variableConfiguration) {
+    ensureNotNull("variableName", variableName);
+
+    commandExecutor.execute(new SetTaskVariableFromSerializedCmd(executionId, variableName,
+        serializedValue, variableTypeName, variableConfiguration, true));
+
   }
 
   public void setVariables(String executionId, Map<String, ? extends Object> variables) {

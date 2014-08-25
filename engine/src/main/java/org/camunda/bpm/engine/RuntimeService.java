@@ -527,7 +527,7 @@ public interface RuntimeService {
    * configuration options.
    * </p>
    *
-   * @param executionId id of process instance or execution to set variable in, cannot be null.
+   * @param executionId id of process instance or execution to set variable for, cannot be null.
    * @param variableName name of variable to set, cannot be null
    * @param serializedValue Serialized value of the variable to set; Expected value types are defined
    * variable-type-specific and defined in {@link SerializedVariableTypes}.
@@ -551,7 +551,7 @@ public interface RuntimeService {
    * configuration options.
    * </p>
    *
-   * @param executionId id of process instance or execution to set variable in, cannot be null.
+   * @param executionId id of process instance or execution to set variable for, cannot be null.
    * @param variableName name of variable to set, cannot be null
    * @param serializedValue Serialized value of the variable to set; Expected value types are defined
    * variable-type-specific and defined in {@link SerializedVariableTypes}.
