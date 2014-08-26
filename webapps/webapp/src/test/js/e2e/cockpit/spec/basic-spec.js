@@ -60,22 +60,33 @@ describe('cockpit dashboard - ', function() {
     it('should check Called Process Definitions tabs', function() {
 
       // when
-      processDefinitionPage.table.calledProcessDefinitionsTab.selectCalledProcessDefinitionsTab();
+      processDefinitionPage.table.calledProcessDefinitionsTab.selectTab();
 
       // then
-      expect(processDefinitionPage.table.calledProcessDefinitionsTab.calledProcessDefinitionsTabName()).toBe('Called Process Definitions');
-      processDefinitionPage.table.calledProcessDefinitionsTab.isCalledProcessDefinitionsTabSelected();
+      expect(processDefinitionPage.table.calledProcessDefinitionsTab.tabName()).toBe('Called Process Definitions');
+      processDefinitionPage.table.calledProcessDefinitionsTab.isTabSelected();
+    });
+
+
+    it('should check Job Definitions tabs', function() {
+
+      // when
+      processDefinitionPage.table.jobDefinitionsTab.selectTab();
+
+      // then
+      expect(processDefinitionPage.table.jobDefinitionsTab.tabName()).toBe('Job Definitions');
+      processDefinitionPage.table.jobDefinitionsTab.isTabSelected();
     });
 
 
     it('should check Process Instances tabs', function() {
 
       // when
-      processDefinitionPage.table.processInstancesTab.selectProcessInstanceTab();
+      processDefinitionPage.table.processInstancesTab.selectTab();
 
       // then
-      expect(processDefinitionPage.table.processInstancesTab.processInstanceTabName()).toBe('Process Instances');
-      processDefinitionPage.table.processInstancesTab.isProcessInstanceTabSelected();
+      expect(processDefinitionPage.table.processInstancesTab.tabName()).toBe('Process Instances');
+      processDefinitionPage.table.processInstancesTab.isTabSelected();
     });
 
 
