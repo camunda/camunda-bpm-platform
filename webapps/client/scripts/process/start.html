@@ -59,7 +59,15 @@
       </h4>
 
       <div class="process-form-fields">
-        <div ng-repeat="(delta, variable) in variables"
+
+        <div ng-if="!variables.length"
+             class="text-help">
+          <i class="glyphicon glyphicon-info-sign"></i>
+          {{ 'USE_GENERIC_FORM' | translate }}
+        </div>
+
+        <div ng-if="variables.length"
+             ng-repeat="(delta, variable) in variables"
              class="form-group row">
           <div class="col-xs-2 text-right">
             <a ng-click="removeVariable(delta)">
@@ -120,7 +128,7 @@
         <div class="row">
           <div class="col-xs-12 col-md-2 text-right">
             <a ng-click="addVariable()">
-              Add a variable
+              {{ 'ADD_VARIABLE' | translate }}
               <i class="glyphicon glyphicon-plus-sign"></i>
             </a>
           </div>

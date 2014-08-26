@@ -11,8 +11,12 @@
                         "Start a process",
   "CLICK_PROCESS_TO_START":
                         "Click on the process to start.",
+  "USE_GENERIC_FORM":
+                        "You can set process instance variables, using a generic form, by clicking the \"Add a variable\" link below.",
   "VARIABLE_NAME":
                         "Variable name",
+  "ADD_VARIABLE":
+                        "Add a variable",
   "TYPE":
                         "Type",
   "VALUE":

@@ -218,7 +218,7 @@ define([
     $scope.addVariable = function() {
       $scope.variables.push(angular.copy(emptyVariable));
     };
-    $scope.addVariable();
+    // $scope.addVariable();
 
 
     $scope.removeVariable = function(delta) {
