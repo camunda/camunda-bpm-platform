@@ -5,12 +5,12 @@ import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.multipart.Boundary;
 import com.sun.jersey.multipart.FormDataMultiPart;
 import com.sun.jersey.multipart.file.StreamDataBodyPart;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 import javax.ws.rs.core.MediaType;
 import org.camunda.bpm.AbstractWebappIntegrationTest;
-import org.camunda.bpm.engine.impl.util.ReflectUtil;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
@@ -141,7 +141,9 @@ public class RestIT extends AbstractWebappIntegrationTest {
     FormDataMultiPart formDataMultiPart = new FormDataMultiPart();
     formDataMultiPart.field("deployment-name", "jobProcess");
     formDataMultiPart.field("enable-duplicate-filtering", "true");
-    StreamDataBodyPart data = new StreamDataBodyPart("data", ReflectUtil.getResourceAsStream(resourcePath), filename, MediaType.MULTIPART_FORM_DATA_TYPE);
+
+    InputStream bpmnResource = getClass().getClassLoader().getResourceAsStream(resourcePath);
+    StreamDataBodyPart data = new StreamDataBodyPart("data", bpmnResource, filename, MediaType.MULTIPART_FORM_DATA_TYPE);
     formDataMultiPart.bodyPart(data);
 
     ClientResponse response = resource
