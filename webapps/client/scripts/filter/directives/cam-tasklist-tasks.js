@@ -54,7 +54,7 @@ define([
 
         scope.filter = scope.filter || $rootScope.currentFilter;
 
-        scope.searchTask = '';
+        // scope.searchTask = '';
 
 
         scope.sorting = angular.element('[cam-sorting-choices]').scope();
@@ -80,11 +80,7 @@ define([
 
         function loadTasks() {
           scope.loading = true;
-          // scope.tasks = [];
-
-          if (arguments[0]) {
-            console.info('loadTasks because of', arguments[0].name);
-          }
+          scope.tasks = [];
 
           var where = buildWhere(scope.sorting.order, scope.sorting.by);
 
@@ -128,33 +124,33 @@ define([
         scope.pageChange = loadTasks;
 
 
-        scope.lookupTask = function(val) {
-          var deferred = $q.defer();
+        // scope.lookupTask = function(val) {
+        //   var deferred = $q.defer();
 
-          scope.loading = true;
+        //   scope.loading = true;
 
-          var where = buildWhere(scope.sorting.order, scope.sorting.by);
+        //   var where = buildWhere(scope.sorting.order, scope.sorting.by);
 
-          where.nameLike = '%'+ val +'%';
+        //   where.nameLike = '%'+ val +'%';
 
-          Task.list(where, function(err, res) {
-            scope.loading = false;
+        //   Task.list(where, function(err, res) {
+        //     scope.loading = false;
 
-            if (err) {
-              return deferred.reject(err);
-            }
+        //     if (err) {
+        //       return deferred.reject(err);
+        //     }
 
-            deferred.resolve(res._embedded.tasks);
-          });
+        //     deferred.resolve(res._embedded.tasks);
+        //   });
 
-          return deferred.promise;
-        };
+        //   return deferred.promise;
+        // };
 
 
-        scope.selectedTask = function($item) {
-          setCurrentTask($item);
-          scope.searchTask = '';
-        };
+        // scope.selectedTask = function($item) {
+        //   setCurrentTask($item);
+        //   scope.searchTask = '';
+        // };
 
 
         scope.focus = function(delta) {
