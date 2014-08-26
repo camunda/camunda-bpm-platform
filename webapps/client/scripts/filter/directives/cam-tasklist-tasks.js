@@ -158,6 +158,9 @@ define([
         };
 
 
+        scope.$on('tasklist.process.start', loadTasks);
+
+
         scope.$on('tasklist.filter.current', function() {
           if ($rootScope.currentFilter) {
             scope.filter = $rootScope.currentFilter;

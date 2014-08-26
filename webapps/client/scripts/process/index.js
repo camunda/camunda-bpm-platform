@@ -19,6 +19,7 @@ define([
 
 
   processModule.controller('processStartModalFormCtrl', [
+    '$rootScope',
     '$scope',
     '$q',
     '$translate',
@@ -26,6 +27,7 @@ define([
     'CamForm',
     'Notifications',
   function(
+    $rootScope,
     $scope,
     $q,
     $translate,
@@ -244,7 +246,9 @@ define([
           errorNotification('PROCESS_START_ERROR', err);
           throw err;
         }
+
         successNotification('PROCESS_START_OK');
+        $rootScope.$broadcast('tasklist.process.start');
         close(res);
       }
 
