@@ -1,0 +1,29 @@
+<div class="modal-header">
+  <div class="names">
+    <h2 class="task">{{ task.name }}</h2>
+    <h4 class="process-definition"
+        ng-class="{suspended: task._embedded.processDefinition[0]}">
+      {{ task._embedded.processDefinition[0].name || task._embedded.processDefinition[0].key }}
+    </h4>
+  </div>
+</div>
+
+
+<div class="form-container modal-body"></div>
+
+
+<div class="modal-footer">
+  <div class="form-actions">
+    <button class="btn btn-link"
+            type="submit"
+            ng-click="exitFullscreen()"
+            translate="ABORT">Abort</button>
+
+    <button class="btn btn-primary"
+            type="submit"
+            ng-click="completeTask()"
+            translate="COMPLETE">Complete</button>
+  </div>
+</div>
+
+

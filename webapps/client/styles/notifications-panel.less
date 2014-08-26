@@ -35,7 +35,8 @@
 
 .page-notifications {
   position: relative;
-  z-index: 1000;
+  // make sure the notifications are coming above the modal windows
+  z-index: @zindex-modal + 10;
   > .notifications {
     position: absolute;
     width: 40%;

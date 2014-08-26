@@ -38,7 +38,17 @@
        class="row tabbed-content">
     <div class="col-xs-12">
       <tabset>
-        <tab heading="{{ 'FORM' | translate }}">
+        <!-- <tab heading="{{ 'FORM' | translate }}"> -->
+        <tab>
+
+          <tab-heading>
+            {{ 'FORM' | translate }}
+
+            <a class="glyphicon glyphicon-fullscreen"
+               ng-if="task.formKey"
+               ng-click="fullscreenForm()"></a>
+          </tab-heading>
+
           <div class="tab-pane">
             <div cam-tasklist-task-form
                  task="task"></div>

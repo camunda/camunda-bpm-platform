@@ -1,7 +1,9 @@
 define([
-  'text!./cam-tasklist-task-form.html'
-], function(template) {
+  'text!./cam-tasklist-task-form.html',
+  'text!./cam-tasklist-task-form-modal.html'
+], function(template, modalTemplate) {
   'use strict';
+  var $ = angular.element;
 
   return [
     '$rootScope',
@@ -9,15 +11,33 @@ define([
     'CamForm',
     '$translate',
     'Notifications',
+    '$interval',
+    '$modal',
   function(
     $rootScope,
     camAPI,
     CamForm,
     $translate,
-    Notifications
+    Notifications,
+    $interval,
+    $modal
   ) {
     var Task = camAPI.resource('task');
 
+    function setModalFormMaxHeight(wrapper, targetContainer) {
+      var availableHeight = $(window).height();
+
+      wrapper.find('> div').each(function() {
+        var $el = $(this);
+        if ($el.hasClass('form-container')) { return; }
+        availableHeight -= $el.outerHeight();
+      });
+
+      targetContainer.css({
+        'overflow': 'auto',
+        'max-height': availableHeight +'px'
+      });
+    }
 
     function errorNotification(src, err) {
       $translate(src).then(function(translated) {
@@ -38,14 +58,68 @@ define([
     }
 
     return {
-      scope: {
-        task: '='
-      },
+      // scope: {
+      //   task: '='
+      // },
+
       link: function(scope, element) {
         var container = element.find('.form-container');
+        var modalInstance;
 
         scope.currentTaskId = null;
         scope._camForm = null;
+        scope.fullscreen = false;
+
+        scope.enterFullscreen = function() {
+          scope.fullscreen = !scope.fullscreen;
+
+          modalInstance = $modal.open({
+            // by passing the scope, we also pass the methods to submit the form
+            scope:        scope,
+            template:     modalTemplate,
+            windowClass:  'task-form-fullscreen'
+          });
+
+          modalInstance.opened.then(function() {
+            // dat ain't neat... dat is di only way to make sure da containa is inna di place
+            var targetContainer;
+            var checkContainerInterval = $interval(function() {
+              targetContainer = $('.modal-content .form-container');
+              if (targetContainer.length) {
+                loadForm(targetContainer);
+
+                var wrapper = $('.modal-content');
+                setModalFormMaxHeight(wrapper, targetContainer);
+                $(window).on('resize', function() {
+                  setModalFormMaxHeight(wrapper, targetContainer);
+                });
+
+                // fatha always said: don't work for free
+                $interval.cancel(checkContainerInterval);
+              }
+            }, 100, 20, false);
+          });
+        };
+
+        scope.exitFullscreen = function() {
+          scope.fullscreen = !scope.fullscreen;
+
+          if (modalInstance) {
+            modalInstance.dismiss();
+            $(window).off('resize');
+          }
+        };
+
+        scope.toggleFullscreen = function() {
+          if (!scope.fullscreen) {
+            scope.enterFullscreen();
+          }
+          else {
+            scope.exitFullscreen();
+          }
+        };
+
+
 
         function submitCb(err) {
           if (err) {
@@ -55,6 +129,10 @@ define([
           scope.currentTaskId = null;
           scope._camForm = null;
           container.html('');
+
+          if (modalInstance) {
+            modalInstance.dismiss();
+          }
 
           $rootScope.$broadcast('tasklist.task.complete');
 
@@ -74,7 +152,9 @@ define([
           }
         };
 
-        function loadForm() {
+
+        function loadForm(targetContainer) {
+          targetContainer = targetContainer || container;
           scope._camForm = null;
 
           var parts = (scope.task.formKey || '').split('embedded:');
@@ -94,7 +174,7 @@ define([
           if (formUrl) {
             scope._camForm = new CamForm({
               taskId:           scope.task.id,
-              containerElement: container,
+              containerElement: targetContainer,
               client:           camAPI,
               formUrl:          formUrl
             });
@@ -102,10 +182,12 @@ define([
           else {
             // clear the content (to avoid other tasks form to appear)
             $translate('NO_TASK_FORM').then(function(translated) {
-              container.html(translated || '');
+              targetContainer.html(translated || '');
             });
           }
         }
+
+
 
         scope.$watch('task', function(newValue, oldValue) {
           if (!scope.task) {

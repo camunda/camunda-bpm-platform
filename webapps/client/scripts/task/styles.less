@@ -1,5 +1,9 @@
 
 .task-card {
+  .nav-tabs .glyphicon {
+    margin-left: 5px;
+  }
+
   .tab-content {
     padding: @grid-gutter-width 0;
   }
@@ -25,7 +29,10 @@
       outline: none;
     }
   }
+}
 
+.task-card,
+.modal-header {
   .names {
     h2 {
       margin-top: 0;
@@ -35,6 +42,30 @@
     }
   }
 }
+
+.modal {
+  &.task-form-fullscreen {
+    .modal-dialog,
+    .modal-content {
+      position: absolute;
+      width: auto;
+      height: auto;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      right: 0;
+      margin: 0;
+      border: 0;
+    }
+    .modal-content {
+      background: @modal-footer-bg;
+    }
+    .form-container {
+      background: @modal-content-bg;
+    }
+  }
+}
+
 
 .row.day {
   margin-top: (@grid-gutter-width / 1);

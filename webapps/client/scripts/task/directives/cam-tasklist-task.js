@@ -59,6 +59,10 @@ define([
           }
         }
 
+        scope.fullscreenForm = function() {
+          element.find('[cam-tasklist-task-form]').scope().enterFullscreen();
+        };
+
         scope.$on('tasklist.task.current', setTask);
 
         $rootScope.$on('$locationChangeSuccess', setTask);
