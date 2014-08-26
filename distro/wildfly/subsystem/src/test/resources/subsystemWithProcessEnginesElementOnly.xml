@@ -1,0 +1,3 @@
+<subsystem xmlns="urn:org.camunda.bpm.jboss:1.1">
+  <process-engines/>
+</subsystem>

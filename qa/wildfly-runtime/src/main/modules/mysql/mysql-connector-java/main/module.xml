@@ -1,0 +1,10 @@
+<module xmlns="urn:jboss:module:1.1" name="mysql.mysql-connector-java">
+  <resources>
+    <resource-root path="mysql-connector-java-5.1.21.jar"/>
+  </resources>
+  
+  <dependencies>
+    <module name="javax.api"/>
+    <module name="javax.transaction.api" />
+  </dependencies>
+</module>

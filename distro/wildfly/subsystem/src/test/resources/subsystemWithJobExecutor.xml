@@ -1,0 +1,14 @@
+<subsystem xmlns="urn:org.camunda.bpm.jboss:1.1">
+	<job-executor>
+	    <thread-pool-name>job-executor-tp</thread-pool-name>
+		<job-acquisitions>
+			<job-acquisition name="default">
+				<acquisition-strategy>SEQUENTIAL</acquisition-strategy>
+				<properties/>
+			</job-acquisition>
+			<job-acquisition name="anders">
+				<acquisition-strategy>SEQUENTIAL</acquisition-strategy>
+			</job-acquisition>
+		</job-acquisitions>
+	</job-executor>
+</subsystem>

@@ -18,7 +18,10 @@
     <!-- 
       all maven properties used in QA/CI 
     -->
-    
+
+    <!-- wildfly : uses the same properties as jboss -->
+    <wildfly.runtime.location>../wildfly-runtime/target/server/wildfly-${version.wildfly}/</wildfly.runtime.location>
+
     <!-- jboss -->
     <jboss.runtime.location>../jboss7-runtime/target/server/jboss-as-${version.jboss.as}/</jboss.runtime.location>
     <jboss.datasource.filename>h2-ds.xml</jboss.datasource.filename>
@@ -70,6 +73,7 @@
 	<profile>
 	  <id>distro</id>  
       <modules>
+        <module>wildfly-runtime</module>
         <module>jboss7-runtime</module>
         <module>gf31-runtime</module>
         <module>tomcat-runtime</module>
@@ -93,16 +97,28 @@
       <modules>       
         <module>jboss7-runtime</module>
       </modules>
-    </profile>  
-    
+    </profile>
     <profile>      
       <id>jboss-domain</id> 
       <modules>       
         <module>jboss7-runtime</module>
       </modules>
-    </profile>  
+    </profile>
+
+    <profile>
+      <id>wildfly</id>
+      <modules>
+        <module>wildfly-runtime</module>
+      </modules>
+    </profile>
+    <profile>
+      <id>wildfly-domain</id>
+      <modules>
+        <module>wildfly-runtime</module>
+      </modules>
+    </profile>
 	
-	<profile>
+	  <profile>
       <id>tomcat</id>       
       <modules>
         <module>tomcat-runtime</module>     

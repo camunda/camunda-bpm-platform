@@ -1,16 +1,7 @@
-<jboss-deployment-structure xmlns="urn:jboss:deployment-structure:1.0">
+<jboss-deployment-structure>
   <deployment>
-    <exclusions>
-      <module name="org.jboss.resteasy.resteasy-atom-provider" />
-      <module name="org.jboss.resteasy.resteasy-cdi" />
-      <module name="org.jboss.resteasy.resteasy-jaxrs" />
-      <module name="org.jboss.resteasy.resteasy-jaxb-provider" />
-      <module name="org.jboss.resteasy.resteasy-jackson-provider" />
-      <module name="org.jboss.resteasy.resteasy-jettison-provider" />
-      <module name="org.jboss.resteasy.resteasy-jsapi" />
-      <module name="org.jboss.resteasy.resteasy-multipart-provider" />
-      <module name="org.jboss.resteasy.resteasy-yaml-provider" />
-      <module name="org.jboss.resteasy.async-http-servlet-30" />
-    </exclusions>
+    <exclude-subsystems>
+      <subsystem name="resteasy" />
+    </exclude-subsystems>
   </deployment>
 </jboss-deployment-structure>

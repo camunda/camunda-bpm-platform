@@ -12,10 +12,10 @@ nb-configuration.xml
 /webapps/fox-platform-tasklist/server-work
 dependency-reduced-pom.xml
 faces-config.NavData
-dependency-reduced-pom.xml
 *.iml
 *.sublime-project
 *.sublime-workspace
 *.h2.db
 *.lock.db
 
+*.DS_Store

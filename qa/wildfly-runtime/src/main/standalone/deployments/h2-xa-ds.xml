@@ -1,0 +1,22 @@
+<datasources>
+	<datasource jndi-name="java:jboss/datasources/ExampleDS" pool-name="ExampleDS" enabled="true" use-java-context="true">
+		<connection-url>jdbc:h2:mem:test;DB_CLOSE_DELAY=-1</connection-url>
+		<driver>h2</driver>
+		<security>
+			<user-name>sa</user-name>
+			<password>sa</password>
+		</security>
+	</datasource>
+	<xa-datasource jndi-name="java:jboss/datasources/ProcessEngine" enabled="true" use-ccm="true" pool-name="ProcessEngine">
+		<xa-datasource-property name="URL">jdbc:h2:./camunda-h2-dbs/process-engine;DB_CLOSE_DELAY=-1;MVCC=TRUE;DB_CLOSE_ON_EXIT=FALSE</xa-datasource-property>
+		<driver>h2</driver>
+		<xa-datasource-property name="User">sa</xa-datasource-property>
+		<xa-datasource-property name="password">sa</xa-datasource-property>                   
+	</xa-datasource>               
+	<xa-datasource jndi-name="java:jboss/datasources/CycleDS" enabled="true" use-java-context="true" jta="true" use-ccm="true" pool-name="CycleDS">
+		<xa-datasource-property name="URL">jdbc:h2:./camunda-h2-dbs/cycle;DB_CLOSE_DELAY=-1;MVCC=TRUE;DB_CLOSE_ON_EXIT=FALSE</xa-datasource-property>
+		<driver>h2</driver>
+		<xa-datasource-property name="User">sa</xa-datasource-property>
+		<xa-datasource-property name="password">sa</xa-datasource-property>                  
+	</xa-datasource>	
+</datasources>
