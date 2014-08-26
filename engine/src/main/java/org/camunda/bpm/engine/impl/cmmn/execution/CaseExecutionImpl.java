@@ -53,8 +53,8 @@ public class CaseExecutionImpl extends CmmnExecution implements Serializable {
 
   // variables ////////////////////////////////////////////////////////////////
 
-//This variable store is not truly persistent but implementing BaseDelegateExecution
- // requires one. As ExecutionImpl is only used internally for PVM testing, this is ok.
+  //This variable store is not truly persistent but implementing BaseDelegateExecution
+  // requires one. As ExecutionImpl is only used internally for PVM testing, this is ok.
   protected PseudoPersistentVariableStore variableStore = new PseudoPersistentVariableStore();
 
   public CaseExecutionImpl() {

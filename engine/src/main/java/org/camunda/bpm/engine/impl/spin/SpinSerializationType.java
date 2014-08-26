@@ -125,7 +125,7 @@ public class SpinSerializationType implements VariableType {
   }
 
   public SerializedVariableValue getSerializedValue(ValueFields valueFields) {
-    SerializedVariableValueImpl value = new SerializedVariableValueImpl();;
+    SerializedVariableValueImpl value = new SerializedVariableValueImpl();
 
     String serializedValue = null;
     if (valueFields.getTextValue() != null) {
@@ -135,7 +135,7 @@ public class SpinSerializationType implements VariableType {
         ByteArrayEntity byteArray = valueFields.getByteArrayValue();
         serializedValue = new String(byteArray.getBytes(), "UTF-8");
       } catch (UnsupportedEncodingException e) {
-        throw new ProcessEngineException("UTF-8 is not a supported encoding");
+        throw new ProcessEngineException("UTF-8 is not a supported encoding", e);
       }
     }
 

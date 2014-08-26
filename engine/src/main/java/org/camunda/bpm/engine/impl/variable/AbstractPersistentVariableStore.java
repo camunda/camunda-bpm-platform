@@ -74,7 +74,7 @@ public abstract class AbstractPersistentVariableStore extends AbstractVariableSt
     return (Collection) variableInstances.values();
   }
 
-  public VariableInstanceEntity getVariableInstance(String variableName) {
+  public PersistentVariableInstance getVariableInstance(String variableName) {
     ensureVariableInstancesInitialized();
     return variableInstances.get(variableName);
   }
@@ -94,7 +94,7 @@ public abstract class AbstractPersistentVariableStore extends AbstractVariableSt
     return variableInstances.containsKey(variableName);
   }
 
-  public VariableInstanceEntity removeVariableInstance(String variableName, CoreVariableScope<PersistentVariableInstance> sourceActivityExecution) {
+  public PersistentVariableInstance removeVariableInstance(String variableName, CoreVariableScope<PersistentVariableInstance> sourceActivityExecution) {
     ensureVariableInstancesInitialized();
     VariableInstanceEntity variable = variableInstances.remove(variableName);
     if(variable != null) {
@@ -237,7 +237,7 @@ public abstract class AbstractPersistentVariableStore extends AbstractVariableSt
 
   public void createOrUpdateVariableFromSerialized(String variableName, Object value, String variableTypeName, Map<String, Object> configuration,
       CoreVariableScope<PersistentVariableInstance> sourceActivityExecution) {
-    VariableInstanceEntity variableInstance = getVariableInstance(variableName);
+    PersistentVariableInstance variableInstance = getVariableInstance(variableName);
 
     if (variableInstance == null) {
       createVariableInstanceFromSerialized(variableName, value, variableTypeName, configuration, sourceActivityExecution);

@@ -34,6 +34,7 @@ public class GetTaskFormVariablesCmd extends AbstractGetFormVariablesCmd {
     super(taskId, variableNames);
   }
 
+  @SuppressWarnings("unchecked")
   public Map<String, VariableInstance> execute(CommandContext commandContext) {
 
     TaskEntity task = commandContext.getTaskManager()
