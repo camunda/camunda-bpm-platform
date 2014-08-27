@@ -13,6 +13,8 @@ define([
   api
 ) {
 
+  var loginModal;
+
   /**
    * @module cam.tasklist.user
    */
@@ -36,9 +38,13 @@ define([
   function(
     $modal
   ) {
-    $modal.open({
+    // ensure login modal is opened across navigation attempts
+    // and close only on actual dismiss / close
+    loginModal = loginModal || $modal.open({
       windowClass:  'user-login',
       template:     require('text!camunda-tasklist-ui/user/login.html')
+    }).result.then(function() {
+      loginModal = null;
     });
   }]);
 
