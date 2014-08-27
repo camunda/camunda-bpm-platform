@@ -9,6 +9,6 @@
                         "Mot de passe",
   "LOGIN":
                         "Authentification",
-  "LOGIN_ACTION":
+  "SIGN_IN_ACTION":
                         "S'authentifier"
 }

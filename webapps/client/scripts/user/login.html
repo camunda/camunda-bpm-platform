@@ -9,13 +9,16 @@
 
   <div class="modal-body">
     <div class="row">
-      <div class="col-md-6 col-sm-12">
+      <div class="auth-fields">
 
+        <h2 translate="PLEASE_SIGN_IN">Please sign in</h2>
         <div notifications-panel class="notifications-panel"></div>
 
         <div class="form-group">
           <!-- <label for="signinFormInputUsername">User name</label> -->
           <input required
+                 autofocus="true"
+                 tabindex="1"
                  ng-model="username"
                  name="username"
                  type="text"
@@ -28,6 +31,7 @@
         <div class="form-group">
           <!-- <label for="signinFormInputPassword">Password</label> -->
           <input required
+                 tabindex="2"
                  ng-model="password"
                  name="password"
                  type="password"
@@ -39,37 +43,19 @@
 
 
       </div>
-      <div class="col-md-6 col-sm-12">
-
-        <div class="panel panel-default splash-screen">
-          <div class="panel-heading">
-            <h3 class="panel-title">Upcoming camunda Tasklist</h3>
-          </div>
-          <div class="panel-body">
-            This is the <strong>draft</strong> of <a target="_blank" href="https://github.com/camunda/camunda-tasklist-ui">upcoming re-designed tasklist</a> for the <a target="_blank" href="https://github.com/camunda/camunda-bpm-platform">camunda BPM platform</a>.<hr/>
-            For now, you can start a process (by clicking on the <i class="glyphicon glyphicon-list-alt"></i> icon in the header).<br/>
-            If you are looking for a more stable version of the tasklist, please, use the one packaged with the 7.1 version of the camunda BPM platform.
-            <hr/>
-            You can give us some feedback in <a href="https://groups.google.com/forum/#!forum/camunda-bpm-users">the forum</a>.
-          </div>
-        </div>
-
-      </div>
     </div>
 
 
   </div>
 
   <div class="modal-footer">
-<!--
-    <button class="btn btn-xs btn-link"
-            type="button"
-            ng-click="cancel()">Cancel</button>
- -->
-    <button class="btn btn-primary"
-            type="submit"
-            ng-disabled="signinForm.$invalid"
-            ng-click="ok()"
-            translate="LOGIN_ACTION">Login</button>
+    <div class="auth-actions">
+      <button class="btn btn-primary"
+              tabindex="3"
+              type="submit"
+              ng-disabled="signinForm.$invalid"
+              ng-click="ok()"
+              translate="SIGN_IN_ACTION">Sign in</button>
+    </div>
   </div>
 </form>

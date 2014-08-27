@@ -7,10 +7,12 @@
                         "User name",
   "PASSWORD":
                         "Password",
+  "PLEASE_SIGN_IN":
+                        "Please sign in",
   "LOGIN":
                         "Login",
-  "LOGIN_ACTION":
-                        "Login",
+  "SIGN_IN_ACTION":
+                        "Sign in",
   "LOGGED_OUT":
                         "You are logged out.",
   "USER_NAME":
