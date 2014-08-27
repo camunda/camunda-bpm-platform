@@ -64,6 +64,12 @@ define([
         scope.sorting.$on('sorting.order.change', loadTasks);
 
 
+        function authed() {
+          return $rootScope.authentication &&
+                  !!$rootScope.authentication.name;
+        }
+
+
         function setCurrentTask(task, silent) {
           $rootScope.currentTask = task;
           if (!silent) {
@@ -79,6 +85,8 @@ define([
 
 
         function loadTasks() {
+          if (!authed()) { return; }
+
           scope.loading = true;
           scope.tasks = [];
 
