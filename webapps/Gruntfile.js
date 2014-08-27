@@ -1,6 +1,15 @@
 /* jshint node: true */
 'use strict';
 var path = require('path');
+var http = require('http');
+var spawn = require('child_process').spawn;
+
+function testOnline(done) {
+  http.get('http://localhost:8080/camunda/app/tasklist/default', function(res) {
+    done(res.statusCode !== 200 ? new Error('The status code is not 200') : null);
+  })
+  .on('error', done);
+}
 
 function autoBuild(project, verbose, stack) {
   var args = ['auto-build'];
@@ -69,7 +78,6 @@ function linkTo(project) {
 
 module.exports = function(grunt) {
   require('load-grunt-tasks')(grunt);
-  require('time-grunt')(grunt);
 
   var verbose = grunt.option('verbose');
   var stack = grunt.option('stack');
@@ -84,6 +92,9 @@ module.exports = function(grunt) {
   if (!grunt.option('update')) {
     webappArgs.push('-o');
   }
+
+  grunt.log.subhead('Will start the platform with command');
+  grunt.log.writeln('mvn '+ webappArgs.join(' '));
 
   grunt.initConfig({
     copy: {
@@ -103,7 +114,53 @@ module.exports = function(grunt) {
       develop: {
         files: 'webapp/src/main/webapp/**/*.html',
         tasks: [
-          'copy:develop'
+          'newer:copy:develop'
+        ]
+      },
+
+      targetAdmin: {
+        options: {
+          debounceDelay: 1000,
+        },
+        files: [
+          'webapp/src/test/js/e2e/admin/**/*.js',
+          // 'webapp/target/camunda-webapp/app/admin/**/*.{js,html}',
+          // '!webapp/target/camunda-webapp/app/admin/assets/**'
+          '../camunda-admin-ui/dist/app/admin/**/*.{js,html}',
+          '!../camunda-admin-ui/dist/app/admin/assets/**'
+        ],
+        tasks: [
+          'test:admin'
+        ]
+      },
+      targetCockpit: {
+        options: {
+          debounceDelay: 1000,
+        },
+        files: [
+          'webapp/src/test/js/e2e/cockpit/**/*.js',
+          // 'webapp/target/camunda-webapp/app/cockpit/**/*.{js,html}',
+          // '!webapp/target/camunda-webapp/app/cockpit/assets/**'
+          '../camunda-cockpit-ui/dist/app/cockpit/**/*.{js,html}',
+          '!../camunda-cockpit-ui/dist/app/cockpit/assets/**'
+        ],
+        tasks: [
+          'test:cockpit'
+        ]
+      },
+      targetTasklist: {
+        options: {
+          debounceDelay: 1000,
+        },
+        files: [
+          'webapp/src/test/js/e2e/tasklist/**/*.js',
+          // 'webapp/target/camunda-webapp/app/tasklist/**/*.{js,html}',
+          // '!webapp/target/camunda-webapp/app/tasklist/vendor/**'
+          '../camunda-tasklist-ui/dist/app/tasklist/**/*.{js,html}',
+          '!../camunda-tasklist-ui/dist/app/tasklist/vendor/**'
+        ],
+        tasks: [
+          'test:tasklist'
         ]
       }
     },
@@ -183,13 +240,56 @@ module.exports = function(grunt) {
           autoBuild('camunda-cockpit-ui', verbose, stack),
           autoBuild('camunda-tasklist-ui', verbose, stack),
           {
+            cmd: 'webdriver-manager',
+            args: ['start']
+          },
+          {
             opts: {},
             cmd: 'grunt',
-            args: ['watch:develop']
+            args: ['watch']
           }
         ]
       }
     }
+  });
+
+  grunt.registerTask('test', function(target) {
+    var done = this.async();
+
+    grunt.log.subhead('Testing '+ target +' UI');
+    var stdout = '';
+    var stderr = '';
+    var args = [
+      '--specs',
+      'webapp/src/test/js/e2e/'+ target +'/spec/**/*.js',
+      'webapp/src/test/js/e2e/develop.conf.js'
+    ];
+
+    testOnline(function(err) {
+      if (err) {
+        grunt.log.writeln(err.message);
+        return;
+      }
+
+      var testRun = spawn('protractor', args);
+
+      testRun.stdout.on('data', function (data) {
+        console.info(data.toString());
+        stdout += data;
+      });
+
+      testRun.stderr.on('data', function (data) {
+        console.info(data.toString());
+        stderr += data;
+      });
+
+      testRun.on('close', function(code) {
+        grunt.file.write('test.'+ target +'.out.log', stdout);
+        grunt.file.write('test.'+ target +'.err.log', stderr);
+        grunt.log.writeln('protractor '+ args.join(' ') +' exited with code: '+ code);
+        done();
+      });
+    });
   });
 
   grunt.registerTask('setup', [
