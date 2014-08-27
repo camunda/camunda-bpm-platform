@@ -30,7 +30,7 @@ import org.camunda.bpm.application.ProcessApplicationInfo;
 import org.camunda.bpm.application.ProcessApplicationInterface;
 import org.camunda.bpm.application.impl.ProcessApplicationDeploymentInfoImpl;
 import org.camunda.bpm.application.impl.ProcessApplicationInfoImpl;
-import org.camunda.bpm.container.impl.jmx.deployment.util.InjectionUtil;
+import org.camunda.bpm.container.impl.deployment.util.InjectionUtil;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.repository.ProcessApplicationDeployment;
