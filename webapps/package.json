@@ -59,7 +59,6 @@
     "load-grunt-tasks": "~0.4.0",
     "q": "~1.0.1",
     "requirejs": "~2.1.11",
-    "time-grunt": "~0.3.1",
     "underscore": "~1.6.0",
     "underscore.string": "~2.3.3",
     "uuid": "~1.4.1",
@@ -67,7 +66,6 @@
   },
   "devDependencies": {
     "camunda-commons-ui": "git+ssh://git@github.com:camunda/camunda-commons-ui",
-    "time-grunt": "~0.3.2",
     "load-grunt-tasks": "~0.4.0",
     "grunt-contrib-jshint": "~0.10.0",
     "grunt-newer": "~0.7.0"
