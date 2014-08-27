@@ -29,8 +29,11 @@
         </h4>
       </div>
 
+
       <div cam-tasklist-task-meta
           task="task"></div>
+
+
     </div>
   </header>
 
@@ -67,9 +70,18 @@
                  history="history"></div>
           </div>
         </tab>
-
+<!--
         <tab heading="{{ 'DIAGRAM' | translate }}">
-          <div class="tab-pane">TODO</div>
+          <div class="tab-pane">
+            <div cam-tasklist-task-diagram
+                 task="task"></div>
+          </div>
+        </tab>
+ -->
+        <tab heading="Debugging">
+          <div class="tab-pane">
+            <pre>{{ task | json }}</pre>
+          </div>
         </tab>
       </tabset>
     </div>

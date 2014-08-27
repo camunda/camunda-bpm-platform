@@ -6,6 +6,7 @@ define([
   'moment',
   'camunda-tasklist-ui/task/directives/cam-tasklist-task',
   'camunda-tasklist-ui/task/directives/cam-tasklist-task-history',
+  'camunda-tasklist-ui/task/directives/cam-tasklist-task-diagram',
   'camunda-tasklist-ui/task/directives/cam-tasklist-task-meta',
   'camunda-tasklist-ui/task/directives/cam-tasklist-task-form',
 
@@ -17,6 +18,7 @@ define([
   moment,
   taskDirective,
   taskHistoryDirective,
+  taskDiagramDirective,
   taskMetaDirective,
   taskFormDirective
 ) {
@@ -40,6 +42,8 @@ define([
   taskModule.directive('camTasklistTask', taskDirective);
 
   taskModule.directive('camTasklistTaskHistory', taskHistoryDirective);
+
+  taskModule.directive('camTasklistTaskDiagram', taskDiagramDirective);
 
   taskModule.directive('camTasklistTaskMeta', taskMetaDirective);
 

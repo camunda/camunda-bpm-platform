@@ -24,6 +24,11 @@ define(function() {
       'angular-moment':             'bower_components/angular-moment/angular-moment',
       'angular-translate':          'bower_components/angular-translate/angular-translate',
 
+      'bpmn-js':                    'bower_components/bpmn-js/bpmn-viewer',
+
+      'lodash':                     'bower_components/lodash/dist/lodash',
+      'sax':                        'bower_components/sax/lib/sax',
+      'snap-svg':                   'bower_components/Snap.svg/dist/snap.svg-min',
 
       'camunda-tasklist-ui':        'scripts',
 
@@ -44,6 +49,8 @@ define(function() {
                                       deps: ['jquery']
                                     },
 
+      // 'snap-svg':                   {exports: 'Snap'},
+
       'camunda-bpm-sdk':            ['angular'],
 
       'angular-route':              ['angular'],
@@ -52,6 +59,12 @@ define(function() {
       'angular-bootstrap':          ['angular'],
       'angular-moment':             ['angular', 'moment'],
 
+      'bpmn-js':                    [
+                                      'lodash',
+                                      'snap-svg',
+                                      'jquery',
+                                      'sax'
+                                    ],
 
       'camunda-tasklist-ui':        [
                                       'angular-route',
