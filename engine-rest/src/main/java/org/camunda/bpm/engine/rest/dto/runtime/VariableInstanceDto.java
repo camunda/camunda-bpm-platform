@@ -13,7 +13,6 @@
 package org.camunda.bpm.engine.rest.dto.runtime;
 
 import org.camunda.bpm.engine.delegate.ProcessEngineVariableType;
-import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.camunda.bpm.engine.runtime.VariableInstance;
 
 /**
@@ -32,6 +31,7 @@ public class VariableInstanceDto {
   private String taskId;
   private String activityInstanceId;
   private String errorMessage;
+  protected SerializedValueDto serializedValue;
 
   public VariableInstanceDto() { }
 
@@ -115,30 +115,39 @@ public class VariableInstanceDto {
     return caseInstanceId;
   }
 
-  public static VariableInstanceDto fromVariableInstance(VariableInstance variableInstance) {
-    VariableInstanceEntity entity = (VariableInstanceEntity) variableInstance;
+  public SerializedValueDto getSerializedValue() {
+    return serializedValue;
+  }
 
+  public void setSerializedValue(SerializedValueDto serializedValue) {
+    this.serializedValue = serializedValue;
+  }
+
+  public static VariableInstanceDto fromVariableInstance(VariableInstance variableInstance) {
     VariableInstanceDto dto = new VariableInstanceDto();
 
-    dto.setId(entity.getId());
-    dto.setName(entity.getName());
-    dto.setProcessInstanceId(entity.getProcessInstanceId());
-    dto.setExecutionId(entity.getExecutionId());
+    dto.setId(variableInstance.getId());
+    dto.setName(variableInstance.getName());
+    dto.setProcessInstanceId(variableInstance.getProcessInstanceId());
+    dto.setExecutionId(variableInstance.getExecutionId());
 
-    dto.caseExecutionId = entity.getCaseExecutionId();
-    dto.caseInstanceId = entity.getCaseInstanceId();
+    dto.caseExecutionId = variableInstance.getCaseExecutionId();
+    dto.caseInstanceId = variableInstance.getCaseInstanceId();
 
-    dto.setTaskId(entity.getTaskId());
-    dto.setActivityInstanceId(entity.getActivityInstanceId());
-    if(ProcessEngineVariableType.SERIALIZABLE.getName().equals(entity.getType().getTypeName())) {
-      if(entity.getValue() != null) {
-        dto.setValue(new SerializedObjectDto(entity.getValue()));
+    dto.setTaskId(variableInstance.getTaskId());
+    dto.setActivityInstanceId(variableInstance.getActivityInstanceId());
+
+    if (variableInstance.storesCustomObjects()) {
+      if (!ProcessEngineVariableType.SERIALIZABLE.getName().equals(variableInstance.getTypeName())) {
+        dto.serializedValue = SerializedValueDto.fromSerializedVariableValue(variableInstance.getSerializedValue());
       }
+
     } else {
-      dto.setValue(entity.getValue());
+      dto.setValue(variableInstance.getValue());
+      dto.setErrorMessage(variableInstance.getErrorMessage());
     }
-    dto.setType(entity.getType().getTypeNameForValue(entity.getValue()));
-    dto.setErrorMessage(entity.getErrorMessage());
+
+    dto.setType(variableInstance.getValueTypeName());
 
     return dto;
   }

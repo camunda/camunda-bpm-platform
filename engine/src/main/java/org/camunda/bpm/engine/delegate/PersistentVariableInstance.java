@@ -33,4 +33,16 @@ public interface PersistentVariableInstance extends CoreVariableInstance {
    * corresponds to the types defined in {@link ProcessEngineVariableType}.
    */
   String getTypeName();
+
+  /**
+   * Returns the simple name of the class of the persisted variable
+   */
+  String getValueTypeName();
+
+  /**
+   * Returns whether this variable potentially stores a custom java object (i.e. an instance
+   * of a non-JDK class). Return value is determined based on the underlying variable type
+   * (cf. {@link ProcessEngineVariableType}).
+   */
+  boolean storesCustomObjects();
 }

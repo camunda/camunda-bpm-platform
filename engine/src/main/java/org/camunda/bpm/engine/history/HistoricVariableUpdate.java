@@ -25,6 +25,8 @@ public interface HistoricVariableUpdate extends HistoricDetail {
   String getVariableName();
   String getVariableTypeName();
   Object getValue();
+  String getValueTypeName();
+  boolean storesCustomObjects();
   int getRevision();
 
   /**

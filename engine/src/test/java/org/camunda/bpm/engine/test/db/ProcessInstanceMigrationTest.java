@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -34,7 +34,7 @@ import org.camunda.bpm.engine.test.Deployment;
  * @author Falko Menge
  */
 public class ProcessInstanceMigrationTest extends PluggableProcessEngineTestCase {
-  
+
   private static final String TEST_PROCESS_WITH_PARALLEL_GATEWAY = "org/camunda/bpm/engine/test/examples/bpmn/gateway/ParallelGatewayTest.testForkJoin.bpmn20.xml";
   private static final String TEST_PROCESS = "org/camunda/bpm/engine/test/db/ProcessInstanceMigrationTest.testSetProcessDefinitionVersion.bpmn20.xml";
   private static final String TEST_PROCESS_ACTIVITY_MISSING = "org/camunda/bpm/engine/test/db/ProcessInstanceMigrationTest.testSetProcessDefinitionVersionActivityMissing.bpmn20.xml";
@@ -42,34 +42,34 @@ public class ProcessInstanceMigrationTest extends PluggableProcessEngineTestCase
   private static final String TEST_PROCESS_CALL_ACTIVITY = "org/camunda/bpm/engine/test/db/ProcessInstanceMigrationTest.withCallActivity.bpmn20.xml";
   private static final String TEST_PROCESS_USER_TASK_V1 = "org/camunda/bpm/engine/test/db/ProcessInstanceMigrationTest.testSetProcessDefinitionVersionWithTask.bpmn20.xml";
   private static final String TEST_PROCESS_USER_TASK_V2 = "org/camunda/bpm/engine/test/db/ProcessInstanceMigrationTest.testSetProcessDefinitionVersionWithTaskV2.bpmn20.xml";
-  
+
   private static final String TEST_PROCESS_SERVICE_TASK_V1 = "org/camunda/bpm/engine/test/db/ProcessInstanceMigrationTest.testSetProcessDefinitionVersionWithServiceTask.bpmn20.xml";
   private static final String TEST_PROCESS_SERVICE_TASK_V2 = "org/camunda/bpm/engine/test/db/ProcessInstanceMigrationTest.testSetProcessDefinitionVersionWithServiceTaskV2.bpmn20.xml";
 
   public void testSetProcessDefinitionVersionEmptyArguments() {
     try {
-      new SetProcessDefinitionVersionCmd(null, 23);    
+      new SetProcessDefinitionVersionCmd(null, 23);
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
       assertTextPresent("The process instance id is mandatory: processInstanceId is null", ae.getMessage());
     }
 
     try {
-      new SetProcessDefinitionVersionCmd("", 23);    
+      new SetProcessDefinitionVersionCmd("", 23);
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
       assertTextPresent("The process instance id is mandatory: processInstanceId is empty", ae.getMessage());
     }
 
     try {
-      new SetProcessDefinitionVersionCmd("42", null);    
+      new SetProcessDefinitionVersionCmd("42", null);
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
       assertTextPresent("The process definition version is mandatory: processDefinitionVersion is null", ae.getMessage());
     }
 
     try {
-      new SetProcessDefinitionVersionCmd("42", -1);    
+      new SetProcessDefinitionVersionCmd("42", -1);
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
       assertTextPresent("The process definition version must be positive: processDefinitionVersion is not positive", ae.getMessage());
@@ -79,13 +79,13 @@ public class ProcessInstanceMigrationTest extends PluggableProcessEngineTestCase
   public void testSetProcessDefinitionVersionNonExistingPI() {
     CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutorTxRequired();
     try {
-      commandExecutor.execute(new SetProcessDefinitionVersionCmd("42", 23));    
+      commandExecutor.execute(new SetProcessDefinitionVersionCmd("42", 23));
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
       assertTextPresent("No process instance found for id = '42'.", ae.getMessage());
     }
   }
-  
+
   @Deployment(resources = {TEST_PROCESS_WITH_PARALLEL_GATEWAY})
   public void testSetProcessDefinitionVersionPIIsSubExecution() {
     // start process instance
@@ -111,13 +111,13 @@ public class ProcessInstanceMigrationTest extends PluggableProcessEngineTestCase
 
     CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutorTxRequired();
     try {
-      commandExecutor.execute(new SetProcessDefinitionVersionCmd(pi.getId(), 23));    
+      commandExecutor.execute(new SetProcessDefinitionVersionCmd(pi.getId(), 23));
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
       assertTextPresent("no processes deployed with key = 'receiveTask' and version = '23'", ae.getMessage());
     }
   }
-  
+
   @Deployment(resources = {TEST_PROCESS})
   public void testSetProcessDefinitionVersionActivityMissing() {
     // start process instance
@@ -128,7 +128,7 @@ public class ProcessInstanceMigrationTest extends PluggableProcessEngineTestCase
       .activityId("waitState1")
       .singleResult();
     assertNotNull(execution);
-    
+
     // deploy new version of the process definition
     org.camunda.bpm.engine.repository.Deployment deployment = repositoryService
       .createDeployment()
@@ -161,7 +161,7 @@ public class ProcessInstanceMigrationTest extends PluggableProcessEngineTestCase
       .activityId("waitState1")
       .singleResult();
     assertNotNull(execution);
-    
+
     // deploy new version of the process definition
     org.camunda.bpm.engine.repository.Deployment deployment = repositoryService
       .createDeployment()
@@ -186,13 +186,14 @@ public class ProcessInstanceMigrationTest extends PluggableProcessEngineTestCase
       .processInstanceId(pi.getId())
       .singleResult();
     assertEquals(newProcessDefinition.getId(), pi.getProcessDefinitionId());
-    
+
     // check history
     if (processEngineConfiguration.getHistoryLevel() > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
       HistoricProcessInstance historicPI = historyService
         .createHistoricProcessInstanceQuery()
         .processInstanceId(pi.getId())
         .singleResult();
+
 //      assertEquals(newProcessDefinition.getId(), historicPI.getProcessDefinitionId());
     }
 
@@ -207,7 +208,7 @@ public class ProcessInstanceMigrationTest extends PluggableProcessEngineTestCase
 
     // check that the user tasks have been reached
     assertEquals(2, taskService.createTaskQuery().count());
-    
+
     // deploy new version of the process definition
     org.camunda.bpm.engine.repository.Deployment deployment = repositoryService
       .createDeployment()
@@ -231,7 +232,7 @@ public class ProcessInstanceMigrationTest extends PluggableProcessEngineTestCase
     for (Execution execution : executions) {
       assertEquals(newProcessDefinition.getId(), ((ExecutionEntity) execution).getProcessDefinitionId());
     }
-    
+
     // undeploy "manually" deployed process definition
     repositoryService.deleteDeployment(deployment.getId(), true);
   }
@@ -247,7 +248,7 @@ public class ProcessInstanceMigrationTest extends PluggableProcessEngineTestCase
       .processDefinitionKey("childProcess")
       .singleResult();
     assertNotNull(execution);
-    
+
     // deploy new version of the process definition
     org.camunda.bpm.engine.repository.Deployment deployment = repositoryService
       .createDeployment()
@@ -268,28 +269,28 @@ public class ProcessInstanceMigrationTest extends PluggableProcessEngineTestCase
     // undeploy "manually" deployed process definition
     repositoryService.deleteDeployment(deployment.getId(), true);
   }
-  
+
   @Deployment(resources = {TEST_PROCESS_USER_TASK_V1})
   public void testSetProcessDefinitionVersionWithWithTask() {
     try {
     // start process instance
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("userTask");
 
-    // check that user task has been reached    
+    // check that user task has been reached
     assertEquals(1, taskService.createTaskQuery().processInstanceId(pi.getId()).count());
-    
+
     // deploy new version of the process definition
     org.camunda.bpm.engine.repository.Deployment deployment = repositoryService
       .createDeployment()
       .addClasspathResource(TEST_PROCESS_USER_TASK_V2)
       .deploy();
     assertEquals(2, repositoryService.createProcessDefinitionQuery().processDefinitionKey("userTask").count());
-    
+
     ProcessDefinition newProcessDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionKey("userTask").processDefinitionVersion(2).singleResult();
 
     // migrate process instance to new process definition version
     processEngineConfiguration.getCommandExecutorTxRequired().execute(new SetProcessDefinitionVersionCmd(pi.getId(), 2));
-    
+
     // check UserTask
     Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
     assertEquals(newProcessDefinition.getId(), task.getProcessDefinitionId());
@@ -304,31 +305,31 @@ public class ProcessInstanceMigrationTest extends PluggableProcessEngineTestCase
     repositoryService.deleteDeployment(deployment.getId(), true);
     }
     catch (Exception ex) {
-     ex.printStackTrace(); 
+     ex.printStackTrace();
     }
   }
-  
+
   @Deployment(resources = TEST_PROCESS_SERVICE_TASK_V1)
   public void testSetProcessDefinitionVersionWithFollowUpTask() {
     String processDefinitionId = repositoryService.createProcessDefinitionQuery().singleResult().getId();
-    
-    String secondDeploymentId = 
+
+    String secondDeploymentId =
         repositoryService.createDeployment().addClasspathResource(TEST_PROCESS_SERVICE_TASK_V2).deploy().getId();
-    
+
     runtimeService.startProcessInstanceById(processDefinitionId);
-    
-    // execute job that triggers the migrating service task 
+
+    // execute job that triggers the migrating service task
     Job migrationJob = managementService.createJobQuery().singleResult();
     assertNotNull(migrationJob);
-    
+
     managementService.executeJob(migrationJob.getId());
-    
+
     Task followUpTask = taskService.createTaskQuery().singleResult();
-    
-    assertNotNull("Should have migrated to the new version and immediately executed the correct follow-up activity", 
+
+    assertNotNull("Should have migrated to the new version and immediately executed the correct follow-up activity",
         followUpTask);
-    
+
     repositoryService.deleteDeployment(secondDeploymentId, true);
   }
-  
+
 }

@@ -45,7 +45,7 @@ public class DoubleType extends PrimitiveVariableType {
     return Double.class.isAssignableFrom(value.getClass());
   }
 
-  public String getTypeNameForValue(Object value) {
+  public String getTypeNameForValue(ValueFields valueFields) {
     // typename independent of value
     return Double.class.getSimpleName();
   }

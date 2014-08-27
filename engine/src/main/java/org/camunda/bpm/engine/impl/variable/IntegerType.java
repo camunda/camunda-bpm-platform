@@ -55,7 +55,7 @@ public class IntegerType extends PrimitiveVariableType {
            || int.class.isAssignableFrom(value.getClass());
   }
 
-  public String getTypeNameForValue(Object value) {
+  public String getTypeNameForValue(ValueFields valueFields) {
     // typename independent of value
     return Integer.class.getSimpleName();
   }

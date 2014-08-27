@@ -41,7 +41,7 @@ public class NullType extends PrimitiveVariableType {
   public void setValue(Object value, ValueFields valueFields) {
   }
 
-  public String getTypeNameForValue(Object value) {
+  public String getTypeNameForValue(ValueFields valueFields) {
     return "Null";
   }
 }

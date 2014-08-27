@@ -172,4 +172,12 @@ public class SpinSerializationType implements VariableType {
         && availableDataFormats.containsKey(configuration.get(CONFIG_DATA_FORMAT));
   }
 
+  public String getTypeNameForValue(ValueFields valueFields) {
+    return Object.class.getSimpleName();
+  }
+
+  public boolean storesCustomObjects() {
+    return true;
+  }
+
 }

@@ -41,4 +41,8 @@ public abstract class PrimitiveVariableType implements VariableType {
   public boolean isAbleToStoreSerializedValue(Object value, Map<String, Object> configuration) {
     return isAbleToStore(value);
   }
+
+  public boolean storesCustomObjects() {
+    return false;
+  }
 }

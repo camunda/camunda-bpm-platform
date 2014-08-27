@@ -58,7 +58,7 @@ public class ByteArrayType extends PrimitiveVariableType {
     return byte[].class.isAssignableFrom(value.getClass());
   }
 
-  public String getTypeNameForValue(Object value) {
-    return "Binary";
+  public String getTypeNameForValue(ValueFields valueFields) {
+    return byte[].class.getSimpleName();
   }
 }

@@ -19,7 +19,9 @@ public class VariableSpec {
   protected String name;
   protected Object value;
   protected String variableTypeName;
+  protected String valueTypeName;
   protected Object serializedValue;
+  protected boolean storesCustomObjects;
   protected Map<String, Object> configuration;
 
   public String getName() {
@@ -43,6 +45,13 @@ public class VariableSpec {
     this.variableTypeName = variableTypeName;
     return this;
   }
+  public String getValueTypeName() {
+    return valueTypeName;
+  }
+  public VariableSpec valueTypeName(String valueTypeName) {
+    this.valueTypeName = valueTypeName;
+    return this;
+  }
   public Object getSerializedValue() {
     return serializedValue;
   }
@@ -55,6 +64,13 @@ public class VariableSpec {
   }
   public VariableSpec configuration(Map<String, Object> configuration) {
     this.configuration = configuration;
+    return this;
+  }
+  public boolean getStoresCustomObjects() {
+    return storesCustomObjects;
+  }
+  public VariableSpec storesCustomObjects(boolean storesCustomObjects) {
+    this.storesCustomObjects = storesCustomObjects;
     return this;
   }
 

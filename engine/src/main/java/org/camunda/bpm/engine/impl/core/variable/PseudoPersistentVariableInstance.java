@@ -45,4 +45,12 @@ public class PseudoPersistentVariableInstance implements PersistentVariableInsta
     throw new UnsupportedOperationException("This variable is not truly persistent");
   }
 
+  public String getValueTypeName() {
+    return value.getClass().getSimpleName();
+  }
+
+  public boolean storesCustomObjects() {
+    throw new UnsupportedOperationException("This variable is not truly persistent");
+  }
+
 }

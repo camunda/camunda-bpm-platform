@@ -14,8 +14,7 @@ package org.camunda.bpm.engine.rest.dto.history;
 
 import org.camunda.bpm.engine.delegate.ProcessEngineVariableType;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
-import org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEntity;
-import org.camunda.bpm.engine.rest.dto.runtime.SerializedObjectDto;
+import org.camunda.bpm.engine.rest.dto.runtime.SerializedValueDto;
 
 public class HistoricVariableInstanceDto {
 
@@ -26,6 +25,7 @@ public class HistoricVariableInstanceDto {
   private String processInstanceId;
   private String activityInstanceId;
   private String errorMessage;
+  protected SerializedValueDto serializedValue;
 
   public String getId() {
     return id;
@@ -55,25 +55,30 @@ public class HistoricVariableInstanceDto {
     return errorMessage;
   }
 
-  public static HistoricVariableInstanceDto fromHistoricVariableInstance(HistoricVariableInstance historicVariableInstance) {
+  public SerializedValueDto getSerializedValue() {
+    return serializedValue;
+  }
 
-    HistoricVariableInstanceEntity entity = (HistoricVariableInstanceEntity) historicVariableInstance;
+  public static HistoricVariableInstanceDto fromHistoricVariableInstance(HistoricVariableInstance historicVariableInstance) {
 
     HistoricVariableInstanceDto dto = new HistoricVariableInstanceDto();
 
-    dto.id = entity.getId();
-    dto.name = entity.getVariableName();
-    dto.processInstanceId = entity.getProcessInstanceId();
-    dto.activityInstanceId = entity.getActivtyInstanceId();
-    if(ProcessEngineVariableType.SERIALIZABLE.getName().equals(entity.getVariableType().getTypeName())) {
-      if(entity.getValue() != null) {
-        dto.value = new SerializedObjectDto(entity.getValue());
+    dto.id = historicVariableInstance.getId();
+    dto.name = historicVariableInstance.getName();
+    dto.processInstanceId = historicVariableInstance.getProcessInstanceId();
+    dto.activityInstanceId = historicVariableInstance.getActivtyInstanceId();
+
+    if (historicVariableInstance.storesCustomObjects()) {
+      if (!ProcessEngineVariableType.SERIALIZABLE.getName().equals(historicVariableInstance.getTypeName())) {
+        dto.serializedValue = SerializedValueDto.fromSerializedVariableValue(historicVariableInstance.getSerializedValue());
       }
     } else {
-      dto.value = entity.getValue();
+      dto.value = historicVariableInstance.getValue();
+      dto.errorMessage = historicVariableInstance.getErrorMessage();
     }
-    dto.type = entity.getVariableType().getTypeNameForValue(entity.getValue());
-    dto.errorMessage = entity.getErrorMessage();
+
+    dto.type = historicVariableInstance.getValueTypeName();
+
 
     return dto;
   }

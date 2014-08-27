@@ -56,7 +56,7 @@ public class DateType implements VariableType {
     }
   }
 
-  public String getTypeNameForValue(Object value) {
+  public String getTypeNameForValue(ValueFields valueFields) {
     // typename independent of value
     return Date.class.getSimpleName();
   }
@@ -82,5 +82,9 @@ public class DateType implements VariableType {
     }
 
     return Long.class.isAssignableFrom(value.getClass());
+  }
+
+  public boolean storesCustomObjects() {
+    return false;
   }
 }

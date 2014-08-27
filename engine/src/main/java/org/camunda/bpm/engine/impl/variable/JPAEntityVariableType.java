@@ -85,12 +85,8 @@ public class JPAEntityVariableType implements VariableType {
     return null;
   }
 
-  public String getTypeNameForValue(Object value) {
-    if(value != null) {
-      return value.getClass().getSimpleName();
-    } else {
-      return getTypeName();
-    }
+  public String getTypeNameForValue(ValueFields valueFields) {
+    return Object.class.getSimpleName();
   }
 
   public SerializedVariableValue getSerializedValue(ValueFields valueFields) {
@@ -111,6 +107,10 @@ public class JPAEntityVariableType implements VariableType {
         && configuration != null
         && configuration.get(CONFIG_CLASS_NAME) instanceof String
         && configuration.get(CONFIG_ENTITY_ID_STRING) instanceof String;
+  }
+
+  public boolean storesCustomObjects() {
+    return true;
   }
 
 }

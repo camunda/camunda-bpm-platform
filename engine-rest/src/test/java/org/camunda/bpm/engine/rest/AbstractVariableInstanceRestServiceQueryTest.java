@@ -5,6 +5,8 @@ import static com.jayway.restassured.RestAssured.given;
 import static com.jayway.restassured.path.json.JsonPath.from;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -19,7 +21,10 @@ import java.util.Map;
 import javax.ws.rs.core.Response.Status;
 import javax.xml.registry.InvalidRequestException;
 
+import org.camunda.bpm.engine.delegate.ProcessEngineVariableType;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
+import org.camunda.bpm.engine.rest.helper.MockSerializedValueBuilder;
+import org.camunda.bpm.engine.rest.helper.MockVariableInstanceBuilder;
 import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.runtime.VariableInstanceQuery;
 import org.junit.Assert;
@@ -36,11 +41,16 @@ public abstract class AbstractVariableInstanceRestServiceQueryTest extends Abstr
   protected static final String VARIABLE_INSTANCE_QUERY_URL = TEST_RESOURCE_ROOT_PATH + "/variable-instance";
   protected static final String VARIABLE_INSTANCE_COUNT_QUERY_URL = VARIABLE_INSTANCE_QUERY_URL + "/count";
 
-  private VariableInstanceQuery mockedQuery;
+  protected VariableInstanceQuery mockedQuery;
+  protected VariableInstance mockInstance;
+  protected MockVariableInstanceBuilder mockInstanceBuilder;
 
   @Before
   public void setUpRuntimeData() {
-    mockedQuery = setUpMockVariableInstanceQuery(createMockVariableInstanceList());
+    mockInstanceBuilder = MockProvider.mockVariableInstance();
+    mockInstance = mockInstanceBuilder.build();
+
+    mockedQuery = setUpMockVariableInstanceQuery(createMockVariableInstanceList(mockInstance));
   }
 
   private VariableInstanceQuery setUpMockVariableInstanceQuery(List<VariableInstance> mockedInstances) {
@@ -53,10 +63,10 @@ public abstract class AbstractVariableInstanceRestServiceQueryTest extends Abstr
     return sampleInstanceQuery;
   }
 
-  private List<VariableInstance> createMockVariableInstanceList() {
+  protected List<VariableInstance> createMockVariableInstanceList(VariableInstance mockInstance) {
     List<VariableInstance> mocks = new ArrayList<VariableInstance>();
 
-    mocks.add(MockProvider.createMockVariableInstance());
+    mocks.add(mockInstance);
     return mocks;
   }
 
@@ -192,6 +202,20 @@ public abstract class AbstractVariableInstanceRestServiceQueryTest extends Abstr
     String queryVariableName = "aVariableInstanceName";
     Response response = given().queryParam("variableName", queryVariableName)
         .then().expect().statusCode(Status.OK.getStatusCode())
+        .and()
+          .body("size()", is(1))
+          .body("[0].id", equalTo(mockInstanceBuilder.getId()))
+          .body("[0].name", equalTo(mockInstanceBuilder.getName()))
+          .body("[0].type", equalTo(mockInstanceBuilder.getValueTypeName()))
+          .body("[0].value", equalTo(mockInstanceBuilder.getValue()))
+          .body("[0].processInstanceId", equalTo(mockInstanceBuilder.getProcessInstanceId()))
+          .body("[0].executionId", equalTo(mockInstanceBuilder.getExecutionId()))
+          .body("[0].caseInstanceId", equalTo(mockInstanceBuilder.getCaseInstanceId()))
+          .body("[0].caseExecutionId", equalTo(mockInstanceBuilder.getCaseExecutionId()))
+          .body("[0].taskId", equalTo(mockInstanceBuilder.getTaskId()))
+          .body("[0].activityInstanceId", equalTo(mockInstanceBuilder.getActivityInstanceId()))
+          .body("[0].errorMessage", equalTo(mockInstanceBuilder.getErrorMessage()))
+          .body("[0].serializedValue", nullValue())
         .when().get(VARIABLE_INSTANCE_QUERY_URL);
 
     // assert query invocation
@@ -201,30 +225,8 @@ public abstract class AbstractVariableInstanceRestServiceQueryTest extends Abstr
 
     String content = response.asString();
     List<String> variables = from(content).getList("");
-    Assert.assertEquals("There should be one process definition returned.", 1, variables.size());
-    Assert.assertNotNull("There should be one process definition returned", variables.get(0));
-
-    String returnedId = from(content).getString("[0].id");
-    String returnedName = from(content).getString("[0].name");
-    String returnedType = from(content).getString("[0].type");
-    String returnedValue = from(content).getString("[0].value");
-    String returnedProcessInstanceId = from(content).getString("[0].processInstanceId");
-    String returnedExecutionId = from(content).getString("[0].executionId");
-    String returnedCaseInstanceId = from(content).getString("[0].caseInstanceId");
-    String returnedCaseExecutionId = from(content).getString("[0].caseExecutionId");
-    String returnedTaskId = from(content).getString("[0].taskId");
-    String returnedActivityId = from(content).getString("[0].activityInstanceId");
-
-    Assert.assertEquals(MockProvider.EXAMPLE_VARIABLE_INSTANCE_ID, returnedId);
-    Assert.assertEquals(MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME, returnedName);
-    Assert.assertEquals(MockProvider.EXAMPLE_VARIABLE_INSTANCE_TYPE, returnedType);
-    Assert.assertEquals(MockProvider.EXAMPLE_VARIABLE_INSTANCE_VALUE, returnedValue);
-    Assert.assertEquals(MockProvider.EXAMPLE_VARIABLE_INSTANCE_PROC_INST_ID, returnedProcessInstanceId);
-    Assert.assertEquals(MockProvider.EXAMPLE_VARIABLE_INSTANCE_EXECUTION_ID, returnedExecutionId);
-    Assert.assertEquals(MockProvider.EXAMPLE_VARIABLE_INSTANCE_CASE_INST_ID, returnedCaseInstanceId);
-    Assert.assertEquals(MockProvider.EXAMPLE_VARIABLE_INSTANCE_CASE_EXECUTION_ID, returnedCaseExecutionId);
-    Assert.assertEquals(MockProvider.EXAMPLE_VARIABLE_INSTANCE_TASK_ID, returnedTaskId);
-    Assert.assertEquals(MockProvider.EXAMPLE_VARIABLE_INSTANCE_ACTIVITY_INSTANCE_ID, returnedActivityId);
+    Assert.assertEquals("There should be one variable instance returned.", 1, variables.size());
+    Assert.assertNotNull("There should be one variable instance returned", variables.get(0));
 
     verify(mockedQuery).disableBinaryFetching();
   }
@@ -237,6 +239,20 @@ public abstract class AbstractVariableInstanceRestServiceQueryTest extends Abstr
 
     Response response = given().contentType(POST_JSON_CONTENT_TYPE).body(queryParameter)
         .then().expect().statusCode(Status.OK.getStatusCode())
+        .and()
+          .body("size()", is(1))
+          .body("[0].id", equalTo(mockInstanceBuilder.getId()))
+          .body("[0].name", equalTo(mockInstanceBuilder.getName()))
+          .body("[0].type", equalTo(mockInstanceBuilder.getValueTypeName()))
+          .body("[0].value", equalTo(mockInstanceBuilder.getValue()))
+          .body("[0].processInstanceId", equalTo(mockInstanceBuilder.getProcessInstanceId()))
+          .body("[0].executionId", equalTo(mockInstanceBuilder.getExecutionId()))
+          .body("[0].caseInstanceId", equalTo(mockInstanceBuilder.getCaseInstanceId()))
+          .body("[0].caseExecutionId", equalTo(mockInstanceBuilder.getCaseExecutionId()))
+          .body("[0].taskId", equalTo(mockInstanceBuilder.getTaskId()))
+          .body("[0].activityInstanceId", equalTo(mockInstanceBuilder.getActivityInstanceId()))
+          .body("[0].errorMessage", equalTo(mockInstanceBuilder.getErrorMessage()))
+          .body("[0].serializedValue", nullValue())
         .when().post(VARIABLE_INSTANCE_QUERY_URL);
 
     // assert query invocation
@@ -249,27 +265,69 @@ public abstract class AbstractVariableInstanceRestServiceQueryTest extends Abstr
     Assert.assertEquals("There should be one process definition returned.", 1, variables.size());
     Assert.assertNotNull("There should be one process definition returned", variables.get(0));
 
-    String returnedName = from(content).getString("[0].name");
-    String returnedType = from(content).getString("[0].type");
-    String returnedValue = from(content).getString("[0].value");
-    String returnedProcessInstanceId = from(content).getString("[0].processInstanceId");
-    String returnedExecutionId = from(content).getString("[0].executionId");
-    String returnedCaseInstanceId = from(content).getString("[0].caseInstanceId");
-    String returnedCaseExecutionId = from(content).getString("[0].caseExecutionId");
-    String returnedTaskId = from(content).getString("[0].taskId");
-    String returnedActivityId = from(content).getString("[0].activityInstanceId");
-
-    Assert.assertEquals(MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME, returnedName);
-    Assert.assertEquals(MockProvider.EXAMPLE_VARIABLE_INSTANCE_TYPE, returnedType);
-    Assert.assertEquals(MockProvider.EXAMPLE_VARIABLE_INSTANCE_VALUE, returnedValue);
-    Assert.assertEquals(MockProvider.EXAMPLE_VARIABLE_INSTANCE_PROC_INST_ID, returnedProcessInstanceId);
-    Assert.assertEquals(MockProvider.EXAMPLE_VARIABLE_INSTANCE_EXECUTION_ID, returnedExecutionId);
-    Assert.assertEquals(MockProvider.EXAMPLE_VARIABLE_INSTANCE_CASE_INST_ID, returnedCaseInstanceId);
-    Assert.assertEquals(MockProvider.EXAMPLE_VARIABLE_INSTANCE_CASE_EXECUTION_ID, returnedCaseExecutionId);
-    Assert.assertEquals(MockProvider.EXAMPLE_VARIABLE_INSTANCE_TASK_ID, returnedTaskId);
-    Assert.assertEquals(MockProvider.EXAMPLE_VARIABLE_INSTANCE_ACTIVITY_INSTANCE_ID, returnedActivityId);
-
     verify(mockedQuery).disableBinaryFetching();
+  }
+
+  @Test
+  public void testSerializableVariableInstanceRetrieval() {
+    MockSerializedValueBuilder serializedValueBuilder =
+        new MockSerializedValueBuilder()
+          .value(MockProvider.EXAMPLE_VARIABLE_INSTANCE_BYTE);
+
+    MockVariableInstanceBuilder builder = MockProvider.mockVariableInstance()
+        .storesCustomObjects(true)
+        .typeName(ProcessEngineVariableType.SERIALIZABLE.getName())
+        .valueTypeName("Serializable")
+        .serializedValue(serializedValueBuilder);
+
+    List<VariableInstance> mockInstances = new ArrayList<VariableInstance>();
+    mockInstances.add(builder.build());
+
+    mockedQuery = setUpMockVariableInstanceQuery(mockInstances);
+
+    given()
+        .then().expect().statusCode(Status.OK.getStatusCode())
+        .and()
+          .body("size()", is(1))
+          .body("[0].type", equalTo("Serializable"))
+          .body("[0].value", nullValue())
+          .body("[0].errorMessage", nullValue())
+          .body("[0].serializedValue", nullValue())
+        .when().get(VARIABLE_INSTANCE_QUERY_URL);
+  }
+
+  @Test
+  public void testSpinVariableInstanceRetrieval() {
+    MockSerializedValueBuilder serializedValueBuilder =
+        new MockSerializedValueBuilder()
+          .value("aSpinSerializedValue")
+          .configuration(ProcessEngineVariableType.SPIN_TYPE_CONFIG_ROOT_TYPE, "aRootType")
+          .configuration(ProcessEngineVariableType.SPIN_TYPE_DATA_FORMAT_ID, "aDataFormat");
+
+    MockVariableInstanceBuilder builder = MockProvider.mockVariableInstance()
+        .storesCustomObjects(true)
+        .typeName(ProcessEngineVariableType.SPIN.getName())
+        .valueTypeName("Object")
+        .serializedValue(serializedValueBuilder);
+
+    List<VariableInstance> mockInstances = new ArrayList<VariableInstance>();
+    mockInstances.add(builder.build());
+
+    mockedQuery = setUpMockVariableInstanceQuery(mockInstances);
+
+    given()
+        .then().expect().statusCode(Status.OK.getStatusCode())
+        .and()
+          .body("size()", is(1))
+          .body("[0].type", equalTo("Object"))
+          .body("[0].value", nullValue())
+          .body("[0].errorMessage", nullValue())
+          .body("[0].serializedValue.value", equalTo("aSpinSerializedValue"))
+          .body("[0].serializedValue.configuration." + ProcessEngineVariableType.SPIN_TYPE_CONFIG_ROOT_TYPE,
+              equalTo("aRootType"))
+          .body("[0].serializedValue.configuration." + ProcessEngineVariableType.SPIN_TYPE_DATA_FORMAT_ID,
+              equalTo("aDataFormat"))
+        .when().get(VARIABLE_INSTANCE_QUERY_URL);
   }
 
   @Test

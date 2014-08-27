@@ -45,7 +45,7 @@ public class StringType extends PrimitiveVariableType {
     return String.class.isAssignableFrom(value.getClass());
   }
 
-  public String getTypeNameForValue(Object value) {
+  public String getTypeNameForValue(ValueFields valueFields) {
     // typename independent of value
     return String.class.getSimpleName();
   }

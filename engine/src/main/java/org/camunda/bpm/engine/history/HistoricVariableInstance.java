@@ -30,7 +30,11 @@ public interface HistoricVariableInstance extends PersistentVariableInstance {
 
   /**
    * Returns the name of <code>this</code> variable instance.
+   *
+   * <p>Deprecated since 7.2: use {@link #getName()} instead.</p>
+   *
    */
+   @Deprecated
   String getVariableName();
 
   /**

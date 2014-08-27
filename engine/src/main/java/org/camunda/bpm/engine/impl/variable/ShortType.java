@@ -55,7 +55,7 @@ public class ShortType extends PrimitiveVariableType {
            || short.class.isAssignableFrom(value.getClass());
   }
 
-  public String getTypeNameForValue(Object value) {
+  public String getTypeNameForValue(ValueFields valueFields) {
     // typename independent of value
     return Short.class.getSimpleName();
   }

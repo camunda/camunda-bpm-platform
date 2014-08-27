@@ -264,6 +264,8 @@ public class VariableDataFormatTest extends AbstractProcessEngineTestCase {
     VariableInstance beanVariable = runtimeService.createVariableInstanceQuery().singleResult();
     assertNotNull(beanVariable);
     assertEquals(ProcessEngineVariableType.SPIN.getName(), beanVariable.getTypeName());
+    assertEquals(Object.class.getSimpleName(), beanVariable.getValueTypeName());
+    assertTrue(beanVariable.storesCustomObjects());
 
     SerializedVariableValue serializedVariable = beanVariable.getSerializedValue();
 

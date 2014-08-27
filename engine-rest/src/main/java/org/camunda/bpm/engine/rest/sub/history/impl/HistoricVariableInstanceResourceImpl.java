@@ -56,7 +56,7 @@ public class HistoricVariableInstanceResourceImpl implements HistoricVariableIns
         .singleResult();
     if(variableInstance != null) {
 
-      Object value = variableInstance.getValue();
+      Object value = variableInstance.getSerializedValue().getValue();
       if(value instanceof byte[]) {
         return new ByteArrayInputStream((byte[]) value);
 

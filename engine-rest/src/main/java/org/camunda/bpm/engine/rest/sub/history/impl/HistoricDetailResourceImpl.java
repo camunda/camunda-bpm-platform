@@ -62,7 +62,7 @@ public class HistoricDetailResourceImpl implements HistoricDetailResource {
       throw new InvalidRequestException(Status.BAD_REQUEST, "Historic detail with Id '"+detailId + "' is not a variable update.");
 
     } else {
-      Object value = ((HistoricVariableUpdate) variableInstance).getValue();
+      Object value = ((HistoricVariableUpdate) variableInstance).getSerializedValue().getValue();
       if(value instanceof byte[]) {
         return new ByteArrayInputStream((byte[]) value);
 

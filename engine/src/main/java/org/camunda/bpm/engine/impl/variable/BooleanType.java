@@ -58,7 +58,7 @@ public class BooleanType extends PrimitiveVariableType {
            || boolean.class.isAssignableFrom(value.getClass());
   }
 
-  public String getTypeNameForValue(Object value) {
+  public String getTypeNameForValue(ValueFields valueFields) {
     // typename independent of value
     return Boolean.class.getSimpleName();
   }

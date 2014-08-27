@@ -457,4 +457,12 @@ public class VariableInstanceEntity implements VariableInstance, ValueFields, Db
            + "]";
   }
 
+  public String getValueTypeName() {
+    return type.getTypeNameForValue(this);
+  }
+
+  public boolean storesCustomObjects() {
+    return type.storesCustomObjects();
+  }
+
 }

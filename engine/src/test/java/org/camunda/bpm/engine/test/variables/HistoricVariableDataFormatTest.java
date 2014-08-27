@@ -42,6 +42,9 @@ public class HistoricVariableDataFormatTest extends AbstractProcessEngineTestCas
     assertNotNull(historicVariable.getValue());
     assertNull(historicVariable.getErrorMessage());
 
+    assertTrue(historicVariable.storesCustomObjects());
+    assertEquals(Object.class.getSimpleName(), historicVariable.getValueTypeName());
+
     SimpleBean historyValue = (SimpleBean) historicVariable.getValue();
     assertEquals(bean.getStringProperty(), historyValue.getStringProperty());
     assertEquals(bean.getIntProperty(), historyValue.getIntProperty());
@@ -79,6 +82,10 @@ public class HistoricVariableDataFormatTest extends AbstractProcessEngineTestCas
 
       HistoricVariableUpdate historicUpdate = (HistoricVariableUpdate)
           historyService.createHistoricDetailQuery().variableUpdates().singleResult();
+
+      assertTrue(historicUpdate.storesCustomObjects());
+      assertEquals(Object.class.getSimpleName(), historicUpdate.getValueTypeName());
+
       SerializedVariableValue serializedValue = historicUpdate.getSerializedValue();
       assertNotNull(serializedValue);
 

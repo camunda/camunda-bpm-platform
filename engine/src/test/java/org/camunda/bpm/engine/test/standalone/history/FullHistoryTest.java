@@ -21,6 +21,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.delegate.ProcessEngineVariableType;
+import org.camunda.bpm.engine.delegate.SerializedVariableValue;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.history.HistoricDetailQuery;
@@ -231,6 +233,13 @@ public class FullHistoryTest extends ResourceProcessEngineTestCase {
     HistoricVariableInstance historicProcessVariable = historyService.createHistoricVariableInstanceQuery().variableValueEquals("process", "one").singleResult();
     assertEquals("process", historicProcessVariable.getVariableName());
     assertEquals("one", historicProcessVariable.getValue());
+    assertEquals(ProcessEngineVariableType.STRING.getName(), historicProcessVariable.getVariableTypeName());
+    assertEquals(String.class.getSimpleName(), historicProcessVariable.getValueTypeName());
+
+    SerializedVariableValue serializedValue = historicProcessVariable.getSerializedValue();
+    assertNotNull(serializedValue);
+    assertEquals("one", serializedValue.getValue());
+    assertTrue(serializedValue.getConfig().isEmpty());
 
     Map<String, Object> variables3 = new HashMap<String, Object>();
     variables3.put("long", 1000l);
@@ -1278,6 +1287,13 @@ public class FullHistoryTest extends ResourceProcessEngineTestCase {
     assertEquals(result.getId(), resultById.getId());
     assertEquals(variableName, ((HistoricVariableUpdate)resultById).getVariableName());
     assertEquals(variableValue, ((HistoricVariableUpdate)resultById).getValue());
+    assertEquals(ProcessEngineVariableType.STRING.getName(), ((HistoricVariableUpdate)resultById).getVariableTypeName());
+    assertEquals(String.class.getSimpleName(), ((HistoricVariableUpdate)resultById).getValueTypeName());
+
+    SerializedVariableValue serializedValue = ((HistoricVariableUpdate)resultById).getSerializedValue();
+    assertNotNull(serializedValue);
+    assertEquals(variableValue, serializedValue.getValue());
+    assertTrue(serializedValue.getConfig().isEmpty());
 
     taskService.deleteTask(newTask.getId(), true);
   }

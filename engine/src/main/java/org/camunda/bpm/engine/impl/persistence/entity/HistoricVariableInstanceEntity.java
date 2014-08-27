@@ -347,5 +347,13 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
     return variableType.getSerializedValue(this);
   }
 
+  public String getValueTypeName() {
+    return variableType.getTypeNameForValue(this);
+  }
+
+  public boolean storesCustomObjects() {
+    return variableType.storesCustomObjects();
+  }
+
 
 }

@@ -30,12 +30,12 @@ public interface VariableType {
   String getTypeName();
 
   /**
-   * <p>Returns the type name (i.e. the simple class name) of the passed value.</p>
+   * <p>Returns the type name (i.e. the simple class name) of the stored value.</p>
    *
    * <p><strong>Note:</strong>For a serializable value only the type name "Serializable"
    * will currently be returned and not the simple class name of the passed value.</p>
    */
-  String getTypeNameForValue(Object value);
+  String getTypeNameForValue(ValueFields valueFields);
   boolean isCachable();
   boolean isAbleToStore(Object value);
   void setValue(Object value, ValueFields valueFields);
@@ -43,5 +43,6 @@ public interface VariableType {
   SerializedVariableValue getSerializedValue(ValueFields valueFields);
   void setValueFromSerialized(Object serializedValue, Map<String, Object> configuration, ValueFields valueFields);
   boolean isAbleToStoreSerializedValue(Object value, Map<String, Object> configuration);
+  boolean storesCustomObjects();
 
 }

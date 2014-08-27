@@ -17,6 +17,7 @@ package org.camunda.bpm.engine.test.examples.variables;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -46,6 +47,8 @@ public class SerializedVariablesTest extends PluggableProcessEngineTestCase {
     .value(true)
     .serializedValue(true)
     .variableTypeName(ProcessEngineVariableType.BOOLEAN.getName())
+    .valueTypeName(Boolean.class.getSimpleName())
+    .storesCustomObjects(false)
     .configuration(new HashMap<String, Object>());
 
   protected static final VariableSpec BYTE_ARRAY_VARIABLE_SPEC = new VariableSpec()
@@ -53,6 +56,8 @@ public class SerializedVariablesTest extends PluggableProcessEngineTestCase {
     .value(byteArray)
     .serializedValue(byteArray)
     .variableTypeName(ProcessEngineVariableType.BYTES.getName())
+    .valueTypeName(byte[].class.getSimpleName())
+    .storesCustomObjects(false)
     .configuration(new HashMap<String, Object>());
 
   protected static final VariableSpec SERIALIZABLE_VARIABLE_SPEC = new VariableSpec()
@@ -60,6 +65,8 @@ public class SerializedVariablesTest extends PluggableProcessEngineTestCase {
     .value(serializable)
     .serializedValue(toExpectedBytes(serializable))
     .variableTypeName(ProcessEngineVariableType.SERIALIZABLE.getName())
+    .valueTypeName(Serializable.class.getSimpleName())
+    .storesCustomObjects(true)
     .configuration(new HashMap<String, Object>());
 
   protected static final VariableSpec DATE_VARIABLE_SPEC = new VariableSpec()
@@ -67,6 +74,8 @@ public class SerializedVariablesTest extends PluggableProcessEngineTestCase {
     .value(new Date(longValue))
     .serializedValue(longValue)
     .variableTypeName(ProcessEngineVariableType.DATE.getName())
+    .valueTypeName(Date.class.getSimpleName())
+    .storesCustomObjects(false)
     .configuration(new HashMap<String, Object>());
 
   protected static final VariableSpec INT_VARIABLE_SPEC = new VariableSpec()
@@ -74,6 +83,8 @@ public class SerializedVariablesTest extends PluggableProcessEngineTestCase {
     .value(42)
     .serializedValue(42)
     .variableTypeName(ProcessEngineVariableType.INTEGER.getName())
+    .valueTypeName(Integer.class.getSimpleName())
+    .storesCustomObjects(false)
     .configuration(new HashMap<String, Object>());
 
   protected static final VariableSpec DOUBLE_VARIABLE_SPEC = new VariableSpec()
@@ -81,6 +92,8 @@ public class SerializedVariablesTest extends PluggableProcessEngineTestCase {
     .value(4.2d)
     .serializedValue(4.2d)
     .variableTypeName(ProcessEngineVariableType.DOUBLE.getName())
+    .valueTypeName(Double.class.getSimpleName())
+    .storesCustomObjects(false)
     .configuration(new HashMap<String, Object>());
 
   protected static final VariableSpec SHORT_VARIABLE_SPEC = new VariableSpec()
@@ -88,6 +101,8 @@ public class SerializedVariablesTest extends PluggableProcessEngineTestCase {
     .value((short) 4)
     .serializedValue((short) 4)
     .variableTypeName(ProcessEngineVariableType.SHORT.getName())
+    .valueTypeName(Short.class.getSimpleName())
+    .storesCustomObjects(false)
     .configuration(new HashMap<String, Object>());
 
   protected static final VariableSpec LONG_VARIABLE_SPEC = new VariableSpec()
@@ -95,6 +110,7 @@ public class SerializedVariablesTest extends PluggableProcessEngineTestCase {
     .value(longValue)
     .serializedValue(longValue)
     .variableTypeName(ProcessEngineVariableType.LONG.getName())
+    .valueTypeName(Long.class.getSimpleName())
     .configuration(new HashMap<String, Object>());
 
   protected static final VariableSpec NULL_VARIABLE_SPEC = new VariableSpec()
@@ -102,6 +118,8 @@ public class SerializedVariablesTest extends PluggableProcessEngineTestCase {
     .value(null)
     .serializedValue(null)
     .variableTypeName(ProcessEngineVariableType.NULL.getName())
+    .valueTypeName("Null")
+    .storesCustomObjects(false)
     .configuration(new HashMap<String, Object>());
 
   protected static final VariableSpec STRING_VARIABLE_SPEC = new VariableSpec()
@@ -109,6 +127,8 @@ public class SerializedVariablesTest extends PluggableProcessEngineTestCase {
     .value("a String value")
     .serializedValue("a String value")
     .variableTypeName(ProcessEngineVariableType.STRING.getName())
+    .valueTypeName(String.class.getSimpleName())
+    .storesCustomObjects(false)
     .configuration(new HashMap<String, Object>());
 
   @Deployment(resources= ONE_TASK_PROCESS)
@@ -401,6 +421,8 @@ public class SerializedVariablesTest extends PluggableProcessEngineTestCase {
     assertEquals(variableSpec.getName(), variableInstance.getName());
     assertEquals(variableSpec.getValue(), variableInstance.getValue());
     assertEquals(variableSpec.getVariableTypeName(), variableInstance.getTypeName());
+    assertEquals(variableSpec.getValueTypeName(), variableInstance.getValueTypeName());
+    assertEquals(variableSpec.getStoresCustomObjects(), variableInstance.storesCustomObjects());
 
     SerializedVariableValue serializedValue = variableInstance.getSerializedValue();
 

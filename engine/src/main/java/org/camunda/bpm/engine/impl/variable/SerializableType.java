@@ -110,8 +110,8 @@ public class SerializableType extends ByteArrayType {
     return value instanceof Serializable;
   }
 
-  public String getTypeNameForValue(Object value) {
-    return "Serializable";
+  public String getTypeNameForValue(ValueFields valueFields) {
+    return Serializable.class.getSimpleName();
   }
 
   public SerializedVariableValue getSerializedValue(ValueFields valueFields) {
@@ -126,6 +126,10 @@ public class SerializableType extends ByteArrayType {
 
   public boolean isAbleToStoreSerializedValue(Object value, Map<String, Object> configuration) {
     return super.isAbleToStoreSerializedValue(value, configuration);
+  }
+
+  public boolean storesCustomObjects() {
+    return true;
   }
 
   protected static class ClassloaderAwareObjectInputStream extends ObjectInputStream {

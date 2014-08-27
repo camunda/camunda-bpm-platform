@@ -78,6 +78,10 @@ public class HistoricDetailVariableInstanceUpdateEntity extends HistoricVariable
     return (variableType!=null ? variableType.getTypeName() : null);
   }
 
+  public String getValueTypeName() {
+    return (variableType != null ? variableType.getTypeNameForValue(this) : null);
+  }
+
   public String getErrorMessage() {
     return errorMessage;
   }
@@ -193,6 +197,10 @@ public class HistoricDetailVariableInstanceUpdateEntity extends HistoricVariable
            + ", taskId=" + taskId
            + ", timestamp=" + timestamp
            + "]";
+  }
+
+  public boolean storesCustomObjects() {
+    return variableType.storesCustomObjects();
   }
 
 }

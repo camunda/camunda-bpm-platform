@@ -2,9 +2,10 @@ package org.camunda.bpm.engine.rest.history;
 
 import static com.jayway.restassured.RestAssured.expect;
 import static com.jayway.restassured.RestAssured.given;
-import static com.jayway.restassured.path.json.JsonPath.from;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -19,18 +20,19 @@ import java.util.Map;
 import javax.ws.rs.core.Response.Status;
 import javax.xml.registry.InvalidRequestException;
 
+import org.camunda.bpm.engine.delegate.ProcessEngineVariableType;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.history.HistoricVariableInstanceQuery;
 import org.camunda.bpm.engine.rest.AbstractRestServiceTest;
+import org.camunda.bpm.engine.rest.helper.MockHistoricVariableInstanceBuilder;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
-import org.junit.Assert;
+import org.camunda.bpm.engine.rest.helper.MockSerializedValueBuilder;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InOrder;
 import org.mockito.Mockito;
 
 import com.jayway.restassured.http.ContentType;
-import com.jayway.restassured.response.Response;
 
 public abstract class AbstractHistoricVariableInstanceRestServiceQueryTest extends AbstractRestServiceTest {
 
@@ -39,10 +41,18 @@ public abstract class AbstractHistoricVariableInstanceRestServiceQueryTest exten
   protected static final String HISTORIC_VARIABLE_INSTANCE_COUNT_RESOURCE_URL = HISTORIC_VARIABLE_INSTANCE_RESOURCE_URL + "/count";
 
   protected HistoricVariableInstanceQuery mockedQuery;
+  protected HistoricVariableInstance mockInstance;
+  protected MockHistoricVariableInstanceBuilder mockInstanceBuilder;
 
   @Before
   public void setUpRuntimeData() {
-    mockedQuery = setUpMockHistoricVariableInstanceQuery(MockProvider.createMockHistoricVariableInstances());
+    mockInstanceBuilder = MockProvider.mockHistoricVariableInstance();
+    mockInstance = mockInstanceBuilder.build();
+
+    List<HistoricVariableInstance> mocks = new ArrayList<HistoricVariableInstance>();
+    mocks.add(mockInstance);
+
+    mockedQuery = setUpMockHistoricVariableInstanceQuery(mocks);
   }
 
   private HistoricVariableInstanceQuery setUpMockHistoricVariableInstanceQuery(List<HistoricVariableInstance> mockedHistoricVariableInstances) {
@@ -245,34 +255,86 @@ public abstract class AbstractHistoricVariableInstanceRestServiceQueryTest exten
   public void testSimpleHistoricVariableQuery() {
     String processInstanceId = MockProvider.EXAMPLE_PROCESS_INSTANCE_ID;
 
-    Response response = given()
+    given()
         .queryParam("processInstanceId", processInstanceId)
       .then()
         .expect()
           .statusCode(Status.OK.getStatusCode())
+        .and()
+          .body("size()", is(1))
+          .body("[0].id", equalTo(mockInstanceBuilder.getId()))
+          .body("[0].name", equalTo(mockInstanceBuilder.getName()))
+          .body("[0].type", equalTo(mockInstanceBuilder.getValueTypeName()))
+          .body("[0].value", equalTo(mockInstanceBuilder.getValue()))
+          .body("[0].processInstanceId", equalTo(mockInstanceBuilder.getProcessInstanceId()))
+          .body("[0].errorMessage", equalTo(mockInstanceBuilder.getErrorMessage()))
+          .body("[0].activityInstanceId", equalTo(mockInstanceBuilder.getActivityInstanceId()))
+          .body("[0].serializedValue", nullValue())
       .when()
         .get(HISTORIC_VARIABLE_INSTANCE_RESOURCE_URL);
 
     InOrder inOrder = inOrder(mockedQuery);
     inOrder.verify(mockedQuery).processInstanceId(processInstanceId);
     inOrder.verify(mockedQuery).list();
+  }
 
-    String content = response.asString();
-    List<String> instances = from(content).getList("");
-    Assert.assertEquals("There should be one variable instance returned.", 1, instances.size());
-    Assert.assertNotNull("The returned variable instance should not be null.", instances.get(0));
+  @Test
+  public void testSerializableVariableInstanceRetrieval() {
+    MockSerializedValueBuilder serializedValueBuilder =
+        new MockSerializedValueBuilder()
+          .value(MockProvider.EXAMPLE_VARIABLE_INSTANCE_BYTE);
 
-    String returnedVariableName = from(content).getString("[0].name");
-    String returnedVariableValue = from(content).getString("[0].value");
-    String returnedVariableType = from(content).getString("[0].type");
-    String returnedProcessInstanceId = from(content).getString("[0].processInstanceId");
-    String returnedActivityInstanceId = from(content).getString("[0].activityInstanceId");
+    MockHistoricVariableInstanceBuilder builder = MockProvider.mockHistoricVariableInstance()
+        .storesCustomObjects(true)
+        .typeName(ProcessEngineVariableType.SERIALIZABLE.getName())
+        .valueTypeName("Serializable")
+        .serializedValue(serializedValueBuilder);
 
-    Assert.assertEquals(MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME, returnedVariableName);
-    Assert.assertEquals(MockProvider.EXAMPLE_VARIABLE_INSTANCE_VALUE, returnedVariableValue);
-    Assert.assertEquals(MockProvider.EXAMPLE_VARIABLE_INSTANCE_TYPE, returnedVariableType);
-    Assert.assertEquals(MockProvider.EXAMPLE_VARIABLE_INSTANCE_PROC_INST_ID, returnedProcessInstanceId);
-    Assert.assertEquals(MockProvider.EXAMPLE_VARIABLE_INSTANCE_ACTIVITY_INSTANCE_ID, returnedActivityInstanceId);
+    List<HistoricVariableInstance> mockInstances = new ArrayList<HistoricVariableInstance>();
+    mockInstances.add(builder.build());
+
+    mockedQuery = setUpMockHistoricVariableInstanceQuery(mockInstances);
+
+    given()
+        .then().expect().statusCode(Status.OK.getStatusCode())
+        .and()
+          .body("[0].type", equalTo("Serializable"))
+          .body("[0].value", nullValue())
+          .body("[0].serializedValue", nullValue())
+        .when().get(HISTORIC_VARIABLE_INSTANCE_RESOURCE_URL);
+  }
+
+  @Test
+  public void testSpinVariableInstanceRetrieval() {
+    MockSerializedValueBuilder serializedValueBuilder =
+        new MockSerializedValueBuilder()
+          .value("aSpinSerializedValue")
+          .configuration(ProcessEngineVariableType.SPIN_TYPE_CONFIG_ROOT_TYPE, "aRootType")
+          .configuration(ProcessEngineVariableType.SPIN_TYPE_DATA_FORMAT_ID, "aDataFormat");
+
+    MockHistoricVariableInstanceBuilder builder = MockProvider.mockHistoricVariableInstance()
+        .storesCustomObjects(true)
+        .typeName(ProcessEngineVariableType.SPIN.getName())
+        .valueTypeName("Object")
+        .serializedValue(serializedValueBuilder);
+
+    List<HistoricVariableInstance> mockInstances = new ArrayList<HistoricVariableInstance>();
+    mockInstances.add(builder.build());
+
+    mockedQuery = setUpMockHistoricVariableInstanceQuery(mockInstances);
+
+    given()
+        .then().expect().statusCode(Status.OK.getStatusCode())
+        .and()
+          .body("size()", is(1))
+          .body("[0].type", equalTo("Object"))
+          .body("[0].value", nullValue())
+          .body("[0].serializedValue.value", equalTo("aSpinSerializedValue"))
+          .body("[0].serializedValue.configuration." + ProcessEngineVariableType.SPIN_TYPE_CONFIG_ROOT_TYPE,
+              equalTo("aRootType"))
+          .body("[0].serializedValue.configuration." + ProcessEngineVariableType.SPIN_TYPE_DATA_FORMAT_ID,
+              equalTo("aDataFormat"))
+        .when().get(HISTORIC_VARIABLE_INSTANCE_RESOURCE_URL);
   }
 
   @Test
@@ -313,33 +375,22 @@ public abstract class AbstractHistoricVariableInstanceRestServiceQueryTest exten
     String variableName = MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME;
     String variableValue = MockProvider.EXAMPLE_VARIABLE_INSTANCE_VALUE;
 
-    Response response = given()
+    given()
         .queryParam("variableName", variableName)
         .queryParam("variableValue", variableValue)
       .then()
         .expect()
           .statusCode(Status.OK.getStatusCode())
+        .and()
+          .body("size()", is(1))
+          .body("[0].name", equalTo(MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME))
+          .body("[0].value", equalTo(MockProvider.EXAMPLE_VARIABLE_INSTANCE_VALUE))
         .when()
           .get(HISTORIC_VARIABLE_INSTANCE_RESOURCE_URL);
 
     InOrder inOrder = inOrder(mockedQuery);
     inOrder.verify(mockedQuery).variableValueEquals(variableName, variableValue);
     inOrder.verify(mockedQuery).list();
-
-    String content = response.asString();
-    List<String> instances = from(content).getList("");
-    Assert.assertEquals("There should be one variable instance returned.", 1, instances.size());
-    Assert.assertNotNull("The returned variable instance should not be null.", instances.get(0));
-
-    String returnedVariableName = from(content).getString("[0].name");
-    String returnedVariableValue = from(content).getString("[0].value");
-    String returnedVariableType = from(content).getString("[0].type");
-    String returnedProcessInstanceId = from(content).getString("[0].processInstanceId");
-
-    Assert.assertEquals(MockProvider.EXAMPLE_VARIABLE_INSTANCE_PROC_INST_ID, returnedProcessInstanceId);
-    Assert.assertEquals(MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME, returnedVariableName);
-    Assert.assertEquals(MockProvider.EXAMPLE_VARIABLE_INSTANCE_VALUE, returnedVariableValue);
-    Assert.assertEquals(MockProvider.EXAMPLE_VARIABLE_INSTANCE_TYPE, returnedVariableType);
   }
 
   @Test

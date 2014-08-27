@@ -287,7 +287,7 @@ public abstract class AbstractProcessEngineRestServiceTest extends
 
   private void createHistoricVariableInstanceMock() {
     List<HistoricVariableInstance> variables = new ArrayList<HistoricVariableInstance>();
-    HistoricVariableInstance mockInstance = MockProvider.createMockHistoricVariableInstance();
+    HistoricVariableInstance mockInstance = MockProvider.mockHistoricVariableInstance().build();
     variables.add(mockInstance);
 
     HistoricVariableInstanceQuery mockHistoricVariableInstanceQuery = mock(HistoricVariableInstanceQuery.class);

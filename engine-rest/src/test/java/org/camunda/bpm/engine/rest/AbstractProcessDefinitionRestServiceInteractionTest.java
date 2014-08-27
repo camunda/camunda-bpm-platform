@@ -558,7 +558,7 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
         .statusCode(Status.OK.getStatusCode()).contentType(ContentType.JSON)
         .body(MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME+".id", equalTo(MockProvider.EXAMPLE_VARIABLE_INSTANCE_ID))
         .body(MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME+".name", equalTo(MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME))
-        .body(MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME+".type", equalTo(MockProvider.EXAMPLE_VARIABLE_INSTANCE_TYPE))
+        .body(MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME+".type", equalTo(MockProvider.STRING_VARIABLE_INSTANCE_TYPE))
       .when().get(START_FORM_VARIABLES_URL)
       .body();
 

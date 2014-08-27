@@ -14,9 +14,7 @@ package org.camunda.bpm.engine.rest.dto.history;
 
 import org.camunda.bpm.engine.delegate.ProcessEngineVariableType;
 import org.camunda.bpm.engine.history.HistoricVariableUpdate;
-import org.camunda.bpm.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity;
-import org.camunda.bpm.engine.impl.variable.SerializableType;
-import org.camunda.bpm.engine.rest.dto.runtime.SerializedObjectDto;
+import org.camunda.bpm.engine.rest.dto.runtime.SerializedValueDto;
 
 /**
  * @author Roman Smirnov
@@ -29,6 +27,7 @@ public class HistoricVariableUpdateDto extends HistoricDetailDto {
   protected Object value;
   protected int revision;
   protected String errorMessage;
+  protected SerializedValueDto serializedValue;
 
   public String getVariableName() {
     return variableName;
@@ -50,24 +49,28 @@ public class HistoricVariableUpdateDto extends HistoricDetailDto {
     return errorMessage;
   }
 
-  public static HistoricVariableUpdateDto fromHistoricVariableUpdate(HistoricVariableUpdate historicVariableUpdate) {
+  public SerializedValueDto getSerializedValue() {
+    return serializedValue;
+  }
 
-    HistoricDetailVariableInstanceUpdateEntity entity = (HistoricDetailVariableInstanceUpdateEntity) historicVariableUpdate;
+  public static HistoricVariableUpdateDto fromHistoricVariableUpdate(HistoricVariableUpdate historicVariableUpdate) {
 
     HistoricVariableUpdateDto dto = new HistoricVariableUpdateDto();
 
-    dto.revision = entity.getRevision();
-    dto.variableName = entity.getVariableName();
-    dto.variableTypeName = entity.getVariableTypeName();
-    if(ProcessEngineVariableType.SERIALIZABLE.getName().equals(entity.getVariableType().getTypeName())) {
-      if(entity.getValue() != null) {
-        dto.value = new SerializedObjectDto(entity.getValue());
+    dto.revision = historicVariableUpdate.getRevision();
+    dto.variableName = historicVariableUpdate.getVariableName();
+    dto.variableTypeName = historicVariableUpdate.getVariableTypeName();
+
+    if(historicVariableUpdate.storesCustomObjects()) {
+      if (!ProcessEngineVariableType.SERIALIZABLE.getName().equals(historicVariableUpdate.getVariableTypeName())) {
+        dto.serializedValue = SerializedValueDto.fromSerializedVariableValue(historicVariableUpdate.getSerializedValue());
       }
     } else {
-      dto.value = entity.getValue();
+      dto.value = historicVariableUpdate.getValue();
+      dto.errorMessage = historicVariableUpdate.getErrorMessage();
     }
-    dto.variableTypeName = entity.getVariableType().getTypeNameForValue(entity.getValue());
-    dto.errorMessage = entity.getErrorMessage();
+
+    dto.variableTypeName = historicVariableUpdate.getValueTypeName();
 
     return dto;
   }
