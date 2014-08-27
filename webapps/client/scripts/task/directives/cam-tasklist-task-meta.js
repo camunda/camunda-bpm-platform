@@ -81,14 +81,16 @@ define([
 
 
         scope.userIsAssignee = function() {
-          return $rootScope.authentication.name &&
-                 ($rootScope.authentication.name === scope.task.assignee);
+          return $rootScope.authentication &&
+                  $rootScope.authentication.name &&
+                  ($rootScope.authentication.name === scope.task.assignee);
         };
 
 
         scope.userIsOwner = function() {
-          return $rootScope.authentication.name &&
-                 ($rootScope.authentication.name === scope.task.owner);
+          return $rootScope.authentication &&
+                  $rootScope.authentication.name &&
+                  ($rootScope.authentication.name === scope.task.owner);
         };
 
 
