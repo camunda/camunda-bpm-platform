@@ -45,7 +45,7 @@ define([
             if (urlTaskId && urlTaskId === $rootScope.currentTask.id) {
               scope.task = $rootScope.currentTask;
             }
-            else {
+            else if (urlTaskId) {
               loadTask(urlTaskId);
             }
           }
