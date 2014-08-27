@@ -14,6 +14,8 @@
 package org.camunda.commons.utils;
 
 import java.io.*;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.charset.Charset;
 
 /**
@@ -32,7 +34,7 @@ public final class IoUtil {
     ByteArrayOutputStream os = new ByteArrayOutputStream();
     try {
       byte[] buffer = new byte[16 * 1024];
-      int read = 0;
+      int read;
       while((read = inputStream.read(buffer)) > 0) {
         os.write(buffer, 0, read);
       }
@@ -70,4 +72,95 @@ public final class IoUtil {
     }
   }
 
+  /**
+   * Returns the content of a file with specified filename
+   *
+   * @param filename name of the file to load
+   * @return Content of the file as {@link String}
+   */
+  public static String fileAsString(String filename) {
+    File classpathFile = getClasspathFile(filename);
+    return fileAsString(classpathFile);
+  }
+
+  /**
+   * Returns the content of a {@link File}.
+   *
+   * @param file the file to load
+   * @return Content of the file as {@link String}
+   */
+  public static String fileAsString(File file) {
+    try {
+      return inputStreamAsString(new FileInputStream(file));
+    } catch(FileNotFoundException e) {
+      throw LOG.fileNotFoundException(file.getAbsolutePath(), e);
+    }
+  }
+
+  /**
+   * Returns the input stream of a file with specified filename
+   *
+   * @param filename the name of a {@link File} to load
+   * @return the file content as input stream
+   * @throws IoUtilException if the file cannot be loaded
+   */
+  public static InputStream fileAsStream(String filename) {
+    File classpathFile = getClasspathFile(filename);
+    return fileAsStream(classpathFile);
+  }
+
+  /**
+   * Returns the input stream of a file.
+   *
+   * @param file the {@link File} to load
+   * @return the file content as input stream
+   * @throws IoUtilException if the file cannot be loaded
+   */
+  public static InputStream fileAsStream(File file) {
+    try {
+      return new BufferedInputStream(new FileInputStream(file));
+    } catch(FileNotFoundException e) {
+      throw LOG.fileNotFoundException(file.getAbsolutePath(), e);
+    }
+  }
+
+  /**
+   * Returns the {@link File} for a filename.
+   *
+   * @param filename the filename to load
+   * @return the file object
+   */
+  public static File getClasspathFile(String filename) {
+    if(filename == null) {
+      throw LOG.nullParameter("filename");
+    }
+
+    return getClasspathFile(filename, IoUtil.class.getClassLoader());
+  }
+
+  /**
+   * Returns the {@link File} for a filename.
+   *
+   * @param filename the filename to load
+   * @param classLoader the classLoader to load file with
+   * @return the file object
+   * @throws IoUtilException if the file cannot be loaded
+   */
+  public static File getClasspathFile(String filename, ClassLoader classLoader) {
+    if(filename == null) {
+      throw LOG.nullParameter("filename");
+    }
+
+    URL fileUrl = classLoader.getResource(filename);
+
+    if(fileUrl == null) {
+      throw LOG.fileNotFoundException(filename);
+    }
+
+    try {
+      return new File(fileUrl.toURI());
+    } catch(URISyntaxException e) {
+      throw LOG.fileNotFoundException(filename, e);
+    }
+  }
 }

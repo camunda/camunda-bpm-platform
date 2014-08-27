@@ -15,20 +15,95 @@ package org.camunda.commons.utils;
 
 import org.junit.Test;
 
+import java.io.BufferedReader;
+import java.io.File;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 
 /**
  * @author Sebastian Menski
  */
 public class IoUtilTest {
 
+  public final static String TEST_FILE_NAME = "org/camunda/commons/utils/testFile.txt";
+
   @Test
   public void shouldTransformBetweenInputStreamAndString() {
     InputStream inputStream = IoUtil.stringAsInputStream("test");
     String string = IoUtil.inputStreamAsString(inputStream);
     assertThat(string).isEqualTo("test");
+  }
+
+  @Test
+  public void getFileContentAsString() {
+    assertThat(IoUtil.fileAsString(TEST_FILE_NAME)).isEqualTo("This is a Test!");
+  }
+
+  @Test
+  public void shouldFailGetFileContentAsStringWithGarbageAsFilename() {
+    try {
+      IoUtil.fileAsString("asd123");
+      fail("Expected: IoUtilException");
+    } catch (IoUtilException e) {
+      // happy way
+    }
+  }
+
+  @Test
+  public void getFileContentAsStream() {
+    InputStream stream = IoUtil.fileAsStream(TEST_FILE_NAME);
+    BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
+    StringBuilder output = new StringBuilder();
+    String line;
+    try {
+      while((line = reader.readLine()) != null) {
+        output.append(line);
+      }
+      assertThat(output.toString()).isEqualTo("This is a Test!");
+    } catch(Exception e) {
+      fail("Something went wrong while reading the input stream");
+    }
+  }
+
+  @Test
+  public void shouldFailGetFileContentAsStreamWithGarbageAsFilename() {
+    try {
+      IoUtil.fileAsStream("asd123");
+      fail("Expected: IoUtilException");
+    } catch(IoUtilException e) {
+      // happy path
+    }
+  }
+
+  @Test
+  public void getFileFromClassPath() {
+    File file = IoUtil.getClasspathFile(TEST_FILE_NAME);
+
+    assertThat(file).isNotNull();
+    assertThat(file.getName()).isEqualTo("testFile.txt");
+  }
+
+  @Test
+  public void shouldFailGetFileFromClassPathWithGarbage() {
+    try {
+      IoUtil.getClasspathFile("asd123");
+      fail("Expected: IoUtilException");
+    } catch(IoUtilException e) {
+      // happy way
+    }
+  }
+
+  @Test
+  public void shouldFailGetFileFromClassPathWithNull() {
+    try {
+      IoUtil.getClasspathFile(null);
+      fail("Expected: IoUtilException");
+    } catch(IoUtilException e) {
+      // happy way
+    }
   }
 
 }

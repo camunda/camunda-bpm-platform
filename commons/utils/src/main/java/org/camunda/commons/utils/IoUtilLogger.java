@@ -24,4 +24,15 @@ public class IoUtilLogger extends UtilsLogger {
     return new IoUtilException(exceptionMessage("001", "Unable to read input stream"), cause);
   }
 
+  public IoUtilException fileNotFoundException(String filename, Exception cause) {
+    return new IoUtilException(exceptionMessage("002", "Unable to find file with path '{}'", filename), cause);
+  }
+
+  public IoUtilException fileNotFoundException(String filename) {
+    return fileNotFoundException(filename, null);
+  }
+
+  public IoUtilException nullParameter(String parameter) {
+    return new IoUtilException(exceptionMessage("003", "Parameter '{}' can not be null", parameter));
+  }
 }
