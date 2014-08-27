@@ -26,6 +26,11 @@ module.exports = Page.extend({
 
     item.click();
     return item;
+  },
+
+  navigateLogout: function() {
+    browser.get(this.url +'logout');
+    expect(element(by.css('.modal.user-login')).isDisplayed()).toBe(true);
   }
 
 });
