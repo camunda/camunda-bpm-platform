@@ -30,6 +30,7 @@ Page.extend = function(data) {
 /*prototype functionality*/
 Page.prototype.navigateTo = function(params) {
   browser.get(injectParams(this.url, params));
+  browser.driver.manage().window().maximize();
 };
 
 Page.prototype.isActive = function(params) {
@@ -69,7 +70,11 @@ Page.prototype.logout = function() {
 };
 
 Page.prototype.loggedInUser = function() {
-  return element(by.css('.navbar [sem-show-user-actions]')).getText();
+  if (/tasklist/.test(this.url)) {
+    return element(by.css('[tooltip="Manage your account"]')).getText();
+  } else {
+    return element(by.css('.navbar [sem-show-user-actions]')).getText();
+  }
 };
 
 Page.prototype.switchWebapp = function(appName) {

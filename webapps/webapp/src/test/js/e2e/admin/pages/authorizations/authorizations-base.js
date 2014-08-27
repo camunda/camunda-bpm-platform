@@ -31,7 +31,7 @@ module.exports = Page.extend({
   },
 
   createNewButton: function() {
-    return groupsSection.element(by.css('[ng-click="toggleCreateNewForm()"]'));
+    return element(by.css('[ng-hide="isCreateNewAuthorization"]')).element(by.css('[ng-click="toggleCreateNewForm()"]'));
   }
 
 });
