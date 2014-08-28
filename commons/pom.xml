@@ -11,7 +11,7 @@
 
   <groupId>org.camunda.commons</groupId>
   <artifactId>camunda-commons-root</artifactId>
-  <version>1.0.3</version>
+  <version>1.0.4-SNAPSHOT</version>
   <name>camunda Commons - Root Pom</name>
   <packaging>pom</packaging>
 
@@ -99,7 +99,7 @@
     <url>https://github.com/camunda/camunda-commons</url>
     <connection>scm:git:git@github.com:camunda/camunda-commons.git</connection>
     <developerConnection>scm:git:git@github.com:camunda/camunda-commons.git</developerConnection>
-    <tag>1.0.3</tag>
+    <tag>HEAD</tag>
   </scm>
 
 </project>
