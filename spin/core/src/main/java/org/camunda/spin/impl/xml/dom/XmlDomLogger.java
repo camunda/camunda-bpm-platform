@@ -135,7 +135,7 @@ public class XmlDomLogger extends SpinLogger {
   }
 
   public SpinXmlDataFormatException unableToMapInput(Object parameter, Throwable cause) {
-    return new SpinXmlDataFormatException(exceptionMessage("027", "Unable to map object '{}' to xml element"), cause);
+    return new SpinXmlDataFormatException(exceptionMessage("027", "Unable to map object '{}' to xml element", parameter.toString()), cause);
   }
 
   public SpinXmlDataFormatException unableToDeserialize(Object node, String canonicalClassName, Throwable cause) {

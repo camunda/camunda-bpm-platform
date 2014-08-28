@@ -12,13 +12,14 @@
  */
 package org.camunda.spin.logging;
 
-import java.io.IOException;
 import org.camunda.spin.SpinFileNotFoundException;
 import org.camunda.spin.SpinRuntimeException;
 import org.camunda.spin.SpinScriptException;
 import org.camunda.spin.spi.SpinDataFormatException;
 import org.camunda.spin.xml.tree.SpinXmlTreeElement;
 import org.camunda.spin.xml.tree.SpinXmlTreeElementException;
+
+import java.io.IOException;
 
 
 /**
@@ -30,20 +31,12 @@ import org.camunda.spin.xml.tree.SpinXmlTreeElementException;
  */
 public class SpinCoreLogger extends SpinLogger {
 
-  public IllegalArgumentException parameterIsNullException(String parameterName) {
-    return new IllegalArgumentException(exceptionMessage("001", "Parameter '{}' is null", parameterName));
-  }
-
-  public SpinRuntimeException unableToInstantiateClass(String className, Exception cause) {
-    return new SpinRuntimeException(exceptionMessage("002", "Unable to instantiate class '{}'", className), cause);
-  }
-
   public IllegalArgumentException unsupportedInputParameter(Class<?> parameterClass) {
-    return new IllegalArgumentException(exceptionMessage("003", "Unsupported input of type '{}'", parameterClass.getName()));
+    return new IllegalArgumentException(exceptionMessage("001", "Unsupported input of type '{}'", parameterClass.getName()));
   }
 
   public SpinFileNotFoundException fileNotFoundException(String filename, Throwable cause) {
-    return new SpinFileNotFoundException(exceptionMessage("004", "Unable to find file with path '{}'", filename), cause);
+    return new SpinFileNotFoundException(exceptionMessage("002", "Unable to find file with path '{}'", filename), cause);
   }
 
   public SpinFileNotFoundException fileNotFoundException(String filename) {
@@ -51,42 +44,26 @@ public class SpinCoreLogger extends SpinLogger {
   }
 
   public SpinRuntimeException unableToReadInputStream(Exception e) {
-    return new SpinRuntimeException(exceptionMessage("006", "Unable to read input stream"), e);
-  }
-
-  public SpinDataFormatException wrongDataFormatException(String requestedDataFormat, String givenDataFormat) {
-    return new SpinDataFormatException(exceptionMessage("007", "Wrong data format: requested '{}', given '{}'", requestedDataFormat, givenDataFormat));
-  }
-
-  public SpinDataFormatException unknownDataFormatException(String givenDataFormat) {
-    return new SpinDataFormatException(exceptionMessage("008", "Unknown data format: given '{}'", givenDataFormat));
+    return new SpinRuntimeException(exceptionMessage("003", "Unable to read input stream"), e);
   }
 
   public SpinDataFormatException unrecognizableDataFormatException() {
-    return new SpinDataFormatException(exceptionMessage("009", "No matching data format detected"));
+    return new SpinDataFormatException(exceptionMessage("004", "No matching data format detected"));
   }
 
   public SpinXmlTreeElementException elementIsNotChildOfThisElement(SpinXmlTreeElement existingChildElement, SpinXmlTreeElement parentDomElement) {
-    return new SpinXmlTreeElementException(exceptionMessage("010", "The element with namespace '{}' and name '{}' " +
+    return new SpinXmlTreeElementException(exceptionMessage("005", "The element with namespace '{}' and name '{}' " +
         "is not a child element of the element with namespace '{}' and name '{}'",
       existingChildElement.namespace(), existingChildElement.name(),
       parentDomElement.namespace(), parentDomElement.name()
     ));
   }
 
-  public IllegalArgumentException unsupportedParameterType(String parameterName, Object param, Class<?> expectedType) {
-    return new IllegalArgumentException(exceptionMessage("011", "Unsupported parameter '{}' of type '{}'. Expected type '{}'.", parameterName, param.getClass(), expectedType.getName()));
-  }
-
   public SpinScriptException noScriptEnvFoundForLanguage(String scriptLanguage, String path) {
-    return new SpinScriptException(exceptionMessage("012", "No script script env found for script language '{}' at path '{}'", scriptLanguage, path));
+    return new SpinScriptException(exceptionMessage("006", "No script script env found for script language '{}' at path '{}'", scriptLanguage, path));
   }
 
   public IOException unableToRewindInputStream() {
-    return new IOException(exceptionMessage("013", "Unable to rewind input stream: rewind buffering limit exceeded"));
-  }
-
-  public UnsupportedOperationException methodNotImplement(String methodName) {
-    return new UnsupportedOperationException(exceptionMessage("014", "Method '{}' not implemented", methodName));
+    return new IOException(exceptionMessage("007", "Unable to rewind input stream: rewind buffering limit exceeded"));
   }
 }
