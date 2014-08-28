@@ -23,5 +23,5 @@ public class UtilsLogger extends BaseLogger {
   public final static String PROJECT_CODE = "UTILS";
 
   public final static IoUtilLogger IO_UTIL_LOGGER = BaseLogger.createLogger(IoUtilLogger.class, PROJECT_CODE, "org.camunda.commons.utils.io", "01");
-
+  public final static EnsureUtilLogger ENSURE_UTIL_LOGGER = BaseLogger.createLogger(EnsureUtilLogger.class, PROJECT_CODE, "org.camunda.commons.utils.ensure", "02");
 }
