@@ -1,6 +1,9 @@
 'use strict';
 
 var dashboardPage = require('../pages/dashboard');
+var cockpitPage = require('../../cockpit/pages/dashboard');
+var cockpitProcessDefinitionPage = require('../../cockpit/pages/process-definition');
+var cockpitProcessInstancePage = require('../../cockpit/pages/process-instance');
 
 describe('tasklist dashboard - ', function() {
 
@@ -14,6 +17,38 @@ describe('tasklist dashboard - ', function() {
 
       // then
       dashboardPage.isActive();
+    });
+
+  });
+
+
+  describe("claim and unclaim", function () {
+
+    it("should claim a task", function () {
+
+      // given
+      dashboardPage.filter.selectFilter(0);
+
+      // when
+      var taskName = dashboardPage.tasks.taskTitle(0);
+      dashboardPage.tasks.selectTask(0);
+      dashboardPage.task.claim();
+      dashboardPage.filter.selectFilter(1);
+
+      // then
+      expect(dashboardPage.tasks.taskList().count()).toBe(2);
+      expect(dashboardPage.tasks.taskTitle(1)).toEqual(taskName);
+    });
+
+
+    it("schould unclaim a task", function () {
+
+      // when
+      dashboardPage.tasks.selectTask(1);
+      dashboardPage.task.unclaim();
+
+      // then
+      expect(dashboardPage.tasks.taskList().count()).toBe(1);
     });
 
   });
@@ -73,25 +108,16 @@ describe('tasklist dashboard - ', function() {
       expect(dashboardPage.tasks.taskList().count()).toBe(2);
     });
 
-
   });
 
 
-  xdescribe('tasks', function() {
 
-    it('should open my tasks', function() {
-
-      // when
-      dashboardPage.filter.selectFilter(1);
-
-      // then
-      expect(dashboardPage.tasks.taskList().count()).toBe(1);
-    });
-
+  describe('work on task', function() {
 
     it('should select a task', function() {
 
       // when
+      dashboardPage.filter.selectFilter(1);
       dashboardPage.tasks.selectTask(0);
 
       // then
@@ -114,10 +140,14 @@ describe('tasklist dashboard - ', function() {
   });
 
 
-  xdescribe('end test', function() {
+  describe('end test', function() {
 
     it('should logout', function() {
 
+      cockpitPage.navigateTo();
+      cockpitPage.deployedProcessesList.selectProcess(12);
+      cockpitProcessDefinitionPage.table.processInstancesTab.selectProcessInstance(0);
+      cockpitProcessInstancePage.actionButton.cancelInstance();
 
     });
 
