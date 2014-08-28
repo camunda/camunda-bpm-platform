@@ -26,6 +26,7 @@ import org.camunda.bpm.container.impl.jboss.util.ProcessesXmlWrapper;
 import org.camunda.bpm.container.impl.metadata.PropertyHelper;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.util.IoUtil;
+import org.camunda.bpm.engine.impl.util.StringUtil;
 import org.jboss.as.ee.component.ComponentDescription;
 import org.jboss.as.ee.component.ComponentView;
 import org.jboss.as.ee.component.ViewDescription;
@@ -212,8 +213,9 @@ public class ProcessApplicationDeploymentProcessor implements DeploymentUnitProc
       final VfsProcessApplicationScanner scanner = new VfsProcessApplicationScanner();
 
       String resourceRootPath = processArchive.getProperties().get(ProcessArchiveXml.PROP_RESOURCE_ROOT_PATH);
+      String[] additionalResourceSuffixes = StringUtil.split(processArchive.getProperties().get(ProcessArchiveXml.PROP_ADDITIONAL_RESOURCE_SUFFIXES), ProcessArchiveXml.PROP_ADDITIONAL_RESOURCE_SUFFIXES_SEPARATOR);
       URL processesXmlUrl = vfsFileAsUrl(processesXmlFile);
-      resources.putAll(scanner.findResources(classLoader, resourceRootPath, processesXmlUrl));
+      resources.putAll(scanner.findResources(classLoader, resourceRootPath, processesXmlUrl, additionalResourceSuffixes));
     }
 
     return resources;

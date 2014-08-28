@@ -1,5 +1,5 @@
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
-  targetNamespace="urn:org.camunda.bpm.wildfly:1.1"
+  targetNamespace="urn:org.camunda.bpm.jboss:1.1"
   xmlns="urn:org.camunda.bpm.jboss:1.1"
   elementFormDefault="qualified"
   attributeFormDefault="unqualified"
