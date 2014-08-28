@@ -6,6 +6,7 @@ var TasksPage = require('./tasks');
 var TaskPage = require('./task');
 var FilterPage = require('./filter');
 var InvoiceStartFormPage = require('./invoice-start-form');
+var GenericStartFormPage = require('./generic-start-form');
 var AuthenticationPage = require('../../../commons/pages/authentication');
 
 module.exports = new DashboardPage();
@@ -15,4 +16,5 @@ module.exports.task = new TaskPage();
 module.exports.task.invoiceStartForm = new InvoiceStartFormPage();
 module.exports.startProcess = new StartProcessPage();
 module.exports.startProcess.invoiceStartForm = new InvoiceStartFormPage();
+module.exports.startProcess.genericStartForm = new GenericStartFormPage();
 module.exports.authentication = new AuthenticationPage();

@@ -43,6 +43,13 @@ module.exports = Page.extend({
 
   selectProcess: function(item) {
    this.processList().get(item).element(by.binding('process.name')).click();
+  },
+
+  startProcessInstance: function(processName) {
+    this.selectNavbarItem('Process');
+    this.searchProcessInput().sendKeys(processName);
+    this.selectProcessFromSearchResult(0);
+    this.startButton().click();
   }
 
 });
