@@ -69,11 +69,10 @@
   </properties>
   
   <profiles>
-	
-	<profile>
-	  <id>distro</id>  
+
+    <profile>
+      <id>distro</id>
       <modules>
-        <module>wildfly-runtime</module>
         <module>jboss7-runtime</module>
         <module>gf31-runtime</module>
         <module>tomcat-runtime</module>
@@ -81,8 +80,15 @@
         <module>integration-tests-engine</module>
         <!-- <module>test-db-upgrade</module> -->
       </modules>
-	</profile>  
-  
+    </profile>
+
+    <profile>
+      <id>distro-wildfly</id>
+      <modules>
+        <module>wildfly-runtime</module>
+      </modules>
+    </profile>
+
     <!-- Server profiles -->
   	
     <profile>

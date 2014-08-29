@@ -53,7 +53,6 @@
         <module>identity/identity-ldap</module>
         
         <module>distro/jbossas7</module>
-        <module>distro/wildfly</module>
         <module>distro/gf31</module>
         <module>distro/tomcat</module>
         <module>distro/sql-script</module>
@@ -70,12 +69,21 @@
       </activation>
       <modules>
         <module>distro/jbossas7</module>
-        <module>distro/wildfly</module>
         <module>distro/gf31</module>
         <module>distro/tomcat</module>
   
         <module>parent</module>
         <module>bom</module>
+      </modules>
+    </profile>
+
+    <profile>
+      <id>distro-wildfly</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <modules>
+        <module>distro/wildfly</module>
       </modules>
     </profile>
 
