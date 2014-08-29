@@ -48,6 +48,7 @@ public class HistoricDetailRestServiceImpl implements HistoricDetailRestService 
     HistoricDetailQueryDto queryDto = new HistoricDetailQueryDto(uriInfo.getQueryParameters());
     HistoricDetailQuery query = queryDto.toQuery(processEngine);
     query.disableBinaryFetching();
+    query.disableCustomObjectDeserialization();
 
     List<HistoricDetail> queryResult;
     if (firstResult != null || maxResults != null) {

@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.delegate.SerializedVariableValue;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
@@ -2201,6 +2202,51 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
     // then value is not fetched
     result = query.singleResult();
     assertNull(result.getValue());
+
+    // delete task
+    taskService.deleteTask(task.getId(), true);
+  }
+
+  @Test
+  public void testDisableCustomObjectDeserialization() {
+    // given
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("customSerializable", new CustomSerializable());
+    variables.put("failingSerializable", new FailingSerializable());
+    Task task = taskService.newTask();
+    taskService.saveTask(task);
+    taskService.setVariablesLocal(task.getId(), variables);
+
+    // when
+    VariableInstanceQuery query =
+        runtimeService.createVariableInstanceQuery().disableCustomObjectDeserialization();
+
+    // then
+    List<VariableInstance> results = query.list();
+
+    // both variables are not deserialized, but their serialized values are available
+    assertEquals(2, results.size());
+
+    for (VariableInstance variableInstance : results) {
+      if(variableInstance.getName().equals("customSerializable")) {
+        assertNull(variableInstance.getValue());
+        assertNull(variableInstance.getErrorMessage());
+
+        SerializedVariableValue serializedValue = variableInstance.getSerializedValue();
+        assertNotNull(serializedValue);
+        assertNotNull(serializedValue.getValue());
+      }
+      if(variableInstance.getName().equals("failingSerializable")) {
+        // no value was fetched
+        assertNull(variableInstance.getValue());
+        // no error message is present
+        assertNull(variableInstance.getErrorMessage());
+
+        SerializedVariableValue serializedValue = variableInstance.getSerializedValue();
+        assertNotNull(serializedValue);
+        assertNotNull(serializedValue.getValue());
+      }
+    }
 
     // delete task
     taskService.deleteTask(task.getId(), true);

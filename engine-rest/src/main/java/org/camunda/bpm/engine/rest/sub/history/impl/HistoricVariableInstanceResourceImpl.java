@@ -41,6 +41,7 @@ public class HistoricVariableInstanceResourceImpl implements HistoricVariableIns
   public HistoricVariableInstanceDto getVariable() {
     HistoricVariableInstance variableInstance = baseQuery()
       .disableBinaryFetching()
+      .disableCustomObjectDeserialization()
       .singleResult();
     if(variableInstance != null) {
       return HistoricVariableInstanceDto.fromHistoricVariableInstance(variableInstance);
@@ -53,6 +54,7 @@ public class HistoricVariableInstanceResourceImpl implements HistoricVariableIns
 
   public InputStream getBinaryVariable() {
     HistoricVariableInstance variableInstance = baseQuery()
+        .disableCustomObjectDeserialization()
         .singleResult();
     if(variableInstance != null) {
 

@@ -41,6 +41,7 @@ public class VariableInstanceResourceImpl implements VariableInstanceResource {
   public VariableInstanceDto getVariable() {
     VariableInstance variableInstance = baseQuery()
       .disableBinaryFetching()
+      .disableCustomObjectDeserialization()
       .singleResult();
     if(variableInstance != null) {
       return VariableInstanceDto.fromVariableInstance(variableInstance);
@@ -53,6 +54,7 @@ public class VariableInstanceResourceImpl implements VariableInstanceResource {
 
   public InputStream getBinaryVariable() {
     VariableInstance variableInstance = baseQuery()
+        .disableCustomObjectDeserialization()
         .singleResult();
     if(variableInstance != null) {
 

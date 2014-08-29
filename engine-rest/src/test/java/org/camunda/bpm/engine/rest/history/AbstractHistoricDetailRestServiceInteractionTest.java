@@ -72,6 +72,7 @@ public abstract class AbstractHistoricDetailRestServiceInteractionTest extends A
 
     when(historicDetailQueryMock.detailId(detailMock.getId())).thenReturn(historicDetailQueryMock);
     when(historicDetailQueryMock.disableBinaryFetching()).thenReturn(historicDetailQueryMock);
+    when(historicDetailQueryMock.disableCustomObjectDeserialization()).thenReturn(historicDetailQueryMock);
     when(historicDetailQueryMock.singleResult()).thenReturn(detailMock);
 
     given().pathParam("id", MockProvider.EXAMPLE_HISTORIC_VAR_UPDATE_ID)
@@ -109,6 +110,7 @@ public abstract class AbstractHistoricDetailRestServiceInteractionTest extends A
 
     when(historicDetailQueryMock.detailId(detailMock.getId())).thenReturn(historicDetailQueryMock);
     when(historicDetailQueryMock.disableBinaryFetching()).thenReturn(historicDetailQueryMock);
+    when(historicDetailQueryMock.disableCustomObjectDeserialization()).thenReturn(historicDetailQueryMock);
     when(historicDetailQueryMock.singleResult()).thenReturn(detailMock);
 
     given().pathParam("id", MockProvider.EXAMPLE_HISTORIC_VAR_UPDATE_ID)
@@ -139,6 +141,7 @@ public abstract class AbstractHistoricDetailRestServiceInteractionTest extends A
 
     when(historicDetailQueryMock.detailId(nonExistingId)).thenReturn(historicDetailQueryMock);
     when(historicDetailQueryMock.disableBinaryFetching()).thenReturn(historicDetailQueryMock);
+    when(historicDetailQueryMock.disableCustomObjectDeserialization()).thenReturn(historicDetailQueryMock);
     when(historicDetailQueryMock.singleResult()).thenReturn(null);
 
     given().pathParam("id", nonExistingId)
@@ -169,6 +172,7 @@ public abstract class AbstractHistoricDetailRestServiceInteractionTest extends A
         .build();
 
     when(historicDetailQueryMock.detailId(detailMock.getId())).thenReturn(historicDetailQueryMock);
+    when(historicDetailQueryMock.disableCustomObjectDeserialization()).thenReturn(historicDetailQueryMock);
     when(historicDetailQueryMock.singleResult()).thenReturn(detailMock);
 
     Response response = given().pathParam("id", MockProvider.EXAMPLE_HISTORIC_VAR_UPDATE_ID)
@@ -203,6 +207,7 @@ public abstract class AbstractHistoricDetailRestServiceInteractionTest extends A
 
     when(historicDetailQueryMock.detailId(detailMock.getId())).thenReturn(historicDetailQueryMock);
     when(historicDetailQueryMock.disableBinaryFetching()).thenReturn(historicDetailQueryMock);
+    when(historicDetailQueryMock.disableCustomObjectDeserialization()).thenReturn(historicDetailQueryMock);
     when(historicDetailQueryMock.singleResult()).thenReturn(detailMock);
 
     Response response = given().pathParam("id", MockProvider.EXAMPLE_HISTORIC_VAR_UPDATE_ID)
@@ -214,6 +219,7 @@ public abstract class AbstractHistoricDetailRestServiceInteractionTest extends A
     byte[] responseBytes = response.getBody().asByteArray();
     Assert.assertEquals(new String(serializedValue), new String(responseBytes));
     verify(historicDetailQueryMock, never()).disableBinaryFetching();
+    verify(historicDetailQueryMock).disableCustomObjectDeserialization();
 
   }
 
@@ -222,6 +228,7 @@ public abstract class AbstractHistoricDetailRestServiceInteractionTest extends A
     HistoricVariableUpdate detailMock =  MockProvider.mockHistoricVariableUpdate().build();
 
     when(historicDetailQueryMock.detailId(detailMock.getId())).thenReturn(historicDetailQueryMock);
+    when(historicDetailQueryMock.disableCustomObjectDeserialization()).thenReturn(historicDetailQueryMock);
     when(historicDetailQueryMock.singleResult()).thenReturn(detailMock);
 
     given().pathParam("id", MockProvider.EXAMPLE_HISTORIC_VAR_UPDATE_ID)
@@ -240,6 +247,7 @@ public abstract class AbstractHistoricDetailRestServiceInteractionTest extends A
     String nonExistingId = "nonExistingId";
 
     when(historicDetailQueryMock.detailId(nonExistingId)).thenReturn(historicDetailQueryMock);
+    when(historicDetailQueryMock.disableCustomObjectDeserialization()).thenReturn(historicDetailQueryMock);
     when(historicDetailQueryMock.singleResult()).thenReturn(null);
 
     given().pathParam("id", nonExistingId)

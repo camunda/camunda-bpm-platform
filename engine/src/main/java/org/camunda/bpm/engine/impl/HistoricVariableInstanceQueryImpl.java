@@ -24,7 +24,6 @@ import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEntity;
-import org.camunda.bpm.engine.impl.variable.ByteArrayType;
 import org.camunda.bpm.engine.impl.variable.VariableTypes;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
@@ -48,6 +47,7 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
   protected String[] activityInstanceIds;
 
   protected boolean isByteArrayFetchingEnabled = true;
+  protected boolean isCustomObjectDeserializationEnabled = true;
 
   public HistoricVariableInstanceQueryImpl() {
   }
@@ -122,6 +122,11 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
     return this;
   }
 
+  public HistoricVariableInstanceQuery disableCustomObjectDeserialization() {
+    this.isCustomObjectDeserializationEnabled = false;
+    return this;
+  }
+
   public long executeCount(CommandContext commandContext) {
     checkQueryOk();
     ensureVariablesInitialized();
@@ -140,22 +145,44 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
 
         HistoricVariableInstanceEntity variableInstanceEntity = (HistoricVariableInstanceEntity) historicVariableInstance;
 
-        // do not fetch values for byte arrays eagerly (unless requested by the user)
-        if (isByteArrayFetchingEnabled
-            || !ProcessEngineVariableType.BYTES.getName().equals(variableInstanceEntity.getVariableType().getTypeName())) {
-
+        if (shouldFetchSerializedValueFor(variableInstanceEntity)) {
           try {
-            variableInstanceEntity.getValue();
+            variableInstanceEntity.getSerializedValue();
+
+            if (shouldFetchValueFor(variableInstanceEntity)) {
+              variableInstanceEntity.getValue();
+            }
+
           } catch(Exception t) {
             // do not fail if one of the variables fails to load
             LOGGER.log(Level.FINE, "Exception while getting value for variable", t);
           }
-
         }
 
       }
     }
     return historicVariableInstances;
+  }
+
+  /**
+   * eagerly fetch the variable's value unless the serialized value should not be fetched
+   * or custom object fetching is disabled
+   */
+  protected boolean shouldFetchValueFor(HistoricVariableInstanceEntity variableInstance) {
+    boolean shouldFetchCustomObjects = !variableInstance.storesCustomObjects() || isCustomObjectDeserializationEnabled;
+
+    return shouldFetchSerializedValueFor(variableInstance) && shouldFetchCustomObjects;
+  }
+
+  /**
+   * Eagerly fetch the variable's serialized value unless the type is "bytes" and
+   * binary fetching disabled
+   */
+  protected boolean shouldFetchSerializedValueFor(HistoricVariableInstanceEntity variableInstance) {
+    boolean shouldFetchBytes = !ProcessEngineVariableType.BYTES.getName().equals(variableInstance.getVariableType().getTypeName())
+        || isByteArrayFetchingEnabled;
+
+    return shouldFetchBytes;
   }
 
   // order by /////////////////////////////////////////////////////////////////

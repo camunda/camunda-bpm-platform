@@ -37,6 +37,7 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.api.runtime.DummySerializable;
+import org.camunda.bpm.engine.test.api.runtime.util.CustomSerializable;
 import org.camunda.bpm.engine.test.api.runtime.util.FailingSerializable;
 import org.camunda.bpm.engine.test.history.SerializableVariable;
 import org.junit.Assert;
@@ -1347,6 +1348,50 @@ public class FullHistoryTest extends ResourceProcessEngineTestCase {
       .singleResult();
 
     assertNull(((HistoricVariableUpdate)result).getValue());
+
+    taskService.deleteTask(newTask.getId(), true);
+  }
+
+  public void testDisableCustomObjectDeserialization() {
+
+    Task newTask = taskService.newTask();
+    taskService.saveTask(newTask);
+
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("customSerializable", new CustomSerializable());
+    variables.put("failingSerializable", new FailingSerializable());
+    taskService.setVariables(newTask.getId(), variables);
+
+    List<HistoricDetail> results = historyService.createHistoricDetailQuery()
+        .disableBinaryFetching()
+        .disableCustomObjectDeserialization()
+        .variableUpdates()
+        .list();
+
+    // both variables are not deserialized, but their serialized values are available
+    assertEquals(2, results.size());
+
+    for (HistoricDetail detail : results) {
+      HistoricVariableUpdate update = (HistoricVariableUpdate) detail;
+      if(update.getVariableName().equals("customSerializable")) {
+        assertNull(update.getValue());
+        assertNull(update.getErrorMessage());
+
+        SerializedVariableValue serializedValue = update.getSerializedValue();
+        assertNotNull(serializedValue);
+        assertNotNull(serializedValue.getValue());
+      }
+      if(update.getVariableName().equals("failingSerializable")) {
+        // no value was fetched
+        assertNull(update.getValue());
+        // no error message is present
+        assertNull(update.getErrorMessage());
+
+        SerializedVariableValue serializedValue = update.getSerializedValue();
+        assertNotNull(serializedValue);
+        assertNotNull(serializedValue.getValue());
+      }
+    }
 
     taskService.deleteTask(newTask.getId(), true);
   }

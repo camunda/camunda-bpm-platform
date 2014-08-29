@@ -111,6 +111,7 @@ public class AbstractHistoricDetailRestServiceQueryTest extends AbstractRestServ
 
     verify(mockedQuery).list();
     verify(mockedQuery).disableBinaryFetching();
+    verify(mockedQuery).disableCustomObjectDeserialization();
     verifyNoMoreInteractions(mockedQuery);
   }
 

@@ -42,6 +42,7 @@ public class HistoricDetailResourceImpl implements HistoricDetailResource {
   public HistoricDetailDto getDetail() {
     HistoricDetail detail = baseQuery()
       .disableBinaryFetching()
+      .disableCustomObjectDeserialization()
       .singleResult();
     if(detail != null) {
       return HistoricDetailDto.fromHistoricDetail(detail);
@@ -54,6 +55,7 @@ public class HistoricDetailResourceImpl implements HistoricDetailResource {
 
   public InputStream getBinaryVariable() {
     HistoricDetail variableInstance = baseQuery()
+        .disableCustomObjectDeserialization()
         .singleResult();
     if(variableInstance == null) {
       throw new InvalidRequestException(Status.NOT_FOUND, "Historic detail with Id '"+detailId + "' does not exist.");

@@ -19,6 +19,7 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.delegate.SerializedVariableValue;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
@@ -33,6 +34,7 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.api.runtime.util.CustomSerializable;
 import org.camunda.bpm.engine.test.api.runtime.util.FailingSerializable;
 
 
@@ -222,7 +224,7 @@ public class HistoricVariableInstanceTest extends AbstractProcessEngineTestCase 
     assertEquals(1, historyService.createHistoricVariableInstanceQuery().variableId(variable.get(0).getId()).count());
 
   }
-  
+
   @Deployment(resources={
       "org/camunda/bpm/engine/test/history/HistoricVariableInstanceTest.testCallSubProcessSettingVariableOnStart.bpmn20.xml",
       "org/camunda/bpm/engine/test/history/subProcessSetVariableOnStart.bpmn20.xml"
@@ -230,9 +232,9 @@ public class HistoricVariableInstanceTest extends AbstractProcessEngineTestCase 
   public void testCallSubProcessSettingVariableOnStart() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("callSubProcess");
     assertProcessEnded(processInstance.getId());
-    
+
     assertEquals(1, historyService.createHistoricVariableInstanceQuery().count());
-    
+
     assertEquals(1, historyService.createHistoricVariableInstanceQuery().variableValueEquals("aVariable", "aValue").count());
   }
 
@@ -490,6 +492,49 @@ public class HistoricVariableInstanceTest extends AbstractProcessEngineTestCase 
     assertNull(variableInstance.getValue());
 
     taskService.deleteTask(newTask.getId(), true);
+  }
+
+  public void testDisableCustomObjectDeserialization() {
+    // given
+    Task newTask = taskService.newTask();
+    taskService.saveTask(newTask);
+
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("customSerializable", new CustomSerializable());
+    variables.put("failingSerializable", new FailingSerializable());
+    taskService.setVariables(newTask.getId(), variables);
+
+    // when
+    List<HistoricVariableInstance> variableInstances = historyService.createHistoricVariableInstanceQuery()
+      .disableCustomObjectDeserialization()
+      .list();
+
+    // then
+    assertEquals(2, variableInstances.size());
+
+    for (HistoricVariableInstance variableInstance : variableInstances) {
+      if(variableInstance.getName().equals("customSerializable")) {
+        assertNull(variableInstance.getValue());
+        assertNull(variableInstance.getErrorMessage());
+
+        SerializedVariableValue serializedValue = variableInstance.getSerializedValue();
+        assertNotNull(serializedValue);
+        assertNotNull(serializedValue.getValue());
+      }
+      if(variableInstance.getName().equals("failingSerializable")) {
+        // no value was fetched
+        assertNull(variableInstance.getValue());
+        // no error message is present
+        assertNull(variableInstance.getErrorMessage());
+
+        SerializedVariableValue serializedValue = variableInstance.getSerializedValue();
+        assertNotNull(serializedValue);
+        assertNotNull(serializedValue.getValue());
+      }
+    }
+
+    taskService.deleteTask(newTask.getId(), true);
+
   }
 
   public void testErrorMessage() {

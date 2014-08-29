@@ -120,6 +120,14 @@ public interface VariableInstanceQuery extends Query<VariableInstanceQuery, Vari
   VariableInstanceQuery disableBinaryFetching();
 
   /**
+   * Disable deserialization of variable values that are custom objects. By default, the query
+   * will attempt to deserialize the value of these variables. By calling this method you can
+   * prevent such attempts in environments where their classes are not available.
+   * Independent of this setting, variable serialized values are accessible.
+   */
+  VariableInstanceQuery disableCustomObjectDeserialization();
+
+  /**
    * Only select variable instances which value is like the given value.
    * This be used on string variables only.
    * @param name variable name, cannot be null.

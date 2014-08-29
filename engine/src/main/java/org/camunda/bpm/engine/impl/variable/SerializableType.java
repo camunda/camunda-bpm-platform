@@ -46,7 +46,7 @@ public class SerializableType extends ByteArrayType {
       return cachedObject;
     }
     byte[] bytes = (byte[]) super.getValue(valueFields);
-    if(bytes != null) {
+    if(bytes != null && Context.getCommandContext() != null) {
       ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
       Object deserializedObject;
       try {

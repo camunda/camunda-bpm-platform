@@ -87,6 +87,7 @@ public abstract class AbstractHistoricVariableInstanceRestServiceQueryTest exten
 
     verify(mockedQuery).list();
     verify(mockedQuery).disableBinaryFetching();
+    verify(mockedQuery).disableCustomObjectDeserialization();
     verifyNoMoreInteractions(mockedQuery);
   }
 
@@ -102,6 +103,7 @@ public abstract class AbstractHistoricVariableInstanceRestServiceQueryTest exten
 
     verify(mockedQuery).list();
     verify(mockedQuery).disableBinaryFetching();
+    verify(mockedQuery).disableCustomObjectDeserialization();
     verifyNoMoreInteractions(mockedQuery);
   }
 
