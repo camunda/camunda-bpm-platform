@@ -11,7 +11,7 @@
 
   <groupId>org.camunda.commons</groupId>
   <artifactId>camunda-commons-root</artifactId>
-  <version>1.0.3-SNAPSHOT</version>
+  <version>1.0.4-SNAPSHOT</version>
   <name>camunda Commons - Root Pom</name>
   <packaging>pom</packaging>
 
