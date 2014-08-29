@@ -30,8 +30,14 @@
               <rules>
                 <requireJavaVersion>
                   <version>[1.7,)</version>
-                  <message>You must use at least JDK 1.7 to compile Wildfly.
-                    Exclude Wildfly from reactor by using '-P-distro-wildfly' to exlucde the profile.</message>
+                  <message>
+                    ***************************************************************************************************
+                    *                                                                                                 *
+                    *            You must use at least JDK 1.7 to compile Camunda Bpm Wildfly!!!                      *
+                    * Continue by excluding Wildfly from reactor by using '-P-distro-wildfly' to disable the profile. *
+                    *                                                                                                 *
+                    ***************************************************************************************************
+                  </message>
                 </requireJavaVersion>
               </rules>
               <failFast>true</failFast>
