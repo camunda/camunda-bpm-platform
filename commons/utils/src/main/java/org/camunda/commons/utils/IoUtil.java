@@ -21,9 +21,10 @@ import java.nio.charset.Charset;
 /**
  * @author Sebastian Menski
  */
-public final class IoUtil {
+public class IoUtil {
 
   private static final IoUtilLogger LOG = UtilsLogger.IO_UTIL_LOGGER;
+  public static final Charset ENCODING_CHARSET = Charset.forName("UTF-8");
 
   /**
    * Returns the input stream as {@link String}.
@@ -54,7 +55,7 @@ public final class IoUtil {
    * @return the {@link InputStream} containing the {@link String}
    */
   public static InputStream stringAsInputStream(String string) {
-    return new ByteArrayInputStream(string.getBytes(Charset.forName("UTF-8")));
+    return new ByteArrayInputStream(string.getBytes(ENCODING_CHARSET));
   }
 
   /**
