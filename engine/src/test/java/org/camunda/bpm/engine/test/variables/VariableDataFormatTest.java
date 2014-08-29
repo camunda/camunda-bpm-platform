@@ -35,6 +35,7 @@ import org.camunda.bpm.engine.impl.spin.SpinVariableTypeResolver;
 import org.camunda.bpm.engine.impl.test.AbstractProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.VariableInstance;
+import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.api.runtime.DummySerializable;
 import org.camunda.spin.DataFormats;
@@ -421,6 +422,31 @@ public class VariableDataFormatTest extends AbstractProcessEngineTestCase {
 
   }
 
+  public void testDisabledDeserialization() {
+    // given
+    Task task = taskService.newTask();
+    taskService.saveTask(task);
+
+    Map<String, Object> variableConfiguration = new HashMap<String, Object>();
+    variableConfiguration.put(ProcessEngineVariableType.SPIN_TYPE_CONFIG_ROOT_TYPE, "an.unavailable.JavaClass");
+    variableConfiguration.put(ProcessEngineVariableType.SPIN_TYPE_DATA_FORMAT_ID, JSON_FORMAT_NAME);
+
+    taskService.setVariableLocalFromSerialized(task.getId(), "variableWithoutClass",
+        "{\"aKey\" : \"aValue\"}", ProcessEngineVariableType.SPIN.getName(), variableConfiguration);
+
+    // when
+    VariableInstance instance =
+        runtimeService.createVariableInstanceQuery().disableCustomObjectDeserialization().singleResult();
+
+    // then
+    assertNotNull(instance);
+    assertNull(instance.getValue());
+    assertNotNull(instance.getSerializedValue());
+    assertNotNull(instance.getSerializedValue().getValue());
+
+    // delete task
+    taskService.deleteTask(task.getId(), true);
+  }
 
   protected void assertCannotRetrieveVariable(String scopeId, String variableName) {
     try {
