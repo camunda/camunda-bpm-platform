@@ -42,7 +42,8 @@ public class HistoricDetailResourceImpl implements HistoricDetailResource {
   public HistoricDetailDto getDetail() {
     HistoricDetail detail = baseQuery()
       .disableBinaryFetching()
-      .disableCustomObjectDeserialization()
+      // Existing API requires that Serializable variables are always resolved
+//      .disableCustomObjectDeserialization()
       .singleResult();
     if(detail != null) {
       return HistoricDetailDto.fromHistoricDetail(detail);

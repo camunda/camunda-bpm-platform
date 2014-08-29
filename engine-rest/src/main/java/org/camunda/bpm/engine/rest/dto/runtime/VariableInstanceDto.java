@@ -140,13 +140,16 @@ public class VariableInstanceDto {
     if (variableInstance.storesCustomObjects()) {
       if (!ProcessEngineVariableType.SERIALIZABLE.getName().equals(variableInstance.getTypeName())) {
         dto.serializedValue = SerializedValueDto.fromSerializedVariableValue(variableInstance.getSerializedValue());
+      } else {
+        // this is legacy code to not break the API
+        dto.value = new SerializedObjectDto(variableInstance.getValue());
       }
 
     } else {
       dto.setValue(variableInstance.getValue());
-      dto.setErrorMessage(variableInstance.getErrorMessage());
     }
 
+    dto.setErrorMessage(variableInstance.getErrorMessage());
     dto.setType(variableInstance.getValueTypeName());
 
     return dto;

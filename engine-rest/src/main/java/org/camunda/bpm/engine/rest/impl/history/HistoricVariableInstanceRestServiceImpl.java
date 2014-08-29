@@ -49,7 +49,8 @@ public class HistoricVariableInstanceRestServiceImpl implements HistoricVariable
   public List<HistoricVariableInstanceDto> queryHistoricVariableInstances(HistoricVariableInstanceQueryDto queryDto, Integer firstResult, Integer maxResults) {
     HistoricVariableInstanceQuery query = queryDto.toQuery(processEngine);
     query.disableBinaryFetching();
-    query.disableCustomObjectDeserialization();
+    // variables of type Serializable have to be deserialized to not break existing API
+//    query.disableCustomObjectDeserialization();
 
     List<HistoricVariableInstance> matchingHistoricVariableInstances;
     if (firstResult != null || maxResults != null) {

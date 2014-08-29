@@ -56,8 +56,8 @@ public class VariableInstanceRestServiceImpl extends AbstractRestProcessEngineAw
     // disable binary fetching by default.
     query.disableBinaryFetching();
 
-    // disable custom object fetching by default.
-    query.disableCustomObjectDeserialization();
+    // disable custom object fetching by default. Cannot be done to not break existing API
+//    query.disableCustomObjectDeserialization();
 
     List<VariableInstance> matchingInstances;
     if (firstResult != null || maxResults != null) {

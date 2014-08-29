@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.rest.dto.history;
 
 import org.camunda.bpm.engine.delegate.ProcessEngineVariableType;
 import org.camunda.bpm.engine.history.HistoricVariableUpdate;
+import org.camunda.bpm.engine.rest.dto.runtime.SerializedObjectDto;
 import org.camunda.bpm.engine.rest.dto.runtime.SerializedValueDto;
 
 /**
@@ -64,13 +65,15 @@ public class HistoricVariableUpdateDto extends HistoricDetailDto {
     if(historicVariableUpdate.storesCustomObjects()) {
       if (!ProcessEngineVariableType.SERIALIZABLE.getName().equals(historicVariableUpdate.getVariableTypeName())) {
         dto.serializedValue = SerializedValueDto.fromSerializedVariableValue(historicVariableUpdate.getSerializedValue());
+      } else {
+        dto.value = new SerializedObjectDto(historicVariableUpdate.getValue());
       }
     } else {
       dto.value = historicVariableUpdate.getValue();
-      dto.errorMessage = historicVariableUpdate.getErrorMessage();
     }
 
     dto.variableTypeName = historicVariableUpdate.getValueTypeName();
+    dto.errorMessage = historicVariableUpdate.getErrorMessage();
 
     return dto;
   }

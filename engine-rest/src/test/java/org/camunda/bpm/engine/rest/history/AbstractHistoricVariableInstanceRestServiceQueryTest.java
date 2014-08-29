@@ -11,6 +11,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.never;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -87,7 +88,10 @@ public abstract class AbstractHistoricVariableInstanceRestServiceQueryTest exten
 
     verify(mockedQuery).list();
     verify(mockedQuery).disableBinaryFetching();
-    verify(mockedQuery).disableCustomObjectDeserialization();
+    // In order to not break current API, we have to deserialize Serializable variables. should be:
+    // verify(mockedQuery).disableCustomObjectDeserialization();
+    verify(mockedQuery, never()).disableCustomObjectDeserialization();
+
     verifyNoMoreInteractions(mockedQuery);
   }
 
@@ -103,7 +107,9 @@ public abstract class AbstractHistoricVariableInstanceRestServiceQueryTest exten
 
     verify(mockedQuery).list();
     verify(mockedQuery).disableBinaryFetching();
-    verify(mockedQuery).disableCustomObjectDeserialization();
+    // In order to not break current API, we have to deserialize Serializable variables. should be:
+    // verify(mockedQuery).disableCustomObjectDeserialization();
+    verify(mockedQuery, never()).disableCustomObjectDeserialization();
     verifyNoMoreInteractions(mockedQuery);
   }
 
@@ -284,11 +290,12 @@ public abstract class AbstractHistoricVariableInstanceRestServiceQueryTest exten
   public void testSerializableVariableInstanceRetrieval() {
     MockSerializedValueBuilder serializedValueBuilder =
         new MockSerializedValueBuilder()
-          .value(MockProvider.EXAMPLE_VARIABLE_INSTANCE_BYTE);
+          .value("a serialized value".getBytes());
 
     MockHistoricVariableInstanceBuilder builder = MockProvider.mockHistoricVariableInstance()
         .storesCustomObjects(true)
         .typeName(ProcessEngineVariableType.SERIALIZABLE.getName())
+        .value("a serialized value")
         .valueTypeName("Serializable")
         .serializedValue(serializedValueBuilder);
 
@@ -301,9 +308,16 @@ public abstract class AbstractHistoricVariableInstanceRestServiceQueryTest exten
         .then().expect().statusCode(Status.OK.getStatusCode())
         .and()
           .body("[0].type", equalTo("Serializable"))
-          .body("[0].value", nullValue())
+
+          // required due to exsting API
+          .body("[0].value.object", equalTo("a serialized value"))
+          .body("[0].value.type", equalTo(String.class.getName()))
           .body("[0].serializedValue", nullValue())
         .when().get(HISTORIC_VARIABLE_INSTANCE_RESOURCE_URL);
+
+    // should not resolve custom objects but existing API requires it
+//  verify(mockedQuery).disableCustomObjectDeserialization();
+    verify(mockedQuery, never()).disableCustomObjectDeserialization();
   }
 
   @Test

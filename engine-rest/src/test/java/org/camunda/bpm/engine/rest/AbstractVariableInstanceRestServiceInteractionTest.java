@@ -86,6 +86,9 @@ public class AbstractVariableInstanceRestServiceInteractionTest extends Abstract
     .when().get(VARIABLE_INSTANCE_URL);
 
     verify(variableInstanceQueryMock, times(1)).disableBinaryFetching();
+    // requirement to not break existing API; should be:
+    // verify(variableInstanceQueryMock).disableCustomObjectDeserialization();
+    verify(variableInstanceQueryMock, never()).disableCustomObjectDeserialization();
 
   }
 
@@ -135,6 +138,9 @@ public class AbstractVariableInstanceRestServiceInteractionTest extends Abstract
     .when().get(VARIABLE_INSTANCE_URL);
 
     verify(variableInstanceQueryMock, times(1)).disableBinaryFetching();
+    // requirement to not break existing API; should be:
+    // verify(mockedQuery).disableCustomObjectDeserialization();
+    verify(variableInstanceQueryMock, never()).disableCustomObjectDeserialization();
 
   }
 
@@ -168,6 +174,7 @@ public class AbstractVariableInstanceRestServiceInteractionTest extends Abstract
     byte[] responseBytes = response.getBody().asByteArray();
     Assert.assertEquals(new String(byteContent), new String(responseBytes));
     verify(variableInstanceQueryMock, never()).disableBinaryFetching();
+    verify(variableInstanceQueryMock).disableCustomObjectDeserialization();
 
   }
 
@@ -221,6 +228,7 @@ public class AbstractVariableInstanceRestServiceInteractionTest extends Abstract
     .when().get(VARIABLE_INSTANCE_BINARY_DATA_URL);
 
     verify(variableInstanceQueryMock, never()).disableBinaryFetching();
+    verify(variableInstanceQueryMock).disableCustomObjectDeserialization();
 
   }
 
@@ -239,7 +247,7 @@ public class AbstractVariableInstanceRestServiceInteractionTest extends Abstract
     .when().get(VARIABLE_INSTANCE_BINARY_DATA_URL);
 
     verify(variableInstanceQueryMock, never()).disableBinaryFetching();
-
+    verify(variableInstanceQueryMock).disableCustomObjectDeserialization();
   }
 
 }
