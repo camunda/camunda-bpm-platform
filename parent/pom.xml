@@ -64,6 +64,8 @@
 
     <!-- OSGi bundles properties -->
     <camunda.artifact />
+    <camunda.osgi.import.camunda.spin.version>version="[$(version;==;${camunda.spin.version.clean}),$(version;=+;${camunda.spin.version.clean}))"</camunda.osgi.import.camunda.spin.version>
+    <camunda.osgi.import.camunda.connect.version>version="[$(version;==;${camunda.connect.version.clean}),$(version;=+;${camunda.connect.version.clean}))"</camunda.osgi.import.camunda.connect.version>
     <camunda.osgi.import.camunda.version>version="[$(version;==;${camunda.osgi.version.clean}),$(version;=+;${camunda.osgi.version.clean}))"</camunda.osgi.import.camunda.version>
     <camunda.osgi.import.strict.version>version="[$(version;===;${camunda.osgi.version.clean}),$(version;==+;${camunda.osgi.version.clean}))"</camunda.osgi.import.strict.version>
     <camunda.osgi.import.default.version>[$(version;==;$(@)),$(version;+;$(@)))</camunda.osgi.import.default.version>
@@ -72,15 +74,15 @@
     <camunda.osgi.import.before.defaults />
     <camunda.osgi.import.additional />
     <camunda.osgi.import.pkg>
-      org.camunda.*;${camunda.osgi.import.camunda.version},
       ${camunda.osgi.import.before.defaults},
       ${camunda.osgi.import.defaults},
       ${camunda.osgi.import.additional},
+      org.camunda.*;${camunda.osgi.import.camunda.version},
       *
     </camunda.osgi.import.pkg>
     <camunda.osgi.activator />
     <camunda.osgi.failok>false</camunda.osgi.failok>
-    <camunda.osgi.export>!org.camunda.bpm.model*, ${camunda.osgi.export.pkg};${camunda.osgi.version};-noimport:=true</camunda.osgi.export>
+    <camunda.osgi.export>${camunda.osgi.export.pkg};${camunda.osgi.version};-noimport:=true</camunda.osgi.export>
     <!--
     <camunda.osgi.export.pkg>!*.impl;${camunda.artifact}*</camunda.osgi.export.pkg>
     <camunda.osgi.private.pkg>${camunda.artifact}*.impl</camunda.osgi.private.pkg>
@@ -779,6 +781,8 @@
             </instructions>
            <versions>
             <camunda.osgi.version.clean>${project.version}</camunda.osgi.version.clean>
+            <camunda.connect.version.clean>${version.camunda.connect}</camunda.connect.version.clean>
+            <camunda.spin.version.clean>${version.camunda.spin}</camunda.spin.version.clean>
            </versions>
           </configuration>
         </plugin>

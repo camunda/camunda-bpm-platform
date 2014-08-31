@@ -172,8 +172,15 @@
       <camunda.artifact>
         org.camunda.bpm
       </camunda.artifact>
+      <camunda.osgi.export.pkg>
+        ${camunda.artifact};${camunda.osgi.version};-noimport:=true,
+        ${camunda.artifact}.application.*;${camunda.osgi.version};-noimport:=true,
+        ${camunda.artifact}.container.*;${camunda.osgi.version};-noimport:=true,
+        ${camunda.artifact}.engine.*
+      </camunda.osgi.export.pkg>
       <camunda.osgi.import.defaults>
-        org.camunda.bpm.model*
+        org.camunda.bpm.connect*;${camunda.osgi.import.camunda.connect.version},
+        org.camunda.spin*;${camunda.osgi.import.camunda.spin.version};resolution:=optional
       </camunda.osgi.import.defaults>
       <camunda.osgi.import.additional>
           junit*;resolution:=optional,
