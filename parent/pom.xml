@@ -63,7 +63,8 @@
     <version.camunda.template-engines>1.0.0</version.camunda.template-engines>
 
     <!-- OSGi bundles properties -->
-    <camunda.artifact />
+    <camunda.artifact />    
+    <camunda.osgi.import.camunda.connect.version>version="[$(version;==;${camunda.connect.version.clean}),$(version;=+;${camunda.connect.version.clean}))"</camunda.osgi.import.camunda.connect.version>
     <camunda.osgi.import.camunda.version>version="[$(version;==;${camunda.osgi.version.clean}),$(version;=+;${camunda.osgi.version.clean}))"</camunda.osgi.import.camunda.version>
     <camunda.osgi.import.strict.version>version="[$(version;===;${camunda.osgi.version.clean}),$(version;==+;${camunda.osgi.version.clean}))"</camunda.osgi.import.strict.version>
     <camunda.osgi.import.default.version>[$(version;==;$(@)),$(version;+;$(@)))</camunda.osgi.import.default.version>
@@ -72,10 +73,10 @@
     <camunda.osgi.import.before.defaults />
     <camunda.osgi.import.additional />
     <camunda.osgi.import.pkg>
-<!--      org.camunda.*;${camunda.osgi.import.camunda.version},-->
       ${camunda.osgi.import.before.defaults},
       ${camunda.osgi.import.defaults},
       ${camunda.osgi.import.additional},
+      org.camunda.*;${camunda.osgi.import.camunda.version},
       *
     </camunda.osgi.import.pkg>
     <camunda.osgi.activator />
@@ -779,6 +780,7 @@
             </instructions>
            <versions>
             <camunda.osgi.version.clean>${project.version}</camunda.osgi.version.clean>
+            <camunda.connect.version.clean>${version.camunda.connect}</camunda.connect.version.clean>
            </versions>
           </configuration>
         </plugin>
