@@ -18,7 +18,7 @@ import static org.camunda.spin.xml.XmlTestConstants.EXAMPLE_XML;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.camunda.spin.impl.util.IoUtil;
+import org.camunda.spin.impl.util.SpinIoUtil;
 import org.camunda.spin.impl.util.RewindableInputStream;
 import org.camunda.spin.impl.xml.dom.XmlDomDataFormatReader;
 import org.junit.After;
@@ -61,7 +61,7 @@ public class XmlDomDataFormatReaderTest {
   }
   
   public RewindableInputStream stringToStream(String input) {
-    InputStream stream = IoUtil.stringAsInputStream(input);
+    InputStream stream = SpinIoUtil.stringAsInputStream(input);
     return new RewindableInputStream(stream, REWINDING_LIMIT);
   }
   

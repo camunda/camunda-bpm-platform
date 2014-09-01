@@ -22,7 +22,7 @@ import static org.assertj.core.api.Assertions.fail;
 import static org.camunda.spin.DataFormats.xmlDom;
 import static org.camunda.spin.Spin.S;
 import static org.camunda.spin.Spin.XML;
-import static org.camunda.spin.impl.util.IoUtil.stringAsInputStream;
+import static org.camunda.spin.impl.util.SpinIoUtil.stringAsInputStream;
 import static org.camunda.spin.xml.XmlTestConstants.*;
 
 /**

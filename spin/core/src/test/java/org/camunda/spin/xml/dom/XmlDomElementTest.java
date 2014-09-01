@@ -14,7 +14,7 @@
 package org.camunda.spin.xml.dom;
 
 import org.camunda.spin.SpinList;
-import org.camunda.spin.impl.util.IoUtil;
+import org.camunda.spin.impl.util.SpinIoUtil;
 import org.camunda.spin.xml.tree.SpinXmlTreeAttribute;
 import org.camunda.spin.xml.tree.SpinXmlTreeAttributeException;
 import org.camunda.spin.xml.tree.SpinXmlTreeElement;
@@ -705,15 +705,15 @@ public class XmlDomElementTest {
   @Test
   public void canWriteToStream() throws IOException {
     OutputStream outputStream = element.toStream();
-    InputStream inputStream = IoUtil.convertOutputStreamToInputStream(outputStream);
-    String value = IoUtil.getStringFromInputStream(inputStream, false);
+    InputStream inputStream = SpinIoUtil.convertOutputStreamToInputStream(outputStream);
+    String value = SpinIoUtil.getStringFromInputStream(inputStream, false);
     assertThat(value).isXmlEqualTo(EXAMPLE_XML);
 
 
     outputStream = new ByteArrayOutputStream();
     element.writeToStream(outputStream);
-    inputStream = IoUtil.convertOutputStreamToInputStream(outputStream);
-    value = IoUtil.getStringFromInputStream(inputStream, false);
+    inputStream = SpinIoUtil.convertOutputStreamToInputStream(outputStream);
+    value = SpinIoUtil.getStringFromInputStream(inputStream, false);
     assertThat(value).isXmlEqualTo(EXAMPLE_XML);
   }
 
@@ -727,7 +727,7 @@ public class XmlDomElementTest {
   @Test
   public void canWriteToStreamAndReadAgain() {
     OutputStream outputStream = element.toStream();
-    InputStream inputStream = IoUtil.convertOutputStreamToInputStream(outputStream);
+    InputStream inputStream = SpinIoUtil.convertOutputStreamToInputStream(outputStream);
     SpinXmlTreeElement xml = XML(inputStream);
     assertThat(xml).isNotNull();
     assertThat(xml.childElements()).isNotEmpty();

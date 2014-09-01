@@ -12,7 +12,7 @@
  */
 package org.camunda.spin.xml;
 
-import org.camunda.spin.impl.util.IoUtil;
+import org.camunda.spin.impl.util.SpinIoUtil;
 import org.camunda.spin.xml.mapping.Customer;
 import org.camunda.spin.xml.mapping.Order;
 import org.camunda.spin.xml.mapping.OrderDetails;
@@ -48,9 +48,9 @@ public class XmlTestConstants {
 
   public static final String EXAMPLE_VALIDATION_XML_FILE_NAME = "org/camunda/spin/xml/validation_example.xml";
 
-  public static final String EXAMPLE_XML = IoUtil.readFileAsString(EXAMPLE_XML_FILE_NAME);
+  public static final String EXAMPLE_XML = SpinIoUtil.fileAsString(EXAMPLE_XML_FILE_NAME);
 
-  public static final String EXAMPLE_VALIDATION_XML = IoUtil.readFileAsString(EXAMPLE_VALIDATION_XML_FILE_NAME);
+  public static final String EXAMPLE_VALIDATION_XML = SpinIoUtil.fileAsString(EXAMPLE_VALIDATION_XML_FILE_NAME);
 
   public static final String EXAMPLE_INVALID_XML = "<invalid";
 
@@ -59,15 +59,15 @@ public class XmlTestConstants {
   public static final String NON_EXISTING = "nonExisting";
 
   public static InputStream exampleXmlFileAsStream() {
-    return IoUtil.getFileAsStream(EXAMPLE_XML_FILE_NAME);
+    return SpinIoUtil.fileAsStream(EXAMPLE_XML_FILE_NAME);
   }
 
   public static InputStream exampleMainXsdFileAsStream() {
-    return IoUtil.getFileAsStream(EXAMPLE_VALIDATION_XSD_FILE_NAME);
+    return SpinIoUtil.fileAsStream(EXAMPLE_VALIDATION_XSD_FILE_NAME);
   }
 
   public static InputStream exampleExtensionXsdFileAsStream() {
-    return IoUtil.getFileAsStream(EXAMPLE_VALIDATION_EXTENSION_XSD_FILE_NAME);
+    return SpinIoUtil.fileAsStream(EXAMPLE_VALIDATION_EXTENSION_XSD_FILE_NAME);
   }
 
   public static Schema createSchema() {

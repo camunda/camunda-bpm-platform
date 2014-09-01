@@ -19,7 +19,7 @@ import static org.camunda.spin.DataFormats.xmlDom;
 import static org.camunda.spin.Spin.JSON;
 import static org.camunda.spin.Spin.S;
 import static org.camunda.spin.Spin.XML;
-import static org.camunda.spin.impl.util.IoUtil.stringAsInputStream;
+import static org.camunda.spin.impl.util.SpinIoUtil.stringAsInputStream;
 import static org.camunda.spin.json.JsonTestConstants.EXAMPLE_EMPTY_STRING;
 import static org.camunda.spin.json.JsonTestConstants.EXAMPLE_INVALID_JSON;
 import static org.camunda.spin.json.JsonTestConstants.EXAMPLE_JSON;

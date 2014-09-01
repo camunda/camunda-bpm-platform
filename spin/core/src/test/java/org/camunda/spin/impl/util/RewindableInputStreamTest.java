@@ -81,7 +81,7 @@ public class RewindableInputStreamTest {
     
     stream.rewind();
     
-    assertThat(IoUtil.inputStreamAsString(stream)).isEqualTo(EXAMPLE_INPUT_STRING);
+    assertThat(SpinIoUtil.inputStreamAsString(stream)).isEqualTo(EXAMPLE_INPUT_STRING);
   }
   
   @Test
@@ -94,7 +94,7 @@ public class RewindableInputStreamTest {
     
     stream.rewind();
     
-    assertThat(IoUtil.inputStreamAsString(stream)).isEqualTo(EXAMPLE_INPUT_STRING);
+    assertThat(SpinIoUtil.inputStreamAsString(stream)).isEqualTo(EXAMPLE_INPUT_STRING);
   }
   
   @Test
@@ -131,7 +131,7 @@ public class RewindableInputStreamTest {
     byte[] buffer = new byte[5];
     stream.read(buffer);
     
-    assertThat(IoUtil.inputStreamAsString(stream)).isEqualTo(EXAMPLE_INPUT_STRING.substring(5));
+    assertThat(SpinIoUtil.inputStreamAsString(stream)).isEqualTo(EXAMPLE_INPUT_STRING.substring(5));
   }
 
   /**
@@ -146,7 +146,7 @@ public class RewindableInputStreamTest {
     byte[] buffer = new byte[DEFAULT_BUFFER_SIZE + 5];
     stream.read(buffer);
     
-    assertThat(IoUtil.inputStreamAsString(stream))
+    assertThat(SpinIoUtil.inputStreamAsString(stream))
       .isEqualTo(EXAMPLE_INPUT_STRING.substring(DEFAULT_BUFFER_SIZE + 5));
     
     try {
@@ -201,12 +201,12 @@ public class RewindableInputStreamTest {
   @After
   public void closeStream() {
     if (stream != null) {
-      IoUtil.closeSilently(stream);
+      SpinIoUtil.closeSilently(stream);
     }
   }
   
   protected RewindableInputStream newStreamInstance(String input, int bufferSize) {
-    InputStream inputStream = IoUtil.stringAsInputStream(input);
+    InputStream inputStream = SpinIoUtil.stringAsInputStream(input);
     return new RewindableInputStream(inputStream, bufferSize);
   }
 }

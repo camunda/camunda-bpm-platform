@@ -19,10 +19,11 @@ import java.io.InputStream;
 
 import org.camunda.spin.DataFormats;
 import org.camunda.spin.impl.json.tree.JsonJacksonTreeDataFormatReader;
-import org.camunda.spin.impl.util.IoUtil;
+import org.camunda.spin.impl.util.SpinIoUtil;
 import org.camunda.spin.impl.util.RewindableInputStream;
 import static org.camunda.spin.json.JsonTestConstants.EXAMPLE_JSON;
 import static org.camunda.spin.json.JsonTestConstants.EXAMPLE_JSON_COLLECTION;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -67,7 +68,7 @@ public class JsonJacksonTreeDataFormatReaderTest {
   }
   
   public RewindableInputStream stringToStream(String input) {
-    InputStream stream = IoUtil.stringAsInputStream(input);
+    InputStream stream = SpinIoUtil.stringAsInputStream(input);
     return new RewindableInputStream(stream, REWINDING_LIMIT);
   }
   

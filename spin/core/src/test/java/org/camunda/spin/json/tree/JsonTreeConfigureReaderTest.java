@@ -25,7 +25,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.camunda.spin.impl.json.tree.JsonJacksonTreeDataFormat;
-import org.camunda.spin.impl.util.IoUtil;
+import org.camunda.spin.impl.util.SpinIoUtil;
 import org.camunda.spin.json.SpinJsonNode;
 import org.camunda.spin.spi.SpinJsonDataFormatException;
 import org.junit.Before;
@@ -84,7 +84,7 @@ public class JsonTreeConfigureReaderTest {
 
   @Test
   public void shouldApplyConfigurationOnCreationFromInputStream() {
-    InputStream input = IoUtil.stringAsInputStream(EXAMPLE_JACKSON_READ_CONFIGURATION_JSON);
+    InputStream input = SpinIoUtil.stringAsInputStream(EXAMPLE_JACKSON_READ_CONFIGURATION_JSON);
 
     try {
       S(input, jsonTree());
@@ -93,15 +93,15 @@ public class JsonTreeConfigureReaderTest {
       // happy path
     }
 
-    input = IoUtil.stringAsInputStream(EXAMPLE_JACKSON_READ_CONFIGURATION_JSON);
+    input = SpinIoUtil.stringAsInputStream(EXAMPLE_JACKSON_READ_CONFIGURATION_JSON);
     SpinJsonNode json = S(input, dataFormatInstance);
     assertThat(json).isNotNull();
 
-    input = IoUtil.stringAsInputStream(EXAMPLE_JACKSON_READ_CONFIGURATION_JSON);
+    input = SpinIoUtil.stringAsInputStream(EXAMPLE_JACKSON_READ_CONFIGURATION_JSON);
     json = JSON(input, dataFormatInstance);
     assertThat(json).isNotNull();
 
-    input = IoUtil.stringAsInputStream(EXAMPLE_JACKSON_READ_CONFIGURATION_JSON);
+    input = SpinIoUtil.stringAsInputStream(EXAMPLE_JACKSON_READ_CONFIGURATION_JSON);
     json = JSON(input, configurationMap, null, null);
     assertThat(json).isNotNull();
   }

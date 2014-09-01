@@ -26,7 +26,7 @@ import java.io.OutputStream;
 import java.io.StringWriter;
 
 import org.camunda.spin.impl.json.tree.SpinJsonJacksonTreeNode;
-import org.camunda.spin.impl.util.IoUtil;
+import org.camunda.spin.impl.util.SpinIoUtil;
 import org.camunda.spin.json.SpinJsonNode;
 import org.junit.Before;
 import org.junit.Test;
@@ -62,15 +62,15 @@ public class JsonJacksonTreeNodeTest {
   @Test
   public void canWriteToStream() throws IOException {
     OutputStream outputStream = jsonNode.toStream();
-    InputStream inputStream = IoUtil.convertOutputStreamToInputStream(outputStream);
-    String value = IoUtil.getStringFromInputStream(inputStream, false);
+    InputStream inputStream = SpinIoUtil.convertOutputStreamToInputStream(outputStream);
+    String value = SpinIoUtil.getStringFromInputStream(inputStream, false);
     assertThatJson(value).isEqualTo(EXAMPLE_JSON);
 
 
     outputStream = new ByteArrayOutputStream();
     jsonNode.writeToStream(outputStream);
-    inputStream = IoUtil.convertOutputStreamToInputStream(outputStream);
-    value = IoUtil.getStringFromInputStream(inputStream, false);
+    inputStream = SpinIoUtil.convertOutputStreamToInputStream(outputStream);
+    value = SpinIoUtil.getStringFromInputStream(inputStream, false);
     assertThatJson(value).isEqualTo(EXAMPLE_JSON);
   }
 
@@ -84,7 +84,7 @@ public class JsonJacksonTreeNodeTest {
   @Test
   public void canWriteToStreamAndReadAgain() {
     OutputStream outputStream = jsonNode.toStream();
-    InputStream inputStream = IoUtil.convertOutputStreamToInputStream(outputStream);
+    InputStream inputStream = SpinIoUtil.convertOutputStreamToInputStream(outputStream);
     SpinJsonNode json = JSON(inputStream);
     assertThat(json).isNotNull();
   }

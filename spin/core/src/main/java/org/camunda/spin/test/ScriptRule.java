@@ -23,7 +23,7 @@ import javax.script.ScriptException;
 import javax.script.SimpleBindings;
 
 import org.camunda.spin.SpinScriptException;
-import org.camunda.spin.impl.util.IoUtil;
+import org.camunda.spin.impl.util.SpinIoUtil;
 import org.camunda.spin.logging.SpinLogger;
 import org.camunda.spin.scripting.SpinScriptEnv;
 import org.junit.ClassRule;
@@ -118,8 +118,8 @@ public class ScriptRule implements TestRule {
     }
     String scriptBasename = getScriptBasename(scriptAnnotation, description);
     scriptPath = getScriptPath(scriptBasename, description);
-    File file = IoUtil.getClasspathFile(scriptPath, description.getTestClass().getClassLoader());
-    return IoUtil.fileAsString(file);
+    File file = SpinIoUtil.getClasspathFile(scriptPath, description.getTestClass().getClassLoader());
+    return SpinIoUtil.fileAsString(file);
   }
 
   /**
@@ -160,8 +160,8 @@ public class ScriptRule implements TestRule {
       LOG.scriptVariableFound(name, "isNull", null);
     }
     else if (!filename.isEmpty()) {
-      File file = IoUtil.getClasspathFile(filename, description.getTestClass().getClassLoader());
-      InputStream fileAsStream = IoUtil.fileAsStream(file);
+      File file = SpinIoUtil.getClasspathFile(filename, description.getTestClass().getClassLoader());
+      InputStream fileAsStream = SpinIoUtil.fileAsStream(file);
       variables.put(name, fileAsStream);
       LOG.scriptVariableFound(name, "input stream", filename);
     }

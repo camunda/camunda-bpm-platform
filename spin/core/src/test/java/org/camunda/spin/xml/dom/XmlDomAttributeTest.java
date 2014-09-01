@@ -13,7 +13,7 @@
 
 package org.camunda.spin.xml.dom;
 
-import org.camunda.spin.impl.util.IoUtil;
+import org.camunda.spin.impl.util.SpinIoUtil;
 import org.camunda.spin.xml.XmlTestConstants;
 import org.camunda.spin.xml.tree.SpinXmlTreeAttribute;
 import org.camunda.spin.xml.tree.SpinXmlTreeAttributeException;
@@ -88,8 +88,8 @@ public class XmlDomAttributeTest {
   public void canWriteToStream() throws IOException {
     OutputStream outputStream = attribute.toStream();
     attribute.writeToStream(outputStream);
-    InputStream inputStream = IoUtil.convertOutputStreamToInputStream(outputStream);
-    String value = IoUtil.getStringFromInputStream(inputStream);
+    InputStream inputStream = SpinIoUtil.convertOutputStreamToInputStream(outputStream);
+    String value = SpinIoUtil.getStringFromInputStream(inputStream);
     assertThat(value).isEqualTo("order1order1");
   }
 

@@ -13,7 +13,7 @@
 package org.camunda.spin.scripting;
 
 import org.camunda.spin.SpinScriptException;
-import org.camunda.spin.impl.util.IoUtil;
+import org.camunda.spin.impl.util.SpinIoUtil;
 import org.camunda.spin.logging.SpinCoreLogger;
 import org.camunda.spin.logging.SpinLogger;
 
@@ -94,10 +94,10 @@ public class SpinScriptEnv {
 
     } else {
       try {
-        return IoUtil.inputStreamAsString(envResource);
+        return SpinIoUtil.inputStreamAsString(envResource);
 
       } finally {
-        IoUtil.closeSilently(envResource);
+        SpinIoUtil.closeSilently(envResource);
 
       }
     }

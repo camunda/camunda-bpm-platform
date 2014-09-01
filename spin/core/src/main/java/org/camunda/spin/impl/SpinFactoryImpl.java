@@ -12,12 +12,6 @@
  */
 package org.camunda.spin.impl;
 
-import static org.camunda.spin.impl.util.IoUtil.stringAsInputStream;
-import static org.camunda.spin.impl.util.SpinEnsure.ensureNotNull;
-
-import java.io.IOException;
-import java.io.InputStream;
-
 import org.camunda.spin.DataFormats;
 import org.camunda.spin.Spin;
 import org.camunda.spin.SpinFactory;
@@ -27,6 +21,12 @@ import org.camunda.spin.spi.DataFormat;
 import org.camunda.spin.spi.DataFormatMapper;
 import org.camunda.spin.spi.DataFormatReader;
 import org.camunda.spin.spi.SpinDataFormatException;
+
+import java.io.IOException;
+import java.io.InputStream;
+
+import static org.camunda.commons.utils.IoUtil.stringAsInputStream;
+import static org.camunda.spin.impl.util.SpinEnsure.ensureNotNull;
 
 /**
  * @author Daniel Meyer
