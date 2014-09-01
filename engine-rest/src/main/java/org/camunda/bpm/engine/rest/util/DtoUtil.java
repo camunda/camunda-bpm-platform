@@ -79,17 +79,30 @@ public class DtoUtil {
 
       // date
       if (type.equalsIgnoreCase(ProcessEngineVariableType.DATE.getName())) {
-        SimpleDateFormat pattern = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-        Date date = pattern.parse(String.valueOf(value));
-        return date;
+        return DtoUtil.toDate(value);
       }
 
       // passed a non supported type
-      throw new IllegalArgumentException("The variable type '" + type + "' is not supported.");
+      throw new IllegalArgumentException("The value type '" + type + "' is not supported.");
     }
 
     // no type specified or value equals null then simply return the value
     return value;
+  }
+
+  /**
+   * Returns whether a given value type can be stored by the primitive variable
+   * types the process engine provides.
+   */
+  public static boolean handledByPrimitivePlainTextType(String type) {
+    return ProcessEngineVariableType.BOOLEAN.getName().equalsIgnoreCase(type)
+        || ProcessEngineVariableType.STRING.getName().equalsIgnoreCase(type)
+        || ProcessEngineVariableType.INTEGER.getName().equalsIgnoreCase(type)
+        || ProcessEngineVariableType.SHORT.getName().equalsIgnoreCase(type)
+        || ProcessEngineVariableType.LONG.getName().equalsIgnoreCase(type)
+        || ProcessEngineVariableType.DOUBLE.getName().equalsIgnoreCase(type)
+        || ProcessEngineVariableType.DATE.getName().equalsIgnoreCase(type);
+
   }
 
   public static Date toDate(Object value) throws ParseException {

@@ -44,4 +44,11 @@ public class LocalTaskVariablesResource extends AbstractVariablesResource {
     return "task";
   }
 
+  @Override
+  protected void setVariableEntityFromSerialized(String variableKey, Object serializedValue, String variableType, Map<String, Object> configuration) {
+    engine.getTaskService().setVariableLocalFromSerialized(resourceId, variableKey,
+        serializedValue, variableType, configuration);
+
+  }
+
 }

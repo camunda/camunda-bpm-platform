@@ -10,7 +10,7 @@ import org.camunda.bpm.engine.rest.sub.impl.AbstractVariablesResource;
 public class ExecutionVariablesResource extends AbstractVariablesResource {
 
   private String resourceTypeName;
-  
+
   public ExecutionVariablesResource(ProcessEngine engine, String resourceId, boolean isProcessInstance) {
     super(engine, resourceId);
     if (isProcessInstance) {
@@ -30,7 +30,7 @@ public class ExecutionVariablesResource extends AbstractVariablesResource {
     RuntimeServiceImpl runtimeService = (RuntimeServiceImpl) engine.getRuntimeService();
     runtimeService.updateVariables(resourceId, modifications, deletions);
   }
-  
+
   @Override
   protected Object getVariableEntity(String variableKey) {
     return engine.getRuntimeService().getVariable(resourceId, variableKey);
@@ -49,6 +49,12 @@ public class ExecutionVariablesResource extends AbstractVariablesResource {
   @Override
   protected String getResourceTypeName() {
     return resourceTypeName;
+  }
+
+  @Override
+  protected void setVariableEntityFromSerialized(String variableKey, Object serializedValue, String variableType, Map<String, Object> configuration) {
+    engine.getRuntimeService().setVariableFromSerialized(resourceId, variableKey,
+        serializedValue, variableType, configuration);
   }
 
 }

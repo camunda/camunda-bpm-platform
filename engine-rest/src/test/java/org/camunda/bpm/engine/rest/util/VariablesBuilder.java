@@ -81,4 +81,22 @@ public class VariablesBuilder {
 
     return variable;
   }
+
+  public static Map<String, Object> getSerializedValueMap(Object value, String variableType, Map<String, Object> configuration) {
+    Map<String, Object> serializedVariable = new HashMap<String, Object>();
+
+    if (value != null) {
+      serializedVariable.put("value", value);
+    }
+
+    if (variableType != null) {
+      serializedVariable.put("variableType", variableType);
+    }
+
+    if (configuration != null) {
+      serializedVariable.put("serializationConfig", configuration);
+    }
+
+    return serializedVariable;
+  }
 }

@@ -46,9 +46,19 @@ public interface VariableResource {
   void putVariable(@PathParam("varId") String variableName, VariableValueDto variable);
 
   @POST // using POST since PUT is not as widely supported for file uploads
-  @Path("/{varId}/data")
+  @Path("/{varId}")
   @Consumes(MediaType.MULTIPART_FORM_DATA)
   void setBinaryVariable(@PathParam("varId") String variableName, MultipartFormData multipartFormData);
+
+  /**
+   * The "/data" suffix is for backwards compatibility and optional.
+   * Using it is deprecated.
+   */
+  @POST // using POST since PUT is not as widely supported for file uploads
+  @Path("/{varId}/data")
+  @Consumes(MediaType.MULTIPART_FORM_DATA)
+  @Deprecated
+  void setBinaryVariableDeprecated(@PathParam("varId") String variableName, MultipartFormData multipartFormData);
 
   @DELETE
   @Path("/{varId}")

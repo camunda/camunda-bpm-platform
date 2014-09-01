@@ -2,7 +2,9 @@ package org.camunda.bpm.engine.rest;
 
 import com.jayway.restassured.http.ContentType;
 import com.jayway.restassured.response.Response;
+
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.delegate.ProcessEngineVariableType;
 import org.camunda.bpm.engine.impl.RuntimeServiceImpl;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceSuspensionStateDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
@@ -22,11 +24,13 @@ import org.junit.Test;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
+
 import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static com.jayway.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.*;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyCollectionOf;
 import static org.mockito.Matchers.anyMapOf;
 import static org.mockito.Matchers.anyString;
@@ -42,7 +46,6 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
   protected static final String SINGLE_PROCESS_INSTANCE_URL = PROCESS_INSTANCE_URL + "/{id}";
   protected static final String PROCESS_INSTANCE_VARIABLES_URL = SINGLE_PROCESS_INSTANCE_URL + "/variables";
   protected static final String SINGLE_PROCESS_INSTANCE_VARIABLE_URL = PROCESS_INSTANCE_VARIABLES_URL + "/{varId}";
-  protected static final String SINGLE_PROCESS_INSTANCE_VARIABLE_DATA_URL = SINGLE_PROCESS_INSTANCE_VARIABLE_URL + "/data";
   protected static final String PROCESS_INSTANCE_ACTIVIY_INSTANCES_URL = SINGLE_PROCESS_INSTANCE_URL + "/activity-instances";
   private static final String EXAMPLE_PROCESS_INSTANCE_ID_WITH_NULL_VALUE_AS_VARIABLE = "aProcessInstanceWithNullValueAsVariable";
   protected static final String SINGLE_PROCESS_INSTANCE_SUSPENDED_URL = SINGLE_PROCESS_INSTANCE_URL + "/suspended";
@@ -369,7 +372,7 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
     given().pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID).contentType(ContentType.JSON).body(messageBodyJson)
       .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
       .body("type", equalTo(RestException.class.getSimpleName()))
-      .body("message", equalTo("Cannot modify variables for process instance: The variable type 'X' is not supported."))
+      .body("message", equalTo("Cannot modify variables for process instance: The value type 'X' is not supported."))
       .when().post(PROCESS_INSTANCE_VARIABLES_URL);
   }
 
@@ -672,8 +675,8 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
     given().pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID).pathParam("varId", variableKey)
       .contentType(ContentType.JSON).body(variableJson)
       .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
-      .body("type", equalTo(RestException.class.getSimpleName()))
-      .body("message", equalTo("Cannot put process instance variable aVariableKey: The variable type 'X' is not supported."))
+      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("message", equalTo("Cannot put process instance variable aVariableKey: Invalid combination of variable type 'null' and value type 'X'"))
       .when().put(SINGLE_PROCESS_INSTANCE_VARIABLE_URL);
   }
 
@@ -689,7 +692,7 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
     .expect()
       .statusCode(Status.NO_CONTENT.getStatusCode())
     .when()
-      .post(SINGLE_PROCESS_INSTANCE_VARIABLE_DATA_URL);
+      .post(SINGLE_PROCESS_INSTANCE_VARIABLE_URL);
 
     verify(runtimeServiceMock).setVariable(eq(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID), eq(variableKey),
         eq(bytes));
@@ -707,10 +710,28 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
     .expect()
       .statusCode(Status.NO_CONTENT.getStatusCode())
     .when()
-      .post(SINGLE_PROCESS_INSTANCE_VARIABLE_DATA_URL);
+      .post(SINGLE_PROCESS_INSTANCE_VARIABLE_URL);
 
     verify(runtimeServiceMock).setVariable(eq(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID), eq(variableKey),
         eq(bytes));
+  }
+
+  @Test
+  public void testPutSingleBinaryVariableOnDeprecatedPath() throws Exception {
+    byte[] bytes = "someContent".getBytes();
+
+    String variableKey = "aVariableKey";
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID).pathParam("varId", variableKey)
+      .multiPart("data", "unspecified", bytes)
+    .expect()
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+      .post(SINGLE_PROCESS_INSTANCE_VARIABLE_URL + "/data");
+
+    verify(runtimeServiceMock).setVariable(
+        eq(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID), eq(variableKey), eq(bytes));
   }
 
   @Test
@@ -732,7 +753,7 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
     .expect()
       .statusCode(Status.NO_CONTENT.getStatusCode())
     .when()
-      .post(SINGLE_PROCESS_INSTANCE_VARIABLE_DATA_URL);
+      .post(SINGLE_PROCESS_INSTANCE_VARIABLE_URL);
 
     verify(runtimeServiceMock).setVariable(eq(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID), eq(variableKey),
         eq(serializable));
@@ -758,10 +779,99 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
       .statusCode(Status.BAD_REQUEST.getStatusCode())
       .body(containsString("Unrecognized content type for serialized java type: unsupported"))
     .when()
-      .post(SINGLE_PROCESS_INSTANCE_VARIABLE_DATA_URL);
+      .post(SINGLE_PROCESS_INSTANCE_VARIABLE_URL);
 
     verify(runtimeServiceMock, never()).setVariable(eq(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID), eq(variableKey),
         eq(serializable));
+  }
+
+  @Test
+  public void testPutSingleVariableFromSerializedMultipart() throws Exception {
+    byte[] bytes = "someContent".getBytes();
+
+    String variableKey = "aVariableKey";
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID).pathParam("varId", variableKey)
+      .multiPart("data", "unspecified", bytes)
+      .multiPart("variableType", ProcessEngineVariableType.SERIALIZABLE.getName(), MediaType.TEXT_PLAIN)
+    .expect()
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+      .post(SINGLE_PROCESS_INSTANCE_VARIABLE_URL);
+
+    verify(runtimeServiceMock).setVariableFromSerialized(
+        eq(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID), eq(variableKey),
+        eq(bytes), eq(ProcessEngineVariableType.SERIALIZABLE.getName()), isNull(Map.class));
+  }
+
+  @Test
+  public void testPutSingleVariableFromSerialized() throws Exception {
+    String serializedValue = "{\"prop\" : \"value\"}";
+    Map<String, Object> config = new HashMap<String, Object>();
+    config.put(ProcessEngineVariableType.SPIN_TYPE_DATA_FORMAT_ID, "aDataFormat");
+    config.put(ProcessEngineVariableType.SPIN_TYPE_CONFIG_ROOT_TYPE, "aRootType");
+
+    Map<String, Object> requestJson = VariablesBuilder
+        .getSerializedValueMap(serializedValue, ProcessEngineVariableType.SPIN.getName(), config);
+
+    String variableKey = "aVariableKey";
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID).pathParam("varId", variableKey)
+      .contentType(ContentType.JSON)
+      .body(requestJson)
+    .expect()
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+      .put(SINGLE_PROCESS_INSTANCE_VARIABLE_URL);
+
+    verify(runtimeServiceMock).setVariableFromSerialized(
+        eq(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID), eq(variableKey),
+        eq(serializedValue), eq(ProcessEngineVariableType.SPIN.getName()), argThat(new EqualsMap(config)));
+  }
+
+  @Test
+  public void testPutSingleVariableFromInvalidSerialized() throws Exception {
+    String serializedValue = "{\"prop\" : \"value\"}";
+
+    Map<String, Object> requestJson = VariablesBuilder
+        .getSerializedValueMap(serializedValue, "aNonExistingType", null);
+
+    String variableKey = "aVariableKey";
+
+    doThrow(new ProcessEngineException("expected exception"))
+      .when(runtimeServiceMock)
+      .setVariableFromSerialized(anyString(), anyString(), any(), anyString(), any(Map.class));
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID).pathParam("varId", variableKey)
+      .contentType(ContentType.JSON)
+      .body(requestJson)
+    .expect()
+      .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
+      .body("type", equalTo(RestException.class.getSimpleName()))
+      .body("message", equalTo("Cannot put process instance variable aVariableKey: expected exception"))
+    .when()
+      .put(SINGLE_PROCESS_INSTANCE_VARIABLE_URL);
+  }
+
+  @Test
+  public void testPutSingleVariableFromSerializedWithNoValue() {
+    String variableKey = "aVariableKey";
+
+    Map<String, Object> config = new HashMap<String, Object>();
+    Map<String, Object> requestJson = VariablesBuilder
+        .getSerializedValueMap(null, ProcessEngineVariableType.SPIN.getName(), config);
+
+    given().pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID).pathParam("varId", variableKey)
+      .contentType(ContentType.JSON).body(requestJson)
+      .then().expect().statusCode(Status.NO_CONTENT.getStatusCode())
+      .when().put(SINGLE_PROCESS_INSTANCE_VARIABLE_URL);
+
+    verify(runtimeServiceMock).setVariableFromSerialized(
+        eq(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID), eq(variableKey),
+        isNull(), eq(ProcessEngineVariableType.SPIN.getName()), argThat(new EqualsMap(config)));
   }
 
   @Test

@@ -15,8 +15,11 @@ package org.camunda.bpm.engine.rest.sub.runtime.impl;
 import java.util.List;
 import java.util.Map;
 
+import javax.ws.rs.core.Response.Status;
+
 import org.camunda.bpm.engine.CaseService;
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.sub.impl.AbstractVariablesResource;
 
 /**
@@ -67,6 +70,10 @@ public class LocalCaseExecutionVariablesResource extends AbstractVariablesResour
 
   protected String getResourceTypeName() {
     return "case execution";
+  }
+
+  protected void setVariableEntityFromSerialized(String variableKey, Object serializedValue, String variableType, Map<String, Object> configuration) {
+    throw new RestException(Status.NOT_FOUND, "Unsupported operation");
   }
 
 }

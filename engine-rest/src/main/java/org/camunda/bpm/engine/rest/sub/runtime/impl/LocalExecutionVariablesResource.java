@@ -23,7 +23,7 @@ public class LocalExecutionVariablesResource extends AbstractVariablesResource {
     RuntimeServiceImpl runtimeService = (RuntimeServiceImpl) engine.getRuntimeService();
     runtimeService.updateVariablesLocal(resourceId, modifications, deletions);
   }
-  
+
   @Override
   protected Object getVariableEntity(String variableKey) {
     return engine.getRuntimeService().getVariableLocal(resourceId, variableKey);
@@ -42,6 +42,12 @@ public class LocalExecutionVariablesResource extends AbstractVariablesResource {
   @Override
   protected String getResourceTypeName() {
     return "execution";
+  }
+
+  @Override
+  protected void setVariableEntityFromSerialized(String variableKey, Object serializedValue, String variableType, Map<String, Object> configuration) {
+    engine.getRuntimeService().setVariableLocalFromSerialized(resourceId, variableKey,
+        serializedValue, variableType, configuration);
   }
 
 }

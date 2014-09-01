@@ -68,6 +68,7 @@ import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.delegate.ProcessEngineVariableType;
 import org.camunda.bpm.engine.form.TaskFormData;
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.history.HistoricTaskInstanceQuery;
@@ -139,7 +140,6 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
   protected static final String SINGLE_TASK_SINGLE_VARIABLE_URL = SINGLE_TASK_VARIABLES_URL + "/{varId}";
   protected static final String SINGLE_TASK_PUT_SINGLE_VARIABLE_URL = SINGLE_TASK_SINGLE_VARIABLE_URL;
   protected static final String SINGLE_TASK_DELETE_SINGLE_VARIABLE_URL = SINGLE_TASK_SINGLE_VARIABLE_URL;
-  protected static final String SINGLE_TASK_SINGLE_VARIABLE_DATA_URL = SINGLE_TASK_SINGLE_VARIABLE_URL + "/data";
   protected static final String SINGLE_TASK_MODIFY_VARIABLES_URL = SINGLE_TASK_VARIABLES_URL;
 
   protected static final String TASK_CREATE_URL = TASK_SERVICE_URL + "/create";
@@ -623,7 +623,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
       .then().expect()
         .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
         .body("type", equalTo(RestException.class.getSimpleName()))
-        .body("message", containsString("Cannot submit task form anId: The variable type 'X' is not supported."))
+        .body("message", containsString("Cannot submit task form anId: The value type 'X' is not supported."))
       .when().post(SUBMIT_FORM_URL);
   }
 
@@ -1124,7 +1124,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
       .then().expect()
         .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
         .body("type", equalTo(RestException.class.getSimpleName()))
-        .body("message", containsString("Cannot complete task anId: The variable type 'X' is not supported."))
+        .body("message", containsString("Cannot complete task anId: The value type 'X' is not supported."))
       .when().post(COMPLETE_TASK_URL);
   }
 
@@ -1289,7 +1289,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
       .then().expect()
         .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
         .body("type", equalTo(RestException.class.getSimpleName()))
-        .body("message", containsString("Cannot resolve task anId: The variable type 'X' is not supported."))
+        .body("message", containsString("Cannot resolve task anId: The value type 'X' is not supported."))
       .when().post(RESOLVE_TASK_URL);
   }
 
@@ -2430,8 +2430,8 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
       .contentType(ContentType.JSON).body(variableJson)
       .header("accept", MediaType.APPLICATION_JSON)
       .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
-      .body("type", equalTo(RestException.class.getSimpleName()))
-      .body("message", equalTo("Cannot put task variable " + variableKey + ": The variable type 'X' is not supported."))
+      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("message", equalTo("Cannot put task variable " + variableKey + ": Invalid combination of variable type 'null' and value type 'X'"))
       .when().put(SINGLE_TASK_PUT_SINGLE_VARIABLE_URL);
   }
 
@@ -2481,7 +2481,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     .expect()
       .statusCode(Status.NO_CONTENT.getStatusCode())
     .when()
-      .post(SINGLE_TASK_SINGLE_VARIABLE_DATA_URL);
+      .post(SINGLE_TASK_PUT_SINGLE_VARIABLE_URL);
 
     verify(taskServiceMock).setVariableLocal(eq(EXAMPLE_TASK_ID), eq(variableKey),
         eq(bytes));
@@ -2500,10 +2500,28 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     .expect()
       .statusCode(Status.NO_CONTENT.getStatusCode())
     .when()
-      .post(SINGLE_TASK_SINGLE_VARIABLE_DATA_URL);
+      .post(SINGLE_TASK_PUT_SINGLE_VARIABLE_URL);
 
     verify(taskServiceMock).setVariableLocal(eq(EXAMPLE_TASK_ID), eq(variableKey),
         eq(bytes));
+  }
+
+  @Test
+  public void testPutSingleLocalBinaryVariableOnDeprecatedPath() throws Exception {
+    byte[] bytes = "someContent".getBytes();
+
+    String variableKey = "aVariableKey";
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_TASK_ID).pathParam("varId", variableKey)
+      .multiPart("data", "unspecified", bytes)
+    .expect()
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+      .post(SINGLE_TASK_PUT_SINGLE_VARIABLE_URL + "/data");
+
+    verify(taskServiceMock).setVariableLocal(
+        eq(MockProvider.EXAMPLE_TASK_ID), eq(variableKey), eq(bytes));
   }
 
   @Test
@@ -2526,7 +2544,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     .expect()
       .statusCode(Status.NO_CONTENT.getStatusCode())
     .when()
-      .post(SINGLE_TASK_SINGLE_VARIABLE_DATA_URL);
+      .post(SINGLE_TASK_PUT_SINGLE_VARIABLE_URL);
 
     verify(taskServiceMock).setVariableLocal(eq(MockProvider.EXAMPLE_TASK_ID), eq(variableKey),
         eq(serializable));
@@ -2553,10 +2571,99 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
       .statusCode(Status.BAD_REQUEST.getStatusCode())
       .body(containsString("Unrecognized content type for serialized java type: unsupported"))
     .when()
-      .post(SINGLE_TASK_SINGLE_VARIABLE_DATA_URL);
+      .post(SINGLE_TASK_PUT_SINGLE_VARIABLE_URL);
 
     verify(taskServiceMock, never()).setVariableLocal(eq(EXAMPLE_TASK_ID), eq(variableKey),
         eq(serializable));
+  }
+
+  @Test
+  public void testPutSingleLocalVariableFromSerializedMultipart() throws Exception {
+    byte[] bytes = "someContent".getBytes();
+
+    String variableKey = "aVariableKey";
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_TASK_ID).pathParam("varId", variableKey)
+      .multiPart("data", "unspecified", bytes)
+      .multiPart("variableType", ProcessEngineVariableType.SERIALIZABLE.getName(), MediaType.TEXT_PLAIN)
+    .expect()
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+      .post(SINGLE_TASK_PUT_SINGLE_VARIABLE_URL);
+
+    verify(taskServiceMock).setVariableLocalFromSerialized(
+        eq(MockProvider.EXAMPLE_TASK_ID), eq(variableKey),
+        eq(bytes), eq(ProcessEngineVariableType.SERIALIZABLE.getName()), isNull(Map.class));
+  }
+
+  @Test
+  public void testPutSingleLocalVariableFromSerialized() throws Exception {
+    String serializedValue = "{\"prop\" : \"value\"}";
+    Map<String, Object> config = new HashMap<String, Object>();
+    config.put(ProcessEngineVariableType.SPIN_TYPE_DATA_FORMAT_ID, "aDataFormat");
+    config.put(ProcessEngineVariableType.SPIN_TYPE_CONFIG_ROOT_TYPE, "aRootType");
+
+    Map<String, Object> requestJson = VariablesBuilder
+        .getSerializedValueMap(serializedValue, ProcessEngineVariableType.SPIN.getName(), config);
+
+    String variableKey = "aVariableKey";
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_TASK_ID).pathParam("varId", variableKey)
+      .contentType(ContentType.JSON)
+      .body(requestJson)
+    .expect()
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+      .put(SINGLE_TASK_PUT_SINGLE_VARIABLE_URL);
+
+    verify(taskServiceMock).setVariableLocalFromSerialized(
+        eq(MockProvider.EXAMPLE_TASK_ID), eq(variableKey),
+        eq(serializedValue), eq(ProcessEngineVariableType.SPIN.getName()), argThat(new EqualsMap(config)));
+  }
+
+  @Test
+  public void testPutSingleLocalVariableFromInvalidSerialized() throws Exception {
+    String serializedValue = "{\"prop\" : \"value\"}";
+
+    Map<String, Object> requestJson = VariablesBuilder
+        .getSerializedValueMap(serializedValue, "aNonExistingType", null);
+
+    String variableKey = "aVariableKey";
+
+    doThrow(new ProcessEngineException("expected exception"))
+      .when(taskServiceMock)
+      .setVariableLocalFromSerialized(anyString(), anyString(), any(), anyString(), any(Map.class));
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_TASK_ID).pathParam("varId", variableKey)
+      .contentType(ContentType.JSON)
+      .body(requestJson)
+    .expect()
+      .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
+      .body("type", equalTo(RestException.class.getSimpleName()))
+      .body("message", equalTo("Cannot put task variable aVariableKey: expected exception"))
+    .when()
+      .put(SINGLE_TASK_PUT_SINGLE_VARIABLE_URL);
+  }
+
+  @Test
+  public void testPutSingleLocalVariableFromSerializedWithNoValue() {
+    String variableKey = "aVariableKey";
+
+    Map<String, Object> config = new HashMap<String, Object>();
+    Map<String, Object> requestJson = VariablesBuilder
+        .getSerializedValueMap(null, ProcessEngineVariableType.SPIN.getName(), config);
+
+    given().pathParam("id", MockProvider.EXAMPLE_TASK_ID).pathParam("varId", variableKey)
+      .contentType(ContentType.JSON).body(requestJson)
+      .then().expect().statusCode(Status.NO_CONTENT.getStatusCode())
+      .when().put(SINGLE_TASK_PUT_SINGLE_VARIABLE_URL);
+
+    verify(taskServiceMock).setVariableLocalFromSerialized(
+        eq(MockProvider.EXAMPLE_TASK_ID), eq(variableKey),
+        isNull(), eq(ProcessEngineVariableType.SPIN.getName()), argThat(new EqualsMap(config)));
   }
 
   @Test

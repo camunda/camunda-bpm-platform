@@ -374,7 +374,7 @@ public abstract class AbstractMessageRestServiceTest extends AbstractRestService
     given().contentType(POST_JSON_CONTENT_TYPE).body(messageParameters)
     .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
     .body("type", equalTo(RestException.class.getSimpleName()))
-    .body("message", equalTo("Cannot deliver a message: The variable type 'X' is not supported."))
+    .body("message", equalTo("Cannot deliver a message: The value type 'X' is not supported."))
     .when().post(MESSAGE_URL);
   }
 
@@ -500,7 +500,7 @@ public abstract class AbstractMessageRestServiceTest extends AbstractRestService
     given().contentType(POST_JSON_CONTENT_TYPE).body(messageParameters)
     .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
     .body("type", equalTo(RestException.class.getSimpleName()))
-    .body("message", equalTo("Cannot deliver a message: The variable type 'X' is not supported."))
+    .body("message", equalTo("Cannot deliver a message: The value type 'X' is not supported."))
     .when().post(MESSAGE_URL);
   }
 }

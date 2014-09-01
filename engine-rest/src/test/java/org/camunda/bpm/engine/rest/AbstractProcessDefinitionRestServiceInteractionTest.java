@@ -533,7 +533,7 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
     .then().expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
       .body("type", equalTo(RestException.class.getSimpleName()))
-      .body("message", containsString("Cannot instantiate process definition aProcDefId: The variable type 'X' is not supported."))
+      .body("message", containsString("Cannot instantiate process definition aProcDefId: The value type 'X' is not supported."))
     .when().post(SUBMIT_FORM_URL);
   }
 
@@ -849,7 +849,7 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
     .then().expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
       .body("type", equalTo(RestException.class.getSimpleName()))
-      .body("message", containsString("Cannot instantiate process definition aProcDefId: The variable type 'X' is not supported."))
+      .body("message", containsString("Cannot instantiate process definition aProcDefId: The value type 'X' is not supported."))
     .when().post(START_PROCESS_INSTANCE_URL);
   }
 
@@ -1776,7 +1776,7 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
     .then().expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
       .body("type", equalTo(RestException.class.getSimpleName()))
-      .body("message", containsString("Cannot instantiate process definition aProcDefId: The variable type 'X' is not supported."))
+      .body("message", containsString("Cannot instantiate process definition aProcDefId: The value type 'X' is not supported."))
     .when().post(SUBMIT_FORM_BY_KEY_URL);
   }
 
@@ -2042,7 +2042,7 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
     .then().expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
       .body("type", equalTo(RestException.class.getSimpleName()))
-      .body("message", containsString("Cannot instantiate process definition aProcDefId: The variable type 'X' is not supported."))
+      .body("message", containsString("Cannot instantiate process definition aProcDefId: The value type 'X' is not supported."))
     .when().post(START_PROCESS_INSTANCE_BY_KEY_URL);
   }
 
