@@ -34,7 +34,7 @@ We can map the following XML object
 </customer>
  ```
  
- to an instance of `Customer` as follows:
+ to an instance of `Customer` in the following way:
 
 ```java
 import static org.camunda.spin.Spin.XML;
