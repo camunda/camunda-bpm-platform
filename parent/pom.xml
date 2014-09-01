@@ -63,7 +63,8 @@
     <version.camunda.template-engines>1.0.0</version.camunda.template-engines>
 
     <!-- OSGi bundles properties -->
-    <camunda.artifact />    
+    <camunda.artifact />
+    <camunda.osgi.import.camunda.spin.version>version="[$(version;==;${camunda.spin.version.clean}),$(version;=+;${camunda.spin.version.clean}))"</camunda.osgi.import.camunda.spin.version>
     <camunda.osgi.import.camunda.connect.version>version="[$(version;==;${camunda.connect.version.clean}),$(version;=+;${camunda.connect.version.clean}))"</camunda.osgi.import.camunda.connect.version>
     <camunda.osgi.import.camunda.version>version="[$(version;==;${camunda.osgi.version.clean}),$(version;=+;${camunda.osgi.version.clean}))"</camunda.osgi.import.camunda.version>
     <camunda.osgi.import.strict.version>version="[$(version;===;${camunda.osgi.version.clean}),$(version;==+;${camunda.osgi.version.clean}))"</camunda.osgi.import.strict.version>
@@ -781,6 +782,7 @@
            <versions>
             <camunda.osgi.version.clean>${project.version}</camunda.osgi.version.clean>
             <camunda.connect.version.clean>${version.camunda.connect}</camunda.connect.version.clean>
+            <camunda.spin.version.clean>${version.camunda.spin}</camunda.spin.version.clean>
            </versions>
           </configuration>
         </plugin>
