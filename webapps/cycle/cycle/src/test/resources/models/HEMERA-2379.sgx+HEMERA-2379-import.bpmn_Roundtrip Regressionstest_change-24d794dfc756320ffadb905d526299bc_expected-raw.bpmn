@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?><definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:signavio="http://www.signavio.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" exporter="Signavio Process Editor, http://www.signavio.com" exporterVersion="7.8.0" expressionLanguage="http://www.w3.org/1999/XPath" id="sid-66ce555a-8851-4271-b95a-eb50cbcc6b52" targetNamespace="http://www.signavio.com/bpmn20" typeLanguage="http://www.w3.org/2001/XMLSchema" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://www.omg.org/spec/BPMN/2.0/20100501/BPMN20.xsd">
    <dataStore capacity="0" id="sid-209235fa-71fd-4642-8d81-863cea537a07" isUnlimited="false" name="Speicherort X"/>
-   <message id="sid-2f27ecf2-9c4b-4ff0-bb37-1f31a2f1b0da" name="AutomatedAcquisition"/>
    <message id="sid-3f094c25-fc31-40f5-9799-52b8d68cf6df" name="ManualAcquisition"/>
+   <message id="sid-2f27ecf2-9c4b-4ff0-bb37-1f31a2f1b0da" name="AutomatedAcquisition"/>
    <error id="sid-ba7c6057-4282-4487-a065-147e900712cd"/>
    <collaboration id="sid-97e522c6-f030-4647-9de8-c0af0e3a2459">
       <participant id="Prozess_Engine_Akquise_Prozess_15" name="Prozess Engine&#10;Akquise Prozess" processRef="CC-Akquise_">
