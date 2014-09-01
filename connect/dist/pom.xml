@@ -67,6 +67,35 @@
          <dependencySourceIncludes><include>org.camunda.connect:*</include></dependencySourceIncludes>
         </configuration>
       </plugin>
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <extensions>true</extensions>
+        <configuration>
+          <unpackBundle>false</unpackBundle>
+          <instructions>
+            <Import-Package>
+              !connectjar*,
+              javax.*;resolution:=optional,
+              org.apache.log*;resolution:=optional,
+              org.apache.log4j*;resolution:=optional,
+              *
+            </Import-Package>
+            <Bundle-ClassPath>.</Bundle-ClassPath>
+            <Embed-Dependency>*;inline=true</Embed-Dependency>
+            <Embed-Transitive>true</Embed-Transitive>
+          </instructions>
+        </configuration>
+        <executions>
+          <execution>
+            <id>bundle-manifest</id>
+            <phase>process-classes</phase>
+            <goals>
+              <goal>manifest</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
 </project>
