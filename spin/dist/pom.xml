@@ -73,6 +73,44 @@
          </additionnalDependencies>
         </configuration>
       </plugin>
+       <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <extensions>true</extensions>
+        <configuration>
+          <unpackBundle>false</unpackBundle>
+          <instructions>
+            <Export-Package>
+              ${project.groupId}*
+            </Export-Package>
+            <Import-Package>
+              !spinjar*,
+              !org.junit*,
+              !org.slf4j.impl,
+              !com.fasterxml*,
+              !com.jayway,
+              !net.minidev.json*,
+              !org.codehaus.jackson*,
+              org.slf4j,
+              org.camunda.commons.utils,
+              org.camunda.commons.logging,
+              *
+            </Import-Package>
+            <Bundle-ClassPath>.</Bundle-ClassPath>
+            <Embed-Dependency>*;inline=true</Embed-Dependency>
+            <Embed-Transitive>true</Embed-Transitive>
+          </instructions>
+        </configuration>
+        <executions>
+          <execution>
+            <id>bundle-manifest</id>
+            <phase>process-classes</phase>
+            <goals>
+              <goal>manifest</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
 </project>
