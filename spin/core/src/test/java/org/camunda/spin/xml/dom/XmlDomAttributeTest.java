@@ -89,7 +89,7 @@ public class XmlDomAttributeTest {
     OutputStream outputStream = attribute.toStream();
     attribute.writeToStream(outputStream);
     InputStream inputStream = SpinIoUtil.convertOutputStreamToInputStream(outputStream);
-    String value = SpinIoUtil.getStringFromInputStream(inputStream, false);
+    String value = SpinIoUtil.getStringFromInputStream(inputStream);
     assertThat(value).isEqualTo("order1order1");
   }
 
