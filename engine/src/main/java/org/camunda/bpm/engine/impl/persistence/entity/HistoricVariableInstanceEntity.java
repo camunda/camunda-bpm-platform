@@ -316,25 +316,6 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
     return errorMessage;
   }
 
-  @Override
-  public String toString() {
-    return this.getClass().getSimpleName()
-           + "[id=" + id
-           + ", processInstanceId=" + processInstanceId
-           + ", taskId=" + taskId
-           + ", executionId=" + executionId
-           + ", activityInstanceId=" + activityInstanceId
-           + ", name=" + name
-           + ", revision=" + revision
-           + ", variableTypeName=" + variableTypeName
-           + ", longValue=" + longValue
-           + ", doubleValue=" + doubleValue
-           + ", textValue=" + textValue
-           + ", textValue2=" + textValue2
-           + ", byteArrayId=" + byteArrayId
-           + "]";
-  }
-
   public String getDataFormatId() {
     return dataFormatId;
   }
@@ -355,5 +336,23 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
     return variableType.storesCustomObjects();
   }
 
+  @Override
+  public String toString() {
+    return this.getClass().getSimpleName()
+      + "[id=" + id
+      + ", processInstanceId=" + processInstanceId
+      + ", taskId=" + taskId
+      + ", executionId=" + executionId
+      + ", activityInstanceId=" + activityInstanceId
+      + ", name=" + name
+      + ", revision=" + revision
+      + ", variableTypeName=" + variableTypeName
+      + ", longValue=" + longValue
+      + ", doubleValue=" + doubleValue
+      + ", textValue=" + textValue
+      + ", textValue2=" + textValue2
+      + ", byteArrayId=" + byteArrayId
+      + "]";
+  }
 
 }

@@ -433,36 +433,36 @@ public class VariableInstanceEntity implements VariableInstance, ValueFields, Db
     return type.getSerializedValue(this);
   }
 
-  @Override
-  public String toString() {
-    return this.getClass().getSimpleName()
-           + "[id=" + id
-           + ", revision=" + revision
-           + ", name=" + name
-           + ", processInstanceId=" + processInstanceId
-           + ", executionId=" + executionId
-           + ", caseInstanceId=" + caseInstanceId
-           + ", caseExecutionId=" + caseExecutionId
-           + ", taskId=" + taskId
-           + ", activityInstanceId=" + activityInstanceId
-           + ", longValue=" + longValue
-           + ", doubleValue=" + doubleValue
-           + ", textValue=" + textValue
-           + ", textValue2=" + textValue2
-           + ", byteArrayValue=" + byteArrayValue
-           + ", byteArrayValueId=" + byteArrayValueId
-           + ", forcedUpdate=" + forcedUpdate
-           + ", dataFormatId=" + dataFormatId
-           + ", configuration=" + configuration
-           + "]";
-  }
-
   public String getValueTypeName() {
     return type.getTypeNameForValue(this);
   }
 
   public boolean storesCustomObjects() {
     return type.storesCustomObjects();
+  }
+
+  @Override
+  public String toString() {
+    return this.getClass().getSimpleName()
+      + "[id=" + id
+      + ", revision=" + revision
+      + ", name=" + name
+      + ", processInstanceId=" + processInstanceId
+      + ", executionId=" + executionId
+      + ", caseInstanceId=" + caseInstanceId
+      + ", caseExecutionId=" + caseExecutionId
+      + ", taskId=" + taskId
+      + ", activityInstanceId=" + activityInstanceId
+      + ", longValue=" + longValue
+      + ", doubleValue=" + doubleValue
+      + ", textValue=" + textValue
+      + ", textValue2=" + textValue2
+      + ", byteArrayValue=" + byteArrayValue
+      + ", byteArrayValueId=" + byteArrayValueId
+      + ", forcedUpdate=" + forcedUpdate
+      + ", dataFormatId=" + dataFormatId
+      + ", configuration=" + configuration
+      + "]";
   }
 
 }

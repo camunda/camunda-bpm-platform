@@ -21,7 +21,7 @@ public class VariableSpec {
   protected String variableTypeName;
   protected String valueTypeName;
   protected Object serializedValue;
-  protected boolean storesCustomObjects;
+  protected Boolean storesCustomObjects;
   protected Map<String, Object> configuration;
 
   public String getName() {

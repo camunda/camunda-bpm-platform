@@ -175,6 +175,10 @@ public class HistoricDetailVariableInstanceUpdateEntity extends HistoricVariable
     return variableType.getSerializedValue(this);
   }
 
+  public boolean storesCustomObjects() {
+    return variableType.storesCustomObjects();
+  }
+
   @Override
   public String toString() {
     return this.getClass().getSimpleName()
@@ -197,10 +201,6 @@ public class HistoricDetailVariableInstanceUpdateEntity extends HistoricVariable
            + ", taskId=" + taskId
            + ", timestamp=" + timestamp
            + "]";
-  }
-
-  public boolean storesCustomObjects() {
-    return variableType.storesCustomObjects();
   }
 
 }

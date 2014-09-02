@@ -111,6 +111,7 @@ public class SerializedVariablesTest extends PluggableProcessEngineTestCase {
     .serializedValue(longValue)
     .variableTypeName(ProcessEngineVariableType.LONG.getName())
     .valueTypeName(Long.class.getSimpleName())
+    .storesCustomObjects(false)
     .configuration(new HashMap<String, Object>());
 
   protected static final VariableSpec NULL_VARIABLE_SPEC = new VariableSpec()

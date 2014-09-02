@@ -53,10 +53,6 @@ public class SpinSerializationType implements VariableType {
     return ProcessEngineVariableType.SPIN.getName();
   }
 
-  public String getTypeNameForValue(Object value) {
-    return "Object";
-  }
-
   public boolean isCachable() {
     return true;
   }
