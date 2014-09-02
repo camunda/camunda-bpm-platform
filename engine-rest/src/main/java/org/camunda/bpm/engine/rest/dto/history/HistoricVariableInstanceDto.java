@@ -12,21 +12,23 @@
  */
 package org.camunda.bpm.engine.rest.dto.history;
 
+import java.util.Map;
+
 import org.camunda.bpm.engine.delegate.ProcessEngineVariableType;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.rest.dto.runtime.SerializedObjectDto;
-import org.camunda.bpm.engine.rest.dto.runtime.SerializedValueDto;
 
 public class HistoricVariableInstanceDto {
 
   private String id;
   private String name;
   private String type;
+  protected String variableType;
   private Object value;
+  protected Map<String, Object> serializationConfig;
   private String processInstanceId;
   private String activityInstanceId;
   private String errorMessage;
-  protected SerializedValueDto serializedValue;
 
   public String getId() {
     return id;
@@ -56,8 +58,12 @@ public class HistoricVariableInstanceDto {
     return errorMessage;
   }
 
-  public SerializedValueDto getSerializedValue() {
-    return serializedValue;
+  public String getVariableType() {
+    return variableType;
+  }
+
+  public Map<String, Object> getSerializationConfig() {
+    return serializationConfig;
   }
 
   public static HistoricVariableInstanceDto fromHistoricVariableInstance(HistoricVariableInstance historicVariableInstance) {
@@ -70,11 +76,13 @@ public class HistoricVariableInstanceDto {
     dto.activityInstanceId = historicVariableInstance.getActivtyInstanceId();
 
     if (historicVariableInstance.storesCustomObjects()) {
-      if (!ProcessEngineVariableType.SERIALIZABLE.getName().equals(historicVariableInstance.getTypeName())) {
-        dto.serializedValue = SerializedValueDto.fromSerializedVariableValue(historicVariableInstance.getSerializedValue());
+      if (ProcessEngineVariableType.SERIALIZABLE.getName().equals(historicVariableInstance.getTypeName())) {
+        if (historicVariableInstance.getValue() != null) {
+          dto.value = new SerializedObjectDto(historicVariableInstance.getValue());
+        }
       } else {
-        // required to not break existing API
-        dto.value = new SerializedObjectDto(historicVariableInstance.getValue());
+        dto.value = historicVariableInstance.getSerializedValue().getValue();
+        dto.serializationConfig = historicVariableInstance.getSerializedValue().getConfig();
       }
     } else {
       dto.value = historicVariableInstance.getValue();
@@ -82,6 +90,7 @@ public class HistoricVariableInstanceDto {
 
     dto.type = historicVariableInstance.getValueTypeName();
     dto.errorMessage = historicVariableInstance.getErrorMessage();
+    dto.variableType = historicVariableInstance.getTypeName();
 
     return dto;
   }

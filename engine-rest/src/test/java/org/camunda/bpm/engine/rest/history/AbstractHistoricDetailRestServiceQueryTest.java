@@ -287,7 +287,6 @@ public class AbstractHistoricDetailRestServiceQueryTest extends AbstractRestServ
           .body("[0].time", equalTo(historicUpdateBuilder.getTime()))
           .body("[0].taskId", equalTo(historicUpdateBuilder.getTaskId()))
           .body("[0].executionId", equalTo(historicUpdateBuilder.getExecutionId()))
-          .body("[0].serializedValue", nullValue())
         .when()
           .get(HISTORIC_DETAIL_RESOURCE_URL);
 
@@ -346,7 +345,6 @@ public class AbstractHistoricDetailRestServiceQueryTest extends AbstractRestServ
           .body("[0].value.object", equalTo("a serialized value"))
           .body("[0].value.type", equalTo(String.class.getName()))
           .body("[0].errorMessage", nullValue())
-          .body("[0].serializedValue", nullValue())
         .when().get(HISTORIC_DETAIL_RESOURCE_URL);
 
     // should not resolve custom objects but existing API requires it
@@ -377,12 +375,11 @@ public class AbstractHistoricDetailRestServiceQueryTest extends AbstractRestServ
         .then().expect().statusCode(Status.OK.getStatusCode())
         .and()
           .body("[0].variableTypeName", equalTo(ProcessEngineVariableType.SPIN.getName()))
-          .body("[0].value", nullValue())
           .body("[0].errorMessage", nullValue())
-          .body("[0].serializedValue.value", equalTo("aSerializedValue"))
-          .body("[0].serializedValue.configuration." + ProcessEngineVariableType.SPIN_TYPE_CONFIG_ROOT_TYPE,
+          .body("[0].value", equalTo("aSerializedValue"))
+          .body("[0].serializationConfig." + ProcessEngineVariableType.SPIN_TYPE_CONFIG_ROOT_TYPE,
               equalTo("aRootType"))
-          .body("[0].serializedValue.configuration." + ProcessEngineVariableType.SPIN_TYPE_DATA_FORMAT_ID,
+          .body("[0].serializationConfig." + ProcessEngineVariableType.SPIN_TYPE_DATA_FORMAT_ID,
               equalTo("aDataFormat"))
         .when().get(HISTORIC_DETAIL_RESOURCE_URL);
   }

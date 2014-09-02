@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.engine.rest.dto.runtime;
 
+import java.util.Map;
+
 import org.camunda.bpm.engine.delegate.ProcessEngineVariableType;
 import org.camunda.bpm.engine.runtime.VariableInstance;
 
@@ -20,18 +22,19 @@ import org.camunda.bpm.engine.runtime.VariableInstance;
  */
 public class VariableInstanceDto {
 
-  private String id;
-  private String name;
-  private String type;
-  private Object value;
-  private String processInstanceId;
-  private String executionId;
-  private String caseInstanceId;
-  private String caseExecutionId;
-  private String taskId;
-  private String activityInstanceId;
-  private String errorMessage;
-  protected SerializedValueDto serializedValue;
+  protected String id;
+  protected String name;
+  protected String type;
+  protected String variableType;
+  protected Object value;
+  protected Map<String, Object> serializationConfig;
+  protected String processInstanceId;
+  protected String executionId;
+  protected String caseInstanceId;
+  protected String caseExecutionId;
+  protected String taskId;
+  protected String activityInstanceId;
+  protected String errorMessage;
 
   public VariableInstanceDto() { }
 
@@ -57,6 +60,14 @@ public class VariableInstanceDto {
 
   public void setType(String type) {
     this.type = type;
+  }
+
+  public String getVariableType() {
+    return variableType;
+  }
+
+  public void setVariableType(String variableType) {
+    this.variableType = variableType;
   }
 
   public Object getValue() {
@@ -115,42 +126,44 @@ public class VariableInstanceDto {
     return caseInstanceId;
   }
 
-  public SerializedValueDto getSerializedValue() {
-    return serializedValue;
+  public Map<String, Object> getSerializationConfig() {
+    return serializationConfig;
   }
 
-  public void setSerializedValue(SerializedValueDto serializedValue) {
-    this.serializedValue = serializedValue;
+  public void setSerializationConfig(Map<String, Object> serializationConfig) {
+    this.serializationConfig = serializationConfig;
   }
 
   public static VariableInstanceDto fromVariableInstance(VariableInstance variableInstance) {
     VariableInstanceDto dto = new VariableInstanceDto();
 
-    dto.setId(variableInstance.getId());
-    dto.setName(variableInstance.getName());
-    dto.setProcessInstanceId(variableInstance.getProcessInstanceId());
-    dto.setExecutionId(variableInstance.getExecutionId());
+    dto.id = variableInstance.getId();
+    dto.name = variableInstance.getName();
+    dto.processInstanceId = variableInstance.getProcessInstanceId();
+    dto.executionId = variableInstance.getExecutionId();
 
     dto.caseExecutionId = variableInstance.getCaseExecutionId();
     dto.caseInstanceId = variableInstance.getCaseInstanceId();
 
-    dto.setTaskId(variableInstance.getTaskId());
-    dto.setActivityInstanceId(variableInstance.getActivityInstanceId());
+    dto.taskId = variableInstance.getTaskId();
+    dto.activityInstanceId = variableInstance.getActivityInstanceId();
 
     if (variableInstance.storesCustomObjects()) {
-      if (!ProcessEngineVariableType.SERIALIZABLE.getName().equals(variableInstance.getTypeName())) {
-        dto.serializedValue = SerializedValueDto.fromSerializedVariableValue(variableInstance.getSerializedValue());
+      if (ProcessEngineVariableType.SERIALIZABLE.getName().equals(variableInstance.getTypeName())) {
+        if (variableInstance.getValue() != null) {
+          dto.value = new SerializedObjectDto(variableInstance.getValue());
+        }
       } else {
-        // this is legacy code to not break the API
-        dto.value = new SerializedObjectDto(variableInstance.getValue());
+        dto.value = variableInstance.getSerializedValue().getValue();
+        dto.serializationConfig = variableInstance.getSerializedValue().getConfig();
       }
-
     } else {
-      dto.setValue(variableInstance.getValue());
+      dto.value = variableInstance.getValue();
     }
 
-    dto.setErrorMessage(variableInstance.getErrorMessage());
-    dto.setType(variableInstance.getValueTypeName());
+    dto.errorMessage = variableInstance.getErrorMessage();
+    dto.type = variableInstance.getValueTypeName();
+    dto.variableType = variableInstance.getTypeName();
 
     return dto;
   }

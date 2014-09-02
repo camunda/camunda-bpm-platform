@@ -14,7 +14,6 @@ package org.camunda.bpm.engine.rest.history;
 
 import static com.jayway.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -89,7 +88,6 @@ public abstract class AbstractHistoricDetailRestServiceInteractionTest extends A
       .body("time", equalTo(builder.getTime()))
       .body("taskId", equalTo(builder.getTaskId()))
       .body("executionId", equalTo(builder.getExecutionId()))
-      .body("serializedValue", nullValue())
     .when().get(HISTORIC_DETAIL_URL);
 
     verify(historicDetailQueryMock, times(1)).disableBinaryFetching();
@@ -127,7 +125,6 @@ public abstract class AbstractHistoricDetailRestServiceInteractionTest extends A
       .body("time", equalTo(builder.getTime()))
       .body("taskId", equalTo(builder.getTaskId()))
       .body("executionId", equalTo(builder.getExecutionId()))
-      .body("serializedValue", nullValue())
     .when().get(HISTORIC_DETAIL_URL);
 
     verify(historicDetailQueryMock, times(1)).disableBinaryFetching();

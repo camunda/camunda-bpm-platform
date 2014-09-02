@@ -85,7 +85,6 @@ public abstract class AbstractHistoricVariableInstanceRestServiceInteractionTest
       .body("processInstanceId", equalTo(builder.getProcessInstanceId()))
       .body("errorMessage", equalTo(builder.getErrorMessage()))
       .body("activityInstanceId", equalTo(builder.getActivityInstanceId()))
-      .body("serializedValue", nullValue())
     .when().get(VARIABLE_INSTANCE_URL);
 
     verify(variableInstanceQueryMock, times(1)).disableBinaryFetching();
@@ -114,7 +113,6 @@ public abstract class AbstractHistoricVariableInstanceRestServiceInteractionTest
     .and()
       .body("type", equalTo("byte[]"))
       .body("value", nullValue())
-      .body("serializedValue", nullValue())
     .when().get(VARIABLE_INSTANCE_URL);
 
     verify(variableInstanceQueryMock, times(1)).disableBinaryFetching();

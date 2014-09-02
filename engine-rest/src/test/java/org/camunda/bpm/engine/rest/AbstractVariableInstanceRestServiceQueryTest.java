@@ -225,6 +225,7 @@ public abstract class AbstractVariableInstanceRestServiceQueryTest extends Abstr
           .body("[0].id", equalTo(mockInstanceBuilder.getId()))
           .body("[0].name", equalTo(mockInstanceBuilder.getName()))
           .body("[0].type", equalTo(mockInstanceBuilder.getValueTypeName()))
+          .body("[0].variableType", equalTo(mockInstanceBuilder.getType()))
           .body("[0].value", equalTo(mockInstanceBuilder.getValue()))
           .body("[0].processInstanceId", equalTo(mockInstanceBuilder.getProcessInstanceId()))
           .body("[0].executionId", equalTo(mockInstanceBuilder.getExecutionId()))
@@ -316,8 +317,8 @@ public abstract class AbstractVariableInstanceRestServiceQueryTest extends Abstr
         .and()
           .body("size()", is(1))
           .body("[0].type", equalTo("Serializable"))
+          .body("[0].variableType", equalTo(ProcessEngineVariableType.SERIALIZABLE.getName()))
           .body("[0].errorMessage", nullValue())
-          .body("[0].serializedValue", nullValue())
           // assertions to not break previous behavior; ideally
 //          .body("[0].value", nullValue())
           .body("[0].value.object", equalTo("a serialized value"))
@@ -353,12 +354,12 @@ public abstract class AbstractVariableInstanceRestServiceQueryTest extends Abstr
         .and()
           .body("size()", is(1))
           .body("[0].type", equalTo("Object"))
-          .body("[0].value", nullValue())
+          .body("[0].variableType", equalTo(ProcessEngineVariableType.SPIN.getName()))
+          .body("[0].value", equalTo("aSpinSerializedValue"))
           .body("[0].errorMessage", nullValue())
-          .body("[0].serializedValue.value", equalTo("aSpinSerializedValue"))
-          .body("[0].serializedValue.configuration." + ProcessEngineVariableType.SPIN_TYPE_CONFIG_ROOT_TYPE,
+          .body("[0].serializationConfig." + ProcessEngineVariableType.SPIN_TYPE_CONFIG_ROOT_TYPE,
               equalTo("aRootType"))
-          .body("[0].serializedValue.configuration." + ProcessEngineVariableType.SPIN_TYPE_DATA_FORMAT_ID,
+          .body("[0].serializationConfig." + ProcessEngineVariableType.SPIN_TYPE_DATA_FORMAT_ID,
               equalTo("aDataFormat"))
         .when().get(VARIABLE_INSTANCE_QUERY_URL);
   }

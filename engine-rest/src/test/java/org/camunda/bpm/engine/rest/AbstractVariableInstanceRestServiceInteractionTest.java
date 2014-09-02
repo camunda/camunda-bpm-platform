@@ -82,7 +82,6 @@ public class AbstractVariableInstanceRestServiceInteractionTest extends Abstract
       .body("taskId", equalTo(builder.getTaskId()))
       .body("activityInstanceId", equalTo(builder.getActivityInstanceId()))
       .body("errorMessage", equalTo(builder.getErrorMessage()))
-      .body("serializedValue", nullValue())
     .when().get(VARIABLE_INSTANCE_URL);
 
     verify(variableInstanceQueryMock, times(1)).disableBinaryFetching();
@@ -115,7 +114,6 @@ public class AbstractVariableInstanceRestServiceInteractionTest extends Abstract
     .and()
       .body("type", equalTo("byte[]"))
       .body("value", nullValue())
-      .body("serializedValue", nullValue())
     .when().get(VARIABLE_INSTANCE_URL);
 
     verify(variableInstanceQueryMock, times(1)).disableBinaryFetching();

@@ -5,13 +5,12 @@ import static com.jayway.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.never;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -277,7 +276,6 @@ public abstract class AbstractHistoricVariableInstanceRestServiceQueryTest exten
           .body("[0].processInstanceId", equalTo(mockInstanceBuilder.getProcessInstanceId()))
           .body("[0].errorMessage", equalTo(mockInstanceBuilder.getErrorMessage()))
           .body("[0].activityInstanceId", equalTo(mockInstanceBuilder.getActivityInstanceId()))
-          .body("[0].serializedValue", nullValue())
       .when()
         .get(HISTORIC_VARIABLE_INSTANCE_RESOURCE_URL);
 
@@ -308,11 +306,11 @@ public abstract class AbstractHistoricVariableInstanceRestServiceQueryTest exten
         .then().expect().statusCode(Status.OK.getStatusCode())
         .and()
           .body("[0].type", equalTo("Serializable"))
+          .body("[0].variableType", equalTo(ProcessEngineVariableType.SERIALIZABLE.getName()))
 
           // required due to exsting API
           .body("[0].value.object", equalTo("a serialized value"))
           .body("[0].value.type", equalTo(String.class.getName()))
-          .body("[0].serializedValue", nullValue())
         .when().get(HISTORIC_VARIABLE_INSTANCE_RESOURCE_URL);
 
     // should not resolve custom objects but existing API requires it
@@ -344,11 +342,11 @@ public abstract class AbstractHistoricVariableInstanceRestServiceQueryTest exten
         .and()
           .body("size()", is(1))
           .body("[0].type", equalTo("Object"))
-          .body("[0].value", nullValue())
-          .body("[0].serializedValue.value", equalTo("aSpinSerializedValue"))
-          .body("[0].serializedValue.configuration." + ProcessEngineVariableType.SPIN_TYPE_CONFIG_ROOT_TYPE,
+          .body("[0].variableType", equalTo(ProcessEngineVariableType.SPIN.getName()))
+          .body("[0].value", equalTo("aSpinSerializedValue"))
+          .body("[0].serializationConfig." + ProcessEngineVariableType.SPIN_TYPE_CONFIG_ROOT_TYPE,
               equalTo("aRootType"))
-          .body("[0].serializedValue.configuration." + ProcessEngineVariableType.SPIN_TYPE_DATA_FORMAT_ID,
+          .body("[0].serializationConfig." + ProcessEngineVariableType.SPIN_TYPE_DATA_FORMAT_ID,
               equalTo("aDataFormat"))
         .when().get(HISTORIC_VARIABLE_INSTANCE_RESOURCE_URL);
   }
