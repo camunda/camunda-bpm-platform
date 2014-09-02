@@ -18,7 +18,6 @@ import org.camunda.spin.logging.SpinLogger;
 
 import java.io.*;
 import java.nio.charset.Charset;
-import java.util.Arrays;
 
 /**
  * @author Daniel Meyer
@@ -40,25 +39,6 @@ public class SpinIoUtil extends IoUtil {
   public static InputStream convertOutputStreamToInputStream(OutputStream outputStream) {
     byte[] data = ((ByteArrayOutputStream) outputStream).toByteArray();
     return new ByteArrayInputStream(data);
-  }
-
-  public static byte[] readFirstBytes(InputStream stream, int limit) {
-    try {
-      byte[] result = new byte[limit];
-      int bytesRead = stream.read(result);
-      
-      if (bytesRead == -1) {
-        result = new byte[0];
-      } else if (bytesRead < result.length) {
-        result = Arrays.copyOfRange(result, 0, bytesRead);
-      }
-      
-      return result;
-    } catch(IOException e) {
-      throw LOG.unableToReadInputStream(e);
-    }
-    
-    
   }
 
   /**
