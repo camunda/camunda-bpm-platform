@@ -440,7 +440,6 @@ public class VariableDataFormatTest extends AbstractProcessEngineTestCase {
 
     // then
     assertNotNull(instance);
-    assertNull(instance.getValue());
     assertNotNull(instance.getSerializedValue());
     assertNotNull(instance.getSerializedValue().getValue());
 

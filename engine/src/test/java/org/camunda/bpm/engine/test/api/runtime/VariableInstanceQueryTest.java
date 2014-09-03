@@ -2229,7 +2229,6 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
 
     for (VariableInstance variableInstance : results) {
       if(variableInstance.getName().equals("customSerializable")) {
-        assertNull(variableInstance.getValue());
         assertNull(variableInstance.getErrorMessage());
 
         SerializedVariableValue serializedValue = variableInstance.getSerializedValue();
@@ -2237,8 +2236,6 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
         assertNotNull(serializedValue.getValue());
       }
       if(variableInstance.getName().equals("failingSerializable")) {
-        // no value was fetched
-        assertNull(variableInstance.getValue());
         // no error message is present
         assertNull(variableInstance.getErrorMessage());
 
@@ -2246,6 +2243,7 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
         assertNotNull(serializedValue);
         assertNotNull(serializedValue.getValue());
       }
+
     }
 
     // delete task

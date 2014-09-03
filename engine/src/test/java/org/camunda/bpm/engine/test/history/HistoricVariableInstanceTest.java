@@ -514,7 +514,6 @@ public class HistoricVariableInstanceTest extends AbstractProcessEngineTestCase 
 
     for (HistoricVariableInstance variableInstance : variableInstances) {
       if(variableInstance.getName().equals("customSerializable")) {
-        assertNull(variableInstance.getValue());
         assertNull(variableInstance.getErrorMessage());
 
         SerializedVariableValue serializedValue = variableInstance.getSerializedValue();
@@ -522,8 +521,6 @@ public class HistoricVariableInstanceTest extends AbstractProcessEngineTestCase 
         assertNotNull(serializedValue.getValue());
       }
       if(variableInstance.getName().equals("failingSerializable")) {
-        // no value was fetched
-        assertNull(variableInstance.getValue());
         // no error message is present
         assertNull(variableInstance.getErrorMessage());
 

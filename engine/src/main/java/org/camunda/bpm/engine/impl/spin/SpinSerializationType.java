@@ -20,7 +20,6 @@ import java.util.Set;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.ProcessEngineVariableType;
 import org.camunda.bpm.engine.delegate.SerializedVariableValue;
-import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.core.variable.SerializedVariableValueImpl;
 import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
@@ -95,11 +94,6 @@ public class SpinSerializationType implements VariableType {
             + "matches the data format " + dataFormatId + " of variable " + valueFields.getName());
       }
 
-      // do not deserialize without active command
-      if (Context.getCommandContext() == null) {
-        return null;
-      }
-
       String variableValue = valueFields.getTextValue();
       if (variableValue == null) {
         ByteArrayEntity byteEntity = valueFields.getByteArrayValue();
@@ -111,8 +105,7 @@ public class SpinSerializationType implements VariableType {
       }
 
       Spin<?> spinNode = SpinFactory.getInstance().createSpinFromString(variableValue, availableDataFormats.get(dataFormatId));
-      Object value = spinNode.mapTo(valueFields.getTextValue2());
-      return value;
+      return spinNode.mapTo(valueFields.getTextValue2());
 
     } catch (SpinRuntimeException e) {
       throw new ProcessEngineException(

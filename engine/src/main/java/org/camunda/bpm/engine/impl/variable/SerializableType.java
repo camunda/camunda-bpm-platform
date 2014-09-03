@@ -45,8 +45,9 @@ public class SerializableType extends ByteArrayType {
     if (cachedObject!=null) {
       return cachedObject;
     }
+
     byte[] bytes = (byte[]) super.getValue(valueFields);
-    if(bytes != null && Context.getCommandContext() != null) {
+    if(bytes != null) {
       ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
       Object deserializedObject;
       try {
@@ -55,6 +56,10 @@ public class SerializableType extends ByteArrayType {
         valueFields.setCachedValue(deserializedObject);
 
         if (valueFields instanceof VariableInstanceEntity) {
+          if (Context.getCommandContext() == null) {
+            throw new ProcessEngineException("Unable to deserizable variable instance outside of a command context");
+          }
+
           Context
             .getCommandContext()
             .getSession(DeserializedObjectsSession.class)

@@ -1374,7 +1374,6 @@ public class FullHistoryTest extends ResourceProcessEngineTestCase {
     for (HistoricDetail detail : results) {
       HistoricVariableUpdate update = (HistoricVariableUpdate) detail;
       if(update.getVariableName().equals("customSerializable")) {
-        assertNull(update.getValue());
         assertNull(update.getErrorMessage());
 
         SerializedVariableValue serializedValue = update.getSerializedValue();
@@ -1382,8 +1381,6 @@ public class FullHistoryTest extends ResourceProcessEngineTestCase {
         assertNotNull(serializedValue.getValue());
       }
       if(update.getVariableName().equals("failingSerializable")) {
-        // no value was fetched
-        assertNull(update.getValue());
         // no error message is present
         assertNull(update.getErrorMessage());
 
