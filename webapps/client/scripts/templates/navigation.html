@@ -1,52 +1,67 @@
-<!-- # CE - src/main/webapp/app/cockpit/templates/navigation.html -->
-<div class="nav-collapse collapse" ng-cloak>
-  <ul class="nav pull-right" ng-controller="AuthenticationController">
+<!-- # CE - camunda-cockpit-ui client/scripts/templates/navigation.html -->
+<div class="nav-collapse collapse"
+     ng-cloak>
+  <ul class="nav pull-right"
+      ng-controller="AuthenticationController">
 
     <li engine-select></li>
 
     <li class="dropdown"
-      cam-if-logged-in ng-cloak>
-      <a href="#"
-        sem-show-user-actions
-        class="dropdown-toggle"
-        data-toggle="dropdown">
-        <i class="icon-user icon-white"></i> {{ authentication.name }}
+      cam-if-logged-in
+      ng-cloak>
+      <a href
+         sem-show-user-actions
+         class="dropdown-toggle"
+         data-toggle="dropdown">
+        <i class="icon-user icon-white"></i>
+        {{ authentication.name }}
       </a>
 
       <ul class="dropdown-menu">
         <li>
-          <a sem-jump-to-profile="#" ng-href="{{ '../../admin/:engine/#/users/' + authentication.name + '?tab=profile' | uri }}">
+          <a sem-jump-to-profile
+             ng-href="{{ '../../admin/:engine/#/users/' + authentication.name + '?tab=profile' | uri }}">
             My Profile
           </a>
         </li>
+
         <li class="divider"></li>
+
         <li>
-          <a href sem-log-out ng-click="logout()">
+          <a href
+             sem-log-out
+             ng-click="logout()">
             Sign out
           </a>
         </li>
       </ul>
     </li>
 
-    <li class="divider-vertical" cam-if-logged-in></li>
+    <li class="divider-vertical"
+        cam-if-logged-in
+        ng-cloak></li>
 
-    <li class="dropdown">
+    <li class="app-switch dropdown">
       <a href
-        sem-show-applications
-        class="dropdown-toggle"
-        data-toggle="dropdown">
+         sem-show-applications
+         class="dropdown-toggle"
+         data-toggle="dropdown">
         <i class="icon-home icon-white"></i>
+        <b class="caret"></b>
       </a>
 
       <ul class="dropdown-menu">
-        <li>
-          <a sem-jump-to-admin ng-href="{{ '../../admin/:engine/' | uri }}">Admin</a>
+        <li ng-if="!authentication || authentication.canAccess('admin')">
+          <a sem-jump-to-admin
+             ng-href="{{ '../../admin/:engine/' | uri }}">Admin</a>
         </li>
-        <li ng-show="authentication.canAccess('tasklist')">
-          <a sem-jump-to-tasklist ng-href="{{ '../../tasklist/:engine/' | uri }}">Tasklist</a>
+
+        <li ng-if="!authentication || authentication.canAccess('tasklist')">
+          <a sem-jump-to-tasklist
+             ng-href="{{ '../../tasklist/:engine/' | uri }}">Tasklist</a>
         </li>
       </ul>
     </li>
   </ul>
 </div>
-<!-- / CE - src/main/webapp/app/cockpit/templates/navigation.html -->
+<!-- / CE - camunda-cockpit-ui client/scripts/templates/navigation.html -->
