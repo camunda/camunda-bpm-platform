@@ -77,7 +77,9 @@ public class AbstractCaseExecutionRestServiceInteractionTest extends AbstractRes
   protected static final String CASE_EXECUTION_LOCAL_VARIABLES_URL = SINGLE_CASE_EXECUTION_URL + "/localVariables";
   protected static final String CASE_EXECUTION_VARIABLES_URL = SINGLE_CASE_EXECUTION_URL + "/variables";
   protected static final String SINGLE_CASE_EXECUTION_LOCAL_VARIABLE_URL = CASE_EXECUTION_LOCAL_VARIABLES_URL + "/{varId}";
+  protected static final String SINGLE_CASE_EXECUTION_LOCAL_BINARY_VARIABLE_URL = SINGLE_CASE_EXECUTION_LOCAL_VARIABLE_URL + "/data";
   protected static final String SINGLE_CASE_EXECUTION_VARIABLE_URL = CASE_EXECUTION_VARIABLES_URL + "/{varId}";
+  protected static final String SINGLE_CASE_EXECUTION_BINARY_VARIABLE_URL = SINGLE_CASE_EXECUTION_VARIABLE_URL + "/data";
 
   private CaseService caseServiceMock;
   private CaseExecutionQuery caseExecutionQueryMock;
@@ -2258,7 +2260,7 @@ public class AbstractCaseExecutionRestServiceInteractionTest extends AbstractRes
     .expect()
       .statusCode(Status.NO_CONTENT.getStatusCode())
     .when()
-      .post(SINGLE_CASE_EXECUTION_LOCAL_VARIABLE_URL);
+      .post(SINGLE_CASE_EXECUTION_LOCAL_BINARY_VARIABLE_URL);
 
     verify(caseServiceMock).withCaseExecution(MockProvider.EXAMPLE_CASE_EXECUTION_ID);
     verify(caseExecutionCommandBuilderMock).setVariableLocal(variableKey, bytes);
@@ -2277,7 +2279,7 @@ public class AbstractCaseExecutionRestServiceInteractionTest extends AbstractRes
     .expect()
       .statusCode(Status.NO_CONTENT.getStatusCode())
     .when()
-      .post(SINGLE_CASE_EXECUTION_VARIABLE_URL);
+      .post(SINGLE_CASE_EXECUTION_BINARY_VARIABLE_URL);
 
     verify(caseServiceMock).withCaseExecution(MockProvider.EXAMPLE_CASE_EXECUTION_ID);
     verify(caseExecutionCommandBuilderMock).setVariable(variableKey, bytes);
@@ -2297,7 +2299,7 @@ public class AbstractCaseExecutionRestServiceInteractionTest extends AbstractRes
     .expect()
       .statusCode(Status.NO_CONTENT.getStatusCode())
     .when()
-      .post(SINGLE_CASE_EXECUTION_LOCAL_VARIABLE_URL);
+      .post(SINGLE_CASE_EXECUTION_LOCAL_BINARY_VARIABLE_URL);
 
     verify(caseServiceMock).withCaseExecution(MockProvider.EXAMPLE_CASE_EXECUTION_ID);
     verify(caseExecutionCommandBuilderMock).setVariableLocal(variableKey, bytes);
@@ -2317,27 +2319,7 @@ public class AbstractCaseExecutionRestServiceInteractionTest extends AbstractRes
     .expect()
       .statusCode(Status.NO_CONTENT.getStatusCode())
     .when()
-      .post(SINGLE_CASE_EXECUTION_VARIABLE_URL);
-
-    verify(caseServiceMock).withCaseExecution(MockProvider.EXAMPLE_CASE_EXECUTION_ID);
-    verify(caseExecutionCommandBuilderMock).setVariable(variableKey, bytes);
-    verify(caseExecutionCommandBuilderMock).execute();
-  }
-
-  @Test
-  public void testPutSingleLocalBinaryVariableOnDeprecatedPath() throws Exception {
-    byte[] bytes = "someContent".getBytes();
-
-    String variableKey = "aVariableKey";
-
-    given()
-      .pathParam("id", MockProvider.EXAMPLE_CASE_EXECUTION_ID)
-      .pathParam("varId", variableKey)
-      .multiPart("data", "unspecified", bytes)
-    .expect()
-      .statusCode(Status.NO_CONTENT.getStatusCode())
-    .when()
-      .post(SINGLE_CASE_EXECUTION_VARIABLE_URL + "/data");
+      .post(SINGLE_CASE_EXECUTION_BINARY_VARIABLE_URL);
 
     verify(caseServiceMock).withCaseExecution(MockProvider.EXAMPLE_CASE_EXECUTION_ID);
     verify(caseExecutionCommandBuilderMock).setVariable(variableKey, bytes);
@@ -2364,7 +2346,7 @@ public class AbstractCaseExecutionRestServiceInteractionTest extends AbstractRes
     .expect()
       .statusCode(Status.NO_CONTENT.getStatusCode())
     .when()
-      .post(SINGLE_CASE_EXECUTION_LOCAL_VARIABLE_URL);
+      .post(SINGLE_CASE_EXECUTION_LOCAL_BINARY_VARIABLE_URL);
 
     verify(caseServiceMock).withCaseExecution(MockProvider.EXAMPLE_CASE_EXECUTION_ID);
     verify(caseExecutionCommandBuilderMock).setVariableLocal(variableKey, serializable);
@@ -2391,7 +2373,7 @@ public class AbstractCaseExecutionRestServiceInteractionTest extends AbstractRes
     .expect()
       .statusCode(Status.NO_CONTENT.getStatusCode())
     .when()
-      .post(SINGLE_CASE_EXECUTION_VARIABLE_URL);
+      .post(SINGLE_CASE_EXECUTION_BINARY_VARIABLE_URL);
 
     verify(caseServiceMock).withCaseExecution(MockProvider.EXAMPLE_CASE_EXECUTION_ID);
     verify(caseExecutionCommandBuilderMock).setVariable(variableKey, serializable);
@@ -2419,7 +2401,7 @@ public class AbstractCaseExecutionRestServiceInteractionTest extends AbstractRes
       .statusCode(Status.BAD_REQUEST.getStatusCode())
       .body(containsString("Unrecognized content type for serialized java type: unsupported"))
     .when()
-      .post(SINGLE_CASE_EXECUTION_LOCAL_VARIABLE_URL);
+      .post(SINGLE_CASE_EXECUTION_LOCAL_BINARY_VARIABLE_URL);
 
     verify(caseServiceMock, never()).withCaseExecution(MockProvider.EXAMPLE_CASE_EXECUTION_ID);
   }
@@ -2445,7 +2427,7 @@ public class AbstractCaseExecutionRestServiceInteractionTest extends AbstractRes
       .statusCode(Status.BAD_REQUEST.getStatusCode())
       .body(containsString("Unrecognized content type for serialized java type: unsupported"))
     .when()
-      .post(SINGLE_CASE_EXECUTION_VARIABLE_URL);
+      .post(SINGLE_CASE_EXECUTION_BINARY_VARIABLE_URL);
 
     verify(caseServiceMock, never()).withCaseExecution(MockProvider.EXAMPLE_CASE_EXECUTION_ID);
   }

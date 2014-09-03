@@ -43,6 +43,7 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
   protected static final String SIGNAL_EXECUTION_URL = EXECUTION_URL + "/signal";
   protected static final String EXECUTION_LOCAL_VARIABLES_URL = EXECUTION_URL + "/localVariables";
   protected static final String SINGLE_EXECUTION_LOCAL_VARIABLE_URL = EXECUTION_LOCAL_VARIABLES_URL + "/{varId}";
+  protected static final String SINGLE_EXECUTION_LOCAL_BINARY_VARIABLE_URL = SINGLE_EXECUTION_LOCAL_VARIABLE_URL + "/data";
   protected static final String MESSAGE_SUBSCRIPTION_URL = EXECUTION_URL + "/messageSubscriptions/{messageName}";
   protected static final String TRIGGER_MESSAGE_SUBSCRIPTION_URL = EXECUTION_URL + "/messageSubscriptions/{messageName}/trigger";
 
@@ -582,7 +583,7 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
     .expect()
       .statusCode(Status.NO_CONTENT.getStatusCode())
     .when()
-      .post(SINGLE_EXECUTION_LOCAL_VARIABLE_URL);
+      .post(SINGLE_EXECUTION_LOCAL_BINARY_VARIABLE_URL);
 
     verify(runtimeServiceMock).setVariableLocal(
         eq(MockProvider.EXAMPLE_EXECUTION_ID), eq(variableKey), eq(bytes));
@@ -600,25 +601,7 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
     .expect()
       .statusCode(Status.NO_CONTENT.getStatusCode())
     .when()
-      .post(SINGLE_EXECUTION_LOCAL_VARIABLE_URL);
-
-    verify(runtimeServiceMock).setVariableLocal(
-        eq(MockProvider.EXAMPLE_EXECUTION_ID), eq(variableKey), eq(bytes));
-  }
-
-  @Test
-  public void testPutSingleLocalBinaryVariableOnDeprecatedPath() throws Exception {
-    byte[] bytes = "someContent".getBytes();
-
-    String variableKey = "aVariableKey";
-
-    given()
-      .pathParam("id", MockProvider.EXAMPLE_EXECUTION_ID).pathParam("varId", variableKey)
-      .multiPart("data", "unspecified", bytes)
-    .expect()
-      .statusCode(Status.NO_CONTENT.getStatusCode())
-    .when()
-      .post(SINGLE_EXECUTION_LOCAL_VARIABLE_URL + "/data");
+      .post(SINGLE_EXECUTION_LOCAL_BINARY_VARIABLE_URL);
 
     verify(runtimeServiceMock).setVariableLocal(
         eq(MockProvider.EXAMPLE_EXECUTION_ID), eq(variableKey), eq(bytes));
@@ -643,7 +626,7 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
     .expect()
       .statusCode(Status.NO_CONTENT.getStatusCode())
     .when()
-      .post(SINGLE_EXECUTION_LOCAL_VARIABLE_URL);
+      .post(SINGLE_EXECUTION_LOCAL_BINARY_VARIABLE_URL);
 
     verify(runtimeServiceMock).setVariableLocal(eq(MockProvider.EXAMPLE_EXECUTION_ID), eq(variableKey),
         eq(serializable));
@@ -669,7 +652,7 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
       .statusCode(Status.BAD_REQUEST.getStatusCode())
       .body(containsString("Unrecognized content type for serialized java type: unsupported"))
     .when()
-      .post(SINGLE_EXECUTION_LOCAL_VARIABLE_URL);
+      .post(SINGLE_EXECUTION_LOCAL_BINARY_VARIABLE_URL);
 
     verify(runtimeServiceMock, never()).setVariableLocal(eq(MockProvider.EXAMPLE_EXECUTION_ID), eq(variableKey),
         eq(serializable));
@@ -689,7 +672,7 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
     .expect()
       .statusCode(Status.NO_CONTENT.getStatusCode())
     .when()
-      .post(SINGLE_EXECUTION_LOCAL_VARIABLE_URL);
+      .post(SINGLE_EXECUTION_LOCAL_BINARY_VARIABLE_URL);
 
     verify(runtimeServiceMock).setVariableLocalFromSerialized(
         eq(MockProvider.EXAMPLE_EXECUTION_ID), eq(variableKey),

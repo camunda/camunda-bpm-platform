@@ -75,6 +75,7 @@ public class AbstractCaseInstanceRestServiceInteractionTest extends AbstractRest
 
   protected static final String CASE_INSTANCE_VARIABLES_URL = SINGLE_CASE_INSTANCE_URL + "/variables";
   protected static final String SINGLE_CASE_INSTANCE_VARIABLE_URL = CASE_INSTANCE_VARIABLES_URL + "/{varId}";
+  protected static final String SINGLE_CASE_INSTANCE_BINARY_VARIABLE_URL = SINGLE_CASE_INSTANCE_VARIABLE_URL + "/data";
 
   protected static final Map<String, Object> EXAMPLE_OBJECT_VARIABLES = new HashMap<String, Object>();
   static {
@@ -661,7 +662,7 @@ public class AbstractCaseInstanceRestServiceInteractionTest extends AbstractRest
     .expect()
       .statusCode(Status.NO_CONTENT.getStatusCode())
     .when()
-      .post(SINGLE_CASE_INSTANCE_VARIABLE_URL);
+      .post(SINGLE_CASE_INSTANCE_BINARY_VARIABLE_URL);
 
     verify(caseServiceMock).withCaseExecution(MockProvider.EXAMPLE_CASE_INSTANCE_ID);
     verify(caseExecutionCommandBuilderMock).setVariable(variableKey, bytes);
@@ -680,27 +681,7 @@ public class AbstractCaseInstanceRestServiceInteractionTest extends AbstractRest
     .expect()
       .statusCode(Status.NO_CONTENT.getStatusCode())
     .when()
-      .post(SINGLE_CASE_INSTANCE_VARIABLE_URL);
-
-    verify(caseServiceMock).withCaseExecution(MockProvider.EXAMPLE_CASE_INSTANCE_ID);
-    verify(caseExecutionCommandBuilderMock).setVariable(variableKey, bytes);
-    verify(caseExecutionCommandBuilderMock).execute();
-  }
-
-  @Test
-  public void testPutSingleLocalBinaryVariableOnDeprecatedPath() throws Exception {
-    byte[] bytes = "someContent".getBytes();
-
-    String variableKey = "aVariableKey";
-
-    given()
-      .pathParam("id", MockProvider.EXAMPLE_CASE_INSTANCE_ID)
-      .pathParam("varId", variableKey)
-      .multiPart("data", "unspecified", bytes)
-    .expect()
-      .statusCode(Status.NO_CONTENT.getStatusCode())
-    .when()
-      .post(SINGLE_CASE_INSTANCE_VARIABLE_URL + "/data");
+      .post(SINGLE_CASE_INSTANCE_BINARY_VARIABLE_URL);
 
     verify(caseServiceMock).withCaseExecution(MockProvider.EXAMPLE_CASE_INSTANCE_ID);
     verify(caseExecutionCommandBuilderMock).setVariable(variableKey, bytes);
@@ -726,7 +707,7 @@ public class AbstractCaseInstanceRestServiceInteractionTest extends AbstractRest
     .expect()
       .statusCode(Status.NO_CONTENT.getStatusCode())
     .when()
-      .post(SINGLE_CASE_INSTANCE_VARIABLE_URL);
+      .post(SINGLE_CASE_INSTANCE_BINARY_VARIABLE_URL);
 
     verify(caseServiceMock).withCaseExecution(MockProvider.EXAMPLE_CASE_INSTANCE_ID);
     verify(caseExecutionCommandBuilderMock).setVariable(variableKey, serializable);
@@ -753,7 +734,7 @@ public class AbstractCaseInstanceRestServiceInteractionTest extends AbstractRest
       .statusCode(Status.BAD_REQUEST.getStatusCode())
       .body(containsString("Unrecognized content type for serialized java type: unsupported"))
     .when()
-      .post(SINGLE_CASE_INSTANCE_VARIABLE_URL);
+      .post(SINGLE_CASE_INSTANCE_BINARY_VARIABLE_URL);
   }
 
   @Test

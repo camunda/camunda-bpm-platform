@@ -162,11 +162,6 @@ public abstract class AbstractVariablesResource implements VariableResource {
     }
   }
 
-  @Override
-  public void setBinaryVariableDeprecated(String variableKey, MultipartFormData payload) {
-    setBinaryVariable(variableKey, payload);
-  }
-
   protected Object deserializeJsonObject(String className, byte[] data) {
     try {
 

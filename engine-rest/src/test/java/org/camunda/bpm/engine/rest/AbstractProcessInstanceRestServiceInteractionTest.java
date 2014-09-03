@@ -46,6 +46,7 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
   protected static final String SINGLE_PROCESS_INSTANCE_URL = PROCESS_INSTANCE_URL + "/{id}";
   protected static final String PROCESS_INSTANCE_VARIABLES_URL = SINGLE_PROCESS_INSTANCE_URL + "/variables";
   protected static final String SINGLE_PROCESS_INSTANCE_VARIABLE_URL = PROCESS_INSTANCE_VARIABLES_URL + "/{varId}";
+  protected static final String SINGLE_PROCESS_INSTANCE_BINARY_VARIABLE_URL = SINGLE_PROCESS_INSTANCE_VARIABLE_URL + "/data";
   protected static final String PROCESS_INSTANCE_ACTIVIY_INSTANCES_URL = SINGLE_PROCESS_INSTANCE_URL + "/activity-instances";
   private static final String EXAMPLE_PROCESS_INSTANCE_ID_WITH_NULL_VALUE_AS_VARIABLE = "aProcessInstanceWithNullValueAsVariable";
   protected static final String SINGLE_PROCESS_INSTANCE_SUSPENDED_URL = SINGLE_PROCESS_INSTANCE_URL + "/suspended";
@@ -692,7 +693,7 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
     .expect()
       .statusCode(Status.NO_CONTENT.getStatusCode())
     .when()
-      .post(SINGLE_PROCESS_INSTANCE_VARIABLE_URL);
+      .post(SINGLE_PROCESS_INSTANCE_BINARY_VARIABLE_URL);
 
     verify(runtimeServiceMock).setVariable(eq(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID), eq(variableKey),
         eq(bytes));
@@ -710,28 +711,10 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
     .expect()
       .statusCode(Status.NO_CONTENT.getStatusCode())
     .when()
-      .post(SINGLE_PROCESS_INSTANCE_VARIABLE_URL);
+      .post(SINGLE_PROCESS_INSTANCE_BINARY_VARIABLE_URL);
 
     verify(runtimeServiceMock).setVariable(eq(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID), eq(variableKey),
         eq(bytes));
-  }
-
-  @Test
-  public void testPutSingleBinaryVariableOnDeprecatedPath() throws Exception {
-    byte[] bytes = "someContent".getBytes();
-
-    String variableKey = "aVariableKey";
-
-    given()
-      .pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID).pathParam("varId", variableKey)
-      .multiPart("data", "unspecified", bytes)
-    .expect()
-      .statusCode(Status.NO_CONTENT.getStatusCode())
-    .when()
-      .post(SINGLE_PROCESS_INSTANCE_VARIABLE_URL + "/data");
-
-    verify(runtimeServiceMock).setVariable(
-        eq(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID), eq(variableKey), eq(bytes));
   }
 
   @Test
@@ -753,7 +736,7 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
     .expect()
       .statusCode(Status.NO_CONTENT.getStatusCode())
     .when()
-      .post(SINGLE_PROCESS_INSTANCE_VARIABLE_URL);
+      .post(SINGLE_PROCESS_INSTANCE_BINARY_VARIABLE_URL);
 
     verify(runtimeServiceMock).setVariable(eq(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID), eq(variableKey),
         eq(serializable));
@@ -779,7 +762,7 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
       .statusCode(Status.BAD_REQUEST.getStatusCode())
       .body(containsString("Unrecognized content type for serialized java type: unsupported"))
     .when()
-      .post(SINGLE_PROCESS_INSTANCE_VARIABLE_URL);
+      .post(SINGLE_PROCESS_INSTANCE_BINARY_VARIABLE_URL);
 
     verify(runtimeServiceMock, never()).setVariable(eq(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID), eq(variableKey),
         eq(serializable));
@@ -798,7 +781,7 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
     .expect()
       .statusCode(Status.NO_CONTENT.getStatusCode())
     .when()
-      .post(SINGLE_PROCESS_INSTANCE_VARIABLE_URL);
+      .post(SINGLE_PROCESS_INSTANCE_BINARY_VARIABLE_URL);
 
     verify(runtimeServiceMock).setVariableFromSerialized(
         eq(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID), eq(variableKey),
