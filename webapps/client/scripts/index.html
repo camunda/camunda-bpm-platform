@@ -14,7 +14,13 @@
       <div class="row controls">
         <div notifications-panel
              class="cols notifications-panel page-notifications"></div>
+      </div>
+    </div>
 
+
+    <div class="container-fluid"
+         cam-if-logged-in>
+      <div class="row controls">
         <div class="cols col-sm-2 task-filters"
              ng-controller="filterCreateCtrl">
           <div class="inner">
@@ -72,3 +78,7 @@
       </div>
     </div>
 
+    <div cam-if-logged-out
+         class="container-fluid"
+         cam-auth-login>
+    </div>

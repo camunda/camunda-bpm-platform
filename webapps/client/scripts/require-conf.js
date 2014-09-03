@@ -92,6 +92,8 @@ define(function() {
                                       'camunda-tasklist-ui/navigation/index',
 
                                       'camunda-commons-ui/directives/notificationsPanel',
+                                      'camunda-commons-ui/directives/engineSelect',
+                                      'camunda-commons-ui/directives/autoFill',
 
                                       'text!camunda-tasklist-ui/index.html',
                                       'json!locales/en.json',

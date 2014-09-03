@@ -1,105 +1,109 @@
 
-      <div class="container-fluid">
-        <!-- Brand and toggle get grouped for better mobile display -->
-        <div class="navbar-header">
-          <button type="button"
-                  class="navbar-toggle"
-                  data-toggle="collapse"
-                  data-target="#cam-tasklist-navigation">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-          <a class="navbar-brand" href="#">camunda Tasklist</a>
-        </div>
+<div class="container-fluid">
+  <!-- Brand and toggle get grouped for better mobile display -->
+  <div class="navbar-header">
+    <button type="button"
+            class="navbar-toggle"
+            data-toggle="collapse"
+            data-target=".navbar-collapse">
+      <span class="sr-only"
+            translate="TOGGLE_NAVIGATION">Toggle navigation</span>
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+    </button>
 
-        <!-- Collect the nav links, forms, and other content for toggling -->
-        <div class="collapse navbar-collapse"
-             id="cam-tasklist-navigation">
-          <ul class="nav navbar-nav navbar-right"
-              ng-if="username">
+    <a class="navbar-brand"
+       ng-href="{{ 'tasklistbase://' | uri }}#{{ (!username ? '/login' : '') }}">
+       <span class="vendor-icon"></span>
+       {{ 'APP_VENDOR' | translate }} {{ 'TASKLIST_APP' | translate }}
+    </a>
+  </div>
 
-            <li>
-              <a tooltip-placement="left"
-                 tooltip="{{ 'START_PROCESS' | translate }}"
-                 ng-controller="processStartCtrl"
-                 ng-click="openProcessStartModal()"
-                 href>
-                <i class="glyphicon glyphicon-list-alt"></i>
-              </a>
-            </li>
+  <!-- Collect the nav links, forms, and other content for toggling -->
+  <div class="collapse navbar-collapse"
+       id="cam-tasklist-navigation">
+    <ul class="nav navbar-nav navbar-right">
 
-            <li class="user-account dropdown">
-              <a tooltip-placement="left"
-                 tooltip="{{ 'MANAGE_ACCOUNT' | translate }}"
-                 href
-                 class="dropdown-toggle"
-                 data-toggle="dropdown">
-                <i class="glyphicon glyphicon-user"></i>
-                {{ username }}
-              </a>
-              <ul class="dropdown-menu">
-                <li class="user-profile">
-                  <a ng-href="{{ 'adminbase://' | uri }}/#/users/{{ username }}?tab=profile">
-                    My Profile
-                  </a>
-                </li>
-
-                <li class="divider"></li>
-
-                <li class="sign-out">
-                  <a href="#/logout">
-                    Sign out
-                  </a>
-                </li>
-              </ul>
-            </li>
+      <li cam-if-logged-in
+          ng-cloak>
+        <a tooltip-placement="left"
+           tooltip="{{ 'START_PROCESS' | translate }}"
+           ng-controller="processStartCtrl"
+           ng-click="openProcessStartModal()"
+           href>
+          <i class="glyphicon glyphicon-list-alt"></i>
+        </a>
+      </li>
 
 
-            <li class="divider"></li>
+      <li class="divider-vertical"
+          cam-if-logged-in
+          ng-cloak></li>
 
 
-            <li ng-repeat="link in links"
-                class="dropdown"
-                ng-class="{dropdown: (link.links && link.links.length)}">
-              <a ng-if="!link.links || !link.links.length"
-                 href="{{ link.href }}">
-                {{ link.title }}
-                <i ng-if="link.icon"
-                   class="glyphicon glyphicon-{{ link.icon }}"></i>
-              </a>
+      <li engine-select></li>
 
-              <a ng-if="link.links && link.links.length"
-                 href
-                 class="dropdown-toggle"
-                 data-toggle="dropdown">
-                {{ link.title }}
-                <i ng-if="link.icon"
-                   class="glyphicon glyphicon-{{ link.icon }}"></i>
-                <b class="caret"></b>
-              </a>
-              <ul ng-if="link.links && link.links.length"
-                  class="dropdown-menu">
-                <li ng-repeat="link in link.links">
-                  <a href="{{ link.href }}">
-                    {{ link.title }}
-                    <i ng-if="link.icon"
-                       class="glyphicon glyphicon-{{ link.icon }}"></i>
-                  </a>
-                </li>
-              </ul>
-            </li>
-          </ul>
 
-          <ul class="nav navbar-nav navbar-right" ng-if="!username">
-            <li>
-              <a tooltip-placement="left"
-                 tooltip="Log in"
-                 href="#/login">
-                <i class="glyphicon glyphicon-log-in"></i>
-              </a>
-            </li>
-          </ul>
-        </div><!-- /.navbar-collapse -->
-      </div><!-- /.container-fluid -->
+      <li class="user-account dropdown"
+          cam-if-logged-in
+          ng-cloak>
+        <a tooltip-placement="left"
+           tooltip="{{ 'MANAGE_ACCOUNT' | translate }}"
+           href
+           class="dropdown-toggle"
+           data-toggle="dropdown">
+          <i class="glyphicon glyphicon-user"></i>
+          {{ authentication.name }}
+        </a>
+        <ul class="dropdown-menu">
+          <li class="user-profile">
+            <a ng-href="{{ 'adminbase://' | uri }}/#/users/{{ username }}?tab=profile"
+               translate="MY_PROFILE">
+              My Profile
+            </a>
+          </li>
+
+          <li class="divider"></li>
+
+          <li class="sign-out">
+            <a href="#/logout"
+               translate="SIGN_OUT_ACTION">
+              Sign out
+            </a>
+          </li>
+        </ul>
+      </li>
+
+
+      <li class="divider-vertical"
+          cam-if-logged-in
+          ng-cloak></li>
+
+
+      <li class="app-switch dropdown">
+        <a href
+           sem-show-applications
+           class="dropdown-toggle"
+           data-toggle="dropdown">
+          <i class="glyphicon glyphicon-home"></i>
+          <b class="caret"></b>
+        </a>
+
+        <ul class="dropdown-menu">
+          <li ng-if="!authentication || authentication.canAccess('admin')">
+            <a sem-jump-to-admin
+               ng-href="{{ '../../admin/:engine/' | uri }}"
+               translate="ADMIN_APP">Admin</a>
+          </li>
+
+          <li ng-if="!authentication || authentication.canAccess('cockpit')">
+            <a sem-jump-to-cockpit
+               ng-href="{{ '../../cockpit/:engine/' | uri }}"
+               translate="COCKPIT_APP">Cockpit</a>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </div><!-- /.navbar-collapse -->
+</div><!-- /.container-fluid -->

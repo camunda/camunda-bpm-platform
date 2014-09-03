@@ -20,13 +20,13 @@ define([
 
 
       .when('/login', {
-        template: tasklistTemplate,
-        controller: 'userLoginCtrl'
+        template: tasklistTemplate
       })
 
 
       .when('/logout', {
         template: tasklistTemplate,
+        authentication: 'required',
         controller: 'userLogoutCtrl'
       })
 

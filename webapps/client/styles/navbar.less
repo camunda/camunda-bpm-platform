@@ -1,32 +1,37 @@
 
-// .navbar-inverse {
-//   background-color: @brand-primary;
-//   .brand {
-//     display: block;
-//     // background: no-repeat url('../images/app-logo.png');
-//     text-indent: -999em;
-//     width: 215px;
-//     height: 39px;
-//     margin-top: 3px;
-//   }
-//   a,
-//   a:link,
-//   a:hover,
-//   a:focus,
-//   a:active {
-//     color: @body-bg;
-//   }
-// }
-
 .navbar {
   border: none;
+  .vendor-icon {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    background-image: url(../images/vendor-logo-16.png);
+  }
 }
 
-// Default navbar
+
+
+.divider-vertical {
+  display: none;
+  @media (min-width: @grid-float-breakpoint) {
+    height: 50px;
+    margin: 0 9px;
+    border-right: 1px solid lighten(@brand-primary, 5%);
+    border-left: 1px solid darken(@brand-primary, 5%);
+  }
+}
+
+
+
+.navbar-collapse {
+  background-color: @brand-primary;
+}
+
+
 .navbar-default {
+  // z-index: @zindex-modal + 20;
   .navbar-nav {
     > .active > a {
-      &,
       &:hover,
       &:focus {
         border-bottom: 2px solid @navbar-default-link-color;

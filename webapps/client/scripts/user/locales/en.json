@@ -4,7 +4,7 @@
   "CREDENTIALS_ERROR":
                         "Can not log in with those credentials.",
   "USERNAME":
-                        "User name",
+                        "Username",
   "PASSWORD":
                         "Password",
   "PLEASE_SIGN_IN":
@@ -13,6 +13,10 @@
                         "Login",
   "SIGN_IN_ACTION":
                         "Sign in",
+  "SIGN_OUT_ACTION":
+                        "Sign out",
+  "MY_PROFILE":
+                        "My profile",
   "LOGGED_OUT":
                         "You are logged out.",
   "USER_NAME":

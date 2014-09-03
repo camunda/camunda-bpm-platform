@@ -55,6 +55,12 @@ define('camunda-tasklist-ui', [
     var notificationsPanel = require('camunda-commons-ui/directives/notificationsPanel');
     tasklistApp.directive('notificationsPanel', notificationsPanel);
 
+    var engineSelect = require('camunda-commons-ui/directives/engineSelect');
+    tasklistApp.directive('engineSelect', engineSelect);
+
+    var autoFill = require('camunda-commons-ui/directives/autoFill');
+    tasklistApp.directive('autoFill', autoFill);
+
     tasklistApp.config(require('camunda-tasklist-ui/config/uris'));
     tasklistApp.config(require('camunda-tasklist-ui/config/translations'));
     tasklistApp.config(require('camunda-tasklist-ui/config/routes'));
