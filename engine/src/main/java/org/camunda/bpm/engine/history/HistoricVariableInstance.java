@@ -54,5 +54,11 @@ public interface HistoricVariableInstance extends PersistentVariableInstance {
   /**
    * Returns the corresponding activity instance id.
    */
+  @Deprecated
   String getActivtyInstanceId();
+
+  /**
+   * Returns the corresponding activity instance id.
+   */
+  String getActivityInstanceId();
 }

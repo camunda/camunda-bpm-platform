@@ -44,7 +44,7 @@ public class HistoricVariableInstanceScopeTest extends PluggableProcessEngineTes
     assertNotNull(variable);
 
     // the variable is in the process instance scope
-    assertEquals(pi.getId(), variable.getActivtyInstanceId());
+    assertEquals(pi.getId(), variable.getActivityInstanceId());
 
     taskService.complete(taskService.createTaskQuery().singleResult().getId());
     assertProcessEnded(pi.getId());
@@ -70,7 +70,7 @@ public class HistoricVariableInstanceScopeTest extends PluggableProcessEngineTes
     assertNotNull(variable);
 
     // the variable is in the task scope
-    assertEquals(taskExecution.getActivityInstanceId(), variable.getActivtyInstanceId());
+    assertEquals(taskExecution.getActivityInstanceId(), variable.getActivityInstanceId());
 
     taskService.complete(task.getId());
     assertProcessEnded(pi.getId());
@@ -98,13 +98,13 @@ public class HistoricVariableInstanceScopeTest extends PluggableProcessEngineTes
     assertEquals("testVar", firstVar.getVariableName());
     assertEquals("testValue", firstVar.getValue());
     // the variable is in the process instance scope
-    assertEquals(pi.getId(), firstVar.getActivtyInstanceId());
+    assertEquals(pi.getId(), firstVar.getActivityInstanceId());
 
     HistoricVariableInstance secondVar = result.get(1);
     assertEquals("testVar", secondVar.getVariableName());
     assertEquals("anotherTestValue", secondVar.getValue());
     // the variable is in the task scope
-    assertEquals(taskExecution.getActivityInstanceId(), secondVar.getActivtyInstanceId());
+    assertEquals(taskExecution.getActivityInstanceId(), secondVar.getActivityInstanceId());
 
     taskService.complete(task.getId());
     assertProcessEnded(pi.getId());
@@ -124,7 +124,7 @@ public class HistoricVariableInstanceScopeTest extends PluggableProcessEngineTes
 
     HistoricVariableInstance variable = query.singleResult();
     // the variable is in the process instance scope
-    assertEquals(pi.getId(), variable.getActivtyInstanceId());
+    assertEquals(pi.getId(), variable.getActivityInstanceId());
 
     taskService.complete(task.getId());
     assertProcessEnded(pi.getId());
@@ -139,7 +139,7 @@ public class HistoricVariableInstanceScopeTest extends PluggableProcessEngineTes
 
     HistoricVariableInstance variable = query.singleResult();
     // the variable is in the process instance scope
-    assertEquals(pi.getId(), variable.getActivtyInstanceId());
+    assertEquals(pi.getId(), variable.getActivityInstanceId());
 
     assertProcessEnded(pi.getId());
   }
@@ -158,7 +158,7 @@ public class HistoricVariableInstanceScopeTest extends PluggableProcessEngineTes
 
     HistoricVariableInstance variable = query.singleResult();
     // the variable is in the sub process scope
-    assertEquals(activityInstanceId, variable.getActivtyInstanceId());
+    assertEquals(activityInstanceId, variable.getActivityInstanceId());
 
     assertProcessEnded(pi.getId());
   }
@@ -181,7 +181,7 @@ public class HistoricVariableInstanceScopeTest extends PluggableProcessEngineTes
 
     HistoricVariableInstance variable = query.singleResult();
     // the variable is in the user task scope
-    assertEquals(taskExecution.getActivityInstanceId(), variable.getActivtyInstanceId());
+    assertEquals(taskExecution.getActivityInstanceId(), variable.getActivityInstanceId());
 
     taskService.complete(task.getId());
 
@@ -202,7 +202,7 @@ public class HistoricVariableInstanceScopeTest extends PluggableProcessEngineTes
 
     HistoricVariableInstance variable = query.singleResult();
     // the variable is in the process instance scope
-    assertEquals(pi.getId(), variable.getActivtyInstanceId());
+    assertEquals(pi.getId(), variable.getActivityInstanceId());
 
     taskService.complete(task.getId());
 
@@ -218,7 +218,7 @@ public class HistoricVariableInstanceScopeTest extends PluggableProcessEngineTes
 
     HistoricVariableInstance variable = query.singleResult();
     // the variable is in the process instance scope
-    assertEquals(pi.getId(), variable.getActivtyInstanceId());
+    assertEquals(pi.getId(), variable.getActivityInstanceId());
 
     assertProcessEnded(pi.getId());
   }
@@ -237,7 +237,7 @@ public class HistoricVariableInstanceScopeTest extends PluggableProcessEngineTes
 
     HistoricVariableInstance variable = query.singleResult();
     // the variable is in the service task scope
-    assertEquals(serviceTask.getId(), variable.getActivtyInstanceId());
+    assertEquals(serviceTask.getId(), variable.getActivityInstanceId());
 
     assertProcessEnded(pi.getId());
   }

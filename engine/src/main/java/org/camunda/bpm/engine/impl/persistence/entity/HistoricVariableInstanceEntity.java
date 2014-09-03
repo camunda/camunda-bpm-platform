@@ -304,11 +304,16 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
     this.executionId = executionId;
   }
 
+  @Deprecated
   public String getActivtyInstanceId() {
     return activityInstanceId;
   }
 
-  public void setActivtyInstanceId(String activityInstanceId) {
+  public String getActivityInstanceId() {
+    return activityInstanceId;
+  }
+
+  public void setActivityInstanceId(String activityInstanceId) {
     this.activityInstanceId = activityInstanceId;
   }
 
