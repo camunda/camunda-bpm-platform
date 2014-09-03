@@ -26,6 +26,7 @@ public class HistoricVariableUpdateDto extends HistoricDetailDto {
 
   protected String variableName;
   protected String variableTypeName;
+  protected String typeName;
   protected Object value;
   protected int revision;
   protected String errorMessage;
@@ -37,6 +38,10 @@ public class HistoricVariableUpdateDto extends HistoricDetailDto {
 
   public String getVariableTypeName() {
     return variableTypeName;
+  }
+
+  public String getTypeName() {
+    return typeName;
   }
 
   public Object getValue() {
@@ -76,7 +81,7 @@ public class HistoricVariableUpdateDto extends HistoricDetailDto {
       dto.value = historicVariableUpdate.getValue();
     }
 
-    dto.variableTypeName = historicVariableUpdate.getValueTypeName();
+    dto.typeName = historicVariableUpdate.getValueTypeName();
     dto.errorMessage = historicVariableUpdate.getErrorMessage();
 
     return dto;

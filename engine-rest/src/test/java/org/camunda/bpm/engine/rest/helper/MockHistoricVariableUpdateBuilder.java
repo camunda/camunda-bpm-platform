@@ -29,7 +29,7 @@ public class MockHistoricVariableUpdateBuilder {
 
   protected String id;
   protected String name;
-  protected String type;
+  protected String typeName;
   protected Object value;
   protected String valueTypeName;
   protected String processInstanceId;
@@ -56,7 +56,7 @@ public class MockHistoricVariableUpdateBuilder {
   }
 
   public MockHistoricVariableUpdateBuilder typeName(String type) {
-    this.type = type;
+    this.typeName = type;
     return this;
   }
 
@@ -119,7 +119,7 @@ public class MockHistoricVariableUpdateBuilder {
     HistoricVariableUpdate mockVariable = mock(HistoricVariableUpdate.class);
     when(mockVariable.getId()).thenReturn(id);
     when(mockVariable.getVariableName()).thenReturn(name);
-    when(mockVariable.getVariableTypeName()).thenReturn(type);
+    when(mockVariable.getVariableTypeName()).thenReturn(typeName);
     when(mockVariable.getValueTypeName()).thenReturn(valueTypeName);
     when(mockVariable.getValue()).thenReturn(value);
     when(mockVariable.getProcessInstanceId()).thenReturn(processInstanceId);
@@ -147,8 +147,8 @@ public class MockHistoricVariableUpdateBuilder {
     return name;
   }
 
-  public String getType() {
-    return type;
+  public String getTypeName() {
+    return typeName;
   }
 
   public Object getValue() {

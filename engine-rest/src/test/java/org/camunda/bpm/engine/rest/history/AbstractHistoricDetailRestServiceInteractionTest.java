@@ -80,6 +80,7 @@ public abstract class AbstractHistoricDetailRestServiceInteractionTest extends A
       .body("id", equalTo(builder.getId()))
       .body("variableName", equalTo(builder.getName()))
       .body("variableTypeName", equalTo(builder.getValueTypeName()))
+      .body("typeName", equalTo(builder.getTypeName()))
       .body("value", equalTo(builder.getValue()))
       .body("processInstanceId", equalTo(builder.getProcessInstanceId()))
       .body("errorMessage", equalTo(builder.getErrorMessage()))
