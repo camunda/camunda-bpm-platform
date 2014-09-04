@@ -12,8 +12,6 @@
  */
 package org.camunda.bpm.engine.rest.helper;
 
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -40,7 +38,6 @@ public class MockHistoricVariableInstanceBuilder {
   protected String activityInstanceId;
 
   protected MockSerializedValueBuilder serializedValueBuilder;
-//  protected Map<String, Object> serializedValueConfiguration = new HashMap<String, Object>();
   protected boolean storesCustomObjects;
 
   public MockHistoricVariableInstanceBuilder id(String id) {
@@ -145,6 +142,7 @@ public class MockHistoricVariableInstanceBuilder {
     when(mockVariable.getProcessInstanceId()).thenReturn(processInstanceId);
     when(mockVariable.getErrorMessage()).thenReturn(errorMessage);
     when(mockVariable.getActivtyInstanceId()).thenReturn(activityInstanceId);
+    when(mockVariable.getActivityInstanceId()).thenReturn(activityInstanceId);
     when(mockVariable.storesCustomObjects()).thenReturn(storesCustomObjects);
 
     if (serializedValueBuilder != null) {

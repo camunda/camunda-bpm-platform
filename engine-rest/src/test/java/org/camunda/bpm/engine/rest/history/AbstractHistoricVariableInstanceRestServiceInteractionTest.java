@@ -171,7 +171,7 @@ public abstract class AbstractHistoricVariableInstanceRestServiceInteractionTest
 
   @Test
   public void testBinaryDataForNonBinaryVariable() {
-    HistoricVariableInstance variableInstanceMock = MockProvider.mockHistoricVariableInstance().build();
+    HistoricVariableInstance variableInstanceMock = MockProvider.createMockHistoricVariableInstance();
 
     when(variableInstanceQueryMock.variableId(variableInstanceMock.getId())).thenReturn(variableInstanceQueryMock);
     when(variableInstanceQueryMock.disableCustomObjectDeserialization()).thenReturn(variableInstanceQueryMock);

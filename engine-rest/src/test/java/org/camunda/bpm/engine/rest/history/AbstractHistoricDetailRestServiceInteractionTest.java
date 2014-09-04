@@ -79,7 +79,7 @@ public abstract class AbstractHistoricDetailRestServiceInteractionTest extends A
     .and()
       .body("id", equalTo(builder.getId()))
       .body("variableName", equalTo(builder.getName()))
-      .body("variableTypeName", equalTo(builder.getValueTypeName()))
+      .body("variableTypeName", equalTo(builder.getVariableTypeName()))
       .body("typeName", equalTo(builder.getTypeName()))
       .body("value", equalTo(builder.getValue()))
       .body("processInstanceId", equalTo(builder.getProcessInstanceId()))
@@ -117,7 +117,8 @@ public abstract class AbstractHistoricDetailRestServiceInteractionTest extends A
     .and()
       .body("id", equalTo(builder.getId()))
       .body("variableName", equalTo(builder.getName()))
-      .body("variableTypeName", equalTo(builder.getValueTypeName()))
+      .body("variableTypeName", equalTo(builder.getVariableTypeName()))
+      .body("typeName", equalTo(builder.getTypeName()))
       .body("value", equalTo(builder.getValue()))
       .body("processInstanceId", equalTo(builder.getProcessInstanceId()))
       .body("errorMessage", equalTo(builder.getErrorMessage()))
@@ -223,7 +224,7 @@ public abstract class AbstractHistoricDetailRestServiceInteractionTest extends A
 
   @Test
   public void testBinaryDataForNonBinaryVariable() {
-    HistoricVariableUpdate detailMock =  MockProvider.mockHistoricVariableUpdate().build();
+    HistoricVariableUpdate detailMock =  MockProvider.createMockHistoricVariableUpdate();
 
     when(historicDetailQueryMock.detailId(detailMock.getId())).thenReturn(historicDetailQueryMock);
     when(historicDetailQueryMock.disableCustomObjectDeserialization()).thenReturn(historicDetailQueryMock);

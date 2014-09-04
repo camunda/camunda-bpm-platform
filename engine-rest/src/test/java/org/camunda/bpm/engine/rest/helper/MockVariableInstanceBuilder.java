@@ -12,8 +12,6 @@
  */
 package org.camunda.bpm.engine.rest.helper;
 
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 

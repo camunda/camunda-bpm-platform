@@ -12,8 +12,6 @@
  */
 package org.camunda.bpm.engine.rest.helper;
 
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -29,9 +27,9 @@ public class MockHistoricVariableUpdateBuilder {
 
   protected String id;
   protected String name;
-  protected String typeName;
+  protected String variableTypeName;
   protected Object value;
-  protected String valueTypeName;
+  protected String typeName;
   protected String processInstanceId;
   protected String errorMessage;
   protected String activityInstanceId;
@@ -40,9 +38,7 @@ public class MockHistoricVariableUpdateBuilder {
   protected String executionId;
   protected String taskId;
 
-
   protected MockSerializedValueBuilder serializedValueBuilder;
-//  protected Map<String, Object> serializedValueConfiguration = new HashMap<String, Object>();
   protected boolean storesCustomObjects;
 
   public MockHistoricVariableUpdateBuilder id(String id) {
@@ -56,7 +52,7 @@ public class MockHistoricVariableUpdateBuilder {
   }
 
   public MockHistoricVariableUpdateBuilder typeName(String type) {
-    this.typeName = type;
+    this.variableTypeName = type;
     return this;
   }
 
@@ -66,7 +62,7 @@ public class MockHistoricVariableUpdateBuilder {
   }
 
   public MockHistoricVariableUpdateBuilder valueTypeName(String valueTypeName) {
-    this.valueTypeName = valueTypeName;
+    this.typeName = valueTypeName;
     return this;
   }
 
@@ -119,8 +115,8 @@ public class MockHistoricVariableUpdateBuilder {
     HistoricVariableUpdate mockVariable = mock(HistoricVariableUpdate.class);
     when(mockVariable.getId()).thenReturn(id);
     when(mockVariable.getVariableName()).thenReturn(name);
-    when(mockVariable.getVariableTypeName()).thenReturn(typeName);
-    when(mockVariable.getValueTypeName()).thenReturn(valueTypeName);
+    when(mockVariable.getVariableTypeName()).thenReturn(variableTypeName);
+    when(mockVariable.getValueTypeName()).thenReturn(typeName);
     when(mockVariable.getValue()).thenReturn(value);
     when(mockVariable.getProcessInstanceId()).thenReturn(processInstanceId);
     when(mockVariable.getErrorMessage()).thenReturn(errorMessage);
@@ -147,16 +143,16 @@ public class MockHistoricVariableUpdateBuilder {
     return name;
   }
 
-  public String getTypeName() {
-    return typeName;
+  public String getVariableTypeName() {
+    return variableTypeName;
   }
 
   public Object getValue() {
     return value;
   }
 
-  public String getValueTypeName() {
-    return valueTypeName;
+  public String getTypeName() {
+    return typeName;
   }
 
   public String getProcessInstanceId() {

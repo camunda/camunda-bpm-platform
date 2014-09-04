@@ -213,7 +213,7 @@ public class AbstractVariableInstanceRestServiceInteractionTest extends Abstract
 
   @Test
   public void testBinaryDataForNonBinaryVariable() {
-    VariableInstance variableInstanceMock = MockProvider.mockVariableInstance().build();
+    VariableInstance variableInstanceMock = MockProvider.createMockVariableInstance();
 
     when(variableInstanceQueryMock.variableId(variableInstanceMock.getId())).thenReturn(variableInstanceQueryMock);
     when(variableInstanceQueryMock.disableCustomObjectDeserialization()).thenReturn(variableInstanceQueryMock);
