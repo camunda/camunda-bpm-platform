@@ -17,6 +17,10 @@
         &lt;{{ processInstance.id }}&gt;
       </span>
 
+      <span ng-show="processInstance.businessKey.length > 0" title="Business key of the process instance">
+        &lt;{{ processInstance.businessKey}}&gt;
+      </span>
+
       <span class="badge badge-warning badge-suspended"
             ng-show="processInstance.suspended"
             tooltip="Currently suspended"
