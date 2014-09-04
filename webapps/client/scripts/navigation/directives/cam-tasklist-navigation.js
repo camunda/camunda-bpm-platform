@@ -6,7 +6,6 @@ define([
   'use strict';
   return function() {
     return {
-      scope: {},
 
       template: template,
 
