@@ -11,27 +11,27 @@
      style="z-index: {{ ((filters.length + 10) - delta) }};">
 
   <div class="task-filter"
-       style="background-color: {{ filter.color }}">
+       style="background-color: {{ filter.properties.color }}">
 
     <h4 class="name"
         ng-click="focus(filter)">{{ filter.name }}</h4>
 
     <div class="info"
-         style="background-color: {{ filter.color }}">
-      <div ng-if="filter.description"
+         style="background-color: {{ filter.properties.color }}">
+      <div ng-if="filter.properties.description"
            class="description">
-        {{ filter.description }}
+        {{ filter.properties.description }}
       </div>
 
-      <ul class="filters list-unstyled">
+      <ul class="query list-unstyled">
         <li ng-click="edit()"
-            ng-repeat="filter in filter.filters">
-          <span class="key">{{ filter.key }}</span>:
+            ng-repeat="queryParam in filter.query">
+          <span class="key">{{ queryParam.key }}</span>:
 
           <span class="operator"
-                ng-if="filter.operator">{{ filter.operator }}</span>
+                ng-if="queryParam.operator">{{ queryParam.operator }}</span>
 
-          <span class="value">{{ filter.value }}</span>
+          <span class="value">{{ queryParam.value }}</span>
         </li>
       </ul>
     </div>
