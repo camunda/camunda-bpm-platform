@@ -30,7 +30,7 @@ module.exports = Page.extend({
 
   navigateLogout: function() {
     browser.get(this.url +'logout');
-    expect(element(by.css('.modal.user-login')).isDisplayed()).toBe(true);
+    expect(element(by.css('input[type="password"]')).isDisplayed()).toBe(true);
   }
 
 });
