@@ -62,6 +62,7 @@ import javax.ws.rs.core.Response.Status;
 import org.camunda.bpm.ProcessApplicationService;
 import org.camunda.bpm.application.ProcessApplicationInfo;
 import org.camunda.bpm.container.RuntimeContainerDelegate;
+import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.FormService;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ManagementService;
@@ -2561,7 +2562,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
   }
 
   @Test
-  public void testPutSingleLocalVariableFromSerializedMultipart() throws Exception {
+  public void testPostSingleLocalVariableFromSerializedMultipart() throws Exception {
     byte[] bytes = "someContent".getBytes();
 
     String variableKey = "aVariableKey";
@@ -2615,7 +2616,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
 
     String variableKey = "aVariableKey";
 
-    doThrow(new ProcessEngineException("expected exception"))
+    doThrow(new BadUserRequestException("expected exception"))
       .when(taskServiceMock)
       .setVariableLocalFromSerialized(anyString(), anyString(), any(), anyString(), any(Map.class));
 
@@ -2624,7 +2625,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
       .contentType(ContentType.JSON)
       .body(requestJson)
     .expect()
-      .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
       .body("type", equalTo(RestException.class.getSimpleName()))
       .body("message", equalTo("Cannot put task variable aVariableKey: expected exception"))
     .when()

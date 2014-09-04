@@ -16,10 +16,9 @@ import java.text.ParseException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
-
+import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.rest.dto.PatchVariablesDto;
@@ -95,12 +94,15 @@ public abstract class AbstractVariablesResource implements VariableResource {
         putPrimitiveVariableValue(variableName, variable.getType(), variable.getValue());
       } else if (variable.isSerializedVariableUpdate()) {
         setVariableEntityFromSerialized(variableName, variable.getValue(),
-            variable.getVariableType(), variable.getSerializationConfig());
+          variable.getVariableType(), variable.getSerializationConfig());
       } else {
         throw new InvalidRequestException(Status.BAD_REQUEST,
-            String.format("Cannot put %s variable %s: Invalid combination of variable type '%s' and value type '%s'",
-                getResourceTypeName(), variableName, variable.getVariableType(), variable.getType()));
+          String.format("Cannot put %s variable %s: Invalid combination of variable type '%s' and value type '%s'",
+            getResourceTypeName(), variableName, variable.getVariableType(), variable.getType()));
       }
+    } catch (BadUserRequestException e) {
+      throw new RestException(Status.BAD_REQUEST, e,
+        String.format("Cannot put %s variable %s: %s", getResourceTypeName(), variableName, e.getMessage()));
     } catch (ProcessEngineException e) {
       throw new RestException(Status.INTERNAL_SERVER_ERROR, e,
           String.format("Cannot put %s variable %s: %s", getResourceTypeName(), variableName, e.getMessage()));

@@ -1,8 +1,32 @@
 package org.camunda.bpm.engine.rest;
 
+import static com.jayway.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.argThat;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.isNull;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import com.jayway.restassured.http.ContentType;
 import com.jayway.restassured.response.Response;
-
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response.Status;
+import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.ProcessEngineVariableType;
 import org.camunda.bpm.engine.impl.RuntimeServiceImpl;
@@ -21,21 +45,6 @@ import org.codehaus.jackson.map.type.TypeFactory;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response.Status;
-
-import java.text.SimpleDateFormat;
-import java.util.*;
-
-import static com.jayway.restassured.RestAssured.given;
-import static org.hamcrest.Matchers.*;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.argThat;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Matchers.isNull;
-import static org.mockito.Mockito.*;
 
 public abstract class AbstractExecutionRestServiceInteractionTest extends AbstractRestServiceTest {
 
@@ -660,7 +669,7 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
 
 
   @Test
-  public void testPutSingleLocalVariableFromSerializedMultipart() throws Exception {
+  public void testPostSingleLocalVariableFromSerializedMultipart() throws Exception {
     byte[] bytes = "someContent".getBytes();
 
     String variableKey = "aVariableKey";
@@ -714,7 +723,7 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
 
     String variableKey = "aVariableKey";
 
-    doThrow(new ProcessEngineException("expected exception"))
+    doThrow(new BadUserRequestException("expected exception"))
       .when(runtimeServiceMock)
       .setVariableLocalFromSerialized(anyString(), anyString(), any(), anyString(), any(Map.class));
 
@@ -723,7 +732,7 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
       .contentType(ContentType.JSON)
       .body(requestJson)
     .expect()
-      .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
       .body("type", equalTo(RestException.class.getSimpleName()))
       .body("message", equalTo("Cannot put execution variable aVariableKey: expected exception"))
     .when()
@@ -769,12 +778,12 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
 
     Map<String, Object> variableJson = VariablesBuilder.getVariableValueMap(variableValue);
 
-    doThrow(new ProcessEngineException("expected exception"))
+    doThrow(new BadUserRequestException("expected exception"))
       .when(runtimeServiceMock).setVariableLocal(eq(MockProvider.EXAMPLE_EXECUTION_ID), eq(variableKey), eq(variableValue));
 
     given().pathParam("id", MockProvider.EXAMPLE_EXECUTION_ID).pathParam("varId", variableKey)
       .contentType(ContentType.JSON).body(variableJson)
-      .then().expect().statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
+      .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
       .body("type", is(RestException.class.getSimpleName()))
       .body("message", is("Cannot put execution variable " + variableKey + ": expected exception"))
       .when().put(SINGLE_EXECUTION_LOCAL_VARIABLE_URL);

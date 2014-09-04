@@ -1,8 +1,37 @@
 package org.camunda.bpm.engine.rest;
 
+import static com.jayway.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyCollectionOf;
+import static org.mockito.Matchers.anyMapOf;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.argThat;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.isNull;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import com.jayway.restassured.http.ContentType;
 import com.jayway.restassured.response.Response;
-
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response.Status;
+import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.ProcessEngineVariableType;
 import org.camunda.bpm.engine.impl.RuntimeServiceImpl;
@@ -21,23 +50,6 @@ import org.codehaus.jackson.map.type.TypeFactory;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response.Status;
-
-import java.text.SimpleDateFormat;
-import java.util.*;
-
-import static com.jayway.restassured.RestAssured.given;
-import static org.hamcrest.Matchers.*;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyCollectionOf;
-import static org.mockito.Matchers.anyMapOf;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.argThat;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Matchers.isNull;
-import static org.mockito.Mockito.*;
 
 public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
     AbstractRestServiceTest {
@@ -769,7 +781,7 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
   }
 
   @Test
-  public void testPutSingleVariableFromSerializedMultipart() throws Exception {
+  public void testPostSingleVariableFromSerializedMultipart() throws Exception {
     byte[] bytes = "someContent".getBytes();
 
     String variableKey = "aVariableKey";
@@ -823,7 +835,7 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
 
     String variableKey = "aVariableKey";
 
-    doThrow(new ProcessEngineException("expected exception"))
+    doThrow(new BadUserRequestException("expected exception"))
       .when(runtimeServiceMock)
       .setVariableFromSerialized(anyString(), anyString(), any(), anyString(), any(Map.class));
 
@@ -832,7 +844,7 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
       .contentType(ContentType.JSON)
       .body(requestJson)
     .expect()
-      .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
       .body("type", equalTo(RestException.class.getSimpleName()))
       .body("message", equalTo("Cannot put process instance variable aVariableKey: expected exception"))
     .when()
