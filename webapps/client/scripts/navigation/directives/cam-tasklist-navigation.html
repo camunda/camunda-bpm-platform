@@ -14,9 +14,11 @@
     </button>
 
     <a class="navbar-brand"
+       title="{{ 'APP_VENDOR' | translate }} {{ 'TASKLIST_APP' | translate }}"
        ng-href="{{ 'tasklistbase://' | uri }}#{{ (!username ? '/login' : '') }}">
-       <span class="vendor-icon"></span>
+<!--
        {{ 'APP_VENDOR' | translate }} {{ 'TASKLIST_APP' | translate }}
+-->
     </a>
   </div>
 
