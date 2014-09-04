@@ -21,9 +21,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.delegate.PersistentVariableInstance;
+import org.camunda.bpm.engine.delegate.ProcessEngineVariableType;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.core.variable.CorePersistentVariableStore;
@@ -205,7 +205,11 @@ public abstract class AbstractPersistentVariableStore extends AbstractVariableSt
     VariableType type = variableTypes.getVariableType(variableTypeName);
 
     if (type == null) {
-      throw new BadUserRequestException("No variable type '" + variableTypeName + "' found");
+      String message = "No variable type '" + variableTypeName + "' found";
+      if (ProcessEngineVariableType.SPIN.getName().equals(variableTypeName)) {
+        message += ". If you want to use the '" + ProcessEngineVariableType.SPIN.getName() + "' type please adjust your 'defaultSerializationFormat' configuration";
+      }
+      throw new BadUserRequestException(message);
     }
 
     return type;

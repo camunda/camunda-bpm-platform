@@ -258,7 +258,7 @@ public interface ProcessEngineVariableType {
    * {@link SPIN_TYPE_CONFIG_ROOT_TYPE}</li>
    * </ul>
    */
-  public static final ProcessEngineVariableType SPIN = new DefaultProcessEngineVariableType("SpinSerialization");
+  public static final ProcessEngineVariableType SPIN = new DefaultProcessEngineVariableType("spin-serialization");
 
 
   /**
