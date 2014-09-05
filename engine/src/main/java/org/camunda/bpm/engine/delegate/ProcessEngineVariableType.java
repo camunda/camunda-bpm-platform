@@ -129,7 +129,7 @@ import org.camunda.bpm.engine.impl.core.variable.DefaultProcessEngineVariableTyp
  *   </tr>
  *
  *   <tr>
- *   <td>SpinSerialization</td>
+ *   <td>spin-serialization</td>
  *   <td>&lt;Custom Class&gt;</td>
  *   <td>String</td>
  *   <td>
