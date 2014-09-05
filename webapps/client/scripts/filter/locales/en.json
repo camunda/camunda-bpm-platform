@@ -1,6 +1,101 @@
 {
+  "FILTER_CREATE":
+                        "Create a filter",
+  "FILTER_EDIT":
+                        "Edit filter",
+  "FILTER_DELETE":
+                        "Delete filter",
+
+
+  "FILTER_DELETION_WARNING":
+                        "Deleting the filter can not be undone, are your sure to want to proceed?",
+  "FILTER_DELETION_SUCCESS":
+                        "Something went wrong while deleting the filter.",
+  "FILTER_DELETION_ERROR":
+                        "The filter has been deleted.",
+
+
+  "FILTER_NOT_FOUND":
+                        "Filter not found",
+  "FILTER_AUTHORIZAION_NOT_FOUND":
+                        "Filter authorizations not found",
+
+  "FILTER_FORM_BASICS":
+                        "General",
+  "FILTER_FORM_BASICS_HINT":
+                        "Customize the appearance of the filter.",
+  "FILTER_NAME_LABEL":
+                        "Name",
+  "FILTER_NAME_PLACEHOLDER":
+                        "My tasks",
+  "FILTER_PRIORITY_LABEL":
+                        "Priority",
+  "FILTER_COLOR_LABEL":
+                        "Color",
+  "FILTER_DESCRIPTION_LABEL":
+                        "Description",
+  "FILTER_DESCRIPTION_PLACEHOLDER":
+                        "Shows the tasks I am assigned",
+
+  "FILTER_FORM_ACCESS_RULES":
+                        "Authorizations",
+  "FILTER_FORM_ACCESS_RULES_HINT":
+                        "Control who can access, update or delete this filter.",
+  "FILTER_OWNER":
+                        "Owner",
+  "FILTER_ACCESS_RULE_TYPE":
+                        "Type",
+  "FILTER_ACCESS_RULE_USER":
+                        "User / Group",
+  "FILTER_ACCESS_RULE_PERMISSIONS":
+                        "Permissions",
+  "FILTER_IDENTITY_TYPE_TOOLTIP":
+                        "Authorization is applied to",
+  "FILTER_IDENTITY_TYPE_USER":
+                        "user",
+  "FILTER_IDENTITY_TYPE_GROUP":
+                        "group",
+  "FILTER_ADD_ACCESS_RULE":
+                        "Add rule",
+  "FILTER_REMOVE_ACCESS_RULE":
+                        "Remove",
+
+  "FILTER_FORM_CRITERIA":
+                        "Criteria",
+  "FILTER_FORM_CRITERIA_HINT":
+                        "This section is aimed to set the parameters used to filter the tasks.",
+  "FILTER_CRITERIA_KEY":
+                        "Key",
+  "FILTER_CRITERIA_OPERATOR":
+                        "Operator",
+  "FILTER_CRITERIA_VALUE":
+                        "Value",
+  "FILTER_ADD_CRITERION":
+                        "Add criterion",
+  "FILTER_REMOVE_CRITERION":
+                        "Remove",
+
+  "FILTER_FORM_VARIABLES":
+                        "Variables",
+  "FILTER_FORM_VARIABLES_HINT":
+                        "You can define variables shown in the tasks list.",
+  "FILTER_VARIABLE_NAME":
+                        "Name",
+  "FILTER_VARIABLE_LABEL":
+                        "Label",
+  "FILTER_VARIABLE_NAME_PLACEHOLDER":
+                        "Machine name of variable",
+  "FILTER_VARIABLE_LABEL_PLACEHOLDER":
+                        "Human readable label",
+  "FILTER_ADD_VARIABLE":
+                        "Add variable",
+  "FILTER_REMOVE_VARIABLE":
+                        "Remove",
+  "FILTER_VARIABLES_AMOUNT_WARNING":
+                        "Showing too much variables in the tasks list could impact on the user experience.",
+
   "SEARCH_TASK_BY_NAME":
                         "Search by task name, case sensitive.",
   "NO_MATCHING_TASK":
-                        "No task macthing filters found."
+                        "No task matching filters found."
 }

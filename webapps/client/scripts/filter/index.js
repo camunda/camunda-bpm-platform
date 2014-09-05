@@ -17,27 +17,30 @@ define([
   'moment',
   './directives/cam-tasklist-filters',
   './directives/cam-tasklist-tasks',
+  './modals/cam-tasklist-filter-form',
   'camunda-tasklist-ui/utils',
-  'camunda-tasklist-ui/api',
-  'text!./form.html'
+  'camunda-tasklist-ui/api'
 ], function(
   require,
   angular,
   moment,
   camTasklistFilters,
-  camTasklistFilterTasks
+  camTasklistFilterTasks,
+  camTasklistFilterForm,
+  utils,
+  api
 ) {
 
   var filterModule = angular.module('cam.tasklist.filter', [
-    require('camunda-tasklist-ui/utils').name,
-    require('camunda-tasklist-ui/api').name,
+    utils.name,
+    api.name,
     'ui.bootstrap',
     'cam.form',
     'angularMoment'
   ]);
 
 
-  filterModule.factory('camTasklistFilterFilterConversion', [
+  filterModule.factory('camTasklistFilterCriteriaConversion', [
     '$rootScope',
   function(
     $rootScope
@@ -97,33 +100,7 @@ define([
   }]);
 
 
-  filterModule.controller('filterCreateCtrl', [
-    '$modal',
-    '$scope',
-  function(
-    $modal,
-    $scope
-  ) {
-    $scope.createFilter = function() {
-      $modal.open({
-        // pass the current scope to the $modalInstance
-        scope: $scope,
-
-        size: 'lg',
-
-        template: require('text!./form.html'),
-
-        controller: 'filterCreateModalCtrl'
-      });
-    };
-  }]);
-
-
-
-
-
-
-
+  filterModule.controller('filterFormCtrl', camTasklistFilterForm);
 
   filterModule.directive('camTasklistFilters', camTasklistFilters);
 

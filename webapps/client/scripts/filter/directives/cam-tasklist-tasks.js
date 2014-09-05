@@ -22,14 +22,14 @@ define([
     '$location',
     '$rootScope',
     '$q',
-    'camTasklistFilterFilterConversion',
+    'camTasklistFilterCriteriaConversion',
     'camAPI',
   function(
     $modal,
     $location,
     $rootScope,
     $q,
-    camTasklistFilterFilterConversion,
+    camTasklistFilterCriteriaConversion,
     camAPI
   ) {
     var Task = camAPI.resource('task');
@@ -107,7 +107,7 @@ define([
         function buildWhere(order, by) {
           var where = {};
           angular.forEach(scope.filter.filters, function(pair) {
-            where[pair.key] = camTasklistFilterFilterConversion(pair.value);
+            where[pair.key] = camTasklistFilterCriteriaConversion(pair.value);
             if (dateExp.test(pair.key)) {
               /* jshint evil: true */
               var date = new Date(eval(where[pair.key]) * 1000);

@@ -9,6 +9,10 @@
   position: relative;
 }
 
+.task-filter-hint {
+  margin: 0 (@grid-gutter-width / 2) (@grid-gutter-width / 2) (@grid-gutter-width / 2);
+}
+
 .task-filter {
   margin: (@grid-gutter-width / 2) 0;
   padding: (@grid-gutter-width / 2) 0;
@@ -132,47 +136,30 @@
   margin: 20px auto;
 }
 
-// .display,
-// .filter-form {
-//   position: relative;
-//   // transition: transform 0.218s;
-//   transition: left 0.8s;
-//   top: 0;
-//   min-height: 200px;
-//   .inner {
-//     background-color: red;
-//   }
-// }
-
-// .display {
-//   // transform: translateX(0);
-//   left: 0;
-// }
-
-// .filter-form {
-//   // transform: translateX(100%);
-//   left: 100%;
-// }
-
-// .task-board.filter-edit {
-//   .display {
-//     // transform: translateX(-100%);
-//     left: -100%;
-//   }
-//   .filter-form {
-//     // transform: translateX(0);
-//     left: 0;
-//   }
-// }
-
-form[name="filter"] {
-  .description-field,
-  .filter-add,
-  .filter-filter {
-    margin-top: (@grid-gutter-width / 2);
+.labels-left {
+  .control-label {
+    text-align: left;
   }
+}
 
-  .filter-add {
-    text-align: right;
+.row-action {
+  text-align: right;
+  margin-top: 0;
+  margin-bottom: 0;
+  padding-top: 7px;
+}
+
+
+.filter-edit-modal {
+  .panel-title {
+    .glyphicon {
+      font-size: @font-size-base;
+      color: @brand-danger;
+    }
+  }
+  .modal-footer {
+    button {
+      min-height: 31px;
+    }
   }
 }
