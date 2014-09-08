@@ -408,6 +408,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
    */
   protected boolean isDeploymentLockUsed = true;
 
+  /** Allows setting whether the process engine should try reusing the first level entity cache.
+   * Default setting is false, enabling it improves performance of asynchronous continuations.
+   */
+  protected boolean isDbEntityCacheReuseEnabled = false;
+
   protected Connectors connectors;
 
   protected List<SerializationVariableTypeResolver> serializationTypeResolvers = new ArrayList<SerializationVariableTypeResolver>();
@@ -2375,4 +2380,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     this.serializationTypeResolvers = serializationTypeResolvers;
     return this;
   }
+
+  public boolean isDbEntityCacheReuseEnabled() {
+    return isDbEntityCacheReuseEnabled;
+  }
+
+  public ProcessEngineConfigurationImpl setDbEntityCacheReuseEnabled(boolean isDbEntityCacheReuseEnabled) {
+    this.isDbEntityCacheReuseEnabled = isDbEntityCacheReuseEnabled;
+    return this;
+  }
+
 }

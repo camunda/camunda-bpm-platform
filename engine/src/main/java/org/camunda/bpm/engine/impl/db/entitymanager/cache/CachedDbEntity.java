@@ -48,8 +48,17 @@ public class CachedDbEntity implements Recyclable {
       && !dbEntity.getPersistentState().equals(copy);
   }
 
+  public void forceSetDirty() {
+    // set the value of the copy to some value which will always be different from the new entity state.
+    this.copy = -1;
+  }
+
   public void makeCopy() {
     copy = dbEntity.getPersistentState();
+  }
+
+  public String toString() {
+    return entityState + " " + dbEntity.getClass().getSimpleName() + "["+dbEntity.getId()+"]";
   }
 
   // getters / setters ////////////////////////////
