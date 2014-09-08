@@ -104,7 +104,7 @@ module.exports = function(config) {
       ]
     },
 
-    sdk: {
+    commons: {
       files: [
         {
           expand: true,
@@ -116,19 +116,6 @@ module.exports = function(config) {
             // 'resources/locales/*.json'
           ],
           dest: '<%= buildTarget %>/vendor/camunda-commons-ui'
-        },
-        {
-          expand: true,
-          cwd: 'node_modules/camunda-bpm-sdk-js/dist',
-          src: ['**/*.js'],
-          dest: '<%= pkg.gruntConfig.clientDir %>/vendor/'
-        // },
-        // {
-        //   expand: true,
-        //   cwd: 'node_modules/camunda-bpm-sdk-js/dist',
-        //   src: ['**/*.js'],
-        //   // dest: '<%= pkg.gruntConfig.clientDir %>/vendor/'
-        //   dest: '<%= buildTarget %>/vendor/'
         }
       ]
     }
