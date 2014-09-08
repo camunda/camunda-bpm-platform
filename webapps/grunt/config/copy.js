@@ -35,6 +35,14 @@ module.exports = function(config) {
           mock: false
         },
 
+        'process-instance': {
+          mock: false
+        },
+
+        'authorization': {
+          mock: false
+        },
+
         'task': {
           mock: false
         }
