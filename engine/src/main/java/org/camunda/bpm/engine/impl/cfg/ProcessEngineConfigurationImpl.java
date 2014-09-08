@@ -99,6 +99,7 @@ import org.camunda.bpm.engine.impl.connector.Connectors;
 import org.camunda.bpm.engine.impl.db.DbIdGenerator;
 import org.camunda.bpm.engine.impl.db.IbatisVariableTypeHandler;
 import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManagerFactory;
+import org.camunda.bpm.engine.impl.db.entitymanager.cache.DbEntityCacheKeyMapping;
 import org.camunda.bpm.engine.impl.db.sql.DbSqlPersistenceProviderFactory;
 import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.delegate.DefaultDelegateInterceptor;
@@ -414,6 +415,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
    */
   protected boolean isDeploymentLockUsed = true;
 
+  /** Allows setting whether the process engine should try reusing the first level entity cache.
+   * Default setting is false, enabling it improves performance of asynchronous continuations.
+   */
+  protected boolean isDbEntityCacheReuseEnabled = false;
+
   protected Connectors connectors;
 
   protected List<SerializationVariableTypeResolver> serializationTypeResolvers = new ArrayList<SerializationVariableTypeResolver>();
@@ -425,6 +431,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   /** used to create instances for listeners, JavaDelegates, etc */
   protected ArtifactFactory artifactFactory;
+
+  protected DbEntityCacheKeyMapping dbEntityCacheKeyMapping = DbEntityCacheKeyMapping.defaultEntityCacheKeyMapping();
 
   // buildProcessEngine ///////////////////////////////////////////////////////
 
@@ -2403,4 +2411,23 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     this.serializationTypeResolvers = serializationTypeResolvers;
     return this;
   }
+
+  public boolean isDbEntityCacheReuseEnabled() {
+    return isDbEntityCacheReuseEnabled;
+  }
+
+  public ProcessEngineConfigurationImpl setDbEntityCacheReuseEnabled(boolean isDbEntityCacheReuseEnabled) {
+    this.isDbEntityCacheReuseEnabled = isDbEntityCacheReuseEnabled;
+    return this;
+  }
+
+  public DbEntityCacheKeyMapping getDbEntityCacheKeyMapping() {
+    return dbEntityCacheKeyMapping;
+  }
+
+  public ProcessEngineConfigurationImpl setDbEntityCacheKeyMapping(DbEntityCacheKeyMapping dbEntityCacheKeyMapping) {
+    this.dbEntityCacheKeyMapping = dbEntityCacheKeyMapping;
+    return this;
+  }
+
 }

@@ -49,6 +49,16 @@ public class DbEntityCache {
    */
   protected Map<Class<?>, Map<String, CachedDbEntity>> cachedEntites = new HashMap<Class<?>, Map<String, CachedDbEntity>>();
 
+  protected DbEntityCacheKeyMapping cacheKeyMapping;
+
+  public DbEntityCache() {
+    this.cacheKeyMapping = DbEntityCacheKeyMapping.emptyMapping();
+  }
+
+  public DbEntityCache(DbEntityCacheKeyMapping cacheKeyMapping) {
+    this.cacheKeyMapping = cacheKeyMapping;
+  }
+
   /**
    * get an object from the cache
    *
@@ -59,7 +69,8 @@ public class DbEntityCache {
    */
   @SuppressWarnings("unchecked")
   public <T extends DbEntity> T get(Class<T> type, String id) {
-    CachedDbEntity cachedDbEntity = getCachedEntity(type, id);
+    Class<?> cacheKey = cacheKeyMapping.getEntityCacheKey(type);
+    CachedDbEntity cachedDbEntity = getCachedEntity(cacheKey, id);
     if(cachedDbEntity != null) {
       DbEntity dbEntity = cachedDbEntity.getEntity();
       try {
@@ -74,13 +85,24 @@ public class DbEntityCache {
 
   @SuppressWarnings("unchecked")
   public <T extends DbEntity> List<T> getEntitiesByType(Class<T> type) {
-    Map<String, CachedDbEntity> entities = cachedEntites.get(type);
+    Class<?> cacheKey = cacheKeyMapping.getEntityCacheKey(type);
+    Map<String, CachedDbEntity> entities = cachedEntites.get(cacheKey);
     List<T> result = new ArrayList<T>();
     if(entities == null) {
       return Collections.emptyList();
     } else {
       for (CachedDbEntity cachedEntity : entities.values()) {
-        result.add((T) cachedEntity.getEntity());
+        if (type != cacheKey) {
+          // if the cacheKey of this type differs from the actual type,
+          // not all cached entites with the key should be returned.
+          // Then we only add those entities whose type matches the argument type.
+          if (type.isAssignableFrom(cachedEntity.getClass())) {
+            result.add((T) cachedEntity.getEntity());
+          }
+        } else {
+          result.add((T) cachedEntity.getEntity());
+        }
+
       }
       return result;
     }
@@ -94,7 +116,8 @@ public class DbEntityCache {
    * @return the cached entity or null if the entity does not exist.
    */
   public CachedDbEntity getCachedEntity(Class<?> type, String id) {
-    Map<String, CachedDbEntity> entitesByType = cachedEntites.get(type);
+    Class<?> cacheKey = cacheKeyMapping.getEntityCacheKey(type);
+    Map<String, CachedDbEntity> entitesByType = cachedEntites.get(cacheKey);
     if(entitesByType != null) {
       return entitesByType.get(id);
     } else {
@@ -153,10 +176,12 @@ public class DbEntityCache {
 
   protected void putInternal(CachedDbEntity entityToAdd) {
     Class<? extends DbEntity> type = entityToAdd.getEntity().getClass();
-    Map<String, CachedDbEntity> map = cachedEntites.get(type);
+    Class<?> cacheKey = cacheKeyMapping.getEntityCacheKey(type);
+
+    Map<String, CachedDbEntity> map = cachedEntites.get(cacheKey);
     if(map == null) {
       map = new HashMap<String, CachedDbEntity>();
-      cachedEntites.put(type, map);
+      cachedEntites.put(cacheKey, map);
     }
 
     // check whether this object is already present in the cache
@@ -229,7 +254,8 @@ public class DbEntityCache {
    * @return
    */
   public boolean remove(DbEntity e) {
-    Map<String, CachedDbEntity> typeMap = cachedEntites.get(e.getClass());
+    Class<?> cacheKey = cacheKeyMapping.getEntityCacheKey(e.getClass());
+    Map<String, CachedDbEntity> typeMap = cachedEntites.get(cacheKey);
     if(typeMap != null) {
       return typeMap.remove(e.getId()) != null;
     } else {

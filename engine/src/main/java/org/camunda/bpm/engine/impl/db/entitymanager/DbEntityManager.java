@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.camunda.bpm.engine.OptimisticLockingException;
@@ -47,7 +48,9 @@ import org.camunda.bpm.engine.impl.ProcessInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.TaskQueryImpl;
 import org.camunda.bpm.engine.impl.UserQueryImpl;
 import org.camunda.bpm.engine.impl.cfg.IdGenerator;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionQueryImpl;
+import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.ListQueryParameterObject;
 import org.camunda.bpm.engine.impl.db.PersistenceSession;
@@ -62,6 +65,7 @@ import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperationType;
 import org.camunda.bpm.engine.impl.identity.db.DbGroupQueryImpl;
 import org.camunda.bpm.engine.impl.identity.db.DbUserQueryImpl;
 import org.camunda.bpm.engine.impl.interceptor.Session;
+import org.camunda.bpm.engine.impl.jobexecutor.JobExecutorContext;
 
 /**
  *
@@ -86,8 +90,38 @@ public class DbEntityManager implements Session {
   public DbEntityManager(IdGenerator idGenerator, PersistenceSession persistenceSession) {
     this.idGenerator = idGenerator;
     this.persistenceSession = persistenceSession;
-    dbEntityCache = new DbEntityCache();
+    initializeEntityCache();
+    initializeOperationManager();
+  }
+
+  protected void initializeOperationManager() {
     dbOperationManager = new DbOperationManager();
+  }
+
+  protected void initializeEntityCache() {
+
+    final JobExecutorContext jobExecutorContext = Context.getJobExecutorContext();
+    final ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
+
+    if(processEngineConfiguration != null
+        && processEngineConfiguration.isDbEntityCacheReuseEnabled()
+        && jobExecutorContext != null) {
+
+      dbEntityCache = jobExecutorContext.getEntityCache();
+      if(dbEntityCache == null) {
+        dbEntityCache = new DbEntityCache(processEngineConfiguration.getDbEntityCacheKeyMapping());
+        jobExecutorContext.setEntityCache(dbEntityCache);
+      }
+
+    } else {
+
+      if (processEngineConfiguration != null) {
+        dbEntityCache = new DbEntityCache(processEngineConfiguration.getDbEntityCacheKeyMapping());
+      } else {
+        dbEntityCache = new DbEntityCache();
+      }
+    }
+
   }
 
   // selects /////////////////////////////////////////////////
@@ -282,6 +316,15 @@ public class DbEntityManager implements Session {
         cachedDbEntity.makeCopy();
       }
     }
+
+    // log cache state after flush
+    if(log.isLoggable(Level.FINEST)) {
+      log.finest("cache state after flush: ");
+      cachedEntities = dbEntityCache.getCachedEntities();
+      for (CachedDbEntity cachedDbEntity : cachedEntities) {
+        log.finest("  "+cachedDbEntity);
+      }
+    }
   }
 
   public void insert(DbEntity dbEntity) {
@@ -305,6 +348,13 @@ public class DbEntityManager implements Session {
     // optimistic locking results in a conflict.
 
     dbEntityCache.putMerged(dbEntity);
+  }
+
+  public void forceUpdate(DbEntity entity) {
+    CachedDbEntity cachedEntity = dbEntityCache.getCachedEntity(entity);
+    if(cachedEntity != null && cachedEntity.getEntityState() == PERSISTENT) {
+      cachedEntity.forceSetDirty();
+    }
   }
 
   public void delete(DbEntity dbEntity) {

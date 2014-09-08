@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.impl.jobexecutor;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.camunda.bpm.engine.impl.db.entitymanager.cache.DbEntityCache;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 
 /**
@@ -23,8 +24,13 @@ import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 public class JobExecutorContext {
 
   protected List<String> currentProcessorJobQueue = new LinkedList<String>();
+
+  /** the currently executed job */
   protected JobEntity currentJob;
-        
+
+  /** reusable cache */
+  protected DbEntityCache entityCache;
+
   public List<String> getCurrentProcessorJobQueue() {
     return currentProcessorJobQueue;
   }
@@ -32,12 +38,21 @@ public class JobExecutorContext {
   public boolean isExecutingExclusiveJob() {
     return currentJob == null ? false : currentJob.isExclusive();
   }
-     
+
   public void setCurrentJob(JobEntity currentJob) {
     this.currentJob = currentJob;
   }
-    
+
   public JobEntity getCurrentJob() {
     return currentJob;
   }
+
+  public DbEntityCache getEntityCache() {
+    return entityCache;
+  }
+
+  public void setEntityCache(DbEntityCache entityCache) {
+    this.entityCache = entityCache;
+  }
+
 }

@@ -89,8 +89,6 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
   protected String parentId;
   protected String superCaseExecutionId;
 
-  protected boolean forcedUpdate;
-
   // case definition ///////////////////////////////////////////////////////////
 
   public String getCaseDefinitionId() {
@@ -511,7 +509,9 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
   }
 
   public void forceUpdate() {
-    this.forcedUpdate = true;
+    Context.getCommandContext()
+      .getDbEntityManager()
+      .forceUpdate(this);
   }
 
   public boolean hasReferenceTo(DbEntity entity) {
@@ -543,11 +543,6 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
     persistentState.put("parentId", parentId);
     persistentState.put("currentState", currentState);
     persistentState.put("previousState", previousState);
-
-    if (forcedUpdate) {
-      persistentState.put("forcedUpdate", Boolean.TRUE);
-    }
-
     return persistentState;
   }
 
