@@ -16,6 +16,7 @@ package org.camunda.bpm.engine.test.api.filter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.filter.Filter;
 import org.camunda.bpm.engine.identity.Group;
@@ -25,6 +26,7 @@ import org.camunda.bpm.engine.impl.QueryOperator;
 import org.camunda.bpm.engine.impl.TaskQueryImpl;
 import org.camunda.bpm.engine.impl.TaskQueryProperty;
 import org.camunda.bpm.engine.impl.TaskQueryVariableValue;
+import org.camunda.bpm.engine.impl.json.JsonTaskQueryConverter;
 import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.query.Query;
@@ -55,6 +57,8 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
   protected User testUser;
   protected Group testGroup;
 
+  protected JsonTaskQueryConverter queryConverter;
+
   public void setUp() {
     filter = filterService.newTaskFilter("name").setOwner("owner").setQuery("{}").setProperties("properties");
     testUser = identityService.newUser("user");
@@ -69,6 +73,8 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
     testCandidateGroups.add(anotherGroup.getId());
 
     createTasks();
+
+    queryConverter = new JsonTaskQueryConverter();
   }
 
   public void tearDown() {
@@ -291,6 +297,56 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
     for (Task task : tasks) {
       assertEquals(DelegationState.RESOLVED, task.getDelegationState());
     }
+
+    String extendingQueryJson = queryConverter.toJson(extendingQuery);
+
+    tasks = filterService.list(filter.getId(), extendingQueryJson);
+    assertEquals(2, tasks.size());
+
+    for (Task task : tasks) {
+      assertEquals(DelegationState.RESOLVED, task.getDelegationState());
+    }
+  }
+
+  public void testExecuteTaskQueryListPage() {
+    TaskQuery query = taskService.createTaskQuery();
+    query.taskNameLike("Task%");
+
+    saveQuery(query);
+
+    List<Task> tasks = filterService.listPage(filter.getId(), 1, 2);
+    assertEquals(2, tasks.size());
+    for (Task task : tasks) {
+      assertEquals(testUser.getId(), task.getOwner());
+    }
+  }
+
+  public void testExtendingTaskQueryListPage() {
+    TaskQuery query = taskService.createTaskQuery();
+
+    saveQuery(query);
+
+    List<Task> tasks = filterService.listPage(filter.getId(), 1, 2);
+    assertEquals(2, tasks.size());
+
+    tasks = filterService.listPage(filter.getId(), query, 1, 2);
+    assertEquals(2, tasks.size());
+
+    TaskQuery extendingQuery = taskService.createTaskQuery();
+
+    extendingQuery.taskDelegationState(DelegationState.RESOLVED);
+
+    tasks = filterService.listPage(filter.getId(), extendingQuery, 1, 2);
+    assertEquals(1, tasks.size());
+
+    assertEquals(DelegationState.RESOLVED, tasks.get(0).getDelegationState());
+
+    String extendingQueryJson = queryConverter.toJson(extendingQuery);
+
+    tasks = filterService.listPage(filter.getId(), extendingQueryJson, 1, 2);
+    assertEquals(1, tasks.size());
+
+    assertEquals(DelegationState.RESOLVED, tasks.get(0).getDelegationState());
   }
 
   public void testExecuteTaskQuerySingleResult() {
@@ -342,6 +398,13 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
     assertNotNull(task);
     assertEquals("Task 1", task.getName());
     assertEquals("task1", task.getId());
+
+    String extendingQueryJson = queryConverter.toJson(extendingQuery);
+
+    task = filterService.singleResult(filter.getId(), extendingQueryJson);
+    assertNotNull(task);
+    assertEquals("Task 1", task.getName());
+    assertEquals("task1", task.getId());
   }
 
   public void testExecuteTaskQueryCount() {
@@ -378,6 +441,12 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(3, count);
 
     count = filterService.count(filter.getId(), extendingQuery);
+
+    assertEquals(1, count);
+
+    String extendingQueryJson = queryConverter.toJson(extendingQuery);
+
+    count = filterService.count(filter.getId(), extendingQueryJson);
 
     assertEquals(1, count);
   }

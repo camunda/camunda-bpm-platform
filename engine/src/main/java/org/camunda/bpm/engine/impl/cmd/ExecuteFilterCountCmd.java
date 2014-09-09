@@ -24,10 +24,14 @@ import org.camunda.bpm.engine.query.Query;
 public class ExecuteFilterCountCmd extends AbstractExecuteFilterCmd implements Command<Long> {
 
   public ExecuteFilterCountCmd(String filterId) {
-    super(filterId, null);
+    super(filterId);
   }
 
   public ExecuteFilterCountCmd(String filterId, Query extendingQuery) {
+    super(filterId, extendingQuery);
+  }
+
+  public ExecuteFilterCountCmd(String filterId, String extendingQuery) {
     super(filterId, extendingQuery);
   }
 

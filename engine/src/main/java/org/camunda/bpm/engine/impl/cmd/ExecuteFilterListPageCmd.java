@@ -18,26 +18,37 @@ import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.query.Query;
 
+import java.util.List;
+
 /**
  * @author Sebastian Menski
  */
-public class ExecuteFilterSingleResultCmd extends AbstractExecuteFilterCmd implements Command<Object> {
+public class ExecuteFilterListPageCmd extends AbstractExecuteFilterCmd implements Command<List> {
 
-  public ExecuteFilterSingleResultCmd(String filterId) {
+  protected int firstResult;
+  protected int maxResults;
+
+  public ExecuteFilterListPageCmd(String filterId, int firstResult, int maxResults) {
     super(filterId);
+    this.firstResult = firstResult;
+    this.maxResults = maxResults;
   }
 
-  public ExecuteFilterSingleResultCmd(String filterId, Query extendingQuery) {
+  public ExecuteFilterListPageCmd(String filterId, Query extendingQuery, int firstResult, int maxResults) {
     super(filterId, extendingQuery);
+    this.firstResult = firstResult;
+    this.maxResults = maxResults;
   }
 
-  public ExecuteFilterSingleResultCmd(String filterId, String extendingQuery) {
+  public ExecuteFilterListPageCmd(String filterId, String extendingQuery, int firstResult, int maxResults) {
     super(filterId, extendingQuery);
+    this.firstResult = firstResult;
+    this.maxResults = maxResults;
   }
 
-  public Object execute(CommandContext commandContext) {
+  public List execute(CommandContext commandContext) {
     Filter filter = getFilter(commandContext);
-    return filter.getTypeQuery().singleResult();
+    return filter.getTypeQuery().listPage(firstResult, maxResults);
   }
 
 }

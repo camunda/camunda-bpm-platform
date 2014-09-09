@@ -91,6 +91,15 @@ public interface Filter {
   <T extends Query> Filter extend(T extendingQuery);
 
   /**
+   * Extends the query with the additional query. The query of the filter is therefore modified
+   * and if the filter is saved the query is updated.
+   *
+   * @param extendingQuery the query to extend the filter with
+   * @return this filter
+   */
+  <T extends Query> Filter extend(String extendingQuery);
+
+  /**
    * @return the properties of the filter as JSON string
    */
   String getProperties();

@@ -51,4 +51,18 @@ public interface FilterQuery extends Query<FilterQuery, Filter> {
    */
   FilterQuery filterOwner(String owner);
 
+  // ordering ////////////////////////////////////////////////////////////
+
+  /** Order by filter id (needs to be followed by {@link #asc()} or {@link #desc()}). */
+  FilterQuery orderByFilterId();
+
+  /** Order by filter id (needs to be followed by {@link #asc()} or {@link #desc()}). */
+  FilterQuery orderByFilterResourceType();
+
+  /** Order by filter id (needs to be followed by {@link #asc()} or {@link #desc()}). */
+  FilterQuery orderByFilterName();
+
+  /** Order by filter id (needs to be followed by {@link #asc()} or {@link #desc()}). */
+  FilterQuery orderByFilterOwner();
+
 }

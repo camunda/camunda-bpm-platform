@@ -20,8 +20,10 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+
 import org.camunda.bpm.engine.EntityTypes;
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.filter.Filter;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.json.JsonObjectConverter;
@@ -52,16 +54,6 @@ public class FilterEntity implements Filter, Serializable, DbEntity {
 
   public FilterEntity() {
     setQuery("{}");
-  }
-
-  public FilterEntity(String resourceType) {
-    this();
-    setResourceType(resourceType);
-  }
-
-  public FilterEntity(String resourceType, String name) {
-    this(resourceType);
-    setName(name);
   }
 
   public void setId(String id) {
@@ -135,18 +127,34 @@ public class FilterEntity implements Filter, Serializable, DbEntity {
   public <T extends Query> Filter extend(T extendingQuery) {
     ensureNotNull("extendingQuery", extendingQuery);
 
-    // parse query to JSON
-    JSONObject queryJson = new JSONObject(query);
-
     // convert extendingQuery to JSON
     JsonObjectConverter converter = getConverter();
     JSONObject extendingQueryJson = converter.toJsonObject(extendingQuery);
 
+    return extendQuery(extendingQueryJson);
+  }
+
+  public <T extends Query> Filter extend(String extendingQuery) {
+    ensureNotEmpty(NotValidException.class, "extendingQuery", extendingQuery);
+    try {
+      JSONObject extendingQueryJson = new JSONObject(extendingQuery);
+      return extendQuery(extendingQueryJson);
+    }
+    catch (JSONException e) {
+      throw new NotValidException("Query string has to be a JSON object", e);
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  protected <T extends Query> Filter extendQuery(JSONObject extendingQuery) {
+    // parse query to JSON
+    JSONObject queryJson = new JSONObject(query);
+
     // merge queries by keys
-    Iterator<String> extendingKeys = extendingQueryJson.keys();
+    Iterator<String> extendingKeys = extendingQuery.keys();
     while (extendingKeys.hasNext()) {
       String key = extendingKeys.next();
-      queryJson.put(key, extendingQueryJson.get(key));
+      queryJson.put(key, extendingQuery.get(key));
     }
 
     // save merged query

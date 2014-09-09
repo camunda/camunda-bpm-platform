@@ -75,6 +75,22 @@ public class FilterQueryImpl extends AbstractQuery<FilterQuery, Filter> implemen
     return this;
   }
 
+  public FilterQuery orderByFilterId() {
+    return orderBy(FilterQueryProperty.FILTER_ID);
+  }
+
+  public FilterQuery orderByFilterResourceType() {
+    return orderBy(FilterQueryProperty.RESOURCE_TYPE);
+  }
+
+  public FilterQuery orderByFilterName() {
+    return orderBy(FilterQueryProperty.NAME);
+  }
+
+  public FilterQuery orderByFilterOwner() {
+    return orderBy(FilterQueryProperty.OWNER);
+  }
+
   public List<Filter> executeList(CommandContext commandContext, Page page) {
     return commandContext
       .getFilterManager()

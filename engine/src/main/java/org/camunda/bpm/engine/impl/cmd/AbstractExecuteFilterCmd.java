@@ -31,12 +31,22 @@ public abstract class AbstractExecuteFilterCmd implements Serializable {
 
   protected String filterId;
   protected Query extendingQuery;
+  protected String extendingQueryJson;
+
+  public AbstractExecuteFilterCmd(String filterId) {
+    this.filterId = filterId;
+  }
 
   public AbstractExecuteFilterCmd(String filterId, Query extendingQuery) {
     this.filterId = filterId;
     this.extendingQuery = extendingQuery;
   }
-  
+
+  public AbstractExecuteFilterCmd(String filterId, String extendingQuery) {
+    this.filterId = filterId;
+    this.extendingQueryJson = extendingQuery;
+  }
+
   protected Filter getFilter(CommandContext commandContext) {
     ensureNotNull("No filter id given to execute", "filterId", filterId);
     Filter filter = commandContext
@@ -47,6 +57,9 @@ public abstract class AbstractExecuteFilterCmd implements Serializable {
 
     if (extendingQuery != null) {
       filter.extend(extendingQuery);
+    }
+    else if (extendingQueryJson != null) {
+      filter.extend(extendingQueryJson);
     }
 
     return filter;

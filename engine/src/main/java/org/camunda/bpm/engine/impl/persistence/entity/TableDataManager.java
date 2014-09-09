@@ -26,6 +26,7 @@ import java.util.logging.Logger;
 
 import org.apache.ibatis.session.RowBounds;
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.filter.Filter;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.history.HistoricFormProperty;
@@ -76,6 +77,8 @@ public class TableDataManager extends AbstractManager {
     persistentObjectToTableNameMap.put(MessageEventSubscriptionEntity.class, "ACT_RU_EVENT_SUBSCRIPTION");
     persistentObjectToTableNameMap.put(SignalEventSubscriptionEntity.class, "ACT_RU_EVENT_SUBSCRIPTION");
 
+    persistentObjectToTableNameMap.put(FilterEntity.class, "ACT_RU_FILTER");
+
     // repository
     persistentObjectToTableNameMap.put(DeploymentEntity.class, "ACT_RE_DEPLOYMENT");
     persistentObjectToTableNameMap.put(ProcessDefinitionEntity.class, "ACT_RE_PROCDEF");
@@ -113,6 +116,7 @@ public class TableDataManager extends AbstractManager {
     apiTypeToTableNameMap.put(Deployment.class, "ACT_RE_DEPLOYMENT");
     apiTypeToTableNameMap.put(Job.class, "ACT_RU_JOB");
     apiTypeToTableNameMap.put(Incident.class, "ACT_RU_INCIDENT");
+    apiTypeToTableNameMap.put(Filter.class, "ACT_RU_FILTER");
 
 
     // history

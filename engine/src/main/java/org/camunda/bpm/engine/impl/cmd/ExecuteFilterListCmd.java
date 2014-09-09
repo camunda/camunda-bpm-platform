@@ -25,10 +25,14 @@ import org.camunda.bpm.engine.query.Query;
 public class ExecuteFilterListCmd extends AbstractExecuteFilterCmd implements Command<List> {
 
   public ExecuteFilterListCmd(String filterId) {
-    super(filterId, null);
+    super(filterId);
   }
 
   public ExecuteFilterListCmd(String filterId, Query extendingQuery) {
+    super(filterId, extendingQuery);
+  }
+
+  public ExecuteFilterListCmd(String filterId, String extendingQuery) {
     super(filterId, extendingQuery);
   }
 
