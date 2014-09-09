@@ -24,6 +24,7 @@ import java.util.logging.Logger;
 import org.camunda.bpm.application.ProcessApplicationInterface;
 import org.camunda.bpm.application.ProcessApplicationRegistration;
 import org.camunda.bpm.application.impl.metadata.spi.ProcessArchiveXml;
+import org.camunda.bpm.container.impl.jboss.util.Tccl;
 import org.camunda.bpm.container.impl.metadata.PropertyHelper;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RepositoryService;
@@ -31,6 +32,7 @@ import org.camunda.bpm.engine.repository.ProcessApplicationDeployment;
 import org.camunda.bpm.engine.repository.ProcessApplicationDeploymentBuilder;
 import org.jboss.as.ee.component.ComponentView;
 import org.jboss.as.naming.ManagedReference;
+import org.jboss.modules.Module;
 import org.jboss.msc.service.Service;
 import org.jboss.msc.service.StartContext;
 import org.jboss.msc.service.StartException;
@@ -69,9 +71,12 @@ public class ProcessApplicationDeploymentService implements Service<ProcessAppli
   /** the deployment we create here */
   protected ProcessApplicationDeployment deployment;
 
-  public ProcessApplicationDeploymentService(Map<String,byte[]> deploymentMap, ProcessArchiveXml processArchive) {
+  protected Module module;
+
+  public ProcessApplicationDeploymentService(Map<String,byte[]> deploymentMap, ProcessArchiveXml processArchive, Module module) {
     this.deploymentMap = deploymentMap;
     this.processArchive = processArchive;
+    this.module = module;
   }
 
   public void start(final StartContext context) throws StartException {
@@ -127,7 +132,7 @@ public class ProcessApplicationDeploymentService implements Service<ProcessAppli
       // build the deployment
       final RepositoryService repositoryService = processEngine.getRepositoryService();
 
-      ProcessApplicationDeploymentBuilder deploymentBuilder = repositoryService.createDeployment(processApplication.getReference());
+      final ProcessApplicationDeploymentBuilder deploymentBuilder = repositoryService.createDeployment(processApplication.getReference());
 
       // enable duplicate filtering
       deploymentBuilder.enableDuplicateFiltering();
@@ -156,7 +161,13 @@ public class ProcessApplicationDeploymentService implements Service<ProcessAppli
       if(!resourceNames.isEmpty()) {
         logDeploymentSummary(resourceNames, deploymentName, processApplicationName);
         // perform the actual deployment
-        deployment = deploymentBuilder.deploy();
+        deployment = Tccl.runUnderClassloader(new Tccl.Operation<ProcessApplicationDeployment>() {
+
+          public ProcessApplicationDeployment run() {
+            return deploymentBuilder.deploy();
+          }
+
+        }, module.getClassLoader());
 
       } else {
         LOGGER.info("Not creating a deployment for process archive '" + processArchive.getName() + "': no resources provided.");

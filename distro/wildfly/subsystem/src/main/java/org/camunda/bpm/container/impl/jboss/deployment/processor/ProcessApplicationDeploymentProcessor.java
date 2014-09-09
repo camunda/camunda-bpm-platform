@@ -102,7 +102,7 @@ public class ProcessApplicationDeploymentProcessor implements DeploymentUnitProc
         Map<String, byte[]> deploymentResources = getDeploymentResources(processArchive, deploymentUnit, processesXmlWrapper.getProcessesXmlFile());
 
         // add the deployment service for each process archive we deploy.
-        ProcessApplicationDeploymentService deploymentService = new ProcessApplicationDeploymentService(deploymentResources, processArchive);
+        ProcessApplicationDeploymentService deploymentService = new ProcessApplicationDeploymentService(deploymentResources, processArchive, module);
         String processArachiveName = processArchive.getName();
         if(processArachiveName == null) {
           // use random name for deployment service if name is null (we cannot ask the process application yet since the component might not be up.
