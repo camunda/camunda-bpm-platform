@@ -36,5 +36,8 @@ public abstract class JsonObjectConverter <T> {
   }
   
   public abstract JSONObject toJsonObject(T object);
+
   public abstract T toObject(Reader reader);
+
+  public abstract T toObject(String jsonString);
 }

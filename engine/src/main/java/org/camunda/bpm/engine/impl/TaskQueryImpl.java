@@ -12,6 +12,9 @@
  */
 package org.camunda.bpm.engine.impl;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -28,8 +31,6 @@ import org.camunda.bpm.engine.impl.variable.VariableTypes;
 import org.camunda.bpm.engine.task.DelegationState;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
-
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.*;
 
 /**
  * @author Joram Barrez
@@ -80,7 +81,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   protected Date followUpAfter;
   protected boolean excludeSubtasks = false;
   protected SuspensionState suspensionState;
-  protected boolean initialzeFormKeys = false;
+  protected boolean initializeFormKeys = false;
 
   // case management /////////////////////////////
   protected String caseDefinitionKey;
@@ -116,7 +117,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   }
 
   public TaskQueryImpl taskNameLike(String nameLike) {
-    ensureNotNull("Task namelike", nameLike);
+    ensureNotNull("Task nameLike", nameLike);
     this.nameLike = nameLike;
     return this;
   }
@@ -504,7 +505,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   }
 
   public TaskQuery initializeFormKeys() {
-    this.initialzeFormKeys = true;
+    this.initializeFormKeys = true;
     return this;
   }
 
@@ -542,7 +543,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
     }
   }
 
-  protected void addVariable(String name, Object value, QueryOperator operator, boolean isTaskVariable, boolean isProcessInstanceVariable) {
+  public void addVariable(String name, Object value, QueryOperator operator, boolean isTaskVariable, boolean isProcessInstanceVariable) {
     ensureNotNull("name", name);
 
     if(value == null || isBoolean(value)) {
@@ -631,7 +632,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
       .getTaskManager()
       .findTasksByQueryCriteria(this);
 
-    if(initialzeFormKeys) {
+    if(initializeFormKeys) {
       for (Task task : taskList) {
         // initialize the form keys of the tasks
         ((TaskEntity) task).initializeFormKey();
@@ -667,7 +668,15 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
     return assigneeLike;
   }
 
-  public boolean getUnassigned() {
+  public String getInvolvedUser() {
+    return involvedUser;
+  }
+
+  public String getOwner() {
+    return owner;
+  }
+
+  public boolean isUnassigned() {
     return unassigned;
   }
 
@@ -675,7 +684,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
     return delegationState;
   }
 
-  public boolean getNoDelegationState() {
+  public boolean isNoDelegationState() {
     return noDelegationState;
   }
 
@@ -717,6 +726,14 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
 
   public Integer getPriority() {
     return priority;
+  }
+
+  public Integer getMinPriority() {
+    return minPriority;
+  }
+
+  public Integer getMaxPriority() {
+    return maxPriority;
   }
 
   public Date getCreateTime() {
@@ -767,8 +784,36 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
     return processInstanceBusinessKeyLike;
   }
 
-  public boolean getExcludeSubtasks() {
+  public Date getDueDate() {
+    return dueDate;
+  }
+
+  public Date getDueBefore() {
+    return dueBefore;
+  }
+
+  public Date getDueAfter() {
+    return dueAfter;
+  }
+
+  public Date getFollowUpDate() {
+    return followUpDate;
+  }
+
+  public Date getFollowUpBefore() {
+    return followUpBefore;
+  }
+
+  public Date getFollowUpAfter() {
+    return followUpAfter;
+  }
+
+  public boolean isExcludeSubtasks() {
     return excludeSubtasks;
+  }
+
+  public SuspensionState getSuspensionState() {
+    return suspensionState;
   }
 
   public String getCaseInstanceId() {

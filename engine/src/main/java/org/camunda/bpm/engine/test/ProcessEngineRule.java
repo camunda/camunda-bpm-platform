@@ -16,6 +16,7 @@ package org.camunda.bpm.engine.test;
 import java.io.FileNotFoundException;
 import java.util.Date;
 
+import org.camunda.bpm.engine.FilterService;
 import org.camunda.bpm.engine.FormService;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.IdentityService;
@@ -81,6 +82,7 @@ public class ProcessEngineRule extends TestWatchman {
   protected IdentityService identityService;
   protected ManagementService managementService;
   protected FormService formService;
+  protected FilterService filterService;
   
   public ProcessEngineRule() {
   }
@@ -206,4 +208,13 @@ public class ProcessEngineRule extends TestWatchman {
   public void setManagementService(ManagementService managementService) {
     this.managementService = managementService;
   }
+
+  public FilterService getFilterService() {
+    return filterService;
+  }
+
+  public void setFilterService(FilterService filterService) {
+    this.filterService = filterService;
+  }
+
 }

@@ -40,4 +40,9 @@ public class JsonProcessDefinitionConverter extends JsonObjectConverter<ProcessD
   public ProcessDefinition toObject(Reader reader) {
     return null;
   }
+
+  public ProcessDefinition toObject(String jsonString) {
+    return null;
+  }
+
 }

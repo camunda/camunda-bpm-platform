@@ -202,6 +202,16 @@ create table ACT_RU_AUTHORIZATION (
   primary key (ID_)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 
+create table ACT_RU_FILTER (
+  ID_ varchar(64) not null,
+  RESOURCE_TYPE_ varchar(255) not null,
+  NAME_ varchar(255) not null,
+  OWNER_ varchar(255),
+  QUERY_ LONGTEXT not null,
+  PROPERTIES_ LONGTEXT,
+  primary key (ID_)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
+
 create index ACT_IDX_EXEC_BUSKEY on ACT_RU_EXECUTION(BUSINESS_KEY_);
 create index ACT_IDX_TASK_CREATE on ACT_RU_TASK(CREATE_TIME_);
 create index ACT_IDX_IDENT_LNK_USER on ACT_RU_IDENTITYLINK(USER_ID_);

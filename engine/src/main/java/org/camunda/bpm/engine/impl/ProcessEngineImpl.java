@@ -39,6 +39,7 @@ public class ProcessEngineImpl implements ProcessEngine {
   protected ManagementService managementService;
   protected AuthorizationService authorizationService;
   protected CaseService caseService;
+  protected FilterService filterService;
   protected String databaseSchemaUpdate;
   protected JobExecutor jobExecutor;
   protected CommandExecutor commandExecutor;
@@ -63,6 +64,7 @@ public class ProcessEngineImpl implements ProcessEngine {
     this.managementService = processEngineConfiguration.getManagementService();
     this.authorizationService = processEngineConfiguration.getAuthorizationService();
     this.caseService = processEngineConfiguration.getCaseService();
+    this.filterService = processEngineConfiguration.getFilterService();
     this.databaseSchemaUpdate = processEngineConfiguration.getDatabaseSchemaUpdate();
     this.jobExecutor = processEngineConfiguration.getJobExecutor();
     this.commandExecutor = processEngineConfiguration.getCommandExecutorTxRequired();
@@ -143,6 +145,10 @@ public class ProcessEngineImpl implements ProcessEngine {
 
   public CaseService getCaseService() {
     return caseService;
+  }
+
+  public FilterService getFilterService() {
+    return filterService;
   }
 
   public ProcessEngineConfigurationImpl getProcessEngineConfiguration() {

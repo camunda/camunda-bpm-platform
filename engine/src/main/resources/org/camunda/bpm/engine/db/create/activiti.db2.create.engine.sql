@@ -205,6 +205,16 @@ create table ACT_RU_AUTHORIZATION (
   UNI_RESOURCE_ID_ varchar (64) not null generated always as (case when "RESOURCE_ID_" is null then "ID_" else "RESOURCE_ID_" end)
 );
 
+create table ACT_RU_FILTER (
+  ID_ varchar(64) not null,
+  RESOURCE_TYPE_ varchar(255) not null,
+  NAME_ varchar(255) not null,
+  OWNER_ varchar(255),
+  QUERY_ CLOB not null,
+  PROPERTIES_ CLOB,
+  primary key (ID_)
+);
+
 create index ACT_IDX_EXEC_BUSKEY on ACT_RU_EXECUTION(BUSINESS_KEY_);
 create index ACT_IDX_TASK_CREATE on ACT_RU_TASK(CREATE_TIME_);
 create index ACT_IDX_IDENT_LNK_USER on ACT_RU_IDENTITYLINK(USER_ID_);

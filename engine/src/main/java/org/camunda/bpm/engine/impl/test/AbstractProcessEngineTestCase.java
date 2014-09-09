@@ -67,6 +67,7 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
   protected ManagementService managementService;
   protected AuthorizationService authorizationService;
   protected CaseService caseService;
+  protected FilterService filterService;
 
   protected abstract void initializeProcessEngine();
 
@@ -169,6 +170,7 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
     managementService = processEngine.getManagementService();
     authorizationService = processEngine.getAuthorizationService();
     caseService = processEngine.getCaseService();
+    filterService = processEngine.getFilterService();
   }
 
   public void assertProcessEnded(final String processInstanceId) {

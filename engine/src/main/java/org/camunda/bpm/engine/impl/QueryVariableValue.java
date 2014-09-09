@@ -68,6 +68,10 @@ public class QueryVariableValue implements Serializable {
     }
     return QueryOperator.EQUALS.toString();
   }
+
+  public Object getValue() {
+    return value;
+  }
   
   public String getTextValue() {
     if(variableInstanceEntity != null) {
