@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.engine.authorization;
 
+import org.camunda.bpm.engine.EntityTypes;
+
 /**
  * <p>The set of built-in {@link Resource} names.</p>
  * 
@@ -20,11 +22,11 @@ package org.camunda.bpm.engine.authorization;
  */
 public enum Resources implements Resource {
   
-  APPLICATION("Application", 0),
-  USER("User", 1),
-  GROUP("Group", 2),
-  GROUP_MEMBERSHIP("Group membership", 3),
-  AUTHORIZATION("Authorization", 4);
+  APPLICATION(EntityTypes.APPLICATION, 0),
+  USER(EntityTypes.USER, 1),
+  GROUP(EntityTypes.GROUP, 2),
+  GROUP_MEMBERSHIP(EntityTypes.GROUP_MEMBERSHIP, 3),
+  AUTHORIZATION(EntityTypes.AUTHORIZATION, 4);
   
   String name;
   int id;

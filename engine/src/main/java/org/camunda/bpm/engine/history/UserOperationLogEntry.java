@@ -14,6 +14,7 @@
 package org.camunda.bpm.engine.history;
 
 import java.util.Date;
+import org.camunda.bpm.engine.EntityTypes;
 
 
 /**
@@ -38,9 +39,15 @@ import java.util.Date;
  */
 public interface UserOperationLogEntry {
 
-  public static String ENTITY_TYPE_TASK = "Task";
-  public static String ENTITY_TYPE_IDENTITY_LINK = "IdentityLink";
-  public static String ENTITY_TYPE_ATTACHMENT = "Attachment";
+  /** @deprecated Please use {@link EntityTypes#TASK} instead. */
+  @Deprecated
+  public static String ENTITY_TYPE_TASK = EntityTypes.TASK;
+  /** @deprecated Please use {@link EntityTypes#IDENTITY_LINK} instead. */
+  @Deprecated
+  public static String ENTITY_TYPE_IDENTITY_LINK = EntityTypes.IDENTITY_LINK;
+  /** @deprecated Please use {@link EntityTypes#ATTACHMENT} instead. */
+  @Deprecated
+  public static String ENTITY_TYPE_ATTACHMENT = EntityTypes.ATTACHMENT;
 
   public static String OPERATION_TYPE_ASSIGN = "Assign";
   public static String OPERATION_TYPE_CLAIM = "Claim";

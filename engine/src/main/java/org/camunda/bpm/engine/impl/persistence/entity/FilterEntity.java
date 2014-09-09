@@ -20,6 +20,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import org.camunda.bpm.engine.EntityTypes;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.filter.Filter;
 import org.camunda.bpm.engine.impl.db.DbEntity;
@@ -39,7 +40,7 @@ public class FilterEntity implements Filter, Serializable, DbEntity {
   public final static Map<String, JsonObjectConverter> queryConverter = new HashMap<String, JsonObjectConverter>();
 
   static {
-    queryConverter.put(RESOURCE_TYPE_TASK, new JsonTaskQueryConverter());
+    queryConverter.put(EntityTypes.TASK, new JsonTaskQueryConverter());
   }
 
   protected String id;

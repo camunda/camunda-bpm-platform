@@ -13,6 +13,7 @@
 package org.camunda.bpm.engine.impl;
 
 import java.util.List;
+import org.camunda.bpm.engine.EntityTypes;
 import org.camunda.bpm.engine.FilterService;
 import org.camunda.bpm.engine.filter.Filter;
 import org.camunda.bpm.engine.filter.FilterQuery;
@@ -33,7 +34,7 @@ import org.camunda.bpm.engine.query.Query;
 public class FilterServiceImpl extends ServiceImpl implements FilterService {
 
   public Filter newTaskFilter() {
-    return new FilterEntity(Filter.RESOURCE_TYPE_TASK);
+    return new FilterEntity(EntityTypes.TASK);
   }
 
   public Filter newTaskFilter(String filterName) {
@@ -41,7 +42,7 @@ public class FilterServiceImpl extends ServiceImpl implements FilterService {
   }
 
   public FilterQuery createTaskFilterQuery() {
-    return new FilterQueryImpl(commandExecutor).filterResourceType(Filter.RESOURCE_TYPE_TASK);
+    return new FilterQueryImpl(commandExecutor).filterResourceType(EntityTypes.TASK);
   }
 
   public Filter saveFilter(Filter filter) {

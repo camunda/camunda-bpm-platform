@@ -21,9 +21,6 @@ import org.camunda.bpm.engine.query.Query;
  */
 public interface Filter {
 
-  /** Known filter resource types */
-  String RESOURCE_TYPE_TASK = "TASK";
-
   /**
    * @return the id of the filer
    */
