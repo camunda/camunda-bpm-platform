@@ -45,11 +45,11 @@ public class FailedJobListener implements TransactionListener, CommandContextLis
   }
 
   public void execute(CommandContext commandContext) {
-	    FailedJobCommandFactory failedJobCommandFactory = commandContext.getFailedJobCommandFactory();
-	    Command<Object> cmd = failedJobCommandFactory.getCommand(jobId, exception);
+    FailedJobCommandFactory failedJobCommandFactory = commandContext.getFailedJobCommandFactory();
+    Command<Object> cmd = failedJobCommandFactory.getCommand(jobId, exception);
 
-	    log.fine("Using FailedJobCommandFactory '" + failedJobCommandFactory.getClass() + "' and command of type '" + cmd.getClass() + "'");
-	    commandExecutor.execute(cmd);
+    log.fine("Using FailedJobCommandFactory '" + failedJobCommandFactory.getClass() + "' and command of type '" + cmd.getClass() + "'");
+    commandExecutor.execute(cmd);
   }
 
   public void setException(Throwable exception) {
