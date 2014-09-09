@@ -19,7 +19,6 @@ import java.io.Serializable;
 
 import org.camunda.bpm.engine.filter.Filter;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.persistence.entity.FilterEntity;
 import org.camunda.bpm.engine.query.Query;
 import org.camunda.bpm.engine.task.TaskQuery;
 
@@ -53,8 +52,8 @@ public abstract class AbstractExecuteFilterCmd implements Serializable {
   protected Filter getFilter(CommandContext commandContext) {
     ensureNotNull("No filter id given to execute", "filterId", filterId);
     Filter filter = commandContext
-      .getDbEntityManager()
-      .selectById(FilterEntity.class, filterId);
+      .getFilterManager()
+      .findFilterById(filterId);
 
     ensureNotNull("No filter found for id '" + filterId + "'", "filter", filter);
 

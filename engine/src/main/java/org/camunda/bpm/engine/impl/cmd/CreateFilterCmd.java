@@ -13,29 +13,19 @@
 
 package org.camunda.bpm.engine.impl.cmd;
 
-import java.io.Serializable;
-
+import org.camunda.bpm.engine.filter.Filter;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 
 /**
  * @author Sebastian Menski
  */
-public class DeleteFilterCmd implements Command<Void>, Serializable {
+public class CreateFilterCmd implements Command<Filter> {
 
-  private static final long serialVersionUID = 1L;
-
-  protected String filterId;
-
-  public DeleteFilterCmd(String filterId) {
-    this.filterId = filterId;
-  }
-
-  public Void execute(CommandContext commandContext) {
-    commandContext
+  public Filter execute(CommandContext commandContext) {
+    return commandContext
       .getFilterManager()
-      .deleteFilter(filterId);
-    return null;
+      .createNewFilter();
   }
 
 }

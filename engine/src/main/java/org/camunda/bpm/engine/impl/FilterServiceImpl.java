@@ -18,6 +18,7 @@ import org.camunda.bpm.engine.EntityTypes;
 import org.camunda.bpm.engine.FilterService;
 import org.camunda.bpm.engine.filter.Filter;
 import org.camunda.bpm.engine.filter.FilterQuery;
+import org.camunda.bpm.engine.impl.cmd.CreateFilterCmd;
 import org.camunda.bpm.engine.impl.cmd.DeleteFilterCmd;
 import org.camunda.bpm.engine.impl.cmd.ExecuteFilterCountCmd;
 import org.camunda.bpm.engine.impl.cmd.ExecuteFilterListCmd;
@@ -26,7 +27,6 @@ import org.camunda.bpm.engine.impl.cmd.ExecuteFilterSingleResultCmd;
 import org.camunda.bpm.engine.impl.cmd.GetFilterCmd;
 import org.camunda.bpm.engine.impl.cmd.SaveFilterCmd;
 import org.camunda.bpm.engine.impl.filter.FilterQueryImpl;
-import org.camunda.bpm.engine.impl.persistence.entity.FilterEntity;
 import org.camunda.bpm.engine.query.Query;
 
 
@@ -36,15 +36,15 @@ import org.camunda.bpm.engine.query.Query;
 public class FilterServiceImpl extends ServiceImpl implements FilterService {
 
   public Filter newFilter() {
-    return new FilterEntity();
+    return commandExecutor.execute(new CreateFilterCmd());
   }
 
   public Filter newFilter(String filterName) {
-    return new FilterEntity().setName(filterName);
+    return newFilter().setName(filterName);
   }
 
   public Filter newTaskFilter() {
-    return new FilterEntity().setResourceType(EntityTypes.TASK);
+    return newFilter().setResourceType(EntityTypes.TASK);
   }
 
   public Filter newTaskFilter(String filterName) {
@@ -67,8 +67,8 @@ public class FilterServiceImpl extends ServiceImpl implements FilterService {
     return commandExecutor.execute(new GetFilterCmd(filterId));
   }
 
-  public Filter deleteFilter(String filterId) {
-    return commandExecutor.execute(new DeleteFilterCmd(filterId));
+  public void deleteFilter(String filterId) {
+    commandExecutor.execute(new DeleteFilterCmd(filterId));
   }
 
   @SuppressWarnings("unchecked")

@@ -13,6 +13,10 @@
 
 package org.camunda.bpm.engine.impl.persistence;
 
+import org.camunda.bpm.engine.authorization.Permission;
+import org.camunda.bpm.engine.authorization.Resource;
+import org.camunda.bpm.engine.impl.AbstractQuery;
+import org.camunda.bpm.engine.impl.cfg.auth.ResourceAuthorizationProvider;
 import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionManager;
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionManager;
 import org.camunda.bpm.engine.impl.context.Context;
@@ -120,6 +124,46 @@ public abstract class AbstractManager implements Session {
   }
 
   public void flush() {
+  }
+
+  // authorizations ///////////////////////////////////////
+
+  protected void configureQuery(AbstractQuery<?,?> query, Resource resource) {
+    Context.getCommandContext()
+      .getAuthorizationManager()
+      .configureQuery(query, resource);
+  }
+
+  protected void checkAuthorization(Permission permission, Resource resource, String resourceId) {
+    Context.getCommandContext()
+      .getAuthorizationManager()
+      .checkAuthorization(permission, resource, resourceId);
+  }
+
+
+  protected ResourceAuthorizationProvider getResourceAuthorizationProvider() {
+    return Context.getProcessEngineConfiguration()
+        .getResourceAuthorizationProvider();
+  }
+
+  protected void deleteAuthorizations(Resource resource, String resourceId) {
+    Context.getCommandContext()
+      .getAuthorizationManager()
+      .deleteAuthorizationsByResourceId(resource, resourceId);
+  }
+
+  protected void saveDefaultAuthorizations(final AuthorizationEntity[] authorizations) {
+    if(authorizations != null) {
+      Context.getCommandContext().runWithoutAuthentication(new Runnable() {
+        public void run() {
+          AuthorizationManager authorizationManager = Context.getCommandContext()
+              .getAuthorizationManager();
+          for (AuthorizationEntity authorization : authorizations) {
+            authorizationManager.insert(authorization);
+          }
+        }
+      });
+    }
   }
 
 }

@@ -21,6 +21,7 @@ public class EntityTypes {
   public static String APPLICATION = "Application";
   public static String ATTACHMENT = "Attachment";
   public static String AUTHORIZATION = "Authorization";
+  public static String FILTER = "Filter";
   public static String GROUP = "Group";
   public static String GROUP_MEMBERSHIP = "Group membership";
   public static String IDENTITY_LINK = "IdentityLink";

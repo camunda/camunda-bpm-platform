@@ -197,8 +197,9 @@ public class FilterServiceTest extends PluggableProcessEngineTestCase {
   }
 
   public void testDeleteUnknownFilter() {
-    Filter deletedFilter = filterService.deleteFilter(filter.getId());
-    assertNotNull(deletedFilter);
+    filterService.deleteFilter(filter.getId());
+    long count = filterService.createFilterQuery().count();
+    assertEquals(0, count);
 
     try {
       filterService.deleteFilter(filter.getId());

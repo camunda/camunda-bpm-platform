@@ -152,31 +152,4 @@ public class DbIdentityServiceProvider extends DbReadOnlyIdentityServiceProvider
     }
   }
 
-  protected ResourceAuthorizationProvider getResourceAuthorizationProvider() {
-    return Context.getProcessEngineConfiguration()
-        .getResourceAuthorizationProvider();
-  }
-
-  protected void deleteAuthorizations(Resource resource, String resourceId) {
-    Context.getCommandContext()
-      .getAuthorizationManager()
-      .deleteAuthorizationsByResourceId(resource, resourceId);
-  }
-
-  protected void saveDefaultAuthorizations(final AuthorizationEntity[] authorizations) {
-    if(authorizations == null) {
-      return;
-
-    } else {
-      Context.getCommandContext().runWithoutAuthentication(new Runnable() {
-        public void run() {
-          AuthorizationManager authorizationManager = Context.getCommandContext()
-              .getAuthorizationManager();
-          for (AuthorizationEntity authorization : authorizations) {
-            authorizationManager.insert(authorization);
-          }
-        }
-      });
-    }
-  }
 }

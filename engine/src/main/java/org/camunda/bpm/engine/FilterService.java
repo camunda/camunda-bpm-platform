@@ -14,6 +14,8 @@ package org.camunda.bpm.engine;
 
 import java.util.List;
 
+import org.camunda.bpm.engine.authorization.Permissions;
+import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.filter.Filter;
 import org.camunda.bpm.engine.filter.FilterQuery;
 import org.camunda.bpm.engine.query.Query;
@@ -28,6 +30,7 @@ public interface FilterService {
    * Creates a new filter.
    *
    * @return a new filter
+   * @throws AuthorizationException if the user has no {@link Permissions#CREATE} permissions on {@link Resources#FILTER}.
    */
   Filter newFilter();
 
@@ -35,6 +38,7 @@ public interface FilterService {
    * Creates a new filter with a given name.
    *
    * @return a new filter with a name
+   * @throws AuthorizationException if the user has no {@link Permissions#CREATE} permissions on {@link Resources#FILTER}.
    */
   Filter newFilter(String filterName);
 
@@ -42,6 +46,7 @@ public interface FilterService {
    * Creates a new task filter.
    *
    * @return a new task filter
+   * @throws AuthorizationException if the user has no {@link Permissions#CREATE} permissions on {@link Resources#FILTER}.
    */
   Filter newTaskFilter();
 
@@ -49,6 +54,7 @@ public interface FilterService {
    * Creates a new task filter with a given name.
    *
    * @return a new task filter with a name
+   * @throws AuthorizationException if the user has no {@link Permissions#CREATE} permissions on {@link Resources#FILTER}.
    */
   Filter newTaskFilter(String filterName);
 
@@ -72,6 +78,8 @@ public interface FilterService {
    *
    * @param filter the filter to save
    * @return return the saved filter
+   * @throws AuthorizationException if the user has no {@link Permissions#CREATE} permissions on {@link Resources#FILTER} (save new filter)
+   * or if user has no {@link Permissions#UPDATE} permissions on {@link Resources#FILTER} (update existing filter).
    */
   Filter saveFilter(Filter filter);
 
@@ -80,6 +88,7 @@ public interface FilterService {
    *
    * @param filterId the id of the filter
    * @return the filter
+   * @throws AuthorizationException if the user has no {@link Permissions#READ} permissions on {@link Resources#FILTER}.
    */
   Filter getFilter(String filterId);
 
@@ -87,15 +96,16 @@ public interface FilterService {
    * Deletes a filter by its id.
    *
    * @param filterId the id of the filter
-   * @return the deleted filter
+   * @throws AuthorizationException if the user has no {@link Permissions#DELETE} permissions on {@link Resources#FILTER}.
    */
-  Filter deleteFilter(String filterId);
+  void deleteFilter(String filterId);
 
   /**
    * Executes the query of the filter and returns the result as list.
    *
    * @param filterId the the id of the filter
    * @return the query result as list
+   * @throws AuthorizationException if the user has no {@link Permissions#READ} permissions on {@link Resources#FILTER}.
    */
   <T> List<T> list(String filterId);
 
@@ -105,6 +115,7 @@ public interface FilterService {
    * @param filterId the id of the filter
    * @param extendingQuery additional query to extend the filter query
    * @return the query result as list
+   * @throws AuthorizationException if the user has no {@link Permissions#READ} permissions on {@link Resources#FILTER}.
    */
   <T> List<T> list(String filterId, Query<?, T> extendingQuery);
 
@@ -114,6 +125,7 @@ public interface FilterService {
    * @param filterId the id of the filter
    * @param extendingQuery additional query to extend the filter query as JSON object
    * @return the query result as list
+   * @throws AuthorizationException if the user has no {@link Permissions#READ} permissions on {@link Resources#FILTER}.
    */
   <T> List<T> list(String filterId, String extendingQuery);
 
@@ -124,6 +136,7 @@ public interface FilterService {
    * @param firstResult first result to select
    * @param maxResults maximal number of results
    * @return the query result as list
+   * @throws AuthorizationException if the user has no {@link Permissions#READ} permissions on {@link Resources#FILTER}.
    */
   <T> List<T> listPage(String filterId, int firstResult, int maxResults);
 
@@ -135,6 +148,7 @@ public interface FilterService {
    * @param firstResult first result to select
    * @param maxResults maximal number of results
    * @return the query result as list
+   * @throws AuthorizationException if the user has no {@link Permissions#READ} permissions on {@link Resources#FILTER}.
    */
   <T> List<T> listPage(String filterId, Query<?, T> extendingQuery, int firstResult, int maxResults);
 
@@ -146,6 +160,7 @@ public interface FilterService {
    * @param firstResult first result to select
    * @param maxResults maximal number of results
    * @return the query result as list
+   * @throws AuthorizationException if the user has no {@link Permissions#READ} permissions on {@link Resources#FILTER}.
    */
   <T> List<T> listPage(String filterId, String extendingQuery, int firstResult, int maxResults);
 
@@ -154,6 +169,7 @@ public interface FilterService {
    *
    * @param filterId the the id of the filter
    * @return the single query result
+   * @throws AuthorizationException if the user has no {@link Permissions#READ} permissions on {@link Resources#FILTER}.
    */
   <T> T singleResult(String filterId);
 
@@ -163,6 +179,7 @@ public interface FilterService {
    * @param filterId the the id of the filter
    * @param extendingQuery additional query to extend the filter query
    * @return the single query result
+   * @throws AuthorizationException if the user has no {@link Permissions#READ} permissions on {@link Resources#FILTER}.
    */
   <T> T singleResult(String filterId, Query<?, T> extendingQuery);
 
@@ -172,6 +189,7 @@ public interface FilterService {
    * @param filterId the the id of the filter
    * @param extendingQuery additional query to extend the filter query as JSON object
    * @return the single query result
+   * @throws AuthorizationException if the user has no {@link Permissions#READ} permissions on {@link Resources#FILTER}.
    */
   <T> T singleResult(String filterId, String extendingQuery);
 
@@ -180,6 +198,7 @@ public interface FilterService {
    *
    * @param filterId the the id of the filter
    * @return the result count
+   * @throws AuthorizationException if the user has no {@link Permissions#READ} permissions on {@link Resources#FILTER}.
    */
   Long count(String filterId);
 
@@ -189,6 +208,7 @@ public interface FilterService {
    * @param filterId the the id of the filter
    * @param extendingQuery additional query to extend the filter query as JSON object
    * @return the result count
+   * @throws AuthorizationException if the user has no {@link Permissions#READ} permissions on {@link Resources#FILTER}.
    */
   Long count(String filterId, Query<?, ?> extendingQuery);
 
@@ -198,6 +218,7 @@ public interface FilterService {
    * @param filterId the the id of the filter
    * @param extendingQuery additional query to extend the filter query as JSON object
    * @return the result count
+   * @throws AuthorizationException if the user has no {@link Permissions#READ} permissions on {@link Resources#FILTER}.
    */
   Long count(String filterId, String extendingQuery);
 
