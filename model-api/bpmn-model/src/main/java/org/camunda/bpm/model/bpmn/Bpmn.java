@@ -72,6 +72,7 @@ import org.camunda.bpm.model.bpmn.impl.instance.di.PlaneImpl;
 import org.camunda.bpm.model.bpmn.impl.instance.di.ShapeImpl;
 import org.camunda.bpm.model.bpmn.impl.instance.di.StyleImpl;
 import org.camunda.bpm.model.bpmn.impl.instance.di.WaypointImpl;
+import org.camunda.bpm.model.bpmn.instance.DataObject;
 import org.camunda.bpm.model.bpmn.instance.Definitions;
 import org.camunda.bpm.model.bpmn.instance.Process;
 import org.camunda.bpm.model.xml.Model;
@@ -313,6 +314,8 @@ public class Bpmn {
     DataOutputRefs.registerType(bpmnModelBuilder);
     DataPath.registerType(bpmnModelBuilder);
     DataStateImpl.registerType(bpmnModelBuilder);
+    DataObjectImpl.registerType(bpmnModelBuilder);
+    DataObjectReferenceImpl.registerType(bpmnModelBuilder);
     DefinitionsImpl.registerType(bpmnModelBuilder);
     DocumentationImpl.registerType(bpmnModelBuilder);
     EndEventImpl.registerType(bpmnModelBuilder);
