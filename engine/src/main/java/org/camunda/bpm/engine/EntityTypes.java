@@ -26,5 +26,6 @@ public class EntityTypes {
   public static String IDENTITY_LINK = "IdentityLink";
   public static String TASK = "Task";
   public static String USER = "User";
+  public static String PROCESS_INSTANCE = "ProcessInstance";
 
 }

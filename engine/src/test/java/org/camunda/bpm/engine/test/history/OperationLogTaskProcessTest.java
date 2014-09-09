@@ -27,9 +27,11 @@ import static org.camunda.bpm.engine.impl.persistence.entity.TaskEntity.PRIORITY
 
 import java.util.HashMap;
 
+import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.history.UserOperationLogQuery;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.DelegationState;
 import org.camunda.bpm.engine.task.Task;
@@ -40,8 +42,9 @@ import org.camunda.bpm.engine.test.Deployment;
  */
 public class OperationLogTaskProcessTest extends PluggableProcessEngineTestCase {
 
-  private ProcessInstance process;
-  private Task task;
+  protected ProcessDefinition processDefinition;
+  protected ProcessInstance process;
+  protected Task task;
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml"})
   public void testCreateAndCompleteTask() {
@@ -274,20 +277,89 @@ public class OperationLogTaskProcessTest extends PluggableProcessEngineTestCase 
 
   }
 
-  private void startTestProcess() {
-    process = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+  @Deployment(resources = {"org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml"})
+  public void testDeleteOpLogEntriesOnUndeployment() {
+    // given
+    startTestProcess();
+    // an op log entry directly related to the process instance is created
+    taskService.resolveTask(task.getId());
+
+    // and an op log entry with indirect reference to the process instance is created
+    runtimeService.suspendProcessInstanceByProcessDefinitionId(processDefinition.getId());
+
+    // when...
+    // ...the deployment is deleted with cascade
+    repositoryService.deleteDeployment(deploymentId, true);
+
+    // then both op log entries are removed
+    assertEquals(0, historyService.createUserOperationLogQuery().count());
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml"})
+  public void testDeleteOpLogEntry() {
+    // given
+    startTestProcess();
+
+    // an op log instance is created
+    taskService.resolveTask(task.getId());
+    UserOperationLogEntry opLogEntry = historyService.createUserOperationLogQuery().singleResult();
+
+    // when the op log instance is deleted
+    historyService.deleteUserOperationLogEntry(opLogEntry.getId());
+
+    // then it should be removed from the database
+    assertEquals(0, historyService.createUserOperationLogQuery().count());
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml"})
+  public void testDeleteOpLogEntryWithNullArgument() {
+    // given
+    startTestProcess();
+
+    // an op log instance is created
+    taskService.resolveTask(task.getId());
+
+    // when null is used as deletion parameter
+    try {
+      historyService.deleteUserOperationLogEntry(null);
+      fail("exeception expected");
+    } catch (NotValidException e) {
+      // then there should be an exception that signals an illegal input
+    }
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml"})
+  public void testDeleteOpLogNonExstingEntry() {
+    // given
+    startTestProcess();
+
+    // an op log instance is created
+    taskService.resolveTask(task.getId());
+
+    // when a non-existing id is used
+    historyService.deleteUserOperationLogEntry("a non existing id");
+
+    // then no op log entry should have been deleted
+    assertEquals(1, historyService.createUserOperationLogQuery().count());
+  }
+
+  protected void startTestProcess() {
+    processDefinition = repositoryService
+        .createProcessDefinitionQuery().processDefinitionKey("oneTaskProcess").singleResult();
+
+    process = runtimeService.startProcessInstanceById(processDefinition.getId());
     task = taskService.createTaskQuery().singleResult();
   }
 
-  private UserOperationLogQuery queryOperationDetails(String type) {
+  protected UserOperationLogQuery queryOperationDetails(String type) {
     return historyService.createUserOperationLogQuery().operationType(type);
   }
 
-  private UserOperationLogQuery queryOperationDetails(String type, String property) {
+  protected UserOperationLogQuery queryOperationDetails(String type, String property) {
     return historyService.createUserOperationLogQuery().operationType(type).property(property);
   }
 
-  private void completeTestProcess() {
+  protected void completeTestProcess() {
     taskService.complete(task.getId());
     assertProcessEnded(process.getId());
   }

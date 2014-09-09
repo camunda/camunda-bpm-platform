@@ -15,13 +15,21 @@ package org.camunda.bpm.engine.impl.test;
 
 import java.io.InputStream;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.logging.Logger;
+
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.SchemaOperationsProcessEngineBuild;
+import org.camunda.bpm.engine.impl.UserOperationLogQueryImpl;
 import org.camunda.bpm.engine.impl.bpmn.deployer.BpmnDeployer;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.db.PersistenceSession;
@@ -278,6 +286,30 @@ public abstract class TestHelper {
          }
          return null;
        }
+      });
+  }
+
+  /**
+   * Required when user operations are logged that are not directly associated with a single deployment
+   * (e.g. runtimeService.suspendProcessDefinitionByKey(..) with cascade to process instances)
+   * and therefore cannot be cleaned up automatically during undeployment.
+   */
+  public static void clearOpLog(ProcessEngineConfigurationImpl processEngineConfiguration) {
+    processEngineConfiguration.getCommandExecutorTxRequired()
+      .execute(new Command<Void>() {
+
+        public Void execute(CommandContext commandContext) {
+          List<UserOperationLogEntry> logEntries =
+              commandContext.getOperationLogManager()
+                .findOperationLogEntriesByQueryCriteria(new UserOperationLogQueryImpl(), null);
+
+          for (UserOperationLogEntry entry : logEntries) {
+            commandContext.getOperationLogManager().deleteOperationLogEntryById(entry.getId());
+          }
+
+          return null;
+        }
+
       });
   }
 

@@ -29,6 +29,7 @@ public class UserOperationLogQueryImpl extends AbstractQuery<UserOperationLogQue
 
   private static final long serialVersionUID = 1L;
   protected String processDefinitionId;
+  protected String processDefinitionKey;
   protected String processInstanceId;
   protected String executionId;
   protected String caseDefinitionId;
@@ -43,6 +44,9 @@ public class UserOperationLogQueryImpl extends AbstractQuery<UserOperationLogQue
   protected Date timestampAfter;
   protected Date timestampBefore;
 
+  public UserOperationLogQueryImpl() {
+  }
+
   public UserOperationLogQueryImpl(CommandExecutor commandExecutor) {
     super(commandExecutor);
   }
@@ -50,6 +54,12 @@ public class UserOperationLogQueryImpl extends AbstractQuery<UserOperationLogQue
   public UserOperationLogQuery processDefinitionId(String processDefinitionId) {
     ensureNotNull("processDefinitionId", processDefinitionId);
     this.processDefinitionId = processDefinitionId;
+    return this;
+  }
+
+  public UserOperationLogQuery processDefinitionKey(String processDefinitionKey) {
+    ensureNotNull("processDefinitionKey", processDefinitionKey);
+    this.processDefinitionKey = processDefinitionKey;
     return this;
   }
 

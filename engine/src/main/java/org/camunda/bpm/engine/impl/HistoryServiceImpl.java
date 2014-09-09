@@ -28,6 +28,7 @@ import org.camunda.bpm.engine.history.NativeHistoricTaskInstanceQuery;
 import org.camunda.bpm.engine.history.UserOperationLogQuery;
 import org.camunda.bpm.engine.impl.cmd.DeleteHistoricProcessInstanceCmd;
 import org.camunda.bpm.engine.impl.cmd.DeleteHistoricTaskInstanceCmd;
+import org.camunda.bpm.engine.impl.cmd.DeleteUserOperationLogEntryCmd;
 
 /**
  * @author Tom Baeyens
@@ -74,6 +75,10 @@ public class HistoryServiceImpl extends ServiceImpl implements HistoryService {
 
   public void deleteHistoricProcessInstance(String processInstanceId) {
     commandExecutor.execute(new DeleteHistoricProcessInstanceCmd(processInstanceId));
+  }
+
+  public void deleteUserOperationLogEntry(String entryId) {
+    commandExecutor.execute(new DeleteUserOperationLogEntryCmd(entryId));
   }
 
   public NativeHistoricProcessInstanceQuery createNativeHistoricProcessInstanceQuery() {

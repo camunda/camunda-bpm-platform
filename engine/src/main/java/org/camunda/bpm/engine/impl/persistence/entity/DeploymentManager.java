@@ -17,6 +17,7 @@ import java.util.List;
 
 import org.camunda.bpm.engine.impl.DeploymentQueryImpl;
 import org.camunda.bpm.engine.impl.Page;
+import org.camunda.bpm.engine.impl.ProcessDefinitionQueryImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.event.MessageEventHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerStartEventJobHandler;
@@ -92,6 +93,12 @@ public class DeploymentManager extends AbstractManager {
           .getCommandContext()
           .getHistoricIncidentManager()
           .deleteHistoricIncidentsByProcessDefinitionId(processDefinitionId);
+
+        // remove historic op log entries which are not related to a process instance
+        Context
+          .getCommandContext()
+          .getOperationLogManager()
+          .deleteOperationLogEntriesByProcessDefinitionId(processDefinitionId);
       }
     }
 

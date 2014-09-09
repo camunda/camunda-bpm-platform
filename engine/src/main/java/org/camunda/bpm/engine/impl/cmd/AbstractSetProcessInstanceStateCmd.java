@@ -13,9 +13,11 @@
 package org.camunda.bpm.engine.impl.cmd;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionManager;
+import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskManager;
 import org.camunda.bpm.engine.runtime.Job;
@@ -26,6 +28,8 @@ import org.camunda.bpm.engine.runtime.Job;
  * @author roman.smirnov
  */
 public abstract class AbstractSetProcessInstanceStateCmd implements Command<Void> {
+
+  protected static final String SUSPENSION_STATE_PROPERTY = "suspensionState";
 
   protected final String processInstanceId;
   protected String processDefinitionId;
@@ -66,6 +70,11 @@ public abstract class AbstractSetProcessInstanceStateCmd implements Command<Void
 
     getSetJobStateCmd().execute(commandContext);
 
+    PropertyChange propertyChange = new PropertyChange(SUSPENSION_STATE_PROPERTY, null, suspensionState.getName());
+    commandContext.getOperationLogManager()
+      .logProcessInstanceOperation(getLogEntryOperation(), processInstanceId, processDefinitionId,
+          processDefinitionKey, propertyChange);
+
     return null;
   }
 
@@ -79,5 +88,7 @@ public abstract class AbstractSetProcessInstanceStateCmd implements Command<Void
    * It will be used to suspend or activate the {@link Job}s.
    */
   protected abstract AbstractSetJobStateCmd getSetJobStateCmd();
+
+  protected abstract String getLogEntryOperation();
 
 }

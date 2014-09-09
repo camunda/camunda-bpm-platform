@@ -85,6 +85,11 @@ public interface HistoryService {
   void deleteHistoricProcessInstance(String processInstanceId);
 
   /**
+   * Deletes a user operation log entry. Does not cascade to any related entities.
+   */
+  void deleteUserOperationLogEntry(String entryId);
+
+  /**
    * creates a native query to search for {@link HistoricProcessInstance}s via SQL
    */
   NativeHistoricProcessInstanceQuery createNativeHistoricProcessInstanceQuery();

@@ -46,6 +46,9 @@ public interface UserOperationLogQuery extends Query<UserOperationLogQuery, User
   /** Query entries which are existing for the given process definition id. */
   UserOperationLogQuery processDefinitionId(String processDefinitionId);
 
+  /** Query entries which are operate on all process definitions of the given key. */
+  UserOperationLogQuery processDefinitionKey(String processDefinitionKey);
+
   /** Query entries which are existing for the given process instance. */
   UserOperationLogQuery processInstanceId(String processInstanceId);
 

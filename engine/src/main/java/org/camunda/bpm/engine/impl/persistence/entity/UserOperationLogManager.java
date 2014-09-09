@@ -14,6 +14,8 @@ package org.camunda.bpm.engine.impl.persistence.entity;
 
 import java.util.Arrays;
 import java.util.List;
+
+import org.camunda.bpm.engine.EntityTypes;
 import org.camunda.bpm.engine.history.UserOperationLogContext;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.Page;
@@ -60,6 +62,16 @@ public class UserOperationLogManager extends AbstractHistoricManager {
     getDbEntityManager().delete(UserOperationLogEntryEventEntity.class, "deleteUserOperationLogEntriesByTaskId", taskId);
   }
 
+  public void deleteOperationLogEntriesByProcessDefinitionId(String processDefinitionId) {
+    getDbEntityManager().delete(UserOperationLogEntryEventEntity.class, "deleteUserOperationLogEntriesByProcessDefinitionId", processDefinitionId);
+  }
+
+  public void deleteOperationLogEntryById(String entryId) {
+    if (isHistoryLevelFullEnabled()) {
+      getDbEntityManager().delete(UserOperationLogEntryEventEntity.class, "deleteUserOperationLogEntryById", entryId);
+    }
+  }
+
   public void logUserOperations(UserOperationLogContext context) {
     if (isHistoryLevelFullEnabled()) {
       ProcessEngineConfigurationImpl configuration = Context.getProcessEngineConfiguration();
@@ -82,6 +94,20 @@ public class UserOperationLogManager extends AbstractHistoricManager {
   public void logLinkOperation(String operation, TaskEntity task, PropertyChange propertyChange) {
     if (isHistoryLevelFullEnabled()) {
       UserOperationLogContext context = createContextForTask(ENTITY_TYPE_IDENTITY_LINK, operation, task, Arrays.asList(propertyChange));
+      logUserOperations(context);
+    }
+  }
+
+  /**
+   * The parameters processInstanceId, processDefinitionId and processInstanceKey are interpreted as selection constraints
+   * that are affected by the operation.
+   */
+  public void logProcessInstanceOperation(String operation, String processInstanceId,
+      String processDefinitionId, String processDefinitionKey, PropertyChange propertyChange) {
+    if (isHistoryLevelFullEnabled()) {
+      UserOperationLogContext context = createContextForProcessInstance(
+          operation, processInstanceId,
+          processDefinitionId, processDefinitionKey, Arrays.asList(propertyChange));
       logUserOperations(context);
     }
   }
@@ -113,6 +139,22 @@ public class UserOperationLogManager extends AbstractHistoricManager {
     context.setCaseInstanceId(task.getCaseInstanceId());
     context.setCaseExecutionId(task.getCaseExecutionId());
     context.setTaskId(task.getId());
+
+    return context;
+  }
+
+  protected UserOperationLogContext createContextForProcessInstance(String operation,
+      String processInstanceId, String processDefinitionId,
+      String processDefinitionKey, List<PropertyChange> propertyChanges) {
+    UserOperationLogContext context = new UserOperationLogContext();
+
+    context.setEntityType(EntityTypes.PROCESS_INSTANCE);
+    context.setOperationType(operation);
+
+    context.setProcessInstanceId(processInstanceId);
+    context.setProcessDefinitionId(processDefinitionId);
+    context.setProcessDefinitionKey(processDefinitionKey);
+    context.setPropertyChanges(propertyChanges);
 
     return context;
   }

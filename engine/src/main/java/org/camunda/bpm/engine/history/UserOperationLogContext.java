@@ -24,6 +24,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 public class UserOperationLogContext {
 
   protected String processDefinitionId;
+  protected String processDefinitionKey;
   protected String processInstanceId;
   protected String executionId;
   protected String caseDefinitionId;
@@ -132,4 +133,11 @@ public class UserOperationLogContext {
     this.operationId = operationId;
   }
 
+  public String getProcessDefinitionKey() {
+    return processDefinitionKey;
+  }
+
+  public void setProcessDefinitionKey(String processDefinitionKey) {
+    this.processDefinitionKey = processDefinitionKey;
+  }
 }
