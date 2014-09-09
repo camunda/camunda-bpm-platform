@@ -806,7 +806,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements
 
     // finally delete this execution
     Context.getCommandContext()
-      .getDbEntityManger()
+      .getDbEntityManager()
       .delete(this);
   }
 
@@ -879,7 +879,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements
     this.replacedBy = (ExecutionEntity) replacedBy;
 
     CommandContext commandContext = Context.getCommandContext();
-    DbEntityManager dbEntityManger = commandContext.getDbEntityManger();
+    DbEntityManager dbEntityManger = commandContext.getDbEntityManager();
 
     // update the related tasks
     for (TaskEntity task: getTasks()) {
@@ -1065,7 +1065,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements
   public void insert() {
     Context
       .getCommandContext()
-      .getDbEntityManger()
+      .getDbEntityManager()
       .insert(this);
   }
 

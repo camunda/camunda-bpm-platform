@@ -40,12 +40,12 @@ public class SaveFilterCmd implements Command<Filter>, Serializable {
 
     if (filter.getId() == null) {
       commandContext
-        .getDbEntityManger()
+        .getDbEntityManager()
         .insert(filterEntity);
     }
     else {
       commandContext
-        .getDbEntityManger()
+        .getDbEntityManager()
         .merge(filterEntity);
     }
 

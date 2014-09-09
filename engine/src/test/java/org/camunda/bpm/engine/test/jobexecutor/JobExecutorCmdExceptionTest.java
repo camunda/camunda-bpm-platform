@@ -175,7 +175,7 @@ public class JobExecutorCmdExceptionTest extends PluggableProcessEngineTestCase 
 
         for (HistoricIncident historicIncident : historicIncidents) {
           commandContext
-            .getDbEntityManger()
+            .getDbEntityManager()
             .delete((DbEntity) historicIncident);
         }
 

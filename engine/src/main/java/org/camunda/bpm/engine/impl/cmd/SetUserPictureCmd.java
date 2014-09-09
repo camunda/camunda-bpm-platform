@@ -19,7 +19,6 @@ import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.IdentityInfoEntity;
-import org.camunda.bpm.engine.impl.util.EnsureUtil;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
@@ -57,12 +56,12 @@ public class SetUserPictureCmd implements Command<Void>, Serializable {
       pictureInfo = new IdentityInfoEntity();
       pictureInfo.setUserId(userId);
       pictureInfo.setKey("picture");
-      commandContext.getDbEntityManger().insert(pictureInfo);
+      commandContext.getDbEntityManager().insert(pictureInfo);
     }
 
     ByteArrayEntity byteArrayEntity = new ByteArrayEntity(picture.getMimeType(), picture.getBytes());
 
-    commandContext.getDbEntityManger()
+    commandContext.getDbEntityManager()
       .insert(byteArrayEntity);
 
     pictureInfo.setValue(byteArrayEntity.getId());

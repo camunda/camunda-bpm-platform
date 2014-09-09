@@ -146,7 +146,7 @@ public class BpmnDeployer implements Deployer {
     CommandContext commandContext = Context.getCommandContext();
     ProcessDefinitionManager processDefinitionManager = commandContext.getProcessDefinitionManager();
     DeploymentCache deploymentCache = Context.getProcessEngineConfiguration().getDeploymentCache();
-    DbEntityManager dbEntityManager = commandContext.getDbEntityManger();
+    DbEntityManager dbEntityManager = commandContext.getDbEntityManager();
     for (ProcessDefinitionEntity processDefinition : processDefinitions) {
 
       if (deployment.isNew()) {
@@ -338,7 +338,7 @@ public class BpmnDeployer implements Deployer {
             .findEventSubscriptionsByName(MessageEventHandler.EVENT_HANDLER_TYPE, messageEventDefinition.getEventName());
           // also look for subscriptions created in the session:
           List<MessageEventSubscriptionEntity> cachedSubscriptions = commandContext
-            .getDbEntityManger()
+            .getDbEntityManager()
             .getCachedEntitiesByType(MessageEventSubscriptionEntity.class);
           for (MessageEventSubscriptionEntity cachedSubscription : cachedSubscriptions) {
             if(messageEventDefinition.getEventName().equals(cachedSubscription.getEventName())
@@ -348,7 +348,7 @@ public class BpmnDeployer implements Deployer {
           }
           // remove subscriptions deleted in the same command
           subscriptionsForSameMessageName = commandContext
-                  .getDbEntityManger()
+                  .getDbEntityManager()
                   .pruneDeletedEntities(subscriptionsForSameMessageName);
 
           if(!subscriptionsForSameMessageName.isEmpty()) {
@@ -385,7 +385,7 @@ public class BpmnDeployer implements Deployer {
           identityLink.setGroupId(expr.toString());
         }
         identityLink.setType(IdentityLinkType.CANDIDATE);
-        commandContext.getDbEntityManger().insert(identityLink);
+        commandContext.getDbEntityManager().insert(identityLink);
       }
     }
   }
@@ -459,7 +459,7 @@ public class BpmnDeployer implements Deployer {
 
     Context
       .getCommandContext()
-      .getDbEntityManger()
+      .getDbEntityManager()
       .insert(resource);
   }
 

@@ -470,7 +470,7 @@ public class JobQueryTest extends PluggableProcessEngineTestCase {
     commandExecutor.execute(new Command<Void>() {
 
       public Void execute(CommandContext commandContext) {
-        JobEntity timer = commandContext.getDbEntityManger().selectById(JobEntity.class, job.getId());
+        JobEntity timer = commandContext.getDbEntityManager().selectById(JobEntity.class, job.getId());
         timer.setRetries(retries);
         return null;
       }
@@ -594,7 +594,7 @@ public class JobQueryTest extends PluggableProcessEngineTestCase {
 
           for (HistoricIncident historicIncident : historicIncidents) {
             commandContext
-              .getDbEntityManger()
+              .getDbEntityManager()
               .delete((DbEntity) historicIncident);
           }
 

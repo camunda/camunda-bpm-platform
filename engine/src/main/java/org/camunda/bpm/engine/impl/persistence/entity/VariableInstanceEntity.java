@@ -78,7 +78,7 @@ public class VariableInstanceEntity implements VariableInstance, ValueFields, Db
   public static void insert(VariableInstanceEntity variableInstance) {
     Context
     .getCommandContext()
-    .getDbEntityManger()
+    .getDbEntityManager()
     .insert(variableInstance);
   }
 
@@ -111,7 +111,7 @@ public class VariableInstanceEntity implements VariableInstance, ValueFields, Db
     // delete variable
     Context
       .getCommandContext()
-      .getDbEntityManger()
+      .getDbEntityManager()
       .delete(this);
 
     deleteByteArrayValue();
@@ -189,7 +189,7 @@ public class VariableInstanceEntity implements VariableInstance, ValueFields, Db
       if(Context.getCommandContext() != null) {
         byteArrayValue = Context
           .getCommandContext()
-          .getDbEntityManger()
+          .getDbEntityManager()
           .selectById(ByteArrayEntity.class, byteArrayValueId);
       }
     }
@@ -209,7 +209,7 @@ public class VariableInstanceEntity implements VariableInstance, ValueFields, Db
       byteArrayValue = new ByteArrayEntity(bytes);
       Context
         .getCommandContext()
-        .getDbEntityManger()
+        .getDbEntityManager()
         .insert(byteArrayValue);
     }
     this.byteArrayValue = byteArrayValue;

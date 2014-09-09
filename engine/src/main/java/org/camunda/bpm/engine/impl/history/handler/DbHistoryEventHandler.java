@@ -89,7 +89,7 @@ public class DbHistoryEventHandler implements HistoryEventHandler {
         ByteArrayEntity byteArrayEntity = new ByteArrayEntity(historyEvent.getVariableName(), byteValue);
         Context
         .getCommandContext()
-        .getDbEntityManger()
+        .getDbEntityManager()
         .insert(byteArrayEntity);
         historyEvent.setByteArrayId(byteArrayEntity.getId());
 
@@ -134,7 +134,7 @@ public class DbHistoryEventHandler implements HistoryEventHandler {
   }
 
   protected DbEntityManager getDbEntityManager() {
-    return Context.getCommandContext().getDbEntityManger();
+    return Context.getCommandContext().getDbEntityManager();
   }
 
 }

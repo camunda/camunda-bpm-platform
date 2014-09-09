@@ -95,7 +95,7 @@ public class GetActivityInstanceCmd implements Command<ActivityInstance> {
 
     // first try to load from cache
     // check whether the process instance is already (partially) loaded in command context
-    List<ExecutionEntity> cachedExecutions = commandContext.getDbEntityManger().getCachedEntitiesByType(ExecutionEntity.class);
+    List<ExecutionEntity> cachedExecutions = commandContext.getDbEntityManager().getCachedEntitiesByType(ExecutionEntity.class);
     for (ExecutionEntity executionEntity : cachedExecutions) {
       if(processInstanceId.equals(executionEntity.getProcessInstanceId())) {
         // found one execution from process instance

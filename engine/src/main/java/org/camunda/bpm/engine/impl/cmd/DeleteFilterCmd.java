@@ -36,13 +36,13 @@ public class DeleteFilterCmd implements Command<Filter>, Serializable {
 
   public Filter execute(CommandContext commandContext) {
     FilterEntity filter = commandContext
-      .getDbEntityManger()
+      .getDbEntityManager()
       .selectById(FilterEntity.class, filterId);
 
     ensureNotNull("No filter found for filter id '" + filterId + "'", "filter", filter);
 
     commandContext
-      .getDbEntityManger()
+      .getDbEntityManager()
       .delete(filter);
 
     return filter;

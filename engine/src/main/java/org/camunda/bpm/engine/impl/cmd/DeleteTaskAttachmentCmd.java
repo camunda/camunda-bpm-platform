@@ -47,7 +47,7 @@ public class DeleteTaskAttachmentCmd implements Command<Object>, Serializable {
     ensureNotNull("No attachment exist for task id '" + taskId + " and attachmentId '" + attachmentId + "'.", "attachment", attachment);
 
     commandContext
-      .getDbEntityManger()
+      .getDbEntityManager()
       .delete(attachment);
 
     if (attachment.getContentId() != null) {

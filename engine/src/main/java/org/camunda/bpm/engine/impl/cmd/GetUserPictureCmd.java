@@ -19,7 +19,6 @@ import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.IdentityInfoEntity;
-import org.camunda.bpm.engine.impl.util.EnsureUtil;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.*;
 
@@ -46,7 +45,7 @@ public class GetUserPictureCmd implements Command<Picture>, Serializable {
     if (pictureInfo != null) {
       String pictureByteArrayId = pictureInfo.getValue();
       if (pictureByteArrayId != null) {
-        ByteArrayEntity byteArray = commandContext.getDbEntityManger()
+        ByteArrayEntity byteArray = commandContext.getDbEntityManager()
           .selectById(ByteArrayEntity.class, pictureByteArrayId);
         return new Picture(byteArray.getBytes(), byteArray.getName());
       }

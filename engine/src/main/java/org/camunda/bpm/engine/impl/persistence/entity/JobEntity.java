@@ -26,7 +26,6 @@ import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.HasDbRevision;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
-import org.camunda.bpm.engine.impl.db.sql.DbSqlSession;
 import org.camunda.bpm.engine.impl.incident.FailedJobIncidentHandler;
 import org.camunda.bpm.engine.impl.incident.IncidentHandler;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -104,7 +103,7 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
   public void insert() {
     DbEntityManager dbEntityManger = Context
       .getCommandContext()
-      .getDbEntityManger();
+      .getDbEntityManager();
 
     dbEntityManger.insert(this);
 
@@ -125,7 +124,7 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
   public void delete(boolean incidentResolved) {
     DbEntityManager dbEntityManger = Context
         .getCommandContext()
-        .getDbEntityManger();
+        .getDbEntityManager();
 
     dbEntityManger.delete(this);
 
@@ -343,7 +342,7 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
       byteArray = new ByteArrayEntity("job.exceptionByteArray", exceptionBytes);
       Context
         .getCommandContext()
-        .getDbEntityManger()
+        .getDbEntityManager()
         .insert(byteArray);
       exceptionByteArrayId = byteArray.getId();
       exceptionByteArray = byteArray;
@@ -399,7 +398,7 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
     if ((exceptionByteArray == null) && (exceptionByteArrayId != null)) {
       exceptionByteArray = Context
         .getCommandContext()
-        .getDbEntityManger()
+        .getDbEntityManager()
         .selectById(ByteArrayEntity.class, exceptionByteArrayId);
     }
     return exceptionByteArray;

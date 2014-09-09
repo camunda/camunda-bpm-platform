@@ -161,7 +161,7 @@ public class TaskEntity extends CorePersistentVariableScope implements Task, Del
     ensureParentTaskActive();
 
     CommandContext commandContext = Context.getCommandContext();
-    DbEntityManager dbEntityManger = commandContext.getDbEntityManger();
+    DbEntityManager dbEntityManger = commandContext.getDbEntityManager();
     dbEntityManger.insert(this);
 
     if(execution != null) {
@@ -173,7 +173,7 @@ public class TaskEntity extends CorePersistentVariableScope implements Task, Del
     registerCommandContextCloseListener();
 
     CommandContext commandContext = Context.getCommandContext();
-    DbEntityManager dbEntityManger = commandContext.getDbEntityManger();
+    DbEntityManager dbEntityManger = commandContext.getDbEntityManager();
     dbEntityManger.merge(this);
   }
 
@@ -523,7 +523,7 @@ public class TaskEntity extends CorePersistentVariableScope implements Task, Del
     for (IdentityLinkEntity identityLink: identityLinks) {
       Context
         .getCommandContext()
-        .getDbEntityManger()
+        .getDbEntityManager()
         .delete(identityLink);
     }
   }
@@ -986,7 +986,7 @@ public class TaskEntity extends CorePersistentVariableScope implements Task, Del
   }
 
   public void onCommandContextClose(CommandContext commandContext) {
-    if(commandContext.getDbEntityManger().isDirty(this)) {
+    if(commandContext.getDbEntityManager().isDirty(this)) {
       commandContext.getHistoricTaskInstanceManager().updateHistoricTaskInstance(this);
     }
   }

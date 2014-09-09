@@ -86,7 +86,7 @@ public class HistoricProcessInstanceManager extends AbstractHistoricManager {
           .getHistoricIncidentManager()
           .deleteHistoricIncidentsByProcessInstanceId(historicProcessInstanceId);
 
-      commandContext.getDbEntityManger().delete(HistoricProcessInstanceEntity.class, "deleteHistoricProcessInstance", historicProcessInstanceId);
+      commandContext.getDbEntityManager().delete(HistoricProcessInstanceEntity.class, "deleteHistoricProcessInstance", historicProcessInstanceId);
 
     }
   }

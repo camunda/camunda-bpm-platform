@@ -40,7 +40,7 @@ public abstract class AbstractExecuteFilterCmd implements Serializable {
   protected Filter getFilter(CommandContext commandContext) {
     ensureNotNull("No filter id given to execute", "filterId", filterId);
     Filter filter = commandContext
-      .getDbEntityManger()
+      .getDbEntityManager()
       .selectById(FilterEntity.class, filterId);
 
     ensureNotNull("No filter found for id '" + filterId + "'", "filter", filter);

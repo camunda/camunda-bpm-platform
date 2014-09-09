@@ -144,7 +144,7 @@ public class ProcessApplicationManager {
       for (String deploymentId : deploymentIds) {
 
         DeploymentEntity deployment = commandContext
-          .getDbEntityManger()
+          .getDbEntityManager()
           .selectById(DeploymentEntity.class, deploymentId);
 
         if(deployment != null) {

@@ -280,7 +280,7 @@ public class CommandContext {
     return (T) session;
   }
 
-  public DbEntityManager getDbEntityManger() {
+  public DbEntityManager getDbEntityManager() {
     return getSession(DbEntityManager.class);
   }
 

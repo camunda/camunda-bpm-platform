@@ -171,7 +171,7 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
     for (IdentityLinkEntity identityLink: identityLinks) {
       Context
         .getCommandContext()
-        .getDbEntityManger()
+        .getDbEntityManager()
         .delete(identityLink);
     }
   }

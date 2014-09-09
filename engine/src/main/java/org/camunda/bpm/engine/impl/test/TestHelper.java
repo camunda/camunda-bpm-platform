@@ -147,7 +147,7 @@ public abstract class TestHelper {
             PersistenceSession persistenceSession = commandContext.getSession(PersistenceSession.class);
             persistenceSession.dbSchemaDrop();
             persistenceSession.dbSchemaCreate();
-            SchemaOperationsProcessEngineBuild.dbCreateHistoryLevel(commandContext.getDbEntityManger());
+            SchemaOperationsProcessEngineBuild.dbCreateHistoryLevel(commandContext.getDbEntityManager());
             return null;
           }
         });
@@ -252,7 +252,7 @@ public abstract class TestHelper {
     processEngineConfiguration.getCommandExecutorTxRequired()
       .execute(new Command<Object>() {
        public Object execute(CommandContext commandContext) {
-         DbEntityManager dbEntityManager = commandContext.getDbEntityManger();
+         DbEntityManager dbEntityManager = commandContext.getDbEntityManager();
          PropertyEntity historyLevelProperty = dbEntityManager.selectById(PropertyEntity.class, "historyLevel");
          if (historyLevelProperty != null) {
            if (processEngineConfiguration.getHistoryLevel() != new Integer(historyLevelProperty.getValue())) {
@@ -271,7 +271,7 @@ public abstract class TestHelper {
     processEngineConfiguration.getCommandExecutorTxRequired()
       .execute(new Command<Object>() {
        public Object execute(CommandContext commandContext) {
-         DbEntityManager dbEntityManager = commandContext.getDbEntityManger();
+         DbEntityManager dbEntityManager = commandContext.getDbEntityManager();
          PropertyEntity historyLevelProperty = dbEntityManager.selectById(PropertyEntity.class, "historyLevel");
          if (historyLevelProperty != null) {
            dbEntityManager.delete(historyLevelProperty);
