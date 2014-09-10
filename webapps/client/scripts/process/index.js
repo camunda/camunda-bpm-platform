@@ -136,6 +136,7 @@ define([
 
     $scope.showList = function() {
       $scope.startingProcess = null;
+      $scope.variables = [];
     };
 
 
