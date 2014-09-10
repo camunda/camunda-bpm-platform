@@ -160,3 +160,14 @@ ALTER TABLE ACT_HI_VARINST
   
 ALTER TABLE ACT_HI_DETAIL
   ADD DATA_FORMAT_ID_ varchar(64);
+
+-- create filter table
+create table ACT_RU_FILTER (
+  ID_ varchar(64) not null,
+  RESOURCE_TYPE_ varchar(255) not null,
+  NAME_ varchar(255) not null,
+  OWNER_ varchar(255),
+  QUERY_ CLOB not null,
+  PROPERTIES_ CLOB,
+  primary key (ID_)
+);

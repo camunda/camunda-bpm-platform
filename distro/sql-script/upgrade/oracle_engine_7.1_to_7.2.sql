@@ -155,3 +155,14 @@ ALTER TABLE ACT_HI_VARINST
   
 ALTER TABLE ACT_HI_DETAIL
   ADD DATA_FORMAT_ID_ NVARCHAR2(64);
+
+-- create filter table
+create table ACT_RU_FILTER (
+  ID_ NVARCHAR2(64) not null,
+  RESOURCE_TYPE_ NVARCHAR2(255) not null,
+  NAME_ NVARCHAR2(255) not null,
+  OWNER_ NVARCHAR2(255),
+  QUERY_ CLOB not null,
+  PROPERTIES_ CLOB,
+  primary key (ID_)
+);
