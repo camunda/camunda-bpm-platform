@@ -83,7 +83,7 @@
 
   <select id="selectFilterByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.filter.FilterQueryImpl" resultMap="filterResultMap">
   	${limitBefore}
-    select RES.* ${limitBetween}
+    select RES.* ${limitBetweenClob}
     <include refid="selectFilterByQueryCriteriaSql" />
     ${orderBy}
     ${limitAfter}
@@ -91,7 +91,7 @@
 
   <select id="selectFilterByQueryCriteria_postgres" parameterType="org.camunda.bpm.engine.impl.filter.FilterQueryImpl" resultMap="filterResultMap_postgres">
     ${limitBefore}
-    select RES.* ${limitBetween}
+    select RES.* ${limitBetweenClob}
     <include refid="selectFilterByQueryCriteriaSql" />
     ${orderBy}
     ${limitAfter}
