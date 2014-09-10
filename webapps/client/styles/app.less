@@ -180,6 +180,8 @@ a.expand-collapse {
   margin: 0 5px 0 0;
 }
 
+
+
 @media (min-width: 980px) {
 
   .ctn-view {
@@ -816,4 +818,53 @@ select.ng-invalid.ng-invalid-date-type-equal {
   box-shadow: 0 0 6px #F8B9B7;
   -webkit-box-shadow: 0 0 6px #F8B9B7;
   -moz-box-shadow: 0 0 6px #f8b9b7;
+}
+
+
+
+
+
+.pagination {
+  text-align: center;
+  display: block;
+
+  &>li {
+    display: inline-block;
+
+    &>a {
+      border: none;
+      border-bottom: 1px solid #FFF;
+      padding: 0 3px;
+      margin: 0 5px;
+
+      &:focus,
+      &:hover {
+        margin-bottom: 0;
+        background: transparent;
+        border-bottom: 1px solid #DDD;
+      }
+    }
+  }
+
+  &>.active>a {
+    margin-bottom: 0;
+    color: #005580;
+    border-bottom: 1px solid #005580;
+    background: transparent;
+
+    &:hover,
+    &:focus {
+      color: #005580;
+      background: transparent;
+    }
+  }
+
+  &>.disabled>a {
+    border-bottom: 1px solid #FFF;
+
+    &:hover,
+    &:focus {
+      border-bottom: 1px solid #FFF;
+    }
+  }
 }
