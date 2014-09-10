@@ -359,6 +359,102 @@ public class OperationLogQueryTest extends PluggableProcessEngineTestCase {
 
   }
 
+  /**
+   * CAM-1930: add assertions for additional op log entries here
+   */
+  @Deployment(resources = {"org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml"})
+  public void testQueryProcessDefinitionOperationsById() {
+    // given
+    process = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+    // when
+    repositoryService.suspendProcessDefinitionById(process.getProcessDefinitionId(), true, null);
+    repositoryService.activateProcessDefinitionById(process.getProcessDefinitionId(), true, null);
+
+    // then
+    assertEquals(2, query().entityType(PROCESS_INSTANCE).count());
+
+    UserOperationLogEntry suspendEntry = query()
+        .entityType(PROCESS_INSTANCE)
+        .processDefinitionId(process.getProcessDefinitionId())
+        .operationType(OPERATION_TYPE_SUSPEND)
+        .singleResult();
+
+    assertNotNull(suspendEntry);
+    assertNull(suspendEntry.getProcessInstanceId());
+    assertEquals(process.getProcessDefinitionId(), suspendEntry.getProcessDefinitionId());
+    assertNull(suspendEntry.getProcessDefinitionKey());
+
+    assertEquals("suspensionState", suspendEntry.getProperty());
+    assertEquals("suspended", suspendEntry.getNewValue());
+    assertNull(suspendEntry.getOrgValue());
+
+    UserOperationLogEntry activateEntry = query()
+        .entityType(PROCESS_INSTANCE)
+        .processDefinitionId(process.getProcessDefinitionId())
+        .operationType(OPERATION_TYPE_ACTIVATE)
+        .singleResult();
+
+    assertNotNull(activateEntry);
+    assertNull(activateEntry.getProcessInstanceId());
+    assertEquals(process.getProcessDefinitionId(), activateEntry.getProcessDefinitionId());
+    assertNull(activateEntry.getProcessDefinitionKey());
+
+    assertEquals("suspensionState", activateEntry.getProperty());
+    assertEquals("active", activateEntry.getNewValue());
+    assertNull(activateEntry.getOrgValue());
+  }
+
+  /**
+   * CAM-1930: add assertions for additional op log entries here
+   */
+  @Deployment(resources = {"org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml"})
+  public void testQueryProcessDefinitionOperationsByKey() {
+    // given
+    process = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+    // when
+    repositoryService.suspendProcessDefinitionByKey("oneTaskProcess", true, null);
+    repositoryService.activateProcessDefinitionByKey("oneTaskProcess", true, null);
+
+    // then
+    assertEquals(2, query().entityType(PROCESS_INSTANCE).count());
+
+    UserOperationLogEntry suspendEntry = query()
+        .entityType(PROCESS_INSTANCE)
+        .processDefinitionKey("oneTaskProcess")
+        .operationType(OPERATION_TYPE_SUSPEND)
+        .singleResult();
+
+    assertNotNull(suspendEntry);
+    assertNull(suspendEntry.getProcessInstanceId());
+    assertNull(suspendEntry.getProcessDefinitionId());
+    assertEquals("oneTaskProcess", suspendEntry.getProcessDefinitionKey());
+
+    assertEquals("suspensionState", suspendEntry.getProperty());
+    assertEquals("suspended", suspendEntry.getNewValue());
+    assertNull(suspendEntry.getOrgValue());
+
+    UserOperationLogEntry activateEntry = query()
+        .entityType(PROCESS_INSTANCE)
+        .processDefinitionKey("oneTaskProcess")
+        .operationType(OPERATION_TYPE_ACTIVATE)
+        .singleResult();
+
+    assertNotNull(activateEntry);
+    assertNull(activateEntry.getProcessInstanceId());
+    assertNull(activateEntry.getProcessDefinitionId());
+    assertEquals("oneTaskProcess", activateEntry.getProcessDefinitionKey());
+
+    assertEquals("suspensionState", activateEntry.getProperty());
+    assertEquals("active", activateEntry.getNewValue());
+    assertNull(activateEntry.getOrgValue());
+
+    // clear op log
+    historyService.deleteUserOperationLogEntry(suspendEntry.getId());
+    historyService.deleteUserOperationLogEntry(activateEntry.getId());
+
+  }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
   public void testQueryByCaseDefinitionId() {
