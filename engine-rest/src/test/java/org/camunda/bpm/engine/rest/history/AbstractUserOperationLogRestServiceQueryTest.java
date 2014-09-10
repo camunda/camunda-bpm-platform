@@ -78,6 +78,7 @@ public abstract class AbstractUserOperationLogRestServiceQueryTest extends Abstr
         .when().get(USER_OPERATION_LOG_RESOURCE_URL);
 
     verify(queryMock, never()).processDefinitionId(anyString());
+    verify(queryMock, never()).processDefinitionKey(anyString());
     verify(queryMock, never()).processInstanceId(anyString());
     verify(queryMock, never()).executionId(anyString());
     verify(queryMock, never()).caseDefinitionId(anyString());
@@ -101,6 +102,7 @@ public abstract class AbstractUserOperationLogRestServiceQueryTest extends Abstr
   public void testQueryParameter() {
     Response response = given()
         .queryParam("processDefinitionId", "1")
+        .queryParam("processDefinitionKey", "6")
         .queryParam("processInstanceId", "2")
         .queryParam("executionId", "3")
         .queryParam("caseDefinitionId", "x")
@@ -116,6 +118,7 @@ public abstract class AbstractUserOperationLogRestServiceQueryTest extends Abstr
         .when().get(USER_OPERATION_LOG_RESOURCE_URL);
 
     verify(queryMock).processDefinitionId("1");
+    verify(queryMock).processDefinitionKey("6");
     verify(queryMock).processInstanceId("2");
     verify(queryMock).executionId("3");
     verify(queryMock).caseDefinitionId("x");
@@ -133,6 +136,7 @@ public abstract class AbstractUserOperationLogRestServiceQueryTest extends Abstr
     UserOperationLogEntryDto actual = from(json).getObject("[0]", UserOperationLogEntryDto.class);
     assertEquals(MockProvider.EXAMPLE_USER_OPERATION_LOG_ID, actual.getId());
     assertEquals(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID, actual.getProcessDefinitionId());
+    assertEquals(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY, actual.getProcessDefinitionKey());
     assertEquals(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID, actual.getProcessInstanceId());
     assertEquals(MockProvider.EXAMPLE_EXECUTION_ID, actual.getExecutionId());
     assertEquals(MockProvider.EXAMPLE_CASE_DEFINITION_ID, actual.getCaseDefinitionId());

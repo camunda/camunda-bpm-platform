@@ -29,20 +29,21 @@ public class UserOperationLogQueryDto extends AbstractQueryDto<UserOperationLogQ
 
   public static final String TIMESTAMP = "timestamp";
 
-  private String processDefinitionId;
-  private String processInstanceId;
-  private String executionId;
-  private String caseDefinitionId;
-  private String caseInstanceId;
-  private String caseExecutionId;
-  private String taskId;
-  private String userId;
-  private String operationId;
-  private String operationType;
-  private String entityType;
-  private String property;
-  private Date afterTimestamp;
-  private Date beforeTimestamp;
+  protected String processDefinitionId;
+  protected String processDefinitionKey;
+  protected String processInstanceId;
+  protected String executionId;
+  protected String caseDefinitionId;
+  protected String caseInstanceId;
+  protected String caseExecutionId;
+  protected String taskId;
+  protected String userId;
+  protected String operationId;
+  protected String operationType;
+  protected String entityType;
+  protected String property;
+  protected Date afterTimestamp;
+  protected Date beforeTimestamp;
 
   public UserOperationLogQueryDto(MultivaluedMap<String, String> queryParameters) {
     super(queryParameters);
@@ -62,6 +63,9 @@ public class UserOperationLogQueryDto extends AbstractQueryDto<UserOperationLogQ
   protected void applyFilters(UserOperationLogQuery query) {
     if (processDefinitionId != null) {
       query.processDefinitionId(processDefinitionId);
+    }
+    if (processDefinitionKey != null) {
+      query.processDefinitionKey(processDefinitionKey);
     }
     if (processInstanceId != null) {
       query.processInstanceId(processInstanceId);
@@ -120,6 +124,11 @@ public class UserOperationLogQueryDto extends AbstractQueryDto<UserOperationLogQ
   @CamundaQueryParam("processDefinitionId")
   public void setProcessDefinitionId(String processDefinitionId) {
     this.processDefinitionId = processDefinitionId;
+  }
+
+  @CamundaQueryParam("processDefinitionKey")
+  public void setProcessDefinitionKey(String processDefinitionKey) {
+    this.processDefinitionKey = processDefinitionKey;
   }
 
   @CamundaQueryParam("processInstanceId")

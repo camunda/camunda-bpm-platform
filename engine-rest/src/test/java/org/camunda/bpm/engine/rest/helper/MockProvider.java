@@ -1162,6 +1162,7 @@ public abstract class MockProvider {
     UserOperationLogEntry entry = mock(UserOperationLogEntry.class);
     when(entry.getId()).thenReturn(EXAMPLE_USER_OPERATION_LOG_ID);
     when(entry.getProcessDefinitionId()).thenReturn(EXAMPLE_PROCESS_DEFINITION_ID);
+    when(entry.getProcessDefinitionKey()).thenReturn(EXAMPLE_PROCESS_DEFINITION_KEY);
     when(entry.getProcessInstanceId()).thenReturn(EXAMPLE_PROCESS_INSTANCE_ID);
     when(entry.getExecutionId()).thenReturn(EXAMPLE_EXECUTION_ID);
     when(entry.getCaseDefinitionId()).thenReturn(EXAMPLE_CASE_DEFINITION_ID);
