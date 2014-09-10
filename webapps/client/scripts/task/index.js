@@ -4,11 +4,11 @@
 define([
   'angular',
   'moment',
-  'camunda-tasklist-ui/task/directives/cam-tasklist-task',
-  'camunda-tasklist-ui/task/directives/cam-tasklist-task-history',
-  'camunda-tasklist-ui/task/directives/cam-tasklist-task-diagram',
-  'camunda-tasklist-ui/task/directives/cam-tasklist-task-meta',
-  'camunda-tasklist-ui/task/directives/cam-tasklist-task-form',
+  './directives/cam-tasklist-task',
+  './directives/cam-tasklist-task-history',
+  './directives/cam-tasklist-task-diagram',
+  './directives/cam-tasklist-task-meta',
+  './directives/cam-tasklist-task-form',
 
   'camunda-tasklist-ui/utils',
   'camunda-tasklist-ui/api',

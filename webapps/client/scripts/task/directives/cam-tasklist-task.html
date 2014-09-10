@@ -52,7 +52,7 @@
                ng-click="fullscreenForm()"></a>
           </tab-heading>
 
-          <div class="tab-pane">
+          <div class="form-pane">
             <div cam-tasklist-task-form
                  task="task"></div>
           </div>
@@ -60,27 +60,22 @@
 
         <tab ng-if="task.description"
              heading="{{ 'DESCRIPTION' | translate }}">
-          <div class="tab-pane">{{ task.description }}</div>
+          <div class="description-pane">{{ task.description }}</div>
         </tab>
 
         <tab ng-if="history"
              heading="{{ 'HISTORY' | translate }}">
-          <div class="tab-pane">
-            <div cam-tasklist-task-history
-                 history="history"></div>
+          <div class="history-pane"
+               cam-tasklist-task-history
+               history="history">
           </div>
         </tab>
-<!--
-        <tab heading="{{ 'DIAGRAM' | translate }}">
-          <div class="tab-pane">
-            <div cam-tasklist-task-diagram
-                 task="task"></div>
-          </div>
-        </tab>
- -->
-        <tab heading="Debugging">
-          <div class="tab-pane">
-            <pre>{{ task | json }}</pre>
+
+        <tab heading="{{ 'DIAGRAM' | translate }}"
+             select="drawDiagram()">
+          <div class="diagram-pane"
+               cam-tasklist-task-diagram
+               task="task">
           </div>
         </tab>
       </tabset>

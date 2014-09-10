@@ -58,9 +58,9 @@ define([
     }
 
     return {
-      // scope: {
-      //   task: '='
-      // },
+      scope: {
+        task: '='
+      },
 
       link: function(scope, element) {
         var container = element.find('.form-container');
