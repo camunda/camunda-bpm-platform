@@ -106,7 +106,7 @@ define([
 
         function buildWhere(order, by) {
           var where = {};
-          angular.forEach(scope.filter.filters, function(pair) {
+          angular.forEach(scope.filter.query, function(pair) {
             where[pair.key] = camTasklistFilterCriteriaConversion(pair.value);
             if (dateExp.test(pair.key)) {
               /* jshint evil: true */
