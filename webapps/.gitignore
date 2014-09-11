@@ -19,3 +19,4 @@ dependency-reduced-pom.xml
 *.h2.db
 *.lock.db
 node_modules
+test.*.log
