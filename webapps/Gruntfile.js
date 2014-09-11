@@ -4,6 +4,7 @@ var path = require('path');
 var http = require('http');
 var spawn = require('child_process').spawn;
 
+
 function testOnline(done) {
   http.get('http://localhost:8080/camunda/app/tasklist/default', function(res) {
     done(res.statusCode !== 200 ? new Error('The status code is not 200') : null);
@@ -79,8 +80,11 @@ function linkTo(project) {
 module.exports = function(grunt) {
   require('load-grunt-tasks')(grunt);
 
-  var verbose = grunt.option('verbose');
-  var stack = grunt.option('stack');
+  var skipTests =   !!grunt.option('skip-tests');
+  var verbose =     !!grunt.option('verbose');
+  var stack =       !!grunt.option('stack');
+  var mvnUpdate =   !!grunt.option('update');
+
   var webappArgs = [
     'clean',
     'install',
@@ -89,7 +93,7 @@ module.exports = function(grunt) {
     '-Pdevelop,livereload',
   ];
 
-  if (!grunt.option('update')) {
+  if (!mvnUpdate) {
     webappArgs.push('-o');
   }
 
@@ -256,10 +260,16 @@ module.exports = function(grunt) {
   grunt.registerTask('test', function(target) {
     var done = this.async();
 
+    if (skipTests) {
+      grunt.log.subhead('Skip '+ target +' UI tests');
+      return done();
+    }
+
     grunt.log.subhead('Testing '+ target +' UI');
     var stdout = '';
     var stderr = '';
     var args = [
+      '--no-jasmineNodeOpts.showColors',
       '--specs',
       'webapp/src/test/js/e2e/'+ target +'/spec/**/*.js',
       'webapp/src/test/js/e2e/develop.conf.js'
@@ -274,12 +284,12 @@ module.exports = function(grunt) {
       var testRun = spawn('protractor', args);
 
       testRun.stdout.on('data', function (data) {
-        console.info(data.toString());
+        grunt.verbose.writeln(data.toString());
         stdout += data;
       });
 
       testRun.stderr.on('data', function (data) {
-        console.info(data.toString());
+        grunt.verbose.writeln(data.toString());
         stderr += data;
       });
 
