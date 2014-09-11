@@ -45,7 +45,7 @@ import com.jayway.restassured.response.Response;
 * @author Roman Smirnov
 *
 */
-public class AbstractCaseExecutionRestServiceQueryTest extends AbstractRestServiceTest {
+public abstract class AbstractCaseExecutionRestServiceQueryTest extends AbstractRestServiceTest {
 
   protected static final String CASE_EXECUTION_QUERY_URL = TEST_RESOURCE_ROOT_PATH + "/case-execution";
   protected static final String CASE_EXECUTION_COUNT_QUERY_URL = CASE_EXECUTION_QUERY_URL + "/count";
@@ -322,7 +322,6 @@ public class AbstractCaseExecutionRestServiceQueryTest extends AbstractRestServi
     List<Map<String, String>> caseExecutions = from(content).getList("");
 
     assertThat(caseExecutions).hasSize(1);
-    assertThat(caseExecutions.get(0)).isNotNull();
     assertThat(caseExecutions.get(0)).isNotNull();
 
     String returnedId = from(content).getString("[0].id");

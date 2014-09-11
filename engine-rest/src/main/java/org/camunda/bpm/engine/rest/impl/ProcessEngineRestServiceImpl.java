@@ -28,6 +28,7 @@ import org.camunda.bpm.engine.rest.CaseExecutionRestService;
 import org.camunda.bpm.engine.rest.CaseInstanceRestService;
 import org.camunda.bpm.engine.rest.DeploymentRestService;
 import org.camunda.bpm.engine.rest.ExecutionRestService;
+import org.camunda.bpm.engine.rest.FilterRestService;
 import org.camunda.bpm.engine.rest.GroupRestService;
 import org.camunda.bpm.engine.rest.IdentityRestService;
 import org.camunda.bpm.engine.rest.IncidentRestService;
@@ -185,6 +186,13 @@ public class ProcessEngineRestServiceImpl implements ProcessEngineRestService {
   public CaseExecutionRestService getCaseExecutionRestService(String engineName) {
     String rootResourcePath = getRelativeEngineUri(engineName).toASCIIString();
     CaseExecutionRestServiceImpl subResource = new CaseExecutionRestServiceImpl(engineName);
+    subResource.setRelativeRootResourceUri(rootResourcePath);
+    return subResource;
+  }
+
+  public FilterRestService getFilterRestService(String engineName) {
+    String rootResourcePath = getRelativeEngineUri(engineName).toASCIIString();
+    FilterRestServiceImpl subResource = new FilterRestServiceImpl(engineName);
     subResource.setRelativeRootResourceUri(rootResourcePath);
     return subResource;
   }

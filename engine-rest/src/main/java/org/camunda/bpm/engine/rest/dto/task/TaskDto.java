@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.rest.dto.task;
 
 import java.util.Date;
 
+import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.rest.dto.converter.DelegationStateConverter;
 import org.camunda.bpm.engine.task.DelegationState;
 import org.camunda.bpm.engine.task.Task;
@@ -165,7 +166,7 @@ public class TaskDto {
     return formKey;
   }
 
-  public static TaskDto fromTask(Task task) {
+  public static TaskDto fromEntity(Task task) {
     TaskDto dto = new TaskDto();
     dto.id = task.getId();
     dto.name = task.getName();
@@ -190,7 +191,13 @@ public class TaskDto {
     dto.caseExecutionId = task.getCaseExecutionId();
     dto.caseInstanceId = task.getCaseInstanceId();
     dto.suspended = task.isSuspended();
-    dto.formKey = task.getFormKey();
+
+    try {
+      dto.formKey = task.getFormKey();
+    }
+    catch (BadUserRequestException e) {
+      // ignore (initializeFormKeys was not called)
+    }
     return dto;
   }
 

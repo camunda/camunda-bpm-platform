@@ -17,7 +17,9 @@ import static javax.ws.rs.core.UriBuilder.fromResource;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.rest.TaskRestService;
+import org.camunda.bpm.engine.rest.hal.HalCollectionResource;
 import org.camunda.bpm.engine.rest.hal.HalResource;
 import org.camunda.bpm.engine.task.Task;
 
@@ -25,12 +27,13 @@ import org.camunda.bpm.engine.task.Task;
  * @author Daniel Meyer
  *
  */
-public class HalTaskList extends HalResource<HalTaskList> {
+public class HalTaskList extends HalCollectionResource<HalTaskList> {
 
-  protected long count = 0;
-
-  public long getCount() {
-    return count;
+  public static HalTaskList generate(List<Task> tasks, long count, ProcessEngine engine) {
+    return fromTaskList(tasks, count)
+      .embed(HalTask.REL_ASSIGNEE, engine)
+      .embed(HalTask.REL_OWNER, engine)
+      .embed(HalTask.REL_PROCESS_DEFINITION, engine);
   }
 
   public static HalTaskList fromTaskList(List<Task> tasks, long count) {

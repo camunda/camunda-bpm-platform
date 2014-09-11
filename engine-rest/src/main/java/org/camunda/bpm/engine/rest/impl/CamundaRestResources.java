@@ -54,6 +54,7 @@ public class CamundaRestResources {
     RESOURCE_CLASSES.add(AuthorizationRestServiceImpl.class);
     RESOURCE_CLASSES.add(HistoryRestServiceImpl.class);
     RESOURCE_CLASSES.add(DeploymentRestServiceImpl.class);
+    RESOURCE_CLASSES.add(FilterRestServiceImpl.class);
 
     RESOURCE_CLASSES.add(CaseDefinitionRestServiceImpl.class);
     RESOURCE_CLASSES.add(CaseInstanceRestServiceImpl.class);

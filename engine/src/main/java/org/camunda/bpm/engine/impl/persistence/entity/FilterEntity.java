@@ -69,7 +69,7 @@ public class FilterEntity implements Filter, Serializable, DbEntity {
   }
 
   public Filter setResourceType(String resourceType) {
-    ensureNotEmpty("Filter resource type must not be null or empty", "resourceType", resourceType);
+    ensureNotEmpty(NotValidException.class, "Filter resource type must not be null or empty", "resourceType", resourceType);
     this.resourceType = resourceType;
     return this;
   }
@@ -79,7 +79,7 @@ public class FilterEntity implements Filter, Serializable, DbEntity {
   }
 
   public Filter setName(String name) {
-    ensureNotEmpty("Filter name must not be null or empty", "name", name);
+    ensureNotEmpty(NotValidException.class, "Filter name must not be null or empty", "name", name);
     this.name = name;
     return this;
   }
@@ -104,12 +104,12 @@ public class FilterEntity implements Filter, Serializable, DbEntity {
   }
 
   public Filter setQuery(String query) {
-    ensureNotEmpty("Query must not be null or empty. Has to be a JSON object", "query", query);
+    ensureNotEmpty(NotValidException.class, "Query must not be null or empty. Has to be a JSON object", "query", query);
     try {
       new JSONObject(query);
     }
     catch (JSONException e) {
-      throw new ProcessEngineException("Query string has to be a JSON object", e);
+      throw new NotValidException("Query string has to be a JSON object", e);
     }
     this.query = query;
     return this;
@@ -117,7 +117,7 @@ public class FilterEntity implements Filter, Serializable, DbEntity {
 
   @SuppressWarnings("unchecked")
   public <T extends Query> Filter setQuery(T query) {
-    ensureNotNull("query", query);
+    ensureNotNull(NotValidException.class, "query", query);
     JsonObjectConverter converter = getConverter();
     setQuery(converter.toJson(query));
     return this;
@@ -125,7 +125,7 @@ public class FilterEntity implements Filter, Serializable, DbEntity {
 
   @SuppressWarnings("unchecked")
   public <T extends Query> Filter extend(T extendingQuery) {
-    ensureNotNull("extendingQuery", extendingQuery);
+    ensureNotNull(NotValidException.class, "extendingQuery", extendingQuery);
 
     // convert extendingQuery to JSON
     JsonObjectConverter converter = getConverter();

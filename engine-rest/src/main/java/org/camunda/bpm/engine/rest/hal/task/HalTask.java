@@ -14,6 +14,8 @@ package org.camunda.bpm.engine.rest.hal.task;
 
 import java.util.Date;
 
+import org.camunda.bpm.engine.BadUserRequestException;
+import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.rest.CaseDefinitionRestService;
 import org.camunda.bpm.engine.rest.CaseExecutionRestService;
 import org.camunda.bpm.engine.rest.CaseInstanceRestService;
@@ -65,6 +67,14 @@ public class HalTask extends HalResource<HalTask> {
   private boolean suspended;
   private String formKey;
 
+  public static HalTask generate(Task task, ProcessEngine engine) {
+    return fromTask(task)
+      .embed(HalTask.REL_PROCESS_DEFINITION, engine)
+      .embed(HalTask.REL_ASSIGNEE, engine)
+      .embed(HalTask.REL_OWNER, engine);
+
+  }
+
   public static HalTask fromTask(Task task) {
     HalTask dto = new HalTask();
 
@@ -88,7 +98,12 @@ public class HalTask extends HalResource<HalTask> {
     dto.caseExecutionId = task.getCaseExecutionId();
     dto.caseInstanceId = task.getCaseInstanceId();
     dto.suspended = task.isSuspended();
-    dto.formKey = task.getFormKey();
+    try {
+      dto.formKey = task.getFormKey();
+    }
+    catch (BadUserRequestException e) {
+      // ignore (initializeFormKeys was not called)
+    }
 
     // links
     dto.linker.createLink(REL_SELF, task.getId());

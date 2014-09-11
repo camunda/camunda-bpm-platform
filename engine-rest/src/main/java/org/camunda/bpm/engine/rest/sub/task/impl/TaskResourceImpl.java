@@ -132,7 +132,7 @@ public class TaskResourceImpl implements TaskResource {
       throw new InvalidRequestException(Status.NOT_FOUND, "No matching task with id " + taskId);
     }
 
-    return TaskDto.fromTask(task);
+    return TaskDto.fromEntity(task);
   }
 
   @Override
@@ -142,10 +142,7 @@ public class TaskResourceImpl implements TaskResource {
       throw new InvalidRequestException(Status.NOT_FOUND, "No matching task with id " + taskId);
     }
 
-    return HalTask.fromTask(task)
-      .embed(HalTask.REL_PROCESS_DEFINITION, engine)
-      .embed(HalTask.REL_ASSIGNEE, engine)
-      .embed(HalTask.REL_OWNER, engine);
+    return HalTask.generate(task, engine);
   }
 
   @Override

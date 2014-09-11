@@ -12,12 +12,15 @@
  */
 package org.camunda.bpm.engine.rest.helper;
 
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -29,6 +32,9 @@ import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.delegate.ProcessEngineVariableType;
+import org.camunda.bpm.engine.exception.NotValidException;
+import org.camunda.bpm.engine.filter.Filter;
+import org.camunda.bpm.engine.filter.FilterQuery;
 import org.camunda.bpm.engine.form.FormField;
 import org.camunda.bpm.engine.form.FormProperty;
 import org.camunda.bpm.engine.form.FormType;
@@ -46,6 +52,7 @@ import org.camunda.bpm.engine.history.HistoricVariableUpdate;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.User;
+import org.camunda.bpm.engine.impl.TaskQueryImpl;
 import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
 import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.engine.impl.persistence.entity.ResourceEntity;
@@ -53,6 +60,7 @@ import org.camunda.bpm.engine.management.ActivityStatistics;
 import org.camunda.bpm.engine.management.IncidentStatistics;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.management.ProcessDefinitionStatistics;
+import org.camunda.bpm.engine.query.Query;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
@@ -437,6 +445,17 @@ public abstract class MockProvider {
   public static final boolean EXAMPLE_CASE_EXECUTION_IS_ENABLED = true;
   public static final boolean EXAMPLE_CASE_EXECUTION_IS_ACTIVE = true;
   public static final boolean EXAMPLE_CASE_EXECUTION_IS_DISABLED = true;
+
+  // filter
+  public static final String EXAMPLE_FILTER_ID = "aFilterId";
+  public static final String EXAMPLE_FILTER_RESOURCE_TYPE = "aFilterResourceType";
+  public static final String EXAMPLE_FILTER_NAME = "aFilterName";
+  public static final String EXAMPLE_FILTER_OWNER = "aFilterOwner";
+  public static final String EXAMPLE_FILTER_QUERY = "{\"name\": \"test\"}";
+  public static final Map<String, Object> EXAMPLE_FILTER_QUERY_MAP = Collections.singletonMap("name", (Object) "test");
+  public static final Query EXAMPLE_FILTER_TYPE_QUERY = new TaskQueryImpl().taskName("test");
+  public static final String EXAMPLE_FILTER_PROPERTIES = "{\"color\": \"#112233\"}";
+  public static final Map<String, Object> EXAMPLE_FILTER_PROPERTIES_MAP = Collections.singletonMap("color", (Object) "#112233");
 
   // tasks
   public static Task createMockTask() {
@@ -1393,5 +1412,57 @@ public abstract class MockProvider {
     VariableInstance variableInstanceMock = createMockVariableInstance();
     mock.put(variableInstanceMock.getName(), variableInstanceMock);
     return mock;
+  }
+
+  public static List<Filter> createMockFilters() {
+    List<Filter> mocks = new ArrayList<Filter>();
+    mocks.add(createMockFilter());
+    return mocks;
+  }
+
+  public static Filter createMockFilter() {
+    Filter mock = mock(Filter.class);
+
+    when(mock.getId()).thenReturn(EXAMPLE_FILTER_ID);
+    when(mock.getResourceType()).thenReturn(EXAMPLE_FILTER_RESOURCE_TYPE);
+    when(mock.getName()).thenReturn(EXAMPLE_FILTER_NAME);
+    when(mock.getOwner()).thenReturn(EXAMPLE_FILTER_OWNER);
+    when(mock.getQuery()).thenReturn(EXAMPLE_FILTER_QUERY);
+    when(mock.getTypeQuery()).thenReturn(EXAMPLE_FILTER_TYPE_QUERY);
+    when(mock.getProperties()).thenReturn(EXAMPLE_FILTER_PROPERTIES);
+    when(mock.getPropertiesMap()).thenReturn(EXAMPLE_FILTER_PROPERTIES_MAP);
+
+    doThrow(new NotValidException("Resource type must not be null"))
+      .when(mock).setResourceType(null);
+    doThrow(new NotValidException("Resource type must not be empty"))
+      .when(mock).setResourceType("");
+    doThrow(new NotValidException("Name must not be null"))
+      .when(mock).setName(null);
+    doThrow(new NotValidException("Name must not be empty"))
+      .when(mock).setName("");
+    doThrow(new NotValidException("Query must not be null"))
+      .when(mock).setQuery((String) null);
+    doThrow(new NotValidException("Query must not be empty"))
+      .when(mock).setQuery("");
+
+    return mock;
+  }
+
+  public static FilterQuery createMockFilterQuery() {
+    List<Filter> mockFilters = createMockFilters();
+
+    FilterQuery query = mock(FilterQuery.class);
+
+    when(query.list()).thenReturn(mockFilters);
+    when(query.count()).thenReturn((long) mockFilters.size());
+    when(query.filterId(anyString())).thenReturn(query);
+    when(query.singleResult()).thenReturn(mockFilters.get(0));
+
+    FilterQuery nonExistingQuery = mock(FilterQuery.class);
+    when(query.filterId(NON_EXISTING_ID)).thenReturn(nonExistingQuery);
+    when(nonExistingQuery.singleResult()).thenReturn(null);
+
+    return query;
+
   }
 }

@@ -14,16 +14,13 @@ package org.camunda.bpm.engine.rest.impl;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.ws.rs.core.UriInfo;
-
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.rest.TaskRestService;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.task.TaskDto;
 import org.camunda.bpm.engine.rest.dto.task.TaskQueryDto;
-import org.camunda.bpm.engine.rest.hal.task.HalTask;
 import org.camunda.bpm.engine.rest.hal.task.HalTaskList;
 import org.camunda.bpm.engine.rest.sub.task.TaskResource;
 import org.camunda.bpm.engine.rest.sub.task.impl.TaskResourceImpl;
@@ -59,12 +56,7 @@ public class TaskRestServiceImpl extends AbstractRestProcessEngineAware implemen
     // get total count
     long count = query.count();
 
-    HalTaskList list = HalTaskList.fromTaskList(matchingTasks, count)
-        .embed(HalTask.REL_ASSIGNEE, engine)
-        .embed(HalTask.REL_OWNER, engine)
-        .embed(HalTask.REL_PROCESS_DEFINITION, engine);
-
-    return list;
+    return HalTaskList.generate(matchingTasks, count, engine);
   }
 
   @Override
@@ -77,7 +69,7 @@ public class TaskRestServiceImpl extends AbstractRestProcessEngineAware implemen
 
     List<TaskDto> tasks = new ArrayList<TaskDto>();
     for (Task task : matchingTasks) {
-      TaskDto returnTask = TaskDto.fromTask(task);
+      TaskDto returnTask = TaskDto.fromEntity(task);
       tasks.add(returnTask);
     }
 
