@@ -27,24 +27,24 @@ module.exports = function(config) {
 
     var tasklistConf = 'var tasklistConf = '+ JSON.stringify({
       apiUri: '/camunda/api/engine',
-      mock: true,
+      mock: false,
 
       // overrides the settings above
       resources: {
         'process-definition': {
-          mock: false
+          // mock: false
         },
 
         'process-instance': {
-          mock: false
+          // mock: false
         },
 
         'authorization': {
-          mock: false
+          // mock: false
         },
 
         'task': {
-          mock: false
+          // mock: false
         }
       }
     }, null, 2) +';';
