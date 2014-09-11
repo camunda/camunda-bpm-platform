@@ -1,16 +1,24 @@
 package org.camunda.bpm.pa.demo;
 
+import java.util.Collections;
+import java.util.Map;
+import java.util.HashMap;
 import java.util.logging.Logger;
 
 import org.camunda.bpm.engine.AuthorizationService;
+import org.camunda.bpm.engine.FilterService;
 import org.camunda.bpm.engine.ProcessEngine;
 import static org.camunda.bpm.engine.authorization.Authorization.*;
 import static org.camunda.bpm.engine.authorization.Permissions.*;
 import static org.camunda.bpm.engine.authorization.Resources.*;
 
+import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.User;
+import org.camunda.bpm.engine.task.TaskQuery;
+
+import org.camunda.bpm.engine.filter.Filter;
 
 /**
  * @author drobisch
@@ -148,5 +156,30 @@ public class InvoiceDemoDataGenerator {
       accMaryAuth.setResourceId("mary");
       accMaryAuth.addPermission(READ);
       authorizationService.saveAuthorization(accMaryAuth);
+
+      // Filter
+      FilterService filterService = engine.getFilterService();
+      Map<String, Object> properties = new HashMap<String, Object>();
+      properties.put("description", "Unfiltered Tasks");
+      properties.put("priority", 1);
+      Filter filter = filterService.newTaskFilter().setName("All Tasks").setProperties(properties);
+      filterService.saveFilter(filter);
+
+      TaskService taskService = engine.getTaskService();
+      TaskQuery query = taskService.createTaskQuery().taskAssignee("jonny1");
+      properties.clear();
+      properties.put("description", "Tasks assigned to me");
+      properties.put("priority", -10);
+      filter = filterService.newTaskFilter().setName("My Tasks").setProperties(properties).setQuery(query);
+      filterService.saveFilter(filter);
+
+      query = taskService.createTaskQuery().taskCandidateGroup("accounting");
+      properties.clear();
+      properties.put("description", "Tasks assigned to group accounting");
+      properties.put("priority", 5);
+      properties.put("color", "#3e4d2f");
+      filter = filterService.newTaskFilter().setName("Accounting Tasks").setProperties(properties).setQuery(query);
+      filterService.saveFilter(filter);
+
     }
 }
