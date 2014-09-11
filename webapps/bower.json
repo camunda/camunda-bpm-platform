@@ -39,8 +39,7 @@
     "hyperagent": "*",
     "jquery": "2.1.1",
     "requirejs-domready": "2.0.1",
-    "bpmn-js": "~0.4.1",
-    "camunda-bpm-sdk-js": "camunda/bower-camunda-bpm-sdk-js#7.2.0-SNAPSHOT"
+    "bpmn-js": "~0.4.1"
   },
   "devDependencies": {
     "jquery-mockjax": "1.5.3",
