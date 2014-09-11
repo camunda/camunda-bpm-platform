@@ -44,6 +44,7 @@ public class DeploymentEntity implements Serializable, Deployment, DbEntity {
    * Will be null otherwise.
    */
   protected Map<Class<?>, List<Object>> deployedArtifacts;
+  protected Map<Class<?>, List<Object>> notdeployedARtifacts;
 
   public ResourceEntity getResource(String resourceName) {
     return getResources().get(resourceName);

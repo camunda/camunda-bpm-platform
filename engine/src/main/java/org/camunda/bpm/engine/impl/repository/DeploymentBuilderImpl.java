@@ -43,6 +43,7 @@ public class DeploymentBuilderImpl implements DeploymentBuilder, Serializable {
   protected transient RepositoryServiceImpl repositoryService;
   protected DeploymentEntity deployment = new DeploymentEntity();
   protected boolean isDuplicateFilterEnabled = false;
+  protected boolean deployAllOnSingleChange = true;
   protected Date processDefinitionsActivationDate;
 
   public DeploymentBuilderImpl(RepositoryServiceImpl repositoryService) {
@@ -106,7 +107,12 @@ public class DeploymentBuilderImpl implements DeploymentBuilder, Serializable {
   }
 
   public DeploymentBuilder enableDuplicateFiltering() {
+    return enableDuplicateFiltering(true);
+  }
+
+  public DeploymentBuilder enableDuplicateFiltering(boolean deployAllOnSingleChange) {
     this.isDuplicateFilterEnabled = true;
+    this.deployAllOnSingleChange = deployAllOnSingleChange;
     return this;
   }
 
@@ -134,6 +140,9 @@ public class DeploymentBuilderImpl implements DeploymentBuilder, Serializable {
   }
   public boolean isDuplicateFilterEnabled() {
     return isDuplicateFilterEnabled;
+  }
+  public boolean isDeployAllOnSingleChange() {
+    return deployAllOnSingleChange;
   }
   public Date getProcessDefinitionsActivationDate() {
     return processDefinitionsActivationDate;

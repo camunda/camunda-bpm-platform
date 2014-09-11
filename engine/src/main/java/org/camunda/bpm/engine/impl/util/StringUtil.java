@@ -45,4 +45,14 @@ public final class StringUtil {
     }
   }
 
+  public static boolean hasAnySuffix(String text, String[] suffixes) {
+    for (String suffix : suffixes) {
+      if (text.endsWith(suffix)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
 }
