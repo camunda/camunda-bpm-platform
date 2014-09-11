@@ -57,7 +57,7 @@
     <version.db2.97>9.7</version.db2.97>
     <version.postgre>9.3-1100-jdbc4</version.postgre>
 
-    <version.camunda.commons>1.0.0</version.camunda.commons>
+    <version.camunda.commons>1.0.4</version.camunda.commons>
     <version.camunda.connect>1.0.0-alpha2</version.camunda.connect>
     <version.camunda.spin>1.0.0-alpha2</version.camunda.spin>
     <version.camunda.template-engines>1.0.0</version.camunda.template-engines>
