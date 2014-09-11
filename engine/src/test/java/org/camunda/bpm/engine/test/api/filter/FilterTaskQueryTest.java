@@ -18,6 +18,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.filter.Filter;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.User;
@@ -449,6 +450,29 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
     count = filterService.count(filter.getId(), extendingQueryJson);
 
     assertEquals(1, count);
+  }
+
+  public void testSpecialExtendingQuery() {
+    TaskQuery query = taskService.createTaskQuery();
+
+    saveQuery(query);
+
+    long count = filterService.count(filter.getId(), (String) null);
+    assertEquals(3, count);
+
+    count = filterService.count(filter.getId(), (Query) null);
+    assertEquals(3, count);
+
+    count = filterService.count(filter.getId(), "");
+    assertEquals(3, count);
+
+    try {
+      filterService.count(filter.getId(), "abc");
+      fail("Exception expected");
+    }
+    catch (NotValidException e) {
+      // expected
+    }
   }
 
   protected void saveQuery(Query query) {
