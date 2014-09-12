@@ -137,17 +137,12 @@ public class FilterServiceTest extends PluggableProcessEngineTestCase {
     TaskQuery extendingQuery = taskService.createTaskQuery()
       .taskName("newName")
       .taskOwner("newOwner");
-    filter.extend(extendingQuery);
+    Filter newFilter = filter.extend(extendingQuery);
+    assertNull(newFilter.getId());
 
-    TaskQueryImpl filterQuery = filter.getTypeQuery();
+    TaskQueryImpl filterQuery = newFilter.getTypeQuery();
     assertEquals("newName", filterQuery.getName());
     assertEquals("newOwner", filterQuery.getOwner());
-
-    filterService.saveFilter(filter);
-
-    Filter filter2 = filterService.getFilter(filter.getId());
-
-    compareFilter(filter, filter2);
   }
 
   public void testQueryFilter() {

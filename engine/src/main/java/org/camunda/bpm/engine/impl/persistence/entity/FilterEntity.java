@@ -157,10 +157,11 @@ public class FilterEntity implements Filter, Serializable, DbEntity {
       queryJson.put(key, extendingQuery.get(key));
     }
 
-    // save merged query
-    setQuery(queryJson.toString());
+    // create copy of the filter with the new query
+    Filter copy = copyFilter();
+    copy.setQuery(queryJson.toString());
 
-    return this;
+    return copy;
   }
 
   public String getProperties() {
@@ -229,6 +230,16 @@ public class FilterEntity implements Filter, Serializable, DbEntity {
     else {
       throw new ProcessEngineException("Unsupported resource type '" + resourceType + "'");
     }
+  }
+
+  protected Filter copyFilter() {
+    FilterEntity copy = new FilterEntity();
+    copy.setResourceType(getResourceType());
+    copy.setName(getName());
+    copy.setOwner(getOwner());
+    copy.setQuery(getQuery());
+    copy.setProperties(getProperties());
+    return copy;
   }
 
 }

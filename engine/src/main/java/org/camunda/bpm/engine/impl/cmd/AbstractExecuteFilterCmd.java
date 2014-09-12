@@ -56,13 +56,14 @@ public abstract class AbstractExecuteFilterCmd implements Serializable {
     ensureNotNull("No filter found for id '" + filterId + "'", "filter", filter);
 
     if (extendingQuery != null) {
-      filter.extend(extendingQuery);
+      return filter.extend(extendingQuery);
     }
     else if (extendingQueryJson != null && !extendingQueryJson.isEmpty()) {
-      filter.extend(extendingQueryJson);
+      return filter.extend(extendingQueryJson);
     }
-
-    return filter;
+    else {
+      return filter;
+    }
   }
 
 }

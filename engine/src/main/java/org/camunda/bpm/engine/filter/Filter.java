@@ -86,7 +86,7 @@ public interface Filter {
    * and if the filter is saved the query is updated.
    *
    * @param extendingQuery the query to extend the filter with
-   * @return this filter
+   * @return a copy of this filter with the extended query
    */
   <T extends Query> Filter extend(T extendingQuery);
 
@@ -95,7 +95,7 @@ public interface Filter {
    * and if the filter is saved the query is updated.
    *
    * @param extendingQuery the query to extend the filter with
-   * @return this filter
+   * @return a copy of this filter with the extended query
    */
   <T extends Query> Filter extend(String extendingQuery);
 
