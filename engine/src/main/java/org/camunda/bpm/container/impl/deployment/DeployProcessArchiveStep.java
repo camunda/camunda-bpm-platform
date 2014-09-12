@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.container.impl.deployment;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.net.URL;
@@ -21,14 +23,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
+
 import org.camunda.bpm.application.AbstractProcessApplication;
 import org.camunda.bpm.application.impl.metadata.spi.ProcessArchiveXml;
 import org.camunda.bpm.container.impl.deployment.scanning.ProcessApplicationScanningUtil;
 import org.camunda.bpm.container.impl.deployment.util.DeployedProcessArchive;
 import org.camunda.bpm.container.impl.metadata.PropertyHelper;
-import org.camunda.bpm.container.impl.spi.PlatformServiceContainer;
 import org.camunda.bpm.container.impl.spi.DeploymentOperation;
 import org.camunda.bpm.container.impl.spi.DeploymentOperationStep;
+import org.camunda.bpm.container.impl.spi.PlatformServiceContainer;
 import org.camunda.bpm.container.impl.spi.ServiceTypes;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RepositoryService;
@@ -36,8 +39,6 @@ import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.impl.util.StringUtil;
 import org.camunda.bpm.engine.repository.ProcessApplicationDeployment;
 import org.camunda.bpm.engine.repository.ProcessApplicationDeploymentBuilder;
-
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 
 /**
@@ -89,7 +90,7 @@ public class DeployProcessArchiveStep extends DeploymentOperationStep {
     if(PropertyHelper.getBooleanProperty(processArchive.getProperties(), ProcessArchiveXml.PROP_IS_SCAN_FOR_PROCESS_DEFINITIONS, true)) {
       String paResourceRoot = processArchive.getProperties().get(ProcessArchiveXml.PROP_RESOURCE_ROOT_PATH);
       String[] additionalResourceSuffixes = StringUtil.split(processArchive.getProperties().get(ProcessArchiveXml.PROP_ADDITIONAL_RESOURCE_SUFFIXES), ProcessArchiveXml.PROP_ADDITIONAL_RESOURCE_SUFFIXES_SEPARATOR);
-      deploymentMap.putAll(ProcessApplicationScanningUtil.findResources(processApplicationClassloader, paResourceRoot, metaFileUrl, additionalResourceSuffixes));
+      deploymentMap.putAll(findResources(processApplicationClassloader, paResourceRoot, additionalResourceSuffixes));
     }
 
     // perform process engine deployment
@@ -138,6 +139,10 @@ public class DeployProcessArchiveStep extends DeploymentOperationStep {
       LOGGER.info("Not creating a deployment for process archive '" + processArchive.getName() + "': no resources provided.");
 
     }
+  }
+
+  protected Map<String, byte[]> findResources(final ClassLoader processApplicationClassloader, String paResourceRoot, String[] additionalResourceSuffixes) {
+    return ProcessApplicationScanningUtil.findResources(processApplicationClassloader, paResourceRoot, metaFileUrl, additionalResourceSuffixes);
   }
 
   protected void logDeploymentSummary(Collection<String> deploymentResourceNames, String deploymentName) {

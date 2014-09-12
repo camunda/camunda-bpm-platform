@@ -24,11 +24,14 @@ import org.camunda.bpm.container.impl.spi.DeploymentOperation;
 import org.camunda.bpm.container.impl.spi.DeploymentOperationStep;
 
 /**
- * <p>Deployment step responsible for creating individual {@link DeployProcessArchiveStep}
- * instances for each process archive configured in the META-INF/processes.xml file.</p>
- *
+ * <p>
+ * Deployment step responsible for creating individual
+ * {@link DeployProcessArchiveStep} instances for each process archive
+ * configured in the META-INF/processes.xml file.
+ * </p>
+ * 
  * @author Daniel Meyer
- *
+ * 
  */
 public class DeployProcessArchivesStep extends DeploymentOperationStep {
 
@@ -43,8 +46,12 @@ public class DeployProcessArchivesStep extends DeploymentOperationStep {
     for (Entry<URL, ProcessesXml> processesXml : processesXmls.entrySet()) {
       for (ProcessArchiveXml processArchive : processesXml.getValue().getProcessArchives()) {
         // for each process archive add an individual operation step
-        operationContext.addStep(new DeployProcessArchiveStep(processArchive, processesXml.getKey()));
+        operationContext.addStep(createDeployProcessArchiveStep(processArchive, processesXml.getKey()));
       }
     }
+  }
+
+  protected DeployProcessArchiveStep createDeployProcessArchiveStep(ProcessArchiveXml parsedProcessArchive, URL url) {
+    return new DeployProcessArchiveStep(parsedProcessArchive, url);
   }
 }
