@@ -17,7 +17,10 @@ import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.HasDbReferences;
 import org.camunda.bpm.engine.impl.db.HasDbRevision;
 import org.camunda.bpm.engine.impl.db.DbEntity;
+import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
+import org.camunda.bpm.engine.impl.history.event.HistoryEventType;
+import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
 import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
 import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
@@ -150,7 +153,7 @@ public class IncidentEntity implements Incident, DbEntity, HasDbRevision, HasDbR
       .getDbEntityManager()
       .insert(incident);
 
-    incident.fireHistoricIncidentEvent(HistoryEvent.INCIDENT_CREATE);
+    incident.fireHistoricIncidentEvent(HistoryEventTypes.INCIDENT_CREATE);
   }
 
   public void delete() {
@@ -195,27 +198,27 @@ public class IncidentEntity implements Incident, DbEntity, HasDbRevision, HasDbR
       .delete(this);
 
     // update historic incident
-    String eventType = resolved ? HistoryEvent.INCIDENT_RESOLVE : HistoryEvent.INCIDENT_DELETE;
+    HistoryEventType eventType = resolved ? HistoryEventTypes.INCIDENT_RESOLVE : HistoryEventTypes.INCIDENT_DELETE;
     fireHistoricIncidentEvent(eventType);
   }
 
-  protected void fireHistoricIncidentEvent(String eventType) {
+  protected void fireHistoricIncidentEvent(HistoryEventType eventType) {
     ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
 
-    int historyLevel = processEngineConfiguration.getHistoryLevel();
-    if (historyLevel >= ProcessEngineConfigurationImpl.HISTORYLEVEL_FULL) {
+    HistoryLevel historyLevel = processEngineConfiguration.getHistoryLevel();
+    if(historyLevel.isHistoryEventProduced(eventType, this)) {
 
       final HistoryEventProducer eventProducer = processEngineConfiguration.getHistoryEventProducer();
       final HistoryEventHandler eventHandler = processEngineConfiguration.getHistoryEventHandler();
 
       HistoryEvent event = null;
-      if (HistoryEvent.INCIDENT_CREATE.equals(eventType)) {
+      if (HistoryEvent.INCIDENT_CREATE.equals(eventType.getEventName())) {
         event = eventProducer.createHistoricIncidentCreateEvt(this);
 
-      } else if (HistoryEvent.INCIDENT_RESOLVE.equals(eventType)) {
+      } else if (HistoryEvent.INCIDENT_RESOLVE.equals(eventType.getEventName())) {
         event = eventProducer.createHistoricIncidentResolveEvt(this);
 
-      } else if (HistoryEvent.INCIDENT_DELETE.equals(eventType)) {
+      } else if (HistoryEvent.INCIDENT_DELETE.equals(eventType.getEventName())) {
         event = eventProducer.createHistoricIncidentDeleteEvt(this);
 
       } else {

@@ -12,16 +12,15 @@
  */
 package org.camunda.bpm.engine.test.bpmn.async;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import org.camunda.bpm.engine.history.*;
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
+import org.camunda.bpm.engine.history.HistoricVariableInstanceQuery;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
-import org.camunda.bpm.engine.runtime.*;
-import org.camunda.bpm.engine.task.Task;
+import org.camunda.bpm.engine.runtime.Job;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 import org.junit.Assert;
 
@@ -60,7 +59,7 @@ public class AsyncEndEventTest extends PluggableProcessEngineTestCase {
     count = runtimeService.createProcessInstanceQuery().processInstanceId(pi.getId()).active().count();
     Assert.assertEquals(0, count);
 
-    if(processEngineConfiguration.getHistoryLevel() > ProcessEngineConfigurationImpl.HISTORYLEVEL_ACTIVITY) {
+    if(processEngineConfiguration.getHistoryLevel().getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_ACTIVITY) {
 
       // after the end event we have a event listener
       HistoricVariableInstanceQuery name = historyService.createHistoricVariableInstanceQuery()
@@ -90,7 +89,7 @@ public class AsyncEndEventTest extends PluggableProcessEngineTestCase {
     // assert that we have finished our instance now
     assertEquals(0, runtimeService.createProcessInstanceQuery().count());
 
-    if(processEngineConfiguration.getHistoryLevel() > ProcessEngineConfigurationImpl.HISTORYLEVEL_ACTIVITY) {
+    if(processEngineConfiguration.getHistoryLevel().getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_ACTIVITY) {
 
       // after the end event we have a event listener
       HistoricVariableInstanceQuery name = historyService.createHistoricVariableInstanceQuery()

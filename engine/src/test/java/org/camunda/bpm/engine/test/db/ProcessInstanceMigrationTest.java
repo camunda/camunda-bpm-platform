@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.test.db;
 
 import java.util.List;
 
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -188,7 +189,7 @@ public class ProcessInstanceMigrationTest extends PluggableProcessEngineTestCase
     assertEquals(newProcessDefinition.getId(), pi.getProcessDefinitionId());
 
     // check history
-    if (processEngineConfiguration.getHistoryLevel() > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
+    if (processEngineConfiguration.getHistoryLevel().getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
       HistoricProcessInstance historicPI = historyService
         .createHistoricProcessInstanceQuery()
         .processInstanceId(pi.getId())

@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.test.bpmn.event.link;
 import java.util.Arrays;
 import java.util.List;
 
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
@@ -45,7 +46,7 @@ public class LinkEventTest extends PluggableProcessEngineTestCase {
     assertProcessEnded(pi.getId());
 
     // validate history
-    if(processEngineConfiguration.getHistoryLevel() >= ProcessEngineConfigurationImpl.HISTORYLEVEL_ACTIVITY) {
+    if(processEngineConfiguration.getHistoryLevel().getId() >= ProcessEngineConfigurationImpl.HISTORYLEVEL_ACTIVITY) {
       List<HistoricActivityInstance> activities = historyService.createHistoricActivityInstanceQuery().processInstanceId(pi.getId()).orderByActivityId().asc().list();
       assertEquals(4, activities.size());
       assertEquals("EndEvent_1", activities.get(0).getActivityId());
@@ -67,7 +68,7 @@ public class LinkEventTest extends PluggableProcessEngineTestCase {
     runtimeService.deleteProcessInstance(pi.getId(), "test done");
 
     // validate history
-    if(processEngineConfiguration.getHistoryLevel() >= ProcessEngineConfigurationImpl.HISTORYLEVEL_ACTIVITY) {
+    if(processEngineConfiguration.getHistoryLevel().getId() >= ProcessEngineConfigurationImpl.HISTORYLEVEL_ACTIVITY) {
       List<HistoricActivityInstance> activities = historyService.createHistoricActivityInstanceQuery().processInstanceId(pi.getId()).orderByActivityId().asc().list();
       assertEquals(5, activities.size());
       assertEquals("ManualTask_1", activities.get(0).getActivityId());

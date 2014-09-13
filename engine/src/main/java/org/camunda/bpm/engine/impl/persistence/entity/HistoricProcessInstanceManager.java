@@ -20,7 +20,6 @@ import java.util.Map;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.impl.HistoricProcessInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.Page;
-import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.history.event.HistoricProcessInstanceEventEntity;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -40,7 +39,7 @@ public class HistoricProcessInstanceManager extends AbstractHistoricManager {
   }
 
   public HistoricProcessInstanceEventEntity findHistoricProcessInstanceEvent(String eventId) {
-    if (historyLevel>ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
+    if (isHistoryEnabled()) {
       return getDbEntityManager().selectById(HistoricProcessInstanceEventEntity.class, eventId);
     }
     return null;

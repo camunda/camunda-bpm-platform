@@ -18,7 +18,6 @@ import java.util.List;
 import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.impl.HistoricDetailQueryImpl;
 import org.camunda.bpm.engine.impl.Page;
-import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.history.event.HistoricDetailEventEntity;
 import org.camunda.bpm.engine.impl.persistence.AbstractHistoricManager;
 
@@ -28,9 +27,8 @@ import org.camunda.bpm.engine.impl.persistence.AbstractHistoricManager;
  */
 public class HistoricDetailManager extends AbstractHistoricManager {
 
-  @SuppressWarnings("unchecked")
   public void deleteHistoricDetailsByProcessInstanceId(String historicProcessInstanceId) {
-    if (historyLevel>=ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT) {
+    if (isHistoryEnabled()) {
       getDbEntityManager().delete(ByteArrayEntity.class, "deleteHistoricDetailsByProcessInstanceId_byteArray", historicProcessInstanceId);
       getDbEntityManager().delete(HistoricDetailEventEntity.class, "deleteHistoricDetailsByProcessInstanceId", historicProcessInstanceId);
     }
@@ -46,7 +44,7 @@ public class HistoricDetailManager extends AbstractHistoricManager {
   }
 
   public void deleteHistoricDetailsByTaskId(String taskId) {
-    if (historyLevel >= ProcessEngineConfigurationImpl.HISTORYLEVEL_FULL) {
+    if (isHistoryEnabled()) {
       getDbEntityManager().delete(ByteArrayEntity.class, "deleteHistoricDetailsByTaskId_byteArray", taskId);
       getDbEntityManager().delete(HistoricDetailEventEntity.class, "deleteHistoricDetailsByTaskId", taskId);
     }

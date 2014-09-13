@@ -129,6 +129,7 @@ import org.camunda.bpm.engine.impl.form.validator.MinLengthValidator;
 import org.camunda.bpm.engine.impl.form.validator.MinValidator;
 import org.camunda.bpm.engine.impl.form.validator.ReadOnlyValidator;
 import org.camunda.bpm.engine.impl.form.validator.RequiredValidator;
+import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.history.handler.DbHistoryEventHandler;
 import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
 import org.camunda.bpm.engine.impl.history.parser.HistoryParseListener;
@@ -238,10 +239,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   public static final String DB_SCHEMA_UPDATE_CREATE = "create";
   public static final String DB_SCHEMA_UPDATE_DROP_CREATE = "drop-create";
 
-  public static final int HISTORYLEVEL_NONE = 0;
-  public static final int HISTORYLEVEL_ACTIVITY = 1;
-  public static final int HISTORYLEVEL_AUDIT = 2;
-  public static final int HISTORYLEVEL_FULL = 3;
+  public static final int HISTORYLEVEL_NONE = HistoryLevel.HISTORY_LEVEL_NONE.getId();
+  public static final int HISTORYLEVEL_ACTIVITY = HistoryLevel.HISTORY_LEVEL_ACTIVITY.getId();
+  public static final int HISTORYLEVEL_AUDIT = HistoryLevel.HISTORY_LEVEL_AUDIT.getId();
+  public static final int HISTORYLEVEL_FULL = HistoryLevel.HISTORY_LEVEL_FULL.getId();
 
   public static final String DEFAULT_WS_SYNC_FACTORY = "org.camunda.bpm.engine.impl.webservice.CxfWebServiceClientFactory";
 
@@ -357,7 +358,13 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected CmmnTransformFactory cmmnTransformFactory;
   protected DefaultCmmnElementHandlerRegistry cmmnElementHandlerRegistry;
 
-  protected int historyLevel;
+  protected HistoryLevel historyLevel;
+
+  /** a list of supported history levels */
+  protected List<HistoryLevel> historyLevels;
+
+  /** a list of supported custom history levels */
+  protected List<HistoryLevel> customHistoryLevels;
 
   protected List<BpmnParseListener> preParseListeners;
   protected List<BpmnParseListener> postParseListeners;
@@ -964,7 +971,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected List<BpmnParseListener> getDefaultBPMNParseListeners() {
     List<BpmnParseListener> defaultListeners = new ArrayList<BpmnParseListener>();
-    if (historyLevel>=ProcessEngineConfigurationImpl.HISTORYLEVEL_ACTIVITY) {
+    if (!historyLevel.equals(HistoryLevel.HISTORY_LEVEL_NONE)) {
       defaultListeners.add(new HistoryParseListener(historyLevel, historyEventProducer));
     }
     return defaultListeners;
@@ -1052,21 +1059,37 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   // history //////////////////////////////////////////////////////////////////
 
   public void initHistoryLevel() {
-    if (HISTORY_NONE.equalsIgnoreCase(history)) {
-      historyLevel = 0;
-    } else if (HISTORY_ACTIVITY.equalsIgnoreCase(history)) {
-      historyLevel = 1;
-    } else if (HISTORY_VARIABLE.equalsIgnoreCase(history)) {
-      historyLevel = 1;
-      log.warning("Using deprecated history level 'variable'. " +
-      		"This history level is deprecated and replaced by 'activity'. " +
-      		"Consider using 'ACTIVITY' instead.");
-    } else if (HISTORY_AUDIT.equalsIgnoreCase(history)) {
-      historyLevel = 2;
-    } else if (HISTORY_FULL.equalsIgnoreCase(history)) {
-      historyLevel = 3;
-    } else {
-      throw new ProcessEngineException("invalid history level: "+history);
+    if(historyLevel == null) {
+      if(historyLevels == null) {
+        historyLevels = new ArrayList<HistoryLevel>();
+        historyLevels.add(HistoryLevel.HISTORY_LEVEL_NONE);
+        historyLevels.add(HistoryLevel.HISTORY_LEVEL_ACTIVITY);
+        historyLevels.add(HistoryLevel.HISTORY_LEVEL_AUDIT);
+        historyLevels.add(HistoryLevel.HISTORY_LEVEL_FULL);
+      }
+
+      if(customHistoryLevels != null) {
+        historyLevels.addAll(customHistoryLevels);
+      }
+
+      if(HISTORY_VARIABLE.equalsIgnoreCase(history)) {
+        historyLevel = HistoryLevel.HISTORY_LEVEL_ACTIVITY;
+        log.warning("Using deprecated history level 'variable'. " +
+            "This history level is deprecated and replaced by 'activity'. " +
+            "Consider using 'ACTIVITY' instead.");
+
+      } else {
+        for (HistoryLevel historyLevel : historyLevels) {
+          if(historyLevel.getName().equalsIgnoreCase(history)) {
+            this.historyLevel = historyLevel;
+          }
+        }
+
+      }
+
+      if(historyLevel == null) {
+        throw new ProcessEngineException("invalid history level: "+history);
+      }
     }
   }
 
@@ -1405,11 +1428,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     return processEngineName;
   }
 
-  public int getHistoryLevel() {
+  public HistoryLevel getHistoryLevel() {
     return historyLevel;
   }
 
-  public void setHistoryLevel(int historyLevel) {
+  public void setHistoryLevel(HistoryLevel historyLevel) {
     this.historyLevel = historyLevel;
   }
 
@@ -2424,6 +2447,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   public ProcessEngineConfigurationImpl setDbEntityCacheKeyMapping(DbEntityCacheKeyMapping dbEntityCacheKeyMapping) {
     this.dbEntityCacheKeyMapping = dbEntityCacheKeyMapping;
     return this;
+  }
+
+  public ProcessEngineConfigurationImpl setCustomHistoryLevels(List<HistoryLevel> customHistoryLevels) {
+    this.customHistoryLevels = customHistoryLevels;
+    return this;
+  }
+
+  public List<HistoryLevel> getCustomHistoryLevels() {
+    return customHistoryLevels;
   }
 
 }

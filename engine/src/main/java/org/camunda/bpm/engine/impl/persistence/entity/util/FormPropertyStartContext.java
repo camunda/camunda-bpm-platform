@@ -19,7 +19,9 @@ import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.form.StartFormHelper;
 import org.camunda.bpm.engine.impl.form.handler.DefaultStartFormHandler;
 import org.camunda.bpm.engine.impl.form.handler.StartFormHandler;
+import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
+import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
 import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
 import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
@@ -48,7 +50,6 @@ public class FormPropertyStartContext extends HistoryAwareStartContext {
   }
 
   public void initialStarted(PvmExecutionImpl execution) {
-
     StartFormHelper.initFormPropertiesOnScope(formProperties, execution);
 
     // make sure create events are fired after form is submitted

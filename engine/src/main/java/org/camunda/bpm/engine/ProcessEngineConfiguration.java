@@ -21,6 +21,7 @@ import org.camunda.bpm.engine.impl.cfg.BeansConfigurationHelper;
 import org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.cfg.StandaloneProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
+import org.camunda.bpm.engine.impl.history.HistoryLevel;
 
 
 /** Configuration information from which a process engine can be build.
@@ -77,36 +78,52 @@ import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
  */
 public abstract class ProcessEngineConfiguration {
 
-  /** Checks the version of the DB schema against the library when
+  /**
+   * Checks the version of the DB schema against the library when
    * the process engine is being created and throws an exception
-   * if the versions don't match. */
+   * if the versions don't match.
+   */
   public static final String DB_SCHEMA_UPDATE_FALSE = "false";
 
-  /** Creates the schema when the process engine is being created and
-   * drops the schema when the process engine is being closed. */
+  /**
+   * Creates the schema when the process engine is being created and
+   * drops the schema when the process engine is being closed.
+   */
   public static final String DB_SCHEMA_UPDATE_CREATE_DROP = "create-drop";
 
-  /** Upon building of the process engine, a check is performed and
-   * an update of the schema is performed if it is necessary. */
+  /**
+   * Upon building of the process engine, a check is performed and
+   * an update of the schema is performed if it is necessary.
+   */
   public static final String DB_SCHEMA_UPDATE_TRUE = "true";
 
-  /** Value for {@link #setHistory(String)} to ensure that no history is being recorded. */
-  public static final String HISTORY_NONE = "none";
-  /** Value for {@link #setHistory(String)} to ensure that only historic process instances and
+  /**
+   * Value for {@link #setHistory(String)} to ensure that no history is being recorded.
+   */
+  public static final String HISTORY_NONE = HistoryLevel.HISTORY_LEVEL_NONE.getName();
+  /**
+   * Value for {@link #setHistory(String)} to ensure that only historic process instances and
    * historic activity instances are being recorded.
-   * This means no details for those entities. */
-  public static final String HISTORY_ACTIVITY = "activity";
-  /** Value for {@link #setHistory(String)} to ensure that only historic process instances,
+   * This means no details for those entities.
+   */
+  public static final String HISTORY_ACTIVITY = HistoryLevel.HISTORY_LEVEL_ACTIVITY.getName();
+  /**
+   * Value for {@link #setHistory(String)} to ensure that only historic process instances,
    * historic activity instances and last process variable values are being recorded.
-   * <p><strong>NOTE:</strong> This history level has been deprecated. Use level {@link #HISTORY_ACTIVITY} instead.</p> */
+   * <p><strong>NOTE:</strong> This history level has been deprecated. Use level {@link #HISTORY_ACTIVITY} instead.</p>
+   */
   @Deprecated
   public static final String HISTORY_VARIABLE = "variable";
-  /** Value for {@link #setHistory(String)} to ensure that only historic process instances,
-   * historic activity instances and submitted form property values are being recorded. */
-  public static final String HISTORY_AUDIT = "audit";
-  /** Value for {@link #setHistory(String)} to ensure that all historic information is
-   * being recorded, including the variable updates. */
-  public static final String HISTORY_FULL = "full";
+  /**
+   * Value for {@link #setHistory(String)} to ensure that only historic process instances,
+   * historic activity instances and submitted form property values are being recorded.
+   */
+  public static final String HISTORY_AUDIT = HistoryLevel.HISTORY_LEVEL_AUDIT.getName();
+  /**
+   * Value for {@link #setHistory(String)} to ensure that all historic information is
+   * being recorded, including the variable updates.
+   */
+  public static final String HISTORY_FULL = HistoryLevel.HISTORY_LEVEL_FULL.getName();
 
   protected String processEngineName = ProcessEngines.NAME_DEFAULT;
   protected int idBlockSize = 100;
@@ -149,11 +166,15 @@ public abstract class ProcessEngineConfiguration {
 
   protected boolean createIncidentOnFailedJobEnabled = true;
 
-  /** switch for controlling whether the process engine performs authorization checks.
-   * The default value is false. */
+  /**
+   * switch for controlling whether the process engine performs authorization checks.
+   * The default value is false.
+   */
   protected boolean authorizationEnabled = false;
 
-  /** use one of the static createXxxx methods instead */
+  /**
+   * use one of the static createXxxx methods instead
+   */
   protected ProcessEngineConfiguration() {
   }
 
@@ -400,7 +421,7 @@ public abstract class ProcessEngineConfiguration {
   }
 
   public String getJdbcPingQuery() {
-      return jdbcPingQuery;
+    return jdbcPingQuery;
   }
 
   public ProcessEngineConfiguration setJdbcPingQuery(String jdbcPingQuery) {
@@ -409,7 +430,7 @@ public abstract class ProcessEngineConfiguration {
   }
 
   public int getJdbcPingConnectionNotUsedFor() {
-      return jdbcPingConnectionNotUsedFor;
+    return jdbcPingConnectionNotUsedFor;
   }
 
   public ProcessEngineConfiguration setJdbcPingConnectionNotUsedFor(int jdbcPingNotUsedFor) {

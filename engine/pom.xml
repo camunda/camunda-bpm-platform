@@ -460,6 +460,7 @@
                 <exclude>**/OperationLog*.java</exclude>
                 <exclude>**/HistoricIncident*Test.java</exclude>
                 <exclude>**/HistoricVariableDataFormatTest.java</exclude>
+                <exclude>**/HistoricVariableInstanceScopeTest.java</exclude>
               </excludes>
             </configuration>
           </plugin>

@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
@@ -170,8 +171,8 @@ public class BoundaryErrorEventTest extends PluggableProcessEngineTestCase {
     assertProcessEnded(procId);
 
     HistoricProcessInstance hip;
-    int historyLevel = processEngineConfiguration.getHistoryLevel();
-    if (historyLevel>ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
+    int historyLevel = processEngineConfiguration.getHistoryLevel().getId();
+    if (historyLevel> ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
       hip = historyService.createHistoricProcessInstanceQuery().processInstanceId(procId).singleResult();
       assertEquals("processEnd1", hip.getEndActivityId());
     }
@@ -180,7 +181,7 @@ public class BoundaryErrorEventTest extends PluggableProcessEngineTestCase {
             CollectionUtil.singletonMap("input", 1)).getId();
     assertProcessEnded(procId);
 
-    if (historyLevel>ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
+    if (historyLevel> ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
       hip = historyService.createHistoricProcessInstanceQuery().processInstanceId(procId).singleResult();
       assertEquals("processEnd1", hip.getEndActivityId());
     }

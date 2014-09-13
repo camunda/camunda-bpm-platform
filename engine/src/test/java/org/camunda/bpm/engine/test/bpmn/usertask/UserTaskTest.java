@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.test.bpmn.usertask;
 
 import java.util.List;
 
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -46,7 +47,7 @@ public class UserTaskTest extends PluggableProcessEngineTestCase {
     assertNotNull(task.getCreateTime());
 
     // the next test verifies that if an execution creates a task, that no events are created during creation of the task.
-    if (processEngineConfiguration.getHistoryLevel() >= ProcessEngineConfigurationImpl.HISTORYLEVEL_ACTIVITY) {
+    if (processEngineConfiguration.getHistoryLevel().getId() >= ProcessEngineConfigurationImpl.HISTORYLEVEL_ACTIVITY) {
       assertEquals(0, taskService.getTaskEvents(task.getId()).size());
     }
   }

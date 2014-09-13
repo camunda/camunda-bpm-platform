@@ -575,7 +575,7 @@ public class ManagementServiceTest extends PluggableProcessEngineTestCase {
 
   public void testGetHistoryLevel() {
     int historyLevel = managementService.getHistoryLevel();
-    assertEquals(processEngineConfiguration.getHistoryLevel(), historyLevel);
+    assertEquals(processEngineConfiguration.getHistoryLevel().getId(), historyLevel);
   }
 
 }

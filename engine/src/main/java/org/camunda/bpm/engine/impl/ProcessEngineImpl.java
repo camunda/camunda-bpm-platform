@@ -14,10 +14,12 @@ package org.camunda.bpm.engine.impl;
 
 import java.util.Map;
 import java.util.logging.Logger;
+
 import org.camunda.bpm.engine.*;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.TransactionContextFactory;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
+import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.interceptor.SessionFactory;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
@@ -46,7 +48,7 @@ public class ProcessEngineImpl implements ProcessEngine {
   protected CommandExecutor commandExecutorSchemaOperations;
   protected Map<Class<?>, SessionFactory> sessionFactories;
   protected ExpressionManager expressionManager;
-  protected int historyLevel;
+  protected HistoryLevel historyLevel;
   protected TransactionContextFactory transactionContextFactory;
   protected ProcessEngineConfigurationImpl processEngineConfiguration;
 
