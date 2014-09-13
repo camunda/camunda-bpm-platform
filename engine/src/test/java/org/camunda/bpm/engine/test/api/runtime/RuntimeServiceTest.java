@@ -27,7 +27,7 @@ import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.impl.RuntimeServiceImpl;
-import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.CollectionUtil;
@@ -534,7 +534,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
   }
 
   private void checkHistoricVariableUpdateEntity(String variableName, String processInstanceId) {
-    if (processEngineConfiguration.getHistoryLevel() == ProcessEngineConfigurationImpl.HISTORYLEVEL_FULL) {
+    if (processEngineConfiguration.getHistoryLevel().equals(HistoryLevel.HISTORY_LEVEL_FULL)) {
       boolean deletedVariableUpdateFound = false;
 
       List<HistoricDetail> resultSet = historyService.createHistoricDetailQuery().processInstanceId(processInstanceId).list();

@@ -19,7 +19,6 @@ import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.history.HistoricVariableInstanceQuery;
 import org.camunda.bpm.engine.impl.HistoricVariableInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.Page;
-import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.persistence.AbstractHistoricManager;
 
@@ -30,7 +29,7 @@ import org.camunda.bpm.engine.impl.persistence.AbstractHistoricManager;
 public class HistoricVariableInstanceManager extends AbstractHistoricManager {
 
   public void deleteHistoricVariableInstanceByProcessInstanceId(String historicProcessInstanceId) {
-    if (historyLevel >= ProcessEngineConfigurationImpl.HISTORYLEVEL_ACTIVITY) {
+    if (isHistoryEnabled()) {
 
       // delete entries in DB
       List<HistoricVariableInstance> historicProcessVariables = Context
@@ -72,7 +71,7 @@ public class HistoricVariableInstanceManager extends AbstractHistoricManager {
   }
 
   public void deleteHistoricVariableInstancesByTaskId(String taskId) {
-    if (historyLevel >= ProcessEngineConfigurationImpl.HISTORYLEVEL_ACTIVITY) {
+    if (isHistoryEnabled()) {
       HistoricVariableInstanceQuery historicProcessVariableQuery = new HistoricVariableInstanceQueryImpl().taskIdIn(taskId);
       List<HistoricVariableInstance> historicProcessVariables = historicProcessVariableQuery.list();
       for(HistoricVariableInstance historicProcessVariable : historicProcessVariables) {

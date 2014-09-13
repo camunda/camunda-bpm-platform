@@ -21,6 +21,7 @@ import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbBulkOperation;
 import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbEntityOperation;
 import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperation;
+import org.camunda.bpm.engine.impl.history.HistoryLevel;
 
 /**
  * @author Sebastian Menski
@@ -66,9 +67,9 @@ public abstract class AbstractPersistenceSession implements PersistenceSession {
   public void dbSchemaCreate() {
     ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
 
-    int configuredHistoryLevel = processEngineConfiguration.getHistoryLevel();
+    HistoryLevel configuredHistoryLevel = processEngineConfiguration.getHistoryLevel();
     if ( (!processEngineConfiguration.isDbHistoryUsed())
-         && (configuredHistoryLevel>ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE)
+         && (!configuredHistoryLevel.equals(HistoryLevel.HISTORY_LEVEL_NONE))
        ) {
       throw new ProcessEngineException("historyLevel config is higher then 'none' and dbHistoryUsed is set to false");
     }

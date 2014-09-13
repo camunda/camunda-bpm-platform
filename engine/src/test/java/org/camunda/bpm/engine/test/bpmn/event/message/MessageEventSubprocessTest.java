@@ -110,7 +110,7 @@ public class MessageEventSubprocessTest extends PluggableProcessEngineTestCase {
     assertEquals("taskInEventSubProcess-end", collectedEvents.get(6));
     assertEquals("eventSubProcess-end", collectedEvents.get(7));
 
-    if (processEngineConfiguration.getHistoryLevel() > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
+    if (processEngineConfiguration.getHistoryLevel().getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
       assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("taskInMainFlow").canceled().count());
       assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("startEventInSubProcess").finished().count());
       assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("taskInEventSubProcess").finished().count());
@@ -147,7 +147,7 @@ public class MessageEventSubprocessTest extends PluggableProcessEngineTestCase {
     assertEquals("taskInEventSubProcess-end", collectedEvents.get(6));
     assertEquals("eventSubProcess-end", collectedEvents.get(7));
 
-    if (processEngineConfiguration.getHistoryLevel() > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
+    if (processEngineConfiguration.getHistoryLevel().getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
       assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("startEventInSubProcess").finished().count());
       assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("taskInMainFlow").finished().count());
       assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("taskInEventSubProcess").finished().count());
@@ -179,7 +179,7 @@ public class MessageEventSubprocessTest extends PluggableProcessEngineTestCase {
     assertEquals("taskInEventSubProcess-end", collectedEvents.get(6));
     assertEquals("eventSubProcess-end", collectedEvents.get(7));
 
-    if (processEngineConfiguration.getHistoryLevel() > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
+    if (processEngineConfiguration.getHistoryLevel().getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
       assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("taskInMainFlow").canceled().count());
       assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("startEventInSubProcess").finished().count());
       assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("taskInEventSubProcess").finished().count());
@@ -217,7 +217,7 @@ public class MessageEventSubprocessTest extends PluggableProcessEngineTestCase {
     assertEquals("taskInEventSubProcess-end", collectedEvents.get(6));
     assertEquals("eventSubProcess-end", collectedEvents.get(7));
 
-    if (processEngineConfiguration.getHistoryLevel() > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
+    if (processEngineConfiguration.getHistoryLevel().getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
       assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("taskInMainFlow").finished().count());
       assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("startEventInSubProcess").finished().count());
       assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("taskInEventSubProcess").finished().count());
@@ -252,7 +252,7 @@ public class MessageEventSubprocessTest extends PluggableProcessEngineTestCase {
     assertEquals("taskInEventSubProcess-end", collectedEvents.get(6));
     assertEquals("eventSubProcess-end", collectedEvents.get(7));
 
-    if (processEngineConfiguration.getHistoryLevel() > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
+    if (processEngineConfiguration.getHistoryLevel().getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
       assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("taskInMainFlow").finished().count());
       assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("taskInMainFlow").canceled().count());
       assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("startEventInSubProcess").finished().count());

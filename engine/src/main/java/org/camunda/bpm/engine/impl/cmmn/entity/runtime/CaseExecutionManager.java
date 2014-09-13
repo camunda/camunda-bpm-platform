@@ -16,8 +16,8 @@ import java.util.List;
 
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.impl.Page;
-import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 import org.camunda.bpm.engine.runtime.CaseExecution;
@@ -47,11 +47,11 @@ public class CaseExecutionManager extends AbstractManager {
     }
 
     // TODO: move this later to HistoricCaseInstance
-    int historyLevel = Context
+    HistoryLevel historyLevel = Context
       .getProcessEngineConfiguration()
       .getHistoryLevel();
 
-    if (historyLevel > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
+    if (!historyLevel.equals(HistoryLevel.HISTORY_LEVEL_NONE)) {
       CommandContext commandContext = Context.getCommandContext();
 
       commandContext
@@ -84,11 +84,11 @@ public class CaseExecutionManager extends AbstractManager {
     execution.deleteCascade();
 
     // TODO: move this later to HistoricCaseInstance
-    int historyLevel = Context
+    HistoryLevel historyLevel = Context
       .getProcessEngineConfiguration()
       .getHistoryLevel();
 
-    if (historyLevel > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
+    if (!historyLevel.equals(HistoryLevel.HISTORY_LEVEL_NONE)) {
 
       commandContext
         .getHistoricTaskInstanceManager()

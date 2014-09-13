@@ -91,7 +91,7 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
       taskService.complete(taskService.createTaskQuery().singleResult().getId());
     }
     
-    if (processEngineConfiguration.getHistoryLevel() > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
+    if (processEngineConfiguration.getHistoryLevel().getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
       
       List<HistoricActivityInstance> historicActivityInstances = historyService.createHistoricActivityInstanceQuery().activityType("userTask").list();
       assertEquals(4, historicActivityInstances.size());
@@ -105,7 +105,7 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
       
     }
 
-    if (processEngineConfiguration.getHistoryLevel() > ProcessEngineConfigurationImpl.HISTORYLEVEL_ACTIVITY) {
+    if (processEngineConfiguration.getHistoryLevel().getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_ACTIVITY) {
 
       List<HistoricTaskInstance> historicTaskInstances = historyService.createHistoricTaskInstanceQuery().list();
       assertEquals(4, historicTaskInstances.size());
@@ -204,7 +204,7 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
     }
     
     // Validate history
-    if (processEngineConfiguration.getHistoryLevel() > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
+    if (processEngineConfiguration.getHistoryLevel().getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
       List<HistoricTaskInstance> historicTaskInstances = historyService.createHistoricTaskInstanceQuery().orderByTaskAssignee().asc().list();
       for (int i=0; i<historicTaskInstances.size(); i++) {
         HistoricTaskInstance hi = historicTaskInstances.get(i);
@@ -288,7 +288,7 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
     assertEquals(0, taskService.createTaskQuery().count());
     assertProcessEnded(procId);
     
-    if (processEngineConfiguration.getHistoryLevel() > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
+    if (processEngineConfiguration.getHistoryLevel().getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
       List<HistoricActivityInstance> activities = historyService.createHistoricActivityInstanceQuery().processInstanceId(procId).orderByActivityId().asc().list();
       assertEquals(3, activities.size());
       // note that the multiple instance task is mentioned in the history once 
@@ -357,7 +357,7 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
     runtimeService.startProcessInstanceByKey("miSequentialScriptTask", vars);
     
     // Validate history
-    if (processEngineConfiguration.getHistoryLevel() > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
+    if (processEngineConfiguration.getHistoryLevel().getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
       List<HistoricActivityInstance> historicInstances = historyService.createHistoricActivityInstanceQuery().activityType("scriptTask").orderByActivityId().asc().list();
       assertEquals(7, historicInstances.size());
       for (int i=0; i<7; i++) {
@@ -395,7 +395,7 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
     vars.put("nrOfLoops", 4);
     runtimeService.startProcessInstanceByKey("miParallelScriptTask", vars);
     
-    if (processEngineConfiguration.getHistoryLevel() > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
+    if (processEngineConfiguration.getHistoryLevel().getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
       List<HistoricActivityInstance> historicActivityInstances = historyService.createHistoricActivityInstanceQuery().activityType("scriptTask").list();
       assertEquals(4, historicActivityInstances.size());
       for (HistoricActivityInstance hai : historicActivityInstances) {
@@ -416,7 +416,7 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
   @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testParallelScriptTasksCompletionCondition.bpmn20.xml"})
   public void testParallelScriptTasksCompletionConditionHistory() {
     runtimeService.startProcessInstanceByKey("miParallelScriptTaskCompletionCondition");
-    if (processEngineConfiguration.getHistoryLevel() > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
+    if (processEngineConfiguration.getHistoryLevel().getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
       List<HistoricActivityInstance> historicActivityInstances = historyService.createHistoricActivityInstanceQuery().activityType("scriptTask").list();
       assertEquals(2, historicActivityInstances.size());
     }
@@ -488,7 +488,7 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
     }
     
     // Validate history
-    if (processEngineConfiguration.getHistoryLevel() > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
+    if (processEngineConfiguration.getHistoryLevel().getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
       List<HistoricActivityInstance> onlySubProcessInstances = historyService.createHistoricActivityInstanceQuery().activityType("subProcess").list();
       assertEquals(4, onlySubProcessInstances.size());
       
@@ -605,7 +605,7 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("miParallelSubprocess");
     
     // Validate history
-    if (processEngineConfiguration.getHistoryLevel() > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
+    if (processEngineConfiguration.getHistoryLevel().getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
       List<HistoricActivityInstance> historicActivityInstances = historyService.createHistoricActivityInstanceQuery().activityId("miSubProcess").list();
       assertEquals(2, historicActivityInstances.size());
       for (HistoricActivityInstance hai : historicActivityInstances) {
@@ -621,7 +621,7 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
     }
     
     // Validate history
-    if (processEngineConfiguration.getHistoryLevel() > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
+    if (processEngineConfiguration.getHistoryLevel().getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
       List<HistoricActivityInstance> historicActivityInstances = historyService.createHistoricActivityInstanceQuery().activityId("miSubProcess").list();
       assertEquals(2, historicActivityInstances.size());
       for (HistoricActivityInstance hai : historicActivityInstances) {
@@ -819,7 +819,7 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
       taskService.complete(tasks.get(i).getId());
     }
     
-    if (processEngineConfiguration.getHistoryLevel() > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
+    if (processEngineConfiguration.getHistoryLevel().getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
       // Validate historic processes
       List<HistoricProcessInstance> historicProcessInstances = historyService.createHistoricProcessInstanceQuery().list();
       assertEquals(7, historicProcessInstances.size()); // 6 subprocesses + main process
@@ -837,7 +837,7 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
       }
     }
 
-    if (processEngineConfiguration.getHistoryLevel() > ProcessEngineConfigurationImpl.HISTORYLEVEL_ACTIVITY) {
+    if (processEngineConfiguration.getHistoryLevel().getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_ACTIVITY) {
       // Validate historic tasks
       List<HistoricTaskInstance> historicTaskInstances = historyService.createHistoricTaskInstanceQuery().list();
       assertEquals(12, historicTaskInstances.size());

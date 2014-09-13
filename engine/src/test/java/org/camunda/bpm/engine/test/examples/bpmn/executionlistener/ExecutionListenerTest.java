@@ -181,7 +181,7 @@ public class ExecutionListenerTest extends PluggableProcessEngineTestCase {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
     assertTrue(processInstance.isEnded());
 
-    if (processEngineConfiguration.getHistoryLevel() >= HISTORYLEVEL_AUDIT) {
+    if (processEngineConfiguration.getHistoryLevel().getId() >= HISTORYLEVEL_AUDIT) {
       HistoricVariableInstanceQuery query = historyService.createHistoricVariableInstanceQuery();
       long count = query.count();
       assertEquals(5, count);
@@ -204,7 +204,7 @@ public class ExecutionListenerTest extends PluggableProcessEngineTestCase {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
     assertTrue(processInstance.isEnded());
 
-    if (processEngineConfiguration.getHistoryLevel() >= HISTORYLEVEL_AUDIT) {
+    if (processEngineConfiguration.getHistoryLevel().getId() >= HISTORYLEVEL_AUDIT) {
       HistoricVariableInstanceQuery query = historyService.createHistoricVariableInstanceQuery();
       long count = query.count();
       assertEquals(5, count);

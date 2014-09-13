@@ -351,7 +351,7 @@ public class CompensateEventTest extends PluggableProcessEngineTestCase {
     int ended = (Integer) runtimeService.getVariable(processInstance.getId(), "end");
     assertEquals(5, ended);
 
-    int historyLevel = processEngineConfiguration.getHistoryLevel();
+    int historyLevel = processEngineConfiguration.getHistoryLevel().getId();
     if (historyLevel > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
       long finishedCount = historyService.createHistoricActivityInstanceQuery().activityId("undoBookHotel").finished().count();
       assertEquals(5, finishedCount);

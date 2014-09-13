@@ -188,7 +188,7 @@ public class ProcessInstanceMigrationTest extends PluggableProcessEngineTestCase
     assertEquals(newProcessDefinition.getId(), pi.getProcessDefinitionId());
 
     // check history
-    if (processEngineConfiguration.getHistoryLevel() > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
+    if (processEngineConfiguration.getHistoryLevel().getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
       HistoricProcessInstance historicPI = historyService
         .createHistoricProcessInstanceQuery()
         .processInstanceId(pi.getId())

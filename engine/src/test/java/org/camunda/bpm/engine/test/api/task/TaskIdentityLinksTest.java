@@ -79,7 +79,7 @@ public class TaskIdentityLinksTest extends PluggableProcessEngineTestCase {
 
     assertEquals(1, identityLinks.size());
 
-    if (processEngineConfiguration.getHistoryLevel()>=ProcessEngineConfigurationImpl.HISTORYLEVEL_FULL) {
+    if (processEngineConfiguration.getHistoryLevel().getId()>=ProcessEngineConfigurationImpl.HISTORYLEVEL_FULL) {
       List<Event> taskEvents = taskService.getTaskEvents(taskId);
       assertEquals(1, taskEvents.size());
       Event taskEvent = taskEvents.get(0);
@@ -92,7 +92,7 @@ public class TaskIdentityLinksTest extends PluggableProcessEngineTestCase {
 
     taskService.deleteCandidateGroup(taskId, "muppets");
 
-    if (processEngineConfiguration.getHistoryLevel()>=ProcessEngineConfigurationImpl.HISTORYLEVEL_FULL) {
+    if (processEngineConfiguration.getHistoryLevel().getId()>=ProcessEngineConfigurationImpl.HISTORYLEVEL_FULL) {
       List<Event> taskEvents = taskService.getTaskEvents(taskId);
       Event taskEvent = findTaskEvent(taskEvents, Event.ACTION_DELETE_GROUP_LINK);
       assertEquals(Event.ACTION_DELETE_GROUP_LINK, taskEvent.getAction());
