@@ -212,7 +212,7 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
 
     // validate embedded tasks
     String content = response.asString();
-    List<Map<String,Object>> instances = from(content).getList("_embedded.tasks");
+    List<Map<String,Object>> instances = from(content).getList("_embedded.task");
     Assert.assertEquals("There should be one task returned.", 1, instances.size());
     Assert.assertNotNull("The returned task should not be null.", instances.get(0));
 

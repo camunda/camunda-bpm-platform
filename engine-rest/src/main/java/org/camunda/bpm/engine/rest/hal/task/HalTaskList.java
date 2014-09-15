@@ -46,7 +46,7 @@ public class HalTaskList extends HalCollectionResource<HalTaskList> {
       embeddedTasks.add(HalTask.fromTask(task));
     }
 
-    taskList.addEmbedded("tasks", embeddedTasks);
+    taskList.addEmbedded("task", embeddedTasks);
 
     // links
     taskList.addLink("self", fromResource(TaskRestService.class).build());
