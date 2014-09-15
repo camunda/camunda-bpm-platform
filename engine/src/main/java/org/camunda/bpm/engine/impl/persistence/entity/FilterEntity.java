@@ -20,7 +20,6 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-
 import org.camunda.bpm.engine.EntityTypes;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.NotValidException;
@@ -134,11 +133,11 @@ public class FilterEntity implements Filter, Serializable, DbEntity {
     return extendQuery(extendingQueryJson);
   }
 
-  public <T extends Query> Filter extend(String extendingQuery) {
+  public Filter extend(String extendingQuery) {
     ensureNotEmpty(NotValidException.class, "extendingQuery", extendingQuery);
     try {
-      JSONObject extendingQueryJson = new JSONObject(extendingQuery);
-      return extendQuery(extendingQueryJson);
+      Query query  = (Query) getConverter().toObject(extendingQuery);
+      return extend(query);
     }
     catch (JSONException e) {
       throw new NotValidException("Query string has to be a JSON object", e);
@@ -154,7 +153,14 @@ public class FilterEntity implements Filter, Serializable, DbEntity {
     Iterator<String> extendingKeys = extendingQuery.keys();
     while (extendingKeys.hasNext()) {
       String key = extendingKeys.next();
-      queryJson.put(key, extendingQuery.get(key));
+      if (key.equals("orderBy") && queryJson.has("orderBy")) {
+        // if extending query also contains a orderBy attribute we append it to the existing
+        String orderBy = queryJson.getString("orderBy") + ", " + extendingQuery.get(key);
+        queryJson.put(key, orderBy);
+      }
+      else {
+        queryJson.put(key, extendingQuery.get(key));
+      }
     }
 
     // create copy of the filter with the new query

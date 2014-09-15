@@ -16,12 +16,12 @@ package org.camunda.bpm.engine.test.api.filter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.filter.Filter;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.User;
+import org.camunda.bpm.engine.impl.AbstractQuery;
 import org.camunda.bpm.engine.impl.Direction;
 import org.camunda.bpm.engine.impl.QueryOperator;
 import org.camunda.bpm.engine.impl.TaskQueryImpl;
@@ -468,6 +468,62 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
 
     try {
       filterService.count(filter.getId(), "abc");
+      fail("Exception expected");
+    }
+    catch (NotValidException e) {
+      // expected
+    }
+  }
+
+  public void testExtendingSorting() {
+    String sortByNameAsc = TaskQueryProperty.NAME.getName() + " " + Direction.ASCENDING.getName();
+    String sortByAssigneeDescJson = "{\"sortBy\": \"assignee\", \"sortOrder\": \"desc\"}";
+    String sortByAssigneeDesc = TaskQueryProperty.ASSIGNEE.getName() + " " + Direction.DESCENDING.getName();
+
+    // create empty query
+    TaskQueryImpl query = (TaskQueryImpl) taskService.createTaskQuery();
+    saveQuery(query);
+
+    // assert default sorting
+    query = filter.getTypeQuery();
+    String orderBy = query.getOrderBy();
+    assertEquals(AbstractQuery.DEFAULT_ORDER_BY, orderBy);
+
+    // extend query by new task query with sorting
+    TaskQuery sortQuery = taskService.createTaskQuery().orderByTaskName().asc();
+    Filter extendedFilter = filter.extend(sortQuery);
+    query = extendedFilter.getTypeQuery();
+    orderBy = query.getOrderBy();
+
+    assertEquals(sortByNameAsc, orderBy);
+
+    // extend query by new json query with sorting
+    extendedFilter = extendedFilter.extend(sortByAssigneeDescJson);
+    query = extendedFilter.getTypeQuery();
+    orderBy = query.getOrderBy();
+
+    assertEquals(sortByNameAsc + ", " + sortByAssigneeDesc, orderBy);
+
+    // extend query by incomplete sorting query (sorting should not change)
+    sortQuery = taskService.createTaskQuery().orderByCaseExecutionId();
+    extendedFilter = extendedFilter.extend(sortQuery);
+    query = extendedFilter.getTypeQuery();
+    orderBy = query.getOrderBy();
+
+    assertEquals(sortByNameAsc + ", " + sortByAssigneeDesc, orderBy);
+
+    // extend query with invalid order attribute
+    try {
+      extendedFilter.extend("{\"sortOrder\": \"abc\"}");
+      fail("Exception expected");
+    }
+    catch (NotValidException e) {
+      // expected
+    }
+
+    // extend query with missing sortBy attribute
+    try {
+      extendedFilter.extend("{\"sortOrder\": \"asc\"}");
       fail("Exception expected");
     }
     catch (NotValidException e) {
