@@ -117,9 +117,9 @@ public class DeploymentRestServiceImpl extends AbstractRestProcessEngineAware im
 
     // deployChangedOnly overrides the enableDuplicateFiltering setting
     if (deployChangedOnly) {
-      deploymentBuilder.enableDuplicateFiltering(false);
-    } else if (enableDuplicateFiltering) {
       deploymentBuilder.enableDuplicateFiltering(true);
+    } else if (enableDuplicateFiltering) {
+      deploymentBuilder.enableDuplicateFiltering(false);
     }
 
     if(!deploymentBuilder.getResourceNames().isEmpty()) {

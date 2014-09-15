@@ -107,7 +107,7 @@ public class SpringProcessEngineConfiguration extends ProcessEngineConfiguration
 
       DeploymentBuilder deploymentBuilder = repositoryService
         .createDeployment()
-        .enableDuplicateFiltering(true)
+        .enableDuplicateFiltering(false)
         .name(deploymentName);
 
       for (Resource resource : deploymentResources) {

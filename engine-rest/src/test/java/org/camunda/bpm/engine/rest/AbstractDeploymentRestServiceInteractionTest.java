@@ -253,7 +253,7 @@ public abstract class AbstractDeploymentRestServiceInteractionTest extends Abstr
     verifyCreatedDeployment(mockDeployment, response);
 
     verify(mockDeploymentBuilder).name(MockProvider.EXAMPLE_DEPLOYMENT_ID);
-    verify(mockDeploymentBuilder).enableDuplicateFiltering(true);
+    verify(mockDeploymentBuilder).enableDuplicateFiltering(false);
 
   }
 
@@ -270,7 +270,7 @@ public abstract class AbstractDeploymentRestServiceInteractionTest extends Abstr
     .when()
       .post(CREATE_DEPLOYMENT_URL);
 
-    verify(mockDeploymentBuilder).enableDuplicateFiltering(false);
+    verify(mockDeploymentBuilder).enableDuplicateFiltering(true);
 
   }
 
@@ -289,7 +289,7 @@ public abstract class AbstractDeploymentRestServiceInteractionTest extends Abstr
     .when()
       .post(CREATE_DEPLOYMENT_URL);
 
-    verify(mockDeploymentBuilder).enableDuplicateFiltering(false);
+    verify(mockDeploymentBuilder).enableDuplicateFiltering(true);
 
   }
 

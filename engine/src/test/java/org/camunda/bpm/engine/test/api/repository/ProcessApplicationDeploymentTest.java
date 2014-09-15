@@ -161,7 +161,7 @@ public class ProcessApplicationDeploymentTest extends PluggableProcessEngineTest
     // second deployment with partial changes:
     ProcessApplicationDeployment deployment2 = repositoryService.createDeployment(processApplication.getReference())
       .name("deployment")
-      .enableDuplicateFiltering(false)
+      .enableDuplicateFiltering(true)
       .resumePreviousVersions()
       .addModelInstance("process1.bpmn20.xml", model1)
       .addModelInstance("process2.bpmn20.xml", changedModel2)
@@ -201,7 +201,7 @@ public class ProcessApplicationDeploymentTest extends PluggableProcessEngineTest
     // testing with a third deployment to ensure the change check is not only performed against
     // the last version of the deployment
     ProcessApplicationDeployment deployment3 = repositoryService.createDeployment(processApplication.getReference())
-        .enableDuplicateFiltering(false)
+        .enableDuplicateFiltering(true)
         .resumePreviousVersions()
         .addModelInstance("process1.bpmn20.xml", model1)
         .addModelInstance("process2.bpmn20.xml", anotherChangedModel2)

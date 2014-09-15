@@ -105,11 +105,7 @@ public class DeployProcessArchiveStep extends DeploymentOperationStep {
     deploymentBuilder.name(deploymentName);
 
     // enable duplicate filtering
-    if (PropertyHelper.getBooleanProperty(processArchive.getProperties(), ProcessArchiveXml.PROP_IS_DEPLOY_CHANGED_ONLY, false)) {
-      deploymentBuilder.enableDuplicateFiltering(false);
-    } else {
-      deploymentBuilder.enableDuplicateFiltering(true);
-    }
+    deploymentBuilder.enableDuplicateFiltering(PropertyHelper.getBooleanProperty(processArchive.getProperties(), ProcessArchiveXml.PROP_IS_DEPLOY_CHANGED_ONLY, false));
 
     // enable resuming of previous versions:
     if(PropertyHelper.getBooleanProperty(processArchive.getProperties(), ProcessArchiveXml.PROP_IS_RESUME_PREVIOUS_VERSIONS, true)) {

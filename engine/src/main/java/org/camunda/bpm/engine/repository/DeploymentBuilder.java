@@ -51,7 +51,7 @@ public interface DeploymentBuilder {
    * <p>If set, this deployment will be compared to any previous deployment.
    * This means that every (non-generated) resource will be compared with the
    * provided resources of this deployment. If any resource of this deployment
-   * is different to the existing resources, <i>all</i> resources are re-deployed
+   * is different to the existing resources, <i>all</i> resources are re-deployed.
    * </p>
    *
    * <p><b>Deprecated</b>: use {@link #enableDuplicateFiltering(boolean)}</p>
@@ -63,13 +63,13 @@ public interface DeploymentBuilder {
    * Check the resources for duplicates in the set of previous deployments.
    * If no resources have changed in this deployment, its contained resources
    * are not deployed at all. For further configuration, use the parameter
-   * <code>deployAllOnSingleChange</code>.
+   * <code>deployChangedOnly</code>.
    *
-   * @param deployAllOnSingleChange determines whether all resources of this deployment
-   * should be deployed if a single resource differs. If false, only
-   * those resources that actually differ are deployed.
+   * @param deployChangedOnly determines whether only those resources should be
+   * deployed that have changed from the previous versions of the deployment.
+   * If false, all of the resources are re-deployed if any resource differs.
    */
-  DeploymentBuilder enableDuplicateFiltering(boolean deployAllOnSingleChange);
+  DeploymentBuilder enableDuplicateFiltering(boolean deployChangedOnly);
 
   /**
    * Sets the date on which the process definitions contained in this deployment

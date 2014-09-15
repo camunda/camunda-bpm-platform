@@ -138,12 +138,12 @@ public class DeployCmd<T> implements Command<Deployment>, Serializable {
             || resourcesDiffer(deployedResource, existingResource)) {
           // resource should be deployed
 
-          if (deploymentBuilder.isDeployAllOnSingleChange()) {
+          if (deploymentBuilder.isDeployChangedOnly()) {
+            resourcesToDeploy.put(resourceName, deployedResource);
+          } else {
             // all resources should be deployed
             resourcesToDeploy = containedResources;
             break;
-          } else {
-            resourcesToDeploy.put(resourceName, deployedResource);
           }
         }
       }

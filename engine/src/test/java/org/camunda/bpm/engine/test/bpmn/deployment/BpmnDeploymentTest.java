@@ -157,7 +157,7 @@ public class BpmnDeploymentTest extends PluggableProcessEngineTestCase {
     BpmnModelInstance changedModel2 = Bpmn.createExecutableProcess("process2").startEvent().done();
 
     org.camunda.bpm.engine.repository.Deployment deployment2 = repositoryService.createDeployment()
-      .enableDuplicateFiltering(false)
+      .enableDuplicateFiltering(true)
       .addModelInstance("process1.bpmn20.xml", model1)
       .addModelInstance("process2.bpmn20.xml", changedModel2)
       .name("thrice")
@@ -180,7 +180,7 @@ public class BpmnDeploymentTest extends PluggableProcessEngineTestCase {
     // testing with a third deployment to ensure the change check is not only performed against
     // the last version of the deployment
     org.camunda.bpm.engine.repository.Deployment deployment3 = repositoryService.createDeployment()
-        .enableDuplicateFiltering(false)
+        .enableDuplicateFiltering(true)
         .addModelInstance("process1.bpmn20.xml", model1)
         .addModelInstance("process2.bpmn20.xml", anotherChangedModel2)
         .name("thrice")
@@ -209,14 +209,14 @@ public class BpmnDeploymentTest extends PluggableProcessEngineTestCase {
     // deployment 2 deploys process version 2
     BpmnModelInstance changedModel1 = Bpmn.createExecutableProcess("process1").startEvent().done();
     org.camunda.bpm.engine.repository.Deployment deployment2 = repositoryService.createDeployment()
-      .enableDuplicateFiltering(false)
+      .enableDuplicateFiltering(true)
       .addModelInstance("process1.bpmn20.xml", changedModel1)
       .name("deployment")
       .deploy();
 
     // deployment 3 deploys process version 1 again
     org.camunda.bpm.engine.repository.Deployment deployment3 = repositoryService.createDeployment()
-      .enableDuplicateFiltering(false)
+      .enableDuplicateFiltering(true)
       .addModelInstance("process1.bpmn20.xml", model1)
       .name("deployment")
       .deploy();
@@ -246,7 +246,7 @@ public class BpmnDeploymentTest extends PluggableProcessEngineTestCase {
 
   public void testDeployDifferentFiles() {
     String bpmnResourceName = "org/camunda/bpm/engine/test/bpmn/deployment/BpmnDeploymentTest.testGetBpmnXmlFileThroughService.bpmn20.xml";
-    repositoryService.createDeployment().enableDuplicateFiltering(true).addClasspathResource(bpmnResourceName).name("twice").deploy();
+    repositoryService.createDeployment().enableDuplicateFiltering(false).addClasspathResource(bpmnResourceName).name("twice").deploy();
 
     String deploymentId = repositoryService.createDeploymentQuery().singleResult().getId();
     List<String> deploymentResources = repositoryService.getDeploymentResourceNames(deploymentId);
