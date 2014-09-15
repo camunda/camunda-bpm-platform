@@ -17,7 +17,8 @@ define([ 'angular', 'require' ], function(angular, require) {
           1: 'User',
           2: 'Group',
           3: 'Group Membership',
-          4: 'Authorization'
+          4: 'Authorization',
+          5: 'Filter'
         };
 
         $scope.permissionMap = {
@@ -26,6 +27,7 @@ define([ 'angular', 'require' ], function(angular, require) {
           2: [ 'READ', 'UPDATE', 'CREATE', 'DELETE' ],
           3: [ 'CREATE', 'DELETE' ],
           4: [ 'READ', 'UPDATE', 'CREATE', 'DELETE' ],
+          5: [ 'READ', 'UPDATE', 'DELETE' ],
         };
 
         $scope.typeMap = {

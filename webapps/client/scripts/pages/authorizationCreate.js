@@ -8,10 +8,11 @@ ngDefine('admin.pages', function(module, $) {
 
     var updatePermissions = function() {
       $scope.availablePermissions = [];
+      var resourcePermissions = $scope.getPermissionsForResource();
 
-      for (var i = 0; i < $scope.getPermissionsForResource().length; i++) {
-        if($scope.selectedPermissions.indexOf($scope.getPermissionsForResource()[i]) == -1) {
-          $scope.availablePermissions.push($scope.getPermissionsForResource()[i]);
+      for (var i = 0; i < resourcePermissions.length; i++) {
+        if($scope.selectedPermissions.indexOf(resourcePermissions[i]) < 0) {
+          $scope.availablePermissions.push(resourcePermissions[i]);
         }
       };
     }
