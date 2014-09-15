@@ -86,7 +86,7 @@ public class FilterRestServiceImpl extends AbstractRestProcessEngineAware implem
     return new CountResultDto(query.count());
   }
 
-  public void createFilter(FilterDto filterDto) {
+  public FilterDto createFilter(FilterDto filterDto) {
     FilterService filterService = getProcessEngine().getFilterService();
 
     Filter filter = filterService.newFilter();
@@ -99,6 +99,8 @@ public class FilterRestServiceImpl extends AbstractRestProcessEngineAware implem
     }
 
     filterService.saveFilter(filter);
+
+    return FilterDto.fromFilter(filter);
   }
 
   protected FilterQuery getQueryFromQueryParameters(MultivaluedMap<String, String> queryParameters) {

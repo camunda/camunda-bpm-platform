@@ -17,6 +17,7 @@ import static javax.ws.rs.core.Response.Status;
 
 import static com.jayway.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
@@ -148,7 +149,8 @@ public abstract class AbstractFilterRestServiceInteractionTest extends AbstractR
       .contentType(POST_JSON_CONTENT_TYPE)
       .body(dto)
     .then().expect()
-      .statusCode(Status.NO_CONTENT.getStatusCode())
+      .statusCode(Status.OK.getStatusCode())
+      .body("id", notNullValue())
     .when()
       .post(CREATE_FILTER_URL);
 

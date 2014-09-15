@@ -50,6 +50,7 @@ public interface FilterRestService {
   @POST
   @Path("/create")
   @Consumes(MediaType.APPLICATION_JSON)
-  void createFilter(FilterDto filterDto);
+  @Produces(MediaType.APPLICATION_JSON)
+  FilterDto createFilter(FilterDto filterDto);
 
 }
