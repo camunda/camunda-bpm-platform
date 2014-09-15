@@ -28,7 +28,8 @@
     <ul class="nav navbar-nav navbar-right">
 
       <li cam-if-logged-in
-          ng-cloak>
+          ng-cloak
+          class="process-definitions">
         <a tooltip-placement="left"
            tooltip="{{ 'START_PROCESS' | translate }}"
            ng-controller="processStartCtrl"
