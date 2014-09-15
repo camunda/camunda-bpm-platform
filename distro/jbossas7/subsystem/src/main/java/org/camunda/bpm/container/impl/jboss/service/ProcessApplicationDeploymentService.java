@@ -135,7 +135,11 @@ public class ProcessApplicationDeploymentService implements Service<ProcessAppli
       final ProcessApplicationDeploymentBuilder deploymentBuilder = repositoryService.createDeployment(processApplication.getReference());
 
       // enable duplicate filtering
-      deploymentBuilder.enableDuplicateFiltering();
+      if (PropertyHelper.getBooleanProperty(processArchive.getProperties(), ProcessArchiveXml.PROP_IS_DEPLOY_CHANGED_ONLY, false)) {
+        deploymentBuilder.enableDuplicateFiltering(false);
+      } else {
+        deploymentBuilder.enableDuplicateFiltering(true);
+      }
 
       // enable resuming of previous versions:
       if(PropertyHelper.getBooleanProperty(processArchive.getProperties(), ProcessArchiveXml.PROP_IS_RESUME_PREVIOUS_VERSIONS, true)) {

@@ -60,6 +60,7 @@ public interface ProcessApplicationDeploymentBuilder extends DeploymentBuilder {
   /* {@inheritDoc} */
   ProcessApplicationDeploymentBuilder name(String name);
   /* {@inheritDoc} */
+  @Deprecated
   ProcessApplicationDeploymentBuilder enableDuplicateFiltering();
   /* {@inheritDoc} */
   ProcessApplicationDeploymentBuilder enableDuplicateFiltering(boolean deployAllOnSingleChange);

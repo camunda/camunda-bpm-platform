@@ -61,6 +61,7 @@ public interface ProcessesXml {
       pa.setProperties(properties);
       properties.put(ProcessArchiveXml.PROP_IS_DELETE_UPON_UNDEPLOY, Boolean.FALSE.toString());
       properties.put(ProcessArchiveXml.PROP_IS_SCAN_FOR_PROCESS_DEFINITIONS, Boolean.TRUE.toString());
+      properties.put(ProcessArchiveXml.PROP_IS_DEPLOY_CHANGED_ONLY, Boolean.FALSE.toString());
 
       return processArchives;
     }

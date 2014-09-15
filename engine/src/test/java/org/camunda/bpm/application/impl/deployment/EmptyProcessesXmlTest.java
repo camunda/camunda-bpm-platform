@@ -49,7 +49,7 @@ public class EmptyProcessesXmlTest extends TestCase {
     Map<String, String> properties = processArchiveXml.getProperties();
 
     assertNotNull(properties);
-    assertEquals(2, properties.size());
+    assertEquals(3, properties.size());
 
     String isDeleteUponUndeploy = properties.get(ProcessArchiveXml.PROP_IS_DELETE_UPON_UNDEPLOY);
     assertNotNull(isDeleteUponUndeploy);
@@ -59,6 +59,9 @@ public class EmptyProcessesXmlTest extends TestCase {
     assertNotNull(isScanForProcessDefinitions);
     assertEquals(Boolean.TRUE.toString(), isScanForProcessDefinitions);
 
+    String isDeployChangedOnly = properties.get(ProcessArchiveXml.PROP_IS_DEPLOY_CHANGED_ONLY);
+    assertNotNull(isDeployChangedOnly);
+    assertEquals(Boolean.FALSE.toString(), isDeployChangedOnly);
   }
 
 }
