@@ -72,11 +72,6 @@
     and D.DEPLOY_TIME_ = LAST_RESOURCE.DEPLOY_TIME_
     and D.NAME_ = #{parameter.deploymentName}
   </sql>
-  <!-- 
-  1. select every resource (byte array) that belongs to a deployment with the given name
-  2. of those, select for all those with matching names the one that has the latest deploy time
-  
-   -->
 
   <!-- postgresql specific -->
   <resultMap id="resourceResultMap_postgres" type="org.camunda.bpm.engine.impl.persistence.entity.ResourceEntity">

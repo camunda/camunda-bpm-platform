@@ -252,6 +252,45 @@ public abstract class AbstractDeploymentRestServiceInteractionTest extends Abstr
 
     verifyCreatedDeployment(mockDeployment, response);
 
+    verify(mockDeploymentBuilder).name(MockProvider.EXAMPLE_DEPLOYMENT_ID);
+    verify(mockDeploymentBuilder).enableDuplicateFiltering(true);
+
+  }
+
+  @Test
+  public void testCreateCompleteDeploymentDeployChangedOnly() throws Exception {
+
+    resourceNames.addAll( Arrays.asList("data", "more-data") );
+
+    given()
+      .multiPart("data", "unspecified", createMockDeploymentResourceByteData())
+      .multiPart("deploy-changed-only", "true")
+    .expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .post(CREATE_DEPLOYMENT_URL);
+
+    verify(mockDeploymentBuilder).enableDuplicateFiltering(false);
+
+  }
+
+  @Test
+  public void testCreateCompleteDeploymentConflictingDuplicateSetting() throws Exception {
+
+    resourceNames.addAll( Arrays.asList("data", "more-data") );
+
+    // deploy-changed-only should override enable-duplicate-filtering
+    given()
+      .multiPart("data", "unspecified", createMockDeploymentResourceByteData())
+      .multiPart("enable-duplicate-filtering", "false")
+      .multiPart("deploy-changed-only", "true")
+    .expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .post(CREATE_DEPLOYMENT_URL);
+
+    verify(mockDeploymentBuilder).enableDuplicateFiltering(false);
+
   }
 
   @Test
