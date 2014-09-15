@@ -127,7 +127,7 @@ public class DeployCmd<T> implements Command<Deployment>, Serializable {
 
       Map<String, ResourceEntity> existingResources = commandContext
           .getResourceManager()
-          .findLatestResourcesByDeploymentName(deployment.getName());
+          .findLatestResourcesByDeploymentName(deployment.getName(), containedResources.keySet());
 
       for (ResourceEntity deployedResource : containedResources.values()) {
         String resourceName = deployedResource.getName();

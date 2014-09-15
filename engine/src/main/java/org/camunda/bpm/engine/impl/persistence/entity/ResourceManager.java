@@ -16,6 +16,7 @@ package org.camunda.bpm.engine.impl.persistence.entity;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 
@@ -53,9 +54,11 @@ public class ResourceManager extends AbstractManager {
   }
 
   @SuppressWarnings("unchecked")
-  public Map<String, ResourceEntity> findLatestResourcesByDeploymentName(String deploymentName) {
+  public Map<String, ResourceEntity> findLatestResourcesByDeploymentName(String deploymentName, Set<String> resourcesToFind) {
     Map<String, Object> params = new HashMap<String, Object>();
     params.put("deploymentName", deploymentName);
+    params.put("resourcesToFind", resourcesToFind);
+
     List<ResourceEntity> resources = getDbEntityManager().selectList("selectLatestResourcesByDeploymentName", params);
 
     Map<String, ResourceEntity> existingResourcesByName = new HashMap<String, ResourceEntity>();
