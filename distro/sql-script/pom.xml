@@ -279,5 +279,91 @@
     </plugins>
   </build>
 
+  <profiles>
+    <profile>
+      <id>check-sql</id>
+
+      <properties>
+        <h2.server.port>18080</h2.server.port>
+      </properties>
+
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>sql-maven-plugin</artifactId>
+            <dependencies>
+              <dependency>
+                <groupId>com.h2database</groupId>
+                <artifactId>h2</artifactId>
+                <version>${version.h2}</version>
+              </dependency>
+            </dependencies>
+            <configuration>
+              <driver>org.h2.Driver</driver>
+              <url>jdbc:h2:${project.basedir}/target/h2/process-engine;MVCC=TRUE;AUTO_SERVER=TRUE;AUTO_SERVER_PORT=${h2.server.port}</url>
+              <username>sa</username>
+              <password>sa</password>
+            </configuration>
+            <executions>
+              <execution>
+                <id>create-engine</id>
+                <phase>generate-test-sources</phase>
+                <goals>
+                  <goal>execute</goal>
+                </goals>
+                <configuration>
+                  <srcFiles>
+                    <srcFile>${project.build.directory}/sql/create/h2_engine_${project.version}.sql</srcFile>
+                  </srcFiles>
+                  <autocommit>true</autocommit>
+                </configuration>
+              </execution>
+              <execution>
+                <id>create-identity</id>
+                <phase>generate-test-sources</phase>
+                <goals>
+                  <goal>execute</goal>
+                </goals>
+                <configuration>
+                  <srcFiles>
+                    <srcFile>${project.build.directory}/sql/create/h2_identity_${project.version}.sql</srcFile>
+                  </srcFiles>
+                  <autocommit>true</autocommit>
+                </configuration>
+              </execution>
+              <execution>
+                <id>drop-engine</id>
+                <phase>generate-test-sources</phase>
+                <goals>
+                  <goal>execute</goal>
+                </goals>
+                <configuration>
+                  <srcFiles>
+                    <srcFile>${project.build.directory}/sql/drop/h2_engine_${project.version}.sql</srcFile>
+                  </srcFiles>
+                  <autocommit>true</autocommit>
+                </configuration>
+              </execution>
+              <execution>
+                <id>drop-identity</id>
+                <phase>generate-test-sources</phase>
+                <goals>
+                  <goal>execute</goal>
+                </goals>
+                <configuration>
+                  <srcFiles>
+                    <srcFile>${project.build.directory}/sql/drop/h2_identity_${project.version}.sql</srcFile>
+                  </srcFiles>
+                  <autocommit>true</autocommit>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+
 
 </project>
