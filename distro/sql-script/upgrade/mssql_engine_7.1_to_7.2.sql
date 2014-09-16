@@ -159,6 +159,7 @@ ALTER TABLE ACT_HI_DETAIL
 -- create filter table
 create table ACT_RU_FILTER (
   ID_ nvarchar(64) not null,
+  REV_ integer not null,
   RESOURCE_TYPE_ nvarchar(255) not null,
   NAME_ nvarchar(255) not null,
   OWNER_ nvarchar(255),

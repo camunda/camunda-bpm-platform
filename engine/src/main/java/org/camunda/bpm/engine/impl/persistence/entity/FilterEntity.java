@@ -20,11 +20,13 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+
 import org.camunda.bpm.engine.EntityTypes;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.filter.Filter;
 import org.camunda.bpm.engine.impl.db.DbEntity;
+import org.camunda.bpm.engine.impl.db.HasDbRevision;
 import org.camunda.bpm.engine.impl.json.JsonObjectConverter;
 import org.camunda.bpm.engine.impl.json.JsonTaskQueryConverter;
 import org.camunda.bpm.engine.impl.util.json.JSONException;
@@ -34,7 +36,7 @@ import org.camunda.bpm.engine.query.Query;
 /**
  * @author Sebastian Menski
  */
-public class FilterEntity implements Filter, Serializable, DbEntity {
+public class FilterEntity implements Filter, Serializable, DbEntity, HasDbRevision {
 
   private static final long serialVersionUID = 1L;
 
@@ -50,6 +52,7 @@ public class FilterEntity implements Filter, Serializable, DbEntity {
   protected String owner;
   protected String query;
   protected String properties;
+  protected int revision = 0;
 
   public FilterEntity() {
     setQuery("{}");
@@ -244,6 +247,18 @@ public class FilterEntity implements Filter, Serializable, DbEntity {
     copy.setQuery(getQuery());
     copy.setProperties(getProperties());
     return copy;
+  }
+
+  public void setRevision(int revision) {
+    this.revision = revision;
+  }
+
+  public int getRevision() {
+    return revision;
+  }
+
+  public int getRevisionNext() {
+    return revision + 1;
   }
 
 }

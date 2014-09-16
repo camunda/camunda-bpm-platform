@@ -204,6 +204,7 @@ create table ACT_RU_AUTHORIZATION (
 
 create table ACT_RU_FILTER (
   ID_ NVARCHAR2(64) not null,
+  REV_ integer not null,
   RESOURCE_TYPE_ NVARCHAR2(255) not null,
   NAME_ NVARCHAR2(255) not null,
   OWNER_ NVARCHAR2(255),

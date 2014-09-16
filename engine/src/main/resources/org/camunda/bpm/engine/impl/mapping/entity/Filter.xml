@@ -21,14 +21,15 @@
   <!-- FILTER INSERT -->
 
   <insert id="insertFilter" parameterType="org.camunda.bpm.engine.impl.persistence.entity.FilterEntity">
-    insert into ${prefix}ACT_RU_FILTER (ID_, RESOURCE_TYPE_, NAME_, OWNER_, QUERY_, PROPERTIES_)
+    insert into ${prefix}ACT_RU_FILTER (ID_, RESOURCE_TYPE_, NAME_, OWNER_, QUERY_, PROPERTIES_, REV_)
     values (
       #{id ,jdbcType=VARCHAR},
       #{resourceType ,jdbcType=VARCHAR},
       #{name ,jdbcType=VARCHAR},
       #{owner ,jdbcType=VARCHAR},
       #{query ,jdbcType=CLOB},
-      #{properties ,jdbcType=CLOB}
+      #{properties ,jdbcType=CLOB},
+      1
     )
   </insert>
 
@@ -37,24 +38,27 @@
   <update id="updateFilter" parameterType="org.camunda.bpm.engine.impl.persistence.entity.FilterEntity">
     update ${prefix}ACT_RU_FILTER
     set
+      REV_ = #{revisionNext, jdbcType=INTEGER},
       NAME_ = #{name, jdbcType=VARCHAR},
       OWNER_ = #{owner, jdbcType=VARCHAR},
       QUERY_ = #{query, jdbcType=CLOB},
       PROPERTIES_ = #{properties, jdbcType=CLOB}
     where ID_ = #{id}
+      and REV_ = #{revision, jdbcType=INTEGER}
   </update>
 
   <!-- FILTER DELETE -->
 
   <delete id="deleteFilter" parameterType="org.camunda.bpm.engine.impl.persistence.entity.FilterEntity">
     delete from ${prefix}ACT_RU_FILTER
-    where ID_ = #{id}
+    where ID_ = #{id} and REV_ = #{revision}
   </delete>
   
   <!-- FILTER RESULTMAP -->
 
   <resultMap id="filterResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.FilterEntity">
     <id property="id" column="ID_" jdbcType="VARCHAR" />
+    <result property="revision" column="REV_" jdbcType="INTEGER" />
     <result property="resourceType" column="RESOURCE_TYPE_" jdbcType="VARCHAR" />
     <result property="name" column="NAME_" jdbcType="VARCHAR" />
     <result property="owner" column="OWNER_" jdbcType="VARCHAR" />
@@ -64,6 +68,7 @@
 
   <resultMap id="filterResultMap_postgres" type="org.camunda.bpm.engine.impl.persistence.entity.FilterEntity">
     <id property="id" column="ID_" jdbcType="VARCHAR" />
+    <result property="revision" column="REV_" jdbcType="INTEGER" />
     <result property="resourceType" column="RESOURCE_TYPE_" jdbcType="VARCHAR" />
     <result property="name" column="NAME_" jdbcType="VARCHAR" />
     <result property="owner" column="OWNER_" jdbcType="VARCHAR" />
