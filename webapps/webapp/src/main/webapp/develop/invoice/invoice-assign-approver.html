@@ -54,4 +54,38 @@
       (i.e. &quot;john&quot;, &quot;mary&quot; or &quot;peter&quot;)
     </div>
   </div>
+
+
+  <script cam-script type="text/form-script">
+    var $ = angular.element;
+    var each = angular.forEach;
+    var variableManager = camForm.variableManager;
+    debugger;
+
+    camForm.on('variables-fetched', function() {
+      // access to all process variables after the form has loaded
+      console.log(variableManager.variables);
+    });
+
+    camForm.on('submit', function(evt) {
+      var invalid = false;
+
+      each(variableManager.variables, function(variable, name) {
+        var $input = $('[cam-variable-name="'+ name +'"]');
+        var $parent = $input.parents('.control-group');
+        var required = $input.attr('required') && !$input.attr('readonly');
+        var fieldValue = $input.val();
+        var fieldValid = !!(required && !$input.val());
+
+        $parent[fieldValid ? 'addClass' : 'removeClass']('has-error');
+
+        invalid = invalid || !fieldValid;
+      });
+
+      // handle submit
+      // may prevent the submit from being executed:
+      evt.submitPrevented = invalid;
+    });
+
+  </script>
 </form>
