@@ -23,6 +23,31 @@ define([
   }
 
 
+  function makeObj(arr) {
+    var obj = {};
+
+    each(arr, function(item) {
+      obj[item.key] = item.value;
+    });
+
+    return obj;
+  }
+
+
+  function makeArr(obj) {
+    var arr = [];
+
+    each(obj, function(value, key) {
+      arr.push({
+        key: key,
+        value: value
+      });
+    });
+
+    return arr;
+  }
+
+
 
   function cleanArray(arr) {
     return unique(arr).map(function(a) { return (''+ a).trim(); });
@@ -106,11 +131,8 @@ define([
     $scope.filter.properties.variables =  $scope.filter.properties.variables || [];
 
 
-    $scope._priority =                    $scope.filter.properties.priority || 50;
-    $scope._color =                       $scope.filter.properties.color || '#dd6666';
-    $scope._description =                 $scope.filter.properties.description;
-
-
+    $scope.filter.properties.priority =   $scope.filter.properties.priority || 10;
+    $scope.filter.properties.color =      $scope.filter.properties.color || '#dd6666';
 
 
 
@@ -122,8 +144,6 @@ define([
                       !$scope._authorizationErrors.length;
 
       $scope.$invalid = !$scope.$valid;
-
-      console.info('form is valid', $scope.$valid);
 
       return $scope.$valid;
     }
@@ -143,7 +163,7 @@ define([
       value: ''
     };
 
-    $scope._query = $scope.filter.query;
+    $scope._query = makeArr($scope.filter.query);
 
     $scope.addCriterion = function() {
       $scope._query.push(copy(emptyCriterion));
@@ -191,16 +211,51 @@ define([
     └──────────────────────────────────────────────────────────────────────────────────────────────┘
     */
 
+    var permissionsMap = ['READ', 'UPDATE', 'DELETE'];
+
     var emptyAuthorization = {
-      type:         1,
-      identityType: 'user',
-      identity:     '',
-      permissions:  'ALL'
+      type:                 1,
+      identityType:         'user',
+      identity:             '',
+      permissions:          'ALL',
+      availablePermissions: permissionsMap
     };
 
-    $scope.permissionsMap = ['READ', 'UPDATE', 'DELETE'];
-
     $scope._authorizations = $scope.filter.authorizations;
+
+    function availablePermissions(authorizationPermissions) {
+      var available = [];
+
+      if (authorizationPermissions.length === 1 && authorizationPermissions[0] === 'ALL') {
+        available = copy(permissionsMap);
+      }
+      else {
+        each(permissionsMap, function(permission) {
+          var has = authorizationPermissions.indexOf(permission);
+
+          if (has === -1) {
+            available.push(permission);
+          }
+        });
+
+        if (available.length < 2) {
+          available = ['ALL'];
+        }
+      }
+
+      return available;
+    }
+
+    each($scope._authorizations, function(authorization) {
+      var hasNone = authorization.permissions.indexOf('NONE');
+      if (hasNone > -1) {
+        authorization.permissions.splice(hasNone, 1);
+      }
+      authorization.permissions = authorization.permissions.join(', ');
+      authorization.availablePermissions = availablePermissions(authorization.permissions);
+      authorization.identity = authorization.userId || authorization.groupId;
+      authorization.identityType = authorization.userId ? 'user' : 'group';
+    });
 
     $scope.addAuthorization = function() {
       $scope._authorizations.push(copy(emptyAuthorization));
@@ -215,7 +270,10 @@ define([
     };
 
     $scope.addPermission = function(authorization, permission) {
-      if (authorization.permissions === 'ALL' || !authorization.permissions) {
+      if (permission === 'ALL') {
+        authorization.permissions = 'ALL';
+      }
+      else if (authorization.permissions === 'ALL' || !authorization.permissions) {
         authorization.permissions = permission;
       }
       else {
@@ -224,6 +282,8 @@ define([
         arr = cleanArray(arr);
         authorization.permissions = arr.join(', ');
       }
+
+      authorization.availablePermissions = availablePermissions(authorization.permissions);
     };
 
     $scope.validateAuthorization = function(authorization, delta) {
@@ -336,26 +396,48 @@ define([
     }
 
     $scope.submit = function() {
-      Filter.save({
+      var toSave = {
         name:         $scope.filter.name,
-        owner:        $scope.filter.owner,
-        query:        $scope._query,
+        // owner:        $scope.filter.owner,
+        resourceType: 'Task',
+        query:        makeObj($scope._query),
         properties:   {
-          color:        $scope._color,
-          description:  $scope._description,
-          priority:     $scope._priority,
+          color:        $scope.filter.properties.color,
+          description:  $scope.filter.properties.description,
+          priority:     $scope.filter.properties.priority,
           variables:    $scope._variables
         }
-      }, function(err, filterResponse) {
+      };
+
+      if ($scope.filter.id) {
+        toSave.id = $scope.filter.id;
+      }
+
+      Filter.save(toSave, function(err, filterResponse) {
         if (err) {
           return errorNotification('FILTER_SAVE_ERROR', err);
         }
 
         var authTasks = [];
-        each(_authorizations, function(auth) {
+        each($scope._authorizations, function(auth) {
           auth = copy(auth);
+
+          auth.error = null;
+          auth.availablePermissions = null;
+
+          if (auth.identityType === 'user') {
+            auth.userId = auth.identity;
+          }
+          else {
+            auth.groupId = auth.identity;
+          }
+          auth.identityType = null;
+          auth.identity = null;
+
           auth.permissions = cleanArray(auth.permissions.split(','));
-          auth.resourceId = filterResponse.id;
+          auth.resourceId = toSave.id || filterResponse.id;
+          auth.resourceType = 5;
+
           authTasks.push(function(cb) { Authorization.save(auth, cb); });
         });
 
@@ -365,6 +447,7 @@ define([
           }
 
           successNotification('FILTER_SAVE_SUCCESS');
+          $scope.$emit('filter.saved');
           $scope.$close();
         });
       });
@@ -385,10 +468,11 @@ define([
     $scope.delete = function() {
       Filter.delete($scope.filter.id, function(err) {
         if (err) {
-          errorNotification('FILTER_DELETION_ERROR', err);
+          return errorNotification('FILTER_DELETION_ERROR', err);
         }
 
         successNotification('FILTER_DELETION_SUCCESS');
+        $scope.$emit('filter.deleted');
         $scope.$close();
       });
     };
@@ -417,23 +501,23 @@ define([
     var Authorization = camAPI.resource('authorization');
     $scope.loading = false;
 
+
+    function clearScopeFilter() {
+      $scope.filter = null;
+    }
+
+
     function open(filter) {
-      if (!!filter &&
-          !!$scope.filter &&
-          filter.id === $scope.filter.id) {
+      if ($scope.filter && filter && $scope.filter.id === filter.id) {
         return;
       }
 
-      $scope.filter = filter;
+      // if not set to something truthy,
+      // it could be possible to open a new modal window
+      $scope.filter = filter || {};
 
       $modal.open({
         scope: $scope,
-
-        resolve: {
-          filter: function() {
-            return filter;
-          }
-        },
 
         windowClass: 'filter-edit-modal',
 
@@ -442,9 +526,9 @@ define([
         template: template,
 
         controller: filterCreateModalCtrl
-      });
+      })
+      .result.then(clearScopeFilter, clearScopeFilter);
     }
-
 
 
     function errorNotification(src, err) {
@@ -457,39 +541,57 @@ define([
     }
 
 
+    function loadPermissions(filter, loaded) {
+      $scope.loading = true;
+      Authorization.list({
+        resourceType: 5,
+        resourceId: filter.id
+      }, function(err, authorizations) {
+        $scope.loading = false;
+
+        if (err) {
+          return errorNotification('FILTER_AUTHORIZAION_NOT_FOUND', err);
+        }
+
+        filter.authorizations = authorizations;
+
+        loaded(filter);
+      });
+    }
 
 
-    var state = $location.search();
-    if (state.filter) {
+    function checkFilterState(evt, givenFilter) {
+      if (givenFilter) {
+        return loadPermissions(givenFilter, open);
+      }
 
-      if (state.filter !== true) {
-        $scope.loading = true;
+      var state = $location.search();
+      if (state.filter) {
 
-        return Filter.get(state.filter, function(err, filter) {
-          if (err) {
-            return errorNotification('FILTER_NOT_FOUND', err);
-          }
+        if (state.filter !== true) {
 
-          Authorization.list({
-            resourceType: 5,
-            resourceId: filter.id
-          }, function(err, authorizations) {
+          $scope.loading = true;
+          return Filter.get(state.filter, function(err, filter) {
             $scope.loading = false;
 
             if (err) {
-              return errorNotification('FILTER_AUTHORIZAION_NOT_FOUND', err);
+              return errorNotification('FILTER_NOT_FOUND', err);
             }
 
-            filter.authorizations = authorizations;
-
-            open(filter);
+            loadPermissions(filter, open);
           });
-        });
-      }
+        }
 
-      // in case of a new filter
-      open();
+        // in case of a new filter
+        open();
+      }
     }
+
+
+    $scope.$on('filter.edit', checkFilterState);
+    $scope.$on('filter.delete', checkFilterState);
+
+    checkFilterState();
 
     $scope.createFilter = open;
   }];

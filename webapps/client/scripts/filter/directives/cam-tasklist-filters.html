@@ -5,7 +5,7 @@
 </div>
 
 <div ng-hide="loading"
-     ng-repeat="(delta, filter) in filters"
+     ng-repeat="(delta, filter) in filters | orderBy:'properties.priority'"
      class="task-filter-wrapper"
      ng-class="{active: filter.id === focusedId}"
      style="z-index: {{ ((filters.length + 10) - delta) }};">
@@ -18,14 +18,33 @@
 
     <div class="info"
          style="background-color: {{ filter.properties.color }}">
+
+      <ul class="filter-actions list-unstyled">
+        <li>
+          <a href
+             ng-click="edit(filter)">
+            <span class="glyphicon glyphicon-pencil"></span>
+            <span class="hidden-sm hidden-xs hidden-md"
+                  translate="FILTER_EDIT">Edit filter</span>
+          </a>
+        </li>
+        <li>
+          <a href
+             ng-click="delete(filter)">
+            <span class="glyphicon glyphicon-trash"></span>
+            <span class="hidden-sm hidden-xs hidden-md"
+                  translate="FILTER_DELETE">Delete filter</span>
+          </a>
+        </li>
+      </ul>
+
       <div ng-if="filter.properties.description"
            class="description">
         {{ filter.properties.description }}
       </div>
-
+      <!--
       <ul class="query list-unstyled">
-        <li ng-click="edit()"
-            ng-repeat="queryParam in filter.query">
+        <li ng-repeat="queryParam in filter.query">
           <span class="key">{{ queryParam.key }}</span>:
 
           <span class="operator"
@@ -34,6 +53,7 @@
           <span class="value">{{ queryParam.value }}</span>
         </li>
       </ul>
+      -->
     </div>
   </div>
 </div>

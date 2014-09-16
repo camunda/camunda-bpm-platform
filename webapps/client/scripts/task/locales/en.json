@@ -38,6 +38,9 @@
   "OWNER_IS_YOU":
         "You are owner",
 
+  "TASK_NO_PROCESS_DEFINITION":
+        "Could not find the process definition of the task.",
+
   "CLAIM_OK":
         "The task has been claimed.",
   "CLAIM_ERROR":

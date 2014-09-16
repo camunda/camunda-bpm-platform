@@ -23,6 +23,7 @@ define([
     $modal
   ) {
     var Task = camAPI.resource('task');
+    var ProcessDefinition = camAPI.resource('process-definition');
 
     function setModalFormMaxHeight(wrapper, targetContainer) {
       var availableHeight = $(window).height();
@@ -139,6 +140,7 @@ define([
           successNotification('COMPLETE_OK');
         }
 
+
         scope.completeTask = function() {
           if (scope._camForm) {
             scope._camForm.submit(submitCb);
@@ -158,31 +160,50 @@ define([
           scope._camForm = null;
 
           var parts = (scope.task.formKey || '').split('embedded:');
-          var ctx = scope.task._embedded.processDefinition[0].contextPath;
-          var formUrl;
 
-          if (parts.length > 1) {
-            formUrl = parts.pop();
-            // ensure a trailing slash
-            ctx = ctx + (ctx.slice(-1) !== '/' ? '/' : '');
-            formUrl = formUrl.replace(/app:(\/?)/, ctx);
+          function showForm(processDefinition) {
+            var ctx = scope.task._embedded.processDefinition[0].contextPath;
+            var formUrl;
+
+            if (parts.length > 1) {
+              formUrl = parts.pop();
+              // ensure a trailing slash
+              ctx = ctx + (ctx.slice(-1) !== '/' ? '/' : '');
+              formUrl = formUrl.replace(/app:(\/?)/, ctx);
+            }
+            else {
+              formUrl = scope.task.formKey;
+            }
+
+            if (formUrl) {
+              scope._camForm = new CamForm({
+                taskId:           scope.task.id,
+                containerElement: targetContainer,
+                client:           camAPI,
+                formUrl:          formUrl
+              });
+            }
+            else {
+              // clear the content (to avoid other tasks form to appear)
+              $translate('NO_TASK_FORM').then(function(translated) {
+                targetContainer.html(translated || '');
+              });
+            }
+          }
+
+          if (scope.task._embedded && scope.task._embedded.processDefinition[0]) {
+            showForm(scope.task._embedded.processDefinition[0]);
           }
           else {
-            formUrl = scope.task.formKey;
-          }
+            // this should not happen, but...
+            ProcessDefinition.get(scope.task.processDefinitionId, function(err, result) {
+              if (err) {
+                return errorNotification('TASK_NO_PROCESS_DEFINITION', err);
+              }
+              scope.task._embedded.processDefinition = scope.task._embedded.processDefinition || [];
+              scope.task._embedded.processDefinition[0] = result;
 
-          if (formUrl) {
-            scope._camForm = new CamForm({
-              taskId:           scope.task.id,
-              containerElement: targetContainer,
-              client:           camAPI,
-              formUrl:          formUrl
-            });
-          }
-          else {
-            // clear the content (to avoid other tasks form to appear)
-            $translate('NO_TASK_FORM').then(function(translated) {
-              targetContainer.html(translated || '');
+              showForm(scope.task._embedded.processDefinition[0]);
             });
           }
         }

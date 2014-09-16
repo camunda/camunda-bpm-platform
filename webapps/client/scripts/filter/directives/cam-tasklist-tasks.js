@@ -9,11 +9,17 @@ define([
 ) {
   'use strict';
 
+  function indexOfId(items, id) {
+    for (var i in items) {
+      if (items[i].id === id) { return i; }
+    }
+    return -1;
+  }
+
   function itemById(items, id) {
-    var i, item;
-    for (i in items) {
-      item = items[i];
-      if (item.id === id) { return item; }
+    var index = indexOfId(items, id);
+    if (index > -1) {
+      return items[index];
     }
   }
 
@@ -22,17 +28,16 @@ define([
     '$location',
     '$rootScope',
     '$q',
-    'camTasklistFilterCriteriaConversion',
     'camAPI',
   function(
     $modal,
     $location,
     $rootScope,
     $q,
-    camTasklistFilterCriteriaConversion,
     camAPI
   ) {
     var Task = camAPI.resource('task');
+    var Filter = camAPI.resource('filter');
 
     return {
       scope: {},
@@ -53,9 +58,6 @@ define([
         scope.tasks = scope.tasks || [];
 
         scope.filter = scope.filter || $rootScope.currentFilter;
-
-        // scope.searchTask = '';
-
 
         scope.sorting = angular.element('[cam-sorting-choices]').scope();
 
@@ -92,30 +94,28 @@ define([
 
           var where = buildWhere(scope.sorting.order, scope.sorting.by);
 
-          Task.list(where, function(err, res) {
+          Filter.getTasks(where, function(err, res) {
             scope.loading = false;
             if (err) { throw err; }
 
             scope.totalItems = res.count;
-            scope.processDefinitions = res._embedded.processDefinition;
-            // TODO: refactor that when #CAM-2550 done
-            scope.tasks = res._embedded.task || res._embedded.tasks;
+            scope.processDefinitions = scope.processDefinitions || [];
+
+            angular.forEach(res._embedded ? res._embedded.processDefinition : [], function(procDef) {
+              if (indexOfId(scope.processDefinitions) === -1) {
+                scope.processDefinitions.push(procDef);
+              }
+            });
+
+            scope.tasks = res._embedded.task;
           });
         }
 
 
         function buildWhere(order, by) {
-          var where = {};
-          angular.forEach(scope.filter.query, function(pair) {
-            where[pair.key] = camTasklistFilterCriteriaConversion(pair.value);
-            if (dateExp.test(pair.key)) {
-              /* jshint evil: true */
-              var date = new Date(eval(where[pair.key]) * 1000);
-              /* jshint evil: false */
-              date = moment(date);
-              where[pair.key] = date.toISOString();
-            }
-          });
+          var where = {
+            id: scope.filter.id
+          };
 
           where.firstResult = (scope.pageNum - 1) * scope.pageSize;
           where.maxResults = scope.pageSize;

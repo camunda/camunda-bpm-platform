@@ -10,10 +10,12 @@
   "FILTER_DELETION_WARNING":
                         "Deleting the filter can not be undone, are your sure to want to proceed?",
   "FILTER_DELETION_SUCCESS":
-                        "Something went wrong while deleting the filter.",
-  "FILTER_DELETION_ERROR":
                         "The filter has been deleted.",
+  "FILTER_DELETION_ERROR":
+                        "Something went wrong while deleting the filter.",
 
+  "FILTER_SAVE_SUCCESS":
+                        "The filter was saved.",
 
   "FILTER_NOT_FOUND":
                         "Filter not found",

@@ -53,7 +53,7 @@
               <div class="col-xs-6">
                 <input class="form-control minicolors"
                        id="filter-form-color"
-                       ng-model="_color"
+                       ng-model="filter.properties.color"
                        type="color" />
               </div>
             </div>
@@ -70,7 +70,7 @@
               <div class="col-xs-9">
                 <input class="form-control"
                        id="filter-form-description"
-                       ng-model="_description"
+                       ng-model="filter.properties.description"
                        type="text"
                        required
                        placeholder="{{ 'FILTER_DESCRIPTION_PLACEHOLDER' | translate }}" />
@@ -87,7 +87,7 @@
               <div class="col-xs-6">
                 <input class="form-control"
                        id="filter-form-priority"
-                       ng-model="_priority"
+                       ng-model="filter.properties.priority"
                        type="number" />
               </div>
             </div>
@@ -241,10 +241,10 @@
 
                     <ul class="dropdown-menu dropdown-menu-right"
                         role="menu">
-                      <li ng-repeat="action in permissionsMap">
+                      <li ng-repeat="action in authorization.availablePermissions">
                         <a href
                            ng-click="addPermission(authorization, action)">
-                          {{ action | translate }}
+                          {{ action }}
                         </a>
                       </li>
                     </ul>
@@ -318,7 +318,7 @@
                             label="{{ criteriaGroup.group | translate }}">
                     <option ng-repeat="criterion in criteriaGroup.options"
                             ng-selected="criterion.name === queryParam.key"
-                            value="criterion.name">
+                            ng-value="criterion.name">
                       {{ criterion.label | translate }}
                     </option>
                   </optgroup>

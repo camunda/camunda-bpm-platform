@@ -54,6 +54,19 @@
     text-transform: uppercase;
   }
 
+  .filter-actions {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+
+    &>li {
+      display: inline-block;
+      background-color: rgba(255, 255, 255, 0.3);
+      padding: 1px 3px;
+      margin: 0;
+    }
+  }
+
   .info {
     padding-left: (@grid-gutter-width / 2);
     padding-right: (@grid-gutter-width / 2);
@@ -69,12 +82,19 @@
 
     transition: max-height 0.218s ease-in-out 1s;
   }
+
+  .description {
+    padding: 5px 0;
+  }
+
   .key {
     .font-bold;
   }
+
   .operator {
     // .font-bold;
   }
+
   .value {
     .font-italic;
   }
