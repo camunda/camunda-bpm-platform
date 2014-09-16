@@ -17,15 +17,17 @@ define([
     // Simply register translation table as object hash
     $translateProvider
       .translations('en', en)
-      .translations('de', de)
-      .translations('fr', fr)
+
+      // .translations('de', de)
+      // .translations('fr', fr)
 
       .registerAvailableLanguageKeys([
         'en',
-        'de',
-        'fr'
+        // 'de',
+        // 'fr'
       ])
       // .preferredLanguage('en')
+
       // using the determinePreferredLanguage()
       // would lead to use something like "en_US"
       .determinePreferredLanguage()
