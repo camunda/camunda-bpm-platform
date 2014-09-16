@@ -13,8 +13,6 @@
 
 package org.camunda.bpm.engine.rest;
 
-import static javax.ws.rs.core.Response.Status;
-
 import static com.jayway.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
@@ -28,7 +26,10 @@ import static org.mockito.Mockito.when;
 
 import java.util.Collections;
 import java.util.List;
+
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response.Status;
+
 import org.camunda.bpm.engine.FilterService;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.NotValidException;
@@ -154,6 +155,7 @@ public abstract class AbstractFilterRestServiceInteractionTest extends AbstractR
     .when()
       .post(CREATE_FILTER_URL);
 
+    verify(filterServiceMock).newFilter();
     verify(filterServiceMock).saveFilter(filterMock);
   }
 

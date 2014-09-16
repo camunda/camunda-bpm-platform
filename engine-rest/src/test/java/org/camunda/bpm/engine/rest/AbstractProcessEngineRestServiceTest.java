@@ -17,23 +17,25 @@ import static com.jayway.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.matchers.JUnitMatchers.hasItems;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
-import com.jayway.restassured.http.ContentType;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
+
 import org.camunda.bpm.engine.CaseService;
+import org.camunda.bpm.engine.FilterService;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ManagementService;
@@ -41,6 +43,8 @@ import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.filter.Filter;
+import org.camunda.bpm.engine.filter.FilterQuery;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricActivityInstanceQuery;
 import org.camunda.bpm.engine.history.HistoricActivityStatistics;
@@ -88,6 +92,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Matchers;
 
+import com.jayway.restassured.http.ContentType;
+
 public abstract class AbstractProcessEngineRestServiceTest extends
     AbstractRestServiceTest {
 
@@ -114,6 +120,8 @@ public abstract class AbstractProcessEngineRestServiceTest extends
   protected static final String CASE_INSTANCE_URL = SINGLE_ENGINE_URL + "/case-instance";
   protected static final String CASE_EXECUTION_URL = SINGLE_ENGINE_URL + "/case-execution";
 
+  protected static final String FILTER_URL = SINGLE_ENGINE_URL + "/filter";
+
   protected static final String HISTORY_URL = SINGLE_ENGINE_URL + "/history";
   protected static final String HISTORY_ACTIVITY_INSTANCE_URL = HISTORY_URL + "/activity-instance";
   protected static final String HISTORY_PROCESS_INSTANCE_URL = HISTORY_URL + "/process-instance";
@@ -133,6 +141,7 @@ public abstract class AbstractProcessEngineRestServiceTest extends
   private ManagementService mockManagementService;
   private HistoryService mockHistoryService;
   private CaseService mockCaseService;
+  private FilterService mockFilterService;
   private MessageCorrelationBuilder mockMessageCorrelationBuilder;
 
   @Before
@@ -145,6 +154,7 @@ public abstract class AbstractProcessEngineRestServiceTest extends
     mockManagementService = mock(ManagementService.class);
     mockHistoryService = mock(HistoryService.class);
     mockCaseService = mock(CaseService.class);
+    mockFilterService = mock(FilterService.class);
 
     when(namedProcessEngine.getRepositoryService()).thenReturn(mockRepoService);
     when(namedProcessEngine.getRuntimeService()).thenReturn(mockRuntimeService);
@@ -153,6 +163,7 @@ public abstract class AbstractProcessEngineRestServiceTest extends
     when(namedProcessEngine.getManagementService()).thenReturn(mockManagementService);
     when(namedProcessEngine.getHistoryService()).thenReturn(mockHistoryService);
     when(namedProcessEngine.getCaseService()).thenReturn(mockCaseService);
+    when(namedProcessEngine.getFilterService()).thenReturn(mockFilterService);
 
     createProcessDefinitionMock();
     createProcessInstanceMock();
@@ -167,6 +178,7 @@ public abstract class AbstractProcessEngineRestServiceTest extends
     createCaseDefinitionMock();
     createCaseInstanceMock();
     createCaseExecutionMock();
+    createFilterMock();
 
     createHistoricActivityInstanceMock();
     createHistoricProcessInstanceMock();
@@ -373,6 +385,16 @@ public abstract class AbstractProcessEngineRestServiceTest extends
     when(deploymentQueryMock.singleResult()).thenReturn(mockDeployment);
 
     when(mockRepoService.createDeploymentQuery()).thenReturn(deploymentQueryMock);
+  }
+
+  private void createFilterMock() {
+    List<Filter> filters = new ArrayList<Filter>();
+    Filter mockFilter = MockProvider.createMockFilter();
+    filters.add(mockFilter);
+
+    FilterQuery mockFilterQuery = mock(FilterQuery.class);
+    when(mockFilterQuery.list()).thenReturn(filters);
+    when(mockFilterService.createFilterQuery()).thenReturn(mockFilterQuery);
   }
 
   @Test
@@ -690,6 +712,20 @@ public abstract class AbstractProcessEngineRestServiceTest extends
         .get(CASE_EXECUTION_URL);
 
     verify(mockCaseService).createCaseExecutionQuery();
+    verifyZeroInteractions(processEngine);
+  }
+
+  @Test
+  public void testFilterAccess() {
+    given()
+      .pathParam("name", EXAMPLE_ENGINE_NAME)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+      .when()
+        .get(FILTER_URL);
+
+    verify(mockFilterService).createFilterQuery();
     verifyZeroInteractions(processEngine);
   }
 }

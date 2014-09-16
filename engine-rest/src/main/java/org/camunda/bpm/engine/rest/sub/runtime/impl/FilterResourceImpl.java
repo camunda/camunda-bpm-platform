@@ -13,8 +13,6 @@
 
 package org.camunda.bpm.engine.rest.sub.runtime.impl;
 
-import static javax.ws.rs.core.Response.Status;
-
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -22,6 +20,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.ws.rs.core.Response.Status;
+
 import org.camunda.bpm.engine.FilterService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -139,7 +140,7 @@ public class FilterResourceImpl implements FilterResource {
   }
 
   public List<Object> queryList(String extendingQuery, Integer firstResult, Integer maxResults) {
-  List<Object> entities = executeFilterList(extendingQuery, firstResult, maxResults);
+    List<Object> entities = executeFilterList(extendingQuery, firstResult, maxResults);
 
     if (entities != null && !entities.isEmpty()) {
       Method fromEntity = getMethodFromMapping(entities.get(0).getClass(), DTO_MAPPING, "fromEntity");
@@ -156,6 +157,7 @@ public class FilterResourceImpl implements FilterResource {
 
   public HalResource queryHalList(String extendingQuery, Integer firstResult, Integer maxResults) {
     List<Object> entities = executeFilterList(extendingQuery, firstResult, maxResults);
+
     if (entities != null && !entities.isEmpty()) {
       long count = executeFilterCount(null);
       Method fromEntityList = getMethodFromMapping(entities.get(0).getClass(), HAL_LIST_MAPPING, "generate");
