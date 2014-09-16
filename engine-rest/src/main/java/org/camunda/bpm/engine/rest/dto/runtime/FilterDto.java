@@ -13,10 +13,10 @@
 
 package org.camunda.bpm.engine.rest.dto.runtime;
 
-import static javax.ws.rs.core.Response.Status;
-
 import java.io.IOException;
 import java.util.Map;
+
+import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.filter.Filter;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
@@ -97,7 +97,7 @@ public class FilterDto {
     filter.setName(getName());
     filter.setOwner(getOwner());
     filter.setQuery(jsonToString(getQuery()));
-    filter.setProperties(getProperties());
+    filter.setProperties(jsonToString(getProperties()));
   }
 
   protected static String jsonToString(Object json) {
