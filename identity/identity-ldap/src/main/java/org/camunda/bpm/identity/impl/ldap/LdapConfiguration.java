@@ -13,10 +13,9 @@
 package org.camunda.bpm.identity.impl.ldap;
 
 
+import javax.naming.directory.SearchControls;
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.naming.directory.SearchControls;
 
 
 /**
@@ -60,6 +59,7 @@ public class LdapConfiguration {
   protected boolean sortControlSupported = false;
   protected boolean useSsl = false;
   protected boolean usePosixGroups = false;
+  protected boolean allowAnonymousLogin = false;
 
   // getters / setters //////////////////////////////////////
 
@@ -142,7 +142,6 @@ public class LdapConfiguration {
   public void setGroupNameAttribute(String groupNameAttribute) {
     this.groupNameAttribute = groupNameAttribute;
   }
-
 
   public String getBaseDn() {
     return baseDn;
@@ -263,4 +262,11 @@ public class LdapConfiguration {
     this.groupTypeAttribute = groupTypeAttribute;
   }
 
+  public boolean isAllowAnonymousLogin() {
+    return allowAnonymousLogin;
+  }
+
+  public void setAllowAnonymousLogin(boolean allowAnonymousLogin) {
+    this.allowAnonymousLogin = allowAnonymousLogin;
+  }
 }

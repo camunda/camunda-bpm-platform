@@ -92,6 +92,11 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
     env.put(Context.SECURITY_PRINCIPAL, userDn);
     env.put(Context.SECURITY_CREDENTIALS, password);
 
+    // for anonymous login
+    if(ldapConfiguration.isAllowAnonymousLogin() && (password.equals("") || password.isEmpty())) {
+      env.put(Context.SECURITY_AUTHENTICATION, "none");
+    }
+
     if(ldapConfiguration.isUseSsl()) {
       env.put(Context.SECURITY_PROTOCOL, "ssl");
     }

@@ -32,5 +32,9 @@ public class LdapLoginTest extends LdapIdentityProviderTest {
     assertFalse(identityService.checkPassword("roman", null));
     assertFalse(identityService.checkPassword(null, null));
   }
+
+  public void testLdapLoginEmptyPassword() {
+    assertTrue(identityService.checkPassword("roman", ""));
+  }
   
 }

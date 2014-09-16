@@ -50,6 +50,7 @@
     <property name="groupIdAttribute" value="ou" />
     <property name="groupNameAttribute" value="cn" />
     <property name="groupMemberAttribute" value="member" />
+    <property name="allowAnonymousLogin" value="true" />
     
   </bean>
 
