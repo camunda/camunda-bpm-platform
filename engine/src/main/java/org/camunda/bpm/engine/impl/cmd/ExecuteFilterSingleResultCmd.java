@@ -22,11 +22,13 @@ import org.camunda.bpm.engine.query.Query;
  */
 public class ExecuteFilterSingleResultCmd extends AbstractExecuteFilterCmd implements Command<Object> {
 
+  private static final long serialVersionUID = 1L;
+
   public ExecuteFilterSingleResultCmd(String filterId) {
     super(filterId);
   }
 
-  public ExecuteFilterSingleResultCmd(String filterId, Query extendingQuery) {
+  public ExecuteFilterSingleResultCmd(String filterId, Query<?, ?> extendingQuery) {
     super(filterId, extendingQuery);
   }
 
@@ -35,7 +37,7 @@ public class ExecuteFilterSingleResultCmd extends AbstractExecuteFilterCmd imple
   }
 
   public Object execute(CommandContext commandContext) {
-    Query query = getFilterQuery(commandContext);
+    Query<?, ?> query = getFilterQuery(commandContext);
     return query.singleResult();
   }
 

@@ -28,6 +28,7 @@ import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
  */
 public class FilterQueryImpl extends AbstractQuery<FilterQuery, Filter> implements FilterQuery {
 
+  private static final long serialVersionUID = 1L;
   protected String filterId;
   protected String resourceType;
   protected String name;

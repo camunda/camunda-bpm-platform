@@ -21,13 +21,15 @@ import org.camunda.bpm.engine.query.Query;
 /**
  * @author Sebastian Menski
  */
-public class ExecuteFilterListCmd extends AbstractExecuteFilterCmd implements Command<List> {
+public class ExecuteFilterListCmd extends AbstractExecuteFilterCmd implements Command<List<?>> {
+
+  private static final long serialVersionUID = 1L;
 
   public ExecuteFilterListCmd(String filterId) {
     super(filterId);
   }
 
-  public ExecuteFilterListCmd(String filterId, Query extendingQuery) {
+  public ExecuteFilterListCmd(String filterId, Query<?, ?> extendingQuery) {
     super(filterId, extendingQuery);
   }
 
@@ -35,8 +37,8 @@ public class ExecuteFilterListCmd extends AbstractExecuteFilterCmd implements Co
     super(filterId, extendingQuery);
   }
 
-  public List execute(CommandContext commandContext) {
-    Query query = getFilterQuery(commandContext);
+  public List<?> execute(CommandContext commandContext) {
+    Query<?, ?> query = getFilterQuery(commandContext);
     return query.list();
   }
 

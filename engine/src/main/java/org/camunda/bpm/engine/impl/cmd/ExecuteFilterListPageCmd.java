@@ -21,7 +21,9 @@ import org.camunda.bpm.engine.query.Query;
 /**
  * @author Sebastian Menski
  */
-public class ExecuteFilterListPageCmd extends AbstractExecuteFilterCmd implements Command<List> {
+public class ExecuteFilterListPageCmd extends AbstractExecuteFilterCmd implements Command<List<?>> {
+
+  private static final long serialVersionUID = 1L;
 
   protected int firstResult;
   protected int maxResults;
@@ -32,7 +34,7 @@ public class ExecuteFilterListPageCmd extends AbstractExecuteFilterCmd implement
     this.maxResults = maxResults;
   }
 
-  public ExecuteFilterListPageCmd(String filterId, Query extendingQuery, int firstResult, int maxResults) {
+  public ExecuteFilterListPageCmd(String filterId, Query<?, ?> extendingQuery, int firstResult, int maxResults) {
     super(filterId, extendingQuery);
     this.firstResult = firstResult;
     this.maxResults = maxResults;
@@ -44,8 +46,8 @@ public class ExecuteFilterListPageCmd extends AbstractExecuteFilterCmd implement
     this.maxResults = maxResults;
   }
 
-  public List execute(CommandContext commandContext) {
-    Query query = getFilterQuery(commandContext);
+  public List<?> execute(CommandContext commandContext) {
+    Query<?, ?> query = getFilterQuery(commandContext);
     return query.listPage(firstResult, maxResults);
   }
 

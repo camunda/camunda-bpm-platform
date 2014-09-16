@@ -106,7 +106,7 @@ public interface FilterService {
    * @param extendingQuery additional query to extend the filter query
    * @return the query result as list
    */
-  <T> List<T> list(String filterId, Query extendingQuery);
+  <T> List<T> list(String filterId, Query<?, T> extendingQuery);
 
   /**
    * Executes the extended query of a filter and returns the result as list.
@@ -136,7 +136,7 @@ public interface FilterService {
    * @param maxResults maximal number of results
    * @return the query result as list
    */
-  <T> List<T> listPage(String filterId, Query extendingQuery, int firstResult, int maxResults);
+  <T> List<T> listPage(String filterId, Query<?, T> extendingQuery, int firstResult, int maxResults);
 
   /**
    * Executes the extended query of a filter and returns the result in the given boundaries as list.
@@ -164,7 +164,7 @@ public interface FilterService {
    * @param extendingQuery additional query to extend the filter query
    * @return the single query result
    */
-  <T> T singleResult(String filterId, Query extendingQuery);
+  <T> T singleResult(String filterId, Query<?, T> extendingQuery);
 
   /**
    * Executes the extended query of the filter and returns the a single result.
@@ -190,7 +190,7 @@ public interface FilterService {
    * @param extendingQuery additional query to extend the filter query as JSON object
    * @return the result count
    */
-  Long count(String filterId, Query extendingQuery);
+  Long count(String filterId, Query<?, ?> extendingQuery);
 
   /**
    * Executes the extended query of the filter and returns the result count.

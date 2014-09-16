@@ -38,7 +38,7 @@ public class FilterEntity implements Filter, Serializable, DbEntity {
 
   private static final long serialVersionUID = 1L;
 
-  public final static Map<String, JsonObjectConverter> queryConverter = new HashMap<String, JsonObjectConverter>();
+  public final static Map<String, JsonObjectConverter<?>> queryConverter = new HashMap<String, JsonObjectConverter<?>>();
 
   static {
     queryConverter.put(EntityTypes.TASK, new JsonTaskQueryConverter());
@@ -96,10 +96,9 @@ public class FilterEntity implements Filter, Serializable, DbEntity {
     return query;
   }
 
-  @SuppressWarnings("unchecked")
-  public <T extends Query> T getTypeQuery() {
-    JsonObjectConverter converter = getConverter();
-    return (T) converter.toObject(query);
+  public <T extends Query<?, ?>> T getTypeQuery() {
+    JsonObjectConverter<T> converter = getConverter();
+    return converter.toObject(query);
   }
 
   public Filter setQuery(String query) {
@@ -114,20 +113,18 @@ public class FilterEntity implements Filter, Serializable, DbEntity {
     return this;
   }
 
-  @SuppressWarnings("unchecked")
-  public <T extends Query> Filter setQuery(T query) {
+  public <T extends Query<?, ?>> Filter setQuery(T query) {
     ensureNotNull(NotValidException.class, "query", query);
-    JsonObjectConverter converter = getConverter();
+    JsonObjectConverter<T> converter = getConverter();
     setQuery(converter.toJson(query));
     return this;
   }
 
-  @SuppressWarnings("unchecked")
-  public <T extends Query> Filter extend(T extendingQuery) {
+  public <T extends Query<?, ?>> Filter extend(T extendingQuery) {
     ensureNotNull(NotValidException.class, "extendingQuery", extendingQuery);
 
     // convert extendingQuery to JSON
-    JsonObjectConverter converter = getConverter();
+    JsonObjectConverter<T> converter = getConverter();
     JSONObject extendingQueryJson = converter.toJsonObject(extendingQuery);
 
     return extendQuery(extendingQueryJson);
@@ -136,7 +133,7 @@ public class FilterEntity implements Filter, Serializable, DbEntity {
   public Filter extend(String extendingQuery) {
     ensureNotEmpty(NotValidException.class, "extendingQuery", extendingQuery);
     try {
-      Query query  = (Query) getConverter().toObject(extendingQuery);
+      Query<?, ?> query  = (Query<?, ?>) getConverter().toObject(extendingQuery);
       return extend(query);
     }
     catch (JSONException e) {
@@ -145,7 +142,7 @@ public class FilterEntity implements Filter, Serializable, DbEntity {
   }
 
   @SuppressWarnings("unchecked")
-  protected <T extends Query> Filter extendQuery(JSONObject extendingQuery) {
+  protected Filter extendQuery(JSONObject extendingQuery) {
     // parse query to JSON
     JSONObject queryJson = new JSONObject(query);
 
@@ -228,8 +225,9 @@ public class FilterEntity implements Filter, Serializable, DbEntity {
     return persistentState;
   }
 
-  protected JsonObjectConverter getConverter() {
-    JsonObjectConverter converter = queryConverter.get(resourceType);
+  @SuppressWarnings("unchecked")
+  protected <T> JsonObjectConverter<T> getConverter() {
+    JsonObjectConverter<T> converter = (JsonObjectConverter<T>) queryConverter.get(resourceType);
     if (converter != null) {
       return converter;
     }

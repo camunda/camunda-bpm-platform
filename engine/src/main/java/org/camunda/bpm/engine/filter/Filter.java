@@ -67,7 +67,7 @@ public interface Filter {
   /**
    * @return the saved query as query object
    */
-  <T extends Query> T getTypeQuery();
+  <T extends Query<?, ?>> T getTypeQuery();
 
   /**
    * @param query the saved query as JSON string
@@ -79,7 +79,7 @@ public interface Filter {
    * @param query the saved query as query object
    * @return this filter
    */
-  <T extends Query> Filter setQuery(T query);
+  <T extends Query<?, ?>> Filter setQuery(T query);
 
   /**
    * Extends the query with the additional query. The query of the filter is therefore modified
@@ -88,7 +88,7 @@ public interface Filter {
    * @param extendingQuery the query to extend the filter with
    * @return a copy of this filter with the extended query
    */
-  <T extends Query> Filter extend(T extendingQuery);
+  <T extends Query<?, ?>> Filter extend(T extendingQuery);
 
   /**
    * Extends the query with the additional query. The query of the filter is therefore modified
@@ -97,7 +97,7 @@ public interface Filter {
    * @param extendingQuery the query to extend the filter with
    * @return a copy of this filter with the extended query
    */
-  <T extends Query> Filter extend(String extendingQuery);
+  Filter extend(String extendingQuery);
 
   /**
    * @return the properties of the filter as JSON string

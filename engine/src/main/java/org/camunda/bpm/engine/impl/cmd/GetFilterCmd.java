@@ -17,7 +17,6 @@ import java.io.Serializable;
 import org.camunda.bpm.engine.filter.Filter;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.persistence.entity.FilterEntity;
 
 /**
  * @author Sebastian Menski

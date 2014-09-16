@@ -27,18 +27,18 @@ import org.camunda.bpm.engine.task.TaskQuery;
  * @author Sebastian Menski
  */
 public abstract class AbstractExecuteFilterCmd implements Serializable {
-  
+
   private static final long serialVersionUID = 1L;
 
   protected String filterId;
-  protected Query extendingQuery;
+  protected Query<?, ?> extendingQuery;
   protected String extendingQueryJson;
 
   public AbstractExecuteFilterCmd(String filterId) {
     this.filterId = filterId;
   }
 
-  public AbstractExecuteFilterCmd(String filterId, Query extendingQuery) {
+  public AbstractExecuteFilterCmd(String filterId, Query<?, ?> extendingQuery) {
     this.filterId = filterId;
     this.extendingQuery = extendingQuery;
   }
@@ -69,9 +69,9 @@ public abstract class AbstractExecuteFilterCmd implements Serializable {
     }
   }
 
-  protected Query getFilterQuery(CommandContext commandContext) {
+  protected Query<?, ?> getFilterQuery(CommandContext commandContext) {
     Filter filter = getFilter(commandContext);
-    Query query = filter.getTypeQuery();
+    Query<?, ?> query = filter.getTypeQuery();
     if (query instanceof TaskQuery) {
       ((TaskQuery) query).initializeFormKeys();
     }

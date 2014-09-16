@@ -72,7 +72,7 @@ public class FilterServiceTest extends PluggableProcessEngineTestCase {
     }
 
     try {
-      filter.setQuery((Query) null);
+      filter.setQuery((Query<?, ?>) null);
       fail("Exception expected");
     }
     catch (ProcessEngineException e) {
