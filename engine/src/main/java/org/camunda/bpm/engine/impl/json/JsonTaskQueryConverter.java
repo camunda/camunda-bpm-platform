@@ -13,12 +13,10 @@
 
 package org.camunda.bpm.engine.impl.json;
 
-import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.impl.Direction;
 import org.camunda.bpm.engine.impl.QueryOperator;
@@ -221,10 +219,6 @@ public class JsonTaskQueryConverter extends JsonObjectConverter<TaskQuery> {
 
   protected void addVariable(JSONArray array, TaskQueryVariableValue variable) {
     array.put(variableValueConverter.toJsonObject(variable));
-  }
-
-  public TaskQuery toObject(Reader reader) {
-    throw new ProcessEngineException("not implemented");
   }
 
   public TaskQuery toObject(String jsonString) {
