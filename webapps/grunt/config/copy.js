@@ -31,21 +31,6 @@ module.exports = function(config) {
 
       // overrides the settings above
       resources: {
-        'process-definition': {
-          // mock: false
-        },
-
-        'process-instance': {
-          // mock: false
-        },
-
-        'authorization': {
-          // mock: false
-        },
-
-        'task': {
-          // mock: false
-        }
       }
     }, null, 2) +';';
 
