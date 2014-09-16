@@ -65,8 +65,31 @@ define('camunda-tasklist-ui', [
     tasklistApp.config(require('camunda-tasklist-ui/config/translations'));
     tasklistApp.config(require('camunda-tasklist-ui/config/routes'));
 
+    tasklistApp.run([
+      '$rootScope',
+      '$translate',
+      'Notifications',
+    function(
+      $rootScope,
+      $translate,
+      Notifications
+    ) {
+      $rootScope.$on('authentication.session.expired', function() {
+        $translate([
+          'SESSION_EXPIRED',
+          'SESSION_EXPIRED_MESSAGE'
+        ]).then(function(translations) {
+          Notifications.addError({
+            status: translations.SESSION_EXPIRED,
+            message: translations.SESSION_EXPIRED_MESSAGE
+          });
+        });
+      });
+    }]);
+
     $(document).ready(function() {
       angular.bootstrap(document, ['cam.tasklist', 'cam.embedded.forms']);
+
       setTimeout(function() {
         var $aufocused = $('[autofocus]');
         if ($aufocused.length) {

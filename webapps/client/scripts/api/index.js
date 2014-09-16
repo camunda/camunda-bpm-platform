@@ -3,7 +3,8 @@
 define([
   'angular',
   'camunda-bpm-sdk',
-  'camunda-bpm-sdk-mock'],
+  'camunda-bpm-sdk-mock'
+],
 function(
   angular,
   CamSDK,
@@ -36,6 +37,11 @@ function(
 
         options.done = function(err, result) {
           $rootScope.$apply(function() {
+            // in case the session expired
+            if (err && err.status === 401) {
+              $rootScope.$broadcast('authentication.changed');
+              $rootScope.$broadcast('authentication.session.expired');
+            }
             original(err, result);
           });
         };

@@ -20,5 +20,9 @@
   "LOGGED_OUT":
                         "You are logged out.",
   "USER_NAME":
-                        "User name"
+                        "User name",
+  "SESSION_EXPIRED":
+                        "Your session has expired",
+  "SESSION_EXPIRED_MESSAGE":
+                        "You need to sign in again."
 }
