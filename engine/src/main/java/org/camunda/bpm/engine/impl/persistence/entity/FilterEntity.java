@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.impl.persistence.entity;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNull;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -72,6 +73,8 @@ public class FilterEntity implements Filter, Serializable, DbEntity, HasDbRevisi
 
   public Filter setResourceType(String resourceType) {
     ensureNotEmpty(NotValidException.class, "Filter resource type must not be null or empty", "resourceType", resourceType);
+    ensureNull(NotValidException.class, "Cannot overwrite filter resource type", "resourceType", this.resourceType);
+
     this.resourceType = resourceType;
     return this;
   }

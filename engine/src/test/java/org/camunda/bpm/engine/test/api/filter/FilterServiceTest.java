@@ -14,6 +14,7 @@
 package org.camunda.bpm.engine.test.api.filter;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.filter.Filter;
 import org.camunda.bpm.engine.impl.TaskQueryImpl;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
@@ -131,6 +132,17 @@ public class FilterServiceTest extends PluggableProcessEngineTestCase {
     Filter filter2 = filterService.getFilter(filter.getId());
 
     compareFilter(filter, filter2);
+  }
+
+  public void testCannotUpdateResourceType() {
+    try {
+      filter.setResourceType("another resource type");
+      fail("expected exception");
+    } catch (NotValidException e) {
+      // expected
+    }
+
+    filterService.saveFilter(filter);
   }
 
   public void testExtendFilter() {

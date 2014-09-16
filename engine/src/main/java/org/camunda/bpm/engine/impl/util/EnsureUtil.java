@@ -17,6 +17,7 @@ import java.lang.reflect.Constructor;
 import java.util.Collection;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.exception.NullValueException;
 
 /**
@@ -40,6 +41,12 @@ public final class EnsureUtil {
   public static void ensureNotNull(Class<? extends ProcessEngineException> exceptionClass, String message, String variableName, Object value) {
     if (value == null) {
       throw generateException(exceptionClass, message, variableName, "is null");
+    }
+  }
+
+  public static void ensureNull(Class<? extends ProcessEngineException> exceptionClass, String message, String variableName, Object value) {
+    if (value != null) {
+      throw generateException(exceptionClass, message, variableName, "is not null");
     }
   }
 
