@@ -20,17 +20,6 @@ define([
 
 
       .when('/login', {
-        // controller: [
-        //   '$rootScope',
-        //   '$location',
-        // function(
-        //   $rootScope,
-        //   $location
-        // ) {
-        //   if ($rootScope.authentication) {
-        //     // $location.replace()
-        //   }
-        // }],
         template: tasklistTemplate
       })
 

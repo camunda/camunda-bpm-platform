@@ -36,21 +36,20 @@ define([
                           activePane.isolateScope() :
                           activePane.scope();
 
-          console.info('paneScope', activePane[0], paneScope);
-
           if (activePane.hasClass('diagram-pane')) {
             paneScope.drawDiagram();
           }
         }
 
+
         function loadTask(taskId) {
-          // wait for #CAM-2596
           Task.get(taskId, function(err, task) {
             if (err) { throw err; }
             scope.task = $rootScope.currentTask = task;
             refreshTabs();
           });
         }
+
 
         function setTask(event) {
           var urlTaskId = $location.search().task;
