@@ -21,6 +21,7 @@ import org.camunda.bpm.engine.filter.Filter;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.FilterEntity;
 import org.camunda.bpm.engine.query.Query;
+import org.camunda.bpm.engine.task.TaskQuery;
 
 /**
  * @author Sebastian Menski
@@ -66,6 +67,15 @@ public abstract class AbstractExecuteFilterCmd implements Serializable {
     else {
       return filter;
     }
+  }
+
+  protected Query getFilterQuery(CommandContext commandContext) {
+    Filter filter = getFilter(commandContext);
+    Query query = filter.getTypeQuery();
+    if (query instanceof TaskQuery) {
+      ((TaskQuery) query).initializeFormKeys();
+    }
+    return query;
   }
 
 }

@@ -16,6 +16,7 @@ package org.camunda.bpm.engine.test.api.filter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.filter.Filter;
@@ -31,9 +32,11 @@ import org.camunda.bpm.engine.impl.json.JsonTaskQueryConverter;
 import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.query.Query;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.DelegationState;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
+import org.camunda.bpm.engine.test.Deployment;
 
 /**
  * @author Sebastian Menski
@@ -529,6 +532,26 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
     catch (NotValidException e) {
       // expected
     }
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/task/oneTaskWithFormKeyProcess.bpmn20.xml"})
+    public void testInitializeFormKeysEnabled() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testProcess");
+
+    TaskQuery query = taskService.createTaskQuery()
+      .processInstanceId(processInstance.getId());
+
+    saveQuery(query);
+
+    Task task = (Task) filterService.list(filter.getId()).get(0);
+
+    assertEquals("exampleFormKey", task.getFormKey());
+
+    task = filterService.singleResult(filter.getId());
+
+    assertEquals("exampleFormKey", task.getFormKey());
+
+    runtimeService.deleteProcessInstance(processInstance.getId(), "test");
   }
 
   protected void saveQuery(Query query) {

@@ -14,7 +14,6 @@
 package org.camunda.bpm.engine.impl.cmd;
 
 import java.util.List;
-import org.camunda.bpm.engine.filter.Filter;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.query.Query;
@@ -37,8 +36,8 @@ public class ExecuteFilterListCmd extends AbstractExecuteFilterCmd implements Co
   }
 
   public List execute(CommandContext commandContext) {
-    Filter filter = getFilter(commandContext);
-    return filter.getTypeQuery().list();
+    Query query = getFilterQuery(commandContext);
+    return query.list();
   }
 
 }
