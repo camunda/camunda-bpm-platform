@@ -19,7 +19,10 @@ package org.camunda.bpm.engine.rest.util;
 public class PathUtil {
 
   public static String decodePathParam(String param) {
-    return param.replaceAll("%2F", "/");
+
+    return param
+      .replaceAll("%2F", "/")
+      .replaceAll("%5C", "\\\\");
   }
 
 }
