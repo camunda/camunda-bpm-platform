@@ -455,7 +455,7 @@ define([
 
 
 
-    $scope.deletion = false;
+    $scope.deletion = typeof $scope.deletion === 'undefined' ? false : $scope.deletion;
 
     $scope.abortDeletion = function() {
       $scope.deletion = false;
@@ -560,7 +560,8 @@ define([
     }
 
 
-    function checkFilterState(evt, givenFilter) {
+    function checkFilterState(evt, givenFilter, deletion) {
+      $scope.deletion = deletion;
       if (givenFilter) {
         return loadPermissions(givenFilter, open);
       }
@@ -589,7 +590,10 @@ define([
 
 
     $scope.$on('filter.edit', checkFilterState);
-    $scope.$on('filter.delete', checkFilterState);
+
+    $scope.$on('filter.delete', function(evt, givenFilter) {
+      checkFilterState(evt, givenFilter, true);
+    });
 
     checkFilterState();
 
