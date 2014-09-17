@@ -252,7 +252,22 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
 
   public boolean checkPassword(String userId, String password) {
 
-    if(userId == null || password == null) {
+    // prevent a null password
+    if(password == null) {
+      return false;
+    }
+
+    // engine can't work without users
+    if(userId == null || userId.equals("") || userId.isEmpty()) {
+      return false;
+    }
+
+    /*
+    * We only allow login with no password if anonymous login is set.
+    * RFC allows such a behavior but discourages the usage so we provide it for
+    * user which have an ldap with anonymous login.
+    */
+    if(!ldapConfiguration.isAllowAnonymousLogin() && (password.isEmpty() || password.equals(""))) {
       return false;
     }
 
