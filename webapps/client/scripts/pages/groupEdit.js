@@ -9,7 +9,9 @@ define(['angular'], function(angular) {
 
     $scope.group = null;
     $scope.groupName = null;
-    $scope.encodedGroupId = $routeParams.groupId.replace(/\//g, '%2F');
+    $scope.encodedGroupId = $routeParams.groupId
+                                            .replace(/\//g, '%2F')
+                                            .replace(/\\/g, '%5C');
 
     $scope.availableOperations = {};
 

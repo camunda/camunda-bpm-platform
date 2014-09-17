@@ -11,8 +11,12 @@ define([ 'angular', 'require' ], function(angular, require) {
               '$scope', '$window', '$routeParams', 'UserResource', 'GroupResource', 'GroupMembershipResource', 'Notifications', '$location', '$modal', 'AuthorizationResource', 'authentication',
       function($scope,   $window,   $routeParams,   UserResource,   GroupResource,   GroupMembershipResource,   Notifications,   $location,   $modal,   AuthorizationResource,   authentication) {
 
-        $scope.encodedUserId = $routeParams.userId.replace(/\//g, '%2F');
-        $scope.decodedUserId = $routeParams.userId.replace(/%2F/g, '/');
+        $scope.encodedUserId = $routeParams.userId
+                                                .replace(/\//g, '%2F')
+                                                .replace(/\\/g, '%5C');
+        $scope.decodedUserId = $routeParams.userId
+                                                .replace(/%2F/g, '/')
+                                                .replace(/%5C/g, '\\');
         $scope.authenticatedUser = authentication;
 
         // used to display information about the user
