@@ -287,7 +287,6 @@ define([
     var modalInstance;
 
     function clearModalInstance() {
-      modalInstance.$destroy();
       modalInstance = null;
     }
 
@@ -296,7 +295,7 @@ define([
         return;
       }
 
-      var modalInstance = $modal.open({
+      modalInstance = $modal.open({
         size: 'lg',
         controller: 'processStartModalFormCtrl',
         template: templateStartForm
