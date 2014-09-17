@@ -276,13 +276,38 @@ define([
 
 
   processModule.controller('processStartCtrl', [
-          '$modal', '$scope',
-  function($modal,   $scope) {
+    '$modal',
+    '$scope',
+    '$rootScope',
+  function(
+    $modal,
+    $scope,
+    $rootScope
+  ) {
+    var modalInstance;
+
+    function clearModalInstance() {
+      modalInstance.$destroy();
+      modalInstance = null;
+    }
+
     $scope.openProcessStartModal = function() {
-      $modal.open({
+      if (!$rootScope.authentication || !$rootScope.authentication.name) {
+        return;
+      }
+
+      var modalInstance = $modal.open({
         size: 'lg',
         controller: 'processStartModalFormCtrl',
         template: templateStartForm
+      });
+
+      modalInstance.result.then(clearModalInstance, clearModalInstance);
+
+      $rootScope.$on('authentication.session.expired', function() {
+        if (modalInstance) {
+          modalInstance.close();
+        }
       });
     };
   }]);
