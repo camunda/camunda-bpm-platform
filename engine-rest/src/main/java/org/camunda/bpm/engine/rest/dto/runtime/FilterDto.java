@@ -93,7 +93,12 @@ public class FilterDto {
   }
 
   public void updateFilter(Filter filter) {
-    filter.setResourceType(getResourceType());
+    if (filter.getResourceType() == null) {
+      filter.setResourceType(getResourceType());
+    }
+    else if (getResourceType() != null && !getResourceType().equals(filter.getResourceType())) {
+      throw new InvalidRequestException(Status.BAD_REQUEST, "Unable to update filter from resource type '" + filter.getResourceType() + "' to '" + getResourceType() + "'");
+    }
     filter.setName(getName());
     filter.setOwner(getOwner());
     filter.setQuery(jsonToString(getQuery()));

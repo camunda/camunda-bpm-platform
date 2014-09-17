@@ -188,6 +188,24 @@ public abstract class AbstractFilterRestServiceInteractionTest extends AbstractR
   }
 
   @Test
+  public void testUpdateResourceType() {
+    FilterDto dto = FilterDto.fromFilter(MockProvider.createMockFilter());
+
+    dto.setResourceType("another" + dto.getResourceType());
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_FILTER_ID)
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(dto)
+      .then().expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+      .when()
+      .put(SINGLE_FILTER_URL);
+
+    verify(filterServiceMock).getFilter(MockProvider.EXAMPLE_FILTER_ID);
+  }
+
+  @Test
   public void testUpdateNonExistingFilter() {
     given()
       .pathParam("id", MockProvider.NON_EXISTING_ID)
