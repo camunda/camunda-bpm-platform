@@ -20,7 +20,6 @@ import java.util.Map;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.impl.HistoricActivityInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.Page;
-import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.persistence.AbstractHistoricManager;
 
 
@@ -30,7 +29,7 @@ import org.camunda.bpm.engine.impl.persistence.AbstractHistoricManager;
 public class HistoricActivityInstanceManager extends AbstractHistoricManager {
 
   public void deleteHistoricActivityInstancesByProcessInstanceId(String historicProcessInstanceId) {
-    if (historyLevel>=ProcessEngineConfigurationImpl.HISTORYLEVEL_ACTIVITY) {
+    if (isHistoryEnabled()) {
       getDbEntityManager().delete(HistoricActivityInstanceEntity.class, "deleteHistoricActivityInstancesByProcessInstanceId", historicProcessInstanceId);
     }
   }

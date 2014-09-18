@@ -263,8 +263,8 @@ public abstract class TestHelper {
          DbEntityManager dbEntityManager = commandContext.getDbEntityManager();
          PropertyEntity historyLevelProperty = dbEntityManager.selectById(PropertyEntity.class, "historyLevel");
          if (historyLevelProperty != null) {
-           if (processEngineConfiguration.getHistoryLevel() != new Integer(historyLevelProperty.getValue())) {
-             historyLevelProperty.setValue(Integer.toString(processEngineConfiguration.getHistoryLevel()));
+           if (processEngineConfiguration.getHistoryLevel().getId() != new Integer(historyLevelProperty.getValue())) {
+             historyLevelProperty.setValue(Integer.toString(processEngineConfiguration.getHistoryLevel().getId()));
              dbEntityManager.merge(historyLevelProperty);
            }
          } else {

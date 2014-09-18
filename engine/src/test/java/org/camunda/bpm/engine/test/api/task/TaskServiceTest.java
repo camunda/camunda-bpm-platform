@@ -86,7 +86,7 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
     assertEquals(0, task.getPriority());
     assertEquals("taskcaseinstanceid", task.getCaseInstanceId());
 
-    if (processEngineConfiguration.getHistoryLevel()>=ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT) {
+    if (processEngineConfiguration.getHistoryLevel().getId()>=ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT) {
       HistoricTaskInstance historicTaskInstance = historyService
         .createHistoricTaskInstanceQuery()
         .taskId(task.getId())
@@ -119,7 +119,7 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
     assertEquals(1, task.getPriority());
     assertEquals("updatetaskcaseinstanceid", task.getCaseInstanceId());
 
-    if (processEngineConfiguration.getHistoryLevel()>=ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT) {
+    if (processEngineConfiguration.getHistoryLevel().getId()>=ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT) {
       HistoricTaskInstance historicTaskInstance = historyService
         .createHistoricTaskInstanceQuery()
         .taskId(task.getId())
@@ -157,7 +157,7 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
   }
 
   public void testTaskComments() {
-    int historyLevel = processEngineConfiguration.getHistoryLevel();
+    int historyLevel = processEngineConfiguration.getHistoryLevel().getId();
     if (historyLevel>ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
       Task task = taskService.newTask();
       task.setOwner("johndoe");
@@ -195,7 +195,7 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
   }
 
   public void testAddTaskCommentNull() {
-    int historyLevel = processEngineConfiguration.getHistoryLevel();
+    int historyLevel = processEngineConfiguration.getHistoryLevel().getId();
     if (historyLevel>ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
       Task task = taskService.newTask("testId");
       taskService.saveTask(task);
@@ -211,7 +211,7 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
   }
 
   public void testAddTaskNullComment() {
-    int historyLevel = processEngineConfiguration.getHistoryLevel();
+    int historyLevel = processEngineConfiguration.getHistoryLevel().getId();
     if (historyLevel>ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
       try {
         taskService.addComment(null, null, "test");
@@ -222,7 +222,7 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
   }
 
   public void testTaskAttachments() {
-    int historyLevel = processEngineConfiguration.getHistoryLevel();
+    int historyLevel = processEngineConfiguration.getHistoryLevel().getId();
     if (historyLevel>ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
       Task task = taskService.newTask();
       task.setOwner("johndoe");
@@ -512,7 +512,7 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
     String taskId = task.getId();
     taskService.complete(taskId, null);
 
-    if (processEngineConfiguration.getHistoryLevel()>=ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT) {
+    if (processEngineConfiguration.getHistoryLevel().getId()>=ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT) {
       historyService.deleteHistoricTaskInstance(taskId);
     }
 
@@ -529,7 +529,7 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
     String taskId = task.getId();
     taskService.complete(taskId, Collections.EMPTY_MAP);
 
-    if (processEngineConfiguration.getHistoryLevel()>=ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT) {
+    if (processEngineConfiguration.getHistoryLevel().getId()>=ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT) {
       historyService.deleteHistoricTaskInstance(taskId);
     }
 
@@ -638,7 +638,7 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
     String taskId = task.getId();
     taskService.resolveTask(taskId, null);
 
-    if (processEngineConfiguration.getHistoryLevel()>=ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT) {
+    if (processEngineConfiguration.getHistoryLevel().getId()>=ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT) {
       historyService.deleteHistoricTaskInstance(taskId);
     }
 
@@ -658,7 +658,7 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
     String taskId = task.getId();
     taskService.resolveTask(taskId, Collections.EMPTY_MAP);
 
-    if (processEngineConfiguration.getHistoryLevel()>=ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT) {
+    if (processEngineConfiguration.getHistoryLevel().getId()>=ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT) {
       historyService.deleteHistoricTaskInstance(taskId);
     }
 
@@ -1064,7 +1064,7 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
   }
 
   private void checkHistoricVariableUpdateEntity(String variableName, String processInstanceId) {
-    if (processEngineConfiguration.getHistoryLevel() == ProcessEngineConfigurationImpl.HISTORYLEVEL_FULL) {
+    if (processEngineConfiguration.getHistoryLevel().getId() == ProcessEngineConfigurationImpl.HISTORYLEVEL_FULL) {
       boolean deletedVariableUpdateFound = false;
 
       List<HistoricDetail> resultSet = historyService.createHistoricDetailQuery().processInstanceId(processInstanceId).list();
@@ -1252,7 +1252,7 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
 
   public void testDeleteTaskWithDeleteReason() {
     // ACT-900: deleteReason can be manually specified - can only be validated when historyLevel > ACTIVITY
-    if (processEngineConfiguration.getHistoryLevel() >= ProcessEngineConfigurationImpl.HISTORYLEVEL_ACTIVITY) {
+    if (processEngineConfiguration.getHistoryLevel().getId() >= ProcessEngineConfigurationImpl.HISTORYLEVEL_ACTIVITY) {
 
       Task task = taskService.newTask();
       task.setName("test task");
@@ -1388,7 +1388,7 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
   }
 
   public void testGetTaskCommentByTaskIdAndCommentId() {
-    if (processEngineConfiguration.getHistoryLevel() > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
+    if (processEngineConfiguration.getHistoryLevel().getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
       // create and save new task
       Task task = taskService.newTask();
       taskService.saveTask(task);
@@ -1414,7 +1414,7 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
   }
 
   public void testTaskAttachmentByTaskIdAndAttachmentId() {
-    int historyLevel = processEngineConfiguration.getHistoryLevel();
+    int historyLevel = processEngineConfiguration.getHistoryLevel().getId();
     if (historyLevel>ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
       // create and save task
       Task task = taskService.newTask();
@@ -1447,7 +1447,7 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
   }
 
   public void testGetTaskAttachmentContentByTaskIdAndAttachmentId() {
-    int historyLevel = processEngineConfiguration.getHistoryLevel();
+    int historyLevel = processEngineConfiguration.getHistoryLevel().getId();
     if (historyLevel>ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
       // create and save task
       Task task = taskService.newTask();
@@ -1471,7 +1471,7 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
   }
 
   public void testGetTaskAttachmentWithNullParameters() {
-    int historyLevel = processEngineConfiguration.getHistoryLevel();
+    int historyLevel = processEngineConfiguration.getHistoryLevel().getId();
     if (historyLevel>ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
       Attachment attachment = taskService.getTaskAttachment(null, null);
       assertNull(attachment);
@@ -1479,7 +1479,7 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
   }
 
   public void testGetTaskAttachmentContentWithNullParameters() {
-    int historyLevel = processEngineConfiguration.getHistoryLevel();
+    int historyLevel = processEngineConfiguration.getHistoryLevel().getId();
     if (historyLevel>ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
       InputStream content = taskService.getTaskAttachmentContent(null, null);
       assertNull(content);
@@ -1487,7 +1487,7 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
   }
 
   public void testCreateTaskAttachmentWithNullTaskId() {
-    int historyLevel = processEngineConfiguration.getHistoryLevel();
+    int historyLevel = processEngineConfiguration.getHistoryLevel().getId();
     if (historyLevel>ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
       try {
         taskService.createAttachment("web page", null, "someprocessinstanceid", "weatherforcast", "temperatures and more", new ByteArrayInputStream("someContent".getBytes()));
@@ -1497,7 +1497,7 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
   }
 
   public void testDeleteTaskAttachmentWithNullParameters() {
-    int historyLevel = processEngineConfiguration.getHistoryLevel();
+    int historyLevel = processEngineConfiguration.getHistoryLevel().getId();
     if (historyLevel>ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
       try {
         taskService.deleteTaskAttachment(null, null);
@@ -1507,7 +1507,7 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
   }
 
   public void testDeleteTaskAttachmentWithTaskIdNull() {
-    int historyLevel = processEngineConfiguration.getHistoryLevel();
+    int historyLevel = processEngineConfiguration.getHistoryLevel().getId();
     if (historyLevel>ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
       try {
         taskService.deleteTaskAttachment(null, "myAttachmentId");
@@ -1517,7 +1517,7 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
   }
 
   public void testGetTaskAttachmentsWithTaskIdNull() {
-    int historyLevel = processEngineConfiguration.getHistoryLevel();
+    int historyLevel = processEngineConfiguration.getHistoryLevel().getId();
     if (historyLevel>ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
       assertEquals(Collections.<Attachment>emptyList(), taskService.getTaskAttachments(null));
     }

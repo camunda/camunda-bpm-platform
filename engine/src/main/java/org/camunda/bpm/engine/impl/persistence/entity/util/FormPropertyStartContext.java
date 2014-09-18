@@ -17,7 +17,9 @@ import java.util.Map;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.form.handler.StartFormHandler;
+import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
+import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
 import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
 import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
@@ -48,20 +50,16 @@ public class FormPropertyStartContext extends HistoryAwareStartContext {
   public void initialStarted(PvmExecutionImpl execution) {
 
     final ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
-    int historyLevel = processEngineConfiguration.getHistoryLevel();
-    if (historyLevel >= ProcessEngineConfigurationImpl.HISTORYLEVEL_ACTIVITY) {
+    HistoryLevel historyLevel = processEngineConfiguration.getHistoryLevel();
 
-      if (historyLevel >= ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT) {
+    if(historyLevel.isHistoryEventProduced(HistoryEventTypes.FORM_PROPERTY_UPDATE, execution)) {
+      final HistoryEventProducer eventProducer = processEngineConfiguration.getHistoryEventProducer();
+      final HistoryEventHandler eventHandler = processEngineConfiguration.getHistoryEventHandler();
 
-        final HistoryEventProducer eventProducer = processEngineConfiguration.getHistoryEventProducer();
-        final HistoryEventHandler eventHandler = processEngineConfiguration.getHistoryEventHandler();
-
-        for (String propertyId : formProperties.keySet()) {
-          Object propertyValue = formProperties.get(propertyId);
-          HistoryEvent evt = eventProducer.createFormPropertyUpdateEvt((ExecutionEntity) execution, propertyId, propertyValue, null);
-          eventHandler.handleEvent(evt);
-        }
-
+      for (String propertyId : formProperties.keySet()) {
+        Object propertyValue = formProperties.get(propertyId);
+        HistoryEvent evt = eventProducer.createFormPropertyUpdateEvt((ExecutionEntity) execution, propertyId, propertyValue, null);
+        eventHandler.handleEvent(evt);
       }
     }
 

@@ -122,7 +122,7 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
 
     runtimeService.deleteProcessInstance(processInstance.getId(), "test");
 
-    if (processEngineConfiguration.getHistoryLevel() >= HISTORYLEVEL_AUDIT) {
+    if (processEngineConfiguration.getHistoryLevel().getId() >= HISTORYLEVEL_AUDIT) {
       HistoricVariableInstance variable = historyService.createHistoricVariableInstanceQuery().variableName("delete").singleResult();
       assertNotNull(variable);
       assertTrue((Boolean) variable.getValue());
@@ -152,7 +152,7 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
 
     runtimeService.deleteProcessInstance(processInstance.getId(), "test");
 
-    if (processEngineConfiguration.getHistoryLevel() >= HISTORYLEVEL_AUDIT) {
+    if (processEngineConfiguration.getHistoryLevel().getId() >= HISTORYLEVEL_AUDIT) {
       HistoricVariableInstance variable = historyService.createHistoricVariableInstanceQuery().variableName("delete").singleResult();
       assertNotNull(variable);
       assertTrue((Boolean) variable.getValue());

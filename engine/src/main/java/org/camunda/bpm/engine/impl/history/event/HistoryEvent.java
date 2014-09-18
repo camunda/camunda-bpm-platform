@@ -42,35 +42,40 @@ public class HistoryEvent implements Serializable, DbEntity {
 
   private static final long serialVersionUID = 1L;
 
-  /** fired when an activity instance is started. */
-  public static final String ACTIVITY_EVENT_TYPE_START = "start";
-  /** fired when an activity instance is updated. */
-  public static final String ACTIVITY_EVENT_TYPE_UPDATE = "update";
-  /** fired when an activity instance is ended. */
-  public static final String ACTIVITY_EVENT_TYPE_END = "end";
+  // constants deprecated since 7.2
 
-  /** fired when a task instance is created */
-  public static final String TASK_EVENT_TYPE_CREATE = "create";
-  /** fired when a task instance is updated. */
-  public static final String TASK_EVENT_TYPE_UPDATE = "update";
-  /** fired when a task instance is completed. */
-  public static final String TASK_EVENT_TYPE_COMPLETE = "complete";
-  /** fired when a task instance is deleted. */
-  public static final String TASK_EVENT_TYPE_DELETE = "delete";
+  @Deprecated
+  public static final String ACTIVITY_EVENT_TYPE_START = HistoryEventTypes.ACTIVITY_INSTANCE_START.getEventName();
+  @Deprecated
+  public static final String ACTIVITY_EVENT_TYPE_UPDATE = HistoryEventTypes.ACTIVITY_INSTANCE_END.getEventName();
+  @Deprecated
+  public static final String ACTIVITY_EVENT_TYPE_END = HistoryEventTypes.ACTIVITY_INSTANCE_END.getEventName();
 
-  /** fired when a variable instance is created */
-  public static final String VARIABLE_EVENT_TYPE_CREATE = "create";
-  /** fired when a variable instance is updated */
-  public static final String VARIABLE_EVENT_TYPE_UPDATE = "update";
-  /** fired when a variable instance is deleted */
-  public static final String VARIABLE_EVENT_TYPE_DELETE = "delete";
+  @Deprecated
+  public static final String TASK_EVENT_TYPE_CREATE = HistoryEventTypes.TASK_INSTANCE_CREATE.getEventName();
+  @Deprecated
+  public static final String TASK_EVENT_TYPE_UPDATE = HistoryEventTypes.TASK_INSTANCE_UPDATE.getEventName();
+  @Deprecated
+  public static final String TASK_EVENT_TYPE_COMPLETE = HistoryEventTypes.TASK_INSTANCE_COMPLETE.getEventName();
+  @Deprecated
+  public static final String TASK_EVENT_TYPE_DELETE = HistoryEventTypes.TASK_INSTANCE_DELETE.getEventName();
 
-  /** fired when a form property is updated */
-  public static final String FORM_PROPERTY_UPDATE = "form-property-update";
+  @Deprecated
+  public static final String VARIABLE_EVENT_TYPE_CREATE = HistoryEventTypes.VARIABLE_INSTANCE_CREATE.getEventName();
+  @Deprecated
+  public static final String VARIABLE_EVENT_TYPE_UPDATE = HistoryEventTypes.VARIABLE_INSTANCE_UPDATE.getEventName();
+  @Deprecated
+  public static final String VARIABLE_EVENT_TYPE_DELETE = HistoryEventTypes.VARIABLE_INSTANCE_DELTE.getEventName();
 
-  public static final String INCIDENT_CREATE = "create";
-  public static final String INCIDENT_DELETE = "delete";
-  public static final String INCIDENT_RESOLVE = "resolve";
+  @Deprecated
+  public static final String FORM_PROPERTY_UPDATE = HistoryEventTypes.FORM_PROPERTY_UPDATE.getEventName();
+
+  @Deprecated
+  public static final String INCIDENT_CREATE = HistoryEventTypes.INCIDENT_CREATE.getEventName();
+  @Deprecated
+  public static final String INCIDENT_DELETE = HistoryEventTypes.INCIDENT_DELETE.getEventName();
+  @Deprecated
+  public static final String INCIDENT_RESOLVE = HistoryEventTypes.INCIDENT_RESOLVE.getEventName();
 
   /** each {@link HistoryEvent} has a unique id */
   protected String id;
@@ -95,19 +100,7 @@ public class HistoryEvent implements Serializable, DbEntity {
 
   /**
    * The type of the activity audit event.
-   *
-   * @see #ACTIVITY_EVENT_TYPE_START
-   * @see #ACTIVITY_EVENT_TYPE_END
-   * @see #ACTIVITY_EVENT_TYPE_UPDATE
-   *
-   * @see #TASK_EVENT_TYPE_CREATE
-   * @see #TASK_EVENT_TYPE_UPDATE
-   * @see #TASK_EVENT_TYPE_COMPLETE
-   * @see #TASK_EVENT_TYPE_DELETE
-   *
-   * @see #VARIABLE_EVENT_TYPE_CREATE
-   * @see #VARIABLE_EVENT_TYPE_UPDATE
-   * @see #VARIABLE_EVENT_TYPE_DELETE
+   * @see HistoryEventType#getEventName()
    * */
   protected String eventType;
 

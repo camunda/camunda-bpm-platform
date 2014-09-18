@@ -25,7 +25,9 @@ import org.camunda.bpm.engine.impl.HistoricTaskInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
+import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
 import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
 import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -51,7 +53,7 @@ public class HistoricTaskInstanceManager extends AbstractHistoricManager {
 
   @SuppressWarnings("unchecked")
   protected void deleteHistoricTaskInstances(String key, String value) {
-    if (historyLevel >= ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT) {
+    if (isHistoryEnabled()) {
 
       Map<String, String> params = new HashMap<String, String>();
       params.put(key, value);
@@ -67,7 +69,7 @@ public class HistoricTaskInstanceManager extends AbstractHistoricManager {
   }
 
   public long findHistoricTaskInstanceCountByQueryCriteria(final HistoricTaskInstanceQueryImpl historicTaskInstanceQuery) {
-    if (historyLevel > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
+    if (isHistoryEnabled()) {
       return (Long) getDbEntityManager()
         .selectOne("selectHistoricTaskInstanceCountByQueryCriteria",historicTaskInstanceQuery);
     }
@@ -77,7 +79,7 @@ public class HistoricTaskInstanceManager extends AbstractHistoricManager {
 
   @SuppressWarnings("unchecked")
   public List<HistoricTaskInstance> findHistoricTaskInstancesByQueryCriteria(final HistoricTaskInstanceQueryImpl historicTaskInstanceQuery, final Page page) {
-    if (historyLevel > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
+    if (isHistoryEnabled()) {
       return getDbEntityManager().selectList("selectHistoricTaskInstancesByQueryCriteria", historicTaskInstanceQuery, page);
     }
 
@@ -87,7 +89,7 @@ public class HistoricTaskInstanceManager extends AbstractHistoricManager {
   public HistoricTaskInstanceEntity findHistoricTaskInstanceById(final String taskId) {
     ensureNotNull("Invalid historic task id", "taskId", taskId);
 
-    if (historyLevel > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
+    if (isHistoryEnabled()) {
       return (HistoricTaskInstanceEntity) getDbEntityManager().selectOne("selectHistoricTaskInstance", taskId);
     }
 
@@ -95,7 +97,7 @@ public class HistoricTaskInstanceManager extends AbstractHistoricManager {
   }
 
   public void deleteHistoricTaskInstanceById(final String taskId) {
-    if (historyLevel > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
+    if (isHistoryEnabled()) {
       HistoricTaskInstanceEntity historicTaskInstance = findHistoricTaskInstanceById(taskId);
       if (historicTaskInstance != null) {
         CommandContext commandContext = Context.getCommandContext();
@@ -139,8 +141,8 @@ public class HistoricTaskInstanceManager extends AbstractHistoricManager {
   public void updateHistoricTaskInstance(TaskEntity taskEntity) {
     ProcessEngineConfigurationImpl configuration = Context.getProcessEngineConfiguration();
 
-    int historyLevel = configuration.getHistoryLevel();
-    if(historyLevel>=ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT) {
+    HistoryLevel historyLevel = configuration.getHistoryLevel();
+    if(historyLevel.isHistoryEventProduced(HistoryEventTypes.TASK_INSTANCE_UPDATE, taskEntity)) {
 
       final HistoryEventProducer eventProducer = configuration.getHistoryEventProducer();
       final HistoryEventHandler eventHandler = configuration.getHistoryEventHandler();
@@ -154,15 +156,15 @@ public class HistoricTaskInstanceManager extends AbstractHistoricManager {
   public void markTaskInstanceEnded(String taskId, String deleteReason) {
     ProcessEngineConfigurationImpl configuration = Context.getProcessEngineConfiguration();
 
-    int historyLevel = configuration.getHistoryLevel();
-    if(historyLevel>=ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT) {
+    TaskEntity taskEntity = Context.getCommandContext()
+        .getDbEntityManager()
+        .selectById(TaskEntity.class, taskId);
+
+    HistoryLevel historyLevel = configuration.getHistoryLevel();
+    if(historyLevel.isHistoryEventProduced(HistoryEventTypes.TASK_INSTANCE_COMPLETE, taskEntity)) {
 
       final HistoryEventProducer eventProducer = configuration.getHistoryEventProducer();
       final HistoryEventHandler eventHandler = configuration.getHistoryEventHandler();
-
-      TaskEntity taskEntity = Context.getCommandContext()
-          .getDbEntityManager()
-          .selectById(TaskEntity.class, taskId);
 
       HistoryEvent evt = eventProducer.createTaskInstanceCompleteEvt(taskEntity, deleteReason);
 
@@ -174,8 +176,8 @@ public class HistoricTaskInstanceManager extends AbstractHistoricManager {
   public void createHistoricTask(TaskEntity task) {
     ProcessEngineConfigurationImpl configuration = Context.getProcessEngineConfiguration();
 
-    int historyLevel = configuration.getHistoryLevel();
-    if(historyLevel>=ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT) {
+    HistoryLevel historyLevel = configuration.getHistoryLevel();
+    if(historyLevel.isHistoryEventProduced(HistoryEventTypes.TASK_INSTANCE_CREATE, task)) {
 
       final HistoryEventProducer eventProducer = configuration.getHistoryEventProducer();
       final HistoryEventHandler eventHandler = configuration.getHistoryEventHandler();

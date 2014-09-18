@@ -523,7 +523,7 @@ public class MessageBoundaryEventTest extends PluggableProcessEngineTestCase {
     // the process instance is ended
     assertProcessEnded(processInstance.getId());
 
-    if(processEngineConfiguration.getHistoryLevel()>ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
+    if(processEngineConfiguration.getHistoryLevel().getId()>ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
       // and all activity instances in history have an end time set
       List<HistoricActivityInstance> hais = historyService.createHistoricActivityInstanceQuery().list();
       for (HistoricActivityInstance historicActivityInstance : hais) {

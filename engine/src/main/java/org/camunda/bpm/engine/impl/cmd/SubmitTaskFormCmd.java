@@ -15,11 +15,14 @@ package org.camunda.bpm.engine.impl.cmd;
 
 import java.io.Serializable;
 import java.util.Map;
+
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.form.handler.TaskFormHandler;
+import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
+import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
 import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
 import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
 import org.camunda.bpm.engine.impl.interceptor.Command;
@@ -59,9 +62,9 @@ public class SubmitTaskFormCmd implements Command<Object>, Serializable {
 
     final ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
 
-    int historyLevel = processEngineConfiguration.getHistoryLevel();
+    HistoryLevel historyLevel = processEngineConfiguration.getHistoryLevel();
     ExecutionEntity execution = task.getExecution();
-    if (historyLevel >= ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT && execution != null) {
+    if (historyLevel.isHistoryEventProduced(HistoryEventTypes.FORM_PROPERTY_UPDATE, execution) && execution != null) {
 
       final HistoryEventProducer eventProducer = processEngineConfiguration.getHistoryEventProducer();
       final HistoryEventHandler eventHandler = processEngineConfiguration.getHistoryEventHandler();

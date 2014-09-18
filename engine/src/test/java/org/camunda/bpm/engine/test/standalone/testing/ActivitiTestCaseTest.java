@@ -38,7 +38,7 @@ public class ActivitiTestCaseTest extends ProcessEngineTestCase {
 
     ProcessEngineConfigurationImpl configuration = ((ProcessEngineImpl)processEngine).getProcessEngineConfiguration();
 
-    if (configuration.getHistoryLevel() > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
+    if (configuration.getHistoryLevel().getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
       assertEquals(1, historyService.createHistoricProcessInstanceQuery().count());
     }
   }

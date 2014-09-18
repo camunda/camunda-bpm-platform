@@ -168,7 +168,7 @@ public class BoundaryErrorEventTest extends PluggableProcessEngineTestCase {
     assertProcessEnded(procId);
 
     HistoricProcessInstance hip;
-    int historyLevel = processEngineConfiguration.getHistoryLevel();
+    int historyLevel = processEngineConfiguration.getHistoryLevel().getId();
     if (historyLevel>ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
       hip = historyService.createHistoricProcessInstanceQuery().processInstanceId(procId).singleResult();
       assertEquals("processEnd1", hip.getEndActivityId());

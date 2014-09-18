@@ -20,7 +20,7 @@ import java.util.List;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.SuspendedEntityInteractionException;
-import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.test.TestHelper;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
@@ -1487,7 +1487,7 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
       fail("should be allowed");
     }
 
-    if(processEngineConfiguration.getHistoryLevel() > ProcessEngineConfigurationImpl.HISTORYLEVEL_ACTIVITY) {
+    if(processEngineConfiguration.getHistoryLevel().getId() > HistoryLevel.HISTORY_LEVEL_ACTIVITY.getId()) {
 
       try {
         taskService.addComment(task.getId(), processInstance.getId(), "test comment");
@@ -1575,7 +1575,7 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
       fail("should be allowed");
     }
 
-    if(processEngineConfiguration.getHistoryLevel() > ProcessEngineConfigurationImpl.HISTORYLEVEL_ACTIVITY) {
+    if(processEngineConfiguration.getHistoryLevel().getId() > HistoryLevel.HISTORY_LEVEL_ACTIVITY.getId()) {
 
       try {
         taskService.addComment(task.getId(), processInstance.getId(), "test comment");
@@ -1663,7 +1663,7 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
       fail("should be allowed");
     }
 
-    if(processEngineConfiguration.getHistoryLevel() > ProcessEngineConfigurationImpl.HISTORYLEVEL_ACTIVITY) {
+    if(processEngineConfiguration.getHistoryLevel().getId() > HistoryLevel.HISTORY_LEVEL_ACTIVITY.getId()) {
 
       try {
         taskService.addComment(task.getId(), processInstance.getId(), "test comment");

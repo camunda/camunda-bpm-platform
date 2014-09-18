@@ -2,7 +2,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -10,20 +10,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.camunda.bpm.engine.impl.history;
 
-package org.camunda.bpm.engine.impl.cmd;
-
-import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.interceptor.Command;
-import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.history.event.HistoryEventType;
 
 /**
- * @author Sebastian Menski
+ *
+ * @author Daniel Meyer
+ *
  */
-public class GetHistoryLevelCmd implements Command<Integer> {
+public class HistoryLevelNone extends AbstractHistoryLevel {
 
-  public Integer execute(CommandContext commandContext) {
-    return Context.getProcessEngineConfiguration().getHistoryLevel().getId();
+  public int getId() {
+    return 0;
+  }
+
+  public String getName() {
+    return "none";
+  }
+
+  public boolean isHistoryEventProduced(HistoryEventType eventType, Object entity) {
+    return false;
   }
 
 }
