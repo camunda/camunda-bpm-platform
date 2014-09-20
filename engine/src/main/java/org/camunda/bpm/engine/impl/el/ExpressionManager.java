@@ -99,7 +99,9 @@ public class ExpressionManager {
 
   protected ProcessEngineElContext createElContext(VariableScope<?> variableScope) {
     ELResolver elResolver = createElResolver(variableScope);
-    return new ProcessEngineElContext(functionMappers, elResolver);
+    ProcessEngineElContext elContext = new ProcessEngineElContext(functionMappers, elResolver);
+    elContext.putContext(ExpressionFactory.class, expressionFactory);
+    return elContext;
   }
 
   protected ELResolver createElResolver(VariableScope<?> variableScope) {
