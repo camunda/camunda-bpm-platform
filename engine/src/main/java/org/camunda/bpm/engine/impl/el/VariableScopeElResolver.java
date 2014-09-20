@@ -12,9 +12,6 @@
  */
 package org.camunda.bpm.engine.impl.el;
 
-import java.beans.FeatureDescriptor;
-import java.util.Iterator;
-
 import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
 import org.camunda.bpm.engine.impl.context.Context;
@@ -22,6 +19,9 @@ import org.camunda.bpm.engine.impl.javax.el.ELContext;
 import org.camunda.bpm.engine.impl.javax.el.ELResolver;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
+
+import java.beans.FeatureDescriptor;
+import java.util.Iterator;
 
 
 /**
@@ -40,33 +40,31 @@ public class VariableScopeElResolver extends ELResolver {
   public static final String TASK_KEY = "task";
   public static final String LOGGED_IN_USER_KEY = "authenticatedUserId";
 
-  protected VariableScope variableScope;
-
-  public VariableScopeElResolver(VariableScope variableScope) {
-    this.variableScope = variableScope;
-  }
-
   public Object getValue(ELContext context, Object base, Object property)  {
 
-    if (base == null) {
-      String variable = (String) property; // according to javadoc, can only be a String
+    Object object = context.getContext(VariableScope.class);
+    if (object instanceof VariableScope) {
+      VariableScope variableScope = (VariableScope) object;
+      if (base == null) {
+        String variable = (String) property; // according to javadoc, can only be a String
 
-      if( (EXECUTION_KEY.equals(property) && variableScope instanceof ExecutionEntity)
-              || (TASK_KEY.equals(property) && variableScope instanceof TaskEntity)
-              || (variableScope instanceof CaseExecutionEntity
-                  && (CASE_EXECUTION_KEY.equals(property) || EXECUTION_KEY.equals(property))) ) {
-        context.setPropertyResolved(true);
-        return variableScope;
-      } else if (EXECUTION_KEY.equals(property) && variableScope instanceof TaskEntity) {
-        context.setPropertyResolved(true);
-        return ((TaskEntity) variableScope).getExecution();
-      } else if(LOGGED_IN_USER_KEY.equals(property)){
-        context.setPropertyResolved(true);
-        return Context.getCommandContext().getAuthenticatedUserId();
-      } else {
-        if (variableScope.hasVariable(variable)) {
-          context.setPropertyResolved(true); // if not set, the next elResolver in the CompositeElResolver will be called
-          return variableScope.getVariable(variable);
+        if( (EXECUTION_KEY.equals(property) && variableScope instanceof ExecutionEntity)
+                || (TASK_KEY.equals(property) && variableScope instanceof TaskEntity)
+                || (variableScope instanceof CaseExecutionEntity
+                && (CASE_EXECUTION_KEY.equals(property) || EXECUTION_KEY.equals(property))) ) {
+          context.setPropertyResolved(true);
+          return variableScope;
+        } else if (EXECUTION_KEY.equals(property) && variableScope instanceof TaskEntity) {
+          context.setPropertyResolved(true);
+          return ((TaskEntity) variableScope).getExecution();
+        } else if(LOGGED_IN_USER_KEY.equals(property)){
+          context.setPropertyResolved(true);
+          return Context.getCommandContext().getAuthenticatedUserId();
+        } else {
+          if (variableScope.hasVariable(variable)) {
+            context.setPropertyResolved(true); // if not set, the next elResolver in the CompositeElResolver will be called
+            return variableScope.getVariable(variable);
+          }
         }
       }
     }
@@ -80,7 +78,8 @@ public class VariableScopeElResolver extends ELResolver {
   public boolean isReadOnly(ELContext context, Object base, Object property) {
     if (base == null) {
       String variable = (String) property;
-      return !variableScope.hasVariable(variable);
+      Object object = context.getContext(VariableScope.class);
+      return object instanceof VariableScope && !((VariableScope)object).hasVariable(variable);
     }
     return true;
   }
@@ -88,8 +87,12 @@ public class VariableScopeElResolver extends ELResolver {
   public void setValue(ELContext context, Object base, Object property, Object value) {
     if (base == null) {
       String variable = (String) property;
-      if (variableScope.hasVariable(variable)) {
-        variableScope.setVariable(variable, value);
+      Object object = context.getContext(VariableScope.class);
+      if (object instanceof VariableScope) {
+        VariableScope variableScope = (VariableScope) object;
+        if (variableScope.hasVariable(variable)) {
+          variableScope.setVariable(variable, value);
+        }
       }
     }
   }

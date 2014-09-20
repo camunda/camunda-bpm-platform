@@ -20,26 +20,26 @@ import java.util.Iterator;
 
 /**
  * Enables customization of variable and property resolution behavior for EL expression evaluation.
- * 
+ *
  * While evaluating an expression, the ELResolver associated with the ELContext is consulted to do
  * the initial resolution of the first variable of an expression. It is also consulted when a . or
  * [] operator is encountered, except for the last such operator in a method expression, in which
  * case the resolution rules are hard coded.
- * 
+ *
  * For example, in the EL expression ${employee.lastName}, the ELResolver determines what object
  * employee refers to, and what it means to get the lastName property on that object.
- * 
+ *
  * Most methods in this class accept a base and property parameter. In the case of variable
  * resolution (e.g. determining what employee refers to in ${employee.lastName}), the base parameter
  * will be null and the property parameter will always be of type String. In this case, if the
  * property is not a String, the behavior of the ELResolver is undefined.
- * 
+ *
  * In the case of property resolution, the base parameter identifies the base object and the
  * property object identifies the property on that base. For example, in the expression
  * ${employee.lastName}, base is the result of the variable resolution for employee and property is
  * the string "lastName". In the expression ${y[x]}, base is the result of the variable resolution
  * for y and property is the result of the variable resolution for x.
- * 
+ *
  * Though only a single ELResolver is associated with an ELContext, there are usually multiple
  * resolvers considered for any given variable or property resolution. ELResolvers are combined
  * together using {@link CompositeELResolver}s, to define rich semantics for evaluating an
@@ -51,7 +51,7 @@ import java.util.Iterator;
  * property) pair, it must set the propertyResolved property of the ELContext to true. If it could
  * not handle the given pair, it must leave this property alone. The caller must ignore the return
  * value of the method if propertyResolved is false.
- * 
+ *
  * The {@link #getFeatureDescriptors(ELContext, Object)} and
  * {@link #getCommonPropertyType(ELContext, Object)} methods are primarily designed for design-time
  * tool support, but must handle invocation at runtime as well. The java.beans.Beans.isDesignTime()
@@ -77,7 +77,7 @@ public abstract class ELResolver {
 	 * primitive value, such as an integer index into an array. For example, the
 	 * {@link ArrayELResolver} will accept any int as a property, so the return value would be
 	 * Integer.class.
-	 * 
+	 *
 	 * @param context
 	 *            The context of this evaluation.
 	 * @param base
@@ -118,7 +118,7 @@ public abstract class ELResolver {
 	 * not Beans.isDesignTime() returns true), without causing errors. The propertyResolved property
 	 * of the ELContext is not relevant to this method. The results of all ELResolvers are
 	 * concatenated in the case of composite resolvers.
-	 * 
+	 *
 	 * @param context
 	 *            The context of this evaluation.
 	 * @param base
@@ -140,7 +140,7 @@ public abstract class ELResolver {
 	 * getValue().getClass(). For example, in the case of an {@link ArrayELResolver}, the getType
 	 * method will return the element type of the array, which might be a superclass of the type of
 	 * the actual element that is currently in the specified array element.
-	 * 
+	 *
 	 * @param context
 	 *            The context of this evaluation.
 	 * @param base
@@ -167,7 +167,7 @@ public abstract class ELResolver {
 	 * handles the given (base, property) pair, the propertyResolved property of the ELContext
 	 * object must be set to true by the resolver, before returning. If this property is not true
 	 * after this method is called, the caller should ignore the return value.
-	 * 
+	 *
 	 * @param context
 	 *            The context of this evaluation.
 	 * @param base
@@ -195,7 +195,7 @@ public abstract class ELResolver {
 	 * handles the given (base, property) pair, the propertyResolved property of the ELContext
 	 * object must be set to true by the resolver, before returning. If this property is not true
 	 * after this method is called, the caller should ignore the return value.
-	 * 
+	 *
 	 * @param context
 	 *            The context of this evaluation.
 	 * @param base
@@ -222,7 +222,7 @@ public abstract class ELResolver {
 	 * resolver handles the given (base, property) pair, the propertyResolved property of the
 	 * ELContext object must be set to true by the resolver, before returning. If this property is
 	 * not true after this method is called, the caller can safely assume no value has been set.
-	 * 
+	 *
 	 * @param context
 	 *            The context of this evaluation.
 	 * @param base
@@ -250,19 +250,19 @@ public abstract class ELResolver {
 	/**
 	 * Attempts to resolve and invoke the given <code>method</code> on the given <code>base</code>
 	 * object.
-	 * 
+	 *
 	 * <p>
 	 * If this resolver handles the given (base, method) pair, the <code>propertyResolved</code>
 	 * property of the <code>ELContext</code> object must be set to <code>true</code> by the
 	 * resolver, before returning. If this property is not <code>true</code> after this method is
 	 * called, the caller should ignore the return value.
 	 * </p>
-	 * 
+	 *
 	 * <p>
 	 * A default implementation is provided that returns null so that existing classes that extend
 	 * ELResolver can continue to function.
 	 * </p>
-	 * 
+	 *
 	 * @param context
 	 *            The context of this evaluation.
 	 * @param base
