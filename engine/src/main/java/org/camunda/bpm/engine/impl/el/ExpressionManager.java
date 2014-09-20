@@ -100,7 +100,7 @@ public class ExpressionManager {
 
   protected ProcessEngineElContext createElContext(VariableScope<?> variableScope) {
     if (cachedElResolver == null) {
-      cachedElResolver = createElResolver(variableScope);
+      cachedElResolver = createElResolver();
     }
 
     ProcessEngineElContext elContext = new ProcessEngineElContext(functionMappers, cachedElResolver);
@@ -109,7 +109,7 @@ public class ExpressionManager {
     return elContext;
   }
 
-  protected ELResolver createElResolver(VariableScope<?> variableScope) {
+  protected ELResolver createElResolver() {
     CompositeELResolver elResolver = new CompositeELResolver();
     elResolver.add(new VariableScopeElResolver());
 
