@@ -28,7 +28,7 @@ public class MockExpressionManager extends ExpressionManager {
   @Override
   protected ELResolver createElResolver(VariableScope<?> variableScope) {
     CompositeELResolver compositeElResolver = new CompositeELResolver();
-    compositeElResolver.add(new VariableScopeElResolver(variableScope));
+    compositeElResolver.add(new VariableScopeElResolver());
     compositeElResolver.add(new MockElResolver());
     compositeElResolver.add(new ArrayELResolver());
     compositeElResolver.add(new ListELResolver());

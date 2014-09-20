@@ -12,10 +12,6 @@
  */
 package org.camunda.bpm.engine.impl.el;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.core.variable.CoreVariableScope;
@@ -30,6 +26,10 @@ import org.camunda.bpm.engine.impl.javax.el.ListELResolver;
 import org.camunda.bpm.engine.impl.javax.el.MapELResolver;
 import org.camunda.bpm.engine.impl.javax.el.ValueExpression;
 import org.camunda.bpm.engine.impl.juel.ExpressionFactoryImpl;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -57,6 +57,7 @@ public class ExpressionManager {
   // Default implementation (does nothing)
   protected ELContext parsingElContext = new ProcessEngineElContext(functionMappers);
   protected Map<Object, Object> beans;
+  protected ELResolver cachedElResolver;
 
 
   public ExpressionManager() {
@@ -98,15 +99,19 @@ public class ExpressionManager {
   }
 
   protected ProcessEngineElContext createElContext(VariableScope<?> variableScope) {
-    ELResolver elResolver = createElResolver(variableScope);
-    ProcessEngineElContext elContext = new ProcessEngineElContext(functionMappers, elResolver);
+    if (cachedElResolver == null) {
+      cachedElResolver = createElResolver(variableScope);
+    }
+
+    ProcessEngineElContext elContext = new ProcessEngineElContext(functionMappers, cachedElResolver);
     elContext.putContext(ExpressionFactory.class, expressionFactory);
+    elContext.putContext(VariableScope.class, variableScope);
     return elContext;
   }
 
   protected ELResolver createElResolver(VariableScope<?> variableScope) {
     CompositeELResolver elResolver = new CompositeELResolver();
-    elResolver.add(new VariableScopeElResolver(variableScope));
+    elResolver.add(new VariableScopeElResolver());
 
     if(beans != null) {
       // ACT-1102: Also expose all beans in configuration when using standalone engine, not
@@ -120,6 +125,7 @@ public class ExpressionManager {
     elResolver.add(new ListELResolver());
     elResolver.add(new MapELResolver());
     elResolver.add(new BeanELResolver());
+
     return elResolver;
   }
 
