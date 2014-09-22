@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.impl.cmmn.operation;
 
 import static org.camunda.bpm.engine.delegate.CaseExecutionListener.COMPLETE;
 import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.COMPLETED;
+import static org.camunda.bpm.engine.impl.util.ActivityBehaviorUtil.getActivityBehavior;
 
 import java.util.List;
 
@@ -48,7 +49,7 @@ public abstract class AbstractAtomicOperationCaseExecutionComplete extends Abstr
     return execution;
   }
 
-  protected void eventNotificationsCompleted(CmmnExecution execution) {
+  protected void transitionNotificationCompleted(CmmnExecution execution) {
     if (!execution.isCaseInstanceExecution()) {
       execution.remove();
     } else {

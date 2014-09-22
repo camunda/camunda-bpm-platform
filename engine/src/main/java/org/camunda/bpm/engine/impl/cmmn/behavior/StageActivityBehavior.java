@@ -37,7 +37,9 @@ public class StageActivityBehavior extends StageOrTaskActivityBehavior implement
     List<CmmnActivity> childActivities = activity.getActivities();
 
     if (childActivities != null && !childActivities.isEmpty()) {
-      execution.createChildExecutions(childActivities);
+      List<CmmnExecution> children = execution.createChildExecutions(childActivities);
+      execution.createSentryParts();
+      execution.triggerChildExecutions(children);
     } else {
       execution.complete();
     }
@@ -158,7 +160,9 @@ public class StageActivityBehavior extends StageOrTaskActivityBehavior implement
         entity.forceUpdate();
       }
 
-      if (canComplete(execution, false, false)) {
+      // TODO: evaluate autoComplete property
+      boolean autoComplete = false;
+      if (canComplete(execution, autoComplete, false)) {
         execution.complete();
       }
     }

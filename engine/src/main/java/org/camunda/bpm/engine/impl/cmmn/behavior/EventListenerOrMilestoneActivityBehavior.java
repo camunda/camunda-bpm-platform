@@ -122,4 +122,8 @@ public abstract class EventListenerOrMilestoneActivityBehavior extends PlanItemD
 
   protected abstract String getTypeName();
 
+  protected boolean isExitCriteriaSatisfied(CmmnActivityExecution execution) {
+    return false;
+  }
+
 }

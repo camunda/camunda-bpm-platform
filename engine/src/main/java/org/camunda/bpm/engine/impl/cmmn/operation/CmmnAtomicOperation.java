@@ -21,6 +21,7 @@ import org.camunda.bpm.engine.impl.core.operation.CoreAtomicOperation;
  */
 public interface CmmnAtomicOperation extends CoreAtomicOperation<CmmnExecution> {
 
+  // lifecycle
   CmmnAtomicOperation CASE_INSTANCE_CREATE = new AtomicOperationCaseInstanceCreate();
   CmmnAtomicOperation CASE_INSTANCE_CLOSE = new AtomicOperationCaseInstanceClose();
   CmmnAtomicOperation CASE_EXECUTION_CREATE = new AtomicOperationCaseExecutionCreate();
@@ -41,6 +42,10 @@ public interface CmmnAtomicOperation extends CoreAtomicOperation<CmmnExecution> 
   CmmnAtomicOperation CASE_EXECUTION_RESUME = new AtomicOperationCaseExecutionResume();
   CmmnAtomicOperation CASE_EXECUTION_PARENT_RESUME = new AtomicOperationCaseExecutionParentResume();
   CmmnAtomicOperation CASE_EXECUTION_RE_ACTIVATE = new AtomicOperationCaseExecutionReactivate();
+
+  // sentry
+  CmmnAtomicOperation CASE_EXECUTION_TRIGGER_ENTRY_CRITERIA = new AtomicOperationCaseExecutionTriggerEntryCriteria();
+  CmmnAtomicOperation CASE_EXECUTION_TRIGGER_EXIT_CRITERIA = new AtomicOperationCaseExecutionTriggerExitCriteria();
 
 
   // delete cascade a case execution

@@ -12,6 +12,7 @@
  */
 package org.camunda.bpm.engine.impl.cmmn.behavior;
 
+import org.camunda.bpm.engine.exception.cmmn.CaseIllegalStateTransitionException;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnActivityExecution;
 
 /**
@@ -32,6 +33,10 @@ public class EventListenerActivityBehavior extends EventListenerOrMilestoneActiv
 
   protected String getTypeName() {
     return "event listener";
+  }
+
+  public void triggerEntryCriteria(CmmnActivityExecution execution) {
+    throw new CaseIllegalStateTransitionException("Cannot trigger case execution '"+execution.getId()+"': entry criteria are not allowed for event listener.");
   }
 
 }

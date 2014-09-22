@@ -26,6 +26,21 @@ create table ACT_RU_CASE_EXECUTION (
     primary key (ID_)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 
+-- create case sentry part table --
+
+create table ACT_RU_CASE_SENTRY_PART (
+    ID_ varchar(64) NOT NULL,
+    REV_ integer,
+    CASE_INST_ID_ varchar(64),
+    CASE_EXEC_ID_ varchar(64),
+    SENTRY_ID_ varchar(255),
+    TYPE_ varchar(255),
+    SOURCE_CASE_EXEC_ID_ varchar(64),
+    STANDARD_EVENT_ varchar(255),
+    SATISFIED_ boolean,
+    primary key (ID_)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
+
 -- create unique constraint on ACT_RE_CASE_DEF --
 alter table ACT_RE_CASE_DEF
     add constraint ACT_UNIQ_CASE_DEF
@@ -71,3 +86,14 @@ alter table ACT_RU_TASK
   add constraint ACT_FK_TASK_CASE_DEF
   foreign key (CASE_DEF_ID_)
   references ACT_RE_CASE_DEF(ID_);
+
+-- create foreign key constraints on ACT_RU_CASE_SENTRY_PART --
+alter table ACT_RU_CASE_SENTRY_PART
+    add constraint ACT_FK_CASE_SENTRY_CASE_INST
+    foreign key (CASE_INST_ID_)
+    references ACT_RU_CASE_EXECUTION(ID_);
+
+alter table ACT_RU_CASE_SENTRY_PART
+    add constraint ACT_FK_CASE_SENTRY_CASE_EXEC
+    foreign key (CASE_EXEC_ID_)
+    references ACT_RU_CASE_EXECUTION(ID_);

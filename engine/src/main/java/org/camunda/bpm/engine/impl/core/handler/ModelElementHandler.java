@@ -22,16 +22,16 @@ import org.camunda.bpm.model.xml.instance.ModelElementInstance;
  * @author Roman Smirnov
  *
  */
-public interface ModelElementHandler<T extends ModelElementInstance, V extends HandlerContext> {
+public interface ModelElementHandler<T extends ModelElementInstance, V extends HandlerContext, E> {
 
   /**
-   * <p>This method handles a element to create a new {@link CoreActivity activity}.</p>
+   * <p>This method handles a element to create a new element.</p>
    *
    * @param element the {@link ModelElementInstance} to be handled.
    * @param context the {@link HandlerContext} which holds necessary information.
    *
-   * @return a new {@link CoreActivity activity}.
+   * @return a new element.
    */
-  CoreActivity handleElement(T element, V context);
+  E handleElement(T element, V context);
 
 }

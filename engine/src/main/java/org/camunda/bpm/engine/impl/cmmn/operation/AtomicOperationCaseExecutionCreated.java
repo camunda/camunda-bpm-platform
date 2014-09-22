@@ -12,10 +12,10 @@
  */
 package org.camunda.bpm.engine.impl.cmmn.operation;
 
+import static org.camunda.bpm.engine.impl.util.ActivityBehaviorUtil.getActivityBehavior;
+
 import org.camunda.bpm.engine.impl.cmmn.behavior.CmmnActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
-import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
-import org.camunda.bpm.engine.impl.pvm.PvmException;
 
 /**
  * @author Tom Baeyens
@@ -27,19 +27,7 @@ public class AtomicOperationCaseExecutionCreated implements CmmnAtomicOperation 
   }
 
   public void execute(CmmnExecution execution) {
-    String id = execution.getId();
-    CmmnActivity activity = execution.getActivity();
-
-    if (activity == null) {
-      throw new PvmException("Case execution '"+id+"': has no current activity.");
-    }
-
-    CmmnActivityBehavior behavior = activity.getActivityBehavior();
-
-    if (behavior==null) {
-      throw new PvmException("There is no behavior specified in "+activity+" for case execution '"+id+"'.");
-    }
-
+    CmmnActivityBehavior behavior = getActivityBehavior(execution);
     behavior.created(execution);
   }
 

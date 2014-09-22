@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.impl.cmmn.operation;
 
 import static org.camunda.bpm.engine.delegate.CaseExecutionListener.DISABLE;
 import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.DISABLED;
+import static org.camunda.bpm.engine.impl.util.ActivityBehaviorUtil.getActivityBehavior;
 
 import org.camunda.bpm.engine.impl.cmmn.behavior.CmmnActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.behavior.CompositeActivityBehavior;
@@ -42,7 +43,7 @@ public class AtomicOperationCaseExecutionDisable extends AbstractCmmnEventAtomic
     return execution;
   }
 
-  protected void eventNotificationsCompleted(CmmnExecution execution) {
+  protected void transitionNotificationCompleted(CmmnExecution execution) {
     CmmnExecution parent = execution.getParent();
     if (parent != null) {
       CmmnActivityBehavior behavior = getActivityBehavior(parent);

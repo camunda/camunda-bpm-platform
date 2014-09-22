@@ -17,7 +17,10 @@ import org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionImpl;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnActivityExecution;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnCaseInstance;
 import org.camunda.bpm.engine.impl.cmmn.model.CaseDefinitionBuilder;
+import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
+import org.camunda.bpm.engine.impl.cmmn.model.CmmnOnPartDeclaration;
+import org.camunda.bpm.engine.impl.cmmn.model.CmmnSentryDeclaration;
 import org.camunda.bpm.engine.impl.test.PvmTestCase;
 import org.junit.Test;
 
@@ -35,9 +38,20 @@ public class CaseExecutionOccurTest extends PvmTestCase {
     CmmnCaseDefinition caseDefinition = new CaseDefinitionBuilder("Case1")
       .createActivity("A")
         .behavior(new MilestoneActivityBehavior())
-        .property("hasEntryCriterias", true)
       .endActivity()
       .buildCaseDefinition();
+
+    CmmnActivity activity = caseDefinition.findActivity("A");
+
+    // a pseudo sentry
+    CmmnSentryDeclaration sentryDeclaration = new CmmnSentryDeclaration("X");
+    caseDefinition.findActivity("Case1").addSentry(sentryDeclaration);
+    activity.addEntryCriteria(sentryDeclaration);
+
+    CmmnOnPartDeclaration onPartDeclaration = new CmmnOnPartDeclaration();
+    onPartDeclaration.setSource(new CmmnActivity("B", caseDefinition));
+    onPartDeclaration.setStandardEvent("complete");
+    sentryDeclaration.addOnPart(onPartDeclaration);
 
     // an active case instance
     CmmnCaseInstance caseInstance = caseDefinition.createCaseInstance();

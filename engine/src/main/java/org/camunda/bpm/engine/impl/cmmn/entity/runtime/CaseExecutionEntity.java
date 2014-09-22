@@ -21,6 +21,7 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.ProcessEngineServices;
 import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
+import org.camunda.bpm.engine.impl.cmmn.execution.CmmnSentryPart;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
 import org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation;
@@ -31,6 +32,7 @@ import org.camunda.bpm.engine.impl.core.variable.CorePersistentVariableStore;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.HasDbReferences;
 import org.camunda.bpm.engine.impl.db.HasDbRevision;
+import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessDefinition;
@@ -50,7 +52,6 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
 
   private static final long serialVersionUID = 1L;
 
-
   // current position /////////////////////////////////////////////////////////
 
   /** the case instance.  this is the root of the execution tree.
@@ -62,6 +63,10 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
 
   /** nested executions */
   protected List<CaseExecutionEntity> caseExecutions;
+
+  /** nested case sentry parts */
+  protected List<CaseSentryPartEntity> caseSentryParts;
+  protected Map<String, List<CaseSentryPartEntity>> sentries;
 
   /** reference to a sub process instance, not-null if currently subprocess is started from this execution */
   protected transient ExecutionEntity subProcessInstance;
@@ -372,6 +377,72 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
     }
   }
 
+  // sentry /////////////////////////////////////////////////////////////////////////
+
+  public List<CaseSentryPartEntity> getCaseSentryParts() {
+    ensureCaseSentryPartsInitialized();
+    return caseSentryParts;
+  }
+
+  protected void ensureCaseSentryPartsInitialized() {
+    if (caseSentryParts == null) {
+
+      caseSentryParts = Context
+        .getCommandContext()
+        .getCaseSentryPartManager()
+        .findCaseSentryPartsByCaseExecutionId(id);
+
+      sentries = new HashMap<String, List<CaseSentryPartEntity>>();
+
+      for (CaseSentryPartEntity sentryPart : caseSentryParts) {
+
+        String sentryId = sentryPart.getSentryId();
+        List<CaseSentryPartEntity> parts = sentries.get(sentryId);
+
+        if (parts == null) {
+          parts = new ArrayList<CaseSentryPartEntity>();
+          sentries.put(sentryId, parts);
+        }
+
+        parts.add(sentryPart);
+
+      }
+
+    }
+  }
+
+  protected void addSentryPart(CmmnSentryPart sentryPart) {
+    CaseSentryPartEntity entity = (CaseSentryPartEntity) sentryPart;
+
+    getCaseSentryParts().add(entity);
+
+    String sentryId = sentryPart.getSentryId();
+    List<CaseSentryPartEntity> parts = sentries.get(sentryId);
+
+    if (parts == null) {
+      parts = new ArrayList<CaseSentryPartEntity>();
+      sentries.put(sentryId, parts);
+    }
+
+    parts.add(entity);
+  }
+
+  protected List<CaseSentryPartEntity> findSentry(String sentryId) {
+    ensureCaseSentryPartsInitialized();
+    return sentries.get(sentryId);
+  }
+
+  protected CaseSentryPartEntity newSentryPart() {
+    CaseSentryPartEntity caseSentryPart = new CaseSentryPartEntity();
+
+    Context
+      .getCommandContext()
+      .getCaseSentryPartManager()
+      .insertCaseSentryPart(caseSentryPart);
+
+    return caseSentryPart;
+  }
+
   // variables //////////////////////////////////////////////////////////////
 
   protected CorePersistentVariableStore getVariableStore() {
@@ -411,8 +482,16 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
 
     variableStore.removeVariablesWithoutFiringEvents();
 
+    CommandContext commandContext = Context.getCommandContext();
+
+    for (CaseSentryPartEntity sentryPart : getCaseSentryParts()) {
+      commandContext
+        .getCaseSentryPartManager()
+        .deleteSentryPart(sentryPart);
+    }
+
     // finally delete this execution
-    Context.getCommandContext()
+    commandContext
       .getCaseExecutionManager()
       .deleteCaseExecution(this);
   }

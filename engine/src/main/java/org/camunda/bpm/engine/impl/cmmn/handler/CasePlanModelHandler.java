@@ -12,10 +12,15 @@
  */
 package org.camunda.bpm.engine.impl.cmmn.handler;
 
+import java.util.Collection;
 import java.util.List;
 
+import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
+import org.camunda.bpm.engine.impl.cmmn.model.CmmnSentryDeclaration;
+import org.camunda.bpm.model.cmmn.impl.instance.CasePlanModel;
 import org.camunda.bpm.model.cmmn.instance.CmmnElement;
 import org.camunda.bpm.model.cmmn.instance.PlanItemDefinition;
+import org.camunda.bpm.model.cmmn.instance.Sentry;
 
 /**
  * @author Roman Smirnov
@@ -29,6 +34,15 @@ public class CasePlanModelHandler extends StageItemHandler {
 
   protected List<String> getStandardEvents(CmmnElement element) {
     return CASE_PLAN_MODEL_EVENTS;
+  }
+
+  public void initializeExitCriterias(CasePlanModel casePlanModel, CmmnActivity activity, CmmnHandlerContext context) {
+    Collection<Sentry> exitCriterias = casePlanModel.getExitCriterias();
+    for (Sentry sentry : exitCriterias) {
+      String sentryId = sentry.getId();
+      CmmnSentryDeclaration sentryDeclaration = activity.getSentry(sentryId);
+      activity.addExitCriteria(sentryDeclaration);
+    }
   }
 
 }

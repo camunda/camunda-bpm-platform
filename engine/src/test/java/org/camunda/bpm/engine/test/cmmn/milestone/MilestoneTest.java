@@ -12,9 +12,6 @@
  */
 package org.camunda.bpm.engine.test.cmmn.milestone;
 
-import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
-import org.camunda.bpm.engine.impl.interceptor.Command;
-import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.CaseInstance;
@@ -62,35 +59,53 @@ public class MilestoneTest extends PluggableProcessEngineTestCase {
         .activityId("PI_Milestone_1")
         .singleResult();
 
-    String milestoneId = milestone.getId();
+    String humanTaskId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
 
     assertTrue(milestone.isAvailable());
 
     // when
-    occur(milestoneId);
+    caseService
+      .withCaseExecution(humanTaskId)
+      .manualStart();
+
+    // then
+    assertNull(caseService.getVariable(caseInstanceId, "occur"));
+
+    milestone = caseService
+        .createCaseExecutionQuery()
+        .available()
+        .singleResult();
+
+    assertTrue(milestone.isAvailable());
+
+    // when
+    caseService
+      .withCaseExecution(humanTaskId)
+      .complete();
 
     // then
     Object occurVariable = caseService.getVariable(caseInstanceId, "occur");
     assertNotNull(occurVariable);
     assertTrue((Boolean) occurVariable);
-  }
 
-  protected void occur(final String caseExecutionId) {
-    processEngineConfiguration
-      .getCommandExecutorTxRequired()
-      .execute(new Command<Void>() {
+    milestone = caseService
+        .createCaseExecutionQuery()
+        .available()
+        .singleResult();
 
-        @Override
-        public Void execute(CommandContext commandContext) {
-          CmmnExecution caseTask = (CmmnExecution) caseService
-              .createCaseExecutionQuery()
-              .caseExecutionId(caseExecutionId)
-              .singleResult();
-          caseTask.occur();
-          return null;
-        }
+    assertNull(milestone);
 
-      });
+    CaseInstance caseInstance = caseService
+        .createCaseInstanceQuery()
+        .caseInstanceId(caseInstanceId)
+        .singleResult();
+
+    assertTrue(caseInstance.isCompleted());
+
   }
 
 }

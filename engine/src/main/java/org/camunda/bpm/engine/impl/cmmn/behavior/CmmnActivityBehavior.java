@@ -64,4 +64,9 @@ public interface CmmnActivityBehavior extends CoreActivityBehavior<CmmnActivityE
   public void reactivated(CmmnActivityExecution execution);
 
   public void onClose(CmmnActivityExecution execution);
+
+  public void triggerEntryCriteria(CmmnActivityExecution execution);
+
+  public void triggerExitCriteria(CmmnActivityExecution execution);
+
 }

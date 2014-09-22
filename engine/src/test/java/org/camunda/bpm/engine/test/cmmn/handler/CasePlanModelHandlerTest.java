@@ -13,14 +13,21 @@
 package org.camunda.bpm.engine.test.cmmn.handler;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import org.camunda.bpm.engine.impl.cmmn.behavior.CmmnActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.behavior.StageActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.handler.CasePlanModelHandler;
+import org.camunda.bpm.engine.impl.cmmn.handler.SentryHandler;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
+import org.camunda.bpm.engine.impl.cmmn.model.CmmnSentryDeclaration;
+import org.camunda.bpm.model.cmmn.impl.instance.Body;
+import org.camunda.bpm.model.cmmn.impl.instance.ConditionExpression;
+import org.camunda.bpm.model.cmmn.instance.IfPart;
+import org.camunda.bpm.model.cmmn.instance.Sentry;
 import org.junit.Test;
 
 /**
@@ -82,4 +89,90 @@ public class CasePlanModelHandlerTest extends CmmnElementHandlerTest {
     assertEquals(parent, activity.getParent());
     assertTrue(parent.getActivities().contains(activity));
   }
+
+  @Test
+  public void testExitCriteria() {
+    // given
+
+    // create sentry containing ifPart
+    Sentry sentry = createElement(casePlanModel, "Sentry_1", Sentry.class);
+    IfPart ifPart = createElement(sentry, "abc", IfPart.class);
+    ConditionExpression conditionExpression = createElement(ifPart, "def", ConditionExpression.class);
+    Body body = createElement(conditionExpression, null, Body.class);
+    body.setTextContent("${test}");
+
+    // set exitCriteria
+    casePlanModel.getExitCriterias().add(sentry);
+
+    // transform casePlanModel
+    CmmnActivity newActivity = handler.handleElement(casePlanModel, context);
+
+    // transform Sentry
+    context.setParent(newActivity);
+    SentryHandler sentryHandler = new SentryHandler();
+    CmmnSentryDeclaration sentryDeclaration = sentryHandler.handleElement(sentry, context);
+
+    // when
+    handler.initializeExitCriterias(casePlanModel, newActivity, context);
+
+    // then
+    assertTrue(newActivity.getEntryCriteria().isEmpty());
+
+    assertFalse(newActivity.getExitCriteria().isEmpty());
+    assertEquals(1, newActivity.getExitCriteria().size());
+
+    assertEquals(sentryDeclaration, newActivity.getExitCriteria().get(0));
+
+  }
+
+  @Test
+  public void testMultipleExitCriteria() {
+    // given
+
+    // create first sentry containing ifPart
+    Sentry sentry1 = createElement(casePlanModel, "Sentry_1", Sentry.class);
+    IfPart ifPart1 = createElement(sentry1, "abc", IfPart.class);
+    ConditionExpression conditionExpression1 = createElement(ifPart1, "def", ConditionExpression.class);
+    Body body1 = createElement(conditionExpression1, null, Body.class);
+    body1.setTextContent("${test}");
+
+    // set first exitCriteria
+    casePlanModel.getExitCriterias().add(sentry1);
+
+    // create first sentry containing ifPart
+    Sentry sentry2 = createElement(casePlanModel, "Sentry_2", Sentry.class);
+    IfPart ifPart2 = createElement(sentry2, "ghi", IfPart.class);
+    ConditionExpression conditionExpression2 = createElement(ifPart2, "jkl", ConditionExpression.class);
+    Body body2 = createElement(conditionExpression2, null, Body.class);
+    body2.setTextContent("${test}");
+
+    // set second exitCriteria
+    casePlanModel.getExitCriterias().add(sentry2);
+
+    // transform casePlanModel
+    CmmnActivity newActivity = handler.handleElement(casePlanModel, context);
+
+    context.setParent(newActivity);
+    SentryHandler sentryHandler = new SentryHandler();
+
+    // transform first Sentry
+    CmmnSentryDeclaration firstSentryDeclaration = sentryHandler.handleElement(sentry1, context);
+
+    // transform second Sentry
+    CmmnSentryDeclaration secondSentryDeclaration = sentryHandler.handleElement(sentry2, context);
+
+    // when
+    handler.initializeExitCriterias(casePlanModel, newActivity, context);
+
+    // then
+    assertTrue(newActivity.getEntryCriteria().isEmpty());
+
+    assertFalse(newActivity.getExitCriteria().isEmpty());
+    assertEquals(2, newActivity.getExitCriteria().size());
+
+    assertTrue(newActivity.getExitCriteria().contains(firstSentryDeclaration));
+    assertTrue(newActivity.getExitCriteria().contains(secondSentryDeclaration));
+
+  }
+
 }

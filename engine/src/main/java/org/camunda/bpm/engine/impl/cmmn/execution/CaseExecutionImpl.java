@@ -41,6 +41,8 @@ public class CaseExecutionImpl extends CmmnExecution implements Serializable {
 
   protected List<CaseExecutionImpl> caseExecutions;
 
+  protected List<CaseSentryPartImpl> caseSentryParts;
+
   protected CaseExecutionImpl caseInstance;
 
   protected CaseExecutionImpl parent;
@@ -173,7 +175,38 @@ public class CaseExecutionImpl extends CmmnExecution implements Serializable {
     this.superCaseExecution = (CaseExecutionImpl) superCaseExecution;
   }
 
-  // new case executions /////////////////////////////////////////////////////////
+  // sentry /////////////////////////////////////////////////////////////////////////
+
+  public List<CaseSentryPartImpl> getCaseSentryParts() {
+    if (caseSentryParts == null) {
+      caseSentryParts = new ArrayList<CaseSentryPartImpl>();
+    }
+    return caseSentryParts;
+  }
+
+  protected List<CaseSentryPartImpl> findSentry(String sentryId) {
+    List<CaseSentryPartImpl> result = new ArrayList<CaseSentryPartImpl>();
+
+    for (CaseSentryPartImpl sentryPart : getCaseSentryParts()) {
+      if (sentryPart.getSentryId().equals(sentryId)) {
+        result.add(sentryPart);
+      }
+    }
+
+    return result;
+  }
+
+  protected void addSentryPart(CmmnSentryPart sentryPart) {
+    getCaseSentryParts().add((CaseSentryPartImpl) sentryPart);
+  }
+
+  protected CmmnSentryPart newSentryPart() {
+    CaseSentryPartImpl caseSentryPart = new CaseSentryPartImpl();
+
+    return caseSentryPart;
+  }
+
+  // new case executions ////////////////////////////////////////////////////////////
 
   protected CaseExecutionImpl createCaseExecution(CmmnActivity activity) {
     CaseExecutionImpl child = newCaseExecution();

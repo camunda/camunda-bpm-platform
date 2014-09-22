@@ -40,6 +40,13 @@ public class CmmnActivity extends CoreActivity {
 
   protected CmmnActivity parent;
 
+  protected List<CmmnSentryDeclaration> sentries = new ArrayList<CmmnSentryDeclaration>();
+  protected Map<String, CmmnSentryDeclaration> sentryMap = new HashMap<String, CmmnSentryDeclaration>();
+
+  protected List<CmmnSentryDeclaration> entryCriteria = new ArrayList<CmmnSentryDeclaration>();
+
+  protected List<CmmnSentryDeclaration> exitCriteria = new ArrayList<CmmnSentryDeclaration>();
+
   public CmmnActivity(String id, CmmnCaseDefinition caseDefinition) {
     super(id);
     this.caseDefinition = caseDefinition;
@@ -111,6 +118,49 @@ public class CmmnActivity extends CoreActivity {
 
   public void setCmmnElement(CmmnElement cmmnElement) {
     this.cmmnElement = cmmnElement;
+  }
+
+  // sentry
+
+  public List<CmmnSentryDeclaration> getSentries() {
+    return sentries;
+  }
+
+  public CmmnSentryDeclaration getSentry(String sentryId) {
+    return sentryMap.get(sentryId);
+  }
+
+  public void addSentry(CmmnSentryDeclaration sentry) {
+    sentryMap.put(sentry.getId(), sentry);
+    sentries.add(sentry);
+  }
+
+  // entryCriteria
+
+  public List<CmmnSentryDeclaration> getEntryCriteria() {
+    return entryCriteria;
+  }
+
+  public void setEntryCriteria(List<CmmnSentryDeclaration> entryCriteria) {
+    this.entryCriteria = entryCriteria;
+  }
+
+  public void addEntryCriteria(CmmnSentryDeclaration entryCriteria) {
+    this.entryCriteria.add(entryCriteria);
+  }
+
+  // exitCriteria
+
+  public List<CmmnSentryDeclaration> getExitCriteria() {
+    return exitCriteria;
+  }
+
+  public void setExitCriteria(List<CmmnSentryDeclaration> exitCriteria) {
+    this.exitCriteria = exitCriteria;
+  }
+
+  public void addExitCriteria(CmmnSentryDeclaration exitCriteria) {
+    this.exitCriteria.add(exitCriteria);
   }
 
 }

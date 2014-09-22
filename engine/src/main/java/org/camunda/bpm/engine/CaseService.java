@@ -23,6 +23,7 @@ import org.camunda.bpm.engine.runtime.CaseExecutionQuery;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.runtime.CaseInstanceBuilder;
 import org.camunda.bpm.engine.runtime.CaseInstanceQuery;
+import org.camunda.bpm.engine.runtime.CaseSentryPartQuery;
 
 /**
  * Service which provides access to {@link CaseInstance case instances}
@@ -66,6 +67,12 @@ public interface CaseService {
    * that can be used to query the executions and case instances.</p>
    */
   CaseExecutionQuery createCaseExecutionQuery();
+
+  /**
+   * <p>Creates a new {@link CaseSentryPartQuery} instance,
+   * that can be used to query the sentry parts.</p>
+   */
+  CaseSentryPartQuery createCaseSentryPartQuery();
 
   /**
    * <p>Define a command to be executed for a {@link CaseExecution} using a fluent builder.</p>

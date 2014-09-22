@@ -18,6 +18,7 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
+import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseSentryPartEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.CompensateEventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.DeploymentEntity;
@@ -66,6 +67,8 @@ public class EntityTypeComparatorForModifications implements Comparator<Class<?>
     typeOrder.put(TimerEntity.class, 1);
 
     typeOrder.put(MembershipEntity.class, 1);
+
+    typeOrder.put(CaseSentryPartEntity.class, 1);
 
     // 2
     typeOrder.put(GroupEntity.class, 2);

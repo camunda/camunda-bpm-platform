@@ -19,10 +19,12 @@ import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
+import org.camunda.bpm.engine.impl.cmmn.handler.CasePlanModelHandler;
 import org.camunda.bpm.engine.impl.cmmn.handler.CmmnElementHandler;
 import org.camunda.bpm.engine.impl.cmmn.handler.CmmnHandlerContext;
 import org.camunda.bpm.engine.impl.cmmn.handler.DefaultCmmnElementHandlerRegistry;
 import org.camunda.bpm.engine.impl.cmmn.handler.ItemHandler;
+import org.camunda.bpm.engine.impl.cmmn.handler.SentryHandler;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
 import org.camunda.bpm.engine.impl.core.transformer.Transform;
@@ -145,7 +147,7 @@ public class CmmnTransform implements Transform<CaseDefinitionEntity> {
 
   protected CaseDefinitionEntity parseCase(Case element) {
     // get CaseTransformer
-    CmmnElementHandler<Case> caseTransformer = getDefinitionHandler(Case.class);
+    CmmnElementHandler<Case, CmmnActivity> caseTransformer = getDefinitionHandler(Case.class);
     CmmnActivity definition = caseTransformer.handleElement(element, context);
 
     context.setCaseDefinition((CmmnCaseDefinition) definition);
@@ -158,18 +160,31 @@ public class CmmnTransform implements Transform<CaseDefinitionEntity> {
   }
 
   protected void parseCasePlanModel(CasePlanModel casePlanModel) {
-    ItemHandler transformer = getPlanItemHandler(CasePlanModel.class);
+    CasePlanModelHandler transformer = (CasePlanModelHandler) getPlanItemHandler(CasePlanModel.class);
     CmmnActivity newActivity = transformer.handleElement(casePlanModel, context);
     context.setParent(newActivity);
 
     parseStage(casePlanModel, newActivity);
+
+    context.setParent(newActivity);
+    transformer.initializeExitCriterias(casePlanModel, newActivity, context);
   }
 
   protected void parseStage(Stage stage, CmmnActivity parent) {
 
     context.setParent(parent);
 
+    // transform a sentry with it ifPart (onParts will
+    // not be transformed in this step)
+    parseSentries(stage);
+
+    // transform planItems
     parsePlanItems(stage, parent);
+
+    // transform the onParts of the existing sentries
+    parseSentryOnParts(stage);
+
+    // parse planningTable (not yet implemented)
     parsePlanningTable(stage.getPlanningTable(), parent);
 
   }
@@ -182,17 +197,33 @@ public class CmmnTransform implements Transform<CaseDefinitionEntity> {
     // planningTable is applicable for planning otherwise it is not.
   }
 
+  protected void parseSentries(Stage stage) {
+    Collection<Sentry> sentries = stage.getSentrys();
+
+    if (sentries != null && !sentries.isEmpty()) {
+      SentryHandler handler = getSentryHandler();
+      for (Sentry sentry : sentries) {
+        handler.handleElement(sentry, context);
+      }
+    }
+  }
+
+  protected void parseSentryOnParts(Stage stage) {
+    Collection<Sentry> sentries = stage.getSentrys();
+
+    if (sentries != null && !sentries.isEmpty()) {
+      SentryHandler handler = getSentryHandler();
+      for (Sentry sentry : sentries) {
+        handler.initializeOnParts(sentry, context);
+      }
+    }
+  }
+
   protected void parsePlanItems(PlanFragment planFragment, CmmnActivity parent) {
     Collection<PlanItem> planItems = planFragment.getPlanItems();
 
     for (PlanItem planItem : planItems) {
-      context.setParent(parent);
       parsePlanItem(planItem, parent);
-    }
-
-    for (PlanItem planItem : planItems) {
-      parseSentry(planItem.getEntryCriterias(), true);
-      parseSentry(planItem.getExitCriterias(), false);
     }
 
   }
@@ -223,6 +254,7 @@ public class CmmnTransform implements Transform<CaseDefinitionEntity> {
     if (definition instanceof Stage) {
       Stage stage = (Stage) definition;
       parseStage(stage, newActivity);
+      context.setParent(parent);
 
     } else if (definition instanceof HumanTask) {
       HumanTask humanTask = (HumanTask) definition;
@@ -235,10 +267,6 @@ public class CmmnTransform implements Transform<CaseDefinitionEntity> {
       }
 
     }
-  }
-
-  protected void parseSentry(Collection<Sentry> sentry, boolean entryCriterias) {
-    // not yet implemented.
   }
 
   // getter/setter ////////////////////////////////////////////////////////////////////
@@ -268,8 +296,8 @@ public class CmmnTransform implements Transform<CaseDefinitionEntity> {
   }
 
   @SuppressWarnings("unchecked")
-  protected <V extends CmmnElement> CmmnElementHandler<V> getDefinitionHandler(Class<V> cls) {
-    return (CmmnElementHandler<V>) getHandlerRegistry().getDefinitionElementHandlers().get(cls);
+  protected <V extends CmmnElement> CmmnElementHandler<V, CmmnActivity> getDefinitionHandler(Class<V> cls) {
+    return (CmmnElementHandler<V, CmmnActivity>) getHandlerRegistry().getDefinitionElementHandlers().get(cls);
   }
 
   protected ItemHandler getPlanItemHandler(Class<? extends PlanItemDefinition> cls) {
@@ -278,6 +306,10 @@ public class CmmnTransform implements Transform<CaseDefinitionEntity> {
 
   protected ItemHandler getDiscretionaryItemHandler(Class<? extends PlanItemDefinition> cls) {
     return getHandlerRegistry().getDiscretionaryElementHandlers().get(cls);
+  }
+
+  protected SentryHandler getSentryHandler() {
+    return getHandlerRegistry().getSentryHandler();
   }
 
   public ExpressionManager getExpressionManager() {

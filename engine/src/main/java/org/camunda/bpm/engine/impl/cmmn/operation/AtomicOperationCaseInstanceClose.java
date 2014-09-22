@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.impl.cmmn.operation;
 
 import static org.camunda.bpm.engine.delegate.CaseExecutionListener.CLOSE;
 import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.CLOSED;
+import static org.camunda.bpm.engine.impl.util.ActivityBehaviorUtil.getActivityBehavior;
 
 import org.camunda.bpm.engine.impl.cmmn.behavior.CmmnActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
@@ -41,7 +42,7 @@ public class AtomicOperationCaseInstanceClose extends AbstractCmmnEventAtomicOpe
     return execution;
   }
 
-  protected void eventNotificationsCompleted(CmmnExecution execution) {
+  protected void transitionNotificationCompleted(CmmnExecution execution) {
     execution.deleteCascade();
   }
 

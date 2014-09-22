@@ -6,7 +6,7 @@
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WICmmnElementHOUCmmnElement WARRANCmmnElementIES OR CONDICmmnElementIONS OF ANY KIND, either express or implied.
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
@@ -22,11 +22,14 @@ import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.impl.bpmn.parser.FieldDeclaration;
 import org.camunda.bpm.engine.impl.cmmn.CaseControlRule;
 import org.camunda.bpm.engine.impl.cmmn.behavior.CaseControlRuleImpl;
+import org.camunda.bpm.engine.impl.cmmn.behavior.CmmnActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.listener.ClassDelegateCaseExecutionListener;
 import org.camunda.bpm.engine.impl.cmmn.listener.DelegateExpressionCaseExecutionListener;
 import org.camunda.bpm.engine.impl.cmmn.listener.ExpressionCaseExecutionListener;
 import org.camunda.bpm.engine.impl.cmmn.listener.ScriptCaseExecutionListener;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
+import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
+import org.camunda.bpm.engine.impl.cmmn.model.CmmnSentryDeclaration;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
 import org.camunda.bpm.engine.impl.el.FixedValue;
@@ -59,7 +62,7 @@ import org.camunda.bpm.model.xml.instance.ModelElementInstance;
  * @author Roman Smirnov
  *
  */
-public abstract class ItemHandler extends CmmnElementHandler<CmmnElement> {
+public abstract class ItemHandler extends CmmnElementHandler<CmmnElement, CmmnActivity> {
 
   public static final String PROPERTY_REQUIRED_RULE = "requiredRule";
   public static final String PROPERTY_MANUAL_ACTIVATION_RULE = "manualActivationRule";
@@ -101,7 +104,31 @@ public abstract class ItemHandler extends CmmnElementHandler<CmmnElement> {
       CaseExecutionListener.CLOSE
     );
 
+  protected CmmnActivity createActivity(CmmnElement element, CmmnHandlerContext context) {
+    String id = element.getId();
+    CmmnActivity parent = context.getParent();
 
+    CmmnActivity newActivity = null;
+
+    if (parent != null) {
+      newActivity = parent.createActivity(id);
+
+    } else {
+      CmmnCaseDefinition caseDefinition = context.getCaseDefinition();
+      newActivity = new CmmnActivity(id, caseDefinition);
+    }
+
+    newActivity.setCmmnElement(element);
+
+    CmmnActivityBehavior behavior = getActivityBehavior();
+    newActivity.setActivityBehavior(behavior);
+
+    return newActivity;
+  }
+
+  protected CmmnActivityBehavior getActivityBehavior() {
+    return null;
+  }
 
   public CmmnActivity handleElement(CmmnElement element, CmmnHandlerContext context) {
     // create a new activity
@@ -138,8 +165,11 @@ public abstract class ItemHandler extends CmmnElementHandler<CmmnElement> {
     // case execution listeners
     initializeCaseExecutionListeners(element, activity, context);
 
-    // initialize entry criterias
+    // initialize entry criteria
     initializeEntryCriterias(element, activity, context);
+
+    // initialize exit criteria
+    initializeExitCriterias(element, activity, context);
 
   }
 
@@ -380,15 +410,33 @@ public abstract class ItemHandler extends CmmnElementHandler<CmmnElement> {
     return null;
   }
 
-  protected void initializeEntryCriterias(CmmnElement element,  CmmnActivity activity, CmmnHandlerContext context) {
-    // NOTE: this is only a temporally implementation!!! This will
-    // be exchanged with a proper implementation of sentries!!!
-
-    // TODO: implement this!
-
+  protected void initializeEntryCriterias(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context) {
     Collection<Sentry> entryCriterias = getEntryCriterias(element);
+
     if (!entryCriterias.isEmpty()) {
-      activity.setProperty("hasEntryCriterias", true);
+      CmmnActivity parent = activity.getParent();
+      if (parent != null) {
+        for (Sentry sentry : entryCriterias) {
+          String sentryId = sentry.getId();
+          CmmnSentryDeclaration sentryDeclaration = parent.getSentry(sentryId);
+          activity.addEntryCriteria(sentryDeclaration);
+        }
+      }
+    }
+  }
+
+  protected void initializeExitCriterias(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context) {
+    Collection<Sentry> exitCriterias = getExitCriterias(element);
+
+    if (!exitCriterias.isEmpty()) {
+      CmmnActivity parent = activity.getParent();
+      if (parent != null) {
+        for (Sentry sentry : exitCriterias) {
+          String sentryId = sentry.getId();
+          CmmnSentryDeclaration sentryDeclaration = parent.getSentry(sentryId);
+          activity.addExitCriteria(sentryDeclaration);
+        }
+      }
     }
   }
 

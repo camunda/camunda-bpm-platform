@@ -91,6 +91,21 @@ create table ACT_RU_CASE_EXECUTION (
     primary key (ID_)
 );
 
+-- create case sentry part table --
+
+create table ACT_RU_CASE_SENTRY_PART (
+    ID_ nvarchar(64) NOT NULL,
+    REV_ int,
+    CASE_INST_ID_ nvarchar(64),
+    CASE_EXEC_ID_ nvarchar(64),
+    SENTRY_ID_ nvarchar(255),
+    TYPE_ nvarchar(255),
+    SOURCE_CASE_EXEC_ID_ nvarchar(64),
+    STANDARD_EVENT_ nvarchar(255),
+    SATISFIED_ tinyint,
+    primary key (ID_)
+);
+
 -- create unique constraint on ACT_RE_CASE_DEF --
 alter table ACT_RE_CASE_DEF
     add constraint ACT_UNIQ_CASE_DEF
@@ -137,22 +152,34 @@ alter table ACT_RU_TASK
   foreign key (CASE_DEF_ID_)
   references ACT_RE_CASE_DEF(ID_);
 
+-- create foreign key constraints on ACT_RU_CASE_SENTRY_PART --
+alter table ACT_RU_CASE_SENTRY_PART
+    add constraint ACT_FK_CASE_SENTRY_CASE_INST
+    foreign key (CASE_INST_ID_)
+    references ACT_RU_CASE_EXECUTION(ID_);
+
+alter table ACT_RU_CASE_SENTRY_PART
+    add constraint ACT_FK_CASE_SENTRY_CASE_EXEC
+    foreign key (CASE_EXEC_ID_)
+    references ACT_RU_CASE_EXECUTION(ID_);
+
 -- indexes for concurrency problems - https://app.camunda.com/jira/browse/CAM-1646 --
 create index ACT_IDX_CASE_EXEC_CASE on ACT_RU_CASE_EXECUTION(CASE_DEF_ID_);
 create index ACT_IDX_CASE_EXEC_PARENT on ACT_RU_CASE_EXECUTION(PARENT_ID_);
 create index ACT_IDX_VARIABLE_CASE_EXEC on ACT_RU_VARIABLE(CASE_EXECUTION_ID_);
 create index ACT_IDX_VARIABLE_CASE_INST on ACT_RU_VARIABLE(CASE_INST_ID_);
 create index ACT_IDX_TASK_CASE_EXEC on ACT_RU_TASK(CASE_EXECUTION_ID_);
-create index ACT_IDX_TASK_CASE_INST on ACT_RU_TASK(CASE_INST_ID_);
 create index ACT_IDX_TASK_CASE_DEF_ID on ACT_RU_TASK(CASE_DEF_ID_);
+create index ACT_IDX_CASE_SENTRY_CASE_INST on ACT_RU_CASE_SENTRY_PART(CASE_INST_ID_);
+create index ACT_IDX_CASE_SENTRY_CASE_EXEC on ACT_RU_CASE_SENTRY_PART(CASE_EXEC_ID_);
 
 -- add data format configuration fields
 ALTER TABLE ACT_RU_VARIABLE
   ADD DATA_FORMAT_ID_ nvarchar(64);
-  
+
 ALTER TABLE ACT_HI_VARINST
   ADD DATA_FORMAT_ID_ nvarchar(64);
-  
+
 ALTER TABLE ACT_HI_DETAIL
   ADD DATA_FORMAT_ID_ nvarchar(64);
 

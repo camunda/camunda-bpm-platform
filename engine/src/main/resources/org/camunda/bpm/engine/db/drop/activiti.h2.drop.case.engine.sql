@@ -24,5 +24,12 @@ alter table ACT_RU_TASK
 alter table ACT_RU_TASK
     drop constraint ACT_FK_TASK_CASE_DEF;
 
+alter table ACT_RU_CASE_SENTRY_PART
+    drop constraint ACT_FK_CASE_SENTRY_CASE_INST;
+
+alter table ACT_RU_CASE_SENTRY_PART
+    drop constraint ACT_FK_CASE_SENTRY_CASE_EXEC;
+
 drop table ACT_RE_CASE_DEF if exists;
 drop table ACT_RU_CASE_EXECUTION if exists;
+drop table ACT_RU_CASE_SENTRY_PART if exists;

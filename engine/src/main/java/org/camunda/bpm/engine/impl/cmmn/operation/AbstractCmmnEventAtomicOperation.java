@@ -12,21 +12,15 @@
  */
 package org.camunda.bpm.engine.impl.cmmn.operation;
 
-import org.camunda.bpm.engine.impl.cmmn.behavior.CmmnActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
 import org.camunda.bpm.engine.impl.core.operation.AbstractEventAtomicOperation;
-import org.camunda.bpm.engine.impl.pvm.PvmException;
 
 /**
  * @author Roman Smirnov
  *
  */
 public abstract class AbstractCmmnEventAtomicOperation extends AbstractEventAtomicOperation<CmmnExecution> implements CmmnAtomicOperation {
-
-  protected void eventNotificationsCompleted(CmmnExecution execution) {
-    // noop
-  }
 
   protected CmmnActivity getScope(CmmnExecution execution) {
     return execution.getActivity();
@@ -36,22 +30,21 @@ public abstract class AbstractCmmnEventAtomicOperation extends AbstractEventAtom
     return false;
   }
 
-  protected CmmnActivityBehavior getActivityBehavior(CmmnExecution execution) {
-    String id = execution.getId();
+  protected final void eventNotificationsCompleted(CmmnExecution execution) {
+    String eventName = getEventName();
 
-    CmmnActivity activity = execution.getActivity();
+    CmmnExecution parent = execution.getParent();
 
-    if (activity == null) {
-      throw new PvmException("Case execution '"+id+"': has no current activity.");
+    if (parent != null) {
+      parent.handleChildTransition(execution, eventName);
     }
 
-    CmmnActivityBehavior behavior = activity.getActivityBehavior();
+    transitionNotificationCompleted(execution);
 
-    if (behavior==null) {
-      throw new PvmException("There is no behavior specified in "+activity+" for case execution '"+id+"'.");
-    }
+  }
 
-    return behavior;
+  protected void transitionNotificationCompleted(CmmnExecution execution) {
+    // noop
   }
 
 }

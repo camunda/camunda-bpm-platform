@@ -22,6 +22,8 @@ import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.FAIL
 import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.NEW;
 import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.SUSPENDED;
 import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.TERMINATED;
+import static org.camunda.bpm.engine.impl.cmmn.model.CmmnSentryDeclaration.IF_PART;
+import static org.camunda.bpm.engine.impl.cmmn.model.CmmnSentryDeclaration.PLAN_ITEM_ON_PART;
 import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_COMPLETE;
 import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_CREATE;
 import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_DELETE_CASCADE;
@@ -40,15 +42,23 @@ import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CAS
 import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_START;
 import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_SUSPEND;
 import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_TERMINATE;
+import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_TRIGGER_ENTRY_CRITERIA;
+import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_TRIGGER_EXIT_CRITERIA;
 import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_INSTANCE_CLOSE;
 import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_INSTANCE_CREATE;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureInstanceOf;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
+import org.camunda.bpm.engine.impl.cmmn.model.CmmnIfPartDeclaration;
+import org.camunda.bpm.engine.impl.cmmn.model.CmmnOnPartDeclaration;
+import org.camunda.bpm.engine.impl.cmmn.model.CmmnSentryDeclaration;
 import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
 import org.camunda.bpm.engine.impl.core.variable.CorePersistentVariableScope;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessDefinition;
@@ -77,6 +87,8 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
   protected int previousState;
 
   protected int currentState = NEW.getStateCode();
+
+  protected List<String> satisfiedSentries;
 
   public CmmnExecution() {
   }
@@ -125,6 +137,237 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
   public abstract CmmnExecution getSuperCaseExecution();
 
   public abstract void setSuperCaseExecution(CmmnExecution superCaseExecution);
+
+  // sentry //////////////////////////////////////////////////////////////////
+
+  // sentry: (1) create and initialize sentry parts
+
+  protected abstract CmmnSentryPart newSentryPart();
+
+  protected abstract void addSentryPart(CmmnSentryPart sentryPart);
+
+  public void createSentryParts() {
+    CmmnActivity activity = getActivity();
+    ensureNotNull("Case execution '"+id+"': has no current activity", "activity", activity);
+
+    List<CmmnSentryDeclaration> sentries = activity.getSentries();
+
+    if (sentries != null && !sentries.isEmpty()) {
+
+      for (CmmnSentryDeclaration sentryDeclaration : sentries) {
+
+        CmmnIfPartDeclaration ifPartDeclaration = sentryDeclaration.getIfPart();
+        if (ifPartDeclaration != null) {
+          CmmnSentryPart ifPart = createIfPart(sentryDeclaration, ifPartDeclaration);
+          addSentryPart(ifPart);
+        }
+
+        List<CmmnOnPartDeclaration> onPartDeclarations = sentryDeclaration.getOnParts();
+
+        for (CmmnOnPartDeclaration onPartDeclaration : onPartDeclarations) {
+          CmmnSentryPart onPart = createOnPart(sentryDeclaration, onPartDeclaration);
+          addSentryPart(onPart);
+        }
+
+      }
+    }
+  }
+
+  protected CmmnSentryPart createOnPart(CmmnSentryDeclaration sentryDeclaration, CmmnOnPartDeclaration onPartDeclaration) {
+    CmmnSentryPart sentryPart = createSentryPart(sentryDeclaration, PLAN_ITEM_ON_PART);
+
+    // set the standard event
+    String standardEvent = onPartDeclaration.getStandardEvent();
+    sentryPart.setStandardEvent(standardEvent);
+
+    // set source case execution
+    CmmnActivity source = onPartDeclaration.getSource();
+    ensureNotNull("The source of sentry '"+sentryDeclaration.getId()+"' is null.", "source", source);
+
+    String sourceActivityId = source.getId();
+
+    CmmnExecution sourceCaseExecution = findCaseExecution(sourceActivityId);
+    sentryPart.setSourceCaseExecution(sourceCaseExecution);
+
+    // TODO: handle also sentryRef!!!
+
+    return sentryPart;
+  }
+
+  protected CmmnSentryPart createIfPart(CmmnSentryDeclaration sentryDeclaration, CmmnIfPartDeclaration ifPartDeclaration) {
+    return createSentryPart(sentryDeclaration, IF_PART);
+  }
+
+  protected CmmnSentryPart createSentryPart(CmmnSentryDeclaration sentryDeclaration, String type) {
+    CmmnSentryPart newSentryPart = newSentryPart();
+
+    // set the type
+    newSentryPart.setType(type);
+
+    // set the case instance and case execution
+    newSentryPart.setCaseInstance(getCaseInstance());
+    newSentryPart.setCaseExecution(this);
+
+    // set sentry id
+    String sentryId = sentryDeclaration.getId();
+    newSentryPart.setSentryId(sentryId);
+
+    return newSentryPart;
+  }
+
+  // sentry: (2) handle transitions
+
+  public void handleChildTransition(CmmnExecution child, String transition) {
+    List<? extends CmmnSentryPart> sentryParts = getCaseSentryParts();
+
+    List<String> affectedSentries = new ArrayList<String>();
+
+    for (CmmnSentryPart sentryPart : sentryParts) {
+
+      // check the ids not the references itself to avoid a select!
+      String sourceCaseExecutionId = sentryPart.getSourceCaseExecutionId();
+      if (child.getId().equals(sourceCaseExecutionId)) {
+
+        String standardEvent = sentryPart.getStandardEvent();
+
+        if (transition.equals(standardEvent)) {
+
+          if (!sentryPart.isSatisfied()) {
+            String sentryId = sentryPart.getSentryId();
+            sentryPart.setSatisfied(true);
+
+            if (!affectedSentries.contains(sentryId)) {
+              affectedSentries.add(sentryId);
+            }
+
+          }
+
+        }
+
+      }
+
+    }
+
+    // collect satisfied sentries
+    List<String> satisfiedSentries = new ArrayList<String>();
+
+    for (String affectedSentryId : affectedSentries) {
+
+      if (isSentrySatisfied(affectedSentryId)) {
+        satisfiedSentries.add(affectedSentryId);
+      }
+
+    }
+
+    if (!satisfiedSentries.isEmpty()) {
+      // if there are satisfied sentries, trigger the associated
+      // case executions
+
+      // returns a copy of the list of child case executions!
+      List<? extends CmmnExecution> children = getCaseExecutions();
+
+      for (CmmnExecution currentChild : children) {
+        CmmnActivity currentChildActivity = currentChild.getActivity();
+
+        // trigger first exitCriteria
+        List<CmmnSentryDeclaration> exitCriteria = currentChildActivity.getExitCriteria();
+        for (CmmnSentryDeclaration sentryDeclaration : exitCriteria) {
+
+          if (satisfiedSentries.contains(sentryDeclaration.getId())) {
+            if (!currentChild.isNew()) {
+              currentChild.exit();
+              break;
+            }
+          }
+
+        }
+
+        // then trigger entryCriteria
+        if (currentChild.isAvailable()) {
+          // do this only, when the current case execution (child)
+          // is available
+
+          List<CmmnSentryDeclaration> entryCriteria = currentChildActivity.getEntryCriteria();
+
+          for (CmmnSentryDeclaration sentryDeclaration : entryCriteria) {
+
+            if (satisfiedSentries.contains(sentryDeclaration.getId())) {
+              currentChild.triggerEntryCriteria();
+              break;
+            }
+          }
+        }
+      }
+
+    }
+
+  }
+
+  public void triggerExitCriteria() {
+    performOperation(CASE_EXECUTION_TRIGGER_EXIT_CRITERIA);
+  }
+
+  public void triggerEntryCriteria() {
+    performOperation(CASE_EXECUTION_TRIGGER_ENTRY_CRITERIA);
+  }
+
+  // sentry: (3) helper
+
+  public abstract List<? extends CmmnSentryPart> getCaseSentryParts();
+
+  protected abstract List<? extends CmmnSentryPart> findSentry(String sentryId);
+
+  public boolean isSentrySatisfied(String sentryId) {
+    List<? extends CmmnSentryPart> sentryParts = findSentry(sentryId);
+
+    // if part will be evaluated in the end
+    CmmnSentryPart ifPart = null;
+
+    for (CmmnSentryPart sentryPart : sentryParts) {
+
+      if (PLAN_ITEM_ON_PART.equals(sentryPart.getType())) {
+
+        if (!sentryPart.isSatisfied()) {
+          return false;
+        }
+
+      } else { /* IF_PART.equals(sentryPart.getType) == true */
+
+        // once the ifPart has been satisfied the whole sentry is satisfied
+        if (ifPart.isSatisfied()) {
+          return true;
+        }
+
+        ifPart = sentryPart;
+      }
+
+    }
+
+    if (ifPart != null) {
+
+      CmmnActivity activity = getActivity();
+      ensureNotNull("Case execution '"+id+"': has no current activity", "activity", activity);
+
+      CmmnSentryDeclaration sentryDeclaration = activity.getSentry(sentryId);
+      ensureNotNull("Case execution '"+id+"': has no declaration for sentry '"+sentryId+"'", "sentryDeclaration", sentryDeclaration);
+
+      CmmnIfPartDeclaration ifPartDeclaration = sentryDeclaration.getIfPart();
+      ensureNotNull("Sentry declaration '"+sentryId+"' has no definied ifPart, but there should be one defined for case execution '"+id+"'.", "ifPartDeclaration", ifPartDeclaration);
+
+      Expression condition = ifPartDeclaration.getCondition();
+      ensureNotNull("A condition was expected for ifPart of Sentry declaration '"+sentryId+"' for case execution '"+id+"'.", "condition", condition);
+
+      Object result = condition.getValue(this);
+      ensureInstanceOf("condition expression returns non-Boolean", "result", result, Boolean.class);
+
+      Boolean booleanResult = (Boolean) result;
+      ifPart.setSatisfied(booleanResult);
+      return booleanResult;
+
+    }
+
+    return true;
+  }
 
   // business key ////////////////////////////////////////////////////////////
 
@@ -304,7 +547,7 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
     performOperation(CASE_INSTANCE_CREATE);
   }
 
-  public void createChildExecutions(List<CmmnActivity> activities) {
+  public List<CmmnExecution> createChildExecutions(List<CmmnActivity> activities) {
     List<CmmnExecution> children = new ArrayList<CmmnExecution>();
 
     // first create new child case executions
@@ -313,12 +556,19 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
       children.add(child);
     }
 
+    return children;
+  }
+
+
+  public void triggerChildExecutions(List<CmmnExecution> children) {
     // then notify create listener for each created
     // child case execution
     for (CmmnExecution child : children) {
 
       if (isActive()) {
-        child.performOperation(CASE_EXECUTION_CREATE);
+        if (child.isNew()) {
+          child.performOperation(CASE_EXECUTION_CREATE);
+        }
       } else {
         // if this case execution is not active anymore,
         // then stop notifying create listener and executing

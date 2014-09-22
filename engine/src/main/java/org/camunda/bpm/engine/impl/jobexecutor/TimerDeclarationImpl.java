@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.impl.jobexecutor;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.delegate.VariableScope;
@@ -76,7 +77,7 @@ public class TimerDeclarationImpl extends JobDeclaration<TimerEntity> {
         .getBusinessCalendar(type.calendarName);
 
     if (description==null) {
-      // Prefent NPE from happening in the next line
+      // Prevent NPE from happening in the next line
       throw new ProcessEngineException("Timer '"+execution.getActivityId()+"' was not configured with a valid duration/time");
     }
 

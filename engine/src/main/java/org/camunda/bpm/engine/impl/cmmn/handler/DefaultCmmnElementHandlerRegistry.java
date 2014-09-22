@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.impl.cmmn.handler;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
 import org.camunda.bpm.model.cmmn.impl.instance.CasePlanModel;
 import org.camunda.bpm.model.cmmn.instance.Case;
 import org.camunda.bpm.model.cmmn.instance.CaseTask;
@@ -33,7 +34,7 @@ import org.camunda.bpm.model.cmmn.instance.Task;
  */
 public class DefaultCmmnElementHandlerRegistry {
 
-  protected Map<Class<? extends CmmnElement>, CmmnElementHandler<? extends CmmnElement>> definitionElementHandlers;
+  protected Map<Class<? extends CmmnElement>, CmmnElementHandler<? extends CmmnElement, ? extends CmmnActivity>> definitionElementHandlers;
   protected Map<Class<? extends PlanItemDefinition>, ItemHandler> planItemElementHandlers;
   protected Map<Class<? extends PlanItemDefinition>, ItemHandler> discretionaryElementHandlers;
 
@@ -51,10 +52,12 @@ public class DefaultCmmnElementHandlerRegistry {
   protected StageItemHandler stageDiscretionaryItemHandler = new StageItemHandler();
   protected HumanTaskItemHandler humanTaskDiscretionaryItemHandler = new HumanTaskItemHandler();
 
+  protected SentryHandler sentryHandler = new SentryHandler();
+
   public DefaultCmmnElementHandlerRegistry() {
 
     // init definition element handler
-    definitionElementHandlers = new HashMap<Class<? extends CmmnElement>, CmmnElementHandler<? extends CmmnElement>>();
+    definitionElementHandlers = new HashMap<Class<? extends CmmnElement>, CmmnElementHandler<? extends CmmnElement, ? extends CmmnActivity>>();
 
     definitionElementHandlers.put(Case.class, caseHandler);
 
@@ -77,11 +80,11 @@ public class DefaultCmmnElementHandlerRegistry {
     discretionaryElementHandlers.put(HumanTask.class, humanTaskDiscretionaryItemHandler);
   }
 
-  public Map<Class<? extends CmmnElement>, CmmnElementHandler<? extends CmmnElement>> getDefinitionElementHandlers() {
+  public Map<Class<? extends CmmnElement>, CmmnElementHandler<? extends CmmnElement, ? extends CmmnActivity>> getDefinitionElementHandlers() {
     return definitionElementHandlers;
   }
 
-  public void setDefinitionElementHandlers(Map<Class<? extends CmmnElement>, CmmnElementHandler<? extends CmmnElement>> definitionElementHandlers) {
+  public void setDefinitionElementHandlers(Map<Class<? extends CmmnElement>, CmmnElementHandler<? extends CmmnElement, ? extends CmmnActivity>> definitionElementHandlers) {
     this.definitionElementHandlers = definitionElementHandlers;
   }
 
@@ -99,6 +102,14 @@ public class DefaultCmmnElementHandlerRegistry {
 
   public void setDiscretionaryElementHandlers(Map<Class<? extends PlanItemDefinition>, ItemHandler> discretionaryElementHandlers) {
     this.discretionaryElementHandlers = discretionaryElementHandlers;
+  }
+
+  public SentryHandler getSentryHandler() {
+    return sentryHandler;
+  }
+
+  public void setSentryHandler(SentryHandler sentryHandler) {
+    this.sentryHandler = sentryHandler;
   }
 
 }

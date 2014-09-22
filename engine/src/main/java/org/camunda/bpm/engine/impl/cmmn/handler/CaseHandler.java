@@ -28,7 +28,7 @@ import org.camunda.bpm.model.cmmn.instance.Definitions;
  * @author Roman Smirnov
  *
  */
-public class CaseHandler extends CmmnElementHandler<Case> {
+public class CaseHandler extends CmmnElementHandler<Case, CmmnCaseDefinition> {
 
   public CmmnCaseDefinition handleElement(Case element, CmmnHandlerContext context) {
     CaseDefinitionEntity definition = createActivity(element, context);
@@ -55,7 +55,6 @@ public class CaseHandler extends CmmnElementHandler<Case> {
     definition.setCategory(category);
   }
 
-  @Override
   protected CaseDefinitionEntity createActivity(CmmnElement element, CmmnHandlerContext context) {
     CaseDefinitionEntity definition = new CaseDefinitionEntity();
 
@@ -63,6 +62,5 @@ public class CaseHandler extends CmmnElementHandler<Case> {
 
     return definition;
   }
-
 
 }

@@ -34,7 +34,11 @@ public class EventListenerItemHandler extends ItemHandler {
   }
 
   protected void initializeEntryCriterias(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context) {
-    // entry criterias are not applicable on event listeners
+    // entry criteria is not applicable on event listeners
+  }
+
+  protected void initializeExitCriterias(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context) {
+    // exit criteria is not applicable on milestones
   }
 
   protected void initializeRepetitionRule(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context) {

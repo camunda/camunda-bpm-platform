@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.engine.impl.cmmn.operation;
 
+import static org.camunda.bpm.engine.impl.util.ActivityBehaviorUtil.getActivityBehavior;
+
 import org.camunda.bpm.engine.impl.cmmn.behavior.CmmnActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
@@ -32,7 +34,7 @@ public abstract class AbstractAtomicOperationCaseExecutionResume extends Abstrac
     return execution;
   }
 
-  protected void eventNotificationsCompleted(CmmnExecution execution) {
+  protected void transitionNotificationCompleted(CmmnExecution execution) {
     CmmnActivityBehavior behavior = getActivityBehavior(execution);
     behavior.resumed(execution);
   }

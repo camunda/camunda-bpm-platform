@@ -90,6 +90,7 @@ import org.camunda.bpm.engine.impl.cmmn.CaseServiceImpl;
 import org.camunda.bpm.engine.impl.cmmn.deployer.CmmnDeployer;
 import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionManager;
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionManager;
+import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseSentryPartManager;
 import org.camunda.bpm.engine.impl.cmmn.handler.DefaultCmmnElementHandlerRegistry;
 import org.camunda.bpm.engine.impl.cmmn.transformer.CmmnTransformFactory;
 import org.camunda.bpm.engine.impl.cmmn.transformer.CmmnTransformer;
@@ -853,6 +854,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
       addSessionFactory(new GenericManagerFactory(CaseDefinitionManager.class));
       addSessionFactory(new GenericManagerFactory(CaseExecutionManager.class));
+      addSessionFactory(new GenericManagerFactory(CaseSentryPartManager.class));
 
       addSessionFactory(new DeserializedObjectsSessionFactory());
 

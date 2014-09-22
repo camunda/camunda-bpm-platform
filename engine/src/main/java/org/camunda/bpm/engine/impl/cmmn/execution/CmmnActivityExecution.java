@@ -116,7 +116,9 @@ public interface CmmnActivityExecution extends DelegateCaseExecution {
    * @param activities a collection of {@link CmmnActivity activities} of planned items
    *                   to execute inside <code>this</code> case execution
    */
-  void createChildExecutions(List<CmmnActivity> activities);
+  List<CmmnExecution> createChildExecutions(List<CmmnActivity> activities);
+
+  void triggerChildExecutions(List<CmmnExecution> children);
 
   /**
    * <p>Transition to {@link CaseExecutionState#ENABLED} state.</p>
@@ -628,4 +630,7 @@ public interface CmmnActivityExecution extends DelegateCaseExecution {
    */
   CmmnCaseInstance createSubCaseInstance(CmmnCaseDefinition caseDefinition, String businessKey);
 
+  void createSentryParts();
+
+  boolean isSentrySatisfied(String sentryId);
 }

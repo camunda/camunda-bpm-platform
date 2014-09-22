@@ -36,29 +36,6 @@ public abstract class StageOrTaskActivityBehavior extends PlanItemDefinitionActi
     evaluateRepetitionRule(execution);
   }
 
-  public void created(CmmnActivityExecution execution) {
-    CmmnActivity activity = execution.getActivity();
-
-    // Step 1: Check Entry Sentries
-    // TODO: Check Entry Sentries, if the entryCriterias
-    // are not fulfilled then stay in state AVAILABLE.
-
-    // Step 2: Check ManualActiviation
-    boolean manualActivation = true;
-    Object manualActivationRule = activity.getProperty(PROPERTY_MANUAL_ACTIVATION_RULE);
-    if (manualActivationRule != null) {
-      CaseControlRule rule = (CaseControlRule) manualActivationRule;
-      manualActivation = rule.evaluate(execution);
-    }
-
-    if (manualActivation) {
-      execution.enable();
-    } else {
-      execution.start();
-    }
-
-  }
-
   public void onEnable(CmmnActivityExecution execution) {
     ensureNotCaseInstance(execution, "enable");
     ensureTransitionAllowed(execution, AVAILABLE, ENABLED, "enable");
@@ -202,5 +179,23 @@ public abstract class StageOrTaskActivityBehavior extends PlanItemDefinitionActi
   protected abstract void performStart(CmmnActivityExecution execution);
 
   protected abstract String getTypeName();
+
+  public void triggerEntryCriteria(CmmnActivityExecution execution) {
+    CmmnActivity activity = execution.getActivity();
+
+    boolean manualActivation = true;
+    Object manualActivationRule = activity.getProperty(PROPERTY_MANUAL_ACTIVATION_RULE);
+    if (manualActivationRule != null) {
+      CaseControlRule rule = (CaseControlRule) manualActivationRule;
+      manualActivation = rule.evaluate(execution);
+    }
+
+    if (manualActivation) {
+      execution.enable();
+    } else {
+      execution.start();
+    }
+
+  }
 
 }
