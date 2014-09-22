@@ -141,6 +141,7 @@ public abstract class ProcessEngineConfiguration {
   protected Object jpaEntityManagerFactory;
   protected boolean jpaHandleTransaction;
   protected boolean jpaCloseEntityManager;
+  protected int defaultNumberOfRetries = 3;
   
   protected ClassLoader classLoader;
   
@@ -547,5 +548,12 @@ public abstract class ProcessEngineConfiguration {
     this.authorizationEnabled = isAuthorizationChecksEnabled;
     return this;
   }
-  
+
+  public int getDefaultNumberOfRetries() {
+    return defaultNumberOfRetries;
+  }
+
+  public void setDefaultNumberOfRetries(int defaultNumberOfRetries) {
+    this.defaultNumberOfRetries = defaultNumberOfRetries;
+  }
 }
