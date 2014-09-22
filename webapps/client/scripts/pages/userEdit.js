@@ -152,7 +152,9 @@ define([ 'angular', 'require' ], function(angular, require) {
         };
 
         $scope.removeGroup = function(groupId) {
-          var encodedGroupId = groupId.replace(/\//g, '%2F');
+          var encodedGroupId = groupId
+                                    .replace(/\//g, '%2F')
+                                    .replace(/\\/g, '%5C');
           GroupMembershipResource.delete({'userId':$scope.encodedUserId, 'groupId': encodedGroupId}).$promise.then(
             function(){
               Notifications.addMessage({type:'success', status:'Success', message:'User '+$scope.user.id+' removed from group.'});
