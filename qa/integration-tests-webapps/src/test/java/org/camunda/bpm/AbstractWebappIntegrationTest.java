@@ -58,8 +58,8 @@ public abstract class AbstractWebappIntegrationTest {
 
     defaultHttpClient = (DefaultHttpClient) client.getClientHandler().getHttpClient();
     HttpParams params = defaultHttpClient.getParams();
-    HttpConnectionParams.setConnectionTimeout(params, 60 * 1000);
-    HttpConnectionParams.setSoTimeout(params, 5 * 60 * 1000);
+    HttpConnectionParams.setConnectionTimeout(params, 3 * 60 * 1000);
+    HttpConnectionParams.setSoTimeout(params, 10 * 60 * 1000);
   }
 
   @After
