@@ -59,6 +59,18 @@ describe('authorizations page -', function() {
     });
 
 
+    it('should validate filter page', function() {
+
+      // when
+      authorizationsPage.selectAuthorizationNavbarItem('Filter');
+
+      // then
+      authorizationsPage.filter.isActive();
+      expect(authorizationsPage.filter.createNewButton().isEnabled()).toBe(true);
+      expect(authorizationsPage.filter.boxHeader()).toBe('Filter Authorizations');
+    });
+
+
     it('should validate group page', function() {
 
       // when
