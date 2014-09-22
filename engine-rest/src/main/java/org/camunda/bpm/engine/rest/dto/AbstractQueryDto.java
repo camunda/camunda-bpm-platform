@@ -16,7 +16,9 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.ws.rs.core.MultivaluedMap;
@@ -50,12 +52,14 @@ public abstract class AbstractQueryDto<T extends Query<?, ?>> {
 
   protected String sortBy;
   protected String sortOrder;
-  
+
+  protected Map<String, String> expressions = new HashMap<String, String>();
+
   // required for populating via jackson
   public AbstractQueryDto() {
-    
+
   }
-  
+
   public AbstractQueryDto(MultivaluedMap<String, String> queryParameters) {
     for (Entry<String, List<String>> param : queryParameters.entrySet()) {
       String key = param.getKey();

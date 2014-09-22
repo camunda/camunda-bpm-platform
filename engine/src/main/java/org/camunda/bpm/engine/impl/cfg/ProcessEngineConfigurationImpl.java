@@ -32,7 +32,6 @@ import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import javax.naming.InitialContext;
 import javax.sql.DataSource;
 
@@ -104,6 +103,8 @@ import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.delegate.DefaultDelegateInterceptor;
 import org.camunda.bpm.engine.impl.digest.PasswordEncryptor;
 import org.camunda.bpm.engine.impl.digest.ShaHashDigest;
+import org.camunda.bpm.engine.impl.el.CommandContextFunctionMapper;
+import org.camunda.bpm.engine.impl.el.DateTimeFunctionMapper;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
 import org.camunda.bpm.engine.impl.event.CompensationEventHandler;
 import org.camunda.bpm.engine.impl.event.EventHandler;
@@ -1256,6 +1257,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected void initExpressionManager() {
     if (expressionManager==null) {
       expressionManager = new ExpressionManager(beans);
+      // add function mapper for command context (eg currentUser(), currentUserGroups())
+      expressionManager.addFunctionMapper(new CommandContextFunctionMapper());
+      // add function mapper for date time (eg now(), dateTime())
+      expressionManager.addFunctionMapper(new DateTimeFunctionMapper());
     }
   }
 

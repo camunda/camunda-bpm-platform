@@ -94,7 +94,7 @@ public class DefaultCorrelationHandler implements CorrelationHandler {
     }
 
     query.messageEventSubscriptionName(messageName);
-    List<Execution> matchingExecutions = query.executeList(commandContext, null);
+    List<Execution> matchingExecutions = query.evaluateExpressionsAndExecuteList(commandContext, null);
 
     List<MessageCorrelationResult> result = new ArrayList<MessageCorrelationResult>(matchingExecutions.size());
 

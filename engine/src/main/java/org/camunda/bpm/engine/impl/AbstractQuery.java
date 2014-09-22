@@ -15,7 +15,12 @@ package org.camunda.bpm.engine.impl;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.NotValidException;
@@ -26,6 +31,7 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.query.Query;
 import org.camunda.bpm.engine.query.QueryProperty;
+import org.joda.time.DateTime;
 
 
 /**
@@ -51,6 +57,8 @@ public abstract class AbstractQuery<T extends Query<?,?>, U> extends ListQueryPa
   protected ResultType resultType;
 
   protected QueryProperty orderProperty;
+
+  protected Map<String, String> expressions = new HashMap<String, String>();
 
   protected AbstractQuery() {
   }
@@ -111,7 +119,7 @@ public abstract class AbstractQuery<T extends Query<?,?>, U> extends ListQueryPa
     if (commandExecutor!=null) {
       return (List<U>) commandExecutor.execute(this);
     }
-    return executeList(Context.getCommandContext(), null);
+    return evaluateExpressionsAndExecuteList(Context.getCommandContext(), null);
   }
 
   @SuppressWarnings("unchecked")
@@ -122,7 +130,7 @@ public abstract class AbstractQuery<T extends Query<?,?>, U> extends ListQueryPa
     if (commandExecutor!=null) {
       return (List<U>) commandExecutor.execute(this);
     }
-    return executeList(Context.getCommandContext(), new Page(firstResult, maxResults));
+    return evaluateExpressionsAndExecuteList(Context.getCommandContext(), new Page(firstResult, maxResults));
   }
 
   public long count() {
@@ -130,22 +138,32 @@ public abstract class AbstractQuery<T extends Query<?,?>, U> extends ListQueryPa
     if (commandExecutor!=null) {
       return (Long) commandExecutor.execute(this);
     }
-    return executeCount(Context.getCommandContext());
+    return evaluateExpressionsAndExecuteCount(Context.getCommandContext());
   }
 
   public Object execute(CommandContext commandContext) {
     if (resultType==ResultType.LIST) {
-      return executeList(commandContext, null);
+      return evaluateExpressionsAndExecuteList(commandContext, null);
     } else if (resultType==ResultType.SINGLE_RESULT) {
       return executeSingleResult(commandContext);
     } else if (resultType==ResultType.LIST_PAGE) {
-      return executeList(commandContext, null);
+      return evaluateExpressionsAndExecuteList(commandContext, null);
     } else {
-      return executeCount(commandContext);
+      return evaluateExpressionsAndExecuteCount(commandContext);
     }
   }
 
+  public long evaluateExpressionsAndExecuteCount(CommandContext commandContext) {
+    evaluateExpressions();
+    return executeCount(commandContext);
+  }
+
   public abstract long executeCount(CommandContext commandContext);
+
+  public List<U> evaluateExpressionsAndExecuteList(CommandContext commandContext, Page page) {
+    evaluateExpressions();
+    return executeList(commandContext, page);
+  }
 
   /**
    * Executes the actual query to retrieve the list of results.
@@ -154,7 +172,7 @@ public abstract class AbstractQuery<T extends Query<?,?>, U> extends ListQueryPa
   public abstract List<U> executeList(CommandContext commandContext, Page page);
 
   public U executeSingleResult(CommandContext commandContext) {
-    List<U> results = executeList(commandContext, null);
+    List<U> results = evaluateExpressionsAndExecuteList(commandContext, null);
     if (results.size() == 1) {
       return results.get(0);
     } else if (results.size() > 1) {
@@ -178,6 +196,64 @@ public abstract class AbstractQuery<T extends Query<?,?>, U> extends ListQueryPa
     } else {
       return orderBy;
     }
+  }
+
+  public Map<String, String> getExpressions() {
+    return expressions;
+  }
+
+  public void setExpressions(Map<String, String> expressions) {
+    this.expressions = expressions;
+  }
+
+  public void addExpression(String key, String expression) {
+    this.expressions.put(key, expression);
+  }
+
+  protected void evaluateExpressions() {
+    // we cannot iterate directly on the entry set cause the expressions
+    // are removed by the setter methods during the iteration
+    ArrayList<Map.Entry<String, String>> entries = new ArrayList<Map.Entry<String, String>>(expressions.entrySet());
+
+    for (Map.Entry<String, String> entry : entries) {
+      String methodName = entry.getKey();
+      String expression = entry.getValue();
+
+      Object value;
+
+      try {
+        value = Context.getProcessEngineConfiguration()
+          .getExpressionManager()
+          .createExpression(expression)
+          .getValue(null);
+      }
+      catch (ProcessEngineException e) {
+        throw new ProcessEngineException("Unable to resolve expression '" + expression + "' for method '" + methodName + "' on class '" + getClass().getCanonicalName() + "'", e);
+      }
+
+      // automatically convert DateTime to date
+      if (value instanceof DateTime) {
+        value = ((DateTime) value).toDate();
+      }
+
+      try {
+        Method method = getMethod(methodName);
+        method.invoke(this, value);
+      } catch (InvocationTargetException e) {
+        throw new ProcessEngineException("Unable to invoke method '" + methodName + "' on class '" + getClass().getCanonicalName() + "'", e);
+      } catch (IllegalAccessException e) {
+        throw new ProcessEngineException("Unable to access method '" + methodName + "' on class '" + getClass().getCanonicalName() + "'", e);
+      }
+    }
+  }
+
+  protected Method getMethod(String methodName) {
+    for (Method method : getClass().getDeclaredMethods()) {
+      if (method.getName().equals(methodName)) {
+        return method;
+      }
+    }
+    throw new ProcessEngineException("Unable to find method '" + methodName + "' on class '" + getClass().getCanonicalName() + "'");
   }
 
 }

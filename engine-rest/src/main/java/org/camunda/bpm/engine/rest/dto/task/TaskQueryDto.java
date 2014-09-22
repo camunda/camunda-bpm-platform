@@ -20,6 +20,8 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
+import org.camunda.bpm.engine.impl.util.StringUtil;
 import org.camunda.bpm.engine.rest.dto.AbstractQueryDto;
 import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
 import org.camunda.bpm.engine.rest.dto.VariableQueryParameterDto;
@@ -76,19 +78,25 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
   private String processDefinitionNameLike;
   private String processInstanceId;
   private String assignee;
+  private String assigneeExpression;
   private String assigneeLike;
+  private String assigneeLikeExpression;
   private String candidateGroup;
+  private String candidateGroupExpression;
   private String candidateUser;
+  private String candidateUserExpression;
   private String taskDefinitionKey;
   private String taskDefinitionKeyLike;
   private String description;
   private String descriptionLike;
   private String involvedUser;
+  private String involvedUserExpression;
   private Integer maxPriority;
   private Integer minPriority;
   private String name;
   private String nameLike;
   private String owner;
+  private String ownerExpression;
   private Integer priority;
   private Boolean unassigned;
   private Boolean active;
@@ -104,18 +112,28 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
   private String caseExecutionId;
 
   private Date dueAfter;
+  private String dueAfterExpression;
   private Date dueBefore;
+  private String dueBeforeExpression;
   private Date dueDate;
+  private String dueDateExpression;
   private Date followUpAfter;
+  private String followUpAfterExpression;
   private Date followUpBefore;
+  private String followUpBeforeExpression;
   private Date followUpDate;
+  private String followUpDateExpression;
   private Date createdAfter;
+  private String createdAfterExpression;
   private Date createdBefore;
+  private String createdBeforeExpression;
   private Date createdOn;
+  private String createdOnExpression;
 
   private String delegationState;
 
   private List<String> candidateGroups;
+  private String candidateGroupsExpression;
 
   private List<VariableQueryParameterDto> taskVariables;
   private List<VariableQueryParameterDto> processVariables;
@@ -179,9 +197,19 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     this.assignee = assignee;
   }
 
+  @CamundaQueryParam("assigneeExpression")
+  public void setAssigneeExpression(String assigneeExpression) {
+    this.assigneeExpression = assigneeExpression;
+  }
+
   @CamundaQueryParam("assigneeLike")
   public void setAssigneeLike(String assigneeLike) {
     this.assigneeLike = assigneeLike;
+  }
+
+  @CamundaQueryParam("assigneeLikeExpression")
+  public void setAssigneeLikeExpression(String assigneeLikeExpression) {
+    this.assigneeLikeExpression = assigneeLikeExpression;
   }
 
   @CamundaQueryParam("candidateGroup")
@@ -189,9 +217,19 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     this.candidateGroup = candidateGroup;
   }
 
+  @CamundaQueryParam("candidateGroupExpression")
+  public void setCandidateGroupExpression(String candidateGroupExpression) {
+    this.candidateGroupExpression = candidateGroupExpression;
+  }
+
   @CamundaQueryParam("candidateUser")
   public void setCandidateUser(String candidateUser) {
     this.candidateUser = candidateUser;
+  }
+
+  @CamundaQueryParam("candidateUserExpression")
+  public void setCandidateUserExpression(String candidateUserExpression) {
+    this.candidateUserExpression = candidateUserExpression;
   }
 
   @CamundaQueryParam("taskDefinitionKey")
@@ -219,6 +257,11 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     this.involvedUser = involvedUser;
   }
 
+  @CamundaQueryParam("involvedUserExpression")
+  public void setInvolvedUserExpression(String involvedUserExpression) {
+    this.involvedUserExpression = involvedUserExpression;
+  }
+
   @CamundaQueryParam(value = "maxPriority", converter = IntegerConverter.class)
   public void setMaxPriority(Integer maxPriority) {
     this.maxPriority = maxPriority;
@@ -242,6 +285,11 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
   @CamundaQueryParam("owner")
   public void setOwner(String owner) {
     this.owner = owner;
+  }
+
+  @CamundaQueryParam("ownerExpression")
+  public void setOwnerExpression(String ownerExpression) {
+    this.ownerExpression = ownerExpression;
   }
 
   @CamundaQueryParam(value = "priority", converter = IntegerConverter.class)
@@ -269,9 +317,19 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     this.dueAfter = dueAfter;
   }
 
+  @CamundaQueryParam(value = "dueAfterExpression")
+  public void setDueAfterExpression(String dueAfterExpression) {
+    this.dueAfterExpression = dueAfterExpression;
+  }
+
   @CamundaQueryParam(value = "dueBefore", converter = DateConverter.class)
   public void setDueBefore(Date dueBefore) {
     this.dueBefore = dueBefore;
+  }
+
+  @CamundaQueryParam(value = "dueBeforeExpression")
+  public void setDueBeforeExpression(String dueBeforeExpression) {
+    this.dueBeforeExpression = dueBeforeExpression;
   }
 
   @CamundaQueryParam(value = "due", converter = DateConverter.class)
@@ -279,9 +337,19 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     this.dueDate = dueDate;
   }
 
+  @CamundaQueryParam(value = "dueDateExpression")
+  public void setDueDateExpression(String dueDateExpression) {
+    this.dueDateExpression = dueDateExpression;
+  }
+
   @CamundaQueryParam(value = "followUpAfter", converter = DateConverter.class)
   public void setFollowUpAfter(Date followUpAfter) {
     this.followUpAfter = followUpAfter;
+  }
+
+  @CamundaQueryParam(value = "followUpAfterExpression")
+  public void setFollowUpAfterExpression(String followUpAfterExpression) {
+    this.followUpAfterExpression = followUpAfterExpression;
   }
 
   @CamundaQueryParam(value = "followUpBefore", converter = DateConverter.class)
@@ -289,9 +357,19 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     this.followUpBefore = followUpBefore;
   }
 
+  @CamundaQueryParam(value = "followUpBeforeExpression")
+  public void setFollowUpBeforeExpression(String followUpBeforeExpression) {
+    this.followUpBeforeExpression = followUpBeforeExpression;
+  }
+
   @CamundaQueryParam(value = "followUp", converter = DateConverter.class)
   public void setFollowUpDate(Date followUp) {
     this.followUpDate = followUp;
+  }
+
+  @CamundaQueryParam(value = "followUpDateExpression")
+  public void setFollowUpDateExpression(String followUpDateExpression) {
+    this.followUpDateExpression = followUpDateExpression;
   }
 
   @CamundaQueryParam(value = "createdAfter", converter = DateConverter.class)
@@ -299,14 +377,29 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     this.createdAfter = createdAfter;
   }
 
+  @CamundaQueryParam(value = "createdAfterExpression")
+  public void setCreatedAfterExpression(String createdAfterExpression) {
+    this.createdAfterExpression = createdAfterExpression;
+  }
+
   @CamundaQueryParam(value = "createdBefore", converter = DateConverter.class)
   public void setCreatedBefore(Date createdBefore) {
     this.createdBefore = createdBefore;
   }
 
+  @CamundaQueryParam(value = "createdBeforeExpression")
+  public void setCreatedBeforeExpression(String createdBeforeExpression) {
+    this.createdBeforeExpression = createdBeforeExpression;
+  }
+
   @CamundaQueryParam(value = "created", converter = DateConverter.class)
   public void setCreatedOn(Date createdOn) {
     this.createdOn = createdOn;
+  }
+
+  @CamundaQueryParam(value = "createdOnExpression")
+  public void setCreatedOnExpression(String createdOnExpression) {
+    this.createdOnExpression = createdOnExpression;
   }
 
   @CamundaQueryParam(value = "delegationState")
@@ -317,6 +410,11 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
   @CamundaQueryParam(value = "candidateGroups", converter = StringListConverter.class)
   public void setCandidateGroups(List<String> candidateGroups) {
     this.candidateGroups = candidateGroups;
+  }
+
+  @CamundaQueryParam(value = "candidateGroupsExpression")
+  public void setCandidateGroupsExpression(String candidateGroupsExpression) {
+    this.candidateGroupsExpression = candidateGroupsExpression;
   }
 
   @CamundaQueryParam(value = "taskVariables", converter = VariableListConverter.class)
@@ -416,14 +514,26 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     if (assignee != null) {
       query.taskAssignee(assignee);
     }
+    if (assigneeExpression != null) {
+      query.taskAssigneeExpression(assigneeExpression);
+    }
     if (assigneeLike != null) {
       query.taskAssigneeLike(assigneeLike);
+    }
+    if (assigneeLikeExpression != null) {
+      query.taskAssigneeLikeExpression(assigneeLikeExpression);
     }
     if (candidateGroup != null) {
       query.taskCandidateGroup(candidateGroup);
     }
+    if (candidateGroupExpression != null) {
+      query.taskCandidateGroupExpression(candidateGroupExpression);
+    }
     if (candidateUser != null) {
       query.taskCandidateUser(candidateUser);
+    }
+    if (candidateUserExpression != null) {
+      query.taskCandidateUserExpression(candidateUserExpression);
     }
     if (taskDefinitionKey != null) {
       query.taskDefinitionKey(taskDefinitionKey);
@@ -440,6 +550,9 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     if (involvedUser != null) {
       query.taskInvolvedUser(involvedUser);
     }
+    if (involvedUserExpression != null) {
+      query.taskInvolvedUserExpression(involvedUserExpression);
+    }
     if (maxPriority != null) {
       query.taskMaxPriority(maxPriority);
     }
@@ -455,6 +568,9 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     if (owner != null) {
       query.taskOwner(owner);
     }
+    if (ownerExpression != null) {
+      query.taskOwnerExpression(ownerExpression);
+    }
     if (priority != null) {
       query.taskPriority(priority);
     }
@@ -464,29 +580,56 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     if (dueAfter != null) {
       query.dueAfter(dueAfter);
     }
+    if (dueAfterExpression != null) {
+      query.dueAfterExpression(dueAfterExpression);
+    }
     if (dueBefore != null) {
       query.dueBefore(dueBefore);
+    }
+    if (dueBeforeExpression != null) {
+      query.dueBeforeExpression(dueBeforeExpression);
     }
     if (dueDate != null) {
       query.dueDate(dueDate);
     }
+    if (dueDateExpression != null) {
+      query.dueDateExpression(dueDateExpression);
+    }
     if (followUpAfter != null) {
       query.followUpAfter(followUpAfter);
+    }
+    if (followUpAfterExpression != null) {
+      query.followUpAfterExpression(followUpAfterExpression);
     }
     if (followUpBefore != null) {
       query.followUpBefore(followUpBefore);
     }
+    if (followUpBeforeExpression != null) {
+      query.followUpBeforeExpression(followUpBeforeExpression);
+    }
     if (followUpDate != null) {
       query.followUpDate(followUpDate);
+    }
+    if (followUpDateExpression != null) {
+      query.followUpDateExpression(followUpDateExpression);
     }
     if (createdAfter != null) {
       query.taskCreatedAfter(createdAfter);
     }
+    if (createdAfterExpression != null) {
+      query.taskCreatedAfterExpression(createdAfterExpression);
+    }
     if (createdBefore != null) {
       query.taskCreatedBefore(createdBefore);
     }
+    if (createdBeforeExpression != null) {
+      query.taskCreatedBeforeExpression(createdBeforeExpression);
+    }
     if (createdOn != null) {
       query.taskCreatedOn(createdOn);
+    }
+    if (createdOnExpression != null) {
+      query.taskCreatedOnExpression(createdOnExpression);
     }
     if (delegationState != null) {
       DelegationStateConverter converter = new DelegationStateConverter();
@@ -495,6 +638,9 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     }
     if (candidateGroups != null) {
       query.taskCandidateGroupIn(candidateGroups);
+    }
+    if (candidateGroupsExpression != null) {
+      query.taskCandidateGroupInExpression(candidateGroupsExpression);
     }
     if (active != null && active == true) {
       query.active();

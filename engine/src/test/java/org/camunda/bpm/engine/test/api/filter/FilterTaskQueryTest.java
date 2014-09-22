@@ -123,18 +123,26 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
     query.taskMinPriority(testInteger);
     query.taskMaxPriority(testInteger);
     query.taskAssignee(testString);
+    query.taskAssigneeExpression(testString);
     query.taskAssigneeLike(testString);
+    query.taskAssigneeLikeExpression(testString);
     query.taskInvolvedUser(testString);
+    query.taskInvolvedUserExpression(testString);
     query.taskOwner(testString);
+    query.taskOwnerExpression(testString);
     query.taskUnassigned();
     query.taskDelegationState(testDelegationState);
     query.taskCandidateGroupIn(testCandidateGroups);
+    query.taskCandidateGroupInExpression(testString);
     query.processInstanceId(testString);
     query.executionId(testString);
     query.activityInstanceIdIn(testActivityInstances);
     query.taskCreatedOn(testDate);
+    query.taskCreatedOnExpression(testString);
     query.taskCreatedBefore(testDate);
+    query.taskCreatedBeforeExpression(testString);
     query.taskCreatedAfter(testDate);
+    query.taskCreatedAfterExpression(testString);
     query.taskDefinitionKey(testString);
     query.taskDefinitionKeyLike(testString);
     query.processDefinitionKey(testString);
@@ -153,11 +161,17 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
     query.caseInstanceVariableValueLessThanOrEquals(variableNames[5], variableValues[5]);
 
     query.dueDate(testDate);
+    query.dueDateExpression(testString);
     query.dueBefore(testDate);
+    query.dueBeforeExpression(testString);
     query.dueAfter(testDate);
+    query.dueAfterExpression(testString);
     query.followUpDate(testDate);
+    query.followUpDateExpression(testString);
     query.followUpBefore(testDate);
+    query.followUpBeforeExpression(testString);
     query.followUpAfter(testDate);
+    query.followUpAfterExpression(testString);
     query.excludeSubtasks();
     query.suspended();
     query.caseDefinitionKey(testString);
@@ -191,12 +205,17 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(testInteger, query.getMinPriority());
     assertEquals(testInteger, query.getMaxPriority());
     assertEquals(testString, query.getAssignee());
+    assertEquals(testString, query.getExpressions().get("taskAssignee"));
     assertEquals(testString, query.getAssigneeLike());
+    assertEquals(testString, query.getExpressions().get("taskAssigneeLike"));
     assertEquals(testString, query.getInvolvedUser());
+    assertEquals(testString, query.getExpressions().get("taskInvolvedUser"));
     assertEquals(testString, query.getOwner());
+    assertEquals(testString, query.getExpressions().get("taskOwner"));
     assertTrue(query.isUnassigned());
     assertEquals(testDelegationState, query.getDelegationState());
     assertEquals(testCandidateGroups, query.getCandidateGroups());
+    assertEquals(testString, query.getExpressions().get("taskCandidateGroupIn"));
     assertEquals(testString, query.getProcessInstanceId());
     assertEquals(testString, query.getExecutionId());
     assertEquals(testActivityInstances.length, query.getActivityInstanceIdIn().length);
@@ -204,8 +223,11 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
       assertEquals(testActivityInstances[i], query.getActivityInstanceIdIn()[i]);
     }
     assertEquals(testDate, query.getCreateTime());
+    assertEquals(testString, query.getExpressions().get("taskCreatedOn"));
     assertEquals(testDate, query.getCreateTimeBefore());
+    assertEquals(testString, query.getExpressions().get("taskCreatedBefore"));
     assertEquals(testDate, query.getCreateTimeAfter());
+    assertEquals(testString, query.getExpressions().get("taskCreatedAfter"));
     assertEquals(testString, query.getKey());
     assertEquals(testString, query.getKeyLike());
     assertEquals(testString, query.getProcessDefinitionKey());
@@ -227,11 +249,17 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
     }
 
     assertEquals(testDate, query.getDueDate());
+    assertEquals(testString, query.getExpressions().get("dueDate"));
     assertEquals(testDate, query.getDueBefore());
+    assertEquals(testString, query.getExpressions().get("dueBefore"));
     assertEquals(testDate, query.getDueAfter());
+    assertEquals(testString, query.getExpressions().get("dueAfter"));
     assertEquals(testDate, query.getFollowUpDate());
+    assertEquals(testString, query.getExpressions().get("followUpDate"));
     assertEquals(testDate, query.getFollowUpBefore());
+    assertEquals(testString, query.getExpressions().get("followUpBefore"));
     assertEquals(testDate, query.getFollowUpAfter());
+    assertEquals(testString, query.getExpressions().get("followUpAfter"));
     assertTrue(query.isExcludeSubtasks());
     assertEquals(SuspensionState.SUSPENDED, query.getSuspensionState());
     assertEquals(testString, query.getCaseDefinitionKey());
@@ -250,21 +278,25 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
   public void testTaskQueryCandidateUser() {
     TaskQueryImpl query = new TaskQueryImpl();
     query.taskCandidateUser(testUser.getId());
+    query.taskCandidateUserExpression(testUser.getId());
 
     filter.setQuery(query);
     query = filter.getTypeQuery();
 
     assertEquals(testUser.getId(), query.getCandidateUser());
+    assertEquals(testUser.getId(), query.getExpressions().get("taskCandidateUser"));
   }
 
   public void testTaskQueryCandidateGroup() {
     TaskQueryImpl query = new TaskQueryImpl();
     query.taskCandidateGroup(testGroup.getId());
+    query.taskCandidateGroupExpression(testGroup.getId());
 
     filter.setQuery(query);
     query = filter.getTypeQuery();
 
     assertEquals(testGroup.getId(), query.getCandidateGroup());
+    assertEquals(testGroup.getId(), query.getExpressions().get("taskCandidateGroup"));
   }
 
   public void testExecuteTaskQueryList() {

@@ -60,12 +60,22 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
   /** Only select tasks which are assigned to the given user. */
   TaskQuery taskAssignee(String assignee);
 
+  /** Only select tasks which are assigned to the user described by the given expression. */
+  TaskQuery taskAssigneeExpression(String assigneeExpression);
+
   /** Only select tasks which are matching the given user.
    *  The syntax is that of SQL: for example usage: nameLike(%activiti%)*/
   TaskQuery taskAssigneeLike(String assignee);
 
+  /** Only select tasks which are assigned to the user described by the given expression.
+   *  The syntax is that of SQL: for example usage: taskAssigneeLikeExpression("${'%test%'}")*/
+  TaskQuery taskAssigneeLikeExpression(String assigneeLikeExpression);
+
   /** Only select tasks for which the given user is the owner. */
   TaskQuery taskOwner(String owner);
+
+  /** Only select tasks for which the described user by the given expression is the owner. */
+  TaskQuery taskOwnerExpression(String ownerExpression);
 
   /** Only select tasks which don't have an assignee. */
   TaskQuery taskUnassigned();
@@ -80,11 +90,20 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
   /** Only select tasks for which the given user is a candidate. */
   TaskQuery taskCandidateUser(String candidateUser);
 
+  /** Only select tasks for which the described user by the given expression is a candidate. */
+  TaskQuery taskCandidateUserExpression(String candidateUserExpression);
+
   /** Only select tasks for which there exist an {@link IdentityLink} with the given user */
   TaskQuery taskInvolvedUser(String involvedUser);
 
+  /** Only select tasks for which there exist an {@link IdentityLink} with the described user by the given expression */
+  TaskQuery taskInvolvedUserExpression(String involvedUserExpression);
+
   /** Only select tasks for which users in the given group are candidates. */
   TaskQuery taskCandidateGroup(String candidateGroup);
+
+  /** Only select tasks for which users in the described group by the given expression are candidates. */
+  TaskQuery taskCandidateGroupExpression(String candidateGroupExpression);
 
   /**
    * Only select tasks for which the 'candidateGroup' is one of the given groups.
@@ -95,6 +114,16 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
    *   When passed group list is empty or <code>null</code>.
    */
   TaskQuery taskCandidateGroupIn(List<String> candidateGroups);
+
+  /**
+   * Only select tasks for which the 'candidateGroup' is one of the described groups of the given expression.
+   *
+   * @throws ProcessEngineException
+   *   When query is executed and {@link #taskCandidateGroup(String)} or
+   *     {@link #taskCandidateUser(String)} has been executed on the query instance.
+   *   When passed group list is empty or <code>null</code>.
+   */
+  TaskQuery taskCandidateGroupInExpression(String candidateGroupsExpression);
 
   /** Only select tasks for the given process instance id. */
   TaskQuery processInstanceId(String processInstanceId);
@@ -115,11 +144,20 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
   /** Only select tasks that are created on the given date. **/
   TaskQuery taskCreatedOn(Date createTime);
 
+  /** Only select tasks that are created on the described date by the given expression. **/
+  TaskQuery taskCreatedOnExpression(String createTimeExpression);
+
   /** Only select tasks that are created before the given date. **/
   TaskQuery taskCreatedBefore(Date before);
 
+  /** Only select tasks that are created before the described date by the given expression. **/
+  TaskQuery taskCreatedBeforeExpression(String beforeExpression);
+
   /** Only select tasks that are created after the given date. **/
   TaskQuery taskCreatedAfter(Date after);
+
+  /** Only select tasks that are created after the described date by the given expression. **/
+  TaskQuery taskCreatedAfterExpression(String afterExpression);
 
   /** Only select tasks that have no parent (i.e. do not select subtasks). **/
   TaskQuery excludeSubtasks();
@@ -379,9 +417,19 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
   TaskQuery dueDate(Date dueDate);
 
   /**
+   * Only select tasks with the described due date by the given expression.
+   */
+  TaskQuery dueDateExpression(String dueDateExpression);
+
+  /**
    * Only select tasks which have a due date before the given date.
    */
   TaskQuery dueBefore(Date dueDate);
+
+  /**
+   * Only select tasks which have a due date before the described date by the given expression.
+   */
+  TaskQuery dueBeforeExpression(String dueDateExpression);
 
   /**
    * Only select tasks which have a due date after the given date.
@@ -389,19 +437,39 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
   TaskQuery dueAfter(Date dueDate);
 
   /**
+   * Only select tasks which have a due date after the described date by the given expression.
+   */
+  TaskQuery dueAfterExpression(String dueDateExpression);
+
+  /**
    * Only select tasks with the given follow-up date.
    */
-  TaskQuery followUpDate(Date dueDate);
+  TaskQuery followUpDate(Date followUpDate);
+
+  /**
+   * Only select tasks with the described follow-up date by the given expression.
+   */
+  TaskQuery followUpDateExpression(String followUpDateExpression);
 
   /**
    * Only select tasks which have a follow-up date before the given date.
    */
-  TaskQuery followUpBefore(Date dueDate);
+  TaskQuery followUpBefore(Date followUpDate);
+
+  /**
+   * Only select tasks which have a follow-up date before the described date by the given expression.
+   */
+  TaskQuery followUpBeforeExpression(String followUpDateExpression);
 
   /**
    * Only select tasks which have a follow-up date after the given date.
    */
-  TaskQuery followUpAfter(Date dueDate);
+  TaskQuery followUpAfter(Date followUpDate);
+
+  /**
+   * Only select tasks which have a follow-up date after the described date by the given expression.
+   */
+  TaskQuery followUpAfterExpression(String followUpDateExpression);
 
   /**
    * Only selects tasks which are suspended, because its process instance was suspended.

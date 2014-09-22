@@ -16,7 +16,11 @@ package org.camunda.bpm.engine.impl.json;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.impl.Direction;
 import org.camunda.bpm.engine.impl.QueryOperator;
@@ -149,6 +153,11 @@ public class JsonTaskQueryConverter extends JsonObjectConverter<TaskQuery> {
     addField(json, CASE_INSTANCE_BUSINESS_KEY_LIKE, query.getCaseInstanceBusinessKeyLike());
     addField(json, CASE_EXECUTION_ID, query.getCaseExecutionId());
     addDefaultField(json, ORDER_BY, ListQueryParameterObject.DEFAULT_ORDER_BY, query.getOrderBy());
+
+    // expressions
+    for (Map.Entry<String, String> expressionEntry : query.getExpressions().entrySet()) {
+      json.put(expressionEntry.getKey() + "Expression", expressionEntry.getValue());
+    }
 
     return json;
   }
@@ -394,6 +403,16 @@ public class JsonTaskQueryConverter extends JsonObjectConverter<TaskQuery> {
       }
       else {
         throw new NotValidException("Unknown sort ordering '" + sortOrder + "' in query");
+      }
+    }
+
+    // expressions
+    Iterator jsonIterator = json.keys();
+    while (jsonIterator.hasNext()) {
+      String key = (String) jsonIterator.next();
+      if (key.endsWith("Expression")) {
+        String expression = json.getString(key);
+        query.addExpression(key.substring(0, key.length() - "Expression".length()), expression);
       }
     }
 

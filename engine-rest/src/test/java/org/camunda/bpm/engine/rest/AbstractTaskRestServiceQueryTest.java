@@ -8,6 +8,7 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -17,7 +18,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 
@@ -1199,6 +1199,78 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
       .when().post(TASK_COUNT_QUERY_URL);
 
     verify(mockQuery).count();
+  }
+
+  @Test
+  public void testQueryWithExpressions() {
+    String testExpression = "${'test'}";
+
+    Map<String, String> params = new HashMap<String, String>();
+    params.put("assigneeExpression", testExpression);
+    params.put("assigneeLikeExpression", testExpression);
+    params.put("ownerExpression", testExpression);
+    params.put("involvedUserExpression", testExpression);
+    params.put("candidateUserExpression", testExpression);
+    params.put("candidateGroupExpression", testExpression);
+    params.put("candidateGroupsExpression", testExpression);
+    params.put("createdBeforeExpression", testExpression);
+    params.put("createdExpression", testExpression);
+    params.put("createdOnExpression", testExpression);
+    params.put("createdAfterExpression", testExpression);
+    params.put("dueBeforeExpression", testExpression);
+    params.put("dueExpression", testExpression);
+    params.put("dueDateExpression", testExpression);
+    params.put("dueAfterExpression", testExpression);
+    params.put("followUpBeforeExpression", testExpression);
+    params.put("followUpExpression", testExpression);
+    params.put("followUpDateExpression", testExpression);
+    params.put("followUpAfterExpression", testExpression);
+
+    // get
+    given()
+      .header("Accept", MediaType.APPLICATION_JSON)
+      .queryParams(params)
+    .expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .get(TASK_QUERY_URL);
+
+    verifyExpressionMocks(testExpression);
+
+    // reset mock
+    reset(mockQuery);
+
+    // post
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .header("Accept", MediaType.APPLICATION_JSON)
+      .body(params)
+    .expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .post(TASK_QUERY_URL);
+
+    verifyExpressionMocks(testExpression);
+
+  }
+
+  protected void verifyExpressionMocks(String testExpression) {
+    verify(mockQuery).taskAssigneeExpression(testExpression);
+    verify(mockQuery).taskAssigneeLikeExpression(testExpression);
+    verify(mockQuery).taskOwnerExpression(testExpression);
+    verify(mockQuery).taskInvolvedUserExpression(testExpression);
+    verify(mockQuery).taskCandidateUserExpression(testExpression);
+    verify(mockQuery).taskCandidateGroupExpression(testExpression);
+    verify(mockQuery).taskCandidateGroupInExpression(testExpression);
+    verify(mockQuery).taskCreatedBeforeExpression(testExpression);
+    verify(mockQuery).taskCreatedOnExpression(testExpression);
+    verify(mockQuery).taskCreatedAfterExpression(testExpression);
+    verify(mockQuery).dueBeforeExpression(testExpression);
+    verify(mockQuery).dueDateExpression(testExpression);
+    verify(mockQuery).dueAfterExpression(testExpression);
+    verify(mockQuery).followUpBeforeExpression(testExpression);
+    verify(mockQuery).followUpDateExpression(testExpression);
+    verify(mockQuery).followUpAfterExpression(testExpression);
   }
 
 }
