@@ -119,6 +119,7 @@ define([
       $scope.loadingProcesses = true;
 
       ProcessDefinition.list({
+        suspended: false,
         latest: true,
         nameLike: '%'+ val +'%'
       }, function(err, res) {
