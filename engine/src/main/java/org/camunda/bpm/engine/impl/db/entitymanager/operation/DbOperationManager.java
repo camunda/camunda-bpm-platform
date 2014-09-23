@@ -41,11 +41,11 @@ public class DbOperationManager {
 
   // comparators ////////////////
 
-  public Comparator<Class<?>> INSERT_TYPE_COMPARATOR = new EntityTypeComparatorForInserts();
-  public Comparator<Class<?>> MODIFICATION_TYPE_COMPARATOR = new EntityTypeComparatorForModifications();
-  public Comparator<DbEntityOperation> INSERT_OPERATION_COMPARATOR = new DbEntityOperationComparator();
-  public Comparator<DbEntityOperation> MODIFICATION_OPERATION_COMPARATOR  = new DbEntityOperationComparator();
-  public Comparator<DbBulkOperation> BULK_OPERATION_COMPARATOR = new DbBulkOperationComparator();
+  public static Comparator<Class<?>> INSERT_TYPE_COMPARATOR = new EntityTypeComparatorForInserts();
+  public static Comparator<Class<?>> MODIFICATION_TYPE_COMPARATOR = new EntityTypeComparatorForModifications();
+  public static Comparator<DbEntityOperation> INSERT_OPERATION_COMPARATOR = new DbEntityOperationComparator();
+  public static Comparator<DbEntityOperation> MODIFICATION_OPERATION_COMPARATOR  = new DbEntityOperationComparator();
+  public static Comparator<DbBulkOperation> BULK_OPERATION_COMPARATOR = new DbBulkOperationComparator();
 
   // pre-sorted operation maps //////////////
 

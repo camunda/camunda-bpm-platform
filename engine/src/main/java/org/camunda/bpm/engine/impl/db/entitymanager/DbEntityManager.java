@@ -43,7 +43,7 @@ import static org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperation
 @SuppressWarnings({ "rawtypes" })
 public class DbEntityManager implements Session {
 
-  protected Logger log = Logger.getLogger(DbEntityManager.class.getName());
+  private static Logger log = Logger.getLogger(DbEntityManager.class.getName());
 
   protected IdGenerator idGenerator;
 
