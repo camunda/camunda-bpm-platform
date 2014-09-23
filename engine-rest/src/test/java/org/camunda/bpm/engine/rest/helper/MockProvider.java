@@ -27,7 +27,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import org.camunda.bpm.application.ProcessApplicationInfo;
+import org.camunda.bpm.engine.EntityTypes;
 import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.Permissions;
@@ -65,6 +67,7 @@ import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.repository.Resource;
+import org.camunda.bpm.engine.rest.dto.task.TaskQueryDto;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.runtime.EventSubscription;
@@ -449,14 +452,12 @@ public abstract class MockProvider {
 
   // filter
   public static final String EXAMPLE_FILTER_ID = "aFilterId";
-  public static final String EXAMPLE_FILTER_RESOURCE_TYPE = "aFilterResourceType";
+  public static final String EXAMPLE_FILTER_RESOURCE_TYPE = EntityTypes.TASK;
   public static final String EXAMPLE_FILTER_NAME = "aFilterName";
   public static final String EXAMPLE_FILTER_OWNER = "aFilterOwner";
-  public static final String EXAMPLE_FILTER_QUERY = "{\"name\": \"test\"}";
-  public static final Map<String, Object> EXAMPLE_FILTER_QUERY_MAP = Collections.singletonMap("name", (Object) "test");
-  public static final Query EXAMPLE_FILTER_TYPE_QUERY = new TaskQueryImpl().taskName("test");
-  public static final String EXAMPLE_FILTER_PROPERTIES = "{\"color\": \"#112233\"}";
-  public static final Map<String, Object> EXAMPLE_FILTER_PROPERTIES_MAP = Collections.singletonMap("color", (Object) "#112233");
+  public static final Query EXAMPLE_FILTER_QUERY = new TaskQueryImpl().taskName("test");
+  public static final TaskQueryDto EXAMPLE_FILTER_QUERY_DTO = TaskQueryDto.fromQuery(EXAMPLE_FILTER_QUERY);
+  public static final Map<String, Object> EXAMPLE_FILTER_PROPERTIES = Collections.singletonMap("color", (Object) "#112233");
 
   // tasks
   public static Task createMockTask() {
@@ -1429,22 +1430,14 @@ public abstract class MockProvider {
     when(mock.getName()).thenReturn(EXAMPLE_FILTER_NAME);
     when(mock.getOwner()).thenReturn(EXAMPLE_FILTER_OWNER);
     when(mock.getQuery()).thenReturn(EXAMPLE_FILTER_QUERY);
-    when(mock.getTypeQuery()).thenReturn(EXAMPLE_FILTER_TYPE_QUERY);
     when(mock.getProperties()).thenReturn(EXAMPLE_FILTER_PROPERTIES);
-    when(mock.getPropertiesMap()).thenReturn(EXAMPLE_FILTER_PROPERTIES_MAP);
 
-    doThrow(new NotValidException("Resource type must not be null"))
-      .when(mock).setResourceType(null);
-    doThrow(new NotValidException("Resource type must not be empty"))
-      .when(mock).setResourceType("");
     doThrow(new NotValidException("Name must not be null"))
       .when(mock).setName(null);
     doThrow(new NotValidException("Name must not be empty"))
       .when(mock).setName("");
     doThrow(new NotValidException("Query must not be null"))
-      .when(mock).setQuery((String) null);
-    doThrow(new NotValidException("Query must not be empty"))
-      .when(mock).setQuery("");
+      .when(mock).setQuery(null);
 
     return mock;
   }

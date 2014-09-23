@@ -33,10 +33,6 @@ public class ExecuteFilterListCmd extends AbstractExecuteFilterCmd implements Co
     super(filterId, extendingQuery);
   }
 
-  public ExecuteFilterListCmd(String filterId, String extendingQuery) {
-    super(filterId, extendingQuery);
-  }
-
   public List<?> execute(CommandContext commandContext) {
     Query<?, ?> query = getFilterQuery(commandContext);
     return query.list();

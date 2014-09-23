@@ -13,10 +13,12 @@
 
 package org.camunda.bpm.engine.test.api.filter;
 
+import java.util.HashMap;
+
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.filter.Filter;
 import org.camunda.bpm.engine.impl.TaskQueryImpl;
+import org.camunda.bpm.engine.impl.persistence.entity.FilterEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.query.Query;
 import org.camunda.bpm.engine.task.TaskQuery;
@@ -32,8 +34,8 @@ public class FilterServiceTest extends PluggableProcessEngineTestCase {
     filter = filterService.newTaskFilter()
       .setName("name")
       .setOwner("owner")
-      .setQuery("{}")
-      .setProperties("properties");
+      .setQuery(taskService.createTaskQuery())
+      .setProperties(new HashMap<String, Object>());
     assertNull(filter.getId());
     filterService.saveFilter(filter);
     assertNotNull(filter.getId());
@@ -79,70 +81,19 @@ public class FilterServiceTest extends PluggableProcessEngineTestCase {
     catch (ProcessEngineException e) {
       // expected
     }
-
-    try {
-      filter.setQuery((String) null);
-      fail("Exception expected");
-    }
-    catch (ProcessEngineException e) {
-      // expected
-    }
-
-    try {
-      filter.setQuery("");
-      fail("Exception expected");
-    }
-    catch (ProcessEngineException e) {
-      // expected
-    }
-
-    try {
-      filter.setQuery("abc");
-      fail("Exception expected");
-    }
-    catch (ProcessEngineException e) {
-      // expected
-    }
-
-    try {
-      filter.setResourceType(null);
-      fail("Exception expected");
-    }
-    catch (ProcessEngineException e) {
-      // expected
-    }
-
-    try {
-      filter.setResourceType("");
-      fail("Exception expected");
-    }
-    catch (ProcessEngineException e) {
-      // expected
-    }
   }
 
   public void testUpdateFilter() {
     filter.setName("newName");
     filter.setOwner("newOwner");
-    filter.setQuery("{\"name\": \"test\"}");
-    filter.setProperties("newProperties");
+    filter.setQuery(taskService.createTaskQuery());
+    filter.setProperties(new HashMap<String, Object>());
 
     filterService.saveFilter(filter);
 
     Filter filter2 = filterService.getFilter(filter.getId());
 
     compareFilter(filter, filter2);
-  }
-
-  public void testCannotUpdateResourceType() {
-    try {
-      filter.setResourceType("another resource type");
-      fail("expected exception");
-    } catch (NotValidException e) {
-      // expected
-    }
-
-    filterService.saveFilter(filter);
   }
 
   public void testExtendFilter() {
@@ -152,7 +103,7 @@ public class FilterServiceTest extends PluggableProcessEngineTestCase {
     Filter newFilter = filter.extend(extendingQuery);
     assertNull(newFilter.getId());
 
-    TaskQueryImpl filterQuery = newFilter.getTypeQuery();
+    TaskQueryImpl filterQuery = newFilter.getQuery();
     assertEquals("newName", filterQuery.getName());
     assertEquals("newOwner", filterQuery.getOwner());
   }
@@ -217,7 +168,7 @@ public class FilterServiceTest extends PluggableProcessEngineTestCase {
     assertEquals(filter1.getResourceType(), filter2.getResourceType());
     assertEquals(filter1.getName(), filter2.getName());
     assertEquals(filter1.getOwner(), filter2.getOwner());
-    assertEquals(filter1.getQuery(), filter2.getQuery());
+    assertEquals(((FilterEntity) filter1).getQueryInternal(), ((FilterEntity) filter2).getQueryInternal());
     assertEquals(filter1.getProperties(), filter2.getProperties());
   }
 

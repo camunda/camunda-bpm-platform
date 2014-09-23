@@ -26,5 +26,5 @@ public abstract class JsonObjectConverter <T> {
 
   public abstract JSONObject toJsonObject(T object);
 
-  public abstract T toObject(String jsonString);
+  public abstract T toObject(JSONObject jsonString);
 }

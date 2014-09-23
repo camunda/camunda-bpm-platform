@@ -25,10 +25,10 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
-import com.jayway.restassured.response.Response;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.camunda.bpm.engine.filter.FilterQuery;
 import org.camunda.bpm.engine.impl.AbstractQuery;
 import org.camunda.bpm.engine.rest.dto.runtime.FilterQueryDto;
@@ -36,6 +36,8 @@ import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InOrder;
+
+import com.jayway.restassured.response.Response;
 
 /**
  * @author Sebastian Menski
@@ -189,8 +191,8 @@ public abstract class AbstractFilterRestServiceQueryTest extends AbstractRestSer
     assertThat(returnedResourceType).isEqualTo(MockProvider.EXAMPLE_FILTER_RESOURCE_TYPE);
     assertThat(returnedName).isEqualTo(MockProvider.EXAMPLE_FILTER_NAME);
     assertThat(returnedOwner).isEqualTo(MockProvider.EXAMPLE_FILTER_OWNER);
-    assertThat(returnedQuery).isEqualTo(MockProvider.EXAMPLE_FILTER_QUERY_MAP);
-    assertThat(returnedProperties).isEqualTo(MockProvider.EXAMPLE_FILTER_PROPERTIES_MAP);
+    assertThat(returnedQuery.get("name")).isEqualTo(MockProvider.EXAMPLE_FILTER_QUERY_DTO.getName());
+    assertThat(returnedProperties).isEqualTo(MockProvider.EXAMPLE_FILTER_PROPERTIES);
   }
 
   private void verifyQueryMockMultipleParameters() {

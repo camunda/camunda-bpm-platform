@@ -18,6 +18,7 @@ import static org.camunda.bpm.engine.authorization.Permissions.READ;
 import static org.camunda.bpm.engine.authorization.Permissions.UPDATE;
 import static org.camunda.bpm.engine.authorization.Resources.FILTER;
 
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URI;
@@ -26,23 +27,27 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
+import java.util.regex.Pattern;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
+import org.camunda.bpm.engine.EntityTypes;
 import org.camunda.bpm.engine.FilterService;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.filter.Filter;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
+import org.camunda.bpm.engine.query.Query;
 import org.camunda.bpm.engine.rest.FilterRestService;
+import org.camunda.bpm.engine.rest.dto.AbstractQueryDto;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.ResourceOptionsDto;
 import org.camunda.bpm.engine.rest.dto.runtime.FilterDto;
 import org.camunda.bpm.engine.rest.dto.task.TaskDto;
+import org.camunda.bpm.engine.rest.dto.task.TaskQueryDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.hal.EmptyHalCollection;
 import org.camunda.bpm.engine.rest.hal.EmptyHalResource;
@@ -51,20 +56,27 @@ import org.camunda.bpm.engine.rest.hal.task.HalTask;
 import org.camunda.bpm.engine.rest.hal.task.HalTaskList;
 import org.camunda.bpm.engine.rest.impl.AbstractAuthorizedRestResource;
 import org.camunda.bpm.engine.rest.sub.runtime.FilterResource;
+import org.codehaus.jackson.map.ObjectMapper;
 
 /**
  * @author Sebastian Menski
  */
 public class FilterResourceImpl extends AbstractAuthorizedRestResource implements FilterResource {
 
+  protected ObjectMapper objectMapper;
+  protected String filterId;
+
   protected FilterService filterService;
   protected String relativeRootResourcePath;
+
+  public static final Pattern EMPTY_JSON_BODY = Pattern.compile("\\s*\\{\\s*\\}\\s*");
 
   public static final String DTO_MAPPING = "dto";
   public static final String HAL_MAPPING = "hal";
   public static final String HAL_LIST_MAPPING = "hal-list";
 
   public static final Map<Class<?>, Map<String, Class<?>>> ENTITY_MAPPING = new HashMap<Class<?>, Map<String, Class<?>>>();
+  public static final Map<String, Class<? extends AbstractQueryDto<?>>> QUERY_MAPPING = new HashMap<String, Class<? extends AbstractQueryDto<?>>>();
 
   static {
     // Task
@@ -73,12 +85,16 @@ public class FilterResourceImpl extends AbstractAuthorizedRestResource implement
     mapping.put(HAL_MAPPING, HalTask.class);
     mapping.put(HAL_LIST_MAPPING, HalTaskList.class);
     ENTITY_MAPPING.put(TaskEntity.class, mapping);
+
+    QUERY_MAPPING.put(EntityTypes.TASK, TaskQueryDto.class);
   }
 
-  public FilterResourceImpl(String processEngineName, String filterId, String relativeRootResourcePath) {
+  public FilterResourceImpl(String processEngineName, ObjectMapper objectMapper, String filterId, String relativeRootResourcePath) {
     super(processEngineName, FILTER, filterId);
-    filterService = processEngine.getFilterService();
     this.relativeRootResourcePath = relativeRootResourcePath;
+    this.objectMapper = objectMapper;
+    this.filterId = filterId;
+    filterService = processEngine.getFilterService();
   }
 
   public FilterDto getFilter() {
@@ -99,7 +115,7 @@ public class FilterResourceImpl extends AbstractAuthorizedRestResource implement
     Filter filter = getDbFilter();
 
     try {
-      filterDto.updateFilter(filter);
+      filterDto.updateFilter(filter, processEngine);
     }
     catch (NotValidException e) {
       throw new InvalidRequestException(Status.BAD_REQUEST, e, "Unable to update filter with invalid content");
@@ -149,7 +165,7 @@ public class FilterResourceImpl extends AbstractAuthorizedRestResource implement
   }
 
   public List<Object> queryList(String extendingQuery, Integer firstResult, Integer maxResults) {
-    List<Object> entities = executeFilterList(extendingQuery, firstResult, maxResults);
+    List<?> entities = executeFilterList(extendingQuery, firstResult, maxResults);
 
     if (entities != null && !entities.isEmpty()) {
       Method fromEntity = getMethodFromMapping(entities.get(0).getClass(), DTO_MAPPING, "fromEntity");
@@ -165,7 +181,7 @@ public class FilterResourceImpl extends AbstractAuthorizedRestResource implement
   }
 
   public HalResource queryHalList(String extendingQuery, Integer firstResult, Integer maxResults) {
-    List<Object> entities = executeFilterList(extendingQuery, firstResult, maxResults);
+    List<?> entities = executeFilterList(extendingQuery, firstResult, maxResults);
 
     if (entities != null && !entities.isEmpty()) {
       long count = executeFilterCount(null);
@@ -187,7 +203,7 @@ public class FilterResourceImpl extends AbstractAuthorizedRestResource implement
 
   protected Object executeFilterSingleResult(String extendingQuery) {
     try {
-      return filterService.singleResult(resourceId, extendingQuery);
+      return  filterService.singleResult(filterId, convertQuery(extendingQuery));
     }
     catch (NullValueException e) {
       throw new InvalidRequestException(Status.NOT_FOUND, e, "Filter with id '" + resourceId + "' does not exist.");
@@ -200,7 +216,8 @@ public class FilterResourceImpl extends AbstractAuthorizedRestResource implement
     }
   }
 
-  protected List<Object> executeFilterList(String extendingQuery, Integer firstResult, Integer maxResults) {
+  protected List<?> executeFilterList(String extendingQueryString, Integer firstResult, Integer maxResults) {
+    Query extendingQuery = convertQuery(extendingQueryString);
     try {
       if (firstResult != null || maxResults != null) {
         if (firstResult == null) {
@@ -224,7 +241,7 @@ public class FilterResourceImpl extends AbstractAuthorizedRestResource implement
 
   protected long executeFilterCount(String extendingQuery) {
     try {
-      return filterService.count(resourceId, extendingQuery);
+      return filterService.count(filterId, convertQuery(extendingQuery));
     }
     catch (NullValueException e) {
       throw new InvalidRequestException(Status.NOT_FOUND, e, "Filter with id '" + resourceId + "' does not exist.");
@@ -312,4 +329,31 @@ public class FilterResourceImpl extends AbstractAuthorizedRestResource implement
 
     return dto;
   }
+
+  protected Query<?, ?> convertQuery(String queryString) {
+    if (queryString == null || queryString.trim().isEmpty() || EMPTY_JSON_BODY.matcher(queryString).matches()) {
+      return null;
+    }
+    else {
+      String resourceType = getDbFilter().getResourceType();
+      Class<? extends AbstractQueryDto<?>> queryDtoClass = QUERY_MAPPING.get(resourceType);
+      if (queryDtoClass != null) {
+        try {
+          AbstractQueryDto<?> queryDto = objectMapper.readValue(queryString, queryDtoClass);
+          if (queryDto != null) {
+            return queryDto.toQuery(processEngine);
+          }
+          else {
+            return null;
+          }
+        } catch (IOException e) {
+          throw new InvalidRequestException(Status.BAD_REQUEST, e, "Unable to convert query of type '" + resourceType + "' to query dto class '" + queryDtoClass.getCanonicalName() + "'");
+        }
+      }
+      else {
+        throw new InvalidRequestException(Status.BAD_REQUEST, "Unsupported filter type '" + resourceType + "'");
+      }
+    }
+  }
+
 }

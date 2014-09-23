@@ -15,13 +15,15 @@ package org.camunda.bpm.engine.rest.dto.task;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
+import java.util.Map;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
-import org.camunda.bpm.engine.impl.util.StringUtil;
+import org.camunda.bpm.engine.impl.TaskQueryImpl;
+import org.camunda.bpm.engine.impl.TaskQueryVariableValue;
+import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
+import org.camunda.bpm.engine.query.Query;
 import org.camunda.bpm.engine.rest.dto.AbstractQueryDto;
 import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
 import org.camunda.bpm.engine.rest.dto.VariableQueryParameterDto;
@@ -35,7 +37,9 @@ import org.camunda.bpm.engine.rest.dto.converter.VariableListConverter;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.task.DelegationState;
 import org.camunda.bpm.engine.task.TaskQuery;
+import org.codehaus.jackson.map.annotate.JsonSerialize;
 
+@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
 
   private static final String SORT_BY_PROCESS_INSTANCE_ID_VALUE = "instanceId";
@@ -482,6 +486,266 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     return engine.getTaskService().createTaskQuery();
   }
 
+  public String getProcessInstanceBusinessKey() {
+    return processInstanceBusinessKey;
+  }
+
+  public String getProcessInstanceBusinessKeyLike() {
+    return processInstanceBusinessKeyLike;
+  }
+
+  public String getProcessDefinitionKey() {
+    return processDefinitionKey;
+  }
+
+  public String getProcessDefinitionId() {
+    return processDefinitionId;
+  }
+
+  public String getExecutionId() {
+    return executionId;
+  }
+
+  public String[] getActivityInstanceIdIn() {
+    return activityInstanceIdIn;
+  }
+
+  public String getProcessDefinitionName() {
+    return processDefinitionName;
+  }
+
+  public String getProcessDefinitionNameLike() {
+    return processDefinitionNameLike;
+  }
+
+  public String getProcessInstanceId() {
+    return processInstanceId;
+  }
+
+  public String getAssignee() {
+    return assignee;
+  }
+
+  public String getAssigneeExpression() {
+    return assigneeExpression;
+  }
+
+  public String getAssigneeLike() {
+    return assigneeLike;
+  }
+
+  public String getAssigneeLikeExpression() {
+    return assigneeLikeExpression;
+  }
+
+  public String getCandidateGroup() {
+    return candidateGroup;
+  }
+
+  public String getCandidateGroupExpression() {
+    return candidateGroupExpression;
+  }
+
+  public String getCandidateUser() {
+    return candidateUser;
+  }
+
+  public String getCandidateUserExpression() {
+    return candidateUserExpression;
+  }
+
+  public String getTaskDefinitionKey() {
+    return taskDefinitionKey;
+  }
+
+  public String getTaskDefinitionKeyLike() {
+    return taskDefinitionKeyLike;
+  }
+
+  public String getDescription() {
+    return description;
+  }
+
+  public String getDescriptionLike() {
+    return descriptionLike;
+  }
+
+  public String getInvolvedUser() {
+    return involvedUser;
+  }
+
+  public String getInvolvedUserExpression() {
+    return involvedUserExpression;
+  }
+
+  public Integer getMaxPriority() {
+    return maxPriority;
+  }
+
+  public Integer getMinPriority() {
+    return minPriority;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public String getNameLike() {
+    return nameLike;
+  }
+
+  public String getOwner() {
+    return owner;
+  }
+
+  public String getOwnerExpression() {
+    return ownerExpression;
+  }
+
+  public Integer getPriority() {
+    return priority;
+  }
+
+  public Boolean getUnassigned() {
+    return unassigned;
+  }
+
+  public Boolean getActive() {
+    return active;
+  }
+
+  public Boolean getSuspended() {
+    return suspended;
+  }
+
+  public String getCaseDefinitionKey() {
+    return caseDefinitionKey;
+  }
+
+  public String getCaseDefinitionId() {
+    return caseDefinitionId;
+  }
+
+  public String getCaseDefinitionName() {
+    return caseDefinitionName;
+  }
+
+  public String getCaseDefinitionNameLike() {
+    return caseDefinitionNameLike;
+  }
+
+  public String getCaseInstanceId() {
+    return caseInstanceId;
+  }
+
+  public String getCaseInstanceBusinessKey() {
+    return caseInstanceBusinessKey;
+  }
+
+  public String getCaseInstanceBusinessKeyLike() {
+    return caseInstanceBusinessKeyLike;
+  }
+
+  public String getCaseExecutionId() {
+    return caseExecutionId;
+  }
+
+  public Date getDueAfter() {
+    return dueAfter;
+  }
+
+  public String getDueAfterExpression() {
+    return dueAfterExpression;
+  }
+
+  public Date getDueBefore() {
+    return dueBefore;
+  }
+
+  public String getDueBeforeExpression() {
+    return dueBeforeExpression;
+  }
+
+  public Date getDueDate() {
+    return dueDate;
+  }
+
+  public String getDueDateExpression() {
+    return dueDateExpression;
+  }
+
+  public Date getFollowUpAfter() {
+    return followUpAfter;
+  }
+
+  public String getFollowUpAfterExpression() {
+    return followUpAfterExpression;
+  }
+
+  public Date getFollowUpBefore() {
+    return followUpBefore;
+  }
+
+  public String getFollowUpBeforeExpression() {
+    return followUpBeforeExpression;
+  }
+
+  public Date getFollowUpDate() {
+    return followUpDate;
+  }
+
+  public String getFollowUpDateExpression() {
+    return followUpDateExpression;
+  }
+
+  public Date getCreatedAfter() {
+    return createdAfter;
+  }
+
+  public String getCreatedAfterExpression() {
+    return createdAfterExpression;
+  }
+
+  public Date getCreatedBefore() {
+    return createdBefore;
+  }
+
+  public String getCreatedBeforeExpression() {
+    return createdBeforeExpression;
+  }
+
+  public Date getCreatedOn() {
+    return createdOn;
+  }
+
+  public String getCreatedOnExpression() {
+    return createdOnExpression;
+  }
+
+  public String getDelegationState() {
+    return delegationState;
+  }
+
+  public List<String> getCandidateGroups() {
+    return candidateGroups;
+  }
+
+  public String getCandidateGroupsExpression() {
+    return candidateGroupsExpression;
+  }
+
+  public List<VariableQueryParameterDto> getTaskVariables() {
+    return taskVariables;
+  }
+
+  public List<VariableQueryParameterDto> getProcessVariables() {
+    return processVariables;
+  }
+
+  public List<VariableQueryParameterDto> getCaseInstanceVariables() {
+    return caseInstanceVariables;
+  }
+
   @Override
   protected void applyFilters(TaskQuery query) {
     if (processInstanceBusinessKey != null) {
@@ -574,7 +838,7 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     if (priority != null) {
       query.taskPriority(priority);
     }
-    if (unassigned != null && unassigned == true) {
+    if (unassigned != null && unassigned) {
       query.taskUnassigned();
     }
     if (dueAfter != null) {
@@ -792,6 +1056,141 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
         query.desc();
       }
     }
+  }
+
+
+  public static TaskQueryDto fromQuery(Query<?, ?> query) {
+    TaskQueryImpl taskQuery = (TaskQueryImpl) query;
+
+    TaskQueryDto dto = new TaskQueryDto();
+
+    dto.activityInstanceIdIn = taskQuery.getActivityInstanceIdIn();
+    dto.assignee = taskQuery.getAssignee();
+    dto.assigneeLike = taskQuery.getAssigneeLike();
+    dto.candidateGroup = taskQuery.getCandidateGroup();
+    dto.candidateGroups = taskQuery.getCandidateGroups();
+    dto.candidateUser = taskQuery.getCandidateUser();
+    dto.caseDefinitionId = taskQuery.getCaseDefinitionId();
+    dto.caseDefinitionKey = taskQuery.getCaseDefinitionKey();
+    dto.caseDefinitionName = taskQuery.getCaseDefinitionName();
+    dto.caseDefinitionNameLike = taskQuery.getCaseDefinitionNameLike();
+    dto.caseExecutionId = taskQuery.getCaseExecutionId();
+    dto.caseInstanceBusinessKey = taskQuery.getCaseInstanceBusinessKey();
+    dto.caseInstanceBusinessKeyLike = taskQuery.getCaseInstanceBusinessKeyLike();
+    dto.caseInstanceId = taskQuery.getCaseInstanceId();
+
+    dto.processInstanceBusinessKey = taskQuery.getProcessInstanceBusinessKey();
+    dto.processInstanceBusinessKeyLike = taskQuery.getProcessInstanceBusinessKeyLike();
+    dto.processDefinitionKey = taskQuery.getProcessDefinitionKey();
+    dto.processDefinitionId = taskQuery.getProcessDefinitionId();
+    dto.executionId = taskQuery.getExecutionId();
+    dto.activityInstanceIdIn = taskQuery.getActivityInstanceIdIn();
+    dto.processDefinitionName = taskQuery.getProcessDefinitionName();
+    dto.processDefinitionNameLike = taskQuery.getProcessDefinitionNameLike();
+    dto.processInstanceId = taskQuery.getProcessInstanceId();
+    dto.assignee = taskQuery.getAssignee();
+    dto.assigneeLike = taskQuery.getAssigneeLike();
+    dto.candidateGroup = taskQuery.getCandidateGroup();
+    dto.candidateUser = taskQuery.getCandidateUser();
+    dto.taskDefinitionKey = taskQuery.getKey();
+    dto.taskDefinitionKeyLike = taskQuery.getKeyLike();
+    dto.description = taskQuery.getDescription();
+    dto.descriptionLike = taskQuery.getDescriptionLike();
+    dto.involvedUser = taskQuery.getInvolvedUser();
+    dto.maxPriority = taskQuery.getMaxPriority();
+    dto.minPriority = taskQuery.getMinPriority();
+    dto.name = taskQuery.getName();
+    dto.nameLike = taskQuery.getNameLike();
+    dto.owner = taskQuery.getOwner();
+    dto.priority = taskQuery.getPriority();
+    dto.unassigned = taskQuery.isUnassignedInternal();
+
+    dto.dueAfter = taskQuery.getDueAfter();
+    dto.dueBefore = taskQuery.getDueBefore();
+    dto.dueDate = taskQuery.getDueDate();
+    dto.followUpAfter = taskQuery.getFollowUpAfter();
+    dto.followUpBefore = taskQuery.getFollowUpBefore();
+    dto.followUpDate = taskQuery.getFollowUpDate();
+    dto.createdAfter = taskQuery.getCreateTimeAfter();
+    dto.createdBefore = taskQuery.getCreateTimeBefore();
+    dto.createdOn = taskQuery.getCreateTime();
+
+    if (taskQuery.getDelegationState() != null) {
+      dto.delegationState = taskQuery.getDelegationState().toString();
+    }
+
+    dto.taskVariables = new ArrayList<VariableQueryParameterDto>();
+    for (TaskQueryVariableValue variableValue : taskQuery.getVariables()) {
+      VariableQueryParameterDto variableValueDto = new VariableQueryParameterDto(variableValue);
+
+      if (variableValue.isProcessInstanceVariable()) {
+        dto.processVariables.add(variableValueDto);
+      } else if (variableValue.isLocal()) {
+        dto.taskVariables.add(variableValueDto);
+      } else {
+        dto.caseInstanceVariables.add(variableValueDto);
+      }
+    }
+
+    if (taskQuery.getSuspensionState() == SuspensionState.ACTIVE) {
+      dto.active = true;
+    }
+    if (taskQuery.getSuspensionState() == SuspensionState.SUSPENDED) {
+      dto.suspended = true;
+    }
+
+    // expressions
+    Map<String, String> expressions = taskQuery.getExpressions();
+    if (expressions.containsKey("taskAssignee")) {
+      dto.setAssigneeExpression(expressions.get("taskAssignee"));
+    }
+    if (expressions.containsKey("taskAssigneeLike")) {
+      dto.setAssigneeLikeExpression(expressions.get("taskAssigneeLike"));
+    }
+    if (expressions.containsKey("taskOwner")) {
+      dto.setOwnerExpression(expressions.get("taskOwner"));
+    }
+    if (expressions.containsKey("taskCandidateUser")) {
+      dto.setCandidateUserExpression(expressions.get("taskCandidateUser"));
+    }
+    if (expressions.containsKey("taskInvolvedUser")) {
+      dto.setInvolvedUserExpression(expressions.get("taskInvolvedUser"));
+    }
+    if (expressions.containsKey("taskCandidateGroup")) {
+      dto.setCandidateGroupExpression(expressions.get("taskCandidateGroup"));
+    }
+    if (expressions.containsKey("taskCandidateGroupIn")) {
+      dto.setCandidateGroupsExpression(expressions.get("taskCandidateGroupIn"));
+    }
+    if (expressions.containsKey("taskCreatedOne")) {
+      dto.setCreatedOnExpression(expressions.get("taskCreatedOne"));
+    }
+    if (expressions.containsKey("taskCreatedBefore")) {
+      dto.setCreatedBeforeExpression(expressions.get("taskCreatedBefore"));
+    }
+    if (expressions.containsKey("taskCreatedAfter")) {
+      dto.setCreatedAfterExpression(expressions.get("taskCreatedAfter"));
+    }
+    if (expressions.containsKey("dueDate")) {
+      dto.setDueDateExpression(expressions.get("dueDate"));
+    }
+    if (expressions.containsKey("dueBefore")) {
+      dto.setDueBeforeExpression(expressions.get("dueBefore"));
+    }
+    if (expressions.containsKey("dueAfter")) {
+      dto.setDueAfterExpression(expressions.get("dueAfter"));
+    }
+    if (expressions.containsKey("followUpDate")) {
+      dto.setFollowUpDateExpression(expressions.get("followUpDate"));
+    }
+    if (expressions.containsKey("followUpBefore")) {
+      dto.setFollowUpBeforeExpression(expressions.get("followUpBefore"));
+    }
+    if (expressions.containsKey("followUpAfter")) {
+      dto.setFollowUpAfterExpression(expressions.get("followUpAfter"));
+    }
+
+    return dto;
   }
 
 }

@@ -66,7 +66,7 @@ public class FilterAuthorizationsTest extends PluggableProcessEngineTestCase {
 
   public void testCreateFilterNotPermitted() {
     try {
-      filterService.newFilter();
+      filterService.newTaskFilter();
       fail("Exception expected");
     }
     catch (AuthorizationException e) {
@@ -76,12 +76,12 @@ public class FilterAuthorizationsTest extends PluggableProcessEngineTestCase {
 
   public void testCreateFilterPermitted() {
     grantCreateFilter();
-    Filter filter = filterService.newFilter();
+    Filter filter = filterService.newTaskFilter();
     assertNotNull(filter);
   }
 
   public void testSaveFilterNotPermitted() {
-    Filter filter = new FilterEntity();
+    Filter filter = new FilterEntity(EntityTypes.TASK);
     try {
       filterService.saveFilter(filter);
       fail("Exception expected");
@@ -92,8 +92,7 @@ public class FilterAuthorizationsTest extends PluggableProcessEngineTestCase {
   }
 
   public void testSaveFilterPermitted() {
-    Filter filter = new FilterEntity()
-      .setResourceType(EntityTypes.TASK)
+    Filter filter = new FilterEntity(EntityTypes.TASK)
       .setName("testFilter");
 
     grantCreateFilter();

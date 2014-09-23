@@ -27,22 +27,6 @@ import org.camunda.bpm.engine.query.Query;
 public interface FilterService {
 
   /**
-   * Creates a new filter.
-   *
-   * @return a new filter
-   * @throws AuthorizationException if the user has no {@link Permissions#CREATE} permissions on {@link Resources#FILTER}.
-   */
-  Filter newFilter();
-
-  /**
-   * Creates a new filter with a given name.
-   *
-   * @return a new filter with a name
-   * @throws AuthorizationException if the user has no {@link Permissions#CREATE} permissions on {@link Resources#FILTER}.
-   */
-  Filter newFilter(String filterName);
-
-  /**
    * Creates a new task filter.
    *
    * @return a new task filter
@@ -117,17 +101,7 @@ public interface FilterService {
    * @return the query result as list
    * @throws AuthorizationException if the user has no {@link Permissions#READ} permissions on {@link Resources#FILTER}.
    */
-  <T> List<T> list(String filterId, Query<?, T> extendingQuery);
-
-  /**
-   * Executes the extended query of a filter and returns the result as list.
-   *
-   * @param filterId the id of the filter
-   * @param extendingQuery additional query to extend the filter query as JSON object
-   * @return the query result as list
-   * @throws AuthorizationException if the user has no {@link Permissions#READ} permissions on {@link Resources#FILTER}.
-   */
-  <T> List<T> list(String filterId, String extendingQuery);
+  <T, Q extends Query<?, T>> List<T> list(String filterId, Q extendingQuery);
 
   /**
    * Executes the query of the filter and returns the result in the given boundaries as list.
@@ -150,19 +124,7 @@ public interface FilterService {
    * @return the query result as list
    * @throws AuthorizationException if the user has no {@link Permissions#READ} permissions on {@link Resources#FILTER}.
    */
-  <T> List<T> listPage(String filterId, Query<?, T> extendingQuery, int firstResult, int maxResults);
-
-  /**
-   * Executes the extended query of a filter and returns the result in the given boundaries as list.
-   *
-   * @param extendingQuery additional query to extend the filter query
-   * @param filterId the id of the filter
-   * @param firstResult first result to select
-   * @param maxResults maximal number of results
-   * @return the query result as list
-   * @throws AuthorizationException if the user has no {@link Permissions#READ} permissions on {@link Resources#FILTER}.
-   */
-  <T> List<T> listPage(String filterId, String extendingQuery, int firstResult, int maxResults);
+  <T, Q extends Query<?, T>> List<T> listPage(String filterId, Q extendingQuery, int firstResult, int maxResults);
 
   /**
    * Executes the query of the filter and returns the a single result.
@@ -181,17 +143,7 @@ public interface FilterService {
    * @return the single query result
    * @throws AuthorizationException if the user has no {@link Permissions#READ} permissions on {@link Resources#FILTER}.
    */
-  <T> T singleResult(String filterId, Query<?, T> extendingQuery);
-
-  /**
-   * Executes the extended query of the filter and returns the a single result.
-   *
-   * @param filterId the the id of the filter
-   * @param extendingQuery additional query to extend the filter query as JSON object
-   * @return the single query result
-   * @throws AuthorizationException if the user has no {@link Permissions#READ} permissions on {@link Resources#FILTER}.
-   */
-  <T> T singleResult(String filterId, String extendingQuery);
+  <T, Q extends Query<?, T>> T singleResult(String filterId, Q extendingQuery);
 
   /**
    * Executes the query of the filter and returns the result count.
@@ -206,20 +158,10 @@ public interface FilterService {
    * Executes the extended query of the filter and returns the result count.
    *
    * @param filterId the the id of the filter
-   * @param extendingQuery additional query to extend the filter query as JSON object
+   * @param extendingQuery additional query to extend the filter query
    * @return the result count
    * @throws AuthorizationException if the user has no {@link Permissions#READ} permissions on {@link Resources#FILTER}.
    */
   Long count(String filterId, Query<?, ?> extendingQuery);
-
-  /**
-   * Executes the extended query of the filter and returns the result count.
-   *
-   * @param filterId the the id of the filter
-   * @param extendingQuery additional query to extend the filter query as JSON object
-   * @return the result count
-   * @throws AuthorizationException if the user has no {@link Permissions#READ} permissions on {@link Resources#FILTER}.
-   */
-  Long count(String filterId, String extendingQuery);
 
 }

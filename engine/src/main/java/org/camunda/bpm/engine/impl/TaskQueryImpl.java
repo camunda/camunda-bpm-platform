@@ -18,7 +18,9 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.identity.Group;
@@ -52,7 +54,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   protected String assigneeLike;
   protected String involvedUser;
   protected String owner;
-  protected boolean unassigned = false;
+  protected Boolean unassigned;
   protected boolean noDelegationState = false;
   protected DelegationState delegationState;
   protected String candidateUser;
@@ -690,7 +692,11 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
         break;
       }
     }
-    variables.add(new TaskQueryVariableValue(name, value, operator, isTaskVariable, isProcessInstanceVariable));
+    addVariable(new TaskQueryVariableValue(name, value, operator, isTaskVariable, isProcessInstanceVariable));
+  }
+
+  protected void addVariable(TaskQueryVariableValue taskQueryVariableValue) {
+    variables.add(taskQueryVariableValue);
   }
 
   private boolean isBoolean(Object value) {
@@ -804,6 +810,15 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   }
 
   public boolean isUnassigned() {
+    if (unassigned == null) {
+      return false;
+    }
+    else {
+      return unassigned;
+    }
+  }
+
+  public Boolean isUnassignedInternal() {
     return unassigned;
   }
 
@@ -974,5 +989,410 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   public String getCaseDefinitionNameLike() {
     return caseDefinitionNameLike;
   }
+
+  public boolean isInitializeFormKeys() {
+    return initializeFormKeys;
+  }
+
+  public TaskQuery extend(TaskQuery extending) {
+    TaskQueryImpl extendingQuery = (TaskQueryImpl) extending;
+    TaskQueryImpl extendedQuery = new TaskQueryImpl();
+
+    if (extendingQuery.getName() != null) {
+      extendedQuery.taskName(extendingQuery.getName());
+    }
+    else if (this.getName() != null) {
+      extendedQuery.taskName(this.getName());
+    }
+
+    if (extendingQuery.getNameLike() != null) {
+      extendedQuery.taskNameLike(extendingQuery.getNameLike());
+    }
+    else if (this.getNameLike() != null) {
+      extendedQuery.taskNameLike(this.getNameLike());
+    }
+
+    if (extendingQuery.getAssignee() != null) {
+      extendedQuery.taskAssignee(extendingQuery.getAssignee());
+    }
+    else if (this.getAssignee() != null) {
+      extendedQuery.taskAssignee(this.getAssignee());
+    }
+
+    if (extendingQuery.getAssigneeLike() != null) {
+      extendedQuery.taskAssigneeLike(extendingQuery.getAssigneeLike());
+    }
+    else if (this.getAssigneeLike() != null) {
+      extendedQuery.taskAssigneeLike(this.getAssigneeLike());
+    }
+
+    if (extendingQuery.getInvolvedUser() != null) {
+      extendedQuery.taskInvolvedUser(extendingQuery.getInvolvedUser());
+    }
+    else if (this.getInvolvedUser() != null) {
+      extendedQuery.taskInvolvedUser(this.getInvolvedUser());
+    }
+
+    if (extendingQuery.getOwner() != null) {
+      extendedQuery.taskOwner(extendingQuery.getOwner());
+    }
+    else if (this.getOwner() != null) {
+      extendedQuery.taskOwner(this.getOwner());
+    }
+
+    if (extendingQuery.isUnassigned() || this.isUnassigned()) {
+      extendedQuery.taskUnassigned();
+    }
+
+    if (extendingQuery.getDelegationState() != null) {
+      extendedQuery.taskDelegationState(extendingQuery.getDelegationState());
+    }
+    else if (this.getDelegationState() != null) {
+      extendedQuery.taskDelegationState(this.getDelegationState());
+    }
+
+    if (extendingQuery.getCandidateUser() != null) {
+      extendedQuery.taskCandidateUser(extendingQuery.getCandidateUser());
+    }
+    else if (this.getCandidateUser() != null) {
+      extendedQuery.taskCandidateUser(this.getCandidateUser());
+    }
+
+    if (extendingQuery.getCandidateGroup() != null) {
+      extendedQuery.taskCandidateGroup(extendingQuery.getCandidateGroup());
+    }
+    else if (this.getCandidateGroup() != null) {
+      extendedQuery.taskCandidateGroup(this.getCandidateGroup());
+    }
+
+    if (extendingQuery.getProcessInstanceId() != null) {
+      extendedQuery.processInstanceId(extendingQuery.getProcessInstanceId());
+    }
+    else if (this.getProcessInstanceId() != null) {
+      extendedQuery.processInstanceId(this.getProcessInstanceId());
+    }
+
+    if (extendingQuery.getExecutionId() != null) {
+      extendedQuery.executionId(extendingQuery.getExecutionId());
+    }
+    else if (this.getExecutionId() != null) {
+      extendedQuery.executionId(this.getExecutionId());
+    }
+
+    if (extendingQuery.getActivityInstanceIdIn() != null) {
+      extendedQuery.activityInstanceIdIn(extendingQuery.getActivityInstanceIdIn());
+    }
+    else if (this.getActivityInstanceIdIn() != null) {
+      extendedQuery.activityInstanceIdIn(this.getActivityInstanceIdIn());
+    }
+
+    if (extendingQuery.getTaskId() != null) {
+      extendedQuery.taskId(extendingQuery.getTaskId());
+    }
+    else if (this.getTaskId() != null) {
+      extendedQuery.taskId(this.getTaskId());
+    }
+
+    if (extendingQuery.getDescription() != null) {
+      extendedQuery.taskDescription(extendingQuery.getDescription());
+    }
+    else if (this.getDescription() != null) {
+      extendedQuery.taskDescription(this.getDescription());
+    }
+
+    if (extendingQuery.getDescriptionLike() != null) {
+      extendedQuery.taskDescriptionLike(extendingQuery.getDescriptionLike());
+    }
+    else if (this.getDescriptionLike() != null) {
+      extendedQuery.taskDescriptionLike(this.getDescriptionLike());
+    }
+
+    if (extendingQuery.getPriority() != null) {
+      extendedQuery.taskPriority(extendingQuery.getPriority());
+    }
+    else if (this.getPriority() != null) {
+      extendedQuery.taskPriority(this.getPriority());
+    }
+
+    if (extendingQuery.getMinPriority() != null) {
+      extendedQuery.taskMinPriority(extendingQuery.getMinPriority());
+    }
+    else if (this.getMinPriority() != null) {
+      extendedQuery.taskMinPriority(this.getMinPriority());
+    }
+
+    if (extendingQuery.getMaxPriority() != null) {
+      extendedQuery.taskMaxPriority(extendingQuery.getMaxPriority());
+    }
+    else if (this.getMaxPriority() != null) {
+      extendedQuery.taskMaxPriority(this.getMaxPriority());
+    }
+
+    if (extendingQuery.getCreateTime() != null) {
+      extendedQuery.taskCreatedOn(extendingQuery.getCreateTime());
+    }
+    else if (this.getCreateTime() != null) {
+      extendedQuery.taskCreatedOn(this.getCreateTime());
+    }
+
+    if (extendingQuery.getCreateTimeBefore() != null) {
+      extendedQuery.taskCreatedBefore(extendingQuery.getCreateTimeBefore());
+    }
+    else if (this.getCreateTimeBefore() != null) {
+      extendedQuery.taskCreatedBefore(this.getCreateTimeBefore());
+    }
+
+    if (extendingQuery.getCreateTimeAfter() != null) {
+      extendedQuery.taskCreatedAfter(extendingQuery.getCreateTimeAfter());
+    }
+    else if (this.getCreateTimeAfter() != null) {
+      extendedQuery.taskCreatedAfter(this.getCreateTimeAfter());
+    }
+
+    if (extendingQuery.getKey() != null) {
+      extendedQuery.taskDefinitionKey(extendingQuery.getKey());
+    }
+    else if (this.getKey() != null) {
+      extendedQuery.taskDefinitionKey(this.getKey());
+    }
+
+    if (extendingQuery.getKeyLike() != null) {
+      extendedQuery.taskDefinitionKeyLike(extendingQuery.getKeyLike());
+    }
+    else if (this.getKeyLike() != null) {
+      extendedQuery.taskDefinitionKeyLike(this.getKeyLike());
+    }
+
+    if (extendingQuery.getProcessDefinitionKey() != null) {
+      extendedQuery.processDefinitionKey(extendingQuery.getProcessDefinitionKey());
+    }
+    else if (this.getProcessDefinitionKey() != null) {
+      extendedQuery.processDefinitionKey(this.getProcessDefinitionKey());
+    }
+
+    if (extendingQuery.getProcessDefinitionId() != null) {
+      extendedQuery.processDefinitionId(extendingQuery.getProcessDefinitionId());
+    }
+    else if (this.getProcessDefinitionId() != null) {
+      extendedQuery.processDefinitionId(this.getProcessDefinitionId());
+    }
+
+    if (extendingQuery.getProcessDefinitionName() != null) {
+      extendedQuery.processDefinitionName(extendingQuery.getProcessDefinitionName());
+    }
+    else if (this.getProcessDefinitionName() != null) {
+      extendedQuery.processDefinitionName(this.getProcessDefinitionName());
+    }
+
+    if (extendingQuery.getProcessDefinitionNameLike() != null) {
+      extendedQuery.processDefinitionNameLike(extendingQuery.getProcessDefinitionNameLike());
+    }
+    else if (this.getProcessDefinitionNameLike() != null) {
+      extendedQuery.processDefinitionNameLike(this.getProcessDefinitionNameLike());
+    }
+
+    if (extendingQuery.getProcessInstanceBusinessKey() != null) {
+      extendedQuery.processInstanceBusinessKey(extendingQuery.getProcessInstanceBusinessKey());
+    }
+    else if (this.getProcessInstanceBusinessKey() != null) {
+      extendedQuery.processInstanceBusinessKey(this.getProcessInstanceBusinessKey());
+    }
+
+    if (extendingQuery.getProcessInstanceBusinessKeyLike() != null) {
+      extendedQuery.processInstanceBusinessKeyLike(extendingQuery.getProcessInstanceBusinessKeyLike());
+    }
+    else if (this.getProcessInstanceBusinessKeyLike() != null) {
+      extendedQuery.processInstanceBusinessKeyLike(this.getProcessInstanceBusinessKeyLike());
+    }
+
+    if (extendingQuery.getDueDate() != null) {
+      extendedQuery.dueDate(extendingQuery.getDueDate());
+    }
+    else if (this.getDueDate() != null) {
+      extendedQuery.dueDate(this.getDueDate());
+    }
+
+    if (extendingQuery.getDueBefore() != null) {
+      extendedQuery.dueBefore(extendingQuery.getDueBefore());
+    }
+    else if (this.getDueBefore() != null) {
+      extendedQuery.dueBefore(this.getDueBefore());
+    }
+
+    if (extendingQuery.getDueAfter() != null) {
+      extendedQuery.dueAfter(extendingQuery.getDueAfter());
+    }
+    else if (this.getDueAfter() != null) {
+      extendedQuery.dueAfter(this.getDueAfter());
+    }
+
+    if (extendingQuery.getFollowUpDate() != null) {
+      extendedQuery.followUpDate(extendingQuery.getFollowUpDate());
+    }
+    else if (this.getFollowUpDate() != null) {
+      extendedQuery.followUpDate(this.getFollowUpDate());
+    }
+
+    if (extendingQuery.getFollowUpBefore() != null) {
+      extendedQuery.followUpBefore(extendingQuery.getFollowUpBefore());
+    }
+    else if (this.getFollowUpBefore() != null) {
+      extendedQuery.followUpBefore(this.getFollowUpBefore());
+    }
+
+    if (extendingQuery.getFollowUpAfter() != null) {
+      extendedQuery.followUpAfter(extendingQuery.getFollowUpAfter());
+    }
+    else if (this.getFollowUpAfter() != null) {
+      extendedQuery.followUpAfter(this.getFollowUpAfter());
+    }
+
+    if (extendingQuery.isExcludeSubtasks() || this.isExcludeSubtasks()) {
+      extendedQuery.excludeSubtasks();
+    }
+
+    if (extendingQuery.getSuspensionState() != null) {
+      if (extendingQuery.getSuspensionState().equals(SuspensionState.ACTIVE)) {
+        extendedQuery.active();
+      }
+      else if (extendingQuery.getSuspensionState().equals(SuspensionState.SUSPENDED)) {
+        extendedQuery.suspended();
+      }
+    }
+    else if (this.getSuspensionState() != null) {
+      if (this.getSuspensionState().equals(SuspensionState.ACTIVE)) {
+        extendedQuery.active();
+      }
+      else if (this.getSuspensionState().equals(SuspensionState.SUSPENDED)) {
+        extendedQuery.suspended();
+      }
+    }
+
+    if (extendingQuery.getCaseInstanceId() != null) {
+      extendedQuery.caseInstanceId(extendingQuery.getCaseInstanceId());
+    }
+    else if (this.getCaseInstanceId() != null) {
+      extendedQuery.caseInstanceId(this.getCaseInstanceId());
+    }
+
+    if (extendingQuery.getCaseInstanceBusinessKey() != null) {
+      extendedQuery.caseInstanceBusinessKey(extendingQuery.getCaseInstanceBusinessKey());
+    }
+    else if (this.getCaseInstanceBusinessKey() != null) {
+      extendedQuery.caseInstanceBusinessKey(this.getCaseInstanceBusinessKey());
+    }
+
+    if (extendingQuery.getCaseInstanceBusinessKeyLike() != null) {
+      extendedQuery.caseInstanceBusinessKeyLike(extendingQuery.getCaseInstanceBusinessKeyLike());
+    }
+    else if (this.getCaseInstanceBusinessKeyLike() != null) {
+      extendedQuery.caseInstanceBusinessKeyLike(this.getCaseInstanceBusinessKeyLike());
+    }
+
+    if (extendingQuery.getCaseExecutionId() != null) {
+      extendedQuery.caseExecutionId(extendingQuery.getCaseExecutionId());
+    }
+    else if (this.getCaseExecutionId() != null) {
+      extendedQuery.caseExecutionId(this.getCaseExecutionId());
+    }
+
+    if (extendingQuery.getCaseDefinitionId() != null) {
+      extendedQuery.caseDefinitionId(extendingQuery.getCaseDefinitionId());
+    }
+    else if (this.getCaseDefinitionId() != null) {
+      extendedQuery.caseDefinitionId(this.getCaseDefinitionId());
+    }
+
+    if (extendingQuery.getCaseDefinitionKey() != null) {
+      extendedQuery.caseDefinitionKey(extendingQuery.getCaseDefinitionKey());
+    }
+    else if (this.getCaseDefinitionKey() != null) {
+      extendedQuery.caseDefinitionKey(this.getCaseDefinitionKey());
+    }
+
+    if (extendingQuery.getCaseDefinitionName() != null) {
+      extendedQuery.caseDefinitionName(extendingQuery.getCaseDefinitionName());
+    }
+    else if (this.getCaseDefinitionName() != null) {
+      extendedQuery.caseDefinitionName(this.getCaseDefinitionName());
+    }
+
+    if (extendingQuery.getCaseDefinitionNameLike() != null) {
+      extendedQuery.caseDefinitionNameLike(extendingQuery.getCaseDefinitionNameLike());
+    }
+    else if (this.getCaseDefinitionNameLike() != null) {
+      extendedQuery.caseDefinitionNameLike(this.getCaseDefinitionNameLike());
+    }
+
+    if (extendingQuery.isInitializeFormKeys() || this.isInitializeFormKeys()) {
+      extendedQuery.initializeFormKeys();
+    }
+
+    // merge variables
+    mergeVariables(extendedQuery, extendingQuery);
+
+    // merge expressions
+    mergeExpressions(extendedQuery, extendingQuery);
+
+    mergeOrdering(extendedQuery, extendingQuery);
+
+    return extendedQuery;
+  }
+
+  /**
+   * Simple implementation of variable merging. Variables are only overridden if they have the same name and are
+   * in the same scope (ie are process instance, task or case execution variables).
+   */
+  protected void mergeVariables(TaskQueryImpl extendedQuery, TaskQueryImpl extendingQuery) {
+    List<TaskQueryVariableValue> extendingVariables = extendingQuery.getVariables();
+
+    Set<TaskQueryVariableValueComparable> extendingVariablesComparable = new HashSet<TaskQueryVariableValueComparable>();
+
+    // set extending variables and save names for comparison of original variables
+    for (TaskQueryVariableValue extendingVariable : extendingVariables) {
+      extendedQuery.addVariable(extendingVariable);
+      extendingVariablesComparable.add(new TaskQueryVariableValueComparable(extendingVariable));
+    }
+
+    for (TaskQueryVariableValue originalVariable : this.getVariables()) {
+      if (!extendingVariablesComparable.contains(new TaskQueryVariableValueComparable(originalVariable))) {
+        extendedQuery.addVariable(originalVariable);
+      }
+    }
+
+  }
+
+  protected class TaskQueryVariableValueComparable {
+
+    protected TaskQueryVariableValue variableValue;
+
+    public TaskQueryVariableValueComparable(TaskQueryVariableValue variableValue) {
+      this.variableValue = variableValue;
+    }
+
+    public TaskQueryVariableValue getVariableValue() {
+      return variableValue;
+    }
+
+    public boolean equals(Object o) {
+      if (this == o) return true;
+      if (o == null || getClass() != o.getClass()) return false;
+
+      TaskQueryVariableValue other = ((TaskQueryVariableValueComparable) o).getVariableValue();
+
+      return variableValue.getName().equals(other.getName())
+             && variableValue.isProcessInstanceVariable() == other.isProcessInstanceVariable()
+             && variableValue.isLocal() == other.isLocal();
+    }
+
+    public int hashCode() {
+      int result = variableValue.getName() != null ? variableValue.getName().hashCode() : 0;
+      result = 31 * result + (variableValue.isProcessInstanceVariable() ? 1 : 0);
+      result = 31 * result + (variableValue.isLocal() ? 1 : 0);
+      return result;
+    }
+
+  }
+
 
 }

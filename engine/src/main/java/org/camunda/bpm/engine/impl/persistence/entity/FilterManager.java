@@ -33,9 +33,9 @@ import org.camunda.bpm.engine.impl.persistence.AbstractManager;
  */
 public class FilterManager extends AbstractManager {
 
-  public Filter createNewFilter() {
+  public Filter createNewFilter(String resourceType) {
     checkAuthorization(CREATE, FILTER, ANY);
-    return new FilterEntity();
+    return new FilterEntity(resourceType);
   }
 
   public Filter insertOrUpdateFilter(Filter filter) {

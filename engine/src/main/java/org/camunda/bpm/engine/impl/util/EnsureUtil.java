@@ -15,9 +15,9 @@ package org.camunda.bpm.engine.impl.util;
 
 import java.lang.reflect.Constructor;
 import java.util.Collection;
+import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.exception.NullValueException;
 
 /**
@@ -111,6 +111,29 @@ public final class EnsureUtil {
   public static void ensureNotEmpty(Class<? extends ProcessEngineException> exceptionClass, String message, String variableName, Collection collection) {
     ensureNotNull(exceptionClass, message, variableName, collection);
     if (collection.isEmpty()) {
+      throw generateException(exceptionClass, message, variableName, "is empty");
+    }
+  }
+
+  @SuppressWarnings("rawtypes")
+  public static void ensureNotEmpty(String variableName, Map map) {
+    ensureNotEmpty("", variableName, map);
+  }
+
+  @SuppressWarnings("rawtypes")
+  public static void ensureNotEmpty(Class<? extends ProcessEngineException> exceptionClass, String variableName, Map map) {
+    ensureNotEmpty(exceptionClass, null, variableName, map);
+  }
+
+  @SuppressWarnings("rawtypes")
+  public static void ensureNotEmpty(String message, String variableName, Map map) {
+    ensureNotEmpty(ProcessEngineException.class, message, variableName, map);
+  }
+
+  @SuppressWarnings("rawtypes")
+  public static void ensureNotEmpty(Class<? extends ProcessEngineException> exceptionClass, String message, String variableName, Map map) {
+    ensureNotNull(exceptionClass, message, variableName, map);
+    if (map.isEmpty()) {
       throw generateException(exceptionClass, message, variableName, "is empty");
     }
   }

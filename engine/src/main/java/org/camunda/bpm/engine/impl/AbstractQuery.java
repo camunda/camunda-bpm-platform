@@ -49,13 +49,10 @@ public abstract class AbstractQuery<T extends Query<?,?>, U> extends ListQueryPa
   private static enum ResultType {
     LIST, LIST_PAGE, SINGLE_RESULT, COUNT
   }
-
   protected transient CommandExecutor commandExecutor;
   protected transient CommandContext commandContext;
   protected String orderBy;
-
   protected ResultType resultType;
-
   protected QueryProperty orderProperty;
 
   protected Map<String, String> expressions = new HashMap<String, String>();
@@ -254,6 +251,32 @@ public abstract class AbstractQuery<T extends Query<?,?>, U> extends ListQueryPa
       }
     }
     throw new ProcessEngineException("Unable to find method '" + methodName + "' on class '" + getClass().getCanonicalName() + "'");
+  }
+
+  public T extend(T extendingQuery) {
+    throw new ProcessEngineException("Extending of query type '" + extendingQuery.getClass().getCanonicalName() + "' currently not supported");
+  }
+
+  protected void mergeOrdering(AbstractQuery<?, ?> extendedQuery, AbstractQuery<?, ?> extendingQuery) {
+    extendedQuery.orderBy = this.orderBy;
+    if (extendingQuery.orderBy != null) {
+       if (extendedQuery.orderBy == null) {
+         extendedQuery.orderBy = extendingQuery.orderBy;
+       }
+       else {
+         extendedQuery.orderBy += ", " + extendingQuery.orderBy;
+       }
+    }
+  }
+
+  protected void mergeExpressions(AbstractQuery<?, ?> extendedQuery, AbstractQuery<?, ?> extendingQuery) {
+    Map<String, String> mergedExpressions = new HashMap<String, String>(extendingQuery.getExpressions());
+    for (Map.Entry<String, String> entry : this.getExpressions().entrySet()) {
+      if (!mergedExpressions.containsKey(entry.getKey())) {
+        mergedExpressions.put(entry.getKey(), entry.getValue());
+      }
+    }
+    extendedQuery.setExpressions(mergedExpressions);
   }
 
 }

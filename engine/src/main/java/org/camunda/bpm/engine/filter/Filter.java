@@ -32,12 +32,6 @@ public interface Filter {
   String getResourceType();
 
   /**
-   * @param resourceType the resource type of the filter
-   * @return this filter
-   */
-  Filter setResourceType(String resourceType);
-
-  /**
    * @return the name of the filter
    */
   String getName();
@@ -60,20 +54,9 @@ public interface Filter {
   Filter setOwner(String owner);
 
   /**
-   * @return the saved query of the filter as JSON string
-   */
-  String getQuery();
-
-  /**
    * @return the saved query as query object
    */
-  <T extends Query<?, ?>> T getTypeQuery();
-
-  /**
-   * @param query the saved query as JSON string
-   * @return this filter
-   */
-  Filter setQuery(String query);
+  <T extends Query<?, ?>> T getQuery();
 
   /**
    * @param query the saved query as query object
@@ -91,29 +74,9 @@ public interface Filter {
   <T extends Query<?, ?>> Filter extend(T extendingQuery);
 
   /**
-   * Extends the query with the additional query. The query of the filter is therefore modified
-   * and if the filter is saved the query is updated.
-   *
-   * @param extendingQuery the query to extend the filter with
-   * @return a copy of this filter with the extended query
-   */
-  Filter extend(String extendingQuery);
-
-  /**
-   * @return the properties of the filter as JSON string
-   */
-  String getProperties();
-
-  /**
    * @return the properties as map
    */
-  Map<String, Object> getPropertiesMap();
-
-  /**
-   * @param properties the properties to set as JSON string
-   * @return this filter
-   */
-  Filter setProperties(String properties);
+  Map<String, Object> getProperties();
 
   /**
    * @param properties the properties to set as map

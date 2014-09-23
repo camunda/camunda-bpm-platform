@@ -30,8 +30,7 @@ public class JsonTaskQueryVariableValueConverter extends JsonObjectConverter<Tas
     return json;
   }
 
-  public TaskQueryVariableValue toObject(String jsonString) {
-    JSONObject json = new JSONObject(jsonString);
+  public TaskQueryVariableValue toObject(JSONObject json) {
     String name = json.getString("name");
     Object value = json.get("value");
     QueryOperator operator = QueryOperator.valueOf(json.getString("operator"));

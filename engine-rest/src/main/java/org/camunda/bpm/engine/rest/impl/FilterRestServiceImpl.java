@@ -20,19 +20,20 @@ import static org.camunda.bpm.engine.authorization.Resources.FILTER;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.ws.rs.HttpMethod;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.ext.Providers;
 
+import org.camunda.bpm.engine.EntityTypes;
 import org.camunda.bpm.engine.FilterService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.filter.Filter;
 import org.camunda.bpm.engine.filter.FilterQuery;
-import org.camunda.bpm.engine.rest.AuthorizationRestService;
 import org.camunda.bpm.engine.rest.FilterRestService;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.ResourceOptionsDto;
@@ -41,11 +42,15 @@ import org.camunda.bpm.engine.rest.dto.runtime.FilterQueryDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.sub.runtime.FilterResource;
 import org.camunda.bpm.engine.rest.sub.runtime.impl.FilterResourceImpl;
+import org.codehaus.jackson.map.ObjectMapper;
+
 
 /**
  * @author Sebastian Menski
  */
 public class FilterRestServiceImpl extends AbstractAuthorizedRestResource implements FilterRestService {
+
+  protected ObjectMapper objectMapper;
 
   public FilterRestServiceImpl() {
     super(FILTER, ANY);
@@ -55,8 +60,8 @@ public class FilterRestServiceImpl extends AbstractAuthorizedRestResource implem
     super(engineName, FILTER, ANY);
   }
 
-  public FilterResource getFilter(String filterId) {
-    return new FilterResourceImpl(getProcessEngine().getName(), filterId, relativeRootResourcePath);
+  public FilterResource getFilter(Providers providers, String filterId) {
+    return new FilterResourceImpl(getProcessEngine().getName(), getObjectMapper(providers), filterId, relativeRootResourcePath);
   }
 
   public List<FilterDto> getFilters(UriInfo uriInfo, Integer firstResult, Integer maxResults) {
@@ -100,10 +105,19 @@ public class FilterRestServiceImpl extends AbstractAuthorizedRestResource implem
   public FilterDto createFilter(FilterDto filterDto) {
     FilterService filterService = getProcessEngine().getFilterService();
 
-    Filter filter = filterService.newFilter();
+    String resourceType = filterDto.getResourceType();
+
+    Filter filter;
+
+    if (EntityTypes.TASK.equals(resourceType)) {
+      filter = filterService.newTaskFilter();
+    }
+    else {
+      throw new InvalidRequestException(Response.Status.BAD_REQUEST, "Unable to create filter with invalid resource type '" + resourceType + "'");
+    }
 
     try {
-      filterDto.updateFilter(filter);
+      filterDto.updateFilter(filter, getProcessEngine());
     }
     catch (NotValidException e) {
       throw new InvalidRequestException(Response.Status.BAD_REQUEST, e, "Unable to create filter with invalid content");
@@ -123,8 +137,8 @@ public class FilterRestServiceImpl extends AbstractAuthorizedRestResource implem
   public ResourceOptionsDto availableOperations(UriInfo context) {
 
     UriBuilder baseUriBuilder = context.getBaseUriBuilder()
-        .path(relativeRootResourcePath)
-        .path(FilterRestService.class);
+      .path(relativeRootResourcePath)
+      .path(FilterRestService.class);
 
     ResourceOptionsDto resourceOptionsDto = new ResourceOptionsDto();
 
@@ -137,12 +151,19 @@ public class FilterRestServiceImpl extends AbstractAuthorizedRestResource implem
     resourceOptionsDto.addReflexiveLink(countUri, HttpMethod.GET, "count");
 
     // POST /create
-    if(isAuthorized(CREATE)) {
+    if (isAuthorized(CREATE)) {
       URI createUri = baseUriBuilder.clone().path("/create").build();
       resourceOptionsDto.addReflexiveLink(createUri, HttpMethod.POST, "create");
     }
 
     return resourceOptionsDto;
+  }
+
+  protected ObjectMapper getObjectMapper(Providers providers) {
+    if (objectMapper == null) {
+      objectMapper = providers.getContextResolver(ObjectMapper.class, MediaType.APPLICATION_JSON_TYPE).getContext(null);
+    }
+    return objectMapper;
   }
 
 }

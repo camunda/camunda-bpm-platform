@@ -13,7 +13,6 @@
 package org.camunda.bpm.engine.rest.mapper;
 
 import java.text.SimpleDateFormat;
-
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.ContextResolver;

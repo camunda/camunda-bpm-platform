@@ -32,10 +32,6 @@ public class ExecuteFilterSingleResultCmd extends AbstractExecuteFilterCmd imple
     super(filterId, extendingQuery);
   }
 
-  public ExecuteFilterSingleResultCmd(String filterId, String extendingQuery) {
-    super(filterId, extendingQuery);
-  }
-
   public Object execute(CommandContext commandContext) {
     Query<?, ?> query = getFilterQuery(commandContext);
     return query.singleResult();

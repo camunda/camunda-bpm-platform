@@ -40,12 +40,6 @@ public class ExecuteFilterListPageCmd extends AbstractExecuteFilterCmd implement
     this.maxResults = maxResults;
   }
 
-  public ExecuteFilterListPageCmd(String filterId, String extendingQuery, int firstResult, int maxResults) {
-    super(filterId, extendingQuery);
-    this.firstResult = firstResult;
-    this.maxResults = maxResults;
-  }
-
   public List<?> execute(CommandContext commandContext) {
     Query<?, ?> query = getFilterQuery(commandContext);
     return query.listPage(firstResult, maxResults);

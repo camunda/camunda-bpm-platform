@@ -35,16 +35,8 @@ import org.camunda.bpm.engine.query.Query;
  */
 public class FilterServiceImpl extends ServiceImpl implements FilterService {
 
-  public Filter newFilter() {
-    return commandExecutor.execute(new CreateFilterCmd());
-  }
-
-  public Filter newFilter(String filterName) {
-    return newFilter().setName(filterName);
-  }
-
   public Filter newTaskFilter() {
-    return newFilter().setResourceType(EntityTypes.TASK);
+    return commandExecutor.execute(new CreateFilterCmd(EntityTypes.TASK));
   }
 
   public Filter newTaskFilter(String filterName) {
@@ -77,12 +69,7 @@ public class FilterServiceImpl extends ServiceImpl implements FilterService {
   }
 
   @SuppressWarnings("unchecked")
-  public <T> List<T> list(String filterId, Query<?, T> extendingQuery) {
-    return (List<T>) commandExecutor.execute(new ExecuteFilterListCmd(filterId, extendingQuery));
-  }
-
-  @SuppressWarnings("unchecked")
-  public <T> List<T> list(String filterId, String extendingQuery) {
+  public <T, Q extends Query<?, T>> List<T> list(String filterId, Q extendingQuery) {
     return (List<T>) commandExecutor.execute(new ExecuteFilterListCmd(filterId, extendingQuery));
   }
 
@@ -92,12 +79,7 @@ public class FilterServiceImpl extends ServiceImpl implements FilterService {
   }
 
   @SuppressWarnings("unchecked")
-  public <T> List<T> listPage(String filterId, Query<?, T> extendingQuery, int firstResult, int maxResults) {
-    return (List<T>) commandExecutor.execute(new ExecuteFilterListPageCmd(filterId, extendingQuery, firstResult, maxResults));
-  }
-
-  @SuppressWarnings("unchecked")
-  public <T> List<T> listPage(String filterId, String extendingQuery, int firstResult, int maxResults) {
+  public <T, Q extends Query<?, T>> List<T> listPage(String filterId, Q extendingQuery, int firstResult, int maxResults) {
     return (List<T>) commandExecutor.execute(new ExecuteFilterListPageCmd(filterId, extendingQuery, firstResult, maxResults));
   }
 
@@ -107,12 +89,7 @@ public class FilterServiceImpl extends ServiceImpl implements FilterService {
   }
 
   @SuppressWarnings("unchecked")
-  public <T> T singleResult(String filterId, Query<?, T> extendingQuery) {
-    return (T) commandExecutor.execute(new ExecuteFilterSingleResultCmd(filterId, extendingQuery));
-  }
-
-  @SuppressWarnings("unchecked")
-  public <T> T singleResult(String filterId, String extendingQuery) {
+  public <T, Q extends Query<?, T>> T singleResult(String filterId, Q extendingQuery) {
     return (T) commandExecutor.execute(new ExecuteFilterSingleResultCmd(filterId, extendingQuery));
   }
 
@@ -121,10 +98,6 @@ public class FilterServiceImpl extends ServiceImpl implements FilterService {
   }
 
   public Long count(String filterId, Query<?, ?> extendingQuery) {
-    return commandExecutor.execute(new ExecuteFilterCountCmd(filterId, extendingQuery));
-  }
-
-  public Long count(String filterId, String extendingQuery) {
     return commandExecutor.execute(new ExecuteFilterCountCmd(filterId, extendingQuery));
   }
 

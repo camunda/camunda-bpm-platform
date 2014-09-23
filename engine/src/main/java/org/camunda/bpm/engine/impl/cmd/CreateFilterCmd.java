@@ -22,10 +22,16 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
  */
 public class CreateFilterCmd implements Command<Filter> {
 
+  protected String resourceType;
+
+  public CreateFilterCmd(String resourceType) {
+    this.resourceType = resourceType;
+  }
+
   public Filter execute(CommandContext commandContext) {
     return commandContext
       .getFilterManager()
-      .createNewFilter();
+      .createNewFilter(resourceType);
   }
 
 }

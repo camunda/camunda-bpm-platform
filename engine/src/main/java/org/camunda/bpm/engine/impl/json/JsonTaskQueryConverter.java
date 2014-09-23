@@ -230,8 +230,7 @@ public class JsonTaskQueryConverter extends JsonObjectConverter<TaskQuery> {
     array.put(variableValueConverter.toJsonObject(variable));
   }
 
-  public TaskQuery toObject(String jsonString) {
-    JSONObject json = new JSONObject(jsonString);
+  public TaskQuery toObject(JSONObject json) {
     TaskQueryImpl query = new TaskQueryImpl();
 
     if (json.has(TASK_ID)) {

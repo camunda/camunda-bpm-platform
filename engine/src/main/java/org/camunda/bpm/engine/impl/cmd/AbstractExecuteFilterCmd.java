@@ -31,7 +31,6 @@ public abstract class AbstractExecuteFilterCmd implements Serializable {
 
   protected String filterId;
   protected Query<?, ?> extendingQuery;
-  protected String extendingQueryJson;
 
   public AbstractExecuteFilterCmd(String filterId) {
     this.filterId = filterId;
@@ -40,13 +39,6 @@ public abstract class AbstractExecuteFilterCmd implements Serializable {
   public AbstractExecuteFilterCmd(String filterId, Query<?, ?> extendingQuery) {
     this.filterId = filterId;
     this.extendingQuery = extendingQuery;
-  }
-
-  public AbstractExecuteFilterCmd(String filterId, String extendingQueryJson) {
-    this.filterId = filterId;
-    if (extendingQueryJson != null) {
-      this.extendingQueryJson = extendingQueryJson.trim();
-    }
   }
 
   protected Filter getFilter(CommandContext commandContext) {
@@ -60,9 +52,6 @@ public abstract class AbstractExecuteFilterCmd implements Serializable {
     if (extendingQuery != null) {
       return filter.extend(extendingQuery);
     }
-    else if (extendingQueryJson != null && !extendingQueryJson.isEmpty()) {
-      return filter.extend(extendingQueryJson);
-    }
     else {
       return filter;
     }
@@ -70,7 +59,7 @@ public abstract class AbstractExecuteFilterCmd implements Serializable {
 
   protected Query<?, ?> getFilterQuery(CommandContext commandContext) {
     Filter filter = getFilter(commandContext);
-    Query<?, ?> query = filter.getTypeQuery();
+    Query<?, ?> query = filter.getQuery();
     if (query instanceof TaskQuery) {
       ((TaskQuery) query).initializeFormKeys();
     }

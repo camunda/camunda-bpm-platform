@@ -32,7 +32,7 @@ public class ConditionQueryParameterDto {
   public static final String LESS_THAN_OR_EQUALS_OPERATOR_NAME = "lteq";
   public static final String LIKE_OPERATOR_NAME = "like";
 
-  private static final Map<String, QueryOperator> OPERATOR_NAME_MAP = new HashMap<String, QueryOperator>() {{
+  protected static final Map<String, QueryOperator> NAME_OPERATOR_MAP = new HashMap<String, QueryOperator>() {{
     put(EQUALS_OPERATOR_NAME, QueryOperator.EQUALS);
     put(NOT_EQUALS_OPERATOR_NAME, QueryOperator.NOT_EQUALS);
     put(GREATER_THAN_OPERATOR_NAME, QueryOperator.GREATER_THAN);
@@ -42,8 +42,18 @@ public class ConditionQueryParameterDto {
     put(LIKE_OPERATOR_NAME, QueryOperator.LIKE);
   }};
 
-  private String operator;
-  private Object value;
+  protected static final Map<QueryOperator, String> OPERATOR_NAME_MAP = new HashMap<QueryOperator, String>() {{
+    put(QueryOperator.EQUALS, EQUALS_OPERATOR_NAME);
+    put(QueryOperator.NOT_EQUALS, NOT_EQUALS_OPERATOR_NAME);
+    put(QueryOperator.GREATER_THAN, GREATER_THAN_OPERATOR_NAME);
+    put(QueryOperator.GREATER_THAN_OR_EQUAL, GREATER_THAN_OR_EQUALS_OPERATOR_NAME);
+    put(QueryOperator.LESS_THAN, LESS_THAN_OPERATOR_NAME);
+    put(QueryOperator.LESS_THAN_OR_EQUAL, LESS_THAN_OR_EQUALS_OPERATOR_NAME);
+    put(QueryOperator.LIKE, LIKE_OPERATOR_NAME);
+  }};
+
+  protected String operator;
+  protected Object value;
 
   public String getOperator() {
     return operator;
@@ -66,6 +76,6 @@ public class ConditionQueryParameterDto {
   }
 
   public static QueryOperator getQueryOperator(String name) {
-    return OPERATOR_NAME_MAP.get(name);
+    return NAME_OPERATOR_MAP.get(name);
   }
 }

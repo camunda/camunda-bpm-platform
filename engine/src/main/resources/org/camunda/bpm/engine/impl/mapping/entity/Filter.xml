@@ -27,8 +27,8 @@
       #{resourceType ,jdbcType=VARCHAR},
       #{name ,jdbcType=VARCHAR},
       #{owner ,jdbcType=VARCHAR},
-      #{query ,jdbcType=CLOB},
-      #{properties ,jdbcType=CLOB},
+      #{queryInternal ,jdbcType=CLOB},
+      #{propertiesInternal ,jdbcType=CLOB},
       1
     )
   </insert>
@@ -41,8 +41,8 @@
       REV_ = #{revisionNext, jdbcType=INTEGER},
       NAME_ = #{name, jdbcType=VARCHAR},
       OWNER_ = #{owner, jdbcType=VARCHAR},
-      QUERY_ = #{query, jdbcType=CLOB},
-      PROPERTIES_ = #{properties, jdbcType=CLOB}
+      QUERY_ = #{queryInternal, jdbcType=CLOB},
+      PROPERTIES_ = #{propertiesInternal, jdbcType=CLOB}
     where ID_ = #{id}
       and REV_ = #{revision, jdbcType=INTEGER}
   </update>
@@ -62,8 +62,8 @@
     <result property="resourceType" column="RESOURCE_TYPE_" jdbcType="VARCHAR" />
     <result property="name" column="NAME_" jdbcType="VARCHAR" />
     <result property="owner" column="OWNER_" jdbcType="VARCHAR" />
-    <result property="query" column="QUERY_" jdbcType="CLOB" />
-    <result property="properties" column="PROPERTIES_" jdbcType="CLOB" />
+    <result property="queryInternal" column="QUERY_" jdbcType="CLOB" />
+    <result property="propertiesInternal" column="PROPERTIES_" jdbcType="CLOB" />
   </resultMap>
 
   <resultMap id="filterResultMap_postgres" type="org.camunda.bpm.engine.impl.persistence.entity.FilterEntity">
@@ -72,8 +72,8 @@
     <result property="resourceType" column="RESOURCE_TYPE_" jdbcType="VARCHAR" />
     <result property="name" column="NAME_" jdbcType="VARCHAR" />
     <result property="owner" column="OWNER_" jdbcType="VARCHAR" />
-    <result property="query" column="QUERY_" jdbcType="BINARY" />
-    <result property="properties" column="PROPERTIES_" jdbcType="BINARY" />
+    <result property="queryInternal" column="QUERY_" jdbcType="BINARY" />
+    <result property="propertiesInternal" column="PROPERTIES_" jdbcType="BINARY" />
   </resultMap>
 
   <!-- FILTER SELECT -->
