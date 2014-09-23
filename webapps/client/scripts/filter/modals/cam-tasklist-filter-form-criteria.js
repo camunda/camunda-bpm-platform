@@ -150,10 +150,6 @@ define([], function() {
       group: 'Dates',
       options: [
         {
-          name: 'created',
-          label: 'Created'
-        },
-        {
           name: 'createdAfter',
           label: 'Created After'
         },
@@ -162,20 +158,12 @@ define([], function() {
           label: 'Created Before'
         },
         {
-          name: 'due',
-          label: 'Due'
-        },
-        {
           name: 'dueAfter',
           label: 'Due After'
         },
         {
           name: 'dueBefore',
           label: 'Due Before'
-        },
-        {
-          name: 'followUp',
-          label: 'Follow Up'
         },
         {
           name: 'followUpAfter',
