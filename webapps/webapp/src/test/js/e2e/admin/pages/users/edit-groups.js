@@ -16,6 +16,10 @@ module.exports = Page.extend({
     return formElement.all(by.repeater('group in groupList'));
   },
 
+  groupName: function(item) {
+    return this.groupList().get(item).element(by.binding('{{group.id}}')).getText();
+  },
+
   addGroupButton: function() {
     return formElement.element(by.css('[data-ng-click="openCreateGroupMembershipDialog()"]'));
   },

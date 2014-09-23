@@ -6,6 +6,7 @@
 'use strict';
 
 var groupsPage = require('../pages/groups');
+var usersPage = require('../pages/users');
 
 describe('groups page -', function() {
 
@@ -69,8 +70,6 @@ describe('groups page -', function() {
 
 
     it('should validate new group menu', function() {
-
-      // then
 
       // when
       expect(groupsPage.newGroup.createNewGroupButton().isEnabled()).toBe(false);
@@ -151,6 +150,127 @@ describe('groups page -', function() {
 
       // then
       expect(groupsPage.groupList().count()).toBe(4);
+    });
+
+  });
+
+
+  describe("special group names -", function () {
+
+    describe("create groups", function () {
+
+      beforeEach(function () {
+
+        groupsPage.newGroup.navigateTo();
+      });
+
+
+      it("should create group with slash", function () {
+
+        // when
+        groupsPage.newGroup.createNewGroup('/göäüp_name', '/üöäüöäü/', 'testgroup/üäö');
+
+        // then
+        expect(groupsPage.groupList().count()).toBe(5);
+      });
+
+
+      it("should create group with backslash", function () {
+
+        // when
+        groupsPage.newGroup.createNewGroup('\\göäüp_name', '\\üöäüöäü\\', 'testgroup\\üäö');
+
+        // then
+        expect(groupsPage.groupList().count()).toBe(6);
+      });
+
+    });
+
+
+    describe("assign groups", function () {
+
+      beforeEach(function () {
+
+        usersPage.navigateTo();
+        usersPage.selectUserByNameLink(0);
+        usersPage.editUserProfile.selectUserNavbarItem('Groups');
+      });
+
+
+      it("should add slash group to user", function () {
+
+        // when
+        usersPage.editUserGroups.addGroupButton().click();
+        usersPage.editUserGroups.selectGroup.addGroup(0);
+
+        // then
+        expect(groupsPage.groupList().count()).toBe(4);
+        expect(usersPage.editUserGroups.groupName(0)).toBe('/göäüp_name');
+      });
+
+
+      it("should add backslash group to user", function () {
+
+        // when
+        usersPage.editUserGroups.addGroupButton().click();
+        usersPage.editUserGroups.selectGroup.addGroup(0);
+
+        // then
+        expect(groupsPage.groupList().count()).toBe(5);
+        expect(usersPage.editUserGroups.groupName(1)).toBe('\\göäüp_name');
+      });
+
+    });
+
+
+    describe("remove groups", function () {
+
+      it("should remove group from user", function () {
+
+        // when
+        usersPage.editUserGroups.removeGroup(0);
+
+        // then
+        expect(usersPage.editUserGroups.groupName(0)).not.toBe('/göäüp_name');
+      });
+
+
+      it("should delete slash group", function () {
+
+        // when
+        usersPage.selectNavbarItem('Groups');
+        groupsPage.editGroupButton(0).click();
+        groupsPage.editGroup.deleteGroup();
+
+        // then
+        expect(groupsPage.groupList().count()).toBe(5);
+      });
+
+
+      it("should delete group", function () {
+
+        // when
+        groupsPage.editGroupButton(0).click();
+        groupsPage.editGroup.deleteGroup();
+
+        // then
+        expect(groupsPage.groupList().count()).toBe(4);
+      });
+
+
+      it("should validate users group setting", function () {
+
+        // given
+        usersPage.navigateTo();
+        usersPage.selectUserByNameLink(0);
+
+        // when
+        usersPage.editUserProfile.selectUserNavbarItem('Groups');
+
+        // then
+        expect(usersPage.editUserGroups.groupName(0)).not.toBe('\\göäüp_name');
+      });
+
     });
 
   });

@@ -35,6 +35,11 @@ module.exports = Page.extend({
   deleteGroupAlert: function() {
     var ptor = protractor.getInstance();
     return ptor.switchTo().alert();
+  },
+
+  deleteGroup: function() {
+    this.deleteGroupButton().click();
+    this.deleteGroupAlert().accept();
   }
 
 });
