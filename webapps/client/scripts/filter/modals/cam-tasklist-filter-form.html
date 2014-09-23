@@ -181,11 +181,11 @@
                 <select class="form-control"
                         ng-model="authorization.type">
                   <option value="0"
-                          ng-selected="authorization.type == 0">GLOBAL</option>
+                          ng-selected="authorization.type === 0">GLOBAL</option>
                   <option value="1"
-                          ng-selected="authorization.type == 1">ALLOW</option>
+                          ng-selected="authorization.type === 1">ALLOW</option>
                   <option value="2"
-                          ng-selected="authorization.type == 2">DENY</option>
+                          ng-selected="authorization.type === 2">DENY</option>
                 </select>
               </div>
 

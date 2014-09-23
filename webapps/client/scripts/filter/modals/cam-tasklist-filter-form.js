@@ -15,6 +15,19 @@ define([
   var copy = angular.copy;
 
 
+  function cleanJson(obj) {
+    each(Object.keys(obj), function(key) {
+      if (key === 'error' || key[0] === '$') {
+        delete obj[key];
+      }
+      else if (angular.isObject(obj[key]) || angular.isArray(obj[key])) {
+        obj[key] = cleanJson(obj[key]);
+      }
+    });
+    return obj;
+  }
+
+
   function unique(a) {
     return a.reduce(function(p, c) {
       if (p.indexOf(c) < 0) p.push(c);
@@ -225,7 +238,6 @@ define([
 
     function availablePermissions(authorizationPermissions) {
       var available = [];
-
       if (authorizationPermissions.length === 1 && authorizationPermissions[0] === 'ALL') {
         available = copy(permissionsMap);
       }
@@ -247,6 +259,10 @@ define([
     }
 
     each($scope._authorizations, function(authorization) {
+      if (authorization.permissions.indexOf('ALL') > -1) {
+        authorization.permissions = ['ALL'];
+      }
+
       var hasNone = authorization.permissions.indexOf('NONE');
       if (hasNone > -1) {
         authorization.permissions.splice(hasNone, 1);
@@ -289,9 +305,16 @@ define([
     $scope.validateAuthorization = function(authorization, delta) {
       authorization.error = null;
 
-      if (!authorization.identity) {
-        authorization.error = {field: 'identity', message: 'REQUIRED_FIELD'};
+      // ALLOW, DENY
+      if (authorization.type !== '0') {
+        if (!authorization.identity) {
+          authorization.error = {field: 'identity', message: 'REQUIRED_FIELD'};
+        }
       }
+      // GLOBAL
+      // else {
+
+      // }
 
       isValid();
       return authorization.error;
@@ -409,6 +432,8 @@ define([
         }
       };
 
+      toSave = cleanJson(toSave);
+
       if ($scope.filter.id) {
         toSave.id = $scope.filter.id;
       }
@@ -421,22 +446,28 @@ define([
         var authTasks = [];
         each($scope._authorizations, function(auth) {
           auth = copy(auth);
+          auth.type = parseInt(auth.type, 10);
 
-          auth.error = null;
-          auth.availablePermissions = null;
-
-          if (auth.identityType === 'user') {
-            auth.userId = auth.identity;
+          if (auth.type !== 0) {
+            if (auth.identityType === 'user') {
+              auth.userId = auth.identity;
+            }
+            else {
+              auth.groupId = auth.identity;
+            }
           }
           else {
-            auth.groupId = auth.identity;
+            auth.userId = '*';
           }
-          auth.identityType = null;
-          auth.identity = null;
 
-          auth.permissions = cleanArray(auth.permissions.split(','));
           auth.resourceId = toSave.id || filterResponse.id;
+          auth.permissions = cleanArray(auth.permissions.split(','));
           auth.resourceType = 5;
+
+          delete auth.identityType;
+          delete auth.identity;
+          delete auth.availablePermissions;
+          auth = cleanJson(auth);
 
           authTasks.push(function(cb) { Authorization.save(auth, cb); });
         });
