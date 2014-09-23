@@ -47,7 +47,7 @@ import org.camunda.bpm.engine.repository.ProcessApplicationDeploymentBuilder;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
-import org.camunda.bpm.model.bpmn.instance.bpmndi.BpmnDiagram;
+import org.camunda.bpm.model.bpmn.instance.Process;
 import org.camunda.bpm.model.cmmn.Cmmn;
 import org.camunda.bpm.model.cmmn.CmmnModelInstance;
 import org.camunda.bpm.model.cmmn.instance.Case;
@@ -240,8 +240,8 @@ public class DeployCmd<T> implements Command<Deployment>, Serializable {
 
         ByteArrayInputStream byteStream = new ByteArrayInputStream(resource.getBytes());
         BpmnModelInstance model = Bpmn.readModelFromStream(byteStream);
-        for (BpmnDiagram bpmnDiagram : model.getDefinitions().getBpmDiagrams()) {
-          keys.add(bpmnDiagram.getId());
+        for (Process process : model.getDefinitions().getChildElementsByType(Process.class)) {
+          keys.add(process.getId());
         }
       } else if (isCmmnResource(resource)) {
 

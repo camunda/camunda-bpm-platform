@@ -28,13 +28,12 @@ import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 
 @RunWith(Arquillian.class)
-public abstract class TestWarDeploymentIsDeployChangedOnly extends AbstractFoxPlatformIntegrationTest {
+public class TestWarDeploymentIsDeployChangedOnly extends AbstractFoxPlatformIntegrationTest {
 
   private static final String PA1 = "PA1";
   private static final String PA2 = "PA2";
@@ -53,7 +52,6 @@ public abstract class TestWarDeploymentIsDeployChangedOnly extends AbstractFoxPl
 
   }
 
-  @Ignore
   @Test
   @OperateOnDeployment(value=PA2)
   public void testDeployProcessArchive() {
@@ -63,7 +61,7 @@ public abstract class TestWarDeploymentIsDeployChangedOnly extends AbstractFoxPl
       .processDefinitionKey("testDeployProcessArchive")
       .count();
 
-    Assert.assertEquals(2, count);
+    Assert.assertEquals(1, count);
 
     // validate registrations:
     ProcessApplicationService processApplicationService = BpmPlatform.getProcessApplicationService();

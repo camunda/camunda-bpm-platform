@@ -92,8 +92,8 @@ public class ProcessApplicationDeploymentBuilderImpl extends DeploymentBuilderIm
   }
 
   @Override
-  public ProcessApplicationDeploymentBuilderImpl enableDuplicateFiltering(boolean deployAllOnSingleChange) {
-    return (ProcessApplicationDeploymentBuilderImpl) super.enableDuplicateFiltering(deployAllOnSingleChange);
+  public ProcessApplicationDeploymentBuilderImpl enableDuplicateFiltering(boolean deployChangedOnly) {
+    return (ProcessApplicationDeploymentBuilderImpl) super.enableDuplicateFiltering(deployChangedOnly);
   }
 
   // getters / setters ///////////////////////////////////////////////

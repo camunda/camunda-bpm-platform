@@ -224,8 +224,30 @@ public class ProcessApplicationDeploymentTest extends PluggableProcessEngineTest
     repositoryService.deleteDeployment(deployment3.getId(), true);
   }
 
-  // TODO: test with a third deployment and make sure that the resume previous versions registers
-  // for all deploy
+  public void testPartialChangesResumePreviousVersion() {
+    BpmnModelInstance model1 = Bpmn.createExecutableProcess("process1").done();
+    BpmnModelInstance model2 = Bpmn.createExecutableProcess("process2").done();
+
+    // create initial deployment
+    ProcessApplicationDeployment deployment1 = repositoryService.createDeployment(processApplication.getReference())
+      .name("deployment")
+      .addModelInstance("process1.bpmn20.xml", model1)
+      .deploy();
+
+    ProcessApplicationDeployment deployment2 = repositoryService.createDeployment(processApplication.getReference())
+      .name("deployment")
+      .enableDuplicateFiltering(true)
+      .resumePreviousVersions()
+      .addModelInstance("process1.bpmn20.xml", model1)
+      .addModelInstance("process2.bpmn20.xml", model2)
+      .deploy();
+
+    ProcessApplicationRegistration registration = deployment2.getProcessApplicationRegistration();
+    assertEquals(2, registration.getDeploymentIds().size());
+
+    repositoryService.deleteDeployment(deployment1.getId(), true);
+    repositoryService.deleteDeployment(deployment2.getId(), true);
+  }
 
   public void testProcessApplicationDeploymentResumePreviousVersions() {
     // create initial deployment

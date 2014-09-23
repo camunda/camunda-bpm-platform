@@ -63,7 +63,7 @@ public interface ProcessApplicationDeploymentBuilder extends DeploymentBuilder {
   @Deprecated
   ProcessApplicationDeploymentBuilder enableDuplicateFiltering();
   /* {@inheritDoc} */
-  ProcessApplicationDeploymentBuilder enableDuplicateFiltering(boolean deployAllOnSingleChange);
+  ProcessApplicationDeploymentBuilder enableDuplicateFiltering(boolean deployChangedOnly);
   /* {@inheritDoc} */
   ProcessApplicationDeploymentBuilder activateProcessDefinitionsOn(Date date);
 
