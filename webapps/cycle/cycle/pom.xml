@@ -413,6 +413,35 @@
       </build>
     </profile>
     
+    <profile>
+      <id>ibo</id>
+      <build>
+        <plugins>          
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <excludes>
+                 <exclude>none</exclude>
+              </excludes>
+              <includes>
+                  <include>**/IboConnectorTest.java</include>
+              </includes>              
+            </configuration>
+            <executions>
+              <execution>
+                <id>ibo-signavio-connector</id>
+                <phase>test</phase>
+                <goals>
+                  <goal>test</goal>
+                </goals>                
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    
     <!-- enables signavio integration test -->
     <profile>
       <id>signavio</id>
