@@ -15,12 +15,13 @@
 <div class="modal-footer">
   <div class="form-actions">
     <button class="btn btn-link"
-            type="submit"
+            type="button"
             ng-click="exitFullscreen()"
             translate="CLOSE">Close</button>
 
     <button class="btn btn-primary"
             type="submit"
+            ng-disabled="$invalid"
             ng-click="completeTask()"
             translate="COMPLETE">Complete</button>
   </div>

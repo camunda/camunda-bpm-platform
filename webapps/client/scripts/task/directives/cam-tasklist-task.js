@@ -3,6 +3,7 @@ define([
 ], function(template) {
   'use strict';
 
+
   return [
     '$rootScope',
     '$location',
@@ -25,10 +26,17 @@ define([
       link: function(scope, element) {
         scope.task = scope.task || $rootScope.currentTask;
 
+        scope.tabs = {
+          form: true,
+          description: false,
+          history: false,
+          diagram: false
+        };
+
         scope.elUID = camUID();
 
-        element.find('.nav li').eq(0).addClass('active');
-        element.find('.tab-pane').eq(0).addClass('active');
+        // element.find('.nav li').eq(0).addClass('active');
+        // element.find('.tab-pane').eq(0).addClass('active');
 
         function refreshTabs() {
           var activePane = element.find('.tab-pane.active > div');
@@ -52,7 +60,8 @@ define([
 
 
         function setTask(event) {
-          var urlTaskId = $location.search().task;
+          var state = $location.search();
+          var urlTaskId = state.task;
 
           if ($rootScope.currentTask) {
             if (urlTaskId && urlTaskId === $rootScope.currentTask.id) {
@@ -73,6 +82,18 @@ define([
             refreshTabs();
           }
         }
+
+        scope.selectTab = function(tabName) {
+          if (tabName === 'diagram') {
+            scope.drawDiagram();
+          }
+
+
+          var state = $location.search();
+          state.tab = state.tab = tabName;
+          $location.search(state);
+          // scope.tabs[tabName] = true;
+        };
 
         scope.fullscreenForm = function() {
           element.find('[cam-tasklist-task-form]').isolateScope().enterFullscreen();

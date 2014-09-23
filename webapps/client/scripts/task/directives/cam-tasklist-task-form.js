@@ -71,6 +71,10 @@ define([
         scope._camForm = null;
         scope.fullscreen = false;
 
+        // // doh!
+        // scope.$valid = true;
+        // scope.$invalid = false;
+
         scope.enterFullscreen = function() {
           scope.fullscreen = !scope.fullscreen;
 
@@ -135,6 +139,7 @@ define([
             modalInstance.dismiss();
           }
 
+          $rootScope.$broadcast('tasklist.task.update');
           $rootScope.$broadcast('tasklist.task.complete');
 
           successNotification('COMPLETE_OK');
@@ -155,44 +160,58 @@ define([
         };
 
 
+        function showForm(targetContainer, processDefinition) {
+          var parts = (scope.task.formKey || '').split('embedded:');
+          var ctx = processDefinition.contextPath;
+          var formUrl;
+
+          if (parts.length > 1) {
+            formUrl = parts.pop();
+            // ensure a trailing slash
+            ctx = ctx + (ctx.slice(-1) !== '/' ? '/' : '');
+            formUrl = formUrl.replace(/app:(\/?)/, ctx);
+          }
+          else {
+            formUrl = scope.task.formKey;
+          }
+
+          if (formUrl) {
+            scope._camForm = new CamForm({
+              taskId:           scope.task.id,
+              containerElement: targetContainer,
+              client:           camAPI,
+              formUrl:          formUrl
+            });
+
+            // scope._camForm.once('form-loaded', function() {
+            //   scope.formScope = scope._camForm.formElement.scope();
+
+            //   scope.formScope.$watch('$invalid', function() {
+            //     if (scope.$invalid !== true && scope.$invalid !== false) {
+            //       return;
+            //     }
+
+            //     scope.$valid = !scope.formScope.$valid;
+            //     scope.$invalid = scope.formScope.$invalid;
+            //   });
+            // });
+          }
+          else {
+            // clear the content (to avoid other tasks form to appear)
+            $translate('NO_TASK_FORM').then(function(translated) {
+              targetContainer.html(translated || '');
+            });
+          }
+        }
+
+
         function loadForm(targetContainer) {
           targetContainer = targetContainer || container;
           scope._camForm = null;
 
-          var parts = (scope.task.formKey || '').split('embedded:');
-
-          function showForm(processDefinition) {
-            var ctx = scope.task._embedded.processDefinition[0].contextPath;
-            var formUrl;
-
-            if (parts.length > 1) {
-              formUrl = parts.pop();
-              // ensure a trailing slash
-              ctx = ctx + (ctx.slice(-1) !== '/' ? '/' : '');
-              formUrl = formUrl.replace(/app:(\/?)/, ctx);
-            }
-            else {
-              formUrl = scope.task.formKey;
-            }
-
-            if (formUrl) {
-              scope._camForm = new CamForm({
-                taskId:           scope.task.id,
-                containerElement: targetContainer,
-                client:           camAPI,
-                formUrl:          formUrl
-              });
-            }
-            else {
-              // clear the content (to avoid other tasks form to appear)
-              $translate('NO_TASK_FORM').then(function(translated) {
-                targetContainer.html(translated || '');
-              });
-            }
-          }
 
           if (scope.task._embedded && scope.task._embedded.processDefinition[0]) {
-            showForm(scope.task._embedded.processDefinition[0]);
+            showForm(targetContainer, scope.task._embedded.processDefinition[0]);
           }
           else {
             // this should not happen, but...
@@ -203,7 +222,7 @@ define([
               scope.task._embedded.processDefinition = scope.task._embedded.processDefinition || [];
               scope.task._embedded.processDefinition[0] = result;
 
-              showForm(scope.task._embedded.processDefinition[0]);
+              showForm(targetContainer, scope.task._embedded.processDefinition[0]);
             });
           }
         }

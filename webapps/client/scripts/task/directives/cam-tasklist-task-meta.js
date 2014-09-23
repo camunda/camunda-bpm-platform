@@ -36,7 +36,46 @@ define([
     }
 
     return {
+      scope: {
+        task: '='
+      },
+
+      template: template,
+
       link: function(scope) {
+
+
+
+
+        function saveDate(propName) {
+          return function(inlineFieldScope) {
+            var self = this;
+            var task = angular.copy(self.task);
+            task[propName] = inlineFieldScope.varValue;
+
+            delete task._embedded;
+            delete task._links;
+
+            Task.update(task, function(err, result) {
+              if (err) {
+                return errorNotification('TASK_UPDATE_ERROR', err);
+              }
+
+              console.info('save '+ propName +' date', task[propName], result, inlineFieldScope.varValue.toJSON());
+
+              $rootScope.$broadcast('tasklist.task.update');
+              $rootScope.$broadcast('tasklist.task.'+propName);
+
+              successNotification('TASK_UPDATE_SUCESS');
+            });
+          };
+        }
+
+        scope.saveFollowUpDate = saveDate('followUp');
+        scope.saveDueDate = saveDate('due');
+
+
+
         // function delegated(err) {
         //   if (err) {
         //     return errorNotification('DELEGATE_ERROR', err);
@@ -52,6 +91,7 @@ define([
           }
 
           successNotification('ASSIGNED_OK');
+          $rootScope.$broadcast('tasklist.task.update');
           $rootScope.$broadcast('tasklist.task.assign');
         }
 
@@ -64,6 +104,7 @@ define([
           scope.task.assignee = $rootScope.authentication.name;
 
           successNotification('CLAIM_OK');
+          $rootScope.$broadcast('tasklist.task.update');
           $rootScope.$broadcast('tasklist.task.claim');
         }
 
@@ -76,6 +117,7 @@ define([
           scope.task.assignee = null;
 
           successNotification('UNCLAIM_OK');
+          $rootScope.$broadcast('tasklist.task.update');
           $rootScope.$broadcast('tasklist.task.unclaim');
         }
 
@@ -190,8 +232,7 @@ define([
         //   //   done: assigned
         //   // });
         // };
-      },
-      template: template
+      }
     };
   }];
 });

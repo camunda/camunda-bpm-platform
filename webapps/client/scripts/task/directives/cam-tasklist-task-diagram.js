@@ -77,11 +77,14 @@ define([
 
             $timeout(function() {
               viewer.importXML(xml.bpmn20Xml, function(err) {
-                scope.rendering = false;
                 if (err) { throw err; }
 
                 $timeout(function() {
+                  // var elSelector = '[data-element-id="'+ scope.task.taskDefinitionKey +'"]';
+                  // var $el = element.find(elSelector);
+                  // $el.addClass('highlight');
                   viewer.get('canvas').zoom('fit-viewport');
+                  scope.rendering = false;
                 }, 10);
               });
             }, 10);

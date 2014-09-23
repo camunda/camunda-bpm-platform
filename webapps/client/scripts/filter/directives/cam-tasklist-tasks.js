@@ -161,6 +161,38 @@ define([
         // };
 
 
+
+
+
+        function saveDate(propName) {
+          return function(inlineFieldScope) {
+            var self = this;
+            var task = angular.copy(self.task);
+            task[propName] = inlineFieldScope.varValue;
+
+            delete task._embedded;
+            delete task._links;
+
+            Task.update(task, function(err, result) {
+              if (err) {
+                throw err;
+              }
+
+              console.info('save '+ propName +' date', task[propName], result, inlineFieldScope.varValue.toJSON());
+
+              // scope.$emit('tasklist.task.'+ propName);
+
+              loadTasks();
+            });
+          };
+        }
+
+        scope.saveFollowUpDate = saveDate('followUp');
+        scope.saveDueDate = saveDate('due');
+
+
+
+
         scope.focus = function(delta) {
           setCurrentTask(scope.tasks[delta], true);
         };
@@ -177,17 +209,11 @@ define([
         });
 
 
-        scope.$on('tasklist.task.assign', loadTasks);
-
-        scope.$on('tasklist.task.delegate', loadTasks);
-
-        scope.$on('tasklist.task.claim', loadTasks);
-
-        scope.$on('tasklist.task.unclaim', loadTasks);
+        scope.$on('tasklist.task.update', loadTasks);
 
         scope.$on('tasklist.task.complete', function() {
           setCurrentTask(null);
-          loadTasks();
+          // loadTasks();
         });
       }
     };

@@ -1,112 +1,108 @@
 <ul class="meta list-inline times">
-
-
-  <li class="followup-date"
-      ng-class="(task.followUp < now ? 'overdue' : '')">
+  <li cam-form-inline-field
+      class="followup-date"
+      ng-class="{overdue: task.followUp && (task.followUp < now)}"
+      type="datetime"
+      change="saveFollowUpDate(this)"
+      value="task.followUp">
     <span tooltip-placement="top"
+          tooltip-append-to-body="true"
           tooltip="{{ 'FOLLOW_UP_DATE' | translate }}"
           class="glyphicon glyphicon-bell"></span>
 
-    <span cam-form-inline-field
-          type="date"
-          value="task.followUp">
+    <span ng-if="varValue"
+          am-time-ago="varValue">{{ varValue }}</span>
 
-      <span ng-if="task.followUp"
-            am-time-ago="task.followUp">{{ task.followUp }}</span>
-
-      <a href
-         ng-if="!task.followUp"
-         translate="SET_FOLLOW_UP_DATE">Set follow up</a>
-    </span>
+    <a href
+       ng-if="!varValue"
+       translate="SET_FOLLOW_UP_DATE">Set follow up</a>
   </li>
 
 
 
-  <li class="due-date"
-      ng-class="(task.due < now ? 'overdue' : '')">
+  <li cam-form-inline-field
+      class="due-date"
+      ng-class="{overdue: task.due && (task.due < now)}"
+      type="datetime"
+      change="saveDueDate(this)"
+      value="task.due">
     <span tooltip-placement="top"
+          tooltip-append-to-body="true"
           tooltip="{{ 'DUE_DATE' | translate }}"
           class="glyphicon glyphicon-calendar"></span>
 
-    <span ng-if="task.due"
-          cam-form-inline-field
-          type="date"
-          value="task.due">
+    <span ng-if="varValue"
+          am-time-ago="varValue">{{ varValue }}</span>
 
-      <span ng-if="task.due"
-            am-time-ago="task.due">{{ task.due }}</span>
-
-      <a href
-         ng-if="!task.due"
-         translate="SET_DUE_DATE">Set due date</a>
-    </span>
+    <a href
+       ng-if="!varValue"
+       translate="SET_DUE_DATE">Set due date</a>
   </li>
 </ul>
 
+
+
+
+
+
 <ul class="meta list-inline actors">
-  <li class="assignee">
+  <li class="assignee set-value"
+      ng-if="!task.assignee">
     <span tooltip-placement="top"
           tooltip="{{ 'ASSIGNEE' | translate }}"
           class="glyphicon glyphicon-user"></span>
 
-    <span ng-if="task.assignee && !userIsAssignee()">
-      <span cam-form-inline-field
-            validate="validateUser(this)"
-            change="assigning(this)"
-            value="task.assignee">
-        {{ task.assignee }}
-      </span>
-<!--
-      <a href
-         tooltip-placement="top"
-         tooltip="{{ 'CLAIM_TASK' | translate }}"
-         ng-click="claim()"
-         class="claim glyphicon glyphicon-hand-left">
-      </a>
-       -->
-    </span>
-
-    <span ng-if="!task.assignee"
-          class="set-value">
-      <a href
-         class="claim"
-         ng-click="claim()"
-         translate="CLAIM_TASK">Claim</a>
-    </span>
-
-    <span ng-if="userIsAssignee()"
-          class="set-value">
-      <span cam-form-inline-field
-            validate="validateUser(this)"
-            change="assigning(this)"
-            value="task.assignee">
-        {{ task.assignee }}
-      </span>
-
-      <a href
-         tooltip-placement="top"
-         tooltip="{{ 'UNCLAIM_TASK' | translate }}"
-         ng-click="unclaim()"
-         class="unclaim glyphicon glyphicon-remove">
-      </a>
-    </span>
+    <a href
+       class="claim"
+       ng-click="claim()"
+       translate="CLAIM_TASK">Claim</a>
   </li>
 
 
 
-<!--   <li ng-if="task.owner"
-      class="owner">
+
+
+  <li class="assignee"
+      ng-if="task.assignee && !userIsAssignee()"
+      cam-form-inline-field
+      type="text"
+      validate="validateUser(this)"
+      change="assigning(this)"
+      value="task.assignee">
+
     <span tooltip-placement="top"
-          tooltip="{{ 'OWNER' | translate }}"
-          class="glyphicon glyphicon-certificate"></span>
+          tooltip="{{ 'ASSIGNEE' | translate }}"
+          class="glyphicon glyphicon-user"></span>
 
-    <span ng-if="task.owner"
-          cam-form-inline-field
-          value="task.owner">
-      {{ task.owner }}
+    {{ varValue }}
+  </li>
+
+
+
+
+
+  <li class="assignee"
+      ng-if="userIsAssignee()">
+    <span cam-form-inline-field
+          class="set-value"
+          type="text"
+          validate="validateUser(this)"
+          change="assigning(this)"
+          value="task.assignee">
+
+      <span tooltip-placement="top"
+            tooltip="{{ 'ASSIGNEE' | translate }}"
+            class="glyphicon glyphicon-user"></span>
+
+      {{ varValue }}
     </span>
-  </li> -->
+
+    <a href
+       tooltip-placement="top"
+       tooltip="{{ 'UNCLAIM_TASK' | translate }}"
+       ng-click="unclaim()"
+       class="unclaim glyphicon glyphicon-remove">
+    </a>
+  </li>
+
 </ul>
-
-
-

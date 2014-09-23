@@ -1,18 +1,45 @@
 <span class="view"
-      ng-show="!editing"
+      ng-if="!editing"
       ng-click="toggleEditing()"
       ng-transclude>
-  {{ varValue }}
+
 </span>
 
 <span class="edit"
-      ng-show="editing">
+      ng-if="editing">
 
-  <input type="{{ varType }}"
-         ng-model="editValue"
-         placeholder="{{ placeholder }}">
+  <span ng-if="varType === 'datetime' || varType === 'date' || varType === 'time'"
+        class="preview">
+    {{ editValue | amCalendar }}
+  </span>
 
-  <div class="btn-group">
+  <span class="field">
+    <input ng-if="simpleField"
+           class="form-control"
+           type="{{ varType }}"
+           ng-model="editValue"
+           ng-change="echo(this)"
+           name="editValue"
+           placeholder="{{ placeholder }}" />
+
+    <span ng-if="varType === 'datetime' || varType === 'date' || varType === 'time'">
+
+      <datepicker class="datepicker"
+                  ng-if="varType === 'datetime' || varType === 'date'"
+                  type="text"
+                  ng-model="_datetime.date"
+                  ng-required="true"
+                  is-open="datePickerOptions.isOpen"
+                  show-button-bar="false" />
+
+      <timepicker class="timepicker"
+                  ng-if="varType === 'datetime' || varType === 'time'"
+                  show-meridian="false"
+                  ng-model="_datetime.time" />
+    </span>
+  </span>
+
+  <span class="btn-group">
     <button type="button"
             class="btn btn-xs btn-default"
             ng-click="applyChange()">
@@ -24,5 +51,5 @@
             ng-click="cancelChange()">
       <span class="glyphicon glyphicon-remove"></span>
     </button>
-  </div>
+  </span>
 </span>

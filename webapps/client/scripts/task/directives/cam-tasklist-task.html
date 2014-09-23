@@ -31,7 +31,7 @@
 
 
       <div cam-tasklist-task-meta
-          task="task"></div>
+           task="task"></div>
 
 
     </div>
@@ -42,8 +42,8 @@
     <div class="col-xs-12">
       <tabset>
         <!-- <tab heading="{{ 'FORM' | translate }}"> -->
-        <tab>
-
+        <tab active="tabs.form"
+             select="selectTab('form')">
           <tab-heading>
             {{ 'FORM' | translate }}
 
@@ -59,11 +59,15 @@
         </tab>
 
         <tab ng-if="task.description"
+             active="tabs.description"
+             select="selectTab('description')"
              heading="{{ 'DESCRIPTION' | translate }}">
           <div class="description-pane">{{ task.description }}</div>
         </tab>
 
         <tab ng-if="history"
+             active="tabs.history"
+             select="selectTab('history')"
              heading="{{ 'HISTORY' | translate }}">
           <div class="history-pane"
                cam-tasklist-task-history
@@ -72,6 +76,8 @@
         </tab>
 
         <tab heading="{{ 'DIAGRAM' | translate }}"
+             active="tabs.diagram"
+             select="selectTab('diagram')"
              select="drawDiagram()">
           <div class="diagram-pane"
                cam-tasklist-task-diagram
