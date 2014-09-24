@@ -119,7 +119,7 @@ define([
       $scope.loadingProcesses = true;
 
       ProcessDefinition.list({
-        suspended: false,
+        active: true,
         latest: true,
         nameLike: '%'+ val +'%'
       }, function(err, res) {
@@ -145,7 +145,8 @@ define([
     $scope.loadProcesses = function() {
       $scope.loadingProcesses = true;
       var where = {
-        latest: true
+        latest: true,
+        active: true
       };
 
       // I found that in the REST API documentation,
