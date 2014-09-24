@@ -271,6 +271,8 @@ define([
       authorization.availablePermissions = availablePermissions(authorization.permissions);
       authorization.identity = authorization.userId || authorization.groupId;
       authorization.identityType = authorization.userId ? 'user' : 'group';
+      authorization.type = parseInt(authorization.type, 10);
+      authorization._originalType = authorization.type;
     });
 
     $scope.addAuthorization = function() {
@@ -469,7 +471,15 @@ define([
           delete auth.availablePermissions;
           auth = cleanJson(auth);
 
-          authTasks.push(function(cb) { Authorization.save(auth, cb); });
+          if (auth.type != auth._originalType) {
+            var newAuth = copy(auth);
+            delete newAuth.id;
+            authTasks.push(function(cb) { Authorization.delete(auth.id, cb); });
+            authTasks.push(function(cb) { Authorization.save(newAuth, cb); });
+          }
+          else {
+            authTasks.push(function(cb) { Authorization.save(auth, cb); });
+          }
         });
 
         camSDK.utils.series(authTasks, function(err, authTasksResult) {
