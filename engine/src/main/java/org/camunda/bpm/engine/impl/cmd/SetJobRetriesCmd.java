@@ -62,6 +62,10 @@ public class SetJobRetriesCmd implements Command<Void>, Serializable {
         .getJobManager()
         .findJobById(jobId);
     if (job != null) {
+      if (job.isInInconsistentLockState()) {
+        job.resetLock();
+      }
+
       job.setRetries(retries);
     } else {
       throw new ProcessEngineException("No job found with id '" + jobId + "'.");

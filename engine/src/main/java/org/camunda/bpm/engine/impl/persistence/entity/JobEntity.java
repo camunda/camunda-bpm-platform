@@ -413,6 +413,16 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
     this.deploymentId = deploymentId;
   }
 
+  public boolean isInInconsistentLockState() {
+    return (lockOwner != null && lockExpirationTime == null)
+        || (retries == 0 && (lockOwner != null || lockExpirationTime != null));
+  }
+
+  public void resetLock() {
+    this.lockOwner = null;
+    this.lockExpirationTime = null;
+  }
+
   @Override
   public String toString() {
     return this.getClass().getSimpleName()

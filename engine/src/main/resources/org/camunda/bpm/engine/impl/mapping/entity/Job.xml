@@ -49,6 +49,8 @@
   <update id="updateFailedJobRetriesByParameters" parameterType="java.util.Map">
     update ${prefix}ACT_RU_JOB set
       REV_ = REV_ + 1,
+      LOCK_OWNER_ = NULL,
+      LOCK_EXP_TIME_ = NULL,
       RETRIES_ = #{retries, jdbcType=INTEGER}
     <where>
       RETRIES_ = 0
