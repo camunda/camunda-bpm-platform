@@ -162,15 +162,22 @@
 
 
         <div ng-repeat="(delta, authorization) in _authorizations"
-             class="form-group">
+             class="form-group"
+             ng-class="{removed: authorization.toDelete}">
 
 
           <div class="col-xs-2 row-action">
-            <a ng-click="removeAuthorization(delta)"
+            <a ng-if="!authorization.toDelete"
+               ng-click="removeAuthorization(delta)"
                href>
-              <span class="hidden-sm hidden-xs">{{ 'FILTER_REMOVE_ACCESS_RULE' | translate }}</span>
+              <span class="hidden-sm hidden-xs"
+                    ng-if="authorization.toDelete"
+                    translate="FILTER_REMOVE_ACCESS_RULE">Remove</span>
               <span class="glyphicon glyphicon-minus-sign"></span>
             </a>
+            <span class="hidden-sm hidden-xs"
+                  ng-if="authorization.toDelete"
+                  translate="FILTER_REMOVED_ACCESS_RULE">Removed</span>
           </div>
 
 

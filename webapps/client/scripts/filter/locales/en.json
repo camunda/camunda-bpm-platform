@@ -61,6 +61,8 @@
                         "Add rule",
   "FILTER_REMOVE_ACCESS_RULE":
                         "Remove",
+  "FILTER_REMOVED_ACCESS_RULE":
+                        "Removed",
 
   "FILTER_FORM_CRITERIA":
                         "Criteria",

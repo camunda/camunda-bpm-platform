@@ -145,7 +145,7 @@ define([
 
 
     $scope.filter.properties.priority =   $scope.filter.properties.priority || 10;
-    $scope.filter.properties.color =      $scope.filter.properties.color || '#eee';
+    $scope.filter.properties.color =      $scope.filter.properties.color || '#EEEEEE';
 
 
 
@@ -234,6 +234,8 @@ define([
       availablePermissions: permissionsMap
     };
 
+    var _authorizationsToDelete = [];
+
     $scope._authorizations = $scope.filter.authorizations;
 
     function availablePermissions(authorizationPermissions) {
@@ -280,7 +282,12 @@ define([
     };
 
     $scope.removeAuthorization = function(delta) {
-      $scope._authorizations = removeArrayItem($scope._authorizations, delta);
+      if ($scope._authorizations[delta].id) {
+        $scope._authorizations[delta].toDelete = true;
+      }
+      else {
+        $scope._authorizations = removeArrayItem($scope._authorizations, delta);
+      }
     };
 
     $scope.identityTypeSwitch = function(authorization, delta) {
@@ -415,6 +422,7 @@ define([
     function successNotification(src) {
       $translate(src).then(function(translated) {
         Notifications.addMessage({
+          duration: 3000,
           status: translated
         });
       });
@@ -459,6 +467,7 @@ define([
             }
           }
           else {
+            auth.groupId = null;
             auth.userId = '*';
           }
 
@@ -471,14 +480,29 @@ define([
           delete auth.availablePermissions;
           auth = cleanJson(auth);
 
-          if (auth.type != auth._originalType) {
+
+          var isNew = isNaN(auth._originalType);
+          if (auth.toDelete) {
+            authTasks.push(function(cb) { Authorization.delete(auth.id, cb); });
+          }
+
+          else if (isNew) {
+            delete auth._originalType;
+            authTasks.push(function(cb) { Authorization.create(auth, cb); });
+          }
+
+          else if (!isNew && auth.type != auth._originalType) {
             var newAuth = copy(auth);
             delete newAuth.id;
+            delete newAuth._originalType;
             authTasks.push(function(cb) { Authorization.delete(auth.id, cb); });
-            authTasks.push(function(cb) { Authorization.save(newAuth, cb); });
+            authTasks.push(function(cb) { Authorization.create(newAuth, cb); });
           }
+
           else {
-            authTasks.push(function(cb) { Authorization.save(auth, cb); });
+            delete auth._originalType;
+            delete auth.type;
+            authTasks.push(function(cb) { Authorization.update(auth, cb); });
           }
         });
 
