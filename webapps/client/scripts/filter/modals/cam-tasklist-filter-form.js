@@ -145,7 +145,7 @@ define([
 
 
     $scope.filter.properties.priority =   $scope.filter.properties.priority || 10;
-    $scope.filter.properties.color =      $scope.filter.properties.color || '#dd6666';
+    $scope.filter.properties.color =      $scope.filter.properties.color || '#eee';
 
 
 
