@@ -35,7 +35,9 @@ public class JobManager extends AbstractManager {
 
   public void send(MessageEntity message) {
     message.insert();
-    hintJobExecutor(message);
+    if (Context.getProcessEngineConfiguration().isHintJobExecutor()) {
+      hintJobExecutor(message);
+    }
   }
 
   public void schedule(TimerEntity timer) {

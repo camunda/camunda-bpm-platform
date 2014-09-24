@@ -113,6 +113,7 @@ public abstract class ProcessEngineConfiguration {
   protected String history = HISTORY_AUDIT;
   protected boolean jobExecutorActivate;
   protected boolean jobExecutorDeploymentAware = false;
+  protected boolean hintJobExecutor = true;
 
   protected String mailServerHost = "localhost";
   protected String mailServerUsername; // by default no name and password are provided, which
@@ -431,6 +432,15 @@ public abstract class ProcessEngineConfiguration {
 
   public ProcessEngineConfiguration setJobExecutorDeploymentAware(boolean jobExecutorDeploymentAware) {
     this.jobExecutorDeploymentAware = jobExecutorDeploymentAware;
+    return this;
+  }
+
+  public boolean isHintJobExecutor() {
+    return hintJobExecutor;
+  }
+
+  public ProcessEngineConfiguration setHintJobExecutor(boolean hintJobExecutor) {
+    this.hintJobExecutor = hintJobExecutor;
     return this;
   }
 

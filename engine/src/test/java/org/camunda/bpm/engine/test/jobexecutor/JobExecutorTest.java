@@ -17,6 +17,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
@@ -57,5 +58,22 @@ public class JobExecutorTest extends JobExecutorTestCase {
     expectedMessages.add("timer-two");
 
     assertEquals(new TreeSet<String>(expectedMessages), new TreeSet<String>(messages));
+  }
+
+  public void testJobExecutorHintConfiguration() {
+    ProcessEngineConfiguration engineConfig1 =
+        ProcessEngineConfiguration.createStandaloneInMemProcessEngineConfiguration();
+
+    assertTrue("default setting is true", engineConfig1.isHintJobExecutor());
+
+    ProcessEngineConfiguration engineConfig2 =
+        ProcessEngineConfiguration.createStandaloneInMemProcessEngineConfiguration().setHintJobExecutor(false);
+
+    assertFalse(engineConfig2.isHintJobExecutor());
+
+    ProcessEngineConfiguration engineConfig3 =
+        ProcessEngineConfiguration.createStandaloneInMemProcessEngineConfiguration().setHintJobExecutor(true);
+
+    assertTrue(engineConfig3.isHintJobExecutor());
   }
 }
