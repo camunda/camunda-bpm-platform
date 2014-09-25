@@ -14,28 +14,41 @@
 package org.camunda.bpm.engine.rest;
 
 import static com.jayway.restassured.RestAssured.given;
+import static org.camunda.bpm.engine.authorization.Authorization.ANY;
+import static org.camunda.bpm.engine.authorization.Permissions.DELETE;
+import static org.camunda.bpm.engine.authorization.Permissions.READ;
+import static org.camunda.bpm.engine.authorization.Permissions.UPDATE;
+import static org.camunda.bpm.engine.authorization.Resources.FILTER;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Collections;
 import java.util.List;
 
+import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 
+import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.FilterService;
+import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.filter.Filter;
 import org.camunda.bpm.engine.filter.FilterQuery;
+import org.camunda.bpm.engine.impl.AuthorizationServiceImpl;
+import org.camunda.bpm.engine.impl.IdentityServiceImpl;
+import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.rest.dto.runtime.FilterDto;
 import org.camunda.bpm.engine.rest.hal.Hal;
@@ -60,6 +73,9 @@ public abstract class AbstractFilterRestServiceInteractionTest extends AbstractR
 
   protected FilterService filterServiceMock;
   protected Filter filterMock;
+
+  protected AuthorizationService authorizationServiceMock;
+  protected IdentityService identityServiceMock;
 
   @Before
   @SuppressWarnings("unchecked")
@@ -115,6 +131,12 @@ public abstract class AbstractFilterRestServiceInteractionTest extends AbstractR
       .when(filterServiceMock).listPage(eq(MockProvider.EXAMPLE_FILTER_ID), eq(invalidExtendingQuery), anyInt(), anyInt());
     doThrow(new NotValidException("Filter cannot be extended by an invalid query"))
       .when(filterServiceMock).count(eq(MockProvider.EXAMPLE_FILTER_ID), eq(invalidExtendingQuery));
+
+    authorizationServiceMock = mock(AuthorizationServiceImpl.class);
+    identityServiceMock = mock(IdentityServiceImpl.class);
+
+    when(processEngine.getAuthorizationService()).thenReturn(authorizationServiceMock);
+    when(processEngine.getIdentityService()).thenReturn(identityServiceMock);
   }
 
   @Test
@@ -676,6 +698,209 @@ public abstract class AbstractFilterRestServiceInteractionTest extends AbstractR
       .post(EXECUTE_COUNT_FILTER_URL);
 
     verify(filterServiceMock).count(MockProvider.EXAMPLE_FILTER_ID, invalidExtendingQuery);
+  }
+
+
+  @Test
+  public void testAnonymousFilterOptions() {
+    String fullFilterUrl = "http://localhost:" + PORT + FILTER_URL;
+
+    // anonymity means the identityService returns a null authentication, so no need to mock here
+
+    given()
+      .then()
+        .statusCode(Status.OK.getStatusCode())
+
+        .body("links.size()", is(3))
+
+        .body("links[0].href", equalTo(fullFilterUrl))
+        .body("links[0].method", equalTo(HttpMethod.GET))
+        .body("links[0].rel", equalTo("list"))
+
+        .body("links[1].href", equalTo(fullFilterUrl + "/count"))
+        .body("links[1].method", equalTo(HttpMethod.GET))
+        .body("links[1].rel", equalTo("count"))
+
+        .body("links[2].href", equalTo(fullFilterUrl + "/create"))
+        .body("links[2].method", equalTo(HttpMethod.POST))
+        .body("links[2].rel", equalTo("create"))
+
+    .when()
+        .options(FILTER_URL);
+
+    verify(identityServiceMock, times(1)).getCurrentAuthentication();
+
+  }
+
+  @Test
+  public void testRestrictedFilterOptions() {
+    String fullFilterUrl = "http://localhost:" + PORT + FILTER_URL;
+
+    Authentication authentication = new Authentication(MockProvider.EXAMPLE_USER_ID, null);
+    when(identityServiceMock.getCurrentAuthentication()).thenReturn(authentication);
+
+    when(authorizationServiceMock.isUserAuthorized(MockProvider.EXAMPLE_USER_ID, null, UPDATE, FILTER, ANY)).thenReturn(false);
+
+    given()
+      .then()
+        .statusCode(Status.OK.getStatusCode())
+
+        .body("links.size()", is(2))
+
+        .body("links[0].href", equalTo(fullFilterUrl))
+        .body("links[0].method", equalTo(HttpMethod.GET))
+        .body("links[0].rel", equalTo("list"))
+
+        .body("links[1].href", equalTo(fullFilterUrl + "/count"))
+        .body("links[1].method", equalTo(HttpMethod.GET))
+        .body("links[1].rel", equalTo("count"))
+
+    .when()
+        .options(FILTER_URL);
+
+    verify(identityServiceMock, times(1)).getCurrentAuthentication();
+
+  }
+
+  @Test
+  public void testAnonymousFilterResourceOptions() {
+    String fullFilterUrl = "http://localhost:" + PORT + FILTER_URL + "/" + MockProvider.EXAMPLE_FILTER_ID;
+
+    // anonymity means the identityService returns a null authentication, so no need to mock here
+
+    given()
+        .pathParam("id", MockProvider.EXAMPLE_FILTER_ID)
+    .then()
+        .statusCode(Status.OK.getStatusCode())
+
+        .body("links.size()", is(9))
+
+        .body("links[0].href", equalTo(fullFilterUrl))
+        .body("links[0].method", equalTo(HttpMethod.GET))
+        .body("links[0].rel", equalTo("self"))
+
+        .body("links[1].href", equalTo(fullFilterUrl + "/singleResult"))
+        .body("links[1].method", equalTo(HttpMethod.GET))
+        .body("links[1].rel", equalTo("singleResult"))
+
+        .body("links[2].href", equalTo(fullFilterUrl + "/singleResult"))
+        .body("links[2].method", equalTo(HttpMethod.POST))
+        .body("links[2].rel", equalTo("singleResult"))
+
+        .body("links[3].href", equalTo(fullFilterUrl + "/list"))
+        .body("links[3].method", equalTo(HttpMethod.GET))
+        .body("links[3].rel", equalTo("list"))
+
+        .body("links[4].href", equalTo(fullFilterUrl + "/list"))
+        .body("links[4].method", equalTo(HttpMethod.POST))
+        .body("links[4].rel", equalTo("list"))
+
+        .body("links[5].href", equalTo(fullFilterUrl + "/count"))
+        .body("links[5].method", equalTo(HttpMethod.GET))
+        .body("links[5].rel", equalTo("count"))
+
+        .body("links[6].href", equalTo(fullFilterUrl + "/count"))
+        .body("links[6].method", equalTo(HttpMethod.POST))
+        .body("links[6].rel", equalTo("count"))
+
+        .body("links[7].href", equalTo(fullFilterUrl))
+        .body("links[7].method", equalTo(HttpMethod.DELETE))
+        .body("links[7].rel", equalTo("delete"))
+
+        .body("links[8].href", equalTo(fullFilterUrl))
+        .body("links[8].method", equalTo(HttpMethod.PUT))
+        .body("links[8].rel", equalTo("update"))
+
+    .when()
+        .options(SINGLE_FILTER_URL);
+
+    verify(identityServiceMock, times(3)).getCurrentAuthentication();
+
+  }
+
+  @Test
+  public void testFilterResourceOptionsUnauthorized() {
+    Authentication authentication = new Authentication(MockProvider.EXAMPLE_USER_ID, null);
+    when(identityServiceMock.getCurrentAuthentication()).thenReturn(authentication);
+
+    when(authorizationServiceMock.isUserAuthorized(MockProvider.EXAMPLE_USER_ID, null, READ, FILTER, MockProvider.EXAMPLE_FILTER_ID)).thenReturn(false);
+    when(authorizationServiceMock.isUserAuthorized(MockProvider.EXAMPLE_USER_ID, null, DELETE, FILTER, MockProvider.EXAMPLE_FILTER_ID)).thenReturn(false);
+    when(authorizationServiceMock.isUserAuthorized(MockProvider.EXAMPLE_USER_ID, null, UPDATE, FILTER, MockProvider.EXAMPLE_FILTER_ID)).thenReturn(false);
+
+    given()
+        .pathParam("id", MockProvider.EXAMPLE_FILTER_ID)
+    .then()
+        .statusCode(Status.OK.getStatusCode())
+
+        .body("links.size()", is(0))
+
+    .when()
+        .options(SINGLE_FILTER_URL);
+
+    verify(identityServiceMock, times(3)).getCurrentAuthentication();
+    verify(authorizationServiceMock, times(1)).isUserAuthorized(MockProvider.EXAMPLE_USER_ID, null, READ, FILTER, MockProvider.EXAMPLE_FILTER_ID);
+    verify(authorizationServiceMock, times(1)).isUserAuthorized(MockProvider.EXAMPLE_USER_ID, null, DELETE, FILTER, MockProvider.EXAMPLE_FILTER_ID);
+    verify(authorizationServiceMock, times(1)).isUserAuthorized(MockProvider.EXAMPLE_USER_ID, null, UPDATE, FILTER, MockProvider.EXAMPLE_FILTER_ID);
+
+  }
+
+  @Test
+  public void testFilterResourceOptionsUpdateUnauthorized() {
+    String fullFilterUrl = "http://localhost:" + PORT + FILTER_URL + "/" + MockProvider.EXAMPLE_FILTER_ID;
+
+    Authentication authentication = new Authentication(MockProvider.EXAMPLE_USER_ID, null);
+    when(identityServiceMock.getCurrentAuthentication()).thenReturn(authentication);
+    when(authorizationServiceMock.isUserAuthorized(MockProvider.EXAMPLE_USER_ID, null, READ, FILTER, MockProvider.EXAMPLE_FILTER_ID)).thenReturn(true);
+    when(authorizationServiceMock.isUserAuthorized(MockProvider.EXAMPLE_USER_ID, null, DELETE, FILTER, MockProvider.EXAMPLE_FILTER_ID)).thenReturn(true);
+    when(authorizationServiceMock.isUserAuthorized(MockProvider.EXAMPLE_USER_ID, null, UPDATE, FILTER, MockProvider.EXAMPLE_FILTER_ID)).thenReturn(false);
+
+    given()
+        .pathParam("id", MockProvider.EXAMPLE_FILTER_ID)
+    .then()
+        .statusCode(Status.OK.getStatusCode())
+
+        .body("links.size()", is(8))
+
+        .body("links[0].href", equalTo(fullFilterUrl))
+        .body("links[0].method", equalTo(HttpMethod.GET))
+        .body("links[0].rel", equalTo("self"))
+
+        .body("links[1].href", equalTo(fullFilterUrl + "/singleResult"))
+        .body("links[1].method", equalTo(HttpMethod.GET))
+        .body("links[1].rel", equalTo("singleResult"))
+
+        .body("links[2].href", equalTo(fullFilterUrl + "/singleResult"))
+        .body("links[2].method", equalTo(HttpMethod.POST))
+        .body("links[2].rel", equalTo("singleResult"))
+
+        .body("links[3].href", equalTo(fullFilterUrl + "/list"))
+        .body("links[3].method", equalTo(HttpMethod.GET))
+        .body("links[3].rel", equalTo("list"))
+
+        .body("links[4].href", equalTo(fullFilterUrl + "/list"))
+        .body("links[4].method", equalTo(HttpMethod.POST))
+        .body("links[4].rel", equalTo("list"))
+
+        .body("links[5].href", equalTo(fullFilterUrl + "/count"))
+        .body("links[5].method", equalTo(HttpMethod.GET))
+        .body("links[5].rel", equalTo("count"))
+
+        .body("links[6].href", equalTo(fullFilterUrl + "/count"))
+        .body("links[6].method", equalTo(HttpMethod.POST))
+        .body("links[6].rel", equalTo("count"))
+
+        .body("links[7].href", equalTo(fullFilterUrl))
+        .body("links[7].method", equalTo(HttpMethod.DELETE))
+        .body("links[7].rel", equalTo("delete"))
+
+    .when()
+        .options(SINGLE_FILTER_URL);
+
+    verify(identityServiceMock, times(3)).getCurrentAuthentication();
+    verify(authorizationServiceMock, times(1)).isUserAuthorized(MockProvider.EXAMPLE_USER_ID, null, READ, FILTER, MockProvider.EXAMPLE_FILTER_ID);
+    verify(authorizationServiceMock, times(1)).isUserAuthorized(MockProvider.EXAMPLE_USER_ID, null, DELETE, FILTER, MockProvider.EXAMPLE_FILTER_ID);
+    verify(authorizationServiceMock, times(1)).isUserAuthorized(MockProvider.EXAMPLE_USER_ID, null, UPDATE, FILTER, MockProvider.EXAMPLE_FILTER_ID);
+
   }
 
 }

@@ -13,18 +13,29 @@
 
 package org.camunda.bpm.engine.rest.impl;
 
+import static org.camunda.bpm.engine.authorization.Authorization.ANY;
+import static org.camunda.bpm.engine.authorization.Permissions.CREATE;
+import static org.camunda.bpm.engine.authorization.Resources.FILTER;
+
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
+
 import org.camunda.bpm.engine.FilterService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.filter.Filter;
 import org.camunda.bpm.engine.filter.FilterQuery;
+import org.camunda.bpm.engine.rest.AuthorizationRestService;
 import org.camunda.bpm.engine.rest.FilterRestService;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
+import org.camunda.bpm.engine.rest.dto.ResourceOptionsDto;
 import org.camunda.bpm.engine.rest.dto.runtime.FilterDto;
 import org.camunda.bpm.engine.rest.dto.runtime.FilterQueryDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
@@ -34,18 +45,18 @@ import org.camunda.bpm.engine.rest.sub.runtime.impl.FilterResourceImpl;
 /**
  * @author Sebastian Menski
  */
-public class FilterRestServiceImpl extends AbstractRestProcessEngineAware implements FilterRestService {
+public class FilterRestServiceImpl extends AbstractAuthorizedRestResource implements FilterRestService {
 
   public FilterRestServiceImpl() {
-    super();
+    super(FILTER, ANY);
   }
 
   public FilterRestServiceImpl(String engineName) {
-    super(engineName);
+    super(engineName, FILTER, ANY);
   }
 
   public FilterResource getFilter(String filterId) {
-    return new FilterResourceImpl(getProcessEngine(), filterId);
+    return new FilterResourceImpl(getProcessEngine().getName(), filterId, relativeRootResourcePath);
   }
 
   public List<FilterDto> getFilters(UriInfo uriInfo, Integer firstResult, Integer maxResults) {
@@ -107,6 +118,31 @@ public class FilterRestServiceImpl extends AbstractRestProcessEngineAware implem
     ProcessEngine engine = getProcessEngine();
     FilterQueryDto queryDto = new FilterQueryDto(queryParameters);
     return queryDto.toQuery(engine);
+  }
+
+  public ResourceOptionsDto availableOperations(UriInfo context) {
+
+    UriBuilder baseUriBuilder = context.getBaseUriBuilder()
+        .path(relativeRootResourcePath)
+        .path(FilterRestService.class);
+
+    ResourceOptionsDto resourceOptionsDto = new ResourceOptionsDto();
+
+    // GET /
+    URI baseUri = baseUriBuilder.build();
+    resourceOptionsDto.addReflexiveLink(baseUri, HttpMethod.GET, "list");
+
+    // GET /count
+    URI countUri = baseUriBuilder.clone().path("/count").build();
+    resourceOptionsDto.addReflexiveLink(countUri, HttpMethod.GET, "count");
+
+    // POST /create
+    if(isAuthorized(CREATE)) {
+      URI createUri = baseUriBuilder.clone().path("/create").build();
+      resourceOptionsDto.addReflexiveLink(createUri, HttpMethod.POST, "create");
+    }
+
+    return resourceOptionsDto;
   }
 
 }

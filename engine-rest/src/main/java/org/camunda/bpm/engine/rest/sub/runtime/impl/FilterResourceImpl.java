@@ -13,24 +13,34 @@
 
 package org.camunda.bpm.engine.rest.sub.runtime.impl;
 
+import static org.camunda.bpm.engine.authorization.Permissions.DELETE;
+import static org.camunda.bpm.engine.authorization.Permissions.READ;
+import static org.camunda.bpm.engine.authorization.Permissions.UPDATE;
+import static org.camunda.bpm.engine.authorization.Resources.FILTER;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriBuilder;
+import javax.ws.rs.core.UriInfo;
 
 import org.camunda.bpm.engine.FilterService;
-import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.filter.Filter;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
+import org.camunda.bpm.engine.rest.FilterRestService;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
+import org.camunda.bpm.engine.rest.dto.ResourceOptionsDto;
 import org.camunda.bpm.engine.rest.dto.runtime.FilterDto;
 import org.camunda.bpm.engine.rest.dto.task.TaskDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
@@ -39,17 +49,16 @@ import org.camunda.bpm.engine.rest.hal.EmptyHalResource;
 import org.camunda.bpm.engine.rest.hal.HalResource;
 import org.camunda.bpm.engine.rest.hal.task.HalTask;
 import org.camunda.bpm.engine.rest.hal.task.HalTaskList;
+import org.camunda.bpm.engine.rest.impl.AbstractAuthorizedRestResource;
 import org.camunda.bpm.engine.rest.sub.runtime.FilterResource;
 
 /**
  * @author Sebastian Menski
  */
-public class FilterResourceImpl implements FilterResource {
-
-  protected ProcessEngine engine;
-  protected String filterId;
+public class FilterResourceImpl extends AbstractAuthorizedRestResource implements FilterResource {
 
   protected FilterService filterService;
+  protected String relativeRootResourcePath;
 
   public static final String DTO_MAPPING = "dto";
   public static final String HAL_MAPPING = "hal";
@@ -66,10 +75,10 @@ public class FilterResourceImpl implements FilterResource {
     ENTITY_MAPPING.put(TaskEntity.class, mapping);
   }
 
-  public FilterResourceImpl(ProcessEngine engine, String filterId) {
-    this.engine = engine;
-    this.filterId = filterId;
-    filterService = engine.getFilterService();
+  public FilterResourceImpl(String processEngineName, String filterId, String relativeRootResourcePath) {
+    super(processEngineName, FILTER, filterId);
+    filterService = processEngine.getFilterService();
+    this.relativeRootResourcePath = relativeRootResourcePath;
   }
 
   public FilterDto getFilter() {
@@ -79,10 +88,10 @@ public class FilterResourceImpl implements FilterResource {
 
   public void deleteFilter() {
     try {
-      filterService.deleteFilter(filterId);
+      filterService.deleteFilter(resourceId);
     }
     catch (NullValueException e) {
-      throw new InvalidRequestException(Status.NOT_FOUND, e, "No filter found for id '" + filterId + "'");
+      throw new InvalidRequestException(Status.NOT_FOUND, e, "No filter found for id '" + resourceId + "'");
     }
   }
 
@@ -124,7 +133,7 @@ public class FilterResourceImpl implements FilterResource {
 
     if (entity != null) {
       Method fromEntity = getMethodFromMapping(entity.getClass(), HAL_MAPPING, "generate");
-      return (HalResource) invokeMappingMethod(fromEntity, entity, engine);
+      return (HalResource) invokeMappingMethod(fromEntity, entity, processEngine);
     }
     else {
       return EmptyHalResource.INSTANCE;
@@ -161,7 +170,7 @@ public class FilterResourceImpl implements FilterResource {
     if (entities != null && !entities.isEmpty()) {
       long count = executeFilterCount(null);
       Method fromEntityList = getMethodFromMapping(entities.get(0).getClass(), HAL_LIST_MAPPING, "generate");
-      return (HalResource) invokeMappingMethod(fromEntityList, entities, count, engine);
+      return (HalResource) invokeMappingMethod(fromEntityList, entities, count, processEngine);
     }
     else {
       return EmptyHalCollection.INSTANCE;
@@ -178,10 +187,10 @@ public class FilterResourceImpl implements FilterResource {
 
   protected Object executeFilterSingleResult(String extendingQuery) {
     try {
-      return filterService.singleResult(filterId, extendingQuery);
+      return filterService.singleResult(resourceId, extendingQuery);
     }
     catch (NullValueException e) {
-      throw new InvalidRequestException(Status.NOT_FOUND, e, "Filter with id '" + filterId + "' does not exist.");
+      throw new InvalidRequestException(Status.NOT_FOUND, e, "Filter with id '" + resourceId + "' does not exist.");
     }
     catch (NotValidException e) {
       throw new InvalidRequestException(Status.BAD_REQUEST, e, "Filter cannot be extended by an invalid query");
@@ -200,13 +209,13 @@ public class FilterResourceImpl implements FilterResource {
         if (maxResults == null) {
           maxResults = Integer.MAX_VALUE;
         }
-        return filterService.listPage(filterId, extendingQuery, firstResult, maxResults);
+        return filterService.listPage(resourceId, extendingQuery, firstResult, maxResults);
       } else {
-        return filterService.list(filterId, extendingQuery);
+        return filterService.list(resourceId, extendingQuery);
       }
     }
     catch (NullValueException e) {
-      throw new InvalidRequestException(Status.NOT_FOUND, e, "Filter with id '" + filterId + "' does not exist.");
+      throw new InvalidRequestException(Status.NOT_FOUND, e, "Filter with id '" + resourceId + "' does not exist.");
     }
     catch (NotValidException e) {
       throw new InvalidRequestException(Status.BAD_REQUEST, e, "Filter cannot be extended by an invalid query");
@@ -215,10 +224,10 @@ public class FilterResourceImpl implements FilterResource {
 
   protected long executeFilterCount(String extendingQuery) {
     try {
-      return filterService.count(filterId, extendingQuery);
+      return filterService.count(resourceId, extendingQuery);
     }
     catch (NullValueException e) {
-      throw new InvalidRequestException(Status.NOT_FOUND, e, "Filter with id '" + filterId + "' does not exist.");
+      throw new InvalidRequestException(Status.NOT_FOUND, e, "Filter with id '" + resourceId + "' does not exist.");
     }
     catch (NotValidException e) {
       throw new InvalidRequestException(Status.BAD_REQUEST, e, "Filter cannot be extended by an invalid query");
@@ -258,11 +267,49 @@ public class FilterResourceImpl implements FilterResource {
 
   protected Filter getDbFilter() {
     Filter filter = filterService
-      .getFilter(filterId);
+      .getFilter(resourceId);
 
     if (filter == null) {
-      throw new InvalidRequestException(Status.NOT_FOUND, "Filter with id '" + filterId + "' does not exist.");
+      throw new InvalidRequestException(Status.NOT_FOUND, "Filter with id '" + resourceId + "' does not exist.");
     }
     return filter;
+  }
+
+  public ResourceOptionsDto availableOperations(UriInfo context) {
+
+    ResourceOptionsDto dto = new ResourceOptionsDto();
+
+    UriBuilder baseUriBuilder = context.getBaseUriBuilder()
+        .path(relativeRootResourcePath)
+        .path(FilterRestService.class)
+        .path(resourceId);
+
+    URI baseUri = baseUriBuilder.build();
+
+    if (isAuthorized(READ)) {
+      dto.addReflexiveLink(baseUri, HttpMethod.GET, "self");
+
+      URI singleResultUri = baseUriBuilder.clone().path("/singleResult").build();
+      dto.addReflexiveLink(singleResultUri, HttpMethod.GET, "singleResult");
+      dto.addReflexiveLink(singleResultUri, HttpMethod.POST, "singleResult");
+
+      URI listUri = baseUriBuilder.clone().path("/list").build();
+      dto.addReflexiveLink(listUri, HttpMethod.GET, "list");
+      dto.addReflexiveLink(listUri, HttpMethod.POST, "list");
+
+      URI countUri = baseUriBuilder.clone().path("/count").build();
+      dto.addReflexiveLink(countUri, HttpMethod.GET, "count");
+      dto.addReflexiveLink(countUri, HttpMethod.POST, "count");
+    }
+
+    if (isAuthorized(DELETE)) {
+      dto.addReflexiveLink(baseUri, HttpMethod.DELETE, "delete");
+    }
+
+    if (isAuthorized(UPDATE)) {
+      dto.addReflexiveLink(baseUri, HttpMethod.PUT, "update");
+    }
+
+    return dto;
   }
 }
