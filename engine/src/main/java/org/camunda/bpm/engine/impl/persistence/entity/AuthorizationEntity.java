@@ -95,7 +95,21 @@ public class AuthorizationEntity implements Authorization, DbEntity, HasDbRevisi
     }    
     return (permissions & p.getValue()) != p.getValue();    
   }
-  
+
+  public boolean isEveryPermissionGranted() {
+    if(AUTH_TYPE_REVOKE == authorizationType) {
+      throw new IllegalStateException("Method isEveryPermissionGranted cannot be used for authorization type REVOKE.");
+    }
+    return permissions == Permissions.ALL.getValue();
+  }
+
+  public boolean isEveryPermissionRevoked() {
+    if (authorizationType == AUTH_TYPE_GRANT) {
+      throw new IllegalStateException("Method isEveryPermissionRevoked cannot be used for authorization type GRANT.");
+    }
+    return permissions == 0;
+  }
+
   public Permission[] getPermissions(Permission[] permissions) {
 
     List<Permission> result = new ArrayList<Permission>();

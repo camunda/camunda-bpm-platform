@@ -137,8 +137,24 @@ public interface Authorization {
    * @throws IllegalStateException if this {@link Authorization} is of type {@link #AUTH_TYPE_GRANT}
    */
   public boolean isPermissionRevoked(Permission permission);
-  
-  /** 
+
+  /**
+   * Allows checking whether this authorization grants every single permission.
+   *
+   * @return true if every single permission is granted otherwise false
+   * @throws IllegalStateException if this {@link Authorization} is of type {@link #AUTH_TYPE_REVOKE}
+   */
+  boolean isEveryPermissionGranted();
+
+  /**
+   * Allows checking whether this authorization revokes every single permission.
+   *
+   * @return true if every single permission is revoked otherwise false
+   * @throws IllegalStateException if this {@link Authorization} is of type {@link #AUTH_TYPE_GRANT}
+   */
+  boolean isEveryPermissionRevoked();
+
+  /**
    * Allows checking whether this authorization grants / revokes a set of permissions.
    * Usually the set of built-in permissions is used: {@link Permissions#values()}
    *  

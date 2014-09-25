@@ -292,7 +292,8 @@ public abstract class MockProvider {
   public static final String EXAMPLE_RESOURCE_TYPE_ID_STRING = "12345678";
   public static final String EXAMPLE_RESOURCE_ID = "exampleResourceId";
   public static final String EXAMPLE_PERMISSION_NAME = "READ";
-  public static final Permission[] EXAMPLE_PERMISSION_VALUES = new Permission[] { Permissions.READ, Permissions.UPDATE };
+  public static final Permission[] EXAMPLE_GRANT_PERMISSION_VALUES = new Permission[] { Permissions.NONE, Permissions.READ, Permissions.UPDATE };
+  public static final Permission[] EXAMPLE_REVOKE_PERMISSION_VALUES = new Permission[] { Permissions.ALL, Permissions.READ, Permissions.UPDATE };
   public static final String[] EXAMPLE_PERMISSION_VALUES_STRING = new String[] { "READ", "UPDATE" };
 
   public static final String EXAMPLE_AUTHORIZATION_ID = "someAuthorizationId";
@@ -893,7 +894,7 @@ public abstract class MockProvider {
 
     when(mockAuthorization.getResourceType()).thenReturn(EXAMPLE_RESOURCE_TYPE_ID);
     when(mockAuthorization.getResourceId()).thenReturn(EXAMPLE_RESOURCE_ID);
-    when(mockAuthorization.getPermissions(Permissions.values())).thenReturn(EXAMPLE_PERMISSION_VALUES);
+    when(mockAuthorization.getPermissions(Permissions.values())).thenReturn(EXAMPLE_GRANT_PERMISSION_VALUES);
 
     return mockAuthorization;
   }
@@ -907,7 +908,7 @@ public abstract class MockProvider {
 
     when(mockAuthorization.getResourceType()).thenReturn(EXAMPLE_RESOURCE_TYPE_ID);
     when(mockAuthorization.getResourceId()).thenReturn(EXAMPLE_RESOURCE_ID);
-    when(mockAuthorization.getPermissions(Permissions.values())).thenReturn(EXAMPLE_PERMISSION_VALUES);
+    when(mockAuthorization.getPermissions(Permissions.values())).thenReturn(EXAMPLE_GRANT_PERMISSION_VALUES);
 
     return mockAuthorization;
   }
@@ -921,7 +922,7 @@ public abstract class MockProvider {
 
     when(mockAuthorization.getResourceType()).thenReturn(EXAMPLE_RESOURCE_TYPE_ID);
     when(mockAuthorization.getResourceId()).thenReturn(EXAMPLE_RESOURCE_ID);
-    when(mockAuthorization.getPermissions(Permissions.values())).thenReturn(EXAMPLE_PERMISSION_VALUES);
+    when(mockAuthorization.getPermissions(Permissions.values())).thenReturn(EXAMPLE_REVOKE_PERMISSION_VALUES);
 
     return mockAuthorization;
   }

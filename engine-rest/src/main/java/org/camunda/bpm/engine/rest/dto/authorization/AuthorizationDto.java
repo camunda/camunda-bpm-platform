@@ -43,7 +43,7 @@ public class AuthorizationDto {
     authorizationDto.setType(dbAuthorization.getAuthorizationType());
 
     Permission[] dbPermissions = dbAuthorization.getPermissions(Permissions.values());
-    authorizationDto.setPermissions(PermissionConverter.getNamesForPermissions(dbPermissions));
+    authorizationDto.setPermissions(PermissionConverter.getNamesForPermissions(dbAuthorization, dbPermissions));
 
     authorizationDto.setUserId(dbAuthorization.getUserId());
     authorizationDto.setGroupId(dbAuthorization.getGroupId());

@@ -27,7 +27,6 @@ import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
@@ -253,7 +252,7 @@ public abstract class AbstractAuthorizationRestServiceInteractionTest extends Ab
     
     verify(authorizationServiceMock).createNewAuthorization(Authorization.AUTH_TYPE_GLOBAL);
     verify(authorization).setUserId(Authorization.ANY);
-    verify(authorization, times(2)).setResourceType(authorization.getAuthorizationType());
+    verify(authorization, times(4)).setResourceType(authorization.getAuthorizationType());
     verify(authorization, times(2)).setResourceId(authorization.getResourceId());
     verify(authorization, times(2)).setPermissions(authorization.getPermissions(Permissions.values()));
     verify(authorizationServiceMock).saveAuthorization(authorization);
@@ -282,7 +281,7 @@ public abstract class AbstractAuthorizationRestServiceInteractionTest extends Ab
     
     verify(authorizationServiceMock).createNewAuthorization(Authorization.AUTH_TYPE_GRANT);
     verify(authorization, times(2)).setUserId(authorization.getUserId());
-    verify(authorization, times(2)).setResourceType(authorization.getAuthorizationType());
+    verify(authorization, times(4)).setResourceType(authorization.getAuthorizationType());
     verify(authorization, times(2)).setResourceId(authorization.getResourceId());
     verify(authorization, times(2)).setPermissions(authorization.getPermissions(Permissions.values()));
     verify(authorizationServiceMock).saveAuthorization(authorization);
@@ -311,7 +310,7 @@ public abstract class AbstractAuthorizationRestServiceInteractionTest extends Ab
     
     verify(authorizationServiceMock).createNewAuthorization(Authorization.AUTH_TYPE_REVOKE);
     verify(authorization, times(2)).setUserId(authorization.getUserId());
-    verify(authorization, times(2)).setResourceType(authorization.getAuthorizationType());
+    verify(authorization, times(4)).setResourceType(authorization.getAuthorizationType());
     verify(authorization, times(2)).setResourceId(authorization.getResourceId());
     verify(authorization, times(2)).setPermissions(authorization.getPermissions(Permissions.values()));
     verify(authorizationServiceMock).saveAuthorization(authorization);

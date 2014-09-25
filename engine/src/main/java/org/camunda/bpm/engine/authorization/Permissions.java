@@ -24,7 +24,17 @@ public enum Permissions implements Permission {
    * It does not mean that no permissions are granted. */
   NONE("NONE", 0),
   
-  /** Indicates that  all interactions are permitted. */
+  /**
+   * Indicates that  all interactions are permitted.
+   * If ALL is revoked it means that the user is not permitted
+   * to do everything, which means that at least one permission
+   * is revoked. This does not implicate that all individual
+   * permissions are revoked.
+   *
+   * Example: If the UPDATE permission is revoke also the ALL
+   * permission is revoked, because the user is not authorized
+   * to execute all actions anymore.
+   */
   ALL("ALL", Integer.MAX_VALUE),
   
   /** Indicates that READ interactions are permitted. */
