@@ -692,6 +692,9 @@ define([
 
     checkFilterState();
 
-    $scope.createFilter = open;
+    $scope.createFilter = function() {
+      $scope.deletion = false;
+      open();
+    };
   }];
 });
