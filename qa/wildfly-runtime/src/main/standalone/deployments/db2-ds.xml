@@ -7,14 +7,6 @@
 		<password>sa</password>
 	  </security>
 	</datasource>
-	<datasource jta="true" jndi-name="java:jboss/datasources/CycleDS" pool-name="CycleDS" enabled="true" use-java-context="true" use-ccm="true">
-	  <connection-url>${database.url}</connection-url>
-	  <driver>db2</driver>
-	  <security>
-		<user-name>${database.user}</user-name>
-		<password>${database.password}</password>
-	  </security>
-	</datasource>
 	<datasource jndi-name="java:jboss/datasources/ProcessEngine" pool-name="ProcessEngine" jta="true" enabled="true" use-java-context="true" use-ccm="true">
 	  <connection-url>${database.url}</connection-url>
 	  <driver>db2</driver>

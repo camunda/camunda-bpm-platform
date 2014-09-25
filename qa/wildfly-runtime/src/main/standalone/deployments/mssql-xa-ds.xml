@@ -18,15 +18,4 @@
 		<valid-connection-checker class-name="org.jboss.jca.adapters.jdbc.extensions.mssql.MSSQLValidConnectionChecker"></valid-connection-checker>
 	  </validation>
 	</xa-datasource>
-	<xa-datasource jndi-name="java:jboss/datasources/CycleDS" enabled="true" use-ccm="false" pool-name="CycleDS">
-	  <xa-datasource-property name="URL">jdbc:sqlserver://${database.host}</xa-datasource-property>
-	  <xa-datasource-property name="PortNumber">1433</xa-datasource-property>
-	  <xa-datasource-property name="DatabaseName">${database.name}</xa-datasource-property>
-	  <xa-datasource-property name="User">${database.user}</xa-datasource-property>
-	  <xa-datasource-property name="Password">${database.password}</xa-datasource-property>
-	  <driver>com.microsoft.sqlserver</driver>
-	  <validation>
-		<valid-connection-checker class-name="org.jboss.jca.adapters.jdbc.extensions.mssql.MSSQLValidConnectionChecker"></valid-connection-checker>
-	  </validation>                   
-	</xa-datasource>
 </datasources>

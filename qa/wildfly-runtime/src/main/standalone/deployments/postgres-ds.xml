@@ -25,22 +25,4 @@
 			<background-validation>false</background-validation>
 		</validation>
 	</datasource>
-	<datasource jta="true" jndi-name="java:jboss/datasources/CycleDS" pool-name="CycleDS" enabled="true" use-java-context="true" use-ccm="true">
-		<connection-url>${database.url}</connection-url>
-		<driver>postgresql</driver>
-		<transaction-isolation>TRANSACTION_READ_COMMITTED</transaction-isolation>
-		<pool>
-			<prefill>false</prefill>
-			<use-strict-min>false</use-strict-min>
-			<flush-strategy>FailingConnectionOnly</flush-strategy>
-		</pool>
-		<security>
-			<user-name>${database.user}</user-name>
-			<password>${database.password}</password>
-		</security>
-		<validation>
-			<validate-on-match>false</validate-on-match>
-			<background-validation>false</background-validation>
-		</validation>
-	</datasource>	
 </datasources>

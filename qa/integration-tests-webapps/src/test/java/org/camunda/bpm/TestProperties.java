@@ -1,8 +1,5 @@
 package org.camunda.bpm;
 
-import org.camunda.bpm.cycle.test.TestCycleRoundtripIT;
-import org.camunda.bpm.cycle.util.IoUtil;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
@@ -58,11 +55,17 @@ public class TestProperties {
 
     InputStream propertiesStream = null;
     try {
-      propertiesStream = TestCycleRoundtripIT.class.getResourceAsStream(TESTCONFIG_PROPERTIES_FILE);
+      propertiesStream = TestProperties.class.getResourceAsStream(TESTCONFIG_PROPERTIES_FILE);
       properties.load(propertiesStream);
       String httpPort = (String) properties.get("http.port");
     } finally {
-      IoUtil.closeSilently(propertiesStream);
+      try {
+        if (propertiesStream != null) {
+          propertiesStream.close();
+        }
+      } catch(Exception e) {
+        // nop
+      }
     }
 
     return properties;

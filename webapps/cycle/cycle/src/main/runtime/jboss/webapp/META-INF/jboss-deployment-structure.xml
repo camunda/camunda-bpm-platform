@@ -1,7 +1,0 @@
-<jboss-deployment-structure>
-  <deployment>
-    <exclude-subsystems>
-      <subsystem name="resteasy" />
-    </exclude-subsystems>
-  </deployment>
-</jboss-deployment-structure>

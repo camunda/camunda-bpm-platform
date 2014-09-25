@@ -33,19 +33,6 @@
         <include>org.camunda.bpm.distro:camunda-sql-scripts:jar:*</include>
       </includes>
     </dependencySet>
-     
-    <dependencySet>
-      <outputDirectory />
-      <unpack>true</unpack>
-      <unpackOptions>
-        <includes>
-          <include>**/*.sql</include>
-        </includes>
-      </unpackOptions>
-      <includes>
-        <include>org.camunda.bpm.cycle:camunda-cycle-sql-scripts:jar:*</include>
-      </includes>
-    </dependencySet>
       
   	<dependencySet>
   		<includes>
@@ -53,14 +40,7 @@
   		</includes>
   		<outputDirectory>server/wildfly-${version.wildfly}/standalone/deployments</outputDirectory>
   	</dependencySet>
-  
-  	<dependencySet>
-  		<includes>
-  			<include>org.camunda.bpm.cycle:camunda-cycle-jboss:war:*</include>
-  		</includes>
-  		<outputDirectory>server/wildfly-${version.wildfly}/standalone/deployments</outputDirectory>
-  	</dependencySet>
-    
+
     <dependencySet>
         <includes>
             <include>org.camunda.bpm:camunda-engine-rest:war:*</include>
