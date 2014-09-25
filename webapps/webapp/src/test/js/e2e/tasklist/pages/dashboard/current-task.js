@@ -9,11 +9,11 @@ module.exports = Page.extend({
   },
 
   taskName: function() {
-    return element(by.binding('task.name')).getText();
+    return this.formElement().element(by.binding('task.name')).getText();
   },
 
   processName: function() {
-    return element(by.binding('task._embedded.processDefinition.name')).getText();
+    return this.formElement().element(by.binding('task._embedded.processDefinition[0].name')).getText();
   },
 
   completeButton: function() {

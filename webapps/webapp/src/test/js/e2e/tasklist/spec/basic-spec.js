@@ -27,28 +27,28 @@ describe('tasklist dashboard - ', function() {
     it("should claim a task", function () {
 
       // given
-      dashboardPage.filter.selectFilter(0);
+      dashboardPage.taskFilters.selectFilter(1);
 
       // when
-      var taskName = dashboardPage.tasks.taskTitle(0);
-      dashboardPage.tasks.selectTask(0);
-      dashboardPage.task.claim();
-      dashboardPage.filter.selectFilter(1);
+      var taskName = dashboardPage.taskList.taskTitle(0);
+      dashboardPage.taskList.selectTask(0);
+      dashboardPage.currentTask.claim();
+      dashboardPage.taskFilters.selectFilter(0);
 
       // then
-      expect(dashboardPage.tasks.taskList().count()).toBe(2);
-      expect(dashboardPage.tasks.taskTitle(1)).toEqual(taskName);
+      expect(dashboardPage.taskList.taskList().count()).toBe(2);
+      expect(dashboardPage.taskList.taskTitle(0)).toEqual(taskName);
     });
 
 
     it("schould unclaim a task", function () {
 
       // when
-      dashboardPage.tasks.selectTask(1);
-      dashboardPage.task.unclaim();
+      dashboardPage.taskList.selectTask(0);
+      dashboardPage.currentTask.unclaim();
 
       // then
-      expect(dashboardPage.tasks.taskList().count()).toBe(1);
+      expect(dashboardPage.taskList.taskList().count()).toBe(1);
     });
 
   });
@@ -56,21 +56,21 @@ describe('tasklist dashboard - ', function() {
 
   describe('filter list', function() {
 
-    it('should select MINES filter', function() {
+    it('should select MY TASKS filter', function() {
 
       // when
-      dashboardPage.filter.selectFilter(1);
+      dashboardPage.taskFilters.selectFilter(0);
 
       // then
-      dashboardPage.filter.isFilterSelected(1);
-      dashboardPage.filter.isFilterNotSelected(0);
-      expect(dashboardPage.tasks.taskList().count()).toBe(1);
+      dashboardPage.taskFilters.isFilterSelected(0);
+      dashboardPage.taskFilters.isFilterNotSelected(1);
+      expect(dashboardPage.taskList.taskList().count()).toBe(1);
     });
 
 
     describe('Start a process', function() {
 
-      it('should search and start process', function() {
+      xit('should search process', function() {
 
         // when
         dashboardPage.selectNavbarItem('Process');
@@ -81,10 +81,21 @@ describe('tasklist dashboard - ', function() {
       });
 
 
-      it('should start process', function() {
+      xit('should start process', function() {
 
         // when
         dashboardPage.startProcess.selectProcessFromSearchResult(1);
+
+        // then
+        expect(dashboardPage.startProcess.invoiceStartForm.creditorInput().isDisplayed()).toBe(true);
+      });
+
+
+      it("should start process", function () {
+
+        // when
+        dashboardPage.selectNavbarItem('Process');
+        dashboardPage.startProcess.selectProcess(12);
 
         // then
         expect(dashboardPage.startProcess.invoiceStartForm.creditorInput().isDisplayed()).toBe(true);
@@ -99,17 +110,16 @@ describe('tasklist dashboard - ', function() {
         dashboardPage.startProcess.invoiceStartForm.startButton().click();
       });
 
-    });
 
+      it('should check filter refresh', function() {
 
-    it('should check filter refresh', function() {
+        // then
+        expect(dashboardPage.taskList.taskList().count()).toBe(2);
+      });
 
-      // then
-      expect(dashboardPage.tasks.taskList().count()).toBe(2);
     });
 
   });
-
 
 
   describe('work on task', function() {
@@ -117,30 +127,29 @@ describe('tasklist dashboard - ', function() {
     it('should select a task', function() {
 
       // when
-      dashboardPage.filter.selectFilter(1);
-      dashboardPage.tasks.selectTask(0);
+      dashboardPage.taskFilters.selectFilter(0);
+      dashboardPage.taskList.selectTask(1);
 
       // then
-      expect(dashboardPage.task.taskName()).toBe('Assign Approver');
-      expect(dashboardPage.task.processName()).toBe('invoice receipt');
+      expect(dashboardPage.currentTask.taskName()).toBe('Assign Approver');
+      expect(dashboardPage.currentTask.processName()).toBe('invoice receipt');
     });
 
     it('should enter my task data', function() {
 
       // when
       dashboardPage.startProcess.invoiceStartForm.approverInput().sendKeys('jonny1');
-      dashboardPage.task.completeButton().click();
-
+      dashboardPage.currentTask.completeButton().click();
 
       // then
-      expect(dashboardPage.tasks.taskList().count()).toBe(1);
-      expect(dashboardPage.tasks.taskTitle(0)).not.toBe('Approve Invoice');
+      expect(dashboardPage.taskList.taskList().count()).toBe(1);
+      expect(dashboardPage.taskList.taskTitle(0)).not.toBe('Approve Invoice');
     });
 
   });
 
 
-  describe('end test', function() {
+  xdescribe('end test', function() {
 
     it('should logout', function() {
 
