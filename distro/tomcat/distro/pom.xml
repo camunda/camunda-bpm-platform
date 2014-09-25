@@ -29,19 +29,6 @@
     </dependency>
 
     <dependency>
-      <groupId>org.camunda.bpm.cycle</groupId>
-      <artifactId>camunda-cycle-sql-scripts</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.camunda.bpm.cycle</groupId>
-      <artifactId>camunda-cycle-tomcat</artifactId>
-      <version>${project.version}</version>
-      <type>war</type>
-    </dependency>
-
-    <dependency>
       <groupId>org.camunda.bpm.distro</groupId>
       <artifactId>camunda-h2-webapp</artifactId>
       <version>${project.version}</version>

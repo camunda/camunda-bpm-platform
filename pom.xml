@@ -35,8 +35,7 @@
         <module>qa</module>            
         
         <module>webapps/h2-webapp</module>
-        <module>webapps/cycle</module>
-        
+
         <module>javaee/ejb-service</module>
         <module>javaee/ejb-client</module>
         <module>javaee/jobexecutor-ra</module>
@@ -104,8 +103,6 @@
       <!-- profile for running webapp unit tests in QA -->
       <id>check-webapps</id>
       <modules>
-        <module>webapps/cycle</module>
-
         <module>parent</module>
         <module>bom</module>
       </modules>

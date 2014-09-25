@@ -61,18 +61,6 @@
               maxPoolSize="20"  
               minPoolSize="5" />
               
-    <Resource name="jdbc/CycleDS"
-              auth="Container"
-              type="javax.sql.DataSource" 
-              factory="org.apache.tomcat.jdbc.pool.DataSourceFactory"
-              uniqueResourceName="cycle-datasource"
-              driverClassName="${database.driver}" 
-              url="${database.url}"
-              username="${database.user}"  
-              password="${database.password}"  
-              maxPoolSize="20"  
-              minPoolSize="5" />
-
     <Resource name="global/camunda-bpm-platform/process-engine/ProcessEngineService!org.camunda.bpm.ProcessEngineService" auth="Container"
               type="org.camunda.bpm.ProcessEngineService"
               description="camunda BPM platform Process Engine Service"

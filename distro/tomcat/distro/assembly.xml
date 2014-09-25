@@ -33,27 +33,6 @@
     </dependencySet>
 
     <dependencySet>
-      <outputDirectory />
-      <unpack>true</unpack>
-      <unpackOptions>
-        <includes>
-          <include>**/*.sql</include>
-        </includes>
-      </unpackOptions>
-      <includes>
-        <include>org.camunda.bpm.cycle:camunda-cycle-sql-scripts:jar:*</include>
-      </includes>
-    </dependencySet>
-
-	<dependencySet>
-  		<includes>
-  			<include>org.camunda.bpm.cycle:camunda-cycle-tomcat:war:*</include>
-  		</includes>
-  		<outputDirectory>server/apache-tomcat-${version.tomcat}/webapps/cycle</outputDirectory>
-        <unpack>true</unpack>
-  	</dependencySet>
-
-    <dependencySet>
       <includes>
         <include>org.camunda.bpm.distro:camunda-h2-webapp:war:*</include>
       </includes>

@@ -26,8 +26,7 @@
     <jdbc-resource pool-name="__TimerPool" jndi-name="jdbc/__TimerPool" object-type="system-admin"></jdbc-resource>
     <jdbc-resource pool-name="DerbyPool" jndi-name="jdbc/__default"></jdbc-resource>
     <jdbc-resource pool-name="ProcessEnginePool" jndi-name="jdbc/ProcessEngine" enabled="true"></jdbc-resource>
-    <jdbc-resource pool-name="CamundaCyclePool" jndi-name="jdbc/CycleDS" enabled="true"></jdbc-resource>
-    
+
     <jdbc-connection-pool datasource-classname="org.apache.derby.jdbc.EmbeddedXADataSource" res-type="javax.sql.XADataSource" name="__TimerPool">
       <property name="databaseName" value="${com.sun.aas.instanceRoot}/lib/databases/ejbtimer"></property>
       <property name="connectionAttributes" value=";create=true"></property>
@@ -47,15 +46,6 @@
           name="ProcessEnginePool">
 	  <property name="Url" value="jdbc:h2:./camunda-h2-dbs/process-engine;DB_CLOSE_DELAY=-1;MVCC=TRUE;DB_CLOSE_ON_EXIT=FALSE"></property>
 	  <property name="User" value="sa"></property>
-      <property name="Password" value="sa"></property>
-    </jdbc-connection-pool>
-    <jdbc-connection-pool 
-          is-isolation-level-guaranteed="false" 
-          datasource-classname="org.h2.jdbcx.JdbcDataSource" 
-          res-type="javax.sql.DataSource" non-transactional-connections="true" 
-          name="CamundaCyclePool">
-      <property name="Url" value="jdbc:h2:./camunda-h2-dbs/camunda-cycle;DB_CLOSE_DELAY=-1;MVCC=TRUE;DB_CLOSE_ON_EXIT=FALSE"></property>
-      <property name="User" value="sa"></property>
       <property name="Password" value="sa"></property>
     </jdbc-connection-pool>
     <resource-adapter-config
@@ -82,7 +72,6 @@
       <resource-ref ref="jdbc/__TimerPool"></resource-ref>
       <resource-ref ref="jdbc/__default"></resource-ref>
       <resource-ref ref="jdbc/ProcessEngine"></resource-ref>
-      <resource-ref ref="jdbc/CycleDS"></resource-ref>
       <resource-ref ref="eis/JcaExecutorServiceConnectionFactory"></resource-ref>
     </server>
   </servers>

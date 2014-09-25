@@ -18,15 +18,4 @@
 		<valid-connection-checker class-name="org.jboss.jca.adapters.jdbc.extensions.mssql.MSSQLValidConnectionChecker"></valid-connection-checker>
 	  </validation>
 	</datasource>
-	<datasource jndi-name="java:jboss/datasources/CycleDS" enabled="true" use-java-context="true" jta="true" use-ccm="true" pool-name="CycleDS">
-	  <connection-url>${database.url}</connection-url>
-	  <driver>com.microsoft.sqlserver</driver>
-	  <security>
-		<user-name>${database.user}</user-name>
-		<password>${database.password}</password>
-	  </security>
-	  <validation>
-		<valid-connection-checker class-name="org.jboss.jca.adapters.jdbc.extensions.mssql.MSSQLValidConnectionChecker"></valid-connection-checker>
-	  </validation>                   
-	</datasource>	
 </datasources>
