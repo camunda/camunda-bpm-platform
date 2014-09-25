@@ -1,3 +1,5 @@
+package org.camunda.bpm.pa.demo;
+
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -10,33 +12,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.pa.service;
-
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.Serializable;
 
 /**
- * Objects of this class cannot be de-serialized.
- *
  * @author Daniel Meyer
  *
  */
-public class FailingSerializable implements Serializable {
+public class Customer {
 
-  protected String foo;
+  protected String firstname;
+  protected String lastname;
 
-  private static final long serialVersionUID = 1L;
-
-  private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
-    throw new ClassNotFoundException("Cannot load class FailingSerializable");
+  public Customer(String firstname, String lastname) {
+    this.firstname = firstname;
+    this.lastname = lastname;
   }
 
-  public String getFoo() {
-    return foo;
+  public String getFirstname() {
+    return firstname;
   }
 
-  public void setFoo(String foo) {
-    this.foo = foo;
+  public void setFirstname(String firstname) {
+    this.firstname = firstname;
   }
+
+  public String getLastname() {
+    return lastname;
+  }
+  public void setLastname(String lastname) {
+    this.lastname = lastname;
+  }
+
 }

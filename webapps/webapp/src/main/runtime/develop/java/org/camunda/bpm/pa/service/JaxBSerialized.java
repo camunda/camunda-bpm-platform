@@ -12,25 +12,16 @@
  */
 package org.camunda.bpm.pa.service;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.Serializable;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
- * Objects of this class cannot be de-serialized.
- *
  * @author Daniel Meyer
  *
  */
-public class FailingSerializable implements Serializable {
+@XmlRootElement
+public class JaxBSerialized {
 
   protected String foo;
-
-  private static final long serialVersionUID = 1L;
-
-  private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
-    throw new ClassNotFoundException("Cannot load class FailingSerializable");
-  }
 
   public String getFoo() {
     return foo;
@@ -39,4 +30,5 @@ public class FailingSerializable implements Serializable {
   public void setFoo(String foo) {
     this.foo = foo;
   }
+
 }

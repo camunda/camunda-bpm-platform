@@ -8,6 +8,9 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
+import org.camunda.bpm.engine.delegate.ProcessEngineVariableType;
+import static org.camunda.spin.Spin.*;
+import static org.camunda.spin.DataFormats.*;
 
 public class AnotherChangeVariablesService implements JavaDelegate {
 
@@ -69,6 +72,28 @@ public class AnotherChangeVariablesService implements JavaDelegate {
     variables.put("cockpitVariableList", cockpitVariableList);
 
     execution.setVariablesLocal(variables);
+
+    // set JSON variable
+
+    JsonSerialized jsonSerialized = new JsonSerialized();
+    jsonSerialized.setFoo("bar");
+
+    Map<String, Object> serializationConfig = new HashMap<String, Object>();
+    serializationConfig.put(ProcessEngineVariableType.SPIN_TYPE_DATA_FORMAT_ID, jsonTree().getName());
+    serializationConfig.put(ProcessEngineVariableType.SPIN_TYPE_CONFIG_ROOT_TYPE, jsonTree().getCanonicalTypeName(jsonSerialized));
+
+    execution.setVariableFromSerialized("jsonSerializable", JSON(jsonSerialized).toString(), ProcessEngineVariableType.SPIN.getName(), serializationConfig);
+
+    // set JAXB variable
+
+    JaxBSerialized jaxBSerialized = new JaxBSerialized();
+    jaxBSerialized.setFoo("bar");
+
+    serializationConfig.put(ProcessEngineVariableType.SPIN_TYPE_DATA_FORMAT_ID, xmlDom().getName());
+    serializationConfig.put(ProcessEngineVariableType.SPIN_TYPE_CONFIG_ROOT_TYPE, jaxBSerialized.getClass().getName());
+
+    execution.setVariableFromSerialized("xmlSerializable", XML(jaxBSerialized).toString(), ProcessEngineVariableType.SPIN.getName(), serializationConfig);
+
   }
 
 }
