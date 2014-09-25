@@ -1148,6 +1148,12 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         }
       } else {
         variableTypes.addType(new SerializableType());
+        if(ProcessEngineSpinSupport.isSpinAvailable()) {
+          VariableType spinVariableType = ProcessEngineSpinSupport
+            .getVariableTypeResolver()
+            .getTypeForSerializationFormat("application/json; implementation=tree");
+          variableTypes.addType(spinVariableType);
+        }
       }
 
       if (customPostVariableTypes!=null) {

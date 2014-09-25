@@ -19,7 +19,7 @@ public class HistoricVariableDataFormatTest extends AbstractProcessEngineTestCas
 
   protected static final String ONE_TASK_PROCESS = "org/camunda/bpm/engine/test/variables/oneTaskProcess.bpmn20.xml";
 
-  protected static final String JSON_FORMAT_NAME = DataFormats.jsonTreeFormat().getName();
+  protected static final String JSON_FORMAT_NAME = DataFormats.jsonTree().getName();
 
   @Override
   protected void initializeProcessEngine() {

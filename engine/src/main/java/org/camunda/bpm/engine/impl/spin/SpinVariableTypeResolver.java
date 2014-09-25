@@ -12,7 +12,6 @@
  */
 package org.camunda.bpm.engine.impl.spin;
 
-import java.util.HashSet;
 import java.util.Set;
 
 import org.camunda.bpm.engine.impl.variable.SerializationVariableTypeResolver;
@@ -42,14 +41,12 @@ public class SpinVariableTypeResolver implements SerializationVariableTypeResolv
       return null;
     }
 
-    return new SpinSerializationType(availableDataFormats, defaultFormat);
+    return new SpinSerializationType(defaultFormat);
 
   }
 
   public Set<DataFormat<?>> lookupDataFormats() {
-    Set<DataFormat<?>> availableDataFormats = new HashSet<DataFormat<?>>();
-    availableDataFormats.add(DataFormats.jsonTree());
-    return availableDataFormats;
+    return DataFormats.getAvailableDataFormats();
   }
 
 }

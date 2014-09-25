@@ -47,7 +47,7 @@ public class VariableDataFormatTest extends AbstractProcessEngineTestCase {
 
   protected static final String ONE_TASK_PROCESS = "org/camunda/bpm/engine/test/variables/oneTaskProcess.bpmn20.xml";
 
-  protected static final String JSON_FORMAT_NAME = DataFormats.jsonTreeFormat().getName();
+  protected static final String JSON_FORMAT_NAME = DataFormats.jsonTree().getName();
 
   @Override
   protected void initializeProcessEngine() {
@@ -240,16 +240,16 @@ public class VariableDataFormatTest extends AbstractProcessEngineTestCase {
   }
 
   public void testApplicationOfGlobalConfiguration() throws JSONException {
-    DataFormats.jsonTreeFormat().mapper().config("aKey", "aValue");
+    DataFormats.jsonTreeGlobal().mapper().config("aKey", "aValue");
 
     SpinVariableTypeResolver resolver = new SpinVariableTypeResolver();
     SpinSerializationType variableType = (SpinSerializationType) resolver.getTypeForSerializationFormat(JSON_FORMAT_NAME);
 
-    DataFormats.jsonTreeFormat().mapper().config("aKey", null);
+    DataFormats.jsonTreeGlobal().mapper().config("aKey", null);
 
     JsonJacksonTreeDataFormat dataFormat = (JsonJacksonTreeDataFormat) variableType.getDefaultDataFormat();
     assertNotSame("The variable type should not use the global data format instance",
-        DataFormats.jsonTreeFormat(), dataFormat);
+        DataFormats.jsonTreeGlobal(), dataFormat);
 
     assertEquals("The global configuration should have been applied to the variable type's format",
         "aValue", dataFormat.mapper().getConfiguration().get("aKey"));

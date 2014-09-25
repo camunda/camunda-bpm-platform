@@ -15,7 +15,6 @@ package org.camunda.bpm.engine.impl.spin;
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.ProcessEngineVariableType;
@@ -25,6 +24,7 @@ import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
 import org.camunda.bpm.engine.impl.variable.ValueFields;
 import org.camunda.bpm.engine.impl.variable.VariableType;
+import org.camunda.spin.DataFormats;
 import org.camunda.spin.Spin;
 import org.camunda.spin.SpinFactory;
 import org.camunda.spin.SpinRuntimeException;
@@ -32,20 +32,19 @@ import org.camunda.spin.spi.DataFormat;
 
 public class SpinSerializationType implements VariableType {
 
-  protected Map<String, DataFormat<?>> availableDataFormats;
+  protected Map<String, DataFormat<?>> availableDataFormats = new HashMap<String, DataFormat<?>>();
   protected DataFormat<?> defaultDataFormat;
 
   protected static final String CONFIG_DATA_FORMAT = ProcessEngineVariableType.SPIN_TYPE_DATA_FORMAT_ID;
   protected static final String CONFIG_ROOT_TYPE = ProcessEngineVariableType.SPIN_TYPE_CONFIG_ROOT_TYPE;
 
-  public SpinSerializationType(Set<DataFormat<?>> dataFormats, DataFormat<?> defaultDataFormat) {
-    this.availableDataFormats = new HashMap<String, DataFormat<?>>();
+  public SpinSerializationType(DataFormat<?> defaultDataFormat) {
 
-    for (DataFormat<?> format : dataFormats) {
-      availableDataFormats.put(format.getName(), format);
+    for (DataFormat<?> format : DataFormats.getAvailableDataFormats()) {
+      availableDataFormats.put(format.getName(), format.newInstance());
     }
 
-    this.defaultDataFormat = defaultDataFormat;
+    this.defaultDataFormat = defaultDataFormat.newInstance();
   }
 
   public String getTypeName() {

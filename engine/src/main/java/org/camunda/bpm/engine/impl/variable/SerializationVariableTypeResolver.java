@@ -22,4 +22,5 @@ public interface SerializationVariableTypeResolver {
    * or null if it cannot handle the format.
    */
   VariableType getTypeForSerializationFormat(String serializationFormat);
+
 }
