@@ -1,24 +1,24 @@
 package org.camunda.bpm.pa.demo;
 
-import java.util.Collections;
-import java.util.Map;
+import static org.camunda.bpm.engine.authorization.Authorization.AUTH_TYPE_GRANT;
+import static org.camunda.bpm.engine.authorization.Permissions.ACCESS;
+import static org.camunda.bpm.engine.authorization.Permissions.READ;
+import static org.camunda.bpm.engine.authorization.Resources.APPLICATION;
+import static org.camunda.bpm.engine.authorization.Resources.USER;
+
 import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.FilterService;
 import org.camunda.bpm.engine.ProcessEngine;
-import static org.camunda.bpm.engine.authorization.Authorization.*;
-import static org.camunda.bpm.engine.authorization.Permissions.*;
-import static org.camunda.bpm.engine.authorization.Resources.*;
-
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.authorization.Authorization;
+import org.camunda.bpm.engine.filter.Filter;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.task.TaskQuery;
-
-import org.camunda.bpm.engine.filter.Filter;
 
 /**
  * @author drobisch
@@ -159,26 +159,41 @@ public class InvoiceDemoDataGenerator {
 
       // Filter
       FilterService filterService = engine.getFilterService();
-      Map<String, Object> properties = new HashMap<String, Object>();
-      properties.put("description", "Unfiltered Tasks");
-      properties.put("priority", 1);
-      Filter filter = filterService.newTaskFilter().setName("All Tasks").setProperties(properties);
+
+      Map<String, Object> filterProperties = new HashMap<String, Object>();
+      filterProperties.put("description", "Unfiltered Tasks");
+      filterProperties.put("priority", 1);
+      Filter filter = filterService.newTaskFilter().setName("All Tasks").setProperties(filterProperties);
       filterService.saveFilter(filter);
 
+      filterProperties.clear();
+      filterProperties.put("description", "Tasks assigned to me");
+      filterProperties.put("priority", -10);
       TaskService taskService = engine.getTaskService();
-      TaskQuery query = taskService.createTaskQuery().taskAssignee("jonny1");
-      properties.clear();
-      properties.put("description", "Tasks assigned to me");
-      properties.put("priority", -10);
-      filter = filterService.newTaskFilter().setName("My Tasks").setProperties(properties).setQuery(query);
+      TaskQuery query = taskService.createTaskQuery().taskAssigneeExpression("${currentUser()}");
+      filter = filterService.newTaskFilter().setName("My Tasks").setProperties(filterProperties).setQuery(query);
       filterService.saveFilter(filter);
 
+      filterProperties.clear();
+      filterProperties.put("description", "Tasks candidate to my groups");
+      filterProperties.put("priority", -5);
+      query = taskService.createTaskQuery().taskCandidateGroupInExpression("${currentUserGroups()}");
+      filter = filterService.newTaskFilter().setName("My Group Tasks").setProperties(filterProperties).setQuery(query);
+      filterService.saveFilter(filter);
+
+      filterProperties.clear();
+      filterProperties.put("description", "Tasks assigned to group accounting");
+      filterProperties.put("priority", 5);
+      filterProperties.put("color", "#9fb4de");
       query = taskService.createTaskQuery().taskCandidateGroup("accounting");
-      properties.clear();
-      properties.put("description", "Tasks assigned to group accounting");
-      properties.put("priority", 5);
-      properties.put("color", "#3e4d2f");
-      filter = filterService.newTaskFilter().setName("Accounting Tasks").setProperties(properties).setQuery(query);
+      filter = filterService.newTaskFilter().setName("Accounting Tasks").setProperties(filterProperties).setQuery(query);
+      filterService.saveFilter(filter);
+
+      filterProperties.clear();
+      filterProperties.put("description", "Task due in the next three days");
+      filterProperties.put("priority", 0);
+      query = taskService.createTaskQuery().dueBeforeExpression("${dateTime().plusDays(4).withTimeAtStartOfDay()}");
+      filter = filterService.newTaskFilter().setName("Soon due tasks").setProperties(filterProperties).setQuery(query);
       filterService.saveFilter(filter);
 
     }
