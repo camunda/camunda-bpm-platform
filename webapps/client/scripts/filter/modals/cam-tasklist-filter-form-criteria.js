@@ -65,27 +65,38 @@ define([], function() {
       options: [
         {
           name: 'assignee',
-          label: 'Assignee'
+          label: 'Assignee',
+          expressionSupport: true
         },
         {
           name: 'assigneeLike',
-          label: 'Assignee Like'
+          label: 'Assignee Like',
+          expressionSupport: true
         },
         {
           name: 'owner',
-          label: 'Owner'
+          label: 'Owner',
+          expressionSupport: true
         },
         {
           name: 'candidateGroup',
-          label: 'Candidate Group'
+          label: 'Candidate Group',
+          expressionSupport: true
+        },
+        {
+          name: 'candidateGroups',
+          label: 'Candidate Groups',
+          expressionSupport: true
         },
         {
           name: 'candidateUser',
-          label: 'Candidate User'
+          label: 'Candidate User',
+          expressionSupport: true
         },
         {
           name: 'involvedUser',
-          label: 'Involved User'
+          label: 'Involved User',
+          expressionSupport: true
         },
         {
           name: 'unassigned',
@@ -94,10 +105,6 @@ define([], function() {
         {
           name: 'delegationState',
           label: 'Delegation State'
-        },
-        {
-          name: 'candidateGroups',
-          label: 'Candidate Groups'
         }
       ]
     },
@@ -150,28 +157,34 @@ define([], function() {
       group: 'Dates',
       options: [
         {
-          name: 'createdAfter',
-          label: 'Created After'
-        },
-        {
           name: 'createdBefore',
-          label: 'Created Before'
+          label: 'Created Before',
+          expressionSupport: true
         },
         {
-          name: 'dueAfter',
-          label: 'Due After'
+          name: 'createdAfter',
+          label: 'Created After',
+          expressionSupport: true
         },
         {
           name: 'dueBefore',
-          label: 'Due Before'
+          label: 'Due Before',
+          expressionSupport: true
+        },
+        {
+          name: 'dueAfter',
+          label: 'Due After',
+          expressionSupport: true
         },
         {
           name: 'followUpAfter',
-          label: 'Follow Up After'
+          label: 'Follow Up After',
+          expressionSupport: true
         },
         {
           name: 'followUpBefore',
-          label: 'Follow Up Before'
+          label: 'Follow Up Before',
+          expressionSupport: true
         }
       ]
     }

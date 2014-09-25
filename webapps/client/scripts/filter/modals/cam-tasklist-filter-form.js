@@ -14,6 +14,18 @@ define([
   var each = angular.forEach;
   var copy = angular.copy;
 
+  var expressionsExp = /^[\s]*(\#|\$)\{/;
+  function fixExpressions(arr) {
+    each(arr, function(obj, i) {
+      console.info('key is', obj.key, 'value is expression', expressionsExp.test(obj.value));
+      if (expressionsExp.test(obj.value) && obj.key.indexOf('Expression') === -1) {
+        arr[i].key = 'task'+ obj.key[0].toUpperCase() + obj.key.slice(1) +'Expression';
+        console.info('fixed key', arr[i].key);
+      }
+    });
+    return arr;
+  }
+
 
   function cleanJson(obj) {
     each(Object.keys(obj), function(key) {
@@ -185,6 +197,24 @@ define([
     $scope.removeCriterion = function(delta) {
       $scope._query = removeArrayItem($scope._query, delta);
     };
+
+    $scope.simpleCriterionName = function(name) {
+      if (!name) { return name; }
+      var simple = name.replace(/^task/, '').replace('Expression', '');
+      simple = simple[0].toLowerCase() + simple.slice(1);
+      return simple;
+    };
+
+    // $scope.criterionSupportExpressions = function(key) {
+    //   var check = $scope.simpleCriterionName(key);
+    //   for (var c in criteria) {
+    //     for (var i in criteria[c].options) {
+    //       if (check === criteria[c].options[i].name) {
+    //         return criteria[c].options[i].expressionSupport;
+    //       }
+    //     }
+    //   }
+    // };
 
     $scope.validateCriterion = function(criterion, delta) {
       criterion.error = null;
@@ -433,7 +463,7 @@ define([
         name:         $scope.filter.name,
         // owner:        $scope.filter.owner,
         resourceType: 'Task',
-        query:        makeObj($scope._query),
+        query:        makeObj(fixExpressions($scope._query)),
         properties:   {
           color:        $scope.filter.properties.color,
           description:  $scope.filter.properties.description,

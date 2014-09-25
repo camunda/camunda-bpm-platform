@@ -324,14 +324,16 @@
                   <optgroup ng-repeat="criteriaGroup in criteria"
                             label="{{ criteriaGroup.group | translate }}">
                     <option ng-repeat="criterion in criteriaGroup.options"
-                            ng-selected="criterion.name === queryParam.key"
+                            ng-selected="(criterion.name === queryParam.key) || (criterion.name === simpleCriterionName(queryParam.key))"
                             ng-value="criterion.name">
                       {{ criterion.label | translate }}
+                      {{ (criterion.expressionSupport ? '*' : '') }}
                     </option>
                   </optgroup>
                 </select>
+
                 <span ng-if="queryParam.error && queryParam.error.field === 'key'"
-                     class="help-block">
+                      class="help-block">
                   {{ queryParam.error.message | translate }}
                 </span>
               </div>
@@ -345,6 +347,13 @@
                      class="help-block">
                   {{ queryParam.error.message | translate }}
                 </span>
+
+                <!--
+                <span class="help-block"
+                      ng-show="criterionSupportExpressions(queryParam.key)"
+                      translate="FILTER_CRITERION_SUPPORT_EXPRESSION">
+                </span>
+                -->
               </div>
 
             </div>

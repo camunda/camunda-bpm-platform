@@ -67,9 +67,11 @@
   "FILTER_FORM_CRITERIA":
                         "Criteria",
   "FILTER_FORM_CRITERIA_HINT":
-                        "This section is aimed to set the parameters used to filter the tasks.",
+                        "This section is aimed to set the parameters used to filter the tasks. Keys marked with a * accept expressions as value.",
   "FILTER_CRITERIA_KEY":
                         "Key",
+  "FILTER_CRITERION_SUPPORT_EXPRESSION":
+                        "You can utilize expression with this criterion.",
   "FILTER_CRITERIA_OPERATOR":
                         "Operator",
   "FILTER_CRITERIA_VALUE":
