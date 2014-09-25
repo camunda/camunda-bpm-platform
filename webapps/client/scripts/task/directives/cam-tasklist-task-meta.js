@@ -61,8 +61,6 @@ define([
                 return errorNotification('TASK_UPDATE_ERROR', err);
               }
 
-              console.info('save '+ propName +' date', task[propName], result, inlineFieldScope.varValue.toJSON());
-
               $rootScope.$broadcast('tasklist.task.update');
               $rootScope.$broadcast('tasklist.task.'+propName);
 

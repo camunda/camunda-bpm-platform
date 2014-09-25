@@ -49,13 +49,5 @@ define([
 
   taskModule.directive('camTasklistTaskForm', taskFormDirective);
 
-  taskModule.controller('camTasklistTaskFormCtrl', [
-    '$scope',
-  function(
-    $scope
-  ) {
-    console.info('camTasklistTaskFormCtrl', this, $scope);
-  }]);
-
   return taskModule;
 });

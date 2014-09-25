@@ -178,8 +178,6 @@ define([
                 throw err;
               }
 
-              console.info('save '+ propName +' date', task[propName], result, inlineFieldScope.varValue.toJSON());
-
               // scope.$emit('tasklist.task.'+ propName);
 
               loadTasks();

@@ -39,67 +39,6 @@ define([
     'angularMoment'
   ]);
 
-
-  filterModule.factory('camTasklistFilterCriteriaConversion', [
-    '$rootScope',
-  function(
-    $rootScope
-  ) {
-    var tokenExp = /(\{[^\}]+\})/g;
-
-
-    function tokenReplace(val) {
-      var user = $rootScope.authentication;
-      if (val === '{self}') {
-        return user ? user.name : 'anonymous';
-      }
-
-      if (val === '{now}') {
-        return Math.round((new Date()).getTime() / 1000);
-      }
-
-      if (val === '{day}') {
-        return 60 * 60 * 24;
-      }
-
-      if (!tokenExp.test(val)) {
-        return val;
-      }
-
-      var pieces = [];
-
-      angular.forEach(val.split(tokenExp), function(piece) {
-        pieces.push(tokenReplace(piece));
-      });
-
-      return pieces.join('');
-    }
-
-    return tokenReplace;
-  }]);
-
-
-
-
-  filterModule.controller('filterCreateModalCtrl', [
-    '$modalInstance',
-    '$scope',
-  function(
-    $modalInstance,
-    $scope
-  ) {
-    $scope.createFilter = function() {
-      console.info('createFilter', arguments);
-    };
-
-    $scope.addFilter = function() {
-      console.info('addFilter', arguments, $scope);
-    };
-
-    $scope.abort = $modalInstance.dismiss;
-  }]);
-
-
   filterModule.controller('filterFormCtrl', camTasklistFilterForm);
 
   filterModule.directive('camTasklistFilters', camTasklistFilters);

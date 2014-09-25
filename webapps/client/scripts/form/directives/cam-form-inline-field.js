@@ -4,11 +4,7 @@ define([
   template
 ) {
   'use strict';
-  return [
-    // '$modal',
-  function(
-    // $modal
-  ) {
+  return [function() {
     return {
       scope: {
         varValue:       '=value',
@@ -26,7 +22,6 @@ define([
       template: template,
 
       link: function(scope, element) {
-        // var modalInstance;
 
         scope.editing =       false;
         scope.invalid =       false;
@@ -43,7 +38,6 @@ define([
 
         scope.echo = function(fieldScope) {
           scope.editValue = fieldScope.editValue;
-          // console.info('echo', fieldScope, arguments.length);
         };
 
         scope.simpleField = [
@@ -59,8 +53,6 @@ define([
           'week'
         ].indexOf(scope.varType) > -1;
 
-        console.info('init inline form field', scope.varType, scope.varValue, scope.editValue);
-
         scope.$watch('varValue', function(newVal, oldVal) {
           if (oldVal === newVal) { return; }
           console.info('varValue changed', oldVal, newVal);
@@ -70,13 +62,6 @@ define([
           if (oldVal === newVal) { return; }
           console.info('editValue changed', oldVal, newVal);
         });
-
-        console.info('scope', scope);
-
-        // scope.datePickerOptions = {
-        //   isOpen: false
-        // };
-
 
         function buildDatetime() {
           var d = scope._datetime.date;
@@ -106,13 +91,6 @@ define([
 
           scope.$watch('_datetime.date', buildDatetime);
           scope.$watch('_datetime.time', buildDatetime);
-
-          // scope.openDatePicker = function($event) {
-          //   $event.preventDefault();
-          //   $event.stopPropagation();
-
-          //   scope.datePickerOptions.isOpen = true;
-          // };
         }
 
 
@@ -121,45 +99,14 @@ define([
 
 
         scope.toggleEditing = function() {
-          // var modal = scope.varType === 'datetime' || scope.varType === 'date';
-          // if (modal) {
-          //   var modalInstance = $modal.open({
-          //     scope: scope,
-
-          //     size: 'sm',
-
-          //     controller: ['$scope', function($scope) {
-          //       $scope.$watch('_date', function() {
-          //         console.info('date changed', scope._date, $scope._date);
-          //       });
-          //       $scope.$watch('_time', function() {
-          //         console.info('time changed', scope._time, $scope._time);
-          //       });
-          //       console.info('modal controller', this, arguments);
-          //     }],
-
-          //     template: '<datepicker ng-model="_date">'+
-          //               (scope.varType === 'datetime' ? '<timepicker ng-model="_time" />' : '')
-          //   });
-          // }
-          // else {
-            scope.editing = !scope.editing;
-          // }
+          scope.editing = !scope.editing;
         };
 
-        // var lastValue = scope.varValue;
         scope.applyChange = function() {
-          // // just quit editing if the value didn't change
-          // if (lastValue === scope.editValue) {
-          //   scope.editing = false;
-          //   return;
-          // }
-
           scope.invalid = scope.validator(scope);
 
           if (!scope.invalid) {
             scope.varValue = scope.editValue;
-            // lastValue = scope.varValue;
 
             console.info('applyChange', scope.varValue);
             scope.$emit('change', scope.varValue);
