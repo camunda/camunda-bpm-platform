@@ -17,10 +17,8 @@ define([
   var expressionsExp = /^[\s]*(\#|\$)\{/;
   function fixExpressions(arr) {
     each(arr, function(obj, i) {
-      console.info('key is', obj.key, 'value is expression', expressionsExp.test(obj.value));
       if (expressionsExp.test(obj.value) && obj.key.indexOf('Expression') === -1) {
         arr[i].key = 'task'+ obj.key[0].toUpperCase() + obj.key.slice(1) +'Expression';
-        console.info('fixed key', arr[i].key);
       }
     });
     return arr;
@@ -254,7 +252,7 @@ define([
     └──────────────────────────────────────────────────────────────────────────────────────────────┘
     */
 
-    var permissionsMap = ['READ', 'UPDATE', 'DELETE'];
+    var permissionsMap = ['ALL', 'READ', 'UPDATE', 'DELETE'];
 
     var emptyAuthorization = {
       type:                 1,
@@ -269,38 +267,26 @@ define([
     $scope._authorizations = $scope.filter.authorizations;
 
     function availablePermissions(authorizationPermissions) {
-      var available = [];
-      if (authorizationPermissions.length === 1 && authorizationPermissions[0] === 'ALL') {
-        available = copy(permissionsMap);
-      }
-      else {
-        each(permissionsMap, function(permission) {
-          var has = authorizationPermissions.indexOf(permission);
+      var available = copy(permissionsMap);
 
-          if (has === -1) {
-            available.push(permission);
-          }
-        });
-
-        if (available.length < 2) {
-          available = ['ALL'];
+      each(authorizationPermissions, function(perm) {
+        var i = available.indexOf(perm);
+        if (i > -1) {
+          available.splice(i, 1);
         }
+      });
+
+      if (available.length < 3) {
+        available = ['ALL'];
       }
 
       return available;
     }
 
     each($scope._authorizations, function(authorization) {
-      if (authorization.permissions.indexOf('ALL') > -1) {
-        authorization.permissions = ['ALL'];
-      }
-
-      var hasNone = authorization.permissions.indexOf('NONE');
-      if (hasNone > -1) {
-        authorization.permissions.splice(hasNone, 1);
-      }
-      authorization.permissions = authorization.permissions.join(', ');
       authorization.availablePermissions = availablePermissions(authorization.permissions);
+
+      authorization.permissions = authorization.permissions.join(/[\s]*,[\s]*/);
       authorization.identity = authorization.userId || authorization.groupId;
       authorization.identityType = authorization.userId ? 'user' : 'group';
       authorization.type = parseInt(authorization.type, 10);
@@ -332,13 +318,13 @@ define([
         authorization.permissions = permission;
       }
       else {
-        var arr = authorization.permissions.split(',');
+        var arr = authorization.permissions.split(/[\s]*,[\s]*/);
         arr.push(permission);
         arr = cleanArray(arr);
         authorization.permissions = arr.join(', ');
       }
 
-      authorization.availablePermissions = availablePermissions(authorization.permissions);
+      authorization.availablePermissions = availablePermissions(authorization.permissions.split(/[\s]*,[\s]*/));
     };
 
     $scope.validateAuthorization = function(authorization, delta) {
