@@ -71,6 +71,9 @@
     <sequenceFlow id="sequenceFlow_178" isImmediate="true" sourceRef="assignApprover" targetRef="approveInvoice"/>
     <sequenceFlow id="SequenceFlow_2" name="" sourceRef="prepareBankTransfer" targetRef="ServiceTask_1"/>
     <startEvent id="StartEvent_1" activiti:formKey="embedded:app:/develop/invoice/invoice-start-form.html" name="Invoice&#xA;received">
+      <extensionElements>
+        <activiti:executionListener class="org.camunda.bpm.pa.service.CreateInvoiceDataListener" event="end"/>
+      </extensionElements>
       <outgoing>SequenceFlow_1</outgoing>
     </startEvent>
     <sequenceFlow id="SequenceFlow_1" name="" sourceRef="StartEvent_1" targetRef="assignApprover"/>

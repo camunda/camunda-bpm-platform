@@ -1,90 +1,57 @@
-<form class="form-horizontal"
-      role="form">
-
-  <div class="panel panel-default">
-    <div class="panel-body">
-      Who should approve this invoice?
-    </div>
-  </div>
-
-  <div class="control-group">
-    <label class="control-label">Creditor</label>
-    <div class="controls">
-      <input cam-variable-name="creditor"
-             type="text"
-             name="creditor"
-             ng-model="creditor"
-             readonly="true"
-             class="form-control" />
-    </div>
-  </div>
-  <div class="control-group">
-    <label class="control-label">Amount</label>
-    <div class="controls">
-      <input cam-variable-name="amount"
-             type="text"
-             name="amount"
-             ng-model="amount"
-             readonly="true"
-             class="form-control" />
-    </div>
-  </div>
-  <div class="control-group">
-    <label class="control-label">Invoice Number</label>
-    <div class="controls">
-      <input cam-variable-name="invoiceNumber"
-             type="text"
-             name="invoiceNumber"
-             ng-model="invoiceNumber"
-             readonly="true"
-             class="form-control" />
-    </div>
-  </div>
-  <div class="control-group">
-    <label class="control-label">Approver: </label>
-    <div class="controls">
-      <input cam-variable-name="approver"
-             cam-variable-type="String"
-             type="text"
-             name="approver"
-             ng-model="approver"
-             class="form-control"
-             required />
-
-      (i.e. &quot;john&quot;, &quot;mary&quot; or &quot;peter&quot;)
-    </div>
-  </div>
-
+<form role="form">
 
   <script cam-script type="text/form-script">
-    var $ = angular.element;
-    var each = angular.forEach;
-    var variableManager = camForm.variableManager;
-
+    camForm.on('form-loaded', function() {
+      camForm.variableManager.fetchVariable('invoiceData');
+    });
     camForm.on('variables-fetched', function() {
-      // access to all process variables after the form has loaded
-      console.log(variableManager.variables);
+      $scope.invoiceData = camForm.variableManager.variableValue('invoiceData');
     });
-
-    camForm.on('submit', function(evt) {
-      var invalid = false;
-
-      each(variableManager.variables, function(variable, name) {
-        var $input = $('[cam-variable-name="'+ name +'"]');
-        var $parent = $input.parents('.control-group');
-        var required = $input.attr('required') && !$input.attr('readonly');
-        var fieldValue = $input.val();
-        var fieldValid = !!(required && !$input.val());
-
-        $parent[fieldValid ? 'addClass' : 'removeClass']('has-error');
-
-        invalid = invalid || !fieldValid;
-      });
-
-      // handle submit
-      // may prevent the submit from being executed:
-      evt.submitPrevented = invalid;
-    });
-
   </script>
+
+  <div class="form-group">
+    <label for="invoiceNumber-field">Invoice Number</label>
+    <input id="invoiceNumber-field"
+           type="text"
+           class="form-control"
+           required
+           ng-model="invoiceData.invoiceNumber">
+  </div>
+  <div class="form-group">
+    <label for="amount-field">Amount</label>
+    <input id="amount-field"
+           type="text"
+           class="form-control"
+           required
+           ng-model="invoiceData.amount">
+  </div>
+  <div class="form-group">
+    <label for="creditor-field">Creditor</label>
+    <input id="creditor-field"
+           type="text"
+           class="form-control"
+           required
+           ng-model="invoiceData.creditor">
+  </div>
+  <div class="form-group">
+    <label for="priority-field">Priority</label>
+    <input id="priority-field"
+           type="number"
+           class="form-control"
+           required
+           ng-model="invoiceData.priority">
+  </div>
+
+  <div class="form-group">
+    <label for="approver-select">Approver</label>
+    <select required
+           id="approver-select"
+           class="form-control"
+           cam-variable-name="approver"
+           cam-variable-type="String"
+           cam-choices="potentialApprovers"
+           ng-model="approver">
+    <div class="help-block">Come on <strong>{{ approver }}</strong></div>
+  </div>
+
 </form>
