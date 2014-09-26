@@ -240,17 +240,6 @@ define([
       return simple;
     };
 
-    // $scope.criterionSupportExpressions = function(key) {
-    //   var check = $scope.simpleCriterionName(key);
-    //   for (var c in criteria) {
-    //     for (var i in criteria[c].options) {
-    //       if (check === criteria[c].options[i].name) {
-    //         return criteria[c].options[i].expressionSupport;
-    //       }
-    //     }
-    //   }
-    // };
-
     $scope.validateCriterion = function(criterion, delta) {
       criterion.error = null;
 

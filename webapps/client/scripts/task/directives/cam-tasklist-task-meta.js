@@ -135,7 +135,6 @@ define([
 
 
         scope.validateUser = function(/*info*/) {
-          // console.info('validateUser', this, this === scope, info);
         };
 
 

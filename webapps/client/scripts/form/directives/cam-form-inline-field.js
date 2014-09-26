@@ -53,15 +53,6 @@ define([
           'week'
         ].indexOf(scope.varType) > -1;
 
-        scope.$watch('varValue', function(newVal, oldVal) {
-          if (oldVal === newVal) { return; }
-          console.info('varValue changed', oldVal, newVal);
-        });
-
-        scope.$watch('editValue', function(newVal, oldVal) {
-          if (oldVal === newVal) { return; }
-          console.info('editValue changed', oldVal, newVal);
-        });
 
         function buildDatetime() {
           var d = scope._datetime.date;
@@ -108,7 +99,6 @@ define([
           if (!scope.invalid) {
             scope.varValue = scope.editValue;
 
-            console.info('applyChange', scope.varValue);
             scope.$emit('change', scope.varValue);
             scope.change(scope);
 
