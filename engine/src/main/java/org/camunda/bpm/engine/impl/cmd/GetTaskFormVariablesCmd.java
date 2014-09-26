@@ -15,6 +15,8 @@ package org.camunda.bpm.engine.impl.cmd;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.delegate.PersistentVariableInstance;
@@ -29,6 +31,8 @@ import org.camunda.bpm.engine.runtime.VariableInstance;
  *
  */
 public class GetTaskFormVariablesCmd extends AbstractGetFormVariablesCmd {
+
+  private final static Logger log = Logger.getLogger(GetTaskFormVariablesCmd.class.getName());
 
   public GetTaskFormVariablesCmd(String taskId, Collection<String> variableNames) {
     super(taskId, variableNames);
@@ -56,6 +60,20 @@ public class GetTaskFormVariablesCmd extends AbstractGetFormVariablesCmd {
 
     // collect remaining variables from task scope and parent scopes
     task.collectVariableInstances(result, formVariableNames);
+
+    // ensure serialized values are fetched
+    for (PersistentVariableInstance variableInstance : result.values()) {
+
+      if(variableInstance.storesCustomObjects()) {
+        try {
+            variableInstance.getSerializedValue();
+            variableInstance.getValue();
+        } catch(Exception t) {
+          // do not fail if one of the variables fails to load
+          log.log(Level.FINE, "Exception while getting value for variable", t);
+        }
+      }
+    }
 
     return (Map) result;
   }

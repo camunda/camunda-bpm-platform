@@ -567,12 +567,13 @@ public class FormServiceTest extends PluggableProcessEngineTestCase {
     processVars.put("someString", "initialValue");
     processVars.put("initialBooleanVariable", true);
     processVars.put("initialLongVariable", 1l);
+    processVars.put("serializable", Arrays.asList("a", "b", "c"));
 
     runtimeService.startProcessInstanceByKey("testProcess", processVars);
 
     Task task = taskService.createTaskQuery().singleResult();
     Map<String, VariableInstance> variables = formService.getTaskFormVariables(task.getId());
-    assertEquals(6, variables.size());
+    assertEquals(7, variables.size());
 
     VariableInstance variable = variables.get("stringField");
     assertEquals("someString", variable.getValue());
@@ -598,11 +599,14 @@ public class FormServiceTest extends PluggableProcessEngineTestCase {
     assertEquals(1l, variable.getValue());
     assertEquals("long", variable.getTypeName());
 
+    variable = variables.get("serializable");
+    assertNotNull(variable.getValue());
+
     // override the long variable
     taskService.setVariableLocal(task.getId(), "initialLongVariable", 2l);
 
     variables = formService.getTaskFormVariables(task.getId());
-    assertEquals(6, variables.size());
+    assertEquals(7, variables.size());
 
     variable = variables.get("initialLongVariable");
     assertEquals(2l, variable.getValue());
@@ -628,7 +632,7 @@ public class FormServiceTest extends PluggableProcessEngineTestCase {
 
     // null => all
     variables = formService.getTaskFormVariables(task.getId(), null);
-    assertEquals(6, variables.size());
+    assertEquals(7, variables.size());
 
   }
 
