@@ -215,7 +215,19 @@ define([
           processDefinitionId:  startingProcess.id,
           containerElement:     $('.start-form-container'),
           client:               camAPI,
-          formUrl:              formUrl
+          formUrl:              formUrl,
+          initialized:          function(camForm) {
+
+            var formName = camForm.formElement.attr('name');
+            var form = camForm.formElement.scope()[formName];
+
+            $scope.$watch(function() {
+              return form.$valid;
+            }, function(value) {
+              $scope.$invalid = !value;
+            });
+          }
+
         });
 
         $scope.startingProcess._form = form;

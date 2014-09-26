@@ -180,21 +180,21 @@ define([
               taskId:           scope.task.id,
               containerElement: targetContainer,
               client:           camAPI,
-              formUrl:          formUrl
+              formUrl:          formUrl,
+              initialized:       function(camForm) {
+
+                var formName = camForm.formElement.attr('name');
+                var form = camForm.formElement.scope()[formName];
+
+                scope.$watch(function() {
+                  return form.$valid;
+                }, function(value) {
+                  scope.$invalid = !value;
+                });
+              }
+
             });
 
-            // scope._camForm.once('form-loaded', function() {
-            //   scope.formScope = scope._camForm.formElement.scope();
-
-            //   scope.formScope.$watch('$invalid', function() {
-            //     if (scope.$invalid !== true && scope.$invalid !== false) {
-            //       return;
-            //     }
-
-            //     scope.$valid = !scope.formScope.$valid;
-            //     scope.$invalid = scope.formScope.$invalid;
-            //   });
-            // });
           }
           else {
             // clear the content (to avoid other tasks form to appear)
