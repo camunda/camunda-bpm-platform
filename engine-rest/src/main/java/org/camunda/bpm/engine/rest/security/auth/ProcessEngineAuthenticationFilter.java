@@ -88,13 +88,13 @@ public class ProcessEngineAuthenticationFilter implements Filter {
       Class<?> authenticationProviderClass = Class.forName(authenticationProviderClassName);
       authenticationProvider = (AuthenticationProvider) authenticationProviderClass.newInstance();
     } catch (ClassNotFoundException e) {
-      new ServletException("Cannot instantiate authentication filter: authentication provider not found", e);
+      throw new ServletException("Cannot instantiate authentication filter: authentication provider not found", e);
     } catch (InstantiationException e) {
-      new ServletException("Cannot instantiate authentication filter: cannot instantiate authentication provider", e);
+      throw new ServletException("Cannot instantiate authentication filter: cannot instantiate authentication provider", e);
     } catch (IllegalAccessException e) {
-      new ServletException("Cannot instantiate authentication filter: constructor not accessible", e);
+      throw new ServletException("Cannot instantiate authentication filter: constructor not accessible", e);
     } catch (ClassCastException e) {
-      new ServletException("Cannot instantiate authentication filter: authentication provider does not implement interface " +
+      throw new ServletException("Cannot instantiate authentication filter: authentication provider does not implement interface " +
           AuthenticationProvider.class.getName(), e);
     }
 
