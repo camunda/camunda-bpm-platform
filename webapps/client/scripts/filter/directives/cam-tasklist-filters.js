@@ -77,6 +77,7 @@ define([
               }
             });
 
+            $rootScope.$broadcast('filters.loaded', res);
             $scope.focus(first);
           });
         }

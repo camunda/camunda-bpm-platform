@@ -87,7 +87,7 @@ define([
 
 
         function loadTasks() {
-          if (!authed()) { return; }
+          if (!authed() || !scope.filter) { return; }
 
           scope.loading = true;
           scope.tasks = [];
@@ -213,6 +213,9 @@ define([
           setCurrentTask(null);
           // loadTasks();
         });
+
+
+        scope.$on('filters.loaded', loadTasks);
       }
     };
   }];
