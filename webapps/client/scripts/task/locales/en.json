@@ -71,6 +71,12 @@
   "COMPLETE_OK":
         "The task is completed.",
 
+  "TASK_UPDATE_SUCESS":
+        "The task was saved.",
+
+  "TASK_UPDATE_ERROR":
+        "The task could not be saved.",
+
   "COMPLETE":
         "Complete",
 
