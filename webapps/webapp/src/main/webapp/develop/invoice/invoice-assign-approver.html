@@ -1,4 +1,4 @@
-<form role="form">
+<form role="form" name="form">
 
   <script cam-script type="text/form-script">
     camForm.on('form-loaded', function() {
@@ -49,9 +49,8 @@
            class="form-control"
            cam-variable-name="approver"
            cam-variable-type="String"
-           cam-choices="potentialApprovers"
-           ng-model="approver">
-    <div class="help-block">Come on <strong>{{ approver }}</strong></div>
+           cam-choices="potentialApprovers">
+    <div class="help-block">Come on <strong>{{ camForm.approver }}</strong></div>
   </div>
 
 </form>
