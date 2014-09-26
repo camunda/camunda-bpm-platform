@@ -176,7 +176,7 @@ public abstract class AbstractFilterRestServiceInteractionTest extends AbstractR
 
   @Test
   public void testCreateFilter() {
-    FilterDto dto = FilterDto.fromFilter(MockProvider.createMockFilter());
+    FilterDto dto = FilterDto.fromFilter(eq(MockProvider.createMockFilter()));
 
     given()
       .contentType(POST_JSON_CONTENT_TYPE)
@@ -452,7 +452,7 @@ public abstract class AbstractFilterRestServiceInteractionTest extends AbstractR
     .when()
       .get(EXECUTE_LIST_FILTER_URL);
 
-    verify(filterServiceMock).list(MockProvider.EXAMPLE_FILTER_ID, null);
+    verify(filterServiceMock).list(eq(MockProvider.EXAMPLE_FILTER_ID), isNull(Query.class));
   }
 
   @Test
@@ -468,7 +468,7 @@ public abstract class AbstractFilterRestServiceInteractionTest extends AbstractR
     .when()
       .get(EXECUTE_LIST_FILTER_URL);
 
-    verify(filterServiceMock).list(MockProvider.EXAMPLE_FILTER_ID, null);
+    verify(filterServiceMock).list(eq(MockProvider.EXAMPLE_FILTER_ID), isNull(Query.class));
   }
 
   @Test
@@ -482,7 +482,7 @@ public abstract class AbstractFilterRestServiceInteractionTest extends AbstractR
     .when()
       .get(EXECUTE_LIST_FILTER_URL);
 
-    verify(filterServiceMock).list(MockProvider.EXAMPLE_FILTER_ID, null);
+    verify(filterServiceMock).list(eq(MockProvider.EXAMPLE_FILTER_ID), isNull(Query.class));
   }
 
   @Test
@@ -500,7 +500,7 @@ public abstract class AbstractFilterRestServiceInteractionTest extends AbstractR
     .when()
       .get(EXECUTE_LIST_FILTER_URL);
 
-    verify(filterServiceMock).list(MockProvider.EXAMPLE_FILTER_ID, null);
+    verify(filterServiceMock).list(eq(MockProvider.EXAMPLE_FILTER_ID), isNull(Query.class));
   }
 
   @Test
@@ -513,7 +513,7 @@ public abstract class AbstractFilterRestServiceInteractionTest extends AbstractR
     .when()
       .get(EXECUTE_LIST_FILTER_URL);
 
-    verify(filterServiceMock).list(MockProvider.NON_EXISTING_ID, null);
+    verify(filterServiceMock).list(eq(MockProvider.NON_EXISTING_ID), isNull(Query.class));
   }
 
   @Test
@@ -529,7 +529,7 @@ public abstract class AbstractFilterRestServiceInteractionTest extends AbstractR
     .when()
       .get(EXECUTE_LIST_FILTER_URL);
 
-    verify(filterServiceMock).listPage(MockProvider.EXAMPLE_FILTER_ID, null, 1, 2);
+    verify(filterServiceMock).listPage(eq(MockProvider.EXAMPLE_FILTER_ID), isNull(Query.class), eq(1), eq(2));
   }
 
   @Test
