@@ -77,12 +77,11 @@ define([
               }
             });
 
-            $rootScope.$broadcast('filters.loaded', res);
             $scope.focus(first);
           });
         }
 
-        $rootScope.$watch('authentication', listFilters);
+        listFilters();
 
         $rootScope.$on('filter.saved', listFilters);
 

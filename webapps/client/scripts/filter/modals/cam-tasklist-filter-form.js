@@ -611,24 +611,10 @@ define([
     $scope.loading = false;
 
 
-    $scope.userCanCreateFilter = false;
-    function checkFilterCreationAccess() {
-      if (!$rootScope.authentication || !$rootScope.authentication.name) {
-        $scope.userCanCreateFilter = false;
-        return;
-      }
-
-      Filter.authorizations(function(err, resp) {
-        if (err) { throw err; }
-        each(resp.links, function(link) {
-          if (link.rel === 'create') {
-            $scope.userCanCreateFilter = true;
-          }
-        });
-      });
-    }
-    checkFilterCreationAccess();
-    $rootScope.$watch('authentication.name', checkFilterCreationAccess);
+    $rootScope.$watch('authentication.userCanCreateFilter', function() {
+      if (!$rootScope.authentication) { return; }
+      $scope.userCanCreateFilter = $rootScope.authentication.userCanCreateFilter;
+    });
 
 
 

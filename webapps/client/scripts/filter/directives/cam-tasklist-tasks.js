@@ -232,7 +232,13 @@ define([
 
 
         scope.$on('tasklist.filter.current', function() {
-          if ($rootScope.currentFilter) {
+          if (scope.filter && $rootScope.currentFilter) {
+            if (scope.filter.id !== $rootScope.currentFilter.id) {
+              scope.filter = $rootScope.currentFilter;
+              loadTasks();
+            }
+          }
+          else if ($rootScope.currentFilter) {
             scope.filter = $rootScope.currentFilter;
             loadTasks();
           }
@@ -243,11 +249,10 @@ define([
 
         scope.$on('tasklist.task.complete', function() {
           setCurrentTask(null);
-          // loadTasks();
         });
 
 
-        scope.$on('filters.loaded', loadTasks);
+        scope.$on('filter.saved', loadTasks);
       }
     };
   }];
