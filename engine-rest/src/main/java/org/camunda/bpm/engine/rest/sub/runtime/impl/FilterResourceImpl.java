@@ -217,7 +217,7 @@ public class FilterResourceImpl extends AbstractAuthorizedRestResource implement
   }
 
   protected List<?> executeFilterList(String extendingQueryString, Integer firstResult, Integer maxResults) {
-    Query extendingQuery = convertQuery(extendingQueryString);
+    Query<?, ?> extendingQuery = convertQuery(extendingQueryString);
     try {
       if (firstResult != null || maxResults != null) {
         if (firstResult == null) {

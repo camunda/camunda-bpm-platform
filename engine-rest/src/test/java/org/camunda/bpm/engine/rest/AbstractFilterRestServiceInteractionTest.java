@@ -19,12 +19,14 @@ import static org.camunda.bpm.engine.authorization.Permissions.DELETE;
 import static org.camunda.bpm.engine.authorization.Permissions.READ;
 import static org.camunda.bpm.engine.authorization.Permissions.UPDATE;
 import static org.camunda.bpm.engine.authorization.Resources.FILTER;
+import static org.camunda.bpm.engine.rest.helper.TaskQueryMatcher.hasName;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isNull;
 import static org.mockito.Mockito.doThrow;
@@ -35,6 +37,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.Collections;
 import java.util.List;
+
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
@@ -58,8 +61,12 @@ import org.camunda.bpm.engine.rest.dto.task.TaskQueryDto;
 import org.camunda.bpm.engine.rest.hal.Hal;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.camunda.bpm.engine.task.TaskQuery;
+import org.codehaus.jackson.map.JsonMappingException;
 import org.junit.Before;
 import org.junit.Test;
+
+import com.jayway.restassured.http.ContentType;
+import com.jayway.restassured.response.Response;
 
 /**
  * @author Sebastian Menski
@@ -230,6 +237,8 @@ public abstract class AbstractFilterRestServiceInteractionTest extends AbstractR
       .body(dto)
     .then().expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode())
+      .contentType(ContentType.JSON)
+      .body("type", equalTo(JsonMappingException.class.getSimpleName()))
     .when()
       .put(SINGLE_FILTER_URL);
   }
@@ -438,7 +447,8 @@ public abstract class AbstractFilterRestServiceInteractionTest extends AbstractR
     .when()
       .post(EXECUTE_SINGLE_RESULT_FILTER_URL);
 
-    verify(filterServiceMock).singleResult(eq(MockProvider.EXAMPLE_FILTER_ID), any(Query.class));
+    verify(filterServiceMock).singleResult(eq(MockProvider.EXAMPLE_FILTER_ID),
+        argThat(hasName(MockProvider.EXAMPLE_TASK_NAME)));
   }
 
   @Test
@@ -579,7 +589,7 @@ public abstract class AbstractFilterRestServiceInteractionTest extends AbstractR
     .when()
       .post(EXECUTE_LIST_FILTER_URL);
 
-    verify(filterServiceMock).listPage(eq(MockProvider.EXAMPLE_FILTER_ID), any(Query.class), eq(1), eq(2));
+    verify(filterServiceMock).listPage(eq(MockProvider.EXAMPLE_FILTER_ID), isNull(Query.class), eq(1), eq(2));
   }
 
   @Test
@@ -595,7 +605,7 @@ public abstract class AbstractFilterRestServiceInteractionTest extends AbstractR
     .when()
       .post(EXECUTE_LIST_FILTER_URL);
 
-    verify(filterServiceMock).list(eq(MockProvider.EXAMPLE_FILTER_ID), any(Query.class));
+    verify(filterServiceMock).list(eq(MockProvider.EXAMPLE_FILTER_ID), argThat(hasName(MockProvider.EXAMPLE_TASK_NAME)));
   }
 
   @Test
@@ -613,7 +623,7 @@ public abstract class AbstractFilterRestServiceInteractionTest extends AbstractR
     .when()
       .post(EXECUTE_LIST_FILTER_URL);
 
-    verify(filterServiceMock).listPage(eq(MockProvider.EXAMPLE_FILTER_ID), any(Query.class), eq(1), eq(2));
+    verify(filterServiceMock).listPage(eq(MockProvider.EXAMPLE_FILTER_ID), argThat(hasName(MockProvider.EXAMPLE_TASK_NAME)), eq(1), eq(2));
   }
 
   @Test
@@ -685,7 +695,7 @@ public abstract class AbstractFilterRestServiceInteractionTest extends AbstractR
     .when()
       .post(EXECUTE_COUNT_FILTER_URL);
 
-    verify(filterServiceMock).count(eq(MockProvider.EXAMPLE_FILTER_ID), any(Query.class));
+    verify(filterServiceMock).count(eq(MockProvider.EXAMPLE_FILTER_ID), argThat(hasName(MockProvider.EXAMPLE_TASK_NAME)));
   }
 
   @Test

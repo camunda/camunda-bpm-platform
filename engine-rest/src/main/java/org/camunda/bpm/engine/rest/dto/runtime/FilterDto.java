@@ -13,7 +13,6 @@
 
 package org.camunda.bpm.engine.rest.dto.runtime;
 
-import java.io.IOException;
 import java.util.Map;
 
 import javax.ws.rs.core.Response.Status;
@@ -115,33 +114,6 @@ public class FilterDto {
     Query<?, ?> query = getQuery().toQuery(engine);
     filter.setQuery(query);
     filter.setProperties(getProperties());
-  }
-
-  protected static String jsonToString(Object json) {
-    if (json != null) {
-      try {
-        return objectMapper.writeValueAsString(json);
-      } catch (IOException e) {
-        throw new InvalidRequestException(Status.BAD_REQUEST, e, "Unable to convert object to JSON string");
-      }
-    }
-    else {
-      return null;
-    }
-  }
-
-  @SuppressWarnings("unchecked")
-  protected static Map<String, Object> stringToJsonMap(String json) {
-    if (json != null && !json.isEmpty()) {
-      try {
-        return (Map<String, Object>) objectMapper.readValue(json, Map.class);
-      } catch (IOException e) {
-        throw new InvalidRequestException(Status.BAD_REQUEST, e, "Unable to convert string to JSON object");
-      }
-    }
-    else {
-      return null;
-    }
   }
 
 }

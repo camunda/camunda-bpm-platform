@@ -26,7 +26,6 @@ public class FilterPropertiesTest extends PluggableProcessEngineTestCase {
   protected Filter filter;
   protected String nestedJsonObject = "{\"id\":\"nested\"}";
   protected String nestedJsonArray = "[\"a\",\"b\"]";
-  protected String propertiesString = "{\"color\": \"#123456\", \"priority\": 42, \"userDefined\": true, \"object\": " + nestedJsonObject  + ", \"array\": " + nestedJsonArray + "}";
 
 
   public void setUp() {
