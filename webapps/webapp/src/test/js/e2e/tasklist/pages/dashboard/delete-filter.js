@@ -12,7 +12,7 @@ module.exports = Page.extend({
     return this.formElement().element(by.css('[ng-click="delete()"]'));
   },
 
-  backButton: function() {
+  editFilterButton: function() {
     return this.formElement().element(by.css('[ng-click="abortDeletion()"]'));
   }
 

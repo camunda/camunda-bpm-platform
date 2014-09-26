@@ -82,30 +82,67 @@ describe('tasklist filter -', function() {
       dashboardPage.taskFilters.editFilterPage.selectPanel('General');
       dashboardPage.taskFilters.editFilterPage.selectPanel('Variables');
       dashboardPage.taskFilters.editFilterPage.selectPanel('Authorizations');
+
+      dashboardPage.taskFilters.editFilterPage.closeButton().click();
     });
 
 
-    it("should add new criteria", function () {
+    describe("variables", function () {
 
-      // when
-      dashboardPage.taskFilters.editFilterPage.selectPanel('Criteria');
-      dashboardPage.taskFilters.editFilterPage.addCriterionButton().click();
+      it("should open variables panel", function () {
 
-      // then
-      dashboardPage.taskFilters.editFilterPage.keyInput('Id');
-      dashboardPage.taskFilters.editFilterPage.valueInput('4711');
+        // when
+        dashboardPage.taskFilters.editFilter(0);
+        dashboardPage.taskFilters.editFilterPage.selectPanel('Variables');
 
-      dashboardPage.taskFilters.editFilterPage.saveButton().click();
+        // then
+        expect(dashboardPage.taskFilters.editFilterPage.variableList().count()).toBe(0);
+      });
+
+      it("should add a variable", function () {
+        var variableName = 'ÖÄÜ-123';
+        var varibleLabel = '123 blaw';
+
+        // when
+        dashboardPage.taskFilters.editFilterPage.addVariableButton().click();
+        dashboardPage.taskFilters.editFilterPage.variableNameInput(0,variableName);
+        dashboardPage.taskFilters.editFilterPage.variableLabelInput(0, varibleLabel);
+
+        // then
+        dashboardPage.taskFilters.editFilterPage.selectPanel('General');
+        dashboardPage.taskFilters.editFilterPage.selectPanel('Variables');
+        dashboardPage.taskFilters.editFilterPage.saveButton().click();
+      });
+
     });
 
 
-    it("should validate filter results", function () {
+    describe("criteria", function () {
 
-      // when
-      dashboardPage.taskFilters.selectFilter(0);
+      it("should add new criteria", function () {
 
-      // then
-      expect(dashboardPage.taskList.taskList().count()).toBe(0);
+        // when
+        dashboardPage.taskFilters.editFilter(0);
+        dashboardPage.taskFilters.editFilterPage.selectPanel('Criteria');
+        dashboardPage.taskFilters.editFilterPage.addCriterionButton().click();
+
+        // then
+        dashboardPage.taskFilters.editFilterPage.keyInput('Id');
+        dashboardPage.taskFilters.editFilterPage.valueInput('4711');
+
+        dashboardPage.taskFilters.editFilterPage.saveButton().click();
+      });
+
+
+      it("should validate filter results", function () {
+
+        // when
+        dashboardPage.taskFilters.selectFilter(0);
+
+        // then
+        expect(dashboardPage.taskList.taskList().count()).toBe(0);
+      });
+
     });
 
   });
@@ -119,10 +156,10 @@ describe('tasklist filter -', function() {
       dashboardPage.taskFilters.deleteFilter(0);
 
       // then
-      expect(dashboardPage.taskFilters.deleteFilterPage.formHeader()).toBe('Edit filter');
+      expect(dashboardPage.taskFilters.deleteFilterPage.formHeader()).toBe('Delete filter');
       expect(dashboardPage.taskFilters.deleteFilterPage.deleteButton().isPresent()).toBe(true);
       expect(dashboardPage.taskFilters.deleteFilterPage.closeButton().isPresent()).toBe(true);
-      expect(dashboardPage.taskFilters.deleteFilterPage.backButton().isPresent()).toBe(true);
+      expect(dashboardPage.taskFilters.deleteFilterPage.editFilterButton().isPresent()).toBe(true);
     });
 
 

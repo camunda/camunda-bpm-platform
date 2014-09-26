@@ -92,9 +92,57 @@ module.exports = Base.extend({
       inputField.sendKeys(inputValue);
 
     return inputField;
-  }
+  },
 
   // variables
 
+  addVariableButton: function() {
+    return this.formElement().element(by.css('[ng-click="addVariable()"]'));
+  },
+
+  variableList: function() {
+    return this.formElement().all(by.repeater('(delta, variable) in _variables'));
+  },
+
+  removeVariableButton: function(item) {
+    return this.variableList().get(item).element(by.css('[ng-click="removeVariable(delta)"]'));
+  },
+
+  variableNameInput: function(item, inputValue) {
+    var inputField = this.variableList().get(item).element(by.model('variable.name'));
+
+    if (arguments.length !== 0)
+      inputField.sendKeys(inputValue);
+
+    return inputField;
+  },
+
+  variableLabelInput: function(item, inputValue) {
+    var inputField = this.variableList().get(item).element(by.model('variable.label'));
+
+    if (arguments.length !== 0)
+      inputField.sendKeys(inputValue);
+
+    return inputField;
+  },
+
+  addVariable: function(name, label) {
+ /*   var items;
+
+    this.variableList().count()
+        .then(function(countVar) {
+          items = countVar;
+          console.log(items);
+        })
+        .then(element(by.css('[ng-click="addVariable()"]')))
+        .then(function(buttonElement) {
+          buttonElement.click();
+        });
+*//*        .then(function() {
+          this.variableNameInput(items, name);
+          this.variableLabelInput(items, label)
+        });*/
+
+  }
 
 });
