@@ -15,7 +15,9 @@ package org.camunda.bpm.engine.test.history;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
@@ -876,5 +878,60 @@ public class HistoricActivityInstanceTest extends PluggableProcessEngineTestCase
     }
 
     return historyService.createHistoricActivityInstanceQuery();
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/history/HistoricActivityInstanceTest.startEventTypesForEventSubprocess.bpmn20.xml")
+  public void FAILING_testMessageEventSubprocess() {
+    Map<String, Object> vars = new HashMap<String, Object>();
+    vars.put("shouldThrowError", false);
+    runtimeService.startProcessInstanceByKey("process", vars);
+
+    runtimeService.correlateMessage("newMessage");
+
+    HistoricActivityInstance historicActivity = historyService.createHistoricActivityInstanceQuery()
+        .activityId("messageStartEvent").singleResult();
+
+    assertEquals("messageStartEvent", historicActivity.getActivityType());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/history/HistoricActivityInstanceTest.startEventTypesForEventSubprocess.bpmn20.xml")
+  public void FAILING_testSignalEventSubprocess() {
+    Map<String, Object> vars = new HashMap<String, Object>();
+    vars.put("shouldThrowError", false);
+    runtimeService.startProcessInstanceByKey("process", vars);
+
+    runtimeService.signalEventReceived("newSignal");
+
+    HistoricActivityInstance historicActivity = historyService.createHistoricActivityInstanceQuery()
+        .activityId("signalStartEvent").singleResult();
+
+    assertEquals("signalStartEvent", historicActivity.getActivityType());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/history/HistoricActivityInstanceTest.startEventTypesForEventSubprocess.bpmn20.xml")
+  public void testTimerEventSubprocess() {
+    Map<String, Object> vars = new HashMap<String, Object>();
+    vars.put("shouldThrowError", false);
+    runtimeService.startProcessInstanceByKey("process", vars);
+
+    Job timerJob = managementService.createJobQuery().singleResult();
+    managementService.executeJob(timerJob.getId());
+
+    HistoricActivityInstance historicActivity = historyService.createHistoricActivityInstanceQuery()
+        .activityId("timerStartEvent").singleResult();
+
+    assertEquals("startTimerEvent", historicActivity.getActivityType());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/history/HistoricActivityInstanceTest.startEventTypesForEventSubprocess.bpmn20.xml")
+  public void testErrorEventSubprocess() {
+    Map<String, Object> vars = new HashMap<String, Object>();
+    vars.put("shouldThrowError", true);
+    runtimeService.startProcessInstanceByKey("process", vars);
+
+    HistoricActivityInstance historicActivity = historyService.createHistoricActivityInstanceQuery()
+        .activityId("errorStartEvent").singleResult();
+
+    assertEquals("errorStartEvent", historicActivity.getActivityType());
   }
 }
