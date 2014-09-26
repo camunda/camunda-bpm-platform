@@ -5,6 +5,7 @@
 
   <dependencies>
     <module name="javax.api"/>
+    <module name="javax.xml.bind.api"/>
     <module name="org.camunda.commons.camunda-commons-logging" />
     <module name="org.camunda.commons.camunda-commons-utils" />
   </dependencies>
