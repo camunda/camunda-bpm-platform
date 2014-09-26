@@ -80,10 +80,10 @@ function linkTo(project) {
 module.exports = function(grunt) {
   require('load-grunt-tasks')(grunt);
 
-  var skipTests =   !!grunt.option('skip-tests');
+  var skipTests =   !grunt.option('run-tests');
+  var mvnUpdate =   !grunt.option('offline');
   var verbose =     !!grunt.option('verbose');
   var stack =       !!grunt.option('stack');
-  var mvnUpdate =   !!grunt.option('update');
 
   var webappArgs = [
     'clean',
@@ -99,8 +99,9 @@ module.exports = function(grunt) {
 
   grunt.log.subhead('Will start the platform with command');
   grunt.log.writeln('mvn '+ webappArgs.join(' '));
+  grunt.log.writeln(skipTests ? 'Tests are skipped' : 'Tests will be performed on UI projects');
 
-  grunt.initConfig({
+  var config = {
     copy: {
       develop: {
         files: [
@@ -110,61 +111,6 @@ module.exports = function(grunt) {
             src: ['**/*.html'],
             dest: 'webapp/target/camunda-webapp/'
           }
-        ]
-      }
-    },
-
-    watch: {
-      develop: {
-        files: 'webapp/src/main/webapp/**/*.html',
-        tasks: [
-          'newer:copy:develop'
-        ]
-      },
-
-      targetAdmin: {
-        options: {
-          debounceDelay: 1000,
-        },
-        files: [
-          'webapp/src/test/js/e2e/admin/**/*.js',
-          // 'webapp/target/camunda-webapp/app/admin/**/*.{js,html}',
-          // '!webapp/target/camunda-webapp/app/admin/assets/**'
-          '../camunda-admin-ui/dist/app/admin/**/*.{js,html}',
-          '!../camunda-admin-ui/dist/app/admin/assets/**'
-        ],
-        tasks: [
-          'test:admin'
-        ]
-      },
-      targetCockpit: {
-        options: {
-          debounceDelay: 1000,
-        },
-        files: [
-          'webapp/src/test/js/e2e/cockpit/**/*.js',
-          // 'webapp/target/camunda-webapp/app/cockpit/**/*.{js,html}',
-          // '!webapp/target/camunda-webapp/app/cockpit/assets/**'
-          '../camunda-cockpit-ui/dist/app/cockpit/**/*.{js,html}',
-          '!../camunda-cockpit-ui/dist/app/cockpit/assets/**'
-        ],
-        tasks: [
-          'test:cockpit'
-        ]
-      },
-      targetTasklist: {
-        options: {
-          debounceDelay: 1000,
-        },
-        files: [
-          'webapp/src/test/js/e2e/tasklist/**/*.js',
-          // 'webapp/target/camunda-webapp/app/tasklist/**/*.{js,html}',
-          // '!webapp/target/camunda-webapp/app/tasklist/vendor/**'
-          '../camunda-tasklist-ui/dist/app/tasklist/**/*.{js,html}',
-          '!../camunda-tasklist-ui/dist/app/tasklist/vendor/**'
-        ],
-        tasks: [
-          'test:tasklist'
         ]
       }
     },
@@ -254,8 +200,69 @@ module.exports = function(grunt) {
           }
         ]
       }
+    },
+
+    watch: {
+      develop: {
+        files: 'webapp/src/main/webapp/**/*.html',
+        tasks: [
+          'newer:copy:develop'
+        ]
+      }
     }
-  });
+  };
+
+  if (!skipTests) {
+    config.watch.targetAdmin = {
+      options: {
+        debounceDelay: 1000,
+      },
+      files: [
+        'webapp/src/test/js/e2e/admin/**/*.js',
+        // 'webapp/target/camunda-webapp/app/admin/**/*.{js,html}',
+        // '!webapp/target/camunda-webapp/app/admin/assets/**'
+        '../camunda-admin-ui/dist/app/admin/**/*.{js,html}',
+        '!../camunda-admin-ui/dist/app/admin/assets/**'
+      ],
+      tasks: [
+        'test:admin'
+      ]
+    };
+
+    config.watch.targetCockpit = {
+      options: {
+        debounceDelay: 1000,
+      },
+      files: [
+        'webapp/src/test/js/e2e/cockpit/**/*.js',
+        // 'webapp/target/camunda-webapp/app/cockpit/**/*.{js,html}',
+        // '!webapp/target/camunda-webapp/app/cockpit/assets/**'
+        '../camunda-cockpit-ui/dist/app/cockpit/**/*.{js,html}',
+        '!../camunda-cockpit-ui/dist/app/cockpit/assets/**'
+      ],
+      tasks: [
+        'test:cockpit'
+      ]
+    };
+
+    config.watch.targetTasklist = {
+      options: {
+        debounceDelay: 1000,
+      },
+      files: [
+        'webapp/src/test/js/e2e/tasklist/**/*.js',
+        // 'webapp/target/camunda-webapp/app/tasklist/**/*.{js,html}',
+        // '!webapp/target/camunda-webapp/app/tasklist/vendor/**'
+        '../camunda-tasklist-ui/dist/app/tasklist/**/*.{js,html}',
+        '!../camunda-tasklist-ui/dist/app/tasklist/vendor/**'
+      ],
+      tasks: [
+        'test:tasklist'
+      ]
+    };
+  }
+
+  grunt.initConfig(config);
 
   grunt.registerTask('test', function(target) {
     var done = this.async();
@@ -286,11 +293,13 @@ module.exports = function(grunt) {
       testRun.stdout.on('data', function (data) {
         grunt.verbose.writeln(data.toString());
         stdout += data;
+        grunt.file.write('test.'+ target +'.out.log', stdout);
       });
 
       testRun.stderr.on('data', function (data) {
         grunt.verbose.writeln(data.toString());
         stderr += data;
+        grunt.file.write('test.'+ target +'.err.log', stderr);
       });
 
       testRun.on('close', function(code) {
