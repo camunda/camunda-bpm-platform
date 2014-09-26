@@ -4,7 +4,7 @@
 
   <div class="modal-header">
     <h3 class="modal-title">
-      {{ (filter.id ? 'FILTER_EDIT' : 'FILTER_CREATE') | translate }}
+      {{ (filter.id && !deletion ? 'FILTER_EDIT' : (deletion ? 'FILTER_DELETE' : 'FILTER_CREATE')) | translate }}
     </h3>
   </div>
 
@@ -477,7 +477,7 @@
                 class="btn btn-xs btn-link"
                 type="button"
                 ng-click="abortDeletion()"
-                translate="BACK">Back</button>
+                translate="FILTER_EDIT">Edit filter</button>
       </div>
 
       <div class="col-xs-8">
