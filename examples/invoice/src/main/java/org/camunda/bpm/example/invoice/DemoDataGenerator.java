@@ -1,25 +1,27 @@
 package org.camunda.bpm.example.invoice;
 
 import org.camunda.bpm.engine.AuthorizationService;
+import org.camunda.bpm.engine.FilterService;
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.authorization.Groups;
 import org.camunda.bpm.engine.authorization.Resource;
 import org.camunda.bpm.engine.authorization.Resources;
+import org.camunda.bpm.engine.filter.Filter;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity;
+import org.camunda.bpm.engine.task.TaskQuery;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Logger;
 
-import static org.camunda.bpm.engine.authorization.Authorization.ANY;
-import static org.camunda.bpm.engine.authorization.Authorization.AUTH_TYPE_GRANT;
-import static org.camunda.bpm.engine.authorization.Permissions.ACCESS;
-import static org.camunda.bpm.engine.authorization.Permissions.ALL;
-import static org.camunda.bpm.engine.authorization.Permissions.READ;
-import static org.camunda.bpm.engine.authorization.Resources.APPLICATION;
-import static org.camunda.bpm.engine.authorization.Resources.USER;
+import static org.camunda.bpm.engine.authorization.Authorization.*;
+import static org.camunda.bpm.engine.authorization.Permissions.*;
+import static org.camunda.bpm.engine.authorization.Resources.*;
 
 /**
  * Creates demo credentials to be used in the invoice showcase.
@@ -188,6 +190,39 @@ public class DemoDataGenerator {
       accMaryAuth.setResourceId("mary");
       accMaryAuth.addPermission(READ);
       authorizationService.saveAuthorization(accMaryAuth);
+
+      // create default filters
+
+      FilterService filterService = engine.getFilterService();
+
+      Map<String, Object> filterProperties = new HashMap<String, Object>();
+      filterProperties.put("description", "Tasks assigned to me");
+      filterProperties.put("priority", -10);
+      TaskService taskService = engine.getTaskService();
+      TaskQuery query = taskService.createTaskQuery().taskAssigneeExpression("${currentUser()}").orderByDueDate().asc();
+      Filter myTasksFilter = filterService.newTaskFilter().setName("My Tasks").setProperties(filterProperties).setQuery(query);
+      filterService.saveFilter(myTasksFilter);
+
+      filterProperties.clear();
+      filterProperties.put("description", "Tasks candidate to my groups");
+      filterProperties.put("priority", -5);
+      query = taskService.createTaskQuery().taskCandidateGroupInExpression("${currentUserGroups()}").orderByDueDate().asc();
+      Filter groupTasksFilter = filterService.newTaskFilter().setName("My Group Tasks").setProperties(filterProperties).setQuery(query);
+      filterService.saveFilter(groupTasksFilter);
+
+      // global read authorizations for these filters
+
+      Authorization globalMyTaskFilterRead = authorizationService.createNewAuthorization(Authorization.AUTH_TYPE_GLOBAL);
+      globalMyTaskFilterRead.setResource(FILTER);
+      globalMyTaskFilterRead.setResourceId(myTasksFilter.getId());
+      globalMyTaskFilterRead.addPermission(READ);
+      authorizationService.saveAuthorization(globalMyTaskFilterRead);
+
+      Authorization globalGroupFilterRead = authorizationService.createNewAuthorization(Authorization.AUTH_TYPE_GLOBAL);
+      globalGroupFilterRead.setResource(FILTER);
+      globalGroupFilterRead.setResourceId(groupTasksFilter.getId());
+      globalGroupFilterRead.addPermission(READ);
+      authorizationService.saveAuthorization(globalGroupFilterRead);
 
     }
 }

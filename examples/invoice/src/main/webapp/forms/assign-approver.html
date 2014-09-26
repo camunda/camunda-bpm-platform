@@ -36,14 +36,19 @@
   <div class="control-group">
     <label class="control-label">Approver: </label>
     <div class="controls">
-      <input cam-variable-name="approver"
-             cam-variable-type="String"
-             type="text"
-             name="approver"
-             class="form-control"
-             required />
-
-      (i.e. &quot;john&quot;, &quot;mary&quot; or &quot;peter&quot;)
+      <select cam-variable-name="approver"
+              cam-variable-type="String"
+              type="text"
+              name="approver"
+              class="form-control"
+              required>
+        <option></option>
+        <option value="demo">Demo</option>
+        <option value="john">John</option>
+        <option value="peter">Peter</option>
+        <option value="mary">Mary</option>
+      </select>
+      <p>Who should approve this invoice?</p>
     </div>
   </div>
 </form>
