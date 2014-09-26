@@ -14,6 +14,16 @@ define([
   var each = angular.forEach;
   var copy = angular.copy;
 
+
+  var criteriaExpressionSupport = {};
+  var criteriaHelp = {};
+  each(criteria, function(group) {
+    each(group.options, function(criterion) {
+      criteriaExpressionSupport[criterion.name] = criterion.expressionSupport;
+      criteriaHelp[criterion.name] = criterion.help;
+    });
+  });
+
   var expressionsExp = /^[\s]*(\#|\$)\{/;
   function fixExpressions(arr) {
     each(arr, function(obj, i) {
@@ -145,6 +155,8 @@ define([
     $scope.$valid = true;
 
     $scope.criteria = criteria;
+    $scope.criteriaExpressionSupport = criteriaExpressionSupport;
+    $scope.criteriaHelp = criteriaHelp;
 
     var state = $location.search();
     var opened = state.focus || 'general';
@@ -607,6 +619,16 @@ define([
     var Authorization = camAPI.resource('authorization');
     $scope.loading = false;
 
+    $scope.userCanCreateFilter = false;
+    Filter.authorizations(function(err, resp) {
+      if (err) { throw err; }
+
+      each(resp.links, function(link) {
+        if (link.rel === 'create') {
+          $scope.userCanCreateFilter = true;
+        }
+      });
+    });
 
     function clearScopeFilter() {
       $scope.filter = null;

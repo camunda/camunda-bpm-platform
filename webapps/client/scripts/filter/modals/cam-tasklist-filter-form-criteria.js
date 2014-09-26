@@ -66,37 +66,44 @@ define([], function() {
         {
           name: 'assignee',
           label: 'Assignee',
-          expressionSupport: true
+          expressionSupport: true,
+          help: 'E.g.: ${ currentUser() }'
         },
         {
           name: 'assigneeLike',
           label: 'Assignee Like',
-          expressionSupport: true
+          expressionSupport: true,
+          help: 'E.g.: ${ currentUser() }'
         },
         {
           name: 'owner',
           label: 'Owner',
-          expressionSupport: true
+          expressionSupport: true,
+          help: 'E.g.: ${ currentUser() }'
         },
         {
           name: 'candidateGroup',
           label: 'Candidate Group',
-          expressionSupport: true
+          expressionSupport: true,
+          help: 'E.g.: '
         },
         {
           name: 'candidateGroups',
           label: 'Candidate Groups',
-          expressionSupport: true
+          expressionSupport: true,
+          help: 'E.g.: ${ currentUserGroups() }'
         },
         {
           name: 'candidateUser',
           label: 'Candidate User',
-          expressionSupport: true
+          expressionSupport: true,
+          help: 'E.g.: ${ currentUser() }'
         },
         {
           name: 'involvedUser',
           label: 'Involved User',
-          expressionSupport: true
+          expressionSupport: true,
+          help: 'E.g.: ${ currentUser() }'
         },
         {
           name: 'unassigned',
@@ -159,32 +166,38 @@ define([], function() {
         {
           name: 'createdBefore',
           label: 'Created Before',
-          expressionSupport: true
+          expressionSupport: true,
+          help: 'E.g.: ${ now() }, ${ timeDate() } or ${ timeDate().plusWeeks(2) })'
         },
         {
           name: 'createdAfter',
           label: 'Created After',
-          expressionSupport: true
+          expressionSupport: true,
+          help: 'E.g.: ${ now() }, ${ timeDate() } or ${ timeDate().plusWeeks(2) })'
         },
         {
           name: 'dueBefore',
           label: 'Due Before',
-          expressionSupport: true
+          expressionSupport: true,
+          help: 'E.g.: ${ now() }, ${ timeDate() } or ${ timeDate().plusWeeks(2) })'
         },
         {
           name: 'dueAfter',
           label: 'Due After',
-          expressionSupport: true
+          expressionSupport: true,
+          help: 'E.g.: ${ now() }, ${ timeDate() } or ${ timeDate().plusWeeks(2) })'
         },
         {
           name: 'followUpAfter',
           label: 'Follow Up After',
-          expressionSupport: true
+          expressionSupport: true,
+          help: 'E.g.: ${ now() }, ${ timeDate() } or ${ timeDate().plusWeeks(2) })'
         },
         {
           name: 'followUpBefore',
           label: 'Follow Up Before',
-          expressionSupport: true
+          expressionSupport: true,
+          help: 'E.g.: ${ now() }, ${ timeDate() } or ${ timeDate().plusWeeks(2) })'
         }
       ]
     }

@@ -343,17 +343,23 @@
                        type="text"
                        ng-change="validateCriteria()"
                        ng-model="queryParam.value" />
+
+                <span class="help-block text-help"
+                      ng-show="criteriaHelp[simpleCriterionName(queryParam.key)]">
+                  {{ criteriaHelp[simpleCriterionName(queryParam.key)] | translate }}
+                </span>
+
+                <!--
+                <span class="help-block text-help"
+                      ng-show="criteriaExpressionSupport[simpleCriterionName(queryParam.key)]"
+                      translate="FILTER_CRITERION_SUPPORT_EXPRESSION">
+                </span>
+                -->
+
                 <span ng-if="queryParam.error && queryParam.error.field === 'value'"
                      class="help-block">
                   {{ queryParam.error.message | translate }}
                 </span>
-
-                <!--
-                <span class="help-block"
-                      ng-show="criterionSupportExpressions(queryParam.key)"
-                      translate="FILTER_CRITERION_SUPPORT_EXPRESSION">
-                </span>
-                -->
               </div>
 
             </div>
