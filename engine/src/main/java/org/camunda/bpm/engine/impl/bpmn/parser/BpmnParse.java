@@ -2557,17 +2557,6 @@ public class BpmnParse extends Parse {
     addTimerDeclaration(catchingScope, timerDeclaration);
   }
 
-  protected void parseMessageStartEventDefinitionForEventSubprocess(Element messageEventDefinition, ActivityImpl messageActivity, ScopeImpl catchingScope) {
-
-  }
-
-  protected void parseSignalStartEventDefinitionForEventSubprocess(Element signalEventDefinition, ActivityImpl signalActivity, ScopeImpl catchingScope) {
-    signalActivity.setProperty("type", "signalStartEvent");
-
-    EventSubscriptionDeclaration eventSubscriptionDeclaration = parseSignalEventDefinition(signalEventDefinition);
-    parseEventDefinitionForSubprocess(eventSubscriptionDeclaration, signalActivity, catchingScope, signalEventDefinition);
-  }
-
   protected void parseEventDefinitionForSubprocess(EventSubscriptionDeclaration subscriptionDeclaration, ActivityImpl activity, ScopeImpl catchingScope, Element element) {
     subscriptionDeclaration.setActivityId(activity.getId());
     subscriptionDeclaration.setEventScopeActivityId(catchingScope.getId());
