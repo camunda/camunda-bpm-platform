@@ -499,7 +499,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     historicFormPropertyEntity.setProcessDefinitionId(execution.getProcessDefinitionId());
     historicFormPropertyEntity.setProcessInstanceId(execution.getProcessInstanceId());
     historicFormPropertyEntity.setPropertyId(propertyId);
-    historicFormPropertyEntity.setPropertyValue(propertyValue);
+    historicFormPropertyEntity.setPropertyValue(propertyValue.toString());
     historicFormPropertyEntity.setTaskId(taskId);
 
     return historicFormPropertyEntity;

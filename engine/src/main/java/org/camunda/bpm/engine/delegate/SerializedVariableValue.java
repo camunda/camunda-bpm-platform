@@ -22,6 +22,16 @@ import org.camunda.bpm.engine.impl.variable.VariableType;
  * Confer {@link ProcessEngineVariableType} for documentation of the default variable
  * types.
  *
+ * <h2>Creating a SerializedVariableValue</h2>
+ * The {@link SerializedVariableValueBuilder} can be used for creating an instance of SerializedVariableValue:
+ * <pre>
+ * SerializedVariableValue serializedValue = SerializedVariableValueBuilder.create()
+ *   .value("{\"someProp\": 1}")
+ *   .configValue(ProcessEngineVariableType.SPIN_TYPE_DATA_FORMAT_ID, "application/json")
+ * .done();
+ * </pre>
+ *
+ *
  * @author Thorben Lindhauer
  */
 public interface SerializedVariableValue {

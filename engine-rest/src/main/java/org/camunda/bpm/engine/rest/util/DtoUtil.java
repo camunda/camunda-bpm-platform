@@ -20,6 +20,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.camunda.bpm.engine.delegate.ProcessEngineVariableType;
+import org.camunda.bpm.engine.delegate.SerializedVariableValue;
+import org.camunda.bpm.engine.delegate.SerializedVariableValueBuilder;
 import org.camunda.bpm.engine.rest.dto.runtime.VariableValueDto;
 
 public class DtoUtil {
@@ -35,11 +37,25 @@ public class DtoUtil {
     }
 
     Map<String, Object> variablesMap = new HashMap<String, Object>();
-    for (Entry<String, VariableValueDto> variable : variables.entrySet()) {
-      String type = variable.getValue().getType();
-      Object originalValue = variable.getValue().getValue();
-      Object concreteValue = toType(type, originalValue);
-      variablesMap.put(variable.getKey(), concreteValue);
+    for (Entry<String, VariableValueDto> variableEntry : variables.entrySet()) {
+
+      VariableValueDto variableDto = variableEntry.getValue();
+      if("Object".equals(variableDto.getType())) {
+        // special treatment for serialized values
+        SerializedVariableValue serializedValue = SerializedVariableValueBuilder.create()
+          .value(variableDto.getValue())
+          .config(variableDto.getSerializationConfig())
+          .done();
+        variablesMap.put(variableEntry.getKey(), serializedValue);
+
+      } else {
+        // primitive valued variables
+        String type = variableDto.getType();
+        Object originalValue = variableDto.getValue();
+        Object concreteValue = toType(type, originalValue);
+        variablesMap.put(variableEntry.getKey(), concreteValue);
+
+      }
     }
     return variablesMap;
   }

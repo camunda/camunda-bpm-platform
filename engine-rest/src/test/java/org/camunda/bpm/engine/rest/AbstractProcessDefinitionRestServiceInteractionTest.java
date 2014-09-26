@@ -35,6 +35,8 @@ import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.delegate.SerializedVariableValue;
+import org.camunda.bpm.engine.delegate.SerializedVariableValueBuilder;
 import org.camunda.bpm.engine.form.StartFormData;
 import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
 import org.camunda.bpm.engine.impl.util.IoUtil;
@@ -363,6 +365,45 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
     expectedVariables.put("aVariable", "aStringValue");
     expectedVariables.put("anotherVariable", 42);
     expectedVariables.put("aThirdValue", Boolean.TRUE);
+
+    verify(formServiceMock).submitStartForm(eq(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID), argThat(new EqualsMap(expectedVariables)));
+  }
+
+  @Test
+  public void testSubmitStartFormWithSerializedVariableValue() {
+
+    String jsonValue = "{}";
+    Map<String, Object> serializationConfig = new HashMap<String, Object>();
+    serializationConfig.put("someSerializationProp", "someSerializationVal");
+
+    Map<String, Object> variables = VariablesBuilder.create()
+        .variable("aVariable", "aStringValue")
+        .variableSerialized("aSerializedVariable", jsonValue, serializationConfig)
+        .getVariables();
+
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("variables", variables);
+
+    given().pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
+      .contentType(POST_JSON_CONTENT_TYPE).body(json)
+      .then().expect()
+        .statusCode(Status.OK.getStatusCode())
+        .body("id", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID))
+        .body("definitionId", equalTo(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID))
+        .body("businessKey", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_BUSINESS_KEY))
+        .body("ended", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_IS_ENDED))
+        .body("suspended", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_IS_SUSPENDED))
+      .when().post(SUBMIT_FORM_URL);
+
+    SerializedVariableValue serializedVariableValue = SerializedVariableValueBuilder.create()
+      .value(jsonValue)
+      .configValue("someSerializationProp", "someSerializationVal")
+      .done();
+
+
+    Map<String, Object> expectedVariables = new HashMap<String, Object>();
+    expectedVariables.put("aVariable", "aStringValue");
+    expectedVariables.put("aSerializedVariable", serializedVariableValue);
 
     verify(formServiceMock).submitStartForm(eq(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID), argThat(new EqualsMap(expectedVariables)));
   }

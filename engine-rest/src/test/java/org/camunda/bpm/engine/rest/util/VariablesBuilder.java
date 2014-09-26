@@ -52,6 +52,13 @@ public class VariablesBuilder {
     return variable(name, value, null, local);
   }
 
+  public VariablesBuilder variableSerialized(String name, String jsonValue, Map<String, Object> serializationConfig) {
+    Map<String, Object> variableValueMap = getVariableValueMap(jsonValue, "Object");
+    variableValueMap.put("serializationConfig", serializationConfig);
+    variables.put(name, variableValueMap);
+    return this;
+  }
+
   public Map<String, Object> getVariables() {
     return variables;
   }
@@ -99,4 +106,5 @@ public class VariablesBuilder {
 
     return serializedVariable;
   }
+
 }

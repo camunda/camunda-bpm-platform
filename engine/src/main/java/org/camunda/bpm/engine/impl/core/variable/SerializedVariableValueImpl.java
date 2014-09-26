@@ -41,6 +41,47 @@ public class SerializedVariableValueImpl implements SerializedVariableValue {
     this.config.put(key, value);
   }
 
+  public void setConfig(Map<String, Object> serializedValue) {
+    this.config.putAll(serializedValue);
+  }
 
+  public String toString() {
+    if(value != null) {
+      return value.toString();
+    } else {
+      return super.toString();
+    }
+  }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((config == null) ? 0 : config.hashCode());
+    result = prime * result + ((value == null) ? 0 : value.hashCode());
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
+    SerializedVariableValueImpl other = (SerializedVariableValueImpl) obj;
+    if (config == null) {
+      if (other.config != null)
+        return false;
+    } else if (!config.equals(other.config))
+      return false;
+    if (value == null) {
+      if (other.value != null)
+        return false;
+    } else if (!value.equals(other.value))
+      return false;
+    return true;
+  }
 
 }

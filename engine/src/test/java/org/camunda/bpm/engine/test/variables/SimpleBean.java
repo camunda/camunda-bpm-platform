@@ -75,4 +75,35 @@ public class SimpleBean {
     return toExpectedJsonString();
   }
 
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + (booleanProperty ? 1231 : 1237);
+    result = prime * result + intProperty;
+    result = prime * result + ((stringProperty == null) ? 0 : stringProperty.hashCode());
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
+    SimpleBean other = (SimpleBean) obj;
+    if (booleanProperty != other.booleanProperty)
+      return false;
+    if (intProperty != other.intProperty)
+      return false;
+    if (stringProperty == null) {
+      if (other.stringProperty != null)
+        return false;
+    } else if (!stringProperty.equals(other.stringProperty))
+      return false;
+    return true;
+  }
+
 }

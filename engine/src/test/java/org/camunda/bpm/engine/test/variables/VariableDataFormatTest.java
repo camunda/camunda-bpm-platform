@@ -25,6 +25,7 @@ import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.ProcessEngineVariableType;
 import org.camunda.bpm.engine.delegate.SerializedVariableValue;
+import org.camunda.bpm.engine.delegate.SerializedVariableValueBuilder;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.interceptor.Command;
@@ -420,6 +421,28 @@ public class VariableDataFormatTest extends AbstractProcessEngineTestCase {
     assertEquals(JSON_FORMAT_NAME, serializedValue.getConfig().get(ProcessEngineVariableType.SPIN_TYPE_DATA_FORMAT_ID));
     assertEquals("java.lang.Object", serializedValue.getConfig().get(ProcessEngineVariableType.SPIN_TYPE_CONFIG_ROOT_TYPE));
 
+  }
+
+  @Deployment(resources = ONE_TASK_PROCESS)
+  public void testSerializedVarValue() {
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+    // given
+
+    // the serialized value of a bean
+    SimpleBean simpleBean = new SimpleBean("someString", 1, true);
+    SerializedVariableValue serializedValue = SerializedVariableValueBuilder.create()
+      .value(simpleBean.toExpectedJsonString())
+      .configValue(ProcessEngineVariableType.SPIN_TYPE_DATA_FORMAT_ID, JSON_FORMAT_NAME)
+      .configValue(ProcessEngineVariableType.SPIN_TYPE_CONFIG_ROOT_TYPE, SimpleBean.class.getCanonicalName())
+    .done();
+
+    // when
+    runtimeService.setVariable(instance.getId(), "beanVariable", serializedValue);
+
+    // then
+    SimpleBean actualValue = (SimpleBean) runtimeService.getVariable(instance.getId(), "beanVariable");
+    assertEquals(simpleBean, actualValue);
   }
 
   public void testDisabledDeserialization() {

@@ -21,9 +21,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.delegate.PersistentVariableInstance;
 import org.camunda.bpm.engine.delegate.ProcessEngineVariableType;
+import org.camunda.bpm.engine.delegate.SerializedVariableValue;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.core.variable.CorePersistentVariableStore;
@@ -109,17 +111,27 @@ public abstract class AbstractPersistentVariableStore extends AbstractVariableSt
   }
 
   public void setVariableInstanceValue(PersistentVariableInstance variableInstance, Object value, CoreVariableScope<PersistentVariableInstance> sourceActivityExecution) {
-    VariableInstanceEntity variableInstanceEntity = (VariableInstanceEntity) variableInstance;
+    if(value != null && value instanceof SerializedVariableValue) {
+      SerializedVariableValue serializedVariableValue = (SerializedVariableValue) value;
+      setVariableInstanceValueFromSerialized(variableInstance,
+          serializedVariableValue.getValue(),
+          ProcessEngineVariableType.SPIN.getName(),
+          serializedVariableValue.getConfig(),
+          sourceActivityExecution);
 
-    if (!canStoreValue(variableInstanceEntity, value)) {
-      clearForNewValue(variableInstanceEntity, getVariableTypeForValue(value));
-    }
+    } else {
+      VariableInstanceEntity variableInstanceEntity = (VariableInstanceEntity) variableInstance;
 
-    variableInstanceEntity.setValue(value);
+      if (!canStoreValue(variableInstanceEntity, value)) {
+        clearForNewValue(variableInstanceEntity, getVariableTypeForValue(value));
+      }
 
-    // fire UPDATE event
-    if(isAutoFireHistoryEvents()) {
-      fireHistoricVariableInstanceUpdate(variableInstanceEntity, sourceActivityExecution);
+      variableInstanceEntity.setValue(value);
+
+      // fire UPDATE event
+      if(isAutoFireHistoryEvents()) {
+        fireHistoricVariableInstanceUpdate(variableInstanceEntity, sourceActivityExecution);
+      }
     }
   }
 
@@ -148,19 +160,29 @@ public abstract class AbstractPersistentVariableStore extends AbstractVariableSt
   }
 
   public PersistentVariableInstance createVariableInstance(String variableName, Object value, CoreVariableScope<PersistentVariableInstance> sourceActivityExecution) {
-    VariableType type = getVariableTypeForValue(value);
+    if(value != null && value instanceof SerializedVariableValue) {
+      SerializedVariableValue serializedVariableValue = (SerializedVariableValue) value;
+      return createVariableInstanceFromSerialized(variableName,
+          serializedVariableValue.getValue(),
+          ProcessEngineVariableType.SPIN.getName(),
+          serializedVariableValue.getConfig(),
+          sourceActivityExecution);
 
-    // create variable instance
-    VariableInstanceEntity variableInstance = VariableInstanceEntity.createAndInsert(variableName, type, value);
-    initializeVariableInstanceBackPointer(variableInstance);
-    variableInstances.put(variableName, variableInstance);
+    } else {
+      VariableType type = getVariableTypeForValue(value);
 
-    // fire CREATE event
-    if(isAutoFireHistoryEvents()) {
-      fireHistoricVariableInstanceCreate(variableInstance, sourceActivityExecution);
+      // create variable instance
+      VariableInstanceEntity variableInstance = VariableInstanceEntity.createAndInsert(variableName, type, value);
+      initializeVariableInstanceBackPointer(variableInstance);
+      variableInstances.put(variableName, variableInstance);
+
+      // fire CREATE event
+      if(isAutoFireHistoryEvents()) {
+        fireHistoricVariableInstanceCreate(variableInstance, sourceActivityExecution);
+      }
+
+      return variableInstance;
     }
-
-    return variableInstance;
   }
 
   public PersistentVariableInstance createVariableInstanceFromSerialized(String variableName, Object value, String variableTypeName,
