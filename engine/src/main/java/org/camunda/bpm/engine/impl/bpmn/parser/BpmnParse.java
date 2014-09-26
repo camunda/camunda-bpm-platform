@@ -3437,7 +3437,20 @@ public class BpmnParse extends Parse {
           addError("camunda:inputOutput mapping unsupported for element type '"+activityElement.getTagName()+"'.", activityElement);
 
         } else {
-          activity.setIoMapping(inputOutput);
+          if (activity.getActivityBehavior() instanceof MultiInstanceActivityBehavior
+              && !inputOutput.getOutputParameters().isEmpty()) {
+            addError("Output parameters not allowed for multi-instance constructs", activityElement);
+          }
+
+          if (activity.getActivityBehavior() instanceof ParallelMultiInstanceBehavior) {
+            ParallelMultiInstanceBehavior behavior = (ParallelMultiInstanceBehavior) activity.getActivityBehavior();
+            behavior.setIoMapping(inputOutput);
+
+          } else {
+            activity.setIoMapping(inputOutput);
+
+          }
+
           // turn activity into a scope (->local scope for variables) unless it is an event subprocess
           if(!activityElement.getTagName().equals("subprocess")
               && !parseBooleanAttribute(activityElement.attribute(PROPERTYNAME_TRIGGERED_BY_EVENT), false)) {

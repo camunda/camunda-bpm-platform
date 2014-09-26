@@ -16,10 +16,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.VariableInstance;
+import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 
 /**
@@ -647,6 +651,129 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
     VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1").singleResult();
     assertNotNull(variable);
     assertEquals("stringValue", variable.getValue());
+  }
+
+  @Deployment
+  public void testSequentialMIActivityIoSupport() {
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("counter", new AtomicInteger());
+    variables.put("nrOfLoops", 2);
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("miSequentialActivity", variables);
+
+    // first sequential mi execution
+    Execution miExecution = runtimeService.createExecutionQuery().activityId("miTask").singleResult();
+    assertNotNull(miExecution);
+    assertFalse(instance.getId().equals(miExecution.getId()));
+    assertEquals(0, runtimeService.getVariable(miExecution.getId(), "loopCounter"));
+
+    // input mapping
+    assertEquals(1, runtimeService.createVariableInstanceQuery().variableName("miCounterValue").count());
+    assertEquals(1, runtimeService.getVariableLocal(miExecution.getId(), "miCounterValue"));
+
+    Task task = taskService.createTaskQuery().singleResult();
+    taskService.complete(task.getId());
+
+    // second sequential mi execution
+    miExecution = runtimeService.createExecutionQuery().activityId("miTask").singleResult();
+    assertNotNull(miExecution);
+    assertFalse(instance.getId().equals(miExecution.getId()));
+    assertEquals(1, runtimeService.getVariable(miExecution.getId(), "loopCounter"));
+
+    // input mapping
+    assertEquals(1, runtimeService.createVariableInstanceQuery().variableName("miCounterValue").count());
+    assertEquals(2, runtimeService.getVariableLocal(miExecution.getId(), "miCounterValue"));
+
+    task = taskService.createTaskQuery().singleResult();
+    taskService.complete(task.getId());
+  }
+
+  @Deployment
+  public void testSequentialMISubprocessIoSupport() {
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("counter", new AtomicInteger());
+    variables.put("nrOfLoops", 2);
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("miSequentialSubprocess", variables);
+
+    // first sequential mi execution
+    Execution miScopeExecution = runtimeService.createExecutionQuery().activityId("task").singleResult();
+    assertNotNull(miScopeExecution);
+    assertEquals(0, runtimeService.getVariable(miScopeExecution.getId(), "loopCounter"));
+
+    // input mapping
+    assertEquals(1, runtimeService.createVariableInstanceQuery().variableName("miCounterValue").count());
+    assertEquals(1, runtimeService.getVariableLocal(miScopeExecution.getId(), "miCounterValue"));
+
+    Task task = taskService.createTaskQuery().singleResult();
+    taskService.complete(task.getId());
+
+    // second sequential mi execution
+    miScopeExecution = runtimeService.createExecutionQuery().activityId("task").singleResult();
+    assertNotNull(miScopeExecution);
+    assertFalse(instance.getId().equals(miScopeExecution.getId()));
+    assertEquals(1, runtimeService.getVariable(miScopeExecution.getId(), "loopCounter"));
+
+    // input mapping
+    assertEquals(1, runtimeService.createVariableInstanceQuery().variableName("miCounterValue").count());
+    assertEquals(2, runtimeService.getVariableLocal(miScopeExecution.getId(), "miCounterValue"));
+  }
+
+  @Deployment
+  public void testParallelMIActivityIoSupport() {
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("counter", new AtomicInteger());
+    variables.put("nrOfLoops", 2);
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("miParallelActivity", variables);
+
+    // first mi execution
+    Execution miExecution1 = runtimeService.createExecutionQuery().activityId("miTask")
+        .variableValueEquals("loopCounter", 0).singleResult();
+    assertNotNull(miExecution1);
+    assertFalse(instance.getId().equals(miExecution1.getId()));
+    assertEquals(1, runtimeService.getVariableLocal(miExecution1.getId(), "miCounterValue"));
+
+    // second mi execution
+    Execution miExecution2 = runtimeService.createExecutionQuery().activityId("miTask")
+        .variableValueEquals("loopCounter", 1).singleResult();
+    assertNotNull(miExecution2);
+    assertFalse(instance.getId().equals(miExecution2.getId()));
+    assertEquals(2, runtimeService.getVariableLocal(miExecution2.getId(), "miCounterValue"));
+
+    assertEquals(2, runtimeService.createVariableInstanceQuery().variableName("miCounterValue").count());
+  }
+
+  @Deployment
+  public void testParallelMISubprocessIoSupport() {
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("counter", new AtomicInteger());
+    variables.put("nrOfLoops", 2);
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("miParallelSubprocess", variables);
+
+    // first sequential mi execution
+    Execution miScopeExecution1 = runtimeService.createExecutionQuery().activityId("task")
+        .variableValueEquals("loopCounter", 0).singleResult();
+    assertNotNull(miScopeExecution1);
+    assertEquals(1, runtimeService.getVariableLocal(miScopeExecution1.getId(), "miCounterValue"));
+
+    // second sequential mi execution
+    Execution miScopeExecution2 = runtimeService.createExecutionQuery().activityId("task")
+        .variableValueEquals("loopCounter", 1).singleResult();
+    assertNotNull(miScopeExecution2);
+    assertFalse(instance.getId().equals(miScopeExecution2.getId()));
+    assertEquals(2, runtimeService.getVariableLocal(miScopeExecution2.getId(), "miCounterValue"));
+
+    assertEquals(2, runtimeService.createVariableInstanceQuery().variableName("miCounterValue").count());
+  }
+
+  public void testMIOutputMappingDisallowed() {
+    try {
+      repositoryService.createDeployment()
+      .addClasspathResource("org/camunda/bpm/engine/test/bpmn/iomapping/InputOutputTest.testMIOutputMappingDisallowed.bpmn20.xml")
+      .deploy();
+      fail("Exception expected");
+    } catch (ProcessEngineException e) {
+      assertTextPresent("Output parameters not allowed for multi-instance constructs", e.getMessage());
+    }
+
   }
 
 }
