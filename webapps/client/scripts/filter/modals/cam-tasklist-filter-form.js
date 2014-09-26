@@ -24,6 +24,32 @@ define([
     return arr;
   }
 
+  var likeExp = /Like$/;
+  function fixLikes(arr) {
+    each(arr, function(obj, i) {
+      if (likeExp.test(obj.key) && obj.value[0] !== '%') {
+        arr[i].value = '%'+ obj.value +'%';
+      }
+    });
+    return arr;
+  }
+
+  function unfixLikes(obj) {
+    each(obj, function(val, key) {
+      if (likeExp.test(key)) {
+        if (val[0] === '%') {
+          val = val.slice(1, val.length);
+        }
+
+        if (val.slice(-1) === '%') {
+          val = val.slice(0, -1);
+        }
+
+        obj[key] = val;
+      }
+    });
+    return obj;
+  }
 
   function cleanJson(obj) {
     each(Object.keys(obj), function(key) {
@@ -186,8 +212,7 @@ define([
       value: ''
     };
 
-    $scope._query = makeArr($scope.filter.query);
-
+    $scope._query = makeArr(unfixLikes($scope.filter.query));
     $scope.addCriterion = function() {
       $scope._query.push(copy(emptyCriterion));
     };
@@ -449,7 +474,7 @@ define([
         name:         $scope.filter.name,
         // owner:        $scope.filter.owner,
         resourceType: 'Task',
-        query:        makeObj(fixExpressions($scope._query)),
+        query:        makeObj(fixExpressions(fixLikes($scope._query))),
         properties:   {
           color:        $scope.filter.properties.color,
           description:  $scope.filter.properties.description,
