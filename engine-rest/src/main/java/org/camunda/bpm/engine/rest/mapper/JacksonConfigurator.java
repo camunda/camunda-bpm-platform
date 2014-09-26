@@ -22,16 +22,13 @@ import org.camunda.bpm.engine.rest.hal.Hal;
 import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.SerializationConfig;
+import org.omg.CORBA.OBJECT_NOT_EXIST;
 
 @Provider
 @Produces({MediaType.APPLICATION_JSON, Hal.MEDIA_TYPE_HAL})
 public class JacksonConfigurator implements ContextResolver<ObjectMapper> {
 
-  ObjectMapper mapper;
-
-  public JacksonConfigurator() {
-    mapper = configureObjectMapper(new ObjectMapper());
-  }
+  public static final ObjectMapper OBJECT_MAPPER = configureObjectMapper(new ObjectMapper());
 
   public static ObjectMapper configureObjectMapper(ObjectMapper mapper) {
     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
@@ -44,7 +41,7 @@ public class JacksonConfigurator implements ContextResolver<ObjectMapper> {
 
   @Override
   public ObjectMapper getContext(Class<?> clazz) {
-    return mapper;
+    return OBJECT_MAPPER;
   }
 
 }

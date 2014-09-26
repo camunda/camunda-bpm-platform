@@ -29,7 +29,7 @@ import org.codehaus.jackson.map.ObjectMapper;
 
 public class FilterDto {
 
-  protected static final ObjectMapper objectMapper = JacksonConfigurator.configureObjectMapper(new ObjectMapper());
+  protected static final ObjectMapper objectMapper = JacksonConfigurator.OBJECT_MAPPER;
 
   protected String id;
   protected String resourceType;
