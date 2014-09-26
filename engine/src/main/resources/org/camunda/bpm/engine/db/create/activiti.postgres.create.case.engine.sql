@@ -97,13 +97,13 @@ alter table ACT_RU_TASK
   references ACT_RE_CASE_DEF(ID_);
 
 -- create foreign key constraints on ACT_RU_CASE_SENTRY_PART --
-create index ACT_IDX_CASE_SENTRY_CASE_INST on ACT_RU_CASE_EXECUTION(CASE_INST_ID_);
+create index ACT_IDX_CASE_SENTRY_CASE_INST on ACT_RU_CASE_SENTRY_PART(CASE_INST_ID_);
 alter table ACT_RU_CASE_SENTRY_PART
     add constraint ACT_FK_CASE_SENTRY_CASE_INST
     foreign key (CASE_INST_ID_)
     references ACT_RU_CASE_EXECUTION(ID_);
 
-create index ACT_IDX_CASE_SENTRY_CASE_EXEC on ACT_RU_CASE_EXECUTION(CASE_EXEC_ID_);
+create index ACT_IDX_CASE_SENTRY_CASE_EXEC on ACT_RU_CASE_SENTRY_PART(CASE_EXEC_ID_);
 alter table ACT_RU_CASE_SENTRY_PART
     add constraint ACT_FK_CASE_SENTRY_CASE_EXEC
     foreign key (CASE_EXEC_ID_)
