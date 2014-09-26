@@ -37,7 +37,6 @@ import static org.mockito.Mockito.when;
 
 import java.util.Collections;
 import java.util.List;
-
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
@@ -61,12 +60,8 @@ import org.camunda.bpm.engine.rest.dto.task.TaskQueryDto;
 import org.camunda.bpm.engine.rest.hal.Hal;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.camunda.bpm.engine.task.TaskQuery;
-import org.codehaus.jackson.map.JsonMappingException;
 import org.junit.Before;
 import org.junit.Test;
-
-import com.jayway.restassured.http.ContentType;
-import com.jayway.restassured.response.Response;
 
 /**
  * @author Sebastian Menski
@@ -237,8 +232,6 @@ public abstract class AbstractFilterRestServiceInteractionTest extends AbstractR
       .body(dto)
     .then().expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode())
-      .contentType(ContentType.JSON)
-      .body("type", equalTo(JsonMappingException.class.getSimpleName()))
     .when()
       .put(SINGLE_FILTER_URL);
   }

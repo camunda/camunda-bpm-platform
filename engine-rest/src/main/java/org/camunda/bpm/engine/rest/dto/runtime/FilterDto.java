@@ -14,7 +14,6 @@
 package org.camunda.bpm.engine.rest.dto.runtime;
 
 import java.util.Map;
-
 import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.EntityTypes;
@@ -24,13 +23,13 @@ import org.camunda.bpm.engine.query.Query;
 import org.camunda.bpm.engine.rest.dto.AbstractQueryDto;
 import org.camunda.bpm.engine.rest.dto.task.TaskQueryDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
-import org.codehaus.jackson.annotate.JsonSubTypes;
-import org.codehaus.jackson.annotate.JsonTypeInfo;
+import org.camunda.bpm.engine.rest.mapper.JacksonConfigurator;
+import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 
 public class FilterDto {
 
-  protected static final ObjectMapper objectMapper = new ObjectMapper();
+  protected static final ObjectMapper objectMapper = JacksonConfigurator.configureObjectMapper(new ObjectMapper());
 
   protected String id;
   protected String resourceType;
@@ -75,11 +74,13 @@ public class FilterDto {
     return query;
   }
 
-  @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "resourceType")
-  @JsonSubTypes(value = {
-    @JsonSubTypes.Type(value = TaskQueryDto.class, name = EntityTypes.TASK)})
-  public void setQuery(AbstractQueryDto<?> query) {
-    this.query = query;
+  public void setQuery(JsonNode query) {
+    try {
+      this.query = objectMapper.readValue(query, TaskQueryDto.class);
+    }
+    catch (Exception e) {
+      throw new InvalidRequestException(Status.BAD_REQUEST, e, "Unable to convert query");
+    }
   }
 
   public Map<String, Object> getProperties() {
