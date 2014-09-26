@@ -28,7 +28,8 @@ define([
   function fixExpressions(arr) {
     each(arr, function(obj, i) {
       if (expressionsExp.test(obj.value) && obj.key.indexOf('Expression') === -1) {
-        arr[i].key = 'task'+ obj.key[0].toUpperCase() + obj.key.slice(1) +'Expression';
+        // arr[i].key = 'task'+ obj.key[0].toUpperCase() + obj.key.slice(1) +'Expression';
+        arr[i].key = obj.key +'Expression';
       }
     });
     return arr;
@@ -225,6 +226,13 @@ define([
     };
 
     $scope._query = makeArr(unfixLikes($scope.filter.query));
+
+    each($scope._query, function(obj, o) {
+      if (obj.key === 'taskVariables') {
+        $scope._query.splice(o, 1);
+      }
+    });
+
     $scope.addCriterion = function() {
       $scope._query.push(copy(emptyCriterion));
     };
@@ -235,7 +243,8 @@ define([
 
     $scope.simpleCriterionName = function(name) {
       if (!name) { return name; }
-      var simple = name.replace(/^task/, '').replace('Expression', '');
+      // var simple = name.replace(/^task/, '').replace('Expression', '');
+      var simple = name.replace('Expression', '');
       simple = simple[0].toLowerCase() + simple.slice(1);
       return simple;
     };
