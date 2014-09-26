@@ -176,7 +176,7 @@ public abstract class AbstractFilterRestServiceInteractionTest extends AbstractR
 
   @Test
   public void testCreateFilter() {
-    FilterDto dto = FilterDto.fromFilter(eq(MockProvider.createMockFilter()));
+    FilterDto dto = FilterDto.fromFilter(MockProvider.createMockFilter());
 
     given()
       .contentType(POST_JSON_CONTENT_TYPE)
