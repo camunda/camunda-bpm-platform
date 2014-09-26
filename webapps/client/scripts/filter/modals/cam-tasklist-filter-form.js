@@ -592,6 +592,7 @@ define([
   return [
     '$modal',
     '$scope',
+    '$rootScope',
     '$location',
     '$translate',
     'Notifications',
@@ -599,6 +600,7 @@ define([
   function(
     $modal,
     $scope,
+    $rootScope,
     $location,
     $translate,
     Notifications,
@@ -608,16 +610,27 @@ define([
     var Authorization = camAPI.resource('authorization');
     $scope.loading = false;
 
-    $scope.userCanCreateFilter = false;
-    Filter.authorizations(function(err, resp) {
-      if (err) { throw err; }
 
-      each(resp.links, function(link) {
-        if (link.rel === 'create') {
-          $scope.userCanCreateFilter = true;
-        }
+    $scope.userCanCreateFilter = false;
+    function checkFilterCreationAccess() {
+      if (!$rootScope.authentication || !$rootScope.authentication.name) {
+        $scope.userCanCreateFilter = false;
+        return;
+      }
+
+      Filter.authorizations(function(err, resp) {
+        if (err) { throw err; }
+        each(resp.links, function(link) {
+          if (link.rel === 'create') {
+            $scope.userCanCreateFilter = true;
+          }
+        });
       });
-    });
+    }
+    checkFilterCreationAccess();
+    $rootScope.$watch('authentication.name', checkFilterCreationAccess);
+
+
 
     function clearScopeFilter() {
       $scope.filter = null;
@@ -672,7 +685,15 @@ define([
 
         filter.authorizations = authorizations;
 
-        loaded(filter);
+        Filter.authorizations(filter.id, function(err, resp) {
+          if (err) { throw err; }
+          $scope.accesses = {};
+          each(resp.links, function(link) {
+            $scope.accesses[link.rel] = true;
+          });
+
+          loaded(filter);
+        });
       });
     }
 

@@ -27,7 +27,7 @@ function(
       this._wrapped = new Client(config);
     }
 
-    angular.forEach(['post', 'get', 'load', 'put', 'del'], function(name) {
+    angular.forEach(['post', 'get', 'load', 'put', 'del', 'options', 'head'], function(name) {
       AngularClient.prototype[name] = function(path, options) {
         if (!options.done) {
           return;

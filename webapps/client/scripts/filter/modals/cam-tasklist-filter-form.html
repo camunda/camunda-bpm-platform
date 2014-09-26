@@ -495,7 +495,7 @@
         <button ng-if="!deletion"
                 class="btn btn-primary"
                 type="submit"
-                ng-disabled="$invalid"
+                ng-disabled="(filter.id && !accesses.update) || $invalid"
                 ng-click="submit()"
                 translate="SAVE">Save</button>
 
@@ -504,6 +504,7 @@
                 class="btn btn-primary"
                 type="submit"
                 ng-click="delete()"
+                ng-disabled="!accesses.delete"
                 translate="DELETE">Delete</button>
       </div>
     </div>
