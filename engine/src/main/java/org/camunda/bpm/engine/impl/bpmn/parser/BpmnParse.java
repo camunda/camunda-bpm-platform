@@ -790,7 +790,7 @@ public class BpmnParse extends Parse {
   protected void parseScopeStartEvent(ActivityImpl startEventActivity, Element startEventElement, Element parentElement, ScopeImpl scope) {
 
     Object triggeredByEvent = scope.getProperty(PROPERTYNAME_TRIGGERED_BY_EVENT);
-    boolean isTriggeredByEvent = triggeredByEvent != null && ((Boolean) triggeredByEvent == true);
+    boolean isTriggeredByEvent = triggeredByEvent != null && ((Boolean) triggeredByEvent);
 
     Element errorEventDefinition = startEventElement.element("errorEventDefinition");
     Element messageEventDefinition = startEventElement.element("messageEventDefinition");
@@ -804,7 +804,7 @@ public class BpmnParse extends Parse {
       startEventActivity.setActivityBehavior(activityBehavior);
 
       String isInterrupting = startEventElement.attribute("isInterrupting");
-      boolean interrupting = isInterrupting.equalsIgnoreCase("true") ? true : false;
+      boolean interrupting = isInterrupting.equalsIgnoreCase("true");
 
       ((ActivityImpl)scope).setCancelScope(interrupting);
       ((ActivityImpl)scope).setConcurrent(!interrupting);
@@ -830,21 +830,19 @@ public class BpmnParse extends Parse {
         parseErrorStartEventDefinition(errorEventDefinition, startEventActivity, catchingScope);
 
       } else if (messageEventDefinition != null) {
+        startEventActivity.setProperty("type", "messageStartEvent");
+
         EventSubscriptionDeclaration eventSubscriptionDeclaration = parseMessageEventDefinition(messageEventDefinition);
-        eventSubscriptionDeclaration.setActivityId(startEventActivity.getId());
-        eventSubscriptionDeclaration.setEventScopeActivityId(catchingScope.getId());
-        eventSubscriptionDeclaration.setStartEvent(false);
-        addEventSubscriptionDeclaration(eventSubscriptionDeclaration, catchingScope, messageEventDefinition);
+        parseEventDefinitionForSubprocess(eventSubscriptionDeclaration, startEventActivity, catchingScope, messageEventDefinition);
 
       } else if (signalEventDefinition != null) {
+        startEventActivity.setProperty("type", "signalStartEvent");
+
         EventSubscriptionDeclaration eventSubscriptionDeclaration = parseSignalEventDefinition(signalEventDefinition);
-        eventSubscriptionDeclaration.setActivityId(startEventActivity.getId());
-        eventSubscriptionDeclaration.setEventScopeActivityId(catchingScope.getId());
-        eventSubscriptionDeclaration.setStartEvent(false);
-        addEventSubscriptionDeclaration(eventSubscriptionDeclaration, catchingScope, signalEventDefinition);
+        parseEventDefinitionForSubprocess(eventSubscriptionDeclaration, startEventActivity, catchingScope, signalEventDefinition);
 
       } else if (timerEventDefinition != null) {
-        parseTimerStartEventDefinitionforEventSubprocess(timerEventDefinition, startEventActivity, catchingScope);
+        parseTimerStartEventDefinitionForEventSubprocess(timerEventDefinition, startEventActivity, catchingScope);
 
       } else {
         addError("start event of event subprocess must be of type 'error', 'message', 'timer' or 'signal'", startEventElement);
@@ -2550,12 +2548,31 @@ public class BpmnParse extends Parse {
 
   protected void parseTimerStartEventDefinitionForEventSubprocess(Element timerEventDefinition, ActivityImpl timerActivity, ScopeImpl catchingScope) {
     timerActivity.setProperty("type", "startTimerEvent");
+
     TimerDeclarationImpl timerDeclaration = parseTimer(timerEventDefinition, timerActivity, TimerStartEventSubprocessJobHandler.TYPE);
     timerDeclaration.setActivityId(timerActivity.getId());
     timerDeclaration.setEventScopeActivityId(catchingScope.getId());
     timerDeclaration.setJobHandlerConfiguration(timerActivity.getParent().getId());
 
     addTimerDeclaration(catchingScope, timerDeclaration);
+  }
+
+  protected void parseMessageStartEventDefinitionForEventSubprocess(Element messageEventDefinition, ActivityImpl messageActivity, ScopeImpl catchingScope) {
+
+  }
+
+  protected void parseSignalStartEventDefinitionForEventSubprocess(Element signalEventDefinition, ActivityImpl signalActivity, ScopeImpl catchingScope) {
+    signalActivity.setProperty("type", "signalStartEvent");
+
+    EventSubscriptionDeclaration eventSubscriptionDeclaration = parseSignalEventDefinition(signalEventDefinition);
+    parseEventDefinitionForSubprocess(eventSubscriptionDeclaration, signalActivity, catchingScope, signalEventDefinition);
+  }
+
+  protected void parseEventDefinitionForSubprocess(EventSubscriptionDeclaration subscriptionDeclaration, ActivityImpl activity, ScopeImpl catchingScope, Element element) {
+    subscriptionDeclaration.setActivityId(activity.getId());
+    subscriptionDeclaration.setEventScopeActivityId(catchingScope.getId());
+    subscriptionDeclaration.setStartEvent(false);
+    addEventSubscriptionDeclaration(subscriptionDeclaration, catchingScope, element);
   }
 
   /**

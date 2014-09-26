@@ -881,7 +881,7 @@ public class HistoricActivityInstanceTest extends PluggableProcessEngineTestCase
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/history/HistoricActivityInstanceTest.startEventTypesForEventSubprocess.bpmn20.xml")
-  public void FAILING_testMessageEventSubprocess() {
+  public void testMessageEventSubprocess() {
     Map<String, Object> vars = new HashMap<String, Object>();
     vars.put("shouldThrowError", false);
     runtimeService.startProcessInstanceByKey("process", vars);
@@ -895,7 +895,7 @@ public class HistoricActivityInstanceTest extends PluggableProcessEngineTestCase
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/history/HistoricActivityInstanceTest.startEventTypesForEventSubprocess.bpmn20.xml")
-  public void FAILING_testSignalEventSubprocess() {
+  public void testSignalEventSubprocess() {
     Map<String, Object> vars = new HashMap<String, Object>();
     vars.put("shouldThrowError", false);
     runtimeService.startProcessInstanceByKey("process", vars);
