@@ -3,6 +3,11 @@ define([
 ], function(template) {
   'use strict';
 
+  function fixReadDateTimezone(dateStr) {
+    if (!dateStr) { return dateStr; }
+    var d = new Date(dateStr);
+    return (new Date(d.getTime() + (d.getTimezoneOffset() * 60 * 1000))).toJSON();
+  }
 
   return [
     '$rootScope',
@@ -53,6 +58,12 @@ define([
         function loadTask(taskId) {
           Task.get(taskId, function(err, task) {
             if (err) { throw err; }
+
+
+            task.due = fixReadDateTimezone(task.due);
+            task.followUp = fixReadDateTimezone(task.followUp);
+
+
             scope.task = $rootScope.currentTask = task;
             refreshTabs();
           });

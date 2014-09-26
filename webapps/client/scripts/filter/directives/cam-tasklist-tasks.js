@@ -23,6 +23,20 @@ define([
     }
   }
 
+
+
+  function fixReadDateTimezone(dateStr) {
+    if (!dateStr) { return dateStr; }
+    var d = new Date(dateStr);
+    return (new Date(d.getTime() + (d.getTimezoneOffset() * 60 * 1000))).toJSON();
+  }
+
+  function fixWriteDateTimezone(dateObj) {
+    return new Date(dateObj.getTime() - (dateObj.getTimezoneOffset() * 1000 * 60));
+  }
+
+
+
   return [
     '$modal',
     '$location',
@@ -101,11 +115,26 @@ define([
             scope.totalItems = res.count;
             scope.processDefinitions = scope.processDefinitions || [];
 
+
             angular.forEach(res._embedded ? res._embedded.processDefinition : [], function(procDef) {
               if (indexOfId(scope.processDefinitions) === -1) {
                 scope.processDefinitions.push(procDef);
               }
             });
+
+
+
+            angular.forEach(res._embedded.task, function(task, t) {
+              // res._embedded.task[t]._serverDue = task.due;
+              // res._embedded.task[t]._serverFollowUp = task.followUp;
+
+              res._embedded.task[t].due = fixReadDateTimezone(task.due);
+              res._embedded.task[t].followUp = fixReadDateTimezone(task.followUp);
+
+              // console.info('fix dates', res._embedded.task[t]._serverDue, res._embedded.task[t].due);
+            });
+
+
 
             scope.tasks = res._embedded.task;
           });
@@ -168,7 +197,10 @@ define([
           return function(inlineFieldScope) {
             var self = this;
             var task = angular.copy(self.task);
-            task[propName] = inlineFieldScope.varValue;
+
+            task[propName] = fixWriteDateTimezone(inlineFieldScope.varValue);
+            // task[propName] = inlineFieldScope.varValue;
+
 
             delete task._embedded;
             delete task._links;

@@ -3,6 +3,10 @@ define([
 ], function(template) {
   'use strict';
 
+  function fixWriteDateTimezone(dateObj) {
+    return new Date(dateObj.getTime() - (dateObj.getTimezoneOffset() * 1000 * 60));
+  }
+
   return [
     '$rootScope',
     '$translate',
@@ -43,15 +47,15 @@ define([
       template: template,
 
       link: function(scope) {
-
-
-
-
         function saveDate(propName) {
           return function(inlineFieldScope) {
             var self = this;
             var task = angular.copy(self.task);
-            task[propName] = inlineFieldScope.varValue;
+
+
+            task[propName] = fixWriteDateTimezone(inlineFieldScope.varValue);
+            // task[propName] = inlineFieldScope.varValue;
+
 
             delete task._embedded;
             delete task._links;
