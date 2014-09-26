@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.rest;
 
 import com.jayway.restassured.path.json.JsonPath;
 import com.jayway.restassured.response.Response;
+
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
@@ -27,6 +28,7 @@ import org.junit.Test;
 
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.Response.Status;
+
 import java.io.InputStream;
 import java.util.*;
 
@@ -47,6 +49,7 @@ public abstract class AbstractDeploymentRestServiceInteractionTest extends Abstr
   protected static final String SINGLE_RESOURCE_DATA_URL = SINGLE_RESOURCE_URL + "/data";
   protected static final String CREATE_DEPLOYMENT_URL = TEST_RESOURCE_ROOT_PATH + "/deployment/create";
 
+  protected RepositoryService mockRepositoryService;
   protected Deployment mockDeployment;
   protected List<Resource> mockDeploymentResources;
   protected Resource mockDeploymentResource;
@@ -56,24 +59,24 @@ public abstract class AbstractDeploymentRestServiceInteractionTest extends Abstr
 
   @Before
   public void setUpRuntimeData() {
-    RepositoryService repositoryServiceMock = mock(RepositoryService.class);
-    when(processEngine.getRepositoryService()).thenReturn(repositoryServiceMock);
+    mockRepositoryService = mock(RepositoryService.class);
+    when(processEngine.getRepositoryService()).thenReturn(mockRepositoryService);
 
     mockDeployment = MockProvider.createMockDeployment();
     mockDeploymentQuery = mock(DeploymentQuery.class);
     when(mockDeploymentQuery.deploymentId(EXAMPLE_DEPLOYMENT_ID)).thenReturn(mockDeploymentQuery);
     when(mockDeploymentQuery.singleResult()).thenReturn(mockDeployment);
-    when(repositoryServiceMock.createDeploymentQuery()).thenReturn(mockDeploymentQuery);
+    when(mockRepositoryService.createDeploymentQuery()).thenReturn(mockDeploymentQuery);
 
     mockDeploymentResources = MockProvider.createMockDeploymentResources();
-    when(repositoryServiceMock.getDeploymentResources(eq(EXAMPLE_DEPLOYMENT_ID))).thenReturn(mockDeploymentResources);
+    when(mockRepositoryService.getDeploymentResources(eq(EXAMPLE_DEPLOYMENT_ID))).thenReturn(mockDeploymentResources);
 
     mockDeploymentResource = MockProvider.createMockDeploymentResource();
 
-    when(repositoryServiceMock.getResourceAsStreamById(eq(EXAMPLE_DEPLOYMENT_ID), eq(EXAMPLE_DEPLOYMENT_RESOURCE_ID))).thenReturn(createMockDeploymentResourceBpmnData());
+    when(mockRepositoryService.getResourceAsStreamById(eq(EXAMPLE_DEPLOYMENT_ID), eq(EXAMPLE_DEPLOYMENT_RESOURCE_ID))).thenReturn(createMockDeploymentResourceBpmnData());
 
     mockDeploymentBuilder = mock(DeploymentBuilder.class);
-    when(repositoryServiceMock.createDeployment()).thenReturn(mockDeploymentBuilder);
+    when(mockRepositoryService.createDeployment()).thenReturn(mockDeploymentBuilder);
     when(mockDeploymentBuilder.addInputStream(anyString(), any(InputStream.class))).thenReturn(mockDeploymentBuilder);
     when(mockDeploymentBuilder.getResourceNames()).thenReturn(resourceNames);
     when(mockDeploymentBuilder.deploy()).thenReturn(mockDeployment);
@@ -320,6 +323,76 @@ public abstract class AbstractDeploymentRestServiceInteractionTest extends Abstr
     .when()
       .post(CREATE_DEPLOYMENT_URL);
 
+  }
+  
+  @Test
+  public void testDeleteDeployment() {
+    
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_DEPLOYMENT_ID)
+    .expect()
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+      .delete(DEPLOYMENT_URL);
+    
+    verify(mockRepositoryService).deleteDeployment(MockProvider.EXAMPLE_DEPLOYMENT_ID, false);
+  }
+  
+  @Test
+  public void testDeleteDeploymentCascade() {
+    
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_DEPLOYMENT_ID)
+      .queryParam("cascade", true)
+    .expect()
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+      .delete(DEPLOYMENT_URL);
+    
+    verify(mockRepositoryService).deleteDeployment(MockProvider.EXAMPLE_DEPLOYMENT_ID, true);
+  }
+  
+  @Test
+  public void testDeleteDeploymentCascadeNonsense() {
+    
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_DEPLOYMENT_ID)
+      .queryParam("cascade", "bla")
+    .expect()
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+      .delete(DEPLOYMENT_URL);
+    
+    verify(mockRepositoryService).deleteDeployment(MockProvider.EXAMPLE_DEPLOYMENT_ID, false);
+  }
+
+  @Test
+  public void testDeleteDeploymentCascadeFalse() {
+    
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_DEPLOYMENT_ID)
+      .queryParam("cascade", false)
+    .expect()
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+      .delete(DEPLOYMENT_URL);
+    
+    verify(mockRepositoryService).deleteDeployment(MockProvider.EXAMPLE_DEPLOYMENT_ID, false);
+  }
+  
+  @Test
+  public void testDeleteNonExistingDeployment() {
+
+    when(mockDeploymentQuery.deploymentId(NON_EXISTING_DEPLOYMENT_ID)).thenReturn(mockDeploymentQuery);
+    when(mockDeploymentQuery.singleResult()).thenReturn(null);
+    
+    given()
+      .pathParam("id", NON_EXISTING_DEPLOYMENT_ID)
+    .expect()
+      .statusCode(Status.NOT_FOUND.getStatusCode())
+      .body(containsString("Deployment with id '" + NON_EXISTING_DEPLOYMENT_ID + "' do not exist"))
+    .when()
+       .delete(DEPLOYMENT_URL);
   }
 
   private void verifyDeployment(Deployment mockDeployment, Response response) {
