@@ -24,6 +24,7 @@ import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricIncidentDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricIncidentQueryDto;
 import org.camunda.bpm.engine.rest.history.HistoricIncidentRestService;
+import org.codehaus.jackson.map.ObjectMapper;
 
 /**
  * @author Roman Smirnov
@@ -31,15 +32,17 @@ import org.camunda.bpm.engine.rest.history.HistoricIncidentRestService;
  */
 public class HistoricIncidentRestServiceImpl implements HistoricIncidentRestService {
 
+  protected ObjectMapper objectMapper;
   protected ProcessEngine processEngine;
 
-  public HistoricIncidentRestServiceImpl(ProcessEngine processEngine) {
+  public HistoricIncidentRestServiceImpl(ObjectMapper objectMapper, ProcessEngine processEngine) {
+    this.objectMapper = objectMapper;
     this.processEngine = processEngine;
   }
 
   @Override
   public List<HistoricIncidentDto> getHistoricIncidents(UriInfo uriInfo, Integer firstResult, Integer maxResults) {
-    HistoricIncidentQueryDto queryDto = new HistoricIncidentQueryDto(uriInfo.getQueryParameters());
+    HistoricIncidentQueryDto queryDto = new HistoricIncidentQueryDto(objectMapper, uriInfo.getQueryParameters());
     HistoricIncidentQuery query = queryDto.toQuery(processEngine);
 
     List<HistoricIncident> queryResult;
@@ -60,7 +63,7 @@ public class HistoricIncidentRestServiceImpl implements HistoricIncidentRestServ
 
   @Override
   public CountResultDto getHistoricIncidentsCount(UriInfo uriInfo) {
-    HistoricIncidentQueryDto queryDto = new HistoricIncidentQueryDto(uriInfo.getQueryParameters());
+    HistoricIncidentQueryDto queryDto = new HistoricIncidentQueryDto(objectMapper, uriInfo.getQueryParameters());
     HistoricIncidentQuery query = queryDto.toQuery(processEngine);
 
     long count = query.count();

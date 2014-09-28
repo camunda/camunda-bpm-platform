@@ -21,6 +21,7 @@ import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.rest.dto.AbstractQueryDto;
 import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
 import org.camunda.bpm.engine.runtime.IncidentQuery;
+import org.codehaus.jackson.map.ObjectMapper;
 
 /**
  * @author Roman Smirnov
@@ -67,8 +68,8 @@ public class IncidentQueryDto extends AbstractQueryDto<IncidentQuery>{
 
   public IncidentQueryDto() {}
 
-  public IncidentQueryDto(MultivaluedMap<String, String> queryParameters) {
-    super(queryParameters);
+  public IncidentQueryDto(ObjectMapper objectMapper, MultivaluedMap<String, String> queryParameters) {
+    super(objectMapper, queryParameters);
   }
 
   @CamundaQueryParam("incidentId")

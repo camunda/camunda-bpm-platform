@@ -24,6 +24,7 @@ import org.camunda.bpm.engine.history.HistoricVariableUpdate;
 import org.camunda.bpm.engine.rest.dto.history.HistoricDetailDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.sub.history.HistoricDetailResource;
+import org.camunda.bpm.engine.variable.type.ValueType;
 
 /**
  * @author Daniel Meyer
@@ -55,25 +56,30 @@ public class HistoricDetailResourceImpl implements HistoricDetailResource {
   }
 
   public InputStream getBinaryVariable() {
-    HistoricDetail variableInstance = baseQuery()
+    HistoricDetail historicDetail = baseQuery()
         .disableCustomObjectDeserialization()
         .singleResult();
-    if(variableInstance == null) {
-      throw new InvalidRequestException(Status.NOT_FOUND, "Historic detail with Id '"+detailId + "' does not exist.");
-
-    } else if(!(variableInstance instanceof HistoricVariableUpdate)) {
-      throw new InvalidRequestException(Status.BAD_REQUEST, "Historic detail with Id '"+detailId + "' is not a variable update.");
-
-    } else {
-      Object value = ((HistoricVariableUpdate) variableInstance).getSerializedValue().getValue();
-      if(value instanceof byte[]) {
-        return new ByteArrayInputStream((byte[]) value);
-
-      } else {
-        throw new InvalidRequestException(Status.BAD_REQUEST, "Historic detail with Id '"+detailId + "' is not a binary variable.");
-
+    if(historicDetail != null) {
+      if(!(historicDetail instanceof HistoricVariableUpdate)) {
+        throw new InvalidRequestException(Status.BAD_REQUEST, "Historic detail with Id '"+detailId + "' is not a variable update.");
       }
 
+      HistoricVariableUpdate update = (HistoricVariableUpdate) historicDetail;
+
+      if (ValueType.BYTES.getName().equals(update.getTypeName())) {
+        byte[] valueBytes = (byte[]) update.getValue();
+        if (valueBytes == null) {
+          valueBytes = new byte[0];
+        }
+
+        return new ByteArrayInputStream(valueBytes);
+      } else {
+        throw new InvalidRequestException(Status.BAD_REQUEST,
+            String.format("Value of variable %s is not a binary value.", detailId));
+      }
+
+    } else {
+      throw new InvalidRequestException(Status.NOT_FOUND, "Historic detail instance with Id '"+detailId + "' does not exist.");
     }
   }
 

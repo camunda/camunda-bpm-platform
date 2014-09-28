@@ -12,13 +12,15 @@
  */
 package org.camunda.bpm.engine.test.examples.variables;
 
-import java.util.Map;
+import static org.junit.Assert.*;
 
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
-import org.camunda.bpm.engine.delegate.PersistentVariableInstance;
-import org.camunda.bpm.engine.delegate.ProcessEngineVariableType;
-import org.junit.Assert;
+import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.variable.serializer.JavaObjectSerializer;
+import org.camunda.bpm.engine.variable.type.ValueType;
+import org.camunda.bpm.engine.variable.value.ObjectValue;
+import org.camunda.spin.DataFormats;
 
 /**
  * @author Thorben Lindhauer
@@ -26,43 +28,48 @@ import org.junit.Assert;
 public class AssertVariableInstancesDelegate implements JavaDelegate {
 
   public void execute(DelegateExecution execution) throws Exception {
+
+    // validate integer variable
+    Integer expectedIntValue = 1234;
+    assertEquals(expectedIntValue, execution.getVariable("anIntegerVariable"));
+    assertEquals(expectedIntValue, execution.getVariableTyped("anIntegerVariable").getValue());
+    assertEquals(ValueType.INTEGER, execution.getVariableTyped("anIntegerVariable").getType());
+    assertNull(execution.getVariableLocal("anIntegerVariable"));
+    assertNull(execution.getVariableLocalTyped("anIntegerVariable"));
+
     // set an additional local variable
     execution.setVariableLocal("aStringVariable", "aStringValue");
 
-    // getVariableInstances()
-    Map<String, PersistentVariableInstance> variableInstances = execution.getVariableInstances();
+    String expectedStringValue = "aStringValue";
+    assertEquals(expectedStringValue, execution.getVariable("aStringVariable"));
+    assertEquals(expectedStringValue, execution.getVariableTyped("aStringVariable").getValue());
+    assertEquals(ValueType.STRING, execution.getVariableTyped("aStringVariable").getType());
+    assertEquals(expectedStringValue, execution.getVariableLocal("aStringVariable"));
+    assertEquals(expectedStringValue, execution.getVariableLocalTyped("aStringVariable").getValue());
+    assertEquals(ValueType.STRING, execution.getVariableLocalTyped("aStringVariable").getType());
 
-    Assert.assertEquals(2, variableInstances.size());
+    SimpleSerializableBean objectValue = (SimpleSerializableBean) execution.getVariable("anObjectValue");
+    assertNotNull(objectValue);
+    assertEquals(10, objectValue.getIntProperty());
+    ObjectValue variableTyped = execution.getVariableTyped("anObjectValue");
+    assertEquals(10, variableTyped.getValue(SimpleSerializableBean.class).getIntProperty());
+    assertEquals(JavaObjectSerializer.SERIALIZATION_DATA_FORMAT, variableTyped.getSerializationDataFormat());
 
-    PersistentVariableInstance intVariable = variableInstances.get("anIntegerVariable");
-    PersistentVariableInstance stringVariable = variableInstances.get("aStringVariable");
+    objectValue = (SimpleSerializableBean) execution.getVariable("anObjectValueJson");
+    assertNotNull(objectValue);
+    assertEquals(20, objectValue.getIntProperty());
+    variableTyped = execution.getVariableTyped("anObjectValueJson");
+    assertEquals(20, variableTyped.getValue(SimpleSerializableBean.class).getIntProperty());
+    assertEquals(DataFormats.json().getName(), variableTyped.getSerializationDataFormat());
 
-    VariableAssertionUtil.assertVariableHasValueAndType(intVariable, 1234, ProcessEngineVariableType.INTEGER.getName());
-    VariableAssertionUtil.assertVariableHasValueAndType(stringVariable, "aStringValue", ProcessEngineVariableType.STRING.getName());
 
-    // getVariableInstancesLocal()
-    variableInstances = execution.getVariableInstancesLocal();
+    objectValue = (SimpleSerializableBean) execution.getVariable("anUntypedObjectValue");
+    assertNotNull(objectValue);
+    assertEquals(30, objectValue.getIntProperty());
+    variableTyped = execution.getVariableTyped("anUntypedObjectValue");
+    assertEquals(30, variableTyped.getValue(SimpleSerializableBean.class).getIntProperty());
+    assertEquals(Context.getProcessEngineConfiguration().getDefaultSerializationFormat(), variableTyped.getSerializationDataFormat());
 
-    Assert.assertEquals(1, variableInstances.size());
-
-    stringVariable = variableInstances.get("aStringVariable");
-
-    VariableAssertionUtil.assertVariableHasValueAndType(stringVariable, "aStringValue", ProcessEngineVariableType.STRING.getName());
-
-    // getVariableInstance(name)
-    intVariable = execution.getVariableInstance("anIntegerVariable");
-
-    Assert.assertNotNull(intVariable);
-    VariableAssertionUtil.assertVariableHasValueAndType(intVariable, 1234, ProcessEngineVariableType.INTEGER.getName());
-
-    // getVariableInstanceLocal(name)
-    stringVariable = execution.getVariableInstanceLocal("aStringVariable");
-
-    Assert.assertNotNull(stringVariable);
-    VariableAssertionUtil.assertVariableHasValueAndType(stringVariable, "aStringValue", ProcessEngineVariableType.STRING.getName());
-
-    intVariable = execution.getVariableInstanceLocal("anIntegerVariable");
-    Assert.assertNull(intVariable);
   }
 
 

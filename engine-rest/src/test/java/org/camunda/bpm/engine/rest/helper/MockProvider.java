@@ -33,7 +33,6 @@ import org.camunda.bpm.engine.EntityTypes;
 import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.Permissions;
-import org.camunda.bpm.engine.delegate.ProcessEngineVariableType;
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.filter.Filter;
 import org.camunda.bpm.engine.filter.FilterQuery;
@@ -84,6 +83,10 @@ import org.camunda.bpm.engine.task.DelegationState;
 import org.camunda.bpm.engine.task.IdentityLink;
 import org.camunda.bpm.engine.task.IdentityLinkType;
 import org.camunda.bpm.engine.task.Task;
+import org.camunda.bpm.engine.variable.VariableMap;
+import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.value.StringValue;
+import org.camunda.bpm.engine.variable.value.TypedValue;
 
 /**
  * Provides mocks for the basic engine entities, such as
@@ -165,11 +168,7 @@ public abstract class MockProvider {
 
   public static final String EXAMPLE_VARIABLE_INSTANCE_NAME = "aVariableInstanceName";
 
-  public static final String STRING_VARIABLE_INSTANCE_TYPE = ProcessEngineVariableType.STRING.getName();
-  public static final String SERIALIZABLE_VARIABLE_INSTANCE_TYPE = ProcessEngineVariableType.SERIALIZABLE.getName();
-  public static final String SPIN_VARIABLE_INSTANCE_TYPE = ProcessEngineVariableType.SPIN.getName();
-
-  public static final String EXAMPLE_VARIABLE_INSTANCE_VALUE = "aVariableInstanceValue";
+  public static final StringValue EXAMPLE_PRIMITIVE_VARIABLE_VALUE = Variables.stringValue("aVariableInstanceValue");
   public static final String EXAMPLE_VARIABLE_INSTANCE_PROC_INST_ID = "aVariableInstanceProcInstId";
   public static final String EXAMPLE_VARIABLE_INSTANCE_EXECUTION_ID = "aVariableInstanceExecutionId";
   public static final String EXAMPLE_VARIABLE_INSTANCE_CASE_INST_ID = "aVariableInstanceCaseInstId";
@@ -405,7 +404,6 @@ public abstract class MockProvider {
   public static final String EXAMPLE_HISTORIC_VAR_UPDATE_NAME = "aVariableName";
   public static final String EXAMPLE_HISTORIC_VAR_UPDATE_TYPE_NAME = "String";
   public static final String EXAMPLE_HISTORIC_VAR_UPDATE_VALUE_TYPE_NAME = "String";
-  public static final String EXAMPLE_HISTORIC_VAR_UPDATE_VALUE = "aValue";
   public static final int EXAMPLE_HISTORIC_VAR_UPDATE_REVISION = 1;
   public static final String EXAMPLE_HISTORIC_VAR_UPDATE_ERROR = "anErrorMessage";
 
@@ -690,23 +688,18 @@ public abstract class MockProvider {
     return new MockVariableInstanceBuilder()
       .id(EXAMPLE_VARIABLE_INSTANCE_ID)
       .name(EXAMPLE_VARIABLE_INSTANCE_NAME)
-      .valueTypeName(STRING_VARIABLE_INSTANCE_TYPE)
-      .typeName(STRING_VARIABLE_INSTANCE_TYPE)
-      .value(EXAMPLE_VARIABLE_INSTANCE_VALUE)
+      .typedValue(EXAMPLE_PRIMITIVE_VARIABLE_VALUE)
       .processInstanceId(EXAMPLE_VARIABLE_INSTANCE_PROC_INST_ID)
       .executionId(EXAMPLE_VARIABLE_INSTANCE_EXECUTION_ID)
       .caseInstanceId(EXAMPLE_VARIABLE_INSTANCE_CASE_INST_ID)
       .caseExecutionId(EXAMPLE_VARIABLE_INSTANCE_CASE_EXECUTION_ID)
       .taskId(EXAMPLE_VARIABLE_INSTANCE_TASK_ID)
       .activityInstanceId(EXAMPLE_VARIABLE_INSTANCE_ACTIVITY_INSTANCE_ID)
-      .serializedValue(mockSerializedValue())
-      .errorMessage(null)
-      .storesCustomObjects(false);
+      .errorMessage(null);
   }
 
-  public static MockSerializedValueBuilder mockSerializedValue() {
-    return new MockSerializedValueBuilder()
-      .value(EXAMPLE_VARIABLE_INSTANCE_VALUE);
+  public static VariableInstance createMockVariableInstance(TypedValue value) {
+    return mockVariableInstance().typedValue(value).build();
   }
 
   public static Execution createMockExecution() {
@@ -1251,14 +1244,10 @@ public abstract class MockProvider {
     return new MockHistoricVariableInstanceBuilder()
         .id(EXAMPLE_VARIABLE_INSTANCE_ID)
         .name(EXAMPLE_VARIABLE_INSTANCE_NAME)
-        .value(EXAMPLE_VARIABLE_INSTANCE_VALUE)
-        .valueTypeName(STRING_VARIABLE_INSTANCE_TYPE)
-        .typeName(STRING_VARIABLE_INSTANCE_TYPE)
+        .typedValue(EXAMPLE_PRIMITIVE_VARIABLE_VALUE)
         .processInstanceId(EXAMPLE_VARIABLE_INSTANCE_PROC_INST_ID)
         .activityInstanceId(EXAMPLE_VARIABLE_INSTANCE_ACTIVITY_INSTANCE_ID)
-        .errorMessage(null)
-        .storesCustomObjects(false)
-        .serializedValue(mockSerializedValue());
+        .errorMessage(null);
   }
 
   public static List<ProcessInstance> createAnotherMockProcessInstanceList() {
@@ -1376,13 +1365,9 @@ public abstract class MockProvider {
         .taskId(EXAMPLE_HISTORIC_VAR_UPDATE_TASK_ID)
         .time(EXAMPLE_HISTORIC_VAR_UPDATE_TIME)
         .name(EXAMPLE_HISTORIC_VAR_UPDATE_NAME)
-        .typeName(EXAMPLE_HISTORIC_VAR_UPDATE_TYPE_NAME)
-        .valueTypeName(EXAMPLE_HISTORIC_VAR_UPDATE_VALUE_TYPE_NAME)
-        .storesCustomObjects(false)
-        .value(EXAMPLE_HISTORIC_VAR_UPDATE_VALUE)
+        .typedValue(EXAMPLE_PRIMITIVE_VARIABLE_VALUE)
         .revision(EXAMPLE_HISTORIC_VAR_UPDATE_REVISION)
-        .errorMessage(null)
-        .serializedValue(mockSerializedValue());
+        .errorMessage(null);
   }
 
 
@@ -1570,10 +1555,9 @@ public abstract class MockProvider {
     return mock;
   }
 
-  public static Map<String, VariableInstance> createMockFormVariables() {
-    Map<String, VariableInstance> mock = new HashMap<String, VariableInstance>();
-    VariableInstance variableInstanceMock = createMockVariableInstance();
-    mock.put(variableInstanceMock.getName(), variableInstanceMock);
+  public static VariableMap createMockFormVariables() {
+    VariableMap mock = Variables.createVariables();
+    mock.putValueTyped(EXAMPLE_VARIABLE_INSTANCE_NAME, EXAMPLE_PRIMITIVE_VARIABLE_VALUE);
     return mock;
   }
 

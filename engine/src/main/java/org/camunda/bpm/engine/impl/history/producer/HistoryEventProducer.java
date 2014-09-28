@@ -16,7 +16,6 @@ import java.util.List;
 
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.DelegateTask;
-import org.camunda.bpm.engine.delegate.PersistentVariableInstance;
 import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.history.UserOperationLogContext;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
@@ -130,7 +129,7 @@ public interface HistoryEventProducer {
    * @param the scope to which the variable is linked
    * @return the history event
    */
-  public HistoryEvent createHistoricVariableCreateEvt(VariableInstanceEntity variableInstance, VariableScope<PersistentVariableInstance> sourceVariableScope);
+  public HistoryEvent createHistoricVariableCreateEvt(VariableInstanceEntity variableInstance, VariableScope sourceVariableScope);
 
   /**
    * Creates the history event fired when a variable is <strong>updated</strong>.
@@ -139,7 +138,7 @@ public interface HistoryEventProducer {
    * @param the scope to which the variable is linked
    * @return the history event
    */
-  public HistoryEvent createHistoricVariableUpdateEvt(VariableInstanceEntity variableInstance, VariableScope<PersistentVariableInstance> sourceVariableScope);
+  public HistoryEvent createHistoricVariableUpdateEvt(VariableInstanceEntity variableInstance, VariableScope sourceVariableScope);
 
   /**
    * Creates the history event fired when a variable is <strong>deleted</strong>.
@@ -148,7 +147,7 @@ public interface HistoryEventProducer {
    * @param variableScopeImpl
    * @return the history event
    */
-  public HistoryEvent createHistoricVariableDeleteEvt(VariableInstanceEntity variableInstance, VariableScope<PersistentVariableInstance> sourceVariableScope);
+  public HistoryEvent createHistoricVariableDeleteEvt(VariableInstanceEntity variableInstance, VariableScope sourceVariableScope);
 
   // Form properties //////////////////////////////////////////
 

@@ -13,7 +13,7 @@
 
 package org.camunda.bpm.engine.history;
 
-import org.camunda.bpm.engine.delegate.SerializedVariableValue;
+import org.camunda.bpm.engine.variable.value.TypedValue;
 
 /** Update of a process variable.  This is only available if history
  * level is configured to FULL.
@@ -23,10 +23,28 @@ import org.camunda.bpm.engine.delegate.SerializedVariableValue;
 public interface HistoricVariableUpdate extends HistoricDetail {
 
   String getVariableName();
+
+  /**
+   * Returns the type name of the variable
+   *
+   * @return the type name of the variable
+   */
+  String getTypeName();
+
+  /**
+   * @return the name of the variable type.
+   * @deprecated since 7.2. Use {@link #getTypeName()}
+   */
+  @Deprecated
   String getVariableTypeName();
+
   Object getValue();
-  String getValueTypeName();
-  boolean storesCustomObjects();
+
+  /**
+   * @return the {@link TypedValue} for this variable update
+   */
+  TypedValue getTypedValue();
+
   int getRevision();
 
   /**
@@ -34,6 +52,4 @@ public interface HistoricVariableUpdate extends HistoricDetail {
    * @return an error message indicating why the variable value could not be loaded.
    */
   String getErrorMessage();
-
-  SerializedVariableValue getSerializedValue();
 }

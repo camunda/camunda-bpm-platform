@@ -13,14 +13,12 @@
 package org.camunda.bpm.engine.rest.sub.runtime.impl;
 
 import java.util.List;
-import java.util.Map;
-
-import javax.ws.rs.core.Response.Status;
-
 import org.camunda.bpm.engine.CaseService;
 import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.sub.impl.AbstractVariablesResource;
+import org.camunda.bpm.engine.variable.VariableMap;
+import org.camunda.bpm.engine.variable.value.TypedValue;
+import org.codehaus.jackson.map.ObjectMapper;
 
 /**
  *
@@ -29,16 +27,16 @@ import org.camunda.bpm.engine.rest.sub.impl.AbstractVariablesResource;
  */
 public class LocalCaseExecutionVariablesResource extends AbstractVariablesResource {
 
-  public LocalCaseExecutionVariablesResource(ProcessEngine engine, String resourceId) {
-    super(engine, resourceId);
+  public LocalCaseExecutionVariablesResource(ProcessEngine engine, String resourceId, ObjectMapper objectMapper) {
+    super(engine, resourceId, objectMapper);
   }
 
-  protected Map<String, Object> getVariableEntities() {
+  protected VariableMap getVariableEntities(boolean deserializeValues) {
     CaseService caseService = engine.getCaseService();
-    return caseService.getVariablesLocal(resourceId);
+    return caseService.getVariablesLocal(resourceId, deserializeValues);
   }
 
-  protected void updateVariableEntities(Map<String, Object> variables, List<String> deletions) {
+  protected void updateVariableEntities(VariableMap variables, List<String> deletions) {
     CaseService caseService = engine.getCaseService();
     caseService
       .withCaseExecution(resourceId)
@@ -47,15 +45,14 @@ public class LocalCaseExecutionVariablesResource extends AbstractVariablesResour
       .execute();
   }
 
-  protected Object getVariableEntity(String variableKey) {
+  protected TypedValue getVariableEntity(String variableKey, boolean deserializeValue) {
     CaseService caseService = engine.getCaseService();
-    return caseService.getVariableLocal(resourceId, variableKey);
+    return caseService.getVariableLocalTyped(resourceId, variableKey, deserializeValue);
   }
 
-  protected void setVariableEntity(String variableKey, Object variableValue) {
+  protected void setVariableEntity(String variableKey, TypedValue variableValue) {
     CaseService caseService = engine.getCaseService();
-    caseService
-      .withCaseExecution(resourceId)
+    caseService.withCaseExecution(resourceId)
       .setVariableLocal(variableKey, variableValue)
       .execute();
   }
@@ -70,10 +67,6 @@ public class LocalCaseExecutionVariablesResource extends AbstractVariablesResour
 
   protected String getResourceTypeName() {
     return "case execution";
-  }
-
-  protected void setVariableEntityFromSerialized(String variableKey, Object serializedValue, String variableType, Map<String, Object> configuration) {
-    throw new RestException(Status.NOT_FOUND, "Unsupported operation");
   }
 
 }

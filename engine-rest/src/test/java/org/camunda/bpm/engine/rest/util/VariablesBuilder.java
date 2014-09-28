@@ -3,6 +3,8 @@ package org.camunda.bpm.engine.rest.util;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.camunda.bpm.engine.impl.core.variable.type.ObjectTypeImpl;
+
 /**
  * <p>Builds maps that fulfill the camunda variable json format.</p>
  * <p>
@@ -52,10 +54,9 @@ public class VariablesBuilder {
     return variable(name, value, null, local);
   }
 
-  public VariablesBuilder variableSerialized(String name, String jsonValue, Map<String, Object> serializationConfig) {
-    Map<String, Object> variableValueMap = getVariableValueMap(jsonValue, "Object");
-    variableValueMap.put("serializationConfig", serializationConfig);
-    variables.put(name, variableValueMap);
+  public VariablesBuilder variable(String name, String type, Object value, String serializationFormat, String objectType) {
+    Map<String, Object> variableValue = getObjectValueMap(value, type, serializationFormat, objectType);
+    variables.put(name, variableValue);
     return this;
   }
 
@@ -89,7 +90,7 @@ public class VariablesBuilder {
     return variable;
   }
 
-  public static Map<String, Object> getSerializedValueMap(Object value, String variableType, Map<String, Object> configuration) {
+  public static Map<String, Object> getObjectValueMap(Object value, String variableType, String serializationFormat, String objectTypeName) {
     Map<String, Object> serializedVariable = new HashMap<String, Object>();
 
     if (value != null) {
@@ -97,12 +98,14 @@ public class VariablesBuilder {
     }
 
     if (variableType != null) {
-      serializedVariable.put("variableType", variableType);
+      serializedVariable.put("type", variableType);
     }
 
-    if (configuration != null) {
-      serializedVariable.put("serializationConfig", configuration);
-    }
+    Map<String, Object> typeInfo = new HashMap<String, Object>();
+    typeInfo.put(ObjectTypeImpl.VALUE_INFO_SERIALIZATION_DATA_FORMAT, serializationFormat);
+    typeInfo.put(ObjectTypeImpl.VALUE_INFO_OBJECT_TYPE_NAME, objectTypeName);
+
+    serializedVariable.put("valueInfo", typeInfo);
 
     return serializedVariable;
   }

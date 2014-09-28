@@ -17,7 +17,6 @@ import java.util.List;
 
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.DelegateTask;
-import org.camunda.bpm.engine.delegate.PersistentVariableInstance;
 import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.history.IncidentState;
 import org.camunda.bpm.engine.history.UserOperationLogContext;
@@ -144,8 +143,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     evt.setTaskId(variableInstance.getTaskId());
     evt.setRevision(variableInstance.getRevision());
     evt.setVariableName(variableInstance.getName());
-    evt.setVariableTypeName(variableInstance.getType().getTypeName());
-    evt.setDataFormatId(variableInstance.getDataFormatId());
+    evt.setSerializerName(variableInstance.getSerializerName());
 
     // copy value
     evt.setTextValue(variableInstance.getTextValue());
@@ -208,7 +206,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
   }
 
 
-  protected HistoryEvent createHistoricVariableEvent(VariableInstanceEntity variableInstance, VariableScope<PersistentVariableInstance> sourceVariableScope, HistoryEventType eventType) {
+  protected HistoryEvent createHistoricVariableEvent(VariableInstanceEntity variableInstance, VariableScope sourceVariableScope, HistoryEventType eventType) {
     String scopeActivityInstanceId = null;
     String sourceActivityInstanceId = null;
 
@@ -473,15 +471,15 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
 
   // variables /////////////////////////////////
 
-  public HistoryEvent createHistoricVariableCreateEvt(VariableInstanceEntity variableInstance, VariableScope<PersistentVariableInstance> sourceVariableScope) {
+  public HistoryEvent createHistoricVariableCreateEvt(VariableInstanceEntity variableInstance, VariableScope sourceVariableScope) {
     return createHistoricVariableEvent(variableInstance, sourceVariableScope, HistoryEventTypes.VARIABLE_INSTANCE_CREATE);
   }
 
-  public HistoryEvent createHistoricVariableDeleteEvt(VariableInstanceEntity variableInstance, VariableScope<PersistentVariableInstance> sourceVariableScope) {
+  public HistoryEvent createHistoricVariableDeleteEvt(VariableInstanceEntity variableInstance, VariableScope sourceVariableScope) {
     return createHistoricVariableEvent(variableInstance, sourceVariableScope, HistoryEventTypes.VARIABLE_INSTANCE_DELTE);
   }
 
-  public HistoryEvent createHistoricVariableUpdateEvt(VariableInstanceEntity variableInstance, VariableScope<PersistentVariableInstance> sourceVariableScope) {
+  public HistoryEvent createHistoricVariableUpdateEvt(VariableInstanceEntity variableInstance, VariableScope sourceVariableScope) {
     return createHistoricVariableEvent(variableInstance, sourceVariableScope, HistoryEventTypes.VARIABLE_INSTANCE_UPDATE);
   }
 

@@ -12,6 +12,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -24,6 +25,7 @@ import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.helper.EqualsMap;
+import org.camunda.bpm.engine.rest.helper.ErrorMessageHelper;
 import org.camunda.bpm.engine.rest.util.VariablesBuilder;
 import org.camunda.bpm.engine.runtime.MessageCorrelationBuilder;
 import org.junit.Before;
@@ -268,8 +270,9 @@ public abstract class AbstractMessageRestServiceTest extends AbstractRestService
 
     given().contentType(POST_JSON_CONTENT_TYPE).body(messageParameters)
     .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
-    .body("type", equalTo(RestException.class.getSimpleName()))
-    .body("message", equalTo("Cannot deliver a message due to number format exception: For input string: \"1abc\""))
+    .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+    .body("message", equalTo("Cannot deliver message: "
+        + ErrorMessageHelper.getExpectedFailingConversionMessage(variableValue, variableType, Integer.class)))
     .when().post(MESSAGE_URL);
   }
 
@@ -289,8 +292,9 @@ public abstract class AbstractMessageRestServiceTest extends AbstractRestService
 
     given().contentType(POST_JSON_CONTENT_TYPE).body(messageParameters)
     .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
-    .body("type", equalTo(RestException.class.getSimpleName()))
-    .body("message", equalTo("Cannot deliver a message due to number format exception: For input string: \"1abc\""))
+    .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+    .body("message", equalTo("Cannot deliver message: "
+        + ErrorMessageHelper.getExpectedFailingConversionMessage(variableValue, variableType, Short.class)))
     .when().post(MESSAGE_URL);
   }
 
@@ -310,8 +314,9 @@ public abstract class AbstractMessageRestServiceTest extends AbstractRestService
 
     given().contentType(POST_JSON_CONTENT_TYPE).body(messageParameters)
     .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
-    .body("type", equalTo(RestException.class.getSimpleName()))
-    .body("message", equalTo("Cannot deliver a message due to number format exception: For input string: \"1abc\""))
+    .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+    .body("message", equalTo("Cannot deliver message: "
+        + ErrorMessageHelper.getExpectedFailingConversionMessage(variableValue, variableType, Long.class)))
     .when().post(MESSAGE_URL);
   }
 
@@ -331,8 +336,9 @@ public abstract class AbstractMessageRestServiceTest extends AbstractRestService
 
     given().contentType(POST_JSON_CONTENT_TYPE).body(messageParameters)
     .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
-    .body("type", equalTo(RestException.class.getSimpleName()))
-    .body("message", equalTo("Cannot deliver a message due to number format exception: For input string: \"1abc\""))
+    .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+    .body("message", equalTo("Cannot deliver message: "
+        + ErrorMessageHelper.getExpectedFailingConversionMessage(variableValue, variableType, Double.class)))
     .when().post(MESSAGE_URL);
   }
 
@@ -352,8 +358,9 @@ public abstract class AbstractMessageRestServiceTest extends AbstractRestService
 
     given().contentType(POST_JSON_CONTENT_TYPE).body(messageParameters)
     .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
-    .body("type", equalTo(RestException.class.getSimpleName()))
-    .body("message", equalTo("Cannot deliver a message due to parse exception: Unparseable date: \"1abc\""))
+    .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+    .body("message", equalTo("Cannot deliver message: "
+        + ErrorMessageHelper.getExpectedFailingConversionMessage(variableValue, variableType, Date.class)))
     .when().post(MESSAGE_URL);
   }
 
@@ -373,8 +380,8 @@ public abstract class AbstractMessageRestServiceTest extends AbstractRestService
 
     given().contentType(POST_JSON_CONTENT_TYPE).body(messageParameters)
     .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
-    .body("type", equalTo(RestException.class.getSimpleName()))
-    .body("message", equalTo("Cannot deliver a message: The value type 'X' is not supported."))
+    .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+    .body("message", equalTo("Cannot deliver message: Unsupported value type 'X'"))
     .when().post(MESSAGE_URL);
   }
 
@@ -394,8 +401,9 @@ public abstract class AbstractMessageRestServiceTest extends AbstractRestService
 
     given().contentType(POST_JSON_CONTENT_TYPE).body(messageParameters)
     .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
-    .body("type", equalTo(RestException.class.getSimpleName()))
-    .body("message", equalTo("Cannot deliver a message due to number format exception: For input string: \"1abc\""))
+    .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+    .body("message", equalTo("Cannot deliver message: "
+        + ErrorMessageHelper.getExpectedFailingConversionMessage(variableValue, variableType, Integer.class)))
     .when().post(MESSAGE_URL);
   }
 
@@ -415,8 +423,9 @@ public abstract class AbstractMessageRestServiceTest extends AbstractRestService
 
     given().contentType(POST_JSON_CONTENT_TYPE).body(messageParameters)
     .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
-    .body("type", equalTo(RestException.class.getSimpleName()))
-    .body("message", equalTo("Cannot deliver a message due to number format exception: For input string: \"1abc\""))
+    .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+    .body("message", equalTo("Cannot deliver message: "
+        + ErrorMessageHelper.getExpectedFailingConversionMessage(variableValue, variableType, Short.class)))
     .when().post(MESSAGE_URL);
   }
 
@@ -436,8 +445,9 @@ public abstract class AbstractMessageRestServiceTest extends AbstractRestService
 
     given().contentType(POST_JSON_CONTENT_TYPE).body(messageParameters)
     .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
-    .body("type", equalTo(RestException.class.getSimpleName()))
-    .body("message", equalTo("Cannot deliver a message due to number format exception: For input string: \"1abc\""))
+    .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+    .body("message", equalTo("Cannot deliver message: "
+        + ErrorMessageHelper.getExpectedFailingConversionMessage(variableValue, variableType, Long.class)))
     .when().post(MESSAGE_URL);
   }
 
@@ -457,8 +467,9 @@ public abstract class AbstractMessageRestServiceTest extends AbstractRestService
 
     given().contentType(POST_JSON_CONTENT_TYPE).body(messageParameters)
     .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
-    .body("type", equalTo(RestException.class.getSimpleName()))
-    .body("message", equalTo("Cannot deliver a message due to number format exception: For input string: \"1abc\""))
+    .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+    .body("message", equalTo("Cannot deliver message: "
+        + ErrorMessageHelper.getExpectedFailingConversionMessage(variableValue, variableType, Double.class)))
     .when().post(MESSAGE_URL);
   }
 
@@ -478,8 +489,9 @@ public abstract class AbstractMessageRestServiceTest extends AbstractRestService
 
     given().contentType(POST_JSON_CONTENT_TYPE).body(messageParameters)
     .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
-    .body("type", equalTo(RestException.class.getSimpleName()))
-    .body("message", equalTo("Cannot deliver a message due to parse exception: Unparseable date: \"1abc\""))
+    .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+    .body("message", equalTo("Cannot deliver message: "
+        + ErrorMessageHelper.getExpectedFailingConversionMessage(variableValue, variableType, Date.class)))
     .when().post(MESSAGE_URL);
   }
 
@@ -499,8 +511,8 @@ public abstract class AbstractMessageRestServiceTest extends AbstractRestService
 
     given().contentType(POST_JSON_CONTENT_TYPE).body(messageParameters)
     .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
-    .body("type", equalTo(RestException.class.getSimpleName()))
-    .body("message", equalTo("Cannot deliver a message: The value type 'X' is not supported."))
+    .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+    .body("message", equalTo("Cannot deliver message: Unsupported value type 'X'"))
     .when().post(MESSAGE_URL);
   }
 }

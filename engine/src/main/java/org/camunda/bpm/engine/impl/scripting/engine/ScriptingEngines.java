@@ -214,7 +214,7 @@ public class ScriptingEngines {
   /** override to build a spring aware ScriptingEngines
    * @param engineBindings
    * @param scriptEngine */
-  public Bindings createBindings(ScriptEngine scriptEngine, VariableScope<?> variableScope) {
+  public Bindings createBindings(ScriptEngine scriptEngine, VariableScope variableScope) {
     return scriptBindingsFactory.createBindings(variableScope, scriptEngine.createBindings());
   }
 

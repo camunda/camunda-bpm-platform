@@ -1,18 +1,19 @@
 package org.camunda.bpm.engine.rest.sub.runtime.impl;
 
 import java.util.List;
-import java.util.Map;
-
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.RuntimeServiceImpl;
 import org.camunda.bpm.engine.rest.sub.impl.AbstractVariablesResource;
+import org.camunda.bpm.engine.variable.VariableMap;
+import org.camunda.bpm.engine.variable.value.TypedValue;
+import org.codehaus.jackson.map.ObjectMapper;
 
 public class ExecutionVariablesResource extends AbstractVariablesResource {
 
   private String resourceTypeName;
 
-  public ExecutionVariablesResource(ProcessEngine engine, String resourceId, boolean isProcessInstance) {
-    super(engine, resourceId);
+  public ExecutionVariablesResource(ProcessEngine engine, String resourceId, boolean isProcessInstance, ObjectMapper objectMapper) {
+    super(engine, resourceId, objectMapper);
     if (isProcessInstance) {
       resourceTypeName = "process instance";
     } else {
@@ -20,41 +21,29 @@ public class ExecutionVariablesResource extends AbstractVariablesResource {
     }
   }
 
-  @Override
-  protected Map<String, Object> getVariableEntities() {
-    return engine.getRuntimeService().getVariables(resourceId);
-  }
-
-  @Override
-  protected void updateVariableEntities(Map<String, Object> modifications, List<String> deletions) {
-    RuntimeServiceImpl runtimeService = (RuntimeServiceImpl) engine.getRuntimeService();
-    runtimeService.updateVariables(resourceId, modifications, deletions);
-  }
-
-  @Override
-  protected Object getVariableEntity(String variableKey) {
-    return engine.getRuntimeService().getVariable(resourceId, variableKey);
-  }
-
-  @Override
-  protected void setVariableEntity(String variableKey, Object variableValue) {
-    engine.getRuntimeService().setVariable(resourceId, variableKey, variableValue);
-  }
-
-  @Override
-  protected void removeVariableEntity(String variableKey) {
-    engine.getRuntimeService().removeVariable(resourceId, variableKey);
-  }
-
-  @Override
   protected String getResourceTypeName() {
     return resourceTypeName;
   }
 
-  @Override
-  protected void setVariableEntityFromSerialized(String variableKey, Object serializedValue, String variableType, Map<String, Object> configuration) {
-    engine.getRuntimeService().setVariableFromSerialized(resourceId, variableKey,
-        serializedValue, variableType, configuration);
+  protected void updateVariableEntities(VariableMap modifications, List<String> deletions) {
+    RuntimeServiceImpl runtimeService = (RuntimeServiceImpl) engine.getRuntimeService();
+    runtimeService.updateVariables(resourceId, modifications, deletions);
+  }
+
+  protected void removeVariableEntity(String variableKey) {
+    engine.getRuntimeService().removeVariable(resourceId, variableKey);
+  }
+
+  protected VariableMap getVariableEntities(boolean deserializeValues) {
+    return engine.getRuntimeService().getVariables(resourceId, deserializeValues);
+  }
+
+  protected TypedValue getVariableEntity(String variableKey, boolean deserializeValue) {
+    return engine.getRuntimeService().getVariableTyped(resourceId, variableKey, deserializeValue);
+  }
+
+  protected void setVariableEntity(String variableKey, TypedValue variableValue) {
+    engine.getRuntimeService().setVariable(resourceId, variableKey, variableValue);
   }
 
 }

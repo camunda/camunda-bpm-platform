@@ -21,6 +21,7 @@ import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.repository.DeploymentQuery;
 import org.camunda.bpm.engine.rest.dto.AbstractQueryDto;
 import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
+import org.codehaus.jackson.map.ObjectMapper;
 
 public class DeploymentQueryDto extends AbstractQueryDto<DeploymentQuery> {
 
@@ -43,8 +44,8 @@ public class DeploymentQueryDto extends AbstractQueryDto<DeploymentQuery> {
   public DeploymentQueryDto() {
   }
 
-  public DeploymentQueryDto(MultivaluedMap<String, String> queryParameters) {
-    super(queryParameters);
+  public DeploymentQueryDto(ObjectMapper objectMapper, MultivaluedMap<String, String> queryParameters) {
+    super(objectMapper, queryParameters);
   }
 
   @CamundaQueryParam("id")

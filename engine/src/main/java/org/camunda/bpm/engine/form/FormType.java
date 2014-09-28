@@ -13,6 +13,8 @@
 
 package org.camunda.bpm.engine.form;
 
+import org.camunda.bpm.engine.variable.value.TypedValue;
+
 
 /**
  * Used to indicate the type on a {@link FormProperty}.
@@ -29,6 +31,8 @@ public interface FormType {
    * which extra information keys each type provides
    * and what return type they give. */
   Object getInformation(String key);
+
+  TypedValue getTypedValue(Object value);
 
 
 }

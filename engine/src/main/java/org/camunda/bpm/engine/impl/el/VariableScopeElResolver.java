@@ -40,9 +40,9 @@ public class VariableScopeElResolver extends ELResolver {
   public static final String TASK_KEY = "task";
   public static final String LOGGED_IN_USER_KEY = "authenticatedUserId";
 
-  protected VariableScope<?> variableScope;
+  protected VariableScope variableScope;
 
-  public VariableScopeElResolver(VariableScope<?> variableScope) {
+  public VariableScopeElResolver(VariableScope variableScope) {
     this.variableScope = variableScope;
   }
 

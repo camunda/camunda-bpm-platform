@@ -18,9 +18,10 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Matchers.isNull;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -38,13 +39,18 @@ import java.util.Map;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 
-import org.apache.wink.common.RestException;
 import org.camunda.bpm.engine.CaseService;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.rest.dto.runtime.VariableNameDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
+import org.camunda.bpm.engine.rest.exception.RestException;
+import org.camunda.bpm.engine.rest.helper.ErrorMessageHelper;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
+import org.camunda.bpm.engine.rest.helper.VariableTypeHelper;
+import org.camunda.bpm.engine.rest.helper.variable.EqualsNullValue;
+import org.camunda.bpm.engine.rest.helper.variable.EqualsObjectValue;
+import org.camunda.bpm.engine.rest.helper.variable.EqualsPrimitiveValue;
 import org.camunda.bpm.engine.rest.util.VariablesBuilder;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.CaseExecutionCommandBuilder;
@@ -99,14 +105,14 @@ public class AbstractCaseExecutionRestServiceInteractionTest extends AbstractRes
     when(caseExecutionQueryMock.caseExecutionId(MockProvider.EXAMPLE_CASE_EXECUTION_ID)).thenReturn(caseExecutionQueryMock);
     when(caseExecutionQueryMock.singleResult()).thenReturn(mockCaseExecution);
 
-    when(caseServiceMock.getVariable(anyString(), anyString())).thenReturn(EXAMPLE_VARIABLE_VALUE);
-    when(caseServiceMock.getVariables(anyString())).thenReturn(EXAMPLE_VARIABLES);
+    when(caseServiceMock.getVariableTyped(anyString(), anyString(), eq(true))).thenReturn(EXAMPLE_VARIABLE_VALUE);
+    when(caseServiceMock.getVariables(anyString(), eq(true))).thenReturn(EXAMPLE_VARIABLES);
 
-    when(caseServiceMock.getVariableLocal(anyString(), anyString())).thenReturn(EXAMPLE_VARIABLE_VALUE);
-    when(caseServiceMock.getVariablesLocal(anyString())).thenReturn(EXAMPLE_VARIABLES);
+    when(caseServiceMock.getVariableLocalTyped(anyString(), anyString(), eq(true))).thenReturn(EXAMPLE_VARIABLE_VALUE);
+    when(caseServiceMock.getVariablesLocal(anyString(), eq(true))).thenReturn(EXAMPLE_VARIABLES);
 
-    when(caseServiceMock.getVariables(anyString(), Matchers.<Collection<String>>any())).thenReturn(EXAMPLE_VARIABLES);
-    when(caseServiceMock.getVariablesLocal(anyString(), Matchers.<Collection<String>>any())).thenReturn(EXAMPLE_VARIABLES);
+    when(caseServiceMock.getVariables(anyString(), Matchers.<Collection<String>>any(), eq(true))).thenReturn(EXAMPLE_VARIABLES);
+    when(caseServiceMock.getVariablesLocal(anyString(), Matchers.<Collection<String>>any(), eq(true))).thenReturn(EXAMPLE_VARIABLES);
 
     caseExecutionCommandBuilderMock = mock(CaseExecutionCommandBuilder.class);
 
@@ -213,8 +219,10 @@ public class AbstractCaseExecutionRestServiceInteractionTest extends AbstractRes
       .post(CASE_EXECUTION_MANUAL_START_URL);
 
     verify(caseServiceMock).withCaseExecution(MockProvider.EXAMPLE_CASE_EXECUTION_ID);
-    verify(caseExecutionCommandBuilderMock).setVariable(aVariableKey, aVariableValue);
-    verify(caseExecutionCommandBuilderMock).setVariable(anotherVariableKey, anotherVariableValue);
+    verify(caseExecutionCommandBuilderMock).setVariable(eq(aVariableKey),
+        argThat(EqualsPrimitiveValue.integerValue(aVariableValue)));
+    verify(caseExecutionCommandBuilderMock).setVariable(eq(anotherVariableKey),
+        argThat(EqualsPrimitiveValue.stringValue(anotherVariableValue)));
     verify(caseExecutionCommandBuilderMock).manualStart();
   }
 
@@ -247,8 +255,10 @@ public class AbstractCaseExecutionRestServiceInteractionTest extends AbstractRes
       .post(CASE_EXECUTION_MANUAL_START_URL);
 
     verify(caseServiceMock).withCaseExecution(MockProvider.EXAMPLE_CASE_EXECUTION_ID);
-    verify(caseExecutionCommandBuilderMock).setVariableLocal(aVariableKey, aVariableValue);
-    verify(caseExecutionCommandBuilderMock).setVariableLocal(anotherVariableKey, anotherVariableValue);
+    verify(caseExecutionCommandBuilderMock).setVariableLocal(eq(aVariableKey),
+        argThat(EqualsPrimitiveValue.integerValue(aVariableValue)));
+    verify(caseExecutionCommandBuilderMock).setVariableLocal(eq(anotherVariableKey),
+        argThat(EqualsPrimitiveValue.stringValue(anotherVariableValue)));
     verify(caseExecutionCommandBuilderMock).manualStart();
   }
 
@@ -281,8 +291,10 @@ public class AbstractCaseExecutionRestServiceInteractionTest extends AbstractRes
       .post(CASE_EXECUTION_MANUAL_START_URL);
 
     verify(caseServiceMock).withCaseExecution(MockProvider.EXAMPLE_CASE_EXECUTION_ID);
-    verify(caseExecutionCommandBuilderMock).setVariable(aVariableKey, aVariableValue);
-    verify(caseExecutionCommandBuilderMock).setVariableLocal(anotherVariableKey, anotherVariableValue);
+    verify(caseExecutionCommandBuilderMock).setVariable(eq(aVariableKey),
+        argThat(EqualsPrimitiveValue.integerValue(aVariableValue)));
+    verify(caseExecutionCommandBuilderMock).setVariableLocal(eq(anotherVariableKey),
+        argThat(EqualsPrimitiveValue.stringValue(anotherVariableValue)));
     verify(caseExecutionCommandBuilderMock).manualStart();
   }
 
@@ -415,7 +427,8 @@ public class AbstractCaseExecutionRestServiceInteractionTest extends AbstractRes
 
     verify(caseServiceMock).withCaseExecution(MockProvider.EXAMPLE_CASE_EXECUTION_ID);
     verify(caseExecutionCommandBuilderMock).removeVariable(aVariableKey);
-    verify(caseExecutionCommandBuilderMock).setVariable(anotherVariableKey, anotherVariableValue);
+    verify(caseExecutionCommandBuilderMock).setVariable(eq(anotherVariableKey),
+        argThat(EqualsPrimitiveValue.stringValue(anotherVariableValue)));
     verify(caseExecutionCommandBuilderMock).manualStart();
   }
 
@@ -452,7 +465,8 @@ public class AbstractCaseExecutionRestServiceInteractionTest extends AbstractRes
 
     verify(caseServiceMock).withCaseExecution(MockProvider.EXAMPLE_CASE_EXECUTION_ID);
     verify(caseExecutionCommandBuilderMock).removeVariableLocal(aVariableKey);
-    verify(caseExecutionCommandBuilderMock).setVariable(anotherVariableKey, anotherVariableValue);
+    verify(caseExecutionCommandBuilderMock).setVariable(eq(anotherVariableKey),
+        argThat(EqualsPrimitiveValue.stringValue(anotherVariableValue)));
     verify(caseExecutionCommandBuilderMock).manualStart();
   }
 
@@ -489,7 +503,8 @@ public class AbstractCaseExecutionRestServiceInteractionTest extends AbstractRes
 
     verify(caseServiceMock).withCaseExecution(MockProvider.EXAMPLE_CASE_EXECUTION_ID);
     verify(caseExecutionCommandBuilderMock).removeVariable(aVariableKey);
-    verify(caseExecutionCommandBuilderMock).setVariableLocal(anotherVariableKey, anotherVariableValue);
+    verify(caseExecutionCommandBuilderMock).setVariableLocal(eq(anotherVariableKey),
+        argThat(EqualsPrimitiveValue.stringValue(anotherVariableValue)));
     verify(caseExecutionCommandBuilderMock).manualStart();
   }
 
@@ -526,7 +541,8 @@ public class AbstractCaseExecutionRestServiceInteractionTest extends AbstractRes
 
     verify(caseServiceMock).withCaseExecution(MockProvider.EXAMPLE_CASE_EXECUTION_ID);
     verify(caseExecutionCommandBuilderMock).removeVariableLocal(aVariableKey);
-    verify(caseExecutionCommandBuilderMock).setVariableLocal(anotherVariableKey, anotherVariableValue);
+    verify(caseExecutionCommandBuilderMock).setVariableLocal(eq(anotherVariableKey),
+        argThat(EqualsPrimitiveValue.stringValue(anotherVariableValue)));
     verify(caseExecutionCommandBuilderMock).manualStart();
   }
 
@@ -595,8 +611,10 @@ public class AbstractCaseExecutionRestServiceInteractionTest extends AbstractRes
       .post(CASE_EXECUTION_DISABLE_URL);
 
     verify(caseServiceMock).withCaseExecution(MockProvider.EXAMPLE_CASE_EXECUTION_ID);
-    verify(caseExecutionCommandBuilderMock).setVariable(aVariableKey, aVariableValue);
-    verify(caseExecutionCommandBuilderMock).setVariable(anotherVariableKey, anotherVariableValue);
+    verify(caseExecutionCommandBuilderMock).setVariable(eq(aVariableKey),
+        argThat(EqualsPrimitiveValue.integerValue(aVariableValue)));
+    verify(caseExecutionCommandBuilderMock).setVariable(eq(anotherVariableKey),
+        argThat(EqualsPrimitiveValue.stringValue(anotherVariableValue)));
     verify(caseExecutionCommandBuilderMock).disable();
   }
 
@@ -629,8 +647,10 @@ public class AbstractCaseExecutionRestServiceInteractionTest extends AbstractRes
       .post(CASE_EXECUTION_DISABLE_URL);
 
     verify(caseServiceMock).withCaseExecution(MockProvider.EXAMPLE_CASE_EXECUTION_ID);
-    verify(caseExecutionCommandBuilderMock).setVariableLocal(aVariableKey, aVariableValue);
-    verify(caseExecutionCommandBuilderMock).setVariableLocal(anotherVariableKey, anotherVariableValue);
+    verify(caseExecutionCommandBuilderMock).setVariableLocal(eq(aVariableKey),
+        argThat(EqualsPrimitiveValue.integerValue(aVariableValue)));
+    verify(caseExecutionCommandBuilderMock).setVariableLocal(eq(anotherVariableKey),
+        argThat(EqualsPrimitiveValue.stringValue(anotherVariableValue)));
     verify(caseExecutionCommandBuilderMock).disable();
   }
 
@@ -663,8 +683,10 @@ public class AbstractCaseExecutionRestServiceInteractionTest extends AbstractRes
       .post(CASE_EXECUTION_DISABLE_URL);
 
     verify(caseServiceMock).withCaseExecution(MockProvider.EXAMPLE_CASE_EXECUTION_ID);
-    verify(caseExecutionCommandBuilderMock).setVariable(aVariableKey, aVariableValue);
-    verify(caseExecutionCommandBuilderMock).setVariableLocal(anotherVariableKey, anotherVariableValue);
+    verify(caseExecutionCommandBuilderMock).setVariable(eq(aVariableKey),
+        argThat(EqualsPrimitiveValue.integerValue(aVariableValue)));
+    verify(caseExecutionCommandBuilderMock).setVariableLocal(eq(anotherVariableKey),
+        argThat(EqualsPrimitiveValue.stringValue(anotherVariableValue)));
     verify(caseExecutionCommandBuilderMock).disable();
   }
 
@@ -797,7 +819,8 @@ public class AbstractCaseExecutionRestServiceInteractionTest extends AbstractRes
 
     verify(caseServiceMock).withCaseExecution(MockProvider.EXAMPLE_CASE_EXECUTION_ID);
     verify(caseExecutionCommandBuilderMock).removeVariable(aVariableKey);
-    verify(caseExecutionCommandBuilderMock).setVariable(anotherVariableKey, anotherVariableValue);
+    verify(caseExecutionCommandBuilderMock).setVariable(eq(anotherVariableKey),
+        argThat(EqualsPrimitiveValue.stringValue(anotherVariableValue)));
     verify(caseExecutionCommandBuilderMock).disable();
   }
 
@@ -834,7 +857,8 @@ public class AbstractCaseExecutionRestServiceInteractionTest extends AbstractRes
 
     verify(caseServiceMock).withCaseExecution(MockProvider.EXAMPLE_CASE_EXECUTION_ID);
     verify(caseExecutionCommandBuilderMock).removeVariableLocal(aVariableKey);
-    verify(caseExecutionCommandBuilderMock).setVariable(anotherVariableKey, anotherVariableValue);
+    verify(caseExecutionCommandBuilderMock).setVariable(eq(anotherVariableKey),
+        argThat(EqualsPrimitiveValue.stringValue(anotherVariableValue)));
     verify(caseExecutionCommandBuilderMock).disable();
   }
 
@@ -871,7 +895,8 @@ public class AbstractCaseExecutionRestServiceInteractionTest extends AbstractRes
 
     verify(caseServiceMock).withCaseExecution(MockProvider.EXAMPLE_CASE_EXECUTION_ID);
     verify(caseExecutionCommandBuilderMock).removeVariable(aVariableKey);
-    verify(caseExecutionCommandBuilderMock).setVariableLocal(anotherVariableKey, anotherVariableValue);
+    verify(caseExecutionCommandBuilderMock).setVariableLocal(eq(anotherVariableKey),
+        argThat(EqualsPrimitiveValue.stringValue(anotherVariableValue)));
     verify(caseExecutionCommandBuilderMock).disable();
   }
 
@@ -908,7 +933,8 @@ public class AbstractCaseExecutionRestServiceInteractionTest extends AbstractRes
 
     verify(caseServiceMock).withCaseExecution(MockProvider.EXAMPLE_CASE_EXECUTION_ID);
     verify(caseExecutionCommandBuilderMock).removeVariableLocal(aVariableKey);
-    verify(caseExecutionCommandBuilderMock).setVariableLocal(anotherVariableKey, anotherVariableValue);
+    verify(caseExecutionCommandBuilderMock).setVariableLocal(eq(anotherVariableKey),
+        argThat(EqualsPrimitiveValue.stringValue(anotherVariableValue)));
     verify(caseExecutionCommandBuilderMock).disable();
   }
 
@@ -977,8 +1003,10 @@ public class AbstractCaseExecutionRestServiceInteractionTest extends AbstractRes
       .post(CASE_EXECUTION_REENABLE_URL);
 
     verify(caseServiceMock).withCaseExecution(MockProvider.EXAMPLE_CASE_EXECUTION_ID);
-    verify(caseExecutionCommandBuilderMock).setVariable(aVariableKey, aVariableValue);
-    verify(caseExecutionCommandBuilderMock).setVariable(anotherVariableKey, anotherVariableValue);
+    verify(caseExecutionCommandBuilderMock).setVariable(eq(aVariableKey),
+        argThat(EqualsPrimitiveValue.integerValue(aVariableValue)));
+    verify(caseExecutionCommandBuilderMock).setVariable(eq(anotherVariableKey),
+        argThat(EqualsPrimitiveValue.stringValue(anotherVariableValue)));
     verify(caseExecutionCommandBuilderMock).reenable();
   }
 
@@ -1011,8 +1039,10 @@ public class AbstractCaseExecutionRestServiceInteractionTest extends AbstractRes
       .post(CASE_EXECUTION_REENABLE_URL);
 
     verify(caseServiceMock).withCaseExecution(MockProvider.EXAMPLE_CASE_EXECUTION_ID);
-    verify(caseExecutionCommandBuilderMock).setVariableLocal(aVariableKey, aVariableValue);
-    verify(caseExecutionCommandBuilderMock).setVariableLocal(anotherVariableKey, anotherVariableValue);
+    verify(caseExecutionCommandBuilderMock).setVariableLocal(eq(aVariableKey),
+        argThat(EqualsPrimitiveValue.integerValue(aVariableValue)));
+    verify(caseExecutionCommandBuilderMock).setVariableLocal(eq(anotherVariableKey),
+        argThat(EqualsPrimitiveValue.stringValue(anotherVariableValue)));
     verify(caseExecutionCommandBuilderMock).reenable();
   }
 
@@ -1045,8 +1075,10 @@ public class AbstractCaseExecutionRestServiceInteractionTest extends AbstractRes
       .post(CASE_EXECUTION_REENABLE_URL);
 
     verify(caseServiceMock).withCaseExecution(MockProvider.EXAMPLE_CASE_EXECUTION_ID);
-    verify(caseExecutionCommandBuilderMock).setVariable(aVariableKey, aVariableValue);
-    verify(caseExecutionCommandBuilderMock).setVariableLocal(anotherVariableKey, anotherVariableValue);
+    verify(caseExecutionCommandBuilderMock).setVariable(eq(aVariableKey),
+        argThat(EqualsPrimitiveValue.integerValue(aVariableValue)));
+    verify(caseExecutionCommandBuilderMock).setVariableLocal(eq(anotherVariableKey),
+        argThat(EqualsPrimitiveValue.stringValue(anotherVariableValue)));
     verify(caseExecutionCommandBuilderMock).reenable();
   }
 
@@ -1179,7 +1211,8 @@ public class AbstractCaseExecutionRestServiceInteractionTest extends AbstractRes
 
     verify(caseServiceMock).withCaseExecution(MockProvider.EXAMPLE_CASE_EXECUTION_ID);
     verify(caseExecutionCommandBuilderMock).removeVariable(aVariableKey);
-    verify(caseExecutionCommandBuilderMock).setVariable(anotherVariableKey, anotherVariableValue);
+    verify(caseExecutionCommandBuilderMock).setVariable(eq(anotherVariableKey),
+        argThat(EqualsPrimitiveValue.stringValue(anotherVariableValue)));
     verify(caseExecutionCommandBuilderMock).reenable();
   }
 
@@ -1216,7 +1249,8 @@ public class AbstractCaseExecutionRestServiceInteractionTest extends AbstractRes
 
     verify(caseServiceMock).withCaseExecution(MockProvider.EXAMPLE_CASE_EXECUTION_ID);
     verify(caseExecutionCommandBuilderMock).removeVariableLocal(aVariableKey);
-    verify(caseExecutionCommandBuilderMock).setVariable(anotherVariableKey, anotherVariableValue);
+    verify(caseExecutionCommandBuilderMock).setVariable(eq(anotherVariableKey),
+        argThat(EqualsPrimitiveValue.stringValue(anotherVariableValue)));
     verify(caseExecutionCommandBuilderMock).reenable();
   }
 
@@ -1253,7 +1287,8 @@ public class AbstractCaseExecutionRestServiceInteractionTest extends AbstractRes
 
     verify(caseServiceMock).withCaseExecution(MockProvider.EXAMPLE_CASE_EXECUTION_ID);
     verify(caseExecutionCommandBuilderMock).removeVariable(aVariableKey);
-    verify(caseExecutionCommandBuilderMock).setVariableLocal(anotherVariableKey, anotherVariableValue);
+    verify(caseExecutionCommandBuilderMock).setVariableLocal(eq(anotherVariableKey),
+        argThat(EqualsPrimitiveValue.stringValue(anotherVariableValue)));
     verify(caseExecutionCommandBuilderMock).reenable();
   }
 
@@ -1290,7 +1325,8 @@ public class AbstractCaseExecutionRestServiceInteractionTest extends AbstractRes
 
     verify(caseServiceMock).withCaseExecution(MockProvider.EXAMPLE_CASE_EXECUTION_ID);
     verify(caseExecutionCommandBuilderMock).removeVariableLocal(aVariableKey);
-    verify(caseExecutionCommandBuilderMock).setVariableLocal(anotherVariableKey, anotherVariableValue);
+    verify(caseExecutionCommandBuilderMock).setVariableLocal(eq(anotherVariableKey),
+        argThat(EqualsPrimitiveValue.stringValue(anotherVariableValue)));
     verify(caseExecutionCommandBuilderMock).reenable();
   }
 
@@ -1302,14 +1338,14 @@ public class AbstractCaseExecutionRestServiceInteractionTest extends AbstractRes
         .expect()
           .statusCode(Status.OK.getStatusCode())
           .body(EXAMPLE_VARIABLE_KEY, notNullValue())
-          .body(EXAMPLE_VARIABLE_KEY + ".value", equalTo(EXAMPLE_VARIABLE_VALUE))
-          .body(EXAMPLE_VARIABLE_KEY + ".type", equalTo(String.class.getSimpleName()))
+          .body(EXAMPLE_VARIABLE_KEY + ".value", equalTo(EXAMPLE_VARIABLE_VALUE.getValue()))
+          .body(EXAMPLE_VARIABLE_KEY + ".type", equalTo("String"))
       .when()
         .get(CASE_EXECUTION_LOCAL_VARIABLES_URL);
 
     Assert.assertEquals("Should return exactly one variable", 1, response.jsonPath().getMap("").size());
 
-    verify(caseServiceMock).getVariablesLocal(MockProvider.EXAMPLE_CASE_EXECUTION_ID);
+    verify(caseServiceMock).getVariablesLocal(MockProvider.EXAMPLE_CASE_EXECUTION_ID, true);
   }
 
   @Test
@@ -1320,19 +1356,20 @@ public class AbstractCaseExecutionRestServiceInteractionTest extends AbstractRes
         .expect()
           .statusCode(Status.OK.getStatusCode())
           .body(EXAMPLE_VARIABLE_KEY, notNullValue())
-          .body(EXAMPLE_VARIABLE_KEY + ".value", equalTo(EXAMPLE_VARIABLE_VALUE))
-          .body(EXAMPLE_VARIABLE_KEY + ".type", equalTo(String.class.getSimpleName()))
+          .body(EXAMPLE_VARIABLE_KEY + ".value", equalTo(EXAMPLE_VARIABLE_VALUE.getValue()))
+          .body(EXAMPLE_VARIABLE_KEY + ".type",
+              equalTo(VariableTypeHelper.toExpectedValueTypeName(EXAMPLE_VARIABLE_VALUE.getType())))
       .when()
         .get(CASE_EXECUTION_VARIABLES_URL);
 
     Assert.assertEquals("Should return exactly one variable", 1, response.jsonPath().getMap("").size());
 
-    verify(caseServiceMock).getVariables(MockProvider.EXAMPLE_CASE_EXECUTION_ID);
+    verify(caseServiceMock).getVariables(MockProvider.EXAMPLE_CASE_EXECUTION_ID, true);
   }
 
   @Test
   public void testGetLocalVariablesForNonExistingExecution() {
-    when(caseServiceMock.getVariablesLocal(anyString())).thenThrow(new ProcessEngineException("expected exception"));
+    when(caseServiceMock.getVariablesLocal(anyString(), anyBoolean())).thenThrow(new ProcessEngineException("expected exception"));
 
     given()
       .pathParam("id", "aNonExistingExecutionId")
@@ -1345,12 +1382,12 @@ public class AbstractCaseExecutionRestServiceInteractionTest extends AbstractRes
       .when()
         .get(CASE_EXECUTION_LOCAL_VARIABLES_URL);
 
-    verify(caseServiceMock).getVariablesLocal("aNonExistingExecutionId");
+    verify(caseServiceMock).getVariablesLocal("aNonExistingExecutionId", true);
   }
 
   @Test
   public void testGetVariablesForNonExistingExecution() {
-    when(caseServiceMock.getVariables(anyString())).thenThrow(new ProcessEngineException("expected exception"));
+    when(caseServiceMock.getVariables(anyString(), anyBoolean())).thenThrow(new ProcessEngineException("expected exception"));
 
     given()
       .pathParam("id", "aNonExistingExecutionId")
@@ -1363,7 +1400,7 @@ public class AbstractCaseExecutionRestServiceInteractionTest extends AbstractRes
       .when()
         .get(CASE_EXECUTION_VARIABLES_URL);
 
-    verify(caseServiceMock).getVariables("aNonExistingExecutionId");
+    verify(caseServiceMock).getVariables("aNonExistingExecutionId", true);
   }
 
   @Test
@@ -1556,12 +1593,12 @@ public class AbstractCaseExecutionRestServiceInteractionTest extends AbstractRes
     .then()
       .expect()
         .statusCode(Status.OK.getStatusCode())
-        .body("value", is(EXAMPLE_VARIABLE_VALUE))
-        .body("type", is("String"))
+        .body("value", is(EXAMPLE_VARIABLE_VALUE.getValue()))
+        .body("type", is(VariableTypeHelper.toExpectedValueTypeName(EXAMPLE_VARIABLE_VALUE.getType())))
     .when()
       .get(SINGLE_CASE_EXECUTION_LOCAL_VARIABLE_URL);
 
-    verify(caseServiceMock).getVariableLocal(MockProvider.EXAMPLE_CASE_EXECUTION_ID, EXAMPLE_VARIABLE_KEY);
+    verify(caseServiceMock).getVariableLocalTyped(MockProvider.EXAMPLE_CASE_EXECUTION_ID, EXAMPLE_VARIABLE_KEY, true);
   }
 
   @Test
@@ -1572,17 +1609,18 @@ public class AbstractCaseExecutionRestServiceInteractionTest extends AbstractRes
     .then()
       .expect()
         .statusCode(Status.OK.getStatusCode())
-        .body("value", is(EXAMPLE_VARIABLE_VALUE))
-        .body("type", is("String"))
+        .body("value", is(EXAMPLE_VARIABLE_VALUE.getValue()))
+        .body("type", is(VariableTypeHelper.toExpectedValueTypeName(EXAMPLE_VARIABLE_VALUE.getType())))
     .when()
       .get(SINGLE_CASE_EXECUTION_VARIABLE_URL);
 
-    verify(caseServiceMock).getVariable(MockProvider.EXAMPLE_CASE_EXECUTION_ID, EXAMPLE_VARIABLE_KEY);
+    verify(caseServiceMock).getVariableTyped(MockProvider.EXAMPLE_CASE_EXECUTION_ID, EXAMPLE_VARIABLE_KEY, true);
   }
 
   @Test
   public void testNonExistingLocalVariable() {
-    when(caseServiceMock.getVariableLocal(eq(MockProvider.EXAMPLE_CASE_EXECUTION_ID), eq(EXAMPLE_VARIABLE_KEY))).thenReturn(null);
+    when(caseServiceMock.getVariableLocalTyped(eq(MockProvider.EXAMPLE_CASE_EXECUTION_ID), eq(EXAMPLE_VARIABLE_KEY), eq(true)))
+      .thenReturn(null);
 
     given()
       .pathParam("id", MockProvider.EXAMPLE_CASE_EXECUTION_ID)
@@ -1598,7 +1636,8 @@ public class AbstractCaseExecutionRestServiceInteractionTest extends AbstractRes
 
   @Test
   public void testNonExistingVariable() {
-    when(caseServiceMock.getVariable(eq(MockProvider.EXAMPLE_CASE_EXECUTION_ID), eq(EXAMPLE_VARIABLE_KEY))).thenReturn(null);
+    when(caseServiceMock.getVariableTyped(eq(MockProvider.EXAMPLE_CASE_EXECUTION_ID), eq(EXAMPLE_VARIABLE_KEY), eq(true)))
+      .thenReturn(null);
 
     given()
       .pathParam("id", MockProvider.EXAMPLE_CASE_EXECUTION_ID)
@@ -1614,7 +1653,8 @@ public class AbstractCaseExecutionRestServiceInteractionTest extends AbstractRes
 
   @Test
   public void testGetLocalVariableForNonExistingExecution() {
-    when(caseServiceMock.getVariableLocal(eq(MockProvider.EXAMPLE_CASE_EXECUTION_ID), eq(EXAMPLE_VARIABLE_KEY)))
+    when(caseServiceMock.getVariableLocalTyped(eq(MockProvider.EXAMPLE_CASE_EXECUTION_ID),
+        eq(EXAMPLE_VARIABLE_KEY), eq(true)))
       .thenThrow(new ProcessEngineException("expected exception"));
 
     given()
@@ -1631,7 +1671,7 @@ public class AbstractCaseExecutionRestServiceInteractionTest extends AbstractRes
 
   @Test
   public void testGetVariableForNonExistingExecution() {
-    when(caseServiceMock.getVariable(eq(MockProvider.EXAMPLE_CASE_EXECUTION_ID), eq(EXAMPLE_VARIABLE_KEY)))
+    when(caseServiceMock.getVariableTyped(eq(MockProvider.EXAMPLE_CASE_EXECUTION_ID), eq(EXAMPLE_VARIABLE_KEY), eq(true)))
       .thenThrow(new ProcessEngineException("expected exception"));
 
     given()
@@ -1648,7 +1688,8 @@ public class AbstractCaseExecutionRestServiceInteractionTest extends AbstractRes
 
   @Test
   public void testPutSingleLocalVariable() {
-    Map<String, Object> variableJson = VariablesBuilder.getVariableValueMap(EXAMPLE_VARIABLE_VALUE);
+    Map<String, Object> variableJson = VariablesBuilder.getVariableValueMap(EXAMPLE_VARIABLE_VALUE.getValue(),
+        EXAMPLE_VARIABLE_VALUE.getType().getName());
 
     given()
       .pathParam("id", MockProvider.EXAMPLE_CASE_EXECUTION_ID)
@@ -1668,7 +1709,8 @@ public class AbstractCaseExecutionRestServiceInteractionTest extends AbstractRes
 
   @Test
   public void testPutSingleVariable() {
-    Map<String, Object> variableJson = VariablesBuilder.getVariableValueMap(EXAMPLE_VARIABLE_VALUE);
+    Map<String, Object> variableJson = VariablesBuilder.getVariableValueMap(EXAMPLE_VARIABLE_VALUE.getValue(),
+        EXAMPLE_VARIABLE_VALUE.getType().getName());
 
     given()
       .pathParam("id", MockProvider.EXAMPLE_CASE_EXECUTION_ID)
@@ -1706,7 +1748,8 @@ public class AbstractCaseExecutionRestServiceInteractionTest extends AbstractRes
       .put(SINGLE_CASE_EXECUTION_LOCAL_VARIABLE_URL);
 
     verify(caseServiceMock).withCaseExecution(MockProvider.EXAMPLE_CASE_EXECUTION_ID);
-    verify(caseExecutionCommandBuilderMock).setVariableLocal(variableKey, variableValue);
+    verify(caseExecutionCommandBuilderMock).setVariableLocal(eq(variableKey),
+        argThat(EqualsPrimitiveValue.integerValue(variableValue)));
     verify(caseExecutionCommandBuilderMock).execute();
   }
 
@@ -1730,7 +1773,8 @@ public class AbstractCaseExecutionRestServiceInteractionTest extends AbstractRes
       .put(SINGLE_CASE_EXECUTION_VARIABLE_URL);
 
     verify(caseServiceMock).withCaseExecution(MockProvider.EXAMPLE_CASE_EXECUTION_ID);
-    verify(caseExecutionCommandBuilderMock).setVariable(variableKey, variableValue);
+    verify(caseExecutionCommandBuilderMock).setVariable(eq(variableKey),
+        argThat(EqualsPrimitiveValue.integerValue(variableValue)));
     verify(caseExecutionCommandBuilderMock).execute();
   }
 
@@ -1750,8 +1794,9 @@ public class AbstractCaseExecutionRestServiceInteractionTest extends AbstractRes
     .then()
       .expect()
         .statusCode(Status.BAD_REQUEST.getStatusCode())
-        .body("type", equalTo(RestException.class.getSimpleName()))
-        .body("message", equalTo("Cannot put case execution variable aVariableKey due to number format exception: For input string: \"1abc\""))
+        .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+        .body("message", equalTo("Cannot put case execution variable aVariableKey: "
+            + ErrorMessageHelper.getExpectedFailingConversionMessage(variableValue, type, Integer.class)))
     .when()
       .put(SINGLE_CASE_EXECUTION_LOCAL_VARIABLE_URL);
   }
@@ -1772,8 +1817,9 @@ public class AbstractCaseExecutionRestServiceInteractionTest extends AbstractRes
     .then()
       .expect()
         .statusCode(Status.BAD_REQUEST.getStatusCode())
-        .body("type", equalTo(RestException.class.getSimpleName()))
-        .body("message", equalTo("Cannot put case execution variable aVariableKey due to number format exception: For input string: \"1abc\""))
+        .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+        .body("message", equalTo("Cannot put case execution variable aVariableKey: "
+            + ErrorMessageHelper.getExpectedFailingConversionMessage(variableValue, type, Integer.class)))
     .when()
       .put(SINGLE_CASE_EXECUTION_VARIABLE_URL);
   }
@@ -1798,7 +1844,8 @@ public class AbstractCaseExecutionRestServiceInteractionTest extends AbstractRes
       .put(SINGLE_CASE_EXECUTION_LOCAL_VARIABLE_URL);
 
     verify(caseServiceMock).withCaseExecution(MockProvider.EXAMPLE_CASE_EXECUTION_ID);
-    verify(caseExecutionCommandBuilderMock).setVariableLocal(variableKey, variableValue);
+    verify(caseExecutionCommandBuilderMock).setVariableLocal(eq(variableKey),
+        argThat(EqualsPrimitiveValue.shortValue(variableValue)));
     verify(caseExecutionCommandBuilderMock).execute();
   }
 
@@ -1822,7 +1869,8 @@ public class AbstractCaseExecutionRestServiceInteractionTest extends AbstractRes
       .put(SINGLE_CASE_EXECUTION_VARIABLE_URL);
 
     verify(caseServiceMock).withCaseExecution(MockProvider.EXAMPLE_CASE_EXECUTION_ID);
-    verify(caseExecutionCommandBuilderMock).setVariable(variableKey, variableValue);
+    verify(caseExecutionCommandBuilderMock).setVariable(eq(variableKey),
+        argThat(EqualsPrimitiveValue.shortValue(variableValue)));
     verify(caseExecutionCommandBuilderMock).execute();
   }
 
@@ -1842,8 +1890,9 @@ public class AbstractCaseExecutionRestServiceInteractionTest extends AbstractRes
     .then()
       .expect()
         .statusCode(Status.BAD_REQUEST.getStatusCode())
-        .body("type", equalTo(RestException.class.getSimpleName()))
-        .body("message", equalTo("Cannot put case execution variable aVariableKey due to number format exception: For input string: \"1abc\""))
+        .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+        .body("message", equalTo("Cannot put case execution variable aVariableKey: "
+            + ErrorMessageHelper.getExpectedFailingConversionMessage(variableValue, type, Short.class)))
     .when()
       .put(SINGLE_CASE_EXECUTION_LOCAL_VARIABLE_URL);
   }
@@ -1864,8 +1913,9 @@ public class AbstractCaseExecutionRestServiceInteractionTest extends AbstractRes
     .then()
       .expect()
         .statusCode(Status.BAD_REQUEST.getStatusCode())
-        .body("type", equalTo(RestException.class.getSimpleName()))
-        .body("message", equalTo("Cannot put case execution variable aVariableKey due to number format exception: For input string: \"1abc\""))
+        .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+        .body("message", equalTo("Cannot put case execution variable aVariableKey: "
+            + ErrorMessageHelper.getExpectedFailingConversionMessage(variableValue, type, Short.class)))
     .when()
       .put(SINGLE_CASE_EXECUTION_VARIABLE_URL);
   }
@@ -1890,7 +1940,8 @@ public class AbstractCaseExecutionRestServiceInteractionTest extends AbstractRes
       .put(SINGLE_CASE_EXECUTION_LOCAL_VARIABLE_URL);
 
     verify(caseServiceMock).withCaseExecution(MockProvider.EXAMPLE_CASE_EXECUTION_ID);
-    verify(caseExecutionCommandBuilderMock).setVariableLocal(variableKey, variableValue);
+    verify(caseExecutionCommandBuilderMock).setVariableLocal(eq(variableKey),
+        argThat(EqualsPrimitiveValue.longValue(variableValue)));
     verify(caseExecutionCommandBuilderMock).execute();
   }
 
@@ -1914,7 +1965,8 @@ public class AbstractCaseExecutionRestServiceInteractionTest extends AbstractRes
       .put(SINGLE_CASE_EXECUTION_VARIABLE_URL);
 
     verify(caseServiceMock).withCaseExecution(MockProvider.EXAMPLE_CASE_EXECUTION_ID);
-    verify(caseExecutionCommandBuilderMock).setVariable(variableKey, variableValue);
+    verify(caseExecutionCommandBuilderMock).setVariable(eq(variableKey),
+        argThat(EqualsPrimitiveValue.longValue(variableValue)));
     verify(caseExecutionCommandBuilderMock).execute();
   }
 
@@ -1934,8 +1986,9 @@ public class AbstractCaseExecutionRestServiceInteractionTest extends AbstractRes
     .then()
       .expect()
         .statusCode(Status.BAD_REQUEST.getStatusCode())
-        .body("type", equalTo(RestException.class.getSimpleName()))
-        .body("message", equalTo("Cannot put case execution variable aVariableKey due to number format exception: For input string: \"1abc\""))
+        .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+        .body("message", equalTo("Cannot put case execution variable aVariableKey: "
+            + ErrorMessageHelper.getExpectedFailingConversionMessage(variableValue, type, Long.class)))
     .when()
       .put(SINGLE_CASE_EXECUTION_LOCAL_VARIABLE_URL);
   }
@@ -1956,8 +2009,9 @@ public class AbstractCaseExecutionRestServiceInteractionTest extends AbstractRes
     .then()
       .expect()
         .statusCode(Status.BAD_REQUEST.getStatusCode())
-        .body("type", equalTo(RestException.class.getSimpleName()))
-        .body("message", equalTo("Cannot put case execution variable aVariableKey due to number format exception: For input string: \"1abc\""))
+        .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+        .body("message", equalTo("Cannot put case execution variable aVariableKey: "
+            + ErrorMessageHelper.getExpectedFailingConversionMessage(variableValue, type, Long.class)))
     .when()
       .put(SINGLE_CASE_EXECUTION_LOCAL_VARIABLE_URL);
   }
@@ -1982,7 +2036,8 @@ public class AbstractCaseExecutionRestServiceInteractionTest extends AbstractRes
       .put(SINGLE_CASE_EXECUTION_LOCAL_VARIABLE_URL);
 
     verify(caseServiceMock).withCaseExecution(MockProvider.EXAMPLE_CASE_EXECUTION_ID);
-    verify(caseExecutionCommandBuilderMock).setVariableLocal(variableKey, variableValue);
+    verify(caseExecutionCommandBuilderMock).setVariableLocal(eq(variableKey),
+        argThat(EqualsPrimitiveValue.doubleValue(variableValue)));
     verify(caseExecutionCommandBuilderMock).execute();
   }
 
@@ -2006,7 +2061,8 @@ public class AbstractCaseExecutionRestServiceInteractionTest extends AbstractRes
       .put(SINGLE_CASE_EXECUTION_VARIABLE_URL);
 
     verify(caseServiceMock).withCaseExecution(MockProvider.EXAMPLE_CASE_EXECUTION_ID);
-    verify(caseExecutionCommandBuilderMock).setVariable(variableKey, variableValue);
+    verify(caseExecutionCommandBuilderMock).setVariable(eq(variableKey),
+        argThat(EqualsPrimitiveValue.doubleValue(variableValue)));
     verify(caseExecutionCommandBuilderMock).execute();
   }
 
@@ -2026,8 +2082,9 @@ public class AbstractCaseExecutionRestServiceInteractionTest extends AbstractRes
     .then()
       .expect()
         .statusCode(Status.BAD_REQUEST.getStatusCode())
-        .body("type", equalTo(RestException.class.getSimpleName()))
-        .body("message", equalTo("Cannot put case execution variable aVariableKey due to number format exception: For input string: \"1abc\""))
+        .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+        .body("message", equalTo("Cannot put case execution variable aVariableKey: "
+            + ErrorMessageHelper.getExpectedFailingConversionMessage(variableValue, type, Double.class)))
     .when()
       .put(SINGLE_CASE_EXECUTION_LOCAL_VARIABLE_URL);
   }
@@ -2048,8 +2105,9 @@ public class AbstractCaseExecutionRestServiceInteractionTest extends AbstractRes
     .then()
       .expect()
         .statusCode(Status.BAD_REQUEST.getStatusCode())
-        .body("type", equalTo(RestException.class.getSimpleName()))
-        .body("message", equalTo("Cannot put case execution variable aVariableKey due to number format exception: For input string: \"1abc\""))
+        .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+        .body("message", equalTo("Cannot put case execution variable aVariableKey: "
+            + ErrorMessageHelper.getExpectedFailingConversionMessage(variableValue, type, Double.class)))
     .when()
       .put(SINGLE_CASE_EXECUTION_VARIABLE_URL);
   }
@@ -2074,7 +2132,8 @@ public class AbstractCaseExecutionRestServiceInteractionTest extends AbstractRes
       .put(SINGLE_CASE_EXECUTION_LOCAL_VARIABLE_URL);
 
     verify(caseServiceMock).withCaseExecution(MockProvider.EXAMPLE_CASE_EXECUTION_ID);
-    verify(caseExecutionCommandBuilderMock).setVariableLocal(variableKey, variableValue);
+    verify(caseExecutionCommandBuilderMock).setVariableLocal(eq(variableKey),
+        argThat(EqualsPrimitiveValue.booleanValue(variableValue)));
     verify(caseExecutionCommandBuilderMock).execute();
   }
 
@@ -2098,7 +2157,8 @@ public class AbstractCaseExecutionRestServiceInteractionTest extends AbstractRes
       .put(SINGLE_CASE_EXECUTION_VARIABLE_URL);
 
     verify(caseServiceMock).withCaseExecution(MockProvider.EXAMPLE_CASE_EXECUTION_ID);
-    verify(caseExecutionCommandBuilderMock).setVariable(variableKey, variableValue);
+    verify(caseExecutionCommandBuilderMock).setVariable(eq(variableKey),
+        argThat(EqualsPrimitiveValue.booleanValue(variableValue)));
     verify(caseExecutionCommandBuilderMock).execute();
   }
 
@@ -2127,7 +2187,8 @@ public class AbstractCaseExecutionRestServiceInteractionTest extends AbstractRes
       .put(SINGLE_CASE_EXECUTION_LOCAL_VARIABLE_URL);
 
     verify(caseServiceMock).withCaseExecution(MockProvider.EXAMPLE_CASE_EXECUTION_ID);
-    verify(caseExecutionCommandBuilderMock).setVariableLocal(variableKey, expectedValue);
+    verify(caseExecutionCommandBuilderMock).setVariableLocal(eq(variableKey),
+        argThat(EqualsPrimitiveValue.dateValue(expectedValue)));
     verify(caseExecutionCommandBuilderMock).execute();
   }
 
@@ -2156,7 +2217,8 @@ public class AbstractCaseExecutionRestServiceInteractionTest extends AbstractRes
       .put(SINGLE_CASE_EXECUTION_VARIABLE_URL);
 
     verify(caseServiceMock).withCaseExecution(MockProvider.EXAMPLE_CASE_EXECUTION_ID);
-    verify(caseExecutionCommandBuilderMock).setVariable(variableKey, expectedValue);
+    verify(caseExecutionCommandBuilderMock).setVariable(eq(variableKey),
+        argThat(EqualsPrimitiveValue.dateValue(expectedValue)));
     verify(caseExecutionCommandBuilderMock).execute();
   }
 
@@ -2176,8 +2238,9 @@ public class AbstractCaseExecutionRestServiceInteractionTest extends AbstractRes
     .then()
       .expect()
         .statusCode(Status.BAD_REQUEST.getStatusCode())
-        .body("type", equalTo(RestException.class.getSimpleName()))
-        .body("message", equalTo("Cannot put case execution variable aVariableKey due to parse exception: Unparseable date: \"1abc\""))
+        .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+        .body("message", equalTo("Cannot put case execution variable aVariableKey: "
+            + ErrorMessageHelper.getExpectedFailingConversionMessage(variableValue, type, Date.class)))
     .when()
       .put(SINGLE_CASE_EXECUTION_LOCAL_VARIABLE_URL);
   }
@@ -2198,8 +2261,9 @@ public class AbstractCaseExecutionRestServiceInteractionTest extends AbstractRes
     .then()
       .expect()
         .statusCode(Status.BAD_REQUEST.getStatusCode())
-        .body("type", equalTo(RestException.class.getSimpleName()))
-        .body("message", equalTo("Cannot put case execution variable aVariableKey due to parse exception: Unparseable date: \"1abc\""))
+        .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+        .body("message", equalTo("Cannot put case execution variable aVariableKey: "
+            + ErrorMessageHelper.getExpectedFailingConversionMessage(variableValue, type, Date.class)))
     .when()
       .put(SINGLE_CASE_EXECUTION_VARIABLE_URL);
   }
@@ -2221,7 +2285,7 @@ public class AbstractCaseExecutionRestServiceInteractionTest extends AbstractRes
       .expect()
         .statusCode(Status.BAD_REQUEST.getStatusCode())
         .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
-        .body("message", equalTo("Cannot put case execution variable aVariableKey: Invalid combination of variable type 'null' and value type 'X'"))
+        .body("message", equalTo("Cannot put case execution variable aVariableKey: Unsupported value type 'X'"))
     .when()
       .put(SINGLE_CASE_EXECUTION_LOCAL_VARIABLE_URL);
   }
@@ -2243,7 +2307,7 @@ public class AbstractCaseExecutionRestServiceInteractionTest extends AbstractRes
       .expect()
         .statusCode(Status.BAD_REQUEST.getStatusCode())
         .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
-        .body("message", equalTo("Cannot put case execution variable aVariableKey: Invalid combination of variable type 'null' and value type 'X'"))
+        .body("message", equalTo("Cannot put case execution variable aVariableKey: Unsupported value type 'X'"))
     .when()
       .put(SINGLE_CASE_EXECUTION_VARIABLE_URL);
   }
@@ -2263,7 +2327,8 @@ public class AbstractCaseExecutionRestServiceInteractionTest extends AbstractRes
       .post(SINGLE_CASE_EXECUTION_LOCAL_BINARY_VARIABLE_URL);
 
     verify(caseServiceMock).withCaseExecution(MockProvider.EXAMPLE_CASE_EXECUTION_ID);
-    verify(caseExecutionCommandBuilderMock).setVariableLocal(variableKey, bytes);
+    verify(caseExecutionCommandBuilderMock).setVariableLocal(eq(variableKey),
+        argThat(EqualsPrimitiveValue.bytesValue(bytes)));
     verify(caseExecutionCommandBuilderMock).execute();
   }
 
@@ -2282,7 +2347,8 @@ public class AbstractCaseExecutionRestServiceInteractionTest extends AbstractRes
       .post(SINGLE_CASE_EXECUTION_BINARY_VARIABLE_URL);
 
     verify(caseServiceMock).withCaseExecution(MockProvider.EXAMPLE_CASE_EXECUTION_ID);
-    verify(caseExecutionCommandBuilderMock).setVariable(variableKey, bytes);
+    verify(caseExecutionCommandBuilderMock).setVariable(eq(variableKey),
+        argThat(EqualsPrimitiveValue.bytesValue(bytes)));
     verify(caseExecutionCommandBuilderMock).execute();
   }
 
@@ -2302,7 +2368,8 @@ public class AbstractCaseExecutionRestServiceInteractionTest extends AbstractRes
       .post(SINGLE_CASE_EXECUTION_LOCAL_BINARY_VARIABLE_URL);
 
     verify(caseServiceMock).withCaseExecution(MockProvider.EXAMPLE_CASE_EXECUTION_ID);
-    verify(caseExecutionCommandBuilderMock).setVariableLocal(variableKey, bytes);
+    verify(caseExecutionCommandBuilderMock).setVariableLocal(eq(variableKey),
+        argThat(EqualsPrimitiveValue.bytesValue(bytes)));
     verify(caseExecutionCommandBuilderMock).execute();
   }
 
@@ -2322,12 +2389,13 @@ public class AbstractCaseExecutionRestServiceInteractionTest extends AbstractRes
       .post(SINGLE_CASE_EXECUTION_BINARY_VARIABLE_URL);
 
     verify(caseServiceMock).withCaseExecution(MockProvider.EXAMPLE_CASE_EXECUTION_ID);
-    verify(caseExecutionCommandBuilderMock).setVariable(variableKey, bytes);
+    verify(caseExecutionCommandBuilderMock).setVariable(eq(variableKey),
+        argThat(EqualsPrimitiveValue.bytesValue(bytes)));
     verify(caseExecutionCommandBuilderMock).execute();
   }
 
   @Test
-  public void testPutSingleLocalSerializableVariable() throws Exception {
+  public void testPutSingleLocalSerializableVariableFromJson() throws Exception {
 
     ArrayList<String> serializable = new ArrayList<String>();
     serializable.add("foo");
@@ -2349,12 +2417,13 @@ public class AbstractCaseExecutionRestServiceInteractionTest extends AbstractRes
       .post(SINGLE_CASE_EXECUTION_LOCAL_BINARY_VARIABLE_URL);
 
     verify(caseServiceMock).withCaseExecution(MockProvider.EXAMPLE_CASE_EXECUTION_ID);
-    verify(caseExecutionCommandBuilderMock).setVariableLocal(variableKey, serializable);
+    verify(caseExecutionCommandBuilderMock).setVariableLocal(eq(variableKey),
+        argThat(EqualsObjectValue.objectValueMatcher().isDeserialized().value(serializable)));
     verify(caseExecutionCommandBuilderMock).execute();
   }
 
   @Test
-  public void testPutSingleSerializableVariable() throws Exception {
+  public void testPutSingleSerializableVariableFormJson() throws Exception {
 
     ArrayList<String> serializable = new ArrayList<String>();
     serializable.add("foo");
@@ -2376,7 +2445,8 @@ public class AbstractCaseExecutionRestServiceInteractionTest extends AbstractRes
       .post(SINGLE_CASE_EXECUTION_BINARY_VARIABLE_URL);
 
     verify(caseServiceMock).withCaseExecution(MockProvider.EXAMPLE_CASE_EXECUTION_ID);
-    verify(caseExecutionCommandBuilderMock).setVariable(variableKey, serializable);
+    verify(caseExecutionCommandBuilderMock).setVariable(eq(variableKey),
+        argThat(EqualsObjectValue.objectValueMatcher().isDeserialized().value(serializable)));
     verify(caseExecutionCommandBuilderMock).execute();
   }
 
@@ -2448,7 +2518,8 @@ public class AbstractCaseExecutionRestServiceInteractionTest extends AbstractRes
       .put(SINGLE_CASE_EXECUTION_LOCAL_VARIABLE_URL);
 
     verify(caseServiceMock).withCaseExecution(MockProvider.EXAMPLE_CASE_EXECUTION_ID);
-    verify(caseExecutionCommandBuilderMock).setVariableLocal(eq(variableKey), isNull());
+    verify(caseExecutionCommandBuilderMock).setVariableLocal(eq(variableKey),
+        argThat(EqualsNullValue.matcher()));
     verify(caseExecutionCommandBuilderMock).execute();
   }
 
@@ -2468,7 +2539,8 @@ public class AbstractCaseExecutionRestServiceInteractionTest extends AbstractRes
       .put(SINGLE_CASE_EXECUTION_VARIABLE_URL);
 
     verify(caseServiceMock).withCaseExecution(MockProvider.EXAMPLE_CASE_EXECUTION_ID);
-    verify(caseExecutionCommandBuilderMock).setVariable(eq(variableKey), isNull());
+    verify(caseExecutionCommandBuilderMock).setVariable(eq(variableKey),
+        argThat(EqualsNullValue.matcher()));
     verify(caseExecutionCommandBuilderMock).execute();
   }
 
@@ -2659,8 +2731,10 @@ public class AbstractCaseExecutionRestServiceInteractionTest extends AbstractRes
       .post(CASE_EXECUTION_COMPLETE_URL);
 
     verify(caseServiceMock).withCaseExecution(MockProvider.EXAMPLE_CASE_EXECUTION_ID);
-    verify(caseExecutionCommandBuilderMock).setVariable(aVariableKey, aVariableValue);
-    verify(caseExecutionCommandBuilderMock).setVariable(anotherVariableKey, anotherVariableValue);
+    verify(caseExecutionCommandBuilderMock).setVariable(eq(aVariableKey),
+        argThat(EqualsPrimitiveValue.integerValue(aVariableValue)));
+    verify(caseExecutionCommandBuilderMock).setVariable(eq(anotherVariableKey),
+        argThat(EqualsPrimitiveValue.stringValue(anotherVariableValue)));
     verify(caseExecutionCommandBuilderMock).complete();
   }
 
@@ -2693,8 +2767,10 @@ public class AbstractCaseExecutionRestServiceInteractionTest extends AbstractRes
       .post(CASE_EXECUTION_COMPLETE_URL);
 
     verify(caseServiceMock).withCaseExecution(MockProvider.EXAMPLE_CASE_EXECUTION_ID);
-    verify(caseExecutionCommandBuilderMock).setVariableLocal(aVariableKey, aVariableValue);
-    verify(caseExecutionCommandBuilderMock).setVariableLocal(anotherVariableKey, anotherVariableValue);
+    verify(caseExecutionCommandBuilderMock).setVariableLocal(eq(aVariableKey),
+        argThat(EqualsPrimitiveValue.integerValue(aVariableValue)));
+    verify(caseExecutionCommandBuilderMock).setVariableLocal(eq(anotherVariableKey),
+        argThat(EqualsPrimitiveValue.stringValue(anotherVariableValue)));
     verify(caseExecutionCommandBuilderMock).complete();
   }
 
@@ -2727,8 +2803,10 @@ public class AbstractCaseExecutionRestServiceInteractionTest extends AbstractRes
       .post(CASE_EXECUTION_COMPLETE_URL);
 
     verify(caseServiceMock).withCaseExecution(MockProvider.EXAMPLE_CASE_EXECUTION_ID);
-    verify(caseExecutionCommandBuilderMock).setVariable(aVariableKey, aVariableValue);
-    verify(caseExecutionCommandBuilderMock).setVariableLocal(anotherVariableKey, anotherVariableValue);
+    verify(caseExecutionCommandBuilderMock).setVariable(eq(aVariableKey),
+        argThat(EqualsPrimitiveValue.integerValue(aVariableValue)));
+    verify(caseExecutionCommandBuilderMock).setVariableLocal(eq(anotherVariableKey),
+        argThat(EqualsPrimitiveValue.stringValue(anotherVariableValue)));
     verify(caseExecutionCommandBuilderMock).complete();
   }
 
@@ -2861,7 +2939,8 @@ public class AbstractCaseExecutionRestServiceInteractionTest extends AbstractRes
 
     verify(caseServiceMock).withCaseExecution(MockProvider.EXAMPLE_CASE_EXECUTION_ID);
     verify(caseExecutionCommandBuilderMock).removeVariable(aVariableKey);
-    verify(caseExecutionCommandBuilderMock).setVariable(anotherVariableKey, anotherVariableValue);
+    verify(caseExecutionCommandBuilderMock).setVariable(eq(anotherVariableKey),
+        argThat(EqualsPrimitiveValue.stringValue(anotherVariableValue)));
     verify(caseExecutionCommandBuilderMock).complete();
   }
 
@@ -2898,7 +2977,8 @@ public class AbstractCaseExecutionRestServiceInteractionTest extends AbstractRes
 
     verify(caseServiceMock).withCaseExecution(MockProvider.EXAMPLE_CASE_EXECUTION_ID);
     verify(caseExecutionCommandBuilderMock).removeVariableLocal(aVariableKey);
-    verify(caseExecutionCommandBuilderMock).setVariable(anotherVariableKey, anotherVariableValue);
+    verify(caseExecutionCommandBuilderMock).setVariable(eq(anotherVariableKey),
+        argThat(EqualsPrimitiveValue.stringValue(anotherVariableValue)));
     verify(caseExecutionCommandBuilderMock).complete();
   }
 
@@ -2935,7 +3015,8 @@ public class AbstractCaseExecutionRestServiceInteractionTest extends AbstractRes
 
     verify(caseServiceMock).withCaseExecution(MockProvider.EXAMPLE_CASE_EXECUTION_ID);
     verify(caseExecutionCommandBuilderMock).removeVariable(aVariableKey);
-    verify(caseExecutionCommandBuilderMock).setVariableLocal(anotherVariableKey, anotherVariableValue);
+    verify(caseExecutionCommandBuilderMock).setVariableLocal(eq(anotherVariableKey),
+        argThat(EqualsPrimitiveValue.stringValue(anotherVariableValue)));
     verify(caseExecutionCommandBuilderMock).complete();
   }
 
@@ -2972,7 +3053,8 @@ public class AbstractCaseExecutionRestServiceInteractionTest extends AbstractRes
 
     verify(caseServiceMock).withCaseExecution(MockProvider.EXAMPLE_CASE_EXECUTION_ID);
     verify(caseExecutionCommandBuilderMock).removeVariableLocal(aVariableKey);
-    verify(caseExecutionCommandBuilderMock).setVariableLocal(anotherVariableKey, anotherVariableValue);
+    verify(caseExecutionCommandBuilderMock).setVariableLocal(eq(anotherVariableKey),
+        argThat(EqualsPrimitiveValue.stringValue(anotherVariableValue)));
     verify(caseExecutionCommandBuilderMock).complete();
   }
 

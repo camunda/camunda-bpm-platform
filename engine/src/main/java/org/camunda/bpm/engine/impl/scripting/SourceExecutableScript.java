@@ -12,13 +12,14 @@
  */
 package org.camunda.bpm.engine.impl.scripting;
 
-import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.delegate.VariableScope;
+import java.util.logging.Logger;
 
 import javax.script.Bindings;
 import javax.script.ScriptEngine;
 import javax.script.ScriptException;
-import java.util.logging.Logger;
+
+import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.delegate.VariableScope;
 
 /**
  * A script which is provided as source code. This is used if the corresponding
@@ -39,7 +40,7 @@ public class SourceExecutableScript extends ExecutableScript {
     scriptSrc = src;
   }
 
-  public Object execute(ScriptEngine engine, VariableScope<?> variableScope, Bindings bindings) {
+  public Object execute(ScriptEngine engine, VariableScope variableScope, Bindings bindings) {
     try {
       LOG.fine("Evaluating un-compiled script using " + language + " script engine ");
       return engine.eval(scriptSrc, bindings);

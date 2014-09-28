@@ -18,7 +18,7 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.bpmn.parser.EventSubscriptionDeclaration;
-import org.camunda.bpm.engine.impl.core.variable.CoreVariableScope;
+import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerDeclarationImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
@@ -48,7 +48,7 @@ public class SequentialMultiInstanceBehavior extends MultiInstanceActivityBehavi
     setLoopVariable(execution, NUMBER_OF_ACTIVE_INSTANCES, 1);
     logLoopDetails(execution, "initialized", 0, 0, 1, nrOfInstances);
 
-    executeIoMapping((CoreVariableScope<?>) execution);
+    executeIoMapping((AbstractVariableScope) execution);
 
     executeOriginalBehavior(execution, 0);
   }
@@ -84,7 +84,7 @@ public class SequentialMultiInstanceBehavior extends MultiInstanceActivityBehavi
 
       callActivityEndListeners(execution);
 
-      executeIoMapping((CoreVariableScope<?>) execution);
+      executeIoMapping((AbstractVariableScope) execution);
 
       // create timer job for the current execution
       List<TimerDeclarationImpl> timerDeclarations = (List<TimerDeclarationImpl>) execution.getActivity().getProperty(BpmnParse.PROPERTYNAME_TIMER_DECLARATION);

@@ -24,6 +24,7 @@ import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricTaskInstanceDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricTaskInstanceQueryDto;
 import org.camunda.bpm.engine.rest.history.HistoricTaskInstanceRestService;
+import org.codehaus.jackson.map.ObjectMapper;
 
 /**
  * @author Roman Smirnov
@@ -31,20 +32,23 @@ import org.camunda.bpm.engine.rest.history.HistoricTaskInstanceRestService;
  */
 public class HistoricTaskInstanceRestServiceImpl implements HistoricTaskInstanceRestService {
 
+  protected ObjectMapper objectMapper;
   protected ProcessEngine processEngine;
 
-  public HistoricTaskInstanceRestServiceImpl(ProcessEngine processEngine) {
+  public HistoricTaskInstanceRestServiceImpl(ObjectMapper objectMapper, ProcessEngine processEngine) {
+    this.objectMapper = objectMapper;
     this.processEngine = processEngine;
   }
 
   @Override
   public List<HistoricTaskInstanceDto> getHistoricTaskInstances(UriInfo uriInfo, Integer firstResult, Integer maxResults) {
-    HistoricTaskInstanceQueryDto queryDto = new HistoricTaskInstanceQueryDto(uriInfo.getQueryParameters());
+    HistoricTaskInstanceQueryDto queryDto = new HistoricTaskInstanceQueryDto(objectMapper, uriInfo.getQueryParameters());
     return queryHistoricTaskInstances(queryDto, firstResult, maxResults);
   }
 
   @Override
   public List<HistoricTaskInstanceDto> queryHistoricTaskInstances(HistoricTaskInstanceQueryDto queryDto, Integer firstResult, Integer maxResults) {
+    queryDto.setObjectMapper(objectMapper);
     HistoricTaskInstanceQuery query = queryDto.toQuery(processEngine);
 
     List<HistoricTaskInstance> match;
@@ -74,12 +78,13 @@ public class HistoricTaskInstanceRestServiceImpl implements HistoricTaskInstance
 
   @Override
   public CountResultDto getHistoricTaskInstancesCount(UriInfo uriInfo) {
-    HistoricTaskInstanceQueryDto queryDto = new HistoricTaskInstanceQueryDto(uriInfo.getQueryParameters());
+    HistoricTaskInstanceQueryDto queryDto = new HistoricTaskInstanceQueryDto(objectMapper, uriInfo.getQueryParameters());
     return queryHistoricTaskInstancesCount(queryDto);
   }
 
   @Override
   public CountResultDto queryHistoricTaskInstancesCount(HistoricTaskInstanceQueryDto queryDto) {
+    queryDto.setObjectMapper(objectMapper);
     HistoricTaskInstanceQuery query = queryDto.toQuery(processEngine);
 
     long count = query.count();

@@ -17,18 +17,33 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
+import org.camunda.bpm.engine.variable.VariableMap;
+import org.camunda.bpm.engine.variable.value.TypedValue;
+
 /**
  * @author Tom Baeyens
  */
-public interface VariableScope<T extends CoreVariableInstance> {
+public interface VariableScope {
 
-  Map<String, Object> getVariables();
+  VariableMap getVariables();
 
-  Map<String, Object> getVariablesLocal();
+  VariableMap getVariables(boolean deserializeValues);
+
+  VariableMap getVariablesLocal();
+
+  VariableMap getVariablesLocal(boolean deserializeValues);
 
   Object getVariable(String variableName);
 
   Object getVariableLocal(String variableName);
+
+  <T extends TypedValue> T getVariableTyped(String variableName);
+
+  <T extends TypedValue> T getVariableTyped(String variableName, boolean deserializeValue);
+
+  <T extends TypedValue> T getVariableLocalTyped(String variableName);
+
+  <T extends TypedValue> T getVariableLocalTyped(String variableName, boolean deserializeValue);
 
   Set<String> getVariableNames();
 
@@ -86,23 +101,4 @@ public interface VariableScope<T extends CoreVariableInstance> {
    */
   void removeVariablesLocal();
 
-  /**
-   * Returns this scope's and its parent's (grandparents etc.) variables as variable instance objects.
-   */
-  Map<String, T> getVariableInstances();
-
-  /**
-   * Returns a single variable instance from either this scope or any of its parents.
-   */
-  T getVariableInstance(String name);
-
-  /**
-   * Returns the variable instances that this scope holds.
-   */
-  Map<String, T> getVariableInstancesLocal();
-
-  /**
-   * Returns a single variable instance that this scope holds.
-   */
-  T getVariableInstanceLocal(String name);
 }

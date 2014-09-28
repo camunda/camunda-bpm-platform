@@ -20,9 +20,9 @@ import org.camunda.bpm.engine.form.StartFormData;
 import org.camunda.bpm.engine.form.TaskFormData;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
-import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
+import org.camunda.bpm.engine.variable.VariableMap;
 
 
 /** Access to form data and rendered forms for starting new process instances and completing tasks.
@@ -106,7 +106,7 @@ public interface FormService {
    * @param processDefinitionId the id of the process definition for which the start form should be retrieved.
    * @return a map of VariableInstances.
    */
-  Map<String, VariableInstance> getStartFormVariables(String processDefinitionId);
+  VariableMap getStartFormVariables(String processDefinitionId);
 
   /**
    * Retrieves a list of requested variables for rendering a start from. The method takes into account
@@ -114,9 +114,10 @@ public interface FormService {
    *
    * @param processDefinitionId the id of the process definition for which the start form should be retrieved.
    * @param formVariables a Collection of the names of the variables to retrieve. Allows restricting the set of retrieved variables.
+   * @param deserializeObjectValues if false object values are not deserialized
    * @return a map of VariableInstances.
    */
-  Map<String, VariableInstance> getStartFormVariables(String processDefinitionId, Collection<String> formVariables);
+  VariableMap getStartFormVariables(String processDefinitionId, Collection<String> formVariables, boolean deserializeObjectValues);
 
   /**
    * <p>Retrieves a list of all variables for rendering a task form. In addition to the task variables and process variables,
@@ -133,7 +134,7 @@ public interface FormService {
    * @param taskId the id of the task for which the variables should be retrieved.
    * @return a map of VariableInstances.
    */
-  Map<String, VariableInstance> getTaskFormVariables(String taskId);
+  VariableMap getTaskFormVariables(String taskId);
 
   /**
    * <p>Retrieves a list of requested variables for rendering a task form. In addition to the task variables and process variables,
@@ -149,9 +150,10 @@ public interface FormService {
    *
    * @param taskId the id of the task for which the variables should be retrieved.
    * @param formVariables a Collection of the names of the variables to retrieve. Allows restricting the set of retrieved variables.
+   * @param deserializeObjectValues if false object values are not deserialized
    * @return a map of VariableInstances.
    */
-  Map<String, VariableInstance> getTaskFormVariables(String taskId, Collection<String> formVariables);
+  VariableMap getTaskFormVariables(String taskId, Collection<String> formVariables, boolean deserializeObjectValues);
 
   /**
    * Retrieves a user defined reference to a start form.

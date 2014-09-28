@@ -22,6 +22,7 @@ import org.camunda.bpm.engine.delegate.VariableScope;
 /**
  * @author Tom Baeyens
  */
+@Deprecated
 public class VariableDeclaration implements Serializable {
 
   private static final long serialVersionUID = 1L;
@@ -36,7 +37,7 @@ public class VariableDeclaration implements Serializable {
   protected Expression linkExpression;
 
 
-  public void initialize(VariableScope<?> innerScopeInstance, VariableScope<?> outerScopeInstance) {
+  public void initialize(VariableScope innerScopeInstance, VariableScope outerScopeInstance) {
     if (sourceVariableName!=null) {
       if (outerScopeInstance.hasVariable(sourceVariableName)) {
         Object value = outerScopeInstance.getVariable(sourceVariableName);
@@ -70,7 +71,7 @@ public class VariableDeclaration implements Serializable {
 
   }
 
-  public void destroy(VariableScope<?> innerScopeInstance, VariableScope<?> outerScopeInstance) {
+  public void destroy(VariableScope innerScopeInstance, VariableScope outerScopeInstance) {
 
     if (destinationVariableName!=null) {
       if (innerScopeInstance.hasVariable(sourceVariableName)) {

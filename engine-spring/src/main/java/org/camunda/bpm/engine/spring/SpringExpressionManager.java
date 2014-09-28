@@ -52,7 +52,7 @@ public class SpringExpressionManager extends ExpressionManager {
   }
 
   @Override
-  protected ELResolver createElResolver(VariableScope<?> variableScope) {
+  protected ELResolver createElResolver(VariableScope variableScope) {
     CompositeELResolver compositeElResolver = new CompositeELResolver();
     compositeElResolver.add(new VariableScopeElResolver(variableScope));
 

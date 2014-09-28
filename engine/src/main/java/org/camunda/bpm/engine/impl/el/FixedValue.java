@@ -30,11 +30,11 @@ public class FixedValue implements Expression {
     this.value = value;
   }
 
-  public Object getValue(VariableScope<?> variableScope) {
+  public Object getValue(VariableScope variableScope) {
     return value;
   }
 
-  public void setValue(Object value, VariableScope<?> variableScope) {
+  public void setValue(Object value, VariableScope variableScope) {
     throw new ProcessEngineException("Cannot change fixed value");
   }
 

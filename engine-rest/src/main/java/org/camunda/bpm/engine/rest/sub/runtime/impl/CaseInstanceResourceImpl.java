@@ -12,7 +12,6 @@
  */
 package org.camunda.bpm.engine.rest.sub.runtime.impl;
 
-import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
 
@@ -32,9 +31,9 @@ import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.sub.VariableResource;
 import org.camunda.bpm.engine.rest.sub.runtime.CaseInstanceResource;
-import org.camunda.bpm.engine.rest.util.DtoUtil;
 import org.camunda.bpm.engine.runtime.CaseExecutionCommandBuilder;
 import org.camunda.bpm.engine.runtime.CaseInstance;
+import org.codehaus.jackson.map.ObjectMapper;
 
 /**
  *
@@ -45,10 +44,12 @@ public class CaseInstanceResourceImpl implements CaseInstanceResource {
 
   protected ProcessEngine engine;
   protected String caseInstanceId;
+  protected ObjectMapper objectMapper;
 
-  public CaseInstanceResourceImpl(ProcessEngine engine, String caseInstanceId) {
+  public CaseInstanceResourceImpl(ProcessEngine engine, String caseInstanceId, ObjectMapper objectMapper) {
     this.engine = engine;
     this.caseInstanceId = caseInstanceId;
+    this.objectMapper = objectMapper;
   }
 
   public CaseInstanceDto getCaseInstance() {
@@ -142,26 +143,18 @@ public class CaseInstanceResourceImpl implements CaseInstanceResource {
     for(String variableName : variables.keySet()) {
       try {
         TriggerVariableValueDto variableValue = variables.get(variableName);
-        Object value = DtoUtil.toType(variableValue.getType(), variableValue.getValue());
 
         if (variableValue.isLocal()) {
-          commandBuilder.setVariableLocal(variableName, value);
+          commandBuilder.setVariableLocal(variableName, variableValue.toTypedValue(engine, objectMapper));
 
         } else {
-          commandBuilder.setVariable(variableName, value);
+          commandBuilder.setVariable(variableName, variableValue.toTypedValue(engine, objectMapper));
         }
 
-      } catch (NumberFormatException e) {
-        String errorMessage = String.format("Cannot %s case instance %s due to number format exception of variable %s: %s", transition, caseInstanceId, variableName, e.getMessage());
-        throw new RestException(Status.BAD_REQUEST, e, errorMessage);
+      } catch (RestException e) {
+        String errorMessage = String.format("Cannot %s case instance %s due to invalid variable %s: %s", transition, caseInstanceId, variableName, e.getMessage());
+        throw new RestException(e.getStatus(), e, errorMessage);
 
-      } catch (ParseException e) {
-        String errorMessage = String.format("Cannot %s case instance %s due to parse exception of variable %s: %s", transition, variableName, variableName, e.getMessage());
-        throw new RestException(Status.BAD_REQUEST, e, errorMessage);
-
-      } catch (IllegalArgumentException e) {
-        String errorMessage = String.format("Cannot %s case instance %s because of variable %s: %s", transition, variableName, variableName, e.getMessage());
-        throw new RestException(Status.BAD_REQUEST, errorMessage);
       }
     }
   }
@@ -177,7 +170,7 @@ public class CaseInstanceResourceImpl implements CaseInstanceResource {
   }
 
   public VariableResource getVariablesResource() {
-    return new CaseExecutionVariablesResource(engine, caseInstanceId);
+    return new CaseExecutionVariablesResource(engine, caseInstanceId, objectMapper);
   }
 
 }

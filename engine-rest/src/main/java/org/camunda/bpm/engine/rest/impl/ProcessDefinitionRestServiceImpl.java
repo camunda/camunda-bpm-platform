@@ -35,6 +35,7 @@ import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.sub.repository.ProcessDefinitionResource;
 import org.camunda.bpm.engine.rest.sub.repository.impl.ProcessDefinitionResourceImpl;
+import org.codehaus.jackson.map.ObjectMapper;
 
 public class ProcessDefinitionRestServiceImpl extends AbstractRestProcessEngineAware implements ProcessDefinitionRestService {
 
@@ -42,8 +43,8 @@ public class ProcessDefinitionRestServiceImpl extends AbstractRestProcessEngineA
     super();
   }
 
-	public ProcessDefinitionRestServiceImpl(String engineName) {
-    super(engineName);
+	public ProcessDefinitionRestServiceImpl(String engineName, ObjectMapper objectMapper) {
+    super(engineName, objectMapper);
   }
 
 	@Override
@@ -70,13 +71,13 @@ public class ProcessDefinitionRestServiceImpl extends AbstractRestProcessEngineA
   @Override
   public ProcessDefinitionResource getProcessDefinitionById(
       String processDefinitionId) {
-    return new ProcessDefinitionResourceImpl(getProcessEngine(), processDefinitionId, relativeRootResourcePath);
+    return new ProcessDefinitionResourceImpl(getProcessEngine(), processDefinitionId, relativeRootResourcePath, getObjectMapper());
   }
 
   @Override
 	public List<ProcessDefinitionDto> getProcessDefinitions(UriInfo uriInfo,
 	    Integer firstResult, Integer maxResults) {
-    ProcessDefinitionQueryDto queryDto = new ProcessDefinitionQueryDto(uriInfo.getQueryParameters());
+    ProcessDefinitionQueryDto queryDto = new ProcessDefinitionQueryDto(getObjectMapper(), uriInfo.getQueryParameters());
 	  List<ProcessDefinitionDto> definitions = new ArrayList<ProcessDefinitionDto>();
 
 	  ProcessEngine engine = getProcessEngine();
@@ -109,7 +110,7 @@ public class ProcessDefinitionRestServiceImpl extends AbstractRestProcessEngineA
 
 	@Override
   public CountResultDto getProcessDefinitionsCount(UriInfo uriInfo) {
-	  ProcessDefinitionQueryDto queryDto = new ProcessDefinitionQueryDto(uriInfo.getQueryParameters());
+	  ProcessDefinitionQueryDto queryDto = new ProcessDefinitionQueryDto(getObjectMapper(), uriInfo.getQueryParameters());
 
 	  ProcessEngine engine = getProcessEngine();
     ProcessDefinitionQuery query = queryDto.toQuery(engine);

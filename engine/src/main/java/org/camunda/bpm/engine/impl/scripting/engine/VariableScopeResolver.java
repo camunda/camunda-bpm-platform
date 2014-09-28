@@ -32,10 +32,10 @@ import org.camunda.bpm.engine.impl.pvm.runtime.ExecutionImpl;
  */
 public class VariableScopeResolver implements Resolver {
 
-  protected VariableScope<?> variableScope;
+  protected VariableScope variableScope;
   protected String variableScopeKey = "scope";
 
-  public VariableScopeResolver(VariableScope<?> variableScope) {
+  public VariableScopeResolver(VariableScope variableScope) {
     ensureNotNull("variableScope", variableScope);
     if (variableScope instanceof ExecutionEntity) {
       variableScopeKey = "execution";

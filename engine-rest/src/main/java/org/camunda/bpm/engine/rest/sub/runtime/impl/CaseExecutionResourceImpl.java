@@ -12,7 +12,6 @@
  */
 package org.camunda.bpm.engine.rest.sub.runtime.impl;
 
-import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
 
@@ -32,9 +31,10 @@ import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.sub.VariableResource;
 import org.camunda.bpm.engine.rest.sub.runtime.CaseExecutionResource;
-import org.camunda.bpm.engine.rest.util.DtoUtil;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.CaseExecutionCommandBuilder;
+import org.camunda.bpm.engine.variable.value.TypedValue;
+import org.codehaus.jackson.map.ObjectMapper;
 
 /**
  *
@@ -45,10 +45,12 @@ public class CaseExecutionResourceImpl implements CaseExecutionResource {
 
   protected ProcessEngine engine;
   protected String caseExecutionId;
+  protected ObjectMapper objectMapper;
 
-  public CaseExecutionResourceImpl(ProcessEngine engine, String caseExecutionId) {
+  public CaseExecutionResourceImpl(ProcessEngine engine, String caseExecutionId, ObjectMapper objectMapper) {
     this.engine = engine;
     this.caseExecutionId = caseExecutionId;
+    this.objectMapper = objectMapper;
   }
 
   public CaseExecutionDto getCaseExecution() {
@@ -191,26 +193,19 @@ public class CaseExecutionResourceImpl implements CaseExecutionResource {
     for(String variableName : variables.keySet()) {
       try {
         TriggerVariableValueDto variableValue = variables.get(variableName);
-        Object value = DtoUtil.toType(variableValue.getType(), variableValue.getValue());
+        TypedValue typedValue = variableValue.toTypedValue(engine, objectMapper);
 
         if (variableValue.isLocal()) {
-          commandBuilder.setVariableLocal(variableName, value);
+          commandBuilder.setVariableLocal(variableName, typedValue);
 
         } else {
-          commandBuilder.setVariable(variableName, value);
+          commandBuilder.setVariable(variableName, typedValue);
         }
 
-      } catch (NumberFormatException e) {
-        String errorMessage = String.format("Cannot %s case execution %s due to number format exception of variable %s: %s", transition, caseExecutionId, variableName, e.getMessage());
-        throw new RestException(Status.BAD_REQUEST, e, errorMessage);
+      } catch (RestException e) {
+        String errorMessage = String.format("Cannot %s case execution %s due to invalid variable %s: %s", transition, caseExecutionId, variableName, e.getMessage());
+        throw new RestException(e.getStatus(), e, errorMessage);
 
-      } catch (ParseException e) {
-        String errorMessage = String.format("Cannot %s case execution %s due to parse exception of variable %s: %s", transition, variableName, variableName, e.getMessage());
-        throw new RestException(Status.BAD_REQUEST, e, errorMessage);
-
-      } catch (IllegalArgumentException e) {
-        String errorMessage = String.format("Cannot %s case execution %s because of variable %s: %s", transition, variableName, variableName, e.getMessage());
-        throw new RestException(Status.BAD_REQUEST, errorMessage);
       }
     }
   }
@@ -226,11 +221,11 @@ public class CaseExecutionResourceImpl implements CaseExecutionResource {
   }
 
   public VariableResource getVariablesLocal() {
-    return new LocalCaseExecutionVariablesResource(engine, caseExecutionId);
+    return new LocalCaseExecutionVariablesResource(engine, caseExecutionId, objectMapper);
   }
 
   public VariableResource getVariables() {
-    return new CaseExecutionVariablesResource(engine, caseExecutionId);
+    return new CaseExecutionVariablesResource(engine, caseExecutionId, objectMapper);
   }
 
 }

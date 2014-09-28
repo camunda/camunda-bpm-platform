@@ -1,6 +1,6 @@
 package org.camunda.bpm.engine.test.variables;
 
-public class FailingSerializationBean extends SimpleBean {
+public class FailingSerializationBean extends JsonSerializable {
 
   public FailingSerializationBean() {
   }

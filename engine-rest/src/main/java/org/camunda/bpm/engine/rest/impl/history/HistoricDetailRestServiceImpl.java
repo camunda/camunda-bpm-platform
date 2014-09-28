@@ -26,6 +26,7 @@ import org.camunda.bpm.engine.rest.dto.history.HistoricDetailQueryDto;
 import org.camunda.bpm.engine.rest.history.HistoricDetailRestService;
 import org.camunda.bpm.engine.rest.sub.history.HistoricDetailResource;
 import org.camunda.bpm.engine.rest.sub.history.impl.HistoricDetailResourceImpl;
+import org.codehaus.jackson.map.ObjectMapper;
 
 /**
  * @author Roman Smirnov
@@ -33,9 +34,11 @@ import org.camunda.bpm.engine.rest.sub.history.impl.HistoricDetailResourceImpl;
  */
 public class HistoricDetailRestServiceImpl implements HistoricDetailRestService {
 
+  protected ObjectMapper objectMapper;
   protected ProcessEngine processEngine;
 
-  public HistoricDetailRestServiceImpl(ProcessEngine processEngine) {
+  public HistoricDetailRestServiceImpl(ObjectMapper objectMapper, ProcessEngine processEngine) {
+    this.objectMapper = objectMapper;
     this.processEngine = processEngine;
   }
 
@@ -45,7 +48,7 @@ public class HistoricDetailRestServiceImpl implements HistoricDetailRestService 
 
   @Override
   public List<HistoricDetailDto> getHistoricDetails(UriInfo uriInfo, Integer firstResult, Integer maxResults) {
-    HistoricDetailQueryDto queryDto = new HistoricDetailQueryDto(uriInfo.getQueryParameters());
+    HistoricDetailQueryDto queryDto = new HistoricDetailQueryDto(objectMapper, uriInfo.getQueryParameters());
     HistoricDetailQuery query = queryDto.toQuery(processEngine);
     query.disableBinaryFetching();
     // existing API requires that Serializable variables are always resolved
@@ -69,7 +72,7 @@ public class HistoricDetailRestServiceImpl implements HistoricDetailRestService 
 
   @Override
   public CountResultDto getHistoricDetailsCount(UriInfo uriInfo) {
-    HistoricDetailQueryDto queryDto = new HistoricDetailQueryDto(uriInfo.getQueryParameters());
+    HistoricDetailQueryDto queryDto = new HistoricDetailQueryDto(objectMapper, uriInfo.getQueryParameters());
     HistoricDetailQuery query = queryDto.toQuery(processEngine);
 
     long count = query.count();

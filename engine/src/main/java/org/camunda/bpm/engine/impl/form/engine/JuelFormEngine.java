@@ -58,7 +58,7 @@ public class JuelFormEngine implements FormEngine {
     return executeScript(formTemplateString, task.getExecution());
   }
 
-  protected Object executeScript(String scriptSrc, VariableScope<?> scope) {
+  protected Object executeScript(String scriptSrc, VariableScope scope) {
     ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
     ScriptingEnvironment scriptingEnvironment = processEngineConfiguration.getScriptingEnvironment();
     ScriptFactory scriptFactory = processEngineConfiguration.getScriptFactory();

@@ -1,6 +1,6 @@
 package org.camunda.bpm.engine.test.variables;
 
-public class FailingDeserializationBean extends SimpleBean {
+public class FailingDeserializationBean extends JsonSerializable {
 
   public FailingDeserializationBean() {
     throw new RuntimeException("I am failing");

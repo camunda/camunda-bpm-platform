@@ -12,15 +12,63 @@
  */
 package org.camunda.bpm.engine.impl;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 import java.io.InputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.camunda.bpm.engine.TaskService;
-import org.camunda.bpm.engine.impl.cmd.*;
+import org.camunda.bpm.engine.impl.cmd.AddCommentCmd;
+import org.camunda.bpm.engine.impl.cmd.AddGroupIdentityLinkCmd;
+import org.camunda.bpm.engine.impl.cmd.AddUserIdentityLinkCmd;
+import org.camunda.bpm.engine.impl.cmd.AssignTaskCmd;
+import org.camunda.bpm.engine.impl.cmd.ClaimTaskCmd;
+import org.camunda.bpm.engine.impl.cmd.CompleteTaskCmd;
+import org.camunda.bpm.engine.impl.cmd.CreateAttachmentCmd;
+import org.camunda.bpm.engine.impl.cmd.DelegateTaskCmd;
+import org.camunda.bpm.engine.impl.cmd.DeleteAttachmentCmd;
+import org.camunda.bpm.engine.impl.cmd.DeleteGroupIdentityLinkCmd;
+import org.camunda.bpm.engine.impl.cmd.DeleteTaskAttachmentCmd;
+import org.camunda.bpm.engine.impl.cmd.DeleteTaskCmd;
+import org.camunda.bpm.engine.impl.cmd.DeleteUserIdentityLinkCmd;
+import org.camunda.bpm.engine.impl.cmd.GetAttachmentCmd;
+import org.camunda.bpm.engine.impl.cmd.GetAttachmentContentCmd;
+import org.camunda.bpm.engine.impl.cmd.GetIdentityLinksForTaskCmd;
+import org.camunda.bpm.engine.impl.cmd.GetProcessInstanceAttachmentsCmd;
+import org.camunda.bpm.engine.impl.cmd.GetProcessInstanceCommentsCmd;
+import org.camunda.bpm.engine.impl.cmd.GetSubTasksCmd;
+import org.camunda.bpm.engine.impl.cmd.GetTaskAttachmentCmd;
+import org.camunda.bpm.engine.impl.cmd.GetTaskAttachmentContentCmd;
+import org.camunda.bpm.engine.impl.cmd.GetTaskAttachmentsCmd;
+import org.camunda.bpm.engine.impl.cmd.GetTaskCommentCmd;
+import org.camunda.bpm.engine.impl.cmd.GetTaskCommentsCmd;
+import org.camunda.bpm.engine.impl.cmd.GetTaskEventsCmd;
+import org.camunda.bpm.engine.impl.cmd.GetTaskVariableCmd;
+import org.camunda.bpm.engine.impl.cmd.GetTaskVariableCmdTyped;
+import org.camunda.bpm.engine.impl.cmd.GetTaskVariablesCmd;
+import org.camunda.bpm.engine.impl.cmd.PatchTaskVariablesCmd;
+import org.camunda.bpm.engine.impl.cmd.RemoveTaskVariablesCmd;
+import org.camunda.bpm.engine.impl.cmd.ResolveTaskCmd;
+import org.camunda.bpm.engine.impl.cmd.SaveAttachmentCmd;
+import org.camunda.bpm.engine.impl.cmd.SaveTaskCmd;
+import org.camunda.bpm.engine.impl.cmd.SetTaskOwnerCmd;
+import org.camunda.bpm.engine.impl.cmd.SetTaskPriorityCmd;
+import org.camunda.bpm.engine.impl.cmd.SetTaskVariablesCmd;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
-import org.camunda.bpm.engine.task.*;
-
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+import org.camunda.bpm.engine.task.Attachment;
+import org.camunda.bpm.engine.task.Comment;
+import org.camunda.bpm.engine.task.Event;
+import org.camunda.bpm.engine.task.IdentityLink;
+import org.camunda.bpm.engine.task.IdentityLinkType;
+import org.camunda.bpm.engine.task.NativeTaskQuery;
+import org.camunda.bpm.engine.task.Task;
+import org.camunda.bpm.engine.task.TaskQuery;
+import org.camunda.bpm.engine.variable.VariableMap;
+import org.camunda.bpm.engine.variable.value.TypedValue;
 
 
 /**
@@ -147,20 +195,36 @@ public class TaskServiceImpl extends ServiceImpl implements TaskService {
     return new NativeTaskQueryImpl(commandExecutor);
   }
 
-  public Map<String, Object> getVariables(String executionId) {
-    return commandExecutor.execute(new GetTaskVariablesCmd(executionId, null, false));
+  public VariableMap getVariables(String executionId) {
+    return getVariables(executionId, true);
   }
 
-  public Map<String, Object> getVariablesLocal(String executionId) {
-    return commandExecutor.execute(new GetTaskVariablesCmd(executionId, null, true));
+  public VariableMap getVariables(String taskId, boolean deserializeValues) {
+    return commandExecutor.execute(new GetTaskVariablesCmd(taskId, null, false, deserializeValues));
   }
 
-  public Map<String, Object> getVariables(String executionId, Collection<String> variableNames) {
-    return commandExecutor.execute(new GetTaskVariablesCmd(executionId, variableNames, false));
+  public VariableMap getVariablesLocal(String taskId) {
+    return getVariablesLocal(taskId, true);
   }
 
-  public Map<String, Object> getVariablesLocal(String executionId, Collection<String> variableNames) {
-    return commandExecutor.execute(new GetTaskVariablesCmd(executionId, variableNames, true));
+  public VariableMap getVariablesLocal(String taskId, boolean deserializeValues) {
+    return commandExecutor.execute(new GetTaskVariablesCmd(taskId, null, true, deserializeValues));
+  }
+
+  public VariableMap getVariables(String executionId, Collection<String> variableNames) {
+    return getVariables(executionId, variableNames, true);
+  }
+
+  public VariableMap getVariables(String executionId, Collection<String> variableNames, boolean deserializeValues) {
+    return commandExecutor.execute(new GetTaskVariablesCmd(executionId, variableNames, false, deserializeValues));
+  }
+
+  public VariableMap getVariablesLocal(String executionId, Collection<String> variableNames) {
+    return getVariablesLocal(executionId, variableNames, true);
+  }
+
+  public VariableMap getVariablesLocal(String executionId, Collection<String> variableNames, boolean deserializeValues) {
+    return commandExecutor.execute(new GetTaskVariablesCmd(executionId, variableNames, true, deserializeValues));
   }
 
   public Object getVariable(String executionId, String variableName) {
@@ -171,6 +235,27 @@ public class TaskServiceImpl extends ServiceImpl implements TaskService {
     return commandExecutor.execute(new GetTaskVariableCmd(executionId, variableName, true));
   }
 
+  public <T extends TypedValue> T getVariableTyped(String taskId, String variableName) {
+    return getVariableTyped(taskId, variableName, false, true);
+  }
+
+  public <T extends TypedValue> T getVariableTyped(String taskId, String variableName, boolean deserializeValue) {
+    return getVariableTyped(taskId, variableName, false, deserializeValue);
+  }
+
+  public <T extends TypedValue> T getVariableLocalTyped(String taskId, String variableName) {
+    return getVariableTyped(taskId, variableName, true, true);
+  }
+
+  public <T extends TypedValue> T getVariableLocalTyped(String taskId, String variableName, boolean deserializeValue) {
+    return getVariableTyped(taskId, variableName, true, deserializeValue);
+  }
+
+  @SuppressWarnings("unchecked")
+  protected <T extends TypedValue> T getVariableTyped(String taskId, String variableName, boolean isLocal, boolean deserializeValue) {
+    return (T) commandExecutor.execute(new GetTaskVariableCmdTyped(taskId, variableName, isLocal, deserializeValue));
+  }
+
   public void setVariable(String executionId, String variableName, Object value) {
     ensureNotNull("variableName", variableName);
     Map<String, Object> variables = new HashMap<String, Object>();
@@ -178,29 +263,11 @@ public class TaskServiceImpl extends ServiceImpl implements TaskService {
     commandExecutor.execute(new SetTaskVariablesCmd(executionId, variables, false));
   }
 
-  public void setVariableFromSerialized(String executionId, String variableName, Object serializedValue, String variableTypeName,
-      Map<String, Object> variableConfiguration) {
-    ensureNotNull("variableName", variableName);
-
-    commandExecutor.execute(new SetTaskVariableFromSerializedCmd(executionId, variableName,
-        serializedValue, variableTypeName, variableConfiguration, false));
-
-  }
-
   public void setVariableLocal(String executionId, String variableName, Object value) {
     ensureNotNull("variableName", variableName);
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put(variableName, value);
     commandExecutor.execute(new SetTaskVariablesCmd(executionId, variables, true));
-  }
-
-  public void setVariableLocalFromSerialized(String executionId, String variableName, Object serializedValue, String variableTypeName,
-      Map<String, Object> variableConfiguration) {
-    ensureNotNull("variableName", variableName);
-
-    commandExecutor.execute(new SetTaskVariableFromSerializedCmd(executionId, variableName,
-        serializedValue, variableTypeName, variableConfiguration, true));
-
   }
 
   public void setVariables(String executionId, Map<String, ? extends Object> variables) {

@@ -36,12 +36,15 @@ import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.CaseDefinitionQuery;
-import org.camunda.bpm.engine.rest.dto.runtime.VariableValueDto;
 import org.camunda.bpm.engine.rest.exception.RestException;
-import org.camunda.bpm.engine.rest.helper.EqualsMap;
+import org.camunda.bpm.engine.rest.helper.EqualsVariableMap;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
+import org.camunda.bpm.engine.rest.helper.variable.EqualsPrimitiveValue;
+import org.camunda.bpm.engine.rest.helper.variable.EqualsUntypedValue;
+import org.camunda.bpm.engine.rest.util.VariablesBuilder;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.runtime.CaseInstanceBuilder;
+import org.camunda.bpm.engine.variable.type.ValueType;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -283,12 +286,9 @@ public abstract class AbstractCaseDefinitionRestServiceInteractionTest extends A
 
   @Test
   public void testCreateCaseInstanceByCaseDefinitionIdWithVariables() {
-    VariableValueDto aVariable = new VariableValueDto("abc", null);
-    VariableValueDto anotherVariable = new VariableValueDto(999, null);
-
     Map<String, Object> variables = new HashMap<String, Object>();
-    variables.put("aVariableName", aVariable);
-    variables.put("anotherVariableName", anotherVariable);
+    variables.put("aVariableName", VariablesBuilder.getVariableValueMap("abc", ValueType.STRING.getName()));
+    variables.put("anotherVariableName", VariablesBuilder.getVariableValueMap(900, ValueType.INTEGER.getName()));
 
     Map<String, Object> params = new HashMap<String, Object>();
     params.put("variables", variables);
@@ -304,25 +304,20 @@ public abstract class AbstractCaseDefinitionRestServiceInteractionTest extends A
     .when()
       .post(CREATE_INSTANCE_URL);
 
-    Map<String, Object> expectedVariables = new HashMap<String, Object>();
-    expectedVariables.put("aVariableName", "abc");
-    expectedVariables.put("anotherVariableName", 999);
-
     verify(caseServiceMock).withCaseDefinition(MockProvider.EXAMPLE_CASE_DEFINITION_ID);
     verify(caseInstanceBuilder).businessKey(null);
-    verify(caseInstanceBuilder).setVariables(argThat(new EqualsMap(expectedVariables)));
+    verify(caseInstanceBuilder).setVariables(argThat(EqualsVariableMap.matches()
+        .matcher("aVariableName", EqualsPrimitiveValue.stringValue("abc"))
+        .matcher("anotherVariableName", EqualsPrimitiveValue.integerValue(900))));
     verify(caseInstanceBuilder).create();
 
   }
 
   @Test
   public void testCreateCaseInstanceByCaseDefinitionKeyWithVariables() {
-    VariableValueDto aVariable = new VariableValueDto("abc", null);
-    VariableValueDto anotherVariable = new VariableValueDto(999, null);
-
     Map<String, Object> variables = new HashMap<String, Object>();
-    variables.put("aVariableName", aVariable);
-    variables.put("anotherVariableName", anotherVariable);
+    variables.put("aVariableName", VariablesBuilder.getVariableValueMap("abc", null));
+    variables.put("anotherVariableName", VariablesBuilder.getVariableValueMap(900, null));
 
     Map<String, Object> params = new HashMap<String, Object>();
     params.put("variables", variables);
@@ -344,18 +339,17 @@ public abstract class AbstractCaseDefinitionRestServiceInteractionTest extends A
 
     verify(caseServiceMock).withCaseDefinition(MockProvider.EXAMPLE_CASE_DEFINITION_ID);
     verify(caseInstanceBuilder).businessKey(null);
-    verify(caseInstanceBuilder).setVariables(argThat(new EqualsMap(expectedVariables)));
+    verify(caseInstanceBuilder).setVariables(argThat(EqualsVariableMap.matches()
+        .matcher("aVariableName", EqualsUntypedValue.matcher().value("abc"))
+        .matcher("anotherVariableName", EqualsUntypedValue.matcher().value(900))));
     verify(caseInstanceBuilder).create();
   }
 
   @Test
   public void testCreateCaseInstanceByCaseDefinitionIdWithBusinessKeyAndVariables() {
-    VariableValueDto aVariable = new VariableValueDto("abc", null);
-    VariableValueDto anotherVariable = new VariableValueDto(999, null);
-
     Map<String, Object> variables = new HashMap<String, Object>();
-    variables.put("aVariableName", aVariable);
-    variables.put("anotherVariableName", anotherVariable);
+    variables.put("aVariableName", VariablesBuilder.getVariableValueMap("abc", null));
+    variables.put("anotherVariableName", VariablesBuilder.getVariableValueMap(900, null));
 
     Map<String, Object> params = new HashMap<String, Object>();
     params.put("variables", variables);
@@ -378,19 +372,18 @@ public abstract class AbstractCaseDefinitionRestServiceInteractionTest extends A
 
     verify(caseServiceMock).withCaseDefinition(MockProvider.EXAMPLE_CASE_DEFINITION_ID);
     verify(caseInstanceBuilder).businessKey("aBusinessKey");
-    verify(caseInstanceBuilder).setVariables(argThat(new EqualsMap(expectedVariables)));
+    verify(caseInstanceBuilder).setVariables(argThat(EqualsVariableMap.matches()
+        .matcher("aVariableName", EqualsUntypedValue.matcher().value("abc"))
+        .matcher("anotherVariableName", EqualsUntypedValue.matcher().value(900))));
     verify(caseInstanceBuilder).create();
 
   }
 
   @Test
   public void testCreateCaseInstanceByCaseDefinitionKeyWithBusinessKeyAndVariables() {
-    VariableValueDto aVariable = new VariableValueDto("abc", null);
-    VariableValueDto anotherVariable = new VariableValueDto(999, null);
-
     Map<String, Object> variables = new HashMap<String, Object>();
-    variables.put("aVariableName", aVariable);
-    variables.put("anotherVariableName", anotherVariable);
+    variables.put("aVariableName", VariablesBuilder.getVariableValueMap("abc", null));
+    variables.put("anotherVariableName", VariablesBuilder.getVariableValueMap(900, null));
 
     Map<String, Object> params = new HashMap<String, Object>();
     params.put("variables", variables);
@@ -413,7 +406,9 @@ public abstract class AbstractCaseDefinitionRestServiceInteractionTest extends A
 
     verify(caseServiceMock).withCaseDefinition(MockProvider.EXAMPLE_CASE_DEFINITION_ID);
     verify(caseInstanceBuilder).businessKey("aBusinessKey");
-    verify(caseInstanceBuilder).setVariables(argThat(new EqualsMap(expectedVariables)));
+    verify(caseInstanceBuilder).setVariables(argThat(EqualsVariableMap.matches()
+        .matcher("aVariableName", EqualsUntypedValue.matcher().value("abc"))
+        .matcher("anotherVariableName", EqualsUntypedValue.matcher().value(900))));
     verify(caseInstanceBuilder).create();
   }
 

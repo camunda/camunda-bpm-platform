@@ -20,6 +20,6 @@ import org.camunda.bpm.engine.delegate.VariableScope;
  */
 public interface TransferVariablesActivityBehavior extends CmmnActivityBehavior {
 
-  public void transferVariables(VariableScope<?> from, VariableScope<?> to);
+  public void transferVariables(VariableScope from, VariableScope to);
 
 }

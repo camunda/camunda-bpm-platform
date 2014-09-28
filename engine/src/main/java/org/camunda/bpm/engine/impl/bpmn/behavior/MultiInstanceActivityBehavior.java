@@ -13,6 +13,8 @@
 
 package org.camunda.bpm.engine.impl.bpmn.behavior;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -28,17 +30,14 @@ import org.camunda.bpm.engine.impl.bpmn.delegate.ExecutionListenerInvocation;
 import org.camunda.bpm.engine.impl.bpmn.helper.ErrorPropagation;
 import org.camunda.bpm.engine.impl.bpmn.helper.ScopeUtil;
 import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.core.mapping.IoMapping;
-import org.camunda.bpm.engine.impl.core.variable.CoreVariableScope;
+import org.camunda.bpm.engine.impl.core.variable.mapping.IoMapping;
+import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.engine.impl.pvm.delegate.CompositeActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.delegate.SubProcessActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
-import org.camunda.bpm.engine.impl.util.EnsureUtil;
-
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.*;
 
 
 /**
@@ -346,7 +345,7 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
     this.ioMapping = ioMapping;
   }
 
-  protected void executeIoMapping(CoreVariableScope<?> scope) {
+  protected void executeIoMapping(AbstractVariableScope scope) {
     if (ioMapping != null) {
       ioMapping.executeInputParameters(scope);
     }

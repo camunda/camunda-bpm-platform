@@ -20,13 +20,12 @@ import static org.camunda.bpm.engine.authorization.Resources.FILTER;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.ws.rs.HttpMethod;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
-import javax.ws.rs.ext.Providers;
 
 import org.camunda.bpm.engine.EntityTypes;
 import org.camunda.bpm.engine.FilterService;
@@ -56,12 +55,12 @@ public class FilterRestServiceImpl extends AbstractAuthorizedRestResource implem
     super(FILTER, ANY);
   }
 
-  public FilterRestServiceImpl(String engineName) {
-    super(engineName, FILTER, ANY);
+  public FilterRestServiceImpl(String engineName, ObjectMapper objectMapper) {
+    super(engineName, FILTER, ANY, objectMapper);
   }
 
-  public FilterResource getFilter(Providers providers, String filterId) {
-    return new FilterResourceImpl(getProcessEngine().getName(), getObjectMapper(providers), filterId, relativeRootResourcePath);
+  public FilterResource getFilter(String filterId) {
+    return new FilterResourceImpl(getProcessEngine().getName(), getObjectMapper(), filterId, relativeRootResourcePath);
   }
 
   public List<FilterDto> getFilters(UriInfo uriInfo, Boolean itemCount, Integer firstResult, Integer maxResults) {
@@ -72,7 +71,7 @@ public class FilterRestServiceImpl extends AbstractAuthorizedRestResource implem
 
     List<FilterDto> filters = new ArrayList<FilterDto>();
     for (Filter filter : matchingFilters) {
-      FilterDto dto = FilterDto.fromFilter(filter);
+      FilterDto dto = FilterDto.fromFilter(filter, getObjectMapper());
       if (itemCount != null && itemCount) {
         dto.setItemCount(filterService.count(filter.getId()));
       }
@@ -121,7 +120,7 @@ public class FilterRestServiceImpl extends AbstractAuthorizedRestResource implem
     }
 
     try {
-      filterDto.updateFilter(filter, getProcessEngine());
+      filterDto.updateFilter(filter, getProcessEngine(), getObjectMapper());
     }
     catch (NotValidException e) {
       throw new InvalidRequestException(Response.Status.BAD_REQUEST, e, "Unable to create filter with invalid content");
@@ -129,12 +128,12 @@ public class FilterRestServiceImpl extends AbstractAuthorizedRestResource implem
 
     filterService.saveFilter(filter);
 
-    return FilterDto.fromFilter(filter);
+    return FilterDto.fromFilter(filter, getObjectMapper());
   }
 
   protected FilterQuery getQueryFromQueryParameters(MultivaluedMap<String, String> queryParameters) {
     ProcessEngine engine = getProcessEngine();
-    FilterQueryDto queryDto = new FilterQueryDto(queryParameters);
+    FilterQueryDto queryDto = new FilterQueryDto(getObjectMapper(), queryParameters);
     return queryDto.toQuery(engine);
   }
 
@@ -161,13 +160,6 @@ public class FilterRestServiceImpl extends AbstractAuthorizedRestResource implem
     }
 
     return resourceOptionsDto;
-  }
-
-  protected ObjectMapper getObjectMapper(Providers providers) {
-    if (objectMapper == null) {
-      objectMapper = providers.getContextResolver(ObjectMapper.class, MediaType.APPLICATION_JSON_TYPE).getContext(null);
-    }
-    return objectMapper;
   }
 
 }

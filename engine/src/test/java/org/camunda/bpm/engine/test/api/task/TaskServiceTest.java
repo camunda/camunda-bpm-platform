@@ -30,8 +30,6 @@ import org.camunda.bpm.engine.OptimisticLockingException;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.TaskAlreadyClaimedException;
-import org.camunda.bpm.engine.delegate.ProcessEngineVariableType;
-import org.camunda.bpm.engine.delegate.SerializedVariableValue;
 import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.identity.Group;
@@ -44,7 +42,6 @@ import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
-import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.task.Attachment;
 import org.camunda.bpm.engine.task.Comment;
 import org.camunda.bpm.engine.task.DelegationState;
@@ -1607,118 +1604,6 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
     // Finally, delete task
     taskService.deleteTask(task.getId(), true);
 
-  }
-
-  @Deployment(resources = TWO_TASKS_PROCESS)
-  public void testSetTaskVariableFromSerialized() {
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("twoTasksProcess");
-
-    // Fetch first task
-    Task task = taskService.createTaskQuery().singleResult();
-    assertNotNull(task);
-
-    taskService.setVariableFromSerialized(task.getId(), "aVar", "aValue", ProcessEngineVariableType.STRING.getName(), null);
-
-    VariableInstance variableInstance =
-        runtimeService.createVariableInstanceQuery().processInstanceIdIn(processInstance.getId()).singleResult();
-
-    assertNotNull(variableInstance);
-    assertEquals("aVar", variableInstance.getName());
-    assertEquals("aValue", variableInstance.getValue());
-    assertEquals(ProcessEngineVariableType.STRING.getName(), variableInstance.getTypeName());
-
-    SerializedVariableValue serializedValue = variableInstance.getSerializedValue();
-    assertNotNull(serializedValue);
-    assertEquals("aValue", serializedValue.getValue());
-    assertTrue(serializedValue.getConfig().isEmpty());
-
-    variableInstance =
-        runtimeService.createVariableInstanceQuery().taskIdIn(task.getId()).singleResult();
-
-    assertNull(variableInstance);
-
-  }
-
-  @Deployment(resources = TWO_TASKS_PROCESS)
-  public void testSetTaskVariableLocalFromSerialized() {
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("twoTasksProcess");
-
-    // Fetch first task
-    Task task = taskService.createTaskQuery().singleResult();
-    assertNotNull(task);
-
-    taskService.setVariableLocalFromSerialized(task.getId(), "aVar", "aValue", ProcessEngineVariableType.STRING.getName(), null);
-
-    VariableInstance variableInstance =
-        runtimeService.createVariableInstanceQuery().processInstanceIdIn(processInstance.getId()).singleResult();
-
-    assertNotNull(variableInstance);
-
-    variableInstance =
-        runtimeService.createVariableInstanceQuery().taskIdIn(task.getId()).singleResult();
-
-    assertNotNull(variableInstance);
-    assertEquals("aVar", variableInstance.getName());
-    assertEquals("aValue", variableInstance.getValue());
-    assertEquals(ProcessEngineVariableType.STRING.getName(), variableInstance.getTypeName());
-
-    SerializedVariableValue serializedValue = variableInstance.getSerializedValue();
-    assertNotNull(serializedValue);
-    assertEquals("aValue", serializedValue.getValue());
-    assertTrue(serializedValue.getConfig().isEmpty());
-  }
-
-  @Deployment(resources = TWO_TASKS_PROCESS)
-  public void testSetVariableWithNoName() {
-    runtimeService.startProcessInstanceByKey("twoTasksProcess");
-
-    Task task = taskService.createTaskQuery().singleResult();
-
-    try {
-      taskService.setVariableFromSerialized(task.getId(), null, "aValue", ProcessEngineVariableType.STRING.getName(), null);
-      fail("Should not allow to set task variable without name");
-    } catch (ProcessEngineException e) {
-      // expected
-    }
-
-    try {
-      taskService.setVariableLocalFromSerialized(task.getId(), null, "aValue", ProcessEngineVariableType.STRING.getName(), null);
-      fail("Should not allow to set task variable without name");
-    } catch (ProcessEngineException e) {
-      // expected
-    }
-  }
-
-  @Deployment(resources = TWO_TASKS_PROCESS)
-  public void testSetVariableWithoutTaskId() {
-    runtimeService.startProcessInstanceByKey("twoTasksProcess");
-
-    try {
-      taskService.setVariableFromSerialized(null, "aVar", "aValue", ProcessEngineVariableType.STRING.getName(), null);
-      fail("Should not allow to set variable for null task");
-    } catch (ProcessEngineException e) {
-      // expected
-    }
-
-    try {
-      taskService.setVariableLocalFromSerialized(null, "aVar", "aValue", ProcessEngineVariableType.STRING.getName(), null);
-      fail("Should not allow to set variable for null task");
-    } catch (ProcessEngineException e) {
-      // expected
-    }
-  }
-
-  public void testVariableValueFromSerializedForStandaloneTask() {
-
-    Task task = taskService.newTask();
-    taskService.saveTask(task);
-
-    taskService.setVariableFromSerialized(task.getId(), "aVar", "aValue", ProcessEngineVariableType.STRING.getName(), null);
-
-    String value = (String) taskService.getVariable(task.getId(), "aVar");
-    assertEquals("aValue", value);
-
-    taskService.deleteTask(task.getId(), true);
   }
 
 }

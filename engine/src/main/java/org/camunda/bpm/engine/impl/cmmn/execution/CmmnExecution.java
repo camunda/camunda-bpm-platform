@@ -78,8 +78,8 @@ import org.camunda.bpm.engine.impl.cmmn.model.CmmnOnPartDeclaration;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnSentryDeclaration;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
-import org.camunda.bpm.engine.impl.core.variable.CorePersistentVariableScope;
-import org.camunda.bpm.engine.impl.core.variable.VariableEvent;
+import org.camunda.bpm.engine.impl.core.variable.event.VariableEvent;
+import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.impl.pvm.PvmException;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessDefinition;
@@ -591,7 +591,7 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
 
   // variables ////////////////////////////////////////////
 
-  public CorePersistentVariableScope getParentVariableScope() {
+  public AbstractVariableScope getParentVariableScope() {
     return getParent();
   }
 
@@ -906,7 +906,7 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
                   .getDelegateInterceptor()
                   .handleInvocation(invocation);
               } catch (Exception e) {
-                throw new ProcessEngineException("Variable listener invocation failed", e);
+                throw new ProcessEngineException("Variable listener invocation failed: "+e.getMessage(), e);
               }
             }
           }

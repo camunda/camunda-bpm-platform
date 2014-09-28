@@ -17,7 +17,7 @@ import javax.ws.rs.core.Response.Status;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.task.DelegationState;
 
-public class DelegationStateConverter implements StringToTypeConverter<DelegationState> {
+public class DelegationStateConverter extends JacksonAwareStringToTypeConverter<DelegationState> {
 
   @Override
   public DelegationState convertQueryParameterToType(String value) {

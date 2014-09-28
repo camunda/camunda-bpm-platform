@@ -16,9 +16,9 @@ package org.camunda.bpm.engine.impl.persistence.entity;
 import java.util.List;
 import java.util.Map;
 
-import org.camunda.bpm.engine.delegate.PersistentVariableInstance;
 import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.VariableInstanceQueryImpl;
+import org.camunda.bpm.engine.impl.core.variable.CoreVariableInstance;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 import org.camunda.bpm.engine.runtime.VariableInstance;
 
@@ -44,9 +44,9 @@ public class VariableInstanceManager extends AbstractManager {
   }
 
   public void deleteVariableInstanceByTask(TaskEntity task) {
-    Map<String, PersistentVariableInstance> variableInstances = task.getVariableInstancesLocal();
+    Map<String, CoreVariableInstance> variableInstances = task.getVariableInstancesLocal();
     if (variableInstances!=null) {
-      for (PersistentVariableInstance variableInstance: variableInstances.values()) {
+      for (CoreVariableInstance variableInstance: variableInstances.values()) {
         ((VariableInstanceEntity) variableInstance).delete();
       }
     }

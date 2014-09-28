@@ -15,9 +15,11 @@ package org.camunda.bpm.engine.rest.helper;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import org.camunda.bpm.engine.delegate.SerializedVariableValue;
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.camunda.bpm.engine.runtime.VariableInstance;
+import org.camunda.bpm.engine.variable.value.ObjectValue;
+import org.camunda.bpm.engine.variable.value.TypedValue;
 
 /**
  * Creates variable mocks and simultaneously provides a ResponseSpecification
@@ -31,9 +33,7 @@ public class MockVariableInstanceBuilder {
 
   protected String id;
   protected String name;
-  protected String type;
-  protected Object value;
-  protected String valueTypeName;
+  protected TypedValue typedValue;
   protected String processInstanceId;
   protected String executionId;
   protected String caseInstanceId;
@@ -41,9 +41,6 @@ public class MockVariableInstanceBuilder {
   protected String taskId;
   protected String activityInstanceId;
   protected String errorMessage;
-
-  protected MockSerializedValueBuilder serializedValueBuilder;
-  protected boolean storesCustomObjects;
 
   public MockVariableInstanceBuilder id(String id) {
     this.id = id;
@@ -55,18 +52,8 @@ public class MockVariableInstanceBuilder {
     return this;
   }
 
-  public MockVariableInstanceBuilder typeName(String type) {
-    this.type = type;
-    return this;
-  }
-
-  public MockVariableInstanceBuilder value(Object value) {
-    this.value = value;
-    return this;
-  }
-
-  public MockVariableInstanceBuilder valueTypeName(String valueTypeName) {
-    this.valueTypeName = valueTypeName;
+  public MockVariableInstanceBuilder typedValue(TypedValue value) {
+    this.typedValue = value;
     return this;
   }
 
@@ -105,16 +92,6 @@ public class MockVariableInstanceBuilder {
     return this;
   }
 
-  public MockVariableInstanceBuilder serializedValue(MockSerializedValueBuilder serializedValueBuilder) {
-    this.serializedValueBuilder = serializedValueBuilder;
-    return this;
-  }
-
-  public MockVariableInstanceBuilder storesCustomObjects(boolean storesCustomObjects) {
-    this.storesCustomObjects = storesCustomObjects;
-    return this;
-  }
-
   public String getId() {
     return id;
   }
@@ -123,16 +100,12 @@ public class MockVariableInstanceBuilder {
     return name;
   }
 
-  public String getType() {
-    return type;
-  }
-
   public Object getValue() {
-    return value;
+    return typedValue.getValue();
   }
 
-  public String getValueTypeName() {
-    return valueTypeName;
+  public TypedValue getTypedValue() {
+    return typedValue;
   }
 
   public String getProcessInstanceId() {
@@ -163,12 +136,8 @@ public class MockVariableInstanceBuilder {
     return errorMessage;
   }
 
-  public MockSerializedValueBuilder getSerializedValueBuilder() {
-    return serializedValueBuilder;
-  }
-
-  public boolean isStoresCustomObjects() {
-    return storesCustomObjects;
+  public String getTypeName() {
+    return typedValue.getType().getName();
   }
 
   public VariableInstance build() {
@@ -193,9 +162,20 @@ public class MockVariableInstanceBuilder {
   protected <T extends VariableInstance> T build(T mockVariable) {
     when(mockVariable.getId()).thenReturn(id);
     when(mockVariable.getName()).thenReturn(name);
-    when(mockVariable.getTypeName()).thenReturn(type);
-    when(mockVariable.getValueTypeName()).thenReturn(valueTypeName);
-    when(mockVariable.getValue()).thenReturn(value);
+    when(mockVariable.getTypeName()).thenReturn(typedValue.getType().getName());
+
+    if (ObjectValue.class.isAssignableFrom(typedValue.getClass())) {
+      ObjectValue objectValue = (ObjectValue) typedValue;
+      if (objectValue.isDeserialized()) {
+        when(mockVariable.getValue()).thenReturn(typedValue.getValue());
+      } else {
+        when(mockVariable.getValue()).thenReturn(null);
+      }
+    } else {
+      when(mockVariable.getValue()).thenReturn(typedValue.getValue());
+    }
+
+    when(mockVariable.getTypedValue()).thenReturn(typedValue);
     when(mockVariable.getProcessInstanceId()).thenReturn(processInstanceId);
     when(mockVariable.getExecutionId()).thenReturn(executionId);
     when(mockVariable.getCaseInstanceId()).thenReturn(caseInstanceId);
@@ -203,12 +183,6 @@ public class MockVariableInstanceBuilder {
     when(mockVariable.getTaskId()).thenReturn(taskId);
     when(mockVariable.getActivityInstanceId()).thenReturn(activityInstanceId);
     when(mockVariable.getErrorMessage()).thenReturn(errorMessage);
-    when(mockVariable.storesCustomObjects()).thenReturn(storesCustomObjects);
-
-    if (serializedValueBuilder != null) {
-      SerializedVariableValue mockSerializedValue = serializedValueBuilder.build();
-      when(mockVariable.getSerializedValue()).thenReturn(mockSerializedValue);
-    }
 
     return mockVariable;
   }

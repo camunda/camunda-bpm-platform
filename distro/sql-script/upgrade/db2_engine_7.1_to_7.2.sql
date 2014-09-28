@@ -180,16 +180,6 @@ create index ACT_IDX_TASK_CASE_DEF_ID on ACT_RU_TASK(CASE_DEF_ID_);
 create index ACT_IDX_CASE_SENTRY_CASE_INST on ACT_RU_CASE_SENTRY_PART(CASE_INST_ID_);
 create index ACT_IDX_CASE_SENTRY_CASE_EXEC on ACT_RU_CASE_SENTRY_PART(CASE_EXEC_ID_);
 
--- add data format configuration fields
-ALTER TABLE ACT_RU_VARIABLE
-  ADD DATA_FORMAT_ID_ varchar(64);
-  
-ALTER TABLE ACT_HI_VARINST
-  ADD DATA_FORMAT_ID_ varchar(64);
-  
-ALTER TABLE ACT_HI_DETAIL
-  ADD DATA_FORMAT_ID_ varchar(64);
-
 -- create filter table
 create table ACT_RU_FILTER (
   ID_ varchar(64) not null,

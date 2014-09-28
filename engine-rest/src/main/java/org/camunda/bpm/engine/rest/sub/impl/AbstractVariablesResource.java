@@ -12,23 +12,26 @@
  */
 package org.camunda.bpm.engine.rest.sub.impl;
 
-import java.text.ParseException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
+
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.rest.dto.PatchVariablesDto;
-import org.camunda.bpm.engine.rest.dto.runtime.VariableValueDto;
+import org.camunda.bpm.engine.rest.dto.VariableValueDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.mapper.MultipartFormData;
 import org.camunda.bpm.engine.rest.mapper.MultipartFormData.FormPart;
 import org.camunda.bpm.engine.rest.sub.VariableResource;
-import org.camunda.bpm.engine.rest.util.DtoUtil;
+import org.camunda.bpm.engine.variable.VariableMap;
+import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.value.TypedValue;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.type.TypeFactory;
 import org.codehaus.jackson.type.JavaType;
@@ -38,51 +41,44 @@ public abstract class AbstractVariablesResource implements VariableResource {
 
   protected ProcessEngine engine;
   protected String resourceId;
+  protected ObjectMapper objectMapper;
 
-  public AbstractVariablesResource(ProcessEngine engine, String resourceId) {
+  public AbstractVariablesResource(ProcessEngine engine, String resourceId, ObjectMapper objectMapper) {
     this.engine = engine;
     this.resourceId = resourceId;
+    this.objectMapper = objectMapper;
   }
 
   @Override
-  public Map<String, VariableValueDto> getVariables() {
+  public Map<String, VariableValueDto> getVariables(boolean deserializeValues) {
+
+    VariableMap variables = getVariableEntities(deserializeValues);
+
     Map<String, VariableValueDto> values = new HashMap<String, VariableValueDto>();
-
-    for (Map.Entry<String, Object> entry : getVariableEntities().entrySet()) {
-      String key = entry.getKey();
-      Object value = entry.getValue();
-      String simpleClassName = null;
-
-      if (value != null) {
-        // if the value is not equals null, then get the simple class name.
-        simpleClassName = value.getClass().getSimpleName();
-      } else {
-        // if the value is equals null, then the simple class name is "Null".
-        simpleClassName = "Null";
-      }
-
-      values.put(key, new VariableValueDto(value, simpleClassName));
+    for (String variableName : variables.keySet()) {
+      VariableValueDto valueDto = VariableValueDto.fromTypedValue(variables.getTypedValue(variableName));
+      values.put(variableName, valueDto);
     }
 
     return values;
   }
 
   @Override
-  public VariableValueDto getVariable(String variableName) {
-    Object variable = null;
+  public VariableValueDto getVariable(String variableName, boolean deserializeValue) {
+    TypedValue value = null;
     try {
-       variable = getVariableEntity(variableName);
+       value = getVariableEntity(variableName, deserializeValue);
     } catch (ProcessEngineException e) {
       String errorMessage = String.format("Cannot get %s variable %s: %s", getResourceTypeName(), variableName, e.getMessage());
       throw new RestException(Status.INTERNAL_SERVER_ERROR, e, errorMessage);
     }
 
-    if (variable == null) {
+    if (value == null) {
       String errorMessage = String.format("%s variable with name %s does not exist or is null", getResourceTypeName(), variableName);
       throw new InvalidRequestException(Status.NOT_FOUND, errorMessage);
     }
 
-    return new VariableValueDto(variable, variable.getClass().getSimpleName());
+    return VariableValueDto.fromTypedValue(value);
 
   }
 
@@ -90,48 +86,25 @@ public abstract class AbstractVariablesResource implements VariableResource {
   public void putVariable(String variableName, VariableValueDto variable) {
 
     try {
-      if (variable.isPrimitiveVariableUpdate()) {
-        putPrimitiveVariableValue(variableName, variable.getType(), variable.getValue());
-      } else if (variable.isSerializedVariableUpdate()) {
-        setVariableEntityFromSerialized(variableName, variable.getValue(),
-          variable.getVariableType(), variable.getSerializationConfig());
-      } else {
-        throw new InvalidRequestException(Status.BAD_REQUEST,
-          String.format("Cannot put %s variable %s: Invalid combination of variable type '%s' and value type '%s'",
-            getResourceTypeName(), variableName, variable.getVariableType(), variable.getType()));
-      }
+      TypedValue typedValue = variable.toTypedValue(engine, objectMapper);
+      setVariableEntity(variableName, typedValue);
+
+    } catch (RestException e) {
+      throw new InvalidRequestException(e.getStatus(), e,
+        String.format("Cannot put %s variable %s: %s", getResourceTypeName(), variableName, e.getMessage()));
     } catch (BadUserRequestException e) {
       throw new RestException(Status.BAD_REQUEST, e,
         String.format("Cannot put %s variable %s: %s", getResourceTypeName(), variableName, e.getMessage()));
+
     } catch (ProcessEngineException e) {
       throw new RestException(Status.INTERNAL_SERVER_ERROR, e,
           String.format("Cannot put %s variable %s: %s", getResourceTypeName(), variableName, e.getMessage()));
     }
   }
 
-  protected void putPrimitiveVariableValue(String variableName, String valueType, Object serializedValue) {
-    try {
-      Object convertedValue = DtoUtil.toType(valueType, serializedValue);
-      setVariableEntity(variableName, convertedValue);
-
-    } catch (NumberFormatException e) {
-      String errorMessage = String.format("Cannot put %s variable %s due to number format exception: %s", getResourceTypeName(), variableName, e.getMessage());
-      throw new RestException(Status.BAD_REQUEST, e, errorMessage);
-
-    } catch (ParseException e) {
-      String errorMessage = String.format("Cannot put %s variable %s due to parse exception: %s", getResourceTypeName(), variableName, e.getMessage());
-      throw new RestException(Status.BAD_REQUEST, e, errorMessage);
-
-    } catch (IllegalArgumentException e) {
-      String errorMessage = String.format("Cannot put %s variable %s: %s", getResourceTypeName(), variableName, e.getMessage());
-      throw new RestException(Status.BAD_REQUEST, errorMessage);
-    }
-  }
-
   public void setBinaryVariable(String variableKey, MultipartFormData payload) {
     FormPart dataPart = payload.getNamedPart("data");
     FormPart valueTypePart = payload.getNamedPart("type");
-    FormPart variableTypePart = payload.getNamedPart("variableType");
 
     if(valueTypePart != null) {
       Object object = null;
@@ -142,21 +115,15 @@ public abstract class AbstractVariablesResource implements VariableResource {
         object = deserializeJsonObject(valueTypePart.getTextContent(), dataPart.getBinaryContent());
 
       } else {
-        // TODO: also support java de-serialization as byte stream?
         throw new InvalidRequestException(Status.BAD_REQUEST, "Unrecognized content type for serialized java type: "+dataPart.getContentType());
       }
 
       if(object != null) {
-        setVariableEntity(variableKey, object);
+        setVariableEntity(variableKey, Variables.objectValue(object).create());
       }
     } else {
       try {
-        // missing variableType means variable is byte[] (for backwards compatibility)
-        if (variableTypePart == null) {
-          setVariableEntity(variableKey, dataPart.getBinaryContent());
-        } else {
-          setVariableEntityFromSerialized(variableKey, dataPart.getBinaryContent(), variableTypePart.getTextContent(), null);
-        }
+        setVariableEntity(variableKey, Variables.byteArrayValue(dataPart.getBinaryContent()));
       } catch (ProcessEngineException e) {
         String errorMessage = String.format("Cannot put %s variable %s: %s", getResourceTypeName(), variableKey, e.getMessage());
         throw new RestException(Status.INTERNAL_SERVER_ERROR, e, errorMessage);
@@ -166,8 +133,6 @@ public abstract class AbstractVariablesResource implements VariableResource {
 
   protected Object deserializeJsonObject(String className, byte[] data) {
     try {
-
-      ObjectMapper objectMapper = new ObjectMapper();
       JavaType type = TypeFactory.fromCanonical(className);
 
       return objectMapper.readValue(new String(data), type);
@@ -191,21 +156,14 @@ public abstract class AbstractVariablesResource implements VariableResource {
 
   @Override
   public void modifyVariables(PatchVariablesDto patch) {
-    Map<String, Object> variableModifications = null;
+    VariableMap variableModifications = null;
     try {
-      variableModifications = DtoUtil.toMap(patch.getModifications());
+      variableModifications = VariableValueDto.toMap(patch.getModifications(), engine, objectMapper);
 
-    } catch (NumberFormatException e) {
-      String errorMessage = String.format("Cannot modify variables for %s due to number format exception: %s", getResourceTypeName(), e.getMessage());
-      throw new RestException(Status.BAD_REQUEST, e, errorMessage);
-
-    } catch (ParseException e) {
-      String errorMessage = String.format("Cannot modify variables for %s due to parse exception: %s", getResourceTypeName(), e.getMessage());
-      throw new RestException(Status.BAD_REQUEST, e, errorMessage);
-
-    } catch (IllegalArgumentException e) {
+    } catch (RestException e) {
       String errorMessage = String.format("Cannot modify variables for %s: %s", getResourceTypeName(), e.getMessage());
-      throw new RestException(Status.BAD_REQUEST, errorMessage);
+      throw new InvalidRequestException(e.getStatus(), e, errorMessage);
+
     }
 
     List<String> variableDeletions = patch.getDeletions();
@@ -220,16 +178,13 @@ public abstract class AbstractVariablesResource implements VariableResource {
 
   }
 
-  protected abstract Map<String, Object> getVariableEntities();
+  protected abstract VariableMap getVariableEntities(boolean deserializeValues);
 
-  protected abstract void updateVariableEntities(Map<String, Object> variables, List<String> deletions);
+  protected abstract void updateVariableEntities(VariableMap variables, List<String> deletions);
 
-  protected abstract Object getVariableEntity(String variableKey);
+  protected abstract TypedValue getVariableEntity(String variableKey, boolean deserializeValue);
 
-  protected abstract void setVariableEntity(String variableKey, Object variableValue);
-
-  protected abstract void setVariableEntityFromSerialized(String variableKey, Object serializedValue,
-      String variableType, Map<String, Object> configuration);
+  protected abstract void setVariableEntity(String variableKey, TypedValue variableValue);
 
   protected abstract void removeVariableEntity(String variableKey);
 

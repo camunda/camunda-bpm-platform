@@ -24,7 +24,7 @@ import org.camunda.bpm.engine.impl.context.Context;
  */
 public class BeansResolverFactory implements ResolverFactory, Resolver {
 
-  public Resolver createResolver(VariableScope<?> variableScope) {
+  public Resolver createResolver(VariableScope variableScope) {
     return this;
   }
 

@@ -16,7 +16,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-public class StringSetConverter implements StringToTypeConverter<Set<String>> {
+public class StringSetConverter extends JacksonAwareStringToTypeConverter<Set<String>> {
 
   @Override
   public Set<String> convertQueryParameterToType(String value) {

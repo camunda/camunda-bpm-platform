@@ -21,15 +21,15 @@ import java.util.zip.ZipInputStream;
 
 import javax.sql.DataSource;
 
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.StandaloneProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.interceptor.CommandContextInterceptor;
 import org.camunda.bpm.engine.impl.interceptor.CommandInterceptor;
 import org.camunda.bpm.engine.impl.interceptor.LogInterceptor;
-import org.camunda.bpm.engine.impl.variable.EntityManagerSession;
+import org.camunda.bpm.engine.impl.variable.serializer.jpa.EntityManagerSession;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.ContextResource;

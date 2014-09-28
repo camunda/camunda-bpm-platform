@@ -12,22 +12,16 @@
  */
 package org.camunda.bpm.engine.rest.dto.runtime;
 
-import java.util.Map;
-
-import org.camunda.bpm.engine.delegate.ProcessEngineVariableType;
+import org.camunda.bpm.engine.rest.dto.VariableValueDto;
 import org.camunda.bpm.engine.runtime.VariableInstance;
 
 /**
  * @author roman.smirnov
  */
-public class VariableInstanceDto {
+public class VariableInstanceDto extends VariableValueDto {
 
   protected String id;
   protected String name;
-  protected String type;
-  protected String variableType;
-  protected Object value;
-  protected Map<String, Object> serializationConfig;
   protected String processInstanceId;
   protected String executionId;
   protected String caseInstanceId;
@@ -52,30 +46,6 @@ public class VariableInstanceDto {
 
   public void setName(String name) {
     this.name = name;
-  }
-
-  public String getType() {
-    return type;
-  }
-
-  public void setType(String type) {
-    this.type = type;
-  }
-
-  public String getVariableType() {
-    return variableType;
-  }
-
-  public void setVariableType(String variableType) {
-    this.variableType = variableType;
-  }
-
-  public Object getValue() {
-    return value;
-  }
-
-  public void setValue(Object value) {
-    this.value = value;
   }
 
   public String getProcessInstanceId() {
@@ -126,14 +96,6 @@ public class VariableInstanceDto {
     return caseInstanceId;
   }
 
-  public Map<String, Object> getSerializationConfig() {
-    return serializationConfig;
-  }
-
-  public void setSerializationConfig(Map<String, Object> serializationConfig) {
-    this.serializationConfig = serializationConfig;
-  }
-
   public static VariableInstanceDto fromVariableInstance(VariableInstance variableInstance) {
     VariableInstanceDto dto = new VariableInstanceDto();
 
@@ -148,22 +110,11 @@ public class VariableInstanceDto {
     dto.taskId = variableInstance.getTaskId();
     dto.activityInstanceId = variableInstance.getActivityInstanceId();
 
-    if (variableInstance.storesCustomObjects()) {
-      if (ProcessEngineVariableType.SERIALIZABLE.getName().equals(variableInstance.getTypeName())) {
-        if (variableInstance.getValue() != null) {
-          dto.value = new SerializedObjectDto(variableInstance.getValue());
-        }
-      } else {
-        dto.value = variableInstance.getSerializedValue().getValue();
-        dto.serializationConfig = variableInstance.getSerializedValue().getConfig();
-      }
-    } else {
-      dto.value = variableInstance.getValue();
-    }
+    dto.type = variableInstance.getTypeName();
+
+    VariableValueDto.fromTypedValue(dto, variableInstance.getTypedValue());
 
     dto.errorMessage = variableInstance.getErrorMessage();
-    dto.type = variableInstance.getValueTypeName();
-    dto.variableType = variableInstance.getTypeName();
 
     return dto;
   }

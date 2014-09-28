@@ -13,6 +13,9 @@
 
 package org.camunda.bpm.engine.impl.form.type;
 
+import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.value.TypedValue;
+
 
 
 /**
@@ -34,6 +37,10 @@ public class StringFormType extends AbstractFormFieldType {
 
   public String convertModelValueToFormValue(Object modelValue) {
     return (String) modelValue;
+  }
+
+  public TypedValue getTypedValue(Object value) {
+    return Variables.stringValue((String) value);
   }
 
 }

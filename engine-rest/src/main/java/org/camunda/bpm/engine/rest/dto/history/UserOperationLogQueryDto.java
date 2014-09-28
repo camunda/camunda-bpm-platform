@@ -21,6 +21,7 @@ import org.camunda.bpm.engine.history.UserOperationLogQuery;
 import org.camunda.bpm.engine.rest.dto.AbstractQueryDto;
 import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
 import org.camunda.bpm.engine.rest.dto.converter.DateConverter;
+import org.codehaus.jackson.map.ObjectMapper;
 
 /**
  * @author Danny Gräf
@@ -45,8 +46,8 @@ public class UserOperationLogQueryDto extends AbstractQueryDto<UserOperationLogQ
   protected Date afterTimestamp;
   protected Date beforeTimestamp;
 
-  public UserOperationLogQueryDto(MultivaluedMap<String, String> queryParameters) {
-    super(queryParameters);
+  public UserOperationLogQueryDto(ObjectMapper objectMapper, MultivaluedMap<String, String> queryParameters) {
+    super(objectMapper, queryParameters);
   }
 
   @Override

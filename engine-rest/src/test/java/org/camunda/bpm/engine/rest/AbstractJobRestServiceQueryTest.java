@@ -149,7 +149,7 @@ public abstract class AbstractJobRestServiceQueryTest extends AbstractRestServic
 	@Test
 	public void testInvalidDueDateComparator() {
 
-		String variableValue = "2013-05-05";
+		String variableValue = "2013-05-05T00:00:00";
 		String invalidComparator = "bt";
 
 		String queryValue = invalidComparator + "_" + variableValue;
@@ -164,12 +164,12 @@ public abstract class AbstractJobRestServiceQueryTest extends AbstractRestServic
 	}
 
   @Test
-  public void testInvalidDueDatComperatoreAsPost() {
+  public void testInvalidDueDateComperatorAsPost() {
     String invalidComparator = "bt";
 
     Map<String, Object> conditionJson = new HashMap<String, Object>();
     conditionJson.put("operator", invalidComparator);
-    conditionJson.put("value", "2013-05-05");
+    conditionJson.put("value", "2013-05-05T00:00:00");
 
     List<Map<String, Object>> conditions = new ArrayList<Map<String, Object>>();
     conditions.add(conditionJson);
@@ -194,7 +194,7 @@ public abstract class AbstractJobRestServiceQueryTest extends AbstractRestServic
     given().queryParam("dueDates", queryValue)
     .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
     .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
-    .body("message", equalTo("Invalid due date format: Invalid format: \"invalidValue\""))
+    .body("message", equalTo("Invalid due date format: Cannot convert value \"invalidValue\" to java type java.util.Date"))
     .when().get(JOBS_RESOURCE_URL);
   }
 
@@ -213,7 +213,7 @@ public abstract class AbstractJobRestServiceQueryTest extends AbstractRestServic
     given().contentType(POST_JSON_CONTENT_TYPE).body(json)
     .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
     .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
-    .body("message", equalTo("Invalid due date format: Invalid format: \"invalidValue\""))
+    .body("message", equalTo("Invalid due date format: Cannot convert value \"invalidValue\" to java type java.util.Date"))
     .when().post(JOBS_RESOURCE_URL);
   }
 
@@ -336,10 +336,8 @@ public abstract class AbstractJobRestServiceQueryTest extends AbstractRestServic
 
 	@Test
 	public void testDueDateParameters() {
-		String variableValue = "2013-05-05";
-
-		DateConverter converter = new DateConverter();
-		Date date = converter.convertQueryParameterToType(variableValue);
+		String variableValue = "2013-05-05T00:00:00";
+		Date date = DateTimeUtil.parseDate(variableValue);
 
 		String queryValue = "lt_" + variableValue;
 		given().queryParam("dueDates", queryValue).then().expect()
@@ -362,12 +360,11 @@ public abstract class AbstractJobRestServiceQueryTest extends AbstractRestServic
 
   @Test
   public void testDueDateParametersAsPost() {
-    String value = "2013-05-18";
-    String anotherValue = "2013-05-05";
+    String value = "2013-05-18T00:00:00";
+    String anotherValue = "2013-05-05T00:00:00";
 
-    DateConverter converter = new DateConverter();
-    Date date = converter.convertQueryParameterToType(value);
-    Date anotherDate = converter.convertQueryParameterToType(anotherValue);
+    Date date = DateTimeUtil.parseDate(value);
+    Date anotherDate = DateTimeUtil.parseDate(anotherValue);
 
     Map<String, Object> conditionJson = new HashMap<String, Object>();
     conditionJson.put("operator", "lt");
@@ -394,15 +391,14 @@ public abstract class AbstractJobRestServiceQueryTest extends AbstractRestServic
 
 	@Test
 	public void testMultipleDueDateParameters() {
-		String variableValue1 =  "2012-05-05";
+		String variableValue1 =  "2012-05-05T00:00:00";
 		String variableParameter1 = "gt_" + variableValue1;
 
-		String variableValue2 = "2013-02-02";
+		String variableValue2 = "2013-02-02T00:00:00";
 		String variableParameter2 = "lt_" + variableValue2;
 
-    DateConverter converter = new DateConverter();
-    Date date = converter.convertQueryParameterToType(variableValue1);
-    Date anotherDate = converter.convertQueryParameterToType(variableValue2);
+    Date date = DateTimeUtil.parseDate(variableValue1);
+    Date anotherDate = DateTimeUtil.parseDate(variableValue2);
 
 		String queryValue = variableParameter1 + "," + variableParameter2;
 

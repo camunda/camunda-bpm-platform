@@ -44,7 +44,7 @@ public abstract class ExecutableScript {
   * @throws ProcessEngineException in case the script cannot be evaluated.
   * @return the result of the script evaluation
   */
-  public abstract Object execute(ScriptEngine scriptEngine, VariableScope<?> variableScope, Bindings bindings);
+  public abstract Object execute(ScriptEngine scriptEngine, VariableScope variableScope, Bindings bindings);
 
   /**
    * The language in which the script is written.

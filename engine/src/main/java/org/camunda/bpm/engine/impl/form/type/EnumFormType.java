@@ -16,6 +16,8 @@ package org.camunda.bpm.engine.impl.form.type;
 import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.value.TypedValue;
 
 
 /**
@@ -70,6 +72,10 @@ public class EnumFormType extends AbstractFormFieldType {
 
   public Map<String, String> getValues() {
     return values;
+  }
+
+  public TypedValue getTypedValue(Object value) {
+    return Variables.stringValue((String) value);
   }
 
 }

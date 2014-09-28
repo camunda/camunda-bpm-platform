@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -21,9 +21,10 @@ import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.identity.GroupQuery;
 import org.camunda.bpm.engine.rest.dto.AbstractQueryDto;
 import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
+import org.codehaus.jackson.map.ObjectMapper;
 
 /**
- * 
+ *
  * @author Daniel Meyer
  */
 public class GroupQueryDto extends AbstractQueryDto<GroupQuery> {
@@ -31,7 +32,7 @@ public class GroupQueryDto extends AbstractQueryDto<GroupQuery> {
   private static final String SORT_BY_GROUP_ID_VALUE = "id";
   private static final String SORT_BY_GROUP_NAME_VALUE = "name";
   private static final String SORT_BY_GROUP_TYPE_VALUE = "type";
-  
+
   private static final List<String> VALID_SORT_BY_VALUES;
   static {
     VALID_SORT_BY_VALUES = new ArrayList<String>();
@@ -39,26 +40,26 @@ public class GroupQueryDto extends AbstractQueryDto<GroupQuery> {
     VALID_SORT_BY_VALUES.add(SORT_BY_GROUP_NAME_VALUE);
     VALID_SORT_BY_VALUES.add(SORT_BY_GROUP_TYPE_VALUE);
   }
-  
+
   protected String id;
   protected String name;
   protected String nameLike;
   protected String type;
   protected String member;
-    
+
   public GroupQueryDto() {
-    
+
   }
-  
-  public GroupQueryDto(MultivaluedMap<String, String> queryParameters) {
-    super(queryParameters);
+
+  public GroupQueryDto(ObjectMapper objectMapper, MultivaluedMap<String, String> queryParameters) {
+    super(objectMapper, queryParameters);
   }
 
   @CamundaQueryParam("id")
   public void setId(String groupId) {
     this.id = groupId;
   }
-  
+
   @CamundaQueryParam("name")
   public void setName(String groupName) {
     this.name = groupName;
@@ -68,17 +69,17 @@ public class GroupQueryDto extends AbstractQueryDto<GroupQuery> {
   public void setNameLike(String groupNameLike) {
     this.nameLike = groupNameLike;
   }
-  
+
   @CamundaQueryParam("type")
   public void setType(String groupType) {
     this.type = groupType;
   }
-  
+
   @CamundaQueryParam("member")
   public void setGroupMember(String member) {
     this.member = member;
   }
-    
+
   @Override
   protected boolean isValidSortByValue(String value) {
     return VALID_SORT_BY_VALUES.contains(value);
@@ -107,7 +108,7 @@ public class GroupQueryDto extends AbstractQueryDto<GroupQuery> {
       query.groupMember(member);
     }
   }
-  
+
   @Override
   protected void applySortingOptions(GroupQuery query) {
     if (sortBy != null) {
@@ -119,7 +120,7 @@ public class GroupQueryDto extends AbstractQueryDto<GroupQuery> {
         query.orderByGroupType();
       }
     }
-    
+
     if (sortOrder != null) {
       if (sortOrder.equals(SORT_ORDER_ASC_VALUE)) {
         query.asc();
@@ -128,5 +129,5 @@ public class GroupQueryDto extends AbstractQueryDto<GroupQuery> {
       }
     }
   }
-  
+
 }

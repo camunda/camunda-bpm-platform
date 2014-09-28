@@ -27,12 +27,10 @@ import javax.ws.rs.core.Response.Status;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.history.HistoricVariableInstanceQuery;
-import org.camunda.bpm.engine.impl.variable.ByteArrayType;
-import org.camunda.bpm.engine.impl.variable.SerializableType;
 import org.camunda.bpm.engine.rest.AbstractRestServiceTest;
 import org.camunda.bpm.engine.rest.helper.MockHistoricVariableInstanceBuilder;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
-import org.camunda.bpm.engine.rest.helper.MockSerializedValueBuilder;
+import org.camunda.bpm.engine.variable.Variables;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -80,7 +78,7 @@ public abstract class AbstractHistoricVariableInstanceRestServiceInteractionTest
     .and()
       .body("id", equalTo(builder.getId()))
       .body("name", equalTo(builder.getName()))
-      .body("type", equalTo(builder.getValueTypeName()))
+      .body("type", equalTo(builder.getTypedValue().getType().getName()))
       .body("value", equalTo(builder.getValue()))
       .body("processInstanceId", equalTo(builder.getProcessInstanceId()))
       .body("errorMessage", equalTo(builder.getErrorMessage()))
@@ -93,14 +91,10 @@ public abstract class AbstractHistoricVariableInstanceRestServiceInteractionTest
 
   @Test
   public void testGetSingleVariableInstanceForBinaryVariable() {
-    final ByteArrayType type = new ByteArrayType();
-
     MockHistoricVariableInstanceBuilder builder = MockProvider.mockHistoricVariableInstance();
 
     HistoricVariableInstance variableInstanceMock = builder
-      .typeName(type.getTypeName())
-      .valueTypeName("byte[]")
-      .value(null)
+      .typedValue(Variables.byteArrayValue(null))
       .build();
 
     when(variableInstanceQueryMock.variableId(variableInstanceMock.getId())).thenReturn(variableInstanceQueryMock);
@@ -140,17 +134,9 @@ public abstract class AbstractHistoricVariableInstanceRestServiceInteractionTest
 
   @Test
   public void testBinaryDataForBinaryVariable() {
-    final ByteArrayType type = new ByteArrayType();
     final byte[] byteContent = "some bytes".getBytes();
-
-    MockSerializedValueBuilder serializedValueBuilder =
-        new MockSerializedValueBuilder()
-          .value(byteContent);
-
     HistoricVariableInstance variableInstanceMock = MockProvider.mockHistoricVariableInstance()
-        .typeName(type.getTypeName())
-        .value(byteContent)
-        .serializedValue(serializedValueBuilder)
+        .typedValue(Variables.byteArrayValue(byteContent))
         .build();
 
     when(variableInstanceQueryMock.variableId(variableInstanceMock.getId())).thenReturn(variableInstanceQueryMock);
@@ -189,20 +175,10 @@ public abstract class AbstractHistoricVariableInstanceRestServiceInteractionTest
 
   @Test
   public void testBinaryDataForSerializableVariable() {
-    final SerializableType type = new SerializableType();
     String value = "some bytes";
-    final byte[] serializedValue = value.getBytes();
-
-    MockSerializedValueBuilder serializedValueBuilder =
-        new MockSerializedValueBuilder()
-          .value(serializedValue);
-
     HistoricVariableInstance variableInstanceMock =
         MockProvider.mockHistoricVariableInstance()
-          .valueTypeName(type.getTypeNameForValue(null))
-          .typeName(type.getTypeName())
-          .value(value)
-          .serializedValue(serializedValueBuilder)
+          .typedValue(Variables.serializedObjectValue(value).create())
           .build();
 
     when(variableInstanceQueryMock.variableId(variableInstanceMock.getId())).thenReturn(variableInstanceQueryMock);
@@ -215,8 +191,7 @@ public abstract class AbstractHistoricVariableInstanceRestServiceInteractionTest
       .contentType(ContentType.BINARY.toString())
     .when().get(VARIABLE_INSTANCE_BINARY_DATA_URL);
 
-    byte[] responseBytes = response.getBody().asByteArray();
-    Assert.assertEquals(new String(serializedValue), new String(responseBytes));
+    Assert.assertEquals(value, response.getBody().asString());
     verify(variableInstanceQueryMock, never()).disableBinaryFetching();
     verify(variableInstanceQueryMock).disableCustomObjectDeserialization();
 

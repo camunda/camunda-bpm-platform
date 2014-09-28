@@ -6,45 +6,54 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Matchers.isNull;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.jayway.restassured.http.ContentType;
-import com.jayway.restassured.response.Response;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
+
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.delegate.ProcessEngineVariableType;
 import org.camunda.bpm.engine.impl.RuntimeServiceImpl;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.helper.EqualsList;
 import org.camunda.bpm.engine.rest.helper.EqualsMap;
+import org.camunda.bpm.engine.rest.helper.ErrorMessageHelper;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
+import org.camunda.bpm.engine.rest.helper.variable.EqualsNullValue;
+import org.camunda.bpm.engine.rest.helper.variable.EqualsObjectValue;
+import org.camunda.bpm.engine.rest.helper.variable.EqualsPrimitiveValue;
+import org.camunda.bpm.engine.rest.helper.variable.EqualsUntypedValue;
 import org.camunda.bpm.engine.rest.util.VariablesBuilder;
 import org.camunda.bpm.engine.runtime.EventSubscription;
 import org.camunda.bpm.engine.runtime.EventSubscriptionQuery;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ExecutionQuery;
+import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.type.ValueType;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.type.TypeFactory;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import com.jayway.restassured.http.ContentType;
+import com.jayway.restassured.response.Response;
 
 public abstract class AbstractExecutionRestServiceInteractionTest extends AbstractRestServiceTest {
 
@@ -61,7 +70,7 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
   @Before
   public void setUpRuntimeData() {
     runtimeServiceMock = mock(RuntimeServiceImpl.class);
-    when(runtimeServiceMock.getVariablesLocal(MockProvider.EXAMPLE_EXECUTION_ID)).thenReturn(EXAMPLE_VARIABLES);
+    when(runtimeServiceMock.getVariablesLocal(MockProvider.EXAMPLE_EXECUTION_ID, true)).thenReturn(EXAMPLE_VARIABLES);
     mockEventSubscriptionQuery();
 
     when(processEngine.getRuntimeService()).thenReturn(runtimeServiceMock);
@@ -141,8 +150,9 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
 
     given().pathParam("id", MockProvider.EXAMPLE_EXECUTION_ID).contentType(ContentType.JSON).body(variablesJson)
     .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
-    .body("type", equalTo(RestException.class.getSimpleName()))
-    .body("message", equalTo("Cannot signal execution anExecutionId due to number format exception: For input string: \"1abc\""))
+    .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+    .body("message", equalTo("Cannot signal execution anExecutionId: "
+          + ErrorMessageHelper.getExpectedFailingConversionMessage(variableValue, variableType, Integer.class)))
     .when().post(SIGNAL_EXECUTION_URL);
   }
 
@@ -159,8 +169,9 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
 
     given().pathParam("id", MockProvider.EXAMPLE_EXECUTION_ID).contentType(ContentType.JSON).body(variablesJson)
     .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
-    .body("type", equalTo(RestException.class.getSimpleName()))
-    .body("message", equalTo("Cannot signal execution anExecutionId due to number format exception: For input string: \"1abc\""))
+    .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+    .body("message", equalTo("Cannot signal execution anExecutionId: "
+          + ErrorMessageHelper.getExpectedFailingConversionMessage(variableValue, variableType, Short.class)))
     .when().post(SIGNAL_EXECUTION_URL);
   }
 
@@ -170,15 +181,15 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
     String variableValue = "1abc";
     String variableType = "Long";
 
-
     Map<String, Object> variablesJson = new HashMap<String, Object>();
     Map<String, Object> variables = VariablesBuilder.create().variable(variableKey, variableValue, variableType).getVariables();
     variablesJson.put("variables", variables);
 
     given().pathParam("id", MockProvider.EXAMPLE_EXECUTION_ID).contentType(ContentType.JSON).body(variablesJson)
     .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
-    .body("type", equalTo(RestException.class.getSimpleName()))
-    .body("message", equalTo("Cannot signal execution anExecutionId due to number format exception: For input string: \"1abc\""))
+    .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+    .body("message", equalTo("Cannot signal execution anExecutionId: "
+          + ErrorMessageHelper.getExpectedFailingConversionMessage(variableValue, variableType, Long.class)))
     .when().post(SIGNAL_EXECUTION_URL);
   }
 
@@ -195,8 +206,9 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
 
     given().pathParam("id", MockProvider.EXAMPLE_EXECUTION_ID).contentType(ContentType.JSON).body(variablesJson)
     .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
-    .body("type", equalTo(RestException.class.getSimpleName()))
-    .body("message", equalTo("Cannot signal execution anExecutionId due to number format exception: For input string: \"1abc\""))
+    .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+    .body("message", equalTo("Cannot signal execution anExecutionId: "
+          + ErrorMessageHelper.getExpectedFailingConversionMessage(variableValue, variableType, Double.class)))
     .when().post(SIGNAL_EXECUTION_URL);
   }
 
@@ -206,15 +218,15 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
     String variableValue = "1abc";
     String variableType = "Date";
 
-
     Map<String, Object> variablesJson = new HashMap<String, Object>();
     Map<String, Object> variables = VariablesBuilder.create().variable(variableKey, variableValue, variableType).getVariables();
     variablesJson.put("variables", variables);
 
     given().pathParam("id", MockProvider.EXAMPLE_EXECUTION_ID).contentType(ContentType.JSON).body(variablesJson)
     .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
-    .body("type", equalTo(RestException.class.getSimpleName()))
-    .body("message", equalTo("Cannot signal execution anExecutionId due to parse exception: Unparseable date: \"1abc\""))
+    .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+    .body("message", equalTo("Cannot signal execution anExecutionId: "
+          + ErrorMessageHelper.getExpectedFailingConversionMessage(variableValue, variableType, Date.class)))
     .when().post(SIGNAL_EXECUTION_URL);
   }
 
@@ -231,8 +243,8 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
 
     given().pathParam("id", MockProvider.EXAMPLE_EXECUTION_ID).contentType(ContentType.JSON).body(variablesJson)
     .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
-    .body("type", equalTo(RestException.class.getSimpleName()))
-    .body("message", equalTo("Cannot signal execution anExecutionId: The value type 'X' is not supported."))
+    .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+    .body("message", equalTo("Cannot signal execution anExecutionId: Unsupported value type 'X'"))
     .when().post(SIGNAL_EXECUTION_URL);
   }
 
@@ -253,7 +265,7 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
     Response response = given().pathParam("id", MockProvider.EXAMPLE_EXECUTION_ID)
       .then().expect().statusCode(Status.OK.getStatusCode())
       .body(EXAMPLE_VARIABLE_KEY, notNullValue())
-      .body(EXAMPLE_VARIABLE_KEY + ".value", equalTo(EXAMPLE_VARIABLE_VALUE))
+      .body(EXAMPLE_VARIABLE_KEY + ".value", equalTo(EXAMPLE_VARIABLE_VALUE.getValue()))
       .body(EXAMPLE_VARIABLE_KEY + ".type", equalTo(String.class.getSimpleName()))
       .when().get(EXECUTION_LOCAL_VARIABLES_URL);
 
@@ -262,7 +274,7 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
 
   @Test
   public void testGetLocalVariablesForNonExistingExecution() {
-    when(runtimeServiceMock.getVariablesLocal(anyString())).thenThrow(new ProcessEngineException("expected exception"));
+    when(runtimeServiceMock.getVariablesLocal(anyString(), eq(true))).thenThrow(new ProcessEngineException("expected exception"));
 
     given().pathParam("id", "aNonExistingExecutionId")
       .then().expect().statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode()).contentType(ContentType.JSON)
@@ -325,7 +337,7 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
     String variableKey = "aVariableKey";
     int variableValue = 123;
 
-    when(runtimeServiceMock.getVariableLocal(eq(MockProvider.EXAMPLE_EXECUTION_ID), eq(variableKey))).thenReturn(variableValue);
+    when(runtimeServiceMock.getVariableLocalTyped(eq(MockProvider.EXAMPLE_EXECUTION_ID), eq(variableKey), anyBoolean())).thenReturn(Variables.integerValue(variableValue));
 
     given().pathParam("id", MockProvider.EXAMPLE_EXECUTION_ID).pathParam("varId", variableKey)
       .then().expect().statusCode(Status.OK.getStatusCode())
@@ -351,7 +363,7 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
   public void testGetLocalVariableForNonExistingExecution() {
     String variableKey = "aVariableKey";
 
-    when(runtimeServiceMock.getVariableLocal(eq(MockProvider.EXAMPLE_EXECUTION_ID), eq(variableKey)))
+    when(runtimeServiceMock.getVariableLocalTyped(eq(MockProvider.EXAMPLE_EXECUTION_ID), eq(variableKey), eq(true)))
       .thenThrow(new ProcessEngineException("expected exception"));
 
     given().pathParam("id", MockProvider.EXAMPLE_EXECUTION_ID).pathParam("varId", variableKey)
@@ -374,7 +386,7 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
       .when().put(SINGLE_EXECUTION_LOCAL_VARIABLE_URL);
 
     verify(runtimeServiceMock).setVariableLocal(eq(MockProvider.EXAMPLE_EXECUTION_ID), eq(variableKey),
-        eq(variableValue));
+        argThat(EqualsUntypedValue.matcher().value(variableValue)));
   }
 
   @Test
@@ -391,7 +403,7 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
       .when().put(SINGLE_EXECUTION_LOCAL_VARIABLE_URL);
 
     verify(runtimeServiceMock).setVariableLocal(eq(MockProvider.EXAMPLE_EXECUTION_ID), eq(variableKey),
-        eq(variableValue));
+        argThat(EqualsPrimitiveValue.integerValue(variableValue)));
   }
 
   @Test
@@ -405,8 +417,9 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
     given().pathParam("id", MockProvider.EXAMPLE_EXECUTION_ID).pathParam("varId", variableKey)
       .contentType(ContentType.JSON).body(variableJson)
       .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
-      .body("type", equalTo(RestException.class.getSimpleName()))
-      .body("message", equalTo("Cannot put execution variable aVariableKey due to number format exception: For input string: \"1abc\""))
+      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("message", equalTo("Cannot put execution variable aVariableKey: "
+          + ErrorMessageHelper.getExpectedFailingConversionMessage(variableValue, type, Integer.class)))
       .when().put(SINGLE_EXECUTION_LOCAL_VARIABLE_URL);
   }
 
@@ -424,7 +437,7 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
       .when().put(SINGLE_EXECUTION_LOCAL_VARIABLE_URL);
 
     verify(runtimeServiceMock).setVariableLocal(eq(MockProvider.EXAMPLE_EXECUTION_ID), eq(variableKey),
-        eq(variableValue));
+        argThat(EqualsPrimitiveValue.shortValue(variableValue)));
   }
 
   @Test
@@ -438,8 +451,9 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
     given().pathParam("id", MockProvider.EXAMPLE_EXECUTION_ID).pathParam("varId", variableKey)
       .contentType(ContentType.JSON).body(variableJson)
       .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
-      .body("type", equalTo(RestException.class.getSimpleName()))
-      .body("message", equalTo("Cannot put execution variable aVariableKey due to number format exception: For input string: \"1abc\""))
+      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("message", equalTo("Cannot put execution variable aVariableKey: "
+          + ErrorMessageHelper.getExpectedFailingConversionMessage(variableValue, type, Short.class)))
       .when().put(SINGLE_EXECUTION_LOCAL_VARIABLE_URL);
   }
 
@@ -457,7 +471,7 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
       .when().put(SINGLE_EXECUTION_LOCAL_VARIABLE_URL);
 
     verify(runtimeServiceMock).setVariableLocal(eq(MockProvider.EXAMPLE_EXECUTION_ID), eq(variableKey),
-        eq(variableValue));
+        argThat(EqualsPrimitiveValue.longValue(variableValue)));
   }
 
   @Test
@@ -471,8 +485,9 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
     given().pathParam("id", MockProvider.EXAMPLE_EXECUTION_ID).pathParam("varId", variableKey)
       .contentType(ContentType.JSON).body(variableJson)
       .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
-      .body("type", equalTo(RestException.class.getSimpleName()))
-      .body("message", equalTo("Cannot put execution variable aVariableKey due to number format exception: For input string: \"1abc\""))
+      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("message", equalTo("Cannot put execution variable aVariableKey: "
+          + ErrorMessageHelper.getExpectedFailingConversionMessage(variableValue, type, Long.class)))
       .when().put(SINGLE_EXECUTION_LOCAL_VARIABLE_URL);
   }
 
@@ -490,7 +505,7 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
       .when().put(SINGLE_EXECUTION_LOCAL_VARIABLE_URL);
 
     verify(runtimeServiceMock).setVariableLocal(eq(MockProvider.EXAMPLE_EXECUTION_ID), eq(variableKey),
-        eq(variableValue));
+        argThat(EqualsPrimitiveValue.doubleValue(variableValue)));
   }
 
   @Test
@@ -504,8 +519,9 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
     given().pathParam("id", MockProvider.EXAMPLE_EXECUTION_ID).pathParam("varId", variableKey)
       .contentType(ContentType.JSON).body(variableJson)
       .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
-      .body("type", equalTo(RestException.class.getSimpleName()))
-      .body("message", equalTo("Cannot put execution variable aVariableKey due to number format exception: For input string: \"1abc\""))
+      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("message", equalTo("Cannot put execution variable aVariableKey: "
+          + ErrorMessageHelper.getExpectedFailingConversionMessage(variableValue, type, Double.class)))
       .when().put(SINGLE_EXECUTION_LOCAL_VARIABLE_URL);
   }
 
@@ -523,7 +539,7 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
       .when().put(SINGLE_EXECUTION_LOCAL_VARIABLE_URL);
 
     verify(runtimeServiceMock).setVariableLocal(eq(MockProvider.EXAMPLE_EXECUTION_ID), eq(variableKey),
-        eq(variableValue));
+        argThat(EqualsPrimitiveValue.booleanValue(variableValue)));
   }
 
   @Test
@@ -545,7 +561,7 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
       .when().put(SINGLE_EXECUTION_LOCAL_VARIABLE_URL);
 
     verify(runtimeServiceMock).setVariableLocal(eq(MockProvider.EXAMPLE_EXECUTION_ID), eq(variableKey),
-        eq(expectedValue));
+        argThat(EqualsPrimitiveValue.dateValue(expectedValue)));
   }
 
   @Test
@@ -559,8 +575,9 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
     given().pathParam("id", MockProvider.EXAMPLE_EXECUTION_ID).pathParam("varId", variableKey)
       .contentType(ContentType.JSON).body(variableJson)
       .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
-      .body("type", equalTo(RestException.class.getSimpleName()))
-      .body("message", equalTo("Cannot put execution variable aVariableKey due to parse exception: Unparseable date: \"1abc\""))
+      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("message", equalTo("Cannot put execution variable aVariableKey: "
+          + ErrorMessageHelper.getExpectedFailingConversionMessage(variableValue, type, Date.class)))
       .when().put(SINGLE_EXECUTION_LOCAL_VARIABLE_URL);
   }
 
@@ -576,7 +593,7 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
       .contentType(ContentType.JSON).body(variableJson)
       .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
       .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
-      .body("message", equalTo("Cannot put execution variable aVariableKey: Invalid combination of variable type 'null' and value type 'X'"))
+      .body("message", equalTo("Cannot put execution variable aVariableKey: Unsupported value type 'X'"))
       .when().put(SINGLE_EXECUTION_LOCAL_VARIABLE_URL);
   }
 
@@ -595,7 +612,8 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
       .post(SINGLE_EXECUTION_LOCAL_BINARY_VARIABLE_URL);
 
     verify(runtimeServiceMock).setVariableLocal(
-        eq(MockProvider.EXAMPLE_EXECUTION_ID), eq(variableKey), eq(bytes));
+        eq(MockProvider.EXAMPLE_EXECUTION_ID), eq(variableKey),
+        argThat(EqualsPrimitiveValue.bytesValue(bytes)));
   }
 
   @Test
@@ -613,7 +631,8 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
       .post(SINGLE_EXECUTION_LOCAL_BINARY_VARIABLE_URL);
 
     verify(runtimeServiceMock).setVariableLocal(
-        eq(MockProvider.EXAMPLE_EXECUTION_ID), eq(variableKey), eq(bytes));
+        eq(MockProvider.EXAMPLE_EXECUTION_ID), eq(variableKey),
+        argThat(EqualsPrimitiveValue.bytesValue(bytes)));
   }
 
   @Test
@@ -638,7 +657,7 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
       .post(SINGLE_EXECUTION_LOCAL_BINARY_VARIABLE_URL);
 
     verify(runtimeServiceMock).setVariableLocal(eq(MockProvider.EXAMPLE_EXECUTION_ID), eq(variableKey),
-        eq(serializable));
+        argThat(EqualsObjectValue.objectValueMatcher().isDeserialized().value(serializable)));
   }
 
   @Test
@@ -669,34 +688,10 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
 
 
   @Test
-  public void testPostSingleLocalVariableFromSerializedMultipart() throws Exception {
-    byte[] bytes = "someContent".getBytes();
-
-    String variableKey = "aVariableKey";
-
-    given()
-      .pathParam("id", MockProvider.EXAMPLE_EXECUTION_ID).pathParam("varId", variableKey)
-      .multiPart("data", "unspecified", bytes)
-      .multiPart("variableType", ProcessEngineVariableType.SERIALIZABLE.getName(), MediaType.TEXT_PLAIN)
-    .expect()
-      .statusCode(Status.NO_CONTENT.getStatusCode())
-    .when()
-      .post(SINGLE_EXECUTION_LOCAL_BINARY_VARIABLE_URL);
-
-    verify(runtimeServiceMock).setVariableLocalFromSerialized(
-        eq(MockProvider.EXAMPLE_EXECUTION_ID), eq(variableKey),
-        eq(bytes), eq(ProcessEngineVariableType.SERIALIZABLE.getName()), isNull(Map.class));
-  }
-
-  @Test
   public void testPutSingleLocalVariableFromSerialized() throws Exception {
     String serializedValue = "{\"prop\" : \"value\"}";
-    Map<String, Object> config = new HashMap<String, Object>();
-    config.put(ProcessEngineVariableType.SPIN_TYPE_DATA_FORMAT_ID, "aDataFormat");
-    config.put(ProcessEngineVariableType.SPIN_TYPE_CONFIG_ROOT_TYPE, "aRootType");
-
     Map<String, Object> requestJson = VariablesBuilder
-        .getSerializedValueMap(serializedValue, ProcessEngineVariableType.SPIN.getName(), config);
+        .getObjectValueMap(serializedValue, ValueType.OBJECT.getName(), "aDataFormat", "aRootType");
 
     String variableKey = "aVariableKey";
 
@@ -709,9 +704,12 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
     .when()
       .put(SINGLE_EXECUTION_LOCAL_VARIABLE_URL);
 
-    verify(runtimeServiceMock).setVariableLocalFromSerialized(
-        eq(MockProvider.EXAMPLE_EXECUTION_ID), eq(variableKey),
-        eq(serializedValue), eq(ProcessEngineVariableType.SPIN.getName()), argThat(new EqualsMap(config)));
+    verify(runtimeServiceMock).setVariableLocal(eq(MockProvider.EXAMPLE_EXECUTION_ID), eq(variableKey),
+        argThat(EqualsObjectValue
+          .objectValueMatcher()
+          .serializationFormat("aDataFormat")
+          .objectTypeName("aRootType")
+          .serializedValue(serializedValue)));
   }
 
   @Test
@@ -719,13 +717,9 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
     String serializedValue = "{\"prop\" : \"value\"}";
 
     Map<String, Object> requestJson = VariablesBuilder
-        .getSerializedValueMap(serializedValue, "aNonExistingType", null);
+        .getObjectValueMap(serializedValue, "aNonExistingType", null, null);
 
     String variableKey = "aVariableKey";
-
-    doThrow(new BadUserRequestException("expected exception"))
-      .when(runtimeServiceMock)
-      .setVariableLocalFromSerialized(anyString(), anyString(), any(), anyString(), any(Map.class));
 
     given()
       .pathParam("id", MockProvider.EXAMPLE_EXECUTION_ID).pathParam("varId", variableKey)
@@ -733,8 +727,8 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
       .body(requestJson)
     .expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode())
-      .body("type", equalTo(RestException.class.getSimpleName()))
-      .body("message", equalTo("Cannot put execution variable aVariableKey: expected exception"))
+      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("message", equalTo("Cannot put execution variable aVariableKey: Unsupported value type 'aNonExistingType'"))
     .when()
       .put(SINGLE_EXECUTION_LOCAL_VARIABLE_URL);
   }
@@ -743,18 +737,20 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
   public void testPutSingleLocalVariableFromSerializedWithNoValue() {
     String variableKey = "aVariableKey";
 
-    Map<String, Object> config = new HashMap<String, Object>();
     Map<String, Object> requestJson = VariablesBuilder
-        .getSerializedValueMap(null, ProcessEngineVariableType.SPIN.getName(), config);
+        .getObjectValueMap(null, ValueType.OBJECT.getName(), null, null);
 
     given().pathParam("id", MockProvider.EXAMPLE_EXECUTION_ID).pathParam("varId", variableKey)
       .contentType(ContentType.JSON).body(requestJson)
       .then().expect().statusCode(Status.NO_CONTENT.getStatusCode())
       .when().put(SINGLE_EXECUTION_LOCAL_VARIABLE_URL);
 
-    verify(runtimeServiceMock).setVariableLocalFromSerialized(
-        eq(MockProvider.EXAMPLE_EXECUTION_ID), eq(variableKey),
-        isNull(), eq(ProcessEngineVariableType.SPIN.getName()), argThat(new EqualsMap(config)));
+    verify(runtimeServiceMock).setVariableLocal(eq(MockProvider.EXAMPLE_EXECUTION_ID), eq(variableKey),
+        argThat(EqualsObjectValue
+          .objectValueMatcher()
+          .serializationFormat(null)
+          .objectTypeName(null)
+          .serializedValue(null)));
   }
 
   @Test
@@ -767,7 +763,7 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
       .when().put(SINGLE_EXECUTION_LOCAL_VARIABLE_URL);
 
     verify(runtimeServiceMock).setVariableLocal(eq(MockProvider.EXAMPLE_EXECUTION_ID), eq(variableKey),
-        isNull());
+        argThat(EqualsNullValue.matcher()));
   }
 
 
@@ -779,7 +775,7 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
     Map<String, Object> variableJson = VariablesBuilder.getVariableValueMap(variableValue);
 
     doThrow(new BadUserRequestException("expected exception"))
-      .when(runtimeServiceMock).setVariableLocal(eq(MockProvider.EXAMPLE_EXECUTION_ID), eq(variableKey), eq(variableValue));
+      .when(runtimeServiceMock).setVariableLocal(eq(MockProvider.EXAMPLE_EXECUTION_ID), eq(variableKey), any());
 
     given().pathParam("id", MockProvider.EXAMPLE_EXECUTION_ID).pathParam("varId", variableKey)
       .contentType(ContentType.JSON).body(variableJson)

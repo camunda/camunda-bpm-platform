@@ -62,4 +62,6 @@ public interface ProcessEngine extends ProcessEngineServices {
   String getName();
 
   void close();
+
+  ProcessEngineConfiguration getProcessEngineConfiguration();
 }

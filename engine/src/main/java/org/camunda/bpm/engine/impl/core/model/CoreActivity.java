@@ -16,7 +16,7 @@ import java.util.List;
 
 import org.camunda.bpm.engine.delegate.BaseDelegateExecution;
 import org.camunda.bpm.engine.impl.core.delegate.CoreActivityBehavior;
-import org.camunda.bpm.engine.impl.core.mapping.IoMapping;
+import org.camunda.bpm.engine.impl.core.variable.mapping.IoMapping;
 
 /**
  * @author Daniel Meyer

@@ -29,7 +29,7 @@ import org.camunda.bpm.engine.impl.cmd.GetTaskFormVariablesCmd;
 import org.camunda.bpm.engine.impl.cmd.SubmitStartFormCmd;
 import org.camunda.bpm.engine.impl.cmd.SubmitTaskFormCmd;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
-import org.camunda.bpm.engine.runtime.VariableInstance;
+import org.camunda.bpm.engine.variable.VariableMap;
 
 
 /**
@@ -94,20 +94,20 @@ public class FormServiceImpl extends ServiceImpl implements FormService {
     return commandExecutor.execute(new GetFormKeyCmd(processDefinitionId, taskDefinitionKey));
   }
 
-  public Map<String, VariableInstance> getStartFormVariables(String processDefinitionId) {
-    return commandExecutor.execute(new GetStartFormVariablesCmd(processDefinitionId, null));
+  public VariableMap getStartFormVariables(String processDefinitionId) {
+    return getStartFormVariables(processDefinitionId, null, true);
   }
 
-  public Map<String, VariableInstance> getStartFormVariables(String processDefinitionId, Collection<String> formVariables) {
-    return commandExecutor.execute(new GetStartFormVariablesCmd(processDefinitionId, formVariables));
+  public VariableMap getStartFormVariables(String processDefinitionId, Collection<String> formVariables, boolean deserializeObjectValues) {
+    return commandExecutor.execute(new GetStartFormVariablesCmd(processDefinitionId, formVariables, deserializeObjectValues));
   }
 
-  public Map<String, VariableInstance> getTaskFormVariables(String taskId) {
-    return commandExecutor.execute(new GetTaskFormVariablesCmd(taskId, null));
+  public VariableMap getTaskFormVariables(String taskId) {
+    return getTaskFormVariables(taskId, null, true);
   }
 
-  public Map<String, VariableInstance> getTaskFormVariables(String taskId, Collection<String> formVariables) {
-    return commandExecutor.execute(new GetTaskFormVariablesCmd(taskId, formVariables));
+  public VariableMap getTaskFormVariables(String taskId, Collection<String> formVariables, boolean deserializeObjectValues) {
+    return commandExecutor.execute(new GetTaskFormVariablesCmd(taskId, formVariables, deserializeObjectValues));
   }
 
 }

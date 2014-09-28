@@ -254,8 +254,8 @@ public class CommandContext {
   }
 
   protected void flushSessions() {
-    for (Session session : sessionList) {
-      session.flush();
+    for (int i = 0; i< sessionList.size(); i++) {
+      sessionList.get(i).flush();
     }
   }
 

@@ -12,9 +12,9 @@
  */
 package org.camunda.bpm.engine.impl.scripting;
 
-import org.camunda.bpm.engine.impl.scripting.engine.ScriptingEngines;
-
 import javax.script.CompiledScript;
+
+import org.camunda.bpm.engine.impl.scripting.engine.ScriptingEngines;
 
 /**
  * <p>A script factory is responsible for creating a {@link ExecutableScript}

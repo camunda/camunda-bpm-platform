@@ -63,19 +63,19 @@ public abstract class AbstractProcessDefinitionRestServiceQueryTest extends Abst
     given().queryParam("ver", anInvalidIntegerQueryParam)
       .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
       .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
-      .body("message", equalTo("Cannot set query parameter 'ver' to value 'aString'"))
+      .body("message", equalTo("Cannot set query parameter 'ver' to value 'aString': "
+          + "Cannot convert value aString to java type java.lang.Integer"))
       .when().get(PROCESS_DEFINITION_QUERY_URL);
   }
 
-  /**
-   * We assume that boolean query parameters that are not "true"
-   * or "false" are evaluated to "false" and don't cause a 400 error.
-   */
   @Test
   public void testInvalidBooleanParameter() {
     String anInvalidBooleanQueryParam = "neitherTrueNorFalse";
     given().queryParam("active", anInvalidBooleanQueryParam)
-      .then().expect().statusCode(Status.OK.getStatusCode())
+      .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
+      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("message", equalTo("Cannot set query parameter 'active' to value 'neitherTrueNorFalse': "
+          + "Cannot convert value neitherTrueNorFalse to java type java.lang.Boolean"))
       .when().get(PROCESS_DEFINITION_QUERY_URL);
   }
 

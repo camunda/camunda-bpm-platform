@@ -76,7 +76,6 @@ create table ACT_HI_VARINST (
     LONG_ bigint,
     TEXT_ varchar(4000),
     TEXT2_ varchar(4000),
-    DATA_FORMAT_ID_ varchar(64),
     primary key (ID_)
 );
 
@@ -97,7 +96,6 @@ create table ACT_HI_DETAIL (
     LONG_ bigint,
     TEXT_ varchar(4000),
     TEXT2_ varchar(4000),
-    DATA_FORMAT_ID_ varchar(64),
     primary key (ID_)
 );
 

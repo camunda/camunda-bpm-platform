@@ -12,10 +12,9 @@
  */
 package org.camunda.bpm.engine.test.el.util;
 
-import org.camunda.bpm.engine.delegate.CoreVariableInstance;
-import org.camunda.bpm.engine.impl.core.variable.CoreVariableScope;
-import org.camunda.bpm.engine.impl.core.variable.CoreVariableStore;
-import org.camunda.bpm.engine.impl.core.variable.SimpleVariableStore;
+import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
+import org.camunda.bpm.engine.impl.core.variable.scope.CoreVariableStore;
+import org.camunda.bpm.engine.impl.core.variable.scope.SimpleVariableStore;
 
 /**
  * Simple standalone variable scope which can be used in testcases.
@@ -23,17 +22,17 @@ import org.camunda.bpm.engine.impl.core.variable.SimpleVariableStore;
  * @author Daniel Meyer
  *
  */
-public class TestVariableScope extends CoreVariableScope<CoreVariableInstance> {
+public class TestVariableScope extends AbstractVariableScope {
 
   private static final long serialVersionUID = 1L;
 
   protected SimpleVariableStore variableStore = new SimpleVariableStore();
 
-  protected CoreVariableStore<CoreVariableInstance> getVariableStore() {
+  protected CoreVariableStore getVariableStore() {
     return variableStore;
   }
 
-  public CoreVariableScope<CoreVariableInstance> getParentVariableScope() {
+  public AbstractVariableScope getParentVariableScope() {
     // flat scope (has no parent)
     return null;
   }

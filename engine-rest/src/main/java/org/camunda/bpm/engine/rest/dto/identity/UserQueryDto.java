@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.rest.dto.identity;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.camunda.bpm.engine.ProcessEngine;
@@ -21,6 +22,7 @@ import org.camunda.bpm.engine.identity.UserQuery;
 import org.camunda.bpm.engine.rest.dto.AbstractQueryDto;
 import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
 import org.camunda.bpm.engine.rest.dto.converter.StringArrayConverter;
+import org.codehaus.jackson.map.ObjectMapper;
 
 /**
  *
@@ -57,8 +59,8 @@ public class UserQueryDto extends AbstractQueryDto<UserQuery> {
 
   }
 
-  public UserQueryDto(MultivaluedMap<String, String> queryParameters) {
-    super(queryParameters);
+  public UserQueryDto(ObjectMapper objectMapper, MultivaluedMap<String, String> queryParameters) {
+    super(objectMapper, queryParameters);
   }
 
   @CamundaQueryParam("id")

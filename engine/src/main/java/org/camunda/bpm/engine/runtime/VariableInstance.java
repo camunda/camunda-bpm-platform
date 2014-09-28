@@ -12,7 +12,7 @@
  */
 package org.camunda.bpm.engine.runtime;
 
-import org.camunda.bpm.engine.delegate.PersistentVariableInstance;
+import org.camunda.bpm.engine.variable.value.TypedValue;
 
 /**
  * A {@link VariableInstance} represents a variable in the execution of
@@ -21,12 +21,34 @@ import org.camunda.bpm.engine.delegate.PersistentVariableInstance;
  * @author roman.smirnov
  *
  */
-public interface VariableInstance extends PersistentVariableInstance {
+public interface VariableInstance {
 
   /**
    * @return the Id of this variable instance
    */
   String getId();
+
+  /**
+   * Returns the name of this variable instance.
+   */
+  String getName();
+
+  /**
+   * Returns the name of the type of this variable instance
+   *
+   * @return the type name of the variable
+   */
+  String getTypeName();
+
+  /**
+   * Returns the value of this variable instance.
+   */
+  Object getValue();
+
+  /**
+   * Returns the TypedValue of this variable instance.
+   */
+  TypedValue getTypedValue();
 
   /**
    * Returns the corresponding process instance id.
@@ -57,5 +79,11 @@ public interface VariableInstance extends PersistentVariableInstance {
    * Returns the corresponding activity instance id.
    */
   String getActivityInstanceId();
+
+  /**
+   * If the variable value could not be loaded, this returns the error message.
+   * @return an error message indicating why the variable value could not be loaded.
+   */
+  String getErrorMessage();
 
 }

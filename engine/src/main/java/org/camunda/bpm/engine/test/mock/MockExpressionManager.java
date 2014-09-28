@@ -26,7 +26,7 @@ import org.camunda.bpm.engine.impl.javax.el.MapELResolver;
 public class MockExpressionManager extends ExpressionManager {
 
   @Override
-  protected ELResolver createElResolver(VariableScope<?> variableScope) {
+  protected ELResolver createElResolver(VariableScope variableScope) {
     CompositeELResolver compositeElResolver = new CompositeELResolver();
     compositeElResolver.add(new VariableScopeElResolver(variableScope));
     compositeElResolver.add(new MockElResolver());

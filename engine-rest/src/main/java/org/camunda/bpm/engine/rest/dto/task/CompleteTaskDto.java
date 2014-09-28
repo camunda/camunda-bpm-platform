@@ -14,7 +14,7 @@ package org.camunda.bpm.engine.rest.dto.task;
 
 import java.util.Map;
 
-import org.camunda.bpm.engine.rest.dto.runtime.VariableValueDto;
+import org.camunda.bpm.engine.rest.dto.VariableValueDto;
 
 public class CompleteTaskDto {
 

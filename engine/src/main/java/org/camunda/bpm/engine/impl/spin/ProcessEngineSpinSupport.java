@@ -12,11 +12,13 @@
  */
 package org.camunda.bpm.engine.impl.spin;
 
+import java.util.List;
+
 import org.camunda.bpm.engine.ClassLoadingException;
 import org.camunda.bpm.engine.impl.javax.el.FunctionMapper;
 import org.camunda.bpm.engine.impl.scripting.env.ScriptEnvResolver;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
-import org.camunda.bpm.engine.impl.variable.SerializationVariableTypeResolver;
+import org.camunda.bpm.engine.impl.variable.serializer.TypedValueSerializer;
 
 /**
  * <p>Entry point for the process engine spin support.</p>
@@ -48,8 +50,10 @@ public class ProcessEngineSpinSupport {
    * @return the {@link SerializationVariableTypeResolver} providing variable
    * types that use Spin's data formats for serialization
    */
-  public static SerializationVariableTypeResolver getVariableTypeResolver() {
-    return (SerializationVariableTypeResolver) ReflectUtil.instantiate("org.camunda.bpm.engine.impl.spin.SpinVariableTypeResolver");
+  @SuppressWarnings("unchecked")
+  public static List<TypedValueSerializer<?>> getSerializers() {
+    Object serializers = ReflectUtil.instantiate("org.camunda.bpm.engine.impl.spin.SpinObjectValueSerializers");
+    return (List<TypedValueSerializer<?>>) ReflectUtil.invoke(serializers, "getSerializers", new Object[0]);
   }
 
   /**

@@ -24,6 +24,7 @@ import org.camunda.bpm.engine.rest.history.HistoricVariableInstanceRestService;
 import org.camunda.bpm.engine.rest.history.HistoryRestService;
 import org.camunda.bpm.engine.rest.history.UserOperationLogRestService;
 import org.camunda.bpm.engine.rest.impl.AbstractRestProcessEngineAware;
+import org.codehaus.jackson.map.ObjectMapper;
 
 public class HistoryRestServiceImpl extends AbstractRestProcessEngineAware implements HistoryRestService {
 
@@ -31,28 +32,28 @@ public class HistoryRestServiceImpl extends AbstractRestProcessEngineAware imple
     super();
   }
 
-  public HistoryRestServiceImpl(String engineName) {
-    super(engineName);
+  public HistoryRestServiceImpl(String engineName, ObjectMapper objectMapper) {
+    super(engineName, objectMapper);
   }
 
   public HistoricProcessInstanceRestService getProcessInstanceService() {
-    return new HistoricProcessInstanceRestServiceImpl(getProcessEngine());
+    return new HistoricProcessInstanceRestServiceImpl(getObjectMapper(), getProcessEngine());
   }
 
   public HistoricCaseInstanceRestService getCaseInstanceService() {
-    return new HistoricCaseInstanceRestServiceImpl(getProcessEngine());
+    return new HistoricCaseInstanceRestServiceImpl(getObjectMapper(), getProcessEngine());
   }
 
   public HistoricActivityInstanceRestService getActivityInstanceService() {
-    return new HistoricActivityInstanceRestServiceImpl(getProcessEngine());
+    return new HistoricActivityInstanceRestServiceImpl(getObjectMapper(), getProcessEngine());
   }
 
   public HistoricCaseActivityInstanceRestService getCaseActivityInstanceService() {
-    return new HistoricCaseActivityInstanceRestServiceImpl(getProcessEngine());
+    return new HistoricCaseActivityInstanceRestServiceImpl(getObjectMapper(), getProcessEngine());
   }
 
   public HistoricVariableInstanceRestService getVariableInstanceService() {
-    return new HistoricVariableInstanceRestServiceImpl(getProcessEngine());
+    return new HistoricVariableInstanceRestServiceImpl(getObjectMapper(), getProcessEngine());
   }
 
   public HistoricActivityStatisticsRestService getActivityStatisticsService() {
@@ -60,19 +61,19 @@ public class HistoryRestServiceImpl extends AbstractRestProcessEngineAware imple
   }
 
   public UserOperationLogRestService getUserOperationLogRestService() {
-    return new UserOperationLogRestServiceImpl(getProcessEngine());
+    return new UserOperationLogRestServiceImpl(getObjectMapper(), getProcessEngine());
   }
 
   public HistoricDetailRestService getDetailService() {
-    return new HistoricDetailRestServiceImpl(getProcessEngine());
+    return new HistoricDetailRestServiceImpl(getObjectMapper(), getProcessEngine());
   }
 
   public HistoricTaskInstanceRestService getTaskInstanceService() {
-    return new HistoricTaskInstanceRestServiceImpl(getProcessEngine());
+    return new HistoricTaskInstanceRestServiceImpl(getObjectMapper(), getProcessEngine());
   }
 
   public HistoricIncidentRestService getIncidentService() {
-    return new HistoricIncidentRestServiceImpl(getProcessEngine());
+    return new HistoricIncidentRestServiceImpl(getObjectMapper(), getProcessEngine());
   }
 
 }

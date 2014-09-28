@@ -24,6 +24,7 @@ import org.camunda.bpm.engine.rest.dto.AbstractQueryDto;
 import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
 import org.camunda.bpm.engine.rest.dto.converter.StringArrayConverter;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
+import org.codehaus.jackson.map.ObjectMapper;
 
 public class HistoricVariableInstanceQueryDto extends AbstractQueryDto<HistoricVariableInstanceQuery> {
 
@@ -48,8 +49,8 @@ public class HistoricVariableInstanceQueryDto extends AbstractQueryDto<HistoricV
   public HistoricVariableInstanceQueryDto() {
   }
 
-  public HistoricVariableInstanceQueryDto(MultivaluedMap<String, String> queryParameters) {
-    super(queryParameters);
+  public HistoricVariableInstanceQueryDto(ObjectMapper objectMapper, MultivaluedMap<String, String> queryParameters) {
+    super(objectMapper, queryParameters);
   }
 
   @CamundaQueryParam("processInstanceId")

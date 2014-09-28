@@ -30,13 +30,12 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 public class FilterDto {
 
-  protected static final ObjectMapper objectMapper = JacksonConfigurator.OBJECT_MAPPER;
-
   protected String id;
   protected String resourceType;
   protected String name;
   protected String owner;
-  protected AbstractQueryDto<?> query;
+  protected JsonNode query;
+  protected AbstractQueryDto<?> resolvedQuery;
   protected Map<String, Object> properties;
 
   protected Long itemCount;
@@ -73,17 +72,24 @@ public class FilterDto {
     this.owner = owner;
   }
 
-  public AbstractQueryDto<?> getQuery() {
+  public JsonNode getQuery() {
     return query;
   }
 
+  public AbstractQueryDto<?> resolveQuery(ObjectMapper objectMapper) {
+    if (resolvedQuery == null) {
+      try {
+        this.resolvedQuery = objectMapper.readValue(query, TaskQueryDto.class);
+      } catch (Exception e) {
+        throw new InvalidRequestException(Status.BAD_REQUEST, e, "Unable to convert query");
+      }
+    }
+
+    return resolvedQuery;
+  }
+
   public void setQuery(JsonNode query) {
-    try {
-      this.query = objectMapper.readValue(query, TaskQueryDto.class);
-    }
-    catch (Exception e) {
-      throw new InvalidRequestException(Status.BAD_REQUEST, e, "Unable to convert query");
-    }
+    this.query = query;
   }
 
   public Map<String, Object> getProperties() {
@@ -103,7 +109,7 @@ public class FilterDto {
     this.itemCount = itemCount;
   }
 
-  public static FilterDto fromFilter(Filter filter) {
+  public static FilterDto fromFilter(Filter filter, ObjectMapper objectMapper) {
     FilterDto dto = new FilterDto();
     dto.id = filter.getId();
     dto.resourceType = filter.getResourceType();
@@ -111,20 +117,20 @@ public class FilterDto {
     dto.owner = filter.getOwner();
 
     if (EntityTypes.TASK.equals(filter.getResourceType())) {
-      dto.query = TaskQueryDto.fromQuery(filter.getQuery());
+      dto.query = objectMapper.valueToTree(TaskQueryDto.fromQuery(filter.getQuery()));
     }
 
     dto.properties = filter.getProperties();
     return dto;
   }
 
-  public void updateFilter(Filter filter, ProcessEngine engine) {
+  public void updateFilter(Filter filter, ProcessEngine engine, ObjectMapper objectMapper) {
     if (getResourceType() != null && !getResourceType().equals(filter.getResourceType())) {
       throw new InvalidRequestException(Status.BAD_REQUEST, "Unable to update filter from resource type '" + filter.getResourceType() + "' to '" + getResourceType() + "'");
     }
     filter.setName(getName());
     filter.setOwner(getOwner());
-    Query<?, ?> query = getQuery().toQuery(engine);
+    Query<?, ?> query = resolveQuery(objectMapper).toQuery(engine);
     filter.setQuery(query);
     filter.setProperties(getProperties());
   }

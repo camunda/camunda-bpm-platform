@@ -14,9 +14,7 @@ package org.camunda.bpm.engine.rest;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Properties;
 import java.util.ServiceLoader;
 
@@ -32,6 +30,9 @@ import org.camunda.bpm.engine.rest.spi.ProcessEngineProvider;
 import org.camunda.bpm.engine.rest.spi.impl.MockedProcessEngineProvider;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.TransitionInstance;
+import org.camunda.bpm.engine.variable.VariableMap;
+import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.value.TypedValue;
 import org.junit.BeforeClass;
 
 import com.jayway.restassured.RestAssured;
@@ -56,18 +57,17 @@ public abstract class AbstractRestServiceTest {
   private static final String PORT_PROPERTY = "rest.http.port";
 
   protected static final String EXAMPLE_VARIABLE_KEY = "aVariableKey";
-  protected static final String EXAMPLE_VARIABLE_VALUE = "aVariableValue";
+  protected static final TypedValue EXAMPLE_VARIABLE_VALUE = Variables.stringValue("aVariableValue");
   protected static final String EXAMPLE_ANOTHER_VARIABLE_KEY = "anotherVariableKey";
-  protected static final String EXAMPLE_ANOTHER_VARIABLE_VALUE_NULL = null;
 
-  protected static final Map<String, Object> EXAMPLE_VARIABLES = new HashMap<String, Object>();
+  protected static final VariableMap EXAMPLE_VARIABLES = Variables.createVariables();
   static {
-    EXAMPLE_VARIABLES.put(EXAMPLE_VARIABLE_KEY, EXAMPLE_VARIABLE_VALUE);
+    EXAMPLE_VARIABLES.putValueTyped(EXAMPLE_VARIABLE_KEY, EXAMPLE_VARIABLE_VALUE);
   }
 
-  protected static final Map<String, Object> EXAMPLE_VARIABLES_WITH_NULL_VALUE = new HashMap<String, Object>();
+  protected static final VariableMap EXAMPLE_VARIABLES_WITH_NULL_VALUE = Variables.createVariables();
   static {
-    EXAMPLE_VARIABLES_WITH_NULL_VALUE.put(EXAMPLE_ANOTHER_VARIABLE_KEY, EXAMPLE_ANOTHER_VARIABLE_VALUE_NULL);
+    EXAMPLE_VARIABLES_WITH_NULL_VALUE.putValueTyped(EXAMPLE_ANOTHER_VARIABLE_KEY, Variables.untypedNullValue());
   }
 
   protected static final String EXAMPLE_ACTIVITY_INSTANCE_ID = "anActivityInstanceId";

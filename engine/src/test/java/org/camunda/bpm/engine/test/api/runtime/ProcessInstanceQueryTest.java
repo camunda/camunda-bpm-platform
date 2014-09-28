@@ -24,8 +24,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.history.UserOperationLogEntry;
-import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.test.TestHelper;
 import org.camunda.bpm.engine.runtime.Execution;
@@ -959,7 +957,7 @@ public class ProcessInstanceQueryTest extends PluggableProcessEngineTestCase {
         .list();
       fail("Expected exception");
     } catch(ProcessEngineException ae) {
-      assertTextPresent("Variables of type ByteArray cannot be used to query", ae.getMessage());
+      assertTextPresent("Object values cannot be used to query", ae.getMessage());
     }
 
     runtimeService.deleteProcessInstance(processInstance.getId(), "test");

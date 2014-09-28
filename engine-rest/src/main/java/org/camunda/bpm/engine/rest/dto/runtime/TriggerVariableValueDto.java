@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.engine.rest.dto.runtime;
 
+import org.camunda.bpm.engine.rest.dto.VariableValueDto;
+
 /**
  *
  * @author Roman Smirnov

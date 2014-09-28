@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.rest.impl.history;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.ws.rs.core.UriInfo;
 
 import org.camunda.bpm.engine.ProcessEngine;
@@ -25,12 +26,15 @@ import org.camunda.bpm.engine.rest.dto.history.HistoricCaseActivityInstanceQuery
 import org.camunda.bpm.engine.rest.history.HistoricCaseActivityInstanceRestService;
 import org.camunda.bpm.engine.rest.sub.history.HistoricCaseActivityInstanceResource;
 import org.camunda.bpm.engine.rest.sub.history.impl.HistoricCaseActivityInstanceResourceImpl;
+import org.codehaus.jackson.map.ObjectMapper;
 
 public class HistoricCaseActivityInstanceRestServiceImpl implements HistoricCaseActivityInstanceRestService {
 
   protected ProcessEngine processEngine;
+  protected ObjectMapper objectMapper;
 
-  public HistoricCaseActivityInstanceRestServiceImpl(ProcessEngine processEngine) {
+  public HistoricCaseActivityInstanceRestServiceImpl(ObjectMapper objectMapper, ProcessEngine processEngine) {
+    this.objectMapper = objectMapper;
     this.processEngine = processEngine;
   }
 
@@ -39,7 +43,7 @@ public class HistoricCaseActivityInstanceRestServiceImpl implements HistoricCase
   }
 
   public List<HistoricCaseActivityInstanceDto> getHistoricCaseActivityInstances(UriInfo uriInfo, Integer firstResult, Integer maxResults) {
-    HistoricCaseActivityInstanceQueryDto queryHistoricCaseActivityInstanceDto = new HistoricCaseActivityInstanceQueryDto(uriInfo.getQueryParameters());
+    HistoricCaseActivityInstanceQueryDto queryHistoricCaseActivityInstanceDto = new HistoricCaseActivityInstanceQueryDto(objectMapper, uriInfo.getQueryParameters());
     return queryHistoricCaseActivityInstances(queryHistoricCaseActivityInstanceDto, firstResult, maxResults);
   }
 
@@ -73,7 +77,7 @@ public class HistoricCaseActivityInstanceRestServiceImpl implements HistoricCase
 
   @Override
   public CountResultDto getHistoricCaseActivityInstancesCount(UriInfo uriInfo) {
-    HistoricCaseActivityInstanceQueryDto queryDto = new HistoricCaseActivityInstanceQueryDto(uriInfo.getQueryParameters());
+    HistoricCaseActivityInstanceQueryDto queryDto = new HistoricCaseActivityInstanceQueryDto(objectMapper, uriInfo.getQueryParameters());
     return queryHistoricCaseActivityInstancesCount(queryDto);
   }
 

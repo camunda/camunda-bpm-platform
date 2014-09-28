@@ -174,16 +174,6 @@ alter table ACT_RU_CASE_SENTRY_PART
     foreign key (CASE_EXEC_ID_)
     references ACT_RU_CASE_EXECUTION(ID_);
 
--- add data format configuration fields
-ALTER TABLE ACT_RU_VARIABLE
-  ADD DATA_FORMAT_ID_ varchar(64);
-
-ALTER TABLE ACT_HI_VARINST
-  ADD DATA_FORMAT_ID_ varchar(64);
-
-ALTER TABLE ACT_HI_DETAIL
-  ADD DATA_FORMAT_ID_ varchar(64);
-
 -- create filter table
 create table ACT_RU_FILTER (
   ID_ varchar(64) not null,

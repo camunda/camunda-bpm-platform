@@ -84,7 +84,8 @@ public abstract class AbstractCaseDefinitionRestServiceQueryTest extends Abstrac
           .statusCode(Status.BAD_REQUEST.getStatusCode())
           .contentType(ContentType.JSON)
           .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
-          .body("message", equalTo("Cannot set query parameter 'version' to value 'aString'"))
+          .body("message", equalTo("Cannot set query parameter 'version' to value 'aString': "
+          + "Cannot convert value aString to java type java.lang.Integer"))
       .when()
         .get(CASE_DEFINITION_QUERY_URL);
   }

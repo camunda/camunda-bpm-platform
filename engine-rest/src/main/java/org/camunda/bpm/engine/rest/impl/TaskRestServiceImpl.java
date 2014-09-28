@@ -14,7 +14,9 @@ package org.camunda.bpm.engine.rest.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.ws.rs.core.UriInfo;
+
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.rest.TaskRestService;
@@ -26,6 +28,7 @@ import org.camunda.bpm.engine.rest.sub.task.TaskResource;
 import org.camunda.bpm.engine.rest.sub.task.impl.TaskResourceImpl;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
+import org.codehaus.jackson.map.ObjectMapper;
 
 public class TaskRestServiceImpl extends AbstractRestProcessEngineAware implements TaskRestService {
 
@@ -33,19 +36,19 @@ public class TaskRestServiceImpl extends AbstractRestProcessEngineAware implemen
     super();
   }
 
-  public TaskRestServiceImpl(String engineName) {
-    super(engineName);
+  public TaskRestServiceImpl(String engineName, final ObjectMapper objectMapper) {
+    super(engineName, objectMapper);
   }
 
   @Override
   public List<TaskDto> getTasks(UriInfo uriInfo, Integer firstResult, Integer maxResults) {
-    TaskQueryDto queryDto = new TaskQueryDto(uriInfo.getQueryParameters());
+    TaskQueryDto queryDto = new TaskQueryDto(getObjectMapper(), uriInfo.getQueryParameters());
     return queryTasks(queryDto, firstResult, maxResults);
   }
 
   @Override
   public HalTaskList getHalTasks(UriInfo uriInfo, Integer firstResult, Integer maxResults) {
-    TaskQueryDto queryDto = new TaskQueryDto(uriInfo.getQueryParameters());
+    TaskQueryDto queryDto = new TaskQueryDto(getObjectMapper(), uriInfo.getQueryParameters());
 
     ProcessEngine engine = getProcessEngine();
     TaskQuery query = queryDto.toQuery(engine);
@@ -63,6 +66,7 @@ public class TaskRestServiceImpl extends AbstractRestProcessEngineAware implemen
   public List<TaskDto> queryTasks(TaskQueryDto queryDto, Integer firstResult,
       Integer maxResults) {
     ProcessEngine engine = getProcessEngine();
+    queryDto.setObjectMapper(getObjectMapper());
     TaskQuery query = queryDto.toQuery(engine);
 
     List<Task> matchingTasks = executeTaskQuery(firstResult, maxResults, query);
@@ -102,13 +106,14 @@ public class TaskRestServiceImpl extends AbstractRestProcessEngineAware implemen
 
   @Override
   public CountResultDto getTasksCount(UriInfo uriInfo) {
-    TaskQueryDto queryDto = new TaskQueryDto(uriInfo.getQueryParameters());
+    TaskQueryDto queryDto = new TaskQueryDto(getObjectMapper(), uriInfo.getQueryParameters());
     return queryTasksCount(queryDto);
   }
 
   @Override
   public CountResultDto queryTasksCount(TaskQueryDto queryDto) {
     ProcessEngine engine = getProcessEngine();
+    queryDto.setObjectMapper(getObjectMapper());
     TaskQuery query = queryDto.toQuery(engine);
 
     long count = query.count();
@@ -120,7 +125,7 @@ public class TaskRestServiceImpl extends AbstractRestProcessEngineAware implemen
 
   @Override
   public TaskResource getTask(String id) {
-    return new TaskResourceImpl(getProcessEngine(), id, relativeRootResourcePath);
+    return new TaskResourceImpl(getProcessEngine(), id, relativeRootResourcePath, getObjectMapper());
   }
 
   public void createTask(TaskDto taskDto) {

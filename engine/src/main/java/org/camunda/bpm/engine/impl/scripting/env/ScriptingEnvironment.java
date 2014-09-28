@@ -64,7 +64,7 @@ public class ScriptingEnvironment {
    * @param scope the scope in which to execute the script
    * @return the result of the script evaluation
    */
-  public Object execute(ExecutableScript script, VariableScope<?> scope) {
+  public Object execute(ExecutableScript script, VariableScope scope) {
 
     final String scriptLanguage = script.getLanguage();
 

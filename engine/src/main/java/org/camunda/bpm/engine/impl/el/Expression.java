@@ -21,9 +21,9 @@ import org.camunda.bpm.engine.delegate.VariableScope;
  */
 public interface Expression extends org.camunda.bpm.engine.delegate.Expression {
 
-   Object getValue(VariableScope<?> variableScope);
+   Object getValue(VariableScope variableScope);
 
-   void setValue(Object value, VariableScope<?> variableScope);
+   void setValue(Object value, VariableScope variableScope);
 
    String getExpressionText();
 

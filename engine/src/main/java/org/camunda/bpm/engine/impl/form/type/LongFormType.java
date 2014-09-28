@@ -13,6 +13,9 @@
 
 package org.camunda.bpm.engine.impl.form.type;
 
+import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.value.TypedValue;
+
 
 
 /**
@@ -40,5 +43,9 @@ public class LongFormType extends AbstractFormFieldType {
       return null;
     }
     return modelValue.toString();
+  }
+
+  public TypedValue getTypedValue(Object value) {
+    return Variables.longValue((Long) value);
   }
 }

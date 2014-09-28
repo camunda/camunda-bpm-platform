@@ -20,7 +20,7 @@ import java.util.logging.Logger;
 
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
 import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
-import org.camunda.bpm.engine.impl.core.variable.CorePersistentVariableScope;
+import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.PvmException;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessDefinition;
@@ -711,7 +711,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
 
   // variables ////////////////////////////////////////////
 
-  public CorePersistentVariableScope getParentVariableScope() {
+  public AbstractVariableScope getParentVariableScope() {
     return getParent();
   }
 

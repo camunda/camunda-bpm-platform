@@ -6,49 +6,44 @@ import java.util.Map;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.TaskServiceImpl;
 import org.camunda.bpm.engine.rest.sub.impl.AbstractVariablesResource;
+import org.camunda.bpm.engine.variable.VariableMap;
+import org.camunda.bpm.engine.variable.value.TypedValue;
+import org.codehaus.jackson.map.ObjectMapper;
 
 public class LocalTaskVariablesResource extends AbstractVariablesResource {
 
-  public LocalTaskVariablesResource(ProcessEngine engine, String resourceId) {
-    super(engine, resourceId);
+  public LocalTaskVariablesResource(ProcessEngine engine, String resourceId, ObjectMapper objectMapper) {
+    super(engine, resourceId, objectMapper);
   }
 
-  @Override
-  protected Map<String, Object> getVariableEntities() {
-    return engine.getTaskService().getVariablesLocal(resourceId);
+  protected String getResourceTypeName() {
+    return "task";
   }
 
-  @Override
   protected void updateVariableEntities(Map<String, Object> modifications, List<String> deletions) {
     TaskServiceImpl taskService = (TaskServiceImpl) engine.getTaskService();
     taskService.updateVariablesLocal(resourceId, modifications, deletions);
   }
 
-  @Override
-  protected Object getVariableEntity(String variableKey) {
-    return engine.getTaskService().getVariableLocal(resourceId, variableKey);
-  }
-
-  @Override
-  protected void setVariableEntity(String variableKey, Object variableValue) {
-    engine.getTaskService().setVariableLocal(resourceId, variableKey, variableValue);
-  }
-
-  @Override
   protected void removeVariableEntity(String variableKey) {
     engine.getTaskService().removeVariableLocal(resourceId, variableKey);
   }
 
-  @Override
-  protected String getResourceTypeName() {
-    return "task";
+  protected VariableMap getVariableEntities(boolean deserializeValues) {
+    return engine.getTaskService().getVariablesLocal(resourceId, deserializeValues);
   }
 
-  @Override
-  protected void setVariableEntityFromSerialized(String variableKey, Object serializedValue, String variableType, Map<String, Object> configuration) {
-    engine.getTaskService().setVariableLocalFromSerialized(resourceId, variableKey,
-        serializedValue, variableType, configuration);
+  protected void updateVariableEntities(VariableMap modifications, List<String> deletions) {
+    TaskServiceImpl taskService = (TaskServiceImpl) engine.getTaskService();
+    taskService.updateVariablesLocal(resourceId, modifications, deletions);
+  }
 
+  protected TypedValue getVariableEntity(String variableKey, boolean deserializeValue) {
+    return engine.getTaskService().getVariableLocalTyped(resourceId, variableKey, deserializeValue);
+  }
+
+  protected void setVariableEntity(String variableKey, TypedValue variableValue) {
+    engine.getTaskService().setVariableLocal(resourceId, variableKey, variableValue);
   }
 
 }

@@ -36,6 +36,7 @@ import org.camunda.bpm.engine.rest.mapper.MultipartFormData;
 import org.camunda.bpm.engine.rest.mapper.MultipartFormData.FormPart;
 import org.camunda.bpm.engine.rest.sub.repository.DeploymentResource;
 import org.camunda.bpm.engine.rest.sub.repository.impl.DeploymentResourceImpl;
+import org.codehaus.jackson.map.ObjectMapper;
 
 public class DeploymentRestServiceImpl extends AbstractRestProcessEngineAware implements DeploymentRestService {
 
@@ -55,8 +56,8 @@ public class DeploymentRestServiceImpl extends AbstractRestProcessEngineAware im
     super();
   }
 
-	public DeploymentRestServiceImpl(String engineName) {
-    super(engineName);
+	public DeploymentRestServiceImpl(String engineName, ObjectMapper objectMapper) {
+    super(engineName, objectMapper);
   }
 
   public DeploymentResource getDeployment(String deploymentId) {
@@ -64,7 +65,7 @@ public class DeploymentRestServiceImpl extends AbstractRestProcessEngineAware im
   }
 
   public List<DeploymentDto> getDeployments(UriInfo uriInfo, Integer firstResult, Integer maxResults) {
-    DeploymentQueryDto queryDto = new DeploymentQueryDto(uriInfo.getQueryParameters());
+    DeploymentQueryDto queryDto = new DeploymentQueryDto(getObjectMapper(), uriInfo.getQueryParameters());
 
     ProcessEngine engine = getProcessEngine();
     DeploymentQuery query = queryDto.toQuery(engine);
@@ -156,7 +157,7 @@ public class DeploymentRestServiceImpl extends AbstractRestProcessEngineAware im
   }
 
   public CountResultDto getDeploymentsCount(UriInfo uriInfo) {
-    DeploymentQueryDto queryDto = new DeploymentQueryDto(uriInfo.getQueryParameters());
+    DeploymentQueryDto queryDto = new DeploymentQueryDto(getObjectMapper(), uriInfo.getQueryParameters());
 
     ProcessEngine engine = getProcessEngine();
     DeploymentQuery query = queryDto.toQuery(engine);

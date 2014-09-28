@@ -16,33 +16,34 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.io.Serializable;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.camunda.bpm.engine.exception.cmmn.CaseExecutionNotFoundException;
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
+import org.camunda.bpm.engine.impl.core.variable.VariableMapImpl;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.variable.VariableMap;
 
 /**
  * @author Roman Smirnov
- *
+ * @author Daniel Meyer
  */
-public class GetCaseExecutionVariablesCmd implements Command<Map<String, Object>>, Serializable {
+public class GetCaseExecutionVariablesCmd implements Command<VariableMap>, Serializable {
 
   private static final long serialVersionUID = 1L;
 
   protected String caseExecutionId;
   protected Collection<String> variableNames;
   protected boolean isLocal;
+  protected boolean deserializeValues;
 
-  public GetCaseExecutionVariablesCmd(String caseExecutionId, Collection<String> variableNames, boolean isLocal) {
+  public GetCaseExecutionVariablesCmd(String caseExecutionId, Collection<String> variableNames, boolean isLocal, boolean deserializeValues) {
     this.caseExecutionId = caseExecutionId;
     this.variableNames = variableNames;
     this.isLocal = isLocal;
+    this.deserializeValues = deserializeValues;
   }
 
-  public Map<String, Object> execute(CommandContext commandContext) {
+  public VariableMap execute(CommandContext commandContext) {
     ensureNotNull("caseExecutionId", caseExecutionId);
 
     CaseExecutionEntity caseExecution = commandContext
@@ -51,28 +52,11 @@ public class GetCaseExecutionVariablesCmd implements Command<Map<String, Object>
 
     ensureNotNull(CaseExecutionNotFoundException.class, "case execution " + caseExecutionId + " doesn't exist", "caseExecution", caseExecution);
 
-    Map<String, Object> caseExecutionVariables;
+    VariableMapImpl result = new VariableMapImpl();
+    // collect variables
+    caseExecution.collectVariables(result, variableNames, isLocal, deserializeValues);
 
-    if (isLocal) {
-      caseExecutionVariables = caseExecution.getVariablesLocal();
-    } else {
-      caseExecutionVariables = caseExecution.getVariables();
-    }
-
-    if (variableNames != null && variableNames.size() > 0) {
-      // if variableNames is not empty, return only variable names mentioned in it
-      Map<String, Object> tempVariables = new HashMap<String, Object>();
-
-      for (String variableName : variableNames) {
-        if (caseExecutionVariables.containsKey(variableName)) {
-          tempVariables.put(variableName, caseExecutionVariables.get(variableName));
-        }
-      }
-
-      caseExecutionVariables = tempVariables;
-    }
-
-    return caseExecutionVariables;
+    return result;
   }
 
 }

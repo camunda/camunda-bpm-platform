@@ -18,8 +18,11 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
-import org.camunda.bpm.engine.delegate.CoreVariableInstance;
 import org.camunda.bpm.engine.delegate.VariableScope;
+import org.camunda.bpm.engine.impl.core.variable.CoreVariableInstance;
+import org.camunda.bpm.engine.variable.VariableMap;
+import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.value.TypedValue;
 
 
 /**
@@ -30,9 +33,11 @@ import org.camunda.bpm.engine.delegate.VariableScope;
  *
  * @author Frederik Heremans
  */
-public class StartProcessVariableScope implements VariableScope<CoreVariableInstance> {
+public class StartProcessVariableScope implements VariableScope {
 
   private static final StartProcessVariableScope INSTANCE = new StartProcessVariableScope();
+
+  private static VariableMap EMPTY_VARIABLE_MAP = Variables.fromMap(Collections.<String, Object>emptyMap());
 
   /**
    * Since a {@link StartProcessVariableScope} has no state, it's safe to use the same
@@ -42,14 +47,12 @@ public class StartProcessVariableScope implements VariableScope<CoreVariableInst
     return INSTANCE;
   }
 
-  @SuppressWarnings("unchecked")
-  public Map<String, Object> getVariables() {
-    return Collections.EMPTY_MAP;
+  public VariableMap getVariables() {
+    return EMPTY_VARIABLE_MAP;
   }
 
-  @SuppressWarnings("unchecked")
-  public Map<String, Object> getVariablesLocal() {
-    return Collections.EMPTY_MAP;
+  public VariableMap getVariablesLocal() {
+    return EMPTY_VARIABLE_MAP;
   }
 
   public Object getVariable(String variableName) {
@@ -57,6 +60,38 @@ public class StartProcessVariableScope implements VariableScope<CoreVariableInst
   }
 
   public Object getVariableLocal(String variableName) {
+    return null;
+  }
+
+  public VariableMap getVariables(boolean deserializeObjectValues) {
+    return getVariables();
+  }
+
+  public VariableMap getVariablesLocal(boolean deserializeObjectValues) {
+    return getVariablesLocal();
+  }
+
+  public Object getVariable(String variableName, boolean deserializeObjectValue) {
+    return null;
+  }
+
+  public Object getVariableLocal(String variableName, boolean deserializeObjectValue) {
+    return null;
+  }
+
+  public <T extends TypedValue> T getVariableTyped(String variableName) {
+    return null;
+  }
+
+  public <T extends TypedValue> T getVariableTyped(String variableName, boolean deserializeObjectValue) {
+    return null;
+  }
+
+  public <T extends TypedValue> T getVariableLocalTyped(String variableName) {
+    return null;
+  }
+
+  public <T extends TypedValue> T getVariableLocalTyped(String variableName, boolean deserializeObjectValue) {
     return null;
   }
 
@@ -125,18 +160,16 @@ public class StartProcessVariableScope implements VariableScope<CoreVariableInst
     throw new UnsupportedOperationException("No execution active, no variables can be removed");
   }
 
-  @SuppressWarnings("unchecked")
   public Map<String, CoreVariableInstance> getVariableInstances() {
-    return Collections.EMPTY_MAP;
+    return Collections.emptyMap();
   }
 
   public CoreVariableInstance getVariableInstance(String name) {
     return null;
   }
 
-  @SuppressWarnings("unchecked")
   public Map<String, CoreVariableInstance> getVariableInstancesLocal() {
-    return Collections.EMPTY_MAP;
+    return Collections.emptyMap();
   }
 
   public CoreVariableInstance getVariableInstanceLocal(String name) {

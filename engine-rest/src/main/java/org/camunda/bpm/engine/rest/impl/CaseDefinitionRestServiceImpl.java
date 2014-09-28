@@ -24,6 +24,7 @@ import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.sub.repository.CaseDefinitionResource;
 import org.camunda.bpm.engine.rest.sub.repository.impl.CaseDefinitionResourceImpl;
+import org.codehaus.jackson.map.ObjectMapper;
 
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
@@ -41,8 +42,8 @@ public class CaseDefinitionRestServiceImpl extends AbstractRestProcessEngineAwar
     super();
   }
 
-  public CaseDefinitionRestServiceImpl(String engineName) {
-    super(engineName);
+  public CaseDefinitionRestServiceImpl(String engineName, ObjectMapper objectMapper) {
+    super(engineName, objectMapper);
   }
 
   @Override
@@ -71,12 +72,12 @@ public class CaseDefinitionRestServiceImpl extends AbstractRestProcessEngineAwar
 
   @Override
   public CaseDefinitionResource getCaseDefinitionById(String caseDefinitionId) {
-    return new CaseDefinitionResourceImpl(getProcessEngine(), caseDefinitionId, relativeRootResourcePath);
+    return new CaseDefinitionResourceImpl(getProcessEngine(), caseDefinitionId, relativeRootResourcePath, getObjectMapper());
   }
 
   @Override
   public List<CaseDefinitionDto> getCaseDefinitions(UriInfo uriInfo, Integer firstResult, Integer maxResults) {
-    CaseDefinitionQueryDto queryDto = new CaseDefinitionQueryDto(uriInfo.getQueryParameters());
+    CaseDefinitionQueryDto queryDto = new CaseDefinitionQueryDto(getObjectMapper(), uriInfo.getQueryParameters());
     List<CaseDefinitionDto> definitions = new ArrayList<CaseDefinitionDto>();
 
     ProcessEngine engine = getProcessEngine();
@@ -109,7 +110,7 @@ public class CaseDefinitionRestServiceImpl extends AbstractRestProcessEngineAwar
 
   @Override
   public CountResultDto getCaseDefinitionsCount(UriInfo uriInfo) {
-    CaseDefinitionQueryDto queryDto = new CaseDefinitionQueryDto(uriInfo.getQueryParameters());
+    CaseDefinitionQueryDto queryDto = new CaseDefinitionQueryDto(getObjectMapper(), uriInfo.getQueryParameters());
 
     ProcessEngine engine = getProcessEngine();
     CaseDefinitionQuery query = queryDto.toQuery(engine);

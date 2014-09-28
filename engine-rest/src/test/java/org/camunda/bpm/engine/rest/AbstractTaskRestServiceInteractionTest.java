@@ -31,10 +31,10 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Matchers.isNull;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -62,15 +62,12 @@ import javax.ws.rs.core.Response.Status;
 import org.camunda.bpm.ProcessApplicationService;
 import org.camunda.bpm.application.ProcessApplicationInfo;
 import org.camunda.bpm.container.RuntimeContainerDelegate;
-import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.FormService;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ManagementService;
-import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.TaskService;
-import org.camunda.bpm.engine.delegate.ProcessEngineVariableType;
 import org.camunda.bpm.engine.form.TaskFormData;
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.history.HistoricTaskInstanceQuery;
@@ -87,9 +84,14 @@ import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.hal.Hal;
 import org.camunda.bpm.engine.rest.helper.EqualsList;
 import org.camunda.bpm.engine.rest.helper.EqualsMap;
+import org.camunda.bpm.engine.rest.helper.ErrorMessageHelper;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
+import org.camunda.bpm.engine.rest.helper.VariableTypeHelper;
+import org.camunda.bpm.engine.rest.helper.variable.EqualsNullValue;
+import org.camunda.bpm.engine.rest.helper.variable.EqualsObjectValue;
+import org.camunda.bpm.engine.rest.helper.variable.EqualsPrimitiveValue;
+import org.camunda.bpm.engine.rest.helper.variable.EqualsUntypedValue;
 import org.camunda.bpm.engine.rest.util.VariablesBuilder;
-import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.task.Attachment;
 import org.camunda.bpm.engine.task.Comment;
 import org.camunda.bpm.engine.task.DelegationState;
@@ -97,6 +99,9 @@ import org.camunda.bpm.engine.task.IdentityLink;
 import org.camunda.bpm.engine.task.IdentityLinkType;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
+import org.camunda.bpm.engine.variable.VariableMap;
+import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.type.ValueType;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.type.TypeFactory;
 import org.fest.assertions.Assertions;
@@ -201,15 +206,15 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     when(taskServiceMock.createAttachment(anyString(), anyString(), anyString(), anyString(), anyString(), any(InputStream.class))).thenReturn(mockTaskAttachment);
     when(taskServiceMock.getTaskAttachmentContent(EXAMPLE_TASK_ID, EXAMPLE_TASK_ATTACHMENT_ID)).thenReturn(new ByteArrayInputStream(createMockByteData()));
 
-    when(taskServiceMock.getVariablesLocal(EXAMPLE_TASK_ID)).thenReturn(EXAMPLE_VARIABLES);
+    when(taskServiceMock.getVariablesLocal(EXAMPLE_TASK_ID, true)).thenReturn(EXAMPLE_VARIABLES);
 
     formServiceMock = mock(FormService.class);
     when(processEngine.getFormService()).thenReturn(formServiceMock);
     TaskFormData mockFormData = MockProvider.createMockTaskFormData();
     when(formServiceMock.getTaskFormData(anyString())).thenReturn(mockFormData);
 
-    Map<String, VariableInstance> variablesMock = MockProvider.createMockFormVariables();
-    when(formServiceMock.getTaskFormVariables(eq(EXAMPLE_TASK_ID), Matchers.<Collection<String>>any())).thenReturn(variablesMock);
+    VariableMap variablesMock = MockProvider.createMockFormVariables();
+    when(formServiceMock.getTaskFormVariables(eq(EXAMPLE_TASK_ID), Matchers.<Collection<String>>any(), eq(true))).thenReturn(variablesMock);
 
     repositoryServiceMock = mock(RepositoryService.class);
     when(processEngine.getRepositoryService()).thenReturn(repositoryServiceMock);
@@ -520,8 +525,9 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
       .contentType(POST_JSON_CONTENT_TYPE).body(variables)
       .then().expect()
         .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
-        .body("type", equalTo(RestException.class.getSimpleName()))
-        .body("message", containsString("Cannot submit task form anId due to number format exception: For input string: \"1abc\""))
+        .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+        .body("message", containsString("Cannot submit task form anId: "
+          + ErrorMessageHelper.getExpectedFailingConversionMessage(variableValue, variableType, Integer.class)))
       .when().post(SUBMIT_FORM_URL);
   }
 
@@ -541,8 +547,9 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
       .contentType(POST_JSON_CONTENT_TYPE).body(variables)
       .then().expect()
         .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
-        .body("type", equalTo(RestException.class.getSimpleName()))
-        .body("message", containsString("Cannot submit task form anId due to number format exception: For input string: \"1abc\""))
+        .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+        .body("message", containsString("Cannot submit task form anId: "
+          + ErrorMessageHelper.getExpectedFailingConversionMessage(variableValue, variableType, Short.class)))
       .when().post(SUBMIT_FORM_URL);
   }
 
@@ -562,8 +569,9 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
       .contentType(POST_JSON_CONTENT_TYPE).body(variables)
       .then().expect()
         .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
-        .body("type", equalTo(RestException.class.getSimpleName()))
-        .body("message", containsString("Cannot submit task form anId due to number format exception: For input string: \"1abc\""))
+        .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+        .body("message", containsString("Cannot submit task form anId: "
+          + ErrorMessageHelper.getExpectedFailingConversionMessage(variableValue, variableType, Long.class)))
       .when().post(SUBMIT_FORM_URL);
   }
 
@@ -583,8 +591,9 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
       .contentType(POST_JSON_CONTENT_TYPE).body(variables)
       .then().expect()
         .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
-        .body("type", equalTo(RestException.class.getSimpleName()))
-        .body("message", containsString("Cannot submit task form anId due to number format exception: For input string: \"1abc\""))
+        .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+        .body("message", containsString("Cannot submit task form anId: "
+            + ErrorMessageHelper.getExpectedFailingConversionMessage(variableValue, variableType, Double.class)))
       .when().post(SUBMIT_FORM_URL);
   }
 
@@ -604,8 +613,9 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
       .contentType(POST_JSON_CONTENT_TYPE).body(variables)
       .then().expect()
         .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
-        .body("type", equalTo(RestException.class.getSimpleName()))
-        .body("message", containsString("Cannot submit task form anId due to parse exception: Unparseable date: \"1abc\""))
+        .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+        .body("message", containsString("Cannot submit task form anId: "
+            + ErrorMessageHelper.getExpectedFailingConversionMessage(variableValue, variableType, Date.class)))
       .when().post(SUBMIT_FORM_URL);
   }
 
@@ -625,8 +635,8 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
       .contentType(POST_JSON_CONTENT_TYPE).body(variables)
       .then().expect()
         .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
-        .body("type", equalTo(RestException.class.getSimpleName()))
-        .body("message", containsString("Cannot submit task form anId: The value type 'X' is not supported."))
+        .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+        .body("message", containsString("Cannot submit task form anId: Unsupported value type 'X'"))
       .when().post(SUBMIT_FORM_URL);
   }
 
@@ -651,18 +661,18 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
       .header("accept", MediaType.APPLICATION_JSON)
       .then().expect()
         .statusCode(Status.OK.getStatusCode()).contentType(ContentType.JSON)
-        .body(MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME+".id", equalTo(MockProvider.EXAMPLE_VARIABLE_INSTANCE_ID))
-        .body(MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME+".name", equalTo(MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME))
-        .body(MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME+".type", equalTo(MockProvider.STRING_VARIABLE_INSTANCE_TYPE))
+        .body(MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME+".type",
+            equalTo(VariableTypeHelper.toExpectedValueTypeName(MockProvider.EXAMPLE_PRIMITIVE_VARIABLE_VALUE.getType())))
+        .body(MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME+".value",
+            equalTo(MockProvider.EXAMPLE_PRIMITIVE_VARIABLE_VALUE.getValue()))
       .when().get(FORM_VARIABLES_URL)
       .body();
 
-    verify(formServiceMock, times(1)).getTaskFormVariables(EXAMPLE_TASK_ID, null);
+    verify(formServiceMock, times(1)).getTaskFormVariables(EXAMPLE_TASK_ID, null, true);
   }
 
   @Test
   public void testGetTaskFormVariablesVarNames() {
-
     given()
       .pathParam("id", EXAMPLE_TASK_ID)
       .queryParam("variableNames", "a,b,c")
@@ -671,7 +681,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
         .statusCode(Status.OK.getStatusCode()).contentType(ContentType.JSON)
       .when().get(FORM_VARIABLES_URL);
 
-    verify(formServiceMock, times(1)).getTaskFormVariables(EXAMPLE_TASK_ID, Arrays.asList(new String[]{"a","b","c"}));
+    verify(formServiceMock, times(1)).getTaskFormVariables(EXAMPLE_TASK_ID, Arrays.asList(new String[]{"a","b","c"}), true);
   }
 
   @Test
@@ -1021,8 +1031,9 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
       .contentType(POST_JSON_CONTENT_TYPE).body(variables)
       .then().expect()
         .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
-        .body("type", equalTo(RestException.class.getSimpleName()))
-        .body("message", containsString("Cannot complete task anId due to number format exception: For input string: \"1abc\""))
+        .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+        .body("message", containsString("Cannot complete task anId: "
+            + ErrorMessageHelper.getExpectedFailingConversionMessage(variableValue, variableType, Integer.class)))
       .when().post(COMPLETE_TASK_URL);
   }
 
@@ -1042,8 +1053,9 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
       .contentType(POST_JSON_CONTENT_TYPE).body(variables)
       .then().expect()
         .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
-        .body("type", equalTo(RestException.class.getSimpleName()))
-        .body("message", containsString("Cannot complete task anId due to number format exception: For input string: \"1abc\""))
+        .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+        .body("message", containsString("Cannot complete task anId: "
+            + ErrorMessageHelper.getExpectedFailingConversionMessage(variableValue, variableType, Short.class)))
       .when().post(COMPLETE_TASK_URL);
   }
 
@@ -1063,8 +1075,9 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
       .contentType(POST_JSON_CONTENT_TYPE).body(variables)
       .then().expect()
         .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
-        .body("type", equalTo(RestException.class.getSimpleName()))
-        .body("message", containsString("Cannot complete task anId due to number format exception: For input string: \"1abc\""))
+        .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+        .body("message", containsString("Cannot complete task anId: "
+          + ErrorMessageHelper.getExpectedFailingConversionMessage(variableValue, variableType, Long.class)))
       .when().post(COMPLETE_TASK_URL);
   }
 
@@ -1084,8 +1097,9 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
       .contentType(POST_JSON_CONTENT_TYPE).body(variables)
       .then().expect()
         .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
-        .body("type", equalTo(RestException.class.getSimpleName()))
-        .body("message", containsString("Cannot complete task anId due to number format exception: For input string: \"1abc\""))
+        .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+        .body("message", containsString("Cannot complete task anId: "
+            + ErrorMessageHelper.getExpectedFailingConversionMessage(variableValue, variableType, Double.class)))
       .when().post(COMPLETE_TASK_URL);
   }
 
@@ -1105,8 +1119,9 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
       .contentType(POST_JSON_CONTENT_TYPE).body(variables)
       .then().expect()
         .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
-        .body("type", equalTo(RestException.class.getSimpleName()))
-        .body("message", containsString("Cannot complete task anId due to parse exception: Unparseable date: \"1abc\""))
+        .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+        .body("message", containsString("Cannot complete task anId: "
+          + ErrorMessageHelper.getExpectedFailingConversionMessage(variableValue, variableType, Date.class)))
       .when().post(COMPLETE_TASK_URL);
   }
 
@@ -1126,8 +1141,8 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
       .contentType(POST_JSON_CONTENT_TYPE).body(variables)
       .then().expect()
         .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
-        .body("type", equalTo(RestException.class.getSimpleName()))
-        .body("message", containsString("Cannot complete task anId: The value type 'X' is not supported."))
+        .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+        .body("message", containsString("Cannot complete task anId: Unsupported value type 'X'"))
       .when().post(COMPLETE_TASK_URL);
   }
 
@@ -1186,8 +1201,9 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
       .contentType(POST_JSON_CONTENT_TYPE).body(variables)
       .then().expect()
         .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
-        .body("type", equalTo(RestException.class.getSimpleName()))
-        .body("message", containsString("Cannot resolve task anId due to number format exception: For input string: \"1abc\""))
+        .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+        .body("message", containsString("Cannot resolve task anId: "
+            + ErrorMessageHelper.getExpectedFailingConversionMessage(variableValue, variableType, Integer.class)))
       .when().post(RESOLVE_TASK_URL);
   }
 
@@ -1207,8 +1223,9 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
       .contentType(POST_JSON_CONTENT_TYPE).body(variables)
       .then().expect()
         .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
-        .body("type", equalTo(RestException.class.getSimpleName()))
-        .body("message", containsString("Cannot resolve task anId due to number format exception: For input string: \"1abc\""))
+        .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+        .body("message", containsString("Cannot resolve task anId: "
+            + ErrorMessageHelper.getExpectedFailingConversionMessage(variableValue, variableType, Short.class)))
       .when().post(RESOLVE_TASK_URL);
   }
 
@@ -1228,8 +1245,9 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
       .contentType(POST_JSON_CONTENT_TYPE).body(variables)
       .then().expect()
         .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
-        .body("type", equalTo(RestException.class.getSimpleName()))
-        .body("message", containsString("Cannot resolve task anId due to number format exception: For input string: \"1abc\""))
+        .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+        .body("message", containsString("Cannot resolve task anId: "
+          + ErrorMessageHelper.getExpectedFailingConversionMessage(variableValue, variableType, Long.class)))
       .when().post(RESOLVE_TASK_URL);
   }
 
@@ -1249,8 +1267,9 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
       .contentType(POST_JSON_CONTENT_TYPE).body(variables)
       .then().expect()
         .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
-        .body("type", equalTo(RestException.class.getSimpleName()))
-        .body("message", containsString("Cannot resolve task anId due to number format exception: For input string: \"1abc\""))
+        .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+        .body("message", containsString("Cannot resolve task anId: "
+            + ErrorMessageHelper.getExpectedFailingConversionMessage(variableValue, variableType, Double.class)))
       .when().post(RESOLVE_TASK_URL);
   }
 
@@ -1270,8 +1289,9 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
       .contentType(POST_JSON_CONTENT_TYPE).body(variables)
       .then().expect()
         .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
-        .body("type", equalTo(RestException.class.getSimpleName()))
-        .body("message", containsString("Cannot resolve task anId due to parse exception: Unparseable date: \"1abc\""))
+        .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+        .body("message", containsString("Cannot resolve task anId: "
+            + ErrorMessageHelper.getExpectedFailingConversionMessage(variableValue, variableType, Date.class)))
       .when().post(RESOLVE_TASK_URL);
   }
 
@@ -1291,8 +1311,8 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
       .contentType(POST_JSON_CONTENT_TYPE).body(variables)
       .then().expect()
         .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
-        .body("type", equalTo(RestException.class.getSimpleName()))
-        .body("message", containsString("Cannot resolve task anId: The value type 'X' is not supported."))
+        .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+        .body("message", containsString("Cannot resolve task anId: Unsupported value type 'X'"))
       .when().post(RESOLVE_TASK_URL);
   }
 
@@ -2105,8 +2125,8 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
       .header("accept", MediaType.APPLICATION_JSON)
       .then().expect().statusCode(Status.OK.getStatusCode())
       .body(EXAMPLE_VARIABLE_KEY, notNullValue())
-      .body(EXAMPLE_VARIABLE_KEY + ".value", equalTo(EXAMPLE_VARIABLE_VALUE))
-      .body(EXAMPLE_VARIABLE_KEY + ".type", equalTo(String.class.getSimpleName()))
+      .body(EXAMPLE_VARIABLE_KEY + ".value", equalTo(EXAMPLE_VARIABLE_VALUE.getValue()))
+      .body(EXAMPLE_VARIABLE_KEY + ".type", equalTo(VariableTypeHelper.toExpectedValueTypeName(EXAMPLE_VARIABLE_VALUE.getType())))
       .when().get(SINGLE_TASK_VARIABLES_URL);
 
     Assert.assertEquals("Should return exactly one variable", 1, response.jsonPath().getMap("").size());
@@ -2114,7 +2134,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
 
   @Test
   public void testGetLocalVariablesForNonExistingTaskId() {
-    when(taskServiceMock.getVariablesLocal(NON_EXISTING_ID)).thenThrow(new ProcessEngineException("task " + NON_EXISTING_ID + " doesn't exist"));
+    when(taskServiceMock.getVariablesLocal(NON_EXISTING_ID, true)).thenThrow(new ProcessEngineException("task " + NON_EXISTING_ID + " doesn't exist"));
 
     given().pathParam("id", NON_EXISTING_ID)
       .header("accept", MediaType.APPLICATION_JSON)
@@ -2186,7 +2206,8 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     String variableKey = "aVariableKey";
     int variableValue = 123;
 
-    when(taskServiceMock.getVariableLocal(eq(EXAMPLE_TASK_ID), eq(variableKey))).thenReturn(variableValue);
+    when(taskServiceMock.getVariableLocalTyped(eq(EXAMPLE_TASK_ID), eq(variableKey), anyBoolean()))
+      .thenReturn(Variables.integerValue(variableValue));
 
     given().pathParam("id", EXAMPLE_TASK_ID).pathParam("varId", variableKey)
       .header("accept", MediaType.APPLICATION_JSON)
@@ -2214,7 +2235,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
   public void testGetLocalVariableForNonExistingTaskId() {
     String variableKey = "aVariableKey";
 
-    when(taskServiceMock.getVariableLocal(eq(NON_EXISTING_ID), eq(variableKey)))
+    when(taskServiceMock.getVariableLocalTyped(eq(NON_EXISTING_ID), eq(variableKey), anyBoolean()))
       .thenThrow(new ProcessEngineException("task " + NON_EXISTING_ID + " doesn't exist"));
 
     given().pathParam("id", NON_EXISTING_ID).pathParam("varId", variableKey)
@@ -2239,7 +2260,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
       .when().put(SINGLE_TASK_PUT_SINGLE_VARIABLE_URL);
 
     verify(taskServiceMock).setVariableLocal(eq(EXAMPLE_TASK_ID), eq(variableKey),
-        eq(variableValue));
+        argThat(EqualsUntypedValue.matcher().value(variableValue)));
   }
 
   @Test
@@ -2257,7 +2278,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
       .when().put(SINGLE_TASK_PUT_SINGLE_VARIABLE_URL);
 
     verify(taskServiceMock).setVariableLocal(eq(EXAMPLE_TASK_ID), eq(variableKey),
-        eq(variableValue));
+        argThat(EqualsPrimitiveValue.integerValue(variableValue)));
   }
 
   @Test
@@ -2272,8 +2293,9 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
       .contentType(ContentType.JSON).body(variableJson)
       .header("accept", MediaType.APPLICATION_JSON)
       .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
-      .body("type", equalTo(RestException.class.getSimpleName()))
-      .body("message", equalTo("Cannot put task variable " + variableKey + " due to number format exception: For input string: \"1abc\""))
+      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("message", equalTo("Cannot put task variable " + variableKey + ": "
+          + ErrorMessageHelper.getExpectedFailingConversionMessage(variableValue, type, Integer.class)))
       .when().put(SINGLE_TASK_PUT_SINGLE_VARIABLE_URL);
   }
 
@@ -2292,7 +2314,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
       .when().put(SINGLE_TASK_PUT_SINGLE_VARIABLE_URL);
 
     verify(taskServiceMock).setVariableLocal(eq(EXAMPLE_TASK_ID), eq(variableKey),
-        eq(variableValue));
+        argThat(EqualsPrimitiveValue.shortValue(variableValue)));
   }
 
   @Test
@@ -2307,8 +2329,9 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
       .contentType(ContentType.JSON).body(variableJson)
       .header("accept", MediaType.APPLICATION_JSON)
       .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
-      .body("type", equalTo(RestException.class.getSimpleName()))
-      .body("message", equalTo("Cannot put task variable " +  variableKey + " due to number format exception: For input string: \"1abc\""))
+      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("message", equalTo("Cannot put task variable " +  variableKey + ": "
+          + ErrorMessageHelper.getExpectedFailingConversionMessage(variableValue, type, Short.class)))
       .when().put(SINGLE_TASK_PUT_SINGLE_VARIABLE_URL);
   }
 
@@ -2327,7 +2350,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
       .when().put(SINGLE_TASK_PUT_SINGLE_VARIABLE_URL);
 
     verify(taskServiceMock).setVariableLocal(eq(EXAMPLE_TASK_ID), eq(variableKey),
-        eq(variableValue));
+        argThat(EqualsPrimitiveValue.longValue(variableValue)));
   }
 
   @Test
@@ -2342,8 +2365,9 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
       .contentType(ContentType.JSON).body(variableJson)
       .header("accept", MediaType.APPLICATION_JSON)
       .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
-      .body("type", equalTo(RestException.class.getSimpleName()))
-      .body("message", equalTo("Cannot put task variable " + variableKey + " due to number format exception: For input string: \"1abc\""))
+      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("message", equalTo("Cannot put task variable " + variableKey + ": "
+          + ErrorMessageHelper.getExpectedFailingConversionMessage(variableValue, type, Long.class)))
       .when().put(SINGLE_TASK_PUT_SINGLE_VARIABLE_URL);
   }
 
@@ -2362,7 +2386,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
       .when().put(SINGLE_TASK_PUT_SINGLE_VARIABLE_URL);
 
     verify(taskServiceMock).setVariableLocal(eq(EXAMPLE_TASK_ID), eq(variableKey),
-        eq(variableValue));
+        argThat(EqualsPrimitiveValue.doubleValue(variableValue)));
   }
 
   @Test
@@ -2377,8 +2401,9 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
       .contentType(ContentType.JSON).body(variableJson)
       .header("accept", MediaType.APPLICATION_JSON)
       .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
-      .body("type", equalTo(RestException.class.getSimpleName()))
-      .body("message", equalTo("Cannot put task variable " + variableKey + " due to number format exception: For input string: \"1abc\""))
+      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("message", equalTo("Cannot put task variable " + variableKey + ": "
+            + ErrorMessageHelper.getExpectedFailingConversionMessage(variableValue, type, Double.class)))
       .when().put(SINGLE_TASK_PUT_SINGLE_VARIABLE_URL);
   }
 
@@ -2397,7 +2422,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
       .when().put(SINGLE_TASK_PUT_SINGLE_VARIABLE_URL);
 
     verify(taskServiceMock).setVariableLocal(eq(EXAMPLE_TASK_ID), eq(variableKey),
-        eq(variableValue));
+        argThat(EqualsPrimitiveValue.booleanValue(variableValue)));
   }
 
   @Test
@@ -2420,7 +2445,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
       .when().put(SINGLE_TASK_PUT_SINGLE_VARIABLE_URL);
 
     verify(taskServiceMock).setVariableLocal(eq(EXAMPLE_TASK_ID), eq(variableKey),
-        eq(expectedValue));
+        argThat(EqualsPrimitiveValue.dateValue(expectedValue)));
   }
 
   @Test
@@ -2435,8 +2460,9 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
       .contentType(ContentType.JSON).body(variableJson)
       .header("accept", MediaType.APPLICATION_JSON)
       .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
-      .body("type", equalTo(RestException.class.getSimpleName()))
-      .body("message", equalTo("Cannot put task variable " + variableKey + " due to parse exception: Unparseable date: \"1abc\""))
+      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("message", equalTo("Cannot put task variable " + variableKey + ": "
+          + ErrorMessageHelper.getExpectedFailingConversionMessage(variableValue, type, Date.class)))
       .when().put(SINGLE_TASK_PUT_SINGLE_VARIABLE_URL);
   }
 
@@ -2453,7 +2479,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
       .header("accept", MediaType.APPLICATION_JSON)
       .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
       .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
-      .body("message", equalTo("Cannot put task variable " + variableKey + ": Invalid combination of variable type 'null' and value type 'X'"))
+      .body("message", equalTo("Cannot put task variable " + variableKey + ": Unsupported value type 'X'"))
       .when().put(SINGLE_TASK_PUT_SINGLE_VARIABLE_URL);
   }
 
@@ -2468,7 +2494,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
       .when().put(SINGLE_TASK_PUT_SINGLE_VARIABLE_URL);
 
     verify(taskServiceMock).setVariableLocal(eq(EXAMPLE_TASK_ID), eq(variableKey),
-        isNull());
+        argThat(EqualsNullValue.matcher()));
   }
 
   @Test
@@ -2479,7 +2505,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     Map<String, Object> variableJson = VariablesBuilder.getVariableValueMap(variableValue);
 
     doThrow(new ProcessEngineException("Cannot find task with id " + NON_EXISTING_ID))
-      .when(taskServiceMock).setVariableLocal(eq(NON_EXISTING_ID), eq(variableKey), eq(variableValue));
+      .when(taskServiceMock).setVariableLocal(eq(NON_EXISTING_ID), eq(variableKey), any());
 
     given().pathParam("id", NON_EXISTING_ID).pathParam("varId", variableKey)
       .contentType(ContentType.JSON).body(variableJson)
@@ -2506,7 +2532,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
       .post(SINGLE_TASK_PUT_SINGLE_BINARY_VARIABLE_URL);
 
     verify(taskServiceMock).setVariableLocal(eq(EXAMPLE_TASK_ID), eq(variableKey),
-        eq(bytes));
+        argThat(EqualsPrimitiveValue.bytesValue(bytes)));
   }
 
   @Test
@@ -2525,7 +2551,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
       .post(SINGLE_TASK_PUT_SINGLE_BINARY_VARIABLE_URL);
 
     verify(taskServiceMock).setVariableLocal(eq(EXAMPLE_TASK_ID), eq(variableKey),
-        eq(bytes));
+        argThat(EqualsPrimitiveValue.bytesValue(bytes)));
   }
 
   @Test
@@ -2551,7 +2577,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
       .post(SINGLE_TASK_PUT_SINGLE_BINARY_VARIABLE_URL);
 
     verify(taskServiceMock).setVariableLocal(eq(MockProvider.EXAMPLE_TASK_ID), eq(variableKey),
-        eq(serializable));
+        argThat(EqualsObjectValue.objectValueMatcher().isDeserialized().value(serializable)));
   }
 
   @Test
@@ -2582,34 +2608,10 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
   }
 
   @Test
-  public void testPostSingleLocalVariableFromSerializedMultipart() throws Exception {
-    byte[] bytes = "someContent".getBytes();
-
-    String variableKey = "aVariableKey";
-
-    given()
-      .pathParam("id", MockProvider.EXAMPLE_TASK_ID).pathParam("varId", variableKey)
-      .multiPart("data", "unspecified", bytes)
-      .multiPart("variableType", ProcessEngineVariableType.SERIALIZABLE.getName(), MediaType.TEXT_PLAIN)
-    .expect()
-      .statusCode(Status.NO_CONTENT.getStatusCode())
-    .when()
-      .post(SINGLE_TASK_PUT_SINGLE_BINARY_VARIABLE_URL);
-
-    verify(taskServiceMock).setVariableLocalFromSerialized(
-        eq(MockProvider.EXAMPLE_TASK_ID), eq(variableKey),
-        eq(bytes), eq(ProcessEngineVariableType.SERIALIZABLE.getName()), isNull(Map.class));
-  }
-
-  @Test
   public void testPutSingleLocalVariableFromSerialized() throws Exception {
     String serializedValue = "{\"prop\" : \"value\"}";
-    Map<String, Object> config = new HashMap<String, Object>();
-    config.put(ProcessEngineVariableType.SPIN_TYPE_DATA_FORMAT_ID, "aDataFormat");
-    config.put(ProcessEngineVariableType.SPIN_TYPE_CONFIG_ROOT_TYPE, "aRootType");
-
     Map<String, Object> requestJson = VariablesBuilder
-        .getSerializedValueMap(serializedValue, ProcessEngineVariableType.SPIN.getName(), config);
+        .getObjectValueMap(serializedValue, ValueType.OBJECT.getName(), "aDataFormat", "aRootType");
 
     String variableKey = "aVariableKey";
 
@@ -2622,9 +2624,12 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     .when()
       .put(SINGLE_TASK_PUT_SINGLE_VARIABLE_URL);
 
-    verify(taskServiceMock).setVariableLocalFromSerialized(
+    verify(taskServiceMock).setVariableLocal(
         eq(MockProvider.EXAMPLE_TASK_ID), eq(variableKey),
-        eq(serializedValue), eq(ProcessEngineVariableType.SPIN.getName()), argThat(new EqualsMap(config)));
+        argThat(EqualsObjectValue.objectValueMatcher()
+          .serializedValue(serializedValue)
+          .serializationFormat("aDataFormat")
+          .objectTypeName("aRootType")));
   }
 
   @Test
@@ -2632,13 +2637,9 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     String serializedValue = "{\"prop\" : \"value\"}";
 
     Map<String, Object> requestJson = VariablesBuilder
-        .getSerializedValueMap(serializedValue, "aNonExistingType", null);
+        .getObjectValueMap(serializedValue, "aNonExistingType", null, null);
 
     String variableKey = "aVariableKey";
-
-    doThrow(new BadUserRequestException("expected exception"))
-      .when(taskServiceMock)
-      .setVariableLocalFromSerialized(anyString(), anyString(), any(), anyString(), any(Map.class));
 
     given()
       .pathParam("id", MockProvider.EXAMPLE_TASK_ID).pathParam("varId", variableKey)
@@ -2646,8 +2647,8 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
       .body(requestJson)
     .expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode())
-      .body("type", equalTo(RestException.class.getSimpleName()))
-      .body("message", equalTo("Cannot put task variable aVariableKey: expected exception"))
+      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("message", equalTo("Cannot put task variable aVariableKey: Unsupported value type 'aNonExistingType'"))
     .when()
       .put(SINGLE_TASK_PUT_SINGLE_VARIABLE_URL);
   }
@@ -2656,18 +2657,17 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
   public void testPutSingleLocalVariableFromSerializedWithNoValue() {
     String variableKey = "aVariableKey";
 
-    Map<String, Object> config = new HashMap<String, Object>();
     Map<String, Object> requestJson = VariablesBuilder
-        .getSerializedValueMap(null, ProcessEngineVariableType.SPIN.getName(), config);
+        .getObjectValueMap(null, ValueType.OBJECT.getName(), null, null);
 
     given().pathParam("id", MockProvider.EXAMPLE_TASK_ID).pathParam("varId", variableKey)
       .contentType(ContentType.JSON).body(requestJson)
       .then().expect().statusCode(Status.NO_CONTENT.getStatusCode())
       .when().put(SINGLE_TASK_PUT_SINGLE_VARIABLE_URL);
 
-    verify(taskServiceMock).setVariableLocalFromSerialized(
+    verify(taskServiceMock).setVariableLocal(
         eq(MockProvider.EXAMPLE_TASK_ID), eq(variableKey),
-        isNull(), eq(ProcessEngineVariableType.SPIN.getName()), argThat(new EqualsMap(config)));
+        argThat(EqualsObjectValue.objectValueMatcher()));
   }
 
   @Test

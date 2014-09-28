@@ -17,9 +17,9 @@ import java.util.Map.Entry;
 
 import org.camunda.bpm.connect.ConnectorRequest;
 import org.camunda.bpm.connect.ConnectorResponse;
-import org.camunda.bpm.engine.delegate.CoreVariableInstance;
-import org.camunda.bpm.engine.impl.core.variable.CoreVariableScope;
-import org.camunda.bpm.engine.impl.core.variable.CoreVariableStore;
+import org.camunda.bpm.engine.impl.core.variable.CoreVariableInstance;
+import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
+import org.camunda.bpm.engine.impl.core.variable.scope.CoreVariableStore;
 
 /**
  * Exposes a connector request as variableScope.
@@ -27,30 +27,30 @@ import org.camunda.bpm.engine.impl.core.variable.CoreVariableStore;
  * @author Daniel Meyer
  *
  */
-public class ConnectorVariableScope extends CoreVariableScope<CoreVariableInstance> {
+public class ConnectorVariableScope extends AbstractVariableScope {
 
   private static final long serialVersionUID = 1L;
 
-  protected CoreVariableScope<CoreVariableInstance> parent;
+  protected AbstractVariableScope parent;
 
   protected ConnectorVariableStore variableStore;
 
-  public ConnectorVariableScope(CoreVariableScope<CoreVariableInstance> parent) {
+  public ConnectorVariableScope(AbstractVariableScope parent) {
     this.parent = parent;
     this.variableStore = new ConnectorVariableStore();
   }
 
-  protected CoreVariableStore<CoreVariableInstance> getVariableStore() {
+  protected CoreVariableStore getVariableStore() {
     return variableStore;
   }
 
-  public CoreVariableScope<CoreVariableInstance> getParentVariableScope() {
+  public AbstractVariableScope getParentVariableScope() {
     return parent;
   }
 
   public void writeToRequest(ConnectorRequest<?> request) {
     for (CoreVariableInstance variable : variableStore.getVariableInstancesValues()) {
-      request.setRequestParameter(variable.getName(), variable.getValue());
+      request.setRequestParameter(variable.getName(), variable.getTypedValue(true).getValue());
     }
   }
 

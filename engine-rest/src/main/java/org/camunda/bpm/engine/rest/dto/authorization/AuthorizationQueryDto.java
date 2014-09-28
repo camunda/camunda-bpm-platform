@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,38 +23,39 @@ import org.camunda.bpm.engine.rest.dto.AbstractQueryDto;
 import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
 import org.camunda.bpm.engine.rest.dto.converter.IntegerConverter;
 import org.camunda.bpm.engine.rest.dto.converter.StringArrayConverter;
+import org.codehaus.jackson.map.ObjectMapper;
 
 /**
- * 
+ *
  * @author Daniel Meyer
  */
 public class AuthorizationQueryDto extends AbstractQueryDto<AuthorizationQuery> {
 
   private static final String SORT_BY_RESOURCE_TYPE = "resourceType";
   private static final String SORT_BY_RESOURCE_ID = "resourceId";
-  
+
   private static final List<String> VALID_SORT_BY_VALUES;
   static {
     VALID_SORT_BY_VALUES = new ArrayList<String>();
     VALID_SORT_BY_VALUES.add(SORT_BY_RESOURCE_TYPE);
     VALID_SORT_BY_VALUES.add(SORT_BY_RESOURCE_ID);
   }
-  
+
   protected String id;
   protected Integer type;
   protected String[] userIdIn;
   protected String[] groupIdIn;
   protected Integer resourceType;
   protected String resourceId;
-    
+
   public AuthorizationQueryDto() {
-    
+
   }
-  
-  public AuthorizationQueryDto(MultivaluedMap<String, String> queryParameters) {
-    super(queryParameters);
-  } 
-   
+
+  public AuthorizationQueryDto(ObjectMapper objectMapper, MultivaluedMap<String, String> queryParameters) {
+    super(objectMapper, queryParameters);
+  }
+
   @CamundaQueryParam("id")
   public void setId(String id) {
     this.id = id;
@@ -94,7 +95,7 @@ public class AuthorizationQueryDto extends AbstractQueryDto<AuthorizationQuery> 
   }
 
   protected void applyFilters(AuthorizationQuery query) {
-    
+
     if (id != null) {
       query.authorizationId(id);
     }
@@ -114,7 +115,7 @@ public class AuthorizationQueryDto extends AbstractQueryDto<AuthorizationQuery> 
       query.resourceId(resourceId);
     }
   }
-  
+
   @Override
   protected void applySortingOptions(AuthorizationQuery query) {
     if (sortBy != null) {
@@ -124,7 +125,7 @@ public class AuthorizationQueryDto extends AbstractQueryDto<AuthorizationQuery> 
         query.orderByResourceType();
       }
     }
-    
+
     if (sortOrder != null) {
       if (sortOrder.equals(SORT_ORDER_ASC_VALUE)) {
         query.asc();
@@ -133,5 +134,5 @@ public class AuthorizationQueryDto extends AbstractQueryDto<AuthorizationQuery> 
       }
     }
   }
-  
+
 }

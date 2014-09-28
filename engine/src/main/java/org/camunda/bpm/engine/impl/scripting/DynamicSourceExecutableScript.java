@@ -28,7 +28,7 @@ public class DynamicSourceExecutableScript extends DynamicExecutableScript {
     super(scriptSourceExpression, language);
   }
 
-  public ExecutableScript getScript(VariableScope<?> variableScope) {
+  public ExecutableScript getScript(VariableScope variableScope) {
     String scriptSource = (String) scriptExpression.getValue(variableScope);
     return compileScript(scriptSource);
   }

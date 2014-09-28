@@ -42,7 +42,7 @@ public class CompiledExecutableScript extends ExecutableScript {
     this.compiledScript = compiledScript;
   }
 
-  public Object execute(ScriptEngine scriptEngine, VariableScope<?> variableScope, Bindings bindings) {
+  public Object execute(ScriptEngine scriptEngine, VariableScope variableScope, Bindings bindings) {
     try {
       return compiledScript.eval(bindings);
     } catch (ScriptException e) {

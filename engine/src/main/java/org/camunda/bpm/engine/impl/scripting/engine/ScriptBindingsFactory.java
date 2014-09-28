@@ -37,7 +37,7 @@ public class ScriptBindingsFactory {
     this.resolverFactories = resolverFactories;
   }
 
-  public Bindings createBindings(VariableScope<?> variableScope, Bindings engineBindings) {
+  public Bindings createBindings(VariableScope variableScope, Bindings engineBindings) {
     List<Resolver> scriptResolvers = new ArrayList<Resolver>();
     for (ResolverFactory scriptResolverFactory: resolverFactories) {
       Resolver resolver = scriptResolverFactory.createResolver(variableScope);

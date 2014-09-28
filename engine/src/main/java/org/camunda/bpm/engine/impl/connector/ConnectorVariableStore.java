@@ -12,27 +12,23 @@
  */
 package org.camunda.bpm.engine.impl.connector;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
-import org.camunda.bpm.engine.delegate.CoreVariableInstance;
-import org.camunda.bpm.engine.impl.core.variable.CoreVariableScope;
-import org.camunda.bpm.engine.impl.variable.AbstractVariableStore;
+import org.camunda.bpm.engine.impl.core.variable.CoreVariableInstance;
+import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
+import org.camunda.bpm.engine.impl.core.variable.scope.MapBasedVariableStore;
+import org.camunda.bpm.engine.variable.value.TypedValue;
 
 /**
  * @author Daniel Meyer
  *
  */
-public class ConnectorVariableStore extends AbstractVariableStore<CoreVariableInstance> {
+public class ConnectorVariableStore extends MapBasedVariableStore {
 
   public static class ConnectorParamVariable implements CoreVariableInstance {
 
     protected String name;
-    protected Object value;
+    protected TypedValue value;
 
-    public ConnectorParamVariable(String name, Object value) {
+    public ConnectorParamVariable(String name, TypedValue value) {
       this.name = name;
       this.value = value;
     }
@@ -41,51 +37,19 @@ public class ConnectorVariableStore extends AbstractVariableStore<CoreVariableIn
       return name;
     }
 
-    public Object getValue() {
+    public TypedValue getTypedValue(boolean deserializeObjectValue) {
       return value;
     }
   }
 
-  protected Map<String, ConnectorParamVariable> variables = new HashMap<String, ConnectorParamVariable>();
-
-  @SuppressWarnings({ "rawtypes", "unchecked" })
-  public Collection<CoreVariableInstance> getVariableInstancesValues() {
-    return (Collection) variables.values();
-  }
-
-  public CoreVariableInstance getVariableInstance(String variableName) {
-    return variables.get(variableName);
-  }
-
-  public Set<String> getVariableNames() {
-    return variables.keySet();
-  }
-
-  public boolean isEmpty() {
-    return variables.isEmpty();
-  }
-
-  public boolean containsVariableInstance(String variableName) {
-    return variables.containsKey(variableName);
-  }
-
-  public ConnectorParamVariable removeVariableInstance(String variableName, CoreVariableScope<CoreVariableInstance> sourceActivityExecution) {
-    return variables.remove(variableName);
-  }
-
-  public void setVariableInstanceValue(CoreVariableInstance variableInstance, Object value, CoreVariableScope<CoreVariableInstance> sourceActivityExecution) {
+  public void setVariableValue(CoreVariableInstance variableInstance, TypedValue value, AbstractVariableScope sourceActivityExecution) {
     ((ConnectorParamVariable)variableInstance).value = value;
   }
 
-  public ConnectorParamVariable createVariableInstance(String variableName, Object value, CoreVariableScope<CoreVariableInstance> sourceActivityExecution) {
+  public ConnectorParamVariable createVariableInstance(String variableName, TypedValue value, AbstractVariableScope sourceActivityExecution) {
     ConnectorParamVariable variableInstance = new ConnectorParamVariable(variableName, value);
     variables.put(variableName, variableInstance);
     return variableInstance;
-  }
-
-  @SuppressWarnings({ "rawtypes", "unchecked" })
-  public Map<String, CoreVariableInstance> getVariableInstances() {
-    return (Map) variables;
   }
 
 }

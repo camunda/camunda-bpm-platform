@@ -16,7 +16,6 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.camunda.bpm.engine.exception.NotAllowedException;
@@ -32,6 +31,7 @@ import org.camunda.bpm.engine.impl.cmmn.cmd.CompleteCaseExecutionCmd;
 import org.camunda.bpm.engine.impl.cmmn.cmd.DisableCaseExecutionCmd;
 import org.camunda.bpm.engine.impl.cmmn.cmd.ManualStartCaseExecutionCmd;
 import org.camunda.bpm.engine.impl.cmmn.cmd.ReenableCaseExecutionCmd;
+import org.camunda.bpm.engine.impl.core.variable.VariableMapImpl;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
@@ -47,8 +47,8 @@ public class CaseExecutionCommandBuilderImpl implements CaseExecutionCommandBuil
   protected CommandContext commandContext;
 
   protected String caseExecutionId;
-  protected Map<String, Object> variables;
-  protected Map<String, Object> variablesLocal;
+  protected VariableMapImpl variables;
+  protected VariableMapImpl variablesLocal;
   protected Collection<String> variableDeletions;
   protected Collection<String> variableLocalDeletions;
 
@@ -71,9 +71,7 @@ public class CaseExecutionCommandBuilderImpl implements CaseExecutionCommandBuil
   public CaseExecutionCommandBuilder setVariable(String variableName, Object variableValue) {
     ensureNotNull(NotValidException.class, "variableName", variableName);
     ensureVariableShouldNotBeRemoved(variableName);
-    if (variables == null) {
-      variables = new HashMap<String, Object>();
-    }
+    ensureVariablesInitialized();
     variables.put(variableName, variableValue);
     return this;
   }
@@ -81,9 +79,7 @@ public class CaseExecutionCommandBuilderImpl implements CaseExecutionCommandBuil
   public CaseExecutionCommandBuilder setVariables(Map<String, Object> variables) {
     if (variables != null) {
       ensureVariablesShouldNotBeRemoved(variables.keySet());
-      if (this.variables == null) {
-        this.variables = new HashMap<String, Object>();
-      }
+      ensureVariablesInitialized();
       this.variables.putAll(variables);
     }
     return this;
@@ -92,9 +88,7 @@ public class CaseExecutionCommandBuilderImpl implements CaseExecutionCommandBuil
   public CaseExecutionCommandBuilder setVariableLocal(String localVariableName, Object localVariableValue) {
     ensureNotNull(NotValidException.class, "localVariableName", localVariableName);
     ensureVariableShouldNotBeRemoved(localVariableName);
-    if (variablesLocal == null) {
-      variablesLocal = new HashMap<String, Object>();
-    }
+    ensureVariablesLocalInitialized();
     variablesLocal.put(localVariableName, localVariableValue);
     return this;
   }
@@ -102,9 +96,7 @@ public class CaseExecutionCommandBuilderImpl implements CaseExecutionCommandBuil
   public CaseExecutionCommandBuilder setVariablesLocal(Map<String, Object> variablesLocal) {
     if (variablesLocal != null) {
       ensureVariablesShouldNotBeRemoved(variablesLocal.keySet());
-      if (this.variablesLocal == null) {
-        this.variablesLocal = new HashMap<String, Object>();
-      }
+      ensureVariablesLocalInitialized();
       this.variablesLocal.putAll(variablesLocal);
     }
     return this;
@@ -113,9 +105,7 @@ public class CaseExecutionCommandBuilderImpl implements CaseExecutionCommandBuil
   public CaseExecutionCommandBuilder removeVariable(String variableName) {
     ensureNotNull(NotValidException.class, "variableName", variableName);
     ensureVariableShouldNotBeSet(variableName);
-    if (variableDeletions == null) {
-      variableDeletions = new ArrayList<String>();
-    }
+    ensureVariableDeletionsInitialized();
     variableDeletions.add(variableName);
     return this;
   }
@@ -123,9 +113,7 @@ public class CaseExecutionCommandBuilderImpl implements CaseExecutionCommandBuil
   public CaseExecutionCommandBuilder removeVariables(Collection<String> variableNames) {
     if (variableNames != null) {
       ensureVariablesShouldNotBeSet(variableNames);
-      if (variableDeletions == null) {
-        variableDeletions = new ArrayList<String>();
-      }
+      ensureVariableDeletionsInitialized();
       variableDeletions.addAll(variableNames);
     }
     return this;
@@ -134,9 +122,7 @@ public class CaseExecutionCommandBuilderImpl implements CaseExecutionCommandBuil
   public CaseExecutionCommandBuilder removeVariableLocal(String variableName) {
     ensureNotNull(NotValidException.class, "localVariableName", variableName);
     ensureVariableShouldNotBeSet(variableName);
-    if (variableLocalDeletions == null) {
-      variableLocalDeletions = new ArrayList<String>();
-    }
+    ensureVariableDeletionsLocalInitialized();
     variableLocalDeletions.add(variableName);
     return this;
   }
@@ -144,9 +130,7 @@ public class CaseExecutionCommandBuilderImpl implements CaseExecutionCommandBuil
   public CaseExecutionCommandBuilder removeVariablesLocal(Collection<String> variableNames) {
     if (variableNames != null) {
       ensureVariablesShouldNotBeSet(variableNames);
-      if (variableLocalDeletions == null) {
-        variableLocalDeletions = new ArrayList<String>();
-      }
+      ensureVariableDeletionsLocalInitialized();
       variableLocalDeletions.addAll(variableNames);
     }
     return this;
@@ -177,6 +161,31 @@ public class CaseExecutionCommandBuilderImpl implements CaseExecutionCommandBuil
       throw new NotValidException("Cannot set and remove a variable with the same variable name: '"+variableName+"' within a command.");
     }
   }
+
+  protected void ensureVariablesInitialized() {
+    if (this.variables == null) {
+      this.variables = new VariableMapImpl();
+    }
+  }
+
+  protected void ensureVariablesLocalInitialized() {
+    if (this.variablesLocal == null) {
+      this.variablesLocal = new VariableMapImpl();
+    }
+  }
+
+  protected void ensureVariableDeletionsInitialized() {
+    if (variableDeletions == null) {
+      variableDeletions = new ArrayList<String>();
+    }
+  }
+
+  protected void ensureVariableDeletionsLocalInitialized() {
+    if (variableLocalDeletions == null) {
+      variableLocalDeletions = new ArrayList<String>();
+    }
+  }
+
 
   public void execute() {
     CaseExecutionVariableCmd command = new CaseExecutionVariableCmd(this);

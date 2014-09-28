@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.impl.scripting;
 
 import javax.script.Bindings;
 import javax.script.ScriptEngine;
+
 import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.context.Context;
@@ -34,12 +35,12 @@ public abstract class DynamicExecutableScript extends ExecutableScript {
     this.scriptExpression = scriptExpression;
   }
 
-  public Object execute(ScriptEngine scriptEngine, VariableScope<?> variableScope, Bindings bindings) {
+  public Object execute(ScriptEngine scriptEngine, VariableScope variableScope, Bindings bindings) {
     ExecutableScript script = getScript(variableScope);
     return script.execute(scriptEngine, variableScope, bindings);
   }
 
-  public abstract ExecutableScript getScript(VariableScope<?> variableScope);
+  public abstract ExecutableScript getScript(VariableScope variableScope);
 
   protected ExecutableScript compileScript(String scriptSource) {
     return Context.getProcessEngineConfiguration()

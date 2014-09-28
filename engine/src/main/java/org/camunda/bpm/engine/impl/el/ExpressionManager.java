@@ -18,7 +18,7 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.delegate.VariableScope;
-import org.camunda.bpm.engine.impl.core.variable.CoreVariableScope;
+import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
 import org.camunda.bpm.engine.impl.javax.el.ArrayELResolver;
 import org.camunda.bpm.engine.impl.javax.el.BeanELResolver;
 import org.camunda.bpm.engine.impl.javax.el.CompositeELResolver;
@@ -80,29 +80,29 @@ public class ExpressionManager {
     this.expressionFactory = expressionFactory;
   }
 
-  public ELContext getElContext(VariableScope<?> variableScope) {
+  public ELContext getElContext(VariableScope variableScope) {
     ELContext elContext = null;
-    if (variableScope instanceof CoreVariableScope) {
-      CoreVariableScope<?> variableScopeImpl = (CoreVariableScope<?>) variableScope;
+    if (variableScope instanceof AbstractVariableScope) {
+      AbstractVariableScope variableScopeImpl = (AbstractVariableScope) variableScope;
       elContext = variableScopeImpl.getCachedElContext();
     }
 
     if (elContext==null) {
       elContext = createElContext(variableScope);
-      if (variableScope instanceof CoreVariableScope) {
-        ((CoreVariableScope<?>)variableScope).setCachedElContext(elContext);
+      if (variableScope instanceof AbstractVariableScope) {
+        ((AbstractVariableScope)variableScope).setCachedElContext(elContext);
       }
     }
 
     return elContext;
   }
 
-  protected ProcessEngineElContext createElContext(VariableScope<?> variableScope) {
+  protected ProcessEngineElContext createElContext(VariableScope variableScope) {
     ELResolver elResolver = createElResolver(variableScope);
     return new ProcessEngineElContext(functionMappers, elResolver);
   }
 
-  protected ELResolver createElResolver(VariableScope<?> variableScope) {
+  protected ELResolver createElResolver(VariableScope variableScope) {
     CompositeELResolver elResolver = new CompositeELResolver();
     elResolver.add(new VariableScopeElResolver(variableScope));
 

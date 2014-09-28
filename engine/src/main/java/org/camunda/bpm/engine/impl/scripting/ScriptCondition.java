@@ -13,12 +13,12 @@
 
 package org.camunda.bpm.engine.impl.scripting;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureInstanceOf;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.impl.Condition;
 import org.camunda.bpm.engine.impl.context.Context;
-
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureInstanceOf;
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 /**
  * A {@link Condition} which invokes a {@link ExecutableScript} when evaluated.

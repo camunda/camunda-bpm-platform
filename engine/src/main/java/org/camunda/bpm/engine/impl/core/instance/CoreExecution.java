@@ -19,7 +19,7 @@ import org.camunda.bpm.engine.delegate.BaseDelegateExecution;
 import org.camunda.bpm.engine.delegate.DelegateListener;
 import org.camunda.bpm.engine.impl.core.model.CoreModelElement;
 import org.camunda.bpm.engine.impl.core.operation.CoreAtomicOperation;
-import org.camunda.bpm.engine.impl.core.variable.CorePersistentVariableScope;
+import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
 
 /**
  * Defines the base API for the execution of an activity.
@@ -29,7 +29,7 @@ import org.camunda.bpm.engine.impl.core.variable.CorePersistentVariableScope;
  * @author Sebastian Menski
  *
  */
-public abstract class CoreExecution extends CorePersistentVariableScope implements BaseDelegateExecution {
+public abstract class CoreExecution extends AbstractVariableScope implements BaseDelegateExecution {
 
   private static final long serialVersionUID = 1L;
 

@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
+
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.camunda.bpm.engine.ProcessEngine;
@@ -26,6 +27,7 @@ import org.camunda.bpm.engine.rest.dto.converter.BooleanConverter;
 import org.camunda.bpm.engine.rest.dto.converter.DateConverter;
 import org.camunda.bpm.engine.rest.dto.converter.StringListConverter;
 import org.camunda.bpm.engine.rest.dto.converter.StringSetConverter;
+import org.codehaus.jackson.map.ObjectMapper;
 
 public class HistoricCaseInstanceQueryDto extends AbstractQueryDto<HistoricCaseInstanceQuery> {
 
@@ -75,8 +77,8 @@ public class HistoricCaseInstanceQueryDto extends AbstractQueryDto<HistoricCaseI
 
   public HistoricCaseInstanceQueryDto() {}
 
-  public HistoricCaseInstanceQueryDto(MultivaluedMap<String, String> queryParameters) {
-    super(queryParameters);
+  public HistoricCaseInstanceQueryDto(ObjectMapper objectMapper, MultivaluedMap<String, String> queryParameters) {
+    super(objectMapper, queryParameters);
   }
 
   @CamundaQueryParam("caseInstanceId")

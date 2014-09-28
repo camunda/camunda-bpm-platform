@@ -21,7 +21,7 @@
   <!-- HISTORIC PROCESS VARIABLE INSERT -->
   
   <insert id="insertHistoricVariableInstance" parameterType="org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEntity">
-    insert into ${prefix}ACT_HI_VARINST (ID_, PROC_INST_ID_, EXECUTION_ID_, ACT_INST_ID_, TASK_ID_, NAME_, REV_, VAR_TYPE_, BYTEARRAY_ID_, DOUBLE_, LONG_ , TEXT_, TEXT2_, DATA_FORMAT_ID_)
+    insert into ${prefix}ACT_HI_VARINST (ID_, PROC_INST_ID_, EXECUTION_ID_, ACT_INST_ID_, TASK_ID_, NAME_, REV_, VAR_TYPE_, BYTEARRAY_ID_, DOUBLE_, LONG_ , TEXT_, TEXT2_)
     values (
       #{id, jdbcType=VARCHAR},
       #{processInstanceId, jdbcType=VARCHAR},
@@ -30,13 +30,12 @@
       #{taskId, jdbcType=VARCHAR},
       #{variableName, jdbcType=VARCHAR},
       #{revision, jdbcType=VARCHAR},
-      #{variableTypeName, jdbcType=VARCHAR},
+      #{serializerName, jdbcType=VARCHAR},
       #{byteArrayId, jdbcType=VARCHAR},
       #{doubleValue, jdbcType=DOUBLE},
       #{longValue, jdbcType=BIGINT},
       #{textValue, jdbcType=VARCHAR},
-      #{textValue2, jdbcType=VARCHAR},
-      #{dataFormatId, jdbcType=VARCHAR}
+      #{textValue2, jdbcType=VARCHAR}
     )
   </insert>
 
@@ -45,13 +44,12 @@
   <update id="updateHistoricVariableInstance" parameterType="org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEntity">
     update ${prefix}ACT_HI_VARINST set
       REV_ = #{revisionNext, jdbcType=INTEGER},
-      VAR_TYPE_ = #{variableTypeName, jdbcType=VARCHAR},
+      VAR_TYPE_ = #{serializerName, jdbcType=VARCHAR},
       BYTEARRAY_ID_ = #{byteArrayId, jdbcType=VARCHAR},
       DOUBLE_ = #{doubleValue, jdbcType=DOUBLE},
       LONG_ = #{longValue, jdbcType=BIGINT},
       TEXT_ = #{textValue, jdbcType=VARCHAR},
-      TEXT2_ = #{textValue2, jdbcType=VARCHAR},
-      DATA_FORMAT_ID_ = #{dataFormatId, jdbcType=VARCHAR}
+      TEXT2_ = #{textValue2, jdbcType=VARCHAR}
     where ID_ = #{id, jdbcType=VARCHAR}
       and REV_ = #{revision, jdbcType=INTEGER}
   </update>
@@ -75,14 +73,12 @@
     <result property="taskId" column="TASK_ID_" jdbcType="VARCHAR" />
     <result property="name" column="NAME_" javaType="String" jdbcType="VARCHAR" />
     <result property="revision" column="REV_" jdbcType="INTEGER" />
-    <result property="variableTypeName" column="VAR_TYPE_" jdbcType="VARCHAR"/>
-    <result property="variableType" column="VAR_TYPE_" javaType="org.camunda.bpm.engine.impl.variable.VariableType" jdbcType="VARCHAR"/>
+    <result property="serializerName" column="VAR_TYPE_" jdbcType="VARCHAR"/>
     <result property="byteArrayId" column="BYTEARRAY_ID_" jdbcType="VARCHAR" />
     <result property="doubleValue" column="DOUBLE_" jdbcType="DOUBLE" />
     <result property="textValue" column="TEXT_" jdbcType="VARCHAR" />
     <result property="textValue2" column="TEXT2_" jdbcType="VARCHAR" />
     <result property="longValue" column="LONG_" jdbcType="BIGINT" />
-    <result property="dataFormatId" column="DATA_FORMAT_ID_" jdbcType="VARCHAR" />
   </resultMap>
   
   <resultMap id="historicProcessVariableResultMap_postgres" type="org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEntity">
@@ -93,14 +89,12 @@
     <result property="taskId" column="TASK_ID_" jdbcType="VARCHAR" />
     <result property="name" column="NAME_" javaType="String" jdbcType="VARCHAR" />
     <result property="revision" column="REV_" jdbcType="INTEGER" />
-    <result property="variableTypeName" column="VAR_TYPE_" jdbcType="VARCHAR"/>
-    <result property="variableType" column="VAR_TYPE_" javaType="org.camunda.bpm.engine.impl.variable.VariableType" jdbcType="VARCHAR"/>
+    <result property="serializerName" column="VAR_TYPE_" jdbcType="VARCHAR"/>
     <result property="byteArrayId" column="BYTEARRAY_ID_" jdbcType="VARCHAR" />
     <result property="doubleValue" column="DOUBLE_" jdbcType="DOUBLE" />
     <result property="textValue" column="TEXT_" jdbcType="VARCHAR" />
     <result property="textValue2" column="TEXT2_" jdbcType="VARCHAR" />
     <result property="longValue" column="LONG_" jdbcType="BIGINT" />
-    <result property="dataFormatId" column="DATA_FORMAT_ID_" jdbcType="VARCHAR" />
   </resultMap>
   
   <!-- HISTORIC VARIABLE SELECT -->

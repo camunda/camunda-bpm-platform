@@ -43,7 +43,7 @@ public class DelegateExpressionTaskListener implements TaskListener {
     // Note: we can't cache the result of the expression, because the
     // execution can change: eg. delegateExpression='${mySpringBeanFactory.randomSpringBean()}'
 
-    VariableScope<?> variableScope = delegateTask.getExecution();
+    VariableScope variableScope = delegateTask.getExecution();
     if (variableScope == null) {
       variableScope = delegateTask.getCaseExecution();
     }

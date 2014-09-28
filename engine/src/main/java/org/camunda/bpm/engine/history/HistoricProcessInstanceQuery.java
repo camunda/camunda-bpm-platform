@@ -87,7 +87,7 @@ public interface HistoricProcessInstanceQuery extends Query<HistoricProcessInsta
    * greater than the passed value. The type only applies to already ended
    * process instances, otherwise use a {@link ProcessInstanceQuery} instead! of
    * variable is determined based on the value, using types configured in
-   * {@link ProcessEngineConfiguration#getVariableTypes()}. Byte-arrays and
+   * {@link ProcessEngineConfiguration#getVariableSerializers()}. Byte-arrays and
    * {@link Serializable} objects (which are not primitive type wrappers) are
    * not supported.
    * @param name of the variable, cannot be null. */

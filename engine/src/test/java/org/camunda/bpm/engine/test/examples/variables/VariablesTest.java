@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.engine.test.examples.variables;
 
+import static org.camunda.bpm.engine.variable.Variables.*;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -20,14 +22,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.camunda.bpm.engine.delegate.ProcessEngineVariableType;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.impl.variable.serializer.JavaObjectSerializer;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.runtime.VariableInstanceQuery;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.history.SerializableVariable;
+import org.camunda.bpm.engine.variable.VariableMap;
+import org.camunda.bpm.engine.variable.type.ValueType;
+import org.camunda.spin.DataFormats;
 
 /**
  * @author Tom Baeyens
@@ -145,15 +150,15 @@ public class VariablesTest extends PluggableProcessEngineTestCase {
     VariableInstanceQuery query = runtimeService.createVariableInstanceQuery().variableName("aVariable");
 
     VariableInstance variable = query.singleResult();
-    assertEquals(ProcessEngineVariableType.INTEGER.getName(), variable.getTypeName());
+    assertEquals(ValueType.INTEGER.getName(), variable.getTypeName());
 
     runtimeService.setVariable(pi.getId(), "aVariable", 1234L);
     variable = query.singleResult();
-    assertEquals(ProcessEngineVariableType.LONG.getName(), variable.getTypeName());
+    assertEquals(ValueType.LONG.getName(), variable.getTypeName());
 
     runtimeService.setVariable(pi.getId(), "aVariable", (short)1234);
     variable = query.singleResult();
-    assertEquals(ProcessEngineVariableType.SHORT.getName(), variable.getTypeName());
+    assertEquals(ValueType.SHORT.getName(), variable.getTypeName());
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/examples/variables/VariablesTest.testBasicVariableOperations.bpmn20.xml"})
@@ -166,11 +171,11 @@ public class VariablesTest extends PluggableProcessEngineTestCase {
     VariableInstanceQuery query = runtimeService.createVariableInstanceQuery().variableName("aVariable");
 
     VariableInstance variable = query.singleResult();
-    assertEquals(ProcessEngineVariableType.SERIALIZABLE.getName(), variable.getTypeName());
+    assertEquals(ValueType.OBJECT.getName(), variable.getTypeName());
 
     runtimeService.setVariable(pi.getId(), "aVariable", null);
     variable = query.singleResult();
-    assertEquals(ProcessEngineVariableType.NULL.getName(), variable.getTypeName());
+    assertEquals(ValueType.NULL.getName(), variable.getTypeName());
 
   }
 
@@ -195,18 +200,22 @@ public class VariablesTest extends PluggableProcessEngineTestCase {
     VariableInstanceQuery query = runtimeService.createVariableInstanceQuery().variableName("aVariable");
 
     VariableInstance variable = query.singleResult();
-    assertEquals(ProcessEngineVariableType.STRING.getName(), variable.getTypeName());
+    assertEquals(ValueType.STRING.getName(), variable.getTypeName());
 
     runtimeService.setVariable(processInstance.getId(), "aVariable", new SerializableVariable("foo"));
     variable = query.singleResult();
-    assertEquals(ProcessEngineVariableType.SERIALIZABLE.getName(), variable.getTypeName());
+    assertEquals(ValueType.OBJECT.getName(), variable.getTypeName());
 
   }
 
   @Deployment
   public void testGetVariableInstancesFromVariableScope() {
-    Map<String, Object> variables = new HashMap<String, Object>();
-    variables.put("anIntegerVariable", 1234);
+
+    VariableMap variables = createVariables()
+      .putValue("anIntegerVariable", 1234)
+      .putValue("anObjectValue", objectValue(new SimpleSerializableBean(10)).serializationDataFormat(JavaObjectSerializer.SERIALIZATION_DATA_FORMAT))
+      .putValue("anObjectValueJson", objectValue(new SimpleSerializableBean(20)).serializationDataFormat(DataFormats.json().getName()))
+      .putValue("anUntypedObjectValue", new SimpleSerializableBean(30));
 
     runtimeService.startProcessInstanceByKey("testProcess", variables);
 

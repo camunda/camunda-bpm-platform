@@ -24,7 +24,7 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.el.util.TestVariableScope;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
-import org.camunda.spin.xml.tree.SpinXmlTreeElement;
+import org.camunda.spin.xml.SpinXmlElement;
 
 /**
  * <p>Testcase ensuring integration of camunda Spin into Process Engine expression language.</p>
@@ -54,14 +54,14 @@ public class SpinElSupportTest extends PluggableProcessEngineTestCase {
 
   public void testSpin_S_Available() {
 
-    SpinXmlTreeElement spinXmlEl = executeExpression("${ S('" + xmlString + "') }");
+    SpinXmlElement spinXmlEl = executeExpression("${ S('" + xmlString + "') }");
     assertNotNull(spinXmlEl);
     assertEquals("elementName", spinXmlEl.name());
   }
 
   public void testSpin_XML_Available() {
 
-    SpinXmlTreeElement spinXmlEl = executeExpression("${ XML('" + xmlString + "') }");
+    SpinXmlElement spinXmlEl = executeExpression("${ XML('" + xmlString + "') }");
     assertNotNull(spinXmlEl);
     assertEquals("elementName", spinXmlEl.name());
   }

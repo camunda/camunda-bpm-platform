@@ -13,12 +13,12 @@
 
 package org.camunda.bpm.engine.impl.el;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureInstanceOf;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.impl.Condition;
-
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureInstanceOf;
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 
 /**

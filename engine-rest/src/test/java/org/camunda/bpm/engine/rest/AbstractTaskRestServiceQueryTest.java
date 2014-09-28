@@ -83,7 +83,8 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
       .header("accept", MediaType.APPLICATION_JSON)
       .expect().statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
       .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
-      .body("message", equalTo("Cannot set query parameter 'due' to value 'anInvalidDate'"))
+      .body("message", equalTo("Cannot set query parameter 'due' to value 'anInvalidDate': "
+          + "Cannot convert value \"anInvalidDate\" to java type java.util.Date"))
       .when().get(TASK_QUERY_URL);
   }
 

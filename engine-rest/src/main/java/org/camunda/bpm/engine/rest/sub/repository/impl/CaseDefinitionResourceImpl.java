@@ -15,8 +15,6 @@ package org.camunda.bpm.engine.rest.sub.repository.impl;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
-import java.text.ParseException;
-import java.util.Map;
 
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.Response.Status;
@@ -32,6 +30,7 @@ import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.rest.CaseInstanceRestService;
+import org.camunda.bpm.engine.rest.dto.VariableValueDto;
 import org.camunda.bpm.engine.rest.dto.repository.CaseDefinitionDiagramDto;
 import org.camunda.bpm.engine.rest.dto.repository.CaseDefinitionDto;
 import org.camunda.bpm.engine.rest.dto.runtime.CaseInstanceDto;
@@ -39,8 +38,9 @@ import org.camunda.bpm.engine.rest.dto.runtime.CreateCaseInstanceDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.sub.repository.CaseDefinitionResource;
-import org.camunda.bpm.engine.rest.util.DtoUtil;
 import org.camunda.bpm.engine.runtime.CaseInstance;
+import org.camunda.bpm.engine.variable.VariableMap;
+import org.codehaus.jackson.map.ObjectMapper;
 
 /**
  *
@@ -49,14 +49,16 @@ import org.camunda.bpm.engine.runtime.CaseInstance;
  */
 public class CaseDefinitionResourceImpl implements CaseDefinitionResource {
 
-  private ProcessEngine engine;
-  private String caseDefinitionId;
+  protected ProcessEngine engine;
+  protected String caseDefinitionId;
   protected String rootResourcePath;
+  protected ObjectMapper objectMapper;
 
-  public CaseDefinitionResourceImpl(ProcessEngine engine, String caseDefinitionId, String rootResourcePath) {
+  public CaseDefinitionResourceImpl(ProcessEngine engine, String caseDefinitionId, String rootResourcePath, ObjectMapper objectMapper) {
     this.engine = engine;
     this.caseDefinitionId = caseDefinitionId;
     this.rootResourcePath = rootResourcePath;
+    this.objectMapper = objectMapper;
   }
 
   @Override
@@ -115,13 +117,17 @@ public class CaseDefinitionResourceImpl implements CaseDefinitionResource {
     try {
 
       String businessKey = parameters.getBusinessKey();
-      Map<String, Object> variables = DtoUtil.toMap(parameters.getVariables());
+      VariableMap variables = VariableValueDto.toMap(parameters.getVariables(), engine, objectMapper);
 
       instance = caseService
           .withCaseDefinition(caseDefinitionId)
           .businessKey(businessKey)
           .setVariables(variables)
           .create();
+
+    } catch (RestException e) {
+      String errorMessage = String.format("Cannot instantiate case definition %s: %s", caseDefinitionId, e.getMessage());
+      throw new InvalidRequestException(e.getStatus(), e, errorMessage);
 
     } catch (NotFoundException e) {
       String errorMessage = String.format("Cannot instantiate case definition %s: %s", caseDefinitionId, e.getMessage());
@@ -139,17 +145,6 @@ public class CaseDefinitionResourceImpl implements CaseDefinitionResource {
       String errorMessage = String.format("Cannot instantiate case definition %s: %s", caseDefinitionId, e.getMessage());
       throw new RestException(Status.INTERNAL_SERVER_ERROR, e, errorMessage);
 
-    } catch (NumberFormatException e) {
-      String errorMessage = String.format("Cannot instantiate case definition %s due to number format exception: %s", caseDefinitionId, e.getMessage());
-      throw new RestException(Status.BAD_REQUEST, e, errorMessage);
-
-    } catch (ParseException e) {
-      String errorMessage = String.format("Cannot instantiate case definition %s due to parse exception: %s", caseDefinitionId, e.getMessage());
-      throw new RestException(Status.BAD_REQUEST, e, errorMessage);
-
-    } catch (IllegalArgumentException e) {
-      String errorMessage = String.format("Cannot instantiate case definition %s: %s", caseDefinitionId, e.getMessage());
-      throw new RestException(Status.BAD_REQUEST, errorMessage);
     }
 
     CaseInstanceDto result = CaseInstanceDto.fromCaseInstance(instance);

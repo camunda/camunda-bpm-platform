@@ -28,7 +28,7 @@ public class HistoricVariableUpdateEventEntity extends HistoricDetailEventEntity
   protected String variableInstanceId;
   protected String scopeActivityInstanceId;
 
-  protected String variableTypeName;
+  protected String serializerName;
 
   protected Long longValue;
   protected Double doubleValue;
@@ -38,21 +38,19 @@ public class HistoricVariableUpdateEventEntity extends HistoricDetailEventEntity
 
   protected String byteArrayId;
 
-  protected String dataFormatId;
-
   // getter / setters ////////////////////////////
 
-  public String getVariableTypeName() {
-    return variableTypeName;
+  public String getSerializerName() {
+    return serializerName;
+  }
+  public void setSerializerName(String serializerName) {
+    this.serializerName = serializerName;
   }
   public String getVariableName() {
     return variableName;
   }
   public void setVariableName(String variableName) {
     this.variableName = variableName;
-  }
-  public void setVariableTypeName(String variableTypeName) {
-    this.variableTypeName = variableTypeName;
   }
   public Long getLongValue() {
     return longValue;
@@ -84,13 +82,6 @@ public class HistoricVariableUpdateEventEntity extends HistoricDetailEventEntity
   public void setByteValue(byte[] byteValue) {
     this.byteValue = byteValue;
   }
-  public String getDataFormatId() {
-    return dataFormatId;
-  }
-  public void setDataFormatId(String dataFormatId) {
-    this.dataFormatId = dataFormatId;
-  }
-
   public int getRevision() {
     return revision;
   }
@@ -122,7 +113,7 @@ public class HistoricVariableUpdateEventEntity extends HistoricDetailEventEntity
            + "[variableName=" + variableName
            + ", variableInstanceId=" + variableInstanceId
            + ", revision=" + revision
-           + ", variableTypeName=" + variableTypeName
+           + ", serializerName=" + serializerName
            + ", longValue=" + longValue
            + ", doubleValue=" + doubleValue
            + ", textValue=" + textValue
@@ -137,7 +128,6 @@ public class HistoricVariableUpdateEventEntity extends HistoricDetailEventEntity
            + ", processInstanceId=" + processInstanceId
            + ", taskId=" + taskId
            + ", timestamp=" + timestamp
-           + ", dataFormatId=" + dataFormatId
            + "]";
   }
 

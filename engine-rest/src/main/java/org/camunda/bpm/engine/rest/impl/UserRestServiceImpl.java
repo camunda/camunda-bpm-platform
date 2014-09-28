@@ -37,6 +37,7 @@ import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.sub.identity.UserResource;
 import org.camunda.bpm.engine.rest.sub.identity.impl.UserResourceImpl;
 import org.camunda.bpm.engine.rest.util.PathUtil;
+import org.codehaus.jackson.map.ObjectMapper;
 
 /**
  * @author Daniel Meyer
@@ -48,22 +49,23 @@ public class UserRestServiceImpl extends AbstractAuthorizedRestResource implemen
     super(USER, ANY);
   }
 
-  public UserRestServiceImpl(String engineName) {
-    super(engineName, USER, ANY);
+  public UserRestServiceImpl(String engineName, ObjectMapper objectMapper) {
+    super(engineName, USER, ANY, objectMapper);
   }
 
   public UserResource getUser(String id) {
     id = PathUtil.decodePathParam(id);
-    return new UserResourceImpl(getProcessEngine().getName(), id, relativeRootResourcePath);
+    return new UserResourceImpl(getProcessEngine().getName(), id, relativeRootResourcePath, getObjectMapper());
   }
 
   public List<UserProfileDto> queryUsers(UriInfo uriInfo, Integer firstResult, Integer maxResults) {
-    UserQueryDto queryDto = new UserQueryDto(uriInfo.getQueryParameters());
+    UserQueryDto queryDto = new UserQueryDto(getObjectMapper(), uriInfo.getQueryParameters());
     return queryUsers(queryDto, firstResult, maxResults);
   }
 
   public List<UserProfileDto> queryUsers(UserQueryDto queryDto, Integer firstResult, Integer maxResults) {
 
+    queryDto.setObjectMapper(getObjectMapper());
     UserQuery query = queryDto.toQuery(getProcessEngine());
 
     List<User> resultList;
@@ -78,7 +80,7 @@ public class UserRestServiceImpl extends AbstractAuthorizedRestResource implemen
 
 
   public CountResultDto getUserCount(UriInfo uriInfo) {
-    UserQueryDto queryDto = new UserQueryDto(uriInfo.getQueryParameters());
+    UserQueryDto queryDto = new UserQueryDto(getObjectMapper(), uriInfo.getQueryParameters());
     return getUserCount(queryDto);
   }
 

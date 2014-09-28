@@ -20,8 +20,9 @@ import javax.sql.DataSource;
 import org.camunda.bpm.engine.impl.cfg.BeansConfigurationHelper;
 import org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.cfg.StandaloneProcessEngineConfiguration;
-import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
+import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
+import org.camunda.bpm.engine.variable.type.ValueTypeResolver;
 
 
 /** Configuration information from which a process engine can be build.
@@ -172,9 +173,9 @@ public abstract class ProcessEngineConfiguration {
    */
   protected boolean authorizationEnabled = false;
 
-  /**
-   * use one of the static createXxxx methods instead
-   */
+  protected ValueTypeResolver valueTypeResolver;
+
+  /** use one of the static createXxxx methods instead */
   protected ProcessEngineConfiguration() {
   }
 
@@ -541,6 +542,15 @@ public abstract class ProcessEngineConfiguration {
 
   public void setDefaultNumberOfRetries(int defaultNumberOfRetries) {
     this.defaultNumberOfRetries = defaultNumberOfRetries;
+  }
+
+  public ValueTypeResolver getValueTypeResolver() {
+    return valueTypeResolver;
+  }
+
+  public ProcessEngineConfiguration setValueTypeResolver(ValueTypeResolver valueTypeResolver) {
+    this.valueTypeResolver = valueTypeResolver;
+    return this;
   }
 
 }

@@ -18,8 +18,10 @@ import org.camunda.bpm.engine.rest.dto.AbstractQueryDto;
 import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
 import org.camunda.bpm.engine.rest.dto.converter.BooleanConverter;
 import org.camunda.bpm.engine.rest.dto.converter.IntegerConverter;
+import org.codehaus.jackson.map.ObjectMapper;
 
 import javax.ws.rs.core.MultivaluedMap;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -66,8 +68,8 @@ public class CaseDefinitionQueryDto extends AbstractQueryDto<CaseDefinitionQuery
 
   public CaseDefinitionQueryDto() {}
 
-  public CaseDefinitionQueryDto(MultivaluedMap<String, String> queryParameters) {
-    super(queryParameters);
+  public CaseDefinitionQueryDto(ObjectMapper objectMapper, MultivaluedMap<String, String> queryParameters) {
+    super(objectMapper, queryParameters);
   }
 
   @CamundaQueryParam("caseDefinitionId")

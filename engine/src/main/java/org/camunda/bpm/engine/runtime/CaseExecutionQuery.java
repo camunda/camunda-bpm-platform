@@ -100,7 +100,7 @@ public interface CaseExecutionQuery extends Query<CaseExecutionQuery, CaseExecut
   /**
    * Only select case executions which have a local variable with the given value. The type
    * of variable is determined based on the value, using types configured in
-   * {@link ProcessEngineConfigurationImpl#getVariableTypes()}.
+   * {@link ProcessEngineConfigurationImpl#getVariableSerializers()}.
    *
    * Byte-arrays and {@link Serializable} objects (which are not primitive type wrappers)
    * are not supported.
@@ -204,7 +204,7 @@ public interface CaseExecutionQuery extends Query<CaseExecutionQuery, CaseExecut
   /**
    * Only select case executions which are part of a case instance that have a variable
    * with the given name set to the given value. The type of variable is determined based
-   * on the value, using types configured in {@link ProcessEngineConfiguration#getVariableTypes()}.
+   * on the value, using types configured in {@link ProcessEngineConfiguration#getVariableSerializers()}.
    *
    * Byte-arrays and {@link Serializable} objects (which are not primitive type wrappers)
    * are not supported.

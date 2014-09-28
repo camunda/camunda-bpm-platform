@@ -55,7 +55,8 @@ public interface VariableInstanceRestService {
   @Produces(MediaType.APPLICATION_JSON)
   List<VariableInstanceDto> getVariableInstances(@Context UriInfo uriInfo,
       @QueryParam("firstResult") Integer firstResult,
-      @QueryParam("maxResults") Integer maxResults);
+      @QueryParam("maxResults") Integer maxResults,
+      @QueryParam("deserializeObjectValues") boolean deserializeObjectValues);
 
   /**
    * Expects the same parameters as
@@ -72,7 +73,8 @@ public interface VariableInstanceRestService {
   @Produces(MediaType.APPLICATION_JSON)
   List<VariableInstanceDto> queryVariableInstances(VariableInstanceQueryDto queryDto,
       @QueryParam("firstResult") Integer firstResult,
-      @QueryParam("maxResults") Integer maxResults);
+      @QueryParam("maxResults") Integer maxResults,
+      @QueryParam("deserializeObjectValues") boolean deserializeObjectValues);
 
   @GET
   @Path("/count")

@@ -22,6 +22,7 @@ import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.filter.FilterQuery;
 import org.camunda.bpm.engine.rest.dto.AbstractQueryDto;
 import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
+import org.codehaus.jackson.map.ObjectMapper;
 
 /**
  * @author Sebastian Menski
@@ -52,8 +53,8 @@ public class FilterQueryDto extends AbstractQueryDto<FilterQuery> {
 
   }
 
-  public FilterQueryDto(MultivaluedMap<String, String> queryParameters) {
-    super(queryParameters);
+  public FilterQueryDto(ObjectMapper objectMapper, MultivaluedMap<String, String> queryParameters) {
+    super(objectMapper, queryParameters);
   }
 
   @CamundaQueryParam("filterId")

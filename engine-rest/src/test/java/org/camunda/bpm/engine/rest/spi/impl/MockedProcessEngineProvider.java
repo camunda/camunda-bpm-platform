@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.rest.spi.impl;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mockito.Matchers.eq;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -27,11 +28,14 @@ import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.impl.variable.ValueTypeResolverImpl;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.camunda.bpm.engine.rest.spi.ProcessEngineProvider;
+import org.camunda.bpm.engine.variable.type.ValueTypeResolver;
 
 public class MockedProcessEngineProvider implements ProcessEngineProvider {
 
@@ -47,6 +51,7 @@ public class MockedProcessEngineProvider implements ProcessEngineProvider {
     ProcessEngine engine = mock(ProcessEngine.class);
     when(engine.getName()).thenReturn(engineName);
     mockServices(engine);
+    mockProcessEngineConfiguration(engine);
     return engine;
   }
 
@@ -70,6 +75,17 @@ public class MockedProcessEngineProvider implements ProcessEngineProvider {
     when(engine.getManagementService()).thenReturn(managementService);
     when(engine.getCaseService()).thenReturn(caseService);
     when(engine.getFilterService()).thenReturn(filterService);
+  }
+
+  protected void mockProcessEngineConfiguration(ProcessEngine engine) {
+    ProcessEngineConfiguration configuration = mock(ProcessEngineConfiguration.class);
+    when(configuration.getValueTypeResolver()).thenReturn(mockValueTypeResolver());
+    when(engine.getProcessEngineConfiguration()).thenReturn(configuration);
+  }
+
+  protected ValueTypeResolver mockValueTypeResolver() {
+    // no true mock here, but the impl class is a simple container and should be safe to use
+    return new ValueTypeResolverImpl();
   }
 
   @Override

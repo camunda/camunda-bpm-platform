@@ -20,9 +20,9 @@ import org.camunda.bpm.engine.impl.cmmn.behavior.CallableElement.CallableElement
 import org.camunda.bpm.engine.impl.cmmn.behavior.CallableElementParameter;
 import org.camunda.bpm.engine.impl.cmmn.behavior.ProcessOrCaseTaskActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
-import org.camunda.bpm.engine.impl.core.mapping.value.ConstantValueProvider;
-import org.camunda.bpm.engine.impl.core.mapping.value.NullValueProvider;
-import org.camunda.bpm.engine.impl.core.mapping.value.ParameterValueProvider;
+import org.camunda.bpm.engine.impl.core.variable.mapping.value.ConstantValueProvider;
+import org.camunda.bpm.engine.impl.core.variable.mapping.value.NullValueProvider;
+import org.camunda.bpm.engine.impl.core.variable.mapping.value.ParameterValueProvider;
 import org.camunda.bpm.engine.impl.el.ElValueProvider;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
 import org.camunda.bpm.engine.impl.util.StringUtil;

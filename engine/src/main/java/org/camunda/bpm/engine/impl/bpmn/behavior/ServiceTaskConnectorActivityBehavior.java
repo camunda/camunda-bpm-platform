@@ -19,8 +19,8 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.connector.ConnectorVariableScope;
 import org.camunda.bpm.engine.impl.connector.Connectors;
 import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.core.mapping.IoMapping;
-import org.camunda.bpm.engine.impl.core.variable.CoreVariableScope;
+import org.camunda.bpm.engine.impl.core.variable.mapping.IoMapping;
+import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 
 /**
@@ -50,8 +50,8 @@ public class ServiceTaskConnectorActivityBehavior extends TaskActivityBehavior {
     ConnectorRequest<? extends ConnectorResponse> request = connectorInstance.createRequest();
 
     // create a variable scopes for the connector
-    ConnectorVariableScope connectorInputVariableScope = new ConnectorVariableScope((CoreVariableScope) execution);
-    ConnectorVariableScope connectorOuputVariableScope = new ConnectorVariableScope((CoreVariableScope) execution);
+    ConnectorVariableScope connectorInputVariableScope = new ConnectorVariableScope((AbstractVariableScope) execution);
+    ConnectorVariableScope connectorOuputVariableScope = new ConnectorVariableScope((AbstractVariableScope) execution);
 
     // TODO: make this non-optional?
     if(ioMapping != null) {

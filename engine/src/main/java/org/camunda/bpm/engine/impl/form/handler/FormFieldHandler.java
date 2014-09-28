@@ -47,7 +47,7 @@ public class FormFieldHandler {
     formField.setId(id);
 
     // set label (evaluate expression)
-    VariableScope<?> variableScope = executionEntity != null ? executionEntity : StartProcessVariableScope.getSharedInstance();
+    VariableScope variableScope = executionEntity != null ? executionEntity : StartProcessVariableScope.getSharedInstance();
     Object labelValueObject = label.getValue(variableScope);
     if(labelValueObject != null) {
       formField.setLabel(labelValueObject.toString());

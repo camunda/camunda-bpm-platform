@@ -12,7 +12,6 @@
  */
 package org.camunda.bpm.engine.rest.sub.task.impl;
 
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -24,7 +23,7 @@ import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.form.FormData;
-import org.camunda.bpm.engine.rest.dto.FormVariablesDto;
+import org.camunda.bpm.engine.rest.dto.VariableValueDto;
 import org.camunda.bpm.engine.rest.dto.converter.StringListConverter;
 import org.camunda.bpm.engine.rest.dto.task.CompleteTaskDto;
 import org.camunda.bpm.engine.rest.dto.task.FormDto;
@@ -39,21 +38,23 @@ import org.camunda.bpm.engine.rest.sub.task.TaskAttachmentResource;
 import org.camunda.bpm.engine.rest.sub.task.TaskCommentResource;
 import org.camunda.bpm.engine.rest.sub.task.TaskResource;
 import org.camunda.bpm.engine.rest.util.ApplicationContextPathUtil;
-import org.camunda.bpm.engine.rest.util.DtoUtil;
-import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.task.IdentityLink;
 import org.camunda.bpm.engine.task.Task;
+import org.camunda.bpm.engine.variable.VariableMap;
+import org.codehaus.jackson.map.ObjectMapper;
 
 public class TaskResourceImpl implements TaskResource {
 
-  private ProcessEngine engine;
-  private String taskId;
-  private String rootResourcePath;
+  protected ProcessEngine engine;
+  protected String taskId;
+  protected String rootResourcePath;
+  protected ObjectMapper objectMapper;
 
-  public TaskResourceImpl(ProcessEngine engine, String taskId, String rootResourcePath) {
+  public TaskResourceImpl(ProcessEngine engine, String taskId, String rootResourcePath, ObjectMapper objectMapper) {
     this.engine = engine;
     this.taskId = taskId;
     this.rootResourcePath = rootResourcePath;
+    this.objectMapper = objectMapper;
   }
 
   @Override
@@ -73,20 +74,12 @@ public class TaskResourceImpl implements TaskResource {
     TaskService taskService = engine.getTaskService();
 
     try {
-      Map<String, Object> variables = DtoUtil.toMap(dto.getVariables());
+      VariableMap variables = VariableValueDto.toMap(dto.getVariables(), engine, objectMapper);
       taskService.complete(taskId, variables);
 
-    } catch (NumberFormatException e) {
-      String errorMessage = String.format("Cannot complete task %s due to number format exception: %s", taskId, e.getMessage());
-      throw new RestException(Status.BAD_REQUEST, e, errorMessage);
-
-    } catch (ParseException e) {
-      String errorMessage = String.format("Cannot complete task %s due to parse exception: %s", taskId, e.getMessage());
-      throw new RestException(Status.BAD_REQUEST, e, errorMessage);
-
-    } catch (IllegalArgumentException e) {
+    } catch (RestException e) {
       String errorMessage = String.format("Cannot complete task %s: %s", taskId, e.getMessage());
-      throw new RestException(Status.BAD_REQUEST, errorMessage);
+      throw new InvalidRequestException(e.getStatus(), e, errorMessage);
 
     } catch (ProcessEngineException e) {
       String errorMessage = String.format("Cannot complete task %s: %s", taskId, e.getMessage());
@@ -98,20 +91,12 @@ public class TaskResourceImpl implements TaskResource {
     FormService formService = engine.getFormService();
 
     try {
-      Map<String, Object> variables = DtoUtil.toMap(dto.getVariables());
+      VariableMap variables = VariableValueDto.toMap(dto.getVariables(), engine, objectMapper);
       formService.submitTaskForm(taskId, variables);
 
-    } catch (NumberFormatException e) {
-      String errorMessage = String.format("Cannot submit task form %s due to number format exception: %s", taskId, e.getMessage());
-      throw new RestException(Status.BAD_REQUEST, e, errorMessage);
-
-    } catch (ParseException e) {
-      String errorMessage = String.format("Cannot submit task form %s due to parse exception: %s", taskId, e.getMessage());
-      throw new RestException(Status.BAD_REQUEST, e, errorMessage);
-
-    } catch (IllegalArgumentException e) {
+    } catch (RestException e) {
       String errorMessage = String.format("Cannot submit task form %s: %s", taskId, e.getMessage());
-      throw new RestException(Status.BAD_REQUEST, errorMessage);
+      throw new InvalidRequestException(e.getStatus(), e, errorMessage);
 
     } catch (ProcessEngineException e) {
       String errorMessage = String.format("Cannot submit task form %s: %s", taskId, e.getMessage());
@@ -184,20 +169,13 @@ public class TaskResourceImpl implements TaskResource {
     TaskService taskService = engine.getTaskService();
 
     try {
-      Map<String, Object> variables = DtoUtil.toMap(dto.getVariables());
+      VariableMap variables = VariableValueDto.toMap(dto.getVariables(), engine, objectMapper);
       taskService.resolveTask(taskId, variables);
 
-    } catch (NumberFormatException e) {
-      String errorMessage = String.format("Cannot resolve task %s due to number format exception: %s", taskId, e.getMessage());
-      throw new RestException(Status.BAD_REQUEST, e, errorMessage);
-
-    } catch (ParseException e) {
-      String errorMessage = String.format("Cannot resolve task %s due to parse exception: %s", taskId, e.getMessage());
-      throw new RestException(Status.BAD_REQUEST, e, errorMessage);
-
-    } catch (IllegalArgumentException e) {
+    } catch (RestException e) {
       String errorMessage = String.format("Cannot resolve task %s: %s", taskId, e.getMessage());
-      throw new RestException(Status.BAD_REQUEST, errorMessage);
+      throw new InvalidRequestException(e.getStatus(), e, errorMessage);
+
     }
 
   }
@@ -270,10 +248,10 @@ public class TaskResourceImpl implements TaskResource {
   }
 
   public VariableResource getLocalVariables() {
-    return new LocalTaskVariablesResource(engine, taskId);
+    return new LocalTaskVariablesResource(engine, taskId, objectMapper);
   }
 
-  public FormVariablesDto getFormVariables(String variableNames) {
+  public Map<String, VariableValueDto> getFormVariables(String variableNames, boolean deserializeValues) {
 
     final FormService formService = engine.getFormService();
     List<String> formVariables = null;
@@ -283,9 +261,9 @@ public class TaskResourceImpl implements TaskResource {
       formVariables = stringListConverter.convertQueryParameterToType(variableNames);
     }
 
-    Map<String, VariableInstance> startFormVariables = formService.getTaskFormVariables(taskId, formVariables);
+    VariableMap startFormVariables = formService.getTaskFormVariables(taskId, formVariables, deserializeValues);
 
-    return FormVariablesDto.fromVariableInstanceMap(startFormVariables);
+    return VariableValueDto.fromVariableMap(startFormVariables);
   }
 
   public void updateTask(TaskDto taskDto) {

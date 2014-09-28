@@ -28,6 +28,9 @@ import org.camunda.bpm.engine.task.IdentityLinkType;
 import org.camunda.bpm.engine.task.NativeTaskQuery;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
+import org.camunda.bpm.engine.variable.VariableMap;
+import org.camunda.bpm.engine.variable.value.SerializableValue;
+import org.camunda.bpm.engine.variable.value.TypedValue;
 
 /** Service which provides access to {@link Task} and form related operations.
  *
@@ -321,29 +324,6 @@ public interface TaskService {
    * execution. */
   void setVariable(String taskId, String variableName, Object value);
 
-  /**
-   * <p>Update or create a variable for a task from its serialized representation.
-   * If the variable does not already exist in the upwards scope hierarchy (any execution that
-   * is a parent of the execution responsible for the related human task),
-   * it will be created in the process instance (which is the root execution).</p>
-   *
-   * <p>
-   * See {@link ProcessEngineVariableType} for available variable types and their required
-   * configuration options.
-   * </p>
-   *
-   * @param taskId id of the task to set the variable for, cannot be null.
-   * @param variableName name of variable to set, cannot be null
-   * @param serializedValue Serialized value of the variable to set; Expected value types are defined
-   * variable-type-specific and defined in {@link ProcessEngineVariableType}.
-   * @param variableTypeName Type of the variable to set. Defined in {@link ProcessEngineVariableType}.
-   * @param variableConfiguration Variable-type-specific configuration of the serialized value. Defined in {@link ProcessEngineVariableType}.
-   * @throws ProcessEngineException when no task is found or the serialized value or its
-   * configuration is not consistent with the chosen variable type
-   */
-  void setVariableFromSerialized(String taskId, String variableName, Object serializedValue,
-      String variableTypeName, Map<String, Object> variableConfiguration);
-
   /** set variables on a task.  If the variable is not already existing, it will be created in the
    * most outer scope.  This means the process instance in case this task is related to an
    * execution. */
@@ -353,28 +333,6 @@ public interface TaskService {
    * task.  */
   void setVariableLocal(String taskId, String variableName, Object value);
 
-  /**
-   * <p>Update or create a variable for a task from its serialized representation.
-   * If the variable does not already exist,
-   * it will be created in the given task.</p>
-   *
-   * <p>
-   * See {@link ProcessEngineVariableType} for available variable types and their required
-   * configuration options.
-   * </p>
-   *
-   * @param taskId id of the task to set the variable for, cannot be null.
-   * @param variableName name of variable to set, cannot be null
-   * @param serializedValue Serialized value of the variable to set; Expected value types are defined
-   * variable-type-specific and defined in {@link ProcessEngineVariableType}.
-   * @param variableTypeName Type of the variable to set. Defined in {@link ProcessEngineVariableType}.
-   * @param variableConfiguration Variable-type-specific configuration of the serialized value. Defined in {@link ProcessEngineVariableType}.
-   * @throws ProcessEngineException when no task is found or the serialized value or its
-   * configuration is not consistent with the chosen variable type
-   */
-  void setVariableLocalFromSerialized(String taskId, String variableName, Object serializedValue,
-      String variableTypeName, Map<String, Object> variableConfiguration);
-
   /** set variables on a task.  If the variable is not already existing, it will be created in the
    * task.  */
   void setVariablesLocal(String taskId, Map<String, ? extends Object> variables);
@@ -382,24 +340,120 @@ public interface TaskService {
   /** get a variables and search in the task scope and if available also the execution scopes. */
   Object getVariable(String taskId, String variableName);
 
+  /** get a variables and search in the task scope and if available also the execution scopes.
+   *
+   * @param taskId the id of the task
+   * @param variableName the name of the variable to fetch
+   *
+   * @return the TypedValue for the variable or 'null' in case no such variable exists.
+   *
+   * @throws ClassCastException in case the value is not of the requested type
+   *
+   * @since 7.2
+   */
+  <T extends TypedValue> T getVariableTyped(String taskId, String variableName);
+
+  /** get a variables and search in the task scope and if available also the execution scopes.
+   *
+   * @param taskId the id of the task
+   * @param variableName the name of the variable to fetch
+   * @param deserializeValue if false a, {@link SerializableValue} will not be deserialized.
+   *
+   * @return the TypedValue for the variable or 'null' in case no such variable exists.
+   *
+   * @throws ClassCastException in case the value is not of the requested type
+   *
+   * @since 7.2
+   */
+  <T extends TypedValue> T getVariableTyped(String taskId, String variableName, boolean deserializeValue);
+
   /** get a variables and only search in the task scope.  */
   Object getVariableLocal(String taskId, String variableName);
+
+  /** get a variables and only search in the task scope.
+  *
+  * @param taskId the id of the task
+  * @param variableName the name of the variable to fetch
+  *
+  * @return the TypedValue for the variable or 'null' in case no such variable exists.
+  *
+  * @throws ClassCastException in case the value is not of the requested type
+  *
+  * @since 7.2
+  */
+  <T extends TypedValue> T getVariableLocalTyped(String taskId, String variableName);
+
+  /** get a variables and only search in the task scope.
+   *
+   * @param taskId the id of the task
+   * @param variableName the name of the variable to fetch
+   * @param deserializeValue if false a, {@link SerializableValue} will not be deserialized.
+   *
+   * @return the TypedValue for the variable or 'null' in case no such variable exists.
+   *
+   * @throws ClassCastException in case the value is not of the requested type
+   *
+   * @since 7.2
+   */
+  <T extends TypedValue> T getVariableLocalTyped(String taskId, String variableName, boolean deserializeValue);
 
   /** get all variables and search in the task scope and if available also the execution scopes.
    * If you have many variables and you only need a few, consider using {@link #getVariables(String, Collection)}
    * for better performance.*/
-  Map<String, Object> getVariables(String taskId);
+  VariableMap getVariables(String taskId);
+
+  /** get all variables and search in the task scope and if available also the execution scopes.
+   * If you have many variables and you only need a few, consider using {@link #getVariables(String, Collection)}
+   * for better performance.
+   *
+   * @param taskId the id of the task
+   * @param deserializeValues if false, {@link SerializableValue SerializableValues} will not be deserialized.
+   *
+   * @since 7.2
+   * */
+  VariableMap getVariables(String taskId, boolean deserializeValues);
 
   /** get all variables and search only in the task scope.
   * If you have many task local variables and you only need a few, consider using {@link #getVariablesLocal(String, Collection)}
   * for better performance.*/
-  Map<String, Object> getVariablesLocal(String taskId);
+  VariableMap getVariablesLocal(String taskId);
 
-  /** get values for all given variableNames and search only in the task scope. */
-  Map<String, Object> getVariables(String taskId, Collection<String> variableNames);
+  /** get all variables and search only in the task scope.
+  * If you have many task local variables and you only need a few, consider using {@link #getVariablesLocal(String, Collection)}
+  * for better performance.
+  *
+  * @param taskId the id of the task
+  * @param deserializeValues if false, {@link SerializableValue SerializableValues} will not be deserialized.
+  *
+  * @since 7.2
+  * */
+  VariableMap getVariablesLocal(String taskId, boolean deserializeValues);
+
+  /** get values for all given variableNames */
+  VariableMap getVariables(String taskId, Collection<String> variableNames);
+
+  /** get values for all given variableName
+   *
+   * @param taskId the id of the task
+   * @param variableNames only fetch variables whose names are in the collection.
+   * @param deserializeValues if false, {@link SerializableValue SerializableValues} will not be deserialized.
+   *
+   * @since 7.2
+   * */
+  VariableMap getVariables(String taskId, Collection<String> variableNames, boolean deserializeValues);
 
   /** get a variable on a task */
-  Map<String, Object> getVariablesLocal(String taskId, Collection<String> variableNames);
+  VariableMap getVariablesLocal(String taskId, Collection<String> variableNames);
+
+  /** get values for all given variableName. Only search in the local task scope.
+  *
+  * @param taskId the id of the task
+  * @param variableNames only fetch variables whose names are in the collection.
+  * @param deserializeValues if false, {@link SerializableValue SerializableValues} will not be deserialized.
+  *
+  * @since 7.2
+  * */
+  VariableMap getVariablesLocal(String taskId, Collection<String> variableNames, boolean deserializeValues);
 
   /**
    * Removes the variable from the task.

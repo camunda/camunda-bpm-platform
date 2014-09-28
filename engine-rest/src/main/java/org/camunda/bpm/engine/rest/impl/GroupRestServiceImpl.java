@@ -36,6 +36,7 @@ import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.sub.identity.GroupResource;
 import org.camunda.bpm.engine.rest.sub.identity.impl.GroupResourceImpl;
 import org.camunda.bpm.engine.rest.util.PathUtil;
+import org.codehaus.jackson.map.ObjectMapper;
 
 /**
  * @author Daniel Meyer
@@ -47,22 +48,23 @@ public class GroupRestServiceImpl extends AbstractAuthorizedRestResource impleme
     super(GROUP, ANY);
   }
 
-  public GroupRestServiceImpl(String engineName) {
-    super(engineName, GROUP, ANY);
+  public GroupRestServiceImpl(String engineName, final ObjectMapper objectMapper) {
+    super(engineName, GROUP, ANY, objectMapper);
   }
 
   public GroupResource getGroup(String id) {
     id = PathUtil.decodePathParam(id);
-    return new GroupResourceImpl(getProcessEngine().getName(), id, relativeRootResourcePath);
+    return new GroupResourceImpl(getProcessEngine().getName(), id, relativeRootResourcePath, getObjectMapper());
   }
 
   public List<GroupDto> queryGroups(UriInfo uriInfo, Integer firstResult, Integer maxResults) {
-    GroupQueryDto queryDto = new GroupQueryDto(uriInfo.getQueryParameters());
+    GroupQueryDto queryDto = new GroupQueryDto(getObjectMapper(), uriInfo.getQueryParameters());
     return queryGroups(queryDto, firstResult, maxResults);
   }
 
   public List<GroupDto> queryGroups(GroupQueryDto queryDto, Integer firstResult, Integer maxResults) {
 
+    queryDto.setObjectMapper(getObjectMapper());
     GroupQuery query = queryDto.toQuery(getProcessEngine());
 
     List<Group> resultList;
@@ -76,7 +78,7 @@ public class GroupRestServiceImpl extends AbstractAuthorizedRestResource impleme
   }
 
   public CountResultDto getGroupCount(UriInfo uriInfo) {
-    GroupQueryDto queryDto = new GroupQueryDto(uriInfo.getQueryParameters());
+    GroupQueryDto queryDto = new GroupQueryDto(getObjectMapper(), uriInfo.getQueryParameters());
     return getGroupCount(queryDto);
   }
 

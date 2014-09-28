@@ -12,15 +12,21 @@
  */
 package org.camunda.bpm.engine.rest.helper;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.hamcrest.Matcher;
 import org.mockito.ArgumentMatcher;
 
 public class EqualsMap extends ArgumentMatcher<Map<String, Object>> {
 
-  private Map<String, Object> mapToCompare;
+  protected Map<String, Object> mapToCompare;
+  protected Map<String, Matcher<?>> matchers;
+
+  public EqualsMap() {
+  }
 
   public EqualsMap(Map<String, Object> mapToCompare) {
     this.mapToCompare = mapToCompare;
@@ -28,13 +34,18 @@ public class EqualsMap extends ArgumentMatcher<Map<String, Object>> {
 
   @Override
   public boolean matches(Object argument) {
-    if ((argument == null && mapToCompare != null) ||
-        (argument != null && mapToCompare == null)) {
-      return false;
+    if (mapToCompare != null) {
+      return matchesExactly(argument);
+    } else if (matchers != null) {
+      return matchesMatchers(argument);
+    } else {
+      return argument == null;
     }
+  }
 
-    if (argument == null && mapToCompare == null) {
-      return true;
+  protected boolean matchesExactly(Object argument) {
+    if (argument == null) {
+      return false;
     }
 
     Map<String, Object> argumentMap = (Map<String, Object>) argument;
@@ -43,6 +54,50 @@ public class EqualsMap extends ArgumentMatcher<Map<String, Object>> {
     Set<Entry<String, Object>> argumentSet = argumentMap.entrySet();
 
     return setToCompare.equals(argumentSet);
+  }
+
+  protected boolean matchesMatchers(Object argument) {
+    if (argument == null) {
+      return false;
+    }
+
+    Map<String, Object> argumentMap = (Map<String, Object>) argument;
+
+    boolean containSameKeys = matchers.keySet().containsAll(argumentMap.keySet()) &&
+        argumentMap.keySet().containsAll(matchers.keySet());
+    if (!containSameKeys) {
+      return false;
+    }
+
+    for (Map.Entry<String, Object> value : argumentMap.entrySet()) {
+      Matcher<?> matcher = matchers.get(value.getKey());
+      if (!matcher.matches(value.getValue())) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  public static EqualsMap containsExactly(Map<String, Object> map) {
+    EqualsMap matcher = new EqualsMap();
+    matcher.mapToCompare = map;
+    return matcher;
+  }
+
+  public static EqualsMap matchesExactly(Map<String, Matcher<?>> matchers) {
+    EqualsMap matcher = new EqualsMap();
+    matcher.matchers = matchers;
+    return matcher;
+  }
+
+  public EqualsMap matcher(String key, Matcher<?> matcher) {
+    if (matchers == null) {
+      this.matchers = new HashMap<String, Matcher<?>>();
+    }
+
+    matchers.put(key, matcher);
+    return this;
   }
 
 }

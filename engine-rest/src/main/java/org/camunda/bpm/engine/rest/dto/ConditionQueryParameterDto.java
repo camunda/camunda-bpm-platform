@@ -12,17 +12,23 @@
  */
 package org.camunda.bpm.engine.rest.dto;
 
-import java.text.ParseException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.ws.rs.core.Response.Status;
+
 import org.camunda.bpm.engine.impl.QueryOperator;
-import org.camunda.bpm.engine.rest.util.DtoUtil;
+import org.codehaus.jackson.map.ObjectMapper;
 
 /**
  * @author roman.smirnov
  */
 public class ConditionQueryParameterDto {
+
+  public ConditionQueryParameterDto() {
+
+  }
 
   public static final String EQUALS_OPERATOR_NAME = "eq";
   public static final String NOT_EQUALS_OPERATOR_NAME = "neq";
@@ -61,17 +67,23 @@ public class ConditionQueryParameterDto {
   public void setOperator(String operator) {
     this.operator = operator;
   }
+  public Object resolveValue(ObjectMapper objectMapper) {
+    if (value instanceof String && objectMapper != null) {
+      try {
+        return objectMapper.readValue("\"" + value + "\"", Date.class);
+      } catch (Exception e) {
+        // ignore the exception
+      }
+    }
+
+    return value;
+  }
+
   public Object getValue() {
     return value;
   }
-  public void setValue(Object value) {
-    try {
-      this.value = DtoUtil.toDate(value);
-      return;
-    } catch (ParseException e) {
-      // ignore exception
-    }
 
+  public void setValue(Object value) {
     this.value = value;
   }
 

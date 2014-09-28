@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.rest.impl.history;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.ws.rs.core.UriInfo;
 
 import org.camunda.bpm.engine.ProcessEngine;
@@ -25,12 +26,15 @@ import org.camunda.bpm.engine.rest.dto.history.HistoricCaseInstanceQueryDto;
 import org.camunda.bpm.engine.rest.history.HistoricCaseInstanceRestService;
 import org.camunda.bpm.engine.rest.sub.history.HistoricCaseInstanceResource;
 import org.camunda.bpm.engine.rest.sub.history.impl.HistoricCaseInstanceResourceImpl;
+import org.codehaus.jackson.map.ObjectMapper;
 
 public class HistoricCaseInstanceRestServiceImpl implements HistoricCaseInstanceRestService {
 
+  protected ObjectMapper objectMapper;
   protected ProcessEngine processEngine;
 
-  public HistoricCaseInstanceRestServiceImpl(ProcessEngine processEngine) {
+  public HistoricCaseInstanceRestServiceImpl(ObjectMapper objectMapper, ProcessEngine processEngine) {
+    this.objectMapper = objectMapper;
     this.processEngine = processEngine;
   }
 
@@ -39,7 +43,7 @@ public class HistoricCaseInstanceRestServiceImpl implements HistoricCaseInstance
   }
 
   public List<HistoricCaseInstanceDto> getHistoricCaseInstances(UriInfo uriInfo, Integer firstResult, Integer maxResults) {
-    HistoricCaseInstanceQueryDto queryHistoricCaseInstanceDto = new HistoricCaseInstanceQueryDto(uriInfo.getQueryParameters());
+    HistoricCaseInstanceQueryDto queryHistoricCaseInstanceDto = new HistoricCaseInstanceQueryDto(objectMapper, uriInfo.getQueryParameters());
     return queryHistoricCaseInstances(queryHistoricCaseInstanceDto, firstResult, maxResults);
   }
 
@@ -72,7 +76,7 @@ public class HistoricCaseInstanceRestServiceImpl implements HistoricCaseInstance
   }
 
   public CountResultDto getHistoricCaseInstancesCount(UriInfo uriInfo) {
-    HistoricCaseInstanceQueryDto queryDto = new HistoricCaseInstanceQueryDto(uriInfo.getQueryParameters());
+    HistoricCaseInstanceQueryDto queryDto = new HistoricCaseInstanceQueryDto(objectMapper, uriInfo.getQueryParameters());
     return queryHistoricCaseInstancesCount(queryDto);
   }
 

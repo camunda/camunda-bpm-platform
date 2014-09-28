@@ -33,8 +33,7 @@
 
     <dependency>
       <groupId>org.camunda.spin</groupId>
-      <artifactId>camunda-spin-all</artifactId>
-      <!-- https://app.camunda.com/jira/browse/CAM-2552 -->
+      <artifactId>camunda-spin-core</artifactId>
       <scope>provided</scope>
     </dependency>
 

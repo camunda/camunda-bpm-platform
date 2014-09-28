@@ -57,14 +57,14 @@ public class ScriptBindings implements Bindings {
     new HashSet<String>(Arrays.asList("out", "out:print", "lang:import", "context", "elcontext", "print", "println"));
 
   protected List<Resolver> scriptResolvers;
-  protected VariableScope<?> variableScope;
+  protected VariableScope variableScope;
 
   protected Bindings wrappedBindings;
 
   /** if true, all script variables will be set in the variable scope. */
   protected boolean autoStoreScriptVariables;
 
-  public ScriptBindings(List<Resolver> scriptResolvers, VariableScope<?> variableScope, Bindings wrappedBindings) {
+  public ScriptBindings(List<Resolver> scriptResolvers, VariableScope variableScope, Bindings wrappedBindings) {
     this.scriptResolvers = scriptResolvers;
     this.variableScope = variableScope;
     this.wrappedBindings = wrappedBindings;

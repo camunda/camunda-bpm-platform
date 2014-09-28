@@ -14,6 +14,8 @@
 package org.camunda.bpm.engine.impl.form.type;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.value.BooleanValue;
 
 /**
  * @author Frederik Heremans
@@ -46,5 +48,9 @@ public class BooleanFormType extends AbstractFormFieldType {
       return modelValue.toString();
     }
     throw new ProcessEngineException("Model value is not of type boolean, but of type " + modelValue.getClass().getName());
+  }
+
+  public BooleanValue getTypedValue(Object value) {
+    return Variables.booleanValue((Boolean) value);
   }
 }

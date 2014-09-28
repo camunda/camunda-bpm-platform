@@ -52,6 +52,7 @@ import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionQueryImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.DbEntity;
+import org.camunda.bpm.engine.impl.db.DbEntityLifecycleAware;
 import org.camunda.bpm.engine.impl.db.ListQueryParameterObject;
 import org.camunda.bpm.engine.impl.db.PersistenceSession;
 import org.camunda.bpm.engine.impl.db.entitymanager.cache.CachedDbEntity;
@@ -228,6 +229,12 @@ public class DbEntityManager implements Session {
       return cachedPersistentObject;
     }
     dbEntityCache.putPersistent(persistentObject);
+
+    // invoke postLoad() lifecycle method
+    if (persistentObject instanceof DbEntityLifecycleAware) {
+      DbEntityLifecycleAware lifecycleAware = (DbEntityLifecycleAware) persistentObject;
+      lifecycleAware.postLoad();
+    }
     return persistentObject;
   }
 

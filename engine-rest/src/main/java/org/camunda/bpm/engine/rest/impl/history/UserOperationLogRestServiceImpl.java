@@ -12,8 +12,9 @@
  */
 package org.camunda.bpm.engine.rest.impl.history;
 
-import javax.ws.rs.core.UriInfo;
 import java.util.List;
+
+import javax.ws.rs.core.UriInfo;
 
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.history.UserOperationLogQuery;
@@ -21,28 +22,31 @@ import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.history.UserOperationLogEntryDto;
 import org.camunda.bpm.engine.rest.dto.history.UserOperationLogQueryDto;
 import org.camunda.bpm.engine.rest.history.UserOperationLogRestService;
+import org.codehaus.jackson.map.ObjectMapper;
 
 /**
  * @author Danny Gräf
  */
 public class UserOperationLogRestServiceImpl implements UserOperationLogRestService {
 
+  protected ObjectMapper objectMapper;
   protected ProcessEngine processEngine;
 
-  public UserOperationLogRestServiceImpl(ProcessEngine processEngine) {
+  public UserOperationLogRestServiceImpl(ObjectMapper objectMapper, ProcessEngine processEngine) {
+    this.objectMapper = objectMapper;
     this.processEngine = processEngine;
   }
 
   @Override
   public CountResultDto queryUserOperationCount(UriInfo uriInfo) {
-    UserOperationLogQueryDto queryDto = new UserOperationLogQueryDto(uriInfo.getQueryParameters());
+    UserOperationLogQueryDto queryDto = new UserOperationLogQueryDto(objectMapper, uriInfo.getQueryParameters());
     UserOperationLogQuery query = queryDto.toQuery(processEngine);
     return new CountResultDto(query.count());
   }
 
   @Override
   public List<UserOperationLogEntryDto> queryUserOperationEntries(UriInfo uriInfo, Integer firstResult, Integer maxResults) {
-    UserOperationLogQueryDto queryDto = new UserOperationLogQueryDto(uriInfo.getQueryParameters());
+    UserOperationLogQueryDto queryDto = new UserOperationLogQueryDto(objectMapper, uriInfo.getQueryParameters());
     UserOperationLogQuery query = queryDto.toQuery(processEngine);
 
     if (firstResult == null && maxResults == null) {

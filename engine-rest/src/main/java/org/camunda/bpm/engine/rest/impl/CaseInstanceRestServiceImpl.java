@@ -26,6 +26,7 @@ import org.camunda.bpm.engine.rest.sub.runtime.CaseInstanceResource;
 import org.camunda.bpm.engine.rest.sub.runtime.impl.CaseInstanceResourceImpl;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.runtime.CaseInstanceQuery;
+import org.codehaus.jackson.map.ObjectMapper;
 
 /**
  * @author Roman Smirnov
@@ -37,21 +38,22 @@ public class CaseInstanceRestServiceImpl extends AbstractRestProcessEngineAware 
     super();
   }
 
-  public CaseInstanceRestServiceImpl(String engineName) {
-    super(engineName);
+  public CaseInstanceRestServiceImpl(String engineName, ObjectMapper objectMapper) {
+    super(engineName, objectMapper);
   }
 
   public CaseInstanceResource getCaseInstance(String caseInstanceId) {
-    return new CaseInstanceResourceImpl(getProcessEngine(), caseInstanceId);
+    return new CaseInstanceResourceImpl(getProcessEngine(), caseInstanceId, getObjectMapper());
   }
 
   public List<CaseInstanceDto> getCaseInstances(UriInfo uriInfo, Integer firstResult, Integer maxResults) {
-    CaseInstanceQueryDto queryDto = new CaseInstanceQueryDto(uriInfo.getQueryParameters());
+    CaseInstanceQueryDto queryDto = new CaseInstanceQueryDto(getObjectMapper(), uriInfo.getQueryParameters());
     return queryCaseInstances(queryDto, firstResult, maxResults);
   }
 
   public List<CaseInstanceDto> queryCaseInstances(CaseInstanceQueryDto queryDto, Integer firstResult, Integer maxResults) {
     ProcessEngine engine = getProcessEngine();
+    queryDto.setObjectMapper(getObjectMapper());
     CaseInstanceQuery query = queryDto.toQuery(engine);
 
     List<CaseInstance> matchingInstances;
@@ -80,12 +82,13 @@ public class CaseInstanceRestServiceImpl extends AbstractRestProcessEngineAware 
   }
 
   public CountResultDto getCaseInstancesCount(UriInfo uriInfo) {
-    CaseInstanceQueryDto queryDto = new CaseInstanceQueryDto(uriInfo.getQueryParameters());
+    CaseInstanceQueryDto queryDto = new CaseInstanceQueryDto(getObjectMapper(), uriInfo.getQueryParameters());
     return queryCaseInstancesCount(queryDto);
   }
 
   public CountResultDto queryCaseInstancesCount(CaseInstanceQueryDto queryDto) {
     ProcessEngine engine = getProcessEngine();
+    queryDto.setObjectMapper(getObjectMapper());
     CaseInstanceQuery query = queryDto.toQuery(engine);
 
     long count = query.count();

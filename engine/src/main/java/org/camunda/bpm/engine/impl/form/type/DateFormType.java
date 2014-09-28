@@ -16,8 +16,11 @@ package org.camunda.bpm.engine.impl.form.type;
 import java.text.Format;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.value.TypedValue;
 
 
 /**
@@ -60,5 +63,9 @@ public class DateFormType extends AbstractFormFieldType {
       return null;
     }
     return dateFormat.format(modelValue);
+  }
+
+  public TypedValue getTypedValue(Object value) {
+    return Variables.dateValue((Date) value);
   }
 }

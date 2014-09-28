@@ -86,7 +86,7 @@ public class TimerDeclarationImpl extends JobDeclaration<TimerEntity> {
 
     // ACT-1415: timer-declaration on start-event may contain expressions NOT
     // evaluating variables but other context, evaluating should happen nevertheless
-    VariableScope<?> scopeForExpression = execution;
+    VariableScope scopeForExpression = execution;
     if(scopeForExpression == null) {
       scopeForExpression = StartProcessVariableScope.getSharedInstance();
     }

@@ -19,7 +19,6 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.delegate.SerializedVariableValue;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
@@ -36,6 +35,7 @@ import org.camunda.bpm.engine.task.TaskQuery;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.api.runtime.util.CustomSerializable;
 import org.camunda.bpm.engine.test.api.runtime.util.FailingSerializable;
+import org.camunda.bpm.engine.variable.value.ObjectValue;
 
 
 /**
@@ -169,11 +169,13 @@ public class HistoricVariableInstanceTest extends AbstractProcessEngineTestCase 
     assertEquals("myVar", historicVariable.getName());
     assertEquals("test101112", historicVariable.getTextValue());
     assertEquals("string", historicVariable.getVariableTypeName());
+    assertEquals("string", historicVariable.getTypeName());
 
     HistoricVariableInstanceEntity historicVariable1 = (HistoricVariableInstanceEntity) variables.get(1);
     assertEquals("myVar1", historicVariable1.getName());
     assertEquals("test789", historicVariable1.getTextValue());
     assertEquals("string", historicVariable1.getVariableTypeName());
+    assertEquals("string", historicVariable1.getTypeName());
 
     assertEquals(18, historyService.createHistoricActivityInstanceQuery().count());
     assertEquals(7, historyService.createHistoricDetailQuery().count());
@@ -513,21 +515,19 @@ public class HistoricVariableInstanceTest extends AbstractProcessEngineTestCase 
     assertEquals(2, variableInstances.size());
 
     for (HistoricVariableInstance variableInstance : variableInstances) {
-      if(variableInstance.getName().equals("customSerializable")) {
-        assertNull(variableInstance.getErrorMessage());
+      assertNull(variableInstance.getErrorMessage());
 
-        SerializedVariableValue serializedValue = variableInstance.getSerializedValue();
-        assertNotNull(serializedValue);
-        assertNotNull(serializedValue.getValue());
+      ObjectValue typedValue = (ObjectValue) variableInstance.getTypedValue();
+      assertNotNull(typedValue);
+      assertFalse(typedValue.isDeserialized());
+      // cannot access the deserialized value
+      try {
+        typedValue.getValue();
       }
-      if(variableInstance.getName().equals("failingSerializable")) {
-        // no error message is present
-        assertNull(variableInstance.getErrorMessage());
-
-        SerializedVariableValue serializedValue = variableInstance.getSerializedValue();
-        assertNotNull(serializedValue);
-        assertNotNull(serializedValue.getValue());
+      catch(IllegalStateException e) {
+        assertTextPresent("Object is not deserialized", e.getMessage());
       }
+      assertNotNull(typedValue.getValueSerialized());
     }
 
     taskService.deleteTask(newTask.getId(), true);

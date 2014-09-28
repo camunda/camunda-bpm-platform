@@ -14,15 +14,15 @@
 package org.camunda.bpm.engine.rest.hal;
 
 import java.util.Map;
+
 import javax.ws.rs.core.UriBuilder;
 
-import org.camunda.bpm.engine.delegate.ProcessEngineVariableType;
 import org.camunda.bpm.engine.rest.CaseExecutionRestService;
 import org.camunda.bpm.engine.rest.CaseInstanceRestService;
 import org.camunda.bpm.engine.rest.ExecutionRestService;
 import org.camunda.bpm.engine.rest.ProcessInstanceRestService;
 import org.camunda.bpm.engine.rest.TaskRestService;
-import org.camunda.bpm.engine.rest.dto.runtime.SerializedObjectDto;
+import org.camunda.bpm.engine.rest.dto.VariableValueDto;
 import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.sub.VariableResource;
 import org.camunda.bpm.engine.runtime.VariableInstance;
@@ -37,8 +37,7 @@ public class HalVariableValue extends HalResource<HalVariableValue> {
   protected String name;
   protected Object value;
   protected String type;
-  protected String variableType;
-  protected Map<String, Object> serializationConfig;
+  protected Map<String, Object> valueInfo;
 
   public static HalVariableValue generateVariableValue(VariableInstance variableInstance, String variableScopeId) {
     if (variableScopeId.equals(variableInstance.getTaskId())) {
@@ -94,23 +93,12 @@ public class HalVariableValue extends HalResource<HalVariableValue> {
   public static HalVariableValue fromVariableInstance(VariableInstance variableInstance) {
     HalVariableValue dto = new HalVariableValue();
 
-    dto.name = variableInstance.getName();
-    dto.value = variableInstance.getValue();
-    dto.type = variableInstance.getValueTypeName();
-    dto.variableType = variableInstance.getTypeName();
+    VariableValueDto variableValueDto = VariableValueDto.fromTypedValue(variableInstance.getTypedValue());
 
-    if (variableInstance.storesCustomObjects()) {
-      if (ProcessEngineVariableType.SERIALIZABLE.getName().equals(variableInstance.getTypeName())) {
-        if (variableInstance.getValue() != null) {
-          dto.value = new SerializedObjectDto(variableInstance.getValue());
-        }
-      } else {
-        dto.value = variableInstance.getSerializedValue().getValue();
-        dto.serializationConfig = variableInstance.getSerializedValue().getConfig();
-      }
-    } else {
-      dto.value = variableInstance.getValue();
-    }
+    dto.name = variableInstance.getName();
+    dto.value = variableValueDto.getValue();
+    dto.type = variableValueDto.getType();
+    dto.valueInfo = variableValueDto.getValueInfo();
 
     return dto;
   }
@@ -127,11 +115,8 @@ public class HalVariableValue extends HalResource<HalVariableValue> {
     return type;
   }
 
-  public String getVariableType() {
-    return variableType;
+  public Map<String, Object> getValueInfo() {
+    return valueInfo;
   }
 
-  public Map<String, Object> getSerializationConfig() {
-    return serializationConfig;
-  }
 }

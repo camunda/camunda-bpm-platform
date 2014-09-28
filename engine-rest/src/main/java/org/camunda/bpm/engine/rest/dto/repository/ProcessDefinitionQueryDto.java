@@ -23,6 +23,7 @@ import org.camunda.bpm.engine.rest.dto.AbstractQueryDto;
 import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
 import org.camunda.bpm.engine.rest.dto.converter.BooleanConverter;
 import org.camunda.bpm.engine.rest.dto.converter.IntegerConverter;
+import org.codehaus.jackson.map.ObjectMapper;
 
 public class ProcessDefinitionQueryDto extends AbstractQueryDto<ProcessDefinitionQuery> {
 
@@ -67,9 +68,8 @@ public class ProcessDefinitionQueryDto extends AbstractQueryDto<ProcessDefinitio
 
   }
 
-  public ProcessDefinitionQueryDto(
-      MultivaluedMap<String, String> queryParameters) {
-    super(queryParameters);
+  public ProcessDefinitionQueryDto(ObjectMapper objectMapper, MultivaluedMap<String, String> queryParameters) {
+    super(objectMapper, queryParameters);
   }
 
   @CamundaQueryParam("category")

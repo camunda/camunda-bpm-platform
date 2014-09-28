@@ -906,7 +906,7 @@ public void testBooleanVariable() throws Exception {
         .list();
       fail("Expected exception");
     } catch(ProcessEngineException ae) {
-      assertTextPresent("Variables of type ByteArray cannot be used to query", ae.getMessage());
+      assertTextPresent("Object values cannot be used to query", ae.getMessage());
     }
 
     runtimeService.deleteProcessInstance(processInstance.getId(), "test");

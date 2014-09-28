@@ -18,12 +18,13 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.camunda.bpm.engine.delegate.ProcessEngineVariableType;
+
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.runtime.VariableInstanceQuery;
+import org.camunda.bpm.engine.variable.type.ValueType;
 
 /**
  * @author roman.smirnov
@@ -116,7 +117,7 @@ public class VariableInstanceQueryImpl extends AbstractVariableQueryImpl<Variabl
     return this;
   }
 
-  public VariableInstanceQuery disableCustomObjectDeserialization() {
+  public VariableInstanceQuery disableObjectValueDeserialization() {
     this.isCustomObjectDeserializationEnabled = false;
     return this;
   }
@@ -163,43 +164,24 @@ public class VariableInstanceQueryImpl extends AbstractVariableQueryImpl<Variabl
     for (VariableInstance variableInstance : result) {
       VariableInstanceEntity variableInstanceEntity = (VariableInstanceEntity) variableInstance;
 
-      if (shouldFetchSerializedValueFor(variableInstanceEntity)) {
+      if (shouldFetchValue(variableInstanceEntity)) {
         try {
-          variableInstanceEntity.getSerializedValue();
-
-          if (shouldFetchValueFor(variableInstanceEntity)) {
-            variableInstanceEntity.getValue();
-          }
+          variableInstanceEntity.getTypedValue(isCustomObjectDeserializationEnabled);
 
         } catch(Exception t) {
           // do not fail if one of the variables fails to load
           LOGGER.log(Level.FINE, "Exception while getting value for variable", t);
         }
       }
+
     }
 
     return result;
   }
 
-  /**
-   * eagerly fetch the variable's value unless the serialized value should not be fetched
-   * or custom object fetching is disabled
-   */
-  protected boolean shouldFetchValueFor(VariableInstanceEntity variableInstance) {
-    boolean shouldFetchCustomObjects = !variableInstance.storesCustomObjects() || isCustomObjectDeserializationEnabled;
-
-    return shouldFetchSerializedValueFor(variableInstance) && shouldFetchCustomObjects;
-  }
-
-  /**
-   * Eagerly fetch the variable's serialized value unless the type is "bytes" and
-   * binary fetching disabled
-   */
-  protected boolean shouldFetchSerializedValueFor(VariableInstanceEntity variableInstance) {
-    boolean shouldFetchBytes = !ProcessEngineVariableType.BYTES.getName().equals(variableInstance.getType().getTypeName())
-        || isByteArrayFetchingEnabled;
-
-    return shouldFetchBytes;
+  protected boolean shouldFetchValue(VariableInstanceEntity entity) {
+    // do not fetch values for byte arrays eagerly (unless requested by the user)
+    return isByteArrayFetchingEnabled || !ValueType.BYTES.equals(entity.getSerializer().getType());
   }
 
   // getters ////////////////////////////////////////////////////

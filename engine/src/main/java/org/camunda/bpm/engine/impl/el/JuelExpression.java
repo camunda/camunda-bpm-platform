@@ -43,7 +43,7 @@ public class JuelExpression implements Expression {
     this.expressionText = expressionText;
   }
 
-  public Object getValue(VariableScope<?> variableScope) {
+  public Object getValue(VariableScope variableScope) {
     ELContext elContext = expressionManager.getElContext(variableScope);
     try {
       ExpressionGetInvocation invocation = new ExpressionGetInvocation(valueExpression, elContext);
@@ -62,7 +62,7 @@ public class JuelExpression implements Expression {
     }
   }
 
-  public void setValue(Object value, VariableScope<?> variableScope) {
+  public void setValue(Object value, VariableScope variableScope) {
     ELContext elContext = expressionManager.getElContext(variableScope);
     try {
       ExpressionSetInvocation invocation = new ExpressionSetInvocation(valueExpression, elContext, value);

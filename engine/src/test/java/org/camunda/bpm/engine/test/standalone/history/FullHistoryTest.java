@@ -21,8 +21,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.delegate.ProcessEngineVariableType;
-import org.camunda.bpm.engine.delegate.SerializedVariableValue;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.history.HistoricDetailQuery;
@@ -43,6 +41,8 @@ import org.camunda.bpm.engine.test.api.runtime.DummySerializable;
 import org.camunda.bpm.engine.test.api.runtime.util.CustomSerializable;
 import org.camunda.bpm.engine.test.api.runtime.util.FailingSerializable;
 import org.camunda.bpm.engine.test.history.SerializableVariable;
+import org.camunda.bpm.engine.variable.type.ValueType;
+import org.camunda.bpm.engine.variable.value.ObjectValue;
 import org.junit.Assert;
 
 
@@ -237,13 +237,10 @@ public class FullHistoryTest extends ResourceProcessEngineTestCase {
     HistoricVariableInstance historicProcessVariable = historyService.createHistoricVariableInstanceQuery().variableValueEquals("process", "one").singleResult();
     assertEquals("process", historicProcessVariable.getVariableName());
     assertEquals("one", historicProcessVariable.getValue());
-    assertEquals(ProcessEngineVariableType.STRING.getName(), historicProcessVariable.getVariableTypeName());
-    assertEquals(String.class.getSimpleName(), historicProcessVariable.getValueTypeName());
-
-    SerializedVariableValue serializedValue = historicProcessVariable.getSerializedValue();
-    assertNotNull(serializedValue);
-    assertEquals("one", serializedValue.getValue());
-    assertTrue(serializedValue.getConfig().isEmpty());
+    assertEquals(ValueType.STRING.getName(), historicProcessVariable.getVariableTypeName());
+    assertEquals(ValueType.STRING.getName(), historicProcessVariable.getTypeName());
+    assertEquals(historicProcessVariable.getValue(), historicProcessVariable.getTypedValue().getValue());
+    assertEquals(historicProcessVariable.getTypeName(), historicProcessVariable.getTypedValue().getType().getName());
 
     Map<String, Object> variables3 = new HashMap<String, Object>();
     variables3.put("long", 1000l);
@@ -1317,13 +1314,8 @@ public class FullHistoryTest extends ResourceProcessEngineTestCase {
     assertEquals(result.getId(), resultById.getId());
     assertEquals(variableName, ((HistoricVariableUpdate)resultById).getVariableName());
     assertEquals(variableValue, ((HistoricVariableUpdate)resultById).getValue());
-    assertEquals(ProcessEngineVariableType.STRING.getName(), ((HistoricVariableUpdate)resultById).getVariableTypeName());
-    assertEquals(String.class.getSimpleName(), ((HistoricVariableUpdate)resultById).getValueTypeName());
-
-    SerializedVariableValue serializedValue = ((HistoricVariableUpdate)resultById).getSerializedValue();
-    assertNotNull(serializedValue);
-    assertEquals(variableValue, serializedValue.getValue());
-    assertTrue(serializedValue.getConfig().isEmpty());
+    assertEquals(ValueType.STRING.getName(), ((HistoricVariableUpdate)resultById).getVariableTypeName());
+    assertEquals(ValueType.STRING.getName(), ((HistoricVariableUpdate)resultById).getTypeName());
 
     taskService.deleteTask(newTask.getId(), true);
   }
@@ -1400,23 +1392,21 @@ public class FullHistoryTest extends ResourceProcessEngineTestCase {
     // both variables are not deserialized, but their serialized values are available
     assertEquals(2, results.size());
 
-    for (HistoricDetail detail : results) {
-      HistoricVariableUpdate update = (HistoricVariableUpdate) detail;
-      if(update.getVariableName().equals("customSerializable")) {
-        assertNull(update.getErrorMessage());
+    for (HistoricDetail update : results) {
+      HistoricVariableUpdate variableUpdate = (HistoricVariableUpdate) update;
+      assertNull(variableUpdate.getErrorMessage());
 
-        SerializedVariableValue serializedValue = update.getSerializedValue();
-        assertNotNull(serializedValue);
-        assertNotNull(serializedValue.getValue());
+      ObjectValue typedValue = (ObjectValue) variableUpdate.getTypedValue();
+      assertNotNull(typedValue);
+      assertFalse(typedValue.isDeserialized());
+      // cannot access the deserialized value
+      try {
+        typedValue.getValue();
       }
-      if(update.getVariableName().equals("failingSerializable")) {
-        // no error message is present
-        assertNull(update.getErrorMessage());
-
-        SerializedVariableValue serializedValue = update.getSerializedValue();
-        assertNotNull(serializedValue);
-        assertNotNull(serializedValue.getValue());
+      catch(IllegalStateException e) {
+        assertTextPresent("Object is not deserialized", e.getMessage());
       }
+      assertNotNull(typedValue.getValueSerialized());
     }
 
     taskService.deleteTask(newTask.getId(), true);

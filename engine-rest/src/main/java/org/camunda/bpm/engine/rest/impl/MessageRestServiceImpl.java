@@ -12,7 +12,6 @@
  */
 package org.camunda.bpm.engine.rest.impl;
 
-import java.text.ParseException;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -21,11 +20,12 @@ import javax.ws.rs.core.Response.Status;
 import org.camunda.bpm.engine.MismatchingMessageCorrelationException;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.rest.MessageRestService;
+import org.camunda.bpm.engine.rest.dto.VariableValueDto;
 import org.camunda.bpm.engine.rest.dto.message.CorrelationMessageDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
-import org.camunda.bpm.engine.rest.util.DtoUtil;
 import org.camunda.bpm.engine.runtime.MessageCorrelationBuilder;
+import org.codehaus.jackson.map.ObjectMapper;
 
 public class MessageRestServiceImpl extends AbstractRestProcessEngineAware implements MessageRestService {
 
@@ -33,8 +33,8 @@ public class MessageRestServiceImpl extends AbstractRestProcessEngineAware imple
     super();
   }
 
-  public MessageRestServiceImpl(String engineName) {
-    super(engineName);
+  public MessageRestServiceImpl(String engineName, ObjectMapper objectMapper) {
+    super(engineName, objectMapper);
   }
 
   @Override
@@ -47,8 +47,9 @@ public class MessageRestServiceImpl extends AbstractRestProcessEngineAware imple
     RuntimeService runtimeService = processEngine.getRuntimeService();
 
     try {
-      Map<String, Object> correlationKeys = DtoUtil.toMap(messageDto.getCorrelationKeys());
-      Map<String, Object> processVariables = DtoUtil.toMap(messageDto.getProcessVariables());
+      ObjectMapper objectMapper = getObjectMapper();
+      Map<String, Object> correlationKeys = VariableValueDto.toMap(messageDto.getCorrelationKeys(), processEngine, objectMapper);
+      Map<String, Object> processVariables = VariableValueDto.toMap(messageDto.getProcessVariables(), processEngine, objectMapper);
 
       MessageCorrelationBuilder correlation = runtimeService
           .createMessageCorrelation(messageDto.getMessageName())
@@ -56,7 +57,7 @@ public class MessageRestServiceImpl extends AbstractRestProcessEngineAware imple
           .processInstanceBusinessKey(messageDto.getBusinessKey());
 
       if (correlationKeys != null && !correlationKeys.isEmpty()) {
-        for (Entry<String, Object> correlationKey : correlationKeys.entrySet()) {
+        for (Entry<String, Object> correlationKey  : correlationKeys.entrySet()) {
           String name = correlationKey.getKey();
           Object value = correlationKey.getValue();
           correlation.processInstanceVariableEquals(name, value);
@@ -69,20 +70,13 @@ public class MessageRestServiceImpl extends AbstractRestProcessEngineAware imple
         correlation.correlateAll();
       }
 
+    } catch (RestException e) {
+      String errorMessage = String.format("Cannot deliver message: %s", e.getMessage());
+      throw new InvalidRequestException(e.getStatus(), e, errorMessage);
+
     } catch (MismatchingMessageCorrelationException e) {
       throw new RestException(Status.BAD_REQUEST, e);
 
-    } catch (NumberFormatException e) {
-      String errorMessage = String.format("Cannot deliver a message due to number format exception: %s", e.getMessage());
-      throw new RestException(Status.BAD_REQUEST, e, errorMessage);
-
-    } catch (ParseException e) {
-      String errorMessage = String.format("Cannot deliver a message due to parse exception: %s", e.getMessage());
-      throw new RestException(Status.BAD_REQUEST, e, errorMessage);
-
-    } catch (IllegalArgumentException e) {
-      String errorMessage = String.format("Cannot deliver a message: %s", e.getMessage());
-      throw new RestException(Status.BAD_REQUEST, errorMessage);
     }
 
   }

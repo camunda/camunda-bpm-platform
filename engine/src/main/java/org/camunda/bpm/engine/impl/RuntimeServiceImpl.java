@@ -28,12 +28,12 @@ import org.camunda.bpm.engine.impl.cmd.DeleteProcessInstanceCmd;
 import org.camunda.bpm.engine.impl.cmd.FindActiveActivityIdsCmd;
 import org.camunda.bpm.engine.impl.cmd.GetActivityInstanceCmd;
 import org.camunda.bpm.engine.impl.cmd.GetExecutionVariableCmd;
+import org.camunda.bpm.engine.impl.cmd.GetExecutionVariableTypedCmd;
 import org.camunda.bpm.engine.impl.cmd.GetExecutionVariablesCmd;
 import org.camunda.bpm.engine.impl.cmd.GetStartFormCmd;
 import org.camunda.bpm.engine.impl.cmd.MessageEventReceivedCmd;
 import org.camunda.bpm.engine.impl.cmd.PatchExecutionVariablesCmd;
 import org.camunda.bpm.engine.impl.cmd.RemoveExecutionVariablesCmd;
-import org.camunda.bpm.engine.impl.cmd.SetExecutionVariableFromSerializedCmd;
 import org.camunda.bpm.engine.impl.cmd.SetExecutionVariablesCmd;
 import org.camunda.bpm.engine.impl.cmd.SignalCmd;
 import org.camunda.bpm.engine.impl.cmd.SignalEventReceivedCmd;
@@ -50,6 +50,8 @@ import org.camunda.bpm.engine.runtime.NativeProcessInstanceQuery;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.camunda.bpm.engine.runtime.VariableInstanceQuery;
+import org.camunda.bpm.engine.variable.VariableMap;
+import org.camunda.bpm.engine.variable.value.TypedValue;
 
 /**
  * @author Tom Baeyens
@@ -138,24 +140,56 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
     return new VariableInstanceQueryImpl(commandExecutor);
   }
 
-  public Map<String, Object> getVariables(String executionId) {
-    return commandExecutor.execute(new GetExecutionVariablesCmd(executionId, null, false));
+  public VariableMap getVariables(String executionId) {
+    return getVariables(executionId, true);
   }
 
-  public Map<String, Object> getVariablesLocal(String executionId) {
-    return commandExecutor.execute(new GetExecutionVariablesCmd(executionId, null, true));
+  public VariableMap getVariables(String executionId, boolean deserializeObjectValues) {
+    return commandExecutor.execute(new GetExecutionVariablesCmd(executionId, null, false, deserializeObjectValues));
   }
 
-  public Map<String, Object> getVariables(String executionId, Collection<String> variableNames) {
-    return commandExecutor.execute(new GetExecutionVariablesCmd(executionId, variableNames, false));
+  public VariableMap getVariablesLocal(String executionId) {
+    return getVariablesLocal(executionId, true);
   }
 
-  public Map<String, Object> getVariablesLocal(String executionId, Collection<String> variableNames) {
-    return commandExecutor.execute(new GetExecutionVariablesCmd(executionId, variableNames, true));
+  public VariableMap getVariablesLocal(String executionId, boolean deserializeObjectValues) {
+    return commandExecutor.execute(new GetExecutionVariablesCmd(executionId, null, true, deserializeObjectValues));
+  }
+
+  public VariableMap getVariables(String executionId, Collection<String> variableNames) {
+    return getVariables(executionId, variableNames, true);
+  }
+
+  public VariableMap getVariables(String executionId, Collection<String> variableNames, boolean deserializeObjectValues) {
+    return commandExecutor.execute(new GetExecutionVariablesCmd(executionId, variableNames, false, deserializeObjectValues));
+  }
+
+  public VariableMap getVariablesLocal(String executionId, Collection<String> variableNames) {
+    return getVariablesLocal(executionId, variableNames, true);
+  }
+
+  public VariableMap getVariablesLocal(String executionId, Collection<String> variableNames, boolean deserializeObjectValues) {
+    return commandExecutor.execute(new GetExecutionVariablesCmd(executionId, variableNames, true, deserializeObjectValues));
   }
 
   public Object getVariable(String executionId, String variableName) {
     return commandExecutor.execute(new GetExecutionVariableCmd(executionId, variableName, false));
+  }
+
+  public <T extends TypedValue> T getVariableTyped(String executionId, String variableName) {
+    return getVariableTyped(executionId, variableName, true);
+  }
+
+  public <T extends TypedValue> T getVariableTyped(String executionId, String variableName, boolean deserializeObjectValue) {
+    return commandExecutor.execute(new GetExecutionVariableTypedCmd<T>(executionId, variableName, false, deserializeObjectValue));
+  }
+
+  public <T extends TypedValue> T getVariableLocalTyped(String executionId, String variableName) {
+    return getVariableLocalTyped(executionId, variableName, true);
+  }
+
+  public <T extends TypedValue> T getVariableLocalTyped(String executionId, String variableName, boolean deserializeObjectValue) {
+    return commandExecutor.execute(new GetExecutionVariableTypedCmd<T>(executionId, variableName, true, deserializeObjectValue));
   }
 
   public Object getVariableLocal(String executionId, String variableName) {
@@ -169,27 +203,11 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
     commandExecutor.execute(new SetExecutionVariablesCmd(executionId, variables, false));
   }
 
-  public void setVariableFromSerialized(String executionId, String variableName, Object serializedValue, String variableTypeName,
-      Map<String, Object> variableConfiguration) {
-    ensureNotNull("variableName", variableName);
-
-    commandExecutor.execute(new SetExecutionVariableFromSerializedCmd(executionId, variableName,
-        serializedValue, variableTypeName, variableConfiguration, false));
-  }
-
   public void setVariableLocal(String executionId, String variableName, Object value) {
     ensureNotNull("variableName", variableName);
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put(variableName, value);
     commandExecutor.execute(new SetExecutionVariablesCmd(executionId, variables, true));
-  }
-
-  public void setVariableLocalFromSerialized(String executionId, String variableName, Object serializedValue, String variableTypeName,
-      Map<String, Object> variableConfiguration) {
-    ensureNotNull("variableName", variableName);
-
-    commandExecutor.execute(new SetExecutionVariableFromSerializedCmd(executionId, variableName,
-        serializedValue, variableTypeName, variableConfiguration, true));
   }
 
   public void setVariables(String executionId, Map<String, ? extends Object> variables) {

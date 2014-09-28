@@ -15,9 +15,9 @@ package org.camunda.bpm.engine.impl.variable.listener;
 import org.camunda.bpm.engine.ProcessEngineServices;
 import org.camunda.bpm.engine.delegate.DelegateCaseVariableInstance;
 import org.camunda.bpm.engine.delegate.DelegateCaseExecution;
-import org.camunda.bpm.engine.delegate.SerializedVariableValue;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.runtime.VariableInstance;
+import org.camunda.bpm.engine.variable.value.TypedValue;
 /**
  * @author Thorben Lindhauer
  *
@@ -37,12 +37,8 @@ public class DelegateCaseVariableInstanceImpl implements DelegateCaseVariableIns
   protected String taskId;
   protected String activityInstanceId;
   protected String errorMessage;
-  protected SerializedVariableValue serializedValue;
-  protected String typeName;
-  protected String valueTypeName;
-  protected boolean storesCustomObjects;
   protected String name;
-  protected Object value;
+  protected TypedValue value;
 
   public String getEventName() {
     return eventName;
@@ -105,20 +101,13 @@ public class DelegateCaseVariableInstanceImpl implements DelegateCaseVariableIns
     return errorMessage;
   }
 
-  public SerializedVariableValue getSerializedValue() {
-    return serializedValue;
-  }
-
   public String getTypeName() {
-    return typeName;
-  }
-
-  public String getValueTypeName() {
-    return valueTypeName;
-  }
-
-  public boolean storesCustomObjects() {
-    return storesCustomObjects;
+    if(value != null) {
+      return value.getType().getName();
+    }
+    else {
+      return null;
+    }
   }
 
   public String getName() {
@@ -126,6 +115,15 @@ public class DelegateCaseVariableInstanceImpl implements DelegateCaseVariableIns
   }
 
   public Object getValue() {
+    if(value != null) {
+      return value.getValue();
+    }
+    else {
+      return null;
+    }
+  }
+
+  public TypedValue getTypedValue() {
     return value;
   }
 
@@ -143,11 +141,8 @@ public class DelegateCaseVariableInstanceImpl implements DelegateCaseVariableIns
     delegateInstance.taskId = variableInstance.getTaskId();
     delegateInstance.activityInstanceId = variableInstance.getActivityInstanceId();
     delegateInstance.errorMessage = variableInstance.getErrorMessage();
-    delegateInstance.serializedValue = variableInstance.getSerializedValue();
-    delegateInstance.typeName = variableInstance.getTypeName();
-    delegateInstance.valueTypeName = variableInstance.getValueTypeName();
     delegateInstance.name = variableInstance.getName();
-    delegateInstance.value = variableInstance.getValue();
+    delegateInstance.value = variableInstance.getTypedValue();
 
     return delegateInstance;
   }

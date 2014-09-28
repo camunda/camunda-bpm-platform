@@ -13,20 +13,20 @@
 
 package org.camunda.bpm.engine.impl;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.camunda.bpm.engine.delegate.ProcessEngineVariableType;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.history.HistoricVariableInstanceQuery;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEntity;
-import org.camunda.bpm.engine.impl.variable.VariableTypes;
-
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+import org.camunda.bpm.engine.impl.variable.serializer.VariableSerializers;
+import org.camunda.bpm.engine.variable.type.ValueType;
 
 /**
  * @author Christian Lipphardt (camunda)
@@ -112,8 +112,8 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
 
   protected void ensureVariablesInitialized() {
     if (this.queryVariableValue != null) {
-      VariableTypes variableTypes = Context.getProcessEngineConfiguration().getVariableTypes();
-      queryVariableValue.initialize(variableTypes);
+      VariableSerializers variableSerializers = Context.getProcessEngineConfiguration().getVariableSerializers();
+      queryVariableValue.initialize(variableSerializers);
     }
   }
 
@@ -144,14 +144,9 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
       for (HistoricVariableInstance historicVariableInstance: historicVariableInstances) {
 
         HistoricVariableInstanceEntity variableInstanceEntity = (HistoricVariableInstanceEntity) historicVariableInstance;
-
-        if (shouldFetchSerializedValueFor(variableInstanceEntity)) {
+        if (shouldFetchValue(variableInstanceEntity)) {
           try {
-            variableInstanceEntity.getSerializedValue();
-
-            if (shouldFetchValueFor(variableInstanceEntity)) {
-              variableInstanceEntity.getValue();
-            }
+            variableInstanceEntity.getTypedValue(isCustomObjectDeserializationEnabled);
 
           } catch(Exception t) {
             // do not fail if one of the variables fails to load
@@ -164,25 +159,9 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
     return historicVariableInstances;
   }
 
-  /**
-   * eagerly fetch the variable's value unless the serialized value should not be fetched
-   * or custom object fetching is disabled
-   */
-  protected boolean shouldFetchValueFor(HistoricVariableInstanceEntity variableInstance) {
-    boolean shouldFetchCustomObjects = !variableInstance.storesCustomObjects() || isCustomObjectDeserializationEnabled;
-
-    return shouldFetchSerializedValueFor(variableInstance) && shouldFetchCustomObjects;
-  }
-
-  /**
-   * Eagerly fetch the variable's serialized value unless the type is "bytes" and
-   * binary fetching disabled
-   */
-  protected boolean shouldFetchSerializedValueFor(HistoricVariableInstanceEntity variableInstance) {
-    boolean shouldFetchBytes = !ProcessEngineVariableType.BYTES.getName().equals(variableInstance.getVariableType().getTypeName())
-        || isByteArrayFetchingEnabled;
-
-    return shouldFetchBytes;
+  protected boolean shouldFetchValue(HistoricVariableInstanceEntity entity) {
+    // do not fetch values for byte arrays eagerly (unless requested by the user)
+    return isByteArrayFetchingEnabled || !ValueType.BYTES.equals(entity.getSerializer().getType());
   }
 
   // order by /////////////////////////////////////////////////////////////////

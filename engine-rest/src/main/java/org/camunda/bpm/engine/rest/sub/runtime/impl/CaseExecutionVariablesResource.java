@@ -13,14 +13,12 @@
 package org.camunda.bpm.engine.rest.sub.runtime.impl;
 
 import java.util.List;
-import java.util.Map;
-
-import javax.ws.rs.core.Response.Status;
-
 import org.camunda.bpm.engine.CaseService;
 import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.sub.impl.AbstractVariablesResource;
+import org.camunda.bpm.engine.variable.VariableMap;
+import org.camunda.bpm.engine.variable.value.TypedValue;
+import org.codehaus.jackson.map.ObjectMapper;
 
 /**
  *
@@ -29,34 +27,21 @@ import org.camunda.bpm.engine.rest.sub.impl.AbstractVariablesResource;
  */
 public class CaseExecutionVariablesResource extends AbstractVariablesResource {
 
-  public CaseExecutionVariablesResource(ProcessEngine engine, String resourceId) {
-    super(engine, resourceId);
+  public CaseExecutionVariablesResource(ProcessEngine engine, String resourceId, ObjectMapper objectMapper) {
+    super(engine, resourceId, objectMapper);
   }
 
-  protected Map<String, Object> getVariableEntities() {
+  protected VariableMap getVariableEntities(boolean deserializeValues) {
     CaseService caseService = engine.getCaseService();
-    return caseService.getVariables(resourceId);
+    return caseService.getVariables(resourceId, deserializeValues);
   }
 
-  protected void updateVariableEntities(Map<String, Object> variables, List<String> deletions) {
+  protected void updateVariableEntities(VariableMap variables, List<String> deletions) {
     CaseService caseService = engine.getCaseService();
     caseService
       .withCaseExecution(resourceId)
       .setVariables(variables)
       .removeVariables(deletions)
-      .execute();
-  }
-
-  protected Object getVariableEntity(String variableKey) {
-    CaseService caseService = engine.getCaseService();
-    return caseService.getVariable(resourceId, variableKey);
-  }
-
-  protected void setVariableEntity(String variableKey, Object variableValue) {
-    CaseService caseService = engine.getCaseService();
-    caseService
-      .withCaseExecution(resourceId)
-      .setVariable(variableKey, variableValue)
       .execute();
   }
 
@@ -72,8 +57,17 @@ public class CaseExecutionVariablesResource extends AbstractVariablesResource {
     return "case execution";
   }
 
-  protected void setVariableEntityFromSerialized(String variableKey, Object serializedValue, String variableType, Map<String, Object> configuration) {
-    throw new RestException(Status.NOT_FOUND, "Unsupported operation");
+  protected TypedValue getVariableEntity(String variableKey, boolean deserializeValue) {
+    CaseService caseService = engine.getCaseService();
+    return caseService.getVariableTyped(resourceId, variableKey, deserializeValue);
+  }
+
+  protected void setVariableEntity(String variableKey, TypedValue variableValue) {
+    CaseService caseService = engine.getCaseService();
+    caseService
+      .withCaseExecution(resourceId)
+      .setVariable(variableKey, variableValue)
+      .execute();
   }
 
 }

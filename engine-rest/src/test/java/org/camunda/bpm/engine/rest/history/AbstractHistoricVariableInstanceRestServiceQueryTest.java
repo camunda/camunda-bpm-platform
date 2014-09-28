@@ -20,13 +20,16 @@ import java.util.Map;
 import javax.ws.rs.core.Response.Status;
 import javax.xml.registry.InvalidRequestException;
 
-import org.camunda.bpm.engine.delegate.ProcessEngineVariableType;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.history.HistoricVariableInstanceQuery;
+import org.camunda.bpm.engine.impl.core.variable.type.ObjectTypeImpl;
+import org.camunda.bpm.engine.impl.variable.serializer.JavaObjectSerializer;
 import org.camunda.bpm.engine.rest.AbstractRestServiceTest;
 import org.camunda.bpm.engine.rest.helper.MockHistoricVariableInstanceBuilder;
+import org.camunda.bpm.engine.rest.helper.MockObjectValue;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
-import org.camunda.bpm.engine.rest.helper.MockSerializedValueBuilder;
+import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.type.ValueType;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InOrder;
@@ -271,7 +274,7 @@ public abstract class AbstractHistoricVariableInstanceRestServiceQueryTest exten
           .body("size()", is(1))
           .body("[0].id", equalTo(mockInstanceBuilder.getId()))
           .body("[0].name", equalTo(mockInstanceBuilder.getName()))
-          .body("[0].type", equalTo(mockInstanceBuilder.getValueTypeName()))
+          .body("[0].type", equalTo(mockInstanceBuilder.getTypedValue().getType().getName()))
           .body("[0].value", equalTo(mockInstanceBuilder.getValue()))
           .body("[0].processInstanceId", equalTo(mockInstanceBuilder.getProcessInstanceId()))
           .body("[0].errorMessage", equalTo(mockInstanceBuilder.getErrorMessage()))
@@ -286,16 +289,12 @@ public abstract class AbstractHistoricVariableInstanceRestServiceQueryTest exten
 
   @Test
   public void testSerializableVariableInstanceRetrieval() {
-    MockSerializedValueBuilder serializedValueBuilder =
-        new MockSerializedValueBuilder()
-          .value("a serialized value".getBytes());
-
     MockHistoricVariableInstanceBuilder builder = MockProvider.mockHistoricVariableInstance()
-        .storesCustomObjects(true)
-        .typeName(ProcessEngineVariableType.SERIALIZABLE.getName())
-        .value("a serialized value")
-        .valueTypeName("Serializable")
-        .serializedValue(serializedValueBuilder);
+        .typedValue(MockObjectValue.fromObjectValue(Variables
+            .objectValue("a serialized value")
+            .serializationDataFormat(JavaObjectSerializer.SERIALIZATION_DATA_FORMAT)
+            .create())
+            .objectTypeName(String.class.getName()));
 
     List<HistoricVariableInstance> mockInstances = new ArrayList<HistoricVariableInstance>();
     mockInstances.add(builder.build());
@@ -305,12 +304,10 @@ public abstract class AbstractHistoricVariableInstanceRestServiceQueryTest exten
     given()
         .then().expect().statusCode(Status.OK.getStatusCode())
         .and()
-          .body("[0].type", equalTo("Serializable"))
-          .body("[0].variableType", equalTo(ProcessEngineVariableType.SERIALIZABLE.getName()))
-
-          // required due to exsting API
-          .body("[0].value.object", equalTo("a serialized value"))
-          .body("[0].value.type", equalTo(String.class.getName()))
+          .body("[0].type", equalTo(ValueType.OBJECT.getName()))
+          .body("[0].value", equalTo("a serialized value"))
+          .body("[0].valueInfo." + ObjectTypeImpl.VALUE_INFO_OBJECT_TYPE_NAME, equalTo(String.class.getName()))
+          .body("[0].valueInfo." + ObjectTypeImpl.VALUE_INFO_SERIALIZATION_DATA_FORMAT, equalTo(JavaObjectSerializer.SERIALIZATION_DATA_FORMAT))
         .when().get(HISTORIC_VARIABLE_INSTANCE_RESOURCE_URL);
 
     // should not resolve custom objects but existing API requires it
@@ -320,17 +317,12 @@ public abstract class AbstractHistoricVariableInstanceRestServiceQueryTest exten
 
   @Test
   public void testSpinVariableInstanceRetrieval() {
-    MockSerializedValueBuilder serializedValueBuilder =
-        new MockSerializedValueBuilder()
-          .value("aSpinSerializedValue")
-          .configuration(ProcessEngineVariableType.SPIN_TYPE_CONFIG_ROOT_TYPE, "aRootType")
-          .configuration(ProcessEngineVariableType.SPIN_TYPE_DATA_FORMAT_ID, "aDataFormat");
-
     MockHistoricVariableInstanceBuilder builder = MockProvider.mockHistoricVariableInstance()
-        .storesCustomObjects(true)
-        .typeName(ProcessEngineVariableType.SPIN.getName())
-        .valueTypeName("Object")
-        .serializedValue(serializedValueBuilder);
+        .typedValue(Variables
+            .serializedObjectValue("aSpinSerializedValue")
+            .serializationDataFormat("aDataFormat")
+            .objectTypeName("aRootType")
+            .create());
 
     List<HistoricVariableInstance> mockInstances = new ArrayList<HistoricVariableInstance>();
     mockInstances.add(builder.build());
@@ -341,12 +333,11 @@ public abstract class AbstractHistoricVariableInstanceRestServiceQueryTest exten
         .then().expect().statusCode(Status.OK.getStatusCode())
         .and()
           .body("size()", is(1))
-          .body("[0].type", equalTo("Object"))
-          .body("[0].variableType", equalTo(ProcessEngineVariableType.SPIN.getName()))
+          .body("[0].type", equalTo(ValueType.OBJECT.getName()))
           .body("[0].value", equalTo("aSpinSerializedValue"))
-          .body("[0].serializationConfig." + ProcessEngineVariableType.SPIN_TYPE_CONFIG_ROOT_TYPE,
+          .body("[0].valueInfo." + ObjectTypeImpl.VALUE_INFO_OBJECT_TYPE_NAME,
               equalTo("aRootType"))
-          .body("[0].serializationConfig." + ProcessEngineVariableType.SPIN_TYPE_DATA_FORMAT_ID,
+          .body("[0].valueInfo." + ObjectTypeImpl.VALUE_INFO_SERIALIZATION_DATA_FORMAT,
               equalTo("aDataFormat"))
         .when().get(HISTORIC_VARIABLE_INSTANCE_RESOURCE_URL);
   }
@@ -372,7 +363,7 @@ public abstract class AbstractHistoricVariableInstanceRestServiceQueryTest exten
 
     parameters.put("processInstanceId", MockProvider.EXAMPLE_VARIABLE_INSTANCE_PROC_INST_ID);
     parameters.put("variableName", MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME);
-    parameters.put("variableValue", MockProvider.EXAMPLE_VARIABLE_INSTANCE_VALUE);
+    parameters.put("variableValue", MockProvider.EXAMPLE_PRIMITIVE_VARIABLE_VALUE.getValue());
     return parameters;
   }
 
@@ -387,7 +378,7 @@ public abstract class AbstractHistoricVariableInstanceRestServiceQueryTest exten
   @Test
   public void testVariableNameAndValueQuery() {
     String variableName = MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME;
-    String variableValue = MockProvider.EXAMPLE_VARIABLE_INSTANCE_VALUE;
+    String variableValue = MockProvider.EXAMPLE_PRIMITIVE_VARIABLE_VALUE.getValue();
 
     given()
         .queryParam("variableName", variableName)
@@ -398,7 +389,7 @@ public abstract class AbstractHistoricVariableInstanceRestServiceQueryTest exten
         .and()
           .body("size()", is(1))
           .body("[0].name", equalTo(MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME))
-          .body("[0].value", equalTo(MockProvider.EXAMPLE_VARIABLE_INSTANCE_VALUE))
+          .body("[0].value", equalTo(MockProvider.EXAMPLE_PRIMITIVE_VARIABLE_VALUE.getValue()))
         .when()
           .get(HISTORIC_VARIABLE_INSTANCE_RESOURCE_URL);
 
@@ -410,7 +401,7 @@ public abstract class AbstractHistoricVariableInstanceRestServiceQueryTest exten
   @Test
   public void testVariableValueQuery_BadRequest() {
     given()
-      .queryParam("variableValue", MockProvider.EXAMPLE_VARIABLE_INSTANCE_VALUE)
+      .queryParam("variableValue", MockProvider.EXAMPLE_PRIMITIVE_VARIABLE_VALUE)
     .then()
       .expect()
         .statusCode(Status.BAD_REQUEST.getStatusCode())

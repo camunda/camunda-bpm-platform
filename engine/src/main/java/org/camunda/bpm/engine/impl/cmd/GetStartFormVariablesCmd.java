@@ -13,13 +13,11 @@
 package org.camunda.bpm.engine.impl.cmd;
 
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.camunda.bpm.engine.form.FormField;
 import org.camunda.bpm.engine.form.StartFormData;
+import org.camunda.bpm.engine.impl.core.variable.VariableMapImpl;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.runtime.VariableInstance;
+import org.camunda.bpm.engine.variable.VariableMap;
 
 /**
  * @author Daniel Meyer
@@ -27,16 +25,18 @@ import org.camunda.bpm.engine.runtime.VariableInstance;
  */
 public class GetStartFormVariablesCmd extends AbstractGetFormVariablesCmd {
 
-  public GetStartFormVariablesCmd(String resourceId, Collection<String> formVariableNames) {
-    super(resourceId, formVariableNames);
+  private static final long serialVersionUID = 1L;
+
+  public GetStartFormVariablesCmd(String resourceId, Collection<String> formVariableNames, boolean deserializeObjectValues) {
+    super(resourceId, formVariableNames, deserializeObjectValues);
   }
 
-  public Map<String, VariableInstance> execute(CommandContext commandContext) {
+  public VariableMap execute(CommandContext commandContext) {
 
     StartFormData startFormData = new GetStartFormCmd(resourceId)
       .execute(commandContext);
 
-    Map<String, VariableInstance> result = new HashMap<String, VariableInstance>();
+    VariableMap result = new VariableMapImpl();
 
     for (FormField formField : startFormData.getFormFields()) {
       if(formVariableNames == null || formVariableNames.contains(formField.getId())) {

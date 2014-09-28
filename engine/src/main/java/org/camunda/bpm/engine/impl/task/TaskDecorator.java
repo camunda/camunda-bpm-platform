@@ -41,7 +41,7 @@ public class TaskDecorator {
     this.expressionManager = expressionManager;
   }
 
-  public void decorate(TaskEntity task, VariableScope<?> variableScope) {
+  public void decorate(TaskEntity task, VariableScope variableScope) {
     // set the taskDefinition
     task.setTaskDefinition(taskDefinition);
 
@@ -57,7 +57,7 @@ public class TaskDecorator {
     initializeTaskAssignments(task, variableScope);
   }
 
-  protected void initializeTaskName(TaskEntity task, VariableScope<?> variableScope) {
+  protected void initializeTaskName(TaskEntity task, VariableScope variableScope) {
     Expression nameExpression = taskDefinition.getNameExpression();
     if (nameExpression != null) {
       String name = (String) nameExpression.getValue(variableScope);
@@ -65,7 +65,7 @@ public class TaskDecorator {
     }
   }
 
-  protected void initializeTaskDescription(TaskEntity task, VariableScope<?> variableScope) {
+  protected void initializeTaskDescription(TaskEntity task, VariableScope variableScope) {
     Expression descriptionExpression = taskDefinition.getDescriptionExpression();
     if (descriptionExpression != null) {
       String description = (String) descriptionExpression.getValue(variableScope);
@@ -73,7 +73,7 @@ public class TaskDecorator {
     }
   }
 
-  protected void initializeTaskDueDate(TaskEntity task, VariableScope<?> variableScope) {
+  protected void initializeTaskDueDate(TaskEntity task, VariableScope variableScope) {
     Expression dueDateExpression = taskDefinition.getDueDateExpression();
     if(dueDateExpression != null) {
       Object dueDate = dueDateExpression.getValue(variableScope);
@@ -97,7 +97,7 @@ public class TaskDecorator {
     }
   }
 
-  protected void initializeTaskPriority(TaskEntity task, VariableScope<?> variableScope) {
+  protected void initializeTaskPriority(TaskEntity task, VariableScope variableScope) {
     Expression priorityExpression = taskDefinition.getPriorityExpression();
     if (priorityExpression != null) {
       Object priority = priorityExpression.getValue(variableScope);
@@ -121,7 +121,7 @@ public class TaskDecorator {
     }
   }
 
-  protected void initializeTaskAssignments(TaskEntity task, VariableScope<?> variableScope) {
+  protected void initializeTaskAssignments(TaskEntity task, VariableScope variableScope) {
     // assignee
     initializeTaskAssignee(task, variableScope);
     // candidateUsers
@@ -130,7 +130,7 @@ public class TaskDecorator {
     initializeTaskCandidateGroups(task, variableScope);
   }
 
-  protected void initializeTaskAssignee(TaskEntity task, VariableScope<?> variableScope) {
+  protected void initializeTaskAssignee(TaskEntity task, VariableScope variableScope) {
     Expression assigneeExpression = taskDefinition.getAssigneeExpression();
     if (assigneeExpression != null) {
       task.setAssignee((String) assigneeExpression.getValue(variableScope));
@@ -138,7 +138,7 @@ public class TaskDecorator {
   }
 
   @SuppressWarnings({ "rawtypes", "unchecked" })
-  protected void initializeTaskCandidateGroups(TaskEntity task, VariableScope<?> variableScope) {
+  protected void initializeTaskCandidateGroups(TaskEntity task, VariableScope variableScope) {
     Set<Expression> candidateGroupIdExpressions = taskDefinition.getCandidateGroupIdExpressions();
 
     for (Expression groupIdExpr : candidateGroupIdExpressions) {

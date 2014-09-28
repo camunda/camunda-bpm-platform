@@ -20,9 +20,9 @@ package org.camunda.bpm.engine.delegate;
  */
 public interface Expression {
 
-   Object getValue(VariableScope<?> variableScope);
+   Object getValue(VariableScope variableScope);
 
-   void setValue(Object value, VariableScope<?> variableScope);
+   void setValue(Object value, VariableScope variableScope);
 
    String getExpressionText();
 

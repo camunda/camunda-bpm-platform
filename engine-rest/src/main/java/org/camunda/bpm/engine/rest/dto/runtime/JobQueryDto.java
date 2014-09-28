@@ -27,7 +27,9 @@ import org.camunda.bpm.engine.rest.dto.converter.BooleanConverter;
 import org.camunda.bpm.engine.rest.dto.converter.ConditionListConverter;
 import org.camunda.bpm.engine.rest.dto.converter.DateConverter;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
+import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.runtime.JobQuery;
+import org.codehaus.jackson.map.ObjectMapper;
 
 public class JobQueryDto extends AbstractQueryDto<JobQuery> {
 
@@ -70,8 +72,8 @@ public class JobQueryDto extends AbstractQueryDto<JobQuery> {
 
   public JobQueryDto() {}
 
-	public JobQueryDto(MultivaluedMap<String, String> queryParameters) {
-		super(queryParameters);
+	public JobQueryDto(ObjectMapper objectMapper, MultivaluedMap<String, String> queryParameters) {
+		super(objectMapper, queryParameters);
 	}
 
 	@CamundaQueryParam("jobId")
@@ -225,15 +227,16 @@ public class JobQueryDto extends AbstractQueryDto<JobQuery> {
 
 		if (dueDates != null) {
 			DateConverter dateConverter = new DateConverter();
+			dateConverter.setObjectMapper(objectMapper);
 
 			for (ConditionQueryParameterDto conditionQueryParam : dueDates) {
 				String op = conditionQueryParam.getOperator();
 				Date dueDate = null;
 
 				try {
-				  dueDate = dateConverter.convertQueryParameterToType((String)conditionQueryParam.getValue());
-				} catch (IllegalArgumentException e) {
-				  throw new InvalidRequestException(Status.BAD_REQUEST, e, "Invalid due date format: " + e.getMessage());
+				  dueDate = dateConverter.convertQueryParameterToType((String) conditionQueryParam.getValue());
+				} catch (RestException e) {
+				  throw new InvalidRequestException(e.getStatus(), e, "Invalid due date format: " + e.getMessage());
 				}
 
 				if (op.equals(ConditionQueryParameterDto.GREATER_THAN_OPERATOR_NAME)) {

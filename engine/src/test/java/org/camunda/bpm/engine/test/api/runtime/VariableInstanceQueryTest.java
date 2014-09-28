@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.delegate.SerializedVariableValue;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
@@ -32,6 +31,7 @@ import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.api.runtime.util.CustomSerializable;
 import org.camunda.bpm.engine.test.api.runtime.util.FailingSerializable;
+import org.camunda.bpm.engine.variable.value.ObjectValue;
 import org.junit.Test;
 
 /**
@@ -2311,7 +2311,7 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
 
     // when
     VariableInstanceQuery query =
-        runtimeService.createVariableInstanceQuery().disableCustomObjectDeserialization();
+        runtimeService.createVariableInstanceQuery().disableObjectValueDeserialization();
 
     // then
     List<VariableInstance> results = query.list();
@@ -2320,22 +2320,19 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(2, results.size());
 
     for (VariableInstance variableInstance : results) {
-      if(variableInstance.getName().equals("customSerializable")) {
-        assertNull(variableInstance.getErrorMessage());
+      assertNull(variableInstance.getErrorMessage());
 
-        SerializedVariableValue serializedValue = variableInstance.getSerializedValue();
-        assertNotNull(serializedValue);
-        assertNotNull(serializedValue.getValue());
+      ObjectValue typedValue = (ObjectValue) variableInstance.getTypedValue();
+      assertNotNull(typedValue);
+      assertFalse(typedValue.isDeserialized());
+      // cannot access the deserialized value
+      try {
+        typedValue.getValue();
       }
-      if(variableInstance.getName().equals("failingSerializable")) {
-        // no error message is present
-        assertNull(variableInstance.getErrorMessage());
-
-        SerializedVariableValue serializedValue = variableInstance.getSerializedValue();
-        assertNotNull(serializedValue);
-        assertNotNull(serializedValue.getValue());
+      catch(IllegalStateException e) {
+        assertTextPresent("Object is not deserialized", e.getMessage());
       }
-
+      assertNotNull(typedValue.getValueSerialized());
     }
 
     // delete task

@@ -13,18 +13,13 @@
 package org.camunda.bpm.engine.impl.cmd;
 
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.camunda.bpm.engine.BadUserRequestException;
-import org.camunda.bpm.engine.delegate.PersistentVariableInstance;
 import org.camunda.bpm.engine.form.FormField;
 import org.camunda.bpm.engine.form.TaskFormData;
+import org.camunda.bpm.engine.impl.core.variable.VariableMapImpl;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
-import org.camunda.bpm.engine.runtime.VariableInstance;
+import org.camunda.bpm.engine.variable.VariableMap;
 
 /**
  * @author Daniel Meyer
@@ -32,14 +27,13 @@ import org.camunda.bpm.engine.runtime.VariableInstance;
  */
 public class GetTaskFormVariablesCmd extends AbstractGetFormVariablesCmd {
 
-  private final static Logger log = Logger.getLogger(GetTaskFormVariablesCmd.class.getName());
+  private static final long serialVersionUID = 1L;
 
-  public GetTaskFormVariablesCmd(String taskId, Collection<String> variableNames) {
-    super(taskId, variableNames);
+  public GetTaskFormVariablesCmd(String taskId, Collection<String> variableNames, boolean deserializeObjectValues) {
+    super(taskId, variableNames, deserializeObjectValues);
   }
 
-  @SuppressWarnings("unchecked")
-  public Map<String, VariableInstance> execute(CommandContext commandContext) {
+  public VariableMap execute(CommandContext commandContext) {
 
     TaskEntity task = commandContext.getTaskManager()
       .findTaskById(resourceId);
@@ -48,7 +42,7 @@ public class GetTaskFormVariablesCmd extends AbstractGetFormVariablesCmd {
       throw new BadUserRequestException("Cannot find task with id '"+resourceId+"'.");
     }
 
-    Map<String, PersistentVariableInstance> result = new HashMap<String, PersistentVariableInstance>();
+    VariableMapImpl result = new VariableMapImpl();
 
     // first, evaluate form fields
     TaskFormData taskFormData = task.getTaskDefinition().getTaskFormHandler().createTaskForm(task);
@@ -59,23 +53,9 @@ public class GetTaskFormVariablesCmd extends AbstractGetFormVariablesCmd {
     }
 
     // collect remaining variables from task scope and parent scopes
-    task.collectVariableInstances(result, formVariableNames);
+    task.collectVariables(result, formVariableNames, false, deserializeObjectValues);
 
-    // ensure serialized values are fetched
-    for (PersistentVariableInstance variableInstance : result.values()) {
-
-      if(variableInstance.storesCustomObjects()) {
-        try {
-            variableInstance.getSerializedValue();
-            variableInstance.getValue();
-        } catch(Exception t) {
-          // do not fail if one of the variables fails to load
-          log.log(Level.FINE, "Exception while getting value for variable", t);
-        }
-      }
-    }
-
-    return (Map) result;
+    return result;
   }
 
 }

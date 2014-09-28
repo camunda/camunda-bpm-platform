@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response.Status;
 
@@ -37,6 +38,7 @@ import org.camunda.bpm.engine.rest.dto.converter.VariableListConverter;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.task.DelegationState;
 import org.camunda.bpm.engine.task.TaskQuery;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
@@ -149,8 +151,8 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
 
   }
 
-  public TaskQueryDto(MultivaluedMap<String, String> queryParameters) {
-    super(queryParameters);
+  public TaskQueryDto(ObjectMapper objectMapper, MultivaluedMap<String, String> queryParameters) {
+    super(objectMapper, queryParameters);
   }
 
   @CamundaQueryParam("processInstanceBusinessKey")
@@ -367,7 +369,7 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
   public void setFollowUpBeforeExpressionOrNotExistent(String followUpBeforeExpression) {
     this.followUpBeforeExpressionOrNotExistent = followUpBeforeExpression;
   }
-  
+
   @CamundaQueryParam(value = "followUpBeforeOrNotExistent", converter = DateConverter.class)
   public void setFollowUpBeforeOrNotExistent(Date followUpBefore) {
     this.followUpBeforeOrNotExistent = followUpBefore;
@@ -376,7 +378,7 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
   @CamundaQueryParam(value = "followUpBeforeExpression")
   public void setFollowUpBeforeExpression(String followUpBeforeExpression) {
     this.followUpBeforeExpression = followUpBeforeExpression;
-  }  
+  }
 
   @CamundaQueryParam(value = "followUp", converter = DateConverter.class)
   public void setFollowUpDate(Date followUp) {
@@ -967,7 +969,7 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
       for (VariableQueryParameterDto variableQueryParam : taskVariables) {
         String variableName = variableQueryParam.getName();
         String op = variableQueryParam.getOperator();
-        Object variableValue = variableQueryParam.getValue();
+        Object variableValue = variableQueryParam.resolveValue(objectMapper);
 
         if (op.equals(VariableQueryParameterDto.EQUALS_OPERATOR_NAME)) {
           query.taskVariableValueEquals(variableName, variableValue);
@@ -994,7 +996,7 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
       for (VariableQueryParameterDto variableQueryParam : processVariables) {
         String variableName = variableQueryParam.getName();
         String op = variableQueryParam.getOperator();
-        Object variableValue = variableQueryParam.getValue();
+        Object variableValue = variableQueryParam.resolveValue(objectMapper);
 
         if (op.equals(VariableQueryParameterDto.EQUALS_OPERATOR_NAME)) {
           query.processVariableValueEquals(variableName, variableValue);
@@ -1021,7 +1023,7 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
       for (VariableQueryParameterDto variableQueryParam : caseInstanceVariables) {
         String variableName = variableQueryParam.getName();
         String op = variableQueryParam.getOperator();
-        Object variableValue = variableQueryParam.getValue();
+        Object variableValue = variableQueryParam.resolveValue(objectMapper);
 
         if (op.equals(VariableQueryParameterDto.EQUALS_OPERATOR_NAME)) {
           query.caseInstanceVariableValueEquals(variableName, variableValue);
