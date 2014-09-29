@@ -1,6 +1,6 @@
 {
   "name": "camunda-admin-ui",
-  "version": "7.2.0-alpha5",
+  "version": "7.2.0-SNAPSHOT",
   "private": true,
   "gruntConfig": {
     "connectPort": 8020,
