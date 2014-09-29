@@ -375,6 +375,7 @@ public abstract class AbstractVariableInstanceRestServiceQueryTest extends Abstr
     queryParameters.put("caseExecutionIdIn", "aCaseExecutionId");
     queryParameters.put("caseInstanceIdIn", "aCaseInstanceId");
     queryParameters.put("taskIdIn", "aTaskId");
+    queryParameters.put("variableScopeIdIn", "aVariableScopeId");
     queryParameters.put("activityInstanceIdIn", "anActivityInstanceId");
 
     given().queryParams(queryParameters)
@@ -388,6 +389,7 @@ public abstract class AbstractVariableInstanceRestServiceQueryTest extends Abstr
     verify(mockedQuery).caseInstanceIdIn(queryParameters.get("caseInstanceIdIn"));
     verify(mockedQuery).caseExecutionIdIn(queryParameters.get("caseExecutionIdIn"));
     verify(mockedQuery).taskIdIn(queryParameters.get("taskIdIn"));
+    verify(mockedQuery).variableScopeIdIn(queryParameters.get("variableScopeIdIn"));
     verify(mockedQuery).activityInstanceIdIn(queryParameters.get("activityInstanceIdIn"));
     verify(mockedQuery).list();
 
@@ -405,6 +407,7 @@ public abstract class AbstractVariableInstanceRestServiceQueryTest extends Abstr
     String aProcessInstanceId = "aProcessInstanceId";
     String anExecutionId = "anExecutionId";
     String aTaskId = "aTaskId";
+    String aVariableScopeId = "aVariableScopeId";
     String anActivityInstanceId = "anActivityInstanceId";
     String aCaseInstanceId = "aCaseInstanceId";
     String aCaseExecutionId = "aCaseExecutionId";
@@ -434,6 +437,10 @@ public abstract class AbstractVariableInstanceRestServiceQueryTest extends Abstr
     taskIdIn.add(aTaskId);
     queryParameters.put("taskIdIn", taskIdIn);
 
+    List<String> variableScopeIdIn = new ArrayList<String>();
+    variableScopeIdIn.add(aVariableScopeId);
+    queryParameters.put("variableScopeIdIn", variableScopeIdIn);
+
     List<String> activityInstanceIdIn = new ArrayList<String>();
     activityInstanceIdIn.add(anActivityInstanceId);
     queryParameters.put("activityInstanceIdIn", activityInstanceIdIn);
@@ -447,6 +454,7 @@ public abstract class AbstractVariableInstanceRestServiceQueryTest extends Abstr
     verify(mockedQuery).processInstanceIdIn(aProcessInstanceId);
     verify(mockedQuery).executionIdIn(anExecutionId);
     verify(mockedQuery).taskIdIn(aTaskId);
+    verify(mockedQuery).variableScopeIdIn(aVariableScopeId);
     verify(mockedQuery).activityInstanceIdIn(anActivityInstanceId);
     verify(mockedQuery).list();
     verify(mockedQuery).disableBinaryFetching();
@@ -581,6 +589,9 @@ public abstract class AbstractVariableInstanceRestServiceQueryTest extends Abstr
     String aTaskId = "aTaskId";
     String anotherTaskId = "anotherTaskId";
 
+    String aVariableScopeId = "aVariableScopeId";
+    String anotherVariableScopeId = "anotherVariableScopeId";
+
     String anActivityInstanceId = "anActivityInstanceId";
     String anotherActivityInstanceId = "anotherActivityInstanceId";
 
@@ -588,6 +599,7 @@ public abstract class AbstractVariableInstanceRestServiceQueryTest extends Abstr
       .queryParam("processInstanceIdIn", aProcessInstanceId + "," + anotherProcessInstanceId)
       .queryParam("executionIdIn", anExecutionId + "," + anotherExecutionId)
       .queryParam("taskIdIn", aTaskId + "," + anotherTaskId)
+      .queryParam("variableScopeIdIn", aVariableScopeId + "," + anotherVariableScopeId)
       .queryParam("activityInstanceIdIn", anActivityInstanceId + "," + anotherActivityInstanceId)
       .then().expect().statusCode(Status.OK.getStatusCode())
       .when().get(VARIABLE_INSTANCE_QUERY_URL);
@@ -595,6 +607,7 @@ public abstract class AbstractVariableInstanceRestServiceQueryTest extends Abstr
     verify(mockedQuery).processInstanceIdIn(aProcessInstanceId, anotherProcessInstanceId);
     verify(mockedQuery).executionIdIn(anExecutionId, anotherExecutionId);
     verify(mockedQuery).taskIdIn(aTaskId, anotherTaskId);
+    verify(mockedQuery).variableScopeIdIn(aVariableScopeId, anotherVariableScopeId);
     verify(mockedQuery).activityInstanceIdIn(anActivityInstanceId, anotherActivityInstanceId);
     verify(mockedQuery).disableBinaryFetching();
 
@@ -626,6 +639,13 @@ public abstract class AbstractVariableInstanceRestServiceQueryTest extends Abstr
     taskIdIn.add(aTaskId);
     taskIdIn.add(anotherTaskId);
 
+    String aVariableScopeId = "aVariableScopeId";
+    String anotherVariableScopeId = "anotherVariableScopeId";
+
+    List<String> variableScopeIdIn= new ArrayList<String>();
+    variableScopeIdIn.add(aVariableScopeId);
+    variableScopeIdIn.add(anotherVariableScopeId);
+
     String anActivityInstanceId = "anActivityInstanceId";
     String anotherActivityInstanceId = "anotherActivityInstanceId";
 
@@ -637,6 +657,7 @@ public abstract class AbstractVariableInstanceRestServiceQueryTest extends Abstr
     json.put("processInstanceIdIn", processDefinitionIdIn);
     json.put("executionIdIn", executionIdIn);
     json.put("taskIdIn", taskIdIn);
+    json.put("variableScopeIdIn", variableScopeIdIn);
     json.put("activityInstanceIdIn", activityInstanceIdIn);
 
     given().contentType(POST_JSON_CONTENT_TYPE).body(json)
@@ -646,6 +667,7 @@ public abstract class AbstractVariableInstanceRestServiceQueryTest extends Abstr
     verify(mockedQuery).processInstanceIdIn(aProcessInstanceId, anotherProcessInstanceId);
     verify(mockedQuery).executionIdIn(anExecutionId, anotherExecutionId);
     verify(mockedQuery).taskIdIn(aTaskId, anotherTaskId);
+    verify(mockedQuery).variableScopeIdIn(aVariableScopeId, anotherVariableScopeId);
     verify(mockedQuery).activityInstanceIdIn(anActivityInstanceId, anotherActivityInstanceId);
     verify(mockedQuery).disableBinaryFetching();
 

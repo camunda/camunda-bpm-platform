@@ -52,6 +52,7 @@ public class VariableInstanceQueryDto extends AbstractQueryDto<VariableInstanceQ
   protected String[] caseExecutionIdIn;
   protected String[] caseInstanceIdIn;
   protected String[] taskIdIn;
+  protected String[] variableScopeIdIn;
   protected String[] activityInstanceIdIn;
 
   public VariableInstanceQueryDto() {}
@@ -98,6 +99,11 @@ public class VariableInstanceQueryDto extends AbstractQueryDto<VariableInstanceQ
   @CamundaQueryParam(value="taskIdIn", converter = StringArrayConverter.class)
   public void setTaskIdIn(String[] taskIdIn) {
     this.taskIdIn = taskIdIn;
+  }
+
+  @CamundaQueryParam(value="variableScopeIdIn", converter = StringArrayConverter.class)
+  public void setVariableScopeIdIn(String[] variableScopeIdIn) {
+    this.variableScopeIdIn = variableScopeIdIn;
   }
 
   @CamundaQueryParam(value="activityInstanceIdIn", converter = StringArrayConverter.class)
@@ -169,6 +175,10 @@ public class VariableInstanceQueryDto extends AbstractQueryDto<VariableInstanceQ
 
     if (taskIdIn != null && taskIdIn.length > 0) {
       query.taskIdIn(taskIdIn);
+    }
+
+    if (variableScopeIdIn != null && variableScopeIdIn.length > 0) {
+      query.variableScopeIdIn(variableScopeIdIn);
     }
 
     if (activityInstanceIdIn != null && activityInstanceIdIn.length > 0) {

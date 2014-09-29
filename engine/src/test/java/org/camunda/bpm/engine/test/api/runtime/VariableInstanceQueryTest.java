@@ -1666,6 +1666,69 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
   }
 
   @Test
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/runtime/VariableInstanceQueryTest.taskInEmbeddedSubProcess.bpmn20.xml"})
+  public void testQueryByVariableScopeId() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testProcess");
+
+    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    assertNotNull(task);
+
+    // get variable scope ids
+    String taskId = task.getId();
+    String executionId = task.getExecutionId();
+    String processInstanceId = task.getProcessInstanceId();
+
+    // set variables
+    String variableName = "foo";
+    Map<String, String> variables = new HashMap<String, String>();
+    variables.put(taskId, "task");
+    variables.put(executionId, "execution");
+    variables.put(processInstanceId, "processInstance");
+
+    taskService.setVariableLocal(taskId, variableName, variables.get(taskId));
+    runtimeService.setVariableLocal(executionId, variableName, variables.get(executionId));
+    runtimeService.setVariableLocal(processInstanceId, variableName, variables.get(processInstanceId));
+
+    List<VariableInstance> variableInstances;
+
+    // query by variable scope id
+    for (String variableScopeId : variables.keySet()) {
+      variableInstances = runtimeService.createVariableInstanceQuery().variableScopeIdIn(variableScopeId).list();
+      assertEquals(1, variableInstances.size());
+      assertEquals(variableName, variableInstances.get(0).getName());
+      assertEquals(variables.get(variableScopeId), variableInstances.get(0).getValue());
+    }
+
+    // query by multiple variable scope ids
+    variableInstances = runtimeService.createVariableInstanceQuery().variableScopeIdIn(taskId, executionId, processInstanceId).list();
+    assertEquals(3, variableInstances.size());
+
+    // remove task variable
+    taskService.removeVariableLocal(taskId, variableName);
+
+    variableInstances = runtimeService.createVariableInstanceQuery().variableScopeIdIn(taskId).list();
+    assertEquals(0, variableInstances.size());
+
+    variableInstances = runtimeService.createVariableInstanceQuery().variableScopeIdIn(taskId, executionId, processInstanceId).list();
+    assertEquals(2, variableInstances.size());
+
+    // remove process instance variable variable
+    runtimeService.removeVariable(processInstanceId, variableName);
+
+    variableInstances = runtimeService.createVariableInstanceQuery().variableScopeIdIn(processInstanceId, taskId).list();
+    assertEquals(0, variableInstances.size());
+
+    variableInstances = runtimeService.createVariableInstanceQuery().variableScopeIdIn(taskId, executionId, processInstanceId).list();
+    assertEquals(1, variableInstances.size());
+
+    // remove execution variable
+    runtimeService.removeVariable(executionId, variableName);
+
+    variableInstances = runtimeService.createVariableInstanceQuery().variableScopeIdIn(taskId, executionId, processInstanceId).list();
+    assertEquals(0, variableInstances.size());
+  }
+
+  @Test
   @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
   public void testQueryByActivityInstanceId() {
     // given

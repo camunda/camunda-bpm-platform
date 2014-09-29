@@ -217,6 +217,15 @@
               </foreach>
             </if>
 
+            <!-- variableScopeIds -->
+            <if test="variableScopeIds != null &amp;&amp; variableScopeIds.length > 0">
+              and RES.VAR_SCOPE_ in
+              <foreach item="item" index="index" collection="variableScopeIds"
+                       open="(" separator="," close=")">
+                #{item}
+              </foreach>
+            </if>
+
             <!-- activityInstanceIds -->
             <if test="activityInstanceIds != null &amp;&amp; activityInstanceIds.length > 0">
               and <include refid="actInstIdColumn"/> in

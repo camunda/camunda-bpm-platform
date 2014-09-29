@@ -42,6 +42,7 @@ public class VariableInstanceQueryImpl extends AbstractVariableQueryImpl<Variabl
   protected String[] caseExecutionIds;
   protected String[] caseInstanceIds;
   protected String[] taskIds;
+  protected String[] variableScopeIds;
   protected String[] activityInstanceIds;
 
   protected boolean isByteArrayFetchingEnabled = true;
@@ -91,6 +92,11 @@ public class VariableInstanceQueryImpl extends AbstractVariableQueryImpl<Variabl
 
   public VariableInstanceQuery taskIdIn(String... taskIds) {
     this.taskIds = taskIds;
+    return this;
+  }
+
+  public VariableInstanceQuery variableScopeIdIn(String... variableScopeIds) {
+    this.variableScopeIds = variableScopeIds;
     return this;
   }
 
@@ -222,6 +228,10 @@ public class VariableInstanceQueryImpl extends AbstractVariableQueryImpl<Variabl
 
   public String[] getTaskIds() {
     return taskIds;
+  }
+
+  public String[] getVariableScopeIds() {
+    return variableScopeIds;
   }
 
   public String[] getActivityInstanceIds() {

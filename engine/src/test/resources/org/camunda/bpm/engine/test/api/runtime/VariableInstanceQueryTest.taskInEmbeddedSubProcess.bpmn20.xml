@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:camunda="http://activiti.org/bpmn"
+  targetNamespace="http://camunda.org/example">
+
+  <process id="testProcess" isExecutable="true">
+    <startEvent id="start" />
+
+    <sequenceFlow sourceRef="start" targetRef="sub"/>
+
+    <subProcess id="sub">
+
+      <startEvent id="subStart"/>
+
+      <sequenceFlow sourceRef="subStart" targetRef="task"/>
+
+      <userTask id="task" />
+
+      <sequenceFlow sourceRef="task" targetRef="subEnd"/>
+
+      <endEvent id="subEnd"/>
+
+    </subProcess>
+
+    <sequenceFlow sourceRef="sub" targetRef="end"/>
+
+    <endEvent id="end"/>
+
+  </process>
+
+</definitions>
