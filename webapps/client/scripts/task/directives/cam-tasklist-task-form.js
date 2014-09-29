@@ -197,6 +197,8 @@ define([
 
           }
           else {
+            scope.$invalid = false;
+
             // clear the content (to avoid other tasks form to appear)
             $translate('NO_TASK_FORM').then(function(translated) {
               targetContainer.html(translated || '');
