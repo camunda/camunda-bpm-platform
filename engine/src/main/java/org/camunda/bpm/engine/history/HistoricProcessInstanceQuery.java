@@ -185,6 +185,14 @@ public interface HistoricProcessInstanceQuery extends Query<HistoricProcessInsta
    * ids match. */
   HistoricProcessInstanceQuery superProcessInstanceId(String superProcessInstanceId);
 
+  /** Only select historic process instances having a sub process instance
+   * with the given process instance id.
+   * 
+   * Note that there will always be maximum only <b>one</b>
+   * such process instance that can be the result of this query.
+   */
+  HistoricProcessInstanceQuery subProcessInstanceId(String subProcessInstanceId);
+
   // below is deprecated and should be removed in 5.12
 
   /** Only select historic process instances that were started as of the provided
@@ -204,4 +212,5 @@ public interface HistoricProcessInstanceQuery extends Query<HistoricProcessInsta
   /** Only select historic process instances that were finished on provided date.
    * @deprecated will be removed in 5.12, use {@link #startedAfter(Date)} and {@link #startedBefore(Date)} instead */
   HistoricProcessInstanceQuery finishDateOn(Date date);
+
 }

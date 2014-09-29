@@ -399,6 +399,7 @@ public abstract class AbstractHistoricProcessInstanceRestServiceQueryTest extend
     parameters.put("processDefinitionNameLike", MockProvider.EXAMPLE_PROCESS_DEFINITION_NAME_LIKE);
     parameters.put("startedBy", "startedBySomeone");
     parameters.put("superProcessInstanceId", MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_SUPER_PROCESS_INSTANCE_ID);
+    parameters.put("subProcessInstanceId", MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_SUB_PROCESS_INSTANCE_ID);
     parameters.put("caseInstanceId", MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_CASE_INSTANCE_ID);
 
     return parameters;
@@ -416,6 +417,7 @@ public abstract class AbstractHistoricProcessInstanceRestServiceQueryTest extend
     verify(mockedQuery).processDefinitionNameLike(stringQueryParameters.get("processDefinitionNameLike"));
     verify(mockedQuery).startedBy(stringQueryParameters.get("startedBy"));
     verify(mockedQuery).superProcessInstanceId(stringQueryParameters.get("superProcessInstanceId"));
+    verify(mockedQuery).subProcessInstanceId(stringQueryParameters.get("subProcessInstanceId"));
     verify(mockedQuery).caseInstanceId(stringQueryParameters.get("caseInstanceId"));
 
     verify(mockedQuery).list();

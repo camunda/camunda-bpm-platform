@@ -315,6 +315,7 @@ public abstract class MockProvider {
   public static final String EXAMPLE_HISTORIC_PROCESS_INSTANCE_START_USER_ID = "aStartUserId";
   public static final String EXAMPLE_HISTORIC_PROCESS_INSTANCE_START_ACTIVITY_ID = "aStartActivityId";
   public static final String EXAMPLE_HISTORIC_PROCESS_INSTANCE_SUPER_PROCESS_INSTANCE_ID = "aSuperProcessInstanceId";
+  public static final String EXAMPLE_HISTORIC_PROCESS_INSTANCE_SUB_PROCESS_INSTANCE_ID = "aSubProcessInstanceId";
   public static final String EXAMPLE_HISTORIC_PROCESS_INSTANCE_CASE_INSTANCE_ID = "aCaseInstanceId";
 
   public static final String EXAMPLE_HISTORIC_PROCESS_INSTANCE_STARTED_AFTER = "2013-04-23T13:42:43";

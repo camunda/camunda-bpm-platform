@@ -213,6 +213,9 @@
       <if test="superProcessInstanceId != null">
         and RES.SUPER_PROCESS_INSTANCE_ID_ = #{superProcessInstanceId}
       </if>
+      <if test="subProcessInstanceId != null">
+        and RES.PROC_INST_ID_ = (select SUPER_PROCESS_INSTANCE_ID_ from ${prefix}ACT_HI_PROCINST where PROC_INST_ID_ = #{subProcessInstanceId})
+      </if>      
       <foreach collection="queryVariableValues" index="index" item="queryVariableValue">
         and A${index}.NAME_= #{queryVariableValue.name}
         <if test="!queryVariableValue.type.equals('null')">
