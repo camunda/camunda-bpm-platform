@@ -18,6 +18,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 
@@ -32,6 +33,7 @@ import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.hal.Hal;
 import org.camunda.bpm.engine.rest.helper.EqualsList;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
+import org.camunda.bpm.engine.rest.helper.ValueGenerator;
 import org.camunda.bpm.engine.task.DelegationState;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
@@ -1203,28 +1205,27 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
 
   @Test
   public void testQueryWithExpressions() {
-    String testExpression = "${'test'}";
+    String testExpression = "${'test-%s'}";
+
+    ValueGenerator generator = new ValueGenerator(testExpression);
 
     Map<String, String> params = new HashMap<String, String>();
-    params.put("assigneeExpression", testExpression);
-    params.put("assigneeLikeExpression", testExpression);
-    params.put("ownerExpression", testExpression);
-    params.put("involvedUserExpression", testExpression);
-    params.put("candidateUserExpression", testExpression);
-    params.put("candidateGroupExpression", testExpression);
-    params.put("candidateGroupsExpression", testExpression);
-    params.put("createdBeforeExpression", testExpression);
-    params.put("createdExpression", testExpression);
-    params.put("createdOnExpression", testExpression);
-    params.put("createdAfterExpression", testExpression);
-    params.put("dueBeforeExpression", testExpression);
-    params.put("dueExpression", testExpression);
-    params.put("dueDateExpression", testExpression);
-    params.put("dueAfterExpression", testExpression);
-    params.put("followUpBeforeExpression", testExpression);
-    params.put("followUpExpression", testExpression);
-    params.put("followUpDateExpression", testExpression);
-    params.put("followUpAfterExpression", testExpression);
+    params.put("assigneeExpression", generator.getValue("assigneeExpression"));
+    params.put("assigneeLikeExpression", generator.getValue("assigneeLikeExpression"));
+    params.put("ownerExpression", generator.getValue("ownerExpression"));
+    params.put("involvedUserExpression", generator.getValue("involvedUserExpression"));
+    params.put("candidateUserExpression", generator.getValue("candidateUserExpression"));
+    params.put("candidateGroupExpression", generator.getValue("candidateGroupExpression"));
+    params.put("candidateGroupsExpression", generator.getValue("candidateGroupsExpression"));
+    params.put("createdBeforeExpression", generator.getValue("createdBeforeExpression"));
+    params.put("createdOnExpression", generator.getValue("createdOnExpression"));
+    params.put("createdAfterExpression", generator.getValue("createdAfterExpression"));
+    params.put("dueBeforeExpression", generator.getValue("dueBeforeExpression"));
+    params.put("dueDateExpression", generator.getValue("dueDateExpression"));
+    params.put("dueAfterExpression", generator.getValue("dueAfterExpression"));
+    params.put("followUpBeforeExpression", generator.getValue("followUpBeforeExpression"));
+    params.put("followUpDateExpression", generator.getValue("followUpDateExpression"));
+    params.put("followUpAfterExpression", generator.getValue("followUpAfterExpression"));
 
     // get
     given()
@@ -1235,7 +1236,7 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
     .when()
       .get(TASK_QUERY_URL);
 
-    verifyExpressionMocks(testExpression);
+    verifyExpressionMocks(generator);
 
     // reset mock
     reset(mockQuery);
@@ -1250,27 +1251,28 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
     .when()
       .post(TASK_QUERY_URL);
 
-    verifyExpressionMocks(testExpression);
+    verifyExpressionMocks(generator);
 
   }
 
-  protected void verifyExpressionMocks(String testExpression) {
-    verify(mockQuery).taskAssigneeExpression(testExpression);
-    verify(mockQuery).taskAssigneeLikeExpression(testExpression);
-    verify(mockQuery).taskOwnerExpression(testExpression);
-    verify(mockQuery).taskInvolvedUserExpression(testExpression);
-    verify(mockQuery).taskCandidateUserExpression(testExpression);
-    verify(mockQuery).taskCandidateGroupExpression(testExpression);
-    verify(mockQuery).taskCandidateGroupInExpression(testExpression);
-    verify(mockQuery).taskCreatedBeforeExpression(testExpression);
-    verify(mockQuery).taskCreatedOnExpression(testExpression);
-    verify(mockQuery).taskCreatedAfterExpression(testExpression);
-    verify(mockQuery).dueBeforeExpression(testExpression);
-    verify(mockQuery).dueDateExpression(testExpression);
-    verify(mockQuery).dueAfterExpression(testExpression);
-    verify(mockQuery).followUpBeforeExpression(testExpression);
-    verify(mockQuery).followUpDateExpression(testExpression);
-    verify(mockQuery).followUpAfterExpression(testExpression);
+  protected void verifyExpressionMocks(ValueGenerator generator) {
+    verify(mockQuery).taskAssigneeExpression(generator.getValue("assigneeExpression"));
+    verify(mockQuery).taskAssigneeLikeExpression(generator.getValue("assigneeLikeExpression"));
+    verify(mockQuery).taskOwnerExpression(generator.getValue("ownerExpression"));
+    verify(mockQuery).taskInvolvedUserExpression(generator.getValue("involvedUserExpression"));
+    verify(mockQuery).taskCandidateUserExpression(generator.getValue("candidateUserExpression"));
+    verify(mockQuery).taskCandidateGroupExpression(generator.getValue("candidateGroupExpression"));
+    verify(mockQuery).taskCandidateGroupInExpression(generator.getValue("candidateGroupsExpression"));
+    verify(mockQuery).taskCreatedBeforeExpression(generator.getValue("createdBeforeExpression"));
+    verify(mockQuery).taskCreatedOnExpression(generator.getValue("createdOnExpression"));
+    verify(mockQuery).taskCreatedAfterExpression(generator.getValue("createdAfterExpression"));
+    verify(mockQuery).dueBeforeExpression(generator.getValue("dueBeforeExpression"));
+    verify(mockQuery).dueDateExpression(generator.getValue("dueDateExpression"));
+    verify(mockQuery).dueAfterExpression(generator.getValue("dueAfterExpression"));
+    verify(mockQuery).followUpBeforeExpression(generator.getValue("followUpBeforeExpression"));
+    verify(mockQuery).followUpDateExpression(generator.getValue("followUpDateExpression"));
+    verify(mockQuery).followUpAfterExpression(generator.getValue("followUpAfterExpression"));
+
   }
 
 }

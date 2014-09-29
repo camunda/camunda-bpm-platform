@@ -453,7 +453,6 @@ public class TaskQueryExpressionTest extends PluggableProcessEngineTestCase {
 
   @After
   public void tearDown() {
-    processEngineConfiguration.setAuthorizationEnabled(false);
     for (Group group : identityService.createGroupQuery().list()) {
       identityService.deleteGroup(group.getId());
     }
@@ -463,6 +462,8 @@ public class TaskQueryExpressionTest extends PluggableProcessEngineTestCase {
     for (Task task : taskService.createTaskQuery().list()) {
       taskService.deleteTask(task.getId(), true);
     }
+
+    identityService.clearAuthentication();
   }
 
 
@@ -475,15 +476,12 @@ public class TaskQueryExpressionTest extends PluggableProcessEngineTestCase {
   }
 
   protected void setCurrentUser(User user) {
-    processEngineConfiguration.setAuthorizationEnabled(false);
-
     List<Group> groups = identityService.createGroupQuery().groupMember(user.getId()).list();
     List<String> groupIds = new ArrayList<String>();
     for (Group group : groups) {
       groupIds.add(group.getId());
     }
 
-    processEngineConfiguration.setAuthorizationEnabled(true);
     identityService.setAuthentication(user.getId(), groupIds);
   }
 
