@@ -80,7 +80,7 @@ define('camunda-tasklist-ui', [
         return $rootScope.authentication && $rootScope.authentication.name;
       }
 
-      $rootScope.$on('authentication.changed', function() {
+      $rootScope.$on('authentication.login.success', function() {
         if (!isAuth()) { return; }
 
         var Filter = camAPI.resource('filter');

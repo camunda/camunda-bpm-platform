@@ -66,7 +66,8 @@ define([
           });
         }
 
-        $rootScope.$on('authentication.changed', refresh);
+        $rootScope.$on('authentication.login.success', refresh);
+        $rootScope.$on('authentication.logout.success', refresh);
 
         // initializes...
         refresh();
