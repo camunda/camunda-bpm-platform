@@ -707,11 +707,16 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
   @Deployment
   public void testParallelSubProcessCompletionCondition() {
     String procId = runtimeService.startProcessInstanceByKey("miParallelSubprocessCompletionCondition").getId();
-    List<Task> tasks = taskService.createTaskQuery().orderByExecutionId().asc().list();
+
+    List<Task> tasks = taskService.createTaskQuery().list();
     assertEquals(4, tasks.size());
 
-    for (int i=0; i<2; i++) {
-      taskService.complete(tasks.get(i).getId());
+    // get activities of a single subprocess
+    ActivityInstance[] taskActivities = runtimeService.getActivityInstance(procId).getChildActivityInstances()[0].getChildActivityInstances();
+
+    for (ActivityInstance taskActivity : taskActivities) {
+      Task task = taskService.createTaskQuery().activityInstanceIdIn(taskActivity.getId()).singleResult();
+      taskService.complete(task.getId());
     }
 
     assertProcessEnded(procId);
