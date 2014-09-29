@@ -254,7 +254,9 @@ define([
         });
 
 
-        scope.$on('filter.saved', loadTasks);
+        $rootScope.$on('filter.deleted', loadTasks);
+
+        $rootScope.$on('filter.saved', loadTasks);
       }
     };
   }];
