@@ -33,15 +33,21 @@ function(
           return;
         }
 
+        if (!$rootScope.authentication) {
+          return options.done(new Error('Not authenticated'));
+        }
+
         var original = options.done;
 
         options.done = function(err, result) {
           $rootScope.$apply(function() {
             // in case the session expired
             if (err && err.status === 401) {
-              $rootScope.$broadcast('authentication.changed');
+              $rootScope.$broadcast('authentication.changed', null);
               $rootScope.$broadcast('authentication.session.expired');
+              return;
             }
+
             original(err, result);
           });
         };
