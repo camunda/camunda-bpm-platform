@@ -63,6 +63,11 @@ define([
       link: function(scope) {
         var dateExp = /(Before|After)$/;
 
+        var _scopeEvents = [];
+        scope.$on('$destroy', function() {
+          angular.forEach(_scopeEvents, function(fn) { fn(); });
+        });
+
         scope.pageSize = 15;
         scope.pageNum = 1;
         scope.totalItems = 0;
@@ -77,9 +82,9 @@ define([
 
         scope.sorting = angular.element('[cam-sorting-choices]').scope();
 
-        scope.sorting.$on('sorting.by.change', loadTasks);
+        _scopeEvents.push(scope.sorting.$on('sorting.by.change', loadTasks));
 
-        scope.sorting.$on('sorting.order.change', loadTasks);
+        _scopeEvents.push(scope.sorting.$on('sorting.order.change', loadTasks));
 
 
         function authed() {
@@ -103,7 +108,7 @@ define([
 
 
         function loadTasks() {
-          if (!authed() || !scope.filter) { return; }
+          if (scope.loading || !authed() || !scope.filter) { return; }
 
           scope.loading = true;
           scope.tasks = [];
@@ -253,10 +258,13 @@ define([
           setCurrentTask(null);
         });
 
+        loadTasks();
 
-        $rootScope.$on('filter.deleted', loadTasks);
+        _scopeEvents.push($rootScope.$on('filter.deleted', loadTasks));
 
-        $rootScope.$on('filter.saved', loadTasks);
+        _scopeEvents.push($rootScope.$on('filter.saved', loadTasks));
+
+        _scopeEvents.push($rootScope.$on('authentication.login.success', loadTasks));
       }
     };
   }];

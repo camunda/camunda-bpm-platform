@@ -33,9 +33,14 @@ define([
       ) {
         var Filter = camAPI.resource('filter');
 
+        var _scopeEvents = [];
+        $scope.$on('$destroy', function() {
+          angular.forEach(_scopeEvents, function(fn) { fn(); });
+        });
+
         $scope.filters = [];
         $scope.focusedId = null;
-        $scope.loading = true;
+        $scope.loading = false;
 
         $scope.edit = function(filter) {
           $rootScope.$broadcast('filter.edit', filter);
@@ -61,7 +66,7 @@ define([
 
 
         function listFilters() {
-          if (!authed()) { return; }
+          if ($scope.loading || !authed()) { return; }
           $scope.loading = true;
 
           Filter.list({}, function(err, res) {
@@ -83,9 +88,12 @@ define([
 
         listFilters();
 
-        $rootScope.$on('filter.saved', listFilters);
 
-        $rootScope.$on('filter.deleted', listFilters);
+        _scopeEvents.push($rootScope.$on('filter.saved', listFilters));
+
+        _scopeEvents.push($rootScope.$on('filter.deleted', listFilters));
+
+        _scopeEvents.push($rootScope.$on('authentication.login.success', listFilters));
       }]
     };
   }];

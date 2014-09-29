@@ -35,6 +35,11 @@ define([
       link: function(scope, element) {
         scope.task = scope.task || $rootScope.currentTask;
 
+        var _scopeEvents = [];
+        scope.$on('$destroy', function() {
+          angular.forEach(_scopeEvents, function(fn) { fn(); });
+        });
+
         scope.tabs = {
           form: true,
           description: false,
@@ -120,7 +125,7 @@ define([
 
         scope.$on('tasklist.task.current', setTask);
 
-        $rootScope.$on('$locationChangeSuccess', setTask);
+        _scopeEvents.push($rootScope.$on('$locationChangeSuccess', setTask));
 
         setTask();
       }
