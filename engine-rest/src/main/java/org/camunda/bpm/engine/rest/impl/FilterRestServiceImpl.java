@@ -64,7 +64,8 @@ public class FilterRestServiceImpl extends AbstractAuthorizedRestResource implem
     return new FilterResourceImpl(getProcessEngine().getName(), getObjectMapper(providers), filterId, relativeRootResourcePath);
   }
 
-  public List<FilterDto> getFilters(UriInfo uriInfo, Integer firstResult, Integer maxResults) {
+  public List<FilterDto> getFilters(UriInfo uriInfo, Boolean itemCount, Integer firstResult, Integer maxResults) {
+    FilterService filterService = getProcessEngine().getFilterService();
     FilterQuery query = getQueryFromQueryParameters(uriInfo.getQueryParameters());
 
     List<Filter> matchingFilters = executeFilterQuery(query, firstResult, maxResults);
@@ -72,6 +73,9 @@ public class FilterRestServiceImpl extends AbstractAuthorizedRestResource implem
     List<FilterDto> filters = new ArrayList<FilterDto>();
     for (Filter filter : matchingFilters) {
       FilterDto dto = FilterDto.fromFilter(filter);
+      if (itemCount != null && itemCount) {
+        dto.setItemCount(filterService.count(filter.getId()));
+      }
       filters.add(dto);
     }
 

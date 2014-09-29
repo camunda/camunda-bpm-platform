@@ -26,6 +26,7 @@ import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.mapper.JacksonConfigurator;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 public class FilterDto {
 
@@ -37,6 +38,9 @@ public class FilterDto {
   protected String owner;
   protected AbstractQueryDto<?> query;
   protected Map<String, Object> properties;
+
+  @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
+  protected Long itemCount;
 
   public String getId() {
     return id;
@@ -89,6 +93,14 @@ public class FilterDto {
 
   public void setProperties(Map<String, Object> properties) {
     this.properties = properties;
+  }
+
+  public Long getItemCount() {
+    return itemCount;
+  }
+
+  public void setItemCount(Long itemCount) {
+    this.itemCount = itemCount;
   }
 
   public static FilterDto fromFilter(Filter filter) {

@@ -452,6 +452,7 @@ public abstract class MockProvider {
 
   // filter
   public static final String EXAMPLE_FILTER_ID = "aFilterId";
+  public static final String ANOTHER_EXAMPLE_FILTER_ID = "anotherFilterId";
   public static final String EXAMPLE_FILTER_RESOURCE_TYPE = EntityTypes.TASK;
   public static final String EXAMPLE_FILTER_NAME = "aFilterName";
   public static final String EXAMPLE_FILTER_OWNER = "aFilterOwner";
@@ -1418,14 +1419,19 @@ public abstract class MockProvider {
 
   public static List<Filter> createMockFilters() {
     List<Filter> mocks = new ArrayList<Filter>();
-    mocks.add(createMockFilter());
+    mocks.add(createMockFilter(EXAMPLE_FILTER_ID));
+    mocks.add(createMockFilter(ANOTHER_EXAMPLE_FILTER_ID));
     return mocks;
   }
 
   public static Filter createMockFilter() {
+    return createMockFilter(EXAMPLE_FILTER_ID);
+  }
+
+  public static Filter createMockFilter(String id) {
     Filter mock = mock(Filter.class);
 
-    when(mock.getId()).thenReturn(EXAMPLE_FILTER_ID);
+    when(mock.getId()).thenReturn(id);
     when(mock.getResourceType()).thenReturn(EXAMPLE_FILTER_RESOURCE_TYPE);
     when(mock.getName()).thenReturn(EXAMPLE_FILTER_NAME);
     when(mock.getOwner()).thenReturn(EXAMPLE_FILTER_OWNER);

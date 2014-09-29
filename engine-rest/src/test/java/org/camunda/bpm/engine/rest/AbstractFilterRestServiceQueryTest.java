@@ -20,6 +20,8 @@ import static com.jayway.restassured.RestAssured.given;
 import static com.jayway.restassured.path.json.JsonPath.from;
 import static org.fest.assertions.Assertions.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -29,6 +31,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.camunda.bpm.engine.FilterService;
+import org.camunda.bpm.engine.filter.Filter;
 import org.camunda.bpm.engine.filter.FilterQuery;
 import org.camunda.bpm.engine.impl.AbstractQuery;
 import org.camunda.bpm.engine.rest.dto.runtime.FilterQueryDto;
@@ -45,14 +49,30 @@ import com.jayway.restassured.response.Response;
 public abstract class AbstractFilterRestServiceQueryTest extends AbstractRestServiceTest {
 
   protected static final String FILTER_QUERY_URL = TEST_RESOURCE_ROOT_PATH + FilterRestService.PATH;
+  protected static final String SINGLE_FILTER_URL = FILTER_QUERY_URL + "/{id}";
   protected static final String FILTER_COUNT_QUERY_URL = FILTER_QUERY_URL + "/count";
 
   protected FilterQuery mockedQuery;
+  protected Filter mockedFilter;
+  protected int mockedFilterItemCount;
+  protected Filter anotherMockedFilter;
+  protected int anotherMockedFilterItemCount;
 
   @Before
   public void setUpRuntimeData() {
     mockedQuery = MockProvider.createMockFilterQuery();
-    when(processEngine.getFilterService().createFilterQuery()).thenReturn(mockedQuery);
+    mockedFilter = MockProvider.createMockFilter(MockProvider.EXAMPLE_FILTER_ID);
+    mockedFilterItemCount = 13;
+    anotherMockedFilter = MockProvider.createMockFilter(MockProvider.ANOTHER_EXAMPLE_FILTER_ID);
+    anotherMockedFilterItemCount = 42;
+
+    FilterService filterService = processEngine.getFilterService();
+
+    when(filterService.createFilterQuery()).thenReturn(mockedQuery);
+    when(filterService.getFilter(eq(MockProvider.EXAMPLE_FILTER_ID))).thenReturn(mockedFilter);
+    when(filterService.count(eq(MockProvider.EXAMPLE_FILTER_ID))).thenReturn((long) mockedFilterItemCount);
+    when(filterService.getFilter(eq(MockProvider.ANOTHER_EXAMPLE_FILTER_ID))).thenReturn(anotherMockedFilter);
+    when(filterService.count(eq(MockProvider.ANOTHER_EXAMPLE_FILTER_ID))).thenReturn((long) anotherMockedFilterItemCount);
   }
 
   @Test
@@ -84,7 +104,7 @@ public abstract class AbstractFilterRestServiceQueryTest extends AbstractRestSer
   public void testCountyQuery() {
     expect()
       .statusCode(Status.OK.getStatusCode())
-      .body("count", equalTo(1))
+      .body("count", equalTo(2))
     .when()
       .get(FILTER_COUNT_QUERY_URL);
 
@@ -157,6 +177,55 @@ public abstract class AbstractFilterRestServiceQueryTest extends AbstractRestSer
     executeAndVerifyPagination(0, null, Status.OK);
   }
 
+  @Test
+  public void testSingleFilterWithItemCount() {
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_FILTER_ID)
+      .queryParam("itemCount", true)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+      .body("containsKey('itemCount')", is(true))
+      .body("itemCount", equalTo(mockedFilterItemCount))
+    .when()
+      .get(SINGLE_FILTER_URL);
+  }
+
+  @Test
+  public void testSingleFilterWithoutItemCount() {
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_FILTER_ID)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+      .body("containsKey('itemCount')", is(false))
+    .when()
+      .get(SINGLE_FILTER_URL);
+  }
+
+  @Test
+  public void testFilterQueryWithItemCount() {
+    given()
+      .queryParam("itemCount", true)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+      .body("$.size", equalTo(2))
+      .body("any { it.containsKey('itemCount') }", is(true))
+      .body("[0].itemCount", equalTo(mockedFilterItemCount))
+      .body("[1].itemCount", equalTo(anotherMockedFilterItemCount))
+    .when()
+      .get(FILTER_QUERY_URL);
+  }
+
+  @Test
+  public void testFilterQueryWithoutItemCount() {
+    given()
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+      .body("$.size", equalTo(2))
+      .body("any { it.containsKey('itemCount') }", is(false))
+    .when()
+      .get(FILTER_QUERY_URL);
+  }
+
   protected Map<String, String> getQueryParameters() {
     Map<String, String> params = new HashMap<String, String>();
 
@@ -177,7 +246,8 @@ public abstract class AbstractFilterRestServiceQueryTest extends AbstractRestSer
     String content = response.asString();
     List<Map<String, String>> filters = from(content).getList("");
 
-    assertThat(filters).hasSize(1);
+    assertThat(filters).hasSize(2);
+
     assertThat(filters.get(0)).isNotNull();
 
     String returnedFilterId = from(content).getString("[0].id");
@@ -193,9 +263,25 @@ public abstract class AbstractFilterRestServiceQueryTest extends AbstractRestSer
     assertThat(returnedOwner).isEqualTo(MockProvider.EXAMPLE_FILTER_OWNER);
     assertThat(returnedQuery.get("name")).isEqualTo(MockProvider.EXAMPLE_FILTER_QUERY_DTO.getName());
     assertThat(returnedProperties).isEqualTo(MockProvider.EXAMPLE_FILTER_PROPERTIES);
+
+    assertThat(filters.get(1)).isNotNull();
+
+    returnedFilterId = from(content).getString("[1].id");
+    returnedResourceType = from(content).getString("[1].resourceType");
+    returnedName = from(content).getString("[1].name");
+    returnedOwner = from(content).getString("[1].owner");
+    returnedQuery = from(content).getJsonObject("[1].query");
+    returnedProperties = from(content).getJsonObject("[1].properties");
+
+    assertThat(returnedFilterId).isEqualTo(MockProvider.ANOTHER_EXAMPLE_FILTER_ID);
+    assertThat(returnedResourceType).isEqualTo(MockProvider.EXAMPLE_FILTER_RESOURCE_TYPE);
+    assertThat(returnedName).isEqualTo(MockProvider.EXAMPLE_FILTER_NAME);
+    assertThat(returnedOwner).isEqualTo(MockProvider.EXAMPLE_FILTER_OWNER);
+    assertThat(returnedQuery.get("name")).isEqualTo(MockProvider.EXAMPLE_FILTER_QUERY_DTO.getName());
+    assertThat(returnedProperties).isEqualTo(MockProvider.EXAMPLE_FILTER_PROPERTIES);
   }
 
-  private void verifyQueryMockMultipleParameters() {
+  protected void verifyQueryMockMultipleParameters() {
     verify(mockedQuery).filterId(MockProvider.EXAMPLE_FILTER_ID);
     verify(mockedQuery).filterResourceType(MockProvider.EXAMPLE_FILTER_RESOURCE_TYPE);
     verify(mockedQuery).filterName(MockProvider.EXAMPLE_FILTER_NAME);
@@ -263,7 +349,7 @@ public abstract class AbstractFilterRestServiceQueryTest extends AbstractRestSer
 
   }
 
-  private void verifyQueryMockPagination(Integer firstResult, Integer maxResults) {
+  protected void verifyQueryMockPagination(Integer firstResult, Integer maxResults) {
     if (firstResult == null) {
       firstResult = 0;
     }

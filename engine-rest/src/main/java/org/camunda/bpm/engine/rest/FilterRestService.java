@@ -44,7 +44,7 @@ public interface FilterRestService {
 
   @GET
   @Produces(MediaType.APPLICATION_JSON)
-  List<FilterDto> getFilters(@Context UriInfo uriInfo,
+  List<FilterDto> getFilters(@Context UriInfo uriInfo, @QueryParam("itemCount") Boolean itemCount,
       @QueryParam("firstResult") Integer firstResult, @QueryParam("maxResults") Integer maxResults);
 
   @GET

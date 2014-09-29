@@ -41,7 +41,7 @@ public interface FilterResource {
 
   @GET
   @Produces(MediaType.APPLICATION_JSON)
-  FilterDto getFilter();
+  FilterDto getFilter(@QueryParam("itemCount") Boolean itemCount);
 
   @DELETE
   void deleteFilter();

@@ -97,9 +97,13 @@ public class FilterResourceImpl extends AbstractAuthorizedRestResource implement
     filterService = processEngine.getFilterService();
   }
 
-  public FilterDto getFilter() {
+  public FilterDto getFilter(Boolean itemCount) {
     Filter filter = getDbFilter();
-    return FilterDto.fromFilter(filter);
+    FilterDto dto = FilterDto.fromFilter(filter);
+    if (itemCount != null && itemCount) {
+      dto.setItemCount(filterService.count(filter.getId()));
+    }
+    return dto;
   }
 
   public void deleteFilter() {
