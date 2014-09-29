@@ -50,9 +50,7 @@ public class ExecuteJobsCmd implements Command<Object>, Serializable {
     if (log.isLoggable(Level.FINE)) {
       log.fine("Executing job " + jobId);
     }
-    JobEntity job = commandContext
-      .getJobManager()
-      .findJobById(jobId);
+    JobEntity job = commandContext.getDbEntityManger().selectById(JobEntity.class, jobId);
 
     final CommandExecutor commandExecutor = Context.getProcessEngineConfiguration().getCommandExecutorTxRequiresNew();
     final JobExecutorContext jobExecutorContext = Context.getJobExecutorContext();

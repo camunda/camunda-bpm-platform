@@ -130,10 +130,10 @@ public class DbSqlSession extends AbstractPersistenceSession {
     }
     sqlSession.insert(insertStatement, parameter);
 
-    // increment revision of our copy
+    // set revision of our copy to 1
     if (parameter instanceof HasDbRevision) {
       HasDbRevision versionedObject = (HasDbRevision) parameter;
-      versionedObject.setRevision(versionedObject.getRevisionNext());
+      versionedObject.setRevision(1);
     }
   }
 

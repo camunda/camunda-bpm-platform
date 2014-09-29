@@ -196,8 +196,6 @@ public class ExecutionEntity extends PvmExecutionImpl implements
    */
   protected String superCaseExecutionId;
 
-  protected boolean forcedUpdate;
-
   public ExecutionEntity() {
 
   }
@@ -1054,9 +1052,6 @@ public class ExecutionEntity extends PvmExecutionImpl implements
     persistentState.put("superExecution", this.superExecutionId);
     persistentState.put("superCaseExecutionId", this.superCaseExecutionId);
     persistentState.put("caseInstanceId", this.caseInstanceId);
-    if (forcedUpdate) {
-      persistentState.put("forcedUpdate", Boolean.TRUE);
-    }
     persistentState.put("suspensionState", this.suspensionState);
     persistentState.put("cachedEntityState", getCachedEntityState());
     return persistentState;
@@ -1080,7 +1075,9 @@ public class ExecutionEntity extends PvmExecutionImpl implements
   }
 
   public void forceUpdate() {
-    this.forcedUpdate = true;
+    Context.getCommandContext()
+      .getDbEntityManger()
+      .forceUpdate(this);
   }
 
   // toString /////////////////////////////////////////////////////////////////
@@ -1142,8 +1139,10 @@ public class ExecutionEntity extends PvmExecutionImpl implements
   }
 
   public void addEventSubscription(EventSubscriptionEntity eventSubscriptionEntity) {
-    getEventSubscriptionsInternal().add(eventSubscriptionEntity);
-
+    List<EventSubscriptionEntity> eventSubscriptionsInternal = getEventSubscriptionsInternal();
+    if(!eventSubscriptionsInternal.contains(eventSubscriptionEntity)) {
+      eventSubscriptionsInternal.add(eventSubscriptionEntity);
+    }
   }
 
   public void removeEventSubscription(EventSubscriptionEntity eventSubscriptionEntity) {
@@ -1171,7 +1170,10 @@ public class ExecutionEntity extends PvmExecutionImpl implements
   }
 
   public void addJob(JobEntity jobEntity) {
-    getJobsInternal().add(jobEntity);
+    List<JobEntity> jobsInternal = getJobsInternal();
+    if(!jobsInternal.contains(jobEntity)) {
+      jobsInternal.add(jobEntity);
+    }
   }
 
   public void removeJob(JobEntity job) {
@@ -1199,7 +1201,10 @@ public class ExecutionEntity extends PvmExecutionImpl implements
   }
 
   public void addIncident(IncidentEntity incident) {
-    getIncidentsInternal().add(incident);
+    List<IncidentEntity> incidentsInternal = getIncidentsInternal();
+    if(!incidentsInternal.contains(incident)) {
+      incidentsInternal.add(incident);
+    }
   }
 
   public void removeIncident(IncidentEntity incident) {
@@ -1237,7 +1242,10 @@ public class ExecutionEntity extends PvmExecutionImpl implements
   }
 
   public void addTask(TaskEntity taskEntity) {
-    getTasksInternal().add(taskEntity);
+    List<TaskEntity> tasksInternal = getTasksInternal();
+    if(!tasksInternal.contains(taskEntity)) {
+      tasksInternal.add(taskEntity);
+    }
   }
 
   public void removeTask(TaskEntity task) {
