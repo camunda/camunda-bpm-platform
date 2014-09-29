@@ -28,6 +28,8 @@ import org.camunda.bpm.engine.impl.bpmn.delegate.ExecutionListenerInvocation;
 import org.camunda.bpm.engine.impl.bpmn.helper.ErrorPropagation;
 import org.camunda.bpm.engine.impl.bpmn.helper.ScopeUtil;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.core.mapping.IoMapping;
+import org.camunda.bpm.engine.impl.core.variable.CoreVariableScope;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
@@ -73,6 +75,7 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
   protected Expression collectionExpression;
   protected String collectionVariable;
   protected String collectionElementVariable;
+  protected IoMapping ioMapping;
 
   /**
    * @param innerActivityBehavior The original {@link ActivityBehavior} of the activity
@@ -327,6 +330,15 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
   public void setInnerActivityBehavior(AbstractBpmnActivityBehavior innerActivityBehavior) {
     this.innerActivityBehavior = innerActivityBehavior;
     this.innerActivityBehavior.setMultiInstanceActivityBehavior(this);
+  }
+  public void setIoMapping(IoMapping ioMapping) {
+    this.ioMapping = ioMapping;
+  }
+
+  protected void executeIoMapping(CoreVariableScope<?> scope) {
+    if (ioMapping != null) {
+      ioMapping.executeInputParameters(scope);
+    }
   }
 
 }

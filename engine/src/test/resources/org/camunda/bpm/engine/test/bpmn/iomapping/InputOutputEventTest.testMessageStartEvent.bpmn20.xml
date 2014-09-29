@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:camunda="http://activiti.org/bpmn" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd" id="_FVEpwO_VEeOtYvXzz5ksgw" exporter="camunda modeler" exporterVersion="2.5.0" targetNamespace="http://activiti.org/bpmn">
+  <message id="incomingMessage" name="IncomingMessage" />
+  <process id="testProcess" isExecutable="true">
+    <startEvent id="start">
+      <extensionElements>
+        <camunda:inputOutput>
+          <camunda:outputParameter name="outVariable">${messageVariable}</camunda:outputParameter>
+        </camunda:inputOutput>
+      </extensionElements>
+      <messageEventDefinition messageRef="incomingMessage" />
+    </startEvent>
+    <sequenceFlow id="flow1" name="" sourceRef="start" targetRef="task"/>
+    <userTask id="task"/>
+    <sequenceFlow id="flow2" name="" sourceRef="task" targetRef="end"/>
+    <endEvent id="end"/>
+  </process>
+</definitions>

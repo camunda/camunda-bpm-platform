@@ -12,7 +12,6 @@
  */
 package org.camunda.bpm.engine.impl.pvm.runtime.operation;
 
-import org.camunda.bpm.engine.impl.core.mapping.IoMapping;
 import org.camunda.bpm.engine.impl.pvm.delegate.CompositeActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
@@ -33,12 +32,6 @@ public abstract class PvmAtomicOperationActivityInstanceStart extends AbstractPv
   @Override
   protected PvmExecutionImpl eventNotificationsStarted(PvmExecutionImpl execution) {
     execution.enterActivityInstance();
-
-    // execute Input Mappings (if they exist).
-    IoMapping ioMapping = getScope(execution).getIoMapping();
-    if(ioMapping != null) {
-      ioMapping.executeInputParameters(execution);
-    }
 
     return execution;
   }

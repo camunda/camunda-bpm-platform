@@ -633,24 +633,38 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
 
   // ensure Io supported on event subprocess /////////////////////////////////
 
-  @Deployment
-  public void testNonInterruptingEventSubprocessIoSupport() {
-    runtimeService.startProcessInstanceByKey("testProcess");
-    runtimeService.correlateMessage("msg");
-
-    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1").singleResult();
-    assertNotNull(variable);
-    assertEquals("stringValue", variable.getValue());
+  public void testInterruptingEventSubprocessIoSupport() {
+    try {
+      repositoryService
+        .createDeployment()
+        .addClasspathResource("org/camunda/bpm/engine/test/bpmn/iomapping/InputOutputTest.testInterruptingEventSubprocessIoSupport.bpmn")
+        .deploy();
+      fail("exception expected");
+    } catch (ProcessEngineException e) {
+      // happy path
+      assertTextPresent("camunda:inputOutput mapping unsupported for element type 'subProcess' with attribute 'triggeredByEvent = true'", e.getMessage());
+    }
   }
 
   @Deployment
-  public void testInterruptingEventSubprocessIoSupport() {
-    runtimeService.startProcessInstanceByKey("testProcess");
-    runtimeService.correlateMessage("msg");
+  public void testSubprocessIoSupport() {
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("processVar", "value");
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testProcess", variables);
 
-    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1").singleResult();
-    assertNotNull(variable);
-    assertEquals("stringValue", variable.getValue());
+    Execution subprocessExecution = runtimeService.createExecutionQuery().activityId("subprocessTask").singleResult();
+    Map<String, Object> variablesLocal = runtimeService.getVariablesLocal(subprocessExecution.getId());
+    assertEquals(1, variablesLocal.size());
+    assertEquals("value", variablesLocal.get("innerVar"));
+
+    Task task = taskService.createTaskQuery().singleResult();
+    taskService.complete(task.getId());
+
+    String outerVariable = (String) runtimeService.getVariableLocal(processInstance.getId(), "outerVar");
+    assertNotNull(outerVariable);
+    assertEquals("value", outerVariable);
+
+
   }
 
   @Deployment

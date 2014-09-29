@@ -57,13 +57,6 @@ public abstract class PvmAtomicOperationActivityInstanceEnd extends AbstractPvmE
   }
 
   protected void eventNotificationsCompleted(PvmExecutionImpl execution) {
-
-    // execute Output Mappings (if they exist).
-    IoMapping ioMapping = getScope(execution).getIoMapping();
-    if(ioMapping != null) {
-      ioMapping.executeOutputParameters(execution);
-    }
-
     // make execution leave the activity instance
     execution.leaveActivityInstance();
   }

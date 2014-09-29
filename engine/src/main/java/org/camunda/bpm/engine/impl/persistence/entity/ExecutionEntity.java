@@ -34,6 +34,7 @@ import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
+import org.camunda.bpm.engine.impl.core.mapping.IoMapping;
 import org.camunda.bpm.engine.impl.core.operation.CoreAtomicOperation;
 import org.camunda.bpm.engine.impl.core.variable.CorePersistentVariableStore;
 import org.camunda.bpm.engine.impl.db.DbEntity;
@@ -344,6 +345,12 @@ public class ExecutionEntity extends PvmExecutionImpl implements
 
     initializeAssociations(this);
 
+    // execute Input Mappings (if they exist).
+    ensureActivityInitialized();
+    if (activity != null && activity.getIoMapping() != null) {
+      activity.getIoMapping().executeInputParameters(this);
+    }
+
     List<TimerDeclarationImpl> timerDeclarations = (List<TimerDeclarationImpl>) scope.getProperty(BpmnParse.PROPERTYNAME_TIMER_DECLARATION);
     if (timerDeclarations!=null) {
       for (TimerDeclarationImpl timerDeclaration : timerDeclarations) {
@@ -388,6 +395,12 @@ public class ExecutionEntity extends PvmExecutionImpl implements
    public void destroy() {
      super.destroy();
      ensureParentInitialized();
+
+     // execute Output Mappings (if they exist).
+     ensureActivityInitialized();
+     if (activity != null && activity.getIoMapping() != null) {
+       activity.getIoMapping().executeOutputParameters(this);
+     }
      variableStore.removeVariablesWithoutFiringEvents();
    }
 

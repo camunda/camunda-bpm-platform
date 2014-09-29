@@ -32,8 +32,6 @@ import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
  */
 public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior {
 
-  protected IoMapping ioMapping;
-
   public ParallelMultiInstanceBehavior(ActivityImpl activity, AbstractBpmnActivityBehavior originalActivityBehavior) {
     super(activity, originalActivityBehavior);
   }
@@ -73,16 +71,16 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
         declaration.createSubscriptionForParallelMultiInstance((ExecutionEntity) concurrentExecution);
       }
 
+      if (ioMapping != null) {
+        ioMapping.executeInputParameters((CoreVariableScope<?>) concurrentExecution);
+      }
+
       // create timer job for the current execution
       List<TimerDeclarationImpl> timerDeclarations = (List<TimerDeclarationImpl>) concurrentExecution.getActivity().getProperty(BpmnParse.PROPERTYNAME_TIMER_DECLARATION);
       if (timerDeclarations!=null) {
         for (TimerDeclarationImpl timerDeclaration : timerDeclarations) {
           timerDeclaration.createTimerInstanceForParallelMultiInstance((ExecutionEntity) concurrentExecution);
         }
-      }
-
-      if (ioMapping != null) {
-        ioMapping.executeInputParameters((CoreVariableScope<?>) concurrentExecution);
       }
 
       concurrentExecutions.add(concurrentExecution);
@@ -187,10 +185,6 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
     ActivityExecution miEnteringExecution = execution.getParent();
     ActivityExecution miRoot = miEnteringExecution.getParent();
     miRoot.setActivityInstanceId(miEnteringExecution.getActivityInstanceId());
-  }
-
-  public void setIoMapping(IoMapping ioMapping) {
-    this.ioMapping = ioMapping;
   }
 
 

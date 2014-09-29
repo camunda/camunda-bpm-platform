@@ -585,7 +585,11 @@ public class BpmnParse extends Parse {
     for (Element postponedElement : postponedElements.values()) {
       if(parentScope.findActivity(postponedElement.attribute("id")) == null) { // check whether activity is already parsed
         if(postponedElement.getTagName().equals("intermediateCatchEvent")) {
-          parseIntermediateCatchEvent(postponedElement, parentScope, false);
+          ActivityImpl activity = parseIntermediateCatchEvent(postponedElement, parentScope, false);
+
+          if (activity != null) {
+            parseActivityInputOutput(postponedElement, activity);
+          }
         }
       }
     }
@@ -708,6 +712,8 @@ public class BpmnParse extends Parse {
       } else {
         parseScopeStartEvent(startEventActivity, startEventElement, parentElement, scope);
       }
+
+      ensureNoIoMappingDefined(startEventElement);
 
       for (BpmnParseListener parseListener : parseListeners) {
         parseListener.parseStartEvent(startEventElement, scope, startEventActivity);
@@ -2346,6 +2352,10 @@ public class BpmnParse extends Parse {
         activity.setActivityBehavior(new NoneEndEventActivityBehavior());
       }
 
+      if(activity != null) {
+        parseActivityInputOutput(endEventElement, activity);
+      }
+
       for (BpmnParseListener parseListener : parseListeners) {
         parseListener.parseEndEvent(endEventElement, scope, activity);
       }
@@ -2432,6 +2442,8 @@ public class BpmnParse extends Parse {
         addError("Unsupported boundary event type", boundaryEventElement);
 
       }
+
+      ensureNoIoMappingDefined(boundaryEventElement);
 
       for (BpmnParseListener parseListener : parseListeners) {
         parseListener.parseBoundaryEvent(boundaryEventElement, scopeElement, nestedActivity);
@@ -3433,17 +3445,14 @@ public class BpmnParse extends Parse {
     if(extensionElements != null) {
       IoMapping inputOutput = parseInputOutput(extensionElements);
       if(inputOutput != null) {
-        if(!isActivityInputOutputSupported(activityElement.getTagName())) {
-          addError("camunda:inputOutput mapping unsupported for element type '"+activityElement.getTagName()+"'.", activityElement);
+        if(checkActivityInputOutputSupported(activityElement)) {
 
-        } else {
-          if (activity.getActivityBehavior() instanceof MultiInstanceActivityBehavior
-              && !inputOutput.getOutputParameters().isEmpty()) {
-            addError("Output parameters not allowed for multi-instance constructs", activityElement);
-          }
+          if (activity.getActivityBehavior() instanceof MultiInstanceActivityBehavior) {
+            if (!inputOutput.getOutputParameters().isEmpty()) {
+              addError("Output parameters not allowed for multi-instance constructs", activityElement);
+            }
 
-          if (activity.getActivityBehavior() instanceof ParallelMultiInstanceBehavior) {
-            ParallelMultiInstanceBehavior behavior = (ParallelMultiInstanceBehavior) activity.getActivityBehavior();
+            MultiInstanceActivityBehavior behavior = (MultiInstanceActivityBehavior) activity.getActivityBehavior();
             behavior.setIoMapping(inputOutput);
 
           } else {
@@ -3451,21 +3460,40 @@ public class BpmnParse extends Parse {
 
           }
 
-          // turn activity into a scope (->local scope for variables) unless it is an event subprocess
-          if(!activityElement.getTagName().equals("subprocess")
-              && !parseBooleanAttribute(activityElement.attribute(PROPERTYNAME_TRIGGERED_BY_EVENT), false)) {
-            activity.setScope(true);
-          }
+          // turn activity into a scope (->local scope for variables)
+          activity.setScope(true);
         }
       }
     }
   }
 
-  public static boolean isActivityInputOutputSupported(String tagName) {
-    return tagName.contains("Task") ||
+  protected boolean checkActivityInputOutputSupported(Element activityElement) {
+    String tagName = activityElement.getTagName();
+
+    if (!(tagName.contains("Task") ||
            tagName.contains("Event") ||
            tagName.equals("transaction") ||
-           tagName.equals("subProcess");
+           tagName.equals("subProcess"))) {
+      addError("camunda:inputOutput mapping unsupported for element type '"+activityElement.getTagName()+"'.", activityElement);
+      return false;
+    }
+
+    if (tagName.equals("subProcess") && "true".equals(activityElement.attribute("triggeredByEvent"))) {
+      addError("camunda:inputOutput mapping unsupported for element type '"+activityElement.getTagName()+"' with attribute 'triggeredByEvent = true'.", activityElement);
+      return false;
+    }
+
+    return true;
+  }
+
+  protected void ensureNoIoMappingDefined(Element element) {
+    Element extensionElements = element.element("extensionElements");
+    if(extensionElements != null) {
+      IoMapping inputOutput = parseInputOutput(extensionElements);
+      if (inputOutput != null) {
+        addError("camunda:inputOutput mapping unsupported for element type '" + element.getTagName() + "'.", element);
+      }
+    }
   }
 
   protected IoMapping parseInputOutput(Element element) {
