@@ -10,7 +10,7 @@
 
   <groupId>org.camunda.bpm</groupId>
   <artifactId>camunda-root</artifactId>
-  <version>7.2.0-SNAPSHOT</version>
+  <version>7.2.0-alpha5</version>
   <packaging>pom</packaging>
   <name>camunda BPM - Root Pom</name>
 
@@ -212,7 +212,7 @@
     <url>https://github.com/camunda/camunda-bpm-platform</url>
     <connection>scm:git:git@github.com:camunda/camunda-bpm-platform.git</connection>
     <developerConnection>scm:git:git@github.com:camunda/camunda-bpm-platform.git</developerConnection>
-    <tag>HEAD</tag>
+    <tag>7.2.0-alpha5</tag>
   </scm>
 
   <issueManagement>

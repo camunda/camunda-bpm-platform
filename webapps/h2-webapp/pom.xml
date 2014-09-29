@@ -9,7 +9,7 @@
     <groupId>org.camunda.bpm</groupId>
     <artifactId>camunda-parent</artifactId>
     <relativePath>../../parent</relativePath>
-    <version>7.2.0-SNAPSHOT</version>
+    <version>7.2.0-alpha5</version>
   </parent>
 
   <name>camunda BPM - H2 Webapp</name>
