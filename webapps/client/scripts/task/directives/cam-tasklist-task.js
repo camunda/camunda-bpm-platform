@@ -26,6 +26,10 @@ define([
     $rootScope.batchActions.selected = [];
 
     return {
+      scope: {
+        task: '='
+      },
+
       template: template,
 
       link: function(scope, element) {

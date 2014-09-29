@@ -54,7 +54,9 @@ define([
     var Filter = camAPI.resource('filter');
 
     return {
-      scope: {},
+      scope: {
+        filter: '='
+      },
 
       template: template,
 
