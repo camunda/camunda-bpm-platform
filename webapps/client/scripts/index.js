@@ -1,9 +1,13 @@
 'use strict';
 
+define('snap-win', ['snap-svg'], function(snap) {
+  window.Snap = snap;
+});
 
 define('camunda-tasklist-ui', [
   'camunda-tasklist-ui/require-conf',
   'camunda-tasklist-ui/utils',
+  'snap-win'
 ], function(
   rjsConf
 ) {
