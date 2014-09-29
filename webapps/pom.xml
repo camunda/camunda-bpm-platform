@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.camunda.bpm.webapp</groupId>
   <artifactId>camunda-cockpit-ui</artifactId>
-  <version>7.2.0-SNAPSHOT</version>
+  <version>7.2.0-alpha5</version>
   <packaging>pom</packaging>
   <name>camunda-cockpit-ui</name>
 
@@ -159,7 +159,7 @@
     <url>https://github.com/camunda/camunda-cockpit-ui</url>
     <connection>scm:git:git@github.com:camunda/camunda-cockpit-ui.git</connection>
     <developerConnection>scm:git:git@github.com:camunda/camunda-cockpit-ui.git</developerConnection>
-    <tag>HEAD</tag>
+    <tag>7.2.0-alpha5</tag>
   </scm>
 
 </project>
