@@ -12,7 +12,7 @@
   <parent>
     <groupId>org.camunda.bpm.glassfish</groupId>
     <artifactId>camunda-glassfish</artifactId>
-    <version>7.2.0-alpha5</version>
+    <version>7.2.0-SNAPSHOT</version>
   </parent>
 
   <name>camunda BPM - Glassfish 3.1.x Assembly</name>
