@@ -137,9 +137,11 @@ public class JobDefinitionFunctionalTest extends PluggableProcessEngineTestCase 
     jobSuspensionThread.proceedAndWaitTillDone();
     acquisitionThread.proceedAndWaitTillDone();
 
-    // then the acquisition will fail with optimistic locking
+    // then the acquisition will not fail with optimistic locking
     assertNull(jobSuspensionThread.exception);
-    assertNotNull(acquisitionThread.exception);
+    assertNull(acquisitionThread.exception);
+    // but the job will also not be acquired
+    assertEquals(0, acquisitionThread.acquiredJobs.size());
 
     //--------------------------------------------
 
@@ -236,6 +238,7 @@ public class JobDefinitionFunctionalTest extends PluggableProcessEngineTestCase 
 
   public class JobAcquisitionThread extends ControllableThread {
     OptimisticLockingException exception;
+    AcquiredJobs acquiredJobs;
     @Override
     public synchronized void startAndWaitUntilControlIsReturned() {
       activeThread = this;
@@ -244,7 +247,7 @@ public class JobDefinitionFunctionalTest extends PluggableProcessEngineTestCase 
     public void run() {
       try {
         JobExecutor jobExecutor = processEngineConfiguration.getJobExecutor();
-        processEngineConfiguration.getCommandExecutorTxRequired()
+        acquiredJobs = (AcquiredJobs) processEngineConfiguration.getCommandExecutorTxRequired()
           .execute(new ControlledCommand(activeThread, new AcquireJobsCmd(jobExecutor)));
 
       } catch (OptimisticLockingException e) {

@@ -41,6 +41,8 @@ public abstract class DbOperation implements Recyclable {
 
   // getters / setters //////////////////////////////////////////
 
+  public abstract boolean isFailed();
+
   public Class<? extends DbEntity> getEntityType() {
     return entityType;
   }

@@ -23,7 +23,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.ibatis.session.SqlSession;
-import org.camunda.bpm.engine.OptimisticLockingException;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.WrongDbException;
@@ -156,27 +155,22 @@ public class DbSqlSession extends AbstractPersistenceSession {
     }
 
     // execute the delete
-    executeDelete(deleteStatement, dbEntity);
+    int nrOfRowsDeleted = executeDelete(deleteStatement, dbEntity);
+
+    // It only makes sense to check for optimistic locking exceptions for objects that actually have a revision
+    if (dbEntity instanceof HasDbRevision && nrOfRowsDeleted == 0) {
+      operation.setFailed(true);
+      return;
+    }
 
     // perform post delete action
     entityDeleted(dbEntity);
   }
 
-  protected void executeDelete(String deleteStatement, Object parameter) {
-
+  protected int executeDelete(String deleteStatement, Object parameter) {
     // map the statement
     deleteStatement = dbSqlSessionFactory.mapStatement(deleteStatement);
-
-    // It only makes sense to check for optimistic locking exceptions for objects that actually have a revision
-    if (parameter instanceof HasDbRevision) {
-      int nrOfRowsDeleted = sqlSession.delete(deleteStatement, parameter);
-      if (nrOfRowsDeleted == 0) {
-        // enforce optimistic locking
-        throw new OptimisticLockingException(toString(parameter) + " was updated by another transaction concurrently");
-      }
-    } else {
-      sqlSession.delete(deleteStatement, parameter);
-    }
+    return sqlSession.delete(deleteStatement, parameter);
   }
 
   protected void entityDeleted(final DbEntity entity) {
@@ -204,32 +198,31 @@ public class DbSqlSession extends AbstractPersistenceSession {
     ensureNotNull("no update statement for " + dbEntity.getClass() + " in the ibatis mapping files", "updateStatement", updateStatement);
 
     if (log.isLoggable(Level.FINE)) {
-      log.fine("updating: " + toString(dbEntity) + "]");
+      log.fine("updating: " + toString(dbEntity));
     }
 
     // execute update
-    executeUpdate(updateStatement, dbEntity);
+    int numOfRowsUpdated = executeUpdate(updateStatement, dbEntity);
+
+    if (dbEntity instanceof HasDbRevision) {
+      if(numOfRowsUpdated != 1) {
+        // failed with optimistic locking
+        operation.setFailed(true);
+        return;
+      } else {
+        // increment revision of our copy
+        HasDbRevision versionedObject = (HasDbRevision) dbEntity;
+        versionedObject.setRevision(versionedObject.getRevisionNext());
+      }
+    }
 
     // perform post update action
     entityUpdated(dbEntity);
   }
 
-  protected void executeUpdate(String updateStatement, Object parameter) {
-
+  protected int executeUpdate(String updateStatement, Object parameter) {
     updateStatement = dbSqlSessionFactory.mapStatement(updateStatement);
-
-    int updatedRecords = sqlSession.update(updateStatement, parameter);
-
-    if (parameter instanceof HasDbRevision) {
-      if (updatedRecords != 1) {
-        // enforce optimistic locking
-        throw new OptimisticLockingException(toString(parameter) + " was updated by another transaction concurrently");
-      } else {
-        // increment revision of our copy
-        HasDbRevision versionedObject = (HasDbRevision) parameter;
-        versionedObject.setRevision(versionedObject.getRevisionNext());
-      }
-    }
+    return sqlSession.update(updateStatement, parameter);
   }
 
   protected void entityUpdated(final DbEntity entity) {

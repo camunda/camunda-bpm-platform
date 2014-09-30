@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -29,13 +29,15 @@ import org.camunda.bpm.engine.test.Deployment;
 public class CompetingJobAcquisitionTest extends PluggableProcessEngineTestCase {
 
   private static Logger log = Logger.getLogger(CompetingSignalsTest.class.getName());
-  
+
   Thread testThread = Thread.currentThread();
   static ControllableThread activeThread;
   static String jobId;
-  
+
   public class JobAcquisitionThread extends ControllableThread {
     OptimisticLockingException exception;
+    AcquiredJobs jobs;
+
     @Override
     public synchronized void startAndWaitUntilControlIsReturned() {
       activeThread = this;
@@ -44,17 +46,17 @@ public class CompetingJobAcquisitionTest extends PluggableProcessEngineTestCase 
     public void run() {
       try {
         JobExecutor jobExecutor = processEngineConfiguration.getJobExecutor();
-        AcquiredJobs jobs = (AcquiredJobs) processEngineConfiguration
+        jobs = (AcquiredJobs) processEngineConfiguration
           .getCommandExecutorTxRequired()
           .execute(new ControlledCommand(activeThread, new AcquireJobsCmd(jobExecutor)));
-        
+
       } catch (OptimisticLockingException e) {
         this.exception = e;
       }
       log.fine(getName()+" ends");
     }
   }
-  
+
   @Deployment
   public void testCompetingJobAcquisitions() throws Exception {
     runtimeService.startProcessInstanceByKey("CompetingJobAcquisitionProcess");
@@ -62,7 +64,7 @@ public class CompetingJobAcquisitionTest extends PluggableProcessEngineTestCase 
     log.fine("test thread starts thread one");
     JobAcquisitionThread threadOne = new JobAcquisitionThread();
     threadOne.startAndWaitUntilControlIsReturned();
-    
+
     log.fine("test thread continues to start thread two");
     JobAcquisitionThread threadTwo = new JobAcquisitionThread();
     threadTwo.startAndWaitUntilControlIsReturned();
@@ -70,11 +72,16 @@ public class CompetingJobAcquisitionTest extends PluggableProcessEngineTestCase 
     log.fine("test thread notifies thread 1");
     threadOne.proceedAndWaitTillDone();
     assertNull(threadOne.exception);
+    // the job was acquired
+    assertEquals(1, threadOne.jobs.size());
 
     log.fine("test thread notifies thread 2");
     threadTwo.proceedAndWaitTillDone();
-    assertNotNull(threadTwo.exception);
-    assertTextPresent("was updated by another transaction concurrently", threadTwo.exception.getMessage());
+    // the acquisition did NOT fail
+    assertNull(threadTwo.exception);
+    // but the job was not acquired
+    assertEquals(0, threadTwo.jobs.size());
+
   }
 
 }

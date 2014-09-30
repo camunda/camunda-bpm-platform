@@ -28,6 +28,11 @@ public class DbEntityOperation extends DbOperation {
    */
   protected DbEntity entity;
 
+  /**
+   * Indicates whether the operation failed to execute due to OptimisticLocking
+   */
+  protected boolean failed;
+
   public void recycle() {
     entity = null;
     super.recycle();
@@ -40,6 +45,14 @@ public class DbEntityOperation extends DbOperation {
   public void setEntity(DbEntity dbEntity) {
     this.entityType = dbEntity.getClass();
     this.entity = dbEntity;
+  }
+
+  public void setFailed(boolean failed) {
+    this.failed = failed;
+  }
+
+  public boolean isFailed() {
+    return failed;
   }
 
   public String toString() {
@@ -73,6 +86,5 @@ public class DbEntityOperation extends DbOperation {
       return false;
     return true;
   }
-
 
 }
