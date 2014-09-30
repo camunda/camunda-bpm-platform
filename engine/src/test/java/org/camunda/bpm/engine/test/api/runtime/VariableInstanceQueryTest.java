@@ -128,6 +128,35 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
 
   @Test
   @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
+  public void testQueryByVariableNames() {
+    // given
+    String variableValue = "a";
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("process", variableValue);
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", variables);
+
+    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    taskService.setVariableLocal(task.getId(), "task", variableValue);
+    runtimeService.setVariableLocal(task.getExecutionId(), "execution", variableValue);
+
+    // when
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery().variableNameIn("task", "process", "execution");
+
+    // then
+    List<VariableInstance> result = query.list();
+    assertFalse(result.isEmpty());
+    assertEquals(3, result.size());
+
+    assertEquals(3, query.count());
+
+    for (VariableInstance variableInstance : result) {
+      assertEquals(variableValue, variableInstance.getValue());
+      assertEquals("string", variableInstance.getTypeName());
+    }
+  }
+
+  @Test
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
   public void testQueryByVariableNameLike() {
     // given
     Map<String, Object> variables = new HashMap<String, Object>();

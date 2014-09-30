@@ -167,6 +167,15 @@
               RES.NAME_ = #{variableName}
             </if>
 
+            <!-- variablesNames -->
+            <if test="variableNames != null &amp;&amp; variableNames.length > 0">
+              and RES.NAME_ in
+              <foreach item="item" index="index" collection="variableNames"
+                       open="(" separator="," close=")">
+                #{item}
+              </foreach>
+            </if>
+
             <!-- variableNameLike -->
             <if test="variableNameLike != null">
               and RES.NAME_ like #{variableNameLike}

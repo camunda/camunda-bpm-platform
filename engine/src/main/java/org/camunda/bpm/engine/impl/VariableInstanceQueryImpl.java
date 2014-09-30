@@ -36,6 +36,7 @@ public class VariableInstanceQueryImpl extends AbstractVariableQueryImpl<Variabl
 
   protected String variableId;
   protected String variableName;
+  protected String[] variableNames;
   protected String variableNameLike;
   protected String[] executionIds;
   protected String[] processInstanceIds;
@@ -62,6 +63,11 @@ public class VariableInstanceQueryImpl extends AbstractVariableQueryImpl<Variabl
 
   public VariableInstanceQuery variableName(String variableName) {
     this.variableName = variableName;
+    return this;
+  }
+
+  public VariableInstanceQuery variableNameIn(String... variableNames) {
+    this.variableNames = variableNames;
     return this;
   }
 
@@ -204,6 +210,10 @@ public class VariableInstanceQueryImpl extends AbstractVariableQueryImpl<Variabl
 
   public String getVariableName() {
     return variableName;
+  }
+
+  public String[] getVariableNames() {
+    return variableNames;
   }
 
   public String getVariableNameLike() {
