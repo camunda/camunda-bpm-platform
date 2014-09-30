@@ -58,7 +58,7 @@ public class PvmAtomicOperationTransitionNotifyListenerTake implements PvmAtomic
         throw new PvmException("couldn't execute event listener : "+e.getMessage(), e);
       }
       execution.setListenerIndex(executionListenerIndex + 1);
-      execution.performOperation(this);
+      execution.performOperationSync(this);
 
     } else {
       log.fine(execution+" takes transition "+transition);

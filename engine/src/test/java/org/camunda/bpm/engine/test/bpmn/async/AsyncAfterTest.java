@@ -21,6 +21,7 @@ import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 
 /**
@@ -219,9 +220,41 @@ public class AsyncAfterTest extends PluggableProcessEngineTestCase {
 
   }
 
+  /**
+   * Test for CAM-2518: Fixes an issue that creates an infinite loop when using
+   * asyncAfter together with an execution listener on sequence flow event "take".
+   * So the only required assertion here is that the process executes successfully.
+   */
+  @Deployment
+  public void testAsyncAfterWithExecutionListener() {
+    // given an async after job and an execution listener on that task
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testProcess");
+
+    Job job = managementService.createJobQuery().singleResult();
+    assertNotNull(job);
+
+    assertNotListenerTakeInvoked(processInstance);
+
+    // when the job is executed
+    managementService.executeJob(job.getId());
+
+    // then the process should advance and not recreate the job
+    job = managementService.createJobQuery().singleResult();
+    assertNull(job);
+
+    Task task = taskService.createTaskQuery().singleResult();
+    assertNotNull(task);
+
+    assertListenerTakeInvoked(processInstance);
+  }
+
 
   protected void assertListenerStartInvoked(Execution e) {
     assertTrue((Boolean) runtimeService.getVariable(e.getId(), "listenerStartInvoked"));
+  }
+
+  protected void assertListenerTakeInvoked(Execution e) {
+    assertTrue((Boolean) runtimeService.getVariable(e.getId(), "listenerTakeInvoked"));
   }
 
   protected void assertListenerEndInvoked(Execution e) {
@@ -234,6 +267,10 @@ public class AsyncAfterTest extends PluggableProcessEngineTestCase {
 
   protected void assertNotListenerStartInvoked(Execution e) {
     assertNull(runtimeService.getVariable(e.getId(), "listenerStartInvoked"));
+  }
+
+  protected void assertNotListenerTakeInvoked(Execution e) {
+    assertNull(runtimeService.getVariable(e.getId(), "listenerTakeInvoked"));
   }
 
   protected void assertNotListenerEndInvoked(Execution e) {
