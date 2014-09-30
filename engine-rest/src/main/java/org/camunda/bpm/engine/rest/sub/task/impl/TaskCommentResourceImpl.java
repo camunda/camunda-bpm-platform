@@ -73,23 +73,17 @@ public class TaskCommentResourceImpl implements TaskCommentResource {
     return CommentDto.fromComment(comment);
   }
 
-  public CommentDto createComment(UriInfo uriInfo, MultipartFormData payload) {
+  public CommentDto createComment(UriInfo uriInfo, CommentDto commentDto) {
     ensureHistoryEnabled(Status.FORBIDDEN);
     ensureTaskExists(Status.BAD_REQUEST);
-
-    FormPart messagePart = payload.getNamedPart("message");
-
-    String message = null;
-    if (messagePart != null) {
-      message = messagePart.getTextContent();
-    }
 
     Comment comment;
 
     try {
-      comment = engine.getTaskService().addComment(taskId, null, message);
+      comment = engine.getTaskService().addComment(taskId, null, commentDto.getMessage());
     }
     catch (ProcessEngineException e) {
+      // TODO check if this is tested
       throw new InvalidRequestException(Status.BAD_REQUEST, e, "Not enough parameters submitted");
     }
 
@@ -99,12 +93,12 @@ public class TaskCommentResourceImpl implements TaskCommentResource {
       .path(taskId + "/comment/" + comment.getId())
       .build();
 
-    CommentDto commentDto = CommentDto.fromComment(comment);
+    CommentDto resultDto = CommentDto.fromComment(comment);
 
     // GET /
-    commentDto.addReflexiveLink(uri, HttpMethod.GET, "self");
+    resultDto.addReflexiveLink(uri, HttpMethod.GET, "self");
 
-    return commentDto;
+    return resultDto;
   }
 
   private boolean isHistoryEnabled() {

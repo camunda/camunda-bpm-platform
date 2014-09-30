@@ -127,7 +127,6 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
 
   protected static final String FORM_VARIABLES_URL = SINGLE_TASK_URL + "/form-variables";
 
-  protected static final String SINGLE_TASK_ADD_COMMENT_URL = SINGLE_TASK_URL + "/comment/create";
   protected static final String SINGLE_TASK_COMMENTS_URL = SINGLE_TASK_URL + "/comment";
   protected static final String SINGLE_TASK_SINGLE_COMMENT_URL = SINGLE_TASK_COMMENTS_URL + "/{commentId}";
 
@@ -1546,15 +1545,21 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
 
   @Test
   public void testAddCompleteTaskComment() {
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("message", EXAMPLE_TASK_COMMENT_FULL_MESSAGE);
 
     Response response = given()
       .pathParam("id", EXAMPLE_TASK_ID)
-      .multiPart("message", "aTaskCommentFullMessage")
       .header("accept", MediaType.APPLICATION_JSON)
+      .contentType(ContentType.JSON)
+      .body(json)
     .then().expect()
       .statusCode(Status.OK.getStatusCode())
+      .contentType(ContentType.JSON)
     .when()
-      .post(SINGLE_TASK_ADD_COMMENT_URL);
+      .post(SINGLE_TASK_COMMENTS_URL);
+
+    verify(taskServiceMock).addComment(EXAMPLE_TASK_ID, null, EXAMPLE_TASK_COMMENT_FULL_MESSAGE);
 
     verifyCreatedTaskComment(mockTaskComment, response);
   }
@@ -1564,15 +1569,19 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
 
     mockHistoryDisabled();
 
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("message", EXAMPLE_TASK_COMMENT_FULL_MESSAGE);
+
     given()
       .pathParam("id", EXAMPLE_TASK_ID)
-      .multiPart("message", "aTaskCommentFullMessage")
+      .contentType(ContentType.JSON)
+      .body(json)
       .header("accept", MediaType.APPLICATION_JSON)
     .then().expect()
       .statusCode(Status.FORBIDDEN.getStatusCode())
       .body(containsString("History is not enabled"))
     .when()
-      .post(SINGLE_TASK_ADD_COMMENT_URL);
+      .post(SINGLE_TASK_COMMENTS_URL);
   }
 
   @Test
@@ -1580,41 +1589,49 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     when(historicTaskInstanceQueryMock.taskId(eq(NON_EXISTING_ID))).thenReturn(historicTaskInstanceQueryMock);
     when(historicTaskInstanceQueryMock.singleResult()).thenReturn(null);
 
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("message", EXAMPLE_TASK_COMMENT_FULL_MESSAGE);
+
     given()
       .pathParam("id", NON_EXISTING_ID)
-      .multiPart("message", EXAMPLE_TASK_COMMENT_FULL_MESSAGE)
+      .contentType(ContentType.JSON)
+      .body(json)
       .header("accept", MediaType.APPLICATION_JSON)
     .then().expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode())
       .body(containsString("No task found for task id " + NON_EXISTING_ID))
     .when()
-      .post(SINGLE_TASK_ADD_COMMENT_URL);
+      .post(SINGLE_TASK_COMMENTS_URL);
   }
 
   @Test
   public void testAddCommentToNonExistingTaskWithHistoryDisabled() {
     mockHistoryDisabled();
 
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("message", EXAMPLE_TASK_COMMENT_FULL_MESSAGE);
+
     given()
       .pathParam("id", NON_EXISTING_ID)
-      .multiPart("message", EXAMPLE_TASK_COMMENT_FULL_MESSAGE)
+      .contentType(ContentType.JSON)
+      .body(json)
       .header("accept", MediaType.APPLICATION_JSON)
     .then().expect()
       .statusCode(Status.FORBIDDEN.getStatusCode())
       .body(containsString("History is not enabled"))
     .when()
-      .post(SINGLE_TASK_ADD_COMMENT_URL);
+      .post(SINGLE_TASK_COMMENTS_URL);
   }
 
   @Test
-  public void testAddTaskCommentWithoutMultiparts() {
+  public void testAddTaskCommentWithoutBody() {
     given()
       .pathParam("id", EXAMPLE_TASK_ID)
       .header("accept", MediaType.APPLICATION_JSON)
     .then().expect()
       .statusCode(Status.UNSUPPORTED_MEDIA_TYPE.getStatusCode())
     .when()
-      .post(SINGLE_TASK_ADD_COMMENT_URL);
+      .post(SINGLE_TASK_COMMENTS_URL);
   }
 
   @Test
@@ -1624,13 +1641,14 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
 
     given()
       .pathParam("id", EXAMPLE_TASK_ID)
-      .multiPart("nonExistingPart", "test")
+      .contentType(ContentType.JSON)
+      .body(EMPTY_JSON_OBJECT)
       .header("accept", MediaType.APPLICATION_JSON)
     .then().expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode())
       .body(containsString("Not enough parameters submitted"))
     .when()
-      .post(SINGLE_TASK_ADD_COMMENT_URL);
+      .post(SINGLE_TASK_COMMENTS_URL);
   }
 
   @Test
