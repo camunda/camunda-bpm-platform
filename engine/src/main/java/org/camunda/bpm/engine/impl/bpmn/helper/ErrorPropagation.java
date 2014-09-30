@@ -165,17 +165,25 @@ public class ErrorPropagation {
       if (currentActivity.getId().equals(catchingScope.getId())) {
         matchingParentFound = true;
       } else {
-        currentActivity = (ActivityImpl) currentActivity.getParent();
+        // boundary events are always defined on scopes, so we have to
+        // find the next parent activity that is a scope
+        currentActivity = currentActivity.getParentScopeActivity();
 
         // Traverse parents until one is found that is a scope
-        // and matches the activity the boundary event is defined on
+        // and matches the activity the boundary event is defined on.
+        //
+        // This loop attempts attempts to find the execution that matches
+        // currentActivity and then checks whether this is the scope that
+        // is responsible for catching the error (i.e. currentActivity == catchingScope).
+        // If not, search is continued in the parent activities and executions.
         while (!matchingParentFound && leavingExecution != null && currentActivity != null) {
           if (!leavingExecution.isConcurrent() && currentActivity.getId().equals(catchingScope.getId())) {
             matchingParentFound = true;
           } else if (leavingExecution.isConcurrent()) {
             leavingExecution = leavingExecution.getParent();
+
           } else {
-            currentActivity = currentActivity.getParentActivity();
+            currentActivity = currentActivity.getParentScopeActivity();
             leavingExecution = leavingExecution.getParent();
           }
         }

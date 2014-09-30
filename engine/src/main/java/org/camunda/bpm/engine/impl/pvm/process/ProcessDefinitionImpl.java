@@ -189,4 +189,12 @@ public class ProcessDefinitionImpl extends ScopeImpl implements PvmProcessDefini
     return null;
   }
 
+  public ScopeImpl getParent() {
+    return null;
+  }
+
+  public boolean isScope() {
+    return true;
+  }
+
 }

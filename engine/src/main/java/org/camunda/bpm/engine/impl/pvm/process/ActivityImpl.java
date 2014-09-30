@@ -226,7 +226,19 @@ public class ActivityImpl extends ScopeImpl implements PvmActivity, HasDIBounds 
   }
 
   public ScopeImpl getParentScope() {
-    return parent;
+    ScopeImpl parentScope = parent;
+    while (parentScope != null && !parentScope.isScope()) {
+      parentScope = parentScope.getParent();
+    }
+    return parentScope;
+  }
+
+  public ActivityImpl getParentScopeActivity() {
+    ScopeImpl parentScope = getParentScope();
+    if (parentScope instanceof ActivityImpl) {
+      return (ActivityImpl) parentScope;
+    }
+    return null;
   }
 
   public boolean isCancelScope() {

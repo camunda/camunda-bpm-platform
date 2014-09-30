@@ -110,6 +110,10 @@ public abstract class ScopeImpl extends CoreActivity implements PvmScope {
     return processDefinition;
   }
 
+  public abstract ScopeImpl getParent();
+
   public abstract ScopeImpl getParentScope();
+
+  public abstract boolean isScope();
 
 }
