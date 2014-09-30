@@ -64,14 +64,6 @@ define([
             viewer = new Viewer({
               container: holder
             });
-            // holder.html('');
-            // viewer.clear();
-
-            // viewer.importXML(xml.bpmn20Xml, function(err) {
-            //   scope.rendering = false;
-            //   if (err) { throw err; }
-            //   viewer.get('canvas').zoom('fit-viewport');
-            // });
 
             angular.element('.bjs-container > a').remove();
 
@@ -80,9 +72,6 @@ define([
                 if (err) { throw err; }
 
                 $timeout(function() {
-                  // var elSelector = '[data-element-id="'+ scope.task.taskDefinitionKey +'"]';
-                  // var $el = element.find(elSelector);
-                  // $el.addClass('highlight');
                   viewer.get('canvas').zoom('fit-viewport');
                   scope.rendering = false;
                 }, 10);

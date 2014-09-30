@@ -71,10 +71,6 @@ define([
         scope._camForm = null;
         scope.fullscreen = false;
 
-        // // doh!
-        // scope.$valid = true;
-        // scope.$invalid = false;
-
         scope.enterFullscreen = function() {
           scope.fullscreen = !scope.fullscreen;
 
@@ -181,7 +177,7 @@ define([
               containerElement: targetContainer,
               client:           camAPI,
               formUrl:          formUrl,
-              initialized:       function(camForm) {
+              initialized:      function(camForm) {
 
                 var formName = camForm.formElement.attr('name');
                 var form = camForm.formElement.scope()[formName];
@@ -192,7 +188,6 @@ define([
                   scope.$invalid = !value;
                 });
               }
-
             });
 
           }
