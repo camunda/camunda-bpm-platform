@@ -9,11 +9,13 @@
 </div>
 
 
-<div class="form-container modal-body"></div>
+<div class="form-container modal-body"
+     ng-class="{'not-assignee': !isAssignee}"></div>
 
 
 <div class="modal-footer">
-  <div class="form-actions">
+  <div class="form-actions"
+       ng-class="{'not-assignee': !isAssignee}">
     <button class="btn btn-link"
             type="button"
             ng-click="exitFullscreen()"

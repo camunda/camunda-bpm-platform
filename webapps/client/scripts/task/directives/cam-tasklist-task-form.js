@@ -183,7 +183,7 @@ define([
                 var form = camForm.formElement.scope()[formName];
 
                 scope.$watch(function() {
-                  return form.$valid;
+                  return form.$valid && scope.isAssignee;
                 }, function(value) {
                   scope.$invalid = !value;
                 });
@@ -206,6 +206,9 @@ define([
           targetContainer = targetContainer || container;
           scope._camForm = null;
 
+          scope.isAssignee = scope.task.assignee &&
+                             scope.$root.authentication &&
+                             scope.task.assignee === scope.$root.authentication.name;
 
           if (scope.task._embedded && scope.task._embedded.processDefinition[0]) {
             showForm(targetContainer, scope.task._embedded.processDefinition[0]);
