@@ -69,7 +69,9 @@ define([
           if ($scope.loading || !authed()) { return; }
           $scope.loading = true;
 
-          Filter.list({}, function(err, res) {
+          Filter.list({
+            itemCount: true
+          }, function(err, res) {
             $scope.loading = false;
             if (err) { throw err; }
 

@@ -51,7 +51,18 @@
     padding-left: (@grid-gutter-width / 2);
     padding-right: (@grid-gutter-width / 2);
     margin-bottom: 7px;
+    text-overflow: ellipsis;
+    overflow: hidden;
     text-transform: uppercase;
+  }
+
+  .counter {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    padding: 0 4px;
+    font-size: 90%;
+    // background-color: rgba(255, 255, 255, 0.3);
   }
 
   .filter-actions {
