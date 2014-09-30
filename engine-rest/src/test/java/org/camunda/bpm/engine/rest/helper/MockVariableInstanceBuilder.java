@@ -16,6 +16,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.camunda.bpm.engine.delegate.SerializedVariableValue;
+import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.camunda.bpm.engine.runtime.VariableInstance;
 
 /**
@@ -172,6 +173,24 @@ public class MockVariableInstanceBuilder {
 
   public VariableInstance build() {
     VariableInstance mockVariable = mock(VariableInstance.class);
+    return build(mockVariable);
+  }
+
+  public VariableInstanceEntity buildEntity() {
+    VariableInstanceEntity mockVariable = mock(VariableInstanceEntity.class);
+    if (taskId != null) {
+      when(mockVariable.getVariableScope()).thenReturn(taskId);
+    }
+    else if (executionId != null) {
+      when(mockVariable.getVariableScope()).thenReturn(executionId);
+    }
+    else {
+      when(mockVariable.getVariableScope()).thenReturn(caseExecutionId);
+    }
+    return build(mockVariable);
+  }
+
+  protected <T extends VariableInstance> T build(T mockVariable) {
     when(mockVariable.getId()).thenReturn(id);
     when(mockVariable.getName()).thenReturn(name);
     when(mockVariable.getTypeName()).thenReturn(type);
