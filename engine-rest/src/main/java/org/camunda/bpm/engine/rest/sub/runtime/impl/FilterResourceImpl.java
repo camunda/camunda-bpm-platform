@@ -19,14 +19,10 @@ import static org.camunda.bpm.engine.authorization.Permissions.UPDATE;
 import static org.camunda.bpm.engine.authorization.Resources.FILTER;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Pattern;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.Response.Status;
@@ -56,6 +52,7 @@ import org.camunda.bpm.engine.rest.hal.task.HalTask;
 import org.camunda.bpm.engine.rest.hal.task.HalTaskList;
 import org.camunda.bpm.engine.rest.impl.AbstractAuthorizedRestResource;
 import org.camunda.bpm.engine.rest.sub.runtime.FilterResource;
+import org.camunda.bpm.engine.task.Task;
 import org.codehaus.jackson.map.ObjectMapper;
 
 /**
@@ -70,24 +67,6 @@ public class FilterResourceImpl extends AbstractAuthorizedRestResource implement
   protected String relativeRootResourcePath;
 
   public static final Pattern EMPTY_JSON_BODY = Pattern.compile("\\s*\\{\\s*\\}\\s*");
-
-  public static final String DTO_MAPPING = "dto";
-  public static final String HAL_MAPPING = "hal";
-  public static final String HAL_LIST_MAPPING = "hal-list";
-
-  public static final Map<Class<?>, Map<String, Class<?>>> ENTITY_MAPPING = new HashMap<Class<?>, Map<String, Class<?>>>();
-  public static final Map<String, Class<? extends AbstractQueryDto<?>>> QUERY_MAPPING = new HashMap<String, Class<? extends AbstractQueryDto<?>>>();
-
-  static {
-    // Task
-    Map<String, Class<?>> mapping = new HashMap<String, Class<?>>();
-    mapping.put(DTO_MAPPING, TaskDto.class);
-    mapping.put(HAL_MAPPING, HalTask.class);
-    mapping.put(HAL_LIST_MAPPING, HalTaskList.class);
-    ENTITY_MAPPING.put(TaskEntity.class, mapping);
-
-    QUERY_MAPPING.put(EntityTypes.TASK, TaskQueryDto.class);
-  }
 
   public FilterResourceImpl(String processEngineName, ObjectMapper objectMapper, String filterId, String relativeRootResourcePath) {
     super(processEngineName, FILTER, filterId);
@@ -140,8 +119,7 @@ public class FilterResourceImpl extends AbstractAuthorizedRestResource implement
     Object entity = executeFilterSingleResult(extendingQuery);
 
     if (entity != null) {
-      Method fromEntity = getMethodFromMapping(entity.getClass(), DTO_MAPPING, "fromEntity");
-      return invokeMappingMethod(fromEntity, entity);
+      return convertToDto(entity);
     }
     else {
       return null;
@@ -152,8 +130,7 @@ public class FilterResourceImpl extends AbstractAuthorizedRestResource implement
     Object entity = executeFilterSingleResult(extendingQuery);
 
     if (entity != null) {
-      Method fromEntity = getMethodFromMapping(entity.getClass(), HAL_MAPPING, "generate");
-      return (HalResource) invokeMappingMethod(fromEntity, entity, processEngine);
+      return convertToHalResource(entity);
     }
     else {
       return EmptyHalResource.INSTANCE;
@@ -172,25 +149,26 @@ public class FilterResourceImpl extends AbstractAuthorizedRestResource implement
     List<?> entities = executeFilterList(extendingQuery, firstResult, maxResults);
 
     if (entities != null && !entities.isEmpty()) {
-      Method fromEntity = getMethodFromMapping(entities.get(0).getClass(), DTO_MAPPING, "fromEntity");
-      List<Object> results = new ArrayList<Object>();
-      for (Object entity : entities) {
-        results.add(invokeMappingMethod(fromEntity, entity));
-      }
-      return results;
+      return convertToDtoList(entities);
     }
     else {
       return Collections.emptyList();
     }
   }
 
+  private List<Object> convertToDtoList(List<?> entities) {
+    List<Object> dtoList = new ArrayList<Object>();
+    for (Object entity : entities) {
+      dtoList.add(convertToDto(entity));
+    }
+    return dtoList;
+  }
+
   public HalResource queryHalList(String extendingQuery, Integer firstResult, Integer maxResults) {
     List<?> entities = executeFilterList(extendingQuery, firstResult, maxResults);
 
     if (entities != null && !entities.isEmpty()) {
-      long count = executeFilterCount(null);
-      Method fromEntityList = getMethodFromMapping(entities.get(0).getClass(), HAL_LIST_MAPPING, "generate");
-      return (HalResource) invokeMappingMethod(fromEntityList, entities, count, processEngine);
+      return convertToHalList(entities);
     }
     else {
       return EmptyHalCollection.INSTANCE;
@@ -217,6 +195,31 @@ public class FilterResourceImpl extends AbstractAuthorizedRestResource implement
     }
     catch (ProcessEngineException e) {
       throw new InvalidRequestException(Status.BAD_REQUEST, e, "Filter does not returns a valid single result");
+    }
+  }
+
+  protected Query convertQuery(String queryString) {
+    if (queryString == null || queryString.trim().isEmpty() || EMPTY_JSON_BODY.matcher(queryString).matches()) {
+      return null;
+    }
+    else {
+      String resourceType = getDbFilter().getResourceType();
+      AbstractQueryDto<?> queryDto;
+      try {
+        if (EntityTypes.TASK.equals(resourceType)) {
+          queryDto = objectMapper.readValue(queryString, TaskQueryDto.class);
+        } else {
+          throw new InvalidRequestException(Status.BAD_REQUEST, "Queries for resource type '" + resourceType + "' are currently not supported by filters.");
+        }
+      } catch (IOException e) {
+        throw new InvalidRequestException(Status.BAD_REQUEST, e, "Invalid query for resource type '" + resourceType + "'");
+      }
+
+      if (queryDto != null) {
+        return queryDto.toQuery(processEngine);
+      } else {
+        throw new InvalidRequestException(Status.BAD_REQUEST, "Unable to convert query for resource type '" + resourceType + "'.");
+      }
     }
   }
 
@@ -252,37 +255,6 @@ public class FilterResourceImpl extends AbstractAuthorizedRestResource implement
     }
     catch (NotValidException e) {
       throw new InvalidRequestException(Status.BAD_REQUEST, e, "Filter cannot be extended by an invalid query");
-    }
-  }
-
-  protected Method getMethodFromMapping(Class<?> entityClass, String mappingKey, String methodName) {
-    Map<String, Class<?>> mapping = ENTITY_MAPPING.get(entityClass);
-    if (mapping != null) {
-      Class<?> mapClass = mapping.get(mappingKey);
-      if (mapClass != null) {
-        for (Method method : mapClass.getMethods()) {
-          if (method.getName().equals(methodName)) {
-            return method;
-          }
-        }
-        throw new InvalidRequestException(Status.INTERNAL_SERVER_ERROR, "Unable to find method '" + methodName + "' of class '" + mapClass.getCanonicalName() + "'");
-      }
-      else {
-        throw new InvalidRequestException(Status.INTERNAL_SERVER_ERROR, "No mapping '" + mappingKey + "' for class '" + entityClass.getCanonicalName() + "' defined");
-      }
-    }
-    else {
-      throw new InvalidRequestException(Status.INTERNAL_SERVER_ERROR, "Unable to find mapping for class '" + entityClass.getCanonicalName() + "'");
-    }
-  }
-
-  protected Object invokeMappingMethod(Method mappingMethod, Object... arguments) {
-    try {
-      return mappingMethod.invoke(null, arguments);
-    } catch (IllegalAccessException e) {
-      throw new InvalidRequestException(Status.INTERNAL_SERVER_ERROR, e, "Unable to access method '" + mappingMethod.getName() + "'");
-    } catch (InvocationTargetException e) {
-      throw new InvalidRequestException(Status.INTERNAL_SERVER_ERROR, e, "Unable to invoke method '" + mappingMethod.getName() + "'");
     }
   }
 
@@ -334,29 +306,33 @@ public class FilterResourceImpl extends AbstractAuthorizedRestResource implement
     return dto;
   }
 
-  protected Query<?, ?> convertQuery(String queryString) {
-    if (queryString == null || queryString.trim().isEmpty() || EMPTY_JSON_BODY.matcher(queryString).matches()) {
-      return null;
+  protected Object convertToDto(Object entity) {
+    if (TaskEntity.class.equals(entity.getClass())) {
+      return TaskDto.fromEntity((Task) entity);
     }
     else {
-      String resourceType = getDbFilter().getResourceType();
-      Class<? extends AbstractQueryDto<?>> queryDtoClass = QUERY_MAPPING.get(resourceType);
-      if (queryDtoClass != null) {
-        try {
-          AbstractQueryDto<?> queryDto = objectMapper.readValue(queryString, queryDtoClass);
-          if (queryDto != null) {
-            return queryDto.toQuery(processEngine);
-          }
-          else {
-            return null;
-          }
-        } catch (IOException e) {
-          throw new InvalidRequestException(Status.BAD_REQUEST, e, "Unable to convert query of type '" + resourceType + "' to query dto class '" + queryDtoClass.getCanonicalName() + "'");
-        }
-      }
-      else {
-        throw new InvalidRequestException(Status.BAD_REQUEST, "Unsupported filter type '" + resourceType + "'");
-      }
+      throw new InvalidRequestException(Status.BAD_REQUEST, "Entities of class '" + entity.getClass().getCanonicalName() + "' are currently not supported by filters.");
+    }
+  }
+
+  protected HalResource<?> convertToHalResource(Object entity) {
+    if (TaskEntity.class.equals(entity.getClass())) {
+      return HalTask.generate((Task) entity, processEngine);
+    }
+    else {
+      throw new InvalidRequestException(Status.BAD_REQUEST, "Entities of class '" + entity.getClass().getCanonicalName() + "' are currently not supported by filters and HAL media type.");
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  protected HalResource convertToHalList(List<?> entities) {
+    long count = executeFilterCount(null);
+
+    if (TaskEntity.class.equals(entities.get(0).getClass())) {
+      return HalTaskList.generate((List<Task>) entities, count, processEngine);
+    }
+    else {
+      throw new InvalidRequestException(Status.BAD_REQUEST, "Entities of class '" + entities.get(0).getClass().getCanonicalName() + "' are currently not supported by filters and HAL media type.");
     }
   }
 
