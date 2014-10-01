@@ -205,6 +205,9 @@ define([
         // };
 
         scope.assigning = function(info) {
+          if (!info.varValue) {
+            return scope.unclaim();
+          }
           Task.assignee(scope.task.id, info.varValue, function(err) {
             if (err) {
               return assigned(err);
