@@ -84,15 +84,13 @@ define('camunda-tasklist-ui', [
         return $rootScope.authentication && $rootScope.authentication.name;
       }
 
-      $rootScope.$on('authentication.login.success', function() {
-        if (!isAuth()) { return; }
 
+      function checkFilterCreationAccess() {
         var Filter = camAPI.resource('filter');
 
         $rootScope.authentication.userCanCreateFilter = false;
 
         Filter.authorizations(function(err, resp) {
-          if (!isAuth()) { return; }
           if (err) { throw err; }
 
           angular.forEach(resp.links, function(link) {
@@ -101,6 +99,12 @@ define('camunda-tasklist-ui', [
             }
           });
         });
+      }
+
+      $rootScope.$watch('authentication', function(newValue, oldValue) {
+        if (isAuth() && (!oldValue || newValue.name !== oldValue.name)) {
+          checkFilterCreationAccess();
+        }
       });
 
 
