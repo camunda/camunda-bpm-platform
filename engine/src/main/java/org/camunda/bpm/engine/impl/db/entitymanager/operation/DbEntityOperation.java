@@ -31,7 +31,7 @@ public class DbEntityOperation extends DbOperation {
   /**
    * Indicates whether the operation failed to execute due to OptimisticLocking
    */
-  protected boolean failed;
+  protected boolean failed = false;
 
   public void recycle() {
     entity = null;
