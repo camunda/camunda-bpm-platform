@@ -80,6 +80,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   protected Date dueAfter;
   protected Date followUpDate;
   protected Date followUpBefore;
+  protected boolean followUpNullAccepted=false;
   protected Date followUpAfter;
   protected boolean excludeSubtasks = false;
   protected SuspensionState suspensionState;
@@ -598,15 +599,32 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
 
   public TaskQuery followUpBefore(Date followUpBefore) {
     this.followUpBefore = followUpBefore;
+    this.followUpNullAccepted = false;
     expressions.remove("followUpBefore");
     return this;
   }
 
   public TaskQuery followUpBeforeExpression(String followUpBeforeExpression) {
+    this.followUpNullAccepted = false;
     expressions.put("followUpBefore", followUpBeforeExpression);
     return this;
   }
 
+  @Override
+  public TaskQuery followUpBeforeOrNotExistent(Date followUpDate) {
+    this.followUpBefore = followUpDate;
+    this.followUpNullAccepted = true;
+    expressions.remove("followUpBefore");
+    return this;
+  }
+
+  @Override
+  public TaskQuery followUpBeforeExpressionOrNotExistent(String followUpDateExpression) {
+    expressions.put("followUpBefore", followUpDateExpression);
+    this.followUpNullAccepted = true;
+    return this;
+  }
+  
   public TaskQuery followUpAfter(Date followUpAfter) {
     this.followUpAfter = followUpAfter;
     expressions.remove("followUpAfter");
@@ -1394,5 +1412,8 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
 
   }
 
+  public boolean isFollowUpNullAccepted() {
+    return followUpNullAccepted;
+  }
 
 }

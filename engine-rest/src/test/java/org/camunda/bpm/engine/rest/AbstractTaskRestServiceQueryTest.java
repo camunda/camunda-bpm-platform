@@ -467,6 +467,7 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
     verify(mockQuery).dueDate(any(Date.class));
     verify(mockQuery).followUpAfter(any(Date.class));
     verify(mockQuery).followUpBefore(any(Date.class));
+    verify(mockQuery).followUpBeforeOrNotExistent(any(Date.class));
     verify(mockQuery).followUpDate(any(Date.class));
     verify(mockQuery).taskCreatedAfter(any(Date.class));
     verify(mockQuery).taskCreatedBefore(any(Date.class));
@@ -483,6 +484,7 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
     parameters.put("created", "2013-01-23T14:42:47");
     parameters.put("followUpAfter", "2013-01-23T14:42:48");
     parameters.put("followUpBefore", "2013-01-23T14:42:49");
+    parameters.put("followUpBeforeOrNotExistent", "2013-01-23T14:42:49");
     parameters.put("followUp", "2013-01-23T14:42:50");
     return parameters;
   }
