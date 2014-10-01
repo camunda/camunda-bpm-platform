@@ -37,12 +37,6 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-war-plugin</artifactId>
         <configuration>
-          <archive>
-            <manifest>
-              <!-- Maven project version number -->
-              <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-            </manifest>
-          </archive>
           <webResources>
             <resource>
               <directory>../../webapp/src/main/runtime/glassfish/webapp</directory>

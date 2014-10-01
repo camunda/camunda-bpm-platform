@@ -190,12 +190,6 @@
               </includes>
             </resource>
           </webResources>
-          <archive>
-            <manifest>
-              <!-- Maven project version number -->
-              <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-            </manifest>
-          </archive>
           <!-- exclude development resources (task forms etc.) -->
           <packagingExcludes>
             develop/**
@@ -321,10 +315,6 @@
             <artifactId>maven-war-plugin</artifactId>
             <configuration>
               <archive>
-                <manifest>
-                  <!-- Maven project version number -->
-                  <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-                </manifest>
                 <manifestEntries>
                   <!-- module dependencies for deployment on AS 7 -->
                   <Dependencies>org.camunda.bpm.camunda-engine</Dependencies>
