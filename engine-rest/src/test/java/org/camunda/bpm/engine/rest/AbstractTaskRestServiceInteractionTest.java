@@ -127,6 +127,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
 
   protected static final String FORM_VARIABLES_URL = SINGLE_TASK_URL + "/form-variables";
 
+  protected static final String SINGLE_TASK_ADD_COMMENT_URL = SINGLE_TASK_URL + "/comment/create";
   protected static final String SINGLE_TASK_COMMENTS_URL = SINGLE_TASK_URL + "/comment";
   protected static final String SINGLE_TASK_SINGLE_COMMENT_URL = SINGLE_TASK_COMMENTS_URL + "/{commentId}";
 
@@ -1557,7 +1558,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
       .statusCode(Status.OK.getStatusCode())
       .contentType(ContentType.JSON)
     .when()
-      .post(SINGLE_TASK_COMMENTS_URL);
+      .post(SINGLE_TASK_ADD_COMMENT_URL);
 
     verify(taskServiceMock).addComment(EXAMPLE_TASK_ID, null, EXAMPLE_TASK_COMMENT_FULL_MESSAGE);
 
@@ -1581,7 +1582,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
       .statusCode(Status.FORBIDDEN.getStatusCode())
       .body(containsString("History is not enabled"))
     .when()
-      .post(SINGLE_TASK_COMMENTS_URL);
+      .post(SINGLE_TASK_ADD_COMMENT_URL);
   }
 
   @Test
@@ -1601,7 +1602,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
       .statusCode(Status.BAD_REQUEST.getStatusCode())
       .body(containsString("No task found for task id " + NON_EXISTING_ID))
     .when()
-      .post(SINGLE_TASK_COMMENTS_URL);
+      .post(SINGLE_TASK_ADD_COMMENT_URL);
   }
 
   @Test
@@ -1620,7 +1621,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
       .statusCode(Status.FORBIDDEN.getStatusCode())
       .body(containsString("History is not enabled"))
     .when()
-      .post(SINGLE_TASK_COMMENTS_URL);
+      .post(SINGLE_TASK_ADD_COMMENT_URL);
   }
 
   @Test
@@ -1631,7 +1632,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     .then().expect()
       .statusCode(Status.UNSUPPORTED_MEDIA_TYPE.getStatusCode())
     .when()
-      .post(SINGLE_TASK_COMMENTS_URL);
+      .post(SINGLE_TASK_ADD_COMMENT_URL);
   }
 
   @Test
@@ -1648,7 +1649,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
       .statusCode(Status.BAD_REQUEST.getStatusCode())
       .body(containsString("Not enough parameters submitted"))
     .when()
-      .post(SINGLE_TASK_COMMENTS_URL);
+      .post(SINGLE_TASK_ADD_COMMENT_URL);
   }
 
   @Test

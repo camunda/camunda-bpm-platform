@@ -38,6 +38,7 @@ public interface TaskCommentResource {
   CommentDto getComment(@PathParam("commentId") String commentId);
 
   @POST
+  @Path("/create")
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
   CommentDto createComment(@Context UriInfo uriInfo, CommentDto comment);

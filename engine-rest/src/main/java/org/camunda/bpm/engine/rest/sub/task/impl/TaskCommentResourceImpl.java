@@ -19,7 +19,6 @@ import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.rest.TaskRestService;
 import org.camunda.bpm.engine.rest.dto.task.CommentDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
-import org.camunda.bpm.engine.rest.mapper.MultipartFormData;
 import org.camunda.bpm.engine.rest.sub.task.TaskCommentResource;
 import org.camunda.bpm.engine.task.Comment;
 
@@ -30,8 +29,6 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import static org.camunda.bpm.engine.rest.mapper.MultipartFormData.FormPart;
 
 public class TaskCommentResourceImpl implements TaskCommentResource {
 
@@ -83,7 +80,6 @@ public class TaskCommentResourceImpl implements TaskCommentResource {
       comment = engine.getTaskService().addComment(taskId, null, commentDto.getMessage());
     }
     catch (ProcessEngineException e) {
-      // TODO check if this is tested
       throw new InvalidRequestException(Status.BAD_REQUEST, e, "Not enough parameters submitted");
     }
 
