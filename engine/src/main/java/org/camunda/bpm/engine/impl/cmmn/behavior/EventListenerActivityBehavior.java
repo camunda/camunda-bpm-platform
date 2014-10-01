@@ -35,7 +35,11 @@ public class EventListenerActivityBehavior extends EventListenerOrMilestoneActiv
     return "event listener";
   }
 
-  public void triggerEntryCriteria(CmmnActivityExecution execution) {
+  protected boolean isAtLeastOneEntryCriteriaSatisfied(CmmnActivityExecution execution) {
+    return false;
+  }
+
+  public void fireEntryCriteria(CmmnActivityExecution execution) {
     throw new CaseIllegalStateTransitionException("Cannot trigger case execution '"+execution.getId()+"': entry criteria are not allowed for event listener.");
   }
 

@@ -14,9 +14,6 @@ package org.camunda.bpm.engine.impl.cmmn.operation;
 
 import static org.camunda.bpm.engine.delegate.CaseExecutionListener.PARENT_TERMINATE;
 
-import org.camunda.bpm.engine.impl.cmmn.behavior.CmmnActivityBehavior;
-import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
-
 /**
  * @author Roman Smirnov
  *
@@ -25,10 +22,6 @@ public class AtomicOperationCaseExecutionParentTerminate extends AbstractAtomicO
 
   public String getCanonicalName() {
     return "case-execution-parent-terminate";
-  }
-
-  protected void triggerBehavior(CmmnActivityBehavior behavior, CmmnExecution execution) {
-    behavior.onParentTermination(execution);
   }
 
   protected String getEventName() {

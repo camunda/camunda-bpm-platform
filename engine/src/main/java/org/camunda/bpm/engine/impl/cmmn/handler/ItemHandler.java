@@ -64,6 +64,7 @@ import org.camunda.bpm.model.xml.instance.ModelElementInstance;
  */
 public abstract class ItemHandler extends CmmnElementHandler<CmmnElement, CmmnActivity> {
 
+  public static final String PROPERTY_AUTO_COMPLETE = "autoComplete";
   public static final String PROPERTY_REQUIRED_RULE = "requiredRule";
   public static final String PROPERTY_MANUAL_ACTIVATION_RULE = "manualActivationRule";
   public static final String PROPERTY_REPETITION_RULE = "repetitionRule";
@@ -153,6 +154,9 @@ public abstract class ItemHandler extends CmmnElementHandler<CmmnElement, CmmnAc
     }
     activity.setName(name);
 
+    // autoComplete
+    initializeAutoComplete(element, activity, context);
+
     // requiredRule
     initializeRequiredRule(element, activity, context);
 
@@ -171,6 +175,10 @@ public abstract class ItemHandler extends CmmnElementHandler<CmmnElement, CmmnAc
     // initialize exit criteria
     initializeExitCriterias(element, activity, context);
 
+  }
+
+  protected void initializeAutoComplete(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context) {
+    // noop
   }
 
   protected void initializeRequiredRule(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context) {

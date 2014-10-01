@@ -81,5 +81,9 @@ public interface CaseExecution {
    */
   boolean isDisabled();
 
+  /**
+   * <p>Returns <code>true</code> if the case execution is terminated.</p>
+   */
+  boolean isTerminated();
 
 }

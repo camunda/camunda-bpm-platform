@@ -66,7 +66,7 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
 
   /** nested case sentry parts */
   protected List<CaseSentryPartEntity> caseSentryParts;
-  protected Map<String, List<CaseSentryPartEntity>> sentries;
+  protected Map<String, List<CmmnSentryPart>> sentries;
 
   /** reference to a sub process instance, not-null if currently subprocess is started from this execution */
   protected transient ExecutionEntity subProcessInstance;
@@ -390,22 +390,22 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
         .getCaseSentryPartManager()
         .findCaseSentryPartsByCaseExecutionId(id);
 
-      sentries = new HashMap<String, List<CaseSentryPartEntity>>();
+      // create a map sentries: sentryId -> caseSentryParts
+      // for simple select to get all parts for one sentry
+      sentries = new HashMap<String, List<CmmnSentryPart>>();
 
       for (CaseSentryPartEntity sentryPart : caseSentryParts) {
 
         String sentryId = sentryPart.getSentryId();
-        List<CaseSentryPartEntity> parts = sentries.get(sentryId);
+        List<CmmnSentryPart> parts = sentries.get(sentryId);
 
         if (parts == null) {
-          parts = new ArrayList<CaseSentryPartEntity>();
+          parts = new ArrayList<CmmnSentryPart>();
           sentries.put(sentryId, parts);
         }
 
         parts.add(sentryPart);
-
       }
-
     }
   }
 
@@ -415,17 +415,22 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
     getCaseSentryParts().add(entity);
 
     String sentryId = sentryPart.getSentryId();
-    List<CaseSentryPartEntity> parts = sentries.get(sentryId);
+    List<CmmnSentryPart> parts = sentries.get(sentryId);
 
     if (parts == null) {
-      parts = new ArrayList<CaseSentryPartEntity>();
+      parts = new ArrayList<CmmnSentryPart>();
       sentries.put(sentryId, parts);
     }
 
     parts.add(entity);
   }
 
-  protected List<CaseSentryPartEntity> findSentry(String sentryId) {
+  protected Map<String, List<CmmnSentryPart>> getSentries() {
+    ensureCaseSentryPartsInitialized();
+    return sentries;
+  }
+
+  protected List<CmmnSentryPart> findSentry(String sentryId) {
     ensureCaseSentryPartsInitialized();
     return sentries.get(sentryId);
   }

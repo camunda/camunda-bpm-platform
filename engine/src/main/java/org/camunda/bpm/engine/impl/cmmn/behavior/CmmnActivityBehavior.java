@@ -65,8 +65,8 @@ public interface CmmnActivityBehavior extends CoreActivityBehavior<CmmnActivityE
 
   public void onClose(CmmnActivityExecution execution);
 
-  public void triggerEntryCriteria(CmmnActivityExecution execution);
+  public void fireEntryCriteria(CmmnActivityExecution execution);
 
-  public void triggerExitCriteria(CmmnActivityExecution execution);
+  public void fireExitCriteria(CmmnActivityExecution execution);
 
 }

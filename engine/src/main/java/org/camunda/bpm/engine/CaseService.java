@@ -24,7 +24,6 @@ import org.camunda.bpm.engine.runtime.CaseExecutionQuery;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.runtime.CaseInstanceBuilder;
 import org.camunda.bpm.engine.runtime.CaseInstanceQuery;
-import org.camunda.bpm.engine.runtime.CaseSentryPartQuery;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.model.cmmn.instance.CaseTask;
 import org.camunda.bpm.model.cmmn.instance.HumanTask;
@@ -491,12 +490,6 @@ public interface CaseService {
    * that can be used to query the executions and case instances.</p>
    */
   CaseExecutionQuery createCaseExecutionQuery();
-
-  /**
-   * <p>Creates a new {@link CaseSentryPartQuery} instance,
-   * that can be used to query the sentry parts.</p>
-   */
-  CaseSentryPartQuery createCaseSentryPartQuery();
 
   // Variables //////////////////////////////////////////////////////////
 

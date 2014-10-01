@@ -26,7 +26,9 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.model.cmmn.instance.CaseTask;
 import org.camunda.bpm.model.cmmn.instance.EventListener;
 import org.camunda.bpm.model.cmmn.instance.HumanTask;
+import org.camunda.bpm.model.cmmn.instance.IfPart;
 import org.camunda.bpm.model.cmmn.instance.Milestone;
+import org.camunda.bpm.model.cmmn.instance.PlanItemOnPart;
 import org.camunda.bpm.model.cmmn.instance.ProcessTask;
 import org.camunda.bpm.model.cmmn.instance.Sentry;
 import org.camunda.bpm.model.cmmn.instance.Stage;
@@ -90,6 +92,29 @@ public interface CmmnActivityExecution extends DelegateCaseExecution {
   boolean isNew();
 
   /**
+   * <p>Returns <code>true</code> iff:<br>
+   *  <code>{@link #getCurrentState()} == {@link CaseExecutionState#TERMINATING_ON_TERMINATION}
+   *        || {@link #getCurrentState()} == {@link CaseExecutionState#TERMINATING_ON_PARENT_TERMINATION}
+   *        || {@link #getCurrentState()} == {@link CaseExecutionState#TERMINATING_ON_EXIT}</code>
+   * </p>
+   *
+   * @return whether <code>this</code> case execution has as current state {@link CaseExecutionState#TERMINATING_ON_TERMINATION},
+   *         {@link CaseExecutionState#TERMINATING_ON_PARENT_TERMINATION} or {@link CaseExecutionState#TERMINATING_ON_EXIT}
+   */
+  boolean isTerminating();
+
+  /**
+   * <p>Returns <code>true</code> iff:<br>
+   *  <code>{@link #getCurrentState()} == {@link CaseExecutionState#SUSPENDING_ON_SUSPENSION}
+   *        || {@link #getCurrentState()} == {@link CaseExecutionState#SUSPENDING_ON_PARENT_SUSPENSION}</code>
+   * </p>
+   *
+   * @return whether <code>this</code> case execution has as current state
+   *        {@link CaseExecutionState#SUSPENDING_ON_SUSPENSION} or {@link CaseExecutionState#SUSPENDING_ON_PARENT_SUSPENSION}
+   */
+  boolean isSuspending();
+
+  /**
    * <p>Returns the {@link CmmnActivity activity} which is associated with
    * <code>this</code> case execution.
    *
@@ -100,8 +125,9 @@ public interface CmmnActivityExecution extends DelegateCaseExecution {
   /**
    * <p>Creates new child case executions for each given {@link CmmnActivity}.</p>
    *
-   * <p>Afterwards each created case executions will be executed (ie. the create
-   * listener will be notified etc.).</p>
+   * <p>Afterwards the method {@link #triggerChildExecutionsLifecycle(List)} must be called
+   * to execute each created case executions (ie. the create listener will be
+   * notified etc.).</p>
    *
    * <p>According to the CMMN 1.0 specification:<br>
    * This method can be called when <code>this</code> case execution (which
@@ -118,7 +144,15 @@ public interface CmmnActivityExecution extends DelegateCaseExecution {
    */
   List<CmmnExecution> createChildExecutions(List<CmmnActivity> activities);
 
-  void triggerChildExecutions(List<CmmnExecution> children);
+  /**
+   * <p>This method triggers for each given case execution the lifecycle.</p>
+   *
+   * <p>This method must be called after {@link #createChildExecutions(List)}.</p>
+   *
+   * @param children a collection of {@link CmmnExecution case execution} to
+   *                 trigger for each given case execution the lifecycle
+   */
+  void triggerChildExecutionsLifecycle(List<CmmnExecution> children);
 
   /**
    * <p>Transition to {@link CaseExecutionState#ENABLED} state.</p>
@@ -342,7 +376,7 @@ public interface CmmnActivityExecution extends DelegateCaseExecution {
   void occur();
 
   /**
-   * <p>Transition to {@link CaseExecutionState#TERMINATED} state.</p>
+   * <p>Transition to {@link CaseExecutionState#TERMINATING_ON_TERMINATION} state.</p>
    *
    * <p>If <code>this</code> case execution is associated with a {@link Stage} or
    * {@link Task}, then <code>this</code> case execution must be in {@link CaseExecutionState#ACTIVE}
@@ -355,6 +389,21 @@ public interface CmmnActivityExecution extends DelegateCaseExecution {
    * will be propagated down to all its contained {@link EventListener EventListener}, {@link Milestone},
    * {@link Stage}, and {@link Task} instances.</p>
    *
+   * <p>In case of a {@link Stage} this corresponding case execution stays in this state until
+   * all children notified this case execution, that they terminated successfully. Afterwards the
+   * method {@link #performTerminate()} must be called to complete the transition into the state
+   * {@link CaseExecutionState#TERMINATED}.</p>
+   *
+   * @throws CaseIllegalStateTransitionException will be thrown, if <code>this</code> case execution
+   *         is not in the expected state.
+   * @throws ProcessEngineException when an internal exception happens during the execution
+   *     of the command.
+   */
+  void terminate();
+
+  /**
+   * <p>Transition to {@link CaseExecutionState#TERMINATED} state.</p>
+   *
    * <p>If <code>this</code> case execution has a parent case execution, that parent
    * case execution will be notified that <code>this</code> case execution has been
    * terminated. This can lead to a completion of the parent case execution, for more
@@ -365,11 +414,29 @@ public interface CmmnActivityExecution extends DelegateCaseExecution {
    * @throws ProcessEngineException when an internal exception happens during the execution
    *     of the command.
    */
-  void terminate();
+  void performTerminate();
 
   /**
-   * <p>Transition to {@link CaseExecutionState#TERMINATED} state when the parent
-   * {@link Stage} transition to {@link CaseExecutionState#TERMINATED} state.</p>
+   * <p>Transition to {@link CaseExecutionState#TERMINATING_ON_PARENT_TERMINATION} state.</p>
+   *
+   * <p><code>This</code> case execution must be in {@link CaseExecutionState#AVAILABLE}
+   * or {@link CaseExecutionState#SUSPENDED} state to be able to do this transition.</p>
+   *
+   * <p>It is only possible to execute a parent termination on a case execution which is
+   * associated with a {@link EventListener} or {@link Milestone}.</p>
+   *
+   * <p>Afterwards the method {@link #performParentTerminate()} must be called to complete
+   * the transition into the state {@link CaseExecutionState#TERMINATED}.</p>
+   *
+   * @throws CaseIllegalStateTransitionException will be thrown, if <code>this</code> case execution
+   *         is not in the expected state.
+   * @throws ProcessEngineException when an internal exception happens during the execution
+   *     of the command.
+   */
+  void parentTerminate();
+
+  /**
+   * <p>Transition to {@link CaseExecutionState#TERMINATED} state.</p>
    *
    * <p><code>This</code> case execution must be in {@link CaseExecutionState#AVAILABLE}
    * or {@link CaseExecutionState#SUSPENDED} state to be able to do this transition.</p>
@@ -382,13 +449,10 @@ public interface CmmnActivityExecution extends DelegateCaseExecution {
    * @throws ProcessEngineException when an internal exception happens during the execution
    *     of the command.
    */
-  void parentTerminate();
+  void performParentTerminate();
 
   /**
-   * <p>Transition to {@link CaseExecutionState#TERMINATED} state when the parent
-   * {@link Stage} transition to {@link CaseExecutionState#TERMINATED} state or
-   * when the exit criteria of the associated {@link Stage} or {@link Task} becomes
-   * <code>true</code>.</p>
+   * <p>Transition to {@link CaseExecutionState#TERMINATING_ON_EXIT} state.</p>
    *
    * <p><code>This</code> case execution must be in one of the following state to
    * be able to do this transition:
@@ -404,6 +468,9 @@ public interface CmmnActivityExecution extends DelegateCaseExecution {
    * <p>It is only possible to execute an exit on a case execution which is
    * associated with a {@link Stage} or {@link Task}.</p>
    *
+   * <p>Afterwards the method {@link #performExit()} must be called to complete
+   * the transition into the state {@link CaseExecutionState#TERMINATED}.</p>
+   *
    * <p>If this transition is triggered by a fulfilled exit criteria and if
    * <code>this</code> case execution has a parent case execution, that parent
    * case execution will be notified that <code>this</code> case execution has been
@@ -418,7 +485,20 @@ public interface CmmnActivityExecution extends DelegateCaseExecution {
   void exit();
 
   /**
-   * <p>Transition to {@link CaseExecutionState#SUSPENDED} state.</p>
+   * <p>Transition to {@link CaseExecutionState#TERMINATED} state.</p>
+   *
+   * <p>This can lead to a completion of the parent case execution, for more
+   * details when the parent case execution can be completed see {@link #complete()}.</p>
+   *
+   * @throws CaseIllegalStateTransitionException will be thrown, if <code>this</code> case execution
+   *         is not in the expected state.
+   * @throws ProcessEngineException when an internal exception happens during the execution
+   *     of the command.
+   */
+  void performExit();
+
+  /**
+   * <p>Transition to {@link CaseExecutionState#SUSPENDING_ON_SUSPENSION} state.</p>
    *
    * <p>If <code>this</code> case execution is associated with a {@link Stage} or
    * {@link Task}, then <code>this</code> case execution must be in {@link CaseExecutionState#ACTIVE}
@@ -431,6 +511,9 @@ public interface CmmnActivityExecution extends DelegateCaseExecution {
    * will be propagated down to all its contained {@link EventListener EventListener}, {@link Milestone},
    * {@link Stage}, and {@link Task} instances.</p>
    *
+   * <p>Afterwards the method {@link #performSuspension()} must be called to complete
+   * the transition into the state {@link CaseExecutionState#SUSPENDED}.</p>
+   *
    * @throws CaseIllegalStateTransitionException will be thrown, if <code>this</code> case execution
    *         is not in the expected state.
    * @throws ProcessEngineException when an internal exception happens during the execution
@@ -439,8 +522,17 @@ public interface CmmnActivityExecution extends DelegateCaseExecution {
   void suspend();
 
   /**
-   * <p>Transition to {@link CaseExecutionState#SUSPENDED} state when the parent
-   * {@link Stage} transition to {@link CaseExecutionState#SUSPENDED} state.</p>
+   * <p>Transition to {@link CaseExecutionState#SUSPENDED} state.</p>
+   *
+   * @throws CaseIllegalStateTransitionException will be thrown, if <code>this</code> case execution
+   *         is not in the expected state.
+   * @throws ProcessEngineException when an internal exception happens during the execution
+   *     of the command.
+   */
+  void performSuspension();
+
+  /**
+   * <p>Transition to {@link CaseExecutionState#SUSPENDING_ON_PARENT_SUSPENSION} state.</p>
    *
    * <p><code>This</code> case execution must be in one of the following state to
    * be able to do this transition:
@@ -454,12 +546,25 @@ public interface CmmnActivityExecution extends DelegateCaseExecution {
    * <p>It is only possible to execute a parent suspension on a case execution which is
    * associated with a {@link Stage} or {@link Task}.</p>
    *
+   * <p>Afterwards the method {@link #performParentSuspension()} must be called to complete
+   * the transition into the state {@link CaseExecutionState#SUSPENDED}.</p>
+   *
    * @throws CaseIllegalStateTransitionException will be thrown, if <code>this</code> case execution
    *         is not in the expected state.
    * @throws ProcessEngineException when an internal exception happens during the execution
    *     of the command.
    */
   void parentSuspend();
+
+  /**
+   * <p>Transition to {@link CaseExecutionState#SUSPENDED} state.</p>
+   *
+   * @throws CaseIllegalStateTransitionException will be thrown, if <code>this</code> case execution
+   *         is not in the expected state.
+   * @throws ProcessEngineException when an internal exception happens during the execution
+   *     of the command.
+   */
+  void performParentSuspension();
 
   /**
    * <p>Transition to either to {@link CaseExecutionState#ACTIVE} state, if <code>this</code>
@@ -630,7 +735,19 @@ public interface CmmnActivityExecution extends DelegateCaseExecution {
    */
   CmmnCaseInstance createSubCaseInstance(CmmnCaseDefinition caseDefinition, String businessKey);
 
+  /**
+   * <p>Creates for each defined {@link PlanItemOnPart} and {@link IfPart} inside
+   * the specified {@link Sentry Sentries} a {@link CmmnSentryPart}.</p>
+   */
   void createSentryParts();
 
+  /**
+   * <p>Returns <code>true</code>, if each {@link CmmnSentryPart} of the given
+   * <code>sentryId</code> is satisfied.
+   *
+   * @param sentryId the id of the sentry to check
+   *
+   * @return <code>true</code> if the sentry is satisfied.
+   */
   boolean isSentrySatisfied(String sentryId);
 }

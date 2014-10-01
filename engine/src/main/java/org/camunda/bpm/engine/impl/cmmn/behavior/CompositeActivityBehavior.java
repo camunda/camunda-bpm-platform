@@ -12,7 +12,7 @@
  */
 package org.camunda.bpm.engine.impl.cmmn.behavior;
 
-import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
+import org.camunda.bpm.engine.impl.cmmn.execution.CmmnActivityExecution;
 
 
 /**
@@ -21,6 +21,12 @@ import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
  */
 public interface CompositeActivityBehavior extends CmmnActivityBehavior {
 
-  public void childStateChanged(CmmnExecution execution, CmmnExecution child);
+  public void handleChildDisabled(CmmnActivityExecution execution, CmmnActivityExecution child);
+
+  public void handleChildTermination(CmmnActivityExecution execution, CmmnActivityExecution child);
+
+  public void handleChildSuspension(CmmnActivityExecution execution, CmmnActivityExecution child);
+
+  public void handleChildCompletion(CmmnActivityExecution execution, CmmnActivityExecution child);
 
 }

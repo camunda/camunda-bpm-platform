@@ -128,7 +128,7 @@
 
       <!-- satisfied -->
       <if test="satisfied">
-        and RES.SATISFIED = 1
+        and RES.SATISFIED_ = 1
       </if>
 
     </where>
@@ -187,7 +187,7 @@
 
       <!-- satisfied -->
       <if test="satisfied">
-        and RES.SATISFIED = true
+        and RES.SATISFIED_ = true
       </if>
 
     </where>

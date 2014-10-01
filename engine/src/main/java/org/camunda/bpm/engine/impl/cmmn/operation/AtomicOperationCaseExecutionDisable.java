@@ -43,13 +43,13 @@ public class AtomicOperationCaseExecutionDisable extends AbstractCmmnEventAtomic
     return execution;
   }
 
-  protected void transitionNotificationCompleted(CmmnExecution execution) {
+  protected void preTransitionNotification(CmmnExecution execution) {
     CmmnExecution parent = execution.getParent();
     if (parent != null) {
       CmmnActivityBehavior behavior = getActivityBehavior(parent);
       if (behavior instanceof CompositeActivityBehavior) {
         CompositeActivityBehavior compositeBehavior = (CompositeActivityBehavior) behavior;
-        compositeBehavior.childStateChanged(parent, execution);
+        compositeBehavior.handleChildDisabled(parent, execution);
       }
     }
   }

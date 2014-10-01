@@ -21,14 +21,12 @@ import org.camunda.bpm.engine.impl.AbstractQuery;
 import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
-import org.camunda.bpm.engine.runtime.CaseSentryPart;
-import org.camunda.bpm.engine.runtime.CaseSentryPartQuery;
 
 /**
  * @author Roman Smirnov
  *
  */
-public class CaseSentryPartQueryImpl extends AbstractQuery<CaseSentryPartQuery, CaseSentryPart> implements CaseSentryPartQuery {
+public class CaseSentryPartQueryImpl extends AbstractQuery<CaseSentryPartQueryImpl, CaseSentryPartEntity> {
 
   private static final long serialVersionUID = 1L;
 
@@ -52,76 +50,76 @@ public class CaseSentryPartQueryImpl extends AbstractQuery<CaseSentryPartQuery, 
     super(commandExecutor);
   }
 
-  public CaseSentryPartQuery caseSentryPartId(String caseSentryPartId) {
+  public CaseSentryPartQueryImpl caseSentryPartId(String caseSentryPartId) {
     ensureNotNull(NotValidException.class, "caseSentryPartId", caseSentryPartId);
     this.id = caseSentryPartId;
     return this;
   }
 
-  public CaseSentryPartQuery caseInstanceId(String caseInstanceId) {
+  public CaseSentryPartQueryImpl caseInstanceId(String caseInstanceId) {
     ensureNotNull(NotValidException.class, "caseInstanceId", caseInstanceId);
     this.caseInstanceId = caseInstanceId;
     return this;
   }
 
-  public CaseSentryPartQuery caseExecutionId(String caseExecutionId) {
+  public CaseSentryPartQueryImpl caseExecutionId(String caseExecutionId) {
     ensureNotNull(NotValidException.class, "caseExecutionId", caseExecutionId);
     this.caseExecutionId = caseExecutionId;
     return this;
   }
 
-  public CaseSentryPartQuery sentryId(String sentryId) {
+  public CaseSentryPartQueryImpl sentryId(String sentryId) {
     ensureNotNull(NotValidException.class, "sentryId", sentryId);
     this.sentryId = sentryId;
     return this;
   }
 
-  public CaseSentryPartQuery type(String type) {
+  public CaseSentryPartQueryImpl type(String type) {
     ensureNotNull(NotValidException.class, "type", type);
     this.type = type;
     return this;
   }
 
-  public CaseSentryPartQuery sourceCaseExecutionId(String sourceCaseExecutionId) {
+  public CaseSentryPartQueryImpl sourceCaseExecutionId(String sourceCaseExecutionId) {
     ensureNotNull(NotValidException.class, "sourceCaseExecutionId", sourceCaseExecutionId);
     this.sourceCaseExecutionId = sourceCaseExecutionId;
     return this;
   }
 
-  public CaseSentryPartQuery standardEvent(String standardEvent) {
+  public CaseSentryPartQueryImpl standardEvent(String standardEvent) {
     ensureNotNull(NotValidException.class, "standardEvent", standardEvent);
     this.standardEvent = standardEvent;
     return this;
   }
 
-  public CaseSentryPartQuery satisfied() {
+  public CaseSentryPartQueryImpl satisfied() {
     this.satisfied = true;
     return this;
   }
 
   // order by ///////////////////////////////////////////
 
-  public CaseSentryPartQuery orderByCaseSentryId() {
+  public CaseSentryPartQueryImpl orderByCaseSentryId() {
     orderBy(CaseSentryPartQueryProperty.CASE_SENTRY_PART_ID);
     return this;
   }
 
-  public CaseSentryPartQuery orderByCaseInstanceId() {
+  public CaseSentryPartQueryImpl orderByCaseInstanceId() {
     orderBy(CaseSentryPartQueryProperty.CASE_INSTANCE_ID);
     return this;
   }
 
-  public CaseSentryPartQuery orderByCaseExecutionId() {
+  public CaseSentryPartQueryImpl orderByCaseExecutionId() {
     orderBy(CaseSentryPartQueryProperty.CASE_EXECUTION_ID);
     return this;
   }
 
-  public CaseSentryPartQuery orderBySentryId() {
+  public CaseSentryPartQueryImpl orderBySentryId() {
     orderBy(CaseSentryPartQueryProperty.SENTRY_ID);
     return this;
   }
 
-  public CaseSentryPartQuery orderBySource() {
+  public CaseSentryPartQueryImpl orderBySource() {
     orderBy(CaseSentryPartQueryProperty.SOURCE);
     return this;
   }
@@ -135,9 +133,9 @@ public class CaseSentryPartQueryImpl extends AbstractQuery<CaseSentryPartQuery, 
       .findCaseSentryPartCountByQueryCriteria(this);
   }
 
-  public List<CaseSentryPart> executeList(CommandContext commandContext, Page page) {
+  public List<CaseSentryPartEntity> executeList(CommandContext commandContext, Page page) {
     checkQueryOk();
-    List<CaseSentryPart> result = commandContext
+    List<CaseSentryPartEntity> result = commandContext
       .getCaseSentryPartManager()
       .findCaseSentryPartByQueryCriteria(this, page);
 

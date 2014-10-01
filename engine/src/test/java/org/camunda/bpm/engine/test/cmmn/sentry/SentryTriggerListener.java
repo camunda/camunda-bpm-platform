@@ -10,28 +10,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.runtime;
+package org.camunda.bpm.engine.test.cmmn.sentry;
+
+import org.camunda.bpm.engine.delegate.CaseExecutionListener;
+import org.camunda.bpm.engine.delegate.DelegateCaseExecution;
 
 /**
  * @author Roman Smirnov
  *
  */
-public interface CaseSentryPart {
+public class SentryTriggerListener implements CaseExecutionListener {
 
-  String getId();
-
-  String getCaseInstanceId();
-
-  String getCaseExecutionId();
-
-  String getSentryId();
-
-  String getType();
-
-  String getSourceCaseExecutionId();
-
-  String getStandardEvent();
-
-  boolean isSatisfied();
+  public void notify(DelegateCaseExecution caseExecution) throws Exception {
+    String eventName = caseExecution.getEventName();
+    caseExecution.setVariable(eventName, true);
+  }
 
 }

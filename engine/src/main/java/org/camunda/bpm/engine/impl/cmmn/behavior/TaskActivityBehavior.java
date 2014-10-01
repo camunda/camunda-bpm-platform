@@ -33,6 +33,10 @@ public class TaskActivityBehavior extends StageOrTaskActivityBehavior {
     execution.complete();
   }
 
+  public void fireExitCriteria(CmmnActivityExecution execution) {
+    execution.exit();
+  }
+
   protected boolean isBlocking(CmmnActivityExecution execution) {
     CmmnActivity activity = execution.getActivity();
     Object isBlockingProperty = activity.getProperty(PROPERTY_IS_BLOCKING);
@@ -45,5 +49,6 @@ public class TaskActivityBehavior extends StageOrTaskActivityBehavior {
   protected String getTypeName() {
     return "task";
   }
+
 
 }

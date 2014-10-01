@@ -34,7 +34,7 @@ public abstract class AbstractAtomicOperationCaseExecutionResume extends Abstrac
     return execution;
   }
 
-  protected void transitionNotificationCompleted(CmmnExecution execution) {
+  protected void postTransitionNotification(CmmnExecution execution) {
     CmmnActivityBehavior behavior = getActivityBehavior(execution);
     behavior.resumed(execution);
   }

@@ -14,13 +14,11 @@ package org.camunda.bpm.engine.impl.cmmn.execution;
 
 import java.io.Serializable;
 
-import org.camunda.bpm.engine.runtime.CaseSentryPart;
-
 /**
  * @author Roman Smirnov
  *
  */
-public abstract class CmmnSentryPart implements Serializable, CaseSentryPart {
+public abstract class CmmnSentryPart implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
@@ -53,10 +51,11 @@ public abstract class CmmnSentryPart implements Serializable, CaseSentryPart {
     this.type = type;
   }
 
+  public abstract String getSourceCaseExecutionId();
+
   public abstract CmmnExecution getSourceCaseExecution();
 
   public abstract void setSourceCaseExecution(CmmnExecution sourceCaseExecution);
-
 
   public String getStandardEvent() {
     return standardEvent;

@@ -130,6 +130,8 @@ public class AbstractCaseInstanceRestServiceInteractionTest extends AbstractRest
         .body("businessKey", equalTo(MockProvider.EXAMPLE_CASE_INSTANCE_BUSINESS_KEY))
         .body("caseDefinitionId", equalTo(MockProvider.EXAMPLE_CASE_INSTANCE_CASE_DEFINITION_ID))
         .body("active", equalTo(MockProvider.EXAMPLE_CASE_INSTANCE_IS_ACTIVE))
+        .body("completed", equalTo(MockProvider.EXAMPLE_CASE_INSTANCE_IS_COMPLETED))
+        .body("terminated", equalTo(MockProvider.EXAMPLE_CASE_INSTANCE_IS_TERMINATED))
     .when()
       .get(SINGLE_CASE_INSTANCE_URL);
 

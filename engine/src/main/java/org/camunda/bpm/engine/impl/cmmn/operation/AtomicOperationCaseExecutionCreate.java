@@ -42,7 +42,7 @@ public class AtomicOperationCaseExecutionCreate extends AbstractCmmnEventAtomicO
     return execution;
   }
 
-  protected void transitionNotificationCompleted(CmmnExecution execution) {
+  protected void postTransitionNotification(CmmnExecution execution) {
     execution.performOperation(CASE_EXECUTION_CREATED);
   }
 

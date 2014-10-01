@@ -25,7 +25,13 @@ public class MilestoneActivityBehavior extends EventListenerOrMilestoneActivityB
     evaluateRepetitionRule(execution);
   }
 
-  public void triggerEntryCriteria(CmmnActivityExecution execution) {
+  public void created(CmmnActivityExecution execution) {
+    if (execution.isAvailable() && isAtLeastOneEntryCriteriaSatisfied(execution)) {
+      fireEntryCriteria(execution);
+    }
+  }
+
+  public void fireEntryCriteria(CmmnActivityExecution execution) {
     execution.occur();
   }
 

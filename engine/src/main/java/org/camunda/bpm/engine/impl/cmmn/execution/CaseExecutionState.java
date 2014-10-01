@@ -36,6 +36,13 @@ public interface CaseExecutionState {
   CaseExecutionState FAILED = new CaseExecutionStateImpl(8, "failed");
   CaseExecutionState CLOSED = new CaseExecutionStateImpl(9, "closed");
 
+  CaseExecutionState TERMINATING_ON_TERMINATION = new CaseExecutionStateImpl(10, "terminatingOnTermination");
+  CaseExecutionState TERMINATING_ON_PARENT_TERMINATION = new CaseExecutionStateImpl(11, "terminatingOnParentTermination");
+  CaseExecutionState TERMINATING_ON_EXIT = new CaseExecutionStateImpl(12, "terminatingOnExit");
+
+  CaseExecutionState SUSPENDING_ON_SUSPENSION = new CaseExecutionStateImpl(13, "suspendingOnSuspension");
+  CaseExecutionState SUSPENDING_ON_PARENT_SUSPENSION = new CaseExecutionStateImpl(14, "suspendingOnParentSuspension");
+
   int getStateCode();
 
   ///////////////////////////////////////////////////// default implementation

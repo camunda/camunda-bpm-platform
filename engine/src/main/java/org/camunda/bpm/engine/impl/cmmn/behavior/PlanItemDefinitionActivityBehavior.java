@@ -16,6 +16,7 @@ import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.AVAI
 import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.NEW;
 import static org.camunda.bpm.engine.impl.cmmn.handler.ItemHandler.PROPERTY_REPETITION_RULE;
 import static org.camunda.bpm.engine.impl.cmmn.handler.ItemHandler.PROPERTY_REQUIRED_RULE;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.util.List;
 
@@ -26,6 +27,7 @@ import org.camunda.bpm.engine.impl.cmmn.execution.CmmnActivityExecution;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnSentryDeclaration;
 import org.camunda.bpm.engine.impl.pvm.PvmException;
+import org.camunda.bpm.engine.impl.util.EnsureUtil;
 
 
 /**
@@ -38,157 +40,53 @@ public abstract class PlanItemDefinitionActivityBehavior implements CmmnActivity
     // nothing to do!
   }
 
-  protected boolean isEntryCriteriaSatisfied(CmmnActivityExecution execution) {
+  // sentries //////////////////////////////////////////////////////////////////////////////
+
+  protected boolean isAtLeastOneEntryCriteriaSatisfied(CmmnActivityExecution execution) {
+    CmmnActivity activity = getActivity(execution);
+
+    List<CmmnSentryDeclaration> entryCriteria = activity.getEntryCriteria();
+
+    if (entryCriteria != null && !entryCriteria.isEmpty()) {
+      return isSentrySatisified(entryCriteria, execution);
+
+    } else {
+      // missing entry criteria (Sentry) is considered true.
+      return true;
+    }
+  }
+
+  protected boolean isAtLeastOneExitCriteriaSatisfied(CmmnActivityExecution execution) {
+    CmmnActivity activity = getActivity(execution);
+
+    List<CmmnSentryDeclaration> exitCriteria = activity.getExitCriteria();
+
+    if (exitCriteria != null && !exitCriteria.isEmpty()) {
+      return isSentrySatisified(exitCriteria, execution);
+
+    } else {
+      return false;
+    }
+  }
+
+  protected boolean isSentrySatisified(List<CmmnSentryDeclaration> sentryDeclarations, CmmnActivityExecution execution) {
     String id = execution.getId();
-    CmmnActivity activity = execution.getActivity();
+    CmmnActivityExecution parent = execution.getParent();
+    EnsureUtil.ensureNotNull(PvmException.class, "Case execution '"+id+"': has no parent.", "parent", parent);
 
-    if (activity != null) {
+    for (CmmnSentryDeclaration sentryDeclaration : sentryDeclarations) {
 
-      List<CmmnSentryDeclaration> entryCriteria = activity.getEntryCriteria();
-
-      if (entryCriteria != null && !entryCriteria.isEmpty()) {
-        CmmnActivityExecution parent = execution.getParent();
-
-        if (parent != null) {
-          for (CmmnSentryDeclaration sentryDeclaration : entryCriteria) {
-
-            String sentryId = sentryDeclaration.getId();
-            if (parent.isSentrySatisfied(sentryId)) {
-              return true;
-            }
-
-          }
-
-          return false;
-
-        } else {
-          throw new PvmException("Case execution '"+id+"': has no parent.");
-        }
-      } else {
-        // missing entry criteria (Sentry) is considered true.
+      String sentryId = sentryDeclaration.getId();
+      if (parent.isSentrySatisfied(sentryId)) {
         return true;
       }
 
-    } else {
-      throw new PvmException("Case execution '"+id+"': has no current activity.");
-
     }
 
+    return false;
   }
 
-  protected boolean isExitCriteriaSatisfied(CmmnActivityExecution execution) {
-    String id = execution.getId();
-    CmmnActivity activity = execution.getActivity();
-
-    if (activity != null) {
-
-      List<CmmnSentryDeclaration> exitCriteria = activity.getExitCriteria();
-
-      if (exitCriteria != null && !exitCriteria.isEmpty()) {
-        CmmnActivityExecution parent = execution.getParent();
-
-        if (parent != null) {
-          for (CmmnSentryDeclaration sentryDeclaration : exitCriteria) {
-
-            String sentryId = sentryDeclaration.getId();
-            if (parent.isSentrySatisfied(sentryId)) {
-              return true;
-            }
-
-          }
-
-          return false;
-
-        } else {
-          throw new PvmException("Case execution '"+id+"': has no parent.");
-        }
-      } else {
-        // missing entry criteria (Sentry) is considered true.
-        return false;
-      }
-
-    } else {
-      throw new PvmException("Case execution '"+id+"': has no current activity.");
-
-    }
-
-  }
-
-  public void created(CmmnActivityExecution execution) {
-    if (isExitCriteriaSatisfied(execution)) {
-      triggerExitCriteria(execution);
-      return;
-    }
-
-    if (isEntryCriteriaSatisfied(execution)) {
-      triggerEntryCriteria(execution);
-    }
-  }
-
-  public void triggerExitCriteria(CmmnActivityExecution execution) {
-    execution.exit();
-  }
-
-  public void onCreate(CmmnActivityExecution execution) {
-    ensureTransitionAllowed(execution, NEW, AVAILABLE, "create");
-    creating(execution);
-  }
-
-  public void onClose(CmmnActivityExecution execution) {
-    String id = execution.getId();
-    if (execution.isCaseInstanceExecution()) {
-
-      if (execution.isClosed()) {
-        String message = "Case instance'"+id+"' is already closed.";
-        throw createIllegalStateTransitionException("close", message, execution);
-      }
-
-      if (execution.isActive()) {
-        String message = "Case instance '"+id+"' must be {completed|terminated|suspended} to close it, but was 'active'.";
-        throw createIllegalStateTransitionException("close", message, execution);
-      }
-
-    } else {
-      String message = "It is not possible to close case execution '"+id+"' which is not a case instance.";
-      throw createIllegalStateTransitionException("close", message, execution);
-    }
-  }
-
-  protected void creating(CmmnActivityExecution execution) {
-    // noop
-  }
-
-  protected void terminating(CmmnActivityExecution execution) {
-    // noop
-  }
-
-  protected void completing(CmmnActivityExecution execution) {
-    // noop
-  }
-
-  protected void manualCompleting(CmmnActivityExecution execution) {
-    // noop
-  }
-
-  protected void suspending(CmmnActivityExecution execution) {
-    // noop
-  }
-
-  protected void resuming(CmmnActivityExecution execution) {
-    // noop
-  }
-
-  public void resumed(CmmnActivityExecution execution) {
-    // noop
-  }
-
-  public void reactivated(CmmnActivityExecution execution) {
-    // noop
-  }
-
-  public void started(CmmnActivityExecution execution) {
-    // noop
-  }
+  // rules (required and repetition rule) /////////////////////////////////////////
 
   protected void evaluateRequiredRule(CmmnActivityExecution execution) {
     CmmnActivity activity = execution.getActivity();
@@ -212,15 +110,120 @@ public abstract class PlanItemDefinitionActivityBehavior implements CmmnActivity
     }
   }
 
+  // creation ///////////////////////////////////////////////////////////////
+
+  public void onCreate(CmmnActivityExecution execution) {
+    ensureTransitionAllowed(execution, NEW, AVAILABLE, "create");
+    creating(execution);
+  }
+
+
+  protected void creating(CmmnActivityExecution execution) {
+    // noop
+  }
+
+  // start /////////////////////////////////////////////////////////////////
+
+  public void started(CmmnActivityExecution execution) {
+    // noop
+  }
+
+  // completion //////////////////////////////////////////////////////////////
+
+  protected void completing(CmmnActivityExecution execution) {
+    // noop
+  }
+
+  protected void manualCompleting(CmmnActivityExecution execution) {
+    // noop
+  }
+
+  // close ///////////////////////////////////////////////////////////////////
+
+  public void onClose(CmmnActivityExecution execution) {
+    String id = execution.getId();
+    if (execution.isCaseInstanceExecution()) {
+
+      if (execution.isClosed()) {
+        String message = "Case instance'"+id+"' is already closed.";
+        throw createIllegalStateTransitionException("close", message, execution);
+      }
+
+      if (execution.isActive()) {
+        String message = "Case instance '"+id+"' must be {completed|terminated|suspended} to close it, but was 'active'.";
+        throw createIllegalStateTransitionException("close", message, execution);
+      }
+
+    } else {
+      String message = "It is not possible to close case execution '"+id+"' which is not a case instance.";
+      throw createIllegalStateTransitionException("close", message, execution);
+    }
+  }
+
+  // termination ////////////////////////////////////////////////////////////
+
+  protected void performTerminate(CmmnActivityExecution execution) {
+    execution.performTerminate();
+  }
+
+  protected void performParentTerminate(CmmnActivityExecution execution) {
+    execution.performParentTerminate();
+  }
+
+  protected void performExit(CmmnActivityExecution execution) {
+    execution.performExit();
+  }
+
+  // suspension ///////////////////////////////////////////////////////////////
+
+  protected void performSuspension(CmmnActivityExecution execution) {
+    execution.performSuspension();
+  }
+
+  protected void performParentSuspension(CmmnActivityExecution execution) {
+    execution.performParentSuspension();
+  }
+
+  // resume /////////////////////////////////////////////////////////////////
+
+  protected void resuming(CmmnActivityExecution execution) {
+    // noop
+  }
+
+  public void resumed(CmmnActivityExecution execution) {
+    if (execution.isAvailable()) {
+      // trigger created() to check whether an exit- or
+      // entryCriteria has been satisfied in the meantime.
+      created(execution);
+    }
+  }
+
+  // re-activation ///////////////////////////////////////////////////////////
+
+  public void reactivated(CmmnActivityExecution execution) {
+    // noop
+  }
+
+  // helper //////////////////////////////////////////////////////////////////////
+
   protected void ensureTransitionAllowed(CmmnActivityExecution execution, CaseExecutionState expected, CaseExecutionState target, String transition) {
     String id = execution.getId();
 
     CaseExecutionState currentState = execution.getCurrentState();
 
+    // the state "suspending" or "terminating" will set immediately
+    // inside the corresponding AtomicOperation, that's why the
+    // previous state will be used to ensure that the transition
+    // is allowed.
+    if (execution.isTerminating() || execution.isSuspending()) {
+      currentState = execution.getPreviousState();
+    }
+
     // is the case execution already in the target state
     if (target.equals(currentState)) {
       String message = "Case execution '"+id+"' is already "+target+".";
       throw createIllegalStateTransitionException(transition, message, execution);
+
     } else
     // is the case execution in the expected state
     if (!expected.equals(currentState)) {
@@ -242,6 +245,14 @@ public abstract class PlanItemDefinitionActivityBehavior implements CmmnActivity
     String id = execution.getId();
     String errorMessage = String.format("Could not perform transition '%s' on case execution '%s': %s", transition, id, message);
     return new CaseIllegalStateTransitionException(errorMessage);
+  }
+
+  protected CmmnActivity getActivity(CmmnActivityExecution execution) {
+    String id = execution.getId();
+    CmmnActivity activity = execution.getActivity();
+    ensureNotNull(PvmException.class, "Case execution '"+id+"': has no current activity.", "activity", activity);
+
+    return activity;
   }
 
 }

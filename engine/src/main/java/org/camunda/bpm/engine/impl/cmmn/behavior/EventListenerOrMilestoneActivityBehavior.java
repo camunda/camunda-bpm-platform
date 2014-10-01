@@ -26,17 +26,25 @@ import org.camunda.bpm.engine.impl.cmmn.execution.CmmnActivityExecution;
  */
 public abstract class EventListenerOrMilestoneActivityBehavior extends PlanItemDefinitionActivityBehavior {
 
+  // enable /////////////////////////////////////////////////////////////
+
   public void onEnable(CmmnActivityExecution execution) {
     throw createIllegalStateTransitionException("enable", execution);
   }
+
+  // re-enable //////////////////////////////////////////////////////////
 
   public void onReenable(CmmnActivityExecution execution) {
     throw createIllegalStateTransitionException("reenable", execution);
   }
 
+  // disable ///////////////////////////////////////////////////////////
+
   public void onDisable(CmmnActivityExecution execution) {
     throw createIllegalStateTransitionException("disable", execution);
   }
+
+  // start /////////////////////////////////////////////////////////////
 
   public void onStart(CmmnActivityExecution execution) {
     throw createIllegalStateTransitionException("start", execution);
@@ -46,6 +54,8 @@ public abstract class EventListenerOrMilestoneActivityBehavior extends PlanItemD
     throw createIllegalStateTransitionException("manualStart", execution);
   }
 
+  // completion /////////////////////////////////////////////////////////
+
   public void onCompletion(CmmnActivityExecution execution) {
     throw createIllegalStateTransitionException("complete", execution);
   }
@@ -54,42 +64,46 @@ public abstract class EventListenerOrMilestoneActivityBehavior extends PlanItemD
     throw createIllegalStateTransitionException("complete", execution);
   }
 
+  // termination ////////////////////////////////////////////////////////
+
   public void onTermination(CmmnActivityExecution execution) {
     ensureTransitionAllowed(execution, AVAILABLE, TERMINATED, "terminate");
-    terminating(execution);
+    performTerminate(execution);
   }
 
   public void onParentTermination(CmmnActivityExecution execution) {
     String id = execution.getId();
 
-    if (execution.isTerminated()) {
-      String message = "Case execution '"+id+"' is already terminated.";
-      throw createIllegalStateTransitionException("parentTerminate", message, execution);
-    }
-
     if (execution.isCompleted()) {
       String message = "Case execution '"+id+"' must be available or suspended, but was completed.";
       throw createIllegalStateTransitionException("parentTerminate", message, execution);
     }
-    terminating(execution);
+
+    performParentTerminate(execution);
   }
 
   public void onExit(CmmnActivityExecution execution) {
     throw createIllegalStateTransitionException("exit", execution);
   }
 
+  // occur /////////////////////////////////////////////////////////////////
+
   public void onOccur(CmmnActivityExecution execution) {
     ensureTransitionAllowed(execution, AVAILABLE, COMPLETED, "occur");
   }
 
+  // suspension ////////////////////////////////////////////////////////////
+
   public void onSuspension(CmmnActivityExecution execution) {
     ensureTransitionAllowed(execution, AVAILABLE, SUSPENDED, "suspend");
-    suspending(execution);
+    performSuspension(execution);
   }
 
   public void onParentSuspension(CmmnActivityExecution execution) {
     throw createIllegalStateTransitionException("parentSuspend", execution);
   }
+
+  // resume ////////////////////////////////////////////////////////////////
 
   public void onResume(CmmnActivityExecution execution) {
     ensureTransitionAllowed(execution, SUSPENDED, AVAILABLE, "resume");
@@ -110,9 +124,23 @@ public abstract class EventListenerOrMilestoneActivityBehavior extends PlanItemD
     throw createIllegalStateTransitionException("parentResume", execution);
   }
 
+  // re-activation ////////////////////////////////////////////////////////
+
   public void onReactivation(CmmnActivityExecution execution) {
     throw createIllegalStateTransitionException("reactivate", execution);
   }
+
+  // sentry ///////////////////////////////////////////////////////////////
+
+  protected boolean isAtLeastOneExitCriteriaSatisfied(CmmnActivityExecution execution) {
+    return false;
+  }
+
+  public void fireExitCriteria(CmmnActivityExecution execution) {
+    throw new CaseIllegalStateTransitionException("Cannot trigger case execution '"+execution.getId()+"': exit criteria are not allowed for event listener.");
+  }
+
+  // helper ////////////////////////////////////////////////////////////////
 
   protected CaseIllegalStateTransitionException createIllegalStateTransitionException(String transition, CmmnActivityExecution execution) {
     String id = execution.getId();
@@ -121,9 +149,5 @@ public abstract class EventListenerOrMilestoneActivityBehavior extends PlanItemD
   }
 
   protected abstract String getTypeName();
-
-  protected boolean isExitCriteriaSatisfied(CmmnActivityExecution execution) {
-    return false;
-  }
 
 }

@@ -22,6 +22,7 @@ import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.runtime.CaseInstanceQuery;
+import org.camunda.bpm.engine.test.Deployment;
 
 /**
  * @author Roman Smirnov
@@ -196,6 +197,35 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTestCase {
     query.completed();
 
     verifyQueryResults(query, 5);
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/runtime/CaseInstanceQueryTest.testQueryByTerminated.cmmn"})
+  public void testQueryByTerminated() {
+    String caseInstanceId = caseService
+        .withCaseDefinitionByKey("termination")
+        .create()
+        .getId();
+
+    String caseExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .caseInstanceId(caseInstanceId)
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(caseExecutionId)
+      .manualStart();
+
+    caseService
+      .withCaseExecution(caseExecutionId)
+      .complete();
+
+    CaseInstanceQuery query = caseService.createCaseInstanceQuery();
+
+    query.terminated();
+
+    verifyQueryResults(query, 1);
   }
 
   public void testQueryByCaseInstanceBusinessKey() {

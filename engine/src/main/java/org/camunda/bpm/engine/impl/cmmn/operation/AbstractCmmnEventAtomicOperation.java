@@ -31,6 +31,16 @@ public abstract class AbstractCmmnEventAtomicOperation extends AbstractEventAtom
   }
 
   protected final void eventNotificationsCompleted(CmmnExecution execution) {
+    preTransitionNotification(execution);
+    performTransitionNotification(execution);
+    postTransitionNotification(execution);
+  }
+
+  protected void preTransitionNotification(CmmnExecution execution) {
+
+  }
+
+  protected void performTransitionNotification(CmmnExecution execution) {
     String eventName = getEventName();
 
     CmmnExecution parent = execution.getParent();
@@ -38,12 +48,9 @@ public abstract class AbstractCmmnEventAtomicOperation extends AbstractEventAtom
     if (parent != null) {
       parent.handleChildTransition(execution, eventName);
     }
-
-    transitionNotificationCompleted(execution);
-
   }
 
-  protected void transitionNotificationCompleted(CmmnExecution execution) {
+  protected void postTransitionNotification(CmmnExecution execution) {
     // noop
   }
 

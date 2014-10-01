@@ -439,6 +439,7 @@ public abstract class MockProvider {
   public static final String EXAMPLE_CASE_INSTANCE_CASE_DEFINITION_ID = "aCaseDefinitionId";
   public static final boolean EXAMPLE_CASE_INSTANCE_IS_ACTIVE = true;
   public static final boolean EXAMPLE_CASE_INSTANCE_IS_COMPLETED = true;
+  public static final boolean EXAMPLE_CASE_INSTANCE_IS_TERMINATED = true;
 
   // case execution
   public static final String EXAMPLE_CASE_EXECUTION_ID = "aCaseExecutionId";
@@ -1386,6 +1387,7 @@ public abstract class MockProvider {
     when(mock.getCaseDefinitionId()).thenReturn(EXAMPLE_CASE_INSTANCE_CASE_DEFINITION_ID);
     when(mock.isActive()).thenReturn(EXAMPLE_CASE_INSTANCE_IS_ACTIVE);
     when(mock.isCompleted()).thenReturn(EXAMPLE_CASE_INSTANCE_IS_COMPLETED);
+    when(mock.isTerminated()).thenReturn(EXAMPLE_CASE_INSTANCE_IS_TERMINATED);
 
     return mock;
   }

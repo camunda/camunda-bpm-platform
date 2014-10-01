@@ -68,6 +68,9 @@ public interface CaseInstanceQuery extends Query<CaseInstanceQuery, CaseInstance
   /** Only select case instances which are completed. **/
   CaseInstanceQuery completed();
 
+  /** Only select case instances which are terminated. **/
+  CaseInstanceQuery terminated();
+
   /**
    * Only select cases instances which have a global variable with the given value. The type
    * of variable is determined based on the value, using types configured in

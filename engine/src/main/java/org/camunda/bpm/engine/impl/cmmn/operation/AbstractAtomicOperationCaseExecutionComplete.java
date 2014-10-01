@@ -49,7 +49,7 @@ public abstract class AbstractAtomicOperationCaseExecutionComplete extends Abstr
     return execution;
   }
 
-  protected void transitionNotificationCompleted(CmmnExecution execution) {
+  protected void postTransitionNotification(CmmnExecution execution) {
     if (!execution.isCaseInstanceExecution()) {
       execution.remove();
     } else {
@@ -68,7 +68,7 @@ public abstract class AbstractAtomicOperationCaseExecutionComplete extends Abstr
       CmmnActivityBehavior behavior = getActivityBehavior(parent);
       if (behavior instanceof CompositeActivityBehavior) {
         CompositeActivityBehavior compositeBehavior = (CompositeActivityBehavior) behavior;
-        compositeBehavior.childStateChanged(parent, execution);
+        compositeBehavior.handleChildCompletion(parent, execution);
       }
     }
 

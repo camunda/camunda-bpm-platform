@@ -42,6 +42,7 @@ public class CaseSentryPartEntity extends CmmnSentryPart implements DbEntity, Ha
   protected String caseInstanceId;
   protected String caseExecutionId;
   protected String sourceCaseExecutionId;
+  private boolean forcedUpdate;
 
   // id ///////////////////////////////////////////////////////////////////
 
@@ -148,9 +149,18 @@ public class CaseSentryPartEntity extends CmmnSentryPart implements DbEntity, Ha
     return revision + 1;
   }
 
+  public void forceUpdate() {
+    this.forcedUpdate = true;
+  }
+
   public Object getPersistentState() {
     Map<String, Object> persistentState = new HashMap<String, Object>();
     persistentState.put("satisfied", isSatisfied());
+
+    if (forcedUpdate) {
+      persistentState.put("forcedUpdate", Boolean.TRUE);
+    }
+
     return persistentState;
   }
 
@@ -162,5 +172,6 @@ public class CaseSentryPartEntity extends CmmnSentryPart implements DbEntity, Ha
         .getCaseExecutionManager()
         .findCaseExecutionById(caseExecutionId);
   }
+
 
 }

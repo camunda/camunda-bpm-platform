@@ -25,13 +25,11 @@ import org.camunda.bpm.engine.impl.cmmn.cmd.GetCaseExecutionVariableCmd;
 import org.camunda.bpm.engine.impl.cmmn.cmd.GetCaseExecutionVariablesCmd;
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionQueryImpl;
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseInstanceQueryImpl;
-import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseSentryPartQueryImpl;
 import org.camunda.bpm.engine.runtime.CaseExecutionCommandBuilder;
 import org.camunda.bpm.engine.runtime.CaseExecutionQuery;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.runtime.CaseInstanceBuilder;
 import org.camunda.bpm.engine.runtime.CaseInstanceQuery;
-import org.camunda.bpm.engine.runtime.CaseSentryPartQuery;
 
 /**
  * @author Roman Smirnov
@@ -53,10 +51,6 @@ public class CaseServiceImpl extends ServiceImpl implements CaseService {
 
   public CaseExecutionQuery createCaseExecutionQuery() {
     return new CaseExecutionQueryImpl(commandExecutor);
-  }
-
-  public CaseSentryPartQuery createCaseSentryPartQuery() {
-    return new CaseSentryPartQueryImpl(commandExecutor);
   }
 
   public CaseExecutionCommandBuilder withCaseExecution(String caseExecutionId) {

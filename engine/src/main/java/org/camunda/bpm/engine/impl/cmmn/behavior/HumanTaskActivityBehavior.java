@@ -44,6 +44,16 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior {
 
   }
 
+  protected void performTerminate(CmmnActivityExecution execution) {
+    terminating(execution);
+    super.performTerminate(execution);
+  }
+
+  protected void performExit(CmmnActivityExecution execution) {
+    terminating(execution);
+    super.performExit(execution);
+  }
+
   protected void terminating(CmmnActivityExecution execution) {
     TaskEntity task = getTask(execution);
     // it can happen that a there does not exist

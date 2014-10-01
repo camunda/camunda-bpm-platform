@@ -21,15 +21,15 @@ import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
  * @author Roman Smirnov
  *
  */
-public class AtomicOperationCaseExecutionTriggerExitCriteria implements CmmnAtomicOperation {
+public class AtomicOperationCaseExecutionFireEntryCriteria implements CmmnAtomicOperation {
 
   public String getCanonicalName() {
-    return "trigger-exit-criteria";
+    return "trigger-entry-criteria";
   }
 
   public void execute(CmmnExecution execution) {
     CmmnActivityBehavior behavior = getActivityBehavior(execution);
-    behavior.triggerExitCriteria(execution);
+    behavior.fireEntryCriteria(execution);
   }
 
   public boolean isAsync(CmmnExecution execution) {

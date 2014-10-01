@@ -14,9 +14,6 @@ package org.camunda.bpm.engine.impl.cmmn.operation;
 
 import static org.camunda.bpm.engine.delegate.CaseExecutionListener.EXIT;
 
-import org.camunda.bpm.engine.impl.cmmn.behavior.CmmnActivityBehavior;
-import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
-
 /**
  * @author Roman Smirnov
  *
@@ -25,10 +22,6 @@ public class AtomicOperationCaseExecutionExit extends AbstractAtomicOperationCas
 
   public String getCanonicalName() {
     return "case-execution-exit";
-  }
-
-  protected void triggerBehavior(CmmnActivityBehavior behavior, CmmnExecution execution) {
-    behavior.onExit(execution);
   }
 
   protected String getEventName() {

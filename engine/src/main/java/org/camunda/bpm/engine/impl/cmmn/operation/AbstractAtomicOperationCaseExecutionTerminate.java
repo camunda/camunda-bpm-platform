@@ -16,6 +16,7 @@ import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.TERM
 import static org.camunda.bpm.engine.impl.util.ActivityBehaviorUtil.getActivityBehavior;
 
 import org.camunda.bpm.engine.impl.cmmn.behavior.CmmnActivityBehavior;
+import org.camunda.bpm.engine.impl.cmmn.behavior.CompositeActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
 
 /**
@@ -25,26 +26,16 @@ import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
 public abstract class AbstractAtomicOperationCaseExecutionTerminate extends AbstractCmmnEventAtomicOperation {
 
   protected CmmnExecution eventNotificationsStarted(CmmnExecution execution) {
-    CmmnActivityBehavior behavior = getActivityBehavior(execution);
-    triggerBehavior(behavior, execution);
-
+    // set current case execution as "TERMINATED"
     execution.setCurrentState(TERMINATED);
 
     return execution;
   }
 
-  protected void transitionNotificationCompleted(CmmnExecution execution) {
+  protected void postTransitionNotification(CmmnExecution execution) {
     if (!execution.isCaseInstanceExecution()) {
       execution.remove();
     }
-
-    // TODO: We need to know what kind of termination happens!
-    // if a case execution will be terminated because the exitCriterias
-    // are fulfilled, then it will be "exit" executed on the case execution.
-    // in that case the case execution have to notify the parent too.
-    // but if the transition "exit" will be executed, because the
-    // parent has been terminated, we do not care about the notification
-    // of the parent.
 
     CmmnExecution parent = execution.getParent();
     if (parent != null) {
@@ -52,10 +43,12 @@ public abstract class AbstractAtomicOperationCaseExecutionTerminate extends Abst
     }
   }
 
-  protected abstract void triggerBehavior(CmmnActivityBehavior behavior, CmmnExecution execution);
-
   protected void notifyParent(CmmnExecution parent, CmmnExecution execution) {
-    // noop
+    CmmnActivityBehavior behavior = getActivityBehavior(parent);
+    if (behavior instanceof CompositeActivityBehavior) {
+      CompositeActivityBehavior compositeBehavior = (CompositeActivityBehavior) behavior;
+      compositeBehavior.handleChildTermination(parent, execution);
+    }
   }
 
 }

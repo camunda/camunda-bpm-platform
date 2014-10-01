@@ -46,8 +46,8 @@ public class MilestoneTest extends PluggableProcessEngineTestCase {
     assertTrue((Boolean) occurVariable);
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/milestone/MilestoneTest.testWithEntryCriterias.cmmn"})
-  public void testWithEntryCriterias() {
+  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/milestone/MilestoneTest.testWithEntryCriteria.cmmn"})
+  public void testWithEntryCriteria() {
     // given
     String caseInstanceId = caseService
         .withCaseDefinitionByKey("case")
@@ -105,6 +105,68 @@ public class MilestoneTest extends PluggableProcessEngineTestCase {
         .singleResult();
 
     assertTrue(caseInstance.isCompleted());
+
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/milestone/MilestoneTest.testWithMultipleEntryCriterias.cmmn"})
+  public void testWithMultipleEntryCriterias() {
+    // given
+    String caseInstanceId = caseService
+        .withCaseDefinitionByKey("case")
+        .create()
+        .getId();
+
+    CaseExecution milestone = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_Milestone_1")
+        .singleResult();
+
+    String humanTaskId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_2")
+        .singleResult()
+        .getId();
+
+    assertTrue(milestone.isAvailable());
+
+    // when
+    caseService
+      .withCaseExecution(humanTaskId)
+      .manualStart();
+
+    // then
+    assertNull(caseService.getVariable(caseInstanceId, "occur"));
+
+    milestone = caseService
+        .createCaseExecutionQuery()
+        .available()
+        .singleResult();
+
+    assertTrue(milestone.isAvailable());
+
+    // when
+    caseService
+      .withCaseExecution(humanTaskId)
+      .complete();
+
+    // then
+    Object occurVariable = caseService.getVariable(caseInstanceId, "occur");
+    assertNotNull(occurVariable);
+    assertTrue((Boolean) occurVariable);
+
+    milestone = caseService
+        .createCaseExecutionQuery()
+        .available()
+        .singleResult();
+
+    assertNull(milestone);
+
+    CaseInstance caseInstance = caseService
+        .createCaseInstanceQuery()
+        .caseInstanceId(caseInstanceId)
+        .singleResult();
+
+    assertTrue(caseInstance.isActive());
 
   }
 

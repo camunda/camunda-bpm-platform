@@ -42,7 +42,7 @@ public class AtomicOperationCaseExecutionReactivate extends AbstractCmmnEventAto
     return execution;
   }
 
-  protected void transitionNotificationCompleted(CmmnExecution execution) {
+  protected void postTransitionNotification(CmmnExecution execution) {
     CmmnActivityBehavior behavior = getActivityBehavior(execution);
     behavior.reactivated(execution);
   }

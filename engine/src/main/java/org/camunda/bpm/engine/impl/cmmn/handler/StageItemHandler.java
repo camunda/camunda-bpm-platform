@@ -16,13 +16,19 @@ import java.util.List;
 
 import org.camunda.bpm.engine.impl.cmmn.behavior.CmmnActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.behavior.StageActivityBehavior;
+import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
 import org.camunda.bpm.model.cmmn.instance.CmmnElement;
+import org.camunda.bpm.model.cmmn.instance.Stage;
 
 /**
  * @author Roman Smirnov
  *
  */
 public class StageItemHandler extends ItemHandler {
+
+  protected void initializeAutoComplete(Stage stage, CmmnActivity activity, CmmnHandlerContext context) {
+    activity.setProperty(PROPERTY_AUTO_COMPLETE, stage.isAutoComplete());
+  }
 
   protected CmmnActivityBehavior getActivityBehavior() {
     return new StageActivityBehavior();

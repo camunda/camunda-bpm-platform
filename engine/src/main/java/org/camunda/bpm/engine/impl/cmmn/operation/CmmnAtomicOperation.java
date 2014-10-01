@@ -43,9 +43,18 @@ public interface CmmnAtomicOperation extends CoreAtomicOperation<CmmnExecution> 
   CmmnAtomicOperation CASE_EXECUTION_PARENT_RESUME = new AtomicOperationCaseExecutionParentResume();
   CmmnAtomicOperation CASE_EXECUTION_RE_ACTIVATE = new AtomicOperationCaseExecutionReactivate();
 
+  // terminating
+  CmmnAtomicOperation CASE_EXECUTION_TERMINATING_ON_TERMINATION = new AtomicOperationCaseExecutionTerminatingOnTermination();
+  CmmnAtomicOperation CASE_EXECUTION_TERMINATING_ON_PARENT_TERMINATION = new AtomicOperationCaseExecutionTerminatingOnParentTermination();
+  CmmnAtomicOperation CASE_EXECUTION_TERMINATING_ON_EXIT = new AtomicOperationCaseExecutionTerminatingOnExit();
+
+  // suspending
+  CmmnAtomicOperation CASE_EXECUTION_SUSPENDING_ON_SUSPENSION = new AtomicOperationCaseExecutionSuspendingOnSuspension();
+  CmmnAtomicOperation CASE_EXECUTION_SUSPENDING_ON_PARENT_SUSPENSION = new AtomicOperationCaseExecutionSuspendingOnParentSuspension();
+
   // sentry
-  CmmnAtomicOperation CASE_EXECUTION_TRIGGER_ENTRY_CRITERIA = new AtomicOperationCaseExecutionTriggerEntryCriteria();
-  CmmnAtomicOperation CASE_EXECUTION_TRIGGER_EXIT_CRITERIA = new AtomicOperationCaseExecutionTriggerExitCriteria();
+  CmmnAtomicOperation CASE_EXECUTION_FIRE_ENTRY_CRITERIA = new AtomicOperationCaseExecutionFireEntryCriteria();
+  CmmnAtomicOperation CASE_EXECUTION_FIRE_EXIT_CRITERIA = new AtomicOperationCaseExecutionFireExitCriteria();
 
 
   // delete cascade a case execution

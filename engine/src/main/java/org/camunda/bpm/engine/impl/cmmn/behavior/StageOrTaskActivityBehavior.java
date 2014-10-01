@@ -31,25 +31,44 @@ import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
  */
 public abstract class StageOrTaskActivityBehavior extends PlanItemDefinitionActivityBehavior {
 
+  // creation /////////////////////////////////////////////////////////
+
   protected void creating(CmmnActivityExecution execution) {
     evaluateRequiredRule(execution);
     evaluateRepetitionRule(execution);
   }
+
+  public void created(CmmnActivityExecution execution) {
+    if (!execution.isCompleted() && !execution.isTerminated() && isAtLeastOneExitCriteriaSatisfied(execution)) {
+      fireExitCriteria(execution);
+
+    } else if (execution.isAvailable() && isAtLeastOneEntryCriteriaSatisfied(execution)) {
+      fireEntryCriteria(execution);
+    }
+  }
+
+  // enable ////////////////////////////////////////////////////////////
 
   public void onEnable(CmmnActivityExecution execution) {
     ensureNotCaseInstance(execution, "enable");
     ensureTransitionAllowed(execution, AVAILABLE, ENABLED, "enable");
   }
 
+  // re-enable /////////////////////////////////////////////////////////
+
   public void onReenable(CmmnActivityExecution execution) {
     ensureNotCaseInstance(execution, "re-enable");
     ensureTransitionAllowed(execution, DISABLED, ENABLED, "re-enable");
   }
 
+  // disable ///////////////////////////////////////////////////////////
+
   public void onDisable(CmmnActivityExecution execution) {
     ensureNotCaseInstance(execution, "disable");
     ensureTransitionAllowed(execution, ENABLED, DISABLED, "disable");
   }
+
+  // start /////////////////////////////////////////////////////////////
 
   public void onStart(CmmnActivityExecution execution) {
     ensureNotCaseInstance(execution, "start");
@@ -61,6 +80,21 @@ public abstract class StageOrTaskActivityBehavior extends PlanItemDefinitionActi
     ensureTransitionAllowed(execution, ENABLED, ACTIVE, "start");
   }
 
+  public void started(CmmnActivityExecution execution) {
+    // only perform start behavior, when this case execution is
+    // still active.
+    // it can happen that a exit sentry will be triggered, so that
+    // the given case execution will be terminated, in that case we
+    // do not need to perform the start behavior
+    if (execution.isActive()) {
+      performStart(execution);
+    }
+  }
+
+  protected abstract void performStart(CmmnActivityExecution execution);
+
+  // completion ////////////////////////////////////////////////////////
+
   public void onCompletion(CmmnActivityExecution execution) {
     ensureTransitionAllowed(execution, ACTIVE, COMPLETED, "complete");
     completing(execution);
@@ -71,9 +105,11 @@ public abstract class StageOrTaskActivityBehavior extends PlanItemDefinitionActi
     manualCompleting(execution);
   }
 
+  // termination //////////////////////////////////////////////////////
+
   public void onTermination(CmmnActivityExecution execution) {
     ensureTransitionAllowed(execution, ACTIVE, TERMINATED, "terminate");
-    terminating(execution);
+    performTerminate(execution);
   }
 
   public void onParentTermination(CmmnActivityExecution execution) {
@@ -95,18 +131,14 @@ public abstract class StageOrTaskActivityBehavior extends PlanItemDefinitionActi
       throw createIllegalStateTransitionException("exit", message, execution);
     }
 
-    terminating(execution);
+    performExit(execution);
   }
 
-  public void onOccur(CmmnActivityExecution execution) {
-    String id = execution.getId();
-    String message = "It is not possible to occur case execution '"+id+"' which associated with a "+getTypeName()+".";
-    throw createIllegalStateTransitionException("occur", message, execution);
-  }
+  // suspension ///////////////////////////////////////////////////////////
 
   public void onSuspension(CmmnActivityExecution execution) {
     ensureTransitionAllowed(execution, ACTIVE, SUSPENDED, "suspend");
-    suspending(execution);
+    performSuspension(execution);
   }
 
   public void onParentSuspension(CmmnActivityExecution execution) {
@@ -124,8 +156,10 @@ public abstract class StageOrTaskActivityBehavior extends PlanItemDefinitionActi
       throw createIllegalStateTransitionException("parentSuspend", message, execution);
     }
 
-    suspending(execution);
+    performParentSuspension(execution);
   }
+
+  // resume /////////////////////////////////////////////////////////////////
 
   public void onResume(CmmnActivityExecution execution) {
     ensureNotCaseInstance(execution, "resume");
@@ -165,37 +199,43 @@ public abstract class StageOrTaskActivityBehavior extends PlanItemDefinitionActi
 
   }
 
-  public void started(CmmnActivityExecution execution) {
-    // only perform start behavior, when this case execution is
-    // still active.
-    // it can happen that a exit sentry will be triggered, so that
-    // the given case execution will be terminated, in that case we
-    // do not need to perform the start behavior
-    if (execution.isActive()) {
-      performStart(execution);
-    }
+  // occur ////////////////////////////////////////////////////////
+
+  public void onOccur(CmmnActivityExecution execution) {
+    String id = execution.getId();
+    String message = "It is not possible to occur case execution '"+id+"' which associated with a "+getTypeName()+".";
+    throw createIllegalStateTransitionException("occur", message, execution);
   }
 
-  protected abstract void performStart(CmmnActivityExecution execution);
 
-  protected abstract String getTypeName();
+  // sentry ///////////////////////////////////////////////////////////////
 
-  public void triggerEntryCriteria(CmmnActivityExecution execution) {
-    CmmnActivity activity = execution.getActivity();
-
-    boolean manualActivation = true;
-    Object manualActivationRule = activity.getProperty(PROPERTY_MANUAL_ACTIVATION_RULE);
-    if (manualActivationRule != null) {
-      CaseControlRule rule = (CaseControlRule) manualActivationRule;
-      manualActivation = rule.evaluate(execution);
-    }
+  public void fireEntryCriteria(CmmnActivityExecution execution) {
+    boolean manualActivation = evaluateManualActivationRule(execution);
 
     if (manualActivation) {
       execution.enable();
+
     } else {
       execution.start();
     }
-
   }
 
+  // manual activation rule //////////////////////////////////////////////
+
+  protected boolean evaluateManualActivationRule(CmmnActivityExecution execution) {
+    CmmnActivity activity = execution.getActivity();
+
+    Object manualActivationRule = activity.getProperty(PROPERTY_MANUAL_ACTIVATION_RULE);
+    if (manualActivationRule != null) {
+      CaseControlRule rule = (CaseControlRule) manualActivationRule;
+      return rule.evaluate(execution);
+    }
+
+    return true;
+  }
+
+  // helper ///////////////////////////////////////////////////////////
+
+  protected abstract String getTypeName();
 }

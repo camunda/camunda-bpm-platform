@@ -13,11 +13,6 @@
 package org.camunda.bpm.engine.impl.cmmn.operation;
 
 import static org.camunda.bpm.engine.delegate.CaseExecutionListener.TERMINATE;
-import static org.camunda.bpm.engine.impl.util.ActivityBehaviorUtil.getActivityBehavior;
-
-import org.camunda.bpm.engine.impl.cmmn.behavior.CmmnActivityBehavior;
-import org.camunda.bpm.engine.impl.cmmn.behavior.CompositeActivityBehavior;
-import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
 
 /**
  * @author Roman Smirnov
@@ -29,20 +24,8 @@ public class AtomicOperationCaseExecutionTerminate extends AbstractAtomicOperati
     return "case-execution-terminate";
   }
 
-  protected void triggerBehavior(CmmnActivityBehavior behavior, CmmnExecution execution) {
-    behavior.onTermination(execution);
-  }
-
   protected String getEventName() {
     return TERMINATE;
-  }
-
-  protected void notifyParent(CmmnExecution parent, CmmnExecution execution) {
-    CmmnActivityBehavior behavior = getActivityBehavior(parent);
-    if (behavior instanceof CompositeActivityBehavior) {
-      CompositeActivityBehavior compositeBehavior = (CompositeActivityBehavior) behavior;
-      compositeBehavior.childStateChanged(parent, execution);
-    }
   }
 
 }

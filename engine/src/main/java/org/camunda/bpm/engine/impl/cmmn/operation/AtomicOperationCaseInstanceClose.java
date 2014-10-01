@@ -42,7 +42,7 @@ public class AtomicOperationCaseInstanceClose extends AbstractCmmnEventAtomicOpe
     return execution;
   }
 
-  protected void transitionNotificationCompleted(CmmnExecution execution) {
+  protected void postTransitionNotification(CmmnExecution execution) {
     execution.deleteCascade();
   }
 

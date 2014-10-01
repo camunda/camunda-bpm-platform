@@ -41,7 +41,7 @@ public class AtomicOperationCaseInstanceCreate extends AbstractCmmnEventAtomicOp
     return execution;
   }
 
-  protected void transitionNotificationCompleted(CmmnExecution execution) {
+  protected void postTransitionNotification(CmmnExecution execution) {
     // the case instance is associated with the
     // casePlanModel as activity
     CmmnActivityBehavior behavior = getActivityBehavior(execution);

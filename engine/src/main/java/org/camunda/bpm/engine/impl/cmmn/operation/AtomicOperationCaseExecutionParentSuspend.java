@@ -14,9 +14,6 @@ package org.camunda.bpm.engine.impl.cmmn.operation;
 
 import static org.camunda.bpm.engine.delegate.CaseExecutionListener.PARENT_SUSPEND;
 
-import org.camunda.bpm.engine.impl.cmmn.behavior.CmmnActivityBehavior;
-import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
-
 /**
  * @author Roman Smirnov
  *
@@ -29,10 +26,6 @@ public class AtomicOperationCaseExecutionParentSuspend extends AbstractAtomicOpe
 
   protected String getEventName() {
     return PARENT_SUSPEND;
-  }
-
-  protected void triggerBehavior(CmmnActivityBehavior behavior, CmmnExecution execution) {
-    behavior.onParentSuspension(execution);
   }
 
 }

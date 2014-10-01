@@ -42,7 +42,7 @@ public class AtomicOperationCaseExecutionStart extends AbstractCmmnEventAtomicOp
     return execution;
   }
 
-  protected void transitionNotificationCompleted(CmmnExecution execution) {
+  protected void postTransitionNotification(CmmnExecution execution) {
     CmmnActivityBehavior behavior = getActivityBehavior(execution);
     behavior.started(execution);
   }

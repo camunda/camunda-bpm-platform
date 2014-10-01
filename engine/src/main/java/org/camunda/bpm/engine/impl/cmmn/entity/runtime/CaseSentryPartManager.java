@@ -16,7 +16,6 @@ import java.util.List;
 
 import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
-import org.camunda.bpm.engine.runtime.CaseSentryPart;
 
 /**
  * @author Roman Smirnov
@@ -42,7 +41,7 @@ public class CaseSentryPartManager extends AbstractManager {
   }
 
   @SuppressWarnings("unchecked")
-  public List<CaseSentryPart> findCaseSentryPartByQueryCriteria(CaseSentryPartQueryImpl caseSentryPartQuery, Page page) {
+  public List<CaseSentryPartEntity> findCaseSentryPartByQueryCriteria(CaseSentryPartQueryImpl caseSentryPartQuery, Page page) {
     return getDbEntityManager().selectList("selectCaseSentryPartsByQueryCriteria", caseSentryPartQuery, page);
   }
 

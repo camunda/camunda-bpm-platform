@@ -12,28 +12,28 @@
  */
 package org.camunda.bpm.engine.impl.cmmn.operation;
 
-import static org.camunda.bpm.engine.impl.util.ActivityBehaviorUtil.getActivityBehavior;
+import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.TERMINATING_ON_EXIT;
 
 import org.camunda.bpm.engine.impl.cmmn.behavior.CmmnActivityBehavior;
+import org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
 
 /**
  * @author Roman Smirnov
  *
  */
-public class AtomicOperationCaseExecutionTriggerEntryCriteria implements CmmnAtomicOperation {
+public class AtomicOperationCaseExecutionTerminatingOnExit extends AbstractAtomicOperationCaseExecutionTerminating {
 
   public String getCanonicalName() {
-    return "trigger-entry-criteria";
+    return "case-execution-terminating-on-exit";
   }
 
-  public void execute(CmmnExecution execution) {
-    CmmnActivityBehavior behavior = getActivityBehavior(execution);
-    behavior.triggerEntryCriteria(execution);
+  protected void triggerBehavior(CmmnActivityBehavior behavior, CmmnExecution execution) {
+    behavior.onExit(execution);
   }
 
-  public boolean isAsync(CmmnExecution execution) {
-    return false;
+  protected CaseExecutionState getTerminatingState() {
+    return TERMINATING_ON_EXIT;
   }
 
 }

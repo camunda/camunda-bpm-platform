@@ -14,7 +14,9 @@ package org.camunda.bpm.engine.impl.cmmn.execution;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineServices;
 import org.camunda.bpm.engine.delegate.CmmnModelExecutionContext;
@@ -182,6 +184,25 @@ public class CaseExecutionImpl extends CmmnExecution implements Serializable {
       caseSentryParts = new ArrayList<CaseSentryPartImpl>();
     }
     return caseSentryParts;
+  }
+
+  protected Map<String, List<CmmnSentryPart>> getSentries() {
+    Map<String, List<CmmnSentryPart>> sentries = new HashMap<String, List<CmmnSentryPart>>();
+
+    for (CaseSentryPartImpl sentryPart : getCaseSentryParts()) {
+
+      String sentryId = sentryPart.getSentryId();
+      List<CmmnSentryPart> parts = sentries.get(sentryId);
+
+      if (parts == null) {
+        parts = new ArrayList<CmmnSentryPart>();
+        sentries.put(sentryId, parts);
+      }
+
+      parts.add(sentryPart);
+    }
+
+    return sentries;
   }
 
   protected List<CaseSentryPartImpl> findSentry(String sentryId) {
