@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:activiti="http://activiti.org/bpmn"
+  targetNamespace="Examples">
+
+  <process id="asyncIntermediateCatchEvent">
+  
+    <startEvent id="theStart" />
+    
+    <sequenceFlow sourceRef="theStart" targetRef="intermediateCatchEvent" />
+    
+    <intermediateCatchEvent id="intermediateCatchEvent" activiti:async="true">
+    	<extensionElements>
+			  <activiti:executionListener event="start" class="org.camunda.bpm.engine.test.bpmn.async.AsyncListener" />
+		  </extensionElements>
+
+      <messageEventDefinition id="testMessage" messageRef="testMessage1" />
+    </intermediateCatchEvent>
+        
+    <sequenceFlow sourceRef="intermediateCatchEvent" targetRef="userTask" />
+
+    <userTask id="userTask" />
+
+    <sequenceFlow sourceRef="userTask" targetRef="theEnd" />
+        
+    <endEvent id="theEnd" />
+    
+  </process>
+
+  <message name="testMessage1" id="testMessage1" />
+
+</definitions>

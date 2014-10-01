@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:activiti="http://activiti.org/bpmn"
+  targetNamespace="Examples">
+
+  <process id="asyncExclusiveGateway">
+  
+    <startEvent id="theStart" />
+    <sequenceFlow id="startFlow" sourceRef="theStart" targetRef="exclusiveGateway" />
+
+    <exclusiveGateway id="exclusiveGateway" name="exclusiveGateway" default="flow1" activiti:async="true">
+      <extensionElements>
+        <activiti:executionListener event="start" class="org.camunda.bpm.engine.test.bpmn.async.AsyncListener" />
+      </extensionElements>
+    </exclusiveGateway>
+
+    <sequenceFlow id="flow1" sourceRef="exclusiveGateway" targetRef="userTask1" />
+    <sequenceFlow id="flow2" sourceRef="exclusiveGateway" targetRef="userTask2">
+      <conditionExpression xsi:type="tFormalExpression">${flow == true}</conditionExpression>
+    </sequenceFlow>
+
+    <userTask id="userTask1" />
+    <userTask id="userTask2" />
+
+    <sequenceFlow sourceRef="userTask1" targetRef="theEnd1" />
+    <sequenceFlow sourceRef="userTask2" targetRef="theEnd2" />
+
+    <endEvent id="theEnd1" />
+    <endEvent id="theEnd2" />
+
+  </process>
+
+</definitions>

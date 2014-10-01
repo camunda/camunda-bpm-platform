@@ -1090,6 +1090,8 @@ public class BpmnParse extends Parse {
     // shared by all events except for link event
     IntermediateCatchEventActivityBehavior defaultCatchBehaviour = new IntermediateCatchEventActivityBehavior(isAfterEventBasedGateway);
 
+    parseAsynchronousContinuation(intermediateEventElement, nestedActivity);
+
     if(isAfterEventBasedGateway) {
       nestedActivity.setCancelScope(true);
       nestedActivity.setScope(scopeElement.getParentScope());
@@ -1191,6 +1193,8 @@ public class BpmnParse extends Parse {
 
     ActivityImpl nestedActivityImpl = createActivityOnScope(intermediateEventElement, scopeElement);
     ActivityBehavior activityBehavior = null;
+
+    parseAsynchronousContinuation(intermediateEventElement, nestedActivityImpl);
 
     if(signalEventDefinitionElement != null) {
       nestedActivityImpl.setProperty("type", "intermediateSignalThrow");
@@ -1436,6 +1440,8 @@ public class BpmnParse extends Parse {
     ActivityImpl activity = createActivityOnScope(exclusiveGwElement, scope);
     activity.setActivityBehavior(new ExclusiveGatewayActivityBehavior());
 
+    parseAsynchronousContinuation(exclusiveGwElement, activity);
+
     parseExecutionListenersOnScope(exclusiveGwElement, activity);
 
     for (BpmnParseListener parseListener : parseListeners) {
@@ -1451,6 +1457,8 @@ public class BpmnParse extends Parse {
     ActivityImpl activity = createActivityOnScope(inclusiveGwElement, scope);
     activity.setActivityBehavior(new InclusiveGatewayActivityBehavior());
 
+    parseAsynchronousContinuation(inclusiveGwElement, activity);
+
     parseExecutionListenersOnScope(inclusiveGwElement, activity);
 
     for (BpmnParseListener parseListener : parseListeners) {
@@ -1463,6 +1471,12 @@ public class BpmnParse extends Parse {
     ActivityImpl activity = createActivityOnScope(eventBasedGwElement, scope);
     activity.setActivityBehavior(new EventBasedGatewayActivityBehavior());
     activity.setScope(true);
+
+    parseAsynchronousContinuation(eventBasedGwElement, activity);
+
+    if(activity.isAsyncAfter()) {
+      addError("'asyncAfter' not supported for " + eventBasedGwElement.getTagName() + " elements.", eventBasedGwElement);
+    }
 
     parseExecutionListenersOnScope(eventBasedGwElement, activity);
 
@@ -1985,6 +1999,8 @@ public class BpmnParse extends Parse {
     ActivityImpl activity = createActivityOnScope(manualTaskElement, scope);
     activity.setActivityBehavior(new ManualTaskActivityBehavior());
 
+    parseAsynchronousContinuation(manualTaskElement, activity);
+
     parseExecutionListenersOnScope(manualTaskElement, activity);
 
     for (BpmnParseListener parseListener : parseListeners) {
@@ -2356,6 +2372,8 @@ public class BpmnParse extends Parse {
         parseActivityInputOutput(endEventElement, activity);
       }
 
+      parseAsynchronousContinuation(endEventElement, activity);
+
       for (BpmnParseListener parseListener : parseListeners) {
         parseListener.parseEndEvent(endEventElement, scope, activity);
       }
@@ -2404,7 +2422,7 @@ public class BpmnParse extends Parse {
       ActivityImpl nestedActivity = createActivityOnScope(boundaryEventElement, parentActivity);
 
       String cancelActivity = boundaryEventElement.attribute("cancelActivity", "true");
-      boolean interrupting = cancelActivity.equals("true") ? true : false;
+      boolean interrupting = cancelActivity.equals("true");
 
       // Catch event behavior is the same for most types
       ActivityBehavior behavior = null;

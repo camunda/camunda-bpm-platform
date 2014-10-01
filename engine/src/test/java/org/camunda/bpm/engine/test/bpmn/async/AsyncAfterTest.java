@@ -17,15 +17,19 @@ import java.util.List;
 import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.Job;
+import org.camunda.bpm.engine.runtime.MessageCorrelationBuilder;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
+import org.camunda.bpm.engine.task.TaskQuery;
 import org.camunda.bpm.engine.test.Deployment;
 
 /**
  * @author Daniel Meyer
+ * @author Stefan Hentschel
  *
  */
 public class AsyncAfterTest extends PluggableProcessEngineTestCase {
@@ -46,28 +50,24 @@ public class AsyncAfterTest extends PluggableProcessEngineTestCase {
 
   @Deployment
   public void testAsyncAfterServiceTask() {
-
     // start process instance
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess");
 
-    // the service task is completely invoked
+    // listeners should be fired by now
     assertListenerStartInvoked(pi);
-    assertBehaviorInvoked(pi);
     assertListenerEndInvoked(pi);
 
-    // and the execution is waiting *after* the service task
-    Job continuationJob = managementService.createJobQuery().singleResult();
-    assertNotNull(continuationJob);
+    // the process should wait *after* the catch event
+    Job job = managementService.createJobQuery().singleResult();
+    assertNotNull(job);
 
-    // if we execute the job, the process instance ends.
-    managementService.executeJob(continuationJob.getId());
+    // if the waiting job is executed, the process instance should end
+    managementService.executeJob(job.getId());
     assertProcessEnded(pi.getId());
-
   }
 
   @Deployment
   public void testAsyncAfterAndBeforeServiceTask() {
-
     // start process instance
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess");
 
@@ -76,26 +76,23 @@ public class AsyncAfterTest extends PluggableProcessEngineTestCase {
     assertNotBehaviorInvoked(pi);
     assertNotListenerEndInvoked(pi);
 
-    // and the execution is waiting *before* the service task
-    Job continuationJob = managementService.createJobQuery().singleResult();
-    assertNotNull(continuationJob);
+    Job job = managementService.createJobQuery().singleResult();
+    assertNotNull(job);
 
-    // if we execute the job
-    managementService.executeJob(continuationJob.getId());
+    // if the job is executed
+    managementService.executeJob(job.getId());
 
-    // the service task is invoked
+    // the manual task is invoked
     assertListenerStartInvoked(pi);
-    assertBehaviorInvoked(pi);
     assertListenerEndInvoked(pi);
 
-    // and now the execution is waiting *after* the service task
-    continuationJob = managementService.createJobQuery().singleResult();
-    assertNotNull(continuationJob);
+    // and now the process is waiting *after* the manual task
+    job = managementService.createJobQuery().singleResult();
+    assertNotNull(job);
 
-    // if we execute the job, the process instance ends.
-    managementService.executeJob(continuationJob.getId());
+    // after executing the waiting job, the process instance will end
+    managementService.executeJob(job.getId());
     assertProcessEnded(pi.getId());
-
   }
 
   @Deployment
@@ -220,6 +217,261 @@ public class AsyncAfterTest extends PluggableProcessEngineTestCase {
 
   }
 
+  @Deployment
+  public void testAsyncAfterManualTask() {
+    // start process instance
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("testManualTask");
+
+    // listeners should be fired by now
+    assertListenerStartInvoked(pi);
+    assertListenerEndInvoked(pi);
+
+    // the process should wait *after* the catch event
+    Job job = managementService.createJobQuery().singleResult();
+    assertNotNull(job);
+
+    // if the waiting job is executed, the process instance should end
+    managementService.executeJob(job.getId());
+    assertProcessEnded(pi.getId());
+  }
+
+  @Deployment
+  public void testAsyncAfterAndBeforeManualTask() {
+    // start process instance
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("testManualTask");
+
+    // the service task is not yet invoked
+    assertNotListenerStartInvoked(pi);
+    assertNotListenerEndInvoked(pi);
+
+    Job job = managementService.createJobQuery().singleResult();
+    assertNotNull(job);
+
+    // if the job is executed
+    managementService.executeJob(job.getId());
+
+    // the manual task is invoked
+    assertListenerStartInvoked(pi);
+    assertListenerEndInvoked(pi);
+
+    // and now the process is waiting *after* the manual task
+    job = managementService.createJobQuery().singleResult();
+    assertNotNull(job);
+
+    // after executing the waiting job, the process instance will end
+    managementService.executeJob(job.getId());
+    assertProcessEnded(pi.getId());
+  }
+
+  @Deployment
+  public void testAsyncAfterIntermediateCatchEvent() {
+    // start process instance
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("testIntermediateCatchEvent");
+
+    // the intermediate catch event is waiting for its message
+    runtimeService.correlateMessage("testMessage1");
+
+    // listeners should be fired by now
+    assertListenerStartInvoked(pi);
+    assertListenerEndInvoked(pi);
+
+    // the process should wait *after* the catch event
+    Job job = managementService.createJobQuery().singleResult();
+    assertNotNull(job);
+
+    // if the waiting job is executed, the process instance should end
+    managementService.executeJob(job.getId());
+    assertProcessEnded(pi.getId());
+  }
+
+  @Deployment
+  public void testAsyncAfterAndBeforeIntermediateCatchEvent() {
+
+    // start process instance
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("testIntermediateCatchEvent");
+
+    // check that no listener is invoked by now
+    assertNotListenerStartInvoked(pi);
+    assertNotListenerEndInvoked(pi);
+
+    // the process is waiting before the message event
+    Job job = managementService.createJobQuery().singleResult();
+    assertNotNull(job);
+
+    // execute job to get to the message event
+    executeAvailableJobs();
+
+    // now we need to trigger the message to proceed
+    runtimeService.correlateMessage("testMessage1");
+
+    // now the listener should be invoked
+    assertListenerStartInvoked(pi);
+    assertListenerEndInvoked(pi);
+
+    // and now the process is waiting *after* the intermediate catch event
+    job = managementService.createJobQuery().singleResult();
+    assertNotNull(job);
+
+    // after executing the waiting job, the process instance will end
+    managementService.executeJob(job.getId());
+    assertProcessEnded(pi.getId());
+  }
+
+  @Deployment
+  public void testAsyncAfterIntermediateThrowEvent() {
+    // start process instance
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("testIntermediateThrowEvent");
+
+    // listeners should be fired by now
+    assertListenerStartInvoked(pi);
+    assertListenerEndInvoked(pi);
+
+    // the process should wait *after* the throw event
+    Job job = managementService.createJobQuery().singleResult();
+    assertNotNull(job);
+
+    // if the waiting job is executed, the process instance should end
+    managementService.executeJob(job.getId());
+    assertProcessEnded(pi.getId());
+  }
+
+  @Deployment
+  public void testAsyncAfterAndBeforeIntermediateThrowEvent() {
+    // start process instance
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("testIntermediateThrowEvent");
+
+    // the throw event is not yet invoked
+    assertNotListenerStartInvoked(pi);
+    assertNotListenerEndInvoked(pi);
+
+    Job job = managementService.createJobQuery().singleResult();
+    assertNotNull(job);
+
+    // if the job is executed
+    managementService.executeJob(job.getId());
+
+    // the listeners are invoked
+    assertListenerStartInvoked(pi);
+    assertListenerEndInvoked(pi);
+
+    // and now the process is waiting *after* the throw event
+    job = managementService.createJobQuery().singleResult();
+    assertNotNull(job);
+
+    // after executing the waiting job, the process instance will end
+    managementService.executeJob(job.getId());
+    assertProcessEnded(pi.getId());
+  }
+
+  @Deployment
+  public void testAsyncAfterInclusiveGateway() {
+    // start process instance
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("testInclusiveGateway");
+
+    // listeners should be fired
+    assertListenerStartInvoked(pi);
+    assertListenerEndInvoked(pi);
+
+    // the process should wait *after* the gateway
+    assertEquals(2, managementService.createJobQuery().active().count());
+
+    executeAvailableJobs();
+
+    // if the waiting job is executed there should be 2 user tasks
+    TaskQuery taskQuery = taskService.createTaskQuery();
+    assertEquals(2, taskQuery.active().count());
+
+    // finish tasks
+    List<Task> tasks = taskQuery.active().list();
+    for(Task task : tasks) {
+      taskService.complete(task.getId());
+    }
+
+    assertProcessEnded(pi.getProcessInstanceId());
+
+  }
+
+  @Deployment
+  public void testAsyncAfterAndBeforeInclusiveGateway() {
+    // start process instance
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("testInclusiveGateway");
+
+    // no listeners are fired:
+    assertNotListenerStartInvoked(pi);
+    assertNotListenerEndInvoked(pi);
+
+    // we should wait *before* the gateway:
+    Job job = managementService.createJobQuery().singleResult();
+    assertNotNull(job);
+
+    // after executing the gateway:
+    managementService.executeJob(job.getId());
+
+    // the listeners are fired:
+    assertListenerStartInvoked(pi);
+    assertListenerEndInvoked(pi);
+
+    // and we will wait *after* the gateway:
+    List<Job> jobs = managementService.createJobQuery().active().list();
+    assertEquals(2, jobs.size());
+  }
+
+  @Deployment
+  public void testAsyncAfterExclusiveGateway() {
+    // start process instance with variables
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("flow", false);
+
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("testExclusiveGateway", variables);
+
+    // listeners should be fired
+    assertListenerStartInvoked(pi);
+    assertListenerEndInvoked(pi);
+
+    // the process should wait *after* the gateway
+    assertEquals(1, managementService.createJobQuery().active().count());
+
+    executeAvailableJobs();
+
+    // if the waiting job is executed there should be 2 user tasks
+    TaskQuery taskQuery = taskService.createTaskQuery();
+    assertEquals(1, taskQuery.active().count());
+
+    // finish tasks
+    List<Task> tasks = taskQuery.active().list();
+    for(Task task : tasks) {
+      taskService.complete(task.getId());
+    }
+
+    assertProcessEnded(pi.getProcessInstanceId());
+  }
+
+  @Deployment
+  public void testAsyncAfterAndBeforeExclusiveGateway() {
+    // start process instance with variables
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("flow", false);
+
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("testExclusiveGateway", variables);
+
+    // no listeners are fired:
+    assertNotListenerStartInvoked(pi);
+    assertNotListenerEndInvoked(pi);
+
+    // we should wait *before* the gateway:
+    Job job = managementService.createJobQuery().singleResult();
+    assertNotNull(job);
+
+    // after executing the gateway:
+    managementService.executeJob(job.getId());
+
+    // the listeners are fired:
+    assertListenerStartInvoked(pi);
+    assertListenerEndInvoked(pi);
+
+    // and we will wait *after* the gateway:
+    assertEquals(1, managementService.createJobQuery().active().count());
+  }
   /**
    * Test for CAM-2518: Fixes an issue that creates an infinite loop when using
    * asyncAfter together with an execution listener on sequence flow event "take".

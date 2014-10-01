@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:camunda="http://activiti.org/bpmn"
+  targetNamespace="Examples"
+  xmlns:tns="Examples">
+
+  <process id="multipleAsyncEndEvent">
+
+    <startEvent id="startEvent" />
+
+    <sequenceFlow sourceRef="startEvent" targetRef="parallelGateway" />
+
+    <parallelGateway id="parallelGateway" />
+
+    <sequenceFlow sourceRef="parallelGateway" targetRef="endEvent"/>
+
+    <endEvent id="endEvent" name="endEvent" camunda:async="true" />
+
+    <sequenceFlow sourceRef="parallelGateway" targetRef="messageEndEvent"/>
+
+    <endEvent id="messageEndEvent" name="messageEndEvent" camunda:async="true" >
+      <messageEventDefinition id="messageEventDefinition" camunda:class="org.camunda.bpm.engine.test.bpmn.async.AsyncEndEventDelegate"/>
+    </endEvent>
+  </process>
+</definitions>

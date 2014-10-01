@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:activiti="http://activiti.org/bpmn"
+  targetNamespace="Examples">
+
+  <process id="asyncEventGateway">
+  
+    <startEvent id="theStart" />
+    <sequenceFlow id="startFlow" sourceRef="theStart" targetRef="eventBasedGateway" />
+
+    <eventBasedGateway id="eventBasedGateway" name="eventBasedGateway" activiti:async="true">
+      <extensionElements>
+        <activiti:executionListener event="start" class="org.camunda.bpm.engine.test.bpmn.async.AsyncListener" />
+      </extensionElements>
+    </eventBasedGateway>
+
+    <sequenceFlow id="flow1" sourceRef="eventBasedGateway" targetRef="catchEvent1" />
+    <sequenceFlow id="flow2" sourceRef="eventBasedGateway" targetRef="catchEvent2" />
+
+    <intermediateCatchEvent id="catchEvent1" name="catchEvent1">
+      <messageEventDefinition id="testMessage1" messageRef="testMessageDef1" />
+    </intermediateCatchEvent>
+
+    <intermediateCatchEvent id="catchEvent2" name="catchEvent2">
+      <messageEventDefinition id="testMessage2" messageRef="testMessageDef2" />
+    </intermediateCatchEvent>
+
+    <sequenceFlow id="flow3" sourceRef="catchEvent1" targetRef="userTask1" />
+    <sequenceFlow id="flow4" sourceRef="catchEvent2" targetRef="userTask2" />
+
+    <userTask id="userTask1" />
+    <userTask id="userTask2" />
+
+    <sequenceFlow sourceRef="userTask1" targetRef="theEnd1" />
+    <sequenceFlow sourceRef="userTask2" targetRef="theEnd2" />
+
+    <endEvent id="theEnd1" />
+    <endEvent id="theEnd2" />
+
+  </process>
+
+  <message id="testMessageDef1" name="testMessageDef1" />
+  <message id="testMessageDef2" name="testMessageDef2" />
+
+</definitions>

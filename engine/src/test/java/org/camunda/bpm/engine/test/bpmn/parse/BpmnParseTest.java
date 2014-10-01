@@ -241,6 +241,18 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
     repositoryService.deleteDeployment(repositoryService.createDeploymentQuery().singleResult().getId(), true);
   }
 
+  public void testInvalidAsyncAfterEventBasedGateway() {
+    try {
+      String resource = TestHelper.getBpmnProcessDefinitionResource(getClass(), "testInvalidAsyncAfterEventBasedGateway");
+      repositoryService.createDeployment().name(resource).addClasspathResource(resource).deploy();
+      fail();
+    }
+    catch (ProcessEngineException e) {
+      // fail on asyncAfter
+      assertTextPresent("'asyncAfter' not supported for", e.getMessage());
+    }
+  }
+
   @Deployment
   public void testParseDiagramInterchangeElements() {
 

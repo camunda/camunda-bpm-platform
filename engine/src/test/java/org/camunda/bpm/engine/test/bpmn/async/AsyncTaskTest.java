@@ -13,6 +13,8 @@
 package org.camunda.bpm.engine.test.bpmn.async;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 
 import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
@@ -21,11 +23,13 @@ import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 
 /**
  *
  * @author Daniel Meyer
+ * @author Stefan Hentschel
  */
 public class AsyncTaskTest extends PluggableProcessEngineTestCase {
 
@@ -104,7 +108,6 @@ public class AsyncTaskTest extends PluggableProcessEngineTestCase {
     // and the job is done
     assertEquals(0, managementService.createJobQuery().count());
   }
-
 
   @Deployment
   public void testFailingAsycServiceTimer() {
@@ -266,6 +269,169 @@ public class AsyncTaskTest extends PluggableProcessEngineTestCase {
     String taskId = taskService.createTaskQuery().singleResult().getId();
     taskService.complete(taskId);
 
+  }
+
+  @Deployment
+  public void testAsyncManualTask() {
+    // start PI
+    String pid = runtimeService.startProcessInstanceByKey("asyncManualTask").getProcessInstanceId();
+
+    // now there should be one job in the database:
+    assertEquals(1, managementService.createJobQuery().count());
+    // the listener was not yet invoked:
+    assertNull(runtimeService.getVariable(pid, "listener"));
+    // there is no manual Task
+    assertNull(taskService.createTaskQuery().singleResult());
+
+    executeAvailableJobs();
+
+    // the listener was invoked now:
+    assertNotNull(runtimeService.getVariable(pid, "listener"));
+    // there isn't a job anymore:
+    assertEquals(0, managementService.createJobQuery().count());
+    // now there is a userTask
+    assertNotNull(taskService.createTaskQuery().singleResult());
+
+    String taskId = taskService.createTaskQuery().singleResult().getId();
+    taskService.complete(taskId);
+  }
+
+  @Deployment
+  public void testAsyncIntermediateCatchEvent() {
+    // start PI
+    String pid = runtimeService.startProcessInstanceByKey("asyncIntermediateCatchEvent").getProcessInstanceId();
+
+    // now there is 1 job in the database:
+    assertEquals(1, managementService.createJobQuery().count());
+    // the listener was not invoked now:
+    assertNull(runtimeService.getVariable(pid, "listener"));
+    // there is no intermediate catch event:
+    assertNull(taskService.createTaskQuery().singleResult());
+
+    executeAvailableJobs();
+    runtimeService.correlateMessage("testMessage1");
+
+    // the listener was now invoked:
+    assertNotNull(runtimeService.getVariable(pid, "listener"));
+    // there isn't a job anymore
+    assertEquals(0, managementService.createJobQuery().count());
+    // now there is a userTask
+    assertNotNull(taskService.createTaskQuery().singleResult());
+
+    String taskId = taskService.createTaskQuery().singleResult().getId();
+    taskService.complete(taskId);
+
+  }
+
+  @Deployment
+  public void testAsyncIntermediateThrowEvent() {
+    // start PI
+    String pid = runtimeService.startProcessInstanceByKey("asyncIntermediateThrowEvent").getProcessInstanceId();
+
+    // now there is 1 job in the database:
+    assertEquals(1, managementService.createJobQuery().count());
+    // the listener was not invoked now:
+    assertNull(runtimeService.getVariable(pid, "listener"));
+    // there is no intermediate throw event:
+    assertNull(taskService.createTaskQuery().singleResult());
+
+    executeAvailableJobs();
+
+    // the listener was now invoked:
+    assertNotNull(runtimeService.getVariable(pid, "listener"));
+    // there isn't a job anymore
+    assertEquals(0, managementService.createJobQuery().count());
+    // now there is a userTask
+    assertNotNull(taskService.createTaskQuery().singleResult());
+
+    String taskId = taskService.createTaskQuery().singleResult().getId();
+    taskService.complete(taskId);
+  }
+
+  @Deployment
+  public void testAsyncExclusiveGateway() {
+    // The test needs variables to work properly
+    HashMap<String, Object> variables = new HashMap<String, Object>();
+    variables.put("flow", false);
+
+    // start PI
+    String pid = runtimeService.startProcessInstanceByKey("asyncExclusiveGateway", variables).getProcessInstanceId();
+
+    // now there is 1 job in the database:
+    assertEquals(1, managementService.createJobQuery().count());
+    // the listener was not invoked now:
+    assertNull(runtimeService.getVariable(pid, "listener"));
+    // there is no gateway:
+    assertNull(taskService.createTaskQuery().singleResult());
+
+    executeAvailableJobs();
+
+    // the listener was now invoked:
+    assertNotNull(runtimeService.getVariable(pid, "listener"));
+    // there isn't a job anymore
+    assertEquals(0, managementService.createJobQuery().count());
+    // now there is a userTask
+    assertNotNull(taskService.createTaskQuery().singleResult());
+
+    String taskId = taskService.createTaskQuery().singleResult().getId();
+    taskService.complete(taskId);
+  }
+
+  @Deployment
+  public void testAsyncInclusiveGateway() {
+    // start PI
+    String pid = runtimeService.startProcessInstanceByKey("asyncInclusiveGateway").getProcessInstanceId();
+
+    // now there is 1 job in the database:
+    assertEquals(1, managementService.createJobQuery().count());
+    // the listener was not invoked now:
+    assertNull(runtimeService.getVariable(pid, "listener"));
+    // there is no gateway:
+    assertNull(taskService.createTaskQuery().singleResult());
+
+    executeAvailableJobs();
+
+    // the listener was now invoked:
+    assertNotNull(runtimeService.getVariable(pid, "listener"));
+    // there isn't a job anymore
+    assertEquals(0, managementService.createJobQuery().count());
+    // now there are 2 user tasks
+    List<Task> list = taskService.createTaskQuery().list();
+    assertEquals(2, list.size());
+
+    // complete these tasks and finish the process instance
+    for(Task task: list) {
+      taskService.complete(task.getId());
+    }
+  }
+
+  @Deployment
+  public void testAsyncEventGateway() {
+    // start PI
+    String pid = runtimeService.startProcessInstanceByKey("asyncEventGateway").getProcessInstanceId();
+
+    // now there is a job in the database
+    assertEquals(1, managementService.createJobQuery().count());
+    // the listener was not invoked now:
+    assertNull(runtimeService.getVariable(pid, "listener"));
+    // there is no task:
+    assertNull(taskService.createTaskQuery().singleResult());
+
+    executeAvailableJobs();
+
+    // the listener was now invoked:
+    assertNotNull(runtimeService.getVariable(pid, "listener"));
+    // there isn't a job anymore
+    assertEquals(0, managementService.createJobQuery().count());
+
+    // correlate Message
+    runtimeService.correlateMessage("testMessageDef1");
+
+    // now there is a userTask
+    assertNotNull(taskService.createTaskQuery().singleResult());
+
+    String taskId = taskService.createTaskQuery().singleResult().getId();
+    taskService.complete(taskId);
   }
 
 }

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:activiti="http://activiti.org/bpmn"
+  targetNamespace="Examples">
+
+  <process id="asyncInclusiveGateway">
+  
+    <startEvent id="theStart" />
+    <sequenceFlow id="startFlow" sourceRef="theStart" targetRef="inclusiveGateway" />
+
+    <inclusiveGateway id="inclusiveGateway" name="inclusiveGateway" activiti:async="true">
+      <extensionElements>
+        <activiti:executionListener event="start" class="org.camunda.bpm.engine.test.bpmn.async.AsyncListener" />
+      </extensionElements>
+    </inclusiveGateway>
+
+    <sequenceFlow id="flow1" sourceRef="inclusiveGateway" targetRef="userTask1" />
+    <sequenceFlow id="flow2" sourceRef="inclusiveGateway" targetRef="userTask2" />
+
+    <userTask id="userTask1" />
+    <userTask id="userTask2" />
+
+    <sequenceFlow sourceRef="userTask1" targetRef="theEnd1" />
+    <sequenceFlow sourceRef="userTask2" targetRef="theEnd2" />
+
+    <endEvent id="theEnd1" />
+    <endEvent id="theEnd2" />
+
+  </process>
+
+</definitions>
