@@ -311,13 +311,16 @@
       <if test="followUpDate != null">
         and RES.FOLLOW_UP_DATE_ = #{followUpDate}
       </if>
-      <if test="followUpBefore != null">
-        and RES.FOLLOW_UP_DATE_ &lt; #{followUpBefore}
+      <if test="followUpBefore != null &amp;&amp; !followUpNullAccepted">
+          and RES.FOLLOW_UP_DATE_ &lt; #{followUpBefore}
+      </if>
+      <if test="followUpBefore != null &amp;&amp; followUpNullAccepted">
+          and (RES.FOLLOW_UP_DATE_ IS NULL OR RES.FOLLOW_UP_DATE_ &lt; #{followUpBefore})
       </if>
       <if test="followUpAfter != null">
         and RES.FOLLOW_UP_DATE_ &gt; #{followUpAfter}
       </if>
-      <if test="followUpDate != null || followUpBefore != null || followUpAfter != null">
+      <if test="(followUpDate != null || followUpBefore != null || followUpAfter != null) &amp;&amp; !followUpNullAccepted">
         and RES.FOLLOW_UP_DATE_ is not null
       </if>
       <if test="excludeSubtasks">

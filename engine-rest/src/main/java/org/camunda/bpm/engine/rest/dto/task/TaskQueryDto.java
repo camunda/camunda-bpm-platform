@@ -125,6 +125,8 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
   private String followUpAfterExpression;
   private Date followUpBefore;
   private String followUpBeforeExpression;
+  private Date followUpBeforeOrNotExistent;
+  private String followUpBeforeExpressionOrNotExistent;
   private Date followUpDate;
   private String followUpDateExpression;
   private Date createdAfter;
@@ -361,10 +363,20 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     this.followUpBefore = followUpBefore;
   }
 
+  @CamundaQueryParam(value = "followUpBeforeExpressionOrNotExistent")
+  public void setFollowUpBeforeExpressionOrNotExistent(String followUpBeforeExpression) {
+    this.followUpBeforeExpressionOrNotExistent = followUpBeforeExpression;
+  }
+  
+  @CamundaQueryParam(value = "followUpBeforeOrNotExistent", converter = DateConverter.class)
+  public void setFollowUpBeforeOrNotExistent(Date followUpBefore) {
+    this.followUpBeforeOrNotExistent = followUpBefore;
+  }
+
   @CamundaQueryParam(value = "followUpBeforeExpression")
   public void setFollowUpBeforeExpression(String followUpBeforeExpression) {
     this.followUpBeforeExpression = followUpBeforeExpression;
-  }
+  }  
 
   @CamundaQueryParam(value = "followUp", converter = DateConverter.class)
   public void setFollowUpDate(Date followUp) {
@@ -690,6 +702,14 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     return followUpBeforeExpression;
   }
 
+  public Date getFollowUpBeforeOrNotExistent() {
+    return followUpBeforeOrNotExistent;
+  }
+
+  public String getFollowUpBeforeExpressionOrNotExistent() {
+    return followUpBeforeExpressionOrNotExistent;
+  }
+
   public Date getFollowUpDate() {
     return followUpDate;
   }
@@ -870,6 +890,12 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     }
     if (followUpBeforeExpression != null) {
       query.followUpBeforeExpression(followUpBeforeExpression);
+    }
+    if (followUpBeforeOrNotExistent != null) {
+      query.followUpBeforeOrNotExistent(followUpBeforeOrNotExistent);
+    }
+    if (followUpBeforeExpressionOrNotExistent != null) {
+      query.followUpBeforeExpressionOrNotExistent(followUpBeforeExpressionOrNotExistent);
     }
     if (followUpDate != null) {
       query.followUpDate(followUpDate);
@@ -1109,7 +1135,11 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     dto.dueBefore = taskQuery.getDueBefore();
     dto.dueDate = taskQuery.getDueDate();
     dto.followUpAfter = taskQuery.getFollowUpAfter();
-    dto.followUpBefore = taskQuery.getFollowUpBefore();
+    if (taskQuery.isFollowUpNullAccepted()) {
+      dto.followUpBeforeOrNotExistent = taskQuery.getFollowUpBefore();
+    } else {
+      dto.followUpBefore = taskQuery.getFollowUpBefore();
+    }
     dto.followUpDate = taskQuery.getFollowUpDate();
     dto.createdAfter = taskQuery.getCreateTimeAfter();
     dto.createdBefore = taskQuery.getCreateTimeBefore();

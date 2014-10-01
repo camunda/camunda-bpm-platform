@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.ibatis.logging.LogFactory;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
@@ -1040,13 +1041,16 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/task/TaskQueryTest.testProcessDefinition.bpmn20.xml"})
-  public void testFollowUpDate() throws Exception {
+  public void testFollowUpDate() throws Exception {    
     Calendar otherDate = Calendar.getInstance();
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
     // do not find any task instances with follow up date
     assertEquals(0, taskService.createTaskQuery().followUpDate(otherDate.getTime()).count());
+    assertEquals(1, taskService.createTaskQuery().processInstanceId(processInstance.getId()) 
+        // we might have tasks from other test cases - so we limit to the current PI
+        .followUpBeforeOrNotExistent(otherDate.getTime()).count());
 
     Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
 
@@ -1063,11 +1067,15 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     otherDate.add(Calendar.YEAR, 1);
     assertEquals(0, taskService.createTaskQuery().followUpDate(otherDate.getTime()).count());
     assertEquals(1, taskService.createTaskQuery().followUpBefore(otherDate.getTime()).count());
+    assertEquals(1, taskService.createTaskQuery().processInstanceId(processInstance.getId()) //
+        .followUpBeforeOrNotExistent(otherDate.getTime()).count());
     assertEquals(0, taskService.createTaskQuery().followUpAfter(otherDate.getTime()).count());
 
     otherDate.add(Calendar.YEAR, -2);
     assertEquals(1, taskService.createTaskQuery().followUpAfter(otherDate.getTime()).count());
     assertEquals(0, taskService.createTaskQuery().followUpBefore(otherDate.getTime()).count());
+    assertEquals(0, taskService.createTaskQuery().processInstanceId(processInstance.getId()) //
+        .followUpBeforeOrNotExistent(otherDate.getTime()).count());
 
     taskService.complete(task.getId());
   }
