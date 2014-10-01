@@ -19,13 +19,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
 import org.camunda.bpm.engine.impl.persistence.entity.TimerEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
-import org.joda.time.DateTime;
 
 /**
  * @author Thorben Lindhauer
@@ -76,7 +76,7 @@ public class InputOutputEventTest extends PluggableProcessEngineTestCase {
   @Deployment
   public void testTimerCatchEvent() {
     Map<String, Object> variables = new HashMap<String, Object>();
-    Date dueDate = DateTime.now().plusMinutes(5).toDate();
+    Date dueDate = DateTimeUtil.now().plusMinutes(5).toDate();
     variables.put("outerVariable", new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(dueDate));
     runtimeService.startProcessInstanceByKey("testProcess", variables);
 
