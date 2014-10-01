@@ -193,7 +193,7 @@ define([
     $scope.filter.properties.variables =  $scope.filter.properties.variables || [];
 
 
-    $scope.filter.properties.priority =   $scope.filter.properties.priority || 10;
+    $scope.filter.properties.priority =   parseInt($scope.filter.properties.priority || 0, 10);
     $scope.filter.properties.color =      $scope.filter.properties.color || '#EEEEEE';
 
 
