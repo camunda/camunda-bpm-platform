@@ -300,37 +300,48 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
   public Expression getLoopCardinalityExpression() {
     return loopCardinalityExpression;
   }
+
   public void setLoopCardinalityExpression(Expression loopCardinalityExpression) {
     this.loopCardinalityExpression = loopCardinalityExpression;
   }
+
   public Expression getCompletionConditionExpression() {
     return completionConditionExpression;
   }
+
   public void setCompletionConditionExpression(Expression completionConditionExpression) {
     this.completionConditionExpression = completionConditionExpression;
   }
+
   public Expression getCollectionExpression() {
     return collectionExpression;
   }
+
   public void setCollectionExpression(Expression collectionExpression) {
     this.collectionExpression = collectionExpression;
   }
+
   public String getCollectionVariable() {
     return collectionVariable;
   }
+
   public void setCollectionVariable(String collectionVariable) {
     this.collectionVariable = collectionVariable;
   }
+
   public String getCollectionElementVariable() {
     return collectionElementVariable;
   }
+
   public void setCollectionElementVariable(String collectionElementVariable) {
     this.collectionElementVariable = collectionElementVariable;
   }
+
   public void setInnerActivityBehavior(AbstractBpmnActivityBehavior innerActivityBehavior) {
     this.innerActivityBehavior = innerActivityBehavior;
     this.innerActivityBehavior.setMultiInstanceActivityBehavior(this);
   }
+
   public void setIoMapping(IoMapping ioMapping) {
     this.ioMapping = ioMapping;
   }

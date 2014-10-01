@@ -25,7 +25,7 @@ import org.camunda.bpm.engine.delegate.JavaDelegate;
  */
 public class VariableLogDelegate implements JavaDelegate, ExecutionListener {
 
-  public static Map<String, Object> LOCAL_VARIABLES= new HashMap<String, Object>();;
+  public static Map<String, Object> LOCAL_VARIABLES= new HashMap<String, Object>();
 
   public void execute(DelegateExecution execution) throws Exception {
     LOCAL_VARIABLES = execution.getVariablesLocal();

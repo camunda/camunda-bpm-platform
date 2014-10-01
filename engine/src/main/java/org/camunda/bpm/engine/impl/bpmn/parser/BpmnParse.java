@@ -3492,12 +3492,12 @@ public class BpmnParse extends Parse {
            tagName.contains("Event") ||
            tagName.equals("transaction") ||
            tagName.equals("subProcess"))) {
-      addError("camunda:inputOutput mapping unsupported for element type '"+activityElement.getTagName()+"'.", activityElement);
+      addError("camunda:inputOutput mapping unsupported for element type '" + tagName + "'.", activityElement);
       return false;
     }
 
     if (tagName.equals("subProcess") && "true".equals(activityElement.attribute("triggeredByEvent"))) {
-      addError("camunda:inputOutput mapping unsupported for element type '"+activityElement.getTagName()+"' with attribute 'triggeredByEvent = true'.", activityElement);
+      addError("camunda:inputOutput mapping unsupported for element type '" + tagName + "' with attribute 'triggeredByEvent = true'.", activityElement);
       return false;
     }
 

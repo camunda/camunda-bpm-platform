@@ -699,6 +699,9 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
 
     task = taskService.createTaskQuery().singleResult();
     taskService.complete(task.getId());
+
+    // variable does not exist outside of scope
+    assertEquals(0, runtimeService.createVariableInstanceQuery().variableName("miCounterValue").count());
   }
 
   @Deployment
@@ -729,6 +732,12 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
     // input mapping
     assertEquals(1, runtimeService.createVariableInstanceQuery().variableName("miCounterValue").count());
     assertEquals(2, runtimeService.getVariableLocal(miScopeExecution.getId(), "miCounterValue"));
+
+    task = taskService.createTaskQuery().singleResult();
+    taskService.complete(task.getId());
+
+    // variable does not exist outside of scope
+    assertEquals(0, runtimeService.createVariableInstanceQuery().variableName("miCounterValue").count());
   }
 
   @Deployment
@@ -753,6 +762,13 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
     assertEquals(2, runtimeService.getVariableLocal(miExecution2.getId(), "miCounterValue"));
 
     assertEquals(2, runtimeService.createVariableInstanceQuery().variableName("miCounterValue").count());
+
+    for (Task task : taskService.createTaskQuery().list()) {
+      taskService.complete(task.getId());
+    }
+
+    // variable does not exist outside of scope
+    assertEquals(0, runtimeService.createVariableInstanceQuery().variableName("miCounterValue").count());
   }
 
   @Deployment
@@ -776,6 +792,13 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
     assertEquals(2, runtimeService.getVariableLocal(miScopeExecution2.getId(), "miCounterValue"));
 
     assertEquals(2, runtimeService.createVariableInstanceQuery().variableName("miCounterValue").count());
+
+    for (Task task : taskService.createTaskQuery().list()) {
+      taskService.complete(task.getId());
+    }
+
+    // variable does not exist outside of scope
+    assertEquals(0, runtimeService.createVariableInstanceQuery().variableName("miCounterValue").count());
   }
 
   public void testMIOutputMappingDisallowed() {
