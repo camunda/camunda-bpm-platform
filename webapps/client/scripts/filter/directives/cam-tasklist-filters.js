@@ -43,11 +43,11 @@ define([
         $scope.loading = false;
 
         $scope.edit = function(filter) {
-          $rootScope.$broadcast('filter.edit', filter);
+          $rootScope.$broadcast('tasklist.filter.edit', filter);
         };
 
         $scope.delete = function(filter) {
-          $rootScope.$broadcast('filter.delete', filter);
+          $rootScope.$broadcast('tasklist.filter.delete', filter);
         };
 
         $scope.focus = function(filter) {
@@ -90,10 +90,11 @@ define([
 
         listFilters();
 
+        _scopeEvents.push($rootScope.$on('tasklist.task.complete', listFilters));
 
-        _scopeEvents.push($rootScope.$on('filter.saved', listFilters));
+        _scopeEvents.push($rootScope.$on('tasklist.filter.saved', listFilters));
 
-        _scopeEvents.push($rootScope.$on('filter.deleted', listFilters));
+        _scopeEvents.push($rootScope.$on('tasklist.filter.deleted', listFilters));
 
         _scopeEvents.push($rootScope.$on('authentication.login.success', listFilters));
       }]

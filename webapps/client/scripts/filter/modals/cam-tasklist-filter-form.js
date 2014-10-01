@@ -595,7 +595,7 @@ define([
           }
 
           successNotification('FILTER_SAVE_SUCCESS');
-          $scope.$emit('filter.saved');
+          $scope.$emit('tasklist.filter.saved');
           $scope.$close();
         });
       });
@@ -620,7 +620,7 @@ define([
         }
 
         successNotification('FILTER_DELETION_SUCCESS');
-        $scope.$emit('filter.deleted');
+        $scope.$emit('tasklist.filter.deleted');
         $scope.$close();
       });
     };
@@ -754,9 +754,9 @@ define([
     }
 
 
-    $scope.$on('filter.edit', checkFilterState);
+    $scope.$on('tasklist.filter.edit', checkFilterState);
 
-    $scope.$on('filter.delete', function(evt, givenFilter) {
+    $scope.$on('tasklist.filter.delete', function(evt, givenFilter) {
       checkFilterState(evt, givenFilter, true);
     });
 

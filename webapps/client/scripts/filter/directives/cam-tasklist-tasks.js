@@ -252,17 +252,17 @@ define([
         });
 
 
-        scope.$on('tasklist.task.update', loadTasks);
-
-        scope.$on('tasklist.task.complete', function() {
-          setCurrentTask(null);
-        });
-
         loadTasks();
 
-        _scopeEvents.push($rootScope.$on('filter.deleted', loadTasks));
+        _scopeEvents.push(scope.$on('tasklist.task.update', loadTasks));
 
-        _scopeEvents.push($rootScope.$on('filter.saved', loadTasks));
+        _scopeEvents.push(scope.$on('tasklist.task.complete', function() {
+          setCurrentTask(null);
+        }));
+
+        _scopeEvents.push($rootScope.$on('tasklist.filter.deleted', loadTasks));
+
+        _scopeEvents.push($rootScope.$on('tasklist.filter.saved', loadTasks));
 
         _scopeEvents.push($rootScope.$on('authentication.login.success', loadTasks));
       }
