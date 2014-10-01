@@ -28,7 +28,8 @@
 
         <div class="form-group">
           <div class="col-xs-8">
-            <div class="row">
+            <div class="row"
+                 ng-class="{'has-error': _generalErrorsByField.name}">
               <label for="filter-form-name"
                      class="col-xs-3 control-label"
                      translate="FILTER_NAME_LABEL">Name</label>
@@ -37,15 +38,22 @@
                 <input class="form-control"
                        id="filter-form-name"
                        ng-model="filter.name"
+                       ng-change="validateGeneralInfo()"
                        type="text"
                        required
                        placeholder="{{ 'FILTER_NAME_PLACEHOLDER' | translate }}" />
+
+                <span ng-if="_generalErrorsByField.name"
+                      class="help-block">
+                  {{ _generalErrorsByField.name | translate }}
+                </span>
               </div>
             </div>
           </div>
 
           <div class="col-xs-4">
-            <div class="row">
+            <div class="row"
+                 ng-class="{'has-error': _generalErrorsByField.color}">
               <label for="filter-form-color"
                      class="col-xs-6 control-label"
                      translate="FILTER_COLOR_LABEL">Color</label>
@@ -53,8 +61,14 @@
               <div class="col-xs-6">
                 <input class="form-control minicolors"
                        id="filter-form-color"
+                       ng-change="validateGeneralInfo()"
                        ng-model="filter.properties.color"
                        type="color" />
+
+                <span ng-if="_generalErrorsByField.color"
+                      class="help-block">
+                  {{ _generalErrorsByField.color | translate }}
+                </span>
               </div>
             </div>
           </div>
@@ -71,15 +85,16 @@
                 <input class="form-control"
                        id="filter-form-description"
                        ng-model="filter.properties.description"
+                       ng-change="validateGeneralInfo()"
                        type="text"
-                       required
                        placeholder="{{ 'FILTER_DESCRIPTION_PLACEHOLDER' | translate }}" />
               </div>
             </div>
           </div>
 
           <div class="col-xs-4">
-            <div class="row">
+            <div class="row"
+                 ng-class="{'has-error': _generalErrorsByField.priority}">
               <label for="filter-form-priority"
                      class="col-xs-6 control-label"
                      translate="FILTER_PRIORITY_LABEL">Priority</label>
@@ -88,7 +103,13 @@
                 <input class="form-control"
                        id="filter-form-priority"
                        ng-model="filter.properties.priority"
+                       ng-change="validateGeneralInfo()"
                        type="number" />
+
+                <span ng-if="_generalErrorsByField.priority"
+                      class="help-block">
+                  {{ _generalErrorsByField.priority | translate }}
+                </span>
               </div>
             </div>
           </div>

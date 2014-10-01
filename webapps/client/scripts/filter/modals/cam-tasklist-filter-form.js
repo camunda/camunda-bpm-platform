@@ -201,7 +201,8 @@ define([
 
 
     function isValid() {
-      $scope.$valid = !$scope._variableErrors.length &&
+      $scope.$valid = !$scope._generalErrors.length &&
+                      !$scope._variableErrors.length &&
                       !$scope._queryErrors.length &&
                       !$scope._authorizationErrors.length;
 
@@ -211,7 +212,38 @@ define([
     }
 
 
+
+    /*
+    ┌──────────────────────────────────────────────────────────────────────────────────────────────┐
+    │ General                                                                                      │
+    └──────────────────────────────────────────────────────────────────────────────────────────────┘
+    */
     $scope._generalErrors = [];
+    var colorExp = /^#([0-9a-f]{6}|[0-9a-f]{3})$/i;
+    $scope.validateGeneralInfo = function() {
+      $scope._generalErrors = [];
+
+      if (!$scope.filter.name) {
+        $scope._generalErrors.push({field: 'name', message: 'REQUIRED_FIELD'});
+      }
+
+      if ($scope.filter.properties.priority % 1 !== 0) {
+        $scope._generalErrors.push({field: 'priority', message: 'REQUIRED_INTEGER_FIELD'});
+      }
+
+      if (!colorExp.test($scope.filter.properties.color)) {
+        $scope._generalErrors.push({field: 'color', message: 'REQUIRED_HEX_COLOR_FIELD'});
+      }
+
+      $scope._generalErrorsByField = {};
+      each($scope._generalErrors, function(err) {
+        $scope._generalErrorsByField[err.field] = err.message;
+      });
+
+      return $scope._generalErrors.length ? $scope._generalErrors : false;
+    };
+
+
 
     /*
     ┌──────────────────────────────────────────────────────────────────────────────────────────────┐
