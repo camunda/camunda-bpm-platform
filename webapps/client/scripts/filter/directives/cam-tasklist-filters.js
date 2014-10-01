@@ -77,20 +77,23 @@ define([
 
             $scope.filters = res;
 
-            var first;
+            var focused;
             angular.forEach(res, function(filter) {
-              if (!first || filter.properties.priority < first.properties.priority) {
-                first = filter;
+              if ($scope.focusedId === filter.id) {
+                focused = filter;
+              }
+              else if (!focused || filter.properties.priority < focused.properties.priority) {
+                focused = filter;
               }
             });
 
-            $scope.focus(first);
+            $scope.focus(focused);
           });
         }
 
         listFilters();
 
-        _scopeEvents.push($rootScope.$on('tasklist.task.complete', listFilters));
+        _scopeEvents.push($rootScope.$on('tasklist.task.update', listFilters));
 
         _scopeEvents.push($rootScope.$on('tasklist.filter.saved', listFilters));
 
