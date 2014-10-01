@@ -222,6 +222,13 @@ define(function() {
           help: dateExpLangHelp,
           validate: dateValidate
         }
+        {
+          name: 'followUpBeforeOrNotExistent',
+          label: 'Follow Up Before or Not Existent',
+          expressionSupport: true,
+          help: dateExpLangHelp,
+          validate: dateValidate
+        }
       ]
     }
   ];
