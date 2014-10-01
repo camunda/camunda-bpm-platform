@@ -1,5 +1,22 @@
-define([], function() {
+define(function() {
   'use strict';
+
+  var dateExpLangHelp = 'E.g.: ${ now() }, ${ timeDate() } or ${ timeDate().plusWeeks(2) })';
+  var userExpLangHelp = 'E.g.: ${ currentUser() }';
+  var groupExpLangHelp = 'E.g.: ${ currentUserGroups() }';
+
+  // check that the date format follows `yyyy-MM-dd'T'HH:mm:ss` or is an expression language string
+  var expressionsExp = /^[\s]*(\#|\$)\{/;
+  var dateExp = /^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(|\.[0-9]{0,4})(|Z)$/;
+  function dateValidate(value) {
+    if (expressionsExp.test(value)) {
+      return false;
+    }
+
+    return !dateExp.test(value) ? 'INVALID_DATE' : false;
+  }
+
+
   var criteria = [
     {
       group: 'Process Instance',
@@ -67,43 +84,43 @@ define([], function() {
           name: 'assignee',
           label: 'Assignee',
           expressionSupport: true,
-          help: 'E.g.: ${ currentUser() }'
+          help: userExpLangHelp
         },
         {
           name: 'assigneeLike',
           label: 'Assignee Like',
           expressionSupport: true,
-          help: 'E.g.: ${ currentUser() }'
+          help: userExpLangHelp
         },
         {
           name: 'owner',
           label: 'Owner',
           expressionSupport: true,
-          help: 'E.g.: ${ currentUser() }'
+          help: userExpLangHelp
         },
         {
           name: 'candidateGroup',
           label: 'Candidate Group',
           expressionSupport: true,
-          help: 'E.g.: '
+          help: groupExpLangHelp
         },
         {
           name: 'candidateGroups',
           label: 'Candidate Groups',
           expressionSupport: true,
-          help: 'E.g.: ${ currentUserGroups() }'
+          help: groupExpLangHelp
         },
         {
           name: 'candidateUser',
           label: 'Candidate User',
           expressionSupport: true,
-          help: 'E.g.: ${ currentUser() }'
+          help: userExpLangHelp
         },
         {
           name: 'involvedUser',
           label: 'Involved User',
           expressionSupport: true,
-          help: 'E.g.: ${ currentUser() }'
+          help: userExpLangHelp
         },
         {
           name: 'unassigned',
@@ -167,37 +184,43 @@ define([], function() {
           name: 'createdBefore',
           label: 'Created Before',
           expressionSupport: true,
-          help: 'E.g.: ${ now() }, ${ timeDate() } or ${ timeDate().plusWeeks(2) })'
+          help: dateExpLangHelp,
+          validate: dateValidate
         },
         {
           name: 'createdAfter',
           label: 'Created After',
           expressionSupport: true,
-          help: 'E.g.: ${ now() }, ${ timeDate() } or ${ timeDate().plusWeeks(2) })'
+          help: dateExpLangHelp,
+          validate: dateValidate
         },
         {
           name: 'dueBefore',
           label: 'Due Before',
           expressionSupport: true,
-          help: 'E.g.: ${ now() }, ${ timeDate() } or ${ timeDate().plusWeeks(2) })'
+          help: dateExpLangHelp,
+          validate: dateValidate
         },
         {
           name: 'dueAfter',
           label: 'Due After',
           expressionSupport: true,
-          help: 'E.g.: ${ now() }, ${ timeDate() } or ${ timeDate().plusWeeks(2) })'
+          help: dateExpLangHelp,
+          validate: dateValidate
         },
         {
           name: 'followUpAfter',
           label: 'Follow Up After',
           expressionSupport: true,
-          help: 'E.g.: ${ now() }, ${ timeDate() } or ${ timeDate().plusWeeks(2) })'
+          help: dateExpLangHelp,
+          validate: dateValidate
         },
         {
           name: 'followUpBefore',
           label: 'Follow Up Before',
           expressionSupport: true,
-          help: 'E.g.: ${ now() }, ${ timeDate() } or ${ timeDate().plusWeeks(2) })'
+          help: dateExpLangHelp,
+          validate: dateValidate
         }
       ]
     }

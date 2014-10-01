@@ -16,11 +16,13 @@ define([
 
 
   var criteriaExpressionSupport = {};
-  var criteriaHelp = {};
+  var criteriaHelp              = {};
+  var criteriaValidator         = {};
   each(criteria, function(group) {
     each(group.options, function(criterion) {
       criteriaExpressionSupport[criterion.name] = criterion.expressionSupport;
-      criteriaHelp[criterion.name] = criterion.help;
+      criteriaHelp[criterion.name]              = criterion.help      || group.help;
+      criteriaValidator[criterion.name]         = criterion.validate  || group.validate;
     });
   });
 
@@ -283,12 +285,20 @@ define([
 
     $scope.validateCriterion = function(criterion, delta) {
       criterion.error = null;
+      var name = $scope.simpleCriterionName(criterion.key);
 
-      if (!criterion.key && criterion.value) {
+      if (!name && criterion.value) {
         criterion.error = {field: 'key', message: 'REQUIRED_FIELD'};
       }
-      else if (criterion.key && !criterion.value) {
+      else if (name && !criterion.value) {
         criterion.error = {field: 'value', message: 'REQUIRED_FIELD'};
+      }
+      else if (criteriaValidator[name]) {
+        var validValue = criteriaValidator[name](criterion.value);
+        console.info('validValue', validValue, criterion.value);
+        if (validValue !== false) {
+          criterion.error = {field: 'value', message: validValue || 'INVALID_FORMAT_FIELD'};
+        }
       }
 
       isValid();
