@@ -39,7 +39,6 @@ public class FilterDto {
   protected AbstractQueryDto<?> query;
   protected Map<String, Object> properties;
 
-  @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
   protected Long itemCount;
 
   public String getId() {
@@ -95,6 +94,7 @@ public class FilterDto {
     this.properties = properties;
   }
 
+  @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
   public Long getItemCount() {
     return itemCount;
   }
