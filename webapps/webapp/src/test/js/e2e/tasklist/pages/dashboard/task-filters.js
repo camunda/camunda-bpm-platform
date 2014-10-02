@@ -4,29 +4,45 @@ var Page = require('./dashboard-view');
 
 module.exports = Page.extend({
 
-  formElement: function () {
+  formElement: function() {
     return element(by.css('[cam-tasklist-filters]'));
   },
 
-  filterList: function () {
+  filterList: function() {
     return this.formElement().all(by.repeater('(delta, filter) in filters'));
   },
 
-  selectFilter: function (item) {
+  findFilter: function(filterName) {
+
+    this.filterList().then(function(arr) {
+
+      for (var i = 0; i < arr.length; ++i) {
+
+        arr[i].getText().then(function (text) {
+
+          console.log(text);
+          if (filterName === text)
+            console.log('got you ' + text);
+        });
+      }
+    });
+  },
+
+  selectFilter: function(item) {
     var pile = this.filterList().get(item).element(by.css('[class="name ng-binding"]'));
     pile.click();
     return pile;
   },
 
-  filterStatus: function (item) {
+  filterStatus: function(item) {
     return this.filterList().get(item).getAttribute('class');
   },
 
-  isFilterSelected: function (item) {
+  isFilterSelected: function(item) {
     expect(this.filterStatus(item)).toMatch('active');
   },
 
-  isFilterNotSelected: function (item) {
+  isFilterNotSelected: function(item) {
     expect(this.filterStatus(item)).not.toMatch('active');
   },
 
@@ -55,6 +71,9 @@ module.exports = Page.extend({
   },
 
   editFilter: function(item) {
+
+    browser.sleep(1000);
+
     protractor.getInstance().actions().mouseMove(this.filterNameElement(item)).perform();
 
     browser.sleep(1000);
@@ -65,6 +84,9 @@ module.exports = Page.extend({
   },
 
   deleteFilter: function(item) {
+
+    browser.sleep(1000);
+
     protractor.getInstance().actions().mouseMove(this.filterNameElement(item)).perform();
 
     browser.sleep(1000);

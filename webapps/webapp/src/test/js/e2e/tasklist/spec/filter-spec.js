@@ -4,9 +4,9 @@ var dashboardPage = require('../pages/dashboard');
 
 describe('tasklist filter -', function() {
 
-  describe("start test", function () {
+  describe("start test", function() {
 
-    it('should login', function () {
+    it('should login', function() {
 
       // when
       dashboardPage.navigateTo();
@@ -19,14 +19,9 @@ describe('tasklist filter -', function() {
   });
 
 
-  xdescribe("validate filter page", function () {
+  describe("create new filter", function() {
 
-  });
-
-
-  describe("create new filter", function () {
-
-    it("should open create new filter page", function () {
+    it("should open create new filter page", function() {
 
       // when
       dashboardPage.taskFilters.createFilterButton().click();
@@ -38,7 +33,7 @@ describe('tasklist filter -', function() {
     });
 
 
-    it("should enter filter values", function () {
+    it("should enter filter values", function() {
 
       // when
       dashboardPage.taskFilters.createFilterPage.nameInput('ÖÄÜ-FILTER');
@@ -53,7 +48,7 @@ describe('tasklist filter -', function() {
     });
 
 
-    it("should validate filter results", function () {
+    it("should validate filter results", function() {
 
       expect(dashboardPage.taskList.taskList().count()).toBeGreaterThan(0);
     });
@@ -61,9 +56,9 @@ describe('tasklist filter -', function() {
   });
 
 
-  describe("edit filter", function () {
+  describe("edit filter", function() {
 
-    it("should open edit filter page", function () {
+    it("should edit first filter", function() {
 
       // when
       dashboardPage.taskFilters.editFilter(0);
@@ -76,84 +71,119 @@ describe('tasklist filter -', function() {
     });
 
 
-    it("should play accordion", function () {
+    describe("criteria panel", function() {
 
-      dashboardPage.taskFilters.editFilterPage.selectPanel('Criteria');
-      dashboardPage.taskFilters.editFilterPage.selectPanel('General');
-      dashboardPage.taskFilters.editFilterPage.selectPanel('Variables');
-      dashboardPage.taskFilters.editFilterPage.selectPanel('Authorizations');
+      it("should open criteria panel", function() {
 
-      dashboardPage.taskFilters.editFilterPage.closeButton().click();
+        // when
+        dashboardPage.taskFilters.editFilterPage.selectPanel('Criteria');
+
+        // then
+        expect(dashboardPage.taskFilters.editFilterPage.addCriterionButton().isPresent()).toBe(true);
+      });
+
+
+      it("should add new criteria", function() {
+
+        // when
+        dashboardPage.taskFilters.editFilterPage.addCriteria('Id', '4711');
+
+        // then
+        expect(dashboardPage.taskFilters.editFilterPage.criterionList().count()).toBe(1);
+      });
+
     });
 
 
-    describe("variables", function () {
+    describe("variable panel", function() {
 
-      it("should open variables panel", function () {
+      it("should open variables panel", function() {
 
         // when
-        dashboardPage.taskFilters.editFilter(0);
         dashboardPage.taskFilters.editFilterPage.selectPanel('Variables');
 
         // then
         expect(dashboardPage.taskFilters.editFilterPage.variableList().count()).toBe(0);
       });
 
-      it("should add a variable", function () {
-        var variableName = 'ÖÄÜ-123';
-        var varibleLabel = '123 blaw';
+
+      it("should add a variable", function() {
 
         // when
-        dashboardPage.taskFilters.editFilterPage.addVariableButton().click();
-        dashboardPage.taskFilters.editFilterPage.variableNameInput(0,variableName);
-        dashboardPage.taskFilters.editFilterPage.variableLabelInput(0, varibleLabel);
+        dashboardPage.taskFilters.editFilterPage.addVariable('ÖÄÜ-123', '123 blaw');
 
         // then
-        dashboardPage.taskFilters.editFilterPage.selectPanel('General');
-        dashboardPage.taskFilters.editFilterPage.selectPanel('Variables');
-        dashboardPage.taskFilters.editFilterPage.saveButton().click();
+        expect(dashboardPage.taskFilters.editFilterPage.variableList().count()).toBe(1);
       });
 
     });
 
 
-    describe("criteria", function () {
+    xdescribe("authorization panel", function() {
 
-      it("should add new criteria", function () {
+    });
+
+
+    describe("general panel", function() {
+
+      it("should open general panel", function() {
 
         // when
-        dashboardPage.taskFilters.editFilter(0);
-        dashboardPage.taskFilters.editFilterPage.selectPanel('Criteria');
-        dashboardPage.taskFilters.editFilterPage.addCriterionButton().click();
+        dashboardPage.taskFilters.editFilterPage.selectPanel('General');
 
         // then
-        dashboardPage.taskFilters.editFilterPage.keyInput('Id');
-        dashboardPage.taskFilters.editFilterPage.valueInput('4711');
-
-        dashboardPage.taskFilters.editFilterPage.saveButton().click();
+        expect(dashboardPage.taskFilters.editFilterPage.nameInput().getAttribute('value')).toEqual('ÖÄÜ-FILTER');
       });
 
 
-      it("should validate filter results", function () {
+      it("should change general panel value", function() {
 
         // when
-        dashboardPage.taskFilters.selectFilter(0);
+        dashboardPage.taskFilters.editFilterPage.nameInput().clear();
+        dashboardPage.taskFilters.editFilterPage.nameInput('123 Filter Name');
+
+        dashboardPage.taskFilters.editFilterPage.priorityInput().clear();
+        dashboardPage.taskFilters.editFilterPage.priorityInput(-9);
 
         // then
-        expect(dashboardPage.taskList.taskList().count()).toBe(0);
+        // check in 'should validate priority ranking'
       });
 
+    });
+
+
+    it("should save filter", function() {
+
+      // when
+      dashboardPage.taskFilters.editFilterPage.saveButton().click();
+
+      // then
+      expect(dashboardPage.taskFilters.editFilterPage.formElement().isPresent()).toBe(false);
+    });
+
+
+    it("should validate priority ranking", function() {
+
+      expect(dashboardPage.taskFilters.filterName(1)).toBe('123 FILTER NAME');
+    });
+
+
+    it("should validate filter refresh", function() {
+
+      expect(dashboardPage.taskList.taskList().count()).toBe(0);
+
+      expect(dashboardPage.taskFilters.isFilterSelected(1));
     });
 
   });
 
 
-  describe("delete filter", function () {
+  describe("delete filter", function() {
 
-    it("should open delete page", function () {
+    it("should open delete page", function() {
 
       // when
-      dashboardPage.taskFilters.deleteFilter(0);
+      dashboardPage.taskFilters.deleteFilter(1);
 
       // then
       expect(dashboardPage.taskFilters.deleteFilterPage.formHeader()).toBe('Delete filter');
@@ -163,7 +193,7 @@ describe('tasklist filter -', function() {
     });
 
 
-    it("should delete the filter", function () {
+    it("should delete the filter", function() {
 
       // when
       dashboardPage.taskFilters.deleteFilterPage.deleteButton().click();

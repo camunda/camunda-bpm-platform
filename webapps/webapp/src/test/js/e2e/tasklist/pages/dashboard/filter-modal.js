@@ -70,14 +70,26 @@ module.exports = Base.extend({
 
   // authorizations
 
+  authorizationnList: function() {
+    return this.formElement().all(by.repeater('(delta, authorization) in _authorizations'));
+  },
+
   // criteria
 
   addCriterionButton: function() {
     return this.formElement().element(by.css('[ng-click="addCriterion()"]'));
   },
 
-  keyInput: function(inputValue) {
-    var inputField = this.formElement().element(by.model('queryParam.key'));
+  removeCriterionButton: function() {
+    return this.criterionList().get(item).element(by.css('[ng-click="removeCriterion(delta)"]'));
+  },
+
+  criterionList: function() {
+    return this.formElement().all(by.repeater('(delta, queryParam) in _query'));
+  },
+
+  criterionKeyInput: function(item, inputValue) {
+    var inputField = this.criterionList().get(item).element(by.model('queryParam.key'));
 
     if (arguments.length !== 0)
       inputField.sendKeys(inputValue);
@@ -85,13 +97,26 @@ module.exports = Base.extend({
     return inputField;
   },
 
-  valueInput: function(inputValue) {
-    var inputField = this.formElement().element(by.model('queryParam.value'));
+  criterionValueInput: function(item, inputValue) {
+    var inputField = this.criterionList().get(item).element(by.model('queryParam.value'));
 
     if (arguments.length !== 0)
       inputField.sendKeys(inputValue);
 
     return inputField;
+  },
+
+  addCriteria: function(key, value) {
+    var self = this;
+
+    this.addCriterionButton().then(function(button) {
+      button.click();
+      self.criterionList().count().then(function(items) {
+        items = items -1;
+        self.criterionKeyInput(items, key);
+        self.criterionValueInput(items, value);
+      });
+    });
   },
 
   // variables
@@ -100,12 +125,12 @@ module.exports = Base.extend({
     return this.formElement().element(by.css('[ng-click="addVariable()"]'));
   },
 
-  variableList: function() {
-    return this.formElement().all(by.repeater('(delta, variable) in _variables'));
-  },
-
   removeVariableButton: function(item) {
     return this.variableList().get(item).element(by.css('[ng-click="removeVariable(delta)"]'));
+  },
+
+  variableList: function() {
+    return this.formElement().all(by.repeater('(delta, variable) in _variables'));
   },
 
   variableNameInput: function(item, inputValue) {
@@ -127,22 +152,16 @@ module.exports = Base.extend({
   },
 
   addVariable: function(name, label) {
- /*   var items;
+    var self = this;
 
-    this.variableList().count()
-        .then(function(countVar) {
-          items = countVar;
-          console.log(items);
-        })
-        .then(element(by.css('[ng-click="addVariable()"]')))
-        .then(function(buttonElement) {
-          buttonElement.click();
-        });
-*//*        .then(function() {
-          this.variableNameInput(items, name);
-          this.variableLabelInput(items, label)
-        });*/
-
+    this.addVariableButton().then(function(button) {
+      button.click();
+      self.variableList().count().then(function(items) {
+        items = items -1;
+        self.variableNameInput(items, name);
+        self.variableLabelInput(items, label);
+      });
+    });
   }
 
 });
