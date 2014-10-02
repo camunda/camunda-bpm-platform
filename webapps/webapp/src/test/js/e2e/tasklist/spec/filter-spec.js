@@ -157,6 +157,8 @@ describe('tasklist filter -', function() {
       // when
       dashboardPage.taskFilters.editFilterPage.saveButton().click();
 
+      browser.sleep(2000);
+
       // then
       expect(dashboardPage.taskFilters.editFilterPage.formElement().isPresent()).toBe(false);
     });
@@ -173,6 +175,24 @@ describe('tasklist filter -', function() {
       expect(dashboardPage.taskList.taskList().count()).toBe(0);
 
       expect(dashboardPage.taskFilters.isFilterSelected(1));
+    });
+
+  });
+
+
+  describe("use filter", function() {
+
+    it("should show filter results after relogin", function () {
+
+      // when
+      dashboardPage.taskFilters.selectFilter(0);
+      var taskName = dashboardPage.taskList.taskTitle(0);
+
+      dashboardPage.navigateLogout();
+      dashboardPage.authentication.userLogin('jonny1', 'jonny1');
+
+      // then
+      expect(dashboardPage.taskList.taskTitle(0)).toBe(taskName);
     });
 
   });
