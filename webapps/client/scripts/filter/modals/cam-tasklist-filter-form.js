@@ -275,6 +275,7 @@ define([
 
     $scope.removeCriterion = function(delta) {
       $scope._query = removeArrayItem($scope._query, delta);
+      $scope.validateCriteria();
     };
 
     $scope.simpleCriterionName = function(name) {
@@ -383,6 +384,8 @@ define([
       else {
         $scope._authorizations = removeArrayItem($scope._authorizations, delta);
       }
+
+      $scope.validateAuthorizations();
     };
 
     $scope.identityTypeSwitch = function(authorization, delta) {
@@ -462,6 +465,7 @@ define([
 
     $scope.removeVariable = function(delta) {
       $scope._variables = removeArrayItem($scope._variables, delta);
+      $scope.validateVariables();
     };
 
     $scope.validateVariable = function(variable, delta) {
@@ -487,7 +491,7 @@ define([
           $scope._variableErrors.push(error);
         }
       });
-      
+
       isValid();
       return $scope._variableErrors.length ? $scope._variableErrors : false;
     };
