@@ -50,7 +50,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.ws.rs.HttpMethod;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.AuthorizationService;
@@ -69,7 +68,6 @@ import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.query.Query;
 import org.camunda.bpm.engine.rest.dto.runtime.FilterDto;
 import org.camunda.bpm.engine.rest.dto.task.TaskQueryDto;
-import org.camunda.bpm.engine.rest.hal.Hal;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.camunda.bpm.engine.rest.helper.MockTaskBuilder;
 import org.camunda.bpm.engine.runtime.VariableInstance;
@@ -321,7 +319,7 @@ public abstract class AbstractFilterRestServiceInteractionTest extends AbstractR
   @Test
   public void testExecuteSingleResult() {
     given()
-      .header("Accept", MediaType.APPLICATION_JSON)
+      .header(ACCEPT_JSON_HEADER)
       .pathParam("id", EXAMPLE_FILTER_ID)
     .then().expect()
       .statusCode(Status.OK.getStatusCode())
@@ -336,7 +334,7 @@ public abstract class AbstractFilterRestServiceInteractionTest extends AbstractR
     when(filterServiceMock.singleResult(anyString(), any(Query.class))).thenReturn(null);
 
     given()
-      .header("Accept", MediaType.APPLICATION_JSON)
+      .header(ACCEPT_JSON_HEADER)
       .pathParam("id", EXAMPLE_FILTER_ID)
     .then().expect()
       .statusCode(Status.NO_CONTENT.getStatusCode())
@@ -352,7 +350,7 @@ public abstract class AbstractFilterRestServiceInteractionTest extends AbstractR
       .when(filterServiceMock).singleResult(anyString(), any(Query.class));
 
     given()
-      .header("Accept", MediaType.APPLICATION_JSON)
+      .header(ACCEPT_JSON_HEADER)
       .pathParam("id", EXAMPLE_FILTER_ID)
     .then().expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode())
@@ -365,7 +363,7 @@ public abstract class AbstractFilterRestServiceInteractionTest extends AbstractR
   @Test
   public void testExecuteHalSingleResult() {
     given()
-      .header("Accept", Hal.MEDIA_TYPE_HAL)
+      .header(ACCEPT_HAL_HEADER)
       .pathParam("id", EXAMPLE_FILTER_ID)
       .then().expect()
       .statusCode(Status.OK.getStatusCode())
@@ -380,7 +378,7 @@ public abstract class AbstractFilterRestServiceInteractionTest extends AbstractR
     when(filterServiceMock.singleResult(anyString(), any(Query.class))).thenReturn(null);
 
     given()
-      .header("Accept", Hal.MEDIA_TYPE_HAL)
+      .header(ACCEPT_HAL_HEADER)
       .pathParam("id", EXAMPLE_FILTER_ID)
     .then().expect()
       .statusCode(Status.OK.getStatusCode())
@@ -398,7 +396,7 @@ public abstract class AbstractFilterRestServiceInteractionTest extends AbstractR
       .when(filterServiceMock).singleResult(anyString(), any(Query.class));
 
     given()
-      .header("Accept", Hal.MEDIA_TYPE_HAL)
+      .header(ACCEPT_HAL_HEADER)
       .pathParam("id", EXAMPLE_FILTER_ID)
     .then().expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode())
@@ -411,7 +409,7 @@ public abstract class AbstractFilterRestServiceInteractionTest extends AbstractR
   @Test
   public void testExecuteSingleResultOfNonExistingFilter() {
     given()
-      .header("Accept", MediaType.APPLICATION_JSON)
+      .header(ACCEPT_JSON_HEADER)
       .pathParam("id", MockProvider.NON_EXISTING_ID)
     .then().expect()
       .statusCode(Status.NOT_FOUND.getStatusCode())
@@ -424,7 +422,7 @@ public abstract class AbstractFilterRestServiceInteractionTest extends AbstractR
   @Test
   public void testExecuteSingleResultAsPost() {
     given()
-      .header("Accept", MediaType.APPLICATION_JSON)
+      .header(ACCEPT_JSON_HEADER)
       .pathParam("id", EXAMPLE_FILTER_ID)
       .contentType(POST_JSON_CONTENT_TYPE)
       .body(EMPTY_JSON_OBJECT)
@@ -439,7 +437,7 @@ public abstract class AbstractFilterRestServiceInteractionTest extends AbstractR
   @Test
   public void testExecuteHalSingleResultAsPost() {
     given()
-      .header("Accept", Hal.MEDIA_TYPE_HAL)
+      .header(ACCEPT_HAL_HEADER)
       .pathParam("id", EXAMPLE_FILTER_ID)
       .contentType(POST_JSON_CONTENT_TYPE)
       .body(EMPTY_JSON_OBJECT)
@@ -454,7 +452,7 @@ public abstract class AbstractFilterRestServiceInteractionTest extends AbstractR
   @Test
   public void testExecuteSingleResultInvalidWithExtendingQuery() {
     given()
-      .header("Accept", MediaType.APPLICATION_JSON)
+      .header(ACCEPT_JSON_HEADER)
       .pathParam("id", EXAMPLE_FILTER_ID)
       .contentType(POST_JSON_CONTENT_TYPE)
       .body(invalidExtendingQuery)
@@ -467,7 +465,7 @@ public abstract class AbstractFilterRestServiceInteractionTest extends AbstractR
   @Test
   public void testExecuteSingleResultWithExtendingQuery() {
     given()
-      .header("Accept", MediaType.APPLICATION_JSON)
+      .header(ACCEPT_JSON_HEADER)
       .pathParam("id", EXAMPLE_FILTER_ID)
       .contentType(POST_JSON_CONTENT_TYPE)
       .body(extendingQueryDto)
@@ -483,7 +481,7 @@ public abstract class AbstractFilterRestServiceInteractionTest extends AbstractR
   @Test
   public void testExecuteList() {
     given()
-      .header("Accept", MediaType.APPLICATION_JSON)
+      .header(ACCEPT_JSON_HEADER)
       .pathParam("id", EXAMPLE_FILTER_ID)
     .then().expect()
       .statusCode(Status.OK.getStatusCode())
@@ -499,7 +497,7 @@ public abstract class AbstractFilterRestServiceInteractionTest extends AbstractR
     when(filterServiceMock.list(anyString(), any(Query.class))).thenReturn(Collections.emptyList());
 
     given()
-      .header("Accept", MediaType.APPLICATION_JSON)
+      .header(ACCEPT_JSON_HEADER)
       .pathParam("id", EXAMPLE_FILTER_ID)
     .then().expect()
       .statusCode(Status.OK.getStatusCode())
@@ -513,7 +511,7 @@ public abstract class AbstractFilterRestServiceInteractionTest extends AbstractR
   @Test
   public void testExecuteHalList() {
     given()
-      .header("Accept", Hal.MEDIA_TYPE_HAL)
+      .header(ACCEPT_HAL_HEADER)
       .pathParam("id", EXAMPLE_FILTER_ID)
     .then().expect()
       .statusCode(Status.OK.getStatusCode())
@@ -529,7 +527,7 @@ public abstract class AbstractFilterRestServiceInteractionTest extends AbstractR
     when(filterServiceMock.list(anyString(), any(Query.class))).thenReturn(Collections.emptyList());
 
     given()
-      .header("Accept", Hal.MEDIA_TYPE_HAL)
+      .header(ACCEPT_HAL_HEADER)
       .pathParam("id", EXAMPLE_FILTER_ID)
     .then().expect()
       .statusCode(Status.OK.getStatusCode())
@@ -545,7 +543,7 @@ public abstract class AbstractFilterRestServiceInteractionTest extends AbstractR
   @Test
   public void testExecuteListOfNonExistingFilter() {
     given()
-      .header("Accept", MediaType.APPLICATION_JSON)
+      .header(ACCEPT_JSON_HEADER)
       .pathParam("id", MockProvider.NON_EXISTING_ID)
     .then().expect()
       .statusCode(Status.NOT_FOUND.getStatusCode())
@@ -558,7 +556,7 @@ public abstract class AbstractFilterRestServiceInteractionTest extends AbstractR
   @Test
   public void testExecuteListWithPagination() {
     given()
-      .header("Accept", MediaType.APPLICATION_JSON)
+      .header(ACCEPT_JSON_HEADER)
       .pathParam("id", EXAMPLE_FILTER_ID)
       .queryParams("firstResult", 1)
       .queryParams("maxResults", 2)
@@ -574,7 +572,7 @@ public abstract class AbstractFilterRestServiceInteractionTest extends AbstractR
   @Test
   public void testExecuteListAsPost() {
     given()
-      .header("Accept", MediaType.APPLICATION_JSON)
+      .header(ACCEPT_JSON_HEADER)
       .pathParam("id", EXAMPLE_FILTER_ID)
       .contentType(POST_JSON_CONTENT_TYPE)
       .body(EMPTY_JSON_OBJECT)
@@ -590,7 +588,7 @@ public abstract class AbstractFilterRestServiceInteractionTest extends AbstractR
   @Test
   public void testExecuteHalListAsPost() {
     given()
-      .header("Accept", Hal.MEDIA_TYPE_HAL)
+      .header(ACCEPT_HAL_HEADER)
       .pathParam("id", EXAMPLE_FILTER_ID)
       .contentType(POST_JSON_CONTENT_TYPE)
       .body(EMPTY_JSON_OBJECT)
@@ -606,7 +604,7 @@ public abstract class AbstractFilterRestServiceInteractionTest extends AbstractR
   @Test
   public void testExecuteListAsPostWithPagination() {
     given()
-      .header("Accept", MediaType.APPLICATION_JSON)
+      .header(ACCEPT_JSON_HEADER)
       .pathParam("id", EXAMPLE_FILTER_ID)
       .queryParams("firstResult", 1)
       .queryParams("maxResults", 2)
@@ -624,7 +622,7 @@ public abstract class AbstractFilterRestServiceInteractionTest extends AbstractR
   @Test
   public void testExecuteListWithExtendingQuery() {
     given()
-      .header("Accept", MediaType.APPLICATION_JSON)
+      .header(ACCEPT_JSON_HEADER)
       .pathParam("id", EXAMPLE_FILTER_ID)
       .contentType(POST_JSON_CONTENT_TYPE)
       .body(extendingQueryDto)
@@ -640,7 +638,7 @@ public abstract class AbstractFilterRestServiceInteractionTest extends AbstractR
   @Test
   public void testExecuteListWithExtendingQueryWithPagination() {
     given()
-      .header("Accept", MediaType.APPLICATION_JSON)
+      .header(ACCEPT_JSON_HEADER)
       .pathParam("id", EXAMPLE_FILTER_ID)
       .queryParams("firstResult", 1)
       .queryParams("maxResults", 2)
@@ -658,7 +656,7 @@ public abstract class AbstractFilterRestServiceInteractionTest extends AbstractR
   @Test
   public void testExecuteListWithInvalidExtendingQuery() {
     given()
-      .header("Accept", MediaType.APPLICATION_JSON)
+      .header(ACCEPT_JSON_HEADER)
       .pathParam("id", EXAMPLE_FILTER_ID)
       .contentType(POST_JSON_CONTENT_TYPE)
       .body(invalidExtendingQuery)
@@ -671,7 +669,7 @@ public abstract class AbstractFilterRestServiceInteractionTest extends AbstractR
   @Test
   public void testExecuteCount() {
     given()
-      .header("Accept", MediaType.APPLICATION_JSON)
+      .header(ACCEPT_JSON_HEADER)
       .pathParam("id", EXAMPLE_FILTER_ID)
     .then().expect()
       .statusCode(Status.OK.getStatusCode())
@@ -685,7 +683,7 @@ public abstract class AbstractFilterRestServiceInteractionTest extends AbstractR
   @Test
   public void testExecuteCountOfNonExistingFilter() {
     given()
-      .header("Accept", MediaType.APPLICATION_JSON)
+      .header(ACCEPT_JSON_HEADER)
       .pathParam("id", MockProvider.NON_EXISTING_ID)
     .then().expect()
       .statusCode(Status.NOT_FOUND.getStatusCode())
@@ -698,7 +696,7 @@ public abstract class AbstractFilterRestServiceInteractionTest extends AbstractR
   @Test
   public void testExecuteCountAsPost() {
     given()
-      .header("Accept", MediaType.APPLICATION_JSON)
+      .header(ACCEPT_JSON_HEADER)
       .pathParam("id", EXAMPLE_FILTER_ID)
       .contentType(POST_JSON_CONTENT_TYPE)
       .body(EMPTY_JSON_OBJECT)
@@ -714,7 +712,7 @@ public abstract class AbstractFilterRestServiceInteractionTest extends AbstractR
   @Test
   public void testExecuteCountWithExtendingQuery() {
     given()
-      .header("Accept", MediaType.APPLICATION_JSON)
+      .header(ACCEPT_JSON_HEADER)
       .pathParam("id", EXAMPLE_FILTER_ID)
       .contentType(POST_JSON_CONTENT_TYPE)
       .body(extendingQueryDto)
@@ -730,7 +728,7 @@ public abstract class AbstractFilterRestServiceInteractionTest extends AbstractR
   @Test
   public void testExecuteCountWithInvalidExtendingQuery() {
     given()
-      .header("Accept", MediaType.APPLICATION_JSON)
+      .header(ACCEPT_JSON_HEADER)
       .pathParam("id", EXAMPLE_FILTER_ID)
       .contentType(POST_JSON_CONTENT_TYPE)
       .body(invalidExtendingQuery)
@@ -953,7 +951,7 @@ public abstract class AbstractFilterRestServiceInteractionTest extends AbstractR
 
     given()
       .pathParam("id", EXAMPLE_FILTER_ID)
-      .header("Accept", Hal.MEDIA_TYPE_HAL)
+      .header(ACCEPT_HAL_HEADER)
     .expect()
       .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
     .when()
@@ -975,7 +973,7 @@ public abstract class AbstractFilterRestServiceInteractionTest extends AbstractR
 
     given()
       .pathParam("id", EXAMPLE_FILTER_ID)
-      .header("Accept", Hal.MEDIA_TYPE_HAL)
+      .header(ACCEPT_HAL_HEADER)
     .expect()
       .statusCode(Status.OK.getStatusCode())
       .body("_embedded", equalTo(null))
@@ -1008,7 +1006,7 @@ public abstract class AbstractFilterRestServiceInteractionTest extends AbstractR
 
     given()
       .pathParam("id", EXAMPLE_FILTER_ID)
-      .header("Accept", Hal.MEDIA_TYPE_HAL)
+      .header(ACCEPT_HAL_HEADER)
     .expect()
       .statusCode(Status.OK.getStatusCode())
       .body("_embedded.containsKey('variable')", is(true))
@@ -1050,7 +1048,7 @@ public abstract class AbstractFilterRestServiceInteractionTest extends AbstractR
 
     Response response = given()
       .pathParam("id", EXAMPLE_FILTER_ID)
-      .header("Accept", Hal.MEDIA_TYPE_HAL)
+      .header(ACCEPT_HAL_HEADER)
     .expect()
       .statusCode(Status.OK.getStatusCode())
       .body("_embedded.containsKey('variable')", is(true))
@@ -1118,7 +1116,7 @@ public abstract class AbstractFilterRestServiceInteractionTest extends AbstractR
 
     Response response = given()
       .pathParam("id", EXAMPLE_FILTER_ID)
-      .header("Accept", Hal.MEDIA_TYPE_HAL)
+      .header(ACCEPT_HAL_HEADER)
     .expect()
       .statusCode(Status.OK.getStatusCode())
       .body("_embedded.task.size", equalTo(3))

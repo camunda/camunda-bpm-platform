@@ -27,6 +27,7 @@ import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.persistence.entity.ActivityInstanceImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.TransitionInstanceImpl;
+import org.camunda.bpm.engine.rest.hal.Hal;
 import org.camunda.bpm.engine.rest.spi.ProcessEngineProvider;
 import org.camunda.bpm.engine.rest.spi.impl.MockedProcessEngineProvider;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
@@ -34,12 +35,17 @@ import org.camunda.bpm.engine.runtime.TransitionInstance;
 import org.junit.BeforeClass;
 
 import com.jayway.restassured.RestAssured;
+import com.jayway.restassured.response.Header;
 
 public abstract class AbstractRestServiceTest {
 
   protected static ProcessEngine processEngine;
   protected static final String TEST_RESOURCE_ROOT_PATH = "/rest-test";
   protected static int PORT;
+
+  protected static final Header ACCEPT_WILDCARD_HEADER = new Header("Accept", MediaType.WILDCARD);
+  protected static final Header ACCEPT_JSON_HEADER = new Header("Accept", MediaType.APPLICATION_JSON);
+  protected static final Header ACCEPT_HAL_HEADER = new Header("Accept", Hal.MEDIA_TYPE_HAL);
 
   protected static final String POST_JSON_CONTENT_TYPE = ContentType.create(MediaType.APPLICATION_JSON, "UTF-8").toString();
   protected static final String XHTML_XML_CONTENT_TYPE = ContentType.create(MediaType.APPLICATION_XHTML_XML).toString();

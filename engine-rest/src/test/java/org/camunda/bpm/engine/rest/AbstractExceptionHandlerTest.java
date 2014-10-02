@@ -24,7 +24,7 @@ public abstract class AbstractExceptionHandlerTest extends AbstractRestServiceTe
   
   @Test
   public void testGeneralExceptionHandler() {
-    given().header("Accept", "*/*")
+    given().header(ACCEPT_WILDCARD_HEADER)
     .expect().contentType(ContentType.JSON)
       .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
       .body("type", equalTo(Exception.class.getSimpleName()))
@@ -34,7 +34,7 @@ public abstract class AbstractExceptionHandlerTest extends AbstractRestServiceTe
   
   @Test
   public void testRestExceptionHandler() {
-    given().header("Accept", "*/*")
+    given().header(ACCEPT_WILDCARD_HEADER)
     .expect().contentType(ContentType.JSON)
       .statusCode(Status.BAD_REQUEST.getStatusCode())
       .body("type", equalTo(RestException.class.getSimpleName()))
@@ -44,7 +44,7 @@ public abstract class AbstractExceptionHandlerTest extends AbstractRestServiceTe
   
   @Test
   public void testProcessEngineExceptionHandler() {
-    given().header("Accept", "*/*")
+    given().header(ACCEPT_WILDCARD_HEADER)
     .expect().contentType(ContentType.JSON)
       .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
       .body("type", equalTo(ProcessEngineException.class.getSimpleName()))
@@ -54,7 +54,7 @@ public abstract class AbstractExceptionHandlerTest extends AbstractRestServiceTe
   
   @Test
   public void testAuthorizationExceptionHandler() {
-    given().header("Accept", "*/*")
+    given().header(ACCEPT_WILDCARD_HEADER)
     .expect().contentType(ContentType.JSON)
       .statusCode(Status.FORBIDDEN.getStatusCode())
       .body("type", equalTo(AuthorizationException.class.getSimpleName()))

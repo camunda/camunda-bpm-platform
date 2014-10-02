@@ -1229,7 +1229,7 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
 
     // get
     given()
-      .header("Accept", MediaType.APPLICATION_JSON)
+      .header(ACCEPT_JSON_HEADER)
       .queryParams(params)
     .expect()
       .statusCode(Status.OK.getStatusCode())
@@ -1244,7 +1244,7 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
     // post
     given()
       .contentType(POST_JSON_CONTENT_TYPE)
-      .header("Accept", MediaType.APPLICATION_JSON)
+      .header(ACCEPT_JSON_HEADER)
       .body(params)
     .expect()
       .statusCode(Status.OK.getStatusCode())
