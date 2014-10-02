@@ -35,6 +35,7 @@ define([
 
         var _scopeEvents = [];
         $scope.$on('$destroy', function() {
+          console.info('filters scope destroy');
           angular.forEach(_scopeEvents, function(fn) { fn(); });
         });
 

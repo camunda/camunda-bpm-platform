@@ -26,13 +26,14 @@ define([
       template: template,
 
       link: function(scope, element) {
-        scope.loading = false;
-        scope.rendering = false;
-        scope.process = null;
-
+        var process;
         var viewer = new Viewer({
           container: element.find('.diagram-holder')
         });
+
+
+        scope.loading = false;
+        scope.rendering = false;
 
 
         function resizeContainer() {
@@ -47,6 +48,48 @@ define([
           }
         }
 
+
+        function renderDiagram() {
+          if (!process._xml) { return; }
+          viewer.importXML(process._xml.bpmn20Xml, function(err) {
+            if (err) { throw err; }
+
+            if (!element.width() || !viewer.diagram) { return; }
+            resizeContainer();
+
+            var canvas = viewer.get('canvas');
+            canvas.addMarker(scope.task.taskDefinitionKey, 'highlight');
+            canvas.zoom('fit-viewport');
+
+            scope.rendering = false;
+          });
+        }
+
+
+        scope.drawDiagram = function() {
+          if (!process || !element.width()) { return; }
+          if (!scope.$root.authentication) {
+            throw new Error('Not authenticated');
+          }
+
+          scope.rendering = true;
+
+          if (process._xml) {
+            return renderDiagram();
+          }
+
+          scope.loading = true;
+          ProcessDefinition.xml(process, function(err, xml) {
+            scope.loading = false;
+            if (err) { throw err; }
+
+            process._xml = xml;
+
+            renderDiagram();
+          });
+        };
+
+
         $win.on('resize', renderDiagram);
         element.on('$destroy', function() {
           $win.off('resize', renderDiagram);
@@ -54,43 +97,9 @@ define([
 
 
         scope.$watch('task', function(newV, oldV) {
-          scope.process = scope.task._embedded.processDefinition[0];
+          process = scope.task._embedded.processDefinition[0];
           scope.drawDiagram();
         });
-
-
-        function renderDiagram() {
-          resizeContainer();
-
-          var canvas = viewer.get('canvas');
-          canvas.addMarker(scope.task.taskDefinitionKey, 'highlight');
-          canvas.zoom('fit-viewport');
-
-          scope.rendering = false;
-        }
-
-        scope.drawDiagram = function() {
-          if (!scope.process || !element.width()) { return; }
-
-          scope.loading = true;
-          scope.rendering = true;
-
-          ProcessDefinition.xml(scope.process, function(err, xml) {
-            scope.loading = false;
-            if (err) { throw err; }
-
-            // yes we can
-            $('.bjs-container > a').remove();
-
-            viewer.importXML(xml.bpmn20Xml, function(err) {
-              if (err) { throw err; }
-
-              if (viewer.diagram) {
-                renderDiagram();
-              }
-            });
-          });
-        };
       }
     };
   }];

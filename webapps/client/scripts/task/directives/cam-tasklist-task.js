@@ -33,10 +33,9 @@ define([
       template: template,
 
       link: function(scope, element) {
-        scope.task = scope.task || $rootScope.currentTask;
-
         var _scopeEvents = [];
-        scope.$on('$destroy', function() {
+        element.on('$destroy', function() {
+          console.info('destroy task directive element');
           angular.forEach(_scopeEvents, function(fn) { fn(); });
         });
 
@@ -104,15 +103,14 @@ define([
         }
 
         scope.selectTab = function(tabName) {
+          console.info('scope.selectTab', tabName);
           if (tabName === 'diagram') {
             scope.drawDiagram();
           }
-
-
-          var state = $location.search();
-          state.tab = state.tab = tabName;
-          $location.search(state);
-          // scope.tabs[tabName] = true;
+          // var state = $location.search();
+          // state.tab = state.tab = tabName;
+          // $location.search(state);
+          // // scope.tabs[tabName] = true;
         };
 
         scope.fullscreenForm = function() {
@@ -125,7 +123,16 @@ define([
 
         scope.$on('tasklist.task.current', setTask);
 
-        _scopeEvents.push($rootScope.$on('$locationChangeSuccess', setTask));
+        // _scopeEvents.push($rootScope.$on('$locationChangeSuccess', setTask));
+
+        _scopeEvents.push($rootScope.$on('$locationChangeSuccess', function() {
+          var state = $location.search();
+          var urlTaskId = state.task;
+          if (!$rootScope.currentTask || $rootScope.currentTask.id !== urlTaskId) {
+            console.info('should load task', urlTaskId);
+            // loadTask(urlTaskId);
+          }
+        }));
 
         setTask();
       }

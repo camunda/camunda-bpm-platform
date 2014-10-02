@@ -203,6 +203,10 @@ define([
 
 
         function loadForm(targetContainer) {
+          if (!scope.$root.authentication) {
+            throw new Error('Not authenticated');
+          }
+
           targetContainer = targetContainer || container;
           scope._camForm = null;
 

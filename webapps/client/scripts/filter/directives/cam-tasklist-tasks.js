@@ -60,11 +60,12 @@ define([
 
       template: template,
 
-      link: function(scope) {
+      link: function(scope, element) {
         var dateExp = /(Before|After)$/;
 
         var _scopeEvents = [];
-        scope.$on('$destroy', function() {
+        element.on('$destroy', function() {
+          console.info('task element destroyed');
           angular.forEach(_scopeEvents, function(fn) { fn(); });
         });
 

@@ -86,6 +86,9 @@ define('camunda-tasklist-ui', [
 
 
       function checkFilterCreationAccess() {
+        if (!isAuth()) {
+          throw new Error('Not authenticated');
+        }
         var Filter = camAPI.resource('filter');
 
         $rootScope.authentication.userCanCreateFilter = false;
