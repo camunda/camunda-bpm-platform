@@ -242,6 +242,8 @@ define([
         $scope._generalErrorsByField[err.field] = err.message;
       });
 
+      isValid();
+
       return $scope._generalErrors.length ? $scope._generalErrors : false;
     };
 
@@ -301,7 +303,6 @@ define([
         }
       }
 
-      isValid();
       return criterion.error;
     };
 
@@ -316,6 +317,7 @@ define([
         }
       });
 
+      isValid();
       return $scope._queryErrors.length ? $scope._queryErrors : false;
     };
 
@@ -418,7 +420,6 @@ define([
 
       // }
 
-      isValid();
       return authorization.error;
     };
 
@@ -433,6 +434,7 @@ define([
         }
       });
 
+      isValid();
       return $scope._authorizationErrors.length ? $scope._authorizationErrors : false;
     };
 
@@ -472,7 +474,6 @@ define([
         variable.error = {field: 'label', message: 'REQUIRED_FIELD'};
       }
 
-      isValid();
       return variable.error;
     };
 
@@ -486,7 +487,8 @@ define([
           $scope._variableErrors.push(error);
         }
       });
-
+      
+      isValid();
       return $scope._variableErrors.length ? $scope._variableErrors : false;
     };
 
