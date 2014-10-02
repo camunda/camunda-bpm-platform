@@ -238,6 +238,7 @@ public abstract class AbstractFilterRestServiceQueryTest extends AbstractRestSer
     return params;
   }
 
+  @SuppressWarnings("unchecked")
   protected void verifyFilterMock(Response response) {
     InOrder inOrder = inOrder(mockedQuery);
     inOrder.verify(mockedQuery).filterId(MockProvider.EXAMPLE_FILTER_ID);
@@ -257,11 +258,19 @@ public abstract class AbstractFilterRestServiceQueryTest extends AbstractRestSer
     Map<String, Object> returnedQuery = from(content).getJsonObject("[0].query");
     Map<String, Object> returnedProperties = from(content).getJsonObject("[0].properties");
 
+    Map<String, String> expectedVariable = new HashMap<String, String>();
+    expectedVariable.put("name", "foo");
+    expectedVariable.put("value", "bar");
+    expectedVariable.put("operator", "eq");
+
     assertThat(returnedFilterId).isEqualTo(MockProvider.EXAMPLE_FILTER_ID);
     assertThat(returnedResourceType).isEqualTo(MockProvider.EXAMPLE_FILTER_RESOURCE_TYPE);
     assertThat(returnedName).isEqualTo(MockProvider.EXAMPLE_FILTER_NAME);
     assertThat(returnedOwner).isEqualTo(MockProvider.EXAMPLE_FILTER_OWNER);
     assertThat(returnedQuery.get("name")).isEqualTo(MockProvider.EXAMPLE_FILTER_QUERY_DTO.getName());
+    assertThat((List<Map<String, String>>) returnedQuery.get("processVariables")).hasSize(1).containsExactly(expectedVariable);
+    assertThat((List<Map<String, String>>) returnedQuery.get("taskVariables")).hasSize(1).containsExactly(expectedVariable);
+    assertThat((List<Map<String, String>>) returnedQuery.get("caseInstanceVariables")).hasSize(1).containsExactly(expectedVariable);
     assertThat(returnedProperties).isEqualTo(MockProvider.EXAMPLE_FILTER_PROPERTIES);
 
     assertThat(filters.get(1)).isNotNull();

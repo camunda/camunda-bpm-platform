@@ -457,7 +457,7 @@ public abstract class MockProvider {
   public static final String EXAMPLE_FILTER_RESOURCE_TYPE = EntityTypes.TASK;
   public static final String EXAMPLE_FILTER_NAME = "aFilterName";
   public static final String EXAMPLE_FILTER_OWNER = "aFilterOwner";
-  public static final Query EXAMPLE_FILTER_QUERY = new TaskQueryImpl().taskName("test");
+  public static final Query EXAMPLE_FILTER_QUERY = new TaskQueryImpl().taskName("test").processVariableValueEquals("foo", "bar").caseInstanceVariableValueEquals("foo", "bar").taskVariableValueEquals("foo", "bar");
   public static final TaskQueryDto EXAMPLE_FILTER_QUERY_DTO = TaskQueryDto.fromQuery(EXAMPLE_FILTER_QUERY);
   public static final Map<String, Object> EXAMPLE_FILTER_PROPERTIES = Collections.singletonMap("color", (Object) "#112233");
 
