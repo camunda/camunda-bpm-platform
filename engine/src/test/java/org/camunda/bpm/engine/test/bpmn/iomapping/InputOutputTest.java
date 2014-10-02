@@ -12,6 +12,7 @@
  */
 package org.camunda.bpm.engine.test.bpmn.iomapping;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,6 +22,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.Execution;
+import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.task.Task;
@@ -811,6 +813,139 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
       assertTextPresent("Output parameters not allowed for multi-instance constructs", e.getMessage());
     }
 
+  }
+
+  @Deployment
+  public void FAILING_testOutputMappingOnErrorBoundaryEvent() {
+
+    // case 1: no error occurs
+    runtimeService.startProcessInstanceByKey("testProcess");
+
+    Task task = taskService.createTaskQuery().singleResult();
+
+    assertNotNull(task);
+    assertEquals("taskOk", task.getTaskDefinitionKey());
+
+    // then: variable mapped exists
+    assertEquals(0, runtimeService.createVariableInstanceQuery().variableName("localNotMapped").count());
+    assertEquals(0, runtimeService.createVariableInstanceQuery().variableName("localMapped").count());
+    assertEquals(1, runtimeService.createVariableInstanceQuery().variableName("mapped").count());
+
+    taskService.complete(task.getId());
+
+    assertEquals(0, runtimeService.createProcessInstanceQuery().count());
+
+    // case 2: error occurs
+    runtimeService.startProcessInstanceByKey("testProcess", Collections.<String, Object>singletonMap("throwError", true));
+
+    task = taskService.createTaskQuery().singleResult();
+
+    assertNotNull(task);
+    assertEquals("taskError", task.getTaskDefinitionKey());
+
+    assertEquals(0, runtimeService.createVariableInstanceQuery().variableName("localNotMapped").count());
+    assertEquals(0, runtimeService.createVariableInstanceQuery().variableName("localMapped").count());
+    assertEquals(0, runtimeService.createVariableInstanceQuery().variableName("mapped").count());
+
+    taskService.complete(task.getId());
+
+    assertEquals(0, runtimeService.createProcessInstanceQuery().count());
+  }
+
+  @Deployment
+  public void FAILING_testOutputMappingOnMessageBoundaryEvent() {
+
+    // case 1: no error occurs
+    runtimeService.startProcessInstanceByKey("testProcess");
+
+    Task task = taskService.createTaskQuery().singleResult();
+
+    assertNotNull(task);
+    assertEquals("wait", task.getTaskDefinitionKey());
+
+    taskService.complete(task.getId());
+
+    task = taskService.createTaskQuery().singleResult();
+
+    assertNotNull(task);
+    assertEquals("taskOk", task.getTaskDefinitionKey());
+
+    // then: variable mapped exists
+    assertEquals(1, runtimeService.createVariableInstanceQuery().variableName("mapped").count());
+
+    taskService.complete(task.getId());
+
+    assertEquals(0, runtimeService.createProcessInstanceQuery().count());
+
+    // case 2: error occurs
+    runtimeService.startProcessInstanceByKey("testProcess", Collections.<String, Object>singletonMap("throwError", true));
+
+    task = taskService.createTaskQuery().singleResult();
+
+    assertNotNull(task);
+    assertEquals("wait", task.getTaskDefinitionKey());
+
+    runtimeService.correlateMessage("message");
+
+    task = taskService.createTaskQuery().singleResult();
+
+    assertNotNull(task);
+    assertEquals("taskError", task.getTaskDefinitionKey());
+
+    assertEquals(0, runtimeService.createVariableInstanceQuery().variableName("mapped").count());
+
+    taskService.complete(task.getId());
+
+    assertEquals(0, runtimeService.createProcessInstanceQuery().count());
+  }
+
+  @Deployment
+  public void FAILING_testOutputMappingOnTimerBoundaryEvent() {
+
+    // case 1: no error occurs
+    runtimeService.startProcessInstanceByKey("testProcess");
+
+    Task task = taskService.createTaskQuery().singleResult();
+
+    assertNotNull(task);
+    assertEquals("wait", task.getTaskDefinitionKey());
+
+    taskService.complete(task.getId());
+
+    task = taskService.createTaskQuery().singleResult();
+
+    assertNotNull(task);
+    assertEquals("taskOk", task.getTaskDefinitionKey());
+
+    // then: variable mapped exists
+    assertEquals(1, runtimeService.createVariableInstanceQuery().variableName("mapped").count());
+
+    taskService.complete(task.getId());
+
+    assertEquals(0, runtimeService.createProcessInstanceQuery().count());
+
+    // case 2: error occurs
+    runtimeService.startProcessInstanceByKey("testProcess", Collections.<String, Object>singletonMap("throwError", true));
+
+    task = taskService.createTaskQuery().singleResult();
+
+    assertNotNull(task);
+    assertEquals("wait", task.getTaskDefinitionKey());
+
+    Job job = managementService.createJobQuery().singleResult();
+    assertNotNull(job);
+    managementService.executeJob(job.getId());
+
+    task = taskService.createTaskQuery().singleResult();
+
+    assertNotNull(task);
+    assertEquals("taskError", task.getTaskDefinitionKey());
+
+    assertEquals(0, runtimeService.createVariableInstanceQuery().variableName("mapped").count());
+
+    taskService.complete(task.getId());
+
+    assertEquals(0, runtimeService.createProcessInstanceQuery().count());
   }
 
 }
