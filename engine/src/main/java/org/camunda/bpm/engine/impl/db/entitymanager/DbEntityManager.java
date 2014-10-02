@@ -264,11 +264,19 @@ public class DbEntityManager implements Session {
   }
 
   protected void handleOptimisticLockingException(DbOperation dbOperation) {
+    boolean isHandled = false;
+
     if(optimisticLockingListeners != null) {
       for (OptimisticLockingListener optimisticLockingListener : optimisticLockingListeners) {
-        optimisticLockingListener.failedOperation(dbOperation);
+        if(optimisticLockingListener.getEntityType() == null
+            || optimisticLockingListener.getEntityType().isAssignableFrom(dbOperation.getEntityType())) {
+          optimisticLockingListener.failedOperation(dbOperation);
+          isHandled = true;
+        }
       }
-    } else {
+    }
+
+    if(!isHandled) {
       throw new OptimisticLockingException("Could not execute "+dbOperation + ". Entity was updated by another transaction concurrently");
     }
   }

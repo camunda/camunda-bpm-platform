@@ -19,6 +19,7 @@ import java.util.List;
 
 import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.entitymanager.OptimisticLockingListener;
 import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbEntityOperation;
 import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperation;
@@ -95,6 +96,10 @@ public class AcquireJobsCmd implements Command<AcquiredJobs>, OptimisticLockingL
     gregorianCalendar.setTime(ClockUtil.getCurrentTime());
     gregorianCalendar.add(Calendar.MILLISECOND, lockTimeInMillis);
     job.setLockExpirationTime(gregorianCalendar.getTime());
+  }
+
+  public Class<? extends DbEntity> getEntityType() {
+    return JobEntity.class;
   }
 
   public void failedOperation(DbOperation operation) {

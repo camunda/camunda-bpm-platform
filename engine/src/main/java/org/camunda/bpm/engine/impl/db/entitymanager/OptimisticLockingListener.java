@@ -12,6 +12,7 @@
  */
 package org.camunda.bpm.engine.impl.db.entitymanager;
 
+import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperation;
 import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperationType;
 
@@ -25,6 +26,20 @@ import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperationType;
  */
 public interface OptimisticLockingListener {
 
+  /**
+   * The type of the entity for which this listener should be notified.
+   * If the implementation returns 'null', the listener is notified for all
+   * entity types.
+   *
+   * @return the entity type for which the listener should be notified.
+   */
+  Class<? extends DbEntity> getEntityType();
+
+  /**
+   * Signifies that an operation failed due to optimistic locking.
+   *
+   * @param operation the failed operation.
+   */
   void failedOperation(DbOperation operation);
 
 }
