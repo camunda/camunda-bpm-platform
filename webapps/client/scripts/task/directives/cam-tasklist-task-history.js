@@ -10,36 +10,79 @@ define([
   template
 ) {
   'use strict';
-  return [function() {
+  return ['camAPI',
+  function(camAPI) {
+    var History = camAPI.resource('history');
     return {
+      scope: {
+        task : '='
+      },
       link: function($scope) {
         $scope.history = [];
         $scope.days = [];
+        var loadHistory = function(taskId) {
+          History.userOperation({
+            taskId : taskId
+          }, function(err, historyData) {
+            $scope.history = historyData;
+            var days = {};
+            var daysArray = [];
+            angular.forEach($scope.history, function(event) {
+              var mom = moment(event.timestamp, 'YYYY-MM-DDTHH:mm:ss');
+              var date = mom.format('DD-MMMM-YYYY');
+              var time = mom.format('HH:mm');
+              var parts = date.split('-');
 
-        $scope.$on('tasklist.task.current', function() {
-          // scope.history = camTaskHistoryData(null, null);
-          $scope.history = [];
-          $scope.now = new Date();
-          var days = {};
-          angular.forEach($scope.history, function(event) {
-            var mom = moment(event.timestamp, 'X');
-            var date = mom.format('DD-MMMM-YYYY');
-            var time = mom.format('HH:mm');
-            var parts = date.split('-');
+              // create object for each day, containing the events for this day
+              if(!days[date]) {
+                days[date] = {
+                  date: {
+                    day: parts[0],
+                    monthWord: parts[1],
+                    month: mom.format('MM'),
+                    year: parts[2]
+                  },
+                  events: {},
+                  eventArray: []
+                };
+                daysArray.push(days[date]);
+              }
+              
+              // process formatting of time
+              switch(event.property) {
+                case 'dueDate':
+                case 'followUpDate':
+                  if(event.orgValue) {
+                    event.orgValue = moment(event.orgValue / 1000, 'X').format('DD. MMMM YYYY HH:mm');
+                  }
+                  event.newValue = moment(event.newValue / 1000, 'X').format('DD. MMMM YYYY HH:mm');
+                  break;
+              }
 
-            days[date] = days[date] || {
-              date: {
-                day: parts[0],
-                month: parts[1],
-                year: parts[2]
-              },
-              events: {}
-            };
-            days[date].events[time] = days[date].events[time] || [];
-            days[date].events[time].push(event);
+              // create event object for each operationId
+              if(!days[date].events[event.operationId]) {
+                days[date].events[event.operationId] = {
+                  time: time, 
+                  type: event.operationType,
+                  userId: event.userId, 
+                  subEvents: []
+                };
+                days[date].eventArray.push(days[date].events[event.operationId]);
+              }
+              days[date].events[event.operationId].subEvents.push(event);
+            });
+            $scope.days = daysArray;
           });
-          $scope.days = days;
+        };
+        loadHistory($scope.task.id);
+        $scope.$on('tasklist.task.current', function(evt) {
+          loadHistory(evt.targetScope.currentTask.id);
         });
+        $scope.$on('tasklist.task.update', function(evt) {
+          loadHistory(evt.targetScope.currentTask.id);
+        });
+        
+        
       },
       template: template
     };

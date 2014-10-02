@@ -39,6 +39,7 @@ define([
           angular.forEach(_scopeEvents, function(fn) { fn(); });
         });
 
+		    //active tabs
         scope.tabs = {
           form: true,
           description: false,

@@ -65,13 +65,12 @@
           <div class="description-pane">{{ task.description }}</div>
         </tab>
 
-        <tab ng-if="history"
-             active="tabs.history"
+        <tab active="tabs.history"
              select="selectTab('history')"
              heading="{{ 'HISTORY' | translate }}">
           <div class="history-pane"
                cam-tasklist-task-history
-               history="history">
+               task="task">
           </div>
         </tab>
 

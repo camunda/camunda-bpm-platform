@@ -107,7 +107,8 @@
   }
 }
 .row.instant,
-.instant .event {
+.instant .event,
+.event-header {
   margin-bottom: (@grid-gutter-width / 2);
 }
 
@@ -121,11 +122,11 @@
     text-align: center;
   }
   .day {
-    font-size: 160%;
+    font-size: 140%;
   }
   .month {
-    padding: (@grid-gutter-width / 6) 0;
-    margin: (@grid-gutter-width / 6) 0;
+    padding: (@grid-gutter-width / 24) 0;
+    margin: (@grid-gutter-width / 24) 0;
     border: 1px dashed @gray-light;
     border-width: 1px 0;
   }
@@ -162,6 +163,23 @@
   width: 80%;
   padding-bottom: 80%;
   margin: auto;
+}
+
+.operation-type {
+  font-size: 140%;
+}
+
+.original-value {
+  text-decoration: line-through;
+}
+
+.operation-user {
+  float: right;
+}
+
+.event-property {
+  font-weight: bold;
+  padding-right: (@grid-gutter-width / 2); 
 }
 
 // .well.no-task {
