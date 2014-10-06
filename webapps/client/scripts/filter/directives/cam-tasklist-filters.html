@@ -8,18 +8,17 @@
      ng-repeat="(delta, filter) in filters | orderBy:'properties.priority'"
      class="task-filter-wrapper"
      ng-class="{active: filter.id === focusedId}"
-     style="z-index: {{ ((filters.length + 10) - delta) }};">
+     style="z-index: {{ ((filters.length + 10) - delta) }};"
+     data-filter-id="{{filter.id}}">
 
-  <div class="task-filter"
-       style="background-color: {{ filter.properties.color }}">
+  <div class="task-filter">
 
     <div class="counter">{{ filter.itemCount }}</div>
 
     <h4 class="name"
         ng-click="focus(filter)">{{ filter.name }}</h4>
 
-    <div class="info"
-         style="background-color: {{ filter.properties.color }}">
+    <div class="info">
 
       <ul class="filter-actions list-unstyled">
         <li>
