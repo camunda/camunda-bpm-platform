@@ -116,6 +116,18 @@ public class InputOutputEventTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  public void testNoneEndEvent() {
+    try {
+      repositoryService
+        .createDeployment()
+        .addClasspathResource("org/camunda/bpm/engine/test/bpmn/iomapping/InputOutputEventTest.testNoneEndEvent.bpmn20.xml")
+        .deploy();
+      fail("expected exception");
+    } catch (ProcessEngineException e) {
+      assertTextPresent("camunda:outputParameter not allowed for element type 'endEvent'", e.getMessage());
+    }
+  }
+
   @Deployment
   public void testMessageEndEvent() {
     runtimeService.startProcessInstanceByKey("testProcess");

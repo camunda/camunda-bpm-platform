@@ -810,7 +810,7 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
       .deploy();
       fail("Exception expected");
     } catch (ProcessEngineException e) {
-      assertTextPresent("Output parameters not allowed for multi-instance constructs", e.getMessage());
+      assertTextPresent("camunda:outputParameter not allowed for multi-instance constructs", e.getMessage());
     }
 
   }

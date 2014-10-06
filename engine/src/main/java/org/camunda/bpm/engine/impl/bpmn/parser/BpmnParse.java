@@ -3463,13 +3463,9 @@ public class BpmnParse extends Parse {
     if(extensionElements != null) {
       IoMapping inputOutput = parseInputOutput(extensionElements);
       if(inputOutput != null) {
-        if(checkActivityInputOutputSupported(activityElement)) {
+        if(checkActivityInputOutputSupported(activityElement, activity, inputOutput)) {
 
           if (activity.getActivityBehavior() instanceof MultiInstanceActivityBehavior) {
-            if (!inputOutput.getOutputParameters().isEmpty()) {
-              addError("Output parameters not allowed for multi-instance constructs", activityElement);
-            }
-
             MultiInstanceActivityBehavior behavior = (MultiInstanceActivityBehavior) activity.getActivityBehavior();
             behavior.setIoMapping(inputOutput);
 
@@ -3485,7 +3481,7 @@ public class BpmnParse extends Parse {
     }
   }
 
-  protected boolean checkActivityInputOutputSupported(Element activityElement) {
+  protected boolean checkActivityInputOutputSupported(Element activityElement, ActivityImpl activity, IoMapping inputOutput) {
     String tagName = activityElement.getTagName();
 
     if (!(tagName.contains("Task") ||
@@ -3501,7 +3497,28 @@ public class BpmnParse extends Parse {
       return false;
     }
 
-    return true;
+    if (!inputOutput.getOutputParameters().isEmpty()) {
+      return checkActivityOutputParameterSupported(activityElement, activity);
+    }
+    else {
+      return true;
+    }
+  }
+
+  protected boolean checkActivityOutputParameterSupported(Element activityElement, ActivityImpl activity) {
+    String tagName = activityElement.getTagName();
+
+    if (tagName.equals("endEvent")) {
+      addError("camunda:outputParameter not allowed for element type '" + tagName + "'.", activityElement);
+      return true;
+    }
+    else if (activity.getActivityBehavior() instanceof MultiInstanceActivityBehavior) {
+      addError("camunda:outputParameter not allowed for multi-instance constructs", activityElement);
+      return false;
+    }
+    else {
+      return true;
+    }
   }
 
   protected void ensureNoIoMappingDefined(Element element) {
