@@ -35,6 +35,7 @@ define([
       link: function(scope, element) {
         var _scopeEvents = [];
         element.on('$destroy', function() {
+          if (!_scopeEvents.length) { return; }
           console.info('destroy task directive element');
           angular.forEach(_scopeEvents, function(fn) { fn(); });
         });
@@ -47,9 +48,6 @@ define([
         };
 
         scope.elUID = camUID();
-
-        // element.find('.nav li').eq(0).addClass('active');
-        // element.find('.tab-pane').eq(0).addClass('active');
 
         function refreshTabs() {
           var activePane = element.find('.tab-pane.active > div');
@@ -64,21 +62,31 @@ define([
 
 
         function loadTask(taskId) {
-          Task.get(taskId, function(err, task) {
+          Task.get(taskId, function(err, loadedTask) {
             if (err) { throw err; }
 
 
-            task.due = fixReadDateTimezone(task.due);
-            task.followUp = fixReadDateTimezone(task.followUp);
+            loadedTask.due = fixReadDateTimezone(loadedTask.due);
+            loadedTask.followUp = fixReadDateTimezone(loadedTask.followUp);
 
-
-            scope.task = $rootScope.currentTask = task;
+            scope.task = loadedTask;
+            if (!$rootScope.currentTask || $rootScope.currentTask.id !== loadedTask.id) {
+              $rootScope.currentTask = loadedTask;
+            }
             refreshTabs();
           });
         }
 
 
-        function setTask(event) {
+        function setTask(newTask) {
+          if (newTask && newTask.id) {
+            if (!$rootScope.currentTask || $rootScope.currentTask.id !== newTask.id) {
+              $rootScope.currentTask = newTask;
+            }
+            scope.task = newTask;
+            return;
+          }
+
           var state = $location.search();
           var urlTaskId = state.task;
 
@@ -103,14 +111,9 @@ define([
         }
 
         scope.selectTab = function(tabName) {
-          console.info('scope.selectTab', tabName);
           if (tabName === 'diagram') {
             scope.drawDiagram();
           }
-          // var state = $location.search();
-          // state.tab = state.tab = tabName;
-          // $location.search(state);
-          // // scope.tabs[tabName] = true;
         };
 
         scope.fullscreenForm = function() {
@@ -121,20 +124,11 @@ define([
           element.find('[cam-tasklist-task-diagram]').isolateScope().drawDiagram();
         };
 
-        scope.$on('tasklist.task.current', setTask);
+        scope.$on('tasklist.task.current', function(ev, task) {
+          setTask(task);
+        });
 
-        // _scopeEvents.push($rootScope.$on('$locationChangeSuccess', setTask));
-
-        _scopeEvents.push($rootScope.$on('$locationChangeSuccess', function() {
-          var state = $location.search();
-          var urlTaskId = state.task;
-          if (!$rootScope.currentTask || $rootScope.currentTask.id !== urlTaskId) {
-            console.info('should load task', urlTaskId);
-            // loadTask(urlTaskId);
-          }
-        }));
-
-        setTask();
+        setTask($rootScope.currentTask);
       }
     };
   }];

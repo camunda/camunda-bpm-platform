@@ -65,6 +65,7 @@ define([
 
         var _scopeEvents = [];
         element.on('$destroy', function() {
+          if (!_scopeEvents.length) { return; }
           console.info('task element destroyed');
           angular.forEach(_scopeEvents, function(fn) { fn(); });
         });
@@ -95,16 +96,26 @@ define([
 
 
         function setCurrentTask(task, silent) {
-          $rootScope.currentTask = task;
-          if (!silent) {
-            // if there's a task, we pass its ID to the URL,
-            // otherwise we clear the URL
-            $location.search(task ? {
-              task: task.id
-            } : {});
-
-            $rootScope.$broadcast('tasklist.task.current');
+          if (!task && !$rootScope.currentTask) {
+            return;
           }
+
+          if (task && $rootScope.currentTask && task.id === $rootScope.currentTask.id) {
+            return;
+          }
+
+          $rootScope.currentTask = task;
+          $rootScope.$broadcast('tasklist.task.current', task);
+
+          if (silent) {
+            return;
+          }
+
+          // if there's a task, we pass its ID to the URL,
+          // otherwise we clear the URL
+          $location.search(task ? {
+            task: task.id
+          } : {});
         }
 
 
