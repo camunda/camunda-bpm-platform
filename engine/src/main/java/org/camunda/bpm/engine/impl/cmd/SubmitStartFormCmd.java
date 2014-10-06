@@ -19,6 +19,7 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.form.StartFormHelper;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
@@ -61,7 +62,18 @@ public class SubmitStartFormCmd implements Command<ProcessInstance>, Serializabl
       processInstance = processDefinition.createProcessInstance();
     }
 
-    processInstance.startWithFormProperties(properties);
+    // if the start event is async, we have to set the variables already here
+    // since they are lost after the async continuation otherwise
+    // see CAM-2828
+    if (processDefinition.getInitial().isAsyncBefore()) {
+      StartFormHelper.initFormPropertiesOnScope(properties, processInstance);
+      processInstance.start();
+
+    } else {
+      processInstance.startWithFormProperties(properties);
+
+    }
+
 
     return processInstance;
   }
