@@ -79,27 +79,16 @@ define([
 
 
         function setTask(newTask) {
-          if (newTask && newTask.id) {
-            if (!$rootScope.currentTask || $rootScope.currentTask.id !== newTask.id) {
-              $rootScope.currentTask = newTask;
-            }
-            scope.task = newTask;
-            return;
-          }
-
           var state = $location.search();
           var urlTaskId = state.task;
 
-          if ($rootScope.currentTask) {
-            if (urlTaskId && urlTaskId === $rootScope.currentTask.id) {
-              scope.task = $rootScope.currentTask;
-              refreshTabs();
-            }
-            else if (urlTaskId) {
-              loadTask(urlTaskId);
-            }
-          }
-          else if(urlTaskId) {
+          if(
+            urlTaskId &&
+            (
+              !scope.task ||
+              (scope.task && scope.task.id !== urlTaskId)
+            )
+          ) {
             loadTask(urlTaskId);
           }
           else {
