@@ -60,6 +60,10 @@ define([
         $scope.history = [];
         $scope.days = [];
 
+        $scope.isTimestampProperty = function(propertyName) {
+          return ['dueDate', 'followUpDate'].indexOf(propertyName) !== -1;
+        };
+
         var loadHistory = function(taskId) {
           camSDK.utils.series({
             historyData: function(cb) { History.userOperation({taskId : taskId}, cb); },
