@@ -261,11 +261,11 @@ define([
       value: ''
     };
 
-    $scope._query = makeArr(unfixLikes($scope.filter.query));
-
-    each($scope._query, function(obj, o) {
-      if (obj.key === 'taskVariables') {
-        $scope._query.splice(o, 1);
+    $scope._query = [];
+    var varExp = /Variables$/;
+    each(makeArr(unfixLikes($scope.filter.query)), function(obj, o) {
+      if (!varExp.test(obj.key)) {
+        $scope._query.push(obj);
       }
     });
 
