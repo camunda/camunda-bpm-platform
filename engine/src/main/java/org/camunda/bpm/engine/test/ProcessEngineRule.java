@@ -40,14 +40,14 @@ import org.junit.runner.Description;
  * <pre>public class YourTest {
  *
  *   &#64;Rule
- *   public ProcessEngineRule activitiRule = new ProcessEngineRule();
+ *   public ProcessEngineRule processEngineRule = new ProcessEngineRule();
  *
  *   ...
  * }
  * </pre>
  *
  * <p>The ProcessEngine and the services will be made available to the test class
- * through the getters of the activitiRule.
+ * through the getters of the processEngineRule.
  * The processEngine will be initialized by default with the camunda.cfg.xml resource
  * on the classpath.  To specify a different configuration file, pass the
  * resource location in {@link #ProcessEngineRule(String) the appropriate constructor}.
@@ -60,7 +60,7 @@ import org.junit.runner.Description;
  * after the tearDown.
  * </p>
  *
- * <p>The activitiRule also lets you {@link ProcessEngineRule#setCurrentTime(Date) set the current time used by the
+ * <p>The processEngineRule also lets you {@link ProcessEngineRule#setCurrentTime(Date) set the current time used by the
  * process engine}. This can be handy to control the exact time that is used by the engine
  * in order to verify e.g. e.g. due dates of timers.  Or start, end and duration times
  * in the history service.  In the tearDown, the internal clock will automatically be
