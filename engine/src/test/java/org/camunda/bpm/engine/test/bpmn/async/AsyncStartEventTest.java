@@ -281,6 +281,7 @@ public class AsyncStartEventTest extends PluggableProcessEngineTestCase {
             .singleResult();
 
         assertNotNull(historicVariableUpdate);
+        assertEquals(theStartActivityInstanceId, historicVariableUpdate.getActivityInstanceId());
         assertEquals("bar", historicVariableUpdate.getValue());
 
       }
@@ -320,14 +321,6 @@ public class AsyncStartEventTest extends PluggableProcessEngineTestCase {
 
       assertNotNull(historicFormUpdate);
       assertEquals(theStartActivityInstanceId, historicFormUpdate.getActivityInstanceId());
-
-      HistoricDetail historicVariableUpdate = historyService
-          .createHistoricDetailQuery()
-          .variableUpdates()
-          .singleResult();
-
-      assertNotNull(historicVariableUpdate);
-      assertEquals(theStartActivityInstanceId, historicVariableUpdate.getActivityInstanceId());
 
     }
   }
