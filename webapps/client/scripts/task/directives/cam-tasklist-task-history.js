@@ -63,6 +63,7 @@ define([
               if(!days[date].events[event.operationId]) {
                 days[date].events[event.operationId] = {
                   time: time, 
+                  timestamp: event.timestamp,
                   type: event.operationType,
                   userId: event.userId, 
                   subEvents: []
