@@ -39,6 +39,8 @@ public class AbstractCallActivityBuilder<B extends AbstractCallActivityBuilder<B
   /** camunda extensions */
 
   /**
+   * @deprecated use camundaAsyncBefore() instead.
+   *
    * Sets the camunda async attribute to true.
    *
    * @return the builder object
@@ -49,6 +51,8 @@ public class AbstractCallActivityBuilder<B extends AbstractCallActivityBuilder<B
   }
 
   /**
+   * @deprecated use camundaAsyncBefore(isCamundaAsyncBefore) instead
+   *
    * Sets the camunda async attribute.
    *
    * @param isCamundaAsync  the async state of the task
@@ -78,27 +82,6 @@ public class AbstractCallActivityBuilder<B extends AbstractCallActivityBuilder<B
    */
   public B camundaCalledElementVersion(String camundaCalledElementVersion) {
     element.setCamundaCalledElementVersion(camundaCalledElementVersion);
-    return myself;
-  }
-
-  /**
-   * Sets camunda exclusive attribute to false.
-   *
-   * @return the builder object
-   */
-  public B notCamundaExclusive() {
-    element.setCamundaExclusive(false);
-    return myself;
-  }
-
-  /**
-   * Sets the camunda exclusive attribute.
-   *
-   * @param isCamundaExclusive  the exclusive state of the task.
-   * @return the builder object
-   */
-  public B camundaExclusive(boolean isCamundaExclusive) {
-    element.setCamundaExclusive(isCamundaExclusive);
     return myself;
   }
 

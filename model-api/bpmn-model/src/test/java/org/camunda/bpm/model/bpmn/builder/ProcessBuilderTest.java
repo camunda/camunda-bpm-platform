@@ -662,6 +662,33 @@ public class ProcessBuilderTest {
     assertThat(scriptTask.getScript().getTextContent()).isEqualTo("println \"hello, world\";");
   }
 
+  @Test
+  public void testEventBasedGatewayAsyncAfter() {
+    try {
+      modelInstance = Bpmn.createProcess()
+        .startEvent()
+        .eventBasedGateway()
+          .camundaAsyncAfter()
+        .done();
+
+      fail("Expected UnsupportedOperationException");
+    } catch(UnsupportedOperationException ex) {
+      // happy path
+    }
+
+    try {
+      modelInstance = Bpmn.createProcess()
+        .startEvent()
+        .eventBasedGateway()
+          .camundaAsyncAfter(true)
+        .endEvent()
+        .done();
+      fail("Expected UnsupportedOperationException");
+    } catch(UnsupportedOperationException ex) {
+      // happy ending :D
+    }
+  }
+
 
   @After
   public void validateModel() throws IOException {

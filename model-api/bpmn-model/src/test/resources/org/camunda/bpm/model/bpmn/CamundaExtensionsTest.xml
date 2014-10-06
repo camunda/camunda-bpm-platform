@@ -16,7 +16,9 @@
     <startEvent id="startEvent"
         camunda:initiator="test"
         camunda:formHandlerClass="org.camunda.test.Test"
-        camunda:formKey="test">
+        camunda:formKey="test"
+        camunda:asyncBefore="true"
+        camunda:asyncAfter="true">
       <extensionElements>
         <camunda:executionListener event="start" expression="${test}"/>
         <camunda:potentialStarter>
@@ -39,6 +41,8 @@
     <userTask id="userTask"
         camunda:assignee="test"
         camunda:async="true"
+        camunda:asyncBefore="true"
+        camunda:asyncAfter="true"
         camunda:candidateGroups="group1, ${group2(a, b)}, group3"
         camunda:candidateUsers="user1, ${user2(a, b)}, user3"
         camunda:dueDate="2014-02-27"
@@ -146,14 +150,19 @@
 
     <scriptTask id="scriptTask" scriptFormat="groovy" camunda:resource="test.groovy" />
 
-    <callActivity id="callActivity" camunda:calledElementBinding="test" camunda:calledElementVersion="test">
+    <callActivity id="callActivity"
+                  camunda:calledElementBinding="test"
+                  camunda:calledElementVersion="test"
+                  camunda:exclusive="false">
       <extensionElements>
         <camunda:in source="test" sourceExpression="${test}" variables="test" businessKey="${test}" target="test"/>
         <camunda:out source="test" sourceExpression="${test}" variables="test" target="test"/>
       </extensionElements>
     </callActivity>
 
-    <endEvent id="endEvent">
+    <endEvent id="endEvent"
+              camunda:asyncAfter="true"
+              camunda:asyncBefore="true">
       <extensionElements>
         <camunda:properties>
           <camunda:property name="name1" value="value1"/>
@@ -163,7 +172,10 @@
       <messageEventDefinition camunda:class="org.camunda.test.Test" camunda:expression="${test}" camunda:delegateExpression="${org.camunda.test.Test}" camunda:resultVariable="test"/>
     </endEvent>
 
-    <parallelGateway id="parallelGateway" camunda:async="true">
+    <parallelGateway id="parallelGateway"
+                     camunda:async="true"
+                     camunda:asyncBefore="true"
+                     camunda:asyncAfter="true">
 
     </parallelGateway>
 

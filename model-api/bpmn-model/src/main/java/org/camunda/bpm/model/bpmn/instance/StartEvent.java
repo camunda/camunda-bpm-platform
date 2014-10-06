@@ -30,13 +30,15 @@ public interface StartEvent extends CatchEvent {
 
   /** camunda extensions */
 
+  /**
+   * @deprecated use isCamundaAsyncBefore() instead.
+   */
   boolean isCamundaAsync();
 
+  /**
+   * @deprecated use setCamundaAsyncBefore(isCamundaAsyncBefore) instead.
+   */
   void setCamundaAsync(boolean isCamundaAsync);
-
-  boolean isCamundaExclusive();
-
-  void setCamundaExclusive(boolean isCamundaExclusive);
 
   String getCamundaFormHandlerClass();
 

@@ -39,7 +39,6 @@ public class CallActivityImpl extends ActivityImpl implements CallActivity {
   protected static Attribute<Boolean> camundaAsyncAttribute;
   protected static Attribute<String> camundaCalledElementBindingAttribute;
   protected static Attribute<String> camundaCalledElementVersionAttribute;
-  protected static Attribute<Boolean> camundaExclusiveAttribute;
 
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(CallActivity.class, BPMN_ELEMENT_CALL_ACTIVITY)
@@ -69,11 +68,6 @@ public class CallActivityImpl extends ActivityImpl implements CallActivity {
       .namespace(CAMUNDA_NS)
       .build();
 
-    camundaExclusiveAttribute = typeBuilder.booleanAttribute(CAMUNDA_ATTRIBUTE_EXCLUSIVE)
-      .namespace(CAMUNDA_NS)
-      .defaultValue(true)
-      .build();
-
     typeBuilder.build();
   }
 
@@ -93,10 +87,16 @@ public class CallActivityImpl extends ActivityImpl implements CallActivity {
     calledElementAttribute.setValue(this, calledElement);
   }
 
+  /**
+   * @deprecated use isCamundaAsyncBefore() instead.
+   */
   public boolean isCamundaAsync() {
     return camundaAsyncAttribute.getValue(this);
   }
 
+  /**
+   * @deprecated use setCamundaAsyncBefore() instead.
+   */
   public void setCamundaAsync(boolean isCamundaAsync) {
     camundaAsyncAttribute.setValue(this, isCamundaAsync);
   }
@@ -115,13 +115,5 @@ public class CallActivityImpl extends ActivityImpl implements CallActivity {
 
   public void setCamundaCalledElementVersion(String camundaCalledElementVersion) {
     camundaCalledElementVersionAttribute.setValue(this, camundaCalledElementVersion);
-  }
-
-  public boolean isCamundaExclusive() {
-    return camundaExclusiveAttribute.getValue(this);
-  }
-
-  public void setCamundaExclusive(boolean isCamundaExclusive) {
-    camundaExclusiveAttribute.setValue(this, isCamundaExclusive);
   }
 }

@@ -20,9 +20,11 @@ import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 import org.junit.Before;
 
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.Collection;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_NS;
 
 /**
  * @author Sebastian Menski
@@ -40,7 +42,10 @@ public abstract class AbstractGatewayTest<G extends Gateway> extends BpmnModelEl
   }
 
   public Collection<AttributeAssumption> getAttributesAssumptions() {
-    return null;
+    return Arrays.asList(
+      new AttributeAssumption(CAMUNDA_NS, "asyncBefore", false, false, false),
+      new AttributeAssumption(CAMUNDA_NS, "asyncAfter", false, false, false)
+    );
   }
 
   @Before

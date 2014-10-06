@@ -37,8 +37,7 @@ public class CallActivityTest extends BpmnModelElementInstanceTest {
       /** camunda extensions */
       new AttributeAssumption(CAMUNDA_NS, "async", false, false, false),
       new AttributeAssumption(CAMUNDA_NS, "calledElementBinding"),
-      new AttributeAssumption(CAMUNDA_NS, "calledElementVersion"),
-      new AttributeAssumption(CAMUNDA_NS, "exclusive", false, false, true)
+      new AttributeAssumption(CAMUNDA_NS, "calledElementVersion")
     );
   }
 }

@@ -35,7 +35,6 @@ public class StartEventImpl extends CatchEventImpl implements StartEvent {
   /** camunda extensions */
 
   protected static Attribute<Boolean> camundaAsyncAttribute;
-  protected static Attribute<Boolean> camundaExclusiveAttribute;
   protected static Attribute<String> camundaFormHandlerClassAttribute;
   protected static Attribute<String> camundaFormKeyAttribute;
   protected static Attribute<String> camundaInitiatorAttribute;
@@ -60,11 +59,6 @@ public class StartEventImpl extends CatchEventImpl implements StartEvent {
     camundaAsyncAttribute = typeBuilder.booleanAttribute(CAMUNDA_ATTRIBUTE_ASYNC)
       .namespace(CAMUNDA_NS)
       .defaultValue(false)
-      .build();
-
-    camundaExclusiveAttribute = typeBuilder.booleanAttribute(CAMUNDA_ATTRIBUTE_EXCLUSIVE)
-      .namespace(CAMUNDA_NS)
-      .defaultValue(true)
       .build();
 
     camundaFormHandlerClassAttribute = typeBuilder.stringAttribute(CAMUNDA_ATTRIBUTE_FORM_HANDLER_CLASS)
@@ -101,20 +95,18 @@ public class StartEventImpl extends CatchEventImpl implements StartEvent {
 
   /** camunda extensions */
 
+  /**
+   * @deprecated use isCamundaAsyncBefore() instead.
+   */
   public boolean isCamundaAsync() {
     return camundaAsyncAttribute.getValue(this);
   }
 
+  /**
+   * @deprecated use setCamundaAsyncBefore(isCamundaAsyncBefore) instead.
+   */
   public void setCamundaAsync(boolean isCamundaAsync) {
     camundaAsyncAttribute.setValue(this, isCamundaAsync);
-  }
-
-  public boolean isCamundaExclusive() {
-    return camundaExclusiveAttribute.getValue(this);
-  }
-
-  public void setCamundaExclusive(boolean isCamundaExclusive) {
-    camundaExclusiveAttribute.setValue(this, isCamundaExclusive);
   }
 
   public String getCamundaFormHandlerClass() {

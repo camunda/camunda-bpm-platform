@@ -34,8 +34,7 @@ public class TaskTest extends BpmnModelElementInstanceTest {
   public Collection<AttributeAssumption> getAttributesAssumptions() {
     return Arrays.asList(
       /** camunda extensions */
-      new AttributeAssumption(CAMUNDA_NS, "async", false, false, false),
-      new AttributeAssumption(CAMUNDA_NS, "exclusive", false, false, true)
+      new AttributeAssumption(CAMUNDA_NS, "async", false, false, false)
     );
   }
 }

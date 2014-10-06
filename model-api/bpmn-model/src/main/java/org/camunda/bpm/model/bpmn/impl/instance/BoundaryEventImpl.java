@@ -83,4 +83,36 @@ public class BoundaryEventImpl extends CatchEventImpl implements BoundaryEvent {
   public void setAttachedTo(Activity attachedTo) {
     attachedToRefAttribute.setReferenceTargetElement(this, attachedTo);
   }
+
+  /** Camunda Attributes */
+
+  @Override
+  public boolean isCamundaAsyncAfter() {
+    throw new UnsupportedOperationException("'asyncAfter' is not supported for 'Boundary Events' right now.");
+  }
+
+  @Override
+  public void setCamundaAsyncAfter(boolean isCamundaAsyncAfter) {
+    throw new UnsupportedOperationException("'asyncAfter' is not supported for 'Boundary Events' right now.");
+  }
+
+  @Override
+  public boolean isCamundaAsyncBefore() {
+    throw new UnsupportedOperationException("'asyncBefore' is not supported for 'Boundary Events' right now.");
+  }
+
+  @Override
+  public void setCamundaAsyncBefore(boolean isCamundaAsyncBefore) {
+    throw new UnsupportedOperationException("'asyncBefore' is not supported for 'Boundary Events' right now.");
+  }
+
+  @Override
+  public boolean isCamundaExclusive() {
+    throw new UnsupportedOperationException("'exclusive' is not supported for 'Boundary Events' right now.");
+  }
+
+  @Override
+  public void setCamundaExclusive(boolean isCamundaExclusive) {
+    throw new UnsupportedOperationException("'exclusive' is not supported for 'Boundary Events' right now.");
+  }
 }

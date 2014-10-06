@@ -36,7 +36,7 @@ public class TaskImpl extends ActivityImpl implements Task {
   /** camunda extensions */
 
   protected static Attribute<Boolean> camundaAsyncAttribute;
-  protected static Attribute<Boolean> camundaExclusiveAttribute;
+
 
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(Task.class, BPMN_ELEMENT_TASK)
@@ -55,11 +55,6 @@ public class TaskImpl extends ActivityImpl implements Task {
       .defaultValue(false)
       .build();
 
-    camundaExclusiveAttribute = typeBuilder.booleanAttribute(CAMUNDA_ATTRIBUTE_EXCLUSIVE)
-      .namespace(CAMUNDA_NS)
-      .defaultValue(true)
-      .build();
-
     typeBuilder.build();
   }
 
@@ -74,21 +69,20 @@ public class TaskImpl extends ActivityImpl implements Task {
 
   /** camunda extensions */
 
+  /**
+   * @deprecated use isCamundaAsyncBefore() instead.
+   */
   public boolean isCamundaAsync() {
     return camundaAsyncAttribute.getValue(this);
   }
 
+  /**
+   * @deprecated use setCamundaAsyncBefore(isCamundaAsyncBefore) instead.
+   */
   public void setCamundaAsync(boolean isCamundaAsync) {
     camundaAsyncAttribute.setValue(this, isCamundaAsync);
   }
 
-  public boolean isCamundaExclusive() {
-    return camundaExclusiveAttribute.getValue(this);
-  }
-
-  public void setCamundaExclusive(boolean isCamundaExclusive) {
-    camundaExclusiveAttribute.setValue(this, isCamundaExclusive);
-  }
 
   public BpmnShape getDiagramElement() {
     return (BpmnShape) super.getDiagramElement();

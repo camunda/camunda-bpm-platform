@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 
 public class EventBasedGatewayTest extends AbstractGatewayTest<EventBasedGateway> {
 
@@ -27,4 +28,22 @@ public class EventBasedGatewayTest extends AbstractGatewayTest<EventBasedGateway
     assertThat(gateway.getEventGatewayType()).isEqualTo(EventBasedGatewayType.Parallel);
   }
 
+  @Test
+  public void shouldFailSetAsyncAfterToEventBasedGateway() {
+    // fetching should fail
+    try {
+      gateway.isCamundaAsyncAfter();
+      fail("Expected: UnsupportedOperationException");
+    } catch(UnsupportedOperationException ex) {
+      // True
+    }
+
+    // set the attribute should fail to!
+    try {
+      gateway.setCamundaAsyncAfter(false);
+      fail("Expected: UnsupportedOperationException");
+    } catch(UnsupportedOperationException ex) {
+      // True
+    }
+  }
 }

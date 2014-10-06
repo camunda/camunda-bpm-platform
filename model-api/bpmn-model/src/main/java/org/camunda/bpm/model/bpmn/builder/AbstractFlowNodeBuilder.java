@@ -32,6 +32,7 @@ import org.camunda.bpm.model.bpmn.instance.SequenceFlow;
 import org.camunda.bpm.model.bpmn.instance.ServiceTask;
 import org.camunda.bpm.model.bpmn.instance.SubProcess;
 import org.camunda.bpm.model.bpmn.instance.UserTask;
+import org.camunda.bpm.model.bpmn.instance.EventBasedGateway;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 
 /**
@@ -162,6 +163,10 @@ public abstract class AbstractFlowNodeBuilder<B extends AbstractFlowNodeBuilder<
     return createTarget(ExclusiveGateway.class).builder();
   }
 
+  public EventBasedGatewayBuilder eventBasedGateway() {
+    return createTarget(EventBasedGateway.class).builder();
+  }
+
   public ExclusiveGatewayBuilder exclusiveGateway(String id) {
     return createTarget(ExclusiveGateway.class, id).builder();
   }
@@ -235,6 +240,69 @@ public abstract class AbstractFlowNodeBuilder<B extends AbstractFlowNodeBuilder<
       connectTarget(targetNode);
       return targetNode.builder();
     }
+  }
+
+  /**
+   * Sets the Camunda AsyncBefore attribute for the build inclusive gateway
+   *
+   * @param asyncBefore boolean value to set
+   * @return the builder object
+   */
+  public B camundaAsyncBefore(boolean asyncBefore) {
+    element.setCamundaAsyncBefore(asyncBefore);
+    return myself;
+  }
+
+  /**
+   * Sets the Camunda asyncBefore attribute to true.
+   *
+   * @return the builder object
+   */
+  public B camundaAsyncBefore() {
+    element.setCamundaAsyncBefore(true);
+    return myself;
+  }
+
+  /**
+   * Sets the Camunda asyncAfter attribute for the build Flo<
+   *
+   * @param asyncAfter boolean value to set
+   * @return the builder object
+   */
+  public B camundaAsyncAfter(boolean asyncAfter) {
+    element.setCamundaAsyncAfter(asyncAfter);
+    return myself;
+  }
+
+  /**
+   * Sets the Camunda asyncAfter attribute to true.
+   *
+   * @return the builder object
+   */
+  public B camundaAsyncAfter() {
+    element.setCamundaAsyncAfter(true);
+    return myself;
+  }
+
+  /**
+   * Sets the Camunda exclusive attribute to true.
+   *
+   * @return the builder object
+   */
+  public B notCamundaExclusive() {
+    element.setCamundaExclusive(false);
+    return myself;
+  }
+
+  /**
+   * Sets the camunda exclusive attribute for the build
+   *
+   * @param exclusive boolean value to set
+   * @return the builder object
+   */
+  public B camundaExclusive(boolean exclusive) {
+    element.setCamundaExclusive(exclusive);
+    return myself;
   }
 
 }

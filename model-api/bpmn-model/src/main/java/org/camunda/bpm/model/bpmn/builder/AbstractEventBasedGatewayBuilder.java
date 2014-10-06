@@ -47,4 +47,12 @@ public class AbstractEventBasedGatewayBuilder<B extends AbstractEventBasedGatewa
     return myself;
   }
 
+  public B camundaAsyncAfter() {
+    throw new UnsupportedOperationException("'asyncAfter' is not supported for 'Event Based Gateway'");
+  }
+
+  public B camundaAsyncAfter(boolean isCamundaAsyncAfter) {
+    throw new UnsupportedOperationException("'asyncAfter' is not supported for 'Event Based Gateway'");
+  }
+
 }

@@ -144,11 +144,51 @@ public class CamundaExtensionsTest {
   public void testAsync() {
     assertThat(startEvent.isCamundaAsync()).isFalse();
     assertThat(userTask.isCamundaAsync()).isTrue();
-    userTask.setCamundaAsync(false);
-    assertThat(userTask.isCamundaAsync()).isFalse();
     assertThat(parallelGateway.isCamundaAsync()).isTrue();
+
+    startEvent.setCamundaAsync(true);
+    userTask.setCamundaAsync(false);
     parallelGateway.setCamundaAsync(false);
+
+    assertThat(startEvent.isCamundaAsync()).isTrue();
+    assertThat(userTask.isCamundaAsync()).isFalse();
     assertThat(parallelGateway.isCamundaAsync()).isFalse();
+  }
+
+  @Test
+  public void testAsyncBefore() {
+    assertThat(startEvent.isCamundaAsyncBefore()).isTrue();
+    assertThat(endEvent.isCamundaAsyncBefore()).isTrue();
+    assertThat(userTask.isCamundaAsyncBefore()).isTrue();
+    assertThat(parallelGateway.isCamundaAsyncBefore()).isTrue();
+
+    startEvent.setCamundaAsyncBefore(false);
+    endEvent.setCamundaAsyncBefore(false);
+    userTask.setCamundaAsyncBefore(false);
+    parallelGateway.setCamundaAsyncBefore(false);
+
+    assertThat(startEvent.isCamundaAsyncBefore()).isFalse();
+    assertThat(endEvent.isCamundaAsyncBefore()).isFalse();
+    assertThat(userTask.isCamundaAsyncBefore()).isFalse();
+    assertThat(parallelGateway.isCamundaAsyncBefore()).isFalse();
+  }
+
+  @Test
+  public void testAsyncAfter() {
+    assertThat(startEvent.isCamundaAsyncAfter()).isTrue();
+    assertThat(endEvent.isCamundaAsyncAfter()).isTrue();
+    assertThat(userTask.isCamundaAsyncAfter()).isTrue();
+    assertThat(parallelGateway.isCamundaAsyncAfter()).isTrue();
+
+    startEvent.setCamundaAsyncAfter(false);
+    endEvent.setCamundaAsyncAfter(false);
+    userTask.setCamundaAsyncAfter(false);
+    parallelGateway.setCamundaAsyncAfter(false);
+
+    assertThat(startEvent.isCamundaAsyncAfter()).isFalse();
+    assertThat(endEvent.isCamundaAsyncAfter()).isFalse();
+    assertThat(userTask.isCamundaAsyncAfter()).isFalse();
+    assertThat(parallelGateway.isCamundaAsyncAfter()).isFalse();
   }
 
   @Test
@@ -249,6 +289,10 @@ public class CamundaExtensionsTest {
     assertThat(parallelGateway.isCamundaExclusive()).isTrue();
     parallelGateway.setCamundaExclusive(false);
     assertThat(parallelGateway.isCamundaExclusive()).isFalse();
+
+    assertThat(callActivity.isCamundaExclusive()).isFalse();
+    callActivity.setCamundaExclusive(true);
+    assertThat(callActivity.isCamundaExclusive()).isTrue();
   }
 
   @Test

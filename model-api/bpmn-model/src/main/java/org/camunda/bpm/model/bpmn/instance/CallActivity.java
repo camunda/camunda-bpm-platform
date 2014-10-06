@@ -30,8 +30,14 @@ public interface CallActivity extends Activity {
 
   /** camunda extensions */
 
+  /**
+   * @deprecated use isCamundaAsyncBefore() instead.
+   */
   boolean isCamundaAsync();
 
+  /**
+   * @deprecated use setCamundaAsyncBefore(isCamundaAsyncBefore) instead.
+   */
   void setCamundaAsync(boolean isCamundaAsync);
 
   String getCamundaCalledElementBinding();
@@ -41,9 +47,5 @@ public interface CallActivity extends Activity {
   String getCamundaCalledElementVersion();
 
   void setCamundaCalledElementVersion(String camundaCalledElementVersion);
-
-  boolean isCamundaExclusive();
-
-  void setCamundaExclusive(boolean isCamundaExclusive);
 
 }

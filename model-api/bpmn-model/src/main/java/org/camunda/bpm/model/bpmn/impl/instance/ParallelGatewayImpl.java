@@ -37,7 +37,6 @@ import static org.camunda.bpm.model.xml.type.ModelElementTypeBuilder.ModelTypeIn
 public class ParallelGatewayImpl extends GatewayImpl implements ParallelGateway {
 
   protected static Attribute<Boolean> camundaAsyncAttribute;
-  protected static Attribute<Boolean> camundaExclusiveAttribute;
 
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(ParallelGateway.class, BPMN_ELEMENT_PARALLEL_GATEWAY)
@@ -56,11 +55,6 @@ public class ParallelGatewayImpl extends GatewayImpl implements ParallelGateway 
       .defaultValue(false)
       .build();
 
-    camundaExclusiveAttribute = typeBuilder.booleanAttribute(CAMUNDA_ATTRIBUTE_EXCLUSIVE)
-      .namespace(CAMUNDA_NS)
-      .defaultValue(true)
-      .build();
-
     typeBuilder.build();
   }
 
@@ -71,20 +65,18 @@ public class ParallelGatewayImpl extends GatewayImpl implements ParallelGateway 
 
   /** camunda extensions */
 
+  /**
+   * @deprecated use isCamundaAsyncBefore() instead.
+   */
   public boolean isCamundaAsync() {
     return camundaAsyncAttribute.getValue(this);
   }
 
+  /**
+   * @deprecated use setCamundaAsyncBefore(isCamundaAsyncBefore) instead.
+   */
   public void setCamundaAsync(boolean isCamundaAsync) {
     camundaAsyncAttribute.setValue(this, isCamundaAsync);
-  }
-
-  public boolean isCamundaExclusive() {
-    return camundaExclusiveAttribute.getValue(this);
-  }
-
-  public void setCamundaExclusive(boolean isCamundaExclusive) {
-    camundaExclusiveAttribute.setValue(this, isCamundaExclusive);
   }
 
   public ParallelGatewayImpl(ModelTypeInstanceContext context) {

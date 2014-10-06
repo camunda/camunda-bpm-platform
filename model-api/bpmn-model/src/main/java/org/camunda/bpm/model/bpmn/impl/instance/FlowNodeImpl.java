@@ -23,6 +23,7 @@ import org.camunda.bpm.model.xml.ModelBuilder;
 import org.camunda.bpm.model.xml.impl.instance.ModelTypeInstanceContext;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 import org.camunda.bpm.model.xml.type.ModelElementTypeBuilder;
+import org.camunda.bpm.model.xml.type.attribute.Attribute;
 import org.camunda.bpm.model.xml.type.child.SequenceBuilder;
 import org.camunda.bpm.model.xml.type.reference.AttributeReference;
 import org.camunda.bpm.model.xml.type.reference.ElementReferenceCollection;
@@ -43,6 +44,11 @@ public abstract class FlowNodeImpl extends FlowElementImpl implements FlowNode {
   protected static ElementReferenceCollection<SequenceFlow, Incoming> incomingCollection;
   protected static ElementReferenceCollection<SequenceFlow, Outgoing> outgoingCollection;
 
+  /** Camunda Attributes */
+  protected static Attribute<Boolean> camundaAsyncAfter;
+  protected static Attribute<Boolean> camundaAsyncBefore;
+  protected static Attribute<Boolean> camundaExclusive;
+
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(FlowNode.class, BPMN_ELEMENT_FLOW_NODE)
       .namespaceUri(BPMN20_NS)
@@ -57,6 +63,23 @@ public abstract class FlowNodeImpl extends FlowElementImpl implements FlowNode {
 
     outgoingCollection = sequenceBuilder.elementCollection(Outgoing.class)
       .qNameElementReferenceCollection(SequenceFlow.class)
+      .build();
+
+    /** Camunda Attributes */
+
+    camundaAsyncAfter = typeBuilder.booleanAttribute(CAMUNDA_ATTRIBUTE_ASYNC_AFTER)
+      .namespace(CAMUNDA_NS)
+      .defaultValue(false)
+      .build();
+
+    camundaAsyncBefore = typeBuilder.booleanAttribute(CAMUNDA_ATTRIBUTE_ASYNC_BEFORE)
+      .namespace(CAMUNDA_NS)
+      .defaultValue(false)
+      .build();
+
+    camundaExclusive = typeBuilder.booleanAttribute(CAMUNDA_ATTRIBUTE_EXCLUSIVE)
+      .namespace(CAMUNDA_NS)
+      .defaultValue(true)
       .build();
 
     typeBuilder.build();
@@ -115,5 +138,31 @@ public abstract class FlowNodeImpl extends FlowElementImpl implements FlowNode {
       succeedingNodes.add(sequenceFlow.getTarget());
     }
     return new QueryImpl<FlowNode>(succeedingNodes);
+  }
+
+  /** Camunda Attributes */
+
+  public boolean isCamundaAsyncBefore() {
+    return camundaAsyncBefore.getValue(this);
+  }
+
+  public void setCamundaAsyncBefore(boolean isCamundaAsyncBefore) {
+    camundaAsyncBefore.setValue(this, isCamundaAsyncBefore);
+  }
+
+  public boolean isCamundaAsyncAfter() {
+    return camundaAsyncAfter.getValue(this);
+  }
+
+  public void setCamundaAsyncAfter(boolean isCamundaAsyncAfter) {
+    camundaAsyncAfter.setValue(this, isCamundaAsyncAfter);
+  }
+
+  public boolean isCamundaExclusive() {
+    return camundaExclusive.getValue(this);
+  }
+
+  public void setCamundaExclusive(boolean isCamundaExclusive) {
+    camundaExclusive.setValue(this, isCamundaExclusive);
   }
 }

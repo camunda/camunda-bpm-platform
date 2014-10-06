@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_NS;
 
 /**
  * @author Sebastian Menski
@@ -41,7 +42,11 @@ public class FlowNodeTest extends BpmnModelElementInstanceTest {
   }
 
   public Collection<AttributeAssumption> getAttributesAssumptions() {
-    return null;
+    return Arrays.asList(
+      new AttributeAssumption(CAMUNDA_NS, "asyncAfter", false, false, false),
+      new AttributeAssumption(CAMUNDA_NS, "asyncBefore", false, false, false),
+      new AttributeAssumption(CAMUNDA_NS, "exclusive", false, false, true)
+    );
   }
 
   @Test
@@ -67,5 +72,57 @@ public class FlowNodeTest extends BpmnModelElementInstanceTest {
     // assert that the new service task has the same incoming and outgoing sequence flows
     assertThat(serviceTask.getIncoming()).containsExactlyElementsOf(incoming);
     assertThat(serviceTask.getOutgoing()).containsExactlyElementsOf(outgoing);
+  }
+
+  @Test
+    public void testCamundaAsyncBefore() {
+    Task task = modelInstance.newInstance(Task.class);
+    assertThat(task.isCamundaAsyncBefore()).isFalse();
+
+    task.setCamundaAsyncBefore(true);
+    assertThat(task.isCamundaAsyncBefore()).isTrue();
+  }
+
+  @Test
+  public void testCamundaAsyncAfter() {
+    Task task = modelInstance.newInstance(Task.class);
+    assertThat(task.isCamundaAsyncAfter()).isFalse();
+
+    task.setCamundaAsyncAfter(true);
+    assertThat(task.isCamundaAsyncAfter()).isTrue();
+  }
+
+  @Test
+  public void testCamundaAsyncAfterAndBefore() {
+    Task task = modelInstance.newInstance(Task.class);
+
+    assertThat(task.isCamundaAsyncAfter()).isFalse();
+    assertThat(task.isCamundaAsyncBefore()).isFalse();
+
+    task.setCamundaAsyncBefore(true);
+
+    assertThat(task.isCamundaAsyncAfter()).isFalse();
+    assertThat(task.isCamundaAsyncBefore()).isTrue();
+
+    task.setCamundaAsyncAfter(true);
+
+    assertThat(task.isCamundaAsyncAfter()).isTrue();
+    assertThat(task.isCamundaAsyncBefore()).isTrue();
+
+    task.setCamundaAsyncBefore(false);
+
+    assertThat(task.isCamundaAsyncAfter()).isTrue();
+    assertThat(task.isCamundaAsyncBefore()).isFalse();
+  }
+
+  @Test
+  public void testCamundaExclusive() {
+    Task task = modelInstance.newInstance(Task.class);
+
+    assertThat(task.isCamundaExclusive()).isTrue();
+
+    task.setCamundaExclusive(false);
+
+    assertThat(task.isCamundaExclusive()).isFalse();
   }
 }

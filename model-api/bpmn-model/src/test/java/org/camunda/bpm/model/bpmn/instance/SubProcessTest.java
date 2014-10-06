@@ -39,8 +39,7 @@ public class SubProcessTest extends BpmnModelElementInstanceTest {
     return Arrays.asList(
       new AttributeAssumption("triggeredByEvent", false, false, false),
       /** camunda extensions */
-      new AttributeAssumption(CAMUNDA_NS, "async", false, false, false),
-      new AttributeAssumption(CAMUNDA_NS, "exclusive", false, false, true)
+      new AttributeAssumption(CAMUNDA_NS, "async", false, false, false)
     );
   }
 }

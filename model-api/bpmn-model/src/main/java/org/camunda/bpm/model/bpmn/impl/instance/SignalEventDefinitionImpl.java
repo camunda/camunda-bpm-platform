@@ -19,11 +19,14 @@ import org.camunda.bpm.model.bpmn.instance.SignalEventDefinition;
 import org.camunda.bpm.model.xml.ModelBuilder;
 import org.camunda.bpm.model.xml.impl.instance.ModelTypeInstanceContext;
 import org.camunda.bpm.model.xml.type.ModelElementTypeBuilder;
+import org.camunda.bpm.model.xml.type.attribute.Attribute;
 import org.camunda.bpm.model.xml.type.reference.AttributeReference;
 
 import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.BPMN20_NS;
 import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.BPMN_ATTRIBUTE_SIGNAL_REF;
 import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.BPMN_ELEMENT_SIGNAL_EVENT_DEFINITION;
+import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_NS;
+import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_ATTRIBUTE_ASYNC;
 import static org.camunda.bpm.model.xml.type.ModelElementTypeBuilder.ModelTypeInstanceProvider;
 
 /**
@@ -34,6 +37,7 @@ import static org.camunda.bpm.model.xml.type.ModelElementTypeBuilder.ModelTypeIn
 public class SignalEventDefinitionImpl extends EventDefinitionImpl implements SignalEventDefinition {
 
   protected static AttributeReference<Signal> signalRefAttribute;
+  protected static Attribute<Boolean> camundaAsyncAttribute;
 
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(SignalEventDefinition.class, BPMN_ELEMENT_SIGNAL_EVENT_DEFINITION)
@@ -49,6 +53,12 @@ public class SignalEventDefinitionImpl extends EventDefinitionImpl implements Si
       .qNameAttributeReference(Signal.class)
       .build();
 
+    /** Camunda Attributes */
+    camundaAsyncAttribute = typeBuilder.booleanAttribute(CAMUNDA_ATTRIBUTE_ASYNC)
+      .namespace(CAMUNDA_NS)
+      .defaultValue(false)
+      .build();
+
     typeBuilder.build();
   }
 
@@ -62,5 +72,13 @@ public class SignalEventDefinitionImpl extends EventDefinitionImpl implements Si
 
   public void setSignal(Signal signal) {
     signalRefAttribute.setReferenceTargetElement(this, signal);
+  }
+
+  public boolean isCamundaAsync() {
+    return camundaAsyncAttribute.getValue(this);
+  }
+
+  public void setCamundaAsync(boolean camundaAsync) {
+    camundaAsyncAttribute.setValue(this, camundaAsync);
   }
 }

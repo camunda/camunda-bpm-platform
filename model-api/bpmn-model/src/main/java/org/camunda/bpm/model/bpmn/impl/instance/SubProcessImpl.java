@@ -41,9 +41,7 @@ public class SubProcessImpl extends ActivityImpl implements SubProcess {
   protected static ChildElementCollection<Artifact> artifactCollection;
 
   /** camunda extensions */
-
   protected static Attribute<Boolean> camundaAsyncAttribute;
-  protected static Attribute<Boolean> camundaExclusiveAttribute;
 
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(SubProcess.class, BPMN_ELEMENT_SUB_PROCESS)
@@ -75,11 +73,6 @@ public class SubProcessImpl extends ActivityImpl implements SubProcess {
     camundaAsyncAttribute = typeBuilder.booleanAttribute(CAMUNDA_ATTRIBUTE_ASYNC)
       .namespace(CAMUNDA_NS)
       .defaultValue(false)
-      .build();
-
-    camundaExclusiveAttribute = typeBuilder.booleanAttribute(CAMUNDA_ATTRIBUTE_EXCLUSIVE)
-      .namespace(CAMUNDA_NS)
-      .defaultValue(true)
       .build();
 
     typeBuilder.build();
@@ -115,20 +108,18 @@ public class SubProcessImpl extends ActivityImpl implements SubProcess {
 
   /** camunda extensions */
 
+  /**
+   * @deprecated use isCamundaAsyncBefore() instead.
+   */
   public boolean isCamundaAsync() {
     return camundaAsyncAttribute.getValue(this);
   }
 
+  /**
+   * @deprecated use setCamundaAsyncBefore(isCamundaAsyncBefore) instead.
+   */
   public void setCamundaAsync(boolean isCamundaAsync) {
     camundaAsyncAttribute.setValue(this, isCamundaAsync);
-  }
-
-  public boolean isCamundaExclusive() {
-    return camundaExclusiveAttribute.getValue(this);
-  }
-
-  public void setCamundaExclusive(boolean isCamundaExclusive) {
-    camundaExclusiveAttribute.setValue(this, isCamundaExclusive);
   }
 
 }

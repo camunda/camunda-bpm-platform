@@ -378,6 +378,8 @@ public final class BpmnModelConstants {
 
   public static final String CAMUNDA_ATTRIBUTE_ASSIGNEE = "assignee";
   public static final String CAMUNDA_ATTRIBUTE_ASYNC = "async";
+  public static final String CAMUNDA_ATTRIBUTE_ASYNC_BEFORE = "asyncBefore";
+  public static final String CAMUNDA_ATTRIBUTE_ASYNC_AFTER = "asyncAfter";
   public static final String CAMUNDA_ATTRIBUTE_BUSINESS_KEY = "businessKey";
   public static final String CAMUNDA_ATTRIBUTE_CALLED_ELEMENT_BINDING = "calledElementBinding";
   public static final String CAMUNDA_ATTRIBUTE_CALLED_ELEMENT_VERSION = "calledElementVersion";

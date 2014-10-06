@@ -25,8 +25,7 @@ public class ParallelGatewayTest extends AbstractGatewayTest<ParallelGateway> {
 
   public Collection<AttributeAssumption> getAttributesAssumptions() {
     return Arrays.asList(
-      new AttributeAssumption(CAMUNDA_NS, "async", false, false, false),
-      new AttributeAssumption(CAMUNDA_NS, "exclusive", false, false, true)
+      new AttributeAssumption(CAMUNDA_NS, "async", false, false, false)
     );
   }
 
