@@ -56,7 +56,7 @@ define([
           if ($scope.focusedId === filter.id) { return; }
           $scope.focusedId = filter.id;
           $rootScope.currentFilter = filter;
-          $rootScope.$broadcast('tasklist.filter.current');
+          $rootScope.$broadcast('tasklist.filter.current', filter);
         };
 
 
@@ -81,8 +81,10 @@ define([
 
             var focused;
             angular.forEach(res, function(filter) {
-              if ($scope.focusedId === filter.id) {
-                focused = filter;
+              if ($scope.focusedId) {
+                if ($scope.focusedId === filter.id) {
+                  focused = filter;
+                }
               }
               else if (!focused || filter.properties.priority < focused.properties.priority) {
                 focused = filter;
