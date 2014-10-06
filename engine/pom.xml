@@ -240,14 +240,6 @@
         </configuration>
       </plugin>
       <plugin>
-        <artifactId>maven-jar-plugin</artifactId>
-        <configuration>
-          <archive>
-            <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
-          </archive>
-        </configuration>
-      </plugin>
-      <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
         <executions>
@@ -687,6 +679,24 @@
           <scope>test</scope>
         </dependency>
        </dependencies>
+    </profile>
+
+    <profile>
+      <id>mariadb</id>
+      <activation>
+        <property>
+          <name>database</name>
+          <value>mariadb</value>
+        </property>
+      </activation>
+      <dependencies>
+        <dependency>
+          <groupId>org.mariadb.jdbc</groupId>
+          <artifactId>mariadb-java-client</artifactId>
+          <version>1.1.7</version>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
     </profile>
 
     <profile>
