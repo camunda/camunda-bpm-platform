@@ -1,16 +1,16 @@
-<div class="day row" ng-repeat="day in days | orderBy:['-date.year', '-date.month', '-date.day']">
+<div class="day row" ng-repeat="day in days | orderBy:'-date'">
   <div class="col-xs-2">
     <div class="date-badge">
-      <span class="day">{{ day.date.day }}</span>
-      <span class="month">{{ day.date.monthWord }}</span>
-      <span class="year">{{ day.date.year }}</span>
+      <span class="day">{{ day.date | date:'dd' }}</span>
+      <span class="month">{{ day.date | date:'MMMM' }}</span>
+      <span class="year">{{ day.date | date:'yyyy' }}</span>
     </div>
   </div>
 
   <div class="col-xs-10 instant">
-    <div class="instant row" ng-repeat="event in day.eventArray | orderBy:'-timestamp'">
+    <div class="instant row" ng-repeat="event in day.events | orderBy:'-time'">
       <div class="col-xs-2">
-        {{ event.time }}
+        {{ event.time | date:'HH:mm' }}
       </div>
 
       <div class="col-xs-10">
@@ -24,10 +24,16 @@
               <div class="col-sm-12 col-md-3 event-property">{{ subEvent.property }}</div>
               <div class="col-sm-12 col-md-9 event-value">
                 <span ng-if="subEvent.orgValue">
-                  <span class="original-value">{{ subEvent.orgValue }}</span>
+                  <span class="original-value">
+                    <span ng-if="isTimestampProperty(subEvent.property)">{{ subEvent.orgValue | date:'dd. MMMM yyyy HH:mm'}}</span>
+                    <span ng-if="!isTimestampProperty(subEvent.property)">{{ subEvent.orgValue }}</span>
+                  </span>
                   <span class="glyphicon glyphicon-arrow-right"></span>
                 </span>
-                <span class="new-value">{{ subEvent.newValue }}</span>
+                <span class="new-value">
+                  <span ng-if="isTimestampProperty(subEvent.property)">{{ subEvent.newValue | date:'dd. MMMM yyyy HH:mm'}}</span>
+                  <span ng-if="!isTimestampProperty(subEvent.property)">{{ subEvent.newValue }}</span>
+                </span>
               </div>
             </div>
           </div>

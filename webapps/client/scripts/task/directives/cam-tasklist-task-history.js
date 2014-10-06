@@ -1,18 +1,57 @@
 define([
   'angular',
+  'jquery',
   'moment',
-
+  'camunda-bpm-sdk',
   'text!./cam-tasklist-task-history.html'
 ], function(
   angular,
+  jquery,
   moment,
-
+  camSDK,
   template
 ) {
   'use strict';
+  
+  var findOrCreateDay = function(days, timestamp) {
+    var day = jquery.grep(days, function(elem) {
+      return moment(elem.date/1000, 'X').format('YYYY-MM-DD') === moment(timestamp/1000, 'X').format('YYYY-MM-DD');
+    });
+    if(day.length > 0) {
+      return day[0];
+    } else {
+      day = {
+        date: timestamp,
+        events: []
+      };
+      days.push(day);
+      return day;
+    }
+  };
+  
+  var findOrCreateEvent = function(events, event, timestamp) {
+    var targetEvent = jquery.grep(events, function(elem) {
+      return elem.operationId === event.operationId;
+    });
+    if(targetEvent.length > 0) {
+      return targetEvent[0];
+    } else {
+      targetEvent = {
+        time: timestamp,
+        type: event.operationType,
+        operationId: event.operationId,
+        userId: event.userId, 
+        subEvents: []
+      };
+      events.push(targetEvent);
+      return targetEvent;
+    }
+  };
+  
   return ['camAPI',
   function(camAPI) {
     var History = camAPI.resource('history');
+    var Task = camAPI.resource('task');
     return {
       scope: {
         task : '='
@@ -20,59 +59,27 @@ define([
       link: function($scope) {
         $scope.history = [];
         $scope.days = [];
+
         var loadHistory = function(taskId) {
-          History.userOperation({
-            taskId : taskId
-          }, function(err, historyData) {
-            $scope.history = historyData;
-            var days = {};
-            var daysArray = [];
+          camSDK.utils.series({
+            historyData: function(cb) { History.userOperation({taskId : taskId}, cb); },
+            commentData: function(cb) { Task.comments(taskId, cb); }
+          }, function(err, data) {
+            $scope.history = data.historyData;
+            var days = [];
             angular.forEach($scope.history, function(event) {
               var mom = moment(event.timestamp, 'YYYY-MM-DDTHH:mm:ss');
-              var date = mom.format('DD-MMMM-YYYY');
-              var time = mom.format('HH:mm');
-              var parts = date.split('-');
+              var timestamp = mom.format('X')*1000;
 
               // create object for each day, containing the events for this day
-              if(!days[date]) {
-                days[date] = {
-                  date: {
-                    day: parts[0],
-                    monthWord: parts[1],
-                    month: mom.format('MM'),
-                    year: parts[2]
-                  },
-                  events: {},
-                  eventArray: []
-                };
-                daysArray.push(days[date]);
-              }
-              
-              // process formatting of time
-              switch(event.property) {
-                case 'dueDate':
-                case 'followUpDate':
-                  if(event.orgValue) {
-                    event.orgValue = moment(event.orgValue / 1000, 'X').format('DD. MMMM YYYY HH:mm');
-                  }
-                  event.newValue = moment(event.newValue / 1000, 'X').format('DD. MMMM YYYY HH:mm');
-                  break;
-              }
+              var day = findOrCreateDay(days, timestamp);
 
               // create event object for each operationId
-              if(!days[date].events[event.operationId]) {
-                days[date].events[event.operationId] = {
-                  time: time, 
-                  timestamp: event.timestamp,
-                  type: event.operationType,
-                  userId: event.userId, 
-                  subEvents: []
-                };
-                days[date].eventArray.push(days[date].events[event.operationId]);
-              }
-              days[date].events[event.operationId].subEvents.push(event);
+              var parentEvent = findOrCreateEvent(day.events, event, timestamp);
+
+              parentEvent.subEvents.push(event);
             });
-            $scope.days = daysArray;
+            $scope.days = days;
           });
         };
         loadHistory($scope.task.id);
@@ -82,8 +89,6 @@ define([
         $scope.$on('tasklist.task.update', function(evt) {
           loadHistory(evt.targetScope.currentTask.id);
         });
-        
-        
       },
       template: template
     };
