@@ -53,9 +53,15 @@ define([
         };
 
         $scope.focus = function(filter) {
-          if ($scope.focusedId === filter.id) { return; }
-          $scope.focusedId = filter.id;
-          $rootScope.currentFilter = filter;
+          if (filter) {
+            if ($scope.focusedId === filter.id) { return; }
+            $scope.focusedId = filter.id;
+            $rootScope.currentFilter = filter;
+          }
+          else {
+            $scope.focusedId = null;
+            $rootScope.currentFilter = null;
+          }
           $rootScope.$broadcast('tasklist.filter.current', filter);
         };
 

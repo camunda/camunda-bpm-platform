@@ -106,6 +106,12 @@ define('camunda-tasklist-ui', [
 
       $rootScope.$watch('authentication', function(newValue, oldValue) {
         if (isAuth() && (!oldValue || newValue.name !== oldValue.name)) {
+          if (newValue && $rootScope._previousUser !== newValue.name) {
+            $rootScope.currentTask = null;
+            $rootScope.currentFilter = null;
+          }
+
+          $rootScope._previousUser = newValue.name;
           checkFilterCreationAccess();
         }
       });

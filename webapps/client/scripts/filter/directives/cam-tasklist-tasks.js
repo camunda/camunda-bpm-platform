@@ -80,8 +80,6 @@ define([
 
         scope.tasks = scope.tasks || [];
 
-        scope.filter = scope.filter || $rootScope.currentFilter;
-
         scope.sorting = angular.element('[cam-sorting-choices]').scope();
 
         _scopeEvents.push(scope.sorting.$on('sorting.by.change', loadTasks));
