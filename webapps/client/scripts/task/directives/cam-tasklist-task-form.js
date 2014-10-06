@@ -217,6 +217,13 @@ define([
         }
 
 
+        function checkAssignee() {
+          scope.isAssignee = scope.task.assignee &&
+                             scope.$root.authentication &&
+                             scope.task.assignee === scope.$root.authentication.name;
+        }
+
+
         function loadForm(targetContainer) {
           if (!scope.$root.authentication) {
             throw new Error('Not authenticated');
@@ -258,6 +265,8 @@ define([
             loadForm();
           }
         });
+
+        scope.$watch('task.assignee', checkAssignee);
 
         if (scope.task) {
           scope.currentTaskId = scope.task.id;
