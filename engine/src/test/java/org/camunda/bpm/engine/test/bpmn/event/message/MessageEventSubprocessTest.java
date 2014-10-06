@@ -13,18 +13,19 @@
 
 package org.camunda.bpm.engine.test.bpmn.event.message;
 
+import java.util.List;
+
 import org.camunda.bpm.engine.impl.EventSubscriptionQueryImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.EventSubscription;
 import org.camunda.bpm.engine.runtime.Execution;
+import org.camunda.bpm.engine.runtime.ExecutionQuery;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.util.TestExecutionListener;
-
-import java.util.List;
 
 
 /**
@@ -578,5 +579,34 @@ public class MessageEventSubprocessTest extends PluggableProcessEngineTestCase {
     // then: complete the last task of the main process
     taskService.complete(taskService.createTaskQuery().singleResult().getId());
     assertProcessEnded(processInstance.getId());
+  }
+
+  @Deployment
+  public void FAILING_testNonInterruptingWithParallelForkInsideEmbeddedSubProcess() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+    runtimeService.messageEventReceived("newMessage", runtimeService.createEventSubscriptionQuery().singleResult().getExecutionId());
+
+    ExecutionQuery executionQuery = runtimeService.createExecutionQuery();
+
+    String forkId = executionQuery
+        .activityId("fork")
+        .singleResult()
+        .getId();
+
+    Execution eventSubProcessTaskExecution = executionQuery
+        .activityId("eventSubProcessTask")
+        .singleResult();
+
+    ExecutionEntity executionEntity = (ExecutionEntity) eventSubProcessTaskExecution;
+    assertEquals(forkId, executionEntity.getParentId());
+
+    List<Task> tasks = taskService.createTaskQuery().list();
+
+    for (Task task : tasks) {
+      taskService.complete(task.getId());
+    }
+
+    assertProcessEnded(processInstance.getId());
+
   }
 }
