@@ -15,7 +15,6 @@ import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.asset.StringAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -56,7 +55,7 @@ import org.junit.runner.RunWith;
  *
  */
 @RunWith(Arquillian.class)
-public abstract class LocalSLSBInvocationWithCallbackTest extends AbstractFoxPlatformIntegrationTest {
+public class LocalSLSBInvocationWithCallbackTest extends AbstractFoxPlatformIntegrationTest {
 
   @Deployment(name="pa", order=2)
   public static WebArchive processArchive() {
@@ -82,7 +81,6 @@ public abstract class LocalSLSBInvocationWithCallbackTest extends AbstractFoxPla
     return webArchive;
   }
 
-  @Ignore
   @Test
   @OperateOnDeployment("pa")
   public void testInvokeBean() throws Exception{

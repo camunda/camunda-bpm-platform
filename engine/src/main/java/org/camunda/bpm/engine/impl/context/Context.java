@@ -187,7 +187,10 @@ public class Context {
 
       try {
         LOGGER.log(Level.FINE, "[PA-CONTEXT] Switch to {0}", paName);
-        return processApplication.execute(callback);
+        // wrap callback
+        ProcessApplicationClassloaderInterceptor<T> wrappedCallback = new ProcessApplicationClassloaderInterceptor<T>(callback);
+        // execute wrapped callback
+        return processApplication.execute(wrappedCallback);
 
       } catch (Exception e) {
 

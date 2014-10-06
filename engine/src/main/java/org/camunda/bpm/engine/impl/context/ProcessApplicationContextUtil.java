@@ -10,6 +10,7 @@ import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
 import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.util.ClassLoaderUtil;
 
 public class ProcessApplicationContextUtil {
 
@@ -98,8 +99,25 @@ public class ProcessApplicationContextUtil {
 
     final ProcessApplicationReference currentProcessApplication = Context.getCurrentProcessApplication();
 
-    return processApplicationReference != null
-      && ( currentProcessApplication == null || !processApplicationReference.getName().equals(currentProcessApplication.getName()) );
+    if(processApplicationReference == null) {
+      return false;
+    }
 
+    if(currentProcessApplication == null) {
+      return true;
+    }
+    else {
+      if(!processApplicationReference.getName().equals(currentProcessApplication.getName())) {
+        return true;
+      }
+      else {
+        // check whether the thread context has been manipulated since last context switch. This can happen as a result of
+        // an operation causing the container to switch to a different application.
+        // Example: JavaDelegate implementation (inside PA) invokes an EJB from different application which in turn interacts with the Process engine.
+        ClassLoader processApplicationClassLoader = ProcessApplicationClassloaderInterceptor.getProcessApplicationClassLoader();
+        ClassLoader currentClassloader = ClassLoaderUtil.getContextClassloader();
+        return currentClassloader != processApplicationClassLoader;
+      }
+    }
   }
 }
