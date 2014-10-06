@@ -1,9 +1,15 @@
 define([
   'text!./cam-tasklist-task-form.html',
-  'text!./cam-tasklist-task-form-modal.html'
-], function(template, modalTemplate) {
+  'text!./cam-tasklist-task-form-modal.html',
+  'angular'
+], function(
+  template,
+  modalTemplate,
+  angular
+) {
   'use strict';
   var $ = angular.element;
+  var each = angular.forEach;
 
   return [
     '$rootScope',
@@ -87,7 +93,7 @@ define([
             var checkContainerInterval = $interval(function() {
               targetContainer = $('.modal-content .form-container');
               if (targetContainer.length) {
-                loadForm(targetContainer);
+                targetContainer.html('').append(scope._camForm.formElement);
 
                 var wrapper = $('.modal-content');
                 setModalFormMaxHeight(wrapper, targetContainer);
@@ -104,9 +110,12 @@ define([
 
         scope.exitFullscreen = function() {
           scope.fullscreen = !scope.fullscreen;
+          container.html('').append(scope._camForm.formElement);
 
           if (modalInstance) {
-            modalInstance.dismiss();
+            try {
+              modalInstance.dismiss();
+            } catch (e) {}
             $(window).off('resize');
           }
         };
@@ -132,7 +141,9 @@ define([
           container.html('');
 
           if (modalInstance) {
-            modalInstance.dismiss();
+            try {
+              modalInstance.dismiss();
+            } catch (e) {}
           }
 
           $rootScope.$broadcast('tasklist.task.update');
@@ -180,7 +191,11 @@ define([
               initialized:      function(camForm) {
 
                 var formName = camForm.formElement.attr('name');
-                var form = camForm.formElement.scope()[formName];
+
+                var camFormScope = camForm.formElement.scope();
+                if (!camFormScope) { return; }
+
+                var form = camFormScope[formName];
 
                 scope.$watch(function() {
                   return form.$valid && scope.isAssignee;
