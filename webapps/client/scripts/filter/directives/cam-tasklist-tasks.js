@@ -66,7 +66,6 @@ define([
         var _scopeEvents = [];
         element.on('$destroy', function() {
           if (!_scopeEvents.length) { return; }
-          console.info('task element destroyed');
           angular.forEach(_scopeEvents, function(fn) { fn(); });
         });
 

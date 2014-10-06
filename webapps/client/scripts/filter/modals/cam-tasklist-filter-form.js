@@ -298,7 +298,6 @@ define([
       }
       else if (criteriaValidator[name]) {
         var validValue = criteriaValidator[name](criterion.value);
-        console.info('validValue', validValue, criterion.value);
         if (validValue !== false) {
           criterion.error = {field: 'value', message: validValue || 'INVALID_FORMAT_FIELD'};
         }

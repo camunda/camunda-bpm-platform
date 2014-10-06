@@ -36,7 +36,6 @@ define([
         var _scopeEvents = [];
         element.on('$destroy', function() {
           if (!_scopeEvents.length) { return; }
-          console.info('destroy task directive element');
           angular.forEach(_scopeEvents, function(fn) { fn(); });
         });
 
