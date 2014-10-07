@@ -232,9 +232,7 @@ define([
           targetContainer = targetContainer || container;
           scope._camForm = null;
 
-          scope.isAssignee = scope.task.assignee &&
-                             scope.$root.authentication &&
-                             scope.task.assignee === scope.$root.authentication.name;
+          checkAssignee();
 
           if (scope.task._embedded && scope.task._embedded.processDefinition[0]) {
             showForm(targetContainer, scope.task._embedded.processDefinition[0]);

@@ -14,8 +14,7 @@
 
 
 <div class="modal-footer">
-  <div class="form-actions"
-       ng-class="{'not-assignee': !isAssignee}">
+  <div class="form-actions">
     <button class="btn btn-link"
             type="button"
             ng-click="exitFullscreen()"
@@ -23,7 +22,7 @@
 
     <button class="btn btn-primary"
             type="submit"
-            ng-disabled="$invalid"
+            ng-disabled="$invalid || !isAssignee"
             ng-click="completeTask()"
             translate="COMPLETE">Complete</button>
   </div>
