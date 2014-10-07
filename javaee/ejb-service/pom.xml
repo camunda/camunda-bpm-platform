@@ -20,7 +20,6 @@
       <groupId>org.camunda.bpm</groupId>
       <artifactId>camunda-engine</artifactId>
       <scope>provided</scope>
-      <version>${project.version}</version>
     </dependency>
     
     <dependency>
