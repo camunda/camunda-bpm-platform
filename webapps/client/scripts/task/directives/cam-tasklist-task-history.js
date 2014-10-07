@@ -48,12 +48,8 @@ define([
     }
   };
   
-  return [
-  'camAPI',
-  '$translate',
-  function(
-    camAPI,
-    $translate) {
+  return ['camAPI',
+  function(camAPI) {
     var History = camAPI.resource('history');
     var Task = camAPI.resource('task');
     return {
@@ -85,20 +81,10 @@ define([
 
               parentEvent.subEvents.push(event);
             });
-            $translate('COMMENT').then(function(translated) {
-              angular.forEach($scope.comments, function(comment) {
-                var day = findOrCreateDay(days, comment.time);
-                var commentEvent = {
-                  time: comment.time,
-                  type: translated,
-                  userId: comment.userId,
-                  subEvents: [{
-                    property: 'content',
-                    newValue: comment.message
-                  }]
-                };
-                day.events.push(commentEvent);
-              });
+            angular.forEach($scope.comments, function(comment) {
+              var day = findOrCreateDay(days, comment.time);
+              comment.type = 'Comment';
+              day.events.push(comment);
             });
             $scope.days = days;
           });

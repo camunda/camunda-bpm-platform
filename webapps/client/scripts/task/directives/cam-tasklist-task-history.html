@@ -20,7 +20,7 @@
             <span class="operation-user">{{ event.userId }}</span>
           </div>
           <div class="col-xs-12 event-body">
-            <div class="row" ng-repeat="subEvent in event.subEvents">
+            <div class="row" ng-repeat="subEvent in event.subEvents" ng-if="event.type !== 'Comment'">
               <div class="col-sm-12 col-md-3 event-property">{{ subEvent.property }}</div>
               <div class="col-sm-12 col-md-9 event-value">
                 <span ng-if="subEvent.orgValue">
@@ -35,6 +35,9 @@
                   <span ng-if="!isTimestampProperty(subEvent.property)">{{ subEvent.newValue }}</span>
                 </span>
               </div>
+            </div>
+            <div ng-if="event.type === 'Comment'">
+              {{event.message}}
             </div>
           </div>
         </div>
