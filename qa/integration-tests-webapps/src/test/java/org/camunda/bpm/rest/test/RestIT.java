@@ -1,24 +1,22 @@
 package org.camunda.bpm.rest.test;
 
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.multipart.Boundary;
-import com.sun.jersey.multipart.FormDataMultiPart;
-import com.sun.jersey.multipart.file.StreamDataBodyPart;
-import java.io.InputStream;
+import static org.junit.Assert.assertEquals;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
+
 import javax.ws.rs.core.MediaType;
+
 import org.camunda.bpm.AbstractWebappIntegrationTest;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
+import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.WebResource;
 
 public class RestIT extends AbstractWebappIntegrationTest {
 
@@ -34,11 +32,6 @@ public class RestIT extends AbstractWebappIntegrationTest {
 
   protected String getApplicationContextPath() {
     return "engine-rest/";
-  }
-
-  @Before
-  public void deployAdditionalProcess() {
-    deployProcess("jobexample.bpmn", "org/camunda/bpm/rest/test/jobexample.bpmn");
   }
 
   @Test
@@ -70,7 +63,7 @@ public class RestIT extends AbstractWebappIntegrationTest {
 
     JSONArray definitionsJson = response.getEntity(JSONArray.class);
     // invoice example
-    assertEquals(2, definitionsJson.length());
+    assertEquals(1, definitionsJson.length());
 
     JSONObject definitionJson = definitionsJson.getJSONObject(0);
 
@@ -103,22 +96,6 @@ public class RestIT extends AbstractWebappIntegrationTest {
   }
 
   @Test
-  public void testDelayedProcessDefinitionSuspension() {
-    log.info("Checking " + APP_BASE_PATH + PROCESS_DEFINITION_PATH + "/key/invoice/suspended");
-
-    WebResource resource = client.resource(APP_BASE_PATH + PROCESS_DEFINITION_PATH + "/key/invoice/suspended");
-
-    Map<String, Object> requestBody = new HashMap<String, Object>();
-    requestBody.put("suspended", true);
-    requestBody.put("includeProcessInstances", true);
-    requestBody.put("executionDate", "2014-08-25T13:55:45");
-
-    ClientResponse response = resource.accept(MediaType.APPLICATION_JSON).type(MediaType.APPLICATION_JSON).put(ClientResponse.class, requestBody);
-
-    assertEquals(204, response.getStatus());
-  }
-
-  @Test
   public void testDelayedJobDefinitionSuspension() {
     log.info("Checking " + APP_BASE_PATH + JOB_DEFINITION_PATH + "/suspended");
 
@@ -134,26 +111,5 @@ public class RestIT extends AbstractWebappIntegrationTest {
 
     assertEquals(204, response.getStatus());
   }
-
-  protected void deployProcess(String filename, String resourcePath) {
-    WebResource resource = client.resource(APP_BASE_PATH + "deployment/create");
-
-    FormDataMultiPart formDataMultiPart = new FormDataMultiPart();
-    formDataMultiPart.field("deployment-name", "jobProcess");
-    formDataMultiPart.field("enable-duplicate-filtering", "true");
-
-    InputStream bpmnResource = getClass().getClassLoader().getResourceAsStream(resourcePath);
-    StreamDataBodyPart data = new StreamDataBodyPart("data", bpmnResource, filename, MediaType.MULTIPART_FORM_DATA_TYPE);
-    formDataMultiPart.bodyPart(data);
-
-    ClientResponse response = resource
-      // Workaround for known issue https://java.net/jira/browse/JERSEY-1424
-      .type(Boundary.addBoundary(MediaType.MULTIPART_FORM_DATA_TYPE))
-      .accept(MediaType.APPLICATION_JSON).post(ClientResponse.class, formDataMultiPart);
-    assertEquals(200, response.getStatus());
-
-    response.close();
-  }
-
 
 }
