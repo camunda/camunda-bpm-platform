@@ -85,7 +85,6 @@
     <dependency>
       <groupId>org.camunda.bpm.javaee</groupId>
       <artifactId>camunda-ejb-client</artifactId>
-      <version>${project.version}</version>
     </dependency>
 
     <dependency>
@@ -104,7 +103,6 @@
     <dependency>
       <groupId>org.camunda.bpm</groupId>
       <artifactId>camunda-engine</artifactId>
-      <version>${project.version}</version>
     </dependency>
 
     <dependency>
