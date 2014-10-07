@@ -200,6 +200,8 @@ public final class BpmnModelConstants {
   public static final String BPMN_ELEMENT_COMPLEX_GATEWAY = "complexGateway";
   public static final String BPMN_ELEMENT_EVENT_BASED_GATEWAY = "eventBasedGateway";
   public static final String BPMN_ELEMENT_INCLUSIVE_GATEWAY = "inclusiveGateway";
+  public static final String BPMN_ELEMENT_TEXT_ANNOTATION = "textAnnotation";
+  public static final String BPMN_ELEMENT_TEXT = "text";
 
   /** DC */
 

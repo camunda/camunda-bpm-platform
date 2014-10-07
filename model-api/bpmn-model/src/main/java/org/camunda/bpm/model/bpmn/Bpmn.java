@@ -415,6 +415,8 @@ public class Bpmn {
     TargetRef.registerType(bpmnModelBuilder);
     TaskImpl.registerType(bpmnModelBuilder);
     TerminateEventDefinitionImpl.registerType(bpmnModelBuilder);
+    TextImpl.registerType(bpmnModelBuilder);
+    TextAnnotationImpl.registerType(bpmnModelBuilder);
     ThrowEventImpl.registerType(bpmnModelBuilder);
     TimeCycleImpl.registerType(bpmnModelBuilder);
     TimeDateImpl.registerType(bpmnModelBuilder);
