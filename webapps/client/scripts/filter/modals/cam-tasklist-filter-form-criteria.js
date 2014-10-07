@@ -221,7 +221,7 @@ define(function() {
           expressionSupport: true,
           help: dateExpLangHelp,
           validate: dateValidate
-        }
+        },
         {
           name: 'followUpBeforeOrNotExistent',
           label: 'Follow Up Before or Not Existent',
