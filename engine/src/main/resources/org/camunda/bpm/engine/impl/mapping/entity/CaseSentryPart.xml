@@ -38,7 +38,7 @@
   <update id="updateCaseSentryPart" parameterType="org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseSentryPartEntity">
     update ${prefix}ACT_RU_CASE_SENTRY_PART set
       REV_ = #{revisionNext, jdbcType=INTEGER},
-      SATISFIED_ = #{satisfied, jdbcType=INTEGER}
+      SATISFIED_ = #{satisfied, jdbcType=BOOLEAN}
     where ID_ = #{id, jdbcType=VARCHAR}
       and REV_ = #{revision, jdbcType=INTEGER}
   </update>
@@ -128,66 +128,7 @@
 
       <!-- satisfied -->
       <if test="satisfied">
-        and RES.SATISFIED = 1
-      </if>
-
-    </where>
-  </sql>
-
-  <select id="selectCaseSentryPartsByQueryCriteria_postgres" parameterType="org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseSentryPartQueryImpl" resultMap="caseSentryPartResultMap">
-    ${limitBefore}
-    select RES.* ${limitBetween}
-    <include refid="selectCaseSentryPartsByQueryCriteriaSql_postgres"/>
-    ${orderBy}
-    ${limitAfter}
-  </select>
-
-  <select id="selectCaseSentryPartsCountByQueryCriteria_postgres" parameterType="org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseSentryPartQueryImpl" resultType="long">
-    select count(*)
-    <include refid="selectCaseSentryPartsByQueryCriteriaSql_postgres"/>
-  </select>
-
-  <sql id="selectCaseSentryPartsByQueryCriteriaSql_postgres">
-    from ${prefix}ACT_RU_CASE_SENTRY_PART RES
-    <where>
-      <!-- id -->
-      <if test="id != null">
-        RES.ID_ = #{id}
-      </if>
-
-      <!-- caseInstanceId -->
-      <if test="caseInstanceId != null">
-        and RES.CASE_INST_ID_ = #{caseInstanceId}
-      </if>
-
-      <!-- caseExecutionId -->
-      <if test="caseExecutionId != null">
-        and RES.CASE_EXEC_ID_ = #{caseExecutionId}
-      </if>
-
-      <!-- sentryId -->
-      <if test="sentryId != null">
-        and RES.SENTRY_ID_ = #{sentryId}
-      </if>
-
-      <!-- type -->
-      <if test="type != null">
-        and RES.TYPE_ = #{type}
-      </if>
-
-      <!-- sourceCaseExecutionId -->
-      <if test="sourceCaseExecutionId != null">
-        and RES.SOURCE_CASE_EXEC_ID_ = #{sourceCaseExecutionId}
-      </if>
-
-      <!-- standardEvent -->
-      <if test="standardEvent != null">
-        and RES.STANDARD_EVENT_ = #{standardEvent}
-      </if>
-
-      <!-- satisfied -->
-      <if test="satisfied">
-        and RES.SATISFIED = true
+        and RES.SATISFIED_ = ${trueConstant}
       </if>
 
     </where>
