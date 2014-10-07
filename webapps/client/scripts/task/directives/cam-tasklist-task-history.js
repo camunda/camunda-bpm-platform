@@ -37,7 +37,7 @@ define([
       return parentEvent[0];
     } else {
       parentEvent = {
-        time: timestamp,
+        time: event.timestamp,
         type: event.operationType,
         operationId: event.operationId,
         userId: event.userId, 
@@ -48,8 +48,12 @@ define([
     }
   };
   
-  return ['camAPI',
-  function(camAPI) {
+  return [
+  'camAPI',
+  '$translate',
+  function(
+    camAPI,
+    $translate) {
     var History = camAPI.resource('history');
     var Task = camAPI.resource('task');
     return {
@@ -70,6 +74,7 @@ define([
             commentData: function(cb) { Task.comments(taskId, cb); }
           }, function(err, data) {
             $scope.history = data.historyData;
+            $scope.comments = data.commentData;
             var days = [];
             angular.forEach($scope.history, function(event) {
               // create object for each day, containing the events for this day
@@ -79,6 +84,21 @@ define([
               var parentEvent = findOrCreateParentEvent(day.events, event);
 
               parentEvent.subEvents.push(event);
+            });
+            $translate('COMMENT').then(function(translated) {
+              angular.forEach($scope.comments, function(comment) {
+                var day = findOrCreateDay(days, comment.time);
+                var commentEvent = {
+                  time: comment.time,
+                  type: translated,
+                  userId: comment.userId,
+                  subEvents: [{
+                    property: 'content',
+                    newValue: comment.message
+                  }]
+                };
+                day.events.push(commentEvent);
+              });
             });
             $scope.days = days;
           });
