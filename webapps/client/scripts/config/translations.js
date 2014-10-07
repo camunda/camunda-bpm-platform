@@ -13,7 +13,6 @@ define([
   function(
     $translateProvider
   ) {
-
     // Simply register translation table as object hash
     $translateProvider
       .translations('en', en)

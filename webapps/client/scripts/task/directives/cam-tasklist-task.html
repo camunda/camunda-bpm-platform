@@ -19,6 +19,13 @@
           <input type="checkbox" ng-model="selected" ng-click="batchSelect()" />
         </div>
         -->
+        <div class="pull-right" ng-controller="commentFormCtrl">
+          <a href
+             ng-click="createComment(task)">
+            Add Comment
+            <span class="glyphicon glyphicon-plus-sign"></span>
+          </a>
+        </div>
       </div>
 
       <div class="names">
@@ -29,10 +36,8 @@
         </h4>
       </div>
 
-
       <div cam-tasklist-task-meta
            task="task"></div>
-
 
     </div>
   </header>

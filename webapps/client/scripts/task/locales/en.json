@@ -21,6 +21,14 @@
         "History",
   "COMMENT":
         "Comment",
+  "COMMENT_CREATE":
+        "Add Comment",
+  "COMMENT_MESSAGE_PLACEHOLDER":
+        "Enter Comment",
+  "COMMENT_SAVE_ERROR":
+        "Comment could not be saved",
+  "COMMENT_SAVE_SUCCESS":
+        "Comment saved successfully",
   "DESCRIPTION":
         "Description",
   "SELECT_TASK_IN_LIST":

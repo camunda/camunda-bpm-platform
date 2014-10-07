@@ -9,6 +9,7 @@ define([
   './directives/cam-tasklist-task-diagram',
   './directives/cam-tasklist-task-meta',
   './directives/cam-tasklist-task-form',
+  './modals/cam-tasklist-comment-form',
 
   'camunda-tasklist-ui/utils',
   'camunda-tasklist-ui/api',
@@ -20,7 +21,8 @@ define([
   taskHistoryDirective,
   taskDiagramDirective,
   taskMetaDirective,
-  taskFormDirective
+  taskFormDirective,
+  taskCommentController
 ) {
 
   var taskModule = angular.module('cam.tasklist.task', [
@@ -38,6 +40,8 @@ define([
   /**
    * @memberof cam.tasklist
    */
+
+  taskModule.controller('commentFormCtrl', taskCommentController);
 
   taskModule.directive('camTasklistTask', taskDirective);
 
