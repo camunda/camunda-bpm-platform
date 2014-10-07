@@ -15,7 +15,7 @@ define([
   
   var findOrCreateDay = function(days, timestamp) {
     var day = jquery.grep(days, function(elem) {
-      return moment(elem.date/1000, 'X').format('YYYY-MM-DD') === moment(timestamp/1000, 'X').format('YYYY-MM-DD');
+      return moment(elem.date).format('YYYY-MM-DD') === moment(timestamp).format('YYYY-MM-DD');
     });
     if(day.length > 0) {
       return day[0];
@@ -29,22 +29,22 @@ define([
     }
   };
   
-  var findOrCreateEvent = function(events, event, timestamp) {
-    var targetEvent = jquery.grep(events, function(elem) {
+  var findOrCreateParentEvent = function(events, event) {
+    var parentEvent = jquery.grep(events, function(elem) {
       return elem.operationId === event.operationId;
     });
-    if(targetEvent.length > 0) {
-      return targetEvent[0];
+    if(parentEvent.length > 0) {
+      return parentEvent[0];
     } else {
-      targetEvent = {
+      parentEvent = {
         time: timestamp,
         type: event.operationType,
         operationId: event.operationId,
         userId: event.userId, 
         subEvents: []
       };
-      events.push(targetEvent);
-      return targetEvent;
+      events.push(parentEvent);
+      return parentEvent;
     }
   };
   
@@ -72,20 +72,18 @@ define([
             $scope.history = data.historyData;
             var days = [];
             angular.forEach($scope.history, function(event) {
-              var mom = moment(event.timestamp, 'YYYY-MM-DDTHH:mm:ss');
-              var timestamp = mom.format('X')*1000;
-
               // create object for each day, containing the events for this day
-              var day = findOrCreateDay(days, timestamp);
+              var day = findOrCreateDay(days, event.timestamp);
 
               // create event object for each operationId
-              var parentEvent = findOrCreateEvent(day.events, event, timestamp);
+              var parentEvent = findOrCreateParentEvent(day.events, event);
 
               parentEvent.subEvents.push(event);
             });
             $scope.days = days;
           });
         };
+
         loadHistory($scope.task.id);
         $scope.$on('tasklist.task.current', function(evt) {
           loadHistory(evt.targetScope.currentTask.id);
