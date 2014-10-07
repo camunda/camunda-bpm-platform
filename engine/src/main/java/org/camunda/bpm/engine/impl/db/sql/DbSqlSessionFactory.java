@@ -53,10 +53,6 @@ public class DbSqlSessionFactory implements SessionFactory {
   public static final Map<String, String> databaseSpecificBitAnd2 = new HashMap<String, String>();
   public static final Map<String, String> databaseSpecificBitAnd3 = new HashMap<String, String>();
 
-  public static final Map<String, String> databaseSpecificDateDiff1 = new HashMap<String, String>();
-  public static final Map<String, String> databaseSpecificDateDiff2 = new HashMap<String, String>();
-  public static final Map<String, String> databaseSpecificDateDiff3 = new HashMap<String, String>();
-
   public static final Map<String, String> databaseSpecificDummyTable = new HashMap<String, String>();
 
   public static final Map<String, String> databaseSpecificTrueConstant = new HashMap<String, String>();
@@ -78,9 +74,6 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificBitAnd1.put(H2, "BITAND(");
     databaseSpecificBitAnd2.put(H2, ",");
     databaseSpecificBitAnd3.put(H2, ")");
-    databaseSpecificDateDiff1.put(H2, "DATEDIFF(ms, ");
-    databaseSpecificDateDiff2.put(H2, ",");
-    databaseSpecificDateDiff3.put(H2, ")");
     databaseSpecificDummyTable.put(H2, "");
     databaseSpecificTrueConstant.put(H2, "1");
     databaseSpecificFalseConstant.put(H2, "0");
@@ -102,9 +95,6 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificBitAnd2.put(MYSQL, " & ");
     databaseSpecificBitAnd3.put(MYSQL, "");
     databaseSpecificDummyTable.put(MYSQL, "");
-    databaseSpecificDateDiff1.put(MYSQL, "TIMESTAMPDIFF(SECOND,");
-    databaseSpecificDateDiff2.put(MYSQL, ",");
-    databaseSpecificDateDiff3.put(MYSQL, ")*1000");
     databaseSpecificTrueConstant.put(MYSQL, "1");
     databaseSpecificFalseConstant.put(MYSQL, "0");
     addDatabaseSpecificStatement(MYSQL, "selectNextJobsToExecute", "selectNextJobsToExecute_mysql");
@@ -130,9 +120,6 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificBitAnd1.put(POSTGRES, "");
     databaseSpecificBitAnd2.put(POSTGRES, " & ");
     databaseSpecificBitAnd3.put(POSTGRES, "");
-    databaseSpecificDateDiff1.put(POSTGRES, "(EXTRACT(EPOCH FROM ");
-    databaseSpecificDateDiff2.put(POSTGRES, " AT TIME ZONE 'UTC') * 1000) - (EXTRACT(EPOCH FROM ");
-    databaseSpecificDateDiff3.put(POSTGRES, " AT TIME ZONE 'UTC') * 1000)");
     databaseSpecificDummyTable.put(POSTGRES, "");
     databaseSpecificTrueConstant.put(POSTGRES, "true");
     databaseSpecificFalseConstant.put(POSTGRES, "false");
@@ -180,9 +167,6 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificBitAnd1.put(ORACLE, "BITAND(");
     databaseSpecificBitAnd2.put(ORACLE, ",");
     databaseSpecificBitAnd3.put(ORACLE, ")");
-    databaseSpecificDateDiff1.put(ORACLE, "((cast(");
-    databaseSpecificDateDiff2.put(ORACLE, " as date) - date '1970-01-01')*24*60*60*1000) - ((cast(");
-    databaseSpecificDateDiff3.put(ORACLE, " as date) - date '1970-01-01')*24*60*60*1000)");
     databaseSpecificTrueConstant.put(ORACLE, "1");
     databaseSpecificFalseConstant.put(ORACLE, "0");
     addDatabaseSpecificStatement(ORACLE, "selectExclusiveJobsToExecute", "selectExclusiveJobsToExecute_integerBoolean");
@@ -203,9 +187,6 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificBitAnd1.put(DB2, "BITAND(");
     databaseSpecificBitAnd2.put(DB2, ",");
     databaseSpecificBitAnd3.put(DB2, ")");
-    databaseSpecificDateDiff1.put(DB2, "");
-    databaseSpecificDateDiff2.put(DB2, "");
-    databaseSpecificDateDiff3.put(DB2, "");
     databaseSpecificDummyTable.put(DB2, "FROM SYSIBM.SYSDUMMY1");
     databaseSpecificTrueConstant.put(DB2, "1");
     databaseSpecificFalseConstant.put(DB2, "0");
@@ -232,9 +213,6 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificBitAnd1.put(MSSQL, "");
     databaseSpecificBitAnd2.put(MSSQL, " &");
     databaseSpecificBitAnd3.put(MSSQL, "");
-    databaseSpecificDateDiff1.put(MSSQL, "");
-    databaseSpecificDateDiff2.put(MSSQL, "");
-    databaseSpecificDateDiff3.put(MSSQL, "");
     databaseSpecificDummyTable.put(MSSQL, "");
     databaseSpecificTrueConstant.put(MSSQL, "1");
     databaseSpecificFalseConstant.put(MSSQL, "0");
