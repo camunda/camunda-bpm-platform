@@ -46,7 +46,7 @@ public class AbstractCallActivityBuilder<B extends AbstractCallActivityBuilder<B
    * @return the builder object
    */
   public B camundaAsync() {
-    element.setCamundaAsync(true);
+    element.setCamundaAsyncBefore(true);
     return myself;
   }
 
@@ -59,7 +59,7 @@ public class AbstractCallActivityBuilder<B extends AbstractCallActivityBuilder<B
    * @return the builder object
    */
   public B camundaAsync(boolean isCamundaAsync) {
-    element.setCamundaAsync(isCamundaAsync);
+    element.setCamundaAsyncBefore(isCamundaAsync);
     return myself;
   }
 

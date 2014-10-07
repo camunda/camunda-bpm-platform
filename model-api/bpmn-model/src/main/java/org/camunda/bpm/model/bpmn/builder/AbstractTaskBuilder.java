@@ -35,7 +35,7 @@ public abstract class AbstractTaskBuilder<B extends AbstractTaskBuilder<B, E>, E
    * @return the builder object
    */
   public B camundaAsync() {
-    element.setCamundaAsync(true);
+    element.setCamundaAsyncBefore(true);
     return myself;
   }
 
@@ -48,7 +48,7 @@ public abstract class AbstractTaskBuilder<B extends AbstractTaskBuilder<B, E>, E
    * @return the builder object
    */
   public B camundaAsync(boolean isCamundaAsync) {
-    element.setCamundaAsync(isCamundaAsync);
+    element.setCamundaAsyncBefore(isCamundaAsync);
     return myself;
   }
 }
