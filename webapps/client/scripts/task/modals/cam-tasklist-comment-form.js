@@ -9,11 +9,13 @@ define([
 ) {
   'use strict';
   var commentCreateModalCtrl = [
+    '$rootScope',
     '$scope',
     '$translate',
     'Notifications',
     'camAPI',
   function(
+    $rootScope,
     $scope,
     $translate,
     Notifications,
@@ -47,7 +49,7 @@ define([
         }
 
         successNotification('COMMENT_SAVE_SUCCESS');
-        //$scope.$emit('tasklist.filter.saved');
+        $rootScope.$broadcast('tasklist.comment.new');
         $scope.$close();
       });
     };

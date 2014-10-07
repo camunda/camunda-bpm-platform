@@ -116,6 +116,10 @@ define([
         scope.$on('tasklist.task.current', function(ev, task) {
           setTask(task);
         });
+        scope.$on('tasklist.comment.new', function(evt) {
+          angular.forEach(scope.tabs, function(ea) { ea = false; });
+          scope.tabs.history = true;
+        });
 
         setTask($rootScope.currentTask);
       }

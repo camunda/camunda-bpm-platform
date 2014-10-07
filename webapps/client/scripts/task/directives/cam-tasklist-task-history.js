@@ -97,6 +97,9 @@ define([
         $scope.$on('tasklist.task.update', function(evt) {
           loadHistory(evt.targetScope.currentTask.id);
         });
+        $scope.$on('tasklist.comment.new', function(evt) {
+          loadHistory(evt.targetScope.currentTask.id);
+        });
       },
       template: template
     };
