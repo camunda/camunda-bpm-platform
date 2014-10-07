@@ -133,21 +133,8 @@
     where (RETRIES_ &gt; 0)
       and (DUEDATE_ is null or DUEDATE_ &lt; #{parameter.now, jdbcType=TIMESTAMP})
       and (LOCK_OWNER_ is null or LOCK_EXP_TIME_ &lt; #{parameter.now, jdbcType=TIMESTAMP})
-      and (EXCLUSIVE_ = TRUE)
+      and (EXCLUSIVE_ = ${trueConstant})
       and (PROCESS_INSTANCE_ID_ = #{parameter.pid})
-      and (RES.SUSPENSION_STATE_ = 1 or RES.SUSPENSION_STATE_ is null)
-    ${limitAfter}
-  </select>
-
-  <select id="selectExclusiveJobsToExecute_integerBoolean" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
-  	${limitBefore}
-    select RES.* ${limitBetween}
-    from ${prefix}ACT_RU_JOB RES
-    where (RETRIES_ &gt; 0)
-      and (DUEDATE_ is null or DUEDATE_ &lt; #{parameter.now, jdbcType=TIMESTAMP})
-      and (LOCK_OWNER_ is null or LOCK_EXP_TIME_ &lt; #{parameter.now, jdbcType=TIMESTAMP})
-      and (EXCLUSIVE_ = 1)
-      and (PROCESS_INSTANCE_ID_ = #{parameter.pid})  
       and (RES.SUSPENSION_STATE_ = 1 or RES.SUSPENSION_STATE_ is null)
     ${limitAfter}
   </select>
