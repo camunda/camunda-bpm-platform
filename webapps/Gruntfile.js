@@ -29,7 +29,7 @@ module.exports = function(grunt) {
 
     protractor:       require('camunda-commons-ui/grunt/config/protractor')(config),
 
-    seleniuminstall:  require('camunda-commons-ui/grunt/config/seleniuminstall')(config),
+    // seleniuminstall:  require('camunda-commons-ui/grunt/config/seleniuminstall')(config),
 
     requirejs:        require('./grunt/config/requirejs')(config),
 
