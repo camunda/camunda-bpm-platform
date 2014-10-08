@@ -10,6 +10,7 @@ drop index ACT_IDX_VAR_EXE;
 drop index ACT_IDX_VAR_PROCINST;
 drop index ACT_IDX_VAR_BYTEARRAY;
 drop index ACT_IDX_JOB_EXCEPTION;
+drop index ACT_IDX_JOB_PROCINST;
 drop index ACT_IDX_INC_CONFIGURATION;
 
 drop index ACT_IDX_EXEC_BUSKEY;

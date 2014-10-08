@@ -184,3 +184,6 @@ create table ACT_RU_FILTER (
   PROPERTIES_ LONGTEXT,
   primary key (ID_)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
+
+-- add index to improve job executor performance
+create index ACT_IDX_JOB_PROCINST on ACT_RU_JOB(PROCESS_INSTANCE_ID_);

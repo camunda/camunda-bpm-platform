@@ -186,3 +186,6 @@ create table ACT_RU_FILTER (
   PROPERTIES_ CLOB,
   primary key (ID_)
 );
+
+-- add index to improve job executor performance
+create index ACT_IDX_JOB_PROCINST on ACT_RU_JOB(PROCESS_INSTANCE_ID_);
