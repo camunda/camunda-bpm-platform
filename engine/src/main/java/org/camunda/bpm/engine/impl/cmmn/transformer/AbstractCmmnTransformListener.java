@@ -1,15 +1,16 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
- *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.camunda.bpm.engine.impl.cmmn.transformer;
 
 import java.util.List;
@@ -31,36 +32,44 @@ import org.camunda.bpm.model.cmmn.instance.Stage;
 import org.camunda.bpm.model.cmmn.instance.Task;
 
 /**
- * Listener which can be registered within the engine to receive events during transforming (and
- * maybe influence it). Instead of implementing this interface you might consider to extend
- * the {@link AbstractCmmnTransformListener}, which contains an empty implementation for all methods
- * and makes your implementation easier and more robust to future changes.
+ * Abstract base class for implementing a {@link CmmnTransformListener} without being forced to implement
+ * all methods provided, which make the implementation more robust to future changes.
  *
  * @author Sebastian Menski
- *
  */
-public interface CmmnTransformListener {
+public class AbstractCmmnTransformListener implements CmmnTransformListener {
 
-  void transformRootElement(Definitions definitions, List<? extends CmmnCaseDefinition> caseDefinitions);
+  public void transformRootElement(Definitions definitions, List<? extends CmmnCaseDefinition> caseDefinitions) {
+  }
 
-  void transformCase(Case element, CmmnCaseDefinition caseDefinition);
+  public void transformCase(Case element, CmmnCaseDefinition caseDefinition) {
+  }
 
-  void transformCasePlanModel(CasePlanModel casePlanModel, CmmnActivity activity);
+  public void transformCasePlanModel(CasePlanModel casePlanModel, CmmnActivity activity) {
+  }
 
-  void transformHumanTask(PlanItem planItem, HumanTask humanTask, CmmnActivity activity);
+  public void transformHumanTask(PlanItem planItem, HumanTask humanTask, CmmnActivity activity) {
+  }
 
-  void transformProcessTask(PlanItem planItem, ProcessTask processTask, CmmnActivity activity);
+  public void transformProcessTask(PlanItem planItem, ProcessTask processTask, CmmnActivity activity) {
+  }
 
-  void transformCaseTask(PlanItem planItem, CaseTask caseTask, CmmnActivity activity);
+  public void transformCaseTask(PlanItem planItem, CaseTask caseTask, CmmnActivity activity) {
+  }
 
-  void transformTask(PlanItem planItem, Task task, CmmnActivity activity);
+  public void transformTask(PlanItem planItem, Task task, CmmnActivity activity) {
+  }
 
-  void transformStage(PlanItem planItem, Stage stage, CmmnActivity activity);
+  public void transformStage(PlanItem planItem, Stage stage, CmmnActivity activity) {
+  }
 
-  void transformMilestone(PlanItem planItem, Milestone milestone, CmmnActivity activity);
+  public void transformMilestone(PlanItem planItem, Milestone milestone, CmmnActivity activity) {
+  }
 
-  void transformEventListener(PlanItem planItem, EventListener eventListener, CmmnActivity activity);
+  public void transformEventListener(PlanItem planItem, EventListener eventListener, CmmnActivity activity) {
+  }
 
-  void transformSentry(Sentry sentry, CmmnSentryDeclaration sentryDeclaration);
+  public void transformSentry(Sentry sentry, CmmnSentryDeclaration sentryDeclaration) {
+  }
 
 }

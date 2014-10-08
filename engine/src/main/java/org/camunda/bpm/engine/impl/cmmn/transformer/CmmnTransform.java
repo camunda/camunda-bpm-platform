@@ -27,6 +27,7 @@ import org.camunda.bpm.engine.impl.cmmn.handler.ItemHandler;
 import org.camunda.bpm.engine.impl.cmmn.handler.SentryHandler;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
+import org.camunda.bpm.engine.impl.cmmn.model.CmmnSentryDeclaration;
 import org.camunda.bpm.engine.impl.core.transformer.Transform;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
 import org.camunda.bpm.engine.impl.persistence.entity.DeploymentEntity;
@@ -61,7 +62,7 @@ public class CmmnTransform implements Transform<CaseDefinitionEntity> {
 
   protected ExpressionManager expressionManager;
   protected DefaultCmmnElementHandlerRegistry handlerRegistry;
-  protected List<CmmnTransformListener> parseListeners;
+  protected List<CmmnTransformListener> transformListeners;
 
   protected ResourceEntity resource;
   protected DeploymentEntity deployment;
@@ -74,7 +75,7 @@ public class CmmnTransform implements Transform<CaseDefinitionEntity> {
     this.transformer = transformer;
     this.expressionManager = transformer.getExpressionManager();
     this.handlerRegistry = transformer.getCmmnElementHandlerRegistry();
-    this.parseListeners = transformer.getTransformListener();
+    this.transformListeners = transformer.getTransformListeners();
   }
 
   public CmmnTransform deployment(DeploymentEntity deployment) {
@@ -112,7 +113,7 @@ public class CmmnTransform implements Transform<CaseDefinitionEntity> {
 
     try {
 
-       parseRootElement();
+       transformRootElement();
 
     } catch (Exception e) {
       // ALL unexpected exceptions should bubble up since they are not handled
@@ -123,29 +124,34 @@ public class CmmnTransform implements Transform<CaseDefinitionEntity> {
     return caseDefinitions;
   }
 
-  protected void parseRootElement() {
+  protected void transformRootElement() {
 
-    parseImports();
-    parseCaseDefinitions();
+    transformImports();
+    transformCaseDefinitions();
+
+    Definitions definitions = model.getDefinitions();
+    for (CmmnTransformListener transformListener : transformListeners) {
+      transformListener.transformRootElement(definitions, caseDefinitions);
+    }
 
   }
 
-  protected void parseImports() {
+  protected void transformImports() {
     // not implemented yet
   }
 
-  protected void parseCaseDefinitions() {
+  protected void transformCaseDefinitions() {
     Definitions definitions = model.getDefinitions();
 
     Collection<Case> cases = definitions.getCases();
 
     for (Case currentCase : cases) {
-      CmmnCaseDefinition caseDefinition = parseCase(currentCase);
+      CmmnCaseDefinition caseDefinition = transformCase(currentCase);
       caseDefinitions.add((CaseDefinitionEntity) caseDefinition);
     }
   }
 
-  protected CaseDefinitionEntity parseCase(Case element) {
+  protected CaseDefinitionEntity transformCase(Case element) {
     // get CaseTransformer
     CmmnElementHandler<Case, CmmnActivity> caseTransformer = getDefinitionHandler(Case.class);
     CmmnActivity definition = caseTransformer.handleElement(element, context);
@@ -154,42 +160,50 @@ public class CmmnTransform implements Transform<CaseDefinitionEntity> {
     context.setParent(definition);
 
     CasePlanModel casePlanModel = element.getCasePlanModel();
-    parseCasePlanModel(casePlanModel);
+    transformCasePlanModel(casePlanModel);
+
+    for (CmmnTransformListener transformListener : transformListeners) {
+      transformListener.transformCase(element, (CmmnCaseDefinition) definition);
+    }
 
     return (CaseDefinitionEntity) definition;
   }
 
-  protected void parseCasePlanModel(CasePlanModel casePlanModel) {
+  protected void transformCasePlanModel(CasePlanModel casePlanModel) {
     CasePlanModelHandler transformer = (CasePlanModelHandler) getPlanItemHandler(CasePlanModel.class);
     CmmnActivity newActivity = transformer.handleElement(casePlanModel, context);
     context.setParent(newActivity);
 
-    parseStage(casePlanModel, newActivity);
+    transformStage(casePlanModel, newActivity);
 
     context.setParent(newActivity);
     transformer.initializeExitCriterias(casePlanModel, newActivity, context);
+
+    for (CmmnTransformListener transformListener : transformListeners) {
+      transformListener.transformCasePlanModel(casePlanModel, newActivity);
+    }
   }
 
-  protected void parseStage(Stage stage, CmmnActivity parent) {
+  protected void transformStage(Stage stage, CmmnActivity parent) {
 
     context.setParent(parent);
 
     // transform a sentry with it ifPart (onParts will
     // not be transformed in this step)
-    parseSentries(stage);
+    transformSentries(stage);
 
     // transform planItems
-    parsePlanItems(stage, parent);
+    transformPlanItems(stage, parent);
 
     // transform the onParts of the existing sentries
-    parseSentryOnParts(stage);
+    transformSentryOnParts(stage);
 
     // parse planningTable (not yet implemented)
-    parsePlanningTable(stage.getPlanningTable(), parent);
+    transformPlanningTable(stage.getPlanningTable(), parent);
 
   }
 
-  protected void parsePlanningTable(PlanningTable planningTable, CmmnActivity parent) {
+  protected void transformPlanningTable(PlanningTable planningTable, CmmnActivity parent) {
     // not yet implemented.
 
     // TODO: think about how to organize the planning tables! A tableItem or planningTable
@@ -197,7 +211,7 @@ public class CmmnTransform implements Transform<CaseDefinitionEntity> {
     // planningTable is applicable for planning otherwise it is not.
   }
 
-  protected void parseSentries(Stage stage) {
+  protected void transformSentries(Stage stage) {
     Collection<Sentry> sentries = stage.getSentrys();
 
     if (sentries != null && !sentries.isEmpty()) {
@@ -208,27 +222,32 @@ public class CmmnTransform implements Transform<CaseDefinitionEntity> {
     }
   }
 
-  protected void parseSentryOnParts(Stage stage) {
+  protected void transformSentryOnParts(Stage stage) {
     Collection<Sentry> sentries = stage.getSentrys();
 
     if (sentries != null && !sentries.isEmpty()) {
       SentryHandler handler = getSentryHandler();
       for (Sentry sentry : sentries) {
         handler.initializeOnParts(sentry, context);
+        // sentry fully transformed -> call transform listener
+        CmmnSentryDeclaration sentryDeclaration = context.getParent().getSentry(sentry.getId());
+        for (CmmnTransformListener transformListener : transformListeners) {
+          transformListener.transformSentry(sentry, sentryDeclaration);
+        }
       }
     }
   }
 
-  protected void parsePlanItems(PlanFragment planFragment, CmmnActivity parent) {
+  protected void transformPlanItems(PlanFragment planFragment, CmmnActivity parent) {
     Collection<PlanItem> planItems = planFragment.getPlanItems();
 
     for (PlanItem planItem : planItems) {
-      parsePlanItem(planItem, parent);
+      transformPlanItem(planItem, parent);
     }
 
   }
 
-  protected void parsePlanItem(PlanItem planItem, CmmnActivity parent) {
+  protected void transformPlanItem(PlanItem planItem, CmmnActivity parent) {
     PlanItemDefinition definition = planItem.getDefinition();
 
     ItemHandler planItemTransformer = null;
@@ -253,7 +272,7 @@ public class CmmnTransform implements Transform<CaseDefinitionEntity> {
 
     if (definition instanceof Stage) {
       Stage stage = (Stage) definition;
-      parseStage(stage, newActivity);
+      transformStage(stage, newActivity);
       context.setParent(parent);
 
     } else if (definition instanceof HumanTask) {
@@ -263,9 +282,27 @@ public class CmmnTransform implements Transform<CaseDefinitionEntity> {
       // one planningTable, the XSD allows multiple planningTables!
       Collection<PlanningTable> planningTables = humanTask.getPlanningTables();
       for (PlanningTable planningTable : planningTables) {
-        parsePlanningTable(planningTable, parent);
+        transformPlanningTable(planningTable, parent);
       }
 
+    }
+
+    for (CmmnTransformListener transformListener : transformListeners) {
+      if (definition instanceof HumanTask) {
+        transformListener.transformHumanTask(planItem, (HumanTask) definition, newActivity);
+      } else if (definition instanceof ProcessTask) {
+        transformListener.transformProcessTask(planItem, (ProcessTask) definition, newActivity);
+      } else if (definition instanceof CaseTask) {
+        transformListener.transformCaseTask(planItem, (CaseTask) definition, newActivity);
+      } else if (definition instanceof Task) {
+        transformListener.transformTask(planItem, (Task) definition, newActivity);
+      } else if (definition instanceof Stage) {
+        transformListener.transformStage(planItem, (Stage) definition, newActivity);
+      } else if (definition instanceof Milestone) {
+        transformListener.transformMilestone(planItem, (Milestone) definition, newActivity);
+      } else if (definition instanceof EventListener) {
+        transformListener.transformEventListener(planItem, (EventListener) definition, newActivity);
+      }
     }
   }
 

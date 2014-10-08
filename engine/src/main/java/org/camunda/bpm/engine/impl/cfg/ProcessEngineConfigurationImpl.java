@@ -93,6 +93,7 @@ import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionManager;
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseSentryPartManager;
 import org.camunda.bpm.engine.impl.cmmn.handler.DefaultCmmnElementHandlerRegistry;
 import org.camunda.bpm.engine.impl.cmmn.transformer.CmmnTransformFactory;
+import org.camunda.bpm.engine.impl.cmmn.transformer.CmmnTransformListener;
 import org.camunda.bpm.engine.impl.cmmn.transformer.CmmnTransformer;
 import org.camunda.bpm.engine.impl.cmmn.transformer.DefaultCmmnTranformFactory;
 import org.camunda.bpm.engine.impl.connector.Connectors;
@@ -368,6 +369,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected List<BpmnParseListener> preParseListeners;
   protected List<BpmnParseListener> postParseListeners;
+
+  protected List<CmmnTransformListener> customPreCmmnTransformListeners;
+  protected List<CmmnTransformListener> customPostCmmnTransformListeners;
 
   protected Map<Object, Object> beans;
 
@@ -992,11 +996,25 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     CmmnTransformer cmmnTransformer = new CmmnTransformer(expressionManager, cmmnElementHandlerRegistry, cmmnTransformFactory);
 
-    // TODO: pre- and postParseListener
+    if (customPreCmmnTransformListeners != null) {
+      cmmnTransformer.getTransformListeners().addAll(customPreCmmnTransformListeners);
+    }
+    cmmnTransformer.getTransformListeners().addAll(getDefaultCmmnTransformListeners());
+    if (customPostCmmnTransformListeners != null) {
+      cmmnTransformer.getTransformListeners().addAll(customPostCmmnTransformListeners);
+    }
 
     cmmnDeployer.setTransformer(cmmnTransformer);
 
     return cmmnDeployer;
+  }
+
+  protected List<CmmnTransformListener> getDefaultCmmnTransformListeners() {
+    List<CmmnTransformListener> defaultListener = new ArrayList<CmmnTransformListener>();
+    if (!historyLevel.equals(HistoryLevel.HISTORY_LEVEL_NONE)) {
+      // TODO: history cmmn transform listener
+    }
+    return defaultListener;
   }
 
   // job executor /////////////////////////////////////////////////////////////
@@ -1893,6 +1911,22 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     this.postParseListeners = postParseListeners;
   }
 
+  public List<CmmnTransformListener> getCustomPreCmmnTransformListeners() {
+    return customPreCmmnTransformListeners;
+  }
+
+  public void setCustomPreCmmnTransformListeners(List<CmmnTransformListener> customPreCmmnTransformListeners) {
+    this.customPreCmmnTransformListeners = customPreCmmnTransformListeners;
+  }
+
+  public List<CmmnTransformListener> getCustomPostCmmnTransformListeners() {
+    return customPostCmmnTransformListeners;
+  }
+
+  public void setCustomPostCmmnTransformListeners(List<CmmnTransformListener> customPostCmmnTransformListeners) {
+    this.customPostCmmnTransformListeners = customPostCmmnTransformListeners;
+  }
+
   public Map<Object, Object> getBeans() {
     return beans;
   }
@@ -2078,7 +2112,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     this.isDbIdentityUsed = isDbIdentityUsed;
   }
 
-
   public boolean isDbHistoryUsed() {
     return isDbHistoryUsed;
   }
@@ -2241,7 +2274,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   public IncidentHandler getIncidentHandler(String incidentType) {
     return incidentHandlers.get(incidentType);
   }
-    public Map<String, IncidentHandler> getIncidentHandlers() {
+
+  public Map<String, IncidentHandler> getIncidentHandlers() {
     return incidentHandlers;
   }
 
