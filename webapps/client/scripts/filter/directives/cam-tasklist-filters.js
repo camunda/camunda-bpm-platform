@@ -88,6 +88,9 @@ define([
 
             var focused;
             each(res, function(filter) {
+              filter.style = {
+                'background-color': filter.properties.color
+              };
               if ($scope.focusedId) {
                 if ($scope.focusedId === filter.id) {
                   focused = filter;
@@ -99,24 +102,6 @@ define([
             });
 
             $scope.focus(focused);
-
-            // this is aimed to fix the color of filters, because angular don't
-            // want to "render" what is in a "conventionnal" HTML arguments
-            // means.. you can not use something like:
-            // style="background-color: {{color}}"
-            // in angular templates
-            $timeout(function() {
-              each($scope.filters, function(filter) {
-                if (filter.properties.color) {
-                  $('[data-filter-id="'+ filter.id +'"]')
-                    .find('.task-filter, .task-filter .info')
-                    .css({
-                      'background-color': filter.properties.color
-                    })
-                  ;
-                }
-              });
-            }, 10);
           });
         }
 
