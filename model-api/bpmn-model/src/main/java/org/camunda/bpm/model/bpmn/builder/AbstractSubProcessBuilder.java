@@ -48,6 +48,7 @@ public class AbstractSubProcessBuilder<B extends AbstractSubProcessBuilder<B>> e
    *
    * @return the builder object
    */
+  @Deprecated
   public B camundaAsync() {
     element.setCamundaAsyncBefore(true);
     return myself;
@@ -61,6 +62,7 @@ public class AbstractSubProcessBuilder<B extends AbstractSubProcessBuilder<B>> e
    * @param isCamundaAsync  the async state of the task
    * @return the builder object
    */
+  @Deprecated
   public B camundaAsync(boolean isCamundaAsync) {
     element.setCamundaAsyncBefore(isCamundaAsync);
     return myself;

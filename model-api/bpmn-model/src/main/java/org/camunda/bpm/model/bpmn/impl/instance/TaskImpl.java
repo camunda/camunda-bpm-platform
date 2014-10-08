@@ -72,6 +72,7 @@ public class TaskImpl extends ActivityImpl implements Task {
   /**
    * @deprecated use isCamundaAsyncBefore() instead.
    */
+  @Deprecated
   public boolean isCamundaAsync() {
     return camundaAsyncAttribute.getValue(this);
   }
@@ -79,6 +80,7 @@ public class TaskImpl extends ActivityImpl implements Task {
   /**
    * @deprecated use setCamundaAsyncBefore(isCamundaAsyncBefore) instead.
    */
+  @Deprecated
   public void setCamundaAsync(boolean isCamundaAsync) {
     camundaAsyncAttribute.setValue(this, isCamundaAsync);
   }

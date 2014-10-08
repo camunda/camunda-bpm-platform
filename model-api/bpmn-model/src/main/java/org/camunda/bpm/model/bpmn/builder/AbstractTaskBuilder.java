@@ -34,6 +34,7 @@ public abstract class AbstractTaskBuilder<B extends AbstractTaskBuilder<B, E>, E
    *
    * @return the builder object
    */
+  @Deprecated
   public B camundaAsync() {
     element.setCamundaAsyncBefore(true);
     return myself;
@@ -47,6 +48,7 @@ public abstract class AbstractTaskBuilder<B extends AbstractTaskBuilder<B, E>, E
    * @param isCamundaAsync  the async state of the task
    * @return the builder object
    */
+  @Deprecated
   public B camundaAsync(boolean isCamundaAsync) {
     element.setCamundaAsyncBefore(isCamundaAsync);
     return myself;

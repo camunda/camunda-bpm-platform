@@ -243,7 +243,7 @@ public abstract class AbstractFlowNodeBuilder<B extends AbstractFlowNodeBuilder<
   }
 
   /**
-   * Sets the Camunda AsyncBefore attribute for the build inclusive gateway
+   * Sets the Camunda AsyncBefore attribute for the build flow node.
    *
    * @param asyncBefore boolean value to set
    * @return the builder object
@@ -264,7 +264,7 @@ public abstract class AbstractFlowNodeBuilder<B extends AbstractFlowNodeBuilder<
   }
 
   /**
-   * Sets the Camunda asyncAfter attribute for the build Flo<
+   * Sets the Camunda asyncAfter attribute for the build flow node.
    *
    * @param asyncAfter boolean value to set
    * @return the builder object
@@ -295,7 +295,7 @@ public abstract class AbstractFlowNodeBuilder<B extends AbstractFlowNodeBuilder<
   }
 
   /**
-   * Sets the camunda exclusive attribute for the build
+   * Sets the camunda exclusive attribute for the build flow node.
    *
    * @param exclusive boolean value to set
    * @return the builder object
