@@ -28,6 +28,7 @@ import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseSentryPartQueryImpl;
 import org.camunda.bpm.engine.runtime.CaseExecutionCommandBuilder;
 import org.camunda.bpm.engine.runtime.CaseExecutionQuery;
+import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.runtime.CaseInstanceBuilder;
 import org.camunda.bpm.engine.runtime.CaseInstanceQuery;
 import org.camunda.bpm.engine.runtime.CaseSentryPartQuery;
@@ -140,6 +141,108 @@ public class CaseServiceImpl extends ServiceImpl implements CaseService {
       throw new NotFoundException(e.getMessage(), e);
 
     }
+  }
+
+  public void setVariables(String caseExecutionId, Map<String, Object> variables) {
+    withCaseExecution(caseExecutionId).setVariables(variables).execute();
+  }
+
+  public void setVariablesLocal(String caseExecutionId, Map<String, Object> variables) {
+    withCaseExecution(caseExecutionId).setVariablesLocal(variables).execute();
+  }
+
+  public void setVariable(String caseExecutionId, String variableName, Object value) {
+    withCaseExecution(caseExecutionId).setVariable(variableName, value).execute();
+  }
+
+  public void setVariableLocal(String caseExecutionId, String variableName, Object value) {
+    withCaseExecution(caseExecutionId).setVariableLocal(variableName, value).execute();
+  }
+
+  public void removeVariables(String caseExecutionId, Collection<String> variableNames) {
+    withCaseExecution(caseExecutionId).removeVariables(variableNames).execute();
+  }
+
+  public void removeVariablesLocal(String caseExecutionId, Collection<String> variableNames) {
+    withCaseExecution(caseExecutionId).removeVariablesLocal(variableNames).execute();
+  }
+
+  public void removeVariable(String caseExecutionId, String variableName) {
+    withCaseExecution(caseExecutionId).removeVariable(variableName).execute();
+  }
+
+  public void removeVariableLocal(String caseExecutionId, String variableName) {
+    withCaseExecution(caseExecutionId).removeVariableLocal(variableName).execute();
+  }
+
+  public CaseInstance createCaseInstanceByKey(String caseDefinitionKey) {
+    return withCaseDefinitionByKey(caseDefinitionKey).create();
+  }
+
+  public CaseInstance createCaseInstanceByKey(String caseDefinitionKey, String businessKey) {
+    return withCaseDefinitionByKey(caseDefinitionKey).businessKey(businessKey).create();
+  }
+
+  public CaseInstance createCaseInstanceByKey(String caseDefinitionKey, Map<String, Object> variables) {
+    return withCaseDefinitionByKey(caseDefinitionKey).setVariables(variables).create();
+  }
+
+  public CaseInstance createCaseInstanceByKey(String caseDefinitionKey, String businessKey, Map<String, Object> variables) {
+    return withCaseDefinitionByKey(caseDefinitionKey).businessKey(businessKey)
+        .setVariables(variables).create();
+  }
+
+  public CaseInstance createCaseInstanceById(String caseDefinitionId) {
+    return withCaseDefinition(caseDefinitionId).create();
+  }
+
+  public CaseInstance createCaseInstanceById(String caseDefinitionId, String businessKey) {
+    return withCaseDefinition(caseDefinitionId).businessKey(businessKey).create();
+  }
+
+  public CaseInstance createCaseInstanceById(String caseDefinitionId, Map<String, Object> variables) {
+    return withCaseDefinition(caseDefinitionId).setVariables(variables).create();
+  }
+
+  public CaseInstance createCaseInstanceById(String caseDefinitionId, String businessKey, Map<String, Object> variables) {
+    return withCaseDefinition(caseDefinitionId).businessKey(businessKey)
+        .setVariables(variables).create();
+  }
+
+  public void manuallyStartCaseExecution(String caseExecutionId) {
+    withCaseExecution(caseExecutionId).manualStart();
+  }
+
+  public void manuallyStartCaseExecution(String caseExecutionId, Map<String, Object> variables) {
+    withCaseExecution(caseExecutionId).setVariables(variables).manualStart();
+  }
+
+  public void disableCaseExecution(String caseExecutionId) {
+    withCaseExecution(caseExecutionId).disable();
+  }
+
+  public void disableCaseExecution(String caseExecutionId, Map<String, Object> variables) {
+    withCaseExecution(caseExecutionId).setVariables(variables).disable();
+  }
+
+  public void reenableCaseExecution(String caseExecutionId) {
+    withCaseExecution(caseExecutionId).reenable();
+  }
+
+  public void reenableCaseExecution(String caseExecutionId, Map<String, Object> variables) {
+    withCaseExecution(caseExecutionId).setVariables(variables).reenable();
+  }
+
+  public void completeCaseExecution(String caseExecutionId) {
+    withCaseExecution(caseExecutionId).complete();
+  }
+
+  public void completeCaseExecution(String caseExecutionId, Map<String, Object> variables) {
+    withCaseExecution(caseExecutionId).setVariables(variables).complete();
+  }
+
+  public void closeCaseInstance(String caseInstanceId) {
+    withCaseExecution(caseInstanceId).close();
   }
 
 }

@@ -161,7 +161,7 @@ public interface CaseExecutionCommandBuilder {
    *
    * @return the builder
    *
-   * @throws NotValidException when one of the passed variables should be removed
+   * @throws NotValidException when one of the passed variables should be set
    *         in the same command
    */
   CaseExecutionCommandBuilder removeVariables(Collection<String> variableNames);
@@ -191,7 +191,7 @@ public interface CaseExecutionCommandBuilder {
    *
    * @return the builder
    *
-   * @throws NotValidException when one of the passed variables should be removed
+   * @throws NotValidException when one of the passed variables should be set
    *         in the same command
    */
   CaseExecutionCommandBuilder removeVariablesLocal(Collection<String> variableNames);

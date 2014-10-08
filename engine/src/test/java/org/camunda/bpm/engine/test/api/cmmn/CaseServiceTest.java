@@ -1430,4 +1430,340 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testSetVariable() {
+    // given:
+    // a deployed case definition
+    // and an active case instance
+    String caseInstanceId = caseService
+        .withCaseDefinitionByKey("oneTaskCase")
+        .create()
+        .getId();
+
+    String caseExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    // when
+    caseService.setVariable(caseExecutionId, "aVariableName", "abc");
+
+    // then
+
+    // query by caseExecutionId
+    List<VariableInstance> result = runtimeService
+        .createVariableInstanceQuery()
+        .caseExecutionIdIn(caseExecutionId)
+        .list();
+
+    assertTrue(result.isEmpty());
+
+    // query by case instance id
+    result = runtimeService
+        .createVariableInstanceQuery()
+        .caseExecutionIdIn(caseInstanceId)
+        .list();
+
+    assertFalse(result.isEmpty());
+    assertEquals(1, result.size());
+
+    VariableInstance variable = result.get(0);
+    assertEquals("aVariableName", variable.getName());
+    assertEquals("abc", variable.getValue());
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testSetVariables() {
+    // given:
+    // a deployed case definition
+    // and an active case instance
+    String caseInstanceId = caseService
+        .withCaseDefinitionByKey("oneTaskCase")
+        .create()
+        .getId();
+
+    String caseExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    // when
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("aVariableName", "abc");
+    variables.put("anotherVariableName", 123);
+    caseService.setVariables(caseExecutionId, variables);
+
+    // then
+
+    // query by caseExecutionId
+    List<VariableInstance> result = runtimeService
+        .createVariableInstanceQuery()
+        .caseExecutionIdIn(caseExecutionId)
+        .list();
+
+    assertTrue(result.isEmpty());
+
+    // query by case instance id
+    result = runtimeService
+        .createVariableInstanceQuery()
+        .caseExecutionIdIn(caseInstanceId)
+        .list();
+
+    assertFalse(result.isEmpty());
+    assertEquals(2, result.size());
+
+    for (VariableInstance variable : result) {
+      if (variable.getName().equals("aVariableName")) {
+        assertEquals(caseInstanceId, variable.getCaseExecutionId());
+        assertEquals(caseInstanceId, variable.getCaseInstanceId());
+
+        assertEquals("aVariableName", variable.getName());
+        assertEquals("abc", variable.getValue());
+
+      } else if (variable.getName().equals("anotherVariableName")) {
+        assertEquals(caseInstanceId, variable.getCaseExecutionId());
+        assertEquals(caseInstanceId, variable.getCaseInstanceId());
+
+        assertEquals("anotherVariableName", variable.getName());
+        assertEquals(123, variable.getValue());
+
+      } else {
+        fail("Unexpected variable: " + variable.getName());
+      }
+    }
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testSetVariableLocal() {
+    // given:
+    // a deployed case definition
+    // an active case instance
+    String caseInstanceId = caseService
+        .withCaseDefinitionByKey("oneTaskCase")
+        .create()
+        .getId();
+
+    String caseExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    // when
+    caseService.setVariableLocal(caseExecutionId, "aVariableName", "abc");
+
+    // then
+
+    // query by case instance id
+    List<VariableInstance> result = runtimeService
+        .createVariableInstanceQuery()
+        .caseExecutionIdIn(caseInstanceId)
+        .list();
+
+    assertTrue(result.isEmpty());
+
+    // query by caseExecutionId
+    result = runtimeService
+        .createVariableInstanceQuery()
+        .caseExecutionIdIn(caseExecutionId)
+        .list();
+
+    assertFalse(result.isEmpty());
+    assertEquals(1, result.size());
+
+    VariableInstance variable = result.get(0);
+    assertEquals("aVariableName", variable.getName());
+    assertEquals("abc", variable.getValue());
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testSetVariablesLocal() {
+    // given:
+    // a deployed case definition
+    // and an active case instance
+    String caseInstanceId = caseService
+        .withCaseDefinitionByKey("oneTaskCase")
+        .create()
+        .getId();
+
+    String caseExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    // when
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("aVariableName", "abc");
+    variables.put("anotherVariableName", 123);
+    caseService.setVariablesLocal(caseExecutionId, variables);
+
+    // then
+
+    // query by case instance id
+    List<VariableInstance> result = runtimeService
+        .createVariableInstanceQuery()
+        .caseExecutionIdIn(caseInstanceId)
+        .list();
+
+    assertTrue(result.isEmpty());
+
+    // query by caseExecutionId
+    result = runtimeService
+        .createVariableInstanceQuery()
+        .caseExecutionIdIn(caseExecutionId)
+        .list();
+
+    assertFalse(result.isEmpty());
+    assertEquals(2, result.size());
+
+    for (VariableInstance variable : result) {
+      if (variable.getName().equals("aVariableName")) {
+        assertEquals(caseExecutionId, variable.getCaseExecutionId());
+        assertEquals(caseInstanceId, variable.getCaseInstanceId());
+
+        assertEquals("aVariableName", variable.getName());
+        assertEquals("abc", variable.getValue());
+
+      } else if (variable.getName().equals("anotherVariableName")) {
+        assertEquals(caseExecutionId, variable.getCaseExecutionId());
+        assertEquals(caseInstanceId, variable.getCaseInstanceId());
+
+        assertEquals("anotherVariableName", variable.getName());
+        assertEquals(123, variable.getValue());
+
+      } else {
+        fail("Unexpected variable: " + variable.getName());
+      }
+    }
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testRemoveVariable() {
+      // given:
+      // a deployed case definition
+      // and an active case instance
+      caseService
+          .withCaseDefinitionByKey("oneTaskCase")
+          .setVariable("aVariableName", "abc")
+          .create()
+          .getId();
+
+      String caseExecutionId = caseService
+          .createCaseExecutionQuery()
+          .activityId("PI_HumanTask_1")
+          .singleResult()
+          .getId();
+
+      // when
+      caseService.removeVariable(caseExecutionId, "aVariableName");
+
+      // then the variable should be gone
+      assertEquals(0, runtimeService.createVariableInstanceQuery().count());
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testRemoveVariables() {
+    // given:
+    // a deployed case definition
+    // and an active case instance
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("aVariable", "abc");
+    variables.put("anotherVariable", 123);
+
+    caseService
+        .withCaseDefinitionByKey("oneTaskCase")
+        .setVariables(variables)
+        .setVariable("aThirdVariable", "def")
+        .create()
+        .getId();
+
+    String caseExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    // when
+    caseService.removeVariables(caseExecutionId, variables.keySet());
+
+    // then there should be only one variable left
+    VariableInstance variable = runtimeService.createVariableInstanceQuery().singleResult();
+    assertNotNull(variable);
+    assertEquals("aThirdVariable", variable.getName());
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testRemoveVariableLocal() {
+    // given:
+    // a deployed case definition
+    // and an active case instance
+    String caseInstanceId = caseService
+        .withCaseDefinitionByKey("oneTaskCase")
+        .create()
+        .getId();
+
+    String caseExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    caseService.setVariableLocal(caseExecutionId, "aVariableName", "abc");
+
+    // when
+    caseService.removeVariableLocal(caseInstanceId, "aVariableName");
+
+    // then the variable should still be there
+    assertEquals(1, runtimeService.createVariableInstanceQuery().count());
+
+    // when
+    caseService.removeVariableLocal(caseExecutionId, "aVariableName");
+
+    // then the variable should be gone
+    assertEquals(0, runtimeService.createVariableInstanceQuery().count());
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testRemoveVariablesLocal() {
+    // given:
+    // a deployed case definition
+    // and an active case instance
+    String caseInstanceId = caseService
+        .withCaseDefinitionByKey("oneTaskCase")
+        .create()
+        .getId();
+
+    String caseExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("aVariable", "abc");
+    variables.put("anotherVariable", 123);
+
+    caseService.setVariablesLocal(caseExecutionId, variables);
+    caseService.setVariableLocal(caseExecutionId, "aThirdVariable", "def");
+
+    // when
+    caseService.removeVariablesLocal(caseInstanceId, variables.keySet());
+
+    // then no variables should have been removed
+    assertEquals(3, runtimeService.createVariableInstanceQuery().count());
+
+    // when
+    caseService.removeVariablesLocal(caseExecutionId, variables.keySet());
+
+    // then there should be only one variable left
+    VariableInstance variable = runtimeService.createVariableInstanceQuery().singleResult();
+    assertNotNull(variable);
+    assertEquals("aThirdVariable", variable.getName());
+  }
+
+
 }

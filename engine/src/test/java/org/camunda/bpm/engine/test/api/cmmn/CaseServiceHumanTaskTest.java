@@ -1317,4 +1317,395 @@ public class CaseServiceHumanTaskTest extends PluggableProcessEngineTestCase {
 
   }
 
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testManualStartNonFluent() {
+    // given:
+    // a deployed case definition
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    // an active case instance
+    caseService
+      .withCaseDefinition(caseDefinitionId)
+      .create();
+
+    CaseExecutionQuery caseExecutionQuery = caseService.createCaseExecutionQuery();
+
+    // an enabled child case execution of
+    // the case instance
+    String caseExecutionId = caseExecutionQuery
+      .activityId("PI_HumanTask_1")
+      .singleResult()
+      .getId();
+
+    // when
+    // activate child case execution
+    caseService.manuallyStartCaseExecution(caseExecutionId);
+
+    // then
+
+    // the child case execution is active...
+    CaseExecution caseExecution = caseExecutionQuery.singleResult();
+    assertTrue(caseExecution.isActive());
+    // ... and not enabled
+    assertFalse(caseExecution.isEnabled());
+
+    // there exists a task
+    Task task = taskService
+      .createTaskQuery()
+      .caseExecutionId(caseExecutionId)
+      .singleResult();
+
+    assertNotNull(task);
+  }
+
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/twoTaskCase.cmmn"})
+  public void testManualStartWithVariablesNonFluent() {
+    // given:
+    // a deployed case definition
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    // an active case instance
+    String caseInstanceId = caseService
+      .withCaseDefinition(caseDefinitionId)
+      .create().getId();
+
+    CaseExecutionQuery caseExecutionQuery = caseService.createCaseExecutionQuery();
+
+    // an enabled child case execution of
+    // the case instance
+    String caseExecutionId = caseExecutionQuery
+      .activityId("PI_HumanTask_1")
+      .singleResult()
+      .getId();
+
+    // when
+    // activate child case execution
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("aVariable", "aValue");
+    caseService.manuallyStartCaseExecution(caseExecutionId, variables);
+
+    // then
+
+    // the child case execution is active...
+    CaseExecution caseExecution = caseExecutionQuery.singleResult();
+    assertTrue(caseExecution.isActive());
+    // ... and not enabled
+    assertFalse(caseExecution.isEnabled());
+
+    // there exists a task
+    Task task = taskService
+      .createTaskQuery()
+      .caseExecutionId(caseExecutionId)
+      .singleResult();
+
+    assertNotNull(task);
+
+    // there is a variable set on the case instance
+    VariableInstance variable = runtimeService.createVariableInstanceQuery().singleResult();
+
+    assertNotNull(variable);
+    assertEquals(caseInstanceId, variable.getCaseExecutionId());
+    assertEquals(caseInstanceId, variable.getCaseInstanceId());
+    assertEquals("aVariable", variable.getName());
+    assertEquals("aValue", variable.getValue());
+
+  }
+
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/twoTaskCase.cmmn"})
+  public void testDisableNonFluent() {
+    // given:
+    // a deployed case definition
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    // an active case instance and the containing
+    // human task is enabled
+    caseService
+        .withCaseDefinition(caseDefinitionId)
+        .create();
+
+    CaseExecutionQuery caseExecutionQuery = caseService.createCaseExecutionQuery();
+
+    String caseExecutionId = caseExecutionQuery
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    // when
+    caseService.disableCaseExecution(caseExecutionId);
+
+    // then
+    CaseExecution caseExecution = caseExecutionQuery.singleResult();
+    // the human task is disabled
+    assertTrue(caseExecution.isDisabled());
+    assertFalse(caseExecution.isActive());
+    assertFalse(caseExecution.isEnabled());
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/twoTaskCase.cmmn"})
+  public void testDisableNonFluentWithVariables() {
+    // given:
+    // a deployed case definition
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    // an active case instance and the containing
+    // human task is enabled
+    String caseInstanceId = caseService
+        .withCaseDefinition(caseDefinitionId)
+        .create().getId();
+
+    CaseExecutionQuery caseExecutionQuery = caseService.createCaseExecutionQuery();
+
+    String caseExecutionId = caseExecutionQuery
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    // when
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("aVariable", "aValue");
+    caseService.disableCaseExecution(caseExecutionId, variables);
+
+    // then
+    CaseExecution caseExecution = caseExecutionQuery.singleResult();
+    // the human task is disabled
+    assertTrue(caseExecution.isDisabled());
+    assertFalse(caseExecution.isActive());
+    assertFalse(caseExecution.isEnabled());
+
+    // there is a variable set on the case instance
+    VariableInstance variable = runtimeService.createVariableInstanceQuery().singleResult();
+
+    assertNotNull(variable);
+    assertEquals(caseInstanceId, variable.getCaseExecutionId());
+    assertEquals(caseInstanceId, variable.getCaseInstanceId());
+    assertEquals("aVariable", variable.getName());
+    assertEquals("aValue", variable.getValue());
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/twoTaskCase.cmmn"})
+  public void testReenableNonFluent() {
+    // given:
+    // a deployed case definition
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    // an active case instance
+    caseService
+        .withCaseDefinition(caseDefinitionId)
+        .create();
+
+    CaseExecutionQuery caseExecutionQuery = caseService.createCaseExecutionQuery();
+
+    String caseExecutionId = caseExecutionQuery
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    // the human task is disabled
+    caseService
+      .withCaseExecution(caseExecutionId)
+      .disable();
+
+    // when
+    caseService.reenableCaseExecution(caseExecutionId);
+
+    // then
+    CaseExecution caseExecution = caseExecutionQuery.singleResult();
+    // the human task is disabled
+    assertFalse(caseExecution.isDisabled());
+    assertFalse(caseExecution.isActive());
+    assertTrue(caseExecution.isEnabled());
+
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/twoTaskCase.cmmn"})
+  public void testReenableNonFluentWithVariables() {
+    // given:
+    // a deployed case definition
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    // an active case instance
+    String caseInstanceId = caseService
+        .withCaseDefinition(caseDefinitionId)
+        .create().getId();
+
+    CaseExecutionQuery caseExecutionQuery = caseService.createCaseExecutionQuery();
+
+    String caseExecutionId = caseExecutionQuery
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    // the human task is disabled
+    caseService
+      .withCaseExecution(caseExecutionId)
+      .disable();
+
+    // when
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("aVariable", "aValue");
+    caseService.reenableCaseExecution(caseExecutionId, variables);
+
+    // then
+    CaseExecution caseExecution = caseExecutionQuery.singleResult();
+    // the human task is disabled
+    assertFalse(caseExecution.isDisabled());
+    assertFalse(caseExecution.isActive());
+    assertTrue(caseExecution.isEnabled());
+
+    // there is a variable set on the case instance
+    VariableInstance variable = runtimeService.createVariableInstanceQuery().singleResult();
+
+    assertNotNull(variable);
+    assertEquals(caseInstanceId, variable.getCaseExecutionId());
+    assertEquals(caseInstanceId, variable.getCaseInstanceId());
+    assertEquals("aVariable", variable.getName());
+    assertEquals("aValue", variable.getValue());
+
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/twoTaskCase.cmmn"})
+  public void testCompleteNonFluent() {
+    // given:
+    // a deployed case definition
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    // an active case instance
+    caseService
+       .withCaseDefinition(caseDefinitionId)
+       .create()
+       .getId();
+
+    String caseExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(caseExecutionId)
+      .manualStart();
+
+    Task task = taskService
+        .createTaskQuery()
+        .singleResult();
+
+    assertNotNull(task);
+
+    // when
+
+    caseService.completeCaseExecution(caseExecutionId);
+
+    // then
+
+    // the task has been completed and has been deleted
+    task = taskService
+        .createTaskQuery()
+        .singleResult();
+
+    assertNull(task);
+
+    // the corresponding case execution has been also
+    // deleted and completed
+    CaseExecution caseExecution = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult();
+
+    assertNull(caseExecution);
+
+    // the case instance is still active
+    CaseInstance caseInstance = caseService
+        .createCaseInstanceQuery()
+        .active()
+        .singleResult();
+
+    assertNotNull(caseInstance);
+    assertTrue(caseInstance.isActive());
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/twoTaskCase.cmmn"})
+  public void testCompleteWithVariablesNonFluent() {
+    // given:
+    // a deployed case definition
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    // an active case instance
+    String caseInstanceId = caseService
+       .withCaseDefinition(caseDefinitionId)
+       .create()
+       .getId();
+
+    String caseExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(caseExecutionId)
+      .manualStart();
+
+    Task task = taskService
+        .createTaskQuery()
+        .singleResult();
+
+    assertNotNull(task);
+
+    // when
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("aVariable", "aValue");
+
+    caseService.completeCaseExecution(caseExecutionId, variables);
+
+    // then
+
+    // the task has been completed and has been deleted
+    assertNull(taskService.createTaskQuery().singleResult());
+
+    // the corresponding case execution has been also
+    // deleted and completed
+    CaseExecution caseExecution = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult();
+
+    assertNull(caseExecution);
+
+    // there is a variable set on the case instance
+    VariableInstance variable = runtimeService.createVariableInstanceQuery().singleResult();
+
+    assertNotNull(variable);
+    assertEquals(caseInstanceId, variable.getCaseExecutionId());
+    assertEquals(caseInstanceId, variable.getCaseInstanceId());
+    assertEquals("aVariable", variable.getName());
+    assertEquals("aValue", variable.getValue());
+
+  }
+
 }
