@@ -1,16 +1,20 @@
 <ul class="meta list-inline times">
   <li cam-form-inline-field
       class="followup-date"
-      ng-class="{overdue: task.followUp && (task.followUp < now)}"
+      ng-class="{overdue: task.followUp && (task.followUp < now) }"
       type="datetime"
       change="saveFollowUpDate(this)"
       value="task.followUp">
+
     <span tooltip-placement="top"
           tooltip-append-to-body="true"
           tooltip="{{ 'FOLLOW_UP_DATE' | translate }}"
           class="glyphicon glyphicon-bell"></span>
 
     <span ng-if="varValue"
+          tooltip-placement="top"
+          tooltip-append-to-body="true"
+          tooltip="{{ varValue | camDate:'long' }}"
           am-time-ago="varValue">{{ varValue }}</span>
 
     <a href
@@ -22,7 +26,7 @@
 
   <li cam-form-inline-field
       class="due-date"
-      ng-class="{overdue: task.due && (task.due < now)}"
+      ng-class="{overdue: task.due && (task.due < now) }"
       type="datetime"
       change="saveDueDate(this)"
       value="task.due">
@@ -32,6 +36,9 @@
           class="glyphicon glyphicon-calendar"></span>
 
     <span ng-if="varValue"
+          tooltip-placement="top"
+          tooltip-append-to-body="true"
+          tooltip="{{ varValue | camDate:'long' }}"
           am-time-ago="varValue">{{ varValue }}</span>
 
     <a href

@@ -76,7 +76,7 @@ define([
         scope.saveFollowUpDate = saveDate('followUp');
         scope.saveDueDate = saveDate('due');
 
-
+        scope.now = (new Date()).toJSON();
 
         // function delegated(err) {
         //   if (err) {

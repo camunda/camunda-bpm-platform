@@ -52,6 +52,9 @@
           </h6>
         </div>
 
+
+
+
         <ul class="list-inline">
           <!--
           <li>
@@ -62,82 +65,48 @@
           </li>
            -->
 
-          <li cam-form-inline-field
-              class="followup-date"
-              ng-class="{overdue: task.followUp && (task.followUp  < now)}"
-              type="datetime"
-              change="saveFollowUpDate(this)"
-              value="task.followUp">
-
+          <li class="followup-date"
+              ng-if="!!task.followUp"
+              ng-class="{overdue: task.followUp && (task.followUp < now) }">
             <span tooltip-placement="top"
                   tooltip-append-to-body="true"
                   tooltip="{{ 'FOLLOW_UP_DATE' | translate }}"
                   class="glyphicon glyphicon-bell"></span>
-
-            <span ng-if="varValue"
-                  am-time-ago="varValue">{{ varValue }}</span>
-
-            <a href
-               ng-if="!varValue"
-               translate="SET">Set</a>
+            <span tooltip-placement="top"
+                  tooltip-append-to-body="true"
+                  tooltip="{{ task.followUp | camDate:'long' }}"
+                  am-time-ago="task.followUp">{{task.followUp}}</span>
           </li>
 
-          <li cam-form-inline-field
-              class="due-date"
-              ng-class="{overdue: task.due  && (task.due < now)}"
-              type="datetime"
-              change="saveDueDate(this)"
-              value="task.due">
+          <li class="due-date"
+              ng-if="!!task.due"
+              ng-class="{overdue: task.due && (task.due < now) }">
             <span tooltip-placement="top"
                   tooltip-append-to-body="true"
                   tooltip="{{ 'DUE_DATE' | translate }}"
                   class="glyphicon glyphicon-calendar"></span>
-
-            <span ng-if="varValue"
-                  am-time-ago="varValue">{{ varValue }}</span>
-
-            <a href
-               ng-if="!varValue"
-               translate="SET">Set</a>
+            <span tooltip-placement="top"
+                  tooltip-append-to-body="true"
+                  tooltip="{{ task.due | camDate:'long' }}"
+                  am-time-ago="task.due">{{task.due}}</span>
           </li>
-
-          <!--
-          <li data-toggle="tooltip"
-              data-placement="top"
-              title="{{ 'ASSIGNEE' | translate }}"
-              class="assignee">
-            <span saveDueDate="glyphicon glyphicon-user"></span>
-            <span cam-form-inline-field value="task.assignee">
-              {{ task.assignee }}
-            </span>
-          </li>
-
-          <li data-toggle="tooltip"
-              data-placement="top"
-              title="{{ 'OWNER' | translate }}"
-              class="owner">
-            <span class="glyphicon glyphicon-certificate"></span>
-            <span cam-form-inline-field value="task.owner">
-              {{ task.owner }}
-            </span>
-          </li>
-          -->
-
         </ul>
       </li>
     </ol>
   </form>
 </div>
 
+
+
 <pagination ng-show="totalItems > pageSize"
-              total-items="totalItems"
-              items-per-page="pageSize"
-              max-size="5"
-              class="pagination-sm"
-              boundary-links="true"
-              ng-model="pageNum"
-              ng-change="pageChange()"
-              next-text="&rsaquo;"
-              last-text="&raquo;"
-              previous-text="&lsaquo;"
-              first-text="&laquo;"></pagination>
+            total-items="totalItems"
+            items-per-page="pageSize"
+            max-size="5"
+            class="pagination-sm"
+            boundary-links="true"
+            ng-model="pageNum"
+            ng-change="pageChange()"
+            next-text="&rsaquo;"
+            last-text="&raquo;"
+            previous-text="&lsaquo;"
+            first-text="&laquo;"></pagination>

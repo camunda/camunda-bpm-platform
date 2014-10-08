@@ -16,41 +16,15 @@ define([
     return -1;
   }
 
-  function itemById(items, id) {
-    var index = indexOfId(items, id);
-    if (index > -1) {
-      return items[index];
-    }
-  }
-
-
-
-  function fixReadDateTimezone(dateStr) {
-    if (!dateStr) { return dateStr; }
-    var d = new Date(dateStr);
-    return (new Date(d.getTime() + (d.getTimezoneOffset() * 60 * 1000))).toJSON();
-  }
-
-  function fixWriteDateTimezone(dateObj) {
-    return new Date(dateObj.getTime() - (dateObj.getTimezoneOffset() * 1000 * 60));
-  }
-
-
-
   return [
-    '$modal',
     '$location',
     '$rootScope',
-    '$q',
     'camAPI',
   function(
-    $modal,
     $location,
     $rootScope,
-    $q,
     camAPI
   ) {
-    var Task = camAPI.resource('task');
     var Filter = camAPI.resource('filter');
 
     return {
@@ -61,8 +35,6 @@ define([
       template: template,
 
       link: function(scope, element) {
-        var dateExp = /(Before|After)$/;
-
         var _scopeEvents = [];
         element.on('$destroy', function() {
           if (!_scopeEvents.length) { return; }
@@ -73,11 +45,11 @@ define([
         scope.pageNum = 1;
         scope.totalItems = 0;
 
-        scope.now = new Date();
-
         scope.loading = false;
 
         scope.tasks = scope.tasks || [];
+
+        scope.now = (new Date()).toJSON();
 
         scope.sorting = angular.element('[cam-sorting-choices]').scope();
 
@@ -138,20 +110,6 @@ define([
               }
             });
 
-
-
-            angular.forEach(res._embedded.task, function(task, t) {
-              // res._embedded.task[t]._serverDue = task.due;
-              // res._embedded.task[t]._serverFollowUp = task.followUp;
-
-              res._embedded.task[t].due = fixReadDateTimezone(task.due);
-              res._embedded.task[t].followUp = fixReadDateTimezone(task.followUp);
-
-              // console.info('fix dates', res._embedded.task[t]._serverDue, res._embedded.task[t].due);
-            });
-
-
-
             scope.tasks = res._embedded.task;
           });
         }
@@ -175,68 +133,6 @@ define([
 
 
         scope.pageChange = loadTasks;
-
-
-        // scope.lookupTask = function(val) {
-        //   var deferred = $q.defer();
-
-        //   scope.loading = true;
-
-        //   var where = buildWhere(scope.sorting.order, scope.sorting.by);
-
-        //   where.nameLike = '%'+ val +'%';
-
-        //   Task.list(where, function(err, res) {
-        //     scope.loading = false;
-
-        //     if (err) {
-        //       return deferred.reject(err);
-        //     }
-
-        //     deferred.resolve(res._embedded.tasks);
-        //   });
-
-        //   return deferred.promise;
-        // };
-
-
-        // scope.selectedTask = function($item) {
-        //   setCurrentTask($item);
-        //   scope.searchTask = '';
-        // };
-
-
-
-
-
-        function saveDate(propName) {
-          return function(inlineFieldScope) {
-            var self = this;
-            var task = angular.copy(self.task);
-
-            task[propName] = fixWriteDateTimezone(inlineFieldScope.varValue);
-            // task[propName] = inlineFieldScope.varValue;
-
-
-            delete task._embedded;
-            delete task._links;
-
-            Task.update(task, function(err, result) {
-              if (err) {
-                throw err;
-              }
-
-              // scope.$emit('tasklist.task.'+ propName);
-
-              loadTasks();
-            });
-          };
-        }
-
-        scope.saveFollowUpDate = saveDate('followUp');
-        scope.saveDueDate = saveDate('due');
-
-
 
 
         scope.focus = function(delta) {
