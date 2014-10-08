@@ -89,7 +89,7 @@ module.exports = function(grunt) {
   ]);
 
 
-  grunt.registerTask('postinstall', ['seleniuminstall']);
+  // grunt.registerTask('postinstall', ['seleniuminstall']);
 
   grunt.registerTask('prepublish', ['build', 'changelog']);
 
