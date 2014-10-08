@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.impl.test;
 
 import java.io.InputStream;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -32,6 +33,7 @@ import org.camunda.bpm.engine.impl.SchemaOperationsProcessEngineBuild;
 import org.camunda.bpm.engine.impl.UserOperationLogQueryImpl;
 import org.camunda.bpm.engine.impl.bpmn.deployer.BpmnDeployer;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.cmmn.deployer.CmmnDeployer;
 import org.camunda.bpm.engine.impl.db.PersistenceSession;
 import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
 import org.camunda.bpm.engine.impl.interceptor.Command;
@@ -58,6 +60,13 @@ public abstract class TestHelper {
   );
 
   static Map<String, ProcessEngine> processEngines = new HashMap<String, ProcessEngine>();
+
+  public final static List<String> RESOURCE_SUFFIXES = new ArrayList<String>();
+
+  static {
+    RESOURCE_SUFFIXES.addAll(Arrays.asList(BpmnDeployer.BPMN_RESOURCE_SUFFIXES));
+    RESOURCE_SUFFIXES.addAll(Arrays.asList(CmmnDeployer.CMMN_RESOURCE_SUFFIXES));
+  }
 
   /**
    * use {@link ProcessEngineAssert} instead.
@@ -114,7 +123,7 @@ public abstract class TestHelper {
    * The first resource matching a suffix will be returned.
    */
   public static String getBpmnProcessDefinitionResource(Class< ? > type, String name) {
-    for (String suffix : BpmnDeployer.BPMN_RESOURCE_SUFFIXES) {
+    for (String suffix : RESOURCE_SUFFIXES) {
       String resource = type.getName().replace('.', '/') + "." + name + "." + suffix;
       InputStream inputStream = ReflectUtil.getResourceAsStream(resource);
       if (inputStream == null) {
