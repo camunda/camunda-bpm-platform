@@ -122,6 +122,10 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
     JobQuery jobQuery = managementService.createJobQuery();
     assertEquals(1, jobQuery.count());
 
+    // ensure that the deployment Id is set on the new job
+    Job job = jobQuery.singleResult();
+    assertNotNull(job.getDeploymentId());
+
     final ProcessInstanceQuery piq = runtimeService.createProcessInstanceQuery().processDefinitionKey("startTimerEventExampleCycle");
 
     assertEquals(0, piq.count());
@@ -130,6 +134,10 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
     executeAllJobs();
     assertEquals(1, piq.count());
     assertEquals(1, jobQuery.count());
+
+    // ensure that the deployment Id is set on the new job
+    job = jobQuery.singleResult();
+    assertNotNull(job.getDeploymentId());
 
     moveByMinutes(5);
     executeAllJobs();
