@@ -24,7 +24,8 @@ define([
         inputFormat:    '@',
         displayFormat:  '@',
         icon:           '@',
-        suffixed:       '@'
+        suffixed:       '@',
+        options:        '=?'
       },
 
       template: template,
@@ -45,6 +46,7 @@ define([
           scope.displayFormat = scope.displayFormat || 'LLL';
           scope.icon =          scope.icon ||          false;
           scope.suffixed =      scope.suffixed ||      false;
+          scope.options =       scope.options ||       [];
 
           scope.varType =       !!scope.varType ? scope.varType : 'text';
 
@@ -95,13 +97,17 @@ define([
           }
         };
 
-        scope.applyChange = function() {
+        scope.applyChange = function(selection) {
 
           scope.invalid = scope.validator(scope);
 
           if (!scope.invalid) {
             if(scope.simpleField) {
               scope.editValue = angular.element('[ng-model="editValue"]').val();
+              scope.varValue = scope.editValue;
+            }
+            else if (scope.varType === "option") {
+              scope.editValue = selection;
               scope.varValue = scope.editValue;
             }
             else if (isDate()) {

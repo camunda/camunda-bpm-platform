@@ -4,5 +4,15 @@
   "PRIORITY":
                   "Priority",
   "CREATION_DATE":
-                  "Created"
+                  "Created",
+  "SEARCH_PLACEHOLDER":
+                  "Search for Tasks",
+  "DELETE_SEARCH":
+                  "Remove search",
+  "PROPERTY":
+                  "Property",
+  "OPERATOR":
+                  "Operator",
+  "INVALID_SEARCH":
+                  "This search query is not valid"
 }

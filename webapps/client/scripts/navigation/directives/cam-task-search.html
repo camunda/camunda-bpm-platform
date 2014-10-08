@@ -1,0 +1,87 @@
+<div class="task-search" ng-controller="taskSearchCtrl">
+  <form class="search-field" ng-submit="createSearch()">
+  <div class="form-container search-container">
+  <span class="search-label" ng-repeat="search in searches">
+    <span
+      class="glyphicon glyphicon-exclamation-sign"
+      ng-if="!(types.indexOf(search.type) !== -1 &&
+         operatorList.indexOf(search.operator) !== -1 &&
+         search.name &&
+         search.value)"
+      tooltip-placement="top"
+      tooltip-append-to-body="true"
+      tooltip="{{'INVALID_SEARCH' | translate}}"></span>
+    <span cam-form-inline-field
+      class="set-value"
+      type="option"
+      options="types"
+      change="changeSearch($index, 'type', varValue)"
+      value="search.type">
+        <span tooltip-placement="top"
+        tooltip-append-to-body="true"
+        tooltip="{{'VARIABLE_TYPE' | translate}}">
+          {{ varValue | queryComponent }}
+        </span>
+    </span>:
+    <span cam-form-inline-field
+      class="set-value"
+      type="text"
+      change="changeSearch($index, 'name', varValue)"
+      value="search.name">
+        <span tooltip-placement="top"
+        tooltip-append-to-body="true"
+        tooltip="{{'PROPERTY' | translate}}">
+          {{ varValue | queryComponent }}
+        </span>
+    </span>
+    <span cam-form-inline-field
+      class="set-value"
+      type="option"
+      options="operatorList"
+      change="changeSearch($index, 'operator', varValue)"
+      value="search.operator">
+        <span tooltip-placement="top"
+        tooltip-append-to-body="true"
+        tooltip="{{'OPERATOR' | translate}}">
+          {{ varValue | queryComponent }}
+        </span>
+    </span>
+    <span cam-form-inline-field
+      class="set-value"
+      type="text"
+      change="changeSearch($index, 'value', varValue)"
+      value="search.value">
+        <span tooltip-placement="top"
+        tooltip-append-to-body="true"
+        tooltip="{{'VALUE' | translate}}">
+          {{ varValue | queryComponent }}
+        </span>
+    </span>
+    <a href
+     tooltip-placement="top"
+     tooltip="{{ 'DELETE_SEARCH' | translate }}"
+     ng-click="deleteSearch($index)"
+     class="remove-search glyphicon glyphicon-remove">
+  </a>
+  </span>
+      <input
+        class="form-control"
+        type="text"
+        placeholder="{{'SEARCH_PLACEHOLDER' | translate}}"
+        ng-model="inputQuery"
+        ng-focus="onFocus()"
+        ng-blur="onBlur()"
+      />
+      <div class="open" ng-if="dropdownOpen" ng-mousedown="dropdownHandler($event)">
+        <ul class="dropdown-menu search-dropdown" role="menu">
+          <li role="presentation" class="dropdown-header">searching for:</li>
+          <li ng-repeat="type in types">
+            <a ng-click="selectType(type)">
+              {{type}}
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </form>
+</div>

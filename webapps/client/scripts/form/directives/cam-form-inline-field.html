@@ -42,9 +42,19 @@
                   ng-change="changeDate(this)" />
 
     </span>
+    <div ng-if="varType === 'option'">
+      <span style="padding: 4px;">{{varValue}}</span>
+      <ul class="dropdown-menu" style="display:block;" role="menu">
+        <li ng-repeat="option in options">
+          <a ng-click="applyChange(option)">
+            {{option}}
+          </a>
+        </li>
+      </ul>
+    </div>
   </span>
 
-  <span class="btn-group">
+  <span class="btn-group" ng-if="varType !== 'option'">
     <button type="button"
             class="btn btn-xs btn-default"
             ng-click="applyChange()">

@@ -21,6 +21,7 @@
     input {
       max-height: 30px;
       color: inherit;
+      background-color: transparent;
     }
   }
 
@@ -50,6 +51,14 @@
     }
     thead button {
       height: 28px;
+    }
+  }
+
+  &[type="option"] {
+    vertical-align: top;
+    .dropdown-menu {
+      min-width: initial;
+      text-align: left;
     }
   }
 
