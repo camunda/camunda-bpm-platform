@@ -1,8 +1,8 @@
 <div class="day row" ng-repeat="day in days | orderBy:'-date'">
   <div class="col-xs-2">
     <div class="date-badge">
-      <span class="day">{{ day.date | date:'dd' }}</span>
-      <span class="month">{{ day.date | date:'MMMM' }}</span>
+      <span class="day">{{ day.date | camDate:'day' }}</span>
+      <span class="month">{{ day.date | camDate:'monthName' }}</span>
       <span class="year">{{ day.date | date:'yyyy' }}</span>
     </div>
   </div>
@@ -25,14 +25,14 @@
               <div class="col-sm-12 col-md-9 event-value">
                 <span ng-if="subEvent.orgValue">
                   <span class="original-value">
-                    <span ng-if="isTimestampProperty(subEvent.property)">{{ subEvent.orgValue | date:'dd. MMMM yyyy HH:mm'}}</span>
-                    <span ng-if="!isTimestampProperty(subEvent.property)">{{ subEvent.orgValue }}</span>
+                    <span ng-if="subEvent.propertyIsDate">{{ subEvent.orgValue | camDate }}</span>
+                    <span ng-if="!subEvent.propertyIsDate">{{ subEvent.orgValue }}</span>
                   </span>
                   <span class="glyphicon glyphicon-arrow-right"></span>
                 </span>
                 <span class="new-value">
-                  <span ng-if="isTimestampProperty(subEvent.property)">{{ subEvent.newValue | date:'dd. MMMM yyyy HH:mm'}}</span>
-                  <span ng-if="!isTimestampProperty(subEvent.property)">{{ subEvent.newValue }}</span>
+                  <span ng-if="subEvent.propertyIsDate">{{ subEvent.newValue | camDate }}</span>
+                  <span ng-if="!subEvent.propertyIsDate">{{ subEvent.newValue }}</span>
                 </span>
               </div>
             </div>

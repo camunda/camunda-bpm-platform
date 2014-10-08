@@ -12,7 +12,7 @@ define([
   template
 ) {
   'use strict';
-  
+
   var findOrCreateDay = function(days, timestamp) {
     var day = jquery.grep(days, function(elem) {
       return moment(elem.date).format('YYYY-MM-DD') === moment(timestamp).format('YYYY-MM-DD');
@@ -28,7 +28,7 @@ define([
       return day;
     }
   };
-  
+
   var findOrCreateParentEvent = function(events, event) {
     var parentEvent = jquery.grep(events, function(elem) {
       return elem.operationId === event.operationId;
@@ -40,14 +40,14 @@ define([
         time: event.timestamp,
         type: event.operationType,
         operationId: event.operationId,
-        userId: event.userId, 
+        userId: event.userId,
         subEvents: []
       };
       events.push(parentEvent);
       return parentEvent;
     }
   };
-  
+
   return ['camAPI',
   function(camAPI) {
     var History = camAPI.resource('history');
@@ -60,9 +60,9 @@ define([
         $scope.history = [];
         $scope.days = [];
 
-        $scope.isTimestampProperty = function(propertyName) {
+        function isTimestampProperty(propertyName) {
           return ['dueDate', 'followUpDate'].indexOf(propertyName) !== -1;
-        };
+        }
 
         var loadHistory = function(taskId) {
           camSDK.utils.series({
@@ -71,6 +71,7 @@ define([
           }, function(err, data) {
             $scope.history = data.historyData;
             $scope.comments = data.commentData;
+
             var days = [];
             angular.forEach($scope.history, function(event) {
               // create object for each day, containing the events for this day
@@ -79,13 +80,22 @@ define([
               // create event object for each operationId
               var parentEvent = findOrCreateParentEvent(day.events, event);
 
+              // preprocess the dates to avoid function calls from the template
+              if (isTimestampProperty(event.property)) {
+                event.propertyIsDate = true;
+                event.newValue = event.newValue ? parseInt(event.newValue, 10) : null;
+                event.orgValue = event.orgValue ? parseInt(event.orgValue, 10) : null;
+              }
+
               parentEvent.subEvents.push(event);
             });
+
             angular.forEach($scope.comments, function(comment) {
               var day = findOrCreateDay(days, comment.time);
               comment.type = 'Comment';
               day.events.push(comment);
             });
+
             $scope.days = days;
           });
         };
