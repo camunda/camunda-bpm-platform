@@ -69,10 +69,6 @@ public class SentryHandler extends CmmnElementHandler<Sentry, CmmnSentryDeclarat
       }
     }
 
-    if ((onParts == null || onParts.isEmpty())
-        && (ifPart == null || ifPart.getConditions().isEmpty())) {
-    }
-
     CmmnSentryDeclaration sentryDeclaration = new CmmnSentryDeclaration(id);
 
     // the ifPart will initialized immediately
