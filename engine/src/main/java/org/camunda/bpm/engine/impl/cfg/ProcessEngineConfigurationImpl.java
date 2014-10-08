@@ -1861,18 +1861,34 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     this.postParseListeners = postParseListeners;
   }
 
+  /**
+   * @deprecated use {@link #getCustomPreBPMNParseListeners} instead.
+   */
+  @Deprecated
   public List<BpmnParseListener> getPreParseListeners() {
     return preParseListeners;
   }
 
+  /**
+   * @deprecated use {@link #setCustomPreBPMNParseListeners} instead.
+   */
+  @Deprecated
   public void setPreParseListeners(List<BpmnParseListener> preParseListeners) {
     this.preParseListeners = preParseListeners;
   }
 
+  /**
+   * @deprecated use {@link #getCustomPostBPMNParseListeners} instead.
+   */
+  @Deprecated
   public List<BpmnParseListener> getPostParseListeners() {
     return postParseListeners;
   }
 
+  /**
+   * @deprecated use {@link #setCustomPostBPMNParseListeners} instead.
+   */
+  @Deprecated
   public void setPostParseListeners(List<BpmnParseListener> postParseListeners) {
     this.postParseListeners = postParseListeners;
   }
