@@ -89,6 +89,11 @@ define([
           });
         };
 
+        scope.$on('tasklist.task.tab', function(evt, tabName) {
+          if (tabName === 'diagram') {
+            scope.drawDiagram();
+          }
+        });
 
         $win.on('resize', renderDiagram);
         element.on('$destroy', function() {

@@ -100,17 +100,11 @@ define([
         }
 
         scope.selectTab = function(tabName) {
-          if (tabName === 'diagram') {
-            scope.drawDiagram();
-          }
+          scope.$broadcast('tasklist.task.tab', tabName);
         };
 
         scope.fullscreenForm = function() {
           element.find('[cam-tasklist-task-form]').isolateScope().enterFullscreen();
-        };
-
-        scope.drawDiagram = function() {
-          element.find('[cam-tasklist-task-diagram]').isolateScope().drawDiagram();
         };
 
         scope.$on('tasklist.task.current', function(ev, task) {

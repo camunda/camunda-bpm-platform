@@ -99,8 +99,11 @@ define([
             $scope.days = days;
           });
         };
-
-        loadHistory($scope.task.id);
+        $scope.$on('tasklist.task.tab', function(evt, tabName) {
+          if(tabName === 'history') {
+            loadHistory($scope.task.id);
+          }
+        });
         $scope.$on('tasklist.task.current', function(evt) {
           loadHistory(evt.targetScope.currentTask.id);
         });
