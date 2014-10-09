@@ -72,7 +72,6 @@ import org.camunda.bpm.model.bpmn.impl.instance.di.PlaneImpl;
 import org.camunda.bpm.model.bpmn.impl.instance.di.ShapeImpl;
 import org.camunda.bpm.model.bpmn.impl.instance.di.StyleImpl;
 import org.camunda.bpm.model.bpmn.impl.instance.di.WaypointImpl;
-import org.camunda.bpm.model.bpmn.instance.DataObject;
 import org.camunda.bpm.model.bpmn.instance.Definitions;
 import org.camunda.bpm.model.bpmn.instance.Process;
 import org.camunda.bpm.model.xml.Model;
@@ -293,6 +292,8 @@ public class Bpmn {
     CompensateEventDefinitionImpl.registerType(bpmnModelBuilder);
     ConditionImpl.registerType(bpmnModelBuilder);
     ConditionalEventDefinitionImpl.registerType(bpmnModelBuilder);
+    CompletionConditionImpl.registerType(bpmnModelBuilder);
+    ComplexBehaviorDefinitionImpl.registerType(bpmnModelBuilder);
     ComplexGatewayImpl.registerType(bpmnModelBuilder);
     ConditionExpressionImpl.registerType(bpmnModelBuilder);
     ConversationAssociationImpl.registerType(bpmnModelBuilder);
@@ -346,6 +347,7 @@ public class Bpmn {
     Incoming.registerType(bpmnModelBuilder);
     InMessageRef.registerType(bpmnModelBuilder);
     InnerParticipantRef.registerType(bpmnModelBuilder);
+    InputDataItemImpl.registerType(bpmnModelBuilder);
     InputSetImpl.registerType(bpmnModelBuilder);
     InputSetRefs.registerType(bpmnModelBuilder);
     InteractionNodeImpl.registerType(bpmnModelBuilder);
@@ -360,7 +362,10 @@ public class Bpmn {
     LaneImpl.registerType(bpmnModelBuilder);
     LaneSetImpl.registerType(bpmnModelBuilder);
     LinkEventDefinitionImpl.registerType(bpmnModelBuilder);
+    LoopCardinalityImpl.registerType(bpmnModelBuilder);
     LoopCharacteristicsImpl.registerType(bpmnModelBuilder);
+    LoopDataInputRef.registerType(bpmnModelBuilder);
+    LoopDataOutputRef.registerType(bpmnModelBuilder);
     ManualTaskImpl.registerType(bpmnModelBuilder);
     MessageEventDefinitionImpl.registerType(bpmnModelBuilder);
     MessageFlowAssociationImpl.registerType(bpmnModelBuilder);
@@ -370,6 +375,7 @@ public class Bpmn {
     MessagePath.registerType(bpmnModelBuilder);
     ModelElementInstanceImpl.registerType(bpmnModelBuilder);
     MonitoringImpl.registerType(bpmnModelBuilder);
+    MultiInstanceLoopCharacteristicsImpl.registerType(bpmnModelBuilder);
     OperationImpl.registerType(bpmnModelBuilder);
     OperationRef.registerType(bpmnModelBuilder);
     OptionalInputRefs.registerType(bpmnModelBuilder);
@@ -377,6 +383,7 @@ public class Bpmn {
     OuterParticipantRef.registerType(bpmnModelBuilder);
     OutMessageRef.registerType(bpmnModelBuilder);
     Outgoing.registerType(bpmnModelBuilder);
+    OutputDataItemImpl.registerType(bpmnModelBuilder);
     OutputSetImpl.registerType(bpmnModelBuilder);
     OutputSetRefs.registerType(bpmnModelBuilder);
     ParallelGatewayImpl.registerType(bpmnModelBuilder);

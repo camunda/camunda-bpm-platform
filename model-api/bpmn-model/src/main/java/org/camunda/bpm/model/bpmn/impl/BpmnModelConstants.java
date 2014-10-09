@@ -202,6 +202,18 @@ public final class BpmnModelConstants {
   public static final String BPMN_ELEMENT_INCLUSIVE_GATEWAY = "inclusiveGateway";
   public static final String BPMN_ELEMENT_TEXT_ANNOTATION = "textAnnotation";
   public static final String BPMN_ELEMENT_TEXT = "text";
+  public static final String BPMN_ELEMENT_COMPLEX_BEHAVIOR_DEFINITION = "complexBehaviorDefinition";
+  public static final String BPMN_ELEMENT_MULTI_INSTANCE_LOOP_CHARACTERISTICS = "multiInstanceLoopCharacteristics";
+  public static final String BPMN_ELEMENT_LOOP_CARDINALITY = "loopCardinality";
+  public static final String BPMN_ELEMENT_COMPLETION_CONDITION = "completionCondition";
+  public static final String BPMN_ELEMENT_OUTPUT_DATA_ITEM = "outputDataItem";
+  public static final String BPMN_ELEMENT_INPUT_DATA_ITEM = "inputDataItem";
+  public static final String BPMN_ELEMENT_LOOP_DATA_OUTPUT_REF = "loopDataOutputRef";
+  public static final String BPMN_ELEMENT_LOOP_DATA_INPUT_REF = "loopDataInputRef";
+  public static final String BPMN_ELEMENT_IS_SEQUENTIAL = "isSequential";
+  public static final String BPMN_ELEMENT_BEHAVIOR= "behavior";
+  public static final String BPMN_ELEMENT_ONE_BEHAVIOR_EVENT_REF = "oneBehaviorEventRef";
+  public static final String BPMN_ELEMENT_NONE_BEHAVIOR_EVENT_REF = "noneBehaviorEventRef";
 
   /** DC */
 
