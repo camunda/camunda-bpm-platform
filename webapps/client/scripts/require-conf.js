@@ -76,6 +76,7 @@ define(function() {
                                       'camunda-commons-ui/util/notifications',
                                       'camunda-commons-ui/filter/date/index',
 
+                                      'camunda-tasklist-ui/config/date',
                                       'camunda-tasklist-ui/config/routes',
                                       'camunda-tasklist-ui/config/translations',
                                       'camunda-tasklist-ui/config/uris',
