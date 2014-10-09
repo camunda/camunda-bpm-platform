@@ -54,7 +54,6 @@ define([
           viewer.importXML(process._xml.bpmn20Xml, function(err) {
             if (err) { throw err; }
 
-            if (!element.width() || !viewer.diagram) { return; }
             resizeContainer();
 
             var canvas = viewer.get('canvas');
@@ -67,7 +66,7 @@ define([
 
 
         scope.drawDiagram = function() {
-          if (!process || !element.width()) { return; }
+          if (!process) { return; }
           if (!scope.$root.authentication) {
             throw new Error('Not authenticated');
           }
@@ -103,7 +102,6 @@ define([
 
         scope.$watch('task', function(newV, oldV) {
           process = scope.task._embedded.processDefinition[0];
-          scope.drawDiagram();
         });
       }
     };
