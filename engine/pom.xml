@@ -34,6 +34,8 @@
     <dependency>
       <groupId>org.camunda.spin</groupId>
       <artifactId>camunda-spin-all</artifactId>
+      <!-- https://app.camunda.com/jira/browse/CAM-2552 -->
+      <scope>provided</scope>
     </dependency>
 
     <dependency>
@@ -236,6 +238,11 @@
             <exclude>**/*TestCase.java</exclude>
 
             <exclude>**/RepeatingServiceTaskTest.java</exclude>
+
+            <!-- https://app.camunda.com/jira/browse/CAM-2552 -->
+            <exclude>**/Spin*.java</exclude>
+            <exclude>**/HistoricVariableDataFormatTest.java</exclude>
+            <exclude>**/VariableDataFormatTest.java</exclude>
           </excludes>
         </configuration>
       </plugin>
@@ -296,6 +303,27 @@
   </build>
 
   <profiles>
+
+    <!-- https://app.camunda.com/jira/browse/CAM-2552 -->
+    <profile>
+      <id>with-spin</id>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <failIfNoTests>false</failIfNoTests>
+              <trimStackTrace>false</trimStackTrace>
+              <redirectTestOutputToFile>true</redirectTestOutputToFile>
+              <excludes>
+                <exclude>**/*TestCase.java</exclude>
+                <exclude>**/RepeatingServiceTaskTest.java</exclude>
+              </excludes>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
 
     <profile>
       <id>checkspring</id>

@@ -82,6 +82,11 @@
     </dependency>
 
     <dependency>
+      <groupId>org.camunda.spin</groupId>
+      <artifactId>camunda-spin-all</artifactId>
+    </dependency>
+
+    <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-web</artifactId>
     </dependency>
@@ -144,6 +149,7 @@
   </build>
 
   <profiles>
+
     <profile>
       <id>jboss</id>
       <activation>
@@ -229,7 +235,6 @@
         </plugins>
       </build>
     </profile>
-
 
     <profile>
       <id>jboss-domain</id>
