@@ -49,17 +49,6 @@ define([
 
         scope.elUID = camUID();
 
-        function refreshTabs() {
-          var activePane = element.find('.tab-pane.active > div');
-          var paneScope = activePane.hasClass('ng-isolated-scope') ?
-                          activePane.isolateScope() :
-                          activePane.scope();
-
-          if (activePane.hasClass('diagram-pane')) {
-            paneScope.drawDiagram();
-          }
-        }
-
 
         function loadTask(taskId) {
           Task.get(taskId, function(err, loadedTask) {
@@ -73,7 +62,6 @@ define([
             if (!$rootScope.currentTask || $rootScope.currentTask.id !== loadedTask.id) {
               $rootScope.currentTask = loadedTask;
             }
-            refreshTabs();
           });
         }
 
@@ -95,7 +83,6 @@ define([
             // should we load the next task?
             // that would happen here
             scope.task = null;
-            refreshTabs();
           }
         }
 
