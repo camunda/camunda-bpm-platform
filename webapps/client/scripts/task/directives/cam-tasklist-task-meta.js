@@ -1,7 +1,13 @@
 define([
+  'angular',
   'text!./cam-tasklist-task-meta.html'
-], function(template) {
+], function(
+  angular,
+  template
+) {
   'use strict';
+
+  var $ = angular.element;
 
   function fixWriteDateTimezone(dateObj) {
     return new Date(dateObj.getTime() - (dateObj.getTimezoneOffset() * 1000 * 60));
@@ -46,7 +52,7 @@ define([
 
       template: template,
 
-      link: function(scope) {
+      link: function(scope, element) {
         function saveDate(propName) {
           return function(inlineFieldScope) {
             var self = this;
@@ -54,7 +60,6 @@ define([
 
 
             task[propName] = fixWriteDateTimezone(inlineFieldScope.varValue);
-            // task[propName] = inlineFieldScope.varValue;
 
 
             delete task._embedded;
@@ -77,15 +82,6 @@ define([
         scope.saveDueDate = saveDate('due');
 
         scope.now = (new Date()).toJSON();
-
-        // function delegated(err) {
-        //   if (err) {
-        //     return errorNotification('DELEGATE_ERROR', err);
-        //   }
-
-        //   successNotification('DELEGATE_OK');
-        // }
-
 
         function assigned(err) {
           if (err) {
@@ -143,22 +139,6 @@ define([
 
 
         scope.claim = function() {
-          // if (scope.userIsOwner()) {
-          //   Task.assignee(scope.task.id, $rootScope.authentication.name, function(err) {
-          //     if (err) {
-          //       return claimed(err);
-          //     }
-
-          //     scope.task.owner = null;
-          //     scope.task.assignee = $rootScope.authentication.name;
-
-          //     claimed();
-          //   });
-          // }
-          // else {
-          //   Task.claim(scope.task.id, $rootScope.authentication.name, claimed);
-          // }
-
           Task.claim(scope.task.id, $rootScope.authentication.name, claimed);
         };
 
@@ -166,43 +146,6 @@ define([
         scope.unclaim = function() {
           Task.unclaim(scope.task.id, unclaimed);
         };
-
-
-        // scope.delegate = function() {
-        //   delegated(null, {userId: $rootScope.authentication.name});
-        // };
-
-
-        // scope.assigning = function(info) {
-        //   // delegation
-        //   if (scope.userIsAssignee()) {
-        //     Task.delegate(scope.task.id, info.varValue, function(err) {
-        //       if (err) {
-        //         return delegated(err);
-        //       }
-
-        //       // scope.task.owner = $rootScope.authentication.name;
-        //       scope.task.assignee = info.varValue;
-
-        //       delegated();
-        //     });
-        //   }
-        //   // assignment
-        //   else if (scope.userIsOwner()) {
-        //     Task.assignee(scope.task.id, info.varValue, function(err) {
-        //       if (err) {
-        //         return assigned(err);
-        //       }
-
-        //       scope.task.assignee = info.varValue;
-
-        //       assigned();
-        //     });
-        //   }
-        //   else {
-        //     errorNotification('NEED_OWNER_OR_ASSIGNEE');
-        //   }
-        // };
 
         scope.assigning = function(info) {
           if (!info.varValue) {
@@ -220,22 +163,13 @@ define([
         };
 
 
-
-        // function resolved(err/*, resp*/) {
-        //   if (err) {
-        //     return errorNotification('RESOLVE_ERROR', err);
-        //   }
-
-        //   scope.task.assignee = null;
-
-        //   successNotification('RESOLVE_OK');
-        // }
-        // scope.resolve = function() {
-        //   resolved(null, {userId: $rootScope.authentication.name});
-        //   // Task.resolve($rootScope.authentication.name, {
-        //   //   done: assigned
-        //   // });
-        // };
+        scope.$on('tasklist.task.current', function(evt, task) {
+          $('[cam-form-inline-field]', element).each(function() {
+            $(this)
+              .isolateScope()
+              .cancelChange();
+          });
+        });
       }
     };
   }];
