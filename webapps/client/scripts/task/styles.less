@@ -5,6 +5,7 @@
   }
 
   .tab-content {
+    position: relative;
     padding: @grid-gutter-width 0;
   }
 
@@ -84,7 +85,31 @@
   }
 }
 
+.diagram-loader {
+  background-color: rgba(255, 255, 255, 0.8);
+  position: absolute;
+  z-index: 5;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  > div {
+    text-align: center;
+    position: absolute;
+    width: 100%;
+    height: 30px;
+    top: 50%;
+    margin-top: -15px;
+  }
+  // .glyphicon {
+  //   font-size: 80px;
+  // }
+}
+
 .diagram-holder {
+  position: relative;
+  z-index: 3;
+
   .bjs-container > a {
     display: none;
   }

@@ -51,16 +51,18 @@ define([
 
         function renderDiagram() {
           if (!process._xml) { return; }
+          scope.rendering = true;
           viewer.importXML(process._xml.bpmn20Xml, function(err) {
-            if (err) { throw err; }
+            scope.$apply(function() {
+              scope.rendering = false;
+              if (err) { throw err; }
 
-            resizeContainer();
+              resizeContainer();
 
-            var canvas = viewer.get('canvas');
-            canvas.addMarker(scope.task.taskDefinitionKey, 'highlight');
-            canvas.zoom('fit-viewport');
-
-            scope.rendering = false;
+              var canvas = viewer.get('canvas');
+              canvas.addMarker(scope.task.taskDefinitionKey, 'highlight');
+              canvas.zoom('fit-viewport');
+            });
           });
         }
 
@@ -71,7 +73,6 @@ define([
             throw new Error('Not authenticated');
           }
 
-          scope.rendering = true;
 
           if (process._xml) {
             return renderDiagram();
@@ -82,7 +83,8 @@ define([
             scope.loading = false;
             if(err) {
               scope.error = err;
-            } else {
+            }
+            else {
               scope.error = null;
               process._xml = xml;
               renderDiagram();
@@ -90,11 +92,13 @@ define([
           });
         };
 
+
         scope.$on('tasklist.task.tab', function(evt, tabName) {
           if (tabName === 'diagram') {
             scope.drawDiagram();
           }
         });
+
 
         $win.on('resize', renderDiagram);
         element.on('$destroy', function() {
@@ -104,6 +108,9 @@ define([
 
         scope.$watch('task', function(newV, oldV) {
           process = scope.task._embedded.processDefinition[0];
+          if (scope.$parent.$parent.tabs.diagram) {
+            scope.drawDiagram();
+          }
         });
       }
     };
