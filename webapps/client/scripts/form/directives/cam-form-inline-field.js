@@ -4,7 +4,9 @@ define([
   template
 ) {
   'use strict';
-  return [function() {
+  return [
+  "$timeout",
+  function($timeout) {
     return {
       scope: {
         varValue:       '=value',
@@ -84,13 +86,11 @@ define([
           scope.$watch('_datetime.time', buildDatetime);
         }
 
-
-
-
-
-
-        scope.toggleEditing = function() {
-          scope.editing = !scope.editing;
+        scope.startEditing = function() {
+          scope.editing = true;
+          $timeout(function(){
+            angular.element('[name="editValue"]').focus();
+          },10);
         };
 
         scope.applyChange = function() {
