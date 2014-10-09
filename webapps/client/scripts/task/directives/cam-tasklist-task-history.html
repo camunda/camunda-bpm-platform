@@ -1,3 +1,7 @@
+<div class="alert alert-danger" ng-if="error">
+  {{error}}
+</div>
+
 <div class="day row" ng-repeat="day in days | orderBy:'-date'">
   <div class="col-xs-2">
     <div class="date-badge">

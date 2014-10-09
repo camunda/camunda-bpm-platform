@@ -69,34 +69,40 @@ define([
             historyData: function(cb) { History.userOperation({taskId : taskId}, cb); },
             commentData: function(cb) { Task.comments(taskId, cb); }
           }, function(err, data) {
-            $scope.history = data.historyData;
-            $scope.comments = data.commentData;
+            if(err) {
+              $scope.error = err;
+            } else {
+              $scope.error = null;
 
-            var days = [];
-            angular.forEach($scope.history, function(event) {
-              // create object for each day, containing the events for this day
-              var day = findOrCreateDay(days, event.timestamp);
+              $scope.history = data.historyData;
+              $scope.comments = data.commentData;
 
-              // create event object for each operationId
-              var parentEvent = findOrCreateParentEvent(day.events, event);
+              var days = [];
+              angular.forEach($scope.history, function(event) {
+                // create object for each day, containing the events for this day
+                var day = findOrCreateDay(days, event.timestamp);
 
-              // preprocess the dates to avoid function calls from the template
-              if (isTimestampProperty(event.property)) {
-                event.propertyIsDate = true;
-                event.newValue = event.newValue ? parseInt(event.newValue, 10) : null;
-                event.orgValue = event.orgValue ? parseInt(event.orgValue, 10) : null;
-              }
+                // create event object for each operationId
+                var parentEvent = findOrCreateParentEvent(day.events, event);
 
-              parentEvent.subEvents.push(event);
-            });
+                // preprocess the dates to avoid function calls from the template
+                if (isTimestampProperty(event.property)) {
+                  event.propertyIsDate = true;
+                  event.newValue = event.newValue ? parseInt(event.newValue, 10) : null;
+                  event.orgValue = event.orgValue ? parseInt(event.orgValue, 10) : null;
+                }
 
-            angular.forEach($scope.comments, function(comment) {
-              var day = findOrCreateDay(days, comment.time);
-              comment.type = 'Comment';
-              day.events.push(comment);
-            });
+                parentEvent.subEvents.push(event);
+              });
 
-            $scope.days = days;
+              angular.forEach($scope.comments, function(comment) {
+                var day = findOrCreateDay(days, comment.time);
+                comment.type = 'Comment';
+                day.events.push(comment);
+              });
+
+              $scope.days = days;
+            }
           });
         };
         $scope.$on('tasklist.task.tab', function(evt, tabName) {
@@ -104,15 +110,13 @@ define([
             loadHistory($scope.task.id);
           }
         });
-        $scope.$on('tasklist.task.current', function(evt) {
+
+        function loadHistoryAfterEvent(evt) {
           loadHistory(evt.targetScope.currentTask.id);
-        });
-        $scope.$on('tasklist.task.update', function(evt) {
-          loadHistory(evt.targetScope.currentTask.id);
-        });
-        $scope.$on('tasklist.comment.new', function(evt) {
-          loadHistory(evt.targetScope.currentTask.id);
-        });
+        }
+        $scope.$on('tasklist.task.current', loadHistoryAfterEvent);
+        $scope.$on('tasklist.task.update',  loadHistoryAfterEvent);
+        $scope.$on('tasklist.comment.new',  loadHistoryAfterEvent);
       },
       template: template
     };

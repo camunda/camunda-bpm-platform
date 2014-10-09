@@ -80,11 +80,13 @@ define([
           scope.loading = true;
           ProcessDefinition.xml(process, function(err, xml) {
             scope.loading = false;
-            if (err) { throw err; }
-
-            process._xml = xml;
-
-            renderDiagram();
+            if(err) {
+              scope.error = err;
+            } else {
+              scope.error = null;
+              process._xml = xml;
+              renderDiagram();
+            }
           });
         };
 
