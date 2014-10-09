@@ -93,5 +93,65 @@
         "Complete",
 
   "NONE":
-        "None"
+        "None",
+
+  "Assign":
+        "Assign",
+  "Claim":
+        "Claim",
+  "Complete":
+        "Complete",
+  "Create":
+        "Create",
+  "Delegate":
+        "Delegate",
+  "Delete":
+        "Delete",
+  "Resolve":
+        "Resolve",
+  "SetOwner":
+        "Set Owner",
+  "SetPriority":
+        "Set Priority",
+  "Update":
+        "Update",
+  "Activate":
+        "Activate",
+  "Suspend":
+        "Suspend",
+  "AddUserLink":
+        "Add User Link",
+  "DeleteUserLink":
+        "Delete User Link",
+  "AddGroupLink":
+        "Add Group Link",
+  "DeleteGroupLink":
+        "Delete Group Link",
+  "AddAttachment":
+        "Add Attachment",
+  "DeleteAttachment":
+        "Delete Attachment",
+
+  "assignee":
+        "Assignee",
+  "delegation":
+        "Delegation",
+  "delete":
+        "Delete",
+  "description":
+        "Description",
+  "dueDate":
+        "Due date",
+  "followUpDate":
+        "Follow-up date",
+  "name":
+        "Name",
+  "owner":
+        "Owner",
+  "parentTask":
+        "Parent task",
+  "priority":
+        "Priority",
+  "caseInstanceId":
+        "Case instance id"
 }

@@ -105,14 +105,20 @@ define([
             }
           });
         };
+        var historyTabActive = false;
         $scope.$on('tasklist.task.tab', function(evt, tabName) {
           if(tabName === 'history') {
+            historyTabActive = true;
             loadHistory($scope.task.id);
+          } else {
+            historyTabActive = false;
           }
         });
 
         function loadHistoryAfterEvent(evt) {
-          loadHistory(evt.targetScope.currentTask.id);
+          if(historyTabActive) {
+            loadHistory(evt.targetScope.currentTask.id);
+          }
         }
         $scope.$on('tasklist.task.current', loadHistoryAfterEvent);
         $scope.$on('tasklist.task.update',  loadHistoryAfterEvent);

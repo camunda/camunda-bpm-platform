@@ -37,6 +37,7 @@ define('camunda-tasklist-ui', [
   function rj2ngNames(names) {
     var name, translated = [];
     for (var n = 0; n < names.length; n++) {
+      if(names[n].indexOf("!") !== -1) continue;
       name = (require(names[n]) || {}).name;
       if (name) translated.push(name);
     }
