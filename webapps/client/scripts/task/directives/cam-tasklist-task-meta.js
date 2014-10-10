@@ -9,10 +9,6 @@ define([
 
   var $ = angular.element;
 
-  function fixWriteDateTimezone(dateObj) {
-    return new Date(dateObj.getTime() - (dateObj.getTimezoneOffset() * 1000 * 60));
-  }
-
   return [
     '$rootScope',
     '$translate',
@@ -56,16 +52,14 @@ define([
         function saveDate(propName) {
           return function(inlineFieldScope) {
             var self = this;
-            var task = angular.copy(self.task);
+            var toSend = angular.copy(self.task);
 
+            toSend[propName] = scope.task[propName] = inlineFieldScope.varValue;
 
-            task[propName] = fixWriteDateTimezone(inlineFieldScope.varValue);
+            delete toSend._embedded;
+            delete toSend._links;
 
-
-            delete task._embedded;
-            delete task._links;
-
-            Task.update(task, function(err, result) {
+            Task.update(toSend, function(err, result) {
               if (err) {
                 return errorNotification('TASK_UPDATE_ERROR', err);
               }

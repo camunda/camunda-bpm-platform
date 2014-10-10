@@ -61,9 +61,7 @@ define([
 
           if (isDate()) {
             var dateStr = scope.varValue;
-
             var dateObj = new Date(dateStr ? Date.parse(dateStr) : Date.now());
-
             dateObj.setTime(dateObj.getTime() + (dateObj.getTimezoneOffset() * 60000));
 
             scope.dateValue = dateObj;
@@ -87,13 +85,15 @@ define([
           if (!scope.invalid) {
             if(scope.simpleField) {
               scope.editValue = angular.element('[ng-model="editValue"]').val();
+              scope.varValue = scope.editValue;
             }
             else if (isDate()) {
               var offset = scope.dateValue.getTimezoneOffset() * 60000;
               scope.dateValue.setTime(scope.dateValue.getTime() - offset);
-            }
 
-            scope.varValue = scope.editValue;
+              // this is important --------------------vvvvvvvvvvvvvvvvvvv
+              scope.varValue = scope.editValue.toJSON().split('.').shift();
+            }
 
             scope.$emit('change', scope.varValue);
             scope.change(scope);
