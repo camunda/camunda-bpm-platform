@@ -52,7 +52,8 @@ define('camunda-tasklist-ui', [
 
     var ngDeps = rj2ngNames(appModules).concat([
       'pascalprecht.translate',
-      'ngRoute'
+      'ngRoute',
+      'dataDepend'
     ]);
 
     tasklistApp = angular.module('cam.tasklist', ngDeps);
@@ -70,6 +71,7 @@ define('camunda-tasklist-ui', [
     tasklistApp.config(require('camunda-tasklist-ui/config/translations'));
     tasklistApp.config(require('camunda-tasklist-ui/config/routes'));
     tasklistApp.config(require('camunda-tasklist-ui/config/date'));
+
 
     tasklistApp.run([
       '$rootScope',

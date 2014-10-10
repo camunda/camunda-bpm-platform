@@ -16,6 +16,7 @@ define(function() {
       'angular-messages':           'bower_components/angular-messages/angular-messages',
       'angular-sanitize':           'bower_components/angular-sanitize/angular-sanitize',
       'angular-animate':            'bower_components/angular-animate/angular-animate',
+      'angular-data-depend':        'bower_components/angular-data-depend/src/dataDepend',
 
       'moment':                     'bower_components/moment/moment',
       'jquery':                     'bower_components/jquery/dist/jquery',
@@ -56,6 +57,8 @@ define(function() {
       'angular-route':              ['angular'],
       'angular-animate':            ['angular'],
 
+      'angular-data-depend':        ['angular'],
+
       'angular-bootstrap':          ['angular'],
       'angular-moment':             ['angular', 'moment'],
 
@@ -71,6 +74,7 @@ define(function() {
                                       'angular-animate',
 
                                       'angular-translate',
+                                      'angular-data-depend',
 
                                       'camunda-commons-ui/auth',
                                       'camunda-commons-ui/util/notifications',

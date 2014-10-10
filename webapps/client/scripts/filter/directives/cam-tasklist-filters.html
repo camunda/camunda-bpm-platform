@@ -7,13 +7,14 @@
 <div ng-hide="loading"
      ng-repeat="(delta, filter) in filters | orderBy:'properties.priority'"
      class="task-filter-wrapper"
-     ng-class="{active: filter.id === focusedId}"
+     ng-class="{active: isFocused(filter)}"
      ng-style="{'z-index': ((filters.length + 10) - delta) }">
 
   <div class="task-filter"
        ng-style="filter.style">
 
-    <div class="counter">{{ filter.itemCount }}</div>
+    <div ng-if="isFocused(filter)"
+      class="counter">{{ filterCount }}</div>
 
     <h4 class="name"
         ng-click="focus(filter)">{{ filter.name }}</h4>

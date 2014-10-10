@@ -9,42 +9,92 @@ define([
   var $ = angular.element;
   var each = angular.forEach;
 
-  function itemById(items, id) {
-    var i, item;
-    for (i in items) {
-      item = items[i];
-      if (item.id === id) { return item; }
-    }
-  }
-
   return [function() {
 
     return {
+
+      restrict: 'EAC',
+      scope: {
+        filterData: '='
+      },
+
       template: template,
 
       controller: [
         '$scope',
         '$rootScope',
-        '$timeout',
-        'camAPI',
       function (
         $scope,
-        $rootScope,
-        $timeout,
-        camAPI
+        $rootScope
       ) {
-        var Filter = camAPI.resource('filter');
 
-        var _scopeEvents = [];
-        $scope.$on('$destroy', function() {
-          if (!_scopeEvents.length) { return; }
-          each(_scopeEvents, function(fn) { fn(); });
+        var filterData = $scope.filterData.newChild($scope);
+        var query;
+
+        /**
+         * observe list of filters and pre-process
+         */
+        filterData.observe('filters', function(filters) {
+
+          var focused;
+          each(filters, function(filter) {
+
+            // read background color from properties
+            filter.style = {
+              'background-color': filter.properties.color
+            };
+
+            // auto focus first filter
+            if(!focused || filter.properties.priority < focused.properties.priority) {
+              focused = filter;
+            }
+          });
+
+          $scope.filters = filters;
+          $scope.focus(focused);
+
         });
 
-        $scope.filters = [];
-        $scope.focusedId = null;
-        $scope.loading = false;
+        /**
+         * observe the count for the current filter
+         */
+        filterData.observe('taskList', function(taskList) {
+          $scope.filterCount = taskList.count;
+        });
 
+        /**
+         * observe the task list query
+         */
+        filterData.observe('taskListQuery', function(taskListQuery) {
+          query = angular.copy(taskListQuery);
+        });
+
+        /**
+         * select a filter
+         */
+        $scope.focus = function(filter) {
+          $scope.filterCount = undefined;
+
+          if(filter.id !== query.id) {
+            // filter changed => reset pagination
+            query.firstResult = 0;
+          }
+
+          query.id = filter.id;
+          filterData.set('taskListQuery', query);
+        };
+
+        /**
+         * returns true if the provided filter is the focused filter
+         */
+        $scope.isFocused = function(filter) {
+          return filter.id === query.id;
+        };
+
+
+
+
+        // TODO: must be cleaned up
         $scope.edit = function(filter) {
           $rootScope.$broadcast('tasklist.filter.edit', filter);
         };
@@ -52,68 +102,6 @@ define([
         $scope.delete = function(filter) {
           $rootScope.$broadcast('tasklist.filter.delete', filter);
         };
-
-        $scope.focus = function(filter) {
-          if (filter) {
-            if ($scope.focusedId === filter.id) { return; }
-            $scope.focusedId = filter.id;
-            $rootScope.currentFilter = filter;
-          }
-          else {
-            $scope.focusedId = null;
-            $rootScope.currentFilter = null;
-          }
-          $rootScope.$broadcast('tasklist.filter.current', filter);
-        };
-
-
-
-        function authed() {
-          return $rootScope.authentication && $rootScope.authentication.name;
-        }
-
-
-
-        function listFilters() {
-          if ($scope.loading || !authed()) { return; }
-          $scope.loading = true;
-
-          Filter.list({
-            itemCount: true
-          }, function(err, res) {
-            $scope.loading = false;
-            if (err) { throw err; }
-
-            $scope.filters = res;
-
-            var focused;
-            each(res, function(filter) {
-              filter.style = {
-                'background-color': filter.properties.color
-              };
-              if ($scope.focusedId) {
-                if ($scope.focusedId === filter.id) {
-                  focused = filter;
-                }
-              }
-              else if (!focused || filter.properties.priority < focused.properties.priority) {
-                focused = filter;
-              }
-            });
-
-            $scope.focus(focused);
-          });
-        }
-
-        listFilters();
-
-        _scopeEvents.push($rootScope.$on('tasklist.task.update', listFilters));
-
-        _scopeEvents.push($rootScope.$on('tasklist.filter.saved', listFilters));
-
-        _scopeEvents.push($rootScope.$on('tasklist.filter.deleted', listFilters));
-
-        _scopeEvents.push($rootScope.$on('authentication.login.success', listFilters));
       }]
     };
   }];
