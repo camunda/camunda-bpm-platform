@@ -18,6 +18,7 @@
            class="form-control"
            type="{{ varType }}"
            ng-model="editValue"
+           ng-keyup="($event.keyCode == 13 && applyChange()) || ($event.keyCode == 27 && cancelChange())"
            placeholder="{{ placeholder }}" />
 
     <span ng-if="varType === 'datetime' || varType === 'date' || varType === 'time'">

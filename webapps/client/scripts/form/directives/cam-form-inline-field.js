@@ -82,9 +82,13 @@ define([
         };
 
         scope.applyChange = function() {
+
           scope.invalid = scope.validator(scope);
 
           if (!scope.invalid) {
+            if(scope.simpleField) {
+              scope.editValue = angular.element('[ng-model="editValue"]').val();
+            }
             scope.varValue = scope.editValue;
 
             scope.$emit('change', scope.varValue);
