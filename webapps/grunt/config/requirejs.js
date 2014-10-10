@@ -23,7 +23,8 @@ module.exports = function() {
     'angular-bootstrap',
     'angular-route',
     'angular-animate',
-    'angular-moment'
+    'angular-moment',
+    'angular-data-depend'
   ];
 
 
