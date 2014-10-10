@@ -10,7 +10,7 @@
 
   <span ng-if="varType === 'datetime' || varType === 'date' || varType === 'time'"
         class="preview">
-    {{ editValue | amCalendar }}
+    {{ editValue | camDate }}
   </span>
 
   <span class="field">
@@ -30,7 +30,7 @@
                   is-open="datePickerOptions.isOpen"
                   show-button-bar="false"
 
-                  ng-model="editValue"
+                  ng-model="dateValue"
                   ng-change="changeDate(this)" />
 
 
@@ -38,7 +38,7 @@
                   ng-if="varType === 'datetime' || varType === 'time'"
                   show-meridian="false"
 
-                  ng-model="editValue"
+                  ng-model="dateValue"
                   ng-change="changeDate(this)" />
 
     </span>

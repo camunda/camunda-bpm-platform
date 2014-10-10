@@ -60,14 +60,13 @@ define([
           ].indexOf(scope.varType) > -1;
 
           if (isDate()) {
-            if (!(scope.editValue instanceof Date))  {
-              var newDate = (new Date(scope.editValue || Date.now()));
-              scope.editValue = newDate;
-              scope.editValue.setTime(newDate.getTime());
-            }
-            else {
-              scope.editValue.setTime(scope.editValue.getTime());
-            }
+            var dateStr = scope.varValue;
+
+            var dateObj = new Date(dateStr ? Date.parse(dateStr) : Date.now());
+
+            dateObj.setTime(dateObj.getTime() + (dateObj.getTimezoneOffset() * 60000));
+
+            scope.dateValue = dateObj;
           }
         }
 
@@ -89,6 +88,11 @@ define([
             if(scope.simpleField) {
               scope.editValue = angular.element('[ng-model="editValue"]').val();
             }
+            else if (isDate()) {
+              var offset = scope.dateValue.getTimezoneOffset() * 60000;
+              scope.dateValue.setTime(scope.dateValue.getTime() - offset);
+            }
+
             scope.varValue = scope.editValue;
 
             scope.$emit('change', scope.varValue);
@@ -106,7 +110,7 @@ define([
         };
 
         scope.changeDate = function(pickerScope) {
-          scope.editValue.setTime(pickerScope.editValue.getTime());
+          scope.editValue = scope.dateValue = pickerScope.dateValue;
         };
 
         scope.$watch('varValue', reset);
