@@ -72,6 +72,11 @@
           <version>${test.version.current}</version>
           <scope>test</scope>
         </dependency>
+
+        <dependency>
+          <groupId>org.camunda.spin</groupId>
+          <artifactId>camunda-spin-all</artifactId>
+        </dependency>
       </dependencies>
     </profile>
     <profile>
@@ -88,6 +93,11 @@
           <artifactId>camunda-engine</artifactId>
           <version>${test.version.current}</version>
           <scope>test</scope>
+        </dependency>
+
+        <dependency>
+          <groupId>org.camunda.spin</groupId>
+          <artifactId>camunda-spin-all</artifactId>
         </dependency>
       </dependencies>
       <build>
