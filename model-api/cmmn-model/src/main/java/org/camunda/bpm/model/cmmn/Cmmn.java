@@ -93,6 +93,7 @@ import org.camunda.bpm.model.cmmn.impl.instance.camunda.CamundaOutImpl;
 import org.camunda.bpm.model.cmmn.impl.instance.camunda.CamundaScriptImpl;
 import org.camunda.bpm.model.cmmn.impl.instance.camunda.CamundaStringImpl;
 import org.camunda.bpm.model.cmmn.impl.instance.camunda.CamundaTaskListenerImpl;
+import org.camunda.bpm.model.cmmn.impl.instance.camunda.CamundaVariableListenerImpl;
 import org.camunda.bpm.model.xml.Model;
 import org.camunda.bpm.model.xml.ModelBuilder;
 import org.camunda.bpm.model.xml.ModelException;
@@ -337,6 +338,7 @@ public class Cmmn {
     CamundaScriptImpl.registerType(modelBuilder);
     CamundaStringImpl.registerType(modelBuilder);
     CamundaTaskListenerImpl.registerType(modelBuilder);
+    CamundaVariableListenerImpl.registerType(modelBuilder);
   }
 
   /**

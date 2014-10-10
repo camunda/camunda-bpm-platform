@@ -138,6 +138,7 @@ public class CmmnModelConstants {
   public static final String CAMUNDA_ELEMENT_OUT = "out";
   public static final String CAMUNDA_ELEMENT_TASK_LISTENER = "taskListener";
   public static final String CAMUNDA_ELEMENT_CASE_EXECUTION_LISTENER = "caseExecutionListener";
+  public static final String CAMUNDA_ELEMENT_VARIABLE_LISTENER = "variableListener";
   public static final String CAMUNDA_ELEMENT_FIELD = "field";
   public static final String CAMUNDA_ELEMENT_EXPRESSION = "expression";
   public static final String CAMUNDA_ELEMENT_STRING = "string";
