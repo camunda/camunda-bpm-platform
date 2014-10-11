@@ -61,6 +61,10 @@ Optionally you could globally install [grunt](http://gruntjs.com/) (using `npm i
 
 ### Setup
 
+#### Adjusting Maven Settings
+
+See https://github.com/camunda/camunda-bpm-platform#building-camunda-bpm-platform
+
 #### Using grunt
 
 They are some grunt tasks aimed to ease the development setup process, __but they can not be considered as stable__ and might do some mess with your NPM linking (at least with the camunda related packages).
