@@ -46,7 +46,7 @@ public interface AuthorizationRestService {
   @GET
   @Path("/check")
   @Produces(MediaType.APPLICATION_JSON)
-  public AuthorizationCheckResultDto isUserAuthorized(
+  AuthorizationCheckResultDto isUserAuthorized(
       @QueryParam("permissionName") String permissionName,
       @QueryParam("resourceName") String resourceName,
       @QueryParam("resourceType") Integer resourceType,
