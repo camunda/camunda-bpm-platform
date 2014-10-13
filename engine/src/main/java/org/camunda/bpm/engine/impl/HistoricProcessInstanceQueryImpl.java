@@ -13,6 +13,8 @@
 
 package org.camunda.bpm.engine.impl;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotContainsEmptyString;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotContainsNull;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
 
 import java.util.Calendar;
@@ -123,6 +125,8 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
   }
 
   public HistoricProcessInstanceQuery processDefinitionKeyNotIn(List<String> processDefinitionKeys) {
+    ensureNotContainsNull("processDefinitionKeys", processDefinitionKeys);
+    ensureNotContainsEmptyString("processDefinitionKeys", processDefinitionKeys);
     this.processKeyNotIn = processDefinitionKeys;
     return this;
   }

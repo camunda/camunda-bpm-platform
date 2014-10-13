@@ -18,6 +18,7 @@ import java.util.Collection;
 import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.exception.NullValueException;
 
 /**
@@ -207,6 +208,39 @@ public final class EnsureUtil {
       }
     }
     throw generateException(exceptionClass, null, null, message);
+  }
+
+  public static void ensureNotContainsEmptyString(String variableName, Collection<String> values) {
+    ensureNotContainsEmptyString((String) null, variableName, values);
+  }
+
+  public static void ensureNotContainsEmptyString(String message, String variableName, Collection<String> values) {
+    ensureNotContainsEmptyString(NotValidException.class, message, variableName, values);
+  }
+
+  public static void ensureNotContainsEmptyString(Class<? extends ProcessEngineException> exceptionClass, String variableName, Collection<String> values) {
+    ensureNotContainsEmptyString(exceptionClass, null, variableName, values);
+  }
+
+  public static void ensureNotContainsEmptyString(Class<? extends ProcessEngineException> exceptionClass, String message, String variableName, Collection<String> values) {
+    ensureNotNull(exceptionClass, message, variableName, values);
+    for (String value : values) {
+      if (value.isEmpty()) {
+        throw generateException(exceptionClass, message, variableName, "contains empty string");
+      }
+    }
+  }
+
+  public static void ensureNotContainsNull(String variableName, Collection<?> values) {
+    ensureNotContainsNull((String) null, variableName, values);
+  }
+
+  public static void ensureNotContainsNull(String message, String variableName, Collection<?> values) {
+    ensureNotContainsNull(NullValueException.class, message, variableName, values);
+  }
+
+  public static void ensureNotContainsNull(Class<? extends ProcessEngineException> exceptionClass, String message, String variableName, Collection<?> values) {
+    ensureNotNull(exceptionClass, message, variableName, values.toArray(new Object[values.size()]));
   }
 
   protected static <T extends ProcessEngineException> T generateException(Class<T> exceptionClass, String message, String variableName, String description) {

@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.history.HistoricCaseInstance;
 import org.camunda.bpm.engine.history.HistoricCaseInstanceQuery;
 import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
@@ -211,9 +212,19 @@ public class HistoricCaseInstanceTest extends CmmnProcessEngineTestCase {
 
     assertCount(1, historicQuery().caseDefinitionKey("oneTaskCase"));
 
-    assertCount(2, historicQuery().caseDefinitionKeyNotIn(Arrays.asList("")));
+    assertCount(2, historicQuery().caseDefinitionKeyNotIn(Arrays.asList("unknown")));
     assertCount(1, historicQuery().caseDefinitionKeyNotIn(Arrays.asList("oneTaskCase")));
     assertCount(0, historicQuery().caseDefinitionKeyNotIn(Arrays.asList("oneTaskCase", "twoTaskCase")));
+
+    try {
+      // oracle handles empty string like null which seems to lead to undefined behavior of the LIKE comparison
+      historicQuery().caseDefinitionKeyNotIn(Arrays.asList(""));
+      fail("Exception expected");
+    }
+    catch (NotValidException e) {
+      // expected
+    }
+
 
     assertCount(1, historicQuery().caseDefinitionName("One Task Case"));
 

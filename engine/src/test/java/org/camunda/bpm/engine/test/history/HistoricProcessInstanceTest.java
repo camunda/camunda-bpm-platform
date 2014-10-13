@@ -14,6 +14,7 @@
 package org.camunda.bpm.engine.test.history;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -22,6 +23,7 @@ import java.util.List;
 import org.apache.commons.lang.time.DateUtils;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.impl.history.event.HistoricProcessInstanceEventEntity;
@@ -277,6 +279,15 @@ public class HistoricProcessInstanceTest extends PluggableProcessEngineTestCase 
 
     exludeIds.add("oneTaskProcess");
     assertEquals(0, historyService.createHistoricProcessInstanceQuery().processDefinitionKeyNotIn(exludeIds).count());
+
+    try {
+      // oracle handles empty string like null which seems to lead to undefined behavior of the LIKE comparison
+      historyService.createHistoricProcessInstanceQuery().processDefinitionKeyNotIn(Arrays.asList(""));
+      fail("Exception expected");
+    }
+    catch (NotValidException e) {
+      // expected
+    }
 
     // After finishing process
     taskService.complete(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId());

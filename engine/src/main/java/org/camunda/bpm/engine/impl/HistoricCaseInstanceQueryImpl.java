@@ -13,7 +13,10 @@
 
 package org.camunda.bpm.engine.impl;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotContainsEmptyString;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotContainsNull;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.util.Date;
 import java.util.List;
@@ -109,6 +112,8 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
   }
 
   public HistoricCaseInstanceQuery caseDefinitionKeyNotIn(List<String> caseDefinitionKeys) {
+    ensureNotContainsNull("caseDefinitionKeys", caseDefinitionKeys);
+    ensureNotContainsEmptyString("caseDefinitionKeys", caseDefinitionKeys);
     this.caseKeyNotIn = caseDefinitionKeys;
     return this;
   }
