@@ -126,7 +126,9 @@ public class HistoricCaseInstanceTest extends CmmnProcessEngineTestCase {
     assertDateSimilar(created, createTime);
     assertDateSimilar(closed, closeTime);
 
-    assertEquals(closeTime.getTime() - createTime.getTime(), (long) durationInMillis);
+    // test that duration is as expected with a maximal difference of one second
+    assertTrue(durationInMillis >= duration);
+    assertTrue(durationInMillis < duration + 1000);
 
     // test queries
     Date beforeCreate = new Date(created.getTime() - 3600 * 1000);
