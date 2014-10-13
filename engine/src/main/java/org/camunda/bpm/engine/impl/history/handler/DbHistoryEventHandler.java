@@ -133,6 +133,7 @@ public class DbHistoryEventHandler implements HistoryEventHandler {
         || HistoryEventTypes.TASK_INSTANCE_CREATE.getEventName().equals(eventType)
         || HistoryEventTypes.FORM_PROPERTY_UPDATE.getEventName().equals(eventType)
         || HistoryEventTypes.INCIDENT_CREATE.getEventName().equals(eventType)
+        || HistoryEventTypes.CASE_INSTANCE_CREATE.getEventName().equals(eventType)
         ;
   }
 

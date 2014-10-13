@@ -1,0 +1,460 @@
+/* Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.camunda.bpm.engine.test.history;
+
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasProperty;
+import static org.junit.Assert.assertThat;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.history.HistoricCaseInstance;
+import org.camunda.bpm.engine.history.HistoricCaseInstanceQuery;
+import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
+import org.camunda.bpm.engine.impl.persistence.entity.HistoricCaseInstanceEntity;
+import org.camunda.bpm.engine.impl.test.CmmnProcessEngineTestCase;
+import org.camunda.bpm.engine.impl.util.ClockUtil;
+import org.camunda.bpm.engine.runtime.CaseInstance;
+import org.camunda.bpm.engine.test.Deployment;
+import org.joda.time.DateTime;
+
+/**
+ * @author Sebastian Menski
+ */
+public class HistoricCaseInstanceTest extends CmmnProcessEngineTestCase {
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/emptyStageCase.cmmn"})
+  public void testCaseInstanceProperties() {
+    CaseInstance caseInstance = createCaseInstance();
+
+    HistoricCaseInstance historicInstance = queryHistoricCaseInstance(caseInstance.getId());
+
+    // assert case instance properties are set correctly
+    assertEquals(caseInstance.getId(), historicInstance.getId());
+    assertEquals(caseInstance.getBusinessKey(), historicInstance.getBusinessKey());
+    assertEquals(caseInstance.getCaseDefinitionId(), historicInstance.getCaseDefinitionId());
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/emptyStageCase.cmmn"})
+  public void testCaseInstanceStates() {
+    String caseInstanceId = createCaseInstance().getId();
+
+    HistoricCaseInstance historicCaseInstance = queryHistoricCaseInstance(caseInstanceId);
+
+    assertTrue(historicCaseInstance.isActive());
+    assertCount(1, historicQuery().active());
+    assertCount(1, historicQuery().notClosed());
+
+    // start empty stage to complete case instance
+    String stageExecutionId = queryCaseExecutionByActivityId("PI_Stage_1").getId();
+    manualStart(stageExecutionId);
+
+    historicCaseInstance = queryHistoricCaseInstance(caseInstanceId);
+    assertTrue(historicCaseInstance.isCompleted());
+    assertCount(1, historicQuery().completed());
+    assertCount(1, historicQuery().notClosed());
+
+    // reactive and terminate case instance
+    reactivate(caseInstanceId);
+    terminate(caseInstanceId);
+
+    historicCaseInstance = queryHistoricCaseInstance(caseInstanceId);
+    assertTrue(historicCaseInstance.isTerminated());
+    assertCount(1, historicQuery().terminated());
+    assertCount(1, historicQuery().notClosed());
+
+    // reactive and suspend case instance
+    reactivate(caseInstanceId);
+    suspend(caseInstanceId);
+
+    historicCaseInstance = queryHistoricCaseInstance(caseInstanceId);
+    assertTrue(historicCaseInstance.isSuspended());
+    assertCount(1, historicQuery().suspended());
+    assertCount(1, historicQuery().notClosed());
+
+    // close case instance
+    close(caseInstanceId);
+
+    historicCaseInstance = queryHistoricCaseInstance(caseInstanceId);
+    assertTrue(historicCaseInstance.isClosed());
+    assertCount(1, historicQuery().closed());
+    assertCount(0, historicQuery().notClosed());
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/emptyStageCase.cmmn"})
+  public void testHistoricCaseInstanceDates() {
+    // create test dates without milliseconds
+    Date created = DateTimeUtil.now().withMillisOfSecond(0).toDate();
+    Date closed = DateTimeUtil.now().plusYears(1).withMillisOfSecond(0).toDate();
+    long duration = closed.getTime() - created.getTime();
+
+    // create instance
+    ClockUtil.setCurrentTime(created);
+    String caseInstanceId = createCaseInstance().getId();
+
+    terminate(caseInstanceId);
+
+    // close instance
+    ClockUtil.setCurrentTime(closed);
+    close(caseInstanceId);
+
+    HistoricCaseInstance historicCaseInstance = queryHistoricCaseInstance(caseInstanceId);
+
+    // read historic dates ignoring milliseconds
+    Date createTime = new DateTime(historicCaseInstance.getCreateTime()).withMillisOfSecond(0).toDate();
+    Date closeTime = new DateTime(historicCaseInstance.getCloseTime()).withMillisOfSecond(0).toDate();
+    Long durationInMillis = historicCaseInstance.getDurationInMillis();
+
+    assertEquals(created, createTime);
+    assertEquals(closed, closeTime);
+
+    // test that duration is as expected with a maximal difference of one second
+    assertTrue(durationInMillis >= duration);
+    assertTrue(durationInMillis <= duration + 1000);
+
+    // test queries
+    Date beforeCreate = new DateTime(created).minusHours(1).toDate();
+    Date afterClose = new DateTime(closed).plusHours(1).toDate();
+
+    assertCount(1, historicQuery().createdAfter(beforeCreate));
+    assertCount(0, historicQuery().createdAfter(closed));
+
+    assertCount(0, historicQuery().createdBefore(beforeCreate));
+    assertCount(1, historicQuery().createdBefore(closed));
+
+    assertCount(1, historicQuery().closedAfter(created));
+    assertCount(0, historicQuery().closedAfter(afterClose));
+
+    assertCount(0, historicQuery().closedBefore(created));
+    assertCount(1, historicQuery().closedBefore(afterClose));
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/emptyStageCase.cmmn"})
+  public void testCreateUser() {
+    String userId = "test";
+    identityService.setAuthenticatedUserId(userId);
+    processEngineConfiguration.setAuthorizationEnabled(true);
+
+    String caseInstanceId = createCaseInstance().getId();
+
+    HistoricCaseInstance historicCaseInstance = queryHistoricCaseInstance(caseInstanceId);
+    assertEquals(userId, historicCaseInstance.getCreateUserId());
+    assertCount(1, historicQuery().createdBy(userId));
+
+    processEngineConfiguration.setAuthorizationEnabled(false);
+    identityService.setAuthenticatedUserId(null);
+  }
+
+  @Deployment(resources = {
+    "org/camunda/bpm/engine/test/api/cmmn/oneCaseTaskCase.cmmn",
+    "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"
+  })
+  public void testSuperCaseInstance() {
+    String caseInstanceId  = createCaseInstanceByKey("oneCaseTaskCase").getId();
+    String caseTaskId = queryCaseExecutionByActivityId("PI_CaseTask_1").getId();
+
+    manualStart(caseTaskId);
+
+    HistoricCaseInstance historicCaseInstance = historicQuery()
+      .superCaseInstanceId(caseInstanceId)
+      .singleResult();
+
+    assertNotNull(historicCaseInstance);
+    assertEquals(caseInstanceId, historicCaseInstance.getSuperCaseInstanceId());
+
+    String superCaseInstanceId = historicQuery()
+      .subCaseInstanceId(historicCaseInstance.getId())
+      .singleResult()
+      .getId();
+
+    assertEquals(caseInstanceId, superCaseInstanceId);
+  }
+
+  @Deployment(resources = {
+    "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn",
+    "org/camunda/bpm/engine/test/api/cmmn/twoTaskCase.cmmn"
+  })
+  public void testHistoricCaseInstanceQuery() {
+    CaseInstance oneTaskCase = createCaseInstanceByKey("oneTaskCase", "oneBusiness");
+    CaseInstance twoTaskCase = createCaseInstanceByKey("twoTaskCase", "twoBusiness");
+
+    assertCount(1, historicQuery().caseInstanceId(oneTaskCase.getId()));
+    assertCount(1, historicQuery().caseInstanceId(twoTaskCase.getId()));
+
+    Set<String> caseInstanceIds = new HashSet<String>();
+    caseInstanceIds.add(oneTaskCase.getId());
+    caseInstanceIds.add("unknown1");
+    caseInstanceIds.add(twoTaskCase.getId());
+    caseInstanceIds.add("unknown2");
+
+    assertCount(2, historicQuery().caseInstanceIds(caseInstanceIds));
+
+    assertCount(1, historicQuery().caseDefinitionId(oneTaskCase.getCaseDefinitionId()));
+
+    assertCount(1, historicQuery().caseDefinitionKey("oneTaskCase"));
+
+    assertCount(2, historicQuery().caseDefinitionKeyNotIn(Arrays.asList("")));
+    assertCount(1, historicQuery().caseDefinitionKeyNotIn(Arrays.asList("oneTaskCase")));
+    assertCount(0, historicQuery().caseDefinitionKeyNotIn(Arrays.asList("oneTaskCase", "twoTaskCase")));
+
+    assertCount(1, historicQuery().caseDefinitionName("One Task Case"));
+
+    assertCount(2, historicQuery().caseDefinitionNameLike("%T%"));
+    assertCount(1, historicQuery().caseDefinitionNameLike("One%"));
+    assertCount(0, historicQuery().caseDefinitionNameLike("%Process%"));
+
+    assertCount(1, historicQuery().caseInstanceBusinessKey("oneBusiness"));
+
+    assertCount(2, historicQuery().caseInstanceBusinessKeyLike("%Business"));
+    assertCount(1, historicQuery().caseInstanceBusinessKeyLike("one%"));
+    assertCount(0, historicQuery().caseInstanceBusinessKeyLike("%unknown%"));
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryPaging() {
+    createCaseInstance();
+    createCaseInstance();
+    createCaseInstance();
+    createCaseInstance();
+
+    assertEquals(3, historicQuery().listPage(0, 3).size());
+    assertEquals(2, historicQuery().listPage(2, 2).size());
+    assertEquals(1, historicQuery().listPage(3, 2).size());
+  }
+
+  @Deployment(resources = {
+    "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn",
+    "org/camunda/bpm/engine/test/api/cmmn/twoTaskCase.cmmn"
+  })
+  @SuppressWarnings("unchecked")
+  public void testQuerySorting() {
+    String oneCaseInstanceId = createCaseInstanceByKey("oneTaskCase", "oneBusinessKey").getId();
+    String twoCaseInstanceId = createCaseInstanceByKey("twoTaskCase", "twoBusinessKey").getId();
+
+    // terminate and close case instances => close time and duration is set
+    terminate(oneCaseInstanceId);
+    close(oneCaseInstanceId);
+    // set time ahead to get different durations
+    ClockUtil.setCurrentTime(DateTimeUtil.now().plusHours(1).toDate());
+    terminate(twoCaseInstanceId);
+    close(twoCaseInstanceId);
+
+    HistoricCaseInstance oneCaseInstance = queryHistoricCaseInstance(oneCaseInstanceId);
+    HistoricCaseInstance twoCaseInstance = queryHistoricCaseInstance(twoCaseInstanceId);
+
+    // sort by case instance ids
+    String property = "id";
+    List<? extends Comparable> sortedList = Arrays.asList(oneCaseInstance.getId(), twoCaseInstance.getId());
+    Collections.sort(sortedList);
+
+    List<HistoricCaseInstance> instances = historicQuery().orderByCaseInstanceId().asc().list();
+    assertEquals(2, instances.size());
+    assertThat(instances, contains(
+      hasProperty(property, equalTo(sortedList.get(0))),
+      hasProperty(property, equalTo(sortedList.get(1)))
+    ));
+
+    instances = historicQuery().orderByCaseInstanceId().desc().list();
+    assertEquals(2, instances.size());
+    assertThat(instances, contains(
+      hasProperty(property, equalTo(sortedList.get(1))),
+      hasProperty(property, equalTo(sortedList.get(0)))
+    ));
+
+    // sort by case definition ids
+    property = "caseDefinitionId";
+    sortedList = Arrays.asList(oneCaseInstance.getCaseDefinitionId(), twoCaseInstance.getCaseDefinitionId());
+    Collections.sort(sortedList);
+
+    instances = historicQuery().orderByCaseDefinitionId().asc().list();
+    assertEquals(2, instances.size());
+    assertThat(instances, contains(
+      hasProperty(property, equalTo(sortedList.get(0))),
+      hasProperty(property, equalTo(sortedList.get(1)))
+    ));
+
+    instances = historicQuery().orderByCaseDefinitionId().desc().list();
+    assertEquals(2, instances.size());
+    assertThat(instances, contains(
+      hasProperty(property, equalTo(sortedList.get(1))),
+      hasProperty(property, equalTo(sortedList.get(0)))
+    ));
+
+    // sort by business keys
+    property = "businessKey";
+    sortedList = Arrays.asList(oneCaseInstance.getBusinessKey(), twoCaseInstance.getBusinessKey());
+    Collections.sort(sortedList);
+
+    instances = historicQuery().orderByCaseInstanceBusinessKey().asc().list();
+    assertEquals(2, instances.size());
+    assertThat(instances, contains(
+      hasProperty(property, equalTo(sortedList.get(0))),
+      hasProperty(property, equalTo(sortedList.get(1)))
+    ));
+
+    instances = historicQuery().orderByCaseInstanceBusinessKey().desc().list();
+    assertEquals(2, instances.size());
+    assertThat(instances, contains(
+      hasProperty(property, equalTo(sortedList.get(1))),
+      hasProperty(property, equalTo(sortedList.get(0)))
+    ));
+
+    // sort by create time
+    property = "createTime";
+    sortedList = Arrays.asList(oneCaseInstance.getCreateTime(), twoCaseInstance.getCreateTime());
+    Collections.sort(sortedList);
+
+    instances = historicQuery().orderByCaseInstanceCreateTime().asc().list();
+    assertEquals(2, instances.size());
+    assertThat(instances, contains(
+      hasProperty(property, equalTo(sortedList.get(0))),
+      hasProperty(property, equalTo(sortedList.get(1)))
+    ));
+
+    instances = historicQuery().orderByCaseInstanceCreateTime().desc().list();
+    assertEquals(2, instances.size());
+    assertThat(instances, contains(
+      hasProperty(property, equalTo(sortedList.get(1))),
+      hasProperty(property, equalTo(sortedList.get(0)))
+    ));
+
+    // sort by close time
+    property = "closeTime";
+    sortedList = Arrays.asList(oneCaseInstance.getCloseTime(), twoCaseInstance.getCloseTime());
+    Collections.sort(sortedList);
+
+    instances = historicQuery().orderByCaseInstanceCloseTime().asc().list();
+    assertEquals(2, instances.size());
+    assertThat(instances, contains(
+      hasProperty(property, equalTo(sortedList.get(0))),
+      hasProperty(property, equalTo(sortedList.get(1)))
+    ));
+
+    instances = historicQuery().orderByCaseInstanceCloseTime().desc().list();
+    assertEquals(2, instances.size());
+    assertThat(instances, contains(
+      hasProperty(property, equalTo(sortedList.get(1))),
+      hasProperty(property, equalTo(sortedList.get(0)))
+    ));
+
+    // sort by duration
+    property = "durationInMillis";
+    sortedList = Arrays.asList(oneCaseInstance.getDurationInMillis(), twoCaseInstance.getDurationInMillis());
+    Collections.sort(sortedList);
+
+    instances = historicQuery().orderByCaseInstanceDuration().asc().list();
+    assertEquals(2, instances.size());
+    assertThat(instances, contains(
+      hasProperty(property, equalTo(sortedList.get(0))),
+      hasProperty(property, equalTo(sortedList.get(1)))
+    ));
+
+    instances = historicQuery().orderByCaseInstanceDuration().desc().list();
+    assertEquals(2, instances.size());
+    assertThat(instances, contains(
+      hasProperty(property, equalTo(sortedList.get(1))),
+      hasProperty(property, equalTo(sortedList.get(0)))
+    ));
+
+  }
+
+  public void testInvalidSorting() {
+    try {
+      historicQuery().asc();
+      fail("Exception expected");
+    }
+    catch (ProcessEngineException e) {
+      // expected
+    }
+
+    try {
+      historicQuery().desc();
+      fail("Exception expected");
+    }
+    catch (ProcessEngineException e) {
+      // expected
+    }
+
+    try {
+      historicQuery().orderByCaseInstanceId().count();
+      fail("Exception expected");
+    }
+    catch (ProcessEngineException e) {
+      // expected
+    }
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testNativeQuery() {
+    String id = createCaseInstance().getId();
+    createCaseInstance();
+    createCaseInstance();
+    createCaseInstance();
+
+    String tableName = managementService.getTableName(HistoricCaseInstance.class);
+
+    assertEquals("ACT_HI_CASEINST", tableName);
+    assertEquals(tableName, managementService.getTableName(HistoricCaseInstanceEntity.class));
+
+    assertEquals(4, historyService.createNativeHistoricCaseInstanceQuery().sql("SELECT * FROM " + tableName).list().size());
+    assertEquals(4, historyService.createNativeHistoricCaseInstanceQuery().sql("SELECT count(*) FROM " + tableName).count());
+
+    assertEquals(16, historyService.createNativeHistoricCaseInstanceQuery().sql("SELECT count(*) FROM " + tableName + " H1, " + tableName + " H2").count());
+
+    // select with distinct
+    assertEquals(4, historyService.createNativeHistoricCaseInstanceQuery().sql("SELECT DISTINCT * FROM " + tableName).list().size());
+
+    assertEquals(1, historyService.createNativeHistoricCaseInstanceQuery().sql("SELECT count(*) FROM " + tableName + " H WHERE H.ID_ = '" + id + "'").count());
+    assertEquals(1, historyService.createNativeHistoricCaseInstanceQuery().sql("SELECT * FROM " + tableName + " H WHERE H.ID_ = '" + id + "'").list().size());
+
+    // use parameters
+    assertEquals(1, historyService.createNativeHistoricCaseInstanceQuery().sql("SELECT count(*) FROM " + tableName + " H WHERE H.ID_ = #{caseInstanceId}").parameter("caseInstanceId", id).count());
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testNativeQueryPaging() {
+    createCaseInstance();
+    createCaseInstance();
+    createCaseInstance();
+    createCaseInstance();
+
+    String tableName = managementService.getTableName(HistoricCaseInstance.class);
+    assertEquals(3, historyService.createNativeHistoricCaseInstanceQuery().sql("SELECT * FROM " + tableName).listPage(0, 3).size());
+    assertEquals(2, historyService.createNativeHistoricCaseInstanceQuery().sql("SELECT * FROM " + tableName).listPage(2, 2).size());
+  }
+
+  protected HistoricCaseInstance queryHistoricCaseInstance(String caseInstanceId) {
+    HistoricCaseInstance historicCaseInstance = historicQuery()
+      .caseInstanceId(caseInstanceId)
+      .singleResult();
+    assertNotNull(historicCaseInstance);
+    return historicCaseInstance;
+  }
+
+  protected HistoricCaseInstanceQuery historicQuery() {
+    return historyService.createHistoricCaseInstanceQuery();
+  }
+
+  protected void assertCount(long count, HistoricCaseInstanceQuery historicQuery) {
+    assertEquals(count, historicQuery.count());
+  }
+
+}

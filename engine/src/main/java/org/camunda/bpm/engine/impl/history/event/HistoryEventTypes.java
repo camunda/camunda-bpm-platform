@@ -56,7 +56,14 @@ public enum HistoryEventTypes implements HistoryEventType {
   /** fired when an incident is deleted. */
   INCIDENT_DELETE("incident", "delete"),
   /** fired when an incident is resolved. */
-  INCIDENT_RESOLVE("incident", "resolve");
+  INCIDENT_RESOLVE("incident", "resolve"),
+
+  /** fired when a case instance is created. */
+  CASE_INSTANCE_CREATE("case-instance", "create"),
+  /** fired when a case instance is updated. */
+  CASE_INSTANCE_UPDATE("case-instance", "update"),
+  /** fired when a case instance is closed. */
+  CASE_INSTANCE_CLOSE("case-instance", "close");
 
   private HistoryEventTypes(String entityType, String eventName) {
     this.entityType = eventName;

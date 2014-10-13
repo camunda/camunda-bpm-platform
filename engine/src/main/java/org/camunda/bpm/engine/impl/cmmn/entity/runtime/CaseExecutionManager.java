@@ -17,7 +17,6 @@ import java.util.List;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 import org.camunda.bpm.engine.runtime.CaseExecution;
@@ -46,21 +45,11 @@ public class CaseExecutionManager extends AbstractManager {
       deleteCaseInstance(caseInstanceId, deleteReason, cascade);
     }
 
-    // TODO: move this later to HistoricCaseInstance
-    HistoryLevel historyLevel = Context
-      .getProcessEngineConfiguration()
-      .getHistoryLevel();
-
-    if (!historyLevel.equals(HistoryLevel.HISTORY_LEVEL_NONE)) {
-      CommandContext commandContext = Context.getCommandContext();
-
-      commandContext
-        .getHistoricTaskInstanceManager()
-        .deleteHistoricTaskInstancesByCaseDefinitionId(caseDefinitionId);
-
-      commandContext
-        .getOperationLogManager()
-        .deleteOperationLogEntriesByCaseDefinitionId(caseDefinitionId);
+    if (cascade) {
+      Context
+        .getCommandContext()
+        .getHistoricCaseInstanceManager()
+        .deleteHistoricCaseInstanceByCaseDefinitionId(caseDefinitionId);
     }
 
   }
@@ -83,20 +72,11 @@ public class CaseExecutionManager extends AbstractManager {
 
     execution.deleteCascade();
 
-    // TODO: move this later to HistoricCaseInstance
-    HistoryLevel historyLevel = Context
-      .getProcessEngineConfiguration()
-      .getHistoryLevel();
-
-    if (!historyLevel.equals(HistoryLevel.HISTORY_LEVEL_NONE)) {
-
-      commandContext
-        .getHistoricTaskInstanceManager()
-        .deleteHistoricTaskInstancesByCaseInstanceId(caseInstanceId);
-
-      commandContext
-        .getOperationLogManager()
-        .deleteOperationLogEntriesByCaseInstanceId(caseInstanceId);
+    if (cascade) {
+      Context
+        .getCommandContext()
+        .getHistoricCaseInstanceManager()
+        .deleteHistoricCaseInstanceById(caseInstanceId);
     }
   }
 

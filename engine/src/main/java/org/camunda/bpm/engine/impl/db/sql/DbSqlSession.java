@@ -13,7 +13,15 @@
 
 package org.camunda.bpm.engine.impl.db.sql;
 
-import java.io.*;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringReader;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
@@ -34,8 +42,6 @@ import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbEntityOperation;
 import org.camunda.bpm.engine.impl.util.ClassNameUtil;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
-
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 
 /**
@@ -290,7 +296,7 @@ public class DbSqlSession extends AbstractPersistenceSession {
       if (dbSqlSessionFactory.isDbIdentityUsed() && !isIdentityTablePresent()) {
         errorMessage = addMissingComponent(errorMessage, "identity");
       }
-      if (dbSqlSessionFactory.isCmmnEnabled() && !isCaseDefinitionTablePresent()) {
+      if (dbSqlSessionFactory.isCmmnEnabled() && !isCmmnTablePresent()) {
         errorMessage = addMissingComponent(errorMessage, "case.engine");
       }
 
@@ -341,6 +347,10 @@ public class DbSqlSession extends AbstractPersistenceSession {
     executeMandatorySchemaResource("create", "case.engine");
   }
 
+  protected void dbSchemaCreateCmmnHistory() {
+    executeMandatorySchemaResource("create", "case.history");
+  }
+
   protected void dbSchemaDropIdentity() {
     executeMandatorySchemaResource("drop", "identity");
   }
@@ -356,6 +366,11 @@ public class DbSqlSession extends AbstractPersistenceSession {
   protected void dbSchemaDropCmmn() {
     executeMandatorySchemaResource("drop", "case.engine");
   }
+
+  protected void dbSchemaDropCmmnHistory() {
+    executeMandatorySchemaResource("drop", "case.history");
+  }
+
 
   public void executeMandatorySchemaResource(String operation, String component) {
     executeSchemaResource(operation, component, getResourceForDbOperation(operation, operation, component), false);
@@ -373,8 +388,12 @@ public class DbSqlSession extends AbstractPersistenceSession {
     return isTablePresent("ACT_ID_USER");
   }
 
-  public boolean isCaseDefinitionTablePresent() {
+  public boolean isCmmnTablePresent() {
     return isTablePresent("ACT_RE_CASE_DEF");
+  }
+
+  public boolean isCmmnHistoryTablePresent() {
+    return isTablePresent("ACT_HI_CASEINST");
   }
 
   public boolean isTablePresent(String tableName) {

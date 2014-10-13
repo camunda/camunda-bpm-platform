@@ -100,6 +100,10 @@ public abstract class AbstractManager implements Session {
     return getSession(HistoricProcessInstanceManager.class);
   }
 
+  protected HistoricCaseInstanceManager getHistoricCaseInstanceManager() {
+    return getSession(HistoricCaseInstanceManager.class);
+  }
+
   protected HistoricDetailManager getHistoricDetailManager() {
     return getSession(HistoricDetailManager.class);
   }

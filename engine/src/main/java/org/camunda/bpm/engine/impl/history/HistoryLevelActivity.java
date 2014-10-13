@@ -12,9 +12,20 @@
  */
 package org.camunda.bpm.engine.impl.history;
 
-import org.camunda.bpm.engine.impl.history.event.HistoryEventType;
+import static org.camunda.bpm.engine.impl.history.event.HistoryEventTypes.ACTIVITY_INSTANCE_END;
+import static org.camunda.bpm.engine.impl.history.event.HistoryEventTypes.ACTIVITY_INSTANCE_START;
+import static org.camunda.bpm.engine.impl.history.event.HistoryEventTypes.ACTIVITY_INSTANCE_UPDATE;
+import static org.camunda.bpm.engine.impl.history.event.HistoryEventTypes.CASE_INSTANCE_CLOSE;
+import static org.camunda.bpm.engine.impl.history.event.HistoryEventTypes.CASE_INSTANCE_CREATE;
+import static org.camunda.bpm.engine.impl.history.event.HistoryEventTypes.CASE_INSTANCE_UPDATE;
+import static org.camunda.bpm.engine.impl.history.event.HistoryEventTypes.PROCESS_INSTANCE_END;
+import static org.camunda.bpm.engine.impl.history.event.HistoryEventTypes.PROCESS_INSTANCE_START;
+import static org.camunda.bpm.engine.impl.history.event.HistoryEventTypes.TASK_INSTANCE_COMPLETE;
+import static org.camunda.bpm.engine.impl.history.event.HistoryEventTypes.TASK_INSTANCE_CREATE;
+import static org.camunda.bpm.engine.impl.history.event.HistoryEventTypes.TASK_INSTANCE_DELETE;
+import static org.camunda.bpm.engine.impl.history.event.HistoryEventTypes.TASK_INSTANCE_UPDATE;
 
-import static org.camunda.bpm.engine.impl.history.event.HistoryEventTypes.*;
+import org.camunda.bpm.engine.impl.history.event.HistoryEventType;
 
 /**
  * @author Daniel Meyer
@@ -42,6 +53,10 @@ public class HistoryLevelActivity extends AbstractHistoryLevel {
         || ACTIVITY_INSTANCE_START == eventType
         || ACTIVITY_INSTANCE_UPDATE == eventType
         || ACTIVITY_INSTANCE_END == eventType
+
+        || CASE_INSTANCE_CREATE == eventType
+        || CASE_INSTANCE_UPDATE == eventType
+        || CASE_INSTANCE_CLOSE == eventType
     ;
   }
 

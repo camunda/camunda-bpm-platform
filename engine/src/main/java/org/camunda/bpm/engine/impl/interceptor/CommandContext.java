@@ -54,6 +54,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionManager;
 import org.camunda.bpm.engine.impl.persistence.entity.FilterManager;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricActivityInstanceManager;
+import org.camunda.bpm.engine.impl.persistence.entity.HistoricCaseInstanceManager;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricDetailManager;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricIncidentManager;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricProcessInstanceManager;
@@ -323,6 +324,10 @@ public class CommandContext {
 
   public HistoricProcessInstanceManager getHistoricProcessInstanceManager() {
     return getSession(HistoricProcessInstanceManager.class);
+  }
+
+  public HistoricCaseInstanceManager getHistoricCaseInstanceManager() {
+    return getSession(HistoricCaseInstanceManager.class);
   }
 
   public HistoricDetailManager getHistoricDetailManager() {

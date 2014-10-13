@@ -17,6 +17,8 @@ package org.camunda.bpm.engine;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricActivityInstanceQuery;
 import org.camunda.bpm.engine.history.HistoricActivityStatisticsQuery;
+import org.camunda.bpm.engine.history.HistoricCaseInstance;
+import org.camunda.bpm.engine.history.HistoricCaseInstanceQuery;
 import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.history.HistoricDetailQuery;
 import org.camunda.bpm.engine.history.HistoricIncident;
@@ -28,6 +30,7 @@ import org.camunda.bpm.engine.history.HistoricTaskInstanceQuery;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.history.HistoricVariableInstanceQuery;
 import org.camunda.bpm.engine.history.NativeHistoricActivityInstanceQuery;
+import org.camunda.bpm.engine.history.NativeHistoricCaseInstanceQuery;
 import org.camunda.bpm.engine.history.NativeHistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.history.NativeHistoricTaskInstanceQuery;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
@@ -72,6 +75,9 @@ public interface HistoryService {
   /** Creates a new programmatic query to search for {@link HistoricIncident historic incidents}. */
   HistoricIncidentQuery createHistoricIncidentQuery();
 
+  /** Creates a new programmatic query to search for {@link HistoricCaseInstance}s. */
+  HistoricCaseInstanceQuery createHistoricCaseInstanceQuery();
+
   /** Deletes historic task instance.  This might be useful for tasks that are
    * {@link TaskService#newTask() dynamically created} and then {@link TaskService#complete(String) completed}.
    * If the historic task instance doesn't exist, no exception is thrown and the
@@ -90,6 +96,12 @@ public interface HistoryService {
   void deleteUserOperationLogEntry(String entryId);
 
   /**
+   * Deletes historic case instance. All historic case activities, historic task and
+   * historic details are deleted as well.
+   */
+  void deleteHistoricCaseInstance(String caseInstanceId);
+
+  /**
    * creates a native query to search for {@link HistoricProcessInstance}s via SQL
    */
   NativeHistoricProcessInstanceQuery createNativeHistoricProcessInstanceQuery();
@@ -103,5 +115,10 @@ public interface HistoryService {
    * creates a native query to search for {@link HistoricActivityInstance}s via SQL
    */
   NativeHistoricActivityInstanceQuery createNativeHistoricActivityInstanceQuery();
+
+  /**
+   * creates a native query to search for {@link HistoricCaseInstance}s via SQL
+   */
+  NativeHistoricCaseInstanceQuery createNativeHistoricCaseInstanceQuery();
 
 }
