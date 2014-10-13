@@ -35,7 +35,6 @@ import org.camunda.bpm.engine.impl.test.CmmnProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.test.Deployment;
-import org.joda.time.DateTime;
 
 /**
  * @author Sebastian Menski
@@ -102,10 +101,10 @@ public class HistoricCaseInstanceTest extends CmmnProcessEngineTestCase {
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/emptyStageCase.cmmn"})
   public void testHistoricCaseInstanceDates() {
-    // create test dates without milliseconds
-    Date created = DateTimeUtil.now().withMillisOfSecond(0).toDate();
-    Date closed = DateTimeUtil.now().plusYears(1).withMillisOfSecond(0).toDate();
-    long duration = closed.getTime() - created.getTime();
+    // create test dates
+    long duration = 72 * 3600 * 1000;
+    Date created = ClockUtil.getCurrentTime();
+    Date closed = new Date(created.getTime() + duration);
 
     // create instance
     ClockUtil.setCurrentTime(created);
@@ -120,20 +119,18 @@ public class HistoricCaseInstanceTest extends CmmnProcessEngineTestCase {
     HistoricCaseInstance historicCaseInstance = queryHistoricCaseInstance(caseInstanceId);
 
     // read historic dates ignoring milliseconds
-    Date createTime = new DateTime(historicCaseInstance.getCreateTime()).withMillisOfSecond(0).toDate();
-    Date closeTime = new DateTime(historicCaseInstance.getCloseTime()).withMillisOfSecond(0).toDate();
+    Date createTime = historicCaseInstance.getCreateTime();
+    Date closeTime = historicCaseInstance.getCloseTime();
     Long durationInMillis = historicCaseInstance.getDurationInMillis();
 
-    assertEquals(created, createTime);
-    assertEquals(closed, closeTime);
+    assertDateSimilar(created, createTime);
+    assertDateSimilar(closed, closeTime);
 
-    // test that duration is as expected with a maximal difference of one second
-    assertTrue(durationInMillis >= duration);
-    assertTrue(durationInMillis <= duration + 1000);
+    assertEquals(closeTime.getTime() - createTime.getTime(), (long) durationInMillis);
 
     // test queries
-    Date beforeCreate = new DateTime(created).minusHours(1).toDate();
-    Date afterClose = new DateTime(closed).plusHours(1).toDate();
+    Date beforeCreate = new Date(created.getTime() - 3600 * 1000);
+    Date afterClose = new Date(closed.getTime() + 3600 * 1000);
 
     assertCount(1, historicQuery().createdAfter(beforeCreate));
     assertCount(0, historicQuery().createdAfter(closed));
@@ -466,6 +463,12 @@ public class HistoricCaseInstanceTest extends CmmnProcessEngineTestCase {
 
   protected void assertCount(long count, HistoricCaseInstanceQuery historicQuery) {
     assertEquals(count, historicQuery.count());
+  }
+
+
+  protected void assertDateSimilar(Date date1, Date date2) {
+    long difference = Math.abs(date1.getTime() - date2.getTime());
+    assertTrue(difference < 1000);
   }
 
 }
