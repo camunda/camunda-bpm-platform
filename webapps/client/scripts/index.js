@@ -67,6 +67,9 @@ define('camunda-tasklist-ui', [
     var autoFill = require('camunda-commons-ui/directives/autoFill');
     tasklistApp.directive('autoFill', autoFill);
 
+    var nl2br = require('camunda-commons-ui/directives/nl2br');
+    tasklistApp.directive('nl2br', nl2br);
+
     tasklistApp.config(require('camunda-tasklist-ui/config/uris'));
     tasklistApp.config(require('camunda-tasklist-ui/config/translations'));
     tasklistApp.config(require('camunda-tasklist-ui/config/routes'));

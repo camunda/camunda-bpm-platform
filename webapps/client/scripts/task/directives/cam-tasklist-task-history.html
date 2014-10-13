@@ -9,39 +9,44 @@
       <span class="month">{{ day.date | camDate:'monthName' }}</span>
       <span class="year">{{ day.date | date:'yyyy' }}</span>
     </div>
+
   </div>
 
-  <div class="col-xs-10 instant">
+  <div class="col-xs-10">
     <div class="instant row" ng-repeat="event in day.events | orderBy:'-time'">
-      <div class="col-xs-2">
-        {{ event.time | date:'HH:mm' }}
+      <div class="col-xs-2 operation-meta">
+        <div class="operation-time"
+             tooltip-placement="left"
+             tooltip-append-to-body="true"
+             tooltip="{{ event.time | camDate:'long' }}">{{ event.time | date:'HH:mm' }}</div>
+        <div class="operation-user">{{ event.userId }}</div>
       </div>
 
-      <div class="col-xs-10">
-        <div class="row event-header">
-          <span class="col-sm-12 col-md-9 operation-type">{{ event.type | translate }}</span>
-          <span class="col-sm-12 col-md-3 operation-user">{{ event.userId }}</span>
+      <div class="col-xs-10 operation-detail">
+        <div class="row">
+          <h4 class="col-xs-12">{{ event.type | translate }}</h4>
         </div>
+
         <div class="row event-body">
           <div ng-repeat="subEvent in event.subEvents" ng-if="event.type !== 'Comment'">
-            <div class="col-sm-12 col-md-3 event-property">{{ subEvent.property | translate }}</div>
-            <div class="col-sm-12 col-md-9 event-value">
-              <span ng-if="subEvent.orgValue">
-                <span class="original-value">
-                  <span ng-if="subEvent.propertyIsDate">{{ subEvent.orgValue | camDate }}</span>
-                  <span ng-if="!subEvent.propertyIsDate">{{ subEvent.orgValue }}</span>
-                </span>
-                <span class="glyphicon glyphicon-arrow-right"></span>
-              </span>
-              <span class="new-value">
+            <h5 class="col-sm-12 col-md-3 event-property">{{ subEvent.property | translate }}</h5>
+
+            <div class="col-sm-12 col-md-9">
+              <div class="original-value"
+                   ng-if="subEvent.orgValue">
+                <span ng-if="subEvent.propertyIsDate">{{ subEvent.orgValue | camDate }}</span>
+                <span ng-if="!subEvent.propertyIsDate">{{ subEvent.orgValue }}</span>
+              </div>
+
+              <div class="new-value">
                 <span ng-if="subEvent.propertyIsDate">{{ subEvent.newValue | camDate }}</span>
                 <span ng-if="!subEvent.propertyIsDate">{{ subEvent.newValue }}</span>
-              </span>
+              </div>
             </div>
           </div>
-          <div class="col-xs-12" ng-if="event.type === 'Comment'">
-            {{event.message}}
-          </div>
+          <div class="col-xs-12"
+               ng-if="event.type === 'Comment'"
+               nl2br="event.message" />
         </div>
       </div>
     </div>

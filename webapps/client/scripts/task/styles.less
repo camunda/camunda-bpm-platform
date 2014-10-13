@@ -93,6 +93,7 @@
   bottom: 0;
   left: 0;
   right: 0;
+
   > div {
     text-align: center;
     position: absolute;
@@ -101,9 +102,6 @@
     top: 50%;
     margin-top: -15px;
   }
-  // .glyphicon {
-  //   font-size: 80px;
-  // }
 }
 
 .diagram-holder {
@@ -119,7 +117,7 @@
   }
 }
 
-.row.day {
+.day.row {
   margin-top: (@grid-gutter-width / 1);
   border-top: 1px dashed @gray-light;
   padding-top: (@grid-gutter-width / 1);
@@ -131,27 +129,74 @@
     padding-top: 0;
   }
 }
-.row.instant,
-.instant .event,
-.event-header {
-  margin-bottom: (@grid-gutter-width / 2);
+
+.instant .event {
+  margin-bottom: (@grid-gutter-width);
+}
+
+
+
+.instant {
+  overflow: hidden;
+
+  &.row {
+    margin-bottom: 0;
+  }
+
+  h4 {
+    margin-top: 0;
+  }
+
+  h5 {
+    margin-top: 2px;
+    margin-bottom: 0;
+  }
+
+  > div {
+    padding-top: (@grid-gutter-width / 2);
+    &:before {
+      display: block;
+      content: ' ';
+      width: 100%;
+      height: 1px;
+      margin-top: -1px;
+      border-top: 1px dashed @gray-light;
+      margin-bottom: (@grid-gutter-width / 2);
+    }
+  }
+
+  &:first-child {
+    > div {
+      padding-top: 0;
+      &:before {
+        display: none;
+      }
+    }
+  }
+
+  .operation-meta {
+    text-align: center;
+  }
+
+  .operation-time {
+    margin-bottom: 9px;
+  }
 }
 
 .date-badge {
-  // background-color: @gray-light;
-  // color: @gray-lighter;
-  // padding: (@grid-gutter-width / 4) 0;
   span {
     display: block;
     width: 100%;
     text-align: center;
   }
+
   .day {
-    font-size: 140%;
+    font-size: 16px;
   }
+
   .month {
-    padding: (@grid-gutter-width / 24) 0;
-    margin: (@grid-gutter-width / 24) 0;
+    padding: 3px 0;
+    margin: 3px 0;
     border: 1px dashed @gray-light;
     border-width: 1px 0;
   }
@@ -164,7 +209,6 @@
 .event {
   .operation {
     margin-bottom: (@grid-gutter-width / 2);
-    font-size: 110%;
     overflow: hidden;
   }
 
@@ -173,33 +217,17 @@
     overflow: hidden;
     text-overflow: ellipsis;
   }
+
   .label {
     font-style: italic;
   }
-  .value {
-
-  }
 }
 
-.user-picture {
-  display: block;
-  background-color: @gray-lighter;
-  border-radius: 2000px;
-  width: 80%;
-  padding-bottom: 80%;
-  margin: auto;
-}
-
-.operation-type {
-  font-size: 140%;
-}
 
 .original-value {
   text-decoration: line-through;
-}
-
-.operation-user {
-  text-align: right;
+  color: @gray-light;
+  margin-bottom: 7px;
 }
 
 .event-property {
@@ -211,6 +239,3 @@
   height: 150px;
 }
 
-// .well.no-task {
-//   margin-top: 15px;
-// }

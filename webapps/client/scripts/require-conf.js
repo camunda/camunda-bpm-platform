@@ -100,6 +100,7 @@ define(function() {
                                       'camunda-commons-ui/directives/notificationsPanel',
                                       'camunda-commons-ui/directives/engineSelect',
                                       'camunda-commons-ui/directives/autoFill',
+                                      'camunda-commons-ui/directives/nl2br',
 
                                       'text!camunda-tasklist-ui/index.html',
                                       'json!locales/en.json',
