@@ -43,16 +43,48 @@ define([
 
     return {
       scope: {
-        task: '='
+        taskData: '=',
+        filterData: '='
       },
 
       template: template,
 
-      link: function(scope, element) {
+      controller: [
+        '$scope',
+      function(
+        $scope
+      ){
+        var taskData = $scope.taskData.newChild($scope);
+        var filterData = $scope.filterData.newChild($scope);
+
+        /**
+         * observe task changes
+         */
+        taskData.observe('task', function(task) {
+          $scope.task = angular.copy(task);
+        });
+
+        /**
+         * reload data after the task has been updated
+         */
+        function reload() {
+
+          // we always refresh the state from the backend after we made a change.
+          // this has advantages:
+          // - limits the risk that our copy gets corrupted
+          // - we see changes made by other users faster
+          taskData.changed('task');
+
+          // list of tasks must be reloaded as well:
+          // changed properties on this task may cause the list to change
+          filterData.changed('taskList');
+        }
+
         function saveDate(propName) {
           return function(inlineFieldScope) {
             var self = this;
-            var toSend = angular.copy(self.task);
+            var toSend = self.task;
+
 
             toSend[propName] = scope.task[propName] = inlineFieldScope.varValue;
 
@@ -64,27 +96,24 @@ define([
                 return errorNotification('TASK_UPDATE_ERROR', err);
               }
 
-              $rootScope.$broadcast('tasklist.task.update');
-              $rootScope.$broadcast('tasklist.task.'+propName);
-
+              reload();
               successNotification('TASK_UPDATE_SUCESS');
             });
           };
         }
 
-        scope.saveFollowUpDate = saveDate('followUp');
-        scope.saveDueDate = saveDate('due');
+        $scope.saveFollowUpDate = saveDate('followUp');
+        $scope.saveDueDate = saveDate('due');
 
-        scope.now = (new Date()).toJSON();
+        $scope.now = (new Date()).toJSON();
 
         function assigned(err) {
           if (err) {
             return errorNotification('ASSIGNED_ERROR', err);
           }
 
+          reload();
           successNotification('ASSIGNED_OK');
-          $rootScope.$broadcast('tasklist.task.update');
-          $rootScope.$broadcast('tasklist.task.assign');
         }
 
 
@@ -93,11 +122,8 @@ define([
             return errorNotification('CLAIM_ERROR', err);
           }
 
-          scope.task.assignee = $rootScope.authentication.name;
-
+          reload();
           successNotification('CLAIM_OK');
-          $rootScope.$broadcast('tasklist.task.update');
-          $rootScope.$broadcast('tasklist.task.claim');
         }
 
 
@@ -106,65 +132,53 @@ define([
             return errorNotification('UNCLAIM_ERROR', err);
           }
 
-          scope.task.assignee = null;
-
+          reload();
           successNotification('UNCLAIM_OK');
-          $rootScope.$broadcast('tasklist.task.update');
-          $rootScope.$broadcast('tasklist.task.unclaim');
         }
 
 
-        scope.userIsAssignee = function() {
+        $scope.userIsAssignee = function() {
           return $rootScope.authentication &&
                   $rootScope.authentication.name &&
-                  ($rootScope.authentication.name === scope.task.assignee);
+                  ($rootScope.authentication.name === $scope.task.assignee);
         };
 
 
-        scope.userIsOwner = function() {
+        $scope.userIsOwner = function() {
           return $rootScope.authentication &&
                   $rootScope.authentication.name &&
-                  ($rootScope.authentication.name === scope.task.owner);
+                  ($rootScope.authentication.name === $scope.task.owner);
         };
 
 
-        scope.validateUser = function(/*info*/) {
+        $scope.validateUser = function(/*info*/) {
         };
 
 
-        scope.claim = function() {
-          Task.claim(scope.task.id, $rootScope.authentication.name, claimed);
+        $scope.claim = function() {
+          Task.claim($scope.task.id, $rootScope.authentication.name, claimed);
         };
 
 
-        scope.unclaim = function() {
-          Task.unclaim(scope.task.id, unclaimed);
+        $scope.unclaim = function() {
+          Task.unclaim($scope.task.id, unclaimed);
         };
 
-        scope.assigning = function(info) {
+        $scope.assigning = function(info) {
           if (!info.varValue) {
-            return scope.unclaim();
+            return $scope.unclaim();
           }
-          Task.assignee(scope.task.id, info.varValue, function(err) {
+          Task.assignee($scope.task.id, info.varValue, function(err) {
             if (err) {
               return assigned(err);
             }
 
-            scope.task.assignee = info.varValue;
+            $scope.task.assignee = info.varValue;
 
             assigned();
           });
         };
-
-
-        scope.$on('tasklist.task.current', function(evt, task) {
-          $('[cam-form-inline-field]', element).each(function() {
-            $(this)
-              .isolateScope()
-              .cancelChange();
-          });
-        });
       }
-    };
+    ]};
   }];
 });

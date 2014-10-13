@@ -3,98 +3,96 @@ define([
 ], function(template) {
   'use strict';
 
+  function fixReadDateTimezone(dateStr) {
+    if (!dateStr) { return dateStr; }
+    var d = new Date(dateStr);
+    return (new Date(d.getTime() + (d.getTimezoneOffset() * 60 * 1000))).toJSON();
+  }
 
-  return [
-    '$rootScope',
-    '$location',
-    'camUID',
-    'camAPI',
-  function(
-    $rootScope,
-    $location,
-    camUID,
-    camAPI
-  ) {
-    var Task = camAPI.resource('task');
+  function fixDates(task) {
+    task.due = fixReadDateTimezone(task.due);
+    task.followUp = fixReadDateTimezone(task.followUp);
+  }
 
-    $rootScope.batchActions = {};
-    $rootScope.batchActions.selected = [];
+  function taskIdFromLocation($location) {
+    return $location.search().task;
+  }
+
+  return [ function() {
 
     return {
+      restrict: 'EAC',
       scope: {
-        task: '='
+        filterData: '='
       },
 
       template: template,
 
-      link: function(scope, element) {
-        var _scopeEvents = [];
-        element.on('$destroy', function() {
-          if (!_scopeEvents.length) { return; }
-          angular.forEach(_scopeEvents, function(fn) { fn(); });
-        });
+      controller : [
+        '$scope',
+        '$location',
+        '$q',
+        'dataDepend',
+        'camAPI',
+      function(
+        $scope,
+        $location,
+        $q,
+        dataDepend,
+        camAPI
+      ) {
 
-		    //active tabs
-        scope.tabs = {
-          form: true,
-          description: false,
-          history: false,
-          diagram: false
-        };
+        var taskData = $scope.taskData = dataDepend.create($scope);
 
-        scope.elUID = camUID();
+        // read initial taskId from location
+        var taskId = taskIdFromLocation($location);
 
+        /**
+         * Provide the current task or the value 'null' in case no task is selected
+         */
+        taskData.provide('task', function() {
 
-        function loadTask(taskId) {
-          Task.get(taskId, function(err, loadedTask) {
-            if (err) { throw err; }
+          var deferred = $q.defer();
 
-            scope.task = loadedTask;
-            if (!$rootScope.currentTask || $rootScope.currentTask.id !== loadedTask.id) {
-              $rootScope.currentTask = loadedTask;
-            }
-          });
-        }
-
-
-        function setTask(newTask) {
-          var state = $location.search();
-          var urlTaskId = state.task;
-
-          if(
-            urlTaskId &&
-            (
-              !scope.task ||
-              (scope.task && scope.task.id !== urlTaskId)
-            )
-          ) {
-            loadTask(urlTaskId);
+          if(typeof taskId !== 'string') {
+            deferred.resolve(null);
           }
           else {
-            // should we load the next task?
-            // that would happen here
-            scope.task = null;
+            camAPI.resource('task')
+              .get(taskId, function(err, res) {
+
+              if(err) {
+                deferred.reject(err);
+              }
+              else {
+                // adjust dates to current timezone
+                fixDates(res);
+                deferred.resolve(res);
+              }
+
+            });
           }
-        }
 
-        scope.selectTab = function(tabName) {
-          scope.$broadcast('tasklist.task.tab', tabName);
-        };
-
-        scope.fullscreenForm = function() {
-          element.find('[cam-tasklist-task-form]').isolateScope().enterFullscreen();
-        };
-
-        scope.$on('tasklist.task.current', function(ev, task) {
-          setTask(task);
-        });
-        scope.$on('tasklist.comment.new', function(evt) {
-          angular.forEach(scope.tabs, function(ea) { ea = false; });
-          scope.tabs.history = true;
+          return deferred.promise;
         });
 
-        setTask($rootScope.currentTask);
-      }
+        /**
+         * expose current task as scope variable
+         */
+        taskData.observe('task', function(task) {
+          $scope.task = task;
+        });
+
+        /**
+         * Update task if location changes
+         */
+        $scope.$on('$locationChangeSuccess', function(prev, current) {
+          taskId = taskIdFromLocation($location);
+          taskData.changed('task');
+        });
+
+      }]
     };
   }];
 });
+

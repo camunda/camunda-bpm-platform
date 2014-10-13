@@ -9,16 +9,7 @@
   <header class="row">
     <div class="col-xs-12">
       <div class="actions">
-        <!--
-        <div class="full-size">
-          <a href="#" ng-click="modalView()">
-            <span class="glyphicon glyphicon-resize-full"></span>
-          </a>
-        </div>
-        <div class="batch-selection">
-          <input type="checkbox" ng-model="selected" ng-click="batchSelect()" />
-        </div>
-        -->
+
         <div class="pull-right" ng-controller="commentFormCtrl">
           <a href
              ng-click="createComment(task)">
@@ -37,7 +28,8 @@
       </div>
 
       <div cam-tasklist-task-meta
-           task="task"></div>
+           task-data="taskData"
+           filter-data="filterData"></div>
 
     </div>
   </header>

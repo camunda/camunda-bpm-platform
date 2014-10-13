@@ -38,7 +38,8 @@
     "bootstrap": "~3.1.1",
     "hyperagent": "*",
     "jquery": "2.1.1",
-    "bpmn-js": "~0.5.1"
+    "bpmn-js": "~0.5.1",
+    "angular-data-depend": "git@github.com:camunda-third-party/angular-data-depend.git"
   },
   "devDependencies": {
     "jquery-mockjax": "1.5.3",
