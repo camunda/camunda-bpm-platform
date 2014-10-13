@@ -188,7 +188,7 @@ create table ACT_RU_FILTER (
 -- add index to improve job executor performance
 create index ACT_IDX_JOB_PROCINST on ACT_RU_JOB(PROCESS_INSTANCE_ID_);
 
--- create historic case instance table and indexes --
+-- create historic case instance/activity table and indexes --
 create table ACT_HI_CASEINST (
     ID_ varchar(64) not null,
     CASE_INST_ID_ varchar(64) not null,
@@ -204,7 +204,29 @@ create table ACT_HI_CASEINST (
     unique (CASE_INST_ID_)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 
+create table ACT_HI_CASEACTINST (
+    ID_ varchar(64) not null,
+    PARENT_ACT_INST_ID_ varchar(64),
+    CASE_DEF_ID_ varchar(64) not null,
+    CASE_INST_ID_ varchar(64) not null,
+    CASE_EXECUTION_ID_ varchar(64) not null,
+    CASE_ACT_ID_ varchar(255) not null,
+    TASK_ID_ varchar(64),
+    CALL_PROC_INST_ID_ varchar(64),
+    CALL_CASE_INST_ID_ varchar(64),
+    CASE_ACT_NAME_ varchar(255),
+    CREATE_TIME_ datetime not null,
+    END_TIME_ datetime,
+    DURATION_ bigint,
+    STATE_ integer,
+    primary key (ID_)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
+
 create index ACT_IDX_HI_CAS_I_CLOSE on ACT_HI_CASEINST(CLOSE_TIME_);
 create index ACT_IDX_HI_CAS_I_BUSKEY on ACT_HI_CASEINST(BUSINESS_KEY_);
+create index ACT_IDX_HI_CAS_A_I_CREATE on ACT_HI_CASEACTINST(CREATE_TIME_);
+create index ACT_IDX_HI_CAS_A_I_END on ACT_HI_CASEACTINST(END_TIME_);
+create index ACT_IDX_HI_CAS_A_I_COMP on ACT_HI_CASEACTINST(CASE_EXECUTION_ID_, CASE_ACT_ID_, END_TIME_, ID_);
+create index ACT_IDX_HI_CAS_A_I_CASEINST on ACT_HI_CASEACTINST(CASE_INST_ID_, CASE_ACT_ID_);
 
 create index ACT_IDX_TASK_ASSIGNEE on ACT_RU_TASK(ASSIGNEE_);

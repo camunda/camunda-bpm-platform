@@ -78,45 +78,83 @@ public abstract class ItemHandler extends CmmnElementHandler<CmmnElement, CmmnAc
   public static final String PROPERTY_IS_BLOCKING = "isBlocking";
   public static final String PROPERTY_DISCRETIONARY = "discretionary";
 
-  public static List<String> TASK_OR_STAGE_EVENTS = Arrays.asList(
-      CaseExecutionListener.CREATE,
+  public static List<String> TASK_OR_STAGE_CREATE_EVENTS = Arrays.asList(
+      CaseExecutionListener.CREATE
+    );
+
+  public static List<String> TASK_OR_STAGE_UPDATE_EVENTS = Arrays.asList(
       CaseExecutionListener.ENABLE,
       CaseExecutionListener.DISABLE,
       CaseExecutionListener.RE_ENABLE,
       CaseExecutionListener.START,
       CaseExecutionListener.MANUAL_START,
-      CaseExecutionListener.TERMINATE,
-      CaseExecutionListener.EXIT,
       CaseExecutionListener.SUSPEND,
       CaseExecutionListener.PARENT_SUSPEND,
       CaseExecutionListener.RESUME,
-      CaseExecutionListener.PARENT_RESUME,
+      CaseExecutionListener.PARENT_RESUME
+    );
+
+  public static List<String> TASK_OR_STAGE_END_EVENTS = Arrays.asList(
+      CaseExecutionListener.TERMINATE,
+      CaseExecutionListener.EXIT,
       CaseExecutionListener.COMPLETE
     );
 
-  public static List<String> EVENTLISTENER_OR_MILESTONE_EVENTS = Arrays.asList(
-      CaseExecutionListener.CREATE,
+  public static List<String> TASK_OR_STAGE_EVENTS = new ArrayList<String>();
+
+  public static List<String> EVENT_LISTENER_OR_MILESTONE_CREATE_EVENTS = Arrays.asList(
+      CaseExecutionListener.CREATE
+    );
+
+  public static List<String> EVENT_LISTENER_OR_MILESTONE_UPDATE_EVENTS = Arrays.asList(
       CaseExecutionListener.SUSPEND,
-      CaseExecutionListener.RESUME,
+      CaseExecutionListener.RESUME
+    );
+
+  public static List<String> EVENT_LISTENER_OR_MILESTONE_END_EVENTS = Arrays.asList(
       CaseExecutionListener.TERMINATE,
       CaseExecutionListener.PARENT_TERMINATE,
       CaseExecutionListener.OCCUR
     );
 
-  public static List<String> CASE_PLAN_MODEL_EVENTS = Arrays.asList(
-      CaseExecutionListener.CREATE,
+  public static List<String> EVENT_LISTENER_OR_MILESTONE_EVENTS = new ArrayList<String>();
+
+  public static List<String> CASE_PLAN_MODEL_CREATE_EVENTS = Arrays.asList(
+      CaseExecutionListener.CREATE
+    );
+
+  public static List<String> CASE_PLAN_MODEL_UPDATE_EVENTS = Arrays.asList(
       CaseExecutionListener.TERMINATE,
       CaseExecutionListener.SUSPEND,
       CaseExecutionListener.COMPLETE,
-      CaseExecutionListener.RE_ACTIVATE,
+      CaseExecutionListener.RE_ACTIVATE
+    );
+
+  public static List<String> CASE_PLAN_MODEL_CLOSE_EVENTS = Arrays.asList(
       CaseExecutionListener.CLOSE
     );
+
+  public static List<String> CASE_PLAN_MODEL_EVENTS = new ArrayList<String>();
 
   public static List<String> DEFAULT_VARIABLE_EVENTS = Arrays.asList(
       VariableListener.CREATE,
       VariableListener.DELETE,
       VariableListener.UPDATE
   );
+
+  static {
+    TASK_OR_STAGE_EVENTS.addAll(TASK_OR_STAGE_CREATE_EVENTS);
+    TASK_OR_STAGE_EVENTS.addAll(TASK_OR_STAGE_UPDATE_EVENTS);
+    TASK_OR_STAGE_EVENTS.addAll(TASK_OR_STAGE_END_EVENTS);
+
+    EVENT_LISTENER_OR_MILESTONE_EVENTS.addAll(EVENT_LISTENER_OR_MILESTONE_CREATE_EVENTS);
+    EVENT_LISTENER_OR_MILESTONE_EVENTS.addAll(EVENT_LISTENER_OR_MILESTONE_UPDATE_EVENTS);
+    EVENT_LISTENER_OR_MILESTONE_EVENTS.addAll(EVENT_LISTENER_OR_MILESTONE_END_EVENTS);
+
+    CASE_PLAN_MODEL_EVENTS.addAll(CASE_PLAN_MODEL_CREATE_EVENTS);
+    CASE_PLAN_MODEL_EVENTS.addAll(CASE_PLAN_MODEL_UPDATE_EVENTS);
+    CASE_PLAN_MODEL_EVENTS.addAll(CASE_PLAN_MODEL_CLOSE_EVENTS);
+  }
 
   protected CmmnActivity createActivity(CmmnElement element, CmmnHandlerContext context) {
     String id = element.getId();

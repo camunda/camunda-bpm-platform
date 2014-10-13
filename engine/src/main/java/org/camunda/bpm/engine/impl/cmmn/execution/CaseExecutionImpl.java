@@ -222,9 +222,7 @@ public class CaseExecutionImpl extends CmmnExecution implements Serializable {
   }
 
   protected CmmnSentryPart newSentryPart() {
-    CaseSentryPartImpl caseSentryPart = new CaseSentryPartImpl();
-
-    return caseSentryPart;
+    return new CaseSentryPartImpl();
   }
 
   // new case executions ////////////////////////////////////////////////////////////

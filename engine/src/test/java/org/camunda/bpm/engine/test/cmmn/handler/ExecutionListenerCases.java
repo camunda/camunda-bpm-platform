@@ -132,7 +132,7 @@ public class ExecutionListenerCases {
           {new ClassExecutionListenerSpec(CaseExecutionListener.PARENT_TERMINATE)},
           {new ClassExecutionListenerSpec(CaseExecutionListener.OCCUR)},
           {new ClassExecutionListenerSpec(AbstractExecutionListenerSpec.ANY_EVENT)
-              .expectRegistrationFor(ItemHandler.EVENTLISTENER_OR_MILESTONE_EVENTS)},
+              .expectRegistrationFor(ItemHandler.EVENT_LISTENER_OR_MILESTONE_EVENTS)},
 
           {new ClassExecutionListenerSpec(CaseExecutionListener.CREATE)
             .withFieldExpression("firstField", "${myFirstExpression}")
@@ -155,7 +155,7 @@ public class ExecutionListenerCases {
           {new ScriptExecutionListenerSpec(CaseExecutionListener.PARENT_TERMINATE)},
           {new ScriptExecutionListenerSpec(CaseExecutionListener.OCCUR)},
           {new ScriptExecutionListenerSpec(AbstractExecutionListenerSpec.ANY_EVENT)
-              .expectRegistrationFor(ItemHandler.EVENTLISTENER_OR_MILESTONE_EVENTS)},
+              .expectRegistrationFor(ItemHandler.EVENT_LISTENER_OR_MILESTONE_EVENTS)},
 
           // delegate expression
           {new DelegateExpressionExecutionListenerSpec(CaseExecutionListener.CREATE)},
@@ -165,7 +165,7 @@ public class ExecutionListenerCases {
           {new DelegateExpressionExecutionListenerSpec(CaseExecutionListener.PARENT_TERMINATE)},
           {new DelegateExpressionExecutionListenerSpec(CaseExecutionListener.OCCUR)},
           {new DelegateExpressionExecutionListenerSpec(AbstractExecutionListenerSpec.ANY_EVENT)
-              .expectRegistrationFor(ItemHandler.EVENTLISTENER_OR_MILESTONE_EVENTS)},
+              .expectRegistrationFor(ItemHandler.EVENT_LISTENER_OR_MILESTONE_EVENTS)},
 
           {new DelegateExpressionExecutionListenerSpec(CaseExecutionListener.CREATE)
             .withFieldExpression("firstField", "${myFirstExpression}")
@@ -188,7 +188,7 @@ public class ExecutionListenerCases {
           {new ExpressionExecutionListenerSpec(CaseExecutionListener.PARENT_TERMINATE)},
           {new ExpressionExecutionListenerSpec(CaseExecutionListener.OCCUR)},
           {new ExpressionExecutionListenerSpec(AbstractExecutionListenerSpec.ANY_EVENT)
-              .expectRegistrationFor(ItemHandler.EVENTLISTENER_OR_MILESTONE_EVENTS)},
+              .expectRegistrationFor(ItemHandler.EVENT_LISTENER_OR_MILESTONE_EVENTS)},
       });
 
   public static final Iterable<Object[]> CASE_PLAN_MODEL_CASES =

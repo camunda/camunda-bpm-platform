@@ -24,7 +24,24 @@ import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
 import org.camunda.bpm.engine.impl.db.sql.DbSqlSession;
 import org.camunda.bpm.engine.impl.interceptor.Session;
-import org.camunda.bpm.engine.impl.persistence.entity.*;
+import org.camunda.bpm.engine.impl.persistence.entity.AttachmentManager;
+import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
+import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayManager;
+import org.camunda.bpm.engine.impl.persistence.entity.DeploymentManager;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionManager;
+import org.camunda.bpm.engine.impl.persistence.entity.HistoricActivityInstanceManager;
+import org.camunda.bpm.engine.impl.persistence.entity.HistoricCaseActivityInstanceManager;
+import org.camunda.bpm.engine.impl.persistence.entity.HistoricCaseInstanceManager;
+import org.camunda.bpm.engine.impl.persistence.entity.HistoricDetailManager;
+import org.camunda.bpm.engine.impl.persistence.entity.HistoricProcessInstanceManager;
+import org.camunda.bpm.engine.impl.persistence.entity.HistoricTaskInstanceManager;
+import org.camunda.bpm.engine.impl.persistence.entity.IdentityInfoManager;
+import org.camunda.bpm.engine.impl.persistence.entity.IdentityLinkManager;
+import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionManager;
+import org.camunda.bpm.engine.impl.persistence.entity.ResourceManager;
+import org.camunda.bpm.engine.impl.persistence.entity.TaskManager;
+import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceManager;
 
 
 /**
@@ -110,6 +127,10 @@ public abstract class AbstractManager implements Session {
 
   protected HistoricActivityInstanceManager getHistoricActivityInstanceManager() {
     return getSession(HistoricActivityInstanceManager.class);
+  }
+
+  protected HistoricCaseActivityInstanceManager getHistoricCaseActivityInstanceManager() {
+    return getSession(HistoricCaseActivityInstanceManager.class);
   }
 
   protected HistoricTaskInstanceManager getHistoricTaskInstanceManager() {

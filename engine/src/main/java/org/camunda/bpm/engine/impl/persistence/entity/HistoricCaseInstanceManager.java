@@ -65,7 +65,9 @@ public class HistoricCaseInstanceManager extends AbstractHistoricManager {
 
       // TODO: delete historic variable instances
 
-      // TODO: delete historic case activities
+      commandContext
+        .getHistoricCaseActivityInstanceManager()
+        .deleteHistoricCaseActivityInstancesByCaseInstanceId(historicCaseInstanceId);
 
       commandContext
         .getHistoricTaskInstanceManager()

@@ -352,7 +352,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     HistoricActivityInstanceEventEntity evt = newActivityInstanceEventEntity(executionEntity);
 
     // initialize event
-    initActivityInstanceEvent(evt, (ExecutionEntity) execution, HistoryEventTypes.ACTIVITY_INSTANCE_START);
+    initActivityInstanceEvent(evt, executionEntity, HistoryEventTypes.ACTIVITY_INSTANCE_START);
 
     evt.setStartTime(ClockUtil.getCurrentTime());
 

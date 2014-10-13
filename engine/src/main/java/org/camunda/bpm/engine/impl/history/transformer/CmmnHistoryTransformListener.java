@@ -13,27 +13,34 @@
 
 package org.camunda.bpm.engine.impl.history.transformer;
 
-import static org.camunda.bpm.engine.delegate.CaseExecutionListener.CLOSE;
-import static org.camunda.bpm.engine.delegate.CaseExecutionListener.COMPLETE;
-import static org.camunda.bpm.engine.delegate.CaseExecutionListener.CREATE;
-import static org.camunda.bpm.engine.delegate.CaseExecutionListener.RE_ACTIVATE;
-import static org.camunda.bpm.engine.delegate.CaseExecutionListener.SUSPEND;
-import static org.camunda.bpm.engine.delegate.CaseExecutionListener.TERMINATE;
-import static org.camunda.bpm.engine.impl.history.event.HistoryEventTypes.CASE_INSTANCE_CLOSE;
-import static org.camunda.bpm.engine.impl.history.event.HistoryEventTypes.CASE_INSTANCE_CREATE;
-import static org.camunda.bpm.engine.impl.history.event.HistoryEventTypes.CASE_INSTANCE_UPDATE;
+import java.util.List;
 
 import org.camunda.bpm.engine.delegate.CaseExecutionListener;
+import org.camunda.bpm.engine.impl.cmmn.handler.ItemHandler;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
-import org.camunda.bpm.engine.impl.cmmn.transformer.AbstractCmmnTransformListener;
+import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
+import org.camunda.bpm.engine.impl.cmmn.model.CmmnSentryDeclaration;
+import org.camunda.bpm.engine.impl.cmmn.transformer.CmmnTransformListener;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
+import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
 import org.camunda.bpm.engine.impl.history.producer.CmmnHistoryEventProducer;
 import org.camunda.bpm.model.cmmn.impl.instance.CasePlanModel;
+import org.camunda.bpm.model.cmmn.instance.Case;
+import org.camunda.bpm.model.cmmn.instance.CaseTask;
+import org.camunda.bpm.model.cmmn.instance.Definitions;
+import org.camunda.bpm.model.cmmn.instance.EventListener;
+import org.camunda.bpm.model.cmmn.instance.HumanTask;
+import org.camunda.bpm.model.cmmn.instance.Milestone;
+import org.camunda.bpm.model.cmmn.instance.PlanItem;
+import org.camunda.bpm.model.cmmn.instance.ProcessTask;
+import org.camunda.bpm.model.cmmn.instance.Sentry;
+import org.camunda.bpm.model.cmmn.instance.Stage;
+import org.camunda.bpm.model.cmmn.instance.Task;
 
 /**
  * @author Sebastian Menski
  */
-public class CmmnHistoryTransformListener extends AbstractCmmnTransformListener {
+public class CmmnHistoryTransformListener implements CmmnTransformListener {
 
   // Cached listeners
   // listeners can be reused for a given process engine instance but cannot be cached in static fields since
@@ -42,6 +49,10 @@ public class CmmnHistoryTransformListener extends AbstractCmmnTransformListener 
   protected CaseExecutionListener CASE_INSTANCE_CREATE_LISTENER;
   protected CaseExecutionListener CASE_INSTANCE_UPDATE_LISTENER;
   protected CaseExecutionListener CASE_INSTANCE_CLOSE_LISTENER;
+
+  protected CaseExecutionListener CASE_ACTIVITY_INSTANCE_CREATE_LISTENER;
+  protected CaseExecutionListener CASE_ACTIVITY_INSTANCE_UPDATE_LISTENER;
+  protected CaseExecutionListener CASE_ACTIVITY_INSTANCE_END_LISTENER;
 
   // The history level set in the process engine configuration
   protected HistoryLevel historyLevel;
@@ -55,21 +66,106 @@ public class CmmnHistoryTransformListener extends AbstractCmmnTransformListener 
     CASE_INSTANCE_CREATE_LISTENER = new CaseInstanceCreateListener(historyEventProducer, historyLevel);
     CASE_INSTANCE_UPDATE_LISTENER = new CaseInstanceUpdateListener(historyEventProducer, historyLevel);
     CASE_INSTANCE_CLOSE_LISTENER = new CaseInstanceCloseListener(historyEventProducer, historyLevel);
+
+    CASE_ACTIVITY_INSTANCE_CREATE_LISTENER = new CaseActivityInstanceCreateListener(historyEventProducer, historyLevel);
+    CASE_ACTIVITY_INSTANCE_UPDATE_LISTENER = new CaseActivityInstanceUpdateListener(historyEventProducer, historyLevel);
+    CASE_ACTIVITY_INSTANCE_END_LISTENER = new CaseActivityInstanceEndListener(historyEventProducer, historyLevel);
   }
 
-  public void transformCasePlanModel(CasePlanModel casePlanModel, CmmnActivity activity) {
-    if (historyLevel.isHistoryEventProduced(CASE_INSTANCE_CREATE, null)) {
-      activity.addListener(CREATE, CASE_INSTANCE_CREATE_LISTENER);
-    }
-    if (historyLevel.isHistoryEventProduced(CASE_INSTANCE_UPDATE, null)) {
-      String[] updateEvents = {COMPLETE, TERMINATE, SUSPEND, RE_ACTIVATE};
-      for (String updateEvent : updateEvents) {
-        activity.addListener(updateEvent, CASE_INSTANCE_UPDATE_LISTENER);
+  public void transformRootElement(Definitions definitions, List<? extends CmmnCaseDefinition> caseDefinitions) {
+  }
+
+  public void transformCase(Case element, CmmnCaseDefinition caseDefinition) {
+  }
+
+  public void transformCasePlanModel(CasePlanModel casePlanModel, CmmnActivity caseActivity) {
+    addCasePlanModelHandlers(caseActivity);
+  }
+
+  public void transformHumanTask(PlanItem planItem, HumanTask humanTask, CmmnActivity caseActivity) {
+    addTaskOrStageHandlers(caseActivity);
+  }
+
+  public void transformProcessTask(PlanItem planItem, ProcessTask processTask, CmmnActivity caseActivity) {
+    addTaskOrStageHandlers(caseActivity);
+  }
+
+  public void transformCaseTask(PlanItem planItem, CaseTask caseTask, CmmnActivity caseActivity) {
+    addTaskOrStageHandlers(caseActivity);
+  }
+
+  public void transformTask(PlanItem planItem, Task task, CmmnActivity caseActivity) {
+    addTaskOrStageHandlers(caseActivity);
+  }
+
+  public void transformStage(PlanItem planItem, Stage stage, CmmnActivity caseActivity) {
+    addTaskOrStageHandlers(caseActivity);
+  }
+
+  public void transformMilestone(PlanItem planItem, Milestone milestone, CmmnActivity caseActivity) {
+    addEventListenerOrMilestoneHandlers(caseActivity);
+  }
+
+  public void transformEventListener(PlanItem planItem, EventListener eventListener, CmmnActivity caseActivity) {
+    addEventListenerOrMilestoneHandlers(caseActivity);
+  }
+
+  public void transformSentry(Sentry sentry, CmmnSentryDeclaration sentryDeclaration) {
+  }
+
+  protected void addCasePlanModelHandlers(CmmnActivity caseActivity) {
+    if (historyLevel.isHistoryEventProduced(HistoryEventTypes.CASE_INSTANCE_CREATE, null)) {
+      for (String event : ItemHandler.CASE_PLAN_MODEL_CREATE_EVENTS) {
+        caseActivity.addListener(event, CASE_INSTANCE_CREATE_LISTENER);
       }
     }
-    if (historyLevel.isHistoryEventProduced(CASE_INSTANCE_CLOSE, null)) {
-      activity.addListener(CLOSE, CASE_INSTANCE_CLOSE_LISTENER);
+    if (historyLevel.isHistoryEventProduced(HistoryEventTypes.CASE_INSTANCE_UPDATE, null)) {
+      for (String event : ItemHandler.CASE_PLAN_MODEL_UPDATE_EVENTS) {
+        caseActivity.addListener(event, CASE_INSTANCE_UPDATE_LISTENER);
+      }
+    }
+    if (historyLevel.isHistoryEventProduced(HistoryEventTypes.CASE_INSTANCE_CLOSE, null)) {
+      for (String event : ItemHandler.CASE_PLAN_MODEL_CLOSE_EVENTS) {
+        caseActivity.addListener(event, CASE_INSTANCE_CLOSE_LISTENER);
+      }
     }
   }
+
+  protected void addTaskOrStageHandlers(CmmnActivity caseActivity) {
+    if (historyLevel.isHistoryEventProduced(HistoryEventTypes.CASE_ACTIVITY_INSTANCE_CREATE, null)) {
+      for (String event : ItemHandler.TASK_OR_STAGE_CREATE_EVENTS) {
+        caseActivity.addListener(event, CASE_ACTIVITY_INSTANCE_CREATE_LISTENER);
+      }
+    }
+    if (historyLevel.isHistoryEventProduced(HistoryEventTypes.CASE_ACTIVITY_INSTANCE_UPDATE, null)) {
+      for (String event : ItemHandler.TASK_OR_STAGE_UPDATE_EVENTS) {
+        caseActivity.addListener(event, CASE_ACTIVITY_INSTANCE_UPDATE_LISTENER);
+      }
+    }
+    if (historyLevel.isHistoryEventProduced(HistoryEventTypes.CASE_ACTIVITY_INSTANCE_END, null)) {
+      for (String event : ItemHandler.TASK_OR_STAGE_END_EVENTS) {
+        caseActivity.addListener(event, CASE_ACTIVITY_INSTANCE_END_LISTENER);
+      }
+    }
+  }
+
+  protected void addEventListenerOrMilestoneHandlers(CmmnActivity caseActivity) {
+    if (historyLevel.isHistoryEventProduced(HistoryEventTypes.CASE_ACTIVITY_INSTANCE_CREATE, null)) {
+      for (String event : ItemHandler.EVENT_LISTENER_OR_MILESTONE_CREATE_EVENTS) {
+        caseActivity.addListener(event, CASE_ACTIVITY_INSTANCE_CREATE_LISTENER);
+      }
+    }
+    if (historyLevel.isHistoryEventProduced(HistoryEventTypes.CASE_ACTIVITY_INSTANCE_UPDATE, null)) {
+      for (String event : ItemHandler.EVENT_LISTENER_OR_MILESTONE_UPDATE_EVENTS) {
+        caseActivity.addListener(event, CASE_ACTIVITY_INSTANCE_UPDATE_LISTENER);
+      }
+    }
+    if (historyLevel.isHistoryEventProduced(HistoryEventTypes.CASE_ACTIVITY_INSTANCE_END, null)) {
+      for (String event : ItemHandler.EVENT_LISTENER_OR_MILESTONE_END_EVENTS) {
+        caseActivity.addListener(event, CASE_ACTIVITY_INSTANCE_END_LISTENER);
+      }
+    }
+  }
+
 
 }

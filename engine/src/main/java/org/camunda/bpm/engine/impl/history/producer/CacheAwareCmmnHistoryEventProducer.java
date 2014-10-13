@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.impl.history.producer;
 
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.history.event.HistoricCaseActivityInstanceEventEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoricCaseInstanceEventEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 
@@ -23,6 +24,7 @@ import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
  */
 public class CacheAwareCmmnHistoryEventProducer extends DefaultCmmnHistoryEventProducer {
 
+  @Override
   protected HistoricCaseInstanceEventEntity loadCaseInstanceEventEntity(CaseExecutionEntity caseExecutionEntity) {
     final String caseInstanceId = caseExecutionEntity.getCaseInstanceId();
 
@@ -33,6 +35,21 @@ public class CacheAwareCmmnHistoryEventProducer extends DefaultCmmnHistoryEventP
     }
     else {
       return newCaseInstanceEventEntity(caseExecutionEntity);
+    }
+
+  }
+
+  @Override
+  protected HistoricCaseActivityInstanceEventEntity loadCaseActivityInstanceEventEntity(CaseExecutionEntity caseExecutionEntity) {
+    final String caseActivityInstanceId = caseExecutionEntity.getId();
+
+    HistoricCaseActivityInstanceEventEntity cachedEntity = findInCache(HistoricCaseActivityInstanceEventEntity.class, caseActivityInstanceId);
+
+    if (cachedEntity != null) {
+      return cachedEntity;
+    }
+    else {
+      return newCaseActivityInstanceEventEntity(caseExecutionEntity);
     }
 
   }

@@ -17,6 +17,7 @@ import org.camunda.bpm.engine.delegate.DelegateCaseExecution;
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.history.event.HistoricCaseActivityInstanceEventEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoricCaseInstanceEventEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
@@ -82,6 +83,65 @@ public class DefaultCmmnHistoryEventProducer implements CmmnHistoryEventProducer
     return evt;
   }
 
+  public HistoryEvent createCaseActivityInstanceCreateEvt(DelegateCaseExecution caseExecution) {
+    final CaseExecutionEntity caseExecutionEntity = (CaseExecutionEntity) caseExecution;
+
+    // create event instance
+    HistoricCaseActivityInstanceEventEntity evt = newCaseActivityInstanceEventEntity(caseExecutionEntity);
+
+    // initialize event
+    initCaseActivityInstanceEvent(evt, caseExecutionEntity, HistoryEventTypes.CASE_ACTIVITY_INSTANCE_CREATE);
+
+    // set start time
+    evt.setCreateTime(ClockUtil.getCurrentTime());
+
+    return evt;
+  }
+
+  public HistoryEvent createCaseActivityInstanceUpdateEvt(DelegateCaseExecution caseExecution) {
+    final CaseExecutionEntity caseExecutionEntity = (CaseExecutionEntity) caseExecution;
+
+    // create event instance
+    HistoricCaseActivityInstanceEventEntity evt = loadCaseActivityInstanceEventEntity(caseExecutionEntity);
+
+    // initialize event
+    initCaseActivityInstanceEvent(evt, caseExecutionEntity, HistoryEventTypes.CASE_ACTIVITY_INSTANCE_UPDATE);
+
+    if (caseExecutionEntity.getTask() != null) {
+      evt.setTaskId(caseExecutionEntity.getTask().getId());
+    }
+
+    if (caseExecutionEntity.getSubProcessInstance() != null) {
+      evt.setCalledProcessInstanceId(caseExecutionEntity.getSubProcessInstance().getId());
+    }
+
+    if (caseExecutionEntity.getSubCaseInstance() != null) {
+      evt.setCalledCaseInstanceId(caseExecutionEntity.getSubCaseInstance().getId());
+    }
+
+    return evt;
+  }
+
+  public HistoryEvent createCaseActivityInstanceEndEvt(DelegateCaseExecution caseExecution) {
+    final CaseExecutionEntity caseExecutionEntity = (CaseExecutionEntity) caseExecution;
+
+    // create event instance
+    HistoricCaseActivityInstanceEventEntity evt = loadCaseActivityInstanceEventEntity(caseExecutionEntity);
+
+    // initialize event
+    initCaseActivityInstanceEvent(evt, caseExecutionEntity, HistoryEventTypes.CASE_ACTIVITY_INSTANCE_END);
+
+    // set end time
+    evt.setEndTime(ClockUtil.getCurrentTime());
+
+    // calculate duration
+    if (evt.getStartTime() != null) {
+      evt.setDurationInMillis(evt.getEndTime().getTime() - evt.getStartTime().getTime());
+    }
+
+    return evt;
+  }
+
   protected HistoricCaseInstanceEventEntity newCaseInstanceEventEntity(CaseExecutionEntity caseExecutionEntity) {
     return new HistoricCaseInstanceEventEntity();
   }
@@ -98,6 +158,27 @@ public class DefaultCmmnHistoryEventProducer implements CmmnHistoryEventProducer
     evt.setCaseExecutionId(caseExecutionEntity.getId());
     evt.setBusinessKey(caseExecutionEntity.getBusinessKey());
     evt.setState(caseExecutionEntity.getState());
+  }
+
+  protected HistoricCaseActivityInstanceEventEntity newCaseActivityInstanceEventEntity(CaseExecutionEntity caseExecutionEntity) {
+    return new HistoricCaseActivityInstanceEventEntity();
+  }
+
+  protected HistoricCaseActivityInstanceEventEntity loadCaseActivityInstanceEventEntity(CaseExecutionEntity caseExecutionEntity) {
+    return newCaseActivityInstanceEventEntity(caseExecutionEntity);
+  }
+
+  protected void initCaseActivityInstanceEvent(HistoricCaseActivityInstanceEventEntity evt, CaseExecutionEntity caseExecutionEntity, HistoryEventTypes eventType) {
+    evt.setId(caseExecutionEntity.getId());
+    evt.setParentCaseActivityInstanceId(caseExecutionEntity.getParentId());
+    evt.setEventType(eventType.getEventName());
+    evt.setCaseDefinitionId(caseExecutionEntity.getCaseDefinitionId());
+    evt.setCaseInstanceId(caseExecutionEntity.getCaseInstanceId());
+    evt.setCaseExecutionId(caseExecutionEntity.getId());
+    evt.setCaseActivityInstanceState(caseExecutionEntity.getState());
+
+    evt.setCaseActivityId(caseExecutionEntity.getActivityId());
+    evt.setCaseActivityName(caseExecutionEntity.getActivityName());
   }
 
 }

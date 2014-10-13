@@ -13,13 +13,28 @@
 
 package org.camunda.bpm.engine.impl.test;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.Callable;
 import java.util.logging.Level;
 
-import junit.framework.AssertionFailedError;
-
-import org.camunda.bpm.engine.*;
+import org.apache.ibatis.logging.LogFactory;
+import org.camunda.bpm.engine.AuthorizationService;
+import org.camunda.bpm.engine.CaseService;
+import org.camunda.bpm.engine.FilterService;
+import org.camunda.bpm.engine.FormService;
+import org.camunda.bpm.engine.HistoryService;
+import org.camunda.bpm.engine.IdentityService;
+import org.camunda.bpm.engine.ManagementService;
+import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.RepositoryService;
+import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.db.PersistenceSession;
@@ -34,6 +49,8 @@ import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.junit.Assert;
+
+import junit.framework.AssertionFailedError;
 
 
 /**

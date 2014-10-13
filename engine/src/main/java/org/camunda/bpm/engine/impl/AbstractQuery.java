@@ -195,6 +195,10 @@ public abstract class AbstractQuery<T extends Query<?,?>, U> extends ListQueryPa
     }
   }
 
+  public QueryProperty getOrderProperty() {
+    return orderProperty;
+  }
+
   public Map<String, String> getExpressions() {
     return expressions;
   }

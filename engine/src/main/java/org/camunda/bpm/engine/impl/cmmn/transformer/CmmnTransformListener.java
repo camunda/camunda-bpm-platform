@@ -45,21 +45,21 @@ public interface CmmnTransformListener {
 
   void transformCase(Case element, CmmnCaseDefinition caseDefinition);
 
-  void transformCasePlanModel(CasePlanModel casePlanModel, CmmnActivity activity);
+  void transformCasePlanModel(CasePlanModel casePlanModel, CmmnActivity caseActivity);
 
-  void transformHumanTask(PlanItem planItem, HumanTask humanTask, CmmnActivity activity);
+  void transformHumanTask(PlanItem planItem, HumanTask humanTask, CmmnActivity caseActivity);
 
-  void transformProcessTask(PlanItem planItem, ProcessTask processTask, CmmnActivity activity);
+  void transformProcessTask(PlanItem planItem, ProcessTask processTask, CmmnActivity caseActivity);
 
-  void transformCaseTask(PlanItem planItem, CaseTask caseTask, CmmnActivity activity);
+  void transformCaseTask(PlanItem planItem, CaseTask caseTask, CmmnActivity caseActivity);
 
-  void transformTask(PlanItem planItem, Task task, CmmnActivity activity);
+  void transformTask(PlanItem planItem, Task task, CmmnActivity caseActivity);
 
-  void transformStage(PlanItem planItem, Stage stage, CmmnActivity activity);
+  void transformStage(PlanItem planItem, Stage stage, CmmnActivity caseActivity);
 
-  void transformMilestone(PlanItem planItem, Milestone milestone, CmmnActivity activity);
+  void transformMilestone(PlanItem planItem, Milestone milestone, CmmnActivity caseActivity);
 
-  void transformEventListener(PlanItem planItem, EventListener eventListener, CmmnActivity activity);
+  void transformEventListener(PlanItem planItem, EventListener eventListener, CmmnActivity caseActivity);
 
   void transformSentry(Sentry sentry, CmmnSentryDeclaration sentryDeclaration);
 

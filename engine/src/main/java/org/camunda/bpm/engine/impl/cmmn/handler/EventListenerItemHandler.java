@@ -26,7 +26,7 @@ import org.camunda.bpm.model.cmmn.instance.CmmnElement;
 public class EventListenerItemHandler extends ItemHandler {
 
   protected List<String> getStandardEvents(CmmnElement element) {
-    return EVENTLISTENER_OR_MILESTONE_EVENTS;
+    return EVENT_LISTENER_OR_MILESTONE_EVENTS;
   }
 
   protected CmmnActivityBehavior getActivityBehavior() {

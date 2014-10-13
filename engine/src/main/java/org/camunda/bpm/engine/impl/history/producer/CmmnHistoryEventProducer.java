@@ -49,4 +49,28 @@ public interface CmmnHistoryEventProducer {
    */
   public HistoryEvent createCaseInstanceCloseEvt(DelegateCaseExecution caseExecution);
 
+  /**
+   * Creates the history event fired when a case activity instance is <strong>created</strong>.
+   *
+   * @param caseExecution the current case execution
+   * @return the created history event
+   */
+  public HistoryEvent createCaseActivityInstanceCreateEvt(DelegateCaseExecution caseExecution);
+
+  /**
+   * Creates the history event fired when a case activity instance is <strong>updated</strong>.
+   *
+   * @param caseExecution the current case execution
+   * @return the created history event
+   */
+  public HistoryEvent createCaseActivityInstanceUpdateEvt(DelegateCaseExecution caseExecution);
+
+  /**
+   * Creates the history event fired when a case activity instance is <strong>ended</strong>.
+   *
+   * @param caseExecution the current case execution
+   * @return the created history event
+   */
+  public HistoryEvent createCaseActivityInstanceEndEvt(DelegateCaseExecution caseExecution);
+
 }

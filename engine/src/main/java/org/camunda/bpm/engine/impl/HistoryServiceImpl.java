@@ -17,6 +17,7 @@ package org.camunda.bpm.engine.impl;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.history.HistoricActivityInstanceQuery;
 import org.camunda.bpm.engine.history.HistoricActivityStatisticsQuery;
+import org.camunda.bpm.engine.history.HistoricCaseActivityInstanceQuery;
 import org.camunda.bpm.engine.history.HistoricCaseInstanceQuery;
 import org.camunda.bpm.engine.history.HistoricDetailQuery;
 import org.camunda.bpm.engine.history.HistoricIncidentQuery;
@@ -24,6 +25,7 @@ import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.history.HistoricTaskInstanceQuery;
 import org.camunda.bpm.engine.history.HistoricVariableInstanceQuery;
 import org.camunda.bpm.engine.history.NativeHistoricActivityInstanceQuery;
+import org.camunda.bpm.engine.history.NativeHistoricCaseActivityInstanceQuery;
 import org.camunda.bpm.engine.history.NativeHistoricCaseInstanceQuery;
 import org.camunda.bpm.engine.history.NativeHistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.history.NativeHistoricTaskInstanceQuery;
@@ -76,6 +78,10 @@ public class HistoryServiceImpl extends ServiceImpl implements HistoryService {
     return new HistoricCaseInstanceQueryImpl(commandExecutor);
   }
 
+  public HistoricCaseActivityInstanceQuery createHistoricCaseActivityInstanceQuery() {
+    return new HistoricCaseActivityInstanceQueryImpl(commandExecutor);
+  }
+
   public void deleteHistoricTaskInstance(String taskId) {
     commandExecutor.execute(new DeleteHistoricTaskInstanceCmd(taskId));
   }
@@ -106,6 +112,10 @@ public class HistoryServiceImpl extends ServiceImpl implements HistoryService {
 
   public NativeHistoricCaseInstanceQuery createNativeHistoricCaseInstanceQuery() {
     return new NativeHistoricCaseInstanceQueryImpl(commandExecutor);
+  }
+
+  public NativeHistoricCaseActivityInstanceQuery createNativeHistoricCaseActivityInstanceQuery() {
+    return new NativeHistoricCaseActivityInstanceQueryImpl(commandExecutor);
   }
 
 }

@@ -59,6 +59,10 @@ public interface CaseExecutionState {
       CASE_EXECUTION_STATES.put(stateCode, this);
     }
 
+    public static CaseExecutionState getStateForCode(Integer stateCode) {
+      return CASE_EXECUTION_STATES.get(stateCode);
+    }
+
     public int getStateCode() {
       return stateCode;
     }

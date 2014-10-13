@@ -17,6 +17,8 @@ package org.camunda.bpm.engine;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricActivityInstanceQuery;
 import org.camunda.bpm.engine.history.HistoricActivityStatisticsQuery;
+import org.camunda.bpm.engine.history.HistoricCaseActivityInstance;
+import org.camunda.bpm.engine.history.HistoricCaseActivityInstanceQuery;
 import org.camunda.bpm.engine.history.HistoricCaseInstance;
 import org.camunda.bpm.engine.history.HistoricCaseInstanceQuery;
 import org.camunda.bpm.engine.history.HistoricDetail;
@@ -30,6 +32,7 @@ import org.camunda.bpm.engine.history.HistoricTaskInstanceQuery;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.history.HistoricVariableInstanceQuery;
 import org.camunda.bpm.engine.history.NativeHistoricActivityInstanceQuery;
+import org.camunda.bpm.engine.history.NativeHistoricCaseActivityInstanceQuery;
 import org.camunda.bpm.engine.history.NativeHistoricCaseInstanceQuery;
 import org.camunda.bpm.engine.history.NativeHistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.history.NativeHistoricTaskInstanceQuery;
@@ -78,6 +81,9 @@ public interface HistoryService {
   /** Creates a new programmatic query to search for {@link HistoricCaseInstance}s. */
   HistoricCaseInstanceQuery createHistoricCaseInstanceQuery();
 
+  /** Creates a new programmatic query to search for {@link HistoricCaseActivityInstance}s. */
+  HistoricCaseActivityInstanceQuery createHistoricCaseActivityInstanceQuery();
+
   /** Deletes historic task instance.  This might be useful for tasks that are
    * {@link TaskService#newTask() dynamically created} and then {@link TaskService#complete(String) completed}.
    * If the historic task instance doesn't exist, no exception is thrown and the
@@ -120,5 +126,10 @@ public interface HistoryService {
    * creates a native query to search for {@link HistoricCaseInstance}s via SQL
    */
   NativeHistoricCaseInstanceQuery createNativeHistoricCaseInstanceQuery();
+
+  /**
+   * creates a native query to search for {@link HistoricCaseActivityInstance}s via SQL
+   */
+  NativeHistoricCaseActivityInstanceQuery createNativeHistoricCaseActivityInstanceQuery();
 
 }

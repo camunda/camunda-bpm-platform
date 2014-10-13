@@ -21,6 +21,7 @@ import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessDefinition;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessInstance;
+import org.camunda.bpm.engine.impl.task.TaskDecorator;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.model.cmmn.instance.CaseTask;
@@ -680,6 +681,16 @@ public interface CmmnActivityExecution extends DelegateCaseExecution {
    * @return a {@link List} of child case executions.
    */
   List<? extends CmmnExecution> getCaseExecutions();
+
+  /**
+   * <p>Creates a new task.</p>
+   *
+   * <p><code>This</code></p> case execution will be the case execution of the
+   * created task.</p>
+   *
+   * @param taskDecorator the task decorator used to create task
+   */
+   org.camunda.bpm.engine.task.Task createTask(TaskDecorator taskDecorator);
 
   /**
    * <p>Creates a new sub process instance.</p>

@@ -19,6 +19,7 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.ProcessEngineServices;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnSentryPart;
@@ -32,11 +33,18 @@ import org.camunda.bpm.engine.impl.core.variable.CorePersistentVariableStore;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.HasDbReferences;
 import org.camunda.bpm.engine.impl.db.HasDbRevision;
+import org.camunda.bpm.engine.impl.history.HistoryLevel;
+import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
+import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
+import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
+import org.camunda.bpm.engine.impl.history.producer.CmmnHistoryEventProducer;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessDefinition;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
+import org.camunda.bpm.engine.impl.task.TaskDecorator;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.model.cmmn.CmmnModelInstance;
@@ -251,6 +259,28 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
     }
   }
 
+  // task ///////////////////////////////////////////////////////////////////
+
+  public TaskEntity getTask() {
+    ensureTaskInitialized();
+    return task;
+  }
+
+  protected void ensureTaskInitialized() {
+    if (task == null) {
+      task = Context
+        .getCommandContext()
+        .getTaskManager()
+        .findTaskByCaseExecutionId(id);
+    }
+  }
+
+  public TaskEntity createTask(TaskDecorator taskDecorator) {
+    TaskEntity task = super.createTask(taskDecorator);
+    fireHistoricCaseActivityInstanceUpdate();
+    return task;
+  }
+
   // case instance /////////////////////////////////////////////////////////
 
   public String getCaseInstanceId() {
@@ -342,6 +372,8 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
     subProcessInstance.setSuperCaseExecution(this);
     setSubProcessInstance(subProcessInstance);
 
+    fireHistoricCaseActivityInstanceUpdate();
+
     return subProcessInstance;
   }
 
@@ -376,7 +408,21 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
     subCaseInstance.setSuperCaseExecution(this);
     setSubCaseInstance(subCaseInstance);
 
+    fireHistoricCaseActivityInstanceUpdate();
+
     return subCaseInstance;
+  }
+
+  public void fireHistoricCaseActivityInstanceUpdate() {
+    ProcessEngineConfigurationImpl configuration = Context.getProcessEngineConfiguration();
+    HistoryLevel historyLevel = configuration.getHistoryLevel();
+    if (historyLevel.isHistoryEventProduced(HistoryEventTypes.CASE_ACTIVITY_INSTANCE_UPDATE, this)) {
+      CmmnHistoryEventProducer eventProducer = configuration.getCmmnHistoryEventProducer();
+      HistoryEventHandler eventHandler = configuration.getHistoryEventHandler();
+
+      HistoryEvent event = eventProducer.createCaseActivityInstanceUpdateEvt(this);
+      eventHandler.handleEvent(event);
+    }
   }
 
   protected void ensureSubCaseInstanceInitialized() {

@@ -28,6 +28,7 @@ import org.apache.ibatis.session.RowBounds;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.filter.Filter;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
+import org.camunda.bpm.engine.history.HistoricCaseActivityInstance;
 import org.camunda.bpm.engine.history.HistoricCaseInstance;
 import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.history.HistoricFormProperty;
@@ -93,6 +94,7 @@ public class TableDataManager extends AbstractManager {
     persistentObjectToTableNameMap.put(HistoricTaskInstanceEntity.class, "ACT_HI_TASKINST");
 
     persistentObjectToTableNameMap.put(HistoricCaseInstanceEntity.class, "ACT_HI_CASEINST");
+    persistentObjectToTableNameMap.put(HistoricCaseActivityInstanceEntity.class, "ACT_HI_CASEACTINST");
 
     // a couple of stuff goes to the same table
     persistentObjectToTableNameMap.put(HistoricFormPropertyEntity.class, "ACT_HI_DETAIL");
@@ -132,6 +134,7 @@ public class TableDataManager extends AbstractManager {
     apiTypeToTableNameMap.put(HistoricVariableInstance.class, "ACT_HI_VARINST");
 
     apiTypeToTableNameMap.put(HistoricCaseInstance.class, "ACT_HI_CASEINST");
+    apiTypeToTableNameMap.put(HistoricCaseActivityInstance.class, "ACT_HI_CASEACTINST");
 
     // TODO: Identity skipped for the moment as no SQL injection is provided here
   }
