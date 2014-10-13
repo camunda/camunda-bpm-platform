@@ -16,12 +16,9 @@ import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.NotAllowedException;
-import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
-import org.camunda.bpm.engine.impl.interceptor.Command;
-import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.impl.test.CmmnProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.runtime.Job;
@@ -34,7 +31,7 @@ import org.camunda.bpm.engine.test.Deployment;
  * @author Roman Smirnov
  *
  */
-public class ProcessTaskTest extends PluggableProcessEngineTestCase {
+public class ProcessTaskTest extends CmmnProcessEngineTestCase {
 
   protected final String PROCESS_TASK = "PI_ProcessTask_1";
   protected final String ONE_PROCESS_TASK_CASE = "oneProcessTaskCase";
@@ -45,7 +42,7 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
     })
   public void testCallProcessAsConstant() {
     // given
-    String caseInstanceId = createCaseInstance(ONE_PROCESS_TASK_CASE).getId();
+    String caseInstanceId = createCaseInstanceByKey(ONE_PROCESS_TASK_CASE).getId();
     String processTaskId = queryCaseExecutionByActivityId(PROCESS_TASK).getId();
 
     // when
@@ -76,7 +73,7 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
     taskService.complete(task.getId());
     assertProcessEnded(processInstance.getId());
 
-    closeCaseInstance(caseInstanceId);
+    close(caseInstanceId);
     assertCaseEnded(caseInstanceId);
 
   }
@@ -88,7 +85,7 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
   public void testCallProcessAsExpressionStartsWithDollar() {
     // given
     // a deployed case definition
-    String caseInstanceId = createCaseInstance(ONE_PROCESS_TASK_CASE).getId();
+    String caseInstanceId = createCaseInstanceByKey(ONE_PROCESS_TASK_CASE).getId();
     String processTaskId = queryCaseExecutionByActivityId(PROCESS_TASK).getId();
 
     // when
@@ -120,7 +117,7 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
     taskService.complete(task.getId());
     assertProcessEnded(processInstance.getId());
 
-    closeCaseInstance(caseInstanceId);
+    close(caseInstanceId);
     assertCaseEnded(caseInstanceId);
   }
 
@@ -131,7 +128,7 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
   public void testCallProcessAsExpressionStartsWithHash() {
     // given
     // a deployed case definition
-    String caseInstanceId = createCaseInstance(ONE_PROCESS_TASK_CASE).getId();
+    String caseInstanceId = createCaseInstanceByKey(ONE_PROCESS_TASK_CASE).getId();
     String processTaskId = queryCaseExecutionByActivityId(PROCESS_TASK).getId();
 
     // when
@@ -163,7 +160,7 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
     taskService.complete(task.getId());
     assertProcessEnded(processInstance.getId());
 
-    closeCaseInstance(caseInstanceId);
+    close(caseInstanceId);
     assertCaseEnded(caseInstanceId);
   }
 
@@ -182,7 +179,7 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
 
     assertEquals(2, repositoryService.createProcessDefinitionQuery().count());
 
-    String caseInstanceId = createCaseInstance(ONE_PROCESS_TASK_CASE).getId();
+    String caseInstanceId = createCaseInstanceByKey(ONE_PROCESS_TASK_CASE).getId();
     String processTaskId = queryCaseExecutionByActivityId(PROCESS_TASK).getId();
 
     // latest process definition
@@ -221,7 +218,7 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
     taskService.complete(task.getId());
     assertProcessEnded(processInstance.getId());
 
-    closeCaseInstance(caseInstanceId);
+    close(caseInstanceId);
     assertCaseEnded(caseInstanceId);
 
     repositoryService.deleteDeployment(deploymentId, true);
@@ -247,7 +244,7 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
 
     assertEquals(2, repositoryService.createProcessDefinitionQuery().count());
 
-    String caseInstanceId = createCaseInstance(ONE_PROCESS_TASK_CASE).getId();
+    String caseInstanceId = createCaseInstanceByKey(ONE_PROCESS_TASK_CASE).getId();
     String processTaskId = queryCaseExecutionByActivityId(PROCESS_TASK).getId();
 
     // latest process definition
@@ -287,7 +284,7 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
     taskService.complete(task.getId());
     assertProcessEnded(processInstance.getId());
 
-    closeCaseInstance(caseInstanceId);
+    close(caseInstanceId);
     assertCaseEnded(caseInstanceId);
 
     repositoryService.deleteDeployment(deploymentId, true);
@@ -313,7 +310,7 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
 
     assertEquals(3, repositoryService.createProcessDefinitionQuery().count());
 
-    String caseInstanceId = createCaseInstance(ONE_PROCESS_TASK_CASE).getId();
+    String caseInstanceId = createCaseInstanceByKey(ONE_PROCESS_TASK_CASE).getId();
     String processTaskId = queryCaseExecutionByActivityId(PROCESS_TASK).getId();
 
     // latest process definition
@@ -353,7 +350,7 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
     taskService.complete(task.getId());
     assertProcessEnded(processInstance.getId());
 
-    closeCaseInstance(caseInstanceId);
+    close(caseInstanceId);
     assertCaseEnded(caseInstanceId);
 
     repositoryService.deleteDeployment(secondDeploymentId, true);
@@ -381,7 +378,7 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
 
     assertEquals(3, repositoryService.createProcessDefinitionQuery().count());
 
-    String caseInstanceId = createCaseInstance(ONE_PROCESS_TASK_CASE).getId();
+    String caseInstanceId = createCaseInstanceByKey(ONE_PROCESS_TASK_CASE).getId();
     String processTaskId = queryCaseExecutionByActivityId(PROCESS_TASK).getId();
 
     // latest process definition
@@ -422,7 +419,7 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
     taskService.complete(task.getId());
     assertProcessEnded(processInstance.getId());
 
-    closeCaseInstance(caseInstanceId);
+    close(caseInstanceId);
     assertCaseEnded(caseInstanceId);
 
     repositoryService.deleteDeployment(secondDeploymentId, true);
@@ -450,7 +447,7 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
 
     assertEquals(3, repositoryService.createProcessDefinitionQuery().count());
 
-    String caseInstanceId = createCaseInstance(ONE_PROCESS_TASK_CASE).getId();
+    String caseInstanceId = createCaseInstanceByKey(ONE_PROCESS_TASK_CASE).getId();
     String processTaskId = queryCaseExecutionByActivityId(PROCESS_TASK).getId();
 
     // latest process definition
@@ -491,7 +488,7 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
     taskService.complete(task.getId());
     assertProcessEnded(processInstance.getId());
 
-    closeCaseInstance(caseInstanceId);
+    close(caseInstanceId);
     assertCaseEnded(caseInstanceId);
 
     repositoryService.deleteDeployment(secondDeploymentId, true);
@@ -505,7 +502,7 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
   public void testInputBusinessKey() {
     // given
     String businessKey = "myBusinessKey";
-    String caseInstanceId = createCaseInstance(ONE_PROCESS_TASK_CASE, businessKey).getId();
+    String caseInstanceId = createCaseInstanceByKey(ONE_PROCESS_TASK_CASE, businessKey).getId();
     String processTaskId = queryCaseExecutionByActivityId(PROCESS_TASK).getId();
 
     // when
@@ -538,7 +535,7 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
     taskService.complete(task.getId());
     assertProcessEnded(processInstance.getId());
 
-    closeCaseInstance(caseInstanceId);
+    close(caseInstanceId);
     assertCaseEnded(caseInstanceId);
 
   }
@@ -550,7 +547,7 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
   public void testInputDifferentBusinessKey() {
     // given
     String businessKey = "myBusinessKey";
-    String caseInstanceId = createCaseInstance(ONE_PROCESS_TASK_CASE, businessKey).getId();
+    String caseInstanceId = createCaseInstanceByKey(ONE_PROCESS_TASK_CASE, businessKey).getId();
     String processTaskId = queryCaseExecutionByActivityId(PROCESS_TASK).getId();
 
     // when
@@ -585,7 +582,7 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
     taskService.complete(task.getId());
     assertProcessEnded(processInstance.getId());
 
-    closeCaseInstance(caseInstanceId);
+    close(caseInstanceId);
     assertCaseEnded(caseInstanceId);
 
   }
@@ -596,7 +593,7 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
     })
   public void testInputSource() {
     // given
-    String caseInstanceId = createCaseInstance(ONE_PROCESS_TASK_CASE).getId();
+    String caseInstanceId = createCaseInstanceByKey(ONE_PROCESS_TASK_CASE).getId();
     String processTaskId = queryCaseExecutionByActivityId(PROCESS_TASK).getId();
 
     // when
@@ -639,7 +636,7 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
     taskService.complete(queryTask().getId());
     assertProcessEnded(processInstance.getId());
 
-    closeCaseInstance(caseInstanceId);
+    close(caseInstanceId);
     assertCaseEnded(caseInstanceId);
 
   }
@@ -650,7 +647,7 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
     })
   public void testInputSourceDifferentTarget() {
     // given
-    String caseInstanceId = createCaseInstance(ONE_PROCESS_TASK_CASE).getId();
+    String caseInstanceId = createCaseInstanceByKey(ONE_PROCESS_TASK_CASE).getId();
     String processTaskId = queryCaseExecutionByActivityId(PROCESS_TASK).getId();
 
     // when
@@ -693,7 +690,7 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
     taskService.complete(queryTask().getId());
     assertProcessEnded(processInstance.getId());
 
-    closeCaseInstance(caseInstanceId);
+    close(caseInstanceId);
     assertCaseEnded(caseInstanceId);
 
   }
@@ -704,7 +701,7 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
     })
   public void testInputSourceNullValue() {
     // given
-    String caseInstanceId = createCaseInstance(ONE_PROCESS_TASK_CASE).getId();
+    String caseInstanceId = createCaseInstanceByKey(ONE_PROCESS_TASK_CASE).getId();
     String processTaskId = queryCaseExecutionByActivityId(PROCESS_TASK).getId();
 
     // when
@@ -741,7 +738,7 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
     taskService.complete(queryTask().getId());
     assertProcessEnded(processInstance.getId());
 
-    closeCaseInstance(caseInstanceId);
+    close(caseInstanceId);
     assertCaseEnded(caseInstanceId);
 
   }
@@ -752,7 +749,7 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
     })
   public void testInputSourceExpression() {
     // given
-    String caseInstanceId = createCaseInstance(ONE_PROCESS_TASK_CASE).getId();
+    String caseInstanceId = createCaseInstanceByKey(ONE_PROCESS_TASK_CASE).getId();
     String processTaskId = queryCaseExecutionByActivityId(PROCESS_TASK).getId();
 
     // when
@@ -794,7 +791,7 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
     taskService.complete(queryTask().getId());
     assertProcessEnded(processInstance.getId());
 
-    closeCaseInstance(caseInstanceId);
+    close(caseInstanceId);
     assertCaseEnded(caseInstanceId);
 
   }
@@ -805,7 +802,7 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
     })
   public void testInputAll() {
     // given
-    String caseInstanceId = createCaseInstance(ONE_PROCESS_TASK_CASE).getId();
+    String caseInstanceId = createCaseInstanceByKey(ONE_PROCESS_TASK_CASE).getId();
     String processTaskId = queryCaseExecutionByActivityId(PROCESS_TASK).getId();
 
     // when
@@ -847,7 +844,7 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
     taskService.complete(queryTask().getId());
     assertProcessEnded(processInstance.getId());
 
-    closeCaseInstance(caseInstanceId);
+    close(caseInstanceId);
     assertCaseEnded(caseInstanceId);
 
   }
@@ -860,7 +857,7 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
   public void testInputOverlapping() {
     // specifics should override "all"
     // given
-    String caseInstanceId = createCaseInstance(ONE_PROCESS_TASK_CASE).getId();
+    String caseInstanceId = createCaseInstanceByKey(ONE_PROCESS_TASK_CASE).getId();
     String processTaskId = queryCaseExecutionByActivityId(PROCESS_TASK).getId();
 
     // when
@@ -902,7 +899,7 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
     taskService.complete(queryTask().getId());
     assertProcessEnded(processInstance.getId());
 
-    closeCaseInstance(caseInstanceId);
+    close(caseInstanceId);
     assertCaseEnded(caseInstanceId);
 
   }
@@ -912,7 +909,7 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
     })
   public void testProcessNotFound() {
     // given
-    String caseInstanceId = createCaseInstance(ONE_PROCESS_TASK_CASE).getId();
+    String caseInstanceId = createCaseInstanceByKey(ONE_PROCESS_TASK_CASE).getId();
     String processTaskId = queryCaseExecutionByActivityId(PROCESS_TASK).getId();
 
     try {
@@ -926,7 +923,7 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
     // complete //////////////////////////////////////////////////////////
 
     terminate(caseInstanceId);
-    closeCaseInstance(caseInstanceId);
+    close(caseInstanceId);
 
   }
 
@@ -936,7 +933,7 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
     })
   public void testCompleteSimpleProcess() {
     // given
-    String caseInstanceId = createCaseInstance(ONE_PROCESS_TASK_CASE).getId();
+    String caseInstanceId = createCaseInstanceByKey(ONE_PROCESS_TASK_CASE).getId();
     String processTaskId = queryCaseExecutionByActivityId(PROCESS_TASK).getId();
 
     caseService
@@ -961,7 +958,7 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
 
     // complete ////////////////////////////////////////////////////////
 
-    closeCaseInstance(caseInstanceId);
+    close(caseInstanceId);
     assertCaseEnded(caseInstanceId);
 
   }
@@ -972,7 +969,7 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
     })
   public void testOutputSource() {
     // given
-    String caseInstanceId = createCaseInstance(ONE_PROCESS_TASK_CASE).getId();
+    String caseInstanceId = createCaseInstanceByKey(ONE_PROCESS_TASK_CASE).getId();
     String processTaskId = queryCaseExecutionByActivityId(PROCESS_TASK).getId();
 
     caseService
@@ -1017,7 +1014,7 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
 
     assertProcessEnded(processInstanceId);
 
-    closeCaseInstance(caseInstanceId);
+    close(caseInstanceId);
     assertCaseEnded(caseInstanceId);
 
   }
@@ -1028,7 +1025,7 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
     })
   public void testOutputSourceDifferentTarget() {
     // given
-    String caseInstanceId = createCaseInstance(ONE_PROCESS_TASK_CASE).getId();
+    String caseInstanceId = createCaseInstanceByKey(ONE_PROCESS_TASK_CASE).getId();
     String processTaskId = queryCaseExecutionByActivityId(PROCESS_TASK).getId();
 
     caseService
@@ -1072,7 +1069,7 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
 
     assertProcessEnded(processInstanceId);
 
-    closeCaseInstance(caseInstanceId);
+    close(caseInstanceId);
     assertCaseEnded(caseInstanceId);
 
   }
@@ -1083,7 +1080,7 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
     })
   public void testOutputSourceNullValue() {
     // given
-    String caseInstanceId = createCaseInstance(ONE_PROCESS_TASK_CASE).getId();
+    String caseInstanceId = createCaseInstanceByKey(ONE_PROCESS_TASK_CASE).getId();
     String processTaskId = queryCaseExecutionByActivityId(PROCESS_TASK).getId();
 
     caseService
@@ -1110,7 +1107,7 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
     for (VariableInstance variable : variables) {
       String name = variable.getName();
       if (!"aVariable".equals(name) && !"anotherVariable".equals(name)) {
-        fail("Found an unexpected variable: '"+name+"'");
+        fail("Found an unexpected variable: '" + name + "'");
       }
 
       assertNull(variable.getValue());
@@ -1120,7 +1117,7 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
 
     assertProcessEnded(processInstanceId);
 
-    closeCaseInstance(caseInstanceId);
+    close(caseInstanceId);
     assertCaseEnded(caseInstanceId);
 
   }
@@ -1131,7 +1128,7 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
     })
   public void testOutputSourceExpression() {
     // given
-    String caseInstanceId = createCaseInstance(ONE_PROCESS_TASK_CASE).getId();
+    String caseInstanceId = createCaseInstanceByKey(ONE_PROCESS_TASK_CASE).getId();
     String processTaskId = queryCaseExecutionByActivityId(PROCESS_TASK).getId();
 
     caseService
@@ -1175,7 +1172,7 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
 
     assertProcessEnded(processInstanceId);
 
-    closeCaseInstance(caseInstanceId);
+    close(caseInstanceId);
     assertCaseEnded(caseInstanceId);
 
   }
@@ -1186,7 +1183,7 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
     })
   public void testOutputAll() {
     // given
-    String caseInstanceId = createCaseInstance(ONE_PROCESS_TASK_CASE).getId();
+    String caseInstanceId = createCaseInstanceByKey(ONE_PROCESS_TASK_CASE).getId();
     String processTaskId = queryCaseExecutionByActivityId(PROCESS_TASK).getId();
 
     caseService
@@ -1230,7 +1227,7 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
 
     assertProcessEnded(processInstanceId);
 
-    closeCaseInstance(caseInstanceId);
+    close(caseInstanceId);
     assertCaseEnded(caseInstanceId);
 
   }
@@ -1241,7 +1238,7 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
     })
   public void testOutputOverlapping() {
     // given
-    String caseInstanceId = createCaseInstance(ONE_PROCESS_TASK_CASE).getId();
+    String caseInstanceId = createCaseInstanceByKey(ONE_PROCESS_TASK_CASE).getId();
     String processTaskId = queryCaseExecutionByActivityId(PROCESS_TASK).getId();
 
     caseService
@@ -1285,7 +1282,7 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
 
     assertProcessEnded(processInstanceId);
 
-    closeCaseInstance(caseInstanceId);
+    close(caseInstanceId);
     assertCaseEnded(caseInstanceId);
 
   }
@@ -1296,7 +1293,7 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
     })
   public void testOutputVariablesShouldNotExistAnymore() {
     // given
-    String caseInstanceId = createCaseInstance(ONE_PROCESS_TASK_CASE).getId();
+    String caseInstanceId = createCaseInstanceByKey(ONE_PROCESS_TASK_CASE).getId();
     String processTaskId = queryCaseExecutionByActivityId(PROCESS_TASK).getId();
 
     caseService
@@ -1331,7 +1328,7 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
 
     assertProcessEnded(processInstanceId);
 
-    closeCaseInstance(caseInstanceId);
+    close(caseInstanceId);
     assertCaseEnded(caseInstanceId);
 
   }
@@ -1342,7 +1339,7 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
     })
   public void testVariablesRoundtrip() {
     // given
-    String caseInstanceId = createCaseInstance(ONE_PROCESS_TASK_CASE).getId();
+    String caseInstanceId = createCaseInstanceByKey(ONE_PROCESS_TASK_CASE).getId();
     String processTaskId = queryCaseExecutionByActivityId(PROCESS_TASK).getId();
 
     caseService
@@ -1389,7 +1386,7 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
 
     assertProcessEnded(processInstanceId);
 
-    closeCaseInstance(caseInstanceId);
+    close(caseInstanceId);
     assertCaseEnded(caseInstanceId);
 
   }
@@ -1400,7 +1397,7 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
     })
   public void testCompleteProcessTask() {
     // given
-    String caseInstanceId = createCaseInstance(ONE_PROCESS_TASK_CASE).getId();
+    String caseInstanceId = createCaseInstanceByKey(ONE_PROCESS_TASK_CASE).getId();
     String processTaskId = queryCaseExecutionByActivityId(PROCESS_TASK).getId();
 
     caseService
@@ -1424,7 +1421,7 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
     taskService.complete(taskId);
     assertProcessEnded(processInstanceId);
 
-    closeCaseInstance(caseInstanceId);
+    close(caseInstanceId);
     assertCaseEnded(caseInstanceId);
 
   }
@@ -1435,7 +1432,7 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
     })
   public void testCompleteProcessTaskAfterTerminateSubProcessInstance() {
     // given
-    String caseInstanceId = createCaseInstance(ONE_PROCESS_TASK_CASE).getId();
+    String caseInstanceId = createCaseInstanceByKey(ONE_PROCESS_TASK_CASE).getId();
     String processTaskId = queryCaseExecutionByActivityId(PROCESS_TASK).getId();
 
     caseService
@@ -1460,7 +1457,7 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
     // complete ////////////////////////////////////////////////////////
 
     terminate(caseInstanceId);
-    closeCaseInstance(caseInstanceId);
+    close(caseInstanceId);
     assertCaseEnded(caseInstanceId);
 
   }
@@ -1471,7 +1468,7 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
     })
   public void testTerminateProcessTask() {
     // given
-    String caseInstanceId = createCaseInstance(ONE_PROCESS_TASK_CASE).getId();
+    String caseInstanceId = createCaseInstanceByKey(ONE_PROCESS_TASK_CASE).getId();
     String processTaskId = queryCaseExecutionByActivityId(PROCESS_TASK).getId();
 
     caseService
@@ -1490,7 +1487,7 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
 
     // complete ////////////////////////////////////////////////////////
 
-    closeCaseInstance(caseInstanceId);
+    close(caseInstanceId);
     assertCaseEnded(caseInstanceId);
 
     Task task = taskService.createTaskQuery().singleResult();
@@ -1506,7 +1503,7 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
     })
   public void testTerminateSubProcessInstance() {
     // given
-    String caseInstanceId = createCaseInstance(ONE_PROCESS_TASK_CASE).getId();
+    String caseInstanceId = createCaseInstanceByKey(ONE_PROCESS_TASK_CASE).getId();
     String processTaskId = queryCaseExecutionByActivityId(PROCESS_TASK).getId();
 
     caseService
@@ -1533,7 +1530,7 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
     // complete ////////////////////////////////////////////////////////
 
     terminate(caseInstanceId);
-    closeCaseInstance(caseInstanceId);
+    close(caseInstanceId);
     assertCaseEnded(caseInstanceId);
 
   }
@@ -1544,7 +1541,7 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
     })
   public void testSuspendProcessTask() {
     // given
-    String caseInstanceId = createCaseInstance(ONE_PROCESS_TASK_CASE).getId();
+    String caseInstanceId = createCaseInstanceByKey(ONE_PROCESS_TASK_CASE).getId();
     String processTaskId = queryCaseExecutionByActivityId(PROCESS_TASK).getId();
 
     caseService
@@ -1568,7 +1565,7 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
 
     resume(processTaskId);
     terminate(caseInstanceId);
-    closeCaseInstance(caseInstanceId);
+    close(caseInstanceId);
     assertCaseEnded(caseInstanceId);
 
     taskService.complete(task.getId());
@@ -1581,7 +1578,7 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
     })
   public void testSuspendSubProcessInstance() {
     // given
-    String caseInstanceId = createCaseInstance(ONE_PROCESS_TASK_CASE).getId();
+    String caseInstanceId = createCaseInstanceByKey(ONE_PROCESS_TASK_CASE).getId();
     String processTaskId = queryCaseExecutionByActivityId(PROCESS_TASK).getId();
 
     caseService
@@ -1611,7 +1608,7 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
     taskService.complete(taskId);
     assertProcessEnded(processInstanceId);
 
-    closeCaseInstance(caseInstanceId);
+    close(caseInstanceId);
     assertCaseEnded(caseInstanceId);
 
   }
@@ -1622,7 +1619,7 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
     })
   public void testResumeProcessTask() {
     // given
-    String caseInstanceId = createCaseInstance(ONE_PROCESS_TASK_CASE).getId();
+    String caseInstanceId = createCaseInstanceByKey(ONE_PROCESS_TASK_CASE).getId();
     String processTaskId = queryCaseExecutionByActivityId(PROCESS_TASK).getId();
 
     caseService
@@ -1653,7 +1650,7 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
     taskService.complete(taskId);
     assertProcessEnded(processInstance.getId());
 
-    closeCaseInstance(caseInstanceId);
+    close(caseInstanceId);
     assertCaseEnded(caseInstanceId);
 
   }
@@ -1664,7 +1661,7 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
     })
   public void testNonBlockingProcessTask() {
     // given
-    String caseInstanceId = createCaseInstance(ONE_PROCESS_TASK_CASE).getId();
+    String caseInstanceId = createCaseInstanceByKey(ONE_PROCESS_TASK_CASE).getId();
     String processTaskId = queryCaseExecutionByActivityId(PROCESS_TASK).getId();
 
     // when
@@ -1690,7 +1687,7 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
 
     // complete ////////////////////////////////////////////////////////
 
-    closeCaseInstance(caseInstanceId);
+    close(caseInstanceId);
     assertCaseEnded(caseInstanceId);
 
     String taskId = queryTask().getId();
@@ -1705,7 +1702,7 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
     })
   public void testProcessInstanceCompletesInOneGo() {
     // given
-    String caseInstanceId = createCaseInstance(ONE_PROCESS_TASK_CASE).getId();
+    String caseInstanceId = createCaseInstanceByKey(ONE_PROCESS_TASK_CASE).getId();
     String processTaskId = queryCaseExecutionByActivityId(PROCESS_TASK).getId();
 
     // when
@@ -1728,7 +1725,7 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
 
     // complete ////////////////////////////////////////////////////////
 
-    closeCaseInstance(caseInstanceId);
+    close(caseInstanceId);
     assertCaseEnded(caseInstanceId);
   }
 
@@ -1738,7 +1735,7 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
     })
   public void testNonBlockingProcessTaskAndProcessInstanceCompletesInOneGo() {
     // given
-    String caseInstanceId = createCaseInstance(ONE_PROCESS_TASK_CASE).getId();
+    String caseInstanceId = createCaseInstanceByKey(ONE_PROCESS_TASK_CASE).getId();
     String processTaskId = queryCaseExecutionByActivityId(PROCESS_TASK).getId();
 
     // when
@@ -1761,7 +1758,7 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
 
     // complete ////////////////////////////////////////////////////////
 
-    closeCaseInstance(caseInstanceId);
+    close(caseInstanceId);
     assertCaseEnded(caseInstanceId);
   }
 
@@ -1771,7 +1768,7 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
     })
   public void testStartProcessInstanceAsync() {
     // given
-    String caseInstanceId = createCaseInstance(ONE_PROCESS_TASK_CASE).getId();
+    String caseInstanceId = createCaseInstanceByKey(ONE_PROCESS_TASK_CASE).getId();
     String processTaskId = queryCaseExecutionByActivityId(PROCESS_TASK).getId();
 
     // when
@@ -1789,26 +1786,8 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
     // complete ////////////////////////////////////////////////////////
 
     managementService.executeJob(job.getId());
-    closeCaseInstance(caseInstanceId);
+    close(caseInstanceId);
     assertCaseEnded(caseInstanceId);
-  }
-
-  protected CaseInstance createCaseInstance(String caseDefinitionKey) {
-    return createCaseInstance(caseDefinitionKey, null);
-  }
-
-  protected CaseInstance createCaseInstance(String caseDefinitionKey, String businessKey) {
-    return caseService
-        .withCaseDefinitionByKey(caseDefinitionKey)
-        .businessKey(businessKey)
-        .create();
-  }
-
-  protected CaseExecution queryCaseExecutionByActivityId(String activityId) {
-    return caseService
-        .createCaseExecutionQuery()
-        .activityId(activityId)
-        .singleResult();
   }
 
   protected ProcessInstance queryProcessInstance() {
@@ -1821,66 +1800,6 @@ public class ProcessTaskTest extends PluggableProcessEngineTestCase {
     return taskService
         .createTaskQuery()
         .singleResult();
-  }
-
-  protected void terminate(final String caseExecutionId) {
-    processEngineConfiguration.
-      getCommandExecutorTxRequired().
-      execute(new Command<Void>() {
-
-        @Override
-        public Void execute(CommandContext commandContext) {
-          CmmnExecution processTask = (CmmnExecution) caseService
-              .createCaseExecutionQuery()
-              .caseExecutionId(caseExecutionId)
-              .singleResult();
-          processTask.terminate();
-          return null;
-        }
-
-      });
-  }
-
-  protected void suspend(final String caseExecutionId) {
-    processEngineConfiguration.
-      getCommandExecutorTxRequired().
-      execute(new Command<Void>() {
-
-        @Override
-        public Void execute(CommandContext commandContext) {
-          CmmnExecution processTask = (CmmnExecution) caseService
-              .createCaseExecutionQuery()
-              .caseExecutionId(caseExecutionId)
-              .singleResult();
-          processTask.suspend();
-          return null;
-        }
-
-      });
-  }
-
-  protected void resume(final String caseExecutionId) {
-    processEngineConfiguration.
-      getCommandExecutorTxRequired().
-      execute(new Command<Void>() {
-
-        @Override
-        public Void execute(CommandContext commandContext) {
-          CmmnExecution processTask = (CmmnExecution) caseService
-              .createCaseExecutionQuery()
-              .caseExecutionId(caseExecutionId)
-              .singleResult();
-          processTask.resume();
-          return null;
-        }
-
-      });
-  }
-
-  protected void closeCaseInstance(String caseInstanceId) {
-    caseService
-      .withCaseExecution(caseInstanceId)
-      .close();
   }
 
 }

@@ -13,10 +13,7 @@
 package org.camunda.bpm.engine.test.cmmn.listener;
 
 import org.camunda.bpm.engine.delegate.CaseExecutionListener;
-import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
-import org.camunda.bpm.engine.impl.interceptor.Command;
-import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.impl.test.CmmnProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.VariableInstanceQuery;
 import org.camunda.bpm.engine.test.Deployment;
 
@@ -24,7 +21,7 @@ import org.camunda.bpm.engine.test.Deployment;
  * @author Roman Smirnov
  *
  */
-public class CaseInstanceListenerTest extends PluggableProcessEngineTestCase {
+public class CaseInstanceListenerTest extends CmmnProcessEngineTestCase {
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testCreateListenerByClass.cmmn"})
   public void testCreateListenerByClass() {
@@ -1020,60 +1017,6 @@ public class CaseInstanceListenerTest extends PluggableProcessEngineTestCase {
       assertTextPresent("couldn't instantiate class org.camunda.bpm.engine.test.cmmn.listener.NotExistingCaseExecutionListener", message);
     }
 
-  }
-
-  protected void terminate(final String caseExecutionId) {
-    processEngineConfiguration
-      .getCommandExecutorTxRequired()
-      .execute(new Command<Void>() {
-
-        @Override
-        public Void execute(CommandContext commandContext) {
-          CmmnExecution caseTask = (CmmnExecution) caseService
-              .createCaseExecutionQuery()
-              .caseExecutionId(caseExecutionId)
-              .singleResult();
-          caseTask.terminate();
-          return null;
-        }
-
-      });
-  }
-
-  protected void suspend(final String caseExecutionId) {
-    processEngineConfiguration
-      .getCommandExecutorTxRequired()
-      .execute(new Command<Void>() {
-
-        @Override
-        public Void execute(CommandContext commandContext) {
-          CmmnExecution caseTask = (CmmnExecution) caseService
-              .createCaseExecutionQuery()
-              .caseExecutionId(caseExecutionId)
-              .singleResult();
-          caseTask.suspend();
-          return null;
-        }
-
-      });
-  }
-
-  protected void reactivate(final String caseExecutionId) {
-    processEngineConfiguration
-      .getCommandExecutorTxRequired()
-      .execute(new Command<Void>() {
-
-        @Override
-        public Void execute(CommandContext commandContext) {
-          CmmnExecution caseTask = (CmmnExecution) caseService
-              .createCaseExecutionQuery()
-              .caseExecutionId(caseExecutionId)
-              .singleResult();
-          caseTask.reactivate();
-          return null;
-        }
-
-      });
   }
 
 }

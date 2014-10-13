@@ -18,9 +18,7 @@ import org.camunda.bpm.engine.exception.NotAllowedException;
 import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
-import org.camunda.bpm.engine.impl.interceptor.Command;
-import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.impl.test.CmmnProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.runtime.VariableInstance;
@@ -31,7 +29,7 @@ import org.camunda.bpm.engine.test.Deployment;
  * @author Roman Smirnov
  *
  */
-public class CaseTaskTest extends PluggableProcessEngineTestCase {
+public class CaseTaskTest extends CmmnProcessEngineTestCase {
 
   protected final String CASE_TASK = "PI_CaseTask_1";
   protected final String ONE_CASE_TASK_CASE = "oneCaseTaskCase";
@@ -43,7 +41,7 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
     })
   public void testCallCaseAsConstant() {
     // given
-    String superCaseInstanceId = createCaseInstance(ONE_CASE_TASK_CASE).getId();
+    String superCaseInstanceId = createCaseInstanceByKey(ONE_CASE_TASK_CASE).getId();
     String caseTaskId = queryCaseExecutionByActivityId(CASE_TASK).getId();
 
     // when
@@ -65,11 +63,11 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
     // complete ////////////////////////////////////////////////////////
 
     terminate(subCaseInstance.getId());
-    closeCaseInstance(subCaseInstance.getId());
+    close(subCaseInstance.getId());
     assertCaseEnded(subCaseInstance.getId());
 
     terminate(caseTaskId);
-    closeCaseInstance(superCaseInstanceId);
+    close(superCaseInstanceId);
     assertCaseEnded(superCaseInstanceId);
 
   }
@@ -81,7 +79,7 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
   public void testCallCaseAsExpressionStartsWithDollar() {
     // given
     // a deployed case definition
-    String superCaseInstanceId = createCaseInstance(ONE_CASE_TASK_CASE).getId();
+    String superCaseInstanceId = createCaseInstanceByKey(ONE_CASE_TASK_CASE).getId();
     String caseTaskId = queryCaseExecutionByActivityId(CASE_TASK).getId();
 
     // when
@@ -104,11 +102,11 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
     // complete ////////////////////////////////////////////////////////
 
     terminate(subCaseInstance.getId());
-    closeCaseInstance(subCaseInstance.getId());
+    close(subCaseInstance.getId());
     assertCaseEnded(subCaseInstance.getId());
 
     terminate(caseTaskId);
-    closeCaseInstance(superCaseInstanceId);
+    close(superCaseInstanceId);
     assertCaseEnded(superCaseInstanceId);
   }
 
@@ -119,7 +117,7 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
   public void testCallCaseAsExpressionStartsWithHash() {
     // given
     // a deployed case definition
-    String superCaseInstanceId = createCaseInstance(ONE_CASE_TASK_CASE).getId();
+    String superCaseInstanceId = createCaseInstanceByKey(ONE_CASE_TASK_CASE).getId();
     String caseTaskId = queryCaseExecutionByActivityId(CASE_TASK).getId();
 
     // when
@@ -142,11 +140,11 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
     // complete ////////////////////////////////////////////////////////
 
     terminate(subCaseInstance.getId());
-    closeCaseInstance(subCaseInstance.getId());
+    close(subCaseInstance.getId());
     assertCaseEnded(subCaseInstance.getId());
 
     terminate(caseTaskId);
-    closeCaseInstance(superCaseInstanceId);
+    close(superCaseInstanceId);
     assertCaseEnded(superCaseInstanceId);
   }
 
@@ -165,7 +163,7 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
 
     assertEquals(3, repositoryService.createCaseDefinitionQuery().count());
 
-    String superCaseInstanceId = createCaseInstance(ONE_CASE_TASK_CASE).getId();
+    String superCaseInstanceId = createCaseInstanceByKey(ONE_CASE_TASK_CASE).getId();
     String caseTaskId = queryCaseExecutionByActivityId(CASE_TASK).getId();
 
     String latestCaseDefinitionId = repositoryService
@@ -195,11 +193,11 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
     // complete ////////////////////////////////////////////////////////
 
     terminate(subCaseInstance.getId());
-    closeCaseInstance(subCaseInstance.getId());
+    close(subCaseInstance.getId());
     assertCaseEnded(subCaseInstance.getId());
 
     terminate(caseTaskId);
-    closeCaseInstance(superCaseInstanceId);
+    close(superCaseInstanceId);
     assertCaseEnded(superCaseInstanceId);
 
     repositoryService.deleteDeployment(deploymentId, true);
@@ -225,7 +223,7 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
 
     assertEquals(3, repositoryService.createCaseDefinitionQuery().count());
 
-    String superCaseInstanceId = createCaseInstance(ONE_CASE_TASK_CASE).getId();
+    String superCaseInstanceId = createCaseInstanceByKey(ONE_CASE_TASK_CASE).getId();
     String caseTaskId = queryCaseExecutionByActivityId(CASE_TASK).getId();
 
     String caseDefinitionIdInSameDeployment = repositoryService
@@ -255,11 +253,11 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
     // complete ////////////////////////////////////////////////////////
 
     terminate(subCaseInstance.getId());
-    closeCaseInstance(subCaseInstance.getId());
+    close(subCaseInstance.getId());
     assertCaseEnded(subCaseInstance.getId());
 
     terminate(caseTaskId);
-    closeCaseInstance(superCaseInstanceId);
+    close(superCaseInstanceId);
     assertCaseEnded(superCaseInstanceId);
 
     repositoryService.deleteDeployment(deploymentId, true);
@@ -285,7 +283,7 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
 
     assertEquals(4, repositoryService.createCaseDefinitionQuery().count());
 
-    String superCaseInstanceId = createCaseInstance(ONE_CASE_TASK_CASE).getId();
+    String superCaseInstanceId = createCaseInstanceByKey(ONE_CASE_TASK_CASE).getId();
     String caseTaskId = queryCaseExecutionByActivityId(CASE_TASK).getId();
 
     String caseDefinitionIdInSecondDeployment = repositoryService
@@ -315,11 +313,11 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
     // complete ////////////////////////////////////////////////////////
 
     terminate(subCaseInstance.getId());
-    closeCaseInstance(subCaseInstance.getId());
+    close(subCaseInstance.getId());
     assertCaseEnded(subCaseInstance.getId());
 
     terminate(caseTaskId);
-    closeCaseInstance(superCaseInstanceId);
+    close(superCaseInstanceId);
     assertCaseEnded(superCaseInstanceId);
 
     repositoryService.deleteDeployment(secondDeploymentId, true);
@@ -347,7 +345,7 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
 
     assertEquals(4, repositoryService.createCaseDefinitionQuery().count());
 
-    String superCaseInstanceId = createCaseInstance(ONE_CASE_TASK_CASE).getId();
+    String superCaseInstanceId = createCaseInstanceByKey(ONE_CASE_TASK_CASE).getId();
     String caseTaskId = queryCaseExecutionByActivityId(CASE_TASK).getId();
 
     String caseDefinitionIdInSecondDeployment = repositoryService
@@ -378,11 +376,11 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
     // complete ////////////////////////////////////////////////////////
 
     terminate(subCaseInstance.getId());
-    closeCaseInstance(subCaseInstance.getId());
+    close(subCaseInstance.getId());
     assertCaseEnded(subCaseInstance.getId());
 
     terminate(caseTaskId);
-    closeCaseInstance(superCaseInstanceId);
+    close(superCaseInstanceId);
     assertCaseEnded(superCaseInstanceId);
 
     repositoryService.deleteDeployment(secondDeploymentId, true);
@@ -410,7 +408,7 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
 
     assertEquals(4, repositoryService.createCaseDefinitionQuery().count());
 
-    String superCaseInstanceId = createCaseInstance(ONE_CASE_TASK_CASE).getId();
+    String superCaseInstanceId = createCaseInstanceByKey(ONE_CASE_TASK_CASE).getId();
     String caseTaskId = queryCaseExecutionByActivityId(CASE_TASK).getId();
 
     String caseDefinitionIdInSecondDeployment = repositoryService
@@ -441,11 +439,11 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
     // complete ////////////////////////////////////////////////////////
 
     terminate(subCaseInstance.getId());
-    closeCaseInstance(subCaseInstance.getId());
+    close(subCaseInstance.getId());
     assertCaseEnded(subCaseInstance.getId());
 
     terminate(caseTaskId);
-    closeCaseInstance(superCaseInstanceId);
+    close(superCaseInstanceId);
     assertCaseEnded(superCaseInstanceId);
 
     repositoryService.deleteDeployment(secondDeploymentId, true);
@@ -459,7 +457,7 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
   public void testInputBusinessKey() {
     // given
     String businessKey = "myBusinessKey";
-    String superCaseInstanceId = createCaseInstance(ONE_CASE_TASK_CASE, businessKey).getId();
+    String superCaseInstanceId = createCaseInstanceByKey(ONE_CASE_TASK_CASE, businessKey).getId();
     String caseTaskId = queryCaseExecutionByActivityId(CASE_TASK).getId();
 
     // when
@@ -482,11 +480,11 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
     // complete ////////////////////////////////////////////////////////
 
     terminate(subCaseInstance.getId());
-    closeCaseInstance(subCaseInstance.getId());
+    close(subCaseInstance.getId());
     assertCaseEnded(subCaseInstance.getId());
 
     terminate(caseTaskId);
-    closeCaseInstance(superCaseInstanceId);
+    close(superCaseInstanceId);
     assertCaseEnded(superCaseInstanceId);
 
   }
@@ -498,7 +496,7 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
   public void testInputDifferentBusinessKey() {
     // given
     String businessKey = "myBusinessKey";
-    String superCaseInstanceId = createCaseInstance(ONE_CASE_TASK_CASE, businessKey).getId();
+    String superCaseInstanceId = createCaseInstanceByKey(ONE_CASE_TASK_CASE, businessKey).getId();
     String caseTaskId = queryCaseExecutionByActivityId(CASE_TASK).getId();
 
     // when
@@ -522,11 +520,11 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
     // complete ////////////////////////////////////////////////////////
 
     terminate(subCaseInstance.getId());
-    closeCaseInstance(subCaseInstance.getId());
+    close(subCaseInstance.getId());
     assertCaseEnded(subCaseInstance.getId());
 
     terminate(caseTaskId);
-    closeCaseInstance(superCaseInstanceId);
+    close(superCaseInstanceId);
     assertCaseEnded(superCaseInstanceId);
 
   }
@@ -537,7 +535,7 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
     })
   public void testInputSource() {
     // given
-    String superCaseInstanceId = createCaseInstance(ONE_CASE_TASK_CASE).getId();
+    String superCaseInstanceId = createCaseInstanceByKey(ONE_CASE_TASK_CASE).getId();
     String caseTaskId = queryCaseExecutionByActivityId(CASE_TASK).getId();
 
     // when
@@ -577,11 +575,11 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
     // complete ////////////////////////////////////////////////////////
 
     terminate(subCaseInstance.getId());
-    closeCaseInstance(subCaseInstance.getId());
+    close(subCaseInstance.getId());
     assertCaseEnded(subCaseInstance.getId());
 
     terminate(caseTaskId);
-    closeCaseInstance(superCaseInstanceId);
+    close(superCaseInstanceId);
     assertCaseEnded(superCaseInstanceId);
 
   }
@@ -592,7 +590,7 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
     })
   public void testInputSourceDifferentTarget() {
     // given
-    String superCaseInstanceId = createCaseInstance(ONE_CASE_TASK_CASE).getId();
+    String superCaseInstanceId = createCaseInstanceByKey(ONE_CASE_TASK_CASE).getId();
     String caseTaskId = queryCaseExecutionByActivityId(CASE_TASK).getId();
 
     // when
@@ -631,11 +629,11 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
     // complete ////////////////////////////////////////////////////////
 
     terminate(subCaseInstance.getId());
-    closeCaseInstance(subCaseInstance.getId());
+    close(subCaseInstance.getId());
     assertCaseEnded(subCaseInstance.getId());
 
     terminate(caseTaskId);
-    closeCaseInstance(superCaseInstanceId);
+    close(superCaseInstanceId);
     assertCaseEnded(superCaseInstanceId);
 
   }
@@ -646,7 +644,7 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
     })
   public void testInputSourceNullValue() {
     // given
-    String superCaseInstanceId = createCaseInstance(ONE_CASE_TASK_CASE).getId();
+    String superCaseInstanceId = createCaseInstanceByKey(ONE_CASE_TASK_CASE).getId();
     String caseTaskId = queryCaseExecutionByActivityId(CASE_TASK).getId();
 
     // when
@@ -684,11 +682,11 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
     // complete ////////////////////////////////////////////////////////
 
     terminate(subCaseInstance.getId());
-    closeCaseInstance(subCaseInstance.getId());
+    close(subCaseInstance.getId());
     assertCaseEnded(subCaseInstance.getId());
 
     terminate(caseTaskId);
-    closeCaseInstance(superCaseInstanceId);
+    close(superCaseInstanceId);
     assertCaseEnded(superCaseInstanceId);
   }
 
@@ -698,7 +696,7 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
     })
   public void testInputSourceExpression() {
     // given
-    String superCaseInstanceId = createCaseInstance(ONE_CASE_TASK_CASE).getId();
+    String superCaseInstanceId = createCaseInstanceByKey(ONE_CASE_TASK_CASE).getId();
     String caseTaskId = queryCaseExecutionByActivityId(CASE_TASK).getId();
 
     // when
@@ -737,11 +735,11 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
     // complete ////////////////////////////////////////////////////////
 
     terminate(subCaseInstance.getId());
-    closeCaseInstance(subCaseInstance.getId());
+    close(subCaseInstance.getId());
     assertCaseEnded(subCaseInstance.getId());
 
     terminate(caseTaskId);
-    closeCaseInstance(superCaseInstanceId);
+    close(superCaseInstanceId);
     assertCaseEnded(superCaseInstanceId);
   }
 
@@ -751,7 +749,7 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
     })
   public void testInputAll() {
     // given
-    String superCaseInstanceId = createCaseInstance(ONE_CASE_TASK_CASE).getId();
+    String superCaseInstanceId = createCaseInstanceByKey(ONE_CASE_TASK_CASE).getId();
     String caseTaskId = queryCaseExecutionByActivityId(CASE_TASK).getId();
 
     // when
@@ -790,11 +788,11 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
     // complete ////////////////////////////////////////////////////////
 
     terminate(subCaseInstance.getId());
-    closeCaseInstance(subCaseInstance.getId());
+    close(subCaseInstance.getId());
     assertCaseEnded(subCaseInstance.getId());
 
     terminate(caseTaskId);
-    closeCaseInstance(superCaseInstanceId);
+    close(superCaseInstanceId);
     assertCaseEnded(superCaseInstanceId);
 
   }
@@ -804,7 +802,7 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
     })
   public void testCaseNotFound() {
     // given
-    String superCaseInstanceId = createCaseInstance(ONE_CASE_TASK_CASE).getId();
+    String superCaseInstanceId = createCaseInstanceByKey(ONE_CASE_TASK_CASE).getId();
     String caseTaskId = queryCaseExecutionByActivityId(CASE_TASK).getId();
 
     try {
@@ -820,7 +818,7 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
     caseService
       .withCaseExecution(caseTaskId)
       .disable();
-    closeCaseInstance(superCaseInstanceId);
+    close(superCaseInstanceId);
 
   }
 
@@ -830,7 +828,7 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
     })
   public void testCompleteSimpleCase() {
     // given
-    String superCaseInstanceId = createCaseInstance(ONE_CASE_TASK_CASE).getId();
+    String superCaseInstanceId = createCaseInstanceByKey(ONE_CASE_TASK_CASE).getId();
     String caseTaskId = queryCaseExecutionByActivityId(CASE_TASK).getId();
 
     caseService
@@ -856,10 +854,10 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
 
     // complete ////////////////////////////////////////////////////////
 
-    closeCaseInstance(subCaseInstanceId);
+    close(subCaseInstanceId);
     assertCaseEnded(subCaseInstanceId);
 
-    closeCaseInstance(superCaseInstanceId);
+    close(superCaseInstanceId);
     assertCaseEnded(superCaseInstanceId);
 
   }
@@ -870,7 +868,7 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
     })
   public void testOutputSource() {
     // given
-    String superCaseInstanceId = createCaseInstance(ONE_CASE_TASK_CASE).getId();
+    String superCaseInstanceId = createCaseInstanceByKey(ONE_CASE_TASK_CASE).getId();
     String caseTaskId = queryCaseExecutionByActivityId(CASE_TASK).getId();
 
     caseService
@@ -925,7 +923,7 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
 
     // complete ////////////////////////////////////////////////////////
 
-    closeCaseInstance(superCaseInstanceId);
+    close(superCaseInstanceId);
     assertCaseEnded(superCaseInstanceId);
 
   }
@@ -936,7 +934,7 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
     })
   public void testOutputSourceDifferentTarget() {
     // given
-    String superCaseInstanceId = createCaseInstance(ONE_CASE_TASK_CASE).getId();
+    String superCaseInstanceId = createCaseInstanceByKey(ONE_CASE_TASK_CASE).getId();
     String caseTaskId = queryCaseExecutionByActivityId(CASE_TASK).getId();
 
     caseService
@@ -990,7 +988,7 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
 
     // complete ////////////////////////////////////////////////////////
 
-    closeCaseInstance(superCaseInstanceId);
+    close(superCaseInstanceId);
     assertCaseEnded(superCaseInstanceId);
 
   }
@@ -1001,7 +999,7 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
     })
   public void testOutputSourceNullValue() {
     // given
-    String superCaseInstanceId = createCaseInstance(ONE_CASE_TASK_CASE).getId();
+    String superCaseInstanceId = createCaseInstanceByKey(ONE_CASE_TASK_CASE).getId();
     String caseTaskId = queryCaseExecutionByActivityId(CASE_TASK).getId();
 
     caseService
@@ -1048,7 +1046,7 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
 
     // complete ////////////////////////////////////////////////////////
 
-    closeCaseInstance(superCaseInstanceId);
+    close(superCaseInstanceId);
     assertCaseEnded(superCaseInstanceId);
 
   }
@@ -1059,7 +1057,7 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
     })
   public void testOutputSourceExpression() {
     // given
-    String superCaseInstanceId = createCaseInstance(ONE_CASE_TASK_CASE).getId();
+    String superCaseInstanceId = createCaseInstanceByKey(ONE_CASE_TASK_CASE).getId();
     String caseTaskId = queryCaseExecutionByActivityId(CASE_TASK).getId();
 
     caseService
@@ -1113,7 +1111,7 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
 
     // complete ////////////////////////////////////////////////////////
 
-    closeCaseInstance(superCaseInstanceId);
+    close(superCaseInstanceId);
     assertCaseEnded(superCaseInstanceId);
 
   }
@@ -1124,7 +1122,7 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
     })
   public void testOutputAll() {
     // given
-    String superCaseInstanceId = createCaseInstance(ONE_CASE_TASK_CASE).getId();
+    String superCaseInstanceId = createCaseInstanceByKey(ONE_CASE_TASK_CASE).getId();
     String caseTaskId = queryCaseExecutionByActivityId(CASE_TASK).getId();
 
     caseService
@@ -1178,7 +1176,7 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
 
     // complete ////////////////////////////////////////////////////////
 
-    closeCaseInstance(superCaseInstanceId);
+    close(superCaseInstanceId);
     assertCaseEnded(superCaseInstanceId);
 
   }
@@ -1189,7 +1187,7 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
     })
   public void testOutputVariablesShouldNotExistAnymore() {
     // given
-    String superCaseInstanceId = createCaseInstance(ONE_CASE_TASK_CASE).getId();
+    String superCaseInstanceId = createCaseInstanceByKey(ONE_CASE_TASK_CASE).getId();
     String caseTaskId = queryCaseExecutionByActivityId(CASE_TASK).getId();
 
     caseService
@@ -1234,7 +1232,7 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
 
     // complete ////////////////////////////////////////////////////////
 
-    closeCaseInstance(superCaseInstanceId);
+    close(superCaseInstanceId);
     assertCaseEnded(superCaseInstanceId);
 
   }
@@ -1245,7 +1243,7 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
     })
   public void testVariablesRoundtrip() {
     // given
-    String superCaseInstanceId = createCaseInstance(ONE_CASE_TASK_CASE).getId();
+    String superCaseInstanceId = createCaseInstanceByKey(ONE_CASE_TASK_CASE).getId();
     String caseTaskId = queryCaseExecutionByActivityId(CASE_TASK).getId();
 
     caseService
@@ -1303,7 +1301,7 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
 
     // complete ////////////////////////////////////////////////////////
 
-    closeCaseInstance(superCaseInstanceId);
+    close(superCaseInstanceId);
     assertCaseEnded(superCaseInstanceId);
 
   }
@@ -1314,7 +1312,7 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
     })
   public void testCompleteCaseTask() {
     // given
-    String superCaseInstanceId = createCaseInstance(ONE_CASE_TASK_CASE).getId();
+    String superCaseInstanceId = createCaseInstanceByKey(ONE_CASE_TASK_CASE).getId();
     String caseTaskId = queryCaseExecutionByActivityId(CASE_TASK).getId();
 
     caseService
@@ -1334,11 +1332,11 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
 
     String subCaseInstanceId = queryOneTaskCaseInstance().getId();
     terminate(subCaseInstanceId);
-    closeCaseInstance(subCaseInstanceId);
+    close(subCaseInstanceId);
     assertCaseEnded(subCaseInstanceId);
 
     terminate(caseTaskId);
-    closeCaseInstance(superCaseInstanceId);
+    close(superCaseInstanceId);
     assertCaseEnded(superCaseInstanceId);
 
   }
@@ -1349,7 +1347,7 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
     })
   public void testTerminateCaseTask() {
     // given
-    String superCaseInstanceId = createCaseInstance(ONE_CASE_TASK_CASE).getId();
+    String superCaseInstanceId = createCaseInstanceByKey(ONE_CASE_TASK_CASE).getId();
     String caseTaskId = queryCaseExecutionByActivityId(CASE_TASK).getId();
 
     caseService
@@ -1369,10 +1367,10 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
 
     String subCaseInstanceId = queryOneTaskCaseInstance().getId();
     terminate(subCaseInstanceId);
-    closeCaseInstance(subCaseInstanceId);
+    close(subCaseInstanceId);
     assertCaseEnded(subCaseInstanceId);
 
-    closeCaseInstance(superCaseInstanceId);
+    close(superCaseInstanceId);
     assertCaseEnded(superCaseInstanceId);
 
   }
@@ -1383,7 +1381,7 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
     })
   public void testTerminateSubCaseInstance() {
     // given
-    String superCaseInstanceId = createCaseInstance(ONE_CASE_TASK_CASE).getId();
+    String superCaseInstanceId = createCaseInstanceByKey(ONE_CASE_TASK_CASE).getId();
     String caseTaskId = queryCaseExecutionByActivityId(CASE_TASK).getId();
 
     caseService
@@ -1406,11 +1404,11 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
 
     // complete ////////////////////////////////////////////////////////
 
-    closeCaseInstance(subCaseInstanceId);
+    close(subCaseInstanceId);
     assertCaseEnded(subCaseInstanceId);
 
     terminate(caseTaskId);
-    closeCaseInstance(superCaseInstanceId);
+    close(superCaseInstanceId);
     assertCaseEnded(superCaseInstanceId);
 
   }
@@ -1421,7 +1419,7 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
     })
   public void testSuspendCaseTask() {
     // given
-    String superCaseInstanceId = createCaseInstance(ONE_CASE_TASK_CASE).getId();
+    String superCaseInstanceId = createCaseInstanceByKey(ONE_CASE_TASK_CASE).getId();
     String caseTaskId = queryCaseExecutionByActivityId(CASE_TASK).getId();
 
     caseService
@@ -1441,11 +1439,11 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
 
     String subCaseInstanceId = queryOneTaskCaseInstance().getId();
     terminate(subCaseInstanceId);
-    closeCaseInstance(subCaseInstanceId);
+    close(subCaseInstanceId);
     assertCaseEnded(subCaseInstanceId);
 
     terminate(superCaseInstanceId);
-    closeCaseInstance(superCaseInstanceId);
+    close(superCaseInstanceId);
     assertCaseEnded(superCaseInstanceId);
 
   }
@@ -1456,7 +1454,7 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
     })
   public void testSuspendSubCaseInstance() {
     // given
-    String superCaseInstanceId = createCaseInstance(ONE_CASE_TASK_CASE).getId();
+    String superCaseInstanceId = createCaseInstanceByKey(ONE_CASE_TASK_CASE).getId();
     String caseTaskId = queryCaseExecutionByActivityId(CASE_TASK).getId();
 
     caseService
@@ -1479,11 +1477,11 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
 
     // complete ////////////////////////////////////////////////////////
 
-    closeCaseInstance(subCaseInstanceId);
+    close(subCaseInstanceId);
     assertCaseEnded(subCaseInstanceId);
 
     terminate(caseTaskId);
-    closeCaseInstance(superCaseInstanceId);
+    close(superCaseInstanceId);
     assertCaseEnded(superCaseInstanceId);
 
   }
@@ -1494,7 +1492,7 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
     })
   public void testResumeCaseTask() {
     // given
-    String superCaseInstanceId = createCaseInstance(ONE_CASE_TASK_CASE).getId();
+    String superCaseInstanceId = createCaseInstanceByKey(ONE_CASE_TASK_CASE).getId();
     String caseTaskId = queryCaseExecutionByActivityId(CASE_TASK).getId();
 
     caseService
@@ -1520,11 +1518,11 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
 
     String subCaseInstanceId = queryOneTaskCaseInstance().getId();
     terminate(subCaseInstanceId);
-    closeCaseInstance(subCaseInstanceId);
+    close(subCaseInstanceId);
     assertCaseEnded(subCaseInstanceId);
 
     terminate(caseTaskId);
-    closeCaseInstance(superCaseInstanceId);
+    close(superCaseInstanceId);
     assertCaseEnded(superCaseInstanceId);
 
   }
@@ -1535,7 +1533,7 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
     })
   public void testNotBlockingCaseTask() {
     // given
-    String superCaseInstanceId = createCaseInstance(ONE_CASE_TASK_CASE).getId();
+    String superCaseInstanceId = createCaseInstanceByKey(ONE_CASE_TASK_CASE).getId();
     String caseTaskId = queryCaseExecutionByActivityId(CASE_TASK).getId();
 
     // when
@@ -1559,20 +1557,20 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
 
     // complete ////////////////////////////////////////////////////////
 
-    closeCaseInstance(superCaseInstanceId);
+    close(superCaseInstanceId);
     assertCaseEnded(superCaseInstanceId);
 
     terminate(subCaseInstance.getId());
-    closeCaseInstance(subCaseInstance.getId());
+    close(subCaseInstance.getId());
     assertProcessEnded(subCaseInstance.getId());
 
   }
 
-  protected CaseInstance createCaseInstance(String caseDefinitionKey) {
-    return createCaseInstance(caseDefinitionKey, null);
+  protected CaseInstance createCaseInstanceByKey(String caseDefinitionKey) {
+    return createCaseInstanceByKey(caseDefinitionKey, null);
   }
 
-  protected CaseInstance createCaseInstance(String caseDefinitionKey, String businessKey) {
+  protected CaseInstance createCaseInstanceByKey(String caseDefinitionKey, String businessKey) {
     return caseService
         .withCaseDefinitionByKey(caseDefinitionKey)
         .businessKey(businessKey)
@@ -1604,66 +1602,6 @@ public class CaseTaskTest extends PluggableProcessEngineTestCase {
     return taskService
         .createTaskQuery()
         .singleResult();
-  }
-
-  protected void terminate(final String caseExecutionId) {
-    processEngineConfiguration.
-      getCommandExecutorTxRequired().
-      execute(new Command<Void>() {
-
-        @Override
-        public Void execute(CommandContext commandContext) {
-          CmmnExecution caseTask = (CmmnExecution) caseService
-              .createCaseExecutionQuery()
-              .caseExecutionId(caseExecutionId)
-              .singleResult();
-          caseTask.terminate();
-          return null;
-        }
-
-      });
-  }
-
-  protected void suspend(final String caseExecutionId) {
-    processEngineConfiguration.
-      getCommandExecutorTxRequired().
-      execute(new Command<Void>() {
-
-        @Override
-        public Void execute(CommandContext commandContext) {
-          CmmnExecution caseTask = (CmmnExecution) caseService
-              .createCaseExecutionQuery()
-              .caseExecutionId(caseExecutionId)
-              .singleResult();
-          caseTask.suspend();
-          return null;
-        }
-
-      });
-  }
-
-  protected void resume(final String caseExecutionId) {
-    processEngineConfiguration.
-      getCommandExecutorTxRequired().
-      execute(new Command<Void>() {
-
-        @Override
-        public Void execute(CommandContext commandContext) {
-          CmmnExecution caseTask = (CmmnExecution) caseService
-              .createCaseExecutionQuery()
-              .caseExecutionId(caseExecutionId)
-              .singleResult();
-          caseTask.resume();
-          return null;
-        }
-
-      });
-  }
-
-  protected void closeCaseInstance(String caseInstanceId) {
-    caseService
-      .withCaseExecution(caseInstanceId)
-      .close();
   }
 
 }

@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.test.cmmn.sentry;
 
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
 import org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState;
+import org.camunda.bpm.engine.impl.test.CmmnProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.test.Deployment;
 
@@ -21,7 +22,7 @@ import org.camunda.bpm.engine.test.Deployment;
  * @author Roman Smirnov
  *
  */
-public class SentryCombinedEntryAndExitCriteriaTest extends SentryTest {
+public class SentryCombinedEntryAndExitCriteriaTest extends CmmnProcessEngineTestCase {
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/SentryCombinedEntryAndExitCriteriaTest.testParentResumeInsideStage.cmmn"})
   public void FAILING_testParentResumeInsideStage() {

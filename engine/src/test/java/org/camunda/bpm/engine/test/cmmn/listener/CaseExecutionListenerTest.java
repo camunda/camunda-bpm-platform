@@ -16,7 +16,7 @@ import org.camunda.bpm.engine.delegate.CaseExecutionListener;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.impl.test.CmmnProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.VariableInstanceQuery;
 import org.camunda.bpm.engine.test.Deployment;
 
@@ -24,7 +24,7 @@ import org.camunda.bpm.engine.test.Deployment;
  * @author Roman Smirnov
  *
  */
-public class CaseExecutionListenerTest extends PluggableProcessEngineTestCase {
+public class CaseExecutionListenerTest extends CmmnProcessEngineTestCase {
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/listener/CaseExecutionListenerTest.testCreateListenerByClass.cmmn"})
   public void testCreateListenerByClass() {
@@ -2589,147 +2589,4 @@ public class CaseExecutionListenerTest extends PluggableProcessEngineTestCase {
 
   }
 
-  protected void terminate(final String caseExecutionId) {
-    processEngineConfiguration
-      .getCommandExecutorTxRequired()
-      .execute(new Command<Void>() {
-
-        @Override
-        public Void execute(CommandContext commandContext) {
-          CmmnExecution caseTask = (CmmnExecution) caseService
-              .createCaseExecutionQuery()
-              .caseExecutionId(caseExecutionId)
-              .singleResult();
-          caseTask.terminate();
-          return null;
-        }
-
-      });
-  }
-
-  protected void exit(final String caseExecutionId) {
-    processEngineConfiguration
-      .getCommandExecutorTxRequired()
-      .execute(new Command<Void>() {
-
-        @Override
-        public Void execute(CommandContext commandContext) {
-          CmmnExecution caseTask = (CmmnExecution) caseService
-              .createCaseExecutionQuery()
-              .caseExecutionId(caseExecutionId)
-              .singleResult();
-          caseTask.exit();
-          return null;
-        }
-
-      });
-  }
-
-  protected void parentTerminate(final String caseExecutionId) {
-    processEngineConfiguration
-      .getCommandExecutorTxRequired()
-      .execute(new Command<Void>() {
-
-        @Override
-        public Void execute(CommandContext commandContext) {
-          CmmnExecution caseTask = (CmmnExecution) caseService
-              .createCaseExecutionQuery()
-              .caseExecutionId(caseExecutionId)
-              .singleResult();
-          caseTask.parentTerminate();
-          return null;
-        }
-
-      });
-  }
-
-  protected void suspend(final String caseExecutionId) {
-    processEngineConfiguration
-      .getCommandExecutorTxRequired()
-      .execute(new Command<Void>() {
-
-        @Override
-        public Void execute(CommandContext commandContext) {
-          CmmnExecution caseTask = (CmmnExecution) caseService
-              .createCaseExecutionQuery()
-              .caseExecutionId(caseExecutionId)
-              .singleResult();
-          caseTask.suspend();
-          return null;
-        }
-
-      });
-  }
-
-  protected void parentSuspend(final String caseExecutionId) {
-    processEngineConfiguration
-      .getCommandExecutorTxRequired()
-      .execute(new Command<Void>() {
-
-        @Override
-        public Void execute(CommandContext commandContext) {
-          CmmnExecution caseTask = (CmmnExecution) caseService
-              .createCaseExecutionQuery()
-              .caseExecutionId(caseExecutionId)
-              .singleResult();
-          caseTask.parentSuspend();
-          return null;
-        }
-
-      });
-  }
-
-  protected void resume(final String caseExecutionId) {
-    processEngineConfiguration
-      .getCommandExecutorTxRequired()
-      .execute(new Command<Void>() {
-
-        @Override
-        public Void execute(CommandContext commandContext) {
-          CmmnExecution caseTask = (CmmnExecution) caseService
-              .createCaseExecutionQuery()
-              .caseExecutionId(caseExecutionId)
-              .singleResult();
-          caseTask.resume();
-          return null;
-        }
-
-      });
-  }
-
-  protected void parentResume(final String caseExecutionId) {
-    processEngineConfiguration
-      .getCommandExecutorTxRequired()
-      .execute(new Command<Void>() {
-
-        @Override
-        public Void execute(CommandContext commandContext) {
-          CmmnExecution caseTask = (CmmnExecution) caseService
-              .createCaseExecutionQuery()
-              .caseExecutionId(caseExecutionId)
-              .singleResult();
-          caseTask.parentResume();
-          return null;
-        }
-
-      });
-  }
-
-  protected void occur(final String caseExecutionId) {
-    processEngineConfiguration
-      .getCommandExecutorTxRequired()
-      .execute(new Command<Void>() {
-
-        @Override
-        public Void execute(CommandContext commandContext) {
-          CmmnExecution caseTask = (CmmnExecution) caseService
-              .createCaseExecutionQuery()
-              .caseExecutionId(caseExecutionId)
-              .singleResult();
-          caseTask.occur();
-          return null;
-        }
-
-      });
-  }
 }

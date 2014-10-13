@@ -17,15 +17,14 @@ import java.util.List;
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseSentryPartEntity;
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseSentryPartQueryImpl;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnSentryDeclaration;
-import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.impl.test.CmmnProcessEngineTestCase;
 import org.camunda.bpm.engine.test.Deployment;
 
 /**
  * @author Roman Smirnov
  *
  */
-public class SentryInitializationTest extends PluggableProcessEngineTestCase {
+public class SentryInitializationTest extends CmmnProcessEngineTestCase {
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/SentryInitializationTest.testOnPart.cmmn"})
   public void testOnPart() {
@@ -263,11 +262,6 @@ public class SentryInitializationTest extends PluggableProcessEngineTestCase {
     assertEquals(humanTaskId, part.getSourceCaseExecutionId());
     assertEquals("complete", part.getStandardEvent());
     assertFalse(part.isSatisfied());
-  }
-
-  protected CaseSentryPartQueryImpl createCaseSentryPartQuery() {
-    CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutorTxRequiresNew();
-    return new CaseSentryPartQueryImpl(commandExecutor);
   }
 
 }

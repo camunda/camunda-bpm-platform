@@ -17,6 +17,7 @@ import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseSentryPartQueryImpl;
 import org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnSentryPart;
+import org.camunda.bpm.engine.impl.test.CmmnProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.CaseExecutionQuery;
 import org.camunda.bpm.engine.test.Deployment;
@@ -25,7 +26,7 @@ import org.camunda.bpm.engine.test.Deployment;
  * @author Roman Smirnov
  *
  */
-public class SentryEntryCriteriaTest extends SentryTest {
+public class SentryEntryCriteriaTest extends CmmnProcessEngineTestCase {
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/SentryEntryCriteriaTest.testSequenceEnableTask.cmmn"})
   public void testSequenceEnableTask() {
