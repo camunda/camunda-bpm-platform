@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.impl.cmmn.entity.runtime;
 
 import java.util.List;
 
+import org.camunda.bpm.engine.impl.core.variable.CoreVariableScope;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.camunda.bpm.engine.impl.variable.AbstractPersistentVariableStore;
 

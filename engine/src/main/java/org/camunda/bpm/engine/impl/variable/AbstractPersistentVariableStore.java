@@ -26,10 +26,12 @@ import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.delegate.PersistentVariableInstance;
 import org.camunda.bpm.engine.delegate.ProcessEngineVariableType;
 import org.camunda.bpm.engine.delegate.SerializedVariableValue;
+import org.camunda.bpm.engine.delegate.VariableListener;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.core.variable.CorePersistentVariableStore;
 import org.camunda.bpm.engine.impl.core.variable.CoreVariableScope;
+import org.camunda.bpm.engine.impl.core.variable.VariableEvent;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
@@ -108,6 +110,7 @@ public abstract class AbstractPersistentVariableStore extends AbstractVariableSt
       if(isAutoFireHistoryEvents()) {
         fireHistoricVariableInstanceDelete(variable, sourceActivityExecution);
       }
+      fireVariableEvent(variable, VariableListener.DELETE, sourceActivityExecution);
     }
     return variable;
   }
@@ -134,6 +137,7 @@ public abstract class AbstractPersistentVariableStore extends AbstractVariableSt
       if(isAutoFireHistoryEvents()) {
         fireHistoricVariableInstanceUpdate(variableInstanceEntity, sourceActivityExecution);
       }
+      fireVariableEvent(variableInstanceEntity, VariableListener.UPDATE, sourceActivityExecution);
     }
   }
 
@@ -151,6 +155,7 @@ public abstract class AbstractPersistentVariableStore extends AbstractVariableSt
     if(isAutoFireHistoryEvents()) {
       fireHistoricVariableInstanceUpdate(variableInstanceEntity, sourceActivityExecution);
     }
+    fireVariableEvent(variableInstanceEntity, VariableListener.UPDATE, sourceActivityExecution);
   }
 
   protected boolean canStoreValue(VariableInstanceEntity variableInstance, Object value) {
@@ -182,6 +187,7 @@ public abstract class AbstractPersistentVariableStore extends AbstractVariableSt
       if(isAutoFireHistoryEvents()) {
         fireHistoricVariableInstanceCreate(variableInstance, sourceActivityExecution);
       }
+      fireVariableEvent(variableInstance, VariableListener.CREATE, sourceActivityExecution);
 
       return variableInstance;
     }
@@ -205,6 +211,7 @@ public abstract class AbstractPersistentVariableStore extends AbstractVariableSt
     if(isAutoFireHistoryEvents()) {
       fireHistoricVariableInstanceCreate(variableInstance, sourceActivityExecution);
     }
+    fireVariableEvent(variableInstance, VariableListener.CREATE, sourceActivityExecution);
 
     return variableInstance;
   }
@@ -316,6 +323,10 @@ public abstract class AbstractPersistentVariableStore extends AbstractVariableSt
       eventHandler.handleEvent(evt);
 
     }
-
   }
+
+  protected void fireVariableEvent(VariableInstanceEntity variableInstance, String eventName, CoreVariableScope<PersistentVariableInstance> sourceActivityExecution) {
+    sourceActivityExecution.dispatchEvent(new VariableEvent(variableInstance, eventName, sourceActivityExecution));
+  }
+
 }

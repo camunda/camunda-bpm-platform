@@ -77,6 +77,11 @@
     select * from ${prefix}ACT_RU_CASE_EXECUTION
     where PARENT_ID_ = #{parameter}
   </select>
+  
+  <select id="selectCaseExecutionsByCaseInstanceId" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="caseExecutionResultMap">
+    select * from ${prefix}ACT_RU_CASE_EXECUTION
+    where CASE_INST_ID_ = #{parameter}
+  </select>
 
   <select id="selectCaseInstanceIdsByCaseDefinitionId" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultType="string">
     select ID_

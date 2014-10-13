@@ -142,12 +142,57 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
 
   protected void ensureParentInitialized() {
     if (parent == null && parentId != null) {
+      if(isExecutionTreePrefetchEnabled()) {
+        ensureCaseExecutionTreeInitialized();
 
-      parent = Context
-        .getCommandContext()
-        .getCaseExecutionManager()
-        .findCaseExecutionById(parentId);
+      } else {
+        parent = Context
+            .getCommandContext()
+            .getCaseExecutionManager()
+            .findCaseExecutionById(parentId);
+
+      }
     }
+  }
+
+  /**
+   * @see ExecutionEntity#ensureExecutionTreeInitialized
+   */
+  protected void ensureCaseExecutionTreeInitialized() {
+    List<CaseExecutionEntity> executions = Context.getCommandContext()
+      .getCaseExecutionManager()
+      .findChildCaseExecutionsByCaseInstanceId(caseInstanceId);
+
+    CaseExecutionEntity caseInstance = null;
+
+    Map<String, CaseExecutionEntity> executionMap = new HashMap<String, CaseExecutionEntity>();
+    for (CaseExecutionEntity execution : executions) {
+      execution.caseExecutions = new ArrayList<CaseExecutionEntity>();
+      executionMap.put(execution.getId(), execution);
+      if(execution.isCaseInstanceExecution()) {
+        caseInstance = execution;
+      }
+    }
+
+    for (CaseExecutionEntity execution : executions) {
+      String parentId = execution.getParentId();
+      CaseExecutionEntity parent = executionMap.get(parentId);
+      if(!execution.isCaseInstanceExecution()) {
+        execution.caseInstance = caseInstance;
+        execution.parent = parent;
+        parent.caseExecutions.add(execution);
+      } else {
+        execution.caseInstance = execution;
+      }
+    }
+  }
+
+  /**
+   * @return true if execution tree prefetching is enabled
+   */
+  protected boolean isExecutionTreePrefetchEnabled() {
+    return Context.getProcessEngineConfiguration()
+      .isExecutionTreePrefetchEnabled();
   }
 
   public String getParentId() {

@@ -437,6 +437,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
    */
   protected boolean isDbEntityCacheReuseEnabled = false;
 
+  protected boolean isInvokeCustomVariableListeners = true;
+
   protected Connectors connectors;
 
   protected List<SerializationVariableTypeResolver> serializationTypeResolvers = new ArrayList<SerializationVariableTypeResolver>();
@@ -2529,6 +2531,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public List<HistoryLevel> getCustomHistoryLevels() {
     return customHistoryLevels;
+  }
+
+  public boolean isInvokeCustomVariableListeners() {
+    return isInvokeCustomVariableListeners;
+  }
+
+  public ProcessEngineConfigurationImpl setInvokeCustomVariableListeners(boolean isInvokeCustomVariableListeners) {
+    this.isInvokeCustomVariableListeners = isInvokeCustomVariableListeners;
+    return this;
   }
 
 }

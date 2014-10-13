@@ -21,6 +21,8 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.delegate.BaseDelegateExecution;
 import org.camunda.bpm.engine.delegate.DelegateListener;
+import org.camunda.bpm.engine.delegate.DelegateVariableInstance;
+import org.camunda.bpm.engine.delegate.VariableListener;
 
 /**
  * @author Daniel Meyer
@@ -41,6 +43,12 @@ public abstract class CoreModelElement implements Serializable {
 
   /** contains all listeners (built-in + user-provided) */
   protected Map<String, List<DelegateListener<? extends BaseDelegateExecution>>> listeners = new HashMap<String, List<DelegateListener<? extends BaseDelegateExecution>>>();
+
+  protected Map<String, List<VariableListener<?>>> builtInVariableListeners =
+      new HashMap<String, List<VariableListener<?>>>();
+
+  protected Map<String, List<VariableListener<?>>> variableListeners =
+      new HashMap<String, List<VariableListener<?>>>();
 
   public CoreModelElement(String id) {
     this.id = id;
@@ -105,6 +113,22 @@ public abstract class CoreModelElement implements Serializable {
     return Collections.emptyList();
   }
 
+  public List<VariableListener<?>> getVariableListenersLocal(String eventName) {
+    List<VariableListener<?>> listenerList = getVariableListeners().get(eventName);
+    if (listenerList != null) {
+      return listenerList;
+    }
+    return Collections.emptyList();
+  }
+
+  public List<VariableListener<?>> getBuiltInVariableListenersLocal(String eventName) {
+    List<VariableListener<?>> listenerList = getBuiltInVariableListeners().get(eventName);
+    if (listenerList != null) {
+      return listenerList;
+    }
+    return Collections.emptyList();
+  }
+
   public void addListener(String eventName, DelegateListener<? extends BaseDelegateExecution> listener) {
     addListener(eventName, listener, -1);
   }
@@ -122,10 +146,10 @@ public abstract class CoreModelElement implements Serializable {
     addListenerToMap(listeners, eventName, listener, index);
   }
 
-  private void addListenerToMap(Map<String, List<DelegateListener<? extends BaseDelegateExecution>>> listenerMap, String eventName, DelegateListener<? extends BaseDelegateExecution> listener, int index) {
-    List<DelegateListener<? extends BaseDelegateExecution>> listeners = listenerMap.get(eventName);
+  protected <T> void addListenerToMap(Map<String, List<T>> listenerMap, String eventName, T listener, int index) {
+    List<T> listeners = listenerMap.get(eventName);
     if (listeners == null) {
-      listeners = new ArrayList<DelegateListener<? extends BaseDelegateExecution>>();
+      listeners = new ArrayList<T>();
       listenerMap.put(eventName, listeners);
     }
     if (index < 0) {
@@ -135,13 +159,37 @@ public abstract class CoreModelElement implements Serializable {
     }
   }
 
+  public void addVariableListener(String eventName, VariableListener<?> listener) {
+    addVariableListener(eventName, listener, -1);
+  }
+
+  public void addVariableListener(String eventName, VariableListener<?> listener, int index) {
+    addListenerToMap(variableListeners, eventName, listener, index);
+  }
+
+  public void addBuiltInVariableListener(String eventName, VariableListener<?> listener) {
+    addBuiltInVariableListener(eventName, listener, -1);
+  }
+
+  public void addBuiltInVariableListener(String eventName, VariableListener<?> listener, int index) {
+    addListenerToMap(variableListeners, eventName, listener, index);
+    addListenerToMap(builtInVariableListeners, eventName, listener, index);
+  }
+
   public Map<String, List<DelegateListener<? extends BaseDelegateExecution>>> getListeners() {
     return listeners;
   }
 
-
   public Map<String, List<DelegateListener<? extends BaseDelegateExecution>>> getBuiltInListeners() {
     return builtInListeners;
+  }
+
+  public Map<String, List<VariableListener<?>>> getBuiltInVariableListeners() {
+    return builtInVariableListeners;
+  }
+
+  public Map<String, List<VariableListener<?>>> getVariableListeners() {
+    return variableListeners;
   }
 
 }

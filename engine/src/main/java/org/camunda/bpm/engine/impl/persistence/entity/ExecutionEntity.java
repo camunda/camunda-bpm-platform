@@ -25,6 +25,7 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.ProcessEngineServices;
 import org.camunda.bpm.engine.SuspendedEntityInteractionException;
 import org.camunda.bpm.engine.delegate.CoreVariableInstance;
+import org.camunda.bpm.engine.delegate.DelegateCaseVariableInstance;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.delegate.PersistentVariableInstance;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;

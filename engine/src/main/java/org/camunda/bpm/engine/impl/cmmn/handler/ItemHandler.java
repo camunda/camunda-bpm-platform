@@ -18,7 +18,9 @@ import java.util.Collection;
 import java.util.List;
 
 import org.camunda.bpm.engine.delegate.CaseExecutionListener;
+import org.camunda.bpm.engine.delegate.CaseVariableListener;
 import org.camunda.bpm.engine.delegate.Expression;
+import org.camunda.bpm.engine.delegate.VariableListener;
 import org.camunda.bpm.engine.impl.bpmn.parser.FieldDeclaration;
 import org.camunda.bpm.engine.impl.cmmn.CaseControlRule;
 import org.camunda.bpm.engine.impl.cmmn.behavior.CaseControlRuleImpl;
@@ -40,6 +42,10 @@ import org.camunda.bpm.engine.impl.scripting.ExecutableScript;
 import org.camunda.bpm.engine.impl.scripting.engine.JuelScriptEngineFactory;
 import org.camunda.bpm.engine.impl.util.ResourceUtil;
 import org.camunda.bpm.engine.impl.util.StringUtil;
+import org.camunda.bpm.engine.impl.variable.listener.ClassDelegateCaseVariableListener;
+import org.camunda.bpm.engine.impl.variable.listener.DelegateExpressionCaseVariableListener;
+import org.camunda.bpm.engine.impl.variable.listener.ExpressionCaseVariableListener;
+import org.camunda.bpm.engine.impl.variable.listener.ScriptCaseVariableListener;
 import org.camunda.bpm.model.cmmn.Query;
 import org.camunda.bpm.model.cmmn.instance.CmmnElement;
 import org.camunda.bpm.model.cmmn.instance.DiscretionaryItem;
@@ -56,6 +62,7 @@ import org.camunda.bpm.model.cmmn.instance.camunda.CamundaExpression;
 import org.camunda.bpm.model.cmmn.instance.camunda.CamundaField;
 import org.camunda.bpm.model.cmmn.instance.camunda.CamundaScript;
 import org.camunda.bpm.model.cmmn.instance.camunda.CamundaString;
+import org.camunda.bpm.model.cmmn.instance.camunda.CamundaVariableListener;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 
 /**
@@ -104,6 +111,12 @@ public abstract class ItemHandler extends CmmnElementHandler<CmmnElement, CmmnAc
       CaseExecutionListener.RE_ACTIVATE,
       CaseExecutionListener.CLOSE
     );
+
+  public static List<String> DEFAULT_VARIABLE_EVENTS = Arrays.asList(
+      VariableListener.CREATE,
+      VariableListener.DELETE,
+      VariableListener.UPDATE
+  );
 
   protected CmmnActivity createActivity(CmmnElement element, CmmnHandlerContext context) {
     String id = element.getId();
@@ -168,6 +181,9 @@ public abstract class ItemHandler extends CmmnElementHandler<CmmnElement, CmmnAc
 
     // case execution listeners
     initializeCaseExecutionListeners(element, activity, context);
+
+    // variable listeners
+    initializeVariableListeners(element, activity, context);
 
     // initialize entry criteria
     initializeEntryCriterias(element, activity, context);
@@ -302,6 +318,59 @@ public abstract class ItemHandler extends CmmnElementHandler<CmmnElement, CmmnAc
     }
 
     return caseExecutionListener;
+  }
+
+  protected void initializeVariableListeners(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context) {
+    PlanItemDefinition definition = getDefinition(element);
+
+    List<CamundaVariableListener> listeners = queryExtensionElementsByClass(definition, CamundaVariableListener.class);
+
+    for (CamundaVariableListener listener : listeners) {
+      CaseVariableListener variableListener = initializeVariableListener(element, activity, context, listener);
+
+      String eventName = listener.getCamundaEvent();
+      if(eventName != null) {
+        activity.addVariableListener(eventName, variableListener);
+
+      } else {
+        for (String event : DEFAULT_VARIABLE_EVENTS) {
+          activity.addVariableListener(event, variableListener);
+        }
+      }
+    }
+  }
+
+  protected CaseVariableListener initializeVariableListener(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context, CamundaVariableListener listener) {
+    Collection<CamundaField> fields = listener.getCamundaFields();
+    List<FieldDeclaration> fieldDeclarations = initializeFieldDeclarations(element, activity, context, fields);
+
+    ExpressionManager expressionManager = context.getExpressionManager();
+
+    String className = listener.getCamundaClass();
+    String expression = listener.getCamundaExpression();
+    String delegateExpression = listener.getCamundaDelegateExpression();
+    CamundaScript scriptElement = listener.getCamundaScript();
+
+    CaseVariableListener variableListener = null;
+    if (className != null) {
+      variableListener = new ClassDelegateCaseVariableListener(className, fieldDeclarations);
+
+    } else if (expression != null) {
+      Expression expressionExp = expressionManager.createExpression(expression);
+      variableListener = new ExpressionCaseVariableListener(expressionExp);
+
+    } else if (delegateExpression != null) {
+      Expression delegateExp = expressionManager.createExpression(delegateExpression);
+      variableListener = new DelegateExpressionCaseVariableListener(delegateExp, fieldDeclarations);
+
+    } else if (scriptElement != null) {
+      ExecutableScript executableScript = initializeScript(element, activity, context, scriptElement);
+      if (executableScript != null) {
+        variableListener = new ScriptCaseVariableListener(executableScript);
+      }
+    }
+
+    return variableListener;
   }
 
   protected ExecutableScript initializeScript(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context, CamundaScript script) {

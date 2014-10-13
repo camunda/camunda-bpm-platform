@@ -31,7 +31,7 @@ import org.camunda.bpm.engine.impl.javax.el.ELContext;
  * @author Sebastian Menski
  *
  */
-public abstract class CoreVariableScope<T extends CoreVariableInstance> implements Serializable, VariableScope<T> {
+public abstract class CoreVariableScope<T extends CoreVariableInstance> implements Serializable, VariableScope<T>, VariableEventDispatcher {
 
   private static final long serialVersionUID = 1L;
 
@@ -282,5 +282,7 @@ public abstract class CoreVariableScope<T extends CoreVariableInstance> implemen
     this.cachedElContext = cachedElContext;
   }
 
-
+  public void dispatchEvent(VariableEvent variableEvent) {
+    // default implementation does nothing
+  }
 }

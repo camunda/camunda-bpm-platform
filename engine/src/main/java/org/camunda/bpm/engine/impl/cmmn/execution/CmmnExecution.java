@@ -60,21 +60,30 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureInstanceOf;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 
+import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.delegate.CaseVariableListener;
 import org.camunda.bpm.engine.delegate.Expression;
+import org.camunda.bpm.engine.delegate.VariableListener;
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseSentryPartEntity;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnIfPartDeclaration;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnOnPartDeclaration;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnSentryDeclaration;
+import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
 import org.camunda.bpm.engine.impl.core.variable.CorePersistentVariableScope;
+import org.camunda.bpm.engine.impl.core.variable.VariableEvent;
 import org.camunda.bpm.engine.impl.pvm.PvmException;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessDefinition;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
+import org.camunda.bpm.engine.impl.variable.listener.CaseVariableListenerInvocation;
+import org.camunda.bpm.engine.impl.variable.listener.DelegateCaseVariableInstanceImpl;
 
 /**
  * @author Roman Smirnov
@@ -99,6 +108,10 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
   protected int previousState;
 
   protected int currentState = NEW.getStateCode();
+
+  protected List<String> satisfiedSentries;
+
+  protected Queue<VariableEvent> variableEventsQueue;
 
   public CmmnExecution() {
   }
@@ -797,7 +810,91 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
     performOperation(CASE_INSTANCE_CLOSE);
   }
 
-  // toString() /////////////////////////////////////////////////
+  // variable listeners
+  public void dispatchEvent(VariableEvent variableEvent) {
+    boolean invokeCustomListeners =
+        Context
+          .getProcessEngineConfiguration()
+          .isInvokeCustomVariableListeners();
+
+    Map<String, List<VariableListener<?>>> listeners = getActivity()
+        .getVariableListeners(variableEvent.getEventName(), invokeCustomListeners);
+
+    // only attempt to invoke listeners if there are any (as this involves resolving the upwards execution hierarchy)
+    if (!listeners.isEmpty()) {
+      getCaseInstance().queueVariableEvent(variableEvent, invokeCustomListeners);
+    }
+  }
+
+  protected void queueVariableEvent(VariableEvent variableEvent, boolean includeCustomerListeners) {
+
+    Queue<VariableEvent> variableEventsQueue = getVariableEventQueue();
+
+    variableEventsQueue.add(variableEvent);
+
+    // if this is the first event added, trigger listener invocation
+    if (variableEventsQueue.size() == 1) {
+      invokeVariableListeners(includeCustomerListeners);
+    }
+  }
+
+  protected void invokeVariableListeners(boolean includeCustomerListeners) {
+    Queue<VariableEvent> variableEventsQueue = getVariableEventQueue();
+
+    while (!variableEventsQueue.isEmpty()) {
+      // do not remove the event yet, as otherwise new events will immediately be dispatched
+      VariableEvent nextEvent = variableEventsQueue.peek();
+
+      CmmnExecution sourceExecution = (CmmnExecution) nextEvent.getSourceScope();
+
+      DelegateCaseVariableInstanceImpl delegateVariable =
+          DelegateCaseVariableInstanceImpl.fromVariableInstance(nextEvent.getVariableInstance());
+      delegateVariable.setEventName(nextEvent.getEventName());
+      delegateVariable.setSourceExecution(sourceExecution);
+
+      Map<String, List<VariableListener<?>>> listenersByActivity =
+          sourceExecution.getActivity().getVariableListeners(delegateVariable.getEventName(), includeCustomerListeners);
+
+      CmmnExecution currentExecution = sourceExecution;
+      while (currentExecution != null) {
+
+        if (currentExecution.getActivityId() != null) {
+          List<VariableListener<?>> listeners = listenersByActivity.get(currentExecution.getActivityId());
+
+          if (listeners != null) {
+            delegateVariable.setScopeExecution(currentExecution);
+
+            for (VariableListener<?> listener : listeners) {
+              try {
+                CaseVariableListener caseVariableListener = (CaseVariableListener) listener;
+                CaseVariableListenerInvocation invocation = new CaseVariableListenerInvocation(caseVariableListener, delegateVariable, currentExecution);
+                Context.getProcessEngineConfiguration()
+                  .getDelegateInterceptor()
+                  .handleInvocation(invocation);
+              } catch (Exception e) {
+                throw new ProcessEngineException("Variable listener invocation failed", e);
+              }
+            }
+          }
+        }
+
+        currentExecution = currentExecution.getParent();
+      }
+
+      // finally remove the event from the queue
+      variableEventsQueue.remove();
+    }
+  }
+
+  protected Queue<VariableEvent> getVariableEventQueue() {
+    if (variableEventsQueue == null) {
+      variableEventsQueue = new LinkedList<VariableEvent>();
+    }
+
+    return variableEventsQueue;
+  }
+
+  // toString() //////////////////////////////////////  ///////////
 
   public String toString() {
     if (isCaseInstanceExecution()) {
