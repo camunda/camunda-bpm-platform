@@ -57,7 +57,7 @@ Contains resources like images and [`.less`](http://lesscss.org) stylesheets as 
 ### Prerequisite
 
 You need [node.js](http://nodejs.org) - we recommend using [nvm](https://github.com/creationix/nvm#install-script) to install node.js.
-Optionally you could globally install [grunt](http://gruntjs.com/) (using `npm install -g grunt-cli`).
+You will also need to install [grunt](http://gruntjs.com) globally using `npm install -g grunt-cli`.
 
 ### Setup
 
@@ -68,7 +68,6 @@ See https://github.com/camunda/camunda-bpm-platform#building-camunda-bpm-platfor
 #### Using grunt
 
 They are some grunt tasks aimed to ease the development setup process, __but they can not be considered as stable__ and might do some mess with your NPM linking (at least with the camunda related packages).
-You __need to install grunt globally__ to use that method.
 
 To give it a try:
 
