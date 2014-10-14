@@ -28,7 +28,6 @@
     "grunt-mkdir": "^0.1.1",
     "grunt-newer": "~0.6.1",
     "grunt-open": "~0.2.0",
-    "grunt-seleniuminstall": "git://github.com/camunda-third-party/grunt-seleniuminstall",
     "karma": "0.11.14",
     "karma-chrome-launcher": "~0.1.0",
     "karma-firefox-launcher": "~0.1.0",
