@@ -79,16 +79,6 @@ module.exports = function(config) {
     //   ]
     // },
 
-    // e2eTest: {
-    //   files: [
-    //     'grunt/config/protractor.js',
-    //     'test/e2e/**/*Spec.js'
-    //   ],
-    //   tasks: [
-    //     'protractor:e2e'
-    //   ]
-    // },
-
     served: {
       files: ['<%= buildTarget %>/**/*.*'],
       options: {
