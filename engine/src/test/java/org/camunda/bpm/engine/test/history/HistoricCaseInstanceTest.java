@@ -27,6 +27,7 @@ import java.util.Set;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.NotValidException;
+import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.history.HistoricCaseInstance;
 import org.camunda.bpm.engine.history.HistoricCaseInstanceQuery;
 import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
@@ -451,6 +452,30 @@ public class HistoricCaseInstanceTest extends CmmnProcessEngineTestCase {
     assertEquals(2, historyService.createNativeHistoricCaseInstanceQuery().sql("SELECT * FROM " + tableName).listPage(2, 2).size());
   }
 
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/emptyStageCase.cmmn"})
+  public void testDeleteHistoricCaseInstance() {
+    CaseInstance caseInstance = createCaseInstance();
+
+    HistoricCaseInstance historicInstance = queryHistoricCaseInstance(caseInstance.getId());
+    assertNotNull(historicInstance);
+
+    try {
+      // should not be able to delete historic case instance cause the case instance is still running
+      historyService.deleteHistoricCaseInstance(historicInstance.getId());
+      fail("Exception expected");
+    }
+    catch (NullValueException e) {
+      // expected
+    }
+
+    terminate(caseInstance.getId());
+    close(caseInstance.getId());
+
+    historyService.deleteHistoricCaseInstance(historicInstance.getId());
+
+    assertCount(0, historicQuery());
+  }
+
   protected HistoricCaseInstance queryHistoricCaseInstance(String caseInstanceId) {
     HistoricCaseInstance historicCaseInstance = historicQuery()
       .caseInstanceId(caseInstanceId)
@@ -466,7 +491,6 @@ public class HistoricCaseInstanceTest extends CmmnProcessEngineTestCase {
   protected void assertCount(long count, HistoricCaseInstanceQuery historicQuery) {
     assertEquals(count, historicQuery.count());
   }
-
 
   protected void assertDateSimilar(Date date1, Date date2) {
     long difference = Math.abs(date1.getTime() - date2.getTime());

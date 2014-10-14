@@ -42,11 +42,11 @@ public class DeleteHistoricCaseInstanceCmd implements Command<Object>, Serializa
       .findHistoricCaseInstance(caseInstanceId);
 
     ensureNotNull("No historic case instance found with id: " + caseInstanceId, "instance", instance);
-    ensureNotNull("Case instance is still running, cannot delete historic process instance: " + caseInstanceId, "instance.getCloseTime()", instance.getCloseTime());
+    ensureNotNull("Case instance is still running, cannot delete historic case instance: " + caseInstanceId, "instance.getCloseTime()", instance.getCloseTime());
 
     commandContext
-      .getHistoricProcessInstanceManager()
-      .deleteHistoricProcessInstanceById(caseInstanceId);
+      .getHistoricCaseInstanceManager()
+      .deleteHistoricCaseInstanceById(caseInstanceId);
 
     return null;
   }
