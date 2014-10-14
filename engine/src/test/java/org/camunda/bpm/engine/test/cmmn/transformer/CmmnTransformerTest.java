@@ -38,7 +38,7 @@ import static org.junit.Assert.*;
  * @author Roman Smirnov
  *
  */
-public class CmmnTranformerTest {
+public class CmmnTransformerTest {
 
   protected CmmnTransform transformer;
   protected CmmnModelInstance modelInstance;

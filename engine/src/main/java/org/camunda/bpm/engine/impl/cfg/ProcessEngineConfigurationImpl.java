@@ -95,7 +95,7 @@ import org.camunda.bpm.engine.impl.cmmn.handler.DefaultCmmnElementHandlerRegistr
 import org.camunda.bpm.engine.impl.cmmn.transformer.CmmnTransformFactory;
 import org.camunda.bpm.engine.impl.cmmn.transformer.CmmnTransformListener;
 import org.camunda.bpm.engine.impl.cmmn.transformer.CmmnTransformer;
-import org.camunda.bpm.engine.impl.cmmn.transformer.DefaultCmmnTranformFactory;
+import org.camunda.bpm.engine.impl.cmmn.transformer.DefaultCmmnTransformFactory;
 import org.camunda.bpm.engine.impl.connector.Connectors;
 import org.camunda.bpm.engine.impl.db.DbIdGenerator;
 import org.camunda.bpm.engine.impl.db.IbatisVariableTypeHandler;
@@ -995,7 +995,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     cmmnDeployer.setIdGenerator(idGenerator);
 
     if (cmmnTransformFactory == null) {
-      cmmnTransformFactory = new DefaultCmmnTranformFactory();
+      cmmnTransformFactory = new DefaultCmmnTransformFactory();
     }
 
     if (cmmnElementHandlerRegistry == null) {

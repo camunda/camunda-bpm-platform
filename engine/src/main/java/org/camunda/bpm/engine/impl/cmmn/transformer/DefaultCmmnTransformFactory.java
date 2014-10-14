@@ -16,7 +16,7 @@ package org.camunda.bpm.engine.impl.cmmn.transformer;
  * @author Roman Smirnov
  *
  */
-public class DefaultCmmnTranformFactory implements CmmnTransformFactory {
+public class DefaultCmmnTransformFactory implements CmmnTransformFactory {
 
   public CmmnTransform createTransform(CmmnTransformer cmmnTransformer) {
     return new CmmnTransform(cmmnTransformer);
