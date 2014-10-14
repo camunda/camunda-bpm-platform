@@ -34,10 +34,6 @@ module.exports = function(grunt) {
 
     karma:            require('camunda-commons-ui/grunt/config/karma')(config),
 
-    protractor:       require('camunda-commons-ui/grunt/config/protractor')(config),
-
-    seleniuminstall:  require('camunda-commons-ui/grunt/config/seleniuminstall')(config),
-
     requirejs:        require('./grunt/config/requirejs')(config),
 
     less:             require('camunda-commons-ui/grunt/config/less')(config),
@@ -150,8 +146,6 @@ module.exports = function(grunt) {
     'watch'
   ]);
 
-
-  grunt.registerTask('postinstall', ['seleniuminstall']);
 
   grunt.registerTask('prepublish', ['build', 'changelog']);
 
