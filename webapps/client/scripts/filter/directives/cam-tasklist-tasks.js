@@ -22,7 +22,7 @@ define([
 
       restrict: 'EAC',
       scope: {
-        filterData: '='
+        tasklistData: '='
       },
 
       template: template,
@@ -41,15 +41,15 @@ define([
         $scope.now = (new Date()).toJSON();
 
         $scope.filterProperties = null;
-
-        var filterData = $scope.filterData.newChild($scope);
+        
+        var tasksData = $scope.tasklistData.newChild($scope);
 
         var query;
 
         /**
          * observe the list of tasks
          */
-        filterData.observe(['taskList', 'taskListQuery', function (taskList, taskListQuery) {
+        $scope.state = tasksData.observe('taskList', function (taskList) {
 
           $scope.totalItems = taskList.count;
           $scope.processDefinitions = $scope.processDefinitions || [];
@@ -62,13 +62,22 @@ define([
 
           $scope.tasks = taskList._embedded.task;
 
+        });
+
+        /**
+         * observe the task list query
+         */
+        tasksData.observe('taskListQuery', function(taskListQuery) {
           // parse pagination properties from query
           query = angular.copy(taskListQuery);
           $scope.pageSize = query.maxResults;
           // Sachbearbeiter starts counting at '1'
           $scope.pageNum = (query.firstResult / $scope.pageSize) + 1;
+        });
 
-        }]);
+        $scope.focus = function (task) {
+          tasksData.set('taskId', { 'taskId' : task.id });
+        };
 
 
         filterData.observe(['currentFilter', function(currentFilter) {
@@ -83,7 +92,7 @@ define([
         $scope.pageChange = function() {
           // update query
           query.firstResult = $scope.pageSize * ($scope.pageNum - 1);
-          filterData.set('taskListQuery', query);
+          tasksData.set('taskListQuery', query);
         };
 
       }]

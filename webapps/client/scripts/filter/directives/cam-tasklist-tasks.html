@@ -21,13 +21,13 @@
 </div>
 -->
 
-<div ng-show="loading"
+<div ng-show="!state.$loaded"
      class="loader">
   <i class="animate-spin glyphicon glyphicon-refresh"></i>
   {{ 'LOADING' | translate }}
 </div>
 
-<div ng-hide="loading">
+<div ng-hide="!state.$loaded">
   <div ng-hide="totalItems"
        class="well">
     <i class="glyphicon glyphicon-info-sign"></i>
@@ -43,7 +43,7 @@
         <div class="names">
           <h4 class="task">
             <a ng-href="#/?task={{ task.id }}"
-               ng-click="focus(delta)"
+               ng-click="focus(task)"
                tabindex="{{ (delta + 1) }}">{{ task.name }}</a>
           </h4>
           <h6 class="process-definition"

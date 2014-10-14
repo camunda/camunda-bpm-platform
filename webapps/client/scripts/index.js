@@ -75,6 +75,8 @@ define('camunda-tasklist-ui', [
     tasklistApp.config(require('camunda-tasklist-ui/config/routes'));
     tasklistApp.config(require('camunda-tasklist-ui/config/date'));
 
+    tasklistApp.controller('camTasklistCtrl', require('camunda-tasklist-ui/controller/cam-tasklist-ctrl'));
+
 
     tasklistApp.run([
       '$rootScope',
@@ -131,7 +133,8 @@ define('camunda-tasklist-ui', [
         ]).then(function(translations) {
           Notifications.addError({
             status: translations.SESSION_EXPIRED,
-            message: translations.SESSION_EXPIRED_MESSAGE
+            message: translations.SESSION_EXPIRED_MESSAGE,
+            exclusive: true
           });
         });
       });

@@ -15,7 +15,7 @@ define([
 
       restrict: 'EAC',
       scope: {
-        filterData: '='
+        tasklistData: '='
       },
 
       template: template,
@@ -28,15 +28,16 @@ define([
         $rootScope
       ) {
 
-        var filterData = $scope.filterData.newChild($scope);
+        var filtersData = $scope.tasklistData.newChild($scope);
         var query;
 
         /**
          * observe list of filters and pre-process
          */
-        filterData.observe('filters', function(filters) {
+        $scope.state = filtersData.observe('filters', function(filters) {
 
           var focused;
+          $scope.totalItems = filters.length;
           each(filters, function(filter) {
 
             // read background color from properties
@@ -58,14 +59,14 @@ define([
         /**
          * observe the count for the current filter
          */
-        filterData.observe('taskList', function(taskList) {
+        filtersData.observe('taskList', function(taskList) {
           $scope.filterCount = taskList.count;
         });
 
         /**
-         * observe the task list query
+         * observe the task list query to get the latest update
          */
-        filterData.observe('taskListQuery', function(taskListQuery) {
+        filtersData.observe('taskListQuery', function(taskListQuery) {
           query = angular.copy(taskListQuery);
         });
 
@@ -75,13 +76,21 @@ define([
         $scope.focus = function(filter) {
           $scope.filterCount = undefined;
 
-          if(filter.id !== query.id) {
-            // filter changed => reset pagination
-            query.firstResult = 0;
+          if (filter) {
+
+            if(filter.id !== query.id) {
+              // filter changed => reset pagination
+              query.firstResult = 0;
+            }
+            query.id = filter.id;
+            
+          }
+          else {
+            query.id = null;
+
           }
 
-          query.id = filter.id;
-          filterData.set('taskListQuery', query);
+          filtersData.set('taskListQuery', query);
         };
 
         /**
@@ -90,9 +99,6 @@ define([
         $scope.isFocused = function(filter) {
           return filter.id === query.id;
         };
-
-
-
 
         // TODO: must be cleaned up
         $scope.edit = function(filter) {

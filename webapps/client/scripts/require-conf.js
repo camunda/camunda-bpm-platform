@@ -93,6 +93,7 @@ define(function() {
                                       'camunda-tasklist-ui/filter',
                                       'camunda-tasklist-ui/task',
                                       'camunda-tasklist-ui/process',
+                                      'camunda-tasklist-ui/controller/cam-tasklist-ctrl',
 
                                       'bootstrap/collapse',
                                       'camunda-tasklist-ui/navigation/index',

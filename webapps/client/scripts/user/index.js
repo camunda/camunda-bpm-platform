@@ -6,13 +6,15 @@ define([
   'camunda-commons-ui/auth',
   'camunda-tasklist-ui/api',
 
-  './directives/cam-auth-login'
+  './controller/cam-user-logout-ctrl',
+  './controller/cam-user-login-ctrl'
 ], function(
   angular,
   auth,
   api,
 
-  camAuthLogin
+  camUserLogoutCtrl,
+  camUserLoginCtrl
 ) {
   /**
    * @module cam.tasklist.user
@@ -29,31 +31,17 @@ define([
     'cam.form'
   ]);
 
-
-  userModule.directive('camAuthLogin', camAuthLogin);
-
   /**
    * controller to be used for the /logout route
    */
-  userModule.controller('userLogoutCtrl', [
-    '$translate',
-    'AuthenticationService',
-    'Notifications',
-  function(
-    $translate,
-    AuthenticationService,
-    Notifications
-  ) {
-    AuthenticationService
-      .logout()
-      .then(function() {
-        $translate('LOGGED_OUT').then(function(translated) {
-          Notifications.add({
-            status: translated
-          });
-        });
-      });
-  }]);
+  userModule.controller('camUserLogoutCtrl', camUserLogoutCtrl);
+
+  /**
+   * Controller used for the /login route
+   */
+  userModule.controller('camUserLoginCtrl', camUserLoginCtrl);
+
 
   return userModule;
 });
+

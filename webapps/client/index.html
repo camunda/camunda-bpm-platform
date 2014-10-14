@@ -31,7 +31,24 @@
 </head>
 
 <body>
-  <div class="page-wrap" ng-view>
+  <!-- # page-navigation -->
+  <nav class="navbar navbar-default"
+       role="navigation"
+       cam-tasklist-navigation>
+  </nav>
+  <!-- / page-navigation -->
+
+  <div class="page-wrap" >
+    <div class="container-fluid">
+      <div class="row controls">
+        <div notifications-panel
+             class="cols notifications-panel page-notifications"></div>
+      </div>
+    </div>
+
+    <div ng-view>
+    </div>
+
   </div>
 
   <footer class="page">

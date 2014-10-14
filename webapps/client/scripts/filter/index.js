@@ -18,7 +18,6 @@ define([
   './directives/cam-tasklist-filters',
   './directives/cam-tasklist-tasks',
   './modals/cam-tasklist-filter-form',
-  './controllers/filter-ctrl',
   'camunda-tasklist-ui/utils',
   'camunda-tasklist-ui/api'
 ], function(
@@ -28,7 +27,6 @@ define([
   camTasklistFilters,
   camTasklistFilterTasks,
   camTasklistFilterForm,
-  camTasklistFilterCtrl,
   utils,
   api
 ) {
@@ -42,8 +40,6 @@ define([
   ]);
 
   filterModule.controller('filterFormCtrl', camTasklistFilterForm);
-
-  filterModule.controller('camTasklistFilterCtrl', camTasklistFilterCtrl);
 
   filterModule.directive('camTasklistFilters', camTasklistFilters);
 

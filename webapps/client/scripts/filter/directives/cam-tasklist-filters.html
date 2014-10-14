@@ -1,62 +1,70 @@
-<div ng-show="loading"
+<div ng-show="!state.$loaded"
      class="loader">
   <i class="animate-spin glyphicon glyphicon-refresh"></i>
   {{ 'LOADING' | translate }}
 </div>
 
-<div ng-hide="loading"
-     ng-repeat="(delta, filter) in filters | orderBy:'properties.priority'"
-     class="task-filter-wrapper"
-     ng-class="{active: isFocused(filter)}"
-     ng-style="{'z-index': ((filters.length + 10) - delta) }">
+<div ng-hide="!state.$loaded">
+  <div ng-hide="totalItems"
+       class="well">
+    <i class="glyphicon glyphicon-info-sign"></i>
+    {{ 'NO_AVAILABLE_FILTER' | translate }}
+  </div>
 
-  <div class="task-filter"
-       ng-style="filter.style">
+  <div ng-show="totalItems"
+       ng-repeat="(delta, filter) in filters | orderBy:'properties.priority'"
+       class="task-filter-wrapper"
+       ng-class="{active: isFocused(filter)}"
+       ng-style="{'z-index': ((filters.length + 10) - delta) }">
 
-    <div ng-if="isFocused(filter)"
-      class="counter">{{ filterCount }}</div>
-
-    <h4 class="name"
-        ng-click="focus(filter)">{{ filter.name }}</h4>
-
-    <div class="info"
+    <div class="task-filter"
          ng-style="filter.style">
 
-      <ul class="filter-actions list-unstyled">
-        <li>
-          <a href
-             ng-click="edit(filter)">
-            <span class="glyphicon glyphicon-pencil"></span>
-            <span class="hidden-sm hidden-xs hidden-md"
-                  translate="FILTER_EDIT">Edit filter</span>
-          </a>
-        </li>
-        <li>
-          <a href
-             ng-click="delete(filter)">
-            <span class="glyphicon glyphicon-trash"></span>
-            <span class="hidden-sm hidden-xs hidden-md"
-                  translate="FILTER_DELETE">Delete filter</span>
-          </a>
-        </li>
-      </ul>
+      <div ng-if="isFocused(filter)"
+        class="counter">{{ filterCount }}</div>
 
-      <div ng-if="filter.properties.description"
-           class="description">
-        {{ filter.properties.description }}
+      <h4 class="name"
+          ng-click="focus(filter)">{{ filter.name }}</h4>
+
+      <div class="info"
+           ng-style="filter.style">
+
+        <ul class="filter-actions list-unstyled">
+          <li>
+            <a href
+               ng-click="edit(filter)">
+              <span class="glyphicon glyphicon-pencil"></span>
+              <span class="hidden-sm hidden-xs hidden-md"
+                    translate="FILTER_EDIT">Edit filter</span>
+            </a>
+          </li>
+          <li>
+            <a href
+               ng-click="delete(filter)">
+              <span class="glyphicon glyphicon-trash"></span>
+              <span class="hidden-sm hidden-xs hidden-md"
+                    translate="FILTER_DELETE">Delete filter</span>
+            </a>
+          </li>
+        </ul>
+
+        <div ng-if="filter.properties.description"
+             class="description">
+          {{ filter.properties.description }}
+        </div>
+        <!--
+        <ul class="query list-unstyled">
+          <li ng-repeat="queryParam in filter.query">
+            <span class="key">{{ queryParam.key }}</span>:
+
+            <span class="operator"
+                  ng-if="queryParam.operator">{{ queryParam.operator }}</span>
+
+            <span class="value">{{ queryParam.value }}</span>
+          </li>
+        </ul>
+        -->
       </div>
-      <!--
-      <ul class="query list-unstyled">
-        <li ng-repeat="queryParam in filter.query">
-          <span class="key">{{ queryParam.key }}</span>:
-
-          <span class="operator"
-                ng-if="queryParam.operator">{{ queryParam.operator }}</span>
-
-          <span class="value">{{ queryParam.value }}</span>
-        </li>
-      </ul>
-      -->
     </div>
   </div>
 </div>

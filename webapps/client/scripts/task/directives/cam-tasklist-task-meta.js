@@ -44,7 +44,7 @@ define([
     return {
       scope: {
         taskData: '=',
-        filterData: '='
+        tasklistData: '='
       },
 
       template: template,
@@ -54,8 +54,7 @@ define([
       function(
         $scope
       ){
-        var taskData = $scope.taskData.newChild($scope);
-        var filterData = $scope.filterData.newChild($scope);
+        var taskData = $scope.tasklistData.newChild($scope);
 
         /**
          * observe task changes
@@ -77,7 +76,7 @@ define([
 
           // list of tasks must be reloaded as well:
           // changed properties on this task may cause the list to change
-          filterData.changed('taskList');
+          taskData.changed('taskList');
         }
 
         function saveDate(propName) {
@@ -86,7 +85,7 @@ define([
             var toSend = self.task;
 
 
-            toSend[propName] = scope.task[propName] = inlineFieldScope.varValue;
+            toSend[propName] = $scope.task[propName] = inlineFieldScope.varValue;
 
             delete toSend._embedded;
             delete toSend._links;
@@ -140,6 +139,7 @@ define([
         $scope.userIsAssignee = function() {
           return $rootScope.authentication &&
                   $rootScope.authentication.name &&
+                  $scope.task &&
                   ($rootScope.authentication.name === $scope.task.assignee);
         };
 

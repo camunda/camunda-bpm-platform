@@ -1,7 +1,9 @@
 define([
-  'text!camunda-tasklist-ui/index.html'
+  'text!camunda-tasklist-ui/index.html',
+  'text!camunda-tasklist-ui/user/controller/cam-auth-login.html'
 ], function(
-  tasklistTemplate
+  tasklistTemplate,
+  userLoginTemplate
 ) {
   'use strict';
 
@@ -14,22 +16,21 @@ define([
     $routeProvider
       .when('/', {
         template: tasklistTemplate,
+        controller: 'camTasklistCtrl',
         authentication: 'required',
         reloadOnSearch: false
       })
 
-
       .when('/login', {
-        template: tasklistTemplate
+        template: userLoginTemplate,
+        controller: 'camUserLoginCtrl'
       })
-
 
       .when('/logout', {
-        template: tasklistTemplate,
+        template: userLoginTemplate,
         authentication: 'required',
-        controller: 'userLogoutCtrl'
+        controller: 'camUserLogoutCtrl'
       })
-
 
       .otherwise({
         redirectTo: '/'

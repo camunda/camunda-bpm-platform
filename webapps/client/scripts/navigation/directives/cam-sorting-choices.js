@@ -12,14 +12,14 @@ define([
 
       restrict: 'EAC',
       scope: {
-        filterData: '='
+        tasklistData: '='
       },
 
       template: template,
 
       link: function(scope, element, attrs) {
 
-        var filterData = scope.filterData.newChild(scope);
+        var tasklistData = scope.tasklistData.newChild(scope);
         var query;
 
         scope.order = null;
@@ -29,7 +29,7 @@ define([
         /**
          * observe the task list query
          */
-        filterData.observe('taskListQuery', function(taskListQuery) {
+        tasklistData.observe('taskListQuery', function(taskListQuery) {
           query = angular.copy(taskListQuery);
           scope.order = query.sortOrder;
           scope.by = query.sortBy;
@@ -42,7 +42,7 @@ define([
         scope.changeOrder = function() {
           // update query
           query.sortOrder = scope.order === 'asc' ? 'desc' : 'asc';
-          filterData.set('taskListQuery', query);
+          tasklistData.set('taskListQuery', query);
         };
 
         /**
@@ -54,7 +54,7 @@ define([
 
           // update query
           query.sortBy = by;
-          filterData.set('taskListQuery', query);
+          tasklistData.set('taskListQuery', query);
         };
 
       }
