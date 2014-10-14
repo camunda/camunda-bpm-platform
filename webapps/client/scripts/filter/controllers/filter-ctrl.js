@@ -48,6 +48,24 @@ function(
     sortOrder: 'asc'
   });
 
+  filterData.provide('currentFilterId', ['taskListQuery', function(taskListQuery) {
+    return taskListQuery.id;
+  }]);
+
+  filterData.provide('currentFilter', ['currentFilterId', 'filters', function(currentFilterId, filters) {
+    if(currentFilterId === null) {
+      return null;
+    }
+    else {
+      for (var f in filters) {
+        if (filters[f].id === currentFilterId) {
+          return filters[f];
+        }
+      }
+      return null;
+    }
+  }]);
+
   /**
    * Provide the list of tasks
    */

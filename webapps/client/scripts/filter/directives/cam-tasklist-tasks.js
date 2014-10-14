@@ -40,6 +40,8 @@ define([
         $scope.totalItems = 0;
         $scope.now = (new Date()).toJSON();
 
+        $scope.filterProperties = null;
+
         var filterData = $scope.filterData.newChild($scope);
 
         var query;
@@ -65,6 +67,13 @@ define([
           $scope.pageSize = query.maxResults;
           // Sachbearbeiter starts counting at '1'
           $scope.pageNum = (query.firstResult / $scope.pageSize) + 1;
+
+        }]);
+
+
+        filterData.observe(['currentFilter', function(currentFilter) {
+
+          $scope.filterProperties = currentFilter !== null ? currentFilter.properties : null;
 
         }]);
 
