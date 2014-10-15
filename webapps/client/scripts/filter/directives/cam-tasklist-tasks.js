@@ -80,6 +80,10 @@ define([
         };
 
 
+        /**
+         * Observes the properties of the current filter.
+         * Used to retrieve information about variables displayed on a task.
+         */
         tasksData.observe(['currentFilter', function(currentFilter) {
 
           $scope.filterProperties = currentFilter !== null ? currentFilter.properties : null;

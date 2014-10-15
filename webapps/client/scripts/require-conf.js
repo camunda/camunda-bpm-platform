@@ -91,6 +91,7 @@ define(function() {
                                       'camunda-tasklist-ui/controls',
                                       'camunda-tasklist-ui/form',
                                       'camunda-tasklist-ui/filter',
+                                      'camunda-tasklist-ui/variable',
                                       'camunda-tasklist-ui/task',
                                       'camunda-tasklist-ui/process',
                                       'camunda-tasklist-ui/controller/cam-tasklist-ctrl',
@@ -145,6 +146,10 @@ define(function() {
       },
       {
         name: 'camunda-tasklist-ui/task',
+        main: 'index'
+      },
+      {
+        name: 'camunda-tasklist-ui/variable',
         main: 'index'
       },
       {

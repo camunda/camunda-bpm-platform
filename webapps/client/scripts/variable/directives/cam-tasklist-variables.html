@@ -1,0 +1,80 @@
+<div class="variables-list"
+     ng-class="{expanded: (expanded && shownVariablesCount > 2)}">
+
+  <!-- <h6 class="col-xs-12"
+      translate="TASK_VARIABLES">Variables</h6> -->
+
+  <div ng-repeat="(delta, info) in variableDefinitions"
+       ng-if="variablesByName[info.name]">
+    <div class="col-xs-12 col-lg-6">
+
+      <div class="row variable-item">
+        <!-- <span class="col-xs-4 col-lg-12"
+              ng-click="selectValue($event)"> -->
+        <span class="col-xs-4 col-lg-12">
+          <strong class="variable-label">
+            {{ info.label }}:
+          </strong>
+        </span>
+
+        <span class="col-xs-8 col-lg-12"
+              ng-if="variablesByName[info.name].value !== null"
+              ng-switch="variablesByName[info.name].type">
+          <span class="variable-value"
+                ng-switch-when="Date">
+            {{ variablesByName[info.name].value | camDate }}
+          </span>
+
+          <span class="variable-value"
+                ng-switch-when="Null">
+            {{ variablesByName[info.name].value }}
+          </span>
+
+          <a class="variable-value variable-type"
+             ng-switch-when="Serializable"
+             ng-click="showValue(variablesByName[info.name])">
+            {{ variablesByName[info.name].value.type }}
+          </a>
+
+          <a class="variable-value variable-type"
+             ng-switch-when="Object"
+             ng-click="showValue(variablesByName[info.name])">
+            {{ variablesByName[info.name].serializationConfig.rootType }}
+          </a>
+
+          <a class="variable-value"
+             ng-switch-when="byte[]"
+             ng-click="download(variablesByName[info.name])">
+            {{ 'DOWNLOAD' | translate }}
+            <span class="glyphicon glyphicon-download"></span>
+          </a>
+
+          <span class="variable-value"
+                ng-switch-default>
+            {{ variablesByName[info.name].value }}
+          </span>
+        </span>
+
+        <span class="col-xs-8 col-lg-12"
+              ng-if="variablesByName[info.name].value === null">
+          <span class="variable-value variable-empty-value"
+                translate="EMPTY_VALUE">Empty</span>
+        </span>
+      </div>
+
+    </div>
+  </div>
+
+
+  <div class="shutter"
+       ng-if="shownVariablesCount > 2">
+    <a ng-click="toggle()"
+       tooltip-placement="bottom"
+       tooltip-append-to-body="true"
+       tooltip="{{ (expanded ? 'LESS' : 'MORE') | translate }}">
+      <span class="glyphicon"
+            ng-class="{'glyphicon-chevron-up': expanded, 'glyphicon-chevron-down': !expanded}"></span>
+    </a>
+  </div>
+</div>
+

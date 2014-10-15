@@ -55,7 +55,7 @@
 
 
 
-        <ul class="list-inline">
+        <ul class="dates list-inline">
           <!--
           <li>
             <input type="checkbox"
@@ -91,6 +91,14 @@
                   am-time-ago="task.due">{{task.due}}</span>
           </li>
         </ul>
+
+
+
+        <div cam-tasklist-variables
+             ng-if="task._embedded.variable.length"
+             filter-properties="filterProperties"
+             variables="task._embedded.variable"
+             class="row variables" />
       </li>
     </ol>
   </form>

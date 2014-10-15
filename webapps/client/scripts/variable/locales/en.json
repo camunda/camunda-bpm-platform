@@ -1,0 +1,18 @@
+{
+  "EMPTY_VALUE":
+                    "&lt;Empty&gt;",
+  "TASK_VARIABLES":
+                    "Variables",
+  "VARIABLE_SERIALIZED_OF":
+                    "Serializable variable of type",
+  "VARIABLE_VALUE":
+                    "Value of",
+  "DOWNLOAD":
+                    "Download",
+  "LESS":
+                    "Less",
+  "MORE":
+                    "More",
+  "TOGGLE":
+                    "Toggle"
+}

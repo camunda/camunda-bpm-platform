@@ -128,7 +128,7 @@
 }
 
 .tasks-list {
-  li.task {
+  > li {
     margin: 0;
     border-top: 1px dashed @gray-light;
     padding: (@grid-gutter-width / 2) 0;
@@ -140,6 +140,10 @@
     &:focus {
       outline: none;
       background-color: @gray-lighter;
+    }
+
+    .names > h4 {
+      margin-top: 0;
     }
   }
 }
