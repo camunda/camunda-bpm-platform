@@ -7,8 +7,10 @@ define([
 
   return [
     '$timeout',
+    '$document',
   function(
-    $timeout
+    $timeout,
+    $document
   ) {
 
     return {
@@ -68,14 +70,29 @@ define([
           }
         }
 
+        function stopEditing(evt) {
+          if(!scope.editing) {
+            return;
+          }
+
+          if(element[0].contains(evt.target)) {
+            return;
+          }
+
+          scope.$apply(scope.cancelChange);
+        }
+
         scope.startEditing = function() {
-          reset();
+          if(!scope.editing) {
+            reset();
 
-          scope.editing = true;
+            scope.editing = true;
 
-          $timeout(function(){
-            angular.element('[ng-model="editValue"]').focus();
-          }, 100);
+            $timeout(function(){
+              angular.element('[ng-model="editValue"]').focus();
+              $document.bind('click', stopEditing);
+            }, 100);
+          }
         };
 
         scope.applyChange = function() {
@@ -99,6 +116,7 @@ define([
             scope.change(scope);
 
             scope.editing = false;
+            $document.unbind('click', stopEditing);
           }
           else {
             scope.$emit('error', scope.invalid);
@@ -107,6 +125,7 @@ define([
 
         scope.cancelChange = function() {
           scope.editing = false;
+          $document.unbind('click', stopEditing);
         };
 
         scope.changeDate = function(pickerScope) {
