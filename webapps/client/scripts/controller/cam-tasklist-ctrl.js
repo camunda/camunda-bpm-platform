@@ -101,8 +101,6 @@ define([
     }]);
 
     tasklistData.provide('currentFilter', ['taskListQuery', 'filters', function(taskListQuery, filters) {
-      /* jshint debug:true */
-      debugger;
       if(taskListQuery.id === null) {
         return null;
       }
