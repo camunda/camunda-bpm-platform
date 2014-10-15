@@ -98,7 +98,7 @@
 
 
 
-<pagination ng-show="totalItems > pageSize"
+<pagination ng-show="state.$loaded && totalItems > pageSize"
             total-items="totalItems"
             items-per-page="pageSize"
             max-size="5"

@@ -61,24 +61,6 @@ define([
       return deferred.promise;
     }]);
 
-    tasklistData.provide('currentFilterId', ['taskListQuery', function(taskListQuery) {
-      return taskListQuery.id;
-    }]);
-
-    tasklistData.provide('currentFilter', ['currentFilterId', 'filters', function(currentFilterId, filters) {
-      if(currentFilterId === null) {
-        return null;
-      }
-      else {
-        for (var f in filters) {
-          if (filters[f].id === currentFilterId) {
-            return filters[f];
-          }
-        }
-        return null;
-      }
-    }]);
-
     /**
      * Provide the initial task list query
      */
@@ -118,7 +100,25 @@ define([
       return deferred.promise;
     }]);
 
-    /**
+    tasklistData.provide('currentFilterId', ['taskListQuery', function(taskListQuery) {
+      return taskListQuery.id;
+    }]);
+
+    tasklistData.provide('currentFilter', ['currentFilterId', 'filters', function(currentFilterId, filters) {
+      if(currentFilterId === null) {
+        return null;
+      }
+      else {
+        for (var f in filters) {
+          if (filters[f].id === currentFilterId) {
+            return filters[f];
+          }
+        }
+        return null;
+      }
+    }]);
+ 
+   /**
      * Provide current task id
      */
     tasklistData.provide('taskId', { 'taskId' : taskId });
