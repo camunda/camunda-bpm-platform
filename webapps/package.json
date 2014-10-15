@@ -59,8 +59,7 @@
     "requirejs": "~2.1.11",
     "underscore": "~1.6.0",
     "underscore.string": "~2.3.3",
-    "uuid": "~1.4.1",
-    "camunda-bpm-sdk-js": "git+ssh://git@github.com:camunda/camunda-bpm-sdk-js"
+    "uuid": "~1.4.1"
   },
   "devDependencies": {
     "camunda-commons-ui": "git+ssh://git@github.com:camunda/camunda-commons-ui",

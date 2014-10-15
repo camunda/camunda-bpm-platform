@@ -39,7 +39,8 @@
     "hyperagent": "*",
     "jquery": "2.1.1",
     "bpmn-js": "~0.5.1",
-    "angular-data-depend": "git@github.com:camunda-third-party/angular-data-depend.git"
+    "angular-data-depend": "git@github.com:camunda-third-party/angular-data-depend.git",
+    "camunda-bpm-sdk-js": "git@github.com:camunda/bower-camunda-bpm-sdk-js#7.2.0-SNAPSHOT"
   },
   "devDependencies": {
     "jquery-mockjax": "1.5.3",
