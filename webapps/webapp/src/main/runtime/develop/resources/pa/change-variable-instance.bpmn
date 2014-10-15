@@ -19,7 +19,7 @@
       <bpmn2:outgoing>SequenceFlow_4</bpmn2:outgoing>
     </bpmn2:serviceTask>
     <bpmn2:sequenceFlow id="SequenceFlow_3" name="" sourceRef="changeVariables_1" targetRef="changeVariables_2"/>
-    <bpmn2:userTask id="userTask" name="Approve Variables">
+    <bpmn2:userTask id="userTask" name="Approve Variables" camunda:assignee="jonny1">
       <bpmn2:incoming>SequenceFlow_4</bpmn2:incoming>
       <bpmn2:outgoing>SequenceFlow_5</bpmn2:outgoing>
     </bpmn2:userTask>

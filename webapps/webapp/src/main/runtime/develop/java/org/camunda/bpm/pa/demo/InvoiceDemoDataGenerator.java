@@ -6,7 +6,9 @@ import static org.camunda.bpm.engine.authorization.Permissions.READ;
 import static org.camunda.bpm.engine.authorization.Resources.APPLICATION;
 import static org.camunda.bpm.engine.authorization.Resources.USER;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -169,6 +171,10 @@ public class InvoiceDemoDataGenerator {
       filterProperties.clear();
       filterProperties.put("description", "Tasks assigned to me");
       filterProperties.put("priority", -10);
+      List<FilterVariableDefinition> variableDefinitions = new ArrayList<FilterVariableDefinition>();
+      variableDefinitions.add(new FilterVariableDefinition("Bytes", "aByteVar"));
+      variableDefinitions.add(new FilterVariableDefinition("String", "aStringVar"));
+      filterProperties.put("variables", variableDefinitions);
       TaskService taskService = engine.getTaskService();
       TaskQuery query = taskService.createTaskQuery().taskAssigneeExpression("${currentUser()}");
       filter = filterService.newTaskFilter().setName("My Tasks").setProperties(filterProperties).setQuery(query);
