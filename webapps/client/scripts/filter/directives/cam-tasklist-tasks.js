@@ -41,7 +41,7 @@ define([
         $scope.now = (new Date()).toJSON();
 
         $scope.filterProperties = null;
-        
+
         var tasksData = $scope.tasklistData.newChild($scope);
 
         var query;
@@ -80,7 +80,7 @@ define([
         };
 
 
-        filterData.observe(['currentFilter', function(currentFilter) {
+        tasksData.observe(['currentFilter', function(currentFilter) {
 
           $scope.filterProperties = currentFilter !== null ? currentFilter.properties : null;
 
