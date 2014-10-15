@@ -18,7 +18,6 @@ import java.util.Map.Entry;
 import org.camunda.bpm.connect.ConnectorRequest;
 import org.camunda.bpm.connect.ConnectorResponse;
 import org.camunda.bpm.engine.delegate.CoreVariableInstance;
-import org.camunda.bpm.engine.delegate.DelegateCaseVariableInstance;
 import org.camunda.bpm.engine.impl.core.variable.CoreVariableScope;
 import org.camunda.bpm.engine.impl.core.variable.CoreVariableStore;
 
@@ -60,10 +59,6 @@ public class ConnectorVariableScope extends CoreVariableScope<CoreVariableInstan
     for (Entry<String, Object> entry : responseParameters.entrySet()) {
       setVariableLocal(entry.getKey(), entry.getValue());
     }
-  }
-
-  public void dispatchEvent(DelegateCaseVariableInstance variable) {
-
   }
 
 }

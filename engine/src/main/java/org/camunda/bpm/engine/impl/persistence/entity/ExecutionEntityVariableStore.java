@@ -12,11 +12,10 @@
  */
 package org.camunda.bpm.engine.impl.persistence.entity;
 
-import org.camunda.bpm.engine.impl.core.variable.CoreVariableScope;
-import org.camunda.bpm.engine.impl.variable.AbstractPersistentVariableStore;
-
 import java.util.List;
 import java.util.Map;
+
+import org.camunda.bpm.engine.impl.variable.AbstractPersistentVariableStore;
 
 /**
  * @author Daniel Meyer
@@ -48,10 +47,6 @@ public class ExecutionEntityVariableStore extends AbstractPersistentVariableStor
 
   public Map<String, VariableInstanceEntity> getVariableInstancesWithoutInitialization() {
     return variableInstances;
-  }
-
-  protected CoreVariableScope<?> getVariableScope() {
-    return executionEntity;
   }
 
 }

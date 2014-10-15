@@ -14,7 +14,6 @@ package org.camunda.bpm.engine.impl.persistence.entity;
 
 import java.util.List;
 
-import org.camunda.bpm.engine.impl.core.variable.CoreVariableScope;
 import org.camunda.bpm.engine.impl.variable.AbstractPersistentVariableStore;
 
 /**
@@ -40,9 +39,4 @@ public class TaskEntityVariableStore extends AbstractPersistentVariableStore {
   protected void initializeVariableInstanceBackPointer(VariableInstanceEntity variableInstance) {
     taskEntity.initializeVariableInstanceBackPointer(variableInstance);
   }
-
-  protected CoreVariableScope<?> getVariableScope() {
-    return taskEntity;
-  }
-
 }

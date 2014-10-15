@@ -18,7 +18,6 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.camunda.bpm.engine.delegate.DelegateCaseVariableInstance;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
 import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
 import org.camunda.bpm.engine.impl.core.variable.CorePersistentVariableScope;
@@ -833,10 +832,6 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
 
   public void setStartContext(ExecutionStartContext startContext) {
     this.startContext = startContext;
-  }
-
-  public void dispatchEvent(DelegateCaseVariableInstance variable) {
-    // do nothing
   }
 
 }

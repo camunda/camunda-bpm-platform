@@ -21,7 +21,6 @@ import java.util.logging.Logger;
 
 import org.camunda.bpm.engine.ProcessEngineServices;
 import org.camunda.bpm.engine.delegate.BpmnModelExecutionContext;
-import org.camunda.bpm.engine.delegate.DelegateCaseVariableInstance;
 import org.camunda.bpm.engine.delegate.ProcessEngineServicesAware;
 import org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionImpl;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;

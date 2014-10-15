@@ -13,7 +13,6 @@
 package org.camunda.bpm.engine.test.el.util;
 
 import org.camunda.bpm.engine.delegate.CoreVariableInstance;
-import org.camunda.bpm.engine.delegate.DelegateCaseVariableInstance;
 import org.camunda.bpm.engine.impl.core.variable.CoreVariableScope;
 import org.camunda.bpm.engine.impl.core.variable.CoreVariableStore;
 import org.camunda.bpm.engine.impl.core.variable.SimpleVariableStore;
