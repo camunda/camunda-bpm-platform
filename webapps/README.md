@@ -44,13 +44,13 @@ See [plugin development guide](http://docs.camunda.org/latest/real-life/how-to/#
 
 ## Libraries
 
-### JS SDK
+### [JS SDK](https://github.com/camunda/camunda-bpm-sdk-js)
 
 Has tools to work with the REST API and forms.
 
-### Commons
+### [Commons](https://github.com/camunda/camunda-commons-ui)
 
-Contains resources like images and [`.less`](http://lesscss.org) stylesheets as well as some [angular.js](http://angularjs.org) modules.
+Contains resources like images, [`.less`](http://lesscss.org) stylesheets as well as some [angular.js](http://angularjs.org) modules and locales for the translation of the Tasklist interface texts.
 
 ## Development
 
