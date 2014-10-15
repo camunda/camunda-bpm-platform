@@ -21,6 +21,10 @@
 
   "FILTER_NOT_FOUND":
                         "Filter not found",
+
+  "FILTER_FORM_AUTHORIZATIONS_HINT":
+                        "This section is aimed to set the authorizations for the filter.",
+
   "FILTER_AUTHORIZAION_NOT_FOUND":
                         "Filter authorizations not found",
 

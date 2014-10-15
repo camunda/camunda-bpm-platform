@@ -2,12 +2,12 @@
 
   <div class="row controls">
     <div class="cols col-sm-2 task-filters"
-         ng-controller="filterFormCtrl">
+         ng-controller="camEditFilterCtrl">
       <div class="inner">
         <h5>
           <a href
              ng-show="userCanCreateFilter"
-             ng-click="createFilter()">
+             ng-click="openDialog('CREATE_NEW_FILTER')">
             New filter
             <span class="glyphicon glyphicon-plus-sign"></span>
           </a>

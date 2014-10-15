@@ -128,21 +128,36 @@ define([
   }
 
 
-  var filterCreateModalCtrl = [
+  return [
     '$location',
     '$scope',
     '$translate',
+    '$modalInstance',
     'Notifications',
     'camAPI',
+    'filter',
+    'action',
+    'filterFormData',
   function(
     $location,
     $scope,
     $translate,
+    $modalInstance,
     Notifications,
-    camAPI
+    camAPI,
+    filter,
+    action,
+    filterFormData
   ) {
 
+    // dismiss the modalInstance on location (or route) change
+    $scope.$on('$locationChangeStart', function() {
+      $modalInstance.dismiss();
+    });
 
+    var EDIT_FILTER_ACTION = 'EDIT_FILTER',
+        DELETE_FILTER_ACTION = 'DELETE_FILTER',
+        CREATE_NEW_FILTER_ACTION = 'CREATE_NEW_FILTER';
 
     /*
     ┌──────────────────────────────────────────────────────────────────────────────────────────────┐
@@ -152,7 +167,29 @@ define([
     var Filter = camAPI.resource('filter');
     var Authorization = camAPI.resource('authorization');
 
+    var formData = $scope.formData = filterFormData.newChild($scope);
 
+    if (filter && action !== CREATE_NEW_FILTER_ACTION) {
+
+      $scope.filter = filter;
+
+      formData.observe('userFilterAccess', function(access) {
+        $scope.accesses = {};
+        each(access.links, function(link) {
+          $scope.accesses[link.rel] = true;
+        });
+
+      });
+
+      formData.observe('definedAuthorizationOnFilterToEdit', function(authorizations) {
+        $scope.filter.authorizations = authorizations;
+        $scope._authorizations = authorizations;
+        initializeAuthorizations($scope._authorizations);
+      });
+
+    }
+
+    $scope.deletion = (action === DELETE_FILTER_ACTION);
 
     $scope.$invalid = false;
     $scope.$valid = true;
@@ -188,7 +225,7 @@ define([
     });
 
 
-    $scope.filter =                       copy($scope.$parent.filter || {});
+    $scope.filter =                       copy($scope.filter || {});
     $scope.filter.query =                 $scope.filter.query || [];
     $scope.filter.authorizations =        $scope.filter.authorizations || [];
     $scope.filter.properties =            $scope.filter.properties || {};
@@ -343,8 +380,6 @@ define([
 
     var _authorizationsToDelete = [];
 
-    $scope._authorizations = $scope.filter.authorizations;
-
     function availablePermissions(authorizationPermissions) {
       var available = copy(permissionsMap);
 
@@ -362,15 +397,21 @@ define([
       return available;
     }
 
-    each($scope._authorizations, function(authorization) {
-      authorization.availablePermissions = availablePermissions(authorization.permissions);
 
-      authorization.permissions = authorization.permissions.join(/[\s]*,[\s]*/);
-      authorization.identity = authorization.userId || authorization.groupId;
-      authorization.identityType = authorization.userId ? 'user' : 'group';
-      authorization.type = parseInt(authorization.type, 10);
-      authorization._originalType = authorization.type;
-    });
+    $scope._authorizations = $scope.filter.authorizations;
+    initializeAuthorizations($scope._authorizations);
+
+    function initializeAuthorizations(authorizations) {
+      each(authorizations, function(authorization) {
+        authorization.availablePermissions = availablePermissions(authorization.permissions);
+
+        authorization.permissions = authorization.permissions.join(/[\s]*,[\s]*/);
+        authorization.identity = authorization.userId || authorization.groupId;
+        authorization.identityType = authorization.userId ? 'user' : 'group';
+        authorization.type = parseInt(authorization.type, 10);
+        authorization._originalType = authorization.type;
+      });
+    }
 
     $scope.addAuthorization = function() {
       $scope._authorizations.push(copy(emptyAuthorization));
@@ -610,21 +651,29 @@ define([
           }
 
           successNotification('FILTER_SAVE_SUCCESS');
-          $scope.$emit('tasklist.filter.saved');
-          $scope.$close();
+
+          var result = {
+            action: action,
+            filter: $scope.filter
+          };
+
+          $scope.$close(result);
         });
+
+
       });
     };
-
 
 
     $scope.deletion = typeof $scope.deletion === 'undefined' ? false : $scope.deletion;
 
     $scope.abortDeletion = function() {
+      action = EDIT_FILTER_ACTION;
       $scope.deletion = false;
     };
 
     $scope.confirmDeletion = function() {
+      action = DELETE_FILTER_ACTION;
       $scope.deletion = true;
     };
 
@@ -635,151 +684,14 @@ define([
         }
 
         successNotification('FILTER_DELETION_SUCCESS');
-        $scope.$emit('tasklist.filter.deleted');
-        $scope.$close();
+        var result = {
+            action: action,
+            filter: $scope.filter
+          };
+        $scope.$close(result);
       });
     };
+
   }];
 
-
-
-
-
-  return [
-    '$modal',
-    '$scope',
-    '$rootScope',
-    '$location',
-    '$translate',
-    'Notifications',
-    'camAPI',
-  function(
-    $modal,
-    $scope,
-    $rootScope,
-    $location,
-    $translate,
-    Notifications,
-    camAPI
-  ) {
-    var Filter = camAPI.resource('filter');
-    var Authorization = camAPI.resource('authorization');
-    $scope.loading = false;
-
-
-    $rootScope.$watch('authentication.userCanCreateFilter', function() {
-      if (!$rootScope.authentication) { return; }
-      $scope.userCanCreateFilter = $rootScope.authentication.userCanCreateFilter;
-    });
-
-
-
-    function clearScopeFilter() {
-      $scope.filter = null;
-    }
-
-
-    function open(filter) {
-      if ($scope.filter && filter && $scope.filter.id === filter.id) {
-        return;
-      }
-
-      // if not set to something truthy,
-      // it could be possible to open a new modal window
-      $scope.filter = filter || {};
-
-      $modal.open({
-        scope: $scope,
-
-        windowClass: 'filter-edit-modal',
-
-        size: 'lg',
-
-        template: template,
-
-        controller: filterCreateModalCtrl
-      })
-      .result.then(clearScopeFilter, clearScopeFilter);
-    }
-
-
-    function errorNotification(src, err) {
-      $translate(src).then(function(translated) {
-        Notifications.addError({
-          status: translated,
-          message: (err ? err.message : '')
-        });
-      });
-    }
-
-
-    function loadPermissions(filter, loaded) {
-      $scope.loading = true;
-      Authorization.list({
-        resourceType: 5,
-        resourceId: filter.id
-      }, function(err, authorizations) {
-        $scope.loading = false;
-
-        if (err) {
-          return errorNotification('FILTER_AUTHORIZAION_NOT_FOUND', err);
-        }
-
-        filter.authorizations = authorizations;
-
-        Filter.authorizations(filter.id, function(err, resp) {
-          if (err) { throw err; }
-          $scope.accesses = {};
-          each(resp.links, function(link) {
-            $scope.accesses[link.rel] = true;
-          });
-
-          loaded(filter);
-        });
-      });
-    }
-
-
-    function checkFilterState(evt, givenFilter, deletion) {
-      $scope.deletion = deletion;
-      if (givenFilter) {
-        return loadPermissions(givenFilter, open);
-      }
-
-      var state = $location.search();
-      if (state.filter) {
-
-        if (state.filter !== true) {
-
-          $scope.loading = true;
-          return Filter.get(state.filter, function(err, filter) {
-            $scope.loading = false;
-
-            if (err) {
-              return errorNotification('FILTER_NOT_FOUND', err);
-            }
-
-            loadPermissions(filter, open);
-          });
-        }
-
-        // in case of a new filter
-        open();
-      }
-    }
-
-
-    $scope.$on('tasklist.filter.edit', checkFilterState);
-
-    $scope.$on('tasklist.filter.delete', function(evt, givenFilter) {
-      checkFilterState(evt, givenFilter, true);
-    });
-
-    checkFilterState();
-
-    $scope.createFilter = function() {
-      $scope.deletion = false;
-      open();
-    };
-  }];
 });

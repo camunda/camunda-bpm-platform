@@ -82,49 +82,11 @@ define('camunda-tasklist-ui', [
       '$rootScope',
       '$translate',
       'Notifications',
-      'camAPI',
     function(
       $rootScope,
       $translate,
-      Notifications,
-      camAPI
+      Notifications
     ) {
-      function isAuth() {
-        return $rootScope.authentication && $rootScope.authentication.name;
-      }
-
-
-      function checkFilterCreationAccess() {
-        if (!isAuth()) {
-          throw new Error('Not authenticated');
-        }
-        var Filter = camAPI.resource('filter');
-
-        $rootScope.authentication.userCanCreateFilter = false;
-
-        Filter.authorizations(function(err, resp) {
-          if (err) { throw err; }
-
-          angular.forEach(resp.links, function(link) {
-            if (link.rel === 'create') {
-              $rootScope.authentication.userCanCreateFilter = true;
-            }
-          });
-        });
-      }
-
-      $rootScope.$watch('authentication', function(newValue, oldValue) {
-        if (isAuth() && (!oldValue || newValue.name !== oldValue.name)) {
-          if (newValue && $rootScope._previousUser !== newValue.name) {
-            $rootScope.currentTask = null;
-            $rootScope.currentFilter = null;
-          }
-
-          $rootScope._previousUser = newValue.name;
-          checkFilterCreationAccess();
-        }
-      });
-
 
       $rootScope.$on('authentication.session.expired', function() {
         $translate([

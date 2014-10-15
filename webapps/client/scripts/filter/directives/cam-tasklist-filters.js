@@ -22,39 +22,52 @@ define([
 
       controller: [
         '$scope',
-        '$rootScope',
+        '$q',
+        'camAPI',
       function (
         $scope,
-        $rootScope
+        $q,
+        camAPI
       ) {
 
-        var filtersData = $scope.tasklistData.newChild($scope);
+        var Filter = camAPI.resource('filter');
+        var filtersData = $scope.filtersData = $scope.tasklistData.newChild($scope);
         var query;
 
         /**
          * observe list of filters and pre-process
          */
-        $scope.state = filtersData.observe('filters', function(filters) {
+        $scope.state = filtersData.observe(['filters', 'taskListQuery', function(filters, taskListQuery) {        
 
-          var focused;
           $scope.totalItems = filters.length;
-          each(filters, function(filter) {
+          
+          var focused,
+              filterId = query.id;
 
+          for (var i = 0, filter; !!(filter = filters[i]); i++) {
             // read background color from properties
             filter.style = {
               'background-color': filter.properties.color
             };
 
-            // auto focus first filter
-            if(!focused || filter.properties.priority < focused.properties.priority) {
-              focused = filter;
+            if (filterId) {
+              if (filterId === filter.id) {
+                focused = filter;
+                break;
+              }
             }
-          });
+            else {
+              // auto focus first filter
+              if(!focused || filter.properties.priority < focused.properties.priority) {
+                focused = filter;
+              }
+            }           
+          }
 
           $scope.filters = filters;
           $scope.focus(focused);
 
-        });
+        }]);
 
         /**
          * observe the count for the current filter
@@ -64,11 +77,58 @@ define([
         });
 
         /**
-         * observe the task list query to get the latest update
+         * observe the count for the current filter
          */
         filtersData.observe('taskListQuery', function(taskListQuery) {
-          query = angular.copy(taskListQuery);
+          query = taskListQuery;
         });
+
+        /**
+         * observe list of filters to set the background-color on a filter
+         */
+        $scope.state = filtersData.observe('filters', function(filters) {        
+
+          $scope.totalItems = filters.length;
+
+          for (var i = 0, filter; !!(filter = filters[i]); i++) {
+            // read background color from properties
+            filter.style = {
+              'background-color': filter.properties.color
+            };
+       
+          }
+
+          $scope.filters = filters;
+
+        });
+
+        /**
+         * observe list of filters and taskListQuery to set the focus
+         */
+        $scope.state = filtersData.observe(['filters', 'taskListQuery', function(filters, taskListQuery) {        
+        
+          var focused,
+              filterId = query.id;
+
+          for (var i = 0, filter; !!(filter = filters[i]); i++) {
+
+            if (filterId) {
+              if (filterId === filter.id) {
+                focused = filter;
+                break;
+              }
+            }
+            else {
+              // auto focus first filter
+              if(!focused || filter.properties.priority < focused.properties.priority) {
+                focused = filter;
+              }
+            }           
+          }
+
+          $scope.focus(focused);
+
+        }]);
 
         /**
          * select a filter
@@ -90,7 +150,7 @@ define([
 
           }
 
-          filtersData.set('taskListQuery', query);
+          filtersData.set('taskListQuery', angular.copy(query));
         };
 
         /**
@@ -100,14 +160,6 @@ define([
           return filter.id === query.id;
         };
 
-        // TODO: must be cleaned up
-        $scope.edit = function(filter) {
-          $rootScope.$broadcast('tasklist.filter.edit', filter);
-        };
-
-        $scope.delete = function(filter) {
-          $rootScope.$broadcast('tasklist.filter.delete', filter);
-        };
       }]
     };
   }];
