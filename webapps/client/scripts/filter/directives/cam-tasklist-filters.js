@@ -35,41 +35,6 @@ define([
         var query;
 
         /**
-         * observe list of filters and pre-process
-         */
-        $scope.state = filtersData.observe(['filters', 'taskListQuery', function(filters, taskListQuery) {        
-
-          $scope.totalItems = filters.length;
-          
-          var focused,
-              filterId = query.id;
-
-          for (var i = 0, filter; !!(filter = filters[i]); i++) {
-            // read background color from properties
-            filter.style = {
-              'background-color': filter.properties.color
-            };
-
-            if (filterId) {
-              if (filterId === filter.id) {
-                focused = filter;
-                break;
-              }
-            }
-            else {
-              // auto focus first filter
-              if(!focused || filter.properties.priority < focused.properties.priority) {
-                focused = filter;
-              }
-            }           
-          }
-
-          $scope.filters = filters;
-          $scope.focus(focused);
-
-        }]);
-
-        /**
          * observe the count for the current filter
          */
         filtersData.observe('taskList', function(taskList) {
