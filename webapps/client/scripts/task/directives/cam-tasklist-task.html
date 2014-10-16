@@ -28,7 +28,7 @@
       </div>
 
       <div cam-tasklist-task-meta
-           tasklist-data="tasklistData"></div>
+           task-data="taskData"></div>
 
     </div>
   </header>
@@ -41,15 +41,11 @@
              select="selectTab('form')">
           <tab-heading>
             {{ 'FORM' | translate }}
-
-            <a class="glyphicon glyphicon-fullscreen"
-               ng-if="task.formKey"
-               ng-click="fullscreenForm()"></a>
           </tab-heading>
 
           <div class="form-pane">
             <div cam-tasklist-task-form
-                 task="task"></div>
+                 task-data="taskData"></div>
           </div>
         </tab>
 

@@ -39,16 +39,26 @@
         "Claim",
   "UNCLAIM_TASK":
         "Unclaim",
+  "RESET_TASK_ASSIGNEE":
+        "Reset assignee",
   "DELEGATE_TASK":
         "Delegate",
   "SET_FOLLOW_UP_DATE":
-        "Set follow up",
+        "Set follow-up date",
+  "RESET_FOLLOW_UP_DATE":
+        "Reset follow-up date",
   "SET_DUE_DATE":
         "Set due date",
+  "RESET_DUE_DATE":
+        "Reset due date",
   "ASSIGNED_TO_YOU":
         "Assigned to you",
   "OWNER_IS_YOU":
         "You are owner",
+  "ASSIGNEE_RESETED_OK":
+        "The assignee has been reseted.",
+  "ASSIGNEE_RESETED_ERROR":
+        "Could not reset the assignee.",
 
   "TASK_NO_PROCESS_DEFINITION":
         "Could not find the process definition of the task.",

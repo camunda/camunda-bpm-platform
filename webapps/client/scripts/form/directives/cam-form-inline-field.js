@@ -7,9 +7,11 @@ define([
 
   return [
     '$timeout',
+    '$filter',
     '$document',
   function(
     $timeout,
+    $filter,
     $document
   ) {
 
@@ -19,6 +21,8 @@ define([
         varType:        '@type',
         validator:      '&validate',
         change:         '&',
+        onStart:        '&onStartEditing',
+        onCancel:       '&onCancelEditing',
 
         placeholder:    '@',
         inputFormat:    '@',
@@ -31,6 +35,17 @@ define([
       template: template,
 
       link: function(scope, element) {
+
+        var dateFilter = $filter('date'),
+            dateFormat = 'yyyy-MM-dd\'T\'HH:mm:ss';
+
+        function fixDateTimezone(dateObj) {
+          var time = dateObj.getTime();
+          var localOffset = dateObj.getTimezoneOffset() * 60000;
+          time = time + localOffset;
+          dateObj.setTime(time);
+        }
+
         function isDate() {
           return ['datetime', 'date', 'time'].indexOf(scope.varType) > -1;
         }
@@ -41,6 +56,8 @@ define([
           scope.editValue =     scope.varValue;
 
           scope.validator =     scope.validator ||     function() {};
+          scope.onStart =       scope.onStart ||       function() {};
+          scope.onCancel =      scope.onCancel ||       function() {};
           scope.change =        scope.change ||        function() {};
           scope.inputFormat =   scope.inputFormat ||   'X';
           scope.displayFormat = scope.displayFormat || 'LLL';
@@ -64,9 +81,15 @@ define([
           ].indexOf(scope.varType) > -1;
 
           if (isDate()) {
-            var dateStr = scope.varValue;
-            var dateObj = new Date(dateStr ? Date.parse(dateStr) : Date.now());
-            dateObj.setTime(dateObj.getTime() + (dateObj.getTimezoneOffset() * 60000));
+            var dateStr = scope.varValue,
+                dateObj = null;
+
+            if (dateStr) {
+              dateObj = new Date(dateStr);
+              fixDateTimezone(dateObj);
+            } else {
+              dateObj = Date.now();
+            }
 
             scope.dateValue = dateObj;
           }
@@ -81,6 +104,18 @@ define([
             return;
           }
 
+          var targetElement = $(evt.target),
+              expectedClasses = 'ng-binding text-muted';
+
+          if (targetElement.hasClass(expectedClasses)) {
+            return;
+          }
+
+          var children = targetElement.children();
+          if (children.hasClass(expectedClasses)) {
+            return;
+          }
+
           scope.$apply(scope.cancelChange);
         }
 
@@ -89,6 +124,7 @@ define([
             reset();
 
             scope.editing = true;
+            scope.onStart(scope);
 
             $timeout(function(){
               angular.element('[ng-model="editValue"]').focus();
@@ -111,26 +147,19 @@ define([
               scope.varValue = scope.editValue;
             }
             else if (isDate()) {
-              var offset = scope.dateValue.getTimezoneOffset() * 60000;
-              scope.dateValue.setTime(scope.dateValue.getTime() - offset);
-
-              // this is important --------------------vvvvvvvvvvvvvvvvvvv
-              scope.varValue = scope.editValue.toJSON().split('.').shift();
+              scope.varValue = dateFilter(scope.dateValue, dateFormat);
             }
 
-            scope.$emit('change', scope.varValue);
             scope.change(scope);
 
             scope.editing = false;
             $document.unbind('click', stopEditing);
           }
-          else {
-            scope.$emit('error', scope.invalid);
-          }
         };
 
         scope.cancelChange = function() {
           scope.editing = false;
+          scope.onCancel(scope);
           $document.unbind('click', stopEditing);
         };
 

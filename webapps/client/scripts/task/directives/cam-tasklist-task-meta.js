@@ -10,12 +10,10 @@ define([
   var $ = angular.element;
 
   return [
-    '$rootScope',
     '$translate',
     'camAPI',
     'Notifications',
   function(
-    $rootScope,
     $translate,
     camAPI,
     Notifications
@@ -43,8 +41,7 @@ define([
 
     return {
       scope: {
-        taskData: '=',
-        tasklistData: '='
+        taskData: '='
       },
 
       template: template,
@@ -54,13 +51,20 @@ define([
       function(
         $scope
       ){
-        var taskData = $scope.tasklistData.newChild($scope);
+        var taskMetaData = $scope.taskData.newChild($scope);
 
         /**
          * observe task changes
          */
-        taskData.observe('task', function(task) {
+        taskMetaData.observe('task', function(task) {
           $scope.task = angular.copy(task);
+        });
+
+        /**
+         * observe task changes
+         */
+        taskMetaData.observe('isAssignee', function(isAssignee) {
+          $scope.isAssignee = isAssignee;
         });
 
         /**
@@ -72,112 +76,160 @@ define([
           // this has advantages:
           // - limits the risk that our copy gets corrupted
           // - we see changes made by other users faster
-          taskData.changed('task');
+          taskMetaData.changed('task');
 
           // list of tasks must be reloaded as well:
           // changed properties on this task may cause the list to change
-          taskData.changed('taskList');
+          taskMetaData.changed('taskList');
         }
 
         function saveDate(propName) {
           return function(inlineFieldScope) {
-            var self = this;
-            var toSend = self.task;
+            setEditingState(propName, false);
+            $scope.task[propName] = inlineFieldScope.varValue;
 
-
-            toSend[propName] = $scope.task[propName] = inlineFieldScope.varValue;
-
-            delete toSend._embedded;
-            delete toSend._links;
-
-            Task.update(toSend, function(err, result) {
-              if (err) {
-                return errorNotification('TASK_UPDATE_ERROR', err);
-              }
-
-              reload();
-              successNotification('TASK_UPDATE_SUCESS');
-            });
+            updateTask();
           };
         }
 
+        function resetProperty(propName) {
+          return function() {
+            $scope.task[propName] = null;
+            updateTask();            
+          };
+        }
+
+        function updateTask() {
+          var toSend = $scope.task;
+
+          delete toSend._embedded;
+          delete toSend._links;
+
+          Task.update(toSend, function(err, result) {
+            if (err) {
+              return errorNotification('TASK_UPDATE_ERROR', err);
+            }
+
+            reload();
+            successNotification('TASK_UPDATE_SUCESS');
+          });
+        }
+
+        function notifyOnStartEditing(property) {
+          return function (inlineFieldScope) {
+            setEditingState(property, true);
+          };
+        }
+
+        function notifyOnCancelEditing(property) {
+          return function (inlineFieldScope) {
+            setEditingState(property, false);
+          };
+        }
+
+        function setEditingState(property, state) {
+          $scope.editingState[property] = state;
+        }
+
         $scope.saveFollowUpDate = saveDate('followUp');
+        $scope.resetFollowUpDate = resetProperty('followUp');
+        $scope.startEditingFollowUpDate = notifyOnStartEditing('followUp');
+        $scope.cancelEditingFollowUpDate = notifyOnCancelEditing('followUp');
+        
         $scope.saveDueDate = saveDate('due');
+        $scope.resetDueDate = resetProperty('due');
+        $scope.startEditingDueDate = notifyOnStartEditing('due');
+        $scope.cancelEditingDueDate = notifyOnCancelEditing('due');
+
+        // initially set each control to false
+        $scope.editingState = {
+          followUp: false,
+          due: false,
+          assignee: false
+        };
 
         $scope.now = (new Date()).toJSON();
 
-        function assigned(err) {
-          if (err) {
-            return errorNotification('ASSIGNED_ERROR', err);
+        var notifications = {
+
+          assigned: {
+            success: 'ASSIGNED_OK',
+            error: 'ASSIGNED_ERROR'
+          },
+
+          assigneeReseted: {
+            success: 'ASSIGNEE_RESETED_OK',
+            error: 'ASSIGNEE_RESETED_ERROR'
+          },
+
+          claimed: {
+            success: 'CLAIM_OK',
+            error: 'CLAIM_ERROR'
+          },
+
+          unclaimed: {
+            success: 'UNCLAIM_OK',
+            error: 'UNCLAIM_ERROR'
           }
 
-          reload();
-          successNotification('ASSIGNED_OK');
-        }
-
-
-        function claimed(err) {
-          if (err) {
-            return errorNotification('CLAIM_ERROR', err);
-          }
-
-          reload();
-          successNotification('CLAIM_OK');
-        }
-
-
-        function unclaimed(err) {
-          if (err) {
-            return errorNotification('UNCLAIM_ERROR', err);
-          }
-
-          reload();
-          successNotification('UNCLAIM_OK');
-        }
-
-
-        $scope.userIsAssignee = function() {
-          return $rootScope.authentication &&
-                  $rootScope.authentication.name &&
-                  $scope.task &&
-                  ($rootScope.authentication.name === $scope.task.assignee);
         };
 
+        $scope.startEditingAssignee = notifyOnStartEditing('assignee');
+        $scope.cancelEditingAssignee = notifyOnCancelEditing('assignee');
 
-        $scope.userIsOwner = function() {
-          return $rootScope.authentication &&
-                  $rootScope.authentication.name &&
-                  ($rootScope.authentication.name === $scope.task.owner);
-        };
+        $scope.assign = function(inlineFieldScope) {
+          setEditingState('assignee', false);
 
+          var newAssignee = inlineFieldScope.varValue;
 
-        $scope.validateUser = function(/*info*/) {
-        };
+          if (!newAssignee) {
 
-
-        $scope.claim = function() {
-          Task.claim($scope.task.id, $rootScope.authentication.name, claimed);
-        };
-
-
-        $scope.unclaim = function() {
-          Task.unclaim($scope.task.id, unclaimed);
-        };
-
-        $scope.assigning = function(info) {
-          if (!info.varValue) {
-            return $scope.unclaim();
-          }
-          Task.assignee($scope.task.id, info.varValue, function(err) {
-            if (err) {
-              return assigned(err);
+            if ($scope.isAssignee) {
+              unclaim();
+            }
+            else {
+              resetAssignee();
             }
 
-            $scope.task.assignee = info.varValue;
+          }
+          else {
+            setAssignee(newAssignee);
+          }
 
-            assigned();
-          });
         };
+
+        var claim = $scope.claim = function() {
+          var assignee = $scope.$root.authentication.name;
+          Task.claim($scope.task.id, assignee, notify('claimed'));
+        };
+
+        var unclaim = $scope.unclaim = function() {
+          Task.unclaim($scope.task.id, notify('unclaimed'));
+        };
+
+        var setAssignee = $scope.setAssignee = function(newAssignee) {
+          Task.assignee($scope.task.id, newAssignee, notify('assigned'));
+        };
+
+        var resetAssignee = $scope.resetAssignee = function() {
+          Task.assignee($scope.task.id, null, notify('assigneeReseted'));
+        };
+
+        function notify(action) {
+          var messages = notifications[action];
+
+          return function (err) {
+            if (err) {
+            return errorNotification(messages.error, err);
+            }
+
+
+          reload();
+          successNotification(messages.success);
+
+          };
+        }
+
       }
     ]};
   }];

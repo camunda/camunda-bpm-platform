@@ -15,16 +15,8 @@ define([
 
       controller : [
         '$scope',
-        '$location',
-        '$q',
-        'dataDepend',
-        'camAPI',
       function(
-        $scope,
-        $location,
-        $q,
-        dataDepend,
-        camAPI
+        $scope
       ) {
 
         if (!$scope.tasklistData) {
@@ -32,6 +24,18 @@ define([
         }
 
         var taskData = $scope.taskData = $scope.tasklistData.newChild($scope);
+
+        taskData.provide('assignee', ['task', function(task) {
+          if (task) {
+            return task.assignee;
+          }
+
+          return null;
+        }]);
+
+        taskData.provide('isAssignee', ['assignee', function(assignee) {
+          return assignee === $scope.$root.authentication.name;
+        }]);
 
         /**
          * expose current task as scope variable

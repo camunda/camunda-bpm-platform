@@ -12,39 +12,20 @@ define([
   var each = angular.forEach;
 
   return [
-    '$rootScope',
     'camAPI',
     'CamForm',
     '$translate',
     'Notifications',
-    '$interval',
-    '$modal',
+    '$location',
   function(
-    $rootScope,
     camAPI,
     CamForm,
     $translate,
     Notifications,
-    $interval,
-    $modal
+    $location
   ) {
     var Task = camAPI.resource('task');
     var ProcessDefinition = camAPI.resource('process-definition');
-
-    function setModalFormMaxHeight(wrapper, targetContainer) {
-      var availableHeight = $(window).height();
-
-      wrapper.find('> div').each(function() {
-        var $el = $(this);
-        if ($el.hasClass('form-container')) { return; }
-        availableHeight -= $el.outerHeight();
-      });
-
-      targetContainer.css({
-        'overflow': 'auto',
-        'max-height': availableHeight +'px'
-      });
-    }
 
     function errorNotification(src, err) {
       $translate(src).then(function(translated) {
@@ -66,92 +47,49 @@ define([
 
     return {
       scope: {
-        task: '='
+        taskData: '='
       },
 
       link: function(scope, element) {
+
+        var taskFormData = scope.taskFormData = scope.taskData.newChild(scope);
+
         var container = element.find('.form-container');
         var modalInstance;
-
-        scope.currentTaskId = null;
         scope._camForm = null;
-        scope.fullscreen = false;
+        scope.task = {};
 
-        scope.enterFullscreen = function() {
-          scope.fullscreen = !scope.fullscreen;
+        taskFormData.observe('task', function (task) {
+          scope.task = task;
+          loadForm();
+        });
 
-          modalInstance = $modal.open({
-            // by passing the scope, we also pass the methods to submit the form
-            scope:        scope,
-            template:     modalTemplate,
-            windowClass:  'task-form-fullscreen'
-          });
-
-          modalInstance.opened.then(function() {
-            // dat ain't neat... dat is di only way to make sure da containa is inna di place
-            var targetContainer;
-            var checkContainerInterval = $interval(function() {
-              targetContainer = $('.modal-content .form-container');
-              if (targetContainer.length) {
-                targetContainer.html('').append(scope._camForm.formElement);
-
-                var wrapper = $('.modal-content');
-                setModalFormMaxHeight(wrapper, targetContainer);
-                $(window).on('resize', function() {
-                  setModalFormMaxHeight(wrapper, targetContainer);
-                });
-
-                // fatha always said: don't work for free
-                $interval.cancel(checkContainerInterval);
-              }
-            }, 100, 20, false);
-          });
-        };
-
-        scope.exitFullscreen = function() {
-          scope.fullscreen = !scope.fullscreen;
-          container.html('').append(scope._camForm.formElement);
-
-          if (modalInstance) {
-            try {
-              modalInstance.dismiss();
-            } catch (e) {}
-            $(window).off('resize');
-          }
-        };
-
-        scope.toggleFullscreen = function() {
-          if (!scope.fullscreen) {
-            scope.enterFullscreen();
-          }
-          else {
-            scope.exitFullscreen();
-          }
-        };
-
-
+        taskFormData.observe('isAssignee', function(isAssignee) {
+          scope.isAssignee = isAssignee;
+        });
 
         function submitCb(err) {
           if (err) {
             return errorNotification('COMPLETE_ERROR', err);
           }
 
-          scope.currentTaskId = null;
           scope._camForm = null;
           container.html('');
 
-          if (modalInstance) {
-            try {
-              modalInstance.dismiss();
-            } catch (e) {}
-          }
-
-          $rootScope.$broadcast('tasklist.task.update');
-          $rootScope.$broadcast('tasklist.task.complete');
-
           successNotification('COMPLETE_OK');
-        }
 
+          // reseting the location leads that
+          // the taskId will set to null and
+          // the current selected task will
+          // also be set to null, so that the
+          // view gets clear
+          $location.search({});
+
+          // list of tasks must be reloaded as
+          // well: changed properties on this
+          // task may cause the list to change
+          taskFormData.changed('taskList');
+        }
 
         scope.completeTask = function() {
           if (scope._camForm) {
@@ -160,12 +98,11 @@ define([
           else {
             var variables = {};
             Task.submitForm({
-              id: scope.currentTaskId,
+              id: scope.task.id,
               variables: variables
             }, submitCb);
           }
         };
-
 
         function showForm(targetContainer, processDefinition) {
           var parts = (scope.task.formKey || '').split('embedded:');
@@ -216,23 +153,10 @@ define([
           }
         }
 
-
-        function checkAssignee() {
-          scope.isAssignee = scope.task.assignee &&
-                             scope.$root.authentication &&
-                             scope.task.assignee === scope.$root.authentication.name;
-        }
-
-
         function loadForm(targetContainer) {
-          if (!scope.$root.authentication) {
-            throw new Error('Not authenticated');
-          }
 
           targetContainer = targetContainer || container;
           scope._camForm = null;
-
-          checkAssignee();
 
           if (scope.task._embedded && scope.task._embedded.processDefinition[0]) {
             showForm(targetContainer, scope.task._embedded.processDefinition[0]);
@@ -251,26 +175,6 @@ define([
           }
         }
 
-
-
-        scope.$watch('task', function(newValue, oldValue) {
-          if (!scope.task) {
-            scope.currentTaskId = null;
-          }
-          else if (newValue.id !== oldValue.id) {
-            scope.currentTaskId = scope.task.id;
-
-            loadForm();
-          }
-        });
-
-        scope.$watch('task.assignee', checkAssignee);
-
-        if (scope.task) {
-          scope.currentTaskId = scope.task.id;
-
-          loadForm();
-        }
       },
       template: template
     };

@@ -3,17 +3,6 @@ define([
 ) {
   'use strict';
 
-  function fixReadDateTimezone(dateStr) {
-    if (!dateStr) { return dateStr; }
-    var d = new Date(dateStr);
-    return (new Date(d.getTime() + (d.getTimezoneOffset() * 60 * 1000))).toJSON();
-  }
-
-  function fixDates(task) {
-    task.due = fixReadDateTimezone(task.due);
-    task.followUp = fixReadDateTimezone(task.followUp);
-  }
-
   function getTaskIdFromLocation($location) {
     return $location.search().task;
   }
@@ -138,8 +127,6 @@ define([
             deferred.reject(err);
           }
           else {
-            // adjust dates to current timezone
-            fixDates(res);
             deferred.resolve(res);
           }
 
