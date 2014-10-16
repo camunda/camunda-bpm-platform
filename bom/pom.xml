@@ -10,7 +10,6 @@
     <relativePath />
   </parent>
 
-  <groupId>org.camunda.bpm</groupId>
   <artifactId>camunda-bom</artifactId>
   <version>7.2.0-SNAPSHOT</version>
   <packaging>pom</packaging>
