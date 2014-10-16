@@ -118,6 +118,11 @@ public class DevProcessApplication extends ServletProcessApplication {
     runtimeService.startProcessInstanceByKey("executionProcess");
     runtimeService.startProcessInstanceByKey("executionProcess");
 
+    runtimeService.startProcessInstanceByKey("changeVariablesProcess");
+    runtimeService.startProcessInstanceByKey("changeVariablesProcess");
+    runtimeService.startProcessInstanceByKey("changeVariablesProcess");
+    runtimeService.startProcessInstanceByKey("changeVariablesProcess");
+
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("changeVariablesProcess");
     TaskService taskService = engine.getTaskService();
     Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
