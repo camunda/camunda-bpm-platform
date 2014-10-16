@@ -23,8 +23,9 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 
 /**
- * @author Roman Smirnov
+ * This query is currently not public API on purpose.
  *
+ * @author Roman Smirnov
  */
 public class CaseSentryPartQueryImpl extends AbstractQuery<CaseSentryPartQueryImpl, CaseSentryPartEntity> {
 

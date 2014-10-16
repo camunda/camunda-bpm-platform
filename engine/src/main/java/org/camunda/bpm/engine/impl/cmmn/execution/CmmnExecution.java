@@ -212,7 +212,7 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
     CmmnExecution sourceCaseExecution = findCaseExecution(sourceActivityId);
     sentryPart.setSourceCaseExecution(sourceCaseExecution);
 
-    // TODO: handle also sentryRef!!!
+    // TODO: handle also sentryRef!!! (currently not implemented on purpose)
 
     return sentryPart;
   }
