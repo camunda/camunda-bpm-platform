@@ -39,6 +39,10 @@ define([
         var dateFilter = $filter('date'),
             dateFormat = 'yyyy-MM-dd\'T\'HH:mm:ss';
 
+        scope.$on('$locationChangeSuccess', function() {
+          scope.cancelChange();
+        });
+
         function fixDateTimezone(dateObj) {
           var time = dateObj.getTime();
           var localOffset = dateObj.getTimezoneOffset() * 60000;
@@ -167,7 +171,6 @@ define([
           scope.editValue = scope.dateValue = pickerScope.dateValue;
         };
 
-        scope.$watch('varValue', reset);
       },
 
       transclude: true
