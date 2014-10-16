@@ -37,7 +37,8 @@ define([
       var deferred = $q.defer();
 
       Filter.list({
-        itemCount: false
+        itemCount: false,
+        resoureType: 'Task'
       }, function(err, res) {
         if(!!err) {
           deferred.reject(err);
