@@ -51,6 +51,7 @@ define([
       function(
         $scope
       ){
+        
         var taskMetaData = $scope.taskData.newChild($scope);
 
         /**

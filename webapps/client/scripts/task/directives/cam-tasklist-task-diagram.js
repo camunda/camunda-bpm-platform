@@ -20,13 +20,26 @@ define([
 
     return {
       scope: {
-        task: '='
+        taskData: '='
       },
 
       template: template,
 
       link: function(scope, element) {
+
+        var diagramData = scope.taskData.newChild(scope);
         var process;
+
+        diagramData.observe(['processDefinition', 'task', function (_processDefinition, task) {
+          process = _processDefinition;
+          scope.task = task;
+
+          if (process) {
+            scope.drawDiagram();
+          }
+
+        }]);
+
         var viewer = new Viewer({
           container: element.find('.diagram-holder')
         });
@@ -69,9 +82,6 @@ define([
 
         scope.drawDiagram = function() {
           if (!process) { return; }
-          if (!scope.$root.authentication) {
-            throw new Error('Not authenticated');
-          }
 
 
           if (process._xml) {
@@ -92,26 +102,11 @@ define([
           });
         };
 
-
-        scope.$on('tasklist.task.tab', function(evt, tabName) {
-          if (tabName === 'diagram') {
-            scope.drawDiagram();
-          }
-        });
-
-
         $win.on('resize', renderDiagram);
         element.on('$destroy', function() {
           $win.off('resize', renderDiagram);
         });
 
-
-        scope.$watch('task', function(newV, oldV) {
-          process = scope.task._embedded.processDefinition[0];
-          if (scope.$parent.$parent.tabs.diagram) {
-            scope.drawDiagram();
-          }
-        });
       }
     };
   }];

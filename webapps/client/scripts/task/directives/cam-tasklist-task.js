@@ -15,13 +15,16 @@ define([
 
       controller : [
         '$scope',
+        '$q',
+        'camAPI',
       function(
-        $scope
+        $scope,
+        $q,
+        camAPI
       ) {
 
-        if (!$scope.tasklistData) {
-          return;
-        }
+        var History = camAPI.resource('history');
+        var Task = camAPI.resource('task');
 
         var taskData = $scope.taskData = $scope.tasklistData.newChild($scope);
 
@@ -35,6 +38,53 @@ define([
 
         taskData.provide('isAssignee', ['assignee', function(assignee) {
           return assignee === $scope.$root.authentication.name;
+        }]);
+
+        taskData.provide('processDefinition', ['task', function (task) {
+          if (!task) {
+            return null;
+          }
+
+          return task._embedded.processDefinition[0];
+          
+        }]);
+
+        taskData.provide('history', ['task', function (task) {
+          var deferred = $q.defer();
+
+          if (!task) {
+            return deferred.resolve(null);
+          }
+
+          History.userOperation({taskId : task.id}, function(err, res) {
+            if(err) {
+              deferred.reject(err);
+            }
+            else {
+              deferred.resolve(res);
+            }
+          });
+
+          return deferred.promise;
+        }]);
+
+        taskData.provide('comments', ['task', function (task) {
+          var deferred = $q.defer();
+
+          if (!task) {
+            return deferred.resolve(null);
+          }
+
+          Task.comments(task.id, function(err, res) {
+            if(err) {
+              deferred.reject(err);
+            }
+            else {
+              deferred.resolve(res);
+            }
+          });
+
+          return deferred.promise;
         }]);
 
         /**

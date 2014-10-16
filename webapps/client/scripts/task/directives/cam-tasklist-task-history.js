@@ -48,81 +48,65 @@ define([
     }
   };
 
+  function isTimestampProperty(propertyName) {
+    return ['dueDate', 'followUpDate'].indexOf(propertyName) !== -1;
+  }
+
   return ['camAPI',
   function(camAPI) {
     var History = camAPI.resource('history');
     var Task = camAPI.resource('task');
     return {
       scope: {
-        task : '='
+        taskData: '='
       },
       link: function($scope) {
-        $scope.history = [];
-        $scope.days = [];
 
-        function isTimestampProperty(propertyName) {
-          return ['dueDate', 'followUpDate'].indexOf(propertyName) !== -1;
-        }
+        var historyData = $scope.taskData.newChild($scope);
 
-        var loadHistory = function(taskId) {
-          camSDK.utils.series({
-            historyData: function(cb) { History.userOperation({taskId : taskId}, cb); },
-            commentData: function(cb) { Task.comments(taskId, cb); }
-          }, function(err, data) {
-            if(err) {
-              $scope.error = err;
-            } else {
-              $scope.error = null;
+        historyData.provide('orderedHistoryAndComments', ['history', 'comments', function (history, comments) {
+          history = history || {};
+          comments = comments || {};
 
-              $scope.history = data.historyData;
-              $scope.comments = data.commentData;
+          var days = [],
+              i = 0,
+              day;
 
-              var days = [];
-              angular.forEach($scope.history, function(event) {
-                // create object for each day, containing the events for this day
-                var day = findOrCreateDay(days, event.timestamp);
+          for (var historyEvent; !!(historyEvent = history[i]); i++) {
+            // create object for each day, containing the events for this day
+            day = findOrCreateDay(days, historyEvent.timestamp);
 
-                // create event object for each operationId
-                var parentEvent = findOrCreateParentEvent(day.events, event);
+            // create historyEvent object for each operationId
+            var parentEvent = findOrCreateParentEvent(day.events, historyEvent);
 
-                // preprocess the dates to avoid function calls from the template
-                if (isTimestampProperty(event.property)) {
-                  event.propertyIsDate = true;
-                  event.newValue = event.newValue ? parseInt(event.newValue, 10) : null;
-                  event.orgValue = event.orgValue ? parseInt(event.orgValue, 10) : null;
-                }
-
-                parentEvent.subEvents.push(event);
-              });
-
-              angular.forEach($scope.comments, function(comment) {
-                var day = findOrCreateDay(days, comment.time);
-                comment.type = 'Comment';
-                day.events.push(comment);
-              });
-
-              $scope.days = days;
+            // preprocess the dates to avoid function calls from the template
+            if (isTimestampProperty(historyEvent.property)) {
+              historyEvent.propertyIsDate = true;
+              historyEvent.newValue = historyEvent.newValue ? parseInt(historyEvent.newValue, 10) : null;
+              historyEvent.orgValue = historyEvent.orgValue ? parseInt(historyEvent.orgValue, 10) : null;
             }
-          });
-        };
-        var historyTabActive = false;
-        $scope.$on('tasklist.task.tab', function(evt, tabName) {
-          if(tabName === 'history') {
-            historyTabActive = true;
-            loadHistory($scope.task.id);
-          } else {
-            historyTabActive = false;
+
+            parentEvent.subEvents.push(historyEvent);
+
           }
+
+          // reset values
+          i = 0;
+          day = null;
+
+          for (var comment; !!(comment = comments[i]); i++) {
+            day = findOrCreateDay(days, comment.time);
+            comment.type = 'Comment';
+            day.events.push(comment);
+          }
+
+          return days;
+        }]);
+
+        historyData.observe('orderedHistoryAndComments', function(days) {
+          $scope.days = days;
         });
 
-        function loadHistoryAfterEvent(evt) {
-          if(historyTabActive) {
-            loadHistory(evt.targetScope.currentTask.id);
-          }
-        }
-        $scope.$on('tasklist.task.current', loadHistoryAfterEvent);
-        $scope.$on('tasklist.task.update',  loadHistoryAfterEvent);
-        $scope.$on('tasklist.comment.new',  loadHistoryAfterEvent);
       },
       template: template
     };

@@ -61,7 +61,9 @@ define([
 
         taskFormData.observe('task', function (task) {
           scope.task = task;
-          loadForm();
+          if (task) {
+            loadForm();
+          }
         });
 
         taskFormData.observe('isAssignee', function(isAssignee) {
