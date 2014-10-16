@@ -51,9 +51,6 @@
 
         <module>identity/identity-ldap</module>
 
-        <module>distro/jbossas7</module>
-        <module>distro/gf31</module>
-        <module>distro/tomcat</module>
         <module>distro/sql-script</module>
 
         <module>parent</module>
@@ -67,12 +64,38 @@
         <activeByDefault>true</activeByDefault>
       </activation>
       <modules>
-        <module>distro/jbossas7</module>
-        <module>distro/gf31</module>
-        <module>distro/tomcat</module>
-
         <module>parent</module>
         <module>bom</module>
+      </modules>
+    </profile>
+
+    <profile>
+      <id>distro-jbossas7</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <modules>
+        <module>distro/jbossas7</module>
+      </modules>
+    </profile>
+
+    <profile>
+      <id>distro-gf31</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <modules>
+        <module>distro/gf31</module>
+      </modules>
+    </profile>
+
+    <profile>
+      <id>distro-tomcat</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <modules>
+        <module>distro/tomcat</module>
       </modules>
     </profile>
 
