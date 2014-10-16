@@ -152,7 +152,6 @@ public class HistoricCaseInstanceTest extends CmmnProcessEngineTestCase {
   public void testCreateUser() {
     String userId = "test";
     identityService.setAuthenticatedUserId(userId);
-    processEngineConfiguration.setAuthorizationEnabled(true);
 
     String caseInstanceId = createCaseInstance().getId();
 
@@ -160,7 +159,6 @@ public class HistoricCaseInstanceTest extends CmmnProcessEngineTestCase {
     assertEquals(userId, historicCaseInstance.getCreateUserId());
     assertCount(1, historicQuery().createdBy(userId));
 
-    processEngineConfiguration.setAuthorizationEnabled(false);
     identityService.setAuthenticatedUserId(null);
   }
 

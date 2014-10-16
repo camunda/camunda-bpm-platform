@@ -140,8 +140,8 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
   }
 
   public HistoricCaseInstanceQuery superCaseInstanceId(String superCaseInstanceId) {
-	 this.superCaseInstanceId = superCaseInstanceId;
-	 return this;
+	  this.superCaseInstanceId = superCaseInstanceId;
+	  return this;
   }
 
   public HistoricCaseInstanceQuery subCaseInstanceId(String subCaseInstanceId) {

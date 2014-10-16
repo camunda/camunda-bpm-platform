@@ -29,7 +29,7 @@ public class HistoricCaseInstanceEventEntity extends HistoricScopeInstanceEvent 
 
   private static final long serialVersionUID = 1L;
 
-  /** the business key of the process instance */
+  /** the business key of the case instance */
   protected String businessKey;
 
   /** the id of the user that created the case instance */
