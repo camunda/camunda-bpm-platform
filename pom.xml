@@ -70,9 +70,65 @@
         <module>distro/jbossas7</module>
         <module>distro/gf31</module>
         <module>distro/tomcat</module>
+      </modules>
+    </profile>
+
+    <profile>
+      <id>distro-serverless</id>
+      <modules>
+        <module>qa</module>
+
+        <module>webapps/h2-webapp</module>
+
+        <module>engine</module>
+        <module>engine-cdi</module>
+        <module>engine-spring</module>
+        <module>engine-rest</module>
+
+        <module>examples/invoice</module>
+        <module>examples/wait-states</module>
+
+        <module>identity/identity-ldap</module>
+
+        <module>distro/sql-script</module>
 
         <module>parent</module>
         <module>bom</module>
+      </modules>
+    </profile>
+
+    <profile>
+      <id>distro-jbossas7</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <modules>
+        <module>javaee/ejb-client</module>
+        <module>distro/jbossas7</module>
+      </modules>
+    </profile>
+
+    <profile>
+      <id>distro-gf31</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <modules>
+        <module>javaee/ejb-service</module>
+        <module>javaee/ejb-client</module>
+        <module>javaee/jobexecutor-ra</module>
+        <module>javaee/jobexecutor-rar</module>
+        <module>distro/gf31</module>
+      </modules>
+    </profile>
+
+    <profile>
+      <id>distro-tomcat</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <modules>
+        <module>distro/tomcat</module>
       </modules>
     </profile>
 
@@ -82,6 +138,7 @@
         <activeByDefault>true</activeByDefault>
       </activation>
       <modules>
+        <module>javaee/ejb-client</module>
         <module>distro/wildfly</module>
       </modules>
     </profile>
