@@ -4,12 +4,12 @@
 define([
   'angular',
   'moment',
-  
+
   './directives/cam-tasklist-task',
   './directives/cam-tasklist-task-meta',
 
-  './controller/cam-tasklist-task-action-ctrl', 
-  
+  './controller/cam-tasklist-task-action-ctrl',
+
   /* detail plugins */
   './plugins/detail/cam-tasklist-task-detail-form-plugin',
   './plugins/detail/cam-tasklist-task-detail-history-plugin',
@@ -26,6 +26,9 @@ define([
 
   /* action plugin controller */
   './plugins/action/modals/cam-tasklist-comment-form',
+
+  './directives/cam-tasklist-groups-form',
+  './filters/cam-groups-list',
 
   'camunda-tasklist-ui/utils',
   'camunda-tasklist-ui/api',
@@ -45,7 +48,7 @@ define([
   camTaskDetailHistoryPlugin,
   camTaskDetailDiagramPlugin,
   camTaskDetailDescriptionPlugin,
-  
+
   /* detail plugin directives */
   taskFormDirective,
   taskDiagramDirective,
@@ -54,7 +57,10 @@ define([
   camTaskActionCommentPlugin,
 
   /* action plugin controller */
-  camCommentCreateModalCtrl
+  camCommentCreateModalCtrl,
+
+  camGroupEditModalCtrl,
+  camGroupsListFilter
 ) {
 
   var taskModule = angular.module('cam.tasklist.task', [
@@ -77,7 +83,7 @@ define([
 
   taskModule.directive('camTasklistTaskMeta', taskMetaDirective);
 
-  taskModule.controller('camTaskActionCtrl', camTaskActionCtrl);  
+  taskModule.controller('camTaskActionCtrl', camTaskActionCtrl);
 
   /* detail plugins */
   taskModule.config(camTaskDetailFormPlugin);
@@ -94,6 +100,9 @@ define([
 
   /* action plugin controller */
   taskModule.controller('camCommentCreateModalCtrl', camCommentCreateModalCtrl);
+
+  taskModule.controller('camGroupEditModalCtrl', camGroupEditModalCtrl);
+  taskModule.filter('groupsList', camGroupsListFilter);
 
   return taskModule;
 });

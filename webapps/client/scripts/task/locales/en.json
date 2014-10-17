@@ -9,6 +9,20 @@
         "Due date",
   "ASSIGNEE":
         "Assignee",
+  "GROUPS":
+        "Groups",
+  "GROUPS_EDIT":
+        "Edit Groups",
+  "GROUP_ADD_ERROR":
+        "Group could not be added",
+  "GROUP_ADD_SUCCESS":
+        "Group added successfully",
+  "GROUP_DELETE_ERROR":
+        "Group could not be removed",
+  "GROUP_DELETE_SUCCESS":
+        "Group removed successfully",
+  "ADD_GROUPS":
+        "add groups",
   "OWNER":
         "Owner",
   "DIAGRAM":

@@ -72,6 +72,18 @@
 
 <ul class="meta list-inline actors">
 
+  <li class="groups" ng-click="editGroups()">
+    <span tooltip-placement="top"
+          tooltip="{{ 'GROUPS' | translate }}"
+          class="glyphicon glyphicon-globe"></span>
+    <span ng-if="groups.length > 0">
+      {{ groups | groupsList }}
+    </span>
+    <span ng-if="groups.length === 0">
+      <a href>{{ 'ADD_GROUPS' | translate }}</a>
+    </span>
+  </li>
+
   <li class="assignee set-value"
       ng-if="!task.assignee">
     <span tooltip-placement="top"
@@ -99,7 +111,6 @@
       <span tooltip-placement="top"
             tooltip="{{ 'ASSIGNEE' | translate }}"
             class="glyphicon glyphicon-user"></span>
-
       {{ varValue }}
     </span>
 

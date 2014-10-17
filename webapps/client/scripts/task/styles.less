@@ -259,3 +259,20 @@
   height: 150px;
 }
 
+.groups {
+    border: 1px solid transparent;
+    margin: 0;
+    padding: 1px 3px;
+    position: relative;
+    // background-color: transparent;
+
+    border-radius: 3px;
+
+    &:hover {
+      z-index: 99;
+      cursor: pointer;
+      border: 1px dashed @gray-light;
+      // background-color: transparent;
+      background-color: @gray-lighter;
+    }
+}

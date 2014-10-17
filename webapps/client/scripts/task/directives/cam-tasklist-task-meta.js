@@ -1,9 +1,11 @@
 define([
   'angular',
-  'text!./cam-tasklist-task-meta.html'
+  'text!./cam-tasklist-task-meta.html',
+  'text!./cam-tasklist-groups-form.html',
 ], function(
   angular,
-  template
+  template,
+  editGroupsFormTemplate
 ) {
   'use strict';
 
@@ -11,10 +13,12 @@ define([
 
   return [
     '$translate',
+    '$modal',
     'camAPI',
     'Notifications',
   function(
     $translate,
+    $modal,
     camAPI,
     Notifications
   ) {
@@ -66,6 +70,10 @@ define([
          */
         taskMetaData.observe('isAssignee', function(isAssignee) {
           $scope.isAssignee = isAssignee;
+        });
+
+        taskMetaData.observe('groups', function(groups) {
+          $scope.groups = groups;
         });
 
         /**
@@ -216,17 +224,33 @@ define([
           Task.assignee($scope.task.id, null, notify('assigneeReseted'));
         };
 
+        var editGroups = $scope.editGroups = function() {
+          $modal.open({
+            // creates a child scope of a provided scope
+            scope: $scope,
+            //TODO: extract filter edit modal class to super style sheet
+            windowClass: 'filter-edit-modal',
+            size: 'md',
+            template: editGroupsFormTemplate,
+            controller: 'camGroupEditModalCtrl',
+            resolve: {
+              task: function() { return $scope.task; },
+              groups: function() { return $scope.groups; },
+              taskMetaData: function() { return taskMetaData; }
+            }
+          });
+        };
+
         function notify(action) {
           var messages = notifications[action];
 
           return function (err) {
             if (err) {
-            return errorNotification(messages.error, err);
+              return errorNotification(messages.error, err);
             }
 
-
-          reload();
-          successNotification(messages.success);
+            reload();
+            successNotification(messages.success);
 
           };
         }

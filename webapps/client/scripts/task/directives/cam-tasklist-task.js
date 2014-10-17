@@ -1,6 +1,7 @@
 define([
-  'text!./cam-tasklist-task.html'
-], function(template) {
+  'text!./cam-tasklist-task.html',
+  'jquery'
+], function(template, jquery) {
   'use strict';
 
   return [ function() {
@@ -40,6 +41,29 @@ define([
           return null;
         }]);
 
+        taskData.provide('groups', ['task', function(task) {
+          var deferred = $q.defer();
+
+          if (!task) {
+            return deferred.resolve(null);
+          }
+          Task.identityLinks(task.id, function(err, res) {
+            if(err) {
+              deferred.reject(err);
+            }
+            else {
+              var groups = jquery.grep(res, function(identityLink) {
+                return identityLink.groupId;
+              }).map(function(groupObj) {
+                return groupObj.groupId;
+              });
+              deferred.resolve(groups);
+            }
+          });
+
+          return deferred.promise;
+        }]);
+
         taskData.provide('isAssignee', ['assignee', function(assignee) {
           return assignee === $scope.$root.authentication.name;
         }]);
@@ -50,7 +74,7 @@ define([
           }
 
           return task._embedded.processDefinition[0];
-          
+
         }]);
 
         /**
