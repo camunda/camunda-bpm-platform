@@ -51,44 +51,6 @@ define([
           
         }]);
 
-        taskData.provide('history', ['task', function (task) {
-          var deferred = $q.defer();
-
-          if (!task) {
-            return deferred.resolve(null);
-          }
-
-          History.userOperation({taskId : task.id}, function(err, res) {
-            if(err) {
-              deferred.reject(err);
-            }
-            else {
-              deferred.resolve(res);
-            }
-          });
-
-          return deferred.promise;
-        }]);
-
-        taskData.provide('comments', ['task', function (task) {
-          var deferred = $q.defer();
-
-          if (!task) {
-            return deferred.resolve(null);
-          }
-
-          Task.comments(task.id, function(err, res) {
-            if(err) {
-              deferred.reject(err);
-            }
-            else {
-              deferred.resolve(res);
-            }
-          });
-
-          return deferred.promise;
-        }]);
-
         /**
          * expose current task as scope variable
          */
