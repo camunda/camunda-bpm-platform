@@ -1,10 +1,8 @@
 define([
   'text!./cam-tasklist-task-form.html',
-  'text!./cam-tasklist-task-form-modal.html',
   'angular'
 ], function(
   template,
-  modalTemplate,
   angular
 ) {
   'use strict';

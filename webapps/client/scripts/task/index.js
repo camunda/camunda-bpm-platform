@@ -4,25 +4,57 @@
 define([
   'angular',
   'moment',
+  
   './directives/cam-tasklist-task',
-  './directives/cam-tasklist-task-history',
-  './directives/cam-tasklist-task-diagram',
   './directives/cam-tasklist-task-meta',
-  './directives/cam-tasklist-task-form',
-  './modals/cam-tasklist-comment-form',
+
+  './controller/cam-tasklist-task-action-ctrl', 
+  
+  /* detail plugins */
+  './plugins/detail/cam-tasklist-task-detail-form-plugin',
+  './plugins/detail/cam-tasklist-task-detail-history-plugin',
+  './plugins/detail/cam-tasklist-task-detail-diagram-plugin',
+  './plugins/detail/cam-tasklist-task-detail-description-plugin',
+
+  /* detail plugin directives */
+  './plugins/detail/directives/cam-tasklist-task-form',
+  './plugins/detail/directives/cam-tasklist-task-diagram',
+
+
+  /* action plugins */
+  './plugins/action/cam-tasklist-task-action-comment-plugin',
+
+  /* action plugin controller */
+  './plugins/action/modals/cam-tasklist-comment-form',
 
   'camunda-tasklist-ui/utils',
   'camunda-tasklist-ui/api',
   'angular-bootstrap'
+
 ], function(
   angular,
   moment,
+
   taskDirective,
-  taskHistoryDirective,
-  taskDiagramDirective,
   taskMetaDirective,
+
+  camTaskActionCtrl,
+
+  /* detail plugins */
+  camTaskDetailFormPlugin,
+  camTaskDetailHistoryPlugin,
+  camTaskDetailDiagramPlugin,
+  camTaskDetailDescriptionPlugin,
+  
+  /* detail plugin directives */
   taskFormDirective,
-  taskCommentController
+  taskDiagramDirective,
+
+  /* action plugins */
+  camTaskActionCommentPlugin,
+
+  /* action plugin controller */
+  camCommentCreateModalCtrl
 ) {
 
   var taskModule = angular.module('cam.tasklist.task', [
@@ -41,17 +73,27 @@ define([
    * @memberof cam.tasklist
    */
 
-  taskModule.controller('commentFormCtrl', taskCommentController);
-
   taskModule.directive('camTasklistTask', taskDirective);
-
-  taskModule.directive('camTasklistTaskHistory', taskHistoryDirective);
-
-  taskModule.directive('camTasklistTaskDiagram', taskDiagramDirective);
 
   taskModule.directive('camTasklistTaskMeta', taskMetaDirective);
 
+  taskModule.controller('camTaskActionCtrl', camTaskActionCtrl);  
+
+  /* detail plugins */
+  taskModule.config(camTaskDetailFormPlugin);
+  taskModule.config(camTaskDetailHistoryPlugin);
+  taskModule.config(camTaskDetailDiagramPlugin);
+  taskModule.config(camTaskDetailDescriptionPlugin);
+
+  /* detail plugin directives */
   taskModule.directive('camTasklistTaskForm', taskFormDirective);
+  taskModule.directive('camTasklistTaskDiagram', taskDiagramDirective);
+
+    /* action plugins */
+  taskModule.config(camTaskActionCommentPlugin);
+
+  /* action plugin controller */
+  taskModule.controller('camCommentCreateModalCtrl', camCommentCreateModalCtrl);
 
   return taskModule;
 });

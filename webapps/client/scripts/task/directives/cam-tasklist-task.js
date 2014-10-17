@@ -17,10 +17,12 @@ define([
         '$scope',
         '$q',
         'camAPI',
+        'Views',
       function(
         $scope,
         $q,
-        camAPI
+        camAPI,
+        Views
       ) {
 
         var History = camAPI.resource('history');
@@ -93,6 +95,17 @@ define([
         taskData.observe('task', function(task) {
           $scope.task = task;
         });
+
+        // plugins //////////////////////////////////////////////////////////////
+
+        $scope.taskVars = { read: [ 'task', 'taskData' ] };
+        $scope.taskDetailTabs = Views.getProviders({ component: 'tasklist.task.detail' });
+
+        $scope.selectedTaskDetailTab = $scope.taskDetailTabs[0];
+
+        $scope.selectTaskDetailTab = function(tab) {
+          $scope.selectedTaskDetailTab = tab;
+        };
 
       }]
     };

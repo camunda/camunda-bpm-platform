@@ -44,7 +44,7 @@
              ng-click="focus(task)">
           <h4 class="task">
             <a ng-href="#/?task={{ task.id }}"
-               tabindex="{{ (delta + 1) }}">{{ task.name }}</a>
+               tabindex="{{ (delta + 1) }}">{{ task.name || task.taskDefinitionKey || task.id }}</a>
           </h4>
           <h6 class="process-definition"
               ng-class="{suspended: task._embedded.processDefinition[0]}">

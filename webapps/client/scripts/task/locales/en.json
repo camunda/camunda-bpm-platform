@@ -33,6 +33,8 @@
         "Comment saved successfully",
   "DESCRIPTION":
         "Description",
+  "NO_DESCRIPTION":
+        "Note there is no description of the task.",
   "SELECT_TASK_IN_LIST":
         "Select a task in the list.",
   "CLAIM_TASK":

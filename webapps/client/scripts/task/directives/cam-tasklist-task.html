@@ -1,15 +1,15 @@
-<div ng-hide="!!task && task.name">
+<div ng-hide="task">
   <div class="no-task well">
     <i class="glyphicon glyphicon-info-sign"></i>
     {{ 'SELECT_TASK_IN_LIST' | translate }}
   </div>
 </div>
-<section ng-if="!!task && task.name"
-         class="task-card">
+
+<section ng-if="task" class="task-card">
   <header class="row">
     <div class="col-xs-12">
       <div class="names">
-        <h2 class="task">{{ task.name }}</h2>
+        <h2 class="task">{{ task.name || task.taskDefinitionKey || task.id }}</h2>
         <h4 class="process-definition"
             ng-class="{suspended: task._embedded.processDefinition[0]}">
           {{ task._embedded.processDefinition[0].name || task._embedded.processDefinition[0].key }}
@@ -21,48 +21,20 @@
     </div>
   </header>
 
-  <div ng-if="!!task"
-       class="row tabbed-content">
-    <div class="col-xs-12">
-      <tabset>
-        <tab active="tabs.form"
-             select="selectTab('form')">
-          <tab-heading>
-            {{ 'FORM' | translate }}
-          </tab-heading>
+  <div class="row tabbed-content">
 
-          <div class="form-pane">
-            <div cam-tasklist-task-form
-                 task-data="taskData"></div>
-          </div>
-        </tab>
+    <div ng-show="taskDetailTabs.length" class="col-xs-12">
+      <ul class="nav nav-tabs">
+        <li ng-class="{ active: selectedTaskDetailTab == taskDetailTab }" ng-repeat="taskDetailTab in taskDetailTabs">
+          <a href ng-click="selectTaskDetailTab(taskDetailTab)">{{ taskDetailTab.label | translate }}</a>
+        </li>
+      </ul>
 
-        <tab ng-if="task.description"
-             active="tabs.description"
-             select="selectTab('description')"
-             heading="{{ 'DESCRIPTION' | translate }}">
-          <div class="description-pane">{{ task.description }}</div>
-        </tab>
+      <div class="tab-content">
+        <view provider="selectedTaskDetailTab" vars="taskVars" />
+      </div>
 
-        <tab active="tabs.history"
-             select="selectTab('history')"
-             heading="{{ 'HISTORY' | translate }}">
-          <div class="history-pane"
-               cam-tasklist-task-history
-               task-data="taskData">
-          </div>
-        </tab>
-
-        <tab heading="{{ 'DIAGRAM' | translate }}"
-             active="tabs.diagram"
-             select="selectTab('diagram')">
-          <div class="diagram-pane"
-               cam-tasklist-task-diagram
-               task-data="taskData">
-          </div>
-        </tab>
-
-      </tabset>
     </div>
   </div>
+
 </section>

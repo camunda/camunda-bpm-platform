@@ -1,14 +1,9 @@
 define([
-  'angular',
-  'camunda-bpm-sdk',
-  'text!./cam-tasklist-comment-form.html'
-], function(
-  angular,
-  camSDK,
-  template
-) {
+
+], function() {
   'use strict';
-  var commentCreateModalCtrl = [
+
+  return [
     '$scope',
     '$translate',
     'Notifications',
@@ -61,37 +56,4 @@ define([
     };
   }];
 
-
-  return [
-    '$modal',
-    '$scope',
-  function(
-    $modal,
-    $scope
-  ) {
-
-    var commentData = $scope.tasklistData.newChild($scope);
-
-    commentData.observe('task', function(task) {
-      $scope.task = task;
-    });
-
-    $scope.createComment = function() {
-      $modal.open({
-        // creates a child scope of a provided scope
-        scope: $scope,
-        //TODO: extract filter edit modal class to super style sheet
-        windowClass: 'filter-edit-modal',
-        size: 'lg',
-        template: template,
-        controller: commentCreateModalCtrl,
-        resolve: {
-          task: function() { return $scope.task; }
-        }
-      }).result.then(function() {
-        commentData.changed('task');
-      });
-
-    };
-  }];
 });

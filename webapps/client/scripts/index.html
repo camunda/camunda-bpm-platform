@@ -30,14 +30,12 @@
   </div>
 
   <div class="cols col-sm-6 current-task"
-       ng-controller="commentFormCtrl">
+       ng-controller="camTaskActionCtrl">
     <div class="inner" ng-show="task">
       <h5>
-        <a href
-           ng-click="createComment()">
-          {{ 'COMMENT_CREATE' | translate }}
-          <span class="glyphicon glyphicon-plus-sign"></span>
-        </a>
+        <span ng-repeat="taskAction in taskActions">
+          <view provider="taskAction" vars="taskVars">
+        </span>
       </h5>
     </div>
   </div>
