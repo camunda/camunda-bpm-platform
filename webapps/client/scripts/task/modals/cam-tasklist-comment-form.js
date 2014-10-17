@@ -70,7 +70,7 @@ define([
     $scope
   ) {
 
-    var commentData = $scope.taskData.newChild($scope);
+    var commentData = $scope.tasklistData.newChild($scope);
 
     function open(task) {
       $modal.open({
