@@ -80,9 +80,9 @@ define([
           $scope.currentTaskId = task.id;
         };
 
-        // tasksData.observe('taskId', function(taskId) {
-        //   $scope.currentTaskId = taskId;
-        // });
+        tasksData.observe('taskId', function(taskId) {
+          $scope.currentTaskId = taskId.taskId;
+        });
 
 
         /**
