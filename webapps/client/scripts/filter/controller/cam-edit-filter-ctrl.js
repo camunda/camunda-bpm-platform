@@ -126,6 +126,8 @@ define([
       }
       
       $modal.open({
+        // creates a child scope of a provided scope
+        scope: $scope,
         windowClass: 'filter-edit-modal',
         size: 'lg',
         controller: 'camEditFilterModalCtrl',

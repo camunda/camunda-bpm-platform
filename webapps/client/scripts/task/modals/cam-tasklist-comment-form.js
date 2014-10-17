@@ -9,26 +9,33 @@ define([
 ) {
   'use strict';
   var commentCreateModalCtrl = [
-    '$rootScope',
     '$scope',
     '$translate',
     'Notifications',
     'camAPI',
+    'task',
   function(
-    $rootScope,
     $scope,
     $translate,
     Notifications,
-    camAPI
+    camAPI,
+    task
   ) {
 
     var Task = camAPI.resource('task');
+
+    $scope.comment = { message: '' };
+
+    $scope.$on('$locationChangeSuccess', function() {
+      $scope.$dismiss();
+    });
 
     function errorNotification(src, err) {
       $translate(src).then(function(translated) {
         Notifications.addError({
           status: translated,
-          message: (err ? err.message : '')
+          message: (err ? err.message : ''),
+          exclusive: true
         });
       });
     }
@@ -43,13 +50,12 @@ define([
     }
 
     $scope.submit = function() {
-      Task.createComment($scope.comment.task.id, $scope.comment.message, function(err) {
+      Task.createComment(task.id, $scope.comment.message, function(err) {
         if (err) {
           return errorNotification('COMMENT_SAVE_ERROR', err);
         }
 
         successNotification('COMMENT_SAVE_SUCCESS');
-        $rootScope.$broadcast('tasklist.comment.new');
         $scope.$close();
       });
     };
@@ -64,18 +70,24 @@ define([
     $scope
   ) {
 
+    var commentData = $scope.taskData.newChild($scope);
+
     function open(task) {
-      $scope.comment = {
-        message: '',
-        task: task
-      };
       $modal.open({
+        // creates a child scope of a provided scope
         scope: $scope,
         //TODO: extract filter edit modal class to super style sheet
         windowClass: 'filter-edit-modal',
         size: 'lg',
         template: template,
-        controller: commentCreateModalCtrl
+        controller: commentCreateModalCtrl,
+        resolve: {
+          task: function() { return task; }
+        }
+      }).result.then(function() {
+
+        commentData.changed('task');
+
       });
     }
 

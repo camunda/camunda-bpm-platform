@@ -37,7 +37,9 @@ define([
   ) {
     var $ = angular.element;
 
-
+    $scope.$on('$locationChangeSuccess', function() {
+      $scope.$dismiss();
+    });
 
     function errorNotification(src, err) {
       $translate(src).then(function(translated) {
@@ -317,11 +319,6 @@ define([
 
       modalInstance.result.then(clearModalInstance, clearModalInstance);
 
-      $rootScope.$on('authentication.session.expired', function() {
-        if (modalInstance) {
-          modalInstance.close();
-        }
-      });
     };
   }]);
 
