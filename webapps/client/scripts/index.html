@@ -7,7 +7,7 @@
         <a href
            ng-show="userCanCreateFilter"
            ng-click="openDialog('CREATE_NEW_FILTER')">
-          New filter
+          {{ 'FILTER_CREATE' | translate }}
           <span class="glyphicon glyphicon-plus-sign"></span>
         </a>
       </h5>
@@ -35,7 +35,7 @@
       <h5>
         <a href
            ng-click="createComment(task)">
-          Add Comment
+          {{ 'COMMENT_CREATE' | translate }}
           <span class="glyphicon glyphicon-plus-sign"></span>
         </a>
       </h5>
