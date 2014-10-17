@@ -77,31 +77,6 @@ define('camunda-tasklist-ui', [
 
     tasklistApp.controller('camTasklistCtrl', require('camunda-tasklist-ui/controller/cam-tasklist-ctrl'));
 
-
-    tasklistApp.run([
-      '$rootScope',
-      '$translate',
-      'Notifications',
-    function(
-      $rootScope,
-      $translate,
-      Notifications
-    ) {
-
-      $rootScope.$on('authentication.session.expired', function() {
-        $translate([
-          'SESSION_EXPIRED',
-          'SESSION_EXPIRED_MESSAGE'
-        ]).then(function(translations) {
-          Notifications.addError({
-            status: translations.SESSION_EXPIRED,
-            message: translations.SESSION_EXPIRED_MESSAGE,
-            exclusive: true
-          });
-        });
-      });
-    }]);
-
     $(document).ready(function() {
       angular.bootstrap(document, ['cam.tasklist', 'cam.embedded.forms']);
 

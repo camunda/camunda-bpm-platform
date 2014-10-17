@@ -19,8 +19,8 @@ function(
   apiModule.value('MockHttpClient', MockClient);
 
   apiModule.factory('camAPIHttpClient', [
-          'MockHttpClient', '$rootScope', '$location',
-  function(MockHttpClient,   $rootScope, $location) {
+          'MockHttpClient', '$rootScope', '$location', '$translate', 'Notifications',
+  function(MockHttpClient,   $rootScope, $location, $translate, Notifications) {
 
     function AngularClient(config) {
       var Client = (config.mock === true ? MockHttpClient : CamSDK.Client.HttpClient);
@@ -43,9 +43,16 @@ function(
           $rootScope.$apply(function() {
             // in case the session expired
             if (err && err.status === 401) {
-              $rootScope.$broadcast('authentication.changed', null);
-              $rootScope.$broadcast('authentication.session.expired');
-              
+              $translate([
+                'SESSION_EXPIRED',
+                'SESSION_EXPIRED_MESSAGE'
+              ]).then(function(translations) {
+                Notifications.addError({
+                  status: translations.SESSION_EXPIRED,
+                  message: translations.SESSION_EXPIRED_MESSAGE,
+                  exclusive: true
+                });
+              });
               // broadcast event that a login is required
               // proceeds a redirect to /login
               $rootScope.$broadcast('authentication.login.required');
