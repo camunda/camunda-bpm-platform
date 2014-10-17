@@ -43,6 +43,8 @@ function(
           $rootScope.$apply(function() {
             // in case the session expired
             if (err && err.status === 401) {
+              $rootScope.$broadcast('authentication.changed', null);
+
               $translate([
                 'SESSION_EXPIRED',
                 'SESSION_EXPIRED_MESSAGE'
@@ -53,6 +55,7 @@ function(
                   exclusive: true
                 });
               });
+              
               // broadcast event that a login is required
               // proceeds a redirect to /login
               $rootScope.$broadcast('authentication.login.required');
