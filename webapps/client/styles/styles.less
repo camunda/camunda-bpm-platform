@@ -1,15 +1,6 @@
 
-/*
-┌─────────────────────────────────────────┐
-│                                         │
-│                                         │
-│                                         │
-│                                         │
-├─────────────────────────────────────────┤
-│                                         │
-│                                         │
-└─────────────────────────────────────────┘
-*/
+
+// bootstrap variables
 @import "../bower_components/bootstrap/less/variables";
 @grid-gutter-width:                 30px;
 
@@ -101,6 +92,19 @@
   font-weight: normal;
 }
 
+
+
+
+// tasklist specific variables
+@column-darkening:                  4%;
+
+// @column-left-bg:                    darken(@body-bg, @column-darkening * 2);
+@column-left-bg:                    darken(@body-bg, @column-darkening * 6.18);
+@column-center-bg:                  darken(@body-bg, @column-darkening * (6.18 * 0.618));
+@column-right-bg:                   darken(@body-bg, @column-darkening * 0);
+
+
+
 strong {
   .font-bold();
 }
@@ -159,29 +163,16 @@ strong {
 
 
 
-/*
-╭─────────────────────────────────────────╮
-│                                         │
-│                                         │
-│                                         │
-│                                         │
-├─────────────────────────────────────────┤
-│                                         │
-│                                         │
-╰─────────────────────────────────────────╯
-*/
-
-
 @import "layout";
 @import "navbar";
 
-@import "./jquery.minicolors.less";
 @import "./notifications-panel.less";
 
+@import "../scripts/controls/styles";
+@import "../scripts/filter/styles";
+@import "../scripts/task/styles";
+@import "../scripts/navigation/styles";
 
-// .splash-screen {
-//   margin-top: 15px;
-// }
 
 
 
@@ -192,75 +183,54 @@ strong {
 }
 
 
-@import "../scripts/controls/styles";
 
-.titled {
-  > .title,
-  > .dropdown-toggle {
-    line-height: 1.1;
-    display: inline-block;
-    font-size: 18px;
-    margin: 10px 5px 10px 0;
-    cursor: pointer;
-  }
+body {
+  // padding-top: 50px;
+  padding-bottom: 25px;
+  overflow-y: scroll;
 }
 
-.task-filter {
-  .inner {
-    background-color: @gray-light;
-    margin-top: 1rem;
-    box-shadow: 0 0 2px @gray-darker inset;
-    &:first-child {
-      margin-top: 0;
-    }
-  }
-
-  .cards {
-    min-height: 50px;
-  }
-
-  .collapsed {
-    &.cards {
-      display: none;
-    }
-  }
+h1,
+h2,
+h3,
+h4 {
+  .font-light;
+  // font-family: volkswagents-regular;
+  // font-weight: normal;
 }
 
-.filter-header {
-  position: relative;
-  height: 4rem;
+h1 {
+  text-transform: uppercase;
 }
 
-@import "../scripts/filter/styles";
-@import "../scripts/task/styles";
-@import "../scripts/navigation/styles";
+a,
+a:link,
+a:hover,
+a:focus,
+a:active {
+  color: @link-color;
+  text-decoration: none;
+}
 
+[ng-click],
+[onclick] {
+  cursor: pointer;
+}
 
-.task-group {
-  background-color: @gray-lighter;
-  padding: 1rem;
-  margin-bottom: 1rem;
-  &:last-child {
-    margin-bottom: 0;
-  }
-
-  header {
-    h2,
-    h4 {
-      margin: 0;
-    }
-    h2 { font-size: 1.8rem; }
-    h4 { font-size: 1.4rem; }
-  }
+label {
+  .font-bold;
 }
 
 
+a {
+  &:focus {
+    outline: none;
+  }
+}
 
 
 /*
-┌─────────────────────────────────────────┐
-│ Modal dialogs                           │
-└─────────────────────────────────────────┘
+ Modal dialogs
 */
 .modal[ng-click] {
   cursor: default;
@@ -302,11 +272,6 @@ strong {
 @import "../scripts/variable/styles.less";
 
 
-/*
-┌─────────────────────────────────────────┐
-│                                         │
-└─────────────────────────────────────────┘
-*/
 
 
 
@@ -325,16 +290,6 @@ strong {
 
 
 
-/*
-┌─────────────────────────────────────────┐
-│                                         │
-└─────────────────────────────────────────┘
-*/
-
-
-
-
-
 
 
 
@@ -347,9 +302,22 @@ strong {
   }
 }
 
-.overdue {
-  color: @brand-danger;
+
+.list-inline > li {
+  padding: 1px 5px;
+  position: relative;
+  z-index: 10;
+
+  &.overdue {
+    color: @alert-warning-text;
+    background-color: @alert-warning-bg;
+    border: 1px solid @alert-warning-border;
+
+    // I know.. rounded corners are for pussies
+    border-radius: 3px;
+  }
 }
+
 
 .loader {
   color: @gray-light;

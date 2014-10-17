@@ -9,10 +9,10 @@
                     "Value of",
   "DOWNLOAD":
                     "Download",
-  "LESS":
-                    "Less",
-  "MORE":
-                    "More",
+  "LESS_VARIABLES":
+                    "Show less variables",
+  "MORE_VARIABLES":
+                    "Show more variables",
   "TOGGLE":
                     "Toggle"
 }

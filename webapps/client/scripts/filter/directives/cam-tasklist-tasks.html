@@ -34,16 +34,16 @@
     {{ 'NO_MATCHING_TASK' | translate }}
   </div>
 
-  <form ng-show="totalItems"
-        role="form">
+  <div ng-show="totalItems">
     <ol class="tasks-list list-unstyled">
       <li class="task"
-          ng-repeat="(delta, task) in tasks">
+          ng-repeat="(delta, task) in tasks"
+          ng-class="{active: currentTaskId === task.id}">
 
-        <div class="names">
+        <div class="names"
+             ng-click="focus(task)">
           <h4 class="task">
             <a ng-href="#/?task={{ task.id }}"
-               ng-click="focus(task)"
                tabindex="{{ (delta + 1) }}">{{ task.name }}</a>
           </h4>
           <h6 class="process-definition"
@@ -101,7 +101,7 @@
              class="row variables" />
       </li>
     </ol>
-  </form>
+  </div>
 </div>
 
 

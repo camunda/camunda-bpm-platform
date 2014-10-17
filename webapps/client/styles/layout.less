@@ -10,57 +10,16 @@ html, body {
 .page-wrap {
   min-height: 100%;
   /* equal to footer height */
-  margin-bottom: -32px;
+  margin-bottom: -25px;
 }
 .page-wrap:after {
-  content: "";
+  content: ' ';
   display: block;
 }
 .footer.page,
 .page-wrap:after {
   /* .push must be the same height as footer */
-  height: 32px;
-}
-.site-footer {
-  background: orange;
-}
-
-
-body {
-  // padding-top: 50px;
-  padding-bottom: 25px;
-  overflow-y: scroll;
-}
-
-h1,
-h2,
-h3,
-h4 {
-  .font-light;
-  // font-family: volkswagents-regular;
-  // font-weight: normal;
-}
-
-h1 {
-  text-transform: uppercase;
-}
-
-a,
-a:link,
-a:hover,
-a:focus,
-a:active {
-  color: @link-color;
-  text-decoration: none;
-}
-
-[ng-click],
-[onclick] {
-  cursor: pointer;
-}
-
-label {
-  .font-bold;
+  height: 25px;
 }
 
 footer.page {
@@ -73,27 +32,85 @@ footer.page {
   text-align: right;
   background-color: @body-bg;
   border-top: 1px solid @gray-lighter;
-  // color: @gray-light;
 }
 
-.page-wrap {
-  // background-color: @gray-darker;
-
-  // background-image: url('/images/camunda-bear.jpg');
-  // background-position: middle center;
-  // background-size: contain;
-}
-
-
-.task-board.row {
-  .cols > .inner {
-    margin-top: (@grid-gutter-width / 2);
-  }
-}
 
 .task-filters,
 .focused-task {
   > .actions {
     min-height: 50px;
   }
+}
+
+
+.controls {
+  > .task-filters,
+  > .task-list,
+  > .current-task {
+    padding-top: 20px;
+  }
+}
+
+.task-board {
+  .task-filters > .inner,
+  .current-task > .inner,
+  .task-list .well {
+    margin-top: (@grid-gutter-width / 2);
+  }
+}
+
+
+.page-wrap .container-fluid{
+  margin: 0;
+  padding: 0;
+}
+
+
+@media (min-width: 768px) {
+  .ui-wrap {
+    display: table;
+    width: 100%;
+  }
+
+  .row.equal-height-cols {
+    // display: table;
+    display: table-row;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+
+    // if left visible, a 1px wide line on the sides is appearing
+    &:before,
+    &:after {
+      display: none;
+    }
+
+    > .cols {
+      display: table-cell;
+      vertical-align: top;
+      float: none;
+    }
+  }
+}
+
+
+
+.cols {
+  &.task-filters {
+    background-color: @column-left-bg;
+  }
+  &.task-list {
+    background-color: @column-center-bg;
+  }
+  &.current-task {
+    background-color: @column-right-bg;
+  }
+}
+
+.task-board [cam-task-search] {
+  margin: (@grid-gutter-width / 2) 0;
+}
+
+.controls [cam-task-search] {
+  margin-top: -10px;
 }

@@ -8,17 +8,6 @@
          class="task-card">
   <header class="row">
     <div class="col-xs-12">
-      <div class="actions">
-
-        <div class="pull-right" ng-controller="commentFormCtrl">
-          <a href
-             ng-click="createComment(task)">
-            Add Comment
-            <span class="glyphicon glyphicon-plus-sign"></span>
-          </a>
-        </div>
-      </div>
-
       <div class="names">
         <h2 class="task">{{ task.name }}</h2>
         <h4 class="process-definition"
@@ -29,7 +18,6 @@
 
       <div cam-tasklist-task-meta
            task-data="taskData"></div>
-
     </div>
   </header>
 

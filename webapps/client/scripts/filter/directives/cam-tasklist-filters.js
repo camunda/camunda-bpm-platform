@@ -51,16 +51,17 @@ define([
         /**
          * observe list of filters to set the background-color on a filter
          */
-        $scope.state = filtersData.observe('filters', function(filters) {        
+        $scope.state = filtersData.observe('filters', function(filters) {
 
           $scope.totalItems = filters.length;
 
           for (var i = 0, filter; !!(filter = filters[i]); i++) {
             // read background color from properties
             filter.style = {
+              'border-color': filter.properties.color,
               'background-color': filter.properties.color
             };
-       
+
           }
 
           $scope.filters = filters;
@@ -70,8 +71,8 @@ define([
         /**
          * observe list of filters and taskListQuery to set the focus
          */
-        $scope.state = filtersData.observe(['filters', 'taskListQuery', function(filters, taskListQuery) {        
-        
+        $scope.state = filtersData.observe(['filters', 'taskListQuery', function(filters, taskListQuery) {
+
           var focused,
               filterId = query.id;
 
@@ -88,7 +89,7 @@ define([
               if(!focused || filter.properties.priority < focused.properties.priority) {
                 focused = filter;
               }
-            }           
+            }
           }
 
           $scope.focus(focused);
@@ -108,7 +109,7 @@ define([
               query.firstResult = 0;
             }
             query.id = filter.id;
-            
+
           }
           else {
             query.id = null;

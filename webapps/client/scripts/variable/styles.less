@@ -16,7 +16,7 @@
 
 .variables {
   font-size: 12px;
-  color: @gray-light;
+  color: @gray;
   margin-top: (@grid-gutter-width / 3);
   margin-bottom: 0;
 }
@@ -28,6 +28,8 @@
   max-height: 58px;
   position: relative;
   margin-top: (@grid-gutter-width / 3);
+
+  transition: max-height 0.218s ease-in-out;
 
   &.expanded {
     max-height: 2000px;
@@ -47,7 +49,9 @@
     right: @grid-gutter-width / 2;
     height: 15px;
 
-    .gradient();
+    transition: background-color 0.218s ease-in-out;
+
+    .gradient(top, fade(@column-center-bg, 0), @column-center-bg);
     background-position-y: 100%;
     background-repeat: repeat-x;
   }
@@ -79,6 +83,10 @@
   }
 }
 
+.task.active .shutter {
+  .gradient(top, fade(@column-right-bg, 0), @column-right-bg);
+}
+
 
 
 .variable-modal-detail {
@@ -87,7 +95,3 @@
   }
 }
 
-// @media (max-width: @screen-md-max) {
-//   .variables {
-//   }
-// }

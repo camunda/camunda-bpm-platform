@@ -1,64 +1,76 @@
-<div class="container-fluid">
 
-  <div class="row controls">
-    <div class="cols col-sm-2 task-filters"
-         ng-controller="camEditFilterCtrl">
-      <div class="inner">
-        <h5>
-          <a href
-             ng-show="userCanCreateFilter"
-             ng-click="openDialog('CREATE_NEW_FILTER')">
-            New filter
-            <span class="glyphicon glyphicon-plus-sign"></span>
-          </a>
-        </h5>
-      </div>
-
+<div class="row controls equal-height-cols">
+  <div class="cols col-sm-2 task-filters"
+       ng-controller="camEditFilterCtrl">
+    <div class="inner">
+      <h5>
+        <a href
+           ng-show="userCanCreateFilter"
+           ng-click="openDialog('CREATE_NEW_FILTER')">
+          New filter
+          <span class="glyphicon glyphicon-plus-sign"></span>
+        </a>
+      </h5>
     </div>
+  </div>
 
-    <div class="cols col-sm-4 current-filter">
-      <div class="inner">
-        <div class="row">
-          <div class="col-xs-12">
-          <!--
-          <div class="col-xs-6">
-            <h5>&nbsp;</h5>
-          </div>
-          <div class="col-xs-6 dropdown sorting">
-          -->
-            <div cam-sorting-choices
-                 tasklist-data="tasklistData"></div>
-            <div cam-task-search
-                 tasklist-data="tasklistData"></div>
-          </div>
+  <div class="cols col-sm-4 task-list">
+    <div class="inner">
+      <div class="row">
+        <div class="col-xs-8">
+          <div cam-task-search
+               tasklist-data="tasklistData"></div>
         </div>
-      </div>
-    </div>
-
-    <div class="cols col-sm-6 current-task">
-      <div class="inner">
-        <h5>&nbsp;</h5>
+        <div class="col-xs-4">
+          <div cam-sorting-choices
+               tasklist-data="tasklistData"></div>
+        </div>
       </div>
     </div>
   </div>
 
-  <div class="row task-board">
-    <div class="cols col-sm-2 task-filters">
-      <div class="inner"
-           cam-tasklist-filters
+  <div class="cols col-sm-6 current-task"
+       ng-controller="commentFormCtrl">
+    <div class="inner">
+      <h5>
+        <a href
+           ng-click="createComment(task)">
+          Add Comment
+          <span class="glyphicon glyphicon-plus-sign"></span>
+        </a>
+      </h5>
+    </div>
+  </div>
+</div>
+
+<div class="row task-board equal-height-cols">
+  <div class="cols col-sm-2 task-filters">
+    <div class="inner"
+         cam-tasklist-filters
+         tasklist-data="tasklistData"></div>
+  </div>
+
+  <div class="cols col-sm-4 task-list">
+    <div class="inner">
+      <!--
+      <div cam-task-search
+           tasklist-data="tasklistData"></div>
+      -->
+
+      <div cam-tasklist-filter-tasks
            tasklist-data="tasklistData"></div>
     </div>
 
-    <div class="cols col-sm-4 task-list">
-      <div class="inner"
-           cam-tasklist-filter-tasks
-           tasklist-data="tasklistData"></div>
-    </div>
+    <!--
+    <div class="inner"
+         cam-tasklist-filter-tasks
+         tasklist-data="tasklistData"></div>
+    -->
+  </div>
 
-    <div class="cols col-sm-6 current-task">
-      <div class="inner"
-           cam-tasklist-task
-           tasklist-data="tasklistData"></div>
-    </div>
+  <div class="cols col-sm-6 current-task">
+    <div class="inner"
+         cam-tasklist-task
+         tasklist-data="tasklistData"></div>
   </div>
 </div>

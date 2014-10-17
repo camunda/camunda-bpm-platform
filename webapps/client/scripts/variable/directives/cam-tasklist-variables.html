@@ -67,13 +67,13 @@
 
 
   <div class="shutter"
-       ng-if="shownVariablesCount > 2">
-    <a ng-click="toggle()"
+       ng-if="shownVariablesCount > 2"
+       ng-click="toggle($event)"
        tooltip-placement="bottom"
        tooltip-append-to-body="true"
-       tooltip="{{ (expanded ? 'LESS' : 'MORE') | translate }}">
-      <span class="glyphicon"
-            ng-class="{'glyphicon-chevron-up': expanded, 'glyphicon-chevron-down': !expanded}"></span>
+       tooltip="{{ (expanded ? 'LESS_VARIABLES' : 'MORE_VARIABLES') | translate }}">
+    <a class="glyphicon"
+       ng-class="{'glyphicon-chevron-up': expanded, 'glyphicon-chevron-down': !expanded}">
     </a>
   </div>
 </div>

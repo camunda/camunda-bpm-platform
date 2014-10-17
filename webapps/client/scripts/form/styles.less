@@ -5,23 +5,30 @@
   >.view {
     border: 1px solid transparent;
     margin: 0;
-    padding: 3px;
+    padding: 1px 3px;
     position: relative;
+    // background-color: transparent;
+
+    border-radius: 3px;
 
     &:hover {
       z-index: 99;
       cursor: pointer;
       border: 1px dashed @gray-light;
-      background-color: transparent;
+      // background-color: transparent;
+      background-color: @gray-lighter;
     }
   }
 
   >.edit {
-    min-height: 30px;
     input {
-      max-height: 30px;
-      color: inherit;
-      background-color: transparent;
+      padding: 1px 3px;
+      height: auto;
+      width: auto;
+      min-width: 40px;
+      max-width: 100%;
+
+      border-radius: 3px 0 3px 3px;
     }
   }
 
@@ -71,7 +78,18 @@
     right: 0;
     background-color: @body-bg;
     bottom: 100%;
-    // margin-bottom: 2px;
+    margin-bottom: -1px;
+
+    border-radius: 3px 3px 0 0;
+    button {
+      border-color: @input-border-focus;
+      &:first-child {
+        border-radius: 3px 0 0 0;
+      }
+      &:last-child {
+        border-radius: 0 3px 0 0;
+      }
+    }
   }
 }
 

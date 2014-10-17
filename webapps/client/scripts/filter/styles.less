@@ -26,23 +26,13 @@
     display: block;
     content: ' ';
     position: absolute;
-    right: 0;
+    // right: 0;
+    right: 0 - (@grid-gutter-width / 2);
     top: 50%;
     width: 0px;
     height: 0px;
   }
-  &:hover:after {
-    margin-top: -(@grid-gutter-width / 5);
-    border-top: (@grid-gutter-width / 5) solid transparent;
-    border-bottom: (@grid-gutter-width / 5) solid transparent;
-    border-right: (@grid-gutter-width / 5) solid @body-bg;
-  }
-  // &.active:after {
-  //   margin-top: -(@grid-gutter-width / 3);
-  //   border-top: (@grid-gutter-width / 3) solid transparent;
-  //   border-bottom: (@grid-gutter-width / 3) solid transparent;
-  //   border-right: (@grid-gutter-width / 3) solid @body-bg;
-  // }
+
 
   h4 {
     cursor: pointer;
@@ -98,17 +88,17 @@
     padding: 5px 0;
   }
 
-  .key {
-    .font-bold;
-  }
+  // .key {
+  //   .font-bold;
+  // }
 
-  .operator {
-    // .font-bold;
-  }
+  // .operator {
+  //   // .font-bold;
+  // }
 
-  .value {
-    .font-italic;
-  }
+  // .value {
+  //   .font-italic;
+  // }
 
   &.current,
   &:hover {
@@ -120,11 +110,13 @@
     // margin-left: -15px;
   }
 }
+
 .active > .task-filter:after {
   margin-top: -(@grid-gutter-width / 3);
   border-top: (@grid-gutter-width / 3) solid transparent;
   border-bottom: (@grid-gutter-width / 3) solid transparent;
-  border-right: (@grid-gutter-width / 3) solid @body-bg;
+  border-right: (@grid-gutter-width / 3) solid @column-center-bg;
+  right: 0 - (@grid-gutter-width / 2);
 }
 
 .tasks-list {
@@ -133,9 +125,41 @@
     border-top: 1px dashed @gray-light;
     padding: (@grid-gutter-width / 2) 0;
 
+    &.active {
+      position: relative;
+      background-color: @column-right-bg;
+      overflow: visible;
+
+      &:after,
+      &:before {
+        content: ' ';
+        display: block;
+        position: absolute;
+        height: 100%;
+        top: 0;
+        bottom: 0;
+        z-index: 5;
+        background-color: @column-right-bg;
+      }
+
+      &:after {
+        width: (@grid-gutter-width / 2);
+        right: (0 - (@grid-gutter-width / 2));
+      }
+
+      &:before {
+        width: (@grid-gutter-width / 5);
+        left: (0 - (@grid-gutter-width / 5));
+      }
+
+      .names {
+        font-style: italic;
+      }
+    }
+
     &:first-child {
       border-top: 0;
-      padding-top: 0;
+      // padding-top: 0;
     }
     &:focus {
       outline: none;
@@ -153,7 +177,7 @@
   clear: both;
   overflow: visible;
   text-align: center;
-  margin: 15px auto 0 auto;
+  margin: (@grid-gutter-width / 2) auto;
   li {
     overflow: visible;
     a {

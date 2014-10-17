@@ -86,8 +86,11 @@ define([
         //   }
         // };
 
-        scope.toggle = function() {
+        scope.toggle = function($event) {
           scope.expanded = !scope.expanded;
+          if ($event && $event.preventDefault) {
+            $event.preventDefault();
+          }
         };
 
         scope.showValue = function(variable) {

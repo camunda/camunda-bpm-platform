@@ -77,7 +77,12 @@ define([
 
         $scope.focus = function (task) {
           tasksData.set('taskId', { 'taskId' : task.id });
+          $scope.currentTaskId = task.id;
         };
+
+        // tasksData.observe('taskId', function(taskId) {
+        //   $scope.currentTaskId = taskId;
+        // });
 
 
         /**
