@@ -52,8 +52,21 @@ footer.page {
 }
 
 .task-board {
-  .task-filters > .inner,
-  .current-task > .inner,
+  // .task-filters > .inner,
+  // .current-task > .inner,
+  // .task-list .well {
+  //   margin-top: (@grid-gutter-width / 2);
+  // }
+
+  > .cols > .inner {
+    border-top: 1px dashed @gray-light;
+    padding-top: (@grid-gutter-width / 2);
+  }
+
+  > .task-list > .inner {
+    padding-top: 0;
+  }
+
   .task-list .well {
     margin-top: (@grid-gutter-width / 2);
   }
@@ -64,6 +77,7 @@ footer.page {
   margin: 0;
   padding: 0;
 }
+
 
 
 @media (min-width: 768px) {
