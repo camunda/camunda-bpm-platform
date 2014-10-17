@@ -14,7 +14,6 @@
 
         <span class="glyphicon glyphicon-exclamation-sign valid-hide"
               tooltip-placement="top"
-              tooltip-append-to-body="true"
               tooltip="{{'INVALID_SEARCH' | translate}}"></span>
 
         <span cam-form-inline-field
@@ -24,7 +23,6 @@
               change="changeSearch($index, 'type', varValue)"
               value="search.type">
           <span tooltip-placement="top"
-                tooltip-append-to-body="true"
                 tooltip="{{'VARIABLE_TYPE' | translate}}">
             {{ varValue | queryComponent }}
           </span>
@@ -36,7 +34,6 @@
               change="changeSearch($index, 'name', varValue)"
               value="search.name">
           <span tooltip-placement="top"
-                tooltip-append-to-body="true"
                 tooltip="{{'PROPERTY' | translate}}">
             {{ varValue | queryComponent }}
           </span>
@@ -49,7 +46,6 @@
               change="changeSearch($index, 'operator', varValue)"
               value="search.operator">
           <span tooltip-placement="top"
-                tooltip-append-to-body="true"
                 tooltip="{{'OPERATOR' | translate}}">
             {{ varValue | queryComponent }}
           </span>
@@ -61,7 +57,6 @@
               change="changeSearch($index, 'value', varValue)"
               value="search.value">
           <span tooltip-placement="top"
-            tooltip-append-to-body="true"
             tooltip="{{'VALUE' | translate}}">
               {{ varValue | queryComponent }}
           </span>

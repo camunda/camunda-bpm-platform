@@ -70,7 +70,6 @@
        ng-if="shownVariablesCount > 2"
        ng-click="toggle($event)"
        tooltip-placement="bottom"
-       tooltip-append-to-body="true"
        tooltip="{{ (expanded ? 'LESS_VARIABLES' : 'MORE_VARIABLES') | translate }}">
     <a class="glyphicon"
        ng-class="{'glyphicon-chevron-up': expanded, 'glyphicon-chevron-down': !expanded}">

@@ -83,6 +83,7 @@ define(function() {
                                       'camunda-tasklist-ui/config/date',
                                       'camunda-tasklist-ui/config/routes',
                                       'camunda-tasklist-ui/config/translations',
+                                      'camunda-tasklist-ui/config/tooltip',
                                       'camunda-tasklist-ui/config/uris',
 
                                       'camunda-tasklist-ui/api',

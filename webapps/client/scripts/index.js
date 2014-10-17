@@ -74,6 +74,7 @@ define('camunda-tasklist-ui', [
     tasklistApp.config(require('camunda-tasklist-ui/config/translations'));
     tasklistApp.config(require('camunda-tasklist-ui/config/routes'));
     tasklistApp.config(require('camunda-tasklist-ui/config/date'));
+    tasklistApp.config(require('camunda-tasklist-ui/config/tooltip'));
 
     tasklistApp.controller('camTasklistCtrl', require('camunda-tasklist-ui/controller/cam-tasklist-ctrl'));
 

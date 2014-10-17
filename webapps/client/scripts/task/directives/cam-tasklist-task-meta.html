@@ -11,13 +11,11 @@
           on-cancel-editing="cancelEditingFollowUpDate(this)"
           value="task.followUp">
       <span tooltip-placement="top"
-            tooltip-append-to-body="true"
             tooltip="{{ 'FOLLOW_UP_DATE' | translate }}"
             class="glyphicon glyphicon-bell"></span>
 
       <span ng-if="varValue"
             tooltip-placement="top"
-            tooltip-append-to-body="true"
             tooltip="{{ varValue | camDate:'long' }}"
             am-time-ago="varValue">{{ varValue }}</span>
       <a href
@@ -47,13 +45,11 @@
           value="task.due">
 
       <span tooltip-placement="top"
-            tooltip-append-to-body="true"
             tooltip="{{ 'DUE_DATE' | translate }}"
             class="glyphicon glyphicon-calendar"></span>
 
       <span ng-if="varValue"
             tooltip-placement="top"
-            tooltip-append-to-body="true"
             tooltip="{{ varValue | camDate:'long' }}"
             am-time-ago="varValue">{{ varValue }}</span>
 
