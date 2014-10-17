@@ -2,7 +2,9 @@
   <form class="search-field" ng-submit="createSearch()">
     <div class="form-container search-container">
 
-      <span class="search-label" ng-repeat="search in searches">
+      <span class="search-label"
+            ng-repeat="search in searches"
+            ng-class="{'invalid': invalidSearch(search, types, operatorList)}">
         <a href
            tooltip-placement="top"
            tooltip="{{ 'DELETE_SEARCH' | translate }}"
@@ -10,11 +12,7 @@
            class="remove-search glyphicon glyphicon-remove">
         </a>
 
-        <span class="glyphicon glyphicon-exclamation-sign"
-              ng-if="!(types.indexOf(search.type) !== -1 &&
-                     operatorList.indexOf(search.operator) !== -1 &&
-                     search.name &&
-                     search.value)"
+        <span class="glyphicon glyphicon-exclamation-sign valid-hide"
               tooltip-placement="top"
               tooltip-append-to-body="true"
               tooltip="{{'INVALID_SEARCH' | translate}}"></span>

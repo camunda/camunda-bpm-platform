@@ -10,12 +10,22 @@ define([
   return [function() {
     return {
       restrict: 'EAC',
+
       scope: {
         tasklistData: '='
       },
+
       link: function(scope, element, attrs) {
-         scope.searches = [];
+        scope.searches = [];
+
+        scope.invalidSearch = function(search, types, operatorList) {
+          return !(types.indexOf(search.type) !== -1 &&
+                   operatorList.indexOf(search.operator) !== -1 &&
+                   search.name &&
+                   search.value);
+        };
       },
+
       template: template
     };
   }];
