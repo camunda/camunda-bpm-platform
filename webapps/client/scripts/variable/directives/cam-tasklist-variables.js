@@ -23,9 +23,13 @@ define([
     $modalInstance,
     details
   ) {
+
+    $scope.$on('$locationChangeSuccess', function() {
+      $scope.$dismiss();
+    });
+
     $scope.value = null;
     $scope.type = null;
-    $scope.close = $modalInstance.close;
     $scope.variable = details;
 
     switch ($scope.variable.type) {
