@@ -314,10 +314,12 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
   }
 
   public void messageEventReceived(String messageName, String executionId) {
+    ensureNotNull("messageName", messageName);
     commandExecutor.execute(new MessageEventReceivedCmd(messageName, executionId, null));
   }
 
   public void messageEventReceived(String messageName, String executionId, Map<String, Object> processVariables) {
+    ensureNotNull("messageName", messageName);
     commandExecutor.execute(new MessageEventReceivedCmd(messageName, executionId, processVariables));
   }
 

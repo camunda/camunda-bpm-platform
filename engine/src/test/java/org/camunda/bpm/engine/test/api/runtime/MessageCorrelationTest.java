@@ -19,6 +19,7 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.MismatchingMessageCorrelationException;
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -286,33 +287,6 @@ public class MessageCorrelationTest extends PluggableProcessEngineTestCase {
         .count();
     assertEquals(2, correlatedExecutions);
 
-  }
-
-  public void testNullMessageEventCorrelation() {
-    try {
-      runtimeService.correlateMessage(null);
-      fail("Exception expected");
-    } catch (ProcessEngineException e) {
-      assertTextPresent("messageName is null", e.getMessage());
-    }
-
-    //fluent builder
-    try {
-      runtimeService.createMessageCorrelation(null)
-        .correlate();
-      fail("Exception expected");
-    } catch (ProcessEngineException e) {
-      assertTextPresent("messageName is null", e.getMessage());
-    }
-
-    //fluent builder multiple
-    try {
-      runtimeService.createMessageCorrelation(null)
-        .correlateAll();
-      fail("Exception expected");
-    } catch (ProcessEngineException e) {
-      assertTextPresent("messageName is null", e.getMessage());
-    }
   }
 
   @Deployment
@@ -742,6 +716,171 @@ public class MessageCorrelationTest extends PluggableProcessEngineTestCase {
       .list();
 
     assertFalse(correlatedExecutions.isEmpty());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testCatchingMessageEventCorrelation.bpmn20.xml")
+  public void testCorrelationByVariablesOnly() {
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("variable", "value1");
+    runtimeService.startProcessInstanceByKey("process", variables);
+
+    variables.put("variable", "value2");
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("process", variables);
+
+    runtimeService.correlateMessage(null, variables);
+
+    List<Execution> correlatedExecutions = runtimeService
+      .createExecutionQuery()
+      .activityId("task")
+      .list();
+
+    assertEquals(1, correlatedExecutions.size());
+    assertEquals(instance.getId(), correlatedExecutions.get(0).getId());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testCatchingMessageEventCorrelation.bpmn20.xml")
+  public void testCorrelationByBusinessKey() {
+    runtimeService.startProcessInstanceByKey("process", "businessKey1");
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("process", "businessKey2");
+
+    runtimeService.correlateMessage(null, "businessKey2");
+
+    List<Execution> correlatedExecutions = runtimeService
+      .createExecutionQuery()
+      .activityId("task")
+      .list();
+
+    assertEquals(1, correlatedExecutions.size());
+    assertEquals(instance.getId(), correlatedExecutions.get(0).getId());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testCatchingMessageEventCorrelation.bpmn20.xml")
+  public void testCorrelationByProcessInstanceIdOnly() {
+    runtimeService.startProcessInstanceByKey("process");
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("process");
+
+    runtimeService
+      .createMessageCorrelation(null)
+      .processInstanceId(instance.getId())
+      .correlate();
+
+    List<Execution> correlatedExecutions = runtimeService
+      .createExecutionQuery()
+      .activityId("task")
+      .list();
+
+    assertEquals(1, correlatedExecutions.size());
+    assertEquals(instance.getId(), correlatedExecutions.get(0).getId());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testCatchingMessageEventCorrelation.bpmn20.xml")
+  public void testCorrelationWithoutMessageNameFluent() {
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("variable", "value1");
+    runtimeService.startProcessInstanceByKey("process", variables);
+
+    variables.put("variable", "value2");
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("process", variables);
+
+    runtimeService.createMessageCorrelation(null)
+      .processInstanceVariableEquals("variable", "value2")
+      .correlate();
+
+    List<Execution> correlatedExecutions = runtimeService
+      .createExecutionQuery()
+      .activityId("task")
+      .list();
+
+    assertEquals(1, correlatedExecutions.size());
+    assertEquals(instance.getId(), correlatedExecutions.get(0).getId());
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testCatchingMessageEventCorrelation.bpmn20.xml",
+      "org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testCorrelateAllWithoutMessage.bpmn20.xml"})
+  public void testCorrelateAllWithoutMessage() {
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("variable", "value1");
+    runtimeService.startProcessInstanceByKey("process", variables);
+    runtimeService.startProcessInstanceByKey("secondProcess", variables);
+
+    variables.put("variable", "value2");
+    ProcessInstance instance1 = runtimeService.startProcessInstanceByKey("process", variables);
+    ProcessInstance instance2 = runtimeService.startProcessInstanceByKey("secondProcess", variables);
+
+    runtimeService.createMessageCorrelation(null)
+      .processInstanceVariableEquals("variable", "value2")
+      .correlateAll();
+
+    List<Execution> correlatedExecutions = runtimeService
+      .createExecutionQuery()
+      .activityId("task")
+      .orderByProcessDefinitionKey()
+      .asc()
+      .list();
+
+    assertEquals(2, correlatedExecutions.size());
+    assertEquals(instance1.getId(), correlatedExecutions.get(0).getId());
+    assertEquals(instance2.getId(), correlatedExecutions.get(1).getId());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testMessageStartEventCorrelation.bpmn20.xml")
+  public void testCorrelationWithoutMessageDoesNotMatchStartEvent() {
+    try {
+      runtimeService.createMessageCorrelation(null)
+        .processInstanceVariableEquals("variable", "value2")
+        .correlate();
+      fail("exception expected");
+    } catch (MismatchingMessageCorrelationException e) {
+      // expected
+    }
+
+    List<Execution> correlatedExecutions = runtimeService
+      .createExecutionQuery()
+      .activityId("task")
+      .list();
+
+    assertTrue(correlatedExecutions.isEmpty());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testCatchingMessageEventCorrelation.bpmn20.xml")
+  public void testCorrelationWithoutCorrelationPropertiesFails() {
+
+    runtimeService.startProcessInstanceByKey("process");
+
+    try {
+      runtimeService.createMessageCorrelation(null)
+        .correlate();
+      fail("expected exception");
+    } catch (NullValueException e) {
+      // expected
+    }
+
+    try {
+      runtimeService.correlateMessage(null);
+      fail("expected exception");
+    } catch (NullValueException e) {
+      // expected
+    }
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/twoBoundaryEventSubscriptions.bpmn20.xml")
+  public void testCorrelationToExecutionWithMultipleSubscriptionsFails() {
+
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("process");
+
+    try {
+      runtimeService.createMessageCorrelation(null)
+        .processInstanceId(instance.getId())
+        .correlate();
+      fail("expected exception");
+    } catch (ProcessEngineException e) {
+      // note: this does not expect a MismatchingCorrelationException since the exception
+      // is only raised in the MessageEventReceivedCmd. Otherwise, this would require explicit checking in the
+      // correlation handler that a matched execution without message name has exactly one message (now it checks for
+      // at least one message)
+
+      // expected
+    }
   }
 
 }

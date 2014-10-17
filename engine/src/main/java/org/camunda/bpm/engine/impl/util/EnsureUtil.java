@@ -243,6 +243,24 @@ public final class EnsureUtil {
     ensureNotNull(exceptionClass, message, variableName, values.toArray(new Object[values.size()]));
   }
 
+  @SuppressWarnings("rawtypes")
+  public static void ensureNumberOfElements(String variableName, Collection collection, int elements) {
+    ensureNumberOfElements("", variableName, collection, elements);
+  }
+
+  @SuppressWarnings("rawtypes")
+  public static void ensureNumberOfElements(String message, String variableName, Collection collection, int elements) {
+    ensureNumberOfElements(ProcessEngineException.class, message, variableName, collection, elements);
+  }
+
+  @SuppressWarnings("rawtypes")
+  public static void ensureNumberOfElements(Class<? extends ProcessEngineException> exceptionClass, String message, String variableName, Collection collection, int elements) {
+    ensureNotNull(exceptionClass, message, variableName, collection);
+    if (collection.size() != elements) {
+      throw generateException(exceptionClass, message, variableName, "does not have " + elements + " elements");
+    }
+  }
+
   protected static <T extends ProcessEngineException> T generateException(Class<T> exceptionClass, String message, String variableName, String description) {
     String formattedMessage = formatMessage(message, variableName, description);
 

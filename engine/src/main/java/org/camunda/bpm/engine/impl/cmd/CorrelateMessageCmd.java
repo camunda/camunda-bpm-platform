@@ -14,6 +14,7 @@
 package org.camunda.bpm.engine.impl.cmd;
 
 import java.util.Map;
+
 import org.camunda.bpm.engine.MismatchingMessageCorrelationException;
 import org.camunda.bpm.engine.impl.MessageCorrelationBuilderImpl;
 import org.camunda.bpm.engine.impl.context.Context;
@@ -22,7 +23,7 @@ import org.camunda.bpm.engine.impl.runtime.CorrelationHandler;
 import org.camunda.bpm.engine.impl.runtime.CorrelationSet;
 import org.camunda.bpm.engine.impl.runtime.MessageCorrelationResult;
 
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureAtLeastOneNotNull;
 
 /**
  * @author Thorben Lindhauer
@@ -46,7 +47,8 @@ public class CorrelateMessageCmd extends AbstractCorrelateMessageCmd {
   }
 
   public Void execute(CommandContext commandContext) {
-    ensureNotNull("messageName", messageName);
+    ensureAtLeastOneNotNull("At least one of the following correlation criteria has to be present: "
+        + "messageName, businessKey, correlationKeys, processInstanceId", messageName, businessKey, correlationKeys, processInstanceId);
 
     CorrelationHandler correlationHandler = Context.getProcessEngineConfiguration().getCorrelationHandler();
 
@@ -61,7 +63,6 @@ public class CorrelateMessageCmd extends AbstractCorrelateMessageCmd {
 
     } else {
       instantiateProcess(commandContext, correlationResult);
-
     }
 
     return null;

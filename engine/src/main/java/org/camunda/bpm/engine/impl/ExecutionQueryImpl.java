@@ -38,6 +38,7 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
   protected String executionId;
   protected String processInstanceId;
   protected List<EventSubscriptionQueryValue> eventSubscriptions;
+  protected boolean hasMessageEventSubscriptions;
   protected SuspensionState suspensionState;
   protected String incidentType;
   protected String incidentId;
@@ -112,6 +113,10 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
     return eventSubscription("message", messageName);
   }
 
+  public ExecutionQuery messageEventSubscription() {
+    return eventSubscription("message");
+  }
+
   public ExecutionQuery eventSubscription(String eventType, String eventName) {
     ensureNotNull("event type", eventType);
     ensureNotNull("event name", eventName);
@@ -119,6 +124,15 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
       eventSubscriptions = new ArrayList<EventSubscriptionQueryValue>();
     }
     eventSubscriptions.add(new EventSubscriptionQueryValue(eventName, eventType));
+    return this;
+  }
+
+  public ExecutionQuery eventSubscription(String eventType) {
+    ensureNotNull("event type", eventType);
+    if(eventSubscriptions == null) {
+      eventSubscriptions = new ArrayList<EventSubscriptionQueryValue>();
+    }
+    eventSubscriptions.add(new EventSubscriptionQueryValue(null, eventType));
     return this;
   }
 

@@ -39,6 +39,7 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.repository.ProcessDefinitionQuery;
+import org.camunda.bpm.engine.runtime.EventSubscription;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ExecutionQuery;
 import org.camunda.bpm.engine.runtime.Incident;
@@ -1303,6 +1304,110 @@ public void testBooleanVariable() throws Exception {
     assertEquals(1, executionList.size());
     // execution id of subprocess != process instance id
     assertNotSame(processInstance.getId(), executionList.get(0).getId());
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml",
+      "org/camunda/bpm/engine/test/api/runtime/oneMessageCatchProcess.bpmn20.xml"})
+  public void testQueryForExecutionsWithMessageEventSubscriptions() {
+    runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    ProcessInstance instance1 = runtimeService.startProcessInstanceByKey("oneMessageCatchProcess");
+    ProcessInstance instance2 = runtimeService.startProcessInstanceByKey("oneMessageCatchProcess");
+
+    List<Execution> executions = runtimeService.createExecutionQuery()
+        .messageEventSubscription().orderByProcessInstanceId().asc().list();
+
+    assertEquals(2, executions.size());
+    if (instance1.getId().compareTo(instance2.getId()) < 0) {
+      assertEquals(instance1.getId(), executions.get(0).getProcessInstanceId());
+      assertEquals(instance2.getId(), executions.get(1).getProcessInstanceId());
+    } else {
+      assertEquals(instance2.getId(), executions.get(0).getProcessInstanceId());
+      assertEquals(instance1.getId(), executions.get(1).getProcessInstanceId());
+    }
+
+  }
+
+  @Deployment(resources="org/camunda/bpm/engine/test/api/runtime/oneMessageCatchProcess.bpmn20.xml")
+  public void testQueryForExecutionsWithMessageEventSubscriptionsOverlappingFilters() {
+
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("oneMessageCatchProcess");
+
+    Execution execution = runtimeService
+      .createExecutionQuery()
+      .messageEventSubscriptionName("newInvoiceMessage")
+      .messageEventSubscription()
+      .singleResult();
+
+    assertNotNull(execution);
+    assertEquals(instance.getId(), execution.getProcessInstanceId());
+
+    runtimeService
+      .createExecutionQuery()
+      .messageEventSubscription()
+      .messageEventSubscriptionName("newInvoiceMessage")
+      .list();
+
+    assertNotNull(execution);
+    assertEquals(instance.getId(), execution.getProcessInstanceId());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/twoBoundaryEventSubscriptions.bpmn20.xml")
+  public void testQueryForExecutionsWithMultipleSubscriptions() {
+    // given two message event subscriptions
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("process");
+
+    List<EventSubscription> subscriptions =
+        runtimeService.createEventSubscriptionQuery().processInstanceId(instance.getId()).list();
+    assertEquals(2, subscriptions.size());
+    assertEquals(subscriptions.get(0).getExecutionId(), subscriptions.get(1).getExecutionId());
+
+    // should return the execution once (not twice)
+    Execution execution = runtimeService
+      .createExecutionQuery()
+      .messageEventSubscription()
+      .singleResult();
+
+    assertNotNull(execution);
+    assertEquals(instance.getId(), execution.getProcessInstanceId());
+
+    // should return the execution once
+    execution = runtimeService
+      .createExecutionQuery()
+      .messageEventSubscriptionName("messageName_1")
+      .singleResult();
+
+    assertNotNull(execution);
+    assertEquals(instance.getId(), execution.getProcessInstanceId());
+
+    // should return the execution once
+    execution = runtimeService
+      .createExecutionQuery()
+      .messageEventSubscriptionName("messageName_2")
+      .singleResult();
+
+    assertNotNull(execution);
+    assertEquals(instance.getId(), execution.getProcessInstanceId());
+
+    // should return the execution once
+    execution = runtimeService
+      .createExecutionQuery()
+      .messageEventSubscriptionName("messageName_1")
+      .messageEventSubscriptionName("messageName_2")
+      .singleResult();
+
+    assertNotNull(execution);
+    assertEquals(instance.getId(), execution.getProcessInstanceId());
+
+    // should not return the execution
+    execution = runtimeService
+      .createExecutionQuery()
+      .messageEventSubscriptionName("messageName_1")
+      .messageEventSubscriptionName("messageName_2")
+      .messageEventSubscriptionName("another")
+      .singleResult();
+
+    assertNull(execution);
   }
 
 }

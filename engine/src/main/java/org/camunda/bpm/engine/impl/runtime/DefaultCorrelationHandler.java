@@ -93,7 +93,12 @@ public class DefaultCorrelationHandler implements CorrelationHandler {
       query.processInstanceId(processInstanceId);
     }
 
-    query.messageEventSubscriptionName(messageName);
+    if (messageName != null) {
+      query.messageEventSubscriptionName(messageName);
+    } else {
+      query.messageEventSubscription();
+    }
+
     List<Execution> matchingExecutions = query.evaluateExpressionsAndExecuteList(commandContext, null);
 
     List<MessageCorrelationResult> result = new ArrayList<MessageCorrelationResult>(matchingExecutions.size());
@@ -106,6 +111,9 @@ public class DefaultCorrelationHandler implements CorrelationHandler {
   }
 
   protected MessageCorrelationResult tryCorrelateMessageToProcessDefinition(CommandContext commandContext, String messageName, CorrelationSet correlationSet) {
+    if (messageName == null) {
+      return null;
+    }
 
     MessageEventSubscriptionEntity messageEventSubscription = commandContext.getEventSubscriptionManager()
       .findMessageStartEventSubscriptionByName(messageName);

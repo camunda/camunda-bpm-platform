@@ -155,6 +155,13 @@ public interface ExecutionQuery extends Query<ExecutionQuery, Execution>{
   ExecutionQuery messageEventSubscriptionName(String messageName);
 
   /**
+   * Only select executions that have a message event subscription.
+   * Use {@link #messageEventSubscriptionName(String)} to filter for executions
+   * with message event subscriptions with a certain name.
+   */
+  ExecutionQuery messageEventSubscription();
+
+  /**
    * Only selects executions which are suspended, because their process instance is suspended.
    */
   ExecutionQuery suspended();

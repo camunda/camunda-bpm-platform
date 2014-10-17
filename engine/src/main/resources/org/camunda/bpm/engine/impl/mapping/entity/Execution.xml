@@ -175,11 +175,6 @@
         </otherwise>
       </choose> 
     </foreach>
-    <if test="eventSubscriptions != null">
-    	 <foreach collection="eventSubscriptions" index="index" item="eventSubscriptionValue">
-    	 	inner join ${prefix}ACT_RU_EVENT_SUBSCR EVT${index} on RES.ID_ = EVT${index}.EXECUTION_ID_
-	    </foreach>
-    </if>
     <if test="businessKey != null">
         inner join ${prefix}ACT_RU_EXECUTION INST on RES.PROC_INST_ID_ = INST.ID_
     </if>
@@ -287,9 +282,15 @@
       </foreach>
       <!-- event subscriptions -->
       <if test="eventSubscriptions != null">
-    	 <foreach collection="eventSubscriptions" index="index" item="eventSubscriptionValue">
-    	    and (EVT${index}.EVENT_TYPE_ = #{eventSubscriptionValue.eventType} and EVT${index}.EVENT_NAME_ = #{eventSubscriptionValue.eventName}) 
-	    </foreach>
+        <foreach collection="eventSubscriptions" index="index" item="eventSubscriptionValue">
+          and exists (select ID_ from ${prefix}ACT_RU_EVENT_SUBSCR EVT where
+          EVT.EXECUTION_ID_ = RES.ID_ and
+          EVT.EVENT_TYPE_ = #{eventSubscriptionValue.eventType} 
+          <if test = "eventSubscriptionValue.eventName != null">
+            and EVT.EVENT_NAME_ = #{eventSubscriptionValue.eventName}
+          </if>
+          )
+        </foreach>
       </if>
       <if test="incidentType != null">
         and INC.INCIDENT_TYPE_ = #{incidentType}
