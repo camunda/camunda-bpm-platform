@@ -64,24 +64,6 @@
   <delete id="deleteHistoricDetailVariableInstanceUpdate">
     delete from ${prefix}ACT_HI_DETAIL where ID_ = #{id}
   </delete>
-  
-  <delete id="deleteHistoricDetailsByProcessInstanceId_byteArray" >
-    delete from ${prefix}ACT_GE_BYTEARRAY where ID_ in
-        (select BYTEARRAY_ID_ from ${prefix}ACT_HI_DETAIL where PROC_INST_ID_ = #{id})
-  </delete>
-  
-  <delete id="deleteHistoricDetailsByProcessInstanceId">
-    delete from ${prefix}ACT_HI_DETAIL where PROC_INST_ID_ = #{id}
-  </delete>
-  
-  <delete id="deleteHistoricDetailsByTaskId">
-    delete from ${prefix}ACT_HI_DETAIL where TASK_ID_ = #{id}
-  </delete>
-  
-  <delete id="deleteHistoricDetailsByTaskId_byteArray" >
-    delete from ${prefix}ACT_GE_BYTEARRAY where ID_ in
-        (select BYTEARRAY_ID_ from ${prefix}ACT_HI_DETAIL where TASK_ID_ = #{id})
-  </delete>
     
   <delete id="deleteHistoricFormProperty">
     delete from ${prefix}ACT_HI_DETAIL where ID_ = #{id}
@@ -147,6 +129,16 @@
   </resultMap>
 
   <!-- HISTORIC VARIABLE UPDATE SELECT -->
+  
+  <select id="selectHistoricDetailsByProcessInstanceId" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="historicDetailResultMap">
+    select * from ${prefix}ACT_HI_DETAIL 
+    where PROC_INST_ID_ = #{parameter, jdbcType=VARCHAR}
+  </select>
+  
+  <select id="selectHistoricDetailsByTaskId" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="historicDetailResultMap">
+    select * from ${prefix}ACT_HI_DETAIL 
+    where TASK_ID_ = #{parameter, jdbcType=VARCHAR}
+  </select>
 
   <select id="selectHistoricDetailsByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.HistoricDetailQueryImpl" resultMap="historicDetailResultMap">
   	${limitBefore}
