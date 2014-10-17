@@ -72,7 +72,11 @@ define([
 
     var commentData = $scope.tasklistData.newChild($scope);
 
-    function open(task) {
+    commentData.observe('task', function(task) {
+      $scope.task = task;
+    });
+
+    $scope.createComment = function() {
       $modal.open({
         // creates a child scope of a provided scope
         scope: $scope,
@@ -82,17 +86,12 @@ define([
         template: template,
         controller: commentCreateModalCtrl,
         resolve: {
-          task: function() { return task; }
+          task: function() { return $scope.task; }
         }
       }).result.then(function() {
-
         commentData.changed('task');
-
       });
-    }
 
-    $scope.createComment = function(task) {
-      open(task);
     };
   }];
 });
