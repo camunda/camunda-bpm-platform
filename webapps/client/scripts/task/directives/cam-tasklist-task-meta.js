@@ -51,7 +51,7 @@ define([
       function(
         $scope
       ){
-        
+
         var taskMetaData = $scope.taskData.newChild($scope);
 
         /**
@@ -96,7 +96,7 @@ define([
         function resetProperty(propName) {
           return function() {
             $scope.task[propName] = null;
-            updateTask();            
+            updateTask();
           };
         }
 
@@ -136,7 +136,7 @@ define([
         $scope.resetFollowUpDate = resetProperty('followUp');
         $scope.startEditingFollowUpDate = notifyOnStartEditing('followUp');
         $scope.cancelEditingFollowUpDate = notifyOnCancelEditing('followUp');
-        
+
         $scope.saveDueDate = saveDate('due');
         $scope.resetDueDate = resetProperty('due');
         $scope.startEditingDueDate = notifyOnStartEditing('due');
@@ -159,8 +159,8 @@ define([
           },
 
           assigneeReseted: {
-            success: 'ASSIGNEE_RESETED_OK',
-            error: 'ASSIGNEE_RESETED_ERROR'
+            success: 'ASSIGNEE_RESET_OK',
+            error: 'ASSIGNEE_RESET_ERROR'
           },
 
           claimed: {

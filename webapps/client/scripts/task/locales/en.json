@@ -55,9 +55,9 @@
         "Assigned to you",
   "OWNER_IS_YOU":
         "You are owner",
-  "ASSIGNEE_RESETED_OK":
-        "The assignee has been reseted.",
-  "ASSIGNEE_RESETED_ERROR":
+  "ASSIGNEE_RESET_OK":
+        "The assignee has been reset.",
+  "ASSIGNEE_RESET_ERROR":
         "Could not reset the assignee.",
 
   "TASK_NO_PROCESS_DEFINITION":
