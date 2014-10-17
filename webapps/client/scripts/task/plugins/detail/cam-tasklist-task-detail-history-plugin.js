@@ -140,7 +140,7 @@ define([
       return days;
     }]);
 
-    historyData.observe('orderedHistoryAndCommentsByDay', function(days) {
+    $scope.state = historyData.observe('orderedHistoryAndCommentsByDay', function(days) {
       $scope.days = days;
     });
 

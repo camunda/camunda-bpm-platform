@@ -21,6 +21,8 @@
         "",
   "HISTORY":
         "History",
+  "NO_HISTORY":
+        "There is no history for the task.",
   "COMMENT":
         "Comment",
   "COMMENT_CREATE":
