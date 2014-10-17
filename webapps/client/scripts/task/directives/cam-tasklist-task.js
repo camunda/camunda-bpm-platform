@@ -18,11 +18,13 @@ define([
         '$q',
         'camAPI',
         'Views',
+        'search',
       function(
         $scope,
         $q,
         camAPI,
-        Views
+        Views,
+        search
       ) {
 
         var History = camAPI.resource('history');
@@ -67,7 +69,39 @@ define([
 
         $scope.selectTaskDetailTab = function(tab) {
           $scope.selectedTaskDetailTab = tab;
+
+          search.updateSilently({
+            detailsTab: tab.id
+          });
         };
+
+        function setDefaultTaskDetailTab(tabs) {
+          var selectedTabId = search().detailsTab;
+
+          if (!tabs || !tabs.length) {
+            return;
+          }
+
+          if (selectedTabId) {
+            var provider = Views.getProvider({ component: 'tasklist.task.detail', id: selectedTabId });
+            if (provider && tabs.indexOf(provider) != -1) {
+              $scope.selectedTaskDetailTab = provider;
+              return;
+            }
+          }
+
+          search.updateSilently({
+            detailsTab: null
+          });
+
+          $scope.selectedTaskDetailTab = tabs[0];
+        }
+
+        setDefaultTaskDetailTab($scope.taskDetailTabs);
+
+        $scope.$on('$routeChanged', function() {
+          setDefaultTaskDetailTab($scope.taskDetailTabs);
+        });
 
       }]
     };

@@ -104,6 +104,16 @@ define([
           tasksData.set('taskListQuery', query);
         };
 
+        $scope.getHrefUrl = function (task) {
+          var href = '#/?task=' + task.id;
+          var detailsTab = $location.search().detailsTab;
+          if (detailsTab) {
+            href = href + '&detailsTab=' + detailsTab;
+          }
+
+          return href;
+        };
+
       }]
     };
   }];

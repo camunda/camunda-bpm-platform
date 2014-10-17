@@ -3,10 +3,6 @@ define([
 ) {
   'use strict';
 
-  function getTaskIdFromLocation($location) {
-    return $location.search().task;
-  }
-
   return [
     '$scope',
     '$q',
@@ -21,8 +17,14 @@ define([
     camAPI
   ) {
 
+    function getPropertyFromLocation(property) {
+      var search = $location.search() || {};
+      return search[property];
+    }
+
     // get current task id from location
-    var taskId = getTaskIdFromLocation($location);
+    var taskId = getPropertyFromLocation('task');
+    var detailsTab = getPropertyFromLocation('detailsTab');
 
     // init data depend for task list data
     var tasklistData = $scope.tasklistData = dataDepend.create($scope);
@@ -140,9 +142,17 @@ define([
     /**
      * Update task if location changes
      */
-    $scope.$on('$locationChangeSuccess', function(prev, current) {
-      taskId = getTaskIdFromLocation($location);
-      tasklistData.set('taskId', { 'taskId' : taskId });
+    $scope.$on('$routeChanged', function(prev, current) {
+      var oldTaskId = taskId;
+      var oldDetailsTab = detailsTab;
+
+      taskId = getPropertyFromLocation('task');
+      detailsTab = getPropertyFromLocation('detailsTab');
+
+      if (oldTaskId !== taskId || oldDetailsTab === detailsTab) {
+        tasklistData.set('taskId', { 'taskId' : taskId });
+      }
+
     });
 
   }];

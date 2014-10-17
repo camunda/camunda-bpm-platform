@@ -1,26 +1,3 @@
-<!--
-<div class="input-group has-feedback"
-     ng-if="!!totalItems">
-  <input type="text"
-         ng-model="searchTask"
-         placeholder="{{ 'TASK_NAME' | translate }}"
-         tooltip="{{ 'SEARCH_TASK_BY_NAME' | translate }}"
-         tooltip-placement="top"
-         typeahead="filteredTask.name for filteredTask in lookupTask($viewValue)"
-         typeahead-loading="loadingTasks"
-         typeahead-wait-ms="100"
-         typeahead-on-select="selectedTask($item, $model, $label)"
-         class="form-control">
-  <span class="input-group-addon">
-    <i ng-show="loadingTasks"
-       class="glyphicon glyphicon-refresh"></i>
-
-    <i ng-show="!loadingTasks"
-       class="glyphicon glyphicon-search"></i>
-  </span>
-</div>
--->
-
 <div ng-show="!state.$loaded"
      class="loader">
   <i class="animate-spin glyphicon glyphicon-refresh"></i>
@@ -43,7 +20,7 @@
         <div class="names"
              ng-click="focus(task)">
           <h4 class="task">
-            <a ng-href="#/?task={{ task.id }}"
+            <a ng-href="{{ getHrefUrl(task) }}"
                tabindex="{{ (delta + 1) }}">{{ task.name || task.taskDefinitionKey || task.id }}</a>
           </h4>
           <h6 class="process-definition"
@@ -52,18 +29,7 @@
           </h6>
         </div>
 
-
-
-
         <ul class="dates list-inline">
-          <!--
-          <li>
-            <input type="checkbox"
-                   name="batch"
-                   ng-model="batch"
-                   ng-change="batchOperationSelect()" />
-          </li>
-           -->
 
           <li class="followup-date"
               ng-if="!!task.followUp"
@@ -88,8 +54,6 @@
           </li>
         </ul>
 
-
-
         <div cam-tasklist-variables
              ng-if="task._embedded.variable.length"
              filter-properties="filterProperties"
@@ -99,8 +63,6 @@
     </ol>
   </div>
 </div>
-
-
 
 <pagination ng-show="state.$loaded && totalItems > pageSize"
             total-items="totalItems"
