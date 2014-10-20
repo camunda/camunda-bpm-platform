@@ -2,14 +2,14 @@
 
 var DashboardPage = require('./dashboard-view');
 var StartProcessPage = require('./start-process');
-var TaskListPage = require('./task-list');
-var CurrentTaskPage = require('./current-task');
-var TaskFiltersPage = require('./task-filters');
-var CreateFilterPage = require('./create-filter');
-var EditFilterPage = require('./edit-filter');
-var DeleteFilterPage = require('./delete-filter');
-var InvoiceStartFormPage = require('./invoice-start-form');
-var GenericStartFormPage = require('./generic-start-form');
+var TaskListPage = require('./tasklist/task-list');
+var CurrentTaskPage = require('./taskview/current-task');
+var TaskFiltersPage = require('./filter/task-filters');
+var CreateFilterPage = require('./filter/create-filter');
+var EditFilterPage = require('./filter/edit-filter');
+var DeleteFilterPage = require('./filter/delete-filter');
+var InvoiceStartFormPage = require('./forms/invoice-start-form');
+var GenericStartFormPage = require('./forms/generic-start-form');
 var AuthenticationPage = require('../../../commons/pages/authentication');
 
 module.exports = new DashboardPage();

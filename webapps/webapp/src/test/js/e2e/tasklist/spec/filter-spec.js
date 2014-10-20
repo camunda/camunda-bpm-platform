@@ -186,13 +186,13 @@ describe('tasklist filter -', function() {
 
       // when
       dashboardPage.taskFilters.selectFilter(0);
-      var taskName = dashboardPage.taskList.taskTitle(0);
+      var taskName = dashboardPage.taskList.taskName(0);
 
       dashboardPage.navigateLogout();
       dashboardPage.authentication.userLogin('jonny1', 'jonny1');
 
       // then
-      expect(dashboardPage.taskList.taskTitle(0)).toBe(taskName);
+      expect(dashboardPage.taskList.taskName(0)).toBe(taskName);
     });
 
   });

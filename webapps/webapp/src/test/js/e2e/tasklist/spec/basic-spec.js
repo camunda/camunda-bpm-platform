@@ -22,7 +22,7 @@ describe('tasklist dashboard - ', function() {
   });
 
 
-  describe("claim and unclaim", function () {
+  xdescribe("claim and unclaim", function () {
 
     it("should claim a task", function () {
 
@@ -30,14 +30,14 @@ describe('tasklist dashboard - ', function() {
       dashboardPage.taskFilters.selectFilter(1);
 
       // when
-      var taskName = dashboardPage.taskList.taskTitle(0);
+      var taskName = dashboardPage.taskList.taskName(0);
       dashboardPage.taskList.selectTask(0);
       dashboardPage.currentTask.claim();
       dashboardPage.taskFilters.selectFilter(0);
 
       // then
       expect(dashboardPage.taskList.taskList().count()).toBe(2);
-      expect(dashboardPage.taskList.taskTitle(0)).toEqual(taskName);
+      expect(dashboardPage.taskList.taskName(0)).toEqual(taskName);
     });
 
 
@@ -143,7 +143,7 @@ describe('tasklist dashboard - ', function() {
 
       // then
       expect(dashboardPage.taskList.taskList().count()).toBe(1);
-      expect(dashboardPage.taskList.taskTitle(0)).not.toBe('Approve Invoice');
+      expect(dashboardPage.taskList.taskName(0)).not.toBe('Approve Invoice');
     });
 
   });

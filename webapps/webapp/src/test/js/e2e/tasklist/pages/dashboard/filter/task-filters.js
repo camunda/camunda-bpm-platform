@@ -1,6 +1,6 @@
 'use strict';
 
-var Page = require('./dashboard-view');
+var Page = require('./../dashboard-view');
 
 module.exports = Page.extend({
 
@@ -67,7 +67,7 @@ module.exports = Page.extend({
   },
 
   createFilterButton: function() {
-    return element(by.css('[ng-click="createFilter()"]'));
+    return element(by.css('[ng-click="openDialog(\'CREATE_NEW_FILTER\')"]'));
   },
 
   editFilter: function(item) {
@@ -78,7 +78,7 @@ module.exports = Page.extend({
 
     browser.sleep(1000);
 
-    var editFilterElement = this.filterList().get(item).element(by.css('[ng-click="edit(filter)"]'));
+    var editFilterElement = this.filterList().get(item).element(by.css('[ng-click="openDialog(\'EDIT_FILTER\')"]'));
     editFilterElement.click();
     return editFilterElement;
   },
@@ -91,7 +91,7 @@ module.exports = Page.extend({
 
     browser.sleep(1000);
 
-    var deleteFilterElement = this.filterList().get(item).element(by.css('[ng-click="delete(filter)"]'));
+    var deleteFilterElement = this.filterList().get(item).element(by.css('[ng-click="openDialog(\'DELETE_FILTER\')"]'));
     deleteFilterElement.click();
     return deleteFilterElement;
   }
