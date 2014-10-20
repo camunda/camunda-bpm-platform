@@ -1,5 +1,6 @@
 package org.camunda.bpm.pa;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -11,12 +12,15 @@ import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
+import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
+import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.rest.dto.identity.UserCredentialsDto;
 import org.camunda.bpm.engine.rest.dto.identity.UserDto;
 import org.camunda.bpm.engine.rest.dto.identity.UserProfileDto;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.pa.demo.InvoiceDemoDataGenerator;
+import org.joda.time.DateTime;
 
 /**
  *
@@ -46,50 +50,79 @@ public class DevProcessApplication extends ServletProcessApplication {
     runtimeService.startProcessInstanceByKey("multipleFailingServiceTasks", "aBusinessKey");
 
     runtimeService.startProcessInstanceByKey("TwoParallelCallActivitiesCallingDifferentProcess");
+    ClockUtil.setCurrentTime(createArtificalDate(2));
     runtimeService.startProcessInstanceByKey("TwoParallelCallActivitiesCallingDifferentProcess");
+    ClockUtil.setCurrentTime(createArtificalDate(4));
     runtimeService.startProcessInstanceByKey("TwoParallelCallActivitiesCallingDifferentProcess");
 
     runtimeService.startProcessInstanceByKey("TwoParallelCallActivitiesCallingSameProcess");
+    ClockUtil.setCurrentTime(createArtificalDate(2));
     runtimeService.startProcessInstanceByKey("TwoParallelCallActivitiesCallingSameProcess");
+    ClockUtil.setCurrentTime(createArtificalDate(4));
     runtimeService.startProcessInstanceByKey("TwoParallelCallActivitiesCallingSameProcess");
+    ClockUtil.setCurrentTime(createArtificalDate(6));
     runtimeService.startProcessInstanceByKey("TwoParallelCallActivitiesCallingSameProcess");
 
     runtimeService.startProcessInstanceByKey("CallingCallActivity");
+    ClockUtil.setCurrentTime(createArtificalDate(2));
     runtimeService.startProcessInstanceByKey("CallingCallActivity");
+    ClockUtil.setCurrentTime(createArtificalDate(4));
     runtimeService.startProcessInstanceByKey("CallingCallActivity");
+    ClockUtil.setCurrentTime(createArtificalDate(6));
     runtimeService.startProcessInstanceByKey("CallingCallActivity");
+    ClockUtil.setCurrentTime(createArtificalDate(8));
     runtimeService.startProcessInstanceByKey("CallingCallActivity");
+    ClockUtil.setCurrentTime(createArtificalDate(10));
     runtimeService.startProcessInstanceByKey("CallingCallActivity");
+    ClockUtil.setCurrentTime(createArtificalDate(12));
     runtimeService.startProcessInstanceByKey("CallingCallActivity");
 
     runtimeService.startProcessInstanceByKey("OrderProcess");
     runtimeService.startProcessInstanceByKey("FailingProcess");
+    ClockUtil.setCurrentTime(createArtificalDate(2));
     runtimeService.startProcessInstanceByKey("FailingProcess");
     runtimeService.startProcessInstanceByKey("CallActivity");
 
     runtimeService.startProcessInstanceByKey("OrderProcess");
+    ClockUtil.setCurrentTime(createArtificalDate(2));
     runtimeService.startProcessInstanceByKey("OrderProcess");
+    ClockUtil.setCurrentTime(createArtificalDate(4));
     runtimeService.startProcessInstanceByKey("OrderProcess");
+    ClockUtil.setCurrentTime(createArtificalDate(6));
     runtimeService.startProcessInstanceByKey("OrderProcess");
 
     runtimeService.startProcessInstanceByKey("FailingProcess");
+    ClockUtil.setCurrentTime(createArtificalDate(2));
     runtimeService.startProcessInstanceByKey("FailingProcess");
+    ClockUtil.setCurrentTime(createArtificalDate(4));
     runtimeService.startProcessInstanceByKey("FailingProcess");
+    ClockUtil.setCurrentTime(createArtificalDate(6));
     runtimeService.startProcessInstanceByKey("FailingProcess");
+    ClockUtil.setCurrentTime(createArtificalDate(8));
     runtimeService.startProcessInstanceByKey("FailingProcess");
+    ClockUtil.setCurrentTime(createArtificalDate(10));
     runtimeService.startProcessInstanceByKey("FailingProcess");
 
     runtimeService.startProcessInstanceByKey("AnotherFailingProcess");
+    ClockUtil.setCurrentTime(createArtificalDate(2));
     runtimeService.startProcessInstanceByKey("AnotherFailingProcess");
+    ClockUtil.setCurrentTime(createArtificalDate(4));
     runtimeService.startProcessInstanceByKey("AnotherFailingProcess");
+    ClockUtil.setCurrentTime(createArtificalDate(6));
     runtimeService.startProcessInstanceByKey("AnotherFailingProcess");
+    ClockUtil.setCurrentTime(createArtificalDate(8));
     runtimeService.startProcessInstanceByKey("AnotherFailingProcess");
+    ClockUtil.setCurrentTime(createArtificalDate(10));
     runtimeService.startProcessInstanceByKey("AnotherFailingProcess");
 
     runtimeService.startProcessInstanceByKey("CallActivity");
+    ClockUtil.setCurrentTime(createArtificalDate(2));
     runtimeService.startProcessInstanceByKey("CallActivity");
+    ClockUtil.setCurrentTime(createArtificalDate(4));
     runtimeService.startProcessInstanceByKey("CallActivity");
+    ClockUtil.setCurrentTime(createArtificalDate(6));
     runtimeService.startProcessInstanceByKey("CallActivity");
+    ClockUtil.setCurrentTime(createArtificalDate(8));
     runtimeService.startProcessInstanceByKey("CallActivity");
 
     runtimeService.startProcessInstanceByKey("invoice");
@@ -100,28 +133,43 @@ public class DevProcessApplication extends ServletProcessApplication {
     params.put("value3", "c");
 
     runtimeService.startProcessInstanceByKey("cornercasesProcess", params);
+    ClockUtil.setCurrentTime(createArtificalDate(2));
     runtimeService.startProcessInstanceByKey("cornercasesProcess", params);
+    ClockUtil.setCurrentTime(createArtificalDate(4));
     runtimeService.startProcessInstanceByKey("cornercasesProcess", params);
+    ClockUtil.setCurrentTime(createArtificalDate(6));
     runtimeService.startProcessInstanceByKey("cornercasesProcess", params);
 
     runtimeService.startProcessInstanceByKey("processWithSubProcess");
+    ClockUtil.setCurrentTime(createArtificalDate(2));
     runtimeService.startProcessInstanceByKey("processWithSubProcess");
+    ClockUtil.setCurrentTime(createArtificalDate(4));
     runtimeService.startProcessInstanceByKey("processWithSubProcess");
+    ClockUtil.setCurrentTime(createArtificalDate(6));
     runtimeService.startProcessInstanceByKey("processWithSubProcess");
+    ClockUtil.setCurrentTime(createArtificalDate(8));
     runtimeService.startProcessInstanceByKey("processWithSubProcess");
+    ClockUtil.setCurrentTime(createArtificalDate(10));
     runtimeService.startProcessInstanceByKey("processWithSubProcess");
 
     runtimeService.startProcessInstanceByKey("executionProcess");
+    ClockUtil.setCurrentTime(createArtificalDate(2));
     runtimeService.startProcessInstanceByKey("executionProcess");
+    ClockUtil.setCurrentTime(createArtificalDate(4));
     runtimeService.startProcessInstanceByKey("executionProcess");
+    ClockUtil.setCurrentTime(createArtificalDate(6));
     runtimeService.startProcessInstanceByKey("executionProcess");
+    ClockUtil.setCurrentTime(createArtificalDate(8));
     runtimeService.startProcessInstanceByKey("executionProcess");
+    ClockUtil.setCurrentTime(createArtificalDate(10));
     runtimeService.startProcessInstanceByKey("executionProcess");
 
     runtimeService.startProcessInstanceByKey("changeVariablesProcess");
     runtimeService.startProcessInstanceByKey("changeVariablesProcess");
     runtimeService.startProcessInstanceByKey("changeVariablesProcess");
     runtimeService.startProcessInstanceByKey("changeVariablesProcess");
+
+    ClockUtil.reset();
 
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("changeVariablesProcess");
     TaskService taskService = engine.getTaskService();
@@ -154,5 +202,14 @@ public class DevProcessApplication extends ServletProcessApplication {
 
     // create invoice demo data
     new InvoiceDemoDataGenerator().createDemoData(engine);
+  }
+
+  private Date createArtificalDate(int offset) {
+    DateTime dt = new DateTime();
+    dt = dt.minusDays(offset);
+    dt = dt.minusHours(offset);
+    dt = dt.minusMinutes(offset);
+    dt = dt.minusSeconds(offset);
+    return dt.toDate();
   }
 }
