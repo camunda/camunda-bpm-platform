@@ -274,6 +274,7 @@
       </properties>
     </profile>
     <profile>
+      <id>os</id>
       <activation>
         <os>
           <family>Windows</family>
