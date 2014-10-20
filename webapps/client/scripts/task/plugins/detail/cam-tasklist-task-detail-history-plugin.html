@@ -21,9 +21,11 @@
 
       <div class="col-xs-2">
         <div class="date-badge">
-          <span class="day">{{ day.date | camDate:'day' }}</span>
-          <span class="month">{{ day.date | camDate:'monthName' }}</span>
-          <span class="year">{{ day.date | date:'yyyy' }}</span>
+          <div>
+            <span class="day">{{ day.date | camDate:'day' }}</span>
+            <span class="month">{{ day.date | camDate:'monthName' }}</span>
+            <span class="year">{{ day.date | date:'yyyy' }}</span>
+          </div>
         </div>
 
       </div>
