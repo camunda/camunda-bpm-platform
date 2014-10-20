@@ -9,10 +9,18 @@
         "Due date",
   "ASSIGNEE":
         "Assignee",
+  "ACTION":
+        "Action",
   "GROUPS":
         "Groups",
   "GROUPS_EDIT":
         "Edit Groups",
+  "CURRENT_GROUPS":
+        "Current group(s)",
+  "GROUP_ID":
+        "Group ID",
+  "GROUP_ADD":
+        "Add a group",
   "GROUP_ADD_ERROR":
         "Group could not be added",
   "GROUP_ADD_SUCCESS":

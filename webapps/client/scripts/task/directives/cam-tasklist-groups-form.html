@@ -12,12 +12,12 @@
   <div class="modal-body">
   <form name="editForm" ng-submit="addFormItem()">
     <fieldset ng-show="groups.length" class="">
-      <legend>Current group(s)</legend>
+      <legend>{{ 'CURRENT_GROUPS' | translate }}</legend>
       <table class="table table-striped table-bordered table-condensed">
          <thead>
           <tr>
-            <th>Group ID</th>
-            <th>Action</th>
+            <th>{{ 'GROUP_ID' | translate }}</th>
+            <th>{{ 'ACTION' | translate }}</th>
           </tr>
         </thead>
         <tbody>
@@ -34,7 +34,7 @@
     </fieldset>
 
     <fieldset>
-      <legend>Add a group</legend>
+      <legend>{{ 'GROUP_ADD' | translate }}</legend>
       <div class="input-append">
         <input type="text" ng-model="newGroup.name" name="newGroup" required>
         <a href

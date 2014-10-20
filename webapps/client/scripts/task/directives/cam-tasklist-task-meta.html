@@ -75,9 +75,9 @@
   <li class="groups" ng-click="editGroups()">
     <span tooltip-placement="top"
           tooltip="{{ 'GROUPS' | translate }}"
-          class="glyphicon glyphicon-globe"></span>
+          class="glyphicon glyphicon-th"></span>
     <span ng-if="groups.length > 0">
-      {{ groups | groupsList }}
+      {{ groups | groupsList:2 }}
     </span>
     <span ng-if="groups.length === 0">
       <a href>{{ 'ADD_GROUPS' | translate }}</a>
