@@ -13,8 +13,8 @@
 package org.camunda.spin.impl.util;
 
 import org.camunda.commons.utils.IoUtil;
-import org.camunda.spin.logging.SpinCoreLogger;
-import org.camunda.spin.logging.SpinLogger;
+import org.camunda.spin.impl.logging.SpinCoreLogger;
+import org.camunda.spin.impl.logging.SpinLogger;
 
 import java.io.*;
 import java.nio.charset.Charset;

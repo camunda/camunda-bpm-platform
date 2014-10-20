@@ -13,8 +13,8 @@
 package org.camunda.spin.json.tree;
 
 import org.camunda.spin.json.SpinJsonNode;
-import org.camunda.spin.json.SpinJsonTreeNodeException;
-import org.camunda.spin.json.SpinJsonTreePropertyException;
+import org.camunda.spin.json.SpinJsonException;
+import org.camunda.spin.json.SpinJsonPropertyException;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -59,7 +59,7 @@ public class JsonTreeEditListPropertyTest {
     try {
       jsonNode.indexOf("n");
       fail("Expected: SpinJsonTreeNodeException");
-    } catch(SpinJsonTreeNodeException e) {
+    } catch(SpinJsonException e) {
       // expected
     }
   }
@@ -79,7 +79,7 @@ public class JsonTreeEditListPropertyTest {
     try {
       customers.indexOf("n");
       fail("Expected: SpinJsonTreeNodeException");
-    } catch(SpinJsonTreeNodeException e) {
+    } catch(SpinJsonException e) {
       // expected
     }
   }
@@ -98,7 +98,7 @@ public class JsonTreeEditListPropertyTest {
     try {
       jsonNode.lastIndexOf("n");
       fail("Expected: SpinJsonTreeNodeException");
-    } catch(SpinJsonTreeNodeException e) {
+    } catch(SpinJsonException e) {
       // expected
     }
   }
@@ -118,7 +118,7 @@ public class JsonTreeEditListPropertyTest {
     try {
       customers.lastIndexOf("n");
       fail("Expected: SpinJsonTreeNodeException");
-    } catch(SpinJsonTreeNodeException e) {
+    } catch(SpinJsonException e) {
       // expected
     }
   }
@@ -149,7 +149,7 @@ public class JsonTreeEditListPropertyTest {
     try {
       jsonNode.append("testcustomer");
       fail("Expected: SpinJsonTreeNodeException");
-    } catch(SpinJsonTreeNodeException e) {
+    } catch(SpinJsonException e) {
       //expected
     }
   }
@@ -159,7 +159,7 @@ public class JsonTreeEditListPropertyTest {
     try {
       jsonNode.append(new Date());
       fail("Expected: SpinJsonTreeNodeException");
-    } catch(SpinJsonTreeNodeException e) {
+    } catch(SpinJsonException e) {
       // expected
     }
   }
@@ -199,7 +199,7 @@ public class JsonTreeEditListPropertyTest {
     try {
       jsonNode.insertAt(1, "test");
       fail("Expected: SpinJsonTreeNodeException");
-    } catch(SpinJsonTreeNodeException e) {
+    } catch(SpinJsonException e) {
       // expected
     }
   }
@@ -247,7 +247,7 @@ public class JsonTreeEditListPropertyTest {
     try {
       currencies.insertAt(1, new Date());
       fail("Expected: SpinJsonTreeNodeException");
-    } catch(SpinJsonTreeNodeException e) {
+    } catch(SpinJsonException e) {
       // expected
     }
   }
@@ -269,7 +269,7 @@ public class JsonTreeEditListPropertyTest {
     try {
       currencies.insertBefore(1, "test");
       fail("Expected: SpinJsonTreePropertyException");
-    } catch(SpinJsonTreePropertyException e) {
+    } catch(SpinJsonPropertyException e) {
       // expected
     }
   }
@@ -333,7 +333,7 @@ public class JsonTreeEditListPropertyTest {
     try {
       currencies.insertBefore("euro", new Date());
       fail("Expected: SpinJsonTreePropertyException");
-    } catch(SpinJsonTreePropertyException e) {
+    } catch(SpinJsonPropertyException e) {
       // expected
     }
   }
@@ -343,7 +343,7 @@ public class JsonTreeEditListPropertyTest {
     try {
       currencies.insertBefore(new Date(), "test");
       fail("Expected: SpinJsonTreePropertyException");
-    } catch (SpinJsonTreePropertyException e) {
+    } catch (SpinJsonPropertyException e) {
       // expected
     }
   }
@@ -353,7 +353,7 @@ public class JsonTreeEditListPropertyTest {
     try {
       jsonNode.insertBefore("test", "test");
       fail("Expected: SpinJsonTreeNodeException");
-    } catch (SpinJsonTreeNodeException e) {
+    } catch (SpinJsonException e) {
       // expected
     }
   }
@@ -365,7 +365,7 @@ public class JsonTreeEditListPropertyTest {
     try {
       currencies.insertBefore("test", "test");
       fail("Expected: SpinJsonTreeNodeException");
-    } catch (SpinJsonTreeNodeException e) {
+    } catch (SpinJsonException e) {
       // expected
     }
   }
@@ -417,7 +417,7 @@ public class JsonTreeEditListPropertyTest {
     try {
       currencies.insertBefore("euro", new Date());
       fail("Expected: SpinJsonTreeNodeException");
-    } catch (SpinJsonTreeNodeException e) {
+    } catch (SpinJsonException e) {
       // expected
     }
   }
@@ -427,7 +427,7 @@ public class JsonTreeEditListPropertyTest {
     try {
       jsonNode.insertBefore("euro", "test");
       fail("Expected: SpinJsonTreeNodeException");
-    } catch (SpinJsonTreeNodeException e) {
+    } catch (SpinJsonException e) {
       // expected
     }
   }
@@ -437,7 +437,7 @@ public class JsonTreeEditListPropertyTest {
     try {
       currencies.insertAfter(new Date(), "test");
       fail("Expected: SpinJsonTreePropertyException");
-    } catch (SpinJsonTreePropertyException e) {
+    } catch (SpinJsonPropertyException e) {
       // expected
     }
   }
@@ -463,7 +463,7 @@ public class JsonTreeEditListPropertyTest {
     try {
       currencies.remove("test");
       fail("Expected: SpinJsonTreePropertyException");
-    } catch(SpinJsonTreeNodeException e) {
+    } catch(SpinJsonException e) {
       // expected
     }
   }
@@ -473,7 +473,7 @@ public class JsonTreeEditListPropertyTest {
     try {
       jsonNode.remove("test");
       fail("Expected: SpinJsonTreePropertyException");
-    } catch(SpinJsonTreeNodeException e) {
+    } catch(SpinJsonException e) {
       // expected
     }
   }
@@ -505,7 +505,7 @@ public class JsonTreeEditListPropertyTest {
     try {
       currencies.removeLast(new Date());
       fail("Expected: SpinJsonTreeNodeException");
-    } catch(SpinJsonTreeNodeException e) {
+    } catch(SpinJsonException e) {
       // expected
     }
   }
@@ -531,7 +531,7 @@ public class JsonTreeEditListPropertyTest {
     try {
       jsonNode.removeLast(1);
       fail("Expected: SpinJsonTreeNodeException ");
-    } catch(SpinJsonTreeNodeException  e) {
+    } catch(SpinJsonException  e) {
       // expected
     }
   }
@@ -557,7 +557,7 @@ public class JsonTreeEditListPropertyTest {
     try {
       jsonNode.removeAt(1);
       fail("Expected: SpinJsonTreeNodeException");
-    } catch(SpinJsonTreeNodeException e) {
+    } catch(SpinJsonException e) {
       // expected
     }
   }

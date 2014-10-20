@@ -15,8 +15,9 @@ package org.camunda.spin.impl.util;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PushbackInputStream;
-import org.camunda.spin.logging.SpinCoreLogger;
-import org.camunda.spin.logging.SpinLogger;
+
+import org.camunda.spin.impl.logging.SpinCoreLogger;
+import org.camunda.spin.impl.logging.SpinLogger;
 
 /**
  * Caches the initial bytes that are read from the supplied {@link InputStream} and 

@@ -14,9 +14,9 @@
 package org.camunda.spin.xml.dom;
 
 import org.camunda.spin.SpinList;
-import org.camunda.spin.xml.tree.SpinXmlTreeAttribute;
-import org.camunda.spin.xml.tree.SpinXmlTreeElement;
-import org.camunda.spin.xml.tree.SpinXmlTreeXPathException;
+import org.camunda.spin.xml.SpinXPathException;
+import org.camunda.spin.xml.SpinXmlAttribute;
+import org.camunda.spin.xml.SpinXmlElement;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -28,7 +28,7 @@ import static org.camunda.spin.Spin.S;
  */
 public class XmlDomXPathTest {
 
-  protected SpinXmlTreeElement element;
+  protected SpinXmlElement element;
 
   @Before
   public void parseXml() {
@@ -37,40 +37,40 @@ public class XmlDomXPathTest {
 
   @Test
   public void canQueryElement() {
-    SpinXmlTreeElement child = element.xPath("/root/child").element();
+    SpinXmlElement child = element.xPath("/root/child").element();
     assertThat(child.name()).isEqualTo("child");
     assertThat(child.attr("id").value()).isEqualTo("child");
 
-    SpinXmlTreeElement b = child.xPath("b").element();
+    SpinXmlElement b = child.xPath("b").element();
     assertThat(b.name()).isEqualTo("b");
     assertThat(b.attr("id").value()).isEqualTo("b");
   }
 
-  @Test(expected = SpinXmlTreeXPathException.class)
+  @Test(expected = SpinXPathException.class)
   public void canNotQueryElementAsAttribute() {
     element.xPath("/root/child/").attribute();
   }
 
   @Test
   public void canQueryElementList() {
-    SpinList<SpinXmlTreeElement> childs = element.xPath("/root/child/a").elementList();
+    SpinList<SpinXmlElement> childs = element.xPath("/root/child/a").elementList();
     assertThat(childs).hasSize(2);
   }
 
-  @Test(expected = SpinXmlTreeXPathException.class)
+  @Test(expected = SpinXPathException.class)
   public void canNotQueryAttributeAsElement() {
     element.xPath("/root/child/@id").element();
   }
 
   @Test
   public void canQueryAttribute() {
-    SpinXmlTreeAttribute attribute = element.xPath("/root/child/@id").attribute();
+    SpinXmlAttribute attribute = element.xPath("/root/child/@id").attribute();
     assertThat(attribute.value()).isEqualTo("child");
   }
 
   @Test
   public void canQueryAttributeList() {
-    SpinList<SpinXmlTreeAttribute> attributes = element.xPath("/root/child/a/@id").attributeList();
+    SpinList<SpinXmlAttribute> attributes = element.xPath("/root/child/a/@id").attributeList();
     assertThat(attributes).hasSize(2);
   }
 

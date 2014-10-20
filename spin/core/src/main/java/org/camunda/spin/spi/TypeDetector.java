@@ -14,14 +14,12 @@ package org.camunda.spin.spi;
 
 /**
  * Detects the canonical type string of a supplied object
- * 
+ *
  * @author Thorben Lindhauer
  */
 public interface TypeDetector {
 
-  boolean appliesTo(DataFormat<?> dataFormat);
-  
   boolean canHandle(Object object);
-  
+
   String detectType(Object object);
 }

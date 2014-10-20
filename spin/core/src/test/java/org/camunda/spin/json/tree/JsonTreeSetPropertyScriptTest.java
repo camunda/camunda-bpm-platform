@@ -13,11 +13,11 @@
 package org.camunda.spin.json.tree;
 
 import org.camunda.spin.SpinScriptException;
+import org.camunda.spin.impl.test.Script;
+import org.camunda.spin.impl.test.ScriptTest;
+import org.camunda.spin.impl.test.ScriptVariable;
 import org.camunda.spin.json.SpinJsonNode;
-import org.camunda.spin.json.SpinJsonTreePropertyException;
-import org.camunda.spin.test.Script;
-import org.camunda.spin.test.ScriptTest;
-import org.camunda.spin.test.ScriptVariable;
+import org.camunda.spin.json.SpinJsonPropertyException;
 import org.junit.Test;
 
 import java.util.Date;
@@ -210,7 +210,7 @@ public abstract class JsonTreeSetPropertyScriptTest extends ScriptTest {
     assertThat(newValue.isObject()).isTrue();
   }
 
-  @Test(expected = SpinJsonTreePropertyException.class)
+  @Test(expected = SpinJsonPropertyException.class)
   @Script(execute = false)
   @ScriptVariable(name = "input", file = EXAMPLE_JSON_FILE_NAME)
   public void shouldFailWhileSettingObject() throws Throwable{
@@ -219,7 +219,7 @@ public abstract class JsonTreeSetPropertyScriptTest extends ScriptTest {
     failingWithException(variables);
   }
 
-  @Test(expected = SpinJsonTreePropertyException.class)
+  @Test(expected = SpinJsonPropertyException.class)
   @Script(execute = false)
   @ScriptVariable(name = "input", file = EXAMPLE_JSON_FILE_NAME)
   public void shouldFailWhileSettingArray() throws Throwable{

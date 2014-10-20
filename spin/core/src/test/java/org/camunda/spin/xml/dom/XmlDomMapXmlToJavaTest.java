@@ -12,17 +12,15 @@
  */
 package org.camunda.spin.xml.dom;
 
-import org.camunda.spin.impl.xml.dom.XmlDomDataFormat;
-import org.camunda.spin.spi.SpinXmlDataFormatException;
+import static org.assertj.core.api.Assertions.fail;
+import static org.camunda.spin.Spin.XML;
+import static org.camunda.spin.xml.XmlTestConstants.EXAMPLE_VALIDATION_XML;
+import static org.camunda.spin.xml.XmlTestConstants.assertIsExampleOrder;
+
+import org.camunda.spin.xml.SpinXmlDataFormatException;
 import org.camunda.spin.xml.mapping.Customer;
 import org.camunda.spin.xml.mapping.Order;
 import org.junit.Test;
-
-import javax.xml.bind.helpers.DefaultValidationEventHandler;
-
-import static org.assertj.core.api.Assertions.fail;
-import static org.camunda.spin.Spin.XML;
-import static org.camunda.spin.xml.XmlTestConstants.*;
 
 public class XmlDomMapXmlToJavaTest {
 
@@ -58,35 +56,4 @@ public class XmlDomMapXmlToJavaTest {
     }
   }
 
-  @Test
-  public void shouldMapWithValidation() {
-    try {
-    XmlDomDataFormat xmlDomDataFormat = new XmlDomDataFormat();
-
-    XmlDomDataFormat dataFormat = xmlDomDataFormat.mapper()
-      .config("schema", createSchema())
-      .config("eventHandler", new DefaultValidationEventHandler())
-      .done();
-
-      XML(EXAMPLE_VALIDATION_XML, dataFormat).mapTo(Order.class);
-    } catch(SpinXmlDataFormatException e) {
-      fail("Could not validate XML", e);
-    }
-  }
-
-  @Test
-  public void shouldFailWithValidation() {
-    try {
-      XmlDomDataFormat xmlDomDataFormat = new XmlDomDataFormat();
-
-      XmlDomDataFormat dataFormat = xmlDomDataFormat.mapper()
-        .config("schema", createSchema())
-        .done();
-
-      XML(EXAMPLE_XML, dataFormat).mapTo(Order.class);
-      fail("Expected SpinXmlDataFormatException");
-    } catch(SpinXmlDataFormatException e) {
-      // expected
-    }
-  }
 }

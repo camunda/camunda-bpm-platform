@@ -14,13 +14,13 @@
 package org.camunda.spin.xml.dom;
 
 import org.camunda.spin.SpinList;
-import org.camunda.spin.test.Script;
-import org.camunda.spin.test.ScriptTest;
-import org.camunda.spin.test.ScriptVariable;
-import org.camunda.spin.xml.tree.SpinXmlTreeAttribute;
-import org.camunda.spin.xml.tree.SpinXmlTreeAttributeException;
-import org.camunda.spin.xml.tree.SpinXmlTreeElement;
-import org.camunda.spin.xml.tree.SpinXmlTreeElementException;
+import org.camunda.spin.impl.test.Script;
+import org.camunda.spin.impl.test.ScriptTest;
+import org.camunda.spin.impl.test.ScriptVariable;
+import org.camunda.spin.xml.SpinXmlAttribute;
+import org.camunda.spin.xml.SpinXmlAttributeException;
+import org.camunda.spin.xml.SpinXmlElement;
+import org.camunda.spin.xml.SpinXmlElementException;
 import org.junit.Test;
 
 import java.util.HashMap;
@@ -166,7 +166,7 @@ public abstract class XmlDomElementScriptTest extends ScriptTest {
     assertThat(value).isEqualTo("order1");
   }
 
-  @Test(expected = SpinXmlTreeAttributeException.class)
+  @Test(expected = SpinXmlAttributeException.class)
   @Script(
     name = "XmlDomElementScriptTest.readAttributeValueByName",
     variables = {
@@ -220,7 +220,7 @@ public abstract class XmlDomElementScriptTest extends ScriptTest {
     assertThat(value).isEqualTo("order1");
   }
 
-  @Test(expected = SpinXmlTreeAttributeException.class)
+  @Test(expected = SpinXmlAttributeException.class)
   @Script(
     name = "XmlDomElementScriptTest.readAttributeValueByNamespaceAndName",
     variables = {
@@ -234,7 +234,7 @@ public abstract class XmlDomElementScriptTest extends ScriptTest {
     failingWithException();
   }
 
-  @Test(expected = SpinXmlTreeAttributeException.class)
+  @Test(expected = SpinXmlAttributeException.class)
   @Script(
     name = "XmlDomElementScriptTest.readAttributeValueByNamespaceAndName",
     variables = {
@@ -262,7 +262,7 @@ public abstract class XmlDomElementScriptTest extends ScriptTest {
     failingWithException();
   }
 
-  @Test(expected = SpinXmlTreeAttributeException.class)
+  @Test(expected = SpinXmlAttributeException.class)
   @Script(
     name = "XmlDomElementScriptTest.readAttributeValueByNamespaceAndName",
     variables = {
@@ -449,7 +449,7 @@ public abstract class XmlDomElementScriptTest extends ScriptTest {
     }
   )
   public void canRemoveAttributeByName() {
-    SpinXmlTreeElement element = script.getVariable("element");
+    SpinXmlElement element = script.getVariable("element");
     assertThat(element.hasAttr("order")).isFalse();
   }
 
@@ -462,7 +462,7 @@ public abstract class XmlDomElementScriptTest extends ScriptTest {
     }
   )
   public void canRemoveAttributeByNonExistingName() {
-    SpinXmlTreeElement element = script.getVariable("element");
+    SpinXmlElement element = script.getVariable("element");
     assertThat(element.hasAttr(NON_EXISTING)).isFalse();
   }
 
@@ -489,7 +489,7 @@ public abstract class XmlDomElementScriptTest extends ScriptTest {
     }
   )
   public void canRemoveAttributeByNamespaceAndName() {
-    SpinXmlTreeElement element = script.getVariable("element");
+    SpinXmlElement element = script.getVariable("element");
     assertThat(element.hasAttrNs(EXAMPLE_NAMESPACE, "order")).isFalse();
   }
 
@@ -503,7 +503,7 @@ public abstract class XmlDomElementScriptTest extends ScriptTest {
     }
   )
   public void canRemoveAttributeByNullNamespaceAndName() {
-    SpinXmlTreeElement element = script.getVariable("element");
+    SpinXmlElement element = script.getVariable("element");
     assertThat(element.hasAttrNs(null, "order")).isFalse();
   }
 
@@ -531,7 +531,7 @@ public abstract class XmlDomElementScriptTest extends ScriptTest {
     }
   )
   public void canRemoveAttributeByNonExistingNamespaceAndName() {
-    SpinXmlTreeElement element = script.getVariable("element");
+    SpinXmlElement element = script.getVariable("element");
     assertThat(element.hasAttrNs(NON_EXISTING, "order")).isFalse();
   }
 
@@ -541,8 +541,8 @@ public abstract class XmlDomElementScriptTest extends ScriptTest {
   @Script("XmlDomElementScriptTest.getAllAttributesAndNames")
   @ScriptVariable(name = "input", file = EXAMPLE_XML_FILE_NAME)
   public void canGetAllAttributes() {
-    SpinList<SpinXmlTreeAttribute> attributes = script.getVariable("attributes");
-    for (SpinXmlTreeAttribute attribute : attributes) {
+    SpinList<SpinXmlAttribute> attributes = script.getVariable("attributes");
+    for (SpinXmlAttribute attribute : attributes) {
       assertThat(attribute.name()).isIn("order", "dueUntil", "xmlns", "ex");
     }
   }
@@ -556,8 +556,8 @@ public abstract class XmlDomElementScriptTest extends ScriptTest {
     }
   )
   public void canGetAllAttributesByNamespace() {
-    SpinList<SpinXmlTreeAttribute> attributes = script.getVariable("attributes");
-    for (SpinXmlTreeAttribute attribute : attributes) {
+    SpinList<SpinXmlAttribute> attributes = script.getVariable("attributes");
+    for (SpinXmlAttribute attribute : attributes) {
       assertThat(attribute.name()).isIn("order", "dueUntil");
       assertThat(attribute.value()).isIn("order1", "20150112");
       assertThat(attribute.namespace()).isEqualTo(EXAMPLE_NAMESPACE);
@@ -573,8 +573,8 @@ public abstract class XmlDomElementScriptTest extends ScriptTest {
     }
   )
   public void canGetAllAttributesByNullNamespace() {
-    SpinList<SpinXmlTreeAttribute> attributes = script.getVariable("attributes");
-    for (SpinXmlTreeAttribute attribute : attributes) {
+    SpinList<SpinXmlAttribute> attributes = script.getVariable("attributes");
+    for (SpinXmlAttribute attribute : attributes) {
       assertThat(attribute.name()).isIn("order", "dueUntil");
       assertThat(attribute.value()).isIn("order1", "20150112");
       assertThat(attribute.namespace()).isNull();
@@ -590,7 +590,7 @@ public abstract class XmlDomElementScriptTest extends ScriptTest {
     }
   )
   public void canGetAllAttributesByNonExistingNamespace() {
-    SpinList<SpinXmlTreeAttribute> attributes = script.getVariable("attributes");
+    SpinList<SpinXmlAttribute> attributes = script.getVariable("attributes");
     assertThat(attributes).isEmpty();
   }
 
@@ -652,12 +652,12 @@ public abstract class XmlDomElementScriptTest extends ScriptTest {
     }
   )
   public void canGetSingleChildElementByName() {
-    SpinXmlTreeElement childElement = script.getVariable("childElement");
+    SpinXmlElement childElement = script.getVariable("childElement");
     assertThat(childElement).isNotNull();
     assertThat(childElement.attr("name").value()).isEqualTo("20140512");
   }
 
-  @Test(expected = SpinXmlTreeElementException.class)
+  @Test(expected = SpinXmlElementException.class)
   @Script(
     name = "XmlDomElementScriptTest.getChildElementByName",
     variables = {
@@ -693,7 +693,7 @@ public abstract class XmlDomElementScriptTest extends ScriptTest {
     }
   )
   public void canGetSingleChildElementByNamespaceAndName() {
-    SpinXmlTreeElement childElement = script.getVariable("childElement");
+    SpinXmlElement childElement = script.getVariable("childElement");
     assertThat(childElement).isNotNull();
     assertThat(childElement.attr("name").value()).isEqualTo("20140512");
   }
@@ -708,11 +708,11 @@ public abstract class XmlDomElementScriptTest extends ScriptTest {
     }
   )
   public void canGetSingleChildElementByNullNamespaceAndName() {
-    SpinXmlTreeElement childElement = script.getVariable("childElement");
+    SpinXmlElement childElement = script.getVariable("childElement");
     assertThat(childElement).isNotNull();
   }
 
-  @Test(expected = SpinXmlTreeElementException.class)
+  @Test(expected = SpinXmlElementException.class)
   @Script(
     name = "XmlDomElementScriptTest.getChildElementByNamespaceAndName",
     variables = {
@@ -740,7 +740,7 @@ public abstract class XmlDomElementScriptTest extends ScriptTest {
     failingWithException();
   }
 
-  @Test(expected = SpinXmlTreeElementException.class)
+  @Test(expected = SpinXmlElementException.class)
   @Script(
     name = "XmlDomElementScriptTest.getChildElementByNamespaceAndName",
     variables = {
@@ -754,7 +754,7 @@ public abstract class XmlDomElementScriptTest extends ScriptTest {
     failingWithException();
   }
 
-  @Test(expected = SpinXmlTreeElementException.class)
+  @Test(expected = SpinXmlElementException.class)
   @Script(
     name = "XmlDomElementScriptTest.getChildElementByNamespaceAndName",
     variables = {
@@ -793,9 +793,9 @@ public abstract class XmlDomElementScriptTest extends ScriptTest {
     }
   )
   public void canAppendChildElement() {
-    SpinXmlTreeElement element = script.getVariable("element");
+    SpinXmlElement element = script.getVariable("element");
 
-    SpinXmlTreeElement child = element.childElement(null, "child");
+    SpinXmlElement child = element.childElement(null, "child");
     assertThat(child).isNotNull();
     assertThat(child.attr("id").value()).isEqualTo("child");
   }
@@ -809,9 +809,9 @@ public abstract class XmlDomElementScriptTest extends ScriptTest {
     }
   )
   public void canAppendChildElementWithNamespace() {
-    SpinXmlTreeElement element = script.getVariable("element");
+    SpinXmlElement element = script.getVariable("element");
 
-    SpinXmlTreeElement child = element.childElement(EXAMPLE_NAMESPACE, "child");
+    SpinXmlElement child = element.childElement(EXAMPLE_NAMESPACE, "child");
     assertThat(child).isNotNull();
     assertThat(child.attr("id").value()).isEqualTo("child");
   }
@@ -838,9 +838,9 @@ public abstract class XmlDomElementScriptTest extends ScriptTest {
     }
   )
   public void canAppendChildElementAtPosition() {
-    SpinXmlTreeElement element = script.getVariable("element");
+    SpinXmlElement element = script.getVariable("element");
 
-    SpinList<SpinXmlTreeElement> childs = element.childElements();
+    SpinList<SpinXmlElement> childs = element.childElements();
 
     assertThat(childs.get(0).name()).isEqualTo("child");
     assertThat(childs.get(2).name()).isEqualTo("child");
@@ -859,8 +859,8 @@ public abstract class XmlDomElementScriptTest extends ScriptTest {
     execute = false
   )
   public void canRemoveAChildElement() {
-    SpinXmlTreeElement element = XML(exampleXmlFileAsStream());
-    SpinXmlTreeElement child = XML("<child/>");
+    SpinXmlElement element = XML(exampleXmlFileAsStream());
+    SpinXmlElement child = XML("<child/>");
     element.append(child);
 
     element = script
@@ -874,7 +874,7 @@ public abstract class XmlDomElementScriptTest extends ScriptTest {
       fail("Child element should be removed");
     }
     catch (Exception e) {
-      assertThat(e).isInstanceOf(SpinXmlTreeElementException.class);
+      assertThat(e).isInstanceOf(SpinXmlElementException.class);
     }
   }
 
@@ -892,7 +892,7 @@ public abstract class XmlDomElementScriptTest extends ScriptTest {
     failingWithException();
   }
 
-  @Test(expected = SpinXmlTreeElementException.class)
+  @Test(expected = SpinXmlElementException.class)
   @Script(
     name = "XmlDomElementScriptTest.removeChildElement",
     variables = {
@@ -915,9 +915,9 @@ public abstract class XmlDomElementScriptTest extends ScriptTest {
     execute = false
   )
   public void canRemoveMultipleChildElements() {
-    SpinXmlTreeElement element = XML(exampleXmlFileAsStream());
-    SpinXmlTreeElement child1 = XML("<child/>");
-    SpinXmlTreeElement child2 = XML("<child/>");
+    SpinXmlElement element = XML(exampleXmlFileAsStream());
+    SpinXmlElement child1 = XML("<child/>");
+    SpinXmlElement child2 = XML("<child/>");
     element.append(child1, child2);
 
     element = script
@@ -932,7 +932,7 @@ public abstract class XmlDomElementScriptTest extends ScriptTest {
       fail("Child elements should be removed");
     }
     catch (Exception e) {
-      assertThat(e).isInstanceOf(SpinXmlTreeElementException.class);
+      assertThat(e).isInstanceOf(SpinXmlElementException.class);
     }
   }
 
@@ -946,7 +946,7 @@ public abstract class XmlDomElementScriptTest extends ScriptTest {
     execute = false
   )
   public void canRemoveChildElementCollection() {
-    SpinXmlTreeElement element = XML(exampleXmlFileAsStream());
+    SpinXmlElement element = XML(exampleXmlFileAsStream());
     element.append(XML("<child/>"), XML("<child/>"), XML("<child/>"));
 
     element = script
@@ -960,7 +960,7 @@ public abstract class XmlDomElementScriptTest extends ScriptTest {
       fail("Child elements should be removed");
     }
     catch (Exception e) {
-      assertThat(e).isInstanceOf(SpinXmlTreeElementException.class);
+      assertThat(e).isInstanceOf(SpinXmlElementException.class);
     }
   }
 
@@ -975,11 +975,11 @@ public abstract class XmlDomElementScriptTest extends ScriptTest {
     }
   )
   public void canGetAllChildElementsByName() {
-    SpinList<SpinXmlTreeElement> childElements = script.getVariable("childElements");
+    SpinList<SpinXmlElement> childElements = script.getVariable("childElements");
     assertThat(childElements).hasSize(3);
   }
 
-  @Test(expected = SpinXmlTreeElementException.class)
+  @Test(expected = SpinXmlElementException.class)
   @Script(
     name = "XmlDomElementScriptTest.getChildElementsByName",
     variables = {
@@ -1015,7 +1015,7 @@ public abstract class XmlDomElementScriptTest extends ScriptTest {
     }
   )
   public void canGetAllChildElementsByNamespaceAndName() {
-    SpinList<SpinXmlTreeElement> childElements = script.getVariable("childElements");
+    SpinList<SpinXmlElement> childElements = script.getVariable("childElements");
     assertThat(childElements).hasSize(3);
   }
 
@@ -1029,11 +1029,11 @@ public abstract class XmlDomElementScriptTest extends ScriptTest {
     }
   )
   public void canGetAllChildElementsByNullNamespaceAndName() {
-    SpinList<SpinXmlTreeElement> childElements = script.getVariable("childElements");
+    SpinList<SpinXmlElement> childElements = script.getVariable("childElements");
     assertThat(childElements).hasSize(2);
   }
 
-  @Test(expected = SpinXmlTreeElementException.class)
+  @Test(expected = SpinXmlElementException.class)
   @Script(
     name = "XmlDomElementScriptTest.getChildElementsByNamespaceAndName",
     variables = {
@@ -1047,7 +1047,7 @@ public abstract class XmlDomElementScriptTest extends ScriptTest {
     failingWithException();
   }
 
-  @Test(expected = SpinXmlTreeElementException.class)
+  @Test(expected = SpinXmlElementException.class)
   @Script(
     name = "XmlDomElementScriptTest.getChildElementsByNamespaceAndName",
     variables = {
@@ -1075,7 +1075,7 @@ public abstract class XmlDomElementScriptTest extends ScriptTest {
     failingWithException();
   }
 
-  @Test(expected = SpinXmlTreeElementException.class)
+  @Test(expected = SpinXmlElementException.class)
   @Script(
     name = "XmlDomElementScriptTest.getChildElementsByNamespaceAndName",
     variables = {
@@ -1115,8 +1115,8 @@ public abstract class XmlDomElementScriptTest extends ScriptTest {
     execute = false
   )
   public void canReplaceAChildElement() {
-    SpinXmlTreeElement element = XML(exampleXmlFileAsStream());
-    SpinXmlTreeElement date = element.childElement("date");
+    SpinXmlElement element = XML(exampleXmlFileAsStream());
+    SpinXmlElement date = element.childElement("date");
 
     element = script
       .setVariable("element", element)
@@ -1128,7 +1128,7 @@ public abstract class XmlDomElementScriptTest extends ScriptTest {
     try {
       element.childElement("date");
     } catch (Exception e) {
-      assertThat(e).isInstanceOf(SpinXmlTreeElementException.class);
+      assertThat(e).isInstanceOf(SpinXmlElementException.class);
     }
   }
 
@@ -1156,8 +1156,8 @@ public abstract class XmlDomElementScriptTest extends ScriptTest {
     execute = false
   )
   public void cannotReplaceByANullChildElement() throws Throwable {
-    SpinXmlTreeElement element = XML(exampleXmlFileAsStream());
-    SpinXmlTreeElement date = element.childElement("date");
+    SpinXmlElement element = XML(exampleXmlFileAsStream());
+    SpinXmlElement date = element.childElement("date");
 
     script
       .setVariable("element", element)
@@ -1165,7 +1165,7 @@ public abstract class XmlDomElementScriptTest extends ScriptTest {
     failingWithException();
   }
 
-  @Test(expected = SpinXmlTreeElementException.class)
+  @Test(expected = SpinXmlElementException.class)
   @Script(
     name = "XmlDomElementScriptTest.replaceChildElement",
     variables = {
@@ -1190,7 +1190,7 @@ public abstract class XmlDomElementScriptTest extends ScriptTest {
     execute = false
   )
   public void canReplaceElement() {
-    SpinXmlTreeElement element = XML(exampleXmlFileAsStream());
+    SpinXmlElement element = XML(exampleXmlFileAsStream());
     script
       .setVariable("oldElement", element.childElement("date"))
       .execute();
@@ -1199,7 +1199,7 @@ public abstract class XmlDomElementScriptTest extends ScriptTest {
     try {
       element.childElement("date");
     } catch (Exception e) {
-      assertThat(e).isInstanceOf(SpinXmlTreeElementException.class);
+      assertThat(e).isInstanceOf(SpinXmlElementException.class);
     }
 
   }
@@ -1213,7 +1213,7 @@ public abstract class XmlDomElementScriptTest extends ScriptTest {
     execute = false
   )
   public void canReplaceRootElement() {
-    SpinXmlTreeElement element = XML(exampleXmlFileAsStream());
+    SpinXmlElement element = XML(exampleXmlFileAsStream());
     element = script
       .setVariable("oldElement", element)
       .execute()
@@ -1232,7 +1232,7 @@ public abstract class XmlDomElementScriptTest extends ScriptTest {
     execute = false
   )
   public void cannotReplaceByNullElement() throws Throwable {
-    SpinXmlTreeElement element = XML(exampleXmlFileAsStream());
+    SpinXmlElement element = XML(exampleXmlFileAsStream());
     script
       .setVariable("oldElement", element);
     failingWithException();

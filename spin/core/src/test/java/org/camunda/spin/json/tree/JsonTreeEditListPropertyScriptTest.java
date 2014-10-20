@@ -12,15 +12,15 @@
  */
 package org.camunda.spin.json.tree;
 
-import org.camunda.spin.json.SpinJsonTreeNodeException;
-import org.camunda.spin.json.SpinJsonTreePropertyException;
-import org.camunda.spin.test.Script;
-import org.camunda.spin.test.ScriptTest;
-import org.camunda.spin.test.ScriptVariable;
-import org.junit.Test;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.spin.json.JsonTestConstants.EXAMPLE_JSON_FILE_NAME;
+
+import org.camunda.spin.impl.test.Script;
+import org.camunda.spin.impl.test.ScriptTest;
+import org.camunda.spin.impl.test.ScriptVariable;
+import org.camunda.spin.json.SpinJsonException;
+import org.camunda.spin.json.SpinJsonPropertyException;
+import org.junit.Test;
 
 /**
  * Index:
@@ -41,7 +41,7 @@ public abstract class JsonTreeEditListPropertyScriptTest extends ScriptTest {
 
   // ----------------- 1) indexOf ----------------------
 
-  @Test(expected = SpinJsonTreeNodeException.class)
+  @Test(expected = SpinJsonException.class)
   @Script(execute = false)
   @ScriptVariable(name = "input", file = EXAMPLE_JSON_FILE_NAME)
   public void shouldFailReadIndexOfNonArray() throws Throwable {
@@ -55,7 +55,7 @@ public abstract class JsonTreeEditListPropertyScriptTest extends ScriptTest {
     failingWithException();
   }
 
-  @Test(expected = SpinJsonTreeNodeException.class)
+  @Test(expected = SpinJsonException.class)
   @Script(execute = false)
   @ScriptVariable(name = "input", file = EXAMPLE_JSON_FILE_NAME)
   public void shouldFailReadIndexOfNonExistentValue() throws Throwable {
@@ -74,7 +74,7 @@ public abstract class JsonTreeEditListPropertyScriptTest extends ScriptTest {
 
   // ----------------- 2) lastIndexOf ----------------------
 
-  @Test(expected = SpinJsonTreeNodeException.class)
+  @Test(expected = SpinJsonException.class)
   @Script(execute = false)
   @ScriptVariable(name = "input", file = EXAMPLE_JSON_FILE_NAME)
   public void shouldFailReadLastIndexOfNonArray() throws Throwable {
@@ -88,7 +88,7 @@ public abstract class JsonTreeEditListPropertyScriptTest extends ScriptTest {
     failingWithException();
   }
 
-  @Test(expected = SpinJsonTreeNodeException.class)
+  @Test(expected = SpinJsonException.class)
   @Script(execute = false)
   @ScriptVariable(name = "input", file = EXAMPLE_JSON_FILE_NAME)
   public void shouldFailReadLastIndexOfNonExistentValue() throws Throwable {
@@ -107,14 +107,14 @@ public abstract class JsonTreeEditListPropertyScriptTest extends ScriptTest {
 
   // ----------------- 3) append ----------------------
 
-  @Test(expected = SpinJsonTreeNodeException.class)
+  @Test(expected = SpinJsonException.class)
   @Script(execute = false)
   @ScriptVariable(name = "input", file = EXAMPLE_JSON_FILE_NAME)
   public void shouldFailAppendToNonArray() throws Throwable {
     failingWithException();
   }
 
-  @Test(expected = SpinJsonTreeNodeException.class)
+  @Test(expected = SpinJsonException.class)
   @Script(execute = false)
   @ScriptVariable(name = "input", file = EXAMPLE_JSON_FILE_NAME)
   public void shouldFailAppendWrongNode() throws Throwable {
@@ -143,7 +143,7 @@ public abstract class JsonTreeEditListPropertyScriptTest extends ScriptTest {
 
   // ----------------- 4) insertAt ----------------------
 
-  @Test(expected = SpinJsonTreeNodeException.class)
+  @Test(expected = SpinJsonException.class)
   @Script(execute = false)
   @ScriptVariable(name = "input", file = EXAMPLE_JSON_FILE_NAME)
   public void shouldFailInsertAtNonArray() throws Throwable {
@@ -164,7 +164,7 @@ public abstract class JsonTreeEditListPropertyScriptTest extends ScriptTest {
     failingWithException();
   }
 
-  @Test(expected = SpinJsonTreeNodeException.class)
+  @Test(expected = SpinJsonException.class)
   @Script(execute = false)
   @ScriptVariable(name = "input", file = EXAMPLE_JSON_FILE_NAME)
   public void shouldFailInsertAtWithWrongObject() throws Throwable {
@@ -212,7 +212,7 @@ public abstract class JsonTreeEditListPropertyScriptTest extends ScriptTest {
 
   // ----------------- 5) insertBefore ----------------------
 
-  @Test(expected = SpinJsonTreeNodeException.class)
+  @Test(expected = SpinJsonException.class)
   @Script(execute = false)
   @ScriptVariable(name = "input", file = EXAMPLE_JSON_FILE_NAME)
   public void shouldFailInsertBeforeNonExistentSearchObject() throws Throwable {
@@ -233,21 +233,21 @@ public abstract class JsonTreeEditListPropertyScriptTest extends ScriptTest {
     failingWithException();
   }
 
-  @Test(expected = SpinJsonTreePropertyException.class)
+  @Test(expected = SpinJsonPropertyException.class)
   @Script(execute = false)
   @ScriptVariable(name = "input", file = EXAMPLE_JSON_FILE_NAME)
   public void shouldFailInsertWrongObjectBeforeSearchObject() throws Throwable {
     failingWithException();
   }
 
-  @Test(expected = SpinJsonTreePropertyException.class)
+  @Test(expected = SpinJsonPropertyException.class)
   @Script(execute = false)
   @ScriptVariable(name = "input", file = EXAMPLE_JSON_FILE_NAME)
   public void shouldFailInsertBeforeWrongSearchObject() throws Throwable {
     failingWithException();
   }
 
-  @Test(expected = SpinJsonTreeNodeException.class)
+  @Test(expected = SpinJsonException.class)
   @Script(execute = false)
   @ScriptVariable(name = "input", file = EXAMPLE_JSON_FILE_NAME)
   public void shouldFailInsertBeforeOnNonArray() throws Throwable {
@@ -291,7 +291,7 @@ public abstract class JsonTreeEditListPropertyScriptTest extends ScriptTest {
 
   // ----------------- 6) insertAfter ----------------------
 
-  @Test(expected = SpinJsonTreeNodeException.class)
+  @Test(expected = SpinJsonException.class)
   @Script(execute = false)
   @ScriptVariable(name = "input", file = EXAMPLE_JSON_FILE_NAME)
   public void shouldFailInsertAfterNonExistentSearchObject() throws Throwable {
@@ -312,21 +312,21 @@ public abstract class JsonTreeEditListPropertyScriptTest extends ScriptTest {
     failingWithException();
   }
 
-  @Test(expected = SpinJsonTreeNodeException.class)
+  @Test(expected = SpinJsonException.class)
   @Script(execute = false)
   @ScriptVariable(name = "input", file = EXAMPLE_JSON_FILE_NAME)
   public void shouldFailInsertWrongObjectAfterSearchObject() throws Throwable {
     failingWithException();
   }
 
-  @Test(expected = SpinJsonTreeNodeException.class)
+  @Test(expected = SpinJsonException.class)
   @Script(execute = false)
   @ScriptVariable(name = "input", file = EXAMPLE_JSON_FILE_NAME)
   public void shouldFailInsertAfterOnNonArray() throws Throwable {
     failingWithException();
   }
 
-  @Test(expected = SpinJsonTreePropertyException.class)
+  @Test(expected = SpinJsonPropertyException.class)
   @Script(execute = false)
   @ScriptVariable(name = "input", file = EXAMPLE_JSON_FILE_NAME)
   public void shouldFailInsertAfterWrongSearchObject() throws Throwable {
@@ -352,14 +352,14 @@ public abstract class JsonTreeEditListPropertyScriptTest extends ScriptTest {
 
   // ----------------- 7) remove ----------------------
 
-  @Test(expected = SpinJsonTreePropertyException.class)
+  @Test(expected = SpinJsonPropertyException.class)
   @Script(execute = false)
   @ScriptVariable(name = "input", file = EXAMPLE_JSON_FILE_NAME)
   public void shouldFailRemoveNonExistentObject() throws Throwable {
     failingWithException();
   }
 
-  @Test(expected = SpinJsonTreeNodeException.class)
+  @Test(expected = SpinJsonException.class)
   @Script(execute = false)
   @ScriptVariable(name = "input", file = EXAMPLE_JSON_FILE_NAME)
   public void shouldFailRemoveNonArray() throws Throwable {
@@ -373,7 +373,7 @@ public abstract class JsonTreeEditListPropertyScriptTest extends ScriptTest {
     failingWithException();
   }
 
-  @Test(expected = SpinJsonTreePropertyException.class)
+  @Test(expected = SpinJsonPropertyException.class)
   @Script(execute = false)
   @ScriptVariable(name = "input", file = EXAMPLE_JSON_FILE_NAME)
   public void shouldFailRemoveWrongObject() throws Throwable {
@@ -404,21 +404,21 @@ public abstract class JsonTreeEditListPropertyScriptTest extends ScriptTest {
     failingWithException();
   }
 
-  @Test(expected = SpinJsonTreePropertyException.class)
+  @Test(expected = SpinJsonPropertyException.class)
   @Script(execute = false)
   @ScriptVariable(name = "input", file = EXAMPLE_JSON_FILE_NAME)
   public void shouldFailRemoveLastWrongObject() throws Throwable {
     failingWithException();
   }
 
-  @Test(expected = SpinJsonTreeNodeException.class)
+  @Test(expected = SpinJsonException.class)
   @Script(execute = false)
   @ScriptVariable(name = "input", file = EXAMPLE_JSON_FILE_NAME)
   public void shouldFailRemoveLastNonArray() throws Throwable {
     failingWithException();
   }
 
-  @Test(expected = SpinJsonTreePropertyException.class)
+  @Test(expected = SpinJsonPropertyException.class)
   @Script(execute = false)
   @ScriptVariable(name = "input", file = EXAMPLE_JSON_FILE_NAME)
   public void shouldFailRemoveLastNonExistentObject() throws Throwable {
@@ -442,7 +442,7 @@ public abstract class JsonTreeEditListPropertyScriptTest extends ScriptTest {
 
   // ----------------- 9) removeAt ----------------------
 
-  @Test(expected = SpinJsonTreeNodeException.class)
+  @Test(expected = SpinJsonException.class)
   @Script(execute = false)
   @ScriptVariable(name = "input", file = EXAMPLE_JSON_FILE_NAME)
   public void shouldFailRemoveAtNonArray() throws Throwable {

@@ -12,28 +12,22 @@
  */
 package org.camunda.spin.json.tree;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
-import com.fasterxml.jackson.databind.ObjectMapper.DefaultTyping;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import org.camunda.spin.SpinList;
-import org.camunda.spin.json.SpinJsonNode;
-import org.camunda.spin.json.mapping.DateObject;
-import org.camunda.spin.json.mapping.EmptyBean;
-import org.camunda.spin.json.mapping.Invoice;
-import org.camunda.spin.json.mapping.Order;
-import org.camunda.spin.spi.SpinJsonDataFormatException;
-import org.junit.Test;
-
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.*;
-
 import static net.javacrumbs.jsonunit.fluent.JsonFluentAssert.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
-import static org.camunda.spin.DataFormats.jsonTree;
 import static org.camunda.spin.Spin.JSON;
-import static org.camunda.spin.json.JsonTestConstants.*;
+import static org.camunda.spin.json.JsonTestConstants.EXAMPLE_JSON;
+import static org.camunda.spin.json.JsonTestConstants.createExampleOrder;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.camunda.spin.SpinList;
+import org.camunda.spin.json.SpinJsonNode;
+import org.camunda.spin.json.mapping.Order;
+import org.junit.Test;
 
 public class JsonTreeMapJavaToJsonTest {
 
@@ -89,55 +83,6 @@ public class JsonTreeMapJavaToJsonTest {
     } catch (IllegalArgumentException e) {
       // happy path
     }
-  }
-
-  @Test
-  public void shouldMapJavaObjectToJsonWithDefaultTypeInformation() {
-    Invoice exampleInvoice = createExampleInvoice();
-
-    String json = JSON(exampleInvoice,
-        jsonTree().mapper().enableDefaultTyping(DefaultTyping.NON_FINAL, As.PROPERTY).done())
-        .toString();
-
-    assertThatJson(json).isEqualTo(EXAMPLE_JACKSON_TYPE_JSON);
-  }
-
-  @Test
-  public void shouldConfigureDateFormatting() {
-    DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-
-    DateObject dateObject = new DateObject();
-
-    Calendar calendar = dateFormat.getCalendar();
-    calendar.set(2012, Calendar.OCTOBER, 10, 10, 20, 42);
-    Date date = calendar.getTime();
-    dateObject.setDate(date);
-
-    String json = JSON(dateObject, jsonTree().mapper().dateFormat(dateFormat).done()).toString();
-
-    String expectedJson = "{\"date\":\"2012-10-10T10:20:42\"}";
-
-    assertThat(json).isEqualTo(expectedJson);
-  }
-
-  @Test
-  public void shouldConfigSerializationByMap() {
-    EmptyBean bean = new EmptyBean();
-
-    try {
-      JSON(bean).toString();
-      fail("Expected mapping exception");
-    } catch (SpinJsonDataFormatException e) {
-      // happy path
-    }
-
-    Map<String, Object> configuration = newMap(SerializationFeature.FAIL_ON_EMPTY_BEANS.name(), Boolean.FALSE);
-
-    String json = JSON(bean, jsonTree().mapper().config(configuration).done()).toString();
-    assertThat(json).isEqualTo("{}");
-
-    json = JSON(bean, null, null, configuration).toString();
-    assertThat(json).isEqualTo("{}");
   }
 
   @Test

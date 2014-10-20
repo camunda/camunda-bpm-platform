@@ -12,13 +12,20 @@
  */
 package org.camunda.spin;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.Set;
 
-import org.camunda.spin.impl.json.tree.JsonJacksonTreeDataFormat;
-import org.camunda.spin.impl.xml.dom.XmlDomDataFormat;
+import org.camunda.spin.impl.json.jackson.format.JacksonJsonDataFormat;
+import org.camunda.spin.impl.json.jackson.format.JacksonJsonDataFormatProvider;
+import org.camunda.spin.impl.logging.SpinCoreLogger;
+import org.camunda.spin.impl.logging.SpinLogger;
+import org.camunda.spin.impl.xml.dom.format.DomXmlDataFormat;
+import org.camunda.spin.impl.xml.dom.format.DomXmlDataFormatProvider;
 import org.camunda.spin.spi.DataFormat;
+import org.camunda.spin.spi.DataFormatProvider;
 
 /**
  * Provides access to all builtin data formats.
@@ -28,80 +35,106 @@ import org.camunda.spin.spi.DataFormat;
  */
 public class DataFormats {
 
-  protected static Set<DataFormat<? extends Spin<?>>> AVAILABLE_FORMATS;
+  private static SpinCoreLogger LOG = SpinLogger.CORE_LOGGER;
 
-  public static JsonJacksonTreeDataFormat DEFAULT_JSON_DATA_FORMAT;
-  public static XmlDomDataFormat DEFAULT_XML_DATA_FORMAT;
+  public static String JSON_DATAFORMAT_NAME = "application/json";
 
-  public static Set<DataFormat<? extends Spin<?>>> getAvailableDataFormats() {
-    ensureDataformatsInitialized();
-    return AVAILABLE_FORMATS;
-  }
+  public static String XML_DATAFORMAT_NAME = "application/xml";
 
-  /**
-   * Detect all available dataformats on the classpath using a {@link ServiceLoader}.
-   */
-  @SuppressWarnings({ "rawtypes", "unchecked" })
-  protected static void ensureDataformatsInitialized() {
-    if(AVAILABLE_FORMATS == null) {
-      synchronized(DataFormats.class) {
-        if(AVAILABLE_FORMATS == null) {
-          AVAILABLE_FORMATS = new HashSet<DataFormat<? extends Spin<?>>>();
-          // find available dataformats on the classpath
-          ServiceLoader<DataFormat> dataFormatLoader = ServiceLoader.load(DataFormat.class, Spin.class.getClassLoader());
-          for (DataFormat dataFormat : dataFormatLoader) {
-
-            // add to list of available data formats
-            AVAILABLE_FORMATS.add(dataFormat);
-
-            // detect default data formats
-            if(dataFormat instanceof JsonJacksonTreeDataFormat) {
-              DEFAULT_JSON_DATA_FORMAT = (JsonJacksonTreeDataFormat) dataFormat;
-
-            } else if(dataFormat instanceof XmlDomDataFormat) {
-              DEFAULT_XML_DATA_FORMAT = (XmlDomDataFormat) dataFormat;
-
-            }
-          }
-        }
-      }
-    }
-  }
+  /** The global instance of the manager */
+  static DataFormats INSTANCE = new DataFormats();
 
   /**
-   * Returns a new instance of the spin xml dom data format that
-   * can be configured individually from the the global format.
+   * Provides the global instance of the DataFormats manager.
+   * @return the global instance.
    */
-  public static XmlDomDataFormat xmlDom() {
-    ensureDataformatsInitialized();
-    return DEFAULT_XML_DATA_FORMAT.newInstance();
+  public static DataFormats getInstance() {
+    return INSTANCE;
   }
 
   /**
    * Returns the global xml data format that can be provided with
    * configuration that applies to any Spin xml operation.
    */
-  public static XmlDomDataFormat xmlDomGlobal() {
-    ensureDataformatsInitialized();
-    return DEFAULT_XML_DATA_FORMAT;
-  }
-
-  /**
-   * Returns a new instance of the spin json data format that
-   * can be configured individually from the the global format.
-   */
-  public static JsonJacksonTreeDataFormat jsonTree() {
-    ensureDataformatsInitialized();
-    return DEFAULT_JSON_DATA_FORMAT.newInstance();
+  public static DomXmlDataFormat xml() {
+    return (DomXmlDataFormat) INSTANCE.getDataFormatByName(XML_DATAFORMAT_NAME);
   }
 
   /**
    * Returns the global json data format that can be provided with
    * configuration that applies to any Spin json operation.
    */
-  public static JsonJacksonTreeDataFormat jsonTreeGlobal() {
+  public static JacksonJsonDataFormat json() {
+    return (JacksonJsonDataFormat) INSTANCE.getDataFormatByName(JSON_DATAFORMAT_NAME);
+  }
+
+  // instance /////////////////////////////////////////////////////
+
+  protected Map<String, DataFormat<?>> availableDataFormats;
+
+  public Set<DataFormat<? extends Spin<?>>> getAvailableDataFormats() {
     ensureDataformatsInitialized();
-    return DEFAULT_JSON_DATA_FORMAT;
+    return new HashSet<DataFormat<? extends Spin<?>>>(availableDataFormats.values());
+  }
+
+  public DataFormat<? extends Spin<?>> getDataFormatByName(String name) {
+    ensureDataformatsInitialized();
+    return availableDataFormats.get(name);
+  }
+
+  /**
+   * Detect all available dataformats on the classpath using a {@link ServiceLoader}.
+   */
+  protected void ensureDataformatsInitialized() {
+    if(availableDataFormats == null) {
+      synchronized(DataFormats.class) {
+        if(availableDataFormats == null) {
+          registerDataFormats();
+        }
+      }
+    }
+  }
+
+  protected void registerDataFormats() {
+    Map<String, DataFormat<?>> dataFormats = new HashMap<String, DataFormat<?>>();
+
+    // discover available custom dataformat providers on the classpath
+    registerCustomDataFormats(dataFormats);
+
+    // register default providers
+    registerDefaultDataFormats(dataFormats);
+
+    this.availableDataFormats = dataFormats;
+  }
+
+  protected void registerCustomDataFormats(Map<String, DataFormat<?>> dataFormats) {
+    // use java.util.ServiceLoader to load custom DataFormatProvider instances on the classpath
+    ServiceLoader<DataFormatProvider> providerLoader = ServiceLoader.load(DataFormatProvider.class, Spin.class.getClassLoader());
+    for (DataFormatProvider provider : providerLoader) {
+      registerProvider(dataFormats, provider);
+    }
+  }
+
+  protected void registerDefaultDataFormats(Map<String, DataFormat<?>> dataFormats) {
+    if(!dataFormats.containsKey(JSON_DATAFORMAT_NAME)) {
+      registerProvider(dataFormats, new JacksonJsonDataFormatProvider());
+    }
+    if(!dataFormats.containsKey(XML_DATAFORMAT_NAME)) {
+      registerProvider(dataFormats, new DomXmlDataFormatProvider());
+    }
+  }
+
+  protected void registerProvider(Map<String, DataFormat<?>> dataFormats, DataFormatProvider provider) {
+
+    String dataFormatName = provider.getDataFormatName();
+
+    if(dataFormats.containsKey(dataFormatName)) {
+      throw LOG.multipleProvidersForDataformat(dataFormatName);
+    }
+    else {
+      DataFormat<?> dataFormatInstance = provider.createInstance();
+      dataFormats.put(dataFormatName, dataFormatInstance);
+    }
   }
 
 }

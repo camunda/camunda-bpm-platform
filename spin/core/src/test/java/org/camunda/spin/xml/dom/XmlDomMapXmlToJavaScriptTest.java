@@ -12,10 +12,10 @@
  */
 package org.camunda.spin.xml.dom;
 
-import org.camunda.spin.spi.SpinXmlDataFormatException;
-import org.camunda.spin.test.Script;
-import org.camunda.spin.test.ScriptTest;
-import org.camunda.spin.test.ScriptVariable;
+import org.camunda.spin.impl.test.Script;
+import org.camunda.spin.impl.test.ScriptTest;
+import org.camunda.spin.impl.test.ScriptVariable;
+import org.camunda.spin.xml.SpinXmlDataFormatException;
 import org.camunda.spin.xml.mapping.Order;
 import org.junit.Test;
 
@@ -48,22 +48,4 @@ public abstract class XmlDomMapXmlToJavaScriptTest extends ScriptTest {
     failingWithException();
   }
 
-  @Test
-  @Script(execute = false)
-  @ScriptVariable(name = "input", file = EXAMPLE_VALIDATION_XML_FILE_NAME)
-  public void shouldMapWithValidation() {
-    script.setVariable("schema", createSchema());
-    script.execute();
-
-    Order order = script.getVariable("result");
-    assertIsExampleOrder(order);
-  }
-
-  @Test(expected = SpinXmlDataFormatException.class)
-  @Script(execute = false)
-  @ScriptVariable(name = "input", file = EXAMPLE_XML_FILE_NAME)
-  public void shouldFailMapWithValidation() throws Throwable {
-    script.setVariable("schema", createSchema());
-    failingWithException();
-  }
 }

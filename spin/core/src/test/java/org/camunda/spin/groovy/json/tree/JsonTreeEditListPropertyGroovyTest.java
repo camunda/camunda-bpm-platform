@@ -12,8 +12,8 @@
  */
 package org.camunda.spin.groovy.json.tree;
 
+import org.camunda.spin.impl.test.ScriptEngine;
 import org.camunda.spin.json.tree.JsonTreeEditListPropertyScriptTest;
-import org.camunda.spin.test.ScriptEngine;
 
 /**
  * @author Stefan Hentschel

@@ -13,10 +13,10 @@
 package org.camunda.spin.json.tree;
 
 import org.camunda.spin.SpinList;
+import org.camunda.spin.json.SpinJsonDataFormatException;
 import org.camunda.spin.json.SpinJsonNode;
-import org.camunda.spin.json.SpinJsonTreePropertyException;
+import org.camunda.spin.json.SpinJsonPropertyException;
 import org.camunda.spin.spi.SpinDataFormatException;
-import org.camunda.spin.spi.SpinJsonDataFormatException;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -73,21 +73,21 @@ public class JsonTreeReadPropertyTest {
     try {
       jsonNode.prop("nonExisting");
       fail("Expected SpinJsonTreePropertyException");
-    } catch(SpinJsonTreePropertyException e) {
+    } catch(SpinJsonPropertyException e) {
       // expected
     }
 
     try {
       order.prop("nonExisting");
       fail("Expected SpinJsonTreePropertyException");
-    } catch(SpinJsonTreePropertyException e) {
+    } catch(SpinJsonPropertyException e) {
       // expected
     }
 
     try {
       customers.prop("nonExisting");
       fail("Expected SpinJsonTreePropertyException");
-    } catch(SpinJsonTreePropertyException e) {
+    } catch(SpinJsonPropertyException e) {
       // expected
     }
 
@@ -101,14 +101,14 @@ public class JsonTreeReadPropertyTest {
     try {
       order.prop("null");
       fail("Expected SpinJsonTreePropertyException");
-    } catch(SpinJsonTreePropertyException e) {
+    } catch(SpinJsonPropertyException e) {
       // expected
     }
 
     try {
       customers.prop("null");
       fail("Expected SpinJsonTreePropertyException");
-    } catch(SpinJsonTreePropertyException e) {
+    } catch(SpinJsonPropertyException e) {
       // expected
     }
   }
@@ -135,14 +135,14 @@ public class JsonTreeReadPropertyTest {
     try {
       jsonNode.prop("order").prop("nonExisting");
       fail("Expected SpinJsonTreePropertyException");
-    } catch(SpinJsonTreePropertyException e) {
+    } catch(SpinJsonPropertyException e) {
       // expected
     }
 
     try {
       orderDetails.prop("roundedPrice").prop("nonExisting");
       fail("Expected SpinJsonTreePropertyException");
-    } catch(SpinJsonTreePropertyException e) {
+    } catch(SpinJsonPropertyException e) {
       // expected
     }
   }

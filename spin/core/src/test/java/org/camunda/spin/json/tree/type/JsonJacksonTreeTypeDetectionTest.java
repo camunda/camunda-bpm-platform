@@ -14,13 +14,11 @@ package org.camunda.spin.json.tree.type;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
-import static org.camunda.spin.DataFormats.jsonTree;
+import static org.camunda.spin.DataFormats.json;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.camunda.spin.impl.json.tree.JsonJacksonTreeDataFormat;
-import org.camunda.spin.impl.json.tree.type.AbstractJsonJacksonTypeDetector;
 import org.camunda.spin.json.mapping.Customer;
 import org.camunda.spin.json.mapping.RegularCustomer;
 import org.junit.Test;
@@ -30,76 +28,46 @@ public class JsonJacksonTreeTypeDetectionTest {
   @Test
   public void shouldDetectTypeFromObject() {
     RegularCustomer customer = new RegularCustomer();
-    String canonicalTypeString = jsonTree().getCanonicalTypeName(customer);
+    String canonicalTypeString = json().getCanonicalTypeName(customer);
     assertThat(canonicalTypeString).isEqualTo("org.camunda.spin.json.mapping.RegularCustomer");
   }
-  
+
   @Test
   public void shouldDetectListType() {
     List<Customer> customers = new ArrayList<Customer>();
     customers.add(new RegularCustomer());
-    
-    String canonicalTypeString = jsonTree().getCanonicalTypeName(customers);
+
+    String canonicalTypeString = json().getCanonicalTypeName(customers);
     assertThat(canonicalTypeString).isEqualTo("java.util.ArrayList<org.camunda.spin.json.mapping.RegularCustomer>");
   }
-  
+
   @Test
   public void shouldDetectListTypeFromEmptyList() {
     List<RegularCustomer> customers = new ArrayList<RegularCustomer>();
-    
-    String canonicalTypeString = jsonTree().getCanonicalTypeName(customers);
+
+    String canonicalTypeString = json().getCanonicalTypeName(customers);
     assertThat(canonicalTypeString).isEqualTo("java.util.ArrayList<java.lang.Object>");
   }
-  
-  @Test
-  public void shouldAllowToAddCustomTypeDetector() {
-    JsonJacksonTreeDataFormat dataFormat = jsonTree();
-    dataFormat.addTypeDetector(new MyTypeDetector());
-    
-    assertThat(dataFormat.getCanonicalTypeName(new RegularCustomer())).isEqualTo("my-type");
-  }
-  
+
   @Test
   public void shouldHandleNullParameter() {
     try {
-      jsonTree().getCanonicalTypeName(null);
+      json().getCanonicalTypeName(null);
       fail("Expected IllegalArgumentException");
     } catch (IllegalArgumentException e) {
       // happy path
     }
   }
-  
+
   @Test
   public void shouldHandleListOfLists() {
     List<List<RegularCustomer>> nestedCustomers = new ArrayList<List<RegularCustomer>>();
     List<RegularCustomer> customers = new ArrayList<RegularCustomer>();
     customers.add(new RegularCustomer());
     nestedCustomers.add(customers);
-    
-    String canonicalTypeString = jsonTree().getCanonicalTypeName(nestedCustomers);
+
+    String canonicalTypeString = json().getCanonicalTypeName(nestedCustomers);
     assertThat(canonicalTypeString).isEqualTo("java.util.ArrayList<java.util.ArrayList<org.camunda.spin.json.mapping.RegularCustomer>>");
   }
-  
-  @Test
-  public void shouldPassTypeDetectorsToNewInstance() {
-    JsonJacksonTreeDataFormat dataFormat = jsonTree();
-    dataFormat.addTypeDetector(new MyTypeDetector());
-    
-    JsonJacksonTreeDataFormat newDataFormat = dataFormat.newInstance();
-    
-    assertThat(newDataFormat.getCanonicalTypeName(new RegularCustomer())).isEqualTo("my-type");
-  }
 
-  private class MyTypeDetector extends AbstractJsonJacksonTypeDetector {
-
-    public boolean canHandle(Object object) {
-      return true;
-    }
-
-    public String detectType(Object object) {
-      return "my-type";
-    }
-    
-  }
-  
 }

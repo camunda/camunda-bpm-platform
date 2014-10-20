@@ -32,8 +32,8 @@ public abstract class SpinJsonNode extends Spin<SpinJsonNode> {
    *
    * @param searchObject Object for which the index should be searched.
    * @return {@link Integer} index of searchObject.
-   * @throws SpinJsonTreeNodeException if the current node is not an array.
-   * @throws SpinJsonTreePropertyException if object is not found.
+   * @throws SpinJsonException if the current node is not an array.
+   * @throws SpinJsonPropertyException if object is not found.
    */
   public abstract Integer indexOf(Object searchObject);
 
@@ -42,7 +42,7 @@ public abstract class SpinJsonNode extends Spin<SpinJsonNode> {
    *
    * @param searchObject Object for which the index should be searched.
    * @return {@link Integer} index of searchObject or -1 if object not found.
-   * @throws SpinJsonTreeNodeException if the current node is not an array.
+   * @throws SpinJsonException if the current node is not an array.
    */
   public abstract Integer lastIndexOf(Object searchObject);
 
@@ -323,5 +323,5 @@ public abstract class SpinJsonNode extends Spin<SpinJsonNode> {
    * @param expression the JsonPath expression
    * @return the JsonPath query
    */
-  public abstract SpinJsonTreePathQuery jsonPath(String expression);
+  public abstract SpinJsonPathQuery jsonPath(String expression);
 }

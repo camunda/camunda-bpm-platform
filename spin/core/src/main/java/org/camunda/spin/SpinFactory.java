@@ -12,8 +12,6 @@
  */
 package org.camunda.spin;
 
-import java.io.InputStream;
-
 import org.camunda.spin.impl.SpinFactoryImpl;
 import org.camunda.spin.spi.DataFormat;
 
@@ -24,37 +22,13 @@ import org.camunda.spin.spi.DataFormat;
  */
 public abstract class SpinFactory {
 
-  protected static SpinFactory INSTANCE;
-
-  public static SpinFactory getInstance() {
-    if(INSTANCE == null) {
-      synchronized (SpinFactory.class) {
-        if(INSTANCE == null) {
-          INSTANCE = new SpinFactoryImpl();
-        }
-      }
-    }
-    return INSTANCE;
-  }
+  /**
+   * The singleton instance of the SpinFactory.
+   */
+  public static SpinFactory INSTANCE = new SpinFactoryImpl();
 
   public abstract <T extends Spin<?>> T createSpin(Object parameter);
 
-  public abstract <T extends Spin<?>> T createSpinFromSpin(T parameter);
-
-  public abstract <T extends Spin<?>> T createSpinFromString(String parameter);
-
-  public abstract <T extends Spin<?>> T createSpinFromStream(InputStream parameter);
-
-
   public abstract <T extends Spin<?>> T createSpin(Object parameter, DataFormat<T> format);
-
-  public abstract <T extends Spin<?>> T createSpinFromSpin(T parameter, DataFormat<T> format);
-
-  public abstract <T extends Spin<?>> T createSpinFromString(String parameter, DataFormat<T> format);
-
-  public abstract <T extends Spin<?> > T createSpinFromStream(InputStream parameter, DataFormat<T> format);
-
-  public abstract <T extends Spin<?>> T createSpinFromObject(Object parameter, DataFormat<T> format);
-
 
 }

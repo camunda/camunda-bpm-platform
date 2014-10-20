@@ -20,51 +20,53 @@ import java.io.InputStream;
 
 import org.camunda.spin.impl.util.SpinIoUtil;
 import org.camunda.spin.impl.util.RewindableInputStream;
-import org.camunda.spin.impl.xml.dom.XmlDomDataFormatReader;
+import org.camunda.spin.impl.xml.dom.format.DomXmlDataFormat;
+import org.camunda.spin.impl.xml.dom.format.DomXmlDataFormatReader;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 public class XmlDomDataFormatReaderTest {
-  
-  private XmlDomDataFormatReader reader;
+
+  private DomXmlDataFormatReader reader;
   private RewindableInputStream stream;
-  
+
   private static final int REWINDING_LIMIT = 256;
-  
+
   @Before
   public void setUp() {
-    reader = new XmlDomDataFormatReader();
+    DomXmlDataFormat domXmlDataFormat = new DomXmlDataFormat();
+    reader = domXmlDataFormat.getReader();
   }
-  
+
   @Test
   public void shouldMatchXmlInput() throws IOException {
     stream = stringToStream(EXAMPLE_XML);
     assertThat(reader.canRead(stream)).isTrue();
     stream.close();
   }
-  
+
   @Test
   public void shouldMatchXmlInputWithWhitespace() throws IOException {
     stream = stringToStream("   " + EXAMPLE_XML);
     assertThat(reader.canRead(stream)).isTrue();
     stream.close();
-    
+
     stream = stringToStream("\r\n\t   " + EXAMPLE_XML);
     assertThat(reader.canRead(stream)).isTrue();
   }
-  
+
   @Test
   public void shouldNotMatchInvalidXml() throws IOException {
     stream = stringToStream("prefix " + EXAMPLE_XML);
     assertThat(reader.canRead(stream)).isFalse();
   }
-  
+
   public RewindableInputStream stringToStream(String input) {
     InputStream stream = SpinIoUtil.stringAsInputStream(input);
     return new RewindableInputStream(stream, REWINDING_LIMIT);
   }
-  
+
   @After
   public void tearDown() throws IOException {
     if (stream != null) {

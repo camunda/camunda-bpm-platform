@@ -17,9 +17,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.spin.json.JsonTestConstants.EXAMPLE_JSON;
 
 import org.camunda.spin.SpinList;
+import org.camunda.spin.impl.test.Script;
+import org.camunda.spin.impl.test.ScriptTest;
 import org.camunda.spin.json.SpinJsonNode;
-import org.camunda.spin.test.Script;
-import org.camunda.spin.test.ScriptTest;
 import org.junit.Test;
 
 public abstract class JsonTreeMapObjectToJsonScriptTest extends ScriptTest {

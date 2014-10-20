@@ -21,19 +21,19 @@ import org.camunda.spin.Spin;
  */
 public interface DataFormat<T extends Spin<?>> {
 
+  String getName();
+
   Class<? extends T> getWrapperType();
 
   T createWrapperInstance(Object parameter);
 
-  String getName();
-
-  DataFormat<T> newInstance();
-
   DataFormatReader getReader();
 
+  DataFormatWriter getWriter();
+
+  /**
+   * @return the DataFormatMapper used by this data format
+   */
   DataFormatMapper getMapper();
 
-  String getCanonicalTypeName(Object object);
-
-  void addTypeDetector(TypeDetector typeDetector);
 }

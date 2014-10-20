@@ -13,7 +13,7 @@
 package org.camunda.spin.json.tree;
 
 import org.camunda.spin.json.SpinJsonNode;
-import org.camunda.spin.json.SpinJsonTreePropertyException;
+import org.camunda.spin.json.SpinJsonPropertyException;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -356,7 +356,7 @@ public class JsonTreeSetPropertyTest {
     try {
       jsonNode.prop("test", map);
       fail("Expected SpinJsonTreePropertyException");
-    } catch(SpinJsonTreePropertyException e) {
+    } catch(SpinJsonPropertyException e) {
       // expected
     }
   }
@@ -370,7 +370,7 @@ public class JsonTreeSetPropertyTest {
     try {
       jsonNode.prop("test", list);
       fail("Expected SpinJsonTreePropertyException");
-    } catch(SpinJsonTreePropertyException e) {
+    } catch(SpinJsonPropertyException e) {
       // expected
     }
   }

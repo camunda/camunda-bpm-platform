@@ -13,6 +13,8 @@
 
 package org.camunda.spin.test;
 
+import org.camunda.spin.impl.test.ScriptEngine;
+
 /**
  * @author Sebastian Menski
  */

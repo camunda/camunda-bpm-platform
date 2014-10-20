@@ -13,9 +13,9 @@
 
 package org.camunda.spin.javascript.xml.dom;
 
-import org.camunda.spin.test.Script;
-import org.camunda.spin.test.ScriptEngine;
-import org.camunda.spin.test.ScriptVariable;
+import org.camunda.spin.impl.test.Script;
+import org.camunda.spin.impl.test.ScriptEngine;
+import org.camunda.spin.impl.test.ScriptVariable;
 import org.camunda.spin.xml.dom.XmlDomElementScriptTest;
 import org.junit.Test;
 

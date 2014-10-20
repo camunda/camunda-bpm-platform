@@ -12,7 +12,7 @@
  */
 package org.camunda.spin.ruby.xml.dom;
 
-import org.camunda.spin.test.ScriptEngine;
+import org.camunda.spin.impl.test.ScriptEngine;
 import org.camunda.spin.xml.dom.XmlDomCreateScriptTest;
 
 /**

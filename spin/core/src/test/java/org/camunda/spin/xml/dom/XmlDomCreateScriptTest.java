@@ -12,10 +12,10 @@
  */
 package org.camunda.spin.xml.dom;
 
-import org.camunda.spin.test.Script;
-import org.camunda.spin.test.ScriptTest;
-import org.camunda.spin.test.ScriptVariable;
-import org.camunda.spin.xml.tree.SpinXmlTreeElement;
+import org.camunda.spin.impl.test.Script;
+import org.camunda.spin.impl.test.ScriptTest;
+import org.camunda.spin.impl.test.ScriptVariable;
+import org.camunda.spin.xml.SpinXmlElement;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -32,13 +32,13 @@ public abstract class XmlDomCreateScriptTest extends ScriptTest {
   @ScriptVariable(name="input", value = "<root/>")
   public void shouldCreateForString() {
 
-    SpinXmlTreeElement xml1 = script.getVariable("xml1");
+    SpinXmlElement xml1 = script.getVariable("xml1");
     assertThat(xml1).isNotNull();
 
-    SpinXmlTreeElement xml2 = script.getVariable("xml2");
+    SpinXmlElement xml2 = script.getVariable("xml2");
     assertThat(xml2).isNotNull();
 
-    SpinXmlTreeElement xml3 = script.getVariable("xml3");
+    SpinXmlElement xml3 = script.getVariable("xml3");
     assertThat(xml3).isNotNull();
 
   }
@@ -53,13 +53,13 @@ public abstract class XmlDomCreateScriptTest extends ScriptTest {
   )
   public void shouldCreateForInputStream() {
 
-    SpinXmlTreeElement xml1 = script.getVariable("xml1");
+    SpinXmlElement xml1 = script.getVariable("xml1");
     assertThat(xml1).isNotNull();
 
-    SpinXmlTreeElement xml2 = script.getVariable("xml2");
+    SpinXmlElement xml2 = script.getVariable("xml2");
     assertThat(xml2).isNotNull();
 
-    SpinXmlTreeElement xml3 = script.getVariable("xml3");
+    SpinXmlElement xml3 = script.getVariable("xml3");
     assertThat(xml3).isNotNull();
 
   }
@@ -69,7 +69,7 @@ public abstract class XmlDomCreateScriptTest extends ScriptTest {
   @ScriptVariable(name="input", file = EXAMPLE_XML_FILE_NAME)
   public void shouldBeIdempotent() {
 
-    SpinXmlTreeElement xml = script.getVariable("xml");
+    SpinXmlElement xml = script.getVariable("xml");
     assertThat(xml).isNotNull();
 
   }

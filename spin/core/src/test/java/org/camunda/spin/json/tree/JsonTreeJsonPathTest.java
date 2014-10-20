@@ -18,9 +18,9 @@ import static org.camunda.spin.Spin.JSON;
 import static org.camunda.spin.json.JsonTestConstants.EXAMPLE_JSON;
 
 import org.camunda.spin.SpinList;
+import org.camunda.spin.json.SpinJsonDataFormatException;
 import org.camunda.spin.json.SpinJsonNode;
-import org.camunda.spin.json.SpinJsonTreePathException;
-import org.camunda.spin.spi.SpinJsonDataFormatException;
+import org.camunda.spin.json.SpinJsonPathException;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -119,14 +119,14 @@ public class JsonTreeJsonPathTest {
     try {
       jsonNode.jsonPath("$.....").element();
       fail("Expected: SpinJsonTreePathException");
-    } catch(SpinJsonTreePathException ex) {
+    } catch(SpinJsonPathException ex) {
       // expected
     }
 
     try {
       jsonNode.jsonPath("").element();
       fail("Expected: SpinJsonTreePathException");
-    } catch(SpinJsonTreePathException ex) {
+    } catch(SpinJsonPathException ex) {
       // expected
     }
   }
@@ -136,7 +136,7 @@ public class JsonTreeJsonPathTest {
     try {
       jsonNode.jsonPath("$.order.test").element();
       fail("Expected: SpinJsonDataFormatException");
-    } catch(SpinJsonTreePathException ex) {
+    } catch(SpinJsonPathException ex) {
       // expected
     }
   }
@@ -265,7 +265,7 @@ public class JsonTreeJsonPathTest {
     }
   }
 
-  @Test(expected = SpinJsonTreePathException.class)
+  @Test(expected = SpinJsonPathException.class)
   public void failOnNonExistingJsonPath() {
     SpinJsonNode json = JSON("{\"a\": {\"id\": \"a\"}, \"b\": {\"id\": \"b\"}}");
     json.jsonPath("$.c?(@.id)").element();

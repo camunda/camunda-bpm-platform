@@ -13,12 +13,12 @@
 package org.camunda.spin.json.tree;
 
 import org.camunda.spin.Spin;
+import org.camunda.spin.impl.test.Script;
+import org.camunda.spin.impl.test.ScriptTest;
+import org.camunda.spin.impl.test.ScriptVariable;
+import org.camunda.spin.json.SpinJsonDataFormatException;
 import org.camunda.spin.json.SpinJsonNode;
-import org.camunda.spin.json.SpinJsonTreePropertyException;
-import org.camunda.spin.spi.SpinJsonDataFormatException;
-import org.camunda.spin.test.Script;
-import org.camunda.spin.test.ScriptTest;
-import org.camunda.spin.test.ScriptVariable;
+import org.camunda.spin.json.SpinJsonPropertyException;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -154,7 +154,7 @@ public abstract class JsonTreeReadPropertyScriptTest extends ScriptTest {
    * One for not existent property
    * @throws Throwable
    */
-  @Test(expected = SpinJsonTreePropertyException.class)
+  @Test(expected = SpinJsonPropertyException.class)
   @Script(execute = false)
   @ScriptVariable(name = "input", file = EXAMPLE_JSON_FILE_NAME)
   public void shouldFailToReadProperty() throws Throwable{

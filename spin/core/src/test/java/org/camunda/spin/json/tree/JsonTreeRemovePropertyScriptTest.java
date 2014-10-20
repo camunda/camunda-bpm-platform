@@ -12,10 +12,10 @@
  */
 package org.camunda.spin.json.tree;
 
-import org.camunda.spin.json.SpinJsonTreePropertyException;
-import org.camunda.spin.test.Script;
-import org.camunda.spin.test.ScriptTest;
-import org.camunda.spin.test.ScriptVariable;
+import org.camunda.spin.impl.test.Script;
+import org.camunda.spin.impl.test.ScriptTest;
+import org.camunda.spin.impl.test.ScriptVariable;
+import org.camunda.spin.json.SpinJsonPropertyException;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -47,14 +47,14 @@ public abstract class JsonTreeRemovePropertyScriptTest extends ScriptTest {
     assertThat(value2).isFalse();
   }
 
-  @Test(expected = SpinJsonTreePropertyException.class)
+  @Test(expected = SpinJsonPropertyException.class)
   @Script(execute = false)
   @ScriptVariable(name = "input", file = EXAMPLE_JSON_FILE_NAME)
   public void shouldFailWhileRemovingPropertyByName() throws Throwable{
     failingWithException();
   }
 
-  @Test(expected = SpinJsonTreePropertyException.class)
+  @Test(expected = SpinJsonPropertyException.class)
   @Script(execute = false)
   @ScriptVariable(name = "input", file = EXAMPLE_JSON_FILE_NAME)
   public void shouldFailWhileRemovingPropertyByList() throws Throwable{

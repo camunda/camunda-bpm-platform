@@ -13,12 +13,12 @@
 package org.camunda.spin.json.tree;
 
 import org.camunda.spin.SpinList;
+import org.camunda.spin.impl.test.Script;
+import org.camunda.spin.impl.test.ScriptTest;
+import org.camunda.spin.impl.test.ScriptVariable;
+import org.camunda.spin.json.SpinJsonDataFormatException;
 import org.camunda.spin.json.SpinJsonNode;
-import org.camunda.spin.json.SpinJsonTreePathException;
-import org.camunda.spin.spi.SpinJsonDataFormatException;
-import org.camunda.spin.test.Script;
-import org.camunda.spin.test.ScriptTest;
-import org.camunda.spin.test.ScriptVariable;
+import org.camunda.spin.json.SpinJsonPathException;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -126,14 +126,14 @@ public abstract class JsonTreeJsonPathScriptTest extends ScriptTest {
     assertThat(nodeList.get(2).stringValue()).isEqualTo("Johnny");
   }
 
-  @Test(expected = SpinJsonTreePathException.class)
+  @Test(expected = SpinJsonPathException.class)
   @Script(execute = false)
   @ScriptVariable(name = "input", file = EXAMPLE_JSON_FILE_NAME)
   public void shouldFailReadingJsonPath() throws Throwable{
     failingWithException();
   }
 
-  @Test(expected = SpinJsonTreePathException.class)
+  @Test(expected = SpinJsonPathException.class)
   @Script(execute = false)
   @ScriptVariable(name = "input", file = EXAMPLE_JSON_FILE_NAME)
   public void shouldFailAccessNonExistentProperty() throws Throwable{

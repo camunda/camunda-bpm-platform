@@ -14,10 +14,10 @@
 package org.camunda.spin.xml.dom;
 
 import org.camunda.spin.impl.util.SpinIoUtil;
+import org.camunda.spin.xml.SpinXmlAttribute;
+import org.camunda.spin.xml.SpinXmlAttributeException;
+import org.camunda.spin.xml.SpinXmlElement;
 import org.camunda.spin.xml.XmlTestConstants;
-import org.camunda.spin.xml.tree.SpinXmlTreeAttribute;
-import org.camunda.spin.xml.tree.SpinXmlTreeAttributeException;
-import org.camunda.spin.xml.tree.SpinXmlTreeElement;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -31,7 +31,7 @@ import static org.camunda.spin.Spin.XML;
  */
 public class XmlDomAttributeTest {
 
-  private SpinXmlTreeAttribute attribute;
+  private SpinXmlAttribute attribute;
 
   @Before
   public void getAttribute() {
@@ -63,7 +63,7 @@ public class XmlDomAttributeTest {
     assertThat(attribute.value("order2").value()).isEqualTo("order2");
   }
 
-  @Test(expected = SpinXmlTreeAttributeException.class)
+  @Test(expected = SpinXmlAttributeException.class)
   public void setNullValue() {
     attribute.value(null);
   }
@@ -73,7 +73,7 @@ public class XmlDomAttributeTest {
     String namespace = attribute.namespace();
     String name = attribute.name();
 
-    SpinXmlTreeElement element = attribute.remove();
+    SpinXmlElement element = attribute.remove();
     assertThat(element.hasAttrNs(namespace, name)).isFalse();
   }
 

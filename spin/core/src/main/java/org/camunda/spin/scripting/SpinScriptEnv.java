@@ -13,11 +13,12 @@
 package org.camunda.spin.scripting;
 
 import org.camunda.spin.SpinScriptException;
+import org.camunda.spin.impl.logging.SpinCoreLogger;
+import org.camunda.spin.impl.logging.SpinLogger;
 import org.camunda.spin.impl.util.SpinIoUtil;
-import org.camunda.spin.logging.SpinCoreLogger;
-import org.camunda.spin.logging.SpinLogger;
 
 import javax.script.ScriptEngine;
+
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;

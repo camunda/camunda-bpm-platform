@@ -12,8 +12,8 @@
  */
 package org.camunda.spin.python.json.tree;
 
+import org.camunda.spin.impl.test.ScriptEngine;
 import org.camunda.spin.json.tree.JsonTreeCreateScriptTest;
-import org.camunda.spin.test.ScriptEngine;
 
 /**
  * @author Thorben Lindhauer

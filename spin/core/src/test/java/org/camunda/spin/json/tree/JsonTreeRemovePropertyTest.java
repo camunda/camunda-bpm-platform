@@ -13,7 +13,7 @@
 package org.camunda.spin.json.tree;
 
 import org.camunda.spin.json.SpinJsonNode;
-import org.camunda.spin.json.SpinJsonTreePropertyException;
+import org.camunda.spin.json.SpinJsonPropertyException;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -70,7 +70,7 @@ public class JsonTreeRemovePropertyTest {
     try {
       jsonNode.deleteProp("waldo");
       fail("Expected SpinJsonTreePropertyException");
-    } catch(SpinJsonTreePropertyException e) {
+    } catch(SpinJsonPropertyException e) {
       // expected
     }
   }
@@ -83,7 +83,7 @@ public class JsonTreeRemovePropertyTest {
     try {
       jsonNode.deleteProp(names);
       fail("Expected SpinJsonTreePropertyException");
-    } catch(SpinJsonTreePropertyException e) {
+    } catch(SpinJsonPropertyException e) {
       // expected
     }
   }

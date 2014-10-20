@@ -16,8 +16,8 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.regex.Pattern;
 
+import org.camunda.spin.impl.logging.SpinCoreLogger;
 import org.camunda.spin.impl.util.RewindableInputStream;
-import org.camunda.spin.logging.SpinCoreLogger;
 
 /**
  * Can be used as a base class to determine whether an input stream

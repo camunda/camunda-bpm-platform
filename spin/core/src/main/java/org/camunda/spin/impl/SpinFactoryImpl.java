@@ -15,8 +15,8 @@ package org.camunda.spin.impl;
 import org.camunda.spin.DataFormats;
 import org.camunda.spin.Spin;
 import org.camunda.spin.SpinFactory;
+import org.camunda.spin.impl.logging.SpinCoreLogger;
 import org.camunda.spin.impl.util.RewindableInputStream;
-import org.camunda.spin.logging.SpinCoreLogger;
 import org.camunda.spin.spi.DataFormat;
 import org.camunda.spin.spi.DataFormatMapper;
 import org.camunda.spin.spi.DataFormatReader;
@@ -100,7 +100,7 @@ public class SpinFactoryImpl extends SpinFactory {
     RewindableInputStream rewindableStream = new RewindableInputStream(parameter, READ_SIZE);
 
     DataFormat<T> matchingDataFormat = null;
-    for (DataFormat<?> format : DataFormats.getAvailableDataFormats()) {
+    for (DataFormat<?> format : DataFormats.getInstance().getAvailableDataFormats()) {
       if (format.getReader().canRead(rewindableStream)) {
         matchingDataFormat = (DataFormat<T>) format;
       }

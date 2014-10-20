@@ -13,13 +13,14 @@
 package org.camunda.spin.xml.dom;
 
 import java.io.InputStream;
+
 import org.camunda.spin.spi.SpinDataFormatException;
-import org.camunda.spin.xml.tree.SpinXmlTreeElement;
+import org.camunda.spin.xml.SpinXmlElement;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
-import static org.camunda.spin.DataFormats.xmlDom;
+import static org.camunda.spin.DataFormats.xml;
 import static org.camunda.spin.Spin.S;
 import static org.camunda.spin.Spin.XML;
 import static org.camunda.spin.impl.util.SpinIoUtil.stringAsInputStream;
@@ -33,10 +34,10 @@ public class XmlDomCreateTest {
 
   @Test
   public void shouldCreateForString() {
-    SpinXmlTreeElement xml = XML(EXAMPLE_XML);
+    SpinXmlElement xml = XML(EXAMPLE_XML);
     assertThat(xml).isNotNull();
 
-    xml = S(EXAMPLE_XML, xmlDom());
+    xml = S(EXAMPLE_XML, xml());
     assertThat(xml).isNotNull();
 
     xml = S(EXAMPLE_XML);
@@ -45,10 +46,10 @@ public class XmlDomCreateTest {
 
   @Test
   public void shouldCreateForInputStream() {
-    SpinXmlTreeElement xml = XML(stringAsInputStream(EXAMPLE_XML));
+    SpinXmlElement xml = XML(stringAsInputStream(EXAMPLE_XML));
     assertThat(xml).isNotNull();
 
-    xml = S(stringAsInputStream(EXAMPLE_XML), xmlDom());
+    xml = S(stringAsInputStream(EXAMPLE_XML), xml());
     assertThat(xml).isNotNull();
 
     xml = S(stringAsInputStream(EXAMPLE_XML));
@@ -57,15 +58,15 @@ public class XmlDomCreateTest {
 
   @Test
   public void shouldBeIdempotent() {
-    SpinXmlTreeElement xml = XML(EXAMPLE_XML);
+    SpinXmlElement xml = XML(EXAMPLE_XML);
     assertThat(xml).isEqualTo(XML(xml));
-    assertThat(xml).isEqualTo(S(xml, xmlDom()));
+    assertThat(xml).isEqualTo(S(xml, xml()));
     assertThat(xml).isEqualTo(S(xml));
   }
 
   @Test
   public void shouldFailForNull() {
-    SpinXmlTreeElement xmlTreeElement = null;
+    SpinXmlElement xmlTreeElement = null;
     
     try {
       XML(xmlTreeElement);
@@ -75,7 +76,7 @@ public class XmlDomCreateTest {
     }
 
     try {
-      S(xmlTreeElement, xmlDom());
+      S(xmlTreeElement, xml());
       fail("Expected IllegalArgumentException");
     } catch(IllegalArgumentException e) {
       // expected
@@ -98,7 +99,7 @@ public class XmlDomCreateTest {
     }
 
     try {
-      S(inputStream, xmlDom());
+      S(inputStream, xml());
       fail("Expected IllegalArgumentException");
     } catch(IllegalArgumentException e) {
       // expected
@@ -121,7 +122,7 @@ public class XmlDomCreateTest {
     }
 
     try {
-      S(inputString, xmlDom());
+      S(inputString, xml());
       fail("Expected IllegalArgumentException");
     } catch(IllegalArgumentException e) {
       // expected
@@ -145,7 +146,7 @@ public class XmlDomCreateTest {
     }
 
     try {
-      S(EXAMPLE_INVALID_XML, xmlDom());
+      S(EXAMPLE_INVALID_XML, xml());
       fail("Expected IllegalArgumentException");
     } catch(SpinDataFormatException e) {
       // expected
@@ -169,7 +170,7 @@ public class XmlDomCreateTest {
     }
 
     try {
-      S(EXAMPLE_EMPTY_STRING, xmlDom());
+      S(EXAMPLE_EMPTY_STRING, xml());
       fail("Expected IllegalArgumentException");
     } catch(SpinDataFormatException e) {
       // expected
@@ -193,7 +194,7 @@ public class XmlDomCreateTest {
     }
 
     try {
-      S(stringAsInputStream(EXAMPLE_EMPTY_STRING), xmlDom());
+      S(stringAsInputStream(EXAMPLE_EMPTY_STRING), xml());
       fail("Expected IllegalArgumentException");
     } catch(SpinDataFormatException e) {
       // expected

@@ -15,10 +15,10 @@ package org.camunda.spin.xml.dom;
 
 import org.camunda.spin.SpinList;
 import org.camunda.spin.impl.util.SpinIoUtil;
-import org.camunda.spin.xml.tree.SpinXmlTreeAttribute;
-import org.camunda.spin.xml.tree.SpinXmlTreeAttributeException;
-import org.camunda.spin.xml.tree.SpinXmlTreeElement;
-import org.camunda.spin.xml.tree.SpinXmlTreeElementException;
+import org.camunda.spin.xml.SpinXmlAttribute;
+import org.camunda.spin.xml.SpinXmlAttributeException;
+import org.camunda.spin.xml.SpinXmlElement;
+import org.camunda.spin.xml.SpinXmlElementException;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -38,7 +38,7 @@ import static org.camunda.spin.xml.XmlTestConstants.*;
  */
 public class XmlDomElementTest {
 
-  protected SpinXmlTreeElement element;
+  protected SpinXmlElement element;
 
   @Before
   public void parseXml() {
@@ -97,12 +97,12 @@ public class XmlDomElementTest {
 
   @Test
   public void canReadAttributeByName() {
-    SpinXmlTreeAttribute attribute = element.attr("order");
+    SpinXmlAttribute attribute = element.attr("order");
     String value = attribute.value();
     assertThat(value).isEqualTo("order1");
   }
 
-  @Test(expected = SpinXmlTreeAttributeException.class)
+  @Test(expected = SpinXmlAttributeException.class)
   public void cannotReadAttributeByNonExistingName() {
     element.attr(NON_EXISTING);
   }
@@ -114,24 +114,24 @@ public class XmlDomElementTest {
 
   @Test
   public void canReadAttributeByNamespaceAndName() {
-    SpinXmlTreeAttribute attribute = element.attrNs(EXAMPLE_NAMESPACE, "dueUntil");
+    SpinXmlAttribute attribute = element.attrNs(EXAMPLE_NAMESPACE, "dueUntil");
     String value = attribute.value();
     assertThat(value).isEqualTo("20150112");
   }
 
   @Test
   public void canReadAttributeByNullNamespaceAndName() {
-    SpinXmlTreeAttribute attribute = element.attrNs(null, "order");
+    SpinXmlAttribute attribute = element.attrNs(null, "order");
     String value = attribute.value();
     assertThat(value).isEqualTo("order1");
   }
 
-  @Test(expected = SpinXmlTreeAttributeException.class)
+  @Test(expected = SpinXmlAttributeException.class)
   public void cannotReadAttributeByNonExistingNamespaceAndName() {
     element.attrNs(NON_EXISTING, "order");
   }
 
-  @Test(expected = SpinXmlTreeAttributeException.class)
+  @Test(expected = SpinXmlAttributeException.class)
   public void cannotReadAttributeByNamespaceAndNonExistingName() {
     element.attrNs(EXAMPLE_NAMESPACE, NON_EXISTING);
   }
@@ -141,7 +141,7 @@ public class XmlDomElementTest {
     element.attrNs(EXAMPLE_NAMESPACE, null);
   }
 
-  @Test(expected = SpinXmlTreeAttributeException.class)
+  @Test(expected = SpinXmlAttributeException.class)
   public void cannotReadAttributeByNonExistingNamespaceAndNonExistingName() {
     element.attrNs(NON_EXISTING, NON_EXISTING);
   }
@@ -255,17 +255,17 @@ public class XmlDomElementTest {
 
   @Test
   public void canGetAllAttributes() {
-    SpinList<SpinXmlTreeAttribute> attributes = element.attrs();
+    SpinList<SpinXmlAttribute> attributes = element.attrs();
     assertThat(attributes).hasSize(4);
-    for (SpinXmlTreeAttribute attribute : attributes) {
+    for (SpinXmlAttribute attribute : attributes) {
       assertThat(attribute.name()).isIn("order", "dueUntil", "xmlns", "ex");
     }
   }
 
   @Test
   public void canGetAllAttributesByNamespace() {
-    SpinList<SpinXmlTreeAttribute> attributes = element.attrs(EXAMPLE_NAMESPACE);
-    for (SpinXmlTreeAttribute attribute : attributes) {
+    SpinList<SpinXmlAttribute> attributes = element.attrs(EXAMPLE_NAMESPACE);
+    for (SpinXmlAttribute attribute : attributes) {
       assertThat(attribute.name()).isIn("order", "dueUntil");
       assertThat(attribute.value()).isIn("order1", "20150112");
       assertThat(attribute.namespace()).isEqualTo(EXAMPLE_NAMESPACE);
@@ -274,8 +274,8 @@ public class XmlDomElementTest {
 
   @Test
   public void canGetAllAttributesByNullNamespace() {
-    SpinList<SpinXmlTreeAttribute> attributes = element.attrs(null);
-    for (SpinXmlTreeAttribute attribute : attributes) {
+    SpinList<SpinXmlAttribute> attributes = element.attrs(null);
+    for (SpinXmlAttribute attribute : attributes) {
       assertThat(attribute.name()).isIn("order", "dueUntil");
       assertThat(attribute.value()).isIn("order1", "20150112");
       assertThat(attribute.namespace()).isNull();
@@ -284,7 +284,7 @@ public class XmlDomElementTest {
 
   @Test
   public void canGetAllAttributesByNonExistingNamespace() {
-    SpinList<SpinXmlTreeAttribute> attributes = element.attrs(NON_EXISTING);
+    SpinList<SpinXmlAttribute> attributes = element.attrs(NON_EXISTING);
     assertThat(attributes).isEmpty();
   }
 
@@ -318,12 +318,12 @@ public class XmlDomElementTest {
 
   @Test
   public void canGetSingleChildElementByName() {
-    SpinXmlTreeElement childElement = element.childElement("date");
+    SpinXmlElement childElement = element.childElement("date");
     assertThat(childElement).isNotNull();
     assertThat(childElement.attr("name").value()).isEqualTo("20140512");
   }
 
-  @Test(expected = SpinXmlTreeElementException.class)
+  @Test(expected = SpinXmlElementException.class)
   public void cannotGetSingleChildElementByNonExistingName() {
     element.childElement(NON_EXISTING);
   }
@@ -335,18 +335,18 @@ public class XmlDomElementTest {
 
   @Test
   public void canGetSingleChildElementByNamespaceAndName() {
-    SpinXmlTreeElement childElement = element.childElement(EXAMPLE_NAMESPACE, "date");
+    SpinXmlElement childElement = element.childElement(EXAMPLE_NAMESPACE, "date");
     assertThat(childElement).isNotNull();
     assertThat(childElement.attr("name").value()).isEqualTo("20140512");
   }
 
   @Test
   public void canGetSingleChildElementByNullNamespaceAndName() {
-    SpinXmlTreeElement childElement = element.childElement(null, "file");
+    SpinXmlElement childElement = element.childElement(null, "file");
     assertThat(childElement).isNotNull();
   }
 
-  @Test(expected = SpinXmlTreeElementException.class)
+  @Test(expected = SpinXmlElementException.class)
   public void cannotGetChildElementByNamespaceAndNonExistingName() {
     element.childElement(EXAMPLE_NAMESPACE, NON_EXISTING);
   }
@@ -356,12 +356,12 @@ public class XmlDomElementTest {
     element.childElement(EXAMPLE_NAMESPACE, null);
   }
 
-  @Test(expected = SpinXmlTreeElementException.class)
+  @Test(expected = SpinXmlElementException.class)
   public void cannotGetChildElementByNonExistingNamespaceAndName() {
     element.childElement(NON_EXISTING, "date");
   }
 
-  @Test(expected = SpinXmlTreeElementException.class)
+  @Test(expected = SpinXmlElementException.class)
   public void cannotGetChildElementByNonExistingNamespaceAndNonExistingName() {
     element.childElement(NON_EXISTING, NON_EXISTING);
   }
@@ -375,7 +375,7 @@ public class XmlDomElementTest {
 
   @Test
   public void canAppendChildElement() {
-    SpinXmlTreeElement child = XML("<child/>");
+    SpinXmlElement child = XML("<child/>");
     element = element.append(child);
 
     child.attr("id", "child");
@@ -387,7 +387,7 @@ public class XmlDomElementTest {
 
   @Test
   public void canAppendChildElementWithNamespace() {
-    SpinXmlTreeElement child = XML("<child xmlns=\"" + EXAMPLE_NAMESPACE + "\"/>");
+    SpinXmlElement child = XML("<child xmlns=\"" + EXAMPLE_NAMESPACE + "\"/>");
     element = element.append(child);
 
     child.attr("id", "child");
@@ -399,9 +399,9 @@ public class XmlDomElementTest {
 
   @Test
   public void canAppendMultipleChildElements() {
-    SpinXmlTreeElement child1 = XML("<child/>");
-    SpinXmlTreeElement child2 = XML("<child/>");
-    SpinXmlTreeElement child3 = XML("<child/>");
+    SpinXmlElement child1 = XML("<child/>");
+    SpinXmlElement child2 = XML("<child/>");
+    SpinXmlElement child3 = XML("<child/>");
 
     element = element.append(child1, child2, child3);
 
@@ -409,10 +409,10 @@ public class XmlDomElementTest {
     child2.attr("id", "child");
     child3.attr("id", "child");
 
-    SpinList<SpinXmlTreeElement> childs = element.childElements(null, "child");
+    SpinList<SpinXmlElement> childs = element.childElements(null, "child");
     assertThat(childs).hasSize(3);
 
-    for (SpinXmlTreeElement childElement : childs) {
+    for (SpinXmlElement childElement : childs) {
       assertThat(childElement).isNotNull();
       assertThat(childElement.attr("id").value()).isEqualTo("child");
     }
@@ -420,65 +420,65 @@ public class XmlDomElementTest {
 
   @Test
   public void canAppendChildElementCollection() {
-    Collection<SpinXmlTreeElement> childElements = new ArrayList<SpinXmlTreeElement>();
+    Collection<SpinXmlElement> childElements = new ArrayList<SpinXmlElement>();
     childElements.add(XML("<child/>"));
     childElements.add(XML("<child/>"));
     childElements.add(XML("<child/>"));
 
     element = element.append(childElements);
 
-    SpinList<SpinXmlTreeElement> childs = element.childElements(null, "child");
+    SpinList<SpinXmlElement> childs = element.childElements(null, "child");
     assertThat(childs).hasSize(3);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void cannotAppendNullChildElements() {
-    element.append((SpinXmlTreeElement[]) null);
+    element.append((SpinXmlElement[]) null);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void cannotAppendNullChildElement() {
-    SpinXmlTreeElement child = XML("<child/>");
+    SpinXmlElement child = XML("<child/>");
     element.append(child, null);
   }
 
   @Test
   public void canAppendChildElementBeforeExistingElement() {
-    SpinXmlTreeElement child = XML("<child/>");
-    SpinXmlTreeElement date = element.childElement("date");
+    SpinXmlElement child = XML("<child/>");
+    SpinXmlElement date = element.childElement("date");
     element.appendBefore(child, date);
-    SpinXmlTreeElement insertedElement = element.childElements().get(0);
+    SpinXmlElement insertedElement = element.childElements().get(0);
     assertThat(insertedElement.name()).isEqualTo("child");
   }
 
-  @Test(expected = SpinXmlTreeElementException.class)
+  @Test(expected = SpinXmlElementException.class)
   public void cannotAppendChildElementBeforeNonChildElement() {
-    SpinXmlTreeElement child = XML("<child/>");
+    SpinXmlElement child = XML("<child/>");
     element.appendBefore(child, child);
   }
 
   @Test
   public void canAppendChildElementAfterExistingElement() {
-    SpinXmlTreeElement child = XML("<child/>");
-    SpinXmlTreeElement date = element.childElement("date");
+    SpinXmlElement child = XML("<child/>");
+    SpinXmlElement date = element.childElement("date");
     element.appendAfter(child, date);
-    SpinXmlTreeElement insertedElement = element.childElements().get(1);
+    SpinXmlElement insertedElement = element.childElements().get(1);
     assertThat(insertedElement.name()).isEqualTo("child");
   }
 
   @Test
   public void canAppendChildElementAfterLastChildElement() {
-    SpinXmlTreeElement child = XML("<child/>");
+    SpinXmlElement child = XML("<child/>");
     int childCount = element.childElements().size();
-    SpinXmlTreeElement lastChildElement = element.childElements().get(childCount - 1);
+    SpinXmlElement lastChildElement = element.childElements().get(childCount - 1);
     element.appendAfter(child, lastChildElement);
-    SpinXmlTreeElement insertedElement = element.childElements().get(childCount);
+    SpinXmlElement insertedElement = element.childElements().get(childCount);
     assertThat(insertedElement.name()).isEqualTo("child");
   }
 
-  @Test(expected = SpinXmlTreeElementException.class)
+  @Test(expected = SpinXmlElementException.class)
   public void cannotAppendChildElementAfterNonChildElement() {
-    SpinXmlTreeElement child = XML("<child/>");
+    SpinXmlElement child = XML("<child/>");
     element.appendAfter(child, child);
   }
 
@@ -486,7 +486,7 @@ public class XmlDomElementTest {
 
   @Test
   public void canRemoveAChildElement() {
-    SpinXmlTreeElement child = XML("<child/>");
+    SpinXmlElement child = XML("<child/>");
     element.append(child);
 
     assertThat(element.childElement(null, "child")).isNotNull();
@@ -497,22 +497,22 @@ public class XmlDomElementTest {
       assertThat(element.childElement(null, "child"));
       fail("Child element should be removed");
     } catch (Exception e) {
-      assertThat(e).isInstanceOf(SpinXmlTreeElementException.class);
+      assertThat(e).isInstanceOf(SpinXmlElementException.class);
     }
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void cannotRemoveANullChildElement() {
-    SpinXmlTreeElement child = XML("<child/>");
+    SpinXmlElement child = XML("<child/>");
     element.append(child);
 
     element.remove(child, null);
   }
 
-  @Test(expected = SpinXmlTreeElementException.class)
+  @Test(expected = SpinXmlElementException.class)
   public void cannotRemoveNonChildElement() {
-    SpinXmlTreeElement child1 = XML("<child/>");
-    SpinXmlTreeElement child2 = XML("<child/>");
+    SpinXmlElement child1 = XML("<child/>");
+    SpinXmlElement child2 = XML("<child/>");
 
     element.append(child1);
 
@@ -521,9 +521,9 @@ public class XmlDomElementTest {
 
   @Test
   public void canRemoveMultipleChildElements() {
-    SpinXmlTreeElement child1 = XML("<child/>");
-    SpinXmlTreeElement child2 = XML("<child/>");
-    SpinXmlTreeElement child3 = XML("<child/>");
+    SpinXmlElement child1 = XML("<child/>");
+    SpinXmlElement child2 = XML("<child/>");
+    SpinXmlElement child3 = XML("<child/>");
     element.append(child1, child2, child3);
 
     assertThat(element.childElements(null, "child")).hasSize(3);
@@ -534,15 +534,15 @@ public class XmlDomElementTest {
       assertThat(element.childElements(null, "child"));
       fail("Child element should be removed");
     } catch (Exception e) {
-      assertThat(e).isInstanceOf(SpinXmlTreeElementException.class);
+      assertThat(e).isInstanceOf(SpinXmlElementException.class);
     }
   }
 
   @Test
   public void canRemoveChildElementCollection() {
-    SpinXmlTreeElement child1 = XML("<child/>");
-    SpinXmlTreeElement child2 = XML("<child/>");
-    SpinXmlTreeElement child3 = XML("<child/>");
+    SpinXmlElement child1 = XML("<child/>");
+    SpinXmlElement child2 = XML("<child/>");
+    SpinXmlElement child3 = XML("<child/>");
     element.append(child1, child2, child3);
 
     assertThat(element.childElements(null, "child")).hasSize(3);
@@ -553,31 +553,31 @@ public class XmlDomElementTest {
       assertThat(element.childElements(null, "child"));
       fail("Child element should be removed");
     } catch (Exception e) {
-      assertThat(e).isInstanceOf(SpinXmlTreeElementException.class);
+      assertThat(e).isInstanceOf(SpinXmlElementException.class);
     }
 
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void cannotRemoveNullChildElements() {
-    element.remove((SpinXmlTreeElement[]) null);
+    element.remove((SpinXmlElement[]) null);
   }
 
   // get child elements
 
   @Test
   public void canGetAllChildElements() {
-    SpinList<SpinXmlTreeElement> childElements = element.childElements();
+    SpinList<SpinXmlElement> childElements = element.childElements();
     assertThat(childElements).hasSize(7);
   }
 
   @Test
   public void canGetAllChildElementsByName() {
-    SpinList<SpinXmlTreeElement> childElements = element.childElements("customer");
+    SpinList<SpinXmlElement> childElements = element.childElements("customer");
     assertThat(childElements).hasSize(3);
   }
 
-  @Test(expected = SpinXmlTreeElementException.class)
+  @Test(expected = SpinXmlElementException.class)
   public void cannotGetAllChildElementsByNonExistingName() {
     element.childElements(NON_EXISTING);
   }
@@ -589,22 +589,22 @@ public class XmlDomElementTest {
 
   @Test
   public void canGetAllChildElementsByNamespaceAndName() {
-    SpinList<SpinXmlTreeElement> childElements = element.childElements(EXAMPLE_NAMESPACE, "customer");
+    SpinList<SpinXmlElement> childElements = element.childElements(EXAMPLE_NAMESPACE, "customer");
     assertThat(childElements).hasSize(3);
   }
 
   @Test
   public void canGetAllChildElementsByNullNamespaceAndName() {
-    SpinList<SpinXmlTreeElement> childElements = element.childElements(null, "info");
+    SpinList<SpinXmlElement> childElements = element.childElements(null, "info");
     assertThat(childElements).hasSize(2);
   }
 
-  @Test(expected = SpinXmlTreeElementException.class)
+  @Test(expected = SpinXmlElementException.class)
   public void cannotGetAllChildElementsByNonExistingNamespaceAndName() {
     element.childElements(NON_EXISTING, "customer");
   }
 
-  @Test(expected = SpinXmlTreeElementException.class)
+  @Test(expected = SpinXmlElementException.class)
   public void cannotGetAllChildElementsByNamespaceAndNonExistingName() {
     element.childElements(EXAMPLE_NAMESPACE, NON_EXISTING);
   }
@@ -614,7 +614,7 @@ public class XmlDomElementTest {
     element.childElements(EXAMPLE_NAMESPACE, null);
   }
 
-  @Test(expected = SpinXmlTreeElementException.class)
+  @Test(expected = SpinXmlElementException.class)
   public void cannotGetAllChildElementsByNonExistingNamespaceAndNonExistingName() {
     element.childElements(NON_EXISTING, NON_EXISTING);
   }
@@ -628,8 +628,8 @@ public class XmlDomElementTest {
 
   @Test
   public void canReplaceAChildElement() {
-    SpinXmlTreeElement child = XML("<child/>");
-    SpinXmlTreeElement date = element.childElement("date");
+    SpinXmlElement child = XML("<child/>");
+    SpinXmlElement date = element.childElement("date");
     assertThat(date).isNotNull();
 
     element.replaceChild(date, child);
@@ -638,26 +638,26 @@ public class XmlDomElementTest {
     try {
       element.childElement("date");
     } catch (Exception e) {
-      assertThat(e).isInstanceOf(SpinXmlTreeElementException.class);
+      assertThat(e).isInstanceOf(SpinXmlElementException.class);
     }
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void cannotReplaceANullChildElement() {
-    SpinXmlTreeElement child = XML("<child/>");
+    SpinXmlElement child = XML("<child/>");
     element.replaceChild(null, child);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void cannotReplaceByANullChildElement() {
-    SpinXmlTreeElement date = element.childElement("date");
+    SpinXmlElement date = element.childElement("date");
     element.replaceChild(date, null);
   }
 
-  @Test(expected = SpinXmlTreeElementException.class)
+  @Test(expected = SpinXmlElementException.class)
   public void cannotReplaceANonChildElement() {
-    SpinXmlTreeElement child = XML("<child/>");
-    SpinXmlTreeElement nonChild = XML("<child/>");
+    SpinXmlElement child = XML("<child/>");
+    SpinXmlElement nonChild = XML("<child/>");
     element.replaceChild(nonChild, child);
   }
 
@@ -666,8 +666,8 @@ public class XmlDomElementTest {
 
   @Test
   public void canReplaceAElement() {
-    SpinXmlTreeElement child = XML("<child/>");
-    SpinXmlTreeElement date = element.childElement("date");
+    SpinXmlElement child = XML("<child/>");
+    SpinXmlElement date = element.childElement("date");
     assertThat(date).isNotNull();
 
     date.replace(child);
@@ -676,13 +676,13 @@ public class XmlDomElementTest {
     try {
       element.childElement("date");
     } catch (Exception e) {
-      assertThat(e).isInstanceOf(SpinXmlTreeElementException.class);
+      assertThat(e).isInstanceOf(SpinXmlElementException.class);
     }
   }
 
   @Test
   public void canReplaceRootElement() {
-    SpinXmlTreeElement root = XML("<root/>");
+    SpinXmlElement root = XML("<root/>");
     assertThat(element.name()).isEqualTo("customers");
     assertThat(element.childElements()).isNotEmpty();
     element = element.replace(root);
@@ -728,7 +728,7 @@ public class XmlDomElementTest {
   public void canWriteToStreamAndReadAgain() {
     OutputStream outputStream = element.toStream();
     InputStream inputStream = SpinIoUtil.convertOutputStreamToInputStream(outputStream);
-    SpinXmlTreeElement xml = XML(inputStream);
+    SpinXmlElement xml = XML(inputStream);
     assertThat(xml).isNotNull();
     assertThat(xml.childElements()).isNotEmpty();
   }

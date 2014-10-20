@@ -20,6 +20,14 @@ package org.camunda.spin.spi;
 public interface DataFormatMapper {
 
   /**
+   * Returns true if this mapper can map the provided Java Object.
+   *
+   * @param parameter the java object to check
+   * @return true if this object can be mapped.
+   */
+  public boolean canMap(Object parameter);
+
+  /**
    * Maps a java object to a data format's internal data representation.
    *
    * @param parameter object that is mapped
@@ -51,4 +59,6 @@ public interface DataFormatMapper {
    *   parameter
    */
   public <T> T mapInternalToJava(Object parameter, String typeIdentifier);
+
+  String getCanonicalTypeName(Object object);
 }

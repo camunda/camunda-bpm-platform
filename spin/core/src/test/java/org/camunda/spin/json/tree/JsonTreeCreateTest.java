@@ -14,8 +14,8 @@ package org.camunda.spin.json.tree;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
-import static org.camunda.spin.DataFormats.jsonTree;
-import static org.camunda.spin.DataFormats.xmlDom;
+import static org.camunda.spin.DataFormats.json;
+import static org.camunda.spin.DataFormats.xml;
 import static org.camunda.spin.Spin.JSON;
 import static org.camunda.spin.Spin.S;
 import static org.camunda.spin.Spin.XML;
@@ -41,7 +41,7 @@ public class JsonTreeCreateTest {
     SpinJsonNode json = JSON(EXAMPLE_JSON);
     assertThat(json).isNotNull();
 
-    json = S(EXAMPLE_JSON, jsonTree());
+    json = S(EXAMPLE_JSON, json());
     assertThat(json).isNotNull();
 
     json = S(EXAMPLE_JSON);
@@ -60,7 +60,7 @@ public class JsonTreeCreateTest {
     SpinJsonNode json = JSON(stringAsInputStream(EXAMPLE_JSON));
     assertThat(json).isNotNull();
 
-    json = S(stringAsInputStream(EXAMPLE_JSON), jsonTree());
+    json = S(stringAsInputStream(EXAMPLE_JSON), json());
     assertThat(json).isNotNull();
 
     json = S(stringAsInputStream(EXAMPLE_JSON));
@@ -71,7 +71,7 @@ public class JsonTreeCreateTest {
   public void shouldBeIdempotent() {
     SpinJsonNode json = JSON(EXAMPLE_JSON);
     assertThat(json).isEqualTo(JSON(json));
-    assertThat(json).isEqualTo(S(json, jsonTree()));
+    assertThat(json).isEqualTo(S(json, json()));
     assertThat(json).isEqualTo(S(json));
   }
 
@@ -87,7 +87,7 @@ public class JsonTreeCreateTest {
     }
 
     try {
-      S(jsonNode, jsonTree());
+      S(jsonNode, json());
       fail("Expected IllegalArgumentException");
     } catch(IllegalArgumentException e) {
       // expected
@@ -110,7 +110,7 @@ public class JsonTreeCreateTest {
     }
 
     try {
-      S(inputStream, jsonTree());
+      S(inputStream, json());
       fail("Expected IllegalArgumentException");
     } catch(IllegalArgumentException e) {
       // expected
@@ -133,7 +133,7 @@ public class JsonTreeCreateTest {
     }
 
     try {
-      S(inputString, jsonTree());
+      S(inputString, json());
       fail("Expected IllegalArgumentException");
     } catch(IllegalArgumentException e) {
       // expected
@@ -157,7 +157,7 @@ public class JsonTreeCreateTest {
     }
 
     try {
-      S(EXAMPLE_INVALID_XML, xmlDom());
+      S(EXAMPLE_INVALID_XML, xml());
       fail("Expected IllegalArgumentException");
     } catch(SpinDataFormatException e) {
       // expected
@@ -181,7 +181,7 @@ public class JsonTreeCreateTest {
     }
 
     try {
-      S(EXAMPLE_INVALID_JSON, jsonTree());
+      S(EXAMPLE_INVALID_JSON, json());
       fail("Expected IllegalArgumentException");
     } catch(SpinDataFormatException e) {
       // expected
@@ -205,7 +205,7 @@ public class JsonTreeCreateTest {
     }
 
     try {
-      S(EXAMPLE_EMPTY_STRING, jsonTree());
+      S(EXAMPLE_EMPTY_STRING, json());
       fail("Expected IllegalArgumentException");
     } catch(SpinDataFormatException e) {
       // expected
@@ -229,7 +229,7 @@ public class JsonTreeCreateTest {
     }
 
     try {
-      S(stringAsInputStream(EXAMPLE_EMPTY_STRING), jsonTree());
+      S(stringAsInputStream(EXAMPLE_EMPTY_STRING), json());
       fail("Expected IllegalArgumentException");
     } catch(SpinDataFormatException e) {
       // expected

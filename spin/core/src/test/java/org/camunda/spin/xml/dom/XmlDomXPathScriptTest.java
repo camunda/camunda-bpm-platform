@@ -14,13 +14,13 @@
 package org.camunda.spin.xml.dom;
 
 import org.camunda.spin.SpinList;
-import org.camunda.spin.test.Script;
-import org.camunda.spin.test.ScriptTest;
-import org.camunda.spin.test.ScriptVariable;
-import org.camunda.spin.xml.tree.SpinXmlTreeAttribute;
-import org.camunda.spin.xml.tree.SpinXmlTreeElement;
-import org.camunda.spin.xml.tree.SpinXmlTreeXPathException;
-import org.camunda.spin.xml.tree.SpinXmlTreeXPathQuery;
+import org.camunda.spin.impl.test.Script;
+import org.camunda.spin.impl.test.ScriptTest;
+import org.camunda.spin.impl.test.ScriptVariable;
+import org.camunda.spin.xml.SpinXPathException;
+import org.camunda.spin.xml.SpinXPathQuery;
+import org.camunda.spin.xml.SpinXmlAttribute;
+import org.camunda.spin.xml.SpinXmlElement;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -41,13 +41,13 @@ public abstract class XmlDomXPathScriptTest extends ScriptTest {
     }
   )
   public void canQueryElement() {
-    SpinXmlTreeXPathQuery query = script.getVariable("query");
-    SpinXmlTreeElement child = query.element();
+    SpinXPathQuery query = script.getVariable("query");
+    SpinXmlElement child = query.element();
     assertThat(child.name()).isEqualTo("child");
     assertThat(child.attr("id").value()).isEqualTo("child");
   }
 
-  @Test(expected = SpinXmlTreeXPathException.class)
+  @Test(expected = SpinXPathException.class)
   @Script(
     name = "XmlDomXPathScriptTest.xPath",
     variables = {
@@ -56,7 +56,7 @@ public abstract class XmlDomXPathScriptTest extends ScriptTest {
     }
   )
   public void canNotQueryElementAsAttribute() {
-    SpinXmlTreeXPathQuery query = script.getVariable("query");
+    SpinXPathQuery query = script.getVariable("query");
     query.attribute();
   }
 
@@ -69,12 +69,12 @@ public abstract class XmlDomXPathScriptTest extends ScriptTest {
     }
   )
   public void canQueryElementList() {
-    SpinXmlTreeXPathQuery query = script.getVariable("query");
-    SpinList<SpinXmlTreeElement> childs = query.elementList();
+    SpinXPathQuery query = script.getVariable("query");
+    SpinList<SpinXmlElement> childs = query.elementList();
     assertThat(childs).hasSize(2);
   }
 
-  @Test(expected = SpinXmlTreeXPathException.class)
+  @Test(expected = SpinXPathException.class)
   @Script(
     name = "XmlDomXPathScriptTest.xPath",
     variables = {
@@ -83,7 +83,7 @@ public abstract class XmlDomXPathScriptTest extends ScriptTest {
     }
   )
   public void canNotQueryAttributeAsElement() {
-    SpinXmlTreeXPathQuery query = script.getVariable("query");
+    SpinXPathQuery query = script.getVariable("query");
     query.element();
   }
 
@@ -96,8 +96,8 @@ public abstract class XmlDomXPathScriptTest extends ScriptTest {
     }
   )
   public void canQueryAttribute() {
-    SpinXmlTreeXPathQuery query = script.getVariable("query");
-    SpinXmlTreeAttribute attribute = query.attribute();
+    SpinXPathQuery query = script.getVariable("query");
+    SpinXmlAttribute attribute = query.attribute();
     assertThat(attribute.value()).isEqualTo("child");
   }
 
@@ -110,8 +110,8 @@ public abstract class XmlDomXPathScriptTest extends ScriptTest {
     }
   )
   public void canQueryAttributeList() {
-    SpinXmlTreeXPathQuery query = script.getVariable("query");
-    SpinList<SpinXmlTreeAttribute> attributes = query.attributeList();
+    SpinXPathQuery query = script.getVariable("query");
+    SpinList<SpinXmlAttribute> attributes = query.attributeList();
     assertThat(attributes).hasSize(2);
   }
 
@@ -124,7 +124,7 @@ public abstract class XmlDomXPathScriptTest extends ScriptTest {
     }
   )
   public void canQueryString() {
-    SpinXmlTreeXPathQuery query = script.getVariable("query");
+    SpinXPathQuery query = script.getVariable("query");
     String value = query.string();
     assertThat(value).isEqualTo("child");
   }
@@ -138,7 +138,7 @@ public abstract class XmlDomXPathScriptTest extends ScriptTest {
     }
   )
   public void canQueryNumber() {
-    SpinXmlTreeXPathQuery query = script.getVariable("query");
+    SpinXPathQuery query = script.getVariable("query");
     Double count = query.number();
     assertThat(count).isEqualTo(2);
   }
@@ -152,7 +152,7 @@ public abstract class XmlDomXPathScriptTest extends ScriptTest {
     }
   )
   public void canQueryBooleanTrue() {
-    SpinXmlTreeXPathQuery query = script.getVariable("query");
+    SpinXPathQuery query = script.getVariable("query");
     Boolean exists = query.bool();
     assertThat(exists).isTrue();
   }
@@ -166,7 +166,7 @@ public abstract class XmlDomXPathScriptTest extends ScriptTest {
     }
   )
   public void canQueryBoolean() {
-    SpinXmlTreeXPathQuery query = script.getVariable("query");
+    SpinXPathQuery query = script.getVariable("query");
     Boolean exists = query.bool();
     assertThat(exists).isFalse();
   }

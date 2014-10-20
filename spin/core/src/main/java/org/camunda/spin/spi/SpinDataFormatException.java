@@ -14,7 +14,6 @@ package org.camunda.spin.spi;
 
 import org.camunda.spin.SpinRuntimeException;
 
-
 /**
  * Indicates an error in the underlying DataFormat layer
  *

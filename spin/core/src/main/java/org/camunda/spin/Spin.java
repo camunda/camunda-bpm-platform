@@ -14,13 +14,11 @@ package org.camunda.spin;
 
 import java.io.OutputStream;
 import java.io.Writer;
-import java.util.Map;
 
-import org.camunda.spin.impl.xml.dom.XmlDomDataFormat;
 import org.camunda.spin.json.SpinJsonNode;
 import org.camunda.spin.spi.DataFormat;
 import org.camunda.spin.spi.SpinDataFormatException;
-import org.camunda.spin.xml.tree.SpinXmlTreeElement;
+import org.camunda.spin.xml.SpinXmlElement;
 
 /**
  *
@@ -28,8 +26,6 @@ import org.camunda.spin.xml.tree.SpinXmlTreeElement;
  * @author Daniel Meyer
  */
 public abstract class Spin<T extends Spin<?>> {
-
-  protected static final SpinFactory SPIN_FACTORY = SpinFactory.getInstance();
 
   /**
    *
@@ -40,7 +36,7 @@ public abstract class Spin<T extends Spin<?>> {
    * @throws IllegalArgumentException in case an argument of illegal type is provided (such as 'null')
    */
   public static <T extends Spin<?>> T S(Object input, DataFormat<T> format) {
-    return SPIN_FACTORY.createSpin(input, format);
+    return SpinFactory.INSTANCE.createSpin(input, format);
   }
 
   /**
@@ -51,7 +47,7 @@ public abstract class Spin<T extends Spin<?>> {
    * @throws IllegalArgumentException in case an argument of illegal type is provided (such as 'null')
    */
   public static <T extends Spin<?>> T S(Object input) {
-    return SPIN_FACTORY.createSpin(input);
+    return SpinFactory.INSTANCE.createSpin(input);
   }
 
   /**
@@ -61,26 +57,8 @@ public abstract class Spin<T extends Spin<?>> {
    *
    * @throws IllegalArgumentException in case an argument of illegal type is provided (such as 'null')
    */
-  public static SpinXmlTreeElement XML(Object input) {
-    return SPIN_FACTORY.createSpin(input, DataFormats.xmlDom());
-  }
-
-  /**
-   *
-   * @param input
-   * @param mapperConfiguration
-   * @return
-   *
-   * @throws SpinDataFormatException in case the input cannot be read as XML
-   * @throws IllegalArgumentException in case an argument of illegal type is provided (such as 'null')
-   */
-  public static SpinXmlTreeElement XML(Object input, Map<String, Object> mapperConfiguration) {
-    DataFormat<SpinXmlTreeElement> configuredFormat =
-      DataFormats.xmlDom()
-        .mapper().config(mapperConfiguration)
-        .done();
-
-    return SPIN_FACTORY.createSpin(input, configuredFormat);
+  public static SpinXmlElement XML(Object input) {
+    return SpinFactory.INSTANCE.createSpin(input, DataFormats.xml());
   }
 
   /**
@@ -92,8 +70,8 @@ public abstract class Spin<T extends Spin<?>> {
    * @throws SpinDataFormatException in case the input cannot be read as XML
    * @throws IllegalArgumentException in case an argument of illegal type is provided (such as 'null')
    */
-  public static SpinXmlTreeElement XML(Object input, DataFormat<SpinXmlTreeElement> format) {
-    return SPIN_FACTORY.createSpin(input, format);
+  public static SpinXmlElement XML(Object input, DataFormat<SpinXmlElement> format) {
+    return SpinFactory.INSTANCE.createSpin(input, format);
   }
 
   /**
@@ -104,29 +82,7 @@ public abstract class Spin<T extends Spin<?>> {
   * @throws IllegalArgumentException in case an argument of illegal type is provided (such as 'null')
   */
   public static SpinJsonNode JSON(Object input) {
-    return SPIN_FACTORY.createSpin(input, DataFormats.jsonTree());
-  }
-
-  /**
-  *
-  * @param input
-  * @param configuration
-  * @return
-  *
-  * @throws SpinDataFormatException in case the input cannot be read as JSON
-  * @throws IllegalArgumentException in case an argument of illegal type is provided (such as 'null')
-  */
-  public static SpinJsonNode JSON(Object input, Map<String, Object> readerConfiguration,
-      Map<String, Object> writerConfiguration, Map<String, Object> mapperConfiguration) {
-
-    DataFormat<SpinJsonNode> configuredFormat =
-        DataFormats.jsonTree()
-          .reader().config(readerConfiguration)
-          .writer().config(writerConfiguration)
-          .mapper().config(mapperConfiguration)
-        .done();
-
-    return SPIN_FACTORY.createSpin(input, configuredFormat);
+    return SpinFactory.INSTANCE.createSpin(input, DataFormats.json());
   }
 
   /**
@@ -139,7 +95,7 @@ public abstract class Spin<T extends Spin<?>> {
   * @throws IllegalArgumentException in case an argument of illegal type is provided (such as 'null')
   */
   public static SpinJsonNode JSON(Object input, DataFormat<SpinJsonNode> format) {
-    return SPIN_FACTORY.createSpin(input, format);
+    return SpinFactory.INSTANCE.createSpin(input, format);
   }
 
   /**
