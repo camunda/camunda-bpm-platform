@@ -30,6 +30,9 @@ import org.camunda.bpm.engine.history.HistoricFormProperty;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.history.HistoricVariableInstanceQuery;
 import org.camunda.bpm.engine.history.HistoricVariableUpdate;
+import org.camunda.bpm.engine.impl.cmd.SubmitStartFormCmd;
+import org.camunda.bpm.engine.impl.interceptor.Command;
+import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.test.ResourceProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
@@ -833,6 +836,32 @@ public class FullHistoryTest extends ResourceProcessEngineTestCase {
       // Expected exception
       assertTextPresent("Process instance is still running, cannot delete historic process instance", ae.getMessage());
     }
+  }
+
+  @Deployment
+  public void testDeleteCachedHistoricDetails() {
+    final String processDefinitionId = repositoryService.createProcessDefinitionQuery().singleResult().getId();
+
+
+    processEngineConfiguration.getCommandExecutorTxRequired().execute(new Command<Void>() {
+
+      public Void execute(CommandContext commandContext) {
+        Map<String, Object> formProperties = new HashMap<String, Object>();
+        formProperties.put("formProp1", "value1");
+
+        ProcessInstance processInstance = new SubmitStartFormCmd(processDefinitionId, null, formProperties).execute(commandContext);
+
+        // two historic details should be in cache: one form property and one variable update
+        commandContext.getHistoricDetailManager().deleteHistoricDetailsByProcessInstanceId(processInstance.getId());
+        return null;
+      }
+    });
+
+    // the historic process instance should still be there
+    assertEquals(1, historyService.createHistoricProcessInstanceQuery().count());
+
+    // the historic details should be deleted
+    assertEquals(0, historyService.createHistoricDetailQuery().count());
   }
 
   /**
