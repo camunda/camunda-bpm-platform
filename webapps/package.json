@@ -62,7 +62,7 @@
     "uuid": "~1.4.1"
   },
   "devDependencies": {
-    "camunda-commons-ui": "git+ssh://git@github.com:camunda/camunda-commons-ui",
+    "camunda-commons-ui": "git://github.com/camunda/camunda-commons-ui",
     "load-grunt-tasks": "~0.4.0",
     "grunt-contrib-jshint": "~0.10.0",
     "grunt-newer": "~0.7.0"
