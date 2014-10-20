@@ -1,34 +1,27 @@
 'use strict';
 
 var Base = require('./../table');
-var repeater = 'tabProvider in processInstanceTabs';
-var tabIndex = 1;
 
-module.exports = Base.extend({
+module.exports = Table.extend({
 
-  selectIncidentsTab: function() {
-    this.selectTab(repeater, tabIndex);
+  tabRepeater: 'tabProvider in processInstanceTabs',
+  tabIndex: 1,
+  tableRepeater: 'incident in incidents',
+
+  incidentMessage: function(item) {
+    return this.tableItem(item, 'incident.rootCauseIncidentMessage').getText();
   },
 
-  incidentsTabName: function() {
-    return this.tabName(repeater, tabIndex);
+  selectIncidentMessage: function(item) {
+    this.tableItem(item, 'incident.rootCauseIncidentMessage').click();
   },
 
-  isIncidentsTabSelected: function() {
-    expect(this.isTabSelected(repeater, tabIndex)).toMatch('ng-scope active');
+  incidentActivity: function(item) {
+    return this.tableItem(item, 'incident.activityName').getText();
   },
 
-  isIncidentsTabNotSelected: function() {
-    expect(this.isTabSelected(repeater, tabIndex)).not.toMatch('ng-scope active');
-  },
-
-  incidentsTable: function() {
-    this.selectIncidentsTab();
-    return element.all(by.repeater('incident in incidents'));
-  },
-
-  selectIncident: function(item) {
-    this.incidentsTable().get(item).element(by.binding('incident.name')).click();
+  selectIncidentActivity: function(item) {
+    this.tableItem(item, 'incident.activityName').click();
   }
 
 });

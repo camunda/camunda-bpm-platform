@@ -1,34 +1,35 @@
 'use strict';
 
 var Base = require('./../table');
-var repeater = 'tabProvider in processInstanceTabs';
-var tabIndex = 2;
 
-module.exports = Base.extend({
+module.exports = Table.extend({
 
-  selectCalledProcessInstanceTab: function() {
-    this.selectTab(repeater, tabIndex);
+  tabRepeater: 'tabProvider in processInstanceTabs',
+  tabIndex: 2,
+  tableRepeater: 'calledProcessInstance in calledProcessInstances',
+
+  calledProcessInstanceName: function(item) {
+    return this.table().get(item).element(by.css('[title]')).getAttribute('title').getText();
   },
 
-  calledProcessInstanceTabName: function() {
-    return this.tabName(repeater, tabIndex);
+  selectCalledProcessInstance: function(item) {
+    return this.tableItem(item, 'calledProcessInstance.id').click();
   },
 
-  isCalledProcessInstanceTabSelected: function() {
-    expect(this.isTabSelected(repeater, tabIndex)).toMatch('ng-scope active');
+  processDefinitionName: function(item) {
+    return this.tableItem(item, 'calledProcessInstance.processDefinitionName').getText();
   },
 
-  isCalledProcessInstanceTabNotSelected: function() {
-    expect(this.isTabSelected(repeater, tabIndex)).not.toMatch('ng-scope active');
+  selectProcessDefinition: function(item) {
+    return this.tableItem(item, 'calledProcessInstance.processDefinitionName').click();
   },
 
-  calledProcessInstancesTable: function() {
-    this.selectCalledProcessInstanceTab();
-    return element.all(by.repeater('calledProcessInstance in calledProcessInstances'));
+  calledActivityName: function(item) {
+    return this.tableItem(item, 'calledProcessInstance.instance.name').getText();
   },
 
-  selectVariables: function(item) {
-    this.calledProcessInstancesTable().get(item).element(by.binding('calledProcessInstance.id')).click();
+  selectCalledActivity: function(item) {
+    return this.tableItem(item, 'calledProcessInstance.instance.name').click();
   }
 
 });

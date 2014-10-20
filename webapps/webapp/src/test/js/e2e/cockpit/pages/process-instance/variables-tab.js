@@ -1,34 +1,31 @@
 'use strict';
 
 var Base = require('./../table');
-var repeater = 'tabProvider in processInstanceTabs';
-var tabIndex = 0;
 
-module.exports = Base.extend({
+module.exports = Table.extend({
 
-  selectVariablesTab: function() {
-    this.selectTab(repeater, tabIndex);
+  tabRepeater: 'tabProvider in processInstanceTabs',
+  tabIndex: 0,
+  tableRepeater: 'variable in variables',
+
+  variableName: function(item) {
+    return this.tableItem(item, 'variable.name').getText();
   },
 
-  variablesTabName: function() {
-    return this.tabName(repeater, tabIndex);
+  variableValue: function(item) {
+    return this.tableItem(item, 'variable.value').getText();
   },
 
-  isVariablesTabSelected: function() {
-    expect(this.isTabSelected(repeater, tabIndex)).toMatch('ng-scope active');
+  variableType: function(item) {
+    return this.tableItem(item, 'variable.type').getText();
   },
 
-  isVariablesTabNotSelected: function() {
-    expect(this.isTabSelected(repeater, tabIndex)).not.toMatch('ng-scope active');
+  selectVariableScope: function(item) {
+    this.tableItem(item, 'variable.instance.name').click();
   },
 
-  calledProcessInstancesTable: function() {
-    this.selectVariablesTab();
-    return element.all(by.repeater('variable in variables'));
-  },
-
-  selectVariables: function(item) {
-    this.calledProcessInstancesTable().get(item).element(by.binding('variable.name')).click();
+  variableScopeName: function(item) {
+    return this.tableItem(item, 'variable.instance.name').getText();
   }
 
 });

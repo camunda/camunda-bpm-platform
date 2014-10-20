@@ -5,19 +5,35 @@ var Table = require('./base');
 module.exports = Table.extend({
 
   tableTabs: function() {
-    return element.all(by.repeater(this.repeater));
+    return element.all(by.repeater(this.tabRepeater));
   },
 
   selectTab: function() {
     this.tableTabs().get(this.tabIndex).click();
   },
 
+  tabSelectionStatus: function() {
+    return this.tableTabs(this.tabRepeater).get(this.tabIndex).getAttribute('class');
+  },
+
   isTabSelected: function() {
-    return this.tableTabs(this.repeater).get(this.tabIndex).getAttribute('class');
+    expect(this.tabSelectionStatus()).toMatch('ng-scope active');
+  },
+
+  isTabNotSelected: function() {
+    expect(this.tabSelectionStatus()).not.toMatch('ng-scope active');
   },
 
   tabName: function() {
     return this.tableTabs(this.repeater).get(this.tabIndex).element(by.css('[class="ng-binding"]')).getText();
+  },
+
+  table: function() {
+    return element.all(by.repeater(this.tableRepeater));
+  },
+
+  tableItem: function(item, bindingSelector) {
+    return this.table().get(item).element(by.binding(bindingSelector));
   }
 
 });
