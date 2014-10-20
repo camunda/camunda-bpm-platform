@@ -31,8 +31,8 @@ public class IncidentManager extends AbstractManager {
     return getDbEntityManager().selectList("selectIncidentsByExecutionId", id);
   }
 
-  public long findIncidentCountByQueryCriteria(IncidentQueryImpl jobQuery) {
-    return (Long) getDbEntityManager().selectOne("selectIncidentCountByQueryCriteria", jobQuery);
+  public long findIncidentCountByQueryCriteria(IncidentQueryImpl incidentQuery) {
+    return (Long) getDbEntityManager().selectOne("selectIncidentCountByQueryCriteria", incidentQuery);
   }
 
   public List<Incident> findIncidentByConfiguration(String configuration) {
@@ -48,8 +48,8 @@ public class IncidentManager extends AbstractManager {
   }
 
   @SuppressWarnings("unchecked")
-  public List<Incident> findIncidentByQueryCriteria(IncidentQueryImpl jobQuery, Page page) {
-    return getDbEntityManager().selectList("selectIncidentByQueryCriteria", jobQuery, page);
+  public List<Incident> findIncidentByQueryCriteria(IncidentQueryImpl incidentQuery, Page page) {
+    return getDbEntityManager().selectList("selectIncidentByQueryCriteria", incidentQuery, page);
   }
 
 }
