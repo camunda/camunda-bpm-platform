@@ -142,13 +142,9 @@ public class DbSqlSessionFactory implements SessionFactory {
     addDatabaseSpecificStatement(POSTGRES, "selectCommentsByProcessInstanceId", "selectCommentsByProcessInstanceId_postgres");
     addDatabaseSpecificStatement(POSTGRES, "selectCommentByTaskIdAndCommentId", "selectCommentByTaskIdAndCommentId_postgres");
     addDatabaseSpecificStatement(POSTGRES, "selectEventsByTaskId", "selectEventsByTaskId_postgres");
-    addDatabaseSpecificStatement(POSTGRES, "selectActivityStatistics", "selectActivityStatistics_postgres");
-    addDatabaseSpecificStatement(POSTGRES, "selectActivityStatisticsCount", "selectActivityStatisticsCount_postgres");
     addDatabaseSpecificStatement(POSTGRES, "selectHistoricVariableInstanceByQueryCriteria", "selectHistoricVariableInstanceByQueryCriteria_postgres");
     addDatabaseSpecificStatement(POSTGRES, "selectFilter", "selectFilter_postgres");
     addDatabaseSpecificStatement(POSTGRES, "selectFilterByQueryCriteria", "selectFilterByQueryCriteria_postgres");
-    addDatabaseSpecificStatement(POSTGRES, "selectCaseSentryPartsByQueryCriteria", "selectCaseSentryPartsByQueryCriteria_postgres");
-    addDatabaseSpecificStatement(POSTGRES, "selectCaseSentryPartsCountByQueryCriteria", "selectCaseSentryPartsCountByQueryCriteria_postgres");
 
     constants = new HashMap<String, String>();
     constants.put("constant.event", "'event'");
@@ -169,7 +165,6 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificBitAnd3.put(ORACLE, ")");
     databaseSpecificTrueConstant.put(ORACLE, "1");
     databaseSpecificFalseConstant.put(ORACLE, "0");
-    addDatabaseSpecificStatement(ORACLE, "selectExclusiveJobsToExecute", "selectExclusiveJobsToExecute_integerBoolean");
 
     constants = new HashMap<String, String>();
     constants.put("constant.event", "cast('event' as nvarchar2(255))");
@@ -190,7 +185,6 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificDummyTable.put(DB2, "FROM SYSIBM.SYSDUMMY1");
     databaseSpecificTrueConstant.put(DB2, "1");
     databaseSpecificFalseConstant.put(DB2, "0");
-    addDatabaseSpecificStatement(DB2, "selectExclusiveJobsToExecute", "selectExclusiveJobsToExecute_integerBoolean");
     addDatabaseSpecificStatement(DB2, "selectExecutionByNativeQuery", "selectExecutionByNativeQuery_mssql_or_db2");
     addDatabaseSpecificStatement(DB2, "selectHistoricActivityInstanceByNativeQuery", "selectHistoricActivityInstanceByNativeQuery_mssql_or_db2");
     addDatabaseSpecificStatement(DB2, "selectHistoricProcessInstanceByNativeQuery", "selectHistoricProcessInstanceByNativeQuery_mssql_or_db2");
@@ -217,7 +211,6 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificDummyTable.put(MSSQL, "");
     databaseSpecificTrueConstant.put(MSSQL, "1");
     databaseSpecificFalseConstant.put(MSSQL, "0");
-    addDatabaseSpecificStatement(MSSQL, "selectExclusiveJobsToExecute", "selectExclusiveJobsToExecute_integerBoolean");
     addDatabaseSpecificStatement(MSSQL, "selectExecutionByNativeQuery", "selectExecutionByNativeQuery_mssql_or_db2");
     addDatabaseSpecificStatement(MSSQL, "selectHistoricActivityInstanceByNativeQuery", "selectHistoricActivityInstanceByNativeQuery_mssql_or_db2");
     addDatabaseSpecificStatement(MSSQL, "selectHistoricProcessInstanceByNativeQuery", "selectHistoricProcessInstanceByNativeQuery_mssql_or_db2");
