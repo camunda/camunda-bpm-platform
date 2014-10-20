@@ -39,15 +39,29 @@ define([
         var dateFilter = $filter('date'),
             dateFormat = 'yyyy-MM-dd\'T\'HH:mm:ss';
 
+        var dateRegex = /(\d\d\d\d)-(\d\d)-(\d\d)T(\d\d):(\d\d):(\d\d)(?:.(\d\d\d)| )?$/;
+
         scope.$on('$locationChangeSuccess', function() {
           scope.cancelChange();
         });
 
-        function fixDateTimezone(dateObj) {
-          var time = dateObj.getTime();
-          var localOffset = dateObj.getTimezoneOffset() * 60000;
-          time = time + localOffset;
-          dateObj.setTime(time);
+        function convertDateStringToObject(date) {
+          var YEAR, MONTH, DAY, HOURS, MINUTES, SECONDS, MILLISECONDS;
+
+          var match = dateRegex.exec(date);
+
+          if (match) {
+
+            YEAR = parseInt(match[1] || 0, 10);
+            MONTH = parseInt(match[2] || 0, 10) - 1;
+            DAY = parseInt(match[3] || 0, 10);
+            HOURS = parseInt(match[4] || 0, 10);
+            MINUTES = parseInt(match[5] || 0, 10);
+            SECONDS = parseInt(match[6] || 0, 10);
+            MILLISECONDS = parseInt(match[7] || 0, 10);
+
+            return new Date(YEAR, MONTH, DAY, HOURS, MINUTES, SECONDS, MILLISECONDS);
+          }
         }
 
         function isDate() {
@@ -89,8 +103,7 @@ define([
                 dateObj = null;
 
             if (dateStr) {
-              dateObj = new Date(dateStr);
-              fixDateTimezone(dateObj);
+              dateObj = convertDateStringToObject(dateStr);
             } else {
               dateObj = Date.now();
             }
