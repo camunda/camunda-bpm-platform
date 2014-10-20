@@ -16,9 +16,6 @@ define([
   ) {
 
     function loginSuccess() {
-      // refatctor me
-      $('body').addClass('authenticated');
-
       $translate('LOGGED_IN').then(function(translated) {
         Notifications.addMessage({
           duration: 5000,

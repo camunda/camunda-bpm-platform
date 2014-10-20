@@ -30,7 +30,7 @@
   <link rel="apple-touch-icon" sizes="114x114" href="$APP_ROOT/app/tasklist/images/apple-touch-icon-114x114.png">
 </head>
 
-<body>
+<body ng-class="{ 'authenticated' : (authentication && authentication.name) }">
   <!-- # page-navigation -->
   <nav class="navbar navbar-default"
        role="navigation"

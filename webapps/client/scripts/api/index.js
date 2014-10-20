@@ -43,7 +43,11 @@ function(
           $rootScope.$apply(function() {
             // in case the session expired
             if (err && err.status === 401) {
+              // broadcast that the authentication changed
               $rootScope.$broadcast('authentication.changed', null);
+              // set authentication to null
+              $rootScope.authentication = null;
+
 
               $translate([
                 'SESSION_EXPIRED',

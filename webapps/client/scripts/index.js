@@ -87,13 +87,7 @@ define('camunda-tasklist-ui', [
           $aufocused[0].focus();
         }
       }, 300);
-
-      // refactor me
-      if (!$('form[name="signinForm"]').length) {
-        $('body').addClass('authenticated');
-      }
-
-      $('body').addClass('task-focus');
+      
     });
   }
 

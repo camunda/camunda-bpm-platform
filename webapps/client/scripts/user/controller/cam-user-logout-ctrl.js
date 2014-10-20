@@ -16,9 +16,6 @@ define([
     AuthenticationService
       .logout()
       .then(function() {
-        // refatctor me
-        $('body').removeClass('authenticated');
-
         $translate('LOGGED_OUT').then(function(translated) {
           Notifications.add({
             status: translated,
