@@ -295,7 +295,7 @@ public class DbEntityManager implements Session {
         // mark PERSISTENT
         cachedDbEntity.setEntityState(PERSISTENT);
 
-      } else if(cachedDbEntity.isDirty()) {
+      } else if(cachedDbEntity.getEntityState() == PERSISTENT && cachedDbEntity.isDirty()) {
         // object is dirty -> perform UPDATE
         performEntityOperation(cachedDbEntity, UPDATE);
 

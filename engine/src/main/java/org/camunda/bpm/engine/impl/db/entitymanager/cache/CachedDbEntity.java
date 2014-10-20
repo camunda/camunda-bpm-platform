@@ -41,11 +41,7 @@ public class CachedDbEntity implements Recyclable {
    * @return true if the entity is dirty (state has changed since it was put into the cache)
    */
   public boolean isDirty() {
-    return
-      // the entity is PERSISTENT
-      entityState == DbEntityState.PERSISTENT
-      // AND it has changed
-      && !dbEntity.getPersistentState().equals(copy);
+    return !dbEntity.getPersistentState().equals(copy);
   }
 
   public void forceSetDirty() {

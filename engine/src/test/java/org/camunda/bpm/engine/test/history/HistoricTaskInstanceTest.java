@@ -16,8 +16,11 @@ package org.camunda.bpm.engine.test.history;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.history.HistoricTaskInstanceQuery;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricTaskInstanceEntity;
@@ -236,6 +239,21 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTestCase {
 
     taskService.deleteTask(task.getId());
     historyService.deleteHistoricTaskInstance(hti.getId());
+  }
+
+  @Deployment
+  public void testHistoricTaskInstanceAssignmentListener() {
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("assignee", "jonny");
+    runtimeService.startProcessInstanceByKey("testProcess", variables);
+
+    HistoricActivityInstance hai = historyService.createHistoricActivityInstanceQuery().activityId("task").singleResult();
+    assertEquals("jonny", hai.getAssignee());
+
+    HistoricTaskInstance hti = historyService.createHistoricTaskInstanceQuery().singleResult();
+    assertEquals("jonny", hti.getAssignee());
+    assertNull(hti.getOwner());
+
   }
 
   public void testHistoricTaskInstanceOwner() {
