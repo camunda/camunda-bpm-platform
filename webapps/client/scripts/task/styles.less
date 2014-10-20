@@ -114,7 +114,7 @@
 
 .day.row {
   margin-top: (@grid-gutter-width / 1);
-  border-top: 1px dashed @gray-light;
+  border-top: 1px @border-style @gray-light;
   padding-top: (@grid-gutter-width / 1);
 
   margin-bottom: (@grid-gutter-width / 1);
@@ -155,7 +155,7 @@
       width: 100%;
       height: 1px;
       margin-top: -1px;
-      border-top: 1px dashed @gray-light;
+      border-top: 1px @border-style @gray-light;
       margin-bottom: (@grid-gutter-width / 2);
     }
   }
@@ -192,7 +192,7 @@
   .month {
     padding: 3px 0;
     margin: 3px 0;
-    border: 1px dashed @gray-light;
+    border: 1px @border-style @gray-light;
     border-width: 1px 0;
   }
 }
@@ -218,6 +218,15 @@
   }
 }
 
+.event-body {
+  > .line {
+    overflow: hidden;
+    margin-top: (@grid-gutter-width / 2);
+    &:first-child {
+      margin-top: 0;
+    }
+  }
+}
 
 .original-value {
   text-decoration: line-through;

@@ -15,7 +15,7 @@
 
 .task-filter {
   margin: (@grid-gutter-width / 2) 0;
-  padding: (@grid-gutter-width / 2) 0;
+  padding: 12px 0;
 
   text-align: right;
   background-color: @gray-lighter;
@@ -122,8 +122,10 @@
 .tasks-list {
   > li {
     margin: 0;
-    border-top: 1px dashed @gray-light;
+    border-top: 1px @border-style @gray-light;
     padding: (@grid-gutter-width / 2) 0;
+
+    min-height: 90px;
 
     &.active {
       position: relative;

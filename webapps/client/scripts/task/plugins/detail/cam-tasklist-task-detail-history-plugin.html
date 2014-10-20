@@ -7,7 +7,7 @@
   </div>
 
   <div ng-hide="!state.$loaded">
-    
+
     <div ng-if="!days.length">
       <div class="well">
         <i class="glyphicon glyphicon-info-sign"></i>
@@ -29,11 +29,11 @@
       </div>
 
       <div class="col-xs-10">
-        <div class="instant row" ng-repeat="event in day.events | orderBy:'-time'">
+        <div class="instant row"
+             ng-repeat="event in day.events | orderBy:'-time'">
           <div class="col-xs-2 operation-meta">
             <div class="operation-time"
                  tooltip-placement="left"
-                 tooltip-append-to-body="true"
                  tooltip="{{ event.time | camDate:'long' }}">{{ event.time | date:'HH:mm' }}</div>
             <div class="operation-user">{{ event.userId }}</div>
           </div>
@@ -44,7 +44,9 @@
             </div>
 
             <div class="row event-body">
-              <div ng-repeat="subEvent in event.subEvents" ng-if="event.type !== 'Comment'">
+              <div class="line"
+                   ng-repeat="subEvent in event.subEvents"
+                   ng-if="event.type !== 'Comment'">
                 <h5 class="col-sm-12 col-md-3 event-property">{{ subEvent.property | translate }}</h5>
 
                 <div class="col-sm-12 col-md-9">

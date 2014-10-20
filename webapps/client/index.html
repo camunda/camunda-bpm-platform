@@ -38,6 +38,7 @@
   </nav>
   <!-- / page-navigation -->
 
+  <!-- # page-content -->
   <div class="page-wrap" >
     <div class="row controls">
       <div notifications-panel
@@ -47,15 +48,27 @@
 
     <div ng-view
          class="ui-wrap"></div>
+  </div>
+  <!-- / page-content -->
 
+
+  <div class="fake-columns container-fluid">
+    <div class="row">
+      <div class="cols col-sm-2 task-filters"></div>
+      <div class="cols col-sm-4 task-list"></div>
+      <div class="cols col-sm-6 current-task"></div>
+    </div>
   </div>
 
+
+  <!-- # page-footer -->
   <footer class="page">
     <div>
       Powered by <a href="http://camunda.org">camunda BPM</a> /
       <span class="version">v${project.version}</span>
     </div>
   </footer>
+  <!-- / page-footer -->
 
   <div cam-tasklist-notifier></div>
 

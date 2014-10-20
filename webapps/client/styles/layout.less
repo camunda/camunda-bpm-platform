@@ -1,16 +1,21 @@
-
-
-
-html, body {
+html,
+body {
   height: 100%;
   .font-regular;
+}
+
+
+body {
+  overflow-y: scroll;
+  padding-top: 41px;
+  margin-top: -41px;
 }
 
 
 .page-wrap {
   min-height: 100%;
   /* equal to footer height */
-  margin-bottom: -25px;
+  margin-bottom: (0 - @footer-height);
 }
 .page-wrap:after {
   content: ' ';
@@ -19,19 +24,27 @@ html, body {
 .footer.page,
 .page-wrap:after {
   /* .push must be the same height as footer */
-  height: 25px;
+  height: @footer-height;
 }
 
 footer.page {
   position: fixed;
   z-index: 99;
-  height: 25px;
+  height: @footer-height;
   bottom: 0;
   left: 0;
   right: 0;
   text-align: right;
   background-color: @body-bg;
   border-top: 1px solid @gray-lighter;
+}
+
+
+.controls,
+.task-board {
+  > .cols {
+    min-height: 100%;
+  }
 }
 
 
@@ -51,15 +64,11 @@ footer.page {
   }
 }
 
-.task-board {
-  // .task-filters > .inner,
-  // .current-task > .inner,
-  // .task-list .well {
-  //   margin-top: (@grid-gutter-width / 2);
-  // }
 
+
+.task-board {
   > .cols > .inner {
-    border-top: 1px dashed @gray-light;
+    border-top: 1px @border-style @gray-light;
     padding-top: (@grid-gutter-width / 2);
   }
 
@@ -78,46 +87,57 @@ footer.page {
   padding: 0;
 }
 
-
-
-@media (min-width: 768px) {
-  .ui-wrap {
-    display: table;
-    width: 100%;
-  }
-
-  .row.equal-height-cols {
-    // display: table;
-    display: table-row;
-    width: 100%;
-    height: 100%;
-    margin: 0;
-
-    // if left visible, a 1px wide line on the sides is appearing
-    &:before,
-    &:after {
-      display: none;
-    }
-
-    > .cols {
-      display: table-cell;
-      vertical-align: top;
-      float: none;
-    }
-  }
+.fake-columns {
+  display: none;
 }
 
-
-
-.cols {
-  &.task-filters {
-    background-color: @column-left-bg;
+@media (min-width: 768px) {
+  body > .navbar,
+  .page-wrap {
+    position: relative;
+    z-index: 5;
   }
-  &.task-list {
-    background-color: @column-center-bg;
+  body > .navbar {
+    z-index: 6;
   }
-  &.current-task {
-    background-color: @column-right-bg;
+  .page-wrap {
+    .container-fixed();
+  }
+
+  .ui-wrap {
+    position: relative;
+    z-index: 5;
+  }
+
+  .authenticated .fake-columns {
+    display: block;
+    position: fixed;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+
+    top: 0;
+    left: 0;
+    bottom: 0;
+    padding: 0 15px;
+    overflow: hidden;
+
+    > .row {
+      height: 100%;
+      > .cols {
+        position: relative;
+        height: 100%;
+      }
+      > .task-filters {
+        background-color: @column-left-bg;
+      }
+      > .task-list {
+        background-color: @column-center-bg;
+      }
+      > .current-task {
+        background-color: @column-right-bg;
+      }
+    }
   }
 }
 
@@ -132,4 +152,8 @@ footer.page {
 
 .controls [cam-task-search] {
   margin-top: -10px;
+  margin-bottom: 10px;
+  .search-dropdown {
+    margin-top: -11px;
+  }
 }

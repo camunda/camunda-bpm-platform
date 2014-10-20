@@ -97,17 +97,20 @@
 
 // tasklist specific variables
 @column-darkening:                  4%;
-
-// @column-left-bg:                    darken(@body-bg, @column-darkening * 2);
 @column-left-bg:                    darken(@body-bg, @column-darkening * 6.18);
 @column-center-bg:                  darken(@body-bg, @column-darkening * (6.18 * 0.618));
 @column-right-bg:                   darken(@body-bg, @column-darkening * 0);
 
+@footer-height:                     25px;
+
+// @border-style:                      dashed;
+// @border-style:                      solid;
+@border-style:                      dotted;
 
 
-strong {
-  .font-bold();
-}
+
+
+
 
 // Core variables and mixins
   @import "../bower_components/bootstrap/less/mixins";
@@ -164,6 +167,7 @@ strong {
 
 
 @import "layout";
+@import "layout-alt";
 @import "navbar";
 
 @import "./notifications-panel.less";
@@ -176,6 +180,7 @@ strong {
 
 
 
+
 .text-help {
   font-style: italic;
   font-size: 90%;
@@ -184,19 +189,12 @@ strong {
 
 
 
-body {
-  // padding-top: 50px;
-  padding-bottom: 25px;
-  overflow-y: scroll;
-}
 
 h1,
 h2,
 h3,
 h4 {
   .font-light;
-  // font-family: volkswagents-regular;
-  // font-weight: normal;
 }
 
 h1 {
@@ -229,37 +227,9 @@ a {
 }
 
 
-/*
- Modal dialogs
-*/
-.modal[ng-click] {
-  cursor: default;
+strong {
+  .font-bold();
 }
-
-.modal-content {
-  .form-actions {
-    margin-bottom: 0;
-  }
-}
-
-.modal-header,
-.modal-body,
-.modal-footer {
-  margin: 0;
-  padding-left: 20px;
-  padding-right: 20px;
-}
-
-.modal-header {
-  border-bottom: 1px solid @gray-lighter;
-  background: @modal-header-bg;
-}
-.modal-footer {
-  border-top: 1px solid @gray-lighter;
-  background: @modal-footer-bg;
-}
-
-
 
 
 
@@ -270,6 +240,15 @@ a {
 @import "../scripts/user/styles.less";
 @import "../scripts/process/styles.less";
 @import "../scripts/variable/styles.less";
+@import "_loader.less";
+@import "_modal.less";
+
+
+
+
+
+
+
 
 
 
@@ -313,104 +292,7 @@ a {
     background-color: @alert-warning-bg;
     border: 1px solid @alert-warning-border;
 
-    // I know.. rounded corners are for pussies
     border-radius: 3px;
-  }
-}
-
-
-.loader {
-  color: @gray-light;
-  text-align: center;
-  margin: 20px auto;
-  .glyphicon {
-    font-size: 11px;
-    margin: 0 15px;
-  }
-}
-/*
-   Animation example, for spinners
-*/
-.animate-spin {
-  -moz-animation: spin 2s infinite linear;
-  -o-animation: spin 2s infinite linear;
-  -webkit-animation: spin 2s infinite linear;
-  animation: spin 2s infinite linear;
-  display: inline-block;
-}
-@-moz-keyframes spin {
-  0% {
-    -moz-transform: rotate(0deg);
-    -o-transform: rotate(0deg);
-    -webkit-transform: rotate(0deg);
-    transform: rotate(0deg);
-  }
-
-  100% {
-    -moz-transform: rotate(359deg);
-    -o-transform: rotate(359deg);
-    -webkit-transform: rotate(359deg);
-    transform: rotate(359deg);
-  }
-}
-@-webkit-keyframes spin {
-  0% {
-    -moz-transform: rotate(0deg);
-    -o-transform: rotate(0deg);
-    -webkit-transform: rotate(0deg);
-    transform: rotate(0deg);
-  }
-
-  100% {
-    -moz-transform: rotate(359deg);
-    -o-transform: rotate(359deg);
-    -webkit-transform: rotate(359deg);
-    transform: rotate(359deg);
-  }
-}
-@-o-keyframes spin {
-  0% {
-    -moz-transform: rotate(0deg);
-    -o-transform: rotate(0deg);
-    -webkit-transform: rotate(0deg);
-    transform: rotate(0deg);
-  }
-
-  100% {
-    -moz-transform: rotate(359deg);
-    -o-transform: rotate(359deg);
-    -webkit-transform: rotate(359deg);
-    transform: rotate(359deg);
-  }
-}
-@-ms-keyframes spin {
-  0% {
-    -moz-transform: rotate(0deg);
-    -o-transform: rotate(0deg);
-    -webkit-transform: rotate(0deg);
-    transform: rotate(0deg);
-  }
-
-  100% {
-    -moz-transform: rotate(359deg);
-    -o-transform: rotate(359deg);
-    -webkit-transform: rotate(359deg);
-    transform: rotate(359deg);
-  }
-}
-@keyframes spin {
-  0% {
-    -moz-transform: rotate(0deg);
-    -o-transform: rotate(0deg);
-    -webkit-transform: rotate(0deg);
-    transform: rotate(0deg);
-  }
-
-  100% {
-    -moz-transform: rotate(359deg);
-    -o-transform: rotate(359deg);
-    -webkit-transform: rotate(359deg);
-    transform: rotate(359deg);
   }
 }
 

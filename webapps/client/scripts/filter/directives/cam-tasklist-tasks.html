@@ -36,7 +36,7 @@
               ng-class="{overdue: task.followUp && (task.followUp < now) }">
             <span tooltip-placement="top"
                   tooltip="{{ 'FOLLOW_UP_DATE' | translate }}"
-                  class="glyphicon glyphicon-bell"></span>
+                  class="glyphicon glyphicon-calendar"></span>
             <span tooltip-placement="top"
                   tooltip="{{ task.followUp | camDate:'long' }}"
                   am-time-ago="task.followUp">{{task.followUp}}</span>
@@ -47,7 +47,7 @@
               ng-class="{overdue: task.due && (task.due < now) }">
             <span tooltip-placement="top"
                   tooltip="{{ 'DUE_DATE' | translate }}"
-                  class="glyphicon glyphicon-calendar"></span>
+                  class="glyphicon glyphicon-bell"></span>
             <span tooltip-placement="top"
                   tooltip="{{ task.due | camDate:'long' }}"
                   am-time-ago="task.due">{{task.due}}</span>
