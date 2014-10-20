@@ -114,25 +114,19 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
   }
 
   public ExecutionQuery messageEventSubscription() {
-    return eventSubscription("message");
+    return eventSubscription("message", null);
   }
 
   public ExecutionQuery eventSubscription(String eventType, String eventName) {
     ensureNotNull("event type", eventType);
-    ensureNotNull("event name", eventName);
+    if (!"message".equals(eventType)) {
+      // event name is optional for message events
+      ensureNotNull("event name", eventName);
+    }
     if(eventSubscriptions == null) {
       eventSubscriptions = new ArrayList<EventSubscriptionQueryValue>();
     }
     eventSubscriptions.add(new EventSubscriptionQueryValue(eventName, eventType));
-    return this;
-  }
-
-  public ExecutionQuery eventSubscription(String eventType) {
-    ensureNotNull("event type", eventType);
-    if(eventSubscriptions == null) {
-      eventSubscriptions = new ArrayList<EventSubscriptionQueryValue>();
-    }
-    eventSubscriptions.add(new EventSubscriptionQueryValue(null, eventType));
     return this;
   }
 
