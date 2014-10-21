@@ -15,6 +15,7 @@ drop index ACT_IDX_INC_CONFIGURATION;
 
 drop index ACT_IDX_EXEC_BUSKEY;
 drop index ACT_IDX_TASK_CREATE;
+drop index ACT_IDX_TASK_ASSIGNEE;
 drop index ACT_IDX_IDENT_LNK_USER;
 drop index ACT_IDX_IDENT_LNK_GROUP;
 drop index ACT_IDX_VARIABLE_TASK_ID;
