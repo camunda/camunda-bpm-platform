@@ -93,7 +93,7 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
     env.put(Context.SECURITY_CREDENTIALS, password);
 
     // for anonymous login
-    if(ldapConfiguration.isAllowAnonymousLogin() && (password.equals("") || password.isEmpty())) {
+    if(ldapConfiguration.isAllowAnonymousLogin() && password.isEmpty()) {
       env.put(Context.SECURITY_AUTHENTICATION, "none");
     }
 
@@ -149,7 +149,7 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
   public List<User> findUserByQueryCriteria(LdapUserQueryImpl query) {
     ensureContextInitialized();
     if(query.getGroupId() != null) {
-      // if restriction on groupId is provided, we need to seach in group tree first, look for the group and then further restrict on the members
+      // if restriction on groupId is provided, we need to search in group tree first, look for the group and then further restrict on the members
       return findUsersByGroupId(query);
     } else {
       String userBaseDn = composeDn(ldapConfiguration.getUserSearchBase(), ldapConfiguration.getBaseDn());
@@ -161,7 +161,7 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
     String baseDn = getDnForGroup(query.getGroupId());
 
     // compose group search filter
-    String groupSearchFilter = "(& "+ldapConfiguration.getGroupSearchFilter()+")";
+    String groupSearchFilter = "(& " + ldapConfiguration.getGroupSearchFilter() + ")";
 
     NamingEnumeration<SearchResult> enumeration = null;
     try {
@@ -171,7 +171,7 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
 
       // first find group
       while (enumeration.hasMoreElements()) {
-        SearchResult result = (SearchResult) enumeration.nextElement();
+        SearchResult result = enumeration.nextElement();
         Attribute memberAttribute = result.getAttributes().get(ldapConfiguration.getGroupMemberAttribute());
         NamingEnumeration<?> allMembers = memberAttribute.getAll();
 
@@ -222,7 +222,7 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
       int resultCount = 0;
       List<User> userList = new ArrayList<User>();
       while (enumeration.hasMoreElements() && userList.size() < query.getMaxResults()) {
-        SearchResult result = (SearchResult) enumeration.nextElement();
+        SearchResult result = enumeration.nextElement();
 
         if(resultCount >= query.getFirstResult()) {
           UserEntity user = transformUser(result);
@@ -258,7 +258,7 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
     }
 
     // engine can't work without users
-    if(userId == null || userId.equals("") || userId.isEmpty()) {
+    if(userId == null || userId.isEmpty()) {
       return false;
     }
 
@@ -267,7 +267,7 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
     * RFC allows such a behavior but discourages the usage so we provide it for
     * user which have an ldap with anonymous login.
     */
-    if(!ldapConfiguration.isAllowAnonymousLogin() && (password.isEmpty() || password.equals(""))) {
+    if(!ldapConfiguration.isAllowAnonymousLogin() && password.equals("")) {
       return false;
     }
 
@@ -377,7 +377,7 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
       int resultCount = 0;
       List<Group> groupList = new ArrayList<Group>();
       while (enumeration.hasMoreElements() && groupList.size() < query.getMaxResults()) {
-        SearchResult result = (SearchResult) enumeration.nextElement();
+        SearchResult result = enumeration.nextElement();
 
         if(resultCount >= query.getFirstResult()) {
           GroupEntity group = transformGroup(result);

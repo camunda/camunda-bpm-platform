@@ -30,7 +30,7 @@ public class CertificateHelper {
       sslContext.init(new KeyManager[0], new TrustManager[] { new DefaultTrustManager() }, new SecureRandom());
       SSLContext.setDefault(sslContext);
     } catch (Exception ex) {
-      throw new RuntimeException("Could not change SSL TrustManager to accept arbitray certificates", ex);
+      throw new RuntimeException("Could not change SSL TrustManager to accept arbitrary certificates", ex);
     }
   }
 

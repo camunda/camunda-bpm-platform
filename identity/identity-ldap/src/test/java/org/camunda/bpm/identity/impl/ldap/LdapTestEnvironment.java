@@ -182,7 +182,7 @@ public class LdapTestEnvironment {
     }
   }
   
-  protected Properties loadTestProperties() throws FileNotFoundException, IOException {
+  protected Properties loadTestProperties() throws IOException {
     Properties properties = new Properties();
     File file = IoUtil.getFile("ldap.properties");
     FileInputStream propertiesStream= null;
