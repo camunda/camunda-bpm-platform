@@ -16,18 +16,18 @@
       <table class="table table-striped table-bordered table-condensed">
          <thead>
           <tr>
+            <th class="text-right group-action-header">{{ 'ACTION' | translate }}</th>
             <th>{{ 'GROUP_ID' | translate }}</th>
-            <th>{{ 'ACTION' | translate }}</th>
           </tr>
         </thead>
         <tbody>
           <tr ng-repeat="(delta, group) in groups">
-            <td>{{ group }}</td>
-            <td>
+            <td class="text-right">
                   <a href
                      ng-click="removeGroup(group)"
                      class="glyphicon glyphicon-remove"></a>
             </td>
+            <td>{{ group }}</td>
           </tr>
         </tbody>
       </table>
@@ -36,7 +36,7 @@
     <fieldset>
       <legend>{{ 'GROUP_ADD' | translate }}</legend>
       <div class="input-append">
-        <input type="text" ng-model="newGroup.name" name="newGroup" required>
+        <input type="text" class="form-control group-input" ng-model="newGroup.name" name="newGroup" required>
         <a href
            ng-click="addGroup()"
            class="glyphicon glyphicon-plus-sign"></a>
