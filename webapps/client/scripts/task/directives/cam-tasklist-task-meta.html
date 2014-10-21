@@ -73,15 +73,17 @@
 <ul class="meta list-inline actors">
 
   <li class="groups" ng-click="editGroups()">
-    <span tooltip-placement="top"
-          tooltip="{{ 'GROUPS' | translate }}"
-          class="glyphicon glyphicon-th"></span>
-    <span ng-if="groups.length > 0">
-      {{ groups | groupsList:2 }}
-    </span>
-    <span ng-if="groups.length === 0">
-      <a href>{{ 'ADD_GROUPS' | translate }}</a>
-    </span>
+    <div>
+      <span tooltip-placement="top"
+            tooltip="{{ 'GROUPS' | translate }}"
+            class="glyphicon glyphicon-th"></span>
+      <span ng-if="groups.length > 0">
+        {{ groups.join(', ') }}
+      </span>
+      <span ng-if="groups.length === 0">
+        <a href>{{ 'ADD_GROUPS' | translate }}</a>
+      </span>
+    </div>
   </li>
 
   <li class="assignee set-value"

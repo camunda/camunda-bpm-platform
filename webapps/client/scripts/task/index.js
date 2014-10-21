@@ -28,7 +28,6 @@ define([
   './plugins/action/modals/cam-tasklist-comment-form',
 
   './directives/cam-tasklist-groups-form',
-  './filters/cam-groups-list',
 
   'camunda-tasklist-ui/utils',
   'camunda-tasklist-ui/api',
@@ -59,8 +58,7 @@ define([
   /* action plugin controller */
   camCommentCreateModalCtrl,
 
-  camGroupEditModalCtrl,
-  camGroupsListFilter
+  camGroupEditModalCtrl
 ) {
 
   var taskModule = angular.module('cam.tasklist.task', [
@@ -102,7 +100,6 @@ define([
   taskModule.controller('camCommentCreateModalCtrl', camCommentCreateModalCtrl);
 
   taskModule.controller('camGroupEditModalCtrl', camGroupEditModalCtrl);
-  taskModule.filter('groupsList', camGroupsListFilter);
 
   return taskModule;
 });
