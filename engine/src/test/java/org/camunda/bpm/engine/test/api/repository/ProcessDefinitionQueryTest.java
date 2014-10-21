@@ -489,7 +489,6 @@ public class ProcessDefinitionQueryTest extends PluggableProcessEngineTestCase {
 
     String secondDeployment = repositoryService
         .createDeployment()
-        .name("org/camunda/bpm/engine/test/repository/one.bpmn20.xml")
         .addClasspathResource("org/camunda/bpm/engine/test/api/repository/first-process.bpmn20.xml")
         .deploy()
         .getId();
@@ -521,7 +520,6 @@ public class ProcessDefinitionQueryTest extends PluggableProcessEngineTestCase {
 
     String secondDeployment = repositoryService
         .createDeployment()
-        .name("org/camunda/bpm/engine/test/repository/one.bpmn20.xml")
         .addClasspathResource("org/camunda/bpm/engine/test/api/repository/second-process.bpmn20.xml")
         .deploy()
         .getId();
@@ -548,7 +546,6 @@ public class ProcessDefinitionQueryTest extends PluggableProcessEngineTestCase {
 
     String secondDeployment = repositoryService
         .createDeployment()
-        .name("org/camunda/bpm/engine/test/repository/one.bpmn20.xml")
         .addClasspathResource("org/camunda/bpm/engine/test/api/repository/second-process.bpmn20.xml")
         .deploy()
         .getId();
@@ -599,7 +596,6 @@ public class ProcessDefinitionQueryTest extends PluggableProcessEngineTestCase {
 
     String secondDeployment = repositoryService
         .createDeployment()
-        .name("org/camunda/bpm/engine/test/repository/one.bpmn20.xml")
         .addClasspathResource("org/camunda/bpm/engine/test/api/repository/second-process.bpmn20.xml")
         .deploy()
         .getId();
