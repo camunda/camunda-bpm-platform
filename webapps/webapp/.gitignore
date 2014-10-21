@@ -3,7 +3,6 @@
 .externalToolBuilders
 projectFilesBackup
 test-results.xml
-develop.conf.js
 /node_modules
 /node
 /bower_components
@@ -12,3 +11,4 @@ develop.conf.js
 /src/main/webapp/assets/vendor
 /doc
 /selenium
+src/test/js/e2e/develop.conf.js
