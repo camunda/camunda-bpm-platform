@@ -7,6 +7,7 @@ body {
 
 body {
   overflow-y: scroll;
+  // navbar (and bottom border) height
   padding-top: 41px;
   margin-top: -41px;
 }
@@ -14,7 +15,6 @@ body {
 
 .page-wrap {
   min-height: 100%;
-  /* equal to footer height */
   margin-bottom: (0 - @footer-height);
 }
 .page-wrap:after {
@@ -23,7 +23,6 @@ body {
 }
 .footer.page,
 .page-wrap:after {
-  /* .push must be the same height as footer */
   height: @footer-height;
 }
 
@@ -61,6 +60,8 @@ footer.page {
   > .task-list,
   > .current-task {
     padding-top: 20px;
+    position: relative;
+    z-index: 10;
   }
 }
 
@@ -91,7 +92,7 @@ footer.page {
   display: none;
 }
 
-@media (min-width: 768px) {
+@media (min-width: @screen-sm-min) {
   body > .navbar,
   .page-wrap {
     position: relative;
@@ -100,8 +101,12 @@ footer.page {
   body > .navbar {
     z-index: 6;
   }
+
   .page-wrap {
     .container-fixed();
+    .controls {
+      z-index: 10;
+    }
   }
 
   .ui-wrap {
@@ -128,15 +133,19 @@ footer.page {
         position: relative;
         height: 100%;
       }
-      > .task-filters {
-        background-color: @column-left-bg;
-      }
-      > .task-list {
-        background-color: @column-center-bg;
-      }
-      > .current-task {
-        background-color: @column-right-bg;
-      }
+    }
+  }
+
+  .row.equal-height-cols,
+  .authenticated .fake-columns .row {
+    > .task-filters {
+      background-color: @column-left-bg;
+    }
+    > .task-list {
+      background-color: @column-center-bg;
+    }
+    > .current-task {
+      background-color: @column-right-bg;
     }
   }
 }

@@ -1,5 +1,6 @@
 
-<div class="row controls equal-height-cols">
+<div ng-controller="camLayoutCtrl"
+     class="row controls equal-height-cols">
   <div class="cols col-sm-2 task-filters"
        ng-controller="camEditFilterCtrl">
     <div class="inner">
@@ -11,6 +12,13 @@
           <span class="glyphicon glyphicon-plus-sign"></span>
         </a>
       </h5>
+
+      <button ng-click="toggleFilters($event)"
+              class="toggle-filters btn btn-link">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
     </div>
   </div>
 
