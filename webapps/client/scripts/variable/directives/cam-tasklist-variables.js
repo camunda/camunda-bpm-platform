@@ -81,15 +81,6 @@ define([
         scope.expanded = false;
         scope.shownVariablesCount = 0;
 
-        // scope.selectValue = function($event) {
-        //   var $label = angular.element($event.target);
-        //   var $value = $label.parents('.variable-item').find('.variable-value');
-        //   if ($value.length) {
-        //     var range = $window.document.createRange();
-        //     range.selectNode($value[0]);
-        //   }
-        // };
-
         scope.toggle = function($event) {
           scope.expanded = !scope.expanded;
           if ($event && $event.preventDefault) {
@@ -121,7 +112,7 @@ define([
           scope.variableDefinitions = scope.filterProperties.variables || {};
 
           // building an object on which keys are name of variables is more efficient
-          // than calling a function who would iterate every time.
+          // than calling a function which would iterate every time.
           angular.forEach(scope.variables, function(variable) {
             scope.variablesByName[variable.name] = variable;
           });
