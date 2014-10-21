@@ -57,6 +57,13 @@
   <span class="btn-group" ng-if="varType !== 'option'">
     <button type="button"
             class="btn btn-xs btn-default"
+            ng-click="changeType()"
+            ng-if="flexible">
+      <span class="glyphicon glyphicon-calendar"></span>
+    </button>
+
+    <button type="button"
+            class="btn btn-xs btn-default"
             ng-click="applyChange()">
       <span class="glyphicon glyphicon-ok"></span>
     </button>

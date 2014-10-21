@@ -29,7 +29,8 @@ define([
         displayFormat:  '@',
         icon:           '@',
         suffixed:       '@',
-        options:        '=?'
+        options:        '=?',
+        flexible:       '@'
       },
 
       template: template,
@@ -68,6 +69,10 @@ define([
           return ['datetime', 'date', 'time'].indexOf(scope.varType) > -1;
         }
 
+        function isSimpleField() {
+          return ['color', 'email', 'month', 'number', 'range', 'tel', 'text', 'time', 'url', 'week'].indexOf(scope.varType) > -1;
+        }
+
         function reset() {
           scope.editing =       false;
           scope.invalid =       false;
@@ -82,21 +87,12 @@ define([
           scope.icon =          scope.icon ||          false;
           scope.suffixed =      scope.suffixed ||      false;
           scope.options =       scope.options ||       [];
+          scope.flexible =      scope.flexible ||      false;
 
           scope.varType =       !!scope.varType ? scope.varType : 'text';
 
-          scope.simpleField = [
-            'color',
-            'email',
-            'month',
-            'number',
-            'range',
-            'tel',
-            'text',
-            'time',
-            'url',
-            'week'
-          ].indexOf(scope.varType) > -1;
+
+          scope.simpleField = isSimpleField();
 
           if (isDate()) {
             var dateStr = scope.varValue,
@@ -135,6 +131,16 @@ define([
 
           scope.$apply(scope.cancelChange);
         }
+
+        scope.changeType = function() {
+          if(scope.varType === "datetime") {
+            scope.varType = "text";
+          } else {
+            scope.varType = 'datetime';
+          }
+          element[0].attributes.type.value = scope.varType;
+          scope.simpleField = isSimpleField();
+        };
 
         scope.startEditing = function() {
           if(!scope.editing) {

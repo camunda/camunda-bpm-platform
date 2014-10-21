@@ -1,12 +1,23 @@
 define([
-  'angular'
+  'angular',
+  'moment'
 ], function(
-  angular
+  angular,
+  moment
 ) {
   'use strict';
-  return function() {
+  return ['$filter', function($filter) {
+    var dateRegex = /(\d\d\d\d)-(\d\d)-(\d\d)T(\d\d):(\d\d):(\d\d)(?:.(\d\d\d)| )?$/;
+    function isDateValue(value) {
+       return value.match(dateRegex);
+    }
+    var camDate = $filter('camDate');
+
     return function(input) {
+      if(input && isDateValue(input)) {
+        return camDate(input, 'abbr');
+      }
       return input ? input : '??';
     };
-  };
+  }];
 });

@@ -8,5 +8,6 @@ define([], function() {
   ) {
     camDateFormatProvider.setDateFormat('MMMM', 'monthName');
     camDateFormatProvider.setDateFormat('DD', 'day');
+    camDateFormatProvider.setDateFormat('lll', 'abbr');
   }];
 });

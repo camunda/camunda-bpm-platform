@@ -99,8 +99,17 @@ define([
          search.value;
     }
     function parseValue(value) {
-      // cast input value to number if needed
-      return isNaN(value) ? value : +value;
+      if(!isNaN(value)) {
+        // value must be transformed to number
+        return +value;
+      }
+      if(value === "true") {
+        return true;
+      }
+      if(value === "false") {
+        return false;
+      }
+      return value;
     }
     function updateQuery() {
       query.processVariables = [];
