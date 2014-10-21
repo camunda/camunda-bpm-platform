@@ -51,7 +51,7 @@ public abstract class AbstractQuery<T extends Query<?,?>, U> extends ListQueryPa
   }
   protected transient CommandExecutor commandExecutor;
   protected transient CommandContext commandContext;
-  protected String orderBy;
+
   protected ResultType resultType;
   protected QueryProperty orderProperty;
 
