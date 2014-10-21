@@ -22,18 +22,18 @@ describe('tasklist dashboard - ', function() {
   });
 
 
-  xdescribe("claim and unclaim", function () {
+  describe('claim and unclaim', function () {
 
-    it("should claim a task", function () {
+    it('should claim a task', function () {
 
       // given
-      dashboardPage.taskFilters.selectFilter(1);
+      dashboardPage.taskFilters.selectFilter(3); // select ALL TASK filter
 
       // when
       var taskName = dashboardPage.taskList.taskName(0);
       dashboardPage.taskList.selectTask(0);
       dashboardPage.currentTask.claim();
-      dashboardPage.taskFilters.selectFilter(0);
+      dashboardPage.taskFilters.selectFilter(0); // select MY TASKS filter
 
       // then
       expect(dashboardPage.taskList.taskList().count()).toBe(2);
@@ -41,7 +41,7 @@ describe('tasklist dashboard - ', function() {
     });
 
 
-    it("schould unclaim a task", function () {
+    it('should unclaim a task', function () {
 
       // when
       dashboardPage.taskList.selectTask(0);
@@ -91,7 +91,7 @@ describe('tasklist dashboard - ', function() {
       });
 
 
-      it("should start process", function () {
+      it('should start process', function () {
 
         // when
         dashboardPage.selectNavbarItem('Process');
@@ -153,10 +153,10 @@ describe('tasklist dashboard - ', function() {
 
     it('should logout', function() {
 
-      cockpitPage.navigateTo();
+  /*    cockpitPage.navigateTo();
       cockpitPage.deployedProcessesList.selectProcess(12);
       cockpitProcessDefinitionPage.table.processInstancesTab.selectProcessInstance(0);
-      cockpitProcessInstancePage.actionButton.cancelInstance();
+      cockpitProcessInstancePage.actionButton.cancelInstance();*/
 
     });
 

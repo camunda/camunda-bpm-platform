@@ -4,7 +4,7 @@ var dashboardPage = require('../pages/dashboard');
 
 describe('tasklist filter -', function() {
 
-  describe("start test", function() {
+  describe('start test', function() {
 
     it('should login', function() {
 
@@ -19,9 +19,9 @@ describe('tasklist filter -', function() {
   });
 
 
-  describe("create new filter", function() {
+  describe('create new filter', function() {
 
-    it("should open create new filter page", function() {
+    it('should open create new filter page', function() {
 
       // when
       dashboardPage.taskFilters.createFilterButton().click();
@@ -33,7 +33,7 @@ describe('tasklist filter -', function() {
     });
 
 
-    it("should enter filter values", function() {
+    it('should enter filter values', function() {
 
       // when
       dashboardPage.taskFilters.createFilterPage.nameInput('ÖÄÜ-FILTER');
@@ -48,7 +48,7 @@ describe('tasklist filter -', function() {
     });
 
 
-    it("should validate filter results", function() {
+    it('should validate filter results', function() {
 
       expect(dashboardPage.taskList.taskList().count()).toBeGreaterThan(0);
     });
@@ -56,9 +56,9 @@ describe('tasklist filter -', function() {
   });
 
 
-  describe("edit filter", function() {
+  describe('edit filter', function() {
 
-    it("should edit first filter", function() {
+    it('should edit first filter', function() {
 
       // when
       dashboardPage.taskFilters.editFilter(0);
@@ -71,9 +71,9 @@ describe('tasklist filter -', function() {
     });
 
 
-    describe("criteria panel", function() {
+    describe('criteria panel', function() {
 
-      it("should open criteria panel", function() {
+      it('should open criteria panel', function() {
 
         // when
         dashboardPage.taskFilters.editFilterPage.selectPanel('Criteria');
@@ -83,7 +83,7 @@ describe('tasklist filter -', function() {
       });
 
 
-      it("should add new criteria", function() {
+      it('should add new criteria', function() {
 
         // when
         dashboardPage.taskFilters.editFilterPage.addCriteria('Id', '4711');
@@ -95,9 +95,9 @@ describe('tasklist filter -', function() {
     });
 
 
-    describe("variable panel", function() {
+    describe('variable panel', function() {
 
-      it("should open variables panel", function() {
+      it('should open variables panel', function() {
 
         // when
         dashboardPage.taskFilters.editFilterPage.selectPanel('Variables');
@@ -107,7 +107,7 @@ describe('tasklist filter -', function() {
       });
 
 
-      it("should add a variable", function() {
+      it('should add a variable', function() {
 
         // when
         dashboardPage.taskFilters.editFilterPage.addVariable('ÖÄÜ-123', '123 blaw');
@@ -119,14 +119,14 @@ describe('tasklist filter -', function() {
     });
 
 
-    xdescribe("authorization panel", function() {
+    xdescribe('authorization panel', function() {
 
     });
 
 
-    describe("general panel", function() {
+    describe('general panel', function() {
 
-      it("should open general panel", function() {
+      it('should open general panel', function() {
 
         // when
         dashboardPage.taskFilters.editFilterPage.selectPanel('General');
@@ -136,7 +136,7 @@ describe('tasklist filter -', function() {
       });
 
 
-      it("should change general panel value", function() {
+      it('should change general panel value', function() {
 
         // when
         dashboardPage.taskFilters.editFilterPage.nameInput().clear();
@@ -152,7 +152,7 @@ describe('tasklist filter -', function() {
     });
 
 
-    it("should save filter", function() {
+    it('should save filter', function() {
 
       // when
       dashboardPage.taskFilters.editFilterPage.saveButton().click();
@@ -164,13 +164,13 @@ describe('tasklist filter -', function() {
     });
 
 
-    it("should validate priority ranking", function() {
+    it('should validate priority ranking', function() {
 
       expect(dashboardPage.taskFilters.filterName(1)).toBe('123 FILTER NAME');
     });
 
 
-    it("should validate filter refresh", function() {
+    it('should validate filter refresh', function() {
 
       expect(dashboardPage.taskList.taskList().count()).toBe(0);
 
@@ -180,9 +180,9 @@ describe('tasklist filter -', function() {
   });
 
 
-  describe("use filter", function() {
+  describe('use filter', function() {
 
-    it("should show filter results after relogin", function () {
+    it('should show filter results after relogin', function () {
 
       // when
       dashboardPage.taskFilters.selectFilter(0);
@@ -198,9 +198,9 @@ describe('tasklist filter -', function() {
   });
 
 
-  describe("delete filter", function() {
+  describe('delete filter', function() {
 
-    it("should open delete page", function() {
+    it('should open delete page', function() {
 
       // when
       dashboardPage.taskFilters.deleteFilter(1);
@@ -213,7 +213,7 @@ describe('tasklist filter -', function() {
     });
 
 
-    it("should delete the filter", function() {
+    it('should delete the filter', function() {
 
       // when
       dashboardPage.taskFilters.deleteFilterPage.deleteButton().click();
