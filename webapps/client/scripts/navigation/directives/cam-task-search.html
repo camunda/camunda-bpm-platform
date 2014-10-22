@@ -4,7 +4,7 @@
 
       <span class="search-label"
             ng-repeat="search in searches"
-            ng-class="{'invalid': invalidSearch(search, types, operatorList)}">
+            ng-class="{'invalid': invalidSearch(search, types, search.operators)}">
         <a href
            tooltip-placement="top"
            tooltip="{{ 'DELETE_SEARCH' | translate }}"
@@ -42,7 +42,7 @@
         <span cam-form-inline-field
               class="set-value"
               type="option"
-              options="operatorList"
+              options="search.operators"
               change="changeSearch($index, 'operator', varValue)"
               value="search.operator">
           <span tooltip-placement="top"

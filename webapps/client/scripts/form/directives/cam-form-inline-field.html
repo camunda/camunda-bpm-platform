@@ -59,7 +59,8 @@
             class="btn btn-xs btn-default"
             ng-click="changeType()"
             ng-if="flexible">
-      <span class="glyphicon glyphicon-calendar"></span>
+      <span ng-show="varType === 'text'" class="glyphicon glyphicon-calendar"></span>
+      <span ng-show="varType === 'datetime'" class="glyphicon glyphicon-pencil"></span>
     </button>
 
     <button type="button"

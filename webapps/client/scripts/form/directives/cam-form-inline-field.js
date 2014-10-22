@@ -133,6 +133,8 @@ define([
         }
 
         scope.changeType = function() {
+          reset();
+          scope.editing = true;
           if(scope.varType === "datetime") {
             scope.varType = "text";
           } else {

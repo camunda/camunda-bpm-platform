@@ -22,6 +22,7 @@ define([
         search.name = match[1];
         search.operator = match[2];
         search.value = match[3];
+        search.operators = getOperators(getType(parseValue(search.value)));
         return true;
       }
       return false;
@@ -29,12 +30,29 @@ define([
     function createSearchObj(type) {
       return {
         type : type,
-        operator: "="
+        operator: "=",
+        operators: getOperators()
       };
+    }
+    function getOperators(varType) {
+      switch(varType) {
+        case 'date':    return ["<", ">", "<=", ">="];
+        case 'boolean':
+        case 'object':  return ["=", "!="];
+        case 'number':  return ["=", "!=", "<", ">", "<=", ">="];
+        default:        return ["=", "!=", "<", ">", "<=", ">=", "like"];
+      }
+    }
+
+    var dateRegex = /(\d\d\d\d)-(\d\d)-(\d\d)T(\d\d):(\d\d):(\d\d)(?:.(\d\d\d)| )?$/;
+    function getType(value) {
+      if(value && typeof value === "string" && value.match(dateRegex)) {
+        return "date";
+      }
+      return typeof value;
     }
 
     $scope.types = ["Process Variable", "Task Variable", "Case Variable"];
-    $scope.operatorList = ["=", "!=", "<", ">", "<=", ">=", "like"];
     $scope.dropdownOpen = false;
 
     $scope.deleteSearch = function(idx) {
@@ -46,6 +64,7 @@ define([
       var search = createSearchObj(type);
       if(!parseSearch(search, $scope.inputQuery)) {
         search.value = $scope.inputQuery;
+        search.operators = getOperators(getType(parseValue(search.value)));
       }
       $scope.searches.push(search);
       updateQuery();
@@ -57,8 +76,23 @@ define([
       $scope.inputQuery = "";
     };
 
+    function getDefaultOperator(valueType) {
+      switch(valueType) {
+        case 'date': return ">=";
+        default:     return "=";
+      }
+    }
+
     $scope.changeSearch = function(idx, field, value) {
-      $scope.searches[idx][field] = value;
+      var search = $scope.searches[idx];
+      search[field] = value;
+      var valueType = getType(parseValue(search.value));
+      search.operators = getOperators(valueType);
+      if(search.operators.indexOf(search.operator) === -1) {
+        // if the current value type does not allow the selected operator,
+        // fall back to default operator
+        search.operator = getDefaultOperator(valueType);
+      }
       updateQuery();
     };
 
@@ -94,7 +128,7 @@ define([
     };
     function isValid(search) {
       return $scope.types.indexOf(search.type) !== -1 &&
-         $scope.operatorList.indexOf(search.operator) !== -1 &&
+         search.operators.indexOf(search.operator) !== -1 &&
          search.name &&
          search.value;
     }
@@ -109,8 +143,13 @@ define([
       if(value === "false") {
         return false;
       }
+      if(value === "NULL") {
+        return null;
+      }
       return value;
     }
+
+
     function updateQuery() {
       query.processVariables = [];
       query.taskVariables = [];
