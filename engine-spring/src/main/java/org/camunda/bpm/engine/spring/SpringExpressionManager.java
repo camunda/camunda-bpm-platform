@@ -13,9 +13,6 @@
 
 package org.camunda.bpm.engine.spring;
 
-import java.util.Map;
-
-import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
 import org.camunda.bpm.engine.impl.el.ReadOnlyMapELResolver;
 import org.camunda.bpm.engine.impl.el.VariableScopeElResolver;
@@ -26,6 +23,8 @@ import org.camunda.bpm.engine.impl.javax.el.ELResolver;
 import org.camunda.bpm.engine.impl.javax.el.ListELResolver;
 import org.camunda.bpm.engine.impl.javax.el.MapELResolver;
 import org.springframework.context.ApplicationContext;
+
+import java.util.Map;
 
 
 /**
@@ -52,9 +51,9 @@ public class SpringExpressionManager extends ExpressionManager {
   }
 
   @Override
-  protected ELResolver createElResolver(VariableScope<?> variableScope) {
+  protected ELResolver createElResolver() {
     CompositeELResolver compositeElResolver = new CompositeELResolver();
-    compositeElResolver.add(new VariableScopeElResolver(variableScope));
+    compositeElResolver.add(new VariableScopeElResolver());
 
     if(beans != null) {
       // Only expose limited set of beans in expressions
@@ -68,6 +67,7 @@ public class SpringExpressionManager extends ExpressionManager {
     compositeElResolver.add(new ListELResolver());
     compositeElResolver.add(new MapELResolver());
     compositeElResolver.add(new BeanELResolver());
+
     return compositeElResolver;
   }
 

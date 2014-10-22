@@ -13,7 +13,6 @@
 
 package org.camunda.bpm.engine.test.mock;
 
-import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
 import org.camunda.bpm.engine.impl.el.VariableScopeElResolver;
 import org.camunda.bpm.engine.impl.javax.el.ArrayELResolver;
@@ -26,9 +25,9 @@ import org.camunda.bpm.engine.impl.javax.el.MapELResolver;
 public class MockExpressionManager extends ExpressionManager {
 
   @Override
-  protected ELResolver createElResolver(VariableScope<?> variableScope) {
+  protected ELResolver createElResolver() {
     CompositeELResolver compositeElResolver = new CompositeELResolver();
-    compositeElResolver.add(new VariableScopeElResolver(variableScope));
+    compositeElResolver.add(new VariableScopeElResolver());
     compositeElResolver.add(new MockElResolver());
     compositeElResolver.add(new ArrayELResolver());
     compositeElResolver.add(new ListELResolver());
