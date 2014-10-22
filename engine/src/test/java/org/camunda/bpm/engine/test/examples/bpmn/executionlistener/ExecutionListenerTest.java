@@ -13,6 +13,8 @@
 
 package org.camunda.bpm.engine.test.examples.bpmn.executionlistener;
 
+import static org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,8 +28,6 @@ import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.examples.bpmn.executionlistener.CurrentActivityExecutionListener.CurrentActivity;
 import org.camunda.bpm.engine.test.examples.bpmn.executionlistener.RecorderExecutionListener.RecordedEvent;
-
-import static org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT;
 
 /**
  * @author Frederik Heremans
@@ -217,6 +217,25 @@ public class ExecutionListenerTest extends PluggableProcessEngineTestCase {
         assertTrue("Variable '" + variableName + "' should be set to true", (Boolean) variableInstance.getValue());
       }
     }
+  }
+
+  /**
+   * See CAM-2937
+   */
+  @Deployment
+  public void FAILING_testExecutionListenerOnTerminateEndEvent() {
+    runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+    Task task = taskService.createTaskQuery().singleResult();
+    taskService.complete(task.getId());
+
+    List<RecordedEvent> recordedEvents = RecorderExecutionListener.getRecordedEvents();
+
+    assertEquals(2, recordedEvents.size());
+
+    assertEquals("start", recordedEvents.get(0).getEventName());
+    assertEquals("end", recordedEvents.get(0).getEventName());
+
   }
 
 }
