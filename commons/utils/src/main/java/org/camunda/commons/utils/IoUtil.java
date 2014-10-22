@@ -136,14 +136,14 @@ public class IoUtil {
       throw LOG.nullParameter("filename");
     }
 
-    return getClasspathFile(filename, IoUtil.class.getClassLoader());
+    return getClasspathFile(filename, null);
   }
 
   /**
    * Returns the {@link File} for a filename.
    *
    * @param filename the filename to load
-   * @param classLoader the classLoader to load file with
+   * @param classLoader the classLoader to load file with, if null falls back to TCCL and then this class's classloader
    * @return the file object
    * @throws IoUtilException if the file cannot be loaded
    */
@@ -152,7 +152,22 @@ public class IoUtil {
       throw LOG.nullParameter("filename");
     }
 
-    URL fileUrl = classLoader.getResource(filename);
+    URL fileUrl = null;
+
+    if (classLoader != null) {
+      fileUrl = classLoader.getResource(filename);
+    }
+    if (fileUrl == null) {
+      // Try the current Thread context classloader
+      classLoader = Thread.currentThread().getContextClassLoader();
+      fileUrl = classLoader.getResource(filename);
+
+      if (fileUrl == null) {
+        // Finally, try the classloader for this class
+        classLoader = IoUtil.class.getClassLoader();
+        fileUrl = classLoader.getResource(filename);
+      }
+    }
 
     if(fileUrl == null) {
       throw LOG.fileNotFoundException(filename);
