@@ -19,6 +19,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URL;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
@@ -104,5 +105,24 @@ public class IoUtilTest {
     } catch(IoUtilException e) {
       // happy way
     }
+  }
+
+  @Test
+  public void shouldUseFallBackWhenCustomClassLoaderIsWrong() {
+    File file = IoUtil.getClasspathFile(TEST_FILE_NAME, new ClassLoader() {
+      @Override
+      public URL getResource(String name) {
+        return null;
+      }
+    });
+    assertThat(file).isNotNull();
+    assertThat(file.getName()).isEqualTo("testFile.txt");
+  }
+
+  @Test
+  public void shouldUseFallBackWhenCustomClassLoaderIsNull() {
+    File file = IoUtil.getClasspathFile(TEST_FILE_NAME, null);
+    assertThat(file).isNotNull();
+    assertThat(file.getName()).isEqualTo("testFile.txt");
   }
 }
