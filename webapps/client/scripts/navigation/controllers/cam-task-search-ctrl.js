@@ -36,7 +36,7 @@ define([
     }
     function getOperators(varType) {
       switch(varType) {
-        case 'date':    return ["<", ">", "<=", ">="];
+        case 'date':    return ["BEFORE", "AFTER"];
         case 'boolean':
         case 'object':  return ["=", "!="];
         case 'number':  return ["=", "!=", "<", ">", "<=", ">="];
@@ -78,7 +78,7 @@ define([
 
     function getDefaultOperator(valueType) {
       switch(valueType) {
-        case 'date': return ">=";
+        case 'date': return "AFTER";
         default:     return "=";
       }
     }
@@ -119,7 +119,9 @@ define([
       "!=": "neq",
       ">=": "gteq",
       "<=": "lteq",
-      "like":"like"
+      "like":"like",
+      "BEFORE":"lteq",
+      "AFTER":"gteq"
     };
     var typeTable = {
       "Process Variable" : "processVariables",

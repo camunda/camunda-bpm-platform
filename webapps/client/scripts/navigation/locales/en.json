@@ -14,5 +14,9 @@
   "OPERATOR":
                   "Operator",
   "INVALID_SEARCH":
-                  "This search query is not valid"
+                  "This search query is not valid",
+  "BEFORE":
+                  "before",
+  "AFTER":
+                  "after"
 }

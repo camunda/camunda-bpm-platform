@@ -43,11 +43,11 @@
 
     </span>
     <div ng-if="varType === 'option'">
-      <span style="padding: 4px;">{{varValue}}</span>
+      <span style="padding: 4px;">{{varValue | translate }}</span>
       <ul class="dropdown-menu" style="display:block;" role="menu">
         <li ng-repeat="option in options">
           <a ng-click="applyChange(option)">
-            {{option}}
+            {{option | translate }}
           </a>
         </li>
       </ul>
