@@ -13,6 +13,7 @@
 package org.camunda.bpm.webapp.plugin.resource;
 
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.ServletContext;
@@ -121,7 +122,8 @@ public class AbstractAppPluginRootResource<T extends AppPlugin> {
    * @param assetStream
    */
   protected InputStream applyResourceOverrides(String file, InputStream assetStream) {
-    List<PluginResourceOverride> resourceOverrides = runtimeDelegate.getResourceOverrides();
+    // use a copy of the list cause it could be modified during iteration
+    List<PluginResourceOverride> resourceOverrides = new ArrayList<PluginResourceOverride>(runtimeDelegate.getResourceOverrides());
     for (PluginResourceOverride pluginResourceOverride : resourceOverrides) {
       assetStream = pluginResourceOverride.filterResource(assetStream, new RequestInfo(headers, servletContext, uriInfo));
     }
