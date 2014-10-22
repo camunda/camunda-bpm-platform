@@ -44,6 +44,7 @@ import org.camunda.bpm.engine.form.StartFormData;
 import org.camunda.bpm.engine.form.TaskFormData;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricActivityStatistics;
+import org.camunda.bpm.engine.history.HistoricCaseInstance;
 import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.history.HistoricFormField;
 import org.camunda.bpm.engine.history.HistoricIncident;
@@ -323,6 +324,19 @@ public abstract class MockProvider {
   public static final String EXAMPLE_HISTORIC_PROCESS_INSTANCE_FINISHED_AFTER = "2013-01-23T13:42:43";
   public static final String EXAMPLE_HISTORIC_PROCESS_INSTANCE_FINISHED_BEFORE = "2013-04-23T13:42:43";
 
+  // Historic Case Instance
+  public static final long EXAMPLE_HISTORIC_CASE_INSTANCE_DURATION_MILLIS = 2000l;
+  public static final String EXAMPLE_HISTORIC_CASE_INSTANCE_CREATE_TIME = "2013-04-23T13:42:43";
+  public static final String EXAMPLE_HISTORIC_CASE_INSTANCE_CLOSE_TIME = "2013-04-23T13:42:43";
+  public static final String EXAMPLE_HISTORIC_CASE_INSTANCE_CREATE_USER_ID = "aCreateUserId";
+  public static final String EXAMPLE_HISTORIC_CASE_INSTANCE_SUPER_CASE_INSTANCE_ID = "aSuperCaseInstanceId";
+  public static final String EXAMPLE_HISTORIC_CASE_INSTANCE_SUB_CASE_INSTANCE_ID = "aSubCaseInstanceId";
+
+  public static final String EXAMPLE_HISTORIC_CASE_INSTANCE_CREATED_AFTER = "2013-04-23T13:42:43";
+  public static final String EXAMPLE_HISTORIC_CASE_INSTANCE_CREATED_BEFORE = "2013-01-23T13:42:43";
+  public static final String EXAMPLE_HISTORIC_CASE_INSTANCE_CLOSED_AFTER = "2013-01-23T13:42:43";
+  public static final String EXAMPLE_HISTORIC_CASE_INSTANCE_CLOSED_BEFORE = "2013-04-23T13:42:43";
+
   // Historic Activity Instance
   public static final String EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_ID = "aHistoricActivityInstanceId";
   public static final String EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_PARENT_ACTIVITY_INSTANCE_ID = "aHistoricParentActivityInstanceId";
@@ -431,11 +445,13 @@ public abstract class MockProvider {
   public static final int EXAMPLE_CASE_DEFINITION_VERSION = 1;
   public static final String EXAMPLE_CASE_DEFINITION_CATEGORY = "aCaseDefinitionCategory";
   public static final String EXAMPLE_CASE_DEFINITION_NAME = "aCaseDefinitionName";
+  public static final String EXAMPLE_CASE_DEFINITION_NAME_LIKE = "aCaseDefinitionNameLike";
   public static final String EXAMPLE_CASE_DEFINITION_RESOURCE_NAME = "aCaseDefinitionResourceName";
 
   // case instance
   public static final String EXAMPLE_CASE_INSTANCE_ID = "aCaseInstId";
   public static final String EXAMPLE_CASE_INSTANCE_BUSINESS_KEY = "aBusinessKey";
+  public static final String EXAMPLE_CASE_INSTANCE_BUSINESS_KEY_LIKE = "aBusinessKeyLike";
   public static final String EXAMPLE_CASE_INSTANCE_CASE_DEFINITION_ID = "aCaseDefinitionId";
   public static final boolean EXAMPLE_CASE_INSTANCE_IS_ACTIVE = true;
   public static final boolean EXAMPLE_CASE_INSTANCE_IS_COMPLETED = true;
@@ -1085,6 +1101,44 @@ public abstract class MockProvider {
     when(mock.getEndTime()).thenReturn(null);
     when(mock.getStartTime()).thenReturn(DateTimeUtil.parseDate(EXAMPLE_HISTORIC_PROCESS_INSTANCE_START_TIME));
     when(mock.getDurationInMillis()).thenReturn(EXAMPLE_HISTORIC_PROCESS_INSTANCE_DURATION_MILLIS);
+    return mock;
+  }
+
+  public static List<HistoricCaseInstance> createMockHistoricCaseInstances() {
+    List<HistoricCaseInstance> mockList = new ArrayList<HistoricCaseInstance>();
+    mockList.add(createMockHistoricCaseInstance());
+    return mockList;
+  }
+
+  public static HistoricCaseInstance createMockHistoricCaseInstance() {
+    HistoricCaseInstance mock = mock(HistoricCaseInstance.class);
+
+    when(mock.getId()).thenReturn(EXAMPLE_CASE_INSTANCE_ID);
+    when(mock.getBusinessKey()).thenReturn(EXAMPLE_CASE_INSTANCE_BUSINESS_KEY);
+    when(mock.getCaseDefinitionId()).thenReturn(EXAMPLE_CASE_DEFINITION_ID);
+    when(mock.getCreateTime()).thenReturn(DateTimeUtil.parseDate(EXAMPLE_HISTORIC_CASE_INSTANCE_CREATE_TIME));
+    when(mock.getCloseTime()).thenReturn(DateTimeUtil.parseDate(EXAMPLE_HISTORIC_CASE_INSTANCE_CLOSE_TIME));
+    when(mock.getDurationInMillis()).thenReturn(EXAMPLE_HISTORIC_CASE_INSTANCE_DURATION_MILLIS);
+    when(mock.getCreateUserId()).thenReturn(EXAMPLE_HISTORIC_CASE_INSTANCE_CREATE_USER_ID);
+    when(mock.getSuperCaseInstanceId()).thenReturn(EXAMPLE_HISTORIC_CASE_INSTANCE_SUPER_CASE_INSTANCE_ID);
+
+    return mock;
+  }
+
+  public static List<HistoricCaseInstance> createMockRunningHistoricCaseInstances() {
+    List<HistoricCaseInstance> mockList = new ArrayList<HistoricCaseInstance>();
+    mockList.add(createMockHistoricCaseInstanceNotClosed());
+    return mockList;
+  }
+
+  public static HistoricCaseInstance createMockHistoricCaseInstanceNotClosed() {
+    HistoricCaseInstance mock = mock(HistoricCaseInstance.class);
+    when(mock.getId()).thenReturn(EXAMPLE_CASE_INSTANCE_ID);
+    when(mock.getBusinessKey()).thenReturn(EXAMPLE_CASE_INSTANCE_BUSINESS_KEY);
+    when(mock.getCaseDefinitionId()).thenReturn(EXAMPLE_CASE_DEFINITION_ID);
+    when(mock.getCloseTime()).thenReturn(null);
+    when(mock.getCreateTime()).thenReturn(DateTimeUtil.parseDate(EXAMPLE_HISTORIC_CASE_INSTANCE_CREATE_TIME));
+    when(mock.getDurationInMillis()).thenReturn(EXAMPLE_HISTORIC_CASE_INSTANCE_DURATION_MILLIS);
     return mock;
   }
 

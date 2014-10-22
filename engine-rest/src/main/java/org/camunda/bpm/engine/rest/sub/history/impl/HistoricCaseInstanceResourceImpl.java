@@ -16,31 +16,30 @@ import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.history.HistoricProcessInstance;
-import org.camunda.bpm.engine.rest.dto.history.HistoricProcessInstanceDto;
+import org.camunda.bpm.engine.history.HistoricCaseInstance;
+import org.camunda.bpm.engine.rest.dto.history.HistoricCaseInstanceDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
-import org.camunda.bpm.engine.rest.sub.history.HistoricProcessInstanceResource;
+import org.camunda.bpm.engine.rest.sub.history.HistoricCaseInstanceResource;
 
-public class HistoricProcessInstanceResourceImpl implements HistoricProcessInstanceResource {
+public class HistoricCaseInstanceResourceImpl implements HistoricCaseInstanceResource {
 
   private ProcessEngine engine;
-  private String processInstanceId;
+  private String caseInstanceId;
 
-  public HistoricProcessInstanceResourceImpl(ProcessEngine engine, String processInstanceId) {
+  public HistoricCaseInstanceResourceImpl(ProcessEngine engine, String caseInstanceId) {
     this.engine = engine;
-    this.processInstanceId = processInstanceId;
+    this.caseInstanceId = caseInstanceId;
   }
 
-  @Override
-  public HistoricProcessInstanceDto getHistoricProcessInstance() {
+  public HistoricCaseInstanceDto getHistoricCaseInstance() {
     HistoryService historyService = engine.getHistoryService();
-    HistoricProcessInstance instance = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
+    HistoricCaseInstance instance = historyService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstanceId).singleResult();
 
     if (instance == null) {
-      throw new InvalidRequestException(Status.NOT_FOUND, "Historic process instance with id " + processInstanceId + " does not exist");
+      throw new InvalidRequestException(Status.NOT_FOUND, "Historic case instance with id '" + caseInstanceId + "' does not exist");
     }
 
-    return HistoricProcessInstanceDto.fromHistoricProcessInstance(instance);
+    return HistoricCaseInstanceDto.fromHistoricCaseInstance(instance);
   }
 
 }

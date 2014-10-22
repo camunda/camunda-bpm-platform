@@ -25,6 +25,9 @@ public interface HistoryRestService {
   @Path(HistoricProcessInstanceRestService.PATH)
   HistoricProcessInstanceRestService getProcessInstanceService();
 
+  @Path(HistoricCaseInstanceRestService.PATH)
+  HistoricCaseInstanceRestService getCaseInstanceService();
+
   @Path(HistoricActivityInstanceRestService.PATH)
   HistoricActivityInstanceRestService getActivityInstanceService();
 

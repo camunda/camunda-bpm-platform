@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.rest.impl.history;
 
 import org.camunda.bpm.engine.rest.history.HistoricActivityInstanceRestService;
 import org.camunda.bpm.engine.rest.history.HistoricActivityStatisticsRestService;
+import org.camunda.bpm.engine.rest.history.HistoricCaseInstanceRestService;
 import org.camunda.bpm.engine.rest.history.HistoricDetailRestService;
 import org.camunda.bpm.engine.rest.history.HistoricIncidentRestService;
 import org.camunda.bpm.engine.rest.history.HistoricProcessInstanceRestService;
@@ -33,42 +34,38 @@ public class HistoryRestServiceImpl extends AbstractRestProcessEngineAware imple
     super(engineName);
   }
 
-  @Override
   public HistoricProcessInstanceRestService getProcessInstanceService() {
     return new HistoricProcessInstanceRestServiceImpl(getProcessEngine());
   }
 
-  @Override
+  public HistoricCaseInstanceRestService getCaseInstanceService() {
+    return new HistoricCaseInstanceRestServiceImpl(getProcessEngine());
+  }
+
   public HistoricActivityInstanceRestService getActivityInstanceService() {
     return new HistoricActivityInstanceRestServiceImpl(getProcessEngine());
   }
 
-  @Override
   public HistoricVariableInstanceRestService getVariableInstanceService() {
     return new HistoricVariableInstanceRestServiceImpl(getProcessEngine());
   }
 
-  @Override
   public HistoricActivityStatisticsRestService getActivityStatisticsService() {
     return new HistoricActivityStatisticsRestServiceImpl(getProcessEngine());
   }
 
-  @Override
   public UserOperationLogRestService getUserOperationLogRestService() {
     return new UserOperationLogRestServiceImpl(getProcessEngine());
   }
 
-  @Override
   public HistoricDetailRestService getDetailService() {
     return new HistoricDetailRestServiceImpl(getProcessEngine());
   }
 
-  @Override
   public HistoricTaskInstanceRestService getTaskInstanceService() {
     return new HistoricTaskInstanceRestServiceImpl(getProcessEngine());
   }
 
-  @Override
   public HistoricIncidentRestService getIncidentService() {
     return new HistoricIncidentRestServiceImpl(getProcessEngine());
   }
