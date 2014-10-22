@@ -68,15 +68,21 @@ define([
           scope.isAssignee = isAssignee;
         });
 
-        function submitCb(err) {
-          if (err) {
-            return errorNotification('COMPLETE_ERROR', err);
+        function enhanceErrorMessage(err) {
+          if(err.indexOf("task is null") !== -1) {
+            // task does not exist (e.g. completed by someone else)
+            return "TASK_NOT_EXIST";
           }
+          if(err.indexOf("is suspended") !== -1) {
+            // process instance is suspended
+            return "INSTANCE_SUSPENDED";
+          }
+          return err;
+        }
 
+        function clearTask() {
           scope._camForm = null;
           container.html('');
-
-          successNotification('COMPLETE_OK');
 
           // reseting the location leads that
           // the taskId will set to null and
@@ -89,6 +95,22 @@ define([
           // well: changed properties on this
           // task may cause the list to change
           taskFormData.changed('taskList');
+        }
+
+        function submitCb(err) {
+          if (err) {
+            var errorMsg = enhanceErrorMessage(err.message);
+            return $translate(errorMsg).then(function(translated) {
+              err.message = translated;
+              errorNotification('COMPLETE_ERROR', err);
+              if(errorMsg === "TASK_NOT_EXIST" || errorMsg === "INSTANCE_SUSPENDED") {
+                clearTask();
+              }
+            });
+          }
+
+          successNotification('COMPLETE_OK');
+          clearTask();
         }
 
         scope.completeTask = function() {
