@@ -269,43 +269,25 @@
   height: 150px;
 }
 
-// .groups {
-//   border: 1px solid transparent;
-//   margin: 0;
-//   padding: 1px 3px;
-//   position: relative;
-//   // background-color: transparent;
+.groups {
+  > div {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 250px;
+    white-space: nowrap;
+    height: 20px;
+    line-height: 20px;
+    display: inline-block;
+    vertical-align: bottom;
+  }
+}
 
-//   &:hover {
-//     cursor: pointer;
-//   }
-//   > div {
-//     overflow: hidden;
-//     text-overflow: ellipsis;
-//     max-width: 250px;
-//     white-space: nowrap;
-//     height: 20px;
-//     line-height: 20px;
-//     display: inline-block;
-//     vertical-align: bottom;
-//   }
-// }
+// used in the modal dialog
+.current-groups {
+  margin-bottom: (@grid-gutter-width / 2);
+}
 
-// .group-action-header {
-//   width: 1px;
-// }
-
-
-// .group-input {
-//   width: auto;
-//   display: inline;
-//   border-radius: 3px;
-
-//   &:hover {
-//     z-index: 99;
-//     cursor: pointer;
-//     border: 1px @line-style @line-color;
-//     // background-color: transparent;
-//     background-color: @gray-lighter;
+// [form="taskGroupForm"] {
+//   .row.values {
 //   }
 // }
