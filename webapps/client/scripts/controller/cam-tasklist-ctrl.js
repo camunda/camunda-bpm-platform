@@ -61,7 +61,8 @@ define([
       firstResult : 0,
       maxResults : 15,
       sortBy : 'priority',
-      sortOrder: 'asc'
+      sortOrder: 'asc',
+      active: true
     });
 
     /**
