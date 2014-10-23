@@ -13,7 +13,6 @@
 package org.camunda.spin.impl.xml.dom.format;
 
 import org.camunda.spin.impl.logging.SpinLogger;
-import org.camunda.spin.impl.xml.dom.DomXmlElement;
 import org.camunda.spin.impl.xml.dom.DomXmlLogger;
 import org.camunda.spin.impl.xml.dom.format.spi.JaxBContextProvider;
 import org.camunda.spin.spi.DataFormatMapper;
@@ -81,11 +80,11 @@ public class DomXmlDataFormatMapper implements DataFormatMapper {
     ensureNotNull("Parameter", parameter);
     ensureNotNull("Type", javaClass);
 
-    DomXmlElement xmlNode = (DomXmlElement) parameter;
+    Node xmlNode = (Node) parameter;
     try {
       Unmarshaller unmarshaller = getUnmarshaller(javaClass);
 
-      return (T) unmarshaller.unmarshal(new DOMSource(xmlNode.unwrap()));
+      return (T) unmarshaller.unmarshal(new DOMSource(xmlNode));
     } catch (JAXBException e) {
       throw LOG.unableToDeserialize(parameter, javaClass.getCanonicalName(), e);
     }

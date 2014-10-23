@@ -384,12 +384,12 @@ public class DomXmlElement extends SpinXmlElement {
 
   public <C> C mapTo(Class<C> javaClass) {
     DataFormatMapper mapper = dataFormat.getMapper();
-    return mapper.mapInternalToJava(this, javaClass);
+    return mapper.mapInternalToJava(this.domElement, javaClass);
   }
 
   public <C> C mapTo(String javaClass) {
     DataFormatMapper mapper = dataFormat.getMapper();
-    return mapper.mapInternalToJava(this, javaClass);
+    return mapper.mapInternalToJava(this.domElement, javaClass);
   }
 
 }
