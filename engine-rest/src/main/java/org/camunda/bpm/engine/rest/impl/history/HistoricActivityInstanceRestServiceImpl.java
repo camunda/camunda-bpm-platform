@@ -24,6 +24,8 @@ import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricActivityInstanceDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricActivityInstanceQueryDto;
 import org.camunda.bpm.engine.rest.history.HistoricActivityInstanceRestService;
+import org.camunda.bpm.engine.rest.sub.history.HistoricActivityInstanceResource;
+import org.camunda.bpm.engine.rest.sub.history.impl.HistoricActivityInstanceResourceImpl;
 
 public class HistoricActivityInstanceRestServiceImpl implements HistoricActivityInstanceRestService {
 
@@ -31,6 +33,10 @@ public class HistoricActivityInstanceRestServiceImpl implements HistoricActivity
 
   public HistoricActivityInstanceRestServiceImpl(ProcessEngine processEngine) {
     this.processEngine = processEngine;
+  }
+
+  public HistoricActivityInstanceResource getHistoricCaseInstance(String activityInstanceId) {
+    return new HistoricActivityInstanceResourceImpl(processEngine, activityInstanceId);
   }
 
   @Override

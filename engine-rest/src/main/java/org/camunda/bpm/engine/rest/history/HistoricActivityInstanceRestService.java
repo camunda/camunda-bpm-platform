@@ -13,11 +13,11 @@
 package org.camunda.bpm.engine.rest.history;
 
 import java.util.List;
-
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
@@ -27,12 +27,16 @@ import javax.ws.rs.core.UriInfo;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricActivityInstanceDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricActivityInstanceQueryDto;
+import org.camunda.bpm.engine.rest.sub.history.HistoricActivityInstanceResource;
 
 @Path(HistoricActivityInstanceRestService.PATH)
 @Produces(MediaType.APPLICATION_JSON)
 public interface HistoricActivityInstanceRestService {
 
   public static final String PATH = "/activity-instance";
+
+  @Path("/{id}")
+  HistoricActivityInstanceResource getHistoricCaseInstance(@PathParam("id") String activityInstanceId);
 
   /**
    * Exposes the {@link HistoricActivityInstanceQuery} interface as a REST

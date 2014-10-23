@@ -45,14 +45,16 @@ public interface HistoricCaseInstanceRestService {
    */
   @GET
   @Produces(MediaType.APPLICATION_JSON)
-  List<HistoricCaseInstanceDto> getHistoricCaseInstances(@Context UriInfo uriInfo, @QueryParam("firstResult") Integer firstResult,
-                                                               @QueryParam("maxResults") Integer maxResults);
+  List<HistoricCaseInstanceDto> getHistoricCaseInstances(@Context UriInfo uriInfo,
+                                                         @QueryParam("firstResult") Integer firstResult,
+                                                         @QueryParam("maxResults") Integer maxResults);
 
   @POST
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
-  List<HistoricCaseInstanceDto> queryHistoricCaseInstances(HistoricCaseInstanceQueryDto query, @QueryParam("firstResult") Integer firstResult,
-                                                                 @QueryParam("maxResults") Integer maxResults);
+  List<HistoricCaseInstanceDto> queryHistoricCaseInstances(HistoricCaseInstanceQueryDto query,
+                                                           @QueryParam("firstResult") Integer firstResult,
+                                                           @QueryParam("maxResults") Integer maxResults);
 
   @GET
   @Path("/count")

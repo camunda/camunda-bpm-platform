@@ -44,6 +44,7 @@ import org.camunda.bpm.engine.form.StartFormData;
 import org.camunda.bpm.engine.form.TaskFormData;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricActivityStatistics;
+import org.camunda.bpm.engine.history.HistoricCaseActivityInstance;
 import org.camunda.bpm.engine.history.HistoricCaseInstance;
 import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.history.HistoricFormField;
@@ -358,11 +359,37 @@ public abstract class MockProvider {
   public static final boolean EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_IS_CANCELED = true;
   public static final boolean EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_IS_COMPLETE_SCOPE = true;
 
+  // Historic Case Activity Instance
+  public static final String EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_ID = "aCaseActivityInstanceId";
+  public static final String EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_PARENT_CASE_ACTIVITY_INSTANCE_ID = "aParentCaseActivityId";
+  public static final String EXAMPLE_HISTORIC_CASE_ACTIVITY_ID = "aCaseActivityId";
+  public static final String EXAMPLE_HISTORIC_CASE_ACTIVITY_NAME = "aCaseActivityName";
+  public static final String EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_CALLED_PROCESS_INSTANCE_ID = "aCalledProcessInstanceId";
+  public static final String EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_CALLED_CASE_INSTANCE_ID = "aCalledCaseInstanceId";
+  public static final String EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_CREATE_TIME = "2014-04-23T18:42:42";
+  public static final String EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_END_TIME = "2014-04-23T18:42:43";
+  public static final long EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_DURATION = 2000l;
+  public static final boolean EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_IS_AVAILABLE = true;
+  public static final boolean EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_IS_ENABLED = true;
+  public static final boolean EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_IS_DISABLED = true;
+  public static final boolean EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_IS_ACTIVE = true;
+  public static final boolean EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_IS_FAILED = true;
+  public static final boolean EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_IS_SUSPENDED = true;
+  public static final boolean EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_IS_COMPLETED = true;
+  public static final boolean EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_IS_TERMINATED = true;
+  public static final boolean EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_IS_UNFINISHED = true;
+  public static final boolean EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_IS_FINISHED = true;
+
+  public static final String EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_CREATED_AFTER = "2014-04-23T18:41:42";
+  public static final String EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_CREATED_BEFORE = "2014-04-23T18:43:42";
+  public static final String EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_ENDED_AFTER = "2014-04-23T18:41:43";
+  public static final String EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_ENDED_BEFORE = "2014-04-23T18:43:43";
+
   // user operation log
   public static final String EXAMPLE_USER_OPERATION_LOG_ID = "userOpLogId";
   public static final String EXAMPLE_USER_OPERATION_ID = "opId";
   public static final String EXAMPLE_USER_OPERATION_TYPE = UserOperationLogEntry.OPERATION_TYPE_CLAIM;
-  public static final String EXAMPLE_USER_OPERATION_ENTITY = UserOperationLogEntry.ENTITY_TYPE_TASK;
+  public static final String EXAMPLE_USER_OPERATION_ENTITY = EntityTypes.TASK;
   public static final String EXAMPLE_USER_OPERATION_PROPERTY = "opProperty";
   public static final String EXAMPLE_USER_OPERATION_ORG_VALUE = "orgValue";
   public static final String EXAMPLE_USER_OPERATION_NEW_VALUE = "newValue";
@@ -1045,6 +1072,63 @@ public abstract class MockProvider {
     return mock;
   }
 
+  public static List<HistoricCaseActivityInstance> createMockHistoricCaseActivityInstances() {
+    ArrayList<HistoricCaseActivityInstance> mockList = new ArrayList<HistoricCaseActivityInstance>();
+    mockList.add(createMockHistoricCaseActivityInstance());
+    return mockList;
+  }
+
+  public static HistoricCaseActivityInstance createMockHistoricCaseActivityInstance() {
+    HistoricCaseActivityInstance mock = mock(HistoricCaseActivityInstance.class);
+
+    when(mock.getId()).thenReturn(EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_ID);
+    when(mock.getParentCaseActivityInstanceId()).thenReturn(EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_PARENT_CASE_ACTIVITY_INSTANCE_ID);
+    when(mock.getCaseActivityId()).thenReturn(EXAMPLE_HISTORIC_CASE_ACTIVITY_ID);
+    when(mock.getCaseActivityName()).thenReturn(EXAMPLE_HISTORIC_CASE_ACTIVITY_NAME);
+    when(mock.getCaseDefinitionId()).thenReturn(EXAMPLE_CASE_DEFINITION_ID);
+    when(mock.getCaseInstanceId()).thenReturn(EXAMPLE_CASE_INSTANCE_ID);
+    when(mock.getCaseExecutionId()).thenReturn(EXAMPLE_CASE_EXECUTION_ID);
+    when(mock.getTaskId()).thenReturn(EXAMPLE_TASK_ID);
+    when(mock.getCalledProcessInstanceId()).thenReturn(EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_CALLED_PROCESS_INSTANCE_ID);
+    when(mock.getCalledCaseInstanceId()).thenReturn(EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_CALLED_CASE_INSTANCE_ID);
+    when(mock.getCreateTime()).thenReturn(DateTimeUtil.parseDate(EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_CREATE_TIME));
+    when(mock.getEndTime()).thenReturn(DateTimeUtil.parseDate(EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_END_TIME));
+    when(mock.getDurationInMillis()).thenReturn(EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_DURATION);
+    when(mock.isAvailable()).thenReturn(EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_IS_AVAILABLE);
+    when(mock.isEnabled()).thenReturn(EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_IS_ENABLED);
+    when(mock.isDisabled()).thenReturn(EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_IS_DISABLED);
+    when(mock.isActive()).thenReturn(EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_IS_ACTIVE);
+    when(mock.isFailed()).thenReturn(EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_IS_FAILED);
+    when(mock.isSuspended()).thenReturn(EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_IS_SUSPENDED);
+    when(mock.isCompleted()).thenReturn(EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_IS_COMPLETED);
+    when(mock.isTerminated()).thenReturn(EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_IS_TERMINATED);
+
+    return mock;
+  }
+
+  public static List<HistoricCaseActivityInstance> createMockRunningHistoricCaseActivityInstances() {
+    List<HistoricCaseActivityInstance> mockList = new ArrayList<HistoricCaseActivityInstance>();
+    mockList.add(createMockRunningHistoricCaseActivityInstance());
+    return mockList;
+  }
+
+  public static HistoricCaseActivityInstance createMockRunningHistoricCaseActivityInstance() {
+    HistoricCaseActivityInstance mock = createMockHistoricCaseActivityInstance();
+
+    when(mock.getEndTime()).thenReturn(null);
+    when(mock.getDurationInMillis()).thenReturn(null);
+    when(mock.isAvailable()).thenReturn(false);
+    when(mock.isEnabled()).thenReturn(false);
+    when(mock.isDisabled()).thenReturn(false);
+    when(mock.isActive()).thenReturn(true);
+    when(mock.isFailed()).thenReturn(false);
+    when(mock.isSuspended()).thenReturn(false);
+    when(mock.isCompleted()).thenReturn(false);
+    when(mock.isTerminated()).thenReturn(false);
+
+    return mock;
+  }
+
   public static List<HistoricActivityStatistics> createMockHistoricActivityStatistics() {
     HistoricActivityStatistics statistics = mock(HistoricActivityStatistics.class);
 
@@ -1145,13 +1229,17 @@ public abstract class MockProvider {
   }
 
   public static HistoricCaseInstance createMockHistoricCaseInstanceNotClosed() {
-    HistoricCaseInstance mock = mock(HistoricCaseInstance.class);
-    when(mock.getId()).thenReturn(EXAMPLE_CASE_INSTANCE_ID);
-    when(mock.getBusinessKey()).thenReturn(EXAMPLE_CASE_INSTANCE_BUSINESS_KEY);
-    when(mock.getCaseDefinitionId()).thenReturn(EXAMPLE_CASE_DEFINITION_ID);
+    HistoricCaseInstance mock = createMockHistoricCaseInstance();
+
     when(mock.getCloseTime()).thenReturn(null);
-    when(mock.getCreateTime()).thenReturn(DateTimeUtil.parseDate(EXAMPLE_HISTORIC_CASE_INSTANCE_CREATE_TIME));
-    when(mock.getDurationInMillis()).thenReturn(EXAMPLE_HISTORIC_CASE_INSTANCE_DURATION_MILLIS);
+    when(mock.getDurationInMillis()).thenReturn(null);
+    when(mock.isActive()).thenReturn(true);
+    when(mock.isCompleted()).thenReturn(false);
+    when(mock.isTerminated()).thenReturn(false);
+    when(mock.isFailed()).thenReturn(false);
+    when(mock.isSuspended()).thenReturn(false);
+    when(mock.isClosed()).thenReturn(false);
+
     return mock;
   }
 
