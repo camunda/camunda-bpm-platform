@@ -12,7 +12,9 @@
         <!-- <span class="col-xs-4 col-lg-12"
               ng-click="selectValue($event)"> -->
         <span class="col-xs-4 col-lg-12">
-          <strong class="variable-label">
+          <strong class="variable-label"
+                  tooltip-placement="left"
+                  tooltip="{{ info.name }}">
             {{ info.label }}:
           </strong>
         </span>
