@@ -7,7 +7,7 @@
       <h5>
         <a href
            ng-show="userCanCreateFilter"
-           ng-click="openDialog('CREATE_NEW_FILTER')">
+           ng-click="openDialog($event, 'CREATE_NEW_FILTER')">
           {{ 'FILTER_CREATE' | translate }}
           <span class="glyphicon glyphicon-plus-sign"></span>
         </a>

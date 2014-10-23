@@ -114,7 +114,9 @@ define([
 
     // open the dialog ///////////////////////////////////////////////////////////////////////////////////
 
-    $scope.openDialog = function (action) {
+    $scope.openDialog = function ($event, action) {
+      $event.stopPropagation();
+      
       if ($scope.filter) {
         // Don't remove the following line!
         // The following line triggers to load filter authorizations and
