@@ -92,6 +92,54 @@ footer.page {
   display: none;
 }
 
+
+.task-filters {
+  z-index: 3;
+}
+.task-list {
+  z-index: 2;
+}
+.current-task {
+  z-index: 1;
+}
+
+// .fake-columns > .row,
+// .row.controls,
+// .row.task-board {
+//   // -webkit-transition: all 0.218s ease-in-out;
+//   //         transition: all 0.218s ease-in-out;
+
+//   > .cols {
+//     // -webkit-transition: all 0.218s ease-in-out;
+//     //         transition: all 0.218s ease-in-out;
+//   }
+// }
+
+button.toggle-filters {
+  display: none;
+  height: 22px;
+  margin: -6px 0 0 0;
+  padding: 0;
+
+  // Bars
+  .icon-bar {
+    display: block;
+    width: 22px;
+    height: 3px;
+    // border-radius: 1px;
+    background-color: @brand-primary;
+  }
+
+  .icon-bar + .icon-bar {
+    margin-top: 3px;
+  }
+
+  &:focus {
+    outline: none;
+  }
+}
+
+
 @media (min-width: @screen-sm-min) {
   body > .navbar,
   .page-wrap {

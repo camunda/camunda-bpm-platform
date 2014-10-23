@@ -12,11 +12,11 @@ define([
   var layouts = [
     {
       label: 'task',
-      css: 'task-focus-layout'
+      css: 'layout-focus-task'
     },
     {
       label: 'list',
-      css: 'list-focus-layout'
+      css: 'layout-focus-list'
     },
     {
       label: 'standard'
@@ -50,9 +50,9 @@ define([
             .removeClass(layoutClasses)
             .addClass(layout.css)
           ;
-
-          console.info('switch layout', layout);
         };
+
+        scope.switchLayout(scope.activeLayout);
       },
 
       template: template

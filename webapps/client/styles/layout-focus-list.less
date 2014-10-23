@@ -1,0 +1,91 @@
+body.layout-focus-list {
+  button.toggle-filters {
+    display: inline-block;
+  }
+
+  .controls .task-filters h5 {
+    display: inline-block;
+    margin-right: 10px;
+  }
+
+  .fake-columns > .row,
+  .row.controls,
+  .row.task-board {
+    padding-left: @grid-gutter-width;
+    // padding-right: @grid-gutter-width;
+  }
+
+  .row > .cols {
+    &.task-filters {
+      position: absolute;
+      z-index: 100;
+
+      width: 300 + @grid-gutter-width;
+
+      -webkit-transition: all 0.218s ease-in-out;
+              transition: all 0.218s ease-in-out;
+      -webkit-transform: translateX(-100%);
+              transform: translateX(-100%);
+    }
+
+    &.task-list {
+      width: 100%;
+    }
+
+    &.current-task {
+      display: none;
+    }
+  }
+
+  &.filters-column-open {
+    .fake-columns > .row > .cols.task-filters,
+    .row > .cols.task-filters {
+      -webkit-transform: translateX(0 - @grid-gutter-width);
+              transform: translateX(0 - @grid-gutter-width);
+    }
+  }
+
+  .tasks-list .list-inline {
+    width: 50%;
+    &.actors {
+      margin: 0;
+    }
+  }
+
+  // ..................................................
+
+  .variables-list {
+    max-height: 2000px;
+    .shutter {
+      display: none;
+    }
+
+    > [ng-repeat] {
+      > .col-xs-12 {
+        width: 50%;
+      }
+    }
+  }
+
+  .variable-item {
+    > .col-xs-4,
+    > .col-xs-8 {
+      width: 50%;
+    }
+    > .col-xs-4 {
+      text-align: right;
+    }
+  }
+}
+
+@media (min-width: @screen-md-min) {
+  body.layout-focus-list {
+    .variables-list {
+      > [ng-repeat] {
+        > .col-lg-6 {
+          width: 25%;
+        }
+      }
+    }
+  }
+}

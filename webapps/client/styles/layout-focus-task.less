@@ -1,0 +1,19 @@
+body.layout-focus-task {
+  .row > .cols {
+    &.task-filters {
+      width: (100% / @grid-columns);
+    }
+    &.task-list {
+      width: (100% / @grid-columns) * 2;
+    }
+    &.current-task {
+      width: (100% / @grid-columns) * 9;
+    }
+  }
+
+  [cam-sorting-choices] {
+    .hidden-xs {
+      display: none;
+    }
+  }
+}

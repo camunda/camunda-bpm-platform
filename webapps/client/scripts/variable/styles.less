@@ -73,10 +73,8 @@
       > span,
       > a,
       > strong {
-        display: block;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
+        .truncate(100%);
+        display: inline-block;
         max-height: 1.5em;
       }
     }

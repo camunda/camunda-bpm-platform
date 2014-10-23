@@ -16,8 +16,8 @@ define([
     // QUESTION: should the target of click event should
     // be taken into account (like when a click is made from
     // inside the navigation)?
-    if ($bdy.hasClass('nav-open') && !evt.isDefaultPrevented()) {
-      $bdy.removeClass('nav-open');
+    if ($bdy.hasClass('filters-column-open') && !evt.isDefaultPrevented()) {
+      $bdy.removeClass('filters-column-open');
     }
   });
 
@@ -32,7 +32,7 @@ define([
         $event.preventDefault();
       }
 
-      $bdy.toggleClass('nav-open');
+      $bdy.toggleClass('filters-column-open');
     };
   }];
 });
