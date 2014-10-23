@@ -29,9 +29,15 @@ define([
   var expressionsExp = /^[\s]*(\#|\$)\{/;
   function fixExpressions(arr) {
     each(arr, function(obj, i) {
-      if (expressionsExp.test(obj.value) && obj.key.indexOf('Expression') === -1) {
-        // arr[i].key = 'task'+ obj.key[0].toUpperCase() + obj.key.slice(1) +'Expression';
-        arr[i].key = obj.key +'Expression';
+      if (expressionsExp.test(obj.value)) {
+        if(obj.key.indexOf('Expression') === -1) {
+          // arr[i].key = 'task'+ obj.key[0].toUpperCase() + obj.key.slice(1) +'Expression';
+          arr[i].key = obj.key +'Expression';
+        }
+      } else {
+        if(obj.key.indexOf('Expression') !== -1) {
+          arr[i].key = obj.key.slice(0,obj.key.indexOf("Expression"));
+        }
       }
     });
     return arr;
@@ -42,6 +48,19 @@ define([
     each(arr, function(obj, i) {
       if (likeExp.test(obj.key) && obj.value[0] !== '%') {
         arr[i].value = '%'+ obj.value +'%';
+      }
+    });
+    return arr;
+  }
+
+  function fixFormat(arr) {
+    each(arr, function(obj, i) {
+      if ((obj.key === "candidateGroups" || obj.key === "activityInstanceIdIn")) {
+        if( typeof obj.value === "string") {
+          arr[i].value = obj.value.split(",");
+        }
+      } else {
+        arr[i].value = ""+obj.value;
       }
     });
     return arr;
@@ -75,7 +94,6 @@ define([
     });
     return obj;
   }
-
 
   function unique(a) {
     return a.reduce(function(p, c) {
@@ -572,7 +590,7 @@ define([
         name:         $scope.filter.name,
         // owner:        $scope.filter.owner,
         resourceType: 'Task',
-        query:        makeObj(fixExpressions(fixLikes($scope._query))),
+        query:        makeObj(fixFormat(fixExpressions(fixLikes($scope._query)))),
         properties:   {
           color:        $scope.filter.properties.color,
           description:  $scope.filter.properties.description,
