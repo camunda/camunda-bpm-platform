@@ -2,7 +2,7 @@
 
   <li>
 
-    <span cam-form-inline-field
+    <span cam-widget-inline-field
           class="followup-date"
           ng-class="{overdue: task.followUp && (task.followUp < now) }"
           type="datetime"
@@ -35,7 +35,7 @@
 
   <li>
 
-    <span cam-form-inline-field
+    <span cam-widget-inline-field
           class="due-date"
           ng-class="{overdue: task.due && (task.due < now) }"
           type="datetime"
@@ -101,7 +101,7 @@
   <li class="assignee"
       ng-if="task.assignee">
 
-    <span cam-form-inline-field
+    <span cam-widget-inline-field
           class="set-value"
           type="text"
           validate="validateUser(this)"

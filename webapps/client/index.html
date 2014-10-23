@@ -31,27 +31,27 @@
 </head>
 
 <body ng-class="{ 'authenticated' : (authentication && authentication.name) }">
-  <!-- # page-navigation -->
-  <nav class="navbar navbar-default"
-       role="navigation"
-       cam-tasklist-navigation>
-  </nav>
-  <!-- / page-navigation -->
 
-  <!-- # page-notifications -->
-  <div class="row controls">
-    <div notifications-panel
-         class="cols notifications-panel page-notifications"></div>
+  <div class="site-wrap" ng-controller="camTasklistAppCtrl">
+    <!-- # page-navigation -->
+    <nav class="navbar navbar-default"
+         role="navigation"
+         cam-tasklist-navigation>
+    </nav>
+    <!-- / page-navigation -->
+
+    <!-- # page-content -->
+    <div class="page-wrap" >
+      <div class="row controls">
+        <div notifications-panel
+             class="cols notifications-panel page-notifications"></div>
+      </div>
+
+      <div ng-view
+           class="ui-wrap"></div>
+    </div>
+    <!-- / page-content -->
   </div>
-  <!-- / page-notifications -->
-
-  <!-- # page-content -->
-  <div class="page-wrap" >
-    <div ng-view
-         class="ui-wrap"></div>
-  </div>
-  <!-- / page-content -->
-
 
   <div class="fake-columns container-fluid">
     <div class="row">
@@ -60,7 +60,6 @@
       <div class="cols col-sm-6 current-task"></div>
     </div>
   </div>
-
 
   <!-- # page-footer -->
   <footer class="page">

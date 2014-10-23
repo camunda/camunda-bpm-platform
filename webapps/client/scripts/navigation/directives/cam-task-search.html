@@ -16,7 +16,7 @@
               tooltip-placement="top"
               tooltip="{{'INVALID_SEARCH' | translate}}"></span>
 
-        <span cam-form-inline-field
+        <span cam-widget-inline-field
               class="set-value"
               type="option"
               options="types"
@@ -28,7 +28,7 @@
           </span>
         </span>:
 
-        <span cam-form-inline-field
+        <span cam-widget-inline-field
               class="set-value"
               type="text"
               change="changeSearch($index, 'name', varValue)"
@@ -39,7 +39,7 @@
           </span>
         </span>
 
-        <span cam-form-inline-field
+        <span cam-widget-inline-field
               class="set-value"
               type="option"
               options="search.operators"
@@ -51,7 +51,7 @@
           </span>
         </span>
 
-        <span cam-form-inline-field
+        <span cam-widget-inline-field
               class="set-value"
               type="text"
               change="changeSearch($index, 'value', varValue)"

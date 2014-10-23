@@ -76,7 +76,8 @@ define('camunda-tasklist-ui', [
     tasklistApp.config(require('camunda-tasklist-ui/config/date'));
     tasklistApp.config(require('camunda-tasklist-ui/config/tooltip'));
 
-    tasklistApp.controller('camTasklistCtrl', require('camunda-tasklist-ui/controller/cam-tasklist-ctrl'));
+    tasklistApp.controller('camTasklistAppCtrl', require('camunda-tasklist-ui/controller/cam-tasklist-app-ctrl'));
+    tasklistApp.controller('camTasklistViewCtrl', require('camunda-tasklist-ui/controller/cam-tasklist-view-ctrl'));
 
     $(document).ready(function() {
       angular.bootstrap(document, ['cam.tasklist', 'cam.embedded.forms']);

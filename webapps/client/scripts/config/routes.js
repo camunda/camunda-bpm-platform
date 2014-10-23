@@ -16,7 +16,7 @@ define([
     $routeProvider
       .when('/', {
         template: tasklistTemplate,
-        controller: 'camTasklistCtrl',
+        controller: 'camTasklistViewCtrl',
         authentication: 'required',
         reloadOnSearch: false
       })

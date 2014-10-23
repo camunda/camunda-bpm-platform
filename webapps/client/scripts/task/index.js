@@ -17,7 +17,6 @@ define([
   './plugins/detail/cam-tasklist-task-detail-description-plugin',
 
   /* detail plugin directives */
-  './plugins/detail/directives/cam-tasklist-task-form',
   './plugins/detail/directives/cam-tasklist-task-diagram',
 
 
@@ -49,7 +48,6 @@ define([
   camTaskDetailDescriptionPlugin,
 
   /* detail plugin directives */
-  taskFormDirective,
   taskDiagramDirective,
 
   /* action plugins */
@@ -65,7 +63,8 @@ define([
     require('camunda-tasklist-ui/utils').name,
     require('camunda-tasklist-ui/api').name,
     'ui.bootstrap',
-    'cam.form',
+    'cam.widget',
+    'cam.tasklist.form',
     'angularMoment'
   ]);
 
@@ -90,7 +89,6 @@ define([
   taskModule.config(camTaskDetailDescriptionPlugin);
 
   /* detail plugin directives */
-  taskModule.directive('camTasklistTaskForm', taskFormDirective);
   taskModule.directive('camTasklistTaskDiagram', taskDiagramDirective);
 
     /* action plugins */

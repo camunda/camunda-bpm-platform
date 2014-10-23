@@ -81,6 +81,8 @@ define(function() {
                                       'camunda-commons-ui/filter/date/index',
                                       'camunda-commons-ui/plugin/index',
                                       'camunda-commons-ui/search/index',
+                                      'camunda-commons-ui/services/index',
+                                      'camunda-commons-ui/util/index',
 
                                       'camunda-tasklist-ui/config/date',
                                       'camunda-tasklist-ui/config/routes',
@@ -91,13 +93,14 @@ define(function() {
                                       'camunda-tasklist-ui/api',
                                       'camunda-tasklist-ui/utils',
                                       'camunda-tasklist-ui/user',
-                                      'camunda-tasklist-ui/controls',
-                                      'camunda-tasklist-ui/form',
+                                      'camunda-tasklist-ui/widgets',
                                       'camunda-tasklist-ui/filter',
                                       'camunda-tasklist-ui/variable',
                                       'camunda-tasklist-ui/task',
                                       'camunda-tasklist-ui/process',
-                                      'camunda-tasklist-ui/controller/cam-tasklist-ctrl',
+                                      'camunda-tasklist-ui/controller/cam-tasklist-app-ctrl',
+                                      'camunda-tasklist-ui/controller/cam-tasklist-view-ctrl',
+                                      'camunda-tasklist-ui/form',
 
                                       'bootstrap/collapse',
                                       'camunda-tasklist-ui/navigation/index',
@@ -132,15 +135,7 @@ define(function() {
         main: 'index'
       },
       {
-        name: 'camunda-tasklist-ui/controls',
-        main: 'index'
-      },
-      {
         name: 'camunda-tasklist-ui/process',
-        main: 'index'
-      },
-      {
-        name: 'camunda-tasklist-ui/form',
         main: 'index'
       },
       {
@@ -157,6 +152,14 @@ define(function() {
       },
       {
         name: 'camunda-tasklist-ui/user',
+        main: 'index'
+      },
+      {
+        name: 'camunda-tasklist-ui/widgets',
+        main: 'index'
+      },
+      {
+        name: 'camunda-tasklist-ui/form',
         main: 'index'
       }
     ]

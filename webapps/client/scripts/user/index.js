@@ -28,7 +28,6 @@ define([
     auth.name,
     api.name,
     'ui.bootstrap',
-    'cam.form'
   ]);
 
   /**

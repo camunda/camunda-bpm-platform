@@ -1,42 +1,30 @@
+'use strict';
+
 define([
   'angular',
-  './directives/cam-form-inline-field',
-  'angular-moment',
-  'text!camunda-tasklist-ui/form/form.html'
+  './directives/cam-tasklist-form',
+  './directives/cam-tasklist-form-generic',
+  './directives/cam-tasklist-form-generic-variables',
+  './directives/cam-tasklist-form-embedded',
+  './directives/cam-tasklist-form-external'
 ], function(
   angular,
-  inlineField
+  camTasklistForm,
+  camTasklistFormGeneric,
+  camTasklistFormGenericVariables,
+  camTasklistFormEmbedded,
+  camTasklistFormExternal
 ) {
-  'use strict';
 
-  /**
-   * @module cam.form
-   */
-
-  var formModule = angular.module('cam.form', [
-    'angularMoment'
+  var formModule = angular.module('cam.tasklist.form', [
+    'ui.bootstrap'
   ]);
-  var c = 1000;
 
-
-
-  formModule.directive('camFormInlineField', inlineField);
-
-
-
-  formModule.directive('camForm', function() {
-    return {
-      link: function(scope) {
-        scope.elUID = c;
-        c++;
-
-        scope.labelsWidth = 3;
-        scope.fieldsWidth = 12 - scope.labelsWidth;
-      },
-      template: require('text!camunda-tasklist-ui/form/form.html')
-    };
-  });
+  formModule.directive('camTasklistForm', camTasklistForm);
+  formModule.directive('camTasklistFormGeneric', camTasklistFormGeneric);
+  formModule.directive('camTasklistFormGenericVariables', camTasklistFormGenericVariables);
+  formModule.directive('camTasklistFormEmbedded', camTasklistFormEmbedded);
+  formModule.directive('camTasklistFormExternal', camTasklistFormExternal);
 
   return formModule;
 });
-

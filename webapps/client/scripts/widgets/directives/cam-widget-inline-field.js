@@ -1,5 +1,5 @@
 define([
-  'text!./cam-form-inline-field.html'
+  'text!./cam-widget-inline-field.html'
 ], function(
   template
 ) {

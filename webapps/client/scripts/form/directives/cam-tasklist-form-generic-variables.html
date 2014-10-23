@@ -1,0 +1,56 @@
+<div class="row">
+  <div class="col-xs-12 col-md-2 text-right">
+    <button type="button"
+            class="btn btn-link"
+            ng-click="addVariable()"
+            ng-disabled="options.disableAddVariableButton">
+      {{ 'ADD_VARIABLE' | translate }}
+      <i class="glyphicon glyphicon-plus-sign"></i>
+    </button>
+  </div>
+</div>
+
+<form name="generic-form">
+  <div ng-if="variables.length"
+       ng-repeat="(delta, variable) in variables"
+       class="form-group row">
+
+    <div class="col-xs-2 text-right">
+      <a ng-click="removeVariable(delta)">
+        <i class="glyphicon glyphicon-minus-sign"></i>
+      </a>
+    </div>
+
+    <div class="col-xs-3">
+      <input required
+             type="text"
+             class="form-control"
+             placeholder="{{ 'VARIABLE_NAME' | translate }}"
+             ng-model="variable.name" />
+    </div>
+
+    <div class="col-xs-3">
+      <select required
+              class="form-control"
+              placeholder="{{ 'VARIABLE_TYPE' | translate }}"
+              ng-model="variable.type">
+
+        <option disabled value="" translate="TYPE">Type</option>
+
+        <option ng-repeat="(type, inputType) in variableTypes"
+                value="{{ type }}">{{ type | translate }}</option>
+      </select>
+    </div>
+
+    <div class="col-xs-4">
+       <input required
+              type="{{ variableTypes[variable.type] }}"
+              class="form-control"
+              placeholder="{{ 'VALUE' | translate }}"
+              ng-model="variable.value"
+              cam-variable-name="{{ variable.name }}" 
+              cam-variable-type="{{ variable.type }}" />
+    </div>
+
+  </div>
+</form>

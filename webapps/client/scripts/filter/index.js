@@ -37,7 +37,7 @@ define([
     utils.name,
     api.name,
     'ui.bootstrap',
-    'cam.form',
+    'cam.widget',
     'angularMoment'
   ]);
 

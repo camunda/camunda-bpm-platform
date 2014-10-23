@@ -1,7 +1,12 @@
 define([
+  'angular',
   'text!./cam-tasklist-task.html',
   'jquery'
-], function(template, jquery) {
+], function(
+  angular,
+  template,
+  jquery
+) {
   'use strict';
 
   return [ function() {
@@ -28,10 +33,14 @@ define([
         search
       ) {
 
+        // setup /////////////////////////////////////////////////////////////////////
+
         var History = camAPI.resource('history');
         var Task = camAPI.resource('task');
 
         var taskData = $scope.taskData = $scope.tasklistData.newChild($scope);
+
+        // provider ///////////////////////////////////////////////////////////////////
 
         taskData.provide('assignee', ['task', function(task) {
           if (task) {
@@ -77,12 +86,39 @@ define([
 
         }]);
 
+        taskData.provide('taskForm', ['task', function(task) {
+          var deferred = $q.defer();
+
+          if (!task || !task.id) {
+            return deferred.resolve(null);
+          }
+
+          Task.form(task.id, function(err, res) {
+
+            if(err) {
+              deferred.reject(err);
+            }
+            else {
+              deferred.resolve(res);
+            }
+          });
+
+          return deferred.promise;
+        }]);
+
+        // observer ////////////////////////////////////////////////////////////////////////
+
         /**
          * expose current task as scope variable
          */
-        taskData.observe('task', function(task) {
+        $scope.taskState = taskData.observe('task', function(task) {
           $scope.task = task;
         });
+
+        taskData.observe('isAssignee', function (isAssignee) {
+          $scope.isAssignee = isAssignee;
+        });
+
 
         // plugins //////////////////////////////////////////////////////////////
 

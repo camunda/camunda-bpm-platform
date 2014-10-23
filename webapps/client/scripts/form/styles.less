@@ -1,125 +1,16 @@
-[cam-form-inline-field] {
-  display: inline-block;
-  position: relative;
-
-  >.view-value {
-    border: 1px solid transparent;
-    margin: 0;
-    padding: 1px 3px;
-    position: relative;
-    // background-color: transparent;
-
-    border-radius: 3px;
-
-    &:hover {
-      z-index: 99;
-      cursor: pointer;
-      border: 1px @line-style @line-color;
-      // background-color: transparent;
-      background-color: @gray-lighter;
-    }
-  }
-
-  >.edit {
-    input {
-      padding: 1px 3px;
-      height: auto;
-      width: auto;
-      min-width: 40px;
-      max-width: 100%;
-
-      border-radius: 3px 0 3px 3px;
-    }
-  }
-
-  &[type="date"],
-  &[type="time"],
-  &[type="datetime"] {
-    >.edit {
-      display: block;
-      position: relative;
-      z-index: 99;
-      min-width: 90px;
-    }
-
-    // .edit-value {}
-
-    .field {
-      position: absolute;
-      top: 30px;
-      left: 0;
-      background-color: @body-bg;
-      overflow: hidden;
-      .box-shadow(0 3px 9px rgba(0,0,0,.5));
-    }
-
-    table button {
-      border: none;
-    }
-    thead button {
-      height: 28px;
-    }
-  }
-
-  &[type="option"] {
-    .dropdown-menu {
-      min-width: initial;
-      text-align: left;
-    }
-  }
-
-  .timepicker {
-    margin: auto;
-    td {
-      text-align: center;
-    }
-    input {
-      width: 50px;
-    }
-  }
-
-  .btn-group {
-    position: absolute;
-    right: 0;
-    background-color: @body-bg;
-    bottom: 100%;
-    margin-bottom: -1px;
-
-    border-radius: 3px 3px 0 0;
-    button {
-      border-color: @input-border-focus;
-      &:first-child {
-        border-radius: 3px 0 0 0;
-      }
-      &:last-child {
-        border-radius: 0 3px 0 0;
-      }
-    }
-  }
+.generic-form-fields .text-right a {
+  line-height: 33px;
 }
 
-.form-actions {
-  text-align: right;
-}
-
-
-.loading {
+.disabled-form {
   position: relative;
-  cursor: wait;
-  cursor: progress;
-  &:after {
-    display: block;
+  &:before {
     content: ' ';
+    background-color: rgba(255, 255, 255, 0.8);
     position: absolute;
     top: 0;
-    right: 0;
-    z-index: 10;
+    left: 0;
     width: 100%;
     height: 100%;
-    background-color: fade(@body-bg, 60%);
   }
-}
-
-.list-inline>[cam-form-inline-field] {
-  padding-right: 0;
 }

@@ -3,6 +3,14 @@ define([
 ) {
   'use strict';
 
+  function getRefreshProvider(tasklistData) {
+    return {
+      refreshTaskList : function () {
+        tasklistData.changed('taskList');
+      }
+    };
+  }
+
   return [
     '$scope',
     '$q',
@@ -22,12 +30,20 @@ define([
       return search[property];
     }
 
-    // get current task id from location
-    var taskId = getPropertyFromLocation('task');
-    var detailsTab = getPropertyFromLocation('detailsTab');
+    $scope.$on('$destroy', function () {
+      $scope.tasklistApp.refreshProvider = null;
+    });
 
     // init data depend for task list data
     var tasklistData = $scope.tasklistData = dataDepend.create($scope);
+
+    if ($scope.tasklistApp) {
+      $scope.tasklistApp.refreshProvider = getRefreshProvider(tasklistData);
+    }
+
+    // get current task id from location
+    var taskId = getPropertyFromLocation('task');
+    var detailsTab = getPropertyFromLocation('detailsTab');
 
     var Filter = camAPI.resource('filter');
     var Task = camAPI.resource('task');

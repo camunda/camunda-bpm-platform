@@ -1,0 +1,186 @@
+define([
+  'angular',
+  'text!./cam-tasklist-form.html'
+], function(
+  angular,
+  template
+) {
+  'use strict';
+
+  var EMBEDDED_KEY = 'embedded:',
+      APP_KEY = 'app:',
+      ENGINE_KEY = 'engine:';
+
+  function compact(arr) {
+    var a = [];
+    for (var ay in arr) {
+      if (arr[ay]) {
+        a.push(arr[ay]);
+      }
+    }
+    return a;
+  }
+
+  var noop = function () {};
+
+  return [function(){
+
+    return {
+
+      restrict: 'EAC',
+
+      scope: {
+        tasklistForm : '=',
+
+        /*
+         * current options are:
+         * - hideCompleteButton: to hide the complete button inside the form directive
+         * - disableCompleteButton: to disable or enable the complete button inside
+         *   the form directive
+         * - disableForm: to disable or enable the form
+         * - disableAddVariableButton: to disable or enable the 'Add Variable' button
+         *   inside a generic form
+         */
+        options: '=',
+
+        /* will be used to make a callback when the form will be completed */
+        onFormCompletionCallback: '&', 
+
+        /* 
+         * will be used to register a completion handler, when the completion
+         * will be trigger from the outside of a form
+         */
+        onFormCompletion: '&',
+
+        /*
+         * is a callback which will called when the validation state of the
+         * form changes (pass the flag '$invalid').
+         */
+        onFormValidation: '&'
+      },
+
+      template: template,
+
+      controller: [
+        '$scope',
+        'Uri',
+      function(
+        $scope,
+        Uri
+      ) {
+
+        // setup //////////////////////////////////////////////////////////////////
+
+        $scope.onFormCompletionCallback = $scope.onFormCompletionCallback() || noop;
+        $scope.onFormCompletion = $scope.onFormCompletion() || noop;
+        $scope.onFormValidation = $scope.onFormValidation() || noop;
+        $scope.completionHandler = noop;
+
+        // handle tasklist form ///////////////////////////////////////////////////
+
+        $scope.$watch('tasklistForm', function(value) {
+          if (value) {
+            $scope.tasklistForm.$loaded = false;
+            parseForm(value);
+          }
+        });     
+
+        function parseForm(form) {
+          var key = form.key,
+              applicationContextPath = form.contextPath;
+
+          // structure may be [embedded:][app:]formKey
+
+          if (!key) {
+            form.type = 'generic';
+            return;
+          }      
+
+          if (key.indexOf(EMBEDDED_KEY) === 0) {
+            key = key.substring(EMBEDDED_KEY.length);
+            form.type = 'embedded';
+          } else {
+            form.type = 'external';
+          }
+
+          if (key.indexOf(APP_KEY) === 0) {
+            if (applicationContextPath) {
+              key = compact([applicationContextPath, key.substring(APP_KEY.length)])
+                .join('/')
+                // prevents multiple "/" in the URI
+                .replace(/\/([\/]+)/, '/');
+            }
+          }
+
+          if(key.indexOf(ENGINE_KEY) === 0) {
+            // resolve relative prefix
+            key = Uri.appUri(key);
+          }
+
+          form.key = key;
+        }
+
+        // completion /////////////////////////////////////////////
+
+        var completionCallback = function (err)  {
+          $scope.onFormCompletionCallback(err);
+        };
+
+        var complete = $scope.complete = function () {
+          $scope.completionHandler(completionCallback);
+        };
+
+        $scope.onFormCompletion(complete);
+
+        $scope.showCompleteButton = function () {
+          return $scope.options && 
+                 !$scope.options.hideCompleteButton &&
+                 $scope.tasklistForm &&
+                 $scope.tasklistForm.$loaded;
+        };
+
+        $scope.disableCompleteButton = function () {
+          return $scope.$invalid || ($scope.options && $scope.options.disableCompleteButton);
+        };
+
+        // API ////////////////////////////////////////////////////
+
+        this.notifyFormInitialized = function () {
+          $scope.tasklistForm.$loaded = true;
+        };
+
+        this.notifyFormInitializationFailed = function (error) {
+          $scope.tasklistForm.$error = error;
+          // mark the form as initialized
+          this.notifyFormInitialized();
+          // set the '$invalid' flag to false to
+          // be able to complete a task (or start
+          // a process)
+          this.notifyFormValidated(false);
+        };
+
+        this.notifyFormCompleted = function (err) {
+          $scope.onFormCompletion(err);
+        };
+
+        this.notifyFormValidated = function (invalid) {
+          $scope.$invalid = invalid;
+          $scope.onFormValidation(invalid);
+        };
+
+        this.getOptions = function () {
+          return $scope.options || {};
+        };
+
+        this.getTasklistForm = function () {
+          return $scope.tasklistForm;
+        };
+
+        this.registerCompletionHandler = function(fn) {
+          $scope.completionHandler = fn ||  noop;
+        };
+
+      }]
+    };
+  }];
+});

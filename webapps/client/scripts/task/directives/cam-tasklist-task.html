@@ -1,40 +1,51 @@
-<div ng-hide="task">
-  <div class="no-task well">
-    <i class="glyphicon glyphicon-info-sign"></i>
-    {{ 'SELECT_TASK_IN_LIST' | translate }}
-  </div>
+<div ng-show="!taskState.$loaded"
+     class="loader">
+  <i class="animate-spin glyphicon glyphicon-refresh"></i>
+  {{ 'LOADING' | translate }}
 </div>
 
-<section ng-if="task" class="task-card">
-  <header class="row">
-    <div class="col-xs-12">
-      <div class="names">
-        <h2 class="task">{{ task.name || task.taskDefinitionKey || task.id }}</h2>
-        <h4 class="process-definition"
-            ng-class="{suspended: task._embedded.processDefinition[0]}">
-          {{ task._embedded.processDefinition[0].name || task._embedded.processDefinition[0].key }}
-        </h4>
-      </div>
-
-      <div cam-tasklist-task-meta
-           task-data="taskData"></div>
-    </div>
-  </header>
-
-  <div class="row tabbed-content">
-
-    <div ng-show="taskDetailTabs.length" class="col-xs-12">
-      <ul class="nav nav-tabs">
-        <li ng-class="{ active: selectedTaskDetailTab == taskDetailTab }" ng-repeat="taskDetailTab in taskDetailTabs">
-          <a href ng-click="selectTaskDetailTab(taskDetailTab)">{{ taskDetailTab.label | translate }}</a>
-        </li>
-      </ul>
-
-      <div class="tab-content">
-        <view provider="selectedTaskDetailTab" vars="taskVars" />
-      </div>
-
+<div ng-if="taskState.$loaded">
+  <div ng-hide="task">
+    <div class="no-task well">
+      <i class="glyphicon glyphicon-info-sign"></i>
+      {{ 'SELECT_TASK_IN_LIST' | translate }}
     </div>
   </div>
 
-</section>
+  <section ng-if="task" class="task-card">
+    <header class="row">
+      <div class="col-xs-12">
+        <div class="names">
+          <h2 class="task">{{ task.name || task.taskDefinitionKey || task.id }}</h2>
+          <h4 class="process-definition"
+              ng-class="{suspended: task._embedded.processDefinition[0]}">
+            {{ task._embedded.processDefinition[0].name || task._embedded.processDefinition[0].key }}
+          </h4>
+        </div>
+
+        <div cam-tasklist-task-meta
+             task-data="taskData"></div>
+      </div>
+    </header>
+
+    <div class="row tabbed-content">
+
+      <div ng-show="taskDetailTabs.length" class="col-xs-12">
+        <ul class="nav nav-tabs">
+          <li ng-class="{ active: selectedTaskDetailTab == taskDetailTab }" ng-repeat="taskDetailTab in taskDetailTabs">
+            <a href ng-click="selectTaskDetailTab(taskDetailTab)">{{ taskDetailTab.label | translate }}</a>
+          </li>
+        </ul>
+
+        <div class="tab-content">
+          <view provider="selectedTaskDetailTab" vars="taskVars" />
+        </div>
+
+      </div>
+    </div>
+
+  </section>
+
+</div>
+
+
