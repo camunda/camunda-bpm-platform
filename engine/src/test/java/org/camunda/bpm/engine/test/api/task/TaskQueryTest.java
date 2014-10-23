@@ -16,13 +16,13 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.ibatis.logging.LogFactory;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
@@ -1174,6 +1174,36 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
 
     assertEquals(6, taskService.createTaskQuery().orderByTaskId().taskName("testTask").asc().list().size());
     assertEquals(6, taskService.createTaskQuery().orderByTaskId().taskName("testTask").desc().list().size());
+  }
+
+  public void FAILING_testQuerySortingByNameShouldBeCaseInsensitive() {
+    // create task with capitalized name
+    Task task = taskService.newTask("caseSensitiveTestTask");
+    task.setName("CaseSensitiveTestTask");
+    taskService.saveTask(task);
+
+    List<String> sortedNames = getTaskNamesFromQuery(taskService.createTaskQuery());
+    Collections.sort(sortedNames, String.CASE_INSENSITIVE_ORDER);
+
+    // ascending ordering
+    List<String> ascNames = getTaskNamesFromQuery(taskService.createTaskQuery().orderByTaskName().asc());
+    assertEquals(sortedNames, ascNames);
+
+    // descending ordering
+    Collections.reverse(sortedNames);
+    List<String> descNames = getTaskNamesFromQuery(taskService.createTaskQuery().orderByTaskName().desc());
+    assertEquals(sortedNames, descNames);
+
+    // delete test task
+    taskService.deleteTask(task.getId(), true);
+  }
+
+  public List<String> getTaskNamesFromQuery(TaskQuery query) {
+    List<String> names = new ArrayList<String>();
+    for (Task task : query.list()) {
+      names.add(task.getName());
+    }
+    return names;
   }
 
   public void testNativeQuery() {
