@@ -106,7 +106,7 @@ public class InclusiveGatewayActivityBehavior extends GatewayActivityBehavior {
     PvmActivity activity = execution.getActivity();
     if (execution.isConcurrent()) {
       for (ActivityExecution concurrentExecution : getLeaveExecutions(execution.getParent())) {
-        if (concurrentExecution.isActive() && concurrentExecution.getActivity() != activity) {
+        if (concurrentExecution.isActive()) {
 
           // TODO: when is transitionBeingTaken cleared? Should we clear it?
           boolean reachable = false;
