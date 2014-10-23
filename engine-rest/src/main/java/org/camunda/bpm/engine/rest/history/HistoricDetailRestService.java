@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.rest.history;
 
 import java.util.List;
 
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -53,8 +54,11 @@ public interface HistoricDetailRestService {
    */
   @GET
   @Produces(MediaType.APPLICATION_JSON)
-  List<HistoricDetailDto> getHistoricDetails(@Context UriInfo uriInfo, @QueryParam("firstResult") Integer firstResult,
-      @QueryParam("maxResults") Integer maxResults);
+  List<HistoricDetailDto> getHistoricDetails(
+      @Context UriInfo uriInfo,
+      @QueryParam("firstResult") Integer firstResult,
+      @QueryParam("maxResults") Integer maxResults,
+      @QueryParam("deserializeObjectValues") @DefaultValue("true") boolean deserializeObjectValues);
 
   @GET
   @Path("/count")

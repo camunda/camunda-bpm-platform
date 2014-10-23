@@ -15,7 +15,6 @@ import static org.mockito.Matchers.anyMapOf;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Matchers.isNull;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -24,6 +23,7 @@ import static org.mockito.Mockito.when;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -32,7 +32,6 @@ import java.util.Map;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 
-import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.RuntimeServiceImpl;
 import org.camunda.bpm.engine.impl.core.variable.type.ObjectTypeImpl;
@@ -56,6 +55,7 @@ import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.type.ValueType;
+import org.camunda.bpm.engine.variable.value.ObjectValue;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.type.TypeFactory;
 import org.junit.Assert;
@@ -202,6 +202,67 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
       .when().get(PROCESS_INSTANCE_VARIABLES_URL);
 
     Assert.assertEquals("Should return exactly one variable", 1, response.jsonPath().getMap("").size());
+  }
+
+  @Test
+  public void testGetObjectVariables() {
+    // given
+    String variableKey = "aVariableId";
+
+    List<String> payload = Arrays.asList("a", "b");
+    ObjectValue variableValue =
+        MockObjectValue
+            .fromObjectValue(Variables
+                .objectValue(payload)
+                .serializationDataFormat("application/json")
+                .create())
+            .objectTypeName(ArrayList.class.getName())
+            .serializedValue("a serialized value"); // this should differ from the serialized json
+
+    when(runtimeServiceMock.getVariables(eq(EXAMPLE_PROCESS_INSTANCE_ID), anyBoolean()))
+      .thenReturn(Variables.createVariables().putValueTyped(variableKey, variableValue));
+
+    // when
+    given().pathParam("id", EXAMPLE_PROCESS_INSTANCE_ID)
+      .then().expect().statusCode(Status.OK.getStatusCode())
+      .body(variableKey + ".value", equalTo(payload))
+      .body(variableKey + ".type", equalTo("Object"))
+      .body(variableKey + ".valueInfo." + ObjectTypeImpl.VALUE_INFO_SERIALIZATION_DATA_FORMAT, equalTo("application/json"))
+      .body(variableKey + ".valueInfo." + ObjectTypeImpl.VALUE_INFO_OBJECT_TYPE_NAME, equalTo(ArrayList.class.getName()))
+      .when().get(PROCESS_INSTANCE_VARIABLES_URL);
+
+    // then
+    verify(runtimeServiceMock).getVariables(EXAMPLE_PROCESS_INSTANCE_ID, true);
+  }
+
+  @Test
+  public void testGetObjectVariablesSerialized() {
+    // given
+    String variableKey = "aVariableId";
+
+    ObjectValue variableValue =
+        Variables
+          .serializedObjectValue("a serialized value")
+          .serializationDataFormat("application/json")
+          .objectTypeName(ArrayList.class.getName())
+          .create();
+
+    when(runtimeServiceMock.getVariables(eq(EXAMPLE_PROCESS_INSTANCE_ID), anyBoolean()))
+      .thenReturn(Variables.createVariables().putValueTyped(variableKey, variableValue));
+
+    // when
+    given()
+      .pathParam("id", EXAMPLE_PROCESS_INSTANCE_ID)
+      .queryParam("deserializeObjectValues", false)
+    .then().expect().statusCode(Status.OK.getStatusCode())
+      .body(variableKey + ".value", equalTo("a serialized value"))
+      .body(variableKey + ".type", equalTo("Object"))
+      .body(variableKey + ".valueInfo." + ObjectTypeImpl.VALUE_INFO_SERIALIZATION_DATA_FORMAT, equalTo("application/json"))
+      .body(variableKey + ".valueInfo." + ObjectTypeImpl.VALUE_INFO_OBJECT_TYPE_NAME, equalTo(ArrayList.class.getName()))
+      .when().get(PROCESS_INSTANCE_VARIABLES_URL);
+
+    // then
+    verify(runtimeServiceMock).getVariables(EXAMPLE_PROCESS_INSTANCE_ID, false);
   }
 
   @Test
@@ -466,6 +527,66 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
       .body("type", is(InvalidRequestException.class.getSimpleName()))
       .body("message", is("process instance variable with name " + variableKey + " does not exist or is null"))
       .when().get(SINGLE_PROCESS_INSTANCE_VARIABLE_URL);
+  }
+
+  @Test
+  public void testGetSingleLocalObjectVariable() {
+    // given
+    String variableKey = "aVariableId";
+
+    List<String> payload = Arrays.asList("a", "b");
+    ObjectValue variableValue =
+        MockObjectValue
+            .fromObjectValue(Variables
+                .objectValue(payload)
+                .serializationDataFormat("application/json")
+                .create())
+            .objectTypeName(ArrayList.class.getName())
+            .serializedValue("a serialized value"); // this should differ from the serialized json
+
+    when(runtimeServiceMock.getVariableTyped(eq(EXAMPLE_PROCESS_INSTANCE_ID), eq(variableKey), anyBoolean())).thenReturn(variableValue);
+
+    // when
+    given().pathParam("id", EXAMPLE_PROCESS_INSTANCE_ID).pathParam("varId", variableKey)
+      .then().expect().statusCode(Status.OK.getStatusCode())
+      .body("value", equalTo(payload))
+      .body("type", equalTo("Object"))
+      .body("valueInfo." + ObjectTypeImpl.VALUE_INFO_SERIALIZATION_DATA_FORMAT, equalTo("application/json"))
+      .body("valueInfo." + ObjectTypeImpl.VALUE_INFO_OBJECT_TYPE_NAME, equalTo(ArrayList.class.getName()))
+      .when().get(SINGLE_PROCESS_INSTANCE_VARIABLE_URL);
+
+    // then
+    verify(runtimeServiceMock).getVariableTyped(EXAMPLE_PROCESS_INSTANCE_ID, variableKey, true);
+  }
+
+  @Test
+  public void testGetSingleLocalObjectVariableSerialized() {
+    // given
+    String variableKey = "aVariableId";
+
+    ObjectValue variableValue =
+        Variables
+          .serializedObjectValue("a serialized value")
+          .serializationDataFormat("application/json")
+          .objectTypeName(ArrayList.class.getName())
+          .create();
+
+    when(runtimeServiceMock.getVariableTyped(eq(EXAMPLE_PROCESS_INSTANCE_ID), eq(variableKey), anyBoolean())).thenReturn(variableValue);
+
+    // when
+    given()
+      .pathParam("id", EXAMPLE_PROCESS_INSTANCE_ID)
+      .pathParam("varId", variableKey)
+      .queryParam("deserializeObjectValue", false)
+    .then().expect().statusCode(Status.OK.getStatusCode())
+      .body("value", equalTo("a serialized value"))
+      .body("type", equalTo("Object"))
+      .body("valueInfo." + ObjectTypeImpl.VALUE_INFO_SERIALIZATION_DATA_FORMAT, equalTo("application/json"))
+      .body("valueInfo." + ObjectTypeImpl.VALUE_INFO_OBJECT_TYPE_NAME, equalTo(ArrayList.class.getName()))
+      .when().get(SINGLE_PROCESS_INSTANCE_VARIABLE_URL);
+
+    // then
+    verify(runtimeServiceMock).getVariableTyped(EXAMPLE_PROCESS_INSTANCE_ID, variableKey, false);
   }
 
   @Test

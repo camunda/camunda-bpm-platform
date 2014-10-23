@@ -47,12 +47,15 @@ public class HistoricDetailRestServiceImpl implements HistoricDetailRestService 
   }
 
   @Override
-  public List<HistoricDetailDto> getHistoricDetails(UriInfo uriInfo, Integer firstResult, Integer maxResults) {
+  public List<HistoricDetailDto> getHistoricDetails(UriInfo uriInfo, Integer firstResult,
+      Integer maxResults, boolean deserializeObjectValues) {
     HistoricDetailQueryDto queryDto = new HistoricDetailQueryDto(objectMapper, uriInfo.getQueryParameters());
     HistoricDetailQuery query = queryDto.toQuery(processEngine);
     query.disableBinaryFetching();
-    // existing API requires that Serializable variables are always resolved
-//    query.disableCustomObjectDeserialization();
+
+    if (!deserializeObjectValues) {
+      query.disableCustomObjectDeserialization();
+    }
 
     List<HistoricDetail> queryResult;
     if (firstResult != null || maxResults != null) {

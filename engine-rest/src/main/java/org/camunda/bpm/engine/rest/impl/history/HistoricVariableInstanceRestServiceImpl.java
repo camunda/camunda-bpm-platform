@@ -43,18 +43,22 @@ public class HistoricVariableInstanceRestServiceImpl implements HistoricVariable
   }
 
   @Override
-  public List<HistoricVariableInstanceDto> getHistoricVariableInstances(UriInfo uriInfo, Integer firstResult, Integer maxResults) {
+  public List<HistoricVariableInstanceDto> getHistoricVariableInstances(UriInfo uriInfo, Integer firstResult,
+      Integer maxResults, boolean deserializeObjectValues) {
     HistoricVariableInstanceQueryDto queryDto = new HistoricVariableInstanceQueryDto(objectMapper, uriInfo.getQueryParameters());
-    return queryHistoricVariableInstances(queryDto, firstResult, maxResults);
+    return queryHistoricVariableInstances(queryDto, firstResult, maxResults, deserializeObjectValues);
   }
 
   @Override
-  public List<HistoricVariableInstanceDto> queryHistoricVariableInstances(HistoricVariableInstanceQueryDto queryDto, Integer firstResult, Integer maxResults) {
+  public List<HistoricVariableInstanceDto> queryHistoricVariableInstances(HistoricVariableInstanceQueryDto queryDto,
+      Integer firstResult, Integer maxResults, boolean deserializeObjectValues) {
     queryDto.setObjectMapper(objectMapper);
     HistoricVariableInstanceQuery query = queryDto.toQuery(processEngine);
     query.disableBinaryFetching();
-    // variables of type Serializable have to be deserialized to not break existing API
-//    query.disableCustomObjectDeserialization();
+
+    if (!deserializeObjectValues) {
+      query.disableCustomObjectDeserialization();
+    }
 
     List<HistoricVariableInstance> matchingHistoricVariableInstances;
     if (firstResult != null || maxResults != null) {

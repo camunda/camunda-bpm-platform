@@ -35,6 +35,11 @@ public class MockObjectValue extends ObjectValueImpl {
     return this;
   }
 
+  public MockObjectValue serializedValue(String serializedValue) {
+    this.serializedValue = serializedValue;
+    return this;
+  }
+
   public static MockObjectValue fromObjectValue(ObjectValue objectValue) {
     MockObjectValue result = new MockObjectValue(objectValue.getValue());
 

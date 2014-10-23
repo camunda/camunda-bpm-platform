@@ -76,9 +76,22 @@ public abstract class AbstractVariableInstanceRestServiceQueryTest extends Abstr
 
     verify(mockedQuery).list();
     verify(mockedQuery).disableBinaryFetching();
+    verify(mockedQuery, never()).disableObjectValueDeserialization();
+    verifyNoMoreInteractions(mockedQuery);
+  }
 
-    // requirement to not break existing API; should be:
-    // verify(mockedQuery).disableCustomObjectDeserialization();
+  @Test
+  public void testNoParametersQueryDisableObjectDeserialization() {
+    given()
+      .queryParam("deserializeObjectValues", false)
+    .expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .get(VARIABLE_INSTANCE_QUERY_URL);
+
+    verify(mockedQuery).list();
+    verify(mockedQuery).disableBinaryFetching();
+    verify(mockedQuery).disableObjectValueDeserialization();
     verifyNoMoreInteractions(mockedQuery);
   }
 
@@ -90,8 +103,24 @@ public abstract class AbstractVariableInstanceRestServiceQueryTest extends Abstr
 
     verify(mockedQuery).list();
     verify(mockedQuery).disableBinaryFetching();
-    // requirement to not break existing API; should be:
-    // verify(mockedQuery).disableCustomObjectDeserialization();
+    verify(mockedQuery, never()).disableObjectValueDeserialization();
+    verifyNoMoreInteractions(mockedQuery);
+  }
+
+  @Test
+  public void testNoParametersQueryAsPostDisableObjectDeserialization() {
+    given()
+      .queryParam("deserializeObjectValues", false)
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(EMPTY_JSON_OBJECT)
+    .expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .post(VARIABLE_INSTANCE_QUERY_URL);
+
+    verify(mockedQuery).list();
+    verify(mockedQuery).disableBinaryFetching();
+    verify(mockedQuery).disableObjectValueDeserialization();
     verifyNoMoreInteractions(mockedQuery);
   }
 

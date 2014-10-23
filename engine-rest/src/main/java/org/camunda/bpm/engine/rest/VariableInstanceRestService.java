@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.rest;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -56,7 +57,7 @@ public interface VariableInstanceRestService {
   List<VariableInstanceDto> getVariableInstances(@Context UriInfo uriInfo,
       @QueryParam("firstResult") Integer firstResult,
       @QueryParam("maxResults") Integer maxResults,
-      @QueryParam("deserializeObjectValues") boolean deserializeObjectValues);
+      @QueryParam("deserializeObjectValues") @DefaultValue("true") boolean deserializeObjectValues);
 
   /**
    * Expects the same parameters as
@@ -74,7 +75,7 @@ public interface VariableInstanceRestService {
   List<VariableInstanceDto> queryVariableInstances(VariableInstanceQueryDto queryDto,
       @QueryParam("firstResult") Integer firstResult,
       @QueryParam("maxResults") Integer maxResults,
-      @QueryParam("deserializeObjectValues") boolean deserializeObjectValues);
+      @QueryParam("deserializeObjectValues") @DefaultValue("true") boolean deserializeObjectValues);
 
   @GET
   @Path("/count")

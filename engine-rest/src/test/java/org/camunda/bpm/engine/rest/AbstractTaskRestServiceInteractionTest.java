@@ -75,6 +75,7 @@ import org.camunda.bpm.engine.identity.UserQuery;
 import org.camunda.bpm.engine.impl.TaskServiceImpl;
 import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.core.variable.type.ObjectTypeImpl;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.CaseDefinitionQuery;
@@ -86,6 +87,7 @@ import org.camunda.bpm.engine.rest.hal.Hal;
 import org.camunda.bpm.engine.rest.helper.EqualsList;
 import org.camunda.bpm.engine.rest.helper.EqualsMap;
 import org.camunda.bpm.engine.rest.helper.ErrorMessageHelper;
+import org.camunda.bpm.engine.rest.helper.MockObjectValue;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.camunda.bpm.engine.rest.helper.VariableTypeHelper;
 import org.camunda.bpm.engine.rest.helper.variable.EqualsNullValue;
@@ -103,6 +105,7 @@ import org.camunda.bpm.engine.task.TaskQuery;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.type.ValueType;
+import org.camunda.bpm.engine.variable.value.ObjectValue;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.type.TypeFactory;
 import org.fest.assertions.Assertions;
@@ -2156,6 +2159,67 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
   }
 
   @Test
+  public void testGetLocalObjectVariables() {
+    // given
+    String variableKey = "aVariableId";
+
+    List<String> payload = Arrays.asList("a", "b");
+    ObjectValue variableValue =
+        MockObjectValue
+            .fromObjectValue(Variables
+                .objectValue(payload)
+                .serializationDataFormat("application/json")
+                .create())
+            .objectTypeName(ArrayList.class.getName())
+            .serializedValue("a serialized value"); // this should differ from the serialized json
+
+    when(taskServiceMock.getVariablesLocal(eq(EXAMPLE_TASK_ID), anyBoolean()))
+      .thenReturn(Variables.createVariables().putValueTyped(variableKey, variableValue));
+
+    // when
+    given().pathParam("id", EXAMPLE_TASK_ID)
+      .then().expect().statusCode(Status.OK.getStatusCode())
+      .body(variableKey + ".value", equalTo(payload))
+      .body(variableKey + ".type", equalTo("Object"))
+      .body(variableKey + ".valueInfo." + ObjectTypeImpl.VALUE_INFO_SERIALIZATION_DATA_FORMAT, equalTo("application/json"))
+      .body(variableKey + ".valueInfo." + ObjectTypeImpl.VALUE_INFO_OBJECT_TYPE_NAME, equalTo(ArrayList.class.getName()))
+      .when().get(SINGLE_TASK_VARIABLES_URL);
+
+    // then
+    verify(taskServiceMock).getVariablesLocal(EXAMPLE_TASK_ID, true);
+  }
+
+  @Test
+  public void testGetLocalObjectVariablesSerialized() {
+    // given
+    String variableKey = "aVariableId";
+
+    ObjectValue variableValue =
+        Variables
+          .serializedObjectValue("a serialized value")
+          .serializationDataFormat("application/json")
+          .objectTypeName(ArrayList.class.getName())
+          .create();
+
+    when(taskServiceMock.getVariablesLocal(eq(EXAMPLE_TASK_ID), anyBoolean()))
+      .thenReturn(Variables.createVariables().putValueTyped(variableKey, variableValue));
+
+    // when
+    given()
+      .pathParam("id", EXAMPLE_TASK_ID)
+      .queryParam("deserializeObjectValues", false)
+    .then().expect().statusCode(Status.OK.getStatusCode())
+      .body(variableKey + ".value", equalTo("a serialized value"))
+      .body(variableKey + ".type", equalTo("Object"))
+      .body(variableKey + ".valueInfo." + ObjectTypeImpl.VALUE_INFO_SERIALIZATION_DATA_FORMAT, equalTo("application/json"))
+      .body(variableKey + ".valueInfo." + ObjectTypeImpl.VALUE_INFO_OBJECT_TYPE_NAME, equalTo(ArrayList.class.getName()))
+      .when().get(SINGLE_TASK_VARIABLES_URL);
+
+    // then
+    verify(taskServiceMock).getVariablesLocal(EXAMPLE_TASK_ID, false);
+  }
+
+  @Test
   public void testGetLocalVariablesForNonExistingTaskId() {
     when(taskServiceMock.getVariablesLocal(NON_EXISTING_ID, true)).thenThrow(new ProcessEngineException("task " + NON_EXISTING_ID + " doesn't exist"));
 
@@ -2238,6 +2302,66 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
       .body("value", is(123))
       .body("type", is("Integer"))
       .when().get(SINGLE_TASK_SINGLE_VARIABLE_URL);
+  }
+
+  @Test
+  public void testGetSingleLocalObjectVariable() {
+    // given
+    String variableKey = "aVariableId";
+
+    List<String> payload = Arrays.asList("a", "b");
+    ObjectValue variableValue =
+        MockObjectValue
+            .fromObjectValue(Variables
+                .objectValue(payload)
+                .serializationDataFormat("application/json")
+                .create())
+            .objectTypeName(ArrayList.class.getName())
+            .serializedValue("a serialized value"); // this should differ from the serialized json
+
+    when(taskServiceMock.getVariableLocalTyped(eq(EXAMPLE_TASK_ID), eq(variableKey), anyBoolean())).thenReturn(variableValue);
+
+    // when
+    given().pathParam("id", EXAMPLE_TASK_ID).pathParam("varId", variableKey)
+      .then().expect().statusCode(Status.OK.getStatusCode())
+      .body("value", equalTo(payload))
+      .body("type", equalTo("Object"))
+      .body("valueInfo." + ObjectTypeImpl.VALUE_INFO_SERIALIZATION_DATA_FORMAT, equalTo("application/json"))
+      .body("valueInfo." + ObjectTypeImpl.VALUE_INFO_OBJECT_TYPE_NAME, equalTo(ArrayList.class.getName()))
+      .when().get(SINGLE_TASK_SINGLE_VARIABLE_URL);
+
+    // then
+    verify(taskServiceMock).getVariableLocalTyped(EXAMPLE_TASK_ID, variableKey, true);
+  }
+
+  @Test
+  public void testGetSingleLocalObjectVariableSerialized() {
+    // given
+    String variableKey = "aVariableId";
+
+    ObjectValue variableValue =
+        Variables
+          .serializedObjectValue("a serialized value")
+          .serializationDataFormat("application/json")
+          .objectTypeName(ArrayList.class.getName())
+          .create();
+
+    when(taskServiceMock.getVariableLocalTyped(eq(EXAMPLE_TASK_ID), eq(variableKey), anyBoolean())).thenReturn(variableValue);
+
+    // when
+    given()
+      .pathParam("id", EXAMPLE_TASK_ID)
+      .pathParam("varId", variableKey)
+      .queryParam("deserializeObjectValue", false)
+    .then().expect().statusCode(Status.OK.getStatusCode())
+      .body("value", equalTo("a serialized value"))
+      .body("type", equalTo("Object"))
+      .body("valueInfo." + ObjectTypeImpl.VALUE_INFO_SERIALIZATION_DATA_FORMAT, equalTo("application/json"))
+      .body("valueInfo." + ObjectTypeImpl.VALUE_INFO_OBJECT_TYPE_NAME, equalTo(ArrayList.class.getName()))
+      .when().get(SINGLE_TASK_SINGLE_VARIABLE_URL);
+
+    // then
+    verify(taskServiceMock).getVariableLocalTyped(EXAMPLE_TASK_ID, variableKey, false);
   }
 
   @Test

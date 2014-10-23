@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.rest.history;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -50,8 +51,11 @@ public interface HistoricVariableInstanceRestService {
    */
   @GET
   @Produces(MediaType.APPLICATION_JSON)
-  List<HistoricVariableInstanceDto> getHistoricVariableInstances(@Context UriInfo uriInfo, @QueryParam("firstResult") Integer firstResult,
-      @QueryParam("maxResults") Integer maxResults);
+  List<HistoricVariableInstanceDto> getHistoricVariableInstances(
+      @Context UriInfo uriInfo,
+      @QueryParam("firstResult") Integer firstResult,
+      @QueryParam("maxResults") Integer maxResults,
+      @QueryParam("deserializeObjectValues") @DefaultValue("true") boolean deserializeObjectValues);
 
   /**
    * @param query
@@ -62,8 +66,11 @@ public interface HistoricVariableInstanceRestService {
   @POST
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
-  List<HistoricVariableInstanceDto> queryHistoricVariableInstances(HistoricVariableInstanceQueryDto query, @QueryParam("firstResult") Integer firstResult,
-      @QueryParam("maxResults") Integer maxResults);
+  List<HistoricVariableInstanceDto> queryHistoricVariableInstances(
+      HistoricVariableInstanceQueryDto query,
+      @QueryParam("firstResult") Integer firstResult,
+      @QueryParam("maxResults") Integer maxResults,
+      @QueryParam("deserializeObjectValues") @DefaultValue("true") boolean deserializeObjectValues);
 
   @GET
   @Path("/count")

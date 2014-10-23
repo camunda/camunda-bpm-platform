@@ -30,6 +30,7 @@ import static org.mockito.Mockito.when;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -42,10 +43,12 @@ import javax.ws.rs.core.Response.Status;
 import org.camunda.bpm.engine.CaseService;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.NotValidException;
+import org.camunda.bpm.engine.impl.core.variable.type.ObjectTypeImpl;
 import org.camunda.bpm.engine.rest.dto.runtime.VariableNameDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.helper.ErrorMessageHelper;
+import org.camunda.bpm.engine.rest.helper.MockObjectValue;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.camunda.bpm.engine.rest.helper.VariableTypeHelper;
 import org.camunda.bpm.engine.rest.helper.variable.EqualsNullValue;
@@ -55,6 +58,8 @@ import org.camunda.bpm.engine.rest.util.VariablesBuilder;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.CaseExecutionCommandBuilder;
 import org.camunda.bpm.engine.runtime.CaseExecutionQuery;
+import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.value.ObjectValue;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.type.TypeFactory;
 import org.junit.Assert;
@@ -1368,6 +1373,67 @@ public class AbstractCaseExecutionRestServiceInteractionTest extends AbstractRes
   }
 
   @Test
+  public void testGetLocalObjectVariables() {
+    // given
+    String variableKey = "aVariableId";
+
+    List<String> payload = Arrays.asList("a", "b");
+    ObjectValue variableValue =
+        MockObjectValue
+            .fromObjectValue(Variables
+                .objectValue(payload)
+                .serializationDataFormat("application/json")
+                .create())
+            .objectTypeName(ArrayList.class.getName())
+            .serializedValue("a serialized value"); // this should differ from the serialized json
+
+    when(caseServiceMock.getVariablesLocal(eq(MockProvider.EXAMPLE_CASE_EXECUTION_ID), anyBoolean()))
+      .thenReturn(Variables.createVariables().putValueTyped(variableKey, variableValue));
+
+    // when
+    given().pathParam("id", MockProvider.EXAMPLE_CASE_EXECUTION_ID)
+      .then().expect().statusCode(Status.OK.getStatusCode())
+      .body(variableKey + ".value", equalTo(payload))
+      .body(variableKey + ".type", equalTo("Object"))
+      .body(variableKey + ".valueInfo." + ObjectTypeImpl.VALUE_INFO_SERIALIZATION_DATA_FORMAT, equalTo("application/json"))
+      .body(variableKey + ".valueInfo." + ObjectTypeImpl.VALUE_INFO_OBJECT_TYPE_NAME, equalTo(ArrayList.class.getName()))
+      .when().get(CASE_EXECUTION_LOCAL_VARIABLES_URL);
+
+    // then
+    verify(caseServiceMock).getVariablesLocal(MockProvider.EXAMPLE_CASE_EXECUTION_ID, true);
+  }
+
+  @Test
+  public void testGetLocalObjectVariablesSerialized() {
+    // given
+    String variableKey = "aVariableId";
+
+    ObjectValue variableValue =
+        Variables
+          .serializedObjectValue("a serialized value")
+          .serializationDataFormat("application/json")
+          .objectTypeName(ArrayList.class.getName())
+          .create();
+
+    when(caseServiceMock.getVariablesLocal(eq(MockProvider.EXAMPLE_CASE_EXECUTION_ID), anyBoolean()))
+      .thenReturn(Variables.createVariables().putValueTyped(variableKey, variableValue));
+
+    // when
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_CASE_EXECUTION_ID)
+      .queryParam("deserializeObjectValues", false)
+    .then().expect().statusCode(Status.OK.getStatusCode())
+      .body(variableKey + ".value", equalTo("a serialized value"))
+      .body(variableKey + ".type", equalTo("Object"))
+      .body(variableKey + ".valueInfo." + ObjectTypeImpl.VALUE_INFO_SERIALIZATION_DATA_FORMAT, equalTo("application/json"))
+      .body(variableKey + ".valueInfo." + ObjectTypeImpl.VALUE_INFO_OBJECT_TYPE_NAME, equalTo(ArrayList.class.getName()))
+      .when().get(CASE_EXECUTION_LOCAL_VARIABLES_URL);
+
+    // then
+    verify(caseServiceMock).getVariablesLocal(MockProvider.EXAMPLE_CASE_EXECUTION_ID, false);
+  }
+
+  @Test
   public void testGetLocalVariablesForNonExistingExecution() {
     when(caseServiceMock.getVariablesLocal(anyString(), anyBoolean())).thenThrow(new ProcessEngineException("expected exception"));
 
@@ -1615,6 +1681,66 @@ public class AbstractCaseExecutionRestServiceInteractionTest extends AbstractRes
       .get(SINGLE_CASE_EXECUTION_VARIABLE_URL);
 
     verify(caseServiceMock).getVariableTyped(MockProvider.EXAMPLE_CASE_EXECUTION_ID, EXAMPLE_VARIABLE_KEY, true);
+  }
+
+  @Test
+  public void testGetSingleLocalObjectVariable() {
+    // given
+    String variableKey = "aVariableId";
+
+    List<String> payload = Arrays.asList("a", "b");
+    ObjectValue variableValue =
+        MockObjectValue
+            .fromObjectValue(Variables
+                .objectValue(payload)
+                .serializationDataFormat("application/json")
+                .create())
+            .objectTypeName(ArrayList.class.getName())
+            .serializedValue("a serialized value"); // this should differ from the serialized json
+
+    when(caseServiceMock.getVariableLocalTyped(eq(MockProvider.EXAMPLE_CASE_EXECUTION_ID), eq(variableKey), anyBoolean())).thenReturn(variableValue);
+
+    // when
+    given().pathParam("id", MockProvider.EXAMPLE_CASE_EXECUTION_ID).pathParam("varId", variableKey)
+      .then().expect().statusCode(Status.OK.getStatusCode())
+      .body("value", equalTo(payload))
+      .body("type", equalTo("Object"))
+      .body("valueInfo." + ObjectTypeImpl.VALUE_INFO_SERIALIZATION_DATA_FORMAT, equalTo("application/json"))
+      .body("valueInfo." + ObjectTypeImpl.VALUE_INFO_OBJECT_TYPE_NAME, equalTo(ArrayList.class.getName()))
+      .when().get(SINGLE_CASE_EXECUTION_LOCAL_VARIABLE_URL);
+
+    // then
+    verify(caseServiceMock).getVariableLocalTyped(MockProvider.EXAMPLE_CASE_EXECUTION_ID, variableKey, true);
+  }
+
+  @Test
+  public void testGetSingleLocalObjectVariableSerialized() {
+    // given
+    String variableKey = "aVariableId";
+
+    ObjectValue variableValue =
+        Variables
+          .serializedObjectValue("a serialized value")
+          .serializationDataFormat("application/json")
+          .objectTypeName(ArrayList.class.getName())
+          .create();
+
+    when(caseServiceMock.getVariableLocalTyped(eq(MockProvider.EXAMPLE_CASE_EXECUTION_ID), eq(variableKey), anyBoolean())).thenReturn(variableValue);
+
+    // when
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_CASE_EXECUTION_ID)
+      .pathParam("varId", variableKey)
+      .queryParam("deserializeObjectValue", false)
+    .then().expect().statusCode(Status.OK.getStatusCode())
+      .body("value", equalTo("a serialized value"))
+      .body("type", equalTo("Object"))
+      .body("valueInfo." + ObjectTypeImpl.VALUE_INFO_SERIALIZATION_DATA_FORMAT, equalTo("application/json"))
+      .body("valueInfo." + ObjectTypeImpl.VALUE_INFO_OBJECT_TYPE_NAME, equalTo(ArrayList.class.getName()))
+      .when().get(SINGLE_CASE_EXECUTION_LOCAL_VARIABLE_URL);
+
+    // then
+    verify(caseServiceMock).getVariableLocalTyped(MockProvider.EXAMPLE_CASE_EXECUTION_ID, variableKey, false);
   }
 
   @Test

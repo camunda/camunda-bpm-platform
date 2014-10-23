@@ -115,8 +115,21 @@ public class AbstractHistoricDetailRestServiceQueryTest extends AbstractRestServ
 
     verify(mockedQuery).list();
     verify(mockedQuery).disableBinaryFetching();
-    // should not resolve custom objects but existing API requires it
-//    verify(mockedQuery).disableCustomObjectDeserialization();
+    verifyNoMoreInteractions(mockedQuery);
+  }
+
+  @Test
+  public void testNoParametersQueryDisableObjectDeserialization() {
+    given()
+      .queryParam("deserializeObjectValues", false)
+    .expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .get(HISTORIC_DETAIL_RESOURCE_URL);
+
+    verify(mockedQuery).list();
+    verify(mockedQuery).disableBinaryFetching();
+    verify(mockedQuery).disableCustomObjectDeserialization();
     verifyNoMoreInteractions(mockedQuery);
   }
 

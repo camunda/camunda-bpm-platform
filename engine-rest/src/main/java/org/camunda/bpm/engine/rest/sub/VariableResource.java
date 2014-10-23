@@ -35,14 +35,14 @@ public interface VariableResource {
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   Map<String, VariableValueDto> getVariables(
-      @QueryParam("deserializeValues") @DefaultValue("true") boolean deserializeValues);
+      @QueryParam("deserializeObjectValues") @DefaultValue("true") boolean deserializeValues);
 
   @GET
   @Path("/{varId}")
   @Produces(MediaType.APPLICATION_JSON)
   VariableValueDto getVariable(
       @PathParam("varId") String variableName,
-      @QueryParam("deserializeValue") @DefaultValue("true") boolean deserializeValue);
+      @QueryParam("deserializeObjectValue") @DefaultValue("true") boolean deserializeValue);
 
   @PUT
   @Path("/{varId}")

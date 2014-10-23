@@ -91,9 +91,23 @@ public abstract class AbstractHistoricVariableInstanceRestServiceQueryTest exten
 
     verify(mockedQuery).list();
     verify(mockedQuery).disableBinaryFetching();
-    // In order to not break current API, we have to deserialize Serializable variables. should be:
-    // verify(mockedQuery).disableCustomObjectDeserialization();
     verify(mockedQuery, never()).disableCustomObjectDeserialization();
+
+    verifyNoMoreInteractions(mockedQuery);
+  }
+
+  @Test
+  public void testNoParametersQueryDisableObjectDeserialization() {
+    given()
+      .queryParam("deserializeObjectValues", false)
+    .expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .get(HISTORIC_VARIABLE_INSTANCE_RESOURCE_URL);
+
+    verify(mockedQuery).list();
+    verify(mockedQuery).disableBinaryFetching();
+    verify(mockedQuery).disableCustomObjectDeserialization();
 
     verifyNoMoreInteractions(mockedQuery);
   }
@@ -110,9 +124,24 @@ public abstract class AbstractHistoricVariableInstanceRestServiceQueryTest exten
 
     verify(mockedQuery).list();
     verify(mockedQuery).disableBinaryFetching();
-    // In order to not break current API, we have to deserialize Serializable variables. should be:
-    // verify(mockedQuery).disableCustomObjectDeserialization();
     verify(mockedQuery, never()).disableCustomObjectDeserialization();
+    verifyNoMoreInteractions(mockedQuery);
+  }
+
+  @Test
+  public void testNoParametersQueryAsPostDisableObjectDeserialization() {
+    given()
+      .queryParam("deserializeObjectValues", false)
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(EMPTY_JSON_OBJECT)
+    .expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .post(HISTORIC_VARIABLE_INSTANCE_RESOURCE_URL);
+
+    verify(mockedQuery).list();
+    verify(mockedQuery).disableBinaryFetching();
+    verify(mockedQuery).disableCustomObjectDeserialization();
     verifyNoMoreInteractions(mockedQuery);
   }
 
