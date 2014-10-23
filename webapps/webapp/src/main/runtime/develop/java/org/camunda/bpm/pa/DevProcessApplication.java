@@ -8,6 +8,7 @@ import org.camunda.bpm.admin.impl.web.SetupResource;
 import org.camunda.bpm.application.PostDeploy;
 import org.camunda.bpm.application.ProcessApplication;
 import org.camunda.bpm.application.impl.ServletProcessApplication;
+import org.camunda.bpm.engine.CaseService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
@@ -17,6 +18,7 @@ import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.rest.dto.identity.UserCredentialsDto;
 import org.camunda.bpm.engine.rest.dto.identity.UserDto;
 import org.camunda.bpm.engine.rest.dto.identity.UserProfileDto;
+import org.camunda.bpm.engine.runtime.CaseExecutionQuery;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.pa.demo.InvoiceDemoDataGenerator;
@@ -175,6 +177,60 @@ public class DevProcessApplication extends ServletProcessApplication {
     TaskService taskService = engine.getTaskService();
     Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
     taskService.setVariableLocal(task.getId(), "localTaskVariable", "foo");
+
+    CaseService caseService = engine.getCaseService();
+    caseService
+      .withCaseDefinitionByKey("loanApplicationCase")
+      .setVariable("aVariable", "abc")
+      .setVariable("anotherVariable", "xyz")
+      .create();
+
+    CaseExecutionQuery query = caseService.createCaseExecutionQuery();
+
+    String stageId = query
+        .activityId("PI_collectDataStage")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(stageId)
+      .manualStart();
+
+    String first = query
+        .activityId("PI_captureAppDataHumanTask")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(first)
+      .manualStart();
+
+    String second = query
+        .activityId("PI_obtainCreditWorthinessHumanTask")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(second)
+      .manualStart();
+
+    String third = query
+        .activityId("PI_reviewDocumentsHumanTask")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(third)
+      .manualStart();
+
+    String fourth = query
+        .activityId("PI_obtainSchufaInfoProcessTask")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(fourth)
+      .manualStart();
 
     new Thread(){
       public void run() {
