@@ -61,6 +61,27 @@ define(function() {
       ]
     },
     {
+      group: 'Case definition',
+      options: [
+        {
+          name: 'caseDefinitionId',
+          label: 'Id'
+        },
+        {
+          name: 'caseDefinitionKey',
+          label: 'Key'
+        },
+        {
+          name: 'caseDefinitionName',
+          label: 'Name'
+        },
+        {
+          name: 'caseDefinitionNameLike',
+          label: 'Name Like'
+        }
+      ]
+    },
+    {
       group: 'Other',
       options: [
         {
