@@ -24,8 +24,10 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.ext.Providers;
 
 import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.IdentityService;
@@ -40,8 +42,10 @@ import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.impl.UserRestServiceImpl;
 import org.camunda.bpm.engine.rest.spi.ProcessEngineProvider;
+import org.camunda.bpm.engine.rest.util.ProvidersUtil;
 import org.camunda.bpm.webapp.impl.security.SecurityActions;
 import org.camunda.bpm.webapp.impl.security.SecurityActions.SecurityAction;
+import org.codehaus.jackson.map.ObjectMapper;
 
 /**
  * <p>Jax RS resource allowing to perform the setup steps.</p>
@@ -55,67 +59,83 @@ import org.camunda.bpm.webapp.impl.security.SecurityActions.SecurityAction;
 @Path("/setup/{engine}")
 public class SetupResource {
 
+  @Context
+  protected Providers providers;
+
   @Path("/user/create")
   @POST
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
   public void createInitialUser(final @PathParam("engine") String processEngineName, final UserDto user) {
 
-    final ProcessEngine processEngine = lookupProcessEngine(processEngineName);    
+    final ProcessEngine processEngine = lookupProcessEngine(processEngineName);
     if(processEngine == null) {
       throw new InvalidRequestException(Status.BAD_REQUEST, "Process Engine '"+processEngineName+"' does not exist.");
     }
-    
+
     SecurityActions.runWithoutAuthentication(new SecurityAction<Void>() {
-      public Void execute() {        
-        createInitialUserInternal(processEngineName, user, processEngine);        
+      public Void execute() {
+        createInitialUserInternal(processEngineName, user, processEngine);
         return null;
       }
     }, processEngine);
-      
+
   }
 
   protected void createInitialUserInternal(String processEngineName, UserDto user, ProcessEngine processEngine) {
+
+    ObjectMapper objectMapper = getObjectMapper();
+
     // make sure we can process this request at this time
     ensureSetupAvailable(processEngine);
 
     // reuse logic from rest api implementation
-    UserRestServiceImpl userRestServiceImpl = new UserRestServiceImpl(processEngineName);
+    UserRestServiceImpl userRestServiceImpl = new UserRestServiceImpl(processEngineName, objectMapper);
     userRestServiceImpl.createUser(user);
-    
+
     // crate the camunda admin group
     ensureCamundaAdminGroupExists(processEngine);
-    
+
     // create group membership (add new user to admin group)
     processEngine.getIdentityService()
       .createMembership(user.getProfile().getId(), Groups.CAMUNDA_ADMIN);
   }
 
+  protected ObjectMapper getObjectMapper() {
+    if(providers != null) {
+      return ProvidersUtil
+        .resolveFromContext(providers, ObjectMapper.class, MediaType.APPLICATION_JSON_TYPE, this.getClass());
+    }
+    else {
+      return null;
+    }
+  }
+
   protected void ensureCamundaAdminGroupExists(ProcessEngine processEngine) {
-        
+
     final IdentityService identityService = processEngine.getIdentityService();
     final AuthorizationService authorizationService = processEngine.getAuthorizationService();
-    
+
     // create group
-    if(identityService.createGroupQuery().groupId(Groups.CAMUNDA_ADMIN).count() == 0) {      
+    if(identityService.createGroupQuery().groupId(Groups.CAMUNDA_ADMIN).count() == 0) {
       Group camundaAdminGroup = identityService.newGroup(Groups.CAMUNDA_ADMIN);
       camundaAdminGroup.setName("camunda BPM Administrators");
       camundaAdminGroup.setType(Groups.GROUP_TYPE_SYSTEM);
-      identityService.saveGroup(camundaAdminGroup);      
+      identityService.saveGroup(camundaAdminGroup);
     }
-    
+
     // create ADMIN authorizations on all built-in resources
     for (Resource resource : Resources.values()) {
-      if(authorizationService.createAuthorizationQuery().groupIdIn(Groups.CAMUNDA_ADMIN).resourceType(resource).resourceId(ANY).count() == 0) {      
+      if(authorizationService.createAuthorizationQuery().groupIdIn(Groups.CAMUNDA_ADMIN).resourceType(resource).resourceId(ANY).count() == 0) {
         AuthorizationEntity userAdminAuth = new AuthorizationEntity(AUTH_TYPE_GRANT);
         userAdminAuth.setGroupId(Groups.CAMUNDA_ADMIN);
         userAdminAuth.setResource(resource);
-        userAdminAuth.setResourceId(ANY);   
+        userAdminAuth.setResourceId(ANY);
         userAdminAuth.addPermission(ALL);
         authorizationService.saveAuthorization(userAdminAuth);
-      }      
+      }
     }
-         
+
   }
 
   protected void ensureSetupAvailable(ProcessEngine processEngine) {
