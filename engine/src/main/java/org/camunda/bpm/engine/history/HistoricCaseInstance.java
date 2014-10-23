@@ -53,7 +53,7 @@ public interface HistoricCaseInstance {
   /** Check if the case is active. */
   boolean isActive();
 
-  /** Check if the case is c.ompleted. */
+  /** Check if the case is completed. */
   boolean isCompleted();
 
   /** Check if the case is terminated. */

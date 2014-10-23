@@ -337,6 +337,13 @@ public abstract class MockProvider {
   public static final String EXAMPLE_HISTORIC_CASE_INSTANCE_CLOSED_AFTER = "2013-01-23T13:42:43";
   public static final String EXAMPLE_HISTORIC_CASE_INSTANCE_CLOSED_BEFORE = "2013-04-23T13:42:43";
 
+  public static final boolean EXAMPLE_HISTORIC_CASE_INSTANCE_IS_ACTIVE = true;
+  public static final boolean EXAMPLE_HISTORIC_CASE_INSTANCE_IS_COMPLETED = true;
+  public static final boolean EXAMPLE_HISTORIC_CASE_INSTANCE_IS_TERMINATED = true;
+  public static final boolean EXAMPLE_HISTORIC_CASE_INSTANCE_IS_FAILED = true;
+  public static final boolean EXAMPLE_HISTORIC_CASE_INSTANCE_IS_SUSPENDED = true;
+  public static final boolean EXAMPLE_HISTORIC_CASE_INSTANCE_IS_CLOSED = true;
+
   // Historic Activity Instance
   public static final String EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_ID = "aHistoricActivityInstanceId";
   public static final String EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_PARENT_ACTIVITY_INSTANCE_ID = "aHistoricParentActivityInstanceId";
@@ -1121,6 +1128,12 @@ public abstract class MockProvider {
     when(mock.getDurationInMillis()).thenReturn(EXAMPLE_HISTORIC_CASE_INSTANCE_DURATION_MILLIS);
     when(mock.getCreateUserId()).thenReturn(EXAMPLE_HISTORIC_CASE_INSTANCE_CREATE_USER_ID);
     when(mock.getSuperCaseInstanceId()).thenReturn(EXAMPLE_HISTORIC_CASE_INSTANCE_SUPER_CASE_INSTANCE_ID);
+    when(mock.isActive()).thenReturn(EXAMPLE_HISTORIC_CASE_INSTANCE_IS_ACTIVE);
+    when(mock.isCompleted()).thenReturn(EXAMPLE_HISTORIC_CASE_INSTANCE_IS_COMPLETED);
+    when(mock.isTerminated()).thenReturn(EXAMPLE_HISTORIC_CASE_INSTANCE_IS_TERMINATED);
+    when(mock.isFailed()).thenReturn(EXAMPLE_HISTORIC_CASE_INSTANCE_IS_FAILED);
+    when(mock.isSuspended()).thenReturn(EXAMPLE_HISTORIC_CASE_INSTANCE_IS_SUSPENDED);
+    when(mock.isClosed()).thenReturn(EXAMPLE_HISTORIC_CASE_INSTANCE_IS_CLOSED);
 
     return mock;
   }

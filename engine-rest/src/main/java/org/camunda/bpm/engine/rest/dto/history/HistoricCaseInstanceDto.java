@@ -18,14 +18,20 @@ import org.camunda.bpm.engine.history.HistoricCaseInstance;
 
 public class HistoricCaseInstanceDto {
 
-  private String id;
-  private String businessKey;
-  private String caseDefinitionId;
-  private Date createTime;
-  private Date closeTime;
-  private Long durationInMillis;
-  private String createUserId;
-  private String superCaseInstanceId;
+  protected String id;
+  protected String businessKey;
+  protected String caseDefinitionId;
+  protected Date createTime;
+  protected Date closeTime;
+  protected Long durationInMillis;
+  protected String createUserId;
+  protected String superCaseInstanceId;
+  protected Boolean active;
+  protected Boolean completed;
+  protected Boolean terminated;
+  protected Boolean failed;
+  protected Boolean suspended;
+  protected Boolean closed;
 
   public String getId() {
     return id;
@@ -59,6 +65,30 @@ public class HistoricCaseInstanceDto {
     return superCaseInstanceId;
   }
 
+  public Boolean getActive() {
+    return active;
+  }
+
+  public Boolean getCompleted() {
+    return completed;
+  }
+
+  public Boolean getTerminated() {
+    return terminated;
+  }
+
+  public Boolean getFailed() {
+    return failed;
+  }
+
+  public Boolean getSuspended() {
+    return suspended;
+  }
+
+  public Boolean getClosed() {
+    return closed;
+  }
+
   public static HistoricCaseInstanceDto fromHistoricCaseInstance(HistoricCaseInstance historicCaseInstance) {
 
     HistoricCaseInstanceDto dto = new HistoricCaseInstanceDto();
@@ -71,6 +101,12 @@ public class HistoricCaseInstanceDto {
     dto.durationInMillis = historicCaseInstance.getDurationInMillis();
     dto.createUserId = historicCaseInstance.getCreateUserId();
     dto.superCaseInstanceId = historicCaseInstance.getSuperCaseInstanceId();
+    dto.active = historicCaseInstance.isActive();
+    dto.completed = historicCaseInstance.isCompleted();
+    dto.terminated = historicCaseInstance.isFailed();
+    dto.failed = historicCaseInstance.isFailed();
+    dto.suspended = historicCaseInstance.isSuspended();
+    dto.closed = historicCaseInstance.isClosed();
 
     return dto;
   }

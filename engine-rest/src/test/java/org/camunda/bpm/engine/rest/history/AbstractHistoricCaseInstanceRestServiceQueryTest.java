@@ -284,6 +284,12 @@ public abstract class AbstractHistoricCaseInstanceRestServiceQueryTest extends A
     long returnedDurationInMillis = from(content).getLong("[0].durationInMillis");
     String returnedCreateUserId = from(content).getString("[0].createUserId");
     String returnedSuperCaseInstanceId = from(content).getString("[0].superCaseInstanceId");
+    boolean active = from(content).getBoolean("[0].active");
+    boolean completed = from(content).getBoolean("[0].completed");
+    boolean terminated = from(content).getBoolean("[0].terminated");
+    boolean failed = from(content).getBoolean("[0].failed");
+    boolean suspended = from(content).getBoolean("[0].suspended");
+    boolean closed = from(content).getBoolean("[0].closed");
 
     Assert.assertEquals(MockProvider.EXAMPLE_CASE_INSTANCE_ID, returnedCaseInstanceId);
     Assert.assertEquals(MockProvider.EXAMPLE_CASE_INSTANCE_BUSINESS_KEY, returnedCaseInstanceBusinessKey);
@@ -293,6 +299,12 @@ public abstract class AbstractHistoricCaseInstanceRestServiceQueryTest extends A
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_CASE_INSTANCE_DURATION_MILLIS, returnedDurationInMillis);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_CASE_INSTANCE_CREATE_USER_ID, returnedCreateUserId);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_CASE_INSTANCE_SUPER_CASE_INSTANCE_ID, returnedSuperCaseInstanceId);
+    Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_CASE_INSTANCE_IS_ACTIVE, active);
+    Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_CASE_INSTANCE_IS_COMPLETED, completed);
+    Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_CASE_INSTANCE_IS_TERMINATED, terminated);
+    Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_CASE_INSTANCE_IS_FAILED, failed);
+    Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_CASE_INSTANCE_IS_SUSPENDED, suspended);
+    Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_CASE_INSTANCE_IS_CLOSED, closed);
   }
 
   @Test
