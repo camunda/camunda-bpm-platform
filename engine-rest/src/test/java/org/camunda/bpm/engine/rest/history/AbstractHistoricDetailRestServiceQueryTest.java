@@ -41,8 +41,10 @@ import org.camunda.bpm.engine.impl.core.variable.type.ObjectTypeImpl;
 import org.camunda.bpm.engine.rest.AbstractRestServiceTest;
 import org.camunda.bpm.engine.rest.helper.MockHistoricVariableUpdateBuilder;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
+import org.camunda.bpm.engine.rest.helper.VariableTypeHelper;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.type.ValueType;
+import org.camunda.bpm.engine.variable.value.ObjectValue;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -279,8 +281,9 @@ public class AbstractHistoricDetailRestServiceQueryTest extends AbstractRestServ
         .and()
           .body("[0].id", equalTo(historicUpdateBuilder.getId()))
           .body("[0].variableName", equalTo(historicUpdateBuilder.getName()))
-          .body("[0].variableType", equalTo(historicUpdateBuilder.getTypedValue().getType().getName()))
-          .body("[0].value", equalTo(historicUpdateBuilder.getTypedValue()))
+          .body("[0].variableType", equalTo(VariableTypeHelper.toExpectedValueTypeName(
+              historicUpdateBuilder.getTypedValue().getType())))
+          .body("[0].value", equalTo(historicUpdateBuilder.getTypedValue().getValue()))
           .body("[0].processInstanceId", equalTo(historicUpdateBuilder.getProcessInstanceId()))
           .body("[0].errorMessage", equalTo(historicUpdateBuilder.getErrorMessage()))
           .body("[0].activityInstanceId", equalTo(historicUpdateBuilder.getActivityInstanceId()))
@@ -323,8 +326,9 @@ public class AbstractHistoricDetailRestServiceQueryTest extends AbstractRestServ
 
   @Test
   public void testSerializableVariableInstanceRetrieval() {
+    ObjectValue serializedValue = Variables.serializedObjectValue("a serialized value").create();
     MockHistoricVariableUpdateBuilder builder = MockProvider.mockHistoricVariableUpdate()
-        .typedValue(Variables.serializedObjectValue("a serialized value").create());
+        .typedValue(serializedValue);
 
     List<HistoricDetail> details = new ArrayList<HistoricDetail>();
     details.add(builder.build());
@@ -334,9 +338,8 @@ public class AbstractHistoricDetailRestServiceQueryTest extends AbstractRestServ
     given()
         .then().expect().statusCode(Status.OK.getStatusCode())
         .and()
-          .body("[0].variableType", equalTo(ValueType.OBJECT.getName()))
-          .body("[0].value.object", equalTo("a serialized value"))
-          .body("[0].value.type", equalTo(String.class.getName()))
+          .body("[0].value", equalTo("a serialized value"))
+          .body("[0].variableType", equalTo(VariableTypeHelper.toExpectedValueTypeName(serializedValue.getType())))
           .body("[0].errorMessage", nullValue())
         .when().get(HISTORIC_DETAIL_RESOURCE_URL);
 
@@ -362,12 +365,12 @@ public class AbstractHistoricDetailRestServiceQueryTest extends AbstractRestServ
     given()
         .then().expect().statusCode(Status.OK.getStatusCode())
         .and()
-          .body("[0].variableType", equalTo(ValueType.OBJECT.getName()))
+          .body("[0].variableType", equalTo(VariableTypeHelper.toExpectedValueTypeName(ValueType.OBJECT)))
           .body("[0].errorMessage", nullValue())
           .body("[0].value", equalTo("aSerializedValue"))
-          .body("[0].typeInfo." + ObjectTypeImpl.VALUE_INFO_OBJECT_TYPE_NAME,
+          .body("[0].valueInfo." + ObjectTypeImpl.VALUE_INFO_OBJECT_TYPE_NAME,
               equalTo("aRootType"))
-          .body("[0].typeInfo." + ObjectTypeImpl.VALUE_INFO_SERIALIZATION_DATA_FORMAT,
+          .body("[0].valueInfo." + ObjectTypeImpl.VALUE_INFO_SERIALIZATION_DATA_FORMAT,
               equalTo("aDataFormat"))
         .when().get(HISTORIC_DETAIL_RESOURCE_URL);
   }

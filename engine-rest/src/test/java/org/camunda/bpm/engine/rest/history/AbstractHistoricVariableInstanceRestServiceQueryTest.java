@@ -28,6 +28,7 @@ import org.camunda.bpm.engine.rest.AbstractRestServiceTest;
 import org.camunda.bpm.engine.rest.helper.MockHistoricVariableInstanceBuilder;
 import org.camunda.bpm.engine.rest.helper.MockObjectValue;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
+import org.camunda.bpm.engine.rest.helper.VariableTypeHelper;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.type.ValueType;
 import org.junit.Before;
@@ -274,7 +275,7 @@ public abstract class AbstractHistoricVariableInstanceRestServiceQueryTest exten
           .body("size()", is(1))
           .body("[0].id", equalTo(mockInstanceBuilder.getId()))
           .body("[0].name", equalTo(mockInstanceBuilder.getName()))
-          .body("[0].type", equalTo(mockInstanceBuilder.getTypedValue().getType().getName()))
+          .body("[0].type", equalTo(VariableTypeHelper.toExpectedValueTypeName(mockInstanceBuilder.getTypedValue().getType())))
           .body("[0].value", equalTo(mockInstanceBuilder.getValue()))
           .body("[0].processInstanceId", equalTo(mockInstanceBuilder.getProcessInstanceId()))
           .body("[0].errorMessage", equalTo(mockInstanceBuilder.getErrorMessage()))
@@ -304,7 +305,7 @@ public abstract class AbstractHistoricVariableInstanceRestServiceQueryTest exten
     given()
         .then().expect().statusCode(Status.OK.getStatusCode())
         .and()
-          .body("[0].type", equalTo(ValueType.OBJECT.getName()))
+          .body("[0].type", equalTo(VariableTypeHelper.toExpectedValueTypeName(ValueType.OBJECT)))
           .body("[0].value", equalTo("a serialized value"))
           .body("[0].valueInfo." + ObjectTypeImpl.VALUE_INFO_OBJECT_TYPE_NAME, equalTo(String.class.getName()))
           .body("[0].valueInfo." + ObjectTypeImpl.VALUE_INFO_SERIALIZATION_DATA_FORMAT, equalTo(JavaObjectSerializer.SERIALIZATION_DATA_FORMAT))
@@ -333,7 +334,7 @@ public abstract class AbstractHistoricVariableInstanceRestServiceQueryTest exten
         .then().expect().statusCode(Status.OK.getStatusCode())
         .and()
           .body("size()", is(1))
-          .body("[0].type", equalTo(ValueType.OBJECT.getName()))
+          .body("[0].type", equalTo(VariableTypeHelper.toExpectedValueTypeName(ValueType.OBJECT)))
           .body("[0].value", equalTo("aSpinSerializedValue"))
           .body("[0].valueInfo." + ObjectTypeImpl.VALUE_INFO_OBJECT_TYPE_NAME,
               equalTo("aRootType"))

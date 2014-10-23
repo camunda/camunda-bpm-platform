@@ -30,7 +30,9 @@ import org.camunda.bpm.engine.history.HistoricVariableInstanceQuery;
 import org.camunda.bpm.engine.rest.AbstractRestServiceTest;
 import org.camunda.bpm.engine.rest.helper.MockHistoricVariableInstanceBuilder;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
+import org.camunda.bpm.engine.rest.helper.VariableTypeHelper;
 import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.type.ValueType;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -78,7 +80,7 @@ public abstract class AbstractHistoricVariableInstanceRestServiceInteractionTest
     .and()
       .body("id", equalTo(builder.getId()))
       .body("name", equalTo(builder.getName()))
-      .body("type", equalTo(builder.getTypedValue().getType().getName()))
+      .body("type", equalTo(VariableTypeHelper.toExpectedValueTypeName(builder.getTypedValue().getType())))
       .body("value", equalTo(builder.getValue()))
       .body("processInstanceId", equalTo(builder.getProcessInstanceId()))
       .body("errorMessage", equalTo(builder.getErrorMessage()))
@@ -105,7 +107,7 @@ public abstract class AbstractHistoricVariableInstanceRestServiceInteractionTest
     given().pathParam("id", MockProvider.EXAMPLE_VARIABLE_INSTANCE_ID)
     .then().expect().statusCode(Status.OK.getStatusCode())
     .and()
-      .body("type", equalTo("byte[]"))
+      .body("type", equalTo(VariableTypeHelper.toExpectedValueTypeName(ValueType.BYTES)))
       .body("value", nullValue())
     .when().get(VARIABLE_INSTANCE_URL);
 
@@ -166,34 +168,10 @@ public abstract class AbstractHistoricVariableInstanceRestServiceInteractionTest
     given().pathParam("id", MockProvider.EXAMPLE_VARIABLE_INSTANCE_ID)
     .then().expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode())
-      .body(containsString("Variable instance with Id '"+variableInstanceMock.getId()+"' is not a binary variable"))
+      .body(containsString("Value of variable "+variableInstanceMock.getId()+" is not a binary value"))
     .when().get(VARIABLE_INSTANCE_BINARY_DATA_URL);
 
     verify(variableInstanceQueryMock, never()).disableBinaryFetching();
-
-  }
-
-  @Test
-  public void testBinaryDataForSerializableVariable() {
-    String value = "some bytes";
-    HistoricVariableInstance variableInstanceMock =
-        MockProvider.mockHistoricVariableInstance()
-          .typedValue(Variables.serializedObjectValue(value).create())
-          .build();
-
-    when(variableInstanceQueryMock.variableId(variableInstanceMock.getId())).thenReturn(variableInstanceQueryMock);
-    when(variableInstanceQueryMock.disableCustomObjectDeserialization()).thenReturn(variableInstanceQueryMock);
-    when(variableInstanceQueryMock.singleResult()).thenReturn(variableInstanceMock);
-
-    Response response = given().pathParam("id", MockProvider.EXAMPLE_VARIABLE_INSTANCE_ID)
-    .then().expect()
-      .statusCode(Status.OK.getStatusCode())
-      .contentType(ContentType.BINARY.toString())
-    .when().get(VARIABLE_INSTANCE_BINARY_DATA_URL);
-
-    Assert.assertEquals(value, response.getBody().asString());
-    verify(variableInstanceQueryMock, never()).disableBinaryFetching();
-    verify(variableInstanceQueryMock).disableCustomObjectDeserialization();
 
   }
 
@@ -208,7 +186,7 @@ public abstract class AbstractHistoricVariableInstanceRestServiceInteractionTest
 
     given().pathParam("id", nonExistingId)
     .then().expect().statusCode(Status.NOT_FOUND.getStatusCode())
-    .body(containsString("Variable instance with Id 'nonExistingId' does not exist."))
+    .body(containsString("Historic variable instance with Id 'nonExistingId' does not exist."))
     .when().get(VARIABLE_INSTANCE_BINARY_DATA_URL);
 
     verify(variableInstanceQueryMock, never()).disableBinaryFetching();
