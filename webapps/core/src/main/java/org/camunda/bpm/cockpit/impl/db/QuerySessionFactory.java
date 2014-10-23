@@ -51,7 +51,7 @@ public class QuerySessionFactory extends StandaloneProcessEngineConfiguration {
     setHistory(processEngineConfiguration.getHistory());
 
     initDataSource();
-    initVariableTypes();
+    initSerialization();
     initCommandContextFactory();
     initTransactionFactory();
     initTransactionContextFactory();
