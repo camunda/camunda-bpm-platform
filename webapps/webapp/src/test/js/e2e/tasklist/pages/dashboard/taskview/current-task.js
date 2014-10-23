@@ -58,21 +58,30 @@ module.exports = Page.extend({
     element(by.css('[ng-click="applyChange()"]')).click();
   },
 
-  setFollowUpDate: function(month, day, hour, minute) {
-    element(by.css('[class="followup-date ng-isolate-scope"] [ng-click="startEditing()"]')).click();
+  followUpDateFormElement: function() {
+    return this.formElement().element(by.css('.followup-date'));
   },
 
-  setDueDate: function(month, day, hour, minute) {
-    element(by.css('[class="due-date ng-isolate-scope"] [ng-click="startEditing()"]')).click();
+  setFollowUpDate: function() {
+    this.followUpDateFormElement().element(by.css('[ng-click="startEditing()"]')).click();
+    this.followUpDateFormElement().element(by.css('[ng-click="applyChange()"]')).click();
   },
 
-  tabs: function() {
-    return element.all(by.repeater('taskDetailTab in taskDetailTabs'));
+  followUpDateText: function() {
+    return this.followUpDateFormElement().element(by.css('[class="view-value ng-scope"] span[ng-if="varValue"], [class="view-value ng-scope"] a')).getText();
   },
 
-  selectTab: function(item) {
+  dueDateFormElement: function() {
+    return this.formElement().element(by.css('.due-date'));
+  },
 
-    this.tabs().get(item).click();
+  setDueDate: function() {
+    this.dueDateFormElement().element(by.css('[ng-click="startEditing()"]')).click();
+    this.dueDateFormElement().element(by.css('[ng-click="applyChange()"]')).click();
+  },
+
+  dueDateText: function() {
+    return this.dueDateFormElement().element(by.css('[class="view-value ng-scope"] span[ng-if="varValue"], [class="view-value ng-scope"] a')).getText();
   }
 
 });

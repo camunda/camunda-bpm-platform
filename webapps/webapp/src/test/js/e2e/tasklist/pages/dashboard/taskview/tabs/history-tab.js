@@ -1,8 +1,10 @@
 'use strict';
 
-var Page = require('./../current-task');
+var Tab = require('./tab');
 
-module.exports = Page.extend({
+module.exports = Tab.extend({
+
+  tabIndex: 1,
 
   historyFormElement: function() {
     return element(by.css('[class="history-pane ng-scope"]'));
@@ -12,15 +14,19 @@ module.exports = Page.extend({
     return this.historyFormElement().all(by.repeater('event in day.events'));
   },
 
-  getHistoryEventType: function(item) {
+  eventType: function(item) {
     return this.historyList().get(item).element(by.binding('event.type')).getText();
   },
 
-  getHistoryOperationUser: function(item) {
+  operationTime: function(item) {
+    return this.historyList().get(item).element(by.binding('event.time')).getText();
+  },
+
+  operationUser: function(item) {
     return this.historyList().get(item).element(by.binding('event.userId')).getText();
   },
 
-  getHistoryCommentMessage: function(item) {
+  commentMessage: function(item) {
     return this.historyList().get(item).element(by.css('[nl2br="event.message"]')).getText();
   },
 
@@ -28,12 +34,19 @@ module.exports = Page.extend({
     return this.historyList().get(item).all(by.repeater('subEvent in event.subEvents'));
   },
 
-  getHistoryAssignee: function(item) {
-    return this.historySubEventList(item).get(0).element(by.binding('subEvent.orgValue')).getText();
+  subEventType: function(item, subItem) {
+    subItem = subItem || 0;
+    return this.historySubEventList(item).get(subItem).element(by.css('.event-property')).getText();
   },
 
-  getHistoryClaimee: function(item) {
-    return this.historySubEventList(item).get(0).element(by.binding('subEvent.newValue')).getText();
+  subEventNewValue: function(item, subItem) {
+    subItem = subItem || 0;
+    return this.historySubEventList(item).get(subItem).element(by.binding('subEvent.newValue')).getText();
+  },
+
+  subEventOriginalValue: function(item, subItem) {
+    subItem = subItem || 0;
+    return this.historySubEventList(item).get(subItem).element(by.binding('subEvent.orgValue')).getText();
   }
 
 });

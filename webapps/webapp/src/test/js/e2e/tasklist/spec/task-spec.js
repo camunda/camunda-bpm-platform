@@ -19,7 +19,7 @@ describe('tasklist filter -', function() {
   });
 
 
-  xdescribe('create new filter', function() {
+  describe('create new filter', function() {
 
     it('should open create new filter page', function () {
 
@@ -62,13 +62,13 @@ describe('tasklist filter -', function() {
     it('should add new comment', function () {
 
       // when
-      dashboardPage.currentTask.addComment('Alles scheiße!!!');
-      dashboardPage.currentTask.selectTab(1);
+      dashboardPage.currentTask.addComment('Thiß üs ä cömmänt');
+      dashboardPage.currentTask.history.selectTab();
 
       expect(dashboardPage.currentTask.history.historyList().count()).toBe(1);
-      expect(dashboardPage.currentTask.history.getHistoryEventType(0)).toBe('Comment');
-      expect(dashboardPage.currentTask.history.getHistoryCommentMessage(0)).toBe('Alles scheiße!!!');
-      expect(dashboardPage.currentTask.history.getHistoryOperationUser(0)).toBe('jonny1');
+      expect(dashboardPage.currentTask.history.eventType(0)).toBe('Comment');
+      expect(dashboardPage.currentTask.history.commentMessage(0)).toBe('Thiß üs ä cömmänt');
+      expect(dashboardPage.currentTask.history.operationUser(0)).toBe('jonny1');
     });
 
 
@@ -76,37 +76,75 @@ describe('tasklist filter -', function() {
 
       // when
       dashboardPage.currentTask.unclaim();
-      dashboardPage.currentTask.selectTab(1);
+      dashboardPage.currentTask.history.selectTab();
 
       // then
       expect(dashboardPage.taskList.taskList().count()).toBe(0);
       expect(dashboardPage.currentTask.history.historyList().count()).toBe(2);
-      expect(dashboardPage.currentTask.history.getHistoryEventType(0)).toBe('Assign');
-      expect(dashboardPage.currentTask.history.getHistoryAssignee(0)).toBe('jonny1');
-      expect(dashboardPage.currentTask.history.getHistoryOperationUser(0)).toBe('jonny1');
-      expect(dashboardPage.currentTask.history.getHistoryCommentMessage(1)).toBe('Alles scheiße!!!');
+      expect(dashboardPage.currentTask.history.eventType(0)).toBe('Assign');
+      expect(dashboardPage.currentTask.history.subEventType(0)).toBe('Assignee');
+      expect(dashboardPage.currentTask.history.operationUser(0)).toBe('jonny1');
+      expect(dashboardPage.currentTask.history.subEventOriginalValue(0)).toBe('jonny1');
+      expect(dashboardPage.currentTask.history.commentMessage(1)).toBe('Thiß üs ä cömmänt');
     });
 
     it('should claim task', function () {
 
       // when
       dashboardPage.currentTask.claim();
-      dashboardPage.currentTask.selectTab(1);
+      dashboardPage.currentTask.history.selectTab();
 
       // then
       expect(dashboardPage.taskList.taskList().count()).toBe(1);
       expect(dashboardPage.currentTask.history.historyList().count()).toBe(3);
-      expect(dashboardPage.currentTask.history.getHistoryEventType(0)).toBe('Claim');
-      expect(dashboardPage.currentTask.history.getHistoryClaimee(0)).toBe('jonny1');
-      expect(dashboardPage.currentTask.history.getHistoryOperationUser(0)).toBe('jonny1');
-      expect(dashboardPage.currentTask.history.getHistoryCommentMessage(2)).toBe('Alles scheiße!!!');
+      expect(dashboardPage.currentTask.history.eventType(0)).toBe('Claim');
+      expect(dashboardPage.currentTask.history.subEventNewValue(0)).toBe('jonny1');
+      expect(dashboardPage.currentTask.history.operationUser(0)).toBe('jonny1');
+      expect(dashboardPage.currentTask.history.commentMessage(2)).toBe('Thiß üs ä cömmänt');
+    });
+
+    describe('dates', function () {
+
+      it('should set follow-up date', function () {
+
+        // when
+        dashboardPage.currentTask.setFollowUpDate();
+
+        // then
+        expect(dashboardPage.currentTask.history.eventType(0)).toBe('Update');
+        expect(dashboardPage.currentTask.history.operationUser(0)).toBe('jonny1');
+        expect(dashboardPage.currentTask.history.subEventType(0)).toBe('Follow-up date');
+
+        dashboardPage.currentTask.history.operationTime(0).then(function(eventTime) {
+          expect(dashboardPage.currentTask.history.subEventNewValue(0)).toContain(eventTime);
+        });
+        expect(dashboardPage.currentTask.followUpDateText()).toBe('a few seconds ago');
+      });
+
+
+      it('should set due date', function () {
+
+        // when
+        dashboardPage.currentTask.setDueDate();
+
+        // then
+        expect(dashboardPage.currentTask.history.eventType(0)).toBe('Update');
+        expect(dashboardPage.currentTask.history.operationUser(0)).toBe('jonny1');
+        expect(dashboardPage.currentTask.history.subEventType(0)).toBe('Due date');
+
+        dashboardPage.currentTask.history.operationTime(0).then(function(eventTime) {
+          expect(dashboardPage.currentTask.history.subEventNewValue(0)).toContain(eventTime);
+        });
+        expect(dashboardPage.currentTask.dueDateText()).toBe('a few seconds ago');
+      });
+
     });
 
   });
 
 
 
-  xdescribe('end test', function() {
+  describe('end test', function() {
 
     it('should delete filter', function () {
 

@@ -1,8 +1,10 @@
 'use strict';
 
-var Page = require('./../current-task');
+var Tab = require('./tab');
 
-module.exports = Page.extend({
+module.exports = Tab.extend({
+
+  tabIndex: 0,
 
   completeButton: function () {
     return element(by.css('[ng-click="completeTask()"]'));
