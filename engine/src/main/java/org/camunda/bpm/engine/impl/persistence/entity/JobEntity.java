@@ -185,6 +185,11 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
   }
 
   public void setRetries(int retries) {
+    // if retries should be set to a negative value set it to 0
+    if (retries < 0) {
+      retries = 0;
+    }
+
     // Assuming: if the number of retries will
     // be changed from 0 to x (x >= 1), means
     // that the corresponding incident is resolved.
@@ -194,7 +199,7 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
 
     // If the retries will be set to 0, an
     // incident has to be created.
-    if(retries == 0) {
+    if(retries == 0 && this.retries > 0) {
       createFailedJobIncident();
     }
     this.retries = retries;
