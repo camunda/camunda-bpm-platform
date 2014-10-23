@@ -509,6 +509,9 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
   /** Order by task name (needs to be followed by {@link #asc()} or {@link #desc()}). */
   TaskQuery orderByTaskName();
 
+  /** Order by task name case insensitive (needs to be followed by {@link #asc()} or {@link #desc()}). */
+  TaskQuery orderByTaskNameCaseInsensitive();
+
   /** Order by description (needs to be followed by {@link #asc()} or {@link #desc()}). */
   TaskQuery orderByTaskDescription();
 

@@ -55,6 +55,7 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
   private static final String SORT_BY_DESCRIPTION_VALUE = "description";
   private static final String SORT_BY_ID_VALUE = "id";
   private static final String SORT_BY_NAME_VALUE = "name";
+  private static final String SORT_BY_NAME_CASE_INSENSITIVE_VALUE = "nameCaseInsensitive";
   private static final String SORT_BY_PRIORITY_VALUE = "priority";
 
   private static final List<String> VALID_SORT_BY_VALUES;
@@ -71,6 +72,7 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     VALID_SORT_BY_VALUES.add(SORT_BY_DESCRIPTION_VALUE);
     VALID_SORT_BY_VALUES.add(SORT_BY_ID_VALUE);
     VALID_SORT_BY_VALUES.add(SORT_BY_NAME_VALUE);
+    VALID_SORT_BY_VALUES.add(SORT_BY_NAME_CASE_INSENSITIVE_VALUE);
     VALID_SORT_BY_VALUES.add(SORT_BY_PRIORITY_VALUE);
   }
 
@@ -1072,6 +1074,8 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
         query.orderByTaskId();
       } else if (sortBy.equals(SORT_BY_NAME_VALUE)) {
         query.orderByTaskName();
+      } else if (sortBy.equals(SORT_BY_NAME_CASE_INSENSITIVE_VALUE)) {
+        query.orderByTaskNameCaseInsensitive();
       } else if (sortBy.equals(SORT_BY_PRIORITY_VALUE)) {
         query.orderByTaskPriority();
       }

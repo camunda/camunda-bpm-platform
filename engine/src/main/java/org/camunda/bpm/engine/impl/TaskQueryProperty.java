@@ -47,6 +47,7 @@ public class TaskQueryProperty implements QueryProperty {
 
   public static final TaskQueryProperty TASK_ID = new TaskQueryProperty("RES.ID_");
   public static final TaskQueryProperty NAME = new TaskQueryProperty("RES.NAME_");
+  public static final TaskQueryProperty NAME_CASE_INSENSITIVE = new TaskQueryProperty("LOWER(RES.NAME_)");
   public static final TaskQueryProperty DESCRIPTION = new TaskQueryProperty("RES.DESCRIPTION_");
   public static final TaskQueryProperty PRIORITY = new TaskQueryProperty("RES.PRIORITY_");
   public static final TaskQueryProperty ASSIGNEE = new TaskQueryProperty("RES.ASSIGNEE_");

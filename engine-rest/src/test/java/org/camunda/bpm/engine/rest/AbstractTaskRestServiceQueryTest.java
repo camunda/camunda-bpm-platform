@@ -609,6 +609,11 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
     inOrder.verify(mockQuery).desc();
 
     inOrder = Mockito.inOrder(mockQuery);
+    executeAndVerifySorting("nameCaseInsensitive", "desc", Status.OK);
+    inOrder.verify(mockQuery).orderByTaskNameCaseInsensitive();
+    inOrder.verify(mockQuery).desc();
+
+    inOrder = Mockito.inOrder(mockQuery);
     executeAndVerifySorting("caseInstanceId", "desc", Status.OK);
     inOrder.verify(mockQuery).orderByCaseInstanceId();
     inOrder.verify(mockQuery).desc();
@@ -661,6 +666,11 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
     inOrder = Mockito.inOrder(mockQuery);
     executeAndVerifySorting("name", "asc", Status.OK);
     inOrder.verify(mockQuery).orderByTaskName();
+    inOrder.verify(mockQuery).asc();
+
+    inOrder = Mockito.inOrder(mockQuery);
+    executeAndVerifySorting("nameCaseInsensitive", "asc", Status.OK);
+    inOrder.verify(mockQuery).orderByTaskNameCaseInsensitive();
     inOrder.verify(mockQuery).asc();
 
     inOrder = Mockito.inOrder(mockQuery);

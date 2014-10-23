@@ -159,7 +159,11 @@
 
   <select id="selectTaskByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.TaskQueryImpl" resultMap="taskResultMap">
     ${limitBefore}
-    select distinct RES.* ${limitBetween}
+    select distinct
+    <if test="taskNameCaseInsensitive">
+      lower(RES.NAME_) LOWER_NAME_,
+    </if>
+    RES.* ${limitBetween}
     <include refid="selectTaskByQueryCriteriaSql"/>
     ${orderBy}
     ${limitAfter}
