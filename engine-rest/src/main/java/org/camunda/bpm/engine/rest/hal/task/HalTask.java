@@ -70,6 +70,7 @@ public class HalTask extends HalResource<HalTask> {
   public static HalTask generate(Task task, ProcessEngine engine) {
     return fromTask(task)
       .embed(HalTask.REL_PROCESS_DEFINITION, engine)
+      .embed(HalTask.REL_CASE_DEFINITION, engine)
       .embed(HalTask.REL_ASSIGNEE, engine)
       .embed(HalTask.REL_OWNER, engine);
 

@@ -34,6 +34,7 @@ public class CaseDefinitionQueryImpl extends AbstractQuery<CaseDefinitionQuery, 
   private static final long serialVersionUID = 1L;
 
   protected String id;
+  protected String[] ids;
   protected String category;
   protected String categoryLike;
   protected String name;
@@ -62,6 +63,11 @@ public class CaseDefinitionQueryImpl extends AbstractQuery<CaseDefinitionQuery, 
   public CaseDefinitionQuery caseDefinitionId(String caseDefinitionId) {
     ensureNotNull(NotValidException.class, "caseDefinitionId", caseDefinitionId);
     this.id = caseDefinitionId;
+    return this;
+  }
+
+  public CaseDefinitionQuery caseDefinitionIdIn(String... ids) {
+    this.ids = ids;
     return this;
   }
 
@@ -190,6 +196,10 @@ public class CaseDefinitionQueryImpl extends AbstractQuery<CaseDefinitionQuery, 
 
   public String getId() {
     return id;
+  }
+
+  public String[] getIds() {
+    return ids;
   }
 
   public String getCategory() {

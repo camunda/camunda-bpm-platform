@@ -33,8 +33,8 @@ public class HalTaskList extends HalCollectionResource<HalTaskList> {
     return fromTaskList(tasks, count)
       .embed(HalTask.REL_ASSIGNEE, engine)
       .embed(HalTask.REL_OWNER, engine)
-      .embed(HalTask.REL_PROCESS_DEFINITION, engine);
-
+      .embed(HalTask.REL_PROCESS_DEFINITION, engine)
+      .embed(HalTask.REL_CASE_DEFINITION, engine);
   }
 
   public static HalTaskList fromTaskList(List<Task> tasks, long count) {

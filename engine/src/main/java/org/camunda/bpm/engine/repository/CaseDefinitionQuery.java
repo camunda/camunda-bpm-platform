@@ -28,6 +28,13 @@ public interface CaseDefinitionQuery extends Query<CaseDefinitionQuery, CaseDefi
   CaseDefinitionQuery caseDefinitionId(String caseDefinitionId);
 
   /**
+   * Only select case definitions with the given ids.
+   *
+   * @param ids list of case definition ids
+   */
+  CaseDefinitionQuery caseDefinitionIdIn(String... ids);
+
+  /**
    * Only select case definitions with the given category.
    *
    * @param caseDefinitionCategory the category of the case definition

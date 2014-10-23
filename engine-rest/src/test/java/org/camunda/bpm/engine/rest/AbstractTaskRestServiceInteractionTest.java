@@ -54,7 +54,6 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
@@ -77,6 +76,8 @@ import org.camunda.bpm.engine.impl.TaskServiceImpl;
 import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.util.IoUtil;
+import org.camunda.bpm.engine.repository.CaseDefinition;
+import org.camunda.bpm.engine.repository.CaseDefinitionQuery;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinitionQuery;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
@@ -292,8 +293,8 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     List<User> mockUsers = MockProvider.createMockUsers();
     UserQuery sampleUserQuery = mock(UserQuery.class);
     when(sampleUserQuery.listPage(0, 1)).thenReturn(mockUsers);
-    when(sampleUserQuery.userIdIn(new String[] {MockProvider.EXAMPLE_TASK_ASSIGNEE_NAME})).thenReturn(sampleUserQuery);
-    when(sampleUserQuery.userIdIn(new String[] {MockProvider.EXAMPLE_TASK_OWNER})).thenReturn(sampleUserQuery);
+    when(sampleUserQuery.userIdIn(MockProvider.EXAMPLE_TASK_ASSIGNEE_NAME)).thenReturn(sampleUserQuery);
+    when(sampleUserQuery.userIdIn(MockProvider.EXAMPLE_TASK_OWNER)).thenReturn(sampleUserQuery);
     when(sampleUserQuery.count()).thenReturn(1l);
     when(processEngine.getIdentityService().createUserQuery()).thenReturn(sampleUserQuery);
 
@@ -301,9 +302,17 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     List<ProcessDefinition> mockDefinitions = MockProvider.createMockDefinitions();
     ProcessDefinitionQuery sampleProcessDefinitionQuery = mock(ProcessDefinitionQuery.class);
     when(sampleProcessDefinitionQuery.listPage(0, 1)).thenReturn(mockDefinitions);
-    when(sampleProcessDefinitionQuery.processDefinitionIdIn(new String[] {MockProvider.EXAMPLE_PROCESS_DEFINITION_ID})).thenReturn(sampleProcessDefinitionQuery);
+    when(sampleProcessDefinitionQuery.processDefinitionIdIn(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)).thenReturn(sampleProcessDefinitionQuery);
     when(sampleProcessDefinitionQuery.count()).thenReturn(1l);
     when(processEngine.getRepositoryService().createProcessDefinitionQuery()).thenReturn(sampleProcessDefinitionQuery);
+
+    // setup case defintion query mock
+    List<CaseDefinition> mockCaseDefinitions = MockProvider.createMockCaseDefinitions();
+    CaseDefinitionQuery sampleCaseDefinitionQuery = mock(CaseDefinitionQuery.class);
+    when(sampleCaseDefinitionQuery.listPage(0, 1)).thenReturn(mockCaseDefinitions);
+    when(sampleCaseDefinitionQuery.caseDefinitionIdIn(MockProvider.EXAMPLE_CASE_DEFINITION_ID)).thenReturn(sampleCaseDefinitionQuery);
+    when(sampleCaseDefinitionQuery.count()).thenReturn(1l);
+    when(processEngine.getRepositoryService().createCaseDefinitionQuery()).thenReturn(sampleCaseDefinitionQuery);
 
     Response response = given()
       .header("accept", Hal.MEDIA_TYPE_HAL)
@@ -380,6 +389,20 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_DEFINITION_DIAGRAM_RESOURCE_NAME, embeddedProcessDefinition.get("diagram"));
     Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_DEFINITION_IS_SUSPENDED, embeddedProcessDefinition.get("suspended"));
     Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_APPLICATION_CONTEXT_PATH, embeddedProcessDefinition.get("contextPath"));
+
+    // validate embedded caseDefinitions:
+    List<Map<String,Object>> embeddedCaseDefinitions = from(content).getList("_embedded.caseDefinition");
+    Assert.assertEquals("There should be one caseDefinition returned.", 1, embeddedCaseDefinitions.size());
+    Map<String, Object> embeddedCaseDefinition = embeddedCaseDefinitions.get(0);
+    Assert.assertNotNull("The returned caseDefinition should not be null.", embeddedCaseDefinition);
+    Assert.assertEquals(MockProvider.EXAMPLE_CASE_DEFINITION_ID, embeddedCaseDefinition.get("id"));
+    Assert.assertEquals(MockProvider.EXAMPLE_CASE_DEFINITION_KEY, embeddedCaseDefinition.get("key"));
+    Assert.assertEquals(MockProvider.EXAMPLE_CASE_DEFINITION_CATEGORY, embeddedCaseDefinition.get("category"));
+    Assert.assertEquals(MockProvider.EXAMPLE_CASE_DEFINITION_NAME, embeddedCaseDefinition.get("name"));
+    Assert.assertEquals(MockProvider.EXAMPLE_CASE_DEFINITION_VERSION, embeddedCaseDefinition.get("version"));
+    Assert.assertEquals(MockProvider.EXAMPLE_CASE_DEFINITION_RESOURCE_NAME, embeddedCaseDefinition.get("resource"));
+    Assert.assertEquals(MockProvider.EXAMPLE_DEPLOYMENT_ID, embeddedCaseDefinition.get("deploymentId"));
+    Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_APPLICATION_CONTEXT_PATH, embeddedCaseDefinition.get("contextPath"));
   }
 
   @Test

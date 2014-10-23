@@ -12,6 +12,7 @@
  */
 package org.camunda.bpm.engine.test.api.repository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -122,6 +123,29 @@ public class CaseDefinitionQueryTest extends PluggableProcessEngineTestCase {
       .deploymentId(deploymentOneId);
 
     verifyQueryResults(query, 2);
+  }
+
+  public void testQueryByDeploymentIds() {
+    // empty list
+    assertTrue(repositoryService.createCaseDefinitionQuery().caseDefinitionIdIn("a", "b").list().isEmpty());
+
+    // collect all ids
+    List<CaseDefinition> caseDefinitions = repositoryService.createCaseDefinitionQuery().list();
+    List<String> ids = new ArrayList<String>();
+    for (CaseDefinition caseDefinition : caseDefinitions) {
+      ids.add(caseDefinition.getId());
+    }
+
+    caseDefinitions = repositoryService.createCaseDefinitionQuery()
+      .caseDefinitionIdIn(ids.toArray(new String[ids.size()]))
+      .list();
+
+    assertEquals(ids.size(), caseDefinitions.size());
+    for (CaseDefinition caseDefinition : caseDefinitions) {
+      if (!ids.contains(caseDefinition.getId())) {
+        fail("Expected to find case definition "+ caseDefinition);
+      }
+    }
   }
 
   public void testQueryByInvalidDeploymentId() {

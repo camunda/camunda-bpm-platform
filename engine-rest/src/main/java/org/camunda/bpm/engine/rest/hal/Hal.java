@@ -15,8 +15,10 @@ package org.camunda.bpm.engine.rest.hal;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.camunda.bpm.engine.rest.CaseDefinitionRestService;
 import org.camunda.bpm.engine.rest.ProcessDefinitionRestService;
 import org.camunda.bpm.engine.rest.UserRestService;
+import org.camunda.bpm.engine.rest.hal.processDefinition.HalCaseDefinitionResolver;
 import org.camunda.bpm.engine.rest.hal.processDefinition.HalProcessDefinitionResolver;
 import org.camunda.bpm.engine.rest.hal.user.HalUserResolver;
 
@@ -36,6 +38,7 @@ public class Hal {
     // register the built-in resolvers
     halLinkResolvers.put(UserRestService.class, new HalUserResolver());
     halLinkResolvers.put(ProcessDefinitionRestService.class, new HalProcessDefinitionResolver());
+    halLinkResolvers.put(CaseDefinitionRestService.class, new HalCaseDefinitionResolver());
   }
 
   public static Hal getInstance() {
