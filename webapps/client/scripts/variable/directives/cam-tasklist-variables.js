@@ -30,17 +30,14 @@ define([
 
     $scope.value = null;
     $scope.type = null;
+    $scope.dataFormat = null;
     $scope.variable = details;
 
     switch ($scope.variable.type) {
-      case 'Serializable':
-        $scope.value = JSON.stringify($scope.variable.value.object, null, 2);
-        $scope.type = $scope.variable.value.type;
-        break;
-
       case 'Object':
-        $scope.type = $scope.variable.serializationConfig.rootType;
+        $scope.type = $scope.variable.valueInfo.objectTypeName;
         $scope.value = $scope.variable.value;
+        $scope.dataFormat = $scope.variable.valueInfo.serializationDataFormat;
 
         if ($scope.type.toLowerCase().indexOf('json') > -1 && typeof $scope.value === 'string') {
           $scope.value = JSON.stringify(JSON.parse($scope.value), null, 2);

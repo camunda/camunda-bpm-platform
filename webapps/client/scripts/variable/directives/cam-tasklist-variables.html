@@ -41,11 +41,11 @@
           <a class="variable-value variable-type"
              ng-switch-when="Object"
              ng-click="showValue(variablesByName[info.name])">
-            {{ variablesByName[info.name].serializationConfig.rootType }}
+            {{ variablesByName[info.name].valueInfo.objectTypeName }}
           </a>
 
           <a class="variable-value"
-             ng-switch-when="byte[]"
+             ng-switch-when="Bytes"
              ng-click="download(variablesByName[info.name])">
             {{ 'DOWNLOAD' | translate }}
             <span class="glyphicon glyphicon-download"></span>
