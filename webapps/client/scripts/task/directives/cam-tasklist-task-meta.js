@@ -12,40 +12,19 @@ define([
   var $ = angular.element;
 
   return [
-    '$translate',
     '$modal',
     'camAPI',
-    'Notifications',
   function(
-    $translate,
     $modal,
-    camAPI,
-    Notifications
+    camAPI
   ) {
     var Task = camAPI.resource('task');
 
-
-    function errorNotification(src, err) {
-      $translate(src).then(function(translated) {
-        Notifications.addError({
-          status: translated,
-          message: (err ? err.message : '')
-        });
-      });
-    }
-
-    function successNotification(src) {
-      $translate(src).then(function(translated) {
-        Notifications.addMessage({
-          duration: 3000,
-          status: translated
-        });
-      });
-    }
-
     return {
       scope: {
-        taskData: '='
+        taskData: '=',
+        successHandler: '&',
+        errorHandler: '&'
       },
 
       template: template,
@@ -57,6 +36,9 @@ define([
       ){
 
         var taskMetaData = $scope.taskData.newChild($scope);
+
+        var successHandler = $scope.successHandler() || function () {};
+        var errorHandler = $scope.errorHandler() || function () {};
 
         /**
          * observe task changes
@@ -116,11 +98,11 @@ define([
 
           Task.update(toSend, function(err, result) {
             if (err) {
-              return errorNotification('TASK_UPDATE_ERROR', err);
+              return errorHandler('TASK_UPDATE_ERROR', err);
             }
 
             reload();
-            successNotification('TASK_UPDATE_SUCESS');
+            successHandler('TASK_UPDATE_SUCESS');
           });
         }
 
@@ -246,11 +228,11 @@ define([
 
           return function (err) {
             if (err) {
-              return errorNotification(messages.error, err);
+              return errorHandler(messages.error, err);
             }
 
             reload();
-            successNotification(messages.success);
+            successHandler(messages.success);
 
           };
         }

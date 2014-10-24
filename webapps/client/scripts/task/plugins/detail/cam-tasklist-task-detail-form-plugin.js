@@ -10,34 +10,15 @@ define([
   var Controller = [
    '$scope',
    '$location',
-   '$translate',
-   'Notifications',
   function (
     $scope,
-    $location,
-    $translate,
-    Notifications
+    $location
   ) {
 
-    function errorNotification(src, err) {
-      $translate(src).then(function(translated) {
-        Notifications.addError({
-          status: translated,
-          message: (err ? err.message : '')
-        });
-      });
-    }
-
-    function successNotification(src) {
-      $translate(src).then(function(translated) {
-        Notifications.addMessage({
-          duration: 3000,
-          status: translated
-        });
-      });
-    }
-
     // setup ///////////////////////////////////////////////////////////
+
+    var errorHandler = $scope.errorHandler;
+    var successHandler = $scope.successHandler;
 
     var DEFAULT_OPTIONS = $scope.options = { 
       hideCompleteButton: false,
@@ -69,18 +50,6 @@ define([
 
     // task form /////////////////////////////////////////////////////////////////////////
 
-    function enhanceErrorMessage(err) {
-      if(err.indexOf("task is null") !== -1) {
-        // task does not exist (e.g. completed by someone else)
-        return "TASK_NOT_EXIST";
-      }
-      if(err.indexOf("is suspended") !== -1) {
-        // process instance is suspended
-        return "INSTANCE_SUSPENDED";
-      }
-      return err;
-    }
-
     function clearTask() {
       // reseting the location leads that
       // the taskId will set to null and
@@ -98,21 +67,10 @@ define([
     // will be called when the form has been submitted
     $scope.completionCallback = function(err) {
       if (err) {
-        var errorMsg = enhanceErrorMessage(err.message);
-
-        return $translate(errorMsg).then(function(translated) {
-          err.message = translated;
-
-          errorNotification('COMPLETE_ERROR', err);
-
-          if(errorMsg === "TASK_NOT_EXIST" || errorMsg === "INSTANCE_SUSPENDED") {
-            clearTask();
-          }
-
-        });
+        return errorHandler('COMPLETE_ERROR', err);
       }
 
-      successNotification('COMPLETE_OK');
+      successHandler('COMPLETE_OK');
       clearTask();
     };
 

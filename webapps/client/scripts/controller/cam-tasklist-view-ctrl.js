@@ -27,7 +27,7 @@ define([
 
     function getPropertyFromLocation(property) {
       var search = $location.search() || {};
-      return search[property];
+      return search[property] || null;
     }
 
     $scope.$on('$destroy', function () {
