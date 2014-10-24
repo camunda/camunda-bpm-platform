@@ -6,28 +6,47 @@ body {
 
 
 body {
-  overflow-y: scroll;
-  // navbar (and bottom border) height
+  padding-bottom: @footer-height;
   padding-top: 41px;
   margin-top: -41px;
+  overflow: hidden;
 }
 
 .site-wrap {
-  position: relative;
+  position: absolute;
   z-index: 2;
+  overflow: visible;
+  min-width: 100%;
+  min-height: 100%;
+  height: 100%;
 }
 
 .page-wrap {
   min-height: 100%;
   margin-bottom: (0 - @footer-height);
+  overflow-x: hidden;
+  overflow-y: scroll;
 }
+
 .page-wrap:after {
   content: ' ';
   display: block;
 }
+
 .footer.page,
 .page-wrap:after {
   height: @footer-height;
+}
+
+.ui-wrap {
+  width: 100%;
+
+  min-height: 100%;
+  position: absolute;
+
+  > .row {
+    width: 100%;
+  }
 }
 
 footer.page {
@@ -60,16 +79,47 @@ footer.page {
 
 
 .controls {
+  position: relative;
+
   > .task-filters,
   > .task-list,
   > .current-task {
     padding-top: 20px;
     position: relative;
-    z-index: 10;
+    // z-index: 10;
+  }
+
+  .inner {
+    white-space: nowrap;
+  }
+
+  h5,
+  [cam-sorting-choices] {
+    white-space: nowrap;
+  }
+
+  h5 {
+    margin-top: 0;
+    text-align: right;
+  }
+
+  [cam-sorting-choices] {
+    margin-top: -2px;
   }
 }
 
-
+// // unfortunately.. have glitches..
+// .row > .cols {
+//   -webkit-transition: padding 0.218s ease-in-out,
+//                       margin 0.218s ease-in-out,
+//                       width 0.218s ease-in-out;
+//       -ms-transition: padding 0.218s ease-in-out,
+//                       margin 0.218s ease-in-out,
+//                       width 0.218s ease-in-out;
+//           transition: padding 0.218s ease-in-out,
+//                       margin 0.218s ease-in-out,
+//                       width 0.218s ease-in-out;
+// }
 
 .task-board {
   > .cols > .inner {
@@ -87,50 +137,92 @@ footer.page {
 }
 
 
-.page-wrap .container-fluid{
-  margin: 0;
-  padding: 0;
-}
+// .page-wrap .container-fluid{
+//   margin: 0;
+//   padding: 0;
+// }
 
 .fake-columns {
   display: none;
 }
 
+.authenticated .fake-columns {
+  display: block;
+}
+
 
 .task-filters {
   z-index: 3;
+  background-color: @column-left-bg;
 }
 .task-list {
   z-index: 2;
+  background-color: @column-center-bg;
 }
 .current-task {
   z-index: 1;
+  background-color: @column-right-bg;
 }
 
-// .fake-columns > .row,
-// .row.controls,
-// .row.task-board {
-//   // -webkit-transition: all 0.218s ease-in-out;
-//   //         transition: all 0.218s ease-in-out;
+// .task-filters {
+//   z-index: 3;
+//   background-color: fade(@column-left-bg, 50%);
+// }
+// .task-list {
+//   z-index: 2;
+//   background-color: fade(@column-center-bg, 50%);
+// }
+// .current-task {
+//   z-index: 1;
+//   background-color: fade(@column-right-bg, 50%);
+// }
 
-//   > .cols {
-//     // -webkit-transition: all 0.218s ease-in-out;
-//     //         transition: all 0.218s ease-in-out;
+// .controls {
+//   .task-filters {
+//     background-color: blue;
+//   }
+//   .task-list {
+//     background-color: green;
+//   }
+//   .current-task {
+//     background-color: yellow;
 //   }
 // }
 
-button.toggle-filters {
+// .fake-columns > .row {
+//   .task-filters {
+//     background-color: blue;
+//   }
+//   .task-list {
+//     background-color: green;
+//   }
+//   .current-task {
+//     background-color: yellow;
+//   }
+// }
+
+
+
+
+
+
+
+
+
+button.off-canvas-toggle {
   display: none;
   height: 22px;
-  margin: -6px 0 0 0;
+  margin: 0;
   padding: 0;
+  position: absolute;
+  right: 0;
+  top: 17px;
 
   // Bars
   .icon-bar {
     display: block;
     width: 22px;
     height: 3px;
-    // border-radius: 1px;
     background-color: @brand-primary;
   }
 
@@ -160,44 +252,27 @@ button.toggle-filters {
       z-index: 10;
     }
   }
+}
 
-  .ui-wrap {
-    position: relative;
-    z-index: 5;
-  }
+.authenticated .fake-columns {
+  display: block;
+  position: fixed;
+  z-index: 1;
+  // width: 100%;
+  height: 100%;
 
-  .authenticated .fake-columns {
-    display: block;
-    position: fixed;
-    z-index: 1;
-    width: 100%;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  padding: 0 30px 0 15px;
+  overflow: hidden;
+
+  > .row {
     height: 100%;
-
-    top: 0;
-    left: 0;
-    bottom: 0;
-    padding: 0 15px;
-    overflow: hidden;
-
-    > .row {
+    > .cols {
+      position: relative;
       height: 100%;
-      > .cols {
-        position: relative;
-        height: 100%;
-      }
-    }
-  }
-
-  .row.equal-height-cols,
-  .authenticated .fake-columns .row {
-    > .task-filters {
-      background-color: @column-left-bg;
-    }
-    > .task-list {
-      background-color: @column-center-bg;
-    }
-    > .current-task {
-      background-color: @column-right-bg;
     }
   }
 }
@@ -212,7 +287,7 @@ button.toggle-filters {
 }
 
 .controls [cam-task-search] {
-  margin-top: -10px;
+  margin-top: -9px;
   margin-bottom: 10px;
   .search-dropdown {
     margin-top: -11px;

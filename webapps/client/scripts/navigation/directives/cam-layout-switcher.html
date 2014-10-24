@@ -6,7 +6,8 @@
 </a>
 
 <ul class="dropdown-menu">
-  <li ng-repeat="(delta, layout) in layouts">
+  <li ng-repeat="(delta, layout) in layouts"
+      ng-if="delta !== activeLayout">
     <a href
        ng-click="switchLayout(delta)">{{ layout.label | translate }}</a>
   </li>

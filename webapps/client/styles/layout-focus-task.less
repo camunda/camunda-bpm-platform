@@ -1,19 +1,144 @@
 body.layout-focus-task {
-  .row > .cols {
-    &.task-filters {
-      width: (100% / @grid-columns);
-    }
-    &.task-list {
-      width: (100% / @grid-columns) * 2;
-    }
-    &.current-task {
-      width: (100% / @grid-columns) * 9;
+  .controls,
+  .task-board,
+  .fake-columns > .row {
+    > .cols {
+      &.task-filters {
+        width: @grid-gutter-width;
+        margin-right: (0 - @grid-gutter-width);
+      }
+
+      &.task-list {
+        width: (@grid-gutter-width * 1);
+        margin-left: (@grid-gutter-width * 1);
+        margin-right: (0 - (@grid-gutter-width * 2));
+      }
+
+      &.current-task {
+        width: 100%;
+        margin-left: (@grid-gutter-width * 2);
+        padding-right: (@grid-gutter-width * 2.5);
+      }
     }
   }
 
-  [cam-sorting-choices] {
-    .hidden-xs {
-      display: none;
+  .controls {
+    > .cols {
+      &.task-filters,
+      &.task-list {
+        > .inner {
+          h5,
+          > .row {
+            display: none;
+          }
+
+          button {
+            display: inline-block;
+          }
+        }
+      }
+    }
+  }
+
+  .task-board {
+    > .cols {
+      &.task-filters,
+      &.task-list {
+        > .inner {
+          display: none;
+          position: absolute;
+          left: 15px;
+          right: 15px;
+        }
+      }
+    }
+  }
+
+
+
+
+
+  &.filters-column-open {
+    .controls,
+    .task-board,
+    .fake-columns > .row {
+      > .cols {
+        &.task-filters {
+          width: (@width + @grid-gutter-width);
+          margin-right: (0 - (@width + @grid-gutter-width));
+
+          > .inner {
+            display: block;
+          }
+
+          h5 {
+            display: block;
+            position: absolute;
+            left: 15px;
+            right: 30px;
+          }
+        }
+
+        &.task-list {
+          margin-left: (@width + (@grid-gutter-width * 1));
+          margin-right: (0 - (@width + (@grid-gutter-width * 3)));
+        }
+
+        &.current-task {
+          margin-left: (@width + (@grid-gutter-width * 3));
+          padding-right: (@width + (@grid-gutter-width * 3.5));
+        }
+      }
+    }
+  }
+
+
+
+  &.list-column-open {
+    .controls,
+    .task-board,
+    .fake-columns > .row {
+      > .cols {
+        &.task-list {
+          margin-left: (@grid-gutter-width * 1);
+          margin-right:  (0 - ((@width * 2) + (@grid-gutter-width * 3)));
+          padding-right: (@width + (@grid-gutter-width * 1.5));
+
+          > .inner {
+            display: block;
+          }
+        }
+
+        &.current-task {
+          margin-left: (@width + (@grid-gutter-width * 3));
+          padding-right: (@width + (@grid-gutter-width * 3.5));
+        }
+      }
+    }
+  }
+
+
+  &.list-column-open.filters-column-open {
+    .controls,
+    .task-board,
+    .fake-columns > .row {
+      > .cols {
+        &.task-filters {
+          width: (@width + @grid-gutter-width);
+          margin-right: (0 - (@width + @grid-gutter-width));
+        }
+
+        &.task-list {
+          margin-left: (@width + (@grid-gutter-width * 1));
+          margin-right:  (0 - ((@width * 2) + (@grid-gutter-width * 3)));
+          padding-right: (@width + (@grid-gutter-width * 1.5));
+        }
+
+        &.current-task {
+          margin-left: ((@width * 2) + (@grid-gutter-width * 3));
+          padding-right: ((@width * 2) + (@grid-gutter-width * 3.5));
+        }
+      }
     }
   }
 }

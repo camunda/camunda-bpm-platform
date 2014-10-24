@@ -1,56 +1,85 @@
+@width: 300px;
+
+
 body.layout-focus-list {
-  button.toggle-filters {
-    display: inline-block;
-  }
+  .controls,
+  .task-board,
+  .fake-columns > .row {
+    > .cols {
+      &.task-filters {
+        width: @grid-gutter-width;
+        margin-right: 0 - @grid-gutter-width;
+      }
 
-  .controls .task-filters h5 {
-    display: inline-block;
-    margin-right: 10px;
-  }
+      &.task-list {
+        width: 100%;
+        margin-left: @grid-gutter-width;
+        padding-right: @grid-gutter-width * 1.5;
+      }
 
-  .fake-columns > .row,
-  .row.controls,
-  .row.task-board {
-    padding-left: @grid-gutter-width;
-    // padding-right: @grid-gutter-width;
-  }
-
-  .row > .cols {
-    &.task-filters {
-      position: absolute;
-      z-index: 100;
-
-      width: 300 + @grid-gutter-width;
-
-      -webkit-transition: all 0.218s ease-in-out;
-              transition: all 0.218s ease-in-out;
-      -webkit-transform: translateX(-100%);
-              transform: translateX(-100%);
-    }
-
-    &.task-list {
-      width: 100%;
-    }
-
-    &.current-task {
-      display: none;
+      &.current-task {
+        display: none;
+      }
     }
   }
+
+
+  .controls {
+    > .cols {
+      &.task-filters {
+        > .inner {
+          h5 {
+            display: none;
+          }
+
+          button {
+            display: inline-block;
+          }
+        }
+      }
+    }
+  }
+
+  .task-board {
+    > .cols {
+      &.task-filters {
+        > .inner {
+          visibility: hidden;
+        }
+      }
+    }
+  }
+
+
+
+
 
   &.filters-column-open {
-    .fake-columns > .row > .cols.task-filters,
-    .row > .cols.task-filters {
-      -webkit-transform: translateX(0 - @grid-gutter-width);
-              transform: translateX(0 - @grid-gutter-width);
+    .controls,
+    .task-board,
+    .fake-columns > .row {
+      > .cols {
+        &.task-filters {
+          width: @width + @grid-gutter-width;
+          margin-right: 0 - (@width + @grid-gutter-width);
+
+          > .inner {
+            visibility: visible;
+          }
+
+          h5 {
+            display: inline-block;
+          }
+        }
+
+        &.task-list {
+          margin-left: @width + @grid-gutter-width;
+          padding-right: @width + (@grid-gutter-width * 1.5);
+        }
+      }
     }
   }
 
-  .tasks-list .list-inline {
-    width: 50%;
-    &.actors {
-      margin: 0;
-    }
-  }
 
   // ..................................................
 
