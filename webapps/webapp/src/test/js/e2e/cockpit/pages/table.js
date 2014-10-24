@@ -28,6 +28,10 @@ module.exports = Table.extend({
     return this.tableTabs(this.repeater).get(this.tabIndex).element(by.css('[class="ng-binding"]')).getText();
   },
 
+  checkTabName: function() {
+    expect(this.tabName()).toBe(this.tabLabel);
+  },
+
   table: function() {
     return element.all(by.repeater(this.tableRepeater));
   },

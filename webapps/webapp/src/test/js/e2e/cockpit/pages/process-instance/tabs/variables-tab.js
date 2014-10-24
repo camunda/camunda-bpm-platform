@@ -1,11 +1,12 @@
 'use strict';
 
-var Base = require('./../table');
+var Table = require('./../../table');
 
 module.exports = Table.extend({
 
   tabRepeater: 'tabProvider in processInstanceTabs',
   tabIndex: 0,
+  tabLabel: 'Variables',
   tableRepeater: 'variable in variables',
 
   variableName: function(item) {

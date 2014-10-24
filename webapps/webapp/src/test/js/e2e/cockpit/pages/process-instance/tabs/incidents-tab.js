@@ -1,18 +1,19 @@
 'use strict';
 
-var Base = require('./../table');
+var Table = require('./../../table');
 
 module.exports = Table.extend({
 
   tabRepeater: 'tabProvider in processInstanceTabs',
-  tabIndex: 3,
-  tableRepeater: 'userTask in userTasks',
+  tabIndex: 1,
+  tabLabel: 'Incidents',
+  tableRepeater: 'incident in incidents',
 
-  userTaskName: function(item) {
+  incidentMessage: function(item) {
     return this.tableItem(item, 'incident.rootCauseIncidentMessage').getText();
   },
 
-  selectUserTask: function(item) {
+  selectIncidentMessage: function(item) {
     this.tableItem(item, 'incident.rootCauseIncidentMessage').click();
   },
 

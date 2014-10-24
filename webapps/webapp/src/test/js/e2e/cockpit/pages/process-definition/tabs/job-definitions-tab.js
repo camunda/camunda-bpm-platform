@@ -1,11 +1,12 @@
 'use strict';
 
-var Table = require('./../table');
+var Table = require('./../../table');
 
 module.exports = Table.extend({
 
   tabRepeater: 'tabProvider in processDefinitionTabs',
   tabIndex: 2,
+  tabLabel: 'Job Definitions',
   tableRepeater: 'jobDefinition in jobDefinitions',
 
   selectJobDefinition: function(item) {

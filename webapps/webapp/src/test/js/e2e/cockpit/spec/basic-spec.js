@@ -59,13 +59,20 @@ describe('cockpit - ', function() {
 
   describe('process definition view', function() {
 
+    it('should check action bar', function () {
+
+      // then
+      expect(processDefinitionPage.actionBar.suspendButton().isEnabled()).toBe(true);
+    });
+
+
     it('should check Called Process Definitions tab', function() {
 
       // when
       processDefinitionPage.table.calledProcessDefinitionsTab.selectTab();
 
       // then
-      expect(processDefinitionPage.table.calledProcessDefinitionsTab.tabName()).toBe('Called Process Definitions');
+      processDefinitionPage.table.calledProcessDefinitionsTab.checkTabName();
       processDefinitionPage.table.calledProcessDefinitionsTab.isTabSelected();
     });
 
@@ -77,7 +84,7 @@ describe('cockpit - ', function() {
       });
     }
 
-    it("should open called process defintion", function () {
+    it('should open called process defintion', function () {
 
       var processName;
 
@@ -95,7 +102,7 @@ describe('cockpit - ', function() {
     });
 
 
-    it("should select calling activity", function () {
+    it('should select calling activity', function () {
 
       // when
       processDefinitionPage.table.calledProcessDefinitionsTab.selectTab();
@@ -106,7 +113,7 @@ describe('cockpit - ', function() {
     });
     
     
-    it("should go deeper", function () {
+    it('should go deeper', function () {
 
       // when
       processDefinitionPage.table.calledProcessDefinitionsTab.selectCalledProcessDefinitions(0);
@@ -122,13 +129,13 @@ describe('cockpit - ', function() {
       processDefinitionPage.table.jobDefinitionsTab.selectTab();
 
       // then
-      expect(processDefinitionPage.table.jobDefinitionsTab.tabName()).toBe('Job Definitions');
+      processDefinitionPage.table.jobDefinitionsTab.checkTabName();
       processDefinitionPage.table.jobDefinitionsTab.isTabSelected();
       processDefinitionPage.table.calledProcessDefinitionsTab.isTabNotSelected();
     });
 
 
-    it("should select job activity", function () {
+    it('should select job activity', function () {
 
       // when
       processDefinitionPage.table.jobDefinitionsTab.selectJobDefinition(0);
@@ -146,7 +153,7 @@ describe('cockpit - ', function() {
       processDefinitionPage.table.processInstancesTab.selectTab();
 
       // then
-      expect(processDefinitionPage.table.processInstancesTab.tabName()).toBe('Process Instances');
+      processDefinitionPage.table.processInstancesTab.checkTabName();
       processDefinitionPage.table.processInstancesTab.isTabSelected();
     });
 
@@ -180,9 +187,9 @@ describe('cockpit - ', function() {
   });
 
 
-  describe("cockpit navigation", function () {
+  describe('cockpit navigation', function () {
 
-    it("should call dashboard by bread crumb", function () {
+    it('should call dashboard by bread crumb', function () {
 
       processInstancePage.pageHeaderProcessInstanceName()
           .then(function(instanceId) {
@@ -202,7 +209,7 @@ describe('cockpit - ', function() {
     });
 
 
-    it("should call defintions page by bread crumb", function () {
+    it('should call defintions page by bread crumb', function () {
 
       // when
       processInstancePage.selectBreadCrumb(2);
@@ -212,7 +219,7 @@ describe('cockpit - ', function() {
     });
 
 
-    it("should call dashboard by header menu", function () {
+    it('should call dashboard by header menu', function () {
       var url;
 
       browser.getCurrentUrl()
@@ -237,71 +244,117 @@ describe('cockpit - ', function() {
 
     });
 
-  }); 
+  });
 
 
-  describe('process instance view', function() {
+  describe('process instance view', function () {
+
+    it('should select process and goto instance view', function () {
+
+      // given
+      dashboardPage.clickNavBarHeader();
+
+      // when
+      dashboardPage.deployedProcessesList.selectProcess(4);  // change variable process
+
+      // then
+      processDefinitionPage.table.processInstancesTab.selectProcessInstance(0);
+    });
+
+
+    it('should select Incident tab', function () {
+
+      // when
+      processInstancePage.table.incidentTab.selectTab();
+
+      // then
+      processInstancePage.table.incidentTab.checkTabName();
+    });
+
+
+    it('should open Called Process Instances tab', function () {
+
+      // when
+      processInstancePage.table.calledProcessInstancesTab.selectTab();
+
+      // then
+      processInstancePage.table.calledProcessInstancesTab.checkTabName();
+    });
+
+
+    it('should open Variables tab', function () {
+
+      // when
+      processInstancePage.table.variablesTab.selectTab();
+
+      // then
+      processInstancePage.table.variablesTab.checkTabName();
+    });
+
+
+    it('should open User Task tab', function () {
+
+      // when
+      processInstancePage.table.userTaskTab.selectTab();
+
+      // then
+      processInstancePage.table.userTaskTab.checkTabName();
+    });
+
+
+    it('should select user task in table', function () {
+
+      // when
+      processInstancePage.table.userTaskTab.selectUserTask(0);
+
+      // then
+      processInstancePage.diagram.isActivitySelected('userTask');
+
+      processInstancePage.diagram.deselectActivity('userTask');
+    });
+
+
+    it('should check action bar', function () {
+
+      // then
+      expect(processInstancePage.actionBar.cancelButton().isEnabled()).toBe(true);
+      expect(processInstancePage.actionBar.retryButton().isEnabled()).toBe(true);
+      expect(processInstancePage.actionBar.addVariableButton().isEnabled()).toBe(true);
+      expect(processInstancePage.actionBar.suspendButton().isEnabled()).toBe(true);
+    });
+
 
     it('should select diagram element', function() {
 
       // when
-      processInstancePage.diagram.selectActivity('ServiceTask_1');
+      processInstancePage.diagram.selectActivity('userTask');
 
       // then
-      processInstancePage.diagram.isActivitySelected('ServiceTask_1');
+      processInstancePage.diagram.isActivitySelected('userTask');
     });
 
 
     it('should deselect diagram element', function() {
 
       // when
-      processInstancePage.diagram.deselectActivity('ServiceTask_1');
+      processInstancePage.diagram.deselectActivity('userTask');
 
       // then
-      processInstancePage.diagram.isActivityNotSelected('ServiceTask_1');
+      processInstancePage.diagram.isActivityNotSelected('userTask');
+
     });
 
   });
 
-  xdescribe("action button toolbar", function () {
 
-    it("should validate action buttons", function () {
-      expect(processInstancePage.actionButton.actionButtonList().count()).toBe(4);
+  describe('end test', function() {
 
-    });
+    it('should log out', function () {
 
-    it("should cancel process", function () {
-
-      // when
-      processInstancePage.actionButton.cancelInstance();
-
-
-
-    });
-
-    it("should prompt ok", function () {
-
-    });
-
-    it('should select diagram element', function() {
-
-      // when
-      processDefinitionPage.diagram.selectActivity('service.task.1');
-
-      // then
-      processDefinitionPage.diagram.isActivitySelected('service.task.1');
-    });
-
-
-    it('should deselect diagram element', function() {
-
-      // when
-      processDefinitionPage.diagram.deselectActivity('service.task.1');
-
-      // then
-      processDefinitionPage.diagram.isActivityNotSelected('service.task.1');
+      dashboardPage.logout();
     });
 
   });
+
 
 });

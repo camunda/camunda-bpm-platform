@@ -1,11 +1,12 @@
 'use strict';
 
-var Table = require('./../table');
+var Table = require('./../../table');
 
 module.exports = Table.extend({
 
   tabRepeater: 'tabProvider in processDefinitionTabs',
   tabIndex: 0,
+  tabLabel: 'Process Instances',
   tableRepeater: 'processInstance in processInstances',
 
   selectProcessInstance: function(item) {
