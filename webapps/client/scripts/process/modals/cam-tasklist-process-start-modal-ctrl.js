@@ -74,7 +74,7 @@ define([
     });
 
     processStartData.observe('startForm', function (startForm) {
-      $scope.startForm = startForm;
+      $scope.startForm = angular.copy(startForm);
     });
 
     $scope.processDefinitionState = processStartData.observe('processDefinitions', function (processDefinitions) {
@@ -126,7 +126,10 @@ define([
 
     // start a process view /////////////////////////////////////////////////////////////////
 
+    $scope.$invalid = true;
+
     $scope.back = function() {
+      $scope.$invalid = true;
       $scope.PROCESS_TO_START_SELECTED = false;
       $scope.options = DEFAULT_OPTIONS;
       processStartData.set('currentProcessDefinitionId', { id: null });

@@ -153,10 +153,10 @@ define([
           $scope.tasklistForm.$error = error;
           // mark the form as initialized
           this.notifyFormInitialized();
-          // set the '$invalid' flag to false to
-          // be able to complete a task (or start
+          // set the '$invalid' flag to true to
+          // not be able to complete a task (or start
           // a process)
-          this.notifyFormValidated(false);
+          this.notifyFormValidated(true);
         };
 
         this.notifyFormCompleted = function (err) {
