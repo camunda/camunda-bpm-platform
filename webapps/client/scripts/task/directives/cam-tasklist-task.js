@@ -191,12 +191,17 @@ define([
         }]);
 
         taskData.provide('processDefinition', ['task', function (task) {
-          if (!task) {
+          if (!task || !task._embedded || !task._embedded.processDefinition) {
             return null;
           }
-
           return task._embedded.processDefinition[0];
+        }]);
 
+        taskData.provide('caseDefinition', ['task', function (task) {
+          if (!task || !task._embedded || !task._embedded.caseDefinition) {
+            return null;
+          }
+          return task._embedded.caseDefinition[0];
         }]);
 
         taskData.provide('taskForm', ['task', function(task) {

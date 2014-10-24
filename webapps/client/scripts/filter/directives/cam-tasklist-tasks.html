@@ -31,7 +31,8 @@
           </h4>
           <h6 class="process-definition"
               ng-class="{suspended: task._embedded.processDefinition[0]}">
-            {{ task._embedded.processDefinition[0].name || task._embedded.processDefinition[0].key }}
+            {{ task._embedded.processDefinition[0].name || task._embedded.processDefinition[0].key ||
+               task._embedded.caseDefinition[0].name || task._embedded.caseDefinition[0].key }}
           </h6>
         </div>
 

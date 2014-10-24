@@ -50,18 +50,8 @@ define([
          * observe the list of tasks
          */
         $scope.state = tasksData.observe('taskList', function (taskList) {
-
           $scope.totalItems = taskList.count;
-          $scope.processDefinitions = $scope.processDefinitions || [];
-
-          angular.forEach(taskList._embedded ? taskList._embedded.processDefinition : [], function(procDef) {
-            if (indexOfId($scope.processDefinitions) === -1) {
-              $scope.processDefinitions.push(procDef);
-            }
-          });
-
           $scope.tasks = taskList._embedded.task;
-
         });
 
         /**

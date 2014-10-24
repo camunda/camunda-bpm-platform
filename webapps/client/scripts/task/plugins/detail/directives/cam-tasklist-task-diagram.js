@@ -63,7 +63,7 @@ define([
 
 
         function renderDiagram() {
-          if (!process._xml) { return; }
+          if (!process || !process._xml) { return; }
           scope.rendering = true;
           viewer.importXML(process._xml.bpmn20Xml, function(err) {
             scope.$apply(function() {
