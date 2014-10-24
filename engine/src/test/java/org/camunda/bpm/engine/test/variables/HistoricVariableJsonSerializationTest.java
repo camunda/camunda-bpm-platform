@@ -5,6 +5,7 @@ import static org.camunda.bpm.engine.variable.Variables.objectValue;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.history.HistoricVariableUpdate;
+import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
@@ -22,39 +23,47 @@ public class HistoricVariableJsonSerializationTest extends PluggableProcessEngin
 
   @Deployment(resources = ONE_TASK_PROCESS)
   public void testSelectHistoricVariableInstances() throws JSONException {
-    ProcessInstance instance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    if (processEngineConfiguration.getHistoryLevel().getId() >=
+        HistoryLevel.HISTORY_LEVEL_AUDIT.getId()) {
+      ProcessInstance instance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
-    JsonSerializable bean = new JsonSerializable("a String", 42, false);
-    runtimeService.setVariable(instance.getId(), "simpleBean", objectValue(bean).serializationDataFormat(JSON_FORMAT_NAME).create());
+      JsonSerializable bean = new JsonSerializable("a String", 42, false);
+      runtimeService.setVariable(instance.getId(), "simpleBean", objectValue(bean).serializationDataFormat(JSON_FORMAT_NAME).create());
 
-    HistoricVariableInstance historicVariable = historyService.createHistoricVariableInstanceQuery().singleResult();
-    assertNotNull(historicVariable.getValue());
-    assertNull(historicVariable.getErrorMessage());
+      HistoricVariableInstance historicVariable = historyService.createHistoricVariableInstanceQuery().singleResult();
+      assertNotNull(historicVariable.getValue());
+      assertNull(historicVariable.getErrorMessage());
 
-    assertEquals(ValueType.OBJECT.getName(), historicVariable.getTypeName());
-    assertEquals(ValueType.OBJECT.getName(), historicVariable.getVariableTypeName());
+      assertEquals(ValueType.OBJECT.getName(), historicVariable.getTypeName());
+      assertEquals(ValueType.OBJECT.getName(), historicVariable.getVariableTypeName());
 
-    JsonSerializable historyValue = (JsonSerializable) historicVariable.getValue();
-    assertEquals(bean.getStringProperty(), historyValue.getStringProperty());
-    assertEquals(bean.getIntProperty(), historyValue.getIntProperty());
-    assertEquals(bean.getBooleanProperty(), historyValue.getBooleanProperty());
+      JsonSerializable historyValue = (JsonSerializable) historicVariable.getValue();
+      assertEquals(bean.getStringProperty(), historyValue.getStringProperty());
+      assertEquals(bean.getIntProperty(), historyValue.getIntProperty());
+      assertEquals(bean.getBooleanProperty(), historyValue.getBooleanProperty());
+    }
   }
 
   @Deployment(resources = ONE_TASK_PROCESS)
   public void testSelectHistoricSerializedValues() throws JSONException {
-    ProcessInstance instance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    if (processEngineConfiguration.getHistoryLevel().getId() >=
+        HistoryLevel.HISTORY_LEVEL_AUDIT.getId()) {
 
-    JsonSerializable bean = new JsonSerializable("a String", 42, false);
-    runtimeService.setVariable(instance.getId(), "simpleBean", objectValue(bean).serializationDataFormat(JSON_FORMAT_NAME));
 
-    HistoricVariableInstance historicVariable = historyService.createHistoricVariableInstanceQuery().singleResult();
-    assertNotNull(historicVariable.getValue());
-    assertNull(historicVariable.getErrorMessage());
+      ProcessInstance instance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
-    ObjectValue typedValue = (ObjectValue) historicVariable.getTypedValue();
-    assertEquals(JSON_FORMAT_NAME, typedValue.getSerializationDataFormat());
-    JSONAssert.assertEquals(bean.toExpectedJsonString(),new String(typedValue.getValueSerialized()), true);
-    assertEquals(JsonSerializable.class.getName(), typedValue.getObjectTypeName());
+      JsonSerializable bean = new JsonSerializable("a String", 42, false);
+      runtimeService.setVariable(instance.getId(), "simpleBean", objectValue(bean).serializationDataFormat(JSON_FORMAT_NAME));
+
+      HistoricVariableInstance historicVariable = historyService.createHistoricVariableInstanceQuery().singleResult();
+      assertNotNull(historicVariable.getValue());
+      assertNull(historicVariable.getErrorMessage());
+
+      ObjectValue typedValue = (ObjectValue) historicVariable.getTypedValue();
+      assertEquals(JSON_FORMAT_NAME, typedValue.getSerializationDataFormat());
+      JSONAssert.assertEquals(bean.toExpectedJsonString(),new String(typedValue.getValueSerialized()), true);
+      assertEquals(JsonSerializable.class.getName(), typedValue.getObjectTypeName());
+    }
   }
 
   @Deployment(resources = ONE_TASK_PROCESS)
