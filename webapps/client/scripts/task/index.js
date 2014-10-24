@@ -26,7 +26,8 @@ define([
   /* action plugin controller */
   './plugins/action/modals/cam-tasklist-comment-form',
 
-  './directives/cam-tasklist-groups-form',
+  /* modals */
+  './modals/cam-tasklist-groups-modal',
 
   'camunda-tasklist-ui/utils',
   'camunda-tasklist-ui/api',
@@ -56,6 +57,7 @@ define([
   /* action plugin controller */
   camCommentCreateModalCtrl,
 
+  /* modals */
   camGroupEditModalCtrl
 ) {
 

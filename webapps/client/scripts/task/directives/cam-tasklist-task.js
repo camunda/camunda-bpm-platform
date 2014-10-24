@@ -83,16 +83,17 @@ define([
         $scope.errorHandler = function (status, err) {
           var _status = enhanceErrorMessage(err.message);
 
-          return $translate(_status).then(function(translated) {
-            err.message = translated;
-
-            errorNotification(status, err);
-
-            if(_status === 'TASK_NOT_EXIST' || _status === 'INSTANCE_SUSPENDED') {
+          if(_status === 'TASK_NOT_EXIST' || _status === 'INSTANCE_SUSPENDED') {
+            return $translate(_status).then(function(translated) {
+              err.message = translated;
+              errorNotification(status, err);
               clearTask(true);
-            }
+            });
 
-          });
+          }
+          else {
+            errorNotification(status, err);
+          }
 
         };
 

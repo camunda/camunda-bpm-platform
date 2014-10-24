@@ -5,11 +5,9 @@
 </div>
 
 
-
-
-
 <div class="modal-body">
-  <div notifications-panel />
+  <div notifications-panel class="cols notifications-panel page-notifications">
+  </div>
 
   <form name="taskGroupForm"
         class="form-horizontal"
@@ -17,14 +15,6 @@
 
     <div ng-if="groups.length"
          class="current-groups">
-
-      <!--
-      <div class="row">
-        <div class="col-xs-12">
-          <h4>{{ 'CURRENT_GROUPS' | translate }}</h4>
-        </div>
-      </div>
-      -->
 
       <div class="row labels"
            ng-if="groups.length">
@@ -39,7 +29,6 @@
       <div class="form-group values"
            ng-repeat="(delta, group) in groups">
         <div class="col-xs-4 align-right">
-          <!-- "remove" text ? -->
           <a href
              ng-click="removeGroup(group)"
              class="glyphicon glyphicon-minus-sign"></a>
@@ -79,12 +68,6 @@
 
   </form>
 </div>
-
-
-
-
-
-
 
 <div class="modal-footer">
   <div class="row row-action">

@@ -1,7 +1,7 @@
 define([
   'angular',
   'text!./cam-tasklist-task-meta.html',
-  'text!./cam-tasklist-groups-form.html',
+  'text!../modals/cam-tasklist-groups-modal.html',
 ], function(
   angular,
   template,
@@ -54,7 +54,7 @@ define([
           $scope.isAssignee = isAssignee;
         });
 
-        taskMetaData.observe('groups', function(groups) {
+        $scope.groupsState = taskMetaData.observe('groups', function(groups) {
           $scope.groups = groups;
         });
 
@@ -212,13 +212,13 @@ define([
             scope: $scope,
             //TODO: extract filter edit modal class to super style sheet
             windowClass: 'filter-edit-modal',
-            size: 'md',
+            // size: 'md',
             template: editGroupsFormTemplate,
             controller: 'camGroupEditModalCtrl',
             resolve: {
-              task: function() { return $scope.task; },
-              groups: function() { return $scope.groups; },
-              taskMetaData: function() { return taskMetaData; }
+              taskMetaData: function() { return taskMetaData; },
+              successHandler: function() { return successHandler; },
+              errorHandler: function() { return errorHandler; }
             }
           });
         };

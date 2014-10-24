@@ -72,7 +72,17 @@
 
 <ul class="meta list-inline actors">
 
-  <li class="groups" ng-click="editGroups()">
+  <li ng-show="!groupsState.$loaded" class="groups">
+    <div class="loaded">
+      <span tooltip-placement="top"
+            tooltip="{{ 'GROUPS' | translate }}"
+            class="glyphicon glyphicon-th">
+      </span>
+      <i class="animate-spin glyphicon glyphicon-refresh"></i>
+    </div>
+  </li>
+
+  <li ng-hide="!groupsState.$loaded" class="groups" ng-click="editGroups()">
     <div>
       <span tooltip-placement="top"
             tooltip="{{ 'GROUPS' | translate }}"
