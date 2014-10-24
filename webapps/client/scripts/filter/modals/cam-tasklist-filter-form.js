@@ -31,7 +31,6 @@ define([
     each(arr, function(obj, i) {
       if (expressionsExp.test(obj.value)) {
         if(obj.key.indexOf('Expression') === -1) {
-          // arr[i].key = 'task'+ obj.key[0].toUpperCase() + obj.key.slice(1) +'Expression';
           arr[i].key = obj.key +'Expression';
         }
       } else {
