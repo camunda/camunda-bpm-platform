@@ -10,17 +10,20 @@ define([
   var Controller = [
    '$scope',
    '$location',
+   'camAPI',
   function (
     $scope,
-    $location
+    $location,
+    camAPI
   ) {
 
     // setup ///////////////////////////////////////////////////////////
 
     var errorHandler = $scope.errorHandler;
     var successHandler = $scope.successHandler;
+    var Task = camAPI.resource('task');
 
-    var DEFAULT_OPTIONS = $scope.options = { 
+    var DEFAULT_OPTIONS = $scope.options = {
       hideCompleteButton: false,
       disableCompleteButton: false,
       disableForm: false,
@@ -64,16 +67,30 @@ define([
       taskFormData.changed('taskList');
     }
 
+    function checkForAssignedTasks() {
+      Task.list({
+        processInstanceId : $scope.task.processInstanceId,
+        assignee : $scope.task.assignee
+      },function(err, data) {
+        if(data._embedded.task.length > 0) {
+          var msg = "";
+          for(var task, i = 0; !!(task = data._embedded.task[i]); i++) {
+            msg += '<a ng-href="#/?task='+ task.id +'" ng-click="removeNotification(notification)">'+task.name+'</a>, ';
+          }
+          successHandler("You are assigned to the following tasks in the same process", msg.slice(0,-2), 16000);
+        }
+      });
+    }
+
     // will be called when the form has been submitted
     $scope.completionCallback = function(err) {
       if (err) {
         return errorHandler('COMPLETE_ERROR', err);
       }
-
       successHandler('COMPLETE_OK');
+      checkForAssignedTasks();
       clearTask();
     };
-
   }];
 
   var Configuration = function PluginConfiguration(ViewsProvider) {

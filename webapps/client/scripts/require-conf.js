@@ -109,6 +109,7 @@ define(function() {
                                       'camunda-commons-ui/directives/engineSelect',
                                       'camunda-commons-ui/directives/autoFill',
                                       'camunda-commons-ui/directives/nl2br',
+                                      'camunda-commons-ui/directives/compileTemplate',
 
                                       'text!camunda-tasklist-ui/index.html',
                                       'json!locales/en.json',

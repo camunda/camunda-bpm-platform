@@ -1,3 +1,4 @@
+/* global define: false */
 'use strict';
 
 define('snap-win', ['snap-svg'], function(snap) {
@@ -70,6 +71,9 @@ define('camunda-tasklist-ui', [
     var nl2br = require('camunda-commons-ui/directives/nl2br');
     tasklistApp.directive('nl2br', nl2br);
 
+    var compileTemplate = require('camunda-commons-ui/directives/compileTemplate');
+    tasklistApp.directive('compileTemplate', compileTemplate);
+
     tasklistApp.config(require('camunda-tasklist-ui/config/uris'));
     tasklistApp.config(require('camunda-tasklist-ui/config/translations'));
     tasklistApp.config(require('camunda-tasklist-ui/config/routes'));
@@ -88,7 +92,7 @@ define('camunda-tasklist-ui', [
           $aufocused[0].focus();
         }
       }, 300);
-      
+
     });
   }
 

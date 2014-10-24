@@ -71,11 +71,12 @@ define([
           });
         }
 
-        function successNotification(src) {
+        function successNotification(src, msg, duration) {
           $translate(src).then(function(translated) {
             Notifications.addMessage({
-              duration: 3000,
-              status: translated
+              duration: duration || 3000,
+              status: translated,
+              message: msg
             });
           });
         }
@@ -150,8 +151,8 @@ define([
 
         // handle successfully actions //////////////////////////////////////////////////
 
-        $scope.successHandler = function (status) {
-          successNotification(status);
+        $scope.successHandler = function (status, msg, duration) {
+          successNotification(status, msg, duration);
         };
 
         // provider ///////////////////////////////////////////////////////////////////
