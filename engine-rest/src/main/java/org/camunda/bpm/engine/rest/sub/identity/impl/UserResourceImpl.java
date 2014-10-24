@@ -91,10 +91,16 @@ public class UserResourceImpl extends AbstractIdentityResource implements UserRe
     ensureNotReadOnly();
 
     Authentication currentAuthentication = identityService.getCurrentAuthentication();
-    if(currentAuthentication != null && currentAuthentication.getUserId() != null) {
+    if(currentAuthentication != null && currentAuthentication.getUserId() != null) {      
       if(!identityService.checkPassword(currentAuthentication.getUserId(), account.getAuthenticatedUserPassword())) {
         throw new InvalidRequestException(Status.BAD_REQUEST, "The given authenticated user password is not valid.");
       }
+      
+      // TODO: Length of new password is not checked.
+      // In UI it checks for minimum 8 chars length
+      if (account.getPassword() == null || account.getPassword().isEmpty()) {
+        throw new InvalidRequestException(Status.BAD_REQUEST, "The given 'new' password is not valid.");
+      }      
     }
 
     User dbUser = findUserObject();
