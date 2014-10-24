@@ -46,6 +46,9 @@ define([
 
     var processStartData = processData.newChild($scope);
 
+    // initially always reset the current selected process definition id to null
+    processStartData.set('currentProcessDefinitionId', { id: null });
+
     var DEFAULT_OPTIONS = $scope.options = {
       hideCompleteButton : true,
       disableForm : false,
