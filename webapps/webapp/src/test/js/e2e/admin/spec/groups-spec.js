@@ -155,9 +155,9 @@ describe('groups page -', function() {
   });
 
 
-  describe("special group names -", function () {
+  describe('special group names -', function () {
 
-    describe("create groups", function () {
+    describe('create groups', function () {
 
       beforeEach(function () {
 
@@ -165,7 +165,7 @@ describe('groups page -', function() {
       });
 
 
-      it("should create group with slash", function () {
+      it('should create group with slash', function () {
 
         // when
         groupsPage.newGroup.createNewGroup('/göäüp_name', '/üöäüöäü/', 'testgroup/üäö');
@@ -175,7 +175,7 @@ describe('groups page -', function() {
       });
 
 
-      it("should create group with backslash", function () {
+      it('should create group with backslash', function () {
 
         // when
         groupsPage.newGroup.createNewGroup('\\göäüp_name', '\\üöäüöäü\\', 'testgroup\\üäö');
@@ -187,7 +187,7 @@ describe('groups page -', function() {
     });
 
 
-    describe("assign groups", function () {
+    describe('assign groups', function () {
 
       beforeEach(function () {
 
@@ -197,7 +197,7 @@ describe('groups page -', function() {
       });
 
 
-      it("should add slash group to user", function () {
+      it('should add slash group to user', function () {
 
         // when
         usersPage.editUserGroups.addGroupButton().click();
@@ -209,7 +209,7 @@ describe('groups page -', function() {
       });
 
 
-      it("should add backslash group to user", function () {
+      it('should add backslash group to user', function () {
 
         // when
         usersPage.editUserGroups.addGroupButton().click();
@@ -223,9 +223,9 @@ describe('groups page -', function() {
     });
 
 
-    describe("remove groups", function () {
+    describe('remove groups', function () {
 
-      it("should remove group from user", function () {
+      it('should remove group from user', function () {
 
         // when
         usersPage.editUserGroups.removeGroup(0);
@@ -235,7 +235,7 @@ describe('groups page -', function() {
       });
 
 
-      it("should delete slash group", function () {
+      it('should delete slash group', function () {
 
         // when
         usersPage.selectNavbarItem('Groups');
@@ -247,7 +247,7 @@ describe('groups page -', function() {
       });
 
 
-      it("should delete group", function () {
+      it('should delete group', function () {
 
         // when
         groupsPage.editGroupButton(0).click();
@@ -258,7 +258,7 @@ describe('groups page -', function() {
       });
 
 
-      it("should validate users group setting", function () {
+      it('should validate users group setting', function () {
 
         // given
         usersPage.navigateTo();
