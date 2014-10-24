@@ -28,9 +28,11 @@ import org.camunda.bpm.engine.history.HistoricDetailQuery;
 import org.camunda.bpm.engine.history.HistoricVariableUpdate;
 import org.camunda.bpm.engine.rest.AbstractRestServiceTest;
 import org.camunda.bpm.engine.rest.helper.MockHistoricVariableUpdateBuilder;
+import org.camunda.bpm.engine.rest.helper.MockObjectValue;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.camunda.bpm.engine.rest.helper.VariableTypeHelper;
 import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.value.ObjectValue;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -90,7 +92,79 @@ public abstract class AbstractHistoricDetailRestServiceInteractionTest extends A
     .when().get(HISTORIC_DETAIL_URL);
 
     verify(historicDetailQueryMock, times(1)).disableBinaryFetching();
+  }
 
+  @Test
+  public void testGetSingleVariableUpdateDeserialized() {
+    ObjectValue serializedValue = MockObjectValue.fromObjectValue(
+        Variables.objectValue("a value").serializationDataFormat("aDataFormat").create())
+        .objectTypeName("aTypeName");
+
+    MockHistoricVariableUpdateBuilder builder = MockProvider.mockHistoricVariableUpdate().typedValue(serializedValue);
+    HistoricVariableUpdate variableInstanceMock = builder.build();
+
+    when(historicDetailQueryMock.detailId(variableInstanceMock.getId())).thenReturn(historicDetailQueryMock);
+    when(historicDetailQueryMock.disableBinaryFetching()).thenReturn(historicDetailQueryMock);
+    when(historicDetailQueryMock.singleResult()).thenReturn(variableInstanceMock);
+
+    given()
+      .pathParam("id", builder.getId())
+    .then().expect().statusCode(Status.OK.getStatusCode())
+    .and()
+      .body("id", equalTo(builder.getId()))
+      .body("variableName", equalTo(builder.getName()))
+      .body("variableType", equalTo(VariableTypeHelper.toExpectedValueTypeName(builder.getTypedValue().getType())))
+      .body("value", equalTo("a value"))
+      .body("valueInfo.serializationDataFormat", equalTo("aDataFormat"))
+      .body("valueInfo.objectTypeName", equalTo("aTypeName"))
+      .body("processInstanceId", equalTo(builder.getProcessInstanceId()))
+      .body("errorMessage", equalTo(builder.getErrorMessage()))
+      .body("activityInstanceId", equalTo(builder.getActivityInstanceId()))
+      .body("revision", equalTo(builder.getRevision()))
+      .body("time", equalTo(builder.getTime()))
+      .body("taskId", equalTo(builder.getTaskId()))
+      .body("executionId", equalTo(builder.getExecutionId()))
+    .when().get(HISTORIC_DETAIL_URL);
+
+    verify(historicDetailQueryMock, times(1)).disableBinaryFetching();
+    verify(historicDetailQueryMock, never()).disableCustomObjectDeserialization();
+  }
+
+  @Test
+  public void testGetSingleVariableUpdateSerialized() {
+    ObjectValue serializedValue = Variables.serializedObjectValue("a serialized value")
+        .serializationDataFormat("aDataFormat").objectTypeName("aTypeName").create();
+
+    MockHistoricVariableUpdateBuilder builder = MockProvider.mockHistoricVariableUpdate().typedValue(serializedValue);
+    HistoricVariableUpdate variableInstanceMock = builder.build();
+
+    when(historicDetailQueryMock.detailId(variableInstanceMock.getId())).thenReturn(historicDetailQueryMock);
+    when(historicDetailQueryMock.disableBinaryFetching()).thenReturn(historicDetailQueryMock);
+    when(historicDetailQueryMock.disableCustomObjectDeserialization()).thenReturn(historicDetailQueryMock);
+    when(historicDetailQueryMock.singleResult()).thenReturn(variableInstanceMock);
+
+    given()
+      .pathParam("id", builder.getId())
+      .queryParam("deserializeObjectValue", false)
+    .then().expect().statusCode(Status.OK.getStatusCode())
+    .and()
+      .body("id", equalTo(builder.getId()))
+      .body("variableName", equalTo(builder.getName()))
+      .body("variableType", equalTo(VariableTypeHelper.toExpectedValueTypeName(builder.getTypedValue().getType())))
+      .body("value", equalTo("a serialized value"))
+      .body("valueInfo.serializationDataFormat", equalTo("aDataFormat"))
+      .body("valueInfo.objectTypeName", equalTo("aTypeName"))
+      .body("processInstanceId", equalTo(builder.getProcessInstanceId()))
+      .body("errorMessage", equalTo(builder.getErrorMessage()))
+      .body("activityInstanceId", equalTo(builder.getActivityInstanceId()))
+      .body("revision", equalTo(builder.getRevision()))
+      .body("time", equalTo(builder.getTime()))
+      .body("taskId", equalTo(builder.getTaskId()))
+      .body("executionId", equalTo(builder.getExecutionId()))
+    .when().get(HISTORIC_DETAIL_URL);
+
+    verify(historicDetailQueryMock, times(1)).disableBinaryFetching();
+    verify(historicDetailQueryMock, times(1)).disableCustomObjectDeserialization();
   }
 
   @Test

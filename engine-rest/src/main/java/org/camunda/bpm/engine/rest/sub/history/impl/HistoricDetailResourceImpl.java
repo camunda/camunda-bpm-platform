@@ -20,6 +20,8 @@ import javax.ws.rs.core.Response.Status;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.history.HistoricDetailQuery;
+import org.camunda.bpm.engine.history.HistoricVariableInstance;
+import org.camunda.bpm.engine.history.HistoricVariableInstanceQuery;
 import org.camunda.bpm.engine.history.HistoricVariableUpdate;
 import org.camunda.bpm.engine.rest.dto.history.HistoricDetailDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
@@ -40,12 +42,15 @@ public class HistoricDetailResourceImpl implements HistoricDetailResource {
     this.engine = engine;
   }
 
-  public HistoricDetailDto getDetail() {
-    HistoricDetail detail = baseQuery()
-      .disableBinaryFetching()
-      // Existing API requires that Serializable variables are always resolved
-//      .disableCustomObjectDeserialization()
-      .singleResult();
+  public HistoricDetailDto getDetail(boolean deserializeObjectValue) {
+    HistoricDetailQuery query = baseQuery().disableBinaryFetching();
+
+    if (!deserializeObjectValue) {
+      query.disableCustomObjectDeserialization();
+    }
+
+    HistoricDetail detail = query.singleResult();
+
     if(detail != null) {
       return HistoricDetailDto.fromHistoricDetail(detail);
 
