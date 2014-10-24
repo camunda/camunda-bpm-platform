@@ -77,7 +77,7 @@
       <span class="message">{{ startFormState.$error.message }}</span>
     </div>
 
-    <div ng-hide="!startFormState.$error"
+    <div ng-hide="startFormState.$error"
          cam-tasklist-form 
          tasklist-form="startForm"
          on-form-completion-callback="completionCallback"
