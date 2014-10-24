@@ -50,12 +50,12 @@
          ng-click="changeBy('followUpDate')">Follow up date</a>
     </li>
 
-    <li ng-show="by !== 'name'">
+    <li ng-show="by !== 'nameCaseInsensitive'">
       <a href
          tabindex="-1"
-         sort-by="name"
+         sort-by="nameCaseInsensitive"
          translate="TASK_NAME"
-         ng-click="changeBy('name')">Task name</a>
+         ng-click="changeBy('nameCaseInsensitive')">Task name</a>
     </li>
 
     <li ng-show="by !== 'assignee'">
