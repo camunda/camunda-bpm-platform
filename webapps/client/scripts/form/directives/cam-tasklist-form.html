@@ -1,4 +1,4 @@
-<div ng-show="!tasklistForm.$loaded"
+<div ng-show="tasklistForm && !tasklistForm.$loaded"
      class="loader">
   <i class="animate-spin glyphicon glyphicon-refresh"></i>
   {{ 'LOADING' | translate }}

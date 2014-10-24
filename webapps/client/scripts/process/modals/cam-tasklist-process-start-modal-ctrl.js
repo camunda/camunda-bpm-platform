@@ -76,7 +76,7 @@ define([
       page.current = (_query.firstResult / page.size) + 1;
     });
 
-    processStartData.observe('startForm', function (startForm) {
+    $scope.startFormState = processStartData.observe('startForm', function (startForm) {
       $scope.startForm = angular.copy(startForm);
     });
 

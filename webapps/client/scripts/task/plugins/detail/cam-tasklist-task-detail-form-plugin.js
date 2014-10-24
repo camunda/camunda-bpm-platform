@@ -63,7 +63,7 @@ define([
       $scope.options.disableAddVariableButton = !isAssignee;
     }]);
 
-    taskFormData.observe('taskForm', function(taskForm) {
+    $scope.taskFormState = taskFormData.observe('taskForm', function(taskForm) {
       $scope.taskForm = angular.copy(taskForm);
     });
 
