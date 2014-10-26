@@ -221,6 +221,8 @@ public abstract class MockProvider {
   public static final String EXAMPLE_DEPLOYMENT_NAME = "aName";
   public static final String EXAMPLE_DEPLOYMENT_NAME_LIKE = "aNameLike";
   public static final String EXAMPLE_DEPLOYMENT_TIME = "2013-01-23T13:59:43";
+  public static final String EXAMPLE_DEPLOYMENT_TIME_BEFORE = "2013-01-03T13:59:43";
+  public static final String EXAMPLE_DEPLOYMENT_TIME_AFTER = "2013-03-23T13:59:43";
   public static final String NON_EXISTING_DEPLOYMENT_TIME = "2013-04-23T13:42:43";
 
   // deployment resources

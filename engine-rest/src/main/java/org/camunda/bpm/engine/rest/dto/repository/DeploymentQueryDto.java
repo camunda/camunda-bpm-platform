@@ -13,6 +13,7 @@
 package org.camunda.bpm.engine.rest.dto.repository;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.ws.rs.core.MultivaluedMap;
@@ -22,6 +23,7 @@ import org.camunda.bpm.engine.repository.DeploymentQuery;
 import org.camunda.bpm.engine.rest.dto.AbstractQueryDto;
 import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.camunda.bpm.engine.rest.dto.converter.DateConverter;
 
 public class DeploymentQueryDto extends AbstractQueryDto<DeploymentQuery> {
 
@@ -40,6 +42,8 @@ public class DeploymentQueryDto extends AbstractQueryDto<DeploymentQuery> {
   private String id;
   private String name;
   private String nameLike;
+  private Date before;
+  private Date after;
 
   public DeploymentQueryDto() {
   }
@@ -63,6 +67,16 @@ public class DeploymentQueryDto extends AbstractQueryDto<DeploymentQuery> {
     this.nameLike = nameLike;
   }
 
+  @CamundaQueryParam(value = "before", converter = DateConverter.class)
+  public void setDeploymentBefore(Date deploymentBefore) {
+    this.before = deploymentBefore;
+  }
+
+  @CamundaQueryParam(value = "after", converter = DateConverter.class)
+  public void setDeploymentAfter(Date deploymentAfter) {
+    this.after = deploymentAfter;
+  }
+
   @Override
   protected boolean isValidSortByValue(String value) {
     return VALID_SORT_BY_VALUES.contains(value);
@@ -83,6 +97,12 @@ public class DeploymentQueryDto extends AbstractQueryDto<DeploymentQuery> {
     }
     if (nameLike != null) {
       query.deploymentNameLike(nameLike);
+    }
+    if (before != null) {
+      query.deploymentBefore(before);
+    }
+    if (after != null) {
+      query.deploymentAfter(after);
     }
   }
 
