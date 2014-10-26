@@ -85,9 +85,9 @@
   </sql>
   
   <select id="selectSignalEventSubscriptionsByEventName" resultMap="eventSubscriptionResultMap" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
-    select * 
+    select EVT.*
     from ${prefix}ACT_RU_EVENT_SUBSCR EVT
-    inner join ${prefix}ACT_RU_EXECUTION EXC on EVT.EXECUTION_ID_ = EXC.ID_ 
+    inner join ${prefix}ACT_RU_EXECUTION EXC on EVT.EXECUTION_ID_ = EXC.ID_
     where (EVENT_TYPE_ = 'signal')
     	and (EVENT_NAME_ = #{parameter})
     	and EXC.SUSPENSION_STATE_ = 1
