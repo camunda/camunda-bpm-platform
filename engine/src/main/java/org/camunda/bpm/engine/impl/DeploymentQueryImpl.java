@@ -14,6 +14,7 @@
 package org.camunda.bpm.engine.impl;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -26,6 +27,7 @@ import org.camunda.bpm.engine.repository.DeploymentQuery;
 /**
  * @author Tom Baeyens
  * @author Joram Barrez
+ * @author Ingo Richtsmeier
  */
 public class DeploymentQueryImpl extends AbstractQuery<DeploymentQuery, Deployment> implements DeploymentQuery, Serializable {
 
@@ -33,6 +35,8 @@ public class DeploymentQueryImpl extends AbstractQuery<DeploymentQuery, Deployme
   protected String deploymentId;
   protected String name;
   protected String nameLike;
+  protected Date deploymentBefore;
+  protected Date deploymentAfter;
 
   public DeploymentQueryImpl() {
   }
@@ -66,6 +70,22 @@ public class DeploymentQueryImpl extends AbstractQuery<DeploymentQuery, Deployme
       throw new ProcessEngineException("deploymentNameLike is null");
     }
     this.nameLike = nameLike;
+    return this;
+  }
+  
+  public DeploymentQuery deploymentBefore(Date before) {
+    if (before == null) {
+      throw new ProcessEngineException("deploymentBefore is null");
+    }
+    this.deploymentBefore = before;
+    return this;
+  }
+  
+  public DeploymentQuery deploymentAfter(Date after) {
+    if (after == null) {
+      throw new ProcessEngineException("deploymentBefore is null");
+    }
+    this.deploymentAfter = after;
     return this;
   }
   
@@ -113,5 +133,13 @@ public class DeploymentQueryImpl extends AbstractQuery<DeploymentQuery, Deployme
 
   public String getNameLike() {
     return nameLike;
+  }
+
+  public Date getDeploymentBefore() {
+    return deploymentBefore;
+  }
+
+  public Date getDeploymentAfter() {
+    return deploymentAfter;
   }
 }

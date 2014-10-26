@@ -4,11 +4,13 @@ import static com.jayway.restassured.RestAssured.expect;
 import static com.jayway.restassured.RestAssured.given;
 import static com.jayway.restassured.path.json.JsonPath.from;
 import static org.hamcrest.Matchers.equalTo;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -141,6 +143,32 @@ public abstract class AbstractDeploymentRestServiceQueryTest extends AbstractRes
     verify(mockedQuery).deploymentName(queryParameters.get("name"));
     verify(mockedQuery).deploymentNameLike(queryParameters.get("nameLike"));
     verify(mockedQuery).deploymentId(queryParameters.get("id"));
+    verify(mockedQuery).list();
+  }
+  
+  @Test
+  public void testDeploymentBefore() {
+    Map<String, String> queryParameters = new HashMap<String, String>();
+    
+    queryParameters.put("before", "2013-03-01T15:55:55");
+    given().queryParams(queryParameters)
+      .expect().statusCode(Status.OK.getStatusCode())
+      .when().get(DEPLOYMENT_QUERY_URL);
+    
+    verify(mockedQuery).deploymentBefore(any(Date.class));
+    verify(mockedQuery).list();
+  }
+
+  @Test
+  public void testDeploymentAfter() {
+    Map<String, String> queryParameters = new HashMap<String, String>();
+    
+    queryParameters.put("after", "2012-05-05T14:42:42");
+    given().queryParams(queryParameters)
+      .expect().statusCode(Status.OK.getStatusCode())
+      .when().get(DEPLOYMENT_QUERY_URL);
+    
+    verify(mockedQuery).deploymentAfter(any(Date.class));
     verify(mockedQuery).list();
   }
 
