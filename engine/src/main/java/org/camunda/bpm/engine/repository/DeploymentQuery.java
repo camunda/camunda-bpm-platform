@@ -13,6 +13,8 @@
 
 package org.camunda.bpm.engine.repository;
 
+import java.util.Date;
+
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.query.Query;
 
@@ -29,6 +31,7 @@ import org.camunda.bpm.engine.query.Query;
  * 
  * @author Tom Baeyens
  * @author Joram Barrez
+ * @author Ingo Richtsmeier
  */
 public interface DeploymentQuery extends Query<DeploymentQuery, Deployment>{
   
@@ -41,6 +44,12 @@ public interface DeploymentQuery extends Query<DeploymentQuery, Deployment>{
   /** Only select deployments with a name like the given string. */
   DeploymentQuery deploymentNameLike(String nameLike);
 
+  /** Only select deployments deployed before the given date */
+  DeploymentQuery deploymentBefore(Date before);
+  
+  /** Only select deployments deployed after the given date */
+  DeploymentQuery deploymentAfter(Date after);
+  
   //sorting ////////////////////////////////////////////////////////
   
   /** Order by deployment id (needs to be followed by {@link #asc()} or {@link #desc()}). */

@@ -13,16 +13,20 @@
 
 package org.camunda.bpm.engine.test.api.repository;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.DeploymentQuery;
 
 
 /**
  * @author Tom Baeyens
+ * @author Ingo Richtsmeier
  */
 public class DeploymentQueryTest extends PluggableProcessEngineTestCase {
   
@@ -39,6 +43,8 @@ public class DeploymentQueryTest extends PluggableProcessEngineTestCase {
       .deploy()
       .getId();
 
+    SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss.SSS");
+    ClockUtil.setCurrentTime(sdf.parse("01/01/2001 01:01:01.000"));
     deploymentTwoId = repositoryService
       .createDeployment()
       .name("org/camunda/bpm/engine/test/repository/two.bpmn20.xml")
@@ -126,6 +132,50 @@ public class DeploymentQueryTest extends PluggableProcessEngineTestCase {
       repositoryService.createDeploymentQuery().deploymentNameLike(null);
       fail();
     } catch (ProcessEngineException e) {}
+  }
+  
+  public void testQueryByDeploymentBefore() throws Exception {
+    SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss.SSS");
+
+    Date before = sdf.parse("03/02/2002 02:02:02.000");
+    DeploymentQuery query = repositoryService.createDeploymentQuery().deploymentBefore(before);
+    assertEquals(1, query.list().size());
+    assertEquals(1, query.count());
+    assertTrue("wrong deployment found", query.singleResult().getName().contains("two"));
+    
+    try {
+      repositoryService.createDeploymentQuery().deploymentBefore(null);
+      fail();
+    } catch (ProcessEngineException e) {}
+  }
+  
+  public void testQueryDeploymentAfter() throws Exception {
+    SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss.SSS");
+
+    Date after = sdf.parse("03/02/2002 02:02:02.000");
+    DeploymentQuery query = repositoryService.createDeploymentQuery().deploymentAfter(after);
+    assertEquals(1, query.list().size());
+    assertEquals(1, query.count());
+    assertTrue("wrong deployment found", query.singleResult().getName().contains("one"));
+    
+    try {
+      repositoryService.createDeploymentQuery().deploymentAfter(null);
+      fail();
+    } catch (ProcessEngineException e) {}
+  }
+
+  public void testQueryDeploymentBetween() throws Exception {
+    SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss.SSS");
+
+    Date after = sdf.parse("03/02/2000 02:02:02.000");
+    Date before = sdf.parse("05/05/2005 05:05:05.000");
+    DeploymentQuery query = repositoryService
+        .createDeploymentQuery()
+        .deploymentAfter(after)
+        .deploymentBefore(before);
+    assertEquals(1, query.list().size());
+    assertEquals(1, query.count());
+    assertTrue("wrong deployment found", query.singleResult().getName().contains("two"));
   }
 
   public void testVerifyDeploymentProperties() {
