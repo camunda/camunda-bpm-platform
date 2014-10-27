@@ -15,7 +15,6 @@ package org.camunda.bpm.engine.test.db;
 
 import java.util.List;
 
-import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -46,6 +45,8 @@ public class ProcessInstanceMigrationTest extends PluggableProcessEngineTestCase
 
   private static final String TEST_PROCESS_SERVICE_TASK_V1 = "org/camunda/bpm/engine/test/db/ProcessInstanceMigrationTest.testSetProcessDefinitionVersionWithServiceTask.bpmn20.xml";
   private static final String TEST_PROCESS_SERVICE_TASK_V2 = "org/camunda/bpm/engine/test/db/ProcessInstanceMigrationTest.testSetProcessDefinitionVersionWithServiceTaskV2.bpmn20.xml";
+
+  private static final String TEST_PROCESS_WITH_MULTIPLE_PARENTS = "org/camunda/bpm/engine/test/db/ProcessInstanceMigrationTest.testSetProcessDefinitionVersionWithMultipleParents.bpmn";
 
   public void testSetProcessDefinitionVersionEmptyArguments() {
     try {
@@ -333,4 +334,54 @@ public class ProcessInstanceMigrationTest extends PluggableProcessEngineTestCase
     repositoryService.deleteDeployment(secondDeploymentId, true);
   }
 
+  @Deployment(resources = {TEST_PROCESS_WITH_MULTIPLE_PARENTS})
+  public void testSetProcessDefinitionVersionWithMultipleParents(){
+    // start process instance
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("multipleJoins");
+
+    // check that the user tasks have been reached
+    assertEquals(2, taskService.createTaskQuery().count());
+
+    //finish task1
+    Task task = taskService.createTaskQuery().taskDefinitionKey("task1").singleResult();
+    taskService.complete(task.getId());
+
+    //we have reached task4
+    task = taskService.createTaskQuery().taskDefinitionKey("task4").singleResult();
+    assertNotNull(task);
+
+    //The timer job has been created
+    Job job = managementService.createJobQuery().executionId(task.getExecutionId()).singleResult();
+    assertNotNull(job);
+
+    // check there are 2 user tasks task4 and task2
+    assertEquals(2, taskService.createTaskQuery().count());
+
+    // deploy new version of the process definition
+    org.camunda.bpm.engine.repository.Deployment deployment = repositoryService
+      .createDeployment()
+      .addClasspathResource(TEST_PROCESS_WITH_MULTIPLE_PARENTS)
+      .deploy();
+    assertEquals(2, repositoryService.createProcessDefinitionQuery().count());
+
+    // migrate process instance to new process definition version
+    CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutorTxRequired();
+    commandExecutor.execute(new SetProcessDefinitionVersionCmd(pi.getId(), 2));
+
+    // check that all executions of the instance now use the new process definition version
+    ProcessDefinition newProcessDefinition = repositoryService
+      .createProcessDefinitionQuery()
+      .processDefinitionVersion(2)
+      .singleResult();
+    List<Execution> executions = runtimeService
+      .createExecutionQuery()
+      .processInstanceId(pi.getId())
+      .list();
+    for (Execution execution : executions) {
+    	assertEquals(newProcessDefinition.getId(), ((ExecutionEntity) execution).getProcessDefinitionId());
+    }
+
+    // undeploy "manually" deployed process definition
+  	repositoryService.deleteDeployment(deployment.getId(), true);
+  }
 }

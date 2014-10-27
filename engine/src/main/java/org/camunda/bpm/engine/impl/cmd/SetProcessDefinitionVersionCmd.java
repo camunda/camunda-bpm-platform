@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -38,25 +38,25 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.*;
 /**
  * {@link Command} that changes the process definition version of an existing
  * process instance.
- * 
+ *
  * Warning: This command will NOT perform any migration magic and simply set the
  * process definition version in the database, assuming that the user knows,
  * what he or she is doing.
- * 
+ *
  * This is only useful for simple migrations. The new process definition MUST
  * have the exact same activity id to make it still run.
- * 
+ *
  * Furthermore, activities referenced by sub-executions and jobs that belong to
  * the process instance MUST exist in the new process definition version.
- * 
+ *
  * The command will fail, if there is already a {@link ProcessInstance} or
  * {@link HistoricProcessInstance} using the new process definition version and
  * the same business key as the {@link ProcessInstance} that is to be migrated.
- * 
+ *
  * If the process instance is not currently waiting but actively running, then
  * this would be a case for optimistic locking, meaning either the version
  * update or the "real work" wins, i.e., this is a race condition.
- * 
+ *
  * @see http://forums.activiti.org/en/viewtopic.php?t=2918
  * @author Falko Menge
  */
@@ -104,23 +104,23 @@ public class SetProcessDefinitionVersionCmd implements Command<Void>, Serializab
 
     ProcessDefinitionEntity newProcessDefinition = deploymentCache
       .findDeployedProcessDefinitionByKeyAndVersion(currentProcessDefinition.getKey(), processDefinitionVersion);
-    
+
     validateAndSwitchVersionOfExecution(commandContext, processInstance, newProcessDefinition);
-    
+
     // switch the historic process instance to the new process definition version
     HistoricProcessInstanceManager historicProcessInstanceManager = commandContext.getHistoricProcessInstanceManager();
     if (historicProcessInstanceManager.isHistoryEnabled()) {
       HistoricProcessInstanceEntity historicProcessInstance = historicProcessInstanceManager.findHistoricProcessInstance(processInstanceId);
       historicProcessInstance.setProcessDefinitionId(newProcessDefinition.getId());
     }
-    
+
     // switch all sub-executions of the process instance to the new process definition version
     List<ExecutionEntity> childExecutions = executionManager
-      .findChildExecutionsByParentExecutionId(processInstanceId);
+      .findChildExecutionsByProcessInstanceId(processInstanceId);
     for (ExecutionEntity executionEntity : childExecutions) {
       validateAndSwitchVersionOfExecution(commandContext, executionEntity, newProcessDefinition);
     }
-    
+
     return null;
   }
 
@@ -146,7 +146,7 @@ public class SetProcessDefinitionVersionCmd implements Command<Void>, Serializab
 
     // switch the process instance to the new process definition version
     execution.setProcessDefinition(newProcessDefinition);
-    
+
     // and change possible existing tasks (as the process definition id is stored there too)
     List<TaskEntity> tasks = commandContext.getTaskManager().findTasksByExecutionId(execution.getId());
     for (TaskEntity taskEntity : tasks) {
