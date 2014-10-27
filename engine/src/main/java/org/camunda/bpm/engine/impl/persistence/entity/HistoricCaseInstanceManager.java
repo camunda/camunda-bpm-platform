@@ -61,9 +61,13 @@ public class HistoricCaseInstanceManager extends AbstractHistoricManager {
     if (isHistoryEnabled()) {
       CommandContext commandContext = Context.getCommandContext();
 
-      // TODO: delete historic details
+      commandContext
+        .getHistoricDetailManager()
+        .deleteHistoricDetailsByCaseInstanceId(historicCaseInstanceId);
 
-      // TODO: delete historic variable instances
+      commandContext
+        .getHistoricVariableInstanceManager()
+        .deleteHistoricVariableInstanceByCaseInstanceId(historicCaseInstanceId);
 
       commandContext
         .getHistoricCaseActivityInstanceManager()

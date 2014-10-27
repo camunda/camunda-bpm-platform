@@ -140,6 +140,8 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     evt.setVariableInstanceId(variableInstance.getId());
     evt.setProcessInstanceId(variableInstance.getProcessInstanceId());
     evt.setExecutionId(variableInstance.getExecutionId());
+    evt.setCaseInstanceId(variableInstance.getCaseInstanceId());
+    evt.setCaseExecutionId(variableInstance.getCaseExecutionId());
     evt.setTaskId(variableInstance.getTaskId());
     evt.setRevision(variableInstance.getRevision());
     evt.setVariableName(variableInstance.getName());

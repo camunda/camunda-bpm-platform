@@ -38,7 +38,9 @@ public class HistoricDetailQueryImpl extends AbstractQuery<HistoricDetailQuery, 
   protected String detailId;
   protected String taskId;
   protected String processInstanceId;
+  protected String caseInstanceId;
   protected String executionId;
+  protected String caseExecutionId;
   protected String activityId;
   protected String activityInstanceId;
   protected String type;
@@ -76,8 +78,20 @@ public class HistoricDetailQueryImpl extends AbstractQuery<HistoricDetailQuery, 
     return this;
   }
 
+  public HistoricDetailQuery caseInstanceId(String caseInstanceId) {
+    ensureNotNull("Case instance id", caseInstanceId);
+    this.caseInstanceId = caseInstanceId;
+    return this;
+  }
+
   public HistoricDetailQuery executionId(String executionId) {
     this.executionId = executionId;
+    return this;
+  }
+
+  public HistoricDetailQuery caseExecutionId(String caseExecutionId) {
+    ensureNotNull("Case execution id", caseExecutionId);
+    this.caseExecutionId = caseExecutionId;
     return this;
   }
 
@@ -199,6 +213,18 @@ public class HistoricDetailQueryImpl extends AbstractQuery<HistoricDetailQuery, 
 
   public String getProcessInstanceId() {
     return processInstanceId;
+  }
+
+  public String getCaseInstanceId() {
+    return caseInstanceId;
+  }
+
+  public String getExecutionId() {
+    return executionId;
+  }
+
+  public String getCaseExecutionId() {
+    return caseExecutionId;
   }
 
   public String getTaskId() {

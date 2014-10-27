@@ -241,4 +241,34 @@ public class HistoricVariableInstanceScopeTest extends PluggableProcessEngineTes
 
     assertProcessEnded(pi.getId());
   }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testHistoricCaseVariableInstanceQuery() {
+    // start case instance with variables
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("foo", "bar");
+    String caseInstanceId =  caseService.createCaseInstanceByKey("oneTaskCase", variables).getId();
+
+    String caseExecutionId = caseService.createCaseExecutionQuery().activityId("CasePlanModel_1").singleResult().getId();
+    String taskExecutionId = caseService.createCaseExecutionQuery().activityId("PI_HumanTask_1").singleResult().getId();
+
+    // set variable on both executions
+    caseService.setVariableLocal(caseExecutionId, "case", "execution");
+    caseService.setVariableLocal(taskExecutionId, "task", "execution");
+
+    // update variable on both executions
+    caseService.setVariableLocal(caseExecutionId, "case", "update");
+    caseService.setVariableLocal(taskExecutionId, "task", "update");
+
+    assertEquals(3, historyService.createHistoricVariableInstanceQuery().count());
+    assertEquals(3, historyService.createHistoricVariableInstanceQuery().caseInstanceId(caseInstanceId).count());
+    assertEquals(3, historyService.createHistoricVariableInstanceQuery().caseExecutionIdIn(caseExecutionId, taskExecutionId).count());
+    assertEquals(2, historyService.createHistoricVariableInstanceQuery().caseExecutionIdIn(caseExecutionId).count());
+    assertEquals(1, historyService.createHistoricVariableInstanceQuery().caseExecutionIdIn(taskExecutionId).count());
+
+    assertEquals(5, historyService.createHistoricDetailQuery().count());
+    assertEquals(5, historyService.createHistoricDetailQuery().caseInstanceId(caseInstanceId).count());
+    assertEquals(3, historyService.createHistoricDetailQuery().caseExecutionId(caseExecutionId).count());
+    assertEquals(2, historyService.createHistoricDetailQuery().caseExecutionId(taskExecutionId).count());
+  }
 }

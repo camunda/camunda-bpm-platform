@@ -44,6 +44,9 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
   protected String executionId;
   protected String activityInstanceId;
 
+  protected String caseInstanceId;
+  protected String caseExecutionId;
+
   protected String name;
   protected int revision;
   protected String serializerName;
@@ -74,6 +77,8 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
     this.taskId = historyEvent.getTaskId();
     this.executionId = historyEvent.getExecutionId();
     this.activityInstanceId = historyEvent.getScopeActivityInstanceId();
+    this.caseInstanceId = historyEvent.getCaseInstanceId();
+    this.caseExecutionId = historyEvent.getCaseExecutionId();
     this.name = historyEvent.getVariableName();
     this.serializerName = historyEvent.getSerializerName();
     this.longValue = historyEvent.getLongValue();
@@ -356,6 +361,22 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
     this.activityInstanceId = activityInstanceId;
   }
 
+  public String getCaseInstanceId() {
+    return caseInstanceId;
+  }
+
+  public void setCaseInstanceId(String caseInstanceId) {
+    this.caseInstanceId = caseInstanceId;
+  }
+
+  public String getCaseExecutionId() {
+    return caseExecutionId;
+  }
+
+  public void setCaseExecutionId(String caseExecutionId) {
+    this.caseExecutionId = caseExecutionId;
+  }
+
   public String getErrorMessage() {
     return errorMessage;
   }
@@ -368,6 +389,8 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
       + ", taskId=" + taskId
       + ", executionId=" + executionId
       + ", activityInstanceId=" + activityInstanceId
+      + ", caseInstanceId=" + caseInstanceId
+      + ", caseExecutionId=" + caseExecutionId
       + ", name=" + name
       + ", revision=" + revision
       + ", serializerName=" + serializerName

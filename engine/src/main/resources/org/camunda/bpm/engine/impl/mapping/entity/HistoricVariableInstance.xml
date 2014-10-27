@@ -21,12 +21,14 @@
   <!-- HISTORIC PROCESS VARIABLE INSERT -->
   
   <insert id="insertHistoricVariableInstance" parameterType="org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEntity">
-    insert into ${prefix}ACT_HI_VARINST (ID_, PROC_INST_ID_, EXECUTION_ID_, ACT_INST_ID_, TASK_ID_, NAME_, REV_, VAR_TYPE_, BYTEARRAY_ID_, DOUBLE_, LONG_ , TEXT_, TEXT2_)
+    insert into ${prefix}ACT_HI_VARINST (ID_, PROC_INST_ID_, EXECUTION_ID_, ACT_INST_ID_, CASE_INST_ID_, CASE_EXECUTION_ID_, TASK_ID_, NAME_, REV_, VAR_TYPE_, BYTEARRAY_ID_, DOUBLE_, LONG_ , TEXT_, TEXT2_)
     values (
       #{id, jdbcType=VARCHAR},
       #{processInstanceId, jdbcType=VARCHAR},
       #{executionId, jdbcType=VARCHAR},
       #{activityInstanceId, jdbcType=VARCHAR},
+      #{caseInstanceId, jdbcType=VARCHAR},
+      #{caseExecutionId, jdbcType=VARCHAR},
       #{taskId, jdbcType=VARCHAR},
       #{variableName, jdbcType=VARCHAR},
       #{revision, jdbcType=VARCHAR},
@@ -65,11 +67,13 @@
   </delete>
   
   <!-- HISTORIC PROCESS VARIABLE RESULTMAP -->
-  <resultMap id="historicProcessVariableResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEntity">
+  <resultMap id="historicVariableInstanceResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEntity">
     <id property="id" column="ID_" jdbcType="VARCHAR" />
     <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR" />
     <result property="executionId" column="EXECUTION_ID_" jdbcType="VARCHAR" />
     <result property="activityInstanceId" column="ACT_INST_ID_" jdbcType="VARCHAR" />
+    <result property="caseInstanceId" column="CASE_INST_ID_" jdbcType="VARCHAR" />
+    <result property="caseExecutionId" column="CASE_EXECUTION_ID_" jdbcType="VARCHAR" />
     <result property="taskId" column="TASK_ID_" jdbcType="VARCHAR" />
     <result property="name" column="NAME_" javaType="String" jdbcType="VARCHAR" />
     <result property="revision" column="REV_" jdbcType="INTEGER" />
@@ -81,11 +85,13 @@
     <result property="longValue" column="LONG_" jdbcType="BIGINT" />
   </resultMap>
   
-  <resultMap id="historicProcessVariableResultMap_postgres" type="org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEntity">
+  <resultMap id="historicVariableInstanceResultMap_postgres" type="org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEntity">
     <id property="id" column="ID_" jdbcType="VARCHAR" />
     <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR" />
     <result property="executionId" column="EXECUTION_ID_" jdbcType="VARCHAR" />
     <result property="activityInstanceId" column="ACT_INST_ID_" jdbcType="VARCHAR" />
+    <result property="caseInstanceId" column="CASE_INST_ID_" jdbcType="VARCHAR" />
+    <result property="caseExecutionId" column="CASE_EXECUTION_ID_" jdbcType="VARCHAR" />
     <result property="taskId" column="TASK_ID_" jdbcType="VARCHAR" />
     <result property="name" column="NAME_" javaType="String" jdbcType="VARCHAR" />
     <result property="revision" column="REV_" jdbcType="INTEGER" />
@@ -99,12 +105,17 @@
   
   <!-- HISTORIC VARIABLE SELECT -->
 
-  <select id="selectHistoricVariablesByProcessInstanceId" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="historicProcessVariableResultMap">
+  <select id="selectHistoricVariablesByProcessInstanceId" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="historicVariableInstanceResultMap">
     select * from ${prefix}ACT_HI_VARINST 
     where PROC_INST_ID_ = #{parameter, jdbcType=VARCHAR}
   </select>
 
-  <select id="selectHistoricVariableInstanceByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.HistoricVariableInstanceQueryImpl" resultMap="historicProcessVariableResultMap">
+  <select id="selectHistoricVariablesByCaseInstanceId" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="historicVariableInstanceResultMap">
+    select * from ${prefix}ACT_HI_VARINST
+    where CASE_INST_ID_ = #{parameter, jdbcType=VARCHAR}
+  </select>
+
+  <select id="selectHistoricVariableInstanceByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.HistoricVariableInstanceQueryImpl" resultMap="historicVariableInstanceResultMap">
   	${limitBefore}
     select RES.* ${limitBetween}
     <include refid="selectHistoricVariableInstanceByQueryCriteriaSql"/>
@@ -117,7 +128,7 @@
     <include refid="selectHistoricVariableInstanceByQueryCriteriaSql"/>
   </select>
   
-  <select id="selectHistoricVariableInstanceByQueryCriteria_postgres" parameterType="org.camunda.bpm.engine.impl.HistoricVariableInstanceQueryImpl" resultMap="historicProcessVariableResultMap_postgres">
+  <select id="selectHistoricVariableInstanceByQueryCriteria_postgres" parameterType="org.camunda.bpm.engine.impl.HistoricVariableInstanceQueryImpl" resultMap="historicVariableInstanceResultMap_postgres">
     ${limitBefore}
     select RES.* ${limitBetween}
     <include refid="selectHistoricVariableInstanceByQueryCriteriaSql"/>
@@ -133,6 +144,9 @@
       </if>
       <if test="processInstanceId != null">
         RES.PROC_INST_ID_ = #{processInstanceId}
+      </if>
+      <if test="caseInstanceId != null">
+        RES.CASE_INST_ID_ = #{caseInstanceId}
       </if>
       <if test="variableName != null">
         and RES.NAME_ = #{variableName}
@@ -154,6 +168,15 @@
       <if test="executionIds != null &amp;&amp; executionIds.length > 0">
         and RES.EXECUTION_ID_ in
         <foreach item="item" index="index" collection="executionIds"
+                 open="(" separator="," close=")">
+          #{item}
+        </foreach>
+      </if>
+
+      <!-- caseExecutionIds -->
+      <if test="caseExecutionIds != null &amp;&amp; caseExecutionIds.length > 0">
+        and RES.CASE_EXECUTION_ID_ in
+        <foreach item="item" index="index" collection="caseExecutionIds"
                  open="(" separator="," close=")">
           #{item}
         </foreach>
@@ -227,11 +250,11 @@
    </choose>
   </sql>
   
-  <select id="selectHistoricVariableInstance" resultMap="historicProcessVariableResultMap">
+  <select id="selectHistoricVariableInstance" resultMap="historicVariableInstanceResultMap">
     select * from ${prefix}ACT_HI_VARINST where ID_ = #{id}
   </select>
   
-  <select id="selectHistoricVariableInstanceByVariableInstanceId" resultMap="historicProcessVariableResultMap">
+  <select id="selectHistoricVariableInstanceByVariableInstanceId" resultMap="historicVariableInstanceResultMap">
     select * from ${prefix}ACT_HI_VARINST where ID_ = #{variableInstanceId}
   </select>
   

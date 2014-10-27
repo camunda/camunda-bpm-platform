@@ -39,11 +39,13 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
   private static final long serialVersionUID = 1L;
   protected String variableId;
   protected String processInstanceId;
+  protected String caseInstanceId;
   protected String variableName;
   protected String variableNameLike;
   protected QueryVariableValue queryVariableValue;
   protected String[] taskIds;
   protected String[] executionIds;
+  protected String[] caseExecutionIds;
   protected String[] activityInstanceIds;
 
   protected boolean isByteArrayFetchingEnabled = true;
@@ -72,6 +74,12 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
     return this;
   }
 
+  public HistoricVariableInstanceQuery caseInstanceId(String caseInstanceId) {
+    ensureNotNull("caseInstanceId", caseInstanceId);
+    this.caseInstanceId = caseInstanceId;
+    return this;
+  }
+
   public HistoricVariableInstanceQuery taskIdIn(String... taskIds) {
     ensureNotNull("Task Ids", taskIds);
     this.taskIds = taskIds;
@@ -81,6 +89,12 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
   public HistoricVariableInstanceQuery executionIdIn(String... executionIds) {
     ensureNotNull("Execution Ids", executionIds);
     this.executionIds = executionIds;
+    return this;
+  }
+
+  public HistoricVariableInstanceQuery caseExecutionIdIn(String... caseExecutionIds) {
+    ensureNotNull("Case execution ids", caseExecutionIds);
+    this.caseExecutionIds = caseExecutionIds;
     return this;
   }
 
@@ -182,6 +196,10 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
     return processInstanceId;
   }
 
+  public String getCaseInstanceId() {
+    return caseInstanceId;
+  }
+
   public String[] getActivityInstanceIds() {
     return activityInstanceIds;
   }
@@ -192,6 +210,10 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
 
   public String[] getExecutionIds() {
     return executionIds;
+  }
+
+  public String[] getCaseExecutionIds() {
+    return caseExecutionIds;
   }
 
   public String getVariableName() {

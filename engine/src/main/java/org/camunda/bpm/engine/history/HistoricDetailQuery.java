@@ -14,7 +14,9 @@
 package org.camunda.bpm.engine.history;
 
 import org.camunda.bpm.engine.query.Query;
+import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.runtime.Execution;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
 
 
 /**
@@ -33,13 +35,19 @@ public interface HistoricDetailQuery extends Query<HistoricDetailQuery, Historic
   HistoricDetailQuery detailId(String id);
 
   /** Only select historic variable updates with the given process instance.
-   * {@link ProcessInstance) ids and {@link HistoricProcessInstance} ids match. */
+   * {@link ProcessInstance} ids and {@link HistoricProcessInstance} ids match. */
   HistoricDetailQuery processInstanceId(String processInstanceId);
+
+  /** Only select historic variable updates with the given case instance.
+   * {@link CaseInstance} ids and {@link HistoricCaseInstance} ids match. */
+  HistoricDetailQuery caseInstanceId(String caseInstanceId);
 
   /** Only select historic variable updates with the given execution.
    * Note that {@link Execution} ids are not stored in the history as first class citizen,
    * only process instances are.*/
   HistoricDetailQuery executionId(String executionId);
+
+  HistoricDetailQuery caseExecutionId(String caseExecutionId);
 
   /** Only select historic variable updates associated to the given {@link HistoricActivityInstance activity instance}.
    * @deprecated since 5.2, use {@link #activityInstanceId(String)} instead */

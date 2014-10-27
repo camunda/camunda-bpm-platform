@@ -39,9 +39,4 @@ public class CaseExecutionEntityVariableStore extends AbstractPersistentVariable
     caseExecutionEntity.initializeVariableInstanceBackPointer(variableInstance);
   }
 
-  @Override
-  protected boolean isAutoFireHistoryEvents() {
-    return false;
-  }
-
 }

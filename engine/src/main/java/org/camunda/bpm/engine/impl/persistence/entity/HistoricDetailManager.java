@@ -13,8 +13,9 @@
 
 package org.camunda.bpm.engine.impl.persistence.entity;
 
-import java.util.List;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureOnlyOneNotNull;
 
+import java.util.List;
 import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.impl.HistoricDetailQueryImpl;
 import org.camunda.bpm.engine.impl.Page;
@@ -28,10 +29,25 @@ import org.camunda.bpm.engine.impl.persistence.AbstractHistoricManager;
 public class HistoricDetailManager extends AbstractHistoricManager {
 
   public void deleteHistoricDetailsByProcessInstanceId(String historicProcessInstanceId) {
+    deleteHistoricDetailsByProcessCaseInstanceId(historicProcessInstanceId, null);
+  }
+
+  public void deleteHistoricDetailsByCaseInstanceId(String historicCaseInstanceId) {
+    deleteHistoricDetailsByProcessCaseInstanceId(null, historicCaseInstanceId);
+  }
+
+  public void deleteHistoricDetailsByProcessCaseInstanceId(String historicProcessInstanceId, String historicCaseInstanceId) {
+    ensureOnlyOneNotNull("Only the process instance or case instance id should be set", historicProcessInstanceId, historicCaseInstanceId);
     if (isHistoryEnabled()) {
 
       // delete entries in DB
-      List<HistoricDetail> historicDetails = findHistoricDetailsByProcessInstanceId(historicProcessInstanceId);
+      List<HistoricDetail> historicDetails;
+      if (historicProcessInstanceId != null) {
+        historicDetails = findHistoricDetailsByProcessInstanceId(historicProcessInstanceId);
+      }
+      else {
+        historicDetails = findHistoricDetailsByCaseInstanceId(historicCaseInstanceId);
+      }
 
       for (HistoricDetail historicDetail : historicDetails) {
         ((HistoricDetailEventEntity) historicDetail).delete();
@@ -41,7 +57,8 @@ public class HistoricDetailManager extends AbstractHistoricManager {
       List<HistoricDetailEventEntity> cachedHistoricDetails = getDbEntityManager().getCachedEntitiesByType(HistoricDetailEventEntity.class);
       for (HistoricDetailEventEntity historicDetail : cachedHistoricDetails) {
         // make sure we only delete the right ones (as we cannot make a proper query in the cache)
-        if (historicDetail.getProcessInstanceId().equals(historicProcessInstanceId )) {
+        if ((historicProcessInstanceId != null && historicProcessInstanceId.equals(historicDetail.getProcessInstanceId()))
+            || (historicCaseInstanceId != null && historicCaseInstanceId.equals(historicDetail.getCaseInstanceId()))) {
           historicDetail.delete();
         }
       }
@@ -51,6 +68,11 @@ public class HistoricDetailManager extends AbstractHistoricManager {
   @SuppressWarnings("unchecked")
   public List<HistoricDetail> findHistoricDetailsByProcessInstanceId(String processInstanceId) {
     return getDbEntityManager().selectList("selectHistoricDetailsByProcessInstanceId", processInstanceId);
+  }
+
+  @SuppressWarnings("unchecked")
+  public List<HistoricDetail> findHistoricDetailsByCaseInstanceId(String caseInstanceId) {
+    return getDbEntityManager().selectList("selectHistoricDetailsByCaseInstanceId", caseInstanceId);
   }
 
   public long findHistoricDetailCountByQueryCriteria(HistoricDetailQueryImpl historicVariableUpdateQuery) {

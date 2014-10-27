@@ -219,3 +219,20 @@ create index ACT_IDX_HI_CAS_A_I_COMP on ACT_HI_CASEACTINST(CASE_ACT_ID_, END_TIM
 create index ACT_IDX_HI_CAS_A_I_CASEINST on ACT_HI_CASEACTINST(CASE_INST_ID_, CASE_ACT_ID_);
 
 create index ACT_IDX_TASK_ASSIGNEE on ACT_RU_TASK(ASSIGNEE_);
+
+-- add case instance/execution to historic variable instance and detail --
+alter table ACT_HI_VARINST
+  add CASE_INST_ID_ varchar(64);
+
+alter table ACT_HI_VARINST
+  add CASE_EXECUTION_ID_ varchar(64);
+
+alter table ACT_HI_DETAIL
+  add CASE_INST_ID_ varchar(64);
+
+alter table ACT_HI_DETAIL
+  add CASE_EXECUTION_ID_ varchar(64);
+
+create index ACT_IDX_HI_DETAIL_CASE_INST on ACT_HI_DETAIL(CASE_INST_ID_);
+create index ACT_IDX_HI_DETAIL_CASE_EXEC on ACT_HI_DETAIL(CASE_EXECUTION_ID_);
+create index ACT_IDX_HI_CASEVAR_CASE_INST on ACT_HI_VARINST(CASE_INST_ID_);

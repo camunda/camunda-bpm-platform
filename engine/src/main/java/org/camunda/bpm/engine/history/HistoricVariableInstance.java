@@ -85,6 +85,16 @@ public interface HistoricVariableInstance {
   String getActivityInstanceId();
 
   /**
+   * The case instance reference.
+   */
+  String getCaseInstanceId();
+
+  /**
+   * Return the corresponding case execution id.
+   */
+  String getCaseExecutionId();
+
+  /**
    * If the variable value could not be loaded, this returns the error message.
    * @return an error message indicating why the variable value could not be loaded.
    */
