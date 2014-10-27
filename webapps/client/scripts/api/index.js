@@ -87,24 +87,34 @@ function(
 
   apiModule.factory('camAPI', [
           'camAPIHttpClient',
-  function(camAPIHttpClient) {
+          '$window',
+  function(camAPIHttpClient, $window) {
+
+    function getCurrentEngine() {
+      var uri = $window.location.href;
+
+      var match = uri.match(/\/app\/tasklist\/(\w+)(|\/)/);
+      if (match) {
+        return match[1];
+      } else {
+        throw new Error('no process engine selected');
+      }
+    }
+
     var conf = {
-      apiUri:     'engine-rest/engine',
-      HttpClient: camAPIHttpClient
+      apiUri:     'engine-rest/api/engine',
+      HttpClient: camAPIHttpClient,
+      engine: getCurrentEngine()
     };
 
-    if (window.tasklistConf) {
-      for (var c in window.tasklistConf) {
-        conf[c] = window.tasklistConf[c];
+    if ($window.tasklistConf) {
+      for (var c in $window.tasklistConf) {
+        conf[c] = $window.tasklistConf[c];
       }
     }
 
     return new CamSDK.Client(conf);
   }]);
-
-  // apiModule.factory('camForm', ['CamForm', function(CamEmbeddedForm) {
-  //   return
-  // }]);
 
   return apiModule;
 });
