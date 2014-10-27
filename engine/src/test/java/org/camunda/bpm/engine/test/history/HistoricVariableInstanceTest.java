@@ -17,7 +17,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricDetail;
@@ -25,9 +24,8 @@ import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.history.HistoricVariableInstanceQuery;
 import org.camunda.bpm.engine.history.HistoricVariableUpdate;
-import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEntity;
-import org.camunda.bpm.engine.impl.test.AbstractProcessEngineTestCase;
+import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.CollectionUtil;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
@@ -41,22 +39,7 @@ import org.camunda.bpm.engine.variable.value.ObjectValue;
 /**
  * @author Christian Lipphardt (camunda)
  */
-public class HistoricVariableInstanceTest extends AbstractProcessEngineTestCase {
-
-  @Override
-  protected void initializeProcessEngine() {
-    processEngineConfiguration = (ProcessEngineConfigurationImpl) ProcessEngineConfiguration.createStandaloneProcessEngineConfiguration()
-    .setProcessEngineName("HistoricVariableInstanceTest-engine")
-    .setJdbcDriver("org.h2.Driver")
-    .setJdbcUrl("jdbc:h2:mem:HistoricVariableInstanceTest;DB_CLOSE_DELAY=1000")
-    .setJdbcUsername("sa")
-    .setJdbcPassword("")
-    .setDatabaseSchemaUpdate(ProcessEngineConfigurationImpl.DB_SCHEMA_UPDATE_TRUE)
-    .setJobExecutorActivate(false)
-    .setHistory(ProcessEngineConfiguration.HISTORY_FULL);
-
-    processEngine = processEngineConfiguration.buildProcessEngine();
-  }
+public class HistoricVariableInstanceTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources={
     "org/camunda/bpm/engine/test/examples/bpmn/callactivity/orderProcess.bpmn20.xml",
