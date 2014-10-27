@@ -86,8 +86,6 @@ public abstract class AbstractHistoricCaseActivityInstanceRestServiceInteraction
     boolean enabled = from(content).getBoolean("enabled");
     boolean disabled = from(content).getBoolean("disabled");
     boolean active = from(content).getBoolean("active");
-    boolean failed = from(content).getBoolean("failed");
-    boolean suspended = from(content).getBoolean("suspended");
     boolean completed = from(content).getBoolean("completed");
     boolean terminated = from(content).getBoolean("terminated");
 
@@ -108,8 +106,6 @@ public abstract class AbstractHistoricCaseActivityInstanceRestServiceInteraction
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_IS_ENABLED, enabled);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_IS_DISABLED, disabled);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_IS_ACTIVE, active);
-    Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_IS_FAILED, failed);
-    Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_IS_SUSPENDED, suspended);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_IS_COMPLETED, completed);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_IS_TERMINATED, terminated);
   }

@@ -68,8 +68,6 @@ public class HistoricCaseActivityInstanceQueryDto extends AbstractQueryDto<Histo
   protected Boolean enabled;
   protected Boolean disabled;
   protected Boolean active;
-  protected Boolean failed;
-  protected Boolean suspended;
   protected Boolean completed;
   protected Boolean terminated;
 
@@ -160,16 +158,6 @@ public class HistoricCaseActivityInstanceQueryDto extends AbstractQueryDto<Histo
     this.active = active;
   }
 
-  @CamundaQueryParam(value = "failed", converter = BooleanConverter.class)
-  public void setFailed(Boolean failed) {
-    this.failed = failed;
-  }
-
-  @CamundaQueryParam(value = "suspended", converter = BooleanConverter.class)
-  public void setSuspended(Boolean suspended) {
-    this.suspended = suspended;
-  }
-
   @CamundaQueryParam(value = "completed", converter = BooleanConverter.class)
   public void setCompleted(Boolean completed) {
     this.completed = completed;
@@ -223,10 +211,10 @@ public class HistoricCaseActivityInstanceQueryDto extends AbstractQueryDto<Histo
       query.endedAfter(endedAfter);
     }
     if (finished != null && finished) {
-      query.finished();
+      query.ended();
     }
     if (unfinished != null && unfinished) {
-      query.unfinished();
+      query.notEnded();
     }
     if (available != null && available) {
       query.available();
@@ -239,12 +227,6 @@ public class HistoricCaseActivityInstanceQueryDto extends AbstractQueryDto<Histo
     }
     if (active != null && active) {
       query.active();
-    }
-    if (failed != null && failed) {
-      query.failed();
-    }
-    if (suspended != null && suspended) {
-      query.suspended();
     }
     if (completed != null && completed) {
       query.completed();

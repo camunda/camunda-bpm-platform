@@ -26,7 +26,6 @@
         PARENT_ACT_INST_ID_,
         CASE_DEF_ID_,
         CASE_INST_ID_,
-        CASE_EXECUTION_ID_,
         CASE_ACT_ID_,
         TASK_ID_,
         CALL_PROC_INST_ID_,
@@ -41,7 +40,6 @@
         #{parentCaseActivityInstanceId ,jdbcType=VARCHAR},
         #{caseDefinitionId, jdbcType=VARCHAR},
         #{caseInstanceId, jdbcType=VARCHAR},
-        #{caseExecutionId, jdbcType=VARCHAR},
         #{caseActivityId ,jdbcType=VARCHAR},
         #{taskId ,jdbcType=VARCHAR},
         #{calledProcessInstanceId ,jdbcType=VARCHAR},
@@ -60,7 +58,6 @@
     UPDATE
         ${prefix}ACT_HI_CASEACTINST
     SET
-      CASE_EXECUTION_ID_ = #{caseExecutionId, jdbcType=VARCHAR},
       STATE_ = #{caseActivityInstanceState, jdbcType=INTEGER}
 
       <if test="eventType == 'update'">
@@ -96,7 +93,6 @@
     <result property="parentCaseActivityInstanceId" column="PARENT_ACT_INST_ID_" jdbcType="VARCHAR" />
     <result property="caseDefinitionId" column="CASE_DEF_ID_" jdbcType="VARCHAR" />
     <result property="caseInstanceId" column="CASE_INST_ID_" jdbcType="VARCHAR" />
-    <result property="caseExecutionId" column="CASE_EXECUTION_ID_" jdbcType="VARCHAR" />
     <result property="caseActivityId" column="CASE_ACT_ID_" jdbcType="VARCHAR" />
     <result property="taskId" column="TASK_ID_" jdbcType="VARCHAR" />
     <result property="calledProcessInstanceId" column="CALL_PROC_INST_ID_" jdbcType="VARCHAR" />
@@ -136,9 +132,6 @@
       <if test="caseActivityInstanceId != null">
         and RES.ID_ = #{caseActivityInstanceId}
       </if>
-      <if test="caseExecutionId != null">
-        and RES.CASE_EXECUTION_ID_ = #{caseExecutionId}
-      </if>
       <if test="caseDefinitionId != null">
         and RES.CASE_DEF_ID_ = #{caseDefinitionId}
       </if>
@@ -148,10 +141,10 @@
       <if test="caseActivityName != null">
         and RES.CASE_ACT_NAME_ = #{caseActivityName}
       </if>
-      <if test="finished != null &amp;&amp; finished">
+      <if test="ended != null &amp;&amp; ended">
         and RES.END_TIME_ is not null
       </if>
-      <if test="finished != null &amp;&amp; !finished">
+      <if test="ended != null &amp;&amp; !ended">
         and RES.END_TIME_ is null
       </if>
       <if test="createdBefore != null">

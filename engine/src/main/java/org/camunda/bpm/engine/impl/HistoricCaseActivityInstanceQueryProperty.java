@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,12 +16,13 @@ package org.camunda.bpm.engine.impl;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.camunda.bpm.engine.history.HistoricCaseActivityInstanceQuery;
 import org.camunda.bpm.engine.query.QueryProperty;
 
 
 /**
  * Contains the possible properties which can be used in a {@link HistoricCaseActivityInstanceQuery}.
- * 
+ *
  * @author Sebastian Menski
  */
 public class HistoricCaseActivityInstanceQueryProperty implements QueryProperty {
@@ -32,7 +33,6 @@ public class HistoricCaseActivityInstanceQueryProperty implements QueryProperty 
 
   public static final HistoricCaseActivityInstanceQueryProperty HISTORIC_CASE_ACTIVITY_INSTANCE_ID = new HistoricCaseActivityInstanceQueryProperty("ID_");
   public static final HistoricCaseActivityInstanceQueryProperty CASE_INSTANCE_ID = new HistoricCaseActivityInstanceQueryProperty("CASE_INST_ID_");
-  public static final HistoricCaseActivityInstanceQueryProperty CASE_EXECUTION_ID = new HistoricCaseActivityInstanceQueryProperty("CASE_EXECUTION_ID_");
   public static final HistoricCaseActivityInstanceQueryProperty CASE_ACTIVITY_ID = new HistoricCaseActivityInstanceQueryProperty("CASE_ACT_ID_");
   public static final HistoricCaseActivityInstanceQueryProperty CASE_ACTIVITY_NAME = new HistoricCaseActivityInstanceQueryProperty("CASE_ACT_NAME_");
   public static final HistoricCaseActivityInstanceQueryProperty CASE_DEFINITION_ID = new HistoricCaseActivityInstanceQueryProperty("CASE_DEF_ID_");
@@ -50,7 +50,7 @@ public class HistoricCaseActivityInstanceQueryProperty implements QueryProperty 
   public String getName() {
     return name;
   }
-  
+
   public static HistoricCaseActivityInstanceQueryProperty findByName(String propertyName) {
     return properties.get(propertyName);
   }

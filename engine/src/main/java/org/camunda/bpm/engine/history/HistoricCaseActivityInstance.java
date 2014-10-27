@@ -73,12 +73,6 @@ public interface HistoricCaseActivityInstance {
    /** Check if the case activity is active. */
    boolean isActive();
 
-   /** Check if the case activity is failed. */
-   boolean isFailed();
-
-   /** Check if the case activity is suspended. */
-   boolean isSuspended();
-
    /** Check if the case activity is completed. */
    boolean isCompleted();
 

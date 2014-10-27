@@ -1091,8 +1091,6 @@ public abstract class MockProvider {
     when(mock.isEnabled()).thenReturn(EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_IS_ENABLED);
     when(mock.isDisabled()).thenReturn(EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_IS_DISABLED);
     when(mock.isActive()).thenReturn(EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_IS_ACTIVE);
-    when(mock.isFailed()).thenReturn(EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_IS_FAILED);
-    when(mock.isSuspended()).thenReturn(EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_IS_SUSPENDED);
     when(mock.isCompleted()).thenReturn(EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_IS_COMPLETED);
     when(mock.isTerminated()).thenReturn(EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_IS_TERMINATED);
 
@@ -1114,8 +1112,6 @@ public abstract class MockProvider {
     when(mock.isEnabled()).thenReturn(false);
     when(mock.isDisabled()).thenReturn(false);
     when(mock.isActive()).thenReturn(true);
-    when(mock.isFailed()).thenReturn(false);
-    when(mock.isSuspended()).thenReturn(false);
     when(mock.isCompleted()).thenReturn(false);
     when(mock.isTerminated()).thenReturn(false);
 

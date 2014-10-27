@@ -17,7 +17,6 @@ import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.AVAI
 import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.COMPLETED;
 import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.DISABLED;
 import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.ENABLED;
-import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.FAILED;
 import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.SUSPENDED;
 import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.TERMINATED;
 
@@ -56,6 +55,10 @@ public class HistoricCaseActivityInstanceEventEntity extends HistoricScopeInstan
 
 
   // getters and setters //////////////////////////////////////////////////////
+
+  public String getCaseExecutionId() {
+    return getId();
+  }
 
   public String getCaseActivityId() {
     return caseActivityId;
@@ -135,10 +138,6 @@ public class HistoricCaseActivityInstanceEventEntity extends HistoricScopeInstan
 
   public boolean isActive() {
     return caseActivityInstanceState == ACTIVE.getStateCode();
-  }
-
-  public boolean isFailed() {
-    return caseActivityInstanceState == FAILED.getStateCode();
   }
 
   public boolean isSuspended() {

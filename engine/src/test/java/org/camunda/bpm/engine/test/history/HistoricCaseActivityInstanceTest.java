@@ -18,7 +18,6 @@ import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.AVAI
 import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.COMPLETED;
 import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.DISABLED;
 import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.ENABLED;
-import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.FAILED;
 import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.SUSPENDED;
 import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.TERMINATED;
 import static org.hamcrest.Matchers.equalTo;
@@ -71,6 +70,11 @@ public class HistoricCaseActivityInstanceTest extends CmmnProcessEngineTestCase 
     assertEquals(stage.getCaseInstanceId(), historicStage.getCaseInstanceId());
     assertEquals(stage.getActivityId(), historicStage.getCaseActivityId());
     assertEquals(stage.getActivityName(), historicStage.getCaseActivityName());
+
+    manualStart(stage.getId());
+
+    historicStage = queryHistoricActivityCaseInstance(activityId);
+    assertNotNull(historicStage.getEndTime());
   }
 
   @Deployment
@@ -464,7 +468,6 @@ public class HistoricCaseActivityInstanceTest extends CmmnProcessEngineTestCase 
     "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn",
     "org/camunda/bpm/engine/test/api/cmmn/twoTaskCase.cmmn"
   })
-  @SuppressWarnings("unchecked")
   public void testQuerySorting() {
     String taskId1 = "PI_HumanTask_1";
     String taskId2 = "PI_HumanTask_2";
@@ -671,28 +674,28 @@ public class HistoricCaseActivityInstanceTest extends CmmnProcessEngineTestCase 
     }
 
     assertCount(stateCounts.count(), historicQuery());
-    assertCount(stateCounts.unfinished(), historicQuery().unfinished());
-    assertCount(stateCounts.finished(), historicQuery().finished());
+    assertCount(stateCounts.unfinished(), historicQuery().notEnded());
+    assertCount(stateCounts.finished(), historicQuery().ended());
 
     assertCount(stateCounts.get(ACTIVE), historicQuery().active());
     assertCount(stateCounts.get(AVAILABLE), historicQuery().available());
     assertCount(stateCounts.get(COMPLETED), historicQuery().completed());
     assertCount(stateCounts.get(DISABLED), historicQuery().disabled());
     assertCount(stateCounts.get(ENABLED), historicQuery().enabled());
-    assertCount(stateCounts.get(FAILED), historicQuery().failed());
-    assertCount(stateCounts.get(SUSPENDED), historicQuery().suspended());
     assertCount(stateCounts.get(TERMINATED), historicQuery().terminated());
   }
 
   protected class CaseExecutionStateCountMap extends HashMap<CaseExecutionState, Long> {
 
+    private static final long serialVersionUID = 1L;
+
     public final Collection<CaseExecutionState> ALL_STATES = CaseExecutionState.CASE_EXECUTION_STATES.values();
-    public final Collection<CaseExecutionState> FINISHED_STATES = Arrays.asList(COMPLETED, TERMINATED);
-    public final Collection<CaseExecutionState> UNFINISHED_STATES;
+    public final Collection<CaseExecutionState> ENDED_STATES = Arrays.asList(COMPLETED, TERMINATED);
+    public final Collection<CaseExecutionState> NOT_ENDED_STATES;
 
     public CaseExecutionStateCountMap() {
-      UNFINISHED_STATES = new ArrayList<CaseExecutionState>(ALL_STATES);
-      UNFINISHED_STATES.removeAll(FINISHED_STATES);
+      NOT_ENDED_STATES = new ArrayList<CaseExecutionState>(ALL_STATES);
+      NOT_ENDED_STATES.removeAll(ENDED_STATES);
     }
 
     public Long get(CaseExecutionState state) {
@@ -704,11 +707,11 @@ public class HistoricCaseActivityInstanceTest extends CmmnProcessEngineTestCase 
     }
 
     public Long finished() {
-      return count(FINISHED_STATES);
+      return count(ENDED_STATES);
     }
 
     public Long unfinished() {
-      return count(UNFINISHED_STATES);
+      return count(NOT_ENDED_STATES);
     }
 
     public Long count(Collection<CaseExecutionState> states) {
@@ -721,6 +724,7 @@ public class HistoricCaseActivityInstanceTest extends CmmnProcessEngineTestCase 
 
   }
 
+  @SuppressWarnings({ "rawtypes", "unchecked" })
   protected void assertQuerySorting(String property, Query<?, ?> query, Comparable... items) {
     AbstractQuery<?, ?> queryImpl = (AbstractQuery<?, ?>) query;
 

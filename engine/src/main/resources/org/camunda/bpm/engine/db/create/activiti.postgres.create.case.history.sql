@@ -18,7 +18,6 @@ create table ACT_HI_CASEACTINST (
     PARENT_ACT_INST_ID_ varchar(64),
     CASE_DEF_ID_ varchar(64) not null,
     CASE_INST_ID_ varchar(64) not null,
-    CASE_EXECUTION_ID_ varchar(64) not null,
     CASE_ACT_ID_ varchar(255) not null,
     TASK_ID_ varchar(64),
     CALL_PROC_INST_ID_ varchar(64),

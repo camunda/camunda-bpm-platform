@@ -15,6 +15,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.ws.rs.core.Response.Status;
 import javax.xml.registry.InvalidRequestException;
 
@@ -333,8 +334,6 @@ public abstract class AbstractHistoricCaseActivityInstanceRestServiceQueryTest e
     boolean enabled = from(content).getBoolean("[0].enabled");
     boolean disabled = from(content).getBoolean("[0].disabled");
     boolean active = from(content).getBoolean("[0].active");
-    boolean failed = from(content).getBoolean("[0].failed");
-    boolean suspended = from(content).getBoolean("[0].suspended");
     boolean completed = from(content).getBoolean("[0].completed");
     boolean terminated = from(content).getBoolean("[0].terminated");
 
@@ -355,8 +354,6 @@ public abstract class AbstractHistoricCaseActivityInstanceRestServiceQueryTest e
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_IS_ENABLED, enabled);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_IS_DISABLED, disabled);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_IS_ACTIVE, active);
-    Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_IS_FAILED, failed);
-    Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_IS_SUSPENDED, suspended);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_IS_COMPLETED, completed);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_IS_TERMINATED, terminated);
   }
@@ -454,8 +451,6 @@ public abstract class AbstractHistoricCaseActivityInstanceRestServiceQueryTest e
     parameters.put("enabled", MockProvider.EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_IS_ENABLED);
     parameters.put("disabled", MockProvider.EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_IS_DISABLED);
     parameters.put("active", MockProvider.EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_IS_ACTIVE);
-    parameters.put("failed", MockProvider.EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_IS_FAILED);
-    parameters.put("suspended", MockProvider.EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_IS_SUSPENDED);
     parameters.put("completed", MockProvider.EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_IS_COMPLETED);
     parameters.put("terminated", MockProvider.EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_IS_TERMINATED);
 
@@ -470,16 +465,14 @@ public abstract class AbstractHistoricCaseActivityInstanceRestServiceQueryTest e
     Boolean enabled = booleanParams.get("enabled");
     Boolean disabled = booleanParams.get("disabled");
     Boolean active = booleanParams.get("active");
-    Boolean failed = booleanParams.get("failed");
-    Boolean suspended = booleanParams.get("suspended");
     Boolean completed = booleanParams.get("completed");
     Boolean terminated = booleanParams.get("terminated");
 
     if (finished != null && finished) {
-      verify(mockedQuery).finished();
+      verify(mockedQuery).ended();
     }
     if (unfinished != null && unfinished) {
-      verify(mockedQuery).unfinished();
+      verify(mockedQuery).notEnded();
     }
     if (available != null && available) {
       verify(mockedQuery).available();
@@ -492,12 +485,6 @@ public abstract class AbstractHistoricCaseActivityInstanceRestServiceQueryTest e
     }
     if (active != null && active) {
       verify(mockedQuery).active();
-    }
-    if (failed != null && failed) {
-      verify(mockedQuery).failed();
-    }
-    if (suspended != null && suspended) {
-      verify(mockedQuery).suspended();
     }
     if (completed != null && completed) {
       verify(mockedQuery).completed();
@@ -519,7 +506,7 @@ public abstract class AbstractHistoricCaseActivityInstanceRestServiceQueryTest e
         .get(HISTORIC_CASE_ACTIVITY_INSTANCE_RESOURCE_URL);
 
     InOrder inOrder = inOrder(mockedQuery);
-    inOrder.verify(mockedQuery).finished();
+    inOrder.verify(mockedQuery).ended();
     inOrder.verify(mockedQuery).list();
 
     String content = response.asString();
@@ -548,7 +535,7 @@ public abstract class AbstractHistoricCaseActivityInstanceRestServiceQueryTest e
         .post(HISTORIC_CASE_ACTIVITY_INSTANCE_RESOURCE_URL);
 
     InOrder inOrder = inOrder(mockedQuery);
-    inOrder.verify(mockedQuery).finished();
+    inOrder.verify(mockedQuery).ended();
     inOrder.verify(mockedQuery).list();
 
     String content = response.asString();
@@ -578,7 +565,7 @@ public abstract class AbstractHistoricCaseActivityInstanceRestServiceQueryTest e
         .get(HISTORIC_CASE_ACTIVITY_INSTANCE_RESOURCE_URL);
 
     InOrder inOrder = inOrder(mockedHistoricCaseActivityInstanceQuery);
-    inOrder.verify(mockedHistoricCaseActivityInstanceQuery).unfinished();
+    inOrder.verify(mockedHistoricCaseActivityInstanceQuery).notEnded();
     inOrder.verify(mockedHistoricCaseActivityInstanceQuery).list();
 
     String content = response.asString();
@@ -612,7 +599,7 @@ public abstract class AbstractHistoricCaseActivityInstanceRestServiceQueryTest e
         .post(HISTORIC_CASE_ACTIVITY_INSTANCE_RESOURCE_URL);
 
     InOrder inOrder = inOrder(mockedHistoricCaseActivityInstanceQuery);
-    inOrder.verify(mockedHistoricCaseActivityInstanceQuery).unfinished();
+    inOrder.verify(mockedHistoricCaseActivityInstanceQuery).notEnded();
     inOrder.verify(mockedHistoricCaseActivityInstanceQuery).list();
 
     String content = response.asString();

@@ -35,8 +35,6 @@ public class HistoricCaseActivityInstanceDto {
   private Boolean enabled;
   private Boolean disabled;
   private Boolean active;
-  private Boolean failed;
-  private Boolean suspended;
   private Boolean completed;
   private Boolean terminated;
 
@@ -108,14 +106,6 @@ public class HistoricCaseActivityInstanceDto {
     return active;
   }
 
-  public Boolean getFailed() {
-    return failed;
-  }
-
-  public Boolean getSuspended() {
-    return suspended;
-  }
-
   public Boolean getCompleted() {
     return completed;
   }
@@ -145,8 +135,6 @@ public class HistoricCaseActivityInstanceDto {
     dto.enabled = historicCaseActivityInstance.isEnabled();
     dto.disabled = historicCaseActivityInstance.isDisabled();
     dto.active = historicCaseActivityInstance.isActive();
-    dto.failed = historicCaseActivityInstance.isFailed();
-    dto.suspended = historicCaseActivityInstance.isSuspended();
     dto.completed = historicCaseActivityInstance.isCompleted();
     dto.terminated = historicCaseActivityInstance.isTerminated();
 

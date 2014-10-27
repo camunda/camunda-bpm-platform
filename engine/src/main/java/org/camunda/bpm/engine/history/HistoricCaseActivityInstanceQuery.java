@@ -28,14 +28,14 @@ public interface HistoricCaseActivityInstanceQuery extends Query<HistoricCaseAct
   /** Only select historic case activity instances with the given id (primary key within history tables). */
   HistoricCaseActivityInstanceQuery caseActivityInstanceId(String caseActivityInstanceId);
 
+  /** Only select historic case activity instances for the given case execution */
+  HistoricCaseActivityInstanceQuery caseExecutionId(String caseExecutionId);
+
   /** Only select historic case activity instances with the given case instance. */
   HistoricCaseActivityInstanceQuery caseInstanceId(String caseInstanceId);
 
   /** Only select historic case activity instances for the given case definition */
   HistoricCaseActivityInstanceQuery caseDefinitionId(String caseDefinitionId);
-
-  /** Only select historic case activity instances for the given case execution */
-  HistoricCaseActivityInstanceQuery caseExecutionId(String caseExecutionId);
 
   /** Only select historic case activity instances for the given case activity (id from CMMN 1.0 XML) */
   HistoricCaseActivityInstanceQuery caseActivityId(String caseActivityId);
@@ -49,17 +49,17 @@ public interface HistoricCaseActivityInstanceQuery extends Query<HistoricCaseAct
   /** Only select historic case activity instances that were created after the given date. */
   HistoricCaseActivityInstanceQuery createdAfter(Date date);
 
-  /** Only select historic case activity instances that were ended before the given date. */
+  /** Only select historic case activity instances that were ended (ie. completed or terminated) before the given date. */
   HistoricCaseActivityInstanceQuery endedBefore(Date date);
 
-  /** Only select historic case activity instances that were ended after the given date. */
+  /** Only select historic case activity instances that were ended (ie. completed or terminated) after the given date. */
   HistoricCaseActivityInstanceQuery endedAfter(Date date);
 
-  /** Only select historic case activity instances which are already finished */
-  HistoricCaseActivityInstanceQuery finished();
+  /** Only select historic case activity instances which are already ended (ie. completed or terminated). */
+  HistoricCaseActivityInstanceQuery ended();
 
-  /** Only select historic case activity instances which are not finished */
-  HistoricCaseActivityInstanceQuery unfinished();
+  /** Only select historic case activity instances which are not ended (ie. completed or terminated). */
+  HistoricCaseActivityInstanceQuery notEnded();
 
   /** Only select historic case activity instances which are available */
   HistoricCaseActivityInstanceQuery available();
@@ -72,12 +72,6 @@ public interface HistoricCaseActivityInstanceQuery extends Query<HistoricCaseAct
 
   /** Only select historic case activity instances which are active */
   HistoricCaseActivityInstanceQuery active();
-
-  /** Only select historic case activity instances which are failed */
-  HistoricCaseActivityInstanceQuery failed();
-
-  /** Only select historic case activity instances which are suspended */
-  HistoricCaseActivityInstanceQuery suspended();
 
   /** Only select historic case activity instances which are completed */
   HistoricCaseActivityInstanceQuery completed();

@@ -18,7 +18,6 @@ create table ACT_HI_CASEACTINST (
     PARENT_ACT_INST_ID_ varchar(64),
     CASE_DEF_ID_ varchar(64) not null,
     CASE_INST_ID_ varchar(64) not null,
-    CASE_EXECUTION_ID_ varchar(64) not null,
     CASE_ACT_ID_ varchar(255) not null,
     TASK_ID_ varchar(64),
     CALL_PROC_INST_ID_ varchar(64),
@@ -35,5 +34,5 @@ create index ACT_IDX_HI_CAS_I_CLOSE on ACT_HI_CASEINST(CLOSE_TIME_);
 create index ACT_IDX_HI_CAS_I_BUSKEY on ACT_HI_CASEINST(BUSINESS_KEY_);
 create index ACT_IDX_HI_CAS_A_I_CREATE on ACT_HI_CASEACTINST(CREATE_TIME_);
 create index ACT_IDX_HI_CAS_A_I_END on ACT_HI_CASEACTINST(END_TIME_);
-create index ACT_IDX_HI_CAS_A_I_COMP on ACT_HI_CASEACTINST(CASE_EXECUTION_ID_, CASE_ACT_ID_, END_TIME_, ID_);
+create index ACT_IDX_HI_CAS_A_I_COMP on ACT_HI_CASEACTINST(CASE_ACT_ID_, END_TIME_, ID_);
 create index ACT_IDX_HI_CAS_A_I_CASEINST on ACT_HI_CASEACTINST(CASE_INST_ID_, CASE_ACT_ID_);

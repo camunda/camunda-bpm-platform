@@ -18,9 +18,9 @@ import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.AVAI
 import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.COMPLETED;
 import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.DISABLED;
 import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.ENABLED;
-import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.FAILED;
 import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.SUSPENDED;
 import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.TERMINATED;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNull;
 
 import java.util.Date;
@@ -37,6 +37,8 @@ import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
  */
 public class HistoricCaseActivityInstanceQueryImpl extends AbstractQuery<HistoricCaseActivityInstanceQuery, HistoricCaseActivityInstance> implements HistoricCaseActivityInstanceQuery {
 
+  private static final long serialVersionUID = 1L;
+
   protected String caseActivityInstanceId;
   protected String caseInstanceId;
   protected String caseDefinitionId;
@@ -47,7 +49,7 @@ public class HistoricCaseActivityInstanceQueryImpl extends AbstractQuery<Histori
   protected Date createdAfter;
   protected Date endedBefore;
   protected Date endedAfter;
-  protected Boolean finished;
+  protected Boolean ended;
   protected Integer caseActivityInstanceState;
 
   public HistoricCaseActivityInstanceQueryImpl() {
@@ -76,62 +78,72 @@ public class HistoricCaseActivityInstanceQueryImpl extends AbstractQuery<Histori
   }
 
   public HistoricCaseActivityInstanceQuery caseActivityInstanceId(String caseActivityInstanceId) {
+    ensureNotNull(NotValidException.class, "caseActivityInstanceId", caseActivityInstanceId);
     this.caseActivityInstanceId = caseActivityInstanceId;
     return this;
   }
 
   public HistoricCaseActivityInstanceQuery caseInstanceId(String caseInstanceId) {
+    ensureNotNull(NotValidException.class, "caseInstanceId", caseInstanceId);
     this.caseInstanceId = caseInstanceId;
     return this;
   }
 
   public HistoricCaseActivityInstanceQuery caseDefinitionId(String caseDefinitionId) {
+    ensureNotNull(NotValidException.class, "caseDefinitionId", caseDefinitionId);
     this.caseDefinitionId = caseDefinitionId;
     return this;
   }
 
   public HistoricCaseActivityInstanceQuery caseExecutionId(String caseExecutionId) {
-    this.caseExecutionId = caseExecutionId;
+    ensureNotNull(NotValidException.class, "caseExecutionId", caseExecutionId);
+    this.caseActivityInstanceId = caseExecutionId;
     return this;
   }
 
   public HistoricCaseActivityInstanceQuery caseActivityId(String caseActivityId) {
+    ensureNotNull(NotValidException.class, "caseActivityId", caseActivityId);
     this.caseActivityId = caseActivityId;
     return this;
   }
 
   public HistoricCaseActivityInstanceQuery caseActivityName(String caseActivityName) {
+    ensureNotNull(NotValidException.class, "caseActivityName", caseActivityName);
     this.caseActivityName = caseActivityName;
     return this;
   }
 
   public HistoricCaseActivityInstanceQuery createdBefore(Date date) {
+    ensureNotNull(NotValidException.class, "createdBefore", date);
     this.createdBefore = date;
     return this;
   }
 
   public HistoricCaseActivityInstanceQuery createdAfter(Date date) {
+    ensureNotNull(NotValidException.class, "createdAfter", date);
     this.createdAfter = date;
     return this;
   }
 
   public HistoricCaseActivityInstanceQuery endedBefore(Date date) {
+    ensureNotNull(NotValidException.class, "finishedBefore", date);
     this.endedBefore = date;
     return this;
   }
 
   public HistoricCaseActivityInstanceQuery endedAfter(Date date) {
+    ensureNotNull(NotValidException.class, "finishedAfter", date);
     this.endedAfter = date;
     return this;
   }
 
-  public HistoricCaseActivityInstanceQuery finished() {
-    this.finished = true;
+  public HistoricCaseActivityInstanceQuery ended() {
+    this.ended = true;
     return this;
   }
 
-  public HistoricCaseActivityInstanceQuery unfinished() {
-    this.finished = false;
+  public HistoricCaseActivityInstanceQuery notEnded() {
+    this.ended = false;
     return this;
   }
 
@@ -156,12 +168,6 @@ public class HistoricCaseActivityInstanceQueryImpl extends AbstractQuery<Histori
   public HistoricCaseActivityInstanceQuery active() {
     ensureNull(NotValidException.class, "Already querying for case activity instance state '" + caseActivityInstanceState + "'", "caseActivityState", caseActivityInstanceState);
     this.caseActivityInstanceState = ACTIVE.getStateCode();
-    return this;
-  }
-
-  public HistoricCaseActivityInstanceQuery failed() {
-    ensureNull(NotValidException.class, "Already querying for case activity instance state '" + caseActivityInstanceState + "'", "caseActivityState", caseActivityInstanceState);
-    this.caseActivityInstanceState = FAILED.getStateCode();
     return this;
   }
 
@@ -196,7 +202,7 @@ public class HistoricCaseActivityInstanceQueryImpl extends AbstractQuery<Histori
   }
 
   public HistoricCaseActivityInstanceQuery orderByCaseExecutionId() {
-    orderBy(HistoricCaseActivityInstanceQueryProperty.CASE_EXECUTION_ID);
+    orderBy(HistoricCaseActivityInstanceQueryProperty.HISTORIC_CASE_ACTIVITY_INSTANCE_ID);
     return this;
   }
 
@@ -244,10 +250,6 @@ public class HistoricCaseActivityInstanceQueryImpl extends AbstractQuery<Histori
     return caseDefinitionId;
   }
 
-  public String getCaseExecutionId() {
-    return caseExecutionId;
-  }
-
   public String getCaseActivityId() {
     return caseActivityId;
   }
@@ -272,8 +274,8 @@ public class HistoricCaseActivityInstanceQueryImpl extends AbstractQuery<Histori
     return endedAfter;
   }
 
-  public Boolean getFinished() {
-    return finished;
+  public Boolean getEnded() {
+    return ended;
   }
 
   public Integer getCaseActivityInstanceState() {
