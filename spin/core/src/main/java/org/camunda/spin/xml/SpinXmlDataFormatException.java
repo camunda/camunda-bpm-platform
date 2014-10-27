@@ -18,7 +18,7 @@ import org.camunda.spin.spi.SpinDataFormatException;
  * @author Daniel Meyer
  *
  */
-public class SpinXmlDataFormatException extends org.camunda.spin.spi.SpinDataFormatException {
+public class SpinXmlDataFormatException extends SpinDataFormatException {
 
   private static final long serialVersionUID = 1L;
 

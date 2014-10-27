@@ -15,7 +15,7 @@ package org.camunda.spin.impl.xml.dom.format.spi;
 import javax.xml.bind.JAXBContext;
 
 /**
- * Provider for the JAXBContext. The JAXBContext cashes information about the types
+ * Provider for the JAXBContext. The JAXBContext caches information about the types
  * it is capable of processing. Since the context is expensive to create, it is useful to cache
  * it. Different applications may require different caching strategies.
  *
