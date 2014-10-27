@@ -54,6 +54,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
@@ -393,6 +394,14 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_DEFINITION_IS_SUSPENDED, embeddedProcessDefinition.get("suspended"));
     Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_APPLICATION_CONTEXT_PATH, embeddedProcessDefinition.get("contextPath"));
 
+    Map<String, Object> links = (Map<String, Object>) embeddedProcessDefinition.get("_links");
+    Assert.assertEquals(3, links.size());
+    assertHalLink(links, "self", "/process-definition/" +  MockProvider.EXAMPLE_PROCESS_DEFINITION_ID);
+    assertHalLink(links, "deployment", "/deployment/" +  MockProvider.EXAMPLE_DEPLOYMENT_ID);
+    assertHalLink(links, "resource", "/deployment/" +  MockProvider.EXAMPLE_DEPLOYMENT_ID + "/resources/"
+        + MockProvider.EXAMPLE_PROCESS_DEFINITION_RESOURCE_NAME);
+
+
     // validate embedded caseDefinitions:
     List<Map<String,Object>> embeddedCaseDefinitions = from(content).getList("_embedded.caseDefinition");
     Assert.assertEquals("There should be one caseDefinition returned.", 1, embeddedCaseDefinitions.size());
@@ -406,6 +415,21 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     Assert.assertEquals(MockProvider.EXAMPLE_CASE_DEFINITION_RESOURCE_NAME, embeddedCaseDefinition.get("resource"));
     Assert.assertEquals(MockProvider.EXAMPLE_DEPLOYMENT_ID, embeddedCaseDefinition.get("deploymentId"));
     Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_APPLICATION_CONTEXT_PATH, embeddedCaseDefinition.get("contextPath"));
+
+    links = (Map<String, Object>) embeddedCaseDefinition.get("_links");
+    Assert.assertEquals(3, links.size());
+    assertHalLink(links, "self", "/case-definition/" +  MockProvider.EXAMPLE_CASE_DEFINITION_ID);
+    assertHalLink(links, "deployment", "/deployment/" +  MockProvider.EXAMPLE_DEPLOYMENT_ID);
+    assertHalLink(links, "resource", "/deployment/" +  MockProvider.EXAMPLE_DEPLOYMENT_ID + "/resources/"
+        + MockProvider.EXAMPLE_CASE_DEFINITION_RESOURCE_NAME);
+  }
+
+  protected void assertHalLink(Map<String, Object> links, String key, String expectedLink) {
+    Map<String, Object> linkObject = (Map<String, Object>) links.get(key);
+    Assert.assertNotNull(linkObject);
+
+    String actualLink = (String) linkObject.get("href");
+    Assert.assertEquals(expectedLink, actualLink);
   }
 
   @Test

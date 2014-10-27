@@ -116,16 +116,7 @@ public class CaseDefinitionQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(deploymentOneId, caseDefinition.getDeploymentId());
   }
 
-  public void testQueryByDeploymentId() {
-    CaseDefinitionQuery query = repositoryService.createCaseDefinitionQuery();
-
-    query
-      .deploymentId(deploymentOneId);
-
-    verifyQueryResults(query, 2);
-  }
-
-  public void testQueryByDeploymentIds() {
+  public void testQueryByCaseDefinitionIds() {
     // empty list
     assertTrue(repositoryService.createCaseDefinitionQuery().caseDefinitionIdIn("a", "b").list().isEmpty());
 
@@ -146,6 +137,15 @@ public class CaseDefinitionQueryTest extends PluggableProcessEngineTestCase {
         fail("Expected to find case definition "+ caseDefinition);
       }
     }
+  }
+
+  public void testQueryByDeploymentId() {
+    CaseDefinitionQuery query = repositoryService.createCaseDefinitionQuery();
+
+    query
+      .deploymentId(deploymentOneId);
+
+    verifyQueryResults(query, 2);
   }
 
   public void testQueryByInvalidDeploymentId() {
