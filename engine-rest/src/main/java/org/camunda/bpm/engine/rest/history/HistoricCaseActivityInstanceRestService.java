@@ -13,9 +13,8 @@
 package org.camunda.bpm.engine.rest.history;
 
 import java.util.List;
-import javax.ws.rs.Consumes;
+
 import javax.ws.rs.GET;
-import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -27,7 +26,6 @@ import javax.ws.rs.core.UriInfo;
 import org.camunda.bpm.engine.history.HistoricCaseActivityInstanceQuery;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricCaseActivityInstanceDto;
-import org.camunda.bpm.engine.rest.dto.history.HistoricCaseActivityInstanceQueryDto;
 import org.camunda.bpm.engine.rest.sub.history.HistoricCaseActivityInstanceResource;
 
 @Path(HistoricCaseActivityInstanceRestService.PATH)
@@ -48,21 +46,8 @@ public interface HistoricCaseActivityInstanceRestService {
                                                                          @QueryParam("firstResult") Integer firstResult,
                                                                          @QueryParam("maxResults") Integer maxResults);
 
-  @POST
-  @Consumes(MediaType.APPLICATION_JSON)
-  @Produces(MediaType.APPLICATION_JSON)
-  List<HistoricCaseActivityInstanceDto> queryHistoricCaseActivityInstances(HistoricCaseActivityInstanceQueryDto query,
-                                                                           @QueryParam("firstResult") Integer firstResult,
-                                                                           @QueryParam("maxResults") Integer maxResults);
-
   @GET
   @Path("/count")
   @Produces(MediaType.APPLICATION_JSON)
   CountResultDto getHistoricCaseActivityInstancesCount(@Context UriInfo uriInfo);
-
-  @POST
-  @Path("/count")
-  @Consumes(MediaType.APPLICATION_JSON)
-  @Produces(MediaType.APPLICATION_JSON)
-  CountResultDto queryHistoricCaseActivityInstancesCount(HistoricCaseActivityInstanceQueryDto query);
 }

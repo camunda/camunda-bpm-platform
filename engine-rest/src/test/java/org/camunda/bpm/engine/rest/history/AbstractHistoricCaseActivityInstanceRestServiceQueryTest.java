@@ -80,20 +80,6 @@ public abstract class AbstractHistoricCaseActivityInstanceRestServiceQueryTest e
   }
 
   @Test
-  public void testNoParametersQueryAsPost() {
-    given()
-      .contentType(POST_JSON_CONTENT_TYPE)
-      .body(EMPTY_JSON_OBJECT)
-    .expect()
-      .statusCode(Status.OK.getStatusCode())
-    .when()
-      .post(HISTORIC_CASE_ACTIVITY_INSTANCE_RESOURCE_URL);
-
-    verify(mockedQuery).list();
-    verifyNoMoreInteractions(mockedQuery);
-  }
-
-  @Test
   public void testInvalidSortingOptions() {
     executeAndVerifySorting("anInvalidSortByOption", "asc", Status.BAD_REQUEST);
     executeAndVerifySorting("instanceId", "anInvalidSortOrderOption", Status.BAD_REQUEST);
@@ -285,19 +271,6 @@ public abstract class AbstractHistoricCaseActivityInstanceRestServiceQueryTest e
   }
 
   @Test
-  public void testQueryCountForPost() {
-    given()
-      .contentType(POST_JSON_CONTENT_TYPE)
-      .body(EMPTY_JSON_OBJECT)
-    .then().expect()
-      .body("count", equalTo(1))
-    .when()
-      .post(HISTORIC_CASE_ACTIVITY_INSTANCE_COUNT_RESOURCE_URL);
-
-    verify(mockedQuery).count();
-  }
-
-  @Test
   public void testSimpleHistoricActivityQuery() {
     String caseInstanceId = MockProvider.EXAMPLE_CASE_INSTANCE_ID;
 
@@ -373,21 +346,6 @@ public abstract class AbstractHistoricCaseActivityInstanceRestServiceQueryTest e
   }
 
   @Test
-  public void testAdditionalParametersAsPost() {
-    Map<String, String> stringQueryParameters = getCompleteStringQueryParameters();
-
-    given()
-      .contentType(POST_JSON_CONTENT_TYPE)
-      .body(stringQueryParameters)
-    .then().expect()
-      .statusCode(Status.OK.getStatusCode())
-    .when()
-      .post(HISTORIC_CASE_ACTIVITY_INSTANCE_RESOURCE_URL);
-
-    verifyStringParameterQueryInvocations();
-  }
-
-  @Test
   public void testBooleanParameters() {
     Map<String, Boolean> params = getCompleteBooleanQueryParameters();
 
@@ -397,21 +355,6 @@ public abstract class AbstractHistoricCaseActivityInstanceRestServiceQueryTest e
       .statusCode(Status.OK.getStatusCode())
     .when()
       .get(HISTORIC_CASE_ACTIVITY_INSTANCE_RESOURCE_URL);
-
-    verifyBooleanParameterQueryInvocations();
-  }
-
-  @Test
-  public void testBooleanParametersAsPost() {
-    Map<String, Boolean> params = getCompleteBooleanQueryParameters();
-
-    given()
-      .contentType(POST_JSON_CONTENT_TYPE)
-      .body(params)
-    .then().expect()
-      .statusCode(Status.OK.getStatusCode())
-    .when()
-      .post(HISTORIC_CASE_ACTIVITY_INSTANCE_RESOURCE_URL);
 
     verifyBooleanParameterQueryInvocations();
   }
@@ -522,35 +465,6 @@ public abstract class AbstractHistoricCaseActivityInstanceRestServiceQueryTest e
   }
 
   @Test
-  public void testFinishedHistoricCaseActivityQueryAsPost() {
-    Map<String, Boolean> body = new HashMap<String, Boolean>();
-    body.put("finished", true);
-
-    Response response = given()
-        .contentType(POST_JSON_CONTENT_TYPE)
-        .body(body)
-      .then().expect()
-        .statusCode(Status.OK.getStatusCode())
-      .when()
-        .post(HISTORIC_CASE_ACTIVITY_INSTANCE_RESOURCE_URL);
-
-    InOrder inOrder = inOrder(mockedQuery);
-    inOrder.verify(mockedQuery).ended();
-    inOrder.verify(mockedQuery).list();
-
-    String content = response.asString();
-    List<String> instances = from(content).getList("");
-    Assert.assertEquals(1, instances.size());
-    Assert.assertNotNull(instances.get(0));
-
-    String returnedCaseDefinitionId = from(content).getString("[0].caseDefinitionId");
-    String returnedActivityEndTime = from(content).getString("[0].endTime");
-
-    Assert.assertEquals(MockProvider.EXAMPLE_CASE_DEFINITION_ID, returnedCaseDefinitionId);
-    Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_END_TIME, returnedActivityEndTime);
-  }
-
-  @Test
   public void testUnfinishedHistoricCaseActivityQuery() {
     List<HistoricCaseActivityInstance> mockedHistoricCaseActivityInstances = MockProvider.createMockRunningHistoricCaseActivityInstances();
     HistoricCaseActivityInstanceQuery mockedHistoricCaseActivityInstanceQuery = mock(HistoricCaseActivityInstanceQuery.class);
@@ -581,40 +495,6 @@ public abstract class AbstractHistoricCaseActivityInstanceRestServiceQueryTest e
   }
 
   @Test
-  public void testUnfinishedHistoricCaseActivityQueryAsPost() {
-    List<HistoricCaseActivityInstance> mockedHistoricCaseActivityInstances = MockProvider.createMockRunningHistoricCaseActivityInstances();
-    HistoricCaseActivityInstanceQuery mockedHistoricCaseActivityInstanceQuery = mock(HistoricCaseActivityInstanceQuery.class);
-    when(mockedHistoricCaseActivityInstanceQuery.list()).thenReturn(mockedHistoricCaseActivityInstances);
-    when(processEngine.getHistoryService().createHistoricCaseActivityInstanceQuery()).thenReturn(mockedHistoricCaseActivityInstanceQuery);
-
-    Map<String, Boolean> body = new HashMap<String, Boolean>();
-    body.put("unfinished", true);
-
-    Response response = given()
-        .contentType(POST_JSON_CONTENT_TYPE)
-        .body(body)
-      .then().expect()
-        .statusCode(Status.OK.getStatusCode())
-      .when()
-        .post(HISTORIC_CASE_ACTIVITY_INSTANCE_RESOURCE_URL);
-
-    InOrder inOrder = inOrder(mockedHistoricCaseActivityInstanceQuery);
-    inOrder.verify(mockedHistoricCaseActivityInstanceQuery).notEnded();
-    inOrder.verify(mockedHistoricCaseActivityInstanceQuery).list();
-
-    String content = response.asString();
-    List<String> instances = from(content).getList("");
-    Assert.assertEquals(1, instances.size());
-    Assert.assertNotNull(instances.get(0));
-
-    String returnedCaseDefinitionId = from(content).getString("[0].caseDefinitionId");
-    String returnedActivityEndTime = from(content).getString("[0].endTime");
-
-    Assert.assertEquals(MockProvider.EXAMPLE_CASE_DEFINITION_ID, returnedCaseDefinitionId);
-    Assert.assertNull(returnedActivityEndTime);
-  }
-
-  @Test
   public void testHistoricAfterAndBeforeCreateTimeQuery() {
     given()
       .queryParam("createdAfter", MockProvider.EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_CREATED_AFTER)
@@ -623,21 +503,6 @@ public abstract class AbstractHistoricCaseActivityInstanceRestServiceQueryTest e
       .statusCode(Status.OK.getStatusCode())
     .when()
       .get(HISTORIC_CASE_ACTIVITY_INSTANCE_RESOURCE_URL);
-
-    verifyCreateParameterQueryInvocations();
-  }
-
-  @Test
-  public void testHistoricAfterAndBeforeCreateTimeQueryAsPost() {
-    Map<String, Date> parameters = getCompleteCreateDateQueryParameters();
-
-    given()
-      .contentType(POST_JSON_CONTENT_TYPE)
-      .body(parameters)
-    .then().expect()
-      .statusCode(Status.OK.getStatusCode())
-    .when()
-      .post(HISTORIC_CASE_ACTIVITY_INSTANCE_RESOURCE_URL);
 
     verifyCreateParameterQueryInvocations();
   }
@@ -669,21 +534,6 @@ public abstract class AbstractHistoricCaseActivityInstanceRestServiceQueryTest e
       .statusCode(Status.OK.getStatusCode())
     .when()
       .get(HISTORIC_CASE_ACTIVITY_INSTANCE_RESOURCE_URL);
-
-    verifyEndedParameterQueryInvocations();
-  }
-
-  @Test
-  public void testHistoricAfterAndBeforeEndTimeQueryAsPost() {
-    Map<String, Date> parameters = getCompleteEndedDateQueryParameters();
-
-    given()
-      .contentType(POST_JSON_CONTENT_TYPE)
-      .body(parameters)
-    .then().expect()
-      .statusCode(Status.OK.getStatusCode())
-    .when()
-      .post(HISTORIC_CASE_ACTIVITY_INSTANCE_RESOURCE_URL);
 
     verifyEndedParameterQueryInvocations();
   }

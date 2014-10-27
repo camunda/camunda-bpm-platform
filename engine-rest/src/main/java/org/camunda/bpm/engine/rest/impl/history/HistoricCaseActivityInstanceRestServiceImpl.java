@@ -81,7 +81,6 @@ public class HistoricCaseActivityInstanceRestServiceImpl implements HistoricCase
     return queryHistoricCaseActivityInstancesCount(queryDto);
   }
 
-  @Override
   public CountResultDto queryHistoricCaseActivityInstancesCount(HistoricCaseActivityInstanceQueryDto queryDto) {
     HistoricCaseActivityInstanceQuery query = queryDto.toQuery(processEngine);
 
