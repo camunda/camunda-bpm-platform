@@ -117,7 +117,7 @@ public class DbHistoryEventHandler implements HistoryEventHandler {
         dbEntityManager.insert(persistentObject);
       }
 
-    } else if(HistoryEventTypes.VARIABLE_INSTANCE_DELTE.getEventName().equals(historyEvent.getEventType())) {
+    } else if(HistoryEventTypes.VARIABLE_INSTANCE_DELETE.getEventName().equals(historyEvent.getEventType())) {
       HistoricVariableInstanceEntity historicVariableInstanceEntity = dbEntityManager.selectById(HistoricVariableInstanceEntity.class, historyEvent.getVariableInstanceId());
       if(historicVariableInstanceEntity != null) {
         historicVariableInstanceEntity.delete();

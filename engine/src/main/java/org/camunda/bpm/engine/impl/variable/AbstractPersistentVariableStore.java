@@ -153,7 +153,7 @@ public abstract class AbstractPersistentVariableStore extends AbstractVariableSt
   public void fireHistoricVariableInstanceDelete(VariableInstanceEntity variableInstance, AbstractVariableScope sourceActivityExecution) {
 
     HistoryLevel historyLevel = Context.getProcessEngineConfiguration().getHistoryLevel();
-    if (historyLevel.isHistoryEventProduced(HistoryEventTypes.VARIABLE_INSTANCE_DELTE, variableInstance)) {
+    if (historyLevel.isHistoryEventProduced(HistoryEventTypes.VARIABLE_INSTANCE_DELETE, variableInstance)) {
 
       final ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
       final HistoryEventHandler eventHandler = processEngineConfiguration.getHistoryEventHandler();

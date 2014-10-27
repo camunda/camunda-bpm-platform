@@ -65,7 +65,7 @@ public class HistoryEvent implements Serializable, DbEntity {
   @Deprecated
   public static final String VARIABLE_EVENT_TYPE_UPDATE = HistoryEventTypes.VARIABLE_INSTANCE_UPDATE.getEventName();
   @Deprecated
-  public static final String VARIABLE_EVENT_TYPE_DELETE = HistoryEventTypes.VARIABLE_INSTANCE_DELTE.getEventName();
+  public static final String VARIABLE_EVENT_TYPE_DELETE = HistoryEventTypes.VARIABLE_INSTANCE_DELETE.getEventName();
 
   @Deprecated
   public static final String FORM_PROPERTY_UPDATE = HistoryEventTypes.FORM_PROPERTY_UPDATE.getEventName();

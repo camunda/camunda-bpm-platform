@@ -46,7 +46,7 @@ public enum HistoryEventTypes implements HistoryEventType {
   /** fired when a variable instance is updated. */
   VARIABLE_INSTANCE_UPDATE("variable-instance", "update"),
   /** fired when a variable instance is deleted. */
-  VARIABLE_INSTANCE_DELTE("variable-instance", "delete"),
+  VARIABLE_INSTANCE_DELETE("variable-instance", "delete"),
 
   /** fired when a form property is updated. */
   FORM_PROPERTY_UPDATE("form-property", "form-property-update"),
