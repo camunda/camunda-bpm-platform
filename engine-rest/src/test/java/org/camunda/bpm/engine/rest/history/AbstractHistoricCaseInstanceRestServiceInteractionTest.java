@@ -80,8 +80,6 @@ public abstract class AbstractHistoricCaseInstanceRestServiceInteractionTest ext
     boolean active = from(content).getBoolean("active");
     boolean completed = from(content).getBoolean("completed");
     boolean terminated = from(content).getBoolean("terminated");
-    boolean failed = from(content).getBoolean("failed");
-    boolean suspended = from(content).getBoolean("suspended");
     boolean closed = from(content).getBoolean("closed");
 
     Assert.assertEquals(MockProvider.EXAMPLE_CASE_INSTANCE_ID, returnedCaseInstanceId);
@@ -95,8 +93,6 @@ public abstract class AbstractHistoricCaseInstanceRestServiceInteractionTest ext
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_CASE_INSTANCE_IS_ACTIVE, active);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_CASE_INSTANCE_IS_COMPLETED, completed);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_CASE_INSTANCE_IS_TERMINATED, terminated);
-    Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_CASE_INSTANCE_IS_FAILED, failed);
-    Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_CASE_INSTANCE_IS_SUSPENDED, suspended);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_CASE_INSTANCE_IS_CLOSED, closed);
   }
 

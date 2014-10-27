@@ -59,12 +59,6 @@ public interface HistoricCaseInstance {
   /** Check if the case is terminated. */
   boolean isTerminated();
 
-  /** Check if the case is failed. */
-  boolean isFailed();
-
-  /** Check if the case is suspended. */
-  boolean isSuspended();
-
   /** Check if the case is closed. */
   boolean isClosed();
 

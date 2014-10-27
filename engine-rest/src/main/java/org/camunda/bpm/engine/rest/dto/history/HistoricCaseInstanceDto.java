@@ -29,8 +29,6 @@ public class HistoricCaseInstanceDto {
   protected Boolean active;
   protected Boolean completed;
   protected Boolean terminated;
-  protected Boolean failed;
-  protected Boolean suspended;
   protected Boolean closed;
 
   public String getId() {
@@ -77,14 +75,6 @@ public class HistoricCaseInstanceDto {
     return terminated;
   }
 
-  public Boolean getFailed() {
-    return failed;
-  }
-
-  public Boolean getSuspended() {
-    return suspended;
-  }
-
   public Boolean getClosed() {
     return closed;
   }
@@ -103,9 +93,7 @@ public class HistoricCaseInstanceDto {
     dto.superCaseInstanceId = historicCaseInstance.getSuperCaseInstanceId();
     dto.active = historicCaseInstance.isActive();
     dto.completed = historicCaseInstance.isCompleted();
-    dto.terminated = historicCaseInstance.isFailed();
-    dto.failed = historicCaseInstance.isFailed();
-    dto.suspended = historicCaseInstance.isSuspended();
+    dto.terminated = historicCaseInstance.isTerminated();
     dto.closed = historicCaseInstance.isClosed();
 
     return dto;

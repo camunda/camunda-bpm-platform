@@ -340,8 +340,6 @@ public abstract class MockProvider {
   public static final boolean EXAMPLE_HISTORIC_CASE_INSTANCE_IS_ACTIVE = true;
   public static final boolean EXAMPLE_HISTORIC_CASE_INSTANCE_IS_COMPLETED = true;
   public static final boolean EXAMPLE_HISTORIC_CASE_INSTANCE_IS_TERMINATED = true;
-  public static final boolean EXAMPLE_HISTORIC_CASE_INSTANCE_IS_FAILED = true;
-  public static final boolean EXAMPLE_HISTORIC_CASE_INSTANCE_IS_SUSPENDED = true;
   public static final boolean EXAMPLE_HISTORIC_CASE_INSTANCE_IS_CLOSED = true;
 
   // Historic Activity Instance
@@ -1204,8 +1202,6 @@ public abstract class MockProvider {
     when(mock.isActive()).thenReturn(EXAMPLE_HISTORIC_CASE_INSTANCE_IS_ACTIVE);
     when(mock.isCompleted()).thenReturn(EXAMPLE_HISTORIC_CASE_INSTANCE_IS_COMPLETED);
     when(mock.isTerminated()).thenReturn(EXAMPLE_HISTORIC_CASE_INSTANCE_IS_TERMINATED);
-    when(mock.isFailed()).thenReturn(EXAMPLE_HISTORIC_CASE_INSTANCE_IS_FAILED);
-    when(mock.isSuspended()).thenReturn(EXAMPLE_HISTORIC_CASE_INSTANCE_IS_SUSPENDED);
     when(mock.isClosed()).thenReturn(EXAMPLE_HISTORIC_CASE_INSTANCE_IS_CLOSED);
 
     return mock;
@@ -1225,8 +1221,6 @@ public abstract class MockProvider {
     when(mock.isActive()).thenReturn(true);
     when(mock.isCompleted()).thenReturn(false);
     when(mock.isTerminated()).thenReturn(false);
-    when(mock.isFailed()).thenReturn(false);
-    when(mock.isSuspended()).thenReturn(false);
     when(mock.isClosed()).thenReturn(false);
 
     return mock;

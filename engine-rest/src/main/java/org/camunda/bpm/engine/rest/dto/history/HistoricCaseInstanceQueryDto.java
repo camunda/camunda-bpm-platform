@@ -70,8 +70,6 @@ public class HistoricCaseInstanceQueryDto extends AbstractQueryDto<HistoricCaseI
   public Boolean active;
   public Boolean completed;
   public Boolean terminated;
-  public Boolean failed;
-  public Boolean suspended;
   public Boolean closed;
   public Boolean notClosed;
 
@@ -176,16 +174,6 @@ public class HistoricCaseInstanceQueryDto extends AbstractQueryDto<HistoricCaseI
     this.terminated = terminated;
   }
 
-  @CamundaQueryParam(value = "failed", converter = BooleanConverter.class)
-  public void setFailed(Boolean failed) {
-    this.failed = failed;
-  }
-
-  @CamundaQueryParam(value = "suspended", converter = BooleanConverter.class)
-  public void setSuspended(Boolean suspended) {
-    this.suspended = suspended;
-  }
-
   @CamundaQueryParam(value = "closed", converter = BooleanConverter.class)
   public void setClosed(Boolean closed) {
     this.closed = closed;
@@ -265,12 +253,6 @@ public class HistoricCaseInstanceQueryDto extends AbstractQueryDto<HistoricCaseI
     }
     if (terminated != null && terminated) {
       query.terminated();
-    }
-    if (failed != null && failed) {
-      query.failed();
-    }
-    if (suspended != null && suspended) {
-      query.suspended();
     }
     if (closed != null && closed) {
       query.closed();

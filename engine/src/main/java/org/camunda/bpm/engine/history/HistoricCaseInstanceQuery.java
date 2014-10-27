@@ -86,7 +86,7 @@ public interface HistoricCaseInstanceQuery extends Query<HistoricCaseInstanceQue
 
   /** Only select historic case instances having a sub case instance
    * with the given case instance id.
-   * 
+   *
    * Note that there will always be maximum only <b>one</b>
    * such case instance that can be the result of this query.
    */
@@ -100,12 +100,6 @@ public interface HistoricCaseInstanceQuery extends Query<HistoricCaseInstanceQue
 
   /** Only select historic case instances which are terminated */
   HistoricCaseInstanceQuery terminated();
-
-  /** Only select historic case instances which are failed */
-  HistoricCaseInstanceQuery failed();
-
-  /** Only select historic case instances which are suspended */
-  HistoricCaseInstanceQuery suspended();
 
   /** Only select historic case instances which are closed */
   HistoricCaseInstanceQuery closed();

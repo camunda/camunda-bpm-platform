@@ -287,8 +287,6 @@ public abstract class AbstractHistoricCaseInstanceRestServiceQueryTest extends A
     boolean active = from(content).getBoolean("[0].active");
     boolean completed = from(content).getBoolean("[0].completed");
     boolean terminated = from(content).getBoolean("[0].terminated");
-    boolean failed = from(content).getBoolean("[0].failed");
-    boolean suspended = from(content).getBoolean("[0].suspended");
     boolean closed = from(content).getBoolean("[0].closed");
 
     Assert.assertEquals(MockProvider.EXAMPLE_CASE_INSTANCE_ID, returnedCaseInstanceId);
@@ -302,8 +300,6 @@ public abstract class AbstractHistoricCaseInstanceRestServiceQueryTest extends A
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_CASE_INSTANCE_IS_ACTIVE, active);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_CASE_INSTANCE_IS_COMPLETED, completed);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_CASE_INSTANCE_IS_TERMINATED, terminated);
-    Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_CASE_INSTANCE_IS_FAILED, failed);
-    Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_CASE_INSTANCE_IS_SUSPENDED, suspended);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_CASE_INSTANCE_IS_CLOSED, closed);
   }
 
@@ -515,70 +511,6 @@ public abstract class AbstractHistoricCaseInstanceRestServiceQueryTest extends A
 
     InOrder inOrder = inOrder(mockedQuery);
     inOrder.verify(mockedQuery).terminated();
-    inOrder.verify(mockedQuery).list();
-  }
-
-  @Test
-  public void testCaseQueryFailed() {
-    given()
-      .queryParam("failed", true)
-    .then().expect()
-      .statusCode(Status.OK.getStatusCode())
-    .when()
-      .get(HISTORIC_CASE_INSTANCE_RESOURCE_URL);
-
-    InOrder inOrder = inOrder(mockedQuery);
-    inOrder.verify(mockedQuery).failed();
-    inOrder.verify(mockedQuery).list();
-  }
-
-  @Test
-  public void testCaseQueryFailedAsPost() {
-    Map<String, Boolean> body = new HashMap<String, Boolean>();
-    body.put("failed", true);
-
-    given()
-      .contentType(POST_JSON_CONTENT_TYPE)
-      .body(body)
-    .then().expect()
-      .statusCode(Status.OK.getStatusCode())
-    .when()
-      .post(HISTORIC_CASE_INSTANCE_RESOURCE_URL);
-
-    InOrder inOrder = inOrder(mockedQuery);
-    inOrder.verify(mockedQuery).failed();
-    inOrder.verify(mockedQuery).list();
-  }
-
-  @Test
-  public void testCaseQuerySuspended() {
-    given()
-      .queryParam("suspended", true)
-    .then().expect()
-      .statusCode(Status.OK.getStatusCode())
-    .when()
-      .get(HISTORIC_CASE_INSTANCE_RESOURCE_URL);
-
-    InOrder inOrder = inOrder(mockedQuery);
-    inOrder.verify(mockedQuery).suspended();
-    inOrder.verify(mockedQuery).list();
-  }
-
-  @Test
-  public void testCaseQuerySuspendedAsPost() {
-    Map<String, Boolean> body = new HashMap<String, Boolean>();
-    body.put("suspended", true);
-
-    given()
-      .contentType(POST_JSON_CONTENT_TYPE)
-      .body(body)
-    .then().expect()
-      .statusCode(Status.OK.getStatusCode())
-    .when()
-      .post(HISTORIC_CASE_INSTANCE_RESOURCE_URL);
-
-    InOrder inOrder = inOrder(mockedQuery);
-    inOrder.verify(mockedQuery).suspended();
     inOrder.verify(mockedQuery).list();
   }
 

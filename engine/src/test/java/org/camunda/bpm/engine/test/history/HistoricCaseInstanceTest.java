@@ -87,8 +87,9 @@ public class HistoricCaseInstanceTest extends CmmnProcessEngineTestCase {
     suspend(caseInstanceId);
 
     historicCaseInstance = queryHistoricCaseInstance(caseInstanceId);
-    assertTrue(historicCaseInstance.isSuspended());
-    assertCount(1, historicQuery().suspended());
+    // not public API
+    assertTrue(((HistoricCaseInstanceEntity) historicCaseInstance).isSuspended());
+//    assertCount(1, historicQuery().suspended());
     assertCount(1, historicQuery().notClosed());
 
     // close case instance

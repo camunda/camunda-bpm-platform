@@ -38,8 +38,8 @@ public class HistoricCaseInstanceRestServiceImpl implements HistoricCaseInstance
     this.processEngine = processEngine;
   }
 
-  public HistoricCaseInstanceResource getHistoricCaseInstance(String processInstanceId) {
-    return new HistoricCaseInstanceResourceImpl(processEngine, processInstanceId);
+  public HistoricCaseInstanceResource getHistoricCaseInstance(String caseInstanceId) {
+    return new HistoricCaseInstanceResourceImpl(processEngine, caseInstanceId);
   }
 
   public List<HistoricCaseInstanceDto> getHistoricCaseInstances(UriInfo uriInfo, Integer firstResult, Integer maxResults) {
