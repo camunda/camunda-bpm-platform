@@ -26,7 +26,7 @@ module.exports = function(config) {
     if (srcpath.slice(-4) !== 'html') { return content; }
 
     var tasklistConf = 'var tasklistConf = '+ JSON.stringify({
-      apiUri: '/camunda/api/engine',
+      apiUri: '$APP_ROOT/api/engine',
       mock: false,
 
       // overrides the settings above
