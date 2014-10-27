@@ -90,7 +90,7 @@
               <div class="control-group">
                 <label class="control-label" for="inputPassword">New Password*:</label>
                 <div class="controls">
-                  <input id="inputPassword" name="inputPassword" type="password" ng-model="credentials.password" data-password></input>
+                  <input id="inputPassword" name="inputPassword" type="password" ng-model="credentials.password" data-password required></input>
                   <p class="text-error" ng-show="updateCredentialsForm.inputPassword.$error.password">Password must have at least 8 characters.</p>
                 </div>
               </div>
