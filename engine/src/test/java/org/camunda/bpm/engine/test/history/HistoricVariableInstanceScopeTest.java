@@ -19,6 +19,7 @@ import java.util.Map;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.history.HistoricVariableInstanceQuery;
+import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -266,9 +267,12 @@ public class HistoricVariableInstanceScopeTest extends PluggableProcessEngineTes
     assertEquals(2, historyService.createHistoricVariableInstanceQuery().caseExecutionIdIn(caseExecutionId).count());
     assertEquals(1, historyService.createHistoricVariableInstanceQuery().caseExecutionIdIn(taskExecutionId).count());
 
-    assertEquals(5, historyService.createHistoricDetailQuery().count());
-    assertEquals(5, historyService.createHistoricDetailQuery().caseInstanceId(caseInstanceId).count());
-    assertEquals(3, historyService.createHistoricDetailQuery().caseExecutionId(caseExecutionId).count());
-    assertEquals(2, historyService.createHistoricDetailQuery().caseExecutionId(taskExecutionId).count());
+    HistoryLevel historyLevel = processEngineConfiguration.getHistoryLevel();
+    if (historyLevel.equals(HistoryLevel.HISTORY_LEVEL_FULL)) {
+      assertEquals(5, historyService.createHistoricDetailQuery().count());
+      assertEquals(5, historyService.createHistoricDetailQuery().caseInstanceId(caseInstanceId).count());
+      assertEquals(3, historyService.createHistoricDetailQuery().caseExecutionId(caseExecutionId).count());
+      assertEquals(2, historyService.createHistoricDetailQuery().caseExecutionId(taskExecutionId).count());
+    }
   }
 }

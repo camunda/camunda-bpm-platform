@@ -24,6 +24,7 @@ import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.history.HistoricVariableInstanceQuery;
 import org.camunda.bpm.engine.history.HistoricVariableUpdate;
+import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.CollectionUtil;
@@ -81,7 +82,10 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTestCase
     assertEquals("test456", historicVariable.getTextValue());
 
     assertEquals(5, historyService.createHistoricActivityInstanceQuery().count());
-    assertEquals(3, historyService.createHistoricDetailQuery().count());
+
+    if (isFullHistoryEnabled()) {
+      assertEquals(3, historyService.createHistoricDetailQuery().count());
+    }
   }
 
   @Deployment
@@ -96,7 +100,10 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTestCase
     assertEquals("test456", historicVariable.getTextValue());
 
     assertEquals(4, historyService.createHistoricActivityInstanceQuery().count());
-    assertEquals(2, historyService.createHistoricDetailQuery().count());
+
+    if (isFullHistoryEnabled()) {
+      assertEquals(2, historyService.createHistoricDetailQuery().count());
+    }
   }
 
   @Deployment
@@ -122,7 +129,10 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTestCase
     assertEquals("test456", historicVariable1.getTextValue());
 
     assertEquals(8, historyService.createHistoricActivityInstanceQuery().count());
-    assertEquals(5, historyService.createHistoricDetailQuery().count());
+
+    if (isFullHistoryEnabled()) {
+      assertEquals(5, historyService.createHistoricDetailQuery().count());
+    }
   }
 
   @Deployment
@@ -137,7 +147,10 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTestCase
     assertEquals("test456", historicVariable.getTextValue());
 
     assertEquals(7, historyService.createHistoricActivityInstanceQuery().count());
-    assertEquals(2, historyService.createHistoricDetailQuery().count());
+
+    if (isFullHistoryEnabled()) {
+      assertEquals(2, historyService.createHistoricDetailQuery().count());
+    }
   }
 
   @Deployment
@@ -161,7 +174,10 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTestCase
     assertEquals("string", historicVariable1.getTypeName());
 
     assertEquals(18, historyService.createHistoricActivityInstanceQuery().count());
-    assertEquals(7, historyService.createHistoricDetailQuery().count());
+
+    if (isFullHistoryEnabled()) {
+      assertEquals(7, historyService.createHistoricDetailQuery().count());
+    }
   }
 
   @Deployment(resources={
@@ -199,7 +215,10 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTestCase
     assertEquals(1, historyService.createHistoricVariableInstanceQuery().variableValueEquals("myVar1", "test666").list().size());
 
     assertEquals(8, historyService.createHistoricActivityInstanceQuery().count());
-    assertEquals(5, historyService.createHistoricDetailQuery().count());
+
+    if (isFullHistoryEnabled()) {
+      assertEquals(5, historyService.createHistoricDetailQuery().count());
+    }
 
     // non-existing id:
     assertEquals(0, historyService.createHistoricVariableInstanceQuery().variableId("non-existing").count());
@@ -240,45 +259,46 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTestCase
 
   @Deployment(resources={"org/camunda/bpm/engine/test/standalone/history/FullHistoryTest.testVariableUpdatesAreLinkedToActivity.bpmn20.xml"})
   public void testVariableUpdatesLinkedToActivity() throws Exception {
-    ProcessInstance pi = runtimeService.startProcessInstanceByKey("ProcessWithSubProcess");
+    if (isFullHistoryEnabled()) {
+      ProcessInstance pi = runtimeService.startProcessInstanceByKey("ProcessWithSubProcess");
 
-    Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
-    Map<String, Object> variables = new HashMap<String, Object>();
-    variables.put("test", "1");
-    taskService.complete(task.getId(), variables);
+      Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
+      Map<String, Object> variables = new HashMap<String, Object>();
+      variables.put("test", "1");
+      taskService.complete(task.getId(), variables);
 
-    // now we are in the subprocess
-    task = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
-    variables.clear();
-    variables.put("test", "2");
-    taskService.complete(task.getId(), variables);
+      // now we are in the subprocess
+      task = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
+      variables.clear();
+      variables.put("test", "2");
+      taskService.complete(task.getId(), variables);
 
-    // now we are ended
-    assertProcessEnded(pi.getId());
+      // now we are ended
+      assertProcessEnded(pi.getId());
 
-    // check history
-    List<HistoricDetail> updates = historyService.createHistoricDetailQuery().variableUpdates().list();
-    assertEquals(2, updates.size());
+      // check history
+      List<HistoricDetail> updates = historyService.createHistoricDetailQuery().variableUpdates().list();
+      assertEquals(2, updates.size());
 
-    Map<String, HistoricVariableUpdate> updatesMap = new HashMap<String, HistoricVariableUpdate>();
-    HistoricVariableUpdate update = (HistoricVariableUpdate) updates.get(0);
-    updatesMap.put((String)update.getValue(), update);
-    update = (HistoricVariableUpdate) updates.get(1);
-    updatesMap.put((String)update.getValue(), update);
+      Map<String, HistoricVariableUpdate> updatesMap = new HashMap<String, HistoricVariableUpdate>();
+      HistoricVariableUpdate update = (HistoricVariableUpdate) updates.get(0);
+      updatesMap.put((String) update.getValue(), update);
+      update = (HistoricVariableUpdate) updates.get(1);
+      updatesMap.put((String) update.getValue(), update);
 
-    HistoricVariableUpdate update1 = updatesMap.get("1");
-    HistoricVariableUpdate update2 = updatesMap.get("2");
+      HistoricVariableUpdate update1 = updatesMap.get("1");
+      HistoricVariableUpdate update2 = updatesMap.get("2");
 
-    assertNotNull(update1.getActivityInstanceId());
-    assertNotNull(update1.getExecutionId());
-    HistoricActivityInstance historicActivityInstance1 = historyService.createHistoricActivityInstanceQuery().activityInstanceId(update1.getActivityInstanceId()).singleResult();
-    assertEquals(historicActivityInstance1.getExecutionId(), update1.getExecutionId());
-    assertEquals("usertask1", historicActivityInstance1.getActivityId());
+      assertNotNull(update1.getActivityInstanceId());
+      assertNotNull(update1.getExecutionId());
+      HistoricActivityInstance historicActivityInstance1 = historyService.createHistoricActivityInstanceQuery().activityInstanceId(update1.getActivityInstanceId()).singleResult();
+      assertEquals(historicActivityInstance1.getExecutionId(), update1.getExecutionId());
+      assertEquals("usertask1", historicActivityInstance1.getActivityId());
 
-    // TODO http://jira.codehaus.org/browse/ACT-1083
-    assertNotNull(update2.getActivityInstanceId());
-    HistoricActivityInstance historicActivityInstance2 = historyService.createHistoricActivityInstanceQuery().activityInstanceId(update2.getActivityInstanceId()).singleResult();
-    assertEquals("usertask2", historicActivityInstance2.getActivityId());
+      // TODO http://jira.codehaus.org/browse/ACT-1083
+      assertNotNull(update2.getActivityInstanceId());
+      HistoricActivityInstance historicActivityInstance2 = historyService.createHistoricActivityInstanceQuery().activityInstanceId(update2.getActivityInstanceId()).singleResult();
+      assertEquals("usertask2", historicActivityInstance2.getActivityId());
 
     /*
      * This is OK! The variable is set on the root execution, on a execution never run through the activity, where the process instances
@@ -287,7 +307,8 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTestCase
      * execution id: On which execution it was set
      * activity id: in which activity was the process instance when setting the variable
      */
-    assertFalse(historicActivityInstance2.getExecutionId().equals(update2.getExecutionId()));
+      assertFalse(historicActivityInstance2.getExecutionId().equals(update2.getExecutionId()));
+    }
   }
 
   // Test for ACT-1528, which (correctly) reported that deleting any
@@ -557,15 +578,17 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTestCase
     // the revision has to be 0
     assertEquals(0, variableEntity.getRevision());
 
-    List<HistoricDetail> details = historyService
-      .createHistoricDetailQuery()
-      .orderByVariableRevision()
-      .asc()
-      .list();
+    if (isFullHistoryEnabled()) {
+      List<HistoricDetail> details = historyService
+        .createHistoricDetailQuery()
+        .orderByVariableRevision()
+        .asc()
+        .list();
 
-    for (HistoricDetail detail : details) {
-      HistoricVariableUpdate variableDetail = (HistoricVariableUpdate) detail;
-      assertEquals(0, variableDetail.getRevision());
+      for (HistoricDetail detail : details) {
+        HistoricVariableUpdate variableDetail = (HistoricVariableUpdate) detail;
+        assertEquals(0, variableDetail.getRevision());
+      }
     }
   }
 
@@ -592,19 +615,25 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTestCase
     // the revision has to be 2
     assertEquals(2, variableEntity.getRevision());
 
-    List<HistoricDetail> details = historyService
-      .createHistoricDetailQuery()
-      .orderByVariableRevision()
-      .asc()
-      .list();
+    if (isFullHistoryEnabled()) {
+      List<HistoricDetail> details = historyService
+        .createHistoricDetailQuery()
+        .orderByVariableRevision()
+        .asc()
+        .list();
 
-    int i = 0;
-    for (HistoricDetail detail : details) {
-      HistoricVariableUpdate variableDetail = (HistoricVariableUpdate) detail;
-      assertEquals(i, variableDetail.getRevision());
-      i++;
+      int i = 0;
+      for (HistoricDetail detail : details) {
+        HistoricVariableUpdate variableDetail = (HistoricVariableUpdate) detail;
+        assertEquals(i, variableDetail.getRevision());
+        i++;
+      }
     }
 
+  }
+
+  protected boolean isFullHistoryEnabled() {
+    return processEngineConfiguration.getHistoryLevel().equals(HistoryLevel.HISTORY_LEVEL_FULL);
   }
 
 }
