@@ -159,7 +159,6 @@ You can now start developing using the `./node_modules/grunt-cli/bin/grunt auto-
 * `camunda-cockpit-ui`
 * `camunda-tasklist-ui`
 * `camunda-admin-ui`
-* `camunda-commons-ui`
 * `camunda-bpm-sdk-js`
 
 If you made the linking, the pages in your browser should reload when a change is made to the scripts of those projects.
