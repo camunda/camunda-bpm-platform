@@ -34,7 +34,7 @@ import org.junit.Test;
 import com.jayway.restassured.http.ContentType;
 import com.jayway.restassured.response.Response;
 
-public class AbstractHistoricProcessInstanceRestServiceInteractionTest extends AbstractRestServiceTest {
+public abstract class AbstractHistoricProcessInstanceRestServiceInteractionTest extends AbstractRestServiceTest {
 
   protected static final String HISTORIC_PROCESS_INSTANCE_URL = TEST_RESOURCE_ROOT_PATH + "/history/process-instance";
   protected static final String HISTORIC_SINGLE_PROCESS_INSTANCE_URL = HISTORIC_PROCESS_INSTANCE_URL + "/{id}";

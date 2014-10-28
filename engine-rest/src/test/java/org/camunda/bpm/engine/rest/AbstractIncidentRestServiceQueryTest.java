@@ -33,7 +33,7 @@ import static org.mockito.Mockito.when;
  * @author Roman Smirnov
  *
  */
-public class AbstractIncidentRestServiceQueryTest extends AbstractRestServiceTest {
+public abstract class AbstractIncidentRestServiceQueryTest extends AbstractRestServiceTest {
 
   protected static final String INCIDENT_QUERY_URL = TEST_RESOURCE_ROOT_PATH + "/incident";
   protected static final String INCIDENT_COUNT_QUERY_URL = INCIDENT_QUERY_URL + "/count";

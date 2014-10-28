@@ -45,7 +45,7 @@ import com.jayway.restassured.response.Response;
  * @author Daniel Meyer
  *
  */
-public class AbstractVariableInstanceRestServiceInteractionTest extends AbstractRestServiceTest {
+public abstract class AbstractVariableInstanceRestServiceInteractionTest extends AbstractRestServiceTest {
 
   protected static final String SERVICE_URL = TEST_RESOURCE_ROOT_PATH + "/variable-instance";
   protected static final String VARIABLE_INSTANCE_URL = SERVICE_URL + "/{id}";

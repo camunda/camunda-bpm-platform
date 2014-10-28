@@ -75,7 +75,7 @@ import com.jayway.restassured.response.Response;
 * @author Roman Smirnov
 *
 */
-public class AbstractCaseExecutionRestServiceInteractionTest extends AbstractRestServiceTest {
+public abstract class AbstractCaseExecutionRestServiceInteractionTest extends AbstractRestServiceTest {
 
   protected static final String CASE_EXECUTION_URL = TEST_RESOURCE_ROOT_PATH + "/case-execution";
   protected static final String SINGLE_CASE_EXECUTION_URL = CASE_EXECUTION_URL + "/{id}";

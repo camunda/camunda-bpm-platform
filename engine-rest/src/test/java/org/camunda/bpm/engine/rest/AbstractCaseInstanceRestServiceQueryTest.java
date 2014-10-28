@@ -44,7 +44,7 @@ import com.jayway.restassured.response.Response;
  * @author Roman Smirnov
  *
  */
-public class AbstractCaseInstanceRestServiceQueryTest extends AbstractRestServiceTest {
+public abstract class AbstractCaseInstanceRestServiceQueryTest extends AbstractRestServiceTest {
 
   protected static final String CASE_INSTANCE_QUERY_URL = TEST_RESOURCE_ROOT_PATH + "/case-instance";
   protected static final String CASE_INSTANCE_COUNT_QUERY_URL = CASE_INSTANCE_QUERY_URL + "/count";
