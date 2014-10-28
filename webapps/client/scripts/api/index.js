@@ -88,23 +88,13 @@ function(
   apiModule.factory('camAPI', [
           'camAPIHttpClient',
           '$window',
-  function(camAPIHttpClient, $window) {
-
-    function getCurrentEngine() {
-      var uri = $window.location.href;
-
-      var match = uri.match(/\/app\/tasklist\/(\w+)(|\/)/);
-      if (match) {
-        return match[1];
-      } else {
-        throw new Error('no process engine selected');
-      }
-    }
+          'Uri',
+  function(camAPIHttpClient, $window, Uri) {
 
     var conf = {
       apiUri:     'engine-rest/api/engine',
       HttpClient: camAPIHttpClient,
-      engine: getCurrentEngine()
+      engine: Uri.appUri(':engine')
     };
 
     if ($window.tasklistConf) {
