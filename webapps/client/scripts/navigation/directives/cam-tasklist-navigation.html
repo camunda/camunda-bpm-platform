@@ -65,6 +65,7 @@
         <a tooltip-placement="left"
            tooltip="{{ 'MANAGE_ACCOUNT' | translate }}"
            href
+           sem-show-user-actions
            class="dropdown-toggle"
            data-toggle="dropdown">
           <i class="glyphicon glyphicon-user"></i>
@@ -72,7 +73,8 @@
         </a>
         <ul class="dropdown-menu">
           <li class="user-profile">
-            <a ng-href="{{ 'adminbase://' | uri }}/#/users/{{ username }}?tab=profile"
+            <a sem-jump-to-profile
+               ng-href="{{ 'adminbase://' | uri }}/#/users/{{ username }}?tab=profile"
                translate="MY_PROFILE">
               My Profile
             </a>
@@ -81,7 +83,8 @@
           <li class="divider"></li>
 
           <li class="sign-out">
-            <a href="#/logout"
+            <a sem-log-out
+               href="#/logout"
                translate="SIGN_OUT_ACTION">
               Sign out
             </a>
