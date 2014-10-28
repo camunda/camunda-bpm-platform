@@ -87,10 +87,10 @@
       <span tooltip-placement="top"
             tooltip="{{ 'GROUPS' | translate }}"
             class="glyphicon glyphicon-th"></span>
-      <a href ng-if="groups.length > 0">
-        {{ groups.join(', ') }}
+      <a href ng-if="groupIds.length > 0">
+        {{ groupIds.join(', ') }}
       </a>
-      <a href ng-if="groups.length === 0">
+      <a href ng-if="groupIds.length === 0">
         {{ 'ADD_GROUPS' | translate }}
       </a>
     </div>

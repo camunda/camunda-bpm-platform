@@ -1,4 +1,22 @@
 {
+  "ADD":
+        "Add",
+  "REMOVE":
+        "Remove",
+  "SUCCESSFUL":
+        "Successful",
+  "FAILED":
+        "Failed",
+  "FAILURE":
+        "Failure",
+  "FINISHED":
+        "Finished",
+  "INIT_GROUPS_FAILURE":
+        "Loading the groups of the selected task failed. Try to refresh the page to try again.",
+  "UPDATE_GROUPS_SUCCESS":
+        "Updating the groups of the selected task finished.",
+  "UPDATE_GROUPS_FAILED":
+        "Updating the groups of the selected task finished with failures. Try to refresh the page to try again.",
   "TASK_NAME":
         "Task name",
   "SEARCH_BY_TASK_NAME":
@@ -11,16 +29,22 @@
         "Assignee",
   "ACTION":
         "Action",
+  "GROUP":
+        "Group",
   "GROUPS":
         "Groups",
   "GROUPS_EDIT":
         "Edit Groups",
+  "GROUPS_ADD":
+        "Add Groups",
   "CURRENT_GROUPS":
         "Current group(s)",
   "GROUP_ID":
         "Group ID",
   "GROUP_ADD":
         "Add a group",
+  "GROUP_REMOVE":
+        "Remove group",
   "GROUP_ADD_ERROR":
         "Group could not be added",
   "GROUP_ADD_SUCCESS":
@@ -31,6 +55,10 @@
         "Group removed successfully",
   "ADD_GROUPS":
         "Add groups",
+  "USE_ADD_GROUP":
+        "You can add groups by clicking the \"Add a group\" link below.",
+  "DUPLICATE_GROUP":
+        "Task is already in this group.",
   "OWNER":
         "Owner",
   "DIAGRAM":

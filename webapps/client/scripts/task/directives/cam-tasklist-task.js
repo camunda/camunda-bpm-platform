@@ -179,7 +179,7 @@ define([
               var groups = jquery.grep(res, function(identityLink) {
                 return identityLink.groupId;
               }).map(function(groupObj) {
-                return groupObj.groupId;
+                return groupObj;
               });
               deferred.resolve(groups);
             }

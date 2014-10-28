@@ -55,7 +55,11 @@ define([
         });
 
         $scope.groupsState = taskMetaData.observe('groups', function(groups) {
-          $scope.groups = groups;
+          var groupIds = [];
+          for (var i = 0, group; !!(group = groups[i]); i++) {
+            groupIds.push(group.groupId);
+          }
+          $scope.groupIds = groupIds;
         });
 
         /**
@@ -220,6 +224,9 @@ define([
               successHandler: function() { return successHandler; },
               errorHandler: function() { return errorHandler; }
             }
+          }).result.then(function() {
+            taskMetaData.set('taskId', { taskId: $scope.task.id });
+            taskMetaData.changed('taskList');
           });
         };
 
