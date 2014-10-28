@@ -55,6 +55,7 @@ define([
         });
 
         $scope.groupsState = taskMetaData.observe('groups', function(groups) {
+          groups = groups || [];
           var groupIds = [];
           for (var i = 0, group; !!(group = groups[i]); i++) {
             groupIds.push(group.groupId);
