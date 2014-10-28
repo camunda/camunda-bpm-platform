@@ -482,6 +482,8 @@ public class FilterResourceImpl extends AbstractAuthorizedRestResource implement
   protected List<VariableInstance> queryVariablesInstancesByVariableScopeIds(Collection<String> variableNames, Collection<String> variableScopeIds) {
     return getProcessEngine().getRuntimeService()
       .createVariableInstanceQuery()
+      .disableBinaryFetching()
+      .disableObjectValueDeserialization()
       .variableNameIn(variableNames.toArray(new String[variableNames.size()]))
       .variableScopeIdIn(variableScopeIds.toArray(new String[variableScopeIds.size()]))
       .list();

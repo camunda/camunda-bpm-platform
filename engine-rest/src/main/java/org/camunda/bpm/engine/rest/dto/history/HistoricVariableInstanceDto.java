@@ -52,9 +52,13 @@ public class HistoricVariableInstanceDto extends VariableValueDto {
     dto.processInstanceId = historicVariableInstance.getProcessInstanceId();
     dto.activityInstanceId = historicVariableInstance.getActivityInstanceId();
 
-    VariableValueDto.fromTypedValue(dto, historicVariableInstance.getTypedValue());
-
-    dto.errorMessage = historicVariableInstance.getErrorMessage();
+    if(historicVariableInstance.getErrorMessage() == null) {
+      VariableValueDto.fromTypedValue(dto, historicVariableInstance.getTypedValue());
+    }
+    else {
+      dto.errorMessage = historicVariableInstance.getErrorMessage();
+      dto.type = VariableValueDto.toRestApiTypeName(historicVariableInstance.getTypeName());
+    }
 
     return dto;
   }

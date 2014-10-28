@@ -27,6 +27,7 @@ import javax.ws.rs.core.UriInfo;
 import org.camunda.bpm.engine.history.HistoricActivityInstanceQuery;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricDetailDto;
+import org.camunda.bpm.engine.rest.sub.VariableResource;
 import org.camunda.bpm.engine.rest.sub.history.HistoricDetailResource;
 
 /**
@@ -58,7 +59,7 @@ public interface HistoricDetailRestService {
       @Context UriInfo uriInfo,
       @QueryParam("firstResult") Integer firstResult,
       @QueryParam("maxResults") Integer maxResults,
-      @QueryParam("deserializeObjectValues") @DefaultValue("true") boolean deserializeObjectValues);
+      @QueryParam(VariableResource.DESERIALIZE_VALUES_QUERY_PARAM) @DefaultValue("true") boolean deserializeObjectValues);
 
   @GET
   @Path("/count")

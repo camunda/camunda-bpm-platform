@@ -62,12 +62,16 @@ public class HistoricVariableUpdateDto extends HistoricDetailDto {
     dto.revision = historicVariableUpdate.getRevision();
     dto.variableName = historicVariableUpdate.getVariableName();
 
-    VariableValueDto variableValueDto = VariableValueDto.fromTypedValue(historicVariableUpdate.getTypedValue());
-    dto.value = variableValueDto.getValue();
-    dto.variableType = variableValueDto.getType();
-    dto.valueInfo = variableValueDto.getValueInfo();
-
-    dto.errorMessage = historicVariableUpdate.getErrorMessage();
+    if(historicVariableUpdate.getErrorMessage() == null) {
+      VariableValueDto variableValueDto = VariableValueDto.fromTypedValue(historicVariableUpdate.getTypedValue());
+      dto.value = variableValueDto.getValue();
+      dto.variableType = variableValueDto.getType();
+      dto.valueInfo = variableValueDto.getValueInfo();
+    }
+    else {
+      dto.errorMessage = historicVariableUpdate.getErrorMessage();
+      dto.variableType = VariableValueDto.toRestApiTypeName(historicVariableUpdate.getTypeName());
+    }
 
     return dto;
   }

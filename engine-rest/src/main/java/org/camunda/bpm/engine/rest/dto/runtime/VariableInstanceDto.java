@@ -110,11 +110,13 @@ public class VariableInstanceDto extends VariableValueDto {
     dto.taskId = variableInstance.getTaskId();
     dto.activityInstanceId = variableInstance.getActivityInstanceId();
 
-    dto.type = variableInstance.getTypeName();
-
-    VariableValueDto.fromTypedValue(dto, variableInstance.getTypedValue());
-
-    dto.errorMessage = variableInstance.getErrorMessage();
+    if(variableInstance.getErrorMessage() == null) {
+      VariableValueDto.fromTypedValue(dto, variableInstance.getTypedValue());
+    }
+    else {
+      dto.errorMessage = variableInstance.getErrorMessage();
+      dto.type = VariableValueDto.toRestApiTypeName(variableInstance.getTypeName());
+    }
 
     return dto;
   }

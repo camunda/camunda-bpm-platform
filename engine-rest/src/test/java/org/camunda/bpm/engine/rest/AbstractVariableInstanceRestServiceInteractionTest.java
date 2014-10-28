@@ -146,7 +146,7 @@ public abstract class AbstractVariableInstanceRestServiceInteractionTest extends
 
     given()
       .pathParam("id", MockProvider.EXAMPLE_VARIABLE_INSTANCE_ID)
-      .queryParam("deserializeObjectValue", false)
+      .queryParam("deserializeValue", false)
     .then().expect().statusCode(Status.OK.getStatusCode())
     .and()
       .body("id", equalTo(builder.getId()))

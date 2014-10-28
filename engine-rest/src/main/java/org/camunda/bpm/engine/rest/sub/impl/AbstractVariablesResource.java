@@ -12,6 +12,7 @@
  */
 package org.camunda.bpm.engine.rest.sub.impl;
 
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -135,7 +136,7 @@ public abstract class AbstractVariablesResource implements VariableResource {
     try {
       JavaType type = TypeFactory.fromCanonical(className);
 
-      return objectMapper.readValue(new String(data), type);
+      return objectMapper.readValue(new String(data, Charset.forName("UTF-8")), type);
 
     } catch(Exception e) {
       throw new InvalidRequestException(Status.INTERNAL_SERVER_ERROR, "Could not deserialize JSON object: "+e.getMessage());

@@ -121,7 +121,7 @@ public abstract class AbstractHistoricDetailRestServiceQueryTest extends Abstrac
   @Test
   public void testNoParametersQueryDisableObjectDeserialization() {
     given()
-      .queryParam("deserializeObjectValues", false)
+      .queryParam("deserializeValues", false)
     .expect()
       .statusCode(Status.OK.getStatusCode())
     .when()

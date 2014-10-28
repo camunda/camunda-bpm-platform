@@ -184,6 +184,8 @@ public abstract class AbstractFilterRestServiceInteractionTest extends AbstractR
       .thenReturn(variableInstanceQueryMock);
     when(variableInstanceQueryMock.variableNameIn((String) anyVararg()))
       .thenReturn(variableInstanceQueryMock);
+    when(variableInstanceQueryMock.disableBinaryFetching()).thenReturn(variableInstanceQueryMock);
+    when(variableInstanceQueryMock.disableObjectValueDeserialization()).thenReturn(variableInstanceQueryMock);
   }
 
   @Test
@@ -1078,6 +1080,8 @@ public abstract class AbstractFilterRestServiceInteractionTest extends AbstractR
     verify(variableInstanceQueryMock, times(1)).variableNameIn((String) anyVararg());
     verify(variableInstanceQueryMock).variableNameIn("foo", "bar");
     verify(variableInstanceQueryMock, times(1)).list();
+    verify(variableInstanceQueryMock, times(1)).disableBinaryFetching();
+    verify(variableInstanceQueryMock, times(1)).disableObjectValueDeserialization();
 
     String content = response.asString();
     List<Map<String, Object>> variables = from(content).getJsonObject("_embedded.variable");

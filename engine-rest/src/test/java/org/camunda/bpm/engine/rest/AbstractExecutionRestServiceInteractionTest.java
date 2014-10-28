@@ -336,7 +336,7 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
     // when
     given()
       .pathParam("id", MockProvider.EXAMPLE_EXECUTION_ID)
-      .queryParam("deserializeObjectValues", false)
+      .queryParam("deserializeValues", false)
     .then().expect().statusCode(Status.OK.getStatusCode())
       .body(variableKey + ".value", equalTo("a serialized value"))
       .body(variableKey + ".type", equalTo("Object"))
@@ -459,7 +459,7 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
     given()
       .pathParam("id", MockProvider.EXAMPLE_EXECUTION_ID)
       .pathParam("varId", variableKey)
-      .queryParam("deserializeObjectValue", false)
+      .queryParam("deserializeValue", false)
     .then().expect().statusCode(Status.OK.getStatusCode())
       .body("value", equalTo("a serialized value"))
       .body("type", equalTo("Object"))

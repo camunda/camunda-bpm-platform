@@ -29,6 +29,7 @@ import javax.ws.rs.core.UriInfo;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.runtime.VariableInstanceDto;
 import org.camunda.bpm.engine.rest.dto.runtime.VariableInstanceQueryDto;
+import org.camunda.bpm.engine.rest.sub.VariableResource;
 import org.camunda.bpm.engine.rest.sub.runtime.VariableInstanceResource;
 import org.camunda.bpm.engine.runtime.VariableInstanceQuery;
 
@@ -57,7 +58,7 @@ public interface VariableInstanceRestService {
   List<VariableInstanceDto> getVariableInstances(@Context UriInfo uriInfo,
       @QueryParam("firstResult") Integer firstResult,
       @QueryParam("maxResults") Integer maxResults,
-      @QueryParam("deserializeObjectValues") @DefaultValue("true") boolean deserializeObjectValues);
+      @QueryParam(VariableResource.DESERIALIZE_VALUES_QUERY_PARAM) @DefaultValue("true") boolean deserializeObjectValues);
 
   /**
    * Expects the same parameters as
@@ -75,7 +76,7 @@ public interface VariableInstanceRestService {
   List<VariableInstanceDto> queryVariableInstances(VariableInstanceQueryDto queryDto,
       @QueryParam("firstResult") Integer firstResult,
       @QueryParam("maxResults") Integer maxResults,
-      @QueryParam("deserializeObjectValues") @DefaultValue("true") boolean deserializeObjectValues);
+      @QueryParam(VariableResource.DESERIALIZE_VALUES_QUERY_PARAM) @DefaultValue("true") boolean deserializeObjectValues);
 
   @GET
   @Path("/count")

@@ -22,6 +22,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
 import org.camunda.bpm.engine.rest.dto.history.HistoricVariableInstanceDto;
+import org.camunda.bpm.engine.rest.sub.VariableResource;
 
 /**
  *
@@ -32,7 +33,7 @@ public interface HistoricVariableInstanceResource {
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   public HistoricVariableInstanceDto getVariable(
-      @QueryParam("deserializeObjectValue") @DefaultValue("true") boolean deserializeObjectValue);
+      @QueryParam(VariableResource.DESERIALIZE_VALUE_QUERY_PARAM) @DefaultValue("true") boolean deserializeValue);
 
 
   @GET

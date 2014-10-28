@@ -118,7 +118,7 @@ public interface TaskResource {
   @Path("/form-variables")
   @Produces(MediaType.APPLICATION_JSON)
   Map<String, VariableValueDto> getFormVariables(@QueryParam("variableNames") String variableNames,
-      @QueryParam("deserializeValue") @DefaultValue("true") boolean deserializeValues);
+      @QueryParam(VariableResource.DESERIALIZE_VALUE_QUERY_PARAM) @DefaultValue("true") boolean deserializeValues);
 
   @PUT
   @Consumes(MediaType.APPLICATION_JSON)

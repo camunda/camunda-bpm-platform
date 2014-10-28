@@ -100,7 +100,7 @@ public abstract class AbstractHistoricVariableInstanceRestServiceQueryTest exten
   @Test
   public void testNoParametersQueryDisableObjectDeserialization() {
     given()
-      .queryParam("deserializeObjectValues", false)
+      .queryParam("deserializeValues", false)
     .expect()
       .statusCode(Status.OK.getStatusCode())
     .when()
@@ -132,7 +132,7 @@ public abstract class AbstractHistoricVariableInstanceRestServiceQueryTest exten
   @Test
   public void testNoParametersQueryAsPostDisableObjectDeserialization() {
     given()
-      .queryParam("deserializeObjectValues", false)
+      .queryParam("deserializeValues", false)
       .contentType(POST_JSON_CONTENT_TYPE)
       .body(EMPTY_JSON_OBJECT)
     .expect()

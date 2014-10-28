@@ -237,54 +237,40 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
   }
 
   public TypedValue getTypedValue() {
-    if(errorMessage == null) {
-      try {
-        return getTypedValue(true);
-      }
-      catch(RuntimeException e) {
-        // catch error message
-        errorMessage = e.getMessage();
-      }
-    }
-    return null;
+    return getTypedValue(true);
   }
 
   public TypedValue getTypedValue(boolean deserializeValue) {
-    if (cachedValue == null) {
-      cachedValue = getSerializer().readValue(this, deserializeValue);
+    if (cachedValue == null && errorMessage == null) {
+      try {
+        cachedValue = getSerializer().readValue(this, deserializeValue);
+      }
+      catch(RuntimeException e) {
+        // intercept the error message
+        this.errorMessage = e.getMessage();
+        throw e;
+      }
     }
     return cachedValue;
   }
 
-  @SuppressWarnings({ "rawtypes", "unchecked" })
+  @SuppressWarnings("unchecked")
   public TypedValue setValue(TypedValue value) {
 
-    TypedValueSerializer valueSerializer = null;
+    // clear value fields
+    clearValueFields();
 
-    if(serializerName != null) {
-      TypedValueSerializer<?> currentSerializer = getSerializer();
-
-      // check whether the current serializer can handle the new value
-      if(currentSerializer.canHandle(value)) {
-        valueSerializer = currentSerializer;
-      }
-    }
-
-    // if the current serializer cannot handle the value, attempt to determine a new serializer
-    if(valueSerializer == null) {
-      valueSerializer = getSerializers().findSerializerForValue(value);
-      serializerName = valueSerializer.getName();
-      // serializer changed -> clear value fields
-      clearValueFields();
-    }
+    // determine serializer to use
+    serializer = getSerializers().findSerializerForValue(value);
+    serializerName = serializer.getName();
 
     if(value instanceof UntypedValueImpl) {
       // type has been detected
-      value = valueSerializer.convertToTypedValue((UntypedValueImpl) value);
+      value = serializer.convertToTypedValue((UntypedValueImpl) value);
     }
 
     // set new value
-    valueSerializer.writeValue(value, this);
+    serializer.writeValue(value, this);
 
     // cache the value
     cachedValue = value;

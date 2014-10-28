@@ -26,9 +26,11 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
 
+import org.camunda.bpm.engine.history.HistoricVariableInstanceQuery;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricVariableInstanceDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricVariableInstanceQueryDto;
+import org.camunda.bpm.engine.rest.sub.VariableResource;
 import org.camunda.bpm.engine.rest.sub.history.HistoricVariableInstanceResource;
 
 @Path(HistoricVariableInstanceRestService.PATH)
@@ -55,7 +57,7 @@ public interface HistoricVariableInstanceRestService {
       @Context UriInfo uriInfo,
       @QueryParam("firstResult") Integer firstResult,
       @QueryParam("maxResults") Integer maxResults,
-      @QueryParam("deserializeObjectValues") @DefaultValue("true") boolean deserializeObjectValues);
+      @QueryParam(VariableResource.DESERIALIZE_VALUES_QUERY_PARAM) @DefaultValue("true") boolean deserializeValues);
 
   /**
    * @param query
@@ -70,7 +72,7 @@ public interface HistoricVariableInstanceRestService {
       HistoricVariableInstanceQueryDto query,
       @QueryParam("firstResult") Integer firstResult,
       @QueryParam("maxResults") Integer maxResults,
-      @QueryParam("deserializeObjectValues") @DefaultValue("true") boolean deserializeObjectValues);
+      @QueryParam(VariableResource.DESERIALIZE_VALUES_QUERY_PARAM) @DefaultValue("true") boolean deserializeValues);
 
   @GET
   @Path("/count")

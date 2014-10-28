@@ -52,21 +52,19 @@ public class HistoricDetailVariableInstanceUpdateEntity extends HistoricVariable
   }
 
   public TypedValue getTypedValue() {
-    if(errorMessage == null) {
-      try {
-        return getTypedValue(true);
-      }
-      catch(RuntimeException e) {
-        // catch error message
-        errorMessage = e.getMessage();
-      }
-    }
-    return null;
+    return getTypedValue(true);
   }
 
   public TypedValue getTypedValue(boolean deserializeValue) {
-    if (cachedValue == null) {
-      cachedValue = getSerializer().readValue(this, deserializeValue);
+    if (cachedValue == null && errorMessage == null) {
+      try {
+        cachedValue = getSerializer().readValue(this, deserializeValue);
+      }
+      catch(RuntimeException e) {
+        // intercept the error message
+        this.errorMessage = e.getMessage();
+        throw e;
+      }
     }
     return cachedValue;
   }

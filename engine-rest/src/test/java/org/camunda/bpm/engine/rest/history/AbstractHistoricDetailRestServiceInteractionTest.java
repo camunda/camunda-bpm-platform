@@ -145,7 +145,7 @@ public abstract class AbstractHistoricDetailRestServiceInteractionTest extends A
 
     given()
       .pathParam("id", builder.getId())
-      .queryParam("deserializeObjectValue", false)
+      .queryParam("deserializeValue", false)
     .then().expect().statusCode(Status.OK.getStatusCode())
     .and()
       .body("id", equalTo(builder.getId()))

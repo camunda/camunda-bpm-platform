@@ -32,17 +32,20 @@ import org.camunda.bpm.engine.rest.mapper.MultipartFormData;
 
 public interface VariableResource {
 
+  public final static String DESERIALIZE_VALUE_QUERY_PARAM = "deserializeValue";
+  public final static String DESERIALIZE_VALUES_QUERY_PARAM = DESERIALIZE_VALUE_QUERY_PARAM + "s";
+
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   Map<String, VariableValueDto> getVariables(
-      @QueryParam("deserializeObjectValues") @DefaultValue("true") boolean deserializeValues);
+      @QueryParam(DESERIALIZE_VALUES_QUERY_PARAM) @DefaultValue("true") boolean deserializeValues);
 
   @GET
   @Path("/{varId}")
   @Produces(MediaType.APPLICATION_JSON)
   VariableValueDto getVariable(
       @PathParam("varId") String variableName,
-      @QueryParam("deserializeObjectValue") @DefaultValue("true") boolean deserializeValue);
+      @QueryParam(DESERIALIZE_VALUE_QUERY_PARAM) @DefaultValue("true") boolean deserializeValue);
 
   @PUT
   @Path("/{varId}")
