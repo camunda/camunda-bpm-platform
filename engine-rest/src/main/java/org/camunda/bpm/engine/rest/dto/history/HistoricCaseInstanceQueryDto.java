@@ -12,21 +12,25 @@
  */
 package org.camunda.bpm.engine.rest.dto.history;
 
+import static javax.ws.rs.core.Response.Status;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
-
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.history.HistoricCaseInstanceQuery;
 import org.camunda.bpm.engine.rest.dto.AbstractQueryDto;
 import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
+import org.camunda.bpm.engine.rest.dto.VariableQueryParameterDto;
 import org.camunda.bpm.engine.rest.dto.converter.BooleanConverter;
 import org.camunda.bpm.engine.rest.dto.converter.DateConverter;
 import org.camunda.bpm.engine.rest.dto.converter.StringListConverter;
 import org.camunda.bpm.engine.rest.dto.converter.StringSetConverter;
+import org.camunda.bpm.engine.rest.dto.converter.VariableListConverter;
+import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.codehaus.jackson.map.ObjectMapper;
 
 public class HistoricCaseInstanceQueryDto extends AbstractQueryDto<HistoricCaseInstanceQuery> {
@@ -72,6 +76,8 @@ public class HistoricCaseInstanceQueryDto extends AbstractQueryDto<HistoricCaseI
   public Boolean terminated;
   public Boolean closed;
   public Boolean notClosed;
+
+  protected List<VariableQueryParameterDto> variables;
 
   public HistoricCaseInstanceQueryDto() {}
 
@@ -184,6 +190,11 @@ public class HistoricCaseInstanceQueryDto extends AbstractQueryDto<HistoricCaseI
     this.notClosed = notClosed;
   }
 
+  @CamundaQueryParam(value = "variables", converter = VariableListConverter.class)
+  public void setVariables(List<VariableQueryParameterDto> variables) {
+    this.variables = variables;
+  }
+
   @Override
   protected boolean isValidSortByValue(String value) {
     return VALID_SORT_BY_VALUES.contains(value);
@@ -259,6 +270,31 @@ public class HistoricCaseInstanceQueryDto extends AbstractQueryDto<HistoricCaseI
     }
     if (notClosed != null && notClosed) {
       query.notClosed();
+    }
+    if (variables != null) {
+      for (VariableQueryParameterDto variableQueryParam : variables) {
+        String variableName = variableQueryParam.getName();
+        String op = variableQueryParam.getOperator();
+        Object variableValue = variableQueryParam.resolveValue(objectMapper);
+
+        if (op.equals(VariableQueryParameterDto.EQUALS_OPERATOR_NAME)) {
+          query.variableValueEquals(variableName, variableValue);
+        } else if (op.equals(VariableQueryParameterDto.GREATER_THAN_OPERATOR_NAME)) {
+          query.variableValueGreaterThan(variableName, variableValue);
+        } else if (op.equals(VariableQueryParameterDto.GREATER_THAN_OR_EQUALS_OPERATOR_NAME)) {
+          query.variableValueGreaterThanOrEqual(variableName, variableValue);
+        } else if (op.equals(VariableQueryParameterDto.LESS_THAN_OPERATOR_NAME)) {
+          query.variableValueLessThan(variableName, variableValue);
+        } else if (op.equals(VariableQueryParameterDto.LESS_THAN_OR_EQUALS_OPERATOR_NAME)) {
+          query.variableValueLessThanOrEqual(variableName, variableValue);
+        } else if (op.equals(VariableQueryParameterDto.NOT_EQUALS_OPERATOR_NAME)) {
+          query.variableValueNotEquals(variableName, variableValue);
+        } else if (op.equals(VariableQueryParameterDto.LIKE_OPERATOR_NAME)) {
+          query.variableValueLike(variableName, String.valueOf(variableValue));
+        } else {
+          throw new InvalidRequestException(Status.BAD_REQUEST, "Invalid variable comparator specified: " + op);
+        }
+      }
     }
   }
 

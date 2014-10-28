@@ -51,6 +51,8 @@ public class HistoricDetailQueryDto extends AbstractQueryDto<HistoricDetailQuery
   protected String processInstanceId;
   protected String executionId;
   protected String activityInstanceId;
+  protected String caseInstanceId;
+  protected String caseExecutionId;
   protected String variableInstanceId;
   protected String taskId;
   protected Boolean formFields;
@@ -77,6 +79,16 @@ public class HistoricDetailQueryDto extends AbstractQueryDto<HistoricDetailQuery
   @CamundaQueryParam(value = "activityInstanceId")
   public void setActivityInstanceId(String activityInstanceId) {
     this.activityInstanceId = activityInstanceId;
+  }
+
+  @CamundaQueryParam(value = "caseInstanceId")
+  public void setCaseInstanceId(String caseInstanceId) {
+    this.caseInstanceId = caseInstanceId;
+  }
+
+  @CamundaQueryParam(value = "caseExecutionId")
+  public void setCaseExecutionId(String caseExecutionId) {
+    this.caseExecutionId = caseExecutionId;
   }
 
   @CamundaQueryParam(value = "variableInstanceId")
@@ -124,6 +136,12 @@ public class HistoricDetailQueryDto extends AbstractQueryDto<HistoricDetailQuery
     }
     if (activityInstanceId != null) {
       query.activityInstanceId(activityInstanceId);
+    }
+    if (caseInstanceId != null) {
+      query.caseInstanceId(caseInstanceId);
+    }
+    if (caseExecutionId != null) {
+      query.caseExecutionId(caseExecutionId);
     }
     if (variableInstanceId != null) {
       query.variableInstanceId(variableInstanceId);

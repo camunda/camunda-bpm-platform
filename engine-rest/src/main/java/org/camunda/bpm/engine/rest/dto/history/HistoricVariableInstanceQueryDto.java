@@ -38,13 +38,15 @@ public class HistoricVariableInstanceQueryDto extends AbstractQueryDto<HistoricV
     VALID_SORT_BY_VALUES.add(SORT_BY_VARIABLE_NAME_VALUE);
   }
 
-  private String processInstanceId;
-  private String variableName;
-  private String variableNameLike;
-  private Object variableValue;
+  protected String processInstanceId;
+  protected String caseInstanceId;
+  protected String variableName;
+  protected String variableNameLike;
+  protected Object variableValue;
   protected String[] executionIdIn;
   protected String[] taskIdIn;
   protected String[] activityInstanceIdIn;
+  protected String[] caseExecutionIdIn;
 
   public HistoricVariableInstanceQueryDto() {
   }
@@ -56,6 +58,11 @@ public class HistoricVariableInstanceQueryDto extends AbstractQueryDto<HistoricV
   @CamundaQueryParam("processInstanceId")
   public void setProcessInstanceId(String processInstanceId) {
     this.processInstanceId = processInstanceId;
+  }
+
+  @CamundaQueryParam("caseInstanceId")
+  public void setCaseInstanceId(String caseInstanceId) {
+    this.caseInstanceId = caseInstanceId;
   }
 
   @CamundaQueryParam("variableName")
@@ -88,6 +95,11 @@ public class HistoricVariableInstanceQueryDto extends AbstractQueryDto<HistoricV
     this.activityInstanceIdIn = activityInstanceIdIn;
   }
 
+  @CamundaQueryParam(value="caseExecutionIdIn", converter = StringArrayConverter.class)
+  public void setCaseExecutionIdIn(String[] caseExecutionIdIn) {
+    this.caseExecutionIdIn = caseExecutionIdIn;
+  }
+
   @Override
   protected boolean isValidSortByValue(String value) {
     return VALID_SORT_BY_VALUES.contains(value);
@@ -102,6 +114,9 @@ public class HistoricVariableInstanceQueryDto extends AbstractQueryDto<HistoricV
   protected void applyFilters(HistoricVariableInstanceQuery query) {
     if (processInstanceId != null) {
       query.processInstanceId(processInstanceId);
+    }
+    if (caseInstanceId != null) {
+      query.caseInstanceId(caseInstanceId);
     }
     if (variableName != null) {
       query.variableName(variableName);
@@ -125,6 +140,9 @@ public class HistoricVariableInstanceQueryDto extends AbstractQueryDto<HistoricV
     }
     if (activityInstanceIdIn != null && activityInstanceIdIn.length > 0) {
       query.activityInstanceIdIn(activityInstanceIdIn);
+    }
+    if (caseExecutionIdIn != null && caseExecutionIdIn.length > 0) {
+      query.caseExecutionIdIn(caseExecutionIdIn);
     }
   }
 

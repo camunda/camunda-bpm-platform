@@ -489,6 +489,7 @@ public abstract class MockProvider {
 
   // case execution
   public static final String EXAMPLE_CASE_EXECUTION_ID = "aCaseExecutionId";
+  public static final String ANOTHER_EXAMPLE_CASE_EXECUTION_ID = "anotherCaseExecutionId";
   public static final String EXAMPLE_CASE_EXECUTION_CASE_INSTANCE_ID = "aCaseInstanceId";
   public static final String EXAMPLE_CASE_EXECUTION_PARENT_ID = "aParentId";
   public static final String EXAMPLE_CASE_EXECUTION_CASE_DEFINITION_ID = "aCaseDefinitionId";

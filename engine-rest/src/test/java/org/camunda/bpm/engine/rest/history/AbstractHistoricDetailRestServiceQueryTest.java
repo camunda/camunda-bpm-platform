@@ -472,4 +472,29 @@ public abstract class AbstractHistoricDetailRestServiceQueryTest extends Abstrac
 
     verify(mockedQuery).excludeTaskDetails();
   }
+
+  @Test
+  public void testQueryByCaseInstanceId() {
+    given()
+      .queryParam("caseInstanceId", MockProvider.EXAMPLE_CASE_INSTANCE_ID)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .get(HISTORIC_DETAIL_RESOURCE_URL);
+
+    verify(mockedQuery).caseInstanceId(MockProvider.EXAMPLE_CASE_INSTANCE_ID);
+  }
+
+  @Test
+  public void testQueryByCaseExecutionId() {
+    given()
+      .queryParam("caseExecutionId", MockProvider.EXAMPLE_CASE_EXECUTION_ID)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .get(HISTORIC_DETAIL_RESOURCE_URL);
+
+    verify(mockedQuery).caseExecutionId(MockProvider.EXAMPLE_CASE_EXECUTION_ID);
+  }
+
 }

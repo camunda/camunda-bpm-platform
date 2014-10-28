@@ -13,6 +13,7 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -61,13 +62,13 @@ public abstract class AbstractHistoricVariableInstanceRestServiceQueryTest exten
 
   private HistoricVariableInstanceQuery setUpMockHistoricVariableInstanceQuery(List<HistoricVariableInstance> mockedHistoricVariableInstances) {
 
-    HistoricVariableInstanceQuery mockedhistoricVariableInstanceQuery = mock(HistoricVariableInstanceQuery.class);
-    when(mockedhistoricVariableInstanceQuery.list()).thenReturn(mockedHistoricVariableInstances);
-    when(mockedhistoricVariableInstanceQuery.count()).thenReturn((long) mockedHistoricVariableInstances.size());
+    HistoricVariableInstanceQuery mockedHistoricVariableInstanceQuery = mock(HistoricVariableInstanceQuery.class);
+    when(mockedHistoricVariableInstanceQuery.list()).thenReturn(mockedHistoricVariableInstances);
+    when(mockedHistoricVariableInstanceQuery.count()).thenReturn((long) mockedHistoricVariableInstances.size());
 
-    when(processEngine.getHistoryService().createHistoricVariableInstanceQuery()).thenReturn(mockedhistoricVariableInstanceQuery);
+    when(processEngine.getHistoryService().createHistoricVariableInstanceQuery()).thenReturn(mockedHistoricVariableInstanceQuery);
 
-    return mockedhistoricVariableInstanceQuery;
+    return mockedHistoricVariableInstanceQuery;
   }
 
   @Test
@@ -518,6 +519,66 @@ public abstract class AbstractHistoricVariableInstanceRestServiceQueryTest exten
       .when().post(HISTORIC_VARIABLE_INSTANCE_RESOURCE_URL);
 
     verify(mockedQuery).activityInstanceIdIn(anActivityInstanceId, anotherActivityInstanceId);
+  }
+
+  @Test
+  public void testHistoricVariableQueryByCaseInstanceId() {
+
+    given()
+      .queryParam("caseInstanceId", MockProvider.EXAMPLE_CASE_INSTANCE_ID)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .get(HISTORIC_VARIABLE_INSTANCE_RESOURCE_URL);
+
+    verify(mockedQuery).caseInstanceId(MockProvider.EXAMPLE_CASE_INSTANCE_ID);
+  }
+
+  @Test
+  public void testHistoricVariableQueryByCaseInstanceIdAsPost() {
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("caseInstanceId", MockProvider.EXAMPLE_CASE_INSTANCE_ID);
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(json)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .post(HISTORIC_VARIABLE_INSTANCE_RESOURCE_URL);
+
+    verify(mockedQuery).caseInstanceId(MockProvider.EXAMPLE_CASE_INSTANCE_ID);
+  }
+
+  @Test
+  public void testHistoricVariableQueryByCaseExecutionIds() {
+
+    String caseExecutionIds = MockProvider.EXAMPLE_CASE_EXECUTION_ID + "," + MockProvider.ANOTHER_EXAMPLE_CASE_EXECUTION_ID;
+
+    given()
+      .queryParam("caseExecutionIdIn", caseExecutionIds)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .get(HISTORIC_VARIABLE_INSTANCE_RESOURCE_URL);
+
+    verify(mockedQuery).caseExecutionIdIn(MockProvider.EXAMPLE_CASE_EXECUTION_ID, MockProvider.ANOTHER_EXAMPLE_CASE_EXECUTION_ID);
+  }
+
+  @Test
+  public void testHistoricVariableQueryByCaseExecutionIdsAsPost() {
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("caseExecutionIdIn", Arrays.asList(MockProvider.EXAMPLE_CASE_EXECUTION_ID, MockProvider.ANOTHER_EXAMPLE_CASE_EXECUTION_ID));
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(json)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .post(HISTORIC_VARIABLE_INSTANCE_RESOURCE_URL);
+
+    verify(mockedQuery).caseExecutionIdIn(MockProvider.EXAMPLE_CASE_EXECUTION_ID, MockProvider.ANOTHER_EXAMPLE_CASE_EXECUTION_ID);
   }
 
 }
