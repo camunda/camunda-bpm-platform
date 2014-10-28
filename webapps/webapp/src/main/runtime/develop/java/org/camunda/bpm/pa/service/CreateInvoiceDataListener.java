@@ -18,6 +18,7 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
+import org.camunda.bpm.engine.variable.Variables;
 
 /**
  * @author Daniel Meyer
@@ -39,7 +40,7 @@ public class CreateInvoiceDataListener implements ExecutionListener {
     potentialApprovers.put("mary", "Mary Anne");
     potentialApprovers.put("peter", "Peter Meter");
 
-    execution.setVariable("potentialApprovers", potentialApprovers);
+    execution.setVariable("potentialApprovers", Variables.objectValue(potentialApprovers).serializationDataFormat("application/json"));
   }
 
 }
