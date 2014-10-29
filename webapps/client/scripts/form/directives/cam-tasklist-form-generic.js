@@ -75,7 +75,7 @@ define([
           });
 
           camForm = new CamForm(options);
-        }   
+        }
 
         var done = function (err, _camForm) {
           if (err) {
@@ -107,10 +107,10 @@ define([
 
         var complete = function (callback) {
 
-          function localCallback(error) {
+          function localCallback(error, result) {
             clearVariableManager();
             clearFields();
-            return callback(error);
+            return callback(error, result);
           }
 
           try {
