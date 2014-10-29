@@ -483,7 +483,7 @@ public class FilterResourceImpl extends AbstractAuthorizedRestResource implement
     return getProcessEngine().getRuntimeService()
       .createVariableInstanceQuery()
       .disableBinaryFetching()
-      .disableObjectValueDeserialization()
+      .disableCustomObjectDeserialization()
       .variableNameIn(variableNames.toArray(new String[variableNames.size()]))
       .variableScopeIdIn(variableScopeIds.toArray(new String[variableScopeIds.size()]))
       .list();
