@@ -13,6 +13,7 @@
 
 package org.camunda.bpm.engine.cdi.impl;
 
+import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Produces;
 import javax.inject.Named;
@@ -34,13 +35,16 @@ import org.camunda.bpm.engine.TaskService;
  * @author Daniel Meyer
  * @author Falko Menge
  */
+@ApplicationScoped
 public class ProcessEngineServicesProducer {
+  private ProcessEngine processEngine;
 
-  @Produces
-  @Named
-  @ApplicationScoped
-  public ProcessEngine processEngine() {
+  @PostConstruct
+  public void setupProcessEngine() {
+    this.processEngine = lookupProcessEngine();
+  }
 
+  private ProcessEngine lookupProcessEngine() {
     ProcessEngine processEngine =  BpmPlatform.getProcessEngineService().getDefaultProcessEngine();
     if(processEngine != null) {
       return processEngine;
@@ -49,7 +53,13 @@ public class ProcessEngineServicesProducer {
       return ProcessEngines.getDefaultProcessEngine(false);
 
     }
+  }
 
+  @Produces
+  @Named
+  @ApplicationScoped
+  public ProcessEngine processEngine() {
+    return processEngine;
   }
 
   @Produces @Named @ApplicationScoped public RuntimeService runtimeService() { return processEngine().getRuntimeService(); }
