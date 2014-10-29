@@ -61,6 +61,23 @@ define(function() {
       ]
     },
     {
+      group: 'Case Instance',
+      options: [
+        {
+          name: 'caseInstanceId',
+          label: 'Id'
+        },
+        {
+          name: 'caseInstanceBusinessKey',
+          label: 'Business Key'
+        },
+        {
+          name: 'caseInstanceBusinessKeyLike',
+          label: 'Business Key Like'
+        }
+      ]
+    },
+    {
       group: 'Case definition',
       options: [
         {
