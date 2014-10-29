@@ -7,6 +7,8 @@
                         "The process could not be started.",
   "SEARCH_PROCESS_BY_NAME":
                         "Search by process name, case sensitive.",
+  "NO_PROCESS_DEFINITION_AVAILABLE":
+                        "Note there are no process definitions available.",
   "START_PROCESS":
                         "Start a process",
   "CLICK_PROCESS_TO_START":
