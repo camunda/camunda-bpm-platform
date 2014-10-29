@@ -87,6 +87,8 @@
         "Description",
   "NO_DESCRIPTION":
         "Note there is no description of the task.",
+  "NO_DIAGRAM":
+        "Note there is no diagram available.",
   "SELECT_TASK_IN_LIST":
         "Select a task in the list.",
   "CLAIM_TASK":

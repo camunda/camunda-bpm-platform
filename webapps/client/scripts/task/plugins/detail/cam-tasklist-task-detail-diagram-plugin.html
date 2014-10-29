@@ -1,4 +1,22 @@
-<div class="diagram-pane"
-     cam-tasklist-task-diagram
-     task-data="taskData">
+<div ng-show="!processDiagramState.$loaded"
+     class="loader">
+  <i class="animate-spin glyphicon glyphicon-refresh"></i>
+  {{ 'LOADING' | translate }}
+</div>
+
+<div ng-if="processDiagramState.$loaded">
+
+  <div ng-show="!processDefinition || !processDiagram.bpmn20xml"
+       class="well">
+    <i class="glyphicon glyphicon-info-sign"></i>
+    {{ 'NO_DIAGRAM' | translate }}
+  </div>
+
+  <div ng-hide="!processDefinition || !processDiagram.bpmn20xml">
+    <div class="diagram-pane"
+         cam-tasklist-task-diagram
+         process-diagram="processDiagram">
+    </div>
+  </div>
+
 </div>

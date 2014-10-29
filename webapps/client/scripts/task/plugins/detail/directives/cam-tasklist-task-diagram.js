@@ -11,43 +11,65 @@ define([
   var $ = angular.element;
   var $win = $(window);
 
-  return [
-    'camAPI',
-  function(
-    camAPI
-  ) {
-    var ProcessDefinition = camAPI.resource('process-definition');
+  return [function() {
 
     return {
       scope: {
-        taskData: '='
+        processDiagram: '='
       },
 
       template: template,
 
-      link: function(scope, element) {
-
-        var diagramData = scope.taskData.newChild(scope);
-        var process;
-
-        diagramData.observe(['processDefinition', 'task', function (_processDefinition, task) {
-          process = _processDefinition;
-          scope.task = task;
-
-          if (process) {
-            scope.drawDiagram();
-          }
-
-        }]);
+      link: function($scope, element) {
 
         var viewer = new Viewer({
           container: element.find('.diagram-holder')
         });
 
+        $scope.rendering = false;
 
-        scope.loading = false;
-        scope.rendering = false;
+        var processDiagram = null;
 
+        resizeContainer();
+
+        $scope.$watch('processDiagram', function(newValue) {
+          if (newValue) {
+            processDiagram = newValue;
+            renderDiagram();
+          }
+        });
+
+        function renderDiagram() {
+          if (processDiagram) {
+
+            if (processDiagram.bpmn20xml) {
+              $scope.rendering = true;
+              
+              viewer.importXML(processDiagram.bpmn20xml, function(err) {
+
+                $scope.$apply(function() {
+              
+                  $scope.rendering = false;
+                 
+                  if (err) { 
+                    $scope.error = err;
+                  }
+
+                  resizeContainer();
+
+                  var canvas = viewer.get('canvas');
+
+                  var taskDefinitionKey = (processDiagram.task || {}).taskDefinitionKey;
+                  if (taskDefinitionKey) {
+                    canvas.addMarker(taskDefinitionKey, 'highlight');
+                  }
+                  
+                  canvas.zoom('fit-viewport');
+                });
+              });
+            }
+          }
+        }
 
         function resizeContainer() {
           var height = $win.height();
@@ -61,48 +83,8 @@ define([
           }
         }
 
-
-        function renderDiagram() {
-          if (!process || !process._xml) { return; }
-          scope.rendering = true;
-          viewer.importXML(process._xml.bpmn20Xml, function(err) {
-            scope.$apply(function() {
-              scope.rendering = false;
-              if (err) { throw err; }
-
-              resizeContainer();
-
-              var canvas = viewer.get('canvas');
-              canvas.addMarker(scope.task.taskDefinitionKey, 'highlight');
-              canvas.zoom('fit-viewport');
-            });
-          });
-        }
-
-
-        scope.drawDiagram = function() {
-          if (!process) { return; }
-
-
-          if (process._xml) {
-            return renderDiagram();
-          }
-
-          scope.loading = true;
-          ProcessDefinition.xml(process, function(err, xml) {
-            scope.loading = false;
-            if(err) {
-              scope.error = err;
-            }
-            else {
-              scope.error = null;
-              process._xml = xml;
-              renderDiagram();
-            }
-          });
-        };
-
         $win.on('resize', renderDiagram);
+
         element.on('$destroy', function() {
           $win.off('resize', renderDiagram);
         });

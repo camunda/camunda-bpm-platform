@@ -18,9 +18,12 @@
         <div class="names">
           <h2 class="task">{{ task.name || task.taskDefinitionKey || task.id }}</h2>
           <h4 class="process-definition"
-              ng-class="{suspended: task._embedded.processDefinition[0]}">
-            {{ task._embedded.processDefinition[0].name || task._embedded.processDefinition[0].key ||
-               task._embedded.caseDefinition[0].name || task._embedded.caseDefinition[0].key }}
+              ng-if="task.processDefinitionId">
+            {{ task._embedded.processDefinition[0].name || task._embedded.processDefinition[0].key }}
+          </h4>
+          <h4 class="case-definition"
+              ng-if="task.caseDefinitionId">
+            {{ task._embedded.caseDefinition[0].name || task._embedded.caseDefinition[0].key }}
           </h4>
         </div>
 

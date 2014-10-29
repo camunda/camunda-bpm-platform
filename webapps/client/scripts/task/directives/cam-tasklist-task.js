@@ -55,6 +55,7 @@ define([
 
         var History = camAPI.resource('history');
         var Task = camAPI.resource('task');
+        var ProcessDefinition = camAPI.resource('process-definition');
 
         var taskData = $scope.taskData = $scope.tasklistData.newChild($scope);
 
@@ -199,6 +200,25 @@ define([
           return task._embedded.processDefinition[0];
         }]);
 
+        taskData.provide('bpmn20xml', ['processDefinition', function (processDefinition) {
+          var deferred = $q.defer();
+
+          if (!processDefinition) {
+            return deferred.resolve(null);
+          }
+
+          ProcessDefinition.xml(processDefinition, function(err, res) {
+            if(err) {
+              deferred.reject(err);
+            }
+            else {
+              deferred.resolve(res);
+            }
+          });
+
+          return deferred.promise;
+        }]);
+
         taskData.provide('caseDefinition', ['task', function (task) {
           if (!task || !task._embedded || !task._embedded.caseDefinition) {
             return null;
@@ -215,6 +235,44 @@ define([
 
           Task.form(task.id, function(err, res) {
 
+            if(err) {
+              deferred.reject(err);
+            }
+            else {
+              deferred.resolve(res);
+            }
+          });
+
+          return deferred.promise;
+        }]);
+
+        taskData.provide('history', ['task', function (task) {
+          var deferred = $q.defer();
+
+          if (!task) {
+            return deferred.resolve(null);
+          }
+
+          History.userOperation({taskId : task.id}, function(err, res) {
+            if(err) {
+              deferred.reject(err);
+            }
+            else {
+              deferred.resolve(res);
+            }
+          });
+
+          return deferred.promise;
+        }]);
+
+        taskData.provide('comments', ['task', function (task) {
+          var deferred = $q.defer();
+
+          if (!task) {
+            return deferred.resolve(null);
+          }
+
+          Task.comments(task.id, function(err, res) {
             if(err) {
               deferred.reject(err);
             }

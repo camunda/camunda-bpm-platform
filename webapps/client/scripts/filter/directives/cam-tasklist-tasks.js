@@ -65,15 +65,9 @@ define([
           $scope.pageNum = (query.firstResult / $scope.pageSize) + 1;
         });
 
-        $scope.focus = function (task) {
-          tasksData.set('taskId', { 'taskId' : task.id });
-          $scope.currentTaskId = task.id;
-        };
-
         tasksData.observe('taskId', function(taskId) {
           $scope.currentTaskId = taskId.taskId;
         });
-
 
         /**
          * Observes the properties of the current filter.
@@ -84,6 +78,11 @@ define([
           $scope.filterProperties = currentFilter !== null ? currentFilter.properties : null;
 
         }]);
+
+        $scope.focus = function (task) {
+          tasksData.set('taskId', { 'taskId' : task.id });
+          $scope.currentTaskId = task.id;
+        };
 
         /**
          * invoked when pagination is changed
