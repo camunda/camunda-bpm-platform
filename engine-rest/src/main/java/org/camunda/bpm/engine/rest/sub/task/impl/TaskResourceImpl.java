@@ -147,9 +147,14 @@ public class TaskResourceImpl implements TaskResource {
         dto.setKey("embedded:engine://engine/:engine/task/"+taskId+"/rendered-form");
       }
     }
+
     String processDefinitionId = task.getProcessDefinitionId();
+    String caseDefinitionId = task.getCaseDefinitionId();
     if (processDefinitionId != null) {
-      dto.setContextPath(ApplicationContextPathUtil.getApplicationPath(engine, task.getProcessDefinitionId()));
+      dto.setContextPath(ApplicationContextPathUtil.getApplicationPathByProcessDefinitionId(engine, processDefinitionId));
+
+    } else if (caseDefinitionId != null) {
+      dto.setContextPath(ApplicationContextPathUtil.getApplicationPathByCaseDefinitionId(engine, caseDefinitionId));
     }
 
     return dto;

@@ -259,7 +259,7 @@ public class ProcessDefinitionResourceImpl implements ProcessDefinitionResource 
         dto.setKey("embedded:engine://engine/:engine/process-definition/"+processDefinitionId+"/rendered-form");
       }
     }
-    dto.setContextPath(ApplicationContextPathUtil.getApplicationPath(engine, processDefinitionId));
+    dto.setContextPath(ApplicationContextPathUtil.getApplicationPathByProcessDefinitionId(engine, processDefinitionId));
 
     return dto;
   }
