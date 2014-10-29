@@ -5,8 +5,6 @@
   </h3>
 </div>
 
-
-
 <div class="modal-body">
   <div class="form-group">
     <label translate="VARIABLE_VALUE_INFO">Value Info</label>
@@ -26,10 +24,10 @@
 
    <ul class="nav nav-tabs">
     <li ng-class="{ active: selectedTab === 'serialized' }">
-      <a href ng-click="selectTab('serialized')">Serialized</a>
+      <a href ng-click="selectTab('serialized')">{{ 'SERIALIZED' | translate }}</a>
     </li>
     <li ng-class="{ active: selectedTab === 'deserialized' }">
-      <a href ng-click="selectTab('deserialized')">Deserialized</a>
+      <a href ng-click="selectTab('deserialized')">{{ 'DESERIALIZED' | translate }}</a>
     </li>
   </ul>
 
@@ -44,8 +42,8 @@
     <div class="alert alert-warning"
          role="alert" 
          ng-show="deserializationError">
-      <strong>Deserialization Error</strong>:
-      {{deserializationError}}
+      <strong>{{ 'DESERIALIZATION_ERROR' | translate }}</strong>:
+      {{ deserializationError }}
     </div>
     <div ng-show="!deserializationError">
       <textarea disabled

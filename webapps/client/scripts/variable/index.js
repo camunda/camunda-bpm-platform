@@ -12,15 +12,13 @@
 
 
 define([
-  'require',
   'angular',
-  'moment',
-  './directives/cam-tasklist-variables'
+  './directives/cam-tasklist-variables',
+  './modals/cam-tasklist-variables-detail-modal'
 ], function(
-  require,
   angular,
-  moment,
-  camTasklistVariables
+  camTasklistVariables,
+  camTasklistVariablesDetailsModalCtrl
 ) {
 
   var variableModule = angular.module('cam.tasklist.variables', [
@@ -29,6 +27,7 @@ define([
   ]);
 
   variableModule.directive('camTasklistVariables', camTasklistVariables);
+  variableModule.controller('camTasklistVariablesDetailsModalCtrl', camTasklistVariablesDetailsModalCtrl);
 
   return variableModule;
 });

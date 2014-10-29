@@ -18,5 +18,11 @@
   "MORE_VARIABLES":
                     "Show more variables",
   "TOGGLE":
-                    "Toggle"
+                    "Toggle",
+  "SERIALIZED":
+                    "Serialized",
+  "DESERIALIZED":
+                    "Deserialized",
+  "DESERIALIZATION_ERROR":
+                    "Deserialization error"
 }
