@@ -13,12 +13,12 @@
 
 package org.camunda.bpm.engine.impl.util;
 
-import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.persistence.entity.DeploymentEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.ResourceEntity;
-
 import java.io.InputStream;
 import java.nio.charset.Charset;
+
+import org.camunda.bpm.engine.exception.NotFoundException;
+import org.camunda.bpm.engine.impl.persistence.entity.DeploymentEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.ResourceEntity;
 
 /**
  * @author Sebastian Menski
@@ -70,7 +70,7 @@ public final class ResourceUtil {
       return new String(resourceBytes, Charset.forName("UTF-8"));
     }
     else {
-      throw new ProcessEngineException("Unable to find resource with name " + resourceLocation);
+      throw new NotFoundException("Unable to find resource with name " + resourcePath);
     }
   }
 

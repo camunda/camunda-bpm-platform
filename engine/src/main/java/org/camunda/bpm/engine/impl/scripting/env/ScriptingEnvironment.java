@@ -12,17 +12,17 @@
  */
 package org.camunda.bpm.engine.impl.scripting.env;
 
-import org.camunda.bpm.engine.delegate.VariableScope;
-import org.camunda.bpm.engine.impl.scripting.ExecutableScript;
-import org.camunda.bpm.engine.impl.scripting.ScriptFactory;
-import org.camunda.bpm.engine.impl.scripting.engine.ScriptingEngines;
-
-import javax.script.Bindings;
-import javax.script.ScriptEngine;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.script.Bindings;
+import javax.script.ScriptEngine;
+
+import org.camunda.bpm.engine.delegate.VariableScope;
+import org.camunda.bpm.engine.impl.scripting.ExecutableScript;
+import org.camunda.bpm.engine.impl.scripting.ScriptFactory;
+import org.camunda.bpm.engine.impl.scripting.engine.ScriptingEngines;
 
 /**
  * <p>The scripting environment contains scripts that provide an environment to
@@ -51,10 +51,10 @@ public class ScriptingEnvironment {
   /** the scripting engines */
   protected ScriptingEngines scriptingEngines;
 
-  public ScriptingEnvironment(ScriptFactory scriptFactory, List<ScriptEnvResolver> envResolvers) {
+  public ScriptingEnvironment(ScriptFactory scriptFactory, List<ScriptEnvResolver> scriptEnvResolvers, ScriptingEngines scriptingEngines) {
     this.scriptFactory = scriptFactory;
-    this.envResolvers = envResolvers;
-    this.scriptingEngines = scriptFactory.getScriptingEngines();
+    this.envResolvers = scriptEnvResolvers;
+    this.scriptingEngines = scriptingEngines;
   }
 
   /**
@@ -117,7 +117,7 @@ public class ScriptingEnvironment {
       String[] resolvedScripts = resolver.resolve(language);
       if(resolvedScripts != null) {
         for (String resolvedScript : resolvedScripts) {
-          scripts.add(scriptFactory.createScript(resolvedScript, language));
+          scripts.add(scriptFactory.createScriptFromSource(language, resolvedScript));
         }
       }
     }

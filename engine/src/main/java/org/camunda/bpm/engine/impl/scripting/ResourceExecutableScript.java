@@ -13,31 +13,41 @@
 
 package org.camunda.bpm.engine.impl.scripting;
 
-import org.camunda.bpm.engine.delegate.Expression;
+import javax.script.Bindings;
+import javax.script.ScriptEngine;
+
 import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.persistence.entity.DeploymentEntity;
 import org.camunda.bpm.engine.impl.util.ResourceUtil;
 
 /**
- * A script which resource path is dynamically determined during the execution.
- * Therefore it has to be executed in the context of an atomic operation.
+ * A script which is provided by an external resource.
  *
  * @author Sebastian Menski
  */
-public class DynamicResourceExecutableScript extends DynamicExecutableScript {
+public class ResourceExecutableScript extends SourceExecutableScript {
 
-  public DynamicResourceExecutableScript(String language, Expression scriptResourceExpression) {
-    super(scriptResourceExpression, language);
+  protected String scriptResource;
+
+  public ResourceExecutableScript(String language, String scriptResource) {
+    super(language, null);
+    this.scriptResource = scriptResource;
   }
 
-  public String getScriptSource(VariableScope variableScope) {
-    String scriptPath = evaluateExpression(variableScope);
-    return ResourceUtil.loadResourceContent(scriptPath, getDeployment());
+  public Object execute(ScriptEngine engine, VariableScope variableScope, Bindings bindings) {
+    if (scriptSource == null) {
+      loadScriptSource();
+    }
+    return super.execute(engine, variableScope, bindings);
   }
 
-  protected DeploymentEntity getDeployment() {
-    return Context.getBpmnExecutionContext().getDeployment();
+  protected synchronized void loadScriptSource() {
+    if (getScriptSource() == null) {
+      DeploymentEntity deployment = Context.getCoreExecutionContext().getDeployment();
+      String source = ResourceUtil.loadResourceContent(scriptResource, deployment);
+      setScriptSource(source);
+    }
   }
 
 }

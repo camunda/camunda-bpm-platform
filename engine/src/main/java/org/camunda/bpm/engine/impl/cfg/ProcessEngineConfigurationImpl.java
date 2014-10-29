@@ -1273,13 +1273,13 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       scriptingEngines = new ScriptingEngines(new ScriptBindingsFactory(resolverFactories));
     }
     if(scriptFactory == null) {
-      scriptFactory = new ScriptFactory(scriptingEngines, enableScriptCompilation);
+      scriptFactory = new ScriptFactory();
     }
     if(scriptEnvResolvers == null) {
       scriptEnvResolvers = new ArrayList<ScriptEnvResolver>();
     }
     if(scriptingEnvironment == null) {
-      scriptingEnvironment = new ScriptingEnvironment(scriptFactory, scriptEnvResolvers);
+      scriptingEnvironment = new ScriptingEnvironment(scriptFactory, scriptEnvResolvers, scriptingEngines);
     }
   }
 

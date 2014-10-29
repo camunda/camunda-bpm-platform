@@ -12,48 +12,33 @@
  */
 package org.camunda.bpm.engine.impl.scripting;
 
-import javax.script.CompiledScript;
-
-import org.camunda.bpm.engine.impl.scripting.engine.ScriptingEngines;
+import org.camunda.bpm.engine.delegate.Expression;
 
 /**
  * <p>A script factory is responsible for creating a {@link ExecutableScript}
  * instance. Users may customize (subclass) this class in order to customize script
- * compilation. For instance, some users may choose to pre-process scripts before
- * they are compiled.</p>
+ * creation. For instance, some users may choose to pre-process scripts before
+ * they are created.</p>
  *
  * @author Daniel Meyer
  *
  */
 public class ScriptFactory {
 
-  protected ScriptingEngines scriptingEngines;
-  protected boolean compileScripts;
-
-
-  public ScriptFactory(ScriptingEngines scriptingEngines, boolean compileScripts) {
-    this.scriptingEngines = scriptingEngines;
-    this.compileScripts = compileScripts;
+  public ExecutableScript createScriptFromResource(String language, String resource) {
+    return new ResourceExecutableScript(language, resource);
   }
 
-  public ExecutableScript createScript(String src, String language) {
-
-    CompiledScript compiledScript = null;
-    if (compileScripts) {
-      compiledScript = scriptingEngines.compile(src, language);
-    }
-
-    if(compiledScript != null) {
-      return new CompiledExecutableScript(language, compiledScript);
-
-    } else {
-      return new SourceExecutableScript(language, src);
-
-    }
+  public ExecutableScript createScriptFromResource(String language, Expression resourceExpression) {
+    return new DynamicResourceExecutableScript(language, resourceExpression);
   }
 
-  public ScriptingEngines getScriptingEngines() {
-    return scriptingEngines;
+  public ExecutableScript createScriptFromSource(String language, String source) {
+    return new SourceExecutableScript(language, source);
+  }
+
+  public ExecutableScript createScriptFromSource(String language, Expression sourceExpression) {
+    return new DynamicSourceExecutableScript(language, sourceExpression);
   }
 
 }

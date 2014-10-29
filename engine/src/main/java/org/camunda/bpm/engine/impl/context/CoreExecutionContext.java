@@ -34,11 +34,10 @@ public abstract class CoreExecutionContext<T extends CoreExecution> {
   protected abstract String getDeploymentId();
 
   public DeploymentEntity getDeployment() {
-    DeploymentEntity deployment = Context
+    return Context
       .getCommandContext()
       .getDeploymentManager()
       .findDeploymentById(getDeploymentId());
-    return deployment;
   }
 
 }

@@ -24,13 +24,12 @@ import org.camunda.bpm.engine.delegate.VariableScope;
  */
 public class DynamicSourceExecutableScript extends DynamicExecutableScript {
 
-  public DynamicSourceExecutableScript(Expression scriptSourceExpression, String language) {
+  public DynamicSourceExecutableScript(String language, Expression scriptSourceExpression) {
     super(scriptSourceExpression, language);
   }
 
-  public ExecutableScript getScript(VariableScope variableScope) {
-    String scriptSource = (String) scriptExpression.getValue(variableScope);
-    return compileScript(scriptSource);
+  public String getScriptSource(VariableScope variableScope) {
+    return evaluateExpression(variableScope);
   }
 
 }

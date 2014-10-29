@@ -17,7 +17,10 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.ScriptCompilationException;
+import org.camunda.bpm.engine.ScriptEvaluationException;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -505,6 +508,37 @@ public class ScriptTaskTest extends PluggableProcessEngineTestCase {
 
     MySerializable myVar = (MySerializable) runtimeService.getVariable(pi.getId(), "myVar");
     assertEquals("test", myVar.getName());
+  }
+
+  public void testGroovyNotExistingImport() {
+    deployProcess(GROOVY, "import unknown");
+
+    try {
+      runtimeService.startProcessInstanceByKey("testProcess");
+      fail("Should fail during script compilation");
+    }
+    catch (ScriptCompilationException e) {
+      assertTextPresentIgnoreCase("import unknown", e.getMessage());
+    }
+  }
+
+  public void testGroovyNotExistingImportWithoutCompilation() {
+    // disable script compilation
+    processEngineConfiguration.setEnableScriptCompilation(false);
+
+    deployProcess(GROOVY, "import unknown");
+
+    try {
+      runtimeService.startProcessInstanceByKey("testProcess");
+      fail("Should fail during script evaluation");
+    }
+    catch (ScriptEvaluationException e) {
+      assertTextPresentIgnoreCase("import unknown", e.getMessage());
+    }
+    finally {
+      // re-enable script compilation
+      processEngineConfiguration.setEnableScriptCompilation(true);
+    }
   }
 
   protected void deployProcess(String scriptFormat, String scriptText) {

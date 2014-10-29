@@ -13,17 +13,18 @@
 package org.camunda.bpm.engine.impl.scripting;
 
 import java.util.logging.Logger;
-
 import javax.script.Bindings;
+import javax.script.CompiledScript;
 import javax.script.ScriptEngine;
 import javax.script.ScriptException;
 
-import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.ScriptEvaluationException;
 import org.camunda.bpm.engine.delegate.VariableScope;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.context.Context;
 
 /**
- * A script which is provided as source code. This is used if the corresponding
- * script engine does not support compilation.
+ * A script which is provided as source code.
  *
  * @author Daniel Meyer
  *
@@ -33,28 +34,84 @@ public class SourceExecutableScript extends ExecutableScript {
   private static final Logger LOG = Logger.getLogger(SourceExecutableScript.class.getName());
 
   /** The source of the script. */
-  protected String scriptSrc;
+  protected String scriptSource;
 
-  public SourceExecutableScript(String language, String src) {
+  /** Flag to signal if the script should be compiled */
+  protected boolean shouldBeCompiled = true;
+
+  /** The cached compiled script. */
+  protected CompiledScript compiledScript;
+
+  public SourceExecutableScript(String language, String source) {
     super(language);
-    scriptSrc = src;
+    scriptSource = source;
   }
 
   public Object execute(ScriptEngine engine, VariableScope variableScope, Bindings bindings) {
-    try {
-      LOG.fine("Evaluating un-compiled script using " + language + " script engine ");
-      return engine.eval(scriptSrc, bindings);
+    if (shouldBeCompiled) {
+      compileScript();
+    }
+    return evaluateScript(engine, bindings);
+  }
 
-    } catch (ScriptException e) {
-      throw new ProcessEngineException("problem evaluating script: " + e.getMessage(), e);
+  protected void compileScript() {
+    ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
+    if (!processEngineConfiguration.isEnableScriptCompilation()) {
+      // if script compilation is disabled abort
+      shouldBeCompiled = false;
+    }
+    else {
+      if (compiledScript == null && shouldBeCompiled) {
+        synchronized (this) {
+          if (compiledScript == null && shouldBeCompiled) {
+            // try to compile script
+            compiledScript = processEngineConfiguration.getScriptingEngines().compile(language, scriptSource);
+            // either the script was successfully compiled or it can't be compiled but we won't try it again
+            shouldBeCompiled = false;
+          }
+        }
+      }
+    }
+
+  }
+
+  protected Object evaluateScript(ScriptEngine engine, Bindings bindings) {
+    try {
+      if (compiledScript != null) {
+        LOG.fine("Evaluating compiled script using " + language + " script engine ");
+        return compiledScript.eval(bindings);
+      }
+      else {
+        LOG.fine("Evaluating un-compiled script using " + language + " script engine ");
+        return engine.eval(scriptSource, bindings);
+      }
+    }
+    catch (ScriptException e) {
+      throw new ScriptEvaluationException("Unable to evaluate script: " + e.getMessage(), e);
     }
   }
 
-  public String getScriptSrc() {
-    return scriptSrc;
+  public String getScriptSource() {
+    return scriptSource;
   }
 
-  public void setScriptSrc(String scriptSrc) {
-    this.scriptSrc = scriptSrc;
+  /**
+   * Sets the script source code. And invalidates any cached compilation result.
+   *
+   * @param scriptSource the new script source code
+   */
+  public void setScriptSource(String scriptSource) {
+    this.compiledScript = null;
+    shouldBeCompiled = true;
+    this.scriptSource = scriptSource;
   }
+
+  public CompiledScript getCompiledScript() {
+    return compiledScript;
+  }
+
+  public boolean isShouldBeCompiled() {
+    return shouldBeCompiled;
+  }
+
 }

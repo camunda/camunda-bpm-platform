@@ -13,6 +13,7 @@
 package org.camunda.bpm.engine.impl.scripting.engine;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.ScriptCompilationException;
 import org.camunda.bpm.engine.delegate.VariableScope;
 
 import javax.script.*;
@@ -89,13 +90,13 @@ public class ScriptingEngines {
    * {@link #enableScriptEngineCaching} is set to 'true'. Depending on the implementation, the compiled
    * script will keep references to the script engine which created it.</p>
    *
-   * @param src a string of the source of the script
    * @param language the script language in which the script is written
+   * @param src a string of the source of the script
    * @return a {@link CompiledScript} or null if script engine can be found but does not support compilation.
    * @throws ProcessEngineException if no {@link ScriptEngine} can be resolved for the provided language or
-   *         if the script cannot be compiled (sytax error ...).
+   *         if the script cannot be compiled (syntax error ...).
    */
-  public CompiledScript compile(String src, String language) {
+  public CompiledScript compile(String language, String src) {
     ScriptEngine scriptEngine = getScriptEngineForLanguage(language);
 
     if(scriptEngine instanceof Compilable && !scriptEngine.getFactory().getLanguageName().equalsIgnoreCase("ecmascript")) {
@@ -109,7 +110,7 @@ public class ScriptingEngines {
         return compiledScript;
 
       } catch (ScriptException e) {
-        throw new ProcessEngineException("problem while compiling script: "+e.getMessage(), e);
+        throw new ScriptCompilationException("Unable to compile script: " + e.getMessage(), e);
 
       }
 

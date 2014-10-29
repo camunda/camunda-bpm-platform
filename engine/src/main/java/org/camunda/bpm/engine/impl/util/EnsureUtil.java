@@ -210,6 +210,19 @@ public final class EnsureUtil {
     throw generateException(exceptionClass, null, null, message);
   }
 
+  public static void ensureAtLeastOneNotEmpty(String message, String... values) {
+    ensureAtLeastOneNotEmpty(ProcessEngineException.class, message, values);
+  }
+
+  public static void ensureAtLeastOneNotEmpty(Class<? extends ProcessEngineException> exceptionClass, String message, String... values) {
+    for (String value : values) {
+      if (value != null && !value.isEmpty()) {
+        return;
+      }
+    }
+    throw generateException(exceptionClass, null, null, message);
+  }
+
   public static void ensureNotContainsEmptyString(String variableName, Collection<String> values) {
     ensureNotContainsEmptyString((String) null, variableName, values);
   }

@@ -71,7 +71,6 @@ import org.camunda.bpm.engine.impl.bpmn.listener.ClassDelegateExecutionListener;
 import org.camunda.bpm.engine.impl.bpmn.listener.DelegateExpressionExecutionListener;
 import org.camunda.bpm.engine.impl.bpmn.listener.ExpressionExecutionListener;
 import org.camunda.bpm.engine.impl.bpmn.listener.ScriptExecutionListener;
-import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.core.variable.mapping.InputParameter;
 import org.camunda.bpm.engine.impl.core.variable.mapping.IoMapping;
 import org.camunda.bpm.engine.impl.core.variable.mapping.OutputParameter;
@@ -112,12 +111,9 @@ import org.camunda.bpm.engine.impl.pvm.process.ParticipantProcess;
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 import org.camunda.bpm.engine.impl.pvm.process.TransitionImpl;
-import org.camunda.bpm.engine.impl.scripting.DynamicResourceExecutableScript;
-import org.camunda.bpm.engine.impl.scripting.DynamicSourceExecutableScript;
 import org.camunda.bpm.engine.impl.scripting.ExecutableScript;
 import org.camunda.bpm.engine.impl.scripting.ScriptCondition;
 import org.camunda.bpm.engine.impl.scripting.ScriptValueProvider;
-import org.camunda.bpm.engine.impl.scripting.engine.JuelScriptEngineFactory;
 import org.camunda.bpm.engine.impl.scripting.engine.ScriptingEngines;
 import org.camunda.bpm.engine.impl.task.TaskDecorator;
 import org.camunda.bpm.engine.impl.task.TaskDefinition;
@@ -126,7 +122,7 @@ import org.camunda.bpm.engine.impl.task.listener.DelegateExpressionTaskListener;
 import org.camunda.bpm.engine.impl.task.listener.ExpressionTaskListener;
 import org.camunda.bpm.engine.impl.task.listener.ScriptTaskListener;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
-import org.camunda.bpm.engine.impl.util.ResourceUtil;
+import org.camunda.bpm.engine.impl.util.ScriptUtil;
 import org.camunda.bpm.engine.impl.util.StringUtil;
 import org.camunda.bpm.engine.impl.util.xml.Element;
 import org.camunda.bpm.engine.impl.util.xml.Parse;
@@ -1540,20 +1536,18 @@ public class BpmnParse extends Parse {
 
     ScriptTaskActivityBehavior activityBehavior = parseScriptTaskElement(scriptTaskElement);
 
-    if (activityBehavior == null) {
-      addError("ScriptTask does not provide script", scriptTaskElement);
-      return activity;
+    if (activityBehavior != null) {
+      parseAsynchronousContinuation(scriptTaskElement, activity);
+
+      activity.setActivityBehavior(activityBehavior);
+
+      parseExecutionListenersOnScope(scriptTaskElement, activity);
+
+      for (BpmnParseListener parseListener : parseListeners) {
+        parseListener.parseScriptTask(scriptTaskElement, scope, activity);
+      }
     }
 
-    parseAsynchronousContinuation(scriptTaskElement, activity);
-
-    activity.setActivityBehavior(activityBehavior);
-
-    parseExecutionListenersOnScope(scriptTaskElement, activity);
-
-    for (BpmnParseListener parseListener : parseListeners) {
-      parseListener.parseScriptTask(scriptTaskElement, scope, activity);
-    }
     return activity;
   }
 
@@ -1579,67 +1573,21 @@ public class BpmnParse extends Parse {
     }
 
     // determine script source
+    String scriptSource = null;
     Element scriptElement = scriptTaskElement.element("script");
-    String scriptResource = scriptTaskElement.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "resource");
     if (scriptElement != null) {
-      String scriptSource = scriptElement.getText();
-      return new ScriptTaskActivityBehavior(parseScriptSource(scriptSource, language), resultVariableName);
-    } else if (scriptResource != null) {
-      try {
-        return new ScriptTaskActivityBehavior(parseScriptResource(scriptResource, language), resultVariableName);
-      } catch (ProcessEngineException e) {
-        addError("Unable to load script file from resource " + scriptResource, scriptTaskElement);
-      }
+      scriptSource = scriptElement.getText();
     }
+    String scriptResource = scriptTaskElement.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "resource");
 
-    return null;
-  }
-
-  /**
-   * Returns a {@link ScriptTaskActivityBehavior} for a script source expression
-   *
-   * @param scriptSource the script source expression
-   * @param language the script language
-   * @return the corresponding {@link ScriptTaskActivityBehavior}
-   */
-  protected ExecutableScript parseScriptSource(String scriptSource, String language) {
-    if (StringUtil.isExpression(scriptSource) && !JuelScriptEngineFactory.names.contains(language)) {
-      Expression scriptExpression = expressionManager.createExpression(scriptSource.trim());
-      return new DynamicSourceExecutableScript(scriptExpression, language);
+    try {
+      ExecutableScript script = ScriptUtil.getScript(language, scriptSource, scriptResource, expressionManager);
+      return new ScriptTaskActivityBehavior(script, resultVariableName);
     }
-    else {
-      return parseScript(scriptSource, language);
+    catch (ProcessEngineException e) {
+      addError("Unable to process ScriptTask: " + e.getMessage(), scriptElement);
+      return null;
     }
-  }
-
-  /**
-   * Returns a {@link ScriptTaskActivityBehavior} for a script resource expression.
-   *
-   * @param scriptResource the script resource expression
-   * @param scriptLanguage the script language
-   * @return the corresponding {@link ScriptTaskActivityBehavior}
-   */
-  protected ExecutableScript parseScriptResource(String scriptResource, String scriptLanguage) {
-    if (StringUtil.isExpression(scriptResource)) {
-      Expression scriptResourceExpression = expressionManager.createExpression(scriptResource);
-      return new DynamicResourceExecutableScript(scriptResourceExpression, scriptLanguage);
-    }
-    else {
-      String scriptSource = ResourceUtil.loadResourceContent(scriptResource, deployment);
-      return parseScript(scriptSource, scriptLanguage);
-    }
-  }
-
-  /**
-   * Parses a script text into an {@link ExecutableScript}.
-   * @param script the script source
-   * @param language the language in which the script is written
-   * @return the executable script
-   */
-  protected ExecutableScript parseScript(String script, String language) {
-    return Context.getProcessEngineConfiguration()
-      .getScriptFactory()
-      .createScript(script, language);
   }
 
   /**
@@ -3118,9 +3066,12 @@ public class BpmnParse extends Parse {
         condition = new UelExpressionCondition(expressionManager.createExpression(expression));
       }
       else {
-        ExecutableScript script = parseScriptDefinition(language, resource, expression);
-        if (script != null) {
+        try {
+          ExecutableScript script = ScriptUtil.getScript(language, expression, resource, expressionManager);
           condition = new ScriptCondition(script);
+        }
+        catch (ProcessEngineException e) {
+          addError("Unable to process condition expression:" + e.getMessage(), conditionExprElement);
         }
       }
       seqFlow.setProperty(PROPERTYNAME_CONDITION_TEXT, expression);
@@ -3663,20 +3614,14 @@ public class BpmnParse extends Parse {
     else {
       String scriptResource = scriptElement.attribute("resource");
       String scriptSource = scriptElement.getText();
-      return parseScriptDefinition(scriptLanguage, scriptResource, scriptSource);
-    }
-  }
-
-  public ExecutableScript parseScriptDefinition(String language, String resource, String source) {
-    if (language != null) {
-      if (resource != null && !resource.isEmpty()) {
-        return parseScriptResource(resource, language);
+      try {
+        return ScriptUtil.getScript(scriptLanguage, scriptSource, scriptResource, expressionManager);
       }
-      else if(source != null) {
-        return parseScriptSource(source, language);
+      catch (ProcessEngineException e) {
+        addError("Unable to process script: " + e.getMessage(), scriptElement);
+        return null;
       }
     }
-    return null;
   }
 
 }

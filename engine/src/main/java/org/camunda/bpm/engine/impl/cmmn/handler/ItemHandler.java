@@ -17,11 +17,13 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.CaseExecutionListener;
 import org.camunda.bpm.engine.delegate.CaseVariableListener;
 import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.delegate.VariableListener;
 import org.camunda.bpm.engine.impl.bpmn.parser.FieldDeclaration;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cmmn.CaseControlRule;
 import org.camunda.bpm.engine.impl.cmmn.behavior.CaseControlRuleImpl;
 import org.camunda.bpm.engine.impl.cmmn.behavior.CmmnActivityBehavior;
@@ -35,13 +37,9 @@ import org.camunda.bpm.engine.impl.cmmn.model.CmmnSentryDeclaration;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
 import org.camunda.bpm.engine.impl.el.FixedValue;
-import org.camunda.bpm.engine.impl.persistence.entity.DeploymentEntity;
-import org.camunda.bpm.engine.impl.scripting.DynamicResourceExecutableScript;
-import org.camunda.bpm.engine.impl.scripting.DynamicSourceExecutableScript;
 import org.camunda.bpm.engine.impl.scripting.ExecutableScript;
-import org.camunda.bpm.engine.impl.scripting.engine.JuelScriptEngineFactory;
-import org.camunda.bpm.engine.impl.util.ResourceUtil;
-import org.camunda.bpm.engine.impl.util.StringUtil;
+import org.camunda.bpm.engine.impl.scripting.engine.ScriptingEngines;
+import org.camunda.bpm.engine.impl.util.ScriptUtil;
 import org.camunda.bpm.engine.impl.variable.listener.ClassDelegateCaseVariableListener;
 import org.camunda.bpm.engine.impl.variable.listener.DelegateExpressionCaseVariableListener;
 import org.camunda.bpm.engine.impl.variable.listener.ExpressionCaseVariableListener;
@@ -416,49 +414,17 @@ public abstract class ItemHandler extends CmmnElementHandler<CmmnElement, CmmnAc
     String resource = script.getCamundaResource();
     String source = script.getTextContent();
 
-    return initializeScriptDefinition(language, resource, source, context);
-  }
+    if (language == null) {
+      language = ScriptingEngines.DEFAULT_SCRIPTING_LANGUAGE;
+    }
 
-  public ExecutableScript initializeScriptDefinition(String language, String resource, String source, CmmnHandlerContext context) {
-    if (language != null) {
-      if (resource != null && !resource.isEmpty()) {
-        return parseScriptResource(resource, language, context);
-      }
-      else if(source != null) {
-        return parseScriptSource(source, language, context);
-      }
+    try {
+      return ScriptUtil.getScript(language, source, resource, context.getExpressionManager());
     }
-    return null;
-  }
-
-  protected ExecutableScript parseScriptSource(String source, String language, CmmnHandlerContext context) {
-    if (StringUtil.isExpression(source) && !JuelScriptEngineFactory.names.contains(language)) {
-      ExpressionManager expressionManager = context.getExpressionManager();
-      Expression scriptExpression = expressionManager.createExpression(source.trim());
-      return new DynamicSourceExecutableScript(scriptExpression, language);
+    catch (ProcessEngineException e) {
+      // ignore
+      return null;
     }
-    else {
-      return parseScript(source, language);
-    }
-  }
-
-  protected ExecutableScript parseScriptResource(String resource, String language, CmmnHandlerContext context) {
-    if (StringUtil.isExpression(resource)) {
-      ExpressionManager expressionManager = context.getExpressionManager();
-      Expression scriptResourceExpression = expressionManager.createExpression(resource);
-      return new DynamicResourceExecutableScript(scriptResourceExpression, language);
-    }
-    else {
-      DeploymentEntity deployment = (DeploymentEntity) context.getDeployment();
-      String scriptSource = ResourceUtil.loadResourceContent(resource, deployment);
-      return parseScript(scriptSource, language);
-    }
-  }
-
-  protected ExecutableScript parseScript(String script, String language) {
-    return Context.getProcessEngineConfiguration()
-      .getScriptFactory()
-      .createScript(script, language);
   }
 
   protected List<FieldDeclaration> initializeFieldDeclarations(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context, Collection<CamundaField> fields) {

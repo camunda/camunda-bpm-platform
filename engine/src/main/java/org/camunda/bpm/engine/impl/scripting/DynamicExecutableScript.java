@@ -15,10 +15,11 @@ package org.camunda.bpm.engine.impl.scripting;
 
 import javax.script.Bindings;
 import javax.script.ScriptEngine;
+import javax.script.ScriptException;
 
+import org.camunda.bpm.engine.ScriptEvaluationException;
 import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.delegate.VariableScope;
-import org.camunda.bpm.engine.impl.context.Context;
 
 /**
  * A script which is dynamically determined during the execution.
@@ -36,16 +37,19 @@ public abstract class DynamicExecutableScript extends ExecutableScript {
   }
 
   public Object execute(ScriptEngine scriptEngine, VariableScope variableScope, Bindings bindings) {
-    ExecutableScript script = getScript(variableScope);
-    return script.execute(scriptEngine, variableScope, bindings);
+    String source = getScriptSource(variableScope);
+    try {
+      return scriptEngine.eval(source, bindings);
+    }
+    catch (ScriptException e) {
+      throw new ScriptEvaluationException("Unable to evaluate script: " + e.getMessage(), e);
+    }
   }
 
-  public abstract ExecutableScript getScript(VariableScope variableScope);
-
-  protected ExecutableScript compileScript(String scriptSource) {
-    return Context.getProcessEngineConfiguration()
-      .getScriptFactory()
-      .createScript(scriptSource, language);
+  protected String evaluateExpression(VariableScope variableScope) {
+    return (String) scriptExpression.getValue(variableScope);
   }
+
+  public abstract String getScriptSource(VariableScope variableScope);
 
 }
