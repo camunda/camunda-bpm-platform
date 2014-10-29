@@ -3,10 +3,14 @@
                     "&lt;Empty&gt;",
   "TASK_VARIABLES":
                     "Variables",
-  "VARIABLE_SERIALIZED_OF":
-                    "Serializable variable of type",
+  "VARIABLE_OBJECT_TYPE_NAME":
+                    "Object Type Name",
+  "VARIABLE_VALUE_INFO":
+                    "Value Info",
   "VARIABLE_VALUE":
-                    "Value of",
+                    "Value",
+  "VARIABLE_SERIALIZATION_DATA_FORMAT":
+                    "Serialization Data Format",
   "DOWNLOAD":
                     "Download",
   "LESS_VARIABLES":

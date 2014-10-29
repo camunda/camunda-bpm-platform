@@ -17,10 +17,14 @@ define([
   var modalCtrl = [
     '$scope',
     '$modalInstance',
+    '$http',
+    'Uri',
     'details',
   function(
     $scope,
     $modalInstance,
+    $http,
+    Uri,
     details
   ) {
 
@@ -29,9 +33,12 @@ define([
     });
 
     $scope.value = null;
+    $scope.valueDeserialized = null;
+    $scope.deserializationError = null;
     $scope.type = null;
     $scope.dataFormat = null;
     $scope.variable = details;
+    $scope.selectedTab = 'serialized';
 
     switch ($scope.variable.type) {
       case 'Object':
@@ -39,14 +46,26 @@ define([
         $scope.value = $scope.variable.value;
         $scope.dataFormat = $scope.variable.valueInfo.serializationDataFormat;
 
-        if ($scope.type.toLowerCase().indexOf('json') > -1 && typeof $scope.value === 'string') {
-          $scope.value = JSON.stringify(JSON.parse($scope.value), null, 2);
-        }
+        // attempt fetching the deserialized value
+        $http({
+          method: 'GET', 
+          url: Uri.appUri('engine://engine/:engine'+$scope.variable._links.self.href)
+        }).success(function(data, status) {
+          $scope.valueDeserialized = JSON.stringify(data.value);
+        }).error(function(data, status) {
+          $scope.deserializationError = data.message;
+        });
+
         break;
 
       default:
         $scope.value = $scope.variable.value;
     }
+
+    $scope.selectTab = function(tab) {
+      $scope.selectedTab = tab;
+    };
+
   }];
 
 
