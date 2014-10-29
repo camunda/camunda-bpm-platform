@@ -101,11 +101,16 @@ define([
           }
         }
 
+        function clearFields() {
+          camForm.fields = [];
+        }
+
         var complete = function (callback) {
           try {
             camForm.initializeFieldHandlers();
           } catch (error) {
             clearVariableManager();
+            clearFields();
             return callback(error);
           }
 
