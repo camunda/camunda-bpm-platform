@@ -73,7 +73,7 @@ public abstract class AbstractVariableInstanceRestServiceInteractionTest extends
 
     when(variableInstanceQueryMock.variableId(variableInstanceMock.getId())).thenReturn(variableInstanceQueryMock);
     when(variableInstanceQueryMock.disableBinaryFetching()).thenReturn(variableInstanceQueryMock);
-    when(variableInstanceQueryMock.disableObjectValueDeserialization()).thenReturn(variableInstanceQueryMock);
+    when(variableInstanceQueryMock.disableCustomObjectDeserialization()).thenReturn(variableInstanceQueryMock);
     when(variableInstanceQueryMock.singleResult()).thenReturn(variableInstanceMock);
 
     given().pathParam("id", MockProvider.EXAMPLE_VARIABLE_INSTANCE_ID)
@@ -128,7 +128,7 @@ public abstract class AbstractVariableInstanceRestServiceInteractionTest extends
     .when().get(VARIABLE_INSTANCE_URL);
 
     verify(variableInstanceQueryMock, times(1)).disableBinaryFetching();
-    verify(variableInstanceQueryMock, never()).disableObjectValueDeserialization();
+    verify(variableInstanceQueryMock, never()).disableCustomObjectDeserialization();
   }
 
   @Test
@@ -141,7 +141,7 @@ public abstract class AbstractVariableInstanceRestServiceInteractionTest extends
 
     when(variableInstanceQueryMock.variableId(variableInstanceMock.getId())).thenReturn(variableInstanceQueryMock);
     when(variableInstanceQueryMock.disableBinaryFetching()).thenReturn(variableInstanceQueryMock);
-    when(variableInstanceQueryMock.disableObjectValueDeserialization()).thenReturn(variableInstanceQueryMock);
+    when(variableInstanceQueryMock.disableCustomObjectDeserialization()).thenReturn(variableInstanceQueryMock);
     when(variableInstanceQueryMock.singleResult()).thenReturn(variableInstanceMock);
 
     given()
@@ -165,7 +165,7 @@ public abstract class AbstractVariableInstanceRestServiceInteractionTest extends
     .when().get(VARIABLE_INSTANCE_URL);
 
     verify(variableInstanceQueryMock, times(1)).disableBinaryFetching();
-    verify(variableInstanceQueryMock, times(1)).disableObjectValueDeserialization();
+    verify(variableInstanceQueryMock, times(1)).disableCustomObjectDeserialization();
   }
 
   @Test
@@ -178,7 +178,7 @@ public abstract class AbstractVariableInstanceRestServiceInteractionTest extends
 
     when(variableInstanceQueryMock.variableId(variableInstanceMock.getId())).thenReturn(variableInstanceQueryMock);
     when(variableInstanceQueryMock.disableBinaryFetching()).thenReturn(variableInstanceQueryMock);
-    when(variableInstanceQueryMock.disableObjectValueDeserialization()).thenReturn(variableInstanceQueryMock);
+    when(variableInstanceQueryMock.disableCustomObjectDeserialization()).thenReturn(variableInstanceQueryMock);
     when(variableInstanceQueryMock.singleResult()).thenReturn(variableInstanceMock);
 
     given().pathParam("id", MockProvider.EXAMPLE_VARIABLE_INSTANCE_ID)
@@ -199,7 +199,7 @@ public abstract class AbstractVariableInstanceRestServiceInteractionTest extends
 
     when(variableInstanceQueryMock.variableId(nonExistingId)).thenReturn(variableInstanceQueryMock);
     when(variableInstanceQueryMock.disableBinaryFetching()).thenReturn(variableInstanceQueryMock);
-    when(variableInstanceQueryMock.disableObjectValueDeserialization()).thenReturn(variableInstanceQueryMock);
+    when(variableInstanceQueryMock.disableCustomObjectDeserialization()).thenReturn(variableInstanceQueryMock);
     when(variableInstanceQueryMock.singleResult()).thenReturn(null);
 
     given().pathParam("id", nonExistingId)
@@ -220,7 +220,7 @@ public abstract class AbstractVariableInstanceRestServiceInteractionTest extends
           .build();
 
     when(variableInstanceQueryMock.variableId(variableInstanceMock.getId())).thenReturn(variableInstanceQueryMock);
-    when(variableInstanceQueryMock.disableObjectValueDeserialization()).thenReturn(variableInstanceQueryMock);
+    when(variableInstanceQueryMock.disableCustomObjectDeserialization()).thenReturn(variableInstanceQueryMock);
     when(variableInstanceQueryMock.singleResult()).thenReturn(variableInstanceMock);
 
     Response response = given().pathParam("id", MockProvider.EXAMPLE_VARIABLE_INSTANCE_ID)
@@ -232,7 +232,7 @@ public abstract class AbstractVariableInstanceRestServiceInteractionTest extends
     byte[] responseBytes = response.getBody().asByteArray();
     Assert.assertEquals(new String(byteContent), new String(responseBytes));
     verify(variableInstanceQueryMock, never()).disableBinaryFetching();
-    verify(variableInstanceQueryMock).disableObjectValueDeserialization();
+    verify(variableInstanceQueryMock).disableCustomObjectDeserialization();
 
   }
 
@@ -241,7 +241,7 @@ public abstract class AbstractVariableInstanceRestServiceInteractionTest extends
     VariableInstance variableInstanceMock = MockProvider.createMockVariableInstance();
 
     when(variableInstanceQueryMock.variableId(variableInstanceMock.getId())).thenReturn(variableInstanceQueryMock);
-    when(variableInstanceQueryMock.disableObjectValueDeserialization()).thenReturn(variableInstanceQueryMock);
+    when(variableInstanceQueryMock.disableCustomObjectDeserialization()).thenReturn(variableInstanceQueryMock);
     when(variableInstanceQueryMock.singleResult()).thenReturn(variableInstanceMock);
 
     given().pathParam("id", MockProvider.EXAMPLE_VARIABLE_INSTANCE_ID)
@@ -251,7 +251,7 @@ public abstract class AbstractVariableInstanceRestServiceInteractionTest extends
     .when().get(VARIABLE_INSTANCE_BINARY_DATA_URL);
 
     verify(variableInstanceQueryMock, never()).disableBinaryFetching();
-    verify(variableInstanceQueryMock).disableObjectValueDeserialization();
+    verify(variableInstanceQueryMock).disableCustomObjectDeserialization();
 
   }
 
@@ -261,7 +261,7 @@ public abstract class AbstractVariableInstanceRestServiceInteractionTest extends
     String nonExistingId = "nonExistingId";
 
     when(variableInstanceQueryMock.variableId(nonExistingId)).thenReturn(variableInstanceQueryMock);
-    when(variableInstanceQueryMock.disableObjectValueDeserialization()).thenReturn(variableInstanceQueryMock);
+    when(variableInstanceQueryMock.disableCustomObjectDeserialization()).thenReturn(variableInstanceQueryMock);
     when(variableInstanceQueryMock.singleResult()).thenReturn(null);
 
     given().pathParam("id", nonExistingId)
@@ -270,7 +270,7 @@ public abstract class AbstractVariableInstanceRestServiceInteractionTest extends
     .when().get(VARIABLE_INSTANCE_BINARY_DATA_URL);
 
     verify(variableInstanceQueryMock, never()).disableBinaryFetching();
-    verify(variableInstanceQueryMock).disableObjectValueDeserialization();
+    verify(variableInstanceQueryMock).disableCustomObjectDeserialization();
   }
 
 }

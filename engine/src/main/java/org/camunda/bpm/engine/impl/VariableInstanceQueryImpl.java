@@ -117,7 +117,7 @@ public class VariableInstanceQueryImpl extends AbstractVariableQueryImpl<Variabl
     return this;
   }
 
-  public VariableInstanceQuery disableObjectValueDeserialization() {
+  public VariableInstanceQuery disableCustomObjectDeserialization() {
     this.isCustomObjectDeserializationEnabled = false;
     return this;
   }

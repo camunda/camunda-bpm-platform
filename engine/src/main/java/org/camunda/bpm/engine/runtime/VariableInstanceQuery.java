@@ -131,7 +131,7 @@ public interface VariableInstanceQuery extends Query<VariableInstanceQuery, Vari
    * prevent such attempts in environments where their classes are not available.
    * Independent of this setting, variable serialized values are accessible.
    */
-  VariableInstanceQuery disableObjectValueDeserialization();
+  VariableInstanceQuery disableCustomObjectDeserialization();
 
   /**
    * Only select variable instances which value is like the given value.

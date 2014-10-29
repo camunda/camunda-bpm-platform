@@ -208,23 +208,6 @@ public class JsonSerializationTest extends PluggableProcessEngineTestCase {
     assertSame(returnedBean, theSameReturnedBean);
   }
 
-//  public void testApplicationOfGlobalConfiguration() throws JSONException {
-//    DataFormats.jsonTreeGlobal().mapper().config("aKey", "aValue");
-//
-//    SpinVariableTypeResolver resolver = new SpinVariableTypeResolver();
-//    SpinSerializationType variableType = (SpinSerializationType) resolver.getTypeForSerializationFormat(JSON_FORMAT_NAME);
-//
-//    DataFormats.jsonTreeGlobal().mapper().config("aKey", null);
-//
-//    JsonJacksonTreeDataFormat dataFormat = (JsonJacksonTreeDataFormat) variableType.getDefaultDataFormat();
-//    assertNotSame("The variable type should not use the global data format instance",
-//        DataFormats.jsonTreeGlobal(), dataFormat);
-//
-//    assertEquals("The global configuration should have been applied to the variable type's format",
-//        "aValue", dataFormat.mapper().getConfiguration().get("aKey"));
-//  }
-//
-
   @Deployment(resources = ONE_TASK_PROCESS)
   public void testGetSerializedVariableValue() throws JSONException {
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("oneTaskProcess");

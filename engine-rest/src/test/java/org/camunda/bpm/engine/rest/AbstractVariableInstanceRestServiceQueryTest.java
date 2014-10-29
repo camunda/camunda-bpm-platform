@@ -76,7 +76,7 @@ public abstract class AbstractVariableInstanceRestServiceQueryTest extends Abstr
 
     verify(mockedQuery).list();
     verify(mockedQuery).disableBinaryFetching();
-    verify(mockedQuery, never()).disableObjectValueDeserialization();
+    verify(mockedQuery, never()).disableCustomObjectDeserialization();
     verifyNoMoreInteractions(mockedQuery);
   }
 
@@ -91,7 +91,7 @@ public abstract class AbstractVariableInstanceRestServiceQueryTest extends Abstr
 
     verify(mockedQuery).list();
     verify(mockedQuery).disableBinaryFetching();
-    verify(mockedQuery).disableObjectValueDeserialization();
+    verify(mockedQuery).disableCustomObjectDeserialization();
     verifyNoMoreInteractions(mockedQuery);
   }
 
@@ -103,7 +103,7 @@ public abstract class AbstractVariableInstanceRestServiceQueryTest extends Abstr
 
     verify(mockedQuery).list();
     verify(mockedQuery).disableBinaryFetching();
-    verify(mockedQuery, never()).disableObjectValueDeserialization();
+    verify(mockedQuery, never()).disableCustomObjectDeserialization();
     verifyNoMoreInteractions(mockedQuery);
   }
 
@@ -120,7 +120,7 @@ public abstract class AbstractVariableInstanceRestServiceQueryTest extends Abstr
 
     verify(mockedQuery).list();
     verify(mockedQuery).disableBinaryFetching();
-    verify(mockedQuery).disableObjectValueDeserialization();
+    verify(mockedQuery).disableCustomObjectDeserialization();
     verifyNoMoreInteractions(mockedQuery);
   }
 
@@ -204,7 +204,7 @@ public abstract class AbstractVariableInstanceRestServiceQueryTest extends Abstr
 
     // requirement to not break existing API; should be:
     // verify(variableInstanceQueryMock).disableCustomObjectDeserialization();
-    verify(mockedQuery, never()).disableObjectValueDeserialization();
+    verify(mockedQuery, never()).disableCustomObjectDeserialization();
   }
 
   /**
@@ -222,7 +222,7 @@ public abstract class AbstractVariableInstanceRestServiceQueryTest extends Abstr
 
     // requirement to not break existing API; should be:
     // verify(variableInstanceQueryMock).disableCustomObjectDeserialization();
-    verify(mockedQuery, never()).disableObjectValueDeserialization();
+    verify(mockedQuery, never()).disableCustomObjectDeserialization();
   }
 
   /**
@@ -240,7 +240,7 @@ public abstract class AbstractVariableInstanceRestServiceQueryTest extends Abstr
 
     // requirement to not break existing API; should be:
     // verify(variableInstanceQueryMock).disableCustomObjectDeserialization();
-    verify(mockedQuery, never()).disableObjectValueDeserialization();
+    verify(mockedQuery, never()).disableCustomObjectDeserialization();
   }
 
   @Test
@@ -277,7 +277,7 @@ public abstract class AbstractVariableInstanceRestServiceQueryTest extends Abstr
     verify(mockedQuery).disableBinaryFetching();
     // requirement to not break existing API; should be:
     // verify(mockedQuery).disableCustomObjectDeserialization();
-    verify(mockedQuery, never()).disableObjectValueDeserialization();
+    verify(mockedQuery, never()).disableCustomObjectDeserialization();
   }
 
 
@@ -319,7 +319,7 @@ public abstract class AbstractVariableInstanceRestServiceQueryTest extends Abstr
 
     // requirement to not break existing API; should be:
     // verify(mockedQuery).disableCustomObjectDeserialization();
-    verify(mockedQuery, never()).disableObjectValueDeserialization();
+    verify(mockedQuery, never()).disableCustomObjectDeserialization();
   }
 
   @Test
@@ -355,7 +355,7 @@ public abstract class AbstractVariableInstanceRestServiceQueryTest extends Abstr
 
     // requirement to not break existing API; should be:
     // verify(mockedQuery).disableCustomObjectDeserialization();
-    verify(mockedQuery, never()).disableObjectValueDeserialization();
+    verify(mockedQuery, never()).disableCustomObjectDeserialization();
   }
 
   @Test
@@ -419,7 +419,7 @@ public abstract class AbstractVariableInstanceRestServiceQueryTest extends Abstr
 
     // requirement to not break existing API; should be:
     // verify(mockedQuery).disableCustomObjectDeserialization();
-    verify(mockedQuery, never()).disableObjectValueDeserialization();
+    verify(mockedQuery, never()).disableCustomObjectDeserialization();
   }
 
   @Test
@@ -471,7 +471,7 @@ public abstract class AbstractVariableInstanceRestServiceQueryTest extends Abstr
 
     // requirement to not break existing API; should be:
     // verify(mockedQuery, times(7)).disableCustomObjectDeserialization();
-    verify(mockedQuery, never()).disableObjectValueDeserialization();
+    verify(mockedQuery, never()).disableCustomObjectDeserialization();
   }
 
   @Test
@@ -496,7 +496,7 @@ public abstract class AbstractVariableInstanceRestServiceQueryTest extends Abstr
 
     // requirement to not break existing API; should be:
     // verify(variableInstanceQueryMock).disableCustomObjectDeserialization();
-    verify(mockedQuery, never()).disableObjectValueDeserialization();
+    verify(mockedQuery, never()).disableCustomObjectDeserialization();
   }
 
   @Test
@@ -533,7 +533,7 @@ public abstract class AbstractVariableInstanceRestServiceQueryTest extends Abstr
 
     // requirement to not break existing API; should be:
     // verify(variableInstanceQueryMock).disableCustomObjectDeserialization();
-    verify(mockedQuery, never()).disableObjectValueDeserialization();
+    verify(mockedQuery, never()).disableCustomObjectDeserialization();
   }
 
   @Test
@@ -571,7 +571,7 @@ public abstract class AbstractVariableInstanceRestServiceQueryTest extends Abstr
 
     // requirement to not break existing API; should be:
     // verify(variableInstanceQueryMock).disableCustomObjectDeserialization();
-    verify(mockedQuery, never()).disableObjectValueDeserialization();
+    verify(mockedQuery, never()).disableCustomObjectDeserialization();
   }
 
   @Test
@@ -631,7 +631,7 @@ public abstract class AbstractVariableInstanceRestServiceQueryTest extends Abstr
 
     // requirement to not break existing API; should be:
     // verify(variableInstanceQueryMock).disableCustomObjectDeserialization();
-    verify(mockedQuery, never()).disableObjectValueDeserialization();
+    verify(mockedQuery, never()).disableCustomObjectDeserialization();
   }
 
   @Test

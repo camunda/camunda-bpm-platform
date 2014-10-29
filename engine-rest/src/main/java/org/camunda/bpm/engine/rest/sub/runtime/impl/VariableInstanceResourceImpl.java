@@ -46,7 +46,7 @@ public class VariableInstanceResourceImpl implements VariableInstanceResource {
     baseQuery.disableBinaryFetching();
 
     if(!deserializeObjectValue) {
-      baseQuery.disableObjectValueDeserialization();
+      baseQuery.disableCustomObjectDeserialization();
     }
 
     VariableInstance variableInstance = baseQuery.singleResult();
@@ -63,7 +63,7 @@ public class VariableInstanceResourceImpl implements VariableInstanceResource {
   public InputStream getBinaryVariable() {
 
     VariableInstance variableInstance = baseQuery()
-        .disableObjectValueDeserialization()
+        .disableCustomObjectDeserialization()
         .singleResult();
     if(variableInstance != null) {
       if (variableInstance.getTypeName().equals(ValueType.BYTES.getName())) {

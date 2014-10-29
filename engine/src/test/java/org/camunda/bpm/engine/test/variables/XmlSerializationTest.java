@@ -34,7 +34,6 @@ import org.camunda.bpm.engine.variable.value.builder.SerializedObjectValueBuilde
 import org.camunda.spin.DataFormats;
 import org.camunda.spin.Spin;
 import org.camunda.spin.xml.SpinXmlElement;
-import org.json.JSONException;
 
 public class XmlSerializationTest extends PluggableProcessEngineTestCase {
 
@@ -45,11 +44,11 @@ public class XmlSerializationTest extends PluggableProcessEngineTestCase {
   protected String originalSerializationFormat;
 
   @Deployment(resources = ONE_TASK_PROCESS)
-  public void testSerializationAsXml() throws JSONException {
+  public void testSerializationAsXml() {
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
     XmlSerializable bean = new XmlSerializable("a String", 42, true);
-    // request object to be serialized as JSON
+    // request object to be serialized as XML
     runtimeService.setVariable(instance.getId(), "simpleBean", objectValue(bean).serializationDataFormat(XML_FORMAT_NAME).create());
 
     // validate untyped value
@@ -186,7 +185,7 @@ public class XmlSerializationTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = ONE_TASK_PROCESS)
-  public void testGetSerializedVariableValue() throws JSONException {
+  public void testGetSerializedVariableValue() {
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
     XmlSerializable bean = new XmlSerializable("a String", 42, true);
@@ -204,9 +203,9 @@ public class XmlSerializationTest extends PluggableProcessEngineTestCase {
   public void testSetSerializedVariableValue() {
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
     XmlSerializable bean = new XmlSerializable("a String", 42, true);
-    String beanAsJson = bean.toExpectedXmlString();
+    String beanAsXml = bean.toExpectedXmlString();
 
-    SerializedObjectValueBuilder serializedValue = serializedObjectValue(beanAsJson)
+    SerializedObjectValueBuilder serializedValue = serializedObjectValue(beanAsXml)
       .serializationDataFormat(XML_FORMAT_NAME)
       .objectTypeName(bean.getClass().getCanonicalName());
 
@@ -224,12 +223,12 @@ public class XmlSerializationTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = ONE_TASK_PROCESS)
-  public void testSetSerializedVariableValueNoTypeName() throws JSONException {
+  public void testSetSerializedVariableValueNoTypeName() {
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
     XmlSerializable bean = new XmlSerializable("a String", 42, true);
-    String beanAsJson = bean.toExpectedXmlString();
+    String beanAsXml = bean.toExpectedXmlString();
 
-    SerializedObjectValueBuilder serializedValue = serializedObjectValue(beanAsJson)
+    SerializedObjectValueBuilder serializedValue = serializedObjectValue(beanAsXml)
       .serializationDataFormat(XML_FORMAT_NAME);
       // no type name
 
@@ -243,12 +242,12 @@ public class XmlSerializationTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = ONE_TASK_PROCESS)
-  public void testSetSerializedVariableValueMismatchingTypeName() throws JSONException {
+  public void testSetSerializedVariableValueMismatchingTypeName() {
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
     XmlSerializable bean = new XmlSerializable("a String", 42, true);
-    String beanAsJson = bean.toExpectedXmlString();
+    String beanAsXml = bean.toExpectedXmlString();
 
-    SerializedObjectValueBuilder serializedValue = serializedObjectValue(beanAsJson)
+    SerializedObjectValueBuilder serializedValue = serializedObjectValue(beanAsXml)
       .serializationDataFormat(XML_FORMAT_NAME)
       .objectTypeName("Insensible type name."); // < not a valid type name
 
@@ -262,7 +261,7 @@ public class XmlSerializationTest extends PluggableProcessEngineTestCase {
       // happy path
     }
 
-    serializedValue = serializedObjectValue(beanAsJson)
+    serializedValue = serializedObjectValue(beanAsXml)
       .serializationDataFormat(XML_FORMAT_NAME)
       .objectTypeName(XmlSerializationTest.class.getName()); // < not the right type name
 
@@ -279,7 +278,7 @@ public class XmlSerializationTest extends PluggableProcessEngineTestCase {
 
 
   @Deployment(resources = ONE_TASK_PROCESS)
-  public void testSetSerializedVariableValueNull() throws JSONException {
+  public void testSetSerializedVariableValueNull() {
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
     SerializedObjectValueBuilder serializedValue = serializedObjectValue()
@@ -302,7 +301,7 @@ public class XmlSerializationTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = ONE_TASK_PROCESS)
-  public void testSetSerializedVariableValueNullNoTypeName() throws JSONException {
+  public void testSetSerializedVariableValueNullNoTypeName() {
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
     SerializedObjectValueBuilder serializedValue = serializedObjectValue()

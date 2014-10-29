@@ -2311,7 +2311,7 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
 
     // when
     VariableInstanceQuery query =
-        runtimeService.createVariableInstanceQuery().disableObjectValueDeserialization();
+        runtimeService.createVariableInstanceQuery().disableCustomObjectDeserialization();
 
     // then
     List<VariableInstance> results = query.list();
