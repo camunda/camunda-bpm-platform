@@ -12,9 +12,14 @@
  */
 package org.camunda.bpm.engine.impl.spin;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 
+import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.impl.variable.serializer.AbstractObjectValueSerializer;
 import org.camunda.bpm.engine.impl.variable.serializer.TypedValueSerializer;
@@ -60,13 +65,18 @@ public class SpinObjectValueSerializer extends AbstractObjectValueSerializer {
     DataFormatWriter writer = dataFormat.getWriter();
 
     ByteArrayOutputStream out = new ByteArrayOutputStream();
+    OutputStreamWriter outWriter = new OutputStreamWriter(out, Context.getProcessEngineConfiguration().getDefaultCharset());
+    BufferedWriter bufferedWriter = new BufferedWriter(outWriter);
+
     try {
       Object mappedObject = mapper.mapJavaToInternal(deserializedObject);
-      writer.writeToStream(out, mappedObject);
+      writer.writeToWriter(bufferedWriter, mappedObject);
       return out.toByteArray();
     }
     finally {
       IoUtil.closeSilently(out);
+      IoUtil.closeSilently(outWriter);
+      IoUtil.closeSilently(bufferedWriter);
     }
   }
 
@@ -75,12 +85,17 @@ public class SpinObjectValueSerializer extends AbstractObjectValueSerializer {
     DataFormatReader reader = dataFormat.getReader();
 
     ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
+    InputStreamReader inReader = new InputStreamReader(bais, Context.getProcessEngineConfiguration().getDefaultCharset());
+    BufferedReader bufferedReader = new BufferedReader(inReader);
+
     try {
-      Object mappedObject = reader.readInput(bais);
+      Object mappedObject = reader.readInput(bufferedReader);
       return mapper.mapInternalToJava(mappedObject, objectTypeName);
     }
     finally{
       IoUtil.closeSilently(bais);
+      IoUtil.closeSilently(inReader);
+      IoUtil.closeSilently(bufferedReader);
     }
   }
 
