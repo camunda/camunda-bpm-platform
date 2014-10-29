@@ -762,15 +762,15 @@
     </profile>
 
     <profile>
-      <!-- check for official api differences between latest major release -->
-      <id>check-api-compability</id>
+      <!-- check for official api differences between latest minor release -->
+      <id>check-api-compatibility</id>
       <build>
         <plugins>
           <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>clirr-maven-plugin</artifactId>
             <configuration>
-              <comparisonVersion>7.0.0-Final</comparisonVersion>
+              <comparisonVersion>7.1.0-Final</comparisonVersion>
               <textOutputFile>${project.build.directory}/clirr.txt</textOutputFile>
               <failOnError>false</failOnError>
               <includes>
