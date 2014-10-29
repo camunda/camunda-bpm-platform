@@ -106,19 +106,24 @@ define([
         }
 
         var complete = function (callback) {
-          try {
-            camForm.initializeFieldHandlers();
-          } catch (error) {
+
+          function localCallback(error) {
             clearVariableManager();
             clearFields();
             return callback(error);
+          }
+
+          try {
+            camForm.initializeFieldHandlers();
+          } catch (error) {
+            return localCallback(error);
           }
 
           var variables = camForm.variableManager.variables;
           for (var v in variables) {
             variables[v].value = null;
           }
-          camForm.submit(callback);
+          camForm.submit(localCallback);
         };
 
         formController.registerCompletionHandler(complete);
