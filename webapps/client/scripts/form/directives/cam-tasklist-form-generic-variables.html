@@ -51,7 +51,8 @@
             <input type="checkbox"
                    ng-model="variable.value"
                    ng-checked="variable.value"
-                   cam-variable-name="{{ variable.name }}" 
+                   class="form-control"
+                   cam-variable-name="{{ variable.name }}"
                    cam-variable-type="{{ variable.type }}" />
           </label>
         </div>
@@ -62,7 +63,7 @@
               class="form-control"
               placeholder="{{ 'VALUE' | translate }}"
               ng-model="variable.value"
-              cam-variable-name="{{ variable.name }}" 
+              cam-variable-name="{{ variable.name }}"
               cam-variable-type="{{ variable.type }}" />
       </div>
     </div>

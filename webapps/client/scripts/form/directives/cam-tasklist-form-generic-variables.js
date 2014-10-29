@@ -24,7 +24,7 @@ define([
         };
 
         var variableTypes = $scope.variableTypes = {
-          'Boolean':  'text', // checkbox is currently not supported
+          'Boolean':  'checkbox', // handled via switch in HTML template
           'Integer':  'text',
           'Double':   'text',
           'Long':     'text',
