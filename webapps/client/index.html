@@ -41,26 +41,24 @@
 
     <!-- # page-content -->
     <div class="page-wrap" >
-      <div class="row controls">
-        <div notifications-panel
-             class="cols notifications-panel page-notifications"></div>
-      </div>
-
       <div ng-view
            class="ui-wrap"></div>
     </div>
     <!-- / page-content -->
   </div>
 
-  <!-- <div class="page-wrap" >
-  </div> -->
-    <div class="fake-columns">
-      <div class="row">
-        <div class="cols col-sm-2 task-filters"></div>
-        <div class="cols col-sm-4 task-list"></div>
-        <div class="cols col-sm-6 current-task"></div>
-      </div>
+
+  <div class="fake-columns">
+    <div class="row">
+      <div class="cols col-sm-2 task-filters"></div>
+      <div class="cols col-sm-4 task-list"></div>
+      <div class="cols col-sm-6 current-task"></div>
     </div>
+  </div>
+
+
+  <div notifications-panel
+       class="page-notifications"></div>
 
   <!-- # page-footer -->
   <footer class="page">
@@ -74,8 +72,6 @@
     </div>
   </footer>
   <!-- / page-footer -->
-
-  <div cam-tasklist-notifier></div>
 
   <script type="text/javascript">
     // override the following line to include configuration

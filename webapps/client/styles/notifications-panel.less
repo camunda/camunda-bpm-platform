@@ -1,3 +1,4 @@
+[notifications-panel],
 .notifications-panel {
   .alert {
 
@@ -18,6 +19,8 @@
     border: 0;
     -webkit-appearance: none;
 
+    margin-left: 12px;
+
     position: relative;
     // top: -2px;
     // right: -21px;
@@ -34,12 +37,13 @@
 }
 
 .page-notifications {
-  position: relative;
+  position: absolute;
   // make sure the notifications are coming above the modal windows
   z-index: @zindex-modal + 10;
-  > .notifications {
-    position: absolute;
-    width: 40%;
-    margin: 0 30%;
-  }
+
+  max-height: 70%;
+  overflow: auto;
+
+  bottom: 20px;
+  right: 30px;
 }
