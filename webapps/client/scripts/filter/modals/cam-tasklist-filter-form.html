@@ -236,8 +236,9 @@
                 <div class="col-xs-1">
 
                   <button class="identity-switch btn btn-default"
-                       tooltip="{{ 'FILTER_IDENTITY_TYPE_TOOLTIP' | translate }}: {{ (authorization.identityType === 'user' ? 'FILTER_IDENTITY_TYPE_USER' : 'FILTER_IDENTITY_TYPE_GROUP') | translate }}"
-                       ng-click="identityTypeSwitch(authorization, delta)">
+                          tooltip-append-to-body="false"
+                          tooltip="{{ 'FILTER_IDENTITY_TYPE_TOOLTIP' | translate }}: {{ (authorization.identityType === 'user' ? 'FILTER_IDENTITY_TYPE_USER' : 'FILTER_IDENTITY_TYPE_GROUP') | translate }}"
+                          ng-click="identityTypeSwitch(authorization, delta)">
 
                     <div ng-show="authorization.identityType === 'user'">
                       <span class="glyphicon glyphicon-user"></span>
