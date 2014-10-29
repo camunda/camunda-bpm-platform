@@ -36,7 +36,7 @@ public class AsyncTaskTest extends PluggableProcessEngineTestCase {
   public static boolean INVOCATION;
 
   @Deployment
-  public void testAsycServiceNoListeners() {
+  public void testAsyncServiceNoListeners() {
     INVOCATION = false;
     // start process
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("asyncService");
@@ -62,7 +62,7 @@ public class AsyncTaskTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
-  public void testAsycServiceListeners() {
+  public void testAsyncServiceListeners() {
     String pid = runtimeService.startProcessInstanceByKey("asyncService").getProcessInstanceId();
     assertEquals(1, managementService.createJobQuery().count());
     // the listener was not yet invoked:
@@ -74,7 +74,7 @@ public class AsyncTaskTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
-  public void testAsycServiceConcurrent() {
+  public void testAsyncServiceConcurrent() {
     INVOCATION = false;
     // start process
     runtimeService.startProcessInstanceByKey("asyncService");
@@ -110,7 +110,7 @@ public class AsyncTaskTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
-  public void testFailingAsycServiceTimer() {
+  public void testFailingAsyncServiceTimer() {
     // start process
     runtimeService.startProcessInstanceByKey("asyncService");
     // now there should be one job in the database, and it is a message
@@ -136,7 +136,7 @@ public class AsyncTaskTest extends PluggableProcessEngineTestCase {
 
   // TODO: Think about this:
   @Deployment
-  public void FAILING_testFailingAsycServiceTimer() {
+  public void FAILING_testFailingAsyncServiceTimer() {
     // start process
     runtimeService.startProcessInstanceByKey("asyncService");
     // now there are two jobs the message and a timer:
@@ -165,7 +165,7 @@ public class AsyncTaskTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
-  public void testAsycServiceSubProcessTimer() {
+  public void testAsyncServiceSubProcessTimer() {
     INVOCATION = false;
     // start process
     runtimeService.startProcessInstanceByKey("asyncService");
@@ -185,7 +185,7 @@ public class AsyncTaskTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
-  public void testAsycServiceSubProcess() {
+  public void testAsyncServiceSubProcess() {
     // start process
     runtimeService.startProcessInstanceByKey("asyncService");
 
@@ -199,7 +199,7 @@ public class AsyncTaskTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
-  public void testAsycTask() {
+  public void testAsyncTask() {
     // start process
     runtimeService.startProcessInstanceByKey("asyncTask");
     // now there should be one job in the database:
@@ -212,7 +212,7 @@ public class AsyncTaskTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
-  public void testAsycScript() {
+  public void testAsyncScript() {
     // start process
     runtimeService.startProcessInstanceByKey("asyncScript").getProcessInstanceId();
     // now there should be one job in the database:
@@ -232,9 +232,9 @@ public class AsyncTaskTest extends PluggableProcessEngineTestCase {
     runtimeService.signal(eid);
   }
 
-  @Deployment(resources={"org/camunda/bpm/engine/test/bpmn/async/AsyncTaskTest.testAsycCallActivity.bpmn20.xml",
-          "org/camunda/bpm/engine/test/bpmn/async/AsyncTaskTest.testAsycServiceNoListeners.bpmn20.xml"})
-  public void testAsycCallActivity() {
+  @Deployment(resources={"org/camunda/bpm/engine/test/bpmn/async/AsyncTaskTest.testAsyncCallActivity.bpmn20.xml",
+          "org/camunda/bpm/engine/test/bpmn/async/AsyncTaskTest.testAsyncServiceNoListeners.bpmn20.xml"})
+  public void testAsyncCallActivity() {
     // start process
     runtimeService.startProcessInstanceByKey("asyncCallactivity");
     // now there should be one job in the database:
