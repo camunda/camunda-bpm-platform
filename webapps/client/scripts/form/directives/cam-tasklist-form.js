@@ -44,9 +44,9 @@ define([
         options: '=',
 
         /* will be used to make a callback when the form will be completed */
-        onFormCompletionCallback: '&', 
+        onFormCompletionCallback: '&',
 
-        /* 
+        /*
          * will be used to register a completion handler, when the completion
          * will be trigger from the outside of a form
          */
@@ -83,7 +83,7 @@ define([
             $scope.tasklistForm.$loaded = false;
             parseForm(value);
           }
-        });     
+        });
 
         function parseForm(form) {
           var key = form.key,
@@ -94,7 +94,7 @@ define([
           if (!key) {
             form.type = 'generic';
             return;
-          }      
+          }
 
           if (key.indexOf(EMBEDDED_KEY) === 0) {
             key = key.substring(EMBEDDED_KEY.length);
@@ -122,8 +122,8 @@ define([
 
         // completion /////////////////////////////////////////////
 
-        var completionCallback = function (err)  {
-          $scope.onFormCompletionCallback(err);
+        var completionCallback = function (err, result)  {
+          $scope.onFormCompletionCallback(err, result);
         };
 
         var complete = $scope.complete = function () {
@@ -133,7 +133,7 @@ define([
         $scope.onFormCompletion(complete);
 
         $scope.showCompleteButton = function () {
-          return $scope.options && 
+          return $scope.options &&
                  !$scope.options.hideCompleteButton &&
                  $scope.tasklistForm &&
                  $scope.tasklistForm.$loaded;

@@ -1,4 +1,4 @@
-/* global define: false */
+/* global define, require: false */
 'use strict';
 
 define('snap-win', ['snap-svg'], function(snap) {
@@ -83,6 +83,8 @@ define('camunda-tasklist-ui', [
 
     tasklistApp.controller('camTasklistAppCtrl', require('camunda-tasklist-ui/controller/cam-tasklist-app-ctrl'));
     tasklistApp.controller('camTasklistViewCtrl', require('camunda-tasklist-ui/controller/cam-tasklist-view-ctrl'));
+
+    tasklistApp.factory('assignNotification', require('camunda-tasklist-ui/services/cam-tasklist-assign-notification'));
 
     $(document).ready(function() {
       angular.bootstrap(document, ['cam.tasklist', 'cam.embedded.forms']);

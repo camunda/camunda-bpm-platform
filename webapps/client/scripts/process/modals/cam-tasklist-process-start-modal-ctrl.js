@@ -7,17 +7,21 @@ define([
   'use strict';
 
   return [
+    '$rootScope',
     '$scope',
     '$translate',
     'debounce',
     'Notifications',
     'processData',
+    'assignNotification',
   function(
+    $rootScope,
     $scope,
     $translate,
     debounce,
     Notifications,
-    processData
+    processData,
+    assignNotification
   ) {
 
     function errorNotification(src, err) {
@@ -138,14 +142,27 @@ define([
       processStartData.set('currentProcessDefinitionId', { id: null });
     };
 
+    var executeAfterDestroy = [];
+    $scope.$on('$destroy', function() {
+      var job;
+      while(!!(job = executeAfterDestroy.pop())) {
+        if(typeof job === "function") {
+          job();
+        }
+      }
+    });
+
     // will be called when the form has been submitted
-    $scope.completionCallback = function(err) {
+    $scope.completionCallback = function(err, result) {
       if (err) {
         return errorNotification('PROCESS_START_ERROR', err);
       }
 
+      executeAfterDestroy.push(function() {
+        successNotification('PROCESS_START_OK');
+        assignNotification(result.id, $rootScope.authentication.name);
+      });
       $scope.$close();
-      successNotification('PROCESS_START_OK');
     };
 
     // will be called on initialization of the 'form'-directive

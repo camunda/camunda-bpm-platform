@@ -82,13 +82,9 @@ define([
           processData: function () { return processData; }
         }
       }).result.then(function(result) {
-
         if ($scope.tasklistApp && $scope.tasklistApp.refreshProvider) {
-
           $scope.tasklistApp.refreshProvider.refreshTaskList();
-
         }
-
       });
     };
 
