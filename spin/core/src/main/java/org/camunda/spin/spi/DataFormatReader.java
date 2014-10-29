@@ -12,38 +12,42 @@
  */
 package org.camunda.spin.spi;
 
-import java.io.InputStream;
+import java.io.Reader;
 
 import org.camunda.spin.Spin;
-import org.camunda.spin.impl.util.RewindableInputStream;
 
 /**
  * Reads the internal representation of a {@link Spin} object from its serialized representation.
  *
  * @author Daniel Meyer
  * @author Sebastian Menski
+ * @author Thorben Lindhauer
  *
  */
 public interface DataFormatReader {
 
   /**
    * Returns true if this reader estimates to be able to consume the input data.
-   * Implementations should not read more than
-   * {@link RewindableInputStream#getRewindBufferSize()} bytes.
+   * Implementations may not read more than <code>readLimit</code>
+   * bytes from the supplied reader.
    *
-   * @param input stream that can be safely read from to detect a data format
+   * @param reader reader that can be read from to detect a data format
+   * @param readLimit positive number that poses a restriction on how many characters
+   * an implementation may read. Reading beyond this limit may lead to incomplete
+   * input when the method {@link #readInput(Reader)} is invoked.
    * @return true if this reader is able to consume the input
    */
-  boolean canRead(RewindableInputStream input);
+  boolean canRead(Reader reader, int readLimit);
 
   /**
-   * Read (or parse) an input stream into this data-formats input structure. An Xml-Based data format may return an
+   * Read (or parse) a reader into this data format's input structure.
+   * For example, an Xml-Based data format may return an
    * internal tree structure which can be used for traversing the xml tree.
    *
-   * @param input an {@link InputStream} providing the data source
+   * @param reader a {@link Reader} providing the data source
    * @return the read or parsed input
    * @throws SpinDataFormatException in case the reader cannot read the input
    */
-  Object readInput(InputStream input);
+  Object readInput(Reader reader);
 
 }

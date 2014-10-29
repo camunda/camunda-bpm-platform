@@ -13,7 +13,7 @@
 package org.camunda.spin.impl.json.jackson.format;
 
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.Reader;
 import java.util.regex.Pattern;
 
 import org.camunda.spin.impl.json.jackson.JacksonJsonLogger;
@@ -37,7 +37,7 @@ public class JacksonJsonDataFormatReader extends TextBasedDataFormatReader {
     this.format = format;
   }
 
-  public Object readInput(InputStream input) {
+  public Object readInput(Reader input) {
     ObjectMapper mapper = format.getObjectMapper();
 
     try {

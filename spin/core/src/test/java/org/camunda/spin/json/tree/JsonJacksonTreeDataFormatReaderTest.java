@@ -13,70 +13,65 @@
 package org.camunda.spin.json.tree;
 
 import static org.assertj.core.api.Assertions.assertThat;
-
-import java.io.IOException;
-import java.io.InputStream;
-
-import org.camunda.spin.DataFormats;
-import org.camunda.spin.impl.json.jackson.format.JacksonJsonDataFormatReader;
-import org.camunda.spin.impl.util.SpinIoUtil;
-import org.camunda.spin.impl.util.RewindableInputStream;
-
 import static org.camunda.spin.json.JsonTestConstants.EXAMPLE_JSON;
 import static org.camunda.spin.json.JsonTestConstants.EXAMPLE_JSON_COLLECTION;
 
+import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
+
+import org.camunda.spin.DataFormats;
+import org.camunda.spin.impl.json.jackson.format.JacksonJsonDataFormatReader;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-
 public class JsonJacksonTreeDataFormatReaderTest {
 
   private JacksonJsonDataFormatReader reader;
-  private RewindableInputStream stream;
-  
+  private Reader inputReader;
+
   private static final int REWINDING_LIMIT = 256;
-  
+
   @Before
   public void setUp() {
     reader = new JacksonJsonDataFormatReader(DataFormats.json());
   }
-  
+
   @Test
   public void shouldMatchJsonInput() throws IOException {
-    stream = stringToStream(EXAMPLE_JSON);
-    assertThat(reader.canRead(stream)).isTrue();
-    stream.close();
-    
-    stream = stringToStream(EXAMPLE_JSON_COLLECTION);
-    assertThat(reader.canRead(stream)).isTrue();
+    inputReader = stringToReader(EXAMPLE_JSON);
+    assertThat(reader.canRead(inputReader, REWINDING_LIMIT)).isTrue();
+    inputReader.close();
+
+    inputReader = stringToReader(EXAMPLE_JSON_COLLECTION);
+    assertThat(reader.canRead(inputReader, REWINDING_LIMIT)).isTrue();
   }
-  
+
   @Test
   public void shouldMatchJsonInputWithWhitespace() throws IOException {
-    stream = stringToStream("   " + EXAMPLE_JSON);
-    assertThat(reader.canRead(stream)).isTrue();
-    stream.close();
-    
-    stream = stringToStream("\r\n\t   " + EXAMPLE_JSON);
-    assertThat(reader.canRead(stream)).isTrue();
+    inputReader = stringToReader("   " + EXAMPLE_JSON);
+    assertThat(reader.canRead(inputReader, REWINDING_LIMIT)).isTrue();
+    inputReader.close();
+
+    inputReader = stringToReader("\r\n\t   " + EXAMPLE_JSON);
+    assertThat(reader.canRead(inputReader, REWINDING_LIMIT)).isTrue();
   }
-  
+
   @Test
   public void shouldNotMatchInvalidJson() throws IOException {
-    stream = stringToStream("prefix " + EXAMPLE_JSON);
-    assertThat(reader.canRead(stream)).isFalse();
+    inputReader = stringToReader("prefix " + EXAMPLE_JSON);
+    assertThat(reader.canRead(inputReader, REWINDING_LIMIT)).isFalse();
   }
-  
-  public RewindableInputStream stringToStream(String input) {
-    InputStream stream = SpinIoUtil.stringAsInputStream(input);
-    return new RewindableInputStream(stream, REWINDING_LIMIT);
+
+  public Reader stringToReader(String input) {
+    return new StringReader(input);
   }
-  
+
   @After
   public void tearDown() throws IOException {
-    if (stream != null) {
-      stream.close();
+    if (inputReader != null) {
+      inputReader.close();
     }
   }
 }

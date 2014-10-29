@@ -19,13 +19,13 @@ import static org.camunda.spin.DataFormats.xml;
 import static org.camunda.spin.Spin.JSON;
 import static org.camunda.spin.Spin.S;
 import static org.camunda.spin.Spin.XML;
-import static org.camunda.spin.impl.util.SpinIoUtil.stringAsInputStream;
+import static org.camunda.spin.impl.util.SpinIoUtil.stringAsReader;
 import static org.camunda.spin.json.JsonTestConstants.EXAMPLE_EMPTY_STRING;
 import static org.camunda.spin.json.JsonTestConstants.EXAMPLE_INVALID_JSON;
 import static org.camunda.spin.json.JsonTestConstants.EXAMPLE_JSON;
 import static org.camunda.spin.xml.XmlTestConstants.EXAMPLE_INVALID_XML;
 
-import java.io.InputStream;
+import java.io.Reader;
 
 import org.camunda.spin.json.SpinJsonNode;
 import org.camunda.spin.spi.SpinDataFormatException;
@@ -56,14 +56,14 @@ public class JsonTreeCreateTest {
   }
 
   @Test
-  public void shouldCreateForInputStream() {
-    SpinJsonNode json = JSON(stringAsInputStream(EXAMPLE_JSON));
+  public void shouldCreateForReader() {
+    SpinJsonNode json = JSON(stringAsReader(EXAMPLE_JSON));
     assertThat(json).isNotNull();
 
-    json = S(stringAsInputStream(EXAMPLE_JSON), json());
+    json = S(stringAsReader(EXAMPLE_JSON), json());
     assertThat(json).isNotNull();
 
-    json = S(stringAsInputStream(EXAMPLE_JSON));
+    json = S(stringAsReader(EXAMPLE_JSON));
     assertThat(json).isNotNull();
   }
 
@@ -100,24 +100,24 @@ public class JsonTreeCreateTest {
       // expected
     }
 
-    InputStream inputStream = null;
+    Reader reader = null;
 
     try {
-      JSON(inputStream);
+      JSON(reader);
       fail("Expected IllegalArgumentException");
     } catch(IllegalArgumentException e) {
       // expected
     }
 
     try {
-      S(inputStream, json());
+      S(reader, json());
       fail("Expected IllegalArgumentException");
     } catch(IllegalArgumentException e) {
       // expected
     }
 
     try {
-      S(inputStream);
+      S(reader);
       fail("Expected IllegalArgumentException");
     } catch(IllegalArgumentException e) {
       // expected
@@ -220,23 +220,23 @@ public class JsonTreeCreateTest {
   }
 
   @Test
-  public void shouldFailForEmptyInputStream() {
+  public void shouldFailForEmptyReader() {
     try {
-      JSON(stringAsInputStream(EXAMPLE_EMPTY_STRING));
+      JSON(stringAsReader(EXAMPLE_EMPTY_STRING));
       fail("Expected IllegalArgumentException");
     } catch(SpinDataFormatException e) {
       // expected
     }
 
     try {
-      S(stringAsInputStream(EXAMPLE_EMPTY_STRING), json());
+      S(stringAsReader(EXAMPLE_EMPTY_STRING), json());
       fail("Expected IllegalArgumentException");
     } catch(SpinDataFormatException e) {
       // expected
     }
 
     try {
-      S(stringAsInputStream(EXAMPLE_EMPTY_STRING));
+      S(stringAsReader(EXAMPLE_EMPTY_STRING));
       fail("Expected IllegalArgumentException");
     } catch(SpinDataFormatException e) {
       // expected

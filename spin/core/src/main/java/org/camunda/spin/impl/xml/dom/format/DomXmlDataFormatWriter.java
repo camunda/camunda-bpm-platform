@@ -12,7 +12,6 @@
  */
 package org.camunda.spin.impl.xml.dom.format;
 
-import java.io.OutputStream;
 import java.io.Writer;
 
 import javax.xml.transform.OutputKeys;
@@ -43,10 +42,6 @@ public class DomXmlDataFormatWriter implements DataFormatWriter {
 
   public DomXmlDataFormatWriter(DomXmlDataFormat domXmlDataFormat) {
     this.domXmlDataFormat = domXmlDataFormat;
-  }
-
-  public void writeToStream(OutputStream stream, Object input) {
-    writeResult(new StreamResult(stream), input);
   }
 
   public void writeToWriter(Writer writer, Object input) {

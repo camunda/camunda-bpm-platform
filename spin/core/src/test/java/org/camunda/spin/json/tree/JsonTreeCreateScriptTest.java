@@ -51,7 +51,7 @@ public abstract class JsonTreeCreateScriptTest extends ScriptTest {
       @ScriptVariable(name="input3", file = EXAMPLE_JSON_FILE_NAME)
     }
   )
-  public void shouldCreateForInputStream() {
+  public void shouldCreateForReader() {
 
     JacksonJsonNode json1 = script.getVariable("json1");
     assertThat(json1).isNotNull();

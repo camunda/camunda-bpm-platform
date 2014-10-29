@@ -51,7 +51,7 @@ public abstract class XmlDomCreateScriptTest extends ScriptTest {
       @ScriptVariable(name="input3", file = EXAMPLE_XML_FILE_NAME)
     }
   )
-  public void shouldCreateForInputStream() {
+  public void shouldCreateForReader() {
 
     SpinXmlElement xml1 = script.getVariable("xml1");
     assertThat(xml1).isNotNull();

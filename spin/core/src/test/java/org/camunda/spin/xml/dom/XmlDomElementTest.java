@@ -42,7 +42,7 @@ public class XmlDomElementTest {
 
   @Before
   public void parseXml() {
-    element = S(exampleXmlFileAsStream());
+    element = S(exampleXmlFileAsReader());
   }
 
   // has attribute
@@ -703,34 +703,11 @@ public class XmlDomElementTest {
   }
 
   @Test
-  public void canWriteToStream() throws IOException {
-    OutputStream outputStream = element.toStream();
-    InputStream inputStream = SpinIoUtil.convertOutputStreamToInputStream(outputStream);
-    String value = SpinIoUtil.getStringFromInputStream(inputStream, false);
-    assertThat(value).isXmlEqualTo(EXAMPLE_XML);
-
-
-    outputStream = new ByteArrayOutputStream();
-    element.writeToStream(outputStream);
-    inputStream = SpinIoUtil.convertOutputStreamToInputStream(outputStream);
-    value = SpinIoUtil.getStringFromInputStream(inputStream, false);
-    assertThat(value).isXmlEqualTo(EXAMPLE_XML);
-  }
-
-  @Test
   public void canWriteToWriter() {
-    StringWriter writer = element.writeToWriter(new StringWriter());
+    StringWriter writer = new StringWriter();
+    element.writeToWriter(writer);
     String value = writer.toString();
     assertThat(value).isXmlEqualTo(EXAMPLE_XML);
-  }
-
-  @Test
-  public void canWriteToStreamAndReadAgain() {
-    OutputStream outputStream = element.toStream();
-    InputStream inputStream = SpinIoUtil.convertOutputStreamToInputStream(outputStream);
-    SpinXmlElement xml = XML(inputStream);
-    assertThat(xml).isNotNull();
-    assertThat(xml.childElements()).isNotEmpty();
   }
 
   // text content

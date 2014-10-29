@@ -13,18 +13,17 @@
 
 package org.camunda.spin.xml.dom;
 
-import org.camunda.spin.impl.util.SpinIoUtil;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.camunda.spin.Spin.XML;
+
+import java.io.StringWriter;
+
 import org.camunda.spin.xml.SpinXmlAttribute;
 import org.camunda.spin.xml.SpinXmlAttributeException;
 import org.camunda.spin.xml.SpinXmlElement;
 import org.camunda.spin.xml.XmlTestConstants;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.io.*;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.camunda.spin.Spin.XML;
 
 /**
  * @author Sebastian Menski
@@ -85,17 +84,9 @@ public class XmlDomAttributeTest {
   }
 
   @Test
-  public void canWriteToStream() throws IOException {
-    OutputStream outputStream = attribute.toStream();
-    attribute.writeToStream(outputStream);
-    InputStream inputStream = SpinIoUtil.convertOutputStreamToInputStream(outputStream);
-    String value = SpinIoUtil.getStringFromInputStream(inputStream);
-    assertThat(value).isEqualTo("order1order1");
-  }
-
-  @Test
   public void canWriteToWriter() {
-    StringWriter writer = attribute.writeToWriter(new StringWriter());
+    StringWriter writer = new StringWriter();
+    attribute.writeToWriter(writer);
     String value = writer.toString();
     assertThat(value).isEqualTo("order1");
   }

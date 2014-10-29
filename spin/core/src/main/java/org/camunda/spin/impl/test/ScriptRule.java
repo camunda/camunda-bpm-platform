@@ -14,7 +14,7 @@
 package org.camunda.spin.impl.test;
 
 import java.io.File;
-import java.io.InputStream;
+import java.io.Reader;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -58,8 +58,18 @@ public class ScriptRule implements TestRule {
       public void evaluate() throws Throwable {
         loadScript(description);
         base.evaluate();
+        tearDownVariables();
       }
     };
+  }
+
+  protected void tearDownVariables() {
+    for (Object variable : variables.values()) {
+      if (variable != null && Reader.class.isAssignableFrom(variable.getClass())) {
+        Reader reader = (Reader) variable;
+        SpinIoUtil.closeSilently(reader);
+      }
+    }
   }
 
   /**
@@ -161,10 +171,9 @@ public class ScriptRule implements TestRule {
       LOG.scriptVariableFound(name, "isNull", null);
     }
     else if (!filename.isEmpty()) {
-      File file = SpinIoUtil.getClasspathFile(filename, description.getTestClass().getClassLoader());
-      InputStream fileAsStream = SpinIoUtil.fileAsStream(file);
-      variables.put(name, fileAsStream);
-      LOG.scriptVariableFound(name, "input stream", filename);
+      Reader fileAsReader = SpinIoUtil.classpathResourceAsReader(filename);
+      variables.put(name, fileAsReader);
+      LOG.scriptVariableFound(name, "reader", filename);
     }
     else {
       variables.put(name, value);

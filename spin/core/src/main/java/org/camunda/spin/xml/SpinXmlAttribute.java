@@ -12,7 +12,6 @@
  */
 package org.camunda.spin.xml;
 
-import java.io.OutputStream;
 import java.io.Writer;
 
 /**
@@ -55,26 +54,10 @@ public abstract class SpinXmlAttribute extends SpinXmlNode<SpinXmlAttribute> {
   public abstract String toString();
 
   /**
-   * Returns the wrapped XML attribute value as output stream.
-   *
-   * @return the output stream
-   */
-  public abstract OutputStream toStream();
-
-  /**
-   * Writes the wrapped XML attribute value to a existing stream.
-   *
-   * @param outputStream the stream to write to
-   * @return the stream after the object was written
-   */
-  public abstract <S extends OutputStream> S writeToStream(S outputStream);
-
-  /**
-   * Writes the wrapped XML attribute value to a existing writer.
+   * Writes the wrapped XML attribute value to an existing writer.
    *
    * @param writer the writer to write to
-   * @return the Writer after the object was written
    */
-  public abstract <W extends Writer> W writeToWriter(W writer);
+  public abstract void writeToWriter(Writer writer);
 
 }

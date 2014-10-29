@@ -13,6 +13,9 @@
 
 package org.camunda.spin.impl.xml.dom;
 
+import java.io.IOException;
+import java.io.Writer;
+
 import org.camunda.spin.impl.logging.SpinLogger;
 import org.camunda.spin.impl.xml.dom.format.DomXmlDataFormat;
 import org.camunda.spin.spi.DataFormatMapper;
@@ -20,12 +23,6 @@ import org.camunda.spin.xml.SpinXmlAttribute;
 import org.camunda.spin.xml.SpinXmlElement;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.Writer;
-import java.nio.charset.Charset;
 
 /**
  * Wrapper of a xml dom attribute.
@@ -99,27 +96,12 @@ public class DomXmlAttribute extends SpinXmlAttribute {
     return value();
   }
 
-  public OutputStream toStream() {
-    return writeToStream(new ByteArrayOutputStream());
-  }
-
-  public <T extends OutputStream> T writeToStream(T outputStream) {
-    byte[] bytes = toString().getBytes(Charset.forName("UTF-8"));
-    try {
-      outputStream.write(bytes);
-    } catch (IOException e) {
-      throw LOG.unableToWriteAttribute(this, e);
-    }
-    return outputStream;
-  }
-
-  public <T extends Writer> T writeToWriter(T writer) {
+  public void writeToWriter(Writer writer) {
     try {
       writer.write(toString());
     } catch (IOException e) {
       throw LOG.unableToWriteAttribute(this, e);
     }
-    return writer;
   }
 
   public <C> C mapTo(Class<C> javaClass) {

@@ -14,12 +14,8 @@ package org.camunda.spin.impl.json.jackson;
 
 import static org.camunda.commons.utils.EnsureUtil.ensureNotNull;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -73,29 +69,13 @@ public class JacksonJsonNode extends SpinJsonNode {
   }
 
   public String toString() {
-    return writeToWriter(new StringWriter()).toString();
+    StringWriter writer = new StringWriter();
+    writeToWriter(writer);
+    return writer.toString();
   }
 
-  public OutputStream toStream() {
-    OutputStream out = new ByteArrayOutputStream();
-    return writeToStream(out);
-  }
-
-  public <S extends OutputStream> S writeToStream(S outputStream) {
-    dataFormat.getWriter().writeToStream(outputStream, jsonNode);
-    return outputStream;
-  }
-
-  public <W extends Writer> W writeToWriter(W writer) {
-    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    writeToStream(baos);
-    try {
-      writer.write(new String(baos.toByteArray(), Charset.forName("UTF-8")));
-      return writer;
-    }
-    catch (IOException e) {
-      throw LOG.unableToWriteJsonNode(e);
-    }
+  public void writeToWriter(Writer writer) {
+    dataFormat.getWriter().writeToWriter(writer, jsonNode);
   }
 
   /**

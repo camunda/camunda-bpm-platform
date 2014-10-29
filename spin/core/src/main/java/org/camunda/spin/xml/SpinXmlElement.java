@@ -12,12 +12,11 @@
  */
 package org.camunda.spin.xml;
 
-import org.camunda.spin.SpinList;
-
-import java.io.OutputStream;
 import java.io.Writer;
 import java.util.Collection;
 import java.util.List;
+
+import org.camunda.spin.SpinList;
 
 /**
  * An element in a tree-oriented XML data format.
@@ -311,28 +310,10 @@ public abstract class SpinXmlElement extends SpinXmlNode<SpinXmlElement> {
   public abstract String toString();
 
   /**
-   * Returns the wrapped XML element as output stream.
-   *
-   * @return the output stream
-   * @throws SpinXmlElementException if the element cannot be transformed or no new transformer can be created
-   */
-  public abstract OutputStream toStream();
-
-  /**
-   * Writes the wrapped XML element to a existing stream.
-   *
-   * @param outputStream the stream to write to
-   * @return the stream after the object was written
-   * @throws SpinXmlElementException if the element cannot be transformed or no new transformer can be created
-   */
-  public abstract <S extends OutputStream> S writeToStream(S outputStream);
-
-  /**
    * Writes the wrapped XML element to a existing writer.
    *
    * @param writer the writer to write to
-   * @return the Writer after the object was written
    * @throws SpinXmlElementException if the element cannot be transformed or no new transformer can be created
    */
-  public abstract <W extends Writer> W writeToWriter(W writer);
+  public abstract void writeToWriter(Writer writer);
 }

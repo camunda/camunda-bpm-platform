@@ -13,7 +13,7 @@
 package org.camunda.spin.impl.xml.dom.format;
 
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.Reader;
 import java.util.regex.Pattern;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -23,6 +23,7 @@ import org.camunda.spin.impl.logging.SpinLogger;
 import org.camunda.spin.impl.xml.dom.DomXmlLogger;
 import org.camunda.spin.spi.TextBasedDataFormatReader;
 import org.w3c.dom.Element;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 /**
@@ -40,12 +41,12 @@ public class DomXmlDataFormatReader extends TextBasedDataFormatReader {
     this.dataFormat = dataFormat;
   }
 
-  public Element readInput(InputStream input) {
+  public Element readInput(Reader input) {
 
     DocumentBuilder documentBuilder = getDocumentBuilder();
     try {
       LOG.parsingInput();
-      return documentBuilder.parse(input).getDocumentElement();
+      return documentBuilder.parse(new InputSource(input)).getDocumentElement();
 
     } catch (SAXException e) {
       throw LOG.unableToParseInput(e);

@@ -12,26 +12,27 @@
  */
 package org.camunda.spin.xml;
 
-import org.camunda.spin.impl.util.SpinIoUtil;
-import org.camunda.spin.xml.mapping.Customer;
-import org.camunda.spin.xml.mapping.Order;
-import org.camunda.spin.xml.mapping.OrderDetails;
-import org.xml.sax.SAXException;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 
-import javax.xml.XMLConstants;
-import javax.xml.transform.Source;
-import javax.xml.transform.stream.StreamSource;
-import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
-import java.io.InputStream;
+import java.io.Reader;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.tuple;
+import javax.xml.XMLConstants;
+import javax.xml.transform.Source;
+import javax.xml.transform.stream.StreamSource;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
+
+import org.camunda.spin.impl.util.SpinIoUtil;
+import org.camunda.spin.xml.mapping.Customer;
+import org.camunda.spin.xml.mapping.Order;
+import org.camunda.spin.xml.mapping.OrderDetails;
+import org.xml.sax.SAXException;
 
 /**
  * @author Daniel Meyer
@@ -58,16 +59,16 @@ public class XmlTestConstants {
 
   public static final String NON_EXISTING = "nonExisting";
 
-  public static InputStream exampleXmlFileAsStream() {
-    return SpinIoUtil.fileAsStream(EXAMPLE_XML_FILE_NAME);
+  public static Reader exampleXmlFileAsReader() {
+    return SpinIoUtil.classpathResourceAsReader(EXAMPLE_XML_FILE_NAME);
   }
 
-  public static InputStream exampleMainXsdFileAsStream() {
-    return SpinIoUtil.fileAsStream(EXAMPLE_VALIDATION_XSD_FILE_NAME);
+  public static Reader exampleMainXsdFileAsStream() {
+    return SpinIoUtil.classpathResourceAsReader(EXAMPLE_VALIDATION_XSD_FILE_NAME);
   }
 
-  public static InputStream exampleExtensionXsdFileAsStream() {
-    return SpinIoUtil.fileAsStream(EXAMPLE_VALIDATION_EXTENSION_XSD_FILE_NAME);
+  public static Reader exampleExtensionXsdFileAsStream() {
+    return SpinIoUtil.classpathResourceAsReader(EXAMPLE_VALIDATION_EXTENSION_XSD_FILE_NAME);
   }
 
   public static Schema createSchema() {

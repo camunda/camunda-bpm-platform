@@ -12,19 +12,21 @@
  */
 package org.camunda.spin.xml.dom;
 
-import java.io.InputStream;
-
-import org.camunda.spin.spi.SpinDataFormatException;
-import org.camunda.spin.xml.SpinXmlElement;
-import org.junit.Test;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 import static org.camunda.spin.DataFormats.xml;
 import static org.camunda.spin.Spin.S;
 import static org.camunda.spin.Spin.XML;
-import static org.camunda.spin.impl.util.SpinIoUtil.stringAsInputStream;
-import static org.camunda.spin.xml.XmlTestConstants.*;
+import static org.camunda.spin.impl.util.SpinIoUtil.stringAsReader;
+import static org.camunda.spin.xml.XmlTestConstants.EXAMPLE_EMPTY_STRING;
+import static org.camunda.spin.xml.XmlTestConstants.EXAMPLE_INVALID_XML;
+import static org.camunda.spin.xml.XmlTestConstants.EXAMPLE_XML;
+
+import java.io.Reader;
+
+import org.camunda.spin.spi.SpinDataFormatException;
+import org.camunda.spin.xml.SpinXmlElement;
+import org.junit.Test;
 
 /**
  * @author Daniel Meyer
@@ -45,14 +47,14 @@ public class XmlDomCreateTest {
   }
 
   @Test
-  public void shouldCreateForInputStream() {
-    SpinXmlElement xml = XML(stringAsInputStream(EXAMPLE_XML));
+  public void shouldCreateForReader() {
+    SpinXmlElement xml = XML(stringAsReader(EXAMPLE_XML));
     assertThat(xml).isNotNull();
 
-    xml = S(stringAsInputStream(EXAMPLE_XML), xml());
+    xml = S(stringAsReader(EXAMPLE_XML), xml());
     assertThat(xml).isNotNull();
 
-    xml = S(stringAsInputStream(EXAMPLE_XML));
+    xml = S(stringAsReader(EXAMPLE_XML));
     assertThat(xml).isNotNull();
   }
 
@@ -67,7 +69,7 @@ public class XmlDomCreateTest {
   @Test
   public void shouldFailForNull() {
     SpinXmlElement xmlTreeElement = null;
-    
+
     try {
       XML(xmlTreeElement);
       fail("Expected IllegalArgumentException");
@@ -88,32 +90,32 @@ public class XmlDomCreateTest {
     } catch(IllegalArgumentException e) {
       // expected
     }
-    
-    InputStream inputStream = null;
-    
+
+    Reader reader = null;
+
     try {
-      XML(inputStream);
+      XML(reader);
       fail("Expected IllegalArgumentException");
     } catch(IllegalArgumentException e) {
       // expected
     }
 
     try {
-      S(inputStream, xml());
+      S(reader, xml());
       fail("Expected IllegalArgumentException");
     } catch(IllegalArgumentException e) {
       // expected
     }
 
     try {
-      S(inputStream);
+      S(reader);
       fail("Expected IllegalArgumentException");
     } catch(IllegalArgumentException e) {
       // expected
     }
-    
+
     String inputString = null;
-    
+
     try {
       XML(inputString);
       fail("Expected IllegalArgumentException");
@@ -185,23 +187,23 @@ public class XmlDomCreateTest {
   }
 
   @Test
-  public void shouldFailForEmptyInputStream() {
+  public void shouldFailForEmptyReader() {
     try {
-      XML(stringAsInputStream(EXAMPLE_EMPTY_STRING));
+      XML(stringAsReader(EXAMPLE_EMPTY_STRING));
       fail("Expected IllegalArgumentException");
     } catch(SpinDataFormatException e) {
       // expected
     }
 
     try {
-      S(stringAsInputStream(EXAMPLE_EMPTY_STRING), xml());
+      S(stringAsReader(EXAMPLE_EMPTY_STRING), xml());
       fail("Expected IllegalArgumentException");
     } catch(SpinDataFormatException e) {
       // expected
     }
 
     try {
-      S(stringAsInputStream(EXAMPLE_EMPTY_STRING));
+      S(stringAsReader(EXAMPLE_EMPTY_STRING));
       fail("Expected IllegalArgumentException");
     } catch(SpinDataFormatException e) {
       // expected

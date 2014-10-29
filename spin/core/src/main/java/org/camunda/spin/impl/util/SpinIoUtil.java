@@ -24,7 +24,7 @@ import java.nio.charset.Charset;
  *
  */
 public class SpinIoUtil extends IoUtil {
-  
+
   public static final Charset ENCODING_CHARSET = Charset.forName("UTF-8");
 
   private static final SpinCoreLogger LOG = SpinLogger.CORE_LOGGER;
@@ -78,6 +78,58 @@ public class SpinIoUtil extends IoUtil {
     }
 
     return stringBuilder.toString();
+  }
+
+  /**
+   * Convert an {@link Reader} to a {@link String}
+   *
+   * @param reader the {@link Reader} to convert
+   * @return the resulting {@link String}
+   * @throws IOException
+   */
+  public static String getStringFromReader(Reader reader) throws IOException {
+    return getStringFromReader(reader, true);
+  }
+
+  /**
+   * Convert an {@link Reader} to a {@link String}
+   *
+   * @param reader the {@link Reader} to convert
+   * @param trim trigger if whitespaces are trimmed in the output
+   * @return the resulting {@link String}
+   * @throws IOException
+   */
+  public static String getStringFromReader(Reader reader, boolean trim) throws IOException {
+    BufferedReader bufferedReader = null;
+    StringBuilder stringBuilder = new StringBuilder();
+    try {
+      bufferedReader = new BufferedReader(reader);
+      String line;
+      while ((line = bufferedReader.readLine()) != null) {
+        if (trim) {
+          stringBuilder.append(line.trim());
+        } else {
+          stringBuilder.append(line).append("\n");
+        }
+      }
+    } finally {
+      closeSilently(bufferedReader);
+    }
+
+    return stringBuilder.toString();
+  }
+
+  public static Reader classpathResourceAsReader(String fileName) {
+    try {
+      File classpathFile = getClasspathFile(fileName);
+      return new FileReader(classpathFile);
+    } catch (FileNotFoundException e) {
+      throw LOG.fileNotFoundException(fileName, e);
+    }
+  }
+
+  public static Reader stringAsReader(String string) {
+    return new StringReader(string);
   }
 
 }

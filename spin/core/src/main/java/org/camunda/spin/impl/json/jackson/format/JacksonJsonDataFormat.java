@@ -12,7 +12,7 @@
  */
 package org.camunda.spin.impl.json.jackson.format;
 
-import static org.camunda.spin.impl.util.SpinEnsure.ensureNotNull;
+import static org.camunda.commons.utils.EnsureUtil.ensureNotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +28,6 @@ import org.camunda.spin.json.SpinJsonNode;
 import org.camunda.spin.spi.DataFormat;
 import org.camunda.spin.spi.TypeDetector;
 
-import com.fasterxml.jackson.core.JsonEncoding;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -99,7 +98,7 @@ public class JacksonJsonDataFormat implements DataFormat<SpinJsonNode> {
   }
 
   protected void initWriter() {
-    this.dataFormatWriter = new JacksonJsonDataFormatWriter(this, JsonEncoding.UTF8);
+    this.dataFormatWriter = new JacksonJsonDataFormatWriter(this);
   }
 
   protected void initReader() {

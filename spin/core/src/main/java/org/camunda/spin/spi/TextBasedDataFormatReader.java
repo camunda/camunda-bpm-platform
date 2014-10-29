@@ -13,38 +13,36 @@
 package org.camunda.spin.spi;
 
 import java.io.IOException;
+import java.io.Reader;
 import java.nio.charset.Charset;
 import java.util.regex.Pattern;
 
 import org.camunda.spin.impl.logging.SpinCoreLogger;
-import org.camunda.spin.impl.util.RewindableInputStream;
 
 /**
- * Can be used as a base class to determine whether an input stream
+ * Can be used as a base class to determine whether an input reader
  * is readable by applying regular expression matching.
- * 
+ *
  * @author Lindhauer
  */
 public abstract class TextBasedDataFormatReader implements DataFormatReader {
 
   private static final SpinCoreLogger LOG = SpinCoreLogger.CORE_LOGGER;
 
-  public boolean canRead(RewindableInputStream input) {
-    int inputSize = input.getCurrentRewindableCapacity();
-    
-    byte[] firstBytes = new byte[inputSize];
-    
+  public boolean canRead(Reader input, int readLimit) {
+    char[] firstCharacters = new char[readLimit];
+
     try {
-      input.read(firstBytes, 0, inputSize);
+      input.read(firstCharacters, 0, readLimit);
     } catch (IOException e) {
-      throw LOG.unableToReadInputStream(e);
+      throw LOG.unableToReadFromReader(e);
     }
-    
-    
+
+
     Pattern pattern = getInputDetectionPattern();
 
-    return pattern.matcher(new String(firstBytes, Charset.forName("UTF-8"))).find();
+    return pattern.matcher(new String(firstCharacters)).find();
   }
-  
+
   protected abstract Pattern getInputDetectionPattern();
 }

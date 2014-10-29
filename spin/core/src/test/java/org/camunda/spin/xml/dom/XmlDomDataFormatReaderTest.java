@@ -16,10 +16,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.spin.xml.XmlTestConstants.EXAMPLE_XML;
 
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.Reader;
+import java.io.StringReader;
 
-import org.camunda.spin.impl.util.SpinIoUtil;
-import org.camunda.spin.impl.util.RewindableInputStream;
 import org.camunda.spin.impl.xml.dom.format.DomXmlDataFormat;
 import org.camunda.spin.impl.xml.dom.format.DomXmlDataFormatReader;
 import org.junit.After;
@@ -29,7 +28,7 @@ import org.junit.Test;
 public class XmlDomDataFormatReaderTest {
 
   private DomXmlDataFormatReader reader;
-  private RewindableInputStream stream;
+  private Reader inputReader;
 
   private static final int REWINDING_LIMIT = 256;
 
@@ -41,36 +40,35 @@ public class XmlDomDataFormatReaderTest {
 
   @Test
   public void shouldMatchXmlInput() throws IOException {
-    stream = stringToStream(EXAMPLE_XML);
-    assertThat(reader.canRead(stream)).isTrue();
-    stream.close();
+    inputReader = stringToReader(EXAMPLE_XML);
+    assertThat(reader.canRead(inputReader, REWINDING_LIMIT)).isTrue();
+    inputReader.close();
   }
 
   @Test
   public void shouldMatchXmlInputWithWhitespace() throws IOException {
-    stream = stringToStream("   " + EXAMPLE_XML);
-    assertThat(reader.canRead(stream)).isTrue();
-    stream.close();
+    inputReader = stringToReader("   " + EXAMPLE_XML);
+    assertThat(reader.canRead(inputReader, REWINDING_LIMIT)).isTrue();
+    inputReader.close();
 
-    stream = stringToStream("\r\n\t   " + EXAMPLE_XML);
-    assertThat(reader.canRead(stream)).isTrue();
+    inputReader = stringToReader("\r\n\t   " + EXAMPLE_XML);
+    assertThat(reader.canRead(inputReader, REWINDING_LIMIT)).isTrue();
   }
 
   @Test
   public void shouldNotMatchInvalidXml() throws IOException {
-    stream = stringToStream("prefix " + EXAMPLE_XML);
-    assertThat(reader.canRead(stream)).isFalse();
+    inputReader = stringToReader("prefix " + EXAMPLE_XML);
+    assertThat(reader.canRead(inputReader, REWINDING_LIMIT)).isFalse();
   }
 
-  public RewindableInputStream stringToStream(String input) {
-    InputStream stream = SpinIoUtil.stringAsInputStream(input);
-    return new RewindableInputStream(stream, REWINDING_LIMIT);
+  public Reader stringToReader(String input) {
+    return new StringReader(input);
   }
 
   @After
   public void tearDown() throws IOException {
-    if (stream != null) {
-      stream.close();
+    if (inputReader != null) {
+      inputReader.close();
     }
   }
 }

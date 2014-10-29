@@ -12,21 +12,23 @@
  */
 package org.camunda.spin.impl;
 
+import static org.camunda.commons.utils.EnsureUtil.ensureNotNull;
+import static org.camunda.commons.utils.IoUtil.stringAsInputStream;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Reader;
+
 import org.camunda.spin.DataFormats;
 import org.camunda.spin.Spin;
 import org.camunda.spin.SpinFactory;
 import org.camunda.spin.impl.logging.SpinCoreLogger;
-import org.camunda.spin.impl.util.RewindableInputStream;
+import org.camunda.spin.impl.util.RewindableReader;
+import org.camunda.spin.impl.util.SpinIoUtil;
 import org.camunda.spin.spi.DataFormat;
 import org.camunda.spin.spi.DataFormatMapper;
 import org.camunda.spin.spi.DataFormatReader;
 import org.camunda.spin.spi.SpinDataFormatException;
-
-import java.io.IOException;
-import java.io.InputStream;
-
-import static org.camunda.commons.utils.IoUtil.stringAsInputStream;
-import static org.camunda.spin.impl.util.SpinEnsure.ensureNotNull;
 
 /**
  * @author Daniel Meyer
@@ -46,8 +48,8 @@ public class SpinFactoryImpl extends SpinFactory {
     if (parameter instanceof String) {
       return createSpinFromString((String) parameter);
 
-    } else if (parameter instanceof InputStream) {
-      return createSpinFromStream((InputStream) parameter);
+    } else if (parameter instanceof Reader) {
+      return createSpinFromReader((Reader) parameter);
 
     } else if (parameter instanceof Spin) {
       return createSpinFromSpin((T) parameter);
@@ -64,8 +66,8 @@ public class SpinFactoryImpl extends SpinFactory {
     if (parameter instanceof String) {
       return createSpinFromString((String) parameter, format);
 
-    } else if (parameter instanceof InputStream) {
-      return createSpinFromStream((InputStream) parameter, format);
+    } else if (parameter instanceof Reader) {
+      return createSpinFromReader((Reader) parameter, format);
 
     } else if (parameter instanceof Spin) {
       return createSpinFromSpin((T) parameter, format);
@@ -89,26 +91,26 @@ public class SpinFactoryImpl extends SpinFactory {
   public <T extends Spin<?>> T createSpinFromString(String parameter) {
     ensureNotNull("parameter", parameter);
 
-    InputStream input = stringAsInputStream(parameter);
+    Reader input = SpinIoUtil.stringAsReader(parameter);
     return createSpin(input);
   }
 
   @SuppressWarnings("unchecked")
-  public <T extends Spin<?>> T createSpinFromStream(InputStream parameter) {
+  public <T extends Spin<?>> T createSpinFromReader(Reader parameter) {
     ensureNotNull("parameter", parameter);
 
-    RewindableInputStream rewindableStream = new RewindableInputStream(parameter, READ_SIZE);
+    RewindableReader rewindableReader = new RewindableReader(parameter, READ_SIZE);
 
     DataFormat<T> matchingDataFormat = null;
     for (DataFormat<?> format : DataFormats.getInstance().getAvailableDataFormats()) {
-      if (format.getReader().canRead(rewindableStream)) {
+      if (format.getReader().canRead(rewindableReader, rewindableReader.getRewindBufferSize())) {
         matchingDataFormat = (DataFormat<T>) format;
       }
 
       try {
-        rewindableStream.rewind();
+        rewindableReader.rewind();
       } catch (IOException e) {
-        throw LOG.unableToReadInputStream(e);
+        throw LOG.unableToReadFromReader(e);
       }
 
     }
@@ -117,7 +119,7 @@ public class SpinFactoryImpl extends SpinFactory {
       throw LOG.unrecognizableDataFormatException();
     }
 
-    return createSpin(rewindableStream, matchingDataFormat);
+    return createSpin(rewindableReader, matchingDataFormat);
   }
 
   /**
@@ -134,11 +136,11 @@ public class SpinFactoryImpl extends SpinFactory {
   public <T extends Spin<?>> T createSpinFromString(String parameter, DataFormat<T> format) {
     ensureNotNull("parameter", parameter);
 
-    InputStream input = stringAsInputStream(parameter);
+    Reader input = SpinIoUtil.stringAsReader(parameter);
     return createSpin(input, format);
   }
 
-  public <T extends Spin<?>> T createSpinFromStream(InputStream parameter, DataFormat<T> format) {
+  public <T extends Spin<?>> T createSpinFromReader(Reader parameter, DataFormat<T> format) {
     ensureNotNull("parameter", parameter);
 
     DataFormatReader reader = format.getReader();

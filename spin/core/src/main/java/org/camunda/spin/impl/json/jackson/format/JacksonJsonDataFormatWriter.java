@@ -13,7 +13,7 @@
 package org.camunda.spin.impl.json.jackson.format;
 
 import java.io.IOException;
-import java.io.OutputStream;
+import java.io.Writer;
 
 import org.camunda.spin.impl.json.jackson.JacksonJsonLogger;
 import org.camunda.spin.impl.logging.SpinLogger;
@@ -34,21 +34,18 @@ public class JacksonJsonDataFormatWriter implements DataFormatWriter {
   private static final JacksonJsonLogger LOG = SpinLogger.JSON_TREE_LOGGER;
 
   protected JacksonJsonDataFormat dataFormat;
-  protected JsonEncoding encoding;
 
-  public JacksonJsonDataFormatWriter(JacksonJsonDataFormat dataFormat, JsonEncoding encoding) {
+  public JacksonJsonDataFormatWriter(JacksonJsonDataFormat dataFormat) {
     this.dataFormat = dataFormat;
-    this.encoding = encoding;
   }
 
-  public void writeToStream(OutputStream stream, Object input) {
+  public void writeToWriter(Writer writer, Object input) {
     final ObjectMapper objectMapper = dataFormat.getObjectMapper();
     final JsonFactory factory = objectMapper.getFactory();
 
     try {
-      JsonGenerator generator = factory.createGenerator(stream, encoding);
+      JsonGenerator generator = factory.createGenerator(writer);
       objectMapper.writeTree(generator, (JsonNode) input);
-
     }
     catch (IOException e) {
       throw LOG.unableToWriteJsonNode(e);

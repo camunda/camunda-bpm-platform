@@ -859,7 +859,7 @@ public abstract class XmlDomElementScriptTest extends ScriptTest {
     execute = false
   )
   public void canRemoveAChildElement() {
-    SpinXmlElement element = XML(exampleXmlFileAsStream());
+    SpinXmlElement element = XML(exampleXmlFileAsReader());
     SpinXmlElement child = XML("<child/>");
     element.append(child);
 
@@ -915,7 +915,7 @@ public abstract class XmlDomElementScriptTest extends ScriptTest {
     execute = false
   )
   public void canRemoveMultipleChildElements() {
-    SpinXmlElement element = XML(exampleXmlFileAsStream());
+    SpinXmlElement element = XML(exampleXmlFileAsReader());
     SpinXmlElement child1 = XML("<child/>");
     SpinXmlElement child2 = XML("<child/>");
     element.append(child1, child2);
@@ -946,7 +946,7 @@ public abstract class XmlDomElementScriptTest extends ScriptTest {
     execute = false
   )
   public void canRemoveChildElementCollection() {
-    SpinXmlElement element = XML(exampleXmlFileAsStream());
+    SpinXmlElement element = XML(exampleXmlFileAsReader());
     element.append(XML("<child/>"), XML("<child/>"), XML("<child/>"));
 
     element = script
@@ -1115,7 +1115,7 @@ public abstract class XmlDomElementScriptTest extends ScriptTest {
     execute = false
   )
   public void canReplaceAChildElement() {
-    SpinXmlElement element = XML(exampleXmlFileAsStream());
+    SpinXmlElement element = XML(exampleXmlFileAsReader());
     SpinXmlElement date = element.childElement("date");
 
     element = script
@@ -1156,7 +1156,7 @@ public abstract class XmlDomElementScriptTest extends ScriptTest {
     execute = false
   )
   public void cannotReplaceByANullChildElement() throws Throwable {
-    SpinXmlElement element = XML(exampleXmlFileAsStream());
+    SpinXmlElement element = XML(exampleXmlFileAsReader());
     SpinXmlElement date = element.childElement("date");
 
     script
@@ -1190,7 +1190,7 @@ public abstract class XmlDomElementScriptTest extends ScriptTest {
     execute = false
   )
   public void canReplaceElement() {
-    SpinXmlElement element = XML(exampleXmlFileAsStream());
+    SpinXmlElement element = XML(exampleXmlFileAsReader());
     script
       .setVariable("oldElement", element.childElement("date"))
       .execute();
@@ -1213,7 +1213,7 @@ public abstract class XmlDomElementScriptTest extends ScriptTest {
     execute = false
   )
   public void canReplaceRootElement() {
-    SpinXmlElement element = XML(exampleXmlFileAsStream());
+    SpinXmlElement element = XML(exampleXmlFileAsReader());
     element = script
       .setVariable("oldElement", element)
       .execute()
@@ -1232,7 +1232,7 @@ public abstract class XmlDomElementScriptTest extends ScriptTest {
     execute = false
   )
   public void cannotReplaceByNullElement() throws Throwable {
-    SpinXmlElement element = XML(exampleXmlFileAsStream());
+    SpinXmlElement element = XML(exampleXmlFileAsReader());
     script
       .setVariable("oldElement", element);
     failingWithException();

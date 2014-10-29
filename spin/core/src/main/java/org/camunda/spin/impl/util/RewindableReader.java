@@ -13,122 +13,115 @@
 package org.camunda.spin.impl.util;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.PushbackInputStream;
+import java.io.PushbackReader;
+import java.io.Reader;
 
 import org.camunda.spin.impl.logging.SpinCoreLogger;
 import org.camunda.spin.impl.logging.SpinLogger;
 
 /**
- * Caches the initial bytes that are read from the supplied {@link InputStream} and 
- * allows to rewind these. As soon as more than <code>size</code> bytes have been read,
+ * Caches the initial characters that are read from the supplied {@link Reader} and
+ * allows to rewind these. As soon as more than <code>size</code> characters have been read,
  * rewinding fails.
- * 
+ *
  * @author Thorben Lindhauer
  */
-public class RewindableInputStream extends InputStream {
+public class RewindableReader extends Reader {
 
   private static final SpinCoreLogger LOG = SpinLogger.CORE_LOGGER;
 
-  protected PushbackInputStream wrappedStream;
-  
-  protected byte[] buffer;
+  protected PushbackReader wrappedReader;
+
+  protected char[] buffer;
   protected int pos;
   protected boolean rewindable;
-  
-  public RewindableInputStream(InputStream input, int size) {
-    this.wrappedStream = new PushbackInputStream(input, size);
-    this.buffer = new byte[size];
+
+  public RewindableReader(Reader input, int size) {
+    this.wrappedReader = new PushbackReader(input, size);
+    this.buffer = new char[size];
     this.pos = 0;
     this.rewindable = true;
   }
-  
-  public int read(byte[] b) throws IOException {
-    return read(b, 0, b.length);
-  }
-  
-  public int read(byte[] b, int off, int len) throws IOException {
-    int bytesRead = wrappedStream.read(b, off, len);
-    
-    if (bytesRead > 0) {
-      if (rewindable && pos + bytesRead > buffer.length) {
+
+  public int read(char[] cbuf, int off, int len) throws IOException {
+    int charactersRead = wrappedReader.read(cbuf, off, len);
+
+    if (charactersRead > 0) {
+      if (rewindable && pos + charactersRead > buffer.length) {
         rewindable = false;
       }
-      
+
       if (pos < buffer.length) {
         int freeBufferSpace = buffer.length - pos;
-        int insertableBytes = Math.min(bytesRead, freeBufferSpace);
-        System.arraycopy(b, off, buffer, pos, insertableBytes);
-        pos += insertableBytes;
+        int insertableCharacters = Math.min(charactersRead, freeBufferSpace);
+        System.arraycopy(cbuf, off, buffer, pos, insertableCharacters);
+        pos += insertableCharacters;
       }
     }
-    
-    return bytesRead;
+
+    return charactersRead;
   }
-  
+
   public int read() throws IOException {
-    int nextByte = wrappedStream.read();
-    
-    if (nextByte != -1) {
+    int nextCharacter = wrappedReader.read();
+
+    if (nextCharacter != -1) {
       if (pos < buffer.length) {
-        buffer[pos] = (byte) nextByte;
+        buffer[pos] = (char) nextCharacter;
         pos++;
       } else if (rewindable && pos >= buffer.length) {
         rewindable = false;
       }
     }
-    
-    return nextByte;
+
+    return nextCharacter;
   }
-  
-  public int available() throws IOException {
-    return wrappedStream.available();
-  }
-  
+
   public void close() throws IOException {
-    wrappedStream.close();
+    wrappedReader.close();
   }
-  
-  public synchronized void mark(int readlimit) {
-    wrappedStream.mark(readlimit);
+
+  public synchronized void mark(int readlimit) throws IOException {
+    wrappedReader.mark(readlimit);
   }
-  
+
   public boolean markSupported() {
-    return wrappedStream.markSupported();
+    return wrappedReader.markSupported();
   }
-  
+
   public synchronized void reset() throws IOException {
-    wrappedStream.reset();
+    wrappedReader.reset();
   }
-  
+
   public long skip(long n) throws IOException {
-    return wrappedStream.skip(n);
+    return wrappedReader.skip(n);
   }
-  
+
   /**
-   * Rewinds the stream such that the initial bytes are returned when invoking read().
-   * 
+   * Rewinds the reader such that the initial characters are returned when invoking read().
+   *
    * Throws an exception if more than the buffering limit has already been read.
    * @throws IOException
    */
   public void rewind() throws IOException {
     if (!rewindable) {
-      throw LOG.unableToRewindInputStream();
+      throw LOG.unableToRewindReader();
     }
-    
-    wrappedStream.unread(buffer, 0, pos);
+
+    wrappedReader.unread(buffer, 0, pos);
     pos = 0;
   }
 
   public int getRewindBufferSize() {
     return buffer.length;
   }
-  
+
   /**
-   * 
-   * @return the number of bytes that can still be read and rewound.
+   *
+   * @return the number of characters that can still be read and rewound.
    */
   public int getCurrentRewindableCapacity() {
     return buffer.length - pos;
   }
+
 }

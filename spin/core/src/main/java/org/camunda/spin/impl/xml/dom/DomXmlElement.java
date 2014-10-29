@@ -13,6 +13,21 @@
 
 package org.camunda.spin.impl.xml.dom;
 
+import static org.camunda.commons.utils.EnsureUtil.ensureNotNull;
+import static org.camunda.commons.utils.EnsureUtil.ensureParamInstanceOf;
+import static org.camunda.spin.impl.util.SpinEnsure.ensureChildElement;
+
+import java.io.StringWriter;
+import java.io.Writer;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+import javax.xml.transform.Transformer;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
+
 import org.camunda.spin.SpinList;
 import org.camunda.spin.impl.SpinListImpl;
 import org.camunda.spin.impl.logging.SpinLogger;
@@ -22,22 +37,11 @@ import org.camunda.spin.spi.DataFormatMapper;
 import org.camunda.spin.xml.SpinXPathQuery;
 import org.camunda.spin.xml.SpinXmlAttribute;
 import org.camunda.spin.xml.SpinXmlElement;
-import org.w3c.dom.*;
-
-import javax.xml.transform.*;
-import javax.xml.xpath.XPathExpression;
-import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
-
-import java.io.ByteArrayOutputStream;
-import java.io.OutputStream;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
-import static org.camunda.spin.impl.util.SpinEnsure.*;
+import org.w3c.dom.Attr;
+import org.w3c.dom.DOMException;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 /**
  * Wrapper for an xml dom element.
@@ -353,21 +357,13 @@ public class DomXmlElement extends SpinXmlElement {
   }
 
   public String toString() {
-    return writeToWriter(new StringWriter()).toString();
+    StringWriter writer = new StringWriter();
+    writeToWriter(writer);
+    return writer.toString();
   }
 
-  public OutputStream toStream() {
-    return writeToStream(new ByteArrayOutputStream());
-  }
-
-  public <T extends OutputStream> T writeToStream(T outputStream) {
-    dataFormat.getWriter().writeToStream(outputStream, this.domElement);
-    return outputStream;
-  }
-
-  public <T extends Writer> T writeToWriter(T writer) {
+  public void writeToWriter(Writer writer) {
     dataFormat.getWriter().writeToWriter(writer, this.domElement);
-    return writer;
   }
 
   /**

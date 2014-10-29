@@ -13,20 +13,12 @@
 package org.camunda.spin.json.tree;
 
 import static net.javacrumbs.jsonunit.fluent.JsonFluentAssert.assertThatJson;
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.spin.Spin.S;
-import static org.camunda.spin.Spin.JSON;
 import static org.camunda.spin.json.JsonTestConstants.EXAMPLE_JSON;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.StringWriter;
 
 import org.camunda.spin.impl.json.jackson.JacksonJsonNode;
-import org.camunda.spin.impl.util.SpinIoUtil;
-import org.camunda.spin.json.SpinJsonNode;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -45,33 +37,11 @@ public class JsonJacksonTreeNodeTest {
   }
 
   @Test
-  public void canWriteToStream() throws IOException {
-    OutputStream outputStream = jsonNode.toStream();
-    InputStream inputStream = SpinIoUtil.convertOutputStreamToInputStream(outputStream);
-    String value = SpinIoUtil.getStringFromInputStream(inputStream, false);
-    assertThatJson(value).isEqualTo(EXAMPLE_JSON);
-
-
-    outputStream = new ByteArrayOutputStream();
-    jsonNode.writeToStream(outputStream);
-    inputStream = SpinIoUtil.convertOutputStreamToInputStream(outputStream);
-    value = SpinIoUtil.getStringFromInputStream(inputStream, false);
-    assertThatJson(value).isEqualTo(EXAMPLE_JSON);
-  }
-
-  @Test
   public void canWriteToWriter() {
-    StringWriter writer = jsonNode.writeToWriter(new StringWriter());
+    StringWriter writer = new StringWriter();
+    jsonNode.writeToWriter(writer);
     String value = writer.toString();
     assertThatJson(value).isEqualTo(EXAMPLE_JSON);
-  }
-
-  @Test
-  public void canWriteToStreamAndReadAgain() {
-    OutputStream outputStream = jsonNode.toStream();
-    InputStream inputStream = SpinIoUtil.convertOutputStreamToInputStream(outputStream);
-    SpinJsonNode json = JSON(inputStream);
-    assertThat(json).isNotNull();
   }
 
 }

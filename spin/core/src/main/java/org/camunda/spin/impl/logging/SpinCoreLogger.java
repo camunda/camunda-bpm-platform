@@ -43,8 +43,8 @@ public class SpinCoreLogger extends SpinLogger {
     return fileNotFoundException(filename, null);
   }
 
-  public SpinRuntimeException unableToReadInputStream(Exception e) {
-    return new SpinRuntimeException(exceptionMessage("003", "Unable to read input stream"), e);
+  public SpinRuntimeException unableToReadFromReader(Exception e) {
+    return new SpinRuntimeException(exceptionMessage("003", "Unable to read from reader"), e);
   }
 
   public SpinDataFormatException unrecognizableDataFormatException() {
@@ -63,7 +63,7 @@ public class SpinCoreLogger extends SpinLogger {
     return new SpinScriptException(exceptionMessage("006", "No script script env found for script language '{}' at path '{}'", scriptLanguage, path));
   }
 
-  public IOException unableToRewindInputStream() {
+  public IOException unableToRewindReader() {
     return new IOException(exceptionMessage("007", "Unable to rewind input stream: rewind buffering limit exceeded"));
   }
 

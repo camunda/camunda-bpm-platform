@@ -12,7 +12,7 @@
  */
 package org.camunda.spin.spi;
 
-import java.io.OutputStream;
+import java.io.Writer;
 
 /**
  * @author Daniel Meyer
@@ -20,6 +20,16 @@ import java.io.OutputStream;
  */
 public interface DataFormatWriter {
 
-  public void writeToStream(OutputStream output, Object input);
+  /**
+   * Writes the internal representation, as provided by <code>input</code>
+   * to the supplied <code>writer</code> according to the data format
+   * that the implementation belongs to.
+   * For example, an XML data format writer writes XML.
+   *
+   * @param writer The writer to write the output to
+   * @param input The object to write. Can be safely cast to the internal
+   * format of the data format.
+   */
+  public void writeToWriter(Writer writer, Object input);
 
 }
