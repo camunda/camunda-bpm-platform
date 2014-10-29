@@ -22,18 +22,6 @@
   position: relative;
   z-index: 1;
 
-  &:after {
-    display: block;
-    content: ' ';
-    position: absolute;
-    // right: 0;
-    right: 0 - (@grid-gutter-width / 2);
-    top: 50%;
-    width: 0px;
-    height: 0px;
-  }
-
-
   h4 {
     cursor: pointer;
     color: @gray-darker;
@@ -46,57 +34,32 @@
     text-transform: uppercase;
   }
 
-  .counter {
+  .counter,
+  .edit-filter {
+    display: inline-block;
     position: absolute;
-    top: 2px;
-    right: 2px;
     padding: 0 4px;
     font-size: 90%;
-    // background-color: rgba(255, 255, 255, 0.3);
   }
 
-  .filter-actions {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-
-    &>li {
-      display: inline-block;
-      background-color: rgba(255, 255, 255, 0.3);
-      padding: 1px 3px;
-      margin: 0;
-    }
+  .counter {
+    top: 2px;
+    right: 2px;
   }
 
-  .info {
-    padding-left: (@grid-gutter-width / 2);
-    padding-right: (@grid-gutter-width / 2);
-    background-color: @gray-lighter;
-    font-size: 85%;
-    color: @gray;
-    max-height: 0;
-    overflow: hidden;
-    position: absolute;
-    width: 100%;
-    box-shadow: 0 0 0 @gray-lighter;
-    // text-align: left;
-
-    transition: max-height 0.218s ease-in-out 1s;
+  .edit-filter {
+    display: none;
+    left: 2px;
+    bottom: 2px;
+  }
+  &:hover .edit-filter {
+    z-index: 10;
+    display: inline-block;
   }
 
-  .description {
-    padding: 5px 0;
-  }
-
-  &.current,
-  &:hover {
-    z-index: 2;
-    .info {
-      max-height: 200px;
-      // box-shadow: 0 2px 2px @gray-light;
-    }
-    // margin-left: -15px;
-  }
+  // &.current {
+  //   z-index: 2;
+  // }
 }
 
 .active > .task-filter:after {
@@ -167,9 +130,6 @@
     z-index: 5;
     top: 3px;
     right: 0;
-    // width: 30px;
-    // height: 30px;
-    // line-height: 30px;
     border-radius: 50%;
     text-align: center;
     color: @gray-light;

@@ -15,56 +15,26 @@
        ng-repeat="(delta, filter) in filters | orderBy:'properties.priority'"
        class="task-filter-wrapper"
        ng-class="{active: isFocused(filter)}"
-       ng-style="{'z-index': ((filters.length + 10) - delta) }">
+       ng-style="{'z-index': ((filters.length + 10) - delta) }"
+       ng-controller="camEditFilterCtrl">
 
     <div class="task-filter"
          ng-style="filter.style"
          ng-click="focus(filter)">
 
       <div ng-if="isFocused(filter)"
-        class="counter">{{ filterCount }}</div>
+           class="counter">{{ filterCount }}</div>
 
-      <h4 class="name">{{ filter.name }}</h4>
+      <a ng-click="openDialog($event, 'EDIT_FILTER')"
+         class="edit-filter">
+        <span class="glyphicon glyphicon-pencil"></span>
+        <span class="hidden-sm hidden-xs hidden-md"
+              translate="FILTER_DETAILS">Filter details</span>
+      </a>
 
-      <div class="info"
-           ng-style="filter.style">
-
-        <ul class="filter-actions list-unstyled" ng-controller="camEditFilterCtrl">
-          <li>
-            <a href
-               ng-click="openDialog($event, 'EDIT_FILTER')">
-              <span class="glyphicon glyphicon-pencil"></span>
-              <span class="hidden-sm hidden-xs hidden-md"
-                    translate="FILTER_EDIT">Edit filter</span>
-            </a>
-          </li>
-          <li>
-            <a href
-               ng-click="openDialog($event, 'DELETE_FILTER')">
-              <span class="glyphicon glyphicon-trash"></span>
-              <span class="hidden-sm hidden-xs hidden-md"
-                    translate="FILTER_DELETE">Delete filter</span>
-            </a>
-          </li>
-        </ul>
-
-        <div ng-if="filter.properties.description"
-             class="description">
-          {{ filter.properties.description }}
-        </div>
-        <!--
-        <ul class="query list-unstyled">
-          <li ng-repeat="queryParam in filter.query">
-            <span class="key">{{ queryParam.key }}</span>:
-
-            <span class="operator"
-                  ng-if="queryParam.operator">{{ queryParam.operator }}</span>
-
-            <span class="value">{{ queryParam.value }}</span>
-          </li>
-        </ul>
-        -->
-      </div>
+      <h4 class="name"
+          tooltip="{{ filter.properties.description }}"
+          tooltip-placement="top">{{ filter.name }}</h4>
     </div>
   </div>
 </div>

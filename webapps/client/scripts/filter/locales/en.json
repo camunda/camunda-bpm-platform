@@ -3,6 +3,8 @@
                         "Create a filter",
   "FILTER_EDIT":
                         "Edit filter",
+  "FILTER_DETAILS":
+                        "Filter details",
   "FILTER_DELETE":
                         "Delete filter",
 
