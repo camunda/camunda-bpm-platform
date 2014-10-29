@@ -37,9 +37,9 @@
       <form name="editGroupsForm">
         <div ng-repeat="(delta, group) in _groups"
              class="form-group row"
-             ng-class="{'has-error': (group.error || !group.groupId) }">
+             ng-class="{'has-error': group.error }">
 
-          <div class="col-xs-3 text-right">
+          <div class="col-xs-3 row-action text-right">
             <a ng-click="removeGroup(delta)">
               <i class="glyphicon glyphicon-minus-sign"></i>
             </a>
