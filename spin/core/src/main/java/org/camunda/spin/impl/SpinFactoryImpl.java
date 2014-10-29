@@ -13,10 +13,8 @@
 package org.camunda.spin.impl;
 
 import static org.camunda.commons.utils.EnsureUtil.ensureNotNull;
-import static org.camunda.commons.utils.IoUtil.stringAsInputStream;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.Reader;
 
 import org.camunda.spin.DataFormats;

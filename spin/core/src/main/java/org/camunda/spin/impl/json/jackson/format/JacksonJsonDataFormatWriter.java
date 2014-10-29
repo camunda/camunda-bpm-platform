@@ -19,7 +19,6 @@ import org.camunda.spin.impl.json.jackson.JacksonJsonLogger;
 import org.camunda.spin.impl.logging.SpinLogger;
 import org.camunda.spin.spi.DataFormatWriter;
 
-import com.fasterxml.jackson.core.JsonEncoding;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonNode;
