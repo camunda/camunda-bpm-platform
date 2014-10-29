@@ -34,6 +34,6 @@ public interface VariableMap extends Map<String, Object> {
 
   <T> T getValue(String name, Class<T> type);
 
-  <T extends TypedValue> T getTypedValue(String name);
+  <T extends TypedValue> T getValueTyped(String name);
 
 }

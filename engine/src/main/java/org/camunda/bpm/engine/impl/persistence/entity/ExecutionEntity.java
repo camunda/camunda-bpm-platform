@@ -66,6 +66,7 @@ import org.camunda.bpm.engine.impl.variable.VariableDeclaration;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.instance.FlowElement;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
@@ -377,7 +378,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements
     execution.cachedEntityState = 0;
   }
 
-   public void startWithFormProperties(Map<String, Object> properties) {
+   public void startWithFormProperties(VariableMap properties) {
      if(isProcessInstanceExecution()) {
        ActivityImpl initial = processDefinition.getInitial();
        if(processInstanceStartContext != null) {

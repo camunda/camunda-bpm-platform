@@ -35,6 +35,10 @@ public class VariableMapImpl implements VariableMap, Serializable {
 
   protected Map<String, TypedValue> variables = new HashMap<String, TypedValue>();
 
+  public VariableMapImpl(VariableMapImpl map) {
+    variables = new HashMap<String, TypedValue>(map.variables);
+  }
+
   public VariableMapImpl(Map<String, Object> map) {
     putAll(map);
   }
@@ -69,7 +73,7 @@ public class VariableMapImpl implements VariableMap, Serializable {
   }
 
   @SuppressWarnings("unchecked")
-  public <T extends TypedValue> T getTypedValue(String name) {
+  public <T extends TypedValue> T getValueTyped(String name) {
     return (T) variables.get(name);
   }
 

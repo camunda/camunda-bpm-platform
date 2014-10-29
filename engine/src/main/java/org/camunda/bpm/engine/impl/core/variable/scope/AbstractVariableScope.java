@@ -211,7 +211,7 @@ public abstract class AbstractVariableScope implements Serializable, VariableSco
       for (String variableName : variables.keySet()) {
         Object value = null;
         if (variables instanceof VariableMap) {
-          value = ((VariableMap) variables).getTypedValue(variableName);
+          value = ((VariableMap) variables).getValueTyped(variableName);
         }
         else {
           value = variables.get(variableName);
@@ -226,7 +226,7 @@ public abstract class AbstractVariableScope implements Serializable, VariableSco
       for (String variableName : variables.keySet()) {
         Object value = null;
         if (variables instanceof VariableMap) {
-          value = ((VariableMap) variables).getTypedValue(variableName);
+          value = ((VariableMap) variables).getValueTyped(variableName);
         }
         else {
           value = variables.get(variableName);

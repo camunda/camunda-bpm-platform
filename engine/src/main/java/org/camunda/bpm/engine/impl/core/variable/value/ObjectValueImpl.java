@@ -123,6 +123,4 @@ public class ObjectValueImpl extends AbstractTypedValue<Object> implements Objec
         + ", serializedValue="+ (serializedValue != null ? (serializedValue.length() + " chars") : null)
         + "]";
   }
-
-
 }

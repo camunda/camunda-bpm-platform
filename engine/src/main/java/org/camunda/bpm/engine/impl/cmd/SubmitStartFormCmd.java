@@ -19,12 +19,14 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.form.StartFormHelper;
+import org.camunda.bpm.engine.impl.form.FormPropertyHelper;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.variable.VariableMap;
+import org.camunda.bpm.engine.variable.Variables;
 
 
 /**
@@ -37,12 +39,12 @@ public class SubmitStartFormCmd implements Command<ProcessInstance>, Serializabl
 
   protected final String processDefinitionId;
   protected final String businessKey;
-  protected Map<String, Object> properties;
+  protected VariableMap variables;
 
   public SubmitStartFormCmd(String processDefinitionId, String businessKey, Map<String, Object> properties) {
     this.processDefinitionId = processDefinitionId;
     this.businessKey = businessKey;
-    this.properties = properties;
+    this.variables = Variables.fromMap(properties);
   }
 
   @Override
@@ -66,11 +68,11 @@ public class SubmitStartFormCmd implements Command<ProcessInstance>, Serializabl
     // since they are lost after the async continuation otherwise
     // see CAM-2828
     if (processDefinition.getInitial().isAsyncBefore()) {
-      StartFormHelper.initFormPropertiesOnScope(properties, processInstance);
+      FormPropertyHelper.initFormPropertiesOnScope(variables, processInstance);
       processInstance.start();
 
     } else {
-      processInstance.startWithFormProperties(properties);
+      processInstance.startWithFormProperties(variables);
 
     }
 

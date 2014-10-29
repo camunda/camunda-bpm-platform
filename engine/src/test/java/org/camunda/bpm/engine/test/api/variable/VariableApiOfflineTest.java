@@ -109,24 +109,24 @@ public class VariableApiOfflineTest {
     assertEquals(DATE_VAR_VALUE, variables.get(DATE_VAR_NAME));
     assertEquals(BYTES_VAR_VALUE, variables.get(BYTES_VAR_NAME));
 
-    assertEquals(STRING_VAR_VALUE, variables.getTypedValue(STRING_VAR_NAME).getValue());
-    assertEquals(INTEGER_VAR_VALUE, variables.getTypedValue(INTEGER_VAR_NAME).getValue());
-    assertEquals(BOOLEAN_VAR_VALUE, variables.getTypedValue(BOOLEAN_VAR_NAME).getValue());
-    assertEquals(null, variables.getTypedValue(NULL_VAR_NAME).getValue());
-    assertEquals(SHORT_VAR_VALUE, variables.getTypedValue(SHORT_VAR_NAME).getValue());
-    assertEquals(DOUBLE_VAR_VALUE, variables.getTypedValue(DOUBLE_VAR_NAME).getValue());
-    assertEquals(DATE_VAR_VALUE, variables.getTypedValue(DATE_VAR_NAME).getValue());
-    assertEquals(BYTES_VAR_VALUE, variables.getTypedValue(BYTES_VAR_NAME).getValue());
+    assertEquals(STRING_VAR_VALUE, variables.getValueTyped(STRING_VAR_NAME).getValue());
+    assertEquals(INTEGER_VAR_VALUE, variables.getValueTyped(INTEGER_VAR_NAME).getValue());
+    assertEquals(BOOLEAN_VAR_VALUE, variables.getValueTyped(BOOLEAN_VAR_NAME).getValue());
+    assertEquals(null, variables.getValueTyped(NULL_VAR_NAME).getValue());
+    assertEquals(SHORT_VAR_VALUE, variables.getValueTyped(SHORT_VAR_NAME).getValue());
+    assertEquals(DOUBLE_VAR_VALUE, variables.getValueTyped(DOUBLE_VAR_NAME).getValue());
+    assertEquals(DATE_VAR_VALUE, variables.getValueTyped(DATE_VAR_NAME).getValue());
+    assertEquals(BYTES_VAR_VALUE, variables.getValueTyped(BYTES_VAR_NAME).getValue());
 
     // type for untyped null is untyped null
-    TypedValue untypedNullVariable = variables.getTypedValue(NULL_VAR_NAME);
+    TypedValue untypedNullVariable = variables.getValueTyped(NULL_VAR_NAME);
     assertNotNull(untypedNullVariable);
     assertEquals(NULL, untypedNullVariable.getType());
     variables.remove(NULL_VAR_NAME);
 
     // no type information present
     for (String varName : variables.keySet()) {
-      TypedValue typedValue = variables.getTypedValue(varName);
+      TypedValue typedValue = variables.getValueTyped(varName);
       assertNull(typedValue.getType());
       assertEquals(variables.get(varName), typedValue.getValue());
     }
@@ -159,30 +159,30 @@ public class VariableApiOfflineTest {
 
     // types are not lost
 
-    assertEquals(STRING, variables.getTypedValue(STRING_VAR_NAME).getType());
-    assertEquals(INTEGER, variables.getTypedValue(INTEGER_VAR_NAME).getType());
-    assertEquals(BOOLEAN, variables.getTypedValue(BOOLEAN_VAR_NAME).getType());
-    assertEquals(NULL, variables.getTypedValue(NULL_VAR_NAME).getType());
-    assertEquals(SHORT, variables.getTypedValue(SHORT_VAR_NAME).getType());
-    assertEquals(DOUBLE, variables.getTypedValue(DOUBLE_VAR_NAME).getType());
-    assertEquals(DATE, variables.getTypedValue(DATE_VAR_NAME).getType());
-    assertEquals(BYTES, variables.getTypedValue(BYTES_VAR_NAME).getType());
+    assertEquals(STRING, variables.getValueTyped(STRING_VAR_NAME).getType());
+    assertEquals(INTEGER, variables.getValueTyped(INTEGER_VAR_NAME).getType());
+    assertEquals(BOOLEAN, variables.getValueTyped(BOOLEAN_VAR_NAME).getType());
+    assertEquals(NULL, variables.getValueTyped(NULL_VAR_NAME).getType());
+    assertEquals(SHORT, variables.getValueTyped(SHORT_VAR_NAME).getType());
+    assertEquals(DOUBLE, variables.getValueTyped(DOUBLE_VAR_NAME).getType());
+    assertEquals(DATE, variables.getValueTyped(DATE_VAR_NAME).getType());
+    assertEquals(BYTES, variables.getValueTyped(BYTES_VAR_NAME).getType());
 
     // get wrappers
 
-    String stringValue = variables.<StringValue>getTypedValue(STRING_VAR_NAME).getValue();
+    String stringValue = variables.<StringValue>getValueTyped(STRING_VAR_NAME).getValue();
     assertEquals(STRING_VAR_VALUE, stringValue);
-    Integer integerValue = variables.<IntegerValue>getTypedValue(INTEGER_VAR_NAME).getValue();
+    Integer integerValue = variables.<IntegerValue>getValueTyped(INTEGER_VAR_NAME).getValue();
     assertEquals(INTEGER_VAR_VALUE, integerValue);
-    Boolean booleanValue = variables.<BooleanValue>getTypedValue(BOOLEAN_VAR_NAME).getValue();
+    Boolean booleanValue = variables.<BooleanValue>getValueTyped(BOOLEAN_VAR_NAME).getValue();
     assertEquals(BOOLEAN_VAR_VALUE, booleanValue);
-    Short shortValue = variables.<ShortValue>getTypedValue(SHORT_VAR_NAME).getValue();
+    Short shortValue = variables.<ShortValue>getValueTyped(SHORT_VAR_NAME).getValue();
     assertEquals(SHORT_VAR_VALUE, shortValue);
-    Double doubleValue = variables.<DoubleValue>getTypedValue(DOUBLE_VAR_NAME).getValue();
+    Double doubleValue = variables.<DoubleValue>getValueTyped(DOUBLE_VAR_NAME).getValue();
     assertEquals(DOUBLE_VAR_VALUE, doubleValue);
-    Date dateValue = variables.<DateValue>getTypedValue(DATE_VAR_NAME).getValue();
+    Date dateValue = variables.<DateValue>getValueTyped(DATE_VAR_NAME).getValue();
     assertEquals(DATE_VAR_VALUE, dateValue);
-    byte[] bytesValue = variables.<BytesValue>getTypedValue(BYTES_VAR_NAME).getValue();
+    byte[] bytesValue = variables.<BytesValue>getValueTyped(BYTES_VAR_NAME).getValue();
     assertEquals(BYTES_VAR_VALUE, bytesValue);
 
   }
@@ -213,30 +213,30 @@ public class VariableApiOfflineTest {
 
     // types are not lost
 
-    assertEquals(STRING, variables.getTypedValue(STRING_VAR_NAME).getType());
-    assertEquals(INTEGER, variables.getTypedValue(INTEGER_VAR_NAME).getType());
-    assertEquals(BOOLEAN, variables.getTypedValue(BOOLEAN_VAR_NAME).getType());
-    assertEquals(NULL, variables.getTypedValue(NULL_VAR_NAME).getType());
-    assertEquals(SHORT, variables.getTypedValue(SHORT_VAR_NAME).getType());
-    assertEquals(DOUBLE, variables.getTypedValue(DOUBLE_VAR_NAME).getType());
-    assertEquals(DATE, variables.getTypedValue(DATE_VAR_NAME).getType());
-    assertEquals(BYTES, variables.getTypedValue(BYTES_VAR_NAME).getType());
+    assertEquals(STRING, variables.getValueTyped(STRING_VAR_NAME).getType());
+    assertEquals(INTEGER, variables.getValueTyped(INTEGER_VAR_NAME).getType());
+    assertEquals(BOOLEAN, variables.getValueTyped(BOOLEAN_VAR_NAME).getType());
+    assertEquals(NULL, variables.getValueTyped(NULL_VAR_NAME).getType());
+    assertEquals(SHORT, variables.getValueTyped(SHORT_VAR_NAME).getType());
+    assertEquals(DOUBLE, variables.getValueTyped(DOUBLE_VAR_NAME).getType());
+    assertEquals(DATE, variables.getValueTyped(DATE_VAR_NAME).getType());
+    assertEquals(BYTES, variables.getValueTyped(BYTES_VAR_NAME).getType());
 
     // get wrappers
 
-    String stringValue = variables.<StringValue>getTypedValue(STRING_VAR_NAME).getValue();
+    String stringValue = variables.<StringValue>getValueTyped(STRING_VAR_NAME).getValue();
     assertEquals(null, stringValue);
-    Integer integerValue = variables.<IntegerValue>getTypedValue(INTEGER_VAR_NAME).getValue();
+    Integer integerValue = variables.<IntegerValue>getValueTyped(INTEGER_VAR_NAME).getValue();
     assertEquals(null, integerValue);
-    Boolean booleanValue = variables.<BooleanValue>getTypedValue(BOOLEAN_VAR_NAME).getValue();
+    Boolean booleanValue = variables.<BooleanValue>getValueTyped(BOOLEAN_VAR_NAME).getValue();
     assertEquals(null, booleanValue);
-    Short shortValue = variables.<ShortValue>getTypedValue(SHORT_VAR_NAME).getValue();
+    Short shortValue = variables.<ShortValue>getValueTyped(SHORT_VAR_NAME).getValue();
     assertEquals(null, shortValue);
-    Double doubleValue = variables.<DoubleValue>getTypedValue(DOUBLE_VAR_NAME).getValue();
+    Double doubleValue = variables.<DoubleValue>getValueTyped(DOUBLE_VAR_NAME).getValue();
     assertEquals(null, doubleValue);
-    Date dateValue = variables.<DateValue>getTypedValue(DATE_VAR_NAME).getValue();
+    Date dateValue = variables.<DateValue>getValueTyped(DATE_VAR_NAME).getValue();
     assertEquals(null, dateValue);
-    byte[] bytesValue = variables.<BytesValue>getTypedValue(BYTES_VAR_NAME).getValue();
+    byte[] bytesValue = variables.<BytesValue>getValueTyped(BYTES_VAR_NAME).getValue();
     assertEquals(null, bytesValue);
 
   }
@@ -250,16 +250,16 @@ public class VariableApiOfflineTest {
     assertEquals(DESERIALIZED_OBJECT_VAR_VALUE, variables.get(DESERIALIZED_OBJECT_VAR_NAME));
     assertEquals(DESERIALIZED_OBJECT_VAR_VALUE, variables.getValue(DESERIALIZED_OBJECT_VAR_NAME, ExampleObject.class));
 
-    Object untypedValue = variables.getTypedValue(DESERIALIZED_OBJECT_VAR_NAME).getValue();
+    Object untypedValue = variables.getValueTyped(DESERIALIZED_OBJECT_VAR_NAME).getValue();
     assertEquals(DESERIALIZED_OBJECT_VAR_VALUE, untypedValue);
 
-    ExampleObject typedValue = variables.<ObjectValue>getTypedValue(DESERIALIZED_OBJECT_VAR_NAME).getValue(ExampleObject.class);
+    ExampleObject typedValue = variables.<ObjectValue>getValueTyped(DESERIALIZED_OBJECT_VAR_NAME).getValue(ExampleObject.class);
     assertEquals(DESERIALIZED_OBJECT_VAR_VALUE, typedValue);
 
     // object type name is not yet available
-    assertNull(variables.<ObjectValue>getTypedValue(DESERIALIZED_OBJECT_VAR_NAME).getObjectTypeName());
+    assertNull(variables.<ObjectValue>getValueTyped(DESERIALIZED_OBJECT_VAR_NAME).getObjectTypeName());
     // class is available
-    assertEquals(DESERIALIZED_OBJECT_VAR_VALUE.getClass(), variables.<ObjectValue>getTypedValue(DESERIALIZED_OBJECT_VAR_NAME).getObjectType());
+    assertEquals(DESERIALIZED_OBJECT_VAR_VALUE.getClass(), variables.<ObjectValue>getValueTyped(DESERIALIZED_OBJECT_VAR_NAME).getObjectType());
 
 
     variables = createVariables()

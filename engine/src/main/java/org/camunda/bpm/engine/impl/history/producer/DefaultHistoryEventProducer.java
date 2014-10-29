@@ -487,7 +487,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
 
   // form Properties ///////////////////////////
 
-  public HistoryEvent createFormPropertyUpdateEvt(ExecutionEntity execution, String propertyId, Object propertyValue, String taskId) {
+  public HistoryEvent createFormPropertyUpdateEvt(ExecutionEntity execution, String propertyId, String propertyValue, String taskId) {
 
     final IdGenerator idGenerator = Context.getProcessEngineConfiguration().getIdGenerator();
 
@@ -501,7 +501,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     historicFormPropertyEntity.setProcessDefinitionId(execution.getProcessDefinitionId());
     historicFormPropertyEntity.setProcessInstanceId(execution.getProcessInstanceId());
     historicFormPropertyEntity.setPropertyId(propertyId);
-    historicFormPropertyEntity.setPropertyValue(propertyValue.toString());
+    historicFormPropertyEntity.setPropertyValue(propertyValue);
     historicFormPropertyEntity.setTaskId(taskId);
 
     return historicFormPropertyEntity;

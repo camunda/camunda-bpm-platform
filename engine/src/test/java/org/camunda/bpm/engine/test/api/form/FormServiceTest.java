@@ -13,6 +13,8 @@
 
 package org.camunda.bpm.engine.test.api.form;
 
+import static org.camunda.bpm.engine.variable.Variables.*;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -30,12 +32,14 @@ import org.camunda.bpm.engine.form.StartFormData;
 import org.camunda.bpm.engine.form.TaskFormData;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.CollectionUtil;
+import org.camunda.bpm.engine.impl.variable.serializer.JavaObjectSerializer;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.type.ValueType;
+import org.camunda.bpm.engine.variable.value.ObjectValue;
 
 /**
  * @author Joram Barrez
@@ -396,6 +400,51 @@ public class FormServiceTest extends PluggableProcessEngineTestCase {
     assertEquals(processInstance.getId(), runtimeService.createProcessInstanceQuery().processInstanceBusinessKey("123").singleResult().getId());
   }
 
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/form/FormsProcess.bpmn20.xml"})
+  public void testSubmitStartFormDataTypedVariables() {
+    String procDefId = repositoryService.createProcessDefinitionQuery().singleResult().getId();
+
+    String stringValue = "some string";
+    String serializedValue = "some value";
+
+    ProcessInstance processInstance = formService.submitStartForm(procDefId,
+        createVariables()
+          .putValueTyped("boolean", booleanValue(null))
+          .putValueTyped("string", stringValue(stringValue))
+          .putValueTyped("serializedObject", serializedObjectValue(serializedValue)
+              .objectTypeName(String.class.getName())
+              .serializationDataFormat(JavaObjectSerializer.SERIALIZATION_DATA_FORMAT)
+              .create())
+          .putValueTyped("object", objectValue(serializedValue).create()));
+
+    VariableMap variables = runtimeService.getVariables(processInstance.getId(), false);
+    assertEquals(booleanValue(null), variables.getValueTyped("boolean"));
+    assertEquals(stringValue(stringValue), variables.getValueTyped("string"));
+    assertNotNull(variables.<ObjectValue>getValueTyped("serializedObject").getValueSerialized());
+    assertNotNull(variables.<ObjectValue>getValueTyped("object").getValueSerialized());
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/form/FormsProcess.bpmn20.xml"})
+  public void testSubmitTaskFormDataTypedVariables() {
+    String procDefId = repositoryService.createProcessDefinitionQuery().singleResult().getId();
+
+    formService.submitStartForm(procDefId, createVariables());
+
+    Task task = taskService.createTaskQuery().singleResult();
+
+    String stringValue = "some string";
+    String serializedValue = "some value";
+
+    formService.submitTaskForm(task.getId(), createVariables()
+        .putValueTyped("boolean", booleanValue(null))
+        .putValueTyped("string", stringValue(stringValue))
+        .putValueTyped("serializedObject", serializedObjectValue(serializedValue)
+            .objectTypeName(String.class.getName())
+            .serializationDataFormat(JavaObjectSerializer.SERIALIZATION_DATA_FORMAT)
+            .create())
+        .putValueTyped("object", objectValue(serializedValue).create()));
+  }
+
   @Deployment
   public void testSubmitStartFormWithBusinessKey() {
     Map<String, Object> properties = new HashMap<String, Object>();
@@ -510,20 +559,20 @@ public class FormServiceTest extends PluggableProcessEngineTestCase {
     assertEquals(4, variables.size());
 
     assertEquals("someString", variables.get("stringField"));
-    assertEquals("someString", variables.getTypedValue("stringField").getValue());
-    assertEquals(ValueType.STRING, variables.getTypedValue("stringField").getType());
+    assertEquals("someString", variables.getValueTyped("stringField").getValue());
+    assertEquals(ValueType.STRING, variables.getValueTyped("stringField").getType());
 
     assertEquals(5l, variables.get("longField"));
-    assertEquals(5l, variables.getTypedValue("longField").getValue());
-    assertEquals(ValueType.LONG, variables.getTypedValue("longField").getType());
+    assertEquals(5l, variables.getValueTyped("longField").getValue());
+    assertEquals(ValueType.LONG, variables.getValueTyped("longField").getType());
 
     assertNull(variables.get("customField"));
-    assertNull(variables.getTypedValue("customField").getValue());
-    assertEquals(ValueType.STRING, variables.getTypedValue("customField").getType());
+    assertNull(variables.getValueTyped("customField").getValue());
+    assertEquals(ValueType.STRING, variables.getValueTyped("customField").getType());
 
     assertNotNull(variables.get("dateField"));
-    assertEquals(variables.get("dateField"), variables.getTypedValue("dateField").getValue());
-    assertEquals(ValueType.DATE, variables.getTypedValue("dateField").getType());
+    assertEquals(variables.get("dateField"), variables.getValueTyped("dateField").getValue());
+    assertEquals(ValueType.DATE, variables.getValueTyped("dateField").getType());
 
     Date dateValue = (Date) variables.get("dateField");
     Calendar calendar = Calendar.getInstance();
@@ -536,8 +585,8 @@ public class FormServiceTest extends PluggableProcessEngineTestCase {
     variables = formService.getStartFormVariables(processDefinition.getId(), Arrays.asList("stringField"), true);
     assertEquals(1, variables.size());
     assertEquals("someString", variables.get("stringField"));
-    assertEquals("someString", variables.getTypedValue("stringField").getValue());
-    assertEquals(ValueType.STRING, variables.getTypedValue("stringField").getType());
+    assertEquals("someString", variables.getValueTyped("stringField").getValue());
+    assertEquals(ValueType.STRING, variables.getValueTyped("stringField").getType());
 
     // request non-existing variable
     variables = formService.getStartFormVariables(processDefinition.getId(), Arrays.asList("non-existing!"), true);
@@ -555,7 +604,7 @@ public class FormServiceTest extends PluggableProcessEngineTestCase {
 
     VariableMap startFormVariables = formService.getStartFormVariables(processDefinition.getId());
     assertEquals("a", startFormVariables.get("enumField"));
-    assertEquals(ValueType.STRING, startFormVariables.getTypedValue("enumField").getType());
+    assertEquals(ValueType.STRING, startFormVariables.getValueTyped("enumField").getType());
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/form/FormServiceTest.taskFormFields.bpmn20.xml"})
@@ -574,28 +623,28 @@ public class FormServiceTest extends PluggableProcessEngineTestCase {
     assertEquals(7, variables.size());
 
     assertEquals("someString", variables.get("stringField"));
-    assertEquals("someString", variables.getTypedValue("stringField").getValue());
-    assertEquals(ValueType.STRING, variables.getTypedValue("stringField").getType());
+    assertEquals("someString", variables.getValueTyped("stringField").getValue());
+    assertEquals(ValueType.STRING, variables.getValueTyped("stringField").getType());
 
     assertEquals(5l, variables.get("longField"));
-    assertEquals(5l, variables.getTypedValue("longField").getValue());
-    assertEquals(ValueType.LONG, variables.getTypedValue("longField").getType());
+    assertEquals(5l, variables.getValueTyped("longField").getValue());
+    assertEquals(ValueType.LONG, variables.getValueTyped("longField").getType());
 
     assertNull(variables.get("customField"));
-    assertNull(variables.getTypedValue("customField").getValue());
-    assertEquals(ValueType.STRING, variables.getTypedValue("customField").getType());
+    assertNull(variables.getValueTyped("customField").getValue());
+    assertEquals(ValueType.STRING, variables.getValueTyped("customField").getType());
 
     assertEquals("initialValue", variables.get("someString"));
-    assertEquals("initialValue", variables.getTypedValue("someString").getValue());
-    assertEquals(ValueType.STRING, variables.getTypedValue("someString").getType());
+    assertEquals("initialValue", variables.getValueTyped("someString").getValue());
+    assertEquals(ValueType.STRING, variables.getValueTyped("someString").getType());
 
     assertEquals(true, variables.get("initialBooleanVariable"));
-    assertEquals(true, variables.getTypedValue("initialBooleanVariable").getValue());
-    assertEquals(ValueType.BOOLEAN, variables.getTypedValue("initialBooleanVariable").getType());
+    assertEquals(true, variables.getValueTyped("initialBooleanVariable").getValue());
+    assertEquals(ValueType.BOOLEAN, variables.getValueTyped("initialBooleanVariable").getType());
 
     assertEquals(1l, variables.get("initialLongVariable"));
-    assertEquals(1l, variables.getTypedValue("initialLongVariable").getValue());
-    assertEquals(ValueType.LONG, variables.getTypedValue("initialLongVariable").getType());
+    assertEquals(1l, variables.getValueTyped("initialLongVariable").getValue());
+    assertEquals(ValueType.LONG, variables.getValueTyped("initialLongVariable").getType());
 
     assertNotNull(variables.get("serializable"));
 
@@ -606,22 +655,22 @@ public class FormServiceTest extends PluggableProcessEngineTestCase {
     assertEquals(7, variables.size());
 
     assertEquals(2l, variables.get("initialLongVariable"));
-    assertEquals(2l, variables.getTypedValue("initialLongVariable").getValue());
-    assertEquals(ValueType.LONG, variables.getTypedValue("initialLongVariable").getType());
+    assertEquals(2l, variables.getValueTyped("initialLongVariable").getValue());
+    assertEquals(ValueType.LONG, variables.getValueTyped("initialLongVariable").getType());
 
     // get restricted set of variables (form field):
     variables = formService.getTaskFormVariables(task.getId(), Arrays.asList("someString"), true);
     assertEquals(1, variables.size());
     assertEquals("initialValue", variables.get("someString"));
-    assertEquals("initialValue", variables.getTypedValue("someString").getValue());
-    assertEquals(ValueType.STRING, variables.getTypedValue("someString").getType());
+    assertEquals("initialValue", variables.getValueTyped("someString").getValue());
+    assertEquals(ValueType.STRING, variables.getValueTyped("someString").getType());
 
     // get restricted set of variables (process variable):
     variables = formService.getTaskFormVariables(task.getId(), Arrays.asList("initialBooleanVariable"), true);
     assertEquals(1, variables.size());
     assertEquals(true, variables.get("initialBooleanVariable"));
-    assertEquals(true, variables.getTypedValue("initialBooleanVariable").getValue());
-    assertEquals(ValueType.BOOLEAN, variables.getTypedValue("initialBooleanVariable").getType());
+    assertEquals(true, variables.getValueTyped("initialBooleanVariable").getValue());
+    assertEquals(ValueType.BOOLEAN, variables.getValueTyped("initialBooleanVariable").getType());
 
     // request non-existing variable
     variables = formService.getTaskFormVariables(task.getId(), Arrays.asList("non-existing!"), true);

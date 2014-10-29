@@ -14,7 +14,6 @@
 package org.camunda.bpm.engine.impl.form.handler;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,6 +24,7 @@ import org.camunda.bpm.engine.form.FormProperty;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParser;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.core.variable.VariableMapImpl;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
 import org.camunda.bpm.engine.impl.form.FormDataImpl;
 import org.camunda.bpm.engine.impl.form.type.AbstractFormFieldType;
@@ -34,6 +34,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.DeploymentEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.util.xml.Element;
+import org.camunda.bpm.engine.variable.VariableMap;
 
 
 /**
@@ -257,8 +258,8 @@ public class DefaultFormHandler implements FormHandler {
     }
   }
 
-  public void submitFormProperties(Map<String, Object> properties, ExecutionEntity execution) {
-    Map<String, Object> propertiesCopy = new HashMap<String, Object>(properties);
+  public void submitFormVariables(VariableMap properties, ExecutionEntity execution) {
+    VariableMap propertiesCopy = new VariableMapImpl(properties);
 
     // support legacy form properties
     for (FormPropertyHandler formPropertyHandler: formPropertyHandlers) {
@@ -274,7 +275,7 @@ public class DefaultFormHandler implements FormHandler {
     // any variables passed in which are not handled by form-fields or form
     // properties are added to the process as variables
     for (String propertyId: propertiesCopy.keySet()) {
-      execution.setVariable(propertyId, propertiesCopy.get(propertyId));
+      execution.setVariable(propertyId, propertiesCopy.getValueTyped(propertyId));
     }
   }
 
