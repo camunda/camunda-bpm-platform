@@ -26,6 +26,7 @@ import org.camunda.bpm.engine.impl.el.StartProcessVariableScope;
 import org.camunda.bpm.engine.impl.form.FormFieldImpl;
 import org.camunda.bpm.engine.impl.form.type.AbstractFormFieldType;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.variable.VariableMap;
 
 /**
  * @author Daniel Meyer
@@ -83,7 +84,7 @@ public class FormFieldHandler {
 
   // submit /////////////////////////////////////////////
 
-  public void handleSubmit(ExecutionEntity execution, Map<String, Object> values, Map<String, Object> allValues) {
+  public void handleSubmit(VariableScope variableScope, VariableMap values, VariableMap allValues) {
     Object submittedValue = values.remove(id);
 
     // update variable(s)
@@ -96,7 +97,7 @@ public class FormFieldHandler {
         modelValue = propertyValue;
       }
     } else if (defaultValueExpression != null) {
-      final Object expressionValue = defaultValueExpression.getValue(execution);
+      final Object expressionValue = defaultValueExpression.getValue(variableScope);
       if (type != null && expressionValue != null) {
         modelValue = type.convertFormValueToModelValue(expressionValue.toString());
       } else if (expressionValue != null) {
@@ -106,12 +107,12 @@ public class FormFieldHandler {
 
     // perform validation
     for (FormFieldValidationConstraintHandler validationHandler : validationHandlers) {
-      validationHandler.validate(modelValue, allValues, this, execution);
+      validationHandler.validate(modelValue, allValues, this, variableScope);
     }
 
     if (modelValue != null) {
       if (id != null) {
-        execution.setVariable(id, modelValue);
+        variableScope.setVariable(id, modelValue);
       }
     }
   }

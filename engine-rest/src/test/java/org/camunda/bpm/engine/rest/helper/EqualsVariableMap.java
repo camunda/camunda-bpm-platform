@@ -47,7 +47,7 @@ public class EqualsVariableMap extends ArgumentMatcher<Map<String, Object>> {
 
     for (String key : argumentMap.keySet()) {
       Matcher<?> matcher = matchers.get(key);
-      if (!matcher.matches(argumentMap.getTypedValue(key))) {
+      if (!matcher.matches(argumentMap.getValueTyped(key))) {
         return false;
       }
     }

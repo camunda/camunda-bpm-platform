@@ -18,11 +18,11 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.form.FormPropertyHelper;
 import org.camunda.bpm.engine.impl.form.handler.TaskFormHandler;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
+import org.camunda.bpm.engine.impl.task.TaskDefinition;
 import org.camunda.bpm.engine.task.DelegationState;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
@@ -56,10 +56,11 @@ public class SubmitTaskFormCmd implements Command<Object>, Serializable {
 
     ensureNotNull("Cannot find task with id " + taskId, "task", task);
 
-    FormPropertyHelper.fireHistoryEvents(properties, task.getExecution());
-
-    TaskFormHandler taskFormHandler = task.getTaskDefinition().getTaskFormHandler();
-    taskFormHandler.submitFormVariables(properties, task.getExecution());
+    TaskDefinition taskDefinition = task.getTaskDefinition();
+    if(taskDefinition != null) {
+      TaskFormHandler taskFormHandler = taskDefinition.getTaskFormHandler();
+      taskFormHandler.submitFormVariables(properties, task);
+    }
 
     // complete or resolve the task
     if (DelegationState.PENDING.equals(task.getDelegationState())) {

@@ -30,14 +30,17 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.form.FormProperty;
 import org.camunda.bpm.engine.form.StartFormData;
 import org.camunda.bpm.engine.form.TaskFormData;
+import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.CollectionUtil;
 import org.camunda.bpm.engine.impl.variable.serializer.JavaObjectSerializer;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
+import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.variable.VariableMap;
+import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.engine.variable.value.ObjectValue;
 
@@ -444,6 +447,44 @@ public class FormServiceTest extends PluggableProcessEngineTestCase {
             .create())
         .putValueTyped("object", objectValue(serializedValue).create()));
   }
+
+  public void testSubmitTaskFormForStandaloneTask() {
+
+    // given
+
+    Task task = taskService.newTask();
+    taskService.saveTask(task);
+
+    formService.submitTaskForm(task.getId(), Variables.createVariables().putValue("foo", "bar"));
+
+    taskService.deleteTask(task.getId());
+    if(processEngineConfiguration.getHistoryLevel().isHistoryEventProduced(HistoryEventTypes.TASK_INSTANCE_CREATE, null)) {
+      historyService.deleteHistoricTaskInstance(task.getId());
+    }
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testSubmitTaskFormForCmmnHumanTask() {
+    caseService.createCaseInstanceByKey("oneTaskCase");
+
+    CaseExecution caseExecution = caseService.createCaseExecutionQuery().enabled().singleResult();
+    caseService.withCaseExecution(caseExecution.getId()).manualStart();
+
+    Task task = taskService.createTaskQuery().singleResult();
+
+    String stringValue = "some string";
+    String serializedValue = "some value";
+
+    formService.submitTaskForm(task.getId(), createVariables()
+        .putValueTyped("boolean", booleanValue(null))
+        .putValueTyped("string", stringValue(stringValue))
+        .putValueTyped("serializedObject", serializedObjectValue(serializedValue)
+            .objectTypeName(String.class.getName())
+            .serializationDataFormat(JavaObjectSerializer.SERIALIZATION_DATA_FORMAT)
+            .create())
+        .putValueTyped("object", objectValue(serializedValue).create()));
+  }
+
 
   @Deployment
   public void testSubmitStartFormWithBusinessKey() {

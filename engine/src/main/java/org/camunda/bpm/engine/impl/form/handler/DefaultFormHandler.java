@@ -19,10 +19,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.camunda.bpm.engine.delegate.Expression;
+import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.form.FormField;
 import org.camunda.bpm.engine.form.FormProperty;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParser;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.core.variable.VariableMapImpl;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
@@ -30,11 +32,19 @@ import org.camunda.bpm.engine.impl.form.FormDataImpl;
 import org.camunda.bpm.engine.impl.form.type.AbstractFormFieldType;
 import org.camunda.bpm.engine.impl.form.type.FormTypes;
 import org.camunda.bpm.engine.impl.form.validator.FormFieldValidator;
+import org.camunda.bpm.engine.impl.history.HistoryLevel;
+import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
+import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
+import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
+import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
 import org.camunda.bpm.engine.impl.persistence.entity.DeploymentEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.impl.util.xml.Element;
 import org.camunda.bpm.engine.variable.VariableMap;
+import org.camunda.bpm.engine.variable.value.SerializableValue;
+import org.camunda.bpm.engine.variable.value.TypedValue;
 
 
 /**
@@ -258,24 +268,67 @@ public class DefaultFormHandler implements FormHandler {
     }
   }
 
-  public void submitFormVariables(VariableMap properties, ExecutionEntity execution) {
+  public void submitFormVariables(VariableMap properties, VariableScope variableScope) {
     VariableMap propertiesCopy = new VariableMapImpl(properties);
 
     // support legacy form properties
     for (FormPropertyHandler formPropertyHandler: formPropertyHandlers) {
       // submitFormProperty will remove all the keys which it takes care of
-      formPropertyHandler.submitFormProperty(execution, propertiesCopy);
+      formPropertyHandler.submitFormProperty(variableScope, propertiesCopy);
     }
 
     // support form data:
     for (FormFieldHandler formFieldHandler : formFieldHandlers) {
-      formFieldHandler.handleSubmit(execution, propertiesCopy, properties);
+      formFieldHandler.handleSubmit(variableScope, propertiesCopy, properties);
     }
 
     // any variables passed in which are not handled by form-fields or form
     // properties are added to the process as variables
     for (String propertyId: propertiesCopy.keySet()) {
-      execution.setVariable(propertyId, propertiesCopy.getValueTyped(propertyId));
+      variableScope.setVariable(propertyId, propertiesCopy.getValueTyped(propertyId));
+    }
+
+    fireFormPropertyHistoryEvents(properties, variableScope);
+  }
+
+  protected void fireFormPropertyHistoryEvents(VariableMap properties, VariableScope variableScope) {
+    final ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
+    HistoryLevel historyLevel = processEngineConfiguration.getHistoryLevel();
+
+    if (historyLevel.isHistoryEventProduced(HistoryEventTypes.FORM_PROPERTY_UPDATE, variableScope)) {
+
+      // fire history events
+      ExecutionEntity executionEntity = null;
+      String taskId = null;
+      if(variableScope instanceof ExecutionEntity) {
+        executionEntity = (ExecutionEntity) variableScope;
+      }
+      else if (variableScope instanceof TaskEntity) {
+        TaskEntity task = (TaskEntity) variableScope;
+        executionEntity = task.getExecution();
+        taskId = task.getId();
+      }
+
+      if (executionEntity != null) {
+        final HistoryEventProducer eventProducer = processEngineConfiguration.getHistoryEventProducer();
+        final HistoryEventHandler eventHandler = processEngineConfiguration.getHistoryEventHandler();
+
+        for (String variableName : properties.keySet()) {
+
+          TypedValue value = properties.getValueTyped(variableName);
+
+          // NOTE: currently SerializableValues are not stored a form properties
+          if (!(value instanceof SerializableValue)) {
+            String stringValue = null;
+            if (value.getValue() != null) {
+              stringValue = value.getValue().toString();
+            }
+
+            HistoryEvent evt = eventProducer.createFormPropertyUpdateEvt(executionEntity, variableName, stringValue, taskId);
+            eventHandler.handleEvent(evt);
+          }
+        }
+      }
     }
   }
 

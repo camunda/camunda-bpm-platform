@@ -166,7 +166,7 @@ public class VariableValueDto {
   public static Map<String, VariableValueDto> fromVariableMap(VariableMap variables) {
     Map<String, VariableValueDto> result = new HashMap<String, VariableValueDto>();
     for(String name: variables.keySet()) {
-      result.put(name, fromTypedValue(variables.getTypedValue(name)));
+      result.put(name, fromTypedValue(variables.getValueTyped(name)));
     }
     return result;
   }

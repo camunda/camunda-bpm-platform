@@ -57,7 +57,7 @@ public abstract class AbstractVariablesResource implements VariableResource {
 
     Map<String, VariableValueDto> values = new HashMap<String, VariableValueDto>();
     for (String variableName : variables.keySet()) {
-      VariableValueDto valueDto = VariableValueDto.fromTypedValue(variables.getTypedValue(variableName));
+      VariableValueDto valueDto = VariableValueDto.fromTypedValue(variables.getValueTyped(variableName));
       values.put(variableName, valueDto);
     }
 
