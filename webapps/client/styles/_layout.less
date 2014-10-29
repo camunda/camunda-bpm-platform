@@ -108,19 +108,6 @@ footer.page {
   }
 }
 
-// // unfortunately.. have glitches..
-// .row > .cols {
-//   -webkit-transition: padding 0.218s ease-in-out,
-//                       margin 0.218s ease-in-out,
-//                       width 0.218s ease-in-out;
-//       -ms-transition: padding 0.218s ease-in-out,
-//                       margin 0.218s ease-in-out,
-//                       width 0.218s ease-in-out;
-//           transition: padding 0.218s ease-in-out,
-//                       margin 0.218s ease-in-out,
-//                       width 0.218s ease-in-out;
-// }
-
 .task-board {
   > .cols > .inner {
     border-top: 1px @line-style @line-color;
@@ -158,48 +145,6 @@ footer.page {
   z-index: 1;
   background-color: @column-right-bg;
 }
-
-// .task-filters {
-//   z-index: 3;
-//   background-color: fade(@column-left-bg, 50%);
-// }
-// .task-list {
-//   z-index: 2;
-//   background-color: fade(@column-center-bg, 50%);
-// }
-// .current-task {
-//   z-index: 1;
-//   background-color: fade(@column-right-bg, 50%);
-// }
-
-// .controls {
-//   .task-filters {
-//     background-color: blue;
-//   }
-//   .task-list {
-//     background-color: green;
-//   }
-//   .current-task {
-//     background-color: yellow;
-//   }
-// }
-
-// .fake-columns > .row {
-//   .task-filters {
-//     background-color: blue;
-//   }
-//   .task-list {
-//     background-color: green;
-//   }
-//   .current-task {
-//     background-color: yellow;
-//   }
-// }
-
-
-
-
-
 
 
 
@@ -253,7 +198,6 @@ button.off-canvas-toggle {
   display: block;
   position: fixed;
   z-index: 1;
-  // width: 100%;
   height: 100%;
 
   top: 0;
@@ -288,3 +232,6 @@ button.off-canvas-toggle {
     margin-top: -11px;
   }
 }
+
+@import "_layout-focus-task";
+@import "_layout-focus-list";

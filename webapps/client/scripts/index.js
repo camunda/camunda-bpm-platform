@@ -52,28 +52,6 @@ define('camunda-tasklist-ui', [
     var angular = require('angular');
     var $ = angular.element;
 
-    // The sales guys at MS pretend it's not needed anymore
-    // they probably never wrote a line of CSS... :(
-    // http://jsfiddle.net/evildonald/jLuF5/
-    function detectIE() {
-      var s = document.body.style;
-      var version;
-
-      if (s.msTextCombineHorizontal !== undefined) {
-        version = 11;
-      }
-      else if (s.msFlexOrder !== undefined) {
-        version = 10;
-      }
-      else if (s.msTransform !== undefined) {
-        version = 9;
-      }
-
-      if (version) {
-        $('html').addClass('ie ie'+version);
-      }
-    }
-
     var ngDeps = rj2ngNames(appModules).concat([
       'pascalprecht.translate',
       'ngRoute',
@@ -115,8 +93,6 @@ define('camunda-tasklist-ui', [
           $aufocused[0].focus();
         }
       }, 300);
-
-      detectIE();
     });
   }
 
