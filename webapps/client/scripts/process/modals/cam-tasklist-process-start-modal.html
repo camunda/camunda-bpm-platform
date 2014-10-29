@@ -21,6 +21,8 @@
 
 <div class="modal-body">
 
+  <div notifications-panel />
+
   <div ng-show="!PROCESS_TO_START_SELECTED">
 
     <div ng-show="!processDefinitionState.$loaded || lookupProcessDefinitionByName.$loading"
@@ -78,7 +80,7 @@
     </div>
 
     <div ng-hide="startFormState.$error"
-         cam-tasklist-form 
+         cam-tasklist-form
          tasklist-form="startForm"
          on-form-completion-callback="completionCallback"
          on-form-completion="registerCompletionHandler"
@@ -91,7 +93,7 @@
 
 <div class="modal-footer">
   <div ng-if="!PROCESS_TO_START_SELECTED">
-      
+
     <div class="col-xs-12">
       <button class="btn btn-xs btn-link"
               type="button"
@@ -129,5 +131,5 @@
     </div>
 
   </div>
-  
+
 </div>
