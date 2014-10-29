@@ -43,13 +43,28 @@
     </div>
 
     <div class="col-xs-4">
-       <input required
+
+      <div ng-switch="variable.type">
+
+        <div ng-switch-when="Boolean" class="checkbox">
+          <label>
+            <input type="checkbox"
+                   ng-model="variable.value"
+                   ng-checked="variable.value"
+                   cam-variable-name="{{ variable.name }}" 
+                   cam-variable-type="{{ variable.type }}" />
+          </label>
+        </div>
+
+       <input ng-switch-default
+              required
               type="{{ variableTypes[variable.type] }}"
               class="form-control"
               placeholder="{{ 'VALUE' | translate }}"
               ng-model="variable.value"
               cam-variable-name="{{ variable.name }}" 
               cam-variable-type="{{ variable.type }}" />
+      </div>
     </div>
 
   </div>
