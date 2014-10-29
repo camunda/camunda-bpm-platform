@@ -485,4 +485,26 @@ public class JsonSerializationTest extends PluggableProcessEngineTestCase {
     ObjectValue typedValue = runtimeService.getVariableTyped(instance.getId(), "varName");
     assertObjectValueDeserializedNull(typedValue);
   }
+
+  @Deployment(resources = ONE_TASK_PROCESS)
+  public void testRemoveVariable() throws JSONException {
+    // given a serialized json variable
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    JsonSerializable bean = new JsonSerializable("a String", 42, true);
+    String beanAsJson = bean.toExpectedJsonString();
+
+    SerializedObjectValueBuilder serializedValue = serializedObjectValue(beanAsJson)
+      .serializationDataFormat(JSON_FORMAT_NAME)
+      .objectTypeName(bean.getClass().getCanonicalName());
+
+    runtimeService.setVariable(instance.getId(), "simpleBean", serializedValue);
+
+    // when
+    runtimeService.removeVariable(instance.getId(), "simpleBean");
+
+    // then
+    assertNull(runtimeService.getVariable(instance.getId(), "simpleBean"));
+    assertNull(runtimeService.getVariableTyped(instance.getId(), "simpleBean"));
+    assertNull(runtimeService.getVariableTyped(instance.getId(), "simpleBean", false));
+  }
 }
