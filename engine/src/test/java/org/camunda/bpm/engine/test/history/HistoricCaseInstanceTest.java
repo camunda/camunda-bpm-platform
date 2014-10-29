@@ -245,15 +245,23 @@ public class HistoricCaseInstanceTest extends CmmnProcessEngineTestCase {
     caseService.setVariable(caseInstanceId, "number", 10);
 
     assertCount(1, historicQuery().variableValueEquals("foo", "bar"));
+    assertCount(0, historicQuery().variableValueNotEquals("foo", "bar"));
     assertCount(1, historicQuery().variableValueNotEquals("foo", "lol"));
+    assertCount(0, historicQuery().variableValueEquals("foo", "lol"));
     assertCount(1, historicQuery().variableValueLike("foo", "%a%"));
+    assertCount(0, historicQuery().variableValueLike("foo", "%lol%"));
 
     assertCount(1, historicQuery().variableValueEquals("number", 10));
+    assertCount(0, historicQuery().variableValueNotEquals("number", 10));
     assertCount(1, historicQuery().variableValueNotEquals("number", 1));
     assertCount(1, historicQuery().variableValueGreaterThan("number", 1));
+    assertCount(0, historicQuery().variableValueLessThan("number", 1));
     assertCount(1, historicQuery().variableValueGreaterThanOrEqual("number", 10));
+    assertCount(0, historicQuery().variableValueLessThan("number", 10));
     assertCount(1, historicQuery().variableValueLessThan("number", 20));
+    assertCount(0, historicQuery().variableValueGreaterThan("number", 20));
     assertCount(1, historicQuery().variableValueLessThanOrEqual("number", 10));
+    assertCount(0, historicQuery().variableValueGreaterThan("number", 10));
   }
 
 

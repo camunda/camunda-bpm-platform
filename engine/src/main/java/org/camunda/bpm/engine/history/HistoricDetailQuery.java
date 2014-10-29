@@ -47,6 +47,9 @@ public interface HistoricDetailQuery extends Query<HistoricDetailQuery, Historic
    * only process instances are.*/
   HistoricDetailQuery executionId(String executionId);
 
+  /** Only select historic variable updates with the given case execution.
+   * Note that {@link CaseExecution} ids are not stored in the history as first class citizen,
+   * only case instances are.*/
   HistoricDetailQuery caseExecutionId(String caseExecutionId);
 
   /** Only select historic variable updates associated to the given {@link HistoricActivityInstance activity instance}.

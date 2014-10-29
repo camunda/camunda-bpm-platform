@@ -81,25 +81,25 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
   }
 
   public HistoricVariableInstanceQuery taskIdIn(String... taskIds) {
-    ensureNotNull("Task Ids", taskIds);
+    ensureNotNull("Task Ids", (Object[]) taskIds);
     this.taskIds = taskIds;
     return this;
   }
 
   public HistoricVariableInstanceQuery executionIdIn(String... executionIds) {
-    ensureNotNull("Execution Ids", executionIds);
+    ensureNotNull("Execution Ids", (Object[]) executionIds);
     this.executionIds = executionIds;
     return this;
   }
 
   public HistoricVariableInstanceQuery caseExecutionIdIn(String... caseExecutionIds) {
-    ensureNotNull("Case execution ids", caseExecutionIds);
+    ensureNotNull("Case execution ids", (Object[]) caseExecutionIds);
     this.caseExecutionIds = caseExecutionIds;
     return this;
   }
 
   public HistoricVariableInstanceQuery activityInstanceIdIn(String... activityInstanceIds) {
-    ensureNotNull("Activity Instance Ids", activityInstanceIds);
+    ensureNotNull("Activity Instance Ids", (Object[]) activityInstanceIds);
     this.activityInstanceIds = activityInstanceIds;
     return this;
   }
