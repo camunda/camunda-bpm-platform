@@ -63,11 +63,17 @@
 }
 
 .active > .task-filter:after {
-  margin-top: -(@grid-gutter-width / 3);
-  border-top: (@grid-gutter-width / 3) solid transparent;
   border-bottom: (@grid-gutter-width / 3) solid transparent;
   border-right: (@grid-gutter-width / 3) solid @column-center-bg;
+  border-top: (@grid-gutter-width / 3) solid transparent;
+  content: ' ';
+  display: block;
+  height: 0px;
+  margin-top: -(@grid-gutter-width / 3);
+  position: absolute;
   right: 0 - (@grid-gutter-width / 2);
+  top: 50%;
+  width: 0px;
 }
 
 .tasks-list {
