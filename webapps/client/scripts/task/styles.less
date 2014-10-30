@@ -25,6 +25,33 @@
 [cam-tasklist-task-meta] {
   position: relative;
   z-index: 10;
+
+  .assignee {
+    [cam-widget-inline-field] {
+      top: -3px;
+
+      .view-value {
+        max-width: 120px;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+        display: inline-block;
+        vertical-align: bottom;
+
+        .ng-binding {
+          max-width: 100%;
+          text-overflow: ellipsis;
+          overflow: hidden;
+          white-space: nowrap;
+        }
+      }
+    }
+
+    .reset-assignee,
+    .unclaim {
+      top: -3px;
+    }
+  }
 }
 
 .task-card,
@@ -221,6 +248,11 @@
   }
 }
 
+.original-value,
+.new-value {
+  .truncate(100%);
+}
+
 .original-value {
   text-decoration: line-through;
   color: @gray-light;
@@ -255,7 +287,7 @@
     height: 20px;
     line-height: 20px;
     display: inline-block;
-    vertical-align: bottom;
+    // vertical-align: bottom;
   }
 }
 
