@@ -296,6 +296,20 @@
   margin-bottom: (@grid-gutter-width / 2);
 }
 
+.group-input {
+
+  &.ng-invalid {
+
+    &.ng-dirty {
+      .form-control-validation(@state-danger-text; @state-danger-text; @state-danger-bg);
+
+      &:focus {
+        .form-control-validation(@state-danger-text; @state-danger-text; @state-danger-bg);
+      }
+    }
+  }
+}
+
 .input-group-btn {
   > button {
     color: @link-color;
