@@ -4,7 +4,11 @@
 
   <div class="modal-header">
     <h3 class="modal-title">
-      {{ (filter.id && !deletion ? 'FILTER_EDIT' : (deletion ? 'FILTER_DELETE' : 'FILTER_CREATE')) | translate }}
+      {{ (
+        filter.id && !deletion ?
+        (accesses.update ? 'FILTER_EDIT' : 'FILTER_DETAILS') :
+        (deletion ? 'FILTER_DELETE' : 'FILTER_CREATE')
+      ) | translate }}
     </h3>
   </div>
 
