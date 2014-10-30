@@ -160,7 +160,10 @@ define([
 
       executeAfterDestroy.push(function() {
         successNotification('PROCESS_START_OK');
-        assignNotification(result.id, $rootScope.authentication.name);
+        assignNotification({
+          assignee: $rootScope.authentication.name,
+          processInstanceId: result.id
+        });
       });
       $scope.$close();
     };

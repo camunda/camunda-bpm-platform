@@ -75,7 +75,18 @@ define([
         return errorHandler('COMPLETE_ERROR', err);
       }
       successHandler('COMPLETE_OK');
-      assignNotification($scope.task.processInstanceId, $scope.task.assignee);
+      if($scope.task.processInstanceId) {
+        assignNotification({
+          assignee: $scope.task.assignee,
+          processInstanceId: $scope.task.processInstanceId
+        });
+      } else if($scope.task.caseInstanceId) {
+        assignNotification({
+          assignee: $scope.task.assignee,
+          caseInstanceId: $scope.task.caseInstanceId
+        });
+      }
+
       clearTask();
     };
   }];
