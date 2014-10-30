@@ -431,7 +431,7 @@ public class FormServiceTest extends PluggableProcessEngineTestCase {
   public void testSubmitTaskFormDataTypedVariables() {
     String procDefId = repositoryService.createProcessDefinitionQuery().singleResult().getId();
 
-    formService.submitStartForm(procDefId, createVariables());
+    ProcessInstance processInstance = formService.submitStartForm(procDefId, createVariables());
 
     Task task = taskService.createTaskQuery().singleResult();
 
@@ -446,6 +446,12 @@ public class FormServiceTest extends PluggableProcessEngineTestCase {
             .serializationDataFormat(JavaObjectSerializer.SERIALIZATION_DATA_FORMAT)
             .create())
         .putValueTyped("object", objectValue(serializedValue).create()));
+
+    VariableMap variables = runtimeService.getVariables(processInstance.getId(), false);
+    assertEquals(booleanValue(null), variables.getValueTyped("boolean"));
+    assertEquals(stringValue(stringValue), variables.getValueTyped("string"));
+    assertNotNull(variables.<ObjectValue>getValueTyped("serializedObject").getValueSerialized());
+    assertNotNull(variables.<ObjectValue>getValueTyped("object").getValueSerialized());
   }
 
   public void testSubmitTaskFormForStandaloneTask() {
