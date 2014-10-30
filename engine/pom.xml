@@ -761,8 +761,8 @@
        </dependencies>
     </profile>
 
+    <!-- check for api differences between latest minor release -->
     <profile>
-      <!-- check for api differences between latest minor release -->
       <id>check-api-compatibility</id>
       <build>
         <plugins>
