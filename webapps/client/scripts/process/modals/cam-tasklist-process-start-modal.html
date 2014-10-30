@@ -85,7 +85,8 @@
          on-form-completion-callback="completionCallback"
          on-form-completion="registerCompletionHandler"
          on-form-validation="notifyFormValidation"
-         options="options" >
+         options="options"
+         params="params" >
     </div>
   </div>
 
@@ -124,7 +125,7 @@
 
       <button class="btn btn-primary"
               type="submit"
-              ng-disabled="$invalid || startForm.type == 'external'"
+              ng-disabled="$invalid"
               ng-click="startProcessInstance()">
         {{ 'START' | translate }}
       </button>

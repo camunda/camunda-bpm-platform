@@ -127,8 +127,21 @@ define([
 
     $scope.selectProcessDefinition = function(processDefinition) {
       $scope.PROCESS_TO_START_SELECTED = true;
-      $scope.options = angular.extend({}, { processDefinitionId : processDefinition.id }, DEFAULT_OPTIONS);
-      processStartData.set('currentProcessDefinitionId', { id: processDefinition.id });
+
+      var processDefinitionId = processDefinition.id;
+      var processDefinitionKey = processDefinition.key;
+
+      $scope.options = angular.copy(DEFAULT_OPTIONS);
+      
+      $scope.params = {
+        processDefinitionId : processDefinitionId,
+        processDefinitionKey : processDefinitionKey
+      };
+
+      processStartData.set('currentProcessDefinitionId', {
+        id: processDefinitionId
+      });
+
     };
 
     // start a process view /////////////////////////////////////////////////////////////////

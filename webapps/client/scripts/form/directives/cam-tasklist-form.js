@@ -43,6 +43,11 @@ define([
          */
         options: '=',
 
+        /*
+         * contains parameter like taskId, processDefinitionId, processDefinitionKey etc.
+         */
+        params: '=',
+
         /* will be used to make a callback when the form will be completed */
         onFormCompletionCallback: '&',
 
@@ -76,11 +81,13 @@ define([
         $scope.onFormValidation = $scope.onFormValidation() || noop;
         $scope.completionHandler = noop;
 
+        $scope.$loaded = false;
+
         // handle tasklist form ///////////////////////////////////////////////////
 
         $scope.$watch('tasklistForm', function(value) {
           if (value) {
-            $scope.tasklistForm.$loaded = false;
+            $scope.$loaded = false;
             parseForm(value);
           }
         });
@@ -135,8 +142,7 @@ define([
         $scope.showCompleteButton = function () {
           return $scope.options &&
                  !$scope.options.hideCompleteButton &&
-                 $scope.tasklistForm &&
-                 $scope.tasklistForm.$loaded;
+                 $scope.$loaded;
         };
 
         $scope.disableCompleteButton = function () {
@@ -146,7 +152,7 @@ define([
         // API ////////////////////////////////////////////////////
 
         this.notifyFormInitialized = function () {
-          $scope.tasklistForm.$loaded = true;
+          $scope.$loaded = true;
         };
 
         this.notifyFormInitializationFailed = function (error) {
@@ -174,6 +180,10 @@ define([
 
         this.getTasklistForm = function () {
           return $scope.tasklistForm;
+        };
+
+        this.getParams = function () {
+          return $scope.params;
         };
 
         this.registerCompletionHandler = function(fn) {

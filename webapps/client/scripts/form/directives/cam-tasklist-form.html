@@ -1,15 +1,15 @@
-<div ng-show="tasklistForm && !tasklistForm.$loaded"
+<div ng-show="tasklistForm && !$loaded"
      class="loader">
   <i class="animate-spin glyphicon glyphicon-refresh"></i>
   {{ 'LOADING' | translate }}
 </div>
 
-<div ng-if="tasklistForm.type" ng-show="tasklistForm.$loaded" ng-class="{ 'disabled-form' : options.disableForm}">
+<div ng-if="tasklistForm.type" ng-show="tasklistForm && $loaded" ng-class="{ 'disabled-form' : options.disableForm}">
 
   <div ng-show="tasklistForm.$error" class="alert alert-danger" role="alert">
     <span class="glyphicon glyphicon-exclamation-sign"></span>
     <strong class="status">{{ 'FORM_FAILURE' | translate }}</strong>
-    <span class="message">{{ tasklistForm.$error.message }}</span>
+    <span class="message">{{ tasklistForm.$error.message | translate }}</span>
   </div>
 
   <div ng-switch="tasklistForm.type" ng-show="!tasklistForm.$error">

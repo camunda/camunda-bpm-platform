@@ -42,12 +42,14 @@ define([
           return $update;
         }, function (value) {
           if (value) {
-            showForm(value, formController.getOptions());
+            showForm(value, formController.getParams());
             $update = false;
           }
         });
 
-        $scope.$watch('tasklistForm', function (value) {
+        $scope.$watch(function () {
+          return formController.getTasklistForm();
+        }, function (value) {
           if (value) {
             $update = true;
             $scope.variables = [];
@@ -60,21 +62,18 @@ define([
           formController.notifyFormValidated(!value);
         });
 
-        function showForm(tasklistForm, options) {
-          options = angular.copy(options);
+        function showForm(tasklistForm, params) {
+          params = angular.copy(params);
 
-          delete options.hideCompleteButton;
-          delete options.disableCompleteButton;
-          delete options.disableForm;
-          delete options.disableAddVariableButton;
+          delete params.processDefinitionKey;
 
-          angular.extend(options, {
+          angular.extend(params, {
             client: camAPI,
             formElement: formElement,
             done: done
           });
 
-          camForm = new CamForm(options);
+          camForm = new CamForm(params);
         }
 
         var done = function (err, _camForm) {
