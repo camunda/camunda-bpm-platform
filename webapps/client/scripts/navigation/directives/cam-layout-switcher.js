@@ -11,15 +11,15 @@ define([
 
   var layouts = [
     {
-      label: 'task',
-      css: 'layout-focus-task'
+      label: 'standard'
     },
     {
       label: 'list',
       css: 'layout-focus-list'
     },
     {
-      label: 'standard'
+      label: 'task',
+      css: 'layout-focus-task'
     }
   ];
 
@@ -27,21 +27,18 @@ define([
     return layout.css || '';
   }).join(' ');
 
-  return [function() {
+  return [
+    '$location',
+    'search',
+  function(
+    $location,
+    search
+  ) {
     return {
       restrict: 'EAC',
 
       link: function(scope) {
-        scope.activeLayout = parseInt(localStorage.hasOwnProperty('tasklistLayout') ?
-                                      localStorage.tasklistLayout :
-                                      (layouts.length - 1), 10);
-        scope.activeLayoutInfo = layouts[scope.activeLayout];
-
-        scope.layouts = layouts;
-
-        scope.switchLayout = function(delta) {
-          localStorage.tasklistLayout = delta;
-
+        function applyLayout(delta) {
           var layout = layouts[delta];
           scope.activeLayout = delta;
           scope.activeLayoutInfo = layout;
@@ -50,9 +47,28 @@ define([
             .removeClass(layoutClasses)
             .addClass(layout.css)
           ;
-        };
+        }
 
-        scope.switchLayout(scope.activeLayout);
+        function applyRouteLayout() {
+          var state = $location.search();
+          var delta = parseInt(state.layout ? state.layout : 0, 10);
+          applyLayout(delta);
+        }
+
+        applyRouteLayout();
+        scope.$on('$routeChanged', applyRouteLayout);
+
+        scope.activeLayoutInfo = layouts[scope.activeLayout];
+
+        scope.layouts = layouts;
+
+
+        scope.switchLayout = function(delta) {
+          var state = $location.search();
+          state.layout = delta;
+          search.updateSilently(state);
+          applyLayout(delta);
+        };
       },
 
       template: template
