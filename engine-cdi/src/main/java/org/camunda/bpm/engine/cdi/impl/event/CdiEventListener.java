@@ -141,24 +141,31 @@ public class CdiEventListener implements TaskListener, ExecutionListener, Serial
 
     if (event.getType() == BusinessProcessEventType.TAKE) {
       annotations.add(new TakeTransitionLiteral(event.getTransitionName()));
+      annotations.add(new TakeTransitionLiteral(""));
     }
     else if (event.getType() == BusinessProcessEventType.START_ACTIVITY) {
       annotations.add(new StartActivityLiteral(event.getActivityId()));
+      annotations.add(new StartActivityLiteral(""));
     }
     else if (event.getType() == BusinessProcessEventType.END_ACTIVITY) {
       annotations.add(new EndActivityLiteral(event.getActivityId()));
+      annotations.add(new EndActivityLiteral(""));
     }
     else if (event.getType() == BusinessProcessEventType.CREATE_TASK) {
       annotations.add(new CreateTaskLiteral(event.getTaskDefinitionKey()));
+      annotations.add(new CreateTaskLiteral(""));
     }
     else if (event.getType() == BusinessProcessEventType.ASSIGN_TASK) {
       annotations.add(new AssignTaskLiteral(event.getTaskDefinitionKey()));
+      annotations.add(new AssignTaskLiteral(""));
     }
     else if (event.getType() == BusinessProcessEventType.COMPLETE_TASK) {
       annotations.add(new CompleteTaskLiteral(event.getTaskDefinitionKey()));
+      annotations.add(new CompleteTaskLiteral(""));
     }
     else if (event.getType() == BusinessProcessEventType.DELETE_TASK) {
       annotations.add(new DeleteTaskLiteral(event.getTaskDefinitionKey()));
+      annotations.add(new DeleteTaskLiteral(""));
     }
     return annotations.toArray(new Annotation[annotations.size()]);
   }
