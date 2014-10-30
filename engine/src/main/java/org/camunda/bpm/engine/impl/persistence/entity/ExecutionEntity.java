@@ -1165,10 +1165,9 @@ public class ExecutionEntity extends PvmExecutionImpl implements
 
   // referenced job entities //////////////////////////////////////////////////
 
-  @SuppressWarnings({ "unchecked", "rawtypes" })
   protected void ensureJobsInitialized() {
     if(jobs == null) {
-      jobs = (List)Context.getCommandContext()
+      jobs = Context.getCommandContext()
         .getJobManager()
         .findJobsByExecutionId(id);
     }
@@ -1196,10 +1195,9 @@ public class ExecutionEntity extends PvmExecutionImpl implements
 
   // referenced incidents entities //////////////////////////////////////////////
 
-  @SuppressWarnings({ "unchecked", "rawtypes" })
   protected void ensureIncidentsInitialized() {
     if(incidents == null) {
-      incidents = (List)Context.getCommandContext()
+      incidents = Context.getCommandContext()
         .getIncidentManager()
         .findIncidentsByExecution(id);
     }

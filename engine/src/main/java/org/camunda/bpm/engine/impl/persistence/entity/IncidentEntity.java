@@ -351,6 +351,7 @@ public class IncidentEntity implements Incident, DbEntity, HasDbRevision, HasDbR
   public Object getPersistentState() {
     Map<String, Object> persistentState = new HashMap<String, Object>();
     persistentState.put("executionId", this.executionId);
+    persistentState.put("processDefinitionId", processDefinitionId);
     return persistentState;
   }
 

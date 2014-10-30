@@ -13,8 +13,14 @@
 
 package org.camunda.bpm.engine.impl.cmd;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensurePositive;
+
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
@@ -26,13 +32,14 @@ import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionManager;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricProcessInstanceEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricProcessInstanceManager;
+import org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
-
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.*;
 
 
 /**
@@ -121,7 +128,71 @@ public class SetProcessDefinitionVersionCmd implements Command<Void>, Serializab
       validateAndSwitchVersionOfExecution(commandContext, executionEntity, newProcessDefinition);
     }
 
+    // switch all jobs to the new process definition version
+    List<JobEntity> jobs = commandContext.getJobManager().findJobsByExecutionId(processInstanceId);
+    List<JobDefinitionEntity> currentJobDefinitions =
+        commandContext.getJobDefinitionManager().findByProcessDefinitionId(currentProcessDefinition.getId());
+    List<JobDefinitionEntity> newVersionJobDefinitions =
+        commandContext.getJobDefinitionManager().findByProcessDefinitionId(newProcessDefinition.getId());
+
+    Map<String, String> jobDefinitionMapping = getJobDefinitionMapping(currentJobDefinitions, newVersionJobDefinitions);
+    for (JobEntity jobEntity : jobs) {
+      switchVersionOfJob(commandContext, jobEntity, newProcessDefinition, jobDefinitionMapping);
+    }
+
+    // switch all incidents to the new process definition version
+    List<IncidentEntity> incidents = commandContext.getIncidentManager().findIncidentsByProcessInstance(processInstanceId);
+    for (IncidentEntity incidentEntity : incidents) {
+      switchVersionOfIncident(commandContext, incidentEntity, newProcessDefinition);
+    }
+
     return null;
+  }
+
+  protected Map<String, String> getJobDefinitionMapping(List<JobDefinitionEntity> currentJobDefinitions, List<JobDefinitionEntity> newVersionJobDefinitions) {
+    Map<String, String> mapping = new HashMap<String, String>();
+
+    for (JobDefinitionEntity currentJobDefinition : currentJobDefinitions) {
+      for (JobDefinitionEntity newJobDefinition : newVersionJobDefinitions) {
+        if (jobDefinitionsMatch(currentJobDefinition, newJobDefinition)) {
+          mapping.put(currentJobDefinition.getId(), newJobDefinition.getId());
+          break;
+        }
+      }
+    }
+
+    return mapping;
+  }
+
+  protected boolean jobDefinitionsMatch(JobDefinitionEntity currentJobDefinition, JobDefinitionEntity newJobDefinition) {
+    boolean activitiesMatch = currentJobDefinition.getActivityId().equals(newJobDefinition.getActivityId());
+
+    boolean typesMatch =
+        (currentJobDefinition.getJobType() == null && newJobDefinition.getJobType() == null)
+          ||
+        (currentJobDefinition.getJobType() != null
+          && currentJobDefinition.getJobType().equals(newJobDefinition.getJobType()));
+
+    boolean configurationsMatch =
+        (currentJobDefinition.getJobConfiguration() == null && newJobDefinition.getJobConfiguration() == null)
+          ||
+        (currentJobDefinition.getJobConfiguration() != null
+          && currentJobDefinition.getJobConfiguration().equals(newJobDefinition.getJobConfiguration()));
+
+    return activitiesMatch && typesMatch && configurationsMatch;
+  }
+
+  protected void switchVersionOfJob(CommandContext commandContext, JobEntity jobEntity, ProcessDefinitionEntity newProcessDefinition,
+      Map<String, String> jobDefinitionMapping) {
+    jobEntity.setProcessDefinitionId(newProcessDefinition.getId());
+    jobEntity.setDeploymentId(newProcessDefinition.getDeploymentId());
+
+    String newJobDefinitionId = jobDefinitionMapping.get(jobEntity.getJobDefinitionId());
+    jobEntity.setJobDefinitionId(newJobDefinitionId);
+  }
+
+  protected void switchVersionOfIncident(CommandContext commandContext, IncidentEntity incidentEntity, ProcessDefinitionEntity newProcessDefinition) {
+    incidentEntity.setProcessDefinitionId(newProcessDefinition.getId());
   }
 
   protected void validateAndSwitchVersionOfExecution(CommandContext commandContext, ExecutionEntity execution, ProcessDefinitionEntity newProcessDefinition) {

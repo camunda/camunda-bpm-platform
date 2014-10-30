@@ -54,6 +54,12 @@
     from ${prefix}ACT_RU_INCIDENT I
     where I.EXECUTION_ID_ = #{parameter}
   </select>
+  
+  <select id="selectIncidentsByProcessInstanceId" parameterType="string" resultMap="incidentResultMap">
+    select *
+    from ${prefix}ACT_RU_INCIDENT I
+    where I.PROC_INST_ID_ = #{parameter}
+  </select>
 
   <select id="selectIncidentsByConfiguration" resultMap="incidentResultMap">
     select *
@@ -117,7 +123,8 @@
     update ${prefix}ACT_RU_INCIDENT
     <set>
       REV_ = #{revisionNext, jdbcType=INTEGER},
-      EXECUTION_ID_ = #{executionId, jdbcType=VARCHAR}
+      EXECUTION_ID_ = #{executionId, jdbcType=VARCHAR},
+      PROC_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR}
     </set>
     <where>
       ID_ = #{id, jdbcType=VARCHAR}

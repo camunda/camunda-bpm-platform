@@ -27,8 +27,13 @@ import org.camunda.bpm.engine.runtime.Incident;
 public class IncidentManager extends AbstractManager {
 
   @SuppressWarnings("unchecked")
-  public List<Incident> findIncidentsByExecution(String id) {
+  public List<IncidentEntity> findIncidentsByExecution(String id) {
     return getDbEntityManager().selectList("selectIncidentsByExecutionId", id);
+  }
+
+  @SuppressWarnings("unchecked")
+  public List<IncidentEntity> findIncidentsByProcessInstance(String id) {
+    return getDbEntityManager().selectList("selectIncidentsByProcessInstanceId", id);
   }
 
   public long findIncidentCountByQueryCriteria(IncidentQueryImpl incidentQuery) {

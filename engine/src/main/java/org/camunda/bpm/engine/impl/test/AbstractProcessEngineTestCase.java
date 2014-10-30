@@ -22,7 +22,8 @@ import java.util.TimerTask;
 import java.util.concurrent.Callable;
 import java.util.logging.Level;
 
-import org.apache.ibatis.logging.LogFactory;
+import junit.framework.AssertionFailedError;
+
 import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.CaseService;
 import org.camunda.bpm.engine.FilterService;
@@ -49,8 +50,6 @@ import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.junit.Assert;
-
-import junit.framework.AssertionFailedError;
 
 
 /**

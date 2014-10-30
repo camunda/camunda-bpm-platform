@@ -154,6 +154,9 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
     persistentState.put("duedate", duedate);
     persistentState.put("exceptionMessage", exceptionMessage);
     persistentState.put("suspensionState", suspensionState);
+    persistentState.put("processDefinitionId", processDefinitionId);
+    persistentState.put("jobDefinitionId", jobDefinitionId);
+    persistentState.put("deploymentId", deploymentId);
     if(exceptionByteArrayId != null) {
       persistentState.put("exceptionByteArrayId", exceptionByteArrayId);
     }
