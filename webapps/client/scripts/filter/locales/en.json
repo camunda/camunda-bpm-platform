@@ -114,5 +114,8 @@
                         "No task matching filters found.",
 
   "NO_AVAILABLE_FILTER":
-                        "No filter available."
+                        "No filter available.",
+
+  "PERMALINK":
+                        "Permanent link"
 }

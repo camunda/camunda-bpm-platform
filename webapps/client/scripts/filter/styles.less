@@ -75,6 +75,7 @@
 
 @hover-color-bg: mix(@column-center-bg, @column-right-bg, 50%);
 
+// NOTE: the .shutter is defined in the variables
 .tasks-list {
   > li {
     margin: 0;
@@ -102,6 +103,10 @@
 
       .shutter {
         .gradient(top, fade(@hover-color-bg, 0), @hover-color-bg);
+      }
+
+      .names > h4 a {
+        display: inline-block;
       }
     }
 
@@ -139,11 +144,15 @@
       padding: (@grid-gutter-width / 2) 0;
     }
 
-    .names {
-      margin: (0 - (@grid-gutter-width / 2)) 0;
-      padding: (@grid-gutter-width / 2) 0;
-      > h4 {
-        margin-top: 0;
+    .names > h4 {
+      height: 20px;
+      line-height: 20px;
+      overflow: visible;
+      margin-top: 0;
+      outline: none;
+      a {
+        font-size: 14px;
+        display: none;
       }
     }
   }

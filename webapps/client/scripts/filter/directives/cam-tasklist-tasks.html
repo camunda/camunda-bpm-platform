@@ -27,13 +27,18 @@
              ng-click="focus(task)">
           <div class="names">
             <h4 class="task">
+              {{ task.name || task.taskDefinitionKey || task.id }}
               <a ng-href="{{ getHrefUrl(task) }}"
-                 tabindex="{{ (delta + 1) }}">{{ task.name || task.taskDefinitionKey || task.id }}</a>
+                 tooltip="{{ 'PERMALINK' | translate }}"
+                 tooltip-placement="right"
+                 class="glyphicon glyphicon-link"></a>
             </h4>
+
             <h6 class="process-definition"
                 ng-if="task.processDefinitionId">
               {{ task._embedded.processDefinition[0].name || task._embedded.processDefinition[0].key }}
             </h6>
+
             <h6 class="case-definition"
                 ng-if="task.caseDefinitionId">
               {{ task._embedded.caseDefinition[0].name || task._embedded.caseDefinition[0].key }}
