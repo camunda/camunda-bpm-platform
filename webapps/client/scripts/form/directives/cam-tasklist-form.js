@@ -183,7 +183,7 @@ define([
         };
 
         this.getParams = function () {
-          return $scope.params;
+          return $scope.params || {};
         };
 
         this.registerCompletionHandler = function(fn) {
