@@ -13,10 +13,14 @@
         "Finished",
   "INIT_GROUPS_FAILURE":
         "Loading the groups of the selected task failed. Try to refresh the page to try again.",
-  "UPDATE_GROUPS_SUCCESS":
-        "Updating the groups of the selected task finished.",
-  "UPDATE_GROUPS_FAILED":
-        "Updating the groups of the selected task finished with failures. Try to refresh the page to try again.",
+  "ADD_GROUP_SUCCESS":
+        "Adding the group to the selected task finished.",
+  "ADD_GROUP_FAILED":
+        "Adding the group to the selected task finished with failures. Try to refresh the page to try again.",
+  "REMOVE_GROUP_SUCCESS":
+        "Removing the group of the selected task finished.",
+  "REMOVE_GROUP_FAILED":
+        "Removing the group of the selected task finished with failures. Try to refresh the page to try again.",
   "TASK_NAME":
         "Task name",
   "SEARCH_BY_TASK_NAME":
@@ -33,8 +37,8 @@
         "Group",
   "GROUPS":
         "Groups",
-  "GROUPS_EDIT":
-        "Edit Groups",
+  "MANAGE_GROUPS":
+        "Manage Groups",
   "GROUPS_ADD":
         "Add Groups",
   "CURRENT_GROUPS":
@@ -56,7 +60,7 @@
   "ADD_GROUPS":
         "Add groups",
   "USE_ADD_GROUP":
-        "You can add groups by clicking the \"Add a group\" link below.",
+        "You can add a group by typing a group id into the input field and afterwards clicking the button with the plus sign.",
   "DUPLICATE_GROUP":
         "Task is already in this group.",
   "OWNER":

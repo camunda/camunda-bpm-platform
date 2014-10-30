@@ -3,23 +3,7 @@ define([
 ], function(angular) {
   'use strict';
 
-  var GROUP_TYPE = 'candidate',
-      OPERATION_REMOVE = 'REMOVE',
-      OPERATION_ADD = 'ADD',
-      ACTION_STATE_PERFORM = 'performing',
-      ACTION_STATE_SUCCESS = 'successful',
-      ACTION_STATE_FAILED = 'failed';
-
-
-  function removeArrayItem(arr, delta) {
-    var newArr = [];
-    for (var key in arr) {
-      if (key != delta) {
-        newArr.push(arr[key]);
-      }
-    }
-    return newArr;
-  }
+  var GROUP_TYPE = 'candidate';
 
   return [
     '$scope',
@@ -43,18 +27,15 @@ define([
 
     var task = null;
 
+    var groupsChanged = false;
+
     var NEW_GROUP = { groupId : null, type: GROUP_TYPE };
+
+    var newGroup = $scope.newGroup =  angular.copy(NEW_GROUP);
 
     var taskGroupsData = taskMetaData.newChild($scope);
 
-    var actions = $scope.actions = [];
-
-    var finishedWithFailures = false;
-
-    $scope.EDIT_GROUPS = true;
     $scope._groups = [];
-
-    $scope.operation = 'GROUPS_ADD';
 
     $scope.$on('$locationChangeSuccess', function() {
       $scope.$dismiss();
@@ -65,15 +46,19 @@ define([
       'FAILURE',
       'INIT_GROUPS_FAILURE',
       'FINISHED',
-      'UPDATE_GROUPS_SUCCESS',
-      'UPDATE_GROUPS_FAILED'
+      'ADD_GROUP_SUCCESS',
+      'ADD_GROUP_FAILED',
+      'REMOVE_GROUP_SUCCESS',
+      'REMOVE_GROUP_FAILED'
     ])
     .then(function(result) {
-      messages.failure             = result.FAILURE;
-      messages.initGroupsFailed    = result.INIT_GROUPS_FAILURE;
-      messages.finished            = result.FINISHED;
-      messages.updateGroupsSuccess = result.UPDATE_GROUPS_SUCCESS;
-      messages.updateGroupsFailed  = result.UPDATE_GROUPS_FAILED;
+      messages.failure            = result.FAILURE;
+      messages.initGroupsFailed   = result.INIT_GROUPS_FAILURE;
+      messages.finished           = result.FINISHED;
+      messages.addGroupSuccess    = result.ADD_GROUP_SUCCESS;
+      messages.addGroupFailed     = result.ADD_GROUP_FAILED;
+      messages.removeGroupSuccess = result.REMOVE_GROUP_SUCCESS;
+      messages.removeGroupFailed  = result.REMOVE_GROUP_FAILED;
     });
 
     // observe ////////////////////////////////////////////////////////
@@ -82,9 +67,6 @@ define([
     taskGroupsData.changed('groups');
 
     $scope.modalGroupsState = taskGroupsData.observe('groups', function(groups) {
-      if (groups && groups.length) {
-        $scope.operation = 'GROUPS_EDIT';
-      }
       $scope._groups = angular.copy(groups) || [];
     });
 
@@ -104,145 +86,88 @@ define([
       }
     });
 
-    function addAction(group, operation) {
-      actions.push({
-        group: group,
-        operation: operation
-      });
-    }
-
     $scope.addGroup = function () {
-      var newGroup = angular.copy(NEW_GROUP);
+      var taskId = task.id;
+      
+      groupsChanged = true;
 
-      addAction(newGroup, OPERATION_ADD);
+      delete newGroup.error;
 
-      $scope._groups.push(newGroup);
+      Task.identityLinksAdd(taskId, newGroup, function(err) {
+        if (err) {
+          return Notifications.addError({
+            status: messages.failure,
+            message: messages.addGroupFailed,
+            exclusive: true
+          });
+        }
+
+        Notifications.addMessage({
+          status: messages.finished,
+          message: messages.addGroupSuccess,
+          exclusive: true
+        });
+
+        newGroup = $scope.newGroup = angular.copy(NEW_GROUP);
+        taskGroupsData.changed('groups');
+
+      });
     };
 
-    $scope.removeGroup = function(delta) {
-      var group = $scope._groups[delta];
+    $scope.removeGroup = function(group) {
+      var taskId = task.id;
 
-      addAction(group, OPERATION_REMOVE);
+      groupsChanged = true;
 
-      $scope._groups = removeArrayItem($scope._groups, delta);
+      Task.identityLinksDelete(taskId, group, function(err) {
+        if (err) {
+          return Notifications.addError({
+            status: messages.failure,
+            message: messages.removeGroupFailed,
+            exclusive: true
+          });
+        }
 
-      validateGroups();
+        Notifications.addMessage({
+          status: messages.finished,
+          message: messages.removeGroupSuccess,
+          exclusive: true
+        });
+
+        taskGroupsData.changed('groups');
+
+      });
     };
 
-    var validateGroups = $scope.validateGroups = function () {
-      for(var i = 0, group; !!(group = $scope._groups[i]); i++) {
-        validateGroup(group);
-      }
-    };
+    $scope.validateNewGroup = function () {
+      delete newGroup.error;
 
-    function validateGroup(group) {
-      delete group.error;
+      var newGroupId = newGroup.groupId;
 
-      var groupId = group.groupId;
-
-      if (groupId) {
+      if (newGroupId) {
         for(var i = 0, currentGroup; !!(currentGroup = $scope._groups[i]); i++) {
-          if (currentGroup !== group) {
-            if (groupId === currentGroup.groupId) {
-              group.error = { message: 'DUPLICATE_GROUP' };
-            }
-          }
+          if (newGroupId === currentGroup.groupId) {
+            newGroup.error = { message: 'DUPLICATE_GROUP' };
+          }          
         }
       }
-    }
-
-    $scope.close = function () {
-      if ($scope.EDIT_GROUPS) {
-        return $scope.$dismiss();
-      }
-
-      $scope.$close();
-
     };
 
     $scope.isValid = function () {
-      if (actions && !actions.length) {
+      if (!newGroup.groupId || newGroup.error) {
         return false;
-      }
-
-      for(var i = 0, group; !!(group = $scope._groups[i]); i++) {
-        if (!group.groupId || group.error) {
-          return false;
-        }
       }
 
       return true;
     };
 
-    $scope.saveChanges = function () {
-      $scope.EDIT_GROUPS = false;
+    $scope.close = function () {
+      if (groupsChanged) {
+        return $scope.$close();
+      }
 
-      doGroupUpdate(actions).then(function () {
-        if (!finishedWithFailures) {
-          Notifications.addMessage({
-            status: messages.finished,
-            message: messages.updateGroupsSuccess,
-            exclusive: true
-          });
-        } else {
-          Notifications.addError({
-            status: messages.finished,
-            message: messages.updateGroupsFailed,
-            exclusive: true
-          });
-        }
-      });
+      $scope.$dismiss();
     };
-
-    function doGroupUpdate (actions) {
-      var deferred = $q.defer();
-
-      var taskId = task.id;
-      var count = actions.length;
-
-      function callback(err, action) {
-        if (err) {
-          action.status = ACTION_STATE_FAILED;
-          action.error = err;
-          finishedWithFailures = true;
-        }
-        else {
-          action.status = ACTION_STATE_SUCCESS;
-        }
-
-        count = count - 1;
-
-        if (count === 0) {
-          deferred.resolve();
-        }
-      }
-
-      function performAction(action) {
-        var group = action.group;
-        var operation = action.operation;
-
-        action.status = ACTION_STATE_PERFORM;
-
-        delete group.error;
-
-        if (operation === OPERATION_ADD) {
-          Task.identityLinksAdd(taskId, group, function(err) {
-            callback(err, action);
-          });
-        }
-        else {
-          Task.identityLinksDelete(taskId, group, function(err) {
-            callback(err, action);
-          });
-        }
-      }
-
-      for (var i = 0, action; !!(action = actions[i]); i++) {
-        performAction(action);
-      }
-
-      return deferred.promise;
-    }
 
   }];
 

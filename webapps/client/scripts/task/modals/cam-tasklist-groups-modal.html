@@ -1,12 +1,12 @@
 <div class="modal-header">
   <h3 class="modal-title">
-    {{ operation | translate }}
+    {{ 'MANAGE_GROUPS' | translate }}
   </h3>
 </div>
 
 <div class="modal-body">
 
-  <div notifications-panel class="cols notifications-panel"></div>
+  <div notifications-panel></div>
 
   <div ng-show="!modalGroupsState.$loaded && !modalGroupsState.$error"
        class="loader">
@@ -16,80 +16,84 @@
 
   <div ng-hide="!modalGroupsState.$loaded || modalGroupsState.$error">
 
-    <div ng-show="EDIT_GROUPS">
       <div class="text-help">
         <i class="glyphicon glyphicon-info-sign"></i>
         {{ 'USE_ADD_GROUP' | translate }}
       </div>
 
-      <div class="form-group row labels-left">
-        <div class="col-xs-3 row-action">
-          <a ng-click="addGroup()"
-             href>
-            <span class="hidden-sm hidden-xs">
-              {{ 'GROUP_ADD' | translate }}
-            </span>
-            <i class="glyphicon glyphicon-plus-sign"></i>
-          </a>
+      <form name="taskGroupForm"
+            class="form-horizontal"
+            ng-submit="addGroup()">
+
+        <div class="new-group" ng-class="{'has-error': newGroup.error }">
+
+          <div class="form-group">
+
+            <div class="col-xs-12">
+              <div class="input-group">
+
+                <input id="new-group-input"
+                       type="text"
+                       class="form-control group-input"
+                       ng-model="newGroup.groupId"
+                       ng-change="validateNewGroup()"
+                       name="newGroup"
+                       placeholder="{{ 'GROUP_ADD' | translate }}"
+                       required>
+
+                <span class="input-group-btn">
+                  <button ng-click="addGroup()"
+                          class="btn btn-default"
+                          type="button"
+                          ng-disabled="!isValid()">
+                    <i class="glyphicon glyphicon-plus-sign"></i>
+                  </button>
+                </span>
+
+
+              </div>
+
+              <span ng-if="newGroup.error"
+                   class="help-block">
+                {{ newGroup.error.message | translate }}
+              </span>
+
+            </div>
+
+          </div>
         </div>
-      </div>
 
-      <form name="editGroupsForm">
-        <div ng-repeat="(delta, group) in _groups"
-             class="form-group row"
-             ng-class="{'has-error': group.error }">
+        <div ng-if="_groups.length"
+             class="current-groups">
 
-          <div class="col-xs-3 row-action text-right">
-            <a ng-click="removeGroup(delta)">
-              <i class="glyphicon glyphicon-minus-sign"></i>
-            </a>
+          <div class="row labels"
+               ng-if="_groups.length">
+            <label class="col-xs-2 align-right">
+              {{ 'ACTION' | translate }}
+            </label>
+            <label class="col-xs-10">
+              {{ 'GROUP' | translate }}
+            </label>
           </div>
 
-          <div class="col-xs-9">
-              <input id="new-group-input"
+          <div class="form-group values"
+               ng-repeat="group in _groups">
+            <div class="col-xs-2 align-right row-action">
+              <a href
+                 ng-click="removeGroup(group)"
+                 class="glyphicon glyphicon-minus-sign"></a>
+            </div>
+            <div class="col-xs-10">
+              <input id="group"
                      type="text"
                      class="form-control group-input"
                      ng-model="group.groupId"
-                     ng-change="validateGroups()"
-                     placeholder="{{ 'GROUP' | translate }}"
-                     required>
-              <span ng-if="group.error"
-                   class="help-block">
-                {{ group.error.message | translate }}
-              </span>
+                     readonly>
+            </div>
           </div>
-
         </div>
+
       </form>
-    </div>
-
-    <div ng-hide="EDIT_GROUPS">
-      <table class="table table-bordered table-hover table-condensed">
-        <thead>
-          <th>Group</th>
-          <th>Operation</th>
-          <th>Status</th>
-        </thead>
-        <tbody>
-          <tr ng-repeat="action in actions">
-            <td>{{ action.group.groupId }}</td>
-            <td>{{ action.operation | translate }}</td>
-            <td>
-              <span ng-show="action.status && action.status === 'performing'" class="loader">
-                <i class="animate-spin glyphicon glyphicon-refresh"></i>
-              </span>
-              <span ng-show="action.status && action.status === 'successful'">
-                <i class="icon-ok"></i>&nbsp;{{ 'SUCCESSFUL' | translate }}
-              </span>
-              <span ng-show="action.status && action.status === 'failed'">
-                <i class="icon-remove"></i>&nbsp;{{ 'FAILED' | translate }}
-              </span>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-
-    </div>
 
   </div>
 
@@ -102,13 +106,6 @@
               type="button"
               ng-click="close()"
               translate="CLOSE">Close</button>
-
-      <button class="btn btn-primary"
-              ng-show="EDIT_GROUPS && !modalGroupsState.$error"
-              type="submit"
-              ng-disabled="!isValid()"
-              ng-click="saveChanges()"
-              translate="SAVE">Save</button>
     </div>
   </div>
 </div>
