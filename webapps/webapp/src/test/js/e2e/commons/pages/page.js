@@ -70,11 +70,7 @@ Page.prototype.logout = function() {
 };
 
 Page.prototype.loggedInUser = function() {
-  if (/tasklist/.test(this.url)) {
-    return element(by.css('[tooltip="Manage your account"]')).getText();
-  } else {
-    return element(by.css('.navbar [sem-show-user-actions]')).getText();
-  }
+  return element(by.css('.navbar [sem-show-user-actions]')).getText();
 };
 
 Page.prototype.switchWebapp = function(appName) {

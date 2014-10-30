@@ -61,6 +61,7 @@ describe('tasklist filter -', function() {
     it('should edit first filter', function() {
 
       // when
+      dashboardPage.taskFilters.selectFilter(0);  // to check whether filter is selected after edit
       dashboardPage.taskFilters.editFilter(0);
 
       // then
@@ -166,14 +167,15 @@ describe('tasklist filter -', function() {
 
     it('should validate priority ranking', function() {
 
+      // then
       expect(dashboardPage.taskFilters.filterName(1)).toBe('123 FILTER NAME');
     });
 
 
     it('should validate filter refresh', function() {
 
+      // then
       expect(dashboardPage.taskList.taskList().count()).toBe(0);
-
       expect(dashboardPage.taskFilters.isFilterSelected(1));
     });
 
@@ -203,7 +205,8 @@ describe('tasklist filter -', function() {
     it('should open delete page', function() {
 
       // when
-      dashboardPage.taskFilters.deleteFilter(1);
+      dashboardPage.taskFilters.editFilter(1);
+      dashboardPage.taskFilters.editFilterPage.deleteFilterButton().click();
 
       // then
       expect(dashboardPage.taskFilters.deleteFilterPage.formHeader()).toBe('Delete filter');

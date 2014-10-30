@@ -7,6 +7,7 @@ describe('tasklist URLs - ', function() {
   describe('unauthenticated user', function() {
     var loginUrl = 'http://localhost:8080' + dashboardPage.url + 'login';
     var taskUrl;
+    var taskName;
 
     it('redirects to /login', function() {
 
@@ -29,11 +30,13 @@ describe('tasklist URLs - ', function() {
       dashboardPage.isActive();
 
       // finally
-      element(by.css('.tasks-list li:first-child .task a'))
-        .getAttribute('href')
-        .then(function(href) {
-          taskUrl = href;
-        });
+      dashboardPage.taskList.taskId(0).then(function(href) {
+        taskUrl = href;
+      });
+
+      dashboardPage.taskList.taskName(0).then(function(name) {
+        taskName = name;
+      });
 
     });
 
@@ -48,6 +51,7 @@ describe('tasklist URLs - ', function() {
       expect(browser.getCurrentUrl()).toBe(loginUrl);
       dashboardPage.authentication.userLogin('demo', 'demo');
       expect(browser.getCurrentUrl()).toBe(taskUrl);
+      expect(dashboardPage.currentTask.taskName()).toBe(taskName);
     });
   });
 

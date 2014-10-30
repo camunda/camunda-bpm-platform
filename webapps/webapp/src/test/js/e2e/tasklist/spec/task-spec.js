@@ -88,6 +88,7 @@ describe('tasklist filter -', function() {
       expect(dashboardPage.currentTask.history.commentMessage(1)).toBe('Thiß üs ä cömmänt');
     });
 
+
     it('should claim task', function () {
 
       // when
@@ -102,6 +103,7 @@ describe('tasklist filter -', function() {
       expect(dashboardPage.currentTask.history.operationUser(0)).toBe('jonny1');
       expect(dashboardPage.currentTask.history.commentMessage(2)).toBe('Thiß üs ä cömmänt');
     });
+
 
     describe('dates', function () {
 
@@ -143,13 +145,13 @@ describe('tasklist filter -', function() {
   });
 
 
-
   describe('end test', function() {
 
     it('should delete filter', function () {
 
       // when
-      dashboardPage.taskFilters.deleteFilter(0);
+      dashboardPage.taskFilters.editFilter(0);
+      dashboardPage.taskFilters.editFilterPage.deleteFilterButton().click();
       dashboardPage.taskFilters.deleteFilterPage.deleteButton().click();
 
       // then

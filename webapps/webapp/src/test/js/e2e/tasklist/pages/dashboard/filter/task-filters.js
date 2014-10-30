@@ -29,9 +29,9 @@ module.exports = Page.extend({
   },
 
   selectFilter: function(item) {
-    var pile = this.filterList().get(item).element(by.css('[class="name ng-binding"]'));
-    pile.click();
-    return pile;
+    var filter = this.filterList().get(item).element(by.css('[class="task-filter"]'));
+    filter.click();
+    return filter;
   },
 
   filterStatus: function(item) {
@@ -59,15 +59,15 @@ module.exports = Page.extend({
 
     browser.sleep(1000);
 
-    return this.filterList().get(item).element(by.binding('filter.properties.description'));
+    return this.filterList().get(item).element(by.css('.name')).getAttribute('tooltip');
   },
 
   filterDescription: function(item) {
-    return this.filterDescriptionElement(item).getText();
+    return this.filterDescriptionElement(item);
   },
 
   createFilterButton: function() {
-    return element(by.css('[ng-click="openDialog(\'CREATE_NEW_FILTER\')"]'));
+    return element(by.css('[ng-click="openDialog($event, \'CREATE_NEW_FILTER\')"]'));
   },
 
   editFilter: function(item) {
@@ -78,22 +78,9 @@ module.exports = Page.extend({
 
     browser.sleep(1000);
 
-    var editFilterElement = this.filterList().get(item).element(by.css('[ng-click="openDialog(\'EDIT_FILTER\')"]'));
+    var editFilterElement = this.filterList().get(item).element(by.css('[ng-click="openDialog($event, \'EDIT_FILTER\')"]'));
     editFilterElement.click();
     return editFilterElement;
-  },
-
-  deleteFilter: function(item) {
-
-    browser.sleep(1000);
-
-    protractor.getInstance().actions().mouseMove(this.filterNameElement(item)).perform();
-
-    browser.sleep(1000);
-
-    var deleteFilterElement = this.filterList().get(item).element(by.css('[ng-click="openDialog(\'DELETE_FILTER\')"]'));
-    deleteFilterElement.click();
-    return deleteFilterElement;
   }
 
 });
