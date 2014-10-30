@@ -30,6 +30,7 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.form.FormProperty;
 import org.camunda.bpm.engine.form.StartFormData;
 import org.camunda.bpm.engine.form.TaskFormData;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.CollectionUtil;
@@ -726,6 +727,55 @@ public class FormServiceTest extends PluggableProcessEngineTestCase {
     // null => all
     variables = formService.getTaskFormVariables(task.getId(), null, true);
     assertEquals(7, variables.size());
+
+  }
+
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
+  public void testSubmitStartFormWithObjectVariables() {
+    // given
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
+
+    // when a start form is submitted with an object variable
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("var", new ArrayList<String>());
+    ProcessInstance processInstance = formService.submitStartForm(processDefinition.getId(), variables);
+
+    // then the variable is available as a process variable
+    ArrayList<String> var = (ArrayList<String>) runtimeService.getVariable(processInstance.getId(), "var");
+    assertNotNull(var);
+    assertTrue(var.isEmpty());
+
+    // then no historic form property event has been written since this is not supported for custom objects
+    if(processEngineConfiguration.getHistoryLevel().getId() >= ProcessEngineConfigurationImpl.HISTORYLEVEL_FULL) {
+      assertEquals(0, historyService.createHistoricDetailQuery().formFields().count());
+    }
+
+  }
+
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/twoTasksProcess.bpmn20.xml" })
+  public void testSubmitTaskFormWithObjectVariables() {
+    // given
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("twoTasksProcess");
+
+    // when a task form is submitted with an object variable
+    Task task = taskService.createTaskQuery().singleResult();
+    assertNotNull(task);
+
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("var", new ArrayList<String>());
+    formService.submitTaskForm(task.getId(), variables);
+
+    // then the variable is available as a process variable
+    ArrayList<String> var = (ArrayList<String>) runtimeService.getVariable(processInstance.getId(), "var");
+    assertNotNull(var);
+    assertTrue(var.isEmpty());
+
+    // then no historic form property event has been written since this is not supported for custom objects
+    if(processEngineConfiguration.getHistoryLevel().getId() >= ProcessEngineConfigurationImpl.HISTORYLEVEL_FULL) {
+      assertEquals(0, historyService.createHistoricDetailQuery().formFields().count());
+    }
 
   }
 
