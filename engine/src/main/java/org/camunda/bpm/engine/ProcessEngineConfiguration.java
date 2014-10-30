@@ -101,13 +101,13 @@ public abstract class ProcessEngineConfiguration {
   /**
    * Value for {@link #setHistory(String)} to ensure that no history is being recorded.
    */
-  public static final String HISTORY_NONE = HistoryLevel.HISTORY_LEVEL_NONE.getName();
+  public static final String HISTORY_NONE = "none";
   /**
    * Value for {@link #setHistory(String)} to ensure that only historic process instances and
    * historic activity instances are being recorded.
    * This means no details for those entities.
    */
-  public static final String HISTORY_ACTIVITY = HistoryLevel.HISTORY_LEVEL_ACTIVITY.getName();
+  public static final String HISTORY_ACTIVITY = "activity";
   /**
    * Value for {@link #setHistory(String)} to ensure that only historic process instances,
    * historic activity instances and last process variable values are being recorded.
@@ -119,12 +119,12 @@ public abstract class ProcessEngineConfiguration {
    * Value for {@link #setHistory(String)} to ensure that only historic process instances,
    * historic activity instances and submitted form property values are being recorded.
    */
-  public static final String HISTORY_AUDIT = HistoryLevel.HISTORY_LEVEL_AUDIT.getName();
+  public static final String HISTORY_AUDIT = "audit";
   /**
    * Value for {@link #setHistory(String)} to ensure that all historic information is
    * being recorded, including the variable updates.
    */
-  public static final String HISTORY_FULL = HistoryLevel.HISTORY_LEVEL_FULL.getName();
+  public static final String HISTORY_FULL = "full";
 
   protected String processEngineName = ProcessEngines.NAME_DEFAULT;
   protected int idBlockSize = 100;

@@ -17,6 +17,7 @@ import static org.camunda.bpm.engine.impl.history.event.HistoryEventTypes.VARIAB
 import static org.camunda.bpm.engine.impl.history.event.HistoryEventTypes.VARIABLE_INSTANCE_DELETE;
 import static org.camunda.bpm.engine.impl.history.event.HistoryEventTypes.VARIABLE_INSTANCE_UPDATE;
 
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventType;
 
 /**
@@ -30,7 +31,7 @@ public class HistoryLevelAudit extends HistoryLevelActivity {
   }
 
   public String getName() {
-    return "audit";
+    return ProcessEngineConfiguration.HISTORY_AUDIT;
   }
 
   @Override

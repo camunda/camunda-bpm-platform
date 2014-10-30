@@ -12,6 +12,7 @@
  */
 package org.camunda.bpm.engine.impl.history;
 
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventType;
 
 /**
@@ -26,7 +27,7 @@ public class HistoryLevelNone extends AbstractHistoryLevel {
   }
 
   public String getName() {
-    return "none";
+    return ProcessEngineConfiguration.HISTORY_NONE;
   }
 
   public boolean isHistoryEventProduced(HistoryEventType eventType, Object entity) {

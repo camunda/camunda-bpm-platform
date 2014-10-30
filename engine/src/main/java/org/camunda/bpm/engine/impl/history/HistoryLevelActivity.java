@@ -28,6 +28,7 @@ import static org.camunda.bpm.engine.impl.history.event.HistoryEventTypes.TASK_I
 import static org.camunda.bpm.engine.impl.history.event.HistoryEventTypes.TASK_INSTANCE_DELETE;
 import static org.camunda.bpm.engine.impl.history.event.HistoryEventTypes.TASK_INSTANCE_UPDATE;
 
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventType;
 
 /**
@@ -41,7 +42,7 @@ public class HistoryLevelActivity extends AbstractHistoryLevel {
   }
 
   public String getName() {
-    return "activity";
+    return ProcessEngineConfiguration.HISTORY_ACTIVITY;
   }
 
   public boolean isHistoryEventProduced(HistoryEventType eventType, Object entity) {
