@@ -56,10 +56,6 @@
     z-index: 10;
     display: inline-block;
   }
-
-  // &.current {
-  //   z-index: 2;
-  // }
 }
 
 .active > .task-filter:after {
@@ -76,6 +72,9 @@
   width: 0px;
 }
 
+
+@hover-color-bg: mix(@column-center-bg, @column-right-bg, 50%);
+
 .tasks-list {
   > li {
     margin: 0;
@@ -85,35 +84,43 @@
     min-height: 90px;
     position: relative;
 
+    &:after {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: (0 - (@grid-gutter-width / 5));
+      right: (0 - (@grid-gutter-width / 2));
+      content: ' ';
+      z-index: 1;
+    }
+
+
+    &:hover {
+      &:after {
+        background-color: @hover-color-bg;
+      }
+
+      .shutter {
+        .gradient(top, fade(@hover-color-bg, 0), @hover-color-bg);
+      }
+    }
+
+
     &.active {
       position: relative;
       background-color: @column-right-bg;
       overflow: visible;
 
-      &:after,
-      &:before {
-        content: ' ';
-        display: block;
-        position: absolute;
-        height: 100%;
-        top: 0;
-        bottom: 0;
-        z-index: 5;
-        background-color: @column-right-bg;
-      }
-
       &:after {
-        width: (@grid-gutter-width / 2);
-        right: (0 - (@grid-gutter-width / 2));
-      }
-
-      &:before {
-        width: (@grid-gutter-width / 5);
-        left: (0 - (@grid-gutter-width / 5));
+        background-color: @column-right-bg;
       }
 
       .names {
         font-style: italic;
+      }
+
+      .shutter {
+        .gradient(top, fade(@column-right-bg, 0), @column-right-bg);
       }
     }
 
@@ -121,13 +128,23 @@
       border-top: 0;
     }
 
-    &:focus {
-      outline: none;
-      background-color: @gray-lighter;
+    > div {
+      position: relative;
+      z-index: 4;
     }
 
-    .names > h4 {
-      margin-top: 0;
+    .clickable {
+      cursor: pointer;
+      margin: (0 - (@grid-gutter-width / 2)) 0;
+      padding: (@grid-gutter-width / 2) 0;
+    }
+
+    .names {
+      margin: (0 - (@grid-gutter-width / 2)) 0;
+      padding: (@grid-gutter-width / 2) 0;
+      > h4 {
+        margin-top: 0;
+      }
     }
   }
 

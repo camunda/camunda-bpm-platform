@@ -23,66 +23,69 @@
           {{ task.priority }}
         </div>
 
-        <div class="names">
-          <h4 class="task">
-            <a ng-href="{{ getHrefUrl(task) }}"
-               ng-click="focus(task)"
-               tabindex="{{ (delta + 1) }}">{{ task.name || task.taskDefinitionKey || task.id }}</a>
-          </h4>
-          <h6 class="process-definition"
-              ng-if="task.processDefinitionId">
-            {{ task._embedded.processDefinition[0].name || task._embedded.processDefinition[0].key }}
-          </h6>
-          <h6 class="case-definition"
-              ng-if="task.caseDefinitionId">
-            {{ task._embedded.caseDefinition[0].name || task._embedded.caseDefinition[0].key }}
-          </h6>
-        </div>
+        <div class="clickable"
+             ng-click="focus(task)">
+          <div class="names">
+            <h4 class="task">
+              <a ng-href="{{ getHrefUrl(task) }}"
+                 tabindex="{{ (delta + 1) }}">{{ task.name || task.taskDefinitionKey || task.id }}</a>
+            </h4>
+            <h6 class="process-definition"
+                ng-if="task.processDefinitionId">
+              {{ task._embedded.processDefinition[0].name || task._embedded.processDefinition[0].key }}
+            </h6>
+            <h6 class="case-definition"
+                ng-if="task.caseDefinitionId">
+              {{ task._embedded.caseDefinition[0].name || task._embedded.caseDefinition[0].key }}
+            </h6>
+          </div>
 
 
-        <div class="row">
-          <ul class="col-md-12 col-lg-9 dates list-inline">
-            <li class="creation-date">
-              <span tooltip-placement="top"
-                    tooltip="{{ 'CREATION_DATE' | translate }}"
-                    class="glyphicon glyphicon-bookmark"></span>
-              <span tooltip-placement="top"
-                    tooltip="{{ task.created | camDate:'long' }}"
-                    am-time-ago="task.created">{{ task.created }}</span>
-            </li>
+          <div class="row"
+               ng-click="focus(task)">
+            <ul class="col-md-12 col-lg-9 dates list-inline">
+              <li class="creation-date">
+                <span tooltip-placement="top"
+                      tooltip="{{ 'CREATION_DATE' | translate }}"
+                      class="glyphicon glyphicon-bookmark"></span>
+                <span tooltip-placement="top"
+                      tooltip="{{ task.created | camDate:'long' }}"
+                      am-time-ago="task.created">{{ task.created }}</span>
+              </li>
 
-            <li class="followup-date"
-                ng-if="!!task.followUp"
-                ng-class="{overdue: task.followUp && (task.followUp < now) }">
-              <span tooltip-placement="top"
-                    tooltip="{{ 'FOLLOW_UP_DATE' | translate }}"
-                    class="glyphicon glyphicon-calendar"></span>
-              <span tooltip-placement="top"
-                    tooltip="{{ task.followUp | camDate:'long' }}"
-                    am-time-ago="task.followUp">{{ task.followUp }}</span>
-            </li>
+              <li class="followup-date"
+                  ng-if="!!task.followUp"
+                  ng-class="{overdue: task.followUp && (task.followUp < now) }">
+                <span tooltip-placement="top"
+                      tooltip="{{ 'FOLLOW_UP_DATE' | translate }}"
+                      class="glyphicon glyphicon-calendar"></span>
+                <span tooltip-placement="top"
+                      tooltip="{{ task.followUp | camDate:'long' }}"
+                      am-time-ago="task.followUp">{{ task.followUp }}</span>
+              </li>
 
-            <li class="due-date"
-                ng-if="!!task.due"
-                ng-class="{overdue: task.due && (task.due < now) }">
-              <span tooltip-placement="top"
-                    tooltip="{{ 'DUE_DATE' | translate }}"
-                    class="glyphicon glyphicon-bell"></span>
-              <span tooltip-placement="top"
-                    tooltip="{{ task.due | camDate:'long' }}"
-                    am-time-ago="task.due">{{ task.due }}</span>
-            </li>
-          </ul>
+              <li class="due-date"
+                  ng-if="!!task.due"
+                  ng-class="{overdue: task.due && (task.due < now) }">
+                <span tooltip-placement="top"
+                      tooltip="{{ 'DUE_DATE' | translate }}"
+                      class="glyphicon glyphicon-bell"></span>
+                <span tooltip-placement="top"
+                      tooltip="{{ task.due | camDate:'long' }}"
+                      am-time-ago="task.due">{{ task.due }}</span>
+              </li>
+            </ul>
 
-          <ul class="col-md-12 col-lg-3 actors list-inline"
-              ng-if="!!task.assignee">
-            <li class="assignee">
-              <span tooltip-placement="top"
-                    tooltip="{{ 'ASSIGNEE' | translate }}"
-                    class="glyphicon glyphicon-user"></span>
-              {{ task.assignee }}
-            </li>
-          </ul>
+            <ul class="col-md-12 col-lg-3 actors list-inline"
+                ng-if="!!task.assignee">
+              <li class="assignee">
+                <span tooltip-placement="top"
+                      tooltip="{{ 'ASSIGNEE' | translate }}"
+                      class="glyphicon glyphicon-user"></span>
+                {{ task.assignee }}
+              </li>
+            </ul>
+          </div>
         </div>
 
 
