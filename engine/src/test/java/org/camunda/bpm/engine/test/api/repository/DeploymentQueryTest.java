@@ -18,8 +18,8 @@ import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.NullValueException;
+import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
-import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.DeploymentQuery;
 
@@ -133,10 +133,10 @@ public class DeploymentQueryTest extends PluggableProcessEngineTestCase {
   }
 
   public void testQueryByDeploymentBefore() throws Exception {
-    Date now = ClockUtil.getCurrentTime();
-    Date earlier = new Date(now.getTime() - 3600);
+    Date later = DateTimeUtil.now().plus(10 * 3600).toDate();
+    Date earlier = DateTimeUtil.now().minus(10 * 3600).toDate();
 
-    long count = repositoryService.createDeploymentQuery().deploymentBefore(now).count();
+    long count = repositoryService.createDeploymentQuery().deploymentBefore(later).count();
     assertEquals(2, count);
 
     count = repositoryService.createDeploymentQuery().deploymentBefore(earlier).count();
@@ -151,10 +151,10 @@ public class DeploymentQueryTest extends PluggableProcessEngineTestCase {
   }
 
   public void testQueryDeploymentAfter() throws Exception {
-    Date now = ClockUtil.getCurrentTime();
-    Date earlier = new Date(ClockUtil.getCurrentTime().getTime() - 3600);
+    Date later = DateTimeUtil.now().plus(10 * 3600).toDate();
+    Date earlier = DateTimeUtil.now().minus(10 * 3600).toDate();
 
-    long count = repositoryService.createDeploymentQuery().deploymentAfter(now).count();
+    long count = repositoryService.createDeploymentQuery().deploymentAfter(later).count();
     assertEquals(0, count);
 
     count = repositoryService.createDeploymentQuery().deploymentAfter(earlier).count();
@@ -169,19 +169,19 @@ public class DeploymentQueryTest extends PluggableProcessEngineTestCase {
   }
 
   public void testQueryDeploymentBetween() throws Exception {
-    Date now = ClockUtil.getCurrentTime();
-    Date earlier = new Date(ClockUtil.getCurrentTime().getTime() - 3600);
+    Date later = DateTimeUtil.now().plus(10 * 3600).toDate();
+    Date earlier = DateTimeUtil.now().minus(10 * 3600).toDate();
 
     long count = repositoryService
         .createDeploymentQuery()
         .deploymentAfter(earlier)
-        .deploymentBefore(now).count();
+        .deploymentBefore(later).count();
     assertEquals(2, count);
 
     count = repositoryService
       .createDeploymentQuery()
-      .deploymentAfter(now)
-      .deploymentBefore(now)
+      .deploymentAfter(later)
+      .deploymentBefore(later)
       .count();
     assertEquals(0, count);
 
