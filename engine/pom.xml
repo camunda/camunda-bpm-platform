@@ -162,7 +162,7 @@
       <artifactId>jsonassert</artifactId>
       <scope>test</scope>
     </dependency>
-    
+
     <dependency>
       <groupId>org.hamcrest</groupId>
       <artifactId>hamcrest-library</artifactId>
@@ -762,17 +762,23 @@
     </profile>
 
     <profile>
-      <!-- check for official api differences between latest minor release -->
+      <!-- check for api differences between latest minor release -->
       <id>check-api-compatibility</id>
       <build>
         <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <skipTests>true</skipTests>
+            </configuration>
+          </plugin>
           <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>clirr-maven-plugin</artifactId>
             <configuration>
               <comparisonVersion>7.1.0-Final</comparisonVersion>
-              <textOutputFile>${project.build.directory}/clirr.txt</textOutputFile>
-              <failOnError>false</failOnError>
+              <logResults>true</logResults>
               <includes>
                 <include>org/camunda/bpm/application/*</include>
                 <include>org/camunda/bpm/container/*</include>
@@ -781,10 +787,28 @@
             </configuration>
             <executions>
               <execution>
+                <id>all</id>
                 <phase>verify</phase>
                 <goals>
                   <goal>check-no-fork</goal>
                 </goals>
+                <configuration>
+                  <textOutputFile>${project.build.directory}/clirr-all.txt</textOutputFile>
+                  <failOnWarning>false</failOnWarning>
+                  <failOnError>false</failOnError>
+                </configuration>
+              </execution>
+              <execution>
+                <id>restrictive</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>check-no-fork</goal>
+                </goals>
+                <configuration>
+                  <textOutputFile>${project.build.directory}/clirr-restrictive.txt</textOutputFile>
+                  <failOnWarning>true</failOnWarning>
+                  <ignoredDifferencesFile>.clirr-jenkins-ignore.xml</ignoredDifferencesFile>
+                </configuration>
               </execution>
             </executions>
           </plugin>
