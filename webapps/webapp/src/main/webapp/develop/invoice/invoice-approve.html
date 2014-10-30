@@ -1,56 +1,47 @@
 <form class="form-horizontal"
       role="form">
 
-  <div class="panel panel-default">
-    <div class="panel-body">
-      Who should approve this invoice?
-    </div>
-  </div>
+    <div class="panel panel-info">Who should approve this invoice?</div>
 
-  <div class="control-group">
-    <label class="control-label">Creditor</label>
-    <div class="controls">
-      <input cam-variable-name="creditor"
-             type="text"
-             ng-model="creditor"
-             name="creditor"
-             readonly="true"
-             class="form-control" />
+    <div class="control-group">
+        <label class="control-label">Creditor</label>
+        <div class="controls">
+            <input cam-variable-name="creditor"
+                   type="text"
+                   name="creditor"
+                   readonly="true"
+                   class="form-control" />
+        </div>
     </div>
-  </div>
-  <div class="control-group">
-    <label class="control-label">Amount</label>
-    <div class="controls">
-      <input cam-variable-name="amount"
-             type="text"
-             ng-model="amount"
-             name="amount"
-             readonly="true"
-             class="form-control" />
+    <div class="control-group">
+        <label class="control-label">Amount</label>
+        <div class="controls">
+            <input cam-variable-name="amount"
+                   type="text"
+                   name="amount"
+                   readonly="true"
+                   class="form-control" />
+        </div>
     </div>
-  </div>
-  <div class="control-group">
-    <label class="control-label">Invoice Number</label>
-    <div class="controls">
-      <input cam-variable-name="invoiceNumber"
-             type="text"
-             ng-model="invoiceNumber"
-             name="invoiceNumber"
-             readonly="true"
-             class="form-control" />
+    <div class="control-group">
+        <label class="control-label">Invoice Number</label>
+        <div class="controls">
+            <input cam-variable-name="invoiceNumber"
+                   type="text"
+                   name="invoiceNumber"
+                   readonly="true"
+                   class="form-control" />
+        </div>
     </div>
-  </div>
-  <div class="control-group">
-    <label class="control-label">Do you approve? </label>
-    <div class="controls">
-      <input cam-variable-name="approved"
-             cam-variable-type="Boolean"
-             type="text"
-             ng-model="approved"
-             name="approved"
-             class="form-control" />
-
-      (i.e. true, false)
+    <div class="control-group">
+        <label class="control-label">Do you approve?</label>
+        <div class="controls">
+            <input cam-variable-name="approved"
+                   cam-variable-type="Boolean"
+                   type="checkbox"
+                   name="approved"
+                   class="form-control" />
+            (yes/no)
+        </div>
     </div>
-  </div>
 </form>

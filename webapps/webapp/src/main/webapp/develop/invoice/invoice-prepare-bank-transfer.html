@@ -1,56 +1,48 @@
 <form class="form-horizontal"
       role="form">
 
-  <div class="panel panel-default">
-    <div class="panel-body">
-      You can prepare the bank transfer for the following invoice
-    </div>
-  </div>
+    <div class="panel panel-info">You can prepare the bank transfer for the following invoice</div>
 
-  <div class="control-group">
-    <label class="control-label">Creditor</label>
-    <div class="controls">
-      <input cam-variable-name="creditor"
-             type="text"
-             name="creditor"
-             ng-model="creditor"
-             readonly="true"
-             class="form-control" />
+    <div class="control-group">
+        <label class="control-label">Creditor</label>
+        <div class="controls">
+            <input cam-variable-name="creditor"
+                   type="text"
+                   name="creditor"
+                   readonly="true"
+                   class="form-control" />
+        </div>
     </div>
-  </div>
-  <div class="control-group">
-    <label class="control-label">Amount</label>
-    <div class="controls">
-      <input cam-variable-name="amount"
-             type="text"
-             name="amount"
-             ng-model="amount"
-             readonly="true"
-             class="form-control" />
+    <div class="control-group">
+        <label class="control-label">Amount</label>
+        <div class="controls">
+            <input cam-variable-name="amount"
+                   type="text"
+                   name="amount"
+                   readonly="true"
+                   class="form-control" />
+        </div>
     </div>
-  </div>
-  <div class="control-group">
-    <label class="control-label">Invoice Number</label>
-    <div class="controls">
-      <input cam-variable-name="invoiceNumber"
-             type="text"
-             name="invoiceNumber"
-             ng-model="invoiceNumber"
-             readonly="true"
-             class="form-control" />
+    <div class="control-group">
+        <label class="control-label">Invoice Number</label>
+        <div class="controls">
+            <input cam-variable-name="invoiceNumber"
+                   type="text"
+                   name="invoiceNumber"
+                   readonly="true"
+                   class="form-control" />
+        </div>
     </div>
-  </div>
-  <div class="control-group">
-    <label class="control-label">Approved by </label>
-    <div class="controls">
-      <input cam-variable-name="approver"
-             type="text"
-             name="approved"
-             ng-model="approved"
-             readonly="true"
-             class="form-control"></input>
-             <p></p>
+    <div class="control-group">
+        <label class="control-label">Approved by </label>
+        <div class="controls">
+            <input cam-variable-name="approver"
+                   type="text"
+                   name="approved"
+                   readonly="true"
+                   class="form-control"></input>
+            <p></p>
+        </div>
     </div>
-  </div>
 </form>
 

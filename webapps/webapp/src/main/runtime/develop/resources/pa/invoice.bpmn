@@ -83,7 +83,7 @@
     <endEvent id="invoiceProcessed" name="Invoice&#xA;processed">
       <incoming>SequenceFlow_3</incoming>
     </endEvent>
-    <serviceTask id="ServiceTask_1" activiti:class="org.camunda.bpm.example.invoice.service.ArchiveInvoiceService" name="Archive Invoice">
+    <serviceTask id="ServiceTask_1" activiti:class="org.camunda.bpm.pa.service.ArchiveInvoiceService" name="Archive Invoice">
       <incoming>SequenceFlow_2</incoming>
       <outgoing>SequenceFlow_3</outgoing>
     </serviceTask>

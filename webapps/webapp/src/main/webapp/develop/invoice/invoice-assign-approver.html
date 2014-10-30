@@ -1,56 +1,55 @@
-<form role="form" name="form">
+<form class="form-horizontal"
+      role="form">
 
-  <script cam-script type="text/form-script">
-    camForm.on('form-loaded', function() {
-      camForm.variableManager.fetchVariable('invoiceData');
-    });
-    camForm.on('variables-fetched', function() {
-      $scope.invoiceData = camForm.variableManager.variableValue('invoiceData');
-    });
-  </script>
+    <div class="panel panel-info">Who should approve this invoice?</div>
 
-  <div class="form-group">
-    <label for="invoiceNumber-field">Invoice Number</label>
-    <input id="invoiceNumber-field"
-           type="text"
-           class="form-control"
-           required
-           ng-model="invoiceData.invoiceNumber">
-  </div>
-  <div class="form-group">
-    <label for="amount-field">Amount</label>
-    <input id="amount-field"
-           type="text"
-           class="form-control"
-           required
-           ng-model="invoiceData.amount">
-  </div>
-  <div class="form-group">
-    <label for="creditor-field">Creditor</label>
-    <input id="creditor-field"
-           type="text"
-           class="form-control"
-           required
-           ng-model="invoiceData.creditor">
-  </div>
-  <div class="form-group">
-    <label for="priority-field">Priority</label>
-    <input id="priority-field"
-           type="number"
-           class="form-control"
-           required
-           ng-model="invoiceData.priority">
-  </div>
-
-  <div class="form-group">
-    <label for="approver-select">Approver</label>
-    <select required
-           id="approver-select"
-           class="form-control"
-           cam-variable-name="approver"
-           cam-variable-type="String"
-           cam-choices="potentialApprovers">
-    <div class="help-block">Come on <strong>{{ camForm.approver }}</strong></div>
-  </div>
-
+    <div class="control-group">
+        <label class="control-label">Creditor</label>
+        <div class="controls">
+            <input cam-variable-name="creditor"
+                   type="text"
+                   name="creditor"
+                   readonly="true"
+                   class="form-control" />
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label">Amount</label>
+        <div class="controls">
+            <input cam-variable-name="amount"
+                   type="text"
+                   name="amount"
+                   readonly="true"
+                   class="form-control" />
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label">Invoice Number</label>
+        <div class="controls">
+            <input cam-variable-name="invoiceNumber"
+                   type="text"
+                   name="invoiceNumber"
+                   readonly="true"
+                   class="form-control" />
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label">Approver: </label>
+        <div class="controls">
+            <select cam-variable-name="approver"
+                    cam-variable-type="String"
+                    type="text"
+                    name="approver"
+                    class="form-control"
+                    required>
+                <option></option>
+                <option value="jonny1">Jonny</option>
+                <option value="demo">Demo</option>
+                <option value="john">John</option>
+                <option value="peter">Peter</option>
+                <option value="mary">Mary</option>
+            </select>
+            <p>Who should approve this invoice?</p>
+        </div>
+    </div>
 </form>

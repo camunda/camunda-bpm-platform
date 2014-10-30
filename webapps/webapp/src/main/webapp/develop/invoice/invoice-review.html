@@ -1,55 +1,48 @@
 <form class="form-horizontal"
       role="form">
 
-  <div class="panel panel-default">
-    <div class="panel-body">
-      <strong>Please clarify:</strong>
-      This invoice needs clarification and could not be approved due to missing data.
+    <div class="panel panel-info">
+        <strong>Please clarify:</strong>
+        This invoice needs clarification and could not be approved due to missing data.
     </div>
-  </div>
 
-  <div class="control-group">
-    <label class="control-label">Creditor</label>
-    <div class="controls">
-      <input cam-variable-name="creditor"
-             type="text"
-             name="creditor"
-             ng-model="creditor"
-             class="form-control" />
+    <div class="control-group">
+        <label class="control-label">Creditor</label>
+        <div class="controls">
+            <input cam-variable-name="creditor"
+                   type="text"
+                   name="creditor"
+                   class="form-control" />
+        </div>
     </div>
-  </div>
-  <div class="control-group">
-    <label class="control-label">Amount</label>
-    <div class="controls">
-      <input cam-variable-name="amount"
-             type="text"
-             name="amount"
-             ng-model="amount"
-             class="form-control" />
+    <div class="control-group">
+        <label class="control-label">Amount</label>
+        <div class="controls">
+            <input cam-variable-name="amount"
+                   type="text"
+                   name="amount"
+                   class="form-control" />
+        </div>
     </div>
-  </div>
-  <div class="control-group">
-    <label class="control-label">Invoice Number</label>
-    <div class="controls">
-      <input cam-variable-name="invoiceNumber"
-             type="text"
-             name="invoiceNumber"
-             ng-model="invoiceNumber"
-             class="form-control" />
+    <div class="control-group">
+        <label class="control-label">Invoice Number</label>
+        <div class="controls">
+            <input cam-variable-name="invoiceNumber"
+                   type="text"
+                   name="invoiceNumber"
+                   class="form-control" />
+        </div>
     </div>
-  </div>
-  <div class="control-group">
-    <label class="control-label">Could you clarify the invoice? </label>
-    <div class="controls">
-      <input cam-variable-name="clarified"
-             cam-variable-type="Boolean"
-             type="text"
-             name="clarified"
-             ng-model="clarified"
-             class="form-control" />
-
-      (i.e. true, false)
+    <div class="control-group">
+        <label class="control-label">Could you clarify the invoice? </label>
+        <div class="controls">
+            <input cam-variable-name="clarified"
+                   cam-variable-type="Boolean"
+                   type="checkbox"
+                   name="clarified"
+                   class="form-control" />
+            (yes/no)
+        </div>
     </div>
-  </div>
 </form>
 
