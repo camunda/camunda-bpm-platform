@@ -37,11 +37,13 @@ define([
     // observer ///////////////////////////////////////////////////////////
 
     taskFormData.observe(['task', 'isAssignee', function(task, isAssignee) {
+      $scope.options = angular.copy(DEFAULT_OPTIONS);
+
       if (task && task.id) {
-        $scope.options = angular.extend({}, { taskId : task.id }, DEFAULT_OPTIONS);
+        $scope.params = { taskId : task.id };
       }
       else {
-        $scope.options = DEFAULT_OPTIONS;
+        $scope.params = null;
       }
 
       $scope.options.disableCompleteButton = !isAssignee;
