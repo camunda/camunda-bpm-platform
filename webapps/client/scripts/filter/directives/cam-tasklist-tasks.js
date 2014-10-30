@@ -30,9 +30,11 @@ define([
       controller: [
         '$scope',
         '$location',
+        'search',
       function(
         $scope,
-        $location
+        $location,
+        search
       ) {
 
         $scope.pageNum = 1;
@@ -80,8 +82,13 @@ define([
         }]);
 
         $scope.focus = function (task) {
-          tasksData.set('taskId', { 'taskId' : task.id });
-          $scope.currentTaskId = task.id;
+          var taskId = task.id;
+          tasksData.set('taskId', { 'taskId' : taskId });
+          $scope.currentTaskId = taskId;
+
+          var searchParams = $location.search() || {};
+          searchParams.task = taskId;
+          search.updateSilently(searchParams);
         };
 
         /**
