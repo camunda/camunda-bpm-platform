@@ -68,6 +68,7 @@ define([
 
     $scope.modalGroupsState = taskGroupsData.observe('groups', function(groups) {
       $scope._groups = angular.copy(groups) || [];
+      $scope.validateNewGroup();
     });
 
     taskGroupsData.observe('task', function (_task) {

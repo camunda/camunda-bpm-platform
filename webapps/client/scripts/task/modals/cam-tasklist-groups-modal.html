@@ -39,6 +39,7 @@
                        ng-change="validateNewGroup()"
                        name="newGroup"
                        placeholder="{{ 'GROUP_ADD' | translate }}"
+                       ng-keyup="($event.keyCode == 13 && isValid() && addGroup())"
                        required>
 
                 <span class="input-group-btn">
