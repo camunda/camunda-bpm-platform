@@ -18,7 +18,7 @@ import java.util.Set;
 import javax.ws.rs.core.Application;
 
 import org.camunda.bpm.engine.rest.impl.CamundaRestResources;
-import org.camunda.bpm.engine.rest.impl.ProcessEngineRestServiceImpl;
+import org.camunda.bpm.engine.rest.impl.NamedProcessEngineRestServiceImpl;
 
 /**
  * The engine rest api exposed by the application.
@@ -32,7 +32,7 @@ public class EngineRestApplication extends Application {
     Set<Class<?>> classes = new HashSet<Class<?>>();
 
     // only provide named process engine access.
-    classes.add(ProcessEngineRestServiceImpl.class);
+    classes.add(NamedProcessEngineRestServiceImpl.class);
 
     // mandatory
     classes.addAll(CamundaRestResources.getConfigurationClasses());
