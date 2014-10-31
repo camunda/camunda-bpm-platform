@@ -31,7 +31,9 @@
 </head>
 
 <body ng-class="{ 'authenticated' : (authentication && authentication.name) }">
-  <div class="site-wrap" ng-controller="camTasklistAppCtrl">
+  <div class="site-wrap"
+       ng-controller="camTasklistAppCtrl">
+
     <!-- # page-navigation -->
     <nav class="navbar navbar-default"
          role="navigation"
@@ -39,26 +41,20 @@
     </nav>
     <!-- / page-navigation -->
 
+
+
     <!-- # page-content -->
-    <div class="page-wrap" >
-      <div ng-view
-           class="ui-wrap"></div>
-    </div>
+    <div class="page-wrap" ng-view></div>
     <!-- / page-content -->
+
   </div>
 
-
-  <div class="fake-columns">
-    <div class="row">
-      <div class="cols col-sm-2 task-filters"></div>
-      <div class="cols col-sm-4 task-list"></div>
-      <div class="cols col-sm-6 current-task"></div>
-    </div>
-  </div>
 
 
   <div notifications-panel
        class="page-notifications"></div>
+
+
 
   <!-- # page-footer -->
   <footer class="page">

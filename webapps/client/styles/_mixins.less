@@ -1,5 +1,11 @@
 // Camunda custom mixins
-
+.abs-box(@top: 0, @right: 0, @bottom: 0, @left: 0) {
+  position: absolute;
+  top: @top;
+  right: @right;
+  bottom: @bottom;
+  left: @left;
+}
 
 .truncate (@max-width) {
   max-width: @max-width;

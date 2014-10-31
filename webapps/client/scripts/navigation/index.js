@@ -8,7 +8,6 @@ define([
   './controllers/cam-task-search-ctrl',
   './controllers/cam-layout-ctrl',
   './filters/cam-query-component',
-  './directives/cam-layout-switcher',
   'camunda-tasklist-ui/utils',
   'camunda-commons-ui/util/index'
 ], function(
@@ -18,8 +17,7 @@ define([
   camTaskSearch,
   taskSearchCtrl,
   camLayoutCtrl,
-  camQueryComponentFilter,
-  camLayoutSwitcher
+  camQueryComponentFilter
 ) {
   var navigationModule = angular.module('cam.tasklist.navigation', [
     require('camunda-tasklist-ui/utils').name,
@@ -33,7 +31,6 @@ define([
   navigationModule.directive('camTasklistNavigation', camTasklistNavigation);
   navigationModule.directive('camSortingChoices', camSortingChoices);
   navigationModule.directive('camTaskSearch', camTaskSearch);
-  navigationModule.directive('camLayoutSwitcher', camLayoutSwitcher);
   navigationModule.filter('queryComponent', camQueryComponentFilter);
 
   return navigationModule;
