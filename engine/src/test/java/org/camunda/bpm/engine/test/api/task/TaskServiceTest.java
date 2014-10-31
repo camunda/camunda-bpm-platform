@@ -164,7 +164,7 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
 
       identityService.setAuthenticatedUserId("johndoe");
       // Fetch the task again and update
-      Comment comment = taskService.addComment(taskId, null, "look at this \n       isn't this great? slkdjf sldkfjs ldkfjs ldkfjs ldkfj sldkfj sldkfj sldkjg laksfg sdfgsd;flgkj ksajdhf skjdfh ksjdhf skjdhf kalskjgh lskh dfialurhg kajsh dfuieqpgkja rzvkfnjviuqerhogiuvysbegkjz lkhf ais liasduh flaisduh ajiasudh vaisudhv nsfd");
+      Comment comment = taskService.createComment(taskId, null, "look at this \n       isn't this great? slkdjf sldkfjs ldkfjs ldkfjs ldkfj sldkfj sldkfj sldkjg laksfg sdfgsd;flgkj ksajdhf skjdfh ksjdhf skjdhf kalskjgh lskh dfialurhg kajsh dfuieqpgkja rzvkfnjviuqerhogiuvysbegkjz lkhf ais liasduh flaisduh ajiasudh vaisudhv nsfd");
       assertNotNull(comment.getId());
       assertEquals("johndoe", comment.getUserId());
       assertEquals(taskId, comment.getTaskId());
@@ -173,8 +173,8 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
       assertEquals("look at this \n       isn't this great? slkdjf sldkfjs ldkfjs ldkfjs ldkfj sldkfj sldkfj sldkjg laksfg sdfgsd;flgkj ksajdhf skjdfh ksjdhf skjdhf kalskjgh lskh dfialurhg kajsh dfuieqpgkja rzvkfnjviuqerhogiuvysbegkjz lkhf ais liasduh flaisduh ajiasudh vaisudhv nsfd", comment.getFullMessage());
       assertNotNull(comment.getTime());
 
-      taskService.addComment(taskId, "pid", "one");
-      taskService.addComment(taskId, "pid", "two");
+      taskService.createComment(taskId, "pid", "one");
+      taskService.createComment(taskId, "pid", "two");
 
       Set<String> expectedComments = new HashSet<String>();
       expectedComments.add("one");
@@ -198,7 +198,7 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
       Task task = taskService.newTask("testId");
       taskService.saveTask(task);
       try {
-        taskService.addComment(task.getId(), null, null);
+        taskService.createComment(task.getId(), null, null);
         fail("Expected process engine exception");
       }
       catch (ProcessEngineException e) {}
@@ -212,7 +212,7 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
     int historyLevel = processEngineConfiguration.getHistoryLevel().getId();
     if (historyLevel> ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
       try {
-        taskService.addComment(null, null, "test");
+        taskService.createComment(null, null, "test");
         fail("Expected process engine exception");
       }
       catch (ProcessEngineException e){}
@@ -1394,7 +1394,7 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
       String taskId = task.getId();
 
       // add comment to task
-      Comment comment = taskService.addComment(taskId, null, "look at this \n       isn't this great? slkdjf sldkfjs ldkfjs ldkfjs ldkfj sldkfj sldkfj sldkjg laksfg sdfgsd;flgkj ksajdhf skjdfh ksjdhf skjdhf kalskjgh lskh dfialurhg kajsh dfuieqpgkja rzvkfnjviuqerhogiuvysbegkjz lkhf ais liasduh flaisduh ajiasudh vaisudhv nsfd");
+      Comment comment = taskService.createComment(taskId, null, "look at this \n       isn't this great? slkdjf sldkfjs ldkfjs ldkfjs ldkfj sldkfj sldkfj sldkjg laksfg sdfgsd;flgkj ksajdhf skjdfh ksjdhf skjdhf kalskjgh lskh dfialurhg kajsh dfuieqpgkja rzvkfnjviuqerhogiuvysbegkjz lkhf ais liasduh flaisduh ajiasudh vaisudhv nsfd");
 
       // select task comment for task id and comment id
       comment = taskService.getTaskComment(taskId, comment.getId());

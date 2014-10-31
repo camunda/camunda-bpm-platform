@@ -479,8 +479,16 @@ public interface TaskService {
    */
   void removeVariablesLocal(String taskId, Collection<String> variableNames);
 
-  /** Add a comment to a task and/or process instance. */
-  Comment addComment(String taskId, String processInstanceId, String message);
+  /**
+   * Add a comment to a task and/or process instance.
+   *
+   * @deprecated Use {@link #createComment(String, String, String)} instead
+   */
+  @Deprecated
+  void addComment(String taskId, String processInstanceId, String message);
+
+  /** Creates a comment to a task and/or process instance and returns the comment. */
+  Comment createComment(String taskId, String processInstanceId, String message);
 
   /** The comments related to the given task. */
   List<Comment> getTaskComments(String taskId);

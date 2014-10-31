@@ -201,7 +201,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     when(taskServiceMock.getTaskComment(EXAMPLE_TASK_ID, EXAMPLE_TASK_COMMENT_ID)).thenReturn(mockTaskComment);
     mockTaskComments = MockProvider.createMockTaskComments();
     when(taskServiceMock.getTaskComments(EXAMPLE_TASK_ID)).thenReturn(mockTaskComments);
-    when(taskServiceMock.addComment(EXAMPLE_TASK_ID, null, EXAMPLE_TASK_COMMENT_FULL_MESSAGE)).thenReturn(mockTaskComment);
+    when(taskServiceMock.createComment(EXAMPLE_TASK_ID, null, EXAMPLE_TASK_COMMENT_FULL_MESSAGE)).thenReturn(mockTaskComment);
 
     mockTaskAttachment = MockProvider.createMockTaskAttachment();
     when(taskServiceMock.getTaskAttachment(EXAMPLE_TASK_ID, EXAMPLE_TASK_ATTACHMENT_ID)).thenReturn(mockTaskAttachment);
@@ -1631,7 +1631,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     .when()
       .post(SINGLE_TASK_ADD_COMMENT_URL);
 
-    verify(taskServiceMock).addComment(EXAMPLE_TASK_ID, null, EXAMPLE_TASK_COMMENT_FULL_MESSAGE);
+    verify(taskServiceMock).createComment(EXAMPLE_TASK_ID, null, EXAMPLE_TASK_COMMENT_FULL_MESSAGE);
 
     verifyCreatedTaskComment(mockTaskComment, response);
   }
@@ -1709,7 +1709,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
   @Test
   public void testAddTaskCommentWithoutMessage() {
 
-    doThrow(new ProcessEngineException("Message is null")).when(taskServiceMock).addComment(EXAMPLE_TASK_ID, null, null);
+    doThrow(new ProcessEngineException("Message is null")).when(taskServiceMock).createComment(EXAMPLE_TASK_ID, null, null);
 
     given()
       .pathParam("id", EXAMPLE_TASK_ID)

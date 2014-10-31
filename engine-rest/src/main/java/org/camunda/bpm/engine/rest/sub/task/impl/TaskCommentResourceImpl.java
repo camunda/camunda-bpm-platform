@@ -12,8 +12,15 @@
  */
 package org.camunda.bpm.engine.rest.sub.task.impl;
 
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import javax.ws.rs.HttpMethod;
+import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriInfo;
+
 import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -22,14 +29,6 @@ import org.camunda.bpm.engine.rest.dto.task.CommentDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.sub.task.TaskCommentResource;
 import org.camunda.bpm.engine.task.Comment;
-
-import javax.ws.rs.HttpMethod;
-import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.UriInfo;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 public class TaskCommentResourceImpl implements TaskCommentResource {
 
@@ -78,7 +77,7 @@ public class TaskCommentResourceImpl implements TaskCommentResource {
     Comment comment;
 
     try {
-      comment = engine.getTaskService().addComment(taskId, null, commentDto.getMessage());
+      comment = engine.getTaskService().createComment(taskId, null, commentDto.getMessage());
     }
     catch (ProcessEngineException e) {
       throw new InvalidRequestException(Status.BAD_REQUEST, e, "Not enough parameters submitted");

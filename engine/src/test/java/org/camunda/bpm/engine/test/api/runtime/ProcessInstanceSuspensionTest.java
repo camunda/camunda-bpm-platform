@@ -1490,7 +1490,7 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     if(processEngineConfiguration.getHistoryLevel().getId() > HistoryLevel.HISTORY_LEVEL_ACTIVITY.getId()) {
 
       try {
-        taskService.addComment(task.getId(), processInstance.getId(), "test comment");
+        taskService.createComment(task.getId(), processInstance.getId(), "test comment");
       } catch (SuspendedEntityInteractionException e) {
         fail("should be allowed");
       }
@@ -1578,7 +1578,7 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     if(processEngineConfiguration.getHistoryLevel().getId() > HistoryLevel.HISTORY_LEVEL_ACTIVITY.getId()) {
 
       try {
-        taskService.addComment(task.getId(), processInstance.getId(), "test comment");
+        taskService.createComment(task.getId(), processInstance.getId(), "test comment");
       } catch (SuspendedEntityInteractionException e) {
         fail("should be allowed");
       }
@@ -1666,7 +1666,7 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     if(processEngineConfiguration.getHistoryLevel().getId() > HistoryLevel.HISTORY_LEVEL_ACTIVITY.getId()) {
 
       try {
-        taskService.addComment(task.getId(), processInstance.getId(), "test comment");
+        taskService.createComment(task.getId(), processInstance.getId(), "test comment");
       } catch (SuspendedEntityInteractionException e) {
         fail("should be allowed");
       }

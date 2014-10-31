@@ -302,7 +302,11 @@ public class TaskServiceImpl extends ServiceImpl implements TaskService {
     commandExecutor.execute(new RemoveTaskVariablesCmd(taskId, variableNames, true));
   }
 
-  public Comment addComment(String taskId, String processInstance, String message) {
+  public void addComment(String taskId, String processInstance, String message) {
+    createComment(taskId, processInstance, message);
+  }
+
+  public Comment createComment(String taskId, String processInstance, String message) {
     return commandExecutor.execute(new AddCommentCmd(taskId, processInstance, message));
   }
 
