@@ -23,9 +23,13 @@ public class EmptyHalCollection extends HalCollectionResource<EmptyHalCollection
   public static final HalResource INSTANCE = new EmptyHalCollection();
 
   public EmptyHalCollection() {
+    this(0);
+  }
+
+  public EmptyHalCollection(long count) {
     _links = Collections.emptyMap();
     _embedded = Collections.emptyMap();
-    count = 0;
+    this.count = count;
   }
 
   @SuppressWarnings("unchecked")

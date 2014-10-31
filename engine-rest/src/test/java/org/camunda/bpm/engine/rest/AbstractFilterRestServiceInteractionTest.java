@@ -543,6 +543,7 @@ public abstract class AbstractFilterRestServiceInteractionTest extends AbstractR
   @Test
   public void testEmptyHalList() {
     when(filterServiceMock.list(anyString(), any(Query.class))).thenReturn(Collections.emptyList());
+    when(filterServiceMock.count(anyString(), any(Query.class))).thenReturn(0l);
 
     given()
       .header(ACCEPT_HAL_HEADER)
@@ -1193,6 +1194,51 @@ public abstract class AbstractFilterRestServiceInteractionTest extends AbstractR
     // case instance variable 'caseInstanceA'
     verifyCaseInstanceVariableValue(variables.get(3), CASE_INSTANCE_A_ID, "bar", CASE_INSTANCE_A_ID);
 
+  }
+
+  @Test
+  public void testHalTaskListCount() {
+    // mock resulting task
+    List<Task> tasks = Arrays.asList(
+      createTaskMock(TASK_A_ID, PROCESS_INSTANCE_A_ID, EXECUTION_A_ID, null, null),
+      createTaskMock(TASK_B_ID, PROCESS_INSTANCE_A_ID, EXECUTION_A_ID, null, null),
+      createTaskMock(TASK_C_ID, PROCESS_INSTANCE_A_ID, EXECUTION_B_ID, null, null)
+    );
+    when(filterServiceMock.list(eq(EXAMPLE_FILTER_ID), any(Query.class))).thenReturn(tasks);
+    when(filterServiceMock.listPage(eq(EXAMPLE_FILTER_ID), any(Query.class), eq(0), eq(2))).thenReturn(tasks.subList(0, 2));
+    when(filterServiceMock.listPage(eq(EXAMPLE_FILTER_ID), any(Query.class), eq(5), eq(2))).thenReturn(Collections.emptyList());
+    when(filterServiceMock.count(eq(EXAMPLE_FILTER_ID), any(Query.class))).thenReturn((long) tasks.size());
+
+    given()
+      .pathParam("id", EXAMPLE_FILTER_ID)
+      .header(ACCEPT_HAL_HEADER)
+    .then().expect()
+      .body("_embedded.task.size", equalTo(3))
+      .body("count", equalTo(3))
+    .when()
+      .get(EXECUTE_LIST_FILTER_URL);
+
+    given()
+      .pathParam("id", EXAMPLE_FILTER_ID)
+      .queryParam("firstResult", 0)
+      .queryParam("maxResults", 2)
+      .header(ACCEPT_HAL_HEADER)
+    .then().expect()
+      .body("_embedded.task.size", equalTo(2))
+      .body("count", equalTo(3))
+    .when()
+      .get(EXECUTE_LIST_FILTER_URL);
+
+    given()
+      .pathParam("id", EXAMPLE_FILTER_ID)
+      .queryParam("firstResult", 5)
+      .queryParam("maxResults", 2)
+      .header(ACCEPT_HAL_HEADER)
+    .then().expect()
+      .body("_embedded.containsKey('task')", is(false))
+      .body("count", equalTo(3))
+    .when()
+      .get(EXECUTE_LIST_FILTER_URL);
   }
 
   @SuppressWarnings("unchecked")

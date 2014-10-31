@@ -192,12 +192,13 @@ public class FilterResourceImpl extends AbstractAuthorizedRestResource implement
 
   public HalResource queryHalList(String extendingQuery, Integer firstResult, Integer maxResults) {
     List<?> entities = executeFilterList(extendingQuery, firstResult, maxResults);
+    long count = executeFilterCount(extendingQuery);
 
     if (entities != null && !entities.isEmpty()) {
-      return convertToHalCollection(entities);
+      return convertToHalCollection(entities, count);
     }
     else {
-      return EmptyHalCollection.INSTANCE;
+      return new EmptyHalCollection(count);
     }
   }
 
@@ -335,13 +336,10 @@ public class FilterResourceImpl extends AbstractAuthorizedRestResource implement
   }
 
   @SuppressWarnings("unchecked")
-  protected HalCollectionResource<HalTaskList> convertToHalCollection(List<?> entities) {
-    long count = executeFilterCount(null);
-
+  protected HalCollectionResource convertToHalCollection(List<?> entities, long count) {
     if (isEntityOfClass(entities.get(0), Task.class)) {
       return convertToHalTaskList((List<Task>) entities, count);
-    }
-    else {
+    } else {
       throw unsupportedEntityClass(entities.get(0));
     }
   }
