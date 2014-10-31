@@ -20,7 +20,7 @@
         </span>
 
         <span class="col-xs-8 col-lg-12"
-              ng-if="variablesByName[info.name].value !== null"
+              ng-if="variablesByName[info.name].value !== null || variablesByName[info.name].type === 'Bytes'"
               ng-switch="variablesByName[info.name].type">
           <span class="variable-value"
                 ng-switch-when="Date">
@@ -31,12 +31,6 @@
                 ng-switch-when="Null">
             {{ variablesByName[info.name].value }}
           </span>
-
-          <a class="variable-value variable-type"
-             ng-switch-when="Serializable"
-             ng-click="showValue(variablesByName[info.name])">
-            {{ variablesByName[info.name].value.type }}
-          </a>
 
           <a class="variable-value variable-type"
              ng-switch-when="Object"
@@ -58,7 +52,7 @@
         </span>
 
         <span class="col-xs-8 col-lg-12"
-              ng-if="variablesByName[info.name].value === null">
+          ng-if="variablesByName[info.name].value === null && variablesByName[info.name].type !== 'Bytes'">
           <span class="variable-value variable-empty-value"
                 translate="EMPTY_VALUE">Empty</span>
         </span>
