@@ -137,7 +137,7 @@ public class SetProcessDefinitionVersionCmd implements Command<Void>, Serializab
 
     Map<String, String> jobDefinitionMapping = getJobDefinitionMapping(currentJobDefinitions, newVersionJobDefinitions);
     for (JobEntity jobEntity : jobs) {
-      switchVersionOfJob(commandContext, jobEntity, newProcessDefinition, jobDefinitionMapping);
+      switchVersionOfJob(jobEntity, newProcessDefinition, jobDefinitionMapping);
     }
 
     // switch all incidents to the new process definition version
@@ -182,8 +182,7 @@ public class SetProcessDefinitionVersionCmd implements Command<Void>, Serializab
     return activitiesMatch && typesMatch && configurationsMatch;
   }
 
-  protected void switchVersionOfJob(CommandContext commandContext, JobEntity jobEntity, ProcessDefinitionEntity newProcessDefinition,
-      Map<String, String> jobDefinitionMapping) {
+  protected void switchVersionOfJob(JobEntity jobEntity, ProcessDefinitionEntity newProcessDefinition, Map<String, String> jobDefinitionMapping) {
     jobEntity.setProcessDefinitionId(newProcessDefinition.getId());
     jobEntity.setDeploymentId(newProcessDefinition.getDeploymentId());
 
