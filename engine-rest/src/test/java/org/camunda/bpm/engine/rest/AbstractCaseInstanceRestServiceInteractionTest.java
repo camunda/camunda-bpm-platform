@@ -120,7 +120,9 @@ public abstract class AbstractCaseInstanceRestServiceInteractionTest extends Abs
     when(caseInstanceQueryMock.caseInstanceId(MockProvider.EXAMPLE_CASE_INSTANCE_ID)).thenReturn(caseInstanceQueryMock);
     when(caseInstanceQueryMock.singleResult()).thenReturn(mockCaseInstance);
 
-    when(caseServiceMock.getVariableTyped(anyString(), anyString(), eq(true))).thenReturn(EXAMPLE_VARIABLE_VALUE);
+    when(caseServiceMock.getVariableTyped(anyString(), eq(EXAMPLE_VARIABLE_KEY), anyBoolean())).thenReturn(EXAMPLE_VARIABLE_VALUE);
+    when(caseServiceMock.getVariableTyped(anyString(), eq(EXAMPLE_BYTES_VARIABLE_KEY), eq(false))).thenReturn(EXAMPLE_VARIABLE_VALUE_BYTES);
+
     when(caseServiceMock.getVariables(anyString(), eq(true))).thenReturn(EXAMPLE_VARIABLES);
     when(caseServiceMock.getVariables(anyString(), Matchers.<Collection<String>>any(), eq(true))).thenReturn(EXAMPLE_VARIABLES);
 
@@ -444,8 +446,54 @@ public abstract class AbstractCaseInstanceRestServiceInteractionTest extends Abs
     given().pathParam("id", MockProvider.EXAMPLE_CASE_INSTANCE_ID).pathParam("varId", variableKey)
       .then().expect().statusCode(Status.NOT_FOUND.getStatusCode())
       .body("type", is(InvalidRequestException.class.getSimpleName()))
-      .body("message", is("case execution variable with name " + variableKey + " does not exist or is null"))
+      .body("message", is("case execution variable with name " + variableKey + " does not exist"))
       .when().get(SINGLE_CASE_INSTANCE_VARIABLE_URL);
+  }
+
+
+  @Test
+  public void testGetSingleLocalVariableData() {
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_CASE_INSTANCE_ID)
+      .pathParam("varId", EXAMPLE_BYTES_VARIABLE_KEY)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+        .contentType(MediaType.APPLICATION_OCTET_STREAM)
+    .when()
+      .get(SINGLE_CASE_INSTANCE_BINARY_VARIABLE_URL);
+
+    verify(caseServiceMock).getVariableTyped(MockProvider.EXAMPLE_CASE_INSTANCE_ID, EXAMPLE_BYTES_VARIABLE_KEY, false);
+  }
+
+  @Test
+  public void testGetSingleLocalVariableDataNonExisting() {
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_CASE_INSTANCE_ID)
+      .pathParam("varId", "nonExisting")
+    .then()
+      .expect()
+        .statusCode(Status.NOT_FOUND.getStatusCode())
+        .body("type", is(InvalidRequestException.class.getSimpleName()))
+        .body("message", is("case execution variable with name " + "nonExisting" + " does not exist"))
+    .when()
+      .get(SINGLE_CASE_INSTANCE_BINARY_VARIABLE_URL);
+
+    verify(caseServiceMock).getVariableTyped(MockProvider.EXAMPLE_CASE_INSTANCE_ID, "nonExisting", false);
+  }
+
+  @Test
+  public void testGetSingleLocalVariabledataNotBinary() {
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_CASE_INSTANCE_ID)
+      .pathParam("varId", EXAMPLE_VARIABLE_KEY)
+    .then()
+      .expect()
+        .statusCode(Status.BAD_REQUEST.getStatusCode())
+    .when()
+      .get(SINGLE_CASE_INSTANCE_BINARY_VARIABLE_URL);
+
+    verify(caseServiceMock).getVariableTyped(MockProvider.EXAMPLE_CASE_INSTANCE_ID, EXAMPLE_VARIABLE_KEY, false);
   }
 
   @Test

@@ -151,7 +151,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
   protected static final String SINGLE_TASK_VARIABLES_URL = SINGLE_TASK_URL + "/localVariables";
   protected static final String SINGLE_TASK_SINGLE_VARIABLE_URL = SINGLE_TASK_VARIABLES_URL + "/{varId}";
   protected static final String SINGLE_TASK_PUT_SINGLE_VARIABLE_URL = SINGLE_TASK_SINGLE_VARIABLE_URL;
-  protected static final String SINGLE_TASK_PUT_SINGLE_BINARY_VARIABLE_URL = SINGLE_TASK_PUT_SINGLE_VARIABLE_URL + "/data";
+  protected static final String SINGLE_TASK_SINGLE_BINARY_VARIABLE_URL = SINGLE_TASK_PUT_SINGLE_VARIABLE_URL + "/data";
   protected static final String SINGLE_TASK_DELETE_SINGLE_VARIABLE_URL = SINGLE_TASK_SINGLE_VARIABLE_URL;
   protected static final String SINGLE_TASK_MODIFY_VARIABLES_URL = SINGLE_TASK_VARIABLES_URL;
 
@@ -2328,6 +2328,61 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
       .when().get(SINGLE_TASK_SINGLE_VARIABLE_URL);
   }
 
+
+  @Test
+  public void testGetSingleLocalVariableData() {
+
+    when(taskServiceMock.getVariableLocalTyped(anyString(), eq(EXAMPLE_BYTES_VARIABLE_KEY), eq(false))).thenReturn(EXAMPLE_VARIABLE_VALUE_BYTES);
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_TASK_ID)
+      .pathParam("varId", EXAMPLE_BYTES_VARIABLE_KEY)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+        .contentType(MediaType.APPLICATION_OCTET_STREAM)
+    .when()
+      .get(SINGLE_TASK_SINGLE_BINARY_VARIABLE_URL);
+
+    verify(taskServiceMock).getVariableLocalTyped(MockProvider.EXAMPLE_TASK_ID, EXAMPLE_BYTES_VARIABLE_KEY, false);
+  }
+
+  @Test
+  public void testGetSingleLocalVariableDataNonExisting() {
+
+    when(taskServiceMock.getVariableLocalTyped(anyString(), eq("nonExisting"), eq(false))).thenReturn(null);
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_TASK_ID)
+      .pathParam("varId", "nonExisting")
+    .then()
+      .expect()
+        .statusCode(Status.NOT_FOUND.getStatusCode())
+        .body("type", is(InvalidRequestException.class.getSimpleName()))
+        .body("message", is("task variable with name " + "nonExisting" + " does not exist"))
+    .when()
+      .get(SINGLE_TASK_SINGLE_BINARY_VARIABLE_URL);
+
+    verify(taskServiceMock).getVariableLocalTyped(MockProvider.EXAMPLE_TASK_ID, "nonExisting", false);
+  }
+
+  @Test
+  public void testGetSingleLocalVariabledataNotBinary() {
+
+    when(taskServiceMock.getVariableLocalTyped(anyString(), eq(EXAMPLE_VARIABLE_KEY), eq(false))).thenReturn(EXAMPLE_VARIABLE_VALUE);
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_TASK_ID)
+      .pathParam("varId", EXAMPLE_VARIABLE_KEY)
+    .then()
+      .expect()
+        .statusCode(Status.BAD_REQUEST.getStatusCode())
+    .when()
+      .get(SINGLE_TASK_SINGLE_BINARY_VARIABLE_URL);
+
+    verify(taskServiceMock).getVariableLocalTyped(MockProvider.EXAMPLE_TASK_ID, EXAMPLE_VARIABLE_KEY, false);
+  }
+
   @Test
   public void testGetSingleLocalObjectVariable() {
     // given
@@ -2398,7 +2453,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
       .header("accept", MediaType.APPLICATION_JSON)
       .then().expect().statusCode(Status.NOT_FOUND.getStatusCode())
       .body("type", is(InvalidRequestException.class.getSimpleName()))
-      .body("message", is("task variable with name " + variableKey + " does not exist or is null"))
+      .body("message", is("task variable with name " + variableKey + " does not exist"))
       .when().get(SINGLE_TASK_SINGLE_VARIABLE_URL);
   }
 
@@ -2700,7 +2755,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     .expect()
       .statusCode(Status.NO_CONTENT.getStatusCode())
     .when()
-      .post(SINGLE_TASK_PUT_SINGLE_BINARY_VARIABLE_URL);
+      .post(SINGLE_TASK_SINGLE_BINARY_VARIABLE_URL);
 
     verify(taskServiceMock).setVariableLocal(eq(EXAMPLE_TASK_ID), eq(variableKey),
         argThat(EqualsPrimitiveValue.bytesValue(bytes)));
@@ -2719,7 +2774,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     .expect()
       .statusCode(Status.NO_CONTENT.getStatusCode())
     .when()
-      .post(SINGLE_TASK_PUT_SINGLE_BINARY_VARIABLE_URL);
+      .post(SINGLE_TASK_SINGLE_BINARY_VARIABLE_URL);
 
     verify(taskServiceMock).setVariableLocal(eq(EXAMPLE_TASK_ID), eq(variableKey),
         argThat(EqualsPrimitiveValue.bytesValue(bytes)));
@@ -2745,7 +2800,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     .expect()
       .statusCode(Status.NO_CONTENT.getStatusCode())
     .when()
-      .post(SINGLE_TASK_PUT_SINGLE_BINARY_VARIABLE_URL);
+      .post(SINGLE_TASK_SINGLE_BINARY_VARIABLE_URL);
 
     verify(taskServiceMock).setVariableLocal(eq(MockProvider.EXAMPLE_TASK_ID), eq(variableKey),
         argThat(EqualsObjectValue.objectValueMatcher().isDeserialized().value(serializable)));
@@ -2772,7 +2827,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
       .statusCode(Status.BAD_REQUEST.getStatusCode())
       .body(containsString("Unrecognized content type for serialized java type: unsupported"))
     .when()
-      .post(SINGLE_TASK_PUT_SINGLE_BINARY_VARIABLE_URL);
+      .post(SINGLE_TASK_SINGLE_BINARY_VARIABLE_URL);
 
     verify(taskServiceMock, never()).setVariableLocal(eq(EXAMPLE_TASK_ID), eq(variableKey),
         eq(serializable));

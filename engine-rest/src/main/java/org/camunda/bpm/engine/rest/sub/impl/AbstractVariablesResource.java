@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.engine.rest.sub.impl;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.List;
@@ -32,6 +34,7 @@ import org.camunda.bpm.engine.rest.mapper.MultipartFormData.FormPart;
 import org.camunda.bpm.engine.rest.sub.VariableResource;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.value.BytesValue;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.type.TypeFactory;
@@ -66,6 +69,12 @@ public abstract class AbstractVariablesResource implements VariableResource {
 
   @Override
   public VariableValueDto getVariable(String variableName, boolean deserializeValue) {
+    TypedValue value = getTypedValueForVariable(variableName, deserializeValue);
+    return VariableValueDto.fromTypedValue(value);
+
+  }
+
+  protected TypedValue getTypedValueForVariable(String variableName, boolean deserializeValue) {
     TypedValue value = null;
     try {
        value = getVariableEntity(variableName, deserializeValue);
@@ -75,12 +84,25 @@ public abstract class AbstractVariablesResource implements VariableResource {
     }
 
     if (value == null) {
-      String errorMessage = String.format("%s variable with name %s does not exist or is null", getResourceTypeName(), variableName);
+      String errorMessage = String.format("%s variable with name %s does not exist", getResourceTypeName(), variableName);
       throw new InvalidRequestException(Status.NOT_FOUND, errorMessage);
     }
+    return value;
+  }
 
-    return VariableValueDto.fromTypedValue(value);
+  public InputStream getVariableBinary(String variableName) {
+    TypedValue typedValue = getTypedValueForVariable(variableName, false);
+    if(typedValue instanceof BytesValue) {
+      byte[] valueBytes = ((BytesValue)typedValue).getValue();
+      if (valueBytes == null) {
+        valueBytes = new byte[0];
+      }
 
+      return new ByteArrayInputStream(valueBytes);
+    }
+    else {
+      throw new InvalidRequestException(Status.BAD_REQUEST, "Variable '"+variableName+"' is not of type 'Bytes' but of type '"+typedValue.getType()+"'.");
+    }
   }
 
   @Override

@@ -525,8 +525,63 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
     given().pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID).pathParam("varId", variableKey)
       .then().expect().statusCode(Status.NOT_FOUND.getStatusCode())
       .body("type", is(InvalidRequestException.class.getSimpleName()))
-      .body("message", is("process instance variable with name " + variableKey + " does not exist or is null"))
+      .body("message", is("process instance variable with name " + variableKey + " does not exist"))
       .when().get(SINGLE_PROCESS_INSTANCE_VARIABLE_URL);
+  }
+
+
+  @Test
+  public void testGetSingleLocalVariableData() {
+
+    when(runtimeServiceMock.getVariableTyped(anyString(), eq(EXAMPLE_BYTES_VARIABLE_KEY), eq(false))).thenReturn(EXAMPLE_VARIABLE_VALUE_BYTES);
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID)
+      .pathParam("varId", EXAMPLE_BYTES_VARIABLE_KEY)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+        .contentType(MediaType.APPLICATION_OCTET_STREAM)
+    .when()
+      .get(SINGLE_PROCESS_INSTANCE_BINARY_VARIABLE_URL);
+
+    verify(runtimeServiceMock).getVariableTyped(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID, EXAMPLE_BYTES_VARIABLE_KEY, false);
+  }
+
+  @Test
+  public void testGetSingleLocalVariableDataNonExisting() {
+
+    when(runtimeServiceMock.getVariableTyped(anyString(), eq("nonExisting"), eq(false))).thenReturn(null);
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID)
+      .pathParam("varId", "nonExisting")
+    .then()
+      .expect()
+        .statusCode(Status.NOT_FOUND.getStatusCode())
+        .body("type", is(InvalidRequestException.class.getSimpleName()))
+        .body("message", is("process instance variable with name " + "nonExisting" + " does not exist"))
+    .when()
+      .get(SINGLE_PROCESS_INSTANCE_BINARY_VARIABLE_URL);
+
+    verify(runtimeServiceMock).getVariableTyped(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID, "nonExisting", false);
+  }
+
+  @Test
+  public void testGetSingleLocalVariabledataNotBinary() {
+
+    when(runtimeServiceMock.getVariableTyped(anyString(), eq(EXAMPLE_VARIABLE_KEY), eq(false))).thenReturn(EXAMPLE_VARIABLE_VALUE);
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID)
+      .pathParam("varId", EXAMPLE_VARIABLE_KEY)
+    .then()
+      .expect()
+        .statusCode(Status.BAD_REQUEST.getStatusCode())
+    .when()
+      .get(SINGLE_PROCESS_INSTANCE_BINARY_VARIABLE_URL);
+
+    verify(runtimeServiceMock).getVariableTyped(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID, EXAMPLE_VARIABLE_KEY, false);
   }
 
   @Test

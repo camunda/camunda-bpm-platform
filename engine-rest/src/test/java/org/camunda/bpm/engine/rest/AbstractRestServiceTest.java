@@ -32,6 +32,7 @@ import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.TransitionInstance;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.value.BytesValue;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 import org.junit.BeforeClass;
 
@@ -58,6 +59,8 @@ public abstract class AbstractRestServiceTest {
 
   protected static final String EXAMPLE_VARIABLE_KEY = "aVariableKey";
   protected static final TypedValue EXAMPLE_VARIABLE_VALUE = Variables.stringValue("aVariableValue");
+  protected static final String EXAMPLE_BYTES_VARIABLE_KEY = "aBytesVariableKey";
+  protected static final BytesValue EXAMPLE_VARIABLE_VALUE_BYTES = Variables.byteArrayValue("someBytes".getBytes());
   protected static final String EXAMPLE_ANOTHER_VARIABLE_KEY = "anotherVariableKey";
 
   protected static final VariableMap EXAMPLE_VARIABLES = Variables.createVariables();
