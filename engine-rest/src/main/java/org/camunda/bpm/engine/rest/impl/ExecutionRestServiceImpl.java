@@ -30,10 +30,6 @@ import org.codehaus.jackson.map.ObjectMapper;
 
 public class ExecutionRestServiceImpl extends AbstractRestProcessEngineAware implements ExecutionRestService {
 
-  public ExecutionRestServiceImpl() {
-    super();
-  }
-
   public ExecutionRestServiceImpl(String engineName, ObjectMapper objectMapper) {
     super(engineName, objectMapper);
   }

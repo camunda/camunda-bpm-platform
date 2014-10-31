@@ -32,7 +32,6 @@ import org.camunda.bpm.engine.rest.dto.ResourceOptionsDto;
 import org.camunda.bpm.engine.rest.dto.runtime.FilterDto;
 import org.camunda.bpm.engine.rest.sub.runtime.FilterResource;
 
-@Path(FilterRestService.PATH)
 @Produces(MediaType.APPLICATION_JSON)
 public interface FilterRestService {
 

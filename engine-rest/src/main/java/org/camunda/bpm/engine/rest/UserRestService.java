@@ -36,7 +36,6 @@ import org.camunda.bpm.engine.rest.sub.identity.UserResource;
  * @author Daniel Meyer
  *
  */
-@Path(UserRestService.PATH)
 @Produces(MediaType.APPLICATION_JSON)
 public interface UserRestService {
 

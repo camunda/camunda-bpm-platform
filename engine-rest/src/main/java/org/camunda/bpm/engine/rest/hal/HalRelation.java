@@ -36,14 +36,6 @@ public class HalRelation {
    * @param resourceType the type of the resource
    * @return the relation
    */
-  public static HalRelation build(String relName, Class<?> resourceType) {
-    HalRelation relation = new HalRelation();
-    relation.relName = relName;
-    relation.uriTemplate = UriBuilder.fromResource(resourceType).path("{id}");
-    relation.resourceType = resourceType;
-    return relation;
-  }
-
   public static HalRelation build(String relName, Class<?> resourceType, UriBuilder urlTemplate) {
     HalRelation relation = new HalRelation();
     relation.relName = relName;

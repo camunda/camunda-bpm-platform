@@ -33,7 +33,6 @@ import org.camunda.bpm.engine.rest.sub.repository.CaseDefinitionResource;
  * @author Roman Smirnov
  *
  */
-@Path(CaseDefinitionRestService.PATH)
 @Produces(MediaType.APPLICATION_JSON)
 public interface CaseDefinitionRestService {
 

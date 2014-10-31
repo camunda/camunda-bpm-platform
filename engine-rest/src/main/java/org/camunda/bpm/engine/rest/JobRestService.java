@@ -32,7 +32,6 @@ import org.camunda.bpm.engine.rest.dto.runtime.JobQueryDto;
 import org.camunda.bpm.engine.rest.dto.runtime.JobSuspensionStateDto;
 import org.camunda.bpm.engine.rest.sub.runtime.JobResource;
 
-@Path(JobRestService.PATH)
 @Produces(MediaType.APPLICATION_JSON)
 public interface JobRestService {
 

@@ -250,7 +250,7 @@ public class FilterResourceImpl extends AbstractAuthorizedRestResource implement
 
     UriBuilder baseUriBuilder = context.getBaseUriBuilder()
       .path(relativeRootResourcePath)
-      .path(FilterRestService.class)
+      .path(FilterRestService.PATH)
       .path(resourceId);
 
     URI baseUri = baseUriBuilder.build();

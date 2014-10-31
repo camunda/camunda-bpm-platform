@@ -110,7 +110,7 @@ public class ProcessDefinitionResourceImpl implements ProcessDefinitionResource 
 
     URI uri = context.getBaseUriBuilder()
       .path(rootResourcePath)
-      .path(ProcessInstanceRestService.class)
+      .path(ProcessInstanceRestService.PATH)
       .path(instance.getId())
       .build();
 
@@ -147,7 +147,7 @@ public class ProcessDefinitionResourceImpl implements ProcessDefinitionResource 
 
     URI uri = context.getBaseUriBuilder()
       .path(rootResourcePath)
-      .path(ProcessInstanceRestService.class)
+      .path(ProcessInstanceRestService.PATH)
       .path(instance.getId())
       .build();
 

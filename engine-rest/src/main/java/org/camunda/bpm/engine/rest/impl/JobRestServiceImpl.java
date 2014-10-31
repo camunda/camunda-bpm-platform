@@ -35,10 +35,6 @@ import org.codehaus.jackson.map.ObjectMapper;
 public class JobRestServiceImpl extends AbstractRestProcessEngineAware
 		implements JobRestService {
 
-	public JobRestServiceImpl() {
-		super();
-	}
-
 	public JobRestServiceImpl(String engineName, ObjectMapper objectMapper) {
 		super(engineName, objectMapper);
 	}

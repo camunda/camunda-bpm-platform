@@ -30,7 +30,6 @@ import org.camunda.bpm.engine.runtime.IncidentQuery;
  * @author Roman Smirnov
  *
  */
-@Path(IncidentRestService.PATH)
 @Produces(MediaType.APPLICATION_JSON)
 public interface IncidentRestService {
 

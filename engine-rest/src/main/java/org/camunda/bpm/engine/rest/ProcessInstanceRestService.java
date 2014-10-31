@@ -33,7 +33,6 @@ import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceSuspensionStateDto
 import org.camunda.bpm.engine.rest.sub.runtime.ProcessInstanceResource;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 
-@Path(ProcessInstanceRestService.PATH)
 @Produces(MediaType.APPLICATION_JSON)
 public interface ProcessInstanceRestService {
 

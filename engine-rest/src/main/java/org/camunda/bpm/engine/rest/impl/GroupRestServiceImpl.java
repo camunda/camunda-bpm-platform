@@ -44,10 +44,6 @@ import org.codehaus.jackson.map.ObjectMapper;
  */
 public class GroupRestServiceImpl extends AbstractAuthorizedRestResource implements GroupRestService {
 
-  public GroupRestServiceImpl() {
-    super(GROUP, ANY);
-  }
-
   public GroupRestServiceImpl(String engineName, final ObjectMapper objectMapper) {
     super(engineName, GROUP, ANY, objectMapper);
   }
@@ -107,7 +103,7 @@ public class GroupRestServiceImpl extends AbstractAuthorizedRestResource impleme
 
     UriBuilder baseUriBuilder = context.getBaseUriBuilder()
         .path(relativeRootResourcePath)
-        .path(GroupRestService.class);
+        .path(GroupRestService.PATH);
 
     ResourceOptionsDto resourceOptionsDto = new ResourceOptionsDto();
 

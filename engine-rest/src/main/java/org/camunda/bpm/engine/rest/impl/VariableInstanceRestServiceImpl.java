@@ -30,10 +30,6 @@ import org.codehaus.jackson.map.ObjectMapper;
 
 public class VariableInstanceRestServiceImpl extends AbstractRestProcessEngineAware implements VariableInstanceRestService {
 
-  public VariableInstanceRestServiceImpl() {
-    super();
-  }
-
   public VariableInstanceRestServiceImpl(String engineName, ObjectMapper objectMapper) {
     super(engineName, objectMapper);
   }

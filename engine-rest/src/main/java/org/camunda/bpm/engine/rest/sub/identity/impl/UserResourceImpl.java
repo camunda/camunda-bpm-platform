@@ -65,7 +65,7 @@ public class UserResourceImpl extends AbstractIdentityResource implements UserRe
     // add links if operations are authorized
     UriBuilder baseUriBuilder = context.getBaseUriBuilder()
         .path(rootResourcePath)
-        .path(UserRestService.class)
+        .path(UserRestService.PATH)
         .path(resourceId);
     URI baseUri = baseUriBuilder.build();
     URI profileUri = baseUriBuilder.path("/profile").build();

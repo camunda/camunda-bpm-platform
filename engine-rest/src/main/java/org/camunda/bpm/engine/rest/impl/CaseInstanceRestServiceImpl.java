@@ -34,10 +34,6 @@ import org.codehaus.jackson.map.ObjectMapper;
  */
 public class CaseInstanceRestServiceImpl extends AbstractRestProcessEngineAware implements CaseInstanceRestService {
 
-  public CaseInstanceRestServiceImpl() {
-    super();
-  }
-
   public CaseInstanceRestServiceImpl(String engineName, ObjectMapper objectMapper) {
     super(engineName, objectMapper);
   }

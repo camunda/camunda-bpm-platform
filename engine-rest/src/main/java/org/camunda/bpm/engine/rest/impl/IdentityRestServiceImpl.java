@@ -32,10 +32,6 @@ import org.codehaus.jackson.map.ObjectMapper;
 
 public class IdentityRestServiceImpl extends AbstractRestProcessEngineAware implements IdentityRestService {
 
-  public IdentityRestServiceImpl() {
-    super();
-  }
-
   public IdentityRestServiceImpl(String engineName, ObjectMapper objectMapper) {
     super(engineName, objectMapper);
   }

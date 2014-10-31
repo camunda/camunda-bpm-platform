@@ -49,12 +49,6 @@ import org.codehaus.jackson.map.ObjectMapper;
  */
 public class FilterRestServiceImpl extends AbstractAuthorizedRestResource implements FilterRestService {
 
-  protected ObjectMapper objectMapper;
-
-  public FilterRestServiceImpl() {
-    super(FILTER, ANY);
-  }
-
   public FilterRestServiceImpl(String engineName, ObjectMapper objectMapper) {
     super(engineName, FILTER, ANY, objectMapper);
   }
@@ -141,7 +135,7 @@ public class FilterRestServiceImpl extends AbstractAuthorizedRestResource implem
 
     UriBuilder baseUriBuilder = context.getBaseUriBuilder()
       .path(relativeRootResourcePath)
-      .path(FilterRestService.class);
+      .path(FilterRestService.PATH);
 
     ResourceOptionsDto resourceOptionsDto = new ResourceOptionsDto();
 

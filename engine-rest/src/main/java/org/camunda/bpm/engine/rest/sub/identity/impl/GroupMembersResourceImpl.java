@@ -58,7 +58,7 @@ public class GroupMembersResourceImpl extends AbstractIdentityResource implement
 
     URI uri = context.getBaseUriBuilder()
         .path(relativeRootResourcePath)
-        .path(GroupRestService.class)
+        .path(GroupRestService.PATH)
         .path(resourceId)
         .path(PATH)
         .build();

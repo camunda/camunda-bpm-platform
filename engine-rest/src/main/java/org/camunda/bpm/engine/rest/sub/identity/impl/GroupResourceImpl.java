@@ -64,7 +64,7 @@ public class GroupResourceImpl extends AbstractIdentityResource implements Group
     // add links if operations are authorized
     URI uri = context.getBaseUriBuilder()
         .path(rootResourcePath)
-        .path(GroupRestService.class)
+        .path(GroupRestService.PATH)
         .path(resourceId)
         .build();
 

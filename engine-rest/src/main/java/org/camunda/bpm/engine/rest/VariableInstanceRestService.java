@@ -36,7 +36,6 @@ import org.camunda.bpm.engine.runtime.VariableInstanceQuery;
 /**
  * @author roman.smirnov
  */
-@Path(VariableInstanceRestService.PATH)
 @Produces(MediaType.APPLICATION_JSON)
 public interface VariableInstanceRestService {
 

@@ -12,7 +12,7 @@
  */
 package org.camunda.bpm.engine.rest.hal.task;
 
-import static javax.ws.rs.core.UriBuilder.fromResource;
+import static javax.ws.rs.core.UriBuilder.fromPath;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,7 +50,7 @@ public class HalTaskList extends HalCollectionResource<HalTaskList> {
     taskList.addEmbedded("task", embeddedTasks);
 
     // links
-    taskList.addLink("self", fromResource(TaskRestService.class).build());
+    taskList.addLink("self", fromPath(TaskRestService.PATH).build());
 
     taskList.count = count;
 

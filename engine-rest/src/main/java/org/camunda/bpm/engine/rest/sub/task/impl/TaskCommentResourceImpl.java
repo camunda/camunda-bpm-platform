@@ -85,7 +85,7 @@ public class TaskCommentResourceImpl implements TaskCommentResource {
 
     URI uri = uriInfo.getBaseUriBuilder()
       .path(rootResourcePath)
-      .path(TaskRestService.class)
+      .path(TaskRestService.PATH)
       .path(taskId + "/comment/" + comment.getId())
       .build();
 

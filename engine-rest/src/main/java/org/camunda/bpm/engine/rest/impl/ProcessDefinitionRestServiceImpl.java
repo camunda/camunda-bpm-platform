@@ -39,10 +39,6 @@ import org.codehaus.jackson.map.ObjectMapper;
 
 public class ProcessDefinitionRestServiceImpl extends AbstractRestProcessEngineAware implements ProcessDefinitionRestService {
 
-  public ProcessDefinitionRestServiceImpl() {
-    super();
-  }
-
 	public ProcessDefinitionRestServiceImpl(String engineName, ObjectMapper objectMapper) {
     super(engineName, objectMapper);
   }

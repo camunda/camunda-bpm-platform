@@ -52,10 +52,6 @@ public class DeploymentRestServiceImpl extends AbstractRestProcessEngineAware im
     RESERVED_KEYWORDS.add(DEPLOY_CHANGED_ONLY);
   }
 
-  public DeploymentRestServiceImpl() {
-    super();
-  }
-
 	public DeploymentRestServiceImpl(String engineName, ObjectMapper objectMapper) {
     super(engineName, objectMapper);
   }
@@ -130,7 +126,7 @@ public class DeploymentRestServiceImpl extends AbstractRestProcessEngineAware im
 
       URI uri = uriInfo.getBaseUriBuilder()
         .path(relativeRootResourcePath)
-        .path(DeploymentRestService.class)
+        .path(DeploymentRestService.PATH)
         .path(deployment.getId())
         .build();
 

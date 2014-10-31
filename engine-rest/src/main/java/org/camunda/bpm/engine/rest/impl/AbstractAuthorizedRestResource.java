@@ -34,12 +34,6 @@ public abstract class AbstractAuthorizedRestResource extends AbstractRestProcess
     this.resourceId = resourceId;
   }
 
-  public AbstractAuthorizedRestResource(Resource resource, String resourceId) {
-    super();
-    this.resource = resource;
-    this.resourceId = resourceId;
-  }
-
   protected boolean isAuthorized(Permission permission, Resource resource, String resourceId) {
 
     final IdentityService identityService = processEngine.getIdentityService();

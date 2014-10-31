@@ -32,10 +32,6 @@ import org.codehaus.jackson.map.ObjectMapper;
 
 public class TaskRestServiceImpl extends AbstractRestProcessEngineAware implements TaskRestService {
 
-  public TaskRestServiceImpl() {
-    super();
-  }
-
   public TaskRestServiceImpl(String engineName, final ObjectMapper objectMapper) {
     super(engineName, objectMapper);
   }

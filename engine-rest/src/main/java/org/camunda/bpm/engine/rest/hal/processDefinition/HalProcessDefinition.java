@@ -29,10 +29,12 @@ import org.camunda.bpm.engine.rest.util.ApplicationContextPathUtil;
  */
 public class HalProcessDefinition extends HalResource<HalProcessDefinition> {
 
-  public static final HalRelation REL_SELF = HalRelation.build("self", ProcessDefinitionRestService.class);
-  public static final HalRelation REL_DEPLOYMENT = HalRelation.build("deployment", DeploymentRestService.class);
+  public static final HalRelation REL_SELF =
+    HalRelation.build("self", ProcessDefinitionRestService.class, UriBuilder.fromPath(ProcessDefinitionRestService.PATH).path("{id}"));
+  public static final HalRelation REL_DEPLOYMENT =
+    HalRelation.build("deployment", DeploymentRestService.class, UriBuilder.fromPath(DeploymentRestService.PATH).path("{id}"));
   public static final HalRelation REL_DEPLOYMENT_RESOURCE = HalRelation.build("resource", DeploymentResourcesResource.class,
-      UriBuilder.fromResource(DeploymentRestService.class)
+      UriBuilder.fromPath(DeploymentRestService.PATH)
                 .path("{deploymentId}")
                 .path("resources")
                 .path("{resourceId}"));

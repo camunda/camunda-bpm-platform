@@ -28,10 +28,6 @@ import org.codehaus.jackson.map.ObjectMapper;
 
 public class HistoryRestServiceImpl extends AbstractRestProcessEngineAware implements HistoryRestService {
 
-  public HistoryRestServiceImpl() {
-    super();
-  }
-
   public HistoryRestServiceImpl(String engineName, ObjectMapper objectMapper) {
     super(engineName, objectMapper);
   }

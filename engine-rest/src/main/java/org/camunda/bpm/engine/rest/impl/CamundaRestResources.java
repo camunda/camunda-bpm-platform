@@ -20,7 +20,6 @@ import org.camunda.bpm.engine.rest.exception.JsonParseExceptionHandler;
 import org.camunda.bpm.engine.rest.exception.ProcessEngineExceptionHandler;
 import org.camunda.bpm.engine.rest.exception.RestExceptionHandler;
 import org.camunda.bpm.engine.rest.hal.JacksonHalJsonProvider;
-import org.camunda.bpm.engine.rest.impl.history.HistoryRestServiceImpl;
 import org.camunda.bpm.engine.rest.mapper.JacksonConfigurator;
 import org.camunda.bpm.engine.rest.mapper.MultipartPayloadProvider;
 import org.codehaus.jackson.jaxrs.JacksonJsonProvider;
@@ -38,27 +37,8 @@ public class CamundaRestResources {
   private static final Set<Class<?>> CONFIGURATION_CLASSES = new HashSet<Class<?>>();
 
   static {
-    RESOURCE_CLASSES.add(ProcessEngineRestServiceImpl.class);
-    RESOURCE_CLASSES.add(ProcessDefinitionRestServiceImpl.class);
-    RESOURCE_CLASSES.add(ProcessInstanceRestServiceImpl.class);
-    RESOURCE_CLASSES.add(TaskRestServiceImpl.class);
-    RESOURCE_CLASSES.add(IdentityRestServiceImpl.class);
-    RESOURCE_CLASSES.add(MessageRestServiceImpl.class);
-    RESOURCE_CLASSES.add(JobDefinitionRestServiceImpl.class);
-    RESOURCE_CLASSES.add(IncidentRestServiceImpl.class);
-    RESOURCE_CLASSES.add(JobRestServiceImpl.class);
-    RESOURCE_CLASSES.add(ExecutionRestServiceImpl.class);
-    RESOURCE_CLASSES.add(VariableInstanceRestServiceImpl.class);
-    RESOURCE_CLASSES.add(UserRestServiceImpl.class);
-    RESOURCE_CLASSES.add(GroupRestServiceImpl.class);
-    RESOURCE_CLASSES.add(AuthorizationRestServiceImpl.class);
-    RESOURCE_CLASSES.add(HistoryRestServiceImpl.class);
-    RESOURCE_CLASSES.add(DeploymentRestServiceImpl.class);
-    RESOURCE_CLASSES.add(FilterRestServiceImpl.class);
-
-    RESOURCE_CLASSES.add(CaseDefinitionRestServiceImpl.class);
-    RESOURCE_CLASSES.add(CaseInstanceRestServiceImpl.class);
-    RESOURCE_CLASSES.add(CaseExecutionRestServiceImpl.class);
+    RESOURCE_CLASSES.add(NamedProcessEngineRestServiceImpl.class);
+    RESOURCE_CLASSES.add(DefaultProcessEngineRestServiceImpl.class);
 
     CONFIGURATION_CLASSES.add(JacksonConfigurator.class);
     CONFIGURATION_CLASSES.add(JacksonJsonProvider.class);

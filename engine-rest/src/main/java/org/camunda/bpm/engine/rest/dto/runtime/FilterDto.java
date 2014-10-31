@@ -14,6 +14,7 @@
 package org.camunda.bpm.engine.rest.dto.runtime;
 
 import java.util.Map;
+
 import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.EntityTypes;
@@ -23,7 +24,6 @@ import org.camunda.bpm.engine.query.Query;
 import org.camunda.bpm.engine.rest.dto.AbstractQueryDto;
 import org.camunda.bpm.engine.rest.dto.task.TaskQueryDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
-import org.camunda.bpm.engine.rest.mapper.JacksonConfigurator;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.annotate.JsonSerialize;

@@ -76,7 +76,7 @@ public class AuthorizationResourceImpl extends AbstractAuthorizedRestResource im
 
     URI uri = context.getBaseUriBuilder()
         .path(relativeRootResourcePath)
-        .path(AuthorizationRestService.class)
+        .path(AuthorizationRestService.PATH)
         .path(resourceId)
         .build();
 

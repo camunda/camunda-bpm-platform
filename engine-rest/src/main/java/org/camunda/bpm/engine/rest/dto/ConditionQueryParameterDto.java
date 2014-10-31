@@ -16,8 +16,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.ws.rs.core.Response.Status;
-
 import org.camunda.bpm.engine.impl.QueryOperator;
 import org.codehaus.jackson.map.ObjectMapper;
 

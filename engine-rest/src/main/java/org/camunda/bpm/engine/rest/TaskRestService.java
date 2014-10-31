@@ -33,7 +33,6 @@ import org.camunda.bpm.engine.rest.dto.task.TaskQueryDto;
 import org.camunda.bpm.engine.rest.hal.task.HalTaskList;
 import org.camunda.bpm.engine.rest.sub.task.TaskResource;
 
-@Path(TaskRestService.PATH)
 @Produces(MediaType.APPLICATION_JSON)
 public interface TaskRestService {
 

@@ -29,10 +29,6 @@ import org.codehaus.jackson.map.ObjectMapper;
 
 public class MessageRestServiceImpl extends AbstractRestProcessEngineAware implements MessageRestService {
 
-  public MessageRestServiceImpl() {
-    super();
-  }
-
   public MessageRestServiceImpl(String engineName, ObjectMapper objectMapper) {
     super(engineName, objectMapper);
   }

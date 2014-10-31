@@ -151,7 +151,7 @@ public class CaseDefinitionResourceImpl implements CaseDefinitionResource {
 
     URI uri = context.getBaseUriBuilder()
       .path(rootResourcePath)
-      .path(CaseInstanceRestService.class)
+      .path(CaseInstanceRestService.PATH)
       .path(instance.getId())
       .build();
 

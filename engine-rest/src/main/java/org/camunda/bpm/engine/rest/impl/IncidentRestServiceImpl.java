@@ -31,10 +31,6 @@ import org.codehaus.jackson.map.ObjectMapper;
  */
 public class IncidentRestServiceImpl extends AbstractRestProcessEngineAware implements IncidentRestService {
 
-  public IncidentRestServiceImpl() {
-    super();
-  }
-
   public IncidentRestServiceImpl(String engineName, ObjectMapper objectMapper) {
     super(engineName, objectMapper);
   }

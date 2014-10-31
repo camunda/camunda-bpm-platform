@@ -38,10 +38,6 @@ import java.util.List;
  */
 public class CaseDefinitionRestServiceImpl extends AbstractRestProcessEngineAware implements CaseDefinitionRestService {
 
-  public CaseDefinitionRestServiceImpl() {
-    super();
-  }
-
   public CaseDefinitionRestServiceImpl(String engineName, ObjectMapper objectMapper) {
     super(engineName, objectMapper);
   }

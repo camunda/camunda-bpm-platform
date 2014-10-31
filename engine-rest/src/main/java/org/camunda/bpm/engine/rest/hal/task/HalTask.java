@@ -14,6 +14,8 @@ package org.camunda.bpm.engine.rest.hal.task;
 
 import java.util.Date;
 
+import javax.ws.rs.core.UriBuilder;
+
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.rest.CaseDefinitionRestService;
@@ -35,16 +37,26 @@ import org.camunda.bpm.engine.task.Task;
  */
 public class HalTask extends HalResource<HalTask> {
 
-  public static HalRelation REL_SELF = HalRelation.build("self", TaskRestService.class);
-  public static HalRelation REL_ASSIGNEE = HalRelation.build("assignee", UserRestService.class);
-  public static HalRelation REL_OWNER = HalRelation.build("owner", UserRestService.class);
-  public static HalRelation REL_EXECUTION = HalRelation.build("execution", ExecutionRestService.class);
-  public static HalRelation REL_PARENT_TASK = HalRelation.build("parentTask", TaskRestService.class);
-  public static HalRelation REL_PROCESS_DEFINITION = HalRelation.build("processDefinition", ProcessDefinitionRestService.class);
-  public static HalRelation REL_PROCESS_INSTANCE = HalRelation.build("processInstance", ProcessInstanceRestService.class);
-  public static HalRelation REL_CASE_INSTANCE = HalRelation.build("caseInstance", CaseInstanceRestService.class);
-  public static HalRelation REL_CASE_EXECUTION = HalRelation.build("caseExecution", CaseExecutionRestService.class);
-  public static HalRelation REL_CASE_DEFINITION = HalRelation.build("caseDefinition", CaseDefinitionRestService.class);
+  public static HalRelation REL_SELF =
+    HalRelation.build("self", TaskRestService.class, UriBuilder.fromPath(TaskRestService.PATH).path("{id}"));
+  public static HalRelation REL_ASSIGNEE =
+    HalRelation.build("assignee", UserRestService.class, UriBuilder.fromPath(UserRestService.PATH).path("{id}"));
+  public static HalRelation REL_OWNER =
+    HalRelation.build("owner", UserRestService.class, UriBuilder.fromPath(UserRestService.PATH).path("{id}"));
+  public static HalRelation REL_EXECUTION =
+    HalRelation.build("execution", ExecutionRestService.class, UriBuilder.fromPath(ExecutionRestService.PATH).path("{id}"));
+  public static HalRelation REL_PARENT_TASK =
+    HalRelation.build("parentTask", TaskRestService.class, UriBuilder.fromPath(TaskRestService.PATH).path("{id}"));
+  public static HalRelation REL_PROCESS_DEFINITION =
+    HalRelation.build("processDefinition", ProcessDefinitionRestService.class, UriBuilder.fromPath(ProcessDefinitionRestService.PATH).path("{id}"));
+  public static HalRelation REL_PROCESS_INSTANCE =
+    HalRelation.build("processInstance", ProcessInstanceRestService.class, UriBuilder.fromPath(ProcessInstanceRestService.PATH).path("{id}"));
+  public static HalRelation REL_CASE_INSTANCE =
+    HalRelation.build("caseInstance", CaseInstanceRestService.class, UriBuilder.fromPath(CaseInstanceRestService.PATH).path("{id}"));
+  public static HalRelation REL_CASE_EXECUTION =
+    HalRelation.build("caseExecution", CaseExecutionRestService.class, UriBuilder.fromPath(CaseExecutionRestService.PATH).path("{id}"));
+  public static HalRelation REL_CASE_DEFINITION =
+    HalRelation.build("caseDefinition", CaseDefinitionRestService.class, UriBuilder.fromPath(CaseDefinitionRestService.PATH).path("{id}"));
 
   private String id;
   private String name;

@@ -45,10 +45,6 @@ import org.codehaus.jackson.map.ObjectMapper;
  */
 public class UserRestServiceImpl extends AbstractAuthorizedRestResource implements UserRestService {
 
-  public UserRestServiceImpl() {
-    super(USER, ANY);
-  }
-
   public UserRestServiceImpl(String engineName, ObjectMapper objectMapper) {
     super(engineName, USER, ANY, objectMapper);
   }
@@ -119,7 +115,7 @@ public class UserRestServiceImpl extends AbstractAuthorizedRestResource implemen
 
     UriBuilder baseUriBuilder = context.getBaseUriBuilder()
         .path(relativeRootResourcePath)
-        .path(UserRestService.class);
+        .path(UserRestService.PATH);
 
     ResourceOptionsDto resourceOptionsDto = new ResourceOptionsDto();
 

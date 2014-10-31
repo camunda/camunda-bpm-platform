@@ -49,10 +49,6 @@ import org.codehaus.jackson.map.ObjectMapper;
  */
 public class AuthorizationRestServiceImpl extends AbstractAuthorizedRestResource implements AuthorizationRestService {
 
-  public AuthorizationRestServiceImpl() {
-    super(AUTHORIZATION, ANY);
-  }
-
   public AuthorizationRestServiceImpl(String engineName, ObjectMapper objectMapper) {
     super(engineName,AUTHORIZATION, ANY, objectMapper);
   }
@@ -106,7 +102,7 @@ public class AuthorizationRestServiceImpl extends AbstractAuthorizedRestResource
 
     UriBuilder baseUriBuilder = context.getBaseUriBuilder()
         .path(relativeRootResourcePath)
-        .path(AuthorizationRestService.class);
+        .path(AuthorizationRestService.PATH);
 
     ResourceOptionsDto resourceOptionsDto = new ResourceOptionsDto();
 
