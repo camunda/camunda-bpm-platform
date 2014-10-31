@@ -7,7 +7,7 @@ define([
 ) {
   'use strict';
 
-  return [function() {
+  return ['search', function(search) {
     return {
 
       restrict: 'EAC',
@@ -41,8 +41,10 @@ define([
          */
         scope.changeOrder = function() {
           // update query
-          query.sortOrder = scope.order === 'asc' ? 'desc' : 'asc';
-          tasklistData.set('taskListQuery', query);
+          search.updateSilently({
+            sortOrder: scope.order === 'asc' ? 'desc' : 'asc'
+          });
+          tasklistData.changed('taskListQuery');
         };
 
         /**
@@ -53,8 +55,10 @@ define([
           element.find('.dropdown.open').removeClass('open');
 
           // update query
-          query.sortBy = by;
-          tasklistData.set('taskListQuery', query);
+          search.updateSilently({
+            sortBy: by
+          });
+          tasklistData.changed('taskListQuery');
         };
 
       }

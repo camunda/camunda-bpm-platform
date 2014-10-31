@@ -23,29 +23,25 @@ define([
       controller: [
         '$scope',
         '$q',
+        '$location',
+        'search',
         'camAPI',
       function (
         $scope,
         $q,
+        $location,
+        search,
         camAPI
       ) {
 
         var Filter = camAPI.resource('filter');
         var filtersData = $scope.filtersData = $scope.tasklistData.newChild($scope);
-        var query;
 
         /**
          * observe the count for the current filter
          */
         filtersData.observe('taskList', function(taskList) {
           $scope.filterCount = taskList.count;
-        });
-
-        /**
-         * observe the count for the current filter
-         */
-        filtersData.observe('taskListQuery', function(taskListQuery) {
-          query = taskListQuery;
         });
 
         /**
@@ -68,33 +64,9 @@ define([
 
         });
 
-        /**
-         * observe list of filters and taskListQuery to set the focus
-         */
-        $scope.state = filtersData.observe(['filters', 'taskListQuery', function(filters, taskListQuery) {
-
-          var focused,
-              filterId = query.id;
-
-          for (var i = 0, filter; !!(filter = filters[i]); i++) {
-
-            if (filterId) {
-              if (filterId === filter.id) {
-                focused = filter;
-                break;
-              }
-            }
-            else {
-              // auto focus first filter
-              if(!focused || filter.properties.priority < focused.properties.priority) {
-                focused = filter;
-              }
-            }
-          }
-
-          $scope.focus(focused);
-
-        }]);
+        filtersData.observe('currentFilter', function (currentFilter) {
+          $scope.currentFilter = currentFilter;
+        });
 
         /**
          * select a filter
@@ -102,28 +74,18 @@ define([
         $scope.focus = function(filter) {
           $scope.filterCount = undefined;
 
-          if (filter) {
+          search.updateSilently({
+            filter: filter.id
+          });
 
-            if(filter.id !== query.id) {
-              // filter changed => reset pagination
-              query.firstResult = 0;
-            }
-            query.id = filter.id;
-
-          }
-          else {
-            query.id = null;
-
-          }
-
-          filtersData.set('taskListQuery', angular.copy(query));
+          filtersData.changed('currentFilter');
         };
 
         /**
          * returns true if the provided filter is the focused filter
          */
         $scope.isFocused = function(filter) {
-          return filter.id === query.id;
+          return filter.id === $scope.currentFilter.id;
         };
 
       }]

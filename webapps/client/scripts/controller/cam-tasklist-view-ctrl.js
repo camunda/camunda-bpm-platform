@@ -15,12 +15,16 @@ define([
     '$scope',
     '$q',
     '$location',
+    '$interval',
+    'search',
     'dataDepend',
     'camAPI',
   function(
     $scope,
     $q,
     $location,
+    $interval,
+    search,
     dataDepend,
     camAPI
   ) {
@@ -53,7 +57,6 @@ define([
      */
     tasklistData.provide('filters', [ function() {
       var deferred = $q.defer();
-
       Filter.list({
         itemCount: false,
         resoureType: 'Task'
@@ -65,63 +68,110 @@ define([
           deferred.resolve(res);
         }
       });
-
       return deferred.promise;
     }]);
 
-    /**
-     * Provide the initial task list query
-     */
-    tasklistData.provide('taskListQuery', {
-      id : null, // initially the id of the filter is null
-      firstResult : 0,
-      maxResults : 15,
-      sortBy : 'priority',
-      sortOrder: 'asc',
-      active: true
+    var currentFilter;
+    tasklistData.provide('currentFilter', ['filters', function(filters) {
+
+      var focused,
+          filterId = getPropertyFromLocation('filter');
+
+      for (var i = 0, filter; !!(filter = filters[i]); i++) {
+
+          if (filterId === filter.id) {
+            focused = filter;
+            break;
+          }
+          // auto focus first filter
+          if(!focused || filter.properties.priority < focused.properties.priority) {
+            focused = filter;
+          }
+      }
+      if(currentFilter) {
+        search.updateSilently({
+          page: "1"
+        });
+      }
+      if(focused.id !== filterId) {
+        search.updateSilently({
+          filter: focused.id
+        });
+      }
+      return angular.copy(focused);
+    }]);
+
+    tasklistData.observe('currentFilter', function(_currentFilter) {
+      currentFilter = _currentFilter;
     });
 
-    /**
-     * Provide the list of tasks
-     */
-    tasklistData.provide('taskList', [ 'taskListQuery', function(taskListQuery) {
-      var deferred = $q.defer();
-
-      if(taskListQuery.id === null) {
-        // no filter selected
-        deferred.resolve({
-          count: 0,
-          _embedded : {}
-        });
-      }
-      else {
-        // filter selected
-        Filter.getTasks(angular.copy(taskListQuery), function(err, res) {
-          if(err) {
-            deferred.reject(err);
-          }
-          else {
-            deferred.resolve(res);
-          }
-        });
-      }
-
-      return deferred.promise;
+    tasklistData.provide('taskListQuery', ['currentFilter', function(currentFilter) {
+      var searches = JSON.parse(getPropertyFromLocation("query"));
+      var query = {};
+      query.processVariables = [];
+      query.taskVariables = [];
+      query.caseInstanceVariables = [];
+      angular.forEach(searches, function(search) {
+         query[search.type].push({
+           name: search.name,
+           operator: search.operator,
+           value: search.value
+         });
+      });
+      return {
+        id : currentFilter.id,
+        firstResult : ($location.search().page - 1 || 0) * 15,
+        maxResults : 15,
+        sortBy : $location.search().sortBy || 'priority',
+        sortOrder: $location.search().sortOrder || 'asc',
+        active: true,
+        processVariables : query.processVariables, //$scope.tasklistApp.searchProvider.get("processVariables"),
+        taskVariables : query.taskVariables,
+        caseInstanceVariables : query.caseInstanceVariables
+      };
     }]);
 
-    tasklistData.provide('currentFilter', ['taskListQuery', 'filters', function(taskListQuery, filters) {
-      if(taskListQuery.id === null) {
-        return null;
+     /**
+      * Provide the list of tasks
+      */
+     tasklistData.provide('taskList', [ 'taskListQuery', function(taskListQuery) {
+       var deferred = $q.defer();
+
+       if(taskListQuery.id === null) {
+         // no filter selected
+         deferred.resolve({
+           count: 0,
+           _embedded : {}
+         });
+       }
+       else {
+         // filter selected
+         Filter.getTasks(angular.copy(taskListQuery), function(err, res) {
+           if(err) {
+             deferred.reject(err);
+           }
+           else {
+             deferred.resolve(res);
+           }
+         });
+       }
+       return deferred.promise;
+     }]);
+
+
+    // automatically refresh the taskList every 10 seconds so that changes (such as claims) are represented in realtime
+    var intervalPromise;
+    tasklistData.observe("currentFilter", function(currentFilter) {
+      // stop current refresh
+      if(intervalPromise) {
+        $interval.cancel(intervalPromise);
       }
-      else {
-        for (var f in filters) {
-          if (filters[f].id === taskListQuery.id) {
-            return filters[f];
-          }
-        }
-        return null;
+      if(currentFilter && currentFilter.properties.refresh) {
+        intervalPromise = $interval(function(){
+          $scope.tasklistApp.refreshProvider.refreshTaskList();
+        }, 10000);
       }
-    }]);
+    });
 
    /**
      * Provide current task id
@@ -170,8 +220,9 @@ define([
         tasklistData.set('taskId', { 'taskId' : taskId });
       }
 
+      currentFilter = null;
+      tasklistData.changed('currentFilter');
+
     });
-
   }];
-
 });

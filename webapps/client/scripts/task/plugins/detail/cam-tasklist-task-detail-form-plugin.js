@@ -63,7 +63,10 @@ define([
       // the current selected task will
       // also be set to null, so that the
       // view gets clear
-      $location.search({});
+      var searchParams = $location.search();
+      delete searchParams.task;
+      delete searchParams.detailsTab;
+      $location.search(searchParams);
 
       // list of tasks must be reloaded as
       // well: changed properties on this

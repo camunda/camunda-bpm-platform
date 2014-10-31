@@ -594,6 +594,7 @@ define([
           color:        $scope.filter.properties.color,
           description:  $scope.filter.properties.description,
           priority:     $scope.filter.properties.priority,
+          refresh:      $scope.filter.properties.refresh,
           variables:    $scope._variables
         }
       };

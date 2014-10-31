@@ -47,6 +47,11 @@
   "FILTER_DESCRIPTION_PLACEHOLDER":
                         "Shows the tasks I am assigned",
 
+  "FILTER_REFRESH_LABEL":
+                        "Auto-Refresh",
+  "FILTER_REFRESH_TOOLTIP":
+                        "Automatically fetches latest changes and keeps the task list up to date",
+
   "FILTER_FORM_ACCESS_RULES":
                         "Authorizations",
   "FILTER_FORM_ACCESS_RULES_HINT":
@@ -112,6 +117,11 @@
                         "Search by task name, case sensitive.",
   "NO_MATCHING_TASK":
                         "No task matching filters found.",
+
+  "RESTRICTION_NOTICE":
+                        "The current search parameters could not retrieve any tasks. Try to reset the search parameters.",
+  "RESET_PAGE":
+                        "Reset page number",
 
   "NO_AVAILABLE_FILTER":
                         "No filter available.",

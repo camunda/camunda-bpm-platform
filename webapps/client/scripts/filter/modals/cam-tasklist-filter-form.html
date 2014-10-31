@@ -125,6 +125,37 @@
             </div>
           </div>
         </div>
+
+        <div class="form-group">
+          <div class="col-xs-8">
+
+          </div>
+
+          <div class="col-xs-4">
+            <div class="row"
+                 ng-class="{'has-error': _generalErrorsByField.refresh}">
+              <label for="filter-form-refresh"
+                     class="col-xs-6 control-label"
+                     translate="FILTER_REFRESH_LABEL">Auto-Refresh</label>
+
+              <div class="col-xs-6">
+                <input class="form-control"
+                       ng-readonly="filter.id && !accesses.update"
+                       id="filter-form-refresh"
+                       ng-model="filter.properties.refresh"
+                       ng-change="validateGeneralInfo()"
+                       type="checkbox"
+                       tooltip-append-to-body="false"
+                       tooltip="{{ 'FILTER_REFRESH_TOOLTIP' | translate }}" />
+
+                <span ng-if="_generalErrorsByField.refresh"
+                      class="help-block">
+                  {{ _generalErrorsByField.refresh | translate }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
       </accordion-group>
 
 

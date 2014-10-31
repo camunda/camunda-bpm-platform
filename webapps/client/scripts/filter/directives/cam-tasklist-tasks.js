@@ -46,7 +46,7 @@ define([
 
         var tasksData = $scope.tasklistData.newChild($scope);
 
-        var query;
+        $scope.query = {};
 
         /**
          * observe the list of tasks
@@ -61,10 +61,10 @@ define([
          */
         tasksData.observe('taskListQuery', function(taskListQuery) {
           // parse pagination properties from query
-          query = angular.copy(taskListQuery);
-          $scope.pageSize = query.maxResults;
+          $scope.query = angular.copy(taskListQuery);
+          $scope.pageSize = $scope.query.maxResults;
           // Sachbearbeiter starts counting at '1'
-          $scope.pageNum = (query.firstResult / $scope.pageSize) + 1;
+          $scope.pageNum = ($scope.query.firstResult / $scope.pageSize) + 1;
         });
 
         tasksData.observe('taskId', function(taskId) {
@@ -76,9 +76,7 @@ define([
          * Used to retrieve information about variables displayed on a task.
          */
         tasksData.observe(['currentFilter', function(currentFilter) {
-
           $scope.filterProperties = currentFilter !== null ? currentFilter.properties : null;
-
         }]);
 
         $scope.focus = function (task) {
@@ -96,9 +94,18 @@ define([
          */
         $scope.pageChange = function() {
           // update query
-          query.firstResult = $scope.pageSize * ($scope.pageNum - 1);
-          tasksData.set('taskListQuery', query);
+          search.updateSilently({
+            page:  $scope.pageNum
+          });
+          tasksData.changed('taskListQuery');
         };
+
+         $scope.resetPage = function() {
+           search.updateSilently({
+             page: 1
+           });
+           tasksData.changed('taskListQuery');
+         };
 
         $scope.getHrefUrl = function (task) {
           var href = '#/?task=' + task.id;

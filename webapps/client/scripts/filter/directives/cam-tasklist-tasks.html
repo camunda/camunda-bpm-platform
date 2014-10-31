@@ -10,6 +10,12 @@
     <i class="glyphicon glyphicon-info-sign"></i>
     {{ 'NO_MATCHING_TASK' | translate }}
   </div>
+  <div ng-show="totalItems && !tasks" >
+    <span>
+    {{ 'RESTRICTION_NOTICE' | translate }}
+    <a ng-click="resetPage()">{{ 'RESET_PAGE' | translate }}</a>
+    </span>
+  </div>
 
   <div ng-show="totalItems">
     <ol class="tasks-list list-unstyled">
