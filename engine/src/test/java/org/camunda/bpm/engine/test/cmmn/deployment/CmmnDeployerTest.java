@@ -12,14 +12,18 @@
  */
 package org.camunda.bpm.engine.test.cmmn.deployment;
 
+import java.io.InputStream;
+
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.CaseDefinitionQuery;
 import org.camunda.bpm.engine.repository.DeploymentQuery;
+import org.camunda.bpm.engine.test.Deployment;
 
 /**
  * @author Roman Smirnov
@@ -68,6 +72,37 @@ public class CmmnDeployerTest extends PluggableProcessEngineTestCase {
       // Verify that nothing is deployed
       assertEquals(0, repositoryService.createDeploymentQuery().count());
     }
+  }
+
+  @Deployment(resources = { "org/camunda/bpm/engine/test/cmmn/deployment/CmmnDeploymentTest.testCaseDiagramResource.cmmn",
+      "org/camunda/bpm/engine/test/cmmn/deployment/CmmnDeploymentTest.testCaseDiagramResource.png" })
+  public void testCaseDiagramResource() {
+    final CaseDefinition caseDefinition = repositoryService.createCaseDefinitionQuery().singleResult();
+
+    assertEquals("org/camunda/bpm/engine/test/cmmn/deployment/CmmnDeploymentTest.testCaseDiagramResource.cmmn", caseDefinition.getResourceName());
+    assertEquals("Case_1", caseDefinition.getKey());
+
+    final String diagramResourceName = caseDefinition.getDiagramResourceName();
+    assertEquals("org/camunda/bpm/engine/test/cmmn/deployment/CmmnDeploymentTest.testCaseDiagramResource.png", diagramResourceName);
+
+    final InputStream diagramStream = repositoryService.getResourceAsStream(deploymentId,
+        "org/camunda/bpm/engine/test/cmmn/deployment/CmmnDeploymentTest.testCaseDiagramResource.png");
+    final byte[] diagramBytes = IoUtil.readInputStream(diagramStream, "diagram stream");
+    assertEquals(2540, diagramBytes.length);
+  }
+
+  @Deployment(resources = { "org/camunda/bpm/engine/test/cmmn/deployment/CmmnDeploymentTest.testMultipleDiagramResourcesProvided.cmmn",
+      "org/camunda/bpm/engine/test/cmmn/deployment/CmmnDeploymentTest.testMultipleDiagramResourcesProvided.a.png",
+      "org/camunda/bpm/engine/test/cmmn/deployment/CmmnDeploymentTest.testMultipleDiagramResourcesProvided.b.png",
+      "org/camunda/bpm/engine/test/cmmn/deployment/CmmnDeploymentTest.testMultipleDiagramResourcesProvided.c.png" })
+  public void testMultipleDiagramResourcesProvided() {
+    final CaseDefinition caseA = repositoryService.createCaseDefinitionQuery().caseDefinitionKey("a").singleResult();
+    final CaseDefinition caseB = repositoryService.createCaseDefinitionQuery().caseDefinitionKey("b").singleResult();
+    final CaseDefinition caseC = repositoryService.createCaseDefinitionQuery().caseDefinitionKey("c").singleResult();
+
+    assertEquals("org/camunda/bpm/engine/test/cmmn/deployment/CmmnDeploymentTest.testMultipleDiagramResourcesProvided.a.png", caseA.getDiagramResourceName());
+    assertEquals("org/camunda/bpm/engine/test/cmmn/deployment/CmmnDeploymentTest.testMultipleDiagramResourcesProvided.b.png", caseB.getDiagramResourceName());
+    assertEquals("org/camunda/bpm/engine/test/cmmn/deployment/CmmnDeploymentTest.testMultipleDiagramResourcesProvided.c.png", caseC.getDiagramResourceName());
   }
 
 }

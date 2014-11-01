@@ -16,14 +16,17 @@ import org.camunda.bpm.engine.RepositoryService;
 
 /**
  * @author Roman Smirnov
- *
+ * 
  */
 public interface CaseDefinition {
 
   /** unique identifier */
   String getId();
 
-  /** category name which is derived from the targetNamespace attribute in the definitions element */
+  /**
+   * category name which is derived from the targetNamespace attribute in the
+   * definitions element
+   */
   String getCategory();
 
   /** label used for display purposes */
@@ -35,11 +38,19 @@ public interface CaseDefinition {
   /** version of this case definition */
   int getVersion();
 
-  /** name of {@link RepositoryService#getResourceAsStream(String, String) the resource}
-   * of this case definition. */
+  /**
+   * name of {@link RepositoryService#getResourceAsStream(String, String) the
+   * resource} of this case definition.
+   */
   String getResourceName();
 
   /** The deployment in which this case definition is contained. */
   String getDeploymentId();
 
+  /**
+   * The diagram resource name.
+   * 
+   * @return the name of the diagram resource. e.G. of the case PNG file.
+   */
+  String getDiagramResourceName();
 }

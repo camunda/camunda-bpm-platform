@@ -37,6 +37,7 @@ public class CaseDefinitionEntity extends CmmnCaseDefinition implements CaseDefi
   protected int version;
   protected String deploymentId;
   protected String resourceName;
+  protected String diagramResourceName;
   protected Map<String, TaskDefinition> taskDefinitions;
 
   public CaseDefinitionEntity() {
@@ -93,6 +94,14 @@ public class CaseDefinitionEntity extends CmmnCaseDefinition implements CaseDefi
 
   public void setResourceName(String resourceName) {
     this.resourceName = resourceName;
+  }
+
+  public String getDiagramResourceName() {
+    return this.diagramResourceName;
+  }
+
+  public void setDiagramResourceName(final String diagramResourceName) {
+    this.diagramResourceName = diagramResourceName;
   }
 
   public Map<String, TaskDefinition> getTaskDefinitions() {

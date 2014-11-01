@@ -44,6 +44,8 @@ public class CaseDefinitionQueryImpl extends AbstractQuery<CaseDefinitionQuery, 
   protected String keyLike;
   protected String resourceName;
   protected String resourceNameLike;
+  protected String diagramResourceName;
+  protected String diagramResourceNameLike;
   protected Integer version;
   protected boolean latest = false;
 
@@ -236,6 +238,14 @@ public class CaseDefinitionQueryImpl extends AbstractQuery<CaseDefinitionQuery, 
 
   public String getResourceNameLike() {
     return resourceNameLike;
+  }
+
+  public String getDiagramResourceName() {
+    return diagramResourceName;
+  }
+
+  public String getDiageamResourceNameLike() {
+    return diagramResourceNameLike;
   }
 
   public Integer getVersion() {

@@ -17,6 +17,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 
 import javax.ws.rs.HttpMethod;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
@@ -158,6 +159,19 @@ public class CaseDefinitionResourceImpl implements CaseDefinitionResource {
     result.addReflexiveLink(uri, HttpMethod.GET, "self");
 
     return result;
+  }
+
+  @Override
+  public Response getCaseDefinitionDiagram() {
+    final CaseDefinition definition = engine.getRepositoryService().getCaseDefinition(caseDefinitionId);
+    final InputStream caseDiagram = engine.getRepositoryService().getProcessDiagram(caseDefinitionId);
+    if (caseDiagram == null) {
+      return Response.noContent().build();
+    } else {
+      final String fileName = definition.getDiagramResourceName();
+      return Response.ok(caseDiagram).header("Content-Disposition", "attachment; filename=" + fileName)
+          .type(ProcessDefinitionResourceImpl.getMediaTypeForFileSuffix(fileName)).build();
+    }
   }
 
 }
