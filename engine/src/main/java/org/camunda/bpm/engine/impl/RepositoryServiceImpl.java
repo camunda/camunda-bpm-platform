@@ -31,6 +31,7 @@ import org.camunda.bpm.engine.impl.cmd.DeleteDeploymentCmd;
 import org.camunda.bpm.engine.impl.cmd.DeleteIdentityLinkForProcessDefinitionCmd;
 import org.camunda.bpm.engine.impl.cmd.DeployCmd;
 import org.camunda.bpm.engine.impl.cmd.GetDeploymentBpmnModelInstanceCmd;
+import org.camunda.bpm.engine.impl.cmd.GetDeploymentCaseDiagramCmd;
 import org.camunda.bpm.engine.impl.cmd.GetDeploymentCmmnModelInstanceCmd;
 import org.camunda.bpm.engine.impl.cmd.GetDeploymentProcessDefinitionCmd;
 import org.camunda.bpm.engine.impl.cmd.GetDeploymentProcessDiagramCmd;
@@ -61,7 +62,6 @@ import org.camunda.bpm.engine.repository.Resource;
 import org.camunda.bpm.engine.task.IdentityLink;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.cmmn.CmmnModelInstance;
-
 
 /**
  * @author Tom Baeyens
@@ -174,6 +174,10 @@ public class RepositoryServiceImpl extends ServiceImpl implements RepositoryServ
 
   public InputStream getProcessDiagram(String processDefinitionId) {
     return commandExecutor.execute(new GetDeploymentProcessDiagramCmd(processDefinitionId));
+  }
+
+  public InputStream getCaseDiagram(String caseDefinitionId) {
+    return commandExecutor.execute(new GetDeploymentCaseDiagramCmd(caseDefinitionId));
   }
 
   public DiagramLayout getProcessDiagramLayout(String processDefinitionId) {

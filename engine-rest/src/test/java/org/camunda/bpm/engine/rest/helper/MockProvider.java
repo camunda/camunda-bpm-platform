@@ -479,6 +479,7 @@ public abstract class MockProvider {
   public static final String EXAMPLE_CASE_DEFINITION_NAME = "aCaseDefinitionName";
   public static final String EXAMPLE_CASE_DEFINITION_NAME_LIKE = "aCaseDefinitionNameLike";
   public static final String EXAMPLE_CASE_DEFINITION_RESOURCE_NAME = "aCaseDefinitionResourceName";
+  public static final String EXAMPLE_CASE_DEFINITION_DIAGRAM_RESOURCE_NAME = "aResourceName.png";
 
   // case instance
   public static final String EXAMPLE_CASE_INSTANCE_ID = "aCaseInstId";
@@ -1499,6 +1500,7 @@ public abstract class MockProvider {
         .key(EXAMPLE_CASE_DEFINITION_KEY)
         .version(EXAMPLE_CASE_DEFINITION_VERSION)
         .resource(EXAMPLE_CASE_DEFINITION_RESOURCE_NAME)
+        .diagram(EXAMPLE_CASE_DEFINITION_DIAGRAM_RESOURCE_NAME)
         .deploymentId(EXAMPLE_DEPLOYMENT_ID)
         .build();
 

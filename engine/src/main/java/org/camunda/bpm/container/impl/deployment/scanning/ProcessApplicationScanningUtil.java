@@ -75,8 +75,7 @@ public class ProcessApplicationScanningUtil {
   public static boolean hasSuffix(String filename, String[] suffixes) {
     if (suffixes == null || suffixes.length == 0) {
       return false;
-    }
-    else {
+    } else {
       for (String suffix : suffixes) {
         if (filename.endsWith(suffix)) {
           return true;
@@ -86,13 +85,31 @@ public class ProcessApplicationScanningUtil {
     }
   }
 
-  public static boolean isDiagramForProcess(String diagramFileName, String processFileName) {
-    for (String bpmnResourceSuffix : BpmnDeployer.BPMN_RESOURCE_SUFFIXES) {
-      if (processFileName.endsWith(bpmnResourceSuffix)) {
-        String processFilePrefix = processFileName.substring(0, processFileName.length() - bpmnResourceSuffix.length());
-        if (diagramFileName.startsWith(processFilePrefix)) {
-          for (String diagramResourceSuffix : BpmnDeployer.DIAGRAM_SUFFIXES) {
-            if (diagramFileName.endsWith(diagramResourceSuffix)) {
+  public static boolean isDiagram(String fileName, String modelFileName) {
+    // process resources
+    boolean isBpmnDiagram = checkDiagram(fileName, modelFileName, BpmnDeployer.DIAGRAM_SUFFIXES, BpmnDeployer.BPMN_RESOURCE_SUFFIXES);
+    // case resources
+    boolean isCmmnDiagram = checkDiagram(fileName, modelFileName, CmmnDeployer.DIAGRAM_SUFFIXES, CmmnDeployer.CMMN_RESOURCE_SUFFIXES);
+
+    return isBpmnDiagram || isCmmnDiagram;
+  }
+
+  /**
+   * Checks, whether a filename is a diagram for the given modelFileName.
+   *
+   * @param fileName filename to check.
+   * @param modelFileName model file name.
+   * @param diagramSuffixes suffixes of the diagram files.
+   * @param modelSuffixes suffixes of model files.
+   * @return true, if a file is a diagram for the model.
+   */
+  protected static boolean checkDiagram(String fileName, String modelFileName, String[] diagramSuffixes, String[] modelSuffixes) {
+    for (String modelSuffix : modelSuffixes) {
+      if (modelFileName.endsWith(modelSuffix)) {
+        String caseFilePrefix = modelFileName.substring(0, modelFileName.length() - modelSuffix.length());
+        if (fileName.startsWith(caseFilePrefix)) {
+          for (String diagramResourceSuffix : diagramSuffixes) {
+            if (fileName.endsWith(diagramResourceSuffix)) {
               return true;
             }
           }
