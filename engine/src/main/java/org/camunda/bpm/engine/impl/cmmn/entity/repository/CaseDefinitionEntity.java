@@ -97,10 +97,10 @@ public class CaseDefinitionEntity extends CmmnCaseDefinition implements CaseDefi
   }
 
   public String getDiagramResourceName() {
-    return this.diagramResourceName;
+    return diagramResourceName;
   }
 
-  public void setDiagramResourceName(final String diagramResourceName) {
+  public void setDiagramResourceName(String diagramResourceName) {
     this.diagramResourceName = diagramResourceName;
   }
 

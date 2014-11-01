@@ -200,6 +200,7 @@ public class RepositoryServiceImpl extends ServiceImpl implements RepositoryServ
     return commandExecutor.execute(new GetDeploymentProcessDiagramCmd(processDefinitionId));
   }
 
+  @Override
   public InputStream getCaseDiagram(final String caseDefinitionId) {
     return commandExecutor.execute(new GetDeploymentCaseDiagramCmd(caseDefinitionId));
   }

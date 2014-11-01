@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.cfg.IdGenerator;
@@ -33,11 +34,14 @@ import org.camunda.bpm.engine.impl.persistence.entity.ResourceEntity;
  * proper {@link CaseDefinitionEntity}s.
  * 
  * @author Roman Smirnov
+ * @author Simon Zambrovski
  *
  */
 public class CmmnDeployer implements Deployer {
 
-  public static final String[] CMMN_RESOURCE_SUFFIXES = new String[] { "cmmn" };
+  private static final Logger LOG = Logger.getLogger(CmmnDeployer.class.getName());
+  
+  public static final String[] CMMN_RESOURCE_SUFFIXES = new String[] { "cmmn10.xml", "cmmn" };
   public static final String[] DIAGRAM_SUFFIXES = new String[] { "png", "jpg", "gif", "svg" };
 
   protected ExpressionManager expressionManager;
@@ -110,7 +114,7 @@ public class CmmnDeployer implements Deployer {
 
       final String diagramResourceName = getDiagramResourceForCase(resourceName, caseDefinition.getKey(), deployment.getResources());
       caseDefinition.setDiagramResourceName(diagramResourceName);
-
+      LOG.info("Setting diagram to " + diagramResourceName);
     }
 
     return caseDefinitions;

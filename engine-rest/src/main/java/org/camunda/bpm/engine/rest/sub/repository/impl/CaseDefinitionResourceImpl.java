@@ -164,7 +164,7 @@ public class CaseDefinitionResourceImpl implements CaseDefinitionResource {
   @Override
   public Response getCaseDefinitionDiagram() {
     final CaseDefinition definition = engine.getRepositoryService().getCaseDefinition(caseDefinitionId);
-    final InputStream caseDiagram = engine.getRepositoryService().getProcessDiagram(caseDefinitionId);
+    final InputStream caseDiagram = engine.getRepositoryService().getCaseDiagram(caseDefinitionId);
     if (caseDiagram == null) {
       return Response.noContent().build();
     } else {

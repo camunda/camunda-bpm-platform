@@ -116,7 +116,7 @@ public class VfsProcessApplicationScanner implements ProcessApplicationScanner {
         // find diagram(s) for process
         List<VirtualFile> diagrams = process.getParent().getChildren(new VirtualFileFilter() {
           public boolean accepts(VirtualFile file) {
-            return ProcessApplicationScanningUtil.isDiagramForProcess(file.getName(), process.getName());
+            return ProcessApplicationScanningUtil.isDiagram(file.getName(), process.getName());
           }
         });
         for (VirtualFile diagram : diagrams) {
