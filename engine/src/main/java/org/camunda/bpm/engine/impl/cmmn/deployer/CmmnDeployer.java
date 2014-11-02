@@ -114,7 +114,7 @@ public class CmmnDeployer implements Deployer {
 
       final String diagramResourceName = getDiagramResourceForCase(resourceName, caseDefinition.getKey(), deployment.getResources());
       caseDefinition.setDiagramResourceName(diagramResourceName);
-      LOG.info("Setting diagram to " + diagramResourceName);
+      LOG.fine("Setting diagram to " + diagramResourceName);
     }
 
     return caseDefinitions;
