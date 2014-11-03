@@ -23,8 +23,10 @@ import org.camunda.bpm.engine.variable.value.TypedValue;
  */
 public class StringFormType extends AbstractFormFieldType {
 
+  public final static String TYPE_NAME = "string";
+
   public String getName() {
-    return "string";
+    return TYPE_NAME;
   }
 
   public String getMimeType() {

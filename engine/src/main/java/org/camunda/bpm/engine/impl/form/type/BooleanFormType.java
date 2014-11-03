@@ -22,8 +22,10 @@ import org.camunda.bpm.engine.variable.value.BooleanValue;
  */
 public class BooleanFormType extends AbstractFormFieldType {
 
+  public final static String TYPE_NAME = "boolean";
+
   public String getName() {
-    return "boolean";
+    return TYPE_NAME;
   }
 
   public String getMimeType() {
