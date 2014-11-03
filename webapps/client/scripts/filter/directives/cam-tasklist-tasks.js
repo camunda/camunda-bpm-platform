@@ -60,11 +60,13 @@ define([
          * observe the task list query
          */
         tasksData.observe('taskListQuery', function(taskListQuery) {
-          // parse pagination properties from query
-          $scope.query = angular.copy(taskListQuery);
-          $scope.pageSize = $scope.query.maxResults;
-          // Sachbearbeiter starts counting at '1'
-          $scope.pageNum = ($scope.query.firstResult / $scope.pageSize) + 1;
+          if (taskListQuery) {
+            // parse pagination properties from query
+            $scope.query = angular.copy(taskListQuery);
+            $scope.pageSize = $scope.query.maxResults;
+            // Sachbearbeiter starts counting at '1'
+            $scope.pageNum = ($scope.query.firstResult / $scope.pageSize) + 1;
+          }
         });
 
         tasksData.observe('taskId', function(taskId) {

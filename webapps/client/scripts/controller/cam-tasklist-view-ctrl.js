@@ -93,7 +93,7 @@ define([
           page: "1"
         });
       }
-      if(focused.id !== filterId) {
+      if(focused && focused.id !== filterId) {
         search.updateSilently({
           filter: focused.id
         });
@@ -121,6 +121,10 @@ define([
       "Case Variable" : "caseInstanceVariables"
     };
     tasklistData.provide('taskListQuery', ['currentFilter', function(currentFilter) {
+      if (!currentFilter) {
+        return null;
+      }
+
       var searches = JSON.parse(getPropertyFromLocation("query"));
       var query = {};
       query.processVariables = [];
@@ -152,7 +156,7 @@ define([
      tasklistData.provide('taskList', [ 'taskListQuery', function(taskListQuery) {
        var deferred = $q.defer();
 
-       if(taskListQuery.id === null) {
+       if(!taskListQuery || taskListQuery.id === null) {
          // no filter selected
          deferred.resolve({
            count: 0,
