@@ -78,7 +78,9 @@ define([
          * Used to retrieve information about variables displayed on a task.
          */
         tasksData.observe(['currentFilter', function(currentFilter) {
-          $scope.filterProperties = currentFilter !== null ? currentFilter.properties : null;
+          if (currentFilter) {
+            $scope.filterProperties = currentFilter !== null ? currentFilter.properties : null;
+          }
         }]);
 
         $scope.focus = function (task) {

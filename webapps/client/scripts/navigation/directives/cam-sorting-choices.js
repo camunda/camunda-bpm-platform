@@ -30,10 +30,12 @@ define([
          * observe the task list query
          */
         tasklistData.observe('taskListQuery', function(taskListQuery) {
-          query = angular.copy(taskListQuery);
-          scope.order = query.sortOrder;
-          scope.by = query.sortBy;
-          scope.byLabel = element.find('[sort-by="'+ scope.by +'"]').text();
+          if (taskListQuery) {
+            query = angular.copy(taskListQuery);
+            scope.order = query.sortOrder;
+            scope.by = query.sortBy;
+            scope.byLabel = element.find('[sort-by="'+ scope.by +'"]').text();
+          }
         });
 
         /**
