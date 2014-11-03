@@ -1607,6 +1607,8 @@ public class BpmnParse extends Parse {
 
     parseAsynchronousContinuation(serviceTaskElement, activity);
 
+    String error = null;
+
     if (type != null) {
       if (type.equalsIgnoreCase("mail")) {
         parseEmailServiceTask(activity, serviceTaskElement, parseFieldDeclarations(serviceTaskElement));
@@ -1646,7 +1648,8 @@ public class BpmnParse extends Parse {
       activity.setActivityBehavior(new ServiceTaskExpressionActivityBehavior(expressionManager.createExpression(expression), resultVariableName));
 
     } else {
-      addError("One of the attributes 'class', 'delegateExpression', 'type', or 'expression' or a nested 'connector' element is mandatory on " + elementName + ".", serviceTaskElement);
+      error = "One of the attributes 'class', 'delegateExpression', 'type', or 'expression' or a nested 'connector' element is mandatory on " + elementName + ".";
+
     }
 
     parseExecutionListenersOnScope(serviceTaskElement, activity);
@@ -1654,6 +1657,11 @@ public class BpmnParse extends Parse {
     for (BpmnParseListener parseListener : parseListeners) {
       parseListener.parseServiceTask(serviceTaskElement, scope, activity);
     }
+
+    if (error != null && activity.getActivityBehavior() == null) {
+      addError(error, serviceTaskElement);
+    }
+
     return activity;
   }
 
