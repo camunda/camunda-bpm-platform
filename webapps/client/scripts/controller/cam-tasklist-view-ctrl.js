@@ -183,7 +183,11 @@ define([
       }
       if(currentFilter && currentFilter.properties.refresh) {
         intervalPromise = $interval(function(){
-          $scope.tasklistApp.refreshProvider.refreshTaskList();
+          if($scope.tasklistApp && $scope.tasklistApp.refreshProvider) {
+            $scope.tasklistApp.refreshProvider.refreshTaskList();
+          } else {
+            $interval.cancel(intervalPromise);
+          }
         }, 10000);
       }
     });
