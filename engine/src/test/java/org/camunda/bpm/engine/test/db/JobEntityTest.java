@@ -1,10 +1,14 @@
 package org.camunda.bpm.engine.test.db;
 
+import java.util.List;
+
+import org.camunda.bpm.engine.impl.interceptor.Command;
+import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.test.Deployment;
-
-import java.util.List;
 
 /**
  *
@@ -74,4 +78,57 @@ public class JobEntityTest extends PluggableProcessEngineTestCase {
     jobList = managementService.createJobQuery().list();
     assertEquals(0, jobList.size());
   }
+
+  public void testInsertJobWithExceptionMessage() {
+    String fittingThreeByteMessage = repeatCharacter("\u9faf", JobEntity.MAX_EXCEPTION_MESSAGE_LENGTH);
+
+    JobEntity threeByteJobEntity = new MessageEntity();
+    threeByteJobEntity.setExceptionMessage(fittingThreeByteMessage);
+
+    // should not fail
+    insertJob(threeByteJobEntity);
+
+    deleteJob(threeByteJobEntity);
+  }
+
+  public void testJobExceptionMessageCutoff() {
+    JobEntity threeByteJobEntity = new MessageEntity();
+
+    String message = repeatCharacter("a", JobEntity.MAX_EXCEPTION_MESSAGE_LENGTH * 2);
+    threeByteJobEntity.setExceptionMessage(message);
+    assertEquals(JobEntity.MAX_EXCEPTION_MESSAGE_LENGTH, threeByteJobEntity.getExceptionMessage().length());
+  }
+
+  protected void insertJob(final JobEntity jobEntity) {
+    processEngineConfiguration.getCommandExecutorTxRequired().execute(new Command<Void>() {
+
+      @Override
+      public Void execute(CommandContext commandContext) {
+        commandContext.getJobManager().insert(jobEntity);
+        return null;
+      }
+    });
+  }
+
+  protected void deleteJob(final JobEntity jobEntity) {
+    processEngineConfiguration.getCommandExecutorTxRequired().execute(new Command<Void>() {
+
+      @Override
+      public Void execute(CommandContext commandContext) {
+        commandContext.getJobManager().delete(jobEntity);
+        return null;
+      }
+    });
+  }
+
+  protected String repeatCharacter(String encodedCharacter, int numCharacters) {
+    StringBuilder sb = new StringBuilder();
+
+    for (int i = 0; i < numCharacters; i++) {
+      sb.append(encodedCharacter);
+    }
+
+    return sb.toString();
+  }
+
 }
