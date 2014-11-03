@@ -23,13 +23,13 @@
       
       <sentry id="Sentry_2">
         <planItemOnPart sourceRef="PI_dataCollectedMilestone">
-          <standardEvent>complete</standardEvent>
+          <standardEvent>occur</standardEvent>
         </planItemOnPart>
       </sentry>
       
       <sentry id="Sentry_3">
         <planItemOnPart sourceRef="PI_customerRetiredUserEvent">
-          <standardEvent>complete</standardEvent>
+          <standardEvent>occur</standardEvent>
         </planItemOnPart>
       </sentry>
       
@@ -42,7 +42,15 @@
       
       <processTask name="Obtain Schufa-Information" id="obtainSchufaInfoProcessTask" processRef="obtainSchufa" />
 
-      <humanTask name="Decide About Loan Application" id="decideHumanTask" camunda:assignee="jonny1" />
+      <humanTask name="Decide About Loan Application" id="decideHumanTask" camunda:assignee="jonny1">
+        <defaultControl>
+          <manualActivationRule>
+            <condition>
+              <body>${false}</body>
+            </condition>
+          </manualActivationRule>
+        </defaultControl>
+      </humanTask>
       <humanTask name="Capture Application Data" id="captureAppDataHumanTask" camunda:assignee="jonny1" />
       <humanTask name="Obtain Credit-worthiness" id="obtainCreditWorthinessHumanTask" camunda:assignee="jonny1" />
       <humanTask name="Request Missing Documents" id="requestMissingDocumentsHumanTask" camunda:assignee="jonny1" />
