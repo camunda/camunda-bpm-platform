@@ -398,6 +398,11 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
       .findVariableInstancesByTaskId(id);
   }
 
+  @Override
+  public String getVariableScopeKey() {
+    return "task";
+  }
+
   // execution ////////////////////////////////////////////////////////////////
 
   public ExecutionEntity getExecution() {
