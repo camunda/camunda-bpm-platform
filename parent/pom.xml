@@ -53,7 +53,7 @@
     <version.postgre>9.3-1100-jdbc4</version.postgre>
 
     <version.camunda.commons>1.0.5</version.camunda.commons>
-    <version.camunda.connect>1.0.0-alpha3</version.camunda.connect>
+    <version.camunda.connect>1.0.0-SNAPSHOT</version.camunda.connect>
     <version.camunda.spin>1.0.0-SNAPSHOT</version.camunda.spin>
     <version.camunda.template-engines>1.0.0</version.camunda.template-engines>
 
@@ -568,8 +568,10 @@
 
       <dependency>
         <groupId>org.camunda.connect</groupId>
-        <artifactId>camunda-connect-all</artifactId>
+        <artifactId>camunda-connect-bom</artifactId>
         <version>${version.camunda.connect}</version>
+        <scope>import</scope>
+        <type>pom</type>
       </dependency>
 
       <dependency>
