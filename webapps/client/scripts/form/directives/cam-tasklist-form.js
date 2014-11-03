@@ -80,6 +80,8 @@ define([
         $scope.onFormCompletion = $scope.onFormCompletion() || noop;
         $scope.onFormValidation = $scope.onFormValidation() || noop;
         $scope.completionHandler = noop;
+        $scope.saveHandler = noop;
+        $scope.restoreHandler = noop;
 
         $scope.$loaded = false;
 
@@ -149,6 +151,16 @@ define([
           return $scope.$invalid || ($scope.options && $scope.options.disableCompleteButton);
         };
 
+        // save and restore ///////////////////////////////////////
+
+        var save = $scope.save = function () {
+          $scope.saveHandler();
+        };
+
+        var restore = $scope.restore = function () {
+          $scope.restoreHandler();
+        };
+
         // API ////////////////////////////////////////////////////
 
         this.notifyFormInitialized = function () {
@@ -189,6 +201,15 @@ define([
         this.registerCompletionHandler = function(fn) {
           $scope.completionHandler = fn ||  noop;
         };
+
+        this.registerSaveHandler = function(fn) {
+          $scope.saveHandler = fn ||  noop;
+        };
+
+        this.registerRestoreHandler = function(fn) {
+          $scope.restoreHandler = fn ||  noop;
+        };
+
 
       }]
     };

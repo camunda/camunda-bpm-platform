@@ -34,6 +34,11 @@
   <div class="form-actions" ng-show="showCompleteButton()">
     <button class="btn btn-primary"
             type="submit"
+            ng-click="save()">
+      {{ 'SAVE' | translate }}
+    </button>
+    <button class="btn btn-primary"
+            type="submit"
             ng-click="complete()"
             ng-disabled="disableCompleteButton()">
       {{ 'COMPLETE' | translate }}
