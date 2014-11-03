@@ -144,7 +144,7 @@ define([
       var outArray = [];
       angular.forEach($scope.searches, function(search) {
         if(isValid(search)) {
-          outArray.push({
+          outArray.unshift({
             name: search.name,
             operator: search.operator,
             value: parseValue(search.value),
@@ -164,19 +164,23 @@ define([
        return search[property] || null;
      }
      tasklistData.observe('taskListQuery', function(taskListQuery) {
-       angular.forEach($scope.searches, function(search, i) {
+       var search, i;
+       for(i = 0; i < $scope.searches.length; i++) {
+         search = $scope.searches[i];
          if(isValid(search)) {
             $scope.searches.splice(i, 1);
+            i--;
          }
-       });
+       }
+
        var searches = JSON.parse(getPropertyFromLocation("query"));
        if(searches) {
-         for(var i=0; i < searches.length; i++) {
-           var search = searches[i];
+         for(i=0; i < searches.length; i++) {
+           search = searches[i];
            search.operators = getOperators(getType(search.value));
            search.value = search.value.toString();
            search.type = search.type;
-           $scope.searches.push(search);
+           $scope.searches.unshift(search);
          }
        }
      });
