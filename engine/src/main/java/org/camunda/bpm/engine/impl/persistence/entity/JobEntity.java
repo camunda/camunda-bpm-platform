@@ -50,7 +50,7 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
 
   public static final boolean DEFAULT_EXCLUSIVE = true;
   public static final int DEFAULT_RETRIES = 3;
-  private static final int MAX_EXCEPTION_MESSAGE_LENGTH = 255;
+  private static final int MAX_EXCEPTION_MESSAGE_LENGTH = 2000;
 
   private static final long serialVersionUID = 1L;
 
