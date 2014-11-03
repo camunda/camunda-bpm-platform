@@ -79,6 +79,13 @@ public class JobEntityTest extends PluggableProcessEngineTestCase {
     assertEquals(0, jobList.size());
   }
 
+  /**
+   * Note: This does not test a message with 4-byte Unicode supplementary
+   * characters for two reasons:
+   * - MySQL 5.1 does not support 4-byte supplementary characters (support from 5.5.3 onwards)
+   * - {@link String#length()} counts these characters twice (since they are represented by two
+   * chars), so essentially the cutoff would be half the actual cutoff for such a string
+   */
   public void testInsertJobWithExceptionMessage() {
     String fittingThreeByteMessage = repeatCharacter("\u9faf", JobEntity.MAX_EXCEPTION_MESSAGE_LENGTH);
 
