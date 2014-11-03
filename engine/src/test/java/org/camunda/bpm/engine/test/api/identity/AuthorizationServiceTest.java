@@ -751,6 +751,17 @@ public class AuthorizationServiceTest extends PluggableProcessEngineTestCase {
 
   }
 
+  public void testIsAuthorizationEnabled() {
+    // default is false
+    assertFalse(authorizationService.isAuthorizationCheckEnabled());
+
+    processEngineConfiguration.setAuthorizationEnabled(true);
+    assertTrue(authorizationService.isAuthorizationCheckEnabled());
+
+    processEngineConfiguration.setAuthorizationEnabled(false);
+    assertFalse(authorizationService.isAuthorizationCheckEnabled());
+  }
+
   protected void cleanupAfterTest() {
     for (User user : identityService.createUserQuery().list()) {
       identityService.deleteUser(user.getId());
