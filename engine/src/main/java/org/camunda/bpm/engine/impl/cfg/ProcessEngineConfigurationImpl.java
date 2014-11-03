@@ -33,7 +33,6 @@ import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import javax.naming.InitialContext;
 import javax.sql.DataSource;
 
@@ -46,8 +45,6 @@ import org.apache.ibatis.session.defaults.DefaultSqlSessionFactory;
 import org.apache.ibatis.transaction.TransactionFactory;
 import org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory;
 import org.apache.ibatis.transaction.managed.ManagedTransactionFactory;
-import org.camunda.bpm.connect.rest.httpclient.RestHttpConnector;
-import org.camunda.bpm.connect.soap.httpclient.SoapHttpConnector;
 import org.camunda.bpm.engine.ArtifactFactory;
 import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.CaseService;
@@ -96,7 +93,6 @@ import org.camunda.bpm.engine.impl.cmmn.transformer.CmmnTransformFactory;
 import org.camunda.bpm.engine.impl.cmmn.transformer.CmmnTransformListener;
 import org.camunda.bpm.engine.impl.cmmn.transformer.CmmnTransformer;
 import org.camunda.bpm.engine.impl.cmmn.transformer.DefaultCmmnTransformFactory;
-import org.camunda.bpm.engine.impl.connector.Connectors;
 import org.camunda.bpm.engine.impl.db.DbIdGenerator;
 import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManagerFactory;
 import org.camunda.bpm.engine.impl.db.entitymanager.cache.DbEntityCacheKeyMapping;
@@ -440,8 +436,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected boolean isInvokeCustomVariableListeners = true;
 
-  protected Connectors connectors;
-
   /**
    * The process engine created by this configuration.
    */
@@ -502,7 +496,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     initPasswordDigest();
     initDeploymentRegistration();
     initResourceAuthorizationProvider();
-    initConnectors();
 
     invokePostInit();
   }
@@ -1278,16 +1271,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     }
     if(scriptingEnvironment == null) {
       scriptingEnvironment = new ScriptingEnvironment(scriptFactory, scriptEnvResolvers, scriptingEngines);
-    }
-  }
-
-  protected void initConnectors() {
-    if(connectors == null) {
-      connectors = new Connectors();
-
-      // register default connectors
-      connectors.addConnector(SoapHttpConnector.ID, SoapHttpConnector.class);
-      connectors.addConnector(RestHttpConnector.ID, RestHttpConnector.class);
     }
   }
 
@@ -2443,14 +2426,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public void setEnvScriptResolvers(List<ScriptEnvResolver> scriptEnvResolvers) {
     this.scriptEnvResolvers = scriptEnvResolvers;
-  }
-
-  public Connectors getConnectors() {
-    return connectors;
-  }
-
-  public void setConnectors(Connectors connectors) {
-    this.connectors = connectors;
   }
 
   public ProcessEngineConfiguration setArtifactFactory(ArtifactFactory artifactFactory) {

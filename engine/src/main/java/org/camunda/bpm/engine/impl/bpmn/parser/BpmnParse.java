@@ -60,7 +60,6 @@ import org.camunda.bpm.engine.impl.bpmn.behavior.ParallelMultiInstanceBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.ReceiveTaskActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.ScriptTaskActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.SequentialMultiInstanceBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.ServiceTaskConnectorActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.ServiceTaskDelegateExpressionActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.ServiceTaskExpressionActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.ShellActivityBehavior;
@@ -1603,7 +1602,6 @@ public class BpmnParse extends Parse {
     if (resultVariableName == null) {
       resultVariableName = serviceTaskElement.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "resultVariableName");
     }
-    Element connectorDefinition = findConnectorDefinition(serviceTaskElement);
 
     parseAsynchronousContinuation(serviceTaskElement, activity);
 
@@ -1617,21 +1615,6 @@ public class BpmnParse extends Parse {
       } else {
         addError("Invalid usage of type attribute on " + elementName + ": '" + type + "'", serviceTaskElement);
       }
-
-    } else if(connectorDefinition != null) {
-      Element connectorIdElement = connectorDefinition.element("connectorId");
-      String connectorId = null;
-      if(connectorIdElement != null)  {
-        connectorId = connectorIdElement.getText().trim();
-      }
-      if(connectorIdElement == null || connectorId.isEmpty()) {
-        addError("No 'id' defined for connector.", serviceTaskElement);
-      }
-
-      // parse mapping. TODO: Make this non-optional?
-      IoMapping ioMapping = parseInputOutput(connectorDefinition);
-      activity.setActivityBehavior(new ServiceTaskConnectorActivityBehavior(connectorId, ioMapping));
-
     } else if (className != null && className.trim().length() > 0) {
       if (resultVariableName != null) {
         addError("'resultVariableName' not supported for " + elementName + " elements using 'class'", serviceTaskElement);
@@ -1663,17 +1646,6 @@ public class BpmnParse extends Parse {
     }
 
     return activity;
-  }
-
-  protected Element findConnectorDefinition(Element serviceTaskElement) {
-    Element extensionElements = serviceTaskElement.element("extensionElements");
-    if(extensionElements != null) {
-      return extensionElements.elementNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "connector");
-
-    } else {
-      return null;
-
-    }
   }
 
   /**
