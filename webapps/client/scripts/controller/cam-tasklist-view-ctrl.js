@@ -104,7 +104,22 @@ define([
     tasklistData.observe('currentFilter', function(_currentFilter) {
       currentFilter = _currentFilter;
     });
-
+    var operatorTable = {
+      "<" : "lt",
+      ">" : "gt",
+      "=" : "eq",
+      "!=": "neq",
+      ">=": "gteq",
+      "<=": "lteq",
+      "like":"like",
+      "BEFORE":"lteq",
+      "AFTER":"gteq"
+    };
+    var typeTable = {
+      "Process Variable" : "processVariables",
+      "Task Variable" : "taskVariables",
+      "Case Variable" : "caseInstanceVariables"
+    };
     tasklistData.provide('taskListQuery', ['currentFilter', function(currentFilter) {
       var searches = JSON.parse(getPropertyFromLocation("query"));
       var query = {};
@@ -112,9 +127,9 @@ define([
       query.taskVariables = [];
       query.caseInstanceVariables = [];
       angular.forEach(searches, function(search) {
-         query[search.type].push({
+         query[typeTable[search.type]].push({
            name: search.name,
-           operator: search.operator,
+           operator: operatorTable[search.operator],
            value: search.value
          });
       });

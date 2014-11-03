@@ -116,36 +116,6 @@ define([
       evt.preventDefault();
     };
 
-    var operatorTable = {
-      "<" : "lt",
-      ">" : "gt",
-      "=" : "eq",
-      "!=": "neq",
-      ">=": "gteq",
-      "<=": "lteq",
-      "like":"like",
-      "BEFORE":"lteq",
-      "AFTER":"gteq"
-    };
-    var typeTable = {
-      "Process Variable" : "processVariables",
-      "Task Variable" : "taskVariables",
-      "Case Variable" : "caseInstanceVariables"
-    };
-    var inverseOperatorTable = {
-      "lt":  "<"     ,
-      "gt":  ">"     ,
-      "eq":  "="    ,
-      "neq":  "!="    ,
-      "gteq":  ">="    ,
-      "lteq":  "<="    ,
-      "like":  "like"  ,
-    };
-    var inverseTypeTable = {
-      "processVariables": "Process Variable" ,
-      "taskVariables": "Task Variable"    ,
-      "caseInstanceVariables": "Case Variable"
-    };
     function isValid(search) {
       return $scope.types.indexOf(search.type) !== -1 &&
          search.operators.indexOf(search.operator) !== -1 &&
@@ -176,9 +146,9 @@ define([
         if(isValid(search)) {
           outArray.push({
             name: search.name,
-            operator: operatorTable[search.operator],
+            operator: search.operator,
             value: parseValue(search.value),
-            type: typeTable[search.type]
+            type: search.type
           });
         }
       });
@@ -189,28 +159,24 @@ define([
       tasklistData.changed('taskListQuery');
     }
 
-     var query;
+     function getPropertyFromLocation(property) {
+       var search = $location.search() || {};
+       return search[property] || null;
+     }
      tasklistData.observe('taskListQuery', function(taskListQuery) {
-
        angular.forEach($scope.searches, function(search, i) {
          if(isValid(search)) {
             $scope.searches.splice(i, 1);
          }
        });
-
-       query = angular.copy(taskListQuery);
-       for(var type in taskListQuery) {
-         if(["processVariables", "taskVariables", "caseInstanceVariables"].indexOf(type) !== -1) {
-           for(var i = 0; i < taskListQuery[type].length; i++) {
-             var elem = taskListQuery[type][i];
-             var search = {};
-             search.name = elem.name;
-             search.operator = inverseOperatorTable[elem.operator];
-             search.value = elem.value.toString();
-             search.type = inverseTypeTable[type];
-             search.operators = getOperators(getType(parseValue(search.value)));
-             $scope.searches.push(search);
-           }
+       var searches = JSON.parse(getPropertyFromLocation("query"));
+       if(searches) {
+         for(var i=0; i < searches.length; i++) {
+           var search = searches[i];
+           search.operators = getOperators(getType(search.value));
+           search.value = search.value.toString();
+           search.type = search.type;
+           $scope.searches.push(search);
          }
        }
      });
