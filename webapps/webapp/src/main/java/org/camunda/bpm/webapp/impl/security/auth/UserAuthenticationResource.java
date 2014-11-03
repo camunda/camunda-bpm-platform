@@ -16,6 +16,7 @@ import static org.camunda.bpm.engine.authorization.Permissions.ACCESS;
 import static org.camunda.bpm.engine.authorization.Resources.APPLICATION;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -112,14 +113,18 @@ public class UserAuthenticationResource {
       AuthorizationService authorizationService = processEngine.getAuthorizationService();
 
       HashSet<String> authorizedApps = new HashSet<String>();
-
-      for (String application: APPS) {
-        if (isAuthorizedForApp(authorizationService, username, groupIds, application)) {
-          authorizedApps.add(application);
-        }
-      }
-
       authorizedApps.add("admin");
+
+      if (processEngine.getProcessEngineConfiguration().isAuthorizationEnabled()) {
+        for (String application: APPS) {
+          if (isAuthorizedForApp(authorizationService, username, groupIds, application)) {
+            authorizedApps.add(application);
+          }
+        }
+
+      } else {
+        Collections.addAll(authorizedApps, APPS);
+      }
 
       if (!authorizedApps.contains(appName)) {
         return forbidden();
