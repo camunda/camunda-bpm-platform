@@ -45,19 +45,13 @@ define([
     $translate([
       'FAILURE',
       'INIT_GROUPS_FAILURE',
-      'FINISHED',
-      'ADD_GROUP_SUCCESS',
       'ADD_GROUP_FAILED',
-      'REMOVE_GROUP_SUCCESS',
       'REMOVE_GROUP_FAILED'
     ])
     .then(function(result) {
       messages.failure            = result.FAILURE;
       messages.initGroupsFailed   = result.INIT_GROUPS_FAILURE;
-      messages.finished           = result.FINISHED;
-      messages.addGroupSuccess    = result.ADD_GROUP_SUCCESS;
       messages.addGroupFailed     = result.ADD_GROUP_FAILED;
-      messages.removeGroupSuccess = result.REMOVE_GROUP_SUCCESS;
       messages.removeGroupFailed  = result.REMOVE_GROUP_FAILED;
     });
 
@@ -89,7 +83,7 @@ define([
 
     $scope.addGroup = function () {
       var taskId = task.id;
-      
+
       groupsChanged = true;
 
       delete newGroup.error;
@@ -102,12 +96,6 @@ define([
             exclusive: true
           });
         }
-
-        Notifications.addMessage({
-          status: messages.finished,
-          message: messages.addGroupSuccess,
-          exclusive: true
-        });
 
         newGroup = $scope.newGroup = angular.copy(NEW_GROUP);
         taskGroupsData.changed('groups');
@@ -149,7 +137,7 @@ define([
         for(var i = 0, currentGroup; !!(currentGroup = $scope._groups[i]); i++) {
           if (newGroupId === currentGroup.groupId) {
             newGroup.error = { message: 'DUPLICATE_GROUP' };
-          }          
+          }
         }
       }
     };

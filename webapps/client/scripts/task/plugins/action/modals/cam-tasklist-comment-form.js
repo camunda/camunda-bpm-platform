@@ -35,22 +35,12 @@ define([
       });
     }
 
-    function successNotification(src) {
-      $translate(src).then(function(translated) {
-        Notifications.addMessage({
-          duration: 3000,
-          status: translated
-        });
-      });
-    }
-
     $scope.submit = function() {
       Task.createComment(task.id, $scope.comment.message, function(err) {
         if (err) {
           return errorNotification('COMMENT_SAVE_ERROR', err);
         }
 
-        successNotification('COMMENT_SAVE_SUCCESS');
         $scope.$close();
       });
     };

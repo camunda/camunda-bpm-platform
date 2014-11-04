@@ -72,16 +72,6 @@ define([
           });
         }
 
-        function successNotification(src, msg, duration) {
-          $translate(src).then(function(translated) {
-            Notifications.addMessage({
-              duration: duration || 3000,
-              status: translated,
-              message: msg
-            });
-          });
-        }
-
         $scope.errorHandler = function (status, err) {
           var _status = enhanceErrorMessage(err.message);
 
@@ -149,12 +139,6 @@ define([
             clearTask(false);
           }
         });
-
-        // handle successfully actions //////////////////////////////////////////////////
-
-        $scope.successHandler = function (status, msg, duration) {
-          successNotification(status, msg, duration);
-        };
 
         // provider ///////////////////////////////////////////////////////////////////
 
@@ -299,7 +283,7 @@ define([
 
         // plugins //////////////////////////////////////////////////////////////
 
-        $scope.taskVars = { read: [ 'task', 'taskData', 'errorHandler', 'successHandler' ] };
+        $scope.taskVars = { read: [ 'task', 'taskData', 'errorHandler' ] };
         $scope.taskDetailTabs = Views.getProviders({ component: 'tasklist.task.detail' });
 
         $scope.selectedTaskDetailTab = $scope.taskDetailTabs[0];

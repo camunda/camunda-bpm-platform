@@ -575,15 +575,6 @@ define([
       });
     }
 
-    function successNotification(src) {
-      $translate(src).then(function(translated) {
-        Notifications.addMessage({
-          duration: 3000,
-          status: translated
-        });
-      });
-    }
-
     $scope.submit = function() {
       var toSave = {
         name:         $scope.filter.name,
@@ -668,8 +659,6 @@ define([
             return errorNotification('FILTER_AUTHORIZATION_SAVE_ERROR', err);
           }
 
-          successNotification('FILTER_SAVE_SUCCESS');
-
           var result = {
             action: action,
             filter: $scope.filter
@@ -701,7 +690,6 @@ define([
           return errorNotification('FILTER_DELETION_ERROR', err);
         }
 
-        successNotification('FILTER_DELETION_SUCCESS');
         var result = {
             action: action,
             filter: $scope.filter

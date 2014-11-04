@@ -22,8 +22,6 @@ define([
     // setup ///////////////////////////////////////////////////////////
 
     var errorHandler = $scope.errorHandler;
-    var successHandler = $scope.successHandler;
-    var Task = camAPI.resource('task');
 
     var DEFAULT_OPTIONS = $scope.options = {
       hideCompleteButton: false,
@@ -79,7 +77,7 @@ define([
       if (err) {
         return errorHandler('COMPLETE_ERROR', err);
       }
-      successHandler('COMPLETE_OK');
+
       if($scope.task.processInstanceId) {
         assignNotification({
           assignee: $scope.task.assignee,

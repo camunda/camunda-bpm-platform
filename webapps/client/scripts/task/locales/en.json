@@ -13,12 +13,8 @@
         "Finished",
   "INIT_GROUPS_FAILURE":
         "Loading the groups of the selected task failed. Try to refresh the page to try again.",
-  "ADD_GROUP_SUCCESS":
-        "Adding the group to the selected task finished.",
   "ADD_GROUP_FAILED":
         "Adding the group to the selected task finished with failures. Try to refresh the page to try again.",
-  "REMOVE_GROUP_SUCCESS":
-        "Removing the group of the selected task finished.",
   "REMOVE_GROUP_FAILED":
         "Removing the group of the selected task finished with failures. Try to refresh the page to try again.",
   "TASK_NAME":
@@ -51,12 +47,8 @@
         "Remove group",
   "GROUP_ADD_ERROR":
         "Group could not be added",
-  "GROUP_ADD_SUCCESS":
-        "Group added successfully",
   "GROUP_DELETE_ERROR":
         "Group could not be removed",
-  "GROUP_DELETE_SUCCESS":
-        "Group removed successfully",
   "ADD_GROUPS":
         "Add groups",
   "USE_ADD_GROUP":
@@ -87,8 +79,6 @@
         "Enter Comment",
   "COMMENT_SAVE_ERROR":
         "Comment could not be saved",
-  "COMMENT_SAVE_SUCCESS":
-        "Comment saved successfully",
   "DESCRIPTION":
         "Description",
   "NO_DESCRIPTION":

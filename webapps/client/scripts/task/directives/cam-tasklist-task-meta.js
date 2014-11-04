@@ -107,7 +107,6 @@ define([
             }
 
             reload();
-            successHandler('TASK_UPDATE_SUCESS');
           });
         }
 
@@ -149,22 +148,18 @@ define([
         var notifications = {
 
           assigned: {
-            success: 'ASSIGNED_OK',
             error: 'ASSIGNED_ERROR'
           },
 
           assigneeReseted: {
-            success: 'ASSIGNEE_RESET_OK',
             error: 'ASSIGNEE_RESET_ERROR'
           },
 
           claimed: {
-            success: 'CLAIM_OK',
             error: 'CLAIM_ERROR'
           },
 
           unclaimed: {
-            success: 'UNCLAIM_OK',
             error: 'UNCLAIM_ERROR'
           }
 
@@ -240,8 +235,6 @@ define([
             }
 
             reload();
-            successHandler(messages.success);
-
           };
         }
 
