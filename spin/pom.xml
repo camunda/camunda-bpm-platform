@@ -3,21 +3,20 @@
 
   <!-- camunda BPM parent release pom -->
   <parent>
-    <groupId>org.camunda</groupId>
-    <artifactId>camunda-release-parent</artifactId>
-    <version>2.5</version>
-    <!-- do not remove empty tag - http://jira.codehaus.org/browse/MNG-4687 -->
-    <relativePath />
+    <groupId>org.camunda.spin</groupId>
+    <artifactId>camunda-spin-bom</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <relativePath>bom</relativePath>
   </parent>
 
-  <groupId>org.camunda.spin</groupId>
-  <artifactId>camunda-spin-parent</artifactId>
-  <version>1.0.0-SNAPSHOT</version>
+  <artifactId>camunda-spin-root</artifactId>
   <name>camunda Spin - parent</name>
   <packaging>pom</packaging>
 
   <modules>
+    <module>bom</module>
     <module>core</module>
+    <module>plugin</module>
     <module>dist</module>
   </modules>
 
@@ -27,7 +26,7 @@
       <dependency>
         <groupId>org.camunda.commons</groupId>
         <artifactId>camunda-commons-bom</artifactId>
-        <version>1.0.4</version>
+        <version>1.0.5</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
