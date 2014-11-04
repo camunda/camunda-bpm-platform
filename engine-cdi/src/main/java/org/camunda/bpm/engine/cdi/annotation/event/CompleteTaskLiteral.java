@@ -19,11 +19,12 @@ public class CompleteTaskLiteral extends AnnotationLiteral<CompleteTask> impleme
 
   protected final String taskDefinitionKey;
 
+    public CompleteTaskLiteral() {this(null);}
   public CompleteTaskLiteral(String taskDefinitionKey) {
     this.taskDefinitionKey = taskDefinitionKey;
   }
   @Override
   public String value() {
-    return taskDefinitionKey != null ? taskDefinitionKey : "";
+    return taskDefinitionKey != null ? taskDefinitionKey : "*";
   }
 }
