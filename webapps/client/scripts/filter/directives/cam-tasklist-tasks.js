@@ -83,7 +83,11 @@ define([
           }
         }]);
 
-        $scope.focus = function (task) {
+        $scope.focus = function ($event, task) {
+          if ($event) {
+            $event.preventDefault();
+          }
+
           var taskId = task.id;
           tasksData.set('taskId', { 'taskId' : taskId });
           $scope.currentTaskId = taskId;

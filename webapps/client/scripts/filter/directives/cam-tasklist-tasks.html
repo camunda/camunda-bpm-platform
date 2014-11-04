@@ -30,14 +30,13 @@
         </div>
 
         <div class="clickable"
-             ng-click="focus(task)">
+             ng-click="focus($event, task)">
           <div class="names">
             <h4 class="task">
-              {{ task.name || task.taskDefinitionKey || task.id }}
               <a ng-href="{{ getHrefUrl(task) }}"
-                 tooltip="{{ 'PERMALINK' | translate }}"
-                 tooltip-placement="right"
-                 class="glyphicon glyphicon-link"></a>
+                 ng-click="focus($event, task)">
+                {{ task.name || task.taskDefinitionKey || task.id }}
+              </a>
             </h4>
 
             <h6 class="process-definition"
@@ -53,7 +52,7 @@
 
 
           <div class="row"
-               ng-click="focus(task)">
+               ng-click="focus($event, task)">
             <ul class="col-md-12 col-lg-9 dates list-inline">
               <li class="creation-date">
                 <span tooltip-placement="top"
