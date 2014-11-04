@@ -12,7 +12,9 @@
  */
 package org.camunda.bpm.engine.test.examples.variables;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
@@ -20,7 +22,6 @@ import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.variable.serializer.JavaObjectSerializer;
 import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.engine.variable.value.ObjectValue;
-import org.camunda.spin.DataFormats;
 
 /**
  * @author Thorben Lindhauer
@@ -54,14 +55,6 @@ public class AssertVariableInstancesDelegate implements JavaDelegate {
     ObjectValue variableTyped = execution.getVariableTyped("anObjectValue");
     assertEquals(10, variableTyped.getValue(SimpleSerializableBean.class).getIntProperty());
     assertEquals(JavaObjectSerializer.SERIALIZATION_DATA_FORMAT, variableTyped.getSerializationDataFormat());
-
-    objectValue = (SimpleSerializableBean) execution.getVariable("anObjectValueJson");
-    assertNotNull(objectValue);
-    assertEquals(20, objectValue.getIntProperty());
-    variableTyped = execution.getVariableTyped("anObjectValueJson");
-    assertEquals(20, variableTyped.getValue(SimpleSerializableBean.class).getIntProperty());
-    assertEquals(DataFormats.json().getName(), variableTyped.getSerializationDataFormat());
-
 
     objectValue = (SimpleSerializableBean) execution.getVariable("anUntypedObjectValue");
     assertNotNull(objectValue);

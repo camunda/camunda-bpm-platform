@@ -23,9 +23,6 @@ import org.camunda.bpm.engine.impl.javax.el.VariableMapper;
 /**
  * {@link ELContext} used by the process engine.
  *
- * This implementation checks whether camunda Spin is available and if true, returns the
- * Spin function mapper.
- *
  * @author Joram Barrez
  * @author Daniel Meyer
  */

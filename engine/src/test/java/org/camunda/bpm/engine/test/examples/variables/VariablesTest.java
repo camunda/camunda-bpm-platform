@@ -12,7 +12,8 @@
  */
 package org.camunda.bpm.engine.test.examples.variables;
 
-import static org.camunda.bpm.engine.variable.Variables.*;
+import static org.camunda.bpm.engine.variable.Variables.createVariables;
+import static org.camunda.bpm.engine.variable.Variables.objectValue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -32,7 +33,6 @@ import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.history.SerializableVariable;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.type.ValueType;
-import org.camunda.spin.DataFormats;
 
 /**
  * @author Tom Baeyens
@@ -214,7 +214,6 @@ public class VariablesTest extends PluggableProcessEngineTestCase {
     VariableMap variables = createVariables()
       .putValue("anIntegerVariable", 1234)
       .putValue("anObjectValue", objectValue(new SimpleSerializableBean(10)).serializationDataFormat(JavaObjectSerializer.SERIALIZATION_DATA_FORMAT))
-      .putValue("anObjectValueJson", objectValue(new SimpleSerializableBean(20)).serializationDataFormat(DataFormats.json().getName()))
       .putValue("anUntypedObjectValue", new SimpleSerializableBean(30));
 
     runtimeService.startProcessInstanceByKey("testProcess", variables);

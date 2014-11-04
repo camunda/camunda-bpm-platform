@@ -209,7 +209,6 @@ import org.camunda.bpm.engine.impl.scripting.engine.ScriptingEngines;
 import org.camunda.bpm.engine.impl.scripting.engine.VariableScopeResolverFactory;
 import org.camunda.bpm.engine.impl.scripting.env.ScriptEnvResolver;
 import org.camunda.bpm.engine.impl.scripting.env.ScriptingEnvironment;
-import org.camunda.bpm.engine.impl.spin.ProcessEngineSpinSupport;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
 import org.camunda.bpm.engine.impl.variable.ValueTypeResolverImpl;
@@ -493,7 +492,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     initSessionFactories();
     initValueTypeResolver();
     initSerialization();
-    initSpin();
     initJpa();
     initDelegateInterceptor();
     initEventHandlers();
@@ -1280,27 +1278,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     }
     if(scriptingEnvironment == null) {
       scriptingEnvironment = new ScriptingEnvironment(scriptFactory, scriptEnvResolvers, scriptingEngines);
-    }
-  }
-
-  protected void initSpin() {
-    if(ProcessEngineSpinSupport.isSpinAvailable()) {
-      log.info("Spin available: camunda Spin is found on the classpath. Spin support is available for variable serialization, in Expression Language and Scripts.");
-      // add spin script env resolver
-      scriptEnvResolvers.add(ProcessEngineSpinSupport.getScriptEnvResolver());
-      // add spin el function mapper
-      expressionManager.addFunctionMapper(ProcessEngineSpinSupport.getElFunctionMapper());
-      // add spin variable serializers
-      int javaObjectSerializerIdx = variableSerializers.getSerializerIndexByName(JavaObjectSerializer.NAME);
-
-      List<TypedValueSerializer<?>> spinSerializers = ProcessEngineSpinSupport.getSerializers();
-      for (TypedValueSerializer<?> spinSerializer : spinSerializers) {
-        // add before java object serializer
-        variableSerializers.addSerializer(spinSerializer, javaObjectSerializerIdx);
-      }
-    } else {
-      log.info("Spin unavailable: camunda Spin is not found on the classpath.");
-
     }
   }
 
