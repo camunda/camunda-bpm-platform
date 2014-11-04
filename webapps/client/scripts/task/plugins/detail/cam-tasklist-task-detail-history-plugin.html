@@ -58,7 +58,7 @@
                     <span ng-if="!subEvent.propertyIsDate">{{ subEvent.orgValue }}</span>
                   </div>
 
-                  <div class="new-value">
+                  <div class="new-value" ng-if="subEvent.newValue">
                     <span ng-if="subEvent.propertyIsDate">{{ subEvent.newValue | camDate }}</span>
                     <span ng-if="!subEvent.propertyIsDate">{{ subEvent.newValue }}</span>
                   </div>
