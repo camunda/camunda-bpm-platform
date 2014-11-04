@@ -19,11 +19,12 @@ public class DeleteTaskLiteral extends AnnotationLiteral<DeleteTask> implements 
 
   protected final String taskDefinitionKey;
 
+    public DeleteTaskLiteral() {this(null);}
   public DeleteTaskLiteral(String taskDefinitionKey) {
     this.taskDefinitionKey = taskDefinitionKey;
   }
   @Override
   public String value() {
-    return taskDefinitionKey != null ? taskDefinitionKey : "";
+    return taskDefinitionKey != null ? taskDefinitionKey : "*";
   }
 }

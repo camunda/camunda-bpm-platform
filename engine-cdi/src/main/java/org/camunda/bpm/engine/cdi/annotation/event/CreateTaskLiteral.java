@@ -19,11 +19,15 @@ public class CreateTaskLiteral extends AnnotationLiteral<CreateTask> implements 
 
   protected final String taskDefinitionKey;
 
+    public CreateTaskLiteral() {
+        this(null);
+    }
+
   public CreateTaskLiteral(String taskDefinitionKey) {
     this.taskDefinitionKey = taskDefinitionKey;
   }
   @Override
   public String value() {
-    return taskDefinitionKey != null ? taskDefinitionKey : "";
+    return taskDefinitionKey != null ? taskDefinitionKey : "*";
   }
 }

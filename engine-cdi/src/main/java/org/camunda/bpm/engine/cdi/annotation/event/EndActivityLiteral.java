@@ -17,13 +17,13 @@ import javax.enterprise.util.AnnotationLiteral;
 
 public class EndActivityLiteral extends AnnotationLiteral<EndActivity> implements EndActivity {
   
-  protected final String activityId;   
-  
+  protected final String activityId;
+    public EndActivityLiteral() {this(null);}
   public EndActivityLiteral(String activityId) {
     this.activityId = activityId;
   }
   @Override
   public String value() {
-    return activityId != null ? activityId : "";
+    return activityId != null ? activityId : "*";
   }
 }
