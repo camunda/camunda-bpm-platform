@@ -21,6 +21,16 @@
       <groupId>org.camunda.spin</groupId>
       <artifactId>camunda-spin-engine-plugin</artifactId>
     </dependency>
+    
+    <dependency>
+      <groupId>org.camunda.spin</groupId>
+      <artifactId>camunda-spin-jackson-json-dataformat</artifactId>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.camunda.spin</groupId>
+      <artifactId>camunda-spin-dom-xml-dataformat</artifactId>
+    </dependency>
 
   </dependencies>
 
@@ -56,6 +66,9 @@
                   <shadedPattern>spinjar.com.jayway</shadedPattern>
                 </relocation>
               </relocations>
+              <transformers>
+                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+              </transformers>
             </configuration>
           </execution>
         </executions>
@@ -67,14 +80,14 @@
         <configuration>
           <includeDependencySources>true</includeDependencySources>
           <includeTransitiveDependencySources>true</includeTransitiveDependencySources>
-         <dependencySourceIncludes><include>org.camunda.spin:*</include></dependencySourceIncludes>
-         <additionnalDependencies>
+          <dependencySourceIncludes><include>org.camunda.spin:*</include></dependencySourceIncludes>
+          <additionnalDependencies>
            <dependency>
              <groupId>junit</groupId>
              <artifactId>junit</artifactId>
              <version>4.11</version>
            </dependency>
-         </additionnalDependencies>
+          </additionnalDependencies>
         </configuration>
       </plugin>
        <plugin>

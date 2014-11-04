@@ -12,14 +12,18 @@
  */
 package org.camunda.spin.impl.logging;
 
+import java.io.IOException;
+import java.util.Collection;
+
 import org.camunda.spin.SpinFileNotFoundException;
 import org.camunda.spin.SpinRuntimeException;
 import org.camunda.spin.SpinScriptException;
+import org.camunda.spin.spi.DataFormat;
+import org.camunda.spin.spi.DataFormatConfigurator;
+import org.camunda.spin.spi.DataFormatProvider;
 import org.camunda.spin.spi.SpinDataFormatException;
 import org.camunda.spin.xml.SpinXmlElement;
 import org.camunda.spin.xml.SpinXmlElementException;
-
-import java.io.IOException;
 
 
 /**
@@ -69,5 +73,32 @@ public class SpinCoreLogger extends SpinLogger {
 
   public SpinDataFormatException multipleProvidersForDataformat(String dataFormatName) {
     return new SpinDataFormatException(exceptionMessage("008", "Multiple providers found for dataformat '{}'", dataFormatName));
+  }
+
+  public void logDataFormats(Collection<DataFormat<?>> formats) {
+    if (isInfoEnabled()) {
+      for (DataFormat<?> format : formats) {
+        logDataFormat(format);
+      }
+    }
+  }
+
+  protected void logDataFormat(DataFormat<?> dataFormat) {
+    logInfo("009", "Discovered Spin data format: {}[name = {}]", dataFormat.getClass().getName(), dataFormat.getName());
+  }
+
+  public void logDataFormatProvider(DataFormatProvider provider) {
+    if (isInfoEnabled()) {
+      logInfo("010", "Discovered Spin data format provider: {}[name = {}]",
+          provider.getClass().getName(), provider.getDataFormatName());
+    }
+  }
+
+  @SuppressWarnings("rawtypes")
+  public void logDataFormatConfigurator(DataFormatConfigurator configurator) {
+    if (isInfoEnabled()) {
+      logInfo("011", "Discovered Spin data format configurator: {}[dataformat = {}]",
+          configurator.getClass(), configurator.getDataFormatClass().getName());
+    }
   }
 }

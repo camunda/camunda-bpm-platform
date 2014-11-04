@@ -17,13 +17,11 @@ import static org.powermock.api.mockito.PowerMockito.mock;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 import static org.powermock.api.mockito.PowerMockito.when;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
-import java.util.List;
 import java.util.ServiceLoader;
 
 import org.camunda.spin.DataFormats;
-import org.camunda.spin.impl.xml.dom.format.DomXmlDataFormat;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -46,6 +44,9 @@ public class DataFormatProviderTest {
 
   protected ServiceLoader<DataFormatProvider> mockServiceLoader;
 
+  @SuppressWarnings("rawtypes")
+  protected ServiceLoader<DataFormatConfigurator> mockConfiguratorLoader;
+
   @Before
   @SuppressWarnings("unchecked")
   public void setUp() {
@@ -54,53 +55,60 @@ public class DataFormatProviderTest {
     mockServiceLoader = mock(ServiceLoader.class);
     when(ServiceLoader.load(Matchers.eq(DataFormatProvider.class), Matchers.any(ClassLoader.class)))
       .thenReturn(mockServiceLoader);
+
+    mockConfiguratorLoader = mock(ServiceLoader.class);
+    when(ServiceLoader.load(Matchers.eq(DataFormatConfigurator.class), Matchers.any(ClassLoader.class)))
+      .thenReturn(mockConfiguratorLoader);
   }
 
   @Test
   @PrepareForTest( { DataFormats.class })
   public void testCustomDataFormatProvider() {
     // given a custom data format provider that is returned by the service loader API
-    final List<DataFormatProvider> customProviders = new ArrayList<DataFormatProvider>();
-    customProviders.add(new CustomDataFormatProvider());
-
-    when(mockServiceLoader.iterator()).thenAnswer(new Answer<Iterator<DataFormatProvider>>() {
-
-      @Override
-      public Iterator<DataFormatProvider> answer(InvocationOnMock invocation) throws Throwable {
-        return customProviders.iterator();
-      }
-    });
+    mockProviders(new CustomDataFormatProvider());
+    mockConfigurators();
 
     // when the custom data format is requested
     DataFormat<?> customDataFormat = DataFormats.getInstance().getDataFormatByName(CustomDataFormatProvider.NAME);
 
     // then it should be properly returned
     assertThat(customDataFormat).isNotNull();
-    assertThat(customDataFormat).isInstanceOf(DomXmlDataFormat.class);
+    assertThat(customDataFormat).isSameAs(CustomDataFormatProvider.DATA_FORMAT);
   }
 
 
   @Test
   @PrepareForTest( { DataFormats.class })
-  public void testOverrideBuiltInDataFormat() {
+  public void testConfigureDataFormat() {
     // given a custom data format provider that is returned by the service loader API
-    final List<DataFormatProvider> customProviders = new ArrayList<DataFormatProvider>();
-    customProviders.add(new OverrideBuiltinJsonDataFormatProvider());
+    mockProviders(new CustomDataFormatProvider());
+    mockConfigurators(new ExampleCustomDataFormatConfigurator());
 
+    DataFormat<?> format = DataFormats.getInstance().getDataFormatByName(CustomDataFormatProvider.NAME);
+    assertThat(format).isSameAs(CustomDataFormatProvider.DATA_FORMAT);
+
+    // then the configuration was applied
+    ExampleCustomDataFormat customFormat = (ExampleCustomDataFormat) format;
+    assertThat(customFormat.getProperty()).isEqualTo(ExampleCustomDataFormatConfigurator.UPDATED_PROPERTY);
+  }
+
+  protected void mockProviders(final DataFormatProvider... providers) {
     when(mockServiceLoader.iterator()).thenAnswer(new Answer<Iterator<DataFormatProvider>>() {
 
       @Override
       public Iterator<DataFormatProvider> answer(InvocationOnMock invocation) throws Throwable {
-        return customProviders.iterator();
+        return Arrays.asList(providers).iterator();
       }
     });
+  }
 
-    // when the default json data format is requested
-    // then the one provided by the provider should be returned
-    DataFormat<?> jsonFormat = DataFormats.json();
-    assertThat(jsonFormat).isSameAs(OverrideBuiltinJsonDataFormatProvider.DATA_FORMAT);
+  protected void mockConfigurators(final DataFormatConfigurator<?>... configurators) {
+    when(mockConfiguratorLoader.iterator()).thenAnswer(new Answer<Iterator<DataFormatConfigurator<?>>>() {
 
-    jsonFormat = DataFormats.getInstance().getDataFormatByName(DataFormats.JSON_DATAFORMAT_NAME);
-    assertThat(jsonFormat).isSameAs(OverrideBuiltinJsonDataFormatProvider.DATA_FORMAT);
+      @Override
+      public Iterator<DataFormatConfigurator<?>> answer(InvocationOnMock invocation) throws Throwable {
+        return Arrays.asList(configurators).iterator();
+      }
+    });
   }
 }

@@ -22,6 +22,8 @@ import org.camunda.spin.SpinRuntimeException;
  */
 public class SpinXPathException extends SpinRuntimeException {
 
+  private static final long serialVersionUID = 1L;
+
   public SpinXPathException(String message, Throwable cause) {
     super(message, cause);
   }

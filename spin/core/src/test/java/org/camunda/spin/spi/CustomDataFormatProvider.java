@@ -12,7 +12,6 @@
  */
 package org.camunda.spin.spi;
 
-import org.camunda.spin.impl.xml.dom.format.DomXmlDataFormat;
 
 /**
  * @author Thorben Lindhauer
@@ -21,6 +20,7 @@ import org.camunda.spin.impl.xml.dom.format.DomXmlDataFormat;
 public class CustomDataFormatProvider implements DataFormatProvider {
 
   public static final String NAME = "test-data-format";
+  public static final ExampleCustomDataFormat DATA_FORMAT = new ExampleCustomDataFormat(NAME);
 
   @Override
   public String getDataFormatName() {
@@ -29,7 +29,7 @@ public class CustomDataFormatProvider implements DataFormatProvider {
 
   @Override
   public DataFormat<?> createInstance() {
-    return new DomXmlDataFormat();
+    return DATA_FORMAT;
   }
 
 }

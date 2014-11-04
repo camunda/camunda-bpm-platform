@@ -14,7 +14,6 @@ package org.camunda.spin.spi;
 
 import java.io.IOException;
 import java.io.Reader;
-import java.nio.charset.Charset;
 import java.util.regex.Pattern;
 
 import org.camunda.spin.impl.logging.SpinCoreLogger;

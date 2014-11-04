@@ -18,14 +18,13 @@ import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.Set;
 
-import org.camunda.spin.impl.json.jackson.format.JacksonJsonDataFormat;
-import org.camunda.spin.impl.json.jackson.format.JacksonJsonDataFormatProvider;
 import org.camunda.spin.impl.logging.SpinCoreLogger;
 import org.camunda.spin.impl.logging.SpinLogger;
-import org.camunda.spin.impl.xml.dom.format.DomXmlDataFormat;
-import org.camunda.spin.impl.xml.dom.format.DomXmlDataFormatProvider;
+import org.camunda.spin.json.SpinJsonNode;
 import org.camunda.spin.spi.DataFormat;
+import org.camunda.spin.spi.DataFormatConfigurator;
 import org.camunda.spin.spi.DataFormatProvider;
+import org.camunda.spin.xml.SpinXmlElement;
 
 /**
  * Provides access to all builtin data formats.
@@ -56,16 +55,18 @@ public class DataFormats {
    * Returns the global xml data format that can be provided with
    * configuration that applies to any Spin xml operation.
    */
-  public static DomXmlDataFormat xml() {
-    return (DomXmlDataFormat) INSTANCE.getDataFormatByName(XML_DATAFORMAT_NAME);
+  @SuppressWarnings("unchecked")
+  public static DataFormat<SpinXmlElement> xml() {
+    return (DataFormat<SpinXmlElement>) INSTANCE.getDataFormatByName(XML_DATAFORMAT_NAME);
   }
 
   /**
    * Returns the global json data format that can be provided with
    * configuration that applies to any Spin json operation.
    */
-  public static JacksonJsonDataFormat json() {
-    return (JacksonJsonDataFormat) INSTANCE.getDataFormatByName(JSON_DATAFORMAT_NAME);
+  @SuppressWarnings("unchecked")
+  public static DataFormat<SpinJsonNode> json() {
+    return (DataFormat<SpinJsonNode>) INSTANCE.getDataFormatByName(JSON_DATAFORMAT_NAME);
   }
 
   // instance /////////////////////////////////////////////////////
@@ -101,8 +102,10 @@ public class DataFormats {
     // discover available custom dataformat providers on the classpath
     registerCustomDataFormats(dataFormats);
 
-    // register default providers
-    registerDefaultDataFormats(dataFormats);
+    // discover and apply data format configurators on the classpath
+    applyConfigurators(dataFormats);
+
+    LOG.logDataFormats(dataFormats.values());
 
     this.availableDataFormats = dataFormats;
   }
@@ -110,17 +113,10 @@ public class DataFormats {
   protected void registerCustomDataFormats(Map<String, DataFormat<?>> dataFormats) {
     // use java.util.ServiceLoader to load custom DataFormatProvider instances on the classpath
     ServiceLoader<DataFormatProvider> providerLoader = ServiceLoader.load(DataFormatProvider.class, Spin.class.getClassLoader());
-    for (DataFormatProvider provider : providerLoader) {
-      registerProvider(dataFormats, provider);
-    }
-  }
 
-  protected void registerDefaultDataFormats(Map<String, DataFormat<?>> dataFormats) {
-    if(!dataFormats.containsKey(JSON_DATAFORMAT_NAME)) {
-      registerProvider(dataFormats, new JacksonJsonDataFormatProvider());
-    }
-    if(!dataFormats.containsKey(XML_DATAFORMAT_NAME)) {
-      registerProvider(dataFormats, new DomXmlDataFormatProvider());
+    for (DataFormatProvider provider : providerLoader) {
+      LOG.logDataFormatProvider(provider);
+      registerProvider(dataFormats, provider);
     }
   }
 
@@ -134,6 +130,25 @@ public class DataFormats {
     else {
       DataFormat<?> dataFormatInstance = provider.createInstance();
       dataFormats.put(dataFormatName, dataFormatInstance);
+    }
+  }
+
+  @SuppressWarnings("rawtypes")
+  protected void applyConfigurators(Map<String, DataFormat<?>> dataFormats) {
+    ServiceLoader<DataFormatConfigurator> configuratorLoader = ServiceLoader.load(DataFormatConfigurator.class, Spin.class.getClassLoader());
+
+    for (DataFormatConfigurator configurator : configuratorLoader) {
+      LOG.logDataFormatConfigurator(configurator);
+      applyConfigurator(dataFormats, configurator);
+    }
+  }
+
+  @SuppressWarnings({ "rawtypes", "unchecked" })
+  protected void applyConfigurator(Map<String, DataFormat<?>> dataFormats, DataFormatConfigurator configurator) {
+    for (DataFormat<?> dataFormat : dataFormats.values()) {
+      if (configurator.getDataFormatClass().isAssignableFrom(dataFormat.getClass())) {
+        configurator.configure(dataFormat);
+      }
     }
   }
 

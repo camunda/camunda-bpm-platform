@@ -41,6 +41,16 @@
         <groupId>org.camunda.spin</groupId>
         <artifactId>camunda-spin-core</artifactId>
       </dependency>
+      
+      <dependency>
+        <groupId>org.camunda.spin</groupId>
+        <artifactId>camunda-spin-jackson-json-dataformat</artifactId>
+      </dependency>
+      
+      <dependency>
+        <groupId>org.camunda.spin</groupId>
+        <artifactId>camunda-spin-dom-xml-dataformat</artifactId>
+      </dependency>
 
       <dependency>
         <groupId>junit</groupId>
