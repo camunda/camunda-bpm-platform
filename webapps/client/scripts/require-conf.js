@@ -38,8 +38,9 @@ define(function() {
 
 
       'camunda-bpm-sdk':            'bower_components/camunda-bpm-sdk-js/camunda-bpm-sdk-angular',
-      'camunda-bpm-sdk-mock':       'bower_components/camunda-bpm-sdk-js/camunda-bpm-sdk-mock'
+      'camunda-bpm-sdk-mock':       'bower_components/camunda-bpm-sdk-js/camunda-bpm-sdk-mock',
 
+      'placeholders-js':            'bower_components/Placeholders.js/lib'
     },
 
     shim: {
@@ -67,6 +68,9 @@ define(function() {
                                       'snap-svg',
                                       'jquery',
                                       'sax'
+                                    ],
+
+      'placeholders-js':            [
                                     ],
 
       'camunda-tasklist-ui':        [
@@ -111,6 +115,10 @@ define(function() {
                                       'camunda-commons-ui/directives/autoFill',
                                       'camunda-commons-ui/directives/nl2br',
                                       'camunda-commons-ui/directives/compileTemplate',
+
+                                      'placeholders-js/utils',
+                                      'placeholders-js/main',
+                                      'placeholders-js/adapters/placeholders.jquery',
 
                                       'text!camunda-tasklist-ui/index.html',
                                       'json!locales/en.json',
