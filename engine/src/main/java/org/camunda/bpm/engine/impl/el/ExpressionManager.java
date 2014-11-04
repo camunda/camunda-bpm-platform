@@ -66,7 +66,6 @@ public class ExpressionManager {
     // Use the ExpressionFactoryImpl built-in version of juel, with parametrised method expressions enabled
     expressionFactory = new ExpressionFactoryImpl();
     this.beans = beans;
-    elResolver = createElResolver();
   }
 
   public Expression createExpression(String expression) {
@@ -96,10 +95,23 @@ public class ExpressionManager {
   }
 
   protected ProcessEngineElContext createElContext(VariableScope variableScope) {
+    ELResolver elResolver = getCachedElResolver();
     ProcessEngineElContext elContext = new ProcessEngineElContext(functionMappers, elResolver);
     elContext.putContext(ExpressionFactory.class, expressionFactory);
     elContext.putContext(VariableScope.class, variableScope);
     return elContext;
+  }
+
+  protected ELResolver getCachedElResolver() {
+    if (elResolver == null) {
+      synchronized(this) {
+        if (elResolver == null) {
+          elResolver = createElResolver();
+        }
+      }
+    }
+
+    return elResolver;
   }
 
   protected ELResolver createElResolver() {
