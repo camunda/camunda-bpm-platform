@@ -10,5 +10,7 @@
   "USE_GENERIC_FORM":
       "You can set variables, using a generic form, by clicking the \"Add a variable\" link below.",
   "EXTERNAL_FORM_LINK":
-      "Open external form"
+      "Open external form",
+  "SAVE_HINT":
+      "Save the current state of the form to complete it later"
 }

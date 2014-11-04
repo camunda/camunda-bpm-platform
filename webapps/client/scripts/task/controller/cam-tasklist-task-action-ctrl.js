@@ -6,9 +6,11 @@ define([
   return [
     '$scope',
     'Views',
+    'CamForm',
   function(
     $scope,
-    Views
+    Views,
+    CamForm
   ) {
 
     var taskData = $scope.taskData = $scope.tasklistData.newChild($scope);
@@ -19,6 +21,11 @@ define([
     taskData.observe('task', function(task) {
       $scope.task = task;
     });
+
+    /**
+     * remove outdated saved forms
+     */
+    CamForm.cleanLocalStorage(Date.now() - 7 * 24 * 60 * 60 * 1000);
 
     // plugins //////////////////////////////////////////////////////////////
 
