@@ -6,6 +6,68 @@ define([
   camSDK
 ) {
   'use strict';
+
+  function parseSearch(search, query) {
+    var searchRegEx = /^\s*(.*?)\s*(!=|<=|>=|like|[=<>])\s*(.*?)\s*$/;
+    var match = searchRegEx.exec(query);
+    if(match && match.length === 4) {
+      search.name = match[1];
+      search.operator = match[2];
+      search.value = match[3];
+      search.operators = getOperators(getType(parseValue(search.value)));
+      return true;
+    }
+    return false;
+  }
+  function createSearchObj(type) {
+    return {
+      type : type,
+      operator: "=",
+      operators: getOperators()
+    };
+  }
+  function getOperators(varType) {
+    switch(varType) {
+      case 'date':    return ["BEFORE", "AFTER"];
+      case 'boolean':
+      case 'object':  return ["=", "!="];
+      case 'number':  return ["=", "!=", "<", ">", "<=", ">="];
+      default:        return ["=", "!=", "<", ">", "<=", ">=", "like"];
+    }
+  }
+
+  var dateRegex = /(\d\d\d\d)-(\d\d)-(\d\d)T(\d\d):(\d\d):(\d\d)(?:.(\d\d\d)| )?$/;
+  function getType(value) {
+    if(value && typeof value === "string" && value.match(dateRegex)) {
+      return "date";
+    }
+    return typeof value;
+  }
+
+  function getDefaultOperator(valueType) {
+    switch(valueType) {
+      case 'date': return "AFTER";
+      default:     return "=";
+    }
+  }
+
+  function parseValue(value) {
+    if(!isNaN(value)) {
+      // value must be transformed to number
+      return +value;
+    }
+    if(value === "true") {
+      return true;
+    }
+    if(value === "false") {
+      return false;
+    }
+    if(value === "NULL") {
+      return null;
+    }
+    return value;
+  }
+
   return [
     '$scope',
     '$rootScope',
@@ -19,49 +81,16 @@ define([
     search,
     $location
   ) {
-    function parseSearch(search, query) {
-      var searchRegEx = /^\s*(.*?)\s*(!=|<=|>=|like|[=<>])\s*(.*?)\s*$/;
-      var match = searchRegEx.exec(query);
-      if(match && match.length === 4) {
-        search.name = match[1];
-        search.operator = match[2];
-        search.value = match[3];
-        search.operators = getOperators(getType(parseValue(search.value)));
-        return true;
-      }
-      return false;
-    }
-    function createSearchObj(type) {
-      return {
-        type : type,
-        operator: "=",
-        operators: getOperators()
-      };
-    }
-    function getOperators(varType) {
-      switch(varType) {
-        case 'date':    return ["BEFORE", "AFTER"];
-        case 'boolean':
-        case 'object':  return ["=", "!="];
-        case 'number':  return ["=", "!=", "<", ">", "<=", ">="];
-        default:        return ["=", "!=", "<", ">", "<=", ">=", "like"];
-      }
-    }
-
-    var dateRegex = /(\d\d\d\d)-(\d\d)-(\d\d)T(\d\d):(\d\d):(\d\d)(?:.(\d\d\d)| )?$/;
-    function getType(value) {
-      if(value && typeof value === "string" && value.match(dateRegex)) {
-        return "date";
-      }
-      return typeof value;
-    }
 
     $scope.types = ["Process Variable", "Task Variable", "Case Variable"];
     $scope.dropdownOpen = false;
 
     $scope.deleteSearch = function(idx) {
+      var needsUpdate = isValid($scope.searches[idx]);
       $scope.searches.splice(idx,1);
-      updateQuery();
+      if(needsUpdate) {
+        updateQuery();
+      }
     };
 
     $scope.createSearch = function(type){
@@ -71,7 +100,9 @@ define([
         search.operators = getOperators(getType(parseValue(search.value)));
       }
       $scope.searches.push(search);
-      updateQuery();
+      if(isValid(search)) {
+        updateQuery();
+      }
 
       // need to use timeout, because jQuery initiates an apply cycle
       // while the current apply cycle is still in progress
@@ -80,15 +111,9 @@ define([
       $scope.inputQuery = "";
     };
 
-    function getDefaultOperator(valueType) {
-      switch(valueType) {
-        case 'date': return "AFTER";
-        default:     return "=";
-      }
-    }
-
     $scope.changeSearch = function(idx, field, value) {
       var search = $scope.searches[idx];
+      var needsUpdate = isValid(search);
       search[field] = value;
       var valueType = getType(parseValue(search.value));
       search.operators = getOperators(valueType);
@@ -97,7 +122,9 @@ define([
         // fall back to default operator
         search.operator = getDefaultOperator(valueType);
       }
-      updateQuery();
+      if(needsUpdate || isValid(search)) {
+        updateQuery();
+      }
     };
 
     $scope.selectType = function(type) {
@@ -121,22 +148,6 @@ define([
          search.operators.indexOf(search.operator) !== -1 &&
          search.name &&
          search.value;
-    }
-    function parseValue(value) {
-      if(!isNaN(value)) {
-        // value must be transformed to number
-        return +value;
-      }
-      if(value === "true") {
-        return true;
-      }
-      if(value === "false") {
-        return false;
-      }
-      if(value === "NULL") {
-        return null;
-      }
-      return value;
     }
 
     var tasklistData = $scope.tasklistData.newChild($scope);

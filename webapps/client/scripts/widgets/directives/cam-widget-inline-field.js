@@ -133,13 +133,13 @@ define([
         }
 
         scope.changeType = function() {
-          reset();
-          scope.editing = true;
           if(scope.varType === "datetime") {
             scope.varType = "text";
           } else {
             scope.varType = 'datetime';
           }
+          reset();
+          scope.editing = true;
           element[0].attributes.type.value = scope.varType;
           scope.simpleField = isSimpleField();
         };
