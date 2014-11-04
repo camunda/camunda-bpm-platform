@@ -1,14 +1,11 @@
 <div class="alert alert-danger"
      ng-if="error">
-  {{ error.message }}
+  <span>
+    <strong>{{ 'DIAGRAM_RENDER_FAILURE' | translate }}:</strong>
+  </span>
+  <span>
+   {{ error.message }}
+  </span>
 </div>
 
-<div ng-if="rendering && !error"
-     class="diagram-loader">
-  <div>
-    <i class="animate-spin glyphicon glyphicon-refresh"></i>
-    {{ 'RENDERING' | translate }}
-  </div>
-</div>
-
-<div ng-show="!rendering && !error" class="diagram-holder"></div>
+<div ng-show="!error" class="diagram-holder"></div>

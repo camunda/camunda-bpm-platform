@@ -69,6 +69,8 @@
         "Diagram",
   "RENDERING":
         "Rendering…",
+  "DIAGRAM_RENDER_FAILURE":
+        "Failure",
   "FORM":
         "Form",
   "NO_TASK_FORM":

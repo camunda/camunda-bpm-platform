@@ -38,7 +38,7 @@
     "bootstrap": "~3.1.1",
     "hyperagent": "*",
     "jquery": "2.1.1",
-    "bpmn-js": "~0.5.1",
+    "bpmn-js": "0.5.1-1-viewer-fixes",
     "angular-data-depend": "git@github.com:camunda-third-party/angular-data-depend.git",
     "camunda-bpm-sdk-js": "git@github.com:camunda/bower-camunda-bpm-sdk-js#7.2.0-SNAPSHOT",
     "Placeholders.js": "~3.0.2"
