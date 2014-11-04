@@ -169,6 +169,7 @@ public class CdiEventListener implements TaskListener, ExecutionListener, Serial
     }
 
     if (event.getType() == BusinessProcessEventType.TAKE) {
+<<<<<<< HEAD
       withActivityName.add(new TakeTransitionLiteral(event.getTransitionName()));
       withoutActivityName.add(new TakeTransitionLiteral());
     } else if (event.getType() == BusinessProcessEventType.START_ACTIVITY) {
@@ -191,5 +192,35 @@ public class CdiEventListener implements TaskListener, ExecutionListener, Serial
       withoutActivityName.add(new DeleteTaskLiteral());
     }
     return both;
+=======
+      annotations.add(new TakeTransitionLiteral(event.getTransitionName()));
+      annotations.add(new TakeTransitionLiteral(""));
+    }
+    else if (event.getType() == BusinessProcessEventType.START_ACTIVITY) {
+      annotations.add(new StartActivityLiteral(event.getActivityId()));
+      annotations.add(new StartActivityLiteral(""));
+    }
+    else if (event.getType() == BusinessProcessEventType.END_ACTIVITY) {
+      annotations.add(new EndActivityLiteral(event.getActivityId()));
+      annotations.add(new EndActivityLiteral(""));
+    }
+    else if (event.getType() == BusinessProcessEventType.CREATE_TASK) {
+      annotations.add(new CreateTaskLiteral(event.getTaskDefinitionKey()));
+      annotations.add(new CreateTaskLiteral(""));
+    }
+    else if (event.getType() == BusinessProcessEventType.ASSIGN_TASK) {
+      annotations.add(new AssignTaskLiteral(event.getTaskDefinitionKey()));
+      annotations.add(new AssignTaskLiteral(""));
+    }
+    else if (event.getType() == BusinessProcessEventType.COMPLETE_TASK) {
+      annotations.add(new CompleteTaskLiteral(event.getTaskDefinitionKey()));
+      annotations.add(new CompleteTaskLiteral(""));
+    }
+    else if (event.getType() == BusinessProcessEventType.DELETE_TASK) {
+      annotations.add(new DeleteTaskLiteral(event.getTaskDefinitionKey()));
+      annotations.add(new DeleteTaskLiteral(""));
+    }
+    return annotations.toArray(new Annotation[annotations.size()]);
+>>>>>>> 79016c5fba8ba634a9299e09cc7d7313cb905d3b
   }
 }
