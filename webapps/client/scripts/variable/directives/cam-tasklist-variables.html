@@ -34,13 +34,13 @@
 
           <a class="variable-value variable-type"
              ng-switch-when="Object"
-             ng-click="showValue(variablesByName[info.name])">
+             ng-click="showValue(variablesByName[info.name], $event)">
             {{ variablesByName[info.name].valueInfo.objectTypeName }}
           </a>
 
           <a class="variable-value"
              ng-switch-when="Bytes"
-             ng-click="download(variablesByName[info.name])">
+             ng-click="download(variablesByName[info.name], $event)">
             {{ 'DOWNLOAD' | translate }}
             <span class="glyphicon glyphicon-download"></span>
           </a>

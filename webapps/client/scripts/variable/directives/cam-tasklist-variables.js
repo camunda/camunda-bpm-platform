@@ -40,9 +40,12 @@ define([
           if ($event && $event.preventDefault) {
             $event.preventDefault();
           }
+          $event.stopPropagation();
         };
 
-        scope.showValue = function(variable) {
+        scope.showValue = function(variable, $event) {
+          $event.preventDefault();
+          $event.stopPropagation();
           $modal.open({
             template: modalTemplate,
 
@@ -56,7 +59,9 @@ define([
           });
         };
 
-        scope.download = function(variable) {
+        scope.download = function(variable, $event) {
+          $event.preventDefault();
+          $event.stopPropagation();
           var link = variable._links.self.href +'/data';
           link = Uri.appUri('engine://engine/:engine'+ link);
           $window.open(link, 'download');
