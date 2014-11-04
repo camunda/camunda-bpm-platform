@@ -36,6 +36,7 @@
     <module name="org.camunda.bpm.camunda-engine" />
     <module name="org.camunda.bpm.identity.camunda-identity-ldap" />
     <module name="org.camunda.spin.camunda-spin-all" />
+    <module name="org.camunda.connect.camunda-connect-all" />
 
     <!-- for LDAP plugin only -->
     <module name="sun.jdk" />

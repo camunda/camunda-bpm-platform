@@ -82,6 +82,11 @@
     </dependency>
 
     <dependency>
+      <groupId>org.camunda.connect</groupId>
+      <artifactId>camunda-connect-all</artifactId>
+    </dependency>
+
+    <dependency>
       <groupId>org.camunda.bpm</groupId>
       <artifactId>camunda-engine-rest</artifactId>
       <classifier>classes</classifier>
