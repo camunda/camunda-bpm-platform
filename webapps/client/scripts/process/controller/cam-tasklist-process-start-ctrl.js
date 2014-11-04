@@ -73,7 +73,7 @@ define([
     }]);
 
     $scope.open = function() {
-      processData.set('processDefinitionQuery', DEFAULT_PROCESS_DEFINITION_QUERY);
+      processData.set('processDefinitionQuery', angular.copy(DEFAULT_PROCESS_DEFINITION_QUERY));
       $modal.open({
         size: 'lg',
         controller: 'camProcessStartModalCtrl',
