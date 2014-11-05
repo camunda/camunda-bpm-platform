@@ -1,10 +1,7 @@
 var camTasklistConf = {
-  "dateFormat": {
-    "monthName": "MMMM",
-    "day": "DD",
-    "abbr": "lll",
-    "normal": "LLL",
-    "long": "LLLL",
-    "short": "LL"
-  }
+  // configure the date format
+  // "dateFormat": {
+  //   "normal": "LLL",
+  //   "long":   "LLLL"
+  // }
 };
