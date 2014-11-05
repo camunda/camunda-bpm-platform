@@ -8,7 +8,6 @@ define([
   './controllers/cam-task-search-ctrl',
   './controllers/cam-layout-ctrl',
   './filters/cam-query-component',
-  'camunda-tasklist-ui/utils',
   'camunda-commons-ui/util/index'
 ], function(
   angular,
@@ -20,7 +19,6 @@ define([
   camQueryComponentFilter
 ) {
   var navigationModule = angular.module('cam.tasklist.navigation', [
-    require('camunda-tasklist-ui/utils').name,
     require('camunda-commons-ui/util/index').name,
     'ui.bootstrap',
     'cam.tasklist.user'

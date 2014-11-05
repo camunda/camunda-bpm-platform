@@ -19,7 +19,6 @@ define([
   './directives/cam-tasklist-tasks',
   './controller/cam-edit-filter-ctrl',
   './modals/cam-tasklist-filter-form',
-  'camunda-tasklist-ui/utils',
   'camunda-tasklist-ui/api'
 ], function(
   require,
@@ -29,12 +28,10 @@ define([
   camTasklistFilterTasks,
   camEditFilterCtrl,
   camTasklistFilterForm,
-  utils,
   api
 ) {
 
   var filterModule = angular.module('cam.tasklist.filter', [
-    utils.name,
     api.name,
     'ui.bootstrap',
     'cam.widget',

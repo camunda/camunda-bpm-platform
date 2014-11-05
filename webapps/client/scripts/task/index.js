@@ -29,7 +29,6 @@ define([
   /* modals */
   './modals/cam-tasklist-groups-modal',
 
-  'camunda-tasklist-ui/utils',
   'camunda-tasklist-ui/api',
   'angular-bootstrap'
 
@@ -62,7 +61,6 @@ define([
 ) {
 
   var taskModule = angular.module('cam.tasklist.task', [
-    require('camunda-tasklist-ui/utils').name,
     require('camunda-tasklist-ui/api').name,
     'ui.bootstrap',
     'cam.widget',

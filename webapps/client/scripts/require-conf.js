@@ -95,7 +95,6 @@ define(function() {
                                       'camunda-tasklist-ui/config/uris',
 
                                       'camunda-tasklist-ui/api',
-                                      'camunda-tasklist-ui/utils',
                                       'camunda-tasklist-ui/user',
                                       'camunda-tasklist-ui/widgets',
                                       'camunda-tasklist-ui/filter',
