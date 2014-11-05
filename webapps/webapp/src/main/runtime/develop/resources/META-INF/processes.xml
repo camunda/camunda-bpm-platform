@@ -10,7 +10,12 @@
       <property name="authorizationEnabled">true</property>
       <property name="history">full</property>
     </properties>
-
+    
+    <plugins>
+      <plugin>
+        <class>org.camunda.spin.plugin.SpinProcessEnginePlugin</class>
+      </plugin>
+    </plugins>
   </process-engine>
 
   <process-engine name="engine2">
@@ -19,6 +24,12 @@
       <property name="jdbcUrl">jdbc:h2:mem:activiti2;MVCC=TRUE;TRACE_LEVEL_FILE=0;DB_CLOSE_ON_EXIT=FALSE</property>
       <property name="authorizationEnabled">true</property>
     </properties>
+    
+    <plugins>
+      <plugin>
+        <class>org.camunda.spin.plugin.SpinProcessEnginePlugin</class>
+      </plugin>
+    </plugins>
   </process-engine>
 
   <process-engine name="engine3">
@@ -27,6 +38,12 @@
       <property name="jdbcUrl">jdbc:h2:mem:activiti3;MVCC=TRUE;TRACE_LEVEL_FILE=0;DB_CLOSE_ON_EXIT=FALSE</property>
       <property name="authorizationEnabled">true</property>
     </properties>
+    
+    <plugins>
+      <plugin>
+        <class>org.camunda.spin.plugin.SpinProcessEnginePlugin</class>
+      </plugin>
+    </plugins>
   </process-engine>
 
   <process-archive name="test-processes">

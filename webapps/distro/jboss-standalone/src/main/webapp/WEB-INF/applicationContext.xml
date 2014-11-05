@@ -38,6 +38,7 @@
       <list>
         <!--<ref bean="ldapIdentityProviderPlugin" />-->
         <!--<ref bean="administratorAuthorizationPlugin" />-->
+        <bean id="spinPlugin" class="org.camunda.spin.plugin.SpinProcessEnginePlugin" />
       </list>
     </property>
   </bean>

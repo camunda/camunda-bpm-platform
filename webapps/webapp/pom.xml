@@ -354,6 +354,10 @@
           <artifactId>camunda-engine</artifactId>
         </dependency>
         <dependency>
+          <groupId>org.camunda.spin</groupId>
+          <artifactId>camunda-spin-all</artifactId>
+        </dependency>
+        <dependency>
           <groupId>org.camunda.bpm.identity</groupId>
           <artifactId>camunda-identity-ldap</artifactId>
           <version>${project.version}</version>
