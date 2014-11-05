@@ -12,5 +12,19 @@
   "EXTERNAL_FORM_LINK":
       "Open external form",
   "SAVE_HINT":
-      "Save the current state of the form to complete it later"
+      "Save the current state of the form to complete it later",
+  "ADD_VARIABLE":
+                        "Add a variable",
+  "NAME":
+                        "Name",
+  "TYPE":
+                        "Type",
+  "VALUE":
+                        "Value",
+  "VARIABLE_NAME":
+                        "Variable name",
+  "VARIABLE_TYPE":
+                        "Variable type",
+  "VARIABLE_VALUE":
+                        "Variable value"
 }

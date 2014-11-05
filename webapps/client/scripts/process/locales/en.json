@@ -12,15 +12,5 @@
   "START_PROCESS":
                         "Start a process",
   "CLICK_PROCESS_TO_START":
-                        "Click on the process to start.",
-  "VARIABLE_NAME":
-                        "Variable name",
-  "ADD_VARIABLE":
-                        "Add a variable",
-  "TYPE":
-                        "Type",
-  "VALUE":
-                        "Value",
-  "VARIABLE_TYPE":
-                        "Variable type"
+                        "Click on the process to start."
 }

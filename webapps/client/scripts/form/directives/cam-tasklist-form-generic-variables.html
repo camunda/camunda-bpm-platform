@@ -1,72 +1,111 @@
-<div class="row">
-  <div class="col-xs-12 col-md-2 text-right">
-    <button type="button"
-            class="btn btn-link"
-            ng-click="addVariable()"
-            ng-disabled="options.disableAddVariableButton">
-      {{ 'ADD_VARIABLE' | translate }}
-      <i class="glyphicon glyphicon-plus-sign"></i>
-    </button>
-  </div>
-</div>
+<form name="generic-form"
+      class="form-horizontal">
 
-<form name="generic-form">
-  <div ng-if="variables.length"
-       ng-repeat="(delta, variable) in variables"
-       class="form-group row">
-
-    <div class="col-xs-2 text-right">
-      <a ng-click="removeVariable(delta)">
-        <i class="glyphicon glyphicon-minus-sign"></i>
+  <div class="form-group labels-left">
+    <div class="col-xs-2 row-action">
+      <a ng-click="addVariable()"
+         ng-disabled="options.disableAddVariableButton">
+        <span class="hidden-xs hidden-sm"
+              translate="ADD_VARIABLE">Add variable</span>
+        <span class="glyphicon glyphicon-plus-sign"></span>
       </a>
     </div>
 
-    <div class="col-xs-3">
-      <input required
-             type="text"
-             class="form-control"
-             placeholder="{{ 'VARIABLE_NAME' | translate }}"
-             ng-model="variable.name" />
-    </div>
 
-    <div class="col-xs-3">
-      <select required
-              class="form-control"
-              placeholder="{{ 'VARIABLE_TYPE' | translate }}"
-              ng-model="variable.type">
 
-        <option disabled value="" translate="TYPE">Type</option>
+    <div class="col-xs-10"
+         ng-if="variables.length">
+      <div class="row">
+        <label class="control-label col-xs-4"
+               translate="NAME">Name</label>
 
-        <option ng-repeat="(type, inputType) in variableTypes"
-                value="{{ type }}">{{ type | translate }}</option>
-      </select>
-    </div>
 
-    <div class="col-xs-4">
 
-      <div ng-switch="variable.type">
+        <label class="control-label col-xs-4"
+               translate="TYPE">Type</label>
 
-        <div ng-switch-when="Boolean" class="checkbox">
-          <label>
-            <input type="checkbox"
-                   ng-model="variable.value"
-                   ng-checked="variable.value"
-                   class="form-control"
-                   cam-variable-name="{{ variable.name }}"
-                   cam-variable-type="{{ variable.type }}" />
-          </label>
-        </div>
 
-       <input ng-switch-default
-              required
-              type="{{ variableTypes[variable.type] }}"
-              class="form-control"
-              placeholder="{{ 'VALUE' | translate }}"
-              ng-model="variable.value"
-              cam-variable-name="{{ variable.name }}"
-              cam-variable-type="{{ variable.type }}" />
+
+        <label class="control-label col-xs-4"
+               translate="VALUE">Value</label>
       </div>
     </div>
+  </div>
 
+
+
+  <div ng-if="variables.length"
+       ng-repeat="(delta, variable) in variables"
+       class="form-group">
+
+    <div class="col-xs-2 row-action">
+      <a ng-click="removeVariable(delta)">
+        <span class="hidden-sm hidden-xs"
+              translate="REMOVE">Remove</span>
+        <span class="glyphicon glyphicon-minus-sign"></span>
+      </a>
+    </div>
+
+
+
+    <div class="col-xs-10">
+      <div class="row">
+        <div class="col-xs-4">
+          <input required
+                 type="text"
+                 class="form-control"
+                 placeholder="{{ 'VARIABLE_NAME' | translate }}"
+                 ng-model="variable.name" />
+        </div>
+
+
+
+        <div class="col-xs-4">
+          <select required
+                  ng-readonly="!variable.name"
+                  class="form-control"
+                  placeholder="{{ 'VARIABLE_TYPE' | translate }}"
+                  ng-model="variable.type">
+
+            <option disabled
+                    value=""
+                    translate="TYPE">Type</option>
+
+            <option ng-repeat="(type, inputType) in variableTypes"
+                    value="{{ type }}">{{ type | translate }}</option>
+          </select>
+        </div>
+
+
+
+        <div class="col-xs-4"
+             ng-switch="variable.type">
+          <input ng-switch-when=""
+                 readonly
+                 type="text"
+                 class="form-control"
+                 placeholder="{{ 'VARIABLE_VALUE' | translate }}" />
+
+
+          <input ng-switch-when="Boolean"
+                 class="form-control"
+                 type="checkbox"
+                 ng-model="variable.value"
+                 ng-checked="variable.value"
+                 cam-variable-name="{{ variable.name }}"
+                 cam-variable-type="{{ variable.type }}" />
+
+
+          <input ng-switch-default
+                 class="form-control"
+                 type="{{ variableTypes[variable.type] }}"
+                 required
+                 ng-model="variable.value"
+                 cam-variable-name="{{ variable.name }}"
+                 cam-variable-type="{{ variable.type }}"
+                 placeholder="{{ 'VARIABLE_VALUE' | translate }}" />
+        </div>
+      </div>
+    </div>
   </div>
 </form>
