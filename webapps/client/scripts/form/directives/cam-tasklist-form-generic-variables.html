@@ -54,6 +54,7 @@
           <input required
                  type="text"
                  class="form-control"
+                 ng-pattern="/^[a-z]{1}[a-zA-Z0-9_]*$/"
                  placeholder="{{ 'VARIABLE_NAME' | translate }}"
                  ng-model="variable.name" />
         </div>
@@ -84,6 +85,50 @@
                  readonly
                  type="text"
                  class="form-control"
+                 placeholder="{{ 'VARIABLE_VALUE' | translate }}" />
+
+
+          <input ng-switch-when="Date"
+                 class="form-control"
+                 type="text"
+                 required
+                 placeholder="yyyy-MM-ddTHH:mm:ss"
+                 ng-pattern="/^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}([0-9]{2}|)$/"
+                 ng-model="variable.value"
+                 cam-variable-name="{{ variable.name }}"
+                 cam-variable-type="{{ variable.type }}" />
+
+
+          <input ng-switch-when="Short"
+                 class="form-control"
+                 type="number"
+                 required
+                 ng-model="variable.value"
+                 ng-pattern="/^(-|)[0-9]+$/"
+                 min="-32768"
+                 max="32768"
+                 cam-variable-name="{{ variable.name }}"
+                 cam-variable-type="{{ variable.type }}"
+                 placeholder="{{ 'VARIABLE_VALUE' | translate }}" />
+
+          <input ng-switch-when="Double"
+                 class="form-control"
+                 type="text"
+                 required
+                 ng-model="variable.value"
+                 ng-pattern="/^(-|)[0-9]+(\.[0-9]+|)$/"
+                 cam-variable-name="{{ variable.name }}"
+                 cam-variable-type="{{ variable.type }}"
+                 placeholder="{{ 'VARIABLE_VALUE' | translate }}" />
+
+          <input ng-switch-when="Long"
+                 class="form-control"
+                 type="text"
+                 required
+                 ng-model="variable.value"
+                 ng-pattern="/^(-|)[0-9]+$/"
+                 cam-variable-name="{{ variable.name }}"
+                 cam-variable-type="{{ variable.type }}"
                  placeholder="{{ 'VARIABLE_VALUE' | translate }}" />
 
 
