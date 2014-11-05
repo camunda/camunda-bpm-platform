@@ -22,32 +22,32 @@ define([
   function createSearchObj(type) {
     return {
       type : type,
-      operator: "=",
+      operator: '=',
       operators: getOperators()
     };
   }
   function getOperators(varType) {
     switch(varType) {
-      case 'date':    return ["BEFORE", "AFTER"];
+      case 'date':    return ['BEFORE', 'AFTER'];
       case 'boolean':
-      case 'object':  return ["=", "!="];
-      case 'number':  return ["=", "!=", "<", ">", "<=", ">="];
-      default:        return ["=", "!=", "<", ">", "<=", ">=", "like"];
+      case 'object':  return ['=', '!='];
+      case 'number':  return ['=', '!=', '<', '>', '<=', '>='];
+      default:        return ['=', '!=', '<', '>', '<=', '>=', 'like'];
     }
   }
 
   var dateRegex = /(\d\d\d\d)-(\d\d)-(\d\d)T(\d\d):(\d\d):(\d\d)(?:.(\d\d\d)| )?$/;
   function getType(value) {
-    if(value && typeof value === "string" && value.match(dateRegex)) {
-      return "date";
+    if(value && typeof value === 'string' && value.match(dateRegex)) {
+      return 'date';
     }
     return typeof value;
   }
 
   function getDefaultOperator(valueType) {
     switch(valueType) {
-      case 'date': return "AFTER";
-      default:     return "=";
+      case 'date': return 'AFTER';
+      default:     return '=';
     }
   }
 
@@ -56,13 +56,13 @@ define([
       // value must be transformed to number
       return +value;
     }
-    if(value === "true") {
+    if(value === 'true') {
       return true;
     }
-    if(value === "false") {
+    if(value === 'false') {
       return false;
     }
-    if(value === "NULL") {
+    if(value === 'NULL') {
       return null;
     }
     return value;
@@ -70,19 +70,22 @@ define([
 
   return [
     '$scope',
-    '$rootScope',
     '$timeout',
     'search',
     '$location',
   function(
     $scope,
-    $rootScope,
     $timeout,
     search,
     $location
   ) {
 
-    $scope.types = ["Process Variable", "Task Variable", "Case Variable"];
+    function getPropertyFromLocation(property) {
+      var search = $location.search() || {};
+      return search[property] || null;
+     }
+
+    $scope.types = ['Process Variable', 'Task Variable', 'Case Variable'];
     $scope.dropdownOpen = false;
 
     $scope.deleteSearch = function(idx) {
@@ -108,7 +111,7 @@ define([
       // while the current apply cycle is still in progress
       $timeout(function(){angular.element('.search-container > input').blur();});
       $scope.dropdownOpen = false;
-      $scope.inputQuery = "";
+      $scope.inputQuery = '';
     };
 
     $scope.changeSearch = function(idx, field, value) {
@@ -151,6 +154,7 @@ define([
     }
 
     var tasklistData = $scope.tasklistData.newChild($scope);
+
     function updateQuery() {
       var outArray = [];
       angular.forEach($scope.searches, function(search) {
@@ -163,6 +167,7 @@ define([
           });
         }
       });
+
       search.updateSilently({
         query: JSON.stringify(outArray)
       });
@@ -170,11 +175,8 @@ define([
       tasklistData.changed('taskListQuery');
     }
 
-     function getPropertyFromLocation(property) {
-       var search = $location.search() || {};
-       return search[property] || null;
-     }
      tasklistData.observe('taskListQuery', function(taskListQuery) {
+
        var search, i;
        for(i = 0; i < $scope.searches.length; i++) {
          search = $scope.searches[i];
@@ -184,7 +186,8 @@ define([
          }
        }
 
-       var searches = JSON.parse(getPropertyFromLocation("query"));
+       var searches = JSON.parse(getPropertyFromLocation('query'));
+       
        if(searches) {
          for(i=0; i < searches.length; i++) {
            search = searches[i];
@@ -194,6 +197,7 @@ define([
            $scope.searches.unshift(search);
          }
        }
+
      });
   }];
 });

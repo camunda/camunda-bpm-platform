@@ -12,8 +12,7 @@ define([
       restrict: 'EAC',
 
       scope: {
-        tasklistData: '=',
-        tasklistApp: '='
+        tasklistData: '='
       },
 
       link: function(scope, element, attrs) {

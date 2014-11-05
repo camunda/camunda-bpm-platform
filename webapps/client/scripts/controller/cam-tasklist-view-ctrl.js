@@ -11,6 +11,24 @@ define([
     };
   }
 
+  var operatorTable = {
+    "<" : "lt",
+    ">" : "gt",
+    "=" : "eq",
+    "!=": "neq",
+    ">=": "gteq",
+    "<=": "lteq",
+    "like":"like",
+    "BEFORE":"lteq",
+    "AFTER":"gteq"
+  };
+
+  var typeTable = {
+    "Process Variable" : "processVariables",
+    "Task Variable" : "taskVariables",
+    "Case Variable" : "caseInstanceVariables"
+  };
+
   return [
     '$scope',
     '$q',
@@ -34,6 +52,10 @@ define([
       return search[property] || null;
     }
 
+    function updateSilently(params) {
+      search.updateSilently(params);
+    }
+
     $scope.$on('$destroy', function () {
       $scope.tasklistApp.refreshProvider = null;
     });
@@ -41,6 +63,7 @@ define([
     // init data depend for task list data
     var tasklistData = $scope.tasklistData = dataDepend.create($scope);
 
+    // init taslist app with a refresh provider
     if ($scope.tasklistApp) {
       $scope.tasklistApp.refreshProvider = getRefreshProvider(tasklistData);
     }
@@ -49,29 +72,37 @@ define([
     var taskId = getPropertyFromLocation('task');
     var detailsTab = getPropertyFromLocation('detailsTab');
 
+    // resources
     var Filter = camAPI.resource('filter');
     var Task = camAPI.resource('task');
+
+    // current selected filter
+    var currentFilter;
+
+    // provide /////////////////////////////////////////////////////////////////////////////////
 
     /**
      * Provides the list of filters
      */
     tasklistData.provide('filters', [ function() {
       var deferred = $q.defer();
+
       Filter.list({
         itemCount: false,
         resoureType: 'Task'
       }, function(err, res) {
         if(!!err) {
           deferred.reject(err);
+
         }
         else {
           deferred.resolve(res);
         }
       });
+
       return deferred.promise;
     }]);
 
-    var currentFilter;
     tasklistData.provide('currentFilter', ['filters', function(filters) {
 
       var focused,
@@ -89,65 +120,61 @@ define([
           }
       }
       if(currentFilter) {
-        search.updateSilently({
-          page: "1"
+        updateSilently({
+          page: '1'
         });
       }
+
       if(focused && focused.id !== filterId) {
-        search.updateSilently({
+        updateSilently({
           filter: focused.id
         });
       }
+
       return angular.copy(focused);
+
     }]);
 
-    tasklistData.observe('currentFilter', function(_currentFilter) {
-      currentFilter = _currentFilter;
-    });
-    var operatorTable = {
-      "<" : "lt",
-      ">" : "gt",
-      "=" : "eq",
-      "!=": "neq",
-      ">=": "gteq",
-      "<=": "lteq",
-      "like":"like",
-      "BEFORE":"lteq",
-      "AFTER":"gteq"
-    };
-    var typeTable = {
-      "Process Variable" : "processVariables",
-      "Task Variable" : "taskVariables",
-      "Case Variable" : "caseInstanceVariables"
-    };
     tasklistData.provide('taskListQuery', ['currentFilter', function(currentFilter) {
       if (!currentFilter) {
         return null;
       }
 
-      var searches = JSON.parse(getPropertyFromLocation("query"));
+      var querySearchParam = getPropertyFromLocation('query');
+      var searches = JSON.parse(querySearchParam);
+
       var query = {};
+
       query.processVariables = [];
       query.taskVariables = [];
       query.caseInstanceVariables = [];
+
       angular.forEach(searches, function(search) {
+
          query[typeTable[search.type]].push({
            name: search.name,
            operator: operatorTable[search.operator],
            value: search.value
          });
+
       });
+
+      var firstResult = (getPropertyFromLocation('page') - 1 || 0) * 15;
+      var sortBy = getPropertyFromLocation('sortBy') || 'priority';
+      var sortOrder = getPropertyFromLocation('sortOrder') || 'asc';
+
       return {
         id : currentFilter.id,
-        firstResult : ($location.search().page - 1 || 0) * 15,
+        firstResult : firstResult,
         maxResults : 15,
-        sortBy : $location.search().sortBy || 'priority',
-        sortOrder: $location.search().sortOrder || 'asc',
+        sortBy : sortBy,
+        sortOrder: sortOrder,
         active: true,
-        processVariables : query.processVariables, //$scope.tasklistApp.searchProvider.get("processVariables"),
+        processVariables : query.processVariables,
         taskVariables : query.taskVariables,
         caseInstanceVariables : query.caseInstanceVariables
       };
+
     }]);
 
      /**
@@ -176,25 +203,6 @@ define([
        }
        return deferred.promise;
      }]);
-
-
-    // automatically refresh the taskList every 10 seconds so that changes (such as claims) are represented in realtime
-    var intervalPromise;
-    tasklistData.observe("currentFilter", function(currentFilter) {
-      // stop current refresh
-      if(intervalPromise) {
-        $interval.cancel(intervalPromise);
-      }
-      if(currentFilter && currentFilter.properties.refresh) {
-        intervalPromise = $interval(function(){
-          if($scope.tasklistApp && $scope.tasklistApp.refreshProvider) {
-            $scope.tasklistApp.refreshProvider.refreshTaskList();
-          } else {
-            $interval.cancel(intervalPromise);
-          }
-        }, 10000);
-      }
-    });
 
    /**
      * Provide current task id
@@ -228,6 +236,41 @@ define([
 
       return deferred.promise;
     }]);
+
+    // observe //////////////////////////////////////////////////////////////////////////////
+
+
+    tasklistData.observe('currentFilter', function(_currentFilter) {
+      currentFilter = _currentFilter;
+    });
+    
+    /*
+     * automatically refresh the taskList every 10 seconds so that changes
+     * (such as claims) are represented in realtime
+     */
+    var intervalPromise;
+    tasklistData.observe('currentFilter', function(currentFilter) {
+      // stop current refresh
+      if(intervalPromise) {
+        $interval.cancel(intervalPromise);
+      }
+
+      if(currentFilter && currentFilter.properties.refresh) {
+        intervalPromise = $interval(function(){
+
+          if($scope.tasklistApp && $scope.tasklistApp.refreshProvider) {
+            $scope.tasklistApp.refreshProvider.refreshTaskList();
+
+          }
+          else {
+            $interval.cancel(intervalPromise);
+          }
+
+        }, 10000);
+      }
+    });
+
+    // routeChanged listener ////////////////////////////////////////////////////////////////
 
     /**
      * Update task if location changes

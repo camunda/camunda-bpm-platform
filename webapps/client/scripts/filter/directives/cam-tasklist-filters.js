@@ -6,6 +6,7 @@ define([
   angular
 ) {
   'use strict';
+  
   var $ = angular.element;
   var each = angular.forEach;
 
@@ -22,14 +23,10 @@ define([
 
       controller: [
         '$scope',
-        '$q',
-        '$location',
         'search',
         'camAPI',
       function (
         $scope,
-        $q,
-        $location,
         search,
         camAPI
       ) {

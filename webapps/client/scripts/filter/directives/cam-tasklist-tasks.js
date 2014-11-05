@@ -37,6 +37,10 @@ define([
         search
       ) {
 
+        function updateSilently(params) {
+          search.updateSilently(params);
+        }
+
         $scope.pageNum = 1;
         $scope.pageSize = null;
         $scope.totalItems = 0;
@@ -94,7 +98,7 @@ define([
 
           var searchParams = $location.search() || {};
           searchParams.task = taskId;
-          search.updateSilently(searchParams);
+          updateSilently(searchParams);
         };
 
         /**
@@ -102,28 +106,18 @@ define([
          */
         $scope.pageChange = function() {
           // update query
-          search.updateSilently({
+          updateSilently({
             page:  $scope.pageNum
           });
           tasksData.changed('taskListQuery');
         };
 
          $scope.resetPage = function() {
-           search.updateSilently({
+           updateSilently({
              page: 1
            });
            tasksData.changed('taskListQuery');
          };
-
-        $scope.getHrefUrl = function (task) {
-          var href = '#/?task=' + task.id;
-          var detailsTab = $location.search().detailsTab;
-          if (detailsTab) {
-            href = href + '&detailsTab=' + detailsTab;
-          }
-
-          return href;
-        };
 
       }]
     };
