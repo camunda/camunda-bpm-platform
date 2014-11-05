@@ -38,6 +38,15 @@ module.exports = function(config) {
       ]
     },
 
+    config: {
+      files: [
+        '<%= pkg.gruntConfig.clientDir %>/scripts/config/config.js'
+      ],
+      tasks: [
+        'copy:config'
+      ]
+    },
+
     sdk: {
       files: [
         // 'grunt/config/require.js',

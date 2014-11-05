@@ -106,6 +106,7 @@ define(function() {
                                       'camunda-tasklist-ui/controller/cam-tasklist-view-ctrl',
                                       'camunda-tasklist-ui/form',
                                       'camunda-tasklist-ui/services/cam-tasklist-assign-notification',
+                                      'camunda-tasklist-ui/services/cam-tasklist-configuration',
 
                                       'bootstrap/collapse',
                                       'camunda-tasklist-ui/navigation/index',

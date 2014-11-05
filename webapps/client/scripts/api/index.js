@@ -59,7 +59,7 @@ function(
                   exclusive: true
                 });
               });
-              
+
               // broadcast event that a login is required
               // proceeds a redirect to /login
               $rootScope.$broadcast('authentication.login.required');
@@ -96,7 +96,6 @@ function(
       HttpClient: camAPIHttpClient,
       engine: Uri.appUri(':engine')
     };
-
     if ($window.tasklistConf) {
       for (var c in $window.tasklistConf) {
         conf[c] = $window.tasklistConf[c];

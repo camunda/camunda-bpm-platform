@@ -23,7 +23,6 @@ define([
     processData,
     assignNotification
   ) {
-
     function errorNotification(src, err) {
       $translate(src).then(function(translated) {
         Notifications.addError({
@@ -132,7 +131,7 @@ define([
       var processDefinitionKey = processDefinition.key;
 
       $scope.options = angular.copy(DEFAULT_OPTIONS);
-      
+
       $scope.params = {
         processDefinitionId : processDefinitionId,
         processDefinitionKey : processDefinitionKey

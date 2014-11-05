@@ -75,6 +75,9 @@ define('camunda-tasklist-ui', [
     var compileTemplate = require('camunda-commons-ui/directives/compileTemplate');
     tasklistApp.directive('compileTemplate', compileTemplate);
 
+    tasklistApp.factory('assignNotification', require('camunda-tasklist-ui/services/cam-tasklist-assign-notification'));
+    tasklistApp.provider('configuration', require('camunda-tasklist-ui/services/cam-tasklist-configuration'));
+
     tasklistApp.config(require('camunda-tasklist-ui/config/uris'));
     tasklistApp.config(require('camunda-tasklist-ui/config/translations'));
     tasklistApp.config(require('camunda-tasklist-ui/config/routes'));
@@ -83,8 +86,6 @@ define('camunda-tasklist-ui', [
 
     tasklistApp.controller('camTasklistAppCtrl', require('camunda-tasklist-ui/controller/cam-tasklist-app-ctrl'));
     tasklistApp.controller('camTasklistViewCtrl', require('camunda-tasklist-ui/controller/cam-tasklist-view-ctrl'));
-
-    tasklistApp.factory('assignNotification', require('camunda-tasklist-ui/services/cam-tasklist-assign-notification'));
 
     $(document).ready(function() {
       angular.bootstrap(document, ['cam.tasklist', 'cam.embedded.forms']);
