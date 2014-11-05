@@ -124,6 +124,17 @@ module.exports = function(config) {
         //   dest: '<%= buildTarget %>/vendor/'
         }
       ]
+    },
+
+    config: {
+      files: [
+        {
+          expand: true,
+          cwd: '<%= pkg.gruntConfig.clientDir %>/scripts/config',
+          src: ['config.js'],
+          dest: '<%= buildTarget %>/scripts/'
+        }
+      ]
     }
   };
 };
