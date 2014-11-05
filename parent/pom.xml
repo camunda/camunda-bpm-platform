@@ -54,10 +54,12 @@
 
     <version.camunda.commons>1.0.5</version.camunda.commons>
     <version.camunda.connect>1.0.0-alpha3</version.camunda.connect>
+    <version.camunda.spin>1.0.0-SNAPSHOT</version.camunda.spin>
     <version.camunda.template-engines>1.0.0</version.camunda.template-engines>
 
     <!-- OSGi bundles properties -->
     <camunda.artifact />
+    <camunda.osgi.import.camunda.spin.version>version="[$(version;==;${camunda.spin.version.clean}),$(version;=+;${camunda.spin.version.clean}))"</camunda.osgi.import.camunda.spin.version>
     <camunda.osgi.import.camunda.connect.version>version="[$(version;==;${camunda.connect.version.clean}),$(version;=+;${camunda.connect.version.clean}))"</camunda.osgi.import.camunda.connect.version>
     <camunda.osgi.import.camunda.version>version="[$(version;==;${camunda.osgi.version.clean}),$(version;=+;${camunda.osgi.version.clean}))"</camunda.osgi.import.camunda.version>
     <camunda.osgi.import.strict.version>version="[$(version;===;${camunda.osgi.version.clean}),$(version;==+;${camunda.osgi.version.clean}))"</camunda.osgi.import.strict.version>
@@ -571,6 +573,14 @@
       </dependency>
 
       <dependency>
+        <groupId>org.camunda.spin</groupId>
+        <artifactId>camunda-spin-bom</artifactId>
+        <version>${version.camunda.spin}</version>
+        <scope>import</scope>
+        <type>pom</type>
+      </dependency>
+
+      <dependency>
         <groupId>org.camunda.template-engines</groupId>
         <artifactId>camunda-template-engines-freemarker</artifactId>
         <version>${version.camunda.template-engines}</version>
@@ -680,6 +690,7 @@
            <versions>
             <camunda.osgi.version.clean>${project.version}</camunda.osgi.version.clean>
             <camunda.connect.version.clean>${version.camunda.connect}</camunda.connect.version.clean>
+            <camunda.spin.version.clean>${version.camunda.spin}</camunda.spin.version.clean>
            </versions>
           </configuration>
         </plugin>
