@@ -12,25 +12,33 @@
  */
 package org.camunda.spin;
 
-import org.camunda.spin.impl.SpinFactoryImpl;
+import static org.assertj.core.api.Assertions.fail;
+import static org.camunda.spin.Spin.S;
+
 import org.camunda.spin.spi.DataFormat;
+import org.junit.Test;
 
 /**
+ * @author Thorben Lindhauer
  *
- * @author Sebastian Menski
- * @author Daniel Meyer
  */
-public abstract class SpinFactory {
+public class SpinCreateTest {
 
-  /**
-   * The singleton instance of the SpinFactory.
-   */
-  public static SpinFactory INSTANCE = new SpinFactoryImpl();
+  @Test
+  public void shouldFailForNonExistingDataFormat() {
+    try {
+      S("{}", "a non-existing format");
+      fail("expected exception");
+    } catch (IllegalArgumentException e) {
+      // happy path
+    }
 
-  public abstract <T extends Spin<?>> T createSpin(Object parameter);
-
-  public abstract <T extends Spin<?>> T createSpin(Object parameter, DataFormat<T> format);
-
-  public abstract <T extends Spin<?>> T createSpin(Object parameter, String dataFormatName);
-
+    try {
+      DataFormat<?> dataFormat = null;
+      S("{}", dataFormat);
+      fail("expected exception");
+    } catch (IllegalArgumentException e) {
+      // happy path
+    }
+  }
 }

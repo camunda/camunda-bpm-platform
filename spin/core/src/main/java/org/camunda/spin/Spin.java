@@ -39,6 +39,18 @@ public abstract class Spin<T extends Spin<?>> {
   }
 
   /**
+  *
+  * @param input
+  * @param format
+  * @return
+  *
+  * @throws IllegalArgumentException in case an argument of illegal type is provided (such as 'null')
+  */
+ public static <T extends Spin<?>> T S(Object input, String dataFormatName) {
+   return SpinFactory.INSTANCE.createSpin(input, dataFormatName);
+ }
+
+  /**
    *
    * @param input
    * @return

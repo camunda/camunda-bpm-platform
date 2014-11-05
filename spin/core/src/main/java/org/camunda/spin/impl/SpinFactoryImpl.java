@@ -60,6 +60,7 @@ public class SpinFactoryImpl extends SpinFactory {
   @SuppressWarnings("unchecked")
   public <T extends Spin<?>> T createSpin(Object parameter, DataFormat<T> format) {
     ensureNotNull("parameter", parameter);
+    ensureNotNull("format", format);
 
     if (parameter instanceof String) {
       return createSpinFromString((String) parameter, format);
@@ -73,6 +74,15 @@ public class SpinFactoryImpl extends SpinFactory {
     } else {
       return createSpinFromObject(parameter, format);
     }
+  }
+
+  @SuppressWarnings("unchecked")
+  public <T extends Spin<?>> T createSpin(Object parameter, String dataFormatName) {
+    ensureNotNull("dataFormatName", dataFormatName);
+
+    DataFormat<T> dataFormat = (DataFormat<T>) DataFormats.getInstance().getDataFormatByName(dataFormatName);
+
+    return createSpin(parameter, dataFormat);
   }
 
   /**
@@ -154,6 +164,4 @@ public class SpinFactoryImpl extends SpinFactory {
 
     return format.createWrapperInstance(dataFormatInput);
   }
-
-
 }

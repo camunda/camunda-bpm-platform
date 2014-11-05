@@ -24,6 +24,7 @@ import static org.camunda.spin.json.JsonTestConstants.EXAMPLE_JSON;
 
 import java.io.Reader;
 
+import org.camunda.spin.DataFormats;
 import org.camunda.spin.json.SpinJsonNode;
 import org.camunda.spin.spi.SpinDataFormatException;
 import org.junit.Test;
@@ -39,6 +40,9 @@ public class JsonTreeCreateTest {
     assertThat(json).isNotNull();
 
     json = S(EXAMPLE_JSON, json());
+    assertThat(json).isNotNull();
+
+    json = S(EXAMPLE_JSON, DataFormats.JSON_DATAFORMAT_NAME);
     assertThat(json).isNotNull();
 
     json = S(EXAMPLE_JSON);
@@ -60,6 +64,9 @@ public class JsonTreeCreateTest {
     json = S(stringAsReader(EXAMPLE_JSON), json());
     assertThat(json).isNotNull();
 
+    json = S(stringAsReader(EXAMPLE_JSON), DataFormats.JSON_DATAFORMAT_NAME);
+    assertThat(json).isNotNull();
+
     json = S(stringAsReader(EXAMPLE_JSON));
     assertThat(json).isNotNull();
   }
@@ -69,6 +76,7 @@ public class JsonTreeCreateTest {
     SpinJsonNode json = JSON(EXAMPLE_JSON);
     assertThat(json).isEqualTo(JSON(json));
     assertThat(json).isEqualTo(S(json, json()));
+    assertThat(json).isEqualTo(S(json, DataFormats.JSON_DATAFORMAT_NAME));
     assertThat(json).isEqualTo(S(json));
   }
 
@@ -137,6 +145,13 @@ public class JsonTreeCreateTest {
     }
 
     try {
+      S(inputString, DataFormats.JSON_DATAFORMAT_NAME);
+      fail("Expected IllegalArgumentException");
+    } catch(IllegalArgumentException e) {
+      // expected
+    }
+
+    try {
       S(inputString);
       fail("Expected IllegalArgumentException");
     } catch(IllegalArgumentException e) {
@@ -161,6 +176,13 @@ public class JsonTreeCreateTest {
     }
 
     try {
+      S(EXAMPLE_INVALID_JSON, DataFormats.JSON_DATAFORMAT_NAME);
+      fail("Expected IllegalArgumentException");
+    } catch(SpinDataFormatException e) {
+      // expected
+    }
+
+    try {
       S(EXAMPLE_INVALID_JSON);
       fail("Expected IllegalArgumentException");
     } catch(SpinDataFormatException e) {
@@ -179,6 +201,13 @@ public class JsonTreeCreateTest {
 
     try {
       S(EXAMPLE_EMPTY_STRING, json());
+      fail("Expected IllegalArgumentException");
+    } catch(SpinDataFormatException e) {
+      // expected
+    }
+
+    try {
+      S(EXAMPLE_EMPTY_STRING, DataFormats.JSON_DATAFORMAT_NAME);
       fail("Expected IllegalArgumentException");
     } catch(SpinDataFormatException e) {
       // expected

@@ -4,4 +4,6 @@ xml1 = XML(input)
 
 xml2 = S(input, xml())
 
-xml3 = S(input)
+xml3 = S(input, "application/xml")
+
+xml4 = S(input)

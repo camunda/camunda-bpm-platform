@@ -24,6 +24,7 @@ import static org.camunda.spin.xml.XmlTestConstants.EXAMPLE_XML;
 
 import java.io.Reader;
 
+import org.camunda.spin.DataFormats;
 import org.camunda.spin.spi.SpinDataFormatException;
 import org.camunda.spin.xml.SpinXmlElement;
 import org.junit.Test;
@@ -42,6 +43,9 @@ public class XmlDomCreateTest {
     xml = S(EXAMPLE_XML, xml());
     assertThat(xml).isNotNull();
 
+    xml = S(EXAMPLE_XML, DataFormats.XML_DATAFORMAT_NAME);
+    assertThat(xml).isNotNull();
+
     xml = S(EXAMPLE_XML);
     assertThat(xml).isNotNull();
   }
@@ -54,6 +58,9 @@ public class XmlDomCreateTest {
     xml = S(stringAsReader(EXAMPLE_XML), xml());
     assertThat(xml).isNotNull();
 
+    xml = S(stringAsReader(EXAMPLE_XML), DataFormats.XML_DATAFORMAT_NAME);
+    assertThat(xml).isNotNull();
+
     xml = S(stringAsReader(EXAMPLE_XML));
     assertThat(xml).isNotNull();
   }
@@ -63,6 +70,7 @@ public class XmlDomCreateTest {
     SpinXmlElement xml = XML(EXAMPLE_XML);
     assertThat(xml).isEqualTo(XML(xml));
     assertThat(xml).isEqualTo(S(xml, xml()));
+    assertThat(xml).isEqualTo(S(xml, DataFormats.XML_DATAFORMAT_NAME));
     assertThat(xml).isEqualTo(S(xml));
   }
 
@@ -131,6 +139,13 @@ public class XmlDomCreateTest {
     }
 
     try {
+      S(inputString, DataFormats.XML_DATAFORMAT_NAME);
+      fail("Expected IllegalArgumentException");
+    } catch(IllegalArgumentException e) {
+      // expected
+    }
+
+    try {
       S(inputString);
       fail("Expected IllegalArgumentException");
     } catch(IllegalArgumentException e) {
@@ -155,6 +170,13 @@ public class XmlDomCreateTest {
     }
 
     try {
+      S(EXAMPLE_INVALID_XML, DataFormats.XML_DATAFORMAT_NAME);
+      fail("Expected IllegalArgumentException");
+    } catch(SpinDataFormatException e) {
+      // expected
+    }
+
+    try {
       S(EXAMPLE_INVALID_XML);
       fail("Expected IllegalArgumentException");
     } catch(SpinDataFormatException e) {
@@ -173,6 +195,13 @@ public class XmlDomCreateTest {
 
     try {
       S(EXAMPLE_EMPTY_STRING, xml());
+      fail("Expected IllegalArgumentException");
+    } catch(SpinDataFormatException e) {
+      // expected
+    }
+
+    try {
+      S(EXAMPLE_EMPTY_STRING, DataFormats.XML_DATAFORMAT_NAME);
       fail("Expected IllegalArgumentException");
     } catch(SpinDataFormatException e) {
       // expected
