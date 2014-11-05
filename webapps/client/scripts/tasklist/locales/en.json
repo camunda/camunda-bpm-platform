@@ -1,0 +1,32 @@
+{
+  "SORT_BY":
+                  "Sort by",
+  "PRIORITY":
+                  "Priority",
+  "CREATION_DATE":
+                  "Created",
+  "SEARCH_PLACEHOLDER":
+                  "Search for Tasks",
+  "DELETE_SEARCH":
+                  "Remove search",
+  "PROPERTY":
+                  "Property",
+  "OPERATOR":
+                  "Operator",
+  "INVALID_SEARCH":
+                  "This search query is not valid",
+  "BEFORE":
+                  "before",
+  "AFTER":
+                  "after",
+  "SEARCH_TASK_BY_NAME":
+                  "Search by task name, case sensitive.",
+  "NO_MATCHING_TASK":
+                  "No task matching filters found.",
+  "RESTRICTION_NOTICE":
+                  "The current search parameters could not retrieve any tasks. Try to reset the search parameters.",
+  "RESET_PAGE":
+                  "Reset page number",
+  "TASK_LIST_LOADING_FAILURE":
+                  "Loading the list of tasks finished with failures. Try to refresh the page to try again."
+}

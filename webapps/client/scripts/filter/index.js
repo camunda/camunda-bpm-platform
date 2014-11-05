@@ -16,7 +16,6 @@ define([
   'angular',
   'moment',
   './directives/cam-tasklist-filters',
-  './directives/cam-tasklist-tasks',
   './controller/cam-edit-filter-ctrl',
   './modals/cam-tasklist-filter-form',
   'camunda-tasklist-ui/api'
@@ -25,7 +24,6 @@ define([
   angular,
   moment,
   camTasklistFilters,
-  camTasklistFilterTasks,
   camEditFilterCtrl,
   camTasklistFilterForm,
   api
@@ -43,8 +41,6 @@ define([
   filterModule.controller('camEditFilterModalCtrl', camTasklistFilterForm);
 
   filterModule.directive('camTasklistFilters', camTasklistFilters);
-
-  filterModule.directive('camTasklistFilterTasks', camTasklistFilterTasks);
 
   return filterModule;
 });

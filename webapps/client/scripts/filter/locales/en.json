@@ -112,26 +112,8 @@
                         "Remove",
   "FILTER_VARIABLES_AMOUNT_WARNING":
                         "Showing too much variables in the tasks list could impact on the user experience.",
-
-  "SEARCH_TASK_BY_NAME":
-                        "Search by task name, case sensitive.",
-  "NO_MATCHING_TASK":
-                        "No task matching filters found.",
-
-  "RESTRICTION_NOTICE":
-                        "The current search parameters could not retrieve any tasks. Try to reset the search parameters.",
-  "RESET_PAGE":
-                        "Reset page number",
-
   "NO_AVAILABLE_FILTER":
                         "No filter available.",
-
-  "PERMALINK":
-                        "Permanent link",
-
-  "TASK_LIST_LOADING_FAILURE":
-                        "Loading the list of tasks finished with failures. Try to refresh the page to try again.",
-
   "FILTERS_LOADING_FAILURE":
                         "Loading the filters finished with failures. Try to refresh the page to try again."
 }

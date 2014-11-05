@@ -1,6 +1,6 @@
 define([
   'angular',
-  'text!./cam-sorting-choices.html'
+  'text!./cam-tasklist-sorting-choices.html'
 ], function(
   angular,
   template
