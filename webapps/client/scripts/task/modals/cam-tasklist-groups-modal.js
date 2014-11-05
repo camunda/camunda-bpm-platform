@@ -117,14 +117,7 @@ define([
           });
         }
 
-        Notifications.addMessage({
-          status: messages.finished,
-          message: messages.removeGroupSuccess,
-          exclusive: true
-        });
-
         taskGroupsData.changed('groups');
-
       });
     };
 

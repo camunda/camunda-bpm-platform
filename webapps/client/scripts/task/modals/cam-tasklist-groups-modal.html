@@ -4,7 +4,7 @@
   </h3>
 </div>
 
-<div class="modal-body">
+<div class="modal-body groups-modal">
 
   <div notifications-panel></div>
 
@@ -17,7 +17,7 @@
   <div ng-hide="!modalGroupsState.$loaded || modalGroupsState.$error">
 
       <div class="text-help">
-        <i class="glyphicon glyphicon-info-sign"></i>
+        <span class="glyphicon glyphicon-info-sign"></span>
         {{ 'USE_ADD_GROUP' | translate }}
       </div>
 
@@ -25,72 +25,45 @@
             class="form-horizontal"
             ng-submit="addGroup()">
 
-        <div class="new-group" ng-class="{'has-error': newGroup.error }">
+        <div class="form-group">
+          <div class="col-xs-4 align-right">
+            <button class="btn btn-link"
+                    ng-click="addGroup()"
+                    type="button"
+                    ng-disabled="!isValid()">
+              <span class="hidden-sm hidden-xs">{{ 'GROUP_ADD' | translate }}</span>
+              <span class="glyphicon glyphicon-plus-sign"></span>
+            </button>
+          </div>
 
-          <div class="form-group">
+          <div class="col-xs-8"
+               ng-class="{'has-error': newGroup.error }">
+            <input type="text"
+                   name="newGroup"
+                   required
+                   placeholder="{{ 'GROUP_ID' | translate }}"
+                   class="form-control"
+                   ng-model="newGroup.groupId"
+                   ng-change="validateNewGroup()"
+                   ng-keyup="($event.keyCode == 13 && isValid() && addGroup())"/>
 
-            <div class="col-xs-12">
-              <div class="input-group">
-
-                <input id="new-group-input"
-                       type="text"
-                       class="form-control group-input"
-                       ng-model="newGroup.groupId"
-                       ng-change="validateNewGroup()"
-                       name="newGroup"
-                       placeholder="{{ 'GROUP_ADD' | translate }}"
-                       ng-keyup="($event.keyCode == 13 && isValid() && addGroup())"
-                       required>
-
-                <span class="input-group-btn">
-                  <button ng-click="addGroup()"
-                          class="btn btn-default"
-                          type="button"
-                          ng-disabled="!isValid()">
-                    <i class="glyphicon glyphicon-plus-sign"></i>
-                  </button>
-                </span>
-
-
-              </div>
-
-              <span ng-if="newGroup.error"
-                   class="help-block">
-                {{ newGroup.error.message | translate }}
-              </span>
-
-            </div>
-
+            <span ng-if="newGroup.error"
+                 class="help-block">
+              {{ newGroup.error.message | translate }}
+            </span>
           </div>
         </div>
 
-        <div ng-if="_groups.length"
-             class="current-groups">
-
-          <div class="row labels"
-               ng-if="_groups.length">
-            <label class="col-xs-2 align-right">
-              {{ 'ACTION' | translate }}
-            </label>
-            <label class="col-xs-10">
-              {{ 'GROUP' | translate }}
-            </label>
+        <div class="form-group values"
+             ng-repeat="group in _groups">
+          <div class="col-xs-4 row-action">
+            <a href
+               ng-click="removeGroup(group)"
+               class="glyphicon glyphicon-minus-sign"></a>
           </div>
 
-          <div class="form-group values"
-               ng-repeat="group in _groups">
-            <div class="col-xs-2 align-right row-action">
-              <a href
-                 ng-click="removeGroup(group)"
-                 class="glyphicon glyphicon-minus-sign"></a>
-            </div>
-            <div class="col-xs-10">
-              <input id="group"
-                     type="text"
-                     class="form-control group-input"
-                     ng-model="group.groupId"
-                     readonly>
-            </div>
+          <div class="col-xs-8 value">
+            {{ group.groupId }}
           </div>
         </div>
 

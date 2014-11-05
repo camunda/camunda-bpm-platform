@@ -287,22 +287,18 @@
   height: 150px;
 }
 
-.groups {
-  > div {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 250px;
-    white-space: nowrap;
+.groups-modal {
+  .align-right {
+    .btn-link {
+      padding-right: 0;
+      padding-left: 0;
+      margin-right: 0;
+      margin-left: 0;
+    }
   }
-}
-
-// used in the modal dialog
-.current-groups {
-  margin-bottom: (@grid-gutter-width / 2);
-}
-
-.input-group-btn {
-  > button {
-    color: @link-color;
+  .value {
+    margin-top: 0;
+    margin-bottom: 0;
+    padding-top: 7px;
   }
 }
