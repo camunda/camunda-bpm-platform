@@ -1,20 +1,27 @@
-<div ng-show="!state.$loaded"
+<div ng-show="!state.$loaded && !state.$error"
      class="loader">
   <i class="animate-spin glyphicon glyphicon-refresh"></i>
   {{ 'LOADING' | translate }}
 </div>
 
-<div ng-hide="!state.$loaded">
+<div ng-show="state.$error" class="alert alert-danger" role="alert">
+  <span class="glyphicon glyphicon-exclamation-sign"></span>
+  <strong class="status">{{ 'FAILURE' | translate }}:</strong>
+  <span class="message">{{ 'TASK_LIST_LOADING_FAILURE' | translate }}</span>
+</div>
+
+<div ng-show="state.$loaded && !state.$error">
+
   <div ng-hide="totalItems"
        class="well">
     <i class="glyphicon glyphicon-info-sign"></i>
     {{ 'NO_MATCHING_TASK' | translate }}
   </div>
-  <div ng-show="totalItems && !tasks" >
-    <span>
+
+  <div ng-show="totalItems && !tasks" class="well">
+    <i class="glyphicon glyphicon-info-sign"></i>
     {{ 'RESTRICTION_NOTICE' | translate }}
     <a ng-click="resetPage()">{{ 'RESET_PAGE' | translate }}</a>
-    </span>
   </div>
 
   <div ng-show="totalItems">
