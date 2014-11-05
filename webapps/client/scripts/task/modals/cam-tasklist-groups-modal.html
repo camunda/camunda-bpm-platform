@@ -23,7 +23,7 @@
 
       <form name="taskGroupForm"
             class="form-horizontal"
-            ng-submit="addGroup()">
+            ng-submit="(isValid() && addGroup())">
 
         <div class="form-group">
           <div class="col-xs-4 align-right">
@@ -44,8 +44,7 @@
                    placeholder="{{ 'GROUP_ID' | translate }}"
                    class="form-control"
                    ng-model="newGroup.groupId"
-                   ng-change="validateNewGroup()"
-                   ng-keyup="($event.keyCode == 13 && isValid() && addGroup())"/>
+                   ng-change="validateNewGroup()"/>
 
             <span ng-if="newGroup.error"
                  class="help-block">
