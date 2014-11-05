@@ -81,7 +81,6 @@ define([
         $scope.onFormValidation = $scope.onFormValidation() || noop;
         $scope.completionHandler = noop;
         $scope.saveHandler = noop;
-        $scope.restoreHandler = noop;
 
         $scope.$loaded = false;
 
@@ -157,10 +156,6 @@ define([
           $scope.saveHandler();
         };
 
-        var restore = $scope.restore = function () {
-          $scope.restoreHandler();
-        };
-
         // API ////////////////////////////////////////////////////
 
         this.notifyFormInitialized = function () {
@@ -205,11 +200,6 @@ define([
         this.registerSaveHandler = function(fn) {
           $scope.saveHandler = fn ||  noop;
         };
-
-        this.registerRestoreHandler = function(fn) {
-          $scope.restoreHandler = fn ||  noop;
-        };
-
 
       }]
     };

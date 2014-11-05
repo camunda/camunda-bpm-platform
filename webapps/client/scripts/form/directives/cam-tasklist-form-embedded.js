@@ -90,13 +90,8 @@ define([
           camForm.store(callback);
         };
 
-        var restore = function(callback) {
-          camForm.restore(callback);
-        };
-
         formController.registerCompletionHandler(complete);
         formController.registerSaveHandler(save);
-        formController.registerRestoreHandler(restore);
 
         $scope.$on('authentication.login.required', function() {
           save();
