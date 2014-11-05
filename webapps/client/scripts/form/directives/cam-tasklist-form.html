@@ -37,7 +37,8 @@
             ng-click="save()"
             ng-hide="tasklistForm.type === 'generic'"
             tooltip-placement="top"
-            tooltip="{{ 'SAVE_HINT' | translate }}">
+            tooltip="{{ 'SAVE_HINT' | translate }}"
+            ng-disabled="!$dirty">
       {{ 'SAVE' | translate }}
     </button>
     <button class="btn btn-primary"

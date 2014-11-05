@@ -47,6 +47,13 @@ define([
           formController.notifyFormValidated(!value);
         });
 
+        // watch for changes in the form
+        $scope.$watch(function() {
+          return form && form.$dirty;
+        }, function(value) {
+          formController.notifyFormDirty(value);
+        });
+
         function showForm(container, tasklistForm, params) {
           var formUrl = tasklistForm.key;
 
@@ -79,6 +86,7 @@ define([
           }
 
           form = camFormScope[formName];
+          form.$setPristine();
           formController.notifyFormInitialized();
         };
 
@@ -87,6 +95,7 @@ define([
         };
 
         var save = function(callback) {
+          form.$setPristine();
           camForm.store(callback);
         };
 

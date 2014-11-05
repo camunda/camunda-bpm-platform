@@ -150,7 +150,7 @@ define([
           return $scope.$invalid || ($scope.options && $scope.options.disableCompleteButton);
         };
 
-        // save and restore ///////////////////////////////////////
+        // save ///////////////////////////////////////////////////
 
         var save = $scope.save = function () {
           $scope.saveHandler();
@@ -180,6 +180,11 @@ define([
           $scope.$invalid = invalid;
           $scope.onFormValidation(invalid);
         };
+
+        this.notifyFormDirty = function (dirty) {
+          $scope.$dirty = dirty;
+        };
+
 
         this.getOptions = function () {
           return $scope.options || {};
