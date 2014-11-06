@@ -20,7 +20,6 @@ define([
     camAPI,
     taskMetaData
   ) {
-
     // setup //////////////////////////////////////////////
 
     var Task = camAPI.resource('task');
@@ -97,6 +96,8 @@ define([
           });
         }
 
+        $scope.$$childTail.taskGroupForm.$setPristine();
+
         newGroup = $scope.newGroup = angular.copy(NEW_GROUP);
         taskGroupsData.changed('groups');
 
@@ -126,10 +127,18 @@ define([
 
       var newGroupId = newGroup.groupId;
 
+      // might not be available at initialization time
+      if ($scope.$$childTail) {
+        $scope.$$childTail.taskGroupForm.$setValidity();
+      }
+
       if (newGroupId) {
         for(var i = 0, currentGroup; !!(currentGroup = $scope._groups[i]); i++) {
           if (newGroupId === currentGroup.groupId) {
             newGroup.error = { message: 'DUPLICATE_GROUP' };
+
+            // https://code.angularjs.org/1.2.16/docs/api/ng/type/ngModel.NgModelController#$setValidity
+            $scope.$$childTail.taskGroupForm.newGroup.$setValidity('newGroup', false);
           }
         }
       }
