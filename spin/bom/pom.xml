@@ -38,13 +38,13 @@
       
       <dependency>
         <groupId>org.camunda.spin</groupId>
-        <artifactId>camunda-spin-jackson-json-dataformat</artifactId>
+        <artifactId>camunda-spin-dataformat-json-jackson</artifactId>
         <version>${project.version}</version>
       </dependency>
       
       <dependency>
         <groupId>org.camunda.spin</groupId>
-        <artifactId>camunda-spin-dom-xml-dataformat</artifactId>
+        <artifactId>camunda-spin-dataformat-xml-dom</artifactId>
         <version>${project.version}</version>
       </dependency>
     </dependencies>
