@@ -12,11 +12,16 @@
  */
 package org.camunda.spin.impl.xml.dom.format.spi;
 
-import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
+
+import org.camunda.spin.impl.xml.dom.format.DomXmlDataFormat;
 
 /**
- * Provider for the JAXBContext. The JAXBContext caches information about the types
- * it is capable of processing. Since the context is expensive to create, it is useful to cache
+ * Provider for the Marshallers and Unmarshallers the {@link DomXmlDataFormat} uses to
+ * map Java objects to XML and vice versa. Implementations typically manage a JAXBContext.
+ * The JAXBContext caches information about the types it is capable of processing.
+ * Since the context is expensive to create, it is useful to cache
  * it. Different applications may require different caching strategies.
  *
  * @author Daniel Meyer
@@ -25,11 +30,19 @@ import javax.xml.bind.JAXBContext;
 public interface JaxBContextProvider {
 
   /**
-   * Obtain a JAXBContext for the provided types.
+   * Obtain a Marshaller that can map the provided types.
    *
-   * @param types the Java Types to construct the context for
-   * @return the JAXBContext capable of handing the provided types.
+   * @param types the Java Types that are going to be marshalled
+   * @return the Marshaller of marshalling the provided types to XML.
    */
-  public JAXBContext getContext(Class<?>... types);
+  public Marshaller createMarshaller(Class<?>... types);
+
+  /**
+   * Obtain an Unmarshaller that can map the provided types.
+   *
+   * @param types the Java Types that are going to be unmarshalled
+   * @return the Marshaller of unmarshalling the provided types from XML.
+   */
+  public Unmarshaller createUnmarshaller(Class<?>... types);
 
 }

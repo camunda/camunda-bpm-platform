@@ -14,6 +14,8 @@ package org.camunda.spin.impl.xml.dom.format.spi;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
 
 import org.camunda.spin.impl.xml.dom.DomXmlLogger;
 
@@ -34,6 +36,24 @@ public class DefaultJaxBContextProvider implements JaxBContextProvider {
     }
     catch (JAXBException e) {
       throw LOG.unableToCreateContext(e);
+    }
+  }
+
+  @Override
+  public Marshaller createMarshaller(Class<?>... types) {
+    try {
+      return getContext(types).createMarshaller();
+    } catch (JAXBException e) {
+      throw LOG.unableToCreateMarshaller(e);
+    }
+  }
+
+  @Override
+  public Unmarshaller createUnmarshaller(Class<?>... types) {
+    try {
+      return getContext(types).createUnmarshaller();
+    } catch (JAXBException e) {
+      throw LOG.unableToCreateUnmarshaller(e);
     }
   }
 

@@ -14,7 +14,6 @@ package org.camunda.spin.impl.xml.dom.format;
 
 import static org.camunda.commons.utils.EnsureUtil.ensureNotNull;
 
-import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
@@ -103,18 +102,12 @@ public class DomXmlDataFormatMapper implements DataFormatMapper {
   }
 
   protected Marshaller getMarshaller(Class<?> parameter) throws JAXBException {
-    JAXBContext context = getJaxBContext(parameter);
-    return context.createMarshaller();
+    JaxBContextProvider jaxBContextProvider = format.getJaxBContextProvider();
+    return jaxBContextProvider.createMarshaller(parameter);
   }
 
   protected Unmarshaller getUnmarshaller(Class<?> parameter) throws JAXBException {
-    JAXBContext context = getJaxBContext(parameter);
-    return context.createUnmarshaller();
-  }
-
-  protected JAXBContext getJaxBContext(Class<?> parameter) {
     JaxBContextProvider jaxBContextProvider = format.getJaxBContextProvider();
-    return jaxBContextProvider.getContext(parameter);
+    return jaxBContextProvider.createUnmarshaller(parameter);
   }
-
 }

@@ -14,6 +14,8 @@ package org.camunda.spin.xml.dom.format.spi;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
 
 import org.camunda.spin.impl.xml.dom.DomXmlLogger;
 import org.camunda.spin.impl.xml.dom.format.spi.JaxBContextProvider;
@@ -26,12 +28,29 @@ public class EmptyContextProvider implements JaxBContextProvider {
 
   private static final DomXmlLogger LOG = DomXmlLogger.XML_DOM_LOGGER;
 
-  @Override
-  public JAXBContext getContext(Class<?>... types) {
+  public JAXBContext getContext() {
     try {
       return JAXBContext.newInstance();
     } catch (JAXBException e) {
       throw LOG.unableToCreateContext(e);
+    }
+  }
+
+  @Override
+  public Marshaller createMarshaller(Class<?>... types) {
+    try {
+      return getContext().createMarshaller();
+    } catch (JAXBException e) {
+      throw LOG.unableToCreateMarshaller(e);
+    }
+  }
+
+  @Override
+  public Unmarshaller createUnmarshaller(Class<?>... types) {
+    try {
+      return getContext().createUnmarshaller();
+    } catch (JAXBException e) {
+      throw LOG.unableToCreateUnmarshaller(e);
     }
   }
 
