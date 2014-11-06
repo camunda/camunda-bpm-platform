@@ -16,7 +16,6 @@ import java.io.Writer;
 
 import org.camunda.spin.json.SpinJsonNode;
 import org.camunda.spin.spi.DataFormat;
-import org.camunda.spin.spi.SpinDataFormatException;
 import org.camunda.spin.xml.SpinXmlElement;
 
 /**
@@ -73,19 +72,6 @@ public abstract class Spin<T extends Spin<?>> {
   }
 
   /**
-   *
-   * @param input
-   * @param format
-   * @return
-   *
-   * @throws SpinDataFormatException in case the input cannot be read as XML
-   * @throws IllegalArgumentException in case an argument of illegal type is provided (such as 'null')
-   */
-  public static SpinXmlElement XML(Object input, DataFormat<SpinXmlElement> format) {
-    return SpinFactory.INSTANCE.createSpin(input, format);
-  }
-
-  /**
   *
   * @param input
   * @return
@@ -94,19 +80,6 @@ public abstract class Spin<T extends Spin<?>> {
   */
   public static SpinJsonNode JSON(Object input) {
     return SpinFactory.INSTANCE.createSpin(input, DataFormats.json());
-  }
-
-  /**
-  *
-  * @param input
-  * @param format
-  * @return
-  *
-  * @throws SpinDataFormatException in case the input cannot be read as JSON
-  * @throws IllegalArgumentException in case an argument of illegal type is provided (such as 'null')
-  */
-  public static SpinJsonNode JSON(Object input, DataFormat<SpinJsonNode> format) {
-    return SpinFactory.INSTANCE.createSpin(input, format);
   }
 
   /**

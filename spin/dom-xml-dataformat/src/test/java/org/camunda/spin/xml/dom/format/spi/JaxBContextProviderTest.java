@@ -26,6 +26,7 @@ import org.camunda.spin.impl.xml.dom.format.DomXmlDataFormat;
 import org.camunda.spin.xml.SpinXmlDataFormatException;
 import org.camunda.spin.xml.SpinXmlElement;
 import org.camunda.spin.xml.mapping.Customer;
+import org.junit.After;
 import org.junit.Test;
 
 /**
@@ -40,17 +41,17 @@ public class JaxBContextProviderTest {
    */
   @Test
   public void testCustomJaxBProvider() {
-    DomXmlDataFormat customDataFormat = new DomXmlDataFormat(DataFormats.XML_DATAFORMAT_NAME, new EmptyContextProvider());
 
     Object objectToConvert = new Customer();
 
-    // using the default xml format for conversion should work
+    // using the default jaxb context provider for conversion should work
     SpinXmlElement spinWrapper = Spin.XML(objectToConvert);
     spinWrapper.writeToWriter(new StringWriter());
 
-    // using the format with the custom jaxb context should fail with a JAXBException
+    // using the custom jaxb context provider should fail with a JAXBException
+    ((DomXmlDataFormat) DataFormats.xml()).setJaxBContextProvider(new EmptyContextProvider());
     try {
-      spinWrapper = Spin.XML(objectToConvert, customDataFormat);
+      spinWrapper = Spin.XML(objectToConvert);
       spinWrapper.writeToWriter(new StringWriter());
     } catch (SpinXmlDataFormatException e) {
 
@@ -68,5 +69,11 @@ public class JaxBContextProviderTest {
       fail("expected a JAXBException in the cause hierarchy of the spin exception");
     }
 
+  }
+
+  @After
+  public void tearDown() {
+    // reset jaxb context provider
+    ((DomXmlDataFormat) DataFormats.xml()).setJaxBContextProvider(DomXmlDataFormat.defaultJaxBContextProvider());
   }
 }
