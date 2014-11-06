@@ -10,6 +10,10 @@ define(['angular'], function(angular) {
       "normal": "LLL",
       "long": "LLLL",
       "short": "LL"
+    },
+    "locales": {
+      "availableLocales": ["en", "de", "fr"],
+      "preferredLocal": "en"
     }
   };
   return [function() {
@@ -17,6 +21,23 @@ define(['angular'], function(angular) {
       var dateFormatObj = config.dateFormat || defaultConfig.dateFormat;
       return dateFormatObj[formatName] || defaultConfig.dateFormat[formatName];
     };
+
+    this.getAvailableLanguages = function() {
+      if(config.locales && config.locales.availableLocales) {
+        return config.locales.availableLocales;
+      } else {
+        return defaultConfig.locales.availableLocales;
+      }
+    };
+
+    this.getPreferredLanguage = function() {
+      if(config.locales && config.locales.preferredLocal) {
+        return config.locales.preferredLocal;
+      } else {
+        return defaultConfig.locales.preferredLocal;
+      }
+    };
+
 
     this.$get = function() {
       return this;

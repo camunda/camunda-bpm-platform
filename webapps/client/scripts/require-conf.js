@@ -24,6 +24,7 @@ define(function() {
       'angular-bootstrap':          'bower_components/angular-bootstrap/ui-bootstrap-tpls',
       'angular-moment':             'bower_components/angular-moment/angular-moment',
       'angular-translate':          'bower_components/angular-translate/angular-translate',
+      'angular-translate-loader-static-files': 'bower_components/angular-translate-loader-static-files/angular-translate-loader-static-files',
 
       'bpmn-js':                    'bower_components/bpmn-js/bpmn-viewer',
 
@@ -78,6 +79,7 @@ define(function() {
                                       'angular-animate',
 
                                       'angular-translate',
+                                      'angular-translate-loader-static-files',
                                       'angular-data-depend',
 
                                       'camunda-commons-ui/auth',
@@ -121,10 +123,7 @@ define(function() {
                                       'placeholders-js/main',
                                       'placeholders-js/adapters/placeholders.jquery',
 
-                                      'text!camunda-tasklist-ui/index.html',
-                                      'json!locales/en.json',
-                                      'json!locales/de.json',
-                                      'json!locales/fr.json'
+                                      'text!camunda-tasklist-ui/index.html'
                                     ]
     },
 

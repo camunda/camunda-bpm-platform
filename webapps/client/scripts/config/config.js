@@ -4,4 +4,8 @@ var camTasklistConf = {
   //   "normal": "LLL",
   //   "long":   "LLLL"
   // }
+  // "locales": {
+  //    "availableLocales": ["en", "de", "fr"],
+  //    "preferredLocal": "en"
+  //  }
 };
