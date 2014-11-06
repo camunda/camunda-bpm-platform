@@ -131,6 +131,16 @@
                  cam-variable-type="{{ variable.type }}"
                  placeholder="{{ 'VARIABLE_VALUE' | translate }}" />
 
+          <input ng-switch-when="Integer"
+                 class="form-control"
+                 type="text"
+                 required
+                 ng-model="variable.value"
+                 ng-pattern="/^(-|)[0-9]+$/"
+                 cam-variable-name="{{ variable.name }}"
+                 cam-variable-type="{{ variable.type }}"
+                 placeholder="{{ 'VARIABLE_VALUE' | translate }}" />
+
 
           <input ng-switch-when="Boolean"
                  class="form-control"
