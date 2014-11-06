@@ -19,7 +19,7 @@
 
     li {
       max-width: 50%;
-      vertical-align: middle;
+      vertical-align: top;
       .preview {
         .truncate(100%);
       }
@@ -276,7 +276,14 @@
   margin-left: 0;
   margin-right: 0;
   text-align: right;
+  white-space: nowrap;
   > li {
+    &.groups {
+      max-width: 120px;
+      > div {
+        .truncate(100%);
+      }
+    }
     &:last-child {
       padding-right: 0;
     }
@@ -300,5 +307,6 @@
     margin-top: 0;
     margin-bottom: 0;
     padding-top: 7px;
+    .truncate(100%);
   }
 }
