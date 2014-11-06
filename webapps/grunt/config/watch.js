@@ -18,7 +18,6 @@ module.exports = function(config) {
 
     styles: {
       files: [
-        // 'node_modules/camunda-commons-ui/grunt/config/less.js',
         '<%= pkg.gruntConfig.clientDir %>/styles/**/*.{css,less}',
         '<%= pkg.gruntConfig.clientDir %>/scripts/*/*.{css,less}'
       ],
@@ -49,13 +48,11 @@ module.exports = function(config) {
 
     sdk: {
       files: [
-        // 'grunt/config/require.js',
         'node_modules/camunda-commons-ui/lib/**/*.js',
         'node_modules/camunda-commons-ui/{resources,lib/*}/locales/**/*.json',
         'node_modules/camunda-bpm-sdk-js/dist/**/*.js'
       ],
       tasks: [
-        'copy:sdk',
         'localescompile',
         'requirejs:scripts',
         'requirejs:dependencies'
@@ -64,7 +61,6 @@ module.exports = function(config) {
 
     unitTest: {
       files: [
-        // 'grunt/config/jasmine_node.js',
         'test/unit/**/*Spec.js'
       ],
       tasks: [
@@ -74,7 +70,6 @@ module.exports = function(config) {
 
     integrationTest: {
       files: [
-        // 'grunt/config/karma.js',
         'test/integration/main.js',
         'test/integration/**/*Spec.js'
       ],
