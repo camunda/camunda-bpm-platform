@@ -121,6 +121,12 @@ define([
           handleResize();
         });
 
+        $scope.$watch(function() {
+          return $win.height();
+        }, function () {
+          handleResize();
+        });
+
         $win.on('resize', applyResize);
 
         $element.on('$destroy', function() {
