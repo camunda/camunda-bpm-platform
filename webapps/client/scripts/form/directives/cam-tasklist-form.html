@@ -34,7 +34,7 @@
   <div class="form-actions" ng-show="showCompleteButton()">
     <button class="btn btn-primary"
             type="submit"
-            ng-click="save()"
+            ng-click="save($event)"
             ng-hide="tasklistForm.type === 'generic'"
             tooltip-placement="top"
             tooltip="{{ 'SAVE_HINT' | translate }}"

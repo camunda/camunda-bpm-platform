@@ -11,9 +11,11 @@ define([
   return [
     'CamForm',
     'camAPI',
+    '$timeout',
   function(
     CamForm,
-    camAPI
+    camAPI,
+    $timeout
   ){
 
     return {
@@ -94,9 +96,14 @@ define([
           camForm.submit(callback);
         };
 
-        var save = function(callback) {
+        var save = function(evt) {
           form.$setPristine();
-          camForm.store(callback);
+          camForm.store();
+
+          // manually trigger a mouseleave event to make the tooltip disappear
+          $timeout(function(){
+            angular.element(evt.target).triggerHandler($.Event('mouseleave'));
+          });
         };
 
         formController.registerCompletionHandler(complete);

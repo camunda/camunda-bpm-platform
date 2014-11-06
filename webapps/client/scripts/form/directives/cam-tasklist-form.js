@@ -152,8 +152,8 @@ define([
 
         // save ///////////////////////////////////////////////////
 
-        var save = $scope.save = function () {
-          $scope.saveHandler();
+        var save = $scope.save = function (evt) {
+          $scope.saveHandler(evt);
         };
 
         // API ////////////////////////////////////////////////////
@@ -205,6 +205,7 @@ define([
         this.registerSaveHandler = function(fn) {
           $scope.saveHandler = fn ||  noop;
         };
+
 
       }]
     };
