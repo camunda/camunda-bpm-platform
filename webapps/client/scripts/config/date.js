@@ -11,5 +11,6 @@ define([], function() {
     for(var i = 0; i < dateProperties.length; i++) {
       camDateFormatProvider.setDateFormat(configurationProvider.getDateFormat(dateProperties[i]), dateProperties[i]);
     }
+
   }];
 });

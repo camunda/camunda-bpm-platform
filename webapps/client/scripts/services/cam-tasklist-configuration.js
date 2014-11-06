@@ -12,8 +12,7 @@ define(['angular'], function(angular) {
       "short": "LL"
     },
     "locales": {
-      "availableLocales": ["en", "de", "fr"],
-      "preferredLocal": "en"
+      "preferredLocale": "en"
     }
   };
   return [function() {
@@ -22,20 +21,16 @@ define(['angular'], function(angular) {
       return dateFormatObj[formatName] || defaultConfig.dateFormat[formatName];
     };
 
-    this.getAvailableLanguages = function() {
-      if(config.locales && config.locales.availableLocales) {
-        return config.locales.availableLocales;
+    this.getPreferredLocale = function() {
+      if(config.locales && config.locales.preferredLocale) {
+        return config.locales.preferredLocale;
       } else {
-        return defaultConfig.locales.availableLocales;
+        return defaultConfig.locales.preferredLocale;
       }
     };
 
-    this.getPreferredLanguage = function() {
-      if(config.locales && config.locales.preferredLocal) {
-        return config.locales.preferredLocal;
-      } else {
-        return defaultConfig.locales.preferredLocal;
-      }
+    this.getDateLocales = function() {
+      return config.camDateLocales;
     };
 
 

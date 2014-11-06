@@ -92,7 +92,7 @@ define(function() {
 
                                       'camunda-tasklist-ui/config/date',
                                       'camunda-tasklist-ui/config/routes',
-                                      'camunda-tasklist-ui/config/translations',
+                                      'camunda-tasklist-ui/config/locales',
                                       'camunda-tasklist-ui/config/tooltip',
                                       'camunda-tasklist-ui/config/uris',
 
@@ -109,6 +109,7 @@ define(function() {
                                       'camunda-tasklist-ui/form',
                                       'camunda-tasklist-ui/services/cam-tasklist-assign-notification',
                                       'camunda-tasklist-ui/services/cam-tasklist-configuration',
+                                      'camunda-tasklist-ui/services/cam-tasklist-locale-loader',
 
                                       'bootstrap/collapse',
                                       'camunda-tasklist-ui/navigation/index',

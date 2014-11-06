@@ -74,11 +74,12 @@ define('camunda-tasklist-ui', [
     var compileTemplate = require('camunda-commons-ui/directives/compileTemplate');
     tasklistApp.directive('compileTemplate', compileTemplate);
 
+    tasklistApp.factory('localeLoader', require('camunda-tasklist-ui/services/cam-tasklist-locale-loader'));
     tasklistApp.factory('assignNotification', require('camunda-tasklist-ui/services/cam-tasklist-assign-notification'));
     tasklistApp.provider('configuration', require('camunda-tasklist-ui/services/cam-tasklist-configuration'));
 
     tasklistApp.config(require('camunda-tasklist-ui/config/uris'));
-    tasklistApp.config(require('camunda-tasklist-ui/config/translations'));
+    tasklistApp.config(require('camunda-tasklist-ui/config/locales'));
     tasklistApp.config(require('camunda-tasklist-ui/config/routes'));
     tasklistApp.config(require('camunda-tasklist-ui/config/date'));
     tasklistApp.config(require('camunda-tasklist-ui/config/tooltip'));
