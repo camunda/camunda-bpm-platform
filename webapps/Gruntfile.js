@@ -45,7 +45,7 @@ module.exports = function(grunt) {
 
     localescompile:   require('camunda-commons-ui/grunt/config/localescompile')(config),
 
-    clean:            require('camunda-commons-ui/grunt/config/clean')(config)
+    clean:            require('./grunt/config/clean')(config)
   });
 
   require('camunda-commons-ui/grunt/tasks/localescompile')(grunt);

@@ -99,30 +99,30 @@ module.exports = function(config) {
 
     sdk: {
       files: [
-        {
-          expand: true,
-          cwd: 'node_modules/camunda-commons-ui',
-          src: [
-            'lib/**/*.js',
-            'lib/*.js',
-            // 'resources/locales/**/*.json',
-            // 'resources/locales/*.json'
-          ],
-          dest: '<%= buildTarget %>/vendor/camunda-commons-ui'
-        },
-        {
-          expand: true,
-          cwd: 'node_modules/camunda-bpm-sdk-js/dist',
-          src: ['**/*.js'],
-          dest: '<%= pkg.gruntConfig.clientDir %>/vendor/'
+        // {
+        //   expand: true,
+        //   cwd: 'node_modules/camunda-commons-ui',
+        //   src: [
+        //     'lib/**/*.js',
+        //     'lib/*.js',
+        //     // 'resources/locales/**/*.json',
+        //     // 'resources/locales/*.json'
+        //   ],
+        //   dest: '<%= buildTarget %>/vendor/camunda-commons-ui'
         // },
         // {
         //   expand: true,
         //   cwd: 'node_modules/camunda-bpm-sdk-js/dist',
         //   src: ['**/*.js'],
-        //   // dest: '<%= pkg.gruntConfig.clientDir %>/vendor/'
-        //   dest: '<%= buildTarget %>/vendor/'
-        }
+        //   dest: '<%= pkg.gruntConfig.clientDir %>/vendor/'
+        // // },
+        // // {
+        // //   expand: true,
+        // //   cwd: 'node_modules/camunda-bpm-sdk-js/dist',
+        // //   src: ['**/*.js'],
+        // //   // dest: '<%= pkg.gruntConfig.clientDir %>/vendor/'
+        // //   dest: '<%= buildTarget %>/vendor/'
+        // }
       ]
     },
 
