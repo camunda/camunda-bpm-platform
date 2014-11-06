@@ -46,8 +46,8 @@ define([
             viewer.importXML(processDiagram.bpmn20xml, function(err) {
 
               $scope.$apply(function() {
-                           
-                if (err) { 
+
+                if (err) {
                   $scope.error = err;
                   return;
                 }
@@ -70,6 +70,10 @@ define([
 
             if (taskDefinitionKey) {
               canvas.addMarker(taskDefinitionKey, 'highlight');
+              $('[data-element-id="'+ taskDefinitionKey+ '"]>.djs-outline').attr({
+                rx: '14px',
+                ry: '14px'
+              });
             }
           }
         }
@@ -102,7 +106,7 @@ define([
           $timeout.cancel(timer);
           timer = $timeout(function () {
             resizeDiagram();
-          }, 500);          
+          }, 500);
         }
 
         function applyResize() {

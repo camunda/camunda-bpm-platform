@@ -124,8 +124,18 @@
     display: none;
   }
 
-  .highlight .djs-visual>:nth-child(1) {
-    fill: @alert-info-bg !important;
+  .highlight {
+    .djs-outline {
+      stroke: saturate(darken(@alert-success-border, 30%), 30%) !important;
+      stroke-width: 2px !important;
+      fill: @alert-success-bg !important;
+    }
+
+    .djs-visual {
+      >:nth-child(1) {
+        fill: @alert-success-bg !important;
+      }
+    }
   }
 }
 
