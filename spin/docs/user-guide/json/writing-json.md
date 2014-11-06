@@ -1,6 +1,6 @@
 # Writing JSON
 
-The JSON datatype supports writing JSON to Strings, output streams or writers.
+The JSON datatype supports writing JSON to Strings or Writers.
 
 ## Writing to a String:
 
@@ -10,16 +10,6 @@ import static org.camunda.spin.Spin.JSON;
 SpinJsonNode jsonNode = JSON("{\"customer\": \"Kermit\"}");
 
 String json = jsonNode.toString();
-```
-
-## Writing to an output stream:
-
-```java
-import static org.camunda.spin.Spin.JSON;
-
-SpinJsonNode jsonNode = JSON("{\"customer\": \"Kermit\"}");
-
-OutputStream ouputStream = jsonNode.toStream();
 ```
 
 ## Writing to a writer

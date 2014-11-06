@@ -8,9 +8,11 @@ Spin supports various use cases for handling XML:
 * [Querying XML][querying-xml]
 * Transforming XML
 * [Mapping XML to Java Objects][mapping-xml]
+* [Configuring XML Handling][configuring-xml]
 
 [reading-xml]: reading-xml.md
 [manipulating-xml]: manipulating-xml.md
 [writing-xml]: writing-xml.md
 [querying-xml]: querying-xml.md
 [mapping-xml]: mapping-xml.md
+[configuring-xml]: configuring-xml.md

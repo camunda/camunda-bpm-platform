@@ -1,6 +1,6 @@
 # Reading JSON
 
-The JSON datatype supports reading JSON from Strings or input streams.
+The JSON datatype supports reading JSON from Strings or Readers.
 
 ## Reading JSON from a String:
 
@@ -23,27 +23,25 @@ SpinJsonNode json = JSON("{\"customer\": \"Kermit\"}");
 
 String values that represent JSON primitive values can also be read. For example, `JSON("true")` returns a `SpinJsonNode` that represents the boolean value `true`.
 
-## Reading JSON from an InputStream:
+## Reading JSON from a Reader:
 
-Spin also supports reading JSON directly from a `java.io.InputStream`:
+Spin also supports reading JSON from an instance of `java.io.Reader`:
 
 ```java
 import static org.camunda.spin.Spin.*;
 import static org.camunda.spin.DataFormats.*;
 
-SpinJsonNode json = S(inputStram, jsonTree());
+SpinJsonNode json = S(reader, jsonTree());
 ```
 
-> **Closing the input stream**: Note that spin does not close the input stream. Users are required to close the input stream after fully processing it with spin.
-
-The `JSON(...)` method also supports input streams. The following example shows how to read JSON from a file (error handling ommitted):
+The `JSON(...)` method also supports readers. The following example shows how to read JSON from a file (error handling ommitted):
 
 ```java
 import static org.camunda.spin.Spin.*;
 
 FileInputStream fis = new FileInputStream("/tmp/customer.json");
-SpinJsonNode json = JSON(fis);
-
+InputStreamReader reader = new InputStreamReader(fis, "utf-8");
+SpinJsonNode json = JSON(reader);
 ```
 
 ## Reading JSON using a Script Language

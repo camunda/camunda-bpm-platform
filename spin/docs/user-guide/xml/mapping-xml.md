@@ -53,28 +53,3 @@ import static org.camunda.spin.Spin.XML;
 
 String xml = XML(customer).toString();
 ```
-
-### Configuring the mapper:
-
-The mapper allows us to append some useful configuration parameters to the JAXB marshaller/unmarshaller. These parameters
-can be configured as a map or simply as a key/value combination. With this you can set one of the following properties:
-
-  * properties - A map which contains properties for the JAXB marshaller/unmarshaller
-  * schema - contains the Schema for the JAXB Validation (The validation will be disabled if this is set to null)
-  * eventHandler - holds the ValidationEventHandler for the marshaller/unmarshaller to fetch all thrown events (A default handler will be used if this is set to null)
-  
-An example of a configuration (as a key/value combination) could look like this:
-
-```java
-  SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-  Schema schema = sf.newSchema(new File("your_schema.xsd");
-  
-  XmlDomDataFormat dataFormat = new XmlDomDataFormat()
-      .mapper()
-      .config("schema", schema)
-      .done();
-
-  String xml = XML(customer, dataFormat).toString();
-```
-
-This would add `your_schema.xsd` to the marshaller and also activate the validation for this conversion.

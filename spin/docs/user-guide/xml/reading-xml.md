@@ -21,27 +21,25 @@ import static org.camunda.spin.Spin.*;
 SpinXmlElement xml = XML("<order />");
 ```
 
-## Reading XML from an InputStream:
+## Reading XML from a Reader:
 
-Spin also supports reading XML directly from a `java.io.InputStream`:
+Spin also supports reading XML directly from a `java.io.Reader`:
 
 ```java
 import static org.camunda.spin.Spin.*;
 import static org.camunda.spin.DataFormats.*;
 
-SpinXmlElement xml = S(inputStram, xmlDom());
+SpinXmlElement xml = S(reader, xmlDom());
 ```
 
-> **Closing the input stream**: Note that spin does not close the input stream. Users are required to close the input stream after fully processing it with Spin.
-
-The `XML(...)` method also supports input streams. The following example shows how to read the XML from a file (error handling ommitted):
+The `XML(...)` method also supports readers. The following example shows how to read the XML from a file (error handling ommitted):
 
 ```java
 import static org.camunda.spin.Spin.*;
 
 FileInputStream fis = new FileInputStream("/tmp/incomingOrder.xml");
-SpinXmlElement xml = XML(fis);
-
+InputStreamReader reader = new InputStreamReader(fis, "utf-8");
+SpinXmlElement xml = XML(reader);
 ```
 
 ## Reading XML using a Script Language

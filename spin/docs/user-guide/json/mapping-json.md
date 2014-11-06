@@ -83,68 +83,9 @@ public class Customer {
 }
 ```
 
-Assuming that `Car` is an interface with various implementations, such as `StationWagon` or `Van`, Jackson cannot tell which implementation to use based solely on the static structure of `Customer`. In these cases, Jackson relies on type information that is part of the JSON. See the [Jackson documentation][jackson-polymorphy] for the various options Jackson offers to configure type serialization and deserialization. 
+Assuming that `Car` is an interface with various implementations, such as `StationWagon` or `Van`, Jackson cannot tell which implementation to use based solely on the static structure of `Customer`. In these cases, Jackson relies on type information that is part of the JSON. See the [Jackson documentation][jackson-polymorphy] for the various options Jackson offers to configure type serialization and deserialization. You can configure these options in Spin as described in the [configuration section][configuring-json].
 
-If you opt for a default type serialization configuration, you can set it as follows in Spin:
-
-```java
-import static org.camunda.spin.Spin.JSON;
-
-String json = 
-  "{\"customer\": \"Kermit\", 
-    \"car\": 
-      {\"brand\": \"Mega Cars\",
-      \"@class\": \"somepackage.Van\"}
-    }";
-
-Customer customer = 
-  JSON(json, 
-    jsonTree()
-      .mapper()
-      .enableDefaultTyping(DefaultTyping.OBJECT_AND_NON_CONCRETE, As.PROPERTY)
-      .done())
-    .mapTo(Customer.class);
-```
-
-The available parameters correspond to Jackson's `DefaultTyping` and `As` enumerations.
-
-When mapping such formatted JSON to Java, the same typing configuration can be applied.
-
-## Date Serialization
-
-Serializing and Deserializing dates typically requires specifying a certain date format (see [Jackson documentation][jackson-date] for built-in date handling). You can set an instance of `DateFormat` by configuring the JSON data format:
-
-```java
-public class DateContainer {
-
-  private Date date;
-  
-  public Date getDate() {
-    return date;
-  }
-  
-  public void setDatae(Date name) {
-    this.date = date;
-  }
-}
-```
-
-```java
-import static org.camunda.spin.Spin.JSON;
-
-String json = "{\"date\": \"2012-10-10T11:18:42\"}";
-
-DateFormat desiredFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-
-DateContainer dateObject = 
-  JSON(json, 
-    jsonTree()
-      .mapper()
-      .dateFormat(desiredFormat)
-      .done())
-    .mapTo(DateContainer.class);
-```
 
 [jackson-polymorphy]: http://wiki.fasterxml.com/JacksonPolymorphicDeserialization
-[jackson-date]: http://wiki.fasterxml.com/JacksonFAQDateHandling
 [reading-json]: reading-json.md
+[configuring-json]: configuring-json.md

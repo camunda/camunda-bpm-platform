@@ -191,6 +191,10 @@ public class JacksonJsonDataFormat implements DataFormat<SpinJsonNode> {
     return jsonPathConfiguration;
   }
 
+  public void setJsonPathConfiguration(Configuration jsonPathConfiguration) {
+    this.jsonPathConfiguration = jsonPathConfiguration;
+  }
+
   /**
    * Returns the configured Jackson {@link ObjectMapper} instance.
    * @return the configured object mapper.

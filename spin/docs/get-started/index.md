@@ -7,11 +7,11 @@ Spin can be used in any Java-based application by adding the following maven dep
 <dependency>
   <groupId>org.camunda.spin</groupId>
   <artifactId>camunda-spin-all</artifactId>
-  <version>1.0.0-alpha1</version>
+  <version>1.0.0-alpha5</version>
 </dependency>
 ```
 
-camunda Spin is pushed to [maven central][1].
+camunda Spin is published to [maven central][1].
 
 [1]: http://search.maven.org/#search%7Cga%7C1%7Ccamunda
 

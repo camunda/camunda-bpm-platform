@@ -18,8 +18,14 @@ package org.camunda.spin.spi;
  */
 public interface DataFormatProvider {
 
+  /**
+   * @return the name of the data format provided by the implementation
+   */
   String getDataFormatName();
 
+  /**
+   * @return an instance of the data format provided by this implementation
+   */
   DataFormat<?> createInstance();
 
 }
