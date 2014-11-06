@@ -1,19 +1,21 @@
 module.exports = function(config) {
   'use strict';
   var grunt = config.grunt;
-  var productionRemoveExp = /<!-- #production-remove.*\/production-remove -->/igm;
-  var prod = grunt.option('target') === 'dist';
+  var productionRemoveExp = /<!-- #production-remove([\s\S.]*)\/production-remove -->/igm;
+  function prod () {
+    return grunt.config('buildTarget') === 'dist';
+  };
 
 
   function productionRemove(content) {
-    if (!prod) { return content; }
+    if (!prod()) { return content; }
     grunt.log.writeln('Removing development snippets');
     return content.replace(productionRemoveExp, '');
   }
 
 
   function livereloadPort(content, srcpath) {
-    if (srcpath.slice(-4) !== 'html' || prod) {
+    if (srcpath.slice(-4) !== 'html' || prod()) {
       return content;
     }
 
@@ -94,35 +96,6 @@ module.exports = function(config) {
           src: ['**'],
           dest: '<%= buildTarget %>/images/'
         }
-      ]
-    },
-
-    sdk: {
-      files: [
-        // {
-        //   expand: true,
-        //   cwd: 'node_modules/camunda-commons-ui',
-        //   src: [
-        //     'lib/**/*.js',
-        //     'lib/*.js',
-        //     // 'resources/locales/**/*.json',
-        //     // 'resources/locales/*.json'
-        //   ],
-        //   dest: '<%= buildTarget %>/vendor/camunda-commons-ui'
-        // },
-        // {
-        //   expand: true,
-        //   cwd: 'node_modules/camunda-bpm-sdk-js/dist',
-        //   src: ['**/*.js'],
-        //   dest: '<%= pkg.gruntConfig.clientDir %>/vendor/'
-        // // },
-        // // {
-        // //   expand: true,
-        // //   cwd: 'node_modules/camunda-bpm-sdk-js/dist',
-        // //   src: ['**/*.js'],
-        // //   // dest: '<%= pkg.gruntConfig.clientDir %>/vendor/'
-        // //   dest: '<%= buildTarget %>/vendor/'
-        // }
       ]
     },
 
