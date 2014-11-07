@@ -159,7 +159,7 @@ define([
 
       });
 
-      var firstResult = (getPropertyFromLocation('page') - 1 || 0) * 15;
+      var firstResult = ((getPropertyFromLocation('page') || 1) - 1) * 15;
       var sortBy = getPropertyFromLocation('sortBy') || 'priority';
       var sortOrder = getPropertyFromLocation('sortOrder') || 'asc';
 
@@ -243,7 +243,7 @@ define([
     tasklistData.observe('currentFilter', function(_currentFilter) {
       currentFilter = _currentFilter;
     });
-    
+
     /*
      * automatically refresh the taskList every 10 seconds so that changes
      * (such as claims) are represented in realtime
