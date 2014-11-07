@@ -9,6 +9,7 @@ define([
   './directives/cam-tasklist-task-meta',
 
   './controller/cam-tasklist-task-action-ctrl',
+  './controller/cam-tasklist-task-groups-ctrl',
 
   /* detail plugins */
   './plugins/detail/cam-tasklist-task-detail-form-plugin',
@@ -40,6 +41,7 @@ define([
   taskMetaDirective,
 
   camTaskActionCtrl,
+  camTaskGroupsCtrl,
 
   /* detail plugins */
   camTaskDetailFormPlugin,
@@ -81,6 +83,7 @@ define([
   taskModule.directive('camTasklistTaskMeta', taskMetaDirective);
 
   taskModule.controller('camTaskActionCtrl', camTaskActionCtrl);
+  taskModule.controller('camTaskGroupsCtrl', camTaskGroupsCtrl);
 
   /* detail plugins */
   taskModule.config(camTaskDetailFormPlugin);
