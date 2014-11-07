@@ -7,19 +7,15 @@
     <version>1.0.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>camunda-connect-core</artifactId>
-  <name>camunda BPM - connect - core</name>
+  <artifactId>camunda-connect-soap-http-client</artifactId>
+  <name>camunda BPM - connect - soap http client</name>
 
   <dependencies>
 
     <dependency>
-      <groupId>org.camunda.commons</groupId>
-      <artifactId>camunda-commons-logging</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.camunda.commons</groupId>
-      <artifactId>camunda-commons-utils</artifactId>
+      <groupId>org.camunda.connect</groupId>
+      <artifactId>camunda-connect-http-client</artifactId>
+      <version>${project.version}</version>
     </dependency>
 
     <dependency>

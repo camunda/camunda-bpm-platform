@@ -1,26 +1,23 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <!-- camunda BPM parent release pom -->
   <parent>
-    <groupId>org.camunda</groupId>
-    <artifactId>camunda-release-parent</artifactId>
-    <version>2.5</version>
-    <!-- do not remove empty tag - http://jira.codehaus.org/browse/MNG-4687 -->
-    <relativePath />
+    <groupId>org.camunda.connect</groupId>
+    <artifactId>camunda-connect-bom</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <relativePath>bom</relativePath>
   </parent>
 
-  <groupId>org.camunda.connect</groupId>
   <artifactId>camunda-connect-root</artifactId>
-  <version>1.0.0-SNAPSHOT</version>
   <name>camunda BPM - connect - parent</name>
   <packaging>pom</packaging>
 
   <modules>
+    <module>bom</module>
     <module>core</module>
-    <module>soap-httpclient</module>
     <module>dist</module>
-    <module>rest-httpclient</module>
+    <module>http-client</module>
+    <module>soap-http-client</module>
   </modules>
 
   <dependencyManagement>
@@ -54,12 +51,6 @@
 
       <dependency>
         <groupId>ch.qos.logback</groupId>
-        <artifactId>logback-core</artifactId>
-        <version>1.1.2</version>
-      </dependency>
-
-      <dependency>
-        <groupId>ch.qos.logback</groupId>
         <artifactId>logback-classic</artifactId>
         <version>1.1.2</version>
       </dependency>
@@ -75,7 +66,10 @@
           <artifactId>maven-bundle-plugin</artifactId>
           <configuration>
             <instructions>
-              <Export-Package>org.camunda.bpm*</Export-Package>
+              <Export-Package>
+                !*impl*,
+                org.camunda.connect*
+              </Export-Package>
             </instructions>
           </configuration>
         </plugin>
@@ -90,12 +84,5 @@
       </plugins>
     </pluginManagement>
   </build>
-
-  <scm>
-    <url>https://github.com/camunda/camunda-connect</url>
-    <connection>scm:git:git@github.com:camunda/camunda-connect.git</connection>
-    <developerConnection>scm:git:git@github.com:camunda/camunda-connect.git</developerConnection>
-    <tag>HEAD</tag>
-  </scm>
 
 </project>

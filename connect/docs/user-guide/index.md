@@ -1,4 +1,4 @@
-# Connect Userguide
+# Connect User Guide
 
-* [REST Connector](rest/index.md)
+* [HTTP Connector](http/index.md)
 * [SOAP Connector](soap/index.md)

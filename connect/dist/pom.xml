@@ -14,14 +14,12 @@
 
     <dependency>
       <groupId>org.camunda.connect</groupId>
-      <artifactId>camunda-connect-soap-httpclient</artifactId>
-      <version>${project.version}</version>
+      <artifactId>camunda-connect-http-client</artifactId>
     </dependency>
 
     <dependency>
       <groupId>org.camunda.connect</groupId>
-      <artifactId>camunda-connect-rest-httpclient</artifactId>
-      <version>${project.version}</version>
+      <artifactId>camunda-connect-soap-http-client</artifactId>
     </dependency>
   </dependencies>
 
@@ -53,6 +51,9 @@
                   <shadedPattern>connectjar.org.apache</shadedPattern>
                 </relocation>
               </relocations>
+              <transformers>
+                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+              </transformers>
             </configuration>
           </execution>
         </executions>
@@ -76,9 +77,7 @@
             <Import-Package>
               !connectjar*,
               javax.*;resolution:=optional,
-              org.apache.log*;resolution:=optional,
-              org.apache.log4j*;resolution:=optional,
-              *
+              org.camunda.commons.logging
             </Import-Package>
             <Bundle-ClassPath>.</Bundle-ClassPath>
             <Embed-Dependency>*;inline=true</Embed-Dependency>
