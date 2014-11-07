@@ -448,6 +448,39 @@ public class BoundaryErrorEventTest extends PluggableProcessEngineTestCase {
     taskService.complete(userTask.getId());
   }
 
+  /**
+   * See CAM-3031
+   */
+  @Deployment
+  public void FAILING_testCatchExceptionExpressionThrownByFollowUpTask() {
+    try {
+      Map<String, Object> vars = throwException();
+      runtimeService.startProcessInstanceByKey("testProcess", vars).getId();
+      fail("should fail and not catch the error on the first task");
+    } catch (ProcessEngineException e) {
+      // happy path
+    }
+
+    assertNull(taskService.createTaskQuery().singleResult());
+  }
+
+  /**
+   * See CAM-3031
+   */
+  @Deployment
+  public void FAILING_testCatchExceptionClassDelegateThrownByFollowUpTask() {
+    try {
+      Map<String, Object> vars = throwException();
+      runtimeService.startProcessInstanceByKey("testProcess", vars).getId();
+      fail("should fail");
+    } catch (ProcessEngineException e) {
+      // happy path
+    }
+
+    assertNull(taskService.createTaskQuery().singleResult());
+  }
+
+
   @Deployment( resources = {
     "org/camunda/bpm/engine/test/bpmn/event/error/BoundaryErrorEventTest.testCatchErrorThrownByAbstractBpmnActivityBehavior.bpmn20.xml"
   })
