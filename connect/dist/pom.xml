@@ -21,6 +21,12 @@
       <groupId>org.camunda.connect</groupId>
       <artifactId>camunda-connect-soap-http-client</artifactId>
     </dependency>
+
+    <dependency>
+      <groupId>org.camunda.connect</groupId>
+      <artifactId>camunda-connect-engine-plugin</artifactId>
+    </dependency>
+
   </dependencies>
 
   <build>
