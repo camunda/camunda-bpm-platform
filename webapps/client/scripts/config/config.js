@@ -3,7 +3,7 @@ var camTasklistConf = {
   // "dateFormat": {
   //   "normal": "LLL",
   //   "long":   "LLLL"
-  // }
+  // },
   // "locales": {
   //    "preferredLocale": "en"
   //  }

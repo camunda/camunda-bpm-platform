@@ -24,7 +24,6 @@ define(function() {
       'angular-bootstrap':          'bower_components/angular-bootstrap/ui-bootstrap-tpls',
       'angular-moment':             'bower_components/angular-moment/angular-moment',
       'angular-translate':          'bower_components/angular-translate/angular-translate',
-      'angular-translate-loader-static-files': 'bower_components/angular-translate-loader-static-files/angular-translate-loader-static-files',
 
       'bpmn-js':                    'bower_components/bpmn-js/bpmn-viewer',
 
@@ -79,7 +78,6 @@ define(function() {
                                       'angular-animate',
 
                                       'angular-translate',
-                                      'angular-translate-loader-static-files',
                                       'angular-data-depend',
 
                                       'camunda-commons-ui/auth',
@@ -109,7 +107,6 @@ define(function() {
                                       'camunda-tasklist-ui/form',
                                       'camunda-tasklist-ui/services/cam-tasklist-assign-notification',
                                       'camunda-tasklist-ui/services/cam-tasklist-configuration',
-                                      'camunda-tasklist-ui/services/cam-tasklist-locale-loader',
 
                                       'bootstrap/collapse',
                                       'camunda-tasklist-ui/navigation/index',

@@ -8,7 +8,6 @@
   "FILTER_DELETE":
                         "Delete filter",
 
-
   "FILTER_DELETION_WARNING":
                         "Deleting the filter can not be undone, are your sure to want to proceed?",
   "FILTER_DELETION_SUCCESS":

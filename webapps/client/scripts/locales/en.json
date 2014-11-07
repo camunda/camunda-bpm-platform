@@ -1,5 +1,10 @@
 {
-  "camDateLocales": {
+  "VARIABLE_VALUE":
+                  "Value",
+
+
+
+  "dateLocales": {
     "months": [
       "January",
       "February",
