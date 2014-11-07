@@ -1099,9 +1099,6 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     dto.activityInstanceIdIn = taskQuery.getActivityInstanceIdIn();
     dto.assignee = taskQuery.getAssignee();
     dto.assigneeLike = taskQuery.getAssigneeLike();
-    dto.candidateGroup = taskQuery.getCandidateGroup();
-    dto.candidateGroups = taskQuery.getCandidateGroups();
-    dto.candidateUser = taskQuery.getCandidateUser();
     dto.caseDefinitionId = taskQuery.getCaseDefinitionId();
     dto.caseDefinitionKey = taskQuery.getCaseDefinitionKey();
     dto.caseDefinitionName = taskQuery.getCaseDefinitionName();
@@ -1110,6 +1107,15 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     dto.caseInstanceBusinessKey = taskQuery.getCaseInstanceBusinessKey();
     dto.caseInstanceBusinessKeyLike = taskQuery.getCaseInstanceBusinessKeyLike();
     dto.caseInstanceId = taskQuery.getCaseInstanceId();
+
+    dto.candidateUser = taskQuery.getCandidateUser();
+    dto.candidateGroup = taskQuery.getCandidateGroup();
+    // only set candidate groups if no other candidate argument was set
+    // NOTE: the getCandidateGroups method does some magic which also
+    //       evaluates candidateUser and candidateGroup
+    if (dto.candidateUser == null && dto.candidateGroup == null) {
+      dto.candidateGroups = taskQuery.getCandidateGroups();
+    }
 
     dto.processInstanceBusinessKey = taskQuery.getProcessInstanceBusinessKey();
     dto.processInstanceBusinessKeyLike = taskQuery.getProcessInstanceBusinessKeyLike();
@@ -1122,8 +1128,6 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     dto.processInstanceId = taskQuery.getProcessInstanceId();
     dto.assignee = taskQuery.getAssignee();
     dto.assigneeLike = taskQuery.getAssigneeLike();
-    dto.candidateGroup = taskQuery.getCandidateGroup();
-    dto.candidateUser = taskQuery.getCandidateUser();
     dto.taskDefinitionKey = taskQuery.getKey();
     dto.taskDefinitionKeyLike = taskQuery.getKeyLike();
     dto.description = taskQuery.getDescription();
