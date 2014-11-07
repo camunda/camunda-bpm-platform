@@ -42,8 +42,6 @@
       min-width: 90px;
     }
 
-    // .edit-value {}
-
     .field {
       position: absolute;
       top: 30px;
@@ -51,46 +49,6 @@
       background-color: @body-bg;
       overflow: hidden;
       .box-shadow(0 3px 9px rgba(0,0,0,.5));
-    }
-
-    table button {
-      border: none;
-    }
-    thead button {
-      height: 28px;
-    }
-  }
-
-  &[type="option"] {
-    .dropdown-menu {
-      min-width: initial;
-      text-align: left;
-    }
-  }
-
-  .timepicker {
-    margin: auto;
-    input {
-      max-width: 50px;
-    }
-  }
-
-  .btn-group {
-    position: absolute;
-    right: 0;
-    background-color: @body-bg;
-    bottom: 100%;
-    margin-bottom: -1px;
-
-    border-radius: 3px 3px 0 0;
-    button {
-      border-color: @input-border-focus;
-      &:first-child {
-        border-radius: 3px 0 0 0;
-      }
-      &:last-child {
-        border-radius: 0 3px 0 0;
-      }
     }
   }
 }
@@ -119,4 +77,69 @@
 
 .list-inline>[cam-widget-inline-field] {
   padding-right: 0;
+}
+
+
+.cam-widget-inline-field {
+  &.btn-group,
+  &.field-control {
+    background-color: @body-bg;
+  }
+
+  &.btn-group {
+    position: absolute;
+    right: 0;
+    background-color: @body-bg;
+    bottom: 100%;
+    margin-bottom: -1px;
+
+    border-radius: 3px 3px 0 0;
+    button {
+      border-color: @input-border-focus;
+      &:first-child {
+        border-radius: 3px 0 0 0;
+      }
+      &:last-child {
+        border-radius: 0 3px 0 0;
+      }
+    }
+  }
+
+  &.field-control {
+    .box-shadow(0 3px 9px rgba(0,0,0,.5));
+
+    table button {
+      border: none;
+    }
+    thead button {
+      height: 28px;
+    }
+
+    .timepicker {
+      margin: auto;
+      input {
+        max-width: 50px;
+      }
+    }
+
+  }
+
+  > .option-value {
+    padding: 4px;
+  }
+
+  > .dropdown-menu {
+    display: block;
+    min-width: initial;
+    text-align: left;
+  }
+}
+
+
+body>.cam-widget-inline-field {
+  &.btn-group,
+  &.field-control {
+    position: absolute;
+    z-index: 99999;
+  }
 }

@@ -2,7 +2,6 @@
       ng-if="!editing"
       ng-click="startEditing()"
       ng-transclude>
-
 </span>
 
 <span class="edit"
@@ -21,7 +20,8 @@
            ng-keyup="($event.keyCode == 13 && applyChange()) || ($event.keyCode == 27 && cancelChange())"
            placeholder="{{ placeholder }}" />
 
-    <span ng-if="varType === 'datetime' || varType === 'date' || varType === 'time'">
+    <span ng-show="varType === 'datetime' || varType === 'date' || varType === 'time'"
+          class="cam-widget-inline-field field-control">
 
       <datepicker class="datepicker"
                   ng-if="varType === 'datetime' || varType === 'date'"
@@ -42,9 +42,12 @@
                   ng-change="changeDate(this)" />
 
     </span>
-    <div ng-if="varType === 'option'">
-      <span style="padding: 4px;">{{varValue | translate }}</span>
-      <ul class="dropdown-menu" style="display:block;" role="menu">
+
+    <div ng-if="varType === 'option'"
+         class="cam-widget-inline-field">
+      <span class="option-value">{{varValue | translate }}</span>
+      <ul class="dropdown-menu"
+          role="menu">
         <li ng-repeat="option in options">
           <a ng-click="applyChange(option)">
             {{option | translate }}
@@ -54,7 +57,8 @@
     </div>
   </span>
 
-  <span class="btn-group" ng-if="varType !== 'option'">
+  <span ng-show="varType !== 'option'"
+        class="cam-widget-inline-field btn-group">
     <button type="button"
             class="btn btn-xs btn-default"
             ng-click="changeType()"

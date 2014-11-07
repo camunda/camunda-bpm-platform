@@ -1,9 +1,13 @@
 define([
-  'text!./cam-widget-inline-field.html'
+  'text!./cam-widget-inline-field.html',
+  'angular'
 ], function(
-  template
+  template,
+  angular
 ) {
   'use strict';
+
+  var $ = angular.element;
 
   return [
     '$timeout',
@@ -36,6 +40,9 @@ define([
       template: template,
 
       link: function(scope, element) {
+        var $bdyEl = angular.element('body');
+        var $btnsEl;
+        var $ctrlsEl;
 
         var dateFilter = $filter('date'),
             dateFormat = 'yyyy-MM-dd\'T\'HH:mm:ss';
@@ -80,7 +87,7 @@ define([
 
           scope.validator =     scope.validator ||     function() {};
           scope.onStart =       scope.onStart ||       function() {};
-          scope.onCancel =      scope.onCancel ||       function() {};
+          scope.onCancel =      scope.onCancel ||      function() {};
           scope.change =        scope.change ||        function() {};
           scope.inputFormat =   scope.inputFormat ||   'X';
           scope.displayFormat = scope.displayFormat || 'LLL';
@@ -90,7 +97,6 @@ define([
           scope.flexible =      scope.flexible ||      false;
 
           scope.varType =       !!scope.varType ? scope.varType : 'text';
-
 
           scope.simpleField = isSimpleField();
 
@@ -108,12 +114,93 @@ define([
           }
         }
 
+        function bodyDirectChild($el) {
+          if (!$el || !$el.length) {
+            return false;
+          }
+
+          var $parent = $el.parent();
+          if (!$parent || !$parent.length) {
+            return false;
+          }
+
+          return $parent[0].tagName.toLowerCase() === 'body';
+        }
+
+        function positionElements() {
+          var $fieldEl = element;//.find('.edit');
+          var offset = $fieldEl.offset();
+
+          $btnsEl
+            .show()
+            .css({
+              left: offset.left + ($fieldEl.outerWidth() - $btnsEl.outerWidth()),
+              top: offset.top - $btnsEl.outerHeight()
+            });
+
+          $ctrlsEl
+            .show()
+            .css({
+              left: offset.left,
+              top: offset.top + $fieldEl.outerHeight()
+            });
+          }
+
+        function appendToBody() {
+          $btnsEl = (($btnsEl && $btnsEl.length) ? $btnsEl : element.find('.btn-group'))
+                    .hide();
+          if (!bodyDirectChild($btnsEl)) {
+            $bdyEl
+              .append($btnsEl);
+          }
+
+          $ctrlsEl = (($ctrlsEl && $ctrlsEl.length) ? $ctrlsEl : element.find('.field-control'))
+                    .hide();
+          if (!bodyDirectChild($ctrlsEl)) {
+            $bdyEl
+              .append($ctrlsEl);
+          }
+
+          $timeout(positionElements, 10);
+        }
+
+        function removeFromBody() {
+          if ($btnsEl && $btnsEl.remove) {
+            $btnsEl.remove();
+          }
+          $btnsEl = null;
+
+          if ($ctrlsEl && $ctrlsEl.remove) {
+            $ctrlsEl.remove();
+          }
+          $ctrlsEl = null;
+        }
+
+
+
+        function bodyClicked(evt) {
+          return element[0].contains(evt.target) ||
+            ($btnsEl && $btnsEl.length && $btnsEl[0].contains(evt.target)) ||
+            ($ctrlsEl && $ctrlsEl.length && $ctrlsEl[0].contains(evt.target));
+        }
+
+
+
+        scope.$watch('editing', function () {
+          if (scope.editing) {
+            appendToBody();
+          }
+          else {
+            removeFromBody();
+          }
+        });
+
         function stopEditing(evt) {
           if(!scope.editing) {
             return;
           }
 
-          if(element[0].contains(evt.target)) {
+          if(bodyClicked(evt)) {
             return;
           }
 
@@ -133,8 +220,8 @@ define([
         }
 
         scope.changeType = function() {
-          if(scope.varType === "datetime") {
-            scope.varType = "text";
+          if(scope.varType === 'datetime') {
+            scope.varType = 'text';
           } else {
             scope.varType = 'datetime';
           }
@@ -152,22 +239,22 @@ define([
             scope.onStart(scope);
 
             $timeout(function(){
-              angular.element('[ng-model="editValue"]').focus();
+              $('[ng-model="editValue"]').focus();
               $document.bind('click', stopEditing);
-            }, 100);
+            }, 50);
           }
         };
 
         scope.applyChange = function(selection) {
-
           scope.invalid = scope.validator(scope);
 
           if (!scope.invalid) {
+
             if(scope.simpleField) {
-              scope.editValue = angular.element('[ng-model="editValue"]').val();
+              scope.editValue = $('[ng-model="editValue"]').val();
               scope.varValue = scope.editValue;
             }
-            else if (scope.varType === "option") {
+            else if (scope.varType === 'option') {
               scope.editValue = selection;
               scope.varValue = scope.editValue;
             }
@@ -178,6 +265,7 @@ define([
             scope.change(scope);
 
             scope.editing = false;
+
             $document.unbind('click', stopEditing);
           }
         };
@@ -185,6 +273,7 @@ define([
         scope.cancelChange = function() {
           scope.editing = false;
           scope.onCancel(scope);
+
           $document.unbind('click', stopEditing);
         };
 
