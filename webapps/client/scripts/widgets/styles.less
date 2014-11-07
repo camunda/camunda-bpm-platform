@@ -1,23 +1,31 @@
 [cam-widget-inline-field] {
+  border-radius: 3px;
+  border: 1px solid transparent;
   display: inline-block;
+  max-width: 100%;
   position: relative;
+  padding: 0;
+  margin: 0;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: middle;
 
-  >.view-value {
-    border: 1px solid transparent;
-    margin: 0;
+  &:hover {
+    background-color: @gray-lighter;
+    border: 1px @line-style @line-color;
+    cursor: pointer;
+  }
+
+  >.view-value,
+  .preview {
+    max-width: 100%;
+    display: inline-block;
+    overflow: hidden;
+    text-overflow: ellipsis;
     padding: 1px 3px;
+    margin: 0;
     position: relative;
-    // background-color: transparent;
-
-    border-radius: 3px;
-
-    &:hover {
-      z-index: 99;
-      cursor: pointer;
-      border: 1px @line-style @line-color;
-      // background-color: transparent;
-      background-color: @gray-lighter;
-    }
+    vertical-align: middle;
   }
 
   >.edit {
@@ -27,10 +35,10 @@
       width: auto;
       min-width: 40px;
       max-width: 100%;
-
       border-radius: 3px 0 3px 3px;
     }
   }
+
 
   &[type="date"],
   &[type="time"],
@@ -83,18 +91,18 @@
 .cam-widget-inline-field {
   &.btn-group,
   &.field-control {
+    position: absolute;
     background-color: @body-bg;
+    display: none;
   }
 
   &.btn-group {
-    position: absolute;
-    right: 0;
-    background-color: @body-bg;
-    bottom: 100%;
-    margin-bottom: -1px;
+    margin-top: 2px;
+    margin-left: -1px;
 
     border-radius: 3px 3px 0 0;
-    button {
+
+    > button.btn {
       border-color: @input-border-focus;
       &:first-child {
         border-radius: 3px 0 0 0;
@@ -107,6 +115,7 @@
 
   &.field-control {
     .box-shadow(0 3px 9px rgba(0,0,0,.5));
+    margin-top: -2px;
 
     table button {
       border: none;
@@ -122,16 +131,11 @@
       }
     }
 
-  }
-
-  > .option-value {
-    padding: 4px;
-  }
-
-  > .dropdown-menu {
-    display: block;
-    min-width: initial;
-    text-align: left;
+    > .dropdown-menu {
+      display: block;
+      min-width: initial;
+      text-align: left;
+    }
   }
 }
 
@@ -141,5 +145,6 @@ body>.cam-widget-inline-field {
   &.field-control {
     position: absolute;
     z-index: 99999;
+    display: block;
   }
 }

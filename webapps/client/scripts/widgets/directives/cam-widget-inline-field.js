@@ -49,8 +49,13 @@ define([
 
         var dateRegex = /(\d\d\d\d)-(\d\d)-(\d\d)T(\d\d):(\d\d):(\d\d)(?:.(\d\d\d)| )?$/;
 
+        scope.editing = false;
+
         scope.$on('$locationChangeSuccess', function() {
           scope.cancelChange();
+        });
+        scope.$on('$destroy', function() {
+          removeFromBody(true);
         });
 
         function convertDateStringToObject(date) {
@@ -128,13 +133,12 @@ define([
         }
 
         function positionElements() {
-          var $fieldEl = element;//.find('.edit');
-          var offset = $fieldEl.offset();
+          var offset = element.offset();
 
           $btnsEl
             .show()
             .css({
-              left: offset.left + ($fieldEl.outerWidth() - $btnsEl.outerWidth()),
+              left: offset.left + (element.outerWidth() - $btnsEl.outerWidth()),
               top: offset.top - $btnsEl.outerHeight()
             });
 
@@ -142,7 +146,7 @@ define([
             .show()
             .css({
               left: offset.left,
-              top: offset.top + $fieldEl.outerHeight()
+              top: offset.top + element.outerHeight()
             });
           }
 
@@ -161,19 +165,23 @@ define([
               .append($ctrlsEl);
           }
 
-          $timeout(positionElements, 10);
+          $timeout(positionElements, 50);
         }
 
-        function removeFromBody() {
-          if ($btnsEl && $btnsEl.remove) {
-            $btnsEl.remove();
-          }
-          $btnsEl = null;
+        function removeFromBody(force) {
+          $timeout(function() {
+            if (scope.editing && !force) { return; }
 
-          if ($ctrlsEl && $ctrlsEl.remove) {
-            $ctrlsEl.remove();
-          }
-          $ctrlsEl = null;
+            if ($btnsEl && $btnsEl.remove) {
+              $btnsEl.remove();
+            }
+            $btnsEl = null;
+
+            if ($ctrlsEl && $ctrlsEl.remove) {
+              $ctrlsEl.remove();
+            }
+            $ctrlsEl = null;
+          }, 50);
         }
 
 
@@ -186,7 +194,9 @@ define([
 
 
 
-        scope.$watch('editing', function () {
+        scope.$watch('editing', function (after, before) {
+          if (after === before) { return; }
+
           if (scope.editing) {
             appendToBody();
           }
@@ -233,6 +243,7 @@ define([
 
         scope.startEditing = function() {
           if(!scope.editing) {
+
             reset();
 
             scope.editing = true;
