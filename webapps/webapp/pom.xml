@@ -91,11 +91,6 @@
       <scope>provided</scope>
     </dependency>
 
-    <dependency>
-      <groupId>org.camunda.spin</groupId>
-      <artifactId>camunda-spin-all</artifactId>
-    </dependency>
-
     <!-- rest api -->
     <dependency>
       <groupId>org.camunda.bpm</groupId>
