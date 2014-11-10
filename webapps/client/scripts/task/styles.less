@@ -18,10 +18,11 @@
     }
 
     li {
-      max-width: 50%;
+      max-width: 49%;
       vertical-align: top;
       .preview {
-        .truncate(100%);
+        max-width: 100%;
+        white-space: nowrap;
       }
     }
 
@@ -53,11 +54,10 @@
         }
       }
     }
+  }
 
-    .reset-assignee,
-    .unclaim {
-      top: 2px;
-    }
+  .glyphicon-remove {
+    top: 3px;
   }
 }
 
