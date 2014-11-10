@@ -80,7 +80,7 @@ public class SpinFactoryImpl extends SpinFactory {
   public <T extends Spin<?>> T createSpin(Object parameter, String dataFormatName) {
     ensureNotNull("dataFormatName", dataFormatName);
 
-    DataFormat<T> dataFormat = (DataFormat<T>) DataFormats.getInstance().getDataFormatByName(dataFormatName);
+    DataFormat<T> dataFormat = (DataFormat<T>) DataFormats.getDataFormat(dataFormatName);
 
     return createSpin(parameter, dataFormat);
   }
@@ -110,7 +110,7 @@ public class SpinFactoryImpl extends SpinFactory {
     RewindableReader rewindableReader = new RewindableReader(parameter, READ_SIZE);
 
     DataFormat<T> matchingDataFormat = null;
-    for (DataFormat<?> format : DataFormats.getInstance().getAvailableDataFormats()) {
+    for (DataFormat<?> format : DataFormats.getAvailableDataFormats()) {
       if (format.getReader().canRead(rewindableReader, rewindableReader.getRewindBufferSize())) {
         matchingDataFormat = (DataFormat<T>) format;
       }

@@ -29,7 +29,7 @@ public class SpinObjectValueSerializers {
   public List<TypedValueSerializer<?>> getSerializers() {
     List<TypedValueSerializer<?>> resultList = new ArrayList<TypedValueSerializer<?>>();
 
-    Set<DataFormat<?>> availableDataFormats = DataFormats.getInstance().getAvailableDataFormats();
+    Set<DataFormat<?>> availableDataFormats = DataFormats.getAvailableDataFormats();
     for (DataFormat<?> dataFormat : availableDataFormats) {
       resultList.add(new SpinObjectValueSerializer("spin://"+dataFormat.getName(), dataFormat));
     }

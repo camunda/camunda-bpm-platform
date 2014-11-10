@@ -65,7 +65,7 @@ public class SpinProcessEnginePlugin implements ProcessEnginePlugin {
   protected List<TypedValueSerializer<?>> lookupSpinSerializers() {
     List<TypedValueSerializer<?>> serializers = new ArrayList<TypedValueSerializer<?>>();
 
-    Set<DataFormat<?>> availableDataFormats = DataFormats.getInstance().getAvailableDataFormats();
+    Set<DataFormat<?>> availableDataFormats = DataFormats.getAvailableDataFormats();
     for (DataFormat<?> dataFormat : availableDataFormats) {
       serializers.add(new SpinObjectValueSerializer("spin://"+dataFormat.getName(), dataFormat));
     }

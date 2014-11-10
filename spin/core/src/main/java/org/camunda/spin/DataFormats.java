@@ -57,7 +57,7 @@ public class DataFormats {
    */
   @SuppressWarnings("unchecked")
   public static DataFormat<SpinXmlElement> xml() {
-    return (DataFormat<SpinXmlElement>) INSTANCE.getDataFormatByName(XML_DATAFORMAT_NAME);
+    return (DataFormat<SpinXmlElement>) getDataFormat(XML_DATAFORMAT_NAME);
   }
 
   /**
@@ -66,14 +66,31 @@ public class DataFormats {
    */
   @SuppressWarnings("unchecked")
   public static DataFormat<SpinJsonNode> json() {
-    return (DataFormat<SpinJsonNode>) INSTANCE.getDataFormatByName(JSON_DATAFORMAT_NAME);
+    return (DataFormat<SpinJsonNode>) getDataFormat(JSON_DATAFORMAT_NAME);
+  }
+
+  /**
+   * Returns the registered data format for the given name.
+   *
+   * @param dataFormatName the name of the data format
+   * @return the data format or null if non is registered for this name
+   */
+  public static DataFormat<? extends Spin<?>> getDataFormat(String dataFormatName) {
+    return INSTANCE.getDataFormatByName(dataFormatName);
+  }
+
+  /**
+   * @return a set of all registered data formats
+   */
+  public static Set<DataFormat<? extends Spin<?>>> getAvailableDataFormats() {
+    return INSTANCE.getAllAvailableDataFormats();
   }
 
   // instance /////////////////////////////////////////////////////
 
   protected Map<String, DataFormat<?>> availableDataFormats;
 
-  public Set<DataFormat<? extends Spin<?>>> getAvailableDataFormats() {
+  public Set<DataFormat<? extends Spin<?>>> getAllAvailableDataFormats() {
     ensureDataformatsInitialized();
     return new HashSet<DataFormat<? extends Spin<?>>>(availableDataFormats.values());
   }

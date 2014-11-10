@@ -69,7 +69,7 @@ public class DataFormatProviderTest {
     mockConfigurators();
 
     // when the custom data format is requested
-    DataFormat<?> customDataFormat = DataFormats.getInstance().getDataFormatByName(CustomDataFormatProvider.NAME);
+    DataFormat<?> customDataFormat = DataFormats.getDataFormat(CustomDataFormatProvider.NAME);
 
     // then it should be properly returned
     assertThat(customDataFormat).isNotNull();
@@ -84,7 +84,7 @@ public class DataFormatProviderTest {
     mockProviders(new CustomDataFormatProvider());
     mockConfigurators(new ExampleCustomDataFormatConfigurator());
 
-    DataFormat<?> format = DataFormats.getInstance().getDataFormatByName(CustomDataFormatProvider.NAME);
+    DataFormat<?> format = DataFormats.getDataFormat(CustomDataFormatProvider.NAME);
     assertThat(format).isSameAs(CustomDataFormatProvider.DATA_FORMAT);
 
     // then the configuration was applied
