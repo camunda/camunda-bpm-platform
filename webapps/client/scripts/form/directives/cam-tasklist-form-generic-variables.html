@@ -62,7 +62,7 @@
 
         <div class="col-xs-4">
           <select required
-                  ng-readonly="!variable.name"
+                  ng-disabled="!variable.name"
                   class="form-control"
                   placeholder="{{ 'VARIABLE_TYPE' | translate }}"
                   ng-model="variable.type">
