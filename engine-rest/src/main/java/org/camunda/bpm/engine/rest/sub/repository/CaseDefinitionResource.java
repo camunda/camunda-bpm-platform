@@ -29,7 +29,7 @@ import org.camunda.bpm.engine.rest.dto.runtime.CreateCaseInstanceDto;
 
 /**
  * @author Roman Smirnov
- * 
+ *
  */
 public interface CaseDefinitionResource {
 

@@ -163,12 +163,12 @@ public class CaseDefinitionResourceImpl implements CaseDefinitionResource {
 
   @Override
   public Response getCaseDefinitionDiagram() {
-    final CaseDefinition definition = engine.getRepositoryService().getCaseDefinition(caseDefinitionId);
-    final InputStream caseDiagram = engine.getRepositoryService().getCaseDiagram(caseDefinitionId);
+    CaseDefinition definition = engine.getRepositoryService().getCaseDefinition(caseDefinitionId);
+    InputStream caseDiagram = engine.getRepositoryService().getCaseDiagram(caseDefinitionId);
     if (caseDiagram == null) {
       return Response.noContent().build();
     } else {
-      final String fileName = definition.getDiagramResourceName();
+      String fileName = definition.getDiagramResourceName();
       return Response.ok(caseDiagram).header("Content-Disposition", "attachment; filename=" + fileName)
           .type(ProcessDefinitionResourceImpl.getMediaTypeForFileSuffix(fileName)).build();
     }

@@ -145,12 +145,6 @@
       <if test="resourceNameLike != null">
         and RES.RESOURCE_NAME_ like #{resourceNameLike}
       </if>
-      <if test="diagramResourceName != null">
-        and RES.DGRM_RESOURCE_NAME_ = #{diagramResourceName}
-      </if>
-      <if test="diagramResourceNameLike != null">
-        and RES.DGRM_RESOURCE_NAME_ like #{diagramResourceNameLike}
-      </if>
       <if test="version != null">
         and RES.VERSION_ = #{version}
       </if>

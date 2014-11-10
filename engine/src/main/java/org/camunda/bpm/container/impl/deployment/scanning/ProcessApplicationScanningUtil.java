@@ -13,7 +13,6 @@
 package org.camunda.bpm.container.impl.deployment.scanning;
 
 import java.net.URL;
-import java.util.Arrays;
 import java.util.Map;
 
 import org.camunda.bpm.application.impl.metadata.spi.ProcessArchiveXml;
@@ -24,7 +23,7 @@ import org.camunda.bpm.engine.impl.cmmn.deployer.CmmnDeployer;
 public class ProcessApplicationScanningUtil {
 
   /**
-   * 
+   *
    * @param classLoader
    *          the classloader to scan
    * @param paResourceRootPath
@@ -38,7 +37,7 @@ public class ProcessApplicationScanningUtil {
   }
 
   /**
-   * 
+   *
    * @param classLoader
    *          the classloader to scan
    * @param paResourceRootPath
@@ -98,14 +97,10 @@ public class ProcessApplicationScanningUtil {
   /**
    * Checks, whether a filename is a diagram for the given modelFileName.
    * 
-   * @param fileName
-   *          filename to check.
-   * @param modelFileName
-   *          model file name.
-   * @param diagramSuffixes
-   *          suffixes of the diagram files.
-   * @param modelSuffixes
-   *          suffixes of model files.
+   * @param fileName filename to check.
+   * @param modelFileName model file name.
+   * @param diagramSuffixes suffixes of the diagram files.
+   * @param modelSuffixes suffixes of model files.
    * @return true, if a file is a diagram for the model.
    */
   private static boolean checkDiagram(final String fileName, final String modelFileName, final String[] diagramSuffixes, final String[] modelSuffixes) {

@@ -70,219 +70,184 @@ import org.camunda.bpm.model.cmmn.CmmnModelInstance;
  */
 public class RepositoryServiceImpl extends ServiceImpl implements RepositoryService {
 
-  @Override
   public DeploymentBuilder createDeployment() {
     return new DeploymentBuilderImpl(this);
   }
 
-  @Override
-  public ProcessApplicationDeploymentBuilder createDeployment(final ProcessApplicationReference processApplication) {
+  public ProcessApplicationDeploymentBuilder createDeployment(ProcessApplicationReference processApplication) {
     return new ProcessApplicationDeploymentBuilderImpl(this, processApplication);
   }
 
-  public Deployment deploy(final DeploymentBuilderImpl deploymentBuilder) {
+  public Deployment deploy(DeploymentBuilderImpl deploymentBuilder) {
     return commandExecutor.execute(new DeployCmd<Deployment>(deploymentBuilder));
   }
 
-  @Override
-  public void deleteDeployment(final String deploymentId) {
+  public void deleteDeployment(String deploymentId) {
     commandExecutor.execute(new DeleteDeploymentCmd(deploymentId, false, false));
   }
 
-  @Override
-  public void deleteDeploymentCascade(final String deploymentId) {
+  public void deleteDeploymentCascade(String deploymentId) {
     commandExecutor.execute(new DeleteDeploymentCmd(deploymentId, true, false));
   }
 
-  @Override
-  public void deleteDeployment(final String deploymentId, final boolean cascade) {
+  public void deleteDeployment(String deploymentId, boolean cascade) {
     commandExecutor.execute(new DeleteDeploymentCmd(deploymentId, cascade, false));
   }
 
-  @Override
-  public void deleteDeployment(final String deploymentId, final boolean cascade, final boolean skipCustomListeners) {
+  public void deleteDeployment(String deploymentId, boolean cascade, boolean skipCustomListeners) {
     commandExecutor.execute(new DeleteDeploymentCmd(deploymentId, cascade, skipCustomListeners));
   }
 
-  @Override
   public ProcessDefinitionQuery createProcessDefinitionQuery() {
     return new ProcessDefinitionQueryImpl(commandExecutor);
   }
 
-  @Override
   public CaseDefinitionQuery createCaseDefinitionQuery() {
     return new CaseDefinitionQueryImpl(commandExecutor);
   }
 
-  @Override
   @SuppressWarnings("unchecked")
-  public List<String> getDeploymentResourceNames(final String deploymentId) {
+  public List<String> getDeploymentResourceNames(String deploymentId) {
     return commandExecutor.execute(new GetDeploymentResourceNamesCmd(deploymentId));
   }
 
-  @Override
   @SuppressWarnings("unchecked")
-  public List<Resource> getDeploymentResources(final String deploymentId) {
+  public List<Resource> getDeploymentResources(String deploymentId) {
     return commandExecutor.execute(new GetDeploymentResourcesCmd(deploymentId));
   }
 
-  @Override
-  public InputStream getResourceAsStream(final String deploymentId, final String resourceName) {
+  public InputStream getResourceAsStream(String deploymentId, String resourceName) {
     return commandExecutor.execute(new GetDeploymentResourceCmd(deploymentId, resourceName));
   }
 
-  @Override
-  public InputStream getResourceAsStreamById(final String deploymentId, final String resourceId) {
+  public InputStream getResourceAsStreamById(String deploymentId, String resourceId) {
     return commandExecutor.execute(new GetDeploymentResourceForIdCmd(deploymentId, resourceId));
   }
 
-  @Override
   public DeploymentQuery createDeploymentQuery() {
     return new DeploymentQueryImpl(commandExecutor);
   }
 
-  @Override
-  public ProcessDefinition getProcessDefinition(final String processDefinitionId) {
+  public ProcessDefinition getProcessDefinition(String processDefinitionId) {
     return commandExecutor.execute(new GetDeploymentProcessDefinitionCmd(processDefinitionId));
   }
 
-  public ReadOnlyProcessDefinition getDeployedProcessDefinition(final String processDefinitionId) {
+  public ReadOnlyProcessDefinition getDeployedProcessDefinition(String processDefinitionId) {
     return commandExecutor.execute(new GetDeploymentProcessDefinitionCmd(processDefinitionId));
   }
 
-  @Override
-  public void suspendProcessDefinitionById(final String processDefinitionId) {
+  public void suspendProcessDefinitionById(String processDefinitionId) {
     commandExecutor.execute(new SuspendProcessDefinitionCmd(processDefinitionId, null, false, null));
   }
 
-  @Override
-  public void suspendProcessDefinitionById(final String processDefinitionId, final boolean suspendProcessInstances, final Date suspensionDate) {
+  public void suspendProcessDefinitionById(String processDefinitionId, boolean suspendProcessInstances, Date suspensionDate) {
     commandExecutor.execute(new SuspendProcessDefinitionCmd(processDefinitionId, null, suspendProcessInstances, suspensionDate));
   }
 
-  @Override
-  public void suspendProcessDefinitionByKey(final String processDefinitionKey) {
+  public void suspendProcessDefinitionByKey(String processDefinitionKey) {
     commandExecutor.execute(new SuspendProcessDefinitionCmd(null, processDefinitionKey, false, null));
   }
 
-  @Override
-  public void suspendProcessDefinitionByKey(final String processDefinitionKey, final boolean suspendProcessInstances, final Date suspensionDate) {
+  public void suspendProcessDefinitionByKey(String processDefinitionKey, boolean suspendProcessInstances, Date suspensionDate) {
     commandExecutor.execute(new SuspendProcessDefinitionCmd(null, processDefinitionKey, suspendProcessInstances, suspensionDate));
   }
 
-  @Override
-  public void activateProcessDefinitionById(final String processDefinitionId) {
+  public void activateProcessDefinitionById(String processDefinitionId) {
     commandExecutor.execute(new ActivateProcessDefinitionCmd(processDefinitionId, null, false, null));
   }
 
-  @Override
-  public void activateProcessDefinitionById(final String processDefinitionId, final boolean activateProcessInstances, final Date activationDate) {
+  public void activateProcessDefinitionById(String processDefinitionId, boolean activateProcessInstances, Date activationDate) {
     commandExecutor.execute(new ActivateProcessDefinitionCmd(processDefinitionId, null, activateProcessInstances, activationDate));
   }
 
-  @Override
-  public void activateProcessDefinitionByKey(final String processDefinitionKey) {
+  public void activateProcessDefinitionByKey(String processDefinitionKey) {
     commandExecutor.execute(new ActivateProcessDefinitionCmd(null, processDefinitionKey, false, null));
   }
 
-  @Override
-  public void activateProcessDefinitionByKey(final String processDefinitionKey, final boolean activateProcessInstances, final Date activationDate) {
+  public void activateProcessDefinitionByKey(String processDefinitionKey, boolean activateProcessInstances, Date activationDate) {
     commandExecutor.execute(new ActivateProcessDefinitionCmd(null, processDefinitionKey, activateProcessInstances, activationDate));
   }
 
-  @Override
-  public InputStream getProcessModel(final String processDefinitionId) {
+  public InputStream getProcessModel(String processDefinitionId) {
     return commandExecutor.execute(new GetDeploymentProcessModelCmd(processDefinitionId));
   }
 
-  @Override
-  public InputStream getProcessDiagram(final String processDefinitionId) {
+  public InputStream getProcessDiagram(String processDefinitionId) {
     return commandExecutor.execute(new GetDeploymentProcessDiagramCmd(processDefinitionId));
   }
 
-  @Override
-  public InputStream getCaseDiagram(final String caseDefinitionId) {
+  public InputStream getCaseDiagram(String caseDefinitionId) {
     return commandExecutor.execute(new GetDeploymentCaseDiagramCmd(caseDefinitionId));
   }
 
-  @Override
-  public DiagramLayout getProcessDiagramLayout(final String processDefinitionId) {
+  public DiagramLayout getProcessDiagramLayout(String processDefinitionId) {
     return commandExecutor.execute(new GetDeploymentProcessDiagramLayoutCmd(processDefinitionId));
   }
 
-  @Override
-  public BpmnModelInstance getBpmnModelInstance(final String processDefinitionId) {
+  public BpmnModelInstance getBpmnModelInstance(String processDefinitionId) {
     return commandExecutor.execute(new GetDeploymentBpmnModelInstanceCmd(processDefinitionId));
   }
 
-  @Override
-  public CmmnModelInstance getCmmnModelInstance(final String caseDefinitionId) {
+  public CmmnModelInstance getCmmnModelInstance(String caseDefinitionId) {
     try {
       return commandExecutor.execute(new GetDeploymentCmmnModelInstanceCmd(caseDefinitionId));
 
-    } catch (final NullValueException e) {
+    } catch (NullValueException e) {
       throw new NotValidException(e.getMessage(), e);
 
-    } catch (final CmmnModelInstanceNotFoundException e) {
+    } catch (CmmnModelInstanceNotFoundException e) {
       throw new NotFoundException(e.getMessage(), e);
 
-    } catch (final DeploymentResourceNotFoundException e) {
+    } catch (DeploymentResourceNotFoundException e) {
       throw new NotFoundException(e.getMessage(), e);
 
     }
   }
 
-  @Override
-  public void addCandidateStarterUser(final String processDefinitionId, final String userId) {
+  public void addCandidateStarterUser(String processDefinitionId, String userId) {
     commandExecutor.execute(new AddIdentityLinkForProcessDefinitionCmd(processDefinitionId, userId, null));
   }
 
-  @Override
-  public void addCandidateStarterGroup(final String processDefinitionId, final String groupId) {
+  public void addCandidateStarterGroup(String processDefinitionId, String groupId) {
     commandExecutor.execute(new AddIdentityLinkForProcessDefinitionCmd(processDefinitionId, null, groupId));
   }
 
-  @Override
-  public void deleteCandidateStarterGroup(final String processDefinitionId, final String groupId) {
+  public void deleteCandidateStarterGroup(String processDefinitionId, String groupId) {
     commandExecutor.execute(new DeleteIdentityLinkForProcessDefinitionCmd(processDefinitionId, null, groupId));
   }
 
-  @Override
-  public void deleteCandidateStarterUser(final String processDefinitionId, final String userId) {
+  public void deleteCandidateStarterUser(String processDefinitionId, String userId) {
     commandExecutor.execute(new DeleteIdentityLinkForProcessDefinitionCmd(processDefinitionId, userId, null));
   }
 
-  @Override
-  public List<IdentityLink> getIdentityLinksForProcessDefinition(final String processDefinitionId) {
+  public List<IdentityLink> getIdentityLinksForProcessDefinition(String processDefinitionId) {
     return commandExecutor.execute(new GetIdentityLinksForProcessDefinitionCmd(processDefinitionId));
   }
 
-  @Override
-  public CaseDefinition getCaseDefinition(final String caseDefinitionId) {
+  public CaseDefinition getCaseDefinition(String caseDefinitionId) {
     try {
       return commandExecutor.execute(new GetDeploymentCaseDefinitionCmd(caseDefinitionId));
 
-    } catch (final NullValueException e) {
+    } catch (NullValueException e) {
       throw new NotValidException(e.getMessage(), e);
 
-    } catch (final CaseDefinitionNotFoundException e) {
+    } catch (CaseDefinitionNotFoundException e) {
       throw new NotFoundException(e.getMessage(), e);
 
     }
   }
 
-  @Override
-  public InputStream getCaseModel(final String caseDefinitionId) {
+  public InputStream getCaseModel(String caseDefinitionId) {
     try {
       return commandExecutor.execute(new GetDeploymentCaseModelCmd(caseDefinitionId));
 
-    } catch (final NullValueException e) {
+    } catch (NullValueException e) {
       throw new NotValidException(e.getMessage(), e);
 
-    } catch (final CaseDefinitionNotFoundException e) {
+    } catch (CaseDefinitionNotFoundException e) {
       throw new NotFoundException(e.getMessage(), e);
 
-    } catch (final DeploymentResourceNotFoundException e) {
+    } catch (DeploymentResourceNotFoundException e) {
       throw new NotFoundException(e.getMessage(), e);
 
     }
