@@ -19,6 +19,7 @@ import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.arquillian.protocol.servlet.arq514hack.descriptors.api.web.WebAppDescriptor;
+import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.asset.StringAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.jboss.shrinkwrap.descriptor.api.Descriptors;
@@ -44,7 +45,7 @@ public class IndependentJobExecutionTest extends AbstractFoxPlatformIntegrationT
   }
 
   @Deployment(order = 0, name="pa1")
-  public static WebArchive processArchive1() {
+  public static Archive<?> processArchive1() {
 
     WebArchive deployment = initWebArchiveDeployment("pa1.war", "org/camunda/bpm/integrationtest/jobexecutor/IndependentJobExecutionTest.pa1.xml")
         .addAsResource("org/camunda/bpm/integrationtest/jobexecutor/IndependentJobExecutionTest.process1.bpmn20.xml")
@@ -52,16 +53,18 @@ public class IndependentJobExecutionTest extends AbstractFoxPlatformIntegrationT
 
     TestContainer.addContainerSpecificProcessEngineConfigurationClass(deployment);
 
-    return deployment;
+    return processArchiveDeployment(deployment);
 
   }
 
   @Deployment(order = 1, name="pa2")
-  public static WebArchive processArchive2() {
+  public static Archive<?> processArchive2() {
 
-    return initWebArchiveDeployment("pa2.war", "org/camunda/bpm/integrationtest/jobexecutor/IndependentJobExecutionTest.pa2.xml")
+    WebArchive archive = initWebArchiveDeployment("pa2.war", "org/camunda/bpm/integrationtest/jobexecutor/IndependentJobExecutionTest.pa2.xml")
         .addAsResource("org/camunda/bpm/integrationtest/jobexecutor/IndependentJobExecutionTest.process2.bpmn20.xml")
         .setWebXML(new StringAsset(Descriptors.create(WebAppDescriptor.class).version("3.0").exportAsString()));
+
+    return processArchiveDeployment(archive);
   }
 
   @OperateOnDeployment("pa1")

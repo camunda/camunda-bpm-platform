@@ -29,6 +29,7 @@ import org.camunda.connect.impl.DebugRequestInterceptor;
 import org.camunda.connect.spi.Connector;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Before;
 import org.junit.Test;
@@ -55,9 +56,11 @@ public class PaConnectSupportTest extends AbstractFoxPlatformIntegrationTest {
   protected DebugRequestInterceptor interceptor;
 
   @Deployment
-  public static WebArchive createDeployment() {
-    return initWebArchiveDeployment()
+  public static Archive<?> createDeployment() {
+    WebArchive archive = initWebArchiveDeployment()
       .addAsResource("org/camunda/bpm/integrationtest/functional/connect/PaConnectSupportTest.connectorServiceTask.bpmn20.xml");
+
+    return processArchiveDeployment(archive);
   }
 
   @Before

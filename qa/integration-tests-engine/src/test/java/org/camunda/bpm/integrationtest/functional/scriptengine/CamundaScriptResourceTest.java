@@ -17,6 +17,7 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -31,11 +32,12 @@ import static org.junit.Assert.*;
 public class CamundaScriptResourceTest extends AbstractFoxPlatformIntegrationTest {
 
   @Deployment
-  public static WebArchive processArchive() {
-
-    return initWebArchiveDeployment()
+  public static Archive<?> processArchive() {
+    WebArchive archive = initWebArchiveDeployment()
       .addAsResource("org/camunda/bpm/integrationtest/functional/scriptengine/CamundaScriptResourceTest.examplescript.js", "CamundaScriptResourceTest.examplescript.js")
       .addAsResource("org/camunda/bpm/integrationtest/functional/scriptengine/CamundaScriptResourceTest.exampleprocess.bpmn", "CamundaScriptResourceTest.exampleprocess.bpmn");
+
+    return processArchiveDeployment(archive);
   }
 
   @Test

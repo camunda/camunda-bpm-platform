@@ -22,6 +22,7 @@ import org.camunda.bpm.integrationtest.deployment.war.beans.GroovyProcessEngineP
 import org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.jboss.shrinkwrap.resolver.api.maven.Maven;
@@ -42,8 +43,8 @@ import static org.junit.Assert.assertEquals;
 public class TestWarDeploymentWithProcessEnginePlugin extends AbstractFoxPlatformIntegrationTest {
 
   @Deployment
-  public static WebArchive processArchive() {
-    return initWebArchiveDeployment("test.war", "singleEngineWithProcessEnginePlugin.xml")
+  public static Archive<?> processArchive() {
+    WebArchive archive = initWebArchiveDeployment("test.war", "singleEngineWithProcessEnginePlugin.xml")
         .addClass(GroovyProcessEnginePlugin.class)
         .addAsResource("org/camunda/bpm/integrationtest/deployment/war/groovy.bpmn20.xml")
         .addAsResource("org/camunda/bpm/integrationtest/deployment/war/groovyAsync.bpmn20.xml")
@@ -53,6 +54,8 @@ public class TestWarDeploymentWithProcessEnginePlugin extends AbstractFoxPlatfor
             .resolve("org.codehaus.groovy:groovy-all:2.3.0")
             .withoutTransitivity()
             .as(JavaArchive.class));
+
+    return processArchiveDeployment(archive);
   }
 
   @Test

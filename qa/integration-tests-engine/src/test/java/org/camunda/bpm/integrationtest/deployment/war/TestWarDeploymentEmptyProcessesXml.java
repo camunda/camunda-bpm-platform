@@ -20,6 +20,7 @@ import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Assert;
 import org.junit.Test;
@@ -40,9 +41,11 @@ import static org.junit.Assert.assertTrue;
 public class TestWarDeploymentEmptyProcessesXml extends AbstractFoxPlatformIntegrationTest {
 
   @Deployment
-  public static WebArchive processArchive() {
-    return initWebArchiveDeployment("test.war", "META-INF/empty_processes.xml")
+  public static Archive<?> processArchive() {
+    WebArchive archive = initWebArchiveDeployment("test.war", "META-INF/empty_processes.xml")
         .addAsResource("org/camunda/bpm/integrationtest/testDeployProcessArchive.bpmn20.xml");
+
+    return processArchiveDeployment(archive);
   }
 
   @Test

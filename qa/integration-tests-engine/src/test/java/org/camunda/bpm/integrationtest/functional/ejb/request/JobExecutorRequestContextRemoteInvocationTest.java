@@ -11,6 +11,7 @@ import org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
@@ -34,22 +35,26 @@ import org.junit.runner.RunWith;
 public class JobExecutorRequestContextRemoteInvocationTest extends AbstractFoxPlatformIntegrationTest {
 
   @Deployment(name="pa", order=2)
-  public static WebArchive processArchive() {
-    return initWebArchiveDeployment()
+  public static Archive<?> processArchive() {
+    WebArchive archive = initWebArchiveDeployment()
       .addClass(InvocationCounterDelegateBean.class)
       .addClass(InvocationCounterService.class) // interface (remote)
       .addAsResource("org/camunda/bpm/integrationtest/functional/ejb/request/JobExecutorRequestContextRemoteInvocationTest.testContextPropagationEjbRemote.bpmn20.xml");
+
+    return processArchiveDeployment(archive);
   }
 
   @Deployment(order=1)
-  public static WebArchive delegateDeployment() {
-    return ShrinkWrap.create(WebArchive.class, "service.war")
+  public static Archive<?> delegateDeployment() {
+    WebArchive archive = ShrinkWrap.create(WebArchive.class, "service.war")
       .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
       .addClass(AbstractFoxPlatformIntegrationTest.class)
       .addClass(InvocationCounter.class) // @RequestScoped CDI bean
       .addClass(InvocationCounterService.class) // interface (remote)
       .addClass(InvocationCounterServiceLocal.class) // interface (local)
       .addClass(InvocationCounterServiceBean.class); // @Stateless ejb
+
+    return processArchiveDeployment(archive);
   }
 
 

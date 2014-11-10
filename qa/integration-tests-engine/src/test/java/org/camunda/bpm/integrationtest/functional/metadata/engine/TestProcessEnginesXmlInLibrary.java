@@ -2,6 +2,7 @@ package org.camunda.bpm.integrationtest.functional.metadata.engine;
 import org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
@@ -20,13 +21,13 @@ import org.junit.runner.RunWith;
 public class TestProcessEnginesXmlInLibrary extends AbstractFoxPlatformIntegrationTest {
 
   @Deployment
-  public static WebArchive processArchive() {    
-    
-    return initWebArchiveDeployment()
+  public static Archive<?> processArchive() {
+    WebArchive archive = initWebArchiveDeployment()
             .addAsLibraries(ShrinkWrap.create(JavaArchive.class, "engine1.jar")
                     .addAsResource("singleEngine.xml", "META-INF/processes.xml")
              );
-            
+
+    return processArchiveDeployment(archive);
   }
   
   @Test

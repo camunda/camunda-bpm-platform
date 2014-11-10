@@ -14,6 +14,7 @@
 package org.camunda.bpm.integrationtest.functional.scriptengine;
 
 import org.jboss.arquillian.container.test.api.Deployment;
+import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 
 /**
@@ -22,10 +23,12 @@ import org.jboss.shrinkwrap.api.spec.WebArchive;
 public class PythonScriptEngineSupportTest extends AbstractScriptEngineSupportTest {
 
   @Deployment
-  public static WebArchive createProcessApplication() {
-    return initWebArchiveDeployment()
+  public static Archive<?> createProcessApplication() {
+    WebArchive archive = initWebArchiveDeployment()
       .addClass(AbstractScriptEngineSupportTest.class)
       .addAsResource(createScriptTaskProcess("python", EXAMPLE_SCRIPT), "process.bpmn20.xml");
+
+    return processArchiveDeployment(archive);
   }
 
 }

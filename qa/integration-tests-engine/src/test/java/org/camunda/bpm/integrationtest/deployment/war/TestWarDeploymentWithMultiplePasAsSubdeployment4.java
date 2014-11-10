@@ -16,6 +16,7 @@
 
 package org.camunda.bpm.integrationtest.deployment.war;
 
+import org.jboss.shrinkwrap.api.Archive;
 import org.junit.Assert;
 
 import org.camunda.bpm.engine.repository.DeploymentQuery;
@@ -82,7 +83,7 @@ public class TestWarDeploymentWithMultiplePasAsSubdeployment4 extends AbstractFo
     "</process-application>";  
     
   @Deployment
-  public static WebArchive processArchive() {    
+  public static Archive<?> processArchive() {
 
     Asset pa2ProcessesXml = TestHelper.getStringAsAssetWithReplacements(
             PROCESSES_XML, 
@@ -112,7 +113,7 @@ public class TestWarDeploymentWithMultiplePasAsSubdeployment4 extends AbstractFo
     
     TestContainer.addContainerSpecificResources(deployment);
     
-    return deployment;
+    return processArchiveDeployment(deployment);
   }
   
   @Test

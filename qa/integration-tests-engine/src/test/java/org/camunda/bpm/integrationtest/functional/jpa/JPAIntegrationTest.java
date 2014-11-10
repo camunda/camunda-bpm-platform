@@ -18,6 +18,7 @@ import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -37,14 +38,16 @@ import javax.transaction.UserTransaction;
 public class JPAIntegrationTest extends AbstractFoxPlatformIntegrationTest {
 
   @Deployment
-  public static WebArchive processArchive() {
-    return initWebArchiveDeployment()
+  public static Archive<?> processArchive() {
+    WebArchive archive = initWebArchiveDeployment()
       .addClass(SomeEntity.class)
       .addClass(PersistenceDelegateBean.class)
       .addClass(AsyncPersistenceDelegateBean.class)
       .addAsResource("org/camunda/bpm/integrationtest/functional/jpa/TransactionIntegrationTest.testDelegateParticipateInApplicationTx.bpmn20.xml")
       .addAsResource("org/camunda/bpm/integrationtest/functional/jpa/TransactionIntegrationTest.testAsyncDelegateNewTx.bpmn20.xml")
       .addAsWebInfResource("persistence.xml", "classes/META-INF/persistence.xml");
+
+    return processArchiveDeployment(archive);
   }
 
   @Inject

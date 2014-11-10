@@ -12,6 +12,9 @@
  */
 package org.camunda.bpm.integrationtest.deployment.callbacks;
 
+import org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest;
+import org.camunda.bpm.integrationtest.util.TestContainer;
+import org.jboss.shrinkwrap.api.Archive;
 import org.junit.Assert;
 
 import org.camunda.bpm.integrationtest.deployment.callbacks.apps.PostDeployFailureApp;
@@ -37,14 +40,14 @@ public class PostDeployFailureTest_JBOSS {
   private Deployer deployer;
   
   @Deployment(managed=false, name=DEPLOYMENT)
-  public static WebArchive createDeployment1() {
+  public static Archive<?> createDeployment1() {
     
     WebArchive archive = ShrinkWrap.create(WebArchive.class, "failingDeployment.war")
         .addAsResource("META-INF/processes.xml", "META-INF/processes.xml")
         .addAsResource("org/camunda/bpm/integrationtest/invoice-it.bpmn20.xml")
         .addClass(PostDeployFailureApp.class);
 
-    return archive;
+    return AbstractFoxPlatformIntegrationTest.processArchiveDeployment(archive);
     
   }
   

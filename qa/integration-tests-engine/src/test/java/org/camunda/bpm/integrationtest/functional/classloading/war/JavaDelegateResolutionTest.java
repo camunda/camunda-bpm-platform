@@ -21,6 +21,7 @@ import org.camunda.bpm.integrationtest.util.TestContainer;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Assert;
@@ -42,22 +43,23 @@ import org.junit.runner.RunWith;
 public class JavaDelegateResolutionTest extends AbstractFoxPlatformIntegrationTest {
 
   @Deployment
-  public static WebArchive createProcessArchiveDeplyoment() {
-    return initWebArchiveDeployment()
+  public static Archive<?> createProcessArchiveDeplyoment() {
+    WebArchive archive = initWebArchiveDeployment()
             .addClass(ExampleDelegate.class)
             .addAsResource("org/camunda/bpm/integrationtest/functional/classloading/JavaDelegateResolutionTest.testResolveClass.bpmn20.xml")
             .addAsResource("org/camunda/bpm/integrationtest/functional/classloading/JavaDelegateResolutionTest.testResolveClassFromJobExecutor.bpmn20.xml");
+
+    return processArchiveDeployment(archive);
   }
 
   @Deployment(name="clientDeployment")
-  public static WebArchive clientDeployment() {
+  public static Archive<?> clientDeployment() {
     WebArchive webArchive = ShrinkWrap.create(WebArchive.class, "client.war")
             .addClass(AbstractFoxPlatformIntegrationTest.class);
 
     TestContainer.addContainerSpecificResources(webArchive);
 
-    return webArchive;
-
+    return processArchiveDeployment(webArchive);
   }
 
   @Test

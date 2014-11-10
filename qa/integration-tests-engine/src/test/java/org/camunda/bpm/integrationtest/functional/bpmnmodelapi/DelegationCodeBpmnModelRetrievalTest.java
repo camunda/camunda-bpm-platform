@@ -19,6 +19,7 @@ import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.asset.StringAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Assert;
@@ -35,16 +36,18 @@ public class DelegationCodeBpmnModelRetrievalTest extends AbstractFoxPlatformInt
   private static final String TEST_PROCESS = "testProcess";
 
   @Deployment
-  public static WebArchive createProcessApplication() {
+  public static Archive<?> createProcessApplication() {
     BpmnModelInstance process = Bpmn.createExecutableProcess(TEST_PROCESS)
         .startEvent()
         .serviceTask()
           .camundaDelegateExpression("${bpmnElementRetrievalDelegate}")
       .done();
 
-    return initWebArchiveDeployment()
+    WebArchive archive = initWebArchiveDeployment()
         .addClass(BpmnElementRetrievalDelegate.class)
         .addAsResource(new StringAsset(Bpmn.convertToString(process)), "testProcess.bpmn20.xml");
+
+    return processArchiveDeployment(archive);
   }
 
   @Test

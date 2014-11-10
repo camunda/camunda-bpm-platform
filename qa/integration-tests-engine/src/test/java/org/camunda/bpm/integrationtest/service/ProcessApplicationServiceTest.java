@@ -22,6 +22,7 @@ import org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Assert;
 import org.junit.Test;
@@ -36,15 +37,19 @@ import org.junit.runner.RunWith;
 public class ProcessApplicationServiceTest extends AbstractFoxPlatformIntegrationTest {
   
   @Deployment(name="test1")
-  public static WebArchive app1() {    
-    return initWebArchiveDeployment("test1.war")
+  public static Archive<?> app1() {
+    WebArchive archive = initWebArchiveDeployment("test1.war")
             .addAsResource("org/camunda/bpm/integrationtest/testDeployProcessArchive.bpmn20.xml");
+
+    return processArchiveDeployment(archive);
   }
   
   @Deployment(name="test2")
-  public static WebArchive app2() {    
-    return initWebArchiveDeployment("test2.war")
+  public static Archive<?> app2() {
+    WebArchive archive = initWebArchiveDeployment("test2.war")
             .addAsResource("org/camunda/bpm/integrationtest/testDeployProcessArchiveWithoutActivitiCdi.bpmn20.xml");
+
+    return processArchiveDeployment(archive);
   }
   
   @Test

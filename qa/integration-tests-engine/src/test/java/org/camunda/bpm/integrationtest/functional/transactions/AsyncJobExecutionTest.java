@@ -8,6 +8,7 @@ import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Assert;
 import org.junit.Test;
@@ -18,12 +19,14 @@ import org.junit.runner.RunWith;
 public class AsyncJobExecutionTest extends AbstractFoxPlatformIntegrationTest {
 
   @Deployment
-  public static WebArchive processArchive() {
-    return initWebArchiveDeployment()
+  public static Archive<?> processArchive() {
+    WebArchive archive = initWebArchiveDeployment()
             .addClass(GetVersionInfoDelegate.class)
             .addClass(UpdateRouterConfiguration.class)
             .addAsResource("org/camunda/bpm/integrationtest/functional/transactions/AsyncJobExecutionTest.testAsyncServiceTasks.bpmn20.xml")
             .addAsWebInfResource("persistence.xml", "classes/META-INF/persistence.xml");
+
+    return processArchiveDeployment(archive);
   }
 
   @Inject

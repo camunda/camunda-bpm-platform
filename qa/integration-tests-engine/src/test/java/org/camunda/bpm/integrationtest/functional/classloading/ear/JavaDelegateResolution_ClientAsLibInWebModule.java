@@ -22,6 +22,7 @@ import org.camunda.bpm.integrationtest.util.TestContainer;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.EnterpriseArchive;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
@@ -44,24 +45,26 @@ import org.junit.runner.RunWith;
 public class JavaDelegateResolution_ClientAsLibInWebModule extends AbstractFoxPlatformIntegrationTest {
 
   @Deployment
-  public static EnterpriseArchive createProcessArchiveDeplyoment() {
+  public static Archive<?> createProcessArchiveDeplyoment() {
     WebArchive processArchiveWar = initWebArchiveDeployment()
       .addClass(ExampleDelegate.class)
       .addAsResource("org/camunda/bpm/integrationtest/functional/classloading/JavaDelegateResolutionTest.testResolveClass.bpmn20.xml")
       .addAsResource("org/camunda/bpm/integrationtest/functional/classloading/JavaDelegateResolutionTest.testResolveClassFromJobExecutor.bpmn20.xml");
 
-    return ShrinkWrap.create(EnterpriseArchive.class, "test-app.ear")
+    EnterpriseArchive ear = ShrinkWrap.create(EnterpriseArchive.class, "test-app.ear")
       .addAsModule(processArchiveWar);
+
+    return processArchiveDeployment(ear);
   }
 
   @Deployment(name="clientDeployment")
-  public static WebArchive clientDeployment() {
+  public static Archive<?> clientDeployment() {
     WebArchive webArchive = ShrinkWrap.create(WebArchive.class, "client.war")
         .addClass(AbstractFoxPlatformIntegrationTest.class);
 
     TestContainer.addContainerSpecificResources(webArchive);
 
-    return webArchive;
+    return processArchiveDeployment(webArchive);
   }
 
   @Test
