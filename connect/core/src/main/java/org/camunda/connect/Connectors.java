@@ -71,6 +71,13 @@ public class Connectors {
     return (C) INSTANCE.getConnectorById(connectorId);
   }
 
+  /**
+   * @return all register connectors
+   */
+  public static Set<Connector> getAvailableConnectors() {
+    return INSTANCE.getAllAvailableConnectors();
+  }
+
   // instance //////////////////////////////////////////////////////////
 
   protected Map<String, Connector> availableConnectors;
@@ -78,7 +85,7 @@ public class Connectors {
   /**
    * @return all register connectors
    */
-  public Set<Connector> getAvailableConnectors() {
+  public Set<Connector> getAllAvailableConnectors() {
     ensureConnectorProvidersInitialized();
     return new HashSet<Connector>(availableConnectors.values());
   }
