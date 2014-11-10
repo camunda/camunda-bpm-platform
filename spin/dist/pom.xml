@@ -10,6 +10,10 @@
   <artifactId>camunda-spin-all</artifactId>
   <name>camunda Spin - all in one</name>
 
+  <properties>
+    <version.camunda.bpm>7.2.0-SNAPSHOT</version.camunda.bpm>
+  </properties>
+
   <dependencies>
 
     <dependency>
@@ -90,7 +94,7 @@
             <additionalDependency>
               <groupId>org.camunda.bpm</groupId>
               <artifactId>camunda-engine</artifactId>
-              <version>7.2.0-SNAPSHOT</version>
+              <version>${version.camunda.bpm}</version>
             </additionalDependency>
           </additionalDependencies>
         </configuration>
