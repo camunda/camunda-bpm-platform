@@ -95,6 +95,12 @@ module.exports = function(config) {
           cwd: '<%= pkg.gruntConfig.clientDir %>/images',
           src: ['**'],
           dest: '<%= buildTarget %>/images/'
+        },
+        {
+          expand: true,
+          cwd: '<%= pkg.gruntConfig.clientDir %>/styles',
+          src: ['*.css'],
+          dest: '<%= buildTarget %>/styles/'
         }
       ]
     },
