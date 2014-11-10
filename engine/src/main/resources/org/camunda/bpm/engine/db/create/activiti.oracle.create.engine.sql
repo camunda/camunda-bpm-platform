@@ -208,8 +208,8 @@ create table ACT_RU_FILTER (
   RESOURCE_TYPE_ NVARCHAR2(255) not null,
   NAME_ NVARCHAR2(255) not null,
   OWNER_ NVARCHAR2(255),
-  QUERY_ CLOB not null,
-  PROPERTIES_ CLOB,
+  QUERY_ NCLOB not null,
+  PROPERTIES_ NCLOB,
   primary key (ID_)
 );
 
