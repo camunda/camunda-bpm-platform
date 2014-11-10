@@ -151,8 +151,8 @@ public class JacksonJsonDataFormat implements DataFormat<SpinJsonNode> {
    * Constructs a {@link JavaType} object based on the parameter, which
    * has to follow Jackson's canonical type string format.
    *
-   * @param canonicalString
-   * @return
+   * @param canonicalString canonical string representation of the type
+   * @return the constructed java type
    * @throws SpinJsonDataFormatException if no type can be constructed from the given parameter
    */
   public JavaType constructJavaTypeFromCanonicalString(String canonicalString) {
