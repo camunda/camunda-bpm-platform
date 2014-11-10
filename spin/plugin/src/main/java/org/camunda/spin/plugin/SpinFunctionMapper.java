@@ -57,6 +57,7 @@ public class SpinFunctionMapper extends FunctionMapper {
     Class<?> spinClass =  Spin.class;
     SPIN_FUNCTION_MAP.put("S", ReflectUtil.getMethod(spinClass, "S", Object.class));
     SPIN_FUNCTION_MAP.put("XML", ReflectUtil.getMethod(spinClass, "XML", Object.class));
+    SPIN_FUNCTION_MAP.put("JSON", ReflectUtil.getMethod(spinClass, "JSON", Object.class));
   }
 
 }

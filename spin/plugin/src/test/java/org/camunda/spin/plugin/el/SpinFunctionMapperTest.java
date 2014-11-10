@@ -23,6 +23,7 @@ import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.camunda.spin.json.SpinJsonNode;
 import org.camunda.spin.plugin.script.TestVariableScope;
 import org.camunda.spin.xml.SpinXmlElement;
 
@@ -35,6 +36,7 @@ import org.camunda.spin.xml.SpinXmlElement;
 public class SpinFunctionMapperTest extends PluggableProcessEngineTestCase {
 
   String xmlString = "<elementName attrName=\"attrValue\" />";
+  String jsonString = "{\"foo\": \"bar\"}";
 
   @SuppressWarnings("unchecked")
   protected <T> T executeExpression(String expression) {
@@ -66,11 +68,25 @@ public class SpinFunctionMapperTest extends PluggableProcessEngineTestCase {
     assertEquals("elementName", spinXmlEl.name());
   }
 
+  public void testSpin_JSON_Available() {
+
+    SpinJsonNode spinJsonEl = executeExpression("${ JSON('" + jsonString + "') }");
+    assertNotNull(spinJsonEl);
+    assertEquals("bar", spinJsonEl.prop("foo").stringValue());
+  }
+
   public void testSpin_XPath_Available() {
 
     String elName = executeExpression("${ S('" + xmlString + "').xPath('/elementName').element().name() }");
     assertNotNull(elName);
     assertEquals("elementName", elName);
+  }
+
+  public void testSpin_JsonPath_Available() {
+
+    String property = executeExpression("${ S('" + jsonString + "').jsonPath('$.foo').stringValue() }");
+    assertNotNull(property);
+    assertEquals("bar", property);
   }
 
   public void testSpinAvailableInBpmn() {
