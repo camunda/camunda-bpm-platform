@@ -8,10 +8,10 @@ The JSON datatype supports reading JSON from Strings or Readers.
 import static org.camunda.spin.Spin.*;
 import static org.camunda.spin.DataFormats.*;
 
-SpinJsonNode json = S("{\"customer\": \"Kermit\"}", jsonTree());
+SpinJsonNode json = S("{\"customer\": \"Kermit\"}", json());
 ```
 
-The second paramter `jsonTree()` hints Spin to use the Jackson tree parser for parsing the JSON.
+The second paramter `json()` hints Spin to use the JSON data format for parsing the JSON.
 
 Alternatively, you can directly use the `JSON(...)` function:
 
@@ -31,7 +31,7 @@ Spin also supports reading JSON from an instance of `java.io.Reader`:
 import static org.camunda.spin.Spin.*;
 import static org.camunda.spin.DataFormats.*;
 
-SpinJsonNode json = S(reader, jsonTree());
+SpinJsonNode json = S(reader, json());
 ```
 
 The `JSON(...)` method also supports readers. The following example shows how to read JSON from a file (error handling ommitted):
@@ -132,63 +132,63 @@ To set a property you can use the `.prop("name", object)` method. This allows yo
   * Long - Example: `.prop("period", 4200000000)`
   * Float - Example: `.prop("price", 42.00)`
   * Boolean - Example: `.prop("active", true)`
-  
+
 or one of the 2 following container types:
 
   * Array - Could contain a number of simple and container types
   Example in Java:
   ```java
   import static org.camunda.spin.Spin.*;
-  
+
   SpinJsonNode json = JSON("{\"customer\": \[\"Kermit\", \"Waldo\"\]}");
   ArrayList<Object> list = new ArrayList<Object>();
   list.add("new entry");
   list.add("new entry2");
   json.prop("new_array", list);
   ```
-  
+
   Example in Javascript:
   ```javascript
   var json = S('{"customer": ["Kermit", "Waldo"]}');
   var list = ["new entry", "new entry2"];
-  json.prop("new_array", list);    
+  json.prop("new_array", list);
   ```
-  
+
   * Object - Could contain a number of simple and container types
   Example in Java:
   ```java
   import static org.camunda.spin.Spin.*;
-    
+
   SpinJsonNode json = JSON("{\"customer\": \[\"Kermit\", \"Waldo\"\]}");
   Map<String, Object> object = new HashMap<String, Object>();
   object.put("new_entry", 42);
   object.put("new_entry2", "Yeah!");
   json.prop("new_object", object);
   ```
-    
+
   Example in Javascript:
   ```javascript
   var json = S('{"customer": ["Kermit", "Waldo"]}');
   var object = {
-    "new_entry": 1, 
+    "new_entry": 1,
     "new_entry2": "Yeah!"
   };
-  json.prop("new_array", object);    
+  json.prop("new_array", object);
   ```
 
 ## Remove JSON Properties
 
 There are 2 ways to remove properties from a JSON object.
- 
+
   * `.deleteProp("name")` - Removes a property with given name.
   * `.deleteProp(<List of names>)` - Removes one or more properties with given names.
-  
+
 For more Details see the following Examples for Javascript and Java.
 
 Java:
 ```java
 import static org.camunda.spin.Spin.*;
-    
+
 SpinJsonNode json = JSON("{\"customer\": \"Kermit\", \"language\": \"en\"}");
 List<String> listOfNames = new ArrayList<String>();
 listOfNames.add("customer");
@@ -226,7 +226,7 @@ JSON arrays represent a list of objects. Spin offers the following methods to ma
   * `.remove(<Object>)` - Removes the FIRST occurrence of the object.
   * `.removeLast(<Object>)` - Removes the LAST occurrence of the object.
   * `.removeAt(Index)` - Removes the list entry at the specified index.
-  
+
 These methods allow us to work with JSON arrays in a fast way. To show this, we will use the following JSON Object as an example:
 
 ```json

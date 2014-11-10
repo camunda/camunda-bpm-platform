@@ -8,10 +8,10 @@ The XML datatype supports reading XML from Strings or input streams.
 import static org.camunda.spin.Spin.*;
 import static org.camunda.spin.DataFormats.*;
 
-SpinXmlElement xml = S("<order />", xmlDom());
+SpinXmlElement xml = S("<order />", xml());
 ```
 
-The second paramter `xmlDom()` hints Spin to use the XML DOM parser for parsing the XML.
+The second paramter `xml()` hints Spin to use the XML data format for parsing the XML.
 
 Alternatively you can directly use the `XML(...)` function:
 
@@ -29,7 +29,7 @@ Spin also supports reading XML directly from a `java.io.Reader`:
 import static org.camunda.spin.Spin.*;
 import static org.camunda.spin.DataFormats.*;
 
-SpinXmlElement xml = S(reader, xmlDom());
+SpinXmlElement xml = S(reader, xml());
 ```
 
 The `XML(...)` method also supports readers. The following example shows how to read the XML from a file (error handling ommitted):
