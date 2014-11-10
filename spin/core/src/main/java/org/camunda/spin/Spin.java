@@ -26,10 +26,11 @@ import org.camunda.spin.xml.SpinXmlElement;
 public abstract class Spin<T extends Spin<?>> {
 
   /**
+   * Creates a spin wrapper for a data input of a given data format.
    *
-   * @param input
-   * @param format
-   * @return
+   * @param input the input to wrap
+   * @param format the data format of the input
+   * @return the spin wrapper for the input
    *
    * @throws IllegalArgumentException in case an argument of illegal type is provided (such as 'null')
    */
@@ -38,21 +39,24 @@ public abstract class Spin<T extends Spin<?>> {
   }
 
   /**
-  *
-  * @param input
-  * @param format
-  * @return
-  *
-  * @throws IllegalArgumentException in case an argument of illegal type is provided (such as 'null')
-  */
+   * Creates a spin wrapper for a data input of a given data format.
+   *
+   * @param input the input to wrap
+   * @param dataFormatName the data format name of the input
+   * @return the spin wrapper for the input
+   *
+   * @throws IllegalArgumentException in case an argument of illegal type is provided (such as 'null')
+   */
  public static <T extends Spin<?>> T S(Object input, String dataFormatName) {
    return SpinFactory.INSTANCE.createSpin(input, dataFormatName);
  }
 
   /**
+   * Creates a spin wrapper for a data input. The data format of the
+   * input is auto detected.
    *
-   * @param input
-   * @return
+   * @param input the input to wrap
+   * @return the spin wrapper for the input
    *
    * @throws IllegalArgumentException in case an argument of illegal type is provided (such as 'null')
    */
@@ -61,9 +65,11 @@ public abstract class Spin<T extends Spin<?>> {
   }
 
   /**
+   * Creates a spin wrapper for a data input. The data format of the
+   * input is assumed to be XML.
    *
-   * @param input
-   * @return
+   * @param input the input to wrap
+   * @return the spin wrapper for the input
    *
    * @throws IllegalArgumentException in case an argument of illegal type is provided (such as 'null')
    */
@@ -72,12 +78,14 @@ public abstract class Spin<T extends Spin<?>> {
   }
 
   /**
-  *
-  * @param input
-  * @return
-  *
-  * @throws IllegalArgumentException in case an argument of illegal type is provided (such as 'null')
-  */
+   * Creates a spin wrapper for a data input. The data format of the
+   * input is assumed to be JSON.
+   *
+   * @param input the input to wrap
+   * @return the spin wrapper for the input
+   *
+   * @throws IllegalArgumentException in case an argument of illegal type is provided (such as 'null')
+   */
   public static SpinJsonNode JSON(Object input) {
     return SpinFactory.INSTANCE.createSpin(input, DataFormats.json());
   }
@@ -108,15 +116,14 @@ public abstract class Spin<T extends Spin<?>> {
    * Writes the wrapped object to a existing writer.
    *
    * @param writer the writer to write to
-   * @return the Writer after the object was written
    */
   public abstract void writeToWriter(Writer writer);
 
   /**
    * Maps the wrapped object to an instance of a java class.
    *
-   * @param type
-   * @return
+   * @param type the java class to map to
+   * @return the mapped object
    */
   public abstract <C> C mapTo(Class<C> type);
 
@@ -125,8 +132,8 @@ public abstract class Spin<T extends Spin<?>> {
    * The object is determined based on the configuration string
    * which is data format specific.
    *
-   * @param type
-   * @return
+   * @param type the class name to map to
+   * @return the mapped object
    */
   public abstract <C> C mapTo(String type);
 }
