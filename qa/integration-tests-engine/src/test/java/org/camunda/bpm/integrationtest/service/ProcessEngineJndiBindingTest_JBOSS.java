@@ -18,6 +18,7 @@ import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Assert;
 import org.junit.Test;
@@ -33,8 +34,8 @@ import org.junit.runner.RunWith;
 public class ProcessEngineJndiBindingTest_JBOSS extends AbstractFoxPlatformIntegrationTest {
 
   @Deployment
-  public static WebArchive app1() {    
-    return initWebArchiveDeployment();
+  public static Archive<?> app1() {
+    return processArchiveDeployment(initWebArchiveDeployment());
   }
   
   @Test

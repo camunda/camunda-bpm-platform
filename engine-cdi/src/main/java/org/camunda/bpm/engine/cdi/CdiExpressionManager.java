@@ -13,7 +13,6 @@
 package org.camunda.bpm.engine.cdi;
 
 import org.camunda.bpm.engine.cdi.impl.el.CdiResolver;
-import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
 import org.camunda.bpm.engine.impl.el.VariableScopeElResolver;
 import org.camunda.bpm.engine.impl.javax.el.ArrayELResolver;
@@ -41,9 +40,9 @@ import org.camunda.bpm.engine.impl.javax.el.MapELResolver;
 public class CdiExpressionManager extends ExpressionManager {
 
   @Override
-  protected ELResolver createElResolver(VariableScope variableScope) {
+  protected ELResolver createElResolver() {
     CompositeELResolver compositeElResolver = new CompositeELResolver();
-    compositeElResolver.add(new VariableScopeElResolver(variableScope));
+    compositeElResolver.add(new VariableScopeElResolver());
 
     compositeElResolver.add(new CdiResolver());
 
@@ -51,6 +50,7 @@ public class CdiExpressionManager extends ExpressionManager {
     compositeElResolver.add(new ListELResolver());
     compositeElResolver.add(new MapELResolver());
     compositeElResolver.add(new BeanELResolver());
+
     return compositeElResolver;
   }
 

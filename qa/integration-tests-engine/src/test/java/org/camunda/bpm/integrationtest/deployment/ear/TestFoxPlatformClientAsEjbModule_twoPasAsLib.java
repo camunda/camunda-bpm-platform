@@ -23,6 +23,7 @@ import org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest;
 import org.camunda.bpm.integrationtest.util.DeploymentHelper;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.ByteArrayAsset;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
@@ -66,7 +67,7 @@ public class TestFoxPlatformClientAsEjbModule_twoPasAsLib extends AbstractFoxPla
    *        
    */   
   @Deployment
-  public static EnterpriseArchive twoPasAsLib() {    
+  public static Archive<?> twoPasAsLib() {
     
     JavaArchive processArchive1Jar = ShrinkWrap.create(JavaArchive.class, "processes1.jar")
       .addAsResource("org/camunda/bpm/integrationtest/deployment/ear/process1.bpmn20.xml")
@@ -84,12 +85,14 @@ public class TestFoxPlatformClientAsEjbModule_twoPasAsLib extends AbstractFoxPla
       .addClass(AbstractFoxPlatformIntegrationTest.class)
       .addClass(TestFoxPlatformClientAsEjbModule_twoPasAsLib.class);
 
-    return ShrinkWrap.create(EnterpriseArchive.class, "twoPasAsLib.ear")            
+    EnterpriseArchive earArchive = ShrinkWrap.create(EnterpriseArchive.class, "twoPasAsLib.ear")
       .addAsLibrary(processArchive1Jar)
       .addAsLibrary(processArchive2Jar)
       .addAsModule(foxPlatformClientJar)
       .addAsModule(testJar)
       .addAsLibrary(DeploymentHelper.getEngineCdi());
+
+    return processArchiveDeployment(earArchive);
   }
   
   @Test

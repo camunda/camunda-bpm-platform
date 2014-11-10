@@ -4,6 +4,7 @@ import org.camunda.bpm.integrationtest.util.DeploymentHelper;
 import org.camunda.bpm.integrationtest.util.TestContainer;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
@@ -21,18 +22,17 @@ import org.junit.runner.RunWith;
 public class TestProcessEnginesXmlInProcessApplication extends AbstractFoxPlatformIntegrationTest {
 
   @Deployment
-  public static WebArchive processArchive() {    
-            
-        WebArchive archive = ShrinkWrap.create(WebArchive.class, "test.war")
-        .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
-        .addAsLibraries(DeploymentHelper.getEngineCdi())
-        .addAsResource("singleEngine.xml", "META-INF/processes.xml")
-        .addClass(AbstractFoxPlatformIntegrationTest.class)
-        .addClass(TestContainer.class);
+  public static Archive<?> processArchive() {
+    WebArchive archive = ShrinkWrap.create(WebArchive.class, "test.war")
+      .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
+      .addAsLibraries(DeploymentHelper.getEngineCdi())
+      .addAsResource("singleEngine.xml", "META-INF/processes.xml")
+      .addClass(AbstractFoxPlatformIntegrationTest.class)
+      .addClass(TestContainer.class);
 
-      TestContainer.addContainerSpecificResources(archive);
-      
-      return archive;
+    TestContainer.addContainerSpecificResources(archive);
+
+    return processArchiveDeployment(archive);
   }
   
   @Test

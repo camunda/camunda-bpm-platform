@@ -14,6 +14,9 @@ package org.camunda.bpm.integrationtest.deployment.callbacks;
 
 import java.util.List;
 
+import org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest;
+import org.camunda.bpm.integrationtest.util.TestContainer;
+import org.jboss.shrinkwrap.api.Archive;
 import org.junit.Assert;
 
 import org.camunda.bpm.engine.ProcessEngine;
@@ -33,13 +36,12 @@ import org.junit.runner.RunWith;
 public class PostDeployInjectDefaultEngineTest {
   
   @Deployment
-  public static WebArchive createDeployment() {
+  public static Archive<?> createDeployment() {
     
     WebArchive archive = ShrinkWrap.create(WebArchive.class, "test.war")
         .addClass(PostDeployInjectApp.class);
 
-    return archive;
-    
+    return AbstractFoxPlatformIntegrationTest.processArchiveDeployment(archive);
   }
   
   @Test

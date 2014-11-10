@@ -1,11 +1,13 @@
 package org.camunda.bpm.integrationtest.functional.metadata.engine;
 
+import org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest;
 import org.camunda.bpm.integrationtest.util.DeploymentHelper;
 import org.jboss.arquillian.container.test.api.Deployer;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.arquillian.test.api.ArquillianResource;
+import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
@@ -27,9 +29,8 @@ public class TestProcessEnginesXmlFails {
   private Deployer deployer;
   
   @Deployment(managed=false, name="deployment")
-  public static WebArchive processArchive() {    
-    
-    return  ShrinkWrap.create(WebArchive.class)
+  public static Archive<?> processArchive() {
+    WebArchive archive = ShrinkWrap.create(WebArchive.class)
             .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
             .addAsLibraries(DeploymentHelper.getEjbClient())
             .addAsResource("META-INF/processes.xml", "META-INF/processes.xml")
@@ -40,6 +41,8 @@ public class TestProcessEnginesXmlFails {
                     // we add the same process engine configuration multiple times -> fails
                    .addAsResource("singleEngine.xml", "META-INF/processes.xml")
          );
+
+    return AbstractFoxPlatformIntegrationTest.processArchiveDeployment(archive);
   }
   
   @Test

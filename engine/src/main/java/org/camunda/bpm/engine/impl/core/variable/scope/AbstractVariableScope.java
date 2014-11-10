@@ -50,6 +50,11 @@ public abstract class AbstractVariableScope implements Serializable, VariableSco
 
   // get variable map /////////////////////////////////////////
 
+
+  public String getVariableScopeKey() {
+    return "scope";
+  }
+
   public VariableMapImpl getVariables() {
     return getVariables(true);
   }

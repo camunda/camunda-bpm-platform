@@ -1,10 +1,12 @@
 package org.camunda.bpm.integrationtest.deployment.war;
 
+import org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest;
 import org.camunda.bpm.integrationtest.util.TestContainer;
 import org.jboss.arquillian.container.test.api.Deployer;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.arquillian.test.api.ArquillianResource;
+import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
@@ -29,7 +31,7 @@ public class TestWarDeploymentWithBrokenBpmnXml {
   private Deployer deployer;
   
   @Deployment(managed=false, name=DEPLOYMENT)
-  public static WebArchive processArchive() {    
+  public static Archive<?> processArchive() {
     
     WebArchive deployment = ShrinkWrap.create(WebArchive.class, "test.war")
       .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
@@ -38,7 +40,7 @@ public class TestWarDeploymentWithBrokenBpmnXml {
     
     TestContainer.addContainerSpecificResources(deployment);
     
-    return deployment;
+    return AbstractFoxPlatformIntegrationTest.processArchiveDeployment(deployment);
   }
   
   @Test

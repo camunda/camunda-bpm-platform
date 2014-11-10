@@ -28,6 +28,8 @@ import org.camunda.bpm.engine.variable.value.TypedValue;
  */
 public class DateFormType extends AbstractFormFieldType {
 
+  public final static String TYPE_NAME = "date";
+
   protected String datePattern;
   protected Format dateFormat;
 
@@ -37,7 +39,7 @@ public class DateFormType extends AbstractFormFieldType {
   }
 
   public String getName() {
-    return "date";
+    return TYPE_NAME;
   }
 
   public Object getInformation(String key) {

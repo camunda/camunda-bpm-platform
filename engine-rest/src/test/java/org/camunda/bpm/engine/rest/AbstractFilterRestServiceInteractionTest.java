@@ -49,7 +49,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.Response.Status;
 
@@ -65,6 +64,7 @@ import org.camunda.bpm.engine.impl.AuthorizationServiceImpl;
 import org.camunda.bpm.engine.impl.IdentityServiceImpl;
 import org.camunda.bpm.engine.impl.TaskQueryImpl;
 import org.camunda.bpm.engine.impl.identity.Authentication;
+import org.camunda.bpm.engine.impl.persistence.entity.FilterEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.query.Query;
 import org.camunda.bpm.engine.rest.dto.task.TaskQueryDto;
@@ -211,6 +211,40 @@ public abstract class AbstractFilterRestServiceInteractionTest extends AbstractR
       .get(SINGLE_FILTER_URL);
 
     verify(filterServiceMock).getFilter(eq(MockProvider.NON_EXISTING_ID));
+  }
+
+  @Test
+  public void testGetFilterWithCandidateGroupQuery() {
+    TaskQueryImpl query = new TaskQueryImpl();
+    query.taskCandidateGroup("abc");
+    Filter filter = new FilterEntity("Task").setName("test").setQuery(query);
+    when(filterServiceMock.getFilter(EXAMPLE_FILTER_ID)).thenReturn(filter);
+
+    given()
+      .pathParam("id", EXAMPLE_FILTER_ID)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+      .body("query.candidateGroup", equalTo("abc"))
+      .body("query.containsKey('candidateGroups')", is(false))
+    .when()
+      .get(SINGLE_FILTER_URL);
+  }
+
+  @Test
+  public void testGetFilterWithCandidateUserQuery() {
+    TaskQueryImpl query = new TaskQueryImpl();
+    query.taskCandidateUser("abc");
+    Filter filter = new FilterEntity("Task").setName("test").setQuery(query);
+    when(filterServiceMock.getFilter(EXAMPLE_FILTER_ID)).thenReturn(filter);
+
+    given()
+      .pathParam("id", EXAMPLE_FILTER_ID)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+      .body("query.candidateUser", equalTo("abc"))
+      .body("query.containsKey('candidateGroups')", is(false))
+  .when()
+      .get(SINGLE_FILTER_URL);
   }
 
   @Test

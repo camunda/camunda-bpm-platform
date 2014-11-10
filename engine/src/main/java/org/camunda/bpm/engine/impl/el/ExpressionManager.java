@@ -12,15 +12,10 @@
  */
 package org.camunda.bpm.engine.impl.el;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
 import org.camunda.bpm.engine.impl.javax.el.ArrayELResolver;
-import org.camunda.bpm.engine.impl.javax.el.BeanELResolver;
 import org.camunda.bpm.engine.impl.javax.el.CompositeELResolver;
 import org.camunda.bpm.engine.impl.javax.el.ELContext;
 import org.camunda.bpm.engine.impl.javax.el.ELResolver;
@@ -30,6 +25,10 @@ import org.camunda.bpm.engine.impl.javax.el.ListELResolver;
 import org.camunda.bpm.engine.impl.javax.el.MapELResolver;
 import org.camunda.bpm.engine.impl.javax.el.ValueExpression;
 import org.camunda.bpm.engine.impl.juel.ExpressionFactoryImpl;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -57,7 +56,7 @@ public class ExpressionManager {
   // Default implementation (does nothing)
   protected ELContext parsingElContext = new ProcessEngineElContext(functionMappers);
   protected Map<Object, Object> beans;
-
+  protected ELResolver elResolver;
 
   public ExpressionManager() {
     this(null);
@@ -68,8 +67,6 @@ public class ExpressionManager {
     expressionFactory = new ExpressionFactoryImpl();
     this.beans = beans;
   }
-
-
 
   public Expression createExpression(String expression) {
     ValueExpression valueExpression = expressionFactory.createValueExpression(parsingElContext, expression, Object.class);
@@ -98,13 +95,28 @@ public class ExpressionManager {
   }
 
   protected ProcessEngineElContext createElContext(VariableScope variableScope) {
-    ELResolver elResolver = createElResolver(variableScope);
-    return new ProcessEngineElContext(functionMappers, elResolver);
+    ELResolver elResolver = getCachedElResolver();
+    ProcessEngineElContext elContext = new ProcessEngineElContext(functionMappers, elResolver);
+    elContext.putContext(ExpressionFactory.class, expressionFactory);
+    elContext.putContext(VariableScope.class, variableScope);
+    return elContext;
   }
 
-  protected ELResolver createElResolver(VariableScope variableScope) {
+  protected ELResolver getCachedElResolver() {
+    if (elResolver == null) {
+      synchronized(this) {
+        if (elResolver == null) {
+          elResolver = createElResolver();
+        }
+      }
+    }
+
+    return elResolver;
+  }
+
+  protected ELResolver createElResolver() {
     CompositeELResolver elResolver = new CompositeELResolver();
-    elResolver.add(new VariableScopeElResolver(variableScope));
+    elResolver.add(new VariableScopeElResolver());
 
     if(beans != null) {
       // ACT-1102: Also expose all beans in configuration when using standalone engine, not
@@ -117,7 +129,8 @@ public class ExpressionManager {
     elResolver.add(new ArrayELResolver());
     elResolver.add(new ListELResolver());
     elResolver.add(new MapELResolver());
-    elResolver.add(new BeanELResolver());
+    elResolver.add(new ProcessApplicationBeanElResolverDelegate());
+
     return elResolver;
   }
 

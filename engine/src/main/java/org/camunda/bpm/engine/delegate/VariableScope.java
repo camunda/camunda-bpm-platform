@@ -25,6 +25,8 @@ import org.camunda.bpm.engine.variable.value.TypedValue;
  */
 public interface VariableScope {
 
+  String getVariableScopeKey();
+
   VariableMap getVariables();
 
   VariableMap getVariables(boolean deserializeValues);

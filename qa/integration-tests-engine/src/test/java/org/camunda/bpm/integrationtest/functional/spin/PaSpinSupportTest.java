@@ -15,9 +15,14 @@ package org.camunda.bpm.integrationtest.functional.spin;
 
 import static org.camunda.spin.Spin.*;
 
+import java.util.List;
+
+import org.camunda.bpm.engine.impl.cfg.ProcessEnginePlugin;
 import org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest;
+import org.camunda.spin.plugin.SpinProcessEnginePlugin;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Assert;
 import org.junit.Test;
@@ -32,8 +37,8 @@ import org.junit.runner.RunWith;
 public class PaSpinSupportTest extends AbstractFoxPlatformIntegrationTest {
 
   @Deployment
-  public static WebArchive createDeployment() {
-    return initWebArchiveDeployment();
+  public static Archive<?> createDeployment() {
+    return processArchiveDeployment(initWebArchiveDeployment());
   }
 
   @Test
@@ -41,4 +46,21 @@ public class PaSpinSupportTest extends AbstractFoxPlatformIntegrationTest {
     Assert.assertEquals("someXml", XML("<someXml />").xPath("/someXml").element().name());
   }
 
+  @Test
+  public void spinPluginShouldBeRegistered() {
+    List<ProcessEnginePlugin> processEnginePlugins = processEngineConfiguration.getProcessEnginePlugins();
+
+    boolean spinPluginFound = false;
+
+    for (ProcessEnginePlugin plugin : processEnginePlugins) {
+      if (plugin instanceof SpinProcessEnginePlugin) {
+        spinPluginFound = true;
+        break;
+      }
+    }
+
+    Assert.assertTrue(spinPluginFound);
+  }
+
 }
+

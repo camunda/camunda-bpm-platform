@@ -10,6 +10,7 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Assert;
 import org.junit.Test;
@@ -20,8 +21,11 @@ import org.junit.runner.RunWith;
 public class JodaTimeClassloadingTest extends AbstractFoxPlatformIntegrationTest {
 
   @Deployment
-  public static WebArchive createDeployment() {
-    return initWebArchiveDeployment().addAsResource("org/camunda/bpm/integrationtest/functional/jodatime/JodaTimeClassloadingTest.bpmn20.xml");
+  public static Archive<?> createDeployment() {
+    WebArchive archive = initWebArchiveDeployment()
+        .addAsResource("org/camunda/bpm/integrationtest/functional/jodatime/JodaTimeClassloadingTest.bpmn20.xml");
+
+    return processArchiveDeployment(archive);
   }
   
   

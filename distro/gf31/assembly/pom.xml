@@ -110,10 +110,14 @@
       <artifactId>camunda-identity-ldap</artifactId>
     </dependency>
 
-    <!-- CAM-2552 SPIN -->
     <dependency>
       <groupId>org.camunda.spin</groupId>
       <artifactId>camunda-spin-all</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.camunda.connect</groupId>
+      <artifactId>camunda-connect-all</artifactId>
     </dependency>
 
     <dependency>

@@ -77,7 +77,15 @@ public class ClassDelegateActivityBehavior extends AbstractBpmnActivityBehavior 
       ActivityBehavior activityBehaviorInstance = getActivityBehaviorInstance(execution);
 
       if (activityBehaviorInstance instanceof SignallableActivityBehavior) {
-        ((SignallableActivityBehavior) activityBehaviorInstance).signal(execution, signalName, signalData);
+        try {
+          ((SignallableActivityBehavior) activityBehaviorInstance).signal(execution, signalName, signalData);
+        }
+        catch (BpmnError error) {
+          ErrorPropagation.propagateError(error, execution);
+        }
+        catch (Exception exception) {
+          ErrorPropagation.propagateException(exception, execution);
+        }
       } else {
         throw new ProcessEngineException("signal() can only be called on a " + SignallableActivityBehavior.class.getName() + " instance");
       }
@@ -86,7 +94,15 @@ public class ClassDelegateActivityBehavior extends AbstractBpmnActivityBehavior 
       Context.executeWithinProcessApplication(new Callable<Void>() {
 
         public Void call() throws Exception {
-          signal(execution, signalName, signalData);
+          try {
+            signal(execution, signalName, signalData);
+          }
+          catch (BpmnError error) {
+            ErrorPropagation.propagateError(error, execution);
+          }
+          catch (Exception exception) {
+            ErrorPropagation.propagateException(exception, execution);
+          }
           return null;
         }
 
@@ -109,8 +125,7 @@ public class ClassDelegateActivityBehavior extends AbstractBpmnActivityBehavior 
   // Adds properties to the given delegation instance (eg multi instance) if needed
   protected ActivityBehavior determineBehaviour(ActivityBehavior delegateInstance, ActivityExecution execution) {
     if (hasMultiInstanceCharacteristics()) {
-      multiInstanceActivityBehavior.setInnerActivityBehavior((AbstractBpmnActivityBehavior) delegateInstance);
-      return multiInstanceActivityBehavior;
+      ((AbstractBpmnActivityBehavior) delegateInstance).setMultiInstanceActivityBehavior(multiInstanceActivityBehavior);
     }
     return delegateInstance;
   }

@@ -13,7 +13,11 @@
 
 package org.camunda.bpm.engine.test.api.form;
 
-import static org.camunda.bpm.engine.variable.Variables.*;
+import static org.camunda.bpm.engine.variable.Variables.booleanValue;
+import static org.camunda.bpm.engine.variable.Variables.createVariables;
+import static org.camunda.bpm.engine.variable.Variables.objectValue;
+import static org.camunda.bpm.engine.variable.Variables.serializedObjectValue;
+import static org.camunda.bpm.engine.variable.Variables.stringValue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -776,6 +780,21 @@ public class FormServiceTest extends PluggableProcessEngineTestCase {
     if(processEngineConfiguration.getHistoryLevel().getId() >= ProcessEngineConfigurationImpl.HISTORYLEVEL_FULL) {
       assertEquals(0, historyService.createHistoricDetailQuery().formFields().count());
     }
+
+  }
+
+  @Deployment
+  public void FAILING_testSubmitTaskFormContainingReadonlyVariable() {
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceById(processDefinition.getId());
+
+    Task task = taskService.createTaskQuery().singleResult();
+    assertNotNull(task);
+
+    formService.submitTaskForm(task.getId(), new HashMap<String, Object>());
+
+    assertProcessEnded(processInstance.getId());
 
   }
 

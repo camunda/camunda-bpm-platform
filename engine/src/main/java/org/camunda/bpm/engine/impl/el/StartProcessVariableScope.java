@@ -47,6 +47,10 @@ public class StartProcessVariableScope implements VariableScope {
     return INSTANCE;
   }
 
+  public String getVariableScopeKey() {
+    return "scope";
+  }
+
   public VariableMap getVariables() {
     return EMPTY_VARIABLE_MAP;
   }
