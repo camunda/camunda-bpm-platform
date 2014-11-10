@@ -50,26 +50,6 @@ define('camunda-tasklist-ui', [
     var angular = require('angular');
     var $ = angular.element;
 
-    // Inspired by http://jsfiddle.net/evildonald/jLuF5/
-    function detectIE() {
-      var s = document.body.style;
-      var version;
-
-      if (s.msTextCombineHorizontal !== undefined) {
-        version = 11;
-      }
-      else if (s.msFlexOrder !== undefined) {
-        version = 10;
-      }
-      else if (s.msTransform !== undefined) {
-        version = 9;
-      }
-
-      if (version) {
-        $('html').addClass('ie ie'+version);
-      }
-    }
-
     function parseUriConfig() {
       var $baseTag = angular.element('base');
       var config = {};
@@ -123,7 +103,6 @@ define('camunda-tasklist-ui', [
 
 
     $(document).ready(function() {
-      detectIE();
       angular.bootstrap(document, ['cam.tasklist', 'cam.embedded.forms']);
 
       setTimeout(function() {
