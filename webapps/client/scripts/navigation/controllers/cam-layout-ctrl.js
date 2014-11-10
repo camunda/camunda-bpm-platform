@@ -71,5 +71,15 @@ define([
       close('list');
       open('task');
     };
+
+    $scope.resetRegions = function($event) {
+      if ($event && $event.preventDefault) {
+        $event.preventDefault();
+      }
+
+      open('filters');
+      open('list');
+      open('task');
+    };
   }];
 });

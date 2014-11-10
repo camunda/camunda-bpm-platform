@@ -76,7 +76,12 @@
       <button ng-click="maximizeRegion($event)"
               data-region="task"
               class="btn btn-link maximize">
-        <span class="glyphicon glyphicon-fullscreen"></span>
+        <span class="glyphicon glyphicon-resize-full"></span>
+      </button>
+
+      <button ng-click="resetRegions($event)"
+              class="btn btn-link reset-regions">
+        <span class="glyphicon glyphicon-resize-small"></span>
       </button>
 
       <div class="task-actions"

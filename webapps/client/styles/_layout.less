@@ -224,6 +224,10 @@ footer.page {
     height: (22px + @grid-gutter-width);
   }
 
+  .reset-regions {
+    display: none;
+  }
+
   > .task-filters {
     z-index: 3;
     background-color: @column-left-bg;
@@ -286,6 +290,9 @@ footer.page {
 .filters-column-close.list-column-close {
   .maximize {
     display: none;
+  }
+  .reset-regions {
+    display: block;
   }
 }
 
@@ -419,6 +426,7 @@ footer.page {
     padding: (@grid-gutter-width / 2);
     .cell.top {
       button.maximize,
+      button.reset-regions,
       button.region-toggle {
         display: none;
       }
