@@ -62,13 +62,6 @@
         <outputDirectory>server/wildfly-${version.wildfly}/standalone/deployments</outputDirectory>
     </dependencySet>
     
-    <dependencySet>
-        <includes>
-          <include>org.camunda.bpm.example:camunda-example-wait-states:war:*</include>
-        </includes>
-        <outputDirectory>server/wildfly-${version.wildfly}/standalone/deployments</outputDirectory>
-    </dependencySet>
-    
   </dependencySets>
   
   <fileSets>

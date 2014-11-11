@@ -65,13 +65,6 @@
       <type>war</type>
     </dependency>
     
-    <dependency>
-      <groupId>org.camunda.bpm.example</groupId>
-      <artifactId>camunda-example-wait-states</artifactId>
-      <version>${project.version}</version>
-      <type>war</type>
-    </dependency>    
-
   </dependencies>
   
   <build>

@@ -64,13 +64,6 @@
         <unpack>true</unpack>
     </dependencySet>
 
-    <dependencySet>
-        <includes>
-            <include>org.camunda.bpm.example:camunda-example-wait-states:war:*</include>
-        </includes>
-        <outputDirectory>server/apache-tomcat-${version.tomcat}/webapps/</outputDirectory>
-    </dependencySet>
-
   </dependencySets>
 
   <fileSets>
