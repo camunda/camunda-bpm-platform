@@ -65,33 +65,34 @@
        ng-click="resetDueDate()"
        class="reset-due-date glyphicon glyphicon-remove">
     </a>
-
   </li>
-
 </ul>
 
-<ul class="meta list-inline actors">
 
-  <li ng-show="!groupsState.$loaded" class="groups">
-    <div class="loaded">
+<ul class="meta list-inline actors">
+  <li class="groups">
+    <div class="loaded"
+         ng-if="!groupsState.$loaded">
       <span tooltip-placement="top"
             tooltip="{{ 'GROUPS' | translate }}"
             class="glyphicon glyphicon-th">
       </span>
       <i class="animate-spin glyphicon glyphicon-refresh"></i>
     </div>
-  </li>
 
-  <li ng-hide="!groupsState.$loaded" class="groups" ng-click="editGroups()">
-    <div>
+    <div ng-if="groupsState.$loaded"
+         ng-click="editGroups()">
       <span tooltip-placement="top"
             tooltip="{{ 'GROUPS' | translate }}"
             class="glyphicon glyphicon-th"></span>
+
       <a href ng-if="groupIds.length > 0">
         {{ groupIds.join(', ') }}
       </a>
-      <a href ng-if="groupIds.length === 0">
-        {{ 'ADD_GROUPS' | translate }}
+
+      <a href ng-if="groupIds.length === 0"
+         translate="ADD_GROUPS">
+        Add groups
       </a>
     </div>
   </li>

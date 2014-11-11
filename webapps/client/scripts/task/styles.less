@@ -8,70 +8,8 @@
   .nav-tabs .glyphicon {
     margin-left: 5px;
   }
-
-  .meta {
-    width: 50%;
-    float: left;
-
-    &:last-child {
-      clear: right;
-    }
-
-    li {
-      max-width: 49%;
-      vertical-align: top;
-      .preview {
-        max-width: 100%;
-        white-space: nowrap;
-      }
-    }
-
-    input {
-      line-height: 1em;
-      outline: none;
-    }
-  }
 }
 
-[cam-tasklist-task-meta] {
-  position: relative;
-  z-index: 10;
-
-  .assignee {
-    [cam-widget-inline-field] {
-      .view-value {
-        max-width: 120px;
-        text-overflow: ellipsis;
-        overflow: hidden;
-        white-space: nowrap;
-        vertical-align: bottom;
-
-        .ng-binding {
-          max-width: 100%;
-          text-overflow: ellipsis;
-          overflow: hidden;
-          white-space: nowrap;
-        }
-      }
-    }
-  }
-
-  .glyphicon-remove {
-    top: 3px;
-  }
-}
-
-.task-card,
-.modal-header {
-  .names {
-    h2 {
-      margin-top: 0;
-    }
-    h4:empty {
-      display: none;
-    }
-  }
-}
 
 .modal {
   &.task-form-fullscreen {
@@ -282,20 +220,44 @@
   padding-right: (@grid-gutter-width / 2);
 }
 
-.actors {
-  margin-left: 0;
-  margin-right: 0;
-  text-align: right;
-  white-space: nowrap;
-  > li {
-    &.groups {
-      max-width: 120px;
-      > div {
-        .truncate(100%);
+
+
+[cam-tasklist-task-meta] {
+  position: relative;
+  z-index: 10;
+
+  .assignee {
+    [cam-widget-inline-field] {
+      .view-value {
+        max-width: 120px;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+        vertical-align: bottom;
+
+        .ng-binding {
+          max-width: 100%;
+          text-overflow: ellipsis;
+          overflow: hidden;
+          white-space: nowrap;
+        }
       }
     }
-    &:last-child {
-      padding-right: 0;
+  }
+
+  .glyphicon-remove {
+    top: 3px;
+  }
+}
+
+.task-card,
+.modal-header {
+  .names {
+    h2 {
+      margin-top: 0;
+    }
+    h4:empty {
+      display: none;
     }
   }
 }
@@ -320,3 +282,124 @@
     .truncate(100%);
   }
 }
+
+
+.task-card .meta {
+  float: none;
+  display: block;
+  width: auto;
+  max-width: 100%;
+  margin-left: -5px;
+
+  li {
+    float: none;
+    display: block;
+    width: auto;
+    max-width: 100%;
+    min-height: 26px;
+    vertical-align: top;
+  }
+
+  &.actors {
+    text-align: left;
+  }
+
+  .groups {
+    padding-left: 10px;
+    padding-top: 3px;
+    .glyphicon {
+      vertical-align: top;
+    }
+
+    a {
+      display: inline-block;
+      max-width: 100%;
+      padding-left: 24px;
+      margin-left: -20px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      overflow: hidden;
+    }
+  }
+
+  [cam-widget-inline-field] {
+    white-space: nowrap;
+    display: inline;
+    max-width: 100%;
+    padding-right: 24px;
+    margin-right: -20px;
+    .view-value {
+      max-width: 100%;
+      padding-right: 24px;
+      margin-right: -24px;
+      .ng-binding {
+        max-width: 100%;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        overflow: hidden;
+      }
+    }
+  }
+}
+
+// XS
+@media (min-width: @screen-xs-min) and (max-width: @screen-xs-max) {
+}
+
+
+// S
+@media (min-width: @screen-sm-min) and (max-width: @screen-sm-max) {
+  body {
+    &.ilters-column-close,
+    &.list-column-close {
+      .task-card .meta {
+        float: left;
+        width: 50%;
+
+        li {
+          float: left;
+          width: 49%;
+        }
+      }
+    }
+  }
+}
+
+
+// M
+@media (min-width: @screen-md-min) and (max-width: @screen-md-max) {
+  .task-card .meta {
+    float: left;
+    width: 50%;
+  }
+  body {
+    &.ilters-column-close,
+    &.list-column-close {
+      .task-card .meta {
+        float: left;
+        width: 50%;
+
+        li {
+          float: left;
+          width: 49%;
+        }
+      }
+    }
+  }
+}
+
+
+@media (min-width: @screen-lg-min) {
+  .task-card .meta {
+    float: left;
+    width: 50%;
+
+    li {
+      float: left;
+      width: 49%;
+    }
+  }
+}
+
