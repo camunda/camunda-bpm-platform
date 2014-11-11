@@ -124,8 +124,10 @@
       </dependency>
       <dependency>
         <groupId>org.camunda.spin</groupId>
-        <artifactId>camunda-spin-all</artifactId>
+        <artifactId>camunda-spin-bom</artifactId>
         <version>${version.camunda.spin}</version>
+        <scope>import</scope>
+        <type>pom</type>
       </dependency>
 
       <!-- template engines, optional -->
