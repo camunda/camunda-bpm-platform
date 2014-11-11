@@ -29,6 +29,8 @@ import org.camunda.bpm.engine.impl.core.variable.scope.CoreVariableStore;
  */
 public class ConnectorVariableScope extends AbstractVariableScope {
 
+  private static final long serialVersionUID = 1L;
+
   protected AbstractVariableScope parent;
 
   protected ConnectorVariableStore variableStore;

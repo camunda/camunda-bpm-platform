@@ -36,7 +36,7 @@ public class DebugRequestInterceptor implements ConnectorRequestInterceptor {
   protected Object response;
   protected boolean proceed;
 
-  private ConnectorRequest request;
+  private ConnectorRequest<?> request;
   private Object target;
 
   public DebugRequestInterceptor() {
@@ -81,7 +81,7 @@ public class DebugRequestInterceptor implements ConnectorRequestInterceptor {
   }
 
   @SuppressWarnings("unchecked")
-  public <T extends ConnectorRequest> T getRequest() {
+  public <T extends ConnectorRequest<?>> T getRequest() {
     return (T) request;
   }
 

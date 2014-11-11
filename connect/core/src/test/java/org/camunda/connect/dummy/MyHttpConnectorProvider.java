@@ -23,7 +23,7 @@ public class MyHttpConnectorProvider implements ConnectorProvider {
     return Connectors.HTTP_CONNECTOR_ID;
   }
 
-  public Connector createConnectorInstance() {
+  public Connector<?> createConnectorInstance() {
     return new MyHttpConnector(Connectors.HTTP_CONNECTOR_ID);
   }
 

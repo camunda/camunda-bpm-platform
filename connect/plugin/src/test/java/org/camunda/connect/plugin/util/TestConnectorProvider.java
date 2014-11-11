@@ -22,7 +22,7 @@ public class TestConnectorProvider implements ConnectorProvider {
     return TestConnector.ID;
   }
 
-  public Connector createConnectorInstance() {
+  public Connector<?> createConnectorInstance() {
     return new TestConnector(TestConnector.ID);
   }
 }

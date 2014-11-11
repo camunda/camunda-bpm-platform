@@ -15,6 +15,8 @@ package org.camunda.connect.spi;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.Set;
+
 import org.camunda.connect.Connectors;
 import org.camunda.connect.dummy.DummyConnector;
 import org.junit.Test;
@@ -44,7 +46,7 @@ public class ConnectorsTest {
     DummyConnector connector = Connectors.getConnector(DummyConnector.ID);
     assertThat(connector).isNotNull();
 
-    assertThat(Connectors.getInstance().getAvailableConnectors())
+    assertThat(Connectors.getAvailableConnectors())
       .hasSize(2)
       .contains(connector);
   }

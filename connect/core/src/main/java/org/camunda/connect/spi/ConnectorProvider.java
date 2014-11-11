@@ -22,6 +22,6 @@ public interface ConnectorProvider {
   String getConnectorId();
 
   /** Create a new instance of the connector created by this factory. */
-  Connector createConnectorInstance();
+  Connector<?> createConnectorInstance();
 
 }

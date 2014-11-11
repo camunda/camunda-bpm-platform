@@ -38,7 +38,7 @@ public interface ConnectorInvocation {
    *
    * @return the connector request
    */
-  public ConnectorRequest getRequest();
+  public ConnectorRequest<?> getRequest();
 
   /**
    * Makes the request proceed through the interceptor chain.

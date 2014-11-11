@@ -32,10 +32,10 @@ public class ConnectorParseListener extends AbstractBpmnParseListener {
       Element connectorIdElement = connectorDefinition.element("connectorId");
 
       String connectorId = null;
-      if(connectorIdElement != null)  {
+      if (connectorIdElement != null)  {
         connectorId = connectorIdElement.getText().trim();
       }
-      if(connectorIdElement == null || connectorId.isEmpty()) {
+      if (connectorIdElement == null || connectorId.isEmpty()) {
         throw new BpmnParseException("No 'id' defined for connector.", connectorDefinition);
       }
 

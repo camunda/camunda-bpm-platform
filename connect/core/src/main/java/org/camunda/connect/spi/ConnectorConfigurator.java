@@ -20,7 +20,7 @@ package org.camunda.connect.spi;
  * may be used for further restrict configuration to connectors
  * with a specific id.
  */
-public interface ConnectorConfigurator<C extends Connector> {
+public interface ConnectorConfigurator<C extends Connector<?>> {
 
   /**
    * @return the class of connectors this configurator can configure (including subclasses)

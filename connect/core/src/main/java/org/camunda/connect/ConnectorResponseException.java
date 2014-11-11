@@ -18,6 +18,8 @@ package org.camunda.connect;
  */
 public class ConnectorResponseException extends ConnectorException {
 
+  private static final long serialVersionUID = 1L;
+
   public ConnectorResponseException(String message) {
     super(message);
   }

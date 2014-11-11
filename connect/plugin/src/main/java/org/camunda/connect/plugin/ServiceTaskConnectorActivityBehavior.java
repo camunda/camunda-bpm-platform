@@ -34,7 +34,7 @@ public class ServiceTaskConnectorActivityBehavior extends TaskActivityBehavior {
 
   /** cached connector instance for this activity.
    * Will be initialized after the first execution of this activity. */
-  protected Connector connectorInstance;
+  protected Connector<?> connectorInstance;
 
   /** the local ioMapping for this connector. */
   protected IoMapping ioMapping;
@@ -47,7 +47,7 @@ public class ServiceTaskConnectorActivityBehavior extends TaskActivityBehavior {
   public void execute(ActivityExecution execution) throws Exception {
     ensureConnectorInitialized();
 
-    ConnectorRequest request = connectorInstance.createRequest();
+    ConnectorRequest<?> request = connectorInstance.createRequest();
     applyInputParameters(execution, request);
 
     try {
@@ -62,7 +62,7 @@ public class ServiceTaskConnectorActivityBehavior extends TaskActivityBehavior {
     leave(execution);
   }
 
-  protected void applyInputParameters(ActivityExecution execution, ConnectorRequest request) {
+  protected void applyInputParameters(ActivityExecution execution, ConnectorRequest<?> request) {
     if(ioMapping != null) {
       // create variable scope for input parameters
       ConnectorVariableScope connectorInputVariableScope = new ConnectorVariableScope((AbstractVariableScope) execution);

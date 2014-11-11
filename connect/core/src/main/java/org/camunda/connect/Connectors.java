@@ -22,6 +22,7 @@ import java.util.Set;
 import org.camunda.connect.spi.Connector;
 import org.camunda.connect.spi.ConnectorConfigurator;
 import org.camunda.connect.spi.ConnectorProvider;
+import org.camunda.connect.spi.ConnectorRequest;
 
 /**
  * Provides access to all available connectors.
@@ -49,7 +50,7 @@ public class Connectors {
    * no connector is registered for this id
    */
   @SuppressWarnings("unchecked")
-  public static <C extends Connector> C http() {
+  public static <C extends Connector<? extends ConnectorRequest<?>>> C http() {
     return (C) INSTANCE.getConnectorById(HTTP_CONNECTOR_ID);
   }
 
@@ -58,7 +59,7 @@ public class Connectors {
    * if no connector is registered for this id
    */
   @SuppressWarnings("unchecked")
-  public static <C extends Connector> C soap() {
+  public static <C extends Connector<? extends ConnectorRequest<?>>> C soap() {
     return (C) INSTANCE.getConnectorById(SOAP_HTTP_CONNECTOR_ID);
   }
 
@@ -67,27 +68,27 @@ public class Connectors {
    * registered for this id
    */
   @SuppressWarnings("unchecked")
-  public static <C extends Connector> C getConnector(String connectorId) {
+  public static <C extends Connector<? extends ConnectorRequest<?>>> C getConnector(String connectorId) {
     return (C) INSTANCE.getConnectorById(connectorId);
   }
 
   /**
    * @return all register connectors
    */
-  public static Set<Connector> getAvailableConnectors() {
+  public static Set<Connector<? extends ConnectorRequest<?>>> getAvailableConnectors() {
     return INSTANCE.getAllAvailableConnectors();
   }
 
   // instance //////////////////////////////////////////////////////////
 
-  protected Map<String, Connector> availableConnectors;
+  protected Map<String, Connector<?>> availableConnectors;
 
   /**
    * @return all register connectors
    */
-  public Set<Connector> getAllAvailableConnectors() {
+  public Set<Connector<? extends ConnectorRequest<?>>> getAllAvailableConnectors() {
     ensureConnectorProvidersInitialized();
-    return new HashSet<Connector>(availableConnectors.values());
+    return new HashSet<Connector<?>>(availableConnectors.values());
   }
 
   /**
@@ -95,7 +96,7 @@ public class Connectors {
    * registered for this id
    */
   @SuppressWarnings("unchecked")
-  public <C extends Connector> C getConnectorById(String connectorId) {
+  public <C extends Connector<? extends ConnectorRequest<?>>> C getConnectorById(String connectorId) {
     ensureConnectorProvidersInitialized();
     return (C) availableConnectors.get(connectorId);
   }
@@ -114,7 +115,7 @@ public class Connectors {
   }
 
   protected void initializeConnectors() {
-    Map<String, Connector> connectors = new HashMap<String, Connector>();
+    Map<String, Connector<?>> connectors = new HashMap<String, Connector<?>>();
 
     // discover available custom connector providers on the classpath
     registerConnectors(connectors);
@@ -126,7 +127,7 @@ public class Connectors {
 
   }
 
-  protected void registerConnectors(Map<String, Connector> connectors) {
+  protected void registerConnectors(Map<String, Connector<?>> connectors) {
     ServiceLoader<ConnectorProvider> providers = ServiceLoader.load(ConnectorProvider.class, Connectors.class.getClassLoader());
 
     for (ConnectorProvider provider : providers) {
@@ -134,19 +135,20 @@ public class Connectors {
     }
   }
 
-  protected void registerProvider(Map<String, Connector> connectors, ConnectorProvider provider)  {
+  protected void registerProvider(Map<String, Connector<?>> connectors, ConnectorProvider provider)  {
     String connectorId = provider.getConnectorId();
     if (connectors.containsKey(connectorId)) {
       throw LOG.multipleConnectorProvidersFound(connectorId);
     }
     else {
-      Connector connectorInstance = provider.createConnectorInstance();
+      Connector<?> connectorInstance = provider.createConnectorInstance();
       LOG.connectorProviderDiscovered(provider, connectorId, connectorInstance);
       connectors.put(connectorId, connectorInstance);
     }
   }
 
-  protected void applyConfigurators(Map<String, Connector> connectors) {
+  @SuppressWarnings("rawtypes")
+  protected void applyConfigurators(Map<String, Connector<?>> connectors) {
     ServiceLoader<ConnectorConfigurator> configurators = ServiceLoader.load(ConnectorConfigurator.class, Connectors.class.getClassLoader());
 
     for (ConnectorConfigurator configurator : configurators) {
@@ -156,8 +158,8 @@ public class Connectors {
   }
 
   @SuppressWarnings({ "rawtypes", "unchecked" })
-  protected void applyConfigurator(Map<String, Connector> connectors, ConnectorConfigurator configurator) {
-    for (Connector connector : connectors.values()) {
+  protected void applyConfigurator(Map<String, Connector<?>> connectors, ConnectorConfigurator configurator) {
+    for (Connector<?> connector : connectors.values()) {
       if (configurator.getConnectorClass().isAssignableFrom(connector.getClass())) {
         configurator.configure(connector);
       }
