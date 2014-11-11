@@ -7,7 +7,7 @@
   <!-- CASEDEFINITION INSERT -->
 
   <insert id="insertCaseDefinition" parameterType="org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity">
-    insert into ${prefix}ACT_RE_CASE_DEF(ID_, CATEGORY_, NAME_, KEY_, VERSION_, DEPLOYMENT_ID_, RESOURCE_NAME_, REV_)
+    insert into ${prefix}ACT_RE_CASE_DEF(ID_, CATEGORY_, NAME_, KEY_, VERSION_, DEPLOYMENT_ID_, RESOURCE_NAME_, DGRM_RESOURCE_NAME_, REV_)
     values (#{id, jdbcType=VARCHAR},
             #{category, jdbcType=VARCHAR},
             #{name, jdbcType=VARCHAR},
@@ -15,6 +15,7 @@
             #{version, jdbcType=INTEGER},
             #{deploymentId, jdbcType=VARCHAR},
             #{resourceName, jdbcType=VARCHAR},
+            #{diagramResourceName, jdbcType=VARCHAR},
             1
            )
   </insert>
@@ -45,6 +46,7 @@
     <result property="version" column="VERSION_" jdbcType="INTEGER"/>
     <result property="deploymentId" column="DEPLOYMENT_ID_" jdbcType="VARCHAR"/>
     <result property="resourceName" column="RESOURCE_NAME_" jdbcType="VARCHAR"/>
+    <result property="diagramResourceName" column="DGRM_RESOURCE_NAME_" jdbcType="VARCHAR"/>    
   </resultMap>
 
   <!-- CASEDEFINITION SELECT -->

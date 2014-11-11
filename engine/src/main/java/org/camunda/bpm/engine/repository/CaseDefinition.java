@@ -35,11 +35,18 @@ public interface CaseDefinition {
   /** version of this case definition */
   int getVersion();
 
-  /** name of {@link RepositoryService#getResourceAsStream(String, String) the resource}
-   * of this case definition. */
+  /** name of {@link RepositoryService#getResourceAsStream(String, String) the resource} 
+   * of this case definition.
+   */
   String getResourceName();
 
   /** The deployment in which this case definition is contained. */
   String getDeploymentId();
 
+  /**
+   * The diagram resource name.
+   * 
+   * @return the name of the diagram resource. e.G. of the case PNG file.
+   */
+  String getDiagramResourceName();
 }

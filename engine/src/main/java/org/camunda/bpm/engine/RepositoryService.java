@@ -359,4 +359,15 @@ public interface RepositoryService {
    */
   InputStream getCaseModel(String caseDefinitionId);
 
+  /**
+   * Gives access to a deployed case diagram, e.g., a PNG image, through a
+   * stream of bytes.
+   *
+   * @param caseDefinitionId id of a {@link CaseDefinition}, cannot be null.
+   * @return null when the diagram resource name of a {@link CaseDefinition} is null.
+   * @throws ProcessEngineException when the process diagram doesn't exist.
+   */
+  InputStream getCaseDiagram(String caseDefinitionId);
+
 }
+
