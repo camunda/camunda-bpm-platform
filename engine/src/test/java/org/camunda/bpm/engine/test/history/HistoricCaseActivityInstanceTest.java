@@ -615,6 +615,12 @@ public class HistoricCaseActivityInstanceTest extends CmmnProcessEngineTestCase 
     assertCount(0, historicQuery());
   }
 
+  @Deployment
+  public void testNonBlockingHumanTask() {
+    CaseInstance caseInstance = createCaseInstance();
+    assertNotNull(caseInstance);
+  }
+
   protected HistoricCaseActivityInstanceQuery historicQuery() {
     return historyService.createHistoricCaseActivityInstanceQuery();
   }
