@@ -298,6 +298,10 @@
     max-width: 100%;
     min-height: 26px;
     vertical-align: top;
+
+    &.set-value {
+      padding-top: 3px;
+    }
   }
 
   &.actors {
@@ -323,16 +327,19 @@
     }
   }
 
+
   [cam-widget-inline-field] {
     white-space: nowrap;
-    display: inline;
     max-width: 100%;
     padding-right: 24px;
-    margin-right: -20px;
+    margin-right: -24px;
+    &.inline-editing {
+      padding-right: 0;
+      margin-right: 0;
+    }
+
     .view-value {
       max-width: 100%;
-      padding-right: 24px;
-      margin-right: -24px;
       .ng-binding {
         max-width: 100%;
         white-space: nowrap;

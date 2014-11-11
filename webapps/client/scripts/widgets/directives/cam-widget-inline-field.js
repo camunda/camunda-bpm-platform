@@ -199,9 +199,11 @@ define([
 
           if (scope.editing) {
             appendToBody();
+            element.addClass('inline-editing');
           }
           else {
             removeFromBody();
+            element.removeClass('inline-editing');
           }
         });
 
