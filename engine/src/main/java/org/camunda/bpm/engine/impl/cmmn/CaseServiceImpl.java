@@ -61,34 +61,42 @@ public class CaseServiceImpl extends ServiceImpl implements CaseService {
   }
 
   public VariableMap getVariables(String caseExecutionId) {
-    return getVariables(caseExecutionId, true);
+    return getVariablesTyped(caseExecutionId);
   }
 
-  public VariableMap getVariables(String caseExecutionId, boolean deserializeValues) {
+  public VariableMap getVariablesTyped(String caseExecutionId) {
+    return getVariablesTyped(caseExecutionId, true);
+  }
+
+  public VariableMap getVariablesTyped(String caseExecutionId, boolean deserializeValues) {
     return getCaseExecutionVariables(caseExecutionId, null, false, deserializeValues);
   }
 
   public VariableMap getVariablesLocal(String caseExecutionId) {
-    return getVariablesLocal(caseExecutionId, true);
+    return getVariablesLocalTyped(caseExecutionId);
   }
 
-  public VariableMap getVariablesLocal(String caseExecutionId, boolean deserializeValues) {
+  public VariableMap getVariablesLocalTyped(String caseExecutionId) {
+    return getVariablesLocalTyped(caseExecutionId, true);
+  }
+
+  public VariableMap getVariablesLocalTyped(String caseExecutionId, boolean deserializeValues) {
     return getCaseExecutionVariables(caseExecutionId, null, true, deserializeValues);
   }
 
   public VariableMap getVariables(String caseExecutionId, Collection<String> variableNames) {
-    return getVariables(caseExecutionId, variableNames, true);
+    return getVariablesTyped(caseExecutionId, variableNames, true);
   }
 
-  public VariableMap getVariables(String caseExecutionId, Collection<String> variableNames, boolean deserializeValues) {
+  public VariableMap getVariablesTyped(String caseExecutionId, Collection<String> variableNames, boolean deserializeValues) {
     return getCaseExecutionVariables(caseExecutionId, variableNames, false, deserializeValues);
   }
 
   public VariableMap getVariablesLocal(String caseExecutionId, Collection<String> variableNames) {
-    return getVariables(caseExecutionId, variableNames, true);
+    return getVariablesLocalTyped(caseExecutionId, variableNames, true);
   }
 
-  public VariableMap getVariablesLocal(String caseExecutionId, Collection<String> variableNames, boolean deserializeValues) {
+  public VariableMap getVariablesLocalTyped(String caseExecutionId, Collection<String> variableNames, boolean deserializeValues) {
     return getCaseExecutionVariables(caseExecutionId, variableNames, true, deserializeValues);
   }
 

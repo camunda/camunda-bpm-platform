@@ -27,13 +27,17 @@ public interface VariableScope {
 
   String getVariableScopeKey();
 
-  VariableMap getVariables();
+  Map<String, Object> getVariables();
 
-  VariableMap getVariables(boolean deserializeValues);
+  VariableMap getVariablesTyped();
 
-  VariableMap getVariablesLocal();
+  VariableMap getVariablesTyped(boolean deserializeValues);
 
-  VariableMap getVariablesLocal(boolean deserializeValues);
+  Map<String, Object> getVariablesLocal();
+
+  VariableMap getVariablesLocalTyped();
+
+  VariableMap getVariablesLocalTyped(boolean deserializeValues);
 
   Object getVariable(String variableName);
 

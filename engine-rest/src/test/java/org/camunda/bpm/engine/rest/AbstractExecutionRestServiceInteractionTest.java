@@ -74,7 +74,7 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
   @Before
   public void setUpRuntimeData() {
     runtimeServiceMock = mock(RuntimeServiceImpl.class);
-    when(runtimeServiceMock.getVariablesLocal(MockProvider.EXAMPLE_EXECUTION_ID, true)).thenReturn(EXAMPLE_VARIABLES);
+    when(runtimeServiceMock.getVariablesLocalTyped(MockProvider.EXAMPLE_EXECUTION_ID, true)).thenReturn(EXAMPLE_VARIABLES);
     mockEventSubscriptionQuery();
 
     when(processEngine.getRuntimeService()).thenReturn(runtimeServiceMock);
@@ -278,7 +278,7 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
 
   @Test
   public void testGetLocalVariablesForNonExistingExecution() {
-    when(runtimeServiceMock.getVariablesLocal(anyString(), eq(true))).thenThrow(new ProcessEngineException("expected exception"));
+    when(runtimeServiceMock.getVariablesLocalTyped(anyString(), eq(true))).thenThrow(new ProcessEngineException("expected exception"));
 
     given().pathParam("id", "aNonExistingExecutionId")
       .then().expect().statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode()).contentType(ContentType.JSON)
@@ -302,7 +302,7 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
             .objectTypeName(ArrayList.class.getName())
             .serializedValue("a serialized value"); // this should differ from the serialized json
 
-    when(runtimeServiceMock.getVariablesLocal(eq(MockProvider.EXAMPLE_EXECUTION_ID), anyBoolean()))
+    when(runtimeServiceMock.getVariablesLocalTyped(eq(MockProvider.EXAMPLE_EXECUTION_ID), anyBoolean()))
       .thenReturn(Variables.createVariables().putValueTyped(variableKey, variableValue));
 
     // when
@@ -315,7 +315,7 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
       .when().get(EXECUTION_LOCAL_VARIABLES_URL);
 
     // then
-    verify(runtimeServiceMock).getVariablesLocal(MockProvider.EXAMPLE_EXECUTION_ID, true);
+    verify(runtimeServiceMock).getVariablesLocalTyped(MockProvider.EXAMPLE_EXECUTION_ID, true);
   }
 
   @Test
@@ -330,7 +330,7 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
           .objectTypeName(ArrayList.class.getName())
           .create();
 
-    when(runtimeServiceMock.getVariablesLocal(eq(MockProvider.EXAMPLE_EXECUTION_ID), anyBoolean()))
+    when(runtimeServiceMock.getVariablesLocalTyped(eq(MockProvider.EXAMPLE_EXECUTION_ID), anyBoolean()))
       .thenReturn(Variables.createVariables().putValueTyped(variableKey, variableValue));
 
     // when
@@ -345,7 +345,7 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
       .when().get(EXECUTION_LOCAL_VARIABLES_URL);
 
     // then
-    verify(runtimeServiceMock).getVariablesLocal(MockProvider.EXAMPLE_EXECUTION_ID, false);
+    verify(runtimeServiceMock).getVariablesLocalTyped(MockProvider.EXAMPLE_EXECUTION_ID, false);
   }
 
   @Test

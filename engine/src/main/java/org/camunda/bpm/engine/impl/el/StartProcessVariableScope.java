@@ -67,11 +67,19 @@ public class StartProcessVariableScope implements VariableScope {
     return null;
   }
 
-  public VariableMap getVariables(boolean deserializeObjectValues) {
+  public VariableMap getVariablesTyped(boolean deserializeObjectValues) {
     return getVariables();
   }
 
-  public VariableMap getVariablesLocal(boolean deserializeObjectValues) {
+  public VariableMap getVariablesLocalTyped() {
+    return getVariablesLocalTyped(true);
+  }
+
+  public VariableMap getVariablesTyped() {
+    return getVariablesTyped(true);
+  }
+
+  public VariableMap getVariablesLocalTyped(boolean deserializeObjectValues) {
     return getVariablesLocal();
   }
 

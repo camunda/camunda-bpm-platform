@@ -123,8 +123,8 @@ public abstract class AbstractCaseInstanceRestServiceInteractionTest extends Abs
     when(caseServiceMock.getVariableTyped(anyString(), eq(EXAMPLE_VARIABLE_KEY), anyBoolean())).thenReturn(EXAMPLE_VARIABLE_VALUE);
     when(caseServiceMock.getVariableTyped(anyString(), eq(EXAMPLE_BYTES_VARIABLE_KEY), eq(false))).thenReturn(EXAMPLE_VARIABLE_VALUE_BYTES);
 
-    when(caseServiceMock.getVariables(anyString(), eq(true))).thenReturn(EXAMPLE_VARIABLES);
-    when(caseServiceMock.getVariables(anyString(), Matchers.<Collection<String>>any(), eq(true))).thenReturn(EXAMPLE_VARIABLES);
+    when(caseServiceMock.getVariablesTyped(anyString(), eq(true))).thenReturn(EXAMPLE_VARIABLES);
+    when(caseServiceMock.getVariablesTyped(anyString(), Matchers.<Collection<String>>any(), eq(true))).thenReturn(EXAMPLE_VARIABLES);
 
     caseExecutionCommandBuilderMock = mock(CaseExecutionCommandBuilder.class);
 
@@ -170,12 +170,12 @@ public abstract class AbstractCaseInstanceRestServiceInteractionTest extends Abs
 
     Assert.assertEquals("Should return exactly one variable", 1, response.jsonPath().getMap("").size());
 
-    verify(caseServiceMock).getVariables(MockProvider.EXAMPLE_CASE_INSTANCE_ID, true);
+    verify(caseServiceMock).getVariablesTyped(MockProvider.EXAMPLE_CASE_INSTANCE_ID, true);
   }
 
   @Test
   public void testGetVariablesWithNullValue() {
-    when(caseServiceMock.getVariables(MockProvider.EXAMPLE_CASE_INSTANCE_ID, true)).thenReturn(EXAMPLE_VARIABLES_WITH_NULL_VALUE);
+    when(caseServiceMock.getVariablesTyped(MockProvider.EXAMPLE_CASE_INSTANCE_ID, true)).thenReturn(EXAMPLE_VARIABLES_WITH_NULL_VALUE);
 
     Response response = given().pathParam("id", MockProvider.EXAMPLE_CASE_INSTANCE_ID)
       .then().expect().statusCode(Status.OK.getStatusCode())
@@ -186,13 +186,13 @@ public abstract class AbstractCaseInstanceRestServiceInteractionTest extends Abs
 
     Assert.assertEquals("Should return exactly one variable", 1, response.jsonPath().getMap("").size());
 
-    verify(caseServiceMock).getVariables(MockProvider.EXAMPLE_CASE_INSTANCE_ID, true);
+    verify(caseServiceMock).getVariablesTyped(MockProvider.EXAMPLE_CASE_INSTANCE_ID, true);
   }
 
 
   @Test
   public void testJavaObjectVariableSerialization() {
-    when(caseServiceMock.getVariables(MockProvider.EXAMPLE_CASE_INSTANCE_ID, true)).thenReturn(EXAMPLE_OBJECT_VARIABLES);
+    when(caseServiceMock.getVariablesTyped(MockProvider.EXAMPLE_CASE_INSTANCE_ID, true)).thenReturn(EXAMPLE_OBJECT_VARIABLES);
 
     Response response = given().pathParam("id", MockProvider.EXAMPLE_CASE_INSTANCE_ID)
       .then().expect().statusCode(Status.OK.getStatusCode())
@@ -206,7 +206,7 @@ public abstract class AbstractCaseInstanceRestServiceInteractionTest extends Abs
 
     Assert.assertEquals("Should return exactly one variable", 1, response.jsonPath().getMap("").size());
 
-    verify(caseServiceMock).getVariables(MockProvider.EXAMPLE_CASE_INSTANCE_ID, true);
+    verify(caseServiceMock).getVariablesTyped(MockProvider.EXAMPLE_CASE_INSTANCE_ID, true);
   }
 
   @Test
@@ -221,7 +221,7 @@ public abstract class AbstractCaseInstanceRestServiceInteractionTest extends Abs
           .objectTypeName(ArrayList.class.getName())
           .create();
 
-    when(caseServiceMock.getVariables(eq(MockProvider.EXAMPLE_CASE_INSTANCE_ID), anyBoolean()))
+    when(caseServiceMock.getVariablesTyped(eq(MockProvider.EXAMPLE_CASE_INSTANCE_ID), anyBoolean()))
       .thenReturn(Variables.createVariables().putValueTyped(variableKey, variableValue));
 
     // when
@@ -236,12 +236,12 @@ public abstract class AbstractCaseInstanceRestServiceInteractionTest extends Abs
       .when().get(CASE_INSTANCE_VARIABLES_URL);
 
     // then
-    verify(caseServiceMock).getVariables(MockProvider.EXAMPLE_CASE_INSTANCE_ID, false);
+    verify(caseServiceMock).getVariablesTyped(MockProvider.EXAMPLE_CASE_INSTANCE_ID, false);
   }
 
   @Test
   public void testGetVariablesForNonExistingCaseInstance() {
-    when(caseServiceMock.getVariables(anyString(), eq(true))).thenThrow(new ProcessEngineException("expected exception"));
+    when(caseServiceMock.getVariablesTyped(anyString(), eq(true))).thenThrow(new ProcessEngineException("expected exception"));
 
     given().pathParam("id", "aNonExistingCaseInstanceId")
       .then().expect().statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode()).contentType(ContentType.JSON)
@@ -249,7 +249,7 @@ public abstract class AbstractCaseInstanceRestServiceInteractionTest extends Abs
       .body("message", equalTo("expected exception"))
       .when().get(CASE_INSTANCE_VARIABLES_URL);
 
-    verify(caseServiceMock).getVariables("aNonExistingCaseInstanceId", true);
+    verify(caseServiceMock).getVariablesTyped("aNonExistingCaseInstanceId", true);
   }
 
   @Test

@@ -426,7 +426,7 @@ public class FormServiceTest extends PluggableProcessEngineTestCase {
               .create())
           .putValueTyped("object", objectValue(serializedValue).create()));
 
-    VariableMap variables = runtimeService.getVariables(processInstance.getId(), false);
+    VariableMap variables = runtimeService.getVariablesTyped(processInstance.getId(), false);
     assertEquals(booleanValue(null), variables.getValueTyped("boolean"));
     assertEquals(stringValue(stringValue), variables.getValueTyped("string"));
     assertNotNull(variables.<ObjectValue>getValueTyped("serializedObject").getValueSerialized());
@@ -453,7 +453,7 @@ public class FormServiceTest extends PluggableProcessEngineTestCase {
             .create())
         .putValueTyped("object", objectValue(serializedValue).create()));
 
-    VariableMap variables = runtimeService.getVariables(processInstance.getId(), false);
+    VariableMap variables = runtimeService.getVariablesTyped(processInstance.getId(), false);
     assertEquals(booleanValue(null), variables.getValueTyped("boolean"));
     assertEquals(stringValue(stringValue), variables.getValueTyped("string"));
     assertNotNull(variables.<ObjectValue>getValueTyped("serializedObject").getValueSerialized());

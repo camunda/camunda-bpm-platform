@@ -211,7 +211,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     when(taskServiceMock.createAttachment(anyString(), anyString(), anyString(), anyString(), anyString(), any(InputStream.class))).thenReturn(mockTaskAttachment);
     when(taskServiceMock.getTaskAttachmentContent(EXAMPLE_TASK_ID, EXAMPLE_TASK_ATTACHMENT_ID)).thenReturn(new ByteArrayInputStream(createMockByteData()));
 
-    when(taskServiceMock.getVariablesLocal(EXAMPLE_TASK_ID, true)).thenReturn(EXAMPLE_VARIABLES);
+    when(taskServiceMock.getVariablesLocalTyped(EXAMPLE_TASK_ID, true)).thenReturn(EXAMPLE_VARIABLES);
 
     formServiceMock = mock(FormService.class);
     when(processEngine.getFormService()).thenReturn(formServiceMock);
@@ -2197,7 +2197,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
             .objectTypeName(ArrayList.class.getName())
             .serializedValue("a serialized value"); // this should differ from the serialized json
 
-    when(taskServiceMock.getVariablesLocal(eq(EXAMPLE_TASK_ID), anyBoolean()))
+    when(taskServiceMock.getVariablesLocalTyped(eq(EXAMPLE_TASK_ID), anyBoolean()))
       .thenReturn(Variables.createVariables().putValueTyped(variableKey, variableValue));
 
     // when
@@ -2210,7 +2210,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
       .when().get(SINGLE_TASK_VARIABLES_URL);
 
     // then
-    verify(taskServiceMock).getVariablesLocal(EXAMPLE_TASK_ID, true);
+    verify(taskServiceMock).getVariablesLocalTyped(EXAMPLE_TASK_ID, true);
   }
 
   @Test
@@ -2225,7 +2225,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
           .objectTypeName(ArrayList.class.getName())
           .create();
 
-    when(taskServiceMock.getVariablesLocal(eq(EXAMPLE_TASK_ID), anyBoolean()))
+    when(taskServiceMock.getVariablesLocalTyped(eq(EXAMPLE_TASK_ID), anyBoolean()))
       .thenReturn(Variables.createVariables().putValueTyped(variableKey, variableValue));
 
     // when
@@ -2240,12 +2240,12 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
       .when().get(SINGLE_TASK_VARIABLES_URL);
 
     // then
-    verify(taskServiceMock).getVariablesLocal(EXAMPLE_TASK_ID, false);
+    verify(taskServiceMock).getVariablesLocalTyped(EXAMPLE_TASK_ID, false);
   }
 
   @Test
   public void testGetLocalVariablesForNonExistingTaskId() {
-    when(taskServiceMock.getVariablesLocal(NON_EXISTING_ID, true)).thenThrow(new ProcessEngineException("task " + NON_EXISTING_ID + " doesn't exist"));
+    when(taskServiceMock.getVariablesLocalTyped(NON_EXISTING_ID, true)).thenThrow(new ProcessEngineException("task " + NON_EXISTING_ID + " doesn't exist"));
 
     given().pathParam("id", NON_EXISTING_ID)
       .header("accept", MediaType.APPLICATION_JSON)

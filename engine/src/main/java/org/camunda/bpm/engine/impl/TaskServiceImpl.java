@@ -196,34 +196,42 @@ public class TaskServiceImpl extends ServiceImpl implements TaskService {
   }
 
   public VariableMap getVariables(String executionId) {
-    return getVariables(executionId, true);
+    return getVariablesTyped(executionId);
   }
 
-  public VariableMap getVariables(String taskId, boolean deserializeValues) {
+  public VariableMap getVariablesTyped(String executionId) {
+    return getVariablesTyped(executionId, true);
+  }
+
+  public VariableMap getVariablesTyped(String taskId, boolean deserializeValues) {
     return commandExecutor.execute(new GetTaskVariablesCmd(taskId, null, false, deserializeValues));
   }
 
   public VariableMap getVariablesLocal(String taskId) {
-    return getVariablesLocal(taskId, true);
+    return getVariablesLocalTyped(taskId);
   }
 
-  public VariableMap getVariablesLocal(String taskId, boolean deserializeValues) {
+  public VariableMap getVariablesLocalTyped(String taskId) {
+    return getVariablesLocalTyped(taskId, true);
+  }
+
+  public VariableMap getVariablesLocalTyped(String taskId, boolean deserializeValues) {
     return commandExecutor.execute(new GetTaskVariablesCmd(taskId, null, true, deserializeValues));
   }
 
   public VariableMap getVariables(String executionId, Collection<String> variableNames) {
-    return getVariables(executionId, variableNames, true);
+    return getVariablesTyped(executionId, variableNames, true);
   }
 
-  public VariableMap getVariables(String executionId, Collection<String> variableNames, boolean deserializeValues) {
+  public VariableMap getVariablesTyped(String executionId, Collection<String> variableNames, boolean deserializeValues) {
     return commandExecutor.execute(new GetTaskVariablesCmd(executionId, variableNames, false, deserializeValues));
   }
 
   public VariableMap getVariablesLocal(String executionId, Collection<String> variableNames) {
-    return getVariablesLocal(executionId, variableNames, true);
+    return getVariablesLocalTyped(executionId, variableNames, true);
   }
 
-  public VariableMap getVariablesLocal(String executionId, Collection<String> variableNames, boolean deserializeValues) {
+  public VariableMap getVariablesLocalTyped(String executionId, Collection<String> variableNames, boolean deserializeValues) {
     return commandExecutor.execute(new GetTaskVariablesCmd(executionId, variableNames, true, deserializeValues));
   }
 
