@@ -23,7 +23,9 @@
               ng-if="variablesByName[info.name].value !== null || variablesByName[info.name].type === 'Bytes'"
               ng-switch="variablesByName[info.name].type">
           <span class="variable-value"
-                ng-switch-when="Date">
+                ng-switch-when="Date"
+                tooltip-placement="top"
+                tooltip="{{ variablesByName[info.name].value | camDate }}">
             {{ variablesByName[info.name].value | camDate }}
           </span>
 
@@ -46,7 +48,9 @@
           </a>
 
           <span class="variable-value"
-                ng-switch-default>
+                ng-switch-default
+                tooltip-placement="top"
+                tooltip="{{ variablesByName[info.name].value }}">
             {{ variablesByName[info.name].value }}
           </span>
         </span>
