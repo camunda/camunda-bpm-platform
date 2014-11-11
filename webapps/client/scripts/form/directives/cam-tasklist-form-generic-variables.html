@@ -64,15 +64,19 @@
           <select required
                   ng-disabled="!variable.name"
                   class="form-control"
-                  placeholder="{{ 'VARIABLE_TYPE' | translate }}"
                   ng-model="variable.type">
 
             <option disabled
                     value=""
-                    translate="TYPE">Type</option>
+                    translate="VARIABLE_TYPE">Type</option>
 
-            <option ng-repeat="(type, inputType) in variableTypes"
-                    value="{{ type }}">{{ type | translate }}</option>
+            <option value="Boolean">Boolean</option>
+            <option value="Integer">Integer</option>
+            <option value="Double">Double</option>
+            <option value="Long">Long</option>
+            <option value="Short">Short</option>
+            <option value="String">String</option>
+            <option value="Date">Date</option>
           </select>
         </div>
 
