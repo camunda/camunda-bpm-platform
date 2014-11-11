@@ -1,5 +1,21 @@
 package org.camunda.bpm.example.invoice;
 
+import static org.camunda.bpm.engine.authorization.Authorization.ANY;
+import static org.camunda.bpm.engine.authorization.Authorization.AUTH_TYPE_GRANT;
+import static org.camunda.bpm.engine.authorization.Permissions.ACCESS;
+import static org.camunda.bpm.engine.authorization.Permissions.ALL;
+import static org.camunda.bpm.engine.authorization.Permissions.READ;
+import static org.camunda.bpm.engine.authorization.Resources.APPLICATION;
+import static org.camunda.bpm.engine.authorization.Resources.FILTER;
+import static org.camunda.bpm.engine.authorization.Resources.USER;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Logger;
+
 import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.FilterService;
 import org.camunda.bpm.engine.IdentityService;
@@ -14,14 +30,6 @@ import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity;
 import org.camunda.bpm.engine.task.TaskQuery;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.logging.Logger;
-
-import static org.camunda.bpm.engine.authorization.Authorization.*;
-import static org.camunda.bpm.engine.authorization.Permissions.*;
-import static org.camunda.bpm.engine.authorization.Resources.*;
 
 /**
  * Creates demo credentials to be used in the invoice showcase.
@@ -198,16 +206,18 @@ public class DemoDataGenerator {
       Map<String, Object> filterProperties = new HashMap<String, Object>();
       filterProperties.put("description", "Tasks assigned to me");
       filterProperties.put("priority", -10);
+      addVariables(filterProperties);
       TaskService taskService = engine.getTaskService();
-      TaskQuery query = taskService.createTaskQuery().taskAssigneeExpression("${currentUser()}").orderByDueDate().asc();
-      Filter myTasksFilter = filterService.newTaskFilter().setName("My Tasks").setProperties(filterProperties).setQuery(query);
+      TaskQuery query = taskService.createTaskQuery().taskAssigneeExpression("${currentUser()}");
+      Filter myTasksFilter = filterService.newTaskFilter().setName("My Tasks").setProperties(filterProperties).setOwner("demo").setQuery(query);
       filterService.saveFilter(myTasksFilter);
 
       filterProperties.clear();
       filterProperties.put("description", "Tasks candidate to my groups");
       filterProperties.put("priority", -5);
-      query = taskService.createTaskQuery().taskCandidateGroupInExpression("${currentUserGroups()}").orderByDueDate().asc();
-      Filter groupTasksFilter = filterService.newTaskFilter().setName("My Group Tasks").setProperties(filterProperties).setQuery(query);
+      addVariables(filterProperties);
+      query = taskService.createTaskQuery().taskCandidateGroupInExpression("${currentUserGroups()}").taskUnassigned();
+      Filter groupTasksFilter = filterService.newTaskFilter().setName("My Group Tasks").setProperties(filterProperties).setOwner("demo").setQuery(query);
       filterService.saveFilter(groupTasksFilter);
 
       // global read authorizations for these filters
@@ -224,5 +234,80 @@ public class DemoDataGenerator {
       globalGroupFilterRead.addPermission(READ);
       authorizationService.saveAuthorization(globalGroupFilterRead);
 
+      // management filter
+
+      filterProperties.clear();
+      filterProperties.put("description", "Tasks for Group Accounting");
+      filterProperties.put("priority", -5);
+      addVariables(filterProperties);
+      query = taskService.createTaskQuery().taskCandidateGroupIn(Arrays.asList("accounting")).taskUnassigned();
+      Filter candidateGroupTasksFilter = filterService.newTaskFilter().setName("Accounting").setProperties(filterProperties).setOwner("demo").setQuery(query);
+      filterService.saveFilter(candidateGroupTasksFilter);
+
+      Authorization managementGroupFilterRead = authorizationService.createNewAuthorization(Authorization.AUTH_TYPE_GRANT);
+      managementGroupFilterRead.setResource(FILTER);
+      managementGroupFilterRead.setResourceId(candidateGroupTasksFilter.getId());
+      managementGroupFilterRead.addPermission(READ);
+      managementGroupFilterRead.setGroupId("accounting");
+      authorizationService.saveAuthorization(managementGroupFilterRead);
+
+      // john's tasks
+
+      filterProperties.clear();
+      filterProperties.put("description", "Tasks assigned to John");
+      filterProperties.put("priority", -5);
+      addVariables(filterProperties);
+      query = taskService.createTaskQuery().taskAssignee("john");
+      Filter johnsTasksFilter = filterService.newTaskFilter().setName("John's Tasks").setProperties(filterProperties).setOwner("demo").setQuery(query);
+      filterService.saveFilter(johnsTasksFilter);
+
+      // mary's tasks
+
+      filterProperties.clear();
+      filterProperties.put("description", "Tasks assigned to Mary");
+      filterProperties.put("priority", -5);
+      addVariables(filterProperties);
+      query = taskService.createTaskQuery().taskAssignee("mary");
+      Filter marysTasksFilter = filterService.newTaskFilter().setName("Mary's Tasks").setProperties(filterProperties).setOwner("demo").setQuery(query);
+      filterService.saveFilter(marysTasksFilter);
+
+      // peter's tasks
+
+      filterProperties.clear();
+      filterProperties.put("description", "Tasks assigned to Peter");
+      filterProperties.put("priority", -5);
+      addVariables(filterProperties);
+      query = taskService.createTaskQuery().taskAssignee("peter");
+      Filter petersTasksFilter = filterService.newTaskFilter().setName("Peter's Tasks").setProperties(filterProperties).setOwner("demo").setQuery(query);
+      filterService.saveFilter(petersTasksFilter);
+
+      // all tasks
+
+      filterProperties.clear();
+      filterProperties.put("description", "All Tasks - Not recommended to be used in production :)");
+      filterProperties.put("priority", -5);
+      addVariables(filterProperties);
+      query = taskService.createTaskQuery();
+      Filter allTasksFilter = filterService.newTaskFilter().setName("All Tasks").setProperties(filterProperties).setOwner("demo").setQuery(query);
+      filterService.saveFilter(allTasksFilter);
+
+    }
+
+    protected void addVariables(Map<String, Object> filterProperties) {
+      List<Object> variables = new ArrayList<Object>();
+
+      addVariable(variables, "amount", "Invoice Amount");
+      addVariable(variables, "invoiceNumber", "Invoice Number");
+      addVariable(variables, "creditor", "Creditor");
+      addVariable(variables, "approver", "Approver");
+
+      filterProperties.put("variables", variables);
+    }
+
+    protected void addVariable(List<Object> variables, String name, String label) {
+      Map<String, String> variable = new HashMap<String, String>();
+      variable.put("name", name);
+      variable.put("label", label);
+      variables.add(variable);
     }
 }

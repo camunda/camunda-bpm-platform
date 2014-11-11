@@ -41,8 +41,8 @@ public class InvoiceProcessApplication extends ServletProcessApplication {
     // start an initial demo process.
 
     Map<String, Object> variables = new HashMap<String, Object>();
-    variables.put("creditor", "Great Pizzas for Everyone Inc.");
-    variables.put("amount", "30$");
+    variables.put("creditor", "Great Pizza for Everyone Inc.");
+    variables.put("amount", "30€");
     variables.put("invoiceNumber", "GPFE-23232323");
 
     processEngine.getRuntimeService().startProcessInstanceByKey("invoice", variables);
