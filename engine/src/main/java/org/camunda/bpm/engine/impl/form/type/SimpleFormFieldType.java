@@ -10,33 +10,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.camunda.bpm.engine.impl.form.type;
 
-import org.camunda.bpm.engine.form.FormType;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
-
 /**
- * @author Tom Baeyens
+ * The SimpleFormFieldType can be used when the form value and the model value are equal.
+ *
  * @author Daniel Meyer
+ *
  */
-public abstract class AbstractFormFieldType implements FormType {
+public abstract class SimpleFormFieldType extends AbstractFormFieldType {
 
-  public abstract String getName();
-
-  public abstract TypedValue convertToFormValue(TypedValue propertyValue);
-
-  public abstract TypedValue convertToModelValue(TypedValue propertyValue);
-
-  @Deprecated
-  public abstract Object convertFormValueToModelValue(Object propertyValue);
-
-  @Deprecated
-  public abstract String convertModelValueToFormValue(Object modelValue);
-
-  public Object getInformation(String key) {
-    return null;
+  public TypedValue convertToFormValue(TypedValue propertyValue) {
+    return convertValue(propertyValue);
   }
 
+  public TypedValue convertToModelValue(TypedValue propertyValue) {
+    return convertValue(propertyValue);
+  }
+
+  protected abstract TypedValue convertValue(TypedValue propertyValue);
 }

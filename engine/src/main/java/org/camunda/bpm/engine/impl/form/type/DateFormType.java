@@ -13,13 +13,14 @@
 
 package org.camunda.bpm.engine.impl.form.type;
 
-import java.text.Format;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
 
@@ -31,7 +32,7 @@ public class DateFormType extends AbstractFormFieldType {
   public final static String TYPE_NAME = "date";
 
   protected String datePattern;
-  protected Format dateFormat;
+  protected DateFormat dateFormat;
 
   public DateFormType(String datePattern) {
     this.datePattern = datePattern;
@@ -48,6 +49,41 @@ public class DateFormType extends AbstractFormFieldType {
     }
     return null;
   }
+
+  public TypedValue convertToModelValue(TypedValue propertyValue) {
+    Object value = propertyValue.getValue();
+    if(value == null) {
+      return Variables.dateValue(null);
+    }
+    else if(value instanceof Date) {
+      return Variables.dateValue((Date) value);
+    }
+    else if(value instanceof String) {
+      try {
+        return Variables.dateValue((Date) dateFormat.parseObject((String) value));
+      } catch (ParseException e) {
+        throw new ProcessEngineException("Could not parse value '"+value+"' as date using date format '"+datePattern+"'.");
+      }
+    }
+    else {
+      throw new ProcessEngineException("Value '"+value+"' cannot be transformed into a Date.");
+    }
+  }
+
+  public TypedValue convertToFormValue(TypedValue modelValue) {
+    if(modelValue.getType() == ValueType.DATE) {
+      if(modelValue.getValue() == null) {
+        return Variables.stringValue(null);
+      } else {
+        return Variables.stringValue(dateFormat.format(modelValue.getValue()));
+      }
+    }
+    else {
+      throw new ProcessEngineException("Expected value to be of type '"+ValueType.DATE+"' but got '"+modelValue.getType()+"'.");
+    }
+  }
+
+  // deprecated //////////////////////////////////////////////////////////
 
   public Object convertFormValueToModelValue(Object propertyValue) {
     if (propertyValue==null || "".equals(propertyValue)) {
@@ -67,7 +103,4 @@ public class DateFormType extends AbstractFormFieldType {
     return dateFormat.format(modelValue);
   }
 
-  public TypedValue getTypedValue(Object value) {
-    return Variables.dateValue((Date) value);
-  }
 }

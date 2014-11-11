@@ -60,4 +60,8 @@ public class FormTypes {
     }
     return formType;
   }
+
+  public AbstractFormFieldType getFormType(String name) {
+    return formTypes.get(name);
+  }
 }

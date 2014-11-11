@@ -217,12 +217,6 @@ public class HtmlFormEngine implements FormEngine {
 
     inputField.attribute(TYPE_ATTRIBUTE, TEXT_INPUT_TYPE);
 
-    // add default value
-    Object defaultValue = formField.getDefaultValue();
-    if(defaultValue != null) {
-      inputField.attribute(VALUE_ATTRIBUTE, defaultValue.toString());
-    }
-
     return inputField;
   }
 
@@ -336,11 +330,6 @@ public class HtmlFormEngine implements FormEngine {
       HtmlElementWriter option = new HtmlElementWriter(OPTION_ELEMENT, false)
         .attribute(VALUE_ATTRIBUTE, value.getKey())
         .textContent(value.getValue());
-
-      Object defaultValue = formField.getDefaultValue();
-      if(defaultValue != null && defaultValue.equals(value.getKey())) {
-        option.attribute(SELECTED_ATTRIBUTE, null);
-      }
 
       documentBuilder.startElement(option).endElement();
     }

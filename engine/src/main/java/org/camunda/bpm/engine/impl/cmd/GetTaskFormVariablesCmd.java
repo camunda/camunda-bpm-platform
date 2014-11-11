@@ -48,7 +48,7 @@ public class GetTaskFormVariablesCmd extends AbstractGetFormVariablesCmd {
     TaskFormData taskFormData = task.getTaskDefinition().getTaskFormHandler().createTaskForm(task);
     for (FormField formField : taskFormData.getFormFields()) {
       if(formVariableNames == null || formVariableNames.contains(formField.getId())) {
-        result.put(formField.getId(), createVariable(formField));
+        result.put(formField.getId(), createVariable(formField, task));
       }
     }
 

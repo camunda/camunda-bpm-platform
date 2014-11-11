@@ -14,6 +14,7 @@
 package org.camunda.bpm.engine.impl.form.type;
 
 import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.value.StringValue;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
 
@@ -21,7 +22,7 @@ import org.camunda.bpm.engine.variable.value.TypedValue;
 /**
  * @author Tom Baeyens
  */
-public class StringFormType extends AbstractFormFieldType {
+public class StringFormType extends SimpleFormFieldType {
 
   public final static String TYPE_NAME = "string";
 
@@ -29,9 +30,22 @@ public class StringFormType extends AbstractFormFieldType {
     return TYPE_NAME;
   }
 
-  public String getMimeType() {
-    return "text/plain";
+  public TypedValue convertValue(TypedValue propertyValue) {
+    if(propertyValue instanceof StringValue) {
+      return propertyValue;
+    }
+    else {
+      Object value = propertyValue.getValue();
+      if(value == null) {
+        return Variables.stringValue(null);
+      }
+      else {
+        return Variables.stringValue(value.toString());
+      }
+    }
   }
+
+  // deprecated ////////////////////////////////////////////////////////////
 
   public Object convertFormValueToModelValue(Object propertyValue) {
     return propertyValue.toString();
@@ -40,9 +54,4 @@ public class StringFormType extends AbstractFormFieldType {
   public String convertModelValueToFormValue(Object modelValue) {
     return (String) modelValue;
   }
-
-  public TypedValue getTypedValue(Object value) {
-    return Variables.stringValue((String) value);
-  }
-
 }

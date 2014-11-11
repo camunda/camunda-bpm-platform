@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.impl.cmd;
 import java.io.Serializable;
 import java.util.Collection;
 
+import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.form.FormField;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.variable.VariableMap;
@@ -37,9 +38,16 @@ public abstract class AbstractGetFormVariablesCmd implements Command<VariableMap
     this.deserializeObjectValues = deserializeObjectValues;
   }
 
-  protected TypedValue createVariable(FormField formField) {
-    Object defaultValue = formField.getDefaultValue();
-    return formField.getType().getTypedValue(defaultValue);
+  protected TypedValue createVariable(FormField formField, VariableScope variableScope) {
+    TypedValue value = formField.getValue();
+
+    if(value != null) {
+      return value;
+    }
+    else {
+      return null;
+    }
+
   }
 
 }

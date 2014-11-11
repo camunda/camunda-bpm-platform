@@ -35,6 +35,7 @@ import org.camunda.bpm.engine.form.FormProperty;
 import org.camunda.bpm.engine.form.StartFormData;
 import org.camunda.bpm.engine.form.TaskFormData;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.form.type.AbstractFormFieldType;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.CollectionUtil;
@@ -624,9 +625,10 @@ public class FormServiceTest extends PluggableProcessEngineTestCase {
 
     assertNotNull(variables.get("dateField"));
     assertEquals(variables.get("dateField"), variables.getValueTyped("dateField").getValue());
-    assertEquals(ValueType.DATE, variables.getValueTyped("dateField").getType());
+    assertEquals(ValueType.STRING, variables.getValueTyped("dateField").getType());
 
-    Date dateValue = (Date) variables.get("dateField");
+    AbstractFormFieldType dateFormType = processEngineConfiguration.getFormTypes().getFormType("date");
+    Date dateValue = (Date) dateFormType.convertToModelValue(variables.getValueTyped("dateField")).getValue();
     Calendar calendar = Calendar.getInstance();
     calendar.setTime(dateValue);
     assertEquals(10, calendar.get(Calendar.DAY_OF_MONTH));
