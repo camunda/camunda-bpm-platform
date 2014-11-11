@@ -40,6 +40,12 @@
       <extensionElements>
         <camunda:formData>
             <camunda:formField
+                id="readonly" label="Readonly" type="string" defaultValue="read only value">
+                <camunda:validation>
+                   <camunda:constraint name="readonly" />
+                </camunda:validation>
+            </camunda:formField>
+            <camunda:formField
                 id="firstname" label="Firstname" type="string">
                 <camunda:validation>
                    <camunda:constraint name="maxlength" config="25" />
@@ -54,7 +60,11 @@
                 </camunda:validation>
             </camunda:formField>
             <camunda:formField
-                id="dateOfBirth" label="Date of Birth" type="date" />
+                id="dateOfBirth" label="Date of Birth" type="date" defaultValue="10/12/2014">
+                <camunda:validation>
+                   <camunda:constraint name="readonly" />
+                </camunda:validation>
+            </camunda:formField>
             <camunda:formField
                 id="enumField" label="Enum Field" type="enum"
                 defaultValue="a">
@@ -113,29 +123,29 @@
       <extensionElements>
         <camunda:formData>
             <camunda:formField
-                id="stringField" label="String Field" type="string"
-                defaultValue="someString">
+                id="firstname" label="Firstname" type="string">
                 <camunda:validation>
-                  <camunda:constraint name="readonly" />
+                   <camunda:constraint name="maxlength" config="25" />
+                   <camunda:constraint name="readonly" />
                 </camunda:validation>
             </camunda:formField>
             <camunda:formField
-                id="longField" label="Long Field" type="long"
-                defaultValue="1" />
-            <camunda:formField
-                id="booleanField" label="Boolean Field" type="boolean"
-                defaultValue="true" />
-            <camunda:formField
-                id="dateField" label="Date Field" type="date"
-                defaultValue="10-JAN-2013">
+                id="lastname" label="Lastname" type="string">
+                <camunda:validation>
+                   <camunda:constraint name="maxlength" config="25" />
+                   <camunda:constraint name="required" />
+                </camunda:validation>
             </camunda:formField>
+            <camunda:formField
+                id="dateOfBirth" label="Date of Birth" type="date" defaultValue="10/12/2014" />
             <camunda:formField
                 id="enumField" label="Enum Field" type="enum"
                 defaultValue="a">
                 <camunda:value id="a" name="A"/>
                 <camunda:value id="b" name="B"/>
                 <camunda:value id="c" name="C"/>
-            </camunda:formField>
+              </camunda:formField>
+              <camunda:formField id="boolField" label="Bool Field" type="boolean"/>
         </camunda:formData>
       </extensionElements>
       <incoming>sequenceFlow_187</incoming>
