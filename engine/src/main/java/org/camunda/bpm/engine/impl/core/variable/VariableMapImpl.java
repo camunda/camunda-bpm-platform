@@ -40,7 +40,9 @@ public class VariableMapImpl implements VariableMap, Serializable {
   }
 
   public VariableMapImpl(Map<String, Object> map) {
-    putAll(map);
+    if(map != null) {
+      putAll(map);
+    }
   }
 
   public VariableMapImpl() {
@@ -139,12 +141,14 @@ public class VariableMapImpl implements VariableMap, Serializable {
   }
 
   public void putAll(Map<? extends String, ? extends Object> m) {
-    if(m instanceof VariableMapImpl) {
-      variables.putAll(((VariableMapImpl)m).variables);
-    }
-    else {
-      for (java.util.Map.Entry<? extends String, ? extends Object> entry : m.entrySet()) {
-        put(entry.getKey(), entry.getValue());
+    if(m != null) {
+      if(m instanceof VariableMapImpl) {
+        variables.putAll(((VariableMapImpl)m).variables);
+      }
+      else {
+        for (java.util.Map.Entry<? extends String, ? extends Object> entry : m.entrySet()) {
+          put(entry.getKey(), entry.getValue());
+        }
       }
     }
   }

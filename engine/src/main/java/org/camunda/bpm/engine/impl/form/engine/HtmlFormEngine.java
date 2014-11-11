@@ -13,6 +13,7 @@
 package org.camunda.bpm.engine.impl.form.engine;
 
 
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -221,6 +222,8 @@ public class HtmlFormEngine implements FormEngine {
   }
 
   protected void renderDatePicker(FormField formField, HtmlDocumentBuilder documentBuilder) {
+    boolean isReadOnly = isReadOnly(formField);
+
     // start input-group
     HtmlElementWriter inputGroupDivElement = new HtmlElementWriter(DIV_ELEMENT)
         .attribute(CLASS_ATTRIBUTE, INPUT_GROUP_CLASS);
@@ -233,55 +236,63 @@ public class HtmlFormEngine implements FormEngine {
     // input field
     HtmlElementWriter inputField = createInputField(formField);
 
-    inputField
-      .attribute(DATEPICKER_POPUP_ATTRIBUTE, DATE_FORMAT)
-      .attribute(IS_OPEN_ATTRIBUTE, String.format(DATE_FIELD_OPENED_ATTRIBUTE, formFieldId));
+    if(!isReadOnly) {
+      inputField
+        .attribute(DATEPICKER_POPUP_ATTRIBUTE, DATE_FORMAT)
+        .attribute(IS_OPEN_ATTRIBUTE, String.format(DATE_FIELD_OPENED_ATTRIBUTE, formFieldId));
+    }
 
     // <input ... />
     documentBuilder
       .startElement(inputField)
       .endElement();
 
-    // input addon
-    HtmlElementWriter addonElement = new HtmlElementWriter(DIV_ELEMENT)
+
+    // if form field is read only, do not render date picker open button
+    if(!isReadOnly) {
+
+      // input addon
+      HtmlElementWriter addonElement = new HtmlElementWriter(DIV_ELEMENT)
       .attribute(CLASS_ATTRIBUTE, INPUT_GROUP_BTN_CLASS);
 
-    // <div>
-    documentBuilder.startElement(addonElement);
+      // <div>
+      documentBuilder.startElement(addonElement);
 
-    // button to open date picker
-    HtmlElementWriter buttonElement = new HtmlElementWriter(BUTTON_ELEMENT)
-      .attribute(TYPE_ATTRIBUTE, BUTTON_BUTTON_TYPE)
-      .attribute(CLASS_ATTRIBUTE, BUTTON_DEFAULT_CLASS)
-      .attribute(NG_CLICK_ATTRIBUTE, String.format(OPEN_DATEPICKER_FUNCTION_SNIPPET, formFieldId));
+      // button to open date picker
+      HtmlElementWriter buttonElement = new HtmlElementWriter(BUTTON_ELEMENT)
+        .attribute(TYPE_ATTRIBUTE, BUTTON_BUTTON_TYPE)
+        .attribute(CLASS_ATTRIBUTE, BUTTON_DEFAULT_CLASS)
+        .attribute(NG_CLICK_ATTRIBUTE, String.format(OPEN_DATEPICKER_FUNCTION_SNIPPET, formFieldId));
 
-    // <button>
-    documentBuilder.startElement(buttonElement);
+      // <button>
+      documentBuilder.startElement(buttonElement);
 
-    HtmlElementWriter iconElement = new HtmlElementWriter(I_ELEMENT)
-      .attribute(CLASS_ATTRIBUTE, CALENDAR_GLYPHICON);
+      HtmlElementWriter iconElement = new HtmlElementWriter(I_ELEMENT)
+        .attribute(CLASS_ATTRIBUTE, CALENDAR_GLYPHICON);
 
-    // <i ...></i>
-    documentBuilder
-      .startElement(iconElement)
-      .endElement();
+      // <i ...></i>
+      documentBuilder
+        .startElement(iconElement)
+        .endElement();
 
-    // </button>
-    documentBuilder.endElement();
+      // </button>
+      documentBuilder.endElement();
 
-    // </div>
-    documentBuilder.endElement();
+      // </div>
+      documentBuilder.endElement();
 
 
-    HtmlElementWriter scriptElement = new HtmlElementWriter(SCRIPT_ELEMENT)
-      .attribute(CAM_SCRIPT_ATTRIBUTE, null)
-      .attribute(TYPE_ATTRIBUTE, TEXT_FORM_SCRIPT_TYPE)
-      .textContent(String.format(OPEN_DATEPICKER_SNIPPET, formFieldId, formFieldId));
+      HtmlElementWriter scriptElement = new HtmlElementWriter(SCRIPT_ELEMENT)
+        .attribute(CAM_SCRIPT_ATTRIBUTE, null)
+        .attribute(TYPE_ATTRIBUTE, TEXT_FORM_SCRIPT_TYPE)
+        .textContent(String.format(OPEN_DATEPICKER_SNIPPET, formFieldId, formFieldId));
 
-    // <script ...> </script>
-    documentBuilder
-      .startElement(scriptElement)
-      .endElement();
+      // <script ...> </script>
+      documentBuilder
+        .startElement(scriptElement)
+        .endElement();
+
+    }
 
     // </div>
     documentBuilder.endElement();
@@ -443,6 +454,18 @@ public class HtmlFormEngine implements FormEngine {
 
   protected boolean isBoolean(FormField formField) {
     return BooleanFormType.TYPE_NAME.equals(formField.getTypeName());
+  }
+
+  protected boolean isReadOnly(FormField formField) {
+    List<FormFieldValidationConstraint> validationConstraints = formField.getValidationConstraints();
+    if(validationConstraints != null) {
+      for (FormFieldValidationConstraint validationConstraint : validationConstraints) {
+        if("readonly".equals(validationConstraint.getName())){
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
 }

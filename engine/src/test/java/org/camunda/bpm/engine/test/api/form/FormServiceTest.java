@@ -460,6 +460,20 @@ public class FormServiceTest extends PluggableProcessEngineTestCase {
     assertNotNull(variables.<ObjectValue>getValueTyped("object").getValueSerialized());
   }
 
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/form/FormsProcess.bpmn20.xml"})
+  public void testSubmitFormVariablesNull() {
+    String procDefId = repositoryService.createProcessDefinitionQuery().singleResult().getId();
+
+    // assert that I can submit the start form with variables null
+    formService.submitStartForm(procDefId, null);
+
+    Task task = taskService.createTaskQuery().singleResult();
+    assertNotNull(task);
+
+    // assert that I can submit the task form with variables null
+    formService.submitTaskForm(task.getId(), null);
+  }
+
   public void testSubmitTaskFormForStandaloneTask() {
 
     // given
@@ -786,7 +800,7 @@ public class FormServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
-  public void FAILING_testSubmitTaskFormContainingReadonlyVariable() {
+  public void testSubmitTaskFormContainingReadonlyVariable() {
     ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceById(processDefinition.getId());

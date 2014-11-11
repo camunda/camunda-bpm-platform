@@ -103,6 +103,15 @@ public class FormFieldHandler {
     TypedValue submittedValue = (TypedValue) values.getValueTyped(id);
     values.remove(id);
 
+    // perform validation
+    for (FormFieldValidationConstraintHandler validationHandler : validationHandlers) {
+      Object value = null;
+      if(submittedValue != null) {
+        value = submittedValue.getValue();
+      }
+      validationHandler.validate(value, allValues, this, variableScope);
+    }
+
     // update variable(s)
     TypedValue modelValue = null;
     if (submittedValue != null) {
@@ -122,15 +131,6 @@ public class FormFieldHandler {
       else if (expressionValue != null) {
         modelValue = Variables.stringValue(expressionValue.getValue().toString());
       }
-    }
-
-    // perform validation
-    for (FormFieldValidationConstraintHandler validationHandler : validationHandlers) {
-      Object value = null;
-      if(modelValue != null) {
-        value = modelValue.getValue();
-      }
-      validationHandler.validate(value, allValues, this, variableScope);
     }
 
     if (modelValue != null) {
