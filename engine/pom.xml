@@ -732,11 +732,9 @@
             <configuration>
               <comparisonVersion>7.1.0-Final</comparisonVersion>
               <logResults>true</logResults>
-              <includes>
-                <include>org/camunda/bpm/application/*</include>
-                <include>org/camunda/bpm/container/*</include>
-                <include>org/camunda/bpm/engine/*</include>
-              </includes>
+              <excludes>
+                <exclude>org/camunda/bpm/*/impl/**</exclude>
+              </excludes>
             </configuration>
             <executions>
               <execution>
