@@ -319,7 +319,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     when(processEngine.getRepositoryService().createCaseDefinitionQuery()).thenReturn(sampleCaseDefinitionQuery);
 
     Response response = given()
-      .header("accept", Hal.MEDIA_TYPE_HAL)
+      .header("accept", Hal.APPLICATION_HAL_JSON)
       .pathParam("id", EXAMPLE_TASK_ID)
       .then().expect().statusCode(Status.OK.getStatusCode())
       .body("id", equalTo(EXAMPLE_TASK_ID))

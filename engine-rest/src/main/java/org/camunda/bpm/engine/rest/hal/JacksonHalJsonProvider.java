@@ -25,8 +25,8 @@ import org.codehaus.jackson.jaxrs.JacksonJsonProvider;
  *
  */
 @Provider
-@Consumes({Hal.MEDIA_TYPE_HAL, "text/json"})
-@Produces({Hal.MEDIA_TYPE_HAL, "text/json"})
+@Consumes({Hal.APPLICATION_HAL_JSON, "text/json"})
+@Produces({Hal.APPLICATION_HAL_JSON, "text/json"})
 public class JacksonHalJsonProvider extends JacksonJsonProvider implements
     MessageBodyReader<Object>,
     MessageBodyWriter<Object> {

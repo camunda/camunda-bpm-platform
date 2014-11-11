@@ -30,11 +30,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
-
 import javax.ws.rs.HttpMethod;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.core.Variant;
 
 import org.camunda.bpm.engine.EntityTypes;
 import org.camunda.bpm.engine.FilterService;
@@ -54,6 +56,7 @@ import org.camunda.bpm.engine.rest.dto.task.TaskQueryDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.hal.EmptyHalCollection;
 import org.camunda.bpm.engine.rest.hal.EmptyHalResource;
+import org.camunda.bpm.engine.rest.hal.Hal;
 import org.camunda.bpm.engine.rest.hal.HalCollectionResource;
 import org.camunda.bpm.engine.rest.hal.HalResource;
 import org.camunda.bpm.engine.rest.hal.HalVariableValue;
@@ -73,6 +76,7 @@ public class FilterResourceImpl extends AbstractAuthorizedRestResource implement
   public static final Pattern EMPTY_JSON_BODY = Pattern.compile("\\s*\\{\\s*\\}\\s*");
   public static final String PROPERTIES_VARIABLES_KEY = "variables";
   public static final String PROPERTIES_VARIABLES_NAME_KEY = "name";
+  public static final List<Variant> VARIANTS = Variant.mediaTypes(MediaType.APPLICATION_JSON_TYPE, Hal.APPLICATION_HAL_JSON_TYPE).add().build();
 
   protected String relativeRootResourcePath;
   protected FilterService filterService;
@@ -126,11 +130,37 @@ public class FilterResourceImpl extends AbstractAuthorizedRestResource implement
     filterService.saveFilter(filter);
   }
 
-  public Object executeSingleResult() {
-    return querySingleResult(null);
+  public Object executeSingleResult(Request request) {
+    Variant variant = request.selectVariant(VARIANTS);
+    if (variant != null) {
+      if (MediaType.APPLICATION_JSON_TYPE.equals(variant.getMediaType())) {
+        return executeJsonSingleResult();
+      }
+      else if (Hal.APPLICATION_HAL_JSON_TYPE.equals(variant.getMediaType())) {
+        return executeHalSingleResult();
+      }
+    }
+    throw new InvalidRequestException(Status.NOT_ACCEPTABLE, "No acceptable content-type found");
   }
 
-  public Object querySingleResult(String extendingQuery) {
+  public Object executeJsonSingleResult() {
+    return queryJsonSingleResult(null);
+  }
+
+  public Object querySingleResult(Request request, String extendingQuery) {
+    Variant variant = request.selectVariant(VARIANTS);
+    if (variant != null) {
+      if (MediaType.APPLICATION_JSON_TYPE.equals(variant.getMediaType())) {
+        return queryJsonSingleResult(extendingQuery);
+      }
+      else if (Hal.APPLICATION_HAL_JSON_TYPE.equals(variant.getMediaType())) {
+        return queryHalSingleResult(extendingQuery);
+      }
+    }
+    throw new InvalidRequestException(Status.NOT_ACCEPTABLE, "No acceptable content-type found");
+  }
+
+  public Object queryJsonSingleResult(String extendingQuery) {
     Object entity = executeFilterSingleResult(extendingQuery);
 
     if (entity != null) {
@@ -171,11 +201,37 @@ public class FilterResourceImpl extends AbstractAuthorizedRestResource implement
     }
   }
 
-  public List<Object> executeList(Integer firstResult, Integer maxResults) {
-    return queryList(null, firstResult, maxResults);
+  public Object executeList(Request request, Integer firstResult, Integer maxResults) {
+    Variant variant = request.selectVariant(VARIANTS);
+    if (variant != null) {
+      if (MediaType.APPLICATION_JSON_TYPE.equals(variant.getMediaType())) {
+        return executeJsonList(firstResult, maxResults);
+      }
+      else if (Hal.APPLICATION_HAL_JSON_TYPE.equals(variant.getMediaType())) {
+        return executeHalList(firstResult, maxResults);
+      }
+    }
+    throw new InvalidRequestException(Status.NOT_ACCEPTABLE, "No acceptable content-type found");
   }
 
-  public List<Object> queryList(String extendingQuery, Integer firstResult, Integer maxResults) {
+  public List<Object> executeJsonList(Integer firstResult, Integer maxResults) {
+    return queryJsonList(null, firstResult, maxResults);
+  }
+
+  public Object queryList(Request request, String extendingQuery, Integer firstResult, Integer maxResults) {
+    Variant variant = request.selectVariant(VARIANTS);
+    if (variant != null) {
+      if (MediaType.APPLICATION_JSON_TYPE.equals(variant.getMediaType())) {
+        return queryJsonList(extendingQuery, firstResult ,maxResults);
+      }
+      else if (Hal.APPLICATION_HAL_JSON_TYPE.equals(variant.getMediaType())) {
+        return queryHalList(extendingQuery, firstResult, maxResults);
+      }
+    }
+    throw new InvalidRequestException(Status.NOT_ACCEPTABLE, "No acceptable content-type found");
+  }
+
+  public List<Object> queryJsonList(String extendingQuery, Integer firstResult, Integer maxResults) {
     List<?> entities = executeFilterList(extendingQuery, firstResult, maxResults);
 
     if (entities != null && !entities.isEmpty()) {

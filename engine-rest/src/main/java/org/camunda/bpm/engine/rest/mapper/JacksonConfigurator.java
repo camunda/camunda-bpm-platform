@@ -25,7 +25,7 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.SerializationConfig;
 
 @Provider
-@Produces({MediaType.APPLICATION_JSON, Hal.MEDIA_TYPE_HAL})
+@Produces({MediaType.APPLICATION_JSON, Hal.APPLICATION_HAL_JSON})
 public class JacksonConfigurator implements ContextResolver<ObjectMapper> {
 
   public static ObjectMapper configureObjectMapper(ObjectMapper mapper) {
