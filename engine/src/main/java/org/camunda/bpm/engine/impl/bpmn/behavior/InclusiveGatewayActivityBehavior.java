@@ -55,6 +55,7 @@ public class InclusiveGatewayActivityBehavior extends GatewayActivityBehavior {
       String defaultSequenceFlow = (String) execution.getActivity().getProperty("default");
       List<PvmTransition> transitionsToTake = new ArrayList<PvmTransition>();
 
+      // find matching non-default sequence flows
       for (PvmTransition outgoingTransition : execution.getActivity().getOutgoingTransitions()) {
         if (defaultSequenceFlow == null || !outgoingTransition.getId().equals(defaultSequenceFlow)) {
           Condition condition = (Condition) outgoingTransition.getProperty(BpmnParse.PROPERTYNAME_CONDITION);
@@ -64,25 +65,25 @@ public class InclusiveGatewayActivityBehavior extends GatewayActivityBehavior {
         }
       }
 
-      if (transitionsToTake.size() > 0) {
-        execution.takeAll(transitionsToTake, joinedExecutions);
-      } else {
-
+      // if none found, add default flow
+      if (transitionsToTake.isEmpty()) {
         if (defaultSequenceFlow != null) {
           PvmTransition defaultTransition = execution.getActivity().findOutgoingTransition(defaultSequenceFlow);
-          if (defaultTransition != null) {
-            // since this execution is the only foregoing, it has to be reactivated
-            execution.setActive(true);
-            execution.take(defaultTransition);
-          } else {
+          if (defaultTransition == null) {
             throw new ProcessEngineException("Default sequence flow '" + defaultSequenceFlow + "' could not be not found");
           }
+
+          transitionsToTake.add(defaultTransition);
+
         } else {
           // No sequence flow could be found, not even a default one
           throw new ProcessEngineException("No outgoing sequence flow of the inclusive gateway '" + execution.getActivity().getId()
                   + "' could be selected for continuing the process");
         }
       }
+
+      // take the flows found
+      execution.takeAll(transitionsToTake, joinedExecutions);
     } else {
       if (log.isLoggable(Level.FINE)) {
         log.fine("Inclusive gateway '" + activity.getId() + "' does not activate");

@@ -320,6 +320,31 @@ public class InclusiveGatewayTest extends PluggableProcessEngineTestCase {
     assertTrue(execution.isActive());
   }
 
+  /**
+   * 1. or split
+   * 2. or join
+   * 3. that same or join splits again (in this case has a single default sequence flow)
+   */
+  @Deployment
+  public void testSplitMergeSplit() {
+    // given a process instance with two concurrent tasks
+    ProcessInstance processInstance =
+        runtimeService.startProcessInstanceByKey("inclusiveGwSplitAndMerge", CollectionUtil.singletonMap("input", 1));
+
+    List<Task> tasks = taskService.createTaskQuery().list();
+    assertEquals(2, tasks.size());
+
+    // when the executions are joined at an inclusive gateway and the gateway itself has an outgoing default flow
+    taskService.complete(tasks.get(0).getId());
+    taskService.complete(tasks.get(1).getId());
+
+    // then the task after the inclusive gateway is reached by the process instance execution (i.e. concurrent root)
+    Task task = taskService.createTaskQuery().singleResult();
+    assertNotNull(task);
+
+    assertEquals(processInstance.getId(), task.getExecutionId());
+  }
+
 
   @Deployment
   public void testNoIdOnSequenceFlow() {
