@@ -13,7 +13,6 @@
 package org.camunda.bpm.integrationtest.util;
 
 import org.camunda.bpm.BpmPlatform;
-import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 
 /**
@@ -40,10 +39,6 @@ public class TestContainer {
 
   public static void addContainerSpecificProcessEngineConfigurationClass(WebArchive deployment) {
     // nothing to do
-  }
-
-  public static Archive<?> processArchive(Archive<?> archive) {
-    return archive;
   }
 
 }

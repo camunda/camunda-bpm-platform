@@ -6,7 +6,6 @@ import org.camunda.bpm.integrationtest.functional.ejb.beans.SingletonBeanDelegat
 import org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
-import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Assert;
 import org.junit.Test;
@@ -24,14 +23,12 @@ import org.junit.runner.RunWith;
 public class SingletonBeanDelegateTest extends AbstractFoxPlatformIntegrationTest {
 
   @Deployment
-  public static Archive<?> processArchive() {
-    WebArchive archive = initWebArchiveDeployment()
+  public static WebArchive processArchive() {
+    return initWebArchiveDeployment()
       .addClass(SingletonBeanDelegate.class)
       .addClass(SingletonBeanClientDelegate.class)
       .addAsResource("org/camunda/bpm/integrationtest/functional/ejb/SingletonBeanDelegateTest.testBeanResolution.bpmn20.xml")
       .addAsResource("org/camunda/bpm/integrationtest/functional/ejb/SingletonBeanDelegateTest.testBeanResolutionFromClient.bpmn20.xml");
-
-    return processArchiveDeployment(archive);
   }
 
 

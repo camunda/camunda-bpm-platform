@@ -10,7 +10,6 @@ import org.camunda.bpm.integrationtest.util.TestContainer;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.junit.Arquillian;
-import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
@@ -35,17 +34,15 @@ import org.junit.runner.RunWith;
 public class LocalSingletonBeanInvocationTest extends AbstractFoxPlatformIntegrationTest {
 
   @Deployment(name="pa", order=2)
-  public static Archive<?> processArchive() {
-    WebArchive archive = initWebArchiveDeployment()
+  public static WebArchive processArchive() {
+    return initWebArchiveDeployment()
       .addClass(LocalSingletonBeanClientDelegateBean.class)
       .addAsResource("org/camunda/bpm/integrationtest/functional/ejb/local/LocalSingletonBeanInvocationTest.testInvokeBean.bpmn20.xml")
       .addAsWebInfResource("org/camunda/bpm/integrationtest/functional/ejb/local/jboss-deployment-structure.xml","jboss-deployment-structure.xml");
-
-    return processArchiveDeployment(archive);
   }
 
   @Deployment(order=1)
-  public static Archive<?> delegateDeployment() {
+  public static WebArchive delegateDeployment() {
     WebArchive webArchive = ShrinkWrap.create(WebArchive.class, "service.war")
       .addAsLibraries(DeploymentHelper.getEjbClient())
       .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
@@ -55,7 +52,7 @@ public class LocalSingletonBeanInvocationTest extends AbstractFoxPlatformIntegra
 
     TestContainer.addContainerSpecificResourcesForNonPa(webArchive);
 
-    return processArchiveDeployment(webArchive);
+    return webArchive;
   }
 
   @Test

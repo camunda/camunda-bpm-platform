@@ -14,10 +14,8 @@ package org.camunda.bpm.integrationtest.deployment.callbacks;
 
 import org.camunda.bpm.integrationtest.deployment.callbacks.apps.CustomEjbProcessApplication;
 import org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest;
-import org.camunda.bpm.integrationtest.util.TestContainer;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
-import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Test;
@@ -31,13 +29,14 @@ import org.junit.runner.RunWith;
 public class EjbPALifecycleCallbacksTest extends AbstractFoxPlatformIntegrationTest {
 
   @Deployment
-  public static Archive<?> createDeployment() {
+  public static WebArchive createDeployment() {
 
     WebArchive archive = ShrinkWrap.create(WebArchive.class, "test.war")
         .addClass(CustomEjbProcessApplication.class)
         .addClass(AbstractFoxPlatformIntegrationTest.class);
 
-    return processArchiveDeployment(archive);
+    return archive;
+
   }
 
   @Test

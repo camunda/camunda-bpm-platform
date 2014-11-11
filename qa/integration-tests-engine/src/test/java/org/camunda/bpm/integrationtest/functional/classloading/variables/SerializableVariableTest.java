@@ -20,7 +20,6 @@ import org.camunda.bpm.integrationtest.functional.classloading.variables.beans.S
 import org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
-import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Assert;
 import org.junit.Test;
@@ -37,14 +36,12 @@ import org.junit.runner.RunWith;
 public class SerializableVariableTest extends AbstractFoxPlatformIntegrationTest {
 
   @Deployment
-  public static Archive<?> createProcessArchiveDeplyoment() {
-    WebArchive archive = initWebArchiveDeployment()
+  public static WebArchive createProcessArchiveDeplyoment() {
+    return initWebArchiveDeployment()
       .addClass(GetVariableDelegate.class)
       .addClass(SetVariableDelegate.class)
       .addClass(SerializableVariable.class)
       .addAsResource("org/camunda/bpm/integrationtest/functional/classloading/SerializableVariableTest.testResolveVariable.bpmn20.xml");
-
-    return processArchiveDeployment(archive);
   }
 
   @Test

@@ -19,7 +19,6 @@ import org.camunda.bpm.integrationtest.util.TestContainer;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.junit.Arquillian;
-import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Assert;
@@ -34,22 +33,20 @@ import org.junit.runner.RunWith;
 public class CaseExecutionListenerResolutionTest extends AbstractFoxPlatformIntegrationTest {
 
   @Deployment
-  public static Archive<?> createProcessArchiveDeplyoment() {
-    WebArchive archive = initWebArchiveDeployment()
+  public static WebArchive createProcessArchiveDeplyoment() {
+    return initWebArchiveDeployment()
             .addClass(ExampleCaseExecutionListener.class)
             .addAsResource("org/camunda/bpm/integrationtest/functional/classloading/CaseExecutionListenerResolutionTest.cmmn");
-
-    return processArchiveDeployment(archive);
   }
 
   @Deployment(name="clientDeployment")
-  public static Archive<?> clientDeployment() {
+  public static WebArchive clientDeployment() {
     WebArchive webArchive = ShrinkWrap.create(WebArchive.class, "client.war")
             .addClass(AbstractFoxPlatformIntegrationTest.class);
 
     TestContainer.addContainerSpecificResources(webArchive);
 
-    return processArchiveDeployment(webArchive);
+    return webArchive;
 
   }
 

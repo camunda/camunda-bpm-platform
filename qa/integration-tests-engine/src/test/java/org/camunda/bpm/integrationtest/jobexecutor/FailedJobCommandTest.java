@@ -4,7 +4,6 @@ import org.camunda.bpm.integrationtest.jobexecutor.beans.FailingSLSB;
 import org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
-import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Assert;
 import org.junit.Test;
@@ -15,12 +14,11 @@ import org.junit.runner.RunWith;
 public class FailedJobCommandTest extends AbstractFoxPlatformIntegrationTest {
 
   @Deployment
-  public static Archive<?> createDeployment() {
-    WebArchive archive = initWebArchiveDeployment()
+  public static WebArchive createDeployment() {
+    return initWebArchiveDeployment()
       .addClass(FailingSLSB.class)
       .addAsResource("org/camunda/bpm/integrationtest/jobexecutor/FailedJobCommandTest.bpmn20.xml");
 
-    return processArchiveDeployment(archive);
   }
 
   @Test

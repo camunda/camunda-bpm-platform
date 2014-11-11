@@ -18,7 +18,6 @@ import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
-import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.asset.StringAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Assert;
@@ -35,11 +34,9 @@ public class RepositoryServiceBpmnModelRetrievalTest extends AbstractFoxPlatform
   private static final String TEST_PROCESS = "testProcess";
 
   @Deployment
-  public static Archive<?> createProcessApplication() {
-    WebArchive archive = initWebArchiveDeployment()
+  public static WebArchive createProcessApplication() {
+    return initWebArchiveDeployment()
         .addAsResource(new StringAsset(Bpmn.convertToString(Bpmn.createExecutableProcess(TEST_PROCESS).done())), "testProcess.bpmn20.xml");
-
-    return processArchiveDeployment(archive);
   }
 
   @Test

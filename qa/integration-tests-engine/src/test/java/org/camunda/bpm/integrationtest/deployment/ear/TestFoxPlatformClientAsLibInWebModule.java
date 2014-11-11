@@ -22,7 +22,6 @@ import org.camunda.bpm.engine.cdi.impl.util.ProgrammaticBeanLookup;
 import org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
-import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.EnterpriseArchive;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
@@ -55,7 +54,7 @@ public class TestFoxPlatformClientAsLibInWebModule extends AbstractFoxPlatformIn
    *        
    */ 
   @Deployment
-  public static Archive<?> deployment() {
+  public static EnterpriseArchive deployment() {    
     
     // this creates the process archive as a WAR file
     WebArchive processArchive = initWebArchiveDeployment()
@@ -63,10 +62,8 @@ public class TestFoxPlatformClientAsLibInWebModule extends AbstractFoxPlatformIn
       .addClass(TestFoxPlatformClientAsLibInWebModule.class);
 
     // this packages the WAR file inside an EAR file
-    EnterpriseArchive earArchive = ShrinkWrap.create(EnterpriseArchive.class, "test-application.ear")
+    return ShrinkWrap.create(EnterpriseArchive.class, "test-application.ear")
       .addAsModule(processArchive);
-
-    return processArchiveDeployment(earArchive);
     
   }
   

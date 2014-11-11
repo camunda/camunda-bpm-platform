@@ -1,6 +1,5 @@
 package org.camunda.bpm.integrationtest.service;
 
-import org.jboss.shrinkwrap.api.Archive;
 import org.junit.Assert;
 
 import org.camunda.bpm.BpmPlatform;
@@ -21,8 +20,8 @@ import org.junit.runner.RunWith;
 public class ProcessEngineServiceTest extends AbstractFoxPlatformIntegrationTest {
 
   @Deployment(name="test1")
-  public static Archive<?> app1() {
-    return processArchiveDeployment(initWebArchiveDeployment("test1.war"));
+  public static WebArchive app1() {    
+    return initWebArchiveDeployment("test1.war");
   }
   
   @Test

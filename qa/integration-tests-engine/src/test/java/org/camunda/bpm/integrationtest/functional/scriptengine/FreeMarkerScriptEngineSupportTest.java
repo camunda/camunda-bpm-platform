@@ -14,7 +14,6 @@
 package org.camunda.bpm.integrationtest.functional.scriptengine;
 
 import org.jboss.arquillian.container.test.api.Deployment;
-import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 
 /**
@@ -23,12 +22,10 @@ import org.jboss.shrinkwrap.api.spec.WebArchive;
 public class FreeMarkerScriptEngineSupportTest extends AbstractTemplateScriptEngineSupportTest {
 
   @Deployment
-  public static Archive<?> createProcessApplication() {
-    WebArchive archive = initWebArchiveDeployment()
+  public static WebArchive createProcessApplication() {
+    return initWebArchiveDeployment()
       .addClass(AbstractTemplateScriptEngineSupportTest.class)
       .addAsResource(createScriptTaskProcess("freemarker", EXAMPLE_TEMPLATE), "process.bpmn20.xml");
-
-    return processArchiveDeployment(archive);
   }
 
 }

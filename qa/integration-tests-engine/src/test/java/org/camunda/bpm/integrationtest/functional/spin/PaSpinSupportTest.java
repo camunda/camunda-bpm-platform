@@ -22,7 +22,6 @@ import org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest;
 import org.camunda.spin.plugin.SpinProcessEnginePlugin;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
-import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Assert;
 import org.junit.Test;
@@ -37,8 +36,8 @@ import org.junit.runner.RunWith;
 public class PaSpinSupportTest extends AbstractFoxPlatformIntegrationTest {
 
   @Deployment
-  public static Archive<?> createDeployment() {
-    return processArchiveDeployment(initWebArchiveDeployment());
+  public static WebArchive createDeployment() {
+    return initWebArchiveDeployment();
   }
 
   @Test

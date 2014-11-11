@@ -14,7 +14,6 @@ package org.camunda.bpm.integrationtest.deployment.war;
 
 
 import org.camunda.bpm.integrationtest.deployment.war.apps.CustomServletPA;
-import org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest;
 import org.camunda.bpm.integrationtest.util.DeploymentHelper;
 import org.camunda.bpm.integrationtest.util.TestContainer;
 import org.jboss.arquillian.container.test.api.Deployer;
@@ -22,7 +21,6 @@ import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.arquillian.test.api.ArquillianResource;
-import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
@@ -48,7 +46,7 @@ public class TestWarDeploymentWithNonExistingDS_JBOSS {
   private Deployer deployer;
   
   @Deployment(managed=false, name=DEPLOYMENT_WITH_EJB_PA)
-  public static Archive<?> createDeployment1() {
+  public static WebArchive createDeployment1() {
     WebArchive archive = ShrinkWrap.create(WebArchive.class, "test1.war")
         .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
         .addAsLibraries(DeploymentHelper.getEngineCdi())
@@ -57,11 +55,11 @@ public class TestWarDeploymentWithNonExistingDS_JBOSS {
     
     TestContainer.addContainerSpecificResources(archive);
     
-    return AbstractFoxPlatformIntegrationTest.processArchiveDeployment(archive);
+    return archive;
   }
   
   @Deployment(managed=false, name=DEPLOYMENT_WITH_SERVLET_PA)
-  public static Archive<?> createDeployment2() {
+  public static WebArchive createDeployment2() {
     WebArchive archive = ShrinkWrap.create(WebArchive.class, "test2.war")
         .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
         .addAsLibraries(DeploymentHelper.getEngineCdi())
@@ -70,7 +68,7 @@ public class TestWarDeploymentWithNonExistingDS_JBOSS {
         
         .addClass(CustomServletPA.class);
     
-    return AbstractFoxPlatformIntegrationTest.processArchiveDeployment(archive);
+    return archive;
   }
   
   @Test

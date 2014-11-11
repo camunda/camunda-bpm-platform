@@ -21,7 +21,6 @@ import org.camunda.bpm.integrationtest.util.TestContainer;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.junit.Arquillian;
-import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
@@ -39,15 +38,14 @@ import org.junit.runner.RunWith;
 public class CdiBeanSignallableActivityBehaviorResolutionTest extends AbstractFoxPlatformIntegrationTest {
 
   @Deployment
-  public static Archive<?> createProcessArchiveDeplyoment() {
-    WebArchive archive = initWebArchiveDeployment()
+  public static WebArchive createProcessArchiveDeplyoment() {
+    return initWebArchiveDeployment()
             .addClass(ExampleSignallableActivityBehaviorBean.class)
             .addAsResource("org/camunda/bpm/integrationtest/functional/cdi/CdiBeanSignallableActivityBehaviorResolutionTest.testResolveBean.bpmn20.xml");
-    return processArchiveDeployment(archive);
   }
 
   @Deployment(name="clientDeployment")
-  public static Archive<?> clientDeployment() {
+  public static WebArchive clientDeployment() {
     WebArchive deployment = ShrinkWrap.create(WebArchive.class, "client.war")
             .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
             .addClass(AbstractFoxPlatformIntegrationTest.class)
@@ -55,7 +53,7 @@ public class CdiBeanSignallableActivityBehaviorResolutionTest extends AbstractFo
 
     TestContainer.addContainerSpecificResourcesForNonPa(deployment);
 
-    return processArchiveDeployment(deployment);
+    return deployment;
   }
 
   @Test

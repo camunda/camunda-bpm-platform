@@ -37,7 +37,6 @@ import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.runtime.Job;
-import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
@@ -82,14 +81,6 @@ public abstract class AbstractFoxPlatformIntegrationTest {
     return initWebArchiveDeployment("test.war");
   }
 
-  /**
-   * Post-process the given archive.
-   * @param archive
-   * @return an EAR or WAR depending on the Application Server
-   */
-  public static Archive<?> processArchiveDeployment(Archive<?> archive) {
-    return TestContainer.processArchive(archive);
-  }
 
   @Before
   public void setupBeforeTest() {

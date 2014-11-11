@@ -17,7 +17,6 @@ import org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest;
 import org.camunda.bpm.integrationtest.util.DeploymentHelper;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
-import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
@@ -35,8 +34,8 @@ import org.junit.runner.RunWith;
 public class TestCustomProcessesXmlFileLocation extends AbstractFoxPlatformIntegrationTest {
 
   @Deployment
-  public static Archive<?> processArchive() {
-
+  public static WebArchive processArchive() {    
+    
     WebArchive archive = ShrinkWrap.create(WebArchive.class, "test.war")
         .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
         .addAsLibraries(DeploymentHelper.getEngineCdi())
@@ -44,8 +43,9 @@ public class TestCustomProcessesXmlFileLocation extends AbstractFoxPlatformInteg
         .addClass(AbstractFoxPlatformIntegrationTest.class)
         .addClass(CustomProcessApplication.class)
         .addAsResource("org/camunda/bpm/integrationtest/deployment/cfg/invoice-it.bpmn20.xml");
-
-    return processArchiveDeployment(archive);
+    
+    return archive;
+    
   }
   
   @Test

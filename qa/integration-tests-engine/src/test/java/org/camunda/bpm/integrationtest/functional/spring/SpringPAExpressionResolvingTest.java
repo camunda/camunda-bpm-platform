@@ -19,7 +19,6 @@ import org.camunda.bpm.integrationtest.util.TestContainer;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.junit.Arquillian;
-import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
@@ -38,10 +37,10 @@ import org.junit.runner.RunWith;
 public class SpringPAExpressionResolvingTest extends AbstractFoxPlatformIntegrationTest {
 
   @Deployment
-  public static Archive<?> processArchive() {
+  public static WebArchive processArchive() {
 
     // deploy spring Process Application (does not include ejb-client nor cdi modules)
-    WebArchive archive = ShrinkWrap.create(WebArchive.class, "test.war")
+    return ShrinkWrap.create(WebArchive.class, "test.war")
 
       // add example bean to serve as JavaDelegate
       .addClass(ExampleBean.class)
@@ -58,13 +57,11 @@ public class SpringPAExpressionResolvingTest extends AbstractFoxPlatformIntegrat
       // spring application context & libs
       .addAsWebInfResource("org/camunda/bpm/integrationtest/functional/spring/SpringPAExpressionResolvingTest-context.xml", "applicationContext.xml")
       .addAsLibraries(DeploymentHelper.getEngineSpring());
-
-    return processArchiveDeployment(archive);
   }
 
 
   @Deployment(name="clientDeployment")
-  public static Archive<?> clientDeployment() {
+  public static WebArchive clientDeployment() {
 
     // the test is deployed as a seperate deployment
 
@@ -75,7 +72,7 @@ public class SpringPAExpressionResolvingTest extends AbstractFoxPlatformIntegrat
 
     TestContainer.addContainerSpecificResourcesForNonPa(deployment);
 
-    return processArchiveDeployment(deployment);
+    return deployment;
   }
 
   @Test

@@ -7,7 +7,6 @@ import org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.junit.Arquillian;
-import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Assert;
 import org.junit.Test;
@@ -29,12 +28,10 @@ import org.junit.runner.RunWith;
 public class JobExecutorRequestContextSFSBDelegateTest extends AbstractFoxPlatformIntegrationTest {
 
   @Deployment(name="pa", order=2)
-  public static Archive<?> processArchive() {
-    WebArchive archive = initWebArchiveDeployment()
+  public static WebArchive processArchive() {
+    return initWebArchiveDeployment()
       .addClass(RequestScopedSFSBDelegate.class)
       .addAsResource("org/camunda/bpm/integrationtest/functional/ejb/request/JobExecutorRequestContextSFSBDelegateTest.testScopingSFSB.bpmn20.xml");
-
-    return processArchiveDeployment(archive);
   }
 
 

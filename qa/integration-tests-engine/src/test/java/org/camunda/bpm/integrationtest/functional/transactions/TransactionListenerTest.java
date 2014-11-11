@@ -1,6 +1,5 @@
 package org.camunda.bpm.integrationtest.functional.transactions;
 
-import org.jboss.shrinkwrap.api.Archive;
 import org.junit.Assert;
 
 import org.camunda.bpm.engine.impl.cfg.TransactionListener;
@@ -24,8 +23,8 @@ import org.junit.runner.RunWith;
 public class TransactionListenerTest extends AbstractFoxPlatformIntegrationTest {
 
   @Deployment
-  public static Archive<?> processArchive() {
-    return processArchiveDeployment(initWebArchiveDeployment());
+  public static WebArchive processArchive() {
+    return initWebArchiveDeployment();
   }
   
   @Test

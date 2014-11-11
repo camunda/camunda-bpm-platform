@@ -12,13 +12,13 @@
  */
 package org.camunda.bpm.integrationtest.deployment.callbacks;
 
-import org.jboss.shrinkwrap.api.Archive;
 import org.junit.Assert;
 
 import org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -30,13 +30,13 @@ import org.junit.runner.RunWith;
 public class PostDeployFailureTest_OTHERS extends AbstractFoxPlatformIntegrationTest {
   
   @Deployment(name="fail")
-  public static Archive<?> createDeployment1() {
-   return processArchiveDeployment(PostDeployFailureTest_JBOSS.createDeployment1());
+  public static WebArchive createDeployment1() {    
+   return PostDeployFailureTest_JBOSS.createDeployment1();    
   }
   
   @Deployment(name="checker")
-  public static Archive<?> createDeployment2() {
-    return processArchiveDeployment(initWebArchiveDeployment("checker.war"));
+  public static WebArchive createDeployment2() {    
+    return initWebArchiveDeployment("checker.war");
   }
   
   @Test

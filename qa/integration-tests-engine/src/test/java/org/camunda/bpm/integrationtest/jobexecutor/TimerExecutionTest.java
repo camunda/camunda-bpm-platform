@@ -3,8 +3,6 @@ package org.camunda.bpm.integrationtest.jobexecutor;
 import java.util.Date;
 import java.util.List;
 import javax.inject.Inject;
-
-import org.jboss.shrinkwrap.api.Archive;
 import org.junit.Assert;
 
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -24,12 +22,12 @@ import org.junit.runner.RunWith;
 public class TimerExecutionTest extends AbstractFoxPlatformIntegrationTest {
 
   @Deployment
-  public static Archive<?> processArchive() {
+  public static WebArchive processArchive() {
     WebArchive archive = initWebArchiveDeployment()
             .addAsResource("org/camunda/bpm/integrationtest/jobexecutor/TimerExecution.bpmn20.xml")
             .addClass(SampleServiceBean.class);
 
-    return processArchiveDeployment(archive);
+    return archive;
   }
 
   @Inject

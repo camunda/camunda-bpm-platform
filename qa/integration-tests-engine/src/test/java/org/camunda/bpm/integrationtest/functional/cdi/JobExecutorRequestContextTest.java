@@ -6,7 +6,6 @@ import org.camunda.bpm.integrationtest.functional.cdi.beans.RequestScopedDelegat
 import org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
-import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Assert;
 import org.junit.Test;
@@ -29,14 +28,12 @@ public class JobExecutorRequestContextTest extends AbstractFoxPlatformIntegratio
   private static final int _6000 = 6000;
 
   @Deployment
-  public static Archive<?> processArchive() {
-    WebArchive archive = initWebArchiveDeployment()
+  public static WebArchive processArchive() {
+    return initWebArchiveDeployment()
       .addClass(RequestScopedDelegateBean.class)
       .addAsResource("org/camunda/bpm/integrationtest/functional/cdi/JobExecutorRequestContextTest.testResolveBean.bpmn20.xml")
       .addAsResource("org/camunda/bpm/integrationtest/functional/cdi/JobExecutorRequestContextTest.testScoping.bpmn20.xml")
       .addAsResource("org/camunda/bpm/integrationtest/functional/cdi/JobExecutorRequestContextTest.testScopingExclusiveJobs.bpmn20.xml");
-
-    return processArchiveDeployment(archive);
   }
 
 

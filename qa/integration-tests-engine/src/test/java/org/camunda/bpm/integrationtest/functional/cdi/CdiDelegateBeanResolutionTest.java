@@ -23,7 +23,6 @@ import org.camunda.bpm.integrationtest.util.TestContainer;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.junit.Arquillian;
-import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
@@ -46,17 +45,15 @@ import org.junit.runner.RunWith;
 public class CdiDelegateBeanResolutionTest extends AbstractFoxPlatformIntegrationTest {
 
   @Deployment
-  public static Archive<?> processArchive() {
-    WebArchive archive = initWebArchiveDeployment()
+  public static WebArchive processArchive() {
+    return initWebArchiveDeployment()
             .addClass(ExampleDelegateBean.class)
             .addAsResource("org/camunda/bpm/integrationtest/functional/cdi/CdiDelegateBeanResolutionTest.testResolveBean.bpmn20.xml")
             .addAsResource("org/camunda/bpm/integrationtest/functional/cdi/CdiDelegateBeanResolutionTest.testResolveBeanFromJobExecutor.bpmn20.xml");
-
-    return processArchiveDeployment(archive);
   }
 
   @Deployment(name="clientDeployment")
-  public static Archive<?> clientDeployment() {
+  public static WebArchive clientDeployment() {
      WebArchive webArchive = ShrinkWrap.create(WebArchive.class, "client.war")
             .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
             .addClass(ProgrammaticBeanLookup.class)
@@ -66,7 +63,7 @@ public class CdiDelegateBeanResolutionTest extends AbstractFoxPlatformIntegratio
 
      TestContainer.addContainerSpecificResources(webArchive);
 
-     return processArchiveDeployment(webArchive);
+     return webArchive;
   }
 
   @Test

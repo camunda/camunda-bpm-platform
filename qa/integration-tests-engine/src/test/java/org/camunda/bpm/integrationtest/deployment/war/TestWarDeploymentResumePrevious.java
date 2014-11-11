@@ -26,7 +26,6 @@ import org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.junit.Arquillian;
-import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Assert;
 import org.junit.Test;
@@ -41,19 +40,16 @@ public class TestWarDeploymentResumePrevious extends AbstractFoxPlatformIntegrat
   private static final String PA2 = "PA2";
 
   @Deployment(order=1, name=PA1)
-  public static Archive<?> processArchive1() {
-    WebArchive archive = initWebArchiveDeployment("pa1.war")
+  public static WebArchive processArchive1() {
+    return initWebArchiveDeployment("pa1.war")
             .addAsResource("org/camunda/bpm/integrationtest/deployment/war/testDeployProcessArchiveV1.bpmn20.xml");
-
-    return processArchiveDeployment(archive);
   }
 
   @Deployment(order=2, name=PA2)
-  public static Archive<?> processArchive2() {
-    WebArchive archive = initWebArchiveDeployment("pa2.war")
+  public static WebArchive processArchive2() {
+    return initWebArchiveDeployment("pa2.war")
         .addAsResource("org/camunda/bpm/integrationtest/deployment/war/testDeployProcessArchiveV2.bpmn20.xml");
 
-    return processArchiveDeployment(archive);
   }
 
   @Test

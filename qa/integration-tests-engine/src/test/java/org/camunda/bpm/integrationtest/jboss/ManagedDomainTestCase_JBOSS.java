@@ -15,11 +15,9 @@ package org.camunda.bpm.integrationtest.jboss;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
-import org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.TargetsContainer;
 import org.jboss.arquillian.junit.Arquillian;
-import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Assert;
@@ -37,8 +35,8 @@ import org.junit.runner.RunWith;
 public class ManagedDomainTestCase_JBOSS {
 
   @Deployment @TargetsContainer("test-domain")
-  public static Archive<?> create1() {
-      return AbstractFoxPlatformIntegrationTest.processArchiveDeployment(ShrinkWrap.create(WebArchive.class, "test.war"));
+  public static WebArchive create1() {
+      return ShrinkWrap.create(WebArchive.class, "test.war");
   }
 
   @Test
