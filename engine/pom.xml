@@ -734,6 +734,7 @@
               <logResults>true</logResults>
               <excludes>
                 <exclude>org/camunda/bpm/*/impl/**</exclude>
+                <exclude>org/camunda/bpm/engine/test/ProcessEngineRule</exclude>
               </excludes>
             </configuration>
             <executions>
