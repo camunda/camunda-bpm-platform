@@ -309,6 +309,18 @@ public class InclusiveGatewayTest extends PluggableProcessEngineTestCase {
     assertEquals("Default input", task.getName());
   }
 
+  @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/gateway/InclusiveGatewayTest.testDefaultSequenceFlow.bpmn20.xml")
+  public void testDefaultSequenceFlowExecutionIsActive() {
+    // given a triggered inclusive gateway default flow
+    runtimeService.startProcessInstanceByKey("inclusiveGwDefaultSequenceFlow", CollectionUtil.singletonMap("input", 5));
+
+    // then the process instance execution is not deactivated
+    ExecutionEntity execution = (ExecutionEntity) runtimeService.createExecutionQuery().singleResult();
+    assertEquals("theTask2", execution.getActivityId());
+    assertTrue(execution.isActive());
+  }
+
+
   @Deployment
   public void testNoIdOnSequenceFlow() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("inclusiveNoIdOnSequenceFlow", CollectionUtil.singletonMap("input", 3));
