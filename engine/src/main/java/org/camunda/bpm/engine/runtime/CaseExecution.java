@@ -86,4 +86,10 @@ public interface CaseExecution {
    */
   boolean isTerminated();
 
+  /**
+   * <p>Returns type of execution.</p> 
+   * @return type of execution, see values of {@link CaseExecutionModelExtender.Type}
+   */
+  String getType();
+
 }
