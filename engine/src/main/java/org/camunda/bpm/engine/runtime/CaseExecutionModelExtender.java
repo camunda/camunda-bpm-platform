@@ -53,11 +53,8 @@ public class CaseExecutionModelExtender {
   public static CaseExecutionModelExtender from(final CaseExecutionEntity caseExecutionEntity) {
 
     final CaseExecutionModelExtender caseExecutionType = new CaseExecutionModelExtender();
-
-    final String caseDefinitionId = caseExecutionEntity.getCaseDefinition().getId();
-    final InputStream caseModel = Context.getProcessEngineConfiguration().getRepositoryService().getCaseModel(caseDefinitionId);
-    final CmmnModelInstance modelInstance = Cmmn.readModelFromStream(caseModel);
-
+    final CmmnModelInstance modelInstance = caseExecutionEntity.getCmmnModelInstance();
+    
     final ModelElementInstance plainItemModel = modelInstance.getModelElementById(caseExecutionEntity.getActivityId());
     if (plainItemModel instanceof PlanItemImpl) {
       final PlanItemImpl planItem = (PlanItemImpl) plainItemModel;

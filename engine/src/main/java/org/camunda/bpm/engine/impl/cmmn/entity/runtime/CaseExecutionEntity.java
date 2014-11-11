@@ -63,8 +63,7 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
 
   // current position /////////////////////////////////////////////////////////
 
-  /**
-   * the case instance. this is the root of the execution tree. the caseInstance
+  /** the case instance. this is the root of the execution tree. the caseInstance
    * of a case instance is a self reference.
    */
   protected transient CaseExecutionEntity caseInstance;
@@ -79,10 +78,7 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
   protected List<CaseSentryPartEntity> caseSentryParts;
   protected Map<String, List<CmmnSentryPart>> sentries;
 
-  /**
-   * reference to a sub process instance, not-null if currently subprocess is
-   * started from this execution
-   */
+  /** reference to a sub process instance, not-null if currently subprocess is started from this execution */
   protected transient ExecutionEntity subProcessInstance;
 
   protected transient CaseExecutionEntity subCaseInstance;
@@ -130,7 +126,10 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
   protected void ensureCaseDefinitionInitialized() {
     if ((caseDefinition == null) && (caseDefinitionId != null)) {
 
-      CaseDefinitionEntity deployedCaseDefinition = Context.getProcessEngineConfiguration().getDeploymentCache().getCaseDefinitionById(caseDefinitionId);
+      CaseDefinitionEntity deployedCaseDefinition = Context
+          .getProcessEngineConfiguration()
+          .getDeploymentCache()
+          .getCaseDefinitionById(caseDefinitionId);
 
       setCaseDefinition(deployedCaseDefinition);
     }
@@ -159,7 +158,10 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
         ensureCaseExecutionTreeInitialized();
 
       } else {
-        parent = Context.getCommandContext().getCaseExecutionManager().findCaseExecutionById(parentId);
+        parent = Context
+            .getCommandContext()
+            .getCaseExecutionManager()
+            .findCaseExecutionById(parentId);
 
       }
     }
@@ -175,7 +177,10 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
    * @see ExecutionEntity#ensureExecutionTreeInitialized
    */
   protected void ensureCaseExecutionTreeInitialized() {
-    List<CaseExecutionEntity> executions = Context.getCommandContext().getCaseExecutionManager().findChildCaseExecutionsByCaseInstanceId(caseInstanceId);
+    List<CaseExecutionEntity> executions = Context
+        .getCommandContext()
+        .getCaseExecutionManager()
+        .findChildCaseExecutionsByCaseInstanceId(caseInstanceId);
 
     CaseExecutionEntity caseInstance = null;
 
@@ -266,7 +271,10 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
 
   protected void ensureCaseExecutionsInitialized() {
     if (caseExecutions == null) {
-      this.caseExecutions = Context.getCommandContext().getCaseExecutionManager().findChildCaseExecutionsByParentCaseExecutionId(id);
+      this.caseExecutions = Context
+          .getCommandContext()
+          .getCaseExecutionManager()
+          .findChildCaseExecutionsByParentCaseExecutionId(id);
     }
   }
 
@@ -311,7 +319,10 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
   protected void ensureCaseInstanceInitialized() {
     if ((caseInstance == null) && (caseInstanceId != null)) {
 
-      caseInstance = Context.getCommandContext().getCaseExecutionManager().findCaseExecutionById(caseInstanceId);
+      caseInstance = Context
+          .getCommandContext()
+          .getCaseExecutionManager()
+          .findCaseExecutionById(caseInstanceId);
 
     }
   }
@@ -343,7 +354,10 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
   protected CaseExecutionEntity newCaseExecution() {
     CaseExecutionEntity newCaseExecution = new CaseExecutionEntity();
 
-    Context.getCommandContext().getCaseExecutionManager().insertCaseExecution(newCaseExecution);
+    Context
+      .getCommandContext()
+      .getCaseExecutionManager()
+      .insertCaseExecution(newCaseExecution);
 
     return newCaseExecution;
   }
@@ -381,12 +395,14 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
 
   protected void ensureSubProcessInstanceInitialized() {
     if (subProcessInstance == null) {
-      subProcessInstance = Context.getCommandContext().getExecutionManager().findSubProcessInstanceBySuperCaseExecutionId(id);
+      subProcessInstance = Context
+          .getCommandContext()
+          .getExecutionManager()
+          .findSubProcessInstanceBySuperCaseExecutionId(id);
     }
   }
 
-  // sub-/super- case instance
-  // ////////////////////////////////////////////////////
+  //sub-/super- case instance ////////////////////////////////////////////////////
 
   public CaseExecutionEntity getSubCaseInstance() {
     ensureSubCaseInstanceInitialized();
@@ -427,7 +443,10 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
 
   protected void ensureSubCaseInstanceInitialized() {
     if (subCaseInstance == null) {
-      subCaseInstance = Context.getCommandContext().getCaseExecutionManager().findSubCaseInstanceBySuperCaseExecutionId(id);
+      subCaseInstance = Context
+          .getCommandContext()
+          .getCaseExecutionManager()
+          .findSubCaseInstanceBySuperCaseExecutionId(id);
     }
   }
 
@@ -456,12 +475,14 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
 
   protected void ensureSuperCaseExecutionInitialized() {
     if (superCaseExecution == null && superCaseExecutionId != null) {
-      superCaseExecution = Context.getCommandContext().getCaseExecutionManager().findCaseExecutionById(superCaseExecutionId);
+      superCaseExecution = Context
+          .getCommandContext()
+          .getCaseExecutionManager()
+          .findCaseExecutionById(superCaseExecutionId);
     }
   }
 
-  // sentry
-  // /////////////////////////////////////////////////////////////////////////
+  //sentry /////////////////////////////////////////////////////////////////////////
 
   public List<CaseSentryPartEntity> getCaseSentryParts() {
     ensureCaseSentryPartsInitialized();
@@ -471,7 +492,10 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
   protected void ensureCaseSentryPartsInitialized() {
     if (caseSentryParts == null) {
 
-      caseSentryParts = Context.getCommandContext().getCaseSentryPartManager().findCaseSentryPartsByCaseExecutionId(id);
+      caseSentryParts = Context
+          .getCommandContext()
+          .getCaseSentryPartManager()
+          .findCaseSentryPartsByCaseExecutionId(id);
 
       // create a map sentries: sentryId -> caseSentryParts
       // for simple select to get all parts for one sentry
@@ -521,7 +545,10 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
   protected CaseSentryPartEntity newSentryPart() {
     CaseSentryPartEntity caseSentryPart = new CaseSentryPartEntity();
 
-    Context.getCommandContext().getCaseSentryPartManager().insertCaseSentryPart(caseSentryPart);
+    Context
+      .getCommandContext()
+      .getCaseSentryPartManager()
+      .insertCaseSentryPart(caseSentryPart);
 
     return caseSentryPart;
   }
@@ -538,16 +565,19 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
   }
 
   protected List<VariableInstanceEntity> loadVariableInstances() {
-    return Context.getCommandContext().getVariableInstanceManager().findVariableInstancesByCaseExecutionId(id);
+    return Context
+        .getCommandContext()
+        .getVariableInstanceManager()
+        .findVariableInstancesByCaseExecutionId(id);
   }
 
   // toString /////////////////////////////////////////////////////////////
 
   public String toString() {
     if (isCaseInstanceExecution()) {
-      return "CaseInstance[" + getToStringIdentity() + "]";
+      return "CaseInstance["+getToStringIdentity()+"]";
     } else {
-      return "CaseExecution[" + getToStringIdentity() + "]";
+      return "CaseExecution["+getToStringIdentity()+"]";
     }
   }
 
@@ -587,7 +617,10 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
   }
 
   public void forceUpdate() {
-    Context.getCommandContext().getDbEntityManager().forceUpdate(this);
+    Context
+      .getCommandContext()
+      .getDbEntityManager()
+      .forceUpdate(this);
   }
 
   public boolean hasReferenceTo(DbEntity entity) {
@@ -623,7 +656,7 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
   }
 
   public CmmnModelInstance getCmmnModelInstance() {
-    if (caseDefinitionId != null) {
+    if(caseDefinitionId != null) {
 
       return Context.getProcessEngineConfiguration().getDeploymentCache().findCmmnModelInstanceForCaseDefinition(caseDefinitionId);
 
@@ -635,17 +668,18 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
 
   public CmmnElement getCmmnModelElementInstance() {
     CmmnModelInstance cmmnModelInstance = getCmmnModelInstance();
-    if (cmmnModelInstance != null) {
+    if(cmmnModelInstance != null) {
 
       ModelElementInstance modelElementInstance = cmmnModelInstance.getModelElementById(activityId);
 
       try {
         return (CmmnElement) modelElementInstance;
 
-      } catch (ClassCastException e) {
+      } catch(ClassCastException e) {
         ModelElementType elementType = modelElementInstance.getElementType();
-        throw new ProcessEngineException("Cannot cast " + modelElementInstance + " to CmmnElement. " + "Is of type " + elementType.getTypeName()
-            + " Namespace " + elementType.getTypeNamespace(), e);
+        throw new ProcessEngineException("Cannot cast "+modelElementInstance+" to CmmnElement. "
+            + "Is of type "+elementType.getTypeName() + " Namespace "
+            + elementType.getTypeNamespace(), e);
       }
 
     } else {
@@ -654,15 +688,21 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
   }
 
   public ProcessEngineServices getProcessEngineServices() {
-    return Context.getProcessEngineConfiguration().getProcessEngine();
+    return Context
+        .getProcessEngineConfiguration()
+        .getProcessEngine();
   }
 
   public <T extends CoreExecution> void performOperation(CoreAtomicOperation<T> operation) {
-    Context.getCommandContext().performOperation((CmmnAtomicOperation) operation, this);
+    Context
+      .getCommandContext()
+      .performOperation((CmmnAtomicOperation) operation, this);
   }
 
   public <T extends CoreExecution> void performOperationSync(CoreAtomicOperation<T> operation) {
-    Context.getCommandContext().performOperation((CmmnAtomicOperation) operation, this);
+    Context
+      .getCommandContext()
+      .performOperation((CmmnAtomicOperation) operation, this);
   }
 
 }
