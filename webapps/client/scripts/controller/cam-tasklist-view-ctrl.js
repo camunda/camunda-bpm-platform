@@ -29,6 +29,13 @@ define([
     "Case Variable" : "caseInstanceVariables"
   };
 
+  var sanitizeValue = function(value, operator) {
+    if(operator === 'like') {
+      return '%'+value+'%';
+    }
+    return value;
+  };
+
   return [
     '$scope',
     '$q',
@@ -154,7 +161,7 @@ define([
          query[typeTable[search.type]].push({
            name: search.name,
            operator: operatorTable[search.operator],
-           value: search.value
+           value: sanitizeValue(search.value, search.operator)
          });
 
       });
