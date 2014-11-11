@@ -1,10 +1,10 @@
-define(['moment'], function(moment) {
+define(['moment', 'angular'], function(moment, angular) {
   'use strict';
 
   return function(ngModule, appRoot) {
 
-    ngModule.factory('localeLoader', ['$q', '$http',
-      function($q,   $http) {
+    ngModule.factory('localeLoader', ['$q', '$http', 'Notifications',
+      function($q, $http, Notifications) {
         return function (options) {
 
           if (!options || (!angular.isString(options.prefix) || !angular.isString(options.suffix))) {
@@ -23,13 +23,18 @@ define(['moment'], function(moment) {
             params: ''
           }, options.$http)).success(function (data) {
             if(typeof options.callback === "function") {
-              options.callback(null, data);
+              options.callback(null, data, options.key);
             }
             deferred.resolve(data.labels);
           }).error(function (data) {
             if(typeof options.callback === "function") {
-              options.callback(data);
+              options.callback(data, null, options.key);
             }
+            // error notification
+            Notifications.addError({
+              status: 'Error in localization configuration',
+              message: '"' + options.key + '" is declared as available locale, but no such locale file exists.'
+            });
             deferred.reject(options.key);
           });
 
@@ -44,17 +49,37 @@ define(['moment'], function(moment) {
       $translateProvider,
        configurationProvider
       ) {
+        var avail = configurationProvider.getAvailableLocales();
+        var fallback = configurationProvider.getFallbackLocale();
 
         $translateProvider.useLoader('localeLoader', {
           prefix: appRoot + '/app/tasklist/locales/',
           suffix: '.json',
-          callback: function(err, data) {
+          callback: function(err, data, locale) {
             if(!err && data && data.dateLocales) {
-              moment.lang(configurationProvider.getPreferredLocale() || 'en', data.dateLocales);
+              moment.lang(locale || fallback, data.dateLocales);
             }
           }
         });
-        $translateProvider.preferredLanguage(configurationProvider.getPreferredLocale());
+
+        $translateProvider.registerAvailableLanguageKeys(avail);
+        $translateProvider.fallbackLanguage(fallback);
+
+        $translateProvider.determinePreferredLanguage(function() {
+          var nav = window.navigator;
+          var browserLang = ((angular.isArray(nav.languages) ? nav.languages[0] :
+                              nav.language ||
+                              nav.browserLanguage ||
+                              nav.systemLanguage ||
+                              nav.userLanguage
+                            ) || '').split('-');
+          var idx = avail.indexOf(angular.lowercase(browserLang[0]));
+          if (idx > -1) {
+            return avail[idx];
+          } else {
+            return fallback;
+          }
+        });
       }]);
   };
 });

@@ -12,7 +12,8 @@ define(['angular'], function(angular) {
       "short": "LL"
     },
     "locales": {
-      "preferredLocale": "en"
+      "availableLocales": ["en"],
+      "fallbackLocale": "en"
     }
   };
   return [function() {
@@ -21,11 +22,19 @@ define(['angular'], function(angular) {
       return dateFormatObj[formatName] || defaultConfig.dateFormat[formatName];
     };
 
-    this.getPreferredLocale = function() {
-      if(config.locales && config.locales.preferredLocale) {
-        return config.locales.preferredLocale;
+    this.getFallbackLocale = function() {
+      if(config.locales && config.locales.fallbackLocale) {
+        return config.locales.fallbackLocale;
       } else {
-        return defaultConfig.locales.preferredLocale;
+        return defaultConfig.locales.fallbackLocale;
+      }
+    };
+
+    this.getAvailableLocales = function() {
+      if(config.locales && config.locales.availableLocales) {
+        return config.locales.availableLocales;
+      } else {
+        return defaultConfig.locales.availableLocales;
       }
     };
 
