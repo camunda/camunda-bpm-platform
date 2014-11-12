@@ -231,6 +231,11 @@ define([
           scope.$apply(scope.cancelChange);
         }
 
+        element
+          .parents()
+          .scroll(stopEditing);
+
+
         scope.changeType = function() {
           if(scope.varType === 'datetime') {
             scope.varType = 'text';
