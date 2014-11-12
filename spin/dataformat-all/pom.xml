@@ -7,19 +7,14 @@
     <version>1.0.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>camunda-spin-all</artifactId>
-  <name>camunda Spin - all in one</name>
+  <artifactId>camunda-spin-dataformat-all</artifactId>
+  <name>camunda Spin - all dataformats in one</name>
 
   <properties>
     <version.camunda.bpm>7.2.0-SNAPSHOT</version.camunda.bpm>
   </properties>
 
   <dependencies>
-
-    <dependency>
-      <groupId>org.camunda.spin</groupId>
-      <artifactId>camunda-spin-core</artifactId>
-    </dependency>
 
     <dependency>
       <groupId>org.camunda.spin</groupId>

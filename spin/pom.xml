@@ -18,7 +18,7 @@
     <module>core</module>
     <module>dataformat-json-jackson</module>
     <module>dataformat-xml-dom</module>
-    <module>dist</module>
+    <module>dataformat-all</module>
   </modules>
 
   <dependencyManagement>
