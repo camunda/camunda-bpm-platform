@@ -127,9 +127,13 @@ define([
           }
       }
       if(currentFilter) {
-        updateSilently({
-          page: '1'
-        });
+        var currentPage = getPropertyFromLocation('page');
+        if (currentPage) {
+          updateSilently({
+            page: '1'
+          });
+        }
+
       }
 
       if(focused && focused.id !== filterId) {
