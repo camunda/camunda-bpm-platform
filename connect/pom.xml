@@ -15,9 +15,9 @@
   <modules>
     <module>bom</module>
     <module>core</module>
-    <module>dist</module>
     <module>http-client</module>
     <module>soap-http-client</module>
+    <module>connectors-all</module>
   </modules>
 
   <dependencyManagement>
