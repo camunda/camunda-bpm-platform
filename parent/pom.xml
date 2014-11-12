@@ -23,6 +23,8 @@
     <spring.framework.version>3.1.2.RELEASE</spring.framework.version>
     <cxf.version>2.6.1</cxf.version>
     <junit.version>4.11</junit.version>
+    <version.assertj>1.5.0</version.assertj>
+    <version.logback>1.1.2</version.logback>
     <version.resteasy>2.3.5.Final</version.resteasy>
 
     <version.commonj>1.1.0</version.commonj>
@@ -212,6 +214,16 @@
         <groupId>junit</groupId>
         <artifactId>junit</artifactId>
         <version>${junit.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.assertj</groupId>
+        <artifactId>assertj-core</artifactId>
+        <version>${version.assertj}</version>
+      </dependency>
+      <dependency>
+        <groupId>ch.qos.logback</groupId>
+        <artifactId>logback-classic</artifactId>
+        <version>${version.logback}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.ant</groupId>
@@ -443,6 +455,17 @@
       <dependency>
         <groupId>org.camunda.bpm.identity</groupId>
         <artifactId>camunda-identity-ldap</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.camunda.bpm</groupId>
+        <artifactId>camunda-engine-plugin-spin</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.camunda.bpm</groupId>
+        <artifactId>camunda-engine-plugin-connect</artifactId>
         <version>${project.version}</version>
       </dependency>
 

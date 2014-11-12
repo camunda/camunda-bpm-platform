@@ -48,7 +48,7 @@
 
         <module>examples/invoice</module>
 
-        <module>identity/identity-ldap</module>
+        <module>engine-plugins</module>
 
         <module>distro/jbossas7</module>
         <module>distro/gf31</module>
@@ -86,7 +86,7 @@
 
         <module>examples/invoice</module>
 
-        <module>identity/identity-ldap</module>
+        <module>engine-plugins</module>
 
         <module>distro/sql-script</module>
 
@@ -172,7 +172,7 @@
 
         <module>javaee/ejb-client</module>
 
-        <module>identity/identity-ldap</module>
+        <module>engine-plugins</module>
 
         <module>parent</module>
         <module>bom</module>

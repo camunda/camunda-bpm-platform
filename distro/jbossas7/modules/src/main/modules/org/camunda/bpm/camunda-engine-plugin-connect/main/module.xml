@@ -1,0 +1,17 @@
+<module xmlns="urn:jboss:module:1.0" name="org.camunda.bpm.camunda-engine-plugin-connect">
+  <resources>
+    <resource-root path="camunda-engine-plugin-connect-@project.version@.jar" />
+  </resources>
+
+  <dependencies>
+
+    <module name="javax.api" />
+
+    <module name="org.camunda.bpm.camunda-engine" />
+
+    <module name="org.camunda.connect.camunda-connect-core" />
+    <module name="org.camunda.connect.camunda-connect-http-client" services="import" />
+    <module name="org.camunda.connect.camunda-connect-soap-http-client" services="import" />
+
+  </dependencies>
+</module>

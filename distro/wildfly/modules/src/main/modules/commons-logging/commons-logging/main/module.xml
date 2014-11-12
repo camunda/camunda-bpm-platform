@@ -1,0 +1,11 @@
+<module xmlns="urn:jboss:module:1.0" name="commons-logging.commons-logging">
+  <resources>
+    <resource-root path="commons-logging-1.1.1.jar" />
+  </resources>
+
+  <dependencies>
+
+    <module name="javax.api" />
+
+  </dependencies>
+</module>

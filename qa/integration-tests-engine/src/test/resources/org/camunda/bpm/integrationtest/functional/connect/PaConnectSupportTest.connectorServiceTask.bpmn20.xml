@@ -1,17 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn2:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:cam="http://activiti.org/bpmn" xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd" id="__hiYAGQLEeSn4PUJP2d52Q" exporter="camunda modeler" exporterVersion="2.6.0" targetNamespace="http://activiti.org/bpmn">
-  <bpmn2:process id="testProcess" isExecutable="true">
-    <bpmn2:startEvent id="StartEvent_1">
-      <bpmn2:outgoing>SequenceFlow_1</bpmn2:outgoing>
-    </bpmn2:startEvent>
-    <bpmn2:serviceTask id="ServiceTask_1" name="HTTP Post">
-      <bpmn2:extensionElements>
-        <cam:connector>
-          <cam:connectorId>soap-http-connector</cam:connectorId>
-          <cam:inputOutput>
-            <cam:inputParameter name="method">POST</cam:inputParameter>
-            <cam:inputParameter name="url">http://camunda.org</cam:inputParameter>
-            <cam:inputParameter name="headers">
+<definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:camunda="http://activiti.org/bpmn" xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd" id="__hiYAGQLEeSn4PUJP2d52Q" exporter="camunda modeler" exporterVersion="2.6.0" targetNamespace="http://activiti.org/bpmn">
+  <process id="testProcess" isExecutable="true">
+    <startEvent id="start" />
+    <sequenceFlow sourceRef="start" targetRef="serviceTask" />
+    <serviceTask id="serviceTask" name="HTTP Post">
+      <extensionElements>
+        <camunda:connector>
+          <camunda:connectorId>pa-test-connector</camunda:connectorId>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="method">POST</camunda:inputParameter>
+            <camunda:inputParameter name="url">http://camunda.org</camunda:inputParameter>
+            <camunda:inputParameter name="headers">
               <map>
                 <entry key="Content-Type">
                   text/plain
@@ -20,39 +19,16 @@
                   doIt
                 </entry>
               </map>
-            </cam:inputParameter>
-            <cam:inputParameter name="payload">Hello world!</cam:inputParameter>
-          </cam:inputOutput>
-        </cam:connector>
-      </bpmn2:extensionElements>
-      <bpmn2:incoming>SequenceFlow_1</bpmn2:incoming>
-      <bpmn2:outgoing>SequenceFlow_3</bpmn2:outgoing>
-    </bpmn2:serviceTask>
-    <bpmn2:sequenceFlow id="SequenceFlow_1" name="" sourceRef="StartEvent_1" targetRef="ServiceTask_1"/>
-    <bpmn2:endEvent id="EndEvent_1">
-      <bpmn2:incoming>SequenceFlow_3</bpmn2:incoming>
-    </bpmn2:endEvent>
-    <bpmn2:sequenceFlow id="SequenceFlow_3" name="" sourceRef="ServiceTask_1" targetRef="EndEvent_1"/>
-  </bpmn2:process>
-  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
-    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="httpPost">
-      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
-        <dc:Bounds height="36.0" width="36.0" x="662.0" y="335.0"/>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="_BPMNShape_ServiceTask_2" bpmnElement="ServiceTask_1">
-        <dc:Bounds height="80.0" width="100.0" x="748.0" y="313.0"/>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_1" bpmnElement="SequenceFlow_1" sourceElement="_BPMNShape_StartEvent_2" targetElement="_BPMNShape_ServiceTask_2">
-        <di:waypoint xsi:type="dc:Point" x="698.0" y="353.0"/>
-        <di:waypoint xsi:type="dc:Point" x="748.0" y="353.0"/>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNShape id="_BPMNShape_EndEvent_2" bpmnElement="EndEvent_1">
-        <dc:Bounds height="36.0" width="36.0" x="898.0" y="335.0"/>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_3" bpmnElement="SequenceFlow_3" sourceElement="_BPMNShape_ServiceTask_2" targetElement="_BPMNShape_EndEvent_2">
-        <di:waypoint xsi:type="dc:Point" x="848.0" y="353.0"/>
-        <di:waypoint xsi:type="dc:Point" x="898.0" y="353.0"/>
-      </bpmndi:BPMNEdge>
-    </bpmndi:BPMNPlane>
-  </bpmndi:BPMNDiagram>
-</bpmn2:definitions>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="payload">Hello world!</camunda:inputParameter>
+            <camunda:outputParameter name="payload">${payload}</camunda:outputParameter>
+          </camunda:inputOutput>
+        </camunda:connector>
+      </extensionElements>
+    </serviceTask>
+    <sequenceFlow sourceRef="serviceTask" targetRef="userTask" />
+    <userTask id="userTask" name="Wait" />
+    <sequenceFlow sourceRef="userTask" targetRef="end" />
+    <endEvent id="end" />
+  </process>
+</definitions>

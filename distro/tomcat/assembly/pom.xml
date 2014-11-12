@@ -75,15 +75,34 @@
       <artifactId>camunda-identity-ldap</artifactId>
     </dependency>
 
-    <!-- CAM-2552 SPIN -->
     <dependency>
       <groupId>org.camunda.spin</groupId>
-      <artifactId>camunda-spin-all</artifactId>
+      <artifactId>camunda-spin-core</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.camunda.bpm</groupId>
+      <artifactId>camunda-engine-plugin-spin</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.camunda.spin</groupId>
+      <artifactId>camunda-spin-dataformat-all</artifactId>
     </dependency>
 
     <dependency>
       <groupId>org.camunda.connect</groupId>
-      <artifactId>camunda-connect-all</artifactId>
+      <artifactId>camunda-connect-core</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.camunda.bpm</groupId>
+      <artifactId>camunda-engine-plugin-connect</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.camunda.connect</groupId>
+      <artifactId>camunda-connect-connectors-all</artifactId>
     </dependency>
 
     <dependency>

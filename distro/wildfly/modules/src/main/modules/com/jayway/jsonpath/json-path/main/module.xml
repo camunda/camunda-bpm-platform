@@ -1,0 +1,12 @@
+<module xmlns="urn:jboss:module:1.0" name="com.jayway.jsonpath.json-path">
+  <resources>
+    <resource-root path="json-path-0.9.1.jar" />
+  </resources>
+
+  <dependencies>
+
+    <module name="javax.api" />
+    <module name="com.fasterxml.jackson.core.jackson-databind" />
+
+  </dependencies>
+</module>

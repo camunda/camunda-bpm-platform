@@ -14,29 +14,16 @@
 package org.camunda.bpm.integrationtest.functional.connect;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
-import java.io.IOException;
-
+import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest;
 import org.camunda.connect.Connectors;
-import org.camunda.connect.httpclient.HttpBaseRequest;
-import org.camunda.connect.httpclient.HttpConnector;
-import org.camunda.connect.httpclient.impl.HttpConnectorImpl;
-import org.camunda.connect.httpclient.soap.SoapHttpConnector;
-import org.camunda.connect.httpclient.soap.SoapHttpRequest;
-import org.camunda.connect.httpclient.soap.impl.SoapHttpConnectorImpl;
-import org.camunda.connect.impl.DebugRequestInterceptor;
-import org.camunda.connect.spi.Connector;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import connectjar.org.apache.http.HttpVersion;
-import connectjar.org.apache.http.client.methods.CloseableHttpResponse;
-import connectjar.org.apache.http.message.BasicHttpResponse;
 
 /**
  * <p>Smoketest Make sure camunda connect can be used in a process application </p>
@@ -46,92 +33,34 @@ import connectjar.org.apache.http.message.BasicHttpResponse;
 @RunWith(Arquillian.class)
 public class PaConnectSupportTest extends AbstractFoxPlatformIntegrationTest {
 
-  public static final String METHOD = "POST";
-  public static final String URL = "http://camunda.org";
-  public static final String CONTENT_TYPE = "text/plain";
-  public static final String SOAP_ACTION = "doIt";
-  public static final String PAYLOAD = "Hello world!";
-
-  protected DebugRequestInterceptor interceptor;
-
   @Deployment
   public static WebArchive createDeployment() {
     return initWebArchiveDeployment()
-      .addAsResource("org/camunda/bpm/integrationtest/functional/connect/PaConnectSupportTest.connectorServiceTask.bpmn20.xml");
-  }
-
-  @Before
-  public void createInterceptor() {
-    interceptor = new DebugRequestInterceptor(new TestResponse());
+      .addAsResource("org/camunda/bpm/integrationtest/functional/connect/PaConnectSupportTest.connectorServiceTask.bpmn20.xml")
+      .addClass(TestConnector.class)
+      .addClass(TestConnectorRequest.class)
+      .addClass(TestConnectorResponse.class);
   }
 
   @Test
   public void httpConnectorShouldBeAvailable() {
-    HttpConnector httpConnector = new HttpConnectorImpl();
-
-    httpConnector
-      .addRequestInterceptor(interceptor)
-      .createRequest()
-      .url(URL)
-      .contentType(CONTENT_TYPE)
-      .payload(PAYLOAD)
-      .post()
-      .execute();
-
-    verifyRequest(false);
+    assertNotNull(Connectors.http());
   }
 
   @Test
   public void soapConnectorShouldBeAvailable() {
-    SoapHttpConnector soapHttpConnector = new SoapHttpConnectorImpl();
-
-    soapHttpConnector
-      .addRequestInterceptor(interceptor)
-      .createRequest()
-      .url(URL)
-      .contentType(CONTENT_TYPE)
-      .soapAction(SOAP_ACTION)
-      .payload(PAYLOAD)
-      .execute();
-
-    verifyRequest(true);
+    assertNotNull(Connectors.soap());
   }
 
   @Test
   public void connectorServiceTask() {
-    Connector connector = Connectors.getConnector(SoapHttpConnector.ID);
-    connector.addRequestInterceptor(interceptor);
+    Connectors.registerConnector(new TestConnector());
 
     runtimeService.startProcessInstanceByKey("testProcess");
-    verifyRequest(true);
-
-    // remove interceptor
-    connector.getRequestInterceptors().clear();
-  }
-
-  protected void verifyRequest(boolean isSoapRequest) {
-    HttpBaseRequest request = interceptor.getRequest();
-    assertEquals(METHOD, request.getMethod());
-    assertEquals(URL, request.getUrl());
-    assertEquals(CONTENT_TYPE, request.getContentType());
-    assertEquals(PAYLOAD, request.getPayload());
-
-    if (isSoapRequest) {
-      SoapHttpRequest soap = (SoapHttpRequest) request;
-      assertEquals(SOAP_ACTION, soap.getSoapAction());
-    }
-  }
-
-  class TestResponse extends BasicHttpResponse implements CloseableHttpResponse {
-
-    public TestResponse() {
-      super(HttpVersion.HTTP_1_1, 200, "OK");
-    }
-
-    public void close() throws IOException {
-
-    }
-
+    Task task = taskService.createTaskQuery().singleResult();
+    assertNotNull(task);
+    String payload = (String) taskService.getVariable(task.getId(), "payload");
+    assertEquals("Hello world!", payload);
   }
 
 }

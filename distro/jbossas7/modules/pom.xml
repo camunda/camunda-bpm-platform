@@ -43,22 +43,42 @@
         </exclusion>
       </exclusions>
     </dependency>
+
     <dependency>
       <groupId>org.camunda.bpm.identity</groupId>
       <artifactId>camunda-identity-ldap</artifactId>
     </dependency>
 
-    <!-- CAM-2552 SPIN -->
+    <dependency>
+      <groupId>org.camunda.bpm</groupId>
+      <artifactId>camunda-engine-plugin-spin</artifactId>
+    </dependency>
+
     <dependency>
       <groupId>org.camunda.spin</groupId>
-      <artifactId>camunda-spin-all</artifactId>
+      <artifactId>camunda-spin-dataformat-json-jackson</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.camunda.spin</groupId>
+      <artifactId>camunda-spin-dataformat-xml-dom</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.camunda.bpm</groupId>
+      <artifactId>camunda-engine-plugin-connect</artifactId>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.camunda.connect</groupId>
+      <artifactId>camunda-connect-http-client</artifactId>
     </dependency>
 
     <dependency>
       <groupId>org.camunda.connect</groupId>
-      <artifactId>camunda-connect-all</artifactId>
+      <artifactId>camunda-connect-soap-http-client</artifactId>
     </dependency>
-
+    
     <!-- script engine dependencies -->
     <dependency>
       <groupId>org.codehaus.groovy</groupId>
@@ -74,6 +94,13 @@
     <dependency>
       <groupId>org.camunda.template-engines</groupId>
       <artifactId>camunda-template-engines-freemarker</artifactId>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>1.7.7</version>
+      <scope>provided</scope>
     </dependency>
 
   </dependencies>

@@ -87,6 +87,16 @@
         <version>${project.version}</version>
       </dependency>
       <dependency>
+        <groupId>org.camunda.bpm</groupId>
+        <artifactId>camunda-engine-plugin-spin</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.camunda.bpm</groupId>
+        <artifactId>camunda-engine-plugin-connect</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
         <groupId>org.camunda.bpm.javaee</groupId>
         <artifactId>camunda-ejb-client</artifactId>
         <version>${project.version}</version>

@@ -112,12 +112,17 @@
 
     <dependency>
       <groupId>org.camunda.spin</groupId>
-      <artifactId>camunda-spin-all</artifactId>
+      <artifactId>camunda-spin-core</artifactId>
     </dependency>
 
     <dependency>
       <groupId>org.camunda.connect</groupId>
-      <artifactId>camunda-connect-all</artifactId>
+      <artifactId>camunda-connect-core</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-jdk14</artifactId>
     </dependency>
 
     <dependency>

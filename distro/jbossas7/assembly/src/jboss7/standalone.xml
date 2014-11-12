@@ -314,7 +314,7 @@
 
                       <!-- plugin enabling connect support -->
                       <plugin>
-                          <class>org.camunda.connect.plugin.ConnectProcessEnginePlugin</class>
+                        <class>org.camunda.connect.plugin.ConnectProcessEnginePlugin</class>
                       </plugin>
 
                     <!-- LDAP CONFIGURATION -->

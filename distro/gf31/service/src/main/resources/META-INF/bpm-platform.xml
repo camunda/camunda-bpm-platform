@@ -35,7 +35,7 @@
       <plugin>
         <class>org.camunda.connect.plugin.ConnectProcessEnginePlugin</class>
       </plugin>
-
+ 
     <!-- LDAP CONFIGURATION -->
     <!-- Uncomment this section in order to enable LDAP support for this process engine -->
     <!-- Adjust configuration, see ( http://docs.camunda.org/latest/guides/user-guide/#process-engine-identity-service-the-ldap-identity-service ) -->

@@ -1,0 +1,13 @@
+<module xmlns="urn:jboss:module:1.0" name="com.fasterxml.jackson.core.jackson-databind">
+  <resources>
+    <resource-root path="jackson-databind-2.4.1.jar" />
+  </resources>
+
+  <dependencies>
+
+    <module name="javax.api" />
+    <module name="com.fasterxml.jackson.core.jackson-core" export="true" />
+    <module name="com.fasterxml.jackson.core.jackson-annotations" export="true" />
+
+  </dependencies>
+</module>
