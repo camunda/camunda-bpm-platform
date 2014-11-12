@@ -17,34 +17,34 @@
   }
 
   .filters-column-close {
-    .task-filters {
+    .column.task-filters {
       left: (0 - (@left-width - @grid-gutter-width));
     }
 
-    .tasks-list {
+    .column.tasks-list {
       left: @grid-gutter-width;
       margin-right: (0 - (@center-width + (@grid-gutter-width * 1)));
     }
 
-    .task-details {
+    .column.task-details {
       left: (@center-width + @grid-gutter-width);
     }
 
     &.task-column-close {
-      .tasks-list {
+      .column.tasks-list {
         right: 30px;
         margin: 0;
       }
     }
 
     &.list-column-close {
-      .tasks-list {
+      .column.tasks-list {
         left: (0 - (@center-width - (@grid-gutter-width * 2)));
         right: 100%;
         margin-right: (0 - (@grid-gutter-width * 2));
       }
 
-      .task-details {
+      .column.task-details {
         left: @grid-gutter-width * 2;
       }
     }
@@ -52,25 +52,25 @@
 
 
   .list-column-close {
-    .tasks-list {
+    .column.tasks-list {
       left: 0;
       right: 100%;
       margin-right: (0 - (@left-width + (@grid-gutter-width * 1)));
     }
 
-    .task-details {
+    .column.task-details {
       left: (@left-width + @grid-gutter-width);
     }
   }
 
 
   .task-column-close {
-    .tasks-list {
+    .column.tasks-list {
       right: @grid-gutter-width;
       margin: 0;
     }
 
-    .task-details {
+    .column.task-details {
       right: (0 - (@center-width - @grid-gutter-width));
       left: 100%;
       margin-left: (0 - @grid-gutter-width);
