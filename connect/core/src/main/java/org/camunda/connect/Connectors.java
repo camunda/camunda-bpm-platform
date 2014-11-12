@@ -108,27 +108,31 @@ public class Connectors {
     if (availableConnectors == null) {
       synchronized (Connectors.class) {
         if (availableConnectors == null) {
-          initializeConnectors();
+          initializeConnectors(null);
         }
       }
     }
   }
 
-  protected void initializeConnectors() {
+  protected void initializeConnectors(ClassLoader classLoader) {
     Map<String, Connector<?>> connectors = new HashMap<String, Connector<?>>();
 
+    if(classLoader == null) {
+      classLoader = Connectors.class.getClassLoader();
+    }
+
     // discover available custom connector providers on the classpath
-    registerConnectors(connectors);
+    registerConnectors(connectors, classLoader);
 
     // discover and apply connector configurators on the classpath
-    applyConfigurators(connectors);
+    applyConfigurators(connectors, classLoader);
 
     this.availableConnectors = connectors;
 
   }
 
-  protected void registerConnectors(Map<String, Connector<?>> connectors) {
-    ServiceLoader<ConnectorProvider> providers = ServiceLoader.load(ConnectorProvider.class, Connectors.class.getClassLoader());
+  protected void registerConnectors(Map<String, Connector<?>> connectors, ClassLoader classLoader) {
+    ServiceLoader<ConnectorProvider> providers = ServiceLoader.load(ConnectorProvider.class, classLoader);
 
     for (ConnectorProvider provider : providers) {
       registerProvider(connectors, provider);
@@ -148,8 +152,8 @@ public class Connectors {
   }
 
   @SuppressWarnings("rawtypes")
-  protected void applyConfigurators(Map<String, Connector<?>> connectors) {
-    ServiceLoader<ConnectorConfigurator> configurators = ServiceLoader.load(ConnectorConfigurator.class, Connectors.class.getClassLoader());
+  protected void applyConfigurators(Map<String, Connector<?>> connectors, ClassLoader classLoader) {
+    ServiceLoader<ConnectorConfigurator> configurators = ServiceLoader.load(ConnectorConfigurator.class, classLoader);
 
     for (ConnectorConfigurator configurator : configurators) {
       LOG.connectorConfiguratorDiscovered(configurator);
@@ -164,6 +168,14 @@ public class Connectors {
         configurator.configure(connector);
       }
     }
+  }
+
+  public static void loadConnectors() {
+    loadConnectors(null);
+  }
+
+  public static void loadConnectors(ClassLoader classloader) {
+    INSTANCE.initializeConnectors(classloader);
   }
 
 }
