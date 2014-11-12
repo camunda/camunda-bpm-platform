@@ -167,7 +167,7 @@ define([
       });
 
       var firstResult = ((getPropertyFromLocation('page') || 1) - 1) * 15;
-      var sortBy = getPropertyFromLocation('sortBy') || 'priority';
+      var sortBy = getPropertyFromLocation('sortBy') || 'created';
       var sortOrder = getPropertyFromLocation('sortOrder') || 'asc';
 
       return {
