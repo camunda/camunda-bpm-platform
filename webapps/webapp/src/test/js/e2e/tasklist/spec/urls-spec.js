@@ -25,15 +25,15 @@ describe('tasklist URLs - ', function() {
 
       // when
       dashboardPage.authentication.userLogin('jonny1', 'jonny1');
+      dashboardPage.taskList.selectTask(0);
 
       // then
-      dashboardPage.isActive();
-
-      // finally
-      dashboardPage.taskList.taskId(0).then(function(href) {
-        taskUrl = href;
+      browser.getCurrentUrl().then(function(urlName) {
+        taskUrl = urlName;
+        expect(urlName).toContain('camunda/app/tasklist/default/#/?filter=');
       });
 
+      // finally
       dashboardPage.taskList.taskName(0).then(function(name) {
         taskName = name;
       });

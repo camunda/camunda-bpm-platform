@@ -7,12 +7,18 @@ var navigationSection = element(by.css('[id="cam-tasklist-navigation"]'));
 module.exports = Page.extend({
 
   pageHeader: function() {
-    return element(by.css('.navbar-header')).getText();
+    return element(by.css('.navbar-header'));
   },
 
-  selectNavbarItem: function(navbarItem) {
+  pageHeaderName: function() {
+    return this.pageHeader().element(by.css('.navbar-brand')).getAttribute('title');
+  },
+
+/*  selectNavbarItem: function(navbarItem) {
     var index = [
+      'Layout',
       'Process',
+      'Engine',
       'Account',
       'Webapps'
     ];
@@ -25,6 +31,43 @@ module.exports = Page.extend({
       item = navigationSection.element(by.css('.navbar ul li:nth-child(1)'));
 
     item.click();
+    return item;
+  },*/
+
+  selectNavbarItem: function(navbarItem) {
+    var index = [
+      'Layout',
+      'Process',
+      'Engine',
+      'Account',
+      'Webapps'
+    ];
+    var cssElement;
+    var item;
+
+    switch(index.indexOf(navbarItem)) {
+      case 0:
+        cssElement = '[cam-layout-switcher]';
+        break;
+      case 1:
+        cssElement = '.process-definitions';
+        break;
+      case 2:
+        cssElement = '.engine-select';
+        break;
+      case 3:
+        cssElement = '.user-account';
+        break;
+      case 4:
+        cssElement = '.app-switch';
+        break;
+      default:
+        cssElement = '';
+        console.log('cannot find navbar item');
+    }
+    item = navigationSection.element(by.css(cssElement));
+    item.click();
+
     return item;
   },
 
