@@ -7,7 +7,8 @@ define([], function() {
     $tooltipProvider
   ) {
     $tooltipProvider.options({
-      appendToBody: true
+      appendToBody: true,
+      popupDelay: 500
     });
   }];
 });
