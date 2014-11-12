@@ -42,12 +42,6 @@
         <version>${project.version}</version>
       </dependency>
 
-      <dependency>
-        <groupId>org.camunda.connect</groupId>
-        <artifactId>camunda-connect-engine-plugin</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
     </dependencies>
   </dependencyManagement>
 

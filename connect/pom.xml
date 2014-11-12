@@ -18,7 +18,6 @@
     <module>dist</module>
     <module>http-client</module>
     <module>soap-http-client</module>
-    <module>plugin</module>
   </modules>
 
   <dependencyManagement>
