@@ -79,6 +79,35 @@ public class Connectors {
     return INSTANCE.getAllAvailableConnectors();
   }
 
+  /**
+   * Load all available connectors.
+   */
+  public static void loadConnectors() {
+    loadConnectors(null);
+  }
+
+  /**
+   * Load all available connectors with the given classloader.
+   */
+  public static void loadConnectors(ClassLoader classloader) {
+    INSTANCE.initializeConnectors(classloader);
+  }
+
+  /**
+   * Register a new connector.
+   */
+  public static void registerConnector(Connector connector) {
+    registerConnector(connector.getId(), connector);
+  }
+
+  /**
+   * Register a new connector under the given connector id.
+   */
+  public static void registerConnector(String connectorId, Connector connector) {
+    INSTANCE.registerConnectorInstance(connectorId, connector);
+  }
+
+
   // instance //////////////////////////////////////////////////////////
 
   protected Map<String, Connector<?>> availableConnectors;
@@ -151,6 +180,11 @@ public class Connectors {
     }
   }
 
+  protected void registerConnectorInstance(String connectorId, Connector connector) {
+    ensureConnectorProvidersInitialized();
+    availableConnectors.put(connectorId, connector);
+  }
+
   @SuppressWarnings("rawtypes")
   protected void applyConfigurators(Map<String, Connector<?>> connectors, ClassLoader classLoader) {
     ServiceLoader<ConnectorConfigurator> configurators = ServiceLoader.load(ConnectorConfigurator.class, classLoader);
@@ -168,14 +202,6 @@ public class Connectors {
         configurator.configure(connector);
       }
     }
-  }
-
-  public static void loadConnectors() {
-    loadConnectors(null);
-  }
-
-  public static void loadConnectors(ClassLoader classloader) {
-    INSTANCE.initializeConnectors(classloader);
   }
 
 }
