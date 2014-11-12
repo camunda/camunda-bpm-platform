@@ -140,7 +140,7 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
     return new VariableInstanceQueryImpl(commandExecutor);
   }
 
-  public Map<String, Object> getVariables(String executionId) {
+  public VariableMap getVariables(String executionId) {
     return getVariablesTyped(executionId);
   }
 
