@@ -12,35 +12,58 @@
 
 
 define([
-  'require',
   'angular',
-  'moment',
+
+  /* directives */
   './directives/cam-tasklist-filters',
-  './controller/cam-edit-filter-ctrl',
-  './modals/cam-tasklist-filter-form',
-  'camunda-tasklist-ui/api'
+  './directives/cam-tasklist-filter-modal-form',
+  './directives/cam-tasklist-filter-modal-form-general',
+  './directives/cam-tasklist-filter-modal-form-criteria',
+  './directives/cam-tasklist-filter-modal-form-variable',
+  './directives/cam-tasklist-filter-modal-form-permission',
+
+  /* controllers */
+  './controllers/cam-tasklist-filters-ctrl',
+
+  /* modals */
+  './modals/cam-tasklist-filter-modal',
+
 ], function(
-  require,
   angular,
-  moment,
+
+  /* directives */
   camTasklistFilters,
-  camEditFilterCtrl,
-  camTasklistFilterForm,
-  api
+  camTasklistFilterModalForm,
+  camTasklistFilterModalFormGeneral,
+  camTasklistFilterModalFormCriteria,
+  camTasklistFilterModalFormVariable,
+  camTasklistFilterModalFormPermission,
+
+  /* controllers */
+  camTasklistFiltersCtrl,
+
+  /* modals */
+  camTasklistFilterModal
 ) {
 
   var filterModule = angular.module('cam.tasklist.filter', [
-    api.name,
     'ui.bootstrap',
-    'cam.widget',
-    'angularMoment'
   ]);
 
-  filterModule.controller('camEditFilterCtrl', camEditFilterCtrl);
-
-  filterModule.controller('camEditFilterModalCtrl', camTasklistFilterForm);
-
+  /* directives */
   filterModule.directive('camTasklistFilters', camTasklistFilters);
+  filterModule.directive('camTasklistFilterModalForm', camTasklistFilterModalForm);
+  filterModule.directive('camTasklistFilterModalFormGeneral', camTasklistFilterModalFormGeneral);
+  filterModule.directive('camTasklistFilterModalFormCriteria', camTasklistFilterModalFormCriteria);
+  filterModule.directive('camTasklistFilterModalFormVariable', camTasklistFilterModalFormVariable);
+  filterModule.directive('camTasklistFilterModalFormPermission', camTasklistFilterModalFormPermission);
+
+  /* controllers */
+  filterModule.controller('camFiltersCtrl', camTasklistFiltersCtrl);
+
+
+  /* modals */
+  filterModule.controller('camFilterModalCtrl', camTasklistFilterModal);
 
   return filterModule;
 });

@@ -22,8 +22,7 @@
        ng-repeat="(delta, filter) in filters | orderBy:'properties.priority'"
        class="task-filter-wrapper"
        ng-class="{active: isFocused(filter)}"
-       ng-style="{'z-index': ((filters.length + 10) - delta) }"
-       ng-controller="camEditFilterCtrl">
+       ng-style="{'z-index': ((filters.length + 10) - delta) }">
 
     <div class="task-filter"
          ng-style="filter.style"
@@ -32,7 +31,7 @@
       <div ng-if="isFocused(filter)"
            class="counter">{{ filterCount }}</div>
 
-      <a ng-click="openDialog($event, 'EDIT_FILTER')"
+      <a ng-click="openModal($event, filter)"
          class="edit-filter">
         <span class="glyphicon glyphicon-pencil"></span>
         <span class="hidden-sm hidden-xs hidden-md"

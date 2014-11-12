@@ -1,21 +1,37 @@
 define(function() {
   'use strict';
 
-  var dateExpLangHelp = 'E.g.: ${ now() }, ${ timeDate() } or ${ timeDate().plusWeeks(2) })';
+  var dateExpLangHelp = 'E.g.: ${ now() }, ${ dateTime() } or ${ dateTime().plusWeeks(2) })';
   var userExpLangHelp = 'E.g.: ${ currentUser() }';
   var groupExpLangHelp = 'E.g.: ${ currentUserGroups() }';
 
-  // check that the date format follows `yyyy-MM-dd'T'HH:mm:ss` or is an expression language string
-  var expressionsExp = /^[\s]*(\#|\$)\{/;
-  var dateExp = /^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(|\.[0-9]{0,4})(|Z)$/;
-  function dateValidate(value) {
-    if (expressionsExp.test(value)) {
-      return false;
-    }
+  // yyyy-MM-dd'T'HH:mm:ss
+  var dateRegex = /^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(|\.[0-9]{0,4})(|Z)$/;
+  var expressionsRegex = /^[\s]*(\#|\$)\{/;
+  var numberRegex = /^-?[\d]+$/;
 
-    return !dateExp.test(value) ? 'INVALID_DATE' : false;
+  function isValid(regex, error, exprSupport) {
+
+    return function (value) {
+
+      if (exprSupport) {
+        if (expressionsRegex.test(value)) {
+          return { valid : true };
+        }
+      }
+
+      if (regex.test(value)) {
+        return { valid : true };
+
+      }
+      else {
+        return {
+          valid : false,
+          error: error || 'format'
+        };
+      }
+    };
   }
-
 
   var criteria = [
     {
@@ -32,10 +48,6 @@ define(function() {
         {
           name: 'processInstanceBusinessKeyLike',
           label: 'Business Key Like'
-        // },
-        // {
-        //   name: 'processVariables',
-        //   label: 'Variables'
         }
       ]
     },
@@ -199,73 +211,66 @@ define(function() {
         },
         {
           name: 'priority',
-          label: 'Priority'
+          label: 'Priority',
+          validate: isValid(numberRegex, 'number')
         },
         {
           name: 'maxPriority',
-          label: 'Priority Max'
+          label: 'Priority Max',
+          validate: isValid(numberRegex, 'number')
         },
         {
           name: 'minPriority',
-          label: 'Priority Min'
-        // },
-        // {
-        //   name: 'taskVariables',
-        //   label: 'Variables'
+          label: 'Priority Min',
+          validate: isValid(numberRegex, 'number')
         }
       ]
     },
     {
       group: 'Dates',
+      validate: isValid(dateRegex, 'date', true),
       options: [
         {
           name: 'createdBefore',
           label: 'Created Before',
           expressionSupport: true,
-          help: dateExpLangHelp,
-          validate: dateValidate
+          help: dateExpLangHelp
         },
         {
           name: 'createdAfter',
           label: 'Created After',
           expressionSupport: true,
-          help: dateExpLangHelp,
-          validate: dateValidate
+          help: dateExpLangHelp
         },
         {
           name: 'dueBefore',
           label: 'Due Before',
           expressionSupport: true,
-          help: dateExpLangHelp,
-          validate: dateValidate
+          help: dateExpLangHelp
         },
         {
           name: 'dueAfter',
           label: 'Due After',
           expressionSupport: true,
-          help: dateExpLangHelp,
-          validate: dateValidate
+          help: dateExpLangHelp
         },
         {
           name: 'followUpAfter',
           label: 'Follow Up After',
           expressionSupport: true,
-          help: dateExpLangHelp,
-          validate: dateValidate
+          help: dateExpLangHelp
         },
         {
           name: 'followUpBefore',
           label: 'Follow Up Before',
           expressionSupport: true,
-          help: dateExpLangHelp,
-          validate: dateValidate
+          help: dateExpLangHelp
         },
         {
           name: 'followUpBeforeOrNotExistent',
           label: 'Follow Up Before or Not Existent',
           expressionSupport: true,
-          help: dateExpLangHelp,
-          validate: dateValidate
+          help: dateExpLangHelp
         }
       ]
     }

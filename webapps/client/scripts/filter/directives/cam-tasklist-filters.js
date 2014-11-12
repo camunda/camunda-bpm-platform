@@ -10,13 +10,16 @@ define([
   var $ = angular.element;
   var each = angular.forEach;
 
+  var noop = function () {};
+
   return [function() {
 
     return {
 
       restrict: 'EAC',
       scope: {
-        tasklistData: '='
+        filtersData: '=',
+        openModal: '&'
       },
 
       template: template,
@@ -24,15 +27,16 @@ define([
       controller: [
         '$scope',
         'search',
-        'camAPI',
       function (
         $scope,
-        search,
-        camAPI
+        search
       ) {
 
-        var Filter = camAPI.resource('filter');
-        var filtersData = $scope.filtersData = $scope.tasklistData.newChild($scope);
+        var filtersData = $scope.filtersData = $scope.filtersData.newChild($scope);
+
+        $scope.openModal = $scope.openModal() || noop;
+
+        // observe ////////////////////////////////////////////////////////////////////////////////
 
         /**
          * observe the count for the current filter
@@ -64,6 +68,8 @@ define([
         filtersData.observe('currentFilter', function (currentFilter) {
           $scope.currentFilter = currentFilter;
         });
+
+        // selection ////////////////////////////////////////////////////////////////
 
         /**
          * select a filter

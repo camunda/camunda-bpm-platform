@@ -3,11 +3,11 @@
 
   <!-- # filters column -->
   <section class="column task-filters"
-           ng-controller="camEditFilterCtrl">
+           ng-controller="camFiltersCtrl">
     <header class="cell top">
       <button class="btn btn-link"
               ng-show="userCanCreateFilter"
-              ng-click="openDialog($event, 'CREATE_NEW_FILTER')">
+              ng-click="openModal($event)">
         <span class="glyphicon glyphicon-plus-sign"></span>
         {{ 'FILTER_CREATE' | translate }}
       </button>
@@ -23,7 +23,8 @@
 
     <div class="cell content">
       <div cam-tasklist-filters
-           tasklist-data="tasklistData"></div>
+           filters-data="filtersData"
+           open-modal="openModal"></div>
     </div>
   </section>
   <!-- / filters column -->

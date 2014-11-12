@@ -1,0 +1,118 @@
+<div ng-form class="form-horizontal" name="filterPermissionForm" role="form">
+
+  <div ng-show="!authorizationState.$loaded && !authorizationState.$error"
+       class="loader">
+    <i class="animate-spin glyphicon glyphicon-refresh"></i>
+    {{ 'LOADING' | translate }}
+  </div>
+
+  <div ng-show="authorizationState.$error" class="alert alert-danger" role="alert">
+    <span class="glyphicon glyphicon-exclamation-sign"></span>
+    <strong class="status">{{ 'FAILURE' | translate }}:</strong>
+    <span class="message">{{ 'FILTER_FORM_PERMISSIONS_LOADING_FAILURE' | translate }}</span>
+  </div>
+
+  <div ng-show="authorizationState.$loaded && !authorizationState.$error">
+
+    <div class="alert alert-warning">
+      <span class="glyphicon glyphicon-exclamation-sign"></span>
+      <span>{{ 'FILTER_FORM_PERMISSIONS_EDIT_HINT' | translate }}</span>
+    </div>
+
+    <div class="checkbox" ng-show="!filter.id || (filter.id && accesses.update)">
+      <label>
+        <input type="checkbox"
+               ng-model="isGlobalReadAuthorization"
+               ng-change="globalReadAuthorizationChanged()"
+               ng-disabled="filter.id && !accesses.update"> Global
+      </label>
+    </div>
+
+    <div class="user-read-permissions" ng-show="!filter.id || (filter.id && accesses.update)">
+      <div class="form-group">
+
+        <div class="col-xs-2 align-right">
+          <button class="btn btn-link"
+                  ng-click="addReadPermission()"
+                  type="button"
+                  ng-disabled="disableAddButton()">
+            <span class="hidden-sm hidden-xs">{{ 'ADD' | translate }}</span>
+            <span class="glyphicon glyphicon-plus-sign"></span>
+          </button>
+        </div>
+
+        <div class="col-xs-10">
+
+          <div class="input-group">
+
+            <div class="input-group-btn">
+
+              <button class="btn btn-default"
+                      tooltip-append-to-body="false"
+                      tooltip="{{ 'FILTER_FORM_PERMISSIONS_IDENTITY_TYPE_TOOLTIP' | translate }}: {{ (newPermission.type === 'user' ? 'FILTER_FORM_PERMISSIONS_IDENTITY_TYPE_USER' : 'FILTER_FORM_PERMISSIONS_IDENTITY_TYPE_GROUP') | translate }}"
+                      ng-click="switchType()"
+                      ng-disabled="isGlobalReadAuthorization">
+                  <i ng-show="newPermission.type === 'user'" class="glyphicon glyphicon-user"></i>
+                  <i ng-show="newPermission.type === 'group'" class="glyphicon glyphicon-th"></i>
+
+              </button>
+            </div>
+
+            <input type="text"
+                   name="newPermission"
+                   placeholder="{{ (newPermission.type === 'user' ? 'FILTER_FORM_PERMISSIONS_USER_ID' : 'FILTER_FORM_PERMISSIONS_GROUP_ID') | translate }}"
+                   class="form-control"
+                   ng-model="newPermission.id"
+                   ng-change="validateNewPermission()"
+                   ng-keydown="keyPressed($event)"
+                   ng-readonly="isGlobalReadAuthorization"
+                   ng-disabled="filter.id && !accesses.update" />
+
+          </div>
+
+          <div ng-if="this.filterPermissionForm.newPermission.$invalid && this.filterPermissionForm.newPermission.$dirty"
+                class="has-error">
+            <span ng-show="this.filterPermissionForm.newPermission.$error.required" class="help-block">
+              {{ 'REQUIRED_FIELD' | translate }}
+            </span>
+            <span ng-show="this.filterPermissionForm.newPermission.$error.duplicate && newPermission.type === 'user'" class="help-block">
+              {{ 'FILTER_FORM_PERMISSIONS_DUPLICATE_USER' | translate }}
+            </span>
+            <span ng-show="this.filterPermissionForm.newPermission.$error.duplicate && newPermission.type === 'group'" class="help-block">
+              {{ 'FILTER_FORM_PERMISSIONS_DUPLICATE_GROUP' | translate }}
+            </span>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="form-group" ng-repeat="auth in getReadAuthorizations(authorizations)">
+        <div class="col-xs-2 row-action" ng-show="!filter.id || (filter.id && accesses.update)">
+          <button class="btn btn-link"
+                  ng-click="removeReadPermission(auth)"
+                  type="button"
+                  ng-disabled="isGlobalReadAuthorization">
+            <span class="hidden-sm hidden-xs">{{ 'FILTER_FORM_PERMISSIONS_REMOVE' | translate }}</span>
+            <span class="glyphicon glyphicon-minus-sign"></span>
+          </button>
+        </div>
+
+        <div ng-class="{ 'col-xs-10': !filter.id || (filter.id && accesses.update) , 'col-xs-12': !(!filter.id || (filter.id && accesses.update)) }">
+
+          <span ng-show="auth.userId">
+            <i class="glyphicon glyphicon-user"></i>
+            {{ auth.userId }}
+          </span>
+
+          <span ng-show="auth.groupId">
+            <i class="glyphicon glyphicon-th"></i>
+            {{ auth.groupId }}
+          </span>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>

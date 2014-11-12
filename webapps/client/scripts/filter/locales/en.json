@@ -23,12 +23,6 @@
   "FILTER_NOT_FOUND":
                         "Filter not found",
 
-  "FILTER_FORM_AUTHORIZATIONS_HINT":
-                        "This section is aimed to set the authorizations for the filter.",
-
-  "FILTER_AUTHORIZAION_NOT_FOUND":
-                        "Filter authorizations not found",
-
   "FILTER_FORM_BASICS":
                         "General",
   "FILTER_FORM_BASICS_HINT":
@@ -45,36 +39,10 @@
                         "Description",
   "FILTER_DESCRIPTION_PLACEHOLDER":
                         "Shows the tasks I am assigned",
-
   "FILTER_REFRESH_LABEL":
                         "Auto-Refresh",
   "FILTER_REFRESH_TOOLTIP":
                         "Automatically fetches latest changes and keeps the task list up to date",
-
-  "FILTER_FORM_ACCESS_RULES":
-                        "Authorizations",
-  "FILTER_FORM_ACCESS_RULES_HINT":
-                        "Control who can access, update or delete this filter.",
-  "FILTER_OWNER":
-                        "Owner",
-  "FILTER_ACCESS_RULE_TYPE":
-                        "Type",
-  "FILTER_ACCESS_RULE_USER":
-                        "User / Group",
-  "FILTER_ACCESS_RULE_PERMISSIONS":
-                        "Permissions",
-  "FILTER_IDENTITY_TYPE_TOOLTIP":
-                        "Authorization is applied to",
-  "FILTER_IDENTITY_TYPE_USER":
-                        "user",
-  "FILTER_IDENTITY_TYPE_GROUP":
-                        "group",
-  "FILTER_ADD_ACCESS_RULE":
-                        "Add rule",
-  "FILTER_REMOVE_ACCESS_RULE":
-                        "Remove",
-  "FILTER_REMOVED_ACCESS_RULE":
-                        "Removed",
 
   "FILTER_FORM_CRITERIA":
                         "Criteria",
@@ -92,6 +60,33 @@
                         "Add criterion",
   "FILTER_REMOVE_CRITERION":
                         "Remove",
+
+  "FILTER_FORM_PERMISSIONS":
+                        "Permissions",
+  "FILTER_FORM_PERMISSIONS_LOADING_FAILURE":
+                        "Loading the permissions finished with failures. Try to refresh the page to try again.",
+  "FILTER_FORM_PERMISSIONS_HINT":
+                        "This section is aimed to set read permissions for the filter.",
+  "FILTER_FORM_PERMISSIONS_EDIT_HINT":
+                        "In order to edit the read permissions you need an authorization to create or edit a filter and a further authorization to create or edit auhtorizations.",
+  "FILTER_FORM_PERMISSIONS_IDENTITY_TYPE_TOOLTIP":
+                        "Permission is applied to",
+  "FILTER_FORM_PERMISSIONS_IDENTITY_TYPE_USER":
+                        "user",
+  "FILTER_FORM_PERMISSIONS_IDENTITY_TYPE_GROUP":
+                        "group",
+  "FILTER_FORM_PERMISSIONS_REMOVE":
+                        "Remove",
+  "FILTER_FORM_PERMISSIONS_SAVE_ERROR":
+                        "Something went wrong while saving the permissions",
+  "FILTER_FORM_PERMISSIONS_USER_ID":
+                        "User Id",
+  "FILTER_FORM_PERMISSIONS_GROUP_ID":
+                        "Group Id",
+  "FILTER_FORM_PERMISSIONS_DUPLICATE_USER":
+                        "Given user has already read permissions",
+  "FILTER_FORM_PERMISSIONS_DUPLICATE_GROUP":
+                        "Given group has already read permissions",
 
   "FILTER_FORM_VARIABLES":
                         "Variables",
@@ -111,8 +106,13 @@
                         "Remove",
   "FILTER_VARIABLES_AMOUNT_WARNING":
                         "Showing too much variables in the tasks list could impact on the user experience.",
+
   "NO_AVAILABLE_FILTER":
                         "No filter available.",
+
   "FILTERS_LOADING_FAILURE":
-                        "Loading the filters finished with failures. Try to refresh the page to try again."
+                        "Loading the filters finished with failures. Try to refresh the page to try again.",
+
+  "INVALID_DATE":
+                        "Invalid date: the date should have the pattern 'yyyy-MM-ddTHH:mm:ss'"
 }
