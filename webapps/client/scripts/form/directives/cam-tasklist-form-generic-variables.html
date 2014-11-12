@@ -36,7 +36,8 @@
 
   <div ng-if="variables.length"
        ng-repeat="(delta, variable) in variables"
-       class="form-group">
+       class="form-group"
+       ng-form="repeatForm">
 
     <div class="col-xs-2 row-action">
       <a ng-click="removeVariable(delta)">
@@ -71,10 +72,11 @@
                     translate="VARIABLE_TYPE">Type</option>
 
             <option value="Boolean">Boolean</option>
-            <option value="Integer">Integer</option>
-            <option value="Double">Double</option>
-            <option value="Long">Long</option>
             <option value="Short">Short</option>
+            <option value="Integer">Integer</option>
+            <option value="Long">Long</option>
+            <option value="Float">Float</option>
+            <option value="Double">Double</option>
             <option value="String">String</option>
             <option value="Date">Date</option>
           </select>
@@ -83,7 +85,8 @@
 
 
         <div class="col-xs-4"
-             ng-switch="variable.type">
+             ng-switch="variable.type"
+             ng-class="{'has-error': repeatForm.value.$error.required || repeatForm.value.$error.requireType }">
           <input ng-switch-when=""
                  readonly
                  type="text"
@@ -104,10 +107,17 @@
                  class="form-control"
                  type="{{ variableTypes[variable.type] }}"
                  required
+                 require-type="{{ variable.type }}"
                  ng-model="variable.value"
+                 name="value"
                  cam-variable-name="{{ variable.name }}"
                  cam-variable-type="{{ variable.type }}"
                  placeholder="{{ 'VARIABLE_VALUE' | translate }}" />
+
+          <span ng-if="repeatForm.value.$error.requireType"
+                class="help-block">
+            Only a {{ variable.type }} value is allowed
+          </span>
         </div>
       </div>
     </div>

@@ -26,9 +26,10 @@ define([
         var variableTypes = $scope.variableTypes = {
           'Boolean':  'checkbox', // handled via switch in HTML template
           'Integer':  'text',
-          'Double':   'text',
           'Long':     'text',
           'Short':    'text',
+          'Double':   'text',
+          'Float':    'text',
           'String':   'text',
           'Date':     'text'
         };
@@ -49,7 +50,6 @@ define([
 
           $scope.variables = vars;
         };
-
       }
     };
   }];
