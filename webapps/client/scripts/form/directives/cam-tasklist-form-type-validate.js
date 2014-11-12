@@ -8,13 +8,13 @@ define(['camunda-bpm-sdk'], function(CamSDK) {
         require: 'ngModel',
         link: function($scope, $element, $attrs, ctrl) {
           var validate = function(viewValue) {
-            var type = $attrs.requireType;
+            var type = $attrs.camVariableType;
 
             if(['Boolean', 'String'].indexOf(type) === -1 && !CamSDK.utils.typeUtils.isType(viewValue, type)) {
-              ctrl.$setValidity('requireType', false );
+              ctrl.$setValidity('camVariableType', false );
             }
             else {
-              ctrl.$setValidity('requireType', true );
+              ctrl.$setValidity('camVariableType', true );
             }
             return viewValue;
           };
@@ -22,7 +22,7 @@ define(['camunda-bpm-sdk'], function(CamSDK) {
           ctrl.$parsers.unshift(validate);
           ctrl.$formatters.push(validate);
 
-          $attrs.$observe('requireType', function(comparisonModel){
+          $attrs.$observe('camVariableType', function(comparisonModel){
             return validate(ctrl.$viewValue);
           });
         }};
