@@ -16,6 +16,10 @@ module.exports = Page.extend({
     this.navBarHeader().click();
   },
 
+  suspendedBadge: function() {
+    return element(by.css('.ctn-header .badge'));
+  },
+
   breadCrumb: function(item) {
     // 0 = home
     // 1 = 1st bread crumb

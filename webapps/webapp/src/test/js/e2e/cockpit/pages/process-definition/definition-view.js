@@ -18,6 +18,14 @@ module.exports = Base.extend({
     return element(by.binding('processDefinition.key')).getText().then(function(fullString) {
       return fullString.replace('PROCESS DEFINITION\n', '');
     });
+  },
+
+  isDefintionSuspended: function() {
+    expect(this.suspendedBadge().isDisplayed()).toBeTruthy();
+  },
+
+  isDefintionNotSuspended: function() {
+    expect(this.suspendedBadge().isDisplayed()).toBeFalsy();
   }
 
 });

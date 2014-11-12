@@ -18,6 +18,14 @@ module.exports = Base.extend({
     return element(by.binding('processInstance.id')).getText().then(function(fullString) {
       return fullString.replace('<', '').replace('>', '');
     });
+  },
+
+  isInstanceSuspended: function() {
+    expect(this.suspendedBadge().isDisplayed()).toBeTruthy();
+  },
+
+  isInstanceNotSuspended: function() {
+    expect(this.suspendedBadge().isDisplayed()).toBeFalsy();
   }
 
 });

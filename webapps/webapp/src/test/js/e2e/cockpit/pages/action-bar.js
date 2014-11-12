@@ -9,11 +9,11 @@ module.exports = SideBar.extend({
   },
 
   getActionButton: function(item) {
-    return this.actionButtons().get(item).element(by.css('[ng-click="openDialog()"]'));
+    return this.actionButtons().get(item).element(by.css('[ng-click="openDialog()"]:not(.ng-hide)'));
   },
 
   clickActionButton: function(item) {
-    this.actionButtons().get(item).element(by.css('[ng-click="openDialog()"]')).click();
+    this.getActionButton(item).click();
   }
 
 });
