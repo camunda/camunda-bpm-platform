@@ -107,29 +107,33 @@ public class DataFormats {
     if(availableDataFormats == null) {
       synchronized(DataFormats.class) {
         if(availableDataFormats == null) {
-          registerDataFormats();
+          registerDataFormats(null);
         }
       }
     }
   }
 
-  protected void registerDataFormats() {
+  protected void registerDataFormats(ClassLoader classloader) {
     Map<String, DataFormat<?>> dataFormats = new HashMap<String, DataFormat<?>>();
 
+    if(classloader == null) {
+      classloader = DataFormats.class.getClassLoader();
+    }
+
     // discover available custom dataformat providers on the classpath
-    registerCustomDataFormats(dataFormats);
+    registerCustomDataFormats(dataFormats, classloader);
 
     // discover and apply data format configurators on the classpath
-    applyConfigurators(dataFormats);
+    applyConfigurators(dataFormats, classloader);
 
     LOG.logDataFormats(dataFormats.values());
 
     this.availableDataFormats = dataFormats;
   }
 
-  protected void registerCustomDataFormats(Map<String, DataFormat<?>> dataFormats) {
+  protected void registerCustomDataFormats(Map<String, DataFormat<?>> dataFormats, ClassLoader classloader) {
     // use java.util.ServiceLoader to load custom DataFormatProvider instances on the classpath
-    ServiceLoader<DataFormatProvider> providerLoader = ServiceLoader.load(DataFormatProvider.class, Spin.class.getClassLoader());
+    ServiceLoader<DataFormatProvider> providerLoader = ServiceLoader.load(DataFormatProvider.class, classloader);
 
     for (DataFormatProvider provider : providerLoader) {
       LOG.logDataFormatProvider(provider);
@@ -151,8 +155,8 @@ public class DataFormats {
   }
 
   @SuppressWarnings("rawtypes")
-  protected void applyConfigurators(Map<String, DataFormat<?>> dataFormats) {
-    ServiceLoader<DataFormatConfigurator> configuratorLoader = ServiceLoader.load(DataFormatConfigurator.class, Spin.class.getClassLoader());
+  protected void applyConfigurators(Map<String, DataFormat<?>> dataFormats, ClassLoader classloader) {
+    ServiceLoader<DataFormatConfigurator> configuratorLoader = ServiceLoader.load(DataFormatConfigurator.class, classloader);
 
     for (DataFormatConfigurator configurator : configuratorLoader) {
       LOG.logDataFormatConfigurator(configurator);
@@ -167,6 +171,14 @@ public class DataFormats {
         configurator.configure(dataFormat);
       }
     }
+  }
+
+  public static void loadDataFormats() {
+    loadDataFormats(null);
+  }
+
+  public static void loadDataFormats(ClassLoader classloader) {
+    INSTANCE.registerDataFormats(classloader);
   }
 
 }
