@@ -1,6 +1,7 @@
 package org.camunda.bpm.rest.test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -201,8 +202,8 @@ public class RestIT extends AbstractWebappIntegrationTest {
   protected void assertMediaType(ClientResponse response, MediaType expected) {
     MediaType actual = response.getType();
     assertEquals(200, response.getStatus());
-    // use startsWith cause sometimes server also returns quality parameters
-    assertEquals(expected, actual);
+    // use startsWith cause sometimes server also returns quality parameters (e.g. websphere/wink)
+    assertTrue("Expected: " + expected + " Actual: " + actual, actual.toString().startsWith(expected.toString()));
   }
 
 }
