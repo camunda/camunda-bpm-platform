@@ -31,9 +31,9 @@ import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.identity.Group;
-import org.camunda.bpm.engine.rest.ProcessEngineRestService;
 import org.camunda.bpm.engine.rest.dto.ExceptionDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
+import org.camunda.bpm.engine.rest.impl.NamedProcessEngineRestServiceImpl;
 import org.camunda.bpm.engine.rest.util.EngineUtil;
 import org.codehaus.jackson.map.ObjectMapper;
 
@@ -63,10 +63,10 @@ public class ProcessEngineAuthenticationFilter implements Filter {
 
   // regexes for urls that may be accessed unauthorized
   protected static final Pattern[] WHITE_LISTED_URL_PATTERNS = new Pattern[] {
-    Pattern.compile("^" + ProcessEngineRestService.PATH + "/?")
+    Pattern.compile("^" + NamedProcessEngineRestServiceImpl.PATH + "/?")
   };
 
-  protected static final Pattern ENGINE_REQUEST_URL_PATTERN = Pattern.compile("^" + ProcessEngineRestService.PATH + "/(.*?)(/|$)");
+  protected static final Pattern ENGINE_REQUEST_URL_PATTERN = Pattern.compile("^" + NamedProcessEngineRestServiceImpl.PATH + "/(.*?)(/|$)");
   protected static final String DEFAULT_ENGINE_NAME = "default";
 
   // init params
