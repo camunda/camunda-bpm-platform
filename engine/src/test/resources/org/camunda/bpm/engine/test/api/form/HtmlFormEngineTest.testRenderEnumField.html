@@ -18,6 +18,9 @@
       <div ng-show="this.generatedForm.enumField.$error.required" class="help-block">
         Required field
       </div>
+      <div ng-show="this.generatedForm.enumField.$error.camVariableType" class="help-block">
+        Only a string value is allowed
+      </div>
     </div>
   </div>
 </form>

@@ -112,6 +112,7 @@ public class HtmlFormEngine implements FormEngine {
   protected static final String ERROR_EXPRESSION = FORM_ELEMENT_SELECTOR + ".$error";
   protected static final String DATE_ERROR_EXPRESSION = ERROR_EXPRESSION + ".date";
   protected static final String REQUIRED_ERROR_EXPRESSION = ERROR_EXPRESSION + ".required";
+  protected static final String TYPE_ERROR_EXPRESSION = ERROR_EXPRESSION + ".camVariableType";
 
   /* JavaScript snippets */
   protected static final String DATE_FIELD_OPENED_ATTRIBUTE = "dateFieldOpened%s";
@@ -123,6 +124,7 @@ public class HtmlFormEngine implements FormEngine {
 
   /* messages */
   protected static final String REQUIRED_FIELD_MESSAGE = "Required field";
+  protected static final String TYPE_FIELD_MESSAGE = "Only a %s value is allowed";
   protected static final String INVALID_DATE_FIELD_MESSAGE = "Invalid date format: the date should have the pattern '" + DATE_FORMAT + "'";
 
   public String getName() {
@@ -361,6 +363,7 @@ public class HtmlFormEngine implements FormEngine {
 
     if (!isDate(formField)) {
       renderInvalidValueMessage(formField, documentBuilder);
+      renderInvalidTypeMessage(formField, documentBuilder);
 
     } else {
       renderInvalidDateMessage(formField, documentBuilder);
@@ -380,6 +383,29 @@ public class HtmlFormEngine implements FormEngine {
       .attribute(NG_SHOW_ATTRIBUTE, expression)
       .attribute(CLASS_ATTRIBUTE, HELP_BLOCK_CLASS)
       .textContent(REQUIRED_FIELD_MESSAGE);
+
+    documentBuilder
+      .startElement(divElement)
+      .endElement();
+  }
+
+  protected void renderInvalidTypeMessage(FormField formField, HtmlDocumentBuilder documentBuilder) {
+    HtmlElementWriter divElement = new HtmlElementWriter(DIV_ELEMENT);
+
+    String formFieldId = formField.getId();
+
+    String expression = String.format(TYPE_ERROR_EXPRESSION, formFieldId);
+
+    String typeName = formField.getTypeName();
+
+    if (isEnum(formField)) {
+      typeName = StringFormType.TYPE_NAME;
+    }
+
+    divElement
+      .attribute(NG_SHOW_ATTRIBUTE, expression)
+      .attribute(CLASS_ATTRIBUTE, HELP_BLOCK_CLASS)
+      .textContent(String.format(TYPE_FIELD_MESSAGE, typeName));
 
     documentBuilder
       .startElement(divElement)
