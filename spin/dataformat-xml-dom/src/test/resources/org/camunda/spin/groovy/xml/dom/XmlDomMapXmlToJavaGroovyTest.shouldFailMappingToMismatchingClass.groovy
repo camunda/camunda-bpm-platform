@@ -1,3 +1,3 @@
 package org.camunda.spin.groovy.xml.dom
 
-order = XML(input).mapTo("org.camunda.spin.xml.mapping.Customer");
+order = S(input, "application/xml").mapTo("org.camunda.spin.xml.mapping.Customer");

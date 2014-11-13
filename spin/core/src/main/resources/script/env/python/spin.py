@@ -16,9 +16,3 @@ limitations under the License.
 
 # Import the Spin S(...) function.
 import org.camunda.spin.Spin.S as S
-
-# Import the Spin XML(..) function.
-import org.camunda.spin.Spin.XML as XML
-
-# Import the Spin JSON(..) function.
-import org.camunda.spin.Spin.JSON as JSON

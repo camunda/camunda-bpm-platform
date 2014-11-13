@@ -1,4 +1,4 @@
-node = JSON(input)
+node = S(input, "application/json")
 
 oldSize = node.elements().size()
 oldValue = node.elements().get(oldSize - 1).stringValue()

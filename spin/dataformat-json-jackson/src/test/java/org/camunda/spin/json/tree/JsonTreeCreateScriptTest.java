@@ -41,9 +41,6 @@ public abstract class JsonTreeCreateScriptTest extends ScriptTest {
     JacksonJsonNode json3 = script.getVariable("json3");
     assertThat(json3).isNotNull();
 
-    JacksonJsonNode json4 = script.getVariable("json4");
-    assertThat(json4).isNotNull();
-
   }
 
   @Test
@@ -51,8 +48,7 @@ public abstract class JsonTreeCreateScriptTest extends ScriptTest {
     variables = {
       @ScriptVariable(name="input1", file = EXAMPLE_JSON_FILE_NAME),
       @ScriptVariable(name="input2", file = EXAMPLE_JSON_FILE_NAME),
-      @ScriptVariable(name="input3", file = EXAMPLE_JSON_FILE_NAME),
-      @ScriptVariable(name="input4", file = EXAMPLE_JSON_FILE_NAME)
+      @ScriptVariable(name="input3", file = EXAMPLE_JSON_FILE_NAME)
     }
   )
   public void shouldCreateForReader() {
@@ -65,9 +61,6 @@ public abstract class JsonTreeCreateScriptTest extends ScriptTest {
 
     JacksonJsonNode json3 = script.getVariable("json3");
     assertThat(json3).isNotNull();
-
-    JacksonJsonNode json4 = script.getVariable("json4");
-    assertThat(json4).isNotNull();
   }
 
   @Test

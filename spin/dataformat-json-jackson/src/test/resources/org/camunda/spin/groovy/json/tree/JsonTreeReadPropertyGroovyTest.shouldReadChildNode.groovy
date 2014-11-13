@@ -1,6 +1,6 @@
 package org.camunda.spin.groovy.json.tree
 
-node = JSON(input)
+node = S(input, "application/json")
 childNode = node.prop("orderDetails")
 
 property = childNode.prop("article")

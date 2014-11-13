@@ -1,1 +1,1 @@
-xml = XML(None).toString()
+xml = S(None, "application/xml").toString()

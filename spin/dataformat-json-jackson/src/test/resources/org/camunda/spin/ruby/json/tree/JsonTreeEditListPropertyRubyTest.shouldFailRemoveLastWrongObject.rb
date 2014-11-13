@@ -1,6 +1,6 @@
 require 'date'
 
-node = JSON($input)
+node = S($input, "application/json")
 customers = node.prop("customers")
 
 customers.removeLast(Date.today)

@@ -1,4 +1,4 @@
-node = JSON(input);
+node = S(input, "application/json");
 list = new ArrayList();
 list.push("test");
 list.push("test2");

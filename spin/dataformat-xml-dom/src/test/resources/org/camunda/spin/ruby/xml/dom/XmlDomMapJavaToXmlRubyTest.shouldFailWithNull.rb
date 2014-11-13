@@ -1,1 +1,1 @@
-$xml = XML(nil).toString()
+$xml = S(nil, "application/xml").toString()

@@ -9,4 +9,4 @@ order["customers"] = customers
 orderDetails = {"article": "camundaBPM", "price": 32000.45, "roundedPrice": 32000, "currencies": ["euro", "dollar"], "paid": False}
 order["orderDetails"] = orderDetails
 
-json = JSON(order).toString()
+json = S(order, "application/json").toString()

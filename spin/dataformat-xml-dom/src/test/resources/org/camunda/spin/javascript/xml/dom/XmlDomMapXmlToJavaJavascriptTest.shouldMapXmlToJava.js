@@ -1,1 +1,1 @@
-order = XML(input).mapTo("org.camunda.spin.xml.mapping.Order");
+order = S(input, "application/xml").mapTo("org.camunda.spin.xml.mapping.Order");

@@ -1,4 +1,4 @@
-node = JSON(input);
+node = S(input, "application/json");
 var list = [];
 list.push("test");
 list.push("test2");

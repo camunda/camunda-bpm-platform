@@ -1,4 +1,4 @@
-node = JSON(input)
+node = S(input, "application/json")
 node.prop("comment", False)
 
 propertyNode = node.prop("comment")

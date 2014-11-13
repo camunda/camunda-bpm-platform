@@ -41,9 +41,6 @@ public abstract class XmlDomCreateScriptTest extends ScriptTest {
     SpinXmlElement xml3 = script.getVariable("xml3");
     assertThat(xml3).isNotNull();
 
-    SpinXmlElement xml4 = script.getVariable("xml4");
-    assertThat(xml4).isNotNull();
-
   }
 
   @Test
@@ -51,8 +48,7 @@ public abstract class XmlDomCreateScriptTest extends ScriptTest {
     variables = {
       @ScriptVariable(name="input1", file = EXAMPLE_XML_FILE_NAME),
       @ScriptVariable(name="input2", file = EXAMPLE_XML_FILE_NAME),
-      @ScriptVariable(name="input3", file = EXAMPLE_XML_FILE_NAME),
-      @ScriptVariable(name="input4", file = EXAMPLE_XML_FILE_NAME)
+      @ScriptVariable(name="input3", file = EXAMPLE_XML_FILE_NAME)
     }
   )
   public void shouldCreateForReader() {
@@ -65,9 +61,6 @@ public abstract class XmlDomCreateScriptTest extends ScriptTest {
 
     SpinXmlElement xml3 = script.getVariable("xml3");
     assertThat(xml3).isNotNull();
-
-    SpinXmlElement xml4 = script.getVariable("xml4");
-    assertThat(xml4).isNotNull();
 
   }
 

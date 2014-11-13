@@ -1,1 +1,1 @@
-xml = XML(null).toString();
+xml = S(null, "application/xml").toString();

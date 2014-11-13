@@ -1,4 +1,4 @@
-node = JSON($input)
+node = S($input, "application/json")
 list = node.fieldNames()
 
 $value1 = list.get(0)

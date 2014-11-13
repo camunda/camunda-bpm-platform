@@ -1,4 +1,4 @@
-$wrappedJson = JSON($input)
+$wrappedJson = S($input, "application/json")
 
-$json = JSON($wrappedJson)
+$json = S($wrappedJson)
 

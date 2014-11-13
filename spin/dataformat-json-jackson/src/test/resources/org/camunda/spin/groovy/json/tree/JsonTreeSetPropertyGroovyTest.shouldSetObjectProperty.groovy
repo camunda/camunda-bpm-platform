@@ -1,4 +1,4 @@
-node = JSON(input);
+node = S(input, "application/json");
 def object = [
     name: "test",
     comment: "42!",

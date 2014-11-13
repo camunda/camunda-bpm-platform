@@ -1,5 +1,5 @@
 require 'date'
-node = JSON($input)
+node = S($input, "application/json")
 object = {
     "date" => Date.today
 }

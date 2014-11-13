@@ -1,3 +1,3 @@
 package org.camunda.spin.groovy.xml.dom
 
-xml = XML(input).toString();
+xml = S(input, "application/xml").toString();

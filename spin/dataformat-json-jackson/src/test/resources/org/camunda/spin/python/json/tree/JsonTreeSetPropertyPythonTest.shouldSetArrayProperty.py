@@ -1,4 +1,4 @@
-node = JSON(input)
+node = S(input, "application/json")
 list = [
     "test",
     "test2"

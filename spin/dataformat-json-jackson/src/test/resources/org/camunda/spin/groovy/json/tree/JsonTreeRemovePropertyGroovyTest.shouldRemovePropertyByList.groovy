@@ -1,6 +1,6 @@
 package org.camunda.spin.groovy.json.tree
 
-node = JSON(input)
+node = S(input, "application/json")
 def list = ["order", "active"]
 node.deleteProp(list)
 

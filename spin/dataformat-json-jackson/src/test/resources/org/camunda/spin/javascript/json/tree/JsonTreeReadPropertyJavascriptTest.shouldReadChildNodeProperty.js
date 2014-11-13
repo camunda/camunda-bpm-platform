@@ -1,4 +1,4 @@
-node = JSON(input);
+node = S(input, "application/json");
 childNode = node.prop("orderDetails");
 childNode2 = childNode.prop("currencies");
 list = childNode2.elements();

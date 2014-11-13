@@ -1,4 +1,4 @@
-node = JSON($input)
+node = S($input, "application/json")
 list = ["order", "active"]
 node.deleteProp(list)
 

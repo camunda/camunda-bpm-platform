@@ -1,6 +1,6 @@
 package org.camunda.spin.groovy.json.tree
 
-node = JSON(input)
+node = S(input, "application/json")
 list = node.fieldNames()
 
 value1 = list.get(0)

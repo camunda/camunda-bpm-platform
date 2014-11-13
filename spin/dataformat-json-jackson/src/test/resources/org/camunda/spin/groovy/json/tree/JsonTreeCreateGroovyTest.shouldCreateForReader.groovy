@@ -1,7 +1,5 @@
-json1 = JSON(input1)
+json1 = S(input1, org.camunda.spin.DataFormats.json())
 
-json2 = S(input2, org.camunda.spin.DataFormats.json())
+json2 = S(input2, "application/json")
 
-json3 = S(input3, "application/json")
-
-json4 = S(input4)
+json3 = S(input3)

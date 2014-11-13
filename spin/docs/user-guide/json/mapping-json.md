@@ -10,11 +10,11 @@ Assume we have a class `Customer` defined as follows:
 public class Customer {
 
   private String name;
-  
+
   public String getName() {
     return name;
   }
-  
+
   public void setName(String name) {
     this.name = name;
   }
@@ -52,31 +52,31 @@ import static org.camunda.spin.Spin.JSON;
 
 String json = "[{\"customer\": \"Kermit\"}, {\"customer\": \"Kermit\"}]"
 
-List<Customer> customers = JSON("{\"customer\": \"Kermit\"}").mapTo("java.util.ArrayList<somepackage.Customer>");
+List<Customer> customers = JSON(json).mapTo("java.util.ArrayList<somepackage.Customer>");
 ```
 
 ## Mapping to Polymorphic Types:
 
-Mapping JSON to Java objects is particularly tricky as JSON does not contain type information which is required to deserialize it to Java objects. In the above examples, we have explicitly told Spin to map the JSON object to a `Customer` object using the `mapTo` method. For nested JSON objects, Jackson is able to infer the desired deserialization type by inspecting the declared fields of the supplied class. However, this does not work for polymorphic types. Consider the following example, where the `Customer` has a reference to a `Car`. 
+Mapping JSON to Java objects is particularly tricky as JSON does not contain type information which is required to deserialize it to Java objects. In the above examples, we have explicitly told Spin to map the JSON object to a `Customer` object using the `mapTo` method. For nested JSON objects, Jackson is able to infer the desired deserialization type by inspecting the declared fields of the supplied class. However, this does not work for polymorphic types. Consider the following example, where the `Customer` has a reference to a `Car`.
 
 ```java
 public class Customer {
 
   private String name;
   private Car car;
-  
+
   public String getName() {
     return name;
   }
-  
+
   public void setName(String name) {
     this.name = name;
   }
-  
+
   public Car getCar() {
     return car;
   }
-  
+
   public void setCar(Car car) {
     this.car = car;
   }

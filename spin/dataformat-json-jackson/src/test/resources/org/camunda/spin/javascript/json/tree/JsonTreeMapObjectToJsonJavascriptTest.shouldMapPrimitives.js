@@ -1,7 +1,7 @@
-stringVar = JSON('"a String"')
+stringVar = S('"a String"', "application/json")
 
-booleanVar = JSON(false)
+booleanVar = S(false, "application/json")
 
-integerVar = JSON(42)
+integerVar = S(42, "application/json")
 
-listVar = JSON(["Waldo", "Hugo", "Kermit"])
+listVar = S(["Waldo", "Hugo", "Kermit"], "application/json")

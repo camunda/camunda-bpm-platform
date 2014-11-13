@@ -1,5 +1,5 @@
-var wrappedXml = XML(input);
+var wrappedXml = S(input, "application/xml");
 
-xml = XML(wrappedXml);
+xml = S(wrappedXml, "application/xml");
 
 

@@ -1,1 +1,1 @@
-$xml = XML($input).toString()
+$xml = S($input, "application/xml").toString()

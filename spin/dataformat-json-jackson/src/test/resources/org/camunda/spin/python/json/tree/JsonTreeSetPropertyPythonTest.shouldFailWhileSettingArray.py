@@ -1,7 +1,7 @@
 class TestObject:
     pass
 
-node = JSON(input)
+node = S(input, "application/json")
 list = [TestObject()]
 
 node.prop("comment", list)

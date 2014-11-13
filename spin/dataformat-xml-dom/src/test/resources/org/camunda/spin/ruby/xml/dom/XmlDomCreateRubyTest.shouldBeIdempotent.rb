@@ -1,4 +1,4 @@
-$wrappedXml = XML($input)
+$wrappedXml = S($input, "application/xml")
 
-$xml = XML($wrappedXml)
+$xml = S($wrappedXml, "application/xml")
 

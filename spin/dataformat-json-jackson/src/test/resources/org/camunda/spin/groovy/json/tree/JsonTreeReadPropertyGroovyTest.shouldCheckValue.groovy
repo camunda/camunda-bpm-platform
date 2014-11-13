@@ -1,6 +1,6 @@
 package org.camunda.spin.groovy.json.tree
 
-node = JSON(input)
+node = S(input, "application/json")
 
 property1 = node.prop("order")
 property2 = node.prop("dueUntil")

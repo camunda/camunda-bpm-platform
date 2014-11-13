@@ -1,2 +1,2 @@
-node = JSON(input)
+node = S(input, "application/json")
 node.removeAt(1)

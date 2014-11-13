@@ -19,13 +19,3 @@
  * Bind the Spin S function to the variable S.
  */
 var S = org.camunda.spin.Spin.S;
-
-/**
- * Bind the Spin XML function to the variable XML.
- */
-var XML = org.camunda.spin.Spin.XML;
-
-/**
- * Bind the Spin JSON  function to the variable JSON.
- */
-var JSON = org.camunda.spin.Spin.JSON;

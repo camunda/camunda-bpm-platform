@@ -1,5 +1,5 @@
 package org.camunda.spin.groovy.json.tree
 
-jsonNode = JSON(input);
+jsonNode = S(input, "application/json");
 
 booleanValue = jsonNode.jsonPath('$.active').boolValue();

@@ -1,1 +1,1 @@
-$order = XML($input).mapTo("rubbish")
+$order = S($input, "application/xml").mapTo("rubbish")

@@ -19,13 +19,3 @@
  * Bind the Spin S(...) function to the variable S.
  */
 S = org.camunda.spin.Spin.&S
-
-/**
- * Bind the Spin XML(..) function to the variable XML.
- */
-XML = org.camunda.spin.Spin.&XML
-
-/**
- * Bind the Spin JSON(..) function to the variable JSON.
- */
-JSON = org.camunda.spin.Spin.&JSON

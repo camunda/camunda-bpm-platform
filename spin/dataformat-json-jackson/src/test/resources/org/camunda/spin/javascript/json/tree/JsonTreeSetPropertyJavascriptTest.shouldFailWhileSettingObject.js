@@ -1,4 +1,4 @@
-var node = JSON(input);
+var node = S(input, "application/json");
 
 var object = {
     date: date

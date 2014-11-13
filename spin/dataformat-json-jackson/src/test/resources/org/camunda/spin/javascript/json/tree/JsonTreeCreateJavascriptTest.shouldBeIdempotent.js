@@ -1,5 +1,5 @@
-var wrappedJson = JSON(input);
+var wrappedJson = S(input, "application/json");
 
-json = JSON(wrappedJson);
+json = S(wrappedJson);
 
 

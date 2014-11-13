@@ -1,7 +1,5 @@
-xml1 = XML(input1)
+xml1 = S(input1, org.camunda.spin.DataFormats.xml())
 
-xml2 = S(input2, org.camunda.spin.DataFormats.xml())
+xml2 = S(input2, "application/xml")
 
-xml3 = S(input3, "application/xml")
-
-xml4 = S(input4)
+xml3 = S(input3)

@@ -1,4 +1,4 @@
-node = JSON(input);
+node = S(input, "application/json");
 var object = {};
 object.name = "test";
 object.comment = "42!";

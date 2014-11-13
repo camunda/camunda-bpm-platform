@@ -1,4 +1,4 @@
-node = JSON($input)
+node = S($input, "application/json")
 
 $oldValue = node.prop("order")
 
