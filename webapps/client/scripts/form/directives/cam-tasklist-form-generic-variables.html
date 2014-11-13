@@ -84,8 +84,7 @@
 
 
         <div class="col-xs-4"
-             ng-switch="variable.type"
-             ng-class="{'has-error': repeatForm.value.$error.required || repeatForm.value.$error.camVariableType }">
+             ng-switch="variable.type">
           <input ng-switch-when=""
                  readonly
                  type="text"
@@ -112,10 +111,17 @@
                  cam-variable-type="{{ variable.type }}"
                  placeholder="{{ 'VARIABLE_VALUE' | translate }}" />
 
-          <span ng-if="repeatForm.value.$error.camVariableType"
-                class="help-block">
-            Only a {{ variable.type }} value is allowed
+          <span ng-if="repeatForm.value.$invalid && repeatForm.value.$dirty" class="has-error">
+            <span ng-if="repeatForm.value.$error.required"
+                  class="help-block">
+              {{ 'REQUIRED_FIELD' | translate }}
+            </span>
+            <span ng-if="repeatForm.value.$error.camVariableType"
+                  class="help-block">
+              Only a {{ variable.type }} value is allowed
+            </span>
           </span>
+
         </div>
       </div>
     </div>
