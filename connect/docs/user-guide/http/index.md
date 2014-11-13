@@ -6,25 +6,41 @@ it can be used to connect to a REST service.
 
 ## Adding the maven dependency
 
-To use the camunda connect HTTP connector in your project import the `camunda-connect-bom`
-dependency with the current `VERSION`. Also add a dependency either for the
-`camunda-connect-http-client` or the `camunda-connect-all` artifact. The later includes every
-artifact of the camunda connect project. If you also use other components of the camunda BPM
-platform please use the `camunda-bom` instead which already imports the `camunda-connect-bom`.
+To use the camunda connect HTTP connector in your project import the
+`camunda-connect-bom` dependency with the current `VERSION`. Also add a
+dependency either for the `camunda-conenct-core` and the
+`camunda-connect-http-client` or the `camunda-connect-connectors-all` artifact.
+The later includes every artifact of the camunda connect project. If you also
+use other components of the camunda BPM platform please use the `camunda-bom`
+instead which already imports the `camunda-connect-bom`.
+
 
 ```xml
-<dependency>
-  <groupId>org.camunda.connect</groupId>
-  <artifactId>camunda-connect-bom</artifactId>
-  <scope>import</scope>
-  <type>pom</type>
-  <version>VERSION</version>
-</dependency>
+<dependencyManagement>
+  <dependencies>
+    <dependency>
+      <groupId>org.camunda.connect</groupId>
+      <artifactId>camunda-connect-bom</artifactId>
+      <scope>import</scope>
+      <type>pom</type>
+      <version>${version.connect}</version>
+    </dependency>
+  </dependencies>
+</dependencyManagement>
+```
 
-<dependency>
-  <groupId>org.camunda.connect</groupId>
-  <artifactId>camunda-connect-http-client</artifactId>
-</dependency>
+```xml
+<dependencies>
+  <dependency>
+    <groupId>org.camunda.connect</groupId>
+    <artifactId>camunda-connect-core</artifactId>
+  </dependency>
+
+  <dependency>
+    <groupId>org.camunda.connect</groupId>
+    <artifactId>camunda-connect-http-client</artifactId>
+  </dependency>
+</dependencies>
 ```
 
 
