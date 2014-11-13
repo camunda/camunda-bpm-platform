@@ -29,7 +29,6 @@ define([
           'Long':     'text',
           'Short':    'text',
           'Double':   'text',
-          'Float':    'text',
           'String':   'text',
           'Date':     'text'
         };
