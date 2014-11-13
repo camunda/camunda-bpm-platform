@@ -96,15 +96,19 @@ public class Connectors {
   /**
    * Register a new connector.
    */
-  public static void registerConnector(Connector connector) {
+  protected static void registerConnector(Connector<?> connector) {
     registerConnector(connector.getId(), connector);
   }
 
   /**
    * Register a new connector under the given connector id.
    */
-  public static void registerConnector(String connectorId, Connector connector) {
+  protected static void registerConnector(String connectorId, Connector<?> connector) {
     INSTANCE.registerConnectorInstance(connectorId, connector);
+  }
+
+  protected static void unregisterConnector(String connectorId) {
+    INSTANCE.unregisterConnectorInstance(connectorId);
   }
 
 
@@ -180,9 +184,18 @@ public class Connectors {
     }
   }
 
-  protected void registerConnectorInstance(String connectorId, Connector connector) {
+  protected void registerConnectorInstance(String connectorId, Connector<?> connector) {
     ensureConnectorProvidersInitialized();
-    availableConnectors.put(connectorId, connector);
+    synchronized (Connectors.class) {
+      availableConnectors.put(connectorId, connector);
+    }
+  }
+
+  protected void unregisterConnectorInstance(String connectorId) {
+    ensureConnectorProvidersInitialized();
+    synchronized (Connectors.class) {
+      availableConnectors.remove(connectorId);
+    }
   }
 
   @SuppressWarnings("rawtypes")
