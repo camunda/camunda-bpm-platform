@@ -19,16 +19,18 @@
       <span>{{ 'FILTER_FORM_PERMISSIONS_EDIT_HINT' | translate }}</span>
     </div>
 
-    <div class="checkbox" ng-show="!filter.id || (filter.id && accesses.update)">
+    <div class="global-access checkbox" ng-show="!filter.id || (filter.id && accesses.update)">
       <label>
         <input type="checkbox"
+               class="form-control"
                ng-model="isGlobalReadAuthorization"
                ng-change="globalReadAuthorizationChanged()"
-               ng-disabled="filter.id && !accesses.update"> Global
+               ng-disabled="filter.id && !accesses.update" />
+         {{ 'FILTER_FORM_PERMISSIONS_GLOBAL' | translate }}
       </label>
     </div>
 
-    <div class="user-read-permissions" ng-show="!filter.id || (filter.id && accesses.update)">
+    <div class="user-read-permissions" ng-show="(!filter.id || (filter.id && accesses.update)) && !isGlobalReadAuthorization">
       <div class="form-group">
 
         <div class="col-xs-2 align-right">
@@ -45,18 +47,17 @@
 
           <div class="input-group">
 
-            <div class="input-group-btn">
-
+            <span class="input-group-btn">
               <button class="btn btn-default"
+                      type="button"
                       tooltip-append-to-body="false"
                       tooltip="{{ 'FILTER_FORM_PERMISSIONS_IDENTITY_TYPE_TOOLTIP' | translate }}: {{ (newPermission.type === 'user' ? 'FILTER_FORM_PERMISSIONS_IDENTITY_TYPE_USER' : 'FILTER_FORM_PERMISSIONS_IDENTITY_TYPE_GROUP') | translate }}"
                       ng-click="switchType()"
                       ng-disabled="isGlobalReadAuthorization">
-                  <i ng-show="newPermission.type === 'user'" class="glyphicon glyphicon-user"></i>
-                  <i ng-show="newPermission.type === 'group'" class="glyphicon glyphicon-th"></i>
-
+                  <span class="glyphicon"
+                        ng-class="newPermission.type === 'user' ? 'glyphicon-user' : 'glyphicon-th'"></span>
               </button>
-            </div>
+            </span>
 
             <input type="text"
                    name="newPermission"
@@ -88,27 +89,21 @@
 
       <div class="form-group" ng-repeat="auth in getReadAuthorizations(authorizations)">
         <div class="col-xs-2 row-action" ng-show="!filter.id || (filter.id && accesses.update)">
-          <button class="btn btn-link"
-                  ng-click="removeReadPermission(auth)"
-                  type="button"
-                  ng-disabled="isGlobalReadAuthorization">
+          <a ng-if="!isGlobalReadAuthorization"
+             ng-click="removeReadPermission(auth)">
             <span class="hidden-sm hidden-xs">{{ 'FILTER_FORM_PERMISSIONS_REMOVE' | translate }}</span>
             <span class="glyphicon glyphicon-minus-sign"></span>
-          </button>
+          </a>
         </div>
 
-        <div ng-class="{ 'col-xs-10': !filter.id || (filter.id && accesses.update) , 'col-xs-12': !(!filter.id || (filter.id && accesses.update)) }">
-
-          <span ng-show="auth.userId">
-            <i class="glyphicon glyphicon-user"></i>
-            {{ auth.userId }}
+        <div class="form-control-static"
+             ng-class="{ 'col-xs-10': !filter.id || (filter.id && accesses.update) , 'col-xs-12': !(!filter.id || (filter.id && accesses.update)) }">
+          <span class="fake-button">
+            <span class="glyphicon"
+                  ng-class="!!auth.userId ? 'glyphicon-user' : 'glyphicon-th'"></span>
           </span>
 
-          <span ng-show="auth.groupId">
-            <i class="glyphicon glyphicon-th"></i>
-            {{ auth.groupId }}
-          </span>
-
+          {{ (auth.userId || auth.groupId) }}
         </div>
       </div>
     </div>
