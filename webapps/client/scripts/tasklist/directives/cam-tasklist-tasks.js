@@ -8,13 +8,7 @@ define([
   template
 ) {
   'use strict';
-
-  function indexOfId(items, id) {
-    for (var i in items) {
-      if (items[i].id === id) { return i; }
-    }
-    return -1;
-  }
+  var $ = angular.element;
 
   return [function(){
 
@@ -67,9 +61,12 @@ define([
           if(forceFocus) {
             $scope.focus(null, $scope.tasks[forceFocus === 'first' ? 0 : $scope.pageSize - 1]);
             $timeout(function(){
-              angular.element($element[0].querySelector("div[ng-keydown]")).trigger('focus');
-              angular.element($element[0].querySelector("div[ng-keydown] li.active"))[0].scrollIntoView(false);
-            },0);
+              $element
+                .find('div[ng-keydown]')
+                .trigger('focus')
+                  .find('li.active')[0]
+                  .scrollIntoView(false);
+            }, 0);
             forceFocus = false;
           }
         });
@@ -123,7 +120,7 @@ define([
           }
           if($scope.pageNum < Math.ceil($scope.totalItems / $scope.pageSize)) {
             $scope.pageNum++;
-            forceFocus = "first";
+            forceFocus = 'first';
             $scope.pageChange();
           }
         };
@@ -136,7 +133,7 @@ define([
           }
           if($scope.pageNum > 1) {
             $scope.pageNum--;
-            forceFocus = "last";
+            forceFocus = 'last';
             $scope.pageChange();
           }
         };
@@ -151,7 +148,7 @@ define([
           }
           // wait for angular to update the classes and scroll to the newly selected task
           $timeout(function(){
-            angular.element($event.target.querySelector("li.active"))[0].scrollIntoView(false);
+            $($event.target).find('li.active')[0].scrollIntoView(false);
           });
         };
 
