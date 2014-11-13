@@ -13,7 +13,7 @@ describe('tasklist filter -', function() {
       dashboardPage.authentication.userLogin('jonny1', 'jonny1');
 
       // then
-      dashboardPage.isActive();
+      expect(dashboardPage.pageHeaderName()).toBe('camunda Tasklist');
     });
 
   });
@@ -28,7 +28,7 @@ describe('tasklist filter -', function() {
 
       // then
       expect(dashboardPage.taskFilters.createFilterPage.formHeader()).toBe('Create a filter');
-      expect(dashboardPage.taskFilters.createFilterPage.saveButton().isEnabled()).toBe(true);
+      expect(dashboardPage.taskFilters.createFilterPage.saveButton().isEnabled()).toBe(false);
       expect(dashboardPage.taskFilters.createFilterPage.closeButton().isPresent()).toBe(true);
     });
 
@@ -61,7 +61,7 @@ describe('tasklist filter -', function() {
     it('should edit first filter', function() {
 
       // when
-      dashboardPage.taskFilters.selectFilter(0);  // to check whether filter is selected after edit
+      dashboardPage.taskFilters.selectFilter(0);  // check filter is selected after edit
       dashboardPage.taskFilters.editFilter(0);
 
       // then
@@ -168,7 +168,7 @@ describe('tasklist filter -', function() {
     it('should validate priority ranking', function() {
 
       // then
-      expect(dashboardPage.taskFilters.filterName(1)).toBe('123 FILTER NAME');
+      expect(dashboardPage.taskFilters.filterName(1)).toBe('123 Filter Name');
     });
 
 

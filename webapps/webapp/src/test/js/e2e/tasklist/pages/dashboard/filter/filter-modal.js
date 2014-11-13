@@ -5,7 +5,7 @@ var Base = require('./../../base');
 module.exports = Base.extend({
 
   formElement: function() {
-    return element(by.css('form[name="newFilter"]'));
+    return element(by.css('.modal-content'));
   },
 
   formHeader: function() {
@@ -15,8 +15,8 @@ module.exports = Base.extend({
   selectPanel: function(panelItem) {
     var index = [
       'General',
-      'Authorizations',
       'Criteria',
+      'Permission',
       'Variables'
     ];
     var item;
@@ -71,7 +71,7 @@ module.exports = Base.extend({
   // authorizations
 
   authorizationnList: function() {
-    return this.formElement().all(by.repeater('(delta, authorization) in _authorizations'));
+    return this.formElement().all(by.repeater('(delta, authorization) in authorizations'));
   },
 
   // criteria
@@ -85,7 +85,7 @@ module.exports = Base.extend({
   },
 
   criterionList: function() {
-    return this.formElement().all(by.repeater('(delta, queryParam) in _query'));
+    return this.formElement().all(by.repeater('(delta, queryParam) in query'));
   },
 
   criterionKeyInput: function(item, inputValue) {
@@ -130,7 +130,7 @@ module.exports = Base.extend({
   },
 
   variableList: function() {
-    return this.formElement().all(by.repeater('(delta, variable) in _variables'));
+    return this.formElement().all(by.repeater('(delta, variable) in variables'));
   },
 
   variableNameInput: function(item, inputValue) {

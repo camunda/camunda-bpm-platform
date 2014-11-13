@@ -67,7 +67,7 @@ module.exports = Page.extend({
   },
 
   createFilterButton: function() {
-    return element(by.css('[ng-click="openDialog($event, \'CREATE_NEW_FILTER\')"]'));
+    return element(by.css('[ng-click="openModal($event)"]'));
   },
 
   editFilter: function(item) {
@@ -78,7 +78,7 @@ module.exports = Page.extend({
 
     browser.sleep(1000);
 
-    var editFilterElement = this.filterList().get(item).element(by.css('[ng-click="openDialog($event, \'EDIT_FILTER\')"]'));
+    var editFilterElement = this.filterList().get(item).element(by.css('[ng-click="openModal($event, filter)"]'));
     editFilterElement.click();
     return editFilterElement;
   }
