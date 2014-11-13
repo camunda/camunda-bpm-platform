@@ -38,8 +38,8 @@
       <list>
         <!--<ref bean="ldapIdentityProviderPlugin" />-->
         <!--<ref bean="administratorAuthorizationPlugin" />-->
-        <bean id="spinPlugin" class="org.camunda.spin.plugin.SpinProcessEnginePlugin" />
-        <bean id="connectPlugin" class="org.camunda.connect.plugin.ConnectProcessEnginePlugin" />
+        <bean id="spinPlugin" class="org.camunda.spin.plugin.impl.SpinProcessEnginePlugin" />
+        <bean id="connectPlugin" class="org.camunda.connect.plugin.impl.ConnectProcessEnginePlugin" />
       </list>
     </property>
   </bean>
