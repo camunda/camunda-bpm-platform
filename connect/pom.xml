@@ -85,4 +85,11 @@
     </pluginManagement>
   </build>
 
+  <scm>
+    <url>https://github.com/camunda/camunda-connect</url>
+    <connection>scm:git:git@github.com:camunda/camunda-connect.git</connection>
+    <developerConnection>scm:git:git@github.com:camunda/camunda-connect.git</developerConnection>
+    <tag>HEAD</tag>
+  </scm>
+
 </project>
