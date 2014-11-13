@@ -151,8 +151,7 @@ define(function() {
         {
           name: 'candidateGroup',
           label: 'Candidate Group',
-          expressionSupport: true,
-          help: groupExpLangHelp
+          expressionSupport: true
         },
         {
           name: 'candidateGroups',
