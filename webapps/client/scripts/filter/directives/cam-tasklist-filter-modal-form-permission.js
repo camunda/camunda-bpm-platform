@@ -339,6 +339,10 @@ define([
                   authorization.$permissions = copy(resp.permissions || []);
                 }
                 else {
+                  if (type === 'delete') {
+                    authorization.id = null;
+                  }
+                  
                   authorization.permissions = copy(authorization.permissions || []);
                   authorization.$permissions = copy(authorization.permissions || []);
                 }
