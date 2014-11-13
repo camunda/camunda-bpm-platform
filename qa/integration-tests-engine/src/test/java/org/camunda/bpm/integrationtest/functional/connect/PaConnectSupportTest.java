@@ -39,7 +39,8 @@ public class PaConnectSupportTest extends AbstractFoxPlatformIntegrationTest {
       .addAsResource("org/camunda/bpm/integrationtest/functional/connect/PaConnectSupportTest.connectorServiceTask.bpmn20.xml")
       .addClass(TestConnector.class)
       .addClass(TestConnectorRequest.class)
-      .addClass(TestConnectorResponse.class);
+      .addClass(TestConnectorResponse.class)
+      .addClass(TestConnectors.class);
   }
 
   @Test
@@ -54,13 +55,16 @@ public class PaConnectSupportTest extends AbstractFoxPlatformIntegrationTest {
 
   @Test
   public void connectorServiceTask() {
-    Connectors.registerConnector(new TestConnector());
+    TestConnector connector = new TestConnector();
+    TestConnectors.registerConnector(connector);
 
     runtimeService.startProcessInstanceByKey("testProcess");
     Task task = taskService.createTaskQuery().singleResult();
     assertNotNull(task);
     String payload = (String) taskService.getVariable(task.getId(), "payload");
     assertEquals("Hello world!", payload);
+
+    TestConnectors.unregisterConnector(connector.getId());
   }
 
 }
