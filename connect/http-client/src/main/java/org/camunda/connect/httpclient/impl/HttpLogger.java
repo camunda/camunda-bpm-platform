@@ -11,18 +11,13 @@
  * limitations under the License.
  */
 
-package org.camunda.connect.httpclient.soap;
+package org.camunda.connect.httpclient.impl;
 
-import org.camunda.connect.ConnectorRequestException;
+import org.camunda.commons.logging.BaseLogger;
 
-public class SoapHttpConnectorLogger extends SoapHttpLogger {
+public abstract class HttpLogger extends BaseLogger {
 
-  public ConnectorRequestException invalidRequestMethod(String method) {
-    return new ConnectorRequestException(exceptionMessage("001", "Invalid request method '{}'", method));
-  }
+  public static final String PROJECT_CODE = "HTCL";
 
-  public ConnectorRequestException noPayloadSet() {
-    return new ConnectorRequestException(exceptionMessage("002", "No payload set on request"));
-  }
-
+  public static HttpConnectorLogger HTTP_LOGGER = createLogger(HttpConnectorLogger.class, PROJECT_CODE, "org.camunda.bpm.connect.httpclient.connector", "02");
 }

@@ -32,8 +32,6 @@ import org.apache.http.entity.InputStreamEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.camunda.connect.httpclient.HttpBaseRequest;
-import org.camunda.connect.httpclient.HttpConnectorLogger;
-import org.camunda.connect.httpclient.HttpLogger;
 import org.camunda.connect.httpclient.HttpResponse;
 import org.camunda.connect.impl.AbstractConnector;
 

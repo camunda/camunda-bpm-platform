@@ -17,8 +17,6 @@ import org.apache.http.client.methods.HttpRequestBase;
 import org.camunda.connect.httpclient.impl.AbstractHttpConnector;
 import org.camunda.connect.httpclient.impl.AbstractHttpRequest;
 import org.camunda.connect.httpclient.soap.SoapHttpConnector;
-import org.camunda.connect.httpclient.soap.SoapHttpConnectorLogger;
-import org.camunda.connect.httpclient.soap.SoapHttpLogger;
 import org.camunda.connect.httpclient.soap.SoapHttpRequest;
 import org.camunda.connect.httpclient.soap.SoapHttpResponse;
 

@@ -19,6 +19,8 @@ import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.Set;
 
+import org.camunda.connect.impl.ConnectCoreLogger;
+import org.camunda.connect.impl.ConnectLogger;
 import org.camunda.connect.spi.Connector;
 import org.camunda.connect.spi.ConnectorConfigurator;
 import org.camunda.connect.spi.ConnectorProvider;

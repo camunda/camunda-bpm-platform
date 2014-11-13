@@ -25,8 +25,6 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpTrace;
 import org.camunda.connect.httpclient.HttpBaseRequest;
-import org.camunda.connect.httpclient.HttpConnectorLogger;
-import org.camunda.connect.httpclient.HttpLogger;
 import org.camunda.connect.httpclient.HttpResponse;
 import org.camunda.connect.impl.AbstractConnectorRequest;
 import org.camunda.connect.spi.Connector;

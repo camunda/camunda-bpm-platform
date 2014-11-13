@@ -10,8 +10,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.connect;
+package org.camunda.connect.impl;
 
+import org.camunda.connect.ConnectorException;
 import org.camunda.connect.spi.CloseableConnectorResponse;
 import org.camunda.connect.spi.Connector;
 import org.camunda.connect.spi.ConnectorConfigurator;

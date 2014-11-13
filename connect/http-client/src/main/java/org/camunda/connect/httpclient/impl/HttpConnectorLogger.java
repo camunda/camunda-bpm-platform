@@ -11,11 +11,11 @@
  * limitations under the License.
  */
 
-package org.camunda.connect.httpclient;
+package org.camunda.connect.httpclient.impl;
 
-import org.camunda.connect.ConnectLogger;
 import org.camunda.connect.ConnectorRequestException;
 import org.camunda.connect.ConnectorResponseException;
+import org.camunda.connect.impl.ConnectLogger;
 
 public class HttpConnectorLogger extends ConnectLogger {
 

@@ -20,8 +20,6 @@ import java.util.Map;
 
 import org.apache.http.Header;
 import org.apache.http.client.methods.CloseableHttpResponse;
-import org.camunda.connect.httpclient.HttpConnectorLogger;
-import org.camunda.connect.httpclient.HttpLogger;
 import org.camunda.connect.httpclient.HttpResponse;
 import org.camunda.connect.impl.AbstractCloseableConnectorResponse;
 import org.camunda.commons.utils.IoUtil;

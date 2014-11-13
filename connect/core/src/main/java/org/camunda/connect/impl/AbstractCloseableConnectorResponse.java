@@ -15,8 +15,6 @@ package org.camunda.connect.impl;
 import java.io.Closeable;
 import java.io.IOException;
 
-import org.camunda.connect.ConnectCoreLogger;
-import org.camunda.connect.ConnectLogger;
 import org.camunda.connect.spi.CloseableConnectorResponse;
 
 /**

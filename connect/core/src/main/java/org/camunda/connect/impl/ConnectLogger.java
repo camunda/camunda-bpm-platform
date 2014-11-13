@@ -2,7 +2,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -10,15 +10,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package org.camunda.connect.httpclient.soap;
+package org.camunda.connect.impl;
 
 import org.camunda.commons.logging.BaseLogger;
 
-public abstract class SoapHttpLogger extends BaseLogger {
+public abstract class ConnectLogger extends BaseLogger {
 
-  public static final String PROJECT_CODE = "SOAPC";
+  public static final String PROJECT_CODE = "CNCT";
 
-  public static SoapHttpConnectorLogger SOAP_CONNECTOR_LOGGER = createLogger(SoapHttpConnectorLogger.class, PROJECT_CODE, "org.camunda.bpm.connect.soap.httpclient.connector", "01");
+  public static ConnectCoreLogger CORE_LOGGER = createLogger(ConnectCoreLogger.class, PROJECT_CODE, "org.camunda.bpm.connect", "01");
 
 }
