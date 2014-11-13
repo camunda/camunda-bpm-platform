@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-package org.camunda.connect.plugin;
+package org.camunda.connect.plugin.impl;
 
 import java.util.ArrayList;
 import java.util.List;

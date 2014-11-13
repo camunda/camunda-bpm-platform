@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.spin.plugin;
+package org.camunda.spin.plugin.impl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +31,7 @@ import org.camunda.spin.spi.DataFormat;
  */
 public class SpinProcessEnginePlugin extends AbstractProcessEnginePlugin {
 
+  @Override
   public void preInit(ProcessEngineConfigurationImpl processEngineConfiguration) {
     // use classloader which loaded the plugin
     ClassLoader classloader = ClassLoaderUtil.getClassloader(SpinProcessEnginePlugin.class);

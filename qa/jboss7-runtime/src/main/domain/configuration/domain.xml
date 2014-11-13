@@ -289,10 +289,10 @@
                             <class>org.camunda.bpm.application.impl.event.ProcessApplicationEventListenerPlugin</class>
                           </plugin>
                           <plugin>
-                            <class>org.camunda.spin.plugin.SpinProcessEnginePlugin</class>
+                            <class>org.camunda.spin.plugin.impl.SpinProcessEnginePlugin</class>
                           </plugin>
                           <plugin>
-                              <class>org.camunda.connect.plugin.ConnectProcessEnginePlugin</class>
+                              <class>org.camunda.connect.plugin.impl.ConnectProcessEnginePlugin</class>
                           </plugin>
                         </plugins>
                     </process-engine>

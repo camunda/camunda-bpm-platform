@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.connect.plugin;
+package org.camunda.connect.plugin.impl;
 
 import java.lang.Object;import java.lang.String;import java.util.Map;
 import java.util.Map.Entry;

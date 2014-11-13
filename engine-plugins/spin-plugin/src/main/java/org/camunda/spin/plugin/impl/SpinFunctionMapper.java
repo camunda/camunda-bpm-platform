@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.spin.plugin;
+package org.camunda.spin.plugin.impl;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;

@@ -19,7 +19,7 @@
 
     <property name="processEnginePlugins">
       <list>
-        <bean class="org.camunda.connect.plugin.ConnectProcessEnginePlugin" />
+        <bean class="org.camunda.connect.plugin.impl.ConnectProcessEnginePlugin" />
       </list>
     </property>
 

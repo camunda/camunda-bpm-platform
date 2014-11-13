@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-package org.camunda.connect.plugin;
+package org.camunda.connect.plugin.impl;
 
 import static org.camunda.bpm.engine.impl.util.BpmnParseUtil.findCamundaExtensionElement;
 import static org.camunda.bpm.engine.impl.util.BpmnParseUtil.parseInputOutput;
