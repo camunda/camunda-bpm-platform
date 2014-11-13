@@ -64,7 +64,6 @@ define([
         function errorNotification(src, err) {
           $translate(src).then(function(translated) {
             Notifications.addError({
-              duration: 3000,
               status: translated,
               message: (err ? err.message : ''),
               exclusive: true
