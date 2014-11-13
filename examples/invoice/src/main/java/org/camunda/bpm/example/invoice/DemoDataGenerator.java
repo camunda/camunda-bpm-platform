@@ -213,7 +213,7 @@ public class DemoDataGenerator {
       filterService.saveFilter(myTasksFilter);
 
       filterProperties.clear();
-      filterProperties.put("description", "Tasks candidate to my groups");
+      filterProperties.put("description", "Tasks assigned to my Groups");
       filterProperties.put("priority", -5);
       addVariables(filterProperties);
       query = taskService.createTaskQuery().taskCandidateGroupInExpression("${currentUserGroups()}").taskUnassigned();
