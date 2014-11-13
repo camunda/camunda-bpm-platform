@@ -31,15 +31,21 @@ define([
         '$scope',
         '$location',
         'search',
+        '$timeout',
+        '$element',
       function(
         $scope,
         $location,
-        search
+        search,
+        $timeout,
+        $element
       ) {
 
         function updateSilently(params) {
           search.updateSilently(params);
         }
+
+        var forceFocus = false;
 
         $scope.pageNum = 1;
         $scope.pageSize = null;
@@ -58,6 +64,14 @@ define([
         $scope.state = tasksData.observe('taskList', function (taskList) {
           $scope.totalItems = taskList.count;
           $scope.tasks = taskList._embedded.task;
+          if(forceFocus) {
+            $scope.focus(null, $scope.tasks[forceFocus === 'first' ? 0 : $scope.pageSize - 1]);
+            $timeout(function(){
+              angular.element($element[0].querySelector("div[ng-keydown]")).trigger('focus');
+              angular.element($element[0].querySelector("div[ng-keydown] li.active"))[0].scrollIntoView(false);
+            },0);
+            forceFocus = false;
+          }
         });
 
         /**
@@ -99,6 +113,46 @@ define([
           var searchParams = $location.search() || {};
           searchParams.task = taskId;
           updateSilently(searchParams);
+        };
+
+        var selectNextTask = function() {
+          for(var i = 0; i < $scope.tasks.length - 1; i++) {
+            if($scope.tasks[i].id === $scope.currentTaskId) {
+              return $scope.focus(null, $scope.tasks[i+1]);
+            }
+          }
+          if($scope.pageNum < Math.ceil($scope.totalItems / $scope.pageSize)) {
+            $scope.pageNum++;
+            forceFocus = "first";
+            $scope.pageChange();
+          }
+        };
+
+        var selectPreviousTask = function() {
+          for(var i = 1; i < $scope.tasks.length; i++) {
+            if($scope.tasks[i].id === $scope.currentTaskId) {
+              return $scope.focus(null, $scope.tasks[i-1]);
+            }
+          }
+          if($scope.pageNum > 1) {
+            $scope.pageNum--;
+            forceFocus = "last";
+            $scope.pageChange();
+          }
+        };
+
+        $scope.handleKeydown = function($event) {
+          $event.preventDefault();
+          if($event.keyCode === 40) {
+            selectNextTask($event);
+          }
+          else if($event.keyCode === 38) {
+            selectPreviousTask();
+          }
+          // wait for angular to update the classes and scroll to the newly selected task
+          $timeout(function(){
+            angular.element($event.target.querySelector("li.active"))[0].scrollIntoView(false);
+          });
         };
 
         /**

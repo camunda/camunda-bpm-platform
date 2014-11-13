@@ -24,7 +24,9 @@
     <a ng-click="resetPage()">{{ 'RESET_PAGE' | translate }}</a>
   </div>
 
-  <div ng-show="totalItems">
+  <div ng-show="totalItems"
+       tabindex="0"
+       ng-keydown="handleKeydown($event)">
     <ol class="tasks-list list-unstyled">
       <li class="task"
           ng-repeat="(delta, task) in tasks"
