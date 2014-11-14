@@ -62,7 +62,7 @@
 
           <div class="row"
                ng-click="focus($event, task)">
-            <ul class="col-md-12 col-lg-9 dates list-inline">
+            <ul class="col-sm-12 col-md-6 dates list-inline">
               <li class="creation-date">
                 <span tooltip-placement="top"
                       tooltip="{{ 'CREATION_DATE' | translate }}"
@@ -95,7 +95,7 @@
               </li>
             </ul>
 
-            <ul class="col-md-12 col-lg-3 actors list-inline"
+            <ul class="col-sm-12 col-md-6 actors list-inline"
                 ng-if="!!task.assignee">
               <li class="assignee">
                 <span tooltip-placement="top"
