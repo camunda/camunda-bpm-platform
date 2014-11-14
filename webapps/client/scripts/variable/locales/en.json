@@ -15,6 +15,8 @@
                     "Show less variables",
   "MORE_VARIABLES":
                     "Show more variables",
+  "UNDEFINED_VARIABLE":
+                    "&lt;Undefined&gt;",
   "TOGGLE":
                     "Toggle",
   "SERIALIZED":

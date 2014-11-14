@@ -76,7 +76,7 @@ define([
             scope.variablesByName[variable.name] = variable;
           });
 
-          scope.shownVariablesCount = Object.keys(scope.variablesByName).length;
+          scope.shownVariablesCount = Object.keys(scope.filterProperties.showUndefinedVariable ? scope.variableDefinitions : scope.variablesByName).length;
         }
       }
     };
