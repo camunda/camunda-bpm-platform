@@ -7,7 +7,19 @@
     {{ 'FILTER_VARIABLES_AMOUNT_WARNING' | translate }}
   </div>
 
+
   <div class="row labels-left">
+    <div class="col-xs-12">
+      <div class="undefined-variable checkbox">
+        <label>
+          <input type="checkbox"
+                 class="form-control"
+                 ng-model="filter.properties.showUndefinedVariable" />
+          {{ 'FILTER_FORM_VARIABLES_SHOW_UNDEFINED' | translate }}
+        </label>
+      </div>
+    </div>
+
     <div class="col-xs-2 row-action" ng-show="!filter.id || (filter.id && accesses.update)">
       <a ng-click="addVariable()"
          href>

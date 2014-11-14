@@ -26,7 +26,8 @@ define([
           name: '',
           label: ''
         };
-        
+
+        $scope.filter.properties.showUndefinedVariable  = $scope.filter.properties.showUndefinedVariable || false;
         $scope.variables = $scope.filter.properties.variables = $scope.filter.properties.variables || [];
 
         // register handler to show or hide the accordion hint /////////////////

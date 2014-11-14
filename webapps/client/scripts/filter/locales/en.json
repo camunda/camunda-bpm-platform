@@ -92,6 +92,8 @@
 
   "FILTER_FORM_VARIABLES":
                         "Variables",
+  "FILTER_FORM_VARIABLES_SHOW_UNDEFINED":
+                        "Show undefined variables",
   "FILTER_FORM_VARIABLES_HINT":
                         "You can define variables shown in the tasks list.",
   "FILTER_VARIABLE_NAME":

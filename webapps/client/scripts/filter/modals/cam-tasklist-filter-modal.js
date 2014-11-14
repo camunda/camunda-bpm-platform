@@ -107,6 +107,7 @@ define([
     $scope.filter.properties.priority =    parseInt($scope.filter.properties.priority || 0, 10);
     $scope.filter.properties.color =       $scope.filter.properties.color || DEFAULT_COLOR;
     $scope.filter.properties.refresh =     $scope.filter.properties.refresh || false;
+    $scope.filter.properties.showUndefinedVariable = $scope.filter.properties.showUndefinedVariable || false;
 
     var filterId =                         $scope.filter.id;
 
@@ -272,7 +273,8 @@ define([
           priority:     parseInt($scope.filter.properties.priority || 0, 10),
           color:        $scope.filter.properties.color || DEFAULT_COLOR,
           refresh:      $scope.filter.properties.refresh,
-          variables:    $scope.filter.properties.variables
+          variables:    $scope.filter.properties.variables,
+          showUndefinedVariable: $scope.filter.properties.showUndefinedVariable
         }
       };
 
