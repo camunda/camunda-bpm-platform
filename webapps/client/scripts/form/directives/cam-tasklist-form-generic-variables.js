@@ -7,15 +7,19 @@ define([
 ) {
   'use strict';
 
-  return [function(){
+  return ['camAPI', 'Notifications', '$translate', function(camAPI, Notifications, $translate){
 
     return {
 
       restrict: 'EAC',
 
+      require: '^camTasklistForm',
+
       template: template,
 
-      link: function($scope) {
+      link: function($scope, $element, attrs, formController) {
+
+        var Task = camAPI.resource('task');
 
         var emptyVariable = {
           name:   '',
@@ -48,6 +52,47 @@ define([
           });
 
           $scope.variables = vars;
+        };
+
+        $scope.variablesLoaded = false;
+        $scope.canLoadVariables= !!formController.getParams().taskId;
+
+        $scope.loadVariables = function() {
+          $scope.variablesLoaded = true;
+          Task.formVariables({
+            id: formController.getParams().taskId
+          }, function(err, result) {
+            if(err) {
+              $scope.variablesLoaded = false;
+              return $translate('LOAD_VARIABLES_FAILURE').then(function(translated) {
+                Notifications.addError({
+                  status: translated,
+                  message: err.message
+                });
+              });
+            }
+
+            var variableAdded = false;
+            angular.forEach(result, function(value, name) {
+              if(variableTypes[value.type]) {
+                $scope.variables.push({
+                  name : name,
+                  value: value.value,
+                  type:  value.type,
+                  fixedName : true
+                });
+                variableAdded = true;
+              }
+            });
+            if(!variableAdded) {
+              $translate('NO_TASK_VARIABLES').then(function(translated) {
+                Notifications.addMessage({
+                  duration: 5000,
+                  status: translated,
+                });
+              });
+            }
+          });
         };
       }
     };

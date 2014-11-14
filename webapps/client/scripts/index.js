@@ -93,7 +93,6 @@ define('camunda-tasklist-ui', [
     require('camunda-tasklist-ui/config/uris')(tasklistApp, uriConfig);
 
 
-    //tasklistApp.config(require('camunda-tasklist-ui/config/uris'));
     tasklistApp.config(require('camunda-tasklist-ui/config/routes'));
     tasklistApp.config(require('camunda-tasklist-ui/config/date'));
     tasklistApp.config(require('camunda-tasklist-ui/config/tooltip'));

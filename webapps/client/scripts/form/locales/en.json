@@ -24,5 +24,11 @@
   "VARIABLE_NAME":
                         "Variable name",
   "VARIABLE_TYPE":
-                        "Variable type"
+                        "Variable type",
+  "LOAD_VARIABLES":
+                        "Load Variables",
+  "LOAD_VARIABLES_FAILURE":
+                        "Could not load variables",
+  "NO_TASK_VARIABLES":
+                        "The task does not contain any variables"
 }

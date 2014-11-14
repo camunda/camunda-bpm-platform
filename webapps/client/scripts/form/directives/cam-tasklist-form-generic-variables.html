@@ -40,7 +40,8 @@
        ng-form="repeatForm">
 
     <div class="col-xs-2 row-action">
-      <a ng-click="removeVariable(delta)">
+      <a ng-click="removeVariable(delta)"
+         ng-if="!variable.fixedName">
         <span class="hidden-sm hidden-xs"
               translate="REMOVE">Remove</span>
         <span class="glyphicon glyphicon-minus-sign"></span>
@@ -56,7 +57,8 @@
                  type="text"
                  class="form-control"
                  placeholder="{{ 'VARIABLE_NAME' | translate }}"
-                 ng-model="variable.name" />
+                 ng-model="variable.name"
+                 ng-readonly="variable.fixedName" />
         </div>
 
 
@@ -126,4 +128,15 @@
       </div>
     </div>
   </div>
+  <div class="form-group"
+       ng-if="canLoadVariables && !variablesLoaded">
+    <div class="col-xs-2 row-action">
+      <a ng-click="loadVariables()">
+        <span class="hidden-sm hidden-xs"
+              translate="LOAD_VARIABLES">Load Variables</span>
+        <span class="glyphicon glyphicon-download"></span>
+      </a>
+    </div>
+  </div>
+
 </form>
