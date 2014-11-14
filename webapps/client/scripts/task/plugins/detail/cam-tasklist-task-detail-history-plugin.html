@@ -52,15 +52,15 @@
                 <h5 class="col-sm-12 col-md-3 event-property">{{ subEvent.property | translate }}</h5>
 
                 <div class="col-sm-12 col-md-9">
+                  <div class="new-value" ng-if="subEvent.newValue">
+                    <span ng-if="subEvent.propertyIsDate">{{ subEvent.newValue | camDate }}</span>
+                    <span ng-if="!subEvent.propertyIsDate">{{ subEvent.newValue }}</span>
+                  </div>
+                  
                   <div class="original-value"
                        ng-if="subEvent.orgValue">
                     <span ng-if="subEvent.propertyIsDate">{{ subEvent.orgValue | camDate }}</span>
                     <span ng-if="!subEvent.propertyIsDate">{{ subEvent.orgValue }}</span>
-                  </div>
-
-                  <div class="new-value" ng-if="subEvent.newValue">
-                    <span ng-if="subEvent.propertyIsDate">{{ subEvent.newValue | camDate }}</span>
-                    <span ng-if="!subEvent.propertyIsDate">{{ subEvent.newValue }}</span>
                   </div>
                 </div>
               </div>
