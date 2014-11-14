@@ -206,7 +206,9 @@ define([
           Task.assignee($scope.task.id, null, notify('assigneeReseted'));
         };
 
-        var editGroups = $scope.editGroups = function() {
+        $scope.editGroups = function() {
+          var groupsChanged;
+
           $modal.open({
             // creates a child scope of a provided scope
             scope: $scope,
@@ -217,13 +219,21 @@ define([
             controller: 'camGroupEditModalCtrl',
             resolve: {
               taskMetaData: function() { return taskMetaData; },
-              successHandler: function() { return successHandler; },
-              errorHandler: function() { return errorHandler; }
+              groupsChanged: function() {
+                return function () {
+                  groupsChanged = true;
+                };
+              }
             }
-          }).result.then(function() {
-            taskMetaData.set('taskId', { taskId: $scope.task.id });
-            taskMetaData.changed('taskList');
-          });
+          }).result.then(dialogClosed, dialogClosed);
+
+          function dialogClosed() {
+            if (groupsChanged) {
+              taskMetaData.set('taskId', { taskId: $scope.task.id });
+              taskMetaData.changed('taskList');
+            }
+          }
+
         };
 
         function notify(action) {

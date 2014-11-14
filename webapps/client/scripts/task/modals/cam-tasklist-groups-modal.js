@@ -6,27 +6,21 @@ define([
   return [
     '$scope',
     'taskMetaData',
+    'groupsChanged',
   function(
     $scope,
-    taskMetaData
+    taskMetaData,
+    groupsChanged
   ) {
     // setup //////////////////////////////////////////////
 
-    var groupsChanged = false;
-
     $scope.taskGroupsData = taskMetaData.newChild($scope);
+
+    $scope.groupsChanged = groupsChanged || function () {};
 
     $scope.$on('$locationChangeSuccess', function() {
       $scope.$dismiss();
     });
-
-    $scope.close = function () {
-      if (groupsChanged) {
-        return $scope.$close();
-      }
-
-      $scope.$dismiss();
-    };
 
   }];
 
