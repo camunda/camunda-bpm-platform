@@ -2,23 +2,20 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.camunda</groupId>
-    <artifactId>camunda-release-parent</artifactId>
-    <version>2.5</version>
-    <!-- do not remove empty tag - http://jira.codehaus.org/browse/MNG-4687 -->
-    <relativePath />
+    <groupId>org.camunda.commons</groupId>
+    <artifactId>camunda-commons-bom</artifactId>
+    <version>1.0.6-SNAPSHOT</version>
+    <relativePath>bom</relativePath>
   </parent>
 
-  <groupId>org.camunda.commons</groupId>
   <artifactId>camunda-commons-root</artifactId>
-  <version>1.0.6-SNAPSHOT</version>
   <name>camunda Commons - Root Pom</name>
   <packaging>pom</packaging>
 
   <modules>
+    <module>bom</module>
     <module>logging</module>
     <module>utils</module>
-    <module>bom</module>
   </modules>
 
   <dependencyManagement>
@@ -40,12 +37,6 @@
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-api</artifactId>
         <version>1.7.7</version>
-      </dependency>
-
-      <dependency>
-        <groupId>ch.qos.logback</groupId>
-        <artifactId>logback-core</artifactId>
-        <version>1.1.2</version>
       </dependency>
 
       <dependency>
