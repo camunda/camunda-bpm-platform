@@ -118,7 +118,7 @@ define([
 
      // transform filter query object into an array
     var query = [];
-    var queryVariables = [];   
+    var queryVariables = [];
 
     for (var key in _query) {
       var value = _query[key];
@@ -163,7 +163,7 @@ define([
             deferred.resolve(resp);
           }
 
-        });            
+        });
       }
 
       return deferred.promise;
@@ -211,7 +211,8 @@ define([
         Notifications.addError({
           status: translated,
           message: (err ? err.message : ''),
-          exclusive: exclusive
+          exclusive: exclusive,
+          scope: $scope
         });
       });
     }

@@ -67,7 +67,8 @@ define([
               return $translate('LOAD_VARIABLES_FAILURE').then(function(translated) {
                 Notifications.addError({
                   status: translated,
-                  message: err.message
+                  message: err.message,
+                  scope: $scope
                 });
               });
             }

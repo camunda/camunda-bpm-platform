@@ -66,7 +66,8 @@ define([
             Notifications.addError({
               status: translated,
               message: (err ? err.message : ''),
-              exclusive: true
+              exclusive: true,
+              scope: $scope
             });
           });
         }

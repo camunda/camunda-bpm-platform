@@ -27,7 +27,8 @@ define([
       $translate(src).then(function(translated) {
         Notifications.addError({
           status: translated,
-          message: (err ? err.message : '')
+          message: (err ? err.message : ''),
+          scope: $scope
         });
       });
     }

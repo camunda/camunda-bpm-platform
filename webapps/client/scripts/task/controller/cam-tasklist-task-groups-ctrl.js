@@ -71,7 +71,8 @@ define([
         Notifications.addError({
           status: messages.failure,
           message: messages.initGroupsFailed,
-          exclusive: true
+          exclusive: true,
+          scope: $scope
         });
       }
     });
@@ -88,7 +89,8 @@ define([
           return Notifications.addError({
             status: messages.failure,
             message: messages.addGroupFailed,
-            exclusive: true
+            exclusive: true,
+            scope: $scope
           });
         }
 
@@ -110,7 +112,8 @@ define([
           return Notifications.addError({
             status: messages.failure,
             message: messages.removeGroupFailed,
-            exclusive: true
+            exclusive: true,
+            scope: $scope
           });
         }
 

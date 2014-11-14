@@ -28,7 +28,8 @@ define([
     function loginError() {
       $translate('CREDENTIALS_ERROR').then(function(translated) {
         Notifications.addError({
-          status: translated
+          status: translated,
+          scope: $scope
         });
       });
     }
