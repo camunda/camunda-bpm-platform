@@ -15,7 +15,6 @@
     <dependency>
       <groupId>org.camunda.connect</groupId>
       <artifactId>camunda-connect-http-client</artifactId>
-      <version>${project.version}</version>
     </dependency>
 
     <dependency>
