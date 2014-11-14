@@ -10,7 +10,7 @@
   </parent>
 
   <artifactId>camunda-spin-root</artifactId>
-  <name>camunda Spin - parent</name>
+  <name>camunda Spin - root</name>
   <packaging>pom</packaging>
 
   <modules>
