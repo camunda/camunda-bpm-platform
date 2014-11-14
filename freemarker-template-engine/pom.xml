@@ -27,7 +27,7 @@
       <dependency>
         <groupId>org.camunda.commons</groupId>
         <artifactId>camunda-commons-bom</artifactId>
-        <version>1.0.1</version>
+        <version>1.0.5</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -54,12 +54,6 @@
         <groupId>org.apache.velocity</groupId>
         <artifactId>velocity</artifactId>
         <version>1.7</version>
-      </dependency>
-
-      <dependency>
-        <groupId>ch.qos.logback</groupId>
-        <artifactId>logback-core</artifactId>
-        <version>1.1.2</version>
       </dependency>
 
       <dependency>
