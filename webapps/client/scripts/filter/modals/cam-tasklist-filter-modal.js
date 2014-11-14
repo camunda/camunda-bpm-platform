@@ -31,12 +31,12 @@ define([
 
   function unfixLike(key, value) {
     if (likeExp.test(key)) {
-      if (val[0] === '%') {
-        val = val.slice(1, val.length);
+      if (value[0] === '%') {
+        value = value.slice(1, value.length);
       }
 
-      if (val.slice(-1) === '%') {
-        val = val.slice(0, -1);
+      if (value.slice(-1) === '%') {
+        value = value.slice(0, -1);
       }
     }
     return value;
