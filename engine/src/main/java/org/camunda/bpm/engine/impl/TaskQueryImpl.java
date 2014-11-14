@@ -625,7 +625,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
     this.followUpNullAccepted = true;
     return this;
   }
-  
+
   public TaskQuery followUpAfter(Date followUpAfter) {
     this.followUpAfter = followUpAfter;
     expressions.remove("followUpAfter");
@@ -671,6 +671,10 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
       return candidateGroups;
     }
     return null;
+  }
+
+  public List<String> getCandidateGroupsInternal() {
+    return candidateGroups;
   }
 
   protected List<String> getGroupsForCandidateUser(String candidateUser) {
@@ -1096,6 +1100,13 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
     }
     else if (this.getCandidateGroup() != null) {
       extendedQuery.taskCandidateGroup(this.getCandidateGroup());
+    }
+
+    if (extendingQuery.getCandidateGroupsInternal() != null) {
+      extendedQuery.taskCandidateGroupIn(extendingQuery.getCandidateGroupsInternal());
+    }
+    else if (this.getCandidateGroupsInternal() != null) {
+      extendedQuery.taskCandidateGroupIn(this.getCandidateGroupsInternal());
     }
 
     if (extendingQuery.getProcessInstanceId() != null) {

@@ -331,6 +331,31 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  public void testExtendingTaskQueryListWithCandidateGroups() {
+    TaskQuery query = taskService.createTaskQuery();
+
+    List<String> candidateGroups = new ArrayList<String>();
+    candidateGroups.add("accounting");
+    query.taskCandidateGroupIn(candidateGroups);
+
+    saveQuery(query);
+
+    List<Task> tasks = filterService.list(filter.getId());
+    assertEquals(1, tasks.size());
+
+    tasks = filterService.list(filter.getId(), query);
+    assertEquals(1, tasks.size());
+
+    TaskQuery extendingQuery = taskService.createTaskQuery();
+
+    extendingQuery
+      .orderByTaskCreateTime()
+      .asc();
+
+    tasks = filterService.list(filter.getId(), extendingQuery);
+    assertEquals(1, tasks.size());
+  }
+
   public void testExecuteTaskQueryListPage() {
     TaskQuery query = taskService.createTaskQuery();
     query.taskNameLike("Task%");
@@ -595,6 +620,9 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
     task.setOwner(testUser.getId());
     task.setDelegationState(DelegationState.PENDING);
     taskService.saveTask(task);
+
+    String taskId = taskService.createTaskQuery().singleResult().getId();
+    taskService.addCandidateGroup(taskId, "accounting");
 
     task = taskService.newTask("task2");
     task.setName("Task 2");

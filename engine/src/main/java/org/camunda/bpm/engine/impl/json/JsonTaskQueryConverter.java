@@ -16,7 +16,6 @@ package org.camunda.bpm.engine.impl.json;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -118,9 +117,7 @@ public class JsonTaskQueryConverter extends JsonObjectConverter<TaskQuery> {
     addField(json, DELEGATION_STATE, query.getDelegationStateString());
     addField(json, CANDIDATE_USER, query.getCandidateUser());
     addField(json, CANDIDATE_GROUP, query.getCandidateGroup());
-    if (query.getCandidateUser() == null && query.getCandidateGroup() == null) {
-      addListField(json, CANDIDATE_GROUPS, query.getCandidateGroups());
-    }
+    addListField(json, CANDIDATE_GROUPS, query.getCandidateGroupsInternal());
     addField(json, PROCESS_INSTANCE_ID, query.getProcessInstanceId());
     addField(json, EXECUTION_ID, query.getExecutionId());
     addArrayField(json, ACTIVITY_INSTANCE_ID_IN, query.getActivityInstanceIdIn());
