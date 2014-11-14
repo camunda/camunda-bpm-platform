@@ -101,7 +101,10 @@
                 <span tooltip-placement="top"
                       tooltip="{{ 'ASSIGNEE' | translate }}"
                       class="glyphicon glyphicon-user"></span>
-                {{ task.assignee }}
+                <span tooltip-placement="top"
+                      tooltip="{{ task.assignee }}">
+                  {{ task.assignee }}
+                </span>
               </li>
             </ul>
           </div>

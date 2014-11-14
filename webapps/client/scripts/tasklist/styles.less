@@ -71,3 +71,19 @@ ol.tasks-list {
     outline: none;
   }
 }
+
+
+ol.tasks-list {
+  li.assignee {
+    // the assignee is the only "item" in the list, use the whole width then
+    width: 100%;
+  }
+}
+
+@media (min-width: @screen-md-min) {
+  ol.tasks-list {
+    li.assignee {
+      text-align: right;
+    }
+  }
+}
