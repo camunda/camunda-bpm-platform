@@ -8,8 +8,8 @@
     <relativePath>bom</relativePath>
   </parent>
 
-  <artifactId>camunda-template-engines-parent</artifactId>
-  <name>camunda template engines jsr223 - parent</name>
+  <artifactId>camunda-template-engines-root</artifactId>
+  <name>camunda template engines jsr223 - root</name>
   <packaging>pom</packaging>
 
   <modules>

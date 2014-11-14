@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <artifactId>camunda-template-engines-parent</artifactId>
+    <artifactId>camunda-template-engines-root</artifactId>
     <groupId>org.camunda.template-engines</groupId>
     <version>1.0.1-SNAPSHOT</version>
   </parent>

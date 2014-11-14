@@ -4,7 +4,7 @@
 
   <parent>
     <groupId>org.camunda.template-engines</groupId>
-    <artifactId>camunda-template-engines-parent</artifactId>
+    <artifactId>camunda-template-engines-root</artifactId>
     <version>1.0.1-SNAPSHOT</version>
   </parent>
 
