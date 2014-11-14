@@ -139,11 +139,12 @@ define([
         };
 
         $scope.handleKeydown = function($event) {
-          $event.preventDefault();
           if($event.keyCode === 40) {
+            $event.preventDefault();
             selectNextTask($event);
           }
           else if($event.keyCode === 38) {
+            $event.preventDefault();
             selectPreviousTask();
           }
           // wait for angular to update the classes and scroll to the newly selected task
