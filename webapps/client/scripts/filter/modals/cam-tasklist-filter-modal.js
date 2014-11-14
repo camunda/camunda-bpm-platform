@@ -253,6 +253,8 @@ define([
                 }
               }
             }
+          } else {
+            value = ''+value;
           }
         }
 
