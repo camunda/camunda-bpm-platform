@@ -15,8 +15,10 @@ package org.camunda.bpm.engine.rest.sub.task.impl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.Variant;
 
 import org.camunda.bpm.engine.FormService;
 import org.camunda.bpm.engine.ProcessEngine;
@@ -32,6 +34,7 @@ import org.camunda.bpm.engine.rest.dto.task.TaskDto;
 import org.camunda.bpm.engine.rest.dto.task.UserIdDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
+import org.camunda.bpm.engine.rest.hal.Hal;
 import org.camunda.bpm.engine.rest.hal.task.HalTask;
 import org.camunda.bpm.engine.rest.sub.VariableResource;
 import org.camunda.bpm.engine.rest.sub.task.TaskAttachmentResource;
@@ -44,6 +47,8 @@ import org.camunda.bpm.engine.variable.VariableMap;
 import org.codehaus.jackson.map.ObjectMapper;
 
 public class TaskResourceImpl implements TaskResource {
+
+  public static final List<Variant> VARIANTS = Variant.mediaTypes(MediaType.APPLICATION_JSON_TYPE, Hal.APPLICATION_HAL_JSON_TYPE).add().build();
 
   protected ProcessEngine engine;
   protected String taskId;
@@ -110,8 +115,20 @@ public class TaskResourceImpl implements TaskResource {
     engine.getTaskService().delegateTask(taskId, delegatedUser.getUserId());
   }
 
-  @Override
-  public TaskDto getTask() {
+  public Object getTask(Request request) {
+    Variant variant = request.selectVariant(VARIANTS);
+    if (variant != null) {
+      if (MediaType.APPLICATION_JSON_TYPE.equals(variant.getMediaType())) {
+        return getJsonTask();
+      }
+      else if (Hal.APPLICATION_HAL_JSON_TYPE.equals(variant.getMediaType())) {
+        return getHalTask();
+      }
+    }
+    throw new InvalidRequestException(Status.NOT_ACCEPTABLE, "No acceptable content-type found");
+  }
+
+  public TaskDto getJsonTask() {
     Task task = getTaskById(taskId);
     if (task == null) {
       throw new InvalidRequestException(Status.NOT_FOUND, "No matching task with id " + taskId);
@@ -120,7 +137,6 @@ public class TaskResourceImpl implements TaskResource {
     return TaskDto.fromEntity(task);
   }
 
-  @Override
   public HalTask getHalTask() {
     Task task = getTaskById(taskId);
     if (task == null) {

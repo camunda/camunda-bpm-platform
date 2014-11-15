@@ -508,7 +508,23 @@ public interface CaseService {
    * @throws NotFoundException when no case execution is found for the given case execution id
    * @throws ProcessEngineException when an internal exception happens during the execution of the command
    */
-  VariableMap getVariables(String caseExecutionId);
+  Map<String, Object> getVariables(String caseExecutionId);
+
+  /**
+   * <p>All variables visible from the given execution scope (including parent scopes).</p>
+  *
+  * <p>If you have many local variables and you only need a few, consider
+  * using {@link #getVariables(String, Collection)} for better performance.</p>
+  *
+  * @param caseExecutionId the id of a case instance or case execution, cannot be null
+  *
+  * @return the variables or an empty map if no such variables are found
+  *
+  * @throws NotValidException when the given case execution id is null
+  * @throws NotFoundException when no case execution is found for the given case execution id
+  * @throws ProcessEngineException when an internal exception happens during the execution of the command
+  */
+ VariableMap getVariablesTyped(String caseExecutionId);
 
   /**
    * <p>All variables visible from the given execution scope (including parent scopes).</p>
@@ -525,7 +541,7 @@ public interface CaseService {
   * @throws NotFoundException when no case execution is found for the given case execution id
   * @throws ProcessEngineException when an internal exception happens during the execution of the command
   */
- VariableMap getVariables(String caseExecutionId, boolean deserializeValues);
+ VariableMap getVariablesTyped(String caseExecutionId, boolean deserializeValues);
 
   /**
    * <p>All variable values that are defined in the case execution scope, without
@@ -542,7 +558,24 @@ public interface CaseService {
    * @throws NotFoundException when no case execution is found for the given case execution id
    * @throws ProcessEngineException when an internal exception happens during the execution of the command
    */
-  VariableMap getVariablesLocal(String caseExecutionId);
+  Map<String, Object> getVariablesLocal(String caseExecutionId);
+
+  /**
+   * <p>All variable values that are defined in the case execution scope, without
+   * taking outer scopes into account.</p>
+   *
+   * <p>If you have many local variables and you only need a few, consider
+   * using {@link #getVariablesLocal(String, Collection)} for better performance.</p>
+   *
+   * @param caseExecutionId the id of a case execution, cannot be null
+   *
+   * @return the variables or an empty map if no such variables are found
+   *
+   * @throws NotValidException when the given case execution id is null
+   * @throws NotFoundException when no case execution is found for the given case execution id
+   * @throws ProcessEngineException when an internal exception happens during the execution of the command
+   */
+  VariableMap getVariablesLocalTyped(String caseExecutionId);
 
   /**
    * <p>All variable values that are defined in the case execution scope, without
@@ -560,7 +593,7 @@ public interface CaseService {
    * @throws NotFoundException when no case execution is found for the given case execution id
    * @throws ProcessEngineException when an internal exception happens during the execution of the command
    */
-  VariableMap getVariablesLocal(String caseExecutionId, boolean deserializeValues);
+  VariableMap getVariablesLocalTyped(String caseExecutionId, boolean deserializeValues);
 
   /**
    * <p>The variable values for all given variableNames, takes all variables
@@ -576,7 +609,7 @@ public interface CaseService {
    * @throws NotFoundException when no case execution is found for the given case execution id
    * @throws ProcessEngineException when an internal exception happens during the execution of the command
    */
-  VariableMap getVariables(String caseExecutionId, Collection<String> variableNames);
+  Map<String, Object> getVariables(String caseExecutionId, Collection<String> variableNames);
 
   /**
    * <p>The variable values for all given variableNames, takes all variables
@@ -593,7 +626,7 @@ public interface CaseService {
    * @throws NotFoundException when no case execution is found for the given case execution id
    * @throws ProcessEngineException when an internal exception happens during the execution of the command
    */
-  VariableMap getVariables(String caseExecutionId, Collection<String> variableNames, boolean deserializeValues);
+  VariableMap getVariablesTyped(String caseExecutionId, Collection<String> variableNames, boolean deserializeValues);
 
   /**
    * <p>The variable values for the given variableNames only taking the given case
@@ -608,7 +641,7 @@ public interface CaseService {
    * @throws NotFoundException when no case execution is found for the given case execution id
    * @throws ProcessEngineException when an internal exception happens during the execution of the command
    */
-  VariableMap getVariablesLocal(String caseExecutionId, Collection<String> variableNames);
+  Map<String,Object> getVariablesLocal(String caseExecutionId, Collection<String> variableNames);
 
   /**
    * <p>The variable values for the given variableNames only taking the given case
@@ -624,7 +657,7 @@ public interface CaseService {
    * @throws NotFoundException when no case execution is found for the given case execution id
    * @throws ProcessEngineException when an internal exception happens during the execution of the command
    */
-  VariableMap getVariablesLocal(String caseExecutionId, Collection<String> variableNames, boolean deserializeValues);
+  VariableMap getVariablesLocalTyped(String caseExecutionId, Collection<String> variableNames, boolean deserializeValues);
 
   /**
    * <p>Searching for the variable is done in all scopes that are visible

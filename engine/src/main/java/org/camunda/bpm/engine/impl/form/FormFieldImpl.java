@@ -20,6 +20,7 @@ import java.util.Map;
 import org.camunda.bpm.engine.form.FormField;
 import org.camunda.bpm.engine.form.FormFieldValidationConstraint;
 import org.camunda.bpm.engine.form.FormType;
+import org.camunda.bpm.engine.variable.value.TypedValue;
 
 /**
  *
@@ -32,6 +33,7 @@ public class FormFieldImpl implements FormField {
   protected String label;
   protected FormType type;
   protected Object defaultValue;
+  protected TypedValue value;
   protected List<FormFieldValidationConstraint> validationConstraints = new ArrayList<FormFieldValidationConstraint>();
   protected Map<String, String> properties = new HashMap<String, String>();
 
@@ -69,8 +71,16 @@ public class FormFieldImpl implements FormField {
     return defaultValue;
   }
 
+  public TypedValue getValue() {
+    return value;
+  }
+
   public void setDefaultValue(Object defaultValue) {
     this.defaultValue = defaultValue;
+  }
+
+  public void setValue(TypedValue value) {
+    this.value = value;
   }
 
   public Map<String, String> getProperties() {

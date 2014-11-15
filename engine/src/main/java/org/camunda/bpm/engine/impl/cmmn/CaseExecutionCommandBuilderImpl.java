@@ -36,6 +36,7 @@ import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.runtime.CaseExecutionCommandBuilder;
+import org.camunda.bpm.engine.variable.VariableMap;
 
 /**
  * @author Roman Smirnov
@@ -245,11 +246,11 @@ public class CaseExecutionCommandBuilderImpl implements CaseExecutionCommandBuil
     return caseExecutionId;
   }
 
-  public Map<String, Object> getVariables() {
+  public VariableMap getVariables() {
     return variables;
   }
 
-  public Map<String, Object> getVariablesLocal() {
+  public VariableMap getVariablesLocal() {
     return variablesLocal;
   }
 

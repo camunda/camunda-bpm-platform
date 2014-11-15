@@ -47,7 +47,7 @@ public abstract class AbstractRestServiceTest {
 
   protected static final Header ACCEPT_WILDCARD_HEADER = new Header("Accept", MediaType.WILDCARD);
   protected static final Header ACCEPT_JSON_HEADER = new Header("Accept", MediaType.APPLICATION_JSON);
-  protected static final Header ACCEPT_HAL_HEADER = new Header("Accept", Hal.MEDIA_TYPE_HAL);
+  protected static final Header ACCEPT_HAL_HEADER = new Header("Accept", Hal.APPLICATION_HAL_JSON);
 
   protected static final String POST_JSON_CONTENT_TYPE = ContentType.create(MediaType.APPLICATION_JSON, "UTF-8").toString();
   protected static final String XHTML_XML_CONTENT_TYPE = ContentType.create(MediaType.APPLICATION_XHTML_XML).toString();

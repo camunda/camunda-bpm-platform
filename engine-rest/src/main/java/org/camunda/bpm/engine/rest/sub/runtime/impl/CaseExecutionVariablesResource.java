@@ -33,7 +33,7 @@ public class CaseExecutionVariablesResource extends AbstractVariablesResource {
 
   protected VariableMap getVariableEntities(boolean deserializeValues) {
     CaseService caseService = engine.getCaseService();
-    return caseService.getVariables(resourceId, deserializeValues);
+    return caseService.getVariablesTyped(resourceId, deserializeValues);
   }
 
   protected void updateVariableEntities(VariableMap variables, List<String> deletions) {

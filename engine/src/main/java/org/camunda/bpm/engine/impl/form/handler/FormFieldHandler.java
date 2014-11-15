@@ -27,6 +27,8 @@ import org.camunda.bpm.engine.impl.form.FormFieldImpl;
 import org.camunda.bpm.engine.impl.form.type.AbstractFormFieldType;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.variable.VariableMap;
+import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.value.TypedValue;
 
 /**
  * @author Daniel Meyer
@@ -58,13 +60,26 @@ public class FormFieldHandler {
     formField.setType(type);
 
     // set default value (evaluate expression)
+    Object defaultValue = null;
     if(defaultValueExpression != null) {
-      Object defaultValue = defaultValueExpression.getValue(variableScope);
+      defaultValue = defaultValueExpression.getValue(variableScope);
       if(defaultValue != null) {
         formField.setDefaultValue(type.convertFormValueToModelValue(defaultValue));
       } else {
         formField.setDefaultValue(null);
       }
+    }
+
+    // value
+    TypedValue value = variableScope.getVariableTyped(id);
+    if(value != null) {
+      formField.setValue(type.convertToFormValue(value));
+    }
+    else {
+      // first, need to convert to model value since the default value may be a String Constant specified in the model xml.
+      TypedValue typedDefaultValue = type.convertToModelValue(Variables.untypedValue(defaultValue));
+      // now convert to form value
+      formField.setValue(type.convertToFormValue(typedDefaultValue));
     }
 
     // properties
@@ -85,29 +100,37 @@ public class FormFieldHandler {
   // submit /////////////////////////////////////////////
 
   public void handleSubmit(VariableScope variableScope, VariableMap values, VariableMap allValues) {
-    Object submittedValue = values.remove(id);
-
-    // update variable(s)
-    Object modelValue = null;
-    if (submittedValue != null) {
-      final Object propertyValue = submittedValue;
-      if (type != null) {
-        modelValue = type.convertFormValueToModelValue(propertyValue);
-      } else {
-        modelValue = propertyValue;
-      }
-    } else if (defaultValueExpression != null) {
-      final Object expressionValue = defaultValueExpression.getValue(variableScope);
-      if (type != null && expressionValue != null) {
-        modelValue = type.convertFormValueToModelValue(expressionValue.toString());
-      } else if (expressionValue != null) {
-        modelValue = expressionValue.toString();
-      }
-    }
+    TypedValue submittedValue = (TypedValue) values.getValueTyped(id);
+    values.remove(id);
 
     // perform validation
     for (FormFieldValidationConstraintHandler validationHandler : validationHandlers) {
-      validationHandler.validate(modelValue, allValues, this, variableScope);
+      Object value = null;
+      if(submittedValue != null) {
+        value = submittedValue.getValue();
+      }
+      validationHandler.validate(value, allValues, this, variableScope);
+    }
+
+    // update variable(s)
+    TypedValue modelValue = null;
+    if (submittedValue != null) {
+      if (type != null) {
+        modelValue = type.convertToModelValue(submittedValue);
+      }
+      else {
+        modelValue = submittedValue;
+      }
+    }
+    else if (defaultValueExpression != null) {
+      final TypedValue expressionValue = Variables.untypedValue(defaultValueExpression.getValue(variableScope));
+      if (type != null) {
+        // first, need to convert to model value since the default value may be a String Constant specified in the model xml.
+        modelValue = type.convertToModelValue(Variables.untypedValue(expressionValue));
+      }
+      else if (expressionValue != null) {
+        modelValue = Variables.stringValue(expressionValue.getValue().toString());
+      }
     }
 
     if (modelValue != null) {

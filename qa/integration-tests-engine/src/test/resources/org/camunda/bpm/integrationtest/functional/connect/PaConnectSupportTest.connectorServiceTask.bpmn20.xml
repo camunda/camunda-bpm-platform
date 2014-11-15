@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:camunda="http://activiti.org/bpmn" xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd" id="__hiYAGQLEeSn4PUJP2d52Q" exporter="camunda modeler" exporterVersion="2.6.0" targetNamespace="http://activiti.org/bpmn">
+  <process id="testProcess" isExecutable="true">
+    <startEvent id="start" />
+    <sequenceFlow sourceRef="start" targetRef="serviceTask" />
+    <serviceTask id="serviceTask" name="HTTP Post">
+      <extensionElements>
+        <camunda:connector>
+          <camunda:connectorId>pa-test-connector</camunda:connectorId>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="method">POST</camunda:inputParameter>
+            <camunda:inputParameter name="url">http://camunda.org</camunda:inputParameter>
+            <camunda:inputParameter name="headers">
+              <map>
+                <entry key="Content-Type">
+                  text/plain
+                </entry>
+                <entry key="SOAPAction">
+                  doIt
+                </entry>
+              </map>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="payload">Hello world!</camunda:inputParameter>
+            <camunda:outputParameter name="payload">${payload}</camunda:outputParameter>
+          </camunda:inputOutput>
+        </camunda:connector>
+      </extensionElements>
+    </serviceTask>
+    <sequenceFlow sourceRef="serviceTask" targetRef="userTask" />
+    <userTask id="userTask" name="Wait" />
+    <sequenceFlow sourceRef="userTask" targetRef="end" />
+    <endEvent id="end" />
+  </process>
+</definitions>

@@ -41,7 +41,6 @@ import org.camunda.bpm.engine.rest.JobDefinitionRestService;
 import org.camunda.bpm.engine.rest.JobRestService;
 import org.camunda.bpm.engine.rest.MessageRestService;
 import org.camunda.bpm.engine.rest.ProcessDefinitionRestService;
-import org.camunda.bpm.engine.rest.ProcessEngineRestService;
 import org.camunda.bpm.engine.rest.ProcessInstanceRestService;
 import org.camunda.bpm.engine.rest.TaskRestService;
 import org.camunda.bpm.engine.rest.UserRestService;
@@ -188,7 +187,7 @@ public class NamedProcessEngineRestServiceImpl extends AbstractProcessEngineRest
 
   @Override
   protected URI getRelativeEngineUri(String engineName) {
-    return UriBuilder.fromResource(ProcessEngineRestService.class).path("{name}").build(engineName);
+    return UriBuilder.fromResource(NamedProcessEngineRestServiceImpl.class).path("{name}").build(engineName);
   }
 
   protected ProcessEngineProvider getProcessEngineProvider() {

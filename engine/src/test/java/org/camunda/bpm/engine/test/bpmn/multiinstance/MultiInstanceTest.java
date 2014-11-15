@@ -41,6 +41,9 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.bpmn.event.error.ThrowErrorDelegate;
+import org.camunda.bpm.engine.variable.VariableMap;
+import org.camunda.bpm.engine.variable.Variables;
 
 
 /**
@@ -1273,7 +1276,7 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
   @Deployment( resources = {
     "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testCatchErrorThrownByParallelAbstractBpmnActivityBehavior.bpmn20.xml"
   })
-  public void testCatchExceptionThrownByExcecuteOfParallelAbstractBpmnActivityBehavior() {
+  public void testCatchExceptionThrownByExecuteOfParallelAbstractBpmnActivityBehavior() {
     String pi = runtimeService.startProcessInstanceByKey("testProcess", throwException()).getId();
 
     assertTrue((Boolean) runtimeService.getVariable(pi, "executed"));
@@ -1289,7 +1292,7 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
   @Deployment( resources = {
     "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testCatchErrorThrownByParallelAbstractBpmnActivityBehavior.bpmn20.xml"
   })
-  public void testCatchErrorThrownByExcecuteOfParallelAbstractBpmnActivityBehavior() {
+  public void testCatchErrorThrownByExecuteOfParallelAbstractBpmnActivityBehavior() {
     String pi = runtimeService.startProcessInstanceByKey("testProcess", throwError()).getId();
 
     assertTrue((Boolean) runtimeService.getVariable(pi, "executed"));
@@ -1352,4 +1355,191 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
     taskService.complete(userTask.getId());
   }
 
+  @Deployment( resources = {
+    "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testCatchErrorThrownBySequentialDelegateExpression.bpmn20.xml"
+  })
+  public void testCatchExceptionThrownByExecuteOfSequentialDelegateExpression() {
+    VariableMap variables = Variables.createVariables().putValue("myDelegate", new ThrowErrorDelegate());
+    variables.putAll(throwException());
+    String pi = runtimeService.startProcessInstanceByKey("testProcess", variables).getId();
+
+    assertTrue((Boolean) runtimeService.getVariable(pi, "executed"));
+    assertNull(runtimeService.getVariable(pi, "signaled"));
+
+    Task userTask = taskService.createTaskQuery().processInstanceId(pi).singleResult();
+    assertNotNull(userTask);
+    assertEquals("userTaskException", userTask.getTaskDefinitionKey());
+
+    taskService.complete(userTask.getId());
+  }
+
+  @Deployment( resources = {
+    "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testCatchErrorThrownBySequentialDelegateExpression.bpmn20.xml"
+  })
+  public void testCatchErrorThrownByExecuteOfSequentialDelegateExpression() {
+    VariableMap variables = Variables.createVariables().putValue("myDelegate", new ThrowErrorDelegate());
+    variables.putAll(throwError());
+    String pi = runtimeService.startProcessInstanceByKey("testProcess", variables).getId();
+
+    assertTrue((Boolean) runtimeService.getVariable(pi, "executed"));
+    assertNull(runtimeService.getVariable(pi, "signaled"));
+
+    Task userTask = taskService.createTaskQuery().processInstanceId(pi).singleResult();
+    assertNotNull(userTask);
+    assertEquals("userTaskError", userTask.getTaskDefinitionKey());
+
+    taskService.complete(userTask.getId());
+  }
+
+  @Deployment( resources = {
+    "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testCatchErrorThrownBySequentialDelegateExpression.bpmn20.xml"
+  })
+  public void testCatchExceptionThrownBySignalOfSequentialDelegateExpression() {
+    VariableMap variables = Variables.createVariables().putValue("myDelegate", new ThrowErrorDelegate());
+    String pi = runtimeService.startProcessInstanceByKey("testProcess", variables).getId();
+
+    assertTrue((Boolean) runtimeService.getVariable(pi, "executed"));
+    assertNull(runtimeService.getVariable(pi, "signaled"));
+
+    // signal 2 times to execute first sequential behaviors
+    runtimeService.setVariables(pi, leaveExecution());
+    runtimeService.signal(runtimeService.createExecutionQuery().processInstanceId(pi).activityId("serviceTask").singleResult().getId());
+    runtimeService.setVariables(pi, leaveExecution());
+    runtimeService.signal(runtimeService.createExecutionQuery().processInstanceId(pi).activityId("serviceTask").singleResult().getId());
+
+    Execution serviceTask = runtimeService.createExecutionQuery().processInstanceId(pi).activityId("serviceTask").singleResult();
+    assertNotNull(serviceTask);
+
+    runtimeService.setVariables(pi, throwException());
+    runtimeService.signal(serviceTask.getId());
+
+    assertTrue((Boolean) runtimeService.getVariable(pi, "executed"));
+    assertTrue((Boolean) runtimeService.getVariable(pi, "signaled"));
+
+    Task userTask = taskService.createTaskQuery().processInstanceId(pi).singleResult();
+    assertNotNull(userTask);
+    assertEquals("userTaskException", userTask.getTaskDefinitionKey());
+
+    taskService.complete(userTask.getId());
+  }
+
+  @Deployment( resources = {
+    "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testCatchErrorThrownBySequentialDelegateExpression.bpmn20.xml"
+  })
+  public void testCatchErrorThrownBySignalOfSequentialDelegateExpression() {
+    VariableMap variables = Variables.createVariables().putValue("myDelegate", new ThrowErrorDelegate());
+    String pi = runtimeService.startProcessInstanceByKey("testProcess", variables).getId();
+
+    assertTrue((Boolean) runtimeService.getVariable(pi, "executed"));
+    assertNull(runtimeService.getVariable(pi, "signaled"));
+
+    // signal 2 times to execute first sequential behaviors
+    runtimeService.setVariables(pi, leaveExecution());
+    runtimeService.signal(runtimeService.createExecutionQuery().processInstanceId(pi).activityId("serviceTask").singleResult().getId());
+    runtimeService.setVariables(pi, leaveExecution());
+    runtimeService.signal(runtimeService.createExecutionQuery().processInstanceId(pi).activityId("serviceTask").singleResult().getId());
+
+    Execution serviceTask = runtimeService.createExecutionQuery().processInstanceId(pi).activityId("serviceTask").singleResult();
+    assertNotNull(serviceTask);
+
+    runtimeService.setVariables(pi, throwError());
+    runtimeService.signal(serviceTask.getId());
+
+    assertTrue((Boolean) runtimeService.getVariable(pi, "executed"));
+    assertTrue((Boolean) runtimeService.getVariable(pi, "signaled"));
+
+    Task userTask = taskService.createTaskQuery().processInstanceId(pi).singleResult();
+    assertNotNull(userTask);
+    assertEquals("userTaskError", userTask.getTaskDefinitionKey());
+
+    taskService.complete(userTask.getId());
+  }
+
+  @Deployment( resources = {
+    "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testCatchErrorThrownByParallelDelegateExpression.bpmn20.xml"
+  })
+  public void testCatchExceptionThrownByExecuteOfParallelDelegateExpression() {
+    VariableMap variables = Variables.createVariables().putValue("myDelegate", new ThrowErrorDelegate());
+    variables.putAll(throwException());
+    String pi = runtimeService.startProcessInstanceByKey("testProcess", variables).getId();
+
+    assertTrue((Boolean) runtimeService.getVariable(pi, "executed"));
+    assertNull(runtimeService.getVariable(pi, "signaled"));
+
+    Task userTask = taskService.createTaskQuery().processInstanceId(pi).singleResult();
+    assertNotNull(userTask);
+    assertEquals("userTaskException", userTask.getTaskDefinitionKey());
+
+    taskService.complete(userTask.getId());
+  }
+
+  @Deployment( resources = {
+    "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testCatchErrorThrownByParallelDelegateExpression.bpmn20.xml"
+  })
+  public void testCatchErrorThrownByExecuteOfParallelDelegateExpression() {
+    VariableMap variables = Variables.createVariables().putValue("myDelegate", new ThrowErrorDelegate());
+    variables.putAll(throwError());
+    String pi = runtimeService.startProcessInstanceByKey("testProcess", variables).getId();
+
+    assertTrue((Boolean) runtimeService.getVariable(pi, "executed"));
+    assertNull(runtimeService.getVariable(pi, "signaled"));
+
+    Task userTask = taskService.createTaskQuery().processInstanceId(pi).singleResult();
+    assertNotNull(userTask);
+    assertEquals("userTaskError", userTask.getTaskDefinitionKey());
+
+    taskService.complete(userTask.getId());
+  }
+
+  @Deployment( resources = {
+    "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testCatchErrorThrownByParallelDelegateExpression.bpmn20.xml"
+  })
+  public void testCatchExceptionThrownBySignalOfParallelDelegateExpression() {
+    VariableMap variables = Variables.createVariables().putValue("myDelegate", new ThrowErrorDelegate());
+    String pi = runtimeService.startProcessInstanceByKey("testProcess", variables).getId();
+
+    assertTrue((Boolean) runtimeService.getVariable(pi, "executed"));
+    assertNull(runtimeService.getVariable(pi, "signaled"));
+
+    Execution serviceTask = runtimeService.createExecutionQuery().processInstanceId(pi).activityId("serviceTask").list().get(3);
+    assertNotNull(serviceTask);
+
+    runtimeService.setVariables(pi, throwException());
+    runtimeService.signal(serviceTask.getId());
+
+    assertTrue((Boolean) runtimeService.getVariable(pi, "executed"));
+    assertTrue((Boolean) runtimeService.getVariable(pi, "signaled"));
+
+    Task userTask = taskService.createTaskQuery().processInstanceId(pi).singleResult();
+    assertNotNull(userTask);
+    assertEquals("userTaskException", userTask.getTaskDefinitionKey());
+
+    taskService.complete(userTask.getId());
+  }
+
+  @Deployment( resources = {
+    "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testCatchErrorThrownByParallelDelegateExpression.bpmn20.xml"
+  })
+  public void testCatchErrorThrownBySignalOfParallelDelegateExpression() {
+    VariableMap variables = Variables.createVariables().putValue("myDelegate", new ThrowErrorDelegate());
+    String pi = runtimeService.startProcessInstanceByKey("testProcess", variables).getId();
+
+    assertTrue((Boolean) runtimeService.getVariable(pi, "executed"));
+    assertNull(runtimeService.getVariable(pi, "signaled"));
+
+    Execution serviceTask = runtimeService.createExecutionQuery().processInstanceId(pi).activityId("serviceTask").list().get(3);
+    assertNotNull(serviceTask);
+
+    runtimeService.setVariables(pi, throwError());
+    runtimeService.signal(serviceTask.getId());
+
+    assertTrue((Boolean) runtimeService.getVariable(pi, "executed"));
+    assertTrue((Boolean) runtimeService.getVariable(pi, "signaled"));
+
+    Task userTask = taskService.createTaskQuery().processInstanceId(pi).singleResult();
+    assertNotNull(userTask);
+    assertEquals("userTaskError", userTask.getTaskDefinitionKey());
+
+    taskService.complete(userTask.getId());
+  }
 }

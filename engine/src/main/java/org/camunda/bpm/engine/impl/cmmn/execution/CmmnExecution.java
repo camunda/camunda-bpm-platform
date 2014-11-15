@@ -591,6 +591,11 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
 
   // variables ////////////////////////////////////////////
 
+  @Override
+  public String getVariableScopeKey() {
+    return "caseExecution";
+  }
+
   public AbstractVariableScope getParentVariableScope() {
     return getParent();
   }

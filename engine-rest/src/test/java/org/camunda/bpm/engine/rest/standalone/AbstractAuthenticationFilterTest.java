@@ -1,6 +1,20 @@
 package org.camunda.bpm.engine.rest.standalone;
 
-import com.jayway.restassured.http.ContentType;
+import static com.jayway.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.equalTo;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response.Status;
+
 import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.RepositoryService;
@@ -14,28 +28,18 @@ import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinitionQuery;
 import org.camunda.bpm.engine.rest.AbstractRestServiceTest;
 import org.camunda.bpm.engine.rest.ProcessDefinitionRestService;
-import org.camunda.bpm.engine.rest.ProcessEngineRestService;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
+import org.camunda.bpm.engine.rest.impl.NamedProcessEngineRestServiceImpl;
 import org.junit.Before;
 import org.junit.Test;
 
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response.Status;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import static com.jayway.restassured.RestAssured.given;
-import static org.hamcrest.Matchers.equalTo;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.*;
+import com.jayway.restassured.http.ContentType;
 
 public abstract class AbstractAuthenticationFilterTest extends AbstractRestServiceTest {
 
   protected static final String SERVLET_PATH = "/rest";
-  protected static final String SERVICE_PATH = TEST_RESOURCE_ROOT_PATH + SERVLET_PATH + ProcessEngineRestService.PATH + "/{name}"+ ProcessDefinitionRestService.PATH;
+  protected static final String SERVICE_PATH = TEST_RESOURCE_ROOT_PATH + SERVLET_PATH + NamedProcessEngineRestServiceImpl.PATH + "/{name}"+ ProcessDefinitionRestService.PATH;
 
   protected AuthorizationService authorizationServiceMock;
   protected IdentityService identityServiceMock;

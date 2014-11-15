@@ -23,6 +23,8 @@
     <spring.framework.version>3.1.2.RELEASE</spring.framework.version>
     <cxf.version>2.6.1</cxf.version>
     <junit.version>4.11</junit.version>
+    <version.assertj>1.5.0</version.assertj>
+    <version.logback>1.1.2</version.logback>
     <version.resteasy>2.3.5.Final</version.resteasy>
 
     <version.commonj>1.1.0</version.commonj>
@@ -53,8 +55,8 @@
     <version.postgre>9.3-1100-jdbc4</version.postgre>
 
     <version.camunda.commons>1.0.5</version.camunda.commons>
-    <version.camunda.connect>1.0.0-alpha3</version.camunda.connect>
-    <version.camunda.spin>1.0.0-SNAPSHOT</version.camunda.spin>
+    <version.camunda.connect>1.0.0-alpha4</version.camunda.connect>
+    <version.camunda.spin>1.0.0-alpha6</version.camunda.spin>
     <version.camunda.template-engines>1.0.0</version.camunda.template-engines>
 
     <!-- OSGi bundles properties -->
@@ -212,6 +214,16 @@
         <groupId>junit</groupId>
         <artifactId>junit</artifactId>
         <version>${junit.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.assertj</groupId>
+        <artifactId>assertj-core</artifactId>
+        <version>${version.assertj}</version>
+      </dependency>
+      <dependency>
+        <groupId>ch.qos.logback</groupId>
+        <artifactId>logback-classic</artifactId>
+        <version>${version.logback}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.ant</groupId>
@@ -447,6 +459,17 @@
       </dependency>
 
       <dependency>
+        <groupId>org.camunda.bpm</groupId>
+        <artifactId>camunda-engine-plugin-spin</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.camunda.bpm</groupId>
+        <artifactId>camunda-engine-plugin-connect</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
         <groupId>org.jboss.spec</groupId>
         <artifactId>jboss-javaee-6.0</artifactId>
         <version>${version.jboss-javaee-spec}</version>
@@ -568,8 +591,10 @@
 
       <dependency>
         <groupId>org.camunda.connect</groupId>
-        <artifactId>camunda-connect-all</artifactId>
+        <artifactId>camunda-connect-bom</artifactId>
         <version>${version.camunda.connect}</version>
+        <scope>import</scope>
+        <type>pom</type>
       </dependency>
 
       <dependency>

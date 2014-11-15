@@ -36,8 +36,8 @@
     <version.joda-time>2.1</version.joda-time>
     <version.uuid-generator>3.1.2</version.uuid-generator>
     <version.camunda.commons>1.0.5</version.camunda.commons>
-    <version.camunda.connect>1.0.0-alpha3</version.camunda.connect>
-    <version.camunda.spin>1.0.0-alpha3</version.camunda.spin>
+    <version.camunda.connect>1.0.0-alpha4</version.camunda.connect>
+    <version.camunda.spin>1.0.0-alpha6</version.camunda.spin>
     <version.camunda.template-engines>1.0.0</version.camunda.template-engines>
   </properties>
 
@@ -59,8 +59,8 @@
         <artifactId>java-uuid-generator</artifactId>
         <version>${version.uuid-generator}</version>
       </dependency>
-  
-      <!-- camunda BPM public artifacts -->       
+
+      <!-- camunda BPM public artifacts -->
       <dependency>
         <groupId>org.camunda.bpm</groupId>
         <artifactId>camunda-engine</artifactId>
@@ -87,11 +87,21 @@
         <version>${project.version}</version>
       </dependency>
       <dependency>
+        <groupId>org.camunda.bpm</groupId>
+        <artifactId>camunda-engine-plugin-spin</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.camunda.bpm</groupId>
+        <artifactId>camunda-engine-plugin-connect</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
         <groupId>org.camunda.bpm.javaee</groupId>
         <artifactId>camunda-ejb-client</artifactId>
         <version>${project.version}</version>
       </dependency>
-      
+
       <dependency>
         <groupId>org.camunda.bpm.model</groupId>
         <artifactId>camunda-bpmn-model</artifactId>
@@ -117,13 +127,17 @@
       <!-- optional dependencies -->
       <dependency>
         <groupId>org.camunda.connect</groupId>
-        <artifactId>camunda-connect-all</artifactId>
+        <artifactId>camunda-connect-bom</artifactId>
         <version>${version.camunda.connect}</version>
+        <scope>import</scope>
+        <type>pom</type>
       </dependency>
       <dependency>
         <groupId>org.camunda.spin</groupId>
-        <artifactId>camunda-spin-all</artifactId>
+        <artifactId>camunda-spin-bom</artifactId>
         <version>${version.camunda.spin}</version>
+        <scope>import</scope>
+        <type>pom</type>
       </dependency>
 
       <!-- template engines, optional -->
@@ -137,7 +151,7 @@
         <artifactId>camunda-template-engines-velocity</artifactId>
         <version>${version.camunda.template-engines}</version>
       </dependency>
-      
+
     </dependencies>
   </dependencyManagement>
 

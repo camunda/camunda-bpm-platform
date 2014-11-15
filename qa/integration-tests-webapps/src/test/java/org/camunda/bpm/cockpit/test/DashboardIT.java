@@ -56,7 +56,7 @@ public class DashboardIT {
 
     WebElement element = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("a.tile")));
     element.click();
-    Boolean found = wait.until(ExpectedConditions.textToBePresentInElement(By.tagName("h1"), "invoice receipt"));
+    Boolean found = wait.until(ExpectedConditions.textToBePresentInElement(By.tagName("h1"), "Invoice Receipt"));
   }
 
   @After

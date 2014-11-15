@@ -30,7 +30,7 @@ public class LocalTaskVariablesResource extends AbstractVariablesResource {
   }
 
   protected VariableMap getVariableEntities(boolean deserializeValues) {
-    return engine.getTaskService().getVariablesLocal(resourceId, deserializeValues);
+    return engine.getTaskService().getVariablesLocalTyped(resourceId, deserializeValues);
   }
 
   protected void updateVariableEntities(VariableMap modifications, List<String> deletions) {

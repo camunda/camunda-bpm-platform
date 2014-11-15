@@ -44,7 +44,7 @@ public class LocalExecutionVariablesResource extends AbstractVariablesResource {
   }
 
   protected VariableMap getVariableEntities(boolean deserializeValues) {
-    return engine.getRuntimeService().getVariablesLocal(resourceId, deserializeValues);
+    return engine.getRuntimeService().getVariablesLocalTyped(resourceId, deserializeValues);
   }
 
   protected TypedValue getVariableEntity(String variableKey, boolean deserializeValue) {

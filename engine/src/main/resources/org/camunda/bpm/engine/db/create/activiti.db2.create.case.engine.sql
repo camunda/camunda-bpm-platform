@@ -9,6 +9,7 @@ create table ACT_RE_CASE_DEF (
     VERSION_ integer not null,
     DEPLOYMENT_ID_ varchar(64),
     RESOURCE_NAME_ varchar(4000),
+    DGRM_RESOURCE_NAME_ varchar(4000),
     primary key (ID_)
 );
 

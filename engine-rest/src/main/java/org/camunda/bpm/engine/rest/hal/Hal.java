@@ -15,6 +15,8 @@ package org.camunda.bpm.engine.rest.hal;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.ws.rs.core.MediaType;
+
 import org.camunda.bpm.engine.rest.CaseDefinitionRestService;
 import org.camunda.bpm.engine.rest.ProcessDefinitionRestService;
 import org.camunda.bpm.engine.rest.UserRestService;
@@ -28,7 +30,8 @@ import org.camunda.bpm.engine.rest.hal.user.HalUserResolver;
  */
 public class Hal {
 
-  public static final String MEDIA_TYPE_HAL = "application/hal+json";
+  public static final String APPLICATION_HAL_JSON = "application/hal+json";
+  public static final MediaType APPLICATION_HAL_JSON_TYPE = new MediaType("application", "hal+json");
 
   public static Hal instance = new Hal();
 

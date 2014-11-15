@@ -74,6 +74,7 @@ create table ACT_RE_CASE_DEF (
     VERSION_ INTEGER NOT NULL,
     DEPLOYMENT_ID_ NVARCHAR2(64),
     RESOURCE_NAME_ NVARCHAR2(2000),
+    DGRM_RESOURCE_NAME_ NVARCHAR2(2000),
     primary key (ID_)
 );
 
@@ -181,8 +182,8 @@ create table ACT_RU_FILTER (
   RESOURCE_TYPE_ NVARCHAR2(255) not null,
   NAME_ NVARCHAR2(255) not null,
   OWNER_ NVARCHAR2(255),
-  QUERY_ CLOB not null,
-  PROPERTIES_ CLOB,
+  QUERY_ NCLOB not null,
+  PROPERTIES_ NCLOB,
   primary key (ID_)
 );
 

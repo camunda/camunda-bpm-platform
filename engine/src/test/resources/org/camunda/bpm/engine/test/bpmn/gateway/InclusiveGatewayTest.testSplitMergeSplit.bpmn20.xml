@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions" 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:activiti="http://activiti.org/bpmn"
+  targetNamespace="Examples">
+  
+  <process id="inclusiveGwSplitAndMerge">
+  
+    <startEvent id="theStart" />
+    
+    <sequenceFlow id="flow1" sourceRef="theStart" targetRef="splittingInclusiveGw" />
+    
+    <inclusiveGateway id="splittingInclusiveGw" name="Splitting Inclusive Gateway" />
+    
+    <sequenceFlow id="flow2" sourceRef="splittingInclusiveGw" targetRef="theTask1">
+      <conditionExpression xsi:type="tFormalExpression">
+        <![CDATA[${input <= 1}]]>
+      </conditionExpression>
+    </sequenceFlow>
+    
+    <sequenceFlow id="flow3" sourceRef="splittingInclusiveGw" targetRef="theTask2">
+      <conditionExpression xsi:type="tFormalExpression">
+        <![CDATA[${input <= 2}]]>
+      </conditionExpression>
+    </sequenceFlow>
+
+    <userTask id="theTask1" name="Task 1" />
+    
+    <sequenceFlow id="flow5" sourceRef="theTask1" targetRef="mergingInclusiveGw" />
+    
+    <userTask id="theTask2" name="Task 2" />
+    
+    <sequenceFlow id="flow6" sourceRef="theTask2" targetRef="mergingInclusiveGw" />
+    
+    <inclusiveGateway id="mergingInclusiveGw" name="Splitting Inclusive Gateway" default="flow7"/>
+    
+    <sequenceFlow id="flow7" sourceRef="mergingInclusiveGw" targetRef="theTask3" />
+    
+    <userTask id="theTask3" name="Task 3" />
+    
+    <sequenceFlow id="flow8" sourceRef="theTask3" targetRef="theEnd" />
+    
+    <endEvent id="theEnd" />
+    
+  </process>
+
+</definitions>

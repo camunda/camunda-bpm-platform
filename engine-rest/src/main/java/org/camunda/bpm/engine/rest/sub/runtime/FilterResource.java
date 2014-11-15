@@ -13,8 +13,6 @@
 
 package org.camunda.bpm.engine.rest.sub.runtime;
 
-import java.util.List;
-
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -26,13 +24,13 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Request;
 import javax.ws.rs.core.UriInfo;
 
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.ResourceOptionsDto;
 import org.camunda.bpm.engine.rest.dto.runtime.FilterDto;
 import org.camunda.bpm.engine.rest.hal.Hal;
-import org.camunda.bpm.engine.rest.hal.HalResource;
 
 /**
  * @author Sebastian Menski
@@ -52,47 +50,26 @@ public interface FilterResource {
 
   @GET
   @Path("/singleResult")
-  @Produces(MediaType.APPLICATION_JSON)
-  Object executeSingleResult();
-
-  @GET
-  @Path("/singleResult")
-  @Produces(Hal.MEDIA_TYPE_HAL)
-  HalResource executeHalSingleResult();
+  @Produces({MediaType.APPLICATION_JSON, Hal.APPLICATION_HAL_JSON})
+  Object executeSingleResult(@Context Request request);
 
   @POST
   @Path("/singleResult")
-  @Produces(MediaType.APPLICATION_JSON)
+  @Produces({MediaType.APPLICATION_JSON, Hal.APPLICATION_HAL_JSON})
   @Consumes(MediaType.APPLICATION_JSON)
-  Object querySingleResult(String extendingQuery);
-
-  @POST
-  @Path("/singleResult")
-  @Produces(Hal.MEDIA_TYPE_HAL)
-  @Consumes(MediaType.APPLICATION_JSON)
-  HalResource queryHalSingleResult(String extendingQuery);
+  Object querySingleResult(@Context Request request, String extendingQuery);
 
   @GET
   @Path("/list")
-  @Produces(MediaType.APPLICATION_JSON)
-  List<Object> executeList(@QueryParam("firstResult") Integer firstResult, @QueryParam("maxResults") Integer maxResults);
-
-  @GET
-  @Path("/list")
-  @Produces(Hal.MEDIA_TYPE_HAL)
-  HalResource executeHalList(@QueryParam("firstResult") Integer firstResult, @QueryParam("maxResults") Integer maxResults);
+  @Produces({MediaType.APPLICATION_JSON, Hal.APPLICATION_HAL_JSON})
+  Object executeList(@Context Request request, @QueryParam("firstResult") Integer firstResult, @QueryParam("maxResults") Integer maxResults);
 
   @POST
   @Path("/list")
-  @Produces(MediaType.APPLICATION_JSON)
+  @Produces({MediaType.APPLICATION_JSON, Hal.APPLICATION_HAL_JSON})
   @Consumes(MediaType.APPLICATION_JSON)
-  List<Object> queryList(String extendingQuery, @QueryParam("firstResult") Integer firstResult, @QueryParam("maxResults") Integer maxResults);
-
-  @POST
-  @Path("/list")
-  @Produces(Hal.MEDIA_TYPE_HAL)
-  @Consumes(MediaType.APPLICATION_JSON)
-  HalResource queryHalList(String extendingQuery, @QueryParam("firstResult") Integer firstResult, @QueryParam("maxResults") Integer maxResults);
+  Object queryList(@Context Request request, String extendingQuery,
+                         @QueryParam("firstResult") Integer firstResult, @QueryParam("maxResults") Integer maxResults);
 
   @GET
   @Path("/count")

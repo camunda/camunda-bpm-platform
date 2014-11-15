@@ -14,17 +14,25 @@
 package org.camunda.bpm.engine.impl.form.type;
 
 import org.camunda.bpm.engine.form.FormType;
+import org.camunda.bpm.engine.variable.value.TypedValue;
 
 
 /**
  * @author Tom Baeyens
+ * @author Daniel Meyer
  */
 public abstract class AbstractFormFieldType implements FormType {
 
   public abstract String getName();
 
+  public abstract TypedValue convertToFormValue(TypedValue propertyValue);
+
+  public abstract TypedValue convertToModelValue(TypedValue propertyValue);
+
+  @Deprecated
   public abstract Object convertFormValueToModelValue(Object propertyValue);
 
+  @Deprecated
   public abstract String convertModelValueToFormValue(Object modelValue);
 
   public Object getInformation(String key) {

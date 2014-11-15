@@ -13,13 +13,17 @@
 
 package org.camunda.bpm.integrationtest.functional.spin;
 
-import static org.camunda.spin.Spin.*;
+import static org.camunda.bpm.engine.variable.Variables.serializedObjectValue;
+import static org.camunda.spin.Spin.XML;
 
+import java.util.HashMap;
 import java.util.List;
 
 import org.camunda.bpm.engine.impl.cfg.ProcessEnginePlugin;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.value.ObjectValue;
 import org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest;
-import org.camunda.spin.plugin.SpinProcessEnginePlugin;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
@@ -37,7 +41,8 @@ public class PaSpinSupportTest extends AbstractFoxPlatformIntegrationTest {
 
   @Deployment
   public static WebArchive createDeployment() {
-    return initWebArchiveDeployment();
+    return initWebArchiveDeployment()
+        .addAsResource("org/camunda/bpm/integrationtest/oneTaskProcess.bpmn");
   }
 
   @Test
@@ -46,13 +51,27 @@ public class PaSpinSupportTest extends AbstractFoxPlatformIntegrationTest {
   }
 
   @Test
+  public void spinCanBeUsedForVariableSerialization() {
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess", Variables.createVariables()
+        .putValue("serializedObject", serializedObjectValue("{\"foo\": \"bar\"}").serializationDataFormat("application/json").objectTypeName(HashMap.class.getName())));
+
+    ObjectValue objectValue = runtimeService.getVariableTyped(pi.getId(), "serializedObject", true);
+
+    HashMap<String, String> expected = new HashMap<String, String>();
+    expected.put("foo", "bar");
+
+    Assert.assertEquals(expected, objectValue.getValue());
+  }
+
+  @Test
   public void spinPluginShouldBeRegistered() {
+
     List<ProcessEnginePlugin> processEnginePlugins = processEngineConfiguration.getProcessEnginePlugins();
 
     boolean spinPluginFound = false;
 
     for (ProcessEnginePlugin plugin : processEnginePlugins) {
-      if (plugin instanceof SpinProcessEnginePlugin) {
+      if (plugin.getClass().getName().contains("Spin")) {
         spinPluginFound = true;
         break;
       }

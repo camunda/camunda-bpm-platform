@@ -18,7 +18,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 
@@ -214,9 +213,9 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
     RuntimeContainerDelegate.INSTANCE.set(delegate);
 
     Response response = given().queryParam("name", queryName)
-      .header("accept", Hal.MEDIA_TYPE_HAL)
+      .header("accept", Hal.APPLICATION_HAL_JSON)
       .then().expect().statusCode(Status.OK.getStatusCode())
-      .contentType(Hal.MEDIA_TYPE_HAL)
+      .contentType(Hal.APPLICATION_HAL_JSON)
       .when().get(TASK_QUERY_URL);
 
     InOrder inOrder = inOrder(mockQuery);

@@ -14,7 +14,6 @@ package org.camunda.bpm.engine.impl.cmmn;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.camunda.bpm.engine.exception.NotAllowedException;
@@ -28,6 +27,8 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.runtime.CaseInstanceBuilder;
+import org.camunda.bpm.engine.variable.VariableMap;
+import org.camunda.bpm.engine.variable.Variables;
 
 /**
  * @author Roman Smirnov
@@ -41,7 +42,7 @@ public class CaseInstanceBuilderImpl implements CaseInstanceBuilder {
   protected String caseDefinitionKey;
   protected String caseDefinitionId;
   protected String businessKey;
-  protected Map<String, Object> variables;
+  protected VariableMap variables;
 
   public CaseInstanceBuilderImpl(CommandExecutor commandExecutor, String caseDefinitionKey, String caseDefinitionId) {
     this(caseDefinitionKey, caseDefinitionId);
@@ -68,18 +69,20 @@ public class CaseInstanceBuilderImpl implements CaseInstanceBuilder {
   public CaseInstanceBuilder setVariable(String variableName, Object variableValue) {
     ensureNotNull(NotValidException.class, "variableName", variableName);
     if (variables == null) {
-      variables = new HashMap<String, Object>();
+      variables = Variables.createVariables();
     }
-    variables.put(variableName, variableValue);
+    variables.putValue(variableName, variableValue);
     return this;
   }
 
   public CaseInstanceBuilder setVariables(Map<String, Object> variables) {
     if (variables != null) {
       if (this.variables == null) {
-        this.variables = new HashMap<String, Object>();
+        this.variables = Variables.fromMap(variables);
       }
-      this.variables.putAll(variables);
+      else {
+        this.variables.putAll(variables);
+      }
     }
     return this;
   }
@@ -119,7 +122,7 @@ public class CaseInstanceBuilderImpl implements CaseInstanceBuilder {
     return businessKey;
   }
 
-  public Map<String, Object> getVariables() {
+  public VariableMap getVariables() {
     return variables;
   }
 

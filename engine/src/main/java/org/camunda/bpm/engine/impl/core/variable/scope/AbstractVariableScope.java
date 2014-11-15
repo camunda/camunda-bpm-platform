@@ -50,21 +50,34 @@ public abstract class AbstractVariableScope implements Serializable, VariableSco
 
   // get variable map /////////////////////////////////////////
 
-  public VariableMapImpl getVariables() {
-    return getVariables(true);
+
+  public String getVariableScopeKey() {
+    return "scope";
   }
 
-  public VariableMapImpl getVariables(boolean deserializeValues) {
+  public VariableMapImpl getVariables() {
+    return getVariablesTyped();
+  }
+
+  public VariableMapImpl getVariablesTyped() {
+    return getVariablesTyped(true);
+  }
+
+  public VariableMapImpl getVariablesTyped(boolean deserializeValues) {
     VariableMapImpl variableMap = new VariableMapImpl();
     collectVariables(variableMap, null, false, deserializeValues);
     return variableMap;
   }
 
   public VariableMapImpl getVariablesLocal() {
-    return getVariablesLocal(true);
+    return getVariablesLocalTyped();
   }
 
-  public VariableMapImpl getVariablesLocal(boolean deserializeObjectValues) {
+  public VariableMapImpl getVariablesLocalTyped() {
+    return getVariablesLocalTyped(true);
+  }
+
+  public VariableMapImpl getVariablesLocalTyped(boolean deserializeObjectValues) {
     VariableMapImpl variables = new VariableMapImpl();
     collectVariables(variables, null, true, deserializeObjectValues);
     return variables;

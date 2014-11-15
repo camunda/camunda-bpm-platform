@@ -13,11 +13,12 @@
 
 package org.camunda.bpm.integrationtest.functional.connect;
 
-import org.camunda.bpm.connect.interceptor.ConnectorInvocation;
-import org.camunda.bpm.connect.interceptor.RequestInterceptor;
-import org.camunda.bpm.connect.rest.httpclient.RestHttpConnector;
-import org.camunda.bpm.connect.soap.httpclient.SoapHttpConnector;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest;
+import org.camunda.connect.Connectors;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
@@ -34,49 +35,36 @@ public class PaConnectSupportTest extends AbstractFoxPlatformIntegrationTest {
 
   @Deployment
   public static WebArchive createDeployment() {
-    return initWebArchiveDeployment();
+    return initWebArchiveDeployment()
+      .addAsResource("org/camunda/bpm/integrationtest/functional/connect/PaConnectSupportTest.connectorServiceTask.bpmn20.xml")
+      .addClass(TestConnector.class)
+      .addClass(TestConnectorRequest.class)
+      .addClass(TestConnectorResponse.class)
+      .addClass(TestConnectors.class);
+  }
+
+  @Test
+  public void httpConnectorShouldBeAvailable() {
+    assertNotNull(Connectors.http());
   }
 
   @Test
   public void soapConnectorShouldBeAvailable() {
-    SoapHttpConnector soapHttpConnector = new SoapHttpConnector();
-
-    soapHttpConnector.addRequestInterceptor(new RequestInterceptor() {
-
-      public Object handleInvocation(ConnectorInvocation invocation) throws Exception {
-        // by not calling invocation.proceed(), here, we make sure the connector does not actually execute the request
-        // nevertheless it will use the internal apache httpclient api for creating a post request etc.
-        return null;
-      }
-
-    });
-
-    soapHttpConnector.createRequest()
-      .endpointUrl("http://foo")
-      .soapAction("bar")
-      .soapEnvelope("foo")
-      .execute();
+    assertNotNull(Connectors.soap());
   }
 
   @Test
-  public void restConnectorShouldBeAvailable() {
-    RestHttpConnector restHttpConnector = new RestHttpConnector();
+  public void connectorServiceTask() {
+    TestConnector connector = new TestConnector();
+    TestConnectors.registerConnector(connector);
 
-    restHttpConnector.addRequestInterceptor(new RequestInterceptor() {
+    runtimeService.startProcessInstanceByKey("testProcess");
+    Task task = taskService.createTaskQuery().singleResult();
+    assertNotNull(task);
+    String payload = (String) taskService.getVariable(task.getId(), "payload");
+    assertEquals("Hello world!", payload);
 
-      public Object handleInvocation(ConnectorInvocation invocation) throws Exception {
-        // by not calling invocation.proceed(), here, we make sure the connector does not actually execute the request
-        // nevertheless it will use the internal apache httpclient api for creating a post request etc.
-        return null;
-      }
-
-    });
-
-    restHttpConnector.createRequest()
-      .requestUrl("http://foo")
-      .requestPayload("bar")
-      .post()
-      .execute();
+    TestConnectors.unregisterConnector(connector.getId());
   }
 
 }

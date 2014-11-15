@@ -13,6 +13,7 @@
 
 package org.camunda.bpm.engine.test.bpmn.event.error;
 
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.Map;
 
@@ -20,7 +21,9 @@ import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.impl.bpmn.behavior.AbstractBpmnActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 
-public class ThrowErrorDelegate extends AbstractBpmnActivityBehavior {
+public class ThrowErrorDelegate extends AbstractBpmnActivityBehavior implements Serializable {
+
+  public static final long serialVersionUID = 1L;
 
   @Override
   public void execute(ActivityExecution execution) throws Exception {

@@ -156,15 +156,15 @@ public class ClassPathProcessApplicationScanner implements ProcessApplicationSca
       Enumeration< ? extends ZipEntry> entries = zipFile.entries();
       while (entries.hasMoreElements()) {
         ZipEntry zipEntry = entries.nextElement();
-        String processFileName = zipEntry.getName();        
-        if (ProcessApplicationScanningUtil.isDeployable(processFileName, additionalResourceSuffixes) && isBelowPath(processFileName, paResourceRootPath)) {
-          addResource(zipFile.getInputStream(zipEntry), resourceMap, file.getName()+"!", processFileName);
+        String modelFileName = zipEntry.getName();        
+        if (ProcessApplicationScanningUtil.isDeployable(modelFileName, additionalResourceSuffixes) && isBelowPath(modelFileName, paResourceRootPath)) {
+          addResource(zipFile.getInputStream(zipEntry), resourceMap, file.getName()+"!", modelFileName);
           // find diagram(s) for process
           Enumeration< ? extends ZipEntry> entries2 = zipFile.entries();
           while (entries2.hasMoreElements()) {
             ZipEntry zipEntry2 = entries2.nextElement();
             String diagramFileName = zipEntry2.getName();
-            if (ProcessApplicationScanningUtil.isDiagramForProcess(diagramFileName, processFileName)) {
+            if (ProcessApplicationScanningUtil.isDiagram(diagramFileName, modelFileName)) {
               addResource(zipFile.getInputStream(zipEntry), resourceMap, file.getName()+"!", diagramFileName);
             }
           }
@@ -204,13 +204,13 @@ public class ClassPathProcessApplicationScanner implements ProcessApplicationSca
         }
         
       } else { // at resource root or below -> continue scanning 
-        String processFileName = path.getPath();
-        if (!path.isDirectory() && ProcessApplicationScanningUtil.isDeployable(processFileName, additionalResourceSuffixes)) {
-          addResource(path, resourceMap, paResourceRootPath, processFileName.replace(rootPath, ""));
+        String modelFileName = path.getPath();
+        if (!path.isDirectory() && ProcessApplicationScanningUtil.isDeployable(modelFileName, additionalResourceSuffixes)) {
+          addResource(path, resourceMap, paResourceRootPath, modelFileName.replace(rootPath, ""));
           // find diagram(s) for process
           for (File file : paths) {
             String diagramFileName = file.getPath();
-            if (!path.isDirectory() && ProcessApplicationScanningUtil.isDiagramForProcess(diagramFileName, processFileName)) {
+            if (!path.isDirectory() && ProcessApplicationScanningUtil.isDiagram(diagramFileName, modelFileName)) {
               addResource(file, resourceMap, paResourceRootPath, diagramFileName.replace(rootPath, ""));
             }
           }

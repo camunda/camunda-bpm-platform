@@ -73,21 +73,21 @@ public class TaskVariablesTest extends PluggableProcessEngineTestCase {
     assertEquals(expectedVariables, taskService.getVariables(taskId));
     assertEquals(expectedVariables, runtimeService.getVariablesLocal(processInstanceId));
     assertEquals(expectedVariables, runtimeService.getVariablesLocal(processInstanceId, null));
-    assertEquals(expectedVariables, runtimeService.getVariablesLocal(processInstanceId, null, true));
+    assertEquals(expectedVariables, runtimeService.getVariablesLocalTyped(processInstanceId, null, true));
 
     taskService.setVariableLocal(taskId, "budget", "unlimited");
 
     expectedVariables = new HashMap<String, Object>();
     expectedVariables.put("budget", "unlimited");
     assertEquals(expectedVariables, taskService.getVariablesLocal(taskId));
-    assertEquals(expectedVariables, taskService.getVariablesLocal(taskId, true));
+    assertEquals(expectedVariables, taskService.getVariablesLocalTyped(taskId, true));
     expectedVariables.put("player", "gonzo");
     expectedVariables.put("instrument", "trumpet");
     assertEquals(expectedVariables, taskService.getVariables(taskId));
-    assertEquals(expectedVariables, taskService.getVariables(taskId, true));
+    assertEquals(expectedVariables, taskService.getVariablesTyped(taskId, true));
 
     assertEquals(expectedVariables, taskService.getVariables(taskId, null));
-    assertEquals(expectedVariables, taskService.getVariables(taskId, null, true));
+    assertEquals(expectedVariables, taskService.getVariablesTyped(taskId, null, true));
 
     expectedVariables = new HashMap<String, Object>();
     expectedVariables.put("player", "gonzo");

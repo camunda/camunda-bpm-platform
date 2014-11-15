@@ -86,7 +86,7 @@ public class BpmnDeployer implements Deployer {
     for (String resourceName : resources.keySet()) {
       BpmnParse bpmnParse = null;
 
-      LOG.info("Processing resource " + resourceName);
+      LOG.fine("Processing resource " + resourceName);
       if (isBpmnResource(resourceName)) {
         ResourceEntity resource = resources.get(resourceName);
         byte[] bytes = resource.getBytes();

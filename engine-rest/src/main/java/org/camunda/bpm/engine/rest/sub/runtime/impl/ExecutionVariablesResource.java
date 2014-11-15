@@ -35,7 +35,7 @@ public class ExecutionVariablesResource extends AbstractVariablesResource {
   }
 
   protected VariableMap getVariableEntities(boolean deserializeValues) {
-    return engine.getRuntimeService().getVariables(resourceId, deserializeValues);
+    return engine.getRuntimeService().getVariablesTyped(resourceId, deserializeValues);
   }
 
   protected TypedValue getVariableEntity(String variableKey, boolean deserializeValue) {

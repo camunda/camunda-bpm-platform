@@ -27,11 +27,6 @@
     </dependency>
 
     <dependency>
-      <groupId>org.camunda.connect</groupId>
-      <artifactId>camunda-connect-all</artifactId>
-    </dependency>
-
-    <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-email</artifactId>
     </dependency>
@@ -173,9 +168,6 @@
         ${camunda.artifact}.container.*;${camunda.osgi.version};-noimport:=true,
         ${camunda.artifact}.engine.*
       </camunda.osgi.export.pkg>
-      <camunda.osgi.import.defaults>
-        org.camunda.bpm.connect*;${camunda.osgi.import.camunda.connect.version}
-      </camunda.osgi.import.defaults>
       <camunda.osgi.import.additional>
           junit*;resolution:=optional,
           org.junit*;resolution:=optional,
@@ -209,6 +201,7 @@
           <include>**/camunda.cfg.xml</include>
           <include>**/*camunda.cfg.xml</include>
           <include>**/camunda.cfg.db.xml</include>
+          <include>**/camunda.cfg.plugins.xml</include>
         </includes>
       </testResource>
     </testResources>
@@ -739,11 +732,10 @@
             <configuration>
               <comparisonVersion>7.1.0-Final</comparisonVersion>
               <logResults>true</logResults>
-              <includes>
-                <include>org/camunda/bpm/application/*</include>
-                <include>org/camunda/bpm/container/*</include>
-                <include>org/camunda/bpm/engine/*</include>
-              </includes>
+              <excludes>
+                <exclude>org/camunda/bpm/*/impl/**</exclude>
+                <exclude>org/camunda/bpm/engine/test/ProcessEngineRule</exclude>
+              </excludes>
             </configuration>
             <executions>
               <execution>
@@ -786,6 +778,56 @@
         </dependency>
       </dependencies>
     </profile>
+
+    <profile>
+      <id>check-plugins</id>
+      <dependencies>
+        <dependency>
+          <groupId>org.camunda.bpm</groupId>
+          <artifactId>camunda-engine-plugin-spin</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>org.camunda.spin</groupId>
+          <artifactId>camunda-spin-dataformat-all</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>org.camunda.bpm</groupId>
+          <artifactId>camunda-engine-plugin-connect</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>org.camunda.connect</groupId>
+          <artifactId>camunda-connect-connectors-all</artifactId>
+        </dependency>
+      </dependencies>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <!--
+              only worked with this version, there might be a bug with antrun
+              see http://jira.codehaus.org/browse/MANTRUN-109
+            -->
+            <version>1.4</version>
+            <executions>
+              <execution>
+                <id>copy-camunda-cfg</id>
+                <phase>process-test-classes</phase>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+                <configuration>
+                  <tasks>
+                    <echo message="Copying camunda.cfg.plugins.xml to camunda.cfg.xml" />
+                    <copy file="target/test-classes/camunda.cfg.plugins.xml" tofile="target/test-classes/camunda.cfg.xml" overwrite="true" />
+                  </tasks>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
   </profiles>
 
 </project>

@@ -1,0 +1,11 @@
+<module xmlns="urn:jboss:module:1.0" name="com.fasterxml.jackson.core.jackson-core">
+  <resources>
+    <resource-root path="jackson-core-2.4.1.jar" />
+  </resources>
+
+  <dependencies>
+
+    <module name="javax.api" />
+
+  </dependencies>
+</module>

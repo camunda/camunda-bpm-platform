@@ -400,7 +400,17 @@ public interface TaskService {
   /** get all variables and search in the task scope and if available also the execution scopes.
    * If you have many variables and you only need a few, consider using {@link #getVariables(String, Collection)}
    * for better performance.*/
-  VariableMap getVariables(String taskId);
+  Map<String, Object> getVariables(String taskId);
+
+  /** get all variables and search in the task scope and if available also the execution scopes.
+   * If you have many variables and you only need a few, consider using {@link #getVariables(String, Collection)}
+   * for better performance.
+   *
+   * @param taskId the id of the task
+   *
+   * @since 7.2
+   * */
+  VariableMap getVariablesTyped(String taskId);
 
   /** get all variables and search in the task scope and if available also the execution scopes.
    * If you have many variables and you only need a few, consider using {@link #getVariables(String, Collection)}
@@ -411,12 +421,12 @@ public interface TaskService {
    *
    * @since 7.2
    * */
-  VariableMap getVariables(String taskId, boolean deserializeValues);
+  VariableMap getVariablesTyped(String taskId, boolean deserializeValues);
 
   /** get all variables and search only in the task scope.
   * If you have many task local variables and you only need a few, consider using {@link #getVariablesLocal(String, Collection)}
   * for better performance.*/
-  VariableMap getVariablesLocal(String taskId);
+  Map<String, Object> getVariablesLocal(String taskId);
 
   /** get all variables and search only in the task scope.
   * If you have many task local variables and you only need a few, consider using {@link #getVariablesLocal(String, Collection)}
@@ -427,10 +437,21 @@ public interface TaskService {
   *
   * @since 7.2
   * */
-  VariableMap getVariablesLocal(String taskId, boolean deserializeValues);
+  VariableMap getVariablesLocalTyped(String taskId);
+
+  /** get all variables and search only in the task scope.
+  * If you have many task local variables and you only need a few, consider using {@link #getVariablesLocal(String, Collection)}
+  * for better performance.
+  *
+  * @param taskId the id of the task
+  * @param deserializeValues if false, {@link SerializableValue SerializableValues} will not be deserialized.
+  *
+  * @since 7.2
+  * */
+  VariableMap getVariablesLocalTyped(String taskId, boolean deserializeValues);
 
   /** get values for all given variableNames */
-  VariableMap getVariables(String taskId, Collection<String> variableNames);
+  Map<String, Object> getVariables(String taskId, Collection<String> variableNames);
 
   /** get values for all given variableName
    *
@@ -440,10 +461,10 @@ public interface TaskService {
    *
    * @since 7.2
    * */
-  VariableMap getVariables(String taskId, Collection<String> variableNames, boolean deserializeValues);
+  VariableMap getVariablesTyped(String taskId, Collection<String> variableNames, boolean deserializeValues);
 
   /** get a variable on a task */
-  VariableMap getVariablesLocal(String taskId, Collection<String> variableNames);
+  Map<String,Object> getVariablesLocal(String taskId, Collection<String> variableNames);
 
   /** get values for all given variableName. Only search in the local task scope.
   *
@@ -453,7 +474,7 @@ public interface TaskService {
   *
   * @since 7.2
   * */
-  VariableMap getVariablesLocal(String taskId, Collection<String> variableNames, boolean deserializeValues);
+  VariableMap getVariablesLocalTyped(String taskId, Collection<String> variableNames, boolean deserializeValues);
 
   /**
    * Removes the variable from the task.

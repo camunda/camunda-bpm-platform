@@ -39,6 +39,7 @@
         <include>org.codehaus.groovy:groovy-all:jar:*</include>
         <include>org.slf4j:*:jar</include>
 
+        <include>org.camunda.bpm:camunda-engine-plugin-*:jar</include>
         <include>org.camunda.spin:*:jar</include>
         <include>org.camunda.connect:*:jar</include>
         <include>org.camunda.commons:*:jar</include>
@@ -66,6 +67,7 @@
         <include>org.codehaus.groovy:groovy-all:jar:*</include>
         <include>org.slf4j:*:jar</include>
 
+        <include>org.camunda.bpm:camunda-engine-plugin-*:jar</include>
         <include>org.camunda.spin:*:jar</include>
         <include>org.camunda.connect:*:jar</include>
         <include>org.camunda.commons:*:jar</include>

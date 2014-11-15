@@ -26,8 +26,7 @@
 
     <module name="org.camunda.bpm.model.camunda-bpmn-model" />
     <module name="org.camunda.bpm.model.camunda-cmmn-model" />
-    <module name="org.camunda.connect.camunda-connect-all" />
-    <module name="org.camunda.spin.camunda-spin-all" />
+    
     <module name="org.camunda.commons.camunda-commons-logging" />
     <module name="org.camunda.commons.camunda-commons-utils" />
     <module name="org.camunda.template-engines.camunda-template-engines-freemarker" services="import" />

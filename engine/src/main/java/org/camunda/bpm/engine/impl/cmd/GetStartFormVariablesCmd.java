@@ -40,7 +40,7 @@ public class GetStartFormVariablesCmd extends AbstractGetFormVariablesCmd {
 
     for (FormField formField : startFormData.getFormFields()) {
       if(formVariableNames == null || formVariableNames.contains(formField.getId())) {
-        result.put(formField.getId(), createVariable(formField));
+        result.put(formField.getId(), createVariable(formField, null));
       }
     }
 

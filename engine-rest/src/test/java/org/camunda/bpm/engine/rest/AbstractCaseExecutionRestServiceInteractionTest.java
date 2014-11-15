@@ -111,14 +111,14 @@ public abstract class AbstractCaseExecutionRestServiceInteractionTest extends Ab
     when(caseExecutionQueryMock.singleResult()).thenReturn(mockCaseExecution);
 
     when(caseServiceMock.getVariableTyped(anyString(), anyString(), eq(true))).thenReturn(EXAMPLE_VARIABLE_VALUE);
-    when(caseServiceMock.getVariables(anyString(), eq(true))).thenReturn(EXAMPLE_VARIABLES);
+    when(caseServiceMock.getVariablesTyped(anyString(), eq(true))).thenReturn(EXAMPLE_VARIABLES);
 
     when(caseServiceMock.getVariableLocalTyped(anyString(), eq(EXAMPLE_VARIABLE_KEY), anyBoolean())).thenReturn(EXAMPLE_VARIABLE_VALUE);
     when(caseServiceMock.getVariableLocalTyped(anyString(), eq(EXAMPLE_BYTES_VARIABLE_KEY), eq(false))).thenReturn(EXAMPLE_VARIABLE_VALUE_BYTES);
-    when(caseServiceMock.getVariablesLocal(anyString(), eq(true))).thenReturn(EXAMPLE_VARIABLES);
+    when(caseServiceMock.getVariablesLocalTyped(anyString(), eq(true))).thenReturn(EXAMPLE_VARIABLES);
 
-    when(caseServiceMock.getVariables(anyString(), Matchers.<Collection<String>>any(), eq(true))).thenReturn(EXAMPLE_VARIABLES);
-    when(caseServiceMock.getVariablesLocal(anyString(), Matchers.<Collection<String>>any(), eq(true))).thenReturn(EXAMPLE_VARIABLES);
+    when(caseServiceMock.getVariablesTyped(anyString(), Matchers.<Collection<String>>any(), eq(true))).thenReturn(EXAMPLE_VARIABLES);
+    when(caseServiceMock.getVariablesLocalTyped(anyString(), Matchers.<Collection<String>>any(), eq(true))).thenReturn(EXAMPLE_VARIABLES);
 
     caseExecutionCommandBuilderMock = mock(CaseExecutionCommandBuilder.class);
 
@@ -1351,7 +1351,7 @@ public abstract class AbstractCaseExecutionRestServiceInteractionTest extends Ab
 
     Assert.assertEquals("Should return exactly one variable", 1, response.jsonPath().getMap("").size());
 
-    verify(caseServiceMock).getVariablesLocal(MockProvider.EXAMPLE_CASE_EXECUTION_ID, true);
+    verify(caseServiceMock).getVariablesLocalTyped(MockProvider.EXAMPLE_CASE_EXECUTION_ID, true);
   }
 
   @Test
@@ -1370,7 +1370,7 @@ public abstract class AbstractCaseExecutionRestServiceInteractionTest extends Ab
 
     Assert.assertEquals("Should return exactly one variable", 1, response.jsonPath().getMap("").size());
 
-    verify(caseServiceMock).getVariables(MockProvider.EXAMPLE_CASE_EXECUTION_ID, true);
+    verify(caseServiceMock).getVariablesTyped(MockProvider.EXAMPLE_CASE_EXECUTION_ID, true);
   }
 
   @Test
@@ -1388,7 +1388,7 @@ public abstract class AbstractCaseExecutionRestServiceInteractionTest extends Ab
             .objectTypeName(ArrayList.class.getName())
             .serializedValue("a serialized value"); // this should differ from the serialized json
 
-    when(caseServiceMock.getVariablesLocal(eq(MockProvider.EXAMPLE_CASE_EXECUTION_ID), anyBoolean()))
+    when(caseServiceMock.getVariablesLocalTyped(eq(MockProvider.EXAMPLE_CASE_EXECUTION_ID), anyBoolean()))
       .thenReturn(Variables.createVariables().putValueTyped(variableKey, variableValue));
 
     // when
@@ -1401,7 +1401,7 @@ public abstract class AbstractCaseExecutionRestServiceInteractionTest extends Ab
       .when().get(CASE_EXECUTION_LOCAL_VARIABLES_URL);
 
     // then
-    verify(caseServiceMock).getVariablesLocal(MockProvider.EXAMPLE_CASE_EXECUTION_ID, true);
+    verify(caseServiceMock).getVariablesLocalTyped(MockProvider.EXAMPLE_CASE_EXECUTION_ID, true);
   }
 
   @Test
@@ -1416,7 +1416,7 @@ public abstract class AbstractCaseExecutionRestServiceInteractionTest extends Ab
           .objectTypeName(ArrayList.class.getName())
           .create();
 
-    when(caseServiceMock.getVariablesLocal(eq(MockProvider.EXAMPLE_CASE_EXECUTION_ID), anyBoolean()))
+    when(caseServiceMock.getVariablesLocalTyped(eq(MockProvider.EXAMPLE_CASE_EXECUTION_ID), anyBoolean()))
       .thenReturn(Variables.createVariables().putValueTyped(variableKey, variableValue));
 
     // when
@@ -1431,12 +1431,12 @@ public abstract class AbstractCaseExecutionRestServiceInteractionTest extends Ab
       .when().get(CASE_EXECUTION_LOCAL_VARIABLES_URL);
 
     // then
-    verify(caseServiceMock).getVariablesLocal(MockProvider.EXAMPLE_CASE_EXECUTION_ID, false);
+    verify(caseServiceMock).getVariablesLocalTyped(MockProvider.EXAMPLE_CASE_EXECUTION_ID, false);
   }
 
   @Test
   public void testGetLocalVariablesForNonExistingExecution() {
-    when(caseServiceMock.getVariablesLocal(anyString(), anyBoolean())).thenThrow(new ProcessEngineException("expected exception"));
+    when(caseServiceMock.getVariablesLocalTyped(anyString(), anyBoolean())).thenThrow(new ProcessEngineException("expected exception"));
 
     given()
       .pathParam("id", "aNonExistingExecutionId")
@@ -1449,12 +1449,12 @@ public abstract class AbstractCaseExecutionRestServiceInteractionTest extends Ab
       .when()
         .get(CASE_EXECUTION_LOCAL_VARIABLES_URL);
 
-    verify(caseServiceMock).getVariablesLocal("aNonExistingExecutionId", true);
+    verify(caseServiceMock).getVariablesLocalTyped("aNonExistingExecutionId", true);
   }
 
   @Test
   public void testGetVariablesForNonExistingExecution() {
-    when(caseServiceMock.getVariables(anyString(), anyBoolean())).thenThrow(new ProcessEngineException("expected exception"));
+    when(caseServiceMock.getVariablesTyped(anyString(), anyBoolean())).thenThrow(new ProcessEngineException("expected exception"));
 
     given()
       .pathParam("id", "aNonExistingExecutionId")
@@ -1467,7 +1467,7 @@ public abstract class AbstractCaseExecutionRestServiceInteractionTest extends Ab
       .when()
         .get(CASE_EXECUTION_VARIABLES_URL);
 
-    verify(caseServiceMock).getVariables("aNonExistingExecutionId", true);
+    verify(caseServiceMock).getVariablesTyped("aNonExistingExecutionId", true);
   }
 
   @Test

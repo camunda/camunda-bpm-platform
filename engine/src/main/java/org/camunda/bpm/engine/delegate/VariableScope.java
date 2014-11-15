@@ -25,13 +25,19 @@ import org.camunda.bpm.engine.variable.value.TypedValue;
  */
 public interface VariableScope {
 
-  VariableMap getVariables();
+  String getVariableScopeKey();
 
-  VariableMap getVariables(boolean deserializeValues);
+  Map<String, Object> getVariables();
 
-  VariableMap getVariablesLocal();
+  VariableMap getVariablesTyped();
 
-  VariableMap getVariablesLocal(boolean deserializeValues);
+  VariableMap getVariablesTyped(boolean deserializeValues);
+
+  Map<String, Object> getVariablesLocal();
+
+  VariableMap getVariablesLocalTyped();
+
+  VariableMap getVariablesLocalTyped(boolean deserializeValues);
 
   Object getVariable(String variableName);
 

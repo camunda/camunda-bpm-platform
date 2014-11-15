@@ -35,6 +35,7 @@ import org.camunda.bpm.engine.form.FormProperty;
 import org.camunda.bpm.engine.form.StartFormData;
 import org.camunda.bpm.engine.form.TaskFormData;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.form.type.AbstractFormFieldType;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.CollectionUtil;
@@ -425,7 +426,7 @@ public class FormServiceTest extends PluggableProcessEngineTestCase {
               .create())
           .putValueTyped("object", objectValue(serializedValue).create()));
 
-    VariableMap variables = runtimeService.getVariables(processInstance.getId(), false);
+    VariableMap variables = runtimeService.getVariablesTyped(processInstance.getId(), false);
     assertEquals(booleanValue(null), variables.getValueTyped("boolean"));
     assertEquals(stringValue(stringValue), variables.getValueTyped("string"));
     assertNotNull(variables.<ObjectValue>getValueTyped("serializedObject").getValueSerialized());
@@ -452,11 +453,25 @@ public class FormServiceTest extends PluggableProcessEngineTestCase {
             .create())
         .putValueTyped("object", objectValue(serializedValue).create()));
 
-    VariableMap variables = runtimeService.getVariables(processInstance.getId(), false);
+    VariableMap variables = runtimeService.getVariablesTyped(processInstance.getId(), false);
     assertEquals(booleanValue(null), variables.getValueTyped("boolean"));
     assertEquals(stringValue(stringValue), variables.getValueTyped("string"));
     assertNotNull(variables.<ObjectValue>getValueTyped("serializedObject").getValueSerialized());
     assertNotNull(variables.<ObjectValue>getValueTyped("object").getValueSerialized());
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/form/FormsProcess.bpmn20.xml"})
+  public void testSubmitFormVariablesNull() {
+    String procDefId = repositoryService.createProcessDefinitionQuery().singleResult().getId();
+
+    // assert that I can submit the start form with variables null
+    formService.submitStartForm(procDefId, null);
+
+    Task task = taskService.createTaskQuery().singleResult();
+    assertNotNull(task);
+
+    // assert that I can submit the task form with variables null
+    formService.submitTaskForm(task.getId(), null);
   }
 
   public void testSubmitTaskFormForStandaloneTask() {
@@ -624,9 +639,10 @@ public class FormServiceTest extends PluggableProcessEngineTestCase {
 
     assertNotNull(variables.get("dateField"));
     assertEquals(variables.get("dateField"), variables.getValueTyped("dateField").getValue());
-    assertEquals(ValueType.DATE, variables.getValueTyped("dateField").getType());
+    assertEquals(ValueType.STRING, variables.getValueTyped("dateField").getType());
 
-    Date dateValue = (Date) variables.get("dateField");
+    AbstractFormFieldType dateFormType = processEngineConfiguration.getFormTypes().getFormType("date");
+    Date dateValue = (Date) dateFormType.convertToModelValue(variables.getValueTyped("dateField")).getValue();
     Calendar calendar = Calendar.getInstance();
     calendar.setTime(dateValue);
     assertEquals(10, calendar.get(Calendar.DAY_OF_MONTH));
@@ -784,7 +800,7 @@ public class FormServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
-  public void FAILING_testSubmitTaskFormContainingReadonlyVariable() {
+  public void testSubmitTaskFormContainingReadonlyVariable() {
     ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceById(processDefinition.getId());

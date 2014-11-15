@@ -96,9 +96,9 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
   public void setUpRuntimeData() {
     runtimeServiceMock = mock(RuntimeServiceImpl.class);
     // variables
-    when(runtimeServiceMock.getVariables(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID, true)).thenReturn(EXAMPLE_VARIABLES);
-    when(runtimeServiceMock.getVariables(MockProvider.ANOTHER_EXAMPLE_PROCESS_INSTANCE_ID, true)).thenReturn(EXAMPLE_OBJECT_VARIABLES);
-    when(runtimeServiceMock.getVariables(EXAMPLE_PROCESS_INSTANCE_ID_WITH_NULL_VALUE_AS_VARIABLE, true)).thenReturn(EXAMPLE_VARIABLES_WITH_NULL_VALUE);
+    when(runtimeServiceMock.getVariablesTyped(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID, true)).thenReturn(EXAMPLE_VARIABLES);
+    when(runtimeServiceMock.getVariablesTyped(MockProvider.ANOTHER_EXAMPLE_PROCESS_INSTANCE_ID, true)).thenReturn(EXAMPLE_OBJECT_VARIABLES);
+    when(runtimeServiceMock.getVariablesTyped(EXAMPLE_PROCESS_INSTANCE_ID_WITH_NULL_VALUE_AS_VARIABLE, true)).thenReturn(EXAMPLE_VARIABLES_WITH_NULL_VALUE);
 
     // activity instances
     when(runtimeServiceMock.getActivityInstance(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID)).thenReturn(EXAMPLE_ACTIVITY_INSTANCE);
@@ -219,7 +219,7 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
             .objectTypeName(ArrayList.class.getName())
             .serializedValue("a serialized value"); // this should differ from the serialized json
 
-    when(runtimeServiceMock.getVariables(eq(EXAMPLE_PROCESS_INSTANCE_ID), anyBoolean()))
+    when(runtimeServiceMock.getVariablesTyped(eq(EXAMPLE_PROCESS_INSTANCE_ID), anyBoolean()))
       .thenReturn(Variables.createVariables().putValueTyped(variableKey, variableValue));
 
     // when
@@ -232,7 +232,7 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
       .when().get(PROCESS_INSTANCE_VARIABLES_URL);
 
     // then
-    verify(runtimeServiceMock).getVariables(EXAMPLE_PROCESS_INSTANCE_ID, true);
+    verify(runtimeServiceMock).getVariablesTyped(EXAMPLE_PROCESS_INSTANCE_ID, true);
   }
 
   @Test
@@ -247,7 +247,7 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
           .objectTypeName(ArrayList.class.getName())
           .create();
 
-    when(runtimeServiceMock.getVariables(eq(EXAMPLE_PROCESS_INSTANCE_ID), anyBoolean()))
+    when(runtimeServiceMock.getVariablesTyped(eq(EXAMPLE_PROCESS_INSTANCE_ID), anyBoolean()))
       .thenReturn(Variables.createVariables().putValueTyped(variableKey, variableValue));
 
     // when
@@ -262,12 +262,12 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
       .when().get(PROCESS_INSTANCE_VARIABLES_URL);
 
     // then
-    verify(runtimeServiceMock).getVariables(EXAMPLE_PROCESS_INSTANCE_ID, false);
+    verify(runtimeServiceMock).getVariablesTyped(EXAMPLE_PROCESS_INSTANCE_ID, false);
   }
 
   @Test
   public void testGetVariablesForNonExistingProcessInstance() {
-    when(runtimeServiceMock.getVariables(anyString(), anyBoolean())).thenThrow(new ProcessEngineException("expected exception"));
+    when(runtimeServiceMock.getVariablesTyped(anyString(), anyBoolean())).thenThrow(new ProcessEngineException("expected exception"));
 
     given().pathParam("id", "aNonExistingProcessInstanceId")
       .then().expect().statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode()).contentType(ContentType.JSON)

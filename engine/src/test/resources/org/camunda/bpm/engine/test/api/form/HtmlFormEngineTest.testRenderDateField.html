@@ -1,0 +1,43 @@
+<form name="generatedForm" role="form">
+  <div class="form-group">
+    <label for="dateField">
+      Date Field
+    </label>
+    <div class="input-group">
+      <input class="form-control" name="dateField" cam-variable-type="String" cam-variable-name="dateField" type="text" datepicker-popup="dd/MM/yyyy" is-open="dateFieldOpeneddateField" />
+      <div class="input-group-btn">
+        <button type="button" class="btn btn-default" ng-click="opendateField($event)">
+          <i class="glyphicon glyphicon-calendar">
+          </i>
+        </button>
+      </div>
+      <script cam-script type="text/form-script">
+        $scope.opendateField = function ($event) { $event.preventDefault(); $event.stopPropagation(); $scope.dateFieldOpeneddateField = true; };
+      </script>
+    </div>
+    <div ng-if="this.generatedForm.dateField.$invalid && this.generatedForm.dateField.$dirty" class="has-error">
+      <div ng-show="this.generatedForm.dateField.$error.required && !this.generatedForm.dateField.$error.date" class="help-block">
+        Required field
+      </div>
+      <div ng-show="this.generatedForm.dateField.$error.date" class="help-block">
+        Invalid date format: the date should have the pattern 'dd/MM/yyyy'
+      </div>
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="readOnlyDateField">
+      Read Only Field
+    </label>
+    <div class="input-group">
+      <input class="form-control" name="readOnlyDateField" cam-variable-type="String" cam-variable-name="readOnlyDateField" readonly type="text" />
+    </div>
+    <div ng-if="this.generatedForm.readOnlyDateField.$invalid && this.generatedForm.readOnlyDateField.$dirty" class="has-error">
+      <div ng-show="this.generatedForm.readOnlyDateField.$error.required && !this.generatedForm.readOnlyDateField.$error.date" class="help-block">
+        Required field
+      </div>
+      <div ng-show="this.generatedForm.readOnlyDateField.$error.date" class="help-block">
+        Invalid date format: the date should have the pattern 'dd/MM/yyyy'
+      </div>
+    </div>
+  </div>
+</form>

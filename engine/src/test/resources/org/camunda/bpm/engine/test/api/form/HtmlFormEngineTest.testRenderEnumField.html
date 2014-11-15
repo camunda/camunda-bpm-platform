@@ -4,7 +4,7 @@
       Enum Field
     </label>
     <select class="form-control" name="enumField" cam-variable-type="String" cam-variable-name="enumField">
-      <option value="a" selected>
+      <option value="a">
         A
       </option>
       <option value="b">
@@ -17,6 +17,9 @@
     <div ng-if="this.generatedForm.enumField.$invalid && this.generatedForm.enumField.$dirty" class="has-error">
       <div ng-show="this.generatedForm.enumField.$error.required" class="help-block">
         Required field
+      </div>
+      <div ng-show="this.generatedForm.enumField.$error.camVariableType" class="help-block">
+        Only a string value is allowed
       </div>
     </div>
   </div>
