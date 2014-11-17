@@ -19,11 +19,15 @@ import static org.camunda.bpm.engine.variable.type.ValueType.DOUBLE;
 import static org.camunda.bpm.engine.variable.type.ValueType.INTEGER;
 import static org.camunda.bpm.engine.variable.type.ValueType.LONG;
 import static org.camunda.bpm.engine.variable.type.ValueType.NULL;
+import static org.camunda.bpm.engine.variable.type.ValueType.NUMBER;
 import static org.camunda.bpm.engine.variable.type.ValueType.OBJECT;
 import static org.camunda.bpm.engine.variable.type.ValueType.SHORT;
 import static org.camunda.bpm.engine.variable.type.ValueType.STRING;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.camunda.bpm.engine.variable.type.ValueType;
@@ -50,6 +54,7 @@ public class ValueTypeResolverImpl implements ValueTypeResolver {
     addType(SHORT);
     addType(STRING);
     addType(OBJECT);
+    addType(NUMBER);
   }
 
   protected void addType(ValueType type) {
@@ -58,6 +63,19 @@ public class ValueTypeResolverImpl implements ValueTypeResolver {
 
   public ValueType typeForName(String typeName) {
     return knownTypes.get(typeName);
+  }
+
+  public Collection<ValueType> getSubTypes(ValueType type) {
+    // TODO: make this a true transitive closure (i.e. consider children of children)
+    List<ValueType> types = new ArrayList<ValueType>();
+
+    for (ValueType knownType : knownTypes.values()) {
+      if (!knownType.isAbstract() && type.equals(knownType.getParent())) {
+        types.add(knownType);
+      }
+    }
+
+    return types;
   }
 
 }

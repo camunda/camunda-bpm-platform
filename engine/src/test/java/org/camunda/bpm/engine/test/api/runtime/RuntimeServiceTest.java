@@ -1181,4 +1181,26 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
 
   }
 
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
+  public void testSetAbstractNumberValueFails() {
+    try {
+      runtimeService.startProcessInstanceByKey("oneTaskProcess",
+          Variables.createVariables().putValueTyped("var", Variables.numberValue(42)));
+      fail("exception expected");
+    } catch (ProcessEngineException e) {
+      // happy path
+      assertTextPresentIgnoreCase("cannot serialize value of abstract type number", e.getMessage());
+    }
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+    try {
+      runtimeService.setVariable(processInstance.getId(), "var", Variables.numberValue(42));
+      fail("exception expected");
+    } catch (ProcessEngineException e) {
+      // happy path
+      assertTextPresent("cannot serialize value of abstract type number", e.getMessage());
+    }
+  }
+
 }

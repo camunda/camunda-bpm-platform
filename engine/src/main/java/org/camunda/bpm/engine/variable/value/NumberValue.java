@@ -10,22 +10,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.variable.type;
-
-import java.util.Collection;
+package org.camunda.bpm.engine.variable.value;
 
 /**
  * @author Thorben Lindhauer
+ *
  */
-public interface ValueTypeResolver {
+public interface NumberValue extends PrimitiveValue<Number> {
 
-  ValueType typeForName(String typeName);
-
-  /**
-   * Returns all (transitive) sub types of the provided type
-   * given they are not abstract
-   *
-   * @return
-   */
-  Collection<ValueType> getSubTypes(ValueType type);
 }

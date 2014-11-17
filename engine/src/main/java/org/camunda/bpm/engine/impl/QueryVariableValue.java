@@ -14,14 +14,10 @@
 package org.camunda.bpm.engine.impl;
 
 import java.io.Serializable;
+import java.util.List;
 
-import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
-import org.camunda.bpm.engine.impl.variable.serializer.TypedValueSerializer;
 import org.camunda.bpm.engine.impl.variable.serializer.VariableSerializers;
-import org.camunda.bpm.engine.impl.variable.serializer.jpa.JPAVariableSerializer;
 import org.camunda.bpm.engine.variable.Variables;
-import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
 
@@ -31,13 +27,13 @@ import org.camunda.bpm.engine.variable.value.TypedValue;
  * @author Frederik Heremans
  */
 public class QueryVariableValue implements Serializable {
-  private static final long serialVersionUID = 1L;
-  private String name;
-  private TypedValue value;
-  private QueryOperator operator;
+  protected static final long serialVersionUID = 1L;
+  protected String name;
+  protected TypedValue value;
+  protected QueryOperator operator;
+  protected boolean local;
 
-  private VariableInstanceEntity variableInstanceEntity;
-  private boolean local;
+  protected AbstractQueryVariableValueCondition valueCondition;
 
   public QueryVariableValue(String name, Object value, QueryOperator operator, boolean local) {
     this.name = name;
@@ -46,83 +42,41 @@ public class QueryVariableValue implements Serializable {
     this.local = local;
   }
 
-  public void initialize(VariableSerializers types) {
-
-    if(variableInstanceEntity == null) {
-
-      // serializer implementation determines which fields are set on the entity
-      variableInstanceEntity = VariableInstanceEntity.create(name, value);
-
-      TypedValueSerializer<?> serializer = variableInstanceEntity.getSerializer();
-      if(serializer.getType() == ValueType.BYTES){
-        throw new ProcessEngineException("Variables of type ByteArray cannot be used to query");
-
-      }
-      else if(serializer instanceof JPAVariableSerializer) {
-        if(operator != QueryOperator.EQUALS) {
-          throw new ProcessEngineException("JPA entity variables can only be used in 'variableValueEquals'");
-        }
-
-      }
-      else {
-        if(!serializer.getType().isPrimitiveValueType()) {
-          throw new ProcessEngineException("Object values cannot be used to query");
-        }
-
-      }
-
-
+  public void initialize(VariableSerializers serializers) {
+    if (value.getType() != null && value.getType().isAbstract()) {
+      valueCondition = new CompositeQueryVariableValueCondition(this);
+    } else {
+      valueCondition = new SingleQueryVariableValueCondition(this);
     }
+
+    valueCondition.initializeValue(serializers);
+  }
+
+  public List<SingleQueryVariableValueCondition> getValueConditions() {
+    return valueCondition.getDisjunctiveConditions();
   }
 
   public String getName() {
     return name;
   }
 
-  public String getOperator() {
+  public QueryOperator getOperator() {
     if(operator != null) {
-      return operator.toString();
+      return operator;
     }
-    return QueryOperator.EQUALS.toString();
+    return QueryOperator.EQUALS;
+  }
+
+  public String getOperatorName() {
+    return getOperator().toString();
   }
 
   public Object getValue() {
     return value.getValue();
   }
 
-  public String getTextValue() {
-    if(variableInstanceEntity != null) {
-      return variableInstanceEntity.getTextValue();
-    }
-    return null;
-  }
-
-  public Long getLongValue() {
-    if(variableInstanceEntity != null) {
-      return variableInstanceEntity.getLongValue();
-    }
-    return null;
-  }
-
-  public Double getDoubleValue() {
-    if(variableInstanceEntity != null) {
-      return variableInstanceEntity.getDoubleValue();
-    }
-    return null;
-  }
-
-  public String getTextValue2() {
-    if(variableInstanceEntity != null) {
-      return variableInstanceEntity.getTextValue2();
-    }
-    return null;
-  }
-
-  public String getType() {
-    if(variableInstanceEntity != null) {
-      return variableInstanceEntity.getSerializer().getName();
-    }
-    return null;
+  public TypedValue getTypedValue() {
+    return value;
   }
 
   public boolean isLocal() {

@@ -12,7 +12,6 @@
  */
 package org.camunda.bpm.engine.rest.dto;
 
-import org.camunda.bpm.engine.impl.QueryOperator;
 import org.camunda.bpm.engine.impl.TaskQueryVariableValue;
 
 public class VariableQueryParameterDto extends ConditionQueryParameterDto {
@@ -23,7 +22,7 @@ public class VariableQueryParameterDto extends ConditionQueryParameterDto {
 
   public VariableQueryParameterDto(TaskQueryVariableValue variableValue) {
     this.name = variableValue.getName();
-    this.operator = OPERATOR_NAME_MAP.get(QueryOperator.valueOf(variableValue.getOperator()));
+    this.operator = OPERATOR_NAME_MAP.get(variableValue.getOperator());
     this.value = variableValue.getValue();
   }
 

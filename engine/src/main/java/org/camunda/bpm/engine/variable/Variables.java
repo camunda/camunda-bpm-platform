@@ -23,6 +23,7 @@ import org.camunda.bpm.engine.impl.core.variable.value.PrimitiveTypeValueImpl.Da
 import org.camunda.bpm.engine.impl.core.variable.value.PrimitiveTypeValueImpl.DoubleValueImpl;
 import org.camunda.bpm.engine.impl.core.variable.value.PrimitiveTypeValueImpl.IntegerValueImpl;
 import org.camunda.bpm.engine.impl.core.variable.value.PrimitiveTypeValueImpl.LongValueImpl;
+import org.camunda.bpm.engine.impl.core.variable.value.PrimitiveTypeValueImpl.NumberValueImpl;
 import org.camunda.bpm.engine.impl.core.variable.value.PrimitiveTypeValueImpl.ShortValueImpl;
 import org.camunda.bpm.engine.impl.core.variable.value.PrimitiveTypeValueImpl.StringValueImpl;
 import org.camunda.bpm.engine.impl.core.variable.value.UntypedValueImpl;
@@ -34,6 +35,7 @@ import org.camunda.bpm.engine.variable.value.DateValue;
 import org.camunda.bpm.engine.variable.value.DoubleValue;
 import org.camunda.bpm.engine.variable.value.IntegerValue;
 import org.camunda.bpm.engine.variable.value.LongValue;
+import org.camunda.bpm.engine.variable.value.NumberValue;
 import org.camunda.bpm.engine.variable.value.ShortValue;
 import org.camunda.bpm.engine.variable.value.StringValue;
 import org.camunda.bpm.engine.variable.value.TypedValue;
@@ -103,6 +105,15 @@ public class Variables {
 
   public static DoubleValue doubleValue(Double doubleValue) {
     return new DoubleValueImpl(doubleValue);
+  }
+
+  /**
+   * Creates an abstract Number value. Note that this value cannot be used to set variables.
+   * Use the specific methods {@link Variables#integerValue(Integer)}, {@link #shortValue(Short)},
+   * {@link #longValue(Long)} and {@link #doubleValue(Double)} instead.
+   */
+  public static NumberValue numberValue(Number numberValue) {
+    return new NumberValueImpl(numberValue);
   }
 
   public static TypedValue untypedNullValue() {

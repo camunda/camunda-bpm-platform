@@ -239,7 +239,7 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
       TaskQueryVariableValue variable = variables.get(i);
       assertEquals(variableNames[i], variable.getName());
       assertEquals(variableValues[i], variable.getValue());
-      assertEquals(variableOperators[i].toString(), variable.getOperator());
+      assertEquals(variableOperators[i], variable.getOperator());
       assertEquals(isTaskVariable[i], variable.isLocal());
       assertEquals(isProcessVariable[i], variable.isProcessInstanceVariable());
     }
@@ -631,7 +631,7 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
     // assert variables (ordering: extending variables are inserted first)
     assertEquals("hello", variables.get(0).getName());
     assertEquals("world", variables.get(0).getValue());
-    assertEquals(QueryOperator.EQUALS.toString(), variables.get(0).getOperator());
+    assertEquals(QueryOperator.EQUALS, variables.get(0).getOperator());
     assertFalse(variables.get(0).isProcessInstanceVariable());
     assertTrue(variables.get(0).isLocal());
     assertEquals("hello", variables.get(1).getName());

@@ -10,22 +10,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.variable.type;
+package org.camunda.bpm.engine.impl;
 
-import java.util.Collection;
+import java.util.List;
+
+import org.camunda.bpm.engine.impl.variable.serializer.VariableSerializers;
+
 
 /**
  * @author Thorben Lindhauer
+ *
  */
-public interface ValueTypeResolver {
+public abstract class AbstractQueryVariableValueCondition {
 
-  ValueType typeForName(String typeName);
+  protected QueryVariableValue wrappedQueryValue;
 
-  /**
-   * Returns all (transitive) sub types of the provided type
-   * given they are not abstract
-   *
-   * @return
-   */
-  Collection<ValueType> getSubTypes(ValueType type);
+  public AbstractQueryVariableValueCondition(QueryVariableValue variableValue) {
+    this.wrappedQueryValue = variableValue;
+  }
+
+  public abstract void initializeValue(VariableSerializers serializers);
+
+  public abstract List<SingleQueryVariableValueCondition> getDisjunctiveConditions();
 }

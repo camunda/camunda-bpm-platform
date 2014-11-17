@@ -25,6 +25,7 @@ import org.camunda.bpm.engine.impl.core.variable.type.PrimitiveValueTypeImpl.Lon
 import org.camunda.bpm.engine.impl.core.variable.type.PrimitiveValueTypeImpl.NullTypeImpl;
 import org.camunda.bpm.engine.impl.core.variable.type.PrimitiveValueTypeImpl.ShortTypeImpl;
 import org.camunda.bpm.engine.impl.core.variable.type.PrimitiveValueTypeImpl.StringTypeImpl;
+import org.camunda.bpm.engine.impl.core.variable.type.PrimitiveValueTypeImpl.NumberTypeImpl;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
 /**
@@ -53,6 +54,8 @@ public interface ValueType extends Serializable {
   public static final PrimitiveValueType DATE = new DateTypeImpl();
 
   public static final PrimitiveValueType BYTES = new BytesTypeImpl();
+
+  public static final PrimitiveValueType NUMBER = new NumberTypeImpl();
 
   public static final SerializableValueType OBJECT = new ObjectTypeImpl();
 
@@ -83,5 +86,14 @@ public interface ValueType extends Serializable {
    * @return the typed value for the value
    */
   public TypedValue createValue(Object value, Map<String, Object> valueInfo);
+
+  ValueType getParent();
+
+  boolean canConvertFromTypedValue(TypedValue typedValue);
+
+  TypedValue convertFromTypedValue(TypedValue typedValue);
+
+  boolean isAbstract();
+
 
 }

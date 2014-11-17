@@ -45,6 +45,9 @@ public class DefaultVariableSerializers implements Serializable, VariableSeriali
     List<TypedValueSerializer<?>> matchedSerializers = new ArrayList<TypedValueSerializer<?>>();
 
     ValueType type = value.getType();
+    if (type != null && type.isAbstract()) {
+      throw new ProcessEngineException("Cannot serialize value of abstract type " + type.getName());
+    }
 
     for (TypedValueSerializer<?> serializer : serializerList) {
       if(type == null || serializer.getType().equals(type)) {
@@ -81,6 +84,11 @@ public class DefaultVariableSerializers implements Serializable, VariableSeriali
       return matchedSerializers.get(0);
     }
 
+  }
+
+  public TypedValueSerializer<?> findSerializerForType(ValueType type) {
+    // TODO Auto-generated method stub
+    return null;
   }
 
   public DefaultVariableSerializers addSerializer(TypedValueSerializer<?> serializer) {
@@ -120,5 +128,6 @@ public class DefaultVariableSerializers implements Serializable, VariableSeriali
     serializerMap.remove(serializer.getName());
     return this;
   }
+
 
 }
