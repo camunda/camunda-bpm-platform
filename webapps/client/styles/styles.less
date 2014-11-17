@@ -22,84 +22,16 @@
 @modal-header-bg:                   lighten(@gray-lighter, 3%);
 @modal-footer-bg:                   @modal-header-bg;
 
-@icon-font-path: '../fonts/bootstrap/';
-
-@font-face {
-    font-family: 'open_sanslight';
-    src: url('../fonts/opensans_light_macroman/OpenSans-Light-webfont.eot');
-    src: url('../fonts/opensans_light_macroman/OpenSans-Light-webfont.eot?#iefix') format('embedded-opentype'),
-         url('../fonts/opensans_light_macroman/OpenSans-Light-webfont.woff') format('woff'),
-         url('../fonts/opensans_light_macroman/OpenSans-Light-webfont.ttf') format('truetype'),
-         url('../fonts/opensans_light_macroman/OpenSans-Light-webfont.svg#open_sanslight') format('svg');
-    font-weight: normal;
-    font-style: normal;
-
-}
-
-@font-face {
-    font-family: 'open_sansregular';
-    src: url('../fonts/opensans_regular_macroman/OpenSans-Regular-webfont.eot');
-    src: url('../fonts/opensans_regular_macroman/OpenSans-Regular-webfont.eot?#iefix') format('embedded-opentype'),
-         url('../fonts/opensans_regular_macroman/OpenSans-Regular-webfont.woff') format('woff'),
-         url('../fonts/opensans_regular_macroman/OpenSans-Regular-webfont.ttf') format('truetype'),
-         url('../fonts/opensans_regular_macroman/OpenSans-Regular-webfont.svg#open_sansregular') format('svg');
-    font-weight: normal;
-    font-style: normal;
-
-}
-
-@font-face {
-    font-family: 'open_sansbold';
-    src: url('../fonts/opensans_bold_macroman/OpenSans-Bold-webfont.eot');
-    src: url('../fonts/opensans_bold_macroman/OpenSans-Bold-webfont.eot?#iefix') format('embedded-opentype'),
-         url('../fonts/opensans_bold_macroman/OpenSans-Bold-webfont.woff') format('woff'),
-         url('../fonts/opensans_bold_macroman/OpenSans-Bold-webfont.ttf') format('truetype'),
-         url('../fonts/opensans_bold_macroman/OpenSans-Bold-webfont.svg#open_sansbold') format('svg');
-    font-weight: normal;
-    font-style: normal;
-
-}
-
-@font-face {
-    font-family: 'open_sansitalic';
-    src: url('../fonts/opensans_italic_macroman/OpenSans-Italic-webfont.eot');
-    src: url('../fonts/opensans_italic_macroman/OpenSans-Italic-webfont.eot?#iefix') format('embedded-opentype'),
-         url('../fonts/opensans_italic_macroman/OpenSans-Italic-webfont.woff') format('woff'),
-         url('../fonts/opensans_italic_macroman/OpenSans-Italic-webfont.ttf') format('truetype'),
-         url('../fonts/opensans_italic_macroman/OpenSans-Italic-webfont.svg#open_sansitalic') format('svg');
-    font-weight: normal;
-    font-style: normal;
-
-}
-
-
-
-// fonts mixins
-.font-regular {
-  font-family: 'open_sansregular', Helvetica, Arial, Verdana, sans-serif;
-  font-weight: normal;
-}
-.font-bold {
-  font-family: 'open_sansbold', Helvetica, Arial, Verdana, sans-serif;
-  font-weight: normal;
-}
-.font-light {
-  font-family: 'open_sanslight', Helvetica, Arial, Verdana, sans-serif;
-  font-weight: normal;
-}
-.font-italic {
-  font-family: 'open_sansitalic', Helvetica, Arial, Verdana, sans-serif;
-  font-weight: normal;
-}
+@icon-font-path:                    '../fonts/bootstrap/';
 
 
 
 
 // tasklist specific variables
-@column-darkening:                  4%;
-@column-left-bg:                    darken(@body-bg, @column-darkening * 6.18);
-@column-center-bg:                  darken(@body-bg, @column-darkening * (6.18 * 0.618));
-@column-right-bg:                   darken(@body-bg, @column-darkening * 0);
+@color-shift:                       4%;
+@column-left-bg:                    darken(@body-bg, @color-shift * 6.18);
+@column-center-bg:                  darken(@body-bg, @color-shift * (6.18 * 0.618));
+@column-right-bg:                   darken(@body-bg, @color-shift * 0);
 @column-top-height:                 22px;
 
 
@@ -112,10 +44,55 @@
 @line-style-alt:                    solid;
 @line-color-alt:                    #ddd;
 
-// @line-style:                        solid;
-// @line-color:                        #333;
 
 
+
+@font-face {
+    font-family: 'open_sanslight';
+    src: url('../fonts/opensans_light_macroman/OpenSans-Light-webfont.eot');
+    src: url('../fonts/opensans_light_macroman/OpenSans-Light-webfont.eot?#iefix') format('embedded-opentype'),
+         url('../fonts/opensans_light_macroman/OpenSans-Light-webfont.woff') format('woff'),
+         url('../fonts/opensans_light_macroman/OpenSans-Light-webfont.ttf') format('truetype'),
+         url('../fonts/opensans_light_macroman/OpenSans-Light-webfont.svg#open_sanslight') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+.font-light {
+  font-family: 'open_sanslight', Helvetica, Arial, Verdana, sans-serif;
+  font-weight: normal;
+}
+
+
+@font-face {
+    font-family: 'open_sansregular';
+    src: url('../fonts/opensans_regular_macroman/OpenSans-Regular-webfont.eot');
+    src: url('../fonts/opensans_regular_macroman/OpenSans-Regular-webfont.eot?#iefix') format('embedded-opentype'),
+         url('../fonts/opensans_regular_macroman/OpenSans-Regular-webfont.woff') format('woff'),
+         url('../fonts/opensans_regular_macroman/OpenSans-Regular-webfont.ttf') format('truetype'),
+         url('../fonts/opensans_regular_macroman/OpenSans-Regular-webfont.svg#open_sansregular') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+.font-regular {
+  font-family: 'open_sansregular', Helvetica, Arial, Verdana, sans-serif;
+  font-weight: normal;
+}
+
+
+@font-face {
+    font-family: 'open_sansbold';
+    src: url('../fonts/opensans_bold_macroman/OpenSans-Bold-webfont.eot');
+    src: url('../fonts/opensans_bold_macroman/OpenSans-Bold-webfont.eot?#iefix') format('embedded-opentype'),
+         url('../fonts/opensans_bold_macroman/OpenSans-Bold-webfont.woff') format('woff'),
+         url('../fonts/opensans_bold_macroman/OpenSans-Bold-webfont.ttf') format('truetype'),
+         url('../fonts/opensans_bold_macroman/OpenSans-Bold-webfont.svg#open_sansbold') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+.font-bold {
+  font-family: 'open_sansbold', Helvetica, Arial, Verdana, sans-serif;
+  font-weight: normal;
+}
 
 
 
@@ -171,30 +148,6 @@
 
 
 
-@import "_mixins";
-
-@import "_layout";
-// @import "_layout-ie9";
-@import "_navbar";
-
-@import "_notifications-panel.less";
-
-@import "../scripts/filter/styles";
-@import "../scripts/task/styles";
-@import "../scripts/tasklist/styles";
-
-
-
-
-
-
-.text-help {
-  font-style: italic;
-  font-size: 90%;
-  color: @gray-light;
-}
-
-
 
 
 h1,
@@ -208,6 +161,13 @@ h1 {
   text-transform: uppercase;
 }
 
+
+label,
+strong {
+  .font-bold();
+}
+
+
 a,
 a:link,
 a:hover,
@@ -216,57 +176,16 @@ a:active {
   color: @link-color;
   text-decoration: none;
 }
+a:focus {
+  outline: none;
+}
 
 [ng-click],
 [onclick] {
   cursor: pointer;
 }
 
-label {
-  .font-bold;
-}
 
-
-a {
-  &:focus {
-    outline: none;
-  }
-}
-
-
-strong {
-  .font-bold();
-}
-
-
-
-
-
-
-@import "../scripts/widgets/styles.less";
-@import "../scripts/user/styles.less";
-@import "../scripts/process/styles.less";
-@import "../scripts/variable/styles.less";
-@import "../scripts/form/styles.less";
-@import "_forms.less";
-@import "_loader.less";
-@import "_modal.less";
-
-
-
-
-
-
-
-
-
-
-
-
-.control-label {
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
 
 .align-left {
   text-align: left;
@@ -278,30 +197,21 @@ strong {
 
 
 
-
-
-
-
-.unassigned {
-  .assignee,
-  .owner,
-  footer {
-    display: none;
-  }
+.text-help {
+  font-style: italic;
+  font-size: 90%;
+  color: @gray;
+  margin-bottom: (@grid-gutter-width / 2);
 }
+
+
+
 
 
 .list-inline > li {
   padding: 1px 5px;
-
-  &.overdue {
-    color: @alert-warning-text;
-    background-color: @alert-warning-bg;
-    border: 1px solid @alert-warning-border;
-
-    border-radius: 3px;
-  }
 }
+
 
 .tab-content {
   position: relative;
@@ -312,6 +222,7 @@ strong {
 .tooltip .tooltip-inner {
   word-wrap: break-word;
 }
+
 
 .pagination {
   display: block;
@@ -330,3 +241,59 @@ strong {
     background-color: @gray-light;
   }
 }
+
+
+
+
+.cam-auth-login {
+  max-width: 330px;
+  margin: auto;
+}
+
+
+
+@import "_mixins";
+
+@import "_layout";
+
+@import "_forms";
+@import "_loader";
+@import "_modal";
+
+@import "_notifications-panel";
+
+
+
+
+@import "../scripts/filter/directives/cam-tasklist-filters";
+@import "../scripts/filter/directives/cam-tasklist-filter-modal-form";
+
+
+@import "../scripts/task/plugins/detail/cam-tasklist-task-detail-diagram-plugin";
+@import "../scripts/task/plugins/detail/cam-tasklist-task-detail-history-plugin";
+@import "../scripts/task/directives/cam-tasklist-task-meta";
+@import "../scripts/task/directives/cam-tasklist-task";
+@import "../scripts/task/modals/cam-tasklist-groups-modal";
+
+
+@import "../scripts/tasklist/directives/cam-tasklist-search.less";
+@import "../scripts/tasklist/directives/cam-tasklist-tasks.less";
+
+
+@import "../scripts/navigation/directives/cam-tasklist-navigation";
+@import "../scripts/widgets/directives/cam-widget-inline-field";
+
+
+
+@import "../scripts/process/modals/cam-tasklist-process-start-modal";
+
+
+@import "../scripts/variable/directives/cam-tasklist-variables";
+@import "../scripts/variable/modals/cam-tasklist-variables-detail-modal";
+
+
+@import "../scripts/form/directives/cam-tasklist-form-generic";
+@import "../scripts/form/directives/cam-tasklist-form-external";
+
+
+

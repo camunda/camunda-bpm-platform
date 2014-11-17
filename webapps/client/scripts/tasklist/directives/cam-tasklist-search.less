@@ -57,33 +57,9 @@
 
   .search-dropdown {
     left: -1px;
-    // right: -1px;
     margin-top: 0;
     & > li > a {
       padding: (@grid-gutter-width / 10) (@grid-gutter-width / 2);
-    }
-  }
-}
-
-[cam-tasks] div,
-ol.tasks-list {
-  &:focus {
-    outline: none;
-  }
-}
-
-
-ol.tasks-list {
-  li.assignee {
-    // the assignee is the only "item" in the list, use the whole width then
-    width: 100%;
-  }
-}
-
-@media (min-width: @screen-md-min) {
-  ol.tasks-list {
-    li.assignee {
-      text-align: right;
     }
   }
 }

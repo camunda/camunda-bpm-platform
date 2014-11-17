@@ -6,7 +6,6 @@
   position: relative;
   padding: 0;
   margin: 0;
-  text-overflow: ellipsis;
   white-space: nowrap;
   vertical-align: middle;
 
@@ -55,7 +54,6 @@
       top: 30px;
       left: 0;
       background-color: @body-bg;
-      overflow: hidden;
       .box-shadow(0 3px 9px rgba(0,0,0,.5));
     }
   }
@@ -103,7 +101,6 @@
     border-radius: 3px 3px 0 0;
 
     > button.btn {
-      border-color: @input-border-focus;
       &:first-child {
         border-radius: 3px 0 0 0;
       }
@@ -119,6 +116,7 @@
 
     table button {
       border: none;
+      width: 100%;
     }
     thead button {
       height: 28px;

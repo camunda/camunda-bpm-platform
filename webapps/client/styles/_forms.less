@@ -14,14 +14,6 @@
   }
 }
 
-
-.generic-form-fields {
-  .text-help {
-    margin-bottom: (@grid-gutter-width / 2);
-  }
-}
-
-
 .form-control{
   &.ng-dirty {
     &.ng-invalid {
@@ -43,6 +35,7 @@
   [type="checkbox"] {
     vertical-align: middle;
   }
+
   label [type="checkbox"] {
     margin-right: 5px;
   }
@@ -86,10 +79,16 @@
   }
 }
 
+.control-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .modal-footer {
   .row-action {
     padding-top: 0;
   }
+
   button {
     min-height: 31px;
   }
