@@ -165,16 +165,6 @@
   
   <sql id="selectExecutionsByQueryCriteriaSql">
     from ${prefix}ACT_RU_EXECUTION RES
-    <foreach collection="queryVariableValues" index="index" item="queryVariableValue">
-      <choose>
-        <when test="queryVariableValue.local">
-          inner join ${prefix}ACT_RU_VARIABLE A${index} on RES.ID_ = A${index}.EXECUTION_ID_
-        </when>
-        <otherwise>
-          inner join ${prefix}ACT_RU_VARIABLE A${index} on RES.PROC_INST_ID_ = A${index}.PROC_INST_ID_
-        </otherwise>
-      </choose> 
-    </foreach>
     <if test="businessKey != null">
         inner join ${prefix}ACT_RU_EXECUTION INST on RES.PROC_INST_ID_ = INST.ID_
     </if>
@@ -233,52 +223,34 @@
       </if>
       <!-- PLEASE NOTE: If you change anything have a look into the HistoricVariableInstance & HistoricProcessInstance, the same query object is used there! -->
       <foreach collection="queryVariableValues" index="index" item="queryVariableValue">
-        <if test="!queryVariableValue.local">
-          <!-- When process instance variable is queried for, only process variables are taken into account -->
-          and A${index}.EXECUTION_ID_ = A${index}.PROC_INST_ID_
+        and EXISTS (
+          select
+            ID_
+          from
+            ${prefix}ACT_RU_VARIABLE
+          WHERE
+            NAME_= #{queryVariableValue.name}
+            
+        <choose>
+          <when test="queryVariableValue.local">
+            and RES.ID_ = EXECUTION_ID_
+          </when>
+          <otherwise>
+            <!-- When process instance or case instance variable is queried for, taskId should be null -->
+            and TASK_ID_ is null and RES.PROC_INST_ID_ = PROC_INST_ID_
+          </otherwise>
+        </choose>
+        
+        <bind name="varTypeField" value="'TYPE_'"/>
+        <bind name="varPrefix" value="''"/>
+        <if test="queryVariableValue.valueConditions != null">
+          and (
+          <foreach collection="queryVariableValue.valueConditions" item="valueCondition" separator="or">
+            <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.variableValueCondition"/>
+          </foreach>
+          )
         </if>
-      	and A${index}.NAME_= #{queryVariableValue.name}
-        <if test="!queryVariableValue.type.equals('null')">
-        <!-- When operator is not-equals or type of value is null, type doesn't matter! -->
-          and A${index}.TYPE_ = #{queryVariableValue.type}
-        </if>
-      	<if test="queryVariableValue.textValue != null &amp;&amp; queryVariableValue.longValue == null &amp;&amp; queryVariableValue.doubleValue == null">
-	      and A${index}.TEXT_
-	      <choose>
-	        <when test="queryVariableValue.operator.equals('LIKE')">LIKE</when>
-	        <otherwise><include refid="executionVariableOperator" /></otherwise>
-	      </choose>
-	        #{queryVariableValue.textValue}
-      	</if>
-      	<if test="queryVariableValue.textValue2 != null">
-	      and A${index}.TEXT2_
-	      <choose>
-	        <when test="queryVariableValue.operator.equals('LIKE')">LIKE</when>
-	        <otherwise><include refid="executionVariableOperator" /></otherwise>
-	      </choose>
-	        #{queryVariableValue.textValue2}
-      	</if>
-      	<if test="queryVariableValue.longValue != null">
-	      and A${index}.LONG_
-	      <include refid="executionVariableOperator" />
-	      #{queryVariableValue.longValue}
-      	</if>
-      	<if test="queryVariableValue.doubleValue != null">
-	      and A${index}.DOUBLE_
-	      <include refid="executionVariableOperator" />
-	      #{queryVariableValue.doubleValue}
-      	</if>
-      	<!-- Null variable type -->
-      	<if test="queryVariableValue.textValue == null &amp;&amp; queryVariableValue.textValue2 == null &amp;&amp; queryVariableValue.longValue == null &amp;&amp; queryVariableValue.doubleValue == null">
-          <choose>
-	        <when test="queryVariableValue.operator.equals('NOT_EQUALS')">
-	          and (A${index}.TEXT_ is not null or A${index}.TEXT2_ is not null or A${index}.LONG_ is not null or A${index}.DOUBLE_ is not null or A${index}.BYTEARRAY_ID_ is not null)
-	        </when>
-	        <otherwise>
-			  and A${index}.TEXT_ is null and A${index}.TEXT2_ is null and A${index}.LONG_ is null and A${index}.DOUBLE_ is null and A${index}.BYTEARRAY_ID_ is null
-	        </otherwise>
-	      </choose>
-      	</if>
+      )
       </foreach>
       <!-- event subscriptions -->
       <if test="eventSubscriptions != null">
@@ -305,17 +277,6 @@
         and INC.INCIDENT_MSG_ like #{incidentMessageLike}
       </if>
     </where>
-  </sql>
-  
-  <sql id="executionVariableOperator">
-    <choose>
-   	  <when test="queryVariableValue.operator.equals('EQUALS')">=</when>
-   	  <when test="queryVariableValue.operator.equals('NOT_EQUALS')">&lt;&gt;</when>
-   	  <when test="queryVariableValue.operator.equals('GREATER_THAN')">&gt;</when>
-   	  <when test="queryVariableValue.operator.equals('GREATER_THAN_OR_EQUAL')">&gt;=</when>
-   	  <when test="queryVariableValue.operator.equals('LESS_THAN')">&lt;</when>
-   	  <when test="queryVariableValue.operator.equals('LESS_THAN_OR_EQUAL')">&lt;=</when>
-   </choose>
   </sql>
 
   <select id="selectSubProcessInstanceBySuperExecutionId" parameterType="string" resultMap="executionResultMap">

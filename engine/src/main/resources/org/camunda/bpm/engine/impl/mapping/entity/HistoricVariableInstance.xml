@@ -193,46 +193,14 @@
 
       <!-- PLEASE NOTE: If you change anything have a look into the Execution, the same query object is used there! -->
       <if test="queryVariableValue != null" >
-        <if test="!queryVariableValue.type.equals('null')">
-        <!-- When operator is not-equals or type of value is null, type doesn't matter! -->
-          and RES.VAR_TYPE_ = #{queryVariableValue.type}
-        </if>
-        <if test="queryVariableValue.textValue != null &amp;&amp; queryVariableValue.longValue == null &amp;&amp; queryVariableValue.doubleValue == null">
-        and RES.TEXT_
-        <choose>
-          <when test="queryVariableValue.operator.equals('LIKE')">LIKE</when>
-          <otherwise><include refid="executionVariableOperator" /></otherwise>
-        </choose>
-          #{queryVariableValue.textValue}
-        </if>
-        <if test="queryVariableValue.textValue2 != null">
-        and RES.TEXT2_
-        <choose>
-          <when test="queryVariableValue.operator.equals('LIKE')">LIKE</when>
-          <otherwise><include refid="executionVariableOperator" /></otherwise>
-        </choose>
-          #{queryVariableValue.textValue2}
-        </if>
-        <if test="queryVariableValue.longValue != null">
-        and RES.LONG_
-        <include refid="executionVariableOperator" />
-        #{queryVariableValue.longValue}
-        </if>
-        <if test="queryVariableValue.doubleValue != null">
-        and RES.DOUBLE_
-        <include refid="executionVariableOperator" />
-        #{queryVariableValue.doubleValue}
-        </if>
-        <!-- Null variable type -->
-        <if test="queryVariableValue.textValue == null &amp;&amp; queryVariableValue.textValue2 == null &amp;&amp; queryVariableValue.longValue == null &amp;&amp; queryVariableValue.doubleValue == null">
-          <choose>
-          <when test="queryVariableValue.operator.equals('NOT_EQUALS')">
-            and (RES.TEXT_ is not null or RES.TEXT2_ is not null or RES.LONG_ is not null or RES.DOUBLE_ is not null or RES.BYTEARRAY_ID_ is not null)
-          </when>
-          <otherwise>
-        and RES.TEXT_ is null and RES.TEXT2_ is null and RES.LONG_ is null and RES.DOUBLE_ is null and RES.BYTEARRAY_ID_ is null
-          </otherwise>
-        </choose>
+        <bind name="varTypeField" value="'VAR_TYPE_'"/>
+        <bind name="varPrefix" value="'RES.'"/>
+        <if test="queryVariableValue.valueConditions != null">
+          and (
+          <foreach collection="queryVariableValue.valueConditions" item="valueCondition" separator="or">
+            <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.variableValueCondition"/>
+          </foreach>
+          )
         </if>
       </if>
       

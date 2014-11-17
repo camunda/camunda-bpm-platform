@@ -636,12 +636,12 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
     assertTrue(variables.get(0).isLocal());
     assertEquals("hello", variables.get(1).getName());
     assertEquals("world", variables.get(1).getValue());
-    assertEquals(QueryOperator.EQUALS.toString(), variables.get(1).getOperator());
+    assertEquals(QueryOperator.EQUALS, variables.get(1).getOperator());
     assertFalse(variables.get(1).isProcessInstanceVariable());
     assertFalse(variables.get(1).isLocal());
     assertEquals("hello", variables.get(2).getName());
     assertEquals("world", variables.get(2).getValue());
-    assertEquals(QueryOperator.EQUALS.toString(), variables.get(2).getOperator());
+    assertEquals(QueryOperator.EQUALS, variables.get(2).getOperator());
     assertTrue(variables.get(2).isProcessInstanceVariable());
     assertFalse(variables.get(2).isLocal());
 
@@ -660,17 +660,17 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
     // assert variables (ordering: extending variables are inserted first)
     assertEquals("hello", variables.get(0).getName());
     assertEquals(42, variables.get(0).getValue());
-    assertEquals(QueryOperator.LESS_THAN.toString(), variables.get(0).getOperator());
+    assertEquals(QueryOperator.LESS_THAN, variables.get(0).getOperator());
     assertTrue(variables.get(0).isProcessInstanceVariable());
     assertFalse(variables.get(0).isLocal());
     assertEquals("hello", variables.get(1).getName());
     assertEquals(42, variables.get(1).getValue());
-    assertEquals(QueryOperator.LESS_THAN.toString(), variables.get(1).getOperator());
+    assertEquals(QueryOperator.LESS_THAN, variables.get(1).getOperator());
     assertFalse(variables.get(1).isProcessInstanceVariable());
     assertTrue(variables.get(1).isLocal());
     assertEquals("hello", variables.get(2).getName());
     assertEquals(42, variables.get(2).getValue());
-    assertEquals(QueryOperator.LESS_THAN.toString(), variables.get(2).getOperator());
+    assertEquals(QueryOperator.LESS_THAN, variables.get(2).getOperator());
     assertFalse(variables.get(2).isProcessInstanceVariable());
     assertFalse(variables.get(2).isLocal());
   }

@@ -1199,7 +1199,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
       fail("exception expected");
     } catch (ProcessEngineException e) {
       // happy path
-      assertTextPresent("cannot serialize value of abstract type number", e.getMessage());
+      assertTextPresentIgnoreCase("cannot serialize value of abstract type number", e.getMessage());
     }
   }
 

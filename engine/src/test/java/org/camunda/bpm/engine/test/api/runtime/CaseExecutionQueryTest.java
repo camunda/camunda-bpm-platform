@@ -23,6 +23,7 @@ import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.CaseExecutionQuery;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.variable.Variables;
 
 /**
  * @author Roman Smirnov
@@ -2345,6 +2346,59 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
     verifyQueryResults(query, 2);
   }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
+  public void testProcessVariableValueEqualsNumber() throws Exception {
+    // long
+    caseService
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
+      .setVariable("var", 123L)
+      .create();
+
+    // non-matching long
+    caseService
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
+      .setVariable("var", 12345L)
+      .create();
+
+    // short
+    caseService
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
+      .setVariable("var", (short) 123)
+      .create();
+
+    // double
+    caseService
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
+      .setVariable("var", 123.0d)
+      .create();
+
+    // integer
+    caseService
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
+      .setVariable("var", 123)
+      .create();
+
+    // untyped null (should not match)
+    caseService
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
+      .setVariable("var", null)
+      .create();
+
+    // typed null (should not match)
+    caseService
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
+      .setVariable("var", Variables.longValue(null))
+      .create();
+
+    assertEquals(4, caseService.createCaseExecutionQuery().variableValueEquals("var", Variables.numberValue(123)).count());
+    assertEquals(4, caseService.createCaseExecutionQuery().variableValueEquals("var", Variables.numberValue(123L)).count());
+    assertEquals(4, caseService.createCaseExecutionQuery().variableValueEquals("var", Variables.numberValue(123.0d)).count());
+    assertEquals(4, caseService.createCaseExecutionQuery().variableValueEquals("var", Variables.numberValue((short) 123)).count());
+
+    assertEquals(1, caseService.createCaseExecutionQuery().variableValueEquals("var", Variables.numberValue(null)).count());
+  }
+
 
   public void testQuerySorting() {
     CaseExecutionQuery query = caseService.createCaseExecutionQuery();

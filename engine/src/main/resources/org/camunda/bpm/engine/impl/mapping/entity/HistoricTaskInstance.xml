@@ -296,44 +296,33 @@
       <if test="followUpDate != null || followUpBefore != null || followUpAfter != null">
         and RES.FOLLOW_UP_DATE_ is not null
       </if>
-      <foreach collection="variables" index="index" item="var">
+      <foreach collection="variables" index="index" item="queryVariableValue">
         and exists (
           select HD.ID_
           from ${prefix}ACT_HI_DETAIL HD
           where
             HD.TYPE_ = 'VariableUpdate'
-            and HD.NAME_ =  #{var.name}
+            and HD.NAME_ =  #{queryVariableValue.name}
             <choose>
-              <when test="var.local">
+              <when test="queryVariableValue.local">
                 and HD.TASK_ID_ = RES.ID_
-                and HD.REV_ = (select max(HDM.REV_) from ${prefix}ACT_HI_DETAIL HDM where HDM.TASK_ID_ = RES.ID_ and HDM.VAR_TYPE_ = #{var.type} and HDM.NAME_ = #{var.name} and HDM.TYPE_ = 'VariableUpdate')
-                and HD.TIME_ = (select max(HDM.TIME_) from ${prefix}ACT_HI_DETAIL HDM where HDM.TASK_ID_ = RES.ID_ and HDM.VAR_TYPE_ = #{var.type} and HDM.NAME_ = #{var.name} and HDM.TYPE_ = 'VariableUpdate')
+                and HD.REV_ = (select max(HDM.REV_) from ${prefix}ACT_HI_DETAIL HDM where HDM.TASK_ID_ = RES.ID_ and HDM.VAR_TYPE_ = #{queryVariableValue.type} and HDM.NAME_ = #{queryVariableValue.name} and HDM.TYPE_ = 'VariableUpdate')
+                and HD.TIME_ = (select max(HDM.TIME_) from ${prefix}ACT_HI_DETAIL HDM where HDM.TASK_ID_ = RES.ID_ and HDM.VAR_TYPE_ = #{queryVariableValue.type} and HDM.NAME_ = #{queryVariableValue.name} and HDM.TYPE_ = 'VariableUpdate')
               </when>
               <otherwise>
                 and HD.PROC_INST_ID_ = RES.PROC_INST_ID_ and HD.TASK_ID_ is null
-                and HD.REV_ = (select max(HDM.REV_) from ${prefix}ACT_HI_DETAIL HDM where HDM.PROC_INST_ID_ = RES.PROC_INST_ID_ and HDM.TASK_ID_ is null and HDM.VAR_TYPE_ = #{var.type} and HDM.NAME_ = #{var.name} and HDM.TYPE_ = 'VariableUpdate')
-                and HD.TIME_ = (select max(HDM.TIME_) from ${prefix}ACT_HI_DETAIL HDM where HDM.PROC_INST_ID_ = RES.PROC_INST_ID_ and HDM.TASK_ID_ is null and HDM.VAR_TYPE_ = #{var.type} and HDM.NAME_ = #{var.name} and HDM.TYPE_ = 'VariableUpdate')
+                and HD.REV_ = (select max(HDM.REV_) from ${prefix}ACT_HI_DETAIL HDM where HDM.PROC_INST_ID_ = RES.PROC_INST_ID_ and HDM.TASK_ID_ is null and HDM.VAR_TYPE_ = #{queryVariableValue.type} and HDM.NAME_ = #{queryVariableValue.name} and HDM.TYPE_ = 'VariableUpdate')
+                and HD.TIME_ = (select max(HDM.TIME_) from ${prefix}ACT_HI_DETAIL HDM where HDM.PROC_INST_ID_ = RES.PROC_INST_ID_ and HDM.TASK_ID_ is null and HDM.VAR_TYPE_ = #{queryVariableValue.type} and HDM.NAME_ = #{queryVariableValue.name} and HDM.TYPE_ = 'VariableUpdate')
               </otherwise>
             </choose>  
-            <if test="!var.type.equals('null')">
-              and HD.VAR_TYPE_ = #{var.type}
-            </if>
-            <!-- Variable value -->
-            <if test="var.textValue != null &amp;&amp; var.longValue == null &amp;&amp; var.doubleValue == null">
-              and HD.TEXT_ =  #{var.textValue}
-            </if>
-            <if test="var.textValue2 != null">
-              and HD.TEXT2_ = #{var.textValue2}
-            </if>
-            <if test="var.longValue != null">
-              and HD.LONG_ = #{var.longValue}
-            </if>
-            <if test="var.doubleValue != null">
-              and HD.DOUBLE_ = #{var.doubleValue}
-            </if>
-            <!-- Null variable type -->
-            <if test="var.textValue == null &amp;&amp; var.textValue2 == null &amp;&amp; var.longValue == null &amp;&amp; var.doubleValue == null">
-              and HD.TEXT_ is null and HD.TEXT2_ is null and HD.LONG_ is null and HD.DOUBLE_ is null and HD.BYTEARRAY_ID_ is null
+            <bind name="varTypeField" value="'VAR_TYPE_'"/>
+            <bind name="varPrefix" value="'HD.'"/>
+            <if test="queryVariableValue.valueConditions != null">
+              and (
+              <foreach collection="queryVariableValue.valueConditions" item="valueCondition" separator="or">
+                <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.variableValueCondition"/>
+              </foreach>
+              )
             </if>
         )
       </foreach>
