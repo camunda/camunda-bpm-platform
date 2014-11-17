@@ -4,7 +4,7 @@
   {{ 'LOADING' | translate }}
 </div>
 
-<div ng-show="taskState.$loaded">
+<div ng-if="taskState.$loaded">
   <div ng-hide="task">
     <div class="no-task well">
       <i class="glyphicon glyphicon-info-sign"></i>
