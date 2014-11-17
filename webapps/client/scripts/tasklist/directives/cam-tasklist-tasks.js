@@ -149,8 +149,21 @@ define([
           }
           // wait for angular to update the classes and scroll to the newly selected task
           $timeout(function(){
-            $($event.target).find('li.active')[0].scrollIntoView(false);
+            var $el = $($event.target).find('li.active')[0];
+            if ($el) {
+              $el.scrollIntoView(false);
+            }
           });
+        };
+
+        $scope.getHrefUrl = function (task) {
+          var href = '#/?task=' + task.id;
+          var detailsTab = $location.search().detailsTab;
+          if (detailsTab) {
+            href = href + '&detailsTab=' + detailsTab;
+          }
+
+          return href;
         };
 
         /**
