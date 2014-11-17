@@ -22,7 +22,26 @@ define([
 
     // provider ////////////////////////////////////////////////////////
 
-    $scope.processDiagramState = diagramData.provide('processDiagram', ['bpmn20xml', 'processDefinition', 'task', function (bpmn20xml, processDefinition, task) {
+    diagramData.provide('bpmn20xml', ['processDefinition', function (processDefinition) {
+      var deferred = $q.defer();
+
+      if (!processDefinition) {
+        return deferred.resolve(null);
+      }
+
+      ProcessDefinition.xml(processDefinition, function(err, res) {
+        if(err) {
+          deferred.reject(err);
+        }
+        else {
+          deferred.resolve(res);
+        }
+      });
+
+      return deferred.promise;
+    }]);
+
+    diagramData.provide('processDiagram', ['bpmn20xml', 'processDefinition', 'task', function (bpmn20xml, processDefinition, task) {
       var processDiagram = {};
 
       processDiagram.processDefinition = processDefinition;

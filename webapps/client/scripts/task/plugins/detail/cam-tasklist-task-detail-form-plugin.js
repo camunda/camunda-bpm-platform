@@ -10,16 +10,20 @@ define([
   var Controller = [
    '$scope',
    '$location',
+   '$q',
    'camAPI',
    'assignNotification',
   function (
     $scope,
     $location,
+    $q,
     camAPI,
     assignNotification
   ) {
 
     // setup ///////////////////////////////////////////////////////////
+
+    var Task = camAPI.resource('task');
 
     var errorHandler = $scope.errorHandler;
 
@@ -31,6 +35,26 @@ define([
     };
 
     var taskFormData = $scope.taskData.newChild($scope);
+
+    taskFormData.provide('taskForm', ['task', function(task) {
+      var deferred = $q.defer();
+
+      if (!task || !task.id) {
+        return deferred.resolve(null);
+      }
+
+      Task.form(task.id, function(err, res) {
+
+        if(err) {
+          deferred.reject(err);
+        }
+        else {
+          deferred.resolve(res);
+        }
+      });
+
+      return deferred.promise;
+    }]);
 
     // observer ///////////////////////////////////////////////////////////
 

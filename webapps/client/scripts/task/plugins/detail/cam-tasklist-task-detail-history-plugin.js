@@ -63,6 +63,44 @@ define([
 
     var historyData = $scope.taskData.newChild($scope);
 
+    historyData.provide('history', ['task', function (task) {
+      var deferred = $q.defer();
+
+      if (!task) {
+        return deferred.resolve(null);
+      }
+
+      History.userOperation({taskId : task.id}, function(err, res) {
+        if(err) {
+          deferred.reject(err);
+        }
+        else {
+          deferred.resolve(res);
+        }
+      });
+
+      return deferred.promise;
+    }]);
+
+    historyData.provide('comments', ['task', function (task) {
+      var deferred = $q.defer();
+
+      if (!task) {
+        return deferred.resolve(null);
+      }
+
+      Task.comments(task.id, function(err, res) {
+        if(err) {
+          deferred.reject(err);
+        }
+        else {
+          deferred.resolve(res);
+        }
+      });
+
+      return deferred.promise;
+    }]);
+
     historyData.provide('orderedHistoryAndCommentsByDay', ['history', 'comments', function (history, comments) {
       history = history || {};
       comments = comments || {};
