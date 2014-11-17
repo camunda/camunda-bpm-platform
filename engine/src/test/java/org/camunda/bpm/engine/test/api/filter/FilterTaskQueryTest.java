@@ -271,6 +271,44 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(testOrderBy, query.getOrderBy());
   }
 
+  public void testTaskQueryByFollowUpBeforeOrNotExistent() {
+    // create query
+    TaskQueryImpl query = new TaskQueryImpl();
+
+    query.followUpBeforeOrNotExistent(testDate);
+
+    // save filter
+    filter.setQuery(query);
+    filterService.saveFilter(filter);
+
+    // fetch from db
+    filter = filterService.createTaskFilterQuery().singleResult();
+
+    // test query
+    query = filter.getQuery();
+    assertTrue(query.isFollowUpNullAccepted());
+    assertEquals(testDate, query.getFollowUpBefore());
+  }
+
+  public void testTaskQueryByFollowUpBeforeOrNotExistentExpression() {
+    // create query
+    TaskQueryImpl query = new TaskQueryImpl();
+
+    query.followUpBeforeOrNotExistentExpression(testString);
+
+    // save filter
+    filter.setQuery(query);
+    filterService.saveFilter(filter);
+
+    // fetch from db
+    filter = filterService.createTaskFilterQuery().singleResult();
+
+    // test query
+    query = filter.getQuery();
+    assertTrue(query.isFollowUpNullAccepted());
+    assertEquals(testString, query.getExpressions().get("followUpBefore"));
+  }
+
   public void testTaskQueryCandidateUser() {
     TaskQueryImpl query = new TaskQueryImpl();
     query.taskCandidateUser(testUser.getId());

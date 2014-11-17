@@ -130,7 +130,7 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
   private Date followUpBefore;
   private String followUpBeforeExpression;
   private Date followUpBeforeOrNotExistent;
-  private String followUpBeforeExpressionOrNotExistent;
+  private String followUpBeforeOrNotExistentExpression;
   private Date followUpDate;
   private String followUpDateExpression;
   private Date createdAfter;
@@ -367,9 +367,9 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     this.followUpBefore = followUpBefore;
   }
 
-  @CamundaQueryParam(value = "followUpBeforeExpressionOrNotExistent")
-  public void setFollowUpBeforeExpressionOrNotExistent(String followUpBeforeExpression) {
-    this.followUpBeforeExpressionOrNotExistent = followUpBeforeExpression;
+  @CamundaQueryParam(value = "followUpBeforeOrNotExistentExpression")
+  public void setFollowUpBeforeOrNotExistentExpression(String followUpBeforeExpression) {
+    this.followUpBeforeOrNotExistentExpression = followUpBeforeExpression;
   }
 
   @CamundaQueryParam(value = "followUpBeforeOrNotExistent", converter = DateConverter.class)
@@ -710,8 +710,8 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     return followUpBeforeOrNotExistent;
   }
 
-  public String getFollowUpBeforeExpressionOrNotExistent() {
-    return followUpBeforeExpressionOrNotExistent;
+  public String getFollowUpBeforeOrNotExistentExpression() {
+    return followUpBeforeOrNotExistentExpression;
   }
 
   public Date getFollowUpDate() {
@@ -898,8 +898,8 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     if (followUpBeforeOrNotExistent != null) {
       query.followUpBeforeOrNotExistent(followUpBeforeOrNotExistent);
     }
-    if (followUpBeforeExpressionOrNotExistent != null) {
-      query.followUpBeforeExpressionOrNotExistent(followUpBeforeExpressionOrNotExistent);
+    if (followUpBeforeOrNotExistentExpression != null) {
+      query.followUpBeforeOrNotExistentExpression(followUpBeforeOrNotExistentExpression);
     }
     if (followUpDate != null) {
       query.followUpDate(followUpDate);
@@ -1112,13 +1112,6 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     dto.candidateGroup = taskQuery.getCandidateGroup();
     dto.candidateGroups = taskQuery.getCandidateGroupsInternal();
 
-    // only set candidate groups if no other candidate argument was set
-    // NOTE: the getCandidateGroups method does some magic which also
-    //       evaluates candidateUser and candidateGroup
-//    if (dto.candidateUser == null && dto.candidateGroup == null) {
-//      dto.candidateGroups = taskQuery.getCandidateGroups();
-//    }
-
     dto.processInstanceBusinessKey = taskQuery.getProcessInstanceBusinessKey();
     dto.processInstanceBusinessKeyLike = taskQuery.getProcessInstanceBusinessKeyLike();
     dto.processDefinitionKey = taskQuery.getProcessDefinitionKey();
@@ -1147,6 +1140,7 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     dto.dueBefore = taskQuery.getDueBefore();
     dto.dueDate = taskQuery.getDueDate();
     dto.followUpAfter = taskQuery.getFollowUpAfter();
+
     if (taskQuery.isFollowUpNullAccepted()) {
       dto.followUpBeforeOrNotExistent = taskQuery.getFollowUpBefore();
     } else {
@@ -1227,8 +1221,15 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     if (expressions.containsKey("followUpDate")) {
       dto.setFollowUpDateExpression(expressions.get("followUpDate"));
     }
-    if (expressions.containsKey("followUpBefore")) {
-      dto.setFollowUpBeforeExpression(expressions.get("followUpBefore"));
+
+    if (!taskQuery.isFollowUpNullAccepted()) {
+      if (expressions.containsKey("followUpBefore")) {
+        dto.setFollowUpBeforeExpression(expressions.get("followUpBefore"));
+      }
+    } else {
+      if (expressions.containsKey("followUpBefore")) {
+        dto.setFollowUpBeforeOrNotExistentExpression(expressions.get("followUpBefore"));
+      }
     }
     if (expressions.containsKey("followUpAfter")) {
       dto.setFollowUpAfterExpression(expressions.get("followUpAfter"));

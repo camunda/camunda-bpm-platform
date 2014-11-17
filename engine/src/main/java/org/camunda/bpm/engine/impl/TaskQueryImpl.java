@@ -620,10 +620,14 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   }
 
   @Override
-  public TaskQuery followUpBeforeExpressionOrNotExistent(String followUpDateExpression) {
+  public TaskQuery followUpBeforeOrNotExistentExpression(String followUpDateExpression) {
     expressions.put("followUpBefore", followUpDateExpression);
     this.followUpNullAccepted = true;
     return this;
+  }
+
+  public void setFollowUpNullAccepted(boolean followUpNullAccepted) {
+    this.followUpNullAccepted = followUpNullAccepted;
   }
 
   public TaskQuery followUpAfter(Date followUpAfter) {
