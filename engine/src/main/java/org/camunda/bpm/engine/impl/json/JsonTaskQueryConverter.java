@@ -139,7 +139,7 @@ public class JsonTaskQueryConverter extends JsonObjectConverter<TaskQuery> {
     addDateField(json, DUE_AFTER, query.getDueAfter());
     addDateField(json, FOLLOW_UP, query.getFollowUpDate());
     addDateField(json, FOLLOW_UP_BEFORE, query.getFollowUpBefore());
-    addFollowUpNullAccepted(json, query.isFollowUpNullAccepted());
+    addDefaultField(json, FOLLOW_UP_NULL_ACCEPTED, false, query.isFollowUpNullAccepted());
     addDateField(json, FOLLOW_UP_AFTER, query.getFollowUpAfter());
     addDefaultField(json, EXCLUDE_SUBTASKS, false, query.isExcludeSubtasks());
     addSuspensionState(json, query.getSuspensionState());
@@ -202,12 +202,6 @@ public class JsonTaskQueryConverter extends JsonObjectConverter<TaskQuery> {
     }
   }
 
-  protected void addFollowUpNullAccepted(JSONObject json, boolean followUpNullAccepted) {
-    if (followUpNullAccepted) {
-      json.put(FOLLOW_UP_NULL_ACCEPTED, true);
-    }
-  }
-
   protected void addVariablesFields(JSONObject json, List<TaskQueryVariableValue> variables) {
     for (TaskQueryVariableValue variable : variables) {
       if (variable.isProcessInstanceVariable()) {
@@ -221,7 +215,6 @@ public class JsonTaskQueryConverter extends JsonObjectConverter<TaskQuery> {
       }
     }
   }
-
 
   protected void addVariable(JSONObject json, String variableType, TaskQueryVariableValue variable) {
     JSONArray array = json.optJSONArray(variableType);
