@@ -11,7 +11,7 @@ define([
 
     return {
 
-      restrict: 'EAC',
+      restrict: 'A',
       require: '^camTasklistFilterModalForm',
       scope: {
         filter: '=',

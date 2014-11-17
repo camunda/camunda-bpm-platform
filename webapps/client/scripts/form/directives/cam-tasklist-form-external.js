@@ -14,7 +14,7 @@ define([
 
     return {
 
-      restrict: 'EAC',
+      restrict: 'A',
 
       require: '^camTasklistForm',
 
@@ -42,7 +42,7 @@ define([
 
             var taskId = params.taskId;
             var processDefinitionKey = params.processDefinitionKey;
-            
+
             var queryParam = null;
 
             if (taskId) {

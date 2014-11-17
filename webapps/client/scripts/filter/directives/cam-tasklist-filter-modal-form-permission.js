@@ -20,7 +20,7 @@ define([
 
     return {
 
-      restrict: 'EAC',
+      restrict: 'A',
       require: '^camTasklistFilterModalForm',
       scope: {
         filter: '=',
@@ -181,7 +181,7 @@ define([
 
           var id = newPermission.id;
 
-          var auths = newPermission.type === 'user' ? userAuthorizationMap : groupAuthorizationMap; 
+          var auths = newPermission.type === 'user' ? userAuthorizationMap : groupAuthorizationMap;
           var auth = auths[id];
 
           if (auth) {
@@ -195,7 +195,7 @@ define([
                 authorizations.push(_auth);
               }
             }
-            
+
             authorizations.push(auth);
           }
           else {
@@ -342,7 +342,7 @@ define([
                   if (type === 'delete') {
                     authorization.id = null;
                   }
-                  
+
                   authorization.permissions = copy(authorization.permissions || []);
                   authorization.$permissions = copy(authorization.permissions || []);
                 }

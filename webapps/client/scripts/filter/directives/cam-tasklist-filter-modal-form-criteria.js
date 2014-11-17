@@ -32,7 +32,7 @@ define([
 
     return {
 
-      restrict: 'EAC',
+      restrict: 'A',
       require: '^camTasklistFilterModalForm',
       scope: {
         filter: '=',
@@ -51,7 +51,7 @@ define([
         $scope.criteria = criteria;
         $scope.criteriaExpressionSupport = criteriaExpressionSupport;
         $scope.criteriaHelp = criteriaHelp;
-        
+
         $scope.query = $scope.filter.query = $scope.filter.query || [];
 
         // register handler to show or hide the accordion hint /////////////////

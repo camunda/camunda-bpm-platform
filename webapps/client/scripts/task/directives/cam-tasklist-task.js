@@ -24,7 +24,7 @@ define([
   return [ function() {
 
     return {
-      restrict: 'EAC',
+      restrict: 'A',
       scope: {
         tasklistData: '='
       },

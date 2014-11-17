@@ -20,7 +20,7 @@ define([
 
     return {
 
-      restrict: 'EAC',
+      restrict: 'A',
 
       require: '^camTasklistForm',
 

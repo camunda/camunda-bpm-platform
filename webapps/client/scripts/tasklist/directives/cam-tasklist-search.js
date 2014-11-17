@@ -83,7 +83,7 @@ define([
   ) {
 
     return {
-      restrict: 'EAC',
+      restrict: 'A',
 
       scope: {
         tasklistData: '='
@@ -207,7 +207,7 @@ define([
            }
 
            var searches = JSON.parse(getPropertyFromLocation('query'));
-           
+
            if(searches) {
              for(i=0; i < searches.length; i++) {
                search = searches[i];

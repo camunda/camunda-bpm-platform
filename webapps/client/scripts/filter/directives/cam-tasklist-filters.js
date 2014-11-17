@@ -6,7 +6,7 @@ define([
   angular
 ) {
   'use strict';
-  
+
   var $ = angular.element;
   var each = angular.forEach;
 
@@ -16,7 +16,7 @@ define([
 
     return {
 
-      restrict: 'EAC',
+      restrict: 'A',
       scope: {
         filtersData: '=',
         openModal: '&'

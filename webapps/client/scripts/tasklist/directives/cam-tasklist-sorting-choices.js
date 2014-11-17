@@ -10,7 +10,7 @@ define([
   return ['search', function(search) {
     return {
 
-      restrict: 'EAC',
+      restrict: 'A',
       scope: {
         tasklistData: '='
       },
