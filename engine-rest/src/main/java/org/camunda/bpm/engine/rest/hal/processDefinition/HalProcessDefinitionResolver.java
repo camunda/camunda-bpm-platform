@@ -19,16 +19,19 @@ import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.rest.hal.HalResource;
-import org.camunda.bpm.engine.rest.hal.HalLinkResolver;
+import org.camunda.bpm.engine.rest.hal.cache.HalIdResourceCacheLinkResolver;
 
 /**
  * @author Daniel Meyer
  *
  */
-public class HalProcessDefinitionResolver implements HalLinkResolver {
+public class HalProcessDefinitionResolver extends HalIdResourceCacheLinkResolver {
 
-  public List<HalResource<?>> resolveLinks(String[] linkedIds, ProcessEngine processEngine) {
+  protected Class<?> getHalResourceClass() {
+    return HalProcessDefinition.class;
+  }
 
+  protected List<HalResource<?>> resolveNotCachedLinks(String[] linkedIds, ProcessEngine processEngine) {
     RepositoryService repositoryService = processEngine.getRepositoryService();
 
     List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery()

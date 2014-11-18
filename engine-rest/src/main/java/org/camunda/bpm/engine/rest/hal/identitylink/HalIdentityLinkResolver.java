@@ -14,23 +14,31 @@ package org.camunda.bpm.engine.rest.hal.identitylink;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.ws.rs.core.Response;
 
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
-import org.camunda.bpm.engine.rest.hal.HalLinkResolver;
 import org.camunda.bpm.engine.rest.hal.HalResource;
+import org.camunda.bpm.engine.rest.hal.cache.HalCachingLinkResolver;
 import org.camunda.bpm.engine.task.IdentityLink;
 
-public class HalIdentityLinkResolver implements HalLinkResolver {
+public class HalIdentityLinkResolver extends HalCachingLinkResolver {
 
+  protected Class<?> getHalResourceClass() {
+    return HalIdentityLink.class;
+  }
+
+  @Override
   public List<HalResource<?>> resolveLinks(String[] linkedIds, ProcessEngine processEngine) {
     if (linkedIds.length > 1) {
       throw new InvalidRequestException(Response.Status.INTERNAL_SERVER_ERROR, "The identity link resolver can only handle one task id");
     }
 
+    return super.resolveLinks(linkedIds, processEngine);
+  }
+
+  protected List<HalResource<?>> resolveNotCachedLinks(String[] linkedIds, ProcessEngine processEngine) {
     TaskService taskService = processEngine.getTaskService();
 
     List<IdentityLink> identityLinks = taskService.getIdentityLinksForTask(linkedIds[0]);
@@ -41,6 +49,18 @@ public class HalIdentityLinkResolver implements HalLinkResolver {
     }
 
     return resolvedIdentityLinks;
+  }
+
+  protected void putIntoCache(List<HalResource<?>> notCachedResources) {
+    // this resolver only can handle a single task and resolves a list of hal resources for this task
+    if (notCachedResources != null && !notCachedResources.isEmpty()) {
+      String taskId = getResourceId(notCachedResources.get(0));
+      getCache().put(taskId, notCachedResources);
+    }
+  }
+
+  protected String getResourceId(HalResource<?> resource) {
+    return ((HalIdentityLink) resource).getTaskId();
   }
 
 }

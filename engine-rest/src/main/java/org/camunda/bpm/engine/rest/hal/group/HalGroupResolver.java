@@ -18,13 +18,16 @@ import java.util.List;
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.identity.Group;
-import org.camunda.bpm.engine.rest.hal.HalLinkResolver;
 import org.camunda.bpm.engine.rest.hal.HalResource;
+import org.camunda.bpm.engine.rest.hal.cache.HalIdResourceCacheLinkResolver;
 
-public class HalGroupResolver implements HalLinkResolver {
+public class HalGroupResolver extends HalIdResourceCacheLinkResolver {
 
-  public List<HalResource<?>> resolveLinks(String[] linkedIds, ProcessEngine processEngine) {
+  protected Class<?> getHalResourceClass() {
+    return HalGroup.class;
+  }
 
+  protected List<HalResource<?>> resolveNotCachedLinks(String[] linkedIds, ProcessEngine processEngine) {
     IdentityService identityService = processEngine.getIdentityService();
 
     List<Group> groups = identityService.createGroupQuery()
