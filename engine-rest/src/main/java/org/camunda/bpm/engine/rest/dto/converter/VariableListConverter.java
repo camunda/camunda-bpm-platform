@@ -12,13 +12,12 @@
  */
 package org.camunda.bpm.engine.rest.dto.converter;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.ws.rs.core.Response.Status;
-
 import org.camunda.bpm.engine.rest.dto.VariableQueryParameterDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
+
+import javax.ws.rs.core.Response.Status;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Reads a list of {@link VariableQueryParameterDto}s from a single parameter. Expects a given format (see method comments).

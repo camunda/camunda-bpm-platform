@@ -1,14 +1,14 @@
 package org.camunda.bpm.engine.rest.sub.task.impl;
 
-import java.util.List;
-import java.util.Map;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.TaskServiceImpl;
 import org.camunda.bpm.engine.rest.sub.impl.AbstractVariablesResource;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.value.TypedValue;
-import org.codehaus.jackson.map.ObjectMapper;
+
+import java.util.List;
+import java.util.Map;
 
 public class LocalTaskVariablesResource extends AbstractVariablesResource {
 

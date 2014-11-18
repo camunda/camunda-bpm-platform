@@ -21,8 +21,9 @@ import java.util.Map;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
 import org.camunda.bpm.engine.rest.cache.Cache;
-import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.map.ObjectMapper;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class HalRelationCacheConfiguration {
 
@@ -85,7 +86,7 @@ public class HalRelationCacheConfiguration {
   protected void parseCacheImplementationClass(JsonNode jsonConfiguration) {
     JsonNode jsonNode = jsonConfiguration.get(CONFIG_CACHE_IMPLEMENTATION);
     if (jsonNode != null) {
-      String cacheImplementationClassName = jsonNode.getTextValue();
+      String cacheImplementationClassName = jsonNode.textValue();
       Class<?> cacheImplementationClass = loadClass(cacheImplementationClassName);
       setCacheImplementationClass(cacheImplementationClass);
     }
@@ -97,7 +98,7 @@ public class HalRelationCacheConfiguration {
   protected void parseCacheConfigurations(JsonNode jsonConfiguration) {
     JsonNode jsonNode = jsonConfiguration.get(CONFIG_CACHES);
     if (jsonNode != null) {
-      Iterator<String> halResourceClassNames = jsonNode.getFieldNames();
+      Iterator<String> halResourceClassNames = jsonNode.fieldNames();
       while (halResourceClassNames.hasNext()) {
         String halResourceClassName = halResourceClassNames.next();
         JsonNode cacheConfiguration = jsonNode.get(halResourceClassName);
@@ -110,7 +111,7 @@ public class HalRelationCacheConfiguration {
   protected void parseCacheConfiguration(String halResourceClassName, JsonNode jsonConfiguration) {
     try {
       Class<?> halResourceClass = loadClass(halResourceClassName);
-      Map<String, Object> configuration = objectMapper.readValue(jsonConfiguration, Map.class);
+      Map<String, Object> configuration = objectMapper.treeToValue(jsonConfiguration, Map.class);
       addCacheConfiguration(halResourceClass, configuration);
     } catch (IOException e) {
       throw new HalRelationCacheConfigurationException("Unable to parse cache configuration for HAL resource " + halResourceClassName);

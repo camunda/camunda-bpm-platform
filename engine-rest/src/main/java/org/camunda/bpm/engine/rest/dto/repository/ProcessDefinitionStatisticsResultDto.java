@@ -12,11 +12,11 @@
  */
 package org.camunda.bpm.engine.rest.dto.repository;
 
-import java.util.ArrayList;
-
 import org.camunda.bpm.engine.management.IncidentStatistics;
 import org.camunda.bpm.engine.management.ProcessDefinitionStatistics;
 import org.camunda.bpm.engine.rest.dto.StatisticsResultDto;
+
+import java.util.ArrayList;
 
 public class ProcessDefinitionStatisticsResultDto extends StatisticsResultDto {
 

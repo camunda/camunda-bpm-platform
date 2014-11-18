@@ -12,11 +12,11 @@
  */
 package org.camunda.bpm.engine.rest.dto.history;
 
+import org.camunda.bpm.engine.history.UserOperationLogEntry;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
-import org.camunda.bpm.engine.history.UserOperationLogEntry;
 
 /**
  * @author Danny Gräf

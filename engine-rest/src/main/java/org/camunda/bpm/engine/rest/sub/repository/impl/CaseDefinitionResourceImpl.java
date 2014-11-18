@@ -12,15 +12,7 @@
  */
 package org.camunda.bpm.engine.rest.sub.repository.impl;
 
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.net.URI;
-
-import javax.ws.rs.HttpMethod;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.UriInfo;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.camunda.bpm.engine.CaseService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -41,7 +33,14 @@ import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.sub.repository.CaseDefinitionResource;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.variable.VariableMap;
-import org.codehaus.jackson.map.ObjectMapper;
+
+import javax.ws.rs.HttpMethod;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriInfo;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URI;
 
 /**
  *

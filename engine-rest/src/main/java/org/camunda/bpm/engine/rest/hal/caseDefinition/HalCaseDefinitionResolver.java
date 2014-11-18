@@ -12,14 +12,14 @@
  */
 package org.camunda.bpm.engine.rest.hal.caseDefinition;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.rest.hal.HalResource;
 import org.camunda.bpm.engine.rest.hal.cache.HalIdResourceCacheLinkResolver;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Daniel Meyer

@@ -26,7 +26,8 @@ import org.camunda.bpm.engine.rest.dto.history.HistoricJobLogQueryDto;
 import org.camunda.bpm.engine.rest.history.HistoricJobLogRestService;
 import org.camunda.bpm.engine.rest.sub.history.HistoricJobLogResource;
 import org.camunda.bpm.engine.rest.sub.history.impl.HistoricJobLogResourceImpl;
-import org.codehaus.jackson.map.ObjectMapper;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author Roman Smirnov

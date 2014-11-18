@@ -12,22 +12,21 @@
  */
 package org.camunda.bpm.engine.rest.exception;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.camunda.bpm.engine.AuthorizationException;
+import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.rest.dto.AuthorizationExceptionDto;
+import org.camunda.bpm.engine.rest.dto.ExceptionDto;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
-
-import org.camunda.bpm.engine.AuthorizationException;
-import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.rest.dto.AuthorizationExceptionDto;
-import org.camunda.bpm.engine.rest.dto.ExceptionDto;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.io.Writer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * <p>Translates any {@link ProcessEngineException} to a HTTP 500 error and a JSON response. 

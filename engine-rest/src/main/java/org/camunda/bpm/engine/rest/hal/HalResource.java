@@ -12,12 +12,12 @@
  */
 package org.camunda.bpm.engine.rest.hal;
 
+import org.camunda.bpm.engine.ProcessEngine;
+
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-
-import org.camunda.bpm.engine.ProcessEngine;
 
 /**
  * Base class for implementing a HAL resource as defined in

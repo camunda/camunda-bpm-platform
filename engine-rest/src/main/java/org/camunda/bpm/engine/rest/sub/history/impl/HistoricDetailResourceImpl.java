@@ -12,11 +12,6 @@
  */
 package org.camunda.bpm.engine.rest.sub.history.impl;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-
-import javax.ws.rs.core.Response.Status;
-
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.history.HistoricDetailQuery;
@@ -25,6 +20,10 @@ import org.camunda.bpm.engine.rest.dto.history.HistoricDetailDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.sub.history.HistoricDetailResource;
 import org.camunda.bpm.engine.variable.type.ValueType;
+
+import javax.ws.rs.core.Response.Status;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 
 /**
  * @author Daniel Meyer

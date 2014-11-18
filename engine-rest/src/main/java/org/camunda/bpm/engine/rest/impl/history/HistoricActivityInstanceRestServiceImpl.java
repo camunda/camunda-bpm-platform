@@ -12,11 +12,7 @@
  */
 package org.camunda.bpm.engine.rest.impl.history;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.ws.rs.core.UriInfo;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricActivityInstanceQuery;
@@ -26,7 +22,10 @@ import org.camunda.bpm.engine.rest.dto.history.HistoricActivityInstanceQueryDto;
 import org.camunda.bpm.engine.rest.history.HistoricActivityInstanceRestService;
 import org.camunda.bpm.engine.rest.sub.history.HistoricActivityInstanceResource;
 import org.camunda.bpm.engine.rest.sub.history.impl.HistoricActivityInstanceResourceImpl;
-import org.codehaus.jackson.map.ObjectMapper;
+
+import javax.ws.rs.core.UriInfo;
+import java.util.ArrayList;
+import java.util.List;
 
 public class HistoricActivityInstanceRestServiceImpl implements HistoricActivityInstanceRestService {
 

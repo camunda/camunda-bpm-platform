@@ -12,10 +12,10 @@
  */
 package org.camunda.bpm.engine.rest.dto.identity;
 
+import org.camunda.bpm.engine.identity.User;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import org.camunda.bpm.engine.identity.User;
 
 /**
  * @author Daniel Meyer

@@ -12,9 +12,9 @@
  */
 package org.camunda.bpm.engine.rest.spi;
 
-import java.util.Set;
-
 import org.camunda.bpm.engine.ProcessEngine;
+
+import java.util.Set;
 
 /**
  * A simple provider SPI used to locate a process engine object.

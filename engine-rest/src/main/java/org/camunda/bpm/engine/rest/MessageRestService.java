@@ -12,12 +12,12 @@
  */
 package org.camunda.bpm.engine.rest;
 
+import org.camunda.bpm.engine.rest.dto.message.CorrelationMessageDto;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-
-import org.camunda.bpm.engine.rest.dto.message.CorrelationMessageDto;
 
 @Produces(MediaType.APPLICATION_JSON)
 public interface MessageRestService {

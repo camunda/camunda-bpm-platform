@@ -12,12 +12,12 @@
  */
 package org.camunda.bpm.engine.rest.dto.converter;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.Permissions;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * <p>Converts between the String-Array based representation of permissions in the REST API

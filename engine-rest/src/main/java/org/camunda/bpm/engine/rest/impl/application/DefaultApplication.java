@@ -12,13 +12,12 @@
  */
 package org.camunda.bpm.engine.rest.impl.application;
 
-import java.util.HashSet;
-import java.util.Set;
+import org.camunda.bpm.engine.rest.impl.CamundaRestResources;
 
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
-
-import org.camunda.bpm.engine.rest.impl.CamundaRestResources;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * <p>Default {@link Application} registering all resources.</p>

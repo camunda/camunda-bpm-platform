@@ -19,8 +19,8 @@ import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.rest.DeploymentRestService;
 import org.camunda.bpm.engine.rest.ProcessDefinitionRestService;
 import org.camunda.bpm.engine.rest.hal.HalIdResource;
-import org.camunda.bpm.engine.rest.hal.HalResource;
 import org.camunda.bpm.engine.rest.hal.HalRelation;
+import org.camunda.bpm.engine.rest.hal.HalResource;
 import org.camunda.bpm.engine.rest.sub.repository.DeploymentResourcesResource;
 import org.camunda.bpm.engine.rest.util.ApplicationContextPathUtil;
 

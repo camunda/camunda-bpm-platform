@@ -12,8 +12,6 @@
  */
 package org.camunda.bpm.engine.rest.sub.management;
 
-import javax.ws.rs.core.Response.Status;
-
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -22,6 +20,8 @@ import org.camunda.bpm.engine.rest.dto.management.JobDefinitionDto;
 import org.camunda.bpm.engine.rest.dto.management.JobDefinitionSuspensionStateDto;
 import org.camunda.bpm.engine.rest.dto.runtime.JobRetriesDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
+
+import javax.ws.rs.core.Response.Status;
 
 /**
  * @author roman.smirnov

@@ -1,5 +1,8 @@
 package org.camunda.bpm.engine.rest.history;
 
+import org.camunda.bpm.engine.rest.dto.CountResultDto;
+import org.camunda.bpm.engine.rest.dto.history.UserOperationLogEntryDto;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -8,9 +11,6 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
 import java.util.List;
-
-import org.camunda.bpm.engine.rest.dto.CountResultDto;
-import org.camunda.bpm.engine.rest.dto.history.UserOperationLogEntryDto;
 
 /**
  * Exposes the {@link org.camunda.bpm.engine.history.UserOperationLogQuery} as REST service.

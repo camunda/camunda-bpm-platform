@@ -12,12 +12,12 @@
  */
 package org.camunda.bpm.engine.rest.dto.runtime;
 
-import javax.ws.rs.core.Response.Status;
-
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.rest.dto.SuspensionStateDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
+
+import javax.ws.rs.core.Response.Status;
 
 /**
  * @author roman.smirnov

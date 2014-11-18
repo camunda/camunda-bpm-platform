@@ -12,17 +12,16 @@
  */
 package org.camunda.bpm.engine.rest.impl.history;
 
-import java.util.List;
-
-import javax.ws.rs.core.UriInfo;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.history.UserOperationLogQuery;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.history.UserOperationLogEntryDto;
 import org.camunda.bpm.engine.rest.dto.history.UserOperationLogQueryDto;
 import org.camunda.bpm.engine.rest.history.UserOperationLogRestService;
-import org.codehaus.jackson.map.ObjectMapper;
+
+import javax.ws.rs.core.UriInfo;
+import java.util.List;
 
 /**
  * @author Danny Gräf

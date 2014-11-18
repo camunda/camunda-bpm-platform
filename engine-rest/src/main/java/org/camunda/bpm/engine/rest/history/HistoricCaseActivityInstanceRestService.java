@@ -12,21 +12,16 @@
  */
 package org.camunda.bpm.engine.rest.history;
 
-import java.util.List;
-
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.UriInfo;
-
 import org.camunda.bpm.engine.history.HistoricCaseActivityInstanceQuery;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricCaseActivityInstanceDto;
 import org.camunda.bpm.engine.rest.sub.history.HistoricCaseActivityInstanceResource;
+
+import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.UriInfo;
+import java.util.List;
 
 @Path(HistoricCaseActivityInstanceRestService.PATH)
 @Produces(MediaType.APPLICATION_JSON)

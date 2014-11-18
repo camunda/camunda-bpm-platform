@@ -12,13 +12,7 @@
  */
 package org.camunda.bpm.engine.rest.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.UriInfo;
-import javax.ws.rs.core.Response.Status;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.rest.JobRestService;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
@@ -30,7 +24,12 @@ import org.camunda.bpm.engine.rest.sub.runtime.JobResource;
 import org.camunda.bpm.engine.rest.sub.runtime.impl.JobResourceImpl;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.JobQuery;
-import org.codehaus.jackson.map.ObjectMapper;
+
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriInfo;
+import java.util.ArrayList;
+import java.util.List;
 
 public class JobRestServiceImpl extends AbstractRestProcessEngineAware
 		implements JobRestService {

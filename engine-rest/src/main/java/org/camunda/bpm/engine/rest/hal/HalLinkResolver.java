@@ -12,9 +12,9 @@
  */
 package org.camunda.bpm.engine.rest.hal;
 
-import java.util.List;
-
 import org.camunda.bpm.engine.ProcessEngine;
+
+import java.util.List;
 
 /**
  * A link resolver is capable of resolving a set of resources by Id.

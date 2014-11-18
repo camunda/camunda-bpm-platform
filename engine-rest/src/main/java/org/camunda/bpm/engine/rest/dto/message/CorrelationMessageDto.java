@@ -12,9 +12,9 @@
  */
 package org.camunda.bpm.engine.rest.dto.message;
 
-import java.util.Map;
-
 import org.camunda.bpm.engine.rest.dto.VariableValueDto;
+
+import java.util.Map;
 
 public class CorrelationMessageDto {
 

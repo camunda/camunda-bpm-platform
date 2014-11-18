@@ -13,7 +13,7 @@
 
   <properties>
     <rest.http.port>8080</rest.http.port>
-    <jackson.version>1.9.11</jackson.version>
+    <jackson.version>2.4.5</jackson.version>
     <!-- use inherited version as default -->
     <resteasy.version>${version.resteasy}</resteasy.version>
     <resteasy.netty.version>2.3.6.Final</resteasy.netty.version>
@@ -21,8 +21,8 @@
 
   <dependencies>
     <dependency>
-      <groupId>org.codehaus.jackson</groupId>
-      <artifactId>jackson-jaxrs</artifactId>
+      <groupId>com.fasterxml.jackson.jaxrs</groupId>
+      <artifactId>jackson-jaxrs-json-provider</artifactId>
       <version>${jackson.version}</version>
     </dependency>
 

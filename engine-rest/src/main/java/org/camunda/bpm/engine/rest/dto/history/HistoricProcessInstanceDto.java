@@ -12,9 +12,9 @@
  */
 package org.camunda.bpm.engine.rest.dto.history;
 
-import java.util.Date;
-
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
+
+import java.util.Date;
 
 public class HistoricProcessInstanceDto {
 

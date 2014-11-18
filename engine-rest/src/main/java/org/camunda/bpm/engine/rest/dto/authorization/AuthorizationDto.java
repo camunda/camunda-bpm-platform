@@ -12,13 +12,13 @@
  */
 package org.camunda.bpm.engine.rest.dto.authorization;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.rest.dto.converter.PermissionConverter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Daniel Meyer

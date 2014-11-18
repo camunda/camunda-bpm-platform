@@ -12,10 +12,10 @@
  */
 package org.camunda.bpm.engine.rest.dto.converter;
 
-import javax.ws.rs.core.Response.Status;
-
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.task.DelegationState;
+
+import javax.ws.rs.core.Response.Status;
 
 public class DelegationStateConverter extends JacksonAwareStringToTypeConverter<DelegationState> {
 

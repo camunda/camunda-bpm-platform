@@ -12,18 +12,13 @@
  */
 package org.camunda.bpm.engine.rest.sub.authorization;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.OPTIONS;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Produces;
+import org.camunda.bpm.engine.rest.dto.ResourceOptionsDto;
+import org.camunda.bpm.engine.rest.dto.authorization.AuthorizationDto;
+
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
-
-import org.camunda.bpm.engine.rest.dto.ResourceOptionsDto;
-import org.camunda.bpm.engine.rest.dto.authorization.AuthorizationDto;
 
 /**
  * @author Daniel Meyer

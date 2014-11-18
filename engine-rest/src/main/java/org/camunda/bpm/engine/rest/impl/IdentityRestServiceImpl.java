@@ -12,13 +12,7 @@
  */
 package org.camunda.bpm.engine.rest.impl;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import javax.ws.rs.core.Response.Status;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.GroupQuery;
@@ -28,7 +22,12 @@ import org.camunda.bpm.engine.rest.dto.task.GroupDto;
 import org.camunda.bpm.engine.rest.dto.task.GroupInfoDto;
 import org.camunda.bpm.engine.rest.dto.task.UserDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
-import org.codehaus.jackson.map.ObjectMapper;
+
+import javax.ws.rs.core.Response.Status;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class IdentityRestServiceImpl extends AbstractRestProcessEngineAware implements IdentityRestService {
 

@@ -12,7 +12,9 @@
  */
 package org.camunda.bpm.engine.rest;
 
-import java.util.List;
+import org.camunda.bpm.engine.rest.dto.CountResultDto;
+import org.camunda.bpm.engine.rest.dto.runtime.IncidentDto;
+import org.camunda.bpm.engine.runtime.IncidentQuery;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -21,10 +23,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
-
-import org.camunda.bpm.engine.rest.dto.CountResultDto;
-import org.camunda.bpm.engine.rest.dto.runtime.IncidentDto;
-import org.camunda.bpm.engine.runtime.IncidentQuery;
+import java.util.List;
 
 /**
  * @author Roman Smirnov

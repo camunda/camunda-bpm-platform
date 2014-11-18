@@ -12,16 +12,16 @@
  */
 package org.camunda.bpm.engine.rest.hal.task;
 
-import static javax.ws.rs.core.UriBuilder.fromPath;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.rest.TaskRestService;
 import org.camunda.bpm.engine.rest.hal.HalCollectionResource;
 import org.camunda.bpm.engine.rest.hal.HalResource;
 import org.camunda.bpm.engine.task.Task;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static javax.ws.rs.core.UriBuilder.fromPath;
 
 /**
  * @author Daniel Meyer

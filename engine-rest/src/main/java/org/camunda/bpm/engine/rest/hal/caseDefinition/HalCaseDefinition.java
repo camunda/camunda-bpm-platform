@@ -12,8 +12,6 @@
  */
 package org.camunda.bpm.engine.rest.hal.caseDefinition;
 
-import javax.ws.rs.core.UriBuilder;
-
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.rest.CaseDefinitionRestService;
@@ -23,6 +21,8 @@ import org.camunda.bpm.engine.rest.hal.HalRelation;
 import org.camunda.bpm.engine.rest.hal.HalResource;
 import org.camunda.bpm.engine.rest.sub.repository.DeploymentResourcesResource;
 import org.camunda.bpm.engine.rest.util.ApplicationContextPathUtil;
+
+import javax.ws.rs.core.UriBuilder;
 
 /**
  * @author Daniel Meyer

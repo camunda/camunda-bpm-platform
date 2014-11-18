@@ -12,8 +12,6 @@
  */
 package org.camunda.bpm.engine.rest.sub.runtime.impl;
 
-import javax.ws.rs.core.Response.Status;
-
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -25,6 +23,8 @@ import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.sub.runtime.JobResource;
 import org.camunda.bpm.engine.runtime.Job;
+
+import javax.ws.rs.core.Response.Status;
 
 public class JobResourceImpl implements JobResource {
 

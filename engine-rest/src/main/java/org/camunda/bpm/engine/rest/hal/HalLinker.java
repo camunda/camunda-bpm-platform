@@ -12,15 +12,10 @@
  */
 package org.camunda.bpm.engine.rest.hal;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
 import org.camunda.bpm.engine.ProcessEngine;
+
+import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * A stateful linker which collects information about the links it creates.

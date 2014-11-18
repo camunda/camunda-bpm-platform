@@ -12,16 +12,9 @@
  */
 package org.camunda.bpm.engine.rest.sub.impl;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.nio.charset.Charset;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response.Status;
-
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.type.TypeFactory;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -36,9 +29,15 @@ import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.value.BytesValue;
 import org.camunda.bpm.engine.variable.value.TypedValue;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.map.type.TypeFactory;
-import org.codehaus.jackson.type.JavaType;
+
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response.Status;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.nio.charset.Charset;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 public abstract class AbstractVariablesResource implements VariableResource {
@@ -156,7 +155,7 @@ public abstract class AbstractVariablesResource implements VariableResource {
 
   protected Object deserializeJsonObject(String className, byte[] data) {
     try {
-      JavaType type = TypeFactory.fromCanonical(className);
+      JavaType type = TypeFactory.defaultInstance().constructFromCanonical(className);
 
       return objectMapper.readValue(new String(data, Charset.forName("UTF-8")), type);
 

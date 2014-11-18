@@ -12,13 +12,14 @@
  */
 package org.camunda.bpm.engine.rest.hal;
 
+
+import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
-
-import org.codehaus.jackson.jaxrs.JacksonJsonProvider;
 
 /**
  * @author Daniel Meyer

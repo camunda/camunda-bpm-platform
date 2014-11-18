@@ -12,6 +12,16 @@
  */
 package org.camunda.bpm.engine.rest.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.query.Query;
+import org.camunda.bpm.engine.rest.dto.converter.JacksonAwareStringToTypeConverter;
+import org.camunda.bpm.engine.rest.dto.converter.StringToTypeConverter;
+import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
+import org.camunda.bpm.engine.rest.exception.RestException;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response.Status;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -20,18 +30,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response.Status;
-
-import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.query.Query;
-import org.camunda.bpm.engine.rest.dto.converter.JacksonAwareStringToTypeConverter;
-import org.camunda.bpm.engine.rest.dto.converter.StringToTypeConverter;
-import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
-import org.camunda.bpm.engine.rest.exception.RestException;
-import org.codehaus.jackson.annotate.JsonIgnore;
-import org.codehaus.jackson.map.ObjectMapper;
 
 /**
  * Defines common query operations, such as sorting options and validation.

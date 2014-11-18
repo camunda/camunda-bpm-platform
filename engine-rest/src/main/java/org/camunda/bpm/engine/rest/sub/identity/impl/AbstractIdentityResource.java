@@ -12,13 +12,13 @@
  */
 package org.camunda.bpm.engine.rest.sub.identity.impl;
 
-import javax.ws.rs.core.Response.Status;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.authorization.Resource;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.impl.AbstractAuthorizedRestResource;
-import org.codehaus.jackson.map.ObjectMapper;
+
+import javax.ws.rs.core.Response.Status;
 
 /**
  * @author Daniel Meyer

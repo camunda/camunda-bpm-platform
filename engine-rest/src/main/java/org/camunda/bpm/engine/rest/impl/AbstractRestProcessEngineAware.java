@@ -12,12 +12,12 @@
  */
 package org.camunda.bpm.engine.rest.impl;
 
-import javax.ws.rs.core.Response.Status;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.spi.impl.AbstractProcessEngineAware;
-import org.codehaus.jackson.map.ObjectMapper;
+
+import javax.ws.rs.core.Response.Status;
 
 public abstract class AbstractRestProcessEngineAware extends AbstractProcessEngineAware {
 

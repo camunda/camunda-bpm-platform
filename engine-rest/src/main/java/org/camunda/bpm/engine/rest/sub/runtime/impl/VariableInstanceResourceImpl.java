@@ -12,11 +12,6 @@
  */
 package org.camunda.bpm.engine.rest.sub.runtime.impl;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-
-import javax.ws.rs.core.Response.Status;
-
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.rest.dto.runtime.VariableInstanceDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
@@ -24,6 +19,10 @@ import org.camunda.bpm.engine.rest.sub.runtime.VariableInstanceResource;
 import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.runtime.VariableInstanceQuery;
 import org.camunda.bpm.engine.variable.type.ValueType;
+
+import javax.ws.rs.core.Response.Status;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 
 /**
  * @author Daniel Meyer

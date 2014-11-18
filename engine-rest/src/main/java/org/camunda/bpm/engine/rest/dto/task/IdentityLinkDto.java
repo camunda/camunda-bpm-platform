@@ -13,10 +13,10 @@
 
 package org.camunda.bpm.engine.rest.dto.task;
 
-import javax.ws.rs.core.Response.Status;
-
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.task.IdentityLink;
+
+import javax.ws.rs.core.Response.Status;
 
 public class IdentityLinkDto {
 

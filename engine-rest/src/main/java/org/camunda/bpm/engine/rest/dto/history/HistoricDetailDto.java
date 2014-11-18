@@ -12,11 +12,11 @@
  */
 package org.camunda.bpm.engine.rest.dto.history;
 
-import java.util.Date;
-
 import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.history.HistoricFormField;
 import org.camunda.bpm.engine.history.HistoricVariableUpdate;
+
+import java.util.Date;
 
 /**
  * @author Roman Smirnov

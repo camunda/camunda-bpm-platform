@@ -12,14 +12,14 @@
  */
 package org.camunda.bpm.engine.rest.sub.history.impl;
 
-import javax.ws.rs.core.Response.Status;
-
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.history.HistoricCaseActivityInstance;
 import org.camunda.bpm.engine.rest.dto.history.HistoricCaseActivityInstanceDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.sub.history.HistoricCaseActivityInstanceResource;
+
+import javax.ws.rs.core.Response.Status;
 
 public class HistoricCaseActivityInstanceResourceImpl implements HistoricCaseActivityInstanceResource {
 

@@ -12,13 +12,13 @@
  */
 package org.camunda.bpm.engine.rest.dto;
 
+import org.camunda.bpm.engine.rest.dto.converter.JacksonAwareStringToTypeConverter;
+import org.camunda.bpm.engine.rest.dto.converter.StringConverter;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-
-import org.camunda.bpm.engine.rest.dto.converter.JacksonAwareStringToTypeConverter;
-import org.camunda.bpm.engine.rest.dto.converter.StringConverter;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)

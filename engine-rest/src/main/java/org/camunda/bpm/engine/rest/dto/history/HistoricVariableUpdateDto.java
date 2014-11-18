@@ -12,10 +12,10 @@
  */
 package org.camunda.bpm.engine.rest.dto.history;
 
-import java.util.Map;
-
 import org.camunda.bpm.engine.history.HistoricVariableUpdate;
 import org.camunda.bpm.engine.rest.dto.VariableValueDto;
+
+import java.util.Map;
 
 /**
  * @author Roman Smirnov

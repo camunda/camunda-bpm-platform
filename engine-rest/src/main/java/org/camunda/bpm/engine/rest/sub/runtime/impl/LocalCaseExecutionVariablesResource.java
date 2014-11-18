@@ -12,13 +12,14 @@
  */
 package org.camunda.bpm.engine.rest.sub.runtime.impl;
 
-import java.util.List;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.camunda.bpm.engine.CaseService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.rest.sub.impl.AbstractVariablesResource;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.value.TypedValue;
-import org.codehaus.jackson.map.ObjectMapper;
+
+import java.util.List;
 
 /**
  *

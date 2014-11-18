@@ -12,10 +12,10 @@
  */
 package org.camunda.bpm.engine.rest.security.auth;
 
+import org.camunda.bpm.engine.ProcessEngine;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import org.camunda.bpm.engine.ProcessEngine;
 
 /**
  * A provider to handle the authentication of {@link HttpServletRequest}s.

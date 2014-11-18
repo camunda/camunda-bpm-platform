@@ -12,8 +12,7 @@
  */
 package org.camunda.bpm.engine.rest.dto.runtime;
 
-import org.codehaus.jackson.map.type.TypeFactory;
-
+import com.fasterxml.jackson.databind.type.TypeFactory;
 
 /**
  *
@@ -25,7 +24,7 @@ public class SerializedObjectDto {
   protected Object object;
 
   public SerializedObjectDto(Object value) {
-    type = TypeFactory.type(value.getClass()).toCanonical();
+    type = TypeFactory.defaultInstance().constructType(value.getClass()).toCanonical();
     object = value;
   }
 

@@ -12,14 +12,13 @@
  */
 package org.camunda.bpm.engine.rest.dto.converter;
 
-import java.io.IOException;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 
 import javax.ws.rs.core.Response.Status;
-
-import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
-import org.codehaus.jackson.JsonParseException;
-import org.codehaus.jackson.map.JsonMappingException;
-import org.codehaus.jackson.map.ObjectMapper;
+import java.io.IOException;
 
 /**
  * @author Thorben Lindhauer

@@ -12,9 +12,9 @@
  */
 package org.camunda.bpm.engine.rest.dto.runtime;
 
-import java.util.Date;
-
 import org.camunda.bpm.engine.runtime.Job;
+
+import java.util.Date;
 
 public class JobDto {
 

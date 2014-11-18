@@ -12,13 +12,13 @@
  */
 package org.camunda.bpm.engine.rest.hal.user;
 
-import javax.ws.rs.core.UriBuilder;
-
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.rest.UserRestService;
 import org.camunda.bpm.engine.rest.hal.HalIdResource;
 import org.camunda.bpm.engine.rest.hal.HalRelation;
 import org.camunda.bpm.engine.rest.hal.HalResource;
+
+import javax.ws.rs.core.UriBuilder;
 
 /**
  * @author Daniel Meyer

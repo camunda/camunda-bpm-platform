@@ -248,21 +248,21 @@ public abstract class AbstractFilterRestServiceInteractionTest extends AbstractR
       .get(SINGLE_FILTER_URL);
   }
 
-  @Test
-  public void testGetFilterWithFollowUpBeforeOrNotExistentExpression() {
-    TaskQueryImpl query = new TaskQueryImpl();
-    query.followUpBeforeOrNotExistentExpression("#{now()}");
-    Filter filter = new FilterEntity("Task").setName("test").setQuery(query);
-    when(filterServiceMock.getFilter(EXAMPLE_FILTER_ID)).thenReturn(filter);
-
-    given()
-      .pathParam("id", EXAMPLE_FILTER_ID)
-    .then().expect()
-      .statusCode(Status.OK.getStatusCode())
-      .body("query.followUpBeforeOrNotExistentExpression", equalTo("#{now()}"))
-    .when()
-        .get(SINGLE_FILTER_URL);
-  }
+//  @Test
+//  public void testGetFilterWithFollowUpBeforeOrNotExistentExpression() {
+//    TaskQueryImpl query = new TaskQueryImpl();
+//    query.followUpBeforeOrNotExistentExpression("#{now()}");
+//    Filter filter = new FilterEntity("Task").setName("test").setQuery(query);
+//    when(filterServiceMock.getFilter(EXAMPLE_FILTER_ID)).thenReturn(filter);
+//
+//    given()
+//      .pathParam("id", EXAMPLE_FILTER_ID)
+//    .then().expect()
+//      .statusCode(Status.OK.getStatusCode())
+//      .body("query.followUpBeforeOrNotExistentExpression", equalTo("#{now()}"))
+//    .when()
+//        .get(SINGLE_FILTER_URL);
+//  }
 
   @Test
   public void testCreateFilter() {

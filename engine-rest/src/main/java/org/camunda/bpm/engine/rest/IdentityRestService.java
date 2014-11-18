@@ -12,13 +12,13 @@
  */
 package org.camunda.bpm.engine.rest;
 
+import org.camunda.bpm.engine.rest.dto.task.GroupInfoDto;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
-
-import org.camunda.bpm.engine.rest.dto.task.GroupInfoDto;
 
 @Produces(MediaType.APPLICATION_JSON)
 public interface IdentityRestService {

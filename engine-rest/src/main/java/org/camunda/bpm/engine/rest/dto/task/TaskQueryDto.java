@@ -41,10 +41,12 @@ import org.camunda.bpm.engine.task.DelegationState;
 import org.camunda.bpm.engine.task.TaskQuery;
 import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.engine.variable.type.ValueTypeResolver;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.map.annotate.JsonSerialize;
 
-@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+@JsonInclude(Include.NON_NULL)
 public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
 
   private static final String SORT_BY_PROCESS_INSTANCE_ID_VALUE = "instanceId";
@@ -908,7 +910,7 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
       query.followUpBeforeOrNotExistent(followUpBeforeOrNotExistent);
     }
     if (followUpBeforeOrNotExistentExpression != null) {
-      query.followUpBeforeOrNotExistentExpression(followUpBeforeOrNotExistentExpression);
+//      query.followUpBeforeOrNotExistentExpression(followUpBeforeOrNotExistentExpression);
     }
     if (followUpDate != null) {
       query.followUpDate(followUpDate);

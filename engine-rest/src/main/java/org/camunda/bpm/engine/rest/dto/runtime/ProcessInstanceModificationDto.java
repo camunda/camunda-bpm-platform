@@ -21,7 +21,8 @@ import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.runtime.ProcessInstanceActivityInstantiationBuilder;
 import org.camunda.bpm.engine.runtime.ProcessInstanceModificationBuilder;
-import org.codehaus.jackson.map.ObjectMapper;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author Thorben Lindhauer

@@ -13,19 +13,14 @@
 
 package org.camunda.bpm.engine.rest.hal;
 
-import java.util.Map;
-
-import javax.ws.rs.core.UriBuilder;
-
-import org.camunda.bpm.engine.rest.CaseExecutionRestService;
-import org.camunda.bpm.engine.rest.CaseInstanceRestService;
-import org.camunda.bpm.engine.rest.ExecutionRestService;
-import org.camunda.bpm.engine.rest.ProcessInstanceRestService;
-import org.camunda.bpm.engine.rest.TaskRestService;
+import org.camunda.bpm.engine.rest.*;
 import org.camunda.bpm.engine.rest.dto.VariableValueDto;
 import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.sub.VariableResource;
 import org.camunda.bpm.engine.runtime.VariableInstance;
+
+import javax.ws.rs.core.UriBuilder;
+import java.util.Map;
 
 /**
  * @author Sebastian Menski

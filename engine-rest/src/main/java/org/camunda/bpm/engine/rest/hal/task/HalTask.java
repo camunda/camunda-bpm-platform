@@ -13,6 +13,7 @@
 package org.camunda.bpm.engine.rest.hal.task;
 
 import java.util.Date;
+
 import javax.ws.rs.core.UriBuilder;
 
 import org.camunda.bpm.engine.BadUserRequestException;

@@ -12,9 +12,9 @@
  */
 package org.camunda.bpm.engine.rest.dto;
 
-import java.util.List;
-
 import org.camunda.bpm.engine.rest.dto.repository.IncidentStatisticsResultDto;
+
+import java.util.List;
 
 public abstract class StatisticsResultDto {
 

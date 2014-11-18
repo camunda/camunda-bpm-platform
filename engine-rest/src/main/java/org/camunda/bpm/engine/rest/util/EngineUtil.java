@@ -12,14 +12,13 @@
  */
 package org.camunda.bpm.engine.rest.util;
 
-import java.util.Iterator;
-import java.util.ServiceLoader;
-
-import javax.ws.rs.core.Response.Status;
-
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.spi.ProcessEngineProvider;
+
+import javax.ws.rs.core.Response.Status;
+import java.util.Iterator;
+import java.util.ServiceLoader;
 
 public class EngineUtil {
 

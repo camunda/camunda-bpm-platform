@@ -12,17 +12,16 @@
  */
 package org.camunda.bpm.engine.rest.mapper;
 
-import java.text.SimpleDateFormat;
+import com.fasterxml.jackson.databind.*;
+import org.camunda.bpm.engine.rest.dto.StatisticsResultDto;
+import org.camunda.bpm.engine.rest.dto.history.HistoricDetailDto;
+import org.camunda.bpm.engine.rest.hal.Hal;
 
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.Provider;
-
-import org.camunda.bpm.engine.rest.hal.Hal;
-import org.codehaus.jackson.map.DeserializationConfig;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.map.SerializationConfig;
+import java.text.SimpleDateFormat;
 
 @Provider
 @Produces({MediaType.APPLICATION_JSON, Hal.APPLICATION_HAL_JSON})
@@ -30,10 +29,14 @@ public class JacksonConfigurator implements ContextResolver<ObjectMapper> {
 
   public static ObjectMapper configureObjectMapper(ObjectMapper mapper) {
     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-    mapper.getSerializationConfig().setDateFormat(dateFormat);
-    mapper.getDeserializationConfig().setDateFormat(dateFormat);
-    mapper.configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-    mapper.configure(SerializationConfig.Feature.WRITE_DATES_AS_TIMESTAMPS, false);
+    mapper.setDateFormat(dateFormat);
+    mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+
+    // mixIns for polymorphy inheritance
+    mapper.addMixInAnnotations(HistoricDetailDto.class, PolymorphicHistoricDetailDtoMixIn.class);
+    mapper.addMixInAnnotations(StatisticsResultDto.class, PolymorphicStatisticsResultDtoMixIn.class);
+
     return mapper;
   }
 

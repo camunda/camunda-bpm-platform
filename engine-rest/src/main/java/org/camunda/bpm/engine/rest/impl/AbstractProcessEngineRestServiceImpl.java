@@ -12,34 +12,16 @@
  */
 package org.camunda.bpm.engine.rest.impl;
 
-import java.net.URI;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.camunda.bpm.engine.rest.*;
+import org.camunda.bpm.engine.rest.history.HistoryRestService;
+import org.camunda.bpm.engine.rest.impl.history.HistoryRestServiceImpl;
+import org.camunda.bpm.engine.rest.util.ProvidersUtil;
 
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.Providers;
-
-import org.camunda.bpm.engine.rest.AuthorizationRestService;
-import org.camunda.bpm.engine.rest.CaseDefinitionRestService;
-import org.camunda.bpm.engine.rest.CaseExecutionRestService;
-import org.camunda.bpm.engine.rest.CaseInstanceRestService;
-import org.camunda.bpm.engine.rest.DeploymentRestService;
-import org.camunda.bpm.engine.rest.ExecutionRestService;
-import org.camunda.bpm.engine.rest.FilterRestService;
-import org.camunda.bpm.engine.rest.GroupRestService;
-import org.camunda.bpm.engine.rest.IdentityRestService;
-import org.camunda.bpm.engine.rest.IncidentRestService;
-import org.camunda.bpm.engine.rest.JobDefinitionRestService;
-import org.camunda.bpm.engine.rest.JobRestService;
-import org.camunda.bpm.engine.rest.MessageRestService;
-import org.camunda.bpm.engine.rest.ProcessDefinitionRestService;
-import org.camunda.bpm.engine.rest.ProcessInstanceRestService;
-import org.camunda.bpm.engine.rest.TaskRestService;
-import org.camunda.bpm.engine.rest.UserRestService;
-import org.camunda.bpm.engine.rest.VariableInstanceRestService;
-import org.camunda.bpm.engine.rest.history.HistoryRestService;
-import org.camunda.bpm.engine.rest.impl.history.HistoryRestServiceImpl;
-import org.camunda.bpm.engine.rest.util.ProvidersUtil;
-import org.codehaus.jackson.map.ObjectMapper;
+import java.net.URI;
 
 /**
  * <p>Abstract process engine resource that provides instantiations of all REST resources.</p>
