@@ -1295,6 +1295,10 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
       extendedQuery.followUpAfter(this.getFollowUpAfter());
     }
 
+    if (extendingQuery.isFollowUpNullAccepted() || this.isFollowUpNullAccepted()) {
+      extendedQuery.setFollowUpNullAccepted(true);
+    }
+
     if (extendingQuery.isExcludeSubtasks() || this.isExcludeSubtasks()) {
       extendedQuery.excludeSubtasks();
     }
