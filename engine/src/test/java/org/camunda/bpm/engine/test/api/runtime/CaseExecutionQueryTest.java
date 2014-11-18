@@ -2347,8 +2347,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
     verifyQueryResults(query, 2);
   }
 
-  @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
-  public void testProcessVariableValueEqualsNumber() throws Exception {
+  public void testCaseVariableValueEqualsNumber() throws Exception {
     // long
     caseService
       .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
@@ -2391,12 +2390,25 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
       .setVariable("var", Variables.longValue(null))
       .create();
 
+    caseService
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
+      .setVariable("var", "123")
+      .create();
+
     assertEquals(4, caseService.createCaseExecutionQuery().variableValueEquals("var", Variables.numberValue(123)).count());
     assertEquals(4, caseService.createCaseExecutionQuery().variableValueEquals("var", Variables.numberValue(123L)).count());
     assertEquals(4, caseService.createCaseExecutionQuery().variableValueEquals("var", Variables.numberValue(123.0d)).count());
     assertEquals(4, caseService.createCaseExecutionQuery().variableValueEquals("var", Variables.numberValue((short) 123)).count());
 
     assertEquals(1, caseService.createCaseExecutionQuery().variableValueEquals("var", Variables.numberValue(null)).count());
+
+    // two executions per case instance match the query
+    assertEquals(8, caseService.createCaseExecutionQuery().caseInstanceVariableValueEquals("var", Variables.numberValue(123)).count());
+    assertEquals(8, caseService.createCaseExecutionQuery().caseInstanceVariableValueEquals("var", Variables.numberValue(123L)).count());
+    assertEquals(8, caseService.createCaseExecutionQuery().caseInstanceVariableValueEquals("var", Variables.numberValue(123.0d)).count());
+    assertEquals(8, caseService.createCaseExecutionQuery().caseInstanceVariableValueEquals("var", Variables.numberValue((short) 123)).count());
+
+    assertEquals(2, caseService.createCaseExecutionQuery().caseInstanceVariableValueEquals("var", Variables.numberValue(null)).count());
   }
 
 
@@ -2479,5 +2491,4 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
     assertNotNull(task.getId());
 
   }
-
 }

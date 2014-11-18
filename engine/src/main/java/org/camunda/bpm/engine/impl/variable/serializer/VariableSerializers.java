@@ -12,7 +12,6 @@
  */
 package org.camunda.bpm.engine.impl.variable.serializer;
 
-import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
 /**
@@ -33,9 +32,6 @@ public interface VariableSerializers {
    */
   @SuppressWarnings("rawtypes")
   public TypedValueSerializer findSerializerForValue(TypedValue value);
-
-  @SuppressWarnings("rawtypes")
-  public TypedValueSerializer findSerializerForType(ValueType type);
 
   /**
    *

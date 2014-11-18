@@ -82,9 +82,4 @@ public class QueryVariableValue implements Serializable {
   public boolean isLocal() {
     return local;
   }
-
-  // TODO: delete
-  public String getType() {
-    return "long";
-  }
 }

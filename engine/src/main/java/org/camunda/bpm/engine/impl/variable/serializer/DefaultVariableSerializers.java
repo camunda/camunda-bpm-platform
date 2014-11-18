@@ -86,11 +86,6 @@ public class DefaultVariableSerializers implements Serializable, VariableSeriali
 
   }
 
-  public TypedValueSerializer<?> findSerializerForType(ValueType type) {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
   public DefaultVariableSerializers addSerializer(TypedValueSerializer<?> serializer) {
     return addSerializer(serializer, serializerList.size());
   }

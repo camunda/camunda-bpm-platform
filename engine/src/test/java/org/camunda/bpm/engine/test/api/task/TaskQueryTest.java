@@ -922,12 +922,45 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     runtimeService.startProcessInstanceByKey("oneTaskProcess",
         Collections.<String, Object>singletonMap("var", Variables.longValue(null)));
 
+    runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Collections.<String, Object>singletonMap("var", "123"));
+
     assertEquals(4, taskService.createTaskQuery().processVariableValueEquals("var", Variables.numberValue(123)).count());
     assertEquals(4, taskService.createTaskQuery().processVariableValueEquals("var", Variables.numberValue(123L)).count());
     assertEquals(4, taskService.createTaskQuery().processVariableValueEquals("var", Variables.numberValue(123.0d)).count());
     assertEquals(4, taskService.createTaskQuery().processVariableValueEquals("var", Variables.numberValue((short) 123)).count());
 
     assertEquals(1, taskService.createTaskQuery().processVariableValueEquals("var", Variables.numberValue(null)).count());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
+  public void testTaskVariableValueEqualsNumber() throws Exception {
+    runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+    List<Task> tasks = taskService.createTaskQuery().processDefinitionKey("oneTaskProcess").list();
+    assertEquals(8, tasks.size());
+    taskService.setVariableLocal(tasks.get(0).getId(), "var", 123L);
+    taskService.setVariableLocal(tasks.get(1).getId(), "var", 12345L);
+    taskService.setVariableLocal(tasks.get(2).getId(), "var", (short) 123);
+    taskService.setVariableLocal(tasks.get(3).getId(), "var", 123.0d);
+    taskService.setVariableLocal(tasks.get(4).getId(), "var", 123);
+    taskService.setVariableLocal(tasks.get(5).getId(), "var", null);
+    taskService.setVariableLocal(tasks.get(6).getId(), "var", Variables.longValue(null));
+    taskService.setVariableLocal(tasks.get(7).getId(), "var", "123");
+
+    assertEquals(4, taskService.createTaskQuery().taskVariableValueEquals("var", Variables.numberValue(123)).count());
+    assertEquals(4, taskService.createTaskQuery().taskVariableValueEquals("var", Variables.numberValue(123L)).count());
+    assertEquals(4, taskService.createTaskQuery().taskVariableValueEquals("var", Variables.numberValue(123.0d)).count());
+    assertEquals(4, taskService.createTaskQuery().taskVariableValueEquals("var", Variables.numberValue((short) 123)).count());
+
+    assertEquals(1, taskService.createTaskQuery().taskVariableValueEquals("var", Variables.numberValue(null)).count());
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
