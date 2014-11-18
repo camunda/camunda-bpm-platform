@@ -1,16 +1,6 @@
 /* jshint node: true */
 'use strict';
 var path = require('path');
-var http = require('http');
-var spawn = require('child_process').spawn;
-
-
-function testOnline(done) {
-  http.get('http://localhost:8080/camunda/app/tasklist/default', function(res) {
-    done(res.statusCode !== 200 ? new Error('The status code is not 200') : null);
-  })
-  .on('error', done);
-}
 
 function autoBuild(project, verbose, stack) {
   var args = ['auto-build'];
@@ -22,7 +12,6 @@ function autoBuild(project, verbose, stack) {
     opts: {
       cwd: path.resolve(__dirname, '../'+ project)
     },
-    // cmd: './node_modules/grunt-cli/bin/grunt',
     cmd: 'grunt',
     args: args
   };
@@ -140,7 +129,6 @@ module.exports = function(grunt) {
           linkFrom('camunda-admin-ui'),
           linkFrom('camunda-cockpit-ui'),
           linkFrom('camunda-tasklist-ui'),
-          // linkFrom('camunda-cockpit-plugin-base')
         ]
       },
 
@@ -149,12 +137,9 @@ module.exports = function(grunt) {
           stream: true
         },
         tasks: [
-          // bonerInstall('camunda-bpm-sdk-js'),
-          // bonerInstall('camunda-commons-ui'),
           bonerInstall('camunda-admin-ui'),
           bonerInstall('camunda-cockpit-ui'),
           bonerInstall('camunda-tasklist-ui'),
-          // bonerInstall('camunda-cockpit-plugin-base')
         ]
       },
 
@@ -168,7 +153,6 @@ module.exports = function(grunt) {
           linkTo('camunda-admin-ui'),
           linkTo('camunda-cockpit-ui'),
           linkTo('camunda-tasklist-ui'),
-          // linkTo('camunda-cockpit-plugin-base')
         ]
       },
 
@@ -185,7 +169,6 @@ module.exports = function(grunt) {
             args: webappArgs
           },
           autoBuild('camunda-bpm-sdk-js', verbose, stack),
-          // autoBuild('camunda-commons-ui', verbose, stack),
           autoBuild('camunda-admin-ui', verbose, stack),
           autoBuild('camunda-cockpit-ui', verbose, stack),
           autoBuild('camunda-tasklist-ui', verbose, stack),
@@ -208,104 +191,9 @@ module.exports = function(grunt) {
     }
   };
 
-  if (!skipTests) {
-    config.watch.targetAdmin = {
-      options: {
-        debounceDelay: 1000,
-      },
-      files: [
-        'webapp/src/test/js/e2e/admin/**/*.js',
-        // 'webapp/target/camunda-webapp/app/admin/**/*.{js,html}',
-        // '!webapp/target/camunda-webapp/app/admin/assets/**'
-        '../camunda-admin-ui/dist/app/admin/**/*.{js,html}',
-        '!../camunda-admin-ui/dist/app/admin/assets/**'
-      ],
-      tasks: [
-        'test:admin'
-      ]
-    };
-
-    config.watch.targetCockpit = {
-      options: {
-        debounceDelay: 1000,
-      },
-      files: [
-        'webapp/src/test/js/e2e/cockpit/**/*.js',
-        // 'webapp/target/camunda-webapp/app/cockpit/**/*.{js,html}',
-        // '!webapp/target/camunda-webapp/app/cockpit/assets/**'
-        '../camunda-cockpit-ui/dist/app/cockpit/**/*.{js,html}',
-        '!../camunda-cockpit-ui/dist/app/cockpit/assets/**'
-      ],
-      tasks: [
-        'test:cockpit'
-      ]
-    };
-
-    config.watch.targetTasklist = {
-      options: {
-        debounceDelay: 1000,
-      },
-      files: [
-        'webapp/src/test/js/e2e/tasklist/**/*.js',
-        // 'webapp/target/camunda-webapp/app/tasklist/**/*.{js,html}',
-        // '!webapp/target/camunda-webapp/app/tasklist/vendor/**'
-        '../camunda-tasklist-ui/dist/app/tasklist/**/*.{js,html}',
-        '!../camunda-tasklist-ui/dist/app/tasklist/vendor/**'
-      ],
-      tasks: [
-        'test:tasklist'
-      ]
-    };
-  }
 
   grunt.initConfig(config);
 
-  grunt.registerTask('test', function(target) {
-    var done = this.async();
-
-    if (skipTests) {
-      grunt.log.subhead('Skip '+ target +' UI tests');
-      return done();
-    }
-
-    grunt.log.subhead('Testing '+ target +' UI');
-    var stdout = '';
-    var stderr = '';
-    var args = [
-      '--no-jasmineNodeOpts.showColors',
-      '--specs',
-      'webapp/src/test/js/e2e/'+ target +'/spec/**/*.js',
-      'webapp/src/test/js/e2e/develop.conf.js'
-    ];
-
-    testOnline(function(err) {
-      if (err) {
-        grunt.log.writeln(err.message);
-        return;
-      }
-
-      var testRun = spawn('protractor', args);
-
-      testRun.stdout.on('data', function (data) {
-        grunt.verbose.writeln(data.toString());
-        stdout += data;
-        grunt.file.write('test.'+ target +'.out.log', stdout);
-      });
-
-      testRun.stderr.on('data', function (data) {
-        grunt.verbose.writeln(data.toString());
-        stderr += data;
-        grunt.file.write('test.'+ target +'.err.log', stderr);
-      });
-
-      testRun.on('close', function(code) {
-        grunt.file.write('test.'+ target +'.out.log', stdout);
-        grunt.file.write('test.'+ target +'.err.log', stderr);
-        grunt.log.writeln('protractor '+ args.join(' ') +' exited with code: '+ code);
-        done();
-      });
-    });
-  });
 
   grunt.registerTask('setup', [
     'parallel:clone',
