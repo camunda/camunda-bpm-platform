@@ -30,7 +30,7 @@ public interface IdentityLink {
   
   /**
    * Returns the type of link.
-   * See {@link IdentityLinkType} for the native supported types by Activiti. 
+   * See {@link IdentityLinkType} for the native supported types by the process engine.
    */
   String getType();
   

@@ -25,7 +25,10 @@ public interface GroupQuery extends Query<GroupQuery, Group> {
   
   /** Only select {@link Group}s with the given id. */
   GroupQuery groupId(String groupId);
-  
+
+  /** Only select {@link Group}s with the given ids */
+  GroupQuery groupIdIn(String... ids);
+
   /** Only select {@link Group}s with the given name. */
   GroupQuery groupName(String groupName);
   

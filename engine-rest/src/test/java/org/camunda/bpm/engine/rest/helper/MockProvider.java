@@ -916,8 +916,7 @@ public abstract class MockProvider {
   }
 
   public static List<Job> createMockEmptyJobList() {
-    List<Job> mockList = new ArrayList<Job>();
-    return mockList;
+    return new ArrayList<Job>();
   }
 
   public static User createMockUserUpdate() {
@@ -1272,7 +1271,16 @@ public abstract class MockProvider {
     IdentityLink identityLink = mock(IdentityLink.class);
     when(identityLink.getTaskId()).thenReturn(EXAMPLE_TASK_ID);
     when(identityLink.getType()).thenReturn(IdentityLinkType.ASSIGNEE);
-    when(identityLink.getUserId()).thenReturn(EXAMPLE_USER_ID);
+    when(identityLink.getUserId()).thenReturn(EXAMPLE_TASK_ASSIGNEE_NAME);
+
+    return identityLink;
+  }
+
+  public static IdentityLink createMockUserOwnerIdentityLink() {
+    IdentityLink identityLink = mock(IdentityLink.class);
+    when(identityLink.getTaskId()).thenReturn(EXAMPLE_TASK_ID);
+    when(identityLink.getType()).thenReturn(IdentityLinkType.OWNER);
+    when(identityLink.getUserId()).thenReturn(EXAMPLE_TASK_OWNER);
 
     return identityLink;
   }

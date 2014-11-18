@@ -13,12 +13,12 @@
 
 package org.camunda.bpm.engine.impl;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.GroupQuery;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
-
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 
 /**
@@ -28,6 +28,7 @@ public abstract class GroupQueryImpl extends AbstractQuery<GroupQuery, Group> im
   
   private static final long serialVersionUID = 1L;
   protected String id;
+  protected String[] ids;
   protected String name;
   protected String nameLike;
   protected String type;
@@ -49,6 +50,12 @@ public abstract class GroupQueryImpl extends AbstractQuery<GroupQuery, Group> im
   public GroupQuery groupId(String id) {
     ensureNotNull("Provided id", id);
     this.id = id;
+    return this;
+  }
+
+  public GroupQuery groupIdIn(String... ids) {
+    ensureNotNull("Provided ids", ids);
+    this.ids = ids;
     return this;
   }
   

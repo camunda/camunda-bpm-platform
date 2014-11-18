@@ -13,7 +13,6 @@
 package org.camunda.bpm.engine.rest.hal.task;
 
 import java.util.Date;
-
 import javax.ws.rs.core.UriBuilder;
 
 import org.camunda.bpm.engine.BadUserRequestException;
@@ -22,12 +21,14 @@ import org.camunda.bpm.engine.rest.CaseDefinitionRestService;
 import org.camunda.bpm.engine.rest.CaseExecutionRestService;
 import org.camunda.bpm.engine.rest.CaseInstanceRestService;
 import org.camunda.bpm.engine.rest.ExecutionRestService;
+import org.camunda.bpm.engine.rest.IdentityRestService;
 import org.camunda.bpm.engine.rest.ProcessDefinitionRestService;
 import org.camunda.bpm.engine.rest.ProcessInstanceRestService;
 import org.camunda.bpm.engine.rest.TaskRestService;
 import org.camunda.bpm.engine.rest.UserRestService;
-import org.camunda.bpm.engine.rest.hal.HalResource;
 import org.camunda.bpm.engine.rest.hal.HalRelation;
+import org.camunda.bpm.engine.rest.hal.HalResource;
+import org.camunda.bpm.engine.rest.hal.user.HalIdentityLink;
 import org.camunda.bpm.engine.task.DelegationState;
 import org.camunda.bpm.engine.task.Task;
 
@@ -57,6 +58,8 @@ public class HalTask extends HalResource<HalTask> {
     HalRelation.build("caseExecution", CaseExecutionRestService.class, UriBuilder.fromPath(CaseExecutionRestService.PATH).path("{id}"));
   public static HalRelation REL_CASE_DEFINITION =
     HalRelation.build("caseDefinition", CaseDefinitionRestService.class, UriBuilder.fromPath(CaseDefinitionRestService.PATH).path("{id}"));
+  public static HalRelation REL_IDENTITY_LINKS =
+    HalRelation.build("identityLink", IdentityRestService.class, UriBuilder.fromPath(TaskRestService.PATH).path("{taskId}").path("identity-links"));
 
   private String id;
   private String name;
@@ -83,9 +86,9 @@ public class HalTask extends HalResource<HalTask> {
     return fromTask(task)
       .embed(HalTask.REL_PROCESS_DEFINITION, engine)
       .embed(HalTask.REL_CASE_DEFINITION, engine)
-      .embed(HalTask.REL_ASSIGNEE, engine)
-      .embed(HalTask.REL_OWNER, engine);
-
+      .embed(HalTask.REL_IDENTITY_LINKS, engine)
+      .embed(HalIdentityLink.REL_USER, engine)
+      .embed(HalIdentityLink.REL_GROUP, engine);
   }
 
   public static HalTask fromTask(Task task) {
@@ -129,6 +132,7 @@ public class HalTask extends HalResource<HalTask> {
     dto.linker.createLink(REL_CASE_INSTANCE, task.getCaseInstanceId());
     dto.linker.createLink(REL_CASE_EXECUTION, task.getCaseExecutionId());
     dto.linker.createLink(REL_CASE_DEFINITION, task.getCaseDefinitionId());
+    dto.linker.createLink(REL_IDENTITY_LINKS, task.getId());
 
     return dto;
   }

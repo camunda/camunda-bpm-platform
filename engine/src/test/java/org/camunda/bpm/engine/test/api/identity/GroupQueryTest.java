@@ -77,25 +77,50 @@ public class GroupQueryTest extends PluggableProcessEngineTestCase {
     GroupQuery query = identityService.createGroupQuery().groupId("muppets");
     verifyQueryResults(query, 1);
   }
-  
+
   public void testQueryByInvalidId() {
     GroupQuery query = identityService.createGroupQuery().groupId("invalid");
     verifyQueryResults(query, 0);
-    
+
     try {
       identityService.createGroupQuery().groupId(null).list();
       fail();
     } catch (ProcessEngineException e) {}
   }
-  
+
+  public void testQueryByIdIn() {
+    // empty list
+    assertTrue(identityService.createGroupQuery().groupIdIn("a", "b").list().isEmpty());
+
+    // collect all ids
+    List<Group> list = identityService.createGroupQuery().list();
+    String[] ids = new String[list.size()];
+    for (int i = 0; i < ids.length; i++) {
+      ids[i] = list.get(i).getId();
+    }
+
+    List<Group> idInList = identityService.createGroupQuery().groupIdIn(ids).list();
+    for (Group group : idInList) {
+      boolean found = false;
+      for (Group otherGroup : list) {
+        if(otherGroup.getId().equals(group.getId())) {
+          found = true; break;
+        }
+      }
+      if(!found) {
+        fail("Expected to find group " + group);
+      }
+    }
+  }
+
   public void testQueryByName() {
     GroupQuery query = identityService.createGroupQuery().groupName("Muppet show characters");
     verifyQueryResults(query, 1);
-    
+
     query = identityService.createGroupQuery().groupName("Famous frogs");
     verifyQueryResults(query, 1);
   }
-  
+
   public void testQueryByInvalidName() {
     GroupQuery query = identityService.createGroupQuery().groupName("invalid");
     verifyQueryResults(query, 0);
