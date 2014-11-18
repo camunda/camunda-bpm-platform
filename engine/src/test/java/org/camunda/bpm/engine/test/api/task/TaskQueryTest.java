@@ -49,6 +49,11 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
 
   private List<String> taskIds;
 
+  // The range of Oracle's NUMBER field is limited to ~10e+125
+  // which is below Double.MAX_VALUE, so we only test with the following
+  // max value
+  protected static final double MAX_DOUBLE_VALUE = 10E+124;
+
   public void setUp() throws Exception {
 
     identityService.saveUser(identityService.newUser("kermit"));
@@ -966,25 +971,25 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
   @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
   public void testVariableEqualsNumberMax() throws Exception {
     runtimeService.startProcessInstanceByKey("oneTaskProcess",
-        Collections.<String, Object>singletonMap("var", Double.MAX_VALUE));
+        Collections.<String, Object>singletonMap("var", MAX_DOUBLE_VALUE));
     runtimeService.startProcessInstanceByKey("oneTaskProcess",
         Collections.<String, Object>singletonMap("var", Long.MAX_VALUE));
 
-    assertEquals(1, taskService.createTaskQuery().processVariableValueEquals("var", Variables.numberValue(Double.MAX_VALUE)).count());
+    assertEquals(1, taskService.createTaskQuery().processVariableValueEquals("var", Variables.numberValue(MAX_DOUBLE_VALUE)).count());
     assertEquals(1, taskService.createTaskQuery().processVariableValueEquals("var", Variables.numberValue(Long.MAX_VALUE)).count());
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
   public void testVariableEqualsNumberLongValueOverflow() throws Exception {
     runtimeService.startProcessInstanceByKey("oneTaskProcess",
-        Collections.<String, Object>singletonMap("var", Double.MAX_VALUE));
+        Collections.<String, Object>singletonMap("var", MAX_DOUBLE_VALUE));
 
     // this results in an overflow
     runtimeService.startProcessInstanceByKey("oneTaskProcess",
-        Collections.<String, Object>singletonMap("var", (long) Double.MAX_VALUE));
+        Collections.<String, Object>singletonMap("var", (long) MAX_DOUBLE_VALUE));
 
     // the query should not find the long variable
-    assertEquals(1, taskService.createTaskQuery().processVariableValueEquals("var", Variables.numberValue(Double.MAX_VALUE)).count());
+    assertEquals(1, taskService.createTaskQuery().processVariableValueEquals("var", Variables.numberValue(MAX_DOUBLE_VALUE)).count());
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
