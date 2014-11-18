@@ -13,6 +13,8 @@
 package org.camunda.bpm.engine.rest.dto;
 
 import org.camunda.bpm.engine.impl.TaskQueryVariableValue;
+import org.camunda.bpm.engine.variable.Variables;
+import org.codehaus.jackson.map.ObjectMapper;
 
 public class VariableQueryParameterDto extends ConditionQueryParameterDto {
 
@@ -33,5 +35,15 @@ public class VariableQueryParameterDto extends ConditionQueryParameterDto {
   }
   public void setName(String name) {
     this.name = name;
+  }
+
+  public Object resolveValue(ObjectMapper objectMapper) {
+    Object value = super.resolveValue(objectMapper);
+
+    if (value != null && Number.class.isAssignableFrom(value.getClass())) {
+      return Variables.numberValue((Number) value);
+    }
+
+    return value;
   }
 }

@@ -87,12 +87,37 @@ public interface ValueType extends Serializable {
    */
   public TypedValue createValue(Object value, Map<String, Object> valueInfo);
 
+  /**
+   * <p>Gets the parent value type.</p>
+   *
+   * <p>Value type hierarchy is only relevant for queries and has the
+   * following meaning: When a value query is made
+   * (e.g. all tasks with a certain variable value), a "child" type's value
+   * also matches a parameter value of the parent type. This is only
+   * supported when the parent value type's implementation of {@link #isAbstract()}
+   * returns <code>true</code>.</p>
+   */
   ValueType getParent();
 
+  /**
+   * Determines whether the argument typed value can be converted to a
+   * typed value of this value type.
+   */
   boolean canConvertFromTypedValue(TypedValue typedValue);
 
+  /**
+   * Converts a typed value to a typed value of this type.
+   * This does not suceed if {@link #canConvertFromTypedValue(TypedValue)}
+   * returns <code>false</code>.
+   */
   TypedValue convertFromTypedValue(TypedValue typedValue);
 
+  /**
+   * <p>Returns whether the value type is abstract. This is <b>not related
+   * to the term <i>abstract</i> in the Java language.</b></p>
+   *
+   * Abstract value types cannot be used as types for variables but only used for querying.
+   */
   boolean isAbstract();
 
 

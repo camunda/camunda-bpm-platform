@@ -68,9 +68,20 @@ public class EqualsPrimitiveValue extends EqualsTypedValue<EqualsPrimitiveValue>
       byte[] otherByteValue = (byte[]) otherValue;
 
       return Arrays.equals(byteValue, otherByteValue);
-    } else {
-      return value.equals(otherValue);
     }
+
+    if (type == ValueType.NUMBER) {
+      if (!(otherValue instanceof Number)) {
+        return false;
+      }
+
+      Number thisNumer = (Number) value;
+      Number otherNumber = (Number) otherValue;
+
+      return thisNumer.doubleValue() == otherNumber.doubleValue();
+    }
+
+    return value.equals(otherValue);
 
   }
 
@@ -108,6 +119,10 @@ public class EqualsPrimitiveValue extends EqualsTypedValue<EqualsPrimitiveValue>
 
   public static EqualsPrimitiveValue dateValue(Date value) {
     return new EqualsPrimitiveValue().type(ValueType.DATE).value(value);
+  }
+
+  public static EqualsPrimitiveValue numberValue(Number value) {
+    return new EqualsPrimitiveValue().type(ValueType.NUMBER).value(value);
   }
 
   public void describeTo(Description description) {

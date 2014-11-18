@@ -6,6 +6,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.argThat;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
@@ -18,6 +19,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 
@@ -35,6 +37,7 @@ import org.camunda.bpm.engine.rest.hal.Hal;
 import org.camunda.bpm.engine.rest.helper.EqualsList;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.camunda.bpm.engine.rest.helper.ValueGenerator;
+import org.camunda.bpm.engine.rest.helper.variable.EqualsPrimitiveValue;
 import org.camunda.bpm.engine.task.DelegationState;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
@@ -1059,7 +1062,7 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
       .when().post(TASK_QUERY_URL);
 
     verify(mockQuery).taskVariableValueEquals(variableName, variableValue);
-    verify(mockQuery).taskVariableValueNotEquals(anotherVariableName, anotherVariableValue);
+    verify(mockQuery).taskVariableValueNotEquals(eq(anotherVariableName), argThat(EqualsPrimitiveValue.numberValue(anotherVariableValue)));
 
   }
 
@@ -1119,7 +1122,7 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
       .post(TASK_QUERY_URL);
 
     verify(mockQuery).processVariableValueEquals(variableName, variableValue);
-    verify(mockQuery).processVariableValueNotEquals(anotherVariableName, anotherVariableValue);
+    verify(mockQuery).processVariableValueNotEquals(eq(anotherVariableName), argThat(EqualsPrimitiveValue.numberValue(anotherVariableValue)));
   }
 
   @Test
@@ -1178,7 +1181,7 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
       .post(TASK_QUERY_URL);
 
     verify(mockQuery).caseInstanceVariableValueEquals(variableName, variableValue);
-    verify(mockQuery).caseInstanceVariableValueNotEquals(anotherVariableName, anotherVariableValue);
+    verify(mockQuery).caseInstanceVariableValueNotEquals(eq(anotherVariableName), argThat(EqualsPrimitiveValue.numberValue(anotherVariableValue)));
   }
 
   @Test
