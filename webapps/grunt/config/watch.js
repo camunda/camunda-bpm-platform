@@ -19,7 +19,7 @@ module.exports = function(config) {
     styles: {
       files: [
         '<%= pkg.gruntConfig.clientDir %>/styles/**/*.{css,less}',
-        '<%= pkg.gruntConfig.clientDir %>/scripts/*/*.{css,less}'
+        '<%= pkg.gruntConfig.clientDir %>/scripts/**/*.{css,less}'
       ],
       tasks: [
         'less'
