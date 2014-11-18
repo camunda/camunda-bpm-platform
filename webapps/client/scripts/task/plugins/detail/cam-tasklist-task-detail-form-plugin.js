@@ -29,6 +29,7 @@ define([
 
     var DEFAULT_OPTIONS = $scope.options = {
       hideCompleteButton: false,
+      hideLoadVariablesButton: false,
       disableCompleteButton: false,
       disableForm: false,
       disableAddVariableButton: false

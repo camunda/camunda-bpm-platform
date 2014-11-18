@@ -129,7 +129,7 @@
     </div>
   </div>
   <div class="form-group"
-       ng-if="canLoadVariables && !variablesLoaded">
+       ng-if="!options.hideLoadVariablesButton && !variablesLoaded">
     <div class="col-xs-2 row-action">
       <a ng-click="loadVariables()">
         <span class="hidden-sm hidden-xs"

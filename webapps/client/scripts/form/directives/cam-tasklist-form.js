@@ -87,8 +87,8 @@ define([
         // handle tasklist form ///////////////////////////////////////////////////
 
         $scope.$watch('tasklistForm', function(value) {
+          $scope.$loaded = false;
           if (value) {
-            $scope.$loaded = false;
             parseForm(value);
           }
         });

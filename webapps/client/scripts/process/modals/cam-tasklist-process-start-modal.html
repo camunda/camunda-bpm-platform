@@ -73,13 +73,13 @@
 
   <div ng-if="PROCESS_TO_START_SELECTED">
 
-    <div ng-show="startFormState.$error" class="alert alert-danger" role="alert">
+    <div ng-if="startFormState.$error" class="alert alert-danger" role="alert">
       <span class="glyphicon glyphicon-exclamation-sign"></span>
       <strong class="status">{{ 'FORM_FAILURE' | translate }}</strong>
       <span class="message">{{ startFormState.$error.message }}</span>
     </div>
 
-    <div ng-hide="startFormState.$error"
+    <div ng-if="startFormState.$loaded && !startFormState.$error"
          cam-tasklist-form
          tasklist-form="startForm"
          on-form-completion-callback="completionCallback"

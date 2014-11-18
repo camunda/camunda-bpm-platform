@@ -21,6 +21,10 @@ define([
 
         var Task = camAPI.resource('task');
 
+        $scope.$watch('tasklistForm', function(value) {
+          $scope.variablesLoaded = false;
+        });
+
         var emptyVariable = {
           name:   '',
           value:  '',
@@ -53,9 +57,6 @@ define([
 
           $scope.variables = vars;
         };
-
-        $scope.variablesLoaded = false;
-        $scope.canLoadVariables= !!formController.getParams().taskId;
 
         $scope.loadVariables = function() {
           $scope.variablesLoaded = true;
@@ -90,6 +91,7 @@ define([
                 Notifications.addMessage({
                   duration: 5000,
                   status: translated,
+                  scope: $scope
                 });
               });
             }
