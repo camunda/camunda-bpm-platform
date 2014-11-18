@@ -4,9 +4,6 @@
   "version": "7.2.0-SNAPSHOT",
   "description": "Webapp for camunda BPM platform",
   "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "repository": {
     "type": "git",
     "url": "git://github.com/camunda/camunda-bpm-webapp.git"
@@ -25,7 +22,6 @@
     "grunt": "~0.4.5",
     "load-grunt-tasks": "~0.6.0",
     "time-grunt": "~0.4.0",
-    "protractor": "~1.0.0",
     "grunt-contrib-copy": "~0.5.0",
     "grunt-contrib-watch": "~0.6.1",
     "grunt-newer": "~0.7.0"
