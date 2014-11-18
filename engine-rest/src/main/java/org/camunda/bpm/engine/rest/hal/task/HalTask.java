@@ -28,7 +28,7 @@ import org.camunda.bpm.engine.rest.TaskRestService;
 import org.camunda.bpm.engine.rest.UserRestService;
 import org.camunda.bpm.engine.rest.hal.HalRelation;
 import org.camunda.bpm.engine.rest.hal.HalResource;
-import org.camunda.bpm.engine.rest.hal.user.HalIdentityLink;
+import org.camunda.bpm.engine.rest.hal.identitylink.HalIdentityLink;
 import org.camunda.bpm.engine.task.DelegationState;
 import org.camunda.bpm.engine.task.Task;
 

@@ -21,10 +21,10 @@ import org.camunda.bpm.engine.rest.GroupRestService;
 import org.camunda.bpm.engine.rest.IdentityRestService;
 import org.camunda.bpm.engine.rest.ProcessDefinitionRestService;
 import org.camunda.bpm.engine.rest.UserRestService;
-import org.camunda.bpm.engine.rest.hal.processDefinition.HalCaseDefinitionResolver;
+import org.camunda.bpm.engine.rest.hal.caseDefinition.HalCaseDefinitionResolver;
 import org.camunda.bpm.engine.rest.hal.processDefinition.HalProcessDefinitionResolver;
-import org.camunda.bpm.engine.rest.hal.user.HalGroupResolver;
-import org.camunda.bpm.engine.rest.hal.user.HalIdentityLinkResolver;
+import org.camunda.bpm.engine.rest.hal.group.HalGroupResolver;
+import org.camunda.bpm.engine.rest.hal.identitylink.HalIdentityLinkResolver;
 import org.camunda.bpm.engine.rest.hal.user.HalUserResolver;
 
 /**
