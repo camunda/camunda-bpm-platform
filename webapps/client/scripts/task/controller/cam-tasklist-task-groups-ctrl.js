@@ -52,9 +52,6 @@ define([
 
     // observe ////////////////////////////////////////////////////////
 
-    // refresh list of groups
-    taskGroupsData.changed('groups');
-
     $scope.modalGroupsState = taskGroupsData.observe('groups', function(groups) {
       $scope._groups = angular.copy(groups) || [];
       $scope.validateNewGroup();
@@ -83,7 +80,6 @@ define([
       groupsChanged();
 
       delete newGroup.error;
-
       Task.identityLinksAdd(taskId, newGroup, function(err) {
         if (err) {
           return Notifications.addError({
@@ -96,18 +92,19 @@ define([
 
         $scope.taskGroupForm.$setPristine();
 
+        $scope._groups.push({id: newGroup.groupId});
+
         newGroup = $scope.newGroup = angular.copy(NEW_GROUP);
-        taskGroupsData.changed('groups');
 
       });
     };
 
-    $scope.removeGroup = function(group) {
+    $scope.removeGroup = function(group, index) {
       var taskId = task.id;
 
       groupsChanged();
 
-      Task.identityLinksDelete(taskId, group, function(err) {
+      Task.identityLinksDelete(taskId, {type: GROUP_TYPE, groupId: group.id}, function(err) {
         if (err) {
           return Notifications.addError({
             status: messages.failure,
@@ -117,7 +114,7 @@ define([
           });
         }
 
-        taskGroupsData.changed('groups');
+        $scope._groups.splice(index, 1);
       });
     };
 
@@ -125,14 +122,14 @@ define([
       delete newGroup.error;
 
       if ($scope.taskGroupForm && $scope.taskGroupForm.newGroup) {
-        
+
         $scope.taskGroupForm.newGroup.$setValidity('duplicate', true);
 
         var newGroupId = newGroup.groupId;
 
         if (newGroupId) {
           for(var i = 0, currentGroup; !!(currentGroup = $scope._groups[i]); i++) {
-            if (newGroupId === currentGroup.groupId) {
+            if (newGroupId === currentGroup.id) {
               newGroup.error = { message: 'DUPLICATE_GROUP' };
 
               $scope.taskGroupForm.newGroup.$setValidity('duplicate', false);

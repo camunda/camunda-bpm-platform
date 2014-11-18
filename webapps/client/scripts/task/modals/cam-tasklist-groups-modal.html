@@ -57,12 +57,12 @@
          ng-repeat="group in _groups">
       <div class="col-xs-4 row-action">
         <a href
-           ng-click="removeGroup(group)"
+           ng-click="removeGroup(group, $index)"
            class="glyphicon glyphicon-minus-sign"></a>
       </div>
 
       <div class="col-xs-8 value">
-        {{ group.groupId }}
+        {{ group.id }}
       </div>
     </div>
 

@@ -24,7 +24,7 @@
               value="search.type">
           <span tooltip-placement="top"
                 tooltip="{{'VARIABLE_TYPE' | translate}}">
-            {{ varValue | camQueryComponent }}
+            {{ search.type | camQueryComponent }}
           </span>
         </span>:
 
@@ -35,7 +35,7 @@
               value="search.name">
           <span tooltip-placement="top"
                 tooltip="{{'PROPERTY' | translate}}">
-            {{ varValue | camQueryComponent }}
+            {{ search.name | camQueryComponent }}
           </span>
         </span>
 
@@ -47,7 +47,7 @@
               value="search.operator">
           <span tooltip-placement="top"
                 tooltip="{{'OPERATOR' | translate}}">
-            {{ varValue | camQueryComponent | translate }}
+            {{ search.operator | camQueryComponent | translate }}
           </span>
         </span>
 
@@ -59,7 +59,7 @@
               flexible="true">
           <span tooltip-placement="top"
             tooltip="{{'VALUE' | translate}}">
-              {{ varValue | camQueryComponent }}
+              {{ search.value | camQueryComponent }}
           </span>
         </span>
       </span>

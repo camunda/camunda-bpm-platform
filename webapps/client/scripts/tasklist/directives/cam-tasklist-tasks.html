@@ -101,9 +101,17 @@
                 <span tooltip-placement="top"
                       tooltip="{{ 'ASSIGNEE' | translate }}"
                       class="glyphicon glyphicon-user"></span>
-                <span tooltip-placement="top"
-                      tooltip="{{ task.assignee }}">
-                  {{ task.assignee }}
+                <span ng-if="assignees[task.assignee] && ( assignees[task.assignee].firstName || assignees[task.assignee].lastName )">
+                  <span tooltip-placement="top"
+                        tooltip="{{ assignees[task.assignee].firstName }} {{ assignees[task.assignee].lastName }} ({{ task.assignee }})">
+                    {{ assignees[task.assignee].firstName }} {{ assignees[task.assignee].lastName }}
+                  </span>
+                </span>
+                <span ng-if="!(assignees[task.assignee] && ( assignees[task.assignee].firstName || assignees[task.assignee].lastName ))">
+                  <span tooltip-placement="top"
+                        tooltip="{{ task.assignee }}">
+                    {{ task.assignee }}
+                  </span>
                 </span>
               </li>
             </ul>

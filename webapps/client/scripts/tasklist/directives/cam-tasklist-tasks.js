@@ -52,12 +52,22 @@ define([
 
         $scope.query = {};
 
+        $scope.assignees = {};
+        var parseAssignees = function(assigneeList) {
+          for(var i = 0; i < assigneeList.length; i++) {
+            $scope.assignees[assigneeList[i].id] = assigneeList[i];
+          }
+        };
+
         /**
          * observe the list of tasks
          */
         $scope.state = tasksData.observe('taskList', function (taskList) {
           $scope.totalItems = taskList.count;
           $scope.tasks = taskList._embedded.task;
+          if(taskList._embedded.assignee) {
+            parseAssignees(taskList._embedded.assignee);
+          }
           if(forceFocus) {
             $scope.focus(null, $scope.tasks[forceFocus === 'first' ? 0 : $scope.pageSize - 1]);
             $timeout(function(){

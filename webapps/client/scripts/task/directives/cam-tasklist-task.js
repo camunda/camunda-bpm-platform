@@ -142,37 +142,42 @@ define([
 
         taskData.provide('assignee', ['task', function(task) {
           if (task) {
-            return task.assignee;
-          }
+            if(task._embedded.identityLink) {
+              for(var i = 0; i < task._embedded.identityLink.length; i++) {
+                if(task._embedded.identityLink[i].type === 'assignee') {
+                  if(task._embedded.identityLink[i]._embedded.user) {
+                    return task._embedded.identityLink[i]._embedded.user[0];
+                  } else {
+                    return {id: task._embedded.identityLink[i].userId};
+                  }
 
+                }
+              }
+            }
+          }
           return null;
         }]);
 
         taskData.provide('groups', ['task', function(task) {
-          var deferred = $q.defer();
-
-          if (!task) {
-            return deferred.resolve(null);
+          var groups = [];
+          if (task) {
+            if(task._embedded.identityLink) {
+              for(var i = 0; i < task._embedded.identityLink.length; i++) {
+                if(task._embedded.identityLink[i].type === 'candidate' && task._embedded.identityLink[i].groupId !== null) {
+                  if(task._embedded.identityLink[i]._embedded.group) {
+                    groups.push(task._embedded.identityLink[i]._embedded.group[0]);
+                  } else {
+                    groups.push({id: task._embedded.identityLink[i].groupId});
+                  }
+                }
+              }
+            }
           }
-          Task.identityLinks(task.id, function(err, res) {
-            if(err) {
-              deferred.reject(err);
-            }
-            else {
-              var groups = jquery.grep(res, function(identityLink) {
-                return identityLink.groupId;
-              }).map(function(groupObj) {
-                return groupObj;
-              });
-              deferred.resolve(groups);
-            }
-          });
-
-          return deferred.promise;
+          return groups;
         }]);
 
         taskData.provide('isAssignee', ['assignee', function(assignee) {
-          return assignee === $scope.$root.authentication.name;
+          return !!assignee && assignee.id === $scope.$root.authentication.name;
         }]);
 
         taskData.provide('processDefinition', ['task', function (task) {

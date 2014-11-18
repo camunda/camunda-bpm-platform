@@ -14,12 +14,12 @@
             tooltip="{{ 'FOLLOW_UP_DATE' | translate }}"
             class="glyphicon glyphicon-calendar"></span>
 
-      <span ng-if="varValue"
+      <span ng-if="task.followUp"
             tooltip-placement="top"
-            tooltip="{{ varValue | camDate:'long' }}"
-            am-time-ago="varValue">{{ varValue }}</span>
+            tooltip="{{ task.followUp | camDate:'long' }}"
+            am-time-ago="task.followUp">{{ task.followUp }}</span>
       <a href
-         ng-if="!varValue"
+         ng-if="!task.followUp"
          translate="SET_FOLLOW_UP_DATE">Set follow up</a>
     </span>
 
@@ -48,13 +48,13 @@
             tooltip="{{ 'DUE_DATE' | translate }}"
             class="glyphicon glyphicon-bell"></span>
 
-      <span ng-if="varValue"
+      <span ng-if="task.due"
             tooltip-placement="top"
-            tooltip="{{ varValue | camDate:'long' }}"
-            am-time-ago="varValue">{{ varValue }}</span>
+            tooltip="{{ task.due | camDate:'long' }}"
+            am-time-ago="task.due">{{ task.due }}</span>
 
       <a href
-         ng-if="!varValue"
+         ng-if="!task.due"
          translate="SET_DUE_DATE">Set due date</a>
     </span>
 
@@ -71,26 +71,16 @@
 
 <ul class="meta list-inline actors">
   <li class="groups">
-    <div class="loaded"
-         ng-if="!groupsState.$loaded">
-      <span tooltip-placement="top"
-            tooltip="{{ 'GROUPS' | translate }}"
-            class="glyphicon glyphicon-th">
-      </span>
-      <i class="animate-spin glyphicon glyphicon-refresh"></i>
-    </div>
-
-    <div ng-if="groupsState.$loaded"
-         ng-click="editGroups()">
+    <div ng-click="editGroups()">
       <span tooltip-placement="top"
             tooltip="{{ 'GROUPS' | translate }}"
             class="glyphicon glyphicon-th"></span>
 
-      <a href ng-if="groupIds.length > 0">
-        {{ groupIds.join(', ') }}
+      <a href ng-if="groupNames.length > 0">
+        {{ groupNames.join(', ') }}
       </a>
 
-      <a href ng-if="groupIds.length === 0"
+      <a href ng-if="groupNames.length === 0"
          translate="ADD_GROUPS">
         Add groups
       </a>
@@ -111,7 +101,6 @@
 
   <li class="assignee"
       ng-if="task.assignee">
-
     <span cam-widget-inline-field
           class="set-value"
           type="text"
@@ -119,12 +108,13 @@
           change="assign(this)"
           on-start-editing="startEditingAssignee(this)"
           on-cancel-editing="cancelEditingAssignee(this)"
-          value="task.assignee">
+          value="assignee.id">
 
       <span tooltip-placement="top"
             tooltip="{{ 'ASSIGNEE' | translate }}"
             class="glyphicon glyphicon-user"></span>
-      {{ varValue }}
+      <span ng-if="assignee.firstName || assignee.lastName">{{ assignee.firstName }} {{ assignee.lastName }}</span>
+      <span ng-if="!(assignee.firstName || assignee.lastName)">{{ assignee.id }}</span>
     </span>
 
     <a href

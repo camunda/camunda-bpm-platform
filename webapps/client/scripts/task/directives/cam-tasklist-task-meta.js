@@ -47,6 +47,11 @@ define([
           $scope.task = angular.copy(task);
         });
 
+        taskMetaData.observe('assignee', function(assignee) {
+          $scope.assignee = angular.copy(assignee);
+        });
+
+
         /**
          * observe task changes
          */
@@ -54,13 +59,13 @@ define([
           $scope.isAssignee = isAssignee;
         });
 
-        $scope.groupsState = taskMetaData.observe('groups', function(groups) {
+        taskMetaData.observe('groups', function(groups) {
           groups = groups || [];
-          var groupIds = [];
+          var groupNames = [];
           for (var i = 0, group; !!(group = groups[i]); i++) {
-            groupIds.push(group.groupId);
+            groupNames.push(group.name || group.id);
           }
-          $scope.groupIds = groupIds;
+          $scope.groupNames = groupNames;
         });
 
         /**
