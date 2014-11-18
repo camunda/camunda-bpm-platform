@@ -853,12 +853,14 @@ public abstract class MockProvider {
   // user & groups
 
   public static Group createMockGroup() {
-    Group mockGroup = mock(Group.class);
-    when(mockGroup.getId()).thenReturn(EXAMPLE_GROUP_ID);
-    when(mockGroup.getName()).thenReturn(EXAMPLE_GROUP_NAME);
-    when(mockGroup.getType()).thenReturn(EXAMPLE_GROUP_TYPE);
+    return mockGroup().build();
+  }
 
-    return mockGroup;
+  public static MockGroupBuilder mockGroup() {
+    return new MockGroupBuilder()
+      .id(EXAMPLE_GROUP_ID)
+      .name(EXAMPLE_GROUP_NAME)
+      .type(EXAMPLE_GROUP_TYPE);
   }
 
   public static Group createMockGroupUpdate() {
@@ -876,13 +878,16 @@ public abstract class MockProvider {
   }
 
   public static User createMockUser() {
-    User mockUser = mock(User.class);
-    when(mockUser.getId()).thenReturn(EXAMPLE_USER_ID);
-    when(mockUser.getFirstName()).thenReturn(EXAMPLE_USER_FIRST_NAME);
-    when(mockUser.getLastName()).thenReturn(EXAMPLE_USER_LAST_NAME);
-    when(mockUser.getEmail()).thenReturn(EXAMPLE_USER_EMAIL);
-    when(mockUser.getPassword()).thenReturn(EXAMPLE_USER_PASSWORD);
-    return mockUser;
+    return mockUser().build();
+  }
+
+  public static MockUserBuilder mockUser() {
+    return new MockUserBuilder()
+      .id(EXAMPLE_USER_ID)
+      .firstName(EXAMPLE_USER_FIRST_NAME)
+      .lastName(EXAMPLE_USER_LAST_NAME)
+      .email(EXAMPLE_USER_EMAIL)
+      .password(EXAMPLE_USER_PASSWORD);
   }
 
   public static Authentication createMockAuthentication() {

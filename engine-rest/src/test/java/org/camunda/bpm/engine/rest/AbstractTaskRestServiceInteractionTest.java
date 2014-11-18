@@ -5,6 +5,8 @@ import static com.jayway.restassured.path.json.JsonPath.from;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_CASE_DEFINITION_ID;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_CASE_EXECUTION_ID;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_CASE_INSTANCE_ID;
+import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_GROUP_ID;
+import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_GROUP_ID2;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_TASK_ASSIGNEE_NAME;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_TASK_ATTACHMENT_DESCRIPTION;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_TASK_ATTACHMENT_ID;
@@ -34,7 +36,6 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.eq;
@@ -302,18 +303,24 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
   public void testGetSingleTaskHal() {
 
     // setup user query mock
-    List<User> mockUsers = MockProvider.createMockUsers();
+    List<User> mockUsers = Arrays.asList(
+      MockProvider.mockUser().id(EXAMPLE_TASK_ASSIGNEE_NAME).build(),
+      MockProvider.mockUser().id(EXAMPLE_TASK_OWNER).build()
+    );
     UserQuery sampleUserQuery = mock(UserQuery.class);
-    when(sampleUserQuery.userIdIn(Matchers.<String[]>anyVararg())).thenReturn(sampleUserQuery);
-    when(sampleUserQuery.listPage(eq(0), anyInt())).thenReturn(mockUsers);
+    when(sampleUserQuery.userIdIn(eq(EXAMPLE_TASK_ASSIGNEE_NAME), eq(EXAMPLE_TASK_OWNER))).thenReturn(sampleUserQuery);
+    when(sampleUserQuery.listPage(eq(0), eq(2))).thenReturn(mockUsers);
     when(sampleUserQuery.count()).thenReturn((long) mockUsers.size());
     when(processEngine.getIdentityService().createUserQuery()).thenReturn(sampleUserQuery);
 
     // setup group query mock
-    List<Group> mockGroups = MockProvider.createMockGroups();
+    List<Group> mockGroups = Arrays.asList(
+      MockProvider.mockGroup().id(mockCandidateGroupIdentityLink.getGroupId()).build(),
+      MockProvider.mockGroup().id(mockCandidateGroup2IdentityLink.getGroupId()).build()
+    );
     GroupQuery sampleGroupQuery = mock(GroupQuery.class);
-    when(sampleGroupQuery.groupIdIn(Matchers.<String[]>anyVararg())).thenReturn(sampleGroupQuery);
-    when(sampleGroupQuery.listPage(eq(0), anyInt())).thenReturn(mockGroups);
+    when(sampleGroupQuery.groupIdIn(eq(EXAMPLE_GROUP_ID), eq(EXAMPLE_GROUP_ID2))).thenReturn(sampleGroupQuery);
+    when(sampleGroupQuery.listPage(eq(0), eq(2))).thenReturn(mockGroups);
     when(sampleGroupQuery.count()).thenReturn((long) mockGroups.size());
     when(processEngine.getIdentityService().createGroupQuery()).thenReturn(sampleGroupQuery);
 
@@ -375,21 +382,34 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
 
     // validate embedded users:
     List<Map<String,Object>> embeddedUsers = from(content).getList("_embedded.user");
-    Assert.assertEquals("There should be one user returned.", 1, embeddedUsers.size());
+    Assert.assertEquals("There should be two users returned.", 2, embeddedUsers.size());
+
     Map<String, Object> embeddedUser = embeddedUsers.get(0);
     assertNotNull("The returned user should not be null.", embeddedUser);
-    assertEquals(MockProvider.EXAMPLE_USER_ID, embeddedUser.get("id"));
+    assertEquals(MockProvider.EXAMPLE_TASK_ASSIGNEE_NAME, embeddedUser.get("id"));
     assertEquals(MockProvider.EXAMPLE_USER_FIRST_NAME, embeddedUser.get("firstName"));
     assertEquals(MockProvider.EXAMPLE_USER_LAST_NAME, embeddedUser.get("lastName"));
     assertEquals(MockProvider.EXAMPLE_USER_EMAIL, embeddedUser.get("email"));
     assertNull(embeddedUser.get("_embedded"));
     Map<String, Object> links = (Map<String, Object>) embeddedUser.get("_links");
     assertEquals(1, links.size());
-    assertHalLink(links, "self", UserRestService.PATH + "/" + MockProvider.EXAMPLE_USER_ID);
+    assertHalLink(links, "self", UserRestService.PATH + "/" + MockProvider.EXAMPLE_TASK_ASSIGNEE_NAME);
+
+    embeddedUser = embeddedUsers.get(1);
+    assertNotNull("The returned user should not be null.", embeddedUser);
+    assertEquals(MockProvider.EXAMPLE_TASK_OWNER, embeddedUser.get("id"));
+    assertEquals(MockProvider.EXAMPLE_USER_FIRST_NAME, embeddedUser.get("firstName"));
+    assertEquals(MockProvider.EXAMPLE_USER_LAST_NAME, embeddedUser.get("lastName"));
+    assertEquals(MockProvider.EXAMPLE_USER_EMAIL, embeddedUser.get("email"));
+    assertNull(embeddedUser.get("_embedded"));
+    links = (Map<String, Object>) embeddedUser.get("_links");
+    assertEquals(1, links.size());
+    assertHalLink(links, "self", UserRestService.PATH + "/" + MockProvider.EXAMPLE_TASK_OWNER);
 
     // validate embedded groups:
     List<Map<String, Object>> embeddedGroups = from(content).getList("_embedded.group");
-    Assert.assertEquals("There should be one group returned.", 1, embeddedGroups.size());
+    Assert.assertEquals("There should be two groups returned.", 2, embeddedGroups.size());
+
     Map<String, Object> embeddedGroup = embeddedGroups.get(0);
     assertNotNull("The returned group should not be null.", embeddedGroup);
     assertEquals(MockProvider.EXAMPLE_GROUP_ID, embeddedGroup.get("id"));
@@ -399,6 +419,16 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     links = (Map<String, Object>) embeddedGroup.get("_links");
     assertEquals(1, links.size());
     assertHalLink(links, "self", GroupRestService.PATH + "/" + MockProvider.EXAMPLE_GROUP_ID);
+
+    embeddedGroup = embeddedGroups.get(1);
+    assertNotNull("The returned group should not be null.", embeddedGroup);
+    assertEquals(MockProvider.EXAMPLE_GROUP_ID2, embeddedGroup.get("id"));
+    assertEquals(MockProvider.EXAMPLE_GROUP_NAME, embeddedGroup.get("name"));
+    assertEquals(MockProvider.EXAMPLE_GROUP_TYPE, embeddedGroup.get("type"));
+    assertNull(embeddedGroup.get("_embedded"));
+    links = (Map<String, Object>) embeddedGroup.get("_links");
+    assertEquals(1, links.size());
+    assertHalLink(links, "self", GroupRestService.PATH + "/" + MockProvider.EXAMPLE_GROUP_ID2);
 
     // validate embedded processDefinitions:
     List<Map<String,Object>> embeddedDefinitions = from(content).getList("_embedded.processDefinition");
