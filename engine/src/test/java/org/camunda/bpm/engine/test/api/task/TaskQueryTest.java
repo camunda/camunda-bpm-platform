@@ -32,6 +32,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.repository.CaseDefinition;
+import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.DelegationState;
 import org.camunda.bpm.engine.task.Task;
@@ -3712,6 +3713,21 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     query.caseInstanceVariableValueLike("aStringValue", "%b%");
 
     verifyQueryResults(query, 1);
+  }
+
+  @Deployment
+  public void testQueryByVariableInParallelBranch() throws Exception {
+    runtimeService.startProcessInstanceByKey("parallelGateway");
+
+    // when there are two process variables of the same name but different types
+    Execution task1Execution = runtimeService.createExecutionQuery().activityId("task1").singleResult();
+    runtimeService.setVariableLocal(task1Execution.getId(), "var", 12345L);
+    Execution task2Execution = runtimeService.createExecutionQuery().activityId("task2").singleResult();
+    runtimeService.setVariableLocal(task2Execution.getId(), "var", 12345);
+
+    // then the task query should be able to filter by both variables and return both tasks
+    assertEquals(2, taskService.createTaskQuery().processVariableValueEquals("var", 12345).count());
+    assertEquals(2, taskService.createTaskQuery().processVariableValueEquals("var", 12345L).count());
   }
 
   private void verifyQueryResults(TaskQuery query, int countExpected) {

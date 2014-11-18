@@ -34,6 +34,7 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.test.ResourceProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
+import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
@@ -975,6 +976,63 @@ public class FullHistoryTest extends ResourceProcessEngineTestCase {
     assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskVariableValueEquals("booleanVar", false).count());
     assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskVariableValueEquals("dateVar", otherDate).count());
     assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskVariableValueEquals("nullVar", null).count());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
+  public void testHistoricTaskInstanceQueryTaskVariableValueEqualsOverwriteType() throws Exception {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+
+    // Set a long variable on a task
+    taskService.setVariableLocal(task.getId(), "var", 12345L);
+
+    // Validate all variable-updates are present in DB
+    assertEquals(1, historyService.createHistoricDetailQuery().variableUpdates().taskId(task.getId()).count());
+
+    // Query Historic task instances based on variable
+    assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskVariableValueEquals("var", 12345L).count());
+
+    // Update the variables to an int variable
+    taskService.setVariableLocal(task.getId(), "var", 12345);
+
+    // Validate all variable-updates are present in DB
+    assertEquals(2, historyService.createHistoricDetailQuery().variableUpdates().taskId(task.getId()).count());
+
+    // The previous long value should not match
+    assertEquals(0, historyService.createHistoricTaskInstanceQuery().taskVariableValueEquals("var", 12345L).count());
+
+    // The previous int value should not match
+    assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskVariableValueEquals("var", 12345).count());
+  }
+
+  @Deployment
+  public void testHistoricTaskInstanceQueryVariableInParallelBranch() throws Exception {
+    runtimeService.startProcessInstanceByKey("parallelGateway");
+
+    // when there are two process variables of the same name but different types
+    Execution task1Execution = runtimeService.createExecutionQuery().activityId("task1").singleResult();
+    runtimeService.setVariableLocal(task1Execution.getId(), "var", 12345L);
+    Execution task2Execution = runtimeService.createExecutionQuery().activityId("task2").singleResult();
+    runtimeService.setVariableLocal(task2Execution.getId(), "var", 12345);
+
+    // then the task query should be able to filter by both variables and return both tasks
+    assertEquals(2, historyService.createHistoricTaskInstanceQuery().processVariableValueEquals("var", 12345).count());
+    assertEquals(2, historyService.createHistoricTaskInstanceQuery().processVariableValueEquals("var", 12345L).count());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/standalone/history/FullHistoryTest.testHistoricTaskInstanceQueryVariableInParallelBranch.bpmn20.xml")
+  public void testHistoricTaskInstanceQueryVariableOfSameTypeInParallelBranch() throws Exception {
+    runtimeService.startProcessInstanceByKey("parallelGateway");
+
+    // when there are two process variables of the same name but different types
+    Execution task1Execution = runtimeService.createExecutionQuery().activityId("task1").singleResult();
+    runtimeService.setVariableLocal(task1Execution.getId(), "var", 12345L);
+    Execution task2Execution = runtimeService.createExecutionQuery().activityId("task2").singleResult();
+    runtimeService.setVariableLocal(task2Execution.getId(), "var", 45678L);
+
+    // then the task query should be able to filter by both variables and return both tasks
+    assertEquals(2, historyService.createHistoricTaskInstanceQuery().processVariableValueEquals("var", 12345L).count());
+    assertEquals(2, historyService.createHistoricTaskInstanceQuery().processVariableValueEquals("var", 45678L).count());
   }
 
   @Deployment
