@@ -1090,7 +1090,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
-  public void FAILING_testChangeVariableType() {
+  public void testChangeVariableType() {
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
     DummySerializable dummy = new DummySerializable();
