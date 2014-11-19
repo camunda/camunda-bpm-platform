@@ -73,6 +73,7 @@ public abstract class AbstractHistoricCaseActivityInstanceRestServiceInteraction
     String returnedParentCaseActivityInstanceId = from(content).getString("parentCaseActivityInstanceId");
     String returnedCaseActivityId = from(content).getString("caseActivityId");
     String returnedCaseActivityName = from(content).getString("caseActivityName");
+    String returnedCaseActivityType = from(content).getString("caseActivityType");
     String returnedCaseDefinitionId = from(content).getString("caseDefinitionId");
     String returnedCaseInstanceId = from(content).getString("caseInstanceId");
     String returnedCaseExecutionId = from(content).getString("caseExecutionId");
@@ -93,6 +94,7 @@ public abstract class AbstractHistoricCaseActivityInstanceRestServiceInteraction
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_PARENT_CASE_ACTIVITY_INSTANCE_ID, returnedParentCaseActivityInstanceId);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_CASE_ACTIVITY_ID, returnedCaseActivityId);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_CASE_ACTIVITY_NAME, returnedCaseActivityName);
+    Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_CASE_ACTIVITY_TYPE, returnedCaseActivityType);
     Assert.assertEquals(MockProvider.EXAMPLE_CASE_DEFINITION_ID, returnedCaseDefinitionId);
     Assert.assertEquals(MockProvider.EXAMPLE_CASE_INSTANCE_ID, returnedCaseInstanceId);
     Assert.assertEquals(MockProvider.EXAMPLE_CASE_EXECUTION_ID, returnedCaseExecutionId);

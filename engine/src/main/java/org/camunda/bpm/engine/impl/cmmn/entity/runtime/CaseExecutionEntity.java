@@ -12,6 +12,9 @@
  */
 package org.camunda.bpm.engine.impl.cmmn.entity.runtime;
 
+import static org.camunda.bpm.engine.impl.cmmn.handler.ItemHandler.PROPERTY_ACTIVITY_DESCRIPTION;
+import static org.camunda.bpm.engine.impl.cmmn.handler.ItemHandler.PROPERTY_ACTIVITY_TYPE;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -92,10 +95,15 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
   protected int revision = 1;
   protected String caseDefinitionId;
   protected String activityId;
-  protected String activityName;
   protected String caseInstanceId;
   protected String parentId;
   protected String superCaseExecutionId;
+
+  // activity properites //////////////////////////////////////////////////////
+
+  protected String activityName;
+  protected String activityType;
+  protected String activityDescription;
 
   // case definition ///////////////////////////////////////////////////////////
 
@@ -209,14 +217,6 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
 
   // activity //////////////////////////////////////////////////////////////////
 
-  public String getActivityId() {
-    return activityId;
-  }
-
-  public String getActivityName() {
-    return activityName;
-  }
-
   public CmmnActivity getActivity() {
     ensureActivityInitialized();
     return super.getActivity();
@@ -227,9 +227,13 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
     if (activity != null) {
       this.activityId = activity.getId();
       this.activityName = activity.getName();
+      this.activityType = getActivityProperty(activity, PROPERTY_ACTIVITY_TYPE);
+      this.activityDescription = getActivityProperty(activity, PROPERTY_ACTIVITY_DESCRIPTION);
     } else {
       this.activityId = null;
       this.activityName = null;
+      this.activityType = null;
+      this.activityDescription = null;
     }
   }
 
@@ -237,6 +241,37 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
     if ((activity == null) && (activityId != null)) {
       setActivity(getCaseDefinition().findActivity(activityId));
     }
+  }
+
+  protected String getActivityProperty(CmmnActivity activity, String property) {
+    String result = null;
+
+    if (activity != null) {
+      Object value = activity.getProperty(property);
+      if (value != null && value instanceof String) {
+        result = (String) value;
+      }
+    }
+
+    return result;
+  }
+
+  // activity properties //////////////////////////////////////////////////////
+
+  public String getActivityId() {
+    return activityId;
+  }
+
+  public String getActivityName() {
+    return activityName;
+  }
+
+  public String getActivityType() {
+    return activityType;
+  }
+
+  public String getActivityDescription() {
+    return activityDescription;
   }
 
   // case executions ////////////////////////////////////////////////////////////////

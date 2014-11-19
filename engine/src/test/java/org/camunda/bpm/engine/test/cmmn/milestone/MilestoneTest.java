@@ -170,4 +170,22 @@ public class MilestoneTest extends PluggableProcessEngineTestCase {
 
   }
 
+  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/milestone/MilestoneTest.testWithEntryCriteria.cmmn"})
+  public void testActivityType() {
+    // given
+    caseService
+      .withCaseDefinitionByKey("case")
+      .create()
+      .getId();
+
+    // when
+    CaseExecution milestone = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_Milestone_1")
+        .singleResult();
+
+    // then
+    assertEquals("milestone", milestone.getActivityType());
+  }
+
 }

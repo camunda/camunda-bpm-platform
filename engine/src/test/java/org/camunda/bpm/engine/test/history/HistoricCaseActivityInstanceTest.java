@@ -70,6 +70,7 @@ public class HistoricCaseActivityInstanceTest extends CmmnProcessEngineTestCase 
     assertEquals(stage.getCaseInstanceId(), historicStage.getCaseInstanceId());
     assertEquals(stage.getActivityId(), historicStage.getCaseActivityId());
     assertEquals(stage.getActivityName(), historicStage.getCaseActivityName());
+    assertEquals(stage.getActivityType(), historicStage.getCaseActivityType());
 
     manualStart(stage.getId());
 
@@ -450,6 +451,9 @@ public class HistoricCaseActivityInstanceTest extends CmmnProcessEngineTestCase 
 
     assertCount(1, historicQuery().caseActivityName(stageName));
     assertCount(1, historicQuery().caseActivityName(taskName));
+
+    assertCount(1, historicQuery().caseActivityType("stage"));
+    assertCount(1, historicQuery().caseActivityType("humanTask"));
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
@@ -498,6 +502,10 @@ public class HistoricCaseActivityInstanceTest extends CmmnProcessEngineTestCase 
     // sort by case activity names
     assertQuerySorting("caseActivityName", historicQuery().orderByCaseActivityName(),
       "A HumanTask", "A HumanTask", "Another HumanTask");
+
+    // sort by case activity type
+    assertQuerySorting("caseActivityType", historicQuery().orderByCaseActivityType(),
+      "humanTask", "humanTask", "humanTask");
 
     // sort by case definition ids
     assertQuerySorting("caseDefinitionId", historicQuery().orderByCaseDefinitionId(),

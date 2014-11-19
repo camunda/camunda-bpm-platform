@@ -285,6 +285,8 @@ public abstract class AbstractCaseExecutionRestServiceQueryTest extends Abstract
     String returnedCaseDefinitionId = from(content).getString("[0].caseDefinitionId");
     String returnedActivityId = from(content).getString("[0].activityId");
     String returnedActivityName = from(content).getString("[0].activityName");
+    String returnedActivityType = from(content).getString("[0].activityType");
+    String returnedActivityDescription = from(content).getString("[0].activityDescription");
     boolean returnedActiveState = from(content).getBoolean("[0].active");
     boolean returnedEnabledState = from(content).getBoolean("[0].enabled");
     boolean returnedDisabledState = from(content).getBoolean("[0].disabled");
@@ -295,6 +297,8 @@ public abstract class AbstractCaseExecutionRestServiceQueryTest extends Abstract
     assertThat(returnedCaseDefinitionId).isEqualTo(MockProvider.EXAMPLE_CASE_EXECUTION_CASE_DEFINITION_ID);
     assertThat(returnedActivityId).isEqualTo(MockProvider.EXAMPLE_CASE_EXECUTION_ACTIVITY_ID);
     assertThat(returnedActivityName).isEqualTo(MockProvider.EXAMPLE_CASE_EXECUTION_ACTIVITY_NAME);
+    assertThat(returnedActivityType).isEqualTo(MockProvider.EXAMPLE_CASE_EXECUTION_ACTIVITY_TYPE);
+    assertThat(returnedActivityDescription).isEqualTo(MockProvider.EXAMPLE_CASE_EXECUTION_ACTIVITY_DESCRIPTION);
     assertThat(returnedEnabledState).isEqualTo(MockProvider.EXAMPLE_CASE_EXECUTION_IS_ENABLED);
     assertThat(returnedActiveState).isEqualTo(MockProvider.EXAMPLE_CASE_EXECUTION_IS_ACTIVE);
     assertThat(returnedDisabledState).isEqualTo(MockProvider.EXAMPLE_CASE_EXECUTION_IS_DISABLED);
@@ -333,6 +337,8 @@ public abstract class AbstractCaseExecutionRestServiceQueryTest extends Abstract
     String returnedCaseDefinitionId = from(content).getString("[0].caseDefinitionId");
     String returnedActivityId = from(content).getString("[0].activityId");
     String returnedActivityName = from(content).getString("[0].activityName");
+    String returnedActivityType = from(content).getString("[0].activityType");
+    String returnedActivityDescription = from(content).getString("[0].activityDescription");
     boolean returnedActiveState = from(content).getBoolean("[0].active");
     boolean returnedEnabledState = from(content).getBoolean("[0].enabled");
     boolean returnedDisabledState = from(content).getBoolean("[0].disabled");
@@ -343,6 +349,8 @@ public abstract class AbstractCaseExecutionRestServiceQueryTest extends Abstract
     assertThat(returnedCaseDefinitionId).isEqualTo(MockProvider.EXAMPLE_CASE_EXECUTION_CASE_DEFINITION_ID);
     assertThat(returnedActivityId).isEqualTo(MockProvider.EXAMPLE_CASE_EXECUTION_ACTIVITY_ID);
     assertThat(returnedActivityName).isEqualTo(MockProvider.EXAMPLE_CASE_EXECUTION_ACTIVITY_NAME);
+    assertThat(returnedActivityType).isEqualTo(MockProvider.EXAMPLE_CASE_EXECUTION_ACTIVITY_TYPE);
+    assertThat(returnedActivityDescription).isEqualTo(MockProvider.EXAMPLE_CASE_EXECUTION_ACTIVITY_DESCRIPTION);
     assertThat(returnedEnabledState).isEqualTo(MockProvider.EXAMPLE_CASE_EXECUTION_IS_ENABLED);
     assertThat(returnedActiveState).isEqualTo(MockProvider.EXAMPLE_CASE_EXECUTION_IS_ACTIVE);
     assertThat(returnedDisabledState).isEqualTo(MockProvider.EXAMPLE_CASE_EXECUTION_IS_DISABLED);

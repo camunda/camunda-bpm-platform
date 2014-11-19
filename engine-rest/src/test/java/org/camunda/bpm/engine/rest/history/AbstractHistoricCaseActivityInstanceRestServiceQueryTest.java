@@ -174,6 +174,15 @@ public abstract class AbstractHistoricCaseActivityInstanceRestServiceQueryTest e
     inOrder.verify(mockedQuery).orderByCaseActivityName();
     inOrder.verify(mockedQuery).desc();
 
+    executeAndVerifySorting("caseActivityType", "asc", Status.OK);
+    inOrder.verify(mockedQuery).orderByCaseActivityType();
+    inOrder.verify(mockedQuery).asc();
+
+    inOrder = Mockito.inOrder(mockedQuery);
+    executeAndVerifySorting("caseActivityType", "desc", Status.OK);
+    inOrder.verify(mockedQuery).orderByCaseActivityType();
+    inOrder.verify(mockedQuery).desc();
+
     inOrder = Mockito.inOrder(mockedQuery);
     executeAndVerifySorting("createTime", "asc", Status.OK);
     inOrder.verify(mockedQuery).orderByHistoricCaseActivityInstanceCreateTime();
@@ -294,6 +303,7 @@ public abstract class AbstractHistoricCaseActivityInstanceRestServiceQueryTest e
     String returnedParentCaseActivityInstanceId = from(content).getString("[0].parentCaseActivityInstanceId");
     String returnedCaseActivityId = from(content).getString("[0].caseActivityId");
     String returnedCaseActivityName = from(content).getString("[0].caseActivityName");
+    String returnedCaseActivityType = from(content).getString("[0].caseActivityType");
     String returnedCaseDefinitionId = from(content).getString("[0].caseDefinitionId");
     String returnedCaseInstanceId = from(content).getString("[0].caseInstanceId");
     String returnedCaseExecutionId = from(content).getString("[0].caseExecutionId");
@@ -314,6 +324,7 @@ public abstract class AbstractHistoricCaseActivityInstanceRestServiceQueryTest e
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_PARENT_CASE_ACTIVITY_INSTANCE_ID, returnedParentCaseActivityInstanceId);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_CASE_ACTIVITY_ID, returnedCaseActivityId);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_CASE_ACTIVITY_NAME, returnedCaseActivityName);
+    Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_CASE_ACTIVITY_TYPE, returnedCaseActivityType);
     Assert.assertEquals(MockProvider.EXAMPLE_CASE_DEFINITION_ID, returnedCaseDefinitionId);
     Assert.assertEquals(MockProvider.EXAMPLE_CASE_INSTANCE_ID, returnedCaseInstanceId);
     Assert.assertEquals(MockProvider.EXAMPLE_CASE_EXECUTION_ID, returnedCaseExecutionId);
@@ -368,6 +379,7 @@ public abstract class AbstractHistoricCaseActivityInstanceRestServiceQueryTest e
     parameters.put("caseExecutionId", MockProvider.EXAMPLE_CASE_EXECUTION_ID);
     parameters.put("caseActivityId", MockProvider.EXAMPLE_HISTORIC_CASE_ACTIVITY_ID);
     parameters.put("caseActivityName", MockProvider.EXAMPLE_HISTORIC_CASE_ACTIVITY_NAME);
+    parameters.put("caseActivityType", MockProvider.EXAMPLE_HISTORIC_CASE_ACTIVITY_TYPE);
 
     return parameters;
   }
@@ -381,6 +393,7 @@ public abstract class AbstractHistoricCaseActivityInstanceRestServiceQueryTest e
     verify(mockedQuery).caseExecutionId(stringQueryParameters.get("caseExecutionId"));
     verify(mockedQuery).caseActivityId(stringQueryParameters.get("caseActivityId"));
     verify(mockedQuery).caseActivityName(stringQueryParameters.get("caseActivityName"));
+    verify(mockedQuery).caseActivityType(stringQueryParameters.get("caseActivityType"));
 
     verify(mockedQuery).list();
   }

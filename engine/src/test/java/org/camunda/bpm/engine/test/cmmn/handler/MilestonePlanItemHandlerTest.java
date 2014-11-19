@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.engine.test.cmmn.handler;
 
+import static org.camunda.bpm.engine.impl.cmmn.handler.ItemHandler.PROPERTY_ACTIVITY_TYPE;
+import static org.camunda.bpm.engine.impl.cmmn.handler.ItemHandler.PROPERTY_ACTIVITY_DESCRIPTION;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
@@ -85,6 +87,44 @@ public class MilestonePlanItemHandlerTest extends CmmnElementHandlerTest {
     // then
     assertNotEquals(milestoneName, activity.getName());
     assertEquals(planItemName, activity.getName());
+  }
+
+  @Test
+  public void testMilestoneActivityType() {
+    // given
+
+    // when
+    CmmnActivity activity = handler.handleElement(planItem, context);
+
+    // then
+    String activityType = (String) activity.getProperty(PROPERTY_ACTIVITY_TYPE);
+    assertEquals("milestone", activityType);
+  }
+
+  @Test
+  public void testMilestoneDescription() {
+    // given
+    String description = "This is a milestone";
+    milestone.setDescription(description);
+
+    // when
+    CmmnActivity activity = handler.handleElement(planItem, context);
+
+    // then
+    assertEquals(description, (String) activity.getProperty(PROPERTY_ACTIVITY_DESCRIPTION));
+  }
+
+  @Test
+  public void testPlanItemDescription() {
+    // given
+    String description = "This is a planItem";
+    planItem.setDescription(description);
+
+    // when
+    CmmnActivity activity = handler.handleElement(planItem, context);
+
+    // then
+    assertEquals(description, (String) activity.getProperty(PROPERTY_ACTIVITY_DESCRIPTION));
   }
 
   @Test

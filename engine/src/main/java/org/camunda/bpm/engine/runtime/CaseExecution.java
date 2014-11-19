@@ -50,6 +50,16 @@ public interface CaseExecution {
   String getActivityName();
 
   /**
+   * <p>The type of the activity associated with <code>this</code> case execution.</p>
+   */
+  String getActivityType();
+
+  /**
+   * <p>The description of the activity associated with <code>this</code> case execution.</p>
+   */
+  String getActivityDescription();
+
+  /**
    * <p>The id of the parent of <code>this</code> case execution.</p>
    */
   String getParentId();

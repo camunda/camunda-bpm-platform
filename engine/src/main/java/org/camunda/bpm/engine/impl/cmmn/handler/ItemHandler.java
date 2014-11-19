@@ -23,7 +23,6 @@ import org.camunda.bpm.engine.delegate.CaseVariableListener;
 import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.delegate.VariableListener;
 import org.camunda.bpm.engine.impl.bpmn.parser.FieldDeclaration;
-import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cmmn.CaseControlRule;
 import org.camunda.bpm.engine.impl.cmmn.behavior.CaseControlRuleImpl;
 import org.camunda.bpm.engine.impl.cmmn.behavior.CmmnActivityBehavior;
@@ -34,7 +33,6 @@ import org.camunda.bpm.engine.impl.cmmn.listener.ScriptCaseExecutionListener;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnSentryDeclaration;
-import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
 import org.camunda.bpm.engine.impl.el.FixedValue;
 import org.camunda.bpm.engine.impl.scripting.ExecutableScript;
@@ -62,6 +60,7 @@ import org.camunda.bpm.model.cmmn.instance.camunda.CamundaScript;
 import org.camunda.bpm.model.cmmn.instance.camunda.CamundaString;
 import org.camunda.bpm.model.cmmn.instance.camunda.CamundaVariableListener;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
+import org.camunda.bpm.model.xml.type.ModelElementType;
 
 /**
  * @author Roman Smirnov
@@ -75,6 +74,8 @@ public abstract class ItemHandler extends CmmnElementHandler<CmmnElement, CmmnAc
   public static final String PROPERTY_REPETITION_RULE = "repetitionRule";
   public static final String PROPERTY_IS_BLOCKING = "isBlocking";
   public static final String PROPERTY_DISCRETIONARY = "discretionary";
+  public static final String PROPERTY_ACTIVITY_TYPE = "activityType";
+  public static final String PROPERTY_ACTIVITY_DESCRIPTION = "description";
 
   public static List<String> TASK_OR_STAGE_CREATE_EVENTS = Arrays.asList(
       CaseExecutionListener.CREATE
@@ -199,9 +200,18 @@ public abstract class ItemHandler extends CmmnElementHandler<CmmnElement, CmmnAc
 
     if (name == null) {
       PlanItemDefinition definition = getDefinition(element);
-      name = definition.getName();
+      if (definition != null) {
+        name = definition.getName();
+      }
     }
+
     activity.setName(name);
+
+    // activityType
+    initializeActivityType(element, activity, context);
+
+    // description
+    initializeDescription(element, activity, context);
 
     // autoComplete
     initializeAutoComplete(element, activity, context);
@@ -227,6 +237,33 @@ public abstract class ItemHandler extends CmmnElementHandler<CmmnElement, CmmnAc
     // initialize exit criteria
     initializeExitCriterias(element, activity, context);
 
+  }
+
+  protected void initializeActivityType(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context) {
+    PlanItemDefinition definition = getDefinition(element);
+
+    String activityType = null;
+    if (definition != null) {
+      ModelElementType elementType = definition.getElementType();
+      if (elementType != null) {
+        activityType = elementType.getTypeName();
+      }
+    }
+
+    activity.setProperty(PROPERTY_ACTIVITY_TYPE, activityType);
+  }
+
+  protected void initializeDescription(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context) {
+    String description = element.getDescription();
+
+    if (description == null) {
+      PlanItemDefinition definition = getDefinition(element);
+      if (definition != null) {
+        description = definition.getDescription();
+      }
+    }
+
+    activity.setProperty(PROPERTY_ACTIVITY_DESCRIPTION, description);
   }
 
   protected void initializeAutoComplete(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context) {

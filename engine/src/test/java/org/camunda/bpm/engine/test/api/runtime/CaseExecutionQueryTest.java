@@ -2488,7 +2488,8 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(caseDefinitionId, task.getCaseDefinitionId());
     assertEquals(caseInstanceId, task.getCaseInstanceId());
     assertEquals(caseInstanceId, task.getParentId());
+    assertEquals("humanTask", task.getActivityType());
+    assertNotNull(task.getActivityDescription());
     assertNotNull(task.getId());
-
   }
 }

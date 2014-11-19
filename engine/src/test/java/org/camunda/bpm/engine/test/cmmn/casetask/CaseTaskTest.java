@@ -1566,6 +1566,18 @@ public class CaseTaskTest extends CmmnProcessEngineTestCase {
 
   }
 
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/cmmn/oneCaseTaskCase.cmmn"})
+  public void testActivityType() {
+    // given
+    createCaseInstanceByKey(ONE_CASE_TASK_CASE).getId();
+
+    // when
+    CaseExecution caseTask = queryCaseExecutionByActivityId(CASE_TASK);
+
+    // then
+    assertEquals("caseTask", caseTask.getActivityType());
+  }
+
   protected CaseInstance createCaseInstanceByKey(String caseDefinitionKey) {
     return createCaseInstanceByKey(caseDefinitionKey, null);
   }
