@@ -29,13 +29,7 @@ module.exports = function(grunt) {
 
     watch:            require('./grunt/config/watch')(config),
 
-    connect:          require('camunda-commons-ui/grunt/config/connect')(config),
-
-    jsdoc:            require('camunda-commons-ui/grunt/config/jsdoc')(config),
-
     jshint:           require('camunda-commons-ui/grunt/config/jshint')(config),
-
-    changelog:        require('camunda-commons-ui/grunt/config/changelog')(config),
 
     localescompile:   require('camunda-commons-ui/grunt/config/localescompile')(config),
 
@@ -60,7 +54,6 @@ module.exports = function(grunt) {
     var tasks = [
       'clean',
       'jshint',
-      'jsdoc',
       'copy',
       'less',
       'localescompile',
@@ -73,11 +66,8 @@ module.exports = function(grunt) {
 
   grunt.registerTask('auto-build', [
     'build:dev',
-    'connect',
     'watch'
   ]);
-
-  grunt.registerTask('prepublish', ['build', 'changelog']);
 
   grunt.registerTask('default', ['build']);
 };
