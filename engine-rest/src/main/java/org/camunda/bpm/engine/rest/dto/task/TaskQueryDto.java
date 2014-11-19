@@ -1221,15 +1221,11 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     if (expressions.containsKey("followUpDate")) {
       dto.setFollowUpDateExpression(expressions.get("followUpDate"));
     }
-
-    if (!taskQuery.isFollowUpNullAccepted()) {
-      if (expressions.containsKey("followUpBefore")) {
-        dto.setFollowUpBeforeExpression(expressions.get("followUpBefore"));
-      }
-    } else {
-      if (expressions.containsKey("followUpBefore")) {
-        dto.setFollowUpBeforeOrNotExistentExpression(expressions.get("followUpBefore"));
-      }
+    if (expressions.containsKey("followUpBefore")) {
+      dto.setFollowUpBeforeExpression(expressions.get("followUpBefore"));
+    }
+    if (expressions.containsKey("followUpBeforeOrNotExistent")) {
+      dto.setFollowUpBeforeOrNotExistentExpression(expressions.get("followUpBeforeOrNotExistent"));
     }
     if (expressions.containsKey("followUpAfter")) {
       dto.setFollowUpAfterExpression(expressions.get("followUpAfter"));
