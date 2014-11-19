@@ -27,8 +27,10 @@ import static org.camunda.bpm.engine.variable.type.ValueType.STRING;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.engine.variable.type.ValueTypeResolver;
@@ -68,9 +70,16 @@ public class ValueTypeResolverImpl implements ValueTypeResolver {
   public Collection<ValueType> getSubTypes(ValueType type) {
     List<ValueType> types = new ArrayList<ValueType>();
 
+    Set<ValueType> validParents = new HashSet<ValueType>();
+    validParents.add(type);
+
     for (ValueType knownType : knownTypes.values()) {
-      if (!knownType.isAbstract() && type.equals(knownType.getParent())) {
-        types.add(knownType);
+      if (validParents.contains(knownType.getParent())) {
+        validParents.add(knownType);
+
+        if (!knownType.isAbstract()) {
+          types.add(knownType);
+        }
       }
     }
 
