@@ -59,25 +59,6 @@ module.exports = function(config) {
       ]
     },
 
-    unitTest: {
-      files: [
-        'test/unit/**/*Spec.js'
-      ],
-      tasks: [
-        'jasmine_node:unit'
-      ]
-    },
-
-    integrationTest: {
-      files: [
-        'test/integration/main.js',
-        'test/integration/**/*Spec.js'
-      ],
-      tasks: [
-        'karma:integration'
-      ]
-    },
-
     served: {
       files: ['<%= buildTarget %>/**/*'],
       options: {
