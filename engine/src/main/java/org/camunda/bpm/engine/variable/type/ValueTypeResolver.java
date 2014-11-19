@@ -22,7 +22,7 @@ public interface ValueTypeResolver {
   ValueType typeForName(String typeName);
 
   /**
-   * Returns all (transitive) sub types of the provided type
+   * Returns all sub types of the provided type
    * given they are not abstract
    *
    * @return

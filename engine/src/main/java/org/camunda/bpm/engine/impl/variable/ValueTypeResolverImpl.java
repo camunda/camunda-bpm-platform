@@ -66,7 +66,6 @@ public class ValueTypeResolverImpl implements ValueTypeResolver {
   }
 
   public Collection<ValueType> getSubTypes(ValueType type) {
-    // TODO: make this a true transitive closure (i.e. consider children of children)
     List<ValueType> types = new ArrayList<ValueType>();
 
     for (ValueType knownType : knownTypes.values()) {
