@@ -296,17 +296,24 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
 
     query.followUpBeforeOrNotExistent(testDate);
 
-    // save filter
+    // save filter without query
+    filterService.saveFilter(filter);
+
+    // fetch from db
+    filter = filterService.createTaskFilterQuery().singleResult();
+
+    // use query as extending query
+    List<Task> tasks = filterService.list(filter.getId(), query);
+    assertEquals(3, tasks.size());
+
+    // set as filter query and save filter
     filter.setQuery(query);
     filterService.saveFilter(filter);
 
     // fetch from db
     filter = filterService.createTaskFilterQuery().singleResult();
 
-    List<Task> tasks = filterService.list(filter.getId());
-    assertEquals(3, tasks.size());
-
-    tasks = filterService.list(filter.getId(), query);
+    tasks = filterService.list(filter.getId());
     assertEquals(3, tasks.size());
 
     TaskQuery extendingQuery = taskService.createTaskQuery();
@@ -335,7 +342,43 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
     // test query
     query = filter.getQuery();
     assertTrue(query.isFollowUpNullAccepted());
-    assertEquals(testString, query.getExpressions().get("followUpBefore"));
+    assertEquals(testString, query.getExpressions().get("followUpBeforeOrNotExistent"));
+  }
+
+  public void testTaskQueryByFollowUpBeforeOrNotExistentExpressionExtendingQuery() {
+    // create query
+    TaskQueryImpl query = new TaskQueryImpl();
+
+    query.followUpBeforeOrNotExistentExpression("${dateTime().withMillis(0)}");
+
+    // save filter without query
+    filterService.saveFilter(filter);
+
+    // fetch from db
+    filter = filterService.createTaskFilterQuery().singleResult();
+
+    // use query as extending query
+    List<Task> tasks = filterService.list(filter.getId(), query);
+    assertEquals(3, tasks.size());
+
+    // set as filter query and save filter
+    filter.setQuery(query);
+    filterService.saveFilter(filter);
+
+    // fetch from db
+    filter = filterService.createTaskFilterQuery().singleResult();
+
+    tasks = filterService.list(filter.getId());
+    assertEquals(3, tasks.size());
+
+    TaskQuery extendingQuery = taskService.createTaskQuery();
+
+    extendingQuery
+      .orderByTaskCreateTime()
+      .asc();
+
+    tasks = filterService.list(filter.getId(), extendingQuery);
+    assertEquals(3, tasks.size());
   }
 
   public void testTaskQueryCandidateUser() {
