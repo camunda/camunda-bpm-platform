@@ -13,7 +13,6 @@ define(function() {
 
       'angular':                    'bower_components/angular/angular',
       'angular-route':              'bower_components/angular-route/angular-route',
-      'angular-messages':           'bower_components/angular-messages/angular-messages',
       'angular-sanitize':           'bower_components/angular-sanitize/angular-sanitize',
       'angular-animate':            'bower_components/angular-animate/angular-animate',
       'angular-data-depend':        'bower_components/angular-data-depend/src/dataDepend',
