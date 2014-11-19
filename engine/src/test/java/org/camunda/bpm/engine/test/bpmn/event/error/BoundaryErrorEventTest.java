@@ -212,6 +212,28 @@ public class BoundaryErrorEventTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/event/error/BoundaryErrorEventTest.testCatchErrorOnCallActivity-parent.bpmn20.xml",
+      "org/camunda/bpm/engine/test/bpmn/event/error/BoundaryErrorEventTest.subprocess.bpmn20.xml"
+  })
+  public void FAILING_testCatchErrorOnCallActivityShouldEndCalledProcessProperly() {
+    // given a process instance that has instantiated (called) a sub process instance
+    runtimeService.startProcessInstanceByKey("catchErrorOnCallActivity").getId();
+    Task task = taskService.createTaskQuery().singleResult();
+    assertEquals("Task in subprocess", task.getName());
+
+    // when an error end event is triggered in the sub process instance and catched in the super process instance
+    taskService.complete(task.getId());
+    task = taskService.createTaskQuery().singleResult();
+    assertEquals("Escalated Task", task.getName());
+
+    // then the called historic process instance should have properly ended
+    HistoricProcessInstance historicSubProcessInstance = historyService.createHistoricProcessInstanceQuery().processDefinitionKey("simpleSubProcess").singleResult();
+    assertNotNull(historicSubProcessInstance);
+    assertNull(historicSubProcessInstance.getDeleteReason());
+    assertEquals("theEnd", historicSubProcessInstance.getEndActivityId());
+  }
+
+  @Deployment(resources = {
           "org/camunda/bpm/engine/test/bpmn/event/error/BoundaryErrorEventTest.subprocess.bpmn20.xml"
   })
   public void testUncaughtError() {
