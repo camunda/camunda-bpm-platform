@@ -21,8 +21,6 @@ module.exports = function(grunt) {
 
     pkg:              pkg,
 
-    bower:            require('camunda-commons-ui/grunt/config/bower')(config),
-
     requirejs:        require('./grunt/config/requirejs')(config),
 
     less:             require('camunda-commons-ui/grunt/config/less')(config),
@@ -63,7 +61,6 @@ module.exports = function(grunt) {
       'clean',
       'jshint',
       'jsdoc',
-      'bower',
       'copy',
       'less',
       'localescompile',
