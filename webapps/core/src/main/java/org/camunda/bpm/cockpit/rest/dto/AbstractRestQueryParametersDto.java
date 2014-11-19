@@ -27,6 +27,7 @@ import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
 import org.camunda.bpm.engine.rest.dto.converter.StringToTypeConverter;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
+import org.camunda.bpm.engine.variable.Variables;
 
 /**
  * @author roman.smirnov
@@ -95,6 +96,13 @@ public abstract class AbstractRestQueryParametersDto<T> extends QueryParameters<
   protected abstract String getOrderByValue(String sortBy);
 
   protected abstract boolean isValidSortByValue(String value);
+
+  protected Object resolveVariableValue(Object value) {
+    if (value != null && Number.class.isAssignableFrom(value.getClass())) {
+      return Variables.numberValue((Number) value);
+    }
+    return value;
+  }
 
   /**
    * Finds the methods that are annotated with a {@link CamundaQueryParam} with a value that matches the key parameter.

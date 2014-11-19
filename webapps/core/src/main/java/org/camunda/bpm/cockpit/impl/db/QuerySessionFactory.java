@@ -59,6 +59,7 @@ public class QuerySessionFactory extends StandaloneProcessEngineConfiguration {
     initIdentityProviderSessionFactory();
     initSqlSessionFactory();
     initSessionFactories();
+    initValueTypeResolver();
   }
 
   @Override
