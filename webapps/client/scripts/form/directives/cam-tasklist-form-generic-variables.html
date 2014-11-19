@@ -58,7 +58,19 @@
                  class="form-control"
                  placeholder="{{ 'VARIABLE_NAME' | translate }}"
                  ng-model="variable.name"
+                 name="name"
+                 cam-unique="{{ getVariableNames() }}"
                  ng-readonly="variable.fixedName" />
+          <span ng-if="repeatForm.name.$invalid && repeatForm.name.$dirty" class="has-error">
+            <span ng-if="repeatForm.name.$error.required"
+                  class="help-block">
+              {{ 'REQUIRED_FIELD' | translate }}
+            </span>
+            <span ng-if="repeatForm.name.$error.camUnique"
+                  class="help-block">
+              {{ 'REQUIRE_UNIQUE_NAME' | translate }}
+            </span>
+          </span>
         </div>
 
 

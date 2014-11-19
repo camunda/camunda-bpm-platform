@@ -58,6 +58,12 @@ define([
           $scope.variables = vars;
         };
 
+        $scope.getVariableNames = function() {
+          return $scope.variables.map(function(variable) {
+            return variable.name;
+          });
+        };
+
         $scope.loadVariables = function() {
           $scope.variablesLoaded = true;
           Task.formVariables({

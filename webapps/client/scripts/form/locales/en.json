@@ -30,5 +30,7 @@
   "LOAD_VARIABLES_FAILURE":
                         "Could not load variables",
   "NO_TASK_VARIABLES":
-                        "The task does not contain any variables"
+                        "The task does not contain any variables",
+  "REQUIRE_UNIQUE_NAME":
+                        "Name must be unique"
 }
