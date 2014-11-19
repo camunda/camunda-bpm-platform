@@ -76,6 +76,10 @@
       }
     }
 
+    &:focus {
+      outline: none;
+    }
+
     .list-inline > li.overdue {
       color: @alert-warning-text;
       background-color: @alert-warning-bg;
@@ -107,6 +111,10 @@
     }
   }
 
+  div:focus,
+  &:focus {
+    outline: none;
+  }
 
   ol.tasks-list {
     li.assignee {
