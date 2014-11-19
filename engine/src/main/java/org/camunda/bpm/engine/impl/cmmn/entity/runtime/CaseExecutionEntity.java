@@ -49,6 +49,7 @@ import org.camunda.bpm.engine.impl.pvm.PvmProcessDefinition;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 import org.camunda.bpm.engine.impl.task.TaskDecorator;
 import org.camunda.bpm.engine.runtime.CaseExecution;
+import org.camunda.bpm.engine.runtime.CaseExecutionModelExtender;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.model.cmmn.CmmnModelInstance;
 import org.camunda.bpm.model.cmmn.instance.CmmnElement;
@@ -85,6 +86,8 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
   protected transient CaseExecutionEntity subCaseInstance;
 
   protected transient CaseExecutionEntity superCaseExecution;
+  
+  protected transient CaseExecutionModelExtender modelExtender;
 
   // associated entities /////////////////////////////////////////////////////
 
@@ -204,6 +207,15 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
   }
 
   /**
+   * Initialize extension. 
+   */
+  protected void ensureCaseExecutionModelExtended() {
+    if (this.modelExtender == null) {
+      this.modelExtender = CaseExecutionModelExtender.from(this);
+    }
+  }
+
+  /**
    * @return true if execution tree prefetching is enabled
    */
   protected boolean isExecutionTreePrefetchEnabled() {
@@ -276,6 +288,14 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
 
   // case executions ////////////////////////////////////////////////////////////////
 
+  /**
+   * Retrieves case execution type.
+   */
+  public String getType() {
+    ensureCaseExecutionModelExtended();
+    return modelExtender.getType();
+  }
+  
   public List<CaseExecutionEntity> getCaseExecutions() {
     return new ArrayList<CaseExecutionEntity>(getCaseExecutionsInternal());
   }

@@ -16,8 +16,9 @@ import org.camunda.bpm.engine.runtime.CaseExecution;
 
 
 /**
+ * Represents case execution.
  * @author Roman Smirnov
- *
+ * @author Simon Zambrovski
  */
 public class CaseExecutionDto {
 
@@ -29,6 +30,7 @@ public class CaseExecutionDto {
   protected String activityType;
   protected String activityDescription;
   protected String parentId;
+  protected String type;
   protected boolean enabled;
   protected boolean active;
   protected boolean disabled;
@@ -77,6 +79,14 @@ public class CaseExecutionDto {
     return disabled;
   }
 
+  /**
+   * Retrieves type of the execution.
+   * @return type, e.G. humantask, processtask, casetask, etc.
+   */
+  public String getType() {
+    return type;
+  }
+
   public static CaseExecutionDto fromCaseExecution(CaseExecution caseExecution) {
     CaseExecutionDto dto = new CaseExecutionDto();
 
@@ -91,7 +101,7 @@ public class CaseExecutionDto {
     dto.active = caseExecution.isActive();
     dto.enabled = caseExecution.isEnabled();
     dto.disabled = caseExecution.isDisabled();
-
+    dto.type = caseExecution.getType();
     return dto;
   }
 
