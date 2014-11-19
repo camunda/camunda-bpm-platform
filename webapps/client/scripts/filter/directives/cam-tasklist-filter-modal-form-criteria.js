@@ -97,7 +97,6 @@ define([
         $scope.valueChanged = function(queryParam, control) {
           control.$setValidity('number', true);
           control.$setValidity('date', true);
-
           if (queryParam.value) {
             if (control.$pristine) {
               control.$setViewValue(queryParam.value);
@@ -109,9 +108,16 @@ define([
               control.$setValidity(validationResult.error, false);
             }
           }
+
         };
 
         // helper //////////////////////////////////////////////////////////////
+
+        $scope.getQueryParamKeys = function() {
+          return $scope.query.map(function(entry) {
+            return entry.key;
+          });
+        };
 
         var getCriterionName = $scope.getCriterionName = function(name) {
           if (!name) { return name; }
