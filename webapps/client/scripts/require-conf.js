@@ -37,7 +37,6 @@ define(function() {
 
 
       'camunda-bpm-sdk':            'bower_components/camunda-bpm-sdk-js/camunda-bpm-sdk-angular',
-      'camunda-bpm-sdk-mock':       'bower_components/camunda-bpm-sdk-js/camunda-bpm-sdk-mock',
 
       'placeholders-js':            'bower_components/Placeholders.js/lib'
     },

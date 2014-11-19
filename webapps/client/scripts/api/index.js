@@ -2,13 +2,11 @@
 
 define([
   'angular',
-  'camunda-bpm-sdk',
-  'camunda-bpm-sdk-mock'
+  'camunda-bpm-sdk'
 ],
 function(
   angular,
-  CamSDK,
-  MockClient
+  CamSDK
 ) {
   var apiModule = angular.module('cam.tasklist.client', []);
 
@@ -16,15 +14,12 @@ function(
 
   apiModule.value('CamForm', CamSDK.Form);
 
-  apiModule.value('MockHttpClient', MockClient);
-
   apiModule.factory('camAPIHttpClient', [
-          'MockHttpClient', '$rootScope', '$location', '$translate', 'Notifications',
-  function(MockHttpClient,   $rootScope, $location, $translate, Notifications) {
+          '$rootScope', '$location', '$translate', 'Notifications',
+  function($rootScope, $location, $translate, Notifications) {
 
     function AngularClient(config) {
-      var Client = (config.mock === true ? MockHttpClient : CamSDK.Client.HttpClient);
-      this._wrapped = new Client(config);
+      this._wrapped = new CamSDK.Client.HttpClient(config);
     }
 
     angular.forEach(['post', 'get', 'load', 'put', 'del', 'options', 'head'], function(name) {
