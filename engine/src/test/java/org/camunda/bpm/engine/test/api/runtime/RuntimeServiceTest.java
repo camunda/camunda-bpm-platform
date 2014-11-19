@@ -536,7 +536,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess",
         Variables.createVariables()
           .putValue("broken", Variables.serializedObjectValue("broken")
-              .serializationDataFormat(JavaObjectSerializer.SERIALIZATION_DATA_FORMAT)
+              .serializationDataFormat(Variables.SerializationDataFormats.JAVA)
               .objectTypeName("unexisting").create()));
 
     // this works
@@ -579,7 +579,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess",
         Variables.createVariables()
           .putValue("broken", Variables.serializedObjectValue("broken")
-              .serializationDataFormat(JavaObjectSerializer.SERIALIZATION_DATA_FORMAT)
+              .serializationDataFormat(Variables.SerializationDataFormats.JAVA)
               .objectTypeName("unexisting").create()));
 
     // this works

@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.impl.core.variable.value.builder;
 
 import org.camunda.bpm.engine.impl.core.variable.value.ObjectValueImpl;
 import org.camunda.bpm.engine.variable.value.ObjectValue;
+import org.camunda.bpm.engine.variable.value.SerializationDataFormat;
 import org.camunda.bpm.engine.variable.value.builder.SerializedObjectValueBuilder;
 
 /**
@@ -32,9 +33,13 @@ public class SerializedObjectValueBuilderImpl implements SerializedObjectValueBu
     variableValue = (ObjectValueImpl) value;
   }
 
-  public SerializedObjectValueBuilderImpl serializationDataFormat(String dataFormatName) {
+  public SerializedObjectValueBuilder serializationDataFormat(String dataFormatName) {
     variableValue.setSerializationDataFormat(dataFormatName);
     return this;
+  }
+
+  public SerializedObjectValueBuilder serializationDataFormat(SerializationDataFormat dataFormat) {
+    return serializationDataFormat(dataFormat.getName());
   }
 
   public ObjectValue create() {

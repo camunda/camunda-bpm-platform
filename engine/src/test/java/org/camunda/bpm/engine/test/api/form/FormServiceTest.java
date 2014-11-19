@@ -39,7 +39,6 @@ import org.camunda.bpm.engine.impl.form.type.AbstractFormFieldType;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.CollectionUtil;
-import org.camunda.bpm.engine.impl.variable.serializer.JavaObjectSerializer;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -422,7 +421,7 @@ public class FormServiceTest extends PluggableProcessEngineTestCase {
           .putValueTyped("string", stringValue(stringValue))
           .putValueTyped("serializedObject", serializedObjectValue(serializedValue)
               .objectTypeName(String.class.getName())
-              .serializationDataFormat(JavaObjectSerializer.SERIALIZATION_DATA_FORMAT)
+              .serializationDataFormat(Variables.SerializationDataFormats.JAVA)
               .create())
           .putValueTyped("object", objectValue(serializedValue).create()));
 
@@ -449,7 +448,7 @@ public class FormServiceTest extends PluggableProcessEngineTestCase {
         .putValueTyped("string", stringValue(stringValue))
         .putValueTyped("serializedObject", serializedObjectValue(serializedValue)
             .objectTypeName(String.class.getName())
-            .serializationDataFormat(JavaObjectSerializer.SERIALIZATION_DATA_FORMAT)
+            .serializationDataFormat(Variables.SerializationDataFormats.JAVA)
             .create())
         .putValueTyped("object", objectValue(serializedValue).create()));
 
@@ -506,7 +505,7 @@ public class FormServiceTest extends PluggableProcessEngineTestCase {
         .putValueTyped("string", stringValue(stringValue))
         .putValueTyped("serializedObject", serializedObjectValue(serializedValue)
             .objectTypeName(String.class.getName())
-            .serializationDataFormat(JavaObjectSerializer.SERIALIZATION_DATA_FORMAT)
+            .serializationDataFormat(Variables.SerializationDataFormats.JAVA)
             .create())
         .putValueTyped("object", objectValue(serializedValue).create()));
   }

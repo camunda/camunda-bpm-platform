@@ -13,13 +13,14 @@
 package org.camunda.bpm.engine.test.variables;
 
 import static org.junit.Assert.*;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.nio.charset.Charset;
 
 import org.camunda.bpm.engine.impl.digest._apacheCommonsCodec.Base64;
-import org.camunda.bpm.engine.impl.variable.serializer.JavaObjectSerializer;
+import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.engine.variable.value.ObjectValue;
 import org.camunda.bpm.engine.variable.value.TypedValue;
@@ -62,7 +63,7 @@ public class TypedValueAssert {
   }
 
   public static void assertObjectValueSerializedJava(ObjectValue typedValue, Object value) {
-    assertEquals(JavaObjectSerializer.SERIALIZATION_DATA_FORMAT, typedValue.getSerializationDataFormat());
+    assertEquals(Variables.SerializationDataFormats.JAVA.getName(), typedValue.getSerializationDataFormat());
 
     try {
       // validate this is the base 64 encoded string representation of the serialized value of the java object

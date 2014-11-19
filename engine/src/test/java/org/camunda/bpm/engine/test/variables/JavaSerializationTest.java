@@ -23,9 +23,9 @@ import java.io.ObjectOutputStream;
 import org.camunda.bpm.engine.impl.digest._apacheCommonsCodec.Base64;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.StringUtil;
-import org.camunda.bpm.engine.impl.variable.serializer.JavaObjectSerializer;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.value.ObjectValue;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
@@ -33,7 +33,7 @@ public class JavaSerializationTest extends PluggableProcessEngineTestCase {
 
   protected static final String ONE_TASK_PROCESS = "org/camunda/bpm/engine/test/variables/oneTaskProcess.bpmn20.xml";
 
-  protected static final String JAVA_DATA_FORMAT = JavaObjectSerializer.SERIALIZATION_DATA_FORMAT;
+  protected static final String JAVA_DATA_FORMAT = Variables.SerializationDataFormats.JAVA.getName();
 
   protected String originalSerializationFormat;
 

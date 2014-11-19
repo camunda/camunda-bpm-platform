@@ -13,6 +13,7 @@
 package org.camunda.bpm.engine.variable.value.builder;
 
 import org.camunda.bpm.engine.variable.value.ObjectValue;
+import org.camunda.bpm.engine.variable.value.SerializationDataFormat;
 
 /**
  * @author Daniel Meyer
@@ -21,5 +22,7 @@ import org.camunda.bpm.engine.variable.value.ObjectValue;
 public interface ObjectValueBuilder extends TypedValueBuilder<ObjectValue> {
 
   ObjectValueBuilder serializationDataFormat(String dataFormatName);
+
+  ObjectValueBuilder serializationDataFormat(SerializationDataFormat dataFormat);
 
 }

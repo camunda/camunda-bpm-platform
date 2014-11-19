@@ -10,22 +10,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.variable.value.builder;
+package org.camunda.bpm.engine.variable.value;
 
-import org.camunda.bpm.engine.variable.value.SerializationDataFormat;
+import org.camunda.bpm.engine.variable.Variables.SerializationDataFormats;
 
 /**
- * @author Daniel Meyer
+ * <p>Represents a serialization data format.</p>
  *
+ * @author Daniel Meyer
+ * @see SerializationDataFormats
+ *
+ * @since 7.2
  */
-public interface SerializedObjectValueBuilder extends ObjectValueBuilder {
+public interface SerializationDataFormat {
 
-  SerializedObjectValueBuilder serializedValue(String value);
-
-  SerializedObjectValueBuilder objectTypeName(String typeName);
-
-  SerializedObjectValueBuilder serializationDataFormat(String dataFormatName);
-
-  SerializedObjectValueBuilder serializationDataFormat(SerializationDataFormat dataFormat);
+  /**
+   * The name of the dataformat. Example: "application/json"
+   *
+   * @return the name of the dataformat.
+   */
+  String getName();
 
 }

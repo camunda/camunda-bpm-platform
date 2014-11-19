@@ -38,7 +38,6 @@ import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.IoUtil;
-import org.camunda.bpm.engine.impl.variable.serializer.JavaObjectSerializer;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -1628,7 +1627,7 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
     runtimeService.startProcessInstanceByKey("oneTaskProcess",
         Variables.createVariables()
           .putValue("broken", Variables.serializedObjectValue("broken")
-              .serializationDataFormat(JavaObjectSerializer.SERIALIZATION_DATA_FORMAT)
+              .serializationDataFormat(Variables.SerializationDataFormats.JAVA)
               .objectTypeName("unexisting").create()));
     String taskId = taskService.createTaskQuery().singleResult().getId();
 
@@ -1676,7 +1675,7 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
     String taskId = taskService.createTaskQuery().singleResult().getId();
     taskService.setVariablesLocal(taskId, Variables.createVariables()
           .putValue("broken", Variables.serializedObjectValue("broken")
-              .serializationDataFormat(JavaObjectSerializer.SERIALIZATION_DATA_FORMAT)
+              .serializationDataFormat(Variables.SerializationDataFormats.JAVA)
               .objectTypeName("unexisting").create()));
 
     // this works

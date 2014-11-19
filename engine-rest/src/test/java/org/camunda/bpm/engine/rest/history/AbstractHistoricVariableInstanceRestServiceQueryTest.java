@@ -24,7 +24,6 @@ import javax.xml.registry.InvalidRequestException;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.history.HistoricVariableInstanceQuery;
 import org.camunda.bpm.engine.impl.core.variable.type.ObjectTypeImpl;
-import org.camunda.bpm.engine.impl.variable.serializer.JavaObjectSerializer;
 import org.camunda.bpm.engine.rest.AbstractRestServiceTest;
 import org.camunda.bpm.engine.rest.helper.MockHistoricVariableInstanceBuilder;
 import org.camunda.bpm.engine.rest.helper.MockObjectValue;
@@ -323,7 +322,7 @@ public abstract class AbstractHistoricVariableInstanceRestServiceQueryTest exten
     MockHistoricVariableInstanceBuilder builder = MockProvider.mockHistoricVariableInstance()
         .typedValue(MockObjectValue.fromObjectValue(Variables
             .objectValue("a serialized value")
-            .serializationDataFormat(JavaObjectSerializer.SERIALIZATION_DATA_FORMAT)
+            .serializationDataFormat(Variables.SerializationDataFormats.JAVA)
             .create())
             .objectTypeName(String.class.getName()));
 
@@ -338,7 +337,7 @@ public abstract class AbstractHistoricVariableInstanceRestServiceQueryTest exten
           .body("[0].type", equalTo(VariableTypeHelper.toExpectedValueTypeName(ValueType.OBJECT)))
           .body("[0].value", equalTo("a serialized value"))
           .body("[0].valueInfo." + ObjectTypeImpl.VALUE_INFO_OBJECT_TYPE_NAME, equalTo(String.class.getName()))
-          .body("[0].valueInfo." + ObjectTypeImpl.VALUE_INFO_SERIALIZATION_DATA_FORMAT, equalTo(JavaObjectSerializer.SERIALIZATION_DATA_FORMAT))
+          .body("[0].valueInfo." + ObjectTypeImpl.VALUE_INFO_SERIALIZATION_DATA_FORMAT, equalTo(Variables.SerializationDataFormats.JAVA.getName()))
         .when().get(HISTORIC_VARIABLE_INSTANCE_RESOURCE_URL);
 
     // should not resolve custom objects but existing API requires it
