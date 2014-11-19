@@ -45,11 +45,7 @@
     "angular-translate-loader-static-files": "~2.4.2"
   },
   "devDependencies": {
-    "jquery-mockjax": "1.5.3",
     "underscore": "./node_modules/underscore/underscore.js",
-    "underscore.string": "./node_modules/underscore.string/lib/underscore.string.js",
-    "fixturer": "./node_modules/fixturer/index.js",
-    "node-uuid": "1.4.1",
     "requirejs-json": "~0.0.3",
     "requirejs-text": "2.0.12"
   },

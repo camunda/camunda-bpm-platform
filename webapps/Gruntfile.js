@@ -23,10 +23,6 @@ module.exports = function(grunt) {
 
     bower:            require('camunda-commons-ui/grunt/config/bower')(config),
 
-    jasmine_node:     require('camunda-commons-ui/grunt/config/jasmine_node')(config),
-
-    karma:            require('camunda-commons-ui/grunt/config/karma')(config),
-
     requirejs:        require('./grunt/config/requirejs')(config),
 
     less:             require('camunda-commons-ui/grunt/config/less')(config),
