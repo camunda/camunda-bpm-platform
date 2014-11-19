@@ -247,11 +247,8 @@
               <bind name="varTypeField" value="'TYPE_'"/>
               <bind name="varPrefix" value="'RES.'"/>
               <if test="queryVariableValue.valueConditions != null">
-                and (
-                <foreach collection="queryVariableValue.valueConditions" item="valueCondition" separator="or">
-                  <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.variableValueCondition"/>
-                </foreach>
-                )
+                and
+                <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.variableValueConditions"/>
               </if>
             </foreach>
 

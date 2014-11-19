@@ -1409,6 +1409,13 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(4, caseService.createCaseInstanceQuery().variableValueEquals("var", Variables.numberValue((short) 123)).count());
 
     assertEquals(1, caseService.createCaseInstanceQuery().variableValueEquals("var", Variables.numberValue(null)).count());
+
+    // other operators
+    assertEquals(3, caseService.createCaseInstanceQuery().variableValueNotEquals("var", Variables.numberValue(123)).count());
+    assertEquals(1, caseService.createCaseInstanceQuery().variableValueGreaterThan("var", Variables.numberValue(123L)).count());
+    assertEquals(5, caseService.createCaseInstanceQuery().variableValueGreaterThanOrEqual("var", Variables.numberValue(123.0d)).count());
+    assertEquals(0, caseService.createCaseInstanceQuery().variableValueLessThan("var", Variables.numberValue((short) 123)).count());
+    assertEquals(4, caseService.createCaseInstanceQuery().variableValueLessThanOrEqual("var", Variables.numberValue((short) 123)).count());
   }
 
 }

@@ -1195,7 +1195,7 @@ public class FullHistoryTest extends ResourceProcessEngineTestCase {
     assertEquals(0, historyService.createHistoricProcessInstanceQuery().variableValueNotEquals("stringVar","stringValue").count());
     assertEquals(0, historyService.createHistoricProcessInstanceQuery().variableValueNotEquals("booleanVar", true).count());
     assertEquals(0, historyService.createHistoricProcessInstanceQuery().variableValueNotEquals("dateVar", date).count());
-    assertEquals(0, historyService.createHistoricProcessInstanceQuery().variableValueNotEquals("nullVar", "123").count());
+    assertEquals(0, historyService.createHistoricProcessInstanceQuery().variableValueNotEquals("nullVar", null).count());
 
 //    assertEquals(1, historyService.createHistoricProcessInstanceQuery().variableValueNotEquals("longVar", 67890L).count());
 //    assertEquals(1, historyService.createHistoricProcessInstanceQuery().variableValueNotEquals("shortVar", (short) 456).count());

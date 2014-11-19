@@ -1460,4 +1460,40 @@ public void testBooleanVariable() throws Exception {
     assertEquals(1, runtimeService.createExecutionQuery().variableValueEquals("var", Variables.numberValue(null)).count());
   }
 
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
+  public void testProcessVariableValueNumberComparison() throws Exception {
+    // long
+    runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Collections.<String, Object>singletonMap("var", 123L));
+
+    // non-matching long
+    runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Collections.<String, Object>singletonMap("var", 12345L));
+
+    // short
+    runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Collections.<String, Object>singletonMap("var", (short) 123));
+
+    // double
+    runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Collections.<String, Object>singletonMap("var", 123.0d));
+
+    // integer
+    runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Collections.<String, Object>singletonMap("var", 123));
+
+    // untyped null
+    runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Collections.<String, Object>singletonMap("var", null));
+
+    // typed null
+    runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Collections.<String, Object>singletonMap("var", Variables.longValue(null)));
+
+    runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Collections.<String, Object>singletonMap("var", "123"));
+
+    assertEquals(3, runtimeService.createExecutionQuery().processVariableValueNotEquals("var", Variables.numberValue(123)).count());
+  }
+
 }
