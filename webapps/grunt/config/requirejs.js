@@ -21,11 +21,22 @@ module.exports = function() {
     'camunda-bpm-sdk',
 
     'angular-bootstrap',
+    'bootstrap/collapse',
     'angular-route',
     'angular-animate',
     'angular-moment',
-    'angular-data-depend'
+    'angular-data-depend',
+    'angular-translate',
+    'bpmn-js',
+    'lodash',
+    'sax',
+    'snap-svg',
+    'placeholders-js/utils',
+    'placeholders-js/main',
+    'placeholders-js/adapters/placeholders.jquery'
   ];
+
+
 
 
   _.extend(rjsConf.paths, {
