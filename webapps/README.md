@@ -4,7 +4,7 @@ A web based interface for [camunda BPM platform](http://camunda.org) tasks.
 
 ## Installation
 
-`git clone git@github.com:camunda/camunda-tasklist-ui.git camunda-tasklist-ui && cd $_ && npm install`
+`git clone git@github.com:camunda/camunda-tasklist-ui.git camunda-tasklist-ui && cd $_ && npm install && bower install`
 
 ## Usage
 
@@ -31,29 +31,6 @@ The supported browsers are:
  - Firefox
  - Internet Explorer 9+
 
-## Test
-
-_needs update_
-They are 3 "testing methods" provide for development.
-
-### Unit tests
-
-Is the fastest executed testing suite, perfect for testing objects
-(who do not rely on something normally provided by a browser).   
-You can run the unit tests with `grunt jasmine_node`.
-
-### Integration tests
-
-A little slower but allows to test things in browsers.   
-You can run the unit tests with `grunt karma`.
-
-### E2E tests
-
-Very slow and especially annoying to write tests for, install and maintain
-(OK, OK, personal point of view), writing E2E tests is still one of
-the best ways to test the application in its whole.   
-You can run the unit tests with `grunt build connect protractor`.
-
 ## Coding styleguide
 
 In place of a guide, just follow the formatting of existing code.
@@ -62,8 +39,3 @@ In place of a guide, just follow the formatting of existing code.
 
 Unless otherwise specified, this project is licensed under [Apache License Version 2.0](./LICENSE).
 
-## Authors
-
- - [Valentin _zeropaper_ Vago](https://github.com/zeropaper) - [@zeropaper](http://twitter.com/zeropaper)
- - [Nico _Nikku_ Rehwaldt](https://github.com/nikku) - [@nrehwaldt](http://twitter.com/nrehwaldt) 
- - [Daniel _meyerdan_ Meyer](https://github.com/meyerdan) - [@meyerdan](http://twitter.com/meyerdan)
