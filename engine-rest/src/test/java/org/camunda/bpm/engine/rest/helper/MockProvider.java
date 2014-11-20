@@ -277,6 +277,7 @@ public abstract class MockProvider {
   public static final String EXAMPLE_JOB_DEFINITION_DELAYED_EXECUTION = "2013-04-23T13:42:43";
 
   // Jobs
+  public static final String EXAMPLE_JOB_ACTIVITY_ID = "aJobActivityId";
   public static final String EXAMPLE_JOB_ID = "aJobId";
   public static final String NON_EXISTING_JOB_ID = "aNonExistingJobId";
   public static final int EXAMPLE_NEGATIVE_JOB_RETRIES = -3;
