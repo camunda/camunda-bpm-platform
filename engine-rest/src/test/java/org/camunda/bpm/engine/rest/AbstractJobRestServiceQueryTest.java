@@ -287,6 +287,7 @@ public abstract class AbstractJobRestServiceQueryTest extends AbstractRestServic
   private Map<String, Object> getCompleteParameters() {
     Map<String, Object> parameters = new HashMap<String, Object>();
 
+    parameters.put("activityId", MockProvider.EXAMPLE_ACTIVITY_ID);
     parameters.put("jobId", MockProvider.EXAMPLE_JOB_ID);
     parameters.put("processInstanceId", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID);
     parameters.put("processDefinitionId", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID);

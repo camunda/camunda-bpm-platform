@@ -53,6 +53,7 @@ public class JobQueryDto extends AbstractQueryDto<JobQuery> {
 		VALID_SORT_BY_VALUES.add(SORT_BY_JOB_DUEDATE_VALUE);
 	}
 
+	private String activityId;
 	private String jobId;
 	private String executionId;
 	private String processInstanceId;
@@ -76,6 +77,11 @@ public class JobQueryDto extends AbstractQueryDto<JobQuery> {
 		super(objectMapper, queryParameters);
 	}
 
+  @CamundaQueryParam("activityId")
+  public void setActivityId(String activityId) {
+    this.activityId = activityId;
+  }
+	
 	@CamundaQueryParam("jobId")
 	public void setJobId(String jobId) {
 		this.jobId = jobId;
@@ -163,6 +169,9 @@ public class JobQueryDto extends AbstractQueryDto<JobQuery> {
 
 	@Override
 	protected void applyFilters(JobQuery query) {
+	  if (activityId != null){
+	    query.activityId(activityId);
+	  }
 		if (jobId != null) {
 			query.jobId(jobId);
 		}
