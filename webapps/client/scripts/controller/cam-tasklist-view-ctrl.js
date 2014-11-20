@@ -172,7 +172,7 @@ define([
 
       var firstResult = ((getPropertyFromLocation('page') || 1) - 1) * 15;
       var sortBy = getPropertyFromLocation('sortBy') || 'created';
-      var sortOrder = getPropertyFromLocation('sortOrder') || 'asc';
+      var sortOrder = getPropertyFromLocation('sortOrder') || 'desc';
 
       return {
         id : currentFilter.id,
