@@ -25,6 +25,9 @@ import org.camunda.bpm.engine.query.Query;
  * @author Falko Menge
  */
 public interface JobQuery extends Query<JobQuery, Job> {
+	
+  /** Only select jobs which contain an activity with the given id. **/
+  JobQuery activityId(String activityId);
 
   /** Only select jobs with the given id */
   JobQuery jobId(String jobId);
