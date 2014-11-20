@@ -15,7 +15,6 @@ package org.camunda.bpm.engine.rest;
 import com.jayway.restassured.http.ContentType;
 import com.jayway.restassured.response.Response;
 import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
-import org.camunda.bpm.engine.rest.dto.converter.DateConverter;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.camunda.bpm.engine.runtime.Job;
@@ -287,6 +286,7 @@ public abstract class AbstractJobRestServiceQueryTest extends AbstractRestServic
   private Map<String, Object> getCompleteParameters() {
     Map<String, Object> parameters = new HashMap<String, Object>();
 
+    parameters.put("activityId", MockProvider.EXAMPLE_ACTIVITY_ID);
     parameters.put("jobId", MockProvider.EXAMPLE_JOB_ID);
     parameters.put("processInstanceId", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID);
     parameters.put("processDefinitionId", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID);
@@ -324,6 +324,7 @@ public abstract class AbstractJobRestServiceQueryTest extends AbstractRestServic
 		verify(mockQuery).processDefinitionId((String) parameters.get("processDefinitionId"));
 		verify(mockQuery).processDefinitionKey((String) parameters.get("processDefinitionKey"));
 		verify(mockQuery).executionId((String) parameters.get("executionId"));
+		verify(mockQuery).activityId((String) parameters.get("activityId"));
 		verify(mockQuery).withRetriesLeft();
 		verify(mockQuery).executable();
 		verify(mockQuery).timers();

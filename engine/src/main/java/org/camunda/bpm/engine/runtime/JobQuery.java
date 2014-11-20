@@ -25,9 +25,6 @@ import org.camunda.bpm.engine.query.Query;
  * @author Falko Menge
  */
 public interface JobQuery extends Query<JobQuery, Job> {
-	
-  /** Only select jobs which contain an activity with the given id. **/
-  JobQuery activityId(String activityId);
 
   /** Only select jobs with the given id */
   JobQuery jobId(String jobId);
@@ -46,6 +43,9 @@ public interface JobQuery extends Query<JobQuery, Job> {
 
   /** Only select jobs which exist for the given execution */
   JobQuery executionId(String executionId);
+
+  /** Only select jobs which are defined on an activity with the given id. **/
+  JobQuery activityId(String activityId);
 
   /** Only select jobs which have retries left */
   JobQuery withRetriesLeft();

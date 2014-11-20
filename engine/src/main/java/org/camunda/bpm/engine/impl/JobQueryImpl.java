@@ -66,11 +66,6 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
     super(commandExecutor);
   }
 
-  public JobQuery activityId(String activityId){
-	  ensureNotNull("Provided activity id", activityId);
-	  this.activityId = activityId;
-	  return this;
-  }
   public JobQuery jobId(String jobId) {
     ensureNotNull("Provided job id", jobId);
     this.id = jobId;
@@ -104,6 +99,12 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
   public JobQuery processDefinitionKey(String processDefinitionKey) {
     ensureNotNull("Provided process instance key", processDefinitionKey);
     this.processDefinitionKey = processDefinitionKey;
+    return this;
+  }
+
+  public JobQuery activityId(String activityId){
+    ensureNotNull("Provided activity id", activityId);
+    this.activityId = activityId;
     return this;
   }
 

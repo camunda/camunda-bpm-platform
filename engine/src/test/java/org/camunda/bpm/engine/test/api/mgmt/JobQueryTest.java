@@ -127,18 +127,18 @@ public class JobQueryTest extends PluggableProcessEngineTestCase {
     JobQuery query = managementService.createJobQuery();
     verifyQueryResults(query, 4);
   }
-  
+
   public void testQueryByActivityId(){
     JobDefinition jobDefinition = managementService.createJobDefinitionQuery().singleResult();
 
     JobQuery query = managementService.createJobQuery().activityId(jobDefinition.getActivityId());
     verifyQueryResults(query, 3);
   }
-  
+
   public void testQueryByInvalidActivityId(){
     JobQuery query = managementService.createJobQuery().activityId("invalid");
     verifyQueryResults(query, 0);
-    
+
     try {
       managementService.createJobQuery().activityId(null).list();
       fail();
