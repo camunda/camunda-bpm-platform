@@ -97,10 +97,11 @@ public class HalRelationCacheConfiguration {
   protected void parseCacheConfigurations(JsonNode jsonConfiguration) {
     JsonNode jsonNode = jsonConfiguration.get(CONFIG_CACHES);
     if (jsonNode != null) {
-      Iterator<Map.Entry<String, JsonNode>> cacheConfigurations = jsonNode.getFields();
-      while(cacheConfigurations.hasNext()) {
-        Map.Entry<String, JsonNode> cacheConfiguration = cacheConfigurations.next();
-        parseCacheConfiguration(cacheConfiguration.getKey(), cacheConfiguration.getValue());
+      Iterator<String> halResourceClassNames = jsonNode.getFieldNames();
+      while (halResourceClassNames.hasNext()) {
+        String halResourceClassName = halResourceClassNames.next();
+        JsonNode cacheConfiguration = jsonNode.get(halResourceClassName);
+        parseCacheConfiguration(halResourceClassName, cacheConfiguration);
       }
     }
   }
