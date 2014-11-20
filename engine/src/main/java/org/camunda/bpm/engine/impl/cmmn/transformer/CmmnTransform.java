@@ -146,6 +146,8 @@ public class CmmnTransform implements Transform<CaseDefinitionEntity> {
     Collection<Case> cases = definitions.getCases();
 
     for (Case currentCase : cases) {
+      context.setCaseDefinition(null);
+      context.setParent(null);
       CmmnCaseDefinition caseDefinition = transformCase(currentCase);
       caseDefinitions.add((CaseDefinitionEntity) caseDefinition);
     }
