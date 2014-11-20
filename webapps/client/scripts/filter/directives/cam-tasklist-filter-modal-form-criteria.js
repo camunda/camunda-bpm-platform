@@ -114,9 +114,18 @@ define([
         // helper //////////////////////////////////////////////////////////////
 
         $scope.getQueryParamKeys = function() {
-          return $scope.query.map(function(entry) {
-            return entry.key;
-          });
+          var result = [];
+
+          for (var i = 0, entry; !!(entry = $scope.query[i]); i++) {
+            var criterionName = getCriterionName(entry.key);
+            result.push(criterionName);
+
+            if (criteriaExpressionSupport[criterionName]) {
+              result.push(criterionName + 'Expression');
+            }
+          }
+
+          return result;
         };
 
         var getCriterionName = $scope.getCriterionName = function(name) {

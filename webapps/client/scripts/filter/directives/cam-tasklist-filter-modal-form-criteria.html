@@ -41,7 +41,7 @@
                     ng-model="queryParam.key"
                     name="queryParamKey"
                     ng-change="valueChanged(queryParam, this.criteriaFieldForm.queryParamValue)"
-                    cam-unique="{{ getQueryParamKeys() }}"
+                    cam-unique-value="{{ getQueryParamKeys() }}"
                     required
                     ng-disabled="filter.id && !accesses.update">
               <optgroup ng-repeat="criteriaGroup in criteria"
@@ -63,7 +63,7 @@
                 <span ng-show="this.criteriaFieldForm.queryParamKey.$error.required" class="help-block">
                   {{ 'REQUIRED_FIELD' | translate }}
                 </span>
-                <span ng-show="this.criteriaFieldForm.queryParamKey.$error.camUnique" class="help-block">
+                <span ng-show="this.criteriaFieldForm.queryParamKey.$error.camUniqueValue" class="help-block">
                   {{ 'REQUIRE_UNIQUE_KEY' | translate }}
                 </span>
             </div>

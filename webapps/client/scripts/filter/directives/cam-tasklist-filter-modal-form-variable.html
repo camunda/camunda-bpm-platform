@@ -63,6 +63,7 @@
                    ng-model="variable.name"
                    placeholder="{{ 'FILTER_VARIABLE_NAME_PLACEHOLDER' | translate }}"
                    required
+                   cam-unique-value="{{ getVariableNames() }}"
                    ng-readonly="filter.id && !accesses.update"
                    ng-disabled="filter.id && !accesses.update" />
 
@@ -70,6 +71,9 @@
                     class="has-error">
                 <span ng-show="this.variableFieldForm.variableName.$error.required" class="help-block">
                   {{ 'REQUIRED_FIELD' | translate }}
+                </span>
+                <span ng-show="this.variableFieldForm.variableName.$error.camUniqueValue" class="help-block">
+                  {{ 'REQUIRE_UNIQUE_NAME' | translate }}
                 </span>
               </div>
 

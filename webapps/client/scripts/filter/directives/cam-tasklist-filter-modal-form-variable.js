@@ -70,6 +70,12 @@ define([
           nestedForms = parentCtrl.removeArrayItem(nestedForms, delta);
         };
 
+        $scope.getVariableNames = function() {
+          return $scope.variables.map(function(entry) {
+            return entry.name;
+          });
+        };
+
       }
 
     };
