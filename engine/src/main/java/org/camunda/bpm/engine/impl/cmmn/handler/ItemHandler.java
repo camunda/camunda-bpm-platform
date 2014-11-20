@@ -43,6 +43,7 @@ import org.camunda.bpm.engine.impl.variable.listener.DelegateExpressionCaseVaria
 import org.camunda.bpm.engine.impl.variable.listener.ExpressionCaseVariableListener;
 import org.camunda.bpm.engine.impl.variable.listener.ScriptCaseVariableListener;
 import org.camunda.bpm.model.cmmn.Query;
+import org.camunda.bpm.model.cmmn.impl.instance.ConditionExpression;
 import org.camunda.bpm.model.cmmn.instance.CmmnElement;
 import org.camunda.bpm.model.cmmn.instance.DiscretionaryItem;
 import org.camunda.bpm.model.cmmn.instance.ExtensionElements;
@@ -285,10 +286,15 @@ public abstract class ItemHandler extends CmmnElementHandler<CmmnElement, CmmnAc
     }
 
     if (requiredRule != null) {
-      String rule = requiredRule.getCondition().getBody();
-      Expression requiredRuleExpression = expressionManager.createExpression(rule);
-      CaseControlRule caseRule = new CaseControlRuleImpl(requiredRuleExpression);
-      activity.setProperty(PROPERTY_REQUIRED_RULE, caseRule);
+      ConditionExpression condition = requiredRule.getCondition();
+      if (condition != null) {
+        String rule = condition.getBody();
+        if (rule != null) {
+          Expression requiredRuleExpression = expressionManager.createExpression(rule);
+          CaseControlRule caseRule = new CaseControlRuleImpl(requiredRuleExpression);
+          activity.setProperty(PROPERTY_REQUIRED_RULE, caseRule);
+        }
+      }
     }
 
   }
@@ -308,10 +314,15 @@ public abstract class ItemHandler extends CmmnElementHandler<CmmnElement, CmmnAc
     }
 
     if (manualActivationRule != null) {
-      String rule = manualActivationRule.getCondition().getBody();
-      Expression manualActivationExpression = expressionManager.createExpression(rule);
-      CaseControlRule caseRule = new CaseControlRuleImpl(manualActivationExpression);
-      activity.setProperty(PROPERTY_MANUAL_ACTIVATION_RULE, caseRule);
+      ConditionExpression condition = manualActivationRule.getCondition();
+      if (condition != null) {
+        String rule = condition.getBody();
+        if (rule != null) {
+          Expression manualActivationExpression = expressionManager.createExpression(rule);
+          CaseControlRule caseRule = new CaseControlRuleImpl(manualActivationExpression);
+          activity.setProperty(PROPERTY_MANUAL_ACTIVATION_RULE, caseRule);
+        }
+      }
     }
 
   }
@@ -331,10 +342,15 @@ public abstract class ItemHandler extends CmmnElementHandler<CmmnElement, CmmnAc
     }
 
     if (repetitionRule != null) {
-      String rule = repetitionRule.getCondition().getBody();
-      Expression repetitionRuleExpression = expressionManager.createExpression(rule);
-      CaseControlRule caseRule = new CaseControlRuleImpl(repetitionRuleExpression);
-      activity.setProperty(PROPERTY_REPETITION_RULE, caseRule);
+      ConditionExpression condition = repetitionRule.getCondition();
+      if (condition != null) {
+        String rule = condition.getBody();
+        if (rule != null) {
+          Expression repetitionRuleExpression = expressionManager.createExpression(rule);
+          CaseControlRule caseRule = new CaseControlRuleImpl(repetitionRuleExpression);
+          activity.setProperty(PROPERTY_REPETITION_RULE, caseRule);
+        }
+      }
     }
 
   }
