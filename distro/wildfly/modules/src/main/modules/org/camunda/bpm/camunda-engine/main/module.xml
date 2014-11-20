@@ -10,7 +10,7 @@
     <module name="javax.enterprise.api" />
     <module name="javax.inject.api" />
     <module name="javax.ejb.api" />
-    <module name="javax.xml.bind.api" /> 
+    <module name="javax.xml.bind.api" />
     <module name="javax.servlet.api" />
 
     <module name="org.jboss.vfs" />
@@ -22,6 +22,7 @@
 
     <module name="sun.jdk" services="import"/>
 
+    <module name="org.camunda.bpm.model.camunda-xml-model" />
     <module name="org.camunda.bpm.model.camunda-bpmn-model" />
     <module name="org.camunda.bpm.model.camunda-cmmn-model" />
 
