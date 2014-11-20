@@ -13,7 +13,6 @@
 
 package org.camunda.bpm.engine.impl.test;
 
-import org.apache.ibatis.logging.LogFactory;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngines;
 
@@ -39,7 +38,6 @@ public class ResourceProcessEngineTestCase extends AbstractProcessEngineTestCase
 
   @Override
   protected void initializeProcessEngine() {
-    LogFactory.useJdkLogging();
     processEngine = ProcessEngineConfiguration
             .createProcessEngineConfigurationFromResource(engineConfigurationResource)
             .buildProcessEngine();
