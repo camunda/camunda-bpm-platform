@@ -15,9 +15,6 @@ package org.camunda.bpm.engine.test.api.task;
 
 import java.util.List;
 
-import junit.framework.AssertionFailedError;
-
-import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.task.Event;
@@ -25,6 +22,8 @@ import org.camunda.bpm.engine.task.IdentityLink;
 import org.camunda.bpm.engine.task.IdentityLinkType;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+
+import junit.framework.AssertionFailedError;
 
 
 /**
@@ -105,6 +104,40 @@ public class TaskIdentityLinksTest extends PluggableProcessEngineTestCase {
     }
 
     assertEquals(0, taskService.getIdentityLinksForTask(taskId).size());
+  }
+
+  public void testAssigneeLink() {
+    Task task = taskService.newTask("task");
+    task.setAssignee("assignee");
+    taskService.saveTask(task);
+
+    List<IdentityLink> identityLinks = taskService.getIdentityLinksForTask(task.getId());
+    assertNotNull(identityLinks);
+    assertEquals(1, identityLinks.size());
+
+    IdentityLink identityLink = identityLinks.get(0);
+    assertEquals(IdentityLinkType.ASSIGNEE, identityLink.getType());
+    assertEquals("assignee", identityLink.getUserId());
+    assertEquals("task", identityLink.getTaskId());
+
+    taskService.deleteTask(task.getId(), true);
+  }
+
+  public void testOwnerLink() {
+    Task task = taskService.newTask("task");
+    task.setOwner("owner");
+    taskService.saveTask(task);
+
+    List<IdentityLink> identityLinks = taskService.getIdentityLinksForTask(task.getId());
+    assertNotNull(identityLinks);
+    assertEquals(1, identityLinks.size());
+
+    IdentityLink identityLink = identityLinks.get(0);
+    assertEquals(IdentityLinkType.OWNER, identityLink.getType());
+    assertEquals("owner", identityLink.getUserId());
+    assertEquals("task", identityLink.getTaskId());
+
+    taskService.deleteTask(task.getId(), true);
   }
 
   private Event findTaskEvent(List<Event> taskEvents, String action) {
