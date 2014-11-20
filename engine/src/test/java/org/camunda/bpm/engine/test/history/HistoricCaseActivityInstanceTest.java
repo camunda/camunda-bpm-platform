@@ -503,10 +503,6 @@ public class HistoricCaseActivityInstanceTest extends CmmnProcessEngineTestCase 
     assertQuerySorting("caseActivityName", historicQuery().orderByCaseActivityName(),
       "A HumanTask", "A HumanTask", "Another HumanTask");
 
-    // sort by case activity type
-    assertQuerySorting("caseActivityType", historicQuery().orderByCaseActivityType(),
-      "humanTask", "humanTask", "humanTask");
-
     // sort by case definition ids
     assertQuerySorting("caseDefinitionId", historicQuery().orderByCaseDefinitionId(),
       task1.getCaseDefinitionId(), task2.getCaseDefinitionId(), task3.getCaseDefinitionId());
@@ -537,6 +533,15 @@ public class HistoricCaseActivityInstanceTest extends CmmnProcessEngineTestCase 
     // sort by durations times
     assertQuerySorting("durationInMillis", historicQuery().orderByHistoricCaseActivityInstanceDuration(),
       historicTask1.getDurationInMillis(), historicTask2.getDurationInMillis(), historicTask3.getDurationInMillis());
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricCaseActivityInstanceTest.testHistoricCaseActivityEventListenerAndMilestoneStates.cmmn"})
+  public void testQuerySortingCaseActivityType() {
+    createCaseInstance().getId();
+
+    // sort by case activity type
+    assertQuerySorting("caseActivityType", historicQuery().orderByCaseActivityType(),
+      "milestone", "userEvent", "userEvent");
   }
 
   public void testInvalidSorting() {
