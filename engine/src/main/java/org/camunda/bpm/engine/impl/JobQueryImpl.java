@@ -35,6 +35,7 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQuery, Serializable {
 
   private static final long serialVersionUID = 1L;
+  protected String activityId;
   protected String id;
   protected String jobDefinitionId;
   protected String processInstanceId;
@@ -65,6 +66,11 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
     super(commandExecutor);
   }
 
+  public JobQuery activityId(String activityId){
+	  ensureNotNull("Provided activity id", activityId);
+	  this.activityId = activityId;
+	  return this;
+  }
   public JobQuery jobId(String jobId) {
     ensureNotNull("Provided job id", jobId);
     this.id = jobId;
