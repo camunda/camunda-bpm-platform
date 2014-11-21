@@ -3,7 +3,7 @@ camunda-connect
 
 <p>
   <a href="http://camunda.org/">Home</a> |
-  <a href="docs/index.md">Documentation</a> |
+  <a href="http://docs.camunda.org/latest/api-references/connect/">Documentation</a> |
   <a href="http://camunda.org/community/forum.html">Forum</a> |
   <a href="https://app.camunda.com/jira/browse/CAM">Issues</a> |
   <a href="LICENSE">License</a> |
@@ -58,10 +58,6 @@ request.setRequestParameter(HttpBaseRequest.PARAM_NAME_REQUEST_PAYLOAD, requestM
 // execute the request
 SoapHttpResponse response = request.execute();
 ```
-
-# Documentation
-
-The sources of the documentation are located in the [docs folder](docs/index.md) of this repository.
 
 # Contributing
 
