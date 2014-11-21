@@ -20,7 +20,6 @@ import org.camunda.bpm.model.cmmn.impl.instance.CasePlanModel;
 import org.camunda.bpm.model.cmmn.instance.Case;
 import org.camunda.bpm.model.cmmn.instance.CaseTask;
 import org.camunda.bpm.model.cmmn.instance.CmmnElement;
-import org.camunda.bpm.model.cmmn.instance.EventListener;
 import org.camunda.bpm.model.cmmn.instance.HumanTask;
 import org.camunda.bpm.model.cmmn.instance.Milestone;
 import org.camunda.bpm.model.cmmn.instance.PlanItemDefinition;
@@ -71,7 +70,9 @@ public class DefaultCmmnElementHandlerRegistry {
     planItemElementHandlers.put(ProcessTask.class, processTaskPlanItemHandler);
     planItemElementHandlers.put(CaseTask.class, caseTaskPlanItemHandler);
     planItemElementHandlers.put(Milestone.class, milestonePlanItemHandler);
-    planItemElementHandlers.put(EventListener.class, eventListenerPlanItemHandler);
+
+    // Note: EventListener is currently not supported!
+    // planItemElementHandlers.put(EventListener.class, eventListenerPlanItemHandler);
 
     // init discretionary element handler
     discretionaryElementHandlers = new HashMap<Class<? extends PlanItemDefinition>, ItemHandler>();

@@ -9,21 +9,19 @@
 
     <casePlanModel>
 
-      <planItem id="PI_Milestone" definitionRef="Milestone" entryCriteriaRefs="Sentry_1" />
-      <planItem id="PI_UserEvent_1" definitionRef="UserEvent_1" />
-      <planItem id="PI_UserEvent_2" definitionRef="UserEvent_2" />
+      <planItem id="PI_Milestone_1" definitionRef="Milestone_1" entryCriteriaRefs="Sentry_1" />
+      <planItem id="PI_HumanTask_1" definitionRef="HumanTask_1" />
+      <planItem id="PI_ProcessTask_1" definitionRef="ProcessTask_1" />
 
       <sentry id="Sentry_1">
-        <planItemOnPart sourceRef="PI_UserEvent_1">
-          <standardEvent>terminate</standardEvent>
+        <planItemOnPart sourceRef="PI_HumanTask_1">
+          <standardEvent>complete</standardEvent>
         </planItemOnPart>
       </sentry>
 
-      <milestone id="Milestone" />
-
-      <userEvent id="UserEvent_1" />
-      <userEvent id="UserEvent_2" />
-
+      <milestone id="Milestone_1" />
+      <humanTask id="HumanTask_1" />
+      <processTask id="ProcessTask_1" />
 
     </casePlanModel>
 
