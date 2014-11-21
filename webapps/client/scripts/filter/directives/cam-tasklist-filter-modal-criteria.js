@@ -1,7 +1,7 @@
 define(function() {
   'use strict';
 
-  var dateExpLangHelp = 'E.g.: ${ now() }, ${ dateTime() } or ${ dateTime().plusWeeks(2) })';
+  var dateExpLangHelp = 'E.g.: ${ now() }, ${ dateTime() } or ${ dateTime().plusWeeks(2) }';
   var userExpLangHelp = 'E.g.: ${ currentUser() }';
   var groupExpLangHelp = 'E.g.: ${ currentUserGroups() }';
 
