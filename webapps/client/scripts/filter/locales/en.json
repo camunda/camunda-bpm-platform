@@ -70,7 +70,7 @@
   "FILTER_FORM_PERMISSIONS_HINT":
                         "This section is aimed to set read permissions for the filter.",
   "FILTER_FORM_PERMISSIONS_EDIT_HINT":
-                        "In order to edit the read permissions you need an authorization to create or edit a filter and a further authorization to create or edit auhtorizations.",
+                        "In order to edit the read permissions you need an authorization to create or edit a filter and a further authorization to create or edit authorizations.",
   "FILTER_FORM_PERMISSIONS_IDENTITY_TYPE_TOOLTIP":
                         "Permission is applied to",
   "FILTER_FORM_PERMISSIONS_IDENTITY_TYPE_USER":
