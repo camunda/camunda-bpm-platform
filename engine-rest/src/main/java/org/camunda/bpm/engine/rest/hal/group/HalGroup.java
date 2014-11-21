@@ -16,10 +16,11 @@ import javax.ws.rs.core.UriBuilder;
 
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.rest.GroupRestService;
+import org.camunda.bpm.engine.rest.hal.HalIdResource;
 import org.camunda.bpm.engine.rest.hal.HalRelation;
 import org.camunda.bpm.engine.rest.hal.HalResource;
 
-public class HalGroup extends HalResource<HalGroup> {
+public class HalGroup extends HalResource<HalGroup> implements HalIdResource {
 
   public final static HalRelation REL_SELF =
     HalRelation.build("self", GroupRestService.class, UriBuilder.fromPath(GroupRestService.PATH).path("{id}"));
