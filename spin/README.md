@@ -3,7 +3,7 @@ camunda-spin
 
 <p>
   <a href="http://camunda.org/">Home</a> |
-  <a href="docs/index.md">Documentation</a> |
+  <a href="http://docs.camunda.org/latest/api-references/spin/">Documentation</a> |
   <a href="http://camunda.org/community/forum.html">Forum</a> |
   <a href="https://app.camunda.com/jira/browse/CAM">Issues</a> |
   <a href="LICENSE">License</a> |
@@ -56,12 +56,6 @@ XML( xmlInput ).append(kate);
 XML( xmlInput ).xPath("/customers/customer[@id='0002']").element();
 ```
 
-
-
-# Documentation
-
-The sources of the camunda spin documentation are located in the [docs folder](docs/index.md) 
-of this repository.
 
 # FAQ
 

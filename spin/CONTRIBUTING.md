@@ -5,7 +5,8 @@ documentation should help you to get started and explain the main concepts of th
 
 ## Writing Docs
 
-All docs are written in Markdown and are located in the `docs/` folder.
+All docs are written in Markdown and are located in the [docs.camunda.org](https://github.com/camunda/docs.camunda.org)
+repository.
 
 ### Markdown editing guidelines:
 
