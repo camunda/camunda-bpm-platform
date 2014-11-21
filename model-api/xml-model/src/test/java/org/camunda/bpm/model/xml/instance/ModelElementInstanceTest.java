@@ -150,6 +150,14 @@ public class ModelElementInstanceTest extends TestModelTest {
   }
 
   @Test
+  public void testReplaceRootElement() {
+    assertThat(((Animals) modelInstance.getDocumentElement()).getAnimals()).isNotEmpty();
+    Animals newAnimals = modelInstance.newInstance(Animals.class);
+    modelInstance.setDocumentElement(newAnimals);
+    assertThat(((Animals) modelInstance.getDocumentElement()).getAnimals()).isEmpty();
+  }
+
+  @Test
   public void testTextContent() {
     assertThat(tweety.getTextContent()).isEqualTo("");
     assertThat(donald.getTextContent()).isEqualTo("some text content");

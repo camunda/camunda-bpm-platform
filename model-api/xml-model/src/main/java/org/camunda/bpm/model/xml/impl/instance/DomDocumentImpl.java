@@ -54,7 +54,7 @@ public class DomDocumentImpl implements DomDocument {
     Element documentElement = document.getDocumentElement();
     Element newDocumentElement = ((DomElementImpl) rootElement).getElement();
     if (documentElement != null) {
-      document.replaceChild(documentElement, newDocumentElement);
+      document.replaceChild(newDocumentElement, documentElement);
     }
     else {
       document.appendChild(newDocumentElement);
