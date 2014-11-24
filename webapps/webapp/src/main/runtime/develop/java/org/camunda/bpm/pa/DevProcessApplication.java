@@ -13,7 +13,6 @@ import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
-import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.rest.dto.identity.UserCredentialsDto;
 import org.camunda.bpm.engine.rest.dto.identity.UserDto;
@@ -231,6 +230,20 @@ public class DevProcessApplication extends ServletProcessApplication {
     caseService
       .withCaseExecution(fourth)
       .manualStart();
+
+    Task standaloneTask = taskService.newTask();
+    standaloneTask.setName("A Standalone Task");
+    standaloneTask.setAssignee("jonny1");
+    taskService.saveTask(standaloneTask);
+
+    String standaloneTaskId = taskService
+        .createTaskQuery()
+        .taskName("A Standalone Task")
+        .singleResult()
+        .getId();
+
+    taskService.setVariable(standaloneTaskId, "aVariable", "abc");
+    taskService.setVariable(standaloneTaskId, "anotherVariable", 123456l);
 
     new Thread(){
       public void run() {
