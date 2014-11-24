@@ -29,6 +29,7 @@ import java.util.Set;
 import org.camunda.bpm.engine.OptimisticLockingException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.TaskAlreadyClaimedException;
+import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.identity.Group;
@@ -134,6 +135,42 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
 
     // Finally, delete task
     taskService.deleteTask(task.getId(), true);
+  }
+
+  public void testSaveTaskSetParentTaskId() {
+    // given
+    Task parent = taskService.newTask("parent");
+    taskService.saveTask(parent);
+
+    Task task = taskService.newTask("subTask");
+
+    // when
+    task.setParentTaskId("parent");
+
+    // then
+    taskService.saveTask(task);
+
+    // update task
+    task = taskService.createTaskQuery().taskId("subTask").singleResult();
+
+    assertEquals(parent.getId(), task.getParentTaskId());
+
+    taskService.deleteTask("parent", true);
+    taskService.deleteTask("subTask", true);
+  }
+
+  public void testSaveTaskWithNonExistingParentTask() {
+    // given
+    Task task = taskService.newTask();
+
+    // when
+    task.setParentTaskId("non-existing");
+
+    // then
+    try {
+      taskService.saveTask(task);
+      fail("It should not be possible to save a task with a non existing parent task.");
+    } catch (NotValidException e) {}
   }
 
   public void testTaskOwner() {

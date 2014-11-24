@@ -16,6 +16,8 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.io.Serializable;
 
+import org.camunda.bpm.engine.exception.NotValidException;
+import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -39,9 +41,15 @@ public class SaveTaskCmd implements Command<Void>, Serializable {
     ensureNotNull("task", task);
 
     if (task.getRevision() == 0) {
-      task.insert(null);
-      commandContext.getHistoricTaskInstanceManager().createHistoricTask(task);
-      task.createHistoricTaskDetails(UserOperationLogEntry.OPERATION_TYPE_CREATE);
+
+      try {
+        task.insert(null);
+        commandContext.getHistoricTaskInstanceManager().createHistoricTask(task);
+        task.createHistoricTaskDetails(UserOperationLogEntry.OPERATION_TYPE_CREATE);
+      } catch (NullValueException e) {
+        throw new NotValidException(e.getMessage(), e);
+      }
+
     } else {
       task.update();
       task.createHistoricTaskDetails(UserOperationLogEntry.OPERATION_TYPE_UPDATE);

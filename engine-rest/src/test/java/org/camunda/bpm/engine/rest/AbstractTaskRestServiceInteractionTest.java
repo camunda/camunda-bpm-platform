@@ -72,6 +72,7 @@ import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.form.TaskFormData;
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.history.HistoricTaskInstanceQuery;
@@ -3223,6 +3224,29 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     verify(taskServiceMock).newTask(null);
     verify(newTask).setDelegationState(DelegationState.PENDING);
     verify(taskServiceMock).saveTask(newTask);
+  }
+
+  @Test
+  public void testPostCreateTask_NotValidValueException() {
+    Map<String, Object> json = new HashMap<String, Object>();
+
+    json.put("id", "anyTaskId");
+
+    Task newTask = mock(Task.class);
+    when(taskServiceMock.newTask(anyString())).thenReturn(newTask);
+
+    doThrow(new NotValidException("parent task is null")).when(taskServiceMock).saveTask(newTask);
+
+    given()
+      .body(json)
+      .contentType(ContentType.JSON)
+      .header("accept", MediaType.APPLICATION_JSON)
+    .then()
+      .expect()
+        .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
+        .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+        .body("message", equalTo("Could not save task: parent task is null"))
+      .when().post(TASK_CREATE_URL);
   }
 
   @Test
