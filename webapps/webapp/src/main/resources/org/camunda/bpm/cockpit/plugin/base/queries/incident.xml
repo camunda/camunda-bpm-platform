@@ -47,11 +47,11 @@
                  CAUSE.PROC_INST_ID_ CAUSE_PROC_INST_ID_,
                  CAUSE.PROC_DEF_ID_ CAUSE_PROC_DEF_ID_,
                  CAUSE.ACTIVITY_ID_ CAUSE_ACTIVITY_ID_,
-                 ROOT.PROC_INST_ID_ ROOT_PROC_INST_ID_,
-                 ROOT.PROC_DEF_ID_ ROOT_PROC_DEF_ID_,
-                 ROOT.ACTIVITY_ID_ ROOT_ACTIVITY_ID_,
-                 ROOT.INCIDENT_MSG_ ROOT_INC_MSG_,
-                 ROOT.CONFIGURATION_ ROOT_INC_CONF_
+                 ROOT_CAUSE.PROC_INST_ID_ ROOT_PROC_INST_ID_,
+                 ROOT_CAUSE.PROC_DEF_ID_ ROOT_PROC_DEF_ID_,
+                 ROOT_CAUSE.ACTIVITY_ID_ ROOT_ACTIVITY_ID_,
+                 ROOT_CAUSE.INCIDENT_MSG_ ROOT_INC_MSG_,
+                 ROOT_CAUSE.CONFIGURATION_ ROOT_INC_CONF_
           from
             ${prefix}ACT_RU_INCIDENT RES
             
@@ -63,9 +63,9 @@
             
           <!-- join once again with the incident table to get the root cause incident -->            
           left join
-            ${prefix}ACT_RU_INCIDENT ROOT
+            ${prefix}ACT_RU_INCIDENT ROOT_CAUSE
           on
-            RES.ROOT_CAUSE_INCIDENT_ID_ = ROOT.ID_
+            RES.ROOT_CAUSE_INCIDENT_ID_ = ROOT_CAUSE.ID_
             
           <where>
             <!-- processInstanceIds -->
