@@ -295,6 +295,17 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
   }
 
   @Test
+  public void testGetStartForm_StartFormDataEqualsNull() {
+    ProcessDefinition mockDefinition = MockProvider.createMockDefinition();
+    when(formServiceMock.getStartFormData(mockDefinition.getId())).thenReturn(null);
+
+    given().pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
+      .then().expect().statusCode(Status.OK.getStatusCode())
+      .body("contextPath", equalTo(MockProvider.EXAMPLE_PROCESS_APPLICATION_CONTEXT_PATH))
+      .when().get(START_FORM_URL);
+  }
+
+  @Test
   public void testGetRenderedStartForm() {
     String expectedResult = "<formField>anyContent</formField>";
 

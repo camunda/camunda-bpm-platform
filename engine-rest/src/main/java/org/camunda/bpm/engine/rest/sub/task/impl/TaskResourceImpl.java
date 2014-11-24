@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.rest.sub.task.impl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response.Status;
@@ -159,7 +160,7 @@ public class TaskResourceImpl implements TaskResource {
 
     FormDto dto = FormDto.fromFormData(formData);
     if(dto.getKey() == null || dto.getKey().isEmpty()) {
-      if(formData.getFormFields() != null && !formData.getFormFields().isEmpty()) {
+      if(formData != null && formData.getFormFields() != null && !formData.getFormFields().isEmpty()) {
         dto.setKey("embedded:engine://engine/:engine/task/"+taskId+"/rendered-form");
       }
     }

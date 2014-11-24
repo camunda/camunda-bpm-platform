@@ -573,6 +573,17 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
   }
 
   @Test
+  public void testGetForm__FormDataEqualsNull() {
+    when(formServiceMock.getTaskFormData(EXAMPLE_TASK_ID)).thenReturn(null);
+
+    given().pathParam("id", EXAMPLE_TASK_ID)
+      .header("accept", MediaType.APPLICATION_JSON)
+      .then().expect().statusCode(Status.OK.getStatusCode())
+      .body("contextPath", equalTo(MockProvider.EXAMPLE_PROCESS_APPLICATION_CONTEXT_PATH))
+      .when().get(TASK_FORM_URL);
+  }
+
+  @Test
   public void testGetRenderedForm() {
     String expectedResult = "<formField>anyContent</formField>";
 
