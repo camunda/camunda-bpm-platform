@@ -626,6 +626,38 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
   }
 
   @Test
+  public void testGetStartFormVariablesAndDoNotDeserializeVariables() {
+
+    given()
+      .pathParam("id", EXAMPLE_PROCESS_DEFINITION_ID)
+      .queryParam("deserializeValues", false)
+     .then()
+       .expect()
+        .statusCode(Status.OK.getStatusCode()).contentType(ContentType.JSON)
+        .body(MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME+".value", equalTo(MockProvider.EXAMPLE_PRIMITIVE_VARIABLE_VALUE.getValue()))
+        .body(MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME+".type",
+            equalTo(VariableTypeHelper.toExpectedValueTypeName(MockProvider.EXAMPLE_PRIMITIVE_VARIABLE_VALUE.getType())))
+      .when().get(START_FORM_VARIABLES_URL)
+      .body();
+
+    verify(formServiceMock, times(1)).getStartFormVariables(EXAMPLE_PROCESS_DEFINITION_ID, null, false);
+  }
+
+  @Test
+  public void testGetStartFormVariablesVarNamesAndDoNotDeserializeVariables() {
+
+    given()
+      .pathParam("id", EXAMPLE_PROCESS_DEFINITION_ID)
+      .queryParam("deserializeValues", false)
+      .queryParam("variableNames", "a,b,c")
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode()).contentType(ContentType.JSON)
+    .when().get(START_FORM_VARIABLES_URL);
+
+    verify(formServiceMock, times(1)).getStartFormVariables(EXAMPLE_PROCESS_DEFINITION_ID, Arrays.asList(new String[]{"a","b","c"}), false);
+  }
+
+  @Test
   public void testSimpleProcessInstantiation() {
     given().pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
       .contentType(POST_JSON_CONTENT_TYPE).body(EMPTY_JSON_OBJECT)

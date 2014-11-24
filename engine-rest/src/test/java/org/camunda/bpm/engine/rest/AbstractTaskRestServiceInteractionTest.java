@@ -58,6 +58,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
@@ -227,7 +228,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     when(formServiceMock.getTaskFormData(anyString())).thenReturn(mockFormData);
 
     VariableMap variablesMock = MockProvider.createMockFormVariables();
-    when(formServiceMock.getTaskFormVariables(eq(EXAMPLE_TASK_ID), Matchers.<Collection<String>>any(), eq(true))).thenReturn(variablesMock);
+    when(formServiceMock.getTaskFormVariables(eq(EXAMPLE_TASK_ID), Matchers.<Collection<String>>any(), anyBoolean())).thenReturn(variablesMock);
 
     repositoryServiceMock = mock(RepositoryService.class);
     when(processEngine.getRepositoryService()).thenReturn(repositoryServiceMock);
@@ -816,6 +817,39 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
       .when().get(FORM_VARIABLES_URL);
 
     verify(formServiceMock, times(1)).getTaskFormVariables(EXAMPLE_TASK_ID, Arrays.asList(new String[]{"a","b","c"}), true);
+  }
+
+  @Test
+  public void testGetTaskFormVariablesAndDoNotDeserializeVariables() {
+
+    given()
+      .pathParam("id", EXAMPLE_TASK_ID)
+      .queryParam("deserializeValues", false)
+      .header("accept", MediaType.APPLICATION_JSON)
+      .then().expect()
+        .statusCode(Status.OK.getStatusCode()).contentType(ContentType.JSON)
+        .body(MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME+".type",
+            equalTo(VariableTypeHelper.toExpectedValueTypeName(MockProvider.EXAMPLE_PRIMITIVE_VARIABLE_VALUE.getType())))
+        .body(MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME+".value",
+            equalTo(MockProvider.EXAMPLE_PRIMITIVE_VARIABLE_VALUE.getValue()))
+      .when().get(FORM_VARIABLES_URL)
+      .body();
+
+    verify(formServiceMock, times(1)).getTaskFormVariables(EXAMPLE_TASK_ID, null, false);
+  }
+
+  @Test
+  public void testGetTaskFormVariablesVarNamesAndDoNotDeserializeVariables() {
+    given()
+      .pathParam("id", EXAMPLE_TASK_ID)
+      .queryParam("deserializeValues", false)
+      .queryParam("variableNames", "a,b,c")
+      .header("accept", MediaType.APPLICATION_JSON)
+      .then().expect()
+        .statusCode(Status.OK.getStatusCode()).contentType(ContentType.JSON)
+      .when().get(FORM_VARIABLES_URL);
+
+    verify(formServiceMock, times(1)).getTaskFormVariables(EXAMPLE_TASK_ID, Arrays.asList(new String[]{"a","b","c"}), false);
   }
 
   @Test
