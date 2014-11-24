@@ -67,7 +67,8 @@ define([
         $scope.loadVariables = function() {
           $scope.variablesLoaded = true;
           Task.formVariables({
-            id: formController.getParams().taskId
+            id: formController.getParams().taskId,
+            deserializeValues: false
           }, function(err, result) {
             if(err) {
               $scope.variablesLoaded = false;
