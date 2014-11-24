@@ -126,14 +126,14 @@ define([
             focused = filter;
           }
       }
-      if(currentFilter) {
+
+      if(currentFilter && currentFilter.id !== focused.id) {
         var currentPage = getPropertyFromLocation('page');
         if (currentPage) {
           updateSilently({
             page: '1'
           });
         }
-
       }
 
       if(focused && focused.id !== filterId) {
@@ -299,7 +299,6 @@ define([
 
       currentFilter = null;
       tasklistData.changed('currentFilter');
-
     });
   }];
 });
