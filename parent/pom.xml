@@ -50,6 +50,7 @@
     <version.mssql>4.0</version.mssql>
     <version.db2.97>9.7</version.db2.97>
     <version.postgre>9.3-1100-jdbc4</version.postgre>
+    <version.informix>4.10</version.informix>
 
     <!-- OSGi bundles properties -->
     <camunda.artifact />
@@ -168,6 +169,12 @@
         <groupId>org.postgresql</groupId>
         <artifactId>postgresql</artifactId>
         <version>${version.postgre}</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>com.ibm.informix.jdbc</groupId>
+        <artifactId>ifxjdbc</artifactId>
+        <version>${version.informix}</version>
         <scope>test</scope>
       </dependency>
 
