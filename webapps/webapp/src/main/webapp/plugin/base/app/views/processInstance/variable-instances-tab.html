@@ -1,0 +1,138 @@
+<!-- # CE - src/main/webapp/plugin/base/app/views/processInstance/variable-instances-tab.html -->
+<table class="table table-bordered table-hover table-condensed">
+  <thead>
+    <tr>
+      <th class="variable-name">Name</th>
+      <th class="variable-value">Value</th>
+      <th class="variable-type">Type</th>
+      <th class="variable-scope">Scope</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr ng-repeat="variable in variables"
+        data-variable-name="{{ variable.name }}"
+        data-variable-type="{{ variable.value.type }}">
+      <td class="variable-name">
+        {{ variable.name }}
+      </td>
+      <td class="variable-value">
+
+        <div ng-if="isPrimitive(variable) && !variable.inEditMode && !variable.errorMessage">
+          {{ variable.value }}
+          <span ng-if="isEditable(variable)" class="edit-toggle" ng-click="editVariable(variable)">
+            <i class="icon-pencil"></i>
+          </span>
+        </div>
+
+        <div ng-if="!!variable.errorMessage" class="muted">
+          <span
+            tooltip="Object which cannot be de-serialized"
+            tooltip-placement="right">
+              Serialized Java Object
+          </span>
+        </div>
+
+        <!-- binary variables -->
+        <div ng-if="isBinary(variable)">
+          <a class="muted"
+             href="{{getBinaryVariableDownloadLink(variable)}}"
+             target="_blank"
+             tooltip="Click to Download"
+             tooltip-placement="right">
+            Binary Content
+          </a>
+          <a class="edit-toggle"
+             href
+             ng-click="openUploadDialog(variable)"
+             tooltip="Upload"
+             tooltip-placement="right">
+            <i class="icon-upload"></i>
+          </a>
+        </div>
+
+        <!-- object variable -->
+        <div ng-if="isObject(variable) && !variable.errorMessage">
+          <a class="muted"
+             ng-click="openInspectDialog(variable)"
+             href
+             tooltip="Click to Inspect"
+             tooltip-placement="right">
+            {{ variable.valueInfo.objectTypeName }}
+          </a>
+        </div>
+
+        <form class="inline-edit" name="editVariableForm" ng-if="variable.inEditMode" ng-submit="submit(variable, this.editVariableForm)" novalidate request-aware>
+
+          <fieldset>
+
+            <div variable="getCopy(variable.id)" inline-edit autofocus></div>
+
+          </fieldset>
+
+          <div class="inline-edit-footer">
+
+            <p class="invalid" ng-show="this.editVariableForm.editDateValue.$error.date">
+              Invalid date: The date should have the pattern 'yyyy-MM-ddTHH:mm:ss'.
+            </p>
+            <p class="invalid" ng-show="this.editVariableForm.editIntegerValue.$error.numeric || this.editVariableForm.editFloatValue.$error.numeric">
+              Invalid value: Only a {{ getCopy(variable.id).type }} value is allowed.
+            </p>
+
+            <p class="invalid" ng-show="getExceptionForVariableId(variable.id)">
+              The passed value could not be stored, see error message: {{ getExceptionForVariableId(variable.id).message }}.
+            </p>
+
+            <div class="btn-group">
+              <button type="submit" class="btn btn-primary" ng-disabled="!isValid(this.editVariableForm)">
+                <i class="icon-ok icon-white"></i>
+              </button>
+              <button type="button" class="btn" ng-click="closeInPlaceEditing(variable)">
+                <i class="icon-ban-circle"></i>
+              </button>
+            </div>
+          </div>
+
+        </form>
+
+      </td>
+      <td class="variable-type">
+        <select ng-show="variable.inEditMode" name="variableType"
+                ng-options="variableType for variableType in variableTypes" ng-model="getCopy(variable.id).type"
+                class="select-variable-type">
+        </select>
+        <span ng-hide="variable.inEditMode">{{ variable.type }}</span>
+      </td>
+      <td class="variable-scope">
+        <a cam-select-activity-instance="variable.instance.id"
+           ng-href="#/process-instance/{{ processInstance.id }}?detailsTab=variables-tab&activityInstanceIds={{ variable.instance.id }}" title="{{ variable.instance.id }}">
+          {{ variable.instance.name }}
+        </a>
+      </td>
+    </tr>
+
+    <tr ng-if="!variables">
+      <td colspan="4">
+        <i class="icon-loading"></i> loading process variables ...
+      </td>
+    </tr>
+
+    <tr ng-if="variables && !variables.length">
+      <td  colspan="4">
+        No process variables
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<pagination ng-if="pages.total > pages.size"
+            class="pagination-sm"
+
+            page="pages.current"
+            ng-model="pages.current"
+
+            total-items="pages.total"
+            items-per-page="pages.size"
+
+            max-size="7"
+            boundary-links="true"></pagination>
+<!-- / CE - src/main/webapp/plugin/base/app/views/processInstance/variable-instances-tab.html -->

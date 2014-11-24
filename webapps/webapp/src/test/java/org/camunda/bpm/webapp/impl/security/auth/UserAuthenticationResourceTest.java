@@ -81,11 +81,11 @@ public class UserAuthenticationResourceTest {
     authorizationService.saveAuthorization(authorization);
 
     processEngineConfiguration.setAuthorizationEnabled(true);
-    setAuthentication("jonny", "default");
+    setAuthentication("jonny", "UserAuthenticationResourceTest-engine");
 
     // when
     UserAuthenticationResource authResource = new UserAuthenticationResource();
-    Response response = authResource.doLogin("default", "tasklist", "jonny", "jonnyspassword");
+    Response response = authResource.doLogin("UserAuthenticationResourceTest-engine", "tasklist", "jonny", "jonnyspassword");
 
     // then
     Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
@@ -99,11 +99,11 @@ public class UserAuthenticationResourceTest {
     identityService.saveUser(jonny);
 
     processEngineConfiguration.setAuthorizationEnabled(true);
-    setAuthentication("jonny", "default");
+    setAuthentication("jonny", "UserAuthenticationResourceTest-engine");
 
     // when
     UserAuthenticationResource authResource = new UserAuthenticationResource();
-    Response response = authResource.doLogin("default", "tasklist", "jonny", "jonnyspassword");
+    Response response = authResource.doLogin("UserAuthenticationResourceTest-engine", "tasklist", "jonny", "jonnyspassword");
 
     // then
     Assert.assertEquals(Status.FORBIDDEN.getStatusCode(), response.getStatus());
@@ -117,11 +117,11 @@ public class UserAuthenticationResourceTest {
     identityService.saveUser(jonny);
 
     processEngineConfiguration.setAuthorizationEnabled(false);
-    setAuthentication("jonny", "default");
+    setAuthentication("jonny", "UserAuthenticationResourceTest-engine");
 
     // when
     UserAuthenticationResource authResource = new UserAuthenticationResource();
-    Response response = authResource.doLogin("default", "tasklist", "jonny", "jonnyspassword");
+    Response response = authResource.doLogin("UserAuthenticationResourceTest-engine", "tasklist", "jonny", "jonnyspassword");
 
     // then
     Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
@@ -129,7 +129,7 @@ public class UserAuthenticationResourceTest {
 
   protected void setAuthentication(String user, String engineName) {
     Authentications authentications = new Authentications();
-    authentications.addAuthentication(new Authentication("jonny", "default"));
+    authentications.addAuthentication(new Authentication("jonny", "UserAuthenticationResourceTest-engine"));
     Authentications.setCurrent(authentications);
   }
 
