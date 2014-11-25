@@ -141,7 +141,7 @@ define([
         // provider ///////////////////////////////////////////////////////////////////
 
         taskData.provide('assignee', ['task', function(task) {
-          if (task) {
+          if (task && task._embedded) {
             if(task._embedded.identityLink) {
               for(var i = 0; i < task._embedded.identityLink.length; i++) {
                 if(task._embedded.identityLink[i].type === 'assignee') {
@@ -160,7 +160,7 @@ define([
 
         taskData.provide('groups', ['task', function(task) {
           var groups = [];
-          if (task) {
+          if (task && task._embedded) {
             if(task._embedded.identityLink) {
               for(var i = 0; i < task._embedded.identityLink.length; i++) {
                 if(task._embedded.identityLink[i].type === 'candidate' && task._embedded.identityLink[i].groupId !== null) {
