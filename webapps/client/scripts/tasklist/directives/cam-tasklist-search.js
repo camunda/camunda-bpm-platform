@@ -56,7 +56,11 @@ define([
   }
 
   function parseValue(value) {
-    if(!isNaN(value)) {
+    if (value && typeof value == 'string') {
+      value = value.trim();
+    }
+
+    if(!isNaN(value) && value !== '') {
       // value must be transformed to number
       return +value;
     }
