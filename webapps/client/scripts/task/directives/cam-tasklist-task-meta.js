@@ -176,7 +176,7 @@ define([
         $scope.assign = function(inlineFieldScope) {
           setEditingState('assignee', false);
 
-          var newAssignee = inlineFieldScope.varValue;
+          var newAssignee = inlineFieldScope.varValue.trim();
 
           if (!newAssignee) {
 

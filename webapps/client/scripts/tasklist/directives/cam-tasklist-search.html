@@ -4,7 +4,7 @@
 
       <span class="search-label"
             ng-repeat="search in searches"
-            ng-class="{'invalid': invalidSearch(search, types, search.operators)}">
+            ng-class="{'invalid': invalidSearch(search)}">
         <a href
            tooltip-placement="top"
            tooltip="{{ 'DELETE_SEARCH' | translate }}"
@@ -57,10 +57,9 @@
               change="changeSearch($index, 'value', varValue)"
               value="search.value"
               flexible="true">
-          <span tooltip-placement="top"
-            tooltip="{{'VALUE' | translate}}">
-              {{ search.value | camQueryComponent }}
-          </span>
+          <span class="visible-whitespace"
+                tooltip-placement="top"
+                tooltip="{{'VALUE' | translate}}">{{ search.value | camQueryComponent }}</span>
         </span>
       </span>
 

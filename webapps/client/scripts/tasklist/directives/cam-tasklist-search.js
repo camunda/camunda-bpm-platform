@@ -12,7 +12,7 @@ define([
 
     var match = searchRegEx.exec(query);
     if(match && match.length === 4) {
-      search.name = match[1];
+      search.name = match[1].trim();
       search.operator = match[2];
       search.value = match[3];
       search.operators = getOperators(getType(parseValue(search.value)));
@@ -56,11 +56,7 @@ define([
   }
 
   function parseValue(value) {
-    if (value && typeof value == 'string') {
-      value = value.trim();
-    }
-
-    if(!isNaN(value) && value !== '') {
+    if(!isNaN(value) && value.trim() !== '') {
       // value must be transformed to number
       return +value;
     }
@@ -105,11 +101,8 @@ define([
 
         $scope.searches = [];
 
-        $scope.invalidSearch = function(search, types, operatorList) {
-          return !(types.indexOf(search.type) !== -1 &&
-                   operatorList.indexOf(search.operator) !== -1 &&
-                   search.name &&
-                   search.value);
+        $scope.invalidSearch = function(search) {
+          return !isValid(search);
         };
 
         $scope.deleteSearch = function(idx) {
@@ -141,7 +134,17 @@ define([
         $scope.changeSearch = function(idx, field, value) {
           var search = $scope.searches[idx];
           var needsUpdate = isValid(search);
-          search[field] = value;
+          if(field === 'name') {
+            // trim the variable name for the model (needed for the *validation*)
+            search[field] = value.trim();
+
+            // trim the name again AFTER the inline field widget overwrites it with the
+            // entered value (which may contain whitespace) - needed for *style*
+            $timeout(function(){search[field] = value.trim();});
+          } else {
+            search[field] = value;
+          }
+
           var valueType = getType(parseValue(search.value));
           search.operators = getOperators(valueType);
           if(search.operators.indexOf(search.operator) === -1) {
@@ -173,8 +176,8 @@ define([
         function isValid(search) {
           return $scope.types.indexOf(search.type) !== -1 &&
              search.operators.indexOf(search.operator) !== -1 &&
-             search.name &&
-             search.value;
+             !!search.name &&
+             !!search.value;
         }
 
         var searchData = $scope.tasklistData.newChild($scope);
@@ -216,7 +219,11 @@ define([
              for(i=0; i < searches.length; i++) {
                search = searches[i];
                search.operators = getOperators(getType(search.value));
-               search.value = search.value.toString();
+               if(search.value === null) {
+                 search.value = "NULL";
+               } else {
+                 search.value = search.value.toString();
+               }
                search.type = search.type;
                $scope.searches.unshift(search);
              }
