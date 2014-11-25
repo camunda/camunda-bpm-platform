@@ -34,9 +34,10 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.form.FormProperty;
 import org.camunda.bpm.engine.form.StartFormData;
 import org.camunda.bpm.engine.form.TaskFormData;
+import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.form.type.AbstractFormFieldType;
-import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
+import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.CollectionUtil;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
@@ -474,18 +475,27 @@ public class FormServiceTest extends PluggableProcessEngineTestCase {
   }
 
   public void testSubmitTaskFormForStandaloneTask() {
-
     // given
-
-    Task task = taskService.newTask();
+    String id = "standaloneTask";
+    Task task = taskService.newTask(id);
     taskService.saveTask(task);
 
+    // when
     formService.submitTaskForm(task.getId(), Variables.createVariables().putValue("foo", "bar"));
 
-    taskService.deleteTask(task.getId());
-    if(processEngineConfiguration.getHistoryLevel().isHistoryEventProduced(HistoryEventTypes.TASK_INSTANCE_CREATE, null)) {
-      historyService.deleteHistoricTaskInstance(task.getId());
+
+    if (processEngineConfiguration.getHistoryLevel().getId() >= HistoryLevel.HISTORY_LEVEL_AUDIT.getId()) {
+      HistoricVariableInstance variableInstance = historyService
+        .createHistoricVariableInstanceQuery()
+        .taskIdIn(id)
+        .singleResult();
+
+      assertNotNull(variableInstance);
+      assertEquals("foo", variableInstance.getName());
+      assertEquals("bar", variableInstance.getValue());
     }
+
+    taskService.deleteTask(id, true);
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})

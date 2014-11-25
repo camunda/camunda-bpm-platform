@@ -13,6 +13,8 @@
 
 package org.camunda.bpm.engine.impl.cmd;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 import java.io.Serializable;
 import java.util.Map;
 
@@ -26,8 +28,6 @@ import org.camunda.bpm.engine.impl.task.TaskDefinition;
 import org.camunda.bpm.engine.task.DelegationState;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
-
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 
 /**
@@ -60,6 +60,9 @@ public class SubmitTaskFormCmd implements Command<Object>, Serializable {
     if(taskDefinition != null) {
       TaskFormHandler taskFormHandler = taskDefinition.getTaskFormHandler();
       taskFormHandler.submitFormVariables(properties, task);
+    } else {
+      // set variables on standalone task
+      task.setVariables(properties);
     }
 
     // complete or resolve the task
