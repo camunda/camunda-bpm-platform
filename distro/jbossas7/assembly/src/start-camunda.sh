@@ -1,6 +1,6 @@
 #!/bin/sh
 
-export JBOSS_HOME=$(dirname "$0")/server/jboss-as-${version.jboss.as}
+export JBOSS_HOME="$(dirname "$0")/server/jboss-as-${version.jboss.as}"
 
 BROWSERS="gnome-www-browser x-www-browser firefox chromium chromium-browser google-chrome"
 
