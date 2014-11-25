@@ -1,5 +1,7 @@
 #!/bin/sh
 
+export JBOSS_HOME="$(dirname "$0")/server/wildfly-${version.wildfly}"
+
 BROWSERS="gnome-www-browser x-www-browser firefox chromium chromium-browser google-chrome"
 
 echo "starting camunda BPM ${project.version} on Wildfly Application Server ${version.wildfly}";

@@ -1,5 +1,7 @@
 @echo off
 
+set "JBOSS_HOME=%CD%\server\wildfly-${version.wildfly}"
+
 echo "starting camunda BPM platform ${project.version} on Wildfly Application Server ${version.wildfly}"
 
 cd server\wildfly-${version.wildfly}\bin\
