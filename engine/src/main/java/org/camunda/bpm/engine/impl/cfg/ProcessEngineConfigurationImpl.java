@@ -1280,11 +1280,12 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected void initExpressionManager() {
     if (expressionManager==null) {
       expressionManager = new ExpressionManager(beans);
-      // add function mapper for command context (eg currentUser(), currentUserGroups())
-      expressionManager.addFunctionMapper(new CommandContextFunctionMapper());
-      // add function mapper for date time (eg now(), dateTime())
-      expressionManager.addFunctionMapper(new DateTimeFunctionMapper());
     }
+
+    // add function mapper for command context (eg currentUser(), currentUserGroups())
+    expressionManager.addFunctionMapper(new CommandContextFunctionMapper());
+    // add function mapper for date time (eg now(), dateTime())
+    expressionManager.addFunctionMapper(new DateTimeFunctionMapper());
   }
 
   protected void initBusinessCalendarManager() {
