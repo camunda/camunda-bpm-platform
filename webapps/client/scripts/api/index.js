@@ -35,7 +35,8 @@ function(
         var original = options.done;
 
         options.done = function(err, result) {
-          $rootScope.$apply(function() {
+
+          function applyResponse() {
             // in case the session expired
             if (err && err.status === 401) {
               // broadcast that the authentication changed
@@ -63,7 +64,16 @@ function(
             }
 
             original(err, result);
-          });
+          }
+
+          var phase = $rootScope.$$phase;
+
+          if(phase !== '$apply' && phase !== '$digest') {
+            $rootScope.$apply(applyResponse);
+          }
+          else {
+            applyResponse();
+          }
         };
 
         this._wrapped[name](path, options);
