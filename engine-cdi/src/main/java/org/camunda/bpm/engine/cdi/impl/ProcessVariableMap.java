@@ -19,6 +19,8 @@ import java.util.Set;
 import javax.inject.Inject;
 
 import org.camunda.bpm.engine.cdi.BusinessProcess;
+import org.camunda.bpm.engine.variable.VariableMap;
+import org.camunda.bpm.engine.variable.value.TypedValue;
 
 /**
  * Allows to expose the process variables of the current business process as a
@@ -31,7 +33,7 @@ import org.camunda.bpm.engine.cdi.BusinessProcess;
  * 
  * @author Daniel Meyer
  */
-public class ProcessVariableMap implements Map<String, Object> {
+public class ProcessVariableMap implements VariableMap {
   
   @Inject private BusinessProcess businessProcess;
   
@@ -41,6 +43,26 @@ public class ProcessVariableMap implements Map<String, Object> {
       throw new IllegalArgumentException("This map does not support 'null' keys.");
     }
     return businessProcess.getVariable(key.toString());
+  }
+
+  @Override
+  public <T> T getValue(String name, Class<T> type) {
+    Object object = get(name);
+    if (object == null) {
+      return null;
+    } else if (type.isAssignableFrom(object.getClass())) {
+      return (T) object;
+    } else {
+      throw new ClassCastException("Cannot cast variable named '" + name + "' with value '" + object + "' to type '" + type + "'.");
+    }
+  }
+
+  @Override
+  public <T extends TypedValue> T getValueTyped(String name) {
+    if (name == null) {
+      throw new IllegalArgumentException("This map does not support 'null' keys.");
+    }
+    return businessProcess.getVariableTyped(name);
   }
 
   @Override
@@ -58,6 +80,16 @@ public class ProcessVariableMap implements Map<String, Object> {
     for (java.util.Map.Entry< ? extends String, ? extends Object> newEntry : m.entrySet()) {
       businessProcess.setVariable(newEntry.getKey(), newEntry.getValue());      
     }
+  }
+
+  @Override
+  public VariableMap putValue(String name, Object value) {
+    throw new UnsupportedOperationException(ProcessVariableMap.class.getName() + ".putValue() is not supported.");
+  }
+
+  @Override
+  public VariableMap putValueTyped(String name, TypedValue value) {
+    throw new UnsupportedOperationException(ProcessVariableMap.class.getName() + ".putValueTyped() is not supported.");
   }
 
   @Override

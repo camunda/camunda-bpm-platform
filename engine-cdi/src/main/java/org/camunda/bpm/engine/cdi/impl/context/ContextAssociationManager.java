@@ -12,11 +12,11 @@
  */
 package org.camunda.bpm.engine.cdi.impl.context;
 
-import java.util.Map;
-
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.task.Task;
+import org.camunda.bpm.engine.variable.VariableMap;
+import org.camunda.bpm.engine.variable.value.TypedValue;
 
 /**
  * Represents a means for associating an execution with a context.
@@ -67,6 +67,11 @@ public interface ContextAssociationManager {
   public void setVariable(String variableName, Object value);
 
   /**
+   * get a typed process variable
+   */
+  public TypedValue getVariableTyped(String variableName);
+
+  /**
    * get a process variable
    */
   public Object getVariable(String variableName);
@@ -74,22 +79,27 @@ public interface ContextAssociationManager {
   /**
    * @return a map of process variables cached between flushes
    */
-  public Map<String,Object> getCachedVariables();
+  public VariableMap getCachedVariables();
 
   /**
    * set a local process variable
    */
-	void setVariableLocal(String variableName, Object value);
+  void setVariableLocal(String variableName, Object value);
 
-	/**
+  /**
+   * get a local typed process variable
+   */
+  TypedValue getVariableLocalTyped(String variableName);
+
+  /**
    * get a local process variable
    */
-	Object getVariableLocal(String variableName);
+  Object getVariableLocal(String variableName);
 
   /**
    * @return a map of local process variables cached between flushes
    */
-  public Map<String,Object> getCachedVariablesLocal();
+  public VariableMap getCachedVariablesLocal();
 
   /**
    * allows to flush the cached variables.

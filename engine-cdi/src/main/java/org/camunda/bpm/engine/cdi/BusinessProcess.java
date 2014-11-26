@@ -13,7 +13,6 @@
 package org.camunda.bpm.engine.cdi;
 
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.Map;
 
 import javax.enterprise.context.Conversation;
@@ -29,9 +28,12 @@ import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.cdi.annotation.BusinessProcessScoped;
 import org.camunda.bpm.engine.cdi.impl.context.ContextAssociationManager;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.core.variable.VariableMapImpl;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
+import org.camunda.bpm.engine.variable.VariableMap;
+import org.camunda.bpm.engine.variable.value.TypedValue;
 
 /**
  * Bean supporting contextual business process management. This allows us to
@@ -110,7 +112,7 @@ public class BusinessProcess implements Serializable {
   public ProcessInstance startProcessById(String processDefinitionId, Map<String, Object> variables) {
     assertCommandContextNotActive();
 
-    Map<String, Object> cachedVariables = getAndClearVariableCache();
+    VariableMap cachedVariables = getAndClearVariableCache();
     cachedVariables.putAll(variables);
     ProcessInstance instance = processEngine.getRuntimeService().startProcessInstanceById(processDefinitionId, cachedVariables);
     if (!instance.isEnded()) {
@@ -122,7 +124,7 @@ public class BusinessProcess implements Serializable {
   public ProcessInstance startProcessById(String processDefinitionId, String businessKey, Map<String, Object> variables) {
     assertCommandContextNotActive();
 
-    Map<String, Object> cachedVariables = getAndClearVariableCache();
+    VariableMap cachedVariables = getAndClearVariableCache();
     cachedVariables.putAll(variables);
     ProcessInstance instance = processEngine.getRuntimeService().startProcessInstanceById(processDefinitionId, businessKey, cachedVariables);
     if (!instance.isEnded()) {
@@ -328,7 +330,8 @@ public class BusinessProcess implements Serializable {
   public void completeTask() {
     assertTaskAssociated();
     processEngine.getTaskService().setVariablesLocal(getTask().getId(), getAndClearVariableLocalCache());
-    processEngine.getTaskService().complete(getTask().getId(), getAndClearVariableCache());
+    processEngine.getTaskService().setVariables(getTask().getId(), getAndClearVariableCache());
+    processEngine.getTaskService().complete(getTask().getId());
     associationManager.disAssociate();
   }
 
@@ -423,6 +426,24 @@ public class BusinessProcess implements Serializable {
   }
 
   /**
+   * @param variableName
+   *          the name of the process variable for which the value is to be
+   *          retrieved
+   * @return the typed value of the provided process variable or 'null' if no
+   *         such variable is set
+   */
+  @SuppressWarnings("unchecked")
+  public <T extends TypedValue> T getVariableTyped(String variableName) {
+    Object variable = associationManager.getVariableTyped(variableName);
+    if (variable == null) {
+      return null;
+    } else {
+      return (T) variable;
+    }
+
+  }
+
+  /**
    * Set a value for a process variable.
    * <p />
    *
@@ -445,9 +466,9 @@ public class BusinessProcess implements Serializable {
    *
    * @return the map of cached variables
    */
-  public Map<String, Object> getAndClearVariableCache() {
-    Map<String, Object> cachedVariables = associationManager.getCachedVariables();
-    Map<String, Object> copy = new HashMap<String, Object>(cachedVariables);
+  public VariableMap getAndClearVariableCache() {
+    VariableMap cachedVariables = associationManager.getCachedVariables();
+    VariableMap copy = new VariableMapImpl(cachedVariables);
     cachedVariables.clear();
     return copy;
   }
@@ -457,8 +478,8 @@ public class BusinessProcess implements Serializable {
    *
    * @return a copy of the map of cached variables.
    */
-  public Map<String, Object> getVariableCache() {
-    return new HashMap<String, Object>(associationManager.getCachedVariables());
+  public VariableMap getVariableCache() {
+    return new VariableMapImpl(associationManager.getCachedVariables());
   }
 
   /**
@@ -475,6 +496,24 @@ public class BusinessProcess implements Serializable {
       return null;
     } else {
       return (T)variable;
+    }
+
+  }
+
+  /**
+   * @param variableName
+   *          the name of the local process variable for which the value is to
+   *          be retrieved
+   * @return the typed value of the provided local process variable or 'null' if
+   *         no such variable is set
+   */
+  @SuppressWarnings("unchecked")
+  public <T> T getVariableLocalTyped(String variableName) {
+    Object variable = associationManager.getVariableLocalTyped(variableName);
+    if (variable == null) {
+      return null;
+    } else {
+      return (T) variable;
     }
 
   }
@@ -502,9 +541,9 @@ public class BusinessProcess implements Serializable {
    *
    * @return the map of cached variables
    */
-  public Map<String, Object> getAndClearVariableLocalCache() {
-    Map<String, Object> cachedVariablesLocal = associationManager.getCachedVariablesLocal();
-    Map<String, Object> copy = new HashMap<String, Object>(cachedVariablesLocal);
+  public VariableMap getAndClearVariableLocalCache() {
+    VariableMap cachedVariablesLocal = associationManager.getCachedVariablesLocal();
+    VariableMap copy = new VariableMapImpl(cachedVariablesLocal);
     cachedVariablesLocal.clear();
     return copy;
   }
@@ -514,8 +553,8 @@ public class BusinessProcess implements Serializable {
    *
    * @return a copy of the map of local cached variables.
    */
-  public Map<String, Object> getVariableLocalCache() {
-    return new HashMap<String, Object>(associationManager.getCachedVariablesLocal());
+  public VariableMap getVariableLocalCache() {
+    return new VariableMapImpl(associationManager.getCachedVariablesLocal());
   }
 
   /**
