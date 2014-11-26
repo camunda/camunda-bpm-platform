@@ -33,10 +33,9 @@ drop index if exists ACT_UNIQ_AUTH_GROUP;
 drop index if exists ACT_UNIQ_AUTH_USER;
 alter table ACT_RU_VARIABLE drop constraint ACT_UNIQ_VARIABLE;
 
--- don't drop, create does not work because it contains mutiple lines ending with a ; --
--- drop function ACT_FCT_USER_ID_OR_ID_;
--- drop function ACT_FCT_GROUP_ID_OR_ID_;
--- drop function ACT_FCT_RESOURCE_ID_OR_ID_;
+drop function ACT_FCT_USER_ID_OR_ID_;
+drop function ACT_FCT_GROUP_ID_OR_ID_;
+drop function ACT_FCT_RESOURCE_ID_OR_ID_;
 
 drop index if exists ACT_IDX_EVENT_SUBSCR_CONFIG_;
 drop index if exists ACT_IDX_ATHRZ_PROCEDEF;

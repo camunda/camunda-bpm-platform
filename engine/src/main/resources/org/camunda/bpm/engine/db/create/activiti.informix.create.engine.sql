@@ -336,15 +336,9 @@ alter table ACT_RU_INCIDENT
 	constraint ACT_FK_INC_RCAUSE;
 
 -- These functions cannot be created atomatically, because every line is terminated by a semicolon and therefore executed seperately. --
--- create function if not exists ACT_FCT_USER_ID_OR_ID_(USER_ID_ varchar(255),ID_ varchar(64)) returning varchar(255) WITH (NOT VARIANT); --
---	return nvl(USER_ID_,ID_); --
--- end function; --
--- create function if not exists ACT_FCT_GROUP_ID_OR_ID_(GROUP_ID_ varchar(255),ID_ varchar(64)) returning varchar(255) WITH (NOT VARIANT); --
---	return nvl(GROUP_ID_,ID_); --
--- end function; --
--- create function if not exists ACT_FCT_RESOURCE_ID_OR_ID_(RESOURCE_ID_ varchar(64),ID_ varchar(64)) returning varchar(64) WITH (NOT VARIANT); --
--- 	return nvl(RESOURCE_ID_,ID_); --
--- end function; --
+create function if not exists ACT_FCT_USER_ID_OR_ID_(USER_ID_ varchar(255),ID_ varchar(64)) returning varchar(255) WITH (NOT VARIANT); return nvl(USER_ID_,ID_); end function;
+create function if not exists ACT_FCT_GROUP_ID_OR_ID_(GROUP_ID_ varchar(255),ID_ varchar(64)) returning varchar(255) WITH (NOT VARIANT); return nvl(GROUP_ID_,ID_); end function;
+create function if not exists ACT_FCT_RESOURCE_ID_OR_ID_(RESOURCE_ID_ varchar(64),ID_ varchar(64)) returning varchar(64) WITH (NOT VARIANT); return nvl(RESOURCE_ID_,ID_); end function;
 create unique index if not exists ACT_UNIQ_AUTH_USER on ACT_RU_AUTHORIZATION(TYPE_,ACT_FCT_USER_ID_OR_ID_(USER_ID_,ID_),RESOURCE_TYPE_,ACT_FCT_RESOURCE_ID_OR_ID_(RESOURCE_ID_,ID_));
 create unique index if not exists ACT_UNIQ_AUTH_GROUP on ACT_RU_AUTHORIZATION(TYPE_,ACT_FCT_GROUP_ID_OR_ID_(GROUP_ID_,ID_),RESOURCE_TYPE_,ACT_FCT_RESOURCE_ID_OR_ID_(RESOURCE_ID_,ID_));
 
