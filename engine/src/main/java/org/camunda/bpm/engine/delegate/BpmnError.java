@@ -16,6 +16,8 @@ package org.camunda.bpm.engine.delegate;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.bpmn.parser.Error;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
+
 
 /**
  * Special exception that can be used to throw a BPMN Error from
@@ -47,12 +49,7 @@ public class BpmnError extends ProcessEngineException {
   }
 
   protected void setErrorCode(String errorCode) {
-    if (errorCode == null) {
-      throw new ProcessEngineException("Error Code must not be null.");
-    }
-    if (errorCode.length() < 1) {
-      throw new ProcessEngineException("Error Code must not be empty.");
-    }
+    ensureNotEmpty("Error Code", errorCode);
     this.errorCode = errorCode;
   }
 

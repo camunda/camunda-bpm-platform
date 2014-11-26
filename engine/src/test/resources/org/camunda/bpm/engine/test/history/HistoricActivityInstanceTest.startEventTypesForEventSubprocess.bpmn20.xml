@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd" id="_vyCYMIHNEeOgYaPSoyiEDA" targetNamespace="http://activiti.org/bpmn">
+  <message id="Message_1" name="newMessage"/>
+  <signal id="Signal_1" name="newSignal"/>
+  
+  <process id="process" isExecutable="true">
+    <startEvent id="start"/>
+    <sequenceFlow id="SequenceFlow_1" name="" sourceRef="start" targetRef="exclusiveGw"/>
+
+    <exclusiveGateway id="exclusiveGw" name="Exclusive Gateway" />
+    
+    <sequenceFlow id="flow2" sourceRef="exclusiveGw" targetRef="taskBeforeInterruptingEventSuprocess">
+      <conditionExpression xsi:type="tFormalExpression">
+        <![CDATA[${!shouldThrowError}]]>
+      </conditionExpression>
+    </sequenceFlow>
+    
+    <sequenceFlow id="flow3" sourceRef="exclusiveGw" targetRef="errorEnd">
+      <conditionExpression xsi:type="tFormalExpression">
+        <![CDATA[${shouldThrowError}]]>
+      </conditionExpression>
+    </sequenceFlow>
+
+    <endEvent id="errorEnd">
+      <errorEventDefinition errorRef="myError" />
+    </endEvent>
+    
+    <userTask id="taskBeforeInterruptingEventSuprocess"/>
+    <sequenceFlow id="SequenceFlow_2" name="" sourceRef="taskBeforeInterruptingEventSuprocess" targetRef="end1"/>
+    <endEvent id="end1"/>
+    
+    <!-- message event subprocess -->
+    <subProcess id="SubProcess_1" triggeredByEvent="true">
+      <startEvent id="messageStartEvent">
+        <messageEventDefinition id="_MessageEventDefinition_2" messageRef="Message_1"/>
+      </startEvent>
+      <userTask id="taskAfterMessageStartEvent"/>
+      <sequenceFlow id="SequenceFlow_3" name="" sourceRef="messageStartEvent" targetRef="taskAfterMessageStartEvent"/>
+      <endEvent id="end2"/>
+      <sequenceFlow id="SequenceFlow_4" name="" sourceRef="taskAfterMessageStartEvent" targetRef="end2"/>
+    </subProcess>
+
+    <!-- signal event subprocess -->    
+    <subProcess id="SubProcess_2" triggeredByEvent="true">
+      <startEvent id="signalStartEvent">
+        <signalEventDefinition id="_SignalEventDefinition_2" signalRef="Signal_1"/>
+      </startEvent>
+      <userTask id="tastAfterSignalStartEvent"/>
+      <sequenceFlow id="SequenceFlow_5" name="" sourceRef="signalStartEvent" targetRef="tastAfterSignalStartEvent"/>
+      <endEvent id="end3"/>
+      <sequenceFlow id="SequenceFlow_6" name="" sourceRef="tastAfterSignalStartEvent" targetRef="end3"/>
+    </subProcess>
+    
+    <!-- timer event subprocess -->    
+    <subProcess id="SubProcess_3" triggeredByEvent="true">
+      <startEvent id="timerStartEvent">
+        <timerEventDefinition>
+          <timeDate>PT10M</timeDate>
+        </timerEventDefinition>
+      </startEvent>
+      
+      <userTask id="tastAfterTimerStartEvent"/>
+      <sequenceFlow id="SequenceFlow_7" name="" sourceRef="timerStartEvent" targetRef="tastAfterTimerStartEvent"/>
+      <endEvent id="end4"/>
+      <sequenceFlow id="SequenceFlow_8" name="" sourceRef="tastAfterTimerStartEvent" targetRef="end4"/>
+    </subProcess>
+    
+    <!-- error event subprocess -->    
+    <subProcess id="SubProcess_4" triggeredByEvent="true">
+      <startEvent id="errorStartEvent">
+        <errorEventDefinition />
+      </startEvent>
+      <userTask id="tastAfterErrorStartEvent"/>
+      <sequenceFlow id="SequenceFlow_9" name="" sourceRef="errorStartEvent" targetRef="tastAfterErrorStartEvent"/>
+      <endEvent id="end5"/>
+      <sequenceFlow id="SequenceFlow_10" name="" sourceRef="tastAfterErrorStartEvent" targetRef="end5"/>
+    </subProcess>
+  </process>
+</definitions>

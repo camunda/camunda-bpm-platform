@@ -12,6 +12,7 @@
  */
 package org.camunda.bpm.engine.impl.util.xml;
 
+import org.camunda.bpm.engine.BpmnParseException;
 import org.xml.sax.SAXParseException;
 
 
@@ -27,15 +28,7 @@ public class Problem {
   protected int column;
 
   public Problem(SAXParseException e, String resource) {
-    Throwable exception = e;
-    while (exception!=null) {
-      if (this.errorMessage==null) {
-        this.errorMessage = exception.getMessage(); 
-      } else {
-        this.errorMessage += ": "+exception.getMessage();
-      }
-      exception = exception.getCause();
-    }
+    concatenateErrorMessages(e);
     this.resource = resource;
     this.line = e.getLineNumber();
     this.column = e.getColumnNumber();
@@ -49,7 +42,29 @@ public class Problem {
       this.column = element.getColumn();
     }
   }
-  
+
+  public Problem(BpmnParseException exception, String resourceName) {
+    concatenateErrorMessages(exception);
+    this.resource = resourceName;
+    Element element = exception.getElement();
+    if (element != null) {
+      this.line = element.getLine();
+      this.column = element.getColumn();
+    }
+  }
+
+  protected void concatenateErrorMessages(Throwable throwable) {
+    while (throwable != null) {
+      if (errorMessage == null) {
+        errorMessage = throwable.getMessage();
+      }
+      else {
+        errorMessage += ": " + throwable.getMessage();
+      }
+      throwable = throwable.getCause();
+    }
+  }
+
   public String toString() {
     return errorMessage+(resource!=null ? " | "+resource : "")+" | line "+line+" | column "+column;
   }

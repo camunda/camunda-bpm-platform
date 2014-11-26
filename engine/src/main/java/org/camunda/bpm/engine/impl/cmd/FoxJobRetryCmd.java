@@ -5,6 +5,7 @@ import java.io.StringWriter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.camunda.bpm.engine.OptimisticLockingException;
 import org.camunda.bpm.engine.impl.bpmn.parser.FoxFailedJobParseListener;
 import org.camunda.bpm.engine.impl.calendar.DurationHelper;
 import org.camunda.bpm.engine.impl.cfg.TransactionContext;
@@ -85,7 +86,9 @@ public class FoxJobRetryCmd implements Command<Object> {
         job.setExceptionStacktrace(getExceptionStacktrace());
       }
 
-      job.setRetries(job.getRetries() - 1);
+      if (exception == null || shouldDecrementRetriesFor(exception)) {
+        job.setRetries(job.getRetries() - 1);
+      }
 
       JobExecutor jobExecutor = Context.getProcessEngineConfiguration().getJobExecutor();
       MessageAddedNotification messageAddedNotification = new MessageAddedNotification(jobExecutor);
@@ -137,6 +140,10 @@ public class FoxJobRetryCmd implements Command<Object> {
   private void executeStandardStrategy(CommandContext commandContext) {
     DecrementJobRetriesCmd decrementCmd = new DecrementJobRetriesCmd(jobId, exception);
     decrementCmd.execute(commandContext);
+  }
+
+  protected boolean shouldDecrementRetriesFor(Throwable t) {
+    return !(t instanceof OptimisticLockingException);
   }
 
 }

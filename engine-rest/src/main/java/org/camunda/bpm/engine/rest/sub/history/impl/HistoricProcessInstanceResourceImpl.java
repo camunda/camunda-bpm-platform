@@ -40,8 +40,7 @@ public class HistoricProcessInstanceResourceImpl implements HistoricProcessInsta
       throw new InvalidRequestException(Status.NOT_FOUND, "Historic process instance with id " + processInstanceId + " does not exist");
     }
 
-    HistoricProcessInstanceDto result = HistoricProcessInstanceDto.fromHistoricProcessInstance(instance);
-    return result;
+    return HistoricProcessInstanceDto.fromHistoricProcessInstance(instance);
   }
 
 }

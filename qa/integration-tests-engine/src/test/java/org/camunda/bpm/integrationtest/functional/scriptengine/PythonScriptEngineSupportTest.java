@@ -19,12 +19,12 @@ import org.jboss.shrinkwrap.api.spec.WebArchive;
 /**
  * @author Sebastian Menski
  */
-public class PythonScriptEngineSupportTest extends ScriptEngineSupportTest {
+public class PythonScriptEngineSupportTest extends AbstractScriptEngineSupportTest {
 
   @Deployment
   public static WebArchive createProcessApplication() {
     return initWebArchiveDeployment()
-      .addClass(ScriptEngineSupportTest.class)
+      .addClass(AbstractScriptEngineSupportTest.class)
       .addAsResource(createScriptTaskProcess("python", EXAMPLE_SCRIPT), "process.bpmn20.xml");
   }
 

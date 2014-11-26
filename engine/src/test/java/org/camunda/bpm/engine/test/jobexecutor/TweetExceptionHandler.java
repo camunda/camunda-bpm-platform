@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -24,28 +24,30 @@ import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
  * @author Tom Baeyens
  */
 public class TweetExceptionHandler implements JobHandler {
-  
+
   private static Logger log = Logger.getLogger(TweetExceptionHandler.class.getName());
-  
+
+  public static final String TYPE = "tweet-exception";
+
   protected AtomicInteger exceptionsRemaining = new AtomicInteger(2);
 
   public String getType() {
-    return "tweet-exception";
+    return TYPE;
   }
 
   public void execute(String configuration, ExecutionEntity execution, CommandContext commandContext) {
-    if (exceptionsRemaining.decrementAndGet() >= 0) {      
+    if (exceptionsRemaining.decrementAndGet() >= 0) {
       throw new RuntimeException("exception remaining: "+exceptionsRemaining);
     }
-    log.info("no more exceptions to throw."); 
+    log.info("no more exceptions to throw.");
   }
 
-  
+
   public int getExceptionsRemaining() {
     return exceptionsRemaining.get();
   }
 
-  
+
   public void setExceptionsRemaining(int exceptionsRemaining) {
     this.exceptionsRemaining.set(exceptionsRemaining);
   }

@@ -39,7 +39,6 @@ Contents:
         
         http://localhost:8080/camunda
         http://localhost:8080/engine-rest
-        http://localhost:8080/cycle
 
   sql/
         This directory contains the create and upgrade sql script

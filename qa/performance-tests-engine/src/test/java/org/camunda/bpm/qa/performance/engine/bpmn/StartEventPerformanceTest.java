@@ -28,7 +28,7 @@ public class StartEventPerformanceTest extends ProcessEnginePerformanceTestCase 
   @Deployment
   public void noneStartEvent() {
 
-    perfomanceTest()
+    performanceTest()
       .step(new StartProcessInstanceStep(engine, "process"))
     .run();
 
@@ -38,7 +38,7 @@ public class StartEventPerformanceTest extends ProcessEnginePerformanceTestCase 
   @Deployment
   public void messageStartEvent() {
 
-    perfomanceTest()
+    performanceTest()
       .step(new StartProcessInstanceByMessageStep(engine, "message"))
     .run();
 

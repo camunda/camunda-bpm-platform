@@ -38,7 +38,7 @@ public class VariableHistoryLevelCompatibilityTest extends ResourceProcessEngine
   }
 
   public void testCompatibilty() {
-    int historyLevel = processEngineConfiguration.getHistoryLevel();
+    int historyLevel = processEngineConfiguration.getHistoryLevel().getId();
     assertEquals(ProcessEngineConfigurationImpl.HISTORYLEVEL_ACTIVITY, historyLevel);
   }
    

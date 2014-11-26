@@ -13,8 +13,10 @@
 package org.camunda.bpm.engine.rest.sub.repository;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -27,12 +29,14 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 import org.camunda.bpm.engine.rest.dto.StatisticsResultDto;
+import org.camunda.bpm.engine.rest.dto.VariableValueDto;
 import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionDiagramDto;
 import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionDto;
 import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionSuspensionStateDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.runtime.StartProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.task.FormDto;
+import org.camunda.bpm.engine.rest.sub.VariableResource;
 
 public interface ProcessDefinitionResource {
 
@@ -81,4 +85,9 @@ public interface ProcessDefinitionResource {
   @Consumes(MediaType.APPLICATION_JSON)
   void updateSuspensionState(ProcessDefinitionSuspensionStateDto dto);
 
+  @GET
+  @Path("/form-variables")
+  @Produces(MediaType.APPLICATION_JSON)
+  Map<String, VariableValueDto> getFormVariables(@QueryParam("variableNames") String variableNames,
+      @QueryParam(VariableResource.DESERIALIZE_VALUES_QUERY_PARAM) @DefaultValue("true") boolean deserializeValues);
 }

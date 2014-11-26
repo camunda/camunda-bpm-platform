@@ -339,8 +339,8 @@ public abstract class AbstractHistoricActivityInstanceRestServiceQueryTest exten
     String returnedTaskId = from(content).getString("[0].taskId");
     String returnedCalledProcessInstanceId = from(content).getString("[0].calledProcessInstanceId");
     String returnedAssignee = from(content).getString("[0].assignee");
-    Date returnedStartTime = DateTimeUtil.parseDateTime(from(content).getString("[0].startTime")).toDate();
-    Date returnedEndTime = DateTimeUtil.parseDateTime(from(content).getString("[0].endTime")).toDate();
+    Date returnedStartTime = DateTimeUtil.parseDate(from(content).getString("[0].startTime"));
+    Date returnedEndTime = DateTimeUtil.parseDate(from(content).getString("[0].endTime"));
     long returnedDurationInMillis = from(content).getLong("[0].durationInMillis");
     boolean canceled = from(content).getBoolean("[0].canceled");
     boolean completeScope = from(content).getBoolean("[0].completeScope");
@@ -356,8 +356,8 @@ public abstract class AbstractHistoricActivityInstanceRestServiceQueryTest exten
     Assert.assertEquals(MockProvider.EXAMPLE_TASK_ID, returnedTaskId);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_CALLED_PROCESS_INSTANCE_ID, returnedCalledProcessInstanceId);
     Assert.assertEquals(MockProvider.EXAMPLE_TASK_ASSIGNEE_NAME, returnedAssignee);
-    Assert.assertEquals(DateTimeUtil.parseDateTime(MockProvider.EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_START_TIME).toDate(), returnedStartTime);
-    Assert.assertEquals(DateTimeUtil.parseDateTime(MockProvider.EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_END_TIME).toDate(), returnedEndTime);
+    Assert.assertEquals(DateTimeUtil.parseDate(MockProvider.EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_START_TIME), returnedStartTime);
+    Assert.assertEquals(DateTimeUtil.parseDate(MockProvider.EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_END_TIME), returnedEndTime);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_DURATION, returnedDurationInMillis);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_IS_CANCELED, canceled);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_IS_COMPLETE_SCOPE, completeScope);
@@ -638,8 +638,8 @@ public abstract class AbstractHistoricActivityInstanceRestServiceQueryTest exten
   private Map<String, Date> getCompleteStartDateQueryParameters() {
     Map<String, Date> parameters = new HashMap<String, Date>();
 
-    parameters.put("startedAfter", DateTimeUtil.parseDateTime(MockProvider.EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_STARTED_AFTER).toDate());
-    parameters.put("startedBefore", DateTimeUtil.parseDateTime(MockProvider.EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_STARTED_BEFORE).toDate());
+    parameters.put("startedAfter", DateTimeUtil.parseDate(MockProvider.EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_STARTED_AFTER));
+    parameters.put("startedBefore", DateTimeUtil.parseDate(MockProvider.EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_STARTED_BEFORE));
 
     return parameters;
   }
@@ -686,8 +686,8 @@ public abstract class AbstractHistoricActivityInstanceRestServiceQueryTest exten
   private Map<String, Date> getCompleteFinishedDateQueryParameters() {
     Map<String, Date> parameters = new HashMap<String, Date>();
 
-    parameters.put("finishedAfter", DateTimeUtil.parseDateTime(MockProvider.EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_FINISHED_AFTER).toDate());
-    parameters.put("finishedBefore", DateTimeUtil.parseDateTime(MockProvider.EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_FINISHED_BEFORE).toDate());
+    parameters.put("finishedAfter", DateTimeUtil.parseDate(MockProvider.EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_FINISHED_AFTER));
+    parameters.put("finishedBefore", DateTimeUtil.parseDate(MockProvider.EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_FINISHED_BEFORE));
 
     return parameters;
   }

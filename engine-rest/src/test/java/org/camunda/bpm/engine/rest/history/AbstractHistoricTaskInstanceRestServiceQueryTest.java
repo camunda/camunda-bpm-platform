@@ -1,7 +1,25 @@
 package org.camunda.bpm.engine.rest.history;
 
-import com.jayway.restassured.http.ContentType;
-import com.jayway.restassured.response.Response;
+import static com.jayway.restassured.RestAssured.expect;
+import static com.jayway.restassured.RestAssured.given;
+import static com.jayway.restassured.path.json.JsonPath.from;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.equalTo;
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.ws.rs.core.Response.Status;
+import javax.xml.registry.InvalidRequestException;
+
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.history.HistoricTaskInstanceQuery;
 import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
@@ -13,16 +31,8 @@ import org.junit.Test;
 import org.mockito.InOrder;
 import org.mockito.Mockito;
 
-import javax.ws.rs.core.Response.Status;
-import javax.xml.registry.InvalidRequestException;
-import java.util.*;
-
-import static com.jayway.restassured.RestAssured.expect;
-import static com.jayway.restassured.RestAssured.given;
-import static com.jayway.restassured.path.json.JsonPath.from;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.equalTo;
-import static org.mockito.Mockito.*;
+import com.jayway.restassured.http.ContentType;
+import com.jayway.restassured.response.Response;
 
 public abstract class AbstractHistoricTaskInstanceRestServiceQueryTest extends AbstractRestServiceTest {
 
@@ -282,6 +292,36 @@ public abstract class AbstractHistoricTaskInstanceRestServiceQueryTest extends A
     executeAndVerifySorting("priority", "desc", Status.OK);
     inOrder.verify(mockedQuery).orderByTaskPriority();
     inOrder.verify(mockedQuery).desc();
+
+    inOrder = Mockito.inOrder(mockedQuery);
+    executeAndVerifySorting("caseDefinitionId", "asc", Status.OK);
+    inOrder.verify(mockedQuery).orderByCaseDefinitionId();
+    inOrder.verify(mockedQuery).asc();
+
+    inOrder = Mockito.inOrder(mockedQuery);
+    executeAndVerifySorting("caseDefinitionId", "desc", Status.OK);
+    inOrder.verify(mockedQuery).orderByCaseDefinitionId();
+    inOrder.verify(mockedQuery).desc();
+
+    inOrder = Mockito.inOrder(mockedQuery);
+    executeAndVerifySorting("caseInstanceId", "asc", Status.OK);
+    inOrder.verify(mockedQuery).orderByCaseInstanceId();
+    inOrder.verify(mockedQuery).asc();
+
+    inOrder = Mockito.inOrder(mockedQuery);
+    executeAndVerifySorting("caseInstanceId", "desc", Status.OK);
+    inOrder.verify(mockedQuery).orderByCaseInstanceId();
+    inOrder.verify(mockedQuery).desc();
+
+    inOrder = Mockito.inOrder(mockedQuery);
+    executeAndVerifySorting("caseExecutionId", "asc", Status.OK);
+    inOrder.verify(mockedQuery).orderByCaseExecutionId();
+    inOrder.verify(mockedQuery).asc();
+
+    inOrder = Mockito.inOrder(mockedQuery);
+    executeAndVerifySorting("caseExecutionId", "desc", Status.OK);
+    inOrder.verify(mockedQuery).orderByCaseExecutionId();
+    inOrder.verify(mockedQuery).desc();
   }
 
   @Test
@@ -383,14 +423,17 @@ public abstract class AbstractHistoricTaskInstanceRestServiceQueryTest extends A
     String returnedDeleteReason = from(content).getString("[0].deleteReason");
     String returnedOwner = from(content).getString("[0].owner");
     String returnedAssignee = from(content).getString("[0].assignee");
-    Date returnedStartTime = DateTimeUtil.parseDateTime(from(content).getString("[0].startTime")).toDate();
-    Date returnedEndTime = DateTimeUtil.parseDateTime(from(content).getString("[0].endTime")).toDate();
+    Date returnedStartTime = DateTimeUtil.parseDate(from(content).getString("[0].startTime"));
+    Date returnedEndTime = DateTimeUtil.parseDate(from(content).getString("[0].endTime"));
     Long returnedDurationInMillis = from(content).getLong("[0].duration");
     String returnedTaskDefinitionKey = from(content).getString("[0].taskDefinitionKey");
     int returnedPriority = from(content).getInt("[0].priority");
     String returnedParentTaskId = from(content).getString("[0].parentTaskId");
-    Date returnedDue = DateTimeUtil.parseDateTime(from(content).getString("[0].due")).toDate();
-    Date returnedFollow = DateTimeUtil.parseDateTime(from(content).getString("[0].followUp")).toDate();
+    Date returnedDue = DateTimeUtil.parseDate(from(content).getString("[0].due"));
+    Date returnedFollow = DateTimeUtil.parseDate(from(content).getString("[0].followUp"));
+    String returnedCaseDefinitionId = from(content).getString("[0].caseDefinitionId");
+    String returnedCaseInstanceId = from(content).getString("[0].caseInstanceId");
+    String returnedCaseExecutionId = from(content).getString("[0].caseExecutionId");
 
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_TASK_INST_ID, returnedId);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_TASK_INST_PROC_INST_ID, returnedProcessInstanceId);
@@ -402,14 +445,17 @@ public abstract class AbstractHistoricTaskInstanceRestServiceQueryTest extends A
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_TASK_INST_DELETE_REASON, returnedDeleteReason);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_TASK_INST_OWNER, returnedOwner);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_TASK_INST_ASSIGNEE, returnedAssignee);
-    Assert.assertEquals(DateTimeUtil.parseDateTime(MockProvider.EXAMPLE_HISTORIC_TASK_INST_START_TIME).toDate(), returnedStartTime);
-    Assert.assertEquals(DateTimeUtil.parseDateTime(MockProvider.EXAMPLE_HISTORIC_TASK_INST_END_TIME).toDate(), returnedEndTime);
+    Assert.assertEquals(DateTimeUtil.parseDate(MockProvider.EXAMPLE_HISTORIC_TASK_INST_START_TIME), returnedStartTime);
+    Assert.assertEquals(DateTimeUtil.parseDate(MockProvider.EXAMPLE_HISTORIC_TASK_INST_END_TIME), returnedEndTime);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_TASK_INST_DURATION, returnedDurationInMillis);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_TASK_INST_DEF_KEY, returnedTaskDefinitionKey);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_TASK_INST_PRIORITY, returnedPriority);
-    Assert.assertEquals(DateTimeUtil.parseDateTime(MockProvider.EXAMPLE_HISTORIC_TASK_INST_DUE_DATE).toDate(), returnedDue);
-    Assert.assertEquals(DateTimeUtil.parseDateTime(MockProvider.EXAMPLE_HISTORIC_TASK_INST_FOLLOW_UP_DATE).toDate(), returnedFollow);
+    Assert.assertEquals(DateTimeUtil.parseDate(MockProvider.EXAMPLE_HISTORIC_TASK_INST_DUE_DATE), returnedDue);
+    Assert.assertEquals(DateTimeUtil.parseDate(MockProvider.EXAMPLE_HISTORIC_TASK_INST_FOLLOW_UP_DATE), returnedFollow);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_TASK_INST_PARENT_TASK_ID, returnedParentTaskId);
+    Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_TASK_INST_CASE_DEF_ID, returnedCaseDefinitionId);
+    Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_TASK_INST_CASE_INST_ID, returnedCaseInstanceId);
+    Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_TASK_INST_CASE_EXEC_ID, returnedCaseExecutionId);
   }
 
   @Test
@@ -441,14 +487,17 @@ public abstract class AbstractHistoricTaskInstanceRestServiceQueryTest extends A
     String returnedDeleteReason = from(content).getString("[0].deleteReason");
     String returnedOwner = from(content).getString("[0].owner");
     String returnedAssignee = from(content).getString("[0].assignee");
-    Date returnedStartTime = DateTimeUtil.parseDateTime(from(content).getString("[0].startTime")).toDate();
-    Date returnedEndTime = DateTimeUtil.parseDateTime(from(content).getString("[0].endTime")).toDate();
+    Date returnedStartTime = DateTimeUtil.parseDate(from(content).getString("[0].startTime"));
+    Date returnedEndTime = DateTimeUtil.parseDate(from(content).getString("[0].endTime"));
     Long returnedDurationInMillis = from(content).getLong("[0].duration");
     String returnedTaskDefinitionKey = from(content).getString("[0].taskDefinitionKey");
     int returnedPriority = from(content).getInt("[0].priority");
     String returnedParentTaskId = from(content).getString("[0].parentTaskId");
-    Date returnedDue = DateTimeUtil.parseDateTime(from(content).getString("[0].due")).toDate();
-    Date returnedFollow = DateTimeUtil.parseDateTime(from(content).getString("[0].followUp")).toDate();
+    Date returnedDue = DateTimeUtil.parseDate(from(content).getString("[0].due"));
+    Date returnedFollow = DateTimeUtil.parseDate(from(content).getString("[0].followUp"));
+    String returnedCaseDefinitionId = from(content).getString("[0].caseDefinitionId");
+    String returnedCaseInstanceId = from(content).getString("[0].caseInstanceId");
+    String returnedCaseExecutionId = from(content).getString("[0].caseExecutionId");
 
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_TASK_INST_ID, returnedId);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_TASK_INST_PROC_INST_ID, returnedProcessInstanceId);
@@ -460,14 +509,17 @@ public abstract class AbstractHistoricTaskInstanceRestServiceQueryTest extends A
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_TASK_INST_DELETE_REASON, returnedDeleteReason);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_TASK_INST_OWNER, returnedOwner);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_TASK_INST_ASSIGNEE, returnedAssignee);
-    Assert.assertEquals(DateTimeUtil.parseDateTime(MockProvider.EXAMPLE_HISTORIC_TASK_INST_START_TIME).toDate(), returnedStartTime);
-    Assert.assertEquals(DateTimeUtil.parseDateTime(MockProvider.EXAMPLE_HISTORIC_TASK_INST_END_TIME).toDate(), returnedEndTime);
+    Assert.assertEquals(DateTimeUtil.parseDate(MockProvider.EXAMPLE_HISTORIC_TASK_INST_START_TIME), returnedStartTime);
+    Assert.assertEquals(DateTimeUtil.parseDate(MockProvider.EXAMPLE_HISTORIC_TASK_INST_END_TIME), returnedEndTime);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_TASK_INST_DURATION, returnedDurationInMillis);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_TASK_INST_DEF_KEY, returnedTaskDefinitionKey);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_TASK_INST_PRIORITY, returnedPriority);
-    Assert.assertEquals(DateTimeUtil.parseDateTime(MockProvider.EXAMPLE_HISTORIC_TASK_INST_DUE_DATE).toDate(), returnedDue);
-    Assert.assertEquals(DateTimeUtil.parseDateTime(MockProvider.EXAMPLE_HISTORIC_TASK_INST_FOLLOW_UP_DATE).toDate(), returnedFollow);
+    Assert.assertEquals(DateTimeUtil.parseDate(MockProvider.EXAMPLE_HISTORIC_TASK_INST_DUE_DATE), returnedDue);
+    Assert.assertEquals(DateTimeUtil.parseDate(MockProvider.EXAMPLE_HISTORIC_TASK_INST_FOLLOW_UP_DATE), returnedFollow);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_TASK_INST_PARENT_TASK_ID, returnedParentTaskId);
+    Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_TASK_INST_CASE_DEF_ID, returnedCaseDefinitionId);
+    Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_TASK_INST_CASE_INST_ID, returnedCaseInstanceId);
+    Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_TASK_INST_CASE_EXEC_ID, returnedCaseExecutionId);
   }
 
   @Test
@@ -1172,7 +1224,7 @@ public abstract class AbstractHistoricTaskInstanceRestServiceQueryTest extends A
       .then().expect().statusCode(Status.OK.getStatusCode())
       .when().get(HISTORIC_TASK_INSTANCE_RESOURCE_URL);
 
-    verify(mockedQuery).taskDueDate(DateTimeUtil.parseDateTime(due).toDate());
+    verify(mockedQuery).taskDueDate(DateTimeUtil.parseDate(due));
   }
 
   @Test
@@ -1180,7 +1232,7 @@ public abstract class AbstractHistoricTaskInstanceRestServiceQueryTest extends A
     String due = MockProvider.EXAMPLE_HISTORIC_TASK_INST_DUE_DATE;
 
     Map<String, Object> params = new HashMap<String, Object>();
-    params.put("taskDueDate", DateTimeUtil.parseDateTime(due).toDate());
+    params.put("taskDueDate", DateTimeUtil.parseDate(due));
 
     given()
       .contentType(POST_JSON_CONTENT_TYPE)
@@ -1188,7 +1240,7 @@ public abstract class AbstractHistoricTaskInstanceRestServiceQueryTest extends A
       .then().expect().statusCode(Status.OK.getStatusCode())
       .when().post(HISTORIC_TASK_INSTANCE_RESOURCE_URL);
 
-    verify(mockedQuery).taskDueDate(DateTimeUtil.parseDateTime(due).toDate());
+    verify(mockedQuery).taskDueDate(DateTimeUtil.parseDate(due));
   }
 
   @Test
@@ -1200,7 +1252,7 @@ public abstract class AbstractHistoricTaskInstanceRestServiceQueryTest extends A
       .then().expect().statusCode(Status.OK.getStatusCode())
       .when().get(HISTORIC_TASK_INSTANCE_RESOURCE_URL);
 
-    verify(mockedQuery).taskDueBefore(DateTimeUtil.parseDateTime(due).toDate());
+    verify(mockedQuery).taskDueBefore(DateTimeUtil.parseDate(due));
   }
 
   @Test
@@ -1208,7 +1260,7 @@ public abstract class AbstractHistoricTaskInstanceRestServiceQueryTest extends A
     String due = MockProvider.EXAMPLE_HISTORIC_TASK_INST_DUE_DATE;
 
     Map<String, Object> params = new HashMap<String, Object>();
-    params.put("taskDueDateBefore", DateTimeUtil.parseDateTime(due).toDate());
+    params.put("taskDueDateBefore", DateTimeUtil.parseDate(due));
 
     given()
       .contentType(POST_JSON_CONTENT_TYPE)
@@ -1216,7 +1268,7 @@ public abstract class AbstractHistoricTaskInstanceRestServiceQueryTest extends A
       .then().expect().statusCode(Status.OK.getStatusCode())
       .when().post(HISTORIC_TASK_INSTANCE_RESOURCE_URL);
 
-    verify(mockedQuery).taskDueBefore(DateTimeUtil.parseDateTime(due).toDate());
+    verify(mockedQuery).taskDueBefore(DateTimeUtil.parseDate(due));
   }
 
   @Test
@@ -1228,7 +1280,7 @@ public abstract class AbstractHistoricTaskInstanceRestServiceQueryTest extends A
       .then().expect().statusCode(Status.OK.getStatusCode())
       .when().get(HISTORIC_TASK_INSTANCE_RESOURCE_URL);
 
-    verify(mockedQuery).taskDueAfter(DateTimeUtil.parseDateTime(due).toDate());
+    verify(mockedQuery).taskDueAfter(DateTimeUtil.parseDate(due));
   }
 
   @Test
@@ -1236,7 +1288,7 @@ public abstract class AbstractHistoricTaskInstanceRestServiceQueryTest extends A
     String due = MockProvider.EXAMPLE_HISTORIC_TASK_INST_DUE_DATE;
 
     Map<String, Object> params = new HashMap<String, Object>();
-    params.put("taskDueDateAfter", DateTimeUtil.parseDateTime(due).toDate());
+    params.put("taskDueDateAfter", DateTimeUtil.parseDate(due));
 
     given()
       .contentType(POST_JSON_CONTENT_TYPE)
@@ -1244,7 +1296,7 @@ public abstract class AbstractHistoricTaskInstanceRestServiceQueryTest extends A
       .then().expect().statusCode(Status.OK.getStatusCode())
       .when().post(HISTORIC_TASK_INSTANCE_RESOURCE_URL);
 
-    verify(mockedQuery).taskDueAfter(DateTimeUtil.parseDateTime(due).toDate());
+    verify(mockedQuery).taskDueAfter(DateTimeUtil.parseDate(due));
   }
 
   @Test
@@ -1256,7 +1308,7 @@ public abstract class AbstractHistoricTaskInstanceRestServiceQueryTest extends A
       .then().expect().statusCode(Status.OK.getStatusCode())
       .when().get(HISTORIC_TASK_INSTANCE_RESOURCE_URL);
 
-    verify(mockedQuery).taskFollowUpDate(DateTimeUtil.parseDateTime(followUp).toDate());
+    verify(mockedQuery).taskFollowUpDate(DateTimeUtil.parseDate(followUp));
   }
 
   @Test
@@ -1264,7 +1316,7 @@ public abstract class AbstractHistoricTaskInstanceRestServiceQueryTest extends A
     String followUp = MockProvider.EXAMPLE_HISTORIC_TASK_INST_FOLLOW_UP_DATE;
 
     Map<String, Object> params = new HashMap<String, Object>();
-    params.put("taskFollowUpDate", DateTimeUtil.parseDateTime(followUp).toDate());
+    params.put("taskFollowUpDate", DateTimeUtil.parseDate(followUp));
 
     given()
       .contentType(POST_JSON_CONTENT_TYPE)
@@ -1272,7 +1324,7 @@ public abstract class AbstractHistoricTaskInstanceRestServiceQueryTest extends A
       .then().expect().statusCode(Status.OK.getStatusCode())
       .when().post(HISTORIC_TASK_INSTANCE_RESOURCE_URL);
 
-    verify(mockedQuery).taskFollowUpDate(DateTimeUtil.parseDateTime(followUp).toDate());
+    verify(mockedQuery).taskFollowUpDate(DateTimeUtil.parseDate(followUp));
   }
 
   @Test
@@ -1284,7 +1336,7 @@ public abstract class AbstractHistoricTaskInstanceRestServiceQueryTest extends A
       .then().expect().statusCode(Status.OK.getStatusCode())
       .when().get(HISTORIC_TASK_INSTANCE_RESOURCE_URL);
 
-    verify(mockedQuery).taskFollowUpBefore(DateTimeUtil.parseDateTime(followUp).toDate());
+    verify(mockedQuery).taskFollowUpBefore(DateTimeUtil.parseDate(followUp));
   }
 
   @Test
@@ -1292,7 +1344,7 @@ public abstract class AbstractHistoricTaskInstanceRestServiceQueryTest extends A
     String followUp = MockProvider.EXAMPLE_HISTORIC_TASK_INST_FOLLOW_UP_DATE;
 
     Map<String, Object> params = new HashMap<String, Object>();
-    params.put("taskFollowUpDateBefore", DateTimeUtil.parseDateTime(followUp).toDate());
+    params.put("taskFollowUpDateBefore", DateTimeUtil.parseDate(followUp));
 
     given()
       .contentType(POST_JSON_CONTENT_TYPE)
@@ -1300,7 +1352,7 @@ public abstract class AbstractHistoricTaskInstanceRestServiceQueryTest extends A
       .then().expect().statusCode(Status.OK.getStatusCode())
       .when().post(HISTORIC_TASK_INSTANCE_RESOURCE_URL);
 
-    verify(mockedQuery).taskFollowUpBefore(DateTimeUtil.parseDateTime(followUp).toDate());
+    verify(mockedQuery).taskFollowUpBefore(DateTimeUtil.parseDate(followUp));
   }
 
   @Test
@@ -1312,7 +1364,7 @@ public abstract class AbstractHistoricTaskInstanceRestServiceQueryTest extends A
       .then().expect().statusCode(Status.OK.getStatusCode())
       .when().get(HISTORIC_TASK_INSTANCE_RESOURCE_URL);
 
-    verify(mockedQuery).taskFollowUpAfter(DateTimeUtil.parseDateTime(followUp).toDate());
+    verify(mockedQuery).taskFollowUpAfter(DateTimeUtil.parseDate(followUp));
   }
 
   @Test
@@ -1320,7 +1372,7 @@ public abstract class AbstractHistoricTaskInstanceRestServiceQueryTest extends A
     String followUp = MockProvider.EXAMPLE_HISTORIC_TASK_INST_FOLLOW_UP_DATE;
 
     Map<String, Object> params = new HashMap<String, Object>();
-    params.put("taskFollowUpDateAfter", DateTimeUtil.parseDateTime(followUp).toDate());
+    params.put("taskFollowUpDateAfter", DateTimeUtil.parseDate(followUp));
 
     given()
       .contentType(POST_JSON_CONTENT_TYPE)
@@ -1328,7 +1380,7 @@ public abstract class AbstractHistoricTaskInstanceRestServiceQueryTest extends A
       .then().expect().statusCode(Status.OK.getStatusCode())
       .when().post(HISTORIC_TASK_INSTANCE_RESOURCE_URL);
 
-    verify(mockedQuery).taskFollowUpAfter(DateTimeUtil.parseDateTime(followUp).toDate());
+    verify(mockedQuery).taskFollowUpAfter(DateTimeUtil.parseDate(followUp));
   }
 
   @Test
@@ -1553,6 +1605,146 @@ public abstract class AbstractHistoricTaskInstanceRestServiceQueryTest extends A
         .body("message", containsString("Invalid variable comparator specified: " + invalidComparator))
       .when()
         .post(HISTORIC_TASK_INSTANCE_RESOURCE_URL);
+  }
+
+  @Test
+  public void testQueryByCaseDefinitionId() {
+    String caseDefinitionId = MockProvider.EXAMPLE_HISTORIC_TASK_INST_CASE_DEF_ID;
+
+    given()
+      .queryParam("caseDefinitionId", caseDefinitionId)
+      .then().expect().statusCode(Status.OK.getStatusCode())
+      .when().get(HISTORIC_TASK_INSTANCE_RESOURCE_URL);
+
+    verify(mockedQuery).caseDefinitionId(caseDefinitionId);
+  }
+
+  @Test
+  public void testQueryByCaseDefinitionIdAsPost() {
+    String caseDefinitionId = MockProvider.EXAMPLE_HISTORIC_TASK_INST_CASE_DEF_ID;
+
+    Map<String, Object> params = new HashMap<String, Object>();
+    params.put("caseDefinitionId", caseDefinitionId);
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(params)
+      .then().expect().statusCode(Status.OK.getStatusCode())
+      .when().post(HISTORIC_TASK_INSTANCE_RESOURCE_URL);
+
+    verify(mockedQuery).caseDefinitionId(caseDefinitionId);
+  }
+
+  @Test
+  public void testQueryByCaseDefinitionKey() {
+    String caseDefinitionKey = "aCaseDefKey";
+
+    given()
+      .queryParam("caseDefinitionKey", caseDefinitionKey)
+      .then().expect().statusCode(Status.OK.getStatusCode())
+      .when().get(HISTORIC_TASK_INSTANCE_RESOURCE_URL);
+
+    verify(mockedQuery).caseDefinitionKey(caseDefinitionKey);
+  }
+
+  @Test
+  public void testQueryByCaseDefinitionKeyAsPost() {
+    String caseDefinitionKey = "aCaseDefKey";
+
+    Map<String, Object> params = new HashMap<String, Object>();
+    params.put("caseDefinitionKey", caseDefinitionKey);
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(params)
+      .then().expect().statusCode(Status.OK.getStatusCode())
+      .when().post(HISTORIC_TASK_INSTANCE_RESOURCE_URL);
+
+    verify(mockedQuery).caseDefinitionKey(caseDefinitionKey);
+  }
+
+  @Test
+  public void testQueryByCaseDefinitionName() {
+    String caseDefinitionName = "aCaseDefName";
+
+    given()
+      .queryParam("caseDefinitionName", caseDefinitionName)
+      .then().expect().statusCode(Status.OK.getStatusCode())
+      .when().get(HISTORIC_TASK_INSTANCE_RESOURCE_URL);
+
+    verify(mockedQuery).caseDefinitionName(caseDefinitionName);
+  }
+
+  @Test
+  public void testQueryByCaseDefinitionNameAsPost() {
+    String caseDefinitionName = "aCaseDefName";
+
+    Map<String, Object> params = new HashMap<String, Object>();
+    params.put("caseDefinitionName", caseDefinitionName);
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(params)
+      .then().expect().statusCode(Status.OK.getStatusCode())
+      .when().post(HISTORIC_TASK_INSTANCE_RESOURCE_URL);
+
+    verify(mockedQuery).caseDefinitionName(caseDefinitionName);
+  }
+
+  @Test
+  public void testQueryByCaseInstanceId() {
+    String caseInstanceId = MockProvider.EXAMPLE_HISTORIC_TASK_INST_CASE_INST_ID;
+
+    given()
+      .queryParam("caseInstanceId", caseInstanceId)
+      .then().expect().statusCode(Status.OK.getStatusCode())
+      .when().get(HISTORIC_TASK_INSTANCE_RESOURCE_URL);
+
+    verify(mockedQuery).caseInstanceId(caseInstanceId);
+  }
+
+  @Test
+  public void testQueryByCaseInstanceIdAsPost() {
+    String caseInstanceId = MockProvider.EXAMPLE_HISTORIC_TASK_INST_CASE_INST_ID;
+
+    Map<String, Object> params = new HashMap<String, Object>();
+    params.put("caseInstanceId", caseInstanceId);
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(params)
+      .then().expect().statusCode(Status.OK.getStatusCode())
+      .when().post(HISTORIC_TASK_INSTANCE_RESOURCE_URL);
+
+    verify(mockedQuery).caseInstanceId(caseInstanceId);
+  }
+
+  @Test
+  public void testQueryByCaseExecutionId() {
+    String caseExecutionId = MockProvider.EXAMPLE_HISTORIC_TASK_INST_CASE_EXEC_ID;
+
+    given()
+      .queryParam("caseExecutionId", caseExecutionId)
+      .then().expect().statusCode(Status.OK.getStatusCode())
+      .when().get(HISTORIC_TASK_INSTANCE_RESOURCE_URL);
+
+    verify(mockedQuery).caseExecutionId(caseExecutionId);
+  }
+
+  @Test
+  public void testQueryByCaseExecutionIdAsPost() {
+    String caseExecutionId = MockProvider.EXAMPLE_HISTORIC_TASK_INST_CASE_EXEC_ID;
+
+    Map<String, Object> params = new HashMap<String, Object>();
+    params.put("caseExecutionId", caseExecutionId);
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(params)
+      .then().expect().statusCode(Status.OK.getStatusCode())
+      .when().post(HISTORIC_TASK_INSTANCE_RESOURCE_URL);
+
+    verify(mockedQuery).caseExecutionId(caseExecutionId);
   }
 
 }

@@ -12,11 +12,17 @@
  */
 package org.camunda.bpm.engine.test.api.runtime;
 
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.SuspendedEntityInteractionException;
-import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.impl.test.TestHelper;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.EventSubscription;
@@ -25,11 +31,6 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.IdentityLinkType;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
-
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
 
 /**
  * @author Daniel Meyer
@@ -103,6 +104,9 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     runtimeService.activateProcessInstanceByProcessDefinitionKey(processDefinition.getKey());
     processInstance = runtimeService.createProcessInstanceQuery().singleResult();
     assertFalse(processInstance.isSuspended());
+
+    // db cleanup
+    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
@@ -140,6 +144,8 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
       fail("Should not fail");
     }
 
+    // db cleanup
+    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
@@ -176,6 +182,8 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
       fail("Should not fail");
     }
 
+    // db cleanup
+    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
   @Deployment(resources={
@@ -258,6 +266,9 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     assertEquals(1, runtimeService.createProcessInstanceQuery().suspended().count());
 
     assertEquals(piToSuspend.getId(), runtimeService.createProcessInstanceQuery().suspended().singleResult().getId());
+
+    // db cleanup
+    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
@@ -333,6 +344,9 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     for (Task task : tasks) {
       assertFalse(task.isSuspended());
     }
+
+    // db cleanup
+    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
@@ -420,6 +434,9 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     task = taskService.createTaskQuery().singleResult();
     taskService.complete(task.getId());
     assertEquals(0, runtimeService.createProcessInstanceQuery().count());
+
+    // db cleanup
+    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
   @Deployment
@@ -498,6 +515,9 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
       }
     }
     assertEquals(0, runtimeService.createProcessInstanceQuery().count());
+
+    // db cleanup
+    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
@@ -636,7 +656,6 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
       fail("This should be possible");
     }
 
-
     try {
       runtimeService.removeVariablesLocal(processInstance.getId(), Arrays.asList("one", "two", "three"));
     } catch (ProcessEngineException e) {
@@ -666,6 +685,9 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     } catch (ProcessEngineException e) {
       fail("This should be possible");
     }
+
+    // db cleanup
+    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
@@ -708,6 +730,9 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     } catch(SuspendedEntityInteractionException e) {
       // This is expected
     }
+
+    // db cleanup
+    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
@@ -789,6 +814,9 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
       assertTextPresent("is suspended", e.getMessage());
       assertTrue(e instanceof BadUserRequestException);
     }
+
+    // db cleanup
+    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
   @Deployment
@@ -861,6 +889,9 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
       // This is expected
       assertTextPresent("is suspended", e.getMessage());
     }
+
+    // db cleanup
+    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
   @Deployment
@@ -992,6 +1023,9 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     runtimeService.activateProcessInstanceById(processInstance.getId());
     runtimeService.signalEventReceived(signal);
     assertEquals(0, runtimeService.createProcessInstanceQuery().count());
+
+    // db cleanup
+    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
@@ -1331,6 +1365,8 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
       // This is good
     }
 
+    // db cleanup
+    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
@@ -1382,6 +1418,9 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
       fail("Creating sub tasks for suspended task should not be possible");
     } catch (SuspendedEntityInteractionException e) {
     }
+
+    // db cleanup
+    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
@@ -1448,10 +1487,10 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
       fail("should be allowed");
     }
 
-    if(processEngineConfiguration.getHistoryLevel() > ProcessEngineConfigurationImpl.HISTORYLEVEL_ACTIVITY) {
+    if(processEngineConfiguration.getHistoryLevel().getId() > HistoryLevel.HISTORY_LEVEL_ACTIVITY.getId()) {
 
       try {
-        taskService.addComment(task.getId(), processInstance.getId(), "test comment");
+        taskService.createComment(task.getId(), processInstance.getId(), "test comment");
       } catch (SuspendedEntityInteractionException e) {
         fail("should be allowed");
       }
@@ -1536,10 +1575,10 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
       fail("should be allowed");
     }
 
-    if(processEngineConfiguration.getHistoryLevel() > ProcessEngineConfigurationImpl.HISTORYLEVEL_ACTIVITY) {
+    if(processEngineConfiguration.getHistoryLevel().getId() > HistoryLevel.HISTORY_LEVEL_ACTIVITY.getId()) {
 
       try {
-        taskService.addComment(task.getId(), processInstance.getId(), "test comment");
+        taskService.createComment(task.getId(), processInstance.getId(), "test comment");
       } catch (SuspendedEntityInteractionException e) {
         fail("should be allowed");
       }
@@ -1624,10 +1663,10 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
       fail("should be allowed");
     }
 
-    if(processEngineConfiguration.getHistoryLevel() > ProcessEngineConfigurationImpl.HISTORYLEVEL_ACTIVITY) {
+    if(processEngineConfiguration.getHistoryLevel().getId() > HistoryLevel.HISTORY_LEVEL_ACTIVITY.getId()) {
 
       try {
-        taskService.addComment(task.getId(), processInstance.getId(), "test comment");
+        taskService.createComment(task.getId(), processInstance.getId(), "test comment");
       } catch (SuspendedEntityInteractionException e) {
         fail("should be allowed");
       }
@@ -1646,6 +1685,9 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     } catch (SuspendedEntityInteractionException e) {
       fail("should be allowed");
     }
+
+    // db cleanup
+    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
   @Deployment
@@ -1721,6 +1763,9 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     managementService.executeJob(managementService.createJobQuery().singleResult().getId());
     assertEquals(0, managementService.createJobQuery().count());
     assertEquals(0, runtimeService.createProcessInstanceQuery().count());
+
+    // db cleanup
+    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/runtime/ProcessInstanceSuspensionTest.callSimpleProcess.bpmn20.xml",
@@ -1792,6 +1837,9 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     taskService.complete(task.getId());
 
     assertEquals(1, runtimeService.createProcessInstanceQuery().count());
+
+    // db cleanup
+    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/runtime/ProcessInstanceSuspensionTest.callMISimpleProcess.bpmn20.xml",
@@ -1874,6 +1922,9 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     taskService.complete(task2.getId());
 
     assertEquals(0, runtimeService.createProcessInstanceQuery().count());
+
+    // db cleanup
+    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
 }

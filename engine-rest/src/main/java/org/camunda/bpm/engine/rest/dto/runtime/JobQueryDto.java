@@ -27,74 +27,82 @@ import org.camunda.bpm.engine.rest.dto.converter.BooleanConverter;
 import org.camunda.bpm.engine.rest.dto.converter.ConditionListConverter;
 import org.camunda.bpm.engine.rest.dto.converter.DateConverter;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
+import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.runtime.JobQuery;
+import org.codehaus.jackson.map.ObjectMapper;
 
 public class JobQueryDto extends AbstractQueryDto<JobQuery> {
 
-	private static final String SORT_BY_JOB_ID_VALUE = "jobId";
-	private static final String SORT_BY_EXECUTION_ID_VALUE = "executionId";
-	private static final String SORT_BY_PROCESS_INSTANCE_ID_VALUE = "processInstanceId";
-	private static final String SORT_BY_PROCESS_DEFINITION_ID_VALUE = "processDefinitionId";
-	private static final String SORT_BY_PROCESS_DEFINITION_KEY_VALUE = "processDefinitionKey";
-	private static final String SORT_BY_JOB_RETRIES_VALUE = "jobRetries";
-	private static final String SORT_BY_JOB_DUEDATE_VALUE = "jobDueDate";
+  private static final String SORT_BY_JOB_ID_VALUE = "jobId";
+  private static final String SORT_BY_EXECUTION_ID_VALUE = "executionId";
+  private static final String SORT_BY_PROCESS_INSTANCE_ID_VALUE = "processInstanceId";
+  private static final String SORT_BY_PROCESS_DEFINITION_ID_VALUE = "processDefinitionId";
+  private static final String SORT_BY_PROCESS_DEFINITION_KEY_VALUE = "processDefinitionKey";
+  private static final String SORT_BY_JOB_RETRIES_VALUE = "jobRetries";
+  private static final String SORT_BY_JOB_DUEDATE_VALUE = "jobDueDate";
 
-	private static final List<String> VALID_SORT_BY_VALUES;
-	static {
-		VALID_SORT_BY_VALUES = new ArrayList<String>();
-		VALID_SORT_BY_VALUES.add(SORT_BY_JOB_ID_VALUE);
-		VALID_SORT_BY_VALUES.add(SORT_BY_EXECUTION_ID_VALUE);
-		VALID_SORT_BY_VALUES.add(SORT_BY_PROCESS_INSTANCE_ID_VALUE);
-		VALID_SORT_BY_VALUES.add(SORT_BY_PROCESS_DEFINITION_ID_VALUE);
-		VALID_SORT_BY_VALUES.add(SORT_BY_PROCESS_DEFINITION_KEY_VALUE);
-		VALID_SORT_BY_VALUES.add(SORT_BY_JOB_RETRIES_VALUE);
-		VALID_SORT_BY_VALUES.add(SORT_BY_JOB_DUEDATE_VALUE);
-	}
+  private static final List<String> VALID_SORT_BY_VALUES;
+  static {
+    VALID_SORT_BY_VALUES = new ArrayList<String>();
+    VALID_SORT_BY_VALUES.add(SORT_BY_JOB_ID_VALUE);
+    VALID_SORT_BY_VALUES.add(SORT_BY_EXECUTION_ID_VALUE);
+    VALID_SORT_BY_VALUES.add(SORT_BY_PROCESS_INSTANCE_ID_VALUE);
+    VALID_SORT_BY_VALUES.add(SORT_BY_PROCESS_DEFINITION_ID_VALUE);
+    VALID_SORT_BY_VALUES.add(SORT_BY_PROCESS_DEFINITION_KEY_VALUE);
+    VALID_SORT_BY_VALUES.add(SORT_BY_JOB_RETRIES_VALUE);
+    VALID_SORT_BY_VALUES.add(SORT_BY_JOB_DUEDATE_VALUE);
+  }
 
-	private String jobId;
-	private String executionId;
-	private String processInstanceId;
-	private String processDefinitionId;
-	private String processDefinitionKey;
-	private Boolean withRetriesLeft;
-	private Boolean executable;
-	private Boolean timers;
-	private Boolean messages;
-	private Boolean withException;
-	private String exceptionMessage;
-	private Boolean noRetriesLeft;
-	private Boolean active;
-	private Boolean suspended;
+  private String activityId;
+  private String jobId;
+  private String executionId;
+  private String processInstanceId;
+  private String processDefinitionId;
+  private String processDefinitionKey;
+  private Boolean withRetriesLeft;
+  private Boolean executable;
+  private Boolean timers;
+  private Boolean messages;
+  private Boolean withException;
+  private String exceptionMessage;
+  private Boolean noRetriesLeft;
+  private Boolean active;
+  private Boolean suspended;
 
-	private List<ConditionQueryParameterDto> dueDates;
+  private List<ConditionQueryParameterDto> dueDates;
 
   public JobQueryDto() {}
 
-	public JobQueryDto(MultivaluedMap<String, String> queryParameters) {
-		super(queryParameters);
-	}
+  public JobQueryDto(ObjectMapper objectMapper, MultivaluedMap<String, String> queryParameters) {
+    super(objectMapper, queryParameters);
+  }
 
-	@CamundaQueryParam("jobId")
-	public void setJobId(String jobId) {
-		this.jobId = jobId;
-	}
+  @CamundaQueryParam("activityId")
+  public void setActivityId(String activityId) {
+    this.activityId = activityId;
+  }
 
-	@CamundaQueryParam("executionId")
-	public void setExecutionId(String executionId) {
-	  this.executionId = executionId;
-	}
+  @CamundaQueryParam("jobId")
+  public void setJobId(String jobId) {
+    this.jobId = jobId;
+  }
 
-	@CamundaQueryParam("processInstanceId")
-	public void setProcessInstanceId(String processInstanceId) {
-		this.processInstanceId = processInstanceId;
-	}
+  @CamundaQueryParam("executionId")
+  public void setExecutionId(String executionId) {
+    this.executionId = executionId;
+  }
 
-	@CamundaQueryParam("processDefinitionId")
+  @CamundaQueryParam("processInstanceId")
+  public void setProcessInstanceId(String processInstanceId) {
+    this.processInstanceId = processInstanceId;
+  }
+
+  @CamundaQueryParam("processDefinitionId")
   public void setProcessDefinitionId(String processDefinitionId) {
     this.processDefinitionId = processDefinitionId;
   }
 
-	@CamundaQueryParam("processDefinitionKey")
+  @CamundaQueryParam("processDefinitionKey")
   public void setProcessDefinitionKey(String processDefinitionKey) {
     this.processDefinitionKey = processDefinitionKey;
   }
@@ -124,15 +132,15 @@ public class JobQueryDto extends AbstractQueryDto<JobQuery> {
     this.messages = messages;
   }
 
-	@CamundaQueryParam("exceptionMessage")
-	public void setExceptionMessage(String exceptionMessage) {
-		this.exceptionMessage = exceptionMessage;
-	}
+  @CamundaQueryParam("exceptionMessage")
+  public void setExceptionMessage(String exceptionMessage) {
+    this.exceptionMessage = exceptionMessage;
+  }
 
-	@CamundaQueryParam(value = "dueDates", converter = ConditionListConverter.class)
-	public void setDueDates(List<ConditionQueryParameterDto> dueDates) {
-		this.dueDates = dueDates;
-	}
+  @CamundaQueryParam(value = "dueDates", converter = ConditionListConverter.class)
+  public void setDueDates(List<ConditionQueryParameterDto> dueDates) {
+    this.dueDates = dueDates;
+  }
 
   @CamundaQueryParam(value="noRetriesLeft", converter = BooleanConverter.class)
   public void setNoRetriesLeft(Boolean noRetriesLeft) {
@@ -149,29 +157,33 @@ public class JobQueryDto extends AbstractQueryDto<JobQuery> {
     this.suspended = suspended;
   }
 
-	@Override
-	protected boolean isValidSortByValue(String value) {
-		return VALID_SORT_BY_VALUES.contains(value);
-	}
+  @Override
+  protected boolean isValidSortByValue(String value) {
+    return VALID_SORT_BY_VALUES.contains(value);
+  }
 
-	@Override
-	protected JobQuery createNewQuery(ProcessEngine engine) {
-		return engine.getManagementService().createJobQuery();
-	}
+  @Override
+  protected JobQuery createNewQuery(ProcessEngine engine) {
+    return engine.getManagementService().createJobQuery();
+  }
 
-	@Override
-	protected void applyFilters(JobQuery query) {
-		if (jobId != null) {
-			query.jobId(jobId);
-		}
+  @Override
+  protected void applyFilters(JobQuery query) {
+    if (activityId != null){
+      query.activityId(activityId);
+    }
 
-		if (executionId != null) {
-		  query.executionId(executionId);
-		}
+    if (jobId != null) {
+      query.jobId(jobId);
+    }
 
-		if (processInstanceId != null) {
-			query.processInstanceId(processInstanceId);
-		}
+    if (executionId != null) {
+      query.executionId(executionId);
+    }
+
+    if (processInstanceId != null) {
+      query.processInstanceId(processInstanceId);
+    }
 
     if (processDefinitionId != null) {
       query.processDefinitionId(processDefinitionId);
@@ -181,9 +193,9 @@ public class JobQueryDto extends AbstractQueryDto<JobQuery> {
       query.processDefinitionKey(processDefinitionKey);
     }
 
-		if (withRetriesLeft != null && withRetriesLeft) {
-		  query.withRetriesLeft();
-		}
+    if (withRetriesLeft != null && withRetriesLeft) {
+      query.withRetriesLeft();
+    }
 
     if (executable != null && executable) {
       query.executable();
@@ -207,9 +219,9 @@ public class JobQueryDto extends AbstractQueryDto<JobQuery> {
       query.withException();
     }
 
-		if (exceptionMessage != null) {
-			query.exceptionMessage(exceptionMessage);
-		}
+    if (exceptionMessage != null) {
+      query.exceptionMessage(exceptionMessage);
+    }
 
     if (noRetriesLeft != null && noRetriesLeft) {
       query.noRetriesLeft();
@@ -223,58 +235,59 @@ public class JobQueryDto extends AbstractQueryDto<JobQuery> {
       query.suspended();
     }
 
-		if (dueDates != null) {
-			DateConverter dateConverter = new DateConverter();
+    if (dueDates != null) {
+      DateConverter dateConverter = new DateConverter();
+      dateConverter.setObjectMapper(objectMapper);
 
-			for (ConditionQueryParameterDto conditionQueryParam : dueDates) {
-				String op = conditionQueryParam.getOperator();
-				Date dueDate = null;
+      for (ConditionQueryParameterDto conditionQueryParam : dueDates) {
+        String op = conditionQueryParam.getOperator();
+        Date dueDate = null;
 
-				try {
-				  dueDate = dateConverter.convertQueryParameterToType((String)conditionQueryParam.getValue());
-				} catch (IllegalArgumentException e) {
-				  throw new InvalidRequestException(Status.BAD_REQUEST, e, "Invalid due date format: " + e.getMessage());
-				}
+        try {
+          dueDate = dateConverter.convertQueryParameterToType((String) conditionQueryParam.getValue());
+        } catch (RestException e) {
+          throw new InvalidRequestException(e.getStatus(), e, "Invalid due date format: " + e.getMessage());
+        }
 
-				if (op.equals(ConditionQueryParameterDto.GREATER_THAN_OPERATOR_NAME)) {
-					query.duedateHigherThan(dueDate);
-				} else if (op.equals(ConditionQueryParameterDto.LESS_THAN_OPERATOR_NAME)) {
-					query.duedateLowerThan(dueDate);
-				} else {
-					throw new InvalidRequestException(Status.BAD_REQUEST, "Invalid due date comparator specified: " + op);
-				}
-			}
-		}
-	}
+        if (op.equals(ConditionQueryParameterDto.GREATER_THAN_OPERATOR_NAME)) {
+          query.duedateHigherThan(dueDate);
+        } else if (op.equals(ConditionQueryParameterDto.LESS_THAN_OPERATOR_NAME)) {
+          query.duedateLowerThan(dueDate);
+        } else {
+          throw new InvalidRequestException(Status.BAD_REQUEST, "Invalid due date comparator specified: " + op);
+        }
+      }
+    }
+  }
 
-	@Override
-	protected void applySortingOptions(JobQuery query) {
-		if (sortBy != null) {
-			if (sortBy.equals(SORT_BY_JOB_ID_VALUE)) {
-				query.orderByJobId();
-			} else if (sortBy.equals(SORT_BY_EXECUTION_ID_VALUE)) {
-				query.orderByExecutionId();
-			} else if (sortBy.equals(SORT_BY_PROCESS_INSTANCE_ID_VALUE)) {
-				query.orderByProcessInstanceId();
+  @Override
+  protected void applySortingOptions(JobQuery query) {
+    if (sortBy != null) {
+      if (sortBy.equals(SORT_BY_JOB_ID_VALUE)) {
+        query.orderByJobId();
+      } else if (sortBy.equals(SORT_BY_EXECUTION_ID_VALUE)) {
+        query.orderByExecutionId();
+      } else if (sortBy.equals(SORT_BY_PROCESS_INSTANCE_ID_VALUE)) {
+        query.orderByProcessInstanceId();
       } else if (sortBy.equals(SORT_BY_PROCESS_DEFINITION_ID_VALUE)) {
         query.orderByProcessDefinitionId();
       } else if (sortBy.equals(SORT_BY_PROCESS_DEFINITION_KEY_VALUE)) {
         query.orderByProcessDefinitionKey();
-			} else if (sortBy.equals(SORT_BY_JOB_RETRIES_VALUE)) {
-				query.orderByJobRetries();
-			} else if (sortBy.equals(SORT_BY_JOB_DUEDATE_VALUE)) {
-				query.orderByJobDuedate();
-			}
-		}
+      } else if (sortBy.equals(SORT_BY_JOB_RETRIES_VALUE)) {
+        query.orderByJobRetries();
+      } else if (sortBy.equals(SORT_BY_JOB_DUEDATE_VALUE)) {
+        query.orderByJobDuedate();
+      }
+    }
 
-		if (sortOrder != null) {
-			if (sortOrder.equals(SORT_ORDER_ASC_VALUE)) {
-				query.asc();
-			} else if (sortOrder.equals(SORT_ORDER_DESC_VALUE)) {
-				query.desc();
-			}
-		}
+    if (sortOrder != null) {
+      if (sortOrder.equals(SORT_ORDER_ASC_VALUE)) {
+        query.asc();
+      } else if (sortOrder.equals(SORT_ORDER_DESC_VALUE)) {
+        query.desc();
+      }
+    }
 
-	}
+  }
 
 }

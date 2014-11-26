@@ -17,12 +17,15 @@ import static com.jayway.restassured.RestAssured.given;
 import static com.jayway.restassured.path.json.JsonPath.from;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -31,9 +34,17 @@ import javax.xml.registry.InvalidRequestException;
 
 import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.history.HistoricDetailQuery;
+import org.camunda.bpm.engine.history.HistoricFormField;
+import org.camunda.bpm.engine.history.HistoricVariableUpdate;
 import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
+import org.camunda.bpm.engine.impl.core.variable.type.ObjectTypeImpl;
 import org.camunda.bpm.engine.rest.AbstractRestServiceTest;
+import org.camunda.bpm.engine.rest.helper.MockHistoricVariableUpdateBuilder;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
+import org.camunda.bpm.engine.rest.helper.VariableTypeHelper;
+import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.type.ValueType;
+import org.camunda.bpm.engine.variable.value.ObjectValue;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -47,7 +58,7 @@ import com.jayway.restassured.response.Response;
  * @author Roman Smirnov
  *
  */
-public class AbstractHistoricDetailRestServiceQueryTest extends AbstractRestServiceTest {
+public abstract class AbstractHistoricDetailRestServiceQueryTest extends AbstractRestServiceTest {
 
   protected static final String HISTORIC_DETAIL_RESOURCE_URL = TEST_RESOURCE_ROOT_PATH + "/history/detail";
 
@@ -55,16 +66,32 @@ public class AbstractHistoricDetailRestServiceQueryTest extends AbstractRestServ
 
   protected HistoricDetailQuery mockedQuery;
 
+  protected HistoricVariableUpdate historicUpdateMock;
+  protected MockHistoricVariableUpdateBuilder historicUpdateBuilder;
+
+  protected HistoricFormField historicFormFieldMock;
+
   @Before
   public void setUpRuntimeData() {
-    mockedQuery = mock(HistoricDetailQuery.class);
+    List<HistoricDetail> details = new ArrayList<HistoricDetail>();
 
-    when(processEngine.getHistoryService().createHistoricDetailQuery()).thenReturn(mockedQuery);
+    historicUpdateBuilder = MockProvider.mockHistoricVariableUpdate();
+    historicUpdateMock = historicUpdateBuilder.build();
+    historicFormFieldMock = MockProvider.createMockHistoricFormField();
 
-    List<HistoricDetail> details = MockProvider.createMockHistoricDetails();
+    details.add(historicUpdateMock);
+    details.add(historicFormFieldMock);
 
-    when(mockedQuery.list()).thenReturn(details);
-    when(mockedQuery.count()).thenReturn((long) details.size());
+    mockedQuery = setUpMockedDetailsQuery(details);
+  }
+
+  protected HistoricDetailQuery setUpMockedDetailsQuery(List<HistoricDetail> detailMocks) {
+    HistoricDetailQuery mock = mock(HistoricDetailQuery.class);
+    when(mock.list()).thenReturn(detailMocks);
+    when(mock.count()).thenReturn((long) detailMocks.size());
+
+    when(processEngine.getHistoryService().createHistoricDetailQuery()).thenReturn(mock);
+    return mock;
   }
 
   @Test
@@ -88,6 +115,21 @@ public class AbstractHistoricDetailRestServiceQueryTest extends AbstractRestServ
 
     verify(mockedQuery).list();
     verify(mockedQuery).disableBinaryFetching();
+    verifyNoMoreInteractions(mockedQuery);
+  }
+
+  @Test
+  public void testNoParametersQueryDisableObjectDeserialization() {
+    given()
+      .queryParam("deserializeValues", false)
+    .expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .get(HISTORIC_DETAIL_RESOURCE_URL);
+
+    verify(mockedQuery).list();
+    verify(mockedQuery).disableBinaryFetching();
+    verify(mockedQuery).disableCustomObjectDeserialization();
     verifyNoMoreInteractions(mockedQuery);
   }
 
@@ -249,6 +291,19 @@ public class AbstractHistoricDetailRestServiceQueryTest extends AbstractRestServ
       .then()
         .expect()
           .statusCode(Status.OK.getStatusCode())
+        .and()
+          .body("[0].id", equalTo(historicUpdateBuilder.getId()))
+          .body("[0].variableName", equalTo(historicUpdateBuilder.getName()))
+          .body("[0].variableType", equalTo(VariableTypeHelper.toExpectedValueTypeName(
+              historicUpdateBuilder.getTypedValue().getType())))
+          .body("[0].value", equalTo(historicUpdateBuilder.getTypedValue().getValue()))
+          .body("[0].processInstanceId", equalTo(historicUpdateBuilder.getProcessInstanceId()))
+          .body("[0].errorMessage", equalTo(historicUpdateBuilder.getErrorMessage()))
+          .body("[0].activityInstanceId", equalTo(historicUpdateBuilder.getActivityInstanceId()))
+          .body("[0].revision", equalTo(historicUpdateBuilder.getRevision()))
+          .body("[0].time", equalTo(historicUpdateBuilder.getTime()))
+          .body("[0].taskId", equalTo(historicUpdateBuilder.getTaskId()))
+          .body("[0].executionId", equalTo(historicUpdateBuilder.getExecutionId()))
         .when()
           .get(HISTORIC_DETAIL_RESOURCE_URL);
 
@@ -261,34 +316,14 @@ public class AbstractHistoricDetailRestServiceQueryTest extends AbstractRestServ
     Assert.assertNotNull("The returned details should not be null.", details.get(0));
     Assert.assertNotNull("The returned details should not be null.", details.get(1));
 
-    String returnedId1 = from(content).getString("[0].id");
-    String returnedProcessInstanceId1 = from(content).getString("[0].processInstanceId");
-    String returnedActivityInstanceId1 = from(content).getString("[0].activityInstanceId");
-    String returnedExecutionId1 = from(content).getString("[0].executionId");
-    String returnedTaskId1 = from(content).getString("[0].taskId");
-    Date returnedTime1 = DateTimeUtil.parseDateTime(from(content).getString("[0].time")).toDate();
-    String returnedVariableName = from(content).getString("[0].variableName");
-    String returnedVariableTypeName = from(content).getString("[0].variableTypeName");
-    String returnedValue = from(content).getString("[0].value");
-    int returnedRevision = from(content).getInt("[0].revision");
-
-    Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_VAR_UPDATE_ID, returnedId1);
-    Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_VAR_UPDATE_PROC_INST_ID, returnedProcessInstanceId1);
-    Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_VAR_UPDATE_ACT_INST_ID, returnedActivityInstanceId1);
-    Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_VAR_UPDATE_EXEC_ID, returnedExecutionId1);
-    Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_VAR_UPDATE_TASK_ID, returnedTaskId1);
-    Assert.assertEquals(DateTimeUtil.parseDateTime(MockProvider.EXAMPLE_HISTORIC_VAR_UPDATE_TIME).toDate(), returnedTime1);
-    Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_VAR_UPDATE_NAME, returnedVariableName);
-    Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_VAR_UPDATE_TYPE_NAME, returnedVariableTypeName);
-    Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_VAR_UPDATE_VALUE, returnedValue);
-    Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_VAR_UPDATE_REVISION, returnedRevision);
+    // note: element [0] is asserted as part of the fluent rest-assured invocation
 
     String returnedId2 = from(content).getString("[1].id");
     String returnedProcessInstanceId2 = from(content).getString("[1].processInstanceId");
     String returnedActivityInstanceId2 = from(content).getString("[1].activityInstanceId");
     String returnedExecutionId2 = from(content).getString("[1].executionId");
     String returnedTaskId2 = from(content).getString("[1].taskId");
-    Date returnedTime2 = DateTimeUtil.parseDateTime(from(content).getString("[1].time")).toDate();
+    Date returnedTime2 = DateTimeUtil.parseDate(from(content).getString("[1].time"));
     String returnedFieldId = from(content).getString("[1].fieldId");
     String returnedFieldValue = from(content).getString("[1].fieldValue");
 
@@ -297,9 +332,60 @@ public class AbstractHistoricDetailRestServiceQueryTest extends AbstractRestServ
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_FORM_FIELD_ACT_INST_ID, returnedActivityInstanceId2);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_FORM_FIELD_EXEC_ID, returnedExecutionId2);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_FORM_FIELD_TASK_ID, returnedTaskId2);
-    Assert.assertEquals(DateTimeUtil.parseDateTime(MockProvider.EXAMPLE_HISTORIC_FORM_FIELD_TIME).toDate(), returnedTime2);
+    Assert.assertEquals(DateTimeUtil.parseDate(MockProvider.EXAMPLE_HISTORIC_FORM_FIELD_TIME), returnedTime2);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_FORM_FIELD_FIELD_ID, returnedFieldId);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_FORM_FIELD_VALUE, returnedFieldValue);
+  }
+
+  @Test
+  public void testSerializableVariableInstanceRetrieval() {
+    ObjectValue serializedValue = Variables.serializedObjectValue("a serialized value").create();
+    MockHistoricVariableUpdateBuilder builder = MockProvider.mockHistoricVariableUpdate()
+        .typedValue(serializedValue);
+
+    List<HistoricDetail> details = new ArrayList<HistoricDetail>();
+    details.add(builder.build());
+
+    mockedQuery = setUpMockedDetailsQuery(details);
+
+    given()
+        .then().expect().statusCode(Status.OK.getStatusCode())
+        .and()
+          .body("[0].value", equalTo("a serialized value"))
+          .body("[0].variableType", equalTo(VariableTypeHelper.toExpectedValueTypeName(serializedValue.getType())))
+          .body("[0].errorMessage", nullValue())
+        .when().get(HISTORIC_DETAIL_RESOURCE_URL);
+
+    // should not resolve custom objects but existing API requires it
+//  verify(mockedQuery).disableCustomObjectDeserialization();
+    verify(mockedQuery, never()).disableCustomObjectDeserialization();
+  }
+
+  @Test
+  public void testSpinVariableInstanceRetrieval() {
+    MockHistoricVariableUpdateBuilder builder = MockProvider.mockHistoricVariableUpdate()
+        .typedValue(Variables
+            .serializedObjectValue("aSerializedValue")
+            .serializationDataFormat("aDataFormat")
+            .objectTypeName("aRootType")
+            .create());
+
+    List<HistoricDetail> details = new ArrayList<HistoricDetail>();
+    details.add(builder.build());
+
+    mockedQuery = setUpMockedDetailsQuery(details);
+
+    given()
+        .then().expect().statusCode(Status.OK.getStatusCode())
+        .and()
+          .body("[0].variableType", equalTo(VariableTypeHelper.toExpectedValueTypeName(ValueType.OBJECT)))
+          .body("[0].errorMessage", nullValue())
+          .body("[0].value", equalTo("aSerializedValue"))
+          .body("[0].valueInfo." + ObjectTypeImpl.VALUE_INFO_OBJECT_TYPE_NAME,
+              equalTo("aRootType"))
+          .body("[0].valueInfo." + ObjectTypeImpl.VALUE_INFO_SERIALIZATION_DATA_FORMAT,
+              equalTo("aDataFormat"))
+        .when().get(HISTORIC_DETAIL_RESOURCE_URL);
   }
 
   @Test
@@ -386,4 +472,29 @@ public class AbstractHistoricDetailRestServiceQueryTest extends AbstractRestServ
 
     verify(mockedQuery).excludeTaskDetails();
   }
+
+  @Test
+  public void testQueryByCaseInstanceId() {
+    given()
+      .queryParam("caseInstanceId", MockProvider.EXAMPLE_CASE_INSTANCE_ID)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .get(HISTORIC_DETAIL_RESOURCE_URL);
+
+    verify(mockedQuery).caseInstanceId(MockProvider.EXAMPLE_CASE_INSTANCE_ID);
+  }
+
+  @Test
+  public void testQueryByCaseExecutionId() {
+    given()
+      .queryParam("caseExecutionId", MockProvider.EXAMPLE_CASE_EXECUTION_ID)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .get(HISTORIC_DETAIL_RESOURCE_URL);
+
+    verify(mockedQuery).caseExecutionId(MockProvider.EXAMPLE_CASE_EXECUTION_ID);
+  }
+
 }

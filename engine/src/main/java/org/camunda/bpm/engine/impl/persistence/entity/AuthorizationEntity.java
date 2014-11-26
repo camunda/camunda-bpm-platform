@@ -22,14 +22,14 @@ import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resource;
-import org.camunda.bpm.engine.impl.db.HasRevision;
-import org.camunda.bpm.engine.impl.db.PersistentObject;
+import org.camunda.bpm.engine.impl.db.HasDbRevision;
+import org.camunda.bpm.engine.impl.db.DbEntity;
 
 /**
  * @author Daniel Meyer
  *
  */
-public class AuthorizationEntity implements Authorization, PersistentObject, HasRevision, Serializable {
+public class AuthorizationEntity implements Authorization, DbEntity, HasDbRevision, Serializable {
 
   private static final long serialVersionUID = 1L;
   
@@ -95,7 +95,21 @@ public class AuthorizationEntity implements Authorization, PersistentObject, Has
     }    
     return (permissions & p.getValue()) != p.getValue();    
   }
-  
+
+  public boolean isEveryPermissionGranted() {
+    if(AUTH_TYPE_REVOKE == authorizationType) {
+      throw new IllegalStateException("Method isEveryPermissionGranted cannot be used for authorization type REVOKE.");
+    }
+    return permissions == Permissions.ALL.getValue();
+  }
+
+  public boolean isEveryPermissionRevoked() {
+    if (authorizationType == AUTH_TYPE_GRANT) {
+      throw new IllegalStateException("Method isEveryPermissionRevoked cannot be used for authorization type GRANT.");
+    }
+    return permissions == 0;
+  }
+
   public Permission[] getPermissions(Permission[] permissions) {
 
     List<Permission> result = new ArrayList<Permission>();

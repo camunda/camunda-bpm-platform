@@ -15,6 +15,8 @@ package org.camunda.bpm.engine.runtime;
 import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.exception.NotFoundException;
+import org.camunda.bpm.engine.exception.NotValidException;
 
 /**
  * <p>A fluent builder to create a new case instance.</p>
@@ -25,22 +27,23 @@ import org.camunda.bpm.engine.ProcessEngineException;
 public interface CaseInstanceBuilder {
 
   /**
-   * A business key can be provided to associate the case instance with a
+   * <p>A business key can be provided to associate the case instance with a
    * certain identifier that has a clear business meaning. This business key can
    * then be used to easily look up that case instance, see
-   * {@link CaseInstanceQuery#caseInstanceBusinessKey(String)}. Providing such a business
-   * key is definitely a best practice.
+   * {@link CaseInstanceQuery#caseInstanceBusinessKey(String)}. Providing such a
+   * business key is definitely a best practice.</p>
    *
-   * Note that a business key MUST be unique for the given case definition WHEN you have added
-   * a database constraint for it.
-   * In this case, only case instance from different case definition are allowed to have the
-   * same business key and the combination of caseDefinitionKey-businessKey must be unique.
+   * <p>Note that a business key MUST be unique for the given case definition WHEN
+   * you have added a database constraint for it. In this case, only case instance
+   * from different case definition are allowed to have the same business key and
+   * the combination of caseDefinitionKey-businessKey must be unique.</p>
    *
    * @param businessKey
    *          a key that uniquely identifies the case instance in the context
    *          of the given case definition.
    *
    * @return the builder
+   *
    */
   CaseInstanceBuilder businessKey(String businessKey);
 
@@ -51,7 +54,10 @@ public interface CaseInstanceBuilder {
    *
    * @param variableName the name of the variable to set
    * @param variableValue the value of the variable to set
+   *
    * @return the builder
+   *
+   * @throws NotValidException when the given variable name is null
    */
   CaseInstanceBuilder setVariable(String variableName, Object variableValue);
 
@@ -66,9 +72,11 @@ public interface CaseInstanceBuilder {
   CaseInstanceBuilder setVariables(Map<String, Object> variables);
 
   /**
-   * Creates a new {@link CaseInstance}, which will be in the ACTIVE state.
+   * <p>Creates a new {@link CaseInstance}, which will be in the <code>ACTIVE</code> state.</p>
    *
-   * @throws ProcessEngineException when no case definition is deployed with the given key or id.
+   * @throws NotValidException when the given case definition key or id is null or
+   * @throws NotFoundException when no case definition is deployed with the given key or id.
+   * @throws ProcessEngineException when an internal exception happens during the execution of the command
    */
   CaseInstance create();
 

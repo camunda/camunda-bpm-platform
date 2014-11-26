@@ -14,10 +14,10 @@ package org.camunda.bpm.engine.test.concurrency;
 
 import java.util.Date;
 import java.util.List;
-
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
-import org.camunda.bpm.engine.impl.db.DbSqlSession;
-import org.camunda.bpm.engine.impl.db.DbSqlSessionFactory;
+import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
+import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManagerFactory;
 import org.camunda.bpm.engine.impl.history.event.HistoricProcessInstanceEventEntity;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -82,8 +82,8 @@ public class DbDeadlockTests extends ConcurrencyTestCase {
     }
 
     public Void execute(CommandContext commandContext) {
-      final DbSqlSession dbSqlSession = commandContext.getDbSqlSession();
-      final DbSqlSessionFactory dbSqlSessionFactory = dbSqlSession.getDbSqlSessionFactory();
+      final DbEntityManager dbEntityManger = commandContext.getDbEntityManager();
+      final DbEntityManagerFactory dbEntityManagerFactory = new DbEntityManagerFactory(Context.getProcessEngineConfiguration().getIdGenerator());
 
       HistoricProcessInstanceEventEntity hpi = new HistoricProcessInstanceEventEntity();
       hpi.setId(id);
@@ -91,13 +91,13 @@ public class DbDeadlockTests extends ConcurrencyTestCase {
       hpi.setProcessDefinitionId("someProcDefId");
       hpi.setStartTime(new Date());
 
-      dbSqlSession.insert(hpi);
-      dbSqlSession.flush();
+      dbEntityManger.insert(hpi);
+      dbEntityManger.flush();
 
       monitor.sync();
 
-      DbSqlSession newDbSqlSession = (DbSqlSession) dbSqlSessionFactory.openSession();
-      newDbSqlSession.createHistoricProcessInstanceQuery().list();
+      DbEntityManager dbEntityManager = dbEntityManagerFactory.openSession();
+      dbEntityManager.createHistoricProcessInstanceQuery().list();
 
       monitor.sync();
 
@@ -118,9 +118,9 @@ public class DbDeadlockTests extends ConcurrencyTestCase {
       .execute(new Command<Void>() {
 
         public Void execute(CommandContext commandContext) {
-          List<HistoricProcessInstance> list = commandContext.getDbSqlSession().createHistoricProcessInstanceQuery().list();
+          List<HistoricProcessInstance> list = commandContext.getDbEntityManager().createHistoricProcessInstanceQuery().list();
           for (HistoricProcessInstance historicProcessInstance : list) {
-            commandContext.getDbSqlSession().delete("deleteHistoricProcessInstance", historicProcessInstance.getId());
+            commandContext.getDbEntityManager().delete(HistoricProcessInstanceEventEntity.class, "deleteHistoricProcessInstance", historicProcessInstance.getId());
           }
           return null;
         }

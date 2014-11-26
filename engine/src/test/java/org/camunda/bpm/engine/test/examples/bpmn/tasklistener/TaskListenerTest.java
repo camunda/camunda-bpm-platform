@@ -12,10 +12,13 @@
  */
 package org.camunda.bpm.engine.test.examples.bpmn.tasklistener;
 
+import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+
+import static org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT;
 
 
 /**
@@ -97,6 +100,63 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
     taskService.complete(task.getId());
     
     assertEquals("Write meeting notes", runtimeService.getVariable(processInstance.getId(), "greeting2"));
+  }
+
+  @Deployment
+  public void testScriptListener() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+
+    Task task = taskService.createTaskQuery().singleResult();
+    assertNotNull(task);
+
+    assertTrue((Boolean) runtimeService.getVariable(processInstance.getId(), "create"));
+
+    taskService.setAssignee(task.getId(), "test");
+    assertTrue((Boolean) runtimeService.getVariable(processInstance.getId(), "assignment"));
+
+    taskService.complete(task.getId());
+    assertTrue((Boolean) runtimeService.getVariable(processInstance.getId(), "complete"));
+
+    task = taskService.createTaskQuery().singleResult();
+    assertNotNull(task);
+
+    runtimeService.deleteProcessInstance(processInstance.getId(), "test");
+
+    if (processEngineConfiguration.getHistoryLevel().getId() >= HISTORYLEVEL_AUDIT) {
+      HistoricVariableInstance variable = historyService.createHistoricVariableInstanceQuery().variableName("delete").singleResult();
+      assertNotNull(variable);
+      assertTrue((Boolean) variable.getValue());
+    }
+  }
+
+  @Deployment(resources = {
+    "org/camunda/bpm/engine/test/examples/bpmn/tasklistener/TaskListenerTest.testScriptResourceListener.bpmn20.xml",
+    "org/camunda/bpm/engine/test/examples/bpmn/tasklistener/taskListener.groovy"
+  })
+  public void testScriptResourceListener() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+
+    Task task = taskService.createTaskQuery().singleResult();
+    assertNotNull(task);
+
+    assertTrue((Boolean) runtimeService.getVariable(processInstance.getId(), "create"));
+
+    taskService.setAssignee(task.getId(), "test");
+    assertTrue((Boolean) runtimeService.getVariable(processInstance.getId(), "assignment"));
+
+    taskService.complete(task.getId());
+    assertTrue((Boolean) runtimeService.getVariable(processInstance.getId(), "complete"));
+
+    task = taskService.createTaskQuery().singleResult();
+    assertNotNull(task);
+
+    runtimeService.deleteProcessInstance(processInstance.getId(), "test");
+
+    if (processEngineConfiguration.getHistoryLevel().getId() >= HISTORYLEVEL_AUDIT) {
+      HistoricVariableInstance variable = historyService.createHistoricVariableInstanceQuery().variableName("delete").singleResult();
+      assertNotNull(variable);
+      assertTrue((Boolean) variable.getValue());
+    }
   }
 
 }

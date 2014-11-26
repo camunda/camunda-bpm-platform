@@ -19,13 +19,16 @@ package org.camunda.bpm.engine.runtime;
 public interface CaseInstance extends CaseExecution {
 
   /**
-   * The id of the case definition of the case instance.
-   */
-  String getCaseDefinitionId();
-
-  /**
    * The business key of this process instance.
    */
   String getBusinessKey();
+
+  /**
+   * <p>Returns <code>true</code> if the case instance is completed.</p>
+   *
+   * <p><strong>Note:</strong> If this case execution is not the case instance,
+   * it will always return <code>false</code>.</p>
+   */
+  boolean isCompleted();
 
 }

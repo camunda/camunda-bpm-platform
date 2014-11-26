@@ -44,7 +44,17 @@ public class PvmAtomicOperationProcessStartInitial extends PvmAtomicOperationAct
 
     ActivityImpl activity = execution.getActivity();
     ProcessDefinitionImpl processDefinition = execution.getProcessDefinition();
+
     ProcessInstanceStartContext processInstanceStartContext = execution.getProcessInstanceStartContext();
+    if (processInstanceStartContext==null) {
+      // The ProcessInstanceStartContext is set on the process instance / parent execution - grab it from there:
+      PvmExecutionImpl executionToUse = execution;
+      while (processInstanceStartContext==null) {
+        executionToUse = execution.getParent();
+        processInstanceStartContext = executionToUse.getProcessInstanceStartContext();
+      }
+    }
+
     if (activity== processInstanceStartContext.getInitial()) {
 
       processInstanceStartContext.initialStarted(execution);
@@ -53,15 +63,16 @@ public class PvmAtomicOperationProcessStartInitial extends PvmAtomicOperationAct
       execution.performOperation(ACTIVITY_EXECUTE);
 
     } else {
-      List<ActivityImpl> initialActivityStack = processDefinition.getInitialActivityStack((ActivityImpl) processInstanceStartContext.getInitial());
+      List<ActivityImpl> initialActivityStack = processDefinition.getInitialActivityStack(processInstanceStartContext.getInitial());
       int index = initialActivityStack.indexOf(activity);
+      // starting the next one
       activity = initialActivityStack.get(index+1);
 
-      PvmExecutionImpl executionToUse;
-      if (activity.isScope()) {
-        executionToUse = execution.getExecutions().get(0);
-      } else {
-        executionToUse = execution;
+      // and search for the correct execution to set the Activity to
+      PvmExecutionImpl executionToUse = execution;
+      if (executionToUse.getActivity().isScope()) {
+        executionToUse.setActive(false); // Deactivate since we jump to a node further down the hierarchy
+        executionToUse = executionToUse.getExecutions().get(0);
       }
       executionToUse.setActivity(activity);
       executionToUse.performOperation(PROCESS_START_INITIAL);

@@ -13,10 +13,14 @@
 
 package org.camunda.bpm.engine.test.examples.bpmn.executionlistener;
 
+import static org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.camunda.bpm.engine.history.HistoricVariableInstance;
+import org.camunda.bpm.engine.history.HistoricVariableInstanceQuery;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -171,4 +175,67 @@ public class ExecutionListenerTest extends PluggableProcessEngineTestCase {
     assertEquals("end boundary listener", recordedEvents.get(1).getParameter());
     assertEquals("end", recordedEvents.get(1).getEventName());
   }
+
+  @Deployment
+  public void testScriptListener() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+    assertTrue(processInstance.isEnded());
+
+    if (processEngineConfiguration.getHistoryLevel().getId() >= HISTORYLEVEL_AUDIT) {
+      HistoricVariableInstanceQuery query = historyService.createHistoricVariableInstanceQuery();
+      long count = query.count();
+      assertEquals(5, count);
+
+      HistoricVariableInstance variableInstance = null;
+      String[] variableNames = new String[]{"start-start", "start-end", "start-take", "end-start", "end-end"};
+      for (String variableName : variableNames) {
+        variableInstance = query.variableName(variableName).singleResult();
+        assertNotNull("Unable ot find variable with name '" + variableName + "'", variableInstance);
+        assertTrue("Variable '" + variableName + "' should be set to true", (Boolean) variableInstance.getValue());
+      }
+    }
+  }
+
+  @Deployment(resources = {
+    "org/camunda/bpm/engine/test/examples/bpmn/executionlistener/ExecutionListenerTest.testScriptResourceListener.bpmn20.xml",
+    "org/camunda/bpm/engine/test/examples/bpmn/executionlistener/executionListener.groovy"
+  })
+  public void testScriptResourceListener() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+    assertTrue(processInstance.isEnded());
+
+    if (processEngineConfiguration.getHistoryLevel().getId() >= HISTORYLEVEL_AUDIT) {
+      HistoricVariableInstanceQuery query = historyService.createHistoricVariableInstanceQuery();
+      long count = query.count();
+      assertEquals(5, count);
+
+      HistoricVariableInstance variableInstance = null;
+      String[] variableNames = new String[]{"start-start", "start-end", "start-take", "end-start", "end-end"};
+      for (String variableName : variableNames) {
+        variableInstance = query.variableName(variableName).singleResult();
+        assertNotNull("Unable ot find variable with name '" + variableName + "'", variableInstance);
+        assertTrue("Variable '" + variableName + "' should be set to true", (Boolean) variableInstance.getValue());
+      }
+    }
+  }
+
+  /**
+   * See CAM-2937
+   */
+  @Deployment
+  public void FAILING_testExecutionListenerOnTerminateEndEvent() {
+    runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+    Task task = taskService.createTaskQuery().singleResult();
+    taskService.complete(task.getId());
+
+    List<RecordedEvent> recordedEvents = RecorderExecutionListener.getRecordedEvents();
+
+    assertEquals(2, recordedEvents.size());
+
+    assertEquals("start", recordedEvents.get(0).getEventName());
+    assertEquals("end", recordedEvents.get(0).getEventName());
+
+  }
+
 }

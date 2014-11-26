@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.impl.test;
 
 import java.io.InputStream;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -26,10 +27,15 @@ import java.util.logging.Logger;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
+import org.camunda.bpm.engine.impl.SchemaOperationsProcessEngineBuild;
+import org.camunda.bpm.engine.impl.UserOperationLogQueryImpl;
 import org.camunda.bpm.engine.impl.bpmn.deployer.BpmnDeployer;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.camunda.bpm.engine.impl.db.DbSqlSession;
+import org.camunda.bpm.engine.impl.cmmn.deployer.CmmnDeployer;
+import org.camunda.bpm.engine.impl.db.PersistenceSession;
+import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
@@ -54,6 +60,13 @@ public abstract class TestHelper {
   );
 
   static Map<String, ProcessEngine> processEngines = new HashMap<String, ProcessEngine>();
+
+  public final static List<String> RESOURCE_SUFFIXES = new ArrayList<String>();
+
+  static {
+    RESOURCE_SUFFIXES.addAll(Arrays.asList(BpmnDeployer.BPMN_RESOURCE_SUFFIXES));
+    RESOURCE_SUFFIXES.addAll(Arrays.asList(CmmnDeployer.CMMN_RESOURCE_SUFFIXES));
+  }
 
   /**
    * use {@link ProcessEngineAssert} instead.
@@ -110,7 +123,7 @@ public abstract class TestHelper {
    * The first resource matching a suffix will be returned.
    */
   public static String getBpmnProcessDefinitionResource(Class< ? > type, String name) {
-    for (String suffix : BpmnDeployer.BPMN_RESOURCE_SUFFIXES) {
+    for (String suffix : RESOURCE_SUFFIXES) {
       String resource = type.getName().replace('.', '/') + "." + name + "." + suffix;
       InputStream inputStream = ReflectUtil.getResourceAsStream(resource);
       if (inputStream == null) {
@@ -148,10 +161,10 @@ public abstract class TestHelper {
         .getCommandExecutorTxRequired()
         .execute(new Command<Object>() {
           public Object execute(CommandContext commandContext) {
-            DbSqlSession dbSqlSession = commandContext.getSession(DbSqlSession.class);
-            dbSqlSession.dbSchemaDrop();
-            dbSqlSession.dbSchemaCreate();
-            dbSqlSession.dbCreateHistoryLevel();
+            PersistenceSession persistenceSession = commandContext.getSession(PersistenceSession.class);
+            persistenceSession.dbSchemaDrop();
+            persistenceSession.dbSchemaCreate();
+            SchemaOperationsProcessEngineBuild.dbCreateHistoryLevel(commandContext.getDbEntityManager());
             return null;
           }
         });
@@ -235,11 +248,8 @@ public abstract class TestHelper {
     processEngineConfiguration.getCommandExecutorTxRequired()
         .execute(new Command<Object>() {
           public Object execute(CommandContext commandContext) {
-            DbSqlSession dbSqlSession = commandContext.getDbSqlSession();
-            dbSqlSession.executeMandatorySchemaResource("create", "engine");
-            dbSqlSession.executeMandatorySchemaResource("create", "history");
-            dbSqlSession.executeMandatorySchemaResource("create", "identity");
-            dbSqlSession.executeMandatorySchemaResource("create", "case.engine");
+
+            commandContext.getSession(PersistenceSession.class).dbSchemaCreate();
             return null;
           }
         });
@@ -259,15 +269,15 @@ public abstract class TestHelper {
     processEngineConfiguration.getCommandExecutorTxRequired()
       .execute(new Command<Object>() {
        public Object execute(CommandContext commandContext) {
-         DbSqlSession dbSqlSession = commandContext.getDbSqlSession();
-         PropertyEntity historyLevelProperty = dbSqlSession.selectById(PropertyEntity.class, "historyLevel");
+         DbEntityManager dbEntityManager = commandContext.getDbEntityManager();
+         PropertyEntity historyLevelProperty = dbEntityManager.selectById(PropertyEntity.class, "historyLevel");
          if (historyLevelProperty != null) {
-           if (processEngineConfiguration.getHistoryLevel() != new Integer(historyLevelProperty.getValue())) {
-             historyLevelProperty.setValue(Integer.toString(processEngineConfiguration.getHistoryLevel()));
-             dbSqlSession.update(historyLevelProperty);
+           if (processEngineConfiguration.getHistoryLevel().getId() != new Integer(historyLevelProperty.getValue())) {
+             historyLevelProperty.setValue(Integer.toString(processEngineConfiguration.getHistoryLevel().getId()));
+             dbEntityManager.merge(historyLevelProperty);
            }
          } else {
-           commandContext.getDbSqlSession().dbCreateHistoryLevel();
+           SchemaOperationsProcessEngineBuild.dbCreateHistoryLevel(dbEntityManager);
          }
          return null;
        }
@@ -278,13 +288,37 @@ public abstract class TestHelper {
     processEngineConfiguration.getCommandExecutorTxRequired()
       .execute(new Command<Object>() {
        public Object execute(CommandContext commandContext) {
-         DbSqlSession dbSqlSession = commandContext.getDbSqlSession();
-         PropertyEntity historyLevelProperty = dbSqlSession.selectById(PropertyEntity.class, "historyLevel");
+         DbEntityManager dbEntityManager = commandContext.getDbEntityManager();
+         PropertyEntity historyLevelProperty = dbEntityManager.selectById(PropertyEntity.class, "historyLevel");
          if (historyLevelProperty != null) {
-           dbSqlSession.delete(historyLevelProperty);
+           dbEntityManager.delete(historyLevelProperty);
          }
          return null;
        }
+      });
+  }
+
+  /**
+   * Required when user operations are logged that are not directly associated with a single deployment
+   * (e.g. runtimeService.suspendProcessDefinitionByKey(..) with cascade to process instances)
+   * and therefore cannot be cleaned up automatically during undeployment.
+   */
+  public static void clearOpLog(ProcessEngineConfigurationImpl processEngineConfiguration) {
+    processEngineConfiguration.getCommandExecutorTxRequired()
+      .execute(new Command<Void>() {
+
+        public Void execute(CommandContext commandContext) {
+          List<UserOperationLogEntry> logEntries =
+              commandContext.getOperationLogManager()
+                .findOperationLogEntriesByQueryCriteria(new UserOperationLogQueryImpl(), null);
+
+          for (UserOperationLogEntry entry : logEntries) {
+            commandContext.getOperationLogManager().deleteOperationLogEntryById(entry.getId());
+          }
+
+          return null;
+        }
+
       });
   }
 

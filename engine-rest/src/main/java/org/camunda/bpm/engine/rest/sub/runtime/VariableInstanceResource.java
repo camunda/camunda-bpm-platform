@@ -14,12 +14,15 @@ package org.camunda.bpm.engine.rest.sub.runtime;
 
 import java.io.InputStream;
 
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
 import org.camunda.bpm.engine.rest.dto.runtime.VariableInstanceDto;
+import org.camunda.bpm.engine.rest.sub.VariableResource;
 
 /**
  *
@@ -29,7 +32,8 @@ public interface VariableInstanceResource {
 
   @GET
   @Produces(MediaType.APPLICATION_JSON)
-  public VariableInstanceDto getVariable();
+  public VariableInstanceDto getVariable(
+      @QueryParam(VariableResource.DESERIALIZE_VALUE_QUERY_PARAM) @DefaultValue("true") boolean deserializeObjectValue);
 
 
   @GET

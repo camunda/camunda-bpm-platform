@@ -17,6 +17,8 @@ import static com.jayway.restassured.RestAssured.given;
 import static com.jayway.restassured.path.json.JsonPath.from;
 import static org.fest.assertions.Assertions.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.mockito.Matchers.argThat;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -30,6 +32,7 @@ import java.util.Map;
 import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.rest.helper.MockProvider;
+import org.camunda.bpm.engine.rest.helper.variable.EqualsPrimitiveValue;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.CaseExecutionQuery;
 import org.junit.Before;
@@ -45,7 +48,7 @@ import com.jayway.restassured.response.Response;
 * @author Roman Smirnov
 *
 */
-public class AbstractCaseExecutionRestServiceQueryTest extends AbstractRestServiceTest {
+public abstract class AbstractCaseExecutionRestServiceQueryTest extends AbstractRestServiceTest {
 
   protected static final String CASE_EXECUTION_QUERY_URL = TEST_RESOURCE_ROOT_PATH + "/case-execution";
   protected static final String CASE_EXECUTION_COUNT_QUERY_URL = CASE_EXECUTION_QUERY_URL + "/count";
@@ -278,13 +281,27 @@ public class AbstractCaseExecutionRestServiceQueryTest extends AbstractRestServi
 
     String returnedId = from(content).getString("[0].id");
     String returnedCaseInstanceId = from(content).getString("[0].caseInstanceId");
+    String returnedParentId = from(content).getString("[0].parentId");
+    String returnedCaseDefinitionId = from(content).getString("[0].caseDefinitionId");
+    String returnedActivityId = from(content).getString("[0].activityId");
+    String returnedActivityName = from(content).getString("[0].activityName");
+    String returnedActivityType = from(content).getString("[0].activityType");
+    String returnedActivityDescription = from(content).getString("[0].activityDescription");
     boolean returnedActiveState = from(content).getBoolean("[0].active");
     boolean returnedEnabledState = from(content).getBoolean("[0].enabled");
+    boolean returnedDisabledState = from(content).getBoolean("[0].disabled");
 
     assertThat(returnedId).isEqualTo(MockProvider.EXAMPLE_CASE_EXECUTION_ID);
     assertThat(returnedCaseInstanceId).isEqualTo(MockProvider.EXAMPLE_CASE_EXECUTION_CASE_INSTANCE_ID);
+    assertThat(returnedParentId).isEqualTo(MockProvider.EXAMPLE_CASE_EXECUTION_PARENT_ID);
+    assertThat(returnedCaseDefinitionId).isEqualTo(MockProvider.EXAMPLE_CASE_EXECUTION_CASE_DEFINITION_ID);
+    assertThat(returnedActivityId).isEqualTo(MockProvider.EXAMPLE_CASE_EXECUTION_ACTIVITY_ID);
+    assertThat(returnedActivityName).isEqualTo(MockProvider.EXAMPLE_CASE_EXECUTION_ACTIVITY_NAME);
+    assertThat(returnedActivityType).isEqualTo(MockProvider.EXAMPLE_CASE_EXECUTION_ACTIVITY_TYPE);
+    assertThat(returnedActivityDescription).isEqualTo(MockProvider.EXAMPLE_CASE_EXECUTION_ACTIVITY_DESCRIPTION);
     assertThat(returnedEnabledState).isEqualTo(MockProvider.EXAMPLE_CASE_EXECUTION_IS_ENABLED);
     assertThat(returnedActiveState).isEqualTo(MockProvider.EXAMPLE_CASE_EXECUTION_IS_ACTIVE);
+    assertThat(returnedDisabledState).isEqualTo(MockProvider.EXAMPLE_CASE_EXECUTION_IS_DISABLED);
   }
 
   @Test
@@ -316,13 +333,27 @@ public class AbstractCaseExecutionRestServiceQueryTest extends AbstractRestServi
 
     String returnedId = from(content).getString("[0].id");
     String returnedCaseInstanceId = from(content).getString("[0].caseInstanceId");
+    String returnedParentId = from(content).getString("[0].parentId");
+    String returnedCaseDefinitionId = from(content).getString("[0].caseDefinitionId");
+    String returnedActivityId = from(content).getString("[0].activityId");
+    String returnedActivityName = from(content).getString("[0].activityName");
+    String returnedActivityType = from(content).getString("[0].activityType");
+    String returnedActivityDescription = from(content).getString("[0].activityDescription");
     boolean returnedActiveState = from(content).getBoolean("[0].active");
     boolean returnedEnabledState = from(content).getBoolean("[0].enabled");
+    boolean returnedDisabledState = from(content).getBoolean("[0].disabled");
 
     assertThat(returnedId).isEqualTo(MockProvider.EXAMPLE_CASE_EXECUTION_ID);
     assertThat(returnedCaseInstanceId).isEqualTo(MockProvider.EXAMPLE_CASE_EXECUTION_CASE_INSTANCE_ID);
+    assertThat(returnedParentId).isEqualTo(MockProvider.EXAMPLE_CASE_EXECUTION_PARENT_ID);
+    assertThat(returnedCaseDefinitionId).isEqualTo(MockProvider.EXAMPLE_CASE_EXECUTION_CASE_DEFINITION_ID);
+    assertThat(returnedActivityId).isEqualTo(MockProvider.EXAMPLE_CASE_EXECUTION_ACTIVITY_ID);
+    assertThat(returnedActivityName).isEqualTo(MockProvider.EXAMPLE_CASE_EXECUTION_ACTIVITY_NAME);
+    assertThat(returnedActivityType).isEqualTo(MockProvider.EXAMPLE_CASE_EXECUTION_ACTIVITY_TYPE);
+    assertThat(returnedActivityDescription).isEqualTo(MockProvider.EXAMPLE_CASE_EXECUTION_ACTIVITY_DESCRIPTION);
     assertThat(returnedEnabledState).isEqualTo(MockProvider.EXAMPLE_CASE_EXECUTION_IS_ENABLED);
     assertThat(returnedActiveState).isEqualTo(MockProvider.EXAMPLE_CASE_EXECUTION_IS_ACTIVE);
+    assertThat(returnedDisabledState).isEqualTo(MockProvider.EXAMPLE_CASE_EXECUTION_IS_DISABLED);
   }
 
   @Test
@@ -337,6 +368,7 @@ public class AbstractCaseExecutionRestServiceQueryTest extends AbstractRestServi
     queryParameters.put("activityId", "anActivityId");
     queryParameters.put("active", "true");
     queryParameters.put("enabled", "true");
+    queryParameters.put("disabled", "true");
 
     given()
       .queryParams(queryParameters)
@@ -354,6 +386,7 @@ public class AbstractCaseExecutionRestServiceQueryTest extends AbstractRestServi
     verify(mockedQuery).activityId(queryParameters.get("activityId"));
     verify(mockedQuery).active();
     verify(mockedQuery).enabled();
+    verify(mockedQuery).disabled();
     verify(mockedQuery).list();
   }
 
@@ -376,6 +409,7 @@ public class AbstractCaseExecutionRestServiceQueryTest extends AbstractRestServi
     queryParameters.put("activityId", anActivityId);
     queryParameters.put("active", "true");
     queryParameters.put("enabled", "true");
+    queryParameters.put("disabled", "true");
 
     given()
       .contentType(POST_JSON_CONTENT_TYPE)
@@ -394,6 +428,7 @@ public class AbstractCaseExecutionRestServiceQueryTest extends AbstractRestServi
     verify(mockedQuery).activityId(anActivityId);
     verify(mockedQuery).active();
     verify(mockedQuery).enabled();
+    verify(mockedQuery).disabled();
     verify(mockedQuery).list();
   }
 
@@ -664,7 +699,7 @@ public class AbstractCaseExecutionRestServiceQueryTest extends AbstractRestServi
         .post(CASE_EXECUTION_QUERY_URL);
 
     verify(mockedQuery).caseInstanceVariableValueEquals(variableName, variableValue);
-    verify(mockedQuery).caseInstanceVariableValueNotEquals(anotherVariableName, anotherVariableValue);
+    verify(mockedQuery).caseInstanceVariableValueNotEquals(eq(anotherVariableName), argThat(EqualsPrimitiveValue.numberValue(anotherVariableValue)));
   }
 
   @Test
@@ -934,7 +969,7 @@ public class AbstractCaseExecutionRestServiceQueryTest extends AbstractRestServi
         .post(CASE_EXECUTION_QUERY_URL);
 
     verify(mockedQuery).variableValueEquals(variableName, variableValue);
-    verify(mockedQuery).variableValueNotEquals(anotherVariableName, anotherVariableValue);
+    verify(mockedQuery).variableValueNotEquals(eq(anotherVariableName), argThat(EqualsPrimitiveValue.numberValue(anotherVariableValue)));
   }
 
   @Test

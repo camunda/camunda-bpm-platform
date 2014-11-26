@@ -33,67 +33,62 @@ import org.junit.runner.RunWith;
 
 /**
  * <p>Deploys two different applications, a process archive and a client application.</p>
- * 
+ *
  * <p>This test ensures that when the process is started from the client,
  * it is able to make the context switch to the process archive and resolve cdi beans
- * from the process archive.</p> 
- * 
- * 
+ * from the process archive.</p>
+ *
+ *
  * @author Daniel Meyer
  */
 @RunWith(Arquillian.class)
 public class CdiBeanResolutionTest extends AbstractFoxPlatformIntegrationTest {
-    
+
   @Deployment
-  public static WebArchive processArchive() {    
+  public static WebArchive processArchive() {
     return initWebArchiveDeployment()
-            .addClass(ExampleBean.class)            
+            .addClass(ExampleBean.class)
             .addAsResource("org/camunda/bpm/integrationtest/functional/cdi/CdiBeanResolutionTest.testResolveBean.bpmn20.xml")
             .addAsResource("org/camunda/bpm/integrationtest/functional/cdi/CdiBeanResolutionTest.testResolveBeanFromJobExecutor.bpmn20.xml");
   }
-  
+
   @Deployment(name="clientDeployment")
-  public static WebArchive clientDeployment() {    
+  public static WebArchive clientDeployment() {
     WebArchive deployment = ShrinkWrap.create(WebArchive.class, "client.war")
             .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
             .addClass(AbstractFoxPlatformIntegrationTest.class)
             .addAsLibraries(DeploymentHelper.getEngineCdi());
-    
+
     TestContainer.addContainerSpecificResourcesForNonPa(deployment);
-    
+
     return deployment;
   }
-    
+
   @Test
   @OperateOnDeployment("clientDeployment")
-  public void testResolveBean() {   
-    try {
-      // assert that we cannot resolve the bean here:
-      ProgrammaticBeanLookup.lookup("exampleBean");
-      Assert.fail("exception expected");
-    }catch (Exception e) {
-      // expected
-    }
-    
+  public void testResolveBean() {
+    // assert that we cannot resolve the bean here:
+    Assert.assertNull(ProgrammaticBeanLookup.lookup("exampleBean"));
+
     Assert.assertEquals(0, runtimeService.createProcessInstanceQuery().processDefinitionKey("testResolveBean").count());
     // but the process engine can:
     runtimeService.startProcessInstanceByKey("testResolveBean");
-    
+
     Assert.assertEquals(0,runtimeService.createProcessInstanceQuery().processDefinitionKey("testResolveBean").count());
   }
-  
+
   @Test
   @OperateOnDeployment("clientDeployment")
   public void testResolveBeanFromJobExecutor() {
-   
+
     Assert.assertEquals(0,runtimeService.createProcessInstanceQuery().processDefinitionKey("testResolveBeanFromJobExecutor").count());
     runtimeService.startProcessInstanceByKey("testResolveBeanFromJobExecutor");
     Assert.assertEquals(1,runtimeService.createProcessInstanceQuery().processDefinitionKey("testResolveBeanFromJobExecutor").count());
-    
-    waitForJobExecutorToProcessAllJobs(16000);    
-    
+
+    waitForJobExecutorToProcessAllJobs();
+
     Assert.assertEquals(0,runtimeService.createProcessInstanceQuery().processDefinitionKey("testResolveBeanFromJobExecutor").count());
-    
+
   }
-  
+
 }

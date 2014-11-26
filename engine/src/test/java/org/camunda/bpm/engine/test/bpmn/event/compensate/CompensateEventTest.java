@@ -13,11 +13,14 @@
 
 package org.camunda.bpm.engine.test.bpmn.event.compensate;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.HistoricVariableInstanceQuery;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -212,7 +215,7 @@ public class CompensateEventTest extends PluggableProcessEngineTestCase {
       .processInstanceId(processInstance.getId())
       .variableName("undoBookHotel");
 
-    if(!processEngineConfiguration.getHistory().equals(ProcessEngineConfiguration.HISTORY_NONE)) {
+    if(processEngineConfiguration.getHistoryLevel().getId() >= ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT) {
       assertEquals(1, historicVariableInstanceQuery.count());
       assertEquals("undoBookHotel", historicVariableInstanceQuery.list().get(0).getVariableName());
       assertEquals(5, historicVariableInstanceQuery.list().get(0).getValue());
@@ -233,7 +236,7 @@ public class CompensateEventTest extends PluggableProcessEngineTestCase {
       .processInstanceId(processInstance.getId())
       .variableName("undoBookHotel");
 
-    if(!processEngineConfiguration.getHistory().equals(ProcessEngineConfiguration.HISTORY_NONE)) {
+    if(processEngineConfiguration.getHistoryLevel().getId() >= ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT) {
       assertEquals(1, historicVariableInstanceQuery.count());
       assertEquals("undoBookHotel", historicVariableInstanceQuery.list().get(0).getVariableName());
       assertEquals(5, historicVariableInstanceQuery.list().get(0).getValue());
@@ -290,7 +293,7 @@ public class CompensateEventTest extends PluggableProcessEngineTestCase {
     HistoricVariableInstanceQuery historicVariableInstanceQuery = historyService.createHistoricVariableInstanceQuery()
       .variableName("undoBookSecondHotel");
 
-    if(!processEngineConfiguration.getHistory().equals(ProcessEngineConfiguration.HISTORY_NONE)) {
+    if(processEngineConfiguration.getHistoryLevel().getId() >= ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT) {
       assertEquals(1, historicVariableInstanceQuery.count());
       assertEquals("undoBookSecondHotel", historicVariableInstanceQuery.list().get(0).getVariableName());
       assertEquals(5, historicVariableInstanceQuery.list().get(0).getValue());
@@ -315,7 +318,7 @@ public class CompensateEventTest extends PluggableProcessEngineTestCase {
     HistoricVariableInstanceQuery historicVariableInstanceQuery = historyService.createHistoricVariableInstanceQuery()
         .variableName("undoBookSecondHotel");
 
-    if(!processEngineConfiguration.getHistory().equals(ProcessEngineConfiguration.HISTORY_NONE)) {
+    if(processEngineConfiguration.getHistoryLevel().getId() >= ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT) {
       assertEquals(1, historicVariableInstanceQuery.count());
       assertEquals("undoBookSecondHotel", historicVariableInstanceQuery.list().get(0).getVariableName());
       assertEquals(5, historicVariableInstanceQuery.list().get(0).getValue());
@@ -331,6 +334,27 @@ public class CompensateEventTest extends PluggableProcessEngineTestCase {
 
       assertEquals(1, historicVariableInstanceQuery.count());
       assertEquals(5, historicVariableInstanceQuery.list().get(0).getValue());
+    }
+  }
+
+  @Deployment
+  public void testExecutionListeners() {
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("start", 0);
+    variables.put("end", 0);
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testProcess", variables);
+
+    int started = (Integer) runtimeService.getVariable(processInstance.getId(), "start");
+    assertEquals(5, started);
+
+    int ended = (Integer) runtimeService.getVariable(processInstance.getId(), "end");
+    assertEquals(5, ended);
+
+    int historyLevel = processEngineConfiguration.getHistoryLevel().getId();
+    if (historyLevel > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
+      long finishedCount = historyService.createHistoricActivityInstanceQuery().activityId("undoBookHotel").finished().count();
+      assertEquals(5, finishedCount);
     }
   }
 

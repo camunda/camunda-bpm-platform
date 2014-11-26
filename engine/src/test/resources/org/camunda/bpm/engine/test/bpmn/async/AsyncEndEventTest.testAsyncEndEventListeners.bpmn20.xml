@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:camundabpm="http://activiti.org/bpmn"
+  targetNamespace="Examples">
+
+  <process id="asyncEndEvent">
+    <extensionElements>
+	    <camundabpm:executionListener event="end"
+	      class="org.camunda.bpm.engine.test.bpmn.async.AsyncListener"></camundabpm:executionListener>
+	  </extensionElements>
+  
+    <startEvent id="startEvent" />
+    
+    <sequenceFlow sourceRef="startEvent" targetRef="endEvent" />
+        
+    <endEvent id="endEvent" camundabpm:async="true" />
+    
+  </process>
+
+</definitions>

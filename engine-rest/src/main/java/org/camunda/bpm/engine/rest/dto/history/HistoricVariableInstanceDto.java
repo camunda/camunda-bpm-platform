@@ -13,16 +13,12 @@
 package org.camunda.bpm.engine.rest.dto.history;
 
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
-import org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEntity;
-import org.camunda.bpm.engine.impl.variable.SerializableType;
-import org.camunda.bpm.engine.rest.dto.runtime.SerializedObjectDto;
+import org.camunda.bpm.engine.rest.dto.VariableValueDto;
 
-public class HistoricVariableInstanceDto {
+public class HistoricVariableInstanceDto extends VariableValueDto {
 
   private String id;
   private String name;
-  private String type;
-  private Object value;
   private String processInstanceId;
   private String activityInstanceId;
   private String errorMessage;
@@ -33,14 +29,6 @@ public class HistoricVariableInstanceDto {
 
   public String getName() {
     return name;
-  }
-
-  public String getType() {
-    return type;
-  }
-
-  public Object getValue() {
-    return value;
   }
 
   public String getProcessInstanceId() {
@@ -57,23 +45,20 @@ public class HistoricVariableInstanceDto {
 
   public static HistoricVariableInstanceDto fromHistoricVariableInstance(HistoricVariableInstance historicVariableInstance) {
 
-    HistoricVariableInstanceEntity entity = (HistoricVariableInstanceEntity) historicVariableInstance;
-
     HistoricVariableInstanceDto dto = new HistoricVariableInstanceDto();
 
-    dto.id = entity.getId();
-    dto.name = entity.getVariableName();
-    dto.processInstanceId = entity.getProcessInstanceId();
-    dto.activityInstanceId = entity.getActivtyInstanceId();
-    if(SerializableType.TYPE_NAME.equals(entity.getVariableType().getTypeName())) {
-      if(entity.getValue() != null) {
-        dto.value = new SerializedObjectDto(entity.getValue());
-      }
-    } else {
-      dto.value = entity.getValue();
+    dto.id = historicVariableInstance.getId();
+    dto.name = historicVariableInstance.getName();
+    dto.processInstanceId = historicVariableInstance.getProcessInstanceId();
+    dto.activityInstanceId = historicVariableInstance.getActivityInstanceId();
+
+    if(historicVariableInstance.getErrorMessage() == null) {
+      VariableValueDto.fromTypedValue(dto, historicVariableInstance.getTypedValue());
     }
-    dto.type = entity.getVariableType().getTypeNameForValue(entity.getValue());
-    dto.errorMessage = entity.getErrorMessage();
+    else {
+      dto.errorMessage = historicVariableInstance.getErrorMessage();
+      dto.type = VariableValueDto.toRestApiTypeName(historicVariableInstance.getTypeName());
+    }
 
     return dto;
   }

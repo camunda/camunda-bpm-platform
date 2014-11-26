@@ -13,28 +13,87 @@
 package org.camunda.bpm.engine.runtime;
 
 /**
+ * <p>Represent a planned item in a case instance.</p>
+ *
+ * <p>Note that a {@link CaseInstance} also is an case execution.</p>
+ *
  * @author Roman Smirnov
  *
  */
 public interface CaseExecution {
 
   /**
-   * The unique identifier of the execution.
+   * <p>The unique identifier of the case execution.</p>
    */
   String getId();
 
-  /** Id of the root of the execution tree representing the case instance.
-   * It is the same as {@link #getId()} if this execution is the case instance. */
+  /**
+   * <p>Id of the root of the case execution tree representing the case instance.</p>
+   *
+   * <p>It is the same as {@link #getId()} if this case execution is the case instance.</p>
+   */
   String getCaseInstanceId();
 
   /**
-   * Returns true if the case instance is active.
+   * <p>The id of the case definition of the case execution.</p>
+   */
+  String getCaseDefinitionId();
+
+  /**
+   * <p>The id of the activity associated with <code>this</code> case execution.</p>
+   */
+  String getActivityId();
+
+  /**
+   * <p>The name of the activity associated with <code>this</code> case execution.</p>
+   */
+  String getActivityName();
+
+  /**
+   * <p>The type of the activity associated with <code>this</code> case execution.</p>
+   */
+  String getActivityType();
+
+  /**
+   * <p>The description of the activity associated with <code>this</code> case execution.</p>
+   */
+  String getActivityDescription();
+
+  /**
+   * <p>The id of the parent of <code>this</code> case execution.</p>
+   */
+  String getParentId();
+
+  /**
+   * <p>Returns <code>true</code> if the case execution is available.</p>
+   */
+  boolean isAvailable();
+
+  /**
+   * <p>Returns <code>true</code> if the case execution is active.</p>
    */
   boolean isActive();
 
   /**
-   * Returns true if the case instance is enabled.
+   * <p>Returns <code>true</code> if the case execution is enabled.</p>
+   *
+   * <p><strong>Note:</strong> If this case execution is the case execution, it will
+   * return always <code>false</code>.</p>
+   *
    */
   boolean isEnabled();
+
+  /**
+   * <p>Returns <code>true</code> if the case execution is disabled.</p>
+   *
+   * <p><strong>Note:</strong> If this case execution is the case instance, it will
+   * return always <code>false</code>.</p>
+   */
+  boolean isDisabled();
+
+  /**
+   * <p>Returns <code>true</code> if the case execution is terminated.</p>
+   */
+  boolean isTerminated();
 
 }

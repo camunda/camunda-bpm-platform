@@ -18,6 +18,7 @@ import java.util.logging.Level;
 
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.bpmn.parser.EventSubscriptionDeclaration;
+import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerDeclarationImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityBehavior;
@@ -67,6 +68,10 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
       // create event subscriptions for the concurrent execution
       for (EventSubscriptionDeclaration declaration : EventSubscriptionDeclaration.getDeclarationsForScope(execution.getActivity())) {
         declaration.createSubscriptionForParallelMultiInstance((ExecutionEntity) concurrentExecution);
+      }
+
+      if (ioMapping != null) {
+        ioMapping.executeInputParameters((AbstractVariableScope) concurrentExecution);
       }
 
       // create timer job for the current execution

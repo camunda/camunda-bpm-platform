@@ -12,7 +12,7 @@
  */
 package org.camunda.bpm.container.impl.jmx.deployment.util;
 
-import org.camunda.bpm.container.impl.jmx.deployment.scanning.ProcessApplicationScanningUtil;
+import org.camunda.bpm.container.impl.deployment.scanning.ProcessApplicationScanningUtil;
 import org.junit.Test;
 
 import java.net.MalformedURLException;
@@ -40,7 +40,7 @@ public class VfsProcessApplicationScannerTest {
     assertEquals(1, scanResult.size());
     String processFileName = "VfsProcessScannerTest.bpmn20.xml";
     assertTrue("'" + processFileName + "'not found", contains(scanResult, processFileName));
-    assertFalse("'bpmn' folder in resource path found", contains(scanResult, "bpmn"));
+    assertFalse("'bpmn' folder in resource path found", contains(scanResult, "processResource.txt"));
   }
 
   @Test
@@ -55,12 +55,27 @@ public class VfsProcessApplicationScannerTest {
     assertEquals(1, scanResult.size());
     String processFileName = "VfsProcessScannerTest.cmmn";
     assertTrue("'" + processFileName + "' not found", contains(scanResult, processFileName));
-    assertFalse("'cmmn' in resource path found", contains(scanResult, "cmmn"));
+    assertFalse("'cmmn' in resource path found", contains(scanResult, "caseResource.txt"));
   }
 
-  private boolean contains(Map<String, byte[]> scanResult, String prefix) {
+  @Test
+  public void testScanProcessArchivePathWithAdditionalResourceSuffixes() throws MalformedURLException {
+    URLClassLoader classLoader = new URLClassLoader(new URL[]{new URL("file:")});
+    String processRootPath = "classpath:org/camunda/bpm/container/impl/jmx/deployment/script/";
+    String[] additionalResourceSuffixes = new String[] { "py", "groovy", "rb" };
+    Map<String, byte[]> scanResult = ProcessApplicationScanningUtil.findResources(classLoader, processRootPath, null, additionalResourceSuffixes);
+
+    assertEquals(4, scanResult.size());
+    String processFileName = "VfsProcessScannerTest.bpmn20.xml";
+    assertTrue("'" + processFileName + "' not found", contains(scanResult, processFileName));
+    assertTrue("'hello.py' in resource path found", contains(scanResult, "hello.py"));
+    assertTrue("'hello.rb' in resource path found", contains(scanResult, "hello.rb"));
+    assertTrue("'hello.groovy' in resource path found", contains(scanResult, "hello.groovy"));
+  }
+
+  private boolean contains(Map<String, byte[]> scanResult, String suffix) {
     for (String string : scanResult.keySet()) {
-      if (string.startsWith(prefix)) {
+      if (string.endsWith(suffix)) {
         return true;
       }
     }

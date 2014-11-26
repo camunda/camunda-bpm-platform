@@ -34,21 +34,21 @@ import org.camunda.bpm.engine.repository.ProcessDefinition;
 public class ProcessDefinitionManager extends AbstractManager {
 
   public ProcessDefinitionEntity findLatestProcessDefinitionByKey(String processDefinitionKey) {
-    return (ProcessDefinitionEntity) getDbSqlSession().selectOne("selectLatestProcessDefinitionByKey", processDefinitionKey);
+    return (ProcessDefinitionEntity) getDbEntityManager().selectOne("selectLatestProcessDefinitionByKey", processDefinitionKey);
   }
 
   public void deleteProcessDefinitionsByDeploymentId(String deploymentId) {
-    getDbSqlSession().delete("deleteProcessDefinitionsByDeploymentId", deploymentId);
+    getDbEntityManager().delete(ProcessDefinitionEntity.class, "deleteProcessDefinitionsByDeploymentId", deploymentId);
   }
 
   public ProcessDefinitionEntity findLatestProcessDefinitionById(String processDefinitionId) {
-    return (ProcessDefinitionEntity) getDbSqlSession().selectOne("selectProcessDefinitionById", processDefinitionId);
+    return getDbEntityManager().selectById(ProcessDefinitionEntity.class, processDefinitionId);
   }
 
   @SuppressWarnings("unchecked")
   public List<ProcessDefinition> findProcessDefinitionsByQueryCriteria(ProcessDefinitionQueryImpl processDefinitionQuery, Page page) {
 //    List<ProcessDefinition> processDefinitions =
-    return getDbSqlSession().selectList("selectProcessDefinitionsByQueryCriteria", processDefinitionQuery, page);
+    return getDbEntityManager().selectList("selectProcessDefinitionsByQueryCriteria", processDefinitionQuery, page);
 
     //skipped this after discussion within the team
 //    // retrieve process definitions from cache (http://jira.codehaus.org/browse/ACT-1020) to have all available information
@@ -63,14 +63,14 @@ public class ProcessDefinitionManager extends AbstractManager {
   }
 
   public long findProcessDefinitionCountByQueryCriteria(ProcessDefinitionQueryImpl processDefinitionQuery) {
-    return (Long) getDbSqlSession().selectOne("selectProcessDefinitionCountByQueryCriteria", processDefinitionQuery);
+    return (Long) getDbEntityManager().selectOne("selectProcessDefinitionCountByQueryCriteria", processDefinitionQuery);
   }
 
   public ProcessDefinitionEntity findProcessDefinitionByDeploymentAndKey(String deploymentId, String processDefinitionKey) {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("deploymentId", deploymentId);
     parameters.put("processDefinitionKey", processDefinitionKey);
-    return (ProcessDefinitionEntity) getDbSqlSession().selectOne("selectProcessDefinitionByDeploymentAndKey", parameters);
+    return (ProcessDefinitionEntity) getDbEntityManager().selectOne("selectProcessDefinitionByDeploymentAndKey", parameters);
   }
 
   public ProcessDefinition findProcessDefinitionByKeyAndVersion(String processDefinitionKey, Integer processDefinitionVersion) {
@@ -84,6 +84,12 @@ public class ProcessDefinitionManager extends AbstractManager {
       throw new ProcessEngineException("There are " + results.size() + " process definitions with key = '" + processDefinitionKey + "' and version = '" + processDefinitionVersion + "'.");
     }
     return null;
+  }
+
+  public List<ProcessDefinition> findProcessDefinitionsByKey(String processDefinitionKey) {
+    ProcessDefinitionQueryImpl processDefinitionQuery = new ProcessDefinitionQueryImpl()
+      .processDefinitionKey(processDefinitionKey);
+    return  findProcessDefinitionsByQueryCriteria(processDefinitionQuery, null);
   }
 
   public List<ProcessDefinition> findProcessDefinitionsStartableByUser(String user) {
@@ -102,15 +108,19 @@ public class ProcessDefinitionManager extends AbstractManager {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("processDefinitionId", processDefinitionId);
     parameters.put("suspensionState", suspensionState.getStateCode());
-    getDbSqlSession().update("updateProcessDefinitionSuspensionStateByParameters", parameters);
+    getDbEntityManager().update(ProcessDefinitionEntity.class, "updateProcessDefinitionSuspensionStateByParameters", parameters);
   }
 
   public void updateProcessDefinitionSuspensionStateByKey(String processDefinitionKey, SuspensionState suspensionState) {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("processDefinitionKey", processDefinitionKey);
     parameters.put("suspensionState", suspensionState.getStateCode());
-    getDbSqlSession().update("updateProcessDefinitionSuspensionStateByParameters", parameters);
+    getDbEntityManager().update(ProcessDefinitionEntity.class, "updateProcessDefinitionSuspensionStateByParameters", parameters);
   }
 
 
+  @SuppressWarnings("unchecked")
+  public List<ProcessDefinition> findProcessDefinitionsByDeploymentId(String deploymentId) {
+    return getDbEntityManager().selectList("selectProcessDefinitionByDeploymentId", deploymentId);
+  }
 }

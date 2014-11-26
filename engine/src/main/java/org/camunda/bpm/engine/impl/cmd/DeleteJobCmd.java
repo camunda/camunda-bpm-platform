@@ -3,11 +3,12 @@ package org.camunda.bpm.engine.impl.cmd;
 import java.io.Serializable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 /**
  * @author Saeid Mirzaei
@@ -26,23 +27,18 @@ public class DeleteJobCmd implements Command<Object>, Serializable {
   }
 
   public Object execute(CommandContext commandContext) {
-    if (jobId == null) {
-      throw new ProcessEngineException("jobId is null");
-    }
+    ensureNotNull("jobId", jobId);
     if (log.isLoggable(Level.FINE)) {
       log.fine("Deleting job " + jobId);
     }
 
     JobEntity job = commandContext.getJobManager().findJobById(jobId);
-    if (job == null) {
-      throw new ProcessEngineException("No job found with id '" + jobId + "'");
-    }
-    
+    ensureNotNull("No job found with id '" + jobId + "'", "job", job);
+
     // We need to check if the job was locked, ie acquired by the job acquisition thread
     // This happens if the the job was already acquired, but not yet executed.
     // In that case, we can't allow to delete the job.
-    if (job.getLockOwner() != null || job.getLockExpirationTime() != null)
-    {
+    if (job.getLockOwner() != null || job.getLockExpirationTime() != null) {
       throw new ProcessEngineException("Cannot delete job when the job is being executed. Try again later.");
     }
 

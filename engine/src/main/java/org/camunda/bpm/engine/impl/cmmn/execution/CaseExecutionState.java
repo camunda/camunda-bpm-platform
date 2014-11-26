@@ -12,6 +12,9 @@
  */
 package org.camunda.bpm.engine.impl.cmmn.execution;
 
+import java.util.HashMap;
+import java.util.Map;
+
 
 
 /**
@@ -20,6 +23,9 @@ package org.camunda.bpm.engine.impl.cmmn.execution;
  */
 public interface CaseExecutionState {
 
+  Map<Integer, CaseExecutionState> CASE_EXECUTION_STATES = new HashMap<Integer, CaseExecutionState>();
+
+  CaseExecutionState NEW = new CaseExecutionStateImpl(0, "new");
   CaseExecutionState AVAILABLE = new CaseExecutionStateImpl(1, "available");
   CaseExecutionState ENABLED = new CaseExecutionStateImpl(2, "enabled");
   CaseExecutionState DISABLED = new CaseExecutionStateImpl(3, "disabled");
@@ -29,6 +35,13 @@ public interface CaseExecutionState {
   CaseExecutionState COMPLETED = new CaseExecutionStateImpl(7, "completed");
   CaseExecutionState FAILED = new CaseExecutionStateImpl(8, "failed");
   CaseExecutionState CLOSED = new CaseExecutionStateImpl(9, "closed");
+
+  CaseExecutionState TERMINATING_ON_TERMINATION = new CaseExecutionStateImpl(10, "terminatingOnTermination");
+  CaseExecutionState TERMINATING_ON_PARENT_TERMINATION = new CaseExecutionStateImpl(11, "terminatingOnParentTermination");
+  CaseExecutionState TERMINATING_ON_EXIT = new CaseExecutionStateImpl(12, "terminatingOnExit");
+
+  CaseExecutionState SUSPENDING_ON_SUSPENSION = new CaseExecutionStateImpl(13, "suspendingOnSuspension");
+  CaseExecutionState SUSPENDING_ON_PARENT_SUSPENSION = new CaseExecutionStateImpl(14, "suspendingOnParentSuspension");
 
   int getStateCode();
 
@@ -42,6 +55,12 @@ public interface CaseExecutionState {
     public CaseExecutionStateImpl(int stateCode, String string) {
       this.stateCode = stateCode;
       this.name = string;
+
+      CASE_EXECUTION_STATES.put(stateCode, this);
+    }
+
+    public static CaseExecutionState getStateForCode(Integer stateCode) {
+      return CASE_EXECUTION_STATES.get(stateCode);
     }
 
     public int getStateCode() {

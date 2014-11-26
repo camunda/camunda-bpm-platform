@@ -1,12 +1,9 @@
 package org.camunda.bpm.container.impl.jmx.kernel.util;
 
-import javax.management.ObjectName;
-
-import org.camunda.bpm.container.impl.jmx.kernel.MBeanServiceContainer.ServiceType;
-import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.container.impl.spi.PlatformServiceContainer.ServiceType;
 
 public enum TestServiceType implements ServiceType {
-    
+
     TYPE1("test.type1"),
     TYPE2("test.type2");
 
@@ -15,21 +12,9 @@ public enum TestServiceType implements ServiceType {
     private TestServiceType(String serviceRealm) {
       this.serviceRealm = serviceRealm;
     }
-    
-    public ObjectName getServiceName(String localName) {
-      try {
-        return new ObjectName(serviceRealm+":type=" + localName);
-      } catch (Exception e) {
-        throw new ProcessEngineException("Could not compose name", e);
-      }
+
+    public String getTypeName() {
+      return serviceRealm;
     }
-    
-    public ObjectName getTypeName() {
-      try {
-        return new ObjectName(serviceRealm + ":type=*");
-      } catch (Exception e) {
-        throw new ProcessEngineException("Could not compose name", e);
-      }
-    }
-     
+
 }

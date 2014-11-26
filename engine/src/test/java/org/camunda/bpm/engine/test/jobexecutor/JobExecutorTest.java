@@ -12,14 +12,19 @@
  */
 package org.camunda.bpm.engine.test.jobexecutor;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
+import org.camunda.bpm.engine.impl.jobexecutor.AcquiredJobs;
 import org.camunda.bpm.engine.impl.persistence.entity.JobManager;
 
 
@@ -57,5 +62,46 @@ public class JobExecutorTest extends JobExecutorTestCase {
     expectedMessages.add("timer-two");
 
     assertEquals(new TreeSet<String>(expectedMessages), new TreeSet<String>(messages));
+  }
+
+  public void testJobExecutorHintConfiguration() {
+    ProcessEngineConfiguration engineConfig1 =
+        ProcessEngineConfiguration.createStandaloneInMemProcessEngineConfiguration();
+
+    assertTrue("default setting is true", engineConfig1.isHintJobExecutor());
+
+    ProcessEngineConfiguration engineConfig2 =
+        ProcessEngineConfiguration.createStandaloneInMemProcessEngineConfiguration().setHintJobExecutor(false);
+
+    assertFalse(engineConfig2.isHintJobExecutor());
+
+    ProcessEngineConfiguration engineConfig3 =
+        ProcessEngineConfiguration.createStandaloneInMemProcessEngineConfiguration().setHintJobExecutor(true);
+
+    assertTrue(engineConfig3.isHintJobExecutor());
+  }
+
+  public void testAcquiredJobs() {
+    List<String> firstBatch = new ArrayList<String>(Arrays.asList("a", "b", "c"));
+    List<String> secondBatch = new ArrayList<String>(Arrays.asList("d", "e", "f"));
+    List<String> thirdBatch = new ArrayList<String>(Arrays.asList("g"));
+
+    AcquiredJobs acquiredJobs = new AcquiredJobs();
+    acquiredJobs.addJobIdBatch(firstBatch);
+    acquiredJobs.addJobIdBatch(secondBatch);
+    acquiredJobs.addJobIdBatch(thirdBatch);
+
+    assertEquals(firstBatch, acquiredJobs.getJobIdBatches().get(0));
+    assertEquals(secondBatch, acquiredJobs.getJobIdBatches().get(1));
+    assertEquals(thirdBatch, acquiredJobs.getJobIdBatches().get(2));
+
+    acquiredJobs.removeJobId("a");
+    assertEquals(Arrays.asList("b", "c"), acquiredJobs.getJobIdBatches().get(0));
+    assertEquals(secondBatch, acquiredJobs.getJobIdBatches().get(1));
+    assertEquals(thirdBatch, acquiredJobs.getJobIdBatches().get(2));
+
+    assertEquals(3, acquiredJobs.getJobIdBatches().size());
+    acquiredJobs.removeJobId("g");
+    assertEquals(2, acquiredJobs.getJobIdBatches().size());
   }
 }

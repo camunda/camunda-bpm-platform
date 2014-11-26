@@ -21,16 +21,18 @@
   <!-- HISTORIC PROCESS VARIABLE INSERT -->
   
   <insert id="insertHistoricVariableInstance" parameterType="org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEntity">
-    insert into ${prefix}ACT_HI_VARINST (ID_, PROC_INST_ID_, EXECUTION_ID_, ACT_INST_ID_, TASK_ID_, NAME_, REV_, VAR_TYPE_, BYTEARRAY_ID_, DOUBLE_, LONG_ , TEXT_, TEXT2_)
+    insert into ${prefix}ACT_HI_VARINST (ID_, PROC_INST_ID_, EXECUTION_ID_, ACT_INST_ID_, CASE_INST_ID_, CASE_EXECUTION_ID_, TASK_ID_, NAME_, REV_, VAR_TYPE_, BYTEARRAY_ID_, DOUBLE_, LONG_ , TEXT_, TEXT2_)
     values (
       #{id, jdbcType=VARCHAR},
       #{processInstanceId, jdbcType=VARCHAR},
       #{executionId, jdbcType=VARCHAR},
       #{activityInstanceId, jdbcType=VARCHAR},
+      #{caseInstanceId, jdbcType=VARCHAR},
+      #{caseExecutionId, jdbcType=VARCHAR},
       #{taskId, jdbcType=VARCHAR},
       #{variableName, jdbcType=VARCHAR},
       #{revision, jdbcType=VARCHAR},
-      #{variableTypeName, jdbcType=VARCHAR},
+      #{serializerName, jdbcType=VARCHAR},
       #{byteArrayId, jdbcType=VARCHAR},
       #{doubleValue, jdbcType=DOUBLE},
       #{longValue, jdbcType=BIGINT},
@@ -44,7 +46,7 @@
   <update id="updateHistoricVariableInstance" parameterType="org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEntity">
     update ${prefix}ACT_HI_VARINST set
       REV_ = #{revisionNext, jdbcType=INTEGER},
-      VAR_TYPE_ = #{variableTypeName, jdbcType=VARCHAR},
+      VAR_TYPE_ = #{serializerName, jdbcType=VARCHAR},
       BYTEARRAY_ID_ = #{byteArrayId, jdbcType=VARCHAR},
       DOUBLE_ = #{doubleValue, jdbcType=DOUBLE},
       LONG_ = #{longValue, jdbcType=BIGINT},
@@ -65,16 +67,17 @@
   </delete>
   
   <!-- HISTORIC PROCESS VARIABLE RESULTMAP -->
-  <resultMap id="historicProcessVariableResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEntity">
+  <resultMap id="historicVariableInstanceResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEntity">
     <id property="id" column="ID_" jdbcType="VARCHAR" />
     <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR" />
     <result property="executionId" column="EXECUTION_ID_" jdbcType="VARCHAR" />
     <result property="activityInstanceId" column="ACT_INST_ID_" jdbcType="VARCHAR" />
+    <result property="caseInstanceId" column="CASE_INST_ID_" jdbcType="VARCHAR" />
+    <result property="caseExecutionId" column="CASE_EXECUTION_ID_" jdbcType="VARCHAR" />
     <result property="taskId" column="TASK_ID_" jdbcType="VARCHAR" />
     <result property="name" column="NAME_" javaType="String" jdbcType="VARCHAR" />
     <result property="revision" column="REV_" jdbcType="INTEGER" />
-    <result property="variableTypeName" column="VAR_TYPE_" jdbcType="VARCHAR"/>
-    <result property="variableType" column="VAR_TYPE_" javaType="org.camunda.bpm.engine.impl.variable.VariableType" jdbcType="VARCHAR"/>
+    <result property="serializerName" column="VAR_TYPE_" jdbcType="VARCHAR"/>
     <result property="byteArrayId" column="BYTEARRAY_ID_" jdbcType="VARCHAR" />
     <result property="doubleValue" column="DOUBLE_" jdbcType="DOUBLE" />
     <result property="textValue" column="TEXT_" jdbcType="VARCHAR" />
@@ -82,16 +85,17 @@
     <result property="longValue" column="LONG_" jdbcType="BIGINT" />
   </resultMap>
   
-  <resultMap id="historicProcessVariableResultMap_postgres" type="org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEntity">
+  <resultMap id="historicVariableInstanceResultMap_postgres" type="org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEntity">
     <id property="id" column="ID_" jdbcType="VARCHAR" />
     <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR" />
     <result property="executionId" column="EXECUTION_ID_" jdbcType="VARCHAR" />
     <result property="activityInstanceId" column="ACT_INST_ID_" jdbcType="VARCHAR" />
+    <result property="caseInstanceId" column="CASE_INST_ID_" jdbcType="VARCHAR" />
+    <result property="caseExecutionId" column="CASE_EXECUTION_ID_" jdbcType="VARCHAR" />
     <result property="taskId" column="TASK_ID_" jdbcType="VARCHAR" />
     <result property="name" column="NAME_" javaType="String" jdbcType="VARCHAR" />
     <result property="revision" column="REV_" jdbcType="INTEGER" />
-    <result property="variableTypeName" column="VAR_TYPE_" jdbcType="VARCHAR"/>
-    <result property="variableType" column="VAR_TYPE_" javaType="org.camunda.bpm.engine.impl.variable.VariableType" jdbcType="VARCHAR"/>
+    <result property="serializerName" column="VAR_TYPE_" jdbcType="VARCHAR"/>
     <result property="byteArrayId" column="BYTEARRAY_ID_" jdbcType="VARCHAR" />
     <result property="doubleValue" column="DOUBLE_" jdbcType="DOUBLE" />
     <result property="textValue" column="TEXT_" jdbcType="VARCHAR" />
@@ -101,12 +105,17 @@
   
   <!-- HISTORIC VARIABLE SELECT -->
 
-  <select id="selectHistoricVariablesByProcessInstanceId" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="historicProcessVariableResultMap">
+  <select id="selectHistoricVariablesByProcessInstanceId" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="historicVariableInstanceResultMap">
     select * from ${prefix}ACT_HI_VARINST 
     where PROC_INST_ID_ = #{parameter, jdbcType=VARCHAR}
   </select>
 
-  <select id="selectHistoricVariableInstanceByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.HistoricVariableInstanceQueryImpl" resultMap="historicProcessVariableResultMap">
+  <select id="selectHistoricVariablesByCaseInstanceId" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="historicVariableInstanceResultMap">
+    select * from ${prefix}ACT_HI_VARINST
+    where CASE_INST_ID_ = #{parameter, jdbcType=VARCHAR}
+  </select>
+
+  <select id="selectHistoricVariableInstanceByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.HistoricVariableInstanceQueryImpl" resultMap="historicVariableInstanceResultMap">
   	${limitBefore}
     select RES.* ${limitBetween}
     <include refid="selectHistoricVariableInstanceByQueryCriteriaSql"/>
@@ -119,7 +128,7 @@
     <include refid="selectHistoricVariableInstanceByQueryCriteriaSql"/>
   </select>
   
-  <select id="selectHistoricVariableInstanceByQueryCriteria_postgres" parameterType="org.camunda.bpm.engine.impl.HistoricVariableInstanceQueryImpl" resultMap="historicProcessVariableResultMap_postgres">
+  <select id="selectHistoricVariableInstanceByQueryCriteria_postgres" parameterType="org.camunda.bpm.engine.impl.HistoricVariableInstanceQueryImpl" resultMap="historicVariableInstanceResultMap_postgres">
     ${limitBefore}
     select RES.* ${limitBetween}
     <include refid="selectHistoricVariableInstanceByQueryCriteriaSql"/>
@@ -135,6 +144,9 @@
       </if>
       <if test="processInstanceId != null">
         RES.PROC_INST_ID_ = #{processInstanceId}
+      </if>
+      <if test="caseInstanceId != null">
+        RES.CASE_INST_ID_ = #{caseInstanceId}
       </if>
       <if test="variableName != null">
         and RES.NAME_ = #{variableName}
@@ -161,6 +173,15 @@
         </foreach>
       </if>
 
+      <!-- caseExecutionIds -->
+      <if test="caseExecutionIds != null &amp;&amp; caseExecutionIds.length > 0">
+        and RES.CASE_EXECUTION_ID_ in
+        <foreach item="item" index="index" collection="caseExecutionIds"
+                 open="(" separator="," close=")">
+          #{item}
+        </foreach>
+      </if>
+
       <!-- activityInstanceIds -->
       <if test="activityInstanceIds != null &amp;&amp; activityInstanceIds.length > 0">
         and RES.ACT_INST_ID_ in
@@ -172,68 +193,22 @@
 
       <!-- PLEASE NOTE: If you change anything have a look into the Execution, the same query object is used there! -->
       <if test="queryVariableValue != null" >
-        <if test="!queryVariableValue.type.equals('null')">
-        <!-- When operator is not-equals or type of value is null, type doesn't matter! -->
-          and RES.VAR_TYPE_ = #{queryVariableValue.type}
-        </if>
-        <if test="queryVariableValue.textValue != null &amp;&amp; queryVariableValue.longValue == null &amp;&amp; queryVariableValue.doubleValue == null">
-        and RES.TEXT_
-        <choose>
-          <when test="queryVariableValue.operator.equals('LIKE')">LIKE</when>
-          <otherwise><include refid="executionVariableOperator" /></otherwise>
-        </choose>
-          #{queryVariableValue.textValue}
-        </if>
-        <if test="queryVariableValue.textValue2 != null">
-        and RES.TEXT2_
-        <choose>
-          <when test="queryVariableValue.operator.equals('LIKE')">LIKE</when>
-          <otherwise><include refid="executionVariableOperator" /></otherwise>
-        </choose>
-          #{queryVariableValue.textValue2}
-        </if>
-        <if test="queryVariableValue.longValue != null">
-        and RES.LONG_
-        <include refid="executionVariableOperator" />
-        #{queryVariableValue.longValue}
-        </if>
-        <if test="queryVariableValue.doubleValue != null">
-        and RES.DOUBLE_
-        <include refid="executionVariableOperator" />
-        #{queryVariableValue.doubleValue}
-        </if>
-        <!-- Null variable type -->
-        <if test="queryVariableValue.textValue == null &amp;&amp; queryVariableValue.textValue2 == null &amp;&amp; queryVariableValue.longValue == null &amp;&amp; queryVariableValue.doubleValue == null">
-          <choose>
-          <when test="queryVariableValue.operator.equals('NOT_EQUALS')">
-            and (RES.TEXT_ is not null or RES.TEXT2_ is not null or RES.LONG_ is not null or RES.DOUBLE_ is not null or RES.BYTEARRAY_ID_ is not null)
-          </when>
-          <otherwise>
-        and RES.TEXT_ is null and RES.TEXT2_ is null and RES.LONG_ is null and RES.DOUBLE_ is null and RES.BYTEARRAY_ID_ is null
-          </otherwise>
-        </choose>
+        <bind name="varTypeField" value="'VAR_TYPE_'"/>
+        <bind name="varPrefix" value="'RES.'"/>
+        <if test="queryVariableValue.valueConditions != null">
+          and
+          <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.variableValueConditions"/>
         </if>
       </if>
       
     </where>
   </sql>
-
-  <sql id="executionVariableOperator">
-    <choose>
-      <when test="queryVariableValue.operator.equals('EQUALS')">=</when>
-      <when test="queryVariableValue.operator.equals('NOT_EQUALS')">&lt;&gt;</when>
-      <when test="queryVariableValue.operator.equals('GREATER_THAN')">&gt;</when>
-      <when test="queryVariableValue.operator.equals('GREATER_THAN_OR_EQUAL')">&gt;=</when>
-      <when test="queryVariableValue.operator.equals('LESS_THAN')">&lt;</when>
-      <when test="queryVariableValue.operator.equals('LESS_THAN_OR_EQUAL')">&lt;=</when>
-   </choose>
-  </sql>
   
-  <select id="selectHistoricVariableInstance" resultMap="historicProcessVariableResultMap">
+  <select id="selectHistoricVariableInstance" resultMap="historicVariableInstanceResultMap">
     select * from ${prefix}ACT_HI_VARINST where ID_ = #{id}
   </select>
   
-  <select id="selectHistoricVariableInstanceByVariableInstanceId" resultMap="historicProcessVariableResultMap">
+  <select id="selectHistoricVariableInstanceByVariableInstanceId" resultMap="historicVariableInstanceResultMap">
     select * from ${prefix}ACT_HI_VARINST where ID_ = #{variableInstanceId}
   </select>
   

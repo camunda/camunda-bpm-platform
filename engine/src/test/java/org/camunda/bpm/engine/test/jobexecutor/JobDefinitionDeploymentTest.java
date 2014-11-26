@@ -16,10 +16,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.camunda.bpm.engine.impl.jobexecutor.AsyncContinuationJobHandler;
-import org.camunda.bpm.engine.impl.jobexecutor.TimerCatchIntermediateEventJobHandler;
-import org.camunda.bpm.engine.impl.jobexecutor.TimerExecuteNestedActivityJobHandler;
-import org.camunda.bpm.engine.impl.jobexecutor.TimerStartEventJobHandler;
+import org.camunda.bpm.engine.impl.jobexecutor.*;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.management.JobDefinitionQuery;
@@ -147,7 +144,7 @@ public class JobDefinitionDeploymentTest extends PluggableProcessEngineTestCase 
     assertNotNull(jobDefinition);
     assertEquals(AsyncContinuationJobHandler.TYPE, jobDefinition.getJobType());
     assertEquals("theService", jobDefinition.getActivityId());
-    assertEquals(null, jobDefinition.getJobConfiguration());
+    assertEquals(MessageJobDeclaration.ASYNC_BEFORE, jobDefinition.getJobConfiguration());
     assertEquals(processDefinition.getId(), jobDefinition.getProcessDefinitionId());
   }
 

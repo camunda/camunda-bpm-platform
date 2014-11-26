@@ -14,8 +14,6 @@
 package org.camunda.bpm.engine.impl.cmd;
 
 import java.util.Map;
-
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -25,6 +23,8 @@ import org.camunda.bpm.engine.impl.persistence.entity.MessageEventSubscriptionEn
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 
 /**
@@ -43,41 +43,33 @@ public class StartProcessInstanceByMessageCmd implements Command<ProcessInstance
   }
 
   public ProcessInstance execute(CommandContext commandContext) {
-    
-    if(messageName == null) {
-      throw new ProcessEngineException("Cannot start process instance by message: message name is null");
-    }
-    
+
+    ensureNotNull("Cannot start process instance by message", "message name", messageName);
+
     MessageEventSubscriptionEntity messageEventSubscription = commandContext.getEventSubscriptionManager()
       .findMessageStartEventSubscriptionByName(messageName);
-    
-    if(messageEventSubscription == null) {
-      throw new ProcessEngineException("Cannot start process instance by message: no subscription to message with name '"+messageName+"' found.");
-    }
-    
+
+    ensureNotNull("Cannot start process instance by message: no subscription to message with name '" + messageName + "' found", "messageEventSubscription", messageEventSubscription);
+
     String processDefinitionId = messageEventSubscription.getConfiguration();
-    if(processDefinitionId == null) {
-      throw new ProcessEngineException("Cannot start process instance by message: subscription to message with name '"+messageName+"' is not a message start event.");
-    }
-        
+    ensureNotNull("Cannot start process instance by message: subscription to message with name '" + messageName + "' is not a message start event", "processDefinitionId", processDefinitionId);
+
     DeploymentCache deploymentCache = Context
-            .getProcessEngineConfiguration()
-            .getDeploymentCache();
-          
+      .getProcessEngineConfiguration()
+      .getDeploymentCache();
+
     ProcessDefinitionEntity processDefinition = deploymentCache.findDeployedProcessDefinitionById(processDefinitionId);
-    if (processDefinition == null) {
-        throw new ProcessEngineException("No process definition found for id '" + processDefinitionId + "'");
-    }
-  
+    ensureNotNull("No process definition found for id '" + processDefinitionId + "'", "processDefinition", processDefinition);
+
     ActivityImpl startActivity = processDefinition.findActivity(messageEventSubscription.getActivityId());
     ExecutionEntity processInstance = processDefinition.createProcessInstance(businessKey, startActivity);
 
     if (processVariables != null) {
       processInstance.setVariables(processVariables);
     }
-    
+
     processInstance.start();
-    
+
     return processInstance;
   }
 

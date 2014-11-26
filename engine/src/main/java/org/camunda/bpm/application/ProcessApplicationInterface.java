@@ -21,6 +21,7 @@ import org.camunda.bpm.application.impl.EmbeddedProcessApplication;
 import org.camunda.bpm.application.impl.ServletProcessApplication;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.delegate.TaskListener;
+import org.camunda.bpm.engine.impl.javax.el.BeanELResolver;
 import org.camunda.bpm.engine.impl.javax.el.ELResolver;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
 
@@ -158,6 +159,13 @@ public interface ProcessApplicationInterface {
    * to {@link #execute(Callable)}</p>
    */
   public ELResolver getElResolver();
+
+  /**
+   * <p>Returns an instance of {@link BeanELResolver} that a process application caches.</p>
+   * <p>Has to be managed by the process application since {@link BeanELResolver} keeps
+   * hard references to classes in a cache.</p>
+   */
+  public BeanELResolver getBeanElResolver();
 
   /**
    * <p>Override this method in order to programmatically add resources to the

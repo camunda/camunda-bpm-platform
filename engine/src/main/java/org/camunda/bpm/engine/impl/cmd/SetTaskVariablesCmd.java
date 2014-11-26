@@ -15,11 +15,11 @@ package org.camunda.bpm.engine.impl.cmd;
 
 import java.io.Serializable;
 import java.util.Map;
-
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 
 /**
@@ -41,24 +41,20 @@ public class SetTaskVariablesCmd implements Command<Object>, Serializable {
   }
   
   public Object execute(CommandContext commandContext) {
-    if(taskId == null) {
-      throw new ProcessEngineException("taskId is null");
-    }
-    
+    ensureNotNull("taskId", taskId);
+
     TaskEntity task = commandContext
       .getTaskManager()
       .findTaskById(taskId);
-    
-    if (task == null) {
-      throw new ProcessEngineException("Cannot find task with id " + taskId);
-    }
-    
+
+    ensureNotNull("Cannot find task with id " + taskId, "task", task);
+
     if (isLocal) {
       task.setVariablesLocal(variables);
     } else {
       task.setVariables(variables);
     }
-    
+
     return null;
   }
   

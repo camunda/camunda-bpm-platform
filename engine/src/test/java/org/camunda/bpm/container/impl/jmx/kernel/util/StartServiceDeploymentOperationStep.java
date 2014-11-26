@@ -1,17 +1,15 @@
 package org.camunda.bpm.container.impl.jmx.kernel.util;
 
-import javax.management.ObjectName;
+import org.camunda.bpm.container.impl.spi.PlatformServiceContainer;
+import org.camunda.bpm.container.impl.spi.DeploymentOperation;
+import org.camunda.bpm.container.impl.spi.DeploymentOperationStep;
 
-import org.camunda.bpm.container.impl.jmx.kernel.MBeanDeploymentOperation;
-import org.camunda.bpm.container.impl.jmx.kernel.MBeanDeploymentOperationStep;
-import org.camunda.bpm.container.impl.jmx.kernel.MBeanServiceContainer;
+public class StartServiceDeploymentOperationStep extends DeploymentOperationStep {
 
-public class StartServiceDeploymentOperationStep extends MBeanDeploymentOperationStep {
-  
   private TestService service;
-  private ObjectName serviceName;
+  private String serviceName;
 
-  public StartServiceDeploymentOperationStep(ObjectName serviceName, TestService service) {
+  public StartServiceDeploymentOperationStep(String serviceName, TestService service) {
     this.serviceName = serviceName;
     this.service = service;
   }
@@ -20,9 +18,9 @@ public class StartServiceDeploymentOperationStep extends MBeanDeploymentOperatio
     return "start "+serviceName;
   }
 
-  public void performOperationStep(MBeanDeploymentOperation operationContext) {
-    final MBeanServiceContainer serviceContainer = operationContext.getServiceContainer();
-    
+  public void performOperationStep(DeploymentOperation operationContext) {
+    final PlatformServiceContainer serviceContainer = operationContext.getServiceContainer();
+
     serviceContainer.startService(serviceName, service);
   }
 

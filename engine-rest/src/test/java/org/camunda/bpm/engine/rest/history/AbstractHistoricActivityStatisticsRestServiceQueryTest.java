@@ -45,7 +45,7 @@ import com.jayway.restassured.response.Response;
  * @author Roman Smirnov
  *
  */
-public class AbstractHistoricActivityStatisticsRestServiceQueryTest extends AbstractRestServiceTest {
+public abstract class AbstractHistoricActivityStatisticsRestServiceQueryTest extends AbstractRestServiceTest {
 
   protected static final String HISTORY_URL = TEST_RESOURCE_ROOT_PATH + "/history";
   protected static final String HISTORIC_ACTIVITY_STATISTICS_URL = HISTORY_URL + "/process-definition/{id}/statistics";

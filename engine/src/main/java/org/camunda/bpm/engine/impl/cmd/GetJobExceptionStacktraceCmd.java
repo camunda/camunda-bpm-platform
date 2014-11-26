@@ -14,11 +14,11 @@
 package org.camunda.bpm.engine.impl.cmd;
 
 import java.io.Serializable;
-
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 
 /**
@@ -35,18 +35,14 @@ public class GetJobExceptionStacktraceCmd implements Command<String>, Serializab
 
 
   public String execute(CommandContext commandContext) {
-    if(jobId == null) {
-      throw new ProcessEngineException("jobId is null");
-    }
-    
+    ensureNotNull("jobId", jobId);
+
     JobEntity job = commandContext
       .getJobManager()
       .findJobById(jobId);
-    
-    if(job == null) {
-      throw new ProcessEngineException("No job found with id " + jobId);
-    }
-    
+
+    ensureNotNull("No job found with id " + jobId, "job", job);
+
     return job.getExceptionStacktrace();
   }
 

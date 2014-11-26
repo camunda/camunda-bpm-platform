@@ -14,12 +14,13 @@ package org.camunda.bpm.engine.impl;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.cmd.CorrelateAllMessageCmd;
 import org.camunda.bpm.engine.impl.cmd.CorrelateMessageCmd;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.runtime.MessageCorrelationBuilder;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 /**
  * @author Daniel Meyer
@@ -38,17 +39,13 @@ public class MessageCorrelationBuilderImpl implements MessageCorrelationBuilder 
 
   public MessageCorrelationBuilderImpl(CommandExecutor commandExecutor, String messageName) {
     this(messageName);
-    if(commandExecutor == null) {
-      throw new ProcessEngineException("commandExecutor cannot be null");
-    }
+    ensureNotNull("commandExecutor", commandExecutor);
     this.commandExecutor = commandExecutor;
   }
 
   public MessageCorrelationBuilderImpl(CommandContext commandContext, String messageName) {
     this(messageName);
-    if(commandContext == null) {
-      throw new ProcessEngineException("commandContext cannot be null");
-    }
+    ensureNotNull("commandContext", commandExecutor);
     this.commandContext = commandContext;
   }
 
@@ -62,6 +59,7 @@ public class MessageCorrelationBuilderImpl implements MessageCorrelationBuilder 
   }
 
   public MessageCorrelationBuilder processInstanceVariableEquals(String variableName, Object variableValue) {
+    ensureNotNull("variableName", variableName);
     if(correlationProcessInstanceVariables == null) {
       correlationProcessInstanceVariables = new HashMap<String, Object>();
     }
@@ -75,6 +73,7 @@ public class MessageCorrelationBuilderImpl implements MessageCorrelationBuilder 
   }
 
   public MessageCorrelationBuilder setVariable(String variableName, Object variableValue) {
+    ensureNotNull("variableName", variableName);
     if(payloadProcessInstanceVariables == null) {
       payloadProcessInstanceVariables = new HashMap<String, Object>();
     }
@@ -83,15 +82,26 @@ public class MessageCorrelationBuilderImpl implements MessageCorrelationBuilder 
   }
 
   public MessageCorrelationBuilder setVariables(Map<String, Object> variables) {
-    if(payloadProcessInstanceVariables == null) {
-      payloadProcessInstanceVariables = new HashMap<String, Object>();
+    if (variables != null) {
+      if (payloadProcessInstanceVariables == null) {
+        payloadProcessInstanceVariables = new HashMap<String, Object>();
+      }
+      payloadProcessInstanceVariables.putAll(variables);
     }
-    payloadProcessInstanceVariables.putAll(variables);
     return this;
   }
 
   public void correlate() {
     CorrelateMessageCmd command = new CorrelateMessageCmd(this);
+    if(commandExecutor != null) {
+      commandExecutor.execute(command);
+    } else {
+      command.execute(commandContext);
+    }
+  }
+
+  public void correlateAll() {
+    CorrelateAllMessageCmd command = new CorrelateAllMessageCmd(this);
     if(commandExecutor != null) {
       commandExecutor.execute(command);
     } else {

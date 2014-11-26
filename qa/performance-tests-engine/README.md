@@ -56,6 +56,25 @@ The raw JSON result files are located in the `target/results/` folder and provid
   }, ...
 }
 ```
+<a name="longterm-results" />
+### Collect longterm results
+
+You could collect your benchmarks over a longer time if you pass the absolute filename
+of a csv file as a commandline parameter. Here you are able to compare different runs in different
+configurations over a long period. If you choose a file outside of your target directory, it won't be deleted
+for the next run.
+
+```Shell
+mvn clean install -Pbenchmark,h2 \ 
+                  -DlongTermBenchmarkResultFile=C:\\Arbeit\\camunda\\performanceTests\\longtermResults.csv
+```
+
+The results file may look like this:
+
+![LongTermBenchmarkResult Screenshot][3]
+
+This feature works only in the benchmark profile.  
+
 <a name="sql-statement-log"></a>
 ## The Sql Statement Log
 
@@ -153,11 +172,10 @@ Example for command line parameters:
 
 ```Shell
 mvn clean install -Pbenchmark,mysql \
-                  -Ddatabase.host=localhost \
-                  -Ddatabase.name=process-engine \
+                  -Ddatabase.driver=com.mysql.jdbc.Driver \
+                  -Ddatabase.url=jdbc:mysql://localhost:3306:camunda \
                   -Ddatabase.user=oscar \
                   -Ddatabase.password=s3cret \
-                  -Ddatabase.port=3306
 ```
 
 <a name="configuration-history" />
@@ -172,3 +190,4 @@ mvn clean install -Pbenchmark,mysql,history-level-full
 
 [1]: docs/benchmark-report.png
 [2]: docs/sql-statement-log-report.png
+[3]: docs/longTermBenchmarkResults.png

@@ -23,6 +23,7 @@ import org.camunda.bpm.engine.history.HistoricVariableInstanceQuery;
 import org.camunda.bpm.engine.rest.dto.history.HistoricVariableInstanceDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.sub.history.HistoricVariableInstanceResource;
+import org.camunda.bpm.engine.variable.type.ValueType;
 
 /**
  * @author Daniel Meyer
@@ -38,10 +39,15 @@ public class HistoricVariableInstanceResourceImpl implements HistoricVariableIns
     this.engine = engine;
   }
 
-  public HistoricVariableInstanceDto getVariable() {
-    HistoricVariableInstance variableInstance = baseQuery()
-      .disableBinaryFetching()
-      .singleResult();
+  public HistoricVariableInstanceDto getVariable(boolean deserializeObjectValue) {
+    HistoricVariableInstanceQuery query = baseQuery().disableBinaryFetching();
+
+    if (!deserializeObjectValue) {
+      query.disableCustomObjectDeserialization();
+    }
+
+    HistoricVariableInstance variableInstance = query.singleResult();
+
     if(variableInstance != null) {
       return HistoricVariableInstanceDto.fromHistoricVariableInstance(variableInstance);
 
@@ -53,20 +59,23 @@ public class HistoricVariableInstanceResourceImpl implements HistoricVariableIns
 
   public InputStream getBinaryVariable() {
     HistoricVariableInstance variableInstance = baseQuery()
+        .disableCustomObjectDeserialization()
         .singleResult();
     if(variableInstance != null) {
+      if (variableInstance.getTypeName().equals(ValueType.BYTES.getName())) {
+        byte[] valueBytes = (byte[]) variableInstance.getValue();
+        if (valueBytes == null) {
+          valueBytes = new byte[0];
+        }
 
-      Object value = variableInstance.getValue();
-      if(value instanceof byte[]) {
-        return new ByteArrayInputStream((byte[]) value);
-
+        return new ByteArrayInputStream(valueBytes);
       } else {
-        throw new InvalidRequestException(Status.BAD_REQUEST, "Variable instance with Id '"+variableId + "' is not a binary variable.");
-
+        throw new InvalidRequestException(Status.BAD_REQUEST,
+            String.format("Value of variable %s is not a binary value.", variableId));
       }
 
     } else {
-      throw new InvalidRequestException(Status.NOT_FOUND, "Variable instance with Id '"+variableId + "' does not exist.");
+      throw new InvalidRequestException(Status.NOT_FOUND, "Historic variable instance with Id '"+variableId + "' does not exist.");
     }
   }
 

@@ -30,6 +30,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -39,11 +40,13 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.repository.ProcessDefinitionQuery;
+import org.camunda.bpm.engine.runtime.EventSubscription;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ExecutionQuery;
 import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.variable.Variables;
 import org.junit.Assert;
 
 
@@ -905,7 +908,7 @@ public void testBooleanVariable() throws Exception {
         .list();
       fail("Expected exception");
     } catch(ProcessEngineException ae) {
-      assertTextPresent("Variables of type ByteArray cannot be used to query", ae.getMessage());
+      assertTextPresent("Object values cannot be used to query", ae.getMessage());
     }
 
     runtimeService.deleteProcessInstance(processInstance.getId(), "test");
@@ -1303,6 +1306,194 @@ public void testBooleanVariable() throws Exception {
     assertEquals(1, executionList.size());
     // execution id of subprocess != process instance id
     assertNotSame(processInstance.getId(), executionList.get(0).getId());
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml",
+      "org/camunda/bpm/engine/test/api/runtime/oneMessageCatchProcess.bpmn20.xml"})
+  public void testQueryForExecutionsWithMessageEventSubscriptions() {
+    runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    ProcessInstance instance1 = runtimeService.startProcessInstanceByKey("oneMessageCatchProcess");
+    ProcessInstance instance2 = runtimeService.startProcessInstanceByKey("oneMessageCatchProcess");
+
+    List<Execution> executions = runtimeService.createExecutionQuery()
+        .messageEventSubscription().orderByProcessInstanceId().asc().list();
+
+    assertEquals(2, executions.size());
+    if (instance1.getId().compareTo(instance2.getId()) < 0) {
+      assertEquals(instance1.getId(), executions.get(0).getProcessInstanceId());
+      assertEquals(instance2.getId(), executions.get(1).getProcessInstanceId());
+    } else {
+      assertEquals(instance2.getId(), executions.get(0).getProcessInstanceId());
+      assertEquals(instance1.getId(), executions.get(1).getProcessInstanceId());
+    }
+
+  }
+
+  @Deployment(resources="org/camunda/bpm/engine/test/api/runtime/oneMessageCatchProcess.bpmn20.xml")
+  public void testQueryForExecutionsWithMessageEventSubscriptionsOverlappingFilters() {
+
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("oneMessageCatchProcess");
+
+    Execution execution = runtimeService
+      .createExecutionQuery()
+      .messageEventSubscriptionName("newInvoiceMessage")
+      .messageEventSubscription()
+      .singleResult();
+
+    assertNotNull(execution);
+    assertEquals(instance.getId(), execution.getProcessInstanceId());
+
+    runtimeService
+      .createExecutionQuery()
+      .messageEventSubscription()
+      .messageEventSubscriptionName("newInvoiceMessage")
+      .list();
+
+    assertNotNull(execution);
+    assertEquals(instance.getId(), execution.getProcessInstanceId());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/twoBoundaryEventSubscriptions.bpmn20.xml")
+  public void testQueryForExecutionsWithMultipleSubscriptions() {
+    // given two message event subscriptions
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("process");
+
+    List<EventSubscription> subscriptions =
+        runtimeService.createEventSubscriptionQuery().processInstanceId(instance.getId()).list();
+    assertEquals(2, subscriptions.size());
+    assertEquals(subscriptions.get(0).getExecutionId(), subscriptions.get(1).getExecutionId());
+
+    // should return the execution once (not twice)
+    Execution execution = runtimeService
+      .createExecutionQuery()
+      .messageEventSubscription()
+      .singleResult();
+
+    assertNotNull(execution);
+    assertEquals(instance.getId(), execution.getProcessInstanceId());
+
+    // should return the execution once
+    execution = runtimeService
+      .createExecutionQuery()
+      .messageEventSubscriptionName("messageName_1")
+      .singleResult();
+
+    assertNotNull(execution);
+    assertEquals(instance.getId(), execution.getProcessInstanceId());
+
+    // should return the execution once
+    execution = runtimeService
+      .createExecutionQuery()
+      .messageEventSubscriptionName("messageName_2")
+      .singleResult();
+
+    assertNotNull(execution);
+    assertEquals(instance.getId(), execution.getProcessInstanceId());
+
+    // should return the execution once
+    execution = runtimeService
+      .createExecutionQuery()
+      .messageEventSubscriptionName("messageName_1")
+      .messageEventSubscriptionName("messageName_2")
+      .singleResult();
+
+    assertNotNull(execution);
+    assertEquals(instance.getId(), execution.getProcessInstanceId());
+
+    // should not return the execution
+    execution = runtimeService
+      .createExecutionQuery()
+      .messageEventSubscriptionName("messageName_1")
+      .messageEventSubscriptionName("messageName_2")
+      .messageEventSubscriptionName("another")
+      .singleResult();
+
+    assertNull(execution);
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
+  public void testProcessVariableValueEqualsNumber() throws Exception {
+    // long
+    runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Collections.<String, Object>singletonMap("var", 123L));
+
+    // non-matching long
+    runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Collections.<String, Object>singletonMap("var", 12345L));
+
+    // short
+    runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Collections.<String, Object>singletonMap("var", (short) 123));
+
+    // double
+    runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Collections.<String, Object>singletonMap("var", 123.0d));
+
+    // integer
+    runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Collections.<String, Object>singletonMap("var", 123));
+
+    // untyped null (should not match)
+    runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Collections.<String, Object>singletonMap("var", null));
+
+    // typed null (should not match)
+    runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Collections.<String, Object>singletonMap("var", Variables.longValue(null)));
+
+    runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Collections.<String, Object>singletonMap("var", "123"));
+
+    assertEquals(4, runtimeService.createExecutionQuery().processVariableValueEquals("var", Variables.numberValue(123)).count());
+    assertEquals(4, runtimeService.createExecutionQuery().processVariableValueEquals("var", Variables.numberValue(123L)).count());
+    assertEquals(4, runtimeService.createExecutionQuery().processVariableValueEquals("var", Variables.numberValue(123.0d)).count());
+    assertEquals(4, runtimeService.createExecutionQuery().processVariableValueEquals("var", Variables.numberValue((short) 123)).count());
+
+    assertEquals(1, runtimeService.createExecutionQuery().processVariableValueEquals("var", Variables.numberValue(null)).count());
+
+    assertEquals(4, runtimeService.createExecutionQuery().variableValueEquals("var", Variables.numberValue(123)).count());
+    assertEquals(4, runtimeService.createExecutionQuery().variableValueEquals("var", Variables.numberValue(123L)).count());
+    assertEquals(4, runtimeService.createExecutionQuery().variableValueEquals("var", Variables.numberValue(123.0d)).count());
+    assertEquals(4, runtimeService.createExecutionQuery().variableValueEquals("var", Variables.numberValue((short) 123)).count());
+
+    assertEquals(1, runtimeService.createExecutionQuery().variableValueEquals("var", Variables.numberValue(null)).count());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
+  public void testProcessVariableValueNumberComparison() throws Exception {
+    // long
+    runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Collections.<String, Object>singletonMap("var", 123L));
+
+    // non-matching long
+    runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Collections.<String, Object>singletonMap("var", 12345L));
+
+    // short
+    runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Collections.<String, Object>singletonMap("var", (short) 123));
+
+    // double
+    runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Collections.<String, Object>singletonMap("var", 123.0d));
+
+    // integer
+    runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Collections.<String, Object>singletonMap("var", 123));
+
+    // untyped null
+    runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Collections.<String, Object>singletonMap("var", null));
+
+    // typed null
+    runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Collections.<String, Object>singletonMap("var", Variables.longValue(null)));
+
+    runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Collections.<String, Object>singletonMap("var", "123"));
+
+    assertEquals(3, runtimeService.createExecutionQuery().processVariableValueNotEquals("var", Variables.numberValue(123)).count());
   }
 
 }

@@ -15,7 +15,6 @@ package org.camunda.bpm.engine.impl.pvm.runtime.operation;
 
 import java.util.List;
 
-import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.delegate.CompositeActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
@@ -24,23 +23,20 @@ import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 
 /**
  * @author Tom Baeyens
+ * @author Daniel Meyer
  */
-public class PvmAtomicOperationActivityEnd extends PvmAtomicOperationActivityInstanceEnd {
+public class PvmAtomicOperationActivityEnd implements PvmAtomicOperation {
 
   protected ScopeImpl getScope(PvmExecutionImpl execution) {
     return execution.getActivity();
   }
 
-  protected String getEventName() {
-    return ExecutionListener.EVENTNAME_END;
+  public boolean isAsync(PvmExecutionImpl execution) {
+    return execution.getActivity().isAsyncAfter();
   }
 
-  @SuppressWarnings("unchecked")
-  @Override
-  protected void eventNotificationsCompleted(PvmExecutionImpl execution) {
-
-    // invoke behavior from abstract AtomicOperationActivityInstanceEnd
-    super.eventNotificationsCompleted(execution);
+  @SuppressWarnings({"unchecked", "rawtypes"})
+  public void execute(PvmExecutionImpl execution) {
 
     ActivityImpl activity = execution.getActivity();
     ActivityImpl parentActivity = activity.getParentActivity();
@@ -50,7 +46,7 @@ public class PvmAtomicOperationActivityEnd extends PvmAtomicOperationActivityIns
          &&(!parentActivity.isScope())
           ) {
       execution.setActivity(parentActivity);
-      execution.performOperation(ACTIVITY_END);
+      execution.performOperation(ACTIVITY_NOTIFY_LISTENER_END);
 
     } else if (execution.isProcessInstanceExecution()) {
       execution.performOperation(PROCESS_END);
@@ -86,7 +82,7 @@ public class PvmAtomicOperationActivityEnd extends PvmAtomicOperationActivityIns
           parentScopeExecution.performOperation(PROCESS_END);
         } else {
           parentScopeExecution.setActivity(parentActivity);
-          parentScopeExecution.performOperation(ACTIVITY_END);
+          parentScopeExecution.performOperation(ACTIVITY_NOTIFY_LISTENER_END);
         }
       }
 
@@ -128,7 +124,6 @@ public class PvmAtomicOperationActivityEnd extends PvmAtomicOperationActivityIns
     }
   }
 
-  @SuppressWarnings("unchecked")
   protected boolean isExecutionAloneInParent(PvmExecutionImpl execution) {
     ScopeImpl parentScope = execution.getActivity().getParent();
     for (PvmExecutionImpl other: execution.getParent().getExecutions()) {

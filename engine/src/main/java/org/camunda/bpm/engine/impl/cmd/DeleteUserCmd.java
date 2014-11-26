@@ -13,10 +13,10 @@
 package org.camunda.bpm.engine.impl.cmd;
 
 import java.io.Serializable;
-
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 
 /**
@@ -32,20 +32,18 @@ public class DeleteUserCmd extends AbstractWritableIdentityServiceCmd<Void> impl
   }
   
   protected Void executeCmd(CommandContext commandContext) {
-    if(userId == null) {
-      throw new ProcessEngineException("userId is null");
-    }
-    
+    ensureNotNull("userId", userId);
+
     // delete user picture
     new DeleteUserPictureCmd(userId).execute(commandContext);
-    
+
     commandContext.getIdentityInfoManager()
       .deleteUserInfoByUserId(userId);
-    
+
     commandContext
       .getWritableIdentityProvider()
       .deleteUser(userId);
-    
+
     return null;
   }
 }

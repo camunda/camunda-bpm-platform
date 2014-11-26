@@ -34,7 +34,7 @@ import org.camunda.bpm.qa.performance.engine.framework.PerfTestException;
  */
 public class PerfTestProcessEngine {
 
-  private static final String PROPERTIES_FILE_NAME = "perf-test-config.properties";
+  public static final String PROPERTIES_FILE_NAME = "perf-test-config.properties";
 
   protected static ProcessEngine processEngine;
 

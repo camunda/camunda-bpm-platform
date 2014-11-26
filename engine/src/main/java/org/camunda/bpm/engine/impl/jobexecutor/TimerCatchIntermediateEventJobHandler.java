@@ -21,6 +21,8 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 
 public class TimerCatchIntermediateEventJobHandler implements JobHandler {
 
@@ -35,9 +37,7 @@ public class TimerCatchIntermediateEventJobHandler implements JobHandler {
   public void execute(String configuration, ExecutionEntity execution, CommandContext commandContext) {
     ActivityImpl intermediateEventActivity = execution.getProcessDefinition().findActivity(configuration);
 
-    if (intermediateEventActivity == null) {
-      throw new ProcessEngineException("Error while firing timer: intermediate event activity " + configuration + " not found");
-    }
+    ensureNotNull("Error while firing timer: intermediate event activity " + configuration + " not found", "intermediateEventActivity", intermediateEventActivity);
 
     try {
       IntermediateCatchEventActivityBehavior behavior = (IntermediateCatchEventActivityBehavior) intermediateEventActivity.getActivityBehavior();
@@ -46,7 +46,7 @@ public class TimerCatchIntermediateEventJobHandler implements JobHandler {
         execution.executeActivity(intermediateEventActivity);
 
       } else {
-        if(!execution.getActivity().getId().equals(intermediateEventActivity.getId())) {
+        if (!execution.getActivity().getId().equals(intermediateEventActivity.getId())) {
           execution.setActivity(intermediateEventActivity);
         }
         execution.signal(null, null);

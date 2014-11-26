@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<definitions name="Test Case"
+                xmlns="http://www.omg.org/spec/CMMN/20131201/MODEL"
+                xmlns:camunda="http://camunda.org/schema/1.0/cmmn"
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                targetNamespace="Examples">
+
+  <case id="testCase" name="Test Case">
+
+    <casePlanModel>
+
+      <planItem id="PI_Milestone_1" definitionRef="Milestone" entryCriteriaRefs="Sentry_1" />
+      <planItem id="PI_Milestone_2" definitionRef="Milestone" entryCriteriaRefs="Sentry_2" />
+      <planItem id="PI_HumanTask_1" definitionRef="HumanTask" />
+      <planItem id="PI_HumanTask_2" definitionRef="HumanTask" />
+
+      <sentry id="Sentry_1">
+        <planItemOnPart sourceRef="PI_HumanTask_1">
+          <standardEvent>terminate</standardEvent>
+        </planItemOnPart>
+      </sentry>
+
+      <sentry id="Sentry_2">
+        <planItemOnPart sourceRef="PI_HumanTask_2">
+          <standardEvent>complete</standardEvent>
+        </planItemOnPart>
+      </sentry>
+
+      <milestone id="Milestone" />
+      <humanTask id="HumanTask" />
+
+    </casePlanModel>
+
+  </case>
+
+</definitions>

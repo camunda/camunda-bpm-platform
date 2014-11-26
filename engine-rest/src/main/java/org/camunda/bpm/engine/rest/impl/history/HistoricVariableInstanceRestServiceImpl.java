@@ -26,12 +26,15 @@ import org.camunda.bpm.engine.rest.dto.history.HistoricVariableInstanceQueryDto;
 import org.camunda.bpm.engine.rest.history.HistoricVariableInstanceRestService;
 import org.camunda.bpm.engine.rest.sub.history.HistoricVariableInstanceResource;
 import org.camunda.bpm.engine.rest.sub.history.impl.HistoricVariableInstanceResourceImpl;
+import org.codehaus.jackson.map.ObjectMapper;
 
 public class HistoricVariableInstanceRestServiceImpl implements HistoricVariableInstanceRestService {
 
+  protected ObjectMapper objectMapper;
   protected ProcessEngine processEngine;
 
-  public HistoricVariableInstanceRestServiceImpl(ProcessEngine processEngine) {
+  public HistoricVariableInstanceRestServiceImpl(ObjectMapper objectMapper,ProcessEngine processEngine) {
+    this.objectMapper = objectMapper;
     this.processEngine = processEngine;
   }
 
@@ -40,15 +43,22 @@ public class HistoricVariableInstanceRestServiceImpl implements HistoricVariable
   }
 
   @Override
-  public List<HistoricVariableInstanceDto> getHistoricVariableInstances(UriInfo uriInfo, Integer firstResult, Integer maxResults) {
-    HistoricVariableInstanceQueryDto queryDto = new HistoricVariableInstanceQueryDto(uriInfo.getQueryParameters());
-    return queryHistoricVariableInstances(queryDto, firstResult, maxResults);
+  public List<HistoricVariableInstanceDto> getHistoricVariableInstances(UriInfo uriInfo, Integer firstResult,
+      Integer maxResults, boolean deserializeObjectValues) {
+    HistoricVariableInstanceQueryDto queryDto = new HistoricVariableInstanceQueryDto(objectMapper, uriInfo.getQueryParameters());
+    return queryHistoricVariableInstances(queryDto, firstResult, maxResults, deserializeObjectValues);
   }
 
   @Override
-  public List<HistoricVariableInstanceDto> queryHistoricVariableInstances(HistoricVariableInstanceQueryDto queryDto, Integer firstResult, Integer maxResults) {
+  public List<HistoricVariableInstanceDto> queryHistoricVariableInstances(HistoricVariableInstanceQueryDto queryDto,
+      Integer firstResult, Integer maxResults, boolean deserializeObjectValues) {
+    queryDto.setObjectMapper(objectMapper);
     HistoricVariableInstanceQuery query = queryDto.toQuery(processEngine);
     query.disableBinaryFetching();
+
+    if (!deserializeObjectValues) {
+      query.disableCustomObjectDeserialization();
+    }
 
     List<HistoricVariableInstance> matchingHistoricVariableInstances;
     if (firstResult != null || maxResults != null) {
@@ -77,12 +87,13 @@ public class HistoricVariableInstanceRestServiceImpl implements HistoricVariable
 
   @Override
   public CountResultDto getHistoricVariableInstancesCount(UriInfo uriInfo) {
-    HistoricVariableInstanceQueryDto queryDto = new HistoricVariableInstanceQueryDto(uriInfo.getQueryParameters());
+    HistoricVariableInstanceQueryDto queryDto = new HistoricVariableInstanceQueryDto(objectMapper, uriInfo.getQueryParameters());
     return queryHistoricVariableInstancesCount(queryDto);
   }
 
   @Override
   public CountResultDto queryHistoricVariableInstancesCount(HistoricVariableInstanceQueryDto queryDto) {
+    queryDto.setObjectMapper(objectMapper);
     HistoricVariableInstanceQuery query = queryDto.toQuery(processEngine);
 
     long count = query.count();

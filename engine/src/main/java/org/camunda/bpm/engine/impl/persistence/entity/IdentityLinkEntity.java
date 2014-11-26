@@ -16,14 +16,14 @@ import java.io.Serializable;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.db.PersistentObject;
+import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.task.IdentityLink;
 
 
 /**
  * @author Joram Barrez
  */
-public class IdentityLinkEntity implements Serializable, IdentityLink, PersistentObject {
+public class IdentityLinkEntity implements Serializable, IdentityLink, DbEntity {
   
   private static final long serialVersionUID = 1L;
   
@@ -51,7 +51,7 @@ public class IdentityLinkEntity implements Serializable, IdentityLink, Persisten
     IdentityLinkEntity identityLinkEntity = new IdentityLinkEntity();
     Context
       .getCommandContext()
-      .getDbSqlSession()
+      .getDbEntityManager()
       .insert(identityLinkEntity);
     return identityLinkEntity;
   }

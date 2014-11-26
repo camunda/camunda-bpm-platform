@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definition" 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:camunda="http://activiti.org/bpmn"
+  targetNamespace="Examples">
+  
+  <process id="miParallelSubprocess">
+  
+    <startEvent id="theStart" />
+    <sequenceFlow id="flow1" sourceRef="theStart" targetRef="subprocess" />
+    
+    <subProcess id="subprocess">
+      <extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="miCounterValue">${counter.incrementAndGet()}</camunda:inputParameter>
+        </camunda:inputOutput>
+      </extensionElements>
+    
+      <multiInstanceLoopCharacteristics isSequential="false">
+        <loopCardinality>${nrOfLoops}</loopCardinality>
+      </multiInstanceLoopCharacteristics>
+
+      <startEvent id="startInScope" />
+      <sequenceFlow id="flow2" sourceRef="startInScope" targetRef="task" />
+      <userTask id="task" name="My Task" camunda:assignee="kermit_${loopCounter}"/>
+      <sequenceFlow id="flow3" sourceRef="task" targetRef="endInScope" />
+      <endEvent id="endInScope" />
+      
+    </subProcess>
+    
+    <sequenceFlow id="flow4" sourceRef="subprocess" targetRef="task2" />
+    
+    <userTask id="task2" name = "After MI"/>
+    
+    <sequenceFlow id="flow5" sourceRef="task2" targetRef="theEnd" />
+    <endEvent id="theEnd" />
+    
+  </process>
+
+</definitions>

@@ -157,7 +157,7 @@ public class EjbProcessApplication extends AbstractProcessApplication {
     try {
       InitialContext ic = new InitialContext();
       SessionContext sctxLookup = (SessionContext) ic.lookup(EJB_CONTEXT_PATH);
-      return (ProcessApplicationInterface) sctxLookup.getBusinessObject(getBusinessInterface());
+      return sctxLookup.getBusinessObject(getBusinessInterface());
       
     } catch (NamingException e) {
       throw new ProcessEngineException("Cannot lookup self reference to EjbProcessApplication", e);

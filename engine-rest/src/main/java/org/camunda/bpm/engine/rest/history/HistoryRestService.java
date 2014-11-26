@@ -16,7 +16,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-@Path(HistoryRestService.PATH)
 @Produces(MediaType.APPLICATION_JSON)
 public interface HistoryRestService {
 
@@ -25,8 +24,14 @@ public interface HistoryRestService {
   @Path(HistoricProcessInstanceRestService.PATH)
   HistoricProcessInstanceRestService getProcessInstanceService();
 
+  @Path(HistoricCaseInstanceRestService.PATH)
+  HistoricCaseInstanceRestService getCaseInstanceService();
+
   @Path(HistoricActivityInstanceRestService.PATH)
   HistoricActivityInstanceRestService getActivityInstanceService();
+
+  @Path(HistoricCaseActivityInstanceRestService.PATH)
+  HistoricCaseActivityInstanceRestService getCaseActivityInstanceService();
 
   @Path(HistoricVariableInstanceRestService.PATH)
   HistoricVariableInstanceRestService getVariableInstanceService();

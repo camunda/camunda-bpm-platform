@@ -15,22 +15,11 @@ package org.camunda.bpm.engine.impl;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import org.camunda.bpm.engine.AuthorizationService;
-import org.camunda.bpm.engine.CaseService;
-import org.camunda.bpm.engine.FormService;
-import org.camunda.bpm.engine.HistoryService;
-import org.camunda.bpm.engine.IdentityService;
-import org.camunda.bpm.engine.ManagementService;
-import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.ProcessEngines;
-import org.camunda.bpm.engine.RepositoryService;
-import org.camunda.bpm.engine.RuntimeService;
-import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.*;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.TransactionContextFactory;
-import org.camunda.bpm.engine.impl.db.DbSqlSession;
-import org.camunda.bpm.engine.impl.db.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
+import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.interceptor.SessionFactory;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
@@ -52,13 +41,14 @@ public class ProcessEngineImpl implements ProcessEngine {
   protected ManagementService managementService;
   protected AuthorizationService authorizationService;
   protected CaseService caseService;
+  protected FilterService filterService;
   protected String databaseSchemaUpdate;
   protected JobExecutor jobExecutor;
   protected CommandExecutor commandExecutor;
   protected CommandExecutor commandExecutorSchemaOperations;
   protected Map<Class<?>, SessionFactory> sessionFactories;
   protected ExpressionManager expressionManager;
-  protected int historyLevel;
+  protected HistoryLevel historyLevel;
   protected TransactionContextFactory transactionContextFactory;
   protected ProcessEngineConfigurationImpl processEngineConfiguration;
 
@@ -76,6 +66,7 @@ public class ProcessEngineImpl implements ProcessEngine {
     this.managementService = processEngineConfiguration.getManagementService();
     this.authorizationService = processEngineConfiguration.getAuthorizationService();
     this.caseService = processEngineConfiguration.getCaseService();
+    this.filterService = processEngineConfiguration.getFilterService();
     this.databaseSchemaUpdate = processEngineConfiguration.getDatabaseSchemaUpdate();
     this.jobExecutor = processEngineConfiguration.getJobExecutor();
     this.commandExecutor = processEngineConfiguration.getCommandExecutorTxRequired();
@@ -114,10 +105,6 @@ public class ProcessEngineImpl implements ProcessEngine {
     }
 
     commandExecutorSchemaOperations.execute(new SchemaOperationProcessEngineClose());
-  }
-
-  public DbSqlSessionFactory getDbSqlSessionFactory() {
-    return (DbSqlSessionFactory) sessionFactories.get(DbSqlSession.class);
   }
 
   // getters and setters //////////////////////////////////////////////////////
@@ -160,6 +147,10 @@ public class ProcessEngineImpl implements ProcessEngine {
 
   public CaseService getCaseService() {
     return caseService;
+  }
+
+  public FilterService getFilterService() {
+    return filterService;
   }
 
   public ProcessEngineConfigurationImpl getProcessEngineConfiguration() {

@@ -12,14 +12,15 @@
  */
 package org.camunda.bpm.engine.test.cmmn.handler;
 
+import static org.camunda.bpm.engine.impl.cmmn.handler.ItemHandler.PROPERTY_ACTIVITY_TYPE;
+import static org.camunda.bpm.engine.impl.cmmn.handler.ItemHandler.PROPERTY_ACTIVITY_DESCRIPTION;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import org.camunda.bpm.engine.impl.cmmn.behavior.CmmnActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.behavior.StageActivityBehavior;
-import org.camunda.bpm.engine.impl.cmmn.execution.CmmnActivityBehavior;
-import org.camunda.bpm.engine.impl.cmmn.handler.CmmnHandlerContext;
-import org.camunda.bpm.engine.impl.cmmn.handler.StageDiscretionaryItemHandler;
+import org.camunda.bpm.engine.impl.cmmn.handler.StageItemHandler;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
 import org.camunda.bpm.model.cmmn.instance.DiscretionaryItem;
@@ -37,19 +38,17 @@ public class StageDiscretionaryItemHandlerTest extends CmmnElementHandlerTest {
   protected Stage stage;
   protected PlanningTable planningTable;
   protected DiscretionaryItem discretionaryItem;
-  protected StageDiscretionaryItemHandler handler = new StageDiscretionaryItemHandler();
-  protected CmmnHandlerContext context;
+  protected StageItemHandler handler = new StageItemHandler();
 
   @Before
   public void setUp() {
     stage = createElement(casePlanModel, "aStage", Stage.class);
 
-    planningTable = createElement(stage, "aPlanningTable", PlanningTable.class);
+    planningTable = createElement(casePlanModel, "aPlanningTable", PlanningTable.class);
 
     discretionaryItem = createElement(planningTable, "DI_aStage", DiscretionaryItem.class);
     discretionaryItem.setDefinition(stage);
 
-    context = new CmmnHandlerContext();
   }
 
   @Test
@@ -64,6 +63,44 @@ public class StageDiscretionaryItemHandlerTest extends CmmnElementHandlerTest {
 
     // then
     assertEquals(name, activity.getName());
+  }
+
+  @Test
+  public void testStageActivityType() {
+    // given
+
+    // when
+    CmmnActivity activity = handler.handleElement(discretionaryItem, context);
+
+    // then
+    String activityType = (String) activity.getProperty(PROPERTY_ACTIVITY_TYPE);
+    assertEquals("stage", activityType);
+  }
+
+  @Test
+  public void testStageDescription() {
+    // given
+    String description = "This is a stage";
+    stage.setDescription(description);
+
+    // when
+    CmmnActivity activity = handler.handleElement(discretionaryItem, context);
+
+    // then
+    assertEquals(description, (String) activity.getProperty(PROPERTY_ACTIVITY_DESCRIPTION));
+  }
+
+  @Test
+  public void testDiscretionaryItemDescription() {
+    // given
+    String description = "This is a discretionaryItem";
+    discretionaryItem.setDescription(description);
+
+    // when
+    CmmnActivity activity = handler.handleElement(discretionaryItem, context);
+
+    // then
+    assertEquals(description, (String) activity.getProperty(PROPERTY_ACTIVITY_DESCRIPTION));
   }
 
   @Test

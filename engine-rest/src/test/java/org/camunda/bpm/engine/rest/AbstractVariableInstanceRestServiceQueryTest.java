@@ -5,7 +5,12 @@ import static com.jayway.restassured.RestAssured.given;
 import static com.jayway.restassured.path.json.JsonPath.from;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
+import static org.mockito.Matchers.argThat;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -20,6 +25,9 @@ import javax.ws.rs.core.Response.Status;
 import javax.xml.registry.InvalidRequestException;
 
 import org.camunda.bpm.engine.rest.helper.MockProvider;
+import org.camunda.bpm.engine.rest.helper.MockVariableInstanceBuilder;
+import org.camunda.bpm.engine.rest.helper.VariableTypeHelper;
+import org.camunda.bpm.engine.rest.helper.variable.EqualsPrimitiveValue;
 import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.runtime.VariableInstanceQuery;
 import org.junit.Assert;
@@ -36,11 +44,16 @@ public abstract class AbstractVariableInstanceRestServiceQueryTest extends Abstr
   protected static final String VARIABLE_INSTANCE_QUERY_URL = TEST_RESOURCE_ROOT_PATH + "/variable-instance";
   protected static final String VARIABLE_INSTANCE_COUNT_QUERY_URL = VARIABLE_INSTANCE_QUERY_URL + "/count";
 
-  private VariableInstanceQuery mockedQuery;
+  protected VariableInstanceQuery mockedQuery;
+  protected VariableInstance mockInstance;
+  protected MockVariableInstanceBuilder mockInstanceBuilder;
 
   @Before
   public void setUpRuntimeData() {
-    mockedQuery = setUpMockVariableInstanceQuery(createMockVariableInstanceList());
+    mockInstanceBuilder = MockProvider.mockVariableInstance();
+    mockInstance = mockInstanceBuilder.build();
+
+    mockedQuery = setUpMockVariableInstanceQuery(createMockVariableInstanceList(mockInstance));
   }
 
   private VariableInstanceQuery setUpMockVariableInstanceQuery(List<VariableInstance> mockedInstances) {
@@ -53,10 +66,10 @@ public abstract class AbstractVariableInstanceRestServiceQueryTest extends Abstr
     return sampleInstanceQuery;
   }
 
-  private List<VariableInstance> createMockVariableInstanceList() {
+  protected List<VariableInstance> createMockVariableInstanceList(VariableInstance mockInstance) {
     List<VariableInstance> mocks = new ArrayList<VariableInstance>();
 
-    mocks.add(MockProvider.createMockVariableInstance());
+    mocks.add(mockInstance);
     return mocks;
   }
 
@@ -66,6 +79,22 @@ public abstract class AbstractVariableInstanceRestServiceQueryTest extends Abstr
 
     verify(mockedQuery).list();
     verify(mockedQuery).disableBinaryFetching();
+    verify(mockedQuery, never()).disableCustomObjectDeserialization();
+    verifyNoMoreInteractions(mockedQuery);
+  }
+
+  @Test
+  public void testNoParametersQueryDisableObjectDeserialization() {
+    given()
+      .queryParam("deserializeValues", false)
+    .expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .get(VARIABLE_INSTANCE_QUERY_URL);
+
+    verify(mockedQuery).list();
+    verify(mockedQuery).disableBinaryFetching();
+    verify(mockedQuery).disableCustomObjectDeserialization();
     verifyNoMoreInteractions(mockedQuery);
   }
 
@@ -77,6 +106,24 @@ public abstract class AbstractVariableInstanceRestServiceQueryTest extends Abstr
 
     verify(mockedQuery).list();
     verify(mockedQuery).disableBinaryFetching();
+    verify(mockedQuery, never()).disableCustomObjectDeserialization();
+    verifyNoMoreInteractions(mockedQuery);
+  }
+
+  @Test
+  public void testNoParametersQueryAsPostDisableObjectDeserialization() {
+    given()
+      .queryParam("deserializeValues", false)
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(EMPTY_JSON_OBJECT)
+    .expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .post(VARIABLE_INSTANCE_QUERY_URL);
+
+    verify(mockedQuery).list();
+    verify(mockedQuery).disableBinaryFetching();
+    verify(mockedQuery).disableCustomObjectDeserialization();
     verifyNoMoreInteractions(mockedQuery);
   }
 
@@ -157,6 +204,10 @@ public abstract class AbstractVariableInstanceRestServiceQueryTest extends Abstr
 
     verify(mockedQuery).listPage(firstResult, maxResults);
     verify(mockedQuery).disableBinaryFetching();
+
+    // requirement to not break existing API; should be:
+    // verify(variableInstanceQueryMock).disableCustomObjectDeserialization();
+    verify(mockedQuery, never()).disableCustomObjectDeserialization();
   }
 
   /**
@@ -171,6 +222,10 @@ public abstract class AbstractVariableInstanceRestServiceQueryTest extends Abstr
 
     verify(mockedQuery).listPage(0, maxResults);
     verify(mockedQuery).disableBinaryFetching();
+
+    // requirement to not break existing API; should be:
+    // verify(variableInstanceQueryMock).disableCustomObjectDeserialization();
+    verify(mockedQuery, never()).disableCustomObjectDeserialization();
   }
 
   /**
@@ -185,6 +240,10 @@ public abstract class AbstractVariableInstanceRestServiceQueryTest extends Abstr
 
     verify(mockedQuery).listPage(firstResult, Integer.MAX_VALUE);
     verify(mockedQuery).disableBinaryFetching();
+
+    // requirement to not break existing API; should be:
+    // verify(variableInstanceQueryMock).disableCustomObjectDeserialization();
+    verify(mockedQuery, never()).disableCustomObjectDeserialization();
   }
 
   @Test
@@ -192,6 +251,20 @@ public abstract class AbstractVariableInstanceRestServiceQueryTest extends Abstr
     String queryVariableName = "aVariableInstanceName";
     Response response = given().queryParam("variableName", queryVariableName)
         .then().expect().statusCode(Status.OK.getStatusCode())
+        .and()
+          .body("size()", is(1))
+          .body("[0].id", equalTo(mockInstanceBuilder.getId()))
+          .body("[0].name", equalTo(mockInstanceBuilder.getName()))
+          .body("[0].type", equalTo(VariableTypeHelper.toExpectedValueTypeName(mockInstanceBuilder.getTypedValue().getType())))
+          .body("[0].value", equalTo(mockInstanceBuilder.getValue()))
+          .body("[0].processInstanceId", equalTo(mockInstanceBuilder.getProcessInstanceId()))
+          .body("[0].executionId", equalTo(mockInstanceBuilder.getExecutionId()))
+          .body("[0].caseInstanceId", equalTo(mockInstanceBuilder.getCaseInstanceId()))
+          .body("[0].caseExecutionId", equalTo(mockInstanceBuilder.getCaseExecutionId()))
+          .body("[0].taskId", equalTo(mockInstanceBuilder.getTaskId()))
+          .body("[0].activityInstanceId", equalTo(mockInstanceBuilder.getActivityInstanceId()))
+          .body("[0].errorMessage", equalTo(mockInstanceBuilder.getErrorMessage()))
+          .body("[0].serializedValue", nullValue())
         .when().get(VARIABLE_INSTANCE_QUERY_URL);
 
     // assert query invocation
@@ -201,33 +274,15 @@ public abstract class AbstractVariableInstanceRestServiceQueryTest extends Abstr
 
     String content = response.asString();
     List<String> variables = from(content).getList("");
-    Assert.assertEquals("There should be one process definition returned.", 1, variables.size());
-    Assert.assertNotNull("There should be one process definition returned", variables.get(0));
-
-    String returnedId = from(content).getString("[0].id");
-    String returnedName = from(content).getString("[0].name");
-    String returnedType = from(content).getString("[0].type");
-    String returnedValue = from(content).getString("[0].value");
-    String returnedProcessInstanceId = from(content).getString("[0].processInstanceId");
-    String returnedExecutionId = from(content).getString("[0].executionId");
-    String returnedCaseInstanceId = from(content).getString("[0].caseInstanceId");
-    String returnedCaseExecutionId = from(content).getString("[0].caseExecutionId");
-    String returnedTaskId = from(content).getString("[0].taskId");
-    String returnedActivityId = from(content).getString("[0].activityInstanceId");
-
-    Assert.assertEquals(MockProvider.EXAMPLE_VARIABLE_INSTANCE_ID, returnedId);
-    Assert.assertEquals(MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME, returnedName);
-    Assert.assertEquals(MockProvider.EXAMPLE_VARIABLE_INSTANCE_TYPE, returnedType);
-    Assert.assertEquals(MockProvider.EXAMPLE_VARIABLE_INSTANCE_VALUE, returnedValue);
-    Assert.assertEquals(MockProvider.EXAMPLE_VARIABLE_INSTANCE_PROC_INST_ID, returnedProcessInstanceId);
-    Assert.assertEquals(MockProvider.EXAMPLE_VARIABLE_INSTANCE_EXECUTION_ID, returnedExecutionId);
-    Assert.assertEquals(MockProvider.EXAMPLE_VARIABLE_INSTANCE_CASE_INST_ID, returnedCaseInstanceId);
-    Assert.assertEquals(MockProvider.EXAMPLE_VARIABLE_INSTANCE_CASE_EXECUTION_ID, returnedCaseExecutionId);
-    Assert.assertEquals(MockProvider.EXAMPLE_VARIABLE_INSTANCE_TASK_ID, returnedTaskId);
-    Assert.assertEquals(MockProvider.EXAMPLE_VARIABLE_INSTANCE_ACTIVITY_INSTANCE_ID, returnedActivityId);
+    Assert.assertEquals("There should be one variable instance returned.", 1, variables.size());
+    Assert.assertNotNull("There should be one variable instance returned", variables.get(0));
 
     verify(mockedQuery).disableBinaryFetching();
+    // requirement to not break existing API; should be:
+    // verify(mockedQuery).disableCustomObjectDeserialization();
+    verify(mockedQuery, never()).disableCustomObjectDeserialization();
   }
+
 
   @Test
   public void testVariableInstanceRetrievalAsPost() {
@@ -237,6 +292,20 @@ public abstract class AbstractVariableInstanceRestServiceQueryTest extends Abstr
 
     Response response = given().contentType(POST_JSON_CONTENT_TYPE).body(queryParameter)
         .then().expect().statusCode(Status.OK.getStatusCode())
+        .and()
+          .body("size()", is(1))
+          .body("[0].id", equalTo(mockInstanceBuilder.getId()))
+          .body("[0].name", equalTo(mockInstanceBuilder.getName()))
+          .body("[0].type", equalTo(VariableTypeHelper.toExpectedValueTypeName(mockInstanceBuilder.getTypedValue().getType())))
+          .body("[0].value", equalTo(mockInstanceBuilder.getTypedValue().getValue()))
+          .body("[0].processInstanceId", equalTo(mockInstanceBuilder.getProcessInstanceId()))
+          .body("[0].executionId", equalTo(mockInstanceBuilder.getExecutionId()))
+          .body("[0].caseInstanceId", equalTo(mockInstanceBuilder.getCaseInstanceId()))
+          .body("[0].caseExecutionId", equalTo(mockInstanceBuilder.getCaseExecutionId()))
+          .body("[0].taskId", equalTo(mockInstanceBuilder.getTaskId()))
+          .body("[0].activityInstanceId", equalTo(mockInstanceBuilder.getActivityInstanceId()))
+          .body("[0].errorMessage", equalTo(mockInstanceBuilder.getErrorMessage()))
+          .body("[0].serializedValue", nullValue())
         .when().post(VARIABLE_INSTANCE_QUERY_URL);
 
     // assert query invocation
@@ -249,27 +318,11 @@ public abstract class AbstractVariableInstanceRestServiceQueryTest extends Abstr
     Assert.assertEquals("There should be one process definition returned.", 1, variables.size());
     Assert.assertNotNull("There should be one process definition returned", variables.get(0));
 
-    String returnedName = from(content).getString("[0].name");
-    String returnedType = from(content).getString("[0].type");
-    String returnedValue = from(content).getString("[0].value");
-    String returnedProcessInstanceId = from(content).getString("[0].processInstanceId");
-    String returnedExecutionId = from(content).getString("[0].executionId");
-    String returnedCaseInstanceId = from(content).getString("[0].caseInstanceId");
-    String returnedCaseExecutionId = from(content).getString("[0].caseExecutionId");
-    String returnedTaskId = from(content).getString("[0].taskId");
-    String returnedActivityId = from(content).getString("[0].activityInstanceId");
-
-    Assert.assertEquals(MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME, returnedName);
-    Assert.assertEquals(MockProvider.EXAMPLE_VARIABLE_INSTANCE_TYPE, returnedType);
-    Assert.assertEquals(MockProvider.EXAMPLE_VARIABLE_INSTANCE_VALUE, returnedValue);
-    Assert.assertEquals(MockProvider.EXAMPLE_VARIABLE_INSTANCE_PROC_INST_ID, returnedProcessInstanceId);
-    Assert.assertEquals(MockProvider.EXAMPLE_VARIABLE_INSTANCE_EXECUTION_ID, returnedExecutionId);
-    Assert.assertEquals(MockProvider.EXAMPLE_VARIABLE_INSTANCE_CASE_INST_ID, returnedCaseInstanceId);
-    Assert.assertEquals(MockProvider.EXAMPLE_VARIABLE_INSTANCE_CASE_EXECUTION_ID, returnedCaseExecutionId);
-    Assert.assertEquals(MockProvider.EXAMPLE_VARIABLE_INSTANCE_TASK_ID, returnedTaskId);
-    Assert.assertEquals(MockProvider.EXAMPLE_VARIABLE_INSTANCE_ACTIVITY_INSTANCE_ID, returnedActivityId);
-
     verify(mockedQuery).disableBinaryFetching();
+
+    // requirement to not break existing API; should be:
+    // verify(mockedQuery).disableCustomObjectDeserialization();
+    verify(mockedQuery, never()).disableCustomObjectDeserialization();
   }
 
   @Test
@@ -283,6 +336,7 @@ public abstract class AbstractVariableInstanceRestServiceQueryTest extends Abstr
     queryParameters.put("caseExecutionIdIn", "aCaseExecutionId");
     queryParameters.put("caseInstanceIdIn", "aCaseInstanceId");
     queryParameters.put("taskIdIn", "aTaskId");
+    queryParameters.put("variableScopeIdIn", "aVariableScopeId");
     queryParameters.put("activityInstanceIdIn", "anActivityInstanceId");
 
     given().queryParams(queryParameters)
@@ -296,10 +350,15 @@ public abstract class AbstractVariableInstanceRestServiceQueryTest extends Abstr
     verify(mockedQuery).caseInstanceIdIn(queryParameters.get("caseInstanceIdIn"));
     verify(mockedQuery).caseExecutionIdIn(queryParameters.get("caseExecutionIdIn"));
     verify(mockedQuery).taskIdIn(queryParameters.get("taskIdIn"));
+    verify(mockedQuery).variableScopeIdIn(queryParameters.get("variableScopeIdIn"));
     verify(mockedQuery).activityInstanceIdIn(queryParameters.get("activityInstanceIdIn"));
     verify(mockedQuery).list();
 
     verify(mockedQuery).disableBinaryFetching();
+
+    // requirement to not break existing API; should be:
+    // verify(mockedQuery).disableCustomObjectDeserialization();
+    verify(mockedQuery, never()).disableCustomObjectDeserialization();
   }
 
   @Test
@@ -309,6 +368,7 @@ public abstract class AbstractVariableInstanceRestServiceQueryTest extends Abstr
     String aProcessInstanceId = "aProcessInstanceId";
     String anExecutionId = "anExecutionId";
     String aTaskId = "aTaskId";
+    String aVariableScopeId = "aVariableScopeId";
     String anActivityInstanceId = "anActivityInstanceId";
     String aCaseInstanceId = "aCaseInstanceId";
     String aCaseExecutionId = "aCaseExecutionId";
@@ -338,6 +398,10 @@ public abstract class AbstractVariableInstanceRestServiceQueryTest extends Abstr
     taskIdIn.add(aTaskId);
     queryParameters.put("taskIdIn", taskIdIn);
 
+    List<String> variableScopeIdIn = new ArrayList<String>();
+    variableScopeIdIn.add(aVariableScopeId);
+    queryParameters.put("variableScopeIdIn", variableScopeIdIn);
+
     List<String> activityInstanceIdIn = new ArrayList<String>();
     activityInstanceIdIn.add(anActivityInstanceId);
     queryParameters.put("activityInstanceIdIn", activityInstanceIdIn);
@@ -351,9 +415,14 @@ public abstract class AbstractVariableInstanceRestServiceQueryTest extends Abstr
     verify(mockedQuery).processInstanceIdIn(aProcessInstanceId);
     verify(mockedQuery).executionIdIn(anExecutionId);
     verify(mockedQuery).taskIdIn(aTaskId);
+    verify(mockedQuery).variableScopeIdIn(aVariableScopeId);
     verify(mockedQuery).activityInstanceIdIn(anActivityInstanceId);
     verify(mockedQuery).list();
     verify(mockedQuery).disableBinaryFetching();
+
+    // requirement to not break existing API; should be:
+    // verify(mockedQuery).disableCustomObjectDeserialization();
+    verify(mockedQuery, never()).disableCustomObjectDeserialization();
   }
 
   @Test
@@ -402,6 +471,10 @@ public abstract class AbstractVariableInstanceRestServiceQueryTest extends Abstr
       .when().get(VARIABLE_INSTANCE_QUERY_URL);
     verify(mockedQuery).variableValueNotEquals(variableName, variableValue);
     verify(mockedQuery, times(7)).disableBinaryFetching();
+
+    // requirement to not break existing API; should be:
+    // verify(mockedQuery, times(7)).disableCustomObjectDeserialization();
+    verify(mockedQuery, never()).disableCustomObjectDeserialization();
   }
 
   @Test
@@ -423,6 +496,10 @@ public abstract class AbstractVariableInstanceRestServiceQueryTest extends Abstr
     verify(mockedQuery).variableValueEquals(variableName1, variableValue1);
     verify(mockedQuery).variableValueNotEquals(variableName2, variableValue2);
     verify(mockedQuery).disableBinaryFetching();
+
+    // requirement to not break existing API; should be:
+    // verify(variableInstanceQueryMock).disableCustomObjectDeserialization();
+    verify(mockedQuery, never()).disableCustomObjectDeserialization();
   }
 
   @Test
@@ -454,8 +531,12 @@ public abstract class AbstractVariableInstanceRestServiceQueryTest extends Abstr
       .when().post(VARIABLE_INSTANCE_QUERY_URL);
 
     verify(mockedQuery).variableValueEquals(variableName, variableValue);
-    verify(mockedQuery).variableValueNotEquals(anotherVariableName, anotherVariableValue);
+    verify(mockedQuery).variableValueNotEquals(eq(anotherVariableName), argThat(EqualsPrimitiveValue.numberValue(anotherVariableValue)));
     verify(mockedQuery).disableBinaryFetching();
+
+    // requirement to not break existing API; should be:
+    // verify(variableInstanceQueryMock).disableCustomObjectDeserialization();
+    verify(mockedQuery, never()).disableCustomObjectDeserialization();
   }
 
   @Test
@@ -469,6 +550,9 @@ public abstract class AbstractVariableInstanceRestServiceQueryTest extends Abstr
     String aTaskId = "aTaskId";
     String anotherTaskId = "anotherTaskId";
 
+    String aVariableScopeId = "aVariableScopeId";
+    String anotherVariableScopeId = "anotherVariableScopeId";
+
     String anActivityInstanceId = "anActivityInstanceId";
     String anotherActivityInstanceId = "anotherActivityInstanceId";
 
@@ -476,6 +560,7 @@ public abstract class AbstractVariableInstanceRestServiceQueryTest extends Abstr
       .queryParam("processInstanceIdIn", aProcessInstanceId + "," + anotherProcessInstanceId)
       .queryParam("executionIdIn", anExecutionId + "," + anotherExecutionId)
       .queryParam("taskIdIn", aTaskId + "," + anotherTaskId)
+      .queryParam("variableScopeIdIn", aVariableScopeId + "," + anotherVariableScopeId)
       .queryParam("activityInstanceIdIn", anActivityInstanceId + "," + anotherActivityInstanceId)
       .then().expect().statusCode(Status.OK.getStatusCode())
       .when().get(VARIABLE_INSTANCE_QUERY_URL);
@@ -483,8 +568,13 @@ public abstract class AbstractVariableInstanceRestServiceQueryTest extends Abstr
     verify(mockedQuery).processInstanceIdIn(aProcessInstanceId, anotherProcessInstanceId);
     verify(mockedQuery).executionIdIn(anExecutionId, anotherExecutionId);
     verify(mockedQuery).taskIdIn(aTaskId, anotherTaskId);
+    verify(mockedQuery).variableScopeIdIn(aVariableScopeId, anotherVariableScopeId);
     verify(mockedQuery).activityInstanceIdIn(anActivityInstanceId, anotherActivityInstanceId);
     verify(mockedQuery).disableBinaryFetching();
+
+    // requirement to not break existing API; should be:
+    // verify(variableInstanceQueryMock).disableCustomObjectDeserialization();
+    verify(mockedQuery, never()).disableCustomObjectDeserialization();
   }
 
   @Test
@@ -510,6 +600,13 @@ public abstract class AbstractVariableInstanceRestServiceQueryTest extends Abstr
     taskIdIn.add(aTaskId);
     taskIdIn.add(anotherTaskId);
 
+    String aVariableScopeId = "aVariableScopeId";
+    String anotherVariableScopeId = "anotherVariableScopeId";
+
+    List<String> variableScopeIdIn= new ArrayList<String>();
+    variableScopeIdIn.add(aVariableScopeId);
+    variableScopeIdIn.add(anotherVariableScopeId);
+
     String anActivityInstanceId = "anActivityInstanceId";
     String anotherActivityInstanceId = "anotherActivityInstanceId";
 
@@ -521,6 +618,7 @@ public abstract class AbstractVariableInstanceRestServiceQueryTest extends Abstr
     json.put("processInstanceIdIn", processDefinitionIdIn);
     json.put("executionIdIn", executionIdIn);
     json.put("taskIdIn", taskIdIn);
+    json.put("variableScopeIdIn", variableScopeIdIn);
     json.put("activityInstanceIdIn", activityInstanceIdIn);
 
     given().contentType(POST_JSON_CONTENT_TYPE).body(json)
@@ -530,8 +628,13 @@ public abstract class AbstractVariableInstanceRestServiceQueryTest extends Abstr
     verify(mockedQuery).processInstanceIdIn(aProcessInstanceId, anotherProcessInstanceId);
     verify(mockedQuery).executionIdIn(anExecutionId, anotherExecutionId);
     verify(mockedQuery).taskIdIn(aTaskId, anotherTaskId);
+    verify(mockedQuery).variableScopeIdIn(aVariableScopeId, anotherVariableScopeId);
     verify(mockedQuery).activityInstanceIdIn(anActivityInstanceId, anotherActivityInstanceId);
     verify(mockedQuery).disableBinaryFetching();
+
+    // requirement to not break existing API; should be:
+    // verify(variableInstanceQueryMock).disableCustomObjectDeserialization();
+    verify(mockedQuery, never()).disableCustomObjectDeserialization();
   }
 
   @Test

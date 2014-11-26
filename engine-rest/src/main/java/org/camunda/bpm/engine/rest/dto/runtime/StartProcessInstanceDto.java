@@ -14,10 +14,13 @@ package org.camunda.bpm.engine.rest.dto.runtime;
 
 import java.util.Map;
 
+import org.camunda.bpm.engine.rest.dto.VariableValueDto;
+
 public class StartProcessInstanceDto {
 
   private Map<String, VariableValueDto> variables;
   private String businessKey;
+  private String caseInstanceId;
 
   public Map<String, VariableValueDto> getVariables() {
     return variables;
@@ -33,5 +36,13 @@ public class StartProcessInstanceDto {
 
   public void setBusinessKey(String businessKey) {
     this.businessKey = businessKey;
+  }
+
+  public String getCaseInstanceId() {
+    return caseInstanceId;
+  }
+
+  public void setCaseInstanceId(String caseInstanceId) {
+    this.caseInstanceId = caseInstanceId;
   }
 }

@@ -12,26 +12,34 @@
  */
 package org.camunda.bpm.qa.performance.engine.steps;
 
+import java.util.Map;
+
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.qa.performance.engine.framework.PerfTestRunContext;
 import org.camunda.bpm.qa.performance.engine.framework.PerfTestStepBehavior;
 
 /**
- * @author Daniel Meyer
+ * @author Daniel Meyer, Ingo Richtsmeier
  *
  */
 public class CompleteTaskStep extends ProcessEngineAwareStep implements PerfTestStepBehavior {
 
   protected String taskIdKey;
+  private Map<String, Object> processVariables;
 
   public CompleteTaskStep(ProcessEngine processEngine, String taskIdKey) {
+    this(processEngine, taskIdKey, null);
+  }
+
+  public CompleteTaskStep(ProcessEngine processEngine, String taskIdKey, Map<String, Object> processVariables) {
     super(processEngine);
     this.taskIdKey = taskIdKey;
+    this.processVariables = processVariables;
   }
 
   public void execute(PerfTestRunContext context) {
     String taskId = context.getVariable(taskIdKey);
-    taskService.complete(taskId);
+    taskService.complete(taskId, processVariables);
   }
 
 }

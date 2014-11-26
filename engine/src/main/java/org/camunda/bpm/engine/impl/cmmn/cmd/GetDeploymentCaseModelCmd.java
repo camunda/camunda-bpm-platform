@@ -12,10 +12,11 @@
  */
 package org.camunda.bpm.engine.impl.cmmn.cmd;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 import java.io.InputStream;
 import java.io.Serializable;
 
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.cmd.GetDeploymentResourceCmd;
 import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
 import org.camunda.bpm.engine.impl.context.Context;
@@ -33,13 +34,12 @@ public class GetDeploymentCaseModelCmd implements Command<InputStream>, Serializ
   protected String caseDefinitionId;
 
   public GetDeploymentCaseModelCmd(String caseDefinitionId) {
-    if (caseDefinitionId == null || caseDefinitionId.length() < 1) {
-      throw new ProcessEngineException("The case definition id is mandatory, but '" + caseDefinitionId + "' has been provided.");
-    }
     this.caseDefinitionId = caseDefinitionId;
   }
 
   public InputStream execute(CommandContext commandContext) {
+    ensureNotNull("caseDefinitionId", caseDefinitionId);
+
     CaseDefinitionEntity caseDefinition = Context
             .getProcessEngineConfiguration()
             .getDeploymentCache()

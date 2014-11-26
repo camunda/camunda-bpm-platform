@@ -26,6 +26,7 @@ import junit.framework.AssertionFailedError;
 
 import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.CaseService;
+import org.camunda.bpm.engine.FilterService;
 import org.camunda.bpm.engine.FormService;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.IdentityService;
@@ -37,7 +38,7 @@ import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.camunda.bpm.engine.impl.db.DbSqlSession;
+import org.camunda.bpm.engine.impl.db.PersistenceSession;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
@@ -45,6 +46,7 @@ import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.impl.util.LogUtil.ThreadLogMode;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
+import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.junit.Assert;
@@ -81,6 +83,7 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
   protected ManagementService managementService;
   protected AuthorizationService authorizationService;
   protected CaseService caseService;
+  protected FilterService filterService;
 
   protected abstract void initializeProcessEngine();
 
@@ -132,15 +135,15 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
    * If the DB is not clean, it is cleaned by performing a create a drop. */
   protected void assertAndEnsureCleanDb() throws Throwable {
     log.fine("verifying that db is clean after test");
-
     Map<String, Long> tableCounts = managementService.getTableCount();
+
     StringBuilder outputMessage = new StringBuilder();
     for (String tableName : tableCounts.keySet()) {
       String tableNameWithoutPrefix = tableName.replace(processEngineConfiguration.getDatabaseTablePrefix(), "");
       if (!TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK.contains(tableNameWithoutPrefix)) {
         Long count = tableCounts.get(tableName);
-        if (count!=0L) {
-          outputMessage.append("  "+tableName + ": " + count + " record(s) ");
+        if (count != 0L) {
+          outputMessage.append("  " + tableName + ": " + count + " record(s)\n");
         }
       }
     }
@@ -151,17 +154,17 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
 
       log.info("dropping and recreating db");
 
-      CommandExecutor commandExecutor = ((ProcessEngineImpl)processEngine).getProcessEngineConfiguration().getCommandExecutorTxRequired();
+      CommandExecutor commandExecutor = ((ProcessEngineImpl) processEngine).getProcessEngineConfiguration().getCommandExecutorTxRequired();
       commandExecutor.execute(new Command<Object>() {
         public Object execute(CommandContext commandContext) {
-          DbSqlSession session = commandContext.getSession(DbSqlSession.class);
-          session.dbSchemaDrop();
-          session.dbSchemaCreate();
+          PersistenceSession persistenceSession = commandContext.getSession(PersistenceSession.class);
+          persistenceSession.dbSchemaDrop();
+          persistenceSession.dbSchemaCreate();
           return null;
         }
       });
 
-      if (exception!=null) {
+      if (exception != null) {
         throw exception;
       } else {
         Assert.fail(outputMessage.toString());
@@ -183,6 +186,7 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
     managementService = processEngine.getManagementService();
     authorizationService = processEngine.getAuthorizationService();
     caseService = processEngine.getCaseService();
+    filterService = processEngine.getFilterService();
   }
 
   public void assertProcessEnded(final String processInstanceId) {
@@ -194,6 +198,18 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
 
     if (processInstance!=null) {
       throw new AssertionFailedError("Expected finished process instance '"+processInstanceId+"' but it was still in the db");
+    }
+  }
+
+  public void assertCaseEnded(final String caseInstanceId) {
+    CaseInstance caseInstance = processEngine
+      .getCaseService()
+      .createCaseInstanceQuery()
+      .caseInstanceId(caseInstanceId)
+      .singleResult();
+
+    if (caseInstance!=null) {
+      throw new AssertionFailedError("Expected finished case instance '"+caseInstanceId+"' but it was still in the db");
     }
   }
 
@@ -289,7 +305,7 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
     for (Job job : jobs) {
       try {
         managementService.executeJob(job.getId());
-      } catch (Exception e) {};
+      } catch (Exception e) {}
     }
 
     executeAvailableJobs();

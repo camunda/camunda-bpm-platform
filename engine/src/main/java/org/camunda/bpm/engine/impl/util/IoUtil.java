@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,13 +15,14 @@ package org.camunda.bpm.engine.impl.util;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.URL;
+import java.nio.charset.Charset;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 
@@ -47,7 +48,7 @@ public class IoUtil {
     }
     return outputStream.toByteArray();
   }
-  
+
   public static String readFileAsString(String filePath) {
     byte[] buffer = new byte[(int) getFile(filePath).length()];
     BufferedInputStream inputStream = null;
@@ -59,9 +60,9 @@ public class IoUtil {
     } finally {
       IoUtil.closeSilently(inputStream);
     }
-    return new String(buffer);
+    return new String(buffer, Charset.forName("UTF-8"));
   }
-  
+
   public static File getFile(String filePath) {
     URL url = IoUtil.class.getClassLoader().getResource(filePath);
     try {
@@ -70,7 +71,7 @@ public class IoUtil {
       throw new ProcessEngineException("Couldn't get file " + filePath + ": " + e.getMessage());
     }
   }
-  
+
   public static void writeStringToFile(String content, String filePath) {
     BufferedOutputStream outputStream = null;
     try {
@@ -85,27 +86,13 @@ public class IoUtil {
   }
 
   /**
-   * Closes the given stream. The same as calling {@link InputStream#close()}, but
+   * Closes the given stream. The same as calling {@link Closeable#close()}, but
    * errors while closing are silently ignored.
    */
-  public static void closeSilently(InputStream inputStream) {
+  public static void closeSilently(Closeable closeable) {
     try {
-      if(inputStream != null) {
-        inputStream.close();
-      }
-    } catch(IOException ignore) {
-      // Exception is silently ignored
-    }
-  }
-
-  /**
-   * Closes the given stream. The same as calling {@link OutputStream#close()}, but
-   * errors while closing are silently ignored.
-   */
-  public static void closeSilently(OutputStream outputStream) {
-    try {
-      if(outputStream != null) {
-        outputStream.close();
+      if(closeable != null) {
+        closeable.close();
       }
     } catch(IOException ignore) {
       // Exception is silently ignored

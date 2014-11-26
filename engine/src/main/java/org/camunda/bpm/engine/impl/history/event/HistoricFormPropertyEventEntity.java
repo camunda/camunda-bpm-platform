@@ -23,7 +23,7 @@ public class HistoricFormPropertyEventEntity extends HistoricDetailEventEntity {
   private static final long serialVersionUID = 1L;
 
   protected String propertyId;
-  protected Object propertyValue;
+  protected String propertyValue;
 
   public HistoricFormPropertyEventEntity() {
   }
@@ -40,7 +40,7 @@ public class HistoricFormPropertyEventEntity extends HistoricDetailEventEntity {
     return propertyValue;
   }
 
-  public void setPropertyValue(Object propertyValue) {
+  public void setPropertyValue(String propertyValue) {
     this.propertyValue = propertyValue;
   }
 

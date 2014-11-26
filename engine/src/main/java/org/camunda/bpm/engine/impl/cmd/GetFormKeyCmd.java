@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -14,8 +14,10 @@
 package org.camunda.bpm.engine.impl.cmd;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.form.handler.DefaultFormHandler;
+import org.camunda.bpm.engine.impl.form.handler.DefaultStartFormHandler;
+import org.camunda.bpm.engine.impl.form.handler.FormHandler;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
@@ -62,18 +64,29 @@ public class GetFormKeyCmd implements Command<String> {
             .getProcessEngineConfiguration()
             .getDeploymentCache()
             .findDeployedProcessDefinitionById(processDefinitionId);
-    DefaultFormHandler formHandler;
+
+    Expression formKeyExpression = null;
+
     if (taskDefinitionKey == null) {
       // TODO: Maybe add getFormKey() to FormHandler interface to avoid the following cast
-      formHandler = (DefaultFormHandler) processDefinition.getStartFormHandler();
+      FormHandler formHandler = processDefinition.getStartFormHandler();
+
+      // Sorry!!! In case of a custom start form handler (which does not extend
+      // the DefaultFormHandler) a formKey would never be returned. So a custom
+      // form handler (for a startForm) has always to extend the DefaultStartFormHandler!
+      if (formHandler instanceof DefaultStartFormHandler) {
+        DefaultStartFormHandler startFormHandler = (DefaultStartFormHandler) formHandler;
+        formKeyExpression = startFormHandler.getFormKey();
+      }
+
     } else {
       TaskDefinition taskDefinition = processDefinition.getTaskDefinitions().get(taskDefinitionKey);
-      // TODO: Maybe add getFormKey() to FormHandler interface to avoid the following cast
-      formHandler = (DefaultFormHandler) taskDefinition.getTaskFormHandler();
+      formKeyExpression = taskDefinition.getFormKey();
     }
+
     String formKey = null;
-    if (formHandler.getFormKey() != null) {
-      formKey = formHandler.getFormKey().getExpressionText();
+    if (formKeyExpression != null) {
+      formKey = formKeyExpression.getExpressionText();
     }
     return formKey;
   }

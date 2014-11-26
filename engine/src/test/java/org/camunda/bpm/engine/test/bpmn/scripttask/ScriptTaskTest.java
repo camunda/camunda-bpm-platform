@@ -13,8 +13,14 @@
 package org.camunda.bpm.engine.test.bpmn.scripttask;
 
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.ScriptCompilationException;
+import org.camunda.bpm.engine.ScriptEvaluationException;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -35,6 +41,7 @@ public class ScriptTaskTest extends PluggableProcessEngineTestCase {
   private static final String PYTHON = "python";
   private static final String RUBY = "ruby";
   private static final String GROOVY = "groovy";
+  private static final String JUEL = "juel";
 
   private List<String> deploymentIds = new ArrayList<String>();
 
@@ -382,6 +389,156 @@ public class ScriptTaskTest extends PluggableProcessEngineTestCase {
     Object variableValue = runtimeService.getVariable(pi.getId(), "foo");
     assertNull(variableValue);
 
+  }
+
+  public void testJuelExpression() {
+    deployProcess(JUEL, "${execution.setVariable('foo', 'bar')}");
+
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess");
+
+    String variableValue = (String) runtimeService.getVariable(pi.getId(), "foo");
+    assertEquals("bar", variableValue);
+  }
+
+  public void testSourceAsExpressionAsVariable() {
+    deployProcess(PYTHON, "${scriptSource}");
+
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("scriptSource", "execution.setVariable('foo', 'bar')");
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess", variables);
+
+    String variableValue = (String) runtimeService.getVariable(pi.getId(), "foo");
+    assertEquals("bar", variableValue);
+  }
+
+  public void testSourceAsExpressionAsNonExistingVariable() {
+    deployProcess(PYTHON, "${scriptSource}");
+
+    try {
+      runtimeService.startProcessInstanceByKey("testProcess");
+      fail("Process variable 'scriptSource' not defined");
+    }
+    catch (ProcessEngineException e) {
+      assertTextPresentIgnoreCase("Cannot resolve identifier 'scriptSource'", e.getMessage());
+    }
+  }
+
+  public void testSourceAsExpressionAsBean() {
+    deployProcess(PYTHON, "#{scriptResourceBean.getSource()}");
+
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("scriptResourceBean", new ScriptResourceBean());
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess", variables);
+
+    String variableValue = (String) runtimeService.getVariable(pi.getId(), "foo");
+    assertEquals("bar", variableValue);
+  }
+
+  public void testSourceAsExpressionWithWhitespace() {
+    deployProcess(PYTHON, "\t\n  \t \n  ${scriptSource}");
+
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("scriptSource", "execution.setVariable('foo', 'bar')");
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess", variables);
+
+    String variableValue = (String) runtimeService.getVariable(pi.getId(), "foo");
+    assertEquals("bar", variableValue);
+  }
+
+  public void testJavascriptVariableSerialization() {
+    deployProcess(JAVASCRIPT, "execution.setVariable('date', new java.util.Date(0));");
+
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess");
+
+    Date date = (Date) runtimeService.getVariable(pi.getId(), "date");
+    assertEquals(0, date.getTime());
+
+    deployProcess(JAVASCRIPT, "execution.setVariable('myVar', new org.camunda.bpm.engine.test.bpmn.scripttask.MySerializable('test'));");
+
+    pi = runtimeService.startProcessInstanceByKey("testProcess");
+
+    MySerializable myVar = (MySerializable) runtimeService.getVariable(pi.getId(), "myVar");
+    assertEquals("test", myVar.getName());
+  }
+
+  public void testPythonVariableSerialization() {
+    deployProcess(PYTHON, "import java.util.Date\nexecution.setVariable('date', java.util.Date(0))");
+
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess");
+
+    Date date = (Date) runtimeService.getVariable(pi.getId(), "date");
+    assertEquals(0, date.getTime());
+
+    deployProcess(PYTHON, "import org.camunda.bpm.engine.test.bpmn.scripttask.MySerializable\n" +
+      "execution.setVariable('myVar', org.camunda.bpm.engine.test.bpmn.scripttask.MySerializable('test'));");
+
+    pi = runtimeService.startProcessInstanceByKey("testProcess");
+
+    MySerializable myVar = (MySerializable) runtimeService.getVariable(pi.getId(), "myVar");
+    assertEquals("test", myVar.getName());
+  }
+
+  public void testRubyVariableSerialization() {
+    deployProcess(RUBY, "require 'java'\n$execution.setVariable('date', java.util.Date.new(0))");
+
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess");
+
+    Date date = (Date) runtimeService.getVariable(pi.getId(), "date");
+    assertEquals(0, date.getTime());
+
+    deployProcess(RUBY, "$execution.setVariable('myVar', org.camunda.bpm.engine.test.bpmn.scripttask.MySerializable.new('test'));");
+
+    pi = runtimeService.startProcessInstanceByKey("testProcess");
+
+    MySerializable myVar = (MySerializable) runtimeService.getVariable(pi.getId(), "myVar");
+    assertEquals("test", myVar.getName());
+  }
+
+  public void testGroovyVariableSerialization() {
+    deployProcess(GROOVY, "execution.setVariable('date', new java.util.Date(0))");
+
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess");
+
+    Date date = (Date) runtimeService.getVariable(pi.getId(), "date");
+    assertEquals(0, date.getTime());
+
+    deployProcess(GROOVY, "execution.setVariable('myVar', new org.camunda.bpm.engine.test.bpmn.scripttask.MySerializable('test'));");
+
+    pi = runtimeService.startProcessInstanceByKey("testProcess");
+
+    MySerializable myVar = (MySerializable) runtimeService.getVariable(pi.getId(), "myVar");
+    assertEquals("test", myVar.getName());
+  }
+
+  public void testGroovyNotExistingImport() {
+    deployProcess(GROOVY, "import unknown");
+
+    try {
+      runtimeService.startProcessInstanceByKey("testProcess");
+      fail("Should fail during script compilation");
+    }
+    catch (ScriptCompilationException e) {
+      assertTextPresentIgnoreCase("import unknown", e.getMessage());
+    }
+  }
+
+  public void testGroovyNotExistingImportWithoutCompilation() {
+    // disable script compilation
+    processEngineConfiguration.setEnableScriptCompilation(false);
+
+    deployProcess(GROOVY, "import unknown");
+
+    try {
+      runtimeService.startProcessInstanceByKey("testProcess");
+      fail("Should fail during script evaluation");
+    }
+    catch (ScriptEvaluationException e) {
+      assertTextPresentIgnoreCase("import unknown", e.getMessage());
+    }
+    finally {
+      // re-enable script compilation
+      processEngineConfiguration.setEnableScriptCompilation(true);
+    }
   }
 
   protected void deployProcess(String scriptFormat, String scriptText) {

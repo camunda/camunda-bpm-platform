@@ -12,18 +12,16 @@
  */
 package org.camunda.bpm.engine.impl.core.variable;
 
+import org.camunda.bpm.engine.variable.value.TypedValue;
+
 /**
  * @author Daniel Meyer
- * @author Roman Smirnov
- * @author Sebastian Menski
  *
  */
 public interface CoreVariableInstance {
 
   String getName();
 
-  Object getValue();
-
-  boolean isAbleToStore(Object value);
+  TypedValue getTypedValue(boolean deserializeValue);
 
 }

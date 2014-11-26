@@ -26,15 +26,12 @@ import org.camunda.bpm.engine.rest.sub.runtime.VariableInstanceResource;
 import org.camunda.bpm.engine.rest.sub.runtime.impl.VariableInstanceResourceImpl;
 import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.runtime.VariableInstanceQuery;
+import org.codehaus.jackson.map.ObjectMapper;
 
 public class VariableInstanceRestServiceImpl extends AbstractRestProcessEngineAware implements VariableInstanceRestService {
 
-  public VariableInstanceRestServiceImpl() {
-    super();
-  }
-
-  public VariableInstanceRestServiceImpl(String engineName) {
-    super(engineName);
+  public VariableInstanceRestServiceImpl(String engineName, ObjectMapper objectMapper) {
+    super(engineName, objectMapper);
   }
 
   @Override
@@ -43,18 +40,24 @@ public class VariableInstanceRestServiceImpl extends AbstractRestProcessEngineAw
   }
 
   @Override
-  public List<VariableInstanceDto> getVariableInstances(UriInfo uriInfo, Integer firstResult, Integer maxResults) {
-    VariableInstanceQueryDto queryDto = new VariableInstanceQueryDto(uriInfo.getQueryParameters());
-    return queryVariableInstances(queryDto, firstResult, maxResults);
+  public List<VariableInstanceDto> getVariableInstances(UriInfo uriInfo, Integer firstResult, Integer maxResults, boolean deserializeObjectValues) {
+    VariableInstanceQueryDto queryDto = new VariableInstanceQueryDto(getObjectMapper(), uriInfo.getQueryParameters());
+    return queryVariableInstances(queryDto, firstResult, maxResults, deserializeObjectValues);
   }
 
   @Override
-  public List<VariableInstanceDto> queryVariableInstances(VariableInstanceQueryDto queryDto, Integer firstResult, Integer maxResults) {
+  public List<VariableInstanceDto> queryVariableInstances(VariableInstanceQueryDto queryDto, Integer firstResult, Integer maxResults, boolean deserializeObjectValues) {
     ProcessEngine engine = getProcessEngine();
+    queryDto.setObjectMapper(getObjectMapper());
     VariableInstanceQuery query = queryDto.toQuery(engine);
 
     // disable binary fetching by default.
     query.disableBinaryFetching();
+
+    // disable custom object fetching by default. Cannot be done to not break existing API
+    if (!deserializeObjectValues) {
+      query.disableCustomObjectDeserialization();
+    }
 
     List<VariableInstance> matchingInstances;
     if (firstResult != null || maxResults != null) {
@@ -83,13 +86,14 @@ public class VariableInstanceRestServiceImpl extends AbstractRestProcessEngineAw
 
   @Override
   public CountResultDto getVariableInstancesCount(UriInfo uriInfo) {
-    VariableInstanceQueryDto queryDto = new VariableInstanceQueryDto(uriInfo.getQueryParameters());
+    VariableInstanceQueryDto queryDto = new VariableInstanceQueryDto(getObjectMapper(), uriInfo.getQueryParameters());
     return queryVariableInstancesCount(queryDto);
   }
 
   @Override
   public CountResultDto queryVariableInstancesCount(VariableInstanceQueryDto queryDto) {
     ProcessEngine engine = getProcessEngine();
+    queryDto.setObjectMapper(getObjectMapper());
     VariableInstanceQuery query = queryDto.toQuery(engine);
 
     long count = query.count();

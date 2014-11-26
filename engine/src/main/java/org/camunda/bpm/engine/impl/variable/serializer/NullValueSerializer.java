@@ -1,0 +1,52 @@
+/* Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.camunda.bpm.engine.impl.variable.serializer;
+
+import org.camunda.bpm.engine.impl.core.variable.value.NullValueImpl;
+import org.camunda.bpm.engine.impl.core.variable.value.UntypedValueImpl;
+import org.camunda.bpm.engine.variable.type.ValueType;
+import org.camunda.bpm.engine.variable.value.TypedValue;
+
+/**
+ * Used to serialize untyped null values.
+ *
+ * @author Daniel Meyer
+ * @author Tom Baeyens
+ */
+public class NullValueSerializer extends AbstractTypedValueSerializer<NullValueImpl> {
+
+  public NullValueSerializer() {
+    super(ValueType.NULL);
+  }
+
+  public String getName() {
+    return ValueType.NULL.getName().toLowerCase();
+  }
+
+  public NullValueImpl convertToTypedValue(UntypedValueImpl untypedValue) {
+    return NullValueImpl.INSTANCE;
+  }
+
+  public void writeValue(NullValueImpl value, ValueFields valueFields) {
+    // nothing to do
+  }
+
+  public NullValueImpl readValue(ValueFields valueFields, boolean deserialize) {
+    return NullValueImpl.INSTANCE;
+  }
+
+  protected boolean canWriteValue(TypedValue value) {
+    return value.getValue() == null;
+  }
+
+}

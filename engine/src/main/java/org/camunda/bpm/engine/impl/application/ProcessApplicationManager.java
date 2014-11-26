@@ -26,10 +26,14 @@ import org.camunda.bpm.application.ProcessApplicationRegistration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.ProcessDefinitionQueryImpl;
 import org.camunda.bpm.engine.impl.cfg.TransactionState;
+import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
+import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionQueryImpl;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentFailListener;
 import org.camunda.bpm.engine.impl.persistence.entity.DeploymentEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
+import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 
 /**
@@ -133,48 +137,114 @@ public class ProcessApplicationManager {
       builder.append(". ");
 
       List<ProcessDefinition> processDefinitions = new ArrayList<ProcessDefinition>();
+      List<CaseDefinition> caseDefinitions = new ArrayList<CaseDefinition>();
+
+      CommandContext commandContext = Context.getCommandContext();
+
       for (String deploymentId : deploymentIds) {
-        DeploymentEntity deployment = Context.getCommandContext()
-          .getDbSqlSession()
+
+        DeploymentEntity deployment = commandContext
+          .getDbEntityManager()
           .selectById(DeploymentEntity.class, deploymentId);
+
         if(deployment != null) {
-          // in case deployment was created by this command
-          List<ProcessDefinitionEntity> deployedArtifacts = deployment.getDeployedArtifacts(ProcessDefinitionEntity.class);
-          if(deployedArtifacts != null) {
-            processDefinitions.addAll(deployedArtifacts);
-          } else {
-            // query db
-            processDefinitions.addAll(new ProcessDefinitionQueryImpl(Context.getCommandContext())
-                .deploymentId(deploymentId)
-                .list());
-          }
+
+          processDefinitions.addAll(getDeployedProcessDefinitionArtifacts(deployment));
+
+          caseDefinitions.addAll(getDeployedCaseDefinitionArtifacts(deployment));
+
         }
       }
 
-      if(processDefinitions.isEmpty()) {
-        builder.append("Deployment does not provide any process definitions.");
-
-      } else {
-        builder.append("Will execute process definitions ");
-        builder.append("\n");
-        for (ProcessDefinition processDefinition : processDefinitions) {
-          builder.append("\n");
-          builder.append("        ");
-          builder.append(processDefinition.getKey());
-          builder.append("[version: ");
-          builder.append(processDefinition.getVersion());
-          builder.append(", id: ");
-          builder.append(processDefinition.getId());
-          builder.append("]");
-        }
-        builder.append("\n");
-      }
+      logProcessDefinitionRegistrations(builder, processDefinitions);
+      logCaseDefinitionRegistrations(builder, caseDefinitions);
 
       LOGGER.info(builder.toString());
 
     } catch(Throwable e) {
       // ignore
       LOGGER.log(Level.WARNING, "Exception while logging registration summary", e);
+    }
+  }
+
+  protected List<ProcessDefinition> getDeployedProcessDefinitionArtifacts(DeploymentEntity deployment) {
+    CommandContext commandContext = Context.getCommandContext();
+
+    // in case deployment was created by this command
+    List<ProcessDefinitionEntity> entities = deployment.getDeployedArtifacts(ProcessDefinitionEntity.class);
+
+    if (entities == null) {
+      String deploymentId = deployment.getId();
+
+      // query db
+      return new ProcessDefinitionQueryImpl(commandContext)
+        .deploymentId(deploymentId)
+        .list();
+    }
+
+    return new ArrayList<ProcessDefinition>(entities);
+
+  }
+
+  protected List<CaseDefinition> getDeployedCaseDefinitionArtifacts(DeploymentEntity deployment) {
+    CommandContext commandContext = Context.getCommandContext();
+
+    // in case deployment was created by this command
+    List<CaseDefinitionEntity> entities = deployment.getDeployedArtifacts(CaseDefinitionEntity.class);
+
+    if (entities == null) {
+      String deploymentId = deployment.getId();
+
+      // query db
+      return new CaseDefinitionQueryImpl(commandContext)
+        .deploymentId(deploymentId)
+        .list();
+    }
+
+    return new ArrayList<CaseDefinition>(entities);
+
+  }
+
+  protected void logProcessDefinitionRegistrations(StringBuilder builder, List<ProcessDefinition> processDefinitions) {
+    if(processDefinitions.isEmpty()) {
+      builder.append("Deployment does not provide any process definitions.");
+
+    } else {
+      builder.append("Will execute process definitions ");
+      builder.append("\n");
+      for (ProcessDefinition processDefinition : processDefinitions) {
+        builder.append("\n");
+        builder.append("        ");
+        builder.append(processDefinition.getKey());
+        builder.append("[version: ");
+        builder.append(processDefinition.getVersion());
+        builder.append(", id: ");
+        builder.append(processDefinition.getId());
+        builder.append("]");
+      }
+      builder.append("\n");
+    }
+  }
+
+  protected void logCaseDefinitionRegistrations(StringBuilder builder, List<CaseDefinition> caseDefinitions) {
+    if(caseDefinitions.isEmpty()) {
+      builder.append("Deployment does not provide any case definitions.");
+
+    } else {
+      builder.append("\n");
+      builder.append("Will execute case definitions ");
+      builder.append("\n");
+      for (CaseDefinition caseDefinition : caseDefinitions) {
+        builder.append("\n");
+        builder.append("        ");
+        builder.append(caseDefinition.getKey());
+        builder.append("[version: ");
+        builder.append(caseDefinition.getVersion());
+        builder.append(", id: ");
+        builder.append(caseDefinition.getId());
+        builder.append("]");
+      }
+      builder.append("\n");
     }
   }
 

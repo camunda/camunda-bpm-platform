@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd" id="_oAboUPrHEeOy29_az6kK_Q" exporter="camunda modeler" exporterVersion="2.6.0" targetNamespace="http://activiti.org/bpmn">
+  <error id="Error_1" errorCode="Error"/>
+  <message id="Message_1" name="outerMessage"/>
+  <message id="Message_2" name="innerMessage"/>
+  
+  <process id="testProcess" isExecutable="true">
+    <startEvent id="start"/>
+    <sequenceFlow id="SequenceFlow_1" name="" sourceRef="start" targetRef="outerSubprocess"/>
+    
+    <!-- outer subprocess -->
+    <subProcess id="outerSubprocess">
+      <startEvent id="subStart"/>
+      <sequenceFlow id="SequenceFlow_2" sourceRef="subStart" targetRef="subTask"/>
+      <userTask id="subTask"/>
+      <sequenceFlow id="SequenceFlow_3" sourceRef="subTask" targetRef="subEnd"/>
+      <endEvent id="subEnd"/>
+      
+      <!-- outer event subprocess that interrupts outer subprocess -->
+      <subProcess id="outerEventSubprocess" triggeredByEvent="true">
+        <startEvent id="subEventStart" isInterrupting="true">
+          <messageEventDefinition id="_MessageEventDefinition_4" messageRef="Message_1"/>
+        </startEvent>
+        <sequenceFlow id="SequenceFlow_4" sourceRef="subEventStart" targetRef="innerSubprocess"/>
+        
+        <!-- inner subprocess -->
+        <subProcess id="innerSubprocess">
+          <startEvent id="innerSubStart"/>
+          <sequenceFlow id="SequenceFlow_5" sourceRef="innerSubStart" targetRef="innerSubTask"/>
+          <userTask id="innerSubTask"/>
+          <sequenceFlow id="SequenceFlow_6" sourceRef="innerSubTask" targetRef="innerSubEnd"/>
+          <endEvent id="innerSubEnd"/>
+          
+          <!-- inner event subprocess that interrupts inner subprocess and throws error -->
+          <subProcess id="innerEventSubprocess" triggeredByEvent="true">
+            <startEvent id="innerSubEventStart" isInterrupting="true">
+              <messageEventDefinition id="_MessageEventDefinition_5" messageRef="Message_2"/>
+            </startEvent>
+            <sequenceFlow id="SequenceFlow_7" sourceRef="innerSubEventStart" targetRef="innerSubEventEnd"/>
+            <endEvent id="innerSubEventEnd">
+              <errorEventDefinition id="_ErrorEventDefinition_2" errorRef="Error_1"/>
+            </endEvent>
+          </subProcess>
+        </subProcess>
+        
+        <sequenceFlow id="SequenceFlow_8" sourceRef="innerSubprocess" targetRef="outerEventSubprocessEnd"/>
+        <endEvent id="outerEventSubprocessEnd"/>
+      </subProcess>
+    </subProcess>
+    <sequenceFlow id="SequenceFlow_9" sourceRef="outerSubprocess" targetRef="end"/>
+    <endEvent id="end"/>
+    
+    <!-- boundary event on outer subprocess that catches the error thrown by inner event subprocess -->
+    <boundaryEvent id="boundary" attachedToRef="outerSubprocess">
+      <errorEventDefinition id="_ErrorEventDefinition_3" errorRef="Error_1"/>
+    </boundaryEvent>
+    <sequenceFlow id="SequenceFlow_10" sourceRef="boundary" targetRef="afterBoundaryTask"/>
+    <userTask id="afterBoundaryTask"/>
+    <sequenceFlow id="SequenceFlow_11" sourceRef="afterBoundaryTask" targetRef="errorEnd"/>
+    <endEvent id="errorEnd"/>
+  </process>
+</definitions>

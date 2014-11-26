@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:camunda="http://activiti.org/bpmn"
+  targetNamespace="org.camunda.bpm.engine.test.enginge.test.api.runtime">
+
+  <process id="process">
+
+    <startEvent id="theStart" camunda:asyncBefore="true" />
+
+    <sequenceFlow id="flow1" sourceRef="theStart" targetRef="theServiceTask" />
+
+    <serviceTask id="theServiceTask" name="my task" camunda:expression="${true}" />
+
+    <sequenceFlow id="flow2" sourceRef="theServiceTask" targetRef="theEnd" />
+
+    <endEvent id="theEnd" />
+
+  </process>
+
+</definitions>

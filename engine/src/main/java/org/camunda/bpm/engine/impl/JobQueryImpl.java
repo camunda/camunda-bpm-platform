@@ -16,7 +16,6 @@ package org.camunda.bpm.engine.impl;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
-
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
@@ -24,6 +23,8 @@ import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.JobQuery;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 
 /**
@@ -34,6 +35,7 @@ import org.camunda.bpm.engine.runtime.JobQuery;
 public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQuery, Serializable {
 
   private static final long serialVersionUID = 1L;
+  protected String activityId;
   protected String id;
   protected String jobDefinitionId;
   protected String processInstanceId;
@@ -65,50 +67,44 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
   }
 
   public JobQuery jobId(String jobId) {
-    if (jobId == null) {
-      throw new ProcessEngineException("Provided job id is null");
-    }
+    ensureNotNull("Provided job id", jobId);
     this.id = jobId;
     return this;
   }
 
   public JobQuery jobDefinitionId(String jobDefinitionId) {
-    if (jobDefinitionId == null) {
-      throw new ProcessEngineException("Provided job definition id is null");
-    }
+    ensureNotNull("Provided job definition id", jobDefinitionId);
     this.jobDefinitionId = jobDefinitionId;
     return this;
   }
 
   public JobQueryImpl processInstanceId(String processInstanceId) {
-    if (processInstanceId == null) {
-      throw new ProcessEngineException("Provided process instance id is null");
-    }
+    ensureNotNull("Provided process instance id", processInstanceId);
     this.processInstanceId = processInstanceId;
     return this;
   }
 
   public JobQueryImpl executionId(String executionId) {
-    if (executionId == null) {
-      throw new ProcessEngineException("Provided execution id is null");
-    }
+    ensureNotNull("Provided execution id", executionId);
     this.executionId = executionId;
     return this;
   }
 
   public JobQuery processDefinitionId(String processDefinitionId) {
-    if (processDefinitionId == null) {
-      throw new ProcessEngineException("Provided process definition id is null");
-    }
+    ensureNotNull("Provided process definition id", processDefinitionId);
     this.processDefinitionId = processDefinitionId;
     return this;
   }
 
   public JobQuery processDefinitionKey(String processDefinitionKey) {
-    if (processDefinitionKey == null) {
-      throw new ProcessEngineException("Provided process instance key is null");
-    }
+    ensureNotNull("Provided process instance key", processDefinitionKey);
     this.processDefinitionKey = processDefinitionKey;
+    return this;
+  }
+
+  public JobQuery activityId(String activityId){
+    ensureNotNull("Provided activity id", activityId);
+    this.activityId = activityId;
     return this;
   }
 
@@ -139,17 +135,13 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
   }
 
   public JobQuery duedateHigherThan(Date date) {
-    if (date == null) {
-      throw new ProcessEngineException("Provided date is null");
-    }
+    ensureNotNull("Provided date", date);
     this.duedateHigherThan = date;
     return this;
   }
 
   public JobQuery duedateLowerThan(Date date) {
-    if (date == null) {
-      throw new ProcessEngineException("Provided date is null");
-    }
+    ensureNotNull("Provided date", date);
     this.duedateLowerThan = date;
     return this;
   }
@@ -159,9 +151,7 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
   }
 
   public JobQuery duedateHigherThenOrEquals(Date date) {
-    if (date == null) {
-      throw new ProcessEngineException("Provided date is null");
-    }
+    ensureNotNull("Provided date", date);
     this.duedateHigherThanOrEqual = date;
     return this;
   }
@@ -171,9 +161,7 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
   }
 
   public JobQuery duedateLowerThenOrEquals(Date date) {
-    if (date == null) {
-      throw new ProcessEngineException("Provided date is null");
-    }
+    ensureNotNull("Provided date", date);
     this.duedateLowerThanOrEqual = date;
     return this;
   }
@@ -184,9 +172,7 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
   }
 
   public JobQuery exceptionMessage(String exceptionMessage) {
-    if (exceptionMessage == null) {
-      throw new ProcessEngineException("Provided exception message is null");
-    }
+    ensureNotNull("Provided exception message", exceptionMessage);
     this.exceptionMessage = exceptionMessage;
     return this;
   }

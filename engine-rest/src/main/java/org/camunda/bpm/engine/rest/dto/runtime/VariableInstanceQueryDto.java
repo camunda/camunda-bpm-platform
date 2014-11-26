@@ -26,6 +26,7 @@ import org.camunda.bpm.engine.rest.dto.converter.StringArrayConverter;
 import org.camunda.bpm.engine.rest.dto.converter.VariableListConverter;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.runtime.VariableInstanceQuery;
+import org.codehaus.jackson.map.ObjectMapper;
 
 /**
  * @author roman.smirnov
@@ -52,12 +53,13 @@ public class VariableInstanceQueryDto extends AbstractQueryDto<VariableInstanceQ
   protected String[] caseExecutionIdIn;
   protected String[] caseInstanceIdIn;
   protected String[] taskIdIn;
+  protected String[] variableScopeIdIn;
   protected String[] activityInstanceIdIn;
 
   public VariableInstanceQueryDto() {}
 
-  public VariableInstanceQueryDto(MultivaluedMap<String, String> queryParameters) {
-    super(queryParameters);
+  public VariableInstanceQueryDto(ObjectMapper objectMapper, MultivaluedMap<String, String> queryParameters) {
+    super(objectMapper, queryParameters);
   }
 
   @CamundaQueryParam("variableName")
@@ -100,6 +102,11 @@ public class VariableInstanceQueryDto extends AbstractQueryDto<VariableInstanceQ
     this.taskIdIn = taskIdIn;
   }
 
+  @CamundaQueryParam(value="variableScopeIdIn", converter = StringArrayConverter.class)
+  public void setVariableScopeIdIn(String[] variableScopeIdIn) {
+    this.variableScopeIdIn = variableScopeIdIn;
+  }
+
   @CamundaQueryParam(value="activityInstanceIdIn", converter = StringArrayConverter.class)
   public void setActivityInstanceIdIn(String[] activityInstanceIdIn) {
     this.activityInstanceIdIn = activityInstanceIdIn;
@@ -129,7 +136,7 @@ public class VariableInstanceQueryDto extends AbstractQueryDto<VariableInstanceQ
       for (VariableQueryParameterDto variableQueryParam : variableValues) {
         String variableName = variableQueryParam.getName();
         String op = variableQueryParam.getOperator();
-        Object variableValue = variableQueryParam.getValue();
+        Object variableValue = variableQueryParam.resolveValue(objectMapper);
 
         if (op.equals(VariableQueryParameterDto.EQUALS_OPERATOR_NAME)) {
           query.variableValueEquals(variableName, variableValue);
@@ -169,6 +176,10 @@ public class VariableInstanceQueryDto extends AbstractQueryDto<VariableInstanceQ
 
     if (taskIdIn != null && taskIdIn.length > 0) {
       query.taskIdIn(taskIdIn);
+    }
+
+    if (variableScopeIdIn != null && variableScopeIdIn.length > 0) {
+      query.variableScopeIdIn(variableScopeIdIn);
     }
 
     if (activityInstanceIdIn != null && activityInstanceIdIn.length > 0) {

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:camunda="http://activiti.org/bpmn"
+  targetNamespace="Examples">
+
+  <process id="testInclusiveGateway">
+
+    <startEvent id="theStart" />
+
+    <sequenceFlow id="flow1"  sourceRef="theStart" targetRef="inclusiveGateway" />
+
+    <inclusiveGateway id="inclusiveGateway"
+                      camunda:asyncBefore="true"
+                      camunda:asyncAfter="true">
+
+      <extensionElements>
+
+          <camunda:executionListener
+              event="start"
+              expression="${execution.setVariable('listenerStartInvoked', true)}" />
+
+          <camunda:executionListener
+              event="end"
+              expression="${execution.setVariable('listenerEndInvoked', true)}" />
+
+        </extensionElements>
+
+    </inclusiveGateway>
+
+    <sequenceFlow id="flow2" sourceRef="inclusiveGateway" targetRef="userTask1" />
+    <sequenceFlow id="flow3" sourceRef="inclusiveGateway" targetRef="userTask2" />
+
+    <userTask id="userTask1" />
+    <userTask id="userTask2" />
+
+    <sequenceFlow sourceRef="userTask1" targetRef="theEnd" />
+    <sequenceFlow sourceRef="userTask2" targetRef="theEnd2" />
+
+    <endEvent id="theEnd" />
+    <endEvent id="theEnd2" />
+
+  </process>
+
+</definitions>

@@ -14,18 +14,14 @@ package org.camunda.bpm.engine.impl.history.producer;
 
 import org.camunda.bpm.engine.delegate.DelegateTask;
 import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.db.DbSqlSession;
-import org.camunda.bpm.engine.impl.history.event.HistoricActivityInstanceEventEntity;
-import org.camunda.bpm.engine.impl.history.event.HistoricIncidentEventEntity;
-import org.camunda.bpm.engine.impl.history.event.HistoricProcessInstanceEventEntity;
-import org.camunda.bpm.engine.impl.history.event.HistoricTaskInstanceEventEntity;
-import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
+import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
+import org.camunda.bpm.engine.impl.history.event.*;
 import org.camunda.bpm.engine.impl.history.handler.DbHistoryEventHandler;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.runtime.Incident;
 
 /**
- * <p>This HistoryEventProducer is aware of the {@link DbSqlSession} cache
+ * <p>This HistoryEventProducer is aware of the {@link DbEntityManager} cache
  * and works in combination with the {@link DbHistoryEventHandler}.</p>
  *
  * @author Daniel Meyer
@@ -94,8 +90,8 @@ public class CacheAwareHistoryEventProducer extends DefaultHistoryEventProducer 
   /** find a cached entity by primary key */
   protected <T extends HistoryEvent> T findInCache(Class<T> type, String id) {
     return Context.getCommandContext()
-      .getDbSqlSession()
-      .findInCache(type, id);
+      .getDbEntityManager()
+      .getCachedEntity(type, id);
   }
 
 }

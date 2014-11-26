@@ -16,36 +16,25 @@ package org.camunda.bpm.engine.impl.cmd;
 import java.util.Map;
 
 import org.camunda.bpm.engine.MismatchingMessageCorrelationException;
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.MessageCorrelationBuilderImpl;
 import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
-import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.runtime.CorrelationHandler;
 import org.camunda.bpm.engine.impl.runtime.CorrelationSet;
 import org.camunda.bpm.engine.impl.runtime.MessageCorrelationResult;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureAtLeastOneNotNull;
+
 /**
  * @author Thorben Lindhauer
  * @author Daniel Meyer
+ * @author Michael Scholz
  */
-public class CorrelateMessageCmd implements Command<Void> {
-
-  protected final String messageName;
-  protected final String businessKey;
-  protected final Map<String, Object> correlationKeys;
-  protected final Map<String, Object> processVariables;
-  protected String processInstanceId;
+public class CorrelateMessageCmd extends AbstractCorrelateMessageCmd {
 
   public CorrelateMessageCmd(String messageName, String businessKey,
       Map<String, Object> correlationKeys, Map<String, Object> processVariables) {
-    this.messageName = messageName;
-    this.businessKey = businessKey;
-    this.correlationKeys = correlationKeys;
-    this.processVariables = processVariables;
+    super(messageName, businessKey, correlationKeys, processVariables);
   }
 
   /**
@@ -54,46 +43,28 @@ public class CorrelateMessageCmd implements Command<Void> {
    * @param messageCorrelationBuilderImpl
    */
   public CorrelateMessageCmd(MessageCorrelationBuilderImpl messageCorrelationBuilderImpl) {
-    this.messageName = messageCorrelationBuilderImpl.getMessageName();
-    this.processVariables = messageCorrelationBuilderImpl.getPayloadProcessInstanceVariables();
-    this.correlationKeys = messageCorrelationBuilderImpl.getCorrelationProcessInstanceVariables();
-    this.businessKey = messageCorrelationBuilderImpl.getBusinessKey();
-    this.processInstanceId = messageCorrelationBuilderImpl.getProcessInstanceId();
+    super(messageCorrelationBuilderImpl);
   }
 
   public Void execute(CommandContext commandContext) {
-    if(messageName == null) {
-      throw new ProcessEngineException("messageName cannot be null");
-    }
+    ensureAtLeastOneNotNull("At least one of the following correlation criteria has to be present: "
+        + "messageName, businessKey, correlationKeys, processInstanceId", messageName, businessKey, correlationKeys, processInstanceId);
 
     CorrelationHandler correlationHandler = Context.getProcessEngineConfiguration().getCorrelationHandler();
 
     CorrelationSet correlationSet = new CorrelationSet(businessKey, processInstanceId, correlationKeys);
     MessageCorrelationResult correlationResult = correlationHandler.correlateMessage(commandContext, messageName, correlationSet);
 
-    if(correlationResult == null) {
+    if (correlationResult == null) {
       throw new MismatchingMessageCorrelationException(messageName, "No process definition or execution matches the parameters");
 
-    } else if(MessageCorrelationResult.TYPE_EXECUTION.equals(correlationResult.getResultType())) {
+    } else if (MessageCorrelationResult.TYPE_EXECUTION.equals(correlationResult.getResultType())) {
       triggerExecution(commandContext, correlationResult);
 
     } else {
       instantiateProcess(commandContext, correlationResult);
-
     }
 
     return null;
   }
-
-  protected void triggerExecution(CommandContext commandContext, MessageCorrelationResult correlationResult) {
-    new MessageEventReceivedCmd(messageName, correlationResult.getExecutionEntity().getId(), processVariables).execute(commandContext);
-  }
-
-  protected void instantiateProcess(CommandContext commandContext, MessageCorrelationResult correlationResult) {
-    ProcessDefinitionEntity processDefinitionEntity = correlationResult.getProcessDefinitionEntity();
-    ActivityImpl messageStartEvent = processDefinitionEntity.findActivity(correlationResult.getStartEventActivityId());
-    ExecutionEntity processInstance = processDefinitionEntity.createProcessInstance(businessKey, messageStartEvent);
-    processInstance.start(businessKey, processVariables);
-  }
-
 }

@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -13,10 +13,12 @@
 
 package org.camunda.bpm.engine.impl;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.repository.Deployment;
@@ -26,13 +28,16 @@ import org.camunda.bpm.engine.repository.DeploymentQuery;
 /**
  * @author Tom Baeyens
  * @author Joram Barrez
+ * @author Ingo Richtsmeier
  */
 public class DeploymentQueryImpl extends AbstractQuery<DeploymentQuery, Deployment> implements DeploymentQuery, Serializable {
 
-  private static final long serialVersionUID = 1L;  
+  private static final long serialVersionUID = 1L;
   protected String deploymentId;
   protected String name;
   protected String nameLike;
+  protected Date deploymentBefore;
+  protected Date deploymentAfter;
 
   public DeploymentQueryImpl() {
   }
@@ -46,45 +51,51 @@ public class DeploymentQueryImpl extends AbstractQuery<DeploymentQuery, Deployme
   }
 
   public DeploymentQueryImpl deploymentId(String deploymentId) {
-    if (deploymentId == null) {
-      throw new ProcessEngineException("Deployment id is null");
-    }
+    ensureNotNull("Deployment id", deploymentId);
     this.deploymentId = deploymentId;
     return this;
   }
-  
+
   public DeploymentQueryImpl deploymentName(String deploymentName) {
-    if (deploymentName == null) {
-      throw new ProcessEngineException("deploymentName is null");
-    }
+    ensureNotNull("deploymentName", deploymentName);
     this.name = deploymentName;
     return this;
   }
 
   public DeploymentQueryImpl deploymentNameLike(String nameLike) {
-    if (nameLike == null) {
-      throw new ProcessEngineException("deploymentNameLike is null");
-    }
+    ensureNotNull("deploymentNameLike", nameLike);
     this.nameLike = nameLike;
     return this;
   }
-  
+
+  public DeploymentQuery deploymentBefore(Date before) {
+    ensureNotNull("deploymentBefore", before);
+    this.deploymentBefore = before;
+    return this;
+  }
+
+  public DeploymentQuery deploymentAfter(Date after) {
+    ensureNotNull("deploymentAfter", after);
+    this.deploymentAfter = after;
+    return this;
+  }
+
   //sorting ////////////////////////////////////////////////////////
-  
+
   public DeploymentQuery orderByDeploymentId() {
     return orderBy(DeploymentQueryProperty.DEPLOYMENT_ID);
   }
-  
+
   public DeploymentQuery orderByDeploymenTime() {
     return orderBy(DeploymentQueryProperty.DEPLOY_TIME);
   }
-  
+
   public DeploymentQuery orderByDeploymentName() {
     return orderBy(DeploymentQueryProperty.DEPLOYMENT_NAME);
   }
-  
+
   //results ////////////////////////////////////////////////////////
-  
+
   @Override
   public long executeCount(CommandContext commandContext) {
     checkQueryOk();
@@ -100,18 +111,26 @@ public class DeploymentQueryImpl extends AbstractQuery<DeploymentQuery, Deployme
       .getDeploymentManager()
       .findDeploymentsByQueryCriteria(this, page);
   }
-  
+
   //getters ////////////////////////////////////////////////////////
-  
+
   public String getDeploymentId() {
     return deploymentId;
   }
-  
+
   public String getName() {
     return name;
   }
 
   public String getNameLike() {
     return nameLike;
+  }
+
+  public Date getDeploymentBefore() {
+    return deploymentBefore;
+  }
+
+  public Date getDeploymentAfter() {
+    return deploymentAfter;
   }
 }

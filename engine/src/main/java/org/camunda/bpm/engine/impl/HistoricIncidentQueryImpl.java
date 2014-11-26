@@ -13,13 +13,14 @@
 package org.camunda.bpm.engine.impl;
 
 import java.util.List;
-
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.HistoricIncident;
 import org.camunda.bpm.engine.history.HistoricIncidentQuery;
 import org.camunda.bpm.engine.history.IncidentState;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 /**
  * @author Roman Smirnov
@@ -53,61 +54,61 @@ public class HistoricIncidentQueryImpl extends AbstractVariableQueryImpl<Histori
   }
 
   public HistoricIncidentQuery incidentId(String incidentId) {
-    assertParamNotNull("incidentId", incidentId);
+    ensureNotNull("incidentId", incidentId);
     this.id = incidentId;
     return this;
   }
 
   public HistoricIncidentQuery incidentType(String incidentType) {
-    assertParamNotNull("incidentType", incidentType);
+    ensureNotNull("incidentType", incidentType);
     this.incidentType = incidentType;
     return this;
   }
 
   public HistoricIncidentQuery incidentMessage(String incidentMessage) {
-    assertParamNotNull("incidentMessage", incidentMessage);
+    ensureNotNull("incidentMessage", incidentMessage);
     this.incidentMessage = incidentMessage;
     return this;
   }
 
   public HistoricIncidentQuery executionId(String executionId) {
-    assertParamNotNull("executionId", executionId);
+    ensureNotNull("executionId", executionId);
     this.executionId = executionId;
     return this;
   }
 
   public HistoricIncidentQuery activityId(String activityId) {
-    assertParamNotNull("activityId", activityId);
+    ensureNotNull("activityId", activityId);
     this.activityId = activityId;
     return this;
   }
 
   public HistoricIncidentQuery processInstanceId(String processInstanceId) {
-    assertParamNotNull("processInstanceId", processInstanceId);
+    ensureNotNull("processInstanceId", processInstanceId);
     this.processInstanceId = processInstanceId;
     return this;
   }
 
   public HistoricIncidentQuery processDefinitionId(String processDefinitionId) {
-    assertParamNotNull("processDefinitionId", processDefinitionId);
+    ensureNotNull("processDefinitionId", processDefinitionId);
     this.processDefinitionId = processDefinitionId;
     return this;
   }
 
   public HistoricIncidentQuery causeIncidentId(String causeIncidentId) {
-    assertParamNotNull("causeIncidentId", causeIncidentId);
+    ensureNotNull("causeIncidentId", causeIncidentId);
     this.causeIncidentId = causeIncidentId;
     return this;
   }
 
   public HistoricIncidentQuery rootCauseIncidentId(String rootCauseIncidentId) {
-    assertParamNotNull("rootCauseIncidentId", rootCauseIncidentId);
+    ensureNotNull("rootCauseIncidentId", rootCauseIncidentId);
     this.rootCauseIncidentId = rootCauseIncidentId;
     return this;
   }
 
   public HistoricIncidentQuery configuration(String configuration) {
-    assertParamNotNull("configuration", configuration);
+    ensureNotNull("configuration", configuration);
     this.configuration = configuration;
     return this;
   }

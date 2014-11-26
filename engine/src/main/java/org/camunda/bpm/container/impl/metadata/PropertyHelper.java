@@ -14,6 +14,9 @@ package org.camunda.bpm.container.impl.metadata;
 
 import java.lang.reflect.Method;
 import java.util.Map;
+import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
@@ -24,6 +27,12 @@ import org.camunda.bpm.engine.impl.util.ReflectUtil;
  *
  */
 public class PropertyHelper {
+
+  
+  /**
+   * Regex for Ant-style property placeholders
+   */
+  private static final Pattern PROPERTY_TEMPLATE = Pattern.compile("([^\\$]*)\\$\\{(.+?)\\}([^\\$]*)");
 
   public static boolean getBooleanProperty(Map<String, String> properties, String name, boolean defaultValue) {
     String value = properties.get(name);
@@ -84,6 +93,28 @@ public class PropertyHelper {
     for (Map.Entry<String, String> property : properties.entrySet()) {
       applyProperty(configuration, property.getKey(), property.getValue());
     }
+  }
+  
+
+  /**
+   * Replaces Ant-style property references if the corresponding keys exist in the provided {@link Properties}.
+   * 
+   * @param props contains possible replacements
+   * @param original may contain Ant-style templates
+   * @return the original string with replaced properties or the unchanged original string if no placeholder found.  
+   */
+  public static String resolveProperty(Properties props, String original) {
+    Matcher matcher = PROPERTY_TEMPLATE.matcher(original);
+    StringBuilder buffer = new StringBuilder();
+    boolean found = false;
+    while(matcher.find()) {
+      found = true;
+      String propertyName = matcher.group(2).trim();
+      buffer.append(matcher.group(1))
+        .append(props.containsKey(propertyName) ? props.getProperty(propertyName) : "")
+        .append(matcher.group(3));
+    }
+    return found ? buffer.toString() : original;
   }
 
 }

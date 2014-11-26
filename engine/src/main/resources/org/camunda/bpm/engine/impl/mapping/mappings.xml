@@ -6,16 +6,20 @@
 	<settings>
 		<setting name="lazyLoadingEnabled" value="false" />
 	</settings>
-	<mappers>  
+	<mappers>
+    <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/Commons.xml" />
+    
     <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/Attachment.xml" />
     <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/Comment.xml" />
     <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/Deployment.xml" />
     <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/Execution.xml" />
     <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/Group.xml" />
     <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/HistoricActivityInstance.xml" />
+    <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/HistoricCaseActivityInstance.xml" />
     <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/HistoricDetail.xml" />
     <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/HistoricIncident.xml" />
     <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/HistoricProcessInstance.xml" />
+    <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/HistoricCaseInstance.xml" />
     <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/HistoricStatistics.xml" />
     <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/HistoricVariableInstance.xml" />
     <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/HistoricTaskInstance.xml" />
@@ -36,11 +40,13 @@
     <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/EventSubscription.xml" />
     <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/Statistics.xml" />
     <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/Authorization.xml" />
-    
+    <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/Filter.xml" />
+
     <!-- CMMN -->
-    
+
     <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/CaseDefinition.xml" />
     <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/CaseExecution.xml" />
-    
+    <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/CaseSentryPart.xml" />
+
 	</mappers>
 </configuration>

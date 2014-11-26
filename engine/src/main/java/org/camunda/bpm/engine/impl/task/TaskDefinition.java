@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -25,13 +25,13 @@ import org.camunda.bpm.engine.impl.form.handler.TaskFormHandler;
 
 /**
  * Container for task definition information gathered at parsing time.
- * 
+ *
  * @author Joram Barrez
  */
-public class TaskDefinition {
 
+public class TaskDefinition {
   protected String key;
-  
+
   // assignment fields
   protected Expression nameExpression;
   protected Expression descriptionExpression;
@@ -40,13 +40,14 @@ public class TaskDefinition {
   protected Set<Expression> candidateGroupIdExpressions = new HashSet<Expression>();
   protected Expression dueDateExpression;
   protected Expression priorityExpression;
-  
+
   // form fields
   protected TaskFormHandler taskFormHandler;
-  
+  protected Expression formKey;
+
   // task listeners
   protected Map<String, List<TaskListener>> taskListeners = new HashMap<String, List<TaskListener>>();
-  
+
   public TaskDefinition(TaskFormHandler taskFormHandler) {
     this.taskFormHandler = taskFormHandler;
   }
@@ -116,11 +117,11 @@ public class TaskDefinition {
   public void setKey(String key) {
     this.key = key;
   }
-  
+
   public Expression getDueDateExpression() {
     return dueDateExpression;
   }
-  
+
   public void setDueDateExpression(Expression dueDateExpression) {
     this.dueDateExpression = dueDateExpression;
   }
@@ -132,11 +133,11 @@ public class TaskDefinition {
   public void setTaskListeners(Map<String, List<TaskListener>> taskListeners) {
     this.taskListeners = taskListeners;
   }
-  
+
   public List<TaskListener> getTaskListener(String eventName) {
     return taskListeners.get(eventName);
   }
-  
+
   public void addTaskListener(String eventName, TaskListener taskListener) {
     List<TaskListener> taskEventListeners = taskListeners.get(eventName);
     if (taskEventListeners == null) {
@@ -145,5 +146,13 @@ public class TaskDefinition {
     }
     taskEventListeners.add(taskListener);
   }
-  
+
+  public Expression getFormKey() {
+    return formKey;
+  }
+
+  public void setFormKey(Expression formKey) {
+    this.formKey = formKey;
+  }
+
 }

@@ -14,11 +14,11 @@
 package org.camunda.bpm.engine.impl.cmd;
 
 import java.io.Serializable;
-
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 /**
  * @author Frederik Heremans
@@ -33,25 +33,19 @@ public class DeleteHistoricProcessInstanceCmd implements Command<Object>, Serial
   }
 
   public Object execute(CommandContext commandContext) {
-    if (processInstanceId == null) {
-      throw new ProcessEngineException("processInstanceId is null");
-    }
+    ensureNotNull("processInstanceId", processInstanceId);
     // Check if process instance is still running
     HistoricProcessInstance instance = commandContext
       .getHistoricProcessInstanceManager()
       .findHistoricProcessInstance(processInstanceId);
-    
-    if(instance == null) {
-      throw new ProcessEngineException("No historic process instance found with id: " + processInstanceId);
-    }
-    if(instance.getEndTime() == null) {
-      throw new ProcessEngineException("Process instance is still running, cannot delete historic process instance: " + processInstanceId);
-    }
-    
+
+    ensureNotNull("No historic process instance found with id: " + processInstanceId, "instance", instance);
+    ensureNotNull("Process instance is still running, cannot delete historic process instance: " + processInstanceId, "instance.getEndTime()", instance.getEndTime());
+
     commandContext
       .getHistoricProcessInstanceManager()
       .deleteHistoricProcessInstanceById(processInstanceId);
-    
+
     return null;
   }
 

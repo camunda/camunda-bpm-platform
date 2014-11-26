@@ -12,12 +12,19 @@
  */
 package org.camunda.bpm.engine.test.cmmn.handler;
 
+import java.util.HashMap;
+
+import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
+import org.camunda.bpm.engine.impl.cmmn.handler.CmmnHandlerContext;
+import org.camunda.bpm.engine.impl.el.ExpressionManager;
+import org.camunda.bpm.engine.impl.task.TaskDefinition;
 import org.camunda.bpm.model.cmmn.Cmmn;
 import org.camunda.bpm.model.cmmn.CmmnModelInstance;
 import org.camunda.bpm.model.cmmn.impl.instance.CasePlanModel;
 import org.camunda.bpm.model.cmmn.instance.Case;
 import org.camunda.bpm.model.cmmn.instance.CmmnModelElementInstance;
 import org.camunda.bpm.model.cmmn.instance.Definitions;
+import org.camunda.bpm.model.cmmn.instance.ExtensionElements;
 import org.junit.Before;
 
 /**
@@ -30,6 +37,7 @@ public abstract class CmmnElementHandlerTest {
   protected Definitions definitions;
   protected Case caseDefinition;
   protected CasePlanModel casePlanModel;
+  protected CmmnHandlerContext context;
 
   @Before
   public void setup() {
@@ -40,6 +48,15 @@ public abstract class CmmnElementHandlerTest {
 
     caseDefinition = createElement(definitions, "aCaseDefinition", Case.class);
     casePlanModel = createElement(caseDefinition, "aCasePlanModel", CasePlanModel.class);
+
+    context = new CmmnHandlerContext();
+
+    CaseDefinitionEntity caseDefinition = new CaseDefinitionEntity();
+    caseDefinition.setTaskDefinitions(new HashMap<String, TaskDefinition>());
+    context.setCaseDefinition(caseDefinition);
+
+    ExpressionManager expressionManager = new ExpressionManager();
+    context.setExpressionManager(expressionManager);
   }
 
   protected <T extends CmmnModelElementInstance> T createElement(CmmnModelElementInstance parentElement, String id, Class<T> elementClass) {
@@ -47,6 +64,10 @@ public abstract class CmmnElementHandlerTest {
     element.setAttributeValue("id", id, true);
     parentElement.addChildElement(element);
     return element;
+  }
+
+  protected ExtensionElements addExtensionElements(CmmnModelElementInstance parentElement) {
+    return createElement(parentElement, null, ExtensionElements.class);
   }
 
 }

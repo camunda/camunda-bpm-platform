@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.engine.impl.bpmn.behavior;
 
+import static org.camunda.bpm.engine.impl.util.ClassDelegateUtil.applyFieldDeclaration;
+
 import java.util.List;
 import java.util.concurrent.Callable;
 
@@ -20,13 +22,12 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
-import org.camunda.bpm.engine.impl.bpmn.helper.ClassDelegate;
+import org.camunda.bpm.engine.impl.bpmn.delegate.ActivityBehaviorInvocation;
+import org.camunda.bpm.engine.impl.bpmn.delegate.JavaDelegateInvocation;
 import org.camunda.bpm.engine.impl.bpmn.helper.ErrorPropagation;
 import org.camunda.bpm.engine.impl.bpmn.parser.FieldDeclaration;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.context.ProcessApplicationContextUtil;
-import org.camunda.bpm.engine.impl.delegate.ActivityBehaviorInvocation;
-import org.camunda.bpm.engine.impl.delegate.JavaDelegateInvocation;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
@@ -59,18 +60,34 @@ public class ServiceTaskDelegateExpressionActivityBehavior extends TaskActivityB
     if (!ProcessApplicationContextUtil.requiresContextSwitch(targetProcessApplication)) {
 
       Object delegate = expression.getValue(execution);
-      ClassDelegate.applyFieldDeclaration(fieldDeclarations, delegate);
+      applyFieldDeclaration(fieldDeclarations, delegate);
       ActivityBehavior activityBehaviorInstance = getActivityBehaviorInstance(execution, delegate);
 
       if (activityBehaviorInstance instanceof SignallableActivityBehavior) {
-        ((SignallableActivityBehavior) activityBehaviorInstance).signal(execution, signalName, signalData);
+        try {
+          ((SignallableActivityBehavior) activityBehaviorInstance).signal(execution, signalName, signalData);
+        }
+        catch (BpmnError error) {
+          ErrorPropagation.propagateError(error, execution);
+        }
+        catch (Exception exception) {
+          ErrorPropagation.propagateException(exception, execution);
+        }
       }
 
     } else {
       Context.executeWithinProcessApplication(new Callable<Void>() {
 
         public Void call() throws Exception {
-          signal(execution, signalName, signalData);
+          try {
+            signal(execution, signalName, signalData);
+          }
+          catch (BpmnError error) {
+            ErrorPropagation.propagateError(error, execution);
+          }
+          catch (Exception exception) {
+            ErrorPropagation.propagateException(exception, execution);
+          }
           return null;
         }
 
@@ -85,7 +102,7 @@ public class ServiceTaskDelegateExpressionActivityBehavior extends TaskActivityB
       // Note: we can't cache the result of the expression, because the
       // execution can change: eg. delegateExpression='${mySpringBeanFactory.randomSpringBean()}'
       Object delegate = expression.getValue(execution);
-      ClassDelegate.applyFieldDeclaration(fieldDeclarations, delegate);
+      applyFieldDeclaration(fieldDeclarations, delegate);
 
       if (delegate instanceof ActivityBehavior) {
         Context.getProcessEngineConfiguration()
@@ -139,8 +156,7 @@ public class ServiceTaskDelegateExpressionActivityBehavior extends TaskActivityB
   // Adds properties to the given delegation instance (eg multi instance) if needed
   protected ActivityBehavior determineBehaviour(ActivityBehavior delegateInstance, ActivityExecution execution) {
     if (hasMultiInstanceCharacteristics()) {
-      multiInstanceActivityBehavior.setInnerActivityBehavior((AbstractBpmnActivityBehavior) delegateInstance);
-      return multiInstanceActivityBehavior;
+      ((AbstractBpmnActivityBehavior) delegateInstance).setMultiInstanceActivityBehavior(multiInstanceActivityBehavior);
     }
     return delegateInstance;
   }

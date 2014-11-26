@@ -16,8 +16,8 @@ package org.camunda.bpm.engine.impl.bpmn.behavior;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
+import org.camunda.bpm.engine.impl.bpmn.delegate.JavaDelegateInvocation;
 import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.delegate.JavaDelegateInvocation;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 
@@ -42,7 +42,7 @@ public class ServiceTaskJavaDelegateActivityBehavior extends TaskActivityBehavio
   }
   
   public void notify(DelegateExecution execution) throws Exception {
-    execute((DelegateExecution) execution);
+    execute(execution);
   }
   
   public void execute(DelegateExecution execution) throws Exception {

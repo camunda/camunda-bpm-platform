@@ -14,7 +14,9 @@
 package org.camunda.bpm.engine.history;
 
 import org.camunda.bpm.engine.query.Query;
+import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.runtime.Execution;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
 
 
 /**
@@ -33,13 +35,22 @@ public interface HistoricDetailQuery extends Query<HistoricDetailQuery, Historic
   HistoricDetailQuery detailId(String id);
 
   /** Only select historic variable updates with the given process instance.
-   * {@link ProcessInstance) ids and {@link HistoricProcessInstance} ids match. */
+   * {@link ProcessInstance} ids and {@link HistoricProcessInstance} ids match. */
   HistoricDetailQuery processInstanceId(String processInstanceId);
+
+  /** Only select historic variable updates with the given case instance.
+   * {@link CaseInstance} ids and {@link HistoricCaseInstance} ids match. */
+  HistoricDetailQuery caseInstanceId(String caseInstanceId);
 
   /** Only select historic variable updates with the given execution.
    * Note that {@link Execution} ids are not stored in the history as first class citizen,
    * only process instances are.*/
   HistoricDetailQuery executionId(String executionId);
+
+  /** Only select historic variable updates with the given case execution.
+   * Note that {@link CaseExecution} ids are not stored in the history as first class citizen,
+   * only case instances are.*/
+  HistoricDetailQuery caseExecutionId(String caseExecutionId);
 
   /** Only select historic variable updates associated to the given {@link HistoricActivityInstance activity instance}.
    * @deprecated since 5.2, use {@link #activityInstanceId(String)} instead */
@@ -71,6 +82,14 @@ public interface HistoricDetailQuery extends Query<HistoricDetailQuery, Historic
    * @return the query builder
    */
   HistoricDetailQuery disableBinaryFetching();
+
+  /**
+   * Disable deserialization of variable values that are custom objects. By default, the query
+   * will attempt to deserialize the value of these variables. By calling this method you can
+   * prevent such attempts in environments where their classes are not available.
+   * Independent of this setting, variable serialized values are accessible.
+   */
+  HistoricDetailQuery disableCustomObjectDeserialization();
 
   /** Exclude all task-related {@link HistoricDetail}s, so only items which have no
    * task-id set will be selected. When used together with {@link #taskId(String)}, this

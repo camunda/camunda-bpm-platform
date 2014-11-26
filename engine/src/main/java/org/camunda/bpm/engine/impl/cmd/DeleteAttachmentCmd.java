@@ -38,11 +38,11 @@ public class DeleteAttachmentCmd implements Command<Object>, Serializable {
 
   public Object execute(CommandContext commandContext) {
     AttachmentEntity attachment = commandContext
-      .getDbSqlSession()
+      .getDbEntityManager()
       .selectById(AttachmentEntity.class, attachmentId);
 
     commandContext
-      .getDbSqlSession()
+      .getDbEntityManager()
       .delete(attachment);
 
     if (attachment.getContentId() != null) {

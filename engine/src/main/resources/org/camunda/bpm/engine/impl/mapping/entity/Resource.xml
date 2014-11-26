@@ -49,7 +49,36 @@
 
   <select id="selectResourcesByDeploymentId" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="resourceResultMap">
     select * from ${prefix}ACT_GE_BYTEARRAY where DEPLOYMENT_ID_ = #{parameter} order by NAME_ asc
-  </select>  
+  </select>
+  
+  <select id="selectLatestResourcesByDeploymentName" parameterType="map" resultMap="resourceResultMap">
+    <include refid="resourcesFromLastDeploymentWithName"/>
+  </select>
+  
+  <sql id="resourcesFromLastDeploymentWithName">
+    select B.*
+    from ${prefix}ACT_GE_BYTEARRAY B
+    inner join
+      (select B.NAME_, MAX(D.DEPLOY_TIME_) DEPLOY_TIME_
+      from ${prefix}ACT_GE_BYTEARRAY B
+        inner join ${prefix}ACT_RE_DEPLOYMENT D
+        on B.DEPLOYMENT_ID_ = D.ID_
+      where D.NAME_ = #{parameter.deploymentName}
+      <if test="parameter.resourcesToFind != null &amp;&amp; parameter.resourcesToFind.size > 0">
+        and B.NAME_ in 
+        <foreach item="resourceName" index="index" collection="parameter.resourcesToFind"
+                 open="(" separator="," close=")">
+          #{resourceName}
+        </foreach>
+      </if>
+      group by B.NAME_) LAST_RESOURCE
+      
+    on B.NAME_ = LAST_RESOURCE.NAME_
+    inner join ${prefix}ACT_RE_DEPLOYMENT D
+    on B.DEPLOYMENT_ID_ = D.ID_
+    and D.DEPLOY_TIME_ = LAST_RESOURCE.DEPLOY_TIME_ 
+    and D.NAME_ = #{parameter.deploymentName}
+  </sql>
 
   <!-- postgresql specific -->
   <resultMap id="resourceResultMap_postgres" type="org.camunda.bpm.engine.impl.persistence.entity.ResourceEntity">
@@ -78,5 +107,9 @@
   <select id="selectResourcesByDeploymentId_postgres" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="resourceResultMap_postgres">
     select * from ${prefix}ACT_GE_BYTEARRAY where DEPLOYMENT_ID_ = #{parameter} order by NAME_ asc
   </select>  
+  
+  <select id="selectLatestResourcesByDeploymentName_postgres" parameterType="map" resultMap="resourceResultMap_postgres">
+    <include refid="resourcesFromLastDeploymentWithName"/>
+  </select>
   
 </mapper>

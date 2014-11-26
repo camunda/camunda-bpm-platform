@@ -122,6 +122,26 @@
             </table>
           </div>
         </div>
+        <div class="row">
+          <div class="span12">
+
+            <div class="page-header">
+              <h1>Async Continuation Demo</h1>
+            </div>
+
+            <p>
+              This process allows you to experiment with <a href="http://docs.camunda.org/latest/guides/user-guide/#process-engine-transactions-in-processes-asynchronous-continuations">asychronous continuations</a>:
+            </p>
+            <ol>
+              <li>Start a new instance of the <em>Invoice Receipt</em> process.</li>
+              <li>Log into cockpit. Select an instance of the <em>Invoice Receipt</em> process.</li>
+              <li>Add a variable named <code>shouldFail</code> to the process and set it to <code>true</code></li>
+              <li>Using the tasklist, make the process advance to the <em>Archive Invoice</em> service task.</li>
+              <li>Back to cockpit, you see an Incident which has been created for the service task.</li>
+              <li>Set the value of the variable <code>shouldFail</code> to <code>false</code> and increment the retries of the failed job.
+              As a result, the process instance is completed.</li>
+          </div>
+        </div>
 
         <div class="ctn-push-down"></div>
       </div>

@@ -1,0 +1,12 @@
+<module xmlns="urn:jboss:module:1.0" name="com.fasterxml.jackson.core.jackson-annotations">
+  <resources>
+    <resource-root path="jackson-annotations-2.4.0.jar" />
+  </resources>
+
+  <dependencies>
+
+    <module name="javax.api" />
+    <module name="com.fasterxml.jackson.core.jackson-core" />
+
+  </dependencies>
+</module>

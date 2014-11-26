@@ -5,7 +5,9 @@ import static com.jayway.restassured.RestAssured.given;
 import static com.jayway.restassured.path.json.JsonPath.from;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
-import static org.mockito.Mockito.anySetOf;
+import static org.mockito.Matchers.anySetOf;
+import static org.mockito.Matchers.argThat;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -13,6 +15,7 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -23,7 +26,9 @@ import javax.ws.rs.core.Response.Status;
 import javax.xml.registry.InvalidRequestException;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
+import org.camunda.bpm.engine.rest.helper.variable.EqualsPrimitiveValue;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.junit.Assert;
@@ -140,12 +145,14 @@ public abstract class AbstractProcessInstanceRestServiceQueryTest extends
     String returnedDefinitionId = from(content).getString("[0].definitionId");
     String returnedBusinessKey = from(content).getString("[0].businessKey");
     Boolean returnedIsSuspended = from(content).getBoolean("[0].suspended");
+    String returnedCaseInstanceId = from(content).getString("[0].caseInstanceId");
 
     Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID, returnedInstanceId);
     Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_INSTANCE_IS_ENDED, returnedIsEnded);
     Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID, returnedDefinitionId);
     Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_INSTANCE_BUSINESS_KEY, returnedBusinessKey);
     Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_INSTANCE_IS_SUSPENDED, returnedIsSuspended);
+    Assert.assertEquals(MockProvider.EXAMPLE_CASE_INSTANCE_ID, returnedCaseInstanceId);
   }
 
   @Test
@@ -185,6 +192,7 @@ public abstract class AbstractProcessInstanceRestServiceQueryTest extends
       .expect().statusCode(Status.OK.getStatusCode())
       .when().get(PROCESS_INSTANCE_QUERY_URL);
 
+    verify(mockedQuery).caseInstanceId(queryParameters.get("caseInstanceId"));
     verify(mockedQuery).processInstanceBusinessKey(queryParameters.get("businessKey"));
     verify(mockedQuery).processDefinitionKey(queryParameters.get("processDefinitionKey"));
     verify(mockedQuery).processDefinitionId(queryParameters.get("processDefinitionId"));
@@ -213,6 +221,7 @@ public abstract class AbstractProcessInstanceRestServiceQueryTest extends
     parameters.put("incidentMessage", "incMessage");
     parameters.put("incidentMessageLike", "incMessageLike");
     parameters.put("incidentType", "incType");
+    parameters.put("caseInstanceId", "aCaseInstanceId");
 
     return parameters;
   }
@@ -313,8 +322,57 @@ public abstract class AbstractProcessInstanceRestServiceQueryTest extends
       .when().post(PROCESS_INSTANCE_QUERY_URL);
 
     verify(mockedQuery).variableValueEquals(variableName, variableValue);
-    verify(mockedQuery).variableValueNotEquals(anotherVariableName, anotherVariableValue);
+    verify(mockedQuery).variableValueNotEquals(eq(anotherVariableName), argThat(EqualsPrimitiveValue.numberValue(anotherVariableValue)));
 
+  }
+
+  @Test
+  public void testDateVariableParameter() {
+    String variableName = "varName";
+    String variableValue = "2014-06-16T10:00:00";
+    String queryValue = variableName + "_eq_" + variableValue;
+
+    given()
+      .queryParam("variables", queryValue)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+    .when()
+      .get(PROCESS_INSTANCE_QUERY_URL);
+
+    Date date = DateTimeUtil.parseDate(variableValue);
+
+    verify(mockedQuery).variableValueEquals(variableName, date);
+  }
+
+  @Test
+  public void testDateVariableParameterAsPost() {
+    String variableName = "varName";
+    String variableValue = "2014-06-16T10:00:00";
+
+    Map<String, Object> variableJson = new HashMap<String, Object>();
+    variableJson.put("name", variableName);
+    variableJson.put("operator", "eq");
+    variableJson.put("value", variableValue);
+
+    List<Map<String, Object>> variables = new ArrayList<Map<String, Object>>();
+    variables.add(variableJson);
+
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("variables", variables);
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(json)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+    .when()
+      .post(PROCESS_INSTANCE_QUERY_URL);
+
+    Date date = DateTimeUtil.parseDate(variableValue);
+
+    verify(mockedQuery).variableValueEquals(variableName, date);
   }
 
   @Test
@@ -325,6 +383,7 @@ public abstract class AbstractProcessInstanceRestServiceQueryTest extends
       .expect().statusCode(Status.OK.getStatusCode())
       .when().post(PROCESS_INSTANCE_QUERY_URL);
 
+    verify(mockedQuery).caseInstanceId(queryParameters.get("caseInstanceId"));
     verify(mockedQuery).processInstanceBusinessKey(queryParameters.get("businessKey"));
     verify(mockedQuery).processDefinitionKey(queryParameters.get("processDefinitionKey"));
     verify(mockedQuery).processDefinitionId(queryParameters.get("processDefinitionId"));

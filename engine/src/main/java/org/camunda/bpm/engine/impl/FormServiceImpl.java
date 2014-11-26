@@ -13,6 +13,7 @@
 
 package org.camunda.bpm.engine.impl;
 
+import java.util.Collection;
 import java.util.Map;
 
 import org.camunda.bpm.engine.FormService;
@@ -22,10 +23,13 @@ import org.camunda.bpm.engine.impl.cmd.GetFormKeyCmd;
 import org.camunda.bpm.engine.impl.cmd.GetRenderedStartFormCmd;
 import org.camunda.bpm.engine.impl.cmd.GetRenderedTaskFormCmd;
 import org.camunda.bpm.engine.impl.cmd.GetStartFormCmd;
+import org.camunda.bpm.engine.impl.cmd.GetStartFormVariablesCmd;
 import org.camunda.bpm.engine.impl.cmd.GetTaskFormCmd;
+import org.camunda.bpm.engine.impl.cmd.GetTaskFormVariablesCmd;
 import org.camunda.bpm.engine.impl.cmd.SubmitStartFormCmd;
 import org.camunda.bpm.engine.impl.cmd.SubmitTaskFormCmd;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.variable.VariableMap;
 
 
 /**
@@ -88,6 +92,22 @@ public class FormServiceImpl extends ServiceImpl implements FormService {
 
   public String getTaskFormKey(String processDefinitionId, String taskDefinitionKey) {
     return commandExecutor.execute(new GetFormKeyCmd(processDefinitionId, taskDefinitionKey));
+  }
+
+  public VariableMap getStartFormVariables(String processDefinitionId) {
+    return getStartFormVariables(processDefinitionId, null, true);
+  }
+
+  public VariableMap getStartFormVariables(String processDefinitionId, Collection<String> formVariables, boolean deserializeObjectValues) {
+    return commandExecutor.execute(new GetStartFormVariablesCmd(processDefinitionId, formVariables, deserializeObjectValues));
+  }
+
+  public VariableMap getTaskFormVariables(String taskId) {
+    return getTaskFormVariables(taskId, null, true);
+  }
+
+  public VariableMap getTaskFormVariables(String taskId, Collection<String> formVariables, boolean deserializeObjectValues) {
+    return commandExecutor.execute(new GetTaskFormVariablesCmd(taskId, formVariables, deserializeObjectValues));
   }
 
 }

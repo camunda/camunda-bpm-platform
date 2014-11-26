@@ -16,14 +16,18 @@ package org.camunda.bpm.engine.test.history;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.history.HistoricTaskInstanceQuery;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricTaskInstanceEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
+import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
@@ -64,6 +68,10 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTestCase {
     assertNull(historicTaskInstance.getEndTime());
     assertNull(historicTaskInstance.getDurationInMillis());
 
+    assertNull(historicTaskInstance.getCaseDefinitionId());
+    assertNull(historicTaskInstance.getCaseInstanceId());
+    assertNull(historicTaskInstance.getCaseExecutionId());
+
     // the activity instance id is set
     assertEquals(((TaskEntity)runtimeTask).getExecution().getActivityInstanceId(), historicTaskInstance.getActivityInstanceId());
 
@@ -90,6 +98,10 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTestCase {
     assertNotNull(historicTaskInstance.getDurationInMillis());
     assertTrue(historicTaskInstance.getDurationInMillis() >= 1000);
     assertTrue(((HistoricTaskInstanceEntity)historicTaskInstance).getDurationRaw() >= 1000);
+
+    assertNull(historicTaskInstance.getCaseDefinitionId());
+    assertNull(historicTaskInstance.getCaseInstanceId());
+    assertNull(historicTaskInstance.getCaseExecutionId());
 
     historyService.deleteHistoricTaskInstance(taskId);
 
@@ -229,6 +241,21 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTestCase {
     historyService.deleteHistoricTaskInstance(hti.getId());
   }
 
+  @Deployment
+  public void testHistoricTaskInstanceAssignmentListener() {
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("assignee", "jonny");
+    runtimeService.startProcessInstanceByKey("testProcess", variables);
+
+    HistoricActivityInstance hai = historyService.createHistoricActivityInstanceQuery().activityId("task").singleResult();
+    assertEquals("jonny", hai.getAssignee());
+
+    HistoricTaskInstance hti = historyService.createHistoricTaskInstanceQuery().singleResult();
+    assertEquals("jonny", hti.getAssignee());
+    assertNull(hti.getOwner());
+
+  }
+
   public void testHistoricTaskInstanceOwner() {
     Task task = taskService.newTask();
     taskService.saveTask(task);
@@ -309,6 +336,9 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTestCase {
     assertEquals(1, historyService.createHistoricTaskInstanceQuery().orderByTaskId().asc().count());
     assertEquals(1, historyService.createHistoricTaskInstanceQuery().orderByTaskDueDate().asc().count());
     assertEquals(1, historyService.createHistoricTaskInstanceQuery().orderByTaskFollowUpDate().asc().count());
+    assertEquals(1, historyService.createHistoricTaskInstanceQuery().orderByCaseDefinitionId().asc().count());
+    assertEquals(1, historyService.createHistoricTaskInstanceQuery().orderByCaseInstanceId().asc().count());
+    assertEquals(1, historyService.createHistoricTaskInstanceQuery().orderByCaseExecutionId().asc().count());
 
     assertEquals(1, historyService.createHistoricTaskInstanceQuery().orderByDeleteReason().desc().count());
     assertEquals(1, historyService.createHistoricTaskInstanceQuery().orderByExecutionId().desc().count());
@@ -324,6 +354,9 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTestCase {
     assertEquals(1, historyService.createHistoricTaskInstanceQuery().orderByTaskId().desc().count());
     assertEquals(1, historyService.createHistoricTaskInstanceQuery().orderByTaskDueDate().desc().count());
     assertEquals(1, historyService.createHistoricTaskInstanceQuery().orderByTaskFollowUpDate().desc().count());
+    assertEquals(1, historyService.createHistoricTaskInstanceQuery().orderByCaseDefinitionId().desc().count());
+    assertEquals(1, historyService.createHistoricTaskInstanceQuery().orderByCaseInstanceId().desc().count());
+    assertEquals(1, historyService.createHistoricTaskInstanceQuery().orderByCaseExecutionId().desc().count());
   }
 
   public void testInvalidSorting() {
@@ -449,6 +482,388 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTestCase {
       query.activityInstanceIdIn(values);
       fail("A ProcessEngineExcpetion was expected.");
     } catch (ProcessEngineException e) {}
+
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryByCaseDefinitionId() {
+    // given
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    String caseInstanceId = caseService
+        .withCaseDefinition(caseDefinitionId)
+        .create()
+        .getId();
+
+    String humanTaskId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    // when
+    caseService
+      .withCaseExecution(humanTaskId)
+      .manualStart();
+
+    // then
+    HistoricTaskInstanceQuery query = historyService.createHistoricTaskInstanceQuery();
+
+    query.caseDefinitionId(caseDefinitionId);
+
+    assertEquals(1, query.count());
+    assertEquals(1, query.list().size());
+    assertNotNull(query.singleResult());
+
+    HistoricTaskInstance task = query.singleResult();
+    assertNotNull(task);
+
+    assertEquals(caseDefinitionId, task.getCaseDefinitionId());
+    assertEquals(caseInstanceId, task.getCaseInstanceId());
+    assertEquals(humanTaskId, task.getCaseExecutionId());
+  }
+
+  public void testQueryByInvalidCaseDefinitionId() {
+    HistoricTaskInstanceQuery query = historyService.createHistoricTaskInstanceQuery();
+
+    query.caseDefinitionId("invalid");
+
+    assertEquals(0, query.count());
+    assertEquals(0, query.list().size());
+    assertNull(query.singleResult());
+
+    query.caseDefinitionId(null);
+
+    assertEquals(0, query.count());
+    assertEquals(0, query.list().size());
+    assertNull(query.singleResult());
+
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryByCaseDefinitionKey() {
+    // given
+    String key = "oneTaskCase";
+
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .caseDefinitionKey(key)
+        .singleResult()
+        .getId();
+
+    String caseInstanceId = caseService
+        .withCaseDefinitionByKey(key)
+        .create()
+        .getId();
+
+    String humanTaskId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    // when
+    caseService
+      .withCaseExecution(humanTaskId)
+      .manualStart();
+
+    // then
+    HistoricTaskInstanceQuery query = historyService.createHistoricTaskInstanceQuery();
+
+    query.caseDefinitionKey(key);
+
+    assertEquals(1, query.count());
+    assertEquals(1, query.list().size());
+    assertNotNull(query.singleResult());
+
+    HistoricTaskInstance task = query.singleResult();
+    assertNotNull(task);
+
+    assertEquals(caseDefinitionId, task.getCaseDefinitionId());
+    assertEquals(caseInstanceId, task.getCaseInstanceId());
+    assertEquals(humanTaskId, task.getCaseExecutionId());
+  }
+
+  public void testQueryByInvalidCaseDefinitionKey() {
+    HistoricTaskInstanceQuery query = historyService.createHistoricTaskInstanceQuery();
+
+    query.caseDefinitionKey("invalid");
+
+    assertEquals(0, query.count());
+    assertEquals(0, query.list().size());
+    assertNull(query.singleResult());
+
+    query.caseDefinitionKey(null);
+
+    assertEquals(0, query.count());
+    assertEquals(0, query.list().size());
+    assertNull(query.singleResult());
+
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryByCaseDefinitionName() {
+    // given
+    CaseDefinition caseDefinition = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult();
+
+    String caseDefinitionName = caseDefinition.getName();
+    String caseDefinitionId = caseDefinition.getId();
+
+    String caseInstanceId = caseService
+        .withCaseDefinitionByKey("oneTaskCase")
+        .create()
+        .getId();
+
+    String humanTaskId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    // when
+    caseService
+      .withCaseExecution(humanTaskId)
+      .manualStart();
+
+    // then
+    HistoricTaskInstanceQuery query = historyService.createHistoricTaskInstanceQuery();
+
+    query.caseDefinitionName(caseDefinitionName);
+
+    assertEquals(1, query.count());
+    assertEquals(1, query.list().size());
+    assertNotNull(query.singleResult());
+
+    HistoricTaskInstance task = query.singleResult();
+    assertNotNull(task);
+
+    assertEquals(caseDefinitionId, task.getCaseDefinitionId());
+    assertEquals(caseInstanceId, task.getCaseInstanceId());
+    assertEquals(humanTaskId, task.getCaseExecutionId());
+  }
+
+  public void testQueryByInvalidCaseDefinitionName() {
+    HistoricTaskInstanceQuery query = historyService.createHistoricTaskInstanceQuery();
+
+    query.caseDefinitionName("invalid");
+
+    assertEquals(0, query.count());
+    assertEquals(0, query.list().size());
+    assertNull(query.singleResult());
+
+    query.caseDefinitionName(null);
+
+    assertEquals(0, query.count());
+    assertEquals(0, query.list().size());
+    assertNull(query.singleResult());
+
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryByCaseInstanceId() {
+    // given
+    String key = "oneTaskCase";
+
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .caseDefinitionKey(key)
+        .singleResult()
+        .getId();
+
+    String caseInstanceId = caseService
+        .withCaseDefinitionByKey(key)
+        .create()
+        .getId();
+
+    String humanTaskId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    // when
+    caseService
+      .withCaseExecution(humanTaskId)
+      .manualStart();
+
+    // then
+    HistoricTaskInstanceQuery query = historyService.createHistoricTaskInstanceQuery();
+
+    query.caseInstanceId(caseInstanceId);
+
+    assertEquals(1, query.count());
+    assertEquals(1, query.list().size());
+    assertNotNull(query.singleResult());
+
+    HistoricTaskInstance task = query.singleResult();
+    assertNotNull(task);
+
+    assertEquals(caseDefinitionId, task.getCaseDefinitionId());
+    assertEquals(caseInstanceId, task.getCaseInstanceId());
+    assertEquals(humanTaskId, task.getCaseExecutionId());
+  }
+
+
+
+  @Deployment(resources=
+    {
+      "org/camunda/bpm/engine/test/history/HistoricTaskInstanceTest.testQueryByCaseInstanceIdHierarchy.cmmn",
+      "org/camunda/bpm/engine/test/history/HistoricTaskInstanceTest.testQueryByCaseInstanceIdHierarchy.bpmn20.xml"
+    })
+  public void testQueryByCaseInstanceIdHierarchy() {
+    // given
+    String caseInstanceId = caseService
+        .withCaseDefinitionByKey("case")
+        .create()
+        .getId();
+
+    String processTaskId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_ProcessTask_1")
+        .singleResult()
+        .getId();
+
+    // when
+    caseService
+      .withCaseExecution(processTaskId)
+      .manualStart();
+
+    // then
+    HistoricTaskInstanceQuery query = historyService.createHistoricTaskInstanceQuery();
+
+    query.caseInstanceId(caseInstanceId);
+
+    assertEquals(2, query.count());
+    assertEquals(2, query.list().size());
+
+    for (HistoricTaskInstance task : query.list()) {
+      assertEquals(caseInstanceId, task.getCaseInstanceId());
+
+      assertNull(task.getCaseDefinitionId());
+      assertNull(task.getCaseExecutionId());
+
+      taskService.complete(task.getId());
+    }
+
+    assertEquals(3, query.count());
+    assertEquals(3, query.list().size());
+
+    for (HistoricTaskInstance task : query.list()) {
+      assertEquals(caseInstanceId, task.getCaseInstanceId());
+
+      assertNull(task.getCaseDefinitionId());
+      assertNull(task.getCaseExecutionId());
+    }
+
+  }
+
+  public void testQueryByInvalidCaseInstanceId() {
+    HistoricTaskInstanceQuery query = historyService.createHistoricTaskInstanceQuery();
+
+    query.caseInstanceId("invalid");
+
+    assertEquals(0, query.count());
+    assertEquals(0, query.list().size());
+    assertNull(query.singleResult());
+
+    query.caseInstanceId(null);
+
+    assertEquals(0, query.count());
+    assertEquals(0, query.list().size());
+    assertNull(query.singleResult());
+
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryByCaseExecutionId() {
+    // given
+    String key = "oneTaskCase";
+
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .caseDefinitionKey(key)
+        .singleResult()
+        .getId();
+
+    String caseInstanceId = caseService
+        .withCaseDefinitionByKey(key)
+        .create()
+        .getId();
+
+    String humanTaskId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    // when
+    caseService
+      .withCaseExecution(humanTaskId)
+      .manualStart();
+
+    // then
+    HistoricTaskInstanceQuery query = historyService.createHistoricTaskInstanceQuery();
+
+    query.caseExecutionId(humanTaskId);
+
+    assertEquals(1, query.count());
+    assertEquals(1, query.list().size());
+    assertNotNull(query.singleResult());
+
+    HistoricTaskInstance task = query.singleResult();
+    assertNotNull(task);
+
+    assertEquals(caseDefinitionId, task.getCaseDefinitionId());
+    assertEquals(caseInstanceId, task.getCaseInstanceId());
+    assertEquals(humanTaskId, task.getCaseExecutionId());
+  }
+
+  public void testQueryByInvalidCaseExecutionId() {
+    HistoricTaskInstanceQuery query = historyService.createHistoricTaskInstanceQuery();
+
+    query.caseExecutionId("invalid");
+
+    assertEquals(0, query.count());
+    assertEquals(0, query.list().size());
+    assertNull(query.singleResult());
+
+    query.caseExecutionId(null);
+
+    assertEquals(0, query.count());
+    assertEquals(0, query.list().size());
+    assertNull(query.singleResult());
+
+  }
+
+  public void testHistoricTaskInstanceCaseInstanceId() {
+    Task task = taskService.newTask();
+    task.setCaseInstanceId("aCaseInstanceId");
+    taskService.saveTask(task);
+
+    HistoricTaskInstance hti = historyService
+        .createHistoricTaskInstanceQuery()
+        .taskId(task.getId())
+        .singleResult();
+
+    assertEquals("aCaseInstanceId", hti.getCaseInstanceId());
+
+    task.setCaseInstanceId("anotherCaseInstanceId");
+    taskService.saveTask(task);
+
+    hti = historyService
+        .createHistoricTaskInstanceQuery()
+        .taskId(task.getId())
+        .singleResult();
+
+    assertEquals("anotherCaseInstanceId", hti.getCaseInstanceId());
+
+    // Finally, delete task
+    taskService.deleteTask(task.getId(), true);
 
   }
 }

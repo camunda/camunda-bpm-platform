@@ -30,46 +30,46 @@ import org.camunda.bpm.engine.management.JobDefinition;
 public class JobDefinitionManager extends AbstractManager {
 
   public JobDefinitionEntity findById(String jobDefinitionId) {
-    return getDbSqlSession().selectById(JobDefinitionEntity.class, jobDefinitionId);
+    return getDbEntityManager().selectById(JobDefinitionEntity.class, jobDefinitionId);
   }
 
   @SuppressWarnings("unchecked")
   public List<JobDefinitionEntity> findByProcessDefinitionId(String processDefinitionId) {
-    return getDbSqlSession().selectList("selectJobDefinitionsByProcessDefinitionId", processDefinitionId);
+    return getDbEntityManager().selectList("selectJobDefinitionsByProcessDefinitionId", processDefinitionId);
   }
 
   public void deleteJobDefinitionsByProcessDefinitionId(String id) {
-    getDbSqlSession().delete("deleteJobDefinitionsByProcessDefinitionId", id);
+    getDbEntityManager().delete(JobDefinitionEntity.class, "deleteJobDefinitionsByProcessDefinitionId", id);
   }
 
   @SuppressWarnings("unchecked")
   public List<JobDefinition> findJobDefnitionByQueryCriteria(JobDefinitionQueryImpl jobDefinitionQuery, Page page) {
-    return getDbSqlSession().selectList("selectJobDefinitionByQueryCriteria", jobDefinitionQuery, page);
+    return getDbEntityManager().selectList("selectJobDefinitionByQueryCriteria", jobDefinitionQuery, page);
   }
 
   public long findJobDefinitionCountByQueryCriteria(JobDefinitionQueryImpl jobDefinitionQuery) {
-    return (Long) getDbSqlSession().selectOne("selectJobDefinitionCountByQueryCriteria", jobDefinitionQuery);
+    return (Long) getDbEntityManager().selectOne("selectJobDefinitionCountByQueryCriteria", jobDefinitionQuery);
   }
 
   public void updateJobDefinitionSuspensionStateById(String jobDefinitionId, SuspensionState suspensionState) {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("jobDefinitionId", jobDefinitionId);
     parameters.put("suspensionState", suspensionState.getStateCode());
-    getDbSqlSession().update("updateJobDefinitionSuspensionStateByParameters", parameters);
+    getDbEntityManager().update(JobDefinitionEntity.class, "updateJobDefinitionSuspensionStateByParameters", parameters);
   }
 
   public void updateJobDefinitionSuspensionStateByProcessDefinitionId(String processDefinitionId, SuspensionState suspensionState) {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("processDefinitionId", processDefinitionId);
     parameters.put("suspensionState", suspensionState.getStateCode());
-    getDbSqlSession().update("updateJobDefinitionSuspensionStateByParameters", parameters);
+    getDbEntityManager().update(JobDefinitionEntity.class, "updateJobDefinitionSuspensionStateByParameters", parameters);
   }
 
   public void updateJobDefinitionSuspensionStateByProcessDefinitionKey(String processDefinitionKey, SuspensionState suspensionState) {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("processDefinitionKey", processDefinitionKey);
     parameters.put("suspensionState", suspensionState.getStateCode());
-    getDbSqlSession().update("updateJobDefinitionSuspensionStateByParameters", parameters);
+    getDbEntityManager().update(JobDefinitionEntity.class, "updateJobDefinitionSuspensionStateByParameters", parameters);
   }
 
 }

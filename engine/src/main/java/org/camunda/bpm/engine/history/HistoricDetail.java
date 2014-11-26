@@ -35,7 +35,13 @@ public interface HistoricDetail {
 
   /** The identifier for the path of execution. */
   String getExecutionId();
-  
+
+  /** The case instance reference. */
+  String getCaseInstanceId();
+
+  /** The case execution reference. */
+  String getCaseExecutionId();
+
   /** The identifier for the task. */
   String getTaskId();
   

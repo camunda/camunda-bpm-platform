@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.cfg.IdGenerator;
@@ -29,12 +30,19 @@ import org.camunda.bpm.engine.impl.persistence.entity.DeploymentEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ResourceEntity;
 
 /**
+ * {@link Deployer} responsible to parse CMMN 1.0 XML files and create the
+ * proper {@link CaseDefinitionEntity}s.
+ *
  * @author Roman Smirnov
+ * @author Simon Zambrovski
  *
  */
 public class CmmnDeployer implements Deployer {
 
-  public static final String[] CMMN_RESOURCE_SUFFIXES = new String[] { "cmmn" };
+  private static final Logger LOG = Logger.getLogger(CmmnDeployer.class.getName());
+
+  public static final String[] CMMN_RESOURCE_SUFFIXES = new String[] { "cmmn10.xml", "cmmn" };
+  public static final String[] DIAGRAM_SUFFIXES = new String[] { "png", "jpg", "gif", "svg" };
 
   protected ExpressionManager expressionManager;
   protected CmmnTransformer transformer;
@@ -103,9 +111,60 @@ public class CmmnDeployer implements Deployer {
     for (CaseDefinitionEntity caseDefinition: caseDefinitions) {
       String resourceName = resource.getName();
       caseDefinition.setResourceName(resourceName);
+
+      String diagramResourceName = getDiagramResourceForCase(resourceName, caseDefinition.getKey(), deployment.getResources());
+      if (diagramResourceName != null) {
+        caseDefinition.setDiagramResourceName(diagramResourceName);
+        LOG.fine("Setting diagram to " + diagramResourceName);
+      }
+
     }
 
     return caseDefinitions;
+  }
+
+  /**
+   * Returns the default name of the image resource for a certain case.
+   *
+   * It will first look for an image resource which matches the case
+   * specifically, before resorting to an image resource which matches the CMMN
+   * 1.0 xml file resource.
+   *
+   * Example: if the deployment contains a CMMN 1.0 xml resource called
+   * 'abc.cmmn' containing only one case with key 'myProcess', then
+   * this method will look for an image resources called 'abc.myProcess.png'
+   * (or .jpg, or .gif, etc.) or 'abc.png' if the previous one wasn't found.
+   *
+   * Example 2: if the deployment contains a CMMN 1.0 xml resource called
+   * 'abc.cmmn' containing three cases (with keys a, b and c),
+   * then this method will first look for an image resource called 'abc.a.png'
+   * before looking for 'abc.png' (likewise for b and c).
+   * Note that if abc.a.png, abc.b.png and abc.c.png don't exist, all
+   * casees will have the same image: abc.png.
+   *
+   * @return null if no matching image resource is found.
+   */
+  protected String getDiagramResourceForCase(String cmmnFileResource, String caseKey, Map<String, ResourceEntity> resources) {
+    for (String diagramSuffix: DIAGRAM_SUFFIXES) {
+      String diagramForBpmnFileResource = getCmmnFileImageResourceName(cmmnFileResource, diagramSuffix);
+      String caseDiagramResource = getCaseImageResourceName(cmmnFileResource, caseKey, diagramSuffix);
+      if (resources.containsKey(caseDiagramResource)) {
+        return caseDiagramResource;
+      } else if (resources.containsKey(diagramForBpmnFileResource)) {
+        return diagramForBpmnFileResource;
+      }
+    }
+    return null;
+  }
+
+  protected String getCaseImageResourceName(String cmmnFileResource, String caseKey, String diagramSuffix) {
+    String cmmnFileResourceBase = stripCmmnFileSuffix(cmmnFileResource);
+    return cmmnFileResourceBase + caseKey + "." + diagramSuffix;
+  }
+
+  protected String getCmmnFileImageResourceName(String cmmnFileResource, String diagramSuffix) {
+    String cmmnFileResourceBase = stripCmmnFileSuffix(cmmnFileResource);
+    return cmmnFileResourceBase + diagramSuffix;
   }
 
   protected int getNextVersion(CaseDefinitionEntity newCaseDefinition, CaseDefinitionEntity latestCaseDefinition) {
@@ -198,6 +257,18 @@ public class CmmnDeployer implements Deployer {
   }
 
   // getters/setters /////////////////////////////////////////////////////////////
+
+  protected String stripCmmnFileSuffix(final String cmmnFileResource) {
+    for (final String suffix : CMMN_RESOURCE_SUFFIXES) {
+      if (cmmnFileResource.endsWith(suffix)) {
+        return cmmnFileResource.substring(0, cmmnFileResource.length() - suffix.length());
+      }
+    }
+    return cmmnFileResource;
+  }
+
+  // getters/setters
+  // /////////////////////////////////////////////////////////////
 
   public ExpressionManager getExpressionManager() {
     return expressionManager;

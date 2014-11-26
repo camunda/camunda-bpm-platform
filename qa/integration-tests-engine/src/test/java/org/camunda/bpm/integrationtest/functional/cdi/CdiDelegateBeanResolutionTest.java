@@ -33,42 +33,42 @@ import org.junit.runner.RunWith;
 
 /**
  * <p>Deploys two different applications, a process archive and a cleint application.</p>
- * 
+ *
  * <p>This test ensures that when the process is started from the client,
- * it is able to make the context switch to the process archvie and resolve cdi beans 
- * from the process archive.</p> 
- * 
- * 
+ * it is able to make the context switch to the process archvie and resolve cdi beans
+ * from the process archive.</p>
+ *
+ *
  * @author Daniel Meyer
  */
 @RunWith(Arquillian.class)
 public class CdiDelegateBeanResolutionTest extends AbstractFoxPlatformIntegrationTest {
-    
+
   @Deployment
-  public static WebArchive processArchive() {    
+  public static WebArchive processArchive() {
     return initWebArchiveDeployment()
-            .addClass(ExampleDelegateBean.class)            
+            .addClass(ExampleDelegateBean.class)
             .addAsResource("org/camunda/bpm/integrationtest/functional/cdi/CdiDelegateBeanResolutionTest.testResolveBean.bpmn20.xml")
             .addAsResource("org/camunda/bpm/integrationtest/functional/cdi/CdiDelegateBeanResolutionTest.testResolveBeanFromJobExecutor.bpmn20.xml");
   }
-  
+
   @Deployment(name="clientDeployment")
-  public static WebArchive clientDeployment() {    
+  public static WebArchive clientDeployment() {
      WebArchive webArchive = ShrinkWrap.create(WebArchive.class, "client.war")
             .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
             .addClass(ProgrammaticBeanLookup.class)
             .addClass(BeanManagerLookup.class)
             .addClass(AbstractFoxPlatformIntegrationTest.class)
             .addAsLibraries(DeploymentHelper.getEngineCdi());
-     
+
      TestContainer.addContainerSpecificResources(webArchive);
-     
+
      return webArchive;
   }
-    
+
   @Test
   @OperateOnDeployment("clientDeployment")
-  public void testResolveBean() {   
+  public void testResolveBean() {
     try {
       // assert that we cannot resolve the bean here:
       ProgrammaticBeanLookup.lookup("exampleDelegateBean");
@@ -76,26 +76,26 @@ public class CdiDelegateBeanResolutionTest extends AbstractFoxPlatformIntegratio
     }catch (Throwable e) {
       // expected
     }
-    
+
     Assert.assertEquals(0, runtimeService.createProcessInstanceQuery().processDefinitionKey("testResolveBean").count());
     // but the process engine can:
     runtimeService.startProcessInstanceByKey("testResolveBean");
-    
+
     Assert.assertEquals(0,runtimeService.createProcessInstanceQuery().processDefinitionKey("testResolveBean").count());
   }
-  
+
   @Test
   @OperateOnDeployment("clientDeployment")
   public void testResolveBeanFromJobExecutor() {
-   
+
     Assert.assertEquals(0,runtimeService.createProcessInstanceQuery().processDefinitionKey("testResolveBeanFromJobExecutor").count());
     runtimeService.startProcessInstanceByKey("testResolveBeanFromJobExecutor");
     Assert.assertEquals(1,runtimeService.createProcessInstanceQuery().processDefinitionKey("testResolveBeanFromJobExecutor").count());
-    
-    waitForJobExecutorToProcessAllJobs(16000);    
-    
+
+    waitForJobExecutorToProcessAllJobs();
+
     Assert.assertEquals(0,runtimeService.createProcessInstanceQuery().processDefinitionKey("testResolveBeanFromJobExecutor").count());
-    
+
   }
-  
+
 }

@@ -7,8 +7,28 @@
   <!-- EXECUTION INSERT -->
 
   <insert id="insertExecution" parameterType="org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity">
-    insert into ${prefix}ACT_RU_EXECUTION (ID_, PROC_INST_ID_, BUSINESS_KEY_, PROC_DEF_ID_, ACT_ID_, ACT_INST_ID_, IS_ACTIVE_, IS_CONCURRENT_, IS_SCOPE_,IS_EVENT_SCOPE_, PARENT_ID_, SUPER_EXEC_, SUSPENSION_STATE_, CACHED_ENT_STATE_, REV_)
-    values (
+    insert into ${prefix}ACT_RU_EXECUTION
+    (
+      ID_,
+      PROC_INST_ID_,
+      BUSINESS_KEY_,
+      PROC_DEF_ID_,
+      ACT_ID_,
+      ACT_INST_ID_,
+      IS_ACTIVE_,
+      IS_CONCURRENT_,
+      IS_SCOPE_,
+      IS_EVENT_SCOPE_,
+      PARENT_ID_,
+      SUPER_EXEC_,
+      SUPER_CASE_EXEC_,
+      CASE_INST_ID_,
+      SUSPENSION_STATE_,
+      CACHED_ENT_STATE_,
+      REV_
+    )
+    values
+    (
       #{id ,jdbcType=VARCHAR},
       #{processInstanceId, jdbcType=VARCHAR},
       #{businessKey, jdbcType=VARCHAR},
@@ -21,6 +41,8 @@
       #{isEventScope ,jdbcType=BOOLEAN},
       #{parentId, jdbcType=VARCHAR},
       #{superExecutionId, jdbcType=VARCHAR},
+      #{superCaseExecutionId, jdbcType=VARCHAR},
+      #{caseInstanceId, jdbcType=VARCHAR},
       #{suspensionState, jdbcType=INTEGER},
       #{cachedEntityState, jdbcType=INTEGER},
       1
@@ -62,16 +84,16 @@
         and PROC_DEF_ID_ IN (SELECT ID_ FROM ${prefix}ACT_RE_PROCDEF WHERE KEY_ = #{processDefinitionKey, jdbcType=VARCHAR})
       </if>
     </where>
-  </update>  
-  
+  </update>
+
   <!-- EXECUTION DELETE -->
-  
+
   <delete id="deleteExecution" parameterType="org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity">
     delete from ${prefix}ACT_RU_EXECUTION where ID_ = #{id} and REV_ = #{revision}
   </delete>
-  
+
   <!-- EXECUTION RESULTMAP -->
-  
+
   <resultMap id="executionResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity">
     <id property="id" column="ID_" jdbcType="VARCHAR" />
     <result property="revision" column="REV_" jdbcType="INTEGER" />
@@ -86,6 +108,8 @@
     <result property="isEventScope" column="IS_EVENT_SCOPE_" jdbcType="BOOLEAN" />
     <result property="parentId" column="PARENT_ID_" jdbcType="VARCHAR" />
     <result property="superExecutionId" column="SUPER_EXEC_" jdbcType="VARCHAR" />
+    <result property="superCaseExecutionId" column="SUPER_CASE_EXEC_" jdbcType="VARCHAR" />
+    <result property="caseInstanceId" column="CASE_INST_ID_" jdbcType="VARCHAR" />
     <result property="suspensionState" column="SUSPENSION_STATE_" jdbcType="INTEGER"/>
     <result property="cachedEntityState" column="CACHED_ENT_STATE_" jdbcType="INTEGER"/>
   </resultMap>
@@ -141,21 +165,6 @@
   
   <sql id="selectExecutionsByQueryCriteriaSql">
     from ${prefix}ACT_RU_EXECUTION RES
-    <foreach collection="queryVariableValues" index="index" item="queryVariableValue">
-      <choose>
-        <when test="queryVariableValue.local">
-          inner join ${prefix}ACT_RU_VARIABLE A${index} on RES.ID_ = A${index}.EXECUTION_ID_
-        </when>
-        <otherwise>
-          inner join ${prefix}ACT_RU_VARIABLE A${index} on RES.PROC_INST_ID_ = A${index}.PROC_INST_ID_
-        </otherwise>
-      </choose> 
-    </foreach>
-    <if test="eventSubscriptions != null">
-    	 <foreach collection="eventSubscriptions" index="index" item="eventSubscriptionValue">
-    	 	inner join ${prefix}ACT_RU_EVENT_SUBSCR EVT${index} on RES.ID_ = EVT${index}.EXECUTION_ID_
-	    </foreach>
-    </if>
     <if test="businessKey != null">
         inner join ${prefix}ACT_RU_EXECUTION INST on RES.PROC_INST_ID_ = INST.ID_
     </if>
@@ -200,7 +209,7 @@
       </if>
       <if test="superProcessInstanceId != null">
         <!-- A sub process instance is stored under a certain *execution*, potentially nested.
-             A sub process instance is NOT stored under the process instanc, hence the following: -->
+             A sub process instance is NOT stored under the process instance, hence the following: -->
         and RES.SUPER_EXEC_ IN (select ID_ from ${prefix}ACT_RU_EXECUTION where PROC_INST_ID_ = #{superProcessInstanceId})
       </if>
       <if test="subProcessInstanceId != null">
@@ -209,60 +218,48 @@
       <if test="suspensionState != null">
         and RES.SUSPENSION_STATE_ = #{suspensionState.stateCode}
       </if>
+      <if test="caseInstanceId != null">
+        and RES.CASE_INST_ID_ = #{caseInstanceId}
+      </if>
       <!-- PLEASE NOTE: If you change anything have a look into the HistoricVariableInstance & HistoricProcessInstance, the same query object is used there! -->
       <foreach collection="queryVariableValues" index="index" item="queryVariableValue">
-        <if test="!queryVariableValue.local">
-          <!-- When process instance variable is queried for, only process variables are taken into account -->
-          and A${index}.EXECUTION_ID_ = A${index}.PROC_INST_ID_
+        and EXISTS (
+          select
+            ID_
+          from
+            ${prefix}ACT_RU_VARIABLE
+          WHERE
+            NAME_= #{queryVariableValue.name}
+            
+        <choose>
+          <when test="queryVariableValue.local">
+            and RES.ID_ = EXECUTION_ID_
+          </when>
+          <otherwise>
+            <!-- When process instance or case instance variable is queried for, taskId should be null -->
+            and TASK_ID_ is null and RES.PROC_INST_ID_ = PROC_INST_ID_
+          </otherwise>
+        </choose>
+        
+        <bind name="varTypeField" value="'TYPE_'"/>
+        <bind name="varPrefix" value="''"/>
+        <if test="queryVariableValue.valueConditions != null">
+          and 
+          <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.variableValueConditions"/>
         </if>
-      	and A${index}.NAME_= #{queryVariableValue.name}
-        <if test="!queryVariableValue.type.equals('null')">
-        <!-- When operator is not-equals or type of value is null, type doesn't matter! -->
-          and A${index}.TYPE_ = #{queryVariableValue.type}
-        </if>
-      	<if test="queryVariableValue.textValue != null &amp;&amp; queryVariableValue.longValue == null &amp;&amp; queryVariableValue.doubleValue == null">
-	      and A${index}.TEXT_
-	      <choose>
-	        <when test="queryVariableValue.operator.equals('LIKE')">LIKE</when>
-	        <otherwise><include refid="executionVariableOperator" /></otherwise>
-	      </choose>
-	        #{queryVariableValue.textValue}
-      	</if>
-      	<if test="queryVariableValue.textValue2 != null">
-	      and A${index}.TEXT2_
-	      <choose>
-	        <when test="queryVariableValue.operator.equals('LIKE')">LIKE</when>
-	        <otherwise><include refid="executionVariableOperator" /></otherwise>
-	      </choose>
-	        #{queryVariableValue.textValue2}
-      	</if>
-      	<if test="queryVariableValue.longValue != null">
-	      and A${index}.LONG_
-	      <include refid="executionVariableOperator" />
-	      #{queryVariableValue.longValue}
-      	</if>
-      	<if test="queryVariableValue.doubleValue != null">
-	      and A${index}.DOUBLE_
-	      <include refid="executionVariableOperator" />
-	      #{queryVariableValue.doubleValue}
-      	</if>
-      	<!-- Null variable type -->
-      	<if test="queryVariableValue.textValue == null &amp;&amp; queryVariableValue.textValue2 == null &amp;&amp; queryVariableValue.longValue == null &amp;&amp; queryVariableValue.doubleValue == null">
-          <choose>
-	        <when test="queryVariableValue.operator.equals('NOT_EQUALS')">
-	          and (A${index}.TEXT_ is not null or A${index}.TEXT2_ is not null or A${index}.LONG_ is not null or A${index}.DOUBLE_ is not null or A${index}.BYTEARRAY_ID_ is not null)
-	        </when>
-	        <otherwise>
-			  and A${index}.TEXT_ is null and A${index}.TEXT2_ is null and A${index}.LONG_ is null and A${index}.DOUBLE_ is null and A${index}.BYTEARRAY_ID_ is null
-	        </otherwise>
-	      </choose>
-      	</if>
+      )
       </foreach>
       <!-- event subscriptions -->
       <if test="eventSubscriptions != null">
-    	 <foreach collection="eventSubscriptions" index="index" item="eventSubscriptionValue">
-    	    and (EVT${index}.EVENT_TYPE_ = #{eventSubscriptionValue.eventType} and EVT${index}.EVENT_NAME_ = #{eventSubscriptionValue.eventName}) 
-	    </foreach>
+        <foreach collection="eventSubscriptions" index="index" item="eventSubscriptionValue">
+          and exists (select ID_ from ${prefix}ACT_RU_EVENT_SUBSCR EVT where
+          EVT.EXECUTION_ID_ = RES.ID_ and
+          EVT.EVENT_TYPE_ = #{eventSubscriptionValue.eventType} 
+          <if test = "eventSubscriptionValue.eventName != null">
+            and EVT.EVENT_NAME_ = #{eventSubscriptionValue.eventName}
+          </if>
+          )
+        </foreach>
       </if>
       <if test="incidentType != null">
         and INC.INCIDENT_TYPE_ = #{incidentType}
@@ -278,24 +275,19 @@
       </if>
     </where>
   </sql>
-  
-  <sql id="executionVariableOperator">
-    <choose>
-   	  <when test="queryVariableValue.operator.equals('EQUALS')">=</when>
-   	  <when test="queryVariableValue.operator.equals('NOT_EQUALS')">&lt;&gt;</when>
-   	  <when test="queryVariableValue.operator.equals('GREATER_THAN')">&gt;</when>
-   	  <when test="queryVariableValue.operator.equals('GREATER_THAN_OR_EQUAL')">&gt;=</when>
-   	  <when test="queryVariableValue.operator.equals('LESS_THAN')">&lt;</when>
-   	  <when test="queryVariableValue.operator.equals('LESS_THAN_OR_EQUAL')">&lt;=</when>
-   </choose>
-  </sql>
-  
+
   <select id="selectSubProcessInstanceBySuperExecutionId" parameterType="string" resultMap="executionResultMap">
     select *
     from ${prefix}ACT_RU_EXECUTION
     where SUPER_EXEC_ = #{parameter}
   </select>
-  
+
+  <select id="selectSubProcessInstanceBySuperCaseExecutionId" parameterType="string" resultMap="executionResultMap">
+    select *
+    from ${prefix}ACT_RU_EXECUTION
+    where SUPER_CASE_EXEC_ = #{parameter}
+  </select>
+
   <select id="selectExecutionByNativeQuery" parameterType="java.util.Map" resultMap="executionResultMap">
     <if test="resultType == 'LIST_PAGE'">
       ${limitBefore}
@@ -305,7 +297,7 @@
       ${limitAfter}
     </if>
   </select>
-  
+
   <select id="selectExecutionByNativeQuery_mssql_or_db2" parameterType="java.util.Map" resultMap="executionResultMap">
     <if test="resultType == 'LIST_PAGE'">
         ${limitBeforeNativeQuery}

@@ -53,6 +53,31 @@ public interface HistoricTaskInstanceQuery  extends Query<HistoricTaskInstanceQu
    */
   HistoricTaskInstanceQuery processDefinitionName(String processDefinitionName);
 
+  /** Only select historic task instances for the given case definition. */
+  HistoricTaskInstanceQuery caseDefinitionId(String caseDefinitionId);
+
+  /**
+   * Only select historic task instances which are part of a case instance
+   * which has the given case definition key.
+   */
+  HistoricTaskInstanceQuery caseDefinitionKey(String caseDefinitionKey);
+
+  /**
+   * Only select historic task instances which are part of a (historic) case instance
+   * which has the given case definition name.
+   */
+  HistoricTaskInstanceQuery caseDefinitionName(String caseDefinitionName);
+
+  /**
+   * Only select historic task instances for the given case instance.
+   */
+  HistoricTaskInstanceQuery caseInstanceId(String caseInstanceId);
+
+  /**
+   * Only select historic task instances for the given case execution id.
+   */
+  HistoricTaskInstanceQuery caseExecutionId(String caseExecutionId);
+
   /**
    * Only select historic task instances with the given task name.
    * This is the last name given to the task.
@@ -146,9 +171,8 @@ public interface HistoricTaskInstanceQuery  extends Query<HistoricTaskInstanceQu
 
   /**
    * Only select historic task instances which have a local task variable with the
-   * given name set to the given value. The last variable value in the variable updates
-   * ({@link HistoricDetail}) will be used, so make sure history-level is configured
-   * to full when this feature is used.
+   * given name set to the given value. Make sure history-level is configured
+   * >= AUDIT when this feature is used.
    */
   HistoricTaskInstanceQuery taskVariableValueEquals(String variableName, Object variableValue);
 
@@ -159,7 +183,7 @@ public interface HistoricTaskInstanceQuery  extends Query<HistoricTaskInstanceQu
    * Only select historic task instances which are part of a process instance which have a variable
    * with the given name set to the given value. The last variable value in the variable updates
    * ({@link HistoricDetail}) will be used, so make sure history-level is configured
-   * to full when this feature is used.
+   * >= AUDIT when this feature is used.
    */
   HistoricTaskInstanceQuery processVariableValueEquals(String variableName, Object variableValue);
 
@@ -246,4 +270,13 @@ public interface HistoricTaskInstanceQuery  extends Query<HistoricTaskInstanceQu
 
   /** Order by task priority key (needs to be followed by {@link #asc()} or {@link #desc()}). */
   HistoricTaskInstanceQuery orderByTaskPriority();
+
+  /** Order by case definition id (needs to be followed by {@link #asc()} or {@link #desc()}). */
+  HistoricTaskInstanceQuery orderByCaseDefinitionId();
+
+  /** Order by case instance id (needs to be followed by {@link #asc()} or {@link #desc()}). */
+  HistoricTaskInstanceQuery orderByCaseInstanceId();
+
+  /** Order by case execution id (needs to be followed by {@link #asc()} or {@link #desc()}). */
+  HistoricTaskInstanceQuery orderByCaseExecutionId();
 }

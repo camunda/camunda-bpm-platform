@@ -26,6 +26,7 @@ import org.camunda.bpm.engine.impl.jobexecutor.FailedJobListener;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutorContext;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 /**
  * @author Tom Baeyens
@@ -44,23 +45,19 @@ public class ExecuteJobsCmd implements Command<Object>, Serializable {
   }
 
   public Object execute(CommandContext commandContext) {
-    if(jobId == null) {
-      throw new ProcessEngineException("jobId is null");
-    }
+    ensureNotNull("jobId", jobId);
 
     if (log.isLoggable(Level.FINE)) {
       log.fine("Executing job " + jobId);
     }
-    JobEntity job = commandContext
-      .getJobManager()
-      .findJobById(jobId);
+    JobEntity job = commandContext.getDbEntityManager().selectById(JobEntity.class, jobId);
 
     final CommandExecutor commandExecutor = Context.getProcessEngineConfiguration().getCommandExecutorTxRequiresNew();
     final JobExecutorContext jobExecutorContext = Context.getJobExecutorContext();
 
     if (job == null) {
 
-      if(jobExecutorContext != null) {
+      if (jobExecutorContext != null) {
         // CAM-1842
         // Job was acquired but does not exist anymore. This is not a problem.
         // It usually means that the job has been deleted after it was acquired which can happen if the
@@ -75,8 +72,18 @@ public class ExecuteJobsCmd implements Command<Object>, Serializable {
 
     }
 
+    // the failed job listener is responsible for decrementing the retries and logging the exception to the DB.
+    FailedJobListener failedJobListener = createFailedJobListener(commandExecutor);
 
-    if(jobExecutorContext != null) { // if null, then we are not called by the job executor
+    // the listener is ALWAYS added to the transaction as SNYC on ROLLABCK. If the transaction does not rollback, it is ignored.
+    commandContext.getTransactionContext().addTransactionListener(
+        TransactionState.ROLLED_BACK,
+        failedJobListener);
+
+    // register as command context close lister to intercept exceptions on flush
+    commandContext.registerCommandContextListener(failedJobListener);
+
+    if (jobExecutorContext != null) { // if null, then we are not called by the job executor
       jobExecutorContext.setCurrentJob(job);
     }
 
@@ -85,49 +92,23 @@ public class ExecuteJobsCmd implements Command<Object>, Serializable {
       return null;
 
     } catch (RuntimeException exception) {
+      log.warning("Exception while excuting job '" + job + "': " + exception.getMessage());
 
-      log.warning("Exception while excuting job '"+job+"': "+exception.getMessage());
-
-      // the failed job listener is responsible for decrementing the retries and logging the exception to the DB.
-      FailedJobListener failedJobListener = createFailedJobListener(exception, commandExecutor);
-
-      try {
-
-        commandContext.getTransactionContext().addTransactionListener(
-                TransactionState.ROLLED_BACK,
-                failedJobListener);
-
-      } catch(Exception ex) {
-        // if the TX has already been rolled back, the listener cannot be registered.
-        log.log(Level.FINE, "Could not register transaction synchronization. Probably the TX has already been rolled back by application code.", ex);
-
-        // Execute the listener in new TX, here.
-        executeCmdInNewTx(commandContext, failedJobListener);
-
-      }
+      // log the exception in the job
+      failedJobListener.setException(exception);
 
       // throw the original exception to indicate the ExecuteJobCmd failed
       throw exception;
 
     } finally {
-      if(jobExecutorContext != null) {
+      if (jobExecutorContext != null) {
         jobExecutorContext.setCurrentJob(null);
       }
     }
 
   }
 
-  protected void executeCmdInNewTx(CommandContext commandContext, FailedJobListener failedJobListener) {
-    try {
-
-      failedJobListener.execute(commandContext);
-
-    } catch(Exception ex) {
-      log.log(Level.SEVERE, "Could not execute the FailedJobListener: "+ex.getMessage(), ex);
-    }
-  }
-
-  protected FailedJobListener createFailedJobListener(RuntimeException exception, CommandExecutor commandExecutor) {
-    return new FailedJobListener(commandExecutor, jobId, exception);
+  protected FailedJobListener createFailedJobListener(CommandExecutor commandExecutor) {
+    return new FailedJobListener(commandExecutor, jobId);
   }
 }

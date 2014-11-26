@@ -47,7 +47,7 @@ public interface ExecutionQuery extends Query<ExecutionQuery, Execution>{
   /**
    * Only select executions which have a local variable with the given value. The type
    * of variable is determined based on the value, using types configured in
-   * {@link ProcessEngineConfiguration#getVariableTypes()}.
+   * {@link ProcessEngineConfiguration#getVariableSerializers()}.
    * Byte-arrays and {@link Serializable} objects (which are not primitive type wrappers)
    * are not supported.
    * @param name name of the variable, cannot be null.
@@ -153,6 +153,13 @@ public interface ExecutionQuery extends Query<ExecutionQuery, Execution>{
    * @param messageName the name of the message the execution has subscribed to
    */
   ExecutionQuery messageEventSubscriptionName(String messageName);
+
+  /**
+   * Only select executions that have a message event subscription.
+   * Use {@link #messageEventSubscriptionName(String)} to filter for executions
+   * with message event subscriptions with a certain name.
+   */
+  ExecutionQuery messageEventSubscription();
 
   /**
    * Only selects executions which are suspended, because their process instance is suspended.

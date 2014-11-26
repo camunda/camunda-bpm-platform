@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -12,11 +12,13 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.Serializable;
 
-import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.exception.DeploymentResourceNotFoundException;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ResourceEntity;
@@ -26,31 +28,25 @@ import org.camunda.bpm.engine.impl.persistence.entity.ResourceEntity;
  * @author Joram Barrez
  */
 public class GetDeploymentResourceCmd implements Command<InputStream>, Serializable {
-  
+
   private static final long serialVersionUID = 1L;
   protected String deploymentId;
   protected String resourceName;
-  
+
   public GetDeploymentResourceCmd(String deploymentId, String resourceName) {
     this.deploymentId = deploymentId;
     this.resourceName = resourceName;
   }
 
   public InputStream execute(CommandContext commandContext) {
-    if (deploymentId == null) {
-      throw new ProcessEngineException("deploymentId is null");
-    }
-    if(resourceName == null) {
-      throw new ProcessEngineException("resourceName is null");
-    }
-    
+    ensureNotNull("deploymentId", deploymentId);
+    ensureNotNull("resourceName", resourceName);
+
     ResourceEntity resource = commandContext
       .getResourceManager()
       .findResourceByDeploymentIdAndResourceName(deploymentId, resourceName);
-    if(resource == null) {
-      throw new ProcessEngineException("no resource found with name '" + resourceName + "' in deployment '" + deploymentId + "'");
-    }
+    ensureNotNull(DeploymentResourceNotFoundException.class, "no resource found with name '" + resourceName + "' in deployment '" + deploymentId + "'", "resource", resource);
     return new ByteArrayInputStream(resource.getBytes());
   }
-  
+
 }

@@ -25,10 +25,12 @@ import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.db.HasRevision;
-import org.camunda.bpm.engine.impl.db.PersistentObject;
+import org.camunda.bpm.engine.impl.db.HasDbRevision;
+import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.form.handler.StartFormHandler;
+import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
+import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
 import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
 import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
@@ -43,7 +45,7 @@ import org.camunda.bpm.engine.task.IdentityLinkType;
  * @author Tom Baeyens
  * @author Daniel Meyer
  */
-public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements ProcessDefinition, PersistentObject, HasRevision {
+public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements ProcessDefinition, DbEntity, HasDbRevision {
 
   private static final long serialVersionUID = 1L;
 
@@ -75,38 +77,63 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
     }
   }
 
+  public ExecutionEntity createProcessInstance() {
+    return createProcessInstance(null, null, null);
+  }
+
+  public ExecutionEntity createProcessInstance(String businessKey) {
+    return createProcessInstance(businessKey, null, null);
+  }
+
+  public ExecutionEntity createProcessInstance(String businessKey, String caseInstanceId) {
+    return createProcessInstance(businessKey, caseInstanceId, null);
+  }
+
   public ExecutionEntity createProcessInstance(String businessKey, ActivityImpl initial) {
+    return createProcessInstance(businessKey, null, initial);
+  }
+
+  public ExecutionEntity createProcessInstance(String businessKey, String caseInstanceId, ActivityImpl initial) {
     ensureNotSuspended();
 
     ExecutionEntity processInstance = null;
 
     if(initial == null) {
       processInstance = (ExecutionEntity) super.createProcessInstance();
-    }else {
-      processInstance = (ExecutionEntity) super.createProcessInstanceForInitial(initial);
+    } else {
+      processInstance = (ExecutionEntity) createProcessInstanceForInitial(initial);
     }
 
-    processInstance.setExecutions(new ArrayList<ExecutionEntity>());
+    // do not reset executions (CAM-2557)!
+    // processInstance.setExecutions(new ArrayList<ExecutionEntity>());
+
     processInstance.setProcessDefinition(processDefinition);
-    // Do not initialize variable map (let it happen lazily)
 
-    if (businessKey != null) {
-    	processInstance.setBusinessKey(businessKey);
-    }
+    // Do not initialize variable map (let it happen lazily)
 
     // reset the process instance in order to have the db-generated process instance id available
     processInstance.setProcessInstance(processInstance);
 
+    // initialize business key
+    if (businessKey != null) {
+      processInstance.setBusinessKey(businessKey);
+    }
+
+    // initialize case instance id
+    if (caseInstanceId != null) {
+      processInstance.setCaseInstanceId(caseInstanceId);
+    }
+
     String initiatorVariableName = (String) getProperty(BpmnParse.PROPERTYNAME_INITIATOR_VARIABLE_NAME);
-    if (initiatorVariableName!=null) {
+    if (initiatorVariableName != null) {
       String authenticatedUserId = Context.getCommandContext().getAuthenticatedUserId();
       processInstance.setVariable(initiatorVariableName, authenticatedUserId);
     }
 
     ProcessEngineConfigurationImpl configuration = Context.getProcessEngineConfiguration();
-    int historyLevel = configuration.getHistoryLevel();
+    HistoryLevel historyLevel = configuration.getHistoryLevel();
     // TODO: This smells bad, as the rest of the history is done via the ParseListener
-    if (historyLevel>=ProcessEngineConfigurationImpl.HISTORYLEVEL_ACTIVITY) {
+    if (historyLevel.isHistoryEventProduced(HistoryEventTypes.PROCESS_INSTANCE_START, processInstance)) {
 
       final HistoryEventProducer eventFactory = configuration.getHistoryEventProducer();
       final HistoryEventHandler eventHandler = configuration.getHistoryEventHandler();
@@ -119,14 +146,6 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
 
     return processInstance;
   }
-  public ExecutionEntity createProcessInstance(String businessKey) {
-    return createProcessInstance(businessKey, null);
-  }
-
-  public ExecutionEntity createProcessInstance() {
-    return createProcessInstance(null);
-  }
-
 
   @Override
   protected PvmExecutionImpl newProcessInstance(ActivityImpl activityImpl) {
@@ -154,7 +173,7 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
     for (IdentityLinkEntity identityLink: identityLinks) {
       Context
         .getCommandContext()
-        .getDbSqlSession()
+        .getDbEntityManager()
         .delete(identityLink);
     }
   }

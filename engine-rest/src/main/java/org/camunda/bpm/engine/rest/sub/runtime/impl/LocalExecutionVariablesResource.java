@@ -1,47 +1,58 @@
+/* Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.camunda.bpm.engine.rest.sub.runtime.impl;
 
 import java.util.List;
-import java.util.Map;
-
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.RuntimeServiceImpl;
 import org.camunda.bpm.engine.rest.sub.impl.AbstractVariablesResource;
+import org.camunda.bpm.engine.variable.VariableMap;
+import org.camunda.bpm.engine.variable.value.TypedValue;
+import org.codehaus.jackson.map.ObjectMapper;
 
+/**
+ *
+ * @author Daniel Meyer
+ */
 public class LocalExecutionVariablesResource extends AbstractVariablesResource {
 
-  public LocalExecutionVariablesResource(ProcessEngine engine, String resourceId) {
-    super(engine, resourceId);
+  public LocalExecutionVariablesResource(ProcessEngine engine, String resourceId, ObjectMapper objectMapper) {
+    super(engine, resourceId, objectMapper);
   }
 
-  @Override
-  protected Map<String, Object> getVariableEntities() {
-    return engine.getRuntimeService().getVariablesLocal(resourceId);
+  protected String getResourceTypeName() {
+    return "execution";
   }
 
-  @Override
-  protected void updateVariableEntities(Map<String, Object> modifications, List<String> deletions) {
+  protected void updateVariableEntities(VariableMap modifications, List<String> deletions) {
     RuntimeServiceImpl runtimeService = (RuntimeServiceImpl) engine.getRuntimeService();
     runtimeService.updateVariablesLocal(resourceId, modifications, deletions);
   }
-  
-  @Override
-  protected Object getVariableEntity(String variableKey) {
-    return engine.getRuntimeService().getVariableLocal(resourceId, variableKey);
-  }
 
-  @Override
-  protected void setVariableEntity(String variableKey, Object variableValue) {
-    engine.getRuntimeService().setVariableLocal(resourceId, variableKey, variableValue);
-  }
-
-  @Override
   protected void removeVariableEntity(String variableKey) {
     engine.getRuntimeService().removeVariableLocal(resourceId, variableKey);
   }
 
-  @Override
-  protected String getResourceTypeName() {
-    return "execution";
+  protected VariableMap getVariableEntities(boolean deserializeValues) {
+    return engine.getRuntimeService().getVariablesLocalTyped(resourceId, deserializeValues);
+  }
+
+  protected TypedValue getVariableEntity(String variableKey, boolean deserializeValue) {
+    return engine.getRuntimeService().getVariableLocalTyped(resourceId, variableKey, deserializeValue);
+  }
+
+  protected void setVariableEntity(String variableKey, TypedValue variableValue) {
+    engine.getRuntimeService().setVariableLocal(resourceId, variableKey, variableValue);
   }
 
 }

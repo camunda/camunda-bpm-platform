@@ -22,6 +22,8 @@ import org.camunda.bpm.engine.form.FormFieldValidationConstraint;
 import org.camunda.bpm.engine.form.FormProperty;
 import org.camunda.bpm.engine.form.FormType;
 import org.camunda.bpm.engine.impl.form.FormFieldValidationConstraintImpl;
+import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.value.TypedValue;
 
 /**
  * @author Daniel Meyer
@@ -70,6 +72,14 @@ public class FormPropertyAdapter implements FormField {
 
   public Map<String, String> getProperties() {
     return Collections.emptyMap();
+  }
+
+  public TypedValue getDefaultValueTyped() {
+    return getValue();
+  }
+
+  public TypedValue getValue() {
+    return Variables.stringValue(formProperty.getValue());
   }
 
 }

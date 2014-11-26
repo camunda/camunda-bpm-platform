@@ -13,6 +13,8 @@
 
 package org.camunda.bpm.engine.impl.bpmn.behavior;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 import org.apache.commons.mail.Email;
 import org.apache.commons.mail.EmailException;
 import org.apache.commons.mail.HtmlEmail;
@@ -165,9 +167,7 @@ public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
     ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
 
     String host = processEngineConfiguration.getMailServerHost();
-    if (host == null) {
-      throw new ProcessEngineException("Could not send email: no SMTP host is configured");
-    }
+    ensureNotNull("Could not send email: no SMTP host is configured", "host", host);
     email.setHostName(host);
 
     int port = processEngineConfiguration.getMailServerPort();

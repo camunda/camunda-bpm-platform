@@ -50,7 +50,7 @@ public class TestWarDeploymentWithProcessEnginePlugin extends AbstractFoxPlatfor
         .addAsLibraries(Maven.resolver()
             .offline()
             .loadPomFromFile("pom.xml")
-            .resolve("org.codehaus.groovy:groovy-all:2.2.1")
+            .resolve("org.codehaus.groovy:groovy-all:2.3.0")
             .withoutTransitivity()
             .as(JavaArchive.class));
   }
@@ -73,7 +73,7 @@ public class TestWarDeploymentWithProcessEnginePlugin extends AbstractFoxPlatfor
 
     ProcessInstance pi = groovyEngine.getRuntimeService().startProcessInstanceByKey("groovyAsync");
 
-    waitForJobExecutorToProcessAllJobs(5000);
+    waitForJobExecutorToProcessAllJobs();
 
     HistoricProcessInstance hpi = groovyEngine.getHistoryService()
         .createHistoricProcessInstanceQuery().processDefinitionKey("groovyAsync").finished().singleResult();

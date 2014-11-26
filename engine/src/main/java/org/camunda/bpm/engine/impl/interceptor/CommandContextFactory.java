@@ -22,13 +22,13 @@ import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 public class CommandContextFactory {
 
   protected ProcessEngineConfigurationImpl processEngineConfiguration;
-  
-  public CommandContext createCommandContext(Command<?> cmd) {
-    return new CommandContext(cmd, processEngineConfiguration);
+
+  public CommandContext createCommandContext() {
+    return new CommandContext(processEngineConfiguration);
   }
-  
+
   // getters and setters //////////////////////////////////////////////////////
-  
+
   public ProcessEngineConfigurationImpl getProcessEngineConfiguration() {
     return processEngineConfiguration;
   }

@@ -14,13 +14,13 @@ package org.camunda.bpm.engine.impl.persistence.entity;
 
 import java.io.Serializable;
 
-import org.camunda.bpm.engine.impl.db.PersistentObject;
+import org.camunda.bpm.engine.impl.db.DbEntity;
 
 
 /**
  * @author Tom Baeyens
  */
-public class MembershipEntity implements Serializable, PersistentObject {
+public class MembershipEntity implements Serializable, DbEntity {
 
   private static final long serialVersionUID = 1L;
 

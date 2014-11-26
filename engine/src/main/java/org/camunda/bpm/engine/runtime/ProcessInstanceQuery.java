@@ -65,9 +65,14 @@ public interface ProcessInstanceQuery extends Query<ProcessInstanceQuery, Proces
   ProcessInstanceQuery subProcessInstanceId(String subProcessInstanceId);
 
   /**
+   * Selects the process instances which are associated with the given case instance id.
+   */
+  ProcessInstanceQuery caseInstanceId(String caseInstanceId);
+
+  /**
    * Only select process instances which have a global variable with the given value. The type
    * of variable is determined based on the value, using types configured in
-   * {@link ProcessEngineConfiguration#getVariableTypes()}.
+   * {@link ProcessEngineConfiguration#getVariableSerializers()}.
    * Byte-arrays and {@link Serializable} objects (which are not primitive type wrappers)
    * are not supported.
    * @param name name of the variable, cannot be null.

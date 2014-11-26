@@ -13,26 +13,18 @@
 
 package org.camunda.bpm.engine.impl.persistence.entity;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.camunda.bpm.engine.ProcessEngineException;
+import java.util.*;
 import org.camunda.bpm.engine.impl.JobQueryImpl;
 import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.cfg.TransactionListener;
 import org.camunda.bpm.engine.impl.cfg.TransactionState;
 import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.jobexecutor.ExclusiveJobAddedNotification;
-import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
-import org.camunda.bpm.engine.impl.jobexecutor.JobExecutorContext;
-import org.camunda.bpm.engine.impl.jobexecutor.MessageAddedNotification;
-import org.camunda.bpm.engine.impl.jobexecutor.TimerStartEventJobHandler;
+import org.camunda.bpm.engine.impl.jobexecutor.*;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.runtime.Job;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 
 /**
@@ -43,14 +35,14 @@ public class JobManager extends AbstractManager {
 
   public void send(MessageEntity message) {
     message.insert();
-    hintJobExecutor(message);
+    if (Context.getProcessEngineConfiguration().isHintJobExecutor()) {
+      hintJobExecutor(message);
+    }
   }
 
   public void schedule(TimerEntity timer) {
     Date duedate = timer.getDuedate();
-    if (duedate==null) {
-      throw new ProcessEngineException("duedate is null");
-    }
+    ensureNotNull("duedate", duedate);
 
     timer.insert();
 
@@ -60,7 +52,7 @@ public class JobManager extends AbstractManager {
 
     JobExecutor jobExecutor = Context.getProcessEngineConfiguration().getJobExecutor();
     int waitTimeInMillis = jobExecutor.getWaitTimeInMillis();
-    if (duedate.getTime() < (ClockUtil.getCurrentTime().getTime()+waitTimeInMillis)) {
+    if (duedate.getTime() < (ClockUtil.getCurrentTime().getTime() + waitTimeInMillis)) {
       hintJobExecutor(timer);
     }
   }
@@ -99,7 +91,7 @@ public class JobManager extends AbstractManager {
   }
 
   public JobEntity findJobById(String jobId) {
-    return (JobEntity) getDbSqlSession().selectOne("selectJob", jobId);
+    return (JobEntity) getDbEntityManager().selectOne("selectJob", jobId);
   }
 
   @SuppressWarnings("unchecked")
@@ -114,12 +106,17 @@ public class JobManager extends AbstractManager {
         params.put("deploymentIds", registeredDeployments);
       }
     }
-    return getDbSqlSession().selectList("selectNextJobsToExecute", params, page);
+    return getDbEntityManager().selectList("selectNextJobsToExecute", params, page);
   }
 
   @SuppressWarnings("unchecked")
-  public List<Job> findJobsByExecutionId(String executionId) {
-    return getDbSqlSession().selectList("selectJobsByExecutionId", executionId);
+  public List<JobEntity> findJobsByExecutionId(String executionId) {
+    return getDbEntityManager().selectList("selectJobsByExecutionId", executionId);
+  }
+
+  @SuppressWarnings("unchecked")
+  public List<JobEntity> findJobsByProcessInstanceId(String processInstanceId) {
+    return getDbEntityManager().selectList("selectJobsByProcessInstanceId", processInstanceId);
   }
 
   @SuppressWarnings("unchecked")
@@ -127,25 +124,25 @@ public class JobManager extends AbstractManager {
     Map<String,Object> params = new HashMap<String, Object>();
     params.put("pid", processInstanceId);
     params.put("now",ClockUtil.getCurrentTime());
-    return getDbSqlSession().selectList("selectExclusiveJobsToExecute", params);
+    return getDbEntityManager().selectList("selectExclusiveJobsToExecute", params);
   }
 
 
   @SuppressWarnings("unchecked")
   public List<TimerEntity> findUnlockedTimersByDuedate(Date duedate, Page page) {
     final String query = "selectUnlockedTimersByDuedate";
-    return getDbSqlSession().selectList(query, duedate, page);
+    return getDbEntityManager().selectList(query, duedate, page);
   }
 
   @SuppressWarnings("unchecked")
   public List<TimerEntity> findTimersByExecutionId(String executionId) {
-    return getDbSqlSession().selectList("selectTimersByExecutionId", executionId);
+    return getDbEntityManager().selectList("selectTimersByExecutionId", executionId);
   }
 
   @SuppressWarnings("unchecked")
   public List<Job> findJobsByQueryCriteria(JobQueryImpl jobQuery, Page page) {
     final String query = "selectJobByQueryCriteria";
-    return getDbSqlSession().selectList(query, jobQuery, page);
+    return getDbEntityManager().selectList(query, jobQuery, page);
   }
 
   @SuppressWarnings("unchecked")
@@ -153,39 +150,39 @@ public class JobManager extends AbstractManager {
     Map<String, String> params = new HashMap<String, String>();
     params.put("handlerType", jobHandlerType);
     params.put("handlerConfiguration", jobHandlerConfiguration);
-    return getDbSqlSession().selectList("selectJobsByConfiguration", params);
+    return getDbEntityManager().selectList("selectJobsByConfiguration", params);
   }
 
   public long findJobCountByQueryCriteria(JobQueryImpl jobQuery) {
-    return (Long) getDbSqlSession().selectOne("selectJobCountByQueryCriteria", jobQuery);
+    return (Long) getDbEntityManager().selectOne("selectJobCountByQueryCriteria", jobQuery);
   }
 
   public void updateJobSuspensionStateById(String jobId, SuspensionState suspensionState) {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("jobId", jobId);
     parameters.put("suspensionState", suspensionState.getStateCode());
-    getDbSqlSession().update("updateJobSuspensionStateByParameters", parameters);
+    getDbEntityManager().update(JobEntity.class, "updateJobSuspensionStateByParameters", parameters);
   }
 
   public void updateJobSuspensionStateByJobDefinitionId(String jobDefinitionId, SuspensionState suspensionState) {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("jobDefinitionId", jobDefinitionId);
     parameters.put("suspensionState", suspensionState.getStateCode());
-    getDbSqlSession().update("updateJobSuspensionStateByParameters", parameters);
+    getDbEntityManager().update(JobEntity.class, "updateJobSuspensionStateByParameters", parameters);
   }
 
   public void updateJobSuspensionStateByProcessInstanceId(String processInstanceId, SuspensionState suspensionState) {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("processInstanceId", processInstanceId);
     parameters.put("suspensionState", suspensionState.getStateCode());
-    getDbSqlSession().update("updateJobSuspensionStateByParameters", parameters);
+    getDbEntityManager().update(JobEntity.class, "updateJobSuspensionStateByParameters", parameters);
   }
 
   public void updateJobSuspensionStateByProcessDefinitionId(String processDefinitionId, SuspensionState suspensionState) {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("processDefinitionId", processDefinitionId);
     parameters.put("suspensionState", suspensionState.getStateCode());
-    getDbSqlSession().update("updateJobSuspensionStateByParameters", parameters);
+    getDbEntityManager().update(JobEntity.class, "updateJobSuspensionStateByParameters", parameters);
   }
 
   public void updateStartTimerJobSuspensionStateByProcessDefinitionId(String processDefinitionId, SuspensionState suspensionState) {
@@ -193,14 +190,14 @@ public class JobManager extends AbstractManager {
     parameters.put("processDefinitionId", processDefinitionId);
     parameters.put("suspensionState", suspensionState.getStateCode());
     parameters.put("handlerType", TimerStartEventJobHandler.TYPE);
-    getDbSqlSession().update("updateJobSuspensionStateByParameters", parameters);
+    getDbEntityManager().update(JobEntity.class, "updateJobSuspensionStateByParameters", parameters);
   }
 
   public void updateJobSuspensionStateByProcessDefinitionKey(String processDefinitionKey, SuspensionState suspensionState) {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("processDefinitionKey", processDefinitionKey);
     parameters.put("suspensionState", suspensionState.getStateCode());
-    getDbSqlSession().update("updateJobSuspensionStateByParameters", parameters);
+    getDbEntityManager().update(JobEntity.class, "updateJobSuspensionStateByParameters", parameters);
   }
 
   public void updateStartTimerJobSuspensionStateByProcessDefinitionKey(String processDefinitionKey, SuspensionState suspensionState) {
@@ -208,14 +205,14 @@ public class JobManager extends AbstractManager {
     parameters.put("processDefinitionKey", processDefinitionKey);
     parameters.put("suspensionState", suspensionState.getStateCode());
     parameters.put("handlerType", TimerStartEventJobHandler.TYPE);
-    getDbSqlSession().update("updateJobSuspensionStateByParameters", parameters);
+    getDbEntityManager().update(JobEntity.class, "updateJobSuspensionStateByParameters", parameters);
   }
 
   public void updateFailedJobRetriesByJobDefinitionId(String jobDefinitionId, int retries) {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("jobDefinitionId", jobDefinitionId);
     parameters.put("retries", retries);
-    getDbSqlSession().update("updateFailedJobRetriesByParameters", parameters);
+    getDbEntityManager().update(JobEntity.class, "updateFailedJobRetriesByParameters", parameters);
   }
 
 }

@@ -1,20 +1,26 @@
-<form class="form-horizontal">
-  <div class="control-group">
-    <label class="control-label">
+<form name="generatedForm" role="form">
+  <div class="form-group">
+    <label for="enumField">
       Enum Field
     </label>
-    <div class="controls">
-      <select form-field type="string" name="enumField">
-        <option value="a" selected>
-          A
-        </option>
-        <option value="b">
-          B
-        </option>
-        <option value="c">
-          C
-        </option>
-      </select>
+    <select class="form-control" name="enumField" cam-variable-type="String" cam-variable-name="enumField">
+      <option value="a">
+        A
+      </option>
+      <option value="b">
+        B
+      </option>
+      <option value="c">
+        C
+      </option>
+    </select>
+    <div ng-if="this.generatedForm.enumField.$invalid && this.generatedForm.enumField.$dirty" class="has-error">
+      <div ng-show="this.generatedForm.enumField.$error.required" class="help-block">
+        Required field
+      </div>
+      <div ng-show="this.generatedForm.enumField.$error.camVariableType" class="help-block">
+        Only a string value is allowed
+      </div>
     </div>
   </div>
 </form>

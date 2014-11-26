@@ -42,6 +42,8 @@ create table ACT_RU_EXECUTION (
     PARENT_ID_ nvarchar(64),
     PROC_DEF_ID_ nvarchar(64),
     SUPER_EXEC_ nvarchar(64),
+    SUPER_CASE_EXEC_ nvarchar(64),
+    CASE_INST_ID_ nvarchar(64),
     ACT_ID_ nvarchar(255),
     ACT_INST_ID_ nvarchar(64),
     IS_ACTIVE_ tinyint,
@@ -110,6 +112,9 @@ create table ACT_RU_TASK (
     EXECUTION_ID_ nvarchar(64),
     PROC_INST_ID_ nvarchar(64),
     PROC_DEF_ID_ nvarchar(64),
+    CASE_EXECUTION_ID_ nvarchar(64),
+    CASE_INST_ID_ nvarchar(64),
+    CASE_DEF_ID_ nvarchar(64),
     NAME_ nvarchar(255),
     PARENT_TASK_ID_ nvarchar(64),
     DESCRIPTION_ nvarchar(4000),
@@ -196,14 +201,27 @@ create table ACT_RU_AUTHORIZATION (
   primary key (ID_)
 );
 
+create table ACT_RU_FILTER (
+  ID_ nvarchar(64) not null,
+  REV_ integer not null,
+  RESOURCE_TYPE_ nvarchar(255) not null,
+  NAME_ nvarchar(255) not null,
+  OWNER_ nvarchar(255),
+  QUERY_ nvarchar(max) not null,
+  PROPERTIES_ nvarchar(max),
+  primary key (ID_)
+);
+
 create index ACT_IDX_EXEC_BUSKEY on ACT_RU_EXECUTION(BUSINESS_KEY_);
 create index ACT_IDX_TASK_CREATE on ACT_RU_TASK(CREATE_TIME_);
+create index ACT_IDX_TASK_ASSIGNEE on ACT_RU_TASK(ASSIGNEE_);
 create index ACT_IDX_IDENT_LNK_USER on ACT_RU_IDENTITYLINK(USER_ID_);
 create index ACT_IDX_IDENT_LNK_GROUP on ACT_RU_IDENTITYLINK(GROUP_ID_);
 create index ACT_IDX_EVENT_SUBSCR_CONFIG_ on ACT_RU_EVENT_SUBSCR(CONFIGURATION_);
 create index ACT_IDX_VARIABLE_TASK_ID on ACT_RU_VARIABLE(TASK_ID_);
 create index ACT_IDX_ATHRZ_PROCEDEF on ACT_RU_IDENTITYLINK(PROC_DEF_ID_);
 create index ACT_IDX_INC_CONFIGURATION on ACT_RU_INCIDENT(CONFIGURATION_);
+create index ACT_IDX_JOB_PROCINST on ACT_RU_JOB(PROCESS_INSTANCE_ID_);
 create unique index ACT_UNIQ_AUTH_USER on ACT_RU_AUTHORIZATION (TYPE_,USER_ID_,RESOURCE_TYPE_,RESOURCE_ID_) where USER_ID_ is not null;
 create unique index ACT_UNIQ_AUTH_GROUP on ACT_RU_AUTHORIZATION (TYPE_,GROUP_ID_,RESOURCE_TYPE_,RESOURCE_ID_) where GROUP_ID_ is not null;
 create unique index ACT_UNIQ_VARIABLE on ACT_RU_VARIABLE(VAR_SCOPE_, NAME_);

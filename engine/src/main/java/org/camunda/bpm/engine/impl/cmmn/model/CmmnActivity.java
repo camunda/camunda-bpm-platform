@@ -17,7 +17,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.camunda.bpm.engine.impl.cmmn.execution.CmmnActivityBehavior;
+import org.camunda.bpm.engine.delegate.VariableListener;
+import org.camunda.bpm.engine.impl.cmmn.behavior.CmmnActivityBehavior;
 import org.camunda.bpm.engine.impl.core.model.CoreActivity;
 import org.camunda.bpm.model.cmmn.instance.CmmnElement;
 
@@ -39,6 +40,17 @@ public class CmmnActivity extends CoreActivity {
   protected CmmnCaseDefinition caseDefinition;
 
   protected CmmnActivity parent;
+
+  protected List<CmmnSentryDeclaration> sentries = new ArrayList<CmmnSentryDeclaration>();
+  protected Map<String, CmmnSentryDeclaration> sentryMap = new HashMap<String, CmmnSentryDeclaration>();
+
+  protected List<CmmnSentryDeclaration> entryCriteria = new ArrayList<CmmnSentryDeclaration>();
+
+  protected List<CmmnSentryDeclaration> exitCriteria = new ArrayList<CmmnSentryDeclaration>();
+
+  // eventName => activity id => variable listeners
+  protected Map<String, Map<String, List<VariableListener<?>>>> resolvedVariableListeners;
+  protected Map<String, Map<String, List<VariableListener<?>>>> resolvedBuiltInVariableListeners;
 
   public CmmnActivity(String id, CmmnCaseDefinition caseDefinition) {
     super(id);
@@ -111,6 +123,98 @@ public class CmmnActivity extends CoreActivity {
 
   public void setCmmnElement(CmmnElement cmmnElement) {
     this.cmmnElement = cmmnElement;
+  }
+
+  // sentry
+
+  public List<CmmnSentryDeclaration> getSentries() {
+    return sentries;
+  }
+
+  public CmmnSentryDeclaration getSentry(String sentryId) {
+    return sentryMap.get(sentryId);
+  }
+
+  public void addSentry(CmmnSentryDeclaration sentry) {
+    sentryMap.put(sentry.getId(), sentry);
+    sentries.add(sentry);
+  }
+
+  // entryCriteria
+
+  public List<CmmnSentryDeclaration> getEntryCriteria() {
+    return entryCriteria;
+  }
+
+  public void setEntryCriteria(List<CmmnSentryDeclaration> entryCriteria) {
+    this.entryCriteria = entryCriteria;
+  }
+
+  public void addEntryCriteria(CmmnSentryDeclaration entryCriteria) {
+    this.entryCriteria.add(entryCriteria);
+  }
+
+  // exitCriteria
+
+  public List<CmmnSentryDeclaration> getExitCriteria() {
+    return exitCriteria;
+  }
+
+  public void setExitCriteria(List<CmmnSentryDeclaration> exitCriteria) {
+    this.exitCriteria = exitCriteria;
+  }
+
+  public void addExitCriteria(CmmnSentryDeclaration exitCriteria) {
+    this.exitCriteria.add(exitCriteria);
+  }
+
+  // variable listeners
+
+  /**
+   * Returns a map of all variable listeners defined on this activity or any of
+   * its parents activities. The map's key is the id of the respective activity
+   * the listener is defined on.
+   */
+  public Map<String, List<VariableListener<?>>> getVariableListeners(String eventName, boolean includeCustomListeners) {
+    Map<String, Map<String, List<VariableListener<?>>>> listenerCache;
+    if (includeCustomListeners) {
+      if (resolvedVariableListeners == null) {
+        resolvedVariableListeners = new HashMap<String, Map<String,List<VariableListener<?>>>>();
+      }
+
+      listenerCache = resolvedVariableListeners;
+    } else {
+      if (resolvedBuiltInVariableListeners == null) {
+        resolvedBuiltInVariableListeners = new HashMap<String, Map<String,List<VariableListener<?>>>>();
+      }
+      listenerCache = resolvedBuiltInVariableListeners;
+    }
+
+    Map<String, List<VariableListener<?>>> resolvedListenersForEvent = listenerCache.get(eventName);
+
+    if (resolvedListenersForEvent == null) {
+      resolvedListenersForEvent = new HashMap<String, List<VariableListener<?>>>();
+      listenerCache.put(eventName, resolvedListenersForEvent);
+
+      CmmnActivity currentActivity = this;
+
+      while (currentActivity != null) {
+        List<VariableListener<?>> localListeners = null;
+        if (includeCustomListeners) {
+          localListeners = currentActivity.getVariableListenersLocal(eventName);
+        } else {
+          localListeners = currentActivity.getBuiltInVariableListenersLocal(eventName);
+        }
+
+        if (localListeners != null && !localListeners.isEmpty()) {
+          resolvedListenersForEvent.put(currentActivity.getId(), localListeners);
+        }
+
+        currentActivity = currentActivity.getParent();
+      }
+    }
+
+    return resolvedListenersForEvent;
   }
 
 }

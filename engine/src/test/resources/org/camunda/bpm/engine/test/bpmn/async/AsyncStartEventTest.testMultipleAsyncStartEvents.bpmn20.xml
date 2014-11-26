@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:camunda="http://activiti.org/bpmn"
+  targetNamespace="Examples"
+  xmlns:tns="Examples">
+
+  <message id="newInvoice" name="newInvoiceMessage" />
+
+  <process id="process">
+
+    <startEvent id="messageStartEvent" camunda:asyncBefore="true">
+      <messageEventDefinition messageRef="tns:newInvoice" />
+    </startEvent>
+
+    <sequenceFlow sourceRef="messageStartEvent" targetRef="taskAfterMessageStartEvent" />
+
+    <userTask id="taskAfterMessageStartEvent"/>
+
+    <sequenceFlow sourceRef="taskAfterMessageStartEvent" targetRef="join" />
+
+    <startEvent id="startEvent" camunda:asyncBefore="true" />
+
+    <sequenceFlow sourceRef="startEvent" targetRef="taskAfterStartEvent" />
+
+    <userTask id="taskAfterStartEvent"/>
+
+    <sequenceFlow sourceRef="taskAfterStartEvent" targetRef="join" />
+
+    <exclusiveGateway id="join" />
+
+    <sequenceFlow sourceRef="join" targetRef="endEvent" />
+
+    <endEvent id="endEvent" />
+
+  </process>
+
+</definitions>

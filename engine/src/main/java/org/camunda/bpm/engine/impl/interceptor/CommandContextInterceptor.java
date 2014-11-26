@@ -22,11 +22,14 @@ import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 
 /**
- * <p>Interceptor used for opening the command context.</p>
+ * <p>Interceptor used for opening the {@link CommandContext} and {@link CommandInvocationContext}.</p>
  *
  * <p>Since 7.1, this interceptor will not always open a new command context but instead reuse an existing
  * command context if possible. This is required for supporting process engine public API access from
- * delegation code (see {@link ProcessEngineServicesAware}.)</p>
+ * delegation code (see {@link ProcessEngineServicesAware}.). However, for every command, a new
+ * command invocation context is created. While a command context holds resources that are
+ * shared between multiple commands, such as database sessions, a command invocation context holds
+ * resources specific for a single command.</p>
  *
  * <p>The interceptor will check whether an open command context exists. If true, it will reuse the
  * command context. If false, it will open a new one. We will always push the context to the
@@ -45,6 +48,7 @@ import org.camunda.bpm.engine.impl.context.Context;
  *
  * @author Tom Baeyens
  * @author Daniel Meyer
+ * @author Thorben Lindhauer
  */
 public class CommandContextInterceptor extends CommandInterceptor {
 
@@ -73,10 +77,13 @@ public class CommandContextInterceptor extends CommandInterceptor {
     CommandContext context  = Context.getCommandContext();
     boolean openNew = (alwaysOpenNew || context == null);
 
+    CommandInvocationContext commandInvocationContext = new CommandInvocationContext(command);
+    Context.setCommandInvocationContext(commandInvocationContext);
+
     try {
       if(openNew) {
         LOGGER.log(Level.FINE, "Opening new command context.");
-        context = commandContextFactory.createCommandContext(command);
+        context = commandContextFactory.createCommandContext();
 
       } else {
         LOGGER.log(Level.FINE, "Reusing existing command context.");
@@ -90,15 +97,18 @@ public class CommandContextInterceptor extends CommandInterceptor {
       return next.execute(command);
 
     } catch (Exception e) {
-      context.exception(e);
+      commandInvocationContext.trySetThrowable(e);
 
     } finally {
       try {
         if (openNew) {
           LOGGER.log(Level.FINE, "Closing command context.");
-          context.close();
+          context.close(commandInvocationContext);
+        } else {
+          commandInvocationContext.rethrow();
         }
       } finally {
+        Context.removeCommandInvocationContext();
         Context.removeCommandContext();
         Context.removeProcessEngineConfiguration();
       }

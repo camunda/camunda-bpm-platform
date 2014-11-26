@@ -4,15 +4,15 @@ import org.camunda.bpm.ProcessApplicationService;
 import org.camunda.bpm.ProcessEngineService;
 import org.camunda.bpm.container.ExecutorService;
 import org.camunda.bpm.container.RuntimeContainerDelegate;
+import org.camunda.bpm.container.impl.RuntimeContainerDelegateImpl;
+import org.camunda.bpm.container.impl.deployment.PlatformXmlStartProcessEnginesStep;
+import org.camunda.bpm.container.impl.deployment.StopProcessApplicationsStep;
+import org.camunda.bpm.container.impl.deployment.StopProcessEnginesStep;
+import org.camunda.bpm.container.impl.deployment.jobexecutor.StartJobExecutorStep;
+import org.camunda.bpm.container.impl.deployment.jobexecutor.StopJobExecutorStep;
 import org.camunda.bpm.container.impl.ejb.deployment.EjbJarParsePlatformXmlStep;
 import org.camunda.bpm.container.impl.ejb.deployment.StartJcaExecutorServiceStep;
 import org.camunda.bpm.container.impl.ejb.deployment.StopJcaExecutorServiceStep;
-import org.camunda.bpm.container.impl.jmx.JmxRuntimeContainerDelegate;
-import org.camunda.bpm.container.impl.jmx.deployment.PlatformXmlStartProcessEnginesStep;
-import org.camunda.bpm.container.impl.jmx.deployment.StopProcessApplicationsStep;
-import org.camunda.bpm.container.impl.jmx.deployment.StopProcessEnginesStep;
-import org.camunda.bpm.container.impl.jmx.deployment.jobexecutor.StartJobExecutorStep;
-import org.camunda.bpm.container.impl.jmx.deployment.jobexecutor.StopJobExecutorStep;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -21,6 +21,7 @@ import javax.ejb.Singleton;
 import javax.ejb.Startup;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -46,7 +47,7 @@ public class EjbBpmPlatformBootstrap {
   @PostConstruct
   protected void start() {
 
-    final JmxRuntimeContainerDelegate containerDelegate = getContainerDelegate();
+    final RuntimeContainerDelegateImpl containerDelegate = getContainerDelegate();
     
     containerDelegate.getServiceContainer().createDeploymentOperation("deploying camunda BPM platform")
       .addStep(new EjbJarParsePlatformXmlStep())
@@ -64,7 +65,7 @@ public class EjbBpmPlatformBootstrap {
   @PreDestroy
   protected void stop() {
     
-    final JmxRuntimeContainerDelegate containerDelegate = getContainerDelegate();
+    final RuntimeContainerDelegateImpl containerDelegate = getContainerDelegate();
     
     containerDelegate.getServiceContainer().createUndeploymentOperation("undeploying camunda BPM platform")
       .addStep(new StopProcessApplicationsStep())
@@ -77,8 +78,8 @@ public class EjbBpmPlatformBootstrap {
 
   }
   
-  protected JmxRuntimeContainerDelegate getContainerDelegate() {
-    return (JmxRuntimeContainerDelegate) RuntimeContainerDelegate.INSTANCE.get();
+  protected RuntimeContainerDelegateImpl getContainerDelegate() {
+    return (RuntimeContainerDelegateImpl) RuntimeContainerDelegate.INSTANCE.get();
   }
   
   // getters //////////////////////////////////////////////

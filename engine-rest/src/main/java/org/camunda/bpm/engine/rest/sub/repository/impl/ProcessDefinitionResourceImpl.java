@@ -15,7 +15,6 @@ package org.camunda.bpm.engine.rest.sub.repository.impl;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -38,6 +37,8 @@ import org.camunda.bpm.engine.management.ActivityStatisticsQuery;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.rest.ProcessInstanceRestService;
 import org.camunda.bpm.engine.rest.dto.StatisticsResultDto;
+import org.camunda.bpm.engine.rest.dto.VariableValueDto;
+import org.camunda.bpm.engine.rest.dto.converter.StringListConverter;
 import org.camunda.bpm.engine.rest.dto.repository.ActivityStatisticsResultDto;
 import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionDiagramDto;
 import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionDto;
@@ -49,19 +50,22 @@ import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.sub.repository.ProcessDefinitionResource;
 import org.camunda.bpm.engine.rest.util.ApplicationContextPathUtil;
-import org.camunda.bpm.engine.rest.util.DtoUtil;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.variable.VariableMap;
+import org.codehaus.jackson.map.ObjectMapper;
 
 public class ProcessDefinitionResourceImpl implements ProcessDefinitionResource {
 
-  private ProcessEngine engine;
-  private String processDefinitionId;
-  private String rootResourcePath;
+  protected ProcessEngine engine;
+  protected String processDefinitionId;
+  protected String rootResourcePath;
+  protected ObjectMapper objectMapper;
 
-  public ProcessDefinitionResourceImpl(ProcessEngine engine, String processDefinitionId, String rootResourcePath) {
+  public ProcessDefinitionResourceImpl(ProcessEngine engine, String processDefinitionId, String rootResourcePath, ObjectMapper objectMapper) {
     this.engine = engine;
     this.processDefinitionId = processDefinitionId;
     this.rootResourcePath = rootResourcePath;
+    this.objectMapper = objectMapper;
   }
 
   @Override
@@ -86,36 +90,27 @@ public class ProcessDefinitionResourceImpl implements ProcessDefinitionResource 
 
     ProcessInstance instance = null;
     try {
-      Map<String, Object> variables = DtoUtil.toMap(parameters.getVariables());
+      Map<String, Object> variables = VariableValueDto.toMap(parameters.getVariables(), engine, objectMapper);
       String businessKey = parameters.getBusinessKey();
-      if (businessKey != null) {
-        instance = runtimeService.startProcessInstanceById(processDefinitionId, businessKey, variables);
-      } else {
-        instance = runtimeService.startProcessInstanceById(processDefinitionId, variables);
-      }
+      String caseInstanceId = parameters.getCaseInstanceId();
+
+      instance = runtimeService.startProcessInstanceById(processDefinitionId, businessKey, caseInstanceId, variables);
 
     } catch (ProcessEngineException e) {
       String errorMessage = String.format("Cannot instantiate process definition %s: %s", processDefinitionId, e.getMessage());
       throw new RestException(Status.INTERNAL_SERVER_ERROR, e, errorMessage);
 
-    } catch (NumberFormatException e) {
-      String errorMessage = String.format("Cannot instantiate process definition %s due to number format exception: %s", processDefinitionId, e.getMessage());
-      throw new RestException(Status.BAD_REQUEST, e, errorMessage);
-
-    } catch (ParseException e) {
-      String errorMessage = String.format("Cannot instantiate process definition %s due to parse exception: %s", processDefinitionId, e.getMessage());
-      throw new RestException(Status.BAD_REQUEST, e, errorMessage);
-
-    } catch (IllegalArgumentException e) {
+    } catch (RestException e) {
       String errorMessage = String.format("Cannot instantiate process definition %s: %s", processDefinitionId, e.getMessage());
-      throw new RestException(Status.BAD_REQUEST, errorMessage);
+      throw new InvalidRequestException(e.getStatus(), e, errorMessage);
+
     }
 
     ProcessInstanceDto result = ProcessInstanceDto.fromProcessInstance(instance);
 
     URI uri = context.getBaseUriBuilder()
       .path(rootResourcePath)
-      .path(ProcessInstanceRestService.class)
+      .path(ProcessInstanceRestService.PATH)
       .path(instance.getId())
       .build();
 
@@ -130,7 +125,7 @@ public class ProcessDefinitionResourceImpl implements ProcessDefinitionResource 
 
     ProcessInstance instance = null;
     try {
-      Map<String, Object> variables = DtoUtil.toMap(parameters.getVariables());
+      Map<String, Object> variables = VariableValueDto.toMap(parameters.getVariables(), engine, objectMapper);
       String businessKey = parameters.getBusinessKey();
       if (businessKey != null) {
         instance = formService.submitStartForm(processDefinitionId, businessKey, variables);
@@ -142,24 +137,17 @@ public class ProcessDefinitionResourceImpl implements ProcessDefinitionResource 
       String errorMessage = String.format("Cannot instantiate process definition %s: %s", processDefinitionId, e.getMessage());
       throw new RestException(Status.INTERNAL_SERVER_ERROR, e, errorMessage);
 
-    } catch (NumberFormatException e) {
-      String errorMessage = String.format("Cannot instantiate process definition %s due to number format exception: %s", processDefinitionId, e.getMessage());
-      throw new RestException(Status.BAD_REQUEST, e, errorMessage);
-
-    } catch (ParseException e) {
-      String errorMessage = String.format("Cannot instantiate process definition %s due to parse exception: %s", processDefinitionId, e.getMessage());
-      throw new RestException(Status.BAD_REQUEST, e, errorMessage);
-
-    } catch (IllegalArgumentException e) {
+    } catch (RestException e) {
       String errorMessage = String.format("Cannot instantiate process definition %s: %s", processDefinitionId, e.getMessage());
-      throw new RestException(Status.BAD_REQUEST, errorMessage);
+      throw new InvalidRequestException(e.getStatus(), e, errorMessage);
+
     }
 
     ProcessInstanceDto result = ProcessInstanceDto.fromProcessInstance(instance);
 
     URI uri = context.getBaseUriBuilder()
       .path(rootResourcePath)
-      .path(ProcessInstanceRestService.class)
+      .path(ProcessInstanceRestService.PATH)
       .path(instance.getId())
       .build();
 
@@ -267,11 +255,11 @@ public class ProcessDefinitionResourceImpl implements ProcessDefinitionResource 
     }
     FormDto dto = FormDto.fromFormData(formData);
     if(dto.getKey() == null || dto.getKey().isEmpty()) {
-      if(formData.getFormFields() != null && !formData.getFormFields().isEmpty()) {
+      if(formData != null && formData.getFormFields() != null && !formData.getFormFields().isEmpty()) {
         dto.setKey("embedded:engine://engine/:engine/process-definition/"+processDefinitionId+"/rendered-form");
       }
     }
-    dto.setContextPath(ApplicationContextPathUtil.getApplicationPath(engine, processDefinitionId));
+    dto.setContextPath(ApplicationContextPathUtil.getApplicationPathByProcessDefinitionId(engine, processDefinitionId));
 
     return dto;
   }
@@ -296,5 +284,20 @@ public class ProcessDefinitionResourceImpl implements ProcessDefinitionResource 
       String message = String.format("The suspension state of Process Definition with id %s could not be updated due to: %s", processDefinitionId, e.getMessage());
       throw new InvalidRequestException(Status.BAD_REQUEST, e, message);
     }
+  }
+
+  public Map<String, VariableValueDto> getFormVariables(String variableNames, boolean deserializeValues) {
+
+    final FormService formService = engine.getFormService();
+    List<String> formVariables = null;
+
+    if(variableNames != null) {
+      StringListConverter stringListConverter = new StringListConverter();
+      formVariables = stringListConverter.convertQueryParameterToType(variableNames);
+    }
+
+    VariableMap startFormVariables = formService.getStartFormVariables(processDefinitionId, formVariables, deserializeValues);
+
+    return VariableValueDto.fromVariableMap(startFormVariables);
   }
 }

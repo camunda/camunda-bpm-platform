@@ -14,13 +14,13 @@ package org.camunda.bpm.engine.impl;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ExecutionQuery;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 
 /**
@@ -38,6 +38,7 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
   protected String executionId;
   protected String processInstanceId;
   protected List<EventSubscriptionQueryValue> eventSubscriptions;
+  protected boolean hasMessageEventSubscriptions;
   protected SuspensionState suspensionState;
   protected String incidentType;
   protected String incidentId;
@@ -47,6 +48,7 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
   // Not used by end-users, but needed for dynamic ibatis query
   protected String superProcessInstanceId;
   protected String subProcessInstanceId;
+  protected String caseInstanceId;
   private String businessKey;
 
   public ExecutionQueryImpl() {
@@ -65,41 +67,31 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
   }
 
   public ExecutionQueryImpl processDefinitionId(String processDefinitionId) {
-    if (processDefinitionId == null) {
-      throw new ProcessEngineException("Process definition id is null");
-    }
+    ensureNotNull("Process definition id", processDefinitionId);
     this.processDefinitionId = processDefinitionId;
     return this;
   }
 
   public ExecutionQueryImpl processDefinitionKey(String processDefinitionKey) {
-    if (processDefinitionKey == null) {
-      throw new ProcessEngineException("Process definition key is null");
-    }
+    ensureNotNull("Process definition key", processDefinitionKey);
     this.processDefinitionKey = processDefinitionKey;
     return this;
   }
 
   public ExecutionQueryImpl processInstanceId(String processInstanceId) {
-    if (processInstanceId == null) {
-      throw new ProcessEngineException("Process instance id is null");
-    }
+    ensureNotNull("Process instance id", processInstanceId);
     this.processInstanceId = processInstanceId;
     return this;
   }
 
   public ExecutionQuery processInstanceBusinessKey(String businessKey) {
-    if (businessKey == null) {
-      throw new ProcessEngineException("Business key is null");
-    }
+    ensureNotNull("Business key", businessKey);
     this.businessKey = businessKey;
     return this;
   }
 
   public ExecutionQueryImpl executionId(String executionId) {
-    if (executionId == null) {
-      throw new ProcessEngineException("Execution id is null");
-    }
+    ensureNotNull("Execution id", executionId);
     this.executionId = executionId;
     return this;
   }
@@ -121,12 +113,15 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
     return eventSubscription("message", messageName);
   }
 
+  public ExecutionQuery messageEventSubscription() {
+    return eventSubscription("message", null);
+  }
+
   public ExecutionQuery eventSubscription(String eventType, String eventName) {
-    if(eventName == null) {
-      throw new ProcessEngineException("event name is null");
-    }
-    if(eventType == null) {
-      throw new ProcessEngineException("event type is null");
+    ensureNotNull("event type", eventType);
+    if (!"message".equals(eventType)) {
+      // event name is optional for message events
+      ensureNotNull("event name", eventName);
     }
     if(eventSubscriptions == null) {
       eventSubscriptions = new ArrayList<EventSubscriptionQueryValue>();
@@ -156,25 +151,25 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
   }
 
   public ExecutionQuery incidentType(String incidentType) {
-    assertParamNotNull("incident type", incidentType);
+    ensureNotNull("incident type", incidentType);
     this.incidentType = incidentType;
     return this;
   }
 
   public ExecutionQuery incidentId(String incidentId) {
-    assertParamNotNull("incident id", incidentId);
+    ensureNotNull("incident id", incidentId);
     this.incidentId = incidentId;
     return this;
   }
 
   public ExecutionQuery incidentMessage(String incidentMessage) {
-    assertParamNotNull("incident message", incidentMessage);
+    ensureNotNull("incident message", incidentMessage);
     this.incidentMessage = incidentMessage;
     return this;
   }
 
   public ExecutionQuery incidentMessageLike(String incidentMessageLike) {
-    assertParamNotNull("incident messageLike", incidentMessageLike);
+    ensureNotNull("incident messageLike", incidentMessageLike);
     this.incidentMessageLike = incidentMessageLike;
     return this;
   }

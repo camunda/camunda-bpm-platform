@@ -23,7 +23,7 @@ import javax.transaction.TransactionManager;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.cfg.jta.JtaTransactionContextFactory;
-import org.camunda.bpm.engine.impl.cfg.standalone.StandaloneMybatisTransactionContextFactory;
+import org.camunda.bpm.engine.impl.cfg.standalone.StandaloneTransactionContextFactory;
 import org.camunda.bpm.engine.impl.interceptor.CommandContextFactory;
 import org.camunda.bpm.engine.impl.interceptor.CommandContextInterceptor;
 import org.camunda.bpm.engine.impl.interceptor.CommandInterceptor;
@@ -90,7 +90,7 @@ public class JtaProcessEngineConfiguration extends ProcessEngineConfigurationImp
     if(dbSchemaOperationsCommandContextFactory == null) {
       TxContextCommandContextFactory cmdContextFactory = new TxContextCommandContextFactory();
       cmdContextFactory.setProcessEngineConfiguration(this);
-      cmdContextFactory.setTransactionContextFactory(new StandaloneMybatisTransactionContextFactory());
+      cmdContextFactory.setTransactionContextFactory(new StandaloneTransactionContextFactory());
       dbSchemaOperationsCommandContextFactory = cmdContextFactory;
     }
   }

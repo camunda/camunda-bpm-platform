@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.engine.impl.pvm.runtime.operation;
 
+import static org.camunda.bpm.engine.impl.util.ActivityBehaviorUtil.getActivityBehavior;
+
 import java.util.logging.Logger;
 
 import org.camunda.bpm.engine.impl.pvm.PvmException;
@@ -31,13 +33,9 @@ public class PvmAtomicOperationActivityExecute implements PvmAtomicOperation {
   }
 
   public void execute(PvmExecutionImpl execution) {
+    ActivityBehavior activityBehavior = getActivityBehavior(execution);
+
     ActivityImpl activity = execution.getActivity();
-
-    ActivityBehavior activityBehavior = activity.getActivityBehavior();
-    if (activityBehavior==null) {
-      throw new PvmException("no behavior specified in "+activity);
-    }
-
     log.fine(execution+" executes "+activity+": "+activityBehavior.getClass().getName());
 
     try {

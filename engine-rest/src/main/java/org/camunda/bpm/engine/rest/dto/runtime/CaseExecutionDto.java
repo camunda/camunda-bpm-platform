@@ -23,8 +23,15 @@ public class CaseExecutionDto {
 
   protected String id;
   protected String caseInstanceId;
+  protected String caseDefinitionId;
+  protected String activityId;
+  protected String activityName;
+  protected String activityType;
+  protected String activityDescription;
+  protected String parentId;
   protected boolean enabled;
   protected boolean active;
+  protected boolean disabled;
 
   public String getId() {
     return id;
@@ -32,6 +39,30 @@ public class CaseExecutionDto {
 
   public String getCaseInstanceId() {
     return caseInstanceId;
+  }
+
+  public String getCaseDefinitionId() {
+    return caseDefinitionId;
+  }
+
+  public String getActivityId() {
+    return activityId;
+  }
+
+  public String getActivityName() {
+    return activityName;
+  }
+
+  public String getActivityType() {
+    return activityType;
+  }
+
+  public String getActivityDescription() {
+    return activityDescription;
+  }
+
+  public String getParentId() {
+    return parentId;
   }
 
   public boolean isEnabled() {
@@ -42,13 +73,24 @@ public class CaseExecutionDto {
     return active;
   }
 
+  public boolean isDisabled() {
+    return disabled;
+  }
+
   public static CaseExecutionDto fromCaseExecution(CaseExecution caseExecution) {
     CaseExecutionDto dto = new CaseExecutionDto();
 
     dto.id = caseExecution.getId();
     dto.caseInstanceId = caseExecution.getCaseInstanceId();
+    dto.caseDefinitionId = caseExecution.getCaseDefinitionId();
+    dto.activityId = caseExecution.getActivityId();
+    dto.activityName = caseExecution.getActivityName();
+    dto.activityType = caseExecution.getActivityType();
+    dto.activityDescription = caseExecution.getActivityDescription();
+    dto.parentId = caseExecution.getParentId();
     dto.active = caseExecution.isActive();
     dto.enabled = caseExecution.isEnabled();
+    dto.disabled = caseExecution.isDisabled();
 
     return dto;
   }

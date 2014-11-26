@@ -12,13 +12,27 @@
  */
 package org.camunda.bpm.engine;
 
-import org.camunda.bpm.engine.repository.Deployment;
-import org.camunda.bpm.engine.repository.ProcessDefinition;
-import org.camunda.bpm.engine.runtime.*;
-
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+
+import org.camunda.bpm.engine.delegate.ExecutionListener;
+import org.camunda.bpm.engine.repository.Deployment;
+import org.camunda.bpm.engine.repository.ProcessDefinition;
+import org.camunda.bpm.engine.runtime.ActivityInstance;
+import org.camunda.bpm.engine.runtime.EventSubscriptionQuery;
+import org.camunda.bpm.engine.runtime.Execution;
+import org.camunda.bpm.engine.runtime.ExecutionQuery;
+import org.camunda.bpm.engine.runtime.IncidentQuery;
+import org.camunda.bpm.engine.runtime.MessageCorrelationBuilder;
+import org.camunda.bpm.engine.runtime.NativeExecutionQuery;
+import org.camunda.bpm.engine.runtime.NativeProcessInstanceQuery;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
+import org.camunda.bpm.engine.runtime.VariableInstanceQuery;
+import org.camunda.bpm.engine.variable.VariableMap;
+import org.camunda.bpm.engine.variable.value.SerializableValue;
+import org.camunda.bpm.engine.variable.value.TypedValue;
 
 
 /** Service which provides access to {@link Deployment}s,
@@ -63,6 +77,35 @@ public interface RuntimeService {
    */
   ProcessInstance startProcessInstanceByKey(String processDefinitionKey, String businessKey);
 
+  /**
+   * Starts a new process instance in the latest version of the process
+   * definition with the given key.
+   *
+   * A business key can be provided to associate the process instance with a
+   * certain identifier that has a clear business meaning. For example in an
+   * order process, the business key could be an order id. This business key can
+   * then be used to easily look up that process instance , see
+   * {@link ProcessInstanceQuery#processInstanceBusinessKey(String)}. Providing such a business
+   * key is definitely a best practice.
+   *
+   * Note that a business key MUST be unique for the given process definition WHEN you have added
+   * a database constraint for it.
+   * In this case, only Process instance from different process definition are allowed to have the
+   * same business key and the combination of processdefinitionKey-businessKey must be unique.
+   *
+   * @param processDefinitionKey
+   *          key of process definition, cannot be null.
+   * @param businessKey
+   *          a key that uniquely identifies the process instance in the context
+   *          of the given process definition.
+   * @param caseInstanceId
+   *          an id of a case instance to associate the process instance with
+   *          a case instance.
+   * @throws ProcessEngineException
+   *           when no process definition is deployed with the given key.
+   */
+  ProcessInstance startProcessInstanceByKey(String processDefinitionKey, String businessKey, String caseInstanceId);
+
   /** Starts a new process instance in the latest version of the process definition with the given key
    * @param processDefinitionKey key of process definition, cannot be null.
    * @param variables the variables to pass, can be null.
@@ -94,6 +137,33 @@ public interface RuntimeService {
    */
   ProcessInstance startProcessInstanceByKey(String processDefinitionKey, String businessKey, Map<String, Object> variables);
 
+  /**
+   * Starts a new process instance in the latest version of the process definition with the given key.
+   *
+   * A business key can be provided to associate the process instance with a
+   * certain identifier that has a clear business meaning. For example in an
+   * order process, the business key could be an order id. This business key can
+   * then be used to easily look up that process instance , see
+   * {@link ProcessInstanceQuery#processInstanceBusinessKey(String)}. Providing such a business
+   * key is definitely a best practice.
+   *
+   * Note that a business key MUST be unique for the given process definition WHEN you have added a
+   * database constraint for it.
+   * In this case, only Process instance from different process definition are allowed to have the
+   * same business key and the combination of processdefinitionKey-businessKey must be unique.
+   *
+   * The combination of processdefinitionKey-businessKey must be unique.
+   * @param processDefinitionKey key of process definition, cannot be null.
+   * @param variables the variables to pass, can be null.
+   * @param businessKey a key that uniquely identifies the process instance in the context of the
+   *                    given process definition.
+   * @param caseInstanceId
+   *          an id of a case instance to associate the process instance with
+   *          a case instance.
+   * @throws ProcessEngineException when no process definition is deployed with the given key.
+   */
+  ProcessInstance startProcessInstanceByKey(String processDefinitionKey, String businessKey, String caseInstanceId, Map<String, Object> variables);
+
   /** Starts a new process instance in the exactly specified version of the process definition with the given id.
    * @param processDefinitionId the id of the process definition, cannot be null.
    * @throws ProcessEngineException when no process definition is deployed with the given key.
@@ -121,6 +191,31 @@ public interface RuntimeService {
    * @throws ProcessEngineException when no process definition is deployed with the given key.
    */
   ProcessInstance startProcessInstanceById(String processDefinitionId, String businessKey);
+
+  /**
+   * Starts a new process instance in the exactly specified version of the process definition with the given id.
+   *
+   * A business key can be provided to associate the process instance with a
+   * certain identifier that has a clear business meaning. For example in an
+   * order process, the business key could be an order id. This business key can
+   * then be used to easily look up that process instance , see
+   * {@link ProcessInstanceQuery#processInstanceBusinessKey(String)}. Providing such a business
+   * key is definitely a best practice.
+   *
+   * Note that a business key MUST be unique for the given process definition WHEN you have added
+   * a database constraint for it.
+   * In this case, only Process instance from different process definition are allowed to have the
+   * same business key and the combination of processdefinitionKey-businessKey must be unique.
+   *
+   * @param processDefinitionId the id of the process definition, cannot be null.
+   * @param businessKey a key that uniquely identifies the process instance in the context of the
+   *                    given process definition.
+   * @param caseInstanceId
+   *          an id of a case instance to associate the process instance with
+   *          a case instance.
+   * @throws ProcessEngineException when no process definition is deployed with the given key.
+   */
+  ProcessInstance startProcessInstanceById(String processDefinitionId, String businessKey, String caseInstanceId);
 
   /** Starts a new process instance in the exactly specified version of the process definition with the given id.
    * @param processDefinitionId the id of the process definition, cannot be null.
@@ -151,6 +246,32 @@ public interface RuntimeService {
    * @throws ProcessEngineException when no process definition is deployed with the given key.
    */
   ProcessInstance startProcessInstanceById(String processDefinitionId, String businessKey, Map<String, Object> variables);
+
+  /**
+   * Starts a new process instance in the exactly specified version of the process definition with the given id.
+   *
+   * A business key can be provided to associate the process instance with a
+   * certain identifier that has a clear business meaning. For example in an
+   * order process, the business key could be an order id. This business key can
+   * then be used to easily look up that process instance , see
+   * {@link ProcessInstanceQuery#processInstanceBusinessKey(String)}. Providing such a business
+   * key is definitely a best practice.
+   *
+   * Note that a business key MUST be unique for the given process definition WHEN you have added
+   * a database constraint for it.
+   * In this case, only Process instance from different process definition are allowed to have the
+   * same business key and the combination of processdefinitionKey-businessKey must be unique.
+   *
+   * @param processDefinitionId the id of the process definition, cannot be null.
+   * @param businessKey a key that uniquely identifies the process instance in the context of the
+   *                    given process definition.
+   * @param caseInstanceId
+   *          an id of a case instance to associate the process instance with
+   *          a case instance.
+   * @param variables variables to be passed, can be null
+   * @throws ProcessEngineException when no process definition is deployed with the given key.
+   */
+  ProcessInstance startProcessInstanceById(String processDefinitionId, String businessKey, String caseInstanceId, Map<String, Object> variables);
 
   /**
    * <p>Signals the process engine that a message is received and starts a new
@@ -246,6 +367,15 @@ public interface RuntimeService {
    * @throws BadUserRequestException when no process instance is found with the given id or id is null.
    */
   void deleteProcessInstance(String processInstanceId, String deleteReason);
+
+  /** Delete an existing runtime process instance.
+   * @param processInstanceId id of process instance to delete, cannot be null.
+   * @param deleteReason reason for deleting, which will be stored in the history. Can be null.
+   * @param skipCustomListeners if true, only the built-in {@link ExecutionListener}s
+   * are notified with the {@link ExecutionListener#EVENTNAME_END} event.
+   * @throws BadUserRequestException when no process instance is found with the given id or id is null.
+   */
+  void deleteProcessInstance(String processInstanceId, String deleteReason, boolean skipCustomListeners);
 
   /** Finds the activity ids for all executions that are waiting in activities.
    * This is a list because a single activity can be active multiple times.
@@ -344,27 +474,78 @@ public interface RuntimeService {
    * @throws ProcessEngineException when no execution is found for the given executionId. */
   Map<String, Object> getVariables(String executionId);
 
+  /** All variables visible from the given execution scope (including parent scopes).
+   * @param executionId id of process instance or execution, cannot be null.
+   * @return the variables or an empty map if no such variables are found.
+   * @throws ProcessEngineException when no execution is found for the given executionId.
+   * @since 7.2 */
+  VariableMap getVariablesTyped(String executionId);
+
+  /** All variables visible from the given execution scope (including parent scopes).
+   * @param executionId id of process instance or execution, cannot be null.
+   * @param deserializeValues if false, {@link SerializableValue}s will not be deserialized
+   * @return the variables or an empty map if no such variables are found.
+   * @throws ProcessEngineException when no execution is found for the given executionId.
+   * @since 7.2 */
+  VariableMap getVariablesTyped(String executionId, boolean deserializeValues);
+
   /** All variable values that are defined in the execution scope, without taking outer scopes into account.
    * If you have many task local variables and you only need a few, consider using {@link #getVariablesLocal(String, Collection)}
    * for better performance.
    * @param executionId id of execution, cannot be null.
    * @return the variables or an empty map if no such variables are found.
    * @throws ProcessEngineException when no execution is found for the given executionId. */
-   Map<String, Object> getVariablesLocal(String executionId);
+  Map<String, Object> getVariablesLocal(String executionId);
+
+  /** All variable values that are defined in the execution scope, without taking outer scopes into account.
+   * If you have many task local variables and you only need a few, consider using {@link #getVariablesLocal(String, Collection)}
+   * for better performance.
+   * @param executionId id of execution, cannot be null.
+   * @return the variables or an empty map if no such variables are found.
+   * @throws ProcessEngineException when no execution is found for the given executionId. */
+  VariableMap getVariablesLocalTyped(String executionId);
+
+  /** All variable values that are defined in the execution scope, without taking outer scopes into account.
+   * If you have many task local variables and you only need a few, consider using {@link #getVariablesLocal(String, Collection)}
+   * for better performance.
+   * @param executionId id of execution, cannot be null.
+   * @param deserializeObjectValues if false, {@link SerializableValue}s will not be deserialized
+   * @return the variables or an empty map if no such variables are found.
+   * @throws ProcessEngineException when no execution is found for the given executionId.
+   * @since 7.2 */
+  VariableMap getVariablesLocalTyped(String executionId, boolean deserializeValues);
 
    /** The variable values for all given variableNames, takes all variables into account which are visible from the given execution scope (including parent scopes).
    * @param executionId id of process instance or execution, cannot be null.
    * @param variableNames the collection of variable names that should be retrieved.
    * @return the variables or an empty map if no such variables are found.
    * @throws ProcessEngineException when no execution is found for the given executionId. */
-   Map<String, Object> getVariables(String executionId, Collection<String> variableNames);
+  Map<String,Object> getVariables(String executionId, Collection<String> variableNames);
+
+  /** The variable values for all given variableNames, takes all variables into account which are visible from the given execution scope (including parent scopes).
+  * @param executionId id of process instance or execution, cannot be null.
+  * @param variableNames the collection of variable names that should be retrieved.
+  * @param deserializeObjectValues if false, {@link SerializableValue}s will not be deserialized
+  * @return the variables or an empty map if no such variables are found.
+  * @throws ProcessEngineException when no execution is found for the given executionId.
+  * @since 7.2 */
+  VariableMap getVariablesTyped(String executionId, Collection<String> variableNames, boolean deserializeValues);
 
    /** The variable values for the given variableNames only taking the given execution scope into account, not looking in outer scopes.
    * @param executionId id of execution, cannot be null.
    * @param variableNames the collection of variable names that should be retrieved.
    * @return the variables or an empty map if no such variables are found.
    * @throws ProcessEngineException when no execution is found for the given executionId.  */
-   Map<String, Object> getVariablesLocal(String executionId, Collection<String> variableNames);
+  Map<String,Object> getVariablesLocal(String executionId, Collection<String> variableNames);
+
+  /** The variable values for the given variableNames only taking the given execution scope into account, not looking in outer scopes.
+  * @param executionId id of execution, cannot be null.
+  * @param variableNames the collection of variable names that should be retrieved.
+  * @param deserializeObjectValues if false, {@link SerializableValue}s will not be deserialized
+  * @return the variables or an empty map if no such variables are found.
+  * @throws ProcessEngineException when no execution is found for the given executionId.
+  * @since 7.2 */
+  VariableMap getVariablesLocalTyped(String executionId, Collection<String> variableNames, boolean deserializeValues);
 
   /** The variable value.  Searching for the variable is done in all scopes that are visible to the given execution (including parent scopes).
    * Returns null when no variable value is found with the given name or when the value is set to null.
@@ -374,11 +555,54 @@ public interface RuntimeService {
    * @throws ProcessEngineException when no execution is found for the given executionId. */
   Object getVariable(String executionId, String variableName);
 
+  /** Returns a {@link TypedValue} for the variable. Searching for the variable is done in all scopes that are visible
+   * to the given execution (including parent scopes). Returns null when no variable value is found with the given name.
+   *
+   * @param executionId id of process instance or execution, cannot be null.
+   * @param variableName name of variable, cannot be null.
+   * @return the variable value or null if the variable is undefined.
+   * @throws ProcessEngineException when no execution is found for the given executionId.
+   * @since 7.2 */
+  <T extends TypedValue> T getVariableTyped(String executionId, String variableName);
+
+  /** Returns a {@link TypedValue} for the variable. Searching for the variable is done in all scopes that are visible
+   * to the given execution (including parent scopes). Returns null when no variable value is found with the given name.
+   *
+   * @param executionId id of process instance or execution, cannot be null.
+   * @param variableName name of variable, cannot be null.
+   * @param deserializeValue if false, a {@link SerializableValue} will not be deserialized
+   * @return the variable value or null if the variable is undefined.
+   * @throws ProcessEngineException when no execution is found for the given executionId.
+   * @since 7.2 */
+  <T extends TypedValue> T getVariableTyped(String executionId, String variableName, boolean deserializeValue);
+
   /** The variable value for an execution. Returns the value when the variable is set
    * for the execution (and not searching parent scopes). Returns null when no variable value is found with the given name or when the value is set to null.  */
   Object getVariableLocal(String executionId, String variableName);
 
-  /** Update or create a variable for an execution.  If the variable is not already existing somewhere in the execution hierarchy,
+  /** Returns a {@link TypedValue} for the variable. Returns the value when the variable is set
+   * for the execution (and not searching parent scopes). Returns null when no variable value is found with the given name.
+   *
+   * @param executionId id of process instance or execution, cannot be null.
+   * @param variableName name of variable, cannot be null.
+   * @return the variable value or null if the variable is undefined.
+   * @throws ProcessEngineException when no execution is found for the given executionId.
+   * @since 7.2 */
+  <T extends TypedValue> T getVariableLocalTyped(String executionId, String variableName);
+
+  /** Returns a {@link TypedValue} for the variable. Searching for the variable is done in all scopes that are visible
+   * to the given execution (including parent scopes). Returns null when no variable value is found with the given name.
+   *
+   * @param executionId id of process instance or execution, cannot be null.
+   * @param variableName name of variable, cannot be null.
+   * @param deserializeValue if false, a {@link SerializableValue} will not be deserialized
+   * @return the variable value or null if the variable is undefined.
+   * @throws ProcessEngineException when no execution is found for the given executionId.
+   * @since 7.2 */
+  <T extends TypedValue> T getVariableLocalTyped(String executionId, String variableName, boolean deserializeValue);
+
+  /** Update or create a variable for an execution.  If the variable does not already exist
+   * somewhere in the execution hierarchy (i.e. the specified execution or any ancestor),
    * it will be created in the process instance (which is the root execution).
    * @param executionId id of process instance or execution to set variable in, cannot be null.
    * @param variableName name of variable to set, cannot be null.
@@ -389,7 +613,7 @@ public interface RuntimeService {
   void setVariable(String executionId, String variableName, Object value);
 
   /** Update or create a variable for an execution (not considering parent scopes).
-   * If the variable is not already existing, it will be created in the given execution.
+   * If the variable does not already exist, it will be created in the given execution.
    * @param executionId id of execution to set variable in, cannot be null.
    * @param variableName name of variable to set, cannot be null.
    * @param value value to set. When null is passed, the variable is not removed,
@@ -711,6 +935,7 @@ public interface RuntimeService {
    *
    * @param messageName the name of the message. Corresponds to the 'name' element
    * of the message defined in BPMN 2.0 Xml.
+   * Can be null to correlate by other criteria (businessKey, processInstanceId, correlationKeys) only.
    *
    * @return the fluent builder for defining the message correlation.
    */
@@ -723,7 +948,7 @@ public interface RuntimeService {
    * Notification and instantiation happen synchronously.
    *
    * @param messageName
-   *          the name of the message event
+   *          the name of the message event; if null, matches any event
    * @throws MismatchingMessageCorrelationException if none or more than one execution or process definition is correlated
    * @throws ProcessEngineException if messageName is null
    */
@@ -733,21 +958,21 @@ public interface RuntimeService {
    * Correlates a message to
    * <ul>
    *  <li>
-   *    an execution that is waiting for this message and belongs to a process instance with the given business key
+   *    an execution that is waiting for a matching message and belongs to a process instance with the given business key
    *  </li>
    *  <li>
-   *    a process definition that can be started by this message.
+   *    a process definition that can be started by a matching message.
    *  </li>
    * </ul>
    *
    * Notification and instantiation happen synchronously.
    *
    * @param messageName
-   *          the name of the message event
+   *          the name of the message event; if null, matches any event
    * @param businessKey
    *          the business key of process instances to correlate against
    * @throws MismatchingMessageCorrelationException if none or more than one execution or process definition is correlated
-   * @throws ProcessEngineException if messageName is null
+   * @throws ProcessEngineException if messageName is null and businessKey is null
    */
   void correlateMessage(String messageName, String businessKey);
 
@@ -755,22 +980,22 @@ public interface RuntimeService {
    * Correlates a message to
    * <ul>
    *  <li>
-   *    an execution that is waiting for this message and can be correlated according
+   *    an execution that is waiting for a matching message and can be correlated according
    *    to the given correlation keys. This is typically matched against process instance variables.
    *  </li>
    *  <li>
-   *    a process definition that can be started by this message.
+   *    a process definition that can be started by message with the provided name.
    *  </li>
    * </ul>
    *
    * Notification and instantiation happen synchronously.
    *
    * @param messageName
-   *          the name of the message event
+   *          the name of the message event; if null, matches any event
    * @param correlationKeys
    *          a map of key value pairs that are used to correlate the message to an execution
    * @throws MismatchingMessageCorrelationException if none or more than one execution or process definition is correlated
-   * @throws ProcessEngineException if messageName is null
+   * @throws ProcessEngineException if messageName is null and correlationKeys is null
    */
   void correlateMessage(String messageName, Map<String, Object> correlationKeys);
 
@@ -778,7 +1003,7 @@ public interface RuntimeService {
    * Correlates a message to
    * <ul>
    *  <li>
-   *    an execution that is waiting for this message and belongs to a process instance with the given business key
+   *    an execution that is waiting for a matching message and belongs to a process instance with the given business key
    *  </li>
    *  <li>
    *    a process definition that can be started by this message.
@@ -789,13 +1014,13 @@ public interface RuntimeService {
    * Notification and instantiation happen synchronously.
    *
    * @param messageName
-   *          the name of the message event
+   *          the name of the message event; if null, matches any event
    * @param businessKey
    *          the business key of process instances to correlate against
    * @param processVariables
    *          a map of variables added to the execution or newly created process instance
    * @throws MismatchingMessageCorrelationException if none or more than one execution or process definition is correlated
-   * @throws ProcessEngineException if messageName is null
+   * @throws ProcessEngineException if messageName is null and businessKey is null
    */
   void correlateMessage(String messageName, String businessKey, Map<String, Object> processVariables);
 
@@ -803,7 +1028,7 @@ public interface RuntimeService {
    * Correlates a message to
    * <ul>
    *  <li>
-   *    an execution that is waiting for this message and can be correlated according
+   *    an execution that is waiting for a matching message and can be correlated according
    *    to the given correlation keys. This is typically matched against process instance variables.
    *  </li>
    *  <li>
@@ -815,13 +1040,13 @@ public interface RuntimeService {
    * Notification and instantiation happen synchronously.
    *
    * @param messageName
-   *          the name of the message event
+   *          the name of the message event; if null, matches any event
    * @param correlationKeys
    *          a map of key value pairs that are used to correlate the message to an execution
    * @param processVariables
    *          a map of variables added to the execution or newly created process instance
    * @throws MismatchingMessageCorrelationException if none or more than one execution or process definition is correlated
-   * @throws ProcessEngineException if messageName is null
+   * @throws ProcessEngineException if messageName is null and correlationKeys is null
    */
   void correlateMessage(String messageName, Map<String, Object> correlationKeys, Map<String, Object> processVariables);
 
@@ -829,7 +1054,7 @@ public interface RuntimeService {
    * Correlates a message to
    * <ul>
    *  <li>
-   *    an execution that is waiting for this message and can be correlated according
+   *    an execution that is waiting for a matching message and can be correlated according
    *    to the given correlation keys. This is typically matched against process instance variables.
    *    The process instance it belongs to has to have the given business key.
    *  </li>
@@ -842,7 +1067,7 @@ public interface RuntimeService {
    * Notification and instantiation happen synchronously.
    *
    * @param messageName
-   *          the name of the message event
+   *          the name of the message event; if null, matches any event
    * @param businessKey
    *          the business key of process instances to correlate against
    * @param correlationKeys
@@ -850,7 +1075,7 @@ public interface RuntimeService {
    * @param processVariables
    *          a map of variables added to the execution or newly created process instance
    * @throws MismatchingMessageCorrelationException if none or more than one execution or process definition is correlated
-   * @throws ProcessEngineException if messageName is null
+   * @throws ProcessEngineException if messageName is null and businessKey is null and correlationKeys is null
    */
   void correlateMessage(String messageName, String businessKey, Map<String, Object> correlationKeys, Map<String, Object> processVariables);
 }

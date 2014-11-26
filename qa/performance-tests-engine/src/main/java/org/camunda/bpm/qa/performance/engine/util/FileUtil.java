@@ -20,22 +20,25 @@ import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.qa.performance.engine.framework.PerfTestException;
 
 /**
- * @author Daniel Meyer
+ * @author Daniel Meyer, Ingo Richtsmeier
  *
  */
 public class FileUtil {
 
   public static void writeStringToFile(String value, String filePath) {
+    writeStringToFile(value, filePath, true);
+  }
+
+  public static void writeStringToFile(String value, String filePath, boolean deleteFile) {
 
     BufferedOutputStream outputStream = null;
     try {
       File file = new File(filePath);
-      if (file.exists()) {
+      if (file.exists() && deleteFile) {
         file.delete();
       }
-      file.createNewFile();
 
-      outputStream = new BufferedOutputStream(new FileOutputStream(file));
+      outputStream = new BufferedOutputStream(new FileOutputStream(file, true));
       outputStream.write(value.getBytes());
       outputStream.flush();
 
@@ -45,6 +48,10 @@ public class FileUtil {
       IoUtil.closeSilently(outputStream);
     }
 
+  }
+  
+  public static void appendStringToFile(String value, String filePath) {
+    writeStringToFile(value, filePath, false);
   }
 
 }

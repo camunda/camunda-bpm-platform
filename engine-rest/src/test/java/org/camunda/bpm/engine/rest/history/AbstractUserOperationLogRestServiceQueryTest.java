@@ -12,22 +12,12 @@
  */
 package org.camunda.bpm.engine.rest.history;
 
-import static com.jayway.restassured.RestAssured.expect;
-import static com.jayway.restassured.RestAssured.given;
-import static com.jayway.restassured.path.json.JsonPath.from;
-import static org.camunda.bpm.engine.history.UserOperationLogEntry.ENTITY_TYPE_TASK;
-import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_CLAIM;
-import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.*;
-
-import javax.ws.rs.core.Response.Status;
-import javax.xml.registry.InvalidRequestException;
-import java.util.Date;
-import java.util.List;
-
 import com.jayway.restassured.http.ContentType;
 import com.jayway.restassured.response.Response;
+import java.util.Date;
+import java.util.List;
+import javax.ws.rs.core.Response.Status;
+import javax.xml.registry.InvalidRequestException;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.history.UserOperationLogQuery;
 import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
@@ -36,6 +26,21 @@ import org.camunda.bpm.engine.rest.dto.history.UserOperationLogEntryDto;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.junit.Before;
 import org.junit.Test;
+
+import static com.jayway.restassured.RestAssured.expect;
+import static com.jayway.restassured.RestAssured.given;
+import static com.jayway.restassured.path.json.JsonPath.from;
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.ENTITY_TYPE_TASK;
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_CLAIM;
+import static org.hamcrest.Matchers.equalTo;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * @author Danny Gräf
@@ -73,8 +78,12 @@ public abstract class AbstractUserOperationLogRestServiceQueryTest extends Abstr
         .when().get(USER_OPERATION_LOG_RESOURCE_URL);
 
     verify(queryMock, never()).processDefinitionId(anyString());
+    verify(queryMock, never()).processDefinitionKey(anyString());
     verify(queryMock, never()).processInstanceId(anyString());
     verify(queryMock, never()).executionId(anyString());
+    verify(queryMock, never()).caseDefinitionId(anyString());
+    verify(queryMock, never()).caseInstanceId(anyString());
+    verify(queryMock, never()).caseExecutionId(anyString());
     verify(queryMock, never()).taskId(anyString());
     verify(queryMock, never()).userId(anyString());
     verify(queryMock, never()).operationId(anyString());
@@ -93,8 +102,12 @@ public abstract class AbstractUserOperationLogRestServiceQueryTest extends Abstr
   public void testQueryParameter() {
     Response response = given()
         .queryParam("processDefinitionId", "1")
+        .queryParam("processDefinitionKey", "6")
         .queryParam("processInstanceId", "2")
         .queryParam("executionId", "3")
+        .queryParam("caseDefinitionId", "x")
+        .queryParam("caseInstanceId", "y")
+        .queryParam("caseExecutionId", "z")
         .queryParam("taskId", "4")
         .queryParam("userId", "icke")
         .queryParam("operationId", "5")
@@ -105,8 +118,12 @@ public abstract class AbstractUserOperationLogRestServiceQueryTest extends Abstr
         .when().get(USER_OPERATION_LOG_RESOURCE_URL);
 
     verify(queryMock).processDefinitionId("1");
+    verify(queryMock).processDefinitionKey("6");
     verify(queryMock).processInstanceId("2");
     verify(queryMock).executionId("3");
+    verify(queryMock).caseDefinitionId("x");
+    verify(queryMock).caseInstanceId("y");
+    verify(queryMock).caseExecutionId("z");
     verify(queryMock).taskId("4");
     verify(queryMock).userId("icke");
     verify(queryMock).operationId("5");
@@ -119,8 +136,12 @@ public abstract class AbstractUserOperationLogRestServiceQueryTest extends Abstr
     UserOperationLogEntryDto actual = from(json).getObject("[0]", UserOperationLogEntryDto.class);
     assertEquals(MockProvider.EXAMPLE_USER_OPERATION_LOG_ID, actual.getId());
     assertEquals(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID, actual.getProcessDefinitionId());
+    assertEquals(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY, actual.getProcessDefinitionKey());
     assertEquals(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID, actual.getProcessInstanceId());
     assertEquals(MockProvider.EXAMPLE_EXECUTION_ID, actual.getExecutionId());
+    assertEquals(MockProvider.EXAMPLE_CASE_DEFINITION_ID, actual.getCaseDefinitionId());
+    assertEquals(MockProvider.EXAMPLE_CASE_INSTANCE_ID, actual.getCaseInstanceId());
+    assertEquals(MockProvider.EXAMPLE_CASE_EXECUTION_ID, actual.getCaseExecutionId());
     assertEquals(MockProvider.EXAMPLE_TASK_ID, actual.getTaskId());
     assertEquals(MockProvider.EXAMPLE_USER_ID, actual.getUserId());
     assertEquals(MockProvider.EXAMPLE_USER_OPERATION_TIMESTAMP, from(json).getString("[0].timestamp"));
@@ -137,7 +158,7 @@ public abstract class AbstractUserOperationLogRestServiceQueryTest extends Abstr
     given().queryParam("afterTimestamp", MockProvider.EXAMPLE_USER_OPERATION_TIMESTAMP)
         .expect().statusCode(Status.OK.getStatusCode())
         .when().get(USER_OPERATION_LOG_RESOURCE_URL);
-    verify(queryMock).afterTimestamp(DateTimeUtil.parseDateTime(MockProvider.EXAMPLE_USER_OPERATION_TIMESTAMP).toDate());
+    verify(queryMock).afterTimestamp(DateTimeUtil.parseDate(MockProvider.EXAMPLE_USER_OPERATION_TIMESTAMP));
   }
 
   @Test
@@ -145,7 +166,7 @@ public abstract class AbstractUserOperationLogRestServiceQueryTest extends Abstr
     given().queryParam("beforeTimestamp", MockProvider.EXAMPLE_USER_OPERATION_TIMESTAMP)
         .expect().statusCode(Status.OK.getStatusCode())
         .when().get(USER_OPERATION_LOG_RESOURCE_URL);
-    verify(queryMock).beforeTimestamp(DateTimeUtil.parseDateTime(MockProvider.EXAMPLE_USER_OPERATION_TIMESTAMP).toDate());
+    verify(queryMock).beforeTimestamp(DateTimeUtil.parseDate(MockProvider.EXAMPLE_USER_OPERATION_TIMESTAMP));
   }
 
   @Test

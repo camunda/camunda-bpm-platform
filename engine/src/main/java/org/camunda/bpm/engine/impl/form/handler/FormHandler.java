@@ -13,13 +13,12 @@
 
 package org.camunda.bpm.engine.impl.form.handler;
 
-import java.util.Map;
-
+import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.persistence.entity.DeploymentEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.util.xml.Element;
+import org.camunda.bpm.engine.variable.VariableMap;
 
 
 /**
@@ -27,9 +26,7 @@ import org.camunda.bpm.engine.impl.util.xml.Element;
  */
 public interface FormHandler {
 
-  ThreadLocal<FormHandler> current = new ThreadLocal<FormHandler>();
-
   void parseConfiguration(Element activityElement, DeploymentEntity deployment, ProcessDefinitionEntity processDefinition, BpmnParse bpmnParse);
 
-  void submitFormProperties(Map<String, Object> properties, ExecutionEntity execution);
+  void submitFormVariables(VariableMap properties, VariableScope variableScope);
 }

@@ -12,14 +12,14 @@
  */
 package org.camunda.bpm.engine.impl.core.instance;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.camunda.bpm.engine.delegate.BaseDelegateExecution;
 import org.camunda.bpm.engine.delegate.DelegateListener;
 import org.camunda.bpm.engine.impl.core.model.CoreModelElement;
 import org.camunda.bpm.engine.impl.core.operation.CoreAtomicOperation;
-import org.camunda.bpm.engine.impl.core.variable.CoreVariableScope;
-
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
 
 /**
  * Defines the base API for the execution of an activity.
@@ -29,7 +29,7 @@ import java.util.logging.Logger;
  * @author Sebastian Menski
  *
  */
-public abstract class CoreExecution extends CoreVariableScope implements BaseDelegateExecution {
+public abstract class CoreExecution extends AbstractVariableScope implements BaseDelegateExecution {
 
   private static final long serialVersionUID = 1L;
 
@@ -47,6 +47,7 @@ public abstract class CoreExecution extends CoreVariableScope implements BaseDel
   protected String eventName;
   protected CoreModelElement eventSource;
   protected int listenerIndex = 0;
+  protected boolean skipCustomListeners;
 
   // atomic operations ////////////////////////////////////////////////////////
 
@@ -113,4 +114,13 @@ public abstract class CoreExecution extends CoreVariableScope implements BaseDel
   public void setBusinessKey(String businessKey) {
     this.businessKey = businessKey;
   }
+
+  public boolean isSkipCustomListeners() {
+    return skipCustomListeners;
+  }
+
+  public void setSkipCustomListeners(boolean skipCustomListeners) {
+    this.skipCustomListeners = skipCustomListeners;
+  }
+
 }

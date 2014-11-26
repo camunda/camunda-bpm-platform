@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions" 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:camunda="http://activiti.org/bpmn"
+  targetNamespace="Examples">
+
+  <process id="process">
+
+    <startEvent id="theStart" />
+
+    <sequenceFlow sourceRef="theStart" targetRef="serviceTask1" />
+
+    <serviceTask id="serviceTask1" camunda:class="org.camunda.bpm.engine.test.history.IncrementVariableService" />
+
+    <sequenceFlow sourceRef="serviceTask1" targetRef="serviceTask2" />
+
+    <serviceTask id="serviceTask2" camunda:class="org.camunda.bpm.engine.test.history.IncrementVariableService" camunda:async="true" />
+
+    <sequenceFlow sourceRef="serviceTask2" targetRef="serviceTask3" />
+
+    <serviceTask id="serviceTask3" camunda:class="org.camunda.bpm.engine.test.history.IncrementVariableService" camunda:async="true" />
+
+    <sequenceFlow sourceRef="serviceTask3" targetRef="end1" />
+
+    <endEvent id="end1" />
+
+  </process>
+
+</definitions>

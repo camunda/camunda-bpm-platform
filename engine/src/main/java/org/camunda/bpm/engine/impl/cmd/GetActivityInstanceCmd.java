@@ -12,7 +12,7 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
-import org.camunda.bpm.engine.ProcessEngineException;
+import java.util.*;
 import org.camunda.bpm.engine.impl.ExecutionQueryImpl;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -25,7 +25,7 @@ import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.TransitionInstance;
 
-import java.util.*;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 /**
  * @author Daniel Meyer
@@ -45,13 +45,11 @@ public class GetActivityInstanceCmd implements Command<ActivityInstance> {
   @SuppressWarnings({ "unchecked", "rawtypes" })
   public ActivityInstance execute(CommandContext commandContext) {
 
-    if(processInstanceId == null) {
-      throw new ProcessEngineException("processInstanceId cannot be null");
-    }
+    ensureNotNull("processInstanceId", processInstanceId);
 
     List<ExecutionEntity> executionList = loadProcessInstance(processInstanceId, commandContext);
 
-    if(executionList.isEmpty()) {
+    if (executionList.isEmpty()) {
       return null;
     }
 
@@ -60,12 +58,12 @@ public class GetActivityInstanceCmd implements Command<ActivityInstance> {
     // find process instance && index executions by parentActivityInstanceId
     Map<String, List<ExecutionEntity>> executionsByParentActIds = new HashMap<String, List<ExecutionEntity>>();
     for (ExecutionEntity executionEntity : executionList) {
-      if(executionEntity.isProcessInstanceExecution()) {
+      if (executionEntity.isProcessInstanceExecution()) {
         processInstance = executionEntity;
       }
       String parentActivityInstanceId = executionEntity.getParentActivityInstanceId();
       List<ExecutionEntity> exeForThisParentActInst = executionsByParentActIds.get(parentActivityInstanceId);
-      if(exeForThisParentActInst == null) {
+      if (exeForThisParentActInst == null) {
         exeForThisParentActInst = new ArrayList<ExecutionEntity>();
         executionsByParentActIds.put(parentActivityInstanceId, exeForThisParentActInst);
       }
@@ -97,7 +95,7 @@ public class GetActivityInstanceCmd implements Command<ActivityInstance> {
 
     // first try to load from cache
     // check whether the process instance is already (partially) loaded in command context
-    List<ExecutionEntity> cachedExecutions = commandContext.getDbSqlSession().findInCache(ExecutionEntity.class);
+    List<ExecutionEntity> cachedExecutions = commandContext.getDbEntityManager().getCachedEntitiesByType(ExecutionEntity.class);
     for (ExecutionEntity executionEntity : cachedExecutions) {
       if(processInstanceId.equals(executionEntity.getProcessInstanceId())) {
         // found one execution from process instance

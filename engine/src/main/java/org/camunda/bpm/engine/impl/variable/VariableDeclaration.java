@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -22,10 +22,11 @@ import org.camunda.bpm.engine.delegate.VariableScope;
 /**
  * @author Tom Baeyens
  */
+@Deprecated
 public class VariableDeclaration implements Serializable {
 
   private static final long serialVersionUID = 1L;
-  
+
   protected String name;
   protected String type;
   protected String sourceVariableName;
@@ -34,25 +35,25 @@ public class VariableDeclaration implements Serializable {
   protected Expression destinationExpression;
   protected String link;
   protected Expression linkExpression;
-  
+
 
   public void initialize(VariableScope innerScopeInstance, VariableScope outerScopeInstance) {
     if (sourceVariableName!=null) {
       if (outerScopeInstance.hasVariable(sourceVariableName)) {
         Object value = outerScopeInstance.getVariable(sourceVariableName);
-        innerScopeInstance.setVariable(destinationVariableName, value);      
+        innerScopeInstance.setVariable(destinationVariableName, value);
       } else {
-        throw new ProcessEngineException("Couldn't create variable '" 
+        throw new ProcessEngineException("Couldn't create variable '"
                 + destinationVariableName + "', since the source variable '"
                 + sourceVariableName + "does not exist");
       }
     }
-    
+
     if (sourceExpression!=null) {
       Object value = sourceExpression.getValue(outerScopeInstance);
       innerScopeInstance.setVariable(destinationVariableName, value);
     }
-    
+
     if (link!=null) {
       if (outerScopeInstance.hasVariable(sourceVariableName)) {
         Object value = outerScopeInstance.getVariable(sourceVariableName);
@@ -69,9 +70,9 @@ public class VariableDeclaration implements Serializable {
     }
 
   }
-  
+
   public void destroy(VariableScope innerScopeInstance, VariableScope outerScopeInstance) {
-    
+
     if (destinationVariableName!=null) {
       if (innerScopeInstance.hasVariable(sourceVariableName)) {
         Object value = innerScopeInstance.getVariable(sourceVariableName);
@@ -85,7 +86,7 @@ public class VariableDeclaration implements Serializable {
       Object value = destinationExpression.getValue(innerScopeInstance);
       outerScopeInstance.setVariable(destinationVariableName, value);
     }
-    
+
     if (link!=null) {
       if (innerScopeInstance.hasVariable(sourceVariableName)) {
         Object value = innerScopeInstance.getVariable(sourceVariableName);
@@ -100,7 +101,7 @@ public class VariableDeclaration implements Serializable {
       outerScopeInstance.setVariable(destinationVariableName, value);
     }
   }
-  
+
   public VariableDeclaration(String name, String type) {
     this.name = name;
     this.type = type;
@@ -118,19 +119,19 @@ public class VariableDeclaration implements Serializable {
   public void setName(String name) {
     this.name = name;
   }
-  
+
   public String getType() {
     return type;
   }
-  
+
   public void setType(String type) {
     this.type = type;
   }
-  
+
   public String getSourceVariableName() {
     return sourceVariableName;
   }
-  
+
   public void setSourceVariableName(String sourceVariableName) {
     this.sourceVariableName = sourceVariableName;
   }
@@ -138,15 +139,15 @@ public class VariableDeclaration implements Serializable {
   public Expression getSourceExpression() {
     return sourceExpression;
   }
-  
+
   public void setSourceExpression(Expression sourceExpression) {
     this.sourceExpression = sourceExpression;
   }
-  
+
   public String getDestinationVariableName() {
     return destinationVariableName;
   }
-  
+
   public void setDestinationVariableName(String destinationVariableName) {
     this.destinationVariableName = destinationVariableName;
   }
@@ -154,19 +155,19 @@ public class VariableDeclaration implements Serializable {
   public Expression getDestinationExpression() {
     return destinationExpression;
   }
-  
+
   public void setDestinationExpression(Expression destinationExpression) {
     this.destinationExpression = destinationExpression;
   }
-  
+
   public String getLink() {
     return link;
   }
-  
+
   public void setLink(String link) {
     this.link = link;
   }
-  
+
   public Expression getLinkExpression() {
     return linkExpression;
   }

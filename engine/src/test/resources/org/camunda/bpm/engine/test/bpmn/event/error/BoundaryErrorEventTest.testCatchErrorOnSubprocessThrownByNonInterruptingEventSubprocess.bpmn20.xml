@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd" id="_oAboUPrHEeOy29_az6kK_Q" exporter="camunda modeler" exporterVersion="2.6.0" targetNamespace="http://activiti.org/bpmn">
+  <error id="Error_1" errorCode="Error"/>
+  <message id="Message_1" name="message"/>
+  
+  <process id="testProcess" isExecutable="true">
+    <startEvent id="start"/>
+    <sequenceFlow id="SequenceFlow_1" name="" sourceRef="start" targetRef="subprocess"/>
+    
+    <subProcess id="subprocess">
+      <startEvent id="subStart"/>
+      <sequenceFlow id="SequenceFlow_3" sourceRef="subStart" targetRef="subTask"/>
+      <userTask id="subTask"/>
+      <sequenceFlow id="SequenceFlow_4" sourceRef="subTask" targetRef="subEnd"/>
+      <endEvent id="subEnd"/>
+      <subProcess id="eventSubprocess" triggeredByEvent="true">
+        <startEvent id="subEventStart" isInterrupting="false">
+          <messageEventDefinition id="_MessageEventDefinition_4" messageRef="Message_1"/>
+        </startEvent>
+        <sequenceFlow id="SequenceFlow_5" sourceRef="subEventStart" targetRef="subEventEnd"/>
+        <endEvent id="subEventEnd">
+          <errorEventDefinition id="_ErrorEventDefinition_2" errorRef="Error_1"/>
+        </endEvent>
+      </subProcess>
+    </subProcess>
+    <sequenceFlow id="SequenceFlow_2" sourceRef="subprocess" targetRef="end"/>
+    <endEvent id="end"/>
+    
+    <boundaryEvent id="boundary" attachedToRef="subprocess">
+      <errorEventDefinition id="_ErrorEventDefinition_3" errorRef="Error_1"/>
+    </boundaryEvent>
+    <sequenceFlow id="SequenceFlow_6" sourceRef="boundary" targetRef="afterBoundaryTask"/>
+    <userTask id="afterBoundaryTask"/>
+    <sequenceFlow id="SequenceFlow_7" sourceRef="afterBoundaryTask" targetRef="errorEnd"/>
+    <endEvent id="errorEnd"/>
+  </process>
+</definitions>

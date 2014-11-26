@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<process-application
+  xmlns="http://www.camunda.org/schema/1.0/ProcessApplication"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.camunda.org/schema/1.0/ProcessApplication http://www.camunda.org/schema/1.0/ProcessApplication ">
+
+  <process-archive>
+    <process-engine>default</process-engine>
+
+    <resource>org/camunda/bpm/application/impl/embedded/StartToEndTest.testStartToEnd.bpmn20.xml</resource>
+    <resource>org/camunda/bpm/application/impl/embedded/hello.groovy</resource>
+    <resource>org/camunda/bpm/application/impl/embedded/hello.py</resource>
+    <resource>org/camunda/bpm/application/impl/embedded/hello.rb</resource>
+
+    <properties>
+      <property name="isDeleteUponUndeploy">true</property>
+      <property name="isScanForProcessDefinitions">false</property>
+    </properties>
+  </process-archive>
+  
+</process-application>

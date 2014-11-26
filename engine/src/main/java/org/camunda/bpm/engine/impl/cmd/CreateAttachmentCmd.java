@@ -15,9 +15,8 @@ package org.camunda.bpm.engine.impl.cmd;
 
 import java.io.InputStream;
 
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
-import org.camunda.bpm.engine.impl.db.DbSqlSession;
+import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.AttachmentEntity;
@@ -26,6 +25,8 @@ import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.task.Attachment;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 
 /**
@@ -55,13 +56,11 @@ public class CreateAttachmentCmd implements Command<Attachment> {
 
   @Override
   public Attachment execute(CommandContext commandContext) {
-    if (taskId == null) {
-      throw new ProcessEngineException("taskId is null");
-    }
+    ensureNotNull("taskId", taskId);
 
     task = commandContext
-        .getTaskManager()
-        .findTaskById(taskId);
+      .getTaskManager()
+      .findTaskById(taskId);
 
     AttachmentEntity attachment = new AttachmentEntity();
     attachment.setName(attachmentName);
@@ -71,20 +70,20 @@ public class CreateAttachmentCmd implements Command<Attachment> {
     attachment.setProcessInstanceId(processInstanceId);
     attachment.setUrl(url);
 
-    DbSqlSession dbSqlSession = commandContext.getDbSqlSession();
-    dbSqlSession.insert(attachment);
+    DbEntityManager dbEntityManger = commandContext.getDbEntityManager();
+    dbEntityManger.insert(attachment);
 
     if (content != null) {
       byte[] bytes = IoUtil.readInputStream(content, attachmentName);
       ByteArrayEntity byteArray = new ByteArrayEntity(bytes);
-      dbSqlSession.insert(byteArray);
+      dbEntityManger.insert(byteArray);
       attachment.setContentId(byteArray.getId());
     }
 
     PropertyChange propertyChange = new PropertyChange("name", null, attachmentName);
 
     commandContext.getOperationLogManager()
-        .logAttachmentOperation(UserOperationLogEntry.OPERATION_TYPE_ADD_ATTACHMENT, task, propertyChange);
+      .logAttachmentOperation(UserOperationLogEntry.OPERATION_TYPE_ADD_ATTACHMENT, task, propertyChange);
 
     return attachment;
   }

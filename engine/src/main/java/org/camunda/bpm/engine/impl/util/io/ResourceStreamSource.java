@@ -13,9 +13,9 @@
 package org.camunda.bpm.engine.impl.util.io;
 
 import java.io.InputStream;
-
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 
 /**
@@ -37,14 +37,12 @@ public class ResourceStreamSource implements StreamSource {
 
   public InputStream getInputStream() {
     InputStream inputStream = null;
-    if (classLoader==null) {
+    if (classLoader == null) {
       inputStream = ReflectUtil.getResourceAsStream(resource);
     } else {
       classLoader.getResourceAsStream(resource);
     }
-    if (inputStream==null) {
-      throw new ProcessEngineException("resource '"+resource+"' doesn't exist");
-    }
+    ensureNotNull("resource '" + resource + "' doesn't exist", "inputStream", inputStream);
     return inputStream;
   }
 

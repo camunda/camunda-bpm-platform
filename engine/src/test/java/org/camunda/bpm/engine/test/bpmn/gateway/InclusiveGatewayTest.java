@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -22,6 +22,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.CollectionUtil;
 import org.camunda.bpm.engine.runtime.Execution;
+import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
@@ -70,21 +71,33 @@ public class InclusiveGatewayTest extends PluggableProcessEngineTestCase {
   public void testMergingInclusiveGateway() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("inclusiveGwMerging", CollectionUtil.singletonMap("input", 2));
     assertEquals(1, taskService.createTaskQuery().count());
-    
+
     runtimeService.deleteProcessInstance(pi.getId(), "testing deletion");
   }
-  
+
+  @Deployment
+  public void testMergingInclusiveGatewayAsync() {
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("inclusiveGwMerging", CollectionUtil.singletonMap("input", 2));
+    List<Job> list = managementService.createJobQuery().list();
+    for (Job job : list) {
+      managementService.executeJob(job.getId());
+    }
+    assertEquals(1, taskService.createTaskQuery().count());
+
+    runtimeService.deleteProcessInstance(pi.getId(), "testing deletion");
+  }
+
   @Deployment
   public void testPartialMergingInclusiveGateway() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("partialInclusiveGwMerging", CollectionUtil.singletonMap("input", 2));
     Task partialTask = taskService.createTaskQuery().singleResult();
     assertEquals("partialTask", partialTask.getTaskDefinitionKey());
-    
+
     taskService.complete(partialTask.getId());
-    
+
     Task fullTask = taskService.createTaskQuery().singleResult();
     assertEquals("theTask", fullTask.getTaskDefinitionKey());
-    
+
     runtimeService.deleteProcessInstance(pi.getId(), "testing deletion");
   }
 
@@ -104,43 +117,43 @@ public class InclusiveGatewayTest extends PluggableProcessEngineTestCase {
   @Deployment
   public void testParentActivationOnNonJoiningEnd() throws Exception {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("parentActivationOnNonJoiningEnd");
-    
+
     List<Execution> executionsBefore = runtimeService.createExecutionQuery().list();
     assertEquals(3, executionsBefore.size());
-    
+
     // start first round of tasks
     List<Task> firstTasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
-    
+
     assertEquals(2, firstTasks.size());
-    
+
     for (Task t: firstTasks) {
       taskService.complete(t.getId());
     }
-    
+
     // start first round of tasks
     List<Task> secondTasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
-    
+
     assertEquals(2, secondTasks.size());
-    
+
     // complete one task
     Task task = secondTasks.get(0);
     taskService.complete(task.getId());
-    
+
     // should have merged last child execution into parent
     List<Execution> executionsAfter = runtimeService.createExecutionQuery().list();
     assertEquals(1, executionsAfter.size());
-    
+
     Execution execution = executionsAfter.get(0);
-    
+
     // and should have one active activity
     List<String> activeActivityIds = runtimeService.getActiveActivityIds(execution.getId());
     assertEquals(1, activeActivityIds.size());
-    
+
     // Completing last task should finish the process instance
-    
+
     Task lastTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
     taskService.complete(lastTask.getId());
-    
+
     assertEquals(0l, runtimeService.createProcessInstanceQuery().active().count());
   }
 
@@ -296,6 +309,43 @@ public class InclusiveGatewayTest extends PluggableProcessEngineTestCase {
     assertEquals("Default input", task.getName());
   }
 
+  @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/gateway/InclusiveGatewayTest.testDefaultSequenceFlow.bpmn20.xml")
+  public void testDefaultSequenceFlowExecutionIsActive() {
+    // given a triggered inclusive gateway default flow
+    runtimeService.startProcessInstanceByKey("inclusiveGwDefaultSequenceFlow", CollectionUtil.singletonMap("input", 5));
+
+    // then the process instance execution is not deactivated
+    ExecutionEntity execution = (ExecutionEntity) runtimeService.createExecutionQuery().singleResult();
+    assertEquals("theTask2", execution.getActivityId());
+    assertTrue(execution.isActive());
+  }
+
+  /**
+   * 1. or split
+   * 2. or join
+   * 3. that same or join splits again (in this case has a single default sequence flow)
+   */
+  @Deployment
+  public void testSplitMergeSplit() {
+    // given a process instance with two concurrent tasks
+    ProcessInstance processInstance =
+        runtimeService.startProcessInstanceByKey("inclusiveGwSplitAndMerge", CollectionUtil.singletonMap("input", 1));
+
+    List<Task> tasks = taskService.createTaskQuery().list();
+    assertEquals(2, tasks.size());
+
+    // when the executions are joined at an inclusive gateway and the gateway itself has an outgoing default flow
+    taskService.complete(tasks.get(0).getId());
+    taskService.complete(tasks.get(1).getId());
+
+    // then the task after the inclusive gateway is reached by the process instance execution (i.e. concurrent root)
+    Task task = taskService.createTaskQuery().singleResult();
+    assertNotNull(task);
+
+    assertEquals(processInstance.getId(), task.getExecutionId());
+  }
+
+
   @Deployment
   public void testNoIdOnSequenceFlow() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("inclusiveNoIdOnSequenceFlow", CollectionUtil.singletonMap("input", 3));
@@ -314,34 +364,34 @@ public class InclusiveGatewayTest extends PluggableProcessEngineTestCase {
     }
     assertEquals(0, expectedNames.size());
   }
-  
-  /** This test the isReachable() check thaty is done to check if 
+
+  /** This test the isReachable() check thaty is done to check if
    * upstream tokens can reach the inclusive gateway.
-   * 
+   *
    * In case of loops, special care needs to be taken in the algorithm,
    * or else stackoverflows will happen very quickly.
    */
   @Deployment
   public void testLoop() {
-    ProcessInstance pi = runtimeService.startProcessInstanceByKey("inclusiveTestLoop", 
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("inclusiveTestLoop",
             CollectionUtil.singletonMap("counter", 1));
-    
+
     Task task = taskService.createTaskQuery().singleResult();
     assertEquals("task C", task.getName());
-    
+
     taskService.complete(task.getId());
     assertEquals(0, taskService.createTaskQuery().count());
-    
+
 
     for (Execution execution : runtimeService.createExecutionQuery().list()) {
       System.out.println(((ExecutionEntity) execution).getActivityId());
     }
-    
+
     assertEquals("Found executions: " + runtimeService.createExecutionQuery().list(), 0, runtimeService.createExecutionQuery().count());
     assertProcessEnded(pi.getId());
   }
-  
-  @Deployment 
+
+  @Deployment
   public void testJoinAfterSubprocesses() {
     // Test case to test act-1204
     Map<String, Object> variableMap = new HashMap<String, Object>();
@@ -395,16 +445,16 @@ public class InclusiveGatewayTest extends PluggableProcessEngineTestCase {
       assertTrue(e.getMessage().contains("No outgoing sequence flow"));
     }
   }
-  
+
   @Deployment(resources={"org/camunda/bpm/engine/test/bpmn/gateway/InclusiveGatewayTest.testJoinAfterCall.bpmn20.xml",
-                    "org/camunda/bpm/engine/test/bpmn/gateway/InclusiveGatewayTest.testJoinAfterCallSubProcess.bpmn20.xml"})  
+                    "org/camunda/bpm/engine/test/bpmn/gateway/InclusiveGatewayTest.testJoinAfterCallSubProcess.bpmn20.xml"})
   public void testJoinAfterCall() {
     // Test case to test act-1026
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("InclusiveGatewayAfterCall");
     assertNotNull(processInstance.getId());
     assertEquals(3, taskService.createTaskQuery().count());
 
-    // now complete task A and check number of remaining tasks. 
+    // now complete task A and check number of remaining tasks.
     // inclusive gateway should wait for the "Task B" and "Task C"
     Task taskA = taskService.createTaskQuery().taskName("Task A").singleResult();
     assertNotNull(taskA);

@@ -31,7 +31,7 @@ import org.camunda.bpm.engine.impl.bpmn.parser.EventSubscriptionDeclaration;
 import org.camunda.bpm.engine.impl.cfg.IdGenerator;
 import org.camunda.bpm.engine.impl.cmd.DeleteJobsCmd;
 import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.db.DbSqlSession;
+import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
 import org.camunda.bpm.engine.impl.event.MessageEventHandler;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -67,7 +67,7 @@ import org.camunda.bpm.engine.task.IdentityLinkType;
  */
 public class BpmnDeployer implements Deployer {
 
-  private static final Logger LOG = Logger.getLogger(BpmnDeployer.class.getName());;
+  private static final Logger LOG = Logger.getLogger(BpmnDeployer.class.getName());
 
   public static final String[] BPMN_RESOURCE_SUFFIXES = new String[] { "bpmn20.xml", "bpmn" };
   public static final String[] DIAGRAM_SUFFIXES = new String[]{"png", "jpg", "gif", "svg"};
@@ -86,7 +86,7 @@ public class BpmnDeployer implements Deployer {
     for (String resourceName : resources.keySet()) {
       BpmnParse bpmnParse = null;
 
-      LOG.info("Processing resource " + resourceName);
+      LOG.fine("Processing resource " + resourceName);
       if (isBpmnResource(resourceName)) {
         ResourceEntity resource = resources.get(resourceName);
         byte[] bytes = resource.getBytes();
@@ -146,7 +146,7 @@ public class BpmnDeployer implements Deployer {
     CommandContext commandContext = Context.getCommandContext();
     ProcessDefinitionManager processDefinitionManager = commandContext.getProcessDefinitionManager();
     DeploymentCache deploymentCache = Context.getProcessEngineConfiguration().getDeploymentCache();
-    DbSqlSession dbSqlSession = commandContext.getSession(DbSqlSession.class);
+    DbEntityManager dbEntityManager = commandContext.getDbEntityManager();
     for (ProcessDefinitionEntity processDefinition : processDefinitions) {
 
       if (deployment.isNew()) {
@@ -160,7 +160,7 @@ public class BpmnDeployer implements Deployer {
         updateJobDeclarations(declarations, processDefinition, deployment.isNew());
         adjustStartEventSubscriptions(processDefinition, latestProcessDefinition);
 
-        dbSqlSession.insert(processDefinition);
+        dbEntityManager.insert(processDefinition);
         deploymentCache.addProcessDefinition(processDefinition);
         addAuthorizations(processDefinition);
 
@@ -338,8 +338,8 @@ public class BpmnDeployer implements Deployer {
             .findEventSubscriptionsByName(MessageEventHandler.EVENT_HANDLER_TYPE, messageEventDefinition.getEventName());
           // also look for subscriptions created in the session:
           List<MessageEventSubscriptionEntity> cachedSubscriptions = commandContext
-            .getDbSqlSession()
-            .findInCache(MessageEventSubscriptionEntity.class);
+            .getDbEntityManager()
+            .getCachedEntitiesByType(MessageEventSubscriptionEntity.class);
           for (MessageEventSubscriptionEntity cachedSubscription : cachedSubscriptions) {
             if(messageEventDefinition.getEventName().equals(cachedSubscription.getEventName())
                     && !subscriptionsForSameMessageName.contains(cachedSubscription)) {
@@ -348,7 +348,7 @@ public class BpmnDeployer implements Deployer {
           }
           // remove subscriptions deleted in the same command
           subscriptionsForSameMessageName = commandContext
-                  .getDbSqlSession()
+                  .getDbEntityManager()
                   .pruneDeletedEntities(subscriptionsForSameMessageName);
 
           if(!subscriptionsForSameMessageName.isEmpty()) {
@@ -376,7 +376,7 @@ public class BpmnDeployer implements Deployer {
     if (exprSet != null) {
       Iterator<Expression> iterator = exprSet.iterator();
       while (iterator.hasNext()) {
-        Expression expr = (Expression) iterator.next();
+        Expression expr = iterator.next();
         IdentityLinkEntity identityLink = new IdentityLinkEntity();
         identityLink.setProcessDef(processDefinition);
         if (exprType.equals(ExprType.USER)) {
@@ -385,7 +385,7 @@ public class BpmnDeployer implements Deployer {
           identityLink.setGroupId(expr.toString());
         }
         identityLink.setType(IdentityLinkType.CANDIDATE);
-        commandContext.getDbSqlSession().insert(identityLink);
+        commandContext.getDbEntityManager().insert(identityLink);
       }
     }
   }
@@ -459,7 +459,7 @@ public class BpmnDeployer implements Deployer {
 
     Context
       .getCommandContext()
-      .getDbSqlSession()
+      .getDbEntityManager()
       .insert(resource);
   }
 

@@ -24,6 +24,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
@@ -33,15 +35,20 @@ import javax.ws.rs.core.Response.Status;
 import org.camunda.bpm.engine.CaseService;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RepositoryService;
+import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.CaseDefinitionQuery;
-import org.camunda.bpm.engine.rest.dto.runtime.VariableValueDto;
 import org.camunda.bpm.engine.rest.exception.RestException;
-import org.camunda.bpm.engine.rest.helper.EqualsMap;
+import org.camunda.bpm.engine.rest.helper.EqualsVariableMap;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
+import org.camunda.bpm.engine.rest.helper.variable.EqualsPrimitiveValue;
+import org.camunda.bpm.engine.rest.helper.variable.EqualsUntypedValue;
+import org.camunda.bpm.engine.rest.sub.repository.impl.ProcessDefinitionResourceImpl;
+import org.camunda.bpm.engine.rest.util.VariablesBuilder;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.runtime.CaseInstanceBuilder;
+import org.camunda.bpm.engine.variable.type.ValueType;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -65,6 +72,9 @@ public abstract class AbstractCaseDefinitionRestServiceInteractionTest extends A
 
   protected static final String CREATE_INSTANCE_URL = SINGLE_CASE_DEFINITION_URL + "/create";
   protected static final String CREATE_INSTANCE_BY_KEY_URL = SINGLE_CASE_DEFINITION_BY_KEY_URL + "/create";
+
+  protected static final String DIAGRAM_DEFINITION_URL = SINGLE_CASE_DEFINITION_URL + "/diagram";
+
 
   private RepositoryService repositoryServiceMock;
   private CaseService caseServiceMock;
@@ -94,7 +104,7 @@ public abstract class AbstractCaseDefinitionRestServiceInteractionTest extends A
     caseInstanceBuilder = mock(CaseInstanceBuilder.class);
     CaseInstance mockCaseInstance = MockProvider.createMockCaseInstance();
 
-    when(caseServiceMock.createCaseInstanceById(MockProvider.EXAMPLE_CASE_DEFINITION_ID)).thenReturn(caseInstanceBuilder);
+    when(caseServiceMock.withCaseDefinition(MockProvider.EXAMPLE_CASE_DEFINITION_ID)).thenReturn(caseInstanceBuilder);
     when(caseInstanceBuilder.businessKey(anyString())).thenReturn(caseInstanceBuilder);
     when(caseInstanceBuilder.setVariables(Matchers.<Map<String, Object>>any())).thenReturn(caseInstanceBuilder);
     when(caseInstanceBuilder.create()).thenReturn(mockCaseInstance);
@@ -210,7 +220,7 @@ public abstract class AbstractCaseDefinitionRestServiceInteractionTest extends A
     .when()
       .post(CREATE_INSTANCE_URL);
 
-    verify(caseServiceMock).createCaseInstanceById(MockProvider.EXAMPLE_CASE_DEFINITION_ID);
+    verify(caseServiceMock).withCaseDefinition(MockProvider.EXAMPLE_CASE_DEFINITION_ID);
     verify(caseInstanceBuilder).businessKey(null);
     verify(caseInstanceBuilder).setVariables(null);
     verify(caseInstanceBuilder).create();
@@ -230,7 +240,7 @@ public abstract class AbstractCaseDefinitionRestServiceInteractionTest extends A
     .when()
       .post(CREATE_INSTANCE_BY_KEY_URL);
 
-    verify(caseServiceMock).createCaseInstanceById(MockProvider.EXAMPLE_CASE_DEFINITION_ID);
+    verify(caseServiceMock).withCaseDefinition(MockProvider.EXAMPLE_CASE_DEFINITION_ID);
     verify(caseInstanceBuilder).businessKey(null);
     verify(caseInstanceBuilder).setVariables(null);
     verify(caseInstanceBuilder).create();
@@ -252,7 +262,7 @@ public abstract class AbstractCaseDefinitionRestServiceInteractionTest extends A
     .when()
       .post(CREATE_INSTANCE_URL);
 
-    verify(caseServiceMock).createCaseInstanceById(MockProvider.EXAMPLE_CASE_DEFINITION_ID);
+    verify(caseServiceMock).withCaseDefinition(MockProvider.EXAMPLE_CASE_DEFINITION_ID);
     verify(caseInstanceBuilder).businessKey(MockProvider.EXAMPLE_CASE_INSTANCE_BUSINESS_KEY);
     verify(caseInstanceBuilder).setVariables(null);
     verify(caseInstanceBuilder).create();
@@ -275,7 +285,7 @@ public abstract class AbstractCaseDefinitionRestServiceInteractionTest extends A
     .when()
       .post(CREATE_INSTANCE_BY_KEY_URL);
 
-    verify(caseServiceMock).createCaseInstanceById(MockProvider.EXAMPLE_CASE_DEFINITION_ID);
+    verify(caseServiceMock).withCaseDefinition(MockProvider.EXAMPLE_CASE_DEFINITION_ID);
     verify(caseInstanceBuilder).businessKey(MockProvider.EXAMPLE_CASE_INSTANCE_BUSINESS_KEY);
     verify(caseInstanceBuilder).setVariables(null);
     verify(caseInstanceBuilder).create();
@@ -283,12 +293,9 @@ public abstract class AbstractCaseDefinitionRestServiceInteractionTest extends A
 
   @Test
   public void testCreateCaseInstanceByCaseDefinitionIdWithVariables() {
-    VariableValueDto aVariable = new VariableValueDto("abc", null);
-    VariableValueDto anotherVariable = new VariableValueDto(999, null);
-
     Map<String, Object> variables = new HashMap<String, Object>();
-    variables.put("aVariableName", aVariable);
-    variables.put("anotherVariableName", anotherVariable);
+    variables.put("aVariableName", VariablesBuilder.getVariableValueMap("abc", ValueType.STRING.getName()));
+    variables.put("anotherVariableName", VariablesBuilder.getVariableValueMap(900, ValueType.INTEGER.getName()));
 
     Map<String, Object> params = new HashMap<String, Object>();
     params.put("variables", variables);
@@ -304,25 +311,20 @@ public abstract class AbstractCaseDefinitionRestServiceInteractionTest extends A
     .when()
       .post(CREATE_INSTANCE_URL);
 
-    Map<String, Object> expectedVariables = new HashMap<String, Object>();
-    expectedVariables.put("aVariableName", "abc");
-    expectedVariables.put("anotherVariableName", 999);
-
-    verify(caseServiceMock).createCaseInstanceById(MockProvider.EXAMPLE_CASE_DEFINITION_ID);
+    verify(caseServiceMock).withCaseDefinition(MockProvider.EXAMPLE_CASE_DEFINITION_ID);
     verify(caseInstanceBuilder).businessKey(null);
-    verify(caseInstanceBuilder).setVariables(argThat(new EqualsMap(expectedVariables)));
+    verify(caseInstanceBuilder).setVariables(argThat(EqualsVariableMap.matches()
+        .matcher("aVariableName", EqualsPrimitiveValue.stringValue("abc"))
+        .matcher("anotherVariableName", EqualsPrimitiveValue.integerValue(900))));
     verify(caseInstanceBuilder).create();
 
   }
 
   @Test
   public void testCreateCaseInstanceByCaseDefinitionKeyWithVariables() {
-    VariableValueDto aVariable = new VariableValueDto("abc", null);
-    VariableValueDto anotherVariable = new VariableValueDto(999, null);
-
     Map<String, Object> variables = new HashMap<String, Object>();
-    variables.put("aVariableName", aVariable);
-    variables.put("anotherVariableName", anotherVariable);
+    variables.put("aVariableName", VariablesBuilder.getVariableValueMap("abc", null));
+    variables.put("anotherVariableName", VariablesBuilder.getVariableValueMap(900, null));
 
     Map<String, Object> params = new HashMap<String, Object>();
     params.put("variables", variables);
@@ -342,20 +344,19 @@ public abstract class AbstractCaseDefinitionRestServiceInteractionTest extends A
     expectedVariables.put("aVariableName", "abc");
     expectedVariables.put("anotherVariableName", 999);
 
-    verify(caseServiceMock).createCaseInstanceById(MockProvider.EXAMPLE_CASE_DEFINITION_ID);
+    verify(caseServiceMock).withCaseDefinition(MockProvider.EXAMPLE_CASE_DEFINITION_ID);
     verify(caseInstanceBuilder).businessKey(null);
-    verify(caseInstanceBuilder).setVariables(argThat(new EqualsMap(expectedVariables)));
+    verify(caseInstanceBuilder).setVariables(argThat(EqualsVariableMap.matches()
+        .matcher("aVariableName", EqualsUntypedValue.matcher().value("abc"))
+        .matcher("anotherVariableName", EqualsUntypedValue.matcher().value(900))));
     verify(caseInstanceBuilder).create();
   }
 
   @Test
   public void testCreateCaseInstanceByCaseDefinitionIdWithBusinessKeyAndVariables() {
-    VariableValueDto aVariable = new VariableValueDto("abc", null);
-    VariableValueDto anotherVariable = new VariableValueDto(999, null);
-
     Map<String, Object> variables = new HashMap<String, Object>();
-    variables.put("aVariableName", aVariable);
-    variables.put("anotherVariableName", anotherVariable);
+    variables.put("aVariableName", VariablesBuilder.getVariableValueMap("abc", null));
+    variables.put("anotherVariableName", VariablesBuilder.getVariableValueMap(900, null));
 
     Map<String, Object> params = new HashMap<String, Object>();
     params.put("variables", variables);
@@ -376,21 +377,20 @@ public abstract class AbstractCaseDefinitionRestServiceInteractionTest extends A
     expectedVariables.put("aVariableName", "abc");
     expectedVariables.put("anotherVariableName", 999);
 
-    verify(caseServiceMock).createCaseInstanceById(MockProvider.EXAMPLE_CASE_DEFINITION_ID);
+    verify(caseServiceMock).withCaseDefinition(MockProvider.EXAMPLE_CASE_DEFINITION_ID);
     verify(caseInstanceBuilder).businessKey("aBusinessKey");
-    verify(caseInstanceBuilder).setVariables(argThat(new EqualsMap(expectedVariables)));
+    verify(caseInstanceBuilder).setVariables(argThat(EqualsVariableMap.matches()
+        .matcher("aVariableName", EqualsUntypedValue.matcher().value("abc"))
+        .matcher("anotherVariableName", EqualsUntypedValue.matcher().value(900))));
     verify(caseInstanceBuilder).create();
 
   }
 
   @Test
   public void testCreateCaseInstanceByCaseDefinitionKeyWithBusinessKeyAndVariables() {
-    VariableValueDto aVariable = new VariableValueDto("abc", null);
-    VariableValueDto anotherVariable = new VariableValueDto(999, null);
-
     Map<String, Object> variables = new HashMap<String, Object>();
-    variables.put("aVariableName", aVariable);
-    variables.put("anotherVariableName", anotherVariable);
+    variables.put("aVariableName", VariablesBuilder.getVariableValueMap("abc", null));
+    variables.put("anotherVariableName", VariablesBuilder.getVariableValueMap(900, null));
 
     Map<String, Object> params = new HashMap<String, Object>();
     params.put("variables", variables);
@@ -411,9 +411,11 @@ public abstract class AbstractCaseDefinitionRestServiceInteractionTest extends A
     expectedVariables.put("aVariableName", "abc");
     expectedVariables.put("anotherVariableName", 999);
 
-    verify(caseServiceMock).createCaseInstanceById(MockProvider.EXAMPLE_CASE_DEFINITION_ID);
+    verify(caseServiceMock).withCaseDefinition(MockProvider.EXAMPLE_CASE_DEFINITION_ID);
     verify(caseInstanceBuilder).businessKey("aBusinessKey");
-    verify(caseInstanceBuilder).setVariables(argThat(new EqualsMap(expectedVariables)));
+    verify(caseInstanceBuilder).setVariables(argThat(EqualsVariableMap.matches()
+        .matcher("aVariableName", EqualsUntypedValue.matcher().value("abc"))
+        .matcher("anotherVariableName", EqualsUntypedValue.matcher().value(900))));
     verify(caseInstanceBuilder).create();
   }
 
@@ -453,6 +455,83 @@ public abstract class AbstractCaseDefinitionRestServiceInteractionTest extends A
         .body("message", containsString("Cannot instantiate case definition aCaseDefnitionId: expected exception"))
     .when()
       .post(CREATE_INSTANCE_BY_KEY_URL);
+  }
+
+  @Test
+  public void testCaseDiagramRetrieval() throws FileNotFoundException {
+    // setup additional mock behavior
+    String fileName = this.getClass().getResource("/processes/todo-process.png").getFile();
+    when(repositoryServiceMock.getCaseDiagram(MockProvider.EXAMPLE_CASE_DEFINITION_ID))
+        .thenReturn(new FileInputStream(fileName));
+
+    // call method
+    byte[] actual = given().pathParam("id", MockProvider.EXAMPLE_CASE_DEFINITION_ID)
+        .expect()
+          .statusCode(Status.OK.getStatusCode())
+          .contentType("image/png")
+          .header("Content-Disposition", "attachment; filename=" +
+              MockProvider.EXAMPLE_CASE_DEFINITION_DIAGRAM_RESOURCE_NAME)
+        .when().get(DIAGRAM_DEFINITION_URL).getBody().asByteArray();
+
+    // verify service interaction
+    verify(repositoryServiceMock).getCaseDefinition(MockProvider.EXAMPLE_CASE_DEFINITION_ID);
+    verify(repositoryServiceMock).getCaseDiagram(MockProvider.EXAMPLE_CASE_DEFINITION_ID);
+
+    // compare input stream with response body bytes
+    byte[] expected = IoUtil.readInputStream(new FileInputStream(fileName), "case diagram");
+    Assert.assertArrayEquals(expected, actual);
+  }
+
+  @Test
+  public void testCaseDiagramNullFilename() throws FileNotFoundException {
+    // setup additional mock behavior
+    String fileName = this.getClass().getResource("/processes/todo-process.png").getFile();
+    when(repositoryServiceMock.getCaseDefinition(MockProvider.EXAMPLE_CASE_DEFINITION_ID).getDiagramResourceName())
+      .thenReturn(null);
+    when(repositoryServiceMock.getCaseDiagram(MockProvider.EXAMPLE_CASE_DEFINITION_ID))
+        .thenReturn(new FileInputStream(fileName));
+
+    // call method
+    byte[] actual = given().pathParam("id", MockProvider.EXAMPLE_CASE_DEFINITION_ID)
+      .expect()
+      .statusCode(Status.OK.getStatusCode())
+      .contentType("application/octet-stream")
+      .header("Content-Disposition", "attachment; filename=" + null)
+      .when().get(DIAGRAM_DEFINITION_URL).getBody().asByteArray();
+
+    // verify service interaction
+    verify(repositoryServiceMock).getCaseDiagram(MockProvider.EXAMPLE_CASE_DEFINITION_ID);
+
+    // compare input stream with response body bytes
+    byte[] expected = IoUtil.readInputStream(new FileInputStream(fileName), "case diagram");
+    Assert.assertArrayEquals(expected, actual);
+  }
+
+  @Test
+  public void testCaseDiagramNotExist() {
+    // setup additional mock behavior
+    when(repositoryServiceMock.getCaseDiagram(MockProvider.EXAMPLE_CASE_DEFINITION_ID)).thenReturn(null);
+
+    // call method
+    given().pathParam("id", MockProvider.EXAMPLE_CASE_DEFINITION_ID)
+        .expect().statusCode(Status.NO_CONTENT.getStatusCode())
+        .when().get(DIAGRAM_DEFINITION_URL);
+
+    // verify service interaction
+    verify(repositoryServiceMock).getCaseDefinition(MockProvider.EXAMPLE_CASE_DEFINITION_ID);
+    verify(repositoryServiceMock).getCaseDiagram(MockProvider.EXAMPLE_CASE_DEFINITION_ID);
+  }
+
+  @Test
+  public void testProcessDiagramMediaType() {
+    Assert.assertEquals("image/png", ProcessDefinitionResourceImpl.getMediaTypeForFileSuffix("process.png"));
+    Assert.assertEquals("image/png", ProcessDefinitionResourceImpl.getMediaTypeForFileSuffix("process.PNG"));
+    Assert.assertEquals("image/svg+xml", ProcessDefinitionResourceImpl.getMediaTypeForFileSuffix("process.svg"));
+    Assert.assertEquals("image/jpeg", ProcessDefinitionResourceImpl.getMediaTypeForFileSuffix("process.jpeg"));
+    Assert.assertEquals("image/jpeg", ProcessDefinitionResourceImpl.getMediaTypeForFileSuffix("process.jpg"));
+    Assert.assertEquals("image/gif", ProcessDefinitionResourceImpl.getMediaTypeForFileSuffix("process.gif"));
+    Assert.assertEquals("image/bmp", ProcessDefinitionResourceImpl.getMediaTypeForFileSuffix("process.bmp"));
+    Assert.assertEquals("application/octet-stream", ProcessDefinitionResourceImpl.getMediaTypeForFileSuffix("process.UNKNOWN"));
   }
 
 }

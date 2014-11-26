@@ -26,7 +26,7 @@ public class ExclusiveGatewayPerformanceTest extends ProcessEnginePerformanceTes
   @Test
   @Deployment
   public void sync1gateway() {
-    perfomanceTest()
+    performanceTest()
       .step(new StartProcessInstanceStep(engine, "process"))
     .run();
   }
@@ -34,7 +34,7 @@ public class ExclusiveGatewayPerformanceTest extends ProcessEnginePerformanceTes
   @Test
   @Deployment
   public void sync2gateways() {
-    perfomanceTest()
+    performanceTest()
       .step(new StartProcessInstanceStep(engine, "process"))
     .run();
   }
@@ -42,7 +42,7 @@ public class ExclusiveGatewayPerformanceTest extends ProcessEnginePerformanceTes
   @Test
   @Deployment
   public void sync5gateways() {
-    perfomanceTest()
+    performanceTest()
       .step(new StartProcessInstanceStep(engine, "process"))
     .run();
   }

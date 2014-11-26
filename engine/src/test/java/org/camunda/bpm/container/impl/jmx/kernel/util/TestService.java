@@ -1,15 +1,15 @@
 package org.camunda.bpm.container.impl.jmx.kernel.util;
 
-import org.camunda.bpm.container.impl.jmx.kernel.MBeanService;
-import org.camunda.bpm.container.impl.jmx.kernel.MBeanServiceContainer;
+import org.camunda.bpm.container.impl.spi.PlatformService;
+import org.camunda.bpm.container.impl.spi.PlatformServiceContainer;
 
-public class TestService implements MBeanService<TestService>, TestServiceMBean {
+public class TestService implements PlatformService<TestService>, TestServiceMBean {
 
-  public void start(MBeanServiceContainer mBeanServiceContainer) {
+  public void start(PlatformServiceContainer mBeanServiceContainer) {
 
   }
 
-  public void stop(MBeanServiceContainer mBeanServiceContainer) {
+  public void stop(PlatformServiceContainer mBeanServiceContainer) {
 
   }
 

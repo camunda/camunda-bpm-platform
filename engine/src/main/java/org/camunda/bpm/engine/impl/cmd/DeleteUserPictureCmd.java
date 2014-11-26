@@ -12,10 +12,11 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.IdentityInfoEntity;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 /**
  * @author Daniel Meyer
@@ -30,11 +31,8 @@ public class DeleteUserPictureCmd implements Command<Void> {
   }
 
   public Void execute(CommandContext commandContext) {
-    
-    if(userId == null) {
-      throw new ProcessEngineException("UserId cannot be null.");
-    }
-    
+    ensureNotNull("UserId", userId);
+
     IdentityInfoEntity infoEntity = commandContext.getIdentityInfoManager()
       .findUserInfoByUserIdAndKey(userId, "picture");
     

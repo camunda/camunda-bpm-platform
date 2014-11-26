@@ -1,16 +1,14 @@
 package org.camunda.bpm.container.impl.jmx.kernel.util;
 
-import javax.management.ObjectName;
+import org.camunda.bpm.container.impl.spi.PlatformServiceContainer;
+import org.camunda.bpm.container.impl.spi.DeploymentOperation;
+import org.camunda.bpm.container.impl.spi.DeploymentOperationStep;
 
-import org.camunda.bpm.container.impl.jmx.kernel.MBeanDeploymentOperation;
-import org.camunda.bpm.container.impl.jmx.kernel.MBeanDeploymentOperationStep;
-import org.camunda.bpm.container.impl.jmx.kernel.MBeanServiceContainer;
+public class StopServiceDeploymentOperationStep extends DeploymentOperationStep {
 
-public class StopServiceDeploymentOperationStep extends MBeanDeploymentOperationStep {
-  
-  private ObjectName serviceName;
+  private String serviceName;
 
-  public StopServiceDeploymentOperationStep(ObjectName serviceName) {
+  public StopServiceDeploymentOperationStep(String serviceName) {
     this.serviceName = serviceName;
   }
 
@@ -18,9 +16,9 @@ public class StopServiceDeploymentOperationStep extends MBeanDeploymentOperation
     return "stop "+serviceName;
   }
 
-  public void performOperationStep(MBeanDeploymentOperation operationContext) {
-    final MBeanServiceContainer serviceContainer = operationContext.getServiceContainer();
-    
+  public void performOperationStep(DeploymentOperation operationContext) {
+    final PlatformServiceContainer serviceContainer = operationContext.getServiceContainer();
+
     serviceContainer.stopService(serviceName);
   }
 

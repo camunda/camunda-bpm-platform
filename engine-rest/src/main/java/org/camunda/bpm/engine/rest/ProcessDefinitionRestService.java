@@ -31,7 +31,6 @@ import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionDto;
 import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionSuspensionStateDto;
 import org.camunda.bpm.engine.rest.sub.repository.ProcessDefinitionResource;
 
-@Path(ProcessDefinitionRestService.PATH)
 @Produces(MediaType.APPLICATION_JSON)
 public interface ProcessDefinitionRestService {
 

@@ -25,15 +25,18 @@ import org.camunda.bpm.engine.rest.sub.VariableResource;
 import org.camunda.bpm.engine.rest.sub.runtime.ProcessInstanceResource;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.codehaus.jackson.map.ObjectMapper;
 
 public class ProcessInstanceResourceImpl implements ProcessInstanceResource {
 
-  private ProcessEngine engine;
-  private String processInstanceId;
+  protected ProcessEngine engine;
+  protected String processInstanceId;
+  protected ObjectMapper objectMapper;
 
-  public ProcessInstanceResourceImpl(ProcessEngine engine, String processInstanceId) {
+  public ProcessInstanceResourceImpl(ProcessEngine engine, String processInstanceId, ObjectMapper objectMapper) {
     this.engine = engine;
     this.processInstanceId = processInstanceId;
+    this.objectMapper = objectMapper;
   }
 
   @Override
@@ -62,7 +65,7 @@ public class ProcessInstanceResourceImpl implements ProcessInstanceResource {
 
   @Override
   public VariableResource getVariablesResource() {
-    return new ExecutionVariablesResource(engine, processInstanceId, true);
+    return new ExecutionVariablesResource(engine, processInstanceId, true, objectMapper);
   }
 
   @Override

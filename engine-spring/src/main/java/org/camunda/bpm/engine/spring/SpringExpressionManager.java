@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -13,9 +13,6 @@
 
 package org.camunda.bpm.engine.spring;
 
-import java.util.Map;
-
-import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
 import org.camunda.bpm.engine.impl.el.ReadOnlyMapELResolver;
 import org.camunda.bpm.engine.impl.el.VariableScopeElResolver;
@@ -27,17 +24,19 @@ import org.camunda.bpm.engine.impl.javax.el.ListELResolver;
 import org.camunda.bpm.engine.impl.javax.el.MapELResolver;
 import org.springframework.context.ApplicationContext;
 
+import java.util.Map;
+
 
 /**
  * {@link ExpressionManager} that exposes the full application-context or a limited set
  * of beans in expressions.
- * 
+ *
  * @author Tom Baeyens
  */
 public class SpringExpressionManager extends ExpressionManager {
-  
+
   protected ApplicationContext applicationContext;
-  
+
   /**
    * @param applicationContext
    *          the applicationContext to use. Ignored when 'beans' parameter is
@@ -52,10 +51,10 @@ public class SpringExpressionManager extends ExpressionManager {
   }
 
   @Override
-  protected ELResolver createElResolver(VariableScope variableScope) {
+  protected ELResolver createElResolver() {
     CompositeELResolver compositeElResolver = new CompositeELResolver();
-    compositeElResolver.add(new VariableScopeElResolver(variableScope));
-    
+    compositeElResolver.add(new VariableScopeElResolver());
+
     if(beans != null) {
       // Only expose limited set of beans in expressions
       compositeElResolver.add(new ReadOnlyMapELResolver(beans));
@@ -63,13 +62,14 @@ public class SpringExpressionManager extends ExpressionManager {
       // Expose full application-context in expressions
       compositeElResolver.add(new ApplicationContextElResolver(applicationContext));
     }
-    
+
     compositeElResolver.add(new ArrayELResolver());
     compositeElResolver.add(new ListELResolver());
     compositeElResolver.add(new MapELResolver());
     compositeElResolver.add(new BeanELResolver());
+
     return compositeElResolver;
   }
 
-  
+
 }

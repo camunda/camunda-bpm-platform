@@ -19,12 +19,20 @@ import java.util.List;
 
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.engine.RepositoryService;
+import org.camunda.bpm.engine.exception.DeploymentResourceNotFoundException;
+import org.camunda.bpm.engine.exception.NotFoundException;
+import org.camunda.bpm.engine.exception.NotValidException;
+import org.camunda.bpm.engine.exception.NullValueException;
+import org.camunda.bpm.engine.exception.cmmn.CaseDefinitionNotFoundException;
+import org.camunda.bpm.engine.exception.cmmn.CmmnModelInstanceNotFoundException;
 import org.camunda.bpm.engine.impl.cmd.ActivateProcessDefinitionCmd;
 import org.camunda.bpm.engine.impl.cmd.AddIdentityLinkForProcessDefinitionCmd;
 import org.camunda.bpm.engine.impl.cmd.DeleteDeploymentCmd;
 import org.camunda.bpm.engine.impl.cmd.DeleteIdentityLinkForProcessDefinitionCmd;
 import org.camunda.bpm.engine.impl.cmd.DeployCmd;
 import org.camunda.bpm.engine.impl.cmd.GetDeploymentBpmnModelInstanceCmd;
+import org.camunda.bpm.engine.impl.cmd.GetDeploymentCaseDiagramCmd;
+import org.camunda.bpm.engine.impl.cmd.GetDeploymentCmmnModelInstanceCmd;
 import org.camunda.bpm.engine.impl.cmd.GetDeploymentProcessDefinitionCmd;
 import org.camunda.bpm.engine.impl.cmd.GetDeploymentProcessDiagramCmd;
 import org.camunda.bpm.engine.impl.cmd.GetDeploymentProcessDiagramLayoutCmd;
@@ -53,7 +61,7 @@ import org.camunda.bpm.engine.repository.ProcessDefinitionQuery;
 import org.camunda.bpm.engine.repository.Resource;
 import org.camunda.bpm.engine.task.IdentityLink;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
-
+import org.camunda.bpm.model.cmmn.CmmnModelInstance;
 
 /**
  * @author Tom Baeyens
@@ -75,15 +83,19 @@ public class RepositoryServiceImpl extends ServiceImpl implements RepositoryServ
   }
 
   public void deleteDeployment(String deploymentId) {
-    commandExecutor.execute(new DeleteDeploymentCmd(deploymentId, false));
+    commandExecutor.execute(new DeleteDeploymentCmd(deploymentId, false, false));
   }
 
   public void deleteDeploymentCascade(String deploymentId) {
-    commandExecutor.execute(new DeleteDeploymentCmd(deploymentId, true));
+    commandExecutor.execute(new DeleteDeploymentCmd(deploymentId, true, false));
   }
 
   public void deleteDeployment(String deploymentId, boolean cascade) {
-    commandExecutor.execute(new DeleteDeploymentCmd(deploymentId, cascade));
+    commandExecutor.execute(new DeleteDeploymentCmd(deploymentId, cascade, false));
+  }
+
+  public void deleteDeployment(String deploymentId, boolean cascade, boolean skipCustomListeners) {
+    commandExecutor.execute(new DeleteDeploymentCmd(deploymentId, cascade, skipCustomListeners));
   }
 
   public ProcessDefinitionQuery createProcessDefinitionQuery() {
@@ -164,12 +176,32 @@ public class RepositoryServiceImpl extends ServiceImpl implements RepositoryServ
     return commandExecutor.execute(new GetDeploymentProcessDiagramCmd(processDefinitionId));
   }
 
+  public InputStream getCaseDiagram(String caseDefinitionId) {
+    return commandExecutor.execute(new GetDeploymentCaseDiagramCmd(caseDefinitionId));
+  }
+
   public DiagramLayout getProcessDiagramLayout(String processDefinitionId) {
     return commandExecutor.execute(new GetDeploymentProcessDiagramLayoutCmd(processDefinitionId));
   }
 
   public BpmnModelInstance getBpmnModelInstance(String processDefinitionId) {
     return commandExecutor.execute(new GetDeploymentBpmnModelInstanceCmd(processDefinitionId));
+  }
+
+  public CmmnModelInstance getCmmnModelInstance(String caseDefinitionId) {
+    try {
+      return commandExecutor.execute(new GetDeploymentCmmnModelInstanceCmd(caseDefinitionId));
+
+    } catch (NullValueException e) {
+      throw new NotValidException(e.getMessage(), e);
+
+    } catch (CmmnModelInstanceNotFoundException e) {
+      throw new NotFoundException(e.getMessage(), e);
+
+    } catch (DeploymentResourceNotFoundException e) {
+      throw new NotFoundException(e.getMessage(), e);
+
+    }
   }
 
   public void addCandidateStarterUser(String processDefinitionId, String userId) {
@@ -193,11 +225,33 @@ public class RepositoryServiceImpl extends ServiceImpl implements RepositoryServ
   }
 
   public CaseDefinition getCaseDefinition(String caseDefinitionId) {
-    return commandExecutor.execute(new GetDeploymentCaseDefinitionCmd(caseDefinitionId));
+    try {
+      return commandExecutor.execute(new GetDeploymentCaseDefinitionCmd(caseDefinitionId));
+
+    } catch (NullValueException e) {
+      throw new NotValidException(e.getMessage(), e);
+
+    } catch (CaseDefinitionNotFoundException e) {
+      throw new NotFoundException(e.getMessage(), e);
+
+    }
   }
 
   public InputStream getCaseModel(String caseDefinitionId) {
-    return commandExecutor.execute(new GetDeploymentCaseModelCmd(caseDefinitionId));
+    try {
+      return commandExecutor.execute(new GetDeploymentCaseModelCmd(caseDefinitionId));
+
+    } catch (NullValueException e) {
+      throw new NotValidException(e.getMessage(), e);
+
+    } catch (CaseDefinitionNotFoundException e) {
+      throw new NotFoundException(e.getMessage(), e);
+
+    } catch (DeploymentResourceNotFoundException e) {
+      throw new NotFoundException(e.getMessage(), e);
+
+    }
+
   }
 
 }

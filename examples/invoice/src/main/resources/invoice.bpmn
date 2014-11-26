@@ -7,7 +7,7 @@
   <collaboration id="collaboration_3">
     <participant id="Process_Engine_1" name="Invoice Receipt" processRef="invoice"/>
   </collaboration>
-  <process id="invoice" name="invoice receipt" isExecutable="true">
+  <process id="invoice" name="Invoice Receipt" isExecutable="true">
     <laneSet id="laneSet_5">
       <lane id="Approver" name="Approver">
         <flowNodeRef>approveInvoice</flowNodeRef>
@@ -26,7 +26,8 @@
         <flowNodeRef>ServiceTask_1</flowNodeRef>
       </lane>
     </laneSet>
-    <userTask id="approveInvoice" activiti:formKey="embedded:app:forms/approve-invoice.html" activiti:assignee="${approver}" name="Approve Invoice">
+    <userTask id="approveInvoice" activiti:formKey="embedded:app:forms/approve-invoice.html" activiti:assignee="${approver}" activiti:dueDate="${dateTime().plusWeeks(1).toDate()}" name="Approve Invoice">
+      <documentation>Approve the invoice (or not).</documentation>
       <incoming>sequenceFlow_178</incoming>
       <incoming>reviewSuccessful</incoming>
       <outgoing>sequenceFlow_180</outgoing>
@@ -36,7 +37,11 @@
       <outgoing>invoiceNotApproved</outgoing>
       <outgoing>invoiceApproved</outgoing>
     </exclusiveGateway>
-    <userTask id="reviewInvoice" activiti:assignee="demo" activiti:formKey="embedded:app:forms/review-invoice.html" name="Review Invoice">
+    <userTask id="reviewInvoice" activiti:assignee="demo" activiti:formKey="embedded:app:forms/review-invoice.html" activiti:dueDate="${dateTime().plusDays(2).toDate()}" name="Review Invoice">
+      <documentation><![CDATA[Review the invoice.
+
+
+If data is missing, provide it.]]></documentation>
       <incoming>invoiceNotApproved</incoming>
       <outgoing>sequenceFlow_183</outgoing>
     </userTask>
@@ -45,7 +50,8 @@
       <outgoing>reviewNotSuccessful</outgoing>
       <outgoing>reviewSuccessful</outgoing>
     </exclusiveGateway>
-    <userTask id="prepareBankTransfer" activiti:formKey="embedded:app:forms/prepare-bank-transfer.html" activiti:candidateGroups="accounting" name="Prepare&#xD;&#xA;Bank&#xD;&#xA;Transfer">
+    <userTask id="prepareBankTransfer" activiti:formKey="embedded:app:forms/prepare-bank-transfer.html" activiti:candidateGroups="accounting" activiti:dueDate="${dateTime().plusWeeks(1).toDate()}" name="Prepare&#xD;&#xA;Bank&#xD;&#xA;Transfer">
+      <documentation>Prepare the bank transfer.</documentation>
       <incoming>invoiceApproved</incoming>
       <outgoing>SequenceFlow_2</outgoing>
     </userTask>
@@ -64,7 +70,8 @@
       <conditionExpression xsi:type="tFormalExpression">${clarified}</conditionExpression>
     </sequenceFlow>
     <dataStoreReference id="DataStoreReference_1" name="Financial Accounting System" dataStoreRef="FinancialAccountingSystem"/>
-    <userTask id="assignApprover" activiti:formKey="embedded:app:forms/assign-approver.html" activiti:assignee="demo" name="Assign Approver">
+    <userTask id="assignApprover" activiti:formKey="embedded:app:forms/assign-approver.html" activiti:assignee="demo" activiti:dueDate="${dateTime().plusDays(3).toDate()}" name="Assign Approver">
+      <documentation>Select the colleague who should approve this invoice.</documentation>
       <incoming>SequenceFlow_1</incoming>
       <outgoing>sequenceFlow_178</outgoing>
     </userTask>
@@ -80,7 +87,7 @@
     <endEvent id="invoiceProcessed" name="Invoice&#xA;processed">
       <incoming>SequenceFlow_3</incoming>
     </endEvent>
-    <serviceTask id="ServiceTask_1" activiti:class="org.camunda.bpm.example.invoice.service.ArchiveInvoiceService" name="Archive Invoice">
+    <serviceTask id="ServiceTask_1" activiti:class="org.camunda.bpm.example.invoice.service.ArchiveInvoiceService" activiti:async="true" name="Archive Invoice">
       <incoming>SequenceFlow_2</incoming>
       <outgoing>SequenceFlow_3</outgoing>
     </serviceTask>

@@ -13,10 +13,10 @@
 package org.camunda.bpm.engine.impl.cmd;
 
 import java.io.Serializable;
-
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 
 /**
@@ -35,12 +35,8 @@ public class CreateMembershipCmd extends AbstractWritableIdentityServiceCmd<Void
   }
   
   protected Void executeCmd(CommandContext commandContext) {
-    if(userId == null) {
-      throw new ProcessEngineException("userId is null");
-    }
-    if(groupId == null) {
-      throw new ProcessEngineException("groupId is null");
-    }
+    ensureNotNull("userId", userId);
+    ensureNotNull("groupId", groupId);
     commandContext
       .getWritableIdentityProvider()
       .createMembership(userId, groupId);

@@ -12,11 +12,16 @@
  */
 package org.camunda.bpm.engine.rest.sub.runtime;
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
+import org.camunda.bpm.engine.rest.dto.runtime.CaseExecutionTriggerDto;
 import org.camunda.bpm.engine.rest.dto.runtime.CaseInstanceDto;
+import org.camunda.bpm.engine.rest.sub.VariableResource;
 
 /**
  *
@@ -28,5 +33,18 @@ public interface CaseInstanceResource {
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   CaseInstanceDto getCaseInstance();
+
+  @POST
+  @Path("/complete")
+  @Consumes(MediaType.APPLICATION_JSON)
+  void complete(CaseExecutionTriggerDto triggerDto);
+
+  @POST
+  @Path("/close")
+  @Consumes(MediaType.APPLICATION_JSON)
+  void close(CaseExecutionTriggerDto triggerDto);
+
+  @Path("/variables")
+  VariableResource getVariablesResource();
 
 }

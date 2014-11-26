@@ -13,16 +13,16 @@
 
 package org.camunda.bpm.engine.impl.form.handler;
 
-import java.util.Map;
-
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.Expression;
+import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.form.FormProperty;
 import org.camunda.bpm.engine.form.FormType;
 import org.camunda.bpm.engine.impl.el.StartProcessVariableScope;
 import org.camunda.bpm.engine.impl.form.FormPropertyImpl;
 import org.camunda.bpm.engine.impl.form.type.AbstractFormFieldType;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.variable.VariableMap;
 
 
 /**
@@ -75,25 +75,25 @@ public class FormPropertyHandler {
     return formProperty;
   }
 
-  public void submitFormProperty(ExecutionEntity execution, Map<String, Object> properties) {
-    if (!isWritable && properties.containsKey(id)) {
+  public void submitFormProperty(VariableScope variableScope, VariableMap variables) {
+    if (!isWritable && variables.containsKey(id)) {
       throw new ProcessEngineException("form property '"+id+"' is not writable");
     }
 
-    if (isRequired && !properties.containsKey(id) && defaultExpression == null) {
+    if (isRequired && !variables.containsKey(id) && defaultExpression == null) {
       throw new ProcessEngineException("form property '"+id+"' is required");
     }
 
     Object modelValue = null;
-    if (properties.containsKey(id)) {
-      final Object propertyValue = properties.remove(id);
+    if (variables.containsKey(id)) {
+      final Object propertyValue = variables.remove(id);
       if (type != null) {
         modelValue = type.convertFormValueToModelValue(propertyValue);
       } else {
         modelValue = propertyValue;
       }
     } else if (defaultExpression != null) {
-      final Object expressionValue = defaultExpression.getValue(execution);
+      final Object expressionValue = defaultExpression.getValue(variableScope);
       if (type != null && expressionValue != null) {
         modelValue = type.convertFormValueToModelValue(expressionValue.toString());
       } else if (expressionValue != null) {
@@ -105,11 +105,11 @@ public class FormPropertyHandler {
 
     if (modelValue != null) {
       if (variableName != null) {
-        execution.setVariable(variableName, modelValue);
+        variableScope.setVariable(variableName, modelValue);
       } else if (variableExpression != null) {
-        variableExpression.setValue(modelValue, execution);
+        variableExpression.setValue(modelValue, variableScope);
       } else {
-        execution.setVariable(id, modelValue);
+        variableScope.setVariable(id, modelValue);
       }
     }
   }

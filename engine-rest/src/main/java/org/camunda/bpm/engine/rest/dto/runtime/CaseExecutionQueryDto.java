@@ -26,6 +26,7 @@ import org.camunda.bpm.engine.rest.dto.converter.BooleanConverter;
 import org.camunda.bpm.engine.rest.dto.converter.VariableListConverter;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.runtime.CaseExecutionQuery;
+import org.codehaus.jackson.map.ObjectMapper;
 
 /**
  * @author Roman Smirnov
@@ -53,6 +54,7 @@ public class CaseExecutionQueryDto extends AbstractQueryDto<CaseExecutionQuery> 
   protected String activityId;
   protected Boolean enabled;
   protected Boolean active;
+  protected Boolean disabled;
 
   protected List<VariableQueryParameterDto> variables;
   protected List<VariableQueryParameterDto> caseInstanceVariables;
@@ -60,8 +62,8 @@ public class CaseExecutionQueryDto extends AbstractQueryDto<CaseExecutionQuery> 
   public CaseExecutionQueryDto() {
   }
 
-  public CaseExecutionQueryDto(MultivaluedMap<String, String> queryParameters) {
-    super(queryParameters);
+  public CaseExecutionQueryDto(ObjectMapper objectMapper, MultivaluedMap<String, String> queryParameters) {
+    super(objectMapper, queryParameters);
   }
 
   @CamundaQueryParam("caseExecutionId")
@@ -102,6 +104,11 @@ public class CaseExecutionQueryDto extends AbstractQueryDto<CaseExecutionQuery> 
   @CamundaQueryParam(value="active", converter = BooleanConverter.class)
   public void setActive(Boolean active) {
     this.active = active;
+  }
+
+  @CamundaQueryParam(value="disabled", converter = BooleanConverter.class)
+  public void setDisabled(Boolean disabled) {
+    this.disabled = disabled;
   }
 
   @CamundaQueryParam(value = "variables", converter = VariableListConverter.class)
@@ -158,13 +165,17 @@ public class CaseExecutionQueryDto extends AbstractQueryDto<CaseExecutionQuery> 
       query.enabled();
     }
 
+    if (disabled != null && disabled == true) {
+      query.disabled();
+    }
+
     if (variables != null) {
 
       for (VariableQueryParameterDto variableQueryParam : variables) {
 
         String variableName = variableQueryParam.getName();
         String op = variableQueryParam.getOperator();
-        Object variableValue = variableQueryParam.getValue();
+        Object variableValue = variableQueryParam.resolveValue(objectMapper);
 
         if (op.equals(VariableQueryParameterDto.EQUALS_OPERATOR_NAME)) {
           query.variableValueEquals(variableName, variableValue);
@@ -192,7 +203,7 @@ public class CaseExecutionQueryDto extends AbstractQueryDto<CaseExecutionQuery> 
 
         String variableName = variableQueryParam.getName();
         String op = variableQueryParam.getOperator();
-        Object variableValue = variableQueryParam.getValue();
+        Object variableValue = variableQueryParam.resolveValue(objectMapper);
 
         if (op.equals(VariableQueryParameterDto.EQUALS_OPERATOR_NAME)) {
           query.caseInstanceVariableValueEquals(variableName, variableValue);

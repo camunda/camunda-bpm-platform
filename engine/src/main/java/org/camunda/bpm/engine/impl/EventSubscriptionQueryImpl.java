@@ -15,11 +15,12 @@ package org.camunda.bpm.engine.impl;
 
 import java.io.Serializable;
 import java.util.List;
-
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.runtime.EventSubscription;
 import org.camunda.bpm.engine.runtime.EventSubscriptionQuery;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 
 /**
@@ -47,37 +48,37 @@ public class EventSubscriptionQueryImpl
   }
 
   public EventSubscriptionQuery eventSubscriptionId(String id) {
-    assertParamNotNull("event subscription id", id);
+    ensureNotNull("event subscription id", id);
     this.eventSubscriptionId = id;
     return this;
   }
 
   public EventSubscriptionQuery eventName(String eventName) {
-    assertParamNotNull("event name", eventName);
+    ensureNotNull("event name", eventName);
     this.eventName = eventName;
     return this;
   }
 
   public EventSubscriptionQueryImpl executionId(String executionId) {
-    assertParamNotNull("execution id", executionId);
+    ensureNotNull("execution id", executionId);
     this.executionId = executionId;
     return this;
   }
 
   public EventSubscriptionQuery processInstanceId(String processInstanceId) {
-    assertParamNotNull("process instance id", processInstanceId);
+    ensureNotNull("process instance id", processInstanceId);
     this.processInstanceId = processInstanceId;
     return this;
   }
 
   public EventSubscriptionQueryImpl activityId(String activityId) {
-    assertParamNotNull("activity id", activityId);
+    ensureNotNull("activity id", activityId);
     this.activityId = activityId;
     return this;
   }
 
   public EventSubscriptionQueryImpl eventType(String eventType) {
-    assertParamNotNull("event type", eventType);
+    ensureNotNull("event type", eventType);
     this.eventType = eventType;
     return this;
   }

@@ -13,6 +13,8 @@
 
 package org.camunda.bpm.engine.impl;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -23,8 +25,8 @@ import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEntity;
-import org.camunda.bpm.engine.impl.variable.ByteArrayType;
-import org.camunda.bpm.engine.impl.variable.VariableTypes;
+import org.camunda.bpm.engine.impl.variable.serializer.VariableSerializers;
+import org.camunda.bpm.engine.variable.type.ValueType;
 
 /**
  * @author Christian Lipphardt (camunda)
@@ -37,14 +39,17 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
   private static final long serialVersionUID = 1L;
   protected String variableId;
   protected String processInstanceId;
+  protected String caseInstanceId;
   protected String variableName;
   protected String variableNameLike;
   protected QueryVariableValue queryVariableValue;
   protected String[] taskIds;
   protected String[] executionIds;
+  protected String[] caseExecutionIds;
   protected String[] activityInstanceIds;
 
   protected boolean isByteArrayFetchingEnabled = true;
+  protected boolean isCustomObjectDeserializationEnabled = true;
 
   public HistoricVariableInstanceQueryImpl() {
   }
@@ -58,64 +63,81 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
   }
 
   public HistoricVariableInstanceQuery variableId(String id) {
-    assertParamNotNull("variableId", id);
+    ensureNotNull("variableId", id);
     this.variableId = id;
     return this;
   }
 
   public HistoricVariableInstanceQueryImpl processInstanceId(String processInstanceId) {
-    assertParamNotNull("processInstanceId", processInstanceId);
+    ensureNotNull("processInstanceId", processInstanceId);
     this.processInstanceId = processInstanceId;
     return this;
   }
 
+  public HistoricVariableInstanceQuery caseInstanceId(String caseInstanceId) {
+    ensureNotNull("caseInstanceId", caseInstanceId);
+    this.caseInstanceId = caseInstanceId;
+    return this;
+  }
+
   public HistoricVariableInstanceQuery taskIdIn(String... taskIds) {
-    assertParamNotNull("Task Ids", taskIds);
+    ensureNotNull("Task Ids", (Object[]) taskIds);
     this.taskIds = taskIds;
     return this;
   }
 
   public HistoricVariableInstanceQuery executionIdIn(String... executionIds) {
-    assertParamNotNull("Execution Ids", executionIds);
+    ensureNotNull("Execution Ids", (Object[]) executionIds);
     this.executionIds = executionIds;
     return this;
   }
 
+  public HistoricVariableInstanceQuery caseExecutionIdIn(String... caseExecutionIds) {
+    ensureNotNull("Case execution ids", (Object[]) caseExecutionIds);
+    this.caseExecutionIds = caseExecutionIds;
+    return this;
+  }
+
   public HistoricVariableInstanceQuery activityInstanceIdIn(String... activityInstanceIds) {
-    assertParamNotNull("Activity Instance Ids", activityInstanceIds);
+    ensureNotNull("Activity Instance Ids", (Object[]) activityInstanceIds);
     this.activityInstanceIds = activityInstanceIds;
     return this;
   }
 
   public HistoricVariableInstanceQuery variableName(String variableName) {
-    assertParamNotNull("variableName", variableName);
+    ensureNotNull("variableName", variableName);
     this.variableName = variableName;
     return this;
   }
 
   public HistoricVariableInstanceQuery variableValueEquals(String variableName, Object variableValue) {
-    assertParamNotNull("variableName", variableName);
-    assertParamNotNull("variableValue", variableValue);
+    ensureNotNull("variableName", variableName);
+    ensureNotNull("variableValue", variableValue);
     this.variableName = variableName;
     queryVariableValue = new QueryVariableValue(variableName, variableValue, QueryOperator.EQUALS, true);
     return this;
   }
 
   public HistoricVariableInstanceQuery variableNameLike(String variableNameLike) {
-    assertParamNotNull("variableNameLike", variableNameLike);
+    ensureNotNull("variableNameLike", variableNameLike);
     this.variableNameLike = variableNameLike;
     return this;
   }
 
   protected void ensureVariablesInitialized() {
     if (this.queryVariableValue != null) {
-      VariableTypes variableTypes = Context.getProcessEngineConfiguration().getVariableTypes();
-      queryVariableValue.initialize(variableTypes);
+      VariableSerializers variableSerializers = Context.getProcessEngineConfiguration().getVariableSerializers();
+      queryVariableValue.initialize(variableSerializers);
     }
   }
 
   public HistoricVariableInstanceQuery disableBinaryFetching() {
     isByteArrayFetchingEnabled = false;
+    return this;
+  }
+
+  public HistoricVariableInstanceQuery disableCustomObjectDeserialization() {
+    this.isCustomObjectDeserializationEnabled = false;
     return this;
   }
 
@@ -136,23 +158,24 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
       for (HistoricVariableInstance historicVariableInstance: historicVariableInstances) {
 
         HistoricVariableInstanceEntity variableInstanceEntity = (HistoricVariableInstanceEntity) historicVariableInstance;
-
-        // do not fetch values for byte arrays eagerly (unless requested by the user)
-        if (isByteArrayFetchingEnabled
-            || !ByteArrayType.TYPE_NAME.equals(variableInstanceEntity.getVariableType().getTypeName())) {
-
+        if (shouldFetchValue(variableInstanceEntity)) {
           try {
-            variableInstanceEntity.getValue();
+            variableInstanceEntity.getTypedValue(isCustomObjectDeserializationEnabled);
+
           } catch(Exception t) {
             // do not fail if one of the variables fails to load
             LOGGER.log(Level.FINE, "Exception while getting value for variable", t);
           }
-
         }
 
       }
     }
     return historicVariableInstances;
+  }
+
+  protected boolean shouldFetchValue(HistoricVariableInstanceEntity entity) {
+    // do not fetch values for byte arrays eagerly (unless requested by the user)
+    return isByteArrayFetchingEnabled || !ValueType.BYTES.equals(entity.getSerializer().getType());
   }
 
   // order by /////////////////////////////////////////////////////////////////
@@ -173,6 +196,10 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
     return processInstanceId;
   }
 
+  public String getCaseInstanceId() {
+    return caseInstanceId;
+  }
+
   public String[] getActivityInstanceIds() {
     return activityInstanceIds;
   }
@@ -183,6 +210,10 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
 
   public String[] getExecutionIds() {
     return executionIds;
+  }
+
+  public String[] getCaseExecutionIds() {
+    return caseExecutionIds;
   }
 
   public String getVariableName() {

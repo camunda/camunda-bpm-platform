@@ -13,6 +13,9 @@
 
 package org.camunda.bpm.engine.impl;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensurePositive;
+
 import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -34,6 +37,7 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
 
   private static final long serialVersionUID = 1L;
   protected String id;
+  protected String[] ids;
   protected String category;
   protected String categoryLike;
   protected String name;
@@ -72,84 +76,67 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
     return this;
   }
 
+  public ProcessDefinitionQueryImpl processDefinitionIdIn(String... ids) {
+    this.ids = ids;
+    return this;
+  }
+
   public ProcessDefinitionQueryImpl processDefinitionCategory(String category) {
-    if (category == null) {
-      throw new ProcessEngineException("category is null");
-    }
+    ensureNotNull("category", category);
     this.category = category;
     return this;
   }
 
   public ProcessDefinitionQueryImpl processDefinitionCategoryLike(String categoryLike) {
-    if (categoryLike == null) {
-      throw new ProcessEngineException("categoryLike is null");
-    }
+    ensureNotNull("categoryLike", categoryLike);
     this.categoryLike = categoryLike;
     return this;
   }
 
   public ProcessDefinitionQueryImpl processDefinitionName(String name) {
-    if (name == null) {
-      throw new ProcessEngineException("name is null");
-    }
+    ensureNotNull("name", name);
     this.name = name;
     return this;
   }
 
   public ProcessDefinitionQueryImpl processDefinitionNameLike(String nameLike) {
-    if (nameLike == null) {
-      throw new ProcessEngineException("nameLike is null");
-    }
+    ensureNotNull("nameLike", nameLike);
     this.nameLike = nameLike;
     return this;
   }
 
   public ProcessDefinitionQueryImpl deploymentId(String deploymentId) {
-    if (deploymentId == null) {
-      throw new ProcessEngineException("id is null");
-    }
+    ensureNotNull("deploymentId", deploymentId);
     this.deploymentId = deploymentId;
     return this;
   }
 
   public ProcessDefinitionQueryImpl processDefinitionKey(String key) {
-    if (key == null) {
-      throw new ProcessEngineException("key is null");
-    }
+    ensureNotNull("key", key);
     this.key = key;
     return this;
   }
 
   public ProcessDefinitionQueryImpl processDefinitionKeyLike(String keyLike) {
-    if (keyLike == null) {
-      throw new ProcessEngineException("keyLike is null");
-    }
+    ensureNotNull("keyLike", keyLike);
     this.keyLike = keyLike;
     return this;
   }
 
   public ProcessDefinitionQueryImpl processDefinitionResourceName(String resourceName) {
-    if (resourceName == null) {
-      throw new ProcessEngineException("resourceName is null");
-    }
+    ensureNotNull("resourceName", resourceName);
     this.resourceName = resourceName;
     return this;
   }
 
   public ProcessDefinitionQueryImpl processDefinitionResourceNameLike(String resourceNameLike) {
-    if (resourceNameLike == null) {
-      throw new ProcessEngineException("resourceNameLike is null");
-    }
+    ensureNotNull("resourceNameLike", resourceNameLike);
     this.resourceNameLike = resourceNameLike;
     return this;
   }
 
   public ProcessDefinitionQueryImpl processDefinitionVersion(Integer version) {
-    if (version == null) {
-      throw new ProcessEngineException("version is null");
-    } else if (version <= 0) {
-      throw new ProcessEngineException("version must be positive");
-    }
+    ensurePositive("version", version);
     this.version = version;
     return this;
   }
@@ -183,37 +170,33 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
   }
 
   public ProcessDefinitionQuery eventSubscription(String eventType, String eventName) {
-    if(eventName == null) {
-      throw new ProcessEngineException("event name is null");
-    }
-    if(eventType == null) {
-      throw new ProcessEngineException("event type is null");
-    }
+    ensureNotNull("event type", eventType);
+    ensureNotNull("event name", eventName);
     this.eventSubscriptionType = eventType;
     this.eventSubscriptionName = eventName;
     return this;
   }
 
   public ProcessDefinitionQuery incidentType(String incidentType) {
-    assertParamNotNull("incident type", incidentType);
+    ensureNotNull("incident type", incidentType);
     this.incidentType = incidentType;
     return this;
   }
 
   public ProcessDefinitionQuery incidentId(String incidentId) {
-    assertParamNotNull("incident id", incidentId);
+    ensureNotNull("incident id", incidentId);
     this.incidentId = incidentId;
     return this;
   }
 
   public ProcessDefinitionQuery incidentMessage(String incidentMessage) {
-    assertParamNotNull("incident message", incidentMessage);
+    ensureNotNull("incident message", incidentMessage);
     this.incidentMessage = incidentMessage;
     return this;
   }
 
   public ProcessDefinitionQuery incidentMessageLike(String incidentMessageLike) {
-    assertParamNotNull("incident messageLike", incidentMessageLike);
+    ensureNotNull("incident messageLike", incidentMessageLike);
     this.incidentMessageLike = incidentMessageLike;
     return this;
   }
@@ -263,9 +246,8 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
   public void checkQueryOk() {
     super.checkQueryOk();
 
-    // latest() makes only sense when used with key() or keyLike()
-    if (latest && ( (id != null) || (name != null) || (nameLike != null) || (version != null) || (deploymentId != null) ) ){
-      throw new ProcessEngineException("Calling latest() can only be used in combination with key(String) and keyLike(String)");
+    if (latest && ( (id != null) || (version != null) || (deploymentId != null) ) ){
+      throw new ProcessEngineException("Calling latest() can only be used in combination with key(String) and keyLike(String) or name(String) and nameLike(String)");
     }
   }
 
@@ -276,6 +258,9 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
   }
   public String getId() {
     return id;
+  }
+  public String[] getIds() {
+    return ids;
   }
   public String getName() {
     return name;
@@ -331,9 +316,7 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
   }
 
   public ProcessDefinitionQueryImpl startableByUser(String userId) {
-    if (userId == null) {
-      throw new ProcessEngineException("userId is null");
-    }
+    ensureNotNull("userId", userId);
     this.authorizationUserId = userId;
     return this;
   }

@@ -19,7 +19,7 @@
 <mapper namespace="org.camunda.bpm.engine.impl.persistence.entity.HistoricProcessInstanceEntity">
 
   <!-- HISTORIC PROCESS INSTANCE INSERT -->
-  
+
   <insert id="insertHistoricProcessInstanceEvent" parameterType="org.camunda.bpm.engine.impl.history.event.HistoricProcessInstanceEventEntity">
       insert into ${prefix}ACT_HI_PROCINST (
         ID_,
@@ -33,6 +33,7 @@
         START_ACT_ID_,
         END_ACT_ID_,
         SUPER_PROCESS_INSTANCE_ID_,
+        CASE_INST_ID_,
         DELETE_REASON_
       ) values (
         #{id ,jdbcType=VARCHAR},
@@ -46,35 +47,36 @@
         #{startActivityId, jdbcType=VARCHAR},
         #{endActivityId, jdbcType=VARCHAR},
         #{superProcessInstanceId, jdbcType=VARCHAR},
+        #{caseInstanceId, jdbcType=VARCHAR},
         #{deleteReason, jdbcType=VARCHAR}
       )
   </insert>
 
   <!-- HISTORIC PROCESS INSTANCE UPDATE -->
-  
+
   <update id="updateHistoricProcessInstanceEvent" parameterType="org.camunda.bpm.engine.impl.persistence.entity.HistoricProcessInstanceEntity">
     update ${prefix}ACT_HI_PROCINST set
       PROC_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR},
       END_ACT_ID_ = #{endActivityId, jdbcType=VARCHAR},
-      DELETE_REASON_ = #{deleteReason, jdbcType=VARCHAR}      
-      
+      DELETE_REASON_ = #{deleteReason, jdbcType=VARCHAR}
+
       <if test="endTime!=null">
         , END_TIME_ = #{endTime, jdbcType=TIMESTAMP}
         , DURATION_ = #{durationInMillis, jdbcType=BIGINT}
-      </if>      
-      
+      </if>
+
     where ID_ = #{id, jdbcType=VARCHAR}
   </update>
-  
+
   <!-- HISTORIC PROCESS INSTANCE SELECT -->
-  
+
   <select id="selectHistoricProcessInstanceEvent" parameterType="java.lang.String" resultMap="historicProcessInstanceResultMap">
-    select HPI.START_TIME_ from ${prefix}ACT_HI_PROCINST HPI              
+    select HPI.START_TIME_ from ${prefix}ACT_HI_PROCINST HPI
     where HPI.ID_ = #{id, jdbcType=VARCHAR}
   </select>
-  
+
   <!-- HISTORIC PROCESS INSTANCE DELETE -->
-  
+
   <delete id="deleteHistoricProcessInstance">
     delete from ${prefix}ACT_HI_PROCINST where PROC_INST_ID_ = #{processInstanceId}
   </delete>
@@ -93,11 +95,12 @@
     <result property="startActivityId" column="START_ACT_ID_" jdbcType="VARCHAR" />
     <result property="endActivityId" column="END_ACT_ID_" jdbcType="VARCHAR" />
     <result property="superProcessInstanceId" column="SUPER_PROCESS_INSTANCE_ID_" jdbcType="VARCHAR" />
+    <result property="caseInstanceId" column="CASE_INST_ID_" jdbcType="VARCHAR" />
     <result property="deleteReason" column="DELETE_REASON_" jdbcType="VARCHAR" />
   </resultMap>
 
   <!-- HISTORIC PROCESS INSTANCE SELECT -->
-  
+
   <select id="selectHistoricProcessInstance" resultMap="historicProcessInstanceResultMap">
     select * from ${prefix}ACT_HI_PROCINST where PROC_INST_ID_ = #{processInstanceId}
   </select>
@@ -107,7 +110,6 @@
     from ${prefix}ACT_HI_PROCINST 
     where PROC_DEF_ID_ = #{parameter}
   </select>
-  
 
   <select id="selectHistoricProcessInstancesByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.HistoricProcessInstanceQueryImpl" resultMap="historicProcessInstanceResultMap">
   	${limitBefore}
@@ -116,20 +118,17 @@
     ${orderBy}
     ${limitAfter}
   </select>
-  
+
   <select id="selectHistoricProcessInstanceCountByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.HistoricProcessInstanceQueryImpl" resultType="long">
     select count(distinct RES.ID_)
     <include refid="selectHistoricProcessInstancesByQueryCriteriaSql"/>
   </select>
-  
+
   <sql id="selectHistoricProcessInstancesByQueryCriteriaSql">
     from ${prefix}ACT_HI_PROCINST RES
     <if test="processKeyNotIn != null || processDefinitionKey != null || processDefinitionName != null || processDefinitionNameLike != null">
       inner join ${prefix}ACT_RE_PROCDEF DEF on RES.PROC_DEF_ID_ = DEF.ID_
     </if>
-    <foreach collection="queryVariableValues" index="index" item="queryVariableValue">
-      inner join ${prefix}ACT_HI_VARINST  A${index} on RES.PROC_INST_ID_ = A${index}.PROC_INST_ID_
-    </foreach>    
     <where>
       <if test="processInstanceId != null">
         RES.PROC_INST_ID_ = #{processInstanceId}
@@ -139,6 +138,9 @@
         <foreach item="item" index="index" collection="processInstanceIds" open="(" separator="," close=")">
           #{item}
         </foreach>
+      </if>
+      <if test="caseInstanceId != null">
+        and RES.CASE_INST_ID_ = #{caseInstanceId}
       </if>
       <if test="processDefinitionId != null">
         and RES.PROC_DEF_ID_ = #{processDefinitionId}
@@ -176,7 +178,7 @@
         and DEF.KEY_ not like #{procDefKey}
       </foreach>
       </if>
-      
+
       <!-- DEPRECATED : TO BE REMOVED IN 5.11 -->
       <if test="startDateOn">
         and RES.START_TIME_ &gt;= #{startDateOnBegin}
@@ -208,64 +210,30 @@
       <if test="superProcessInstanceId != null">
         and RES.SUPER_PROCESS_INSTANCE_ID_ = #{superProcessInstanceId}
       </if>
+      <if test="subProcessInstanceId != null">
+        and RES.PROC_INST_ID_ = (select SUPER_PROCESS_INSTANCE_ID_ from ${prefix}ACT_HI_PROCINST where PROC_INST_ID_ = #{subProcessInstanceId})
+      </if>      
       <foreach collection="queryVariableValues" index="index" item="queryVariableValue">
-        and A${index}.NAME_= #{queryVariableValue.name}
-        <if test="!queryVariableValue.type.equals('null')">
-        <!-- When operator is not-equals or type of value is null, type doesn't matter! -->
-          and A${index}.VAR_TYPE_ = #{queryVariableValue.type}
+        and EXISTS (
+          select
+            ID_
+          from
+            ${prefix}ACT_HI_VARINST
+          WHERE
+            NAME_= #{queryVariableValue.name}
+          AND PROC_INST_ID_ = RES.PROC_INST_ID_
+          
+        <bind name="varTypeField" value="'VAR_TYPE_'"/>
+        <bind name="varPrefix" value="''"/>
+        <if test="queryVariableValue.valueConditions != null">
+          and 
+          <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.variableValueConditions"/>
         </if>
-        <if test="queryVariableValue.textValue != null &amp;&amp; queryVariableValue.longValue == null &amp;&amp; queryVariableValue.doubleValue == null">
-        and A${index}.TEXT_
-        <choose>
-          <when test="queryVariableValue.operator.equals('LIKE')">LIKE</when>
-          <otherwise><include refid="executionVariableOperator" /></otherwise>
-        </choose>
-          #{queryVariableValue.textValue}
-        </if>
-        <if test="queryVariableValue.textValue2 != null">
-        and A${index}.TEXT2_
-        <choose>
-          <when test="queryVariableValue.operator.equals('LIKE')">LIKE</when>
-          <otherwise><include refid="executionVariableOperator" /></otherwise>
-        </choose>
-          #{queryVariableValue.textValue2}
-        </if>
-        <if test="queryVariableValue.longValue != null">
-        and A${index}.LONG_
-        <include refid="executionVariableOperator" />
-        #{queryVariableValue.longValue}
-        </if>
-        <if test="queryVariableValue.doubleValue != null">
-        and A${index}.DOUBLE_
-        <include refid="executionVariableOperator" />
-        #{queryVariableValue.doubleValue}
-        </if>
-        <!-- Null variable type -->
-        <if test="queryVariableValue.textValue == null &amp;&amp; queryVariableValue.textValue2 == null &amp;&amp; queryVariableValue.longValue == null &amp;&amp; queryVariableValue.doubleValue == null">
-          <choose>
-          <when test="queryVariableValue.operator.equals('NOT_EQUALS')">
-            and (A${index}.TEXT_ is not null or A${index}.TEXT2_ is not null or A${index}.LONG_ is not null or A${index}.DOUBLE_ is not null or A${index}.BYTEARRAY_ID_ is not null)
-          </when>
-          <otherwise>
-            and A${index}.TEXT_ is null and A${index}.TEXT2_ is null and A${index}.LONG_ is null and A${index}.DOUBLE_ is null and A${index}.BYTEARRAY_ID_ is null
-          </otherwise>
-        </choose>
-        </if>
+        )
       </foreach>
     </where>
   </sql>
-  
-  <sql id="executionVariableOperator">
-    <choose>
-      <when test="queryVariableValue.operator.equals('EQUALS')">=</when>
-      <when test="queryVariableValue.operator.equals('NOT_EQUALS')">&lt;&gt;</when>
-      <when test="queryVariableValue.operator.equals('GREATER_THAN')">&gt;</when>
-      <when test="queryVariableValue.operator.equals('GREATER_THAN_OR_EQUAL')">&gt;=</when>
-      <when test="queryVariableValue.operator.equals('LESS_THAN')">&lt;</when>
-      <when test="queryVariableValue.operator.equals('LESS_THAN_OR_EQUAL')">&lt;=</when>
-   </choose>
-  </sql>
- 
+
   <select id="selectHistoricProcessInstanceByNativeQuery" parameterType="java.util.Map" resultMap="historicProcessInstanceResultMap">
     <if test="resultType == 'LIST_PAGE'">
       ${limitBefore}
@@ -275,12 +243,12 @@
       ${limitAfter}
     </if>
   </select>
-  
+
   <select id="selectHistoricProcessInstanceByNativeQuery_mssql_or_db2" parameterType="java.util.Map" resultMap="historicProcessInstanceResultMap">
     <if test="resultType == 'LIST_PAGE'">
         ${limitBeforeNativeQuery}
     </if>
-    ${sql} 
+    ${sql}
     <if test="resultType == 'LIST_PAGE'">
       ${limitAfter}
     </if>

@@ -36,7 +36,6 @@ import org.camunda.bpm.engine.rest.sub.management.JobDefinitionResource;
 /**
  * @author roman.smirnov
  */
-@Path(JobDefinitionRestService.PATH)
 @Produces(MediaType.APPLICATION_JSON)
 public interface JobDefinitionRestService {
 

@@ -22,6 +22,7 @@ import org.camunda.bpm.engine.history.HistoricIncidentQuery;
 import org.camunda.bpm.engine.rest.dto.AbstractQueryDto;
 import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
 import org.camunda.bpm.engine.rest.dto.converter.BooleanConverter;
+import org.codehaus.jackson.map.ObjectMapper;
 
 /**
  * @author Roman Smirnov
@@ -73,8 +74,8 @@ public class HistoricIncidentQueryDto extends AbstractQueryDto<HistoricIncidentQ
 
   public HistoricIncidentQueryDto() {}
 
-  public HistoricIncidentQueryDto(MultivaluedMap<String, String> queryParameters) {
-    super(queryParameters);
+  public HistoricIncidentQueryDto(ObjectMapper objectMapper, MultivaluedMap<String, String> queryParameters) {
+    super(objectMapper, queryParameters);
   }
 
   @CamundaQueryParam("incidentId")

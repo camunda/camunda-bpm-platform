@@ -29,6 +29,7 @@ import java.util.Set;
 import org.camunda.bpm.engine.OptimisticLockingException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.TaskAlreadyClaimedException;
+import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.identity.Group;
@@ -38,6 +39,8 @@ import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.IoUtil;
+import org.camunda.bpm.engine.runtime.CaseExecution;
+import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Attachment;
 import org.camunda.bpm.engine.task.Comment;
@@ -47,6 +50,8 @@ import org.camunda.bpm.engine.task.IdentityLink;
 import org.camunda.bpm.engine.task.IdentityLinkType;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.variable.VariableMap;
+import org.camunda.bpm.engine.variable.Variables;
 
 /**
  * @author Frederik Heremans
@@ -54,6 +59,8 @@ import org.camunda.bpm.engine.test.Deployment;
  * @author Falko Menge
  */
 public class TaskServiceTest extends PluggableProcessEngineTestCase {
+
+  protected static final String TWO_TASKS_PROCESS = "org/camunda/bpm/engine/test/api/twoTasksProcess.bpmn20.xml";
 
   public void testSaveTaskUpdate() throws Exception{
 
@@ -66,6 +73,7 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
     task.setOwner("taskowner");
     Date dueDate = sdf.parse("01/02/2003 04:05:06");
     task.setDueDate(dueDate);
+    task.setCaseInstanceId("taskcaseinstanceid");
     taskService.saveTask(task);
 
     // Fetch the task again and update
@@ -76,6 +84,21 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
     assertEquals("taskowner", task.getOwner());
     assertEquals(dueDate, task.getDueDate());
     assertEquals(0, task.getPriority());
+    assertEquals("taskcaseinstanceid", task.getCaseInstanceId());
+
+    if (processEngineConfiguration.getHistoryLevel().getId()>= ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT) {
+      HistoricTaskInstance historicTaskInstance = historyService
+        .createHistoricTaskInstanceQuery()
+        .taskId(task.getId())
+        .singleResult();
+      assertEquals("taskname", historicTaskInstance.getName());
+      assertEquals("description", historicTaskInstance.getDescription());
+      assertEquals("taskassignee", historicTaskInstance.getAssignee());
+      assertEquals("taskowner", historicTaskInstance.getOwner());
+      assertEquals(dueDate, historicTaskInstance.getDueDate());
+      assertEquals(0, historicTaskInstance.getPriority());
+      assertEquals("taskcaseinstanceid", historicTaskInstance.getCaseInstanceId());
+    }
 
     task.setName("updatedtaskname");
     task.setDescription("updateddescription");
@@ -84,6 +107,7 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
     task.setOwner("updatedowner");
     dueDate = sdf.parse("01/02/2003 04:05:06");
     task.setDueDate(dueDate);
+    task.setCaseInstanceId("updatetaskcaseinstanceid");
     taskService.saveTask(task);
 
     task = taskService.createTaskQuery().taskId(task.getId()).singleResult();
@@ -93,8 +117,9 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
     assertEquals("updatedowner", task.getOwner());
     assertEquals(dueDate, task.getDueDate());
     assertEquals(1, task.getPriority());
+    assertEquals("updatetaskcaseinstanceid", task.getCaseInstanceId());
 
-    if (processEngineConfiguration.getHistoryLevel()>=ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT) {
+    if (processEngineConfiguration.getHistoryLevel().getId()>= ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT) {
       HistoricTaskInstance historicTaskInstance = historyService
         .createHistoricTaskInstanceQuery()
         .taskId(task.getId())
@@ -105,10 +130,47 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
       assertEquals("updatedowner", historicTaskInstance.getOwner());
       assertEquals(dueDate, historicTaskInstance.getDueDate());
       assertEquals(1, historicTaskInstance.getPriority());
+      assertEquals("updatetaskcaseinstanceid", historicTaskInstance.getCaseInstanceId());
     }
 
     // Finally, delete task
     taskService.deleteTask(task.getId(), true);
+  }
+
+  public void testSaveTaskSetParentTaskId() {
+    // given
+    Task parent = taskService.newTask("parent");
+    taskService.saveTask(parent);
+
+    Task task = taskService.newTask("subTask");
+
+    // when
+    task.setParentTaskId("parent");
+
+    // then
+    taskService.saveTask(task);
+
+    // update task
+    task = taskService.createTaskQuery().taskId("subTask").singleResult();
+
+    assertEquals(parent.getId(), task.getParentTaskId());
+
+    taskService.deleteTask("parent", true);
+    taskService.deleteTask("subTask", true);
+  }
+
+  public void testSaveTaskWithNonExistingParentTask() {
+    // given
+    Task task = taskService.newTask();
+
+    // when
+    task.setParentTaskId("non-existing");
+
+    // then
+    try {
+      taskService.saveTask(task);
+      fail("It should not be possible to save a task with a non existing parent task.");
+    } catch (NotValidException e) {}
   }
 
   public void testTaskOwner() {
@@ -131,8 +193,8 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
   }
 
   public void testTaskComments() {
-    int historyLevel = processEngineConfiguration.getHistoryLevel();
-    if (historyLevel>ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
+    int historyLevel = processEngineConfiguration.getHistoryLevel().getId();
+    if (historyLevel> ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
       Task task = taskService.newTask();
       task.setOwner("johndoe");
       taskService.saveTask(task);
@@ -140,7 +202,7 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
 
       identityService.setAuthenticatedUserId("johndoe");
       // Fetch the task again and update
-      Comment comment = taskService.addComment(taskId, null, "look at this \n       isn't this great? slkdjf sldkfjs ldkfjs ldkfjs ldkfj sldkfj sldkfj sldkjg laksfg sdfgsd;flgkj ksajdhf skjdfh ksjdhf skjdhf kalskjgh lskh dfialurhg kajsh dfuieqpgkja rzvkfnjviuqerhogiuvysbegkjz lkhf ais liasduh flaisduh ajiasudh vaisudhv nsfd");
+      Comment comment = taskService.createComment(taskId, null, "look at this \n       isn't this great? slkdjf sldkfjs ldkfjs ldkfjs ldkfj sldkfj sldkfj sldkjg laksfg sdfgsd;flgkj ksajdhf skjdfh ksjdhf skjdhf kalskjgh lskh dfialurhg kajsh dfuieqpgkja rzvkfnjviuqerhogiuvysbegkjz lkhf ais liasduh flaisduh ajiasudh vaisudhv nsfd");
       assertNotNull(comment.getId());
       assertEquals("johndoe", comment.getUserId());
       assertEquals(taskId, comment.getTaskId());
@@ -149,8 +211,8 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
       assertEquals("look at this \n       isn't this great? slkdjf sldkfjs ldkfjs ldkfjs ldkfj sldkfj sldkfj sldkjg laksfg sdfgsd;flgkj ksajdhf skjdfh ksjdhf skjdhf kalskjgh lskh dfialurhg kajsh dfuieqpgkja rzvkfnjviuqerhogiuvysbegkjz lkhf ais liasduh flaisduh ajiasudh vaisudhv nsfd", comment.getFullMessage());
       assertNotNull(comment.getTime());
 
-      taskService.addComment(taskId, "pid", "one");
-      taskService.addComment(taskId, "pid", "two");
+      taskService.createComment(taskId, "pid", "one");
+      taskService.createComment(taskId, "pid", "two");
 
       Set<String> expectedComments = new HashSet<String>();
       expectedComments.add("one");
@@ -169,12 +231,12 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
   }
 
   public void testAddTaskCommentNull() {
-    int historyLevel = processEngineConfiguration.getHistoryLevel();
-    if (historyLevel>ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
+    int historyLevel = processEngineConfiguration.getHistoryLevel().getId();
+    if (historyLevel> ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
       Task task = taskService.newTask("testId");
       taskService.saveTask(task);
       try {
-        taskService.addComment(task.getId(), null, null);
+        taskService.createComment(task.getId(), null, null);
         fail("Expected process engine exception");
       }
       catch (ProcessEngineException e) {}
@@ -185,10 +247,10 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
   }
 
   public void testAddTaskNullComment() {
-    int historyLevel = processEngineConfiguration.getHistoryLevel();
-    if (historyLevel>ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
+    int historyLevel = processEngineConfiguration.getHistoryLevel().getId();
+    if (historyLevel> ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
       try {
-        taskService.addComment(null, null, "test");
+        taskService.createComment(null, null, "test");
         fail("Expected process engine exception");
       }
       catch (ProcessEngineException e){}
@@ -196,8 +258,8 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
   }
 
   public void testTaskAttachments() {
-    int historyLevel = processEngineConfiguration.getHistoryLevel();
-    if (historyLevel>ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
+    int historyLevel = processEngineConfiguration.getHistoryLevel().getId();
+    if (historyLevel> ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
       Task task = taskService.newTask();
       task.setOwner("johndoe");
       taskService.saveTask(task);
@@ -486,7 +548,7 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
     String taskId = task.getId();
     taskService.complete(taskId, null);
 
-    if (processEngineConfiguration.getHistoryLevel()>=ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT) {
+    if (processEngineConfiguration.getHistoryLevel().getId() >= ProcessEngineConfigurationImpl.HISTORYLEVEL_ACTIVITY) {
       historyService.deleteHistoricTaskInstance(taskId);
     }
 
@@ -503,7 +565,7 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
     String taskId = task.getId();
     taskService.complete(taskId, Collections.EMPTY_MAP);
 
-    if (processEngineConfiguration.getHistoryLevel()>=ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT) {
+    if (processEngineConfiguration.getHistoryLevel().getId() >= ProcessEngineConfigurationImpl.HISTORYLEVEL_ACTIVITY) {
       historyService.deleteHistoricTaskInstance(taskId);
     }
 
@@ -513,8 +575,7 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
   }
 
 
-  @Deployment(resources = {
-    "org/camunda/bpm/engine/test/api/twoTasksProcess.bpmn20.xml" })
+  @Deployment(resources = TWO_TASKS_PROCESS)
   public void testCompleteWithParametersTask() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("twoTasksProcess");
 
@@ -535,6 +596,56 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
     Map<String, Object> variables = runtimeService.getVariables(processInstance.getId());
     assertEquals(1, variables.size());
     assertEquals("myValue", variables.get("myParam"));
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testCompleteTaskShouldCompleteCaseExecution() {
+    // given
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    // an active case instance
+    caseService
+       .withCaseDefinition(caseDefinitionId)
+       .create();
+
+    String caseExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(caseExecutionId)
+      .manualStart();
+
+    Task task = taskService.createTaskQuery().singleResult();
+    assertNotNull(task);
+
+    // when
+    taskService.complete(task.getId());
+
+    // then
+
+    task = taskService.createTaskQuery().singleResult();
+
+    assertNull(task);
+
+    CaseExecution caseExecution = caseService
+      .createCaseExecutionQuery()
+      .activityId("PI_HumanTask_1")
+      .singleResult();
+
+    assertNull(caseExecution);
+
+    CaseInstance caseInstance = caseService
+        .createCaseInstanceQuery()
+        .singleResult();
+
+    assertNotNull(caseInstance);
+    assertTrue(caseInstance.isCompleted());
   }
 
   public void testResolveTaskNullTaskId() {
@@ -563,7 +674,7 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
     String taskId = task.getId();
     taskService.resolveTask(taskId, null);
 
-    if (processEngineConfiguration.getHistoryLevel()>=ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT) {
+    if (processEngineConfiguration.getHistoryLevel().getId()>= ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT) {
       historyService.deleteHistoricTaskInstance(taskId);
     }
 
@@ -583,7 +694,7 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
     String taskId = task.getId();
     taskService.resolveTask(taskId, Collections.EMPTY_MAP);
 
-    if (processEngineConfiguration.getHistoryLevel()>=ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT) {
+    if (processEngineConfiguration.getHistoryLevel().getId()>= ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT) {
       historyService.deleteHistoricTaskInstance(taskId);
     }
 
@@ -594,8 +705,7 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
     taskService.deleteTask(taskId, true);
   }
 
-  @Deployment(resources = {
-  "org/camunda/bpm/engine/test/api/twoTasksProcess.bpmn20.xml" })
+  @Deployment(resources = TWO_TASKS_PROCESS)
   public void testResolveWithParametersTask() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("twoTasksProcess");
 
@@ -990,7 +1100,7 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
   }
 
   private void checkHistoricVariableUpdateEntity(String variableName, String processInstanceId) {
-    if (processEngineConfiguration.getHistoryLevel() == ProcessEngineConfigurationImpl.HISTORYLEVEL_FULL) {
+    if (processEngineConfiguration.getHistoryLevel().getId() == ProcessEngineConfigurationImpl.HISTORYLEVEL_FULL) {
       boolean deletedVariableUpdateFound = false;
 
       List<HistoricDetail> resultSet = historyService.createHistoricDetailQuery().processInstanceId(processInstanceId).list();
@@ -1178,7 +1288,7 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
 
   public void testDeleteTaskWithDeleteReason() {
     // ACT-900: deleteReason can be manually specified - can only be validated when historyLevel > ACTIVITY
-    if (processEngineConfiguration.getHistoryLevel() >= ProcessEngineConfigurationImpl.HISTORYLEVEL_ACTIVITY) {
+    if (processEngineConfiguration.getHistoryLevel().getId() >= ProcessEngineConfigurationImpl.HISTORYLEVEL_ACTIVITY) {
 
       Task task = taskService.newTask();
       task.setName("test task");
@@ -1244,8 +1354,77 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
 
   }
 
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testDeleteTaskPartOfCaseInstance() {
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    // an active case instance
+    caseService
+       .withCaseDefinition(caseDefinitionId)
+       .create();
+
+    String caseExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(caseExecutionId)
+      .manualStart();
+
+    Task task = taskService.createTaskQuery().singleResult();
+    assertNotNull(task);
+
+    try {
+      taskService.deleteTask(task.getId());
+      fail("Should not be possible to delete task");
+    } catch(ProcessEngineException ae) {
+      assertEquals("The task cannot be deleted because is part of a running case instance", ae.getMessage());
+    }
+
+    try {
+      taskService.deleteTask(task.getId(), true);
+      fail("Should not be possible to delete task");
+    } catch(ProcessEngineException ae) {
+      assertEquals("The task cannot be deleted because is part of a running case instance", ae.getMessage());
+    }
+
+    try {
+      taskService.deleteTask(task.getId(), "test");
+      fail("Should not be possible to delete task");
+    } catch(ProcessEngineException ae) {
+      assertEquals("The task cannot be deleted because is part of a running case instance", ae.getMessage());
+    }
+
+    try {
+      taskService.deleteTasks(Arrays.asList(task.getId()));
+      fail("Should not be possible to delete task");
+    } catch(ProcessEngineException ae) {
+      assertEquals("The task cannot be deleted because is part of a running case instance", ae.getMessage());
+    }
+
+    try {
+      taskService.deleteTasks(Arrays.asList(task.getId()), true);
+      fail("Should not be possible to delete task");
+    } catch(ProcessEngineException ae) {
+      assertEquals("The task cannot be deleted because is part of a running case instance", ae.getMessage());
+    }
+
+    try {
+      taskService.deleteTasks(Arrays.asList(task.getId()), "test");
+      fail("Should not be possible to delete task");
+    } catch(ProcessEngineException ae) {
+      assertEquals("The task cannot be deleted because is part of a running case instance", ae.getMessage());
+    }
+
+  }
+
   public void testGetTaskCommentByTaskIdAndCommentId() {
-    if (processEngineConfiguration.getHistoryLevel() > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
+    if (processEngineConfiguration.getHistoryLevel().getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
       // create and save new task
       Task task = taskService.newTask();
       taskService.saveTask(task);
@@ -1253,7 +1432,7 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
       String taskId = task.getId();
 
       // add comment to task
-      Comment comment = taskService.addComment(taskId, null, "look at this \n       isn't this great? slkdjf sldkfjs ldkfjs ldkfjs ldkfj sldkfj sldkfj sldkjg laksfg sdfgsd;flgkj ksajdhf skjdfh ksjdhf skjdhf kalskjgh lskh dfialurhg kajsh dfuieqpgkja rzvkfnjviuqerhogiuvysbegkjz lkhf ais liasduh flaisduh ajiasudh vaisudhv nsfd");
+      Comment comment = taskService.createComment(taskId, null, "look at this \n       isn't this great? slkdjf sldkfjs ldkfjs ldkfjs ldkfj sldkfj sldkfj sldkjg laksfg sdfgsd;flgkj ksajdhf skjdfh ksjdhf skjdhf kalskjgh lskh dfialurhg kajsh dfuieqpgkja rzvkfnjviuqerhogiuvysbegkjz lkhf ais liasduh flaisduh ajiasudh vaisudhv nsfd");
 
       // select task comment for task id and comment id
       comment = taskService.getTaskComment(taskId, comment.getId());
@@ -1271,8 +1450,8 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
   }
 
   public void testTaskAttachmentByTaskIdAndAttachmentId() {
-    int historyLevel = processEngineConfiguration.getHistoryLevel();
-    if (historyLevel>ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
+    int historyLevel = processEngineConfiguration.getHistoryLevel().getId();
+    if (historyLevel> ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
       // create and save task
       Task task = taskService.newTask();
       taskService.saveTask(task);
@@ -1304,8 +1483,8 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
   }
 
   public void testGetTaskAttachmentContentByTaskIdAndAttachmentId() {
-    int historyLevel = processEngineConfiguration.getHistoryLevel();
-    if (historyLevel>ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
+    int historyLevel = processEngineConfiguration.getHistoryLevel().getId();
+    if (historyLevel> ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
       // create and save task
       Task task = taskService.newTask();
       taskService.saveTask(task);
@@ -1328,24 +1507,24 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
   }
 
   public void testGetTaskAttachmentWithNullParameters() {
-    int historyLevel = processEngineConfiguration.getHistoryLevel();
-    if (historyLevel>ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
+    int historyLevel = processEngineConfiguration.getHistoryLevel().getId();
+    if (historyLevel> ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
       Attachment attachment = taskService.getTaskAttachment(null, null);
       assertNull(attachment);
     }
   }
 
   public void testGetTaskAttachmentContentWithNullParameters() {
-    int historyLevel = processEngineConfiguration.getHistoryLevel();
-    if (historyLevel>ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
+    int historyLevel = processEngineConfiguration.getHistoryLevel().getId();
+    if (historyLevel> ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
       InputStream content = taskService.getTaskAttachmentContent(null, null);
       assertNull(content);
     }
   }
 
   public void testCreateTaskAttachmentWithNullTaskId() {
-    int historyLevel = processEngineConfiguration.getHistoryLevel();
-    if (historyLevel>ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
+    int historyLevel = processEngineConfiguration.getHistoryLevel().getId();
+    if (historyLevel> ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
       try {
         taskService.createAttachment("web page", null, "someprocessinstanceid", "weatherforcast", "temperatures and more", new ByteArrayInputStream("someContent".getBytes()));
         fail("expected process engine exception");
@@ -1354,8 +1533,8 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
   }
 
   public void testDeleteTaskAttachmentWithNullParameters() {
-    int historyLevel = processEngineConfiguration.getHistoryLevel();
-    if (historyLevel>ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
+    int historyLevel = processEngineConfiguration.getHistoryLevel().getId();
+    if (historyLevel> ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
       try {
         taskService.deleteTaskAttachment(null, null);
         fail("expected process engine exception");
@@ -1364,8 +1543,8 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
   }
 
   public void testDeleteTaskAttachmentWithTaskIdNull() {
-    int historyLevel = processEngineConfiguration.getHistoryLevel();
-    if (historyLevel>ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
+    int historyLevel = processEngineConfiguration.getHistoryLevel().getId();
+    if (historyLevel> ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
       try {
         taskService.deleteTaskAttachment(null, "myAttachmentId");
         fail("expected process engine exception");
@@ -1374,8 +1553,8 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
   }
 
   public void testGetTaskAttachmentsWithTaskIdNull() {
-    int historyLevel = processEngineConfiguration.getHistoryLevel();
-    if (historyLevel>ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
+    int historyLevel = processEngineConfiguration.getHistoryLevel().getId();
+    if (historyLevel> ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
       assertEquals(Collections.<Attachment>emptyList(), taskService.getTaskAttachments(null));
     }
   }
@@ -1445,5 +1624,117 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  public void testTaskCaseInstanceId() {
+    Task task = taskService.newTask();
+    task.setCaseInstanceId("aCaseInstanceId");
+    taskService.saveTask(task);
+
+    // Fetch the task again and update
+    task = taskService.createTaskQuery().taskId(task.getId()).singleResult();
+    assertEquals("aCaseInstanceId", task.getCaseInstanceId());
+
+    task.setCaseInstanceId("anotherCaseInstanceId");
+    taskService.saveTask(task);
+
+    task = taskService.createTaskQuery().taskId(task.getId()).singleResult();
+    assertEquals("anotherCaseInstanceId", task.getCaseInstanceId());
+
+    // Finally, delete task
+    taskService.deleteTask(task.getId(), true);
+
+  }
+
+  @Deployment(resources={
+  "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void testGetVariablesTyped() {
+    Map<String, Object> vars = new HashMap<String, Object>();
+    vars.put("variable1", "value1");
+    vars.put("variable2", "value2");
+
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", vars);
+    String taskId = taskService.createTaskQuery().singleResult().getId();
+    VariableMap variablesTyped = taskService.getVariablesTyped(taskId);
+    assertEquals(vars, variablesTyped);
+  }
+
+  @Deployment(resources={
+  "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void testGetVariablesTypedDeserialize() {
+
+    runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Variables.createVariables()
+          .putValue("broken", Variables.serializedObjectValue("broken")
+              .serializationDataFormat(Variables.SerializationDataFormats.JAVA)
+              .objectTypeName("unexisting").create()));
+    String taskId = taskService.createTaskQuery().singleResult().getId();
+
+    // this works
+    VariableMap variablesTyped = taskService.getVariablesTyped(taskId, false);
+    assertNotNull(variablesTyped.getValueTyped("broken"));
+    variablesTyped = taskService.getVariablesTyped(taskId, Arrays.asList("broken"), false);
+    assertNotNull(variablesTyped.getValueTyped("broken"));
+
+    // this does not
+    try {
+      taskService.getVariablesTyped(taskId);
+    } catch(ProcessEngineException e) {
+      assertTextPresent("Cannot deserialize object", e.getMessage());
+    }
+
+    // this does not
+    try {
+      taskService.getVariablesTyped(taskId, Arrays.asList("broken"), true);
+    } catch(ProcessEngineException e) {
+      assertTextPresent("Cannot deserialize object", e.getMessage());
+    }
+  }
+
+  @Deployment(resources={
+  "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void testGetVariablesLocalTyped() {
+    Map<String, Object> vars = new HashMap<String, Object>();
+    vars.put("variable1", "value1");
+    vars.put("variable2", "value2");
+
+    runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    String taskId = taskService.createTaskQuery().singleResult().getId();
+    taskService.setVariablesLocal(taskId, vars);
+
+    VariableMap variablesTyped = taskService.getVariablesLocalTyped(taskId);
+    assertEquals(vars, variablesTyped);
+  }
+
+  @Deployment(resources={
+  "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void testGetVariablesLocalTypedDeserialize() {
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    String taskId = taskService.createTaskQuery().singleResult().getId();
+    taskService.setVariablesLocal(taskId, Variables.createVariables()
+          .putValue("broken", Variables.serializedObjectValue("broken")
+              .serializationDataFormat(Variables.SerializationDataFormats.JAVA)
+              .objectTypeName("unexisting").create()));
+
+    // this works
+    VariableMap variablesTyped = taskService.getVariablesLocalTyped(taskId, false);
+    assertNotNull(variablesTyped.getValueTyped("broken"));
+    variablesTyped = taskService.getVariablesLocalTyped(taskId, Arrays.asList("broken"), false);
+    assertNotNull(variablesTyped.getValueTyped("broken"));
+
+    // this does not
+    try {
+      taskService.getVariablesLocalTyped(taskId);
+    } catch(ProcessEngineException e) {
+      assertTextPresent("Cannot deserialize object", e.getMessage());
+    }
+
+    // this does not
+    try {
+      taskService.getVariablesLocalTyped(taskId, Arrays.asList("broken"), true);
+    } catch(ProcessEngineException e) {
+      assertTextPresent("Cannot deserialize object", e.getMessage());
+    }
+
+  }
 
 }

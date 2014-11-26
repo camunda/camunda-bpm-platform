@@ -51,6 +51,7 @@ public class TimerEntity extends JobEntity {
     processInstanceId = te.processInstanceId;
     jobDefinitionId = te.jobDefinitionId;
     suspensionState = te.suspensionState;
+    deploymentId = te.deploymentId;
   }
 
   @Override

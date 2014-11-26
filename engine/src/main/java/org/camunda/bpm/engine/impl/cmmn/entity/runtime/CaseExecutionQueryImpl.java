@@ -12,8 +12,11 @@
  */
 package org.camunda.bpm.engine.impl.cmmn.entity.runtime;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 import java.util.List;
 
+import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.impl.AbstractVariableQueryImpl;
 import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.QueryOperator;
@@ -51,38 +54,43 @@ public class CaseExecutionQueryImpl extends AbstractVariableQueryImpl<CaseExecut
   }
 
   public CaseExecutionQuery caseInstanceId(String caseInstanceId) {
-    assertParamNotNull("caseInstanceId", caseInstanceId);
+    ensureNotNull(NotValidException.class, "caseInstanceId", caseInstanceId);
     this.caseInstanceId = caseInstanceId;
     return this;
   }
 
   public CaseExecutionQuery caseDefinitionId(String caseDefinitionId) {
-    assertParamNotNull("caseDefinitionId", caseDefinitionId);
+    ensureNotNull(NotValidException.class, "caseDefinitionId", caseDefinitionId);
     this.caseDefinitionId = caseDefinitionId;
     return this;
   }
 
   public CaseExecutionQuery caseDefinitionKey(String caseDefinitionKey) {
-    assertParamNotNull("caseDefinitionKey", caseDefinitionKey);
+    ensureNotNull(NotValidException.class, "caseDefinitionKey", caseDefinitionKey);
     this.caseDefinitionKey = caseDefinitionKey;
     return this;
   }
 
   public CaseExecutionQuery caseInstanceBusinessKey(String caseInstanceBusinessKey) {
-    assertParamNotNull("caseInstanceBusinessKey", caseInstanceBusinessKey);
+    ensureNotNull(NotValidException.class, "caseInstanceBusinessKey", caseInstanceBusinessKey);
     this.businessKey = caseInstanceBusinessKey;
     return this;
   }
 
   public CaseExecutionQuery caseExecutionId(String caseExecutionId) {
-    assertParamNotNull("caseExecutionId", caseExecutionId);
+    ensureNotNull(NotValidException.class, "caseExecutionId", caseExecutionId);
     this.caseExecutionId = caseExecutionId;
     return this;
   }
 
   public CaseExecutionQuery activityId(String activityId) {
-    assertParamNotNull("activityId", activityId);
+    ensureNotNull(NotValidException.class, "activityId", activityId);
     this.activityId = activityId;
+    return this;
+  }
+
+  public CaseExecutionQuery available() {
+    state = CaseExecutionState.AVAILABLE;
     return this;
   }
 
@@ -93,6 +101,11 @@ public class CaseExecutionQueryImpl extends AbstractVariableQueryImpl<CaseExecut
 
   public CaseExecutionQuery active() {
     state = CaseExecutionState.ACTIVE;
+    return this;
+  }
+
+  public CaseExecutionQuery disabled() {
+    state = CaseExecutionState.DISABLED;
     return this;
   }
 
@@ -161,9 +174,18 @@ public class CaseExecutionQueryImpl extends AbstractVariableQueryImpl<CaseExecut
   public List<CaseExecution> executeList(CommandContext commandContext, Page page) {
     checkQueryOk();
     ensureVariablesInitialized();
-    return commandContext
+    List<CaseExecution> result = commandContext
       .getCaseExecutionManager()
       .findCaseExecutionsByQueryCriteria(this, page);
+
+    for (CaseExecution caseExecution : result) {
+      CaseExecutionEntity caseExecutionEntity = (CaseExecutionEntity) caseExecution;
+      // initializes the name, type and description
+      // of the activity on current case execution
+      caseExecutionEntity.getActivity();
+    }
+
+    return result;
   }
 
   // getters /////////////////////////////////////////////

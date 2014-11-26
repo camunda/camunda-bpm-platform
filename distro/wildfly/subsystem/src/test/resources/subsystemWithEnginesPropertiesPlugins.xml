@@ -1,0 +1,40 @@
+<subsystem xmlns="urn:org.camunda.bpm.jboss:1.1">
+  <process-engines>
+    <process-engine name="__default" default="true">
+      <datasource>java:jboss/datasources/ExampleDS</datasource>
+      <history-level>audit</history-level>
+      <configuration>org.camunda.bpm.container.impl.jboss.config.ManagedJtaProcessEngineConfiguration</configuration>
+      <properties>
+        <property name="job-acquisition-name">default</property>
+        <property name="job-acquisition">default</property>
+        <property name="job-name">default</property>
+      </properties>
+    </process-engine>
+    <process-engine  default="false"  name="__test">
+      <datasource>java:jboss/datasources/ExampleDS</datasource>
+      <history-level>full</history-level>
+      <configuration>org.camunda.bpm.container.impl.jboss.config.ManagedJtaProcessEngineConfiguration</configuration>
+      <properties>
+        <property name="job-acquisition-name">default</property>
+      </properties>
+      <plugins>
+        <plugin>
+          <class>org.camunda.bpm.identity.impl.ldap.plugin.LdapIdentityProviderPlugin</class>
+          <properties>
+            <property name="test">abc</property>
+            <property name="number">123</property>
+            <property name="bool">true</property>
+          </properties>
+        </plugin>
+        <plugin>
+          <class>org.camunda.bpm.identity.impl.ldap.plugin.LdapIdentityProviderPlugin</class>
+          <properties>
+            <property name="test">cba</property>
+            <property name="number">321</property>
+            <property name="bool">false</property>
+          </properties>
+        </plugin>
+      </plugins>
+    </process-engine>
+  </process-engines>
+</subsystem>

@@ -13,11 +13,12 @@
 
 package org.camunda.bpm.engine.impl.cmd;
 
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.repository.Deployment;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 /**
  * @author Thorben Lindhauer
@@ -32,11 +33,9 @@ public class RegisterDeploymentCmd implements Command<Void> {
   
   public Void execute(CommandContext commandContext) {
     Deployment deployment = commandContext.getDeploymentManager().findDeploymentById(deploymentId);
-    
-    if (deployment == null) {
-      throw new ProcessEngineException("Deployment " + deploymentId + " does not exist");
-    }
-    
+
+    ensureNotNull("Deployment " + deploymentId + " does not exist", "deployment", deployment);
+
     Context.getProcessEngineConfiguration().getRegisteredDeployments().add(deploymentId);
     return null;
   }

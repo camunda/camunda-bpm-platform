@@ -3,8 +3,8 @@ package org.camunda.bpm.integrationtest.deployment.war.beans;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEnginePlugin;
-import org.camunda.bpm.engine.impl.scripting.ScriptBindingsFactory;
-import org.camunda.bpm.engine.impl.scripting.ScriptingEngines;
+import org.camunda.bpm.engine.impl.scripting.engine.ScriptBindingsFactory;
+import org.camunda.bpm.engine.impl.scripting.engine.ScriptingEngines;
 
 public class GroovyProcessEnginePlugin implements ProcessEnginePlugin {
 

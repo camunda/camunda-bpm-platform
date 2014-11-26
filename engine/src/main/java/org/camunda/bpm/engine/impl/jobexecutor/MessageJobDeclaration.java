@@ -14,6 +14,8 @@ package org.camunda.bpm.engine.impl.jobexecutor;
 
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
+import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
+import org.camunda.bpm.engine.impl.pvm.runtime.AtomicOperation;
 
 /**
  * <p>Declaration of a Message Job (Asynchronous continuation job)</p>
@@ -23,11 +25,17 @@ import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
  */
 public class MessageJobDeclaration extends JobDeclaration<MessageEntity> {
 
-  public MessageJobDeclaration() {
-    super(AsyncContinuationJobHandler.TYPE);
-  }
+  public static final String ASYNC_BEFORE = "async-before";
+  public static final String ASYNC_AFTER = "async-after";
 
   private static final long serialVersionUID = 1L;
+
+  protected String[] operationIdentifier;
+
+  public MessageJobDeclaration(String[] operationsIdentifier) {
+    super(AsyncContinuationJobHandler.TYPE);
+    this.operationIdentifier = operationsIdentifier;
+  }
 
   protected MessageEntity newJobInstance(ExecutionEntity execution) {
     MessageEntity message = new MessageEntity();
@@ -36,5 +44,30 @@ public class MessageJobDeclaration extends JobDeclaration<MessageEntity> {
     return message;
   }
 
+  public void setJobHandlerConfiguration(MessageEntity message, ExecutionEntity execution, AtomicOperation executionOperation) {
+    String configuration = executionOperation.getCanonicalName();
+    ActivityImpl activity = execution.getActivity();
+
+    if(activity != null && activity.isAsyncAfter()) {
+      if(execution.getTransition() != null) {
+        // store id of selected transition in case this is async after.
+        // id is not serialized with the execution -> we need to remember it as
+        // job handler configuration.
+        configuration += "$"+execution.getTransition().getId();
+      }
+    }
+
+    message.setJobHandlerConfiguration(configuration);
+
+  }
+
+  public boolean isApplicableForOperation(AtomicOperation operation) {
+    for (String identifier : operationIdentifier) {
+      if (operation.getCanonicalName().equals(identifier)) {
+        return true;
+      }
+    }
+    return false;
+  }
 
 }

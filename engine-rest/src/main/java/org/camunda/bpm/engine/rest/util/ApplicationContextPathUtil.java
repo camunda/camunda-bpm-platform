@@ -4,19 +4,35 @@ import org.camunda.bpm.BpmPlatform;
 import org.camunda.bpm.ProcessApplicationService;
 import org.camunda.bpm.application.ProcessApplicationInfo;
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 
 public class ApplicationContextPathUtil {
 
-  public static String getApplicationPath(ProcessEngine engine, String processDefinitionId) {
+  public static String getApplicationPathByProcessDefinitionId(ProcessEngine engine, String processDefinitionId) {
     ProcessDefinition processDefinition = engine.getRepositoryService().getProcessDefinition(processDefinitionId);
 
     if (processDefinition == null) {
       return null;
     }
 
+    return getApplicationPathForDeployment(engine, processDefinition.getDeploymentId());
+  }
+
+  public static String getApplicationPathByCaseDefinitionId(ProcessEngine engine, String caseDefinitionId) {
+    CaseDefinition caseDefinition = engine.getRepositoryService().getCaseDefinition(caseDefinitionId);
+
+    if (caseDefinition == null) {
+      return null;
+    }
+
+    return getApplicationPathForDeployment(engine, caseDefinition.getDeploymentId());
+  }
+
+  public static String getApplicationPathForDeployment(ProcessEngine engine, String deploymentId) {
+
     // get the name of the process application that made the deployment
-    String processApplicationName = engine.getManagementService().getProcessApplicationForDeployment(processDefinition.getDeploymentId());
+    String processApplicationName = engine.getManagementService().getProcessApplicationForDeployment(deploymentId);
 
     if (processApplicationName == null) {
       // no a process application deployment

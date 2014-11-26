@@ -19,8 +19,8 @@ import java.util.HashMap;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.db.HasRevision;
-import org.camunda.bpm.engine.impl.db.PersistentObject;
+import org.camunda.bpm.engine.impl.db.HasDbRevision;
+import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.event.EventHandler;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.ProcessEventJobHandler;
@@ -29,10 +29,12 @@ import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.runtime.EventSubscription;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 /**
  * @author Daniel Meyer
  */
-public abstract class EventSubscriptionEntity implements EventSubscription, PersistentObject, HasRevision, Serializable {
+public abstract class EventSubscriptionEntity implements EventSubscription, DbEntity, HasDbRevision, Serializable {
 
   private static final long serialVersionUID = 1L;
   
@@ -76,9 +78,7 @@ public abstract class EventSubscriptionEntity implements EventSubscription, Pers
   
   protected void processEventSync(Object payload) {
     EventHandler eventHandler = Context.getProcessEngineConfiguration().getEventHandler(eventType);
-    if (eventHandler == null) {
-      throw new ProcessEngineException("Could not find eventhandler for event of type '" + eventType + "'.");
-    }    
+    ensureNotNull("Could not find eventhandler for event of type '" + eventType + "'", "eventHandler", eventHandler);
     eventHandler.handleEvent(this, payload, Context.getCommandContext());
   }
   

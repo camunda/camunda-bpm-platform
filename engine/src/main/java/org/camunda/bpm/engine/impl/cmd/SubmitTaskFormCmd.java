@@ -13,22 +13,21 @@
 
 package org.camunda.bpm.engine.impl.cmd;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 import java.io.Serializable;
 import java.util.Map;
 
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
-import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.form.handler.TaskFormHandler;
-import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
-import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
-import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
+import org.camunda.bpm.engine.impl.task.TaskDefinition;
 import org.camunda.bpm.engine.task.DelegationState;
+import org.camunda.bpm.engine.variable.VariableMap;
+import org.camunda.bpm.engine.variable.Variables;
 
 
 /**
@@ -40,50 +39,34 @@ public class SubmitTaskFormCmd implements Command<Object>, Serializable {
   private static final long serialVersionUID = 1L;
 
   protected String taskId;
-  protected Map<String, Object> properties;
+  protected VariableMap properties;
 
   public SubmitTaskFormCmd(String taskId, Map<String, Object> properties) {
     this.taskId = taskId;
-    this.properties = properties;
+    this.properties = Variables.fromMap(properties);
   }
 
   public Object execute(CommandContext commandContext) {
-    if(taskId == null) {
-      throw new ProcessEngineException("taskId is null");
-    }
+    ensureNotNull("taskId", taskId);
 
     TaskEntity task = Context
       .getCommandContext()
       .getTaskManager()
       .findTaskById(taskId);
 
-    if (task == null) {
-      throw new ProcessEngineException("Cannot find task with id " + taskId);
+    ensureNotNull("Cannot find task with id " + taskId, "task", task);
+
+    TaskDefinition taskDefinition = task.getTaskDefinition();
+    if(taskDefinition != null) {
+      TaskFormHandler taskFormHandler = taskDefinition.getTaskFormHandler();
+      taskFormHandler.submitFormVariables(properties, task);
+    } else {
+      // set variables on standalone task
+      task.setVariables(properties);
     }
-
-    final ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
-
-    int historyLevel = processEngineConfiguration.getHistoryLevel();
-    ExecutionEntity execution = task.getExecution();
-    if (historyLevel>=ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT && execution != null) {
-
-      final HistoryEventProducer eventProducer = processEngineConfiguration.getHistoryEventProducer();
-      final HistoryEventHandler eventHandler = processEngineConfiguration.getHistoryEventHandler();
-
-      for (String propertyId: properties.keySet()) {
-        Object propertyValue = properties.get(propertyId);
-
-        HistoryEvent evt = eventProducer.createFormPropertyUpdateEvt(execution, propertyId, propertyValue, taskId);
-        eventHandler.handleEvent(evt);
-
-      }
-    }
-
-    TaskFormHandler taskFormHandler = task.getTaskDefinition().getTaskFormHandler();
-    taskFormHandler.submitFormProperties(properties, task.getExecution());
 
     // complete or resolve the task
-    if(DelegationState.PENDING.equals(task.getDelegationState())) {
+    if (DelegationState.PENDING.equals(task.getDelegationState())) {
       task.resolve();
       task.createHistoricTaskDetails(UserOperationLogEntry.OPERATION_TYPE_RESOLVE);
     } else {

@@ -12,6 +12,17 @@
  */
 package org.camunda.bpm.engine.rest.impl;
 
+import java.io.ByteArrayInputStream;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import javax.ws.rs.HttpMethod;
+import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriInfo;
+
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
@@ -25,27 +36,24 @@ import org.camunda.bpm.engine.rest.mapper.MultipartFormData;
 import org.camunda.bpm.engine.rest.mapper.MultipartFormData.FormPart;
 import org.camunda.bpm.engine.rest.sub.repository.DeploymentResource;
 import org.camunda.bpm.engine.rest.sub.repository.impl.DeploymentResourceImpl;
-
-import javax.ws.rs.HttpMethod;
-import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.UriInfo;
-import java.io.ByteArrayInputStream;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import org.codehaus.jackson.map.ObjectMapper;
 
 public class DeploymentRestServiceImpl extends AbstractRestProcessEngineAware implements DeploymentRestService {
 
   public final static String DEPLOYMENT_NAME = "deployment-name";
   public final static String ENABLE_DUPLICATE_FILTERING = "enable-duplicate-filtering";
+  public final static String DEPLOY_CHANGED_ONLY = "deploy-changed-only";
 
-  public DeploymentRestServiceImpl() {
-    super();
+  protected static final Set<String> RESERVED_KEYWORDS = new HashSet<String>();
+
+  static {
+    RESERVED_KEYWORDS.add(DEPLOYMENT_NAME);
+    RESERVED_KEYWORDS.add(ENABLE_DUPLICATE_FILTERING);
+    RESERVED_KEYWORDS.add(DEPLOY_CHANGED_ONLY);
   }
 
-	public DeploymentRestServiceImpl(String engineName) {
-    super(engineName);
+	public DeploymentRestServiceImpl(String engineName, ObjectMapper objectMapper) {
+    super(engineName, objectMapper);
   }
 
   public DeploymentResource getDeployment(String deploymentId) {
@@ -53,7 +61,7 @@ public class DeploymentRestServiceImpl extends AbstractRestProcessEngineAware im
   }
 
   public List<DeploymentDto> getDeployments(UriInfo uriInfo, Integer firstResult, Integer maxResults) {
-    DeploymentQueryDto queryDto = new DeploymentQueryDto(uriInfo.getQueryParameters());
+    DeploymentQueryDto queryDto = new DeploymentQueryDto(getObjectMapper(), uriInfo.getQueryParameters());
 
     ProcessEngine engine = getProcessEngine();
     DeploymentQuery query = queryDto.toQuery(engine);
@@ -77,17 +85,38 @@ public class DeploymentRestServiceImpl extends AbstractRestProcessEngineAware im
     DeploymentBuilder deploymentBuilder = getProcessEngine().getRepositoryService().createDeployment();
 
     Set<String> partNames = payload.getPartNames();
+
     for (String name : partNames) {
       FormPart part = payload.getNamedPart(name);
-      if (DEPLOYMENT_NAME.equals(name)) {
-        deploymentBuilder.name(part.getTextContent());
-      } else if (ENABLE_DUPLICATE_FILTERING.equals(name)) {
-        if (Boolean.parseBoolean(part.getTextContent())) {
-          deploymentBuilder.enableDuplicateFiltering();
-        }
-      } else {
+
+      if (!RESERVED_KEYWORDS.contains(name)) {
         deploymentBuilder.addInputStream(part.getFileName(), new ByteArrayInputStream(part.getBinaryContent()));
       }
+    }
+
+    if (payload.getNamedPart(DEPLOYMENT_NAME) != null) {
+      FormPart part = payload.getNamedPart(DEPLOYMENT_NAME);
+      deploymentBuilder.name(part.getTextContent());
+    }
+
+    boolean enableDuplicateFiltering = false;
+    boolean deployChangedOnly = false;
+
+    if (payload.getNamedPart(ENABLE_DUPLICATE_FILTERING) != null) {
+      FormPart part = payload.getNamedPart(ENABLE_DUPLICATE_FILTERING);
+      enableDuplicateFiltering = Boolean.parseBoolean(part.getTextContent());
+    }
+
+    if (payload.getNamedPart(DEPLOY_CHANGED_ONLY) != null) {
+      FormPart part = payload.getNamedPart(DEPLOY_CHANGED_ONLY);
+      deployChangedOnly = Boolean.parseBoolean(part.getTextContent());
+    }
+
+    // deployChangedOnly overrides the enableDuplicateFiltering setting
+    if (deployChangedOnly) {
+      deploymentBuilder.enableDuplicateFiltering(true);
+    } else if (enableDuplicateFiltering) {
+      deploymentBuilder.enableDuplicateFiltering(false);
     }
 
     if(!deploymentBuilder.getResourceNames().isEmpty()) {
@@ -97,7 +126,7 @@ public class DeploymentRestServiceImpl extends AbstractRestProcessEngineAware im
 
       URI uri = uriInfo.getBaseUriBuilder()
         .path(relativeRootResourcePath)
-        .path(DeploymentRestService.class)
+        .path(DeploymentRestService.PATH)
         .path(deployment.getId())
         .build();
 
@@ -124,7 +153,7 @@ public class DeploymentRestServiceImpl extends AbstractRestProcessEngineAware im
   }
 
   public CountResultDto getDeploymentsCount(UriInfo uriInfo) {
-    DeploymentQueryDto queryDto = new DeploymentQueryDto(uriInfo.getQueryParameters());
+    DeploymentQueryDto queryDto = new DeploymentQueryDto(getObjectMapper(), uriInfo.getQueryParameters());
 
     ProcessEngine engine = getProcessEngine();
     DeploymentQuery query = queryDto.toQuery(engine);

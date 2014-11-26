@@ -23,6 +23,7 @@ import org.camunda.bpm.engine.rest.dto.AbstractQueryDto;
 import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
 import org.camunda.bpm.engine.rest.dto.converter.BooleanConverter;
 import org.camunda.bpm.engine.rest.dto.converter.StringArrayConverter;
+import org.codehaus.jackson.map.ObjectMapper;
 
 /**
  * @author roman.smirnov
@@ -60,8 +61,8 @@ public class JobDefinitionQueryDto extends AbstractQueryDto<JobDefinitionQuery> 
 
   public JobDefinitionQueryDto() {}
 
-  public JobDefinitionQueryDto(MultivaluedMap<String, String> queryParameters) {
-    super(queryParameters);
+  public JobDefinitionQueryDto(ObjectMapper objectMapper, MultivaluedMap<String, String> queryParameters) {
+    super(objectMapper, queryParameters);
   }
 
   @CamundaQueryParam("jobDefinitionId")

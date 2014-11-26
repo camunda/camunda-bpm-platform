@@ -10,20 +10,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.camunda.bpm.engine.impl.cmd;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.io.Serializable;
 import java.util.Map;
 
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.form.FormPropertyHelper;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.variable.VariableMap;
+import org.camunda.bpm.engine.variable.Variables;
 
 
 /**
@@ -36,12 +39,12 @@ public class SubmitStartFormCmd implements Command<ProcessInstance>, Serializabl
 
   protected final String processDefinitionId;
   protected final String businessKey;
-  protected Map<String, Object> properties;
+  protected VariableMap variables;
 
   public SubmitStartFormCmd(String processDefinitionId, String businessKey, Map<String, Object> properties) {
     this.processDefinitionId = processDefinitionId;
     this.businessKey = businessKey;
-    this.properties = properties;
+    this.variables = Variables.fromMap(properties);
   }
 
   @Override
@@ -52,9 +55,7 @@ public class SubmitStartFormCmd implements Command<ProcessInstance>, Serializabl
       .getDeploymentCache()
       .findDeployedProcessDefinitionById(processDefinitionId);
 
-    if (processDefinition == null) {
-      throw new ProcessEngineException("No process definition found for id = '" + processDefinitionId + "'");
-    }
+    ensureNotNull("No process definition found for id = '" + processDefinitionId + "'", "processDefinition", processDefinition);
 
     ExecutionEntity processInstance = null;
     if (businessKey != null) {
@@ -63,7 +64,18 @@ public class SubmitStartFormCmd implements Command<ProcessInstance>, Serializabl
       processInstance = processDefinition.createProcessInstance();
     }
 
-    processInstance.startWithFormProperties(properties);
+    // if the start event is async, we have to set the variables already here
+    // since they are lost after the async continuation otherwise
+    // see CAM-2828
+    if (processDefinition.getInitial().isAsyncBefore()) {
+      FormPropertyHelper.initFormPropertiesOnScope(variables, processInstance);
+      processInstance.start();
+
+    } else {
+      processInstance.startWithFormProperties(variables);
+
+    }
+
 
     return processInstance;
   }

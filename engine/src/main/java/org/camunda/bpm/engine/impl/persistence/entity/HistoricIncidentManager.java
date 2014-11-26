@@ -26,23 +26,23 @@ import org.camunda.bpm.engine.impl.persistence.AbstractHistoricManager;
 public class HistoricIncidentManager extends AbstractHistoricManager {
 
   public long findHistoricIncidentCountByQueryCriteria(HistoricIncidentQueryImpl query) {
-    return (Long) getDbSqlSession().selectOne("selectHistoricIncidentCountByQueryCriteria", query);
+    return (Long) getDbEntityManager().selectOne("selectHistoricIncidentCountByQueryCriteria", query);
   }
 
   @SuppressWarnings("unchecked")
   public List<HistoricIncident> findHistoricIncidentByQueryCriteria(HistoricIncidentQueryImpl query, Page page) {
-    return getDbSqlSession().selectList("selectHistoricIncidentByQueryCriteria", query, page);
+    return getDbEntityManager().selectList("selectHistoricIncidentByQueryCriteria", query, page);
   }
 
   public void deleteHistoricIncidentsByProcessInstanceId(String processInstanceId) {
     if (isHistoryLevelFullEnabled()) {
-      getDbSqlSession().delete("deleteHistoricIncidentsByProcessInstanceId", processInstanceId);
+      getDbEntityManager().delete(HistoricIncidentEntity.class, "deleteHistoricIncidentsByProcessInstanceId", processInstanceId);
     }
   }
 
   public void deleteHistoricIncidentsByProcessDefinitionId(String processDefinitionId) {
     if (isHistoryLevelFullEnabled()) {
-      getDbSqlSession().delete("deleteHistoricIncidentsByProcessDefinitionId", processDefinitionId);
+      getDbEntityManager().delete(HistoricIncidentEntity.class, "deleteHistoricIncidentsByProcessDefinitionId", processDefinitionId);
     }
   }
 

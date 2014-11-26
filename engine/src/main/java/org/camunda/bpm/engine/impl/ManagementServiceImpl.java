@@ -12,23 +12,23 @@
  */
 package org.camunda.bpm.engine.impl;
 
-import org.camunda.bpm.application.ProcessApplicationReference;
-import org.camunda.bpm.application.ProcessApplicationRegistration;
-import org.camunda.bpm.engine.ManagementService;
-import org.camunda.bpm.engine.impl.cmd.*;
-import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.db.DbSqlSession;
-import org.camunda.bpm.engine.impl.db.DbSqlSessionFactory;
-import org.camunda.bpm.engine.impl.interceptor.Command;
-import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.management.*;
-import org.camunda.bpm.engine.runtime.JobQuery;
-
 import java.sql.Connection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
+import org.camunda.bpm.application.ProcessApplicationReference;
+import org.camunda.bpm.application.ProcessApplicationRegistration;
+import org.camunda.bpm.engine.ManagementService;
+import org.camunda.bpm.engine.impl.cmd.*;
+import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.db.sql.DbSqlSession;
+import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
+import org.camunda.bpm.engine.impl.interceptor.Command;
+import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.management.*;
+import org.camunda.bpm.engine.runtime.JobQuery;
 
 
 /**
@@ -121,7 +121,9 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
         DbSqlSessionFactory dbSqlSessionFactory = (DbSqlSessionFactory) commandContext.getSessionFactories().get(DbSqlSession.class);
         DbSqlSession dbSqlSession = new DbSqlSession(dbSqlSessionFactory, connection, catalog, schema);
         commandContext.getSessions().put(DbSqlSession.class, dbSqlSession);
-        return dbSqlSession.dbSchemaUpdate();
+        dbSqlSession.dbSchemaUpdate();
+
+        return "";
       }
     });
   }

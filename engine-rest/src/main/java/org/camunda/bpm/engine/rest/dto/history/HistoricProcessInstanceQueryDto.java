@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
-
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response.Status;
 
@@ -31,6 +30,7 @@ import org.camunda.bpm.engine.rest.dto.converter.StringListConverter;
 import org.camunda.bpm.engine.rest.dto.converter.StringSetConverter;
 import org.camunda.bpm.engine.rest.dto.converter.VariableListConverter;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
+import org.codehaus.jackson.map.ObjectMapper;
 
 public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricProcessInstanceQuery> {
 
@@ -69,13 +69,15 @@ public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricPr
   private Date finishedAfter;
   private String startedBy;
   private String superProcessInstanceId;
+  private String subProcessInstanceId;
+  private String caseInstanceId;
 
   private List<VariableQueryParameterDto> variables;
 
   public HistoricProcessInstanceQueryDto() {}
 
-  public HistoricProcessInstanceQueryDto(MultivaluedMap<String, String> queryParameters) {
-    super(queryParameters);
+  public HistoricProcessInstanceQueryDto(ObjectMapper objectMapper, MultivaluedMap<String, String> queryParameters) {
+    super(objectMapper, queryParameters);
   }
 
   @CamundaQueryParam("processInstanceId")
@@ -163,6 +165,16 @@ public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricPr
     this.superProcessInstanceId = superProcessInstanceId;
   }
 
+  @CamundaQueryParam("subProcessInstanceId")
+  public void setSubProcessInstanceId(String subProcessInstanceId) {
+    this.subProcessInstanceId = subProcessInstanceId;
+  }
+
+  @CamundaQueryParam("caseInstanceId")
+  public void setCaseInstanceId(String caseInstanceId) {
+    this.caseInstanceId = caseInstanceId;
+  }
+
   @CamundaQueryParam(value = "variables", converter = VariableListConverter.class)
   public void setVariables(List<VariableQueryParameterDto> variables) {
     this.variables = variables;
@@ -232,12 +244,18 @@ public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricPr
     if (superProcessInstanceId != null) {
       query.superProcessInstanceId(superProcessInstanceId);
     }
+    if (subProcessInstanceId != null) {
+      query.subProcessInstanceId(subProcessInstanceId);
+    }
+    if (caseInstanceId != null) {
+      query.caseInstanceId(caseInstanceId);
+    }
 
     if (variables != null) {
       for (VariableQueryParameterDto variableQueryParam : variables) {
         String variableName = variableQueryParam.getName();
         String op = variableQueryParam.getOperator();
-        Object variableValue = variableQueryParam.getValue();
+        Object variableValue = variableQueryParam.resolveValue(objectMapper);
 
         if (op.equals(VariableQueryParameterDto.EQUALS_OPERATOR_NAME)) {
           query.variableValueEquals(variableName, variableValue);

@@ -160,7 +160,7 @@ public interface HistoryEventProducer {
    * @param taskId
    * @return the history event
    */
-  public HistoryEvent createFormPropertyUpdateEvt(ExecutionEntity execution, String propertyId, Object propertyValue, String taskId);
+  public HistoryEvent createFormPropertyUpdateEvt(ExecutionEntity execution, String propertyId, String propertyValue, String taskId);
 
   // Incidents //////////////////////////////////////////
 

@@ -28,6 +28,7 @@ import org.camunda.bpm.engine.rest.dto.converter.StringSetConverter;
 import org.camunda.bpm.engine.rest.dto.converter.VariableListConverter;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
+import org.codehaus.jackson.map.ObjectMapper;
 
 public class ProcessInstanceQueryDto extends AbstractQueryDto<ProcessInstanceQuery> {
 
@@ -45,6 +46,7 @@ public class ProcessInstanceQueryDto extends AbstractQueryDto<ProcessInstanceQue
 
   private String processDefinitionKey;
   private String businessKey;
+  private String caseInstanceId;
   private String processDefinitionId;
   private String superProcessInstance;
   private String subProcessInstance;
@@ -62,8 +64,8 @@ public class ProcessInstanceQueryDto extends AbstractQueryDto<ProcessInstanceQue
 
   }
 
-  public ProcessInstanceQueryDto(MultivaluedMap<String, String> queryParameters) {
-    super(queryParameters);
+  public ProcessInstanceQueryDto(ObjectMapper objectMapper, MultivaluedMap<String, String> queryParameters) {
+    super(objectMapper, queryParameters);
   }
 
   public String getProcessDefinitionKey() {
@@ -83,6 +85,11 @@ public class ProcessInstanceQueryDto extends AbstractQueryDto<ProcessInstanceQue
   @CamundaQueryParam("businessKey")
   public void setBusinessKey(String businessKey) {
     this.businessKey = businessKey;
+  }
+
+  @CamundaQueryParam("caseInstanceId")
+  public void setCaseInstanceId(String caseInstanceId) {
+    this.caseInstanceId = caseInstanceId;
   }
 
   @CamundaQueryParam("processDefinitionId")
@@ -157,6 +164,9 @@ public class ProcessInstanceQueryDto extends AbstractQueryDto<ProcessInstanceQue
     if (businessKey != null) {
       query.processInstanceBusinessKey(businessKey);
     }
+    if (caseInstanceId != null) {
+      query.caseInstanceId(caseInstanceId);
+    }
     if (processDefinitionId != null) {
       query.processDefinitionId(processDefinitionId);
     }
@@ -188,7 +198,7 @@ public class ProcessInstanceQueryDto extends AbstractQueryDto<ProcessInstanceQue
       for (VariableQueryParameterDto variableQueryParam : variables) {
         String variableName = variableQueryParam.getName();
         String op = variableQueryParam.getOperator();
-        Object variableValue = variableQueryParam.getValue();
+        Object variableValue = variableQueryParam.resolveValue(objectMapper);
 
         if (op.equals(VariableQueryParameterDto.EQUALS_OPERATOR_NAME)) {
           query.variableValueEquals(variableName, variableValue);

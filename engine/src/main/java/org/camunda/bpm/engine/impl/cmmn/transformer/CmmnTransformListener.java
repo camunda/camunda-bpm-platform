@@ -12,10 +12,55 @@
  */
 package org.camunda.bpm.engine.impl.cmmn.transformer;
 
+import java.util.List;
+
+import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
+import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
+import org.camunda.bpm.engine.impl.cmmn.model.CmmnSentryDeclaration;
+import org.camunda.bpm.model.cmmn.impl.instance.CasePlanModel;
+import org.camunda.bpm.model.cmmn.instance.Case;
+import org.camunda.bpm.model.cmmn.instance.CaseTask;
+import org.camunda.bpm.model.cmmn.instance.Definitions;
+import org.camunda.bpm.model.cmmn.instance.EventListener;
+import org.camunda.bpm.model.cmmn.instance.HumanTask;
+import org.camunda.bpm.model.cmmn.instance.Milestone;
+import org.camunda.bpm.model.cmmn.instance.PlanItem;
+import org.camunda.bpm.model.cmmn.instance.ProcessTask;
+import org.camunda.bpm.model.cmmn.instance.Sentry;
+import org.camunda.bpm.model.cmmn.instance.Stage;
+import org.camunda.bpm.model.cmmn.instance.Task;
+
 /**
- * @author Roman Smirnov
+ * Listener which can be registered within the engine to receive events during transforming (and
+ * maybe influence it). Instead of implementing this interface you might consider to extend
+ * the {@link AbstractCmmnTransformListener}, which contains an empty implementation for all methods
+ * and makes your implementation easier and more robust to future changes.
+ *
+ * @author Sebastian Menski
  *
  */
 public interface CmmnTransformListener {
+
+  void transformRootElement(Definitions definitions, List<? extends CmmnCaseDefinition> caseDefinitions);
+
+  void transformCase(Case element, CmmnCaseDefinition caseDefinition);
+
+  void transformCasePlanModel(CasePlanModel casePlanModel, CmmnActivity caseActivity);
+
+  void transformHumanTask(PlanItem planItem, HumanTask humanTask, CmmnActivity caseActivity);
+
+  void transformProcessTask(PlanItem planItem, ProcessTask processTask, CmmnActivity caseActivity);
+
+  void transformCaseTask(PlanItem planItem, CaseTask caseTask, CmmnActivity caseActivity);
+
+  void transformTask(PlanItem planItem, Task task, CmmnActivity caseActivity);
+
+  void transformStage(PlanItem planItem, Stage stage, CmmnActivity caseActivity);
+
+  void transformMilestone(PlanItem planItem, Milestone milestone, CmmnActivity caseActivity);
+
+  void transformEventListener(PlanItem planItem, EventListener eventListener, CmmnActivity caseActivity);
+
+  void transformSentry(Sentry sentry, CmmnSentryDeclaration sentryDeclaration);
 
 }

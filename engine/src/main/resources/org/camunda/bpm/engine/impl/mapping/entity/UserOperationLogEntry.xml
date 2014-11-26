@@ -24,8 +24,12 @@
       insert into ${prefix}ACT_HI_OP_LOG (
         ID_,
         PROC_DEF_ID_,
+        PROC_DEF_KEY_,
         PROC_INST_ID_,
         EXECUTION_ID_,
+        CASE_DEF_ID_,
+        CASE_INST_ID_,
+        CASE_EXECUTION_ID_,
         TASK_ID_,
         USER_ID_,
         TIMESTAMP_,
@@ -38,8 +42,12 @@
       ) values (
         #{id ,jdbcType=VARCHAR},
         #{processDefinitionId, jdbcType=VARCHAR},
+        #{processDefinitionKey, jdbcType=VARCHAR},
         #{processInstanceId, jdbcType=VARCHAR},
         #{executionId, jdbcType=VARCHAR},
+        #{caseDefinitionId, jdbcType=VARCHAR},
+        #{caseInstanceId, jdbcType=VARCHAR},
+        #{caseExecutionId, jdbcType=VARCHAR},
         #{taskId ,jdbcType=VARCHAR},
         #{userId ,jdbcType=VARCHAR},
         #{timestamp ,jdbcType=TIMESTAMP},
@@ -53,13 +61,29 @@
   </insert>
 
   <!-- OPERATION LOG ENTRY DELETE -->
+  
+  <delete id="deleteUserOperationLogEntryById">
+    delete from ${prefix}ACT_HI_OP_LOG where ID_ = #{id}
+  </delete>
 
   <delete id="deleteUserOperationLogEntriesByProcessInstanceId">
     delete from ${prefix}ACT_HI_OP_LOG where PROC_INST_ID_ = #{id}
   </delete>
 
+  <delete id="deleteUserOperationLogEntriesByCaseInstanceId">
+    delete from ${prefix}ACT_HI_OP_LOG where CASE_INST_ID_ = #{id}
+  </delete>
+
+  <delete id="deleteUserOperationLogEntriesByCaseDefinitionId">
+    delete from ${prefix}ACT_HI_OP_LOG where CASE_DEF_ID_ = #{id}
+  </delete>
+
   <delete id="deleteUserOperationLogEntriesByTaskId">
     delete from ${prefix}ACT_HI_OP_LOG where TASK_ID_ = #{id}
+  </delete>
+  
+  <delete id="deleteUserOperationLogEntriesByProcessDefinitionId">
+    delete from ${prefix}ACT_HI_OP_LOG where PROC_DEF_ID_ = #{id}
   </delete>
 
   <!--OPERATION LOG ENTRY RESULT MAP -->
@@ -67,8 +91,12 @@
   <resultMap id="UserOperationLogResultMap" type="org.camunda.bpm.engine.impl.history.event.UserOperationLogEntryEventEntity">
     <id property="id" column="ID_" jdbcType="VARCHAR" />
     <result property="processDefinitionId" column="PROC_DEF_ID_" jdbcType="VARCHAR" />
+    <result property="processDefinitionKey" column="PROC_DEF_KEY_" jdbcType="VARCHAR" />
     <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR" />
     <result property="executionId" column="EXECUTION_ID_" jdbcType="VARCHAR" />
+    <result property="caseDefinitionId" column="CASE_DEF_ID_" jdbcType="VARCHAR" />
+    <result property="caseInstanceId" column="CASE_INST_ID_" jdbcType="VARCHAR" />
+    <result property="caseExecutionId" column="CASE_EXECUTION_ID_" jdbcType="VARCHAR" />
     <result property="taskId" column="TASK_ID_" jdbcType="VARCHAR" />
     <result property="userId" column="USER_ID_" jdbcType="VARCHAR" />
     <result property="timestamp" column="TIMESTAMP_" jdbcType="TIMESTAMP" />
@@ -105,11 +133,23 @@
       <if test="processDefinitionId != null">
         RES.PROC_DEF_ID_ = #{processDefinitionId}
       </if>
+      <if test="processDefinitionKey != null">
+        RES.PROC_DEF_KEY_ = #{processDefinitionKey}
+      </if>
       <if test="processInstanceId != null">
         and RES.PROC_INST_ID_ = #{processInstanceId}
       </if>
       <if test="executionId != null">
         and RES.EXECUTION_ID_ = #{executionId}
+      </if>
+      <if test="caseDefinitionId != null">
+        and RES.CASE_DEF_ID_ = #{caseDefinitionId}
+      </if>
+      <if test="caseInstanceId != null">
+        and RES.CASE_INST_ID_ = #{caseInstanceId}
+      </if>
+      <if test="caseExecutionId != null">
+        and RES.CASE_EXECUTION_ID_ = #{caseExecutionId}
       </if>
       <if test="taskId != null">
         and RES.TASK_ID_ = #{taskId}

@@ -1,5 +1,7 @@
 @echo off
 
+set "CATALINA_HOME=%CD%\server\apache-tomcat-${version.tomcat}"
+
 echo "starting camunda BPM platform ${project.version} on Apache Tomcat ${version.tomcat}"
 
 cd server\apache-tomcat-${version.tomcat}\bin\

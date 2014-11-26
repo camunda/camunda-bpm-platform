@@ -32,6 +32,7 @@ import org.camunda.bpm.engine.rest.dto.identity.UserCredentialsDto;
 import org.camunda.bpm.engine.rest.dto.identity.UserProfileDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.sub.identity.UserResource;
+import org.codehaus.jackson.map.ObjectMapper;
 
 /**
  * @author Daniel Meyer
@@ -41,8 +42,8 @@ public class UserResourceImpl extends AbstractIdentityResource implements UserRe
 
   protected String rootResourcePath;
 
-  public UserResourceImpl(String processEngineName, String userId, String rootResourcePath) {
-    super(processEngineName, USER, userId);
+  public UserResourceImpl(String processEngineName, String userId, String rootResourcePath, ObjectMapper objectMapper) {
+    super(processEngineName, USER, userId, objectMapper);
     this.rootResourcePath = rootResourcePath;
   }
 
@@ -64,7 +65,7 @@ public class UserResourceImpl extends AbstractIdentityResource implements UserRe
     // add links if operations are authorized
     UriBuilder baseUriBuilder = context.getBaseUriBuilder()
         .path(rootResourcePath)
-        .path(UserRestService.class)
+        .path(UserRestService.PATH)
         .path(resourceId);
     URI baseUri = baseUriBuilder.build();
     URI profileUri = baseUriBuilder.path("/profile").build();

@@ -21,58 +21,41 @@ import org.camunda.bpm.engine.impl.core.operation.CoreAtomicOperation;
  */
 public interface CmmnAtomicOperation extends CoreAtomicOperation<CmmnExecution> {
 
-  // lifecycle of a case //////////////////////////////////
-  CmmnAtomicOperation CASE_INSTANCE_NOTIFY_LISTENER_CREATE = new AtomicOperationCaseInstanceNotifyListenerCreate();
+  // lifecycle
+  CmmnAtomicOperation CASE_INSTANCE_CREATE = new AtomicOperationCaseInstanceCreate();
+  CmmnAtomicOperation CASE_INSTANCE_CLOSE = new AtomicOperationCaseInstanceClose();
+  CmmnAtomicOperation CASE_EXECUTION_CREATE = new AtomicOperationCaseExecutionCreate();
+  CmmnAtomicOperation CASE_EXECUTION_CREATED = new AtomicOperationCaseExecutionCreated();
+  CmmnAtomicOperation CASE_EXECUTION_ENABLE = new AtomicOperationCaseExecutionEnable();
+  CmmnAtomicOperation CASE_EXECUTION_RE_ENABLE = new AtomicOperationCaseExecutionReenable();
+  CmmnAtomicOperation CASE_EXECUTION_DISABLE = new AtomicOperationCaseExecutionDisable();
+  CmmnAtomicOperation CASE_EXECUTION_START = new AtomicOperationCaseExecutionStart();
+  CmmnAtomicOperation CASE_EXECUTION_MANUAL_START = new AtomicOperationCaseExecutionManualStart();
+  CmmnAtomicOperation CASE_EXECUTION_COMPLETE = new AtomicOperationCaseExecutionComplete();
+  CmmnAtomicOperation CASE_EXECUTION_MANUAL_COMPLETE = new AtomicOperationCaseExecutionManualComplete();
+  CmmnAtomicOperation CASE_EXECUTION_OCCUR = new AtomicOperationCaseExecutionOccur();
+  CmmnAtomicOperation CASE_EXECUTION_TERMINATE = new AtomicOperationCaseExecutionTerminate();
+  CmmnAtomicOperation CASE_EXECUTION_PARENT_TERMINATE = new AtomicOperationCaseExecutionParentTerminate();
+  CmmnAtomicOperation CASE_EXECUTION_EXIT = new AtomicOperationCaseExecutionExit();
+  CmmnAtomicOperation CASE_EXECUTION_SUSPEND = new AtomicOperationCaseExecutionSuspend();
+  CmmnAtomicOperation CASE_EXECUTION_PARENT_SUSPEND = new AtomicOperationCaseExecutionParentSuspend();
+  CmmnAtomicOperation CASE_EXECUTION_RESUME = new AtomicOperationCaseExecutionResume();
+  CmmnAtomicOperation CASE_EXECUTION_PARENT_RESUME = new AtomicOperationCaseExecutionParentResume();
+  CmmnAtomicOperation CASE_EXECUTION_RE_ACTIVATE = new AtomicOperationCaseExecutionReactivate();
 
-  // lifecycle of a case execution: ////////////////////////////
+  // terminating
+  CmmnAtomicOperation CASE_EXECUTION_TERMINATING_ON_TERMINATION = new AtomicOperationCaseExecutionTerminatingOnTermination();
+  CmmnAtomicOperation CASE_EXECUTION_TERMINATING_ON_PARENT_TERMINATION = new AtomicOperationCaseExecutionTerminatingOnParentTermination();
+  CmmnAtomicOperation CASE_EXECUTION_TERMINATING_ON_EXIT = new AtomicOperationCaseExecutionTerminatingOnExit();
 
-  // create a new case execution
-  CmmnAtomicOperation CASE_EXECUTION_NOTIFY_LISTENER_CREATE = new AtomicOperationCaseExecutionNotifyListenerCreate();
+  // suspending
+  CmmnAtomicOperation CASE_EXECUTION_SUSPENDING_ON_SUSPENSION = new AtomicOperationCaseExecutionSuspendingOnSuspension();
+  CmmnAtomicOperation CASE_EXECUTION_SUSPENDING_ON_PARENT_SUSPENSION = new AtomicOperationCaseExecutionSuspendingOnParentSuspension();
 
-  // start a case execution
-  CmmnAtomicOperation CASE_EXECUTION_NOTIFY_LISTENER_START = new AtomicOperationCaseExecutionNotifyListenerStart();
+  // sentry
+  CmmnAtomicOperation CASE_EXECUTION_FIRE_ENTRY_CRITERIA = new AtomicOperationCaseExecutionFireEntryCriteria();
+  CmmnAtomicOperation CASE_EXECUTION_FIRE_EXIT_CRITERIA = new AtomicOperationCaseExecutionFireExitCriteria();
 
-  // enable case execution
-  CmmnAtomicOperation CASE_EXECUTION_NOTIFY_LISTENER_ENABLE = new AtomicOperationCaseExecutionNotifyListenerEnable();
-
-  // disable a case execution
-  CmmnAtomicOperation CASE_EXECUTION_NOTIFY_LISTENER_DISABLE = new AtomicOperationCaseExecutionNotifyListenerDisable();
-
-  // re-enable a case execution
-  CmmnAtomicOperation CASE_EXECUTION_NOTIFY_LISTENER_RE_ENABLE = new AtomicOperationCaseExecutionNotifyListenerReEnable();
-
-  // start manual a case execution
-  CmmnAtomicOperation CASE_EXECUTION_NOTIFY_LISTENER_MANUAL_START = new AtomicOperationCaseExecutionNotifyListenerManualStart();
-
-  // fault of a case execution
-  CmmnAtomicOperation CASE_EXECUTION_NOTIFY_LISTENER_FAULT = new AtomicOperationCaseExecutionNotifyListenerFault();
-
-  // execute activity behavior
-  CmmnAtomicOperation ACTIVITY_EXECUTE = new AtomicOperationActivityExecute();
-
-  // re-activate a case execution
-  CmmnAtomicOperation CASE_EXECUTION_NOTIFY_LISTENER_RE_ACTIVATE = new AtomicOperationCaseExecutionNotifyListenerReActivate();
-
-  // complete a case execution
-  CmmnAtomicOperation CASE_EXECUTION_NOTIFY_LISTENER_COMPLETE = new AtomicOperationCaseExecutionNotifyListenerComplete();
-
-  // terminate a case execution
-  CmmnAtomicOperation CASE_EXECUTION_NOTIFY_LISTENER_TERMINATE = new AtomicOperationCaseExecutionNotifyListenerTerminate();
-
-  // exit a case execution
-  CmmnAtomicOperation CASE_EXECUTION_NOTIFY_LISTENER_EXIT = new AtomicOperationCaseExecutionNotifyListenerExit();
-
-  // suspend a case execution
-  CmmnAtomicOperation CASE_EXECUTION_NOTIFY_LISTENER_SUSPEND = new AtomicOperationCaseExecutionNotifyListenerSuspend();
-
-  // resume a case execution
-  CmmnAtomicOperation CASE_EXECUTION_NOTIFY_LISTENER_RESUME = new AtomicOperationCaseExecutionNotifyListenerResume();
-
-  // parent suspend a case execution
-  CmmnAtomicOperation CASE_EXECUTION_NOTIFY_LISTENER_PARENT_SUSPEND = new AtomicOperationCaseExecutionNotifyListenerParentSuspend();
-
-  // parent resume a case execution
-  CmmnAtomicOperation CASE_EXECUTION_NOTIFY_LISTENER_PARENT_RESUME = new AtomicOperationCaseExecutionNotifyListenerParentResume();
 
   // delete cascade a case execution
   CmmnAtomicOperation CASE_EXECUTION_DELETE_CASCADE = new AtomicOperationCaseExecutionDeleteCascade();

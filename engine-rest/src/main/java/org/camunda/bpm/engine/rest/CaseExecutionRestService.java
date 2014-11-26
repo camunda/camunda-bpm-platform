@@ -36,7 +36,6 @@ import org.camunda.bpm.engine.runtime.CaseExecutionQuery;
  * @author Roman Smirnov
  *
  */
-@Path(CaseExecutionRestService.PATH)
 @Produces(MediaType.APPLICATION_JSON)
 public interface CaseExecutionRestService {
 

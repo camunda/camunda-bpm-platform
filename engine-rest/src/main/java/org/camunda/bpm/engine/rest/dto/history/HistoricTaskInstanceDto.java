@@ -26,6 +26,9 @@ public class HistoricTaskInstanceDto {
   protected String processDefinitionId;
   protected String processInstanceId;
   protected String executionId;
+  protected String caseDefinitionId;
+  protected String caseInstanceId;
+  protected String caseExecutionId;
   protected String activityInstanceId;
   protected String name;
   protected String description;
@@ -55,6 +58,18 @@ public class HistoricTaskInstanceDto {
 
   public String getExecutionId() {
     return executionId;
+  }
+
+  public String getCaseDefinitionId() {
+    return caseDefinitionId;
+  }
+
+  public String getCaseInstanceId() {
+    return caseInstanceId;
+  }
+
+  public String getCaseExecutionId() {
+    return caseExecutionId;
   }
 
   public String getActivityInstanceId() {
@@ -121,6 +136,9 @@ public class HistoricTaskInstanceDto {
     dto.processDefinitionId = taskInstance.getProcessDefinitionId();
     dto.processInstanceId = taskInstance.getProcessInstanceId();
     dto.executionId = taskInstance.getExecutionId();
+    dto.caseDefinitionId = taskInstance.getCaseDefinitionId();
+    dto.caseInstanceId = taskInstance.getCaseInstanceId();
+    dto.caseExecutionId = taskInstance.getCaseExecutionId();
     dto.activityInstanceId = taskInstance.getActivityInstanceId();
     dto.name = taskInstance.getName();
     dto.description = taskInstance.getDescription();

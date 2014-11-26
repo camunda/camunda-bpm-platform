@@ -25,7 +25,7 @@ import java.net.URLClassLoader;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.camunda.bpm.container.impl.jmx.deployment.scanning.ClassPathProcessApplicationScanner;
+import org.camunda.bpm.container.impl.deployment.scanning.ClassPathProcessApplicationScanner;
 import org.junit.Test;
 
 

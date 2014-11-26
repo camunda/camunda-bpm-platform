@@ -14,9 +14,13 @@ package org.camunda.bpm.engine.impl.persistence.entity;
 
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.db.HasRevision;
-import org.camunda.bpm.engine.impl.db.PersistentObject;
+import org.camunda.bpm.engine.impl.db.HasDbReferences;
+import org.camunda.bpm.engine.impl.db.HasDbRevision;
+import org.camunda.bpm.engine.impl.db.DbEntity;
+import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
+import org.camunda.bpm.engine.impl.history.event.HistoryEventType;
+import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
 import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
 import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
@@ -27,7 +31,7 @@ import java.util.*;
 /**
  * @author roman.smirnov
  */
-public class IncidentEntity implements Incident, PersistentObject, HasRevision {
+public class IncidentEntity implements Incident, DbEntity, HasDbRevision, HasDbReferences {
 
   protected int revision;
 
@@ -146,10 +150,10 @@ public class IncidentEntity implements Incident, PersistentObject, HasRevision {
     // persist new incident
     Context
       .getCommandContext()
-      .getDbSqlSession()
+      .getDbEntityManager()
       .insert(incident);
 
-    incident.fireHistoricIncidentEvent(HistoryEvent.INCIDENT_CREATE);
+    incident.fireHistoricIncidentEvent(HistoryEventTypes.INCIDENT_CREATE);
   }
 
   public void delete() {
@@ -190,31 +194,31 @@ public class IncidentEntity implements Incident, PersistentObject, HasRevision {
     // always delete the incident
     Context
       .getCommandContext()
-      .getDbSqlSession()
+      .getDbEntityManager()
       .delete(this);
 
     // update historic incident
-    String eventType = resolved ? HistoryEvent.INCIDENT_RESOLVE : HistoryEvent.INCIDENT_DELETE;
+    HistoryEventType eventType = resolved ? HistoryEventTypes.INCIDENT_RESOLVE : HistoryEventTypes.INCIDENT_DELETE;
     fireHistoricIncidentEvent(eventType);
   }
 
-  protected void fireHistoricIncidentEvent(String eventType) {
+  protected void fireHistoricIncidentEvent(HistoryEventType eventType) {
     ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
 
-    int historyLevel = processEngineConfiguration.getHistoryLevel();
-    if (historyLevel >= ProcessEngineConfigurationImpl.HISTORYLEVEL_FULL) {
+    HistoryLevel historyLevel = processEngineConfiguration.getHistoryLevel();
+    if(historyLevel.isHistoryEventProduced(eventType, this)) {
 
       final HistoryEventProducer eventProducer = processEngineConfiguration.getHistoryEventProducer();
       final HistoryEventHandler eventHandler = processEngineConfiguration.getHistoryEventHandler();
 
       HistoryEvent event = null;
-      if (HistoryEvent.INCIDENT_CREATE.equals(eventType)) {
+      if (HistoryEvent.INCIDENT_CREATE.equals(eventType.getEventName())) {
         event = eventProducer.createHistoricIncidentCreateEvt(this);
 
-      } else if (HistoryEvent.INCIDENT_RESOLVE.equals(eventType)) {
+      } else if (HistoryEvent.INCIDENT_RESOLVE.equals(eventType.getEventName())) {
         event = eventProducer.createHistoricIncidentResolveEvt(this);
 
-      } else if (HistoryEvent.INCIDENT_DELETE.equals(eventType)) {
+      } else if (HistoryEvent.INCIDENT_DELETE.equals(eventType.getEventName())) {
         event = eventProducer.createHistoricIncidentDeleteEvt(this);
 
       } else {
@@ -223,6 +227,19 @@ public class IncidentEntity implements Incident, PersistentObject, HasRevision {
 
       eventHandler.handleEvent(event);
     }
+  }
+
+  public boolean hasReferenceTo(DbEntity entity) {
+    if (entity instanceof IncidentEntity) {
+      IncidentEntity incident = (IncidentEntity) entity;
+      String otherId = incident.getId();
+
+      if(causeIncidentId != null && causeIncidentId.equals(otherId)) {
+        return true;
+      }
+
+    }
+    return false;
   }
 
   public String getId() {
@@ -334,6 +351,7 @@ public class IncidentEntity implements Incident, PersistentObject, HasRevision {
   public Object getPersistentState() {
     Map<String, Object> persistentState = new HashMap<String, Object>();
     persistentState.put("executionId", this.executionId);
+    persistentState.put("processDefinitionId", processDefinitionId);
     return persistentState;
   }
 
@@ -364,6 +382,31 @@ public class IncidentEntity implements Incident, PersistentObject, HasRevision {
            + ", configuration=" + configuration
            + ", incidentMessage=" + incidentMessage
            + "]";
+  }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((id == null) ? 0 : id.hashCode());
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
+    IncidentEntity other = (IncidentEntity) obj;
+    if (id == null) {
+      if (other.id != null)
+        return false;
+    } else if (!id.equals(other.id))
+      return false;
+    return true;
   }
 
 }

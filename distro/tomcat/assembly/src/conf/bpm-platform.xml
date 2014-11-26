@@ -23,6 +23,16 @@
       <plugin>
         <class>org.camunda.bpm.application.impl.event.ProcessApplicationEventListenerPlugin</class>
       </plugin>
+      
+      <!-- plugin enabling integration of camunda Spin -->
+      <plugin>
+        <class>org.camunda.spin.plugin.impl.SpinProcessEnginePlugin</class>
+      </plugin>
+
+      <!-- plugin enabling connect support -->
+      <plugin>
+        <class>org.camunda.connect.plugin.impl.ConnectProcessEnginePlugin</class>
+      </plugin>
 
     <!-- LDAP CONFIGURATION -->
     <!-- Uncomment this section in order to enable LDAP support for this process engine -->

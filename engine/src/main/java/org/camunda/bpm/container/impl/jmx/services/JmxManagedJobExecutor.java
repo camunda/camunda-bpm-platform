@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -12,27 +12,27 @@
  */
 package org.camunda.bpm.container.impl.jmx.services;
 
-import org.camunda.bpm.container.impl.jmx.kernel.MBeanService;
-import org.camunda.bpm.container.impl.jmx.kernel.MBeanServiceContainer;
+import org.camunda.bpm.container.impl.spi.PlatformService;
+import org.camunda.bpm.container.impl.spi.PlatformServiceContainer;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
 
 /**
  * @author Daniel Meyer
  *
  */
-public class JmxManagedJobExecutor implements MBeanService<JobExecutor>, JmxManagedJobExecutorMBean {
+public class JmxManagedJobExecutor implements PlatformService<JobExecutor>, JmxManagedJobExecutorMBean {
 
   protected final JobExecutor jobExecutor;
-  
+
   public JmxManagedJobExecutor(JobExecutor jobExecutor) {
     this.jobExecutor = jobExecutor;
   }
-  
-  public void start(MBeanServiceContainer mBeanServiceContainer) {
+
+  public void start(PlatformServiceContainer mBeanServiceContainer) {
     start();
   }
-  
-  public void stop(MBeanServiceContainer mBeanServiceContainer) {
+
+  public void stop(PlatformServiceContainer mBeanServiceContainer) {
     shutdown();
   }
 
@@ -79,7 +79,7 @@ public class JmxManagedJobExecutor implements MBeanService<JobExecutor>, JmxMana
   public String getName() {
     return jobExecutor.getName();
   }
-  
+
   public JobExecutor getValue() {
     return jobExecutor;
   }

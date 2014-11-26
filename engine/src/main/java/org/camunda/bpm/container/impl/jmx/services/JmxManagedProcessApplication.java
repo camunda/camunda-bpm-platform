@@ -19,16 +19,16 @@ import java.util.Map;
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.application.impl.ProcessApplicationInfoImpl;
 import org.camunda.bpm.application.impl.metadata.spi.ProcessesXml;
-import org.camunda.bpm.container.impl.jmx.deployment.util.DeployedProcessArchive;
-import org.camunda.bpm.container.impl.jmx.kernel.MBeanService;
-import org.camunda.bpm.container.impl.jmx.kernel.MBeanServiceContainer;
+import org.camunda.bpm.container.impl.deployment.util.DeployedProcessArchive;
+import org.camunda.bpm.container.impl.spi.PlatformService;
+import org.camunda.bpm.container.impl.spi.PlatformServiceContainer;
 
 /**
  *
  * @author Daniel Meyer
  *
  */
-public class JmxManagedProcessApplication implements MBeanService<JmxManagedProcessApplication>, JmxManagedProcessApplicationMBean {
+public class JmxManagedProcessApplication implements PlatformService<JmxManagedProcessApplication>, JmxManagedProcessApplicationMBean {
 
   protected final ProcessApplicationInfoImpl processApplicationInfo;
   protected final ProcessApplicationReference processApplicationReference;
@@ -45,10 +45,10 @@ public class JmxManagedProcessApplication implements MBeanService<JmxManagedProc
 		return processApplicationInfo.getName();
 	}
 
-	public void start(MBeanServiceContainer mBeanServiceContainer) {
+	public void start(PlatformServiceContainer mBeanServiceContainer) {
 	}
 
-	public void stop(MBeanServiceContainer mBeanServiceContainer) {
+	public void stop(PlatformServiceContainer mBeanServiceContainer) {
 	}
 
 	public JmxManagedProcessApplication getValue() {

@@ -13,6 +13,8 @@
 
 package org.camunda.bpm.engine.impl.bpmn.behavior;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -24,10 +26,12 @@ import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.delegate.Expression;
+import org.camunda.bpm.engine.impl.bpmn.delegate.ExecutionListenerInvocation;
 import org.camunda.bpm.engine.impl.bpmn.helper.ErrorPropagation;
 import org.camunda.bpm.engine.impl.bpmn.helper.ScopeUtil;
 import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.delegate.ExecutionListenerInvocation;
+import org.camunda.bpm.engine.impl.core.variable.mapping.IoMapping;
+import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
@@ -70,6 +74,7 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
   protected Expression collectionExpression;
   protected String collectionVariable;
   protected String collectionElementVariable;
+  protected IoMapping ioMapping;
 
   /**
    * @param innerActivityBehavior The original {@link ActivityBehavior} of the activity
@@ -248,9 +253,7 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
       parent = parent.getParent();
     }
 
-    if (value == null) {
-      throw new ProcessEngineException("The variable \"" + variableName + "\" could not be found in execution with id " + execution.getId());
-    }
+    ensureNotNull("The variable \"" + variableName + "\" could not be found in execution with id " + execution.getId(), "value", value);
 
     return (Integer) value;
   }
@@ -296,36 +299,56 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
   public Expression getLoopCardinalityExpression() {
     return loopCardinalityExpression;
   }
+
   public void setLoopCardinalityExpression(Expression loopCardinalityExpression) {
     this.loopCardinalityExpression = loopCardinalityExpression;
   }
+
   public Expression getCompletionConditionExpression() {
     return completionConditionExpression;
   }
+
   public void setCompletionConditionExpression(Expression completionConditionExpression) {
     this.completionConditionExpression = completionConditionExpression;
   }
+
   public Expression getCollectionExpression() {
     return collectionExpression;
   }
+
   public void setCollectionExpression(Expression collectionExpression) {
     this.collectionExpression = collectionExpression;
   }
+
   public String getCollectionVariable() {
     return collectionVariable;
   }
+
   public void setCollectionVariable(String collectionVariable) {
     this.collectionVariable = collectionVariable;
   }
+
   public String getCollectionElementVariable() {
     return collectionElementVariable;
   }
+
   public void setCollectionElementVariable(String collectionElementVariable) {
     this.collectionElementVariable = collectionElementVariable;
   }
+
   public void setInnerActivityBehavior(AbstractBpmnActivityBehavior innerActivityBehavior) {
     this.innerActivityBehavior = innerActivityBehavior;
     this.innerActivityBehavior.setMultiInstanceActivityBehavior(this);
+  }
+
+  public void setIoMapping(IoMapping ioMapping) {
+    this.ioMapping = ioMapping;
+  }
+
+  protected void executeIoMapping(AbstractVariableScope scope) {
+    if (ioMapping != null) {
+      ioMapping.executeInputParameters(scope);
+    }
   }
 
 }

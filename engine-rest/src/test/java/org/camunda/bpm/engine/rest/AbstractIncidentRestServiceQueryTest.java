@@ -1,5 +1,21 @@
 package org.camunda.bpm.engine.rest;
 
+import com.jayway.restassured.http.ContentType;
+import com.jayway.restassured.response.Response;
+import java.util.Date;
+import java.util.List;
+import javax.ws.rs.core.Response.Status;
+import javax.xml.registry.InvalidRequestException;
+import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
+import org.camunda.bpm.engine.rest.helper.MockProvider;
+import org.camunda.bpm.engine.runtime.Incident;
+import org.camunda.bpm.engine.runtime.IncidentQuery;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.InOrder;
+import org.mockito.Mockito;
+
 import static com.jayway.restassured.RestAssured.expect;
 import static com.jayway.restassured.RestAssured.given;
 import static com.jayway.restassured.path.json.JsonPath.from;
@@ -11,32 +27,13 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
-import java.util.Date;
-import java.util.List;
-
-import javax.ws.rs.core.Response.Status;
-import javax.xml.registry.InvalidRequestException;
-
-import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
-import org.camunda.bpm.engine.rest.helper.MockProvider;
-import org.camunda.bpm.engine.runtime.Incident;
-import org.camunda.bpm.engine.runtime.IncidentQuery;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.InOrder;
-import org.mockito.Mockito;
-
-import com.jayway.restassured.http.ContentType;
-import com.jayway.restassured.response.Response;
-
 
 /**
  *
  * @author Roman Smirnov
  *
  */
-public class AbstractIncidentRestServiceQueryTest extends AbstractRestServiceTest {
+public abstract class AbstractIncidentRestServiceQueryTest extends AbstractRestServiceTest {
 
   protected static final String INCIDENT_QUERY_URL = TEST_RESOURCE_ROOT_PATH + "/incident";
   protected static final String INCIDENT_COUNT_QUERY_URL = INCIDENT_QUERY_URL + "/count";
@@ -292,7 +289,7 @@ public class AbstractIncidentRestServiceQueryTest extends AbstractRestServiceTes
     String returnedProcessDefinitionId = from(content).getString("[0].processDefinitionId");
     String returnedProcessInstanceId = from(content).getString("[0].processInstanceId");
     String returnedExecutionId = from(content).getString("[0].executionId");
-    Date returnedIncidentTimestamp = DateTimeUtil.parseDateTime(from(content).getString("[0].incidentTimestamp")).toDate();
+    Date returnedIncidentTimestamp = DateTimeUtil.parseDate(from(content).getString("[0].incidentTimestamp"));
     String returnedIncidentType = from(content).getString("[0].incidentType");
     String returnedActivityId = from(content).getString("[0].activityId");
     String returnedCauseIncidentId = from(content).getString("[0].causeIncidentId");
@@ -302,7 +299,7 @@ public class AbstractIncidentRestServiceQueryTest extends AbstractRestServiceTes
 
     Assert.assertEquals(MockProvider.EXAMPLE_INCIDENT_ID, returnedId);
     Assert.assertEquals(MockProvider.EXAMPLE_INCIDENT_PROC_INST_ID, returnedProcessInstanceId);
-    Assert.assertEquals(DateTimeUtil.parseDateTime(MockProvider.EXAMPLE_INCIDENT_TIMESTAMP).toDate(), returnedIncidentTimestamp);
+    Assert.assertEquals(DateTimeUtil.parseDate(MockProvider.EXAMPLE_INCIDENT_TIMESTAMP), returnedIncidentTimestamp);
     Assert.assertEquals(MockProvider.EXAMPLE_INCIDENT_EXECUTION_ID, returnedExecutionId);
     Assert.assertEquals(MockProvider.EXAMPLE_INCIDENT_PROC_DEF_ID, returnedProcessDefinitionId);
     Assert.assertEquals(MockProvider.EXAMPLE_INCIDENT_TYPE, returnedIncidentType);

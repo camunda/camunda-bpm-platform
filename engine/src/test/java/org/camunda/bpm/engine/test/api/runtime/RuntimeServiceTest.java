@@ -13,24 +13,36 @@
 
 package org.camunda.bpm.engine.test.api.runtime;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.impl.RuntimeServiceImpl;
-import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.CollectionUtil;
+import org.camunda.bpm.engine.impl.variable.serializer.JavaObjectSerializer;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
-
-import java.util.*;
+import org.camunda.bpm.engine.test.util.TestExecutionListener;
+import org.camunda.bpm.engine.variable.VariableMap;
+import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.type.ValueType;
 
 
 /**
@@ -132,6 +144,65 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
 
       assertEquals(deleteReason, historicTaskInstance.getDeleteReason());
     }
+  }
+
+  @Deployment(resources={
+  "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void testDeleteProcessInstanceSkipCustomListenersEnsureHistoryWritten() {
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+    // if we skip the custom listeners,
+    runtimeService.deleteProcessInstance(processInstance.getId(), null, true);
+
+    // buit-in listeners are still invoked and thus history is written
+    if(!ProcessEngineConfiguration.HISTORY_NONE.equals(processEngineConfiguration.getHistory())) {
+      // verify that all historic activity instances are ended
+      List<HistoricActivityInstance> hais = historyService.createHistoricActivityInstanceQuery().list();
+      for (HistoricActivityInstance hai : hais) {
+        assertNotNull(hai.getEndTime());
+      }
+    }
+  }
+
+  @Deployment
+  public void testDeleteProcessInstanceSkipCustomListeners() {
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testProcess");
+
+    // if we do not skip the custom listeners,
+    runtimeService.deleteProcessInstance(processInstance.getId(), null, false);
+    // the custom listener is invoked
+    assertTrue(TestExecutionListener.collectedEvents.size() == 1);
+    TestExecutionListener.reset();
+
+    processInstance = runtimeService.startProcessInstanceByKey("testProcess");
+
+    // if we DO skip the custom listeners,
+    runtimeService.deleteProcessInstance(processInstance.getId(), null, true);
+    // the custom listener is not invoked
+    assertTrue(TestExecutionListener.collectedEvents.size() == 0);
+    TestExecutionListener.reset();
+  }
+
+  @Deployment
+  public void testDeleteProcessInstanceSkipCustomListenersScope() {
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testProcess");
+
+    // if we do not skip the custom listeners,
+    runtimeService.deleteProcessInstance(processInstance.getId(), null, false);
+    // the custom listener is invoked
+    assertTrue(TestExecutionListener.collectedEvents.size() == 1);
+    TestExecutionListener.reset();
+
+    processInstance = runtimeService.startProcessInstanceByKey("testProcess");
+
+    // if we DO skip the custom listeners,
+    runtimeService.deleteProcessInstance(processInstance.getId(), null, true);
+    // the custom listener is not invoked
+    assertTrue(TestExecutionListener.collectedEvents.size() == 0);
+    TestExecutionListener.reset();
   }
 
   @Deployment(resources={
@@ -337,7 +408,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
     runtimeService.signal(processInstance.getId(), null, null, processVariables);
 
     Map<String, Object> variables = runtimeService.getVariables(processInstance.getId());
-    assertEquals(variables, processVariables);
+    assertEquals(processVariables, variables);
 
   }
 
@@ -446,6 +517,93 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
     assertEquals("value2", runtimeService.getVariable(processInstance.getId(), "variable2"));
   }
 
+  @Deployment(resources={
+  "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void testGetVariablesTyped() {
+    Map<String, Object> vars = new HashMap<String, Object>();
+    vars.put("variable1", "value1");
+    vars.put("variable2", "value2");
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", vars);
+    VariableMap variablesTyped = runtimeService.getVariablesTyped(processInstance.getId());
+    assertEquals(vars, variablesTyped);
+  }
+
+  @Deployment(resources={
+  "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void testGetVariablesTypedDeserialize() {
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Variables.createVariables()
+          .putValue("broken", Variables.serializedObjectValue("broken")
+              .serializationDataFormat(Variables.SerializationDataFormats.JAVA)
+              .objectTypeName("unexisting").create()));
+
+    // this works
+    VariableMap variablesTyped = runtimeService.getVariablesTyped(processInstance.getId(), false);
+    assertNotNull(variablesTyped.getValueTyped("broken"));
+    variablesTyped = runtimeService.getVariablesTyped(processInstance.getId(), Arrays.asList("broken"), false);
+    assertNotNull(variablesTyped.getValueTyped("broken"));
+
+    // this does not
+    try {
+      runtimeService.getVariablesTyped(processInstance.getId());
+    } catch(ProcessEngineException e) {
+      assertTextPresent("Cannot deserialize object", e.getMessage());
+    }
+
+    // this does not
+    try {
+      runtimeService.getVariablesTyped(processInstance.getId(), Arrays.asList("broken"), true);
+    } catch(ProcessEngineException e) {
+      assertTextPresent("Cannot deserialize object", e.getMessage());
+    }
+  }
+
+  @Deployment(resources={
+  "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void testGetVariablesLocalTyped() {
+    Map<String, Object> vars = new HashMap<String, Object>();
+    vars.put("variable1", "value1");
+    vars.put("variable2", "value2");
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", vars);
+    VariableMap variablesTyped = runtimeService.getVariablesLocalTyped(processInstance.getId());
+    assertEquals(vars, variablesTyped);
+  }
+
+  @Deployment(resources={
+  "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void testGetVariablesLocalTypedDeserialize() {
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Variables.createVariables()
+          .putValue("broken", Variables.serializedObjectValue("broken")
+              .serializationDataFormat(Variables.SerializationDataFormats.JAVA)
+              .objectTypeName("unexisting").create()));
+
+    // this works
+    VariableMap variablesTyped = runtimeService.getVariablesLocalTyped(processInstance.getId(), false);
+    assertNotNull(variablesTyped.getValueTyped("broken"));
+    variablesTyped = runtimeService.getVariablesLocalTyped(processInstance.getId(), Arrays.asList("broken"), false);
+    assertNotNull(variablesTyped.getValueTyped("broken"));
+
+    // this does not
+    try {
+      runtimeService.getVariablesLocalTyped(processInstance.getId());
+    } catch(ProcessEngineException e) {
+      assertTextPresent("Cannot deserialize object", e.getMessage());
+    }
+
+    // this does not
+    try {
+      runtimeService.getVariablesLocalTyped(processInstance.getId(), Arrays.asList("broken"), true);
+    } catch(ProcessEngineException e) {
+      assertTextPresent("Cannot deserialize object", e.getMessage());
+    }
+
+  }
+
   @SuppressWarnings("unchecked")
   public void testSetVariablesUnexistingExecutionId() {
     try {
@@ -467,7 +625,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
   }
 
   private void checkHistoricVariableUpdateEntity(String variableName, String processInstanceId) {
-    if (processEngineConfiguration.getHistoryLevel() == ProcessEngineConfigurationImpl.HISTORYLEVEL_FULL) {
+    if (processEngineConfiguration.getHistoryLevel().equals(HistoryLevel.HISTORY_LEVEL_FULL)) {
       boolean deletedVariableUpdateFound = false;
 
       List<HistoricDetail> resultSet = historyService.createHistoricDetailQuery().processInstanceId(processInstanceId).list();
@@ -895,7 +1053,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
       runtimeService.getActivityInstance(null);
       fail("PEE expected!");
     } catch (ProcessEngineException engineException) {
-      assertTrue(engineException.getMessage().contains("processInstanceId cannot be null"));
+      assertTrue(engineException.getMessage().contains("processInstanceId is null"));
     }
   }
 
@@ -931,5 +1089,118 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
 
   }
 
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
+  public void testChangeVariableType() {
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+    DummySerializable dummy = new DummySerializable();
+    runtimeService.setVariable(instance.getId(), "dummy", dummy);
+
+    runtimeService.setVariable(instance.getId(), "dummy", 47);
+
+    VariableInstance variableInstance = runtimeService.createVariableInstanceQuery().singleResult();
+
+    assertEquals(47, variableInstance.getValue());
+    assertEquals(ValueType.INTEGER.getName(), variableInstance.getTypeName());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
+  public void testStartByKeyWithCaseInstanceId() {
+    String caseInstanceId = "aCaseInstanceId";
+
+    ProcessInstance firstInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", null, caseInstanceId);
+
+    assertEquals(caseInstanceId, firstInstance.getCaseInstanceId());
+
+    // load process instance from db
+    firstInstance = runtimeService
+        .createProcessInstanceQuery()
+        .processInstanceId(firstInstance.getId())
+        .singleResult();
+
+    assertNotNull(firstInstance);
+
+    assertEquals(caseInstanceId, firstInstance.getCaseInstanceId());
+
+    // the second possibility to start a process instance /////////////////////////////////////////////
+
+    ProcessInstance secondInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", null, caseInstanceId, null);
+
+    assertEquals(caseInstanceId, secondInstance.getCaseInstanceId());
+
+    // load process instance from db
+    secondInstance = runtimeService
+        .createProcessInstanceQuery()
+        .processInstanceId(secondInstance.getId())
+        .singleResult();
+
+    assertNotNull(secondInstance);
+
+    assertEquals(caseInstanceId, secondInstance.getCaseInstanceId());
+
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
+  public void testStartByIdWithCaseInstanceId() {
+    String processDefinitionId = repositoryService
+        .createProcessDefinitionQuery()
+        .processDefinitionKey("oneTaskProcess")
+        .singleResult()
+        .getId();
+
+    String caseInstanceId = "aCaseInstanceId";
+    ProcessInstance firstInstance = runtimeService.startProcessInstanceById(processDefinitionId, null, caseInstanceId);
+
+    assertEquals(caseInstanceId, firstInstance.getCaseInstanceId());
+
+    // load process instance from db
+    firstInstance = runtimeService
+        .createProcessInstanceQuery()
+        .processInstanceId(firstInstance.getId())
+        .singleResult();
+
+    assertNotNull(firstInstance);
+
+    assertEquals(caseInstanceId, firstInstance.getCaseInstanceId());
+
+    // the second possibility to start a process instance /////////////////////////////////////////////
+
+    ProcessInstance secondInstance = runtimeService.startProcessInstanceById(processDefinitionId, null, caseInstanceId, null);
+
+    assertEquals(caseInstanceId, secondInstance.getCaseInstanceId());
+
+    // load process instance from db
+    secondInstance = runtimeService
+        .createProcessInstanceQuery()
+        .processInstanceId(secondInstance.getId())
+        .singleResult();
+
+    assertNotNull(secondInstance);
+
+    assertEquals(caseInstanceId, secondInstance.getCaseInstanceId());
+
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
+  public void testSetAbstractNumberValueFails() {
+    try {
+      runtimeService.startProcessInstanceByKey("oneTaskProcess",
+          Variables.createVariables().putValueTyped("var", Variables.numberValue(42)));
+      fail("exception expected");
+    } catch (ProcessEngineException e) {
+      // happy path
+      assertTextPresentIgnoreCase("cannot serialize value of abstract type number", e.getMessage());
+    }
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+    try {
+      runtimeService.setVariable(processInstance.getId(), "var", Variables.numberValue(42));
+      fail("exception expected");
+    } catch (ProcessEngineException e) {
+      // happy path
+      assertTextPresentIgnoreCase("cannot serialize value of abstract type number", e.getMessage());
+    }
+  }
 
 }

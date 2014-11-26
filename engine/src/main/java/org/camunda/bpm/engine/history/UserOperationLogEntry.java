@@ -14,6 +14,7 @@
 package org.camunda.bpm.engine.history;
 
 import java.util.Date;
+import org.camunda.bpm.engine.EntityTypes;
 
 
 /**
@@ -30,7 +31,28 @@ import java.util.Date;
  * <p>The type of the entity on which the operation was performed. Operations may be
  * performed on tasks, attachments, ...</p>
  *
- * <p>The event contains data about the Operation performed</p>
+ * <h2>Affected Entity Criteria</h2>
+ * <p>
+ *   The methods that reference other entities (except users), such as {@link #getProcessInstanceId()}
+ *   or {@link #getProcessDefinitionId()}, describe which entities were affected
+ *   by the operation and represent restriction criteria.
+ *   A <code>null</code> return value of any of those methods means that regarding
+ *   this criterion, any entity was affected.
+ * </p>
+ * <p>
+ *   For example, if an operation suspends all process instances that belong to a certain
+ *   process definition id, one operation log entry is created.
+ *   Its return value for the method {@link #getProcessInstanceId()} is <code>null</code>,
+ *   while {@link #getProcessDefinitionId()} returns an id. Thus, the return values
+ *   of these methods can be understood as selection criteria of instances of the entity type
+ *   that were affected by the operation.
+ * </p>
+ *
+ * <h2>Additional Considerations</h2>
+ * <p>The event describes which user has requested out the operation and the time
+ * at which the operation was performed. Furthermore, one operation can result in multiple
+ * {@link UserOperationLogEntry} entities whicha are linked by the value of the
+ * {@link #getOperationId()} method.</p>
  *
  * @author Danny Gräf
  * @author Daniel Meyer
@@ -38,9 +60,15 @@ import java.util.Date;
  */
 public interface UserOperationLogEntry {
 
-  public static String ENTITY_TYPE_TASK = "Task";
-  public static String ENTITY_TYPE_IDENTITY_LINK = "IdentityLink";
-  public static String ENTITY_TYPE_ATTACHMENT = "Attachment";
+  /** @deprecated Please use {@link EntityTypes#TASK} instead. */
+  @Deprecated
+  public static String ENTITY_TYPE_TASK = EntityTypes.TASK;
+  /** @deprecated Please use {@link EntityTypes#IDENTITY_LINK} instead. */
+  @Deprecated
+  public static String ENTITY_TYPE_IDENTITY_LINK = EntityTypes.IDENTITY_LINK;
+  /** @deprecated Please use {@link EntityTypes#ATTACHMENT} instead. */
+  @Deprecated
+  public static String ENTITY_TYPE_ATTACHMENT = EntityTypes.ATTACHMENT;
 
   public static String OPERATION_TYPE_ASSIGN = "Assign";
   public static String OPERATION_TYPE_CLAIM = "Claim";
@@ -52,6 +80,8 @@ public interface UserOperationLogEntry {
   public static String OPERATION_TYPE_SET_OWNER = "SetOwner";
   public static String OPERATION_TYPE_SET_PRIORITY = "SetPriority";
   public static String OPERATION_TYPE_UPDATE = "Update";
+  public static String OPERATION_TYPE_ACTIVATE = "Activate";
+  public static String OPERATION_TYPE_SUSPEND = "Suspend";
   public static String OPERATION_TYPE_ADD_USER_LINK = "AddUserLink";
   public static String OPERATION_TYPE_DELETE_USER_LINK = "DeleteUserLink";
   public static String OPERATION_TYPE_ADD_GROUP_LINK = "AddGroupLink";
@@ -65,11 +95,25 @@ public interface UserOperationLogEntry {
   /** Process definition reference. */
   String getProcessDefinitionId();
 
+  /**
+   * Key of the process definition this log entry belongs to; <code>null</code> means any.
+   */
+  String getProcessDefinitionKey();
+
   /** Process instance reference. */
   String getProcessInstanceId();
 
   /** Execution reference. */
   String getExecutionId();
+
+  /** Case definition reference. */
+  String getCaseDefinitionId();
+
+  /** Case instance reference. */
+  String getCaseInstanceId();
+
+  /** Case execution reference. */
+  String getCaseExecutionId();
 
   /** Task instance reference. */
   String getTaskId();

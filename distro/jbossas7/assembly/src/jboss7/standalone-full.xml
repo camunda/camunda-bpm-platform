@@ -119,15 +119,6 @@
                         <password>sa</password>
                     </security>                   
                 </datasource>               
-                <datasource jta="true" jndi-name="java:jboss/datasources/CycleDS" pool-name="CycleDS" enabled="true" use-java-context="true" use-ccm="true">
-                    <connection-url>jdbc:h2:./camunda-h2-dbs/cycle;DB_CLOSE_DELAY=-1;MVCC=TRUE;DB_CLOSE_ON_EXIT=FALSE</connection-url>
-                    <driver>h2</driver>
-                    <pool></pool>
-                    <security>
-                        <user-name>sa</user-name>
-                        <password>sa</password>
-                    </security>
-                </datasource>                
                 <drivers>
                     <driver name="h2" module="com.h2database.h2">
                         <xa-datasource-class>org.h2.jdbcx.JdbcDataSource</xa-datasource-class>
@@ -403,6 +394,16 @@
                       <!-- plugin enabling Process Application event listener support -->
                       <plugin>
                         <class>org.camunda.bpm.application.impl.event.ProcessApplicationEventListenerPlugin</class>
+                      </plugin>
+                      
+                      <!-- plugin enabling integration of camunda Spin -->
+                      <plugin>
+                        <class>org.camunda.spin.plugin.impl.SpinProcessEnginePlugin</class>
+                      </plugin>
+
+                      <!-- plugin enabling connect support -->
+                      <plugin>
+                          <class>org.camunda.connect.plugin.impl.ConnectProcessEnginePlugin</class>
                       </plugin>
 
                     <!-- LDAP CONFIGURATION -->

@@ -5,12 +5,14 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isNull;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -18,6 +20,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -41,10 +45,17 @@ import org.camunda.bpm.engine.repository.ProcessDefinitionQuery;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.helper.EqualsMap;
+import org.camunda.bpm.engine.rest.helper.EqualsVariableMap;
+import org.camunda.bpm.engine.rest.helper.ErrorMessageHelper;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
+import org.camunda.bpm.engine.rest.helper.VariableTypeHelper;
+import org.camunda.bpm.engine.rest.helper.variable.EqualsObjectValue;
+import org.camunda.bpm.engine.rest.helper.variable.EqualsUntypedValue;
 import org.camunda.bpm.engine.rest.sub.repository.impl.ProcessDefinitionResourceImpl;
 import org.camunda.bpm.engine.rest.util.VariablesBuilder;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.variable.VariableMap;
+import org.camunda.bpm.engine.variable.type.ValueType;
 import org.fest.assertions.Assertions;
 import org.junit.Assert;
 import org.junit.Before;
@@ -53,8 +64,6 @@ import org.mockito.Matchers;
 
 import com.jayway.restassured.http.ContentType;
 import com.jayway.restassured.response.Response;
-
-import org.mockito.Mock;
 
 public abstract class AbstractProcessDefinitionRestServiceInteractionTest extends AbstractRestServiceTest {
 
@@ -73,6 +82,7 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
   protected static final String RENDERED_FORM_BY_KEY_URL = SINGLE_PROCESS_DEFINITION_BY_KEY_URL + "/rendered-form";
   protected static final String SUBMIT_FORM_URL = SINGLE_PROCESS_DEFINITION_URL + "/submit-form";
   protected static final String SUBMIT_FORM_BY_KEY_URL = SINGLE_PROCESS_DEFINITION_BY_KEY_URL + "/submit-form";
+  protected static final String START_FORM_VARIABLES_URL = SINGLE_PROCESS_DEFINITION_URL + "/form-variables";
 
   protected static final String SINGLE_PROCESS_DEFINITION_SUSPENDED_URL = SINGLE_PROCESS_DEFINITION_URL + "/suspended";
   protected static final String SINGLE_PROCESS_DEFINITION_BY_KEY_SUSPENDED_URL = SINGLE_PROCESS_DEFINITION_BY_KEY_URL + "/suspended";
@@ -93,7 +103,7 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
     runtimeServiceMock = mock(RuntimeService.class);
     when(processEngine.getRuntimeService()).thenReturn(runtimeServiceMock);
     when(runtimeServiceMock.startProcessInstanceById(eq(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID), Matchers.<Map<String, Object>>any())).thenReturn(mockInstance);
-    when(runtimeServiceMock.startProcessInstanceById(eq(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID), anyString(), Matchers.<Map<String, Object>>any())).thenReturn(mockInstance);
+    when(runtimeServiceMock.startProcessInstanceById(eq(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID), anyString(), anyString(), Matchers.<Map<String, Object>>any())).thenReturn(mockInstance);
 
     repositoryServiceMock = mock(RepositoryService.class);
     when(processEngine.getRepositoryService()).thenReturn(repositoryServiceMock);
@@ -108,6 +118,9 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
     when(formServiceMock.getStartFormData(eq(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID))).thenReturn(formDataMock);
     when(formServiceMock.submitStartForm(eq(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID),  Matchers.<Map<String, Object>>any())).thenReturn(mockInstance);
     when(formServiceMock.submitStartForm(eq(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID),  anyString(), Matchers.<Map<String, Object>>any())).thenReturn(mockInstance);
+
+    VariableMap startFormVariablesMock = MockProvider.createMockFormVariables();
+    when(formServiceMock.getStartFormVariables(eq(EXAMPLE_PROCESS_DEFINITION_ID), Matchers.<Collection<String>>any(), anyBoolean())).thenReturn(startFormVariablesMock);
 
     managementServiceMock = mock(ManagementService.class);
     when(processEngine.getManagementService()).thenReturn(managementServiceMock);
@@ -282,6 +295,17 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
   }
 
   @Test
+  public void testGetStartForm_StartFormDataEqualsNull() {
+    ProcessDefinition mockDefinition = MockProvider.createMockDefinition();
+    when(formServiceMock.getStartFormData(mockDefinition.getId())).thenReturn(null);
+
+    given().pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
+      .then().expect().statusCode(Status.OK.getStatusCode())
+      .body("contextPath", equalTo(MockProvider.EXAMPLE_PROCESS_APPLICATION_CONTEXT_PATH))
+      .when().get(START_FORM_URL);
+  }
+
+  @Test
   public void testGetRenderedStartForm() {
     String expectedResult = "<formField>anyContent</formField>";
 
@@ -362,6 +386,41 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
   }
 
   @Test
+  public void testSubmitStartFormWithSerializedVariableValue() {
+
+    String jsonValue = "{}";
+
+    Map<String, Object> variables = VariablesBuilder.create()
+        .variable("aVariable", "aStringValue")
+        .variable("aSerializedVariable", ValueType.OBJECT.getName(), jsonValue, "aFormat", "aRootType")
+        .getVariables();
+
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("variables", variables);
+
+    given().pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
+      .contentType(POST_JSON_CONTENT_TYPE).body(json)
+      .then().expect()
+        .statusCode(Status.OK.getStatusCode())
+        .body("id", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID))
+        .body("definitionId", equalTo(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID))
+        .body("businessKey", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_BUSINESS_KEY))
+        .body("ended", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_IS_ENDED))
+        .body("suspended", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_IS_SUSPENDED))
+      .when().post(SUBMIT_FORM_URL);
+
+    verify(formServiceMock).submitStartForm(eq(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID),
+        argThat(
+            new EqualsVariableMap()
+              .matcher("aVariable", EqualsUntypedValue.matcher().value("aStringValue"))
+              .matcher("aSerializedVariable", EqualsObjectValue
+                                                .objectValueMatcher()
+                                                .serializedValue(jsonValue)
+                                                .serializationFormat("aFormat")
+                                                .objectTypeName("aRootType"))));
+  }
+
+  @Test
   public void testSubmitStartFormWithBusinessKey() {
     Map<String, Object> json = new HashMap<String, Object>();
     json.put("businessKey", "myBusinessKey");
@@ -426,8 +485,9 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
     .contentType(POST_JSON_CONTENT_TYPE).body(variables)
     .then().expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
-      .body("type", equalTo(RestException.class.getSimpleName()))
-      .body("message", containsString("Cannot instantiate process definition aProcDefId due to number format exception: For input string: \"1abc\""))
+      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("message", containsString("Cannot instantiate process definition aProcDefId: "
+        + ErrorMessageHelper.getExpectedFailingConversionMessage(variableValue, variableType, Integer.class)))
     .when().post(SUBMIT_FORM_URL);
   }
 
@@ -446,8 +506,9 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
     .contentType(POST_JSON_CONTENT_TYPE).body(variables)
     .then().expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
-      .body("type", equalTo(RestException.class.getSimpleName()))
-      .body("message", containsString("Cannot instantiate process definition aProcDefId due to number format exception: For input string: \"1abc\""))
+      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("message", containsString("Cannot instantiate process definition aProcDefId: "
+        + ErrorMessageHelper.getExpectedFailingConversionMessage(variableValue, variableType, Short.class)))
     .when().post(SUBMIT_FORM_URL);
   }
 
@@ -466,8 +527,9 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
     .contentType(POST_JSON_CONTENT_TYPE).body(variables)
     .then().expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
-      .body("type", equalTo(RestException.class.getSimpleName()))
-      .body("message", containsString("Cannot instantiate process definition aProcDefId due to number format exception: For input string: \"1abc\""))
+      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("message", containsString("Cannot instantiate process definition aProcDefId: "
+        + ErrorMessageHelper.getExpectedFailingConversionMessage(variableValue, variableType, Long.class)))
     .when().post(SUBMIT_FORM_URL);
   }
 
@@ -486,8 +548,9 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
     .contentType(POST_JSON_CONTENT_TYPE).body(variables)
     .then().expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
-      .body("type", equalTo(RestException.class.getSimpleName()))
-      .body("message", containsString("Cannot instantiate process definition aProcDefId due to number format exception: For input string: \"1abc\""))
+      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("message", containsString("Cannot instantiate process definition aProcDefId: "
+        + ErrorMessageHelper.getExpectedFailingConversionMessage(variableValue, variableType, Double.class)))
     .when().post(SUBMIT_FORM_URL);
   }
 
@@ -506,8 +569,9 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
     .contentType(POST_JSON_CONTENT_TYPE).body(variables)
     .then().expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
-      .body("type", equalTo(RestException.class.getSimpleName()))
-      .body("message", containsString("Cannot instantiate process definition aProcDefId due to parse exception: Unparseable date: \"1abc\""))
+      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("message", containsString("Cannot instantiate process definition aProcDefId: "
+        + ErrorMessageHelper.getExpectedFailingConversionMessage(variableValue, variableType, Date.class)))
     .when().post(SUBMIT_FORM_URL);
   }
 
@@ -526,8 +590,8 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
     .contentType(POST_JSON_CONTENT_TYPE).body(variables)
     .then().expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
-      .body("type", equalTo(RestException.class.getSimpleName()))
-      .body("message", containsString("Cannot instantiate process definition aProcDefId: The variable type 'X' is not supported."))
+      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("message", containsString("Cannot instantiate process definition aProcDefId: Unsupported value type 'X'"))
     .when().post(SUBMIT_FORM_URL);
   }
 
@@ -542,6 +606,66 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
         .body("type", equalTo(RestException.class.getSimpleName()))
         .body("message", equalTo("Cannot instantiate process definition " + MockProvider.EXAMPLE_PROCESS_DEFINITION_ID + ": expected exception"))
       .when().post(SUBMIT_FORM_URL);
+  }
+
+  @Test
+  public void testGetStartFormVariables() {
+
+    given().pathParam("id", EXAMPLE_PROCESS_DEFINITION_ID)
+      .then().expect()
+        .statusCode(Status.OK.getStatusCode()).contentType(ContentType.JSON)
+        .body(MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME+".value", equalTo(MockProvider.EXAMPLE_PRIMITIVE_VARIABLE_VALUE.getValue()))
+        .body(MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME+".type",
+            equalTo(VariableTypeHelper.toExpectedValueTypeName(MockProvider.EXAMPLE_PRIMITIVE_VARIABLE_VALUE.getType())))
+      .when().get(START_FORM_VARIABLES_URL)
+      .body();
+
+    verify(formServiceMock, times(1)).getStartFormVariables(EXAMPLE_PROCESS_DEFINITION_ID, null, true);
+  }
+
+  @Test
+  public void testGetStartFormVariablesVarNames() {
+
+    given()
+      .pathParam("id", EXAMPLE_PROCESS_DEFINITION_ID)
+      .queryParam("variableNames", "a,b,c")
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode()).contentType(ContentType.JSON)
+    .when().get(START_FORM_VARIABLES_URL);
+
+    verify(formServiceMock, times(1)).getStartFormVariables(EXAMPLE_PROCESS_DEFINITION_ID, Arrays.asList(new String[]{"a","b","c"}), true);
+  }
+
+  @Test
+  public void testGetStartFormVariablesAndDoNotDeserializeVariables() {
+
+    given()
+      .pathParam("id", EXAMPLE_PROCESS_DEFINITION_ID)
+      .queryParam("deserializeValues", false)
+     .then()
+       .expect()
+        .statusCode(Status.OK.getStatusCode()).contentType(ContentType.JSON)
+        .body(MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME+".value", equalTo(MockProvider.EXAMPLE_PRIMITIVE_VARIABLE_VALUE.getValue()))
+        .body(MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME+".type",
+            equalTo(VariableTypeHelper.toExpectedValueTypeName(MockProvider.EXAMPLE_PRIMITIVE_VARIABLE_VALUE.getType())))
+      .when().get(START_FORM_VARIABLES_URL)
+      .body();
+
+    verify(formServiceMock, times(1)).getStartFormVariables(EXAMPLE_PROCESS_DEFINITION_ID, null, false);
+  }
+
+  @Test
+  public void testGetStartFormVariablesVarNamesAndDoNotDeserializeVariables() {
+
+    given()
+      .pathParam("id", EXAMPLE_PROCESS_DEFINITION_ID)
+      .queryParam("deserializeValues", false)
+      .queryParam("variableNames", "a,b,c")
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode()).contentType(ContentType.JSON)
+    .when().get(START_FORM_VARIABLES_URL);
+
+    verify(formServiceMock, times(1)).getStartFormVariables(EXAMPLE_PROCESS_DEFINITION_ID, Arrays.asList(new String[]{"a","b","c"}), false);
   }
 
   @Test
@@ -576,7 +700,7 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
     expectedParameters.put("aString", "aStringVariableValue");
     expectedParameters.put("anInteger", 42);
 
-    verify(runtimeServiceMock).startProcessInstanceById(eq(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID), argThat(new EqualsMap(expectedParameters)));
+    verify(runtimeServiceMock).startProcessInstanceById(eq(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID), isNull(String.class), isNull(String.class), argThat(new EqualsMap(expectedParameters)));
 
   }
 
@@ -592,7 +716,7 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
         .body("id", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID))
       .when().post(START_PROCESS_INSTANCE_URL);
 
-    verify(runtimeServiceMock).startProcessInstanceById(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID, "myBusinessKey", null);
+    verify(runtimeServiceMock).startProcessInstanceById(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID, "myBusinessKey", null, null);
 
   }
 
@@ -620,7 +744,7 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
     expectedParameters.put("aString", "aStringVariableValue");
     expectedParameters.put("anInteger", 42);
 
-    verify(runtimeServiceMock).startProcessInstanceById(eq(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID), eq("myBusinessKey"), argThat(new EqualsMap(expectedParameters)));
+    verify(runtimeServiceMock).startProcessInstanceById(eq(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID), eq("myBusinessKey"), isNull(String.class), argThat(new EqualsMap(expectedParameters)));
 
   }
 
@@ -629,7 +753,7 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
    */
   @Test
   public void testUnsuccessfulInstantiation() {
-    when(runtimeServiceMock.startProcessInstanceById(eq(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID), Matchers.<Map<String, Object>>any()))
+    when(runtimeServiceMock.startProcessInstanceById(eq(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID), anyString(), anyString(), Matchers.<Map<String, Object>>any()))
       .thenThrow(new ProcessEngineException("expected exception"));
 
     given().pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
@@ -714,8 +838,9 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
     .contentType(POST_JSON_CONTENT_TYPE).body(variables)
     .then().expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
-      .body("type", equalTo(RestException.class.getSimpleName()))
-      .body("message", containsString("Cannot instantiate process definition aProcDefId due to number format exception: For input string: \"1abc\""))
+      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("message", containsString("Cannot instantiate process definition aProcDefId: "
+        + ErrorMessageHelper.getExpectedFailingConversionMessage(variableValue, variableType, Integer.class)))
     .when().post(START_PROCESS_INSTANCE_URL);
   }
 
@@ -734,8 +859,9 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
     .contentType(POST_JSON_CONTENT_TYPE).body(variables)
     .then().expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
-      .body("type", equalTo(RestException.class.getSimpleName()))
-      .body("message", containsString("Cannot instantiate process definition aProcDefId due to number format exception: For input string: \"1abc\""))
+      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("message", containsString("Cannot instantiate process definition aProcDefId: "
+        + ErrorMessageHelper.getExpectedFailingConversionMessage(variableValue, variableType, Short.class)))
     .when().post(START_PROCESS_INSTANCE_URL);
   }
 
@@ -754,8 +880,9 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
     .contentType(POST_JSON_CONTENT_TYPE).body(variables)
     .then().expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
-      .body("type", equalTo(RestException.class.getSimpleName()))
-      .body("message", containsString("Cannot instantiate process definition aProcDefId due to number format exception: For input string: \"1abc\""))
+      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("message", containsString("Cannot instantiate process definition aProcDefId: "
+        + ErrorMessageHelper.getExpectedFailingConversionMessage(variableValue, variableType, Long.class)))
     .when().post(START_PROCESS_INSTANCE_URL);
   }
 
@@ -774,8 +901,9 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
     .contentType(POST_JSON_CONTENT_TYPE).body(variables)
     .then().expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
-      .body("type", equalTo(RestException.class.getSimpleName()))
-      .body("message", containsString("Cannot instantiate process definition aProcDefId due to number format exception: For input string: \"1abc\""))
+      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("message", containsString("Cannot instantiate process definition aProcDefId: "
+        + ErrorMessageHelper.getExpectedFailingConversionMessage(variableValue, variableType, Double.class)))
     .when().post(START_PROCESS_INSTANCE_URL);
   }
 
@@ -794,8 +922,9 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
     .contentType(POST_JSON_CONTENT_TYPE).body(variables)
     .then().expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
-      .body("type", equalTo(RestException.class.getSimpleName()))
-      .body("message", containsString("Cannot instantiate process definition aProcDefId due to parse exception: Unparseable date: \"1abc\""))
+      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("message", containsString("Cannot instantiate process definition aProcDefId: "
+        + ErrorMessageHelper.getExpectedFailingConversionMessage(variableValue, variableType, Date.class)))
     .when().post(START_PROCESS_INSTANCE_URL);
   }
 
@@ -814,8 +943,8 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
     .contentType(POST_JSON_CONTENT_TYPE).body(variables)
     .then().expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
-      .body("type", equalTo(RestException.class.getSimpleName()))
-      .body("message", containsString("Cannot instantiate process definition aProcDefId: The variable type 'X' is not supported."))
+      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("message", containsString("Cannot instantiate process definition aProcDefId: Unsupported value type 'X'"))
     .when().post(START_PROCESS_INSTANCE_URL);
   }
 
@@ -845,7 +974,7 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
     params.put("includeProcessInstances", false);
     params.put("executionDate", MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION);
 
-    Date executionDate = DateTimeUtil.parseDateTime(MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION).toDate();
+    Date executionDate = DateTimeUtil.parseDate(MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION);
 
     given()
       .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
@@ -886,7 +1015,7 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
     params.put("includeProcessInstances", true);
     params.put("executionDate", MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION);
 
-    Date executionDate = DateTimeUtil.parseDateTime(MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION).toDate();
+    Date executionDate = DateTimeUtil.parseDate(MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION);
 
     given()
       .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
@@ -975,7 +1104,7 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
     params.put("includeProcessInstances", false);
     params.put("executionDate", MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION);
 
-    Date executionDate = DateTimeUtil.parseDateTime(MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION).toDate();
+    Date executionDate = DateTimeUtil.parseDate(MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION);
 
     given()
       .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
@@ -1016,7 +1145,7 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
     params.put("includeProcessInstances", true);
     params.put("executionDate", MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION);
 
-    Date executionDate = DateTimeUtil.parseDateTime(MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION).toDate();
+    Date executionDate = DateTimeUtil.parseDate(MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION);
 
     given()
       .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
@@ -1144,7 +1273,7 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
     params.put("processDefinitionKey", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
     params.put("executionDate", MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION);
 
-    Date executionDate = DateTimeUtil.parseDateTime(MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION).toDate();
+    Date executionDate = DateTimeUtil.parseDate(MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION);
 
     given()
       .contentType(ContentType.JSON)
@@ -1166,7 +1295,7 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
     params.put("processDefinitionKey", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
     params.put("executionDate", MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION);
 
-    Date executionDate = DateTimeUtil.parseDateTime(MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION).toDate();
+    Date executionDate = DateTimeUtil.parseDate(MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION);
 
     given()
       .contentType(ContentType.JSON)
@@ -1268,7 +1397,7 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
     params.put("processDefinitionKey", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
     params.put("executionDate", MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION);
 
-    Date executionDate = DateTimeUtil.parseDateTime(MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION).toDate();
+    Date executionDate = DateTimeUtil.parseDate(MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION);
 
     given()
       .contentType(ContentType.JSON)
@@ -1290,7 +1419,7 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
     params.put("processDefinitionKey", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
     params.put("executionDate", MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION);
 
-    Date executionDate = DateTimeUtil.parseDateTime(MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION).toDate();
+    Date executionDate = DateTimeUtil.parseDate(MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION);
 
     given()
       .contentType(ContentType.JSON)
@@ -1641,8 +1770,9 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
     .contentType(POST_JSON_CONTENT_TYPE).body(variables)
     .then().expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
-      .body("type", equalTo(RestException.class.getSimpleName()))
-      .body("message", containsString("Cannot instantiate process definition aProcDefId due to number format exception: For input string: \"1abc\""))
+      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("message", containsString("Cannot instantiate process definition aProcDefId: "
+        + ErrorMessageHelper.getExpectedFailingConversionMessage(variableValue, variableType, Integer.class)))
     .when().post(SUBMIT_FORM_BY_KEY_URL);
   }
 
@@ -1661,8 +1791,9 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
     .contentType(POST_JSON_CONTENT_TYPE).body(variables)
     .then().expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
-      .body("type", equalTo(RestException.class.getSimpleName()))
-      .body("message", containsString("Cannot instantiate process definition aProcDefId due to number format exception: For input string: \"1abc\""))
+      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("message", containsString("Cannot instantiate process definition aProcDefId: "
+        + ErrorMessageHelper.getExpectedFailingConversionMessage(variableValue, variableType, Short.class)))
     .when().post(SUBMIT_FORM_BY_KEY_URL);
   }
 
@@ -1681,8 +1812,9 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
     .contentType(POST_JSON_CONTENT_TYPE).body(variables)
     .then().expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
-      .body("type", equalTo(RestException.class.getSimpleName()))
-      .body("message", containsString("Cannot instantiate process definition aProcDefId due to number format exception: For input string: \"1abc\""))
+      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("message", containsString("Cannot instantiate process definition aProcDefId: "
+        + ErrorMessageHelper.getExpectedFailingConversionMessage(variableValue, variableType, Long.class)))
     .when().post(SUBMIT_FORM_BY_KEY_URL);
   }
 
@@ -1701,8 +1833,9 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
     .contentType(POST_JSON_CONTENT_TYPE).body(variables)
     .then().expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
-      .body("type", equalTo(RestException.class.getSimpleName()))
-      .body("message", containsString("Cannot instantiate process definition aProcDefId due to number format exception: For input string: \"1abc\""))
+      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("message", containsString("Cannot instantiate process definition aProcDefId: "
+        + ErrorMessageHelper.getExpectedFailingConversionMessage(variableValue, variableType, Double.class)))
     .when().post(SUBMIT_FORM_BY_KEY_URL);
   }
 
@@ -1721,8 +1854,9 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
     .contentType(POST_JSON_CONTENT_TYPE).body(variables)
     .then().expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
-      .body("type", equalTo(RestException.class.getSimpleName()))
-      .body("message", containsString("Cannot instantiate process definition aProcDefId due to parse exception: Unparseable date: \"1abc\""))
+      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("message", containsString("Cannot instantiate process definition aProcDefId: "
+        + ErrorMessageHelper.getExpectedFailingConversionMessage(variableValue, variableType, Date.class)))
     .when().post(SUBMIT_FORM_BY_KEY_URL);
   }
 
@@ -1741,8 +1875,8 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
     .contentType(POST_JSON_CONTENT_TYPE).body(variables)
     .then().expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
-      .body("type", equalTo(RestException.class.getSimpleName()))
-      .body("message", containsString("Cannot instantiate process definition aProcDefId: The variable type 'X' is not supported."))
+      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("message", containsString("Cannot instantiate process definition aProcDefId: Unsupported value type 'X'"))
     .when().post(SUBMIT_FORM_BY_KEY_URL);
   }
 
@@ -1791,7 +1925,7 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
     expectedParameters.put("aString", "aStringVariableValue");
     expectedParameters.put("anInteger", 42);
 
-    verify(runtimeServiceMock).startProcessInstanceById(eq(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID), argThat(new EqualsMap(expectedParameters)));
+    verify(runtimeServiceMock).startProcessInstanceById(eq(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID), isNull(String.class), isNull(String.class), argThat(new EqualsMap(expectedParameters)));
 
   }
 
@@ -1807,7 +1941,7 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
         .body("id", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID))
       .when().post(START_PROCESS_INSTANCE_BY_KEY_URL);
 
-    verify(runtimeServiceMock).startProcessInstanceById(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID, "myBusinessKey", null);
+    verify(runtimeServiceMock).startProcessInstanceById(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID, "myBusinessKey", null, null);
 
   }
 
@@ -1835,7 +1969,7 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
     expectedParameters.put("aString", "aStringVariableValue");
     expectedParameters.put("anInteger", 42);
 
-    verify(runtimeServiceMock).startProcessInstanceById(eq(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID), eq("myBusinessKey"), argThat(new EqualsMap(expectedParameters)));
+    verify(runtimeServiceMock).startProcessInstanceById(eq(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID), eq("myBusinessKey"), isNull(String.class), argThat(new EqualsMap(expectedParameters)));
 
   }
 
@@ -1844,7 +1978,7 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
    */
   @Test
   public void testUnsuccessfulInstantiation_ByKey() {
-    when(runtimeServiceMock.startProcessInstanceById(eq(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID), Matchers.<Map<String, Object>>any()))
+    when(runtimeServiceMock.startProcessInstanceById(eq(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID), anyString(), anyString(), Matchers.<Map<String, Object>>any()))
       .thenThrow(new ProcessEngineException("expected exception"));
 
     given().pathParam("key", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY)
@@ -1907,8 +2041,9 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
     .contentType(POST_JSON_CONTENT_TYPE).body(variables)
     .then().expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
-      .body("type", equalTo(RestException.class.getSimpleName()))
-      .body("message", containsString("Cannot instantiate process definition aProcDefId due to number format exception: For input string: \"1abc\""))
+      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("message", containsString("Cannot instantiate process definition aProcDefId: "
+        + ErrorMessageHelper.getExpectedFailingConversionMessage(variableValue, variableType, Integer.class)))
     .when().post(START_PROCESS_INSTANCE_BY_KEY_URL);
   }
 
@@ -1927,8 +2062,9 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
     .contentType(POST_JSON_CONTENT_TYPE).body(variables)
     .then().expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
-      .body("type", equalTo(RestException.class.getSimpleName()))
-      .body("message", containsString("Cannot instantiate process definition aProcDefId due to number format exception: For input string: \"1abc\""))
+      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("message", containsString("Cannot instantiate process definition aProcDefId: "
+        + ErrorMessageHelper.getExpectedFailingConversionMessage(variableValue, variableType, Short.class)))
     .when().post(START_PROCESS_INSTANCE_BY_KEY_URL);
   }
 
@@ -1947,8 +2083,9 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
     .contentType(POST_JSON_CONTENT_TYPE).body(variables)
     .then().expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
-      .body("type", equalTo(RestException.class.getSimpleName()))
-      .body("message", containsString("Cannot instantiate process definition aProcDefId due to number format exception: For input string: \"1abc\""))
+      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("message", containsString("Cannot instantiate process definition aProcDefId: "
+        + ErrorMessageHelper.getExpectedFailingConversionMessage(variableValue, variableType, Long.class)))
     .when().post(START_PROCESS_INSTANCE_BY_KEY_URL);
   }
 
@@ -1967,8 +2104,9 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
     .contentType(POST_JSON_CONTENT_TYPE).body(variables)
     .then().expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
-      .body("type", equalTo(RestException.class.getSimpleName()))
-      .body("message", containsString("Cannot instantiate process definition aProcDefId due to number format exception: For input string: \"1abc\""))
+      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("message", containsString("Cannot instantiate process definition aProcDefId: "
+        + ErrorMessageHelper.getExpectedFailingConversionMessage(variableValue, variableType, Double.class)))
     .when().post(START_PROCESS_INSTANCE_BY_KEY_URL);
   }
 
@@ -1987,8 +2125,9 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
     .contentType(POST_JSON_CONTENT_TYPE).body(variables)
     .then().expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
-      .body("type", equalTo(RestException.class.getSimpleName()))
-      .body("message", containsString("Cannot instantiate process definition aProcDefId due to parse exception: Unparseable date: \"1abc\""))
+      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("message", containsString("Cannot instantiate process definition aProcDefId: "
+        + ErrorMessageHelper.getExpectedFailingConversionMessage(variableValue, variableType, Date.class)))
     .when().post(START_PROCESS_INSTANCE_BY_KEY_URL);
   }
 
@@ -2007,8 +2146,8 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
     .contentType(POST_JSON_CONTENT_TYPE).body(variables)
     .then().expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
-      .body("type", equalTo(RestException.class.getSimpleName()))
-      .body("message", containsString("Cannot instantiate process definition aProcDefId: The variable type 'X' is not supported."))
+      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("message", containsString("Cannot instantiate process definition aProcDefId: Unsupported value type 'X'"))
     .when().post(START_PROCESS_INSTANCE_BY_KEY_URL);
   }
 
@@ -2038,7 +2177,7 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
     params.put("includeProcessInstances", false);
     params.put("executionDate", MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION);
 
-    Date executionDate = DateTimeUtil.parseDateTime(MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION).toDate();
+    Date executionDate = DateTimeUtil.parseDate(MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION);
 
     given()
       .pathParam("key", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY)
@@ -2079,7 +2218,7 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
     params.put("includeProcessInstances", true);
     params.put("executionDate", MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION);
 
-    Date executionDate = DateTimeUtil.parseDateTime(MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION).toDate();
+    Date executionDate = DateTimeUtil.parseDate(MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION);
 
     given()
       .pathParam("key", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY)
@@ -2168,7 +2307,7 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
     params.put("includeProcessInstances", false);
     params.put("executionDate", MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION);
 
-    Date executionDate = DateTimeUtil.parseDateTime(MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION).toDate();
+    Date executionDate = DateTimeUtil.parseDate(MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION);
 
     given()
       .pathParam("key", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY)
@@ -2211,7 +2350,7 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
     params.put("includeProcessInstances", true);
     params.put("executionDate", MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION);
 
-    Date executionDate = DateTimeUtil.parseDateTime(MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION).toDate();
+    Date executionDate = DateTimeUtil.parseDate(MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION);
 
     given()
       .pathParam("key", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY)
@@ -2272,6 +2411,68 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
         .body("message", is(exceptionMessage))
       .when()
         .put(SINGLE_PROCESS_DEFINITION_BY_KEY_SUSPENDED_URL);
+  }
+
+  @Test
+  public void testProcessInstantiationWithCaseInstanceId() throws IOException {
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("caseInstanceId", "myCaseInstanceId");
+
+    given().pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
+      .contentType(POST_JSON_CONTENT_TYPE).body(json)
+      .then().expect()
+        .statusCode(Status.OK.getStatusCode())
+        .body("id", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID))
+      .when().post(START_PROCESS_INSTANCE_URL);
+
+    verify(runtimeServiceMock).startProcessInstanceById(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID, null, "myCaseInstanceId", null);
+
+  }
+
+  @Test
+  public void testProcessInstantiationWithCaseInstanceIdAndBusinessKey() throws IOException {
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("caseInstanceId", "myCaseInstanceId");
+    json.put("businessKey", "myBusinessKey");
+
+    given().pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
+      .contentType(POST_JSON_CONTENT_TYPE).body(json)
+      .then().expect()
+        .statusCode(Status.OK.getStatusCode())
+        .body("id", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID))
+      .when().post(START_PROCESS_INSTANCE_URL);
+
+    verify(runtimeServiceMock).startProcessInstanceById(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID, "myBusinessKey", "myCaseInstanceId", null);
+
+  }
+
+  @Test
+  public void testProcessInstantiationWithCaseInstanceIdAndBusinessKeyAndParameters() throws IOException {
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("caseInstanceId", "myCaseInstanceId");
+    json.put("businessKey", "myBusinessKey");
+
+    Map<String, Object> parameters = VariablesBuilder.create()
+        .variable("aBoolean", Boolean.TRUE)
+        .variable("aString", "aStringVariableValue")
+        .variable("anInteger", 42).getVariables();
+
+    json.put("variables", parameters);
+
+    given().pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
+      .contentType(POST_JSON_CONTENT_TYPE).body(json)
+      .then().expect()
+        .statusCode(Status.OK.getStatusCode())
+        .body("id", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID))
+      .when().post(START_PROCESS_INSTANCE_URL);
+
+    Map<String, Object> expectedParameters = new HashMap<String, Object>();
+    expectedParameters.put("aBoolean", Boolean.TRUE);
+    expectedParameters.put("aString", "aStringVariableValue");
+    expectedParameters.put("anInteger", 42);
+
+    verify(runtimeServiceMock).startProcessInstanceById(eq(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID), eq("myBusinessKey"), eq("myCaseInstanceId"), argThat(new EqualsMap(expectedParameters)));
+
   }
 
 }

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:camunda="http://activiti.org/bpmn" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd" id="_FVEpwO_VEeOtYvXzz5ksgw" exporter="camunda modeler" exporterVersion="2.5.0" targetNamespace="http://activiti.org/bpmn">
+
+  <error id="myError" errorCode="42"/>
+
+  <process id="testProcess" isExecutable="true">
+    <startEvent id="start"/>
+
+    <sequenceFlow sourceRef="start" targetRef="script"/>
+
+    <scriptTask id="script" scriptFormat="groovy">
+      <extensionElements>
+        <camunda:inputOutput>
+          <camunda:outputParameter name="mapped">
+            ${localMapped}
+          </camunda:outputParameter>
+        </camunda:inputOutput>
+      </extensionElements>
+      <script>
+        import org.camunda.bpm.engine.delegate.BpmnError;
+
+        execution.setVariableLocal("localNotMapped", "a")
+        execution.setVariableLocal("localMapped", "b")
+
+        if (execution.getVariable("throwError")) {
+          throw new BpmnError("42", "ups")
+        }
+      </script>
+    </scriptTask>
+
+    <sequenceFlow sourceRef="script" targetRef="taskOk"/>
+
+    <userTask id="taskOk"/>
+    
+    <sequenceFlow sourceRef="taskOk" targetRef="endOk"/>
+
+    <endEvent id="endOk"/>
+
+    <boundaryEvent id="catchError" attachedToRef="script">
+      <errorEventDefinition errorRef="myError"/>
+    </boundaryEvent>
+
+    <sequenceFlow sourceRef="catchError" targetRef="taskError"/>
+
+    <userTask id="taskError"/>
+
+    <sequenceFlow sourceRef="taskError" targetRef="endError"/>
+
+    <endEvent id="endError"/>
+  </process>
+</definitions>

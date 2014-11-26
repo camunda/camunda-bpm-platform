@@ -1,9 +1,11 @@
 drop index ACT_IDX_EXEC_BUSKEY on ACT_RU_EXECUTION;
 drop index ACT_IDX_TASK_CREATE on ACT_RU_TASK;
+drop index ACT_IDX_TASK_ASSIGNEE on ACT_RU_TASK;
 drop index ACT_IDX_IDENT_LNK_USER on ACT_RU_IDENTITYLINK;
 drop index ACT_IDX_IDENT_LNK_GROUP on ACT_RU_IDENTITYLINK;
 drop index ACT_IDX_VARIABLE_TASK_ID on ACT_RU_VARIABLE;
 drop index ACT_IDX_INC_CONFIGURATION on ACT_RU_INCIDENT;
+drop index ACT_IDX_JOB_PROCINST on ACT_RU_JOB;
 
 alter table ACT_GE_BYTEARRAY 
     drop FOREIGN KEY ACT_FK_BYTEARR_DEPL;
@@ -67,7 +69,14 @@ alter table ACT_RU_INCIDENT
     
 drop index ACT_IDX_ATHRZ_PROCEDEF on ACT_RU_IDENTITYLINK;
 drop index ACT_IDX_EVENT_SUBSCR_CONFIG_ on ACT_RU_EVENT_SUBSCR;
-    
+
+-- indexes for deadlock problems - https://app.camunda.com/jira/browse/CAM-2567
+drop index ACT_IDX_INC_CAUSEINCID on ACT_RU_INCIDENT;
+drop index ACT_IDX_INC_EXID on ACT_RU_INCIDENT;
+drop index ACT_IDX_INC_PROCDEFID on ACT_RU_INCIDENT;
+drop index ACT_IDX_INC_PROCINSTID on ACT_RU_INCIDENT;
+drop index ACT_IDX_INC_ROOTCAUSEINCID on ACT_RU_INCIDENT;
+
 drop table if exists ACT_GE_PROPERTY;
 drop table if exists ACT_RU_VARIABLE;
 drop table if exists ACT_GE_BYTEARRAY;
@@ -81,3 +90,4 @@ drop table if exists ACT_RU_JOBDEF;
 drop table if exists ACT_RU_EVENT_SUBSCR;
 drop table if exists ACT_RU_INCIDENT;
 drop table if exists ACT_RU_AUTHORIZATION;
+drop table if exists ACT_RU_FILTER;

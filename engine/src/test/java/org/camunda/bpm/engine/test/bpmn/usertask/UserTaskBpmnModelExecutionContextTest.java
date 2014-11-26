@@ -126,7 +126,7 @@ public class UserTaskBpmnModelExecutionContextTest extends PluggableProcessEngin
     taskListener.setAttributeValueNs(CAMUNDA_NS, "class", ModelExecutionContextTaskListener.class.getName());
     taskListener.setAttributeValueNs(CAMUNDA_NS, "event", eventName);
 
-    UserTask userTask = (UserTask) modelInstance.getModelElementById(USER_TASK_ID);
+    UserTask userTask = modelInstance.getModelElementById(USER_TASK_ID);
     userTask.setExtensionElements(extensionElements);
 
     deploymentId = repositoryService.createDeployment().addModelInstance("process.bpmn", modelInstance).deploy().getId();

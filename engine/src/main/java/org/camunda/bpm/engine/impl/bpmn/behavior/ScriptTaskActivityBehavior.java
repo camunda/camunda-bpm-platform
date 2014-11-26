@@ -17,8 +17,10 @@ import javax.script.ScriptException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.impl.bpmn.helper.ErrorPropagation;
+import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
+import org.camunda.bpm.engine.impl.scripting.ExecutableScript;
 
 
 /**
@@ -32,10 +34,12 @@ import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
  */
 public class ScriptTaskActivityBehavior extends TaskActivityBehavior {
 
-  protected ScriptInvocationHandler invocationHandler;
+  protected ExecutableScript script;
+  protected String resultVariable;
 
-  public ScriptTaskActivityBehavior(String script, String language, String resultVariable) {
-    invocationHandler = createInvocationHandler(script, language, resultVariable);
+  public ScriptTaskActivityBehavior(ExecutableScript script, String resultVariable) {
+    this.script = script;
+    this.resultVariable = resultVariable;
   }
 
   public void execute(ActivityExecution execution) throws Exception {
@@ -43,8 +47,12 @@ public class ScriptTaskActivityBehavior extends TaskActivityBehavior {
     boolean noErrors = true;
 
     try {
-      // evaluate the script
-      invocationHandler.evaluate(execution);
+      Object result = Context.getProcessEngineConfiguration()
+        .getScriptingEnvironment()
+        .execute(script, execution);
+      if(result != null && resultVariable != null) {
+        execution.setVariable(resultVariable, result);
+      }
 
     } catch (ProcessEngineException e) {
       noErrors = false;
@@ -67,16 +75,8 @@ public class ScriptTaskActivityBehavior extends TaskActivityBehavior {
     }
   }
 
-  /**
-   * Creates an instance of the {@link ScriptInvocationHandler}.
-   *
-   * @param script source code of the script
-   * @param language the language used
-   * @param resultVariable the variable name under which the result of the script invocation (if any) should be stored
-   * @return the invocation handler instance
-   */
-  protected ScriptInvocationHandler createInvocationHandler(String script, String language, String resultVariable) {
-    return new ScriptInvocationHandler(script, language, resultVariable);
+  public ExecutableScript getScript() {
+    return script;
   }
 
 }

@@ -12,6 +12,10 @@
  */
 package org.camunda.bpm.engine.rest.dto.converter;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.Permissions;
 
@@ -23,7 +27,7 @@ import org.camunda.bpm.engine.authorization.Permissions;
  *
  */
 public class PermissionConverter {
-  
+
   public static Permission[] getPermissionsForNames(String[] names) {
     
     final Permission[] permissions = new Permission[names.length];
@@ -35,18 +39,34 @@ public class PermissionConverter {
     return permissions;    
   }
   
-  public static String[] getNamesForPermissions(Permission[] permissions) {
-    
-    final String[] names = new String[permissions.length];
-    
-    for (int i = 0; i < permissions.length; i++) {
-      names[i] = permissions[i].getName();
+  public static String[] getNamesForPermissions(Authorization authorization, Permission[] permissions) {
+
+    int type = authorization.getAuthorizationType();
+
+    // special case all permissions are granted
+    if ((type == Authorization.AUTH_TYPE_GLOBAL || type == Authorization.AUTH_TYPE_GRANT)
+        && authorization.isEveryPermissionGranted()) {
+      return new String[] { Permissions.ALL.getName() };
     }
-    
-    return names;
-    
+
+    // special case all permissions are revoked
+    if (type == Authorization.AUTH_TYPE_REVOKE && authorization.isEveryPermissionRevoked()) {
+      return new String[] { Permissions.ALL.getName() };
+    }
+
+    List<String> names = new ArrayList<String>();
+
+    for (Permission permission : permissions) {
+      String name = permission.getName();
+      // filter NONE and ALL from permissions array
+      if (!name.equals(Permissions.NONE.getName()) && !name.equals(Permissions.ALL.getName())) {
+        names.add(name);
+      }
+    }
+
+    return names.toArray(new String[names.size()]);
   }
-  
+
   // permission provider SPI /////////////////////////////////////
   
   public static Permission[] getAllPermissions() {

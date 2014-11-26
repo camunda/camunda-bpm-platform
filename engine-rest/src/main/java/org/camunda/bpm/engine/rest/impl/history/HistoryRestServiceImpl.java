@@ -14,6 +14,8 @@ package org.camunda.bpm.engine.rest.impl.history;
 
 import org.camunda.bpm.engine.rest.history.HistoricActivityInstanceRestService;
 import org.camunda.bpm.engine.rest.history.HistoricActivityStatisticsRestService;
+import org.camunda.bpm.engine.rest.history.HistoricCaseActivityInstanceRestService;
+import org.camunda.bpm.engine.rest.history.HistoricCaseInstanceRestService;
 import org.camunda.bpm.engine.rest.history.HistoricDetailRestService;
 import org.camunda.bpm.engine.rest.history.HistoricIncidentRestService;
 import org.camunda.bpm.engine.rest.history.HistoricProcessInstanceRestService;
@@ -22,55 +24,52 @@ import org.camunda.bpm.engine.rest.history.HistoricVariableInstanceRestService;
 import org.camunda.bpm.engine.rest.history.HistoryRestService;
 import org.camunda.bpm.engine.rest.history.UserOperationLogRestService;
 import org.camunda.bpm.engine.rest.impl.AbstractRestProcessEngineAware;
+import org.codehaus.jackson.map.ObjectMapper;
 
 public class HistoryRestServiceImpl extends AbstractRestProcessEngineAware implements HistoryRestService {
 
-  public HistoryRestServiceImpl() {
-    super();
+  public HistoryRestServiceImpl(String engineName, ObjectMapper objectMapper) {
+    super(engineName, objectMapper);
   }
 
-  public HistoryRestServiceImpl(String engineName) {
-    super(engineName);
-  }
-
-  @Override
   public HistoricProcessInstanceRestService getProcessInstanceService() {
-    return new HistoricProcessInstanceRestServiceImpl(getProcessEngine());
+    return new HistoricProcessInstanceRestServiceImpl(getObjectMapper(), getProcessEngine());
   }
 
-  @Override
+  public HistoricCaseInstanceRestService getCaseInstanceService() {
+    return new HistoricCaseInstanceRestServiceImpl(getObjectMapper(), getProcessEngine());
+  }
+
   public HistoricActivityInstanceRestService getActivityInstanceService() {
-    return new HistoricActivityInstanceRestServiceImpl(getProcessEngine());
+    return new HistoricActivityInstanceRestServiceImpl(getObjectMapper(), getProcessEngine());
   }
 
-  @Override
+  public HistoricCaseActivityInstanceRestService getCaseActivityInstanceService() {
+    return new HistoricCaseActivityInstanceRestServiceImpl(getObjectMapper(), getProcessEngine());
+  }
+
   public HistoricVariableInstanceRestService getVariableInstanceService() {
-    return new HistoricVariableInstanceRestServiceImpl(getProcessEngine());
+    return new HistoricVariableInstanceRestServiceImpl(getObjectMapper(), getProcessEngine());
   }
 
-  @Override
   public HistoricActivityStatisticsRestService getActivityStatisticsService() {
     return new HistoricActivityStatisticsRestServiceImpl(getProcessEngine());
   }
 
-  @Override
   public UserOperationLogRestService getUserOperationLogRestService() {
-    return new UserOperationLogRestServiceImpl(getProcessEngine());
+    return new UserOperationLogRestServiceImpl(getObjectMapper(), getProcessEngine());
   }
 
-  @Override
   public HistoricDetailRestService getDetailService() {
-    return new HistoricDetailRestServiceImpl(getProcessEngine());
+    return new HistoricDetailRestServiceImpl(getObjectMapper(), getProcessEngine());
   }
 
-  @Override
   public HistoricTaskInstanceRestService getTaskInstanceService() {
-    return new HistoricTaskInstanceRestServiceImpl(getProcessEngine());
+    return new HistoricTaskInstanceRestServiceImpl(getObjectMapper(), getProcessEngine());
   }
 
-  @Override
   public HistoricIncidentRestService getIncidentService() {
-    return new HistoricIncidentRestServiceImpl(getProcessEngine());
+    return new HistoricIncidentRestServiceImpl(getObjectMapper(), getProcessEngine());
   }
 
 }

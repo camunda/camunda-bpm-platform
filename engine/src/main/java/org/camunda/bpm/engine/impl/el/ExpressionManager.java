@@ -12,21 +12,23 @@
  */
 package org.camunda.bpm.engine.impl.el;
 
-import java.util.Map;
-
 import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.delegate.VariableScope;
-import org.camunda.bpm.engine.impl.core.variable.CoreVariableScope;
+import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
 import org.camunda.bpm.engine.impl.javax.el.ArrayELResolver;
-import org.camunda.bpm.engine.impl.javax.el.BeanELResolver;
 import org.camunda.bpm.engine.impl.javax.el.CompositeELResolver;
 import org.camunda.bpm.engine.impl.javax.el.ELContext;
 import org.camunda.bpm.engine.impl.javax.el.ELResolver;
 import org.camunda.bpm.engine.impl.javax.el.ExpressionFactory;
+import org.camunda.bpm.engine.impl.javax.el.FunctionMapper;
 import org.camunda.bpm.engine.impl.javax.el.ListELResolver;
 import org.camunda.bpm.engine.impl.javax.el.MapELResolver;
 import org.camunda.bpm.engine.impl.javax.el.ValueExpression;
 import org.camunda.bpm.engine.impl.juel.ExpressionFactoryImpl;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -49,23 +51,22 @@ import org.camunda.bpm.engine.impl.juel.ExpressionFactoryImpl;
 public class ExpressionManager {
 
 
+  protected List<FunctionMapper> functionMappers = new ArrayList<FunctionMapper>();
   protected ExpressionFactory expressionFactory;
   // Default implementation (does nothing)
-  protected ELContext parsingElContext = new ParsingElContext();
+  protected ELContext parsingElContext = new ProcessEngineElContext(functionMappers);
   protected Map<Object, Object> beans;
-
+  protected ELResolver elResolver;
 
   public ExpressionManager() {
     this(null);
   }
 
   public ExpressionManager(Map<Object, Object> beans) {
-    // Use the ExpressionFactoryImpl in activiti build in version of juel, with parametrised method expressions enabled
+    // Use the ExpressionFactoryImpl built-in version of juel, with parametrised method expressions enabled
     expressionFactory = new ExpressionFactoryImpl();
     this.beans = beans;
   }
-
-
 
   public Expression createExpression(String expression) {
     ValueExpression valueExpression = expressionFactory.createValueExpression(parsingElContext, expression, Object.class);
@@ -78,32 +79,47 @@ public class ExpressionManager {
 
   public ELContext getElContext(VariableScope variableScope) {
     ELContext elContext = null;
-    if (variableScope instanceof CoreVariableScope) {
-      CoreVariableScope variableScopeImpl = (CoreVariableScope) variableScope;
+    if (variableScope instanceof AbstractVariableScope) {
+      AbstractVariableScope variableScopeImpl = (AbstractVariableScope) variableScope;
       elContext = variableScopeImpl.getCachedElContext();
     }
 
     if (elContext==null) {
       elContext = createElContext(variableScope);
-      if (variableScope instanceof CoreVariableScope) {
-        ((CoreVariableScope)variableScope).setCachedElContext(elContext);
+      if (variableScope instanceof AbstractVariableScope) {
+        ((AbstractVariableScope)variableScope).setCachedElContext(elContext);
       }
     }
 
     return elContext;
   }
 
-  protected ActivitiElContext createElContext(VariableScope variableScope) {
-    ELResolver elResolver = createElResolver(variableScope);
-    return new ActivitiElContext(elResolver);
+  protected ProcessEngineElContext createElContext(VariableScope variableScope) {
+    ELResolver elResolver = getCachedElResolver();
+    ProcessEngineElContext elContext = new ProcessEngineElContext(functionMappers, elResolver);
+    elContext.putContext(ExpressionFactory.class, expressionFactory);
+    elContext.putContext(VariableScope.class, variableScope);
+    return elContext;
   }
 
-  protected ELResolver createElResolver(VariableScope variableScope) {
+  protected ELResolver getCachedElResolver() {
+    if (elResolver == null) {
+      synchronized(this) {
+        if (elResolver == null) {
+          elResolver = createElResolver();
+        }
+      }
+    }
+
+    return elResolver;
+  }
+
+  protected ELResolver createElResolver() {
     CompositeELResolver elResolver = new CompositeELResolver();
-    elResolver.add(new VariableScopeElResolver(variableScope));
+    elResolver.add(new VariableScopeElResolver());
 
     if(beans != null) {
-      // ACT-1102: Also expose all beans in configuration when using standalone activiti, not
+      // ACT-1102: Also expose all beans in configuration when using standalone engine, not
       // in spring-context
       elResolver.add(new ReadOnlyMapELResolver(beans));
     }
@@ -113,7 +129,15 @@ public class ExpressionManager {
     elResolver.add(new ArrayELResolver());
     elResolver.add(new ListELResolver());
     elResolver.add(new MapELResolver());
-    elResolver.add(new BeanELResolver());
+    elResolver.add(new ProcessApplicationBeanElResolverDelegate());
+
     return elResolver;
+  }
+
+  /**
+   * @param elFunctionMapper
+   */
+  public void addFunctionMapper(FunctionMapper elFunctionMapper) {
+    this.functionMappers.add(elFunctionMapper);
   }
 }

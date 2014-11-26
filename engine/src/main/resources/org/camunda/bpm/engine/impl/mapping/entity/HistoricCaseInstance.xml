@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!--
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~       http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.camunda.bpm.engine.impl.persistence.entity.HistoricCaseInstanceEntity">
+
+  <!-- HISTORIC CASE INSTANCE INSERT -->
+
+  <insert id="insertHistoricCaseInstanceEvent" parameterType="org.camunda.bpm.engine.impl.history.event.HistoricCaseInstanceEventEntity">
+      insert into ${prefix}ACT_HI_CASEINST (
+        ID_,
+        CASE_INST_ID_,
+        BUSINESS_KEY_,
+        CASE_DEF_ID_,
+        CREATE_TIME_,
+        CLOSE_TIME_,
+        DURATION_,
+        STATE_,
+        CREATE_USER_ID_,
+        SUPER_CASE_INSTANCE_ID_
+      ) values (
+        #{id ,jdbcType=VARCHAR},
+        #{caseInstanceId, jdbcType=VARCHAR},
+        #{businessKey, jdbcType=VARCHAR},
+        #{caseDefinitionId, jdbcType=VARCHAR},
+        #{startTime, jdbcType=TIMESTAMP},
+        #{endTime, jdbcType=TIMESTAMP},
+        #{durationInMillis ,jdbcType=BIGINT},
+        #{state, jdbcType=INTEGER},
+        #{createUserId, jdbcType=VARCHAR},
+        #{superCaseInstanceId, jdbcType=VARCHAR}
+      )
+  </insert>
+
+  <!-- HISTORIC CASE INSTANCE UPDATE -->
+
+  <update id="updateHistoricCaseInstanceEvent" parameterType="org.camunda.bpm.engine.impl.persistence.entity.HistoricCaseInstanceEntity">
+    update ${prefix}ACT_HI_CASEINST set
+      CASE_DEF_ID_ = #{caseDefinitionId, jdbcType=VARCHAR},
+      STATE_ = #{state, jdbcType=INTEGER}
+
+      <if test="endTime != null">
+        , CLOSE_TIME_ = #{endTime, jdbcType=TIMESTAMP}
+        , DURATION_ = #{durationInMillis, jdbcType=BIGINT}
+      </if>
+
+    where ID_ = #{id, jdbcType=VARCHAR}
+  </update>
+
+  <!-- HISTORIC CASE INSTANCE EVENT SELECT -->
+
+  <select id="selectHistoricCaseInstanceEvent" parameterType="java.lang.String" resultMap="historicCaseInstanceResultMap">
+    select HCI.CREATE_TIME_ from ${prefix}ACT_HI_CASEINST HCI
+    where HCI.ID_ = #{id, jdbcType=VARCHAR}
+  </select>
+
+  <!-- HISTORIC CASE INSTANCE DELETE -->
+
+  <delete id="deleteHistoricCaseInstance">
+    delete from ${prefix}ACT_HI_CASEINST where CASE_INST_ID_ = #{caseInstanceId}
+  </delete>
+
+  <!-- HISTORIC CASE INSTANCE RESULT MAP -->
+
+  <resultMap id="historicCaseInstanceResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.HistoricCaseInstanceEntity">
+    <id property="id" column="ID_" jdbcType="VARCHAR" />
+    <result property="caseInstanceId" column="CASE_INST_ID_" jdbcType="VARCHAR" />
+    <result property="businessKey" column="BUSINESS_KEY_" jdbcType="VARCHAR"/>
+    <result property="caseDefinitionId" column="CASE_DEF_ID_" jdbcType="VARCHAR" />
+    <result property="startTime" column="CREATE_TIME_" jdbcType="TIMESTAMP" />
+    <result property="endTime" column="CLOSE_TIME_" jdbcType="TIMESTAMP" />
+    <result property="durationInMillis" column="DURATION_" jdbcType="BIGINT" />
+    <result property="state" column="STATE_" jdbcType="INTEGER" />
+    <result property="createUserId" column="CREATE_USER_ID_" jdbcType="VARCHAR" />
+    <result property="superCaseInstanceId" column="SUPER_CASE_INSTANCE_ID_" jdbcType="VARCHAR" />
+  </resultMap>
+
+  <!-- HISTORIC CASE INSTANCE SELECT -->
+
+  <select id="selectHistoricCaseInstance" resultMap="historicCaseInstanceResultMap">
+    select * from ${prefix}ACT_HI_CASEINST where CASE_INST_ID_ = #{caseInstanceId}
+  </select>
+
+  <select id="selectHistoricCaseInstanceIdsByCaseDefinitionId" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultType="string">
+    select ID_
+    from ${prefix}ACT_HI_CASEINST
+    where CASE_DEF_ID_ = #{parameter}
+  </select>
+
+  <select id="selectHistoricCaseInstancesByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.HistoricCaseInstanceQueryImpl" resultMap="historicCaseInstanceResultMap">
+    ${limitBefore}
+    select RES.* ${limitBetween}
+    <include refid="selectHistoricCaseInstancesByQueryCriteriaSql"/>
+    ${orderBy}
+    ${limitAfter}
+  </select>
+
+  <select id="selectHistoricCaseInstanceCountByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.HistoricCaseInstanceQueryImpl" resultType="long">
+    select count(distinct RES.ID_)
+    <include refid="selectHistoricCaseInstancesByQueryCriteriaSql"/>
+  </select>
+
+  <sql id="selectHistoricCaseInstancesByQueryCriteriaSql">
+    from ${prefix}ACT_HI_CASEINST RES
+    <if test="caseKeyNotIn != null || caseDefinitionKey != null || caseDefinitionName != null || caseDefinitionNameLike != null">
+      inner join ${prefix}ACT_RE_CASE_DEF DEF on RES.CASE_DEF_ID_ = DEF.ID_
+    </if>
+    <where>
+      <if test="caseInstanceId != null">
+        RES.CASE_INST_ID_ = #{caseInstanceId}
+      </if>
+      <if test="caseInstanceIds != null and !caseInstanceIds.isEmpty()">
+        and RES.CASE_INST_ID_ in
+        <foreach item="item" index="index" collection="caseInstanceIds" open="(" separator="," close=")">
+          #{item}
+        </foreach>
+      </if>
+      <if test="caseDefinitionId != null">
+        and RES.CASE_DEF_ID_ = #{caseDefinitionId}
+      </if>
+      <if test="caseDefinitionKey != null">
+        and DEF.KEY_ = #{caseDefinitionKey}
+      </if>
+      <if test="caseDefinitionName != null">
+        and DEF.NAME_ = #{caseDefinitionName}
+      </if>
+      <if test="caseDefinitionNameLike != null">
+        and DEF.NAME_ like #{caseDefinitionNameLike}
+      </if>
+      <if test="businessKey != null">
+        and RES.BUSINESS_KEY_ = #{businessKey}
+      </if>
+      <if test="businessKeyLike != null">
+        and RES.BUSINESS_KEY_ like #{businessKeyLike}
+      </if>
+
+      <if test="createdBefore != null">
+        and RES.CREATE_TIME_ &lt;= #{createdBefore}
+      </if>
+      <if test="createdAfter != null">
+        and RES.CREATE_TIME_ &gt;= #{createdAfter}
+      </if>
+      <if test="closedBefore != null">
+        and RES.CLOSE_TIME_ &lt;= #{closedBefore}
+      </if>
+      <if test="closedAfter != null">
+        and RES.CLOSE_TIME_ &gt;= #{closedAfter}
+      </if>
+      <if test="caseKeyNotIn != null">
+        <foreach collection="caseKeyNotIn" index="index" item="caseDefKey">
+        and DEF.KEY_ not like #{caseDefKey}
+      </foreach>
+      </if>
+
+      <if test="state != null">
+        and RES.STATE_ = #{state}
+      </if>
+
+      <if test="notClosed != null &amp;&amp; notClosed">
+        and RES.CLOSE_TIME_ IS NULL
+      </if>
+      <if test="createdBy != null">
+        and RES.CREATE_USER_ID_ = #{createdBy}
+      </if>
+      <if test="superCaseInstanceId != null">
+        and RES.SUPER_CASE_INSTANCE_ID_ = #{superCaseInstanceId}
+      </if>
+      <if test="subCaseInstanceId != null">
+        and RES.CASE_INST_ID_ = (select SUPER_CASE_INSTANCE_ID_ from ${prefix}ACT_HI_CASEINST where CASE_INST_ID_ = #{subCaseInstanceId})
+      </if>
+      <foreach collection="queryVariableValues" index="index" item="queryVariableValue">
+        and EXISTS (
+          select
+            ID_
+          from
+            ${prefix}ACT_HI_VARINST
+          WHERE
+            NAME_= #{queryVariableValue.name}
+          AND CASE_INST_ID_ = RES.CASE_INST_ID_
+          
+        <bind name="varTypeField" value="'VAR_TYPE_'"/>
+        <bind name="varPrefix" value="''"/>
+        <if test="queryVariableValue.valueConditions != null">
+          and 
+          <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.variableValueConditions"/>
+        </if>
+        )
+      </foreach>
+    </where>
+  </sql>
+
+  <select id="selectHistoricCaseInstanceByNativeQuery" parameterType="java.util.Map" resultMap="historicCaseInstanceResultMap">
+    <if test="resultType == 'LIST_PAGE'">
+      ${limitBefore}
+    </if>
+    ${sql}
+    <if test="resultType == 'LIST_PAGE'">
+      ${limitAfter}
+    </if>
+  </select>
+
+  <select id="selectHistoricCaseInstanceByNativeQuery_mssql_or_db2" parameterType="java.util.Map" resultMap="historicCaseInstanceResultMap">
+    <if test="resultType == 'LIST_PAGE'">
+        ${limitBeforeNativeQuery}
+    </if>
+    ${sql}
+    <if test="resultType == 'LIST_PAGE'">
+      ${limitAfter}
+    </if>
+  </select>
+
+  <select id="selectHistoricCaseInstanceCountByNativeQuery" parameterType="java.util.Map" resultType="long">
+    ${sql}
+  </select>
+</mapper>

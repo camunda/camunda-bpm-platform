@@ -13,6 +13,8 @@
 
 package org.camunda.bpm.engine.impl;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -22,7 +24,7 @@ import org.camunda.bpm.engine.history.HistoricDetailQuery;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity;
-import org.camunda.bpm.engine.impl.variable.ByteArrayType;
+import org.camunda.bpm.engine.variable.type.ValueType;
 
 
 /**
@@ -36,7 +38,9 @@ public class HistoricDetailQueryImpl extends AbstractQuery<HistoricDetailQuery, 
   protected String detailId;
   protected String taskId;
   protected String processInstanceId;
+  protected String caseInstanceId;
   protected String executionId;
+  protected String caseExecutionId;
   protected String activityId;
   protected String activityInstanceId;
   protected String type;
@@ -44,6 +48,7 @@ public class HistoricDetailQueryImpl extends AbstractQuery<HistoricDetailQuery, 
 
   protected boolean excludeTaskRelated = false;
   protected boolean isByteArrayFetchingEnabled = true;
+  protected boolean isCustomObjectDeserializationEnabled = true;
 
   public HistoricDetailQueryImpl() {
   }
@@ -57,13 +62,13 @@ public class HistoricDetailQueryImpl extends AbstractQuery<HistoricDetailQuery, 
   }
 
   public HistoricDetailQuery detailId(String id) {
-    assertParamNotNull("detailId", id);
+    ensureNotNull("detailId", id);
     this.detailId = id;
     return this;
   }
 
   public HistoricDetailQuery variableInstanceId(String variableInstanceId) {
-    assertParamNotNull("variableInstanceId", variableInstanceId);
+    ensureNotNull("variableInstanceId", variableInstanceId);
     this.variableInstanceId = variableInstanceId;
     return this;
   }
@@ -73,8 +78,20 @@ public class HistoricDetailQueryImpl extends AbstractQuery<HistoricDetailQuery, 
     return this;
   }
 
+  public HistoricDetailQuery caseInstanceId(String caseInstanceId) {
+    ensureNotNull("Case instance id", caseInstanceId);
+    this.caseInstanceId = caseInstanceId;
+    return this;
+  }
+
   public HistoricDetailQuery executionId(String executionId) {
     this.executionId = executionId;
+    return this;
+  }
+
+  public HistoricDetailQuery caseExecutionId(String caseExecutionId) {
+    ensureNotNull("Case execution id", caseExecutionId);
+    this.caseExecutionId = caseExecutionId;
     return this;
   }
 
@@ -125,6 +142,11 @@ public class HistoricDetailQueryImpl extends AbstractQuery<HistoricDetailQuery, 
     return this;
   }
 
+  public HistoricDetailQuery disableCustomObjectDeserialization() {
+    this.isCustomObjectDeserializationEnabled = false;
+    return this;
+  }
+
   public List<HistoricDetail> executeList(CommandContext commandContext, Page page) {
     checkQueryOk();
     List<HistoricDetail> historicDetails = commandContext
@@ -134,23 +156,25 @@ public class HistoricDetailQueryImpl extends AbstractQuery<HistoricDetailQuery, 
       for (HistoricDetail historicDetail: historicDetails) {
         if (historicDetail instanceof HistoricDetailVariableInstanceUpdateEntity) {
           HistoricDetailVariableInstanceUpdateEntity entity = (HistoricDetailVariableInstanceUpdateEntity) historicDetail;
-          // do not fetch values for byte arrays eagerly (unless requested by the user)
-          if (isByteArrayFetchingEnabled
-              || !ByteArrayType.TYPE_NAME.equals(entity.getVariableType().getTypeName())) {
-
+          if (shouldFetchValue(entity)) {
             try {
-              entity.getValue();
+              entity.getTypedValue(isCustomObjectDeserializationEnabled);
+
             } catch(Exception t) {
               // do not fail if one of the variables fails to load
               LOGGER.log(Level.FINE, "Exception while getting value for variable", t);
             }
-
           }
 
         }
       }
     }
     return historicDetails;
+  }
+
+  protected boolean shouldFetchValue(HistoricDetailVariableInstanceUpdateEntity entity) {
+    // do not fetch values for byte arrays eagerly (unless requested by the user)
+    return isByteArrayFetchingEnabled || !ValueType.BYTES.equals(entity.getSerializer().getType());
   }
 
   // order by /////////////////////////////////////////////////////////////////
@@ -189,6 +213,18 @@ public class HistoricDetailQueryImpl extends AbstractQuery<HistoricDetailQuery, 
 
   public String getProcessInstanceId() {
     return processInstanceId;
+  }
+
+  public String getCaseInstanceId() {
+    return caseInstanceId;
+  }
+
+  public String getExecutionId() {
+    return executionId;
+  }
+
+  public String getCaseExecutionId() {
+    return caseExecutionId;
   }
 
   public String getTaskId() {

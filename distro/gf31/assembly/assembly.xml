@@ -43,10 +43,16 @@
         <include>org.camunda.bpm:camunda-engine:jar:*</include>
         <include>org.camunda.bpm.identity:camunda-identity-ldap:jar:*</include>
         <include>org.camunda.bpm.model:*:jar:*</include>
+        <include>org.camunda.spin:*:jar</include>
+        <include>org.camunda.connect:*:jar</include>
+        <include>org.camunda.commons:*:jar</include>
+        <include>org.camunda.template-engines:*:jar</include>
+        <include>org.freemarker:*:jar</include>
         <include>org.mybatis:mybatis:jar:*</include>
         <include>com.fasterxml.uuid:java-uuid-generator:jar:*</include>
         <include>joda-time:joda-time:jar:*</include>
         <include>org.codehaus.groovy:groovy-all:jar:*</include>
+        <include>org.slf4j:*:jar</include>
       </includes>
     </dependencySet>
     <dependencySet>
@@ -83,10 +89,16 @@
         <include>org.camunda.bpm:camunda-engine:jar:*</include>
         <include>org.camunda.bpm.identity:camunda-identity-ldap:jar:*</include>
         <include>org.camunda.bpm.model:*:jar:*</include>
+        <include>org.camunda.spin:*:jar</include>
+        <include>org.camunda.connect:*:jar</include>
+        <include>org.camunda.commons:*:jar</include>
+        <include>org.camunda.template-engines:*:jar</include>
+        <include>org.freemarker:*:jar</include>
         <include>org.mybatis:mybatis:jar:*</include>
         <include>com.fasterxml.uuid:java-uuid-generator:jar:*</include>
         <include>joda-time:joda-time:jar:*</include>
         <include>org.codehaus.groovy:groovy-all:jar:*</include>
+        <include>org.slf4j:*:jar</include>
       </includes>
     </dependencySet>
     <dependencySet>

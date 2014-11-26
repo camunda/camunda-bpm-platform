@@ -15,6 +15,8 @@ package org.camunda.bpm.engine.form;
 import java.util.List;
 import java.util.Map;
 
+import org.camunda.bpm.engine.variable.value.TypedValue;
+
 /**
  * <p>Represents an individual field in a form.</p>
  *
@@ -48,7 +50,13 @@ public interface FormField {
   /**
    * @return the default value for this form field.
    */
+  @Deprecated
   public Object getDefaultValue();
+
+  /**
+   * @return the value for this form field
+   */
+  public TypedValue getValue();
 
   /**
    * @return a list of {@link FormFieldValidationConstraint ValidationConstraints}.

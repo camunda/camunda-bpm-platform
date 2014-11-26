@@ -14,7 +14,7 @@ package org.camunda.bpm.engine.impl.persistence.entity;
 
 import java.util.List;
 
-import org.camunda.bpm.engine.impl.variable.AbstractVariableStore;
+import org.camunda.bpm.engine.impl.variable.AbstractPersistentVariableStore;
 
 /**
  * Variable store adapter for TaskEntity
@@ -22,7 +22,7 @@ import org.camunda.bpm.engine.impl.variable.AbstractVariableStore;
  * @author Daniel Meyer
  *
  */
-public class TaskEntityVariableStore extends AbstractVariableStore {
+public class TaskEntityVariableStore extends AbstractPersistentVariableStore {
 
   private static final long serialVersionUID = 1L;
 
@@ -39,5 +39,4 @@ public class TaskEntityVariableStore extends AbstractVariableStore {
   protected void initializeVariableInstanceBackPointer(VariableInstanceEntity variableInstance) {
     taskEntity.initializeVariableInstanceBackPointer(variableInstance);
   }
-
 }

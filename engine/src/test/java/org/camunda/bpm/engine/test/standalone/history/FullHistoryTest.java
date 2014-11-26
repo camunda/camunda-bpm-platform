@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.test.standalone.history;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -28,15 +29,23 @@ import org.camunda.bpm.engine.history.HistoricFormProperty;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.history.HistoricVariableInstanceQuery;
 import org.camunda.bpm.engine.history.HistoricVariableUpdate;
+import org.camunda.bpm.engine.impl.cmd.SubmitStartFormCmd;
+import org.camunda.bpm.engine.impl.interceptor.Command;
+import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.test.ResourceProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
+import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.api.runtime.DummySerializable;
+import org.camunda.bpm.engine.test.api.runtime.util.CustomSerializable;
 import org.camunda.bpm.engine.test.api.runtime.util.FailingSerializable;
 import org.camunda.bpm.engine.test.history.SerializableVariable;
+import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.type.ValueType;
+import org.camunda.bpm.engine.variable.value.ObjectValue;
 import org.junit.Assert;
 
 
@@ -231,6 +240,10 @@ public class FullHistoryTest extends ResourceProcessEngineTestCase {
     HistoricVariableInstance historicProcessVariable = historyService.createHistoricVariableInstanceQuery().variableValueEquals("process", "one").singleResult();
     assertEquals("process", historicProcessVariable.getVariableName());
     assertEquals("one", historicProcessVariable.getValue());
+    assertEquals(ValueType.STRING.getName(), historicProcessVariable.getVariableTypeName());
+    assertEquals(ValueType.STRING.getName(), historicProcessVariable.getTypeName());
+    assertEquals(historicProcessVariable.getValue(), historicProcessVariable.getTypedValue().getValue());
+    assertEquals(historicProcessVariable.getTypeName(), historicProcessVariable.getTypedValue().getType().getName());
 
     Map<String, Object> variables3 = new HashMap<String, Object>();
     variables3.put("long", 1000l);
@@ -825,6 +838,32 @@ public class FullHistoryTest extends ResourceProcessEngineTestCase {
     }
   }
 
+  @Deployment
+  public void testDeleteCachedHistoricDetails() {
+    final String processDefinitionId = repositoryService.createProcessDefinitionQuery().singleResult().getId();
+
+
+    processEngineConfiguration.getCommandExecutorTxRequired().execute(new Command<Void>() {
+
+      public Void execute(CommandContext commandContext) {
+        Map<String, Object> formProperties = new HashMap<String, Object>();
+        formProperties.put("formProp1", "value1");
+
+        ProcessInstance processInstance = new SubmitStartFormCmd(processDefinitionId, null, formProperties).execute(commandContext);
+
+        // two historic details should be in cache: one form property and one variable update
+        commandContext.getHistoricDetailManager().deleteHistoricDetailsByProcessInstanceId(processInstance.getId());
+        return null;
+      }
+    });
+
+    // the historic process instance should still be there
+    assertEquals(1, historyService.createHistoricProcessInstanceQuery().count());
+
+    // the historic details should be deleted
+    assertEquals(0, historyService.createHistoricDetailQuery().count());
+  }
+
   /**
    * Test created to validate ACT-621 fix.
    */
@@ -939,6 +978,63 @@ public class FullHistoryTest extends ResourceProcessEngineTestCase {
     assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskVariableValueEquals("booleanVar", false).count());
     assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskVariableValueEquals("dateVar", otherDate).count());
     assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskVariableValueEquals("nullVar", null).count());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
+  public void testHistoricTaskInstanceQueryTaskVariableValueEqualsOverwriteType() throws Exception {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+
+    // Set a long variable on a task
+    taskService.setVariableLocal(task.getId(), "var", 12345L);
+
+    // Validate all variable-updates are present in DB
+    assertEquals(1, historyService.createHistoricDetailQuery().variableUpdates().taskId(task.getId()).count());
+
+    // Query Historic task instances based on variable
+    assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskVariableValueEquals("var", 12345L).count());
+
+    // Update the variables to an int variable
+    taskService.setVariableLocal(task.getId(), "var", 12345);
+
+    // Validate all variable-updates are present in DB
+    assertEquals(2, historyService.createHistoricDetailQuery().variableUpdates().taskId(task.getId()).count());
+
+    // The previous long value should not match
+    assertEquals(0, historyService.createHistoricTaskInstanceQuery().taskVariableValueEquals("var", 12345L).count());
+
+    // The previous int value should not match
+    assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskVariableValueEquals("var", 12345).count());
+  }
+
+  @Deployment
+  public void testHistoricTaskInstanceQueryVariableInParallelBranch() throws Exception {
+    runtimeService.startProcessInstanceByKey("parallelGateway");
+
+    // when there are two process variables of the same name but different types
+    Execution task1Execution = runtimeService.createExecutionQuery().activityId("task1").singleResult();
+    runtimeService.setVariableLocal(task1Execution.getId(), "var", 12345L);
+    Execution task2Execution = runtimeService.createExecutionQuery().activityId("task2").singleResult();
+    runtimeService.setVariableLocal(task2Execution.getId(), "var", 12345);
+
+    // then the task query should be able to filter by both variables and return both tasks
+    assertEquals(2, historyService.createHistoricTaskInstanceQuery().processVariableValueEquals("var", 12345).count());
+    assertEquals(2, historyService.createHistoricTaskInstanceQuery().processVariableValueEquals("var", 12345L).count());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/standalone/history/FullHistoryTest.testHistoricTaskInstanceQueryVariableInParallelBranch.bpmn20.xml")
+  public void testHistoricTaskInstanceQueryVariableOfSameTypeInParallelBranch() throws Exception {
+    runtimeService.startProcessInstanceByKey("parallelGateway");
+
+    // when there are two process variables of the same name but different types
+    Execution task1Execution = runtimeService.createExecutionQuery().activityId("task1").singleResult();
+    runtimeService.setVariableLocal(task1Execution.getId(), "var", 12345L);
+    Execution task2Execution = runtimeService.createExecutionQuery().activityId("task2").singleResult();
+    runtimeService.setVariableLocal(task2Execution.getId(), "var", 45678L);
+
+    // then the task query should be able to filter by both variables and return both tasks
+    assertEquals(2, historyService.createHistoricTaskInstanceQuery().processVariableValueEquals("var", 12345L).count());
+    assertEquals(2, historyService.createHistoricTaskInstanceQuery().processVariableValueEquals("var", 45678L).count());
   }
 
   @Deployment
@@ -1099,7 +1195,7 @@ public class FullHistoryTest extends ResourceProcessEngineTestCase {
     assertEquals(0, historyService.createHistoricProcessInstanceQuery().variableValueNotEquals("stringVar","stringValue").count());
     assertEquals(0, historyService.createHistoricProcessInstanceQuery().variableValueNotEquals("booleanVar", true).count());
     assertEquals(0, historyService.createHistoricProcessInstanceQuery().variableValueNotEquals("dateVar", date).count());
-    assertEquals(0, historyService.createHistoricProcessInstanceQuery().variableValueNotEquals("nullVar", "123").count());
+    assertEquals(0, historyService.createHistoricProcessInstanceQuery().variableValueNotEquals("nullVar", null).count());
 
 //    assertEquals(1, historyService.createHistoricProcessInstanceQuery().variableValueNotEquals("longVar", 67890L).count());
 //    assertEquals(1, historyService.createHistoricProcessInstanceQuery().variableValueNotEquals("shortVar", (short) 456).count());
@@ -1278,6 +1374,8 @@ public class FullHistoryTest extends ResourceProcessEngineTestCase {
     assertEquals(result.getId(), resultById.getId());
     assertEquals(variableName, ((HistoricVariableUpdate)resultById).getVariableName());
     assertEquals(variableValue, ((HistoricVariableUpdate)resultById).getValue());
+    assertEquals(ValueType.STRING.getName(), ((HistoricVariableUpdate)resultById).getVariableTypeName());
+    assertEquals(ValueType.STRING.getName(), ((HistoricVariableUpdate)resultById).getTypeName());
 
     taskService.deleteTask(newTask.getId(), true);
   }
@@ -1331,6 +1429,45 @@ public class FullHistoryTest extends ResourceProcessEngineTestCase {
       .singleResult();
 
     assertNull(((HistoricVariableUpdate)result).getValue());
+
+    taskService.deleteTask(newTask.getId(), true);
+  }
+
+  public void testDisableCustomObjectDeserialization() {
+
+    Task newTask = taskService.newTask();
+    taskService.saveTask(newTask);
+
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("customSerializable", new CustomSerializable());
+    variables.put("failingSerializable", new FailingSerializable());
+    taskService.setVariables(newTask.getId(), variables);
+
+    List<HistoricDetail> results = historyService.createHistoricDetailQuery()
+        .disableBinaryFetching()
+        .disableCustomObjectDeserialization()
+        .variableUpdates()
+        .list();
+
+    // both variables are not deserialized, but their serialized values are available
+    assertEquals(2, results.size());
+
+    for (HistoricDetail update : results) {
+      HistoricVariableUpdate variableUpdate = (HistoricVariableUpdate) update;
+      assertNull(variableUpdate.getErrorMessage());
+
+      ObjectValue typedValue = (ObjectValue) variableUpdate.getTypedValue();
+      assertNotNull(typedValue);
+      assertFalse(typedValue.isDeserialized());
+      // cannot access the deserialized value
+      try {
+        typedValue.getValue();
+      }
+      catch(IllegalStateException e) {
+        assertTextPresent("Object is not deserialized", e.getMessage());
+      }
+      assertNotNull(typedValue.getValueSerialized());
+    }
 
     taskService.deleteTask(newTask.getId(), true);
   }

@@ -15,8 +15,10 @@ package org.camunda.bpm.engine.impl.form.handler;
 import java.util.Map;
 
 import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.camunda.bpm.engine.form.FormData;
+import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.form.validator.FormFieldValidatorContext;
+import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
+import org.camunda.bpm.engine.variable.VariableMap;
 
 /**
  * @author Daniel Meyer
@@ -24,23 +26,31 @@ import org.camunda.bpm.engine.impl.form.validator.FormFieldValidatorContext;
  */
 public class DefaultFormFieldValidatorContext implements FormFieldValidatorContext {
 
-  protected DelegateExecution execution;
+  protected VariableScope variableScope;
   protected String configuration;
-  protected Map<String, Object> submittedValues;
+  protected VariableMap submittedValues;
 
-  public DefaultFormFieldValidatorContext(DelegateExecution execution, String configuration, Map<String, Object> submittedValues) {
+  public DefaultFormFieldValidatorContext(VariableScope variableScope, String configuration, VariableMap submittedValues) {
     super();
-    this.execution = execution;
+    this.variableScope = variableScope;
     this.configuration = configuration;
     this.submittedValues = submittedValues;
   }
 
   public DelegateExecution getExecution() {
-    return execution;
+    if(variableScope instanceof DelegateExecution) {
+      return (DelegateExecution) variableScope;
+    }
+    else if(variableScope instanceof TaskEntity){
+      return ((TaskEntity) variableScope).getExecution();
+    }
+    else {
+      return null;
+    }
   }
 
-  public void setExecution(DelegateExecution execution) {
-    this.execution = execution;
+  public VariableScope getVariableScope() {
+    return variableScope;
   }
 
   public String getConfiguration() {
@@ -53,10 +63,6 @@ public class DefaultFormFieldValidatorContext implements FormFieldValidatorConte
 
   public Map<String, Object> getSubmittedValues() {
     return submittedValues;
-  }
-
-  public void setSubmittedValues(Map<String, Object> submittedValues) {
-    this.submittedValues = submittedValues;
   }
 
 }

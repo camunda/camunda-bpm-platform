@@ -12,39 +12,56 @@
  */
 package org.camunda.bpm.engine.impl.cmmn.entity.runtime;
 
+import static org.camunda.bpm.engine.impl.cmmn.handler.ItemHandler.PROPERTY_ACTIVITY_DESCRIPTION;
+import static org.camunda.bpm.engine.impl.cmmn.handler.ItemHandler.PROPERTY_ACTIVITY_TYPE;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.ProcessEngineServices;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
-import org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
+import org.camunda.bpm.engine.impl.cmmn.execution.CmmnSentryPart;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
+import org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation;
 import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.core.variable.CoreVariableStore;
-import org.camunda.bpm.engine.impl.db.HasRevision;
-import org.camunda.bpm.engine.impl.db.PersistentObject;
+import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
+import org.camunda.bpm.engine.impl.core.operation.CoreAtomicOperation;
+import org.camunda.bpm.engine.impl.core.variable.scope.CoreVariableStore;
+import org.camunda.bpm.engine.impl.db.DbEntity;
+import org.camunda.bpm.engine.impl.db.HasDbReferences;
+import org.camunda.bpm.engine.impl.db.HasDbRevision;
+import org.camunda.bpm.engine.impl.history.HistoryLevel;
+import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
+import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
+import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
+import org.camunda.bpm.engine.impl.history.producer.CmmnHistoryEventProducer;
+import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
+import org.camunda.bpm.engine.impl.pvm.PvmProcessDefinition;
+import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
+import org.camunda.bpm.engine.impl.task.TaskDecorator;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.model.cmmn.CmmnModelInstance;
 import org.camunda.bpm.model.cmmn.instance.CmmnElement;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
+import org.camunda.bpm.model.xml.type.ModelElementType;
 
 /**
  * @author Roman Smirnov
  *
  */
-public class CaseExecutionEntity extends CmmnExecution implements CaseExecution, CaseInstance, PersistentObject, HasRevision {
+public class CaseExecutionEntity extends CmmnExecution implements CaseExecution, CaseInstance, DbEntity, HasDbRevision, HasDbReferences {
 
   private static final long serialVersionUID = 1L;
-
-  private static Logger log = Logger.getLogger(CmmnExecution.class.getName());
-
 
   // current position /////////////////////////////////////////////////////////
 
@@ -58,6 +75,17 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
   /** nested executions */
   protected List<CaseExecutionEntity> caseExecutions;
 
+  /** nested case sentry parts */
+  protected List<CaseSentryPartEntity> caseSentryParts;
+  protected Map<String, List<CmmnSentryPart>> sentries;
+
+  /** reference to a sub process instance, not-null if currently subprocess is started from this execution */
+  protected transient ExecutionEntity subProcessInstance;
+
+  protected transient CaseExecutionEntity subCaseInstance;
+
+  protected transient CaseExecutionEntity superCaseExecution;
+
   // associated entities /////////////////////////////////////////////////////
 
   protected CaseExecutionEntityVariableStore variableStore = new CaseExecutionEntityVariableStore(this);
@@ -67,9 +95,15 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
   protected int revision = 1;
   protected String caseDefinitionId;
   protected String activityId;
-  protected String activityName;
   protected String caseInstanceId;
   protected String parentId;
+  protected String superCaseExecutionId;
+
+  // activity properites //////////////////////////////////////////////////////
+
+  protected String activityName;
+  protected String activityType;
+  protected String activityDescription;
 
   // case definition ///////////////////////////////////////////////////////////
 
@@ -99,7 +133,7 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
       CaseDefinitionEntity deployedCaseDefinition = Context
         .getProcessEngineConfiguration()
         .getDeploymentCache()
-        .findDeployedCaseDefinitionById(caseDefinitionId);
+        .getCaseDefinitionById(caseDefinitionId);
 
       setCaseDefinition(deployedCaseDefinition);
     }
@@ -124,12 +158,57 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
 
   protected void ensureParentInitialized() {
     if (parent == null && parentId != null) {
+      if(isExecutionTreePrefetchEnabled()) {
+        ensureCaseExecutionTreeInitialized();
 
-      parent = Context
-        .getCommandContext()
-        .getCaseExecutionManager()
-        .findCaseExecutionById(parentId);
+      } else {
+        parent = Context
+            .getCommandContext()
+            .getCaseExecutionManager()
+            .findCaseExecutionById(parentId);
+
+      }
     }
+  }
+
+  /**
+   * @see ExecutionEntity#ensureExecutionTreeInitialized
+   */
+  protected void ensureCaseExecutionTreeInitialized() {
+    List<CaseExecutionEntity> executions = Context.getCommandContext()
+      .getCaseExecutionManager()
+      .findChildCaseExecutionsByCaseInstanceId(caseInstanceId);
+
+    CaseExecutionEntity caseInstance = null;
+
+    Map<String, CaseExecutionEntity> executionMap = new HashMap<String, CaseExecutionEntity>();
+    for (CaseExecutionEntity execution : executions) {
+      execution.caseExecutions = new ArrayList<CaseExecutionEntity>();
+      executionMap.put(execution.getId(), execution);
+      if(execution.isCaseInstanceExecution()) {
+        caseInstance = execution;
+      }
+    }
+
+    for (CaseExecutionEntity execution : executions) {
+      String parentId = execution.getParentId();
+      CaseExecutionEntity parent = executionMap.get(parentId);
+      if(!execution.isCaseInstanceExecution()) {
+        execution.caseInstance = caseInstance;
+        execution.parent = parent;
+        parent.caseExecutions.add(execution);
+      } else {
+        execution.caseInstance = execution;
+      }
+    }
+  }
+
+  /**
+   * @return true if execution tree prefetching is enabled
+   */
+  protected boolean isExecutionTreePrefetchEnabled() {
+    return Context.getProcessEngineConfiguration()
+      .isExecutionTreePrefetchEnabled();
   }
 
   public String getParentId() {
@@ -137,14 +216,6 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
   }
 
   // activity //////////////////////////////////////////////////////////////////
-
-  public String getActivityId() {
-    return activityId;
-  }
-
-  public String getActivityName() {
-    return activityName;
-  }
 
   public CmmnActivity getActivity() {
     ensureActivityInitialized();
@@ -155,10 +226,14 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
     super.setActivity(activity);
     if (activity != null) {
       this.activityId = activity.getId();
-      this.activityName = (String) activity.getProperty("name");
+      this.activityName = activity.getName();
+      this.activityType = getActivityProperty(activity, PROPERTY_ACTIVITY_TYPE);
+      this.activityDescription = getActivityProperty(activity, PROPERTY_ACTIVITY_DESCRIPTION);
     } else {
       this.activityId = null;
       this.activityName = null;
+      this.activityType = null;
+      this.activityDescription = null;
     }
   }
 
@@ -168,9 +243,44 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
     }
   }
 
+  protected String getActivityProperty(CmmnActivity activity, String property) {
+    String result = null;
+
+    if (activity != null) {
+      Object value = activity.getProperty(property);
+      if (value != null && value instanceof String) {
+        result = (String) value;
+      }
+    }
+
+    return result;
+  }
+
+  // activity properties //////////////////////////////////////////////////////
+
+  public String getActivityId() {
+    return activityId;
+  }
+
+  public String getActivityName() {
+    return activityName;
+  }
+
+  public String getActivityType() {
+    return activityType;
+  }
+
+  public String getActivityDescription() {
+    return activityDescription;
+  }
+
   // case executions ////////////////////////////////////////////////////////////////
 
   public List<CaseExecutionEntity> getCaseExecutions() {
+    return new ArrayList<CaseExecutionEntity>(getCaseExecutionsInternal());
+  }
+
+  protected List<CaseExecutionEntity> getCaseExecutionsInternal() {
     ensureCaseExecutionsInitialized();
     return caseExecutions;
   }
@@ -182,6 +292,28 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
         .getCaseExecutionManager()
         .findChildCaseExecutionsByParentCaseExecutionId(id);
     }
+  }
+
+  // task ///////////////////////////////////////////////////////////////////
+
+  public TaskEntity getTask() {
+    ensureTaskInitialized();
+    return task;
+  }
+
+  protected void ensureTaskInitialized() {
+    if (task == null) {
+      task = Context
+        .getCommandContext()
+        .getTaskManager()
+        .findTaskByCaseExecutionId(id);
+    }
+  }
+
+  public TaskEntity createTask(TaskDecorator taskDecorator) {
+    TaskEntity task = super.createTask(taskDecorator);
+    fireHistoricCaseActivityInstanceUpdate();
+    return task;
   }
 
   // case instance /////////////////////////////////////////////////////////
@@ -222,14 +354,12 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
   protected CaseExecutionEntity createCaseExecution(CmmnActivity activity) {
     CaseExecutionEntity child = newCaseExecution();
 
-    // TODO: evaluate "RepetitionRule" and "RequiredRule"
-
     // set activity to execute
     child.setActivity(activity);
 
     // handle child/parent-relation
     child.setParent(this);
-    getCaseExecutions().add(child);
+    getCaseExecutionsInternal().add(child);
 
     // set case instance
     child.setCaseInstance(getCaseInstance());
@@ -237,15 +367,8 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
     // set case definition
     child.setCaseDefinition(getCaseDefinition());
 
-    // set state to available
-    child.setCurrentState(CaseExecutionState.AVAILABLE);
-
-    if (log.isLoggable(Level.FINE)) {
-      log.fine("Child caseExecution " + child + " created with parent " + this);
-    }
-
     return child;
-  };
+  }
 
   protected CaseExecutionEntity newCaseExecution() {
     CaseExecutionEntity newCaseExecution = new CaseExecutionEntity();
@@ -256,6 +379,197 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
       .insertCaseExecution(newCaseExecution);
 
     return newCaseExecution;
+  }
+
+  // sub process instance ///////////////////////////////////////////////////
+
+  public ExecutionEntity getSubProcessInstance() {
+    ensureSubProcessInstanceInitialized();
+    return subProcessInstance;
+  }
+
+  public void setSubProcessInstance(PvmExecutionImpl subProcessInstance) {
+    this.subProcessInstance = (ExecutionEntity) subProcessInstance;
+  }
+
+  public ExecutionEntity createSubProcessInstance(PvmProcessDefinition processDefinition) {
+    return createSubProcessInstance(processDefinition, null);
+  }
+
+  public ExecutionEntity createSubProcessInstance(PvmProcessDefinition processDefinition, String businessKey) {
+    return createSubProcessInstance(processDefinition, businessKey, getCaseInstanceId());
+  }
+
+  public ExecutionEntity createSubProcessInstance(PvmProcessDefinition processDefinition, String businessKey, String caseInstanceId) {
+    ExecutionEntity subProcessInstance = (ExecutionEntity) processDefinition.createProcessInstance(businessKey, caseInstanceId);
+
+    // manage bidirectional super-subprocess relation
+    subProcessInstance.setSuperCaseExecution(this);
+    setSubProcessInstance(subProcessInstance);
+
+    fireHistoricCaseActivityInstanceUpdate();
+
+    return subProcessInstance;
+  }
+
+  protected void ensureSubProcessInstanceInitialized() {
+    if (subProcessInstance == null) {
+      subProcessInstance = Context
+        .getCommandContext()
+        .getExecutionManager()
+        .findSubProcessInstanceBySuperCaseExecutionId(id);
+    }
+  }
+
+  // sub-/super- case instance ////////////////////////////////////////////////////
+
+  public CaseExecutionEntity getSubCaseInstance() {
+    ensureSubCaseInstanceInitialized();
+    return subCaseInstance;
+  }
+
+  public void setSubCaseInstance(CmmnExecution subCaseInstance) {
+    this.subCaseInstance = (CaseExecutionEntity) subCaseInstance;
+  }
+
+  public CaseExecutionEntity createSubCaseInstance(CmmnCaseDefinition caseDefinition) {
+    return createSubCaseInstance(caseDefinition, null);
+  }
+
+  public CaseExecutionEntity createSubCaseInstance(CmmnCaseDefinition caseDefinition, String businessKey) {
+    CaseExecutionEntity subCaseInstance = (CaseExecutionEntity) caseDefinition.createCaseInstance(businessKey);
+
+    // manage bidirectional super-sub-case-instances relation
+    subCaseInstance.setSuperCaseExecution(this);
+    setSubCaseInstance(subCaseInstance);
+
+    fireHistoricCaseActivityInstanceUpdate();
+
+    return subCaseInstance;
+  }
+
+  public void fireHistoricCaseActivityInstanceUpdate() {
+    ProcessEngineConfigurationImpl configuration = Context.getProcessEngineConfiguration();
+    HistoryLevel historyLevel = configuration.getHistoryLevel();
+    if (historyLevel.isHistoryEventProduced(HistoryEventTypes.CASE_ACTIVITY_INSTANCE_UPDATE, this)) {
+      CmmnHistoryEventProducer eventProducer = configuration.getCmmnHistoryEventProducer();
+      HistoryEventHandler eventHandler = configuration.getHistoryEventHandler();
+
+      HistoryEvent event = eventProducer.createCaseActivityInstanceUpdateEvt(this);
+      eventHandler.handleEvent(event);
+    }
+  }
+
+  protected void ensureSubCaseInstanceInitialized() {
+    if (subCaseInstance == null) {
+      subCaseInstance = Context
+        .getCommandContext()
+        .getCaseExecutionManager()
+        .findSubCaseInstanceBySuperCaseExecutionId(id);
+    }
+  }
+
+  public String getSuperCaseExecutionId() {
+    return superCaseExecutionId;
+  }
+
+  public void setSuperCaseExecutionId(String superCaseExecutionId) {
+    this.superCaseExecutionId = superCaseExecutionId;
+  }
+
+  public CmmnExecution getSuperCaseExecution() {
+    ensureSuperCaseExecutionInitialized();
+    return superCaseExecution;
+  }
+
+  public void setSuperCaseExecution(CmmnExecution superCaseExecution) {
+    this.superCaseExecution = (CaseExecutionEntity) superCaseExecution;
+
+    if (superCaseExecution != null) {
+      this.superCaseExecutionId = superCaseExecution.getId();
+    } else {
+      this.superCaseExecutionId = null;
+    }
+  }
+
+  protected void ensureSuperCaseExecutionInitialized() {
+    if (superCaseExecution == null && superCaseExecutionId != null) {
+      superCaseExecution = Context
+        .getCommandContext()
+        .getCaseExecutionManager()
+        .findCaseExecutionById(superCaseExecutionId);
+    }
+  }
+
+  // sentry /////////////////////////////////////////////////////////////////////////
+
+  public List<CaseSentryPartEntity> getCaseSentryParts() {
+    ensureCaseSentryPartsInitialized();
+    return caseSentryParts;
+  }
+
+  protected void ensureCaseSentryPartsInitialized() {
+    if (caseSentryParts == null) {
+
+      caseSentryParts = Context
+        .getCommandContext()
+        .getCaseSentryPartManager()
+        .findCaseSentryPartsByCaseExecutionId(id);
+
+      // create a map sentries: sentryId -> caseSentryParts
+      // for simple select to get all parts for one sentry
+      sentries = new HashMap<String, List<CmmnSentryPart>>();
+
+      for (CaseSentryPartEntity sentryPart : caseSentryParts) {
+
+        String sentryId = sentryPart.getSentryId();
+        List<CmmnSentryPart> parts = sentries.get(sentryId);
+
+        if (parts == null) {
+          parts = new ArrayList<CmmnSentryPart>();
+          sentries.put(sentryId, parts);
+        }
+
+        parts.add(sentryPart);
+      }
+    }
+  }
+
+  protected void addSentryPart(CmmnSentryPart sentryPart) {
+    CaseSentryPartEntity entity = (CaseSentryPartEntity) sentryPart;
+
+    getCaseSentryParts().add(entity);
+
+    String sentryId = sentryPart.getSentryId();
+    List<CmmnSentryPart> parts = sentries.get(sentryId);
+
+    if (parts == null) {
+      parts = new ArrayList<CmmnSentryPart>();
+      sentries.put(sentryId, parts);
+    }
+
+    parts.add(entity);
+  }
+
+  protected Map<String, List<CmmnSentryPart>> getSentries() {
+    ensureCaseSentryPartsInitialized();
+    return sentries;
+  }
+
+  protected List<CmmnSentryPart> findSentry(String sentryId) {
+    ensureCaseSentryPartsInitialized();
+    return sentries.get(sentryId);
+  }
+
+  protected CaseSentryPartEntity newSentryPart() {
+    CaseSentryPartEntity caseSentryPart = new CaseSentryPartEntity();
+
+    Context
+      .getCommandContext()
+      .getCaseSentryPartManager()
+      .insertCaseSentryPart(caseSentryPart);
+
+    return caseSentryPart;
   }
 
   // variables //////////////////////////////////////////////////////////////
@@ -297,8 +611,16 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
 
     variableStore.removeVariablesWithoutFiringEvents();
 
+    CommandContext commandContext = Context.getCommandContext();
+
+    for (CaseSentryPartEntity sentryPart : getCaseSentryParts()) {
+      commandContext
+        .getCaseSentryPartManager()
+        .deleteSentryPart(sentryPart);
+    }
+
     // finally delete this execution
-    Context.getCommandContext()
+    commandContext
       .getCaseExecutionManager()
       .deleteCaseExecution(this);
   }
@@ -315,6 +637,33 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
 
   public int getRevisionNext() {
     return revision + 1;
+  }
+
+  public void forceUpdate() {
+    Context.getCommandContext()
+      .getDbEntityManager()
+      .forceUpdate(this);
+  }
+
+  public boolean hasReferenceTo(DbEntity entity) {
+
+    if (entity instanceof CaseExecutionEntity) {
+      CaseExecutionEntity otherEntity = (CaseExecutionEntity) entity;
+      String otherId = otherEntity.getId();
+
+      // parentId
+      if(parentId != null && parentId.equals(otherId)) {
+        return true;
+      }
+
+      // superExecutionId
+      if(superCaseExecutionId != null && superCaseExecutionId.equals(otherId)) {
+        return true;
+      }
+
+    }
+    return false;
+
   }
 
   public Object getPersistentState() {
@@ -347,7 +696,15 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
 
       ModelElementInstance modelElementInstance = cmmnModelInstance.getModelElementById(activityId);
 
-      return (CmmnElement) modelElementInstance;
+      try {
+        return (CmmnElement) modelElementInstance;
+
+      } catch(ClassCastException e) {
+        ModelElementType elementType = modelElementInstance.getElementType();
+        throw new ProcessEngineException("Cannot cast "+modelElementInstance+" to CmmnElement. "
+            + "Is of type "+elementType.getTypeName() + " Namespace "
+            + elementType.getTypeNamespace(), e);
+      }
 
     } else {
       return null;
@@ -358,6 +715,16 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
     return Context
         .getProcessEngineConfiguration()
         .getProcessEngine();
+  }
+
+  public <T extends CoreExecution> void performOperation(CoreAtomicOperation<T> operation) {
+    Context.getCommandContext()
+      .performOperation((CmmnAtomicOperation) operation, this);
+  }
+
+  public <T extends CoreExecution> void performOperationSync(CoreAtomicOperation<T> operation) {
+    Context.getCommandContext()
+      .performOperation((CmmnAtomicOperation) operation, this);
   }
 
 }

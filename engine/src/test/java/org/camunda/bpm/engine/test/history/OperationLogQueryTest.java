@@ -12,6 +12,29 @@
  */
 package org.camunda.bpm.engine.test.history;
 
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.ENTITY_TYPE_ATTACHMENT;
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.ENTITY_TYPE_IDENTITY_LINK;
+import static org.camunda.bpm.engine.EntityTypes.PROCESS_INSTANCE;
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.ENTITY_TYPE_TASK;
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_ACTIVATE;
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_ADD_ATTACHMENT;
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_ADD_GROUP_LINK;
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_ADD_USER_LINK;
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_CREATE;
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_DELETE;
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_DELETE_ATTACHMENT;
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_DELETE_GROUP_LINK;
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_DELETE_USER_LINK;
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_SET_PRIORITY;
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_SUSPEND;
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_UPDATE;
+import static org.camunda.bpm.engine.impl.persistence.entity.TaskEntity.ASSIGNEE;
+import static org.camunda.bpm.engine.impl.persistence.entity.TaskEntity.OWNER;
+
+import java.util.Date;
+import java.util.List;
+
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.history.UserOperationLogQuery;
 import org.camunda.bpm.engine.impl.interceptor.Command;
@@ -23,11 +46,6 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Attachment;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
-import java.util.Date;
-import java.util.List;
-
-import static org.camunda.bpm.engine.history.UserOperationLogEntry.*;
-import static org.camunda.bpm.engine.impl.persistence.entity.TaskEntity.*;
 
 /**
  * @author Danny Gräf
@@ -192,6 +210,391 @@ public class OperationLogQueryTest extends PluggableProcessEngineTestCase {
 
     // complete the userTask
     taskService.complete(userTask.getId());
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml"})
+  public void testQueryProcessInstanceOperationsById() {
+    // given
+    process = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+    // when
+    runtimeService.suspendProcessInstanceById(process.getId());
+    runtimeService.activateProcessInstanceById(process.getId());
+
+    runtimeService.deleteProcessInstance(process.getId(), "a delete reason");
+
+    // then
+    assertEquals(3, query().entityType(PROCESS_INSTANCE).count());
+
+    UserOperationLogEntry deleteEntry = query()
+        .entityType(PROCESS_INSTANCE)
+        .processInstanceId(process.getId())
+        .operationType(OPERATION_TYPE_DELETE)
+        .singleResult();
+
+    assertNotNull(deleteEntry);
+    assertEquals(process.getId(), deleteEntry.getProcessInstanceId());
+    assertNull(deleteEntry.getProcessDefinitionId());
+    assertNull(deleteEntry.getProcessDefinitionKey());
+
+    UserOperationLogEntry suspendEntry = query()
+        .entityType(PROCESS_INSTANCE)
+        .processInstanceId(process.getId())
+        .operationType(OPERATION_TYPE_SUSPEND)
+        .singleResult();
+
+    assertNotNull(suspendEntry);
+    assertEquals(process.getId(), suspendEntry.getProcessInstanceId());
+    assertNull(suspendEntry.getProcessDefinitionId());
+    assertNull(suspendEntry.getProcessDefinitionKey());
+
+    assertEquals("suspensionState", suspendEntry.getProperty());
+    assertEquals("suspended", suspendEntry.getNewValue());
+    assertNull(suspendEntry.getOrgValue());
+
+    UserOperationLogEntry activateEntry = query()
+        .entityType(PROCESS_INSTANCE)
+        .processInstanceId(process.getId())
+        .operationType(OPERATION_TYPE_ACTIVATE)
+        .singleResult();
+
+    assertNotNull(activateEntry);
+    assertEquals(process.getId(), activateEntry.getProcessInstanceId());
+    assertNull(activateEntry.getProcessDefinitionId());
+    assertNull(activateEntry.getProcessDefinitionKey());
+
+    assertEquals("suspensionState", activateEntry.getProperty());
+    assertEquals("active", activateEntry.getNewValue());
+    assertNull(activateEntry.getOrgValue());
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml"})
+  public void testQueryProcessInstanceOperationsByProcessDefinitionId() {
+    // given
+    process = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+    // when
+    runtimeService.suspendProcessInstanceByProcessDefinitionId(process.getProcessDefinitionId());
+    runtimeService.activateProcessInstanceByProcessDefinitionId(process.getProcessDefinitionId());
+
+    // then
+    assertEquals(2, query().entityType(PROCESS_INSTANCE).count());
+
+    UserOperationLogEntry suspendEntry = query()
+        .entityType(PROCESS_INSTANCE)
+        .processDefinitionId(process.getProcessDefinitionId())
+        .operationType(OPERATION_TYPE_SUSPEND)
+        .singleResult();
+
+    assertNotNull(suspendEntry);
+    assertEquals(process.getProcessDefinitionId(), suspendEntry.getProcessDefinitionId());
+    assertNull(suspendEntry.getProcessInstanceId());
+    assertNull(suspendEntry.getProcessDefinitionKey());
+
+    assertEquals("suspensionState", suspendEntry.getProperty());
+    assertEquals("suspended", suspendEntry.getNewValue());
+    assertNull(suspendEntry.getOrgValue());
+
+    UserOperationLogEntry activateEntry = query()
+        .entityType(PROCESS_INSTANCE)
+        .processDefinitionId(process.getProcessDefinitionId())
+        .operationType(OPERATION_TYPE_ACTIVATE)
+        .singleResult();
+
+    assertNotNull(activateEntry);
+    assertNull(activateEntry.getProcessInstanceId());
+    assertNull(activateEntry.getProcessDefinitionKey());
+    assertEquals(process.getProcessDefinitionId(), activateEntry.getProcessDefinitionId());
+
+    assertEquals("suspensionState", activateEntry.getProperty());
+    assertEquals("active", activateEntry.getNewValue());
+    assertNull(activateEntry.getOrgValue());
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml"})
+  public void testQueryProcessInstanceOperationsByProcessDefinitionKey() {
+    // given
+    process = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+    // when
+    runtimeService.suspendProcessInstanceByProcessDefinitionKey("oneTaskProcess");
+    runtimeService.activateProcessInstanceByProcessDefinitionKey("oneTaskProcess");
+
+    // then
+    assertEquals(2, query().entityType(PROCESS_INSTANCE).count());
+
+    UserOperationLogEntry suspendEntry = query()
+        .entityType(PROCESS_INSTANCE)
+        .processDefinitionKey("oneTaskProcess")
+        .operationType(OPERATION_TYPE_SUSPEND)
+        .singleResult();
+
+    assertNotNull(suspendEntry);
+    assertNull(suspendEntry.getProcessInstanceId());
+    assertNull(suspendEntry.getProcessDefinitionId());
+    assertEquals("oneTaskProcess", suspendEntry.getProcessDefinitionKey());
+
+    assertEquals("suspensionState", suspendEntry.getProperty());
+    assertEquals("suspended", suspendEntry.getNewValue());
+    assertNull(suspendEntry.getOrgValue());
+
+    UserOperationLogEntry activateEntry = query()
+        .entityType(PROCESS_INSTANCE)
+        .processDefinitionKey("oneTaskProcess")
+        .operationType(OPERATION_TYPE_ACTIVATE)
+        .singleResult();
+
+    assertNotNull(activateEntry);
+    assertNull(activateEntry.getProcessInstanceId());
+    assertNull(activateEntry.getProcessDefinitionId());
+    assertEquals("oneTaskProcess", activateEntry.getProcessDefinitionKey());
+
+    assertEquals("suspensionState", activateEntry.getProperty());
+    assertEquals("active", activateEntry.getNewValue());
+    assertNull(activateEntry.getOrgValue());
+
+    // clear op log
+    historyService.deleteUserOperationLogEntry(suspendEntry.getId());
+    historyService.deleteUserOperationLogEntry(activateEntry.getId());
+
+  }
+
+  /**
+   * CAM-1930: add assertions for additional op log entries here
+   */
+  @Deployment(resources = {"org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml"})
+  public void testQueryProcessDefinitionOperationsById() {
+    // given
+    process = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+    // when
+    repositoryService.suspendProcessDefinitionById(process.getProcessDefinitionId(), true, null);
+    repositoryService.activateProcessDefinitionById(process.getProcessDefinitionId(), true, null);
+
+    // then
+    assertEquals(2, query().entityType(PROCESS_INSTANCE).count());
+
+    UserOperationLogEntry suspendEntry = query()
+        .entityType(PROCESS_INSTANCE)
+        .processDefinitionId(process.getProcessDefinitionId())
+        .operationType(OPERATION_TYPE_SUSPEND)
+        .singleResult();
+
+    assertNotNull(suspendEntry);
+    assertNull(suspendEntry.getProcessInstanceId());
+    assertEquals(process.getProcessDefinitionId(), suspendEntry.getProcessDefinitionId());
+    assertNull(suspendEntry.getProcessDefinitionKey());
+
+    assertEquals("suspensionState", suspendEntry.getProperty());
+    assertEquals("suspended", suspendEntry.getNewValue());
+    assertNull(suspendEntry.getOrgValue());
+
+    UserOperationLogEntry activateEntry = query()
+        .entityType(PROCESS_INSTANCE)
+        .processDefinitionId(process.getProcessDefinitionId())
+        .operationType(OPERATION_TYPE_ACTIVATE)
+        .singleResult();
+
+    assertNotNull(activateEntry);
+    assertNull(activateEntry.getProcessInstanceId());
+    assertEquals(process.getProcessDefinitionId(), activateEntry.getProcessDefinitionId());
+    assertNull(activateEntry.getProcessDefinitionKey());
+
+    assertEquals("suspensionState", activateEntry.getProperty());
+    assertEquals("active", activateEntry.getNewValue());
+    assertNull(activateEntry.getOrgValue());
+  }
+
+  /**
+   * CAM-1930: add assertions for additional op log entries here
+   */
+  @Deployment(resources = {"org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml"})
+  public void testQueryProcessDefinitionOperationsByKey() {
+    // given
+    process = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+    // when
+    repositoryService.suspendProcessDefinitionByKey("oneTaskProcess", true, null);
+    repositoryService.activateProcessDefinitionByKey("oneTaskProcess", true, null);
+
+    // then
+    assertEquals(2, query().entityType(PROCESS_INSTANCE).count());
+
+    UserOperationLogEntry suspendEntry = query()
+        .entityType(PROCESS_INSTANCE)
+        .processDefinitionKey("oneTaskProcess")
+        .operationType(OPERATION_TYPE_SUSPEND)
+        .singleResult();
+
+    assertNotNull(suspendEntry);
+    assertNull(suspendEntry.getProcessInstanceId());
+    assertNull(suspendEntry.getProcessDefinitionId());
+    assertEquals("oneTaskProcess", suspendEntry.getProcessDefinitionKey());
+
+    assertEquals("suspensionState", suspendEntry.getProperty());
+    assertEquals("suspended", suspendEntry.getNewValue());
+    assertNull(suspendEntry.getOrgValue());
+
+    UserOperationLogEntry activateEntry = query()
+        .entityType(PROCESS_INSTANCE)
+        .processDefinitionKey("oneTaskProcess")
+        .operationType(OPERATION_TYPE_ACTIVATE)
+        .singleResult();
+
+    assertNotNull(activateEntry);
+    assertNull(activateEntry.getProcessInstanceId());
+    assertNull(activateEntry.getProcessDefinitionId());
+    assertEquals("oneTaskProcess", activateEntry.getProcessDefinitionKey());
+
+    assertEquals("suspensionState", activateEntry.getProperty());
+    assertEquals("active", activateEntry.getNewValue());
+    assertNull(activateEntry.getOrgValue());
+
+    // clear op log
+    historyService.deleteUserOperationLogEntry(suspendEntry.getId());
+    historyService.deleteUserOperationLogEntry(activateEntry.getId());
+
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryByCaseDefinitionId() {
+    // given:
+    // a deployed case definition
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    // an active case instance
+    caseService
+       .withCaseDefinition(caseDefinitionId)
+       .create();
+
+    String caseExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(caseExecutionId)
+      .manualStart();
+
+    Task task = taskService.createTaskQuery().singleResult();
+
+    assertNotNull(task);
+
+    // when
+    taskService.setAssignee(task.getId(), "demo");
+
+    // then
+
+    UserOperationLogQuery query = historyService
+      .createUserOperationLogQuery()
+      .caseDefinitionId(caseDefinitionId);
+
+    verifyQueryResults(query, 1);
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryByCaseInstanceId() {
+    // given:
+    // a deployed case definition
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    // an active case instance
+    String caseInstanceId = caseService
+       .withCaseDefinition(caseDefinitionId)
+       .create()
+       .getId();
+
+    String caseExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(caseExecutionId)
+      .manualStart();
+
+    Task task = taskService.createTaskQuery().singleResult();
+
+    assertNotNull(task);
+
+    // when
+    taskService.setAssignee(task.getId(), "demo");
+
+    // then
+
+    UserOperationLogQuery query = historyService
+      .createUserOperationLogQuery()
+      .caseInstanceId(caseInstanceId);
+
+    verifyQueryResults(query, 1);
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryByCaseExecutionId() {
+    // given:
+    // a deployed case definition
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    // an active case instance
+    caseService
+       .withCaseDefinition(caseDefinitionId)
+       .create();
+
+    String caseExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(caseExecutionId)
+      .manualStart();
+
+    Task task = taskService.createTaskQuery().singleResult();
+
+    assertNotNull(task);
+
+    // when
+    taskService.setAssignee(task.getId(), "demo");
+
+    // then
+
+    UserOperationLogQuery query = historyService
+      .createUserOperationLogQuery()
+      .caseExecutionId(caseExecutionId);
+
+    verifyQueryResults(query, 1);
+  }
+
+  private void verifyQueryResults(UserOperationLogQuery query, int countExpected) {
+    assertEquals(countExpected, query.list().size());
+    assertEquals(countExpected, query.count());
+
+    if (countExpected == 1) {
+      assertNotNull(query.singleResult());
+    } else if (countExpected > 1){
+      verifySingleResultFails(query);
+    } else if (countExpected == 0) {
+      assertNull(query.singleResult());
+    }
+  }
+
+  private void verifySingleResultFails(UserOperationLogQuery query) {
+    try {
+      query.singleResult();
+      fail();
+    } catch (ProcessEngineException e) {}
   }
 
 }

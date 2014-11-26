@@ -1,28 +1,46 @@
-<strong>Do you approve this invoice?</strong>
+<form class="form-horizontal"
+      role="form">
 
-<form class="form-horizontal">
+  <div class="panel panel-info">Who should approve this invoice?</div>
+
   <div class="control-group">
     <label class="control-label">Creditor</label>
     <div class="controls">
-      <input form-field type="string" name="creditor" readonly="true" />
+      <input cam-variable-name="creditor"
+             type="text"
+             name="creditor"
+             readonly="true"
+             class="form-control" />
     </div>
   </div>
   <div class="control-group">
     <label class="control-label">Amount</label>
     <div class="controls">
-      <input form-field type="string" name="amount" readonly="true" />
+      <input cam-variable-name="amount"
+             type="text"
+             name="amount"
+             readonly="true"
+             class="form-control" />
     </div>
   </div>
   <div class="control-group">
     <label class="control-label">Invoice Number</label>
     <div class="controls">
-      <input form-field type="string" name="invoiceNumber" readonly="true" />
+      <input cam-variable-name="invoiceNumber"
+             type="text"
+             name="invoiceNumber"
+             readonly="true"
+             class="form-control" />
     </div>
   </div>
   <div class="control-group">
-    <label class="control-label">Approve? </label>
+    <label class="control-label">Do you approve? </label>
     <div class="controls">
-      <input form-field type="boolean" name="approved" />
+      <input cam-variable-name="approved"
+             cam-variable-type="Boolean"
+             type="checkbox"
+             name="approved"
+             class="form-control" />
     </div>
   </div>
 </form>

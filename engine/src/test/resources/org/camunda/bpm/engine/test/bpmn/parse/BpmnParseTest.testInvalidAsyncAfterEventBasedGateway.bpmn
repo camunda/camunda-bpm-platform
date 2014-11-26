@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions"
+             xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:camunda="http://activiti.org/bpmn"
+             targetNamespace="Examples">
+
+  <process id="testInvalidAsyncAfterEventBasedGateway">
+
+    <startEvent id="theStart" />
+
+    <sequenceFlow id="flow1" sourceRef="theStart" targetRef="eventBasedGateway" />
+
+    <eventBasedGateway id="eventBasedGateway" camunda:asyncAfter="true">
+      <extensionElements>
+        <camunda:executionListener
+            event="start"
+            expression="${execution.setVariable('listenerStartInvoked', true)}" />
+
+        <camunda:executionListener
+            event="end"
+            expression="${execution.setVariable('listenerEndInvoked', true)}" />
+      </extensionElements>
+    </eventBasedGateway>
+
+    <sequenceFlow id="flow2" sourceRef="eventBasedGateway" targetRef="catchEvent1" />
+    <sequenceFlow id="flow3" sourceRef="eventBasedGateway" targetRef="catchEvent2" />
+
+    <intermediateCatchEvent id="catchEvent1">
+      <messageEventDefinition id="testMessageDef1" messageRef="testMessage1" />
+    </intermediateCatchEvent>
+
+    <intermediateCatchEvent id="catchEvent2">
+      <messageEventDefinition id="testMessageDef2" messageRef="testMessage2" />
+    </intermediateCatchEvent>
+
+    <sequenceFlow sourceRef="catchEvent1" targetRef="theEnd1" />
+    <sequenceFlow sourceRef="catchEvent2" targetRef="theEnd2" />
+
+    <endEvent id="theEnd1" />
+    <endEvent id="theEnd2" />
+
+  </process>
+
+  <message id="testMessage1" name="testMessage1" />
+  <message id="testMessage2" name="testMessage2" />
+
+</definitions>

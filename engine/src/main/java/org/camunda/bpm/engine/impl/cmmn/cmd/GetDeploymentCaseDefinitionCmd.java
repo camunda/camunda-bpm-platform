@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.engine.impl.cmmn.cmd;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 import java.io.Serializable;
 
 import org.camunda.bpm.engine.impl.context.Context;
@@ -33,6 +35,8 @@ public class GetDeploymentCaseDefinitionCmd implements Command<CaseDefinition>, 
   }
 
   public CaseDefinition execute(CommandContext commandContext) {
+    ensureNotNull("caseDefinitionId", caseDefinitionId);
+
     return Context
       .getProcessEngineConfiguration()
       .getDeploymentCache()

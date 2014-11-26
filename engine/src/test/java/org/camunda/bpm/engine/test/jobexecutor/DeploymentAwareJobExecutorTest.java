@@ -250,7 +250,7 @@ public class DeploymentAwareJobExecutorTest extends AbstractProcessEngineTestCas
 
       @Override
       public List<JobEntity> execute(CommandContext commandContext) {
-        return (List<JobEntity>)commandContext
+        return commandContext
           .getJobManager()
           .findNextJobsToExecute(new Page(0, 100));
       }

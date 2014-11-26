@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 import java.io.Serializable;
 import java.util.Map;
 
@@ -36,11 +38,13 @@ public class StartProcessInstanceCmd implements Command<ProcessInstance>, Serial
   protected String processDefinitionId;
   protected Map<String, Object> variables;
   protected String businessKey;
+  protected String caseInstanceId;
 
-  public StartProcessInstanceCmd(String processDefinitionKey, String processDefinitionId, String businessKey, Map<String, Object> variables) {
+  public StartProcessInstanceCmd(String processDefinitionKey, String processDefinitionId, String businessKey, String caseInstanceId, Map<String, Object> variables) {
     this.processDefinitionKey = processDefinitionKey;
     this.processDefinitionId = processDefinitionId;
     this.businessKey = businessKey;
+    this.caseInstanceId = caseInstanceId;
     this.variables = variables;
   }
 
@@ -53,20 +57,16 @@ public class StartProcessInstanceCmd implements Command<ProcessInstance>, Serial
     ProcessDefinitionEntity processDefinition = null;
     if (processDefinitionId!=null) {
       processDefinition = deploymentCache.findDeployedProcessDefinitionById(processDefinitionId);
-      if (processDefinition == null) {
-        throw new ProcessEngineException("No process definition found for id = '" + processDefinitionId + "'");
-      }
-    } else if(processDefinitionKey != null){
+      ensureNotNull("No process definition found for id = '" + processDefinitionId + "'", "processDefinition", processDefinition);
+    } else if(processDefinitionKey != null) {
       processDefinition = deploymentCache.findDeployedLatestProcessDefinitionByKey(processDefinitionKey);
-      if (processDefinition == null) {
-        throw new ProcessEngineException("No process definition found for key '" + processDefinitionKey +"'");
-      }
+      ensureNotNull("No process definition found for key '" + processDefinitionKey + "'", "processDefinition", processDefinition);
     } else {
       throw new ProcessEngineException("processDefinitionKey and processDefinitionId are null");
     }
 
     // Start the process instance
-    ExecutionEntity processInstance = processDefinition.createProcessInstance(businessKey);
+    ExecutionEntity processInstance = processDefinition.createProcessInstance(businessKey, caseInstanceId);
     processInstance.start(variables);
     return processInstance;
   }

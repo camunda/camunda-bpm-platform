@@ -127,9 +127,7 @@ public class BpmnActivityBehavior {
         Object isForCompensation = execution.getActivity().getProperty(BpmnParse.PROPERTYNAME_IS_FOR_COMPENSATION);
         if(isForCompensation != null && (Boolean) isForCompensation) {
 
-          ActivityExecution parentExecution = execution.getParent();
-          execution.remove();
-          parentExecution.signal("compensationDone", null);
+          execution.endCompensation();
 
         } else {
 

@@ -14,12 +14,15 @@ package org.camunda.bpm.engine.rest.sub.history;
 
 import java.io.InputStream;
 
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
 import org.camunda.bpm.engine.rest.dto.history.HistoricDetailDto;
+import org.camunda.bpm.engine.rest.sub.VariableResource;
 
 /**
  *
@@ -29,7 +32,8 @@ public interface HistoricDetailResource {
 
   @GET
   @Produces(MediaType.APPLICATION_JSON)
-  public HistoricDetailDto getDetail();
+  public HistoricDetailDto getDetail(
+      @QueryParam(VariableResource.DESERIALIZE_VALUE_QUERY_PARAM) @DefaultValue("true") boolean deserializeValue);
 
 
   @GET

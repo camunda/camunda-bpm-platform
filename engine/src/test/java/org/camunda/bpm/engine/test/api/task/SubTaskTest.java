@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
-import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.task.Task;
 
@@ -43,7 +43,7 @@ public class SubTaskTest extends PluggableProcessEngineTestCase {
     subTaskTwo.setName("subtask two");
     subTaskTwo.setParentTaskId(gonzoTaskId);
     taskService.saveTask(subTaskTwo);
-    
+
     String subTaskId = subTaskOne.getId();
     assertTrue(taskService.getSubTasks(subTaskId).isEmpty());
     assertTrue(historyService
@@ -58,23 +58,23 @@ public class SubTaskTest extends PluggableProcessEngineTestCase {
       subTaskNames.add(subTask.getName());
     }
 
-    if (processEngineConfiguration.getHistoryLevel()>=ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT) {
+    if(processEngineConfiguration.getHistoryLevel().getId() >= HistoryLevel.HISTORY_LEVEL_AUDIT.getId()) {
       Set<String> expectedSubTaskNames = new HashSet<String>();
       expectedSubTaskNames.add("subtask one");
       expectedSubTaskNames.add("subtask two");
 
       assertEquals(expectedSubTaskNames, subTaskNames);
-      
+
       List<HistoricTaskInstance> historicSubTasks = historyService
         .createHistoricTaskInstanceQuery()
         .taskParentTaskId(gonzoTaskId)
         .list();
-      
+
       subTaskNames = new HashSet<String>();
       for (HistoricTaskInstance historicSubTask: historicSubTasks) {
         subTaskNames.add(historicSubTask.getName());
       }
-      
+
       assertEquals(expectedSubTaskNames, subTaskNames);
     }
 

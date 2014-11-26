@@ -12,26 +12,23 @@
  */
 package org.camunda.bpm.engine.rest.dto.runtime;
 
-import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
-import org.camunda.bpm.engine.impl.variable.SerializableType;
+import org.camunda.bpm.engine.rest.dto.VariableValueDto;
 import org.camunda.bpm.engine.runtime.VariableInstance;
 
 /**
  * @author roman.smirnov
  */
-public class VariableInstanceDto {
+public class VariableInstanceDto extends VariableValueDto {
 
-  private String id;
-  private String name;
-  private String type;
-  private Object value;
-  private String processInstanceId;
-  private String executionId;
-  private String caseInstanceId;
-  private String caseExecutionId;
-  private String taskId;
-  private String activityInstanceId;
-  private String errorMessage;
+  protected String id;
+  protected String name;
+  protected String processInstanceId;
+  protected String executionId;
+  protected String caseInstanceId;
+  protected String caseExecutionId;
+  protected String taskId;
+  protected String activityInstanceId;
+  protected String errorMessage;
 
   public VariableInstanceDto() { }
 
@@ -49,22 +46,6 @@ public class VariableInstanceDto {
 
   public void setName(String name) {
     this.name = name;
-  }
-
-  public String getType() {
-    return type;
-  }
-
-  public void setType(String type) {
-    this.type = type;
-  }
-
-  public Object getValue() {
-    return value;
-  }
-
-  public void setValue(Object value) {
-    this.value = value;
   }
 
   public String getProcessInstanceId() {
@@ -116,29 +97,26 @@ public class VariableInstanceDto {
   }
 
   public static VariableInstanceDto fromVariableInstance(VariableInstance variableInstance) {
-    VariableInstanceEntity entity = (VariableInstanceEntity) variableInstance;
-
     VariableInstanceDto dto = new VariableInstanceDto();
 
-    dto.setId(entity.getId());
-    dto.setName(entity.getName());
-    dto.setProcessInstanceId(entity.getProcessInstanceId());
-    dto.setExecutionId(entity.getExecutionId());
+    dto.id = variableInstance.getId();
+    dto.name = variableInstance.getName();
+    dto.processInstanceId = variableInstance.getProcessInstanceId();
+    dto.executionId = variableInstance.getExecutionId();
 
-    dto.caseExecutionId = entity.getCaseExecutionId();
-    dto.caseInstanceId = entity.getCaseInstanceId();
+    dto.caseExecutionId = variableInstance.getCaseExecutionId();
+    dto.caseInstanceId = variableInstance.getCaseInstanceId();
 
-    dto.setTaskId(entity.getTaskId());
-    dto.setActivityInstanceId(entity.getActivityInstanceId());
-    if(SerializableType.TYPE_NAME.equals(entity.getType().getTypeName())) {
-      if(entity.getValue() != null) {
-        dto.setValue(new SerializedObjectDto(entity.getValue()));
-      }
-    } else {
-      dto.setValue(entity.getValue());
+    dto.taskId = variableInstance.getTaskId();
+    dto.activityInstanceId = variableInstance.getActivityInstanceId();
+
+    if(variableInstance.getErrorMessage() == null) {
+      VariableValueDto.fromTypedValue(dto, variableInstance.getTypedValue());
     }
-    dto.setType(entity.getType().getTypeNameForValue(entity.getValue()));
-    dto.setErrorMessage(entity.getErrorMessage());
+    else {
+      dto.errorMessage = variableInstance.getErrorMessage();
+      dto.type = VariableValueDto.toRestApiTypeName(variableInstance.getTypeName());
+    }
 
     return dto;
   }

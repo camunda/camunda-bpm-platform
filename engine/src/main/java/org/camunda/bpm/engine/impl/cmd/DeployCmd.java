@@ -12,10 +12,24 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
+import java.io.ByteArrayInputStream;
+import java.io.Serializable;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.application.ProcessApplicationRegistration;
 import org.camunda.bpm.engine.impl.ProcessDefinitionQueryImpl;
+import org.camunda.bpm.engine.impl.bpmn.deployer.BpmnDeployer;
 import org.camunda.bpm.engine.impl.cfg.TransactionState;
+import org.camunda.bpm.engine.impl.cmmn.deployer.CmmnDeployer;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -27,19 +41,21 @@ import org.camunda.bpm.engine.impl.persistence.entity.ResourceEntity;
 import org.camunda.bpm.engine.impl.repository.DeploymentBuilderImpl;
 import org.camunda.bpm.engine.impl.repository.ProcessApplicationDeploymentBuilderImpl;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
+import org.camunda.bpm.engine.impl.util.StringUtil;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.ProcessApplicationDeploymentBuilder;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
-
-import java.io.Serializable;
-import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.camunda.bpm.model.bpmn.Bpmn;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.camunda.bpm.model.bpmn.instance.Process;
+import org.camunda.bpm.model.cmmn.Cmmn;
+import org.camunda.bpm.model.cmmn.CmmnModelInstance;
+import org.camunda.bpm.model.cmmn.instance.Case;
 
 /**
  * @author Tom Baeyens
  * @author Joram Barrez
- * @author Torben Lindhauer
+ * @author Thorben Lindhauer
  * @author Daniel Meyer
  */
 public class DeployCmd<T> implements Command<Deployment>, Serializable {
@@ -56,6 +72,37 @@ public class DeployCmd<T> implements Command<Deployment>, Serializable {
 
   public Deployment execute(CommandContext commandContext) {
 
+    acquireExclusiveLock(commandContext);
+    DeploymentEntity deployment = initDeployment();
+    Map<String, ResourceEntity> resourcesToDeploy = resolveResourcesToDeploy(commandContext, deployment);
+    Map<String, ResourceEntity> resourcesToIgnore = new HashMap<String, ResourceEntity>(deployment.getResources());
+    resourcesToIgnore.keySet().removeAll(resourcesToDeploy.keySet());
+
+    if (!resourcesToDeploy.isEmpty()) {
+      log.fine("Creating new deployment.");
+      deployment.setResources(resourcesToDeploy);
+      deploy(deployment);
+    } else {
+      log.fine("Using existing deployment.");
+      deployment = getExistingDeployment(commandContext, deployment.getName());
+    }
+
+    scheduleProcessDefinitionActivation(commandContext, deployment);
+
+    if(deploymentBuilder instanceof ProcessApplicationDeploymentBuilder) {
+      // for process application deployments, job executor registration is managed by
+      // process application manager
+      Set<String> processesToRegisterFor = retrieveProcessKeysFromResources(resourcesToIgnore);
+      ProcessApplicationRegistration registration = registerProcessApplication(commandContext, deployment, processesToRegisterFor);
+      return new ProcessApplicationDeploymentImpl(deployment, registration);
+    } else {
+      registerWithJobExecutor(commandContext, deployment);
+    }
+
+    return deployment;
+  }
+
+  protected void acquireExclusiveLock(CommandContext commandContext) {
     if (Context.getProcessEngineConfiguration().isDeploymentLockUsed()) {
       // Acquire global exclusive lock: this ensures that there can be only one
       // transaction in the cluster which is allowed to perform deployments.
@@ -64,75 +111,107 @@ public class DeployCmd<T> implements Command<Deployment>, Serializable {
 
       commandContext.getPropertyManager().acquireExclusiveLock();
     }
+  }
 
+  protected DeploymentEntity initDeployment() {
     DeploymentEntity deployment = deploymentBuilder.getDeployment();
-
     deployment.setDeploymentTime(ClockUtil.getCurrentTime());
+    return deployment;
+  }
 
-    DeploymentEntity existingDeployment = null;
-    if ( deploymentBuilder.isDuplicateFilterEnabled() ) {
-      existingDeployment = Context
-        .getCommandContext()
-        .getDeploymentManager()
-        .findLatestDeploymentByName(deployment.getName());
+  protected Map<String, ResourceEntity> resolveResourcesToDeploy(CommandContext commandContext, DeploymentEntity deployment) {
+    Map<String, ResourceEntity> resourcesToDeploy = new HashMap<String, ResourceEntity>();
+    Map<String, ResourceEntity> containedResources = deployment.getResources();
 
-      if (existingDeployment != null) {
-        log.fine("Found existing deployment "+existingDeployment+" checking resources.");
+    if (deploymentBuilder.isDuplicateFilterEnabled()) {
 
-        if (deploymentsDiffer(deployment, existingDeployment)) {
-          log.fine("Resources differ.");
-          existingDeployment = null;
+      Map<String, ResourceEntity> existingResources = commandContext
+          .getResourceManager()
+          .findLatestResourcesByDeploymentName(deployment.getName(), containedResources.keySet());
 
-        } else {
-          log.fine("Resources do not differ.");
+      for (ResourceEntity deployedResource : containedResources.values()) {
+        String resourceName = deployedResource.getName();
+        ResourceEntity existingResource = existingResources.get(resourceName);
 
+        if (existingResource == null
+            || existingResource.isGenerated()
+            || resourcesDiffer(deployedResource, existingResource)) {
+          // resource should be deployed
+
+          if (deploymentBuilder.isDeployChangedOnly()) {
+            resourcesToDeploy.put(resourceName, deployedResource);
+          } else {
+            // all resources should be deployed
+            resourcesToDeploy = containedResources;
+            break;
+          }
         }
-      } else {
-        log.fine("No existing deployment for name "+deployment.getName()+".");
-
       }
 
+    } else {
+      resourcesToDeploy = containedResources;
     }
 
-    if(existingDeployment == null) {
-      log.fine("Creating new deployment.");
-      deployment.setNew(true);
-      Context
-        .getCommandContext()
+    return resourcesToDeploy;
+  }
+
+  protected boolean resourcesDiffer(ResourceEntity resource, ResourceEntity existing) {
+    byte[] bytes = resource.getBytes();
+    byte[] savedBytes = existing.getBytes();
+    return !Arrays.equals(bytes, savedBytes);
+  }
+
+  protected void deploy(DeploymentEntity deployment) {
+    deployment.setNew(true);
+    Context
+      .getCommandContext()
+      .getDeploymentManager()
+      .insertDeployment(deployment);
+  }
+
+  protected DeploymentEntity getExistingDeployment(CommandContext commandContext, String deploymentName) {
+    return commandContext
         .getDeploymentManager()
-        .insertDeployment(deployment);
-    } else {
-      log.fine("Using existing deployment.");
-      deployment = existingDeployment;
-    }
+        .findLatestDeploymentByName(deploymentName);
+  }
 
+  protected void scheduleProcessDefinitionActivation(CommandContext commandContext, DeploymentEntity deployment) {
     if (deploymentBuilder.getProcessDefinitionsActivationDate() != null) {
-      scheduleProcessDefinitionActivation(commandContext, deployment);
-    }
+      for (ProcessDefinitionEntity processDefinitionEntity : deployment.getDeployedArtifacts(ProcessDefinitionEntity.class)) {
 
-    if(deploymentBuilder instanceof ProcessApplicationDeploymentBuilder) {
-      // for process application deployments, job executor registration is managed by
-      // process application manager
-      ProcessApplicationRegistration registration = registerProcessApplication(commandContext, deployment);
-      return new ProcessApplicationDeploymentImpl(deployment, registration);
+        // If activation date is set, we first suspend all the process definition
+        SuspendProcessDefinitionCmd suspendProcessDefinitionCmd =
+                new SuspendProcessDefinitionCmd(processDefinitionEntity, false, null);
+        suspendProcessDefinitionCmd.execute(commandContext);
 
-    } else {
-      registerWithJobExecutor(commandContext, deployment);
-      return deployment;
-
+        // And we schedule an activation at the provided date
+        ActivateProcessDefinitionCmd activateProcessDefinitionCmd =
+                new ActivateProcessDefinitionCmd(processDefinitionEntity, false, deploymentBuilder.getProcessDefinitionsActivationDate());
+        activateProcessDefinitionCmd.execute(commandContext);
+      }
     }
   }
 
-  protected ProcessApplicationRegistration registerProcessApplication(CommandContext commandContext, DeploymentEntity deployment) {
+  protected ProcessApplicationRegistration registerProcessApplication(CommandContext commandContext, DeploymentEntity deployment,
+      Set<String> additionalProcessKeysToRegisterFor) {
     ProcessApplicationDeploymentBuilderImpl appDeploymentBuilder = (ProcessApplicationDeploymentBuilderImpl) deploymentBuilder;
     final ProcessApplicationReference appReference = appDeploymentBuilder.getProcessApplicationReference();
 
-    boolean resumePreviousVersions = appDeploymentBuilder.isResumePreviousVersions();
-
     // build set of deployment ids this process app should be registered for:
     Set<String> deploymentsToRegister = new HashSet<String>(Collections.singleton(deployment.getId()));
-    if(resumePreviousVersions) {
-      resumePreviousVersions(commandContext, deployment, deploymentsToRegister);
+
+    if (appDeploymentBuilder.isResumePreviousVersions()) {
+      Set<String> processDefinitionKeys = new HashSet<String>();
+
+      List<ProcessDefinitionEntity> deployedProcesses = getDeployedProcesses(deployment);
+      for (ProcessDefinitionEntity deployedProcess : deployedProcesses) {
+        if (deployedProcess.getVersion() > 1) {
+          processDefinitionKeys.add(deployedProcess.getKey());
+        }
+      }
+
+      processDefinitionKeys.addAll(additionalProcessKeysToRegisterFor);
+      resumePreviousVersions(commandContext, processDefinitionKeys, deploymentsToRegister);
     }
 
     // register process application for deployments
@@ -141,7 +220,7 @@ public class DeployCmd<T> implements Command<Deployment>, Serializable {
   }
 
   @SuppressWarnings({ "unchecked", "rawtypes" })
-  protected void resumePreviousVersions(CommandContext commandContext, DeploymentEntity deployment, Set<String> deploymentsToRegister) {
+  protected List<ProcessDefinitionEntity> getDeployedProcesses(DeploymentEntity deployment) {
     List<ProcessDefinitionEntity> deployedProcessDefinitions = deployment.getDeployedArtifacts(ProcessDefinitionEntity.class);
     if(deployedProcessDefinitions == null) {
       // existing deployment
@@ -149,18 +228,52 @@ public class DeployCmd<T> implements Command<Deployment>, Serializable {
         .deploymentId(deployment.getId())
         .list();
     }
-    for (ProcessDefinitionEntity processDefinitionEntity : deployedProcessDefinitions) {
-      if(processDefinitionEntity.getVersion() > 1) {
 
-        // query for process definitions with the same key:
-        List<ProcessDefinition> previousVersionDefinition = new ProcessDefinitionQueryImpl(commandContext)
-          .processDefinitionKey(processDefinitionEntity.getKey())
-          .list();
+    return deployedProcessDefinitions;
+  }
 
-        // add their deployment IDs to the set of deployments to register
-        for (ProcessDefinition processDefinition : previousVersionDefinition) {
-          deploymentsToRegister.add(processDefinition.getDeploymentId());
+  protected Set<String> retrieveProcessKeysFromResources(Map<String, ResourceEntity> resources) {
+    Set<String> keys = new HashSet<String>();
+
+    for (ResourceEntity resource : resources.values()) {
+      if (isBpmnResource(resource)) {
+
+        ByteArrayInputStream byteStream = new ByteArrayInputStream(resource.getBytes());
+        BpmnModelInstance model = Bpmn.readModelFromStream(byteStream);
+        for (Process process : model.getDefinitions().getChildElementsByType(Process.class)) {
+          keys.add(process.getId());
         }
+      } else if (isCmmnResource(resource)) {
+
+        ByteArrayInputStream byteStream = new ByteArrayInputStream(resource.getBytes());
+        CmmnModelInstance model = Cmmn.readModelFromStream(byteStream);
+        for (Case cmmnCase : model.getDefinitions().getCases()) {
+          keys.add(cmmnCase.getId());
+        }
+      }
+    }
+
+    return keys;
+  }
+
+  protected boolean isBpmnResource(ResourceEntity resourceEntity) {
+    return StringUtil.hasAnySuffix(resourceEntity.getName(), BpmnDeployer.BPMN_RESOURCE_SUFFIXES);
+  }
+
+  protected boolean isCmmnResource(ResourceEntity resourceEntity) {
+    return StringUtil.hasAnySuffix(resourceEntity.getName(), CmmnDeployer.CMMN_RESOURCE_SUFFIXES);
+  }
+
+  protected void resumePreviousVersions(CommandContext commandContext, Set<String> processDefinitionKeys, Set<String> deploymentsToRegister) {
+    for (String processDefinitionKey : processDefinitionKeys) {
+      // query for process definitions with that key:
+      List<ProcessDefinition> previousVersionDefinition = new ProcessDefinitionQueryImpl(commandContext)
+        .processDefinitionKey(processDefinitionKey)
+        .list();
+
+      // add their deployment IDs to the set of deployments to register
+      for (ProcessDefinition processDefinition : previousVersionDefinition) {
+        deploymentsToRegister.add(processDefinition.getDeploymentId());
       }
     }
   }
@@ -180,70 +293,4 @@ public class DeployCmd<T> implements Command<Deployment>, Serializable {
       }
     }
   }
-
-  protected boolean deploymentsDiffer(DeploymentEntity deployment, DeploymentEntity saved) {
-    if(deployment.getResources() == null || saved.getResources() == null) {
-      return true;
-    }
-
-    Map<String, ResourceEntity> resources = deployment.getResources();
-    Map<String, ResourceEntity> savedResources = saved.getResources();
-
-    for (String resourceName: resources.keySet()) {
-      ResourceEntity savedResource = savedResources.get(resourceName);
-
-      if(savedResource == null) {
-        return true;
-      }
-
-      if(!savedResource.isGenerated()) {
-        ResourceEntity resource = resources.get(resourceName);
-
-        byte[] bytes = resource.getBytes();
-        byte[] savedBytes = savedResource.getBytes();
-        if (!Arrays.equals(bytes, savedBytes)) {
-          return true;
-        }
-      }
-    }
-    return false;
-  }
-
-  protected void scheduleProcessDefinitionActivation(CommandContext commandContext, DeploymentEntity deployment) {
-    for (ProcessDefinitionEntity processDefinitionEntity : deployment.getDeployedArtifacts(ProcessDefinitionEntity.class)) {
-
-      // If activation date is set, we first suspend all the process definition
-      SuspendProcessDefinitionCmd suspendProcessDefinitionCmd =
-              new SuspendProcessDefinitionCmd(processDefinitionEntity, false, null);
-      suspendProcessDefinitionCmd.execute(commandContext);
-
-      // And we schedule an activation at the provided date
-      ActivateProcessDefinitionCmd activateProcessDefinitionCmd =
-              new ActivateProcessDefinitionCmd(processDefinitionEntity, false, deploymentBuilder.getProcessDefinitionsActivationDate());
-      activateProcessDefinitionCmd.execute(commandContext);
-    }
-  }
-
-//  private boolean resourcesDiffer(ByteArrayEntity value, ByteArrayEntity other) {
-//    if (value == null && other == null) {
-//      return false;
-//    }
-//    String bytes = createKey(value.getBytes());
-//    String savedBytes = other == null ? null : createKey(other.getBytes());
-//    return !bytes.equals(savedBytes);
-//  }
-//
-//  private String createKey(byte[] bytes) {
-//    if (bytes == null) {
-//      return "";
-//    }
-//    MessageDigest digest;
-//    try {
-//      digest = MessageDigest.getInstance("MD5");
-//    } catch (NoSuchAlgorithmException e) {
-//      throw new IllegalStateException("MD5 algorithm not available.  Fatal (should be in the JDK).");
-//    }
-//    bytes = digest.digest(bytes);
-//    return String.format("%032x", new BigInteger(1, bytes));
-//  }
 }

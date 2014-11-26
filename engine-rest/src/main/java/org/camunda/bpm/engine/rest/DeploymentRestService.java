@@ -23,7 +23,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
 import java.util.List;
 
-@Path(DeploymentRestService.PATH)
 @Produces(MediaType.APPLICATION_JSON)
 public interface DeploymentRestService {
 

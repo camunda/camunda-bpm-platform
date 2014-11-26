@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -30,19 +30,20 @@ import org.camunda.bpm.engine.rest.dto.authorization.AuthorizationDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.impl.AbstractAuthorizedRestResource;
 import org.camunda.bpm.engine.rest.sub.authorization.AuthorizationResource;
+import org.codehaus.jackson.map.ObjectMapper;
 
 /**
- * 
+ *
  * @author Daniel Meyer
- * 
+ *
  */
 public class AuthorizationResourceImpl extends AbstractAuthorizedRestResource implements AuthorizationResource {
 
   protected final AuthorizationService authorizationService;
   protected String relativeRootResourcePath;
 
-  public AuthorizationResourceImpl(String processEngineName, String resourceId, String relativeRootResourcePath) {
-    super(processEngineName, AUTHORIZATION, resourceId);
+  public AuthorizationResourceImpl(String processEngineName, String resourceId, String relativeRootResourcePath, ObjectMapper objectMapper) {
+    super(processEngineName, AUTHORIZATION, resourceId, objectMapper);
     this.relativeRootResourcePath = relativeRootResourcePath;
     authorizationService = processEngine.getAuthorizationService();
   }
@@ -68,26 +69,26 @@ public class AuthorizationResourceImpl extends AbstractAuthorizedRestResource im
     // save
     authorizationService.saveAuthorization(dbAuthorization);
   }
-  
+
   public ResourceOptionsDto availableOperations(UriInfo context) {
 
     ResourceOptionsDto dto = new ResourceOptionsDto();
 
     URI uri = context.getBaseUriBuilder()
         .path(relativeRootResourcePath)
-        .path(AuthorizationRestService.class)
+        .path(AuthorizationRestService.PATH)
         .path(resourceId)
         .build();
-    
+
     dto.addReflexiveLink(uri, HttpMethod.GET, "self");
-    
+
     if (isAuthorized(DELETE)) {
       dto.addReflexiveLink(uri, HttpMethod.DELETE, "delete");
     }
     if (isAuthorized(UPDATE)) {
       dto.addReflexiveLink(uri, HttpMethod.PUT, "update");
     }
-    
+
     return dto;
   }
 

@@ -24,7 +24,7 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.HistoricIncident;
 import org.camunda.bpm.engine.impl.cmd.DeleteJobsCmd;
 import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.db.PersistentObject;
+import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
@@ -126,6 +126,23 @@ public class JobQueryTest extends PluggableProcessEngineTestCase {
   public void testQueryByNoCriteria() {
     JobQuery query = managementService.createJobQuery();
     verifyQueryResults(query, 4);
+  }
+
+  public void testQueryByActivityId(){
+    JobDefinition jobDefinition = managementService.createJobDefinitionQuery().singleResult();
+
+    JobQuery query = managementService.createJobQuery().activityId(jobDefinition.getActivityId());
+    verifyQueryResults(query, 3);
+  }
+
+  public void testQueryByInvalidActivityId(){
+    JobQuery query = managementService.createJobQuery().activityId("invalid");
+    verifyQueryResults(query, 0);
+
+    try {
+      managementService.createJobQuery().activityId(null).list();
+      fail();
+    } catch (ProcessEngineException e) {}
   }
 
   public void testByJobDefinitionId() {
@@ -470,7 +487,7 @@ public class JobQueryTest extends PluggableProcessEngineTestCase {
     commandExecutor.execute(new Command<Void>() {
 
       public Void execute(CommandContext commandContext) {
-        JobEntity timer = commandContext.getDbSqlSession().selectById(JobEntity.class, job.getId());
+        JobEntity timer = commandContext.getDbEntityManager().selectById(JobEntity.class, job.getId());
         timer.setRetries(retries);
         return null;
       }
@@ -594,8 +611,8 @@ public class JobQueryTest extends PluggableProcessEngineTestCase {
 
           for (HistoricIncident historicIncident : historicIncidents) {
             commandContext
-              .getDbSqlSession()
-              .delete((PersistentObject) historicIncident);
+              .getDbEntityManager()
+              .delete((DbEntity) historicIncident);
           }
 
           return null;

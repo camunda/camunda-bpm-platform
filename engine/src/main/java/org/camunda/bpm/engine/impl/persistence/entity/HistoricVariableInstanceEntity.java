@@ -17,18 +17,23 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.db.HasRevision;
-import org.camunda.bpm.engine.impl.db.PersistentObject;
+import org.camunda.bpm.engine.impl.db.DbEntityLifecycleAware;
+import org.camunda.bpm.engine.impl.db.HasDbRevision;
+import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoricVariableUpdateEventEntity;
-import org.camunda.bpm.engine.impl.variable.ValueFields;
-import org.camunda.bpm.engine.impl.variable.VariableType;
+import org.camunda.bpm.engine.impl.variable.serializer.ValueFields;
+import org.camunda.bpm.engine.impl.variable.serializer.TypedValueSerializer;
+import org.camunda.bpm.engine.impl.variable.serializer.VariableSerializers;
+import org.camunda.bpm.engine.variable.type.ValueType;
+import org.camunda.bpm.engine.variable.value.TypedValue;
 
 /**
  * @author Christian Lipphardt (camunda)
  */
-public class HistoricVariableInstanceEntity implements ValueFields, HistoricVariableInstance, PersistentObject, HasRevision, Serializable {
+public class HistoricVariableInstanceEntity implements ValueFields, HistoricVariableInstance, DbEntity, HasDbRevision, Serializable, DbEntityLifecycleAware {
 
   private static final long serialVersionUID = 1L;
 
@@ -39,10 +44,13 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
   protected String executionId;
   protected String activityInstanceId;
 
+  protected String caseInstanceId;
+  protected String caseExecutionId;
+
   protected String name;
   protected int revision;
-  protected String variableTypeName;
-  protected VariableType variableType;
+  protected String serializerName;
+  protected TypedValueSerializer<?> serializer;
 
   protected Long longValue;
   protected Double doubleValue;
@@ -52,10 +60,9 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
   protected ByteArrayEntity byteArrayValue;
   protected String byteArrayId;
 
-  protected Object cachedValue;
+  protected TypedValue cachedValue;
 
   protected String errorMessage;
-
 
   public HistoricVariableInstanceEntity() {
   }
@@ -70,8 +77,10 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
     this.taskId = historyEvent.getTaskId();
     this.executionId = historyEvent.getExecutionId();
     this.activityInstanceId = historyEvent.getScopeActivityInstanceId();
+    this.caseInstanceId = historyEvent.getCaseInstanceId();
+    this.caseExecutionId = historyEvent.getCaseExecutionId();
     this.name = historyEvent.getVariableName();
-    this.variableTypeName = historyEvent.getVariableTypeName();
+    this.serializerName = historyEvent.getSerializerName();
     this.longValue = historyEvent.getLongValue();
     this.doubleValue = historyEvent.getDoubleValue();
     this.textValue = historyEvent.getTextValue();
@@ -88,13 +97,13 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
     deleteByteArrayValue();
     Context
       .getCommandContext()
-      .getDbSqlSession()
+      .getDbEntityManager()
       .delete(this);
   }
 
   public Object getPersistentState() {
     List<Object> state = new ArrayList<Object>(5);
-    state.add(variableTypeName);
+    state.add(serializerName);
     state.add(textValue);
     state.add(textValue2);
     state.add(doubleValue);
@@ -108,19 +117,53 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
   }
 
   public Object getValue() {
-    if (errorMessage == null && (!variableType.isCachable() || cachedValue==null)) {
+    TypedValue typedValue = getTypedValue();
+    if(typedValue != null) {
+      return typedValue.getValue();
+    } else {
+      return null;
+    }
+  }
+
+  public TypedValue getTypedValue() {
+    return getTypedValue(true);
+  }
+
+  public TypedValue getTypedValue(boolean deserializeValue) {
+    if (cachedValue == null && errorMessage == null) {
       try {
-        cachedValue = variableType.getValue(this);
-
-      } catch(RuntimeException e) {
-        // catch error message
-        errorMessage = e.getMessage();
-
-        //re-throw the exception
+        cachedValue = getSerializer().readValue(this, deserializeValue);
+      }
+      catch(RuntimeException e) {
+        // intercept the error message
+        this.errorMessage = e.getMessage();
         throw e;
       }
     }
     return cachedValue;
+  }
+
+  public TypedValueSerializer<?> getSerializer() {
+    ensureSerializerInitialized();
+    return serializer;
+  }
+
+  protected void ensureSerializerInitialized() {
+    if (serializerName != null && serializer == null) {
+      serializer = getSerializers().getSerializerByName(serializerName);
+      if (serializer == null) {
+        throw new ProcessEngineException("No serializer defined for variable instance '" + this + "'.");
+      }
+    }
+  }
+
+  public static VariableSerializers getSerializers() {
+    if(Context.getCommandContext() != null) {
+      return Context.getProcessEngineConfiguration()
+          .getVariableSerializers();
+    } else {
+      throw new ProcessEngineException("Cannot work with serializers outside of command context.");
+    }
   }
 
  // byte array value /////////////////////////////////////////////////////////
@@ -148,7 +191,7 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
       if(Context.getCommandContext() != null) {
         byteArrayValue = Context
           .getCommandContext()
-          .getDbSqlSession()
+          .getDbEntityManager()
           .selectById(ByteArrayEntity.class, byteArrayId);
       }
     }
@@ -162,7 +205,7 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
       byteArrayValue = new ByteArrayEntity(name, bytes);
       Context
         .getCommandContext()
-        .getDbSqlSession()
+        .getDbEntityManager()
         .insert(byteArrayValue);
     }
     this.byteArrayValue = byteArrayValue;
@@ -186,18 +229,37 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
     }
   }
 
+  // entity lifecycle /////////////////////////////////////////////////////////
+
+  public void postLoad() {
+    // make sure the serializer is initialized
+    ensureSerializerInitialized();
+  }
+
   // getters and setters //////////////////////////////////////////////////////
 
+  public String getSerializerName() {
+    return serializerName;
+  }
+
+  public void setSerializerName(String serializerName) {
+    this.serializerName = serializerName;
+  }
+
+  public String getTypeName() {
+    if(serializerName == null) {
+      return ValueType.NULL.getName();
+    } else {
+      return getSerializer().getType().getName();
+    }
+  }
+
   public String getVariableTypeName() {
-    return variableTypeName;
+    return getTypeName();
   }
 
   public String getVariableName() {
     return name;
-  }
-
-  public VariableType getVariableType() {
-    return variableType;
   }
 
   public int getRevision() {
@@ -252,18 +314,6 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
     this.byteArrayValue = byteArrayValue;
   }
 
-  public Object getCachedValue() {
-    return cachedValue;
-  }
-
-  public void setCachedValue(Object cachedValue) {
-    this.cachedValue = cachedValue;
-  }
-
-  public void setVariableType(VariableType variableType) {
-    this.variableType = variableType;
-  }
-
   public void setProcessInstanceId(String processInstanceId) {
     this.processInstanceId = processInstanceId;
   }
@@ -296,12 +346,33 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
     this.executionId = executionId;
   }
 
+  @Deprecated
   public String getActivtyInstanceId() {
     return activityInstanceId;
   }
 
-  public void setActivtyInstanceId(String activityInstanceId) {
+  public String getActivityInstanceId() {
+    return activityInstanceId;
+  }
+
+  public void setActivityInstanceId(String activityInstanceId) {
     this.activityInstanceId = activityInstanceId;
+  }
+
+  public String getCaseInstanceId() {
+    return caseInstanceId;
+  }
+
+  public void setCaseInstanceId(String caseInstanceId) {
+    this.caseInstanceId = caseInstanceId;
+  }
+
+  public String getCaseExecutionId() {
+    return caseExecutionId;
+  }
+
+  public void setCaseExecutionId(String caseExecutionId) {
+    this.caseExecutionId = caseExecutionId;
   }
 
   public String getErrorMessage() {
@@ -311,20 +382,22 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
   @Override
   public String toString() {
     return this.getClass().getSimpleName()
-           + "[id=" + id
-           + ", processInstanceId=" + processInstanceId
-           + ", taskId=" + taskId
-           + ", executionId=" + executionId
-           + ", activityInstanceId=" + activityInstanceId
-           + ", name=" + name
-           + ", revision=" + revision
-           + ", variableTypeName=" + variableTypeName
-           + ", longValue=" + longValue
-           + ", doubleValue=" + doubleValue
-           + ", textValue=" + textValue
-           + ", textValue2=" + textValue2
-           + ", byteArrayId=" + byteArrayId
-           + "]";
+      + "[id=" + id
+      + ", processInstanceId=" + processInstanceId
+      + ", taskId=" + taskId
+      + ", executionId=" + executionId
+      + ", activityInstanceId=" + activityInstanceId
+      + ", caseInstanceId=" + caseInstanceId
+      + ", caseExecutionId=" + caseExecutionId
+      + ", name=" + name
+      + ", revision=" + revision
+      + ", serializerName=" + serializerName
+      + ", longValue=" + longValue
+      + ", doubleValue=" + doubleValue
+      + ", textValue=" + textValue
+      + ", textValue2=" + textValue2
+      + ", byteArrayId=" + byteArrayId
+      + "]";
   }
 
 }

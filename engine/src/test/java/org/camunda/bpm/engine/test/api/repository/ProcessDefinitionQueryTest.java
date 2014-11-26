@@ -229,16 +229,6 @@ public class ProcessDefinitionQueryTest extends PluggableProcessEngineTestCase {
     } catch (ProcessEngineException e) {}
 
     try {
-      repositoryService.createProcessDefinitionQuery().processDefinitionName("test").latestVersion().list();
-      fail();
-    } catch (ProcessEngineException e) {}
-
-    try {
-      repositoryService.createProcessDefinitionQuery().processDefinitionNameLike("test").latestVersion().list();
-      fail();
-    } catch (ProcessEngineException e) {}
-
-    try {
       repositoryService.createProcessDefinitionQuery().processDefinitionVersion(1).latestVersion().list();
       fail();
     } catch (ProcessEngineException e) {}
@@ -461,6 +451,165 @@ public class ProcessDefinitionQueryTest extends PluggableProcessEngineTestCase {
       query.incidentMessageLike(null);
       fail();
     } catch (ProcessEngineException e) {}
+  }
+
+  public void testQueryByProcessDefinitionIds() {
+
+    // empty list
+    assertTrue(repositoryService.createProcessDefinitionQuery().processDefinitionIdIn("a", "b").list().isEmpty());
+
+
+    // collect all ids
+    List<ProcessDefinition> list = repositoryService.createProcessDefinitionQuery().list();
+    String[] ids = new String[list.size()];
+    for (int i = 0; i < ids.length; i++) {
+      ids[i] = list.get(i).getId();
+    }
+
+    List<ProcessDefinition> idInList = repositoryService.createProcessDefinitionQuery().processDefinitionIdIn(ids).list();
+    for (ProcessDefinition processDefinition : idInList) {
+      boolean found = false;
+      for (ProcessDefinition otherProcessDefinition : list) {
+        if(otherProcessDefinition.getId().equals(processDefinition.getId())) {
+          found = true; break;
+        }
+      }
+      if(!found) {
+        fail("Expected to find process definition "+processDefinition);
+      }
+    }
+  }
+
+  public void testQueryByLatestAndName() {
+    String firstDeployment = repositoryService
+        .createDeployment()
+        .addClasspathResource("org/camunda/bpm/engine/test/api/repository/first-process.bpmn20.xml")
+        .deploy()
+        .getId();
+
+    String secondDeployment = repositoryService
+        .createDeployment()
+        .addClasspathResource("org/camunda/bpm/engine/test/api/repository/first-process.bpmn20.xml")
+        .deploy()
+        .getId();
+
+    ProcessDefinitionQuery query = repositoryService.createProcessDefinitionQuery();
+
+    query
+      .processDefinitionName("First Test Process")
+      .latestVersion();
+
+    verifyQueryResults(query, 1);
+
+    ProcessDefinition result = query.singleResult();
+
+    assertEquals("First Test Process", result.getName());
+    assertEquals(2, result.getVersion());
+
+    repositoryService.deleteDeployment(firstDeployment, true);
+    repositoryService.deleteDeployment(secondDeployment, true);
+
+  }
+
+  public void testQueryByLatestAndName_NotFound() {
+    String firstDeployment = repositoryService
+        .createDeployment()
+        .addClasspathResource("org/camunda/bpm/engine/test/api/repository/first-process.bpmn20.xml")
+        .deploy()
+        .getId();
+
+    String secondDeployment = repositoryService
+        .createDeployment()
+        .addClasspathResource("org/camunda/bpm/engine/test/api/repository/second-process.bpmn20.xml")
+        .deploy()
+        .getId();
+
+    ProcessDefinitionQuery query = repositoryService.createProcessDefinitionQuery();
+
+    query
+      .processDefinitionName("First Test Process")
+      .latestVersion();
+
+    verifyQueryResults(query, 0);
+
+    repositoryService.deleteDeployment(firstDeployment, true);
+    repositoryService.deleteDeployment(secondDeployment, true);
+
+  }
+
+  public void testQueryByLatestAndNameLike() {
+    String firstDeployment = repositoryService
+        .createDeployment()
+        .addClasspathResource("org/camunda/bpm/engine/test/api/repository/first-process.bpmn20.xml")
+        .deploy()
+        .getId();
+
+    String secondDeployment = repositoryService
+        .createDeployment()
+        .addClasspathResource("org/camunda/bpm/engine/test/api/repository/second-process.bpmn20.xml")
+        .deploy()
+        .getId();
+
+    ProcessDefinitionQuery query = repositoryService.createProcessDefinitionQuery();
+
+    query
+      .processDefinitionNameLike("%Test Process")
+      .latestVersion();
+
+    verifyQueryResults(query, 1);
+
+    ProcessDefinition result = query.singleResult();
+
+    assertEquals("Second Test Process", result.getName());
+    assertEquals(2, result.getVersion());
+
+    query
+      .processDefinitionNameLike("%Test%")
+      .latestVersion();
+
+    verifyQueryResults(query, 1);
+
+    result = query.singleResult();
+
+    assertEquals("Second Test Process", result.getName());
+    assertEquals(2, result.getVersion());
+
+    query
+      .processDefinitionNameLike("Second%")
+      .latestVersion();
+
+    result = query.singleResult();
+
+    assertEquals("Second Test Process", result.getName());
+    assertEquals(2, result.getVersion());
+
+    repositoryService.deleteDeployment(firstDeployment, true);
+    repositoryService.deleteDeployment(secondDeployment, true);
+  }
+
+  public void testQueryByLatestAndNameLike_NotFound() {
+    String firstDeployment = repositoryService
+        .createDeployment()
+        .addClasspathResource("org/camunda/bpm/engine/test/api/repository/first-process.bpmn20.xml")
+        .deploy()
+        .getId();
+
+    String secondDeployment = repositoryService
+        .createDeployment()
+        .addClasspathResource("org/camunda/bpm/engine/test/api/repository/second-process.bpmn20.xml")
+        .deploy()
+        .getId();
+
+    ProcessDefinitionQuery query = repositoryService.createProcessDefinitionQuery();
+
+    query
+      .processDefinitionNameLike("First%")
+      .latestVersion();
+
+    verifyQueryResults(query, 0);
+
+    repositoryService.deleteDeployment(firstDeployment, true);
+    repositoryService.deleteDeployment(secondDeployment, true);
   }
 
 }

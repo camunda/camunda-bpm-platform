@@ -19,29 +19,27 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.Provider;
 
+import org.camunda.bpm.engine.rest.hal.Hal;
 import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.SerializationConfig;
 
 @Provider
-@Produces(MediaType.APPLICATION_JSON)
+@Produces({MediaType.APPLICATION_JSON, Hal.APPLICATION_HAL_JSON})
 public class JacksonConfigurator implements ContextResolver<ObjectMapper> {
 
-  ObjectMapper mapper;
-
-  public JacksonConfigurator() {
-    mapper = new ObjectMapper();
-
+  public static ObjectMapper configureObjectMapper(ObjectMapper mapper) {
     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
     mapper.getSerializationConfig().setDateFormat(dateFormat);
     mapper.getDeserializationConfig().setDateFormat(dateFormat);
     mapper.configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     mapper.configure(SerializationConfig.Feature.WRITE_DATES_AS_TIMESTAMPS, false);
+    return mapper;
   }
 
   @Override
   public ObjectMapper getContext(Class<?> clazz) {
-    return mapper;
+    return configureObjectMapper(new ObjectMapper());
   }
 
 }

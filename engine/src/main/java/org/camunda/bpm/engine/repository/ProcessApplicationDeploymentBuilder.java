@@ -18,6 +18,7 @@ import java.util.zip.ZipInputStream;
 
 import org.camunda.bpm.application.ProcessApplication;
 import org.camunda.bpm.application.ProcessApplicationInterface;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 
 /**
  * <p>Builder for a {@link ProcessApplication} deployment</p>
@@ -53,11 +54,16 @@ public interface ProcessApplicationDeploymentBuilder extends DeploymentBuilder {
   /* {@inheritDoc} */
   ProcessApplicationDeploymentBuilder addString(String resourceName, String text);
   /* {@inheritDoc} */
+  ProcessApplicationDeploymentBuilder addModelInstance(String resourceName, BpmnModelInstance modelInstance);
+  /* {@inheritDoc} */
   ProcessApplicationDeploymentBuilder addZipInputStream(ZipInputStream zipInputStream);
   /* {@inheritDoc} */
   ProcessApplicationDeploymentBuilder name(String name);
   /* {@inheritDoc} */
+  @Deprecated
   ProcessApplicationDeploymentBuilder enableDuplicateFiltering();
+  /* {@inheritDoc} */
+  ProcessApplicationDeploymentBuilder enableDuplicateFiltering(boolean deployChangedOnly);
   /* {@inheritDoc} */
   ProcessApplicationDeploymentBuilder activateProcessDefinitionsOn(Date date);
 

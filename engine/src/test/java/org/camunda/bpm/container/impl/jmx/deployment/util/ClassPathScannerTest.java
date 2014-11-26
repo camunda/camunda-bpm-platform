@@ -28,7 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.camunda.bpm.container.impl.jmx.deployment.scanning.ClassPathProcessApplicationScanner;
+import org.camunda.bpm.container.impl.deployment.scanning.ClassPathProcessApplicationScanner;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -52,6 +52,7 @@ public class ClassPathScannerTest {
             { "file:src/test/resources/org/camunda/bpm/container/impl/jmx/deployment/util/ClassPathScannerTest.testScanClassPathWithFiles/" },
             { "file:src/test/resources/org/camunda/bpm/container/impl/jmx/deployment/util/ClassPathScannerTest.testScanClassPathWithFilesRecursive/" },
             { "file:src/test/resources/org/camunda/bpm/container/impl/jmx/deployment/util/ClassPathScannerTest.testScanClassPathWithFilesRecursiveTwoDirectories/" },
+            { "file:src/test/resources/org/camunda/bpm/container/impl/jmx/deployment/util/ClassPathScannerTest.testScanClassPathWithAdditionalResourceSuffixes/" },
             { "file:src/test/resources/org/camunda/bpm/container/impl/jmx/deployment/util/ClassPathScannerTest.testScanClassPath.jar" },
             { "file:src/test/resources/org/camunda/bpm/container/impl/jmx/deployment/util/ClassPathScannerTest.testScanClassPathRecursive.jar" },
             { "file:src/test/resources/org/camunda/bpm/container/impl/jmx/deployment/util/ClassPathScannerTest.testScanClassPathRecursiveTwoDirectories.jar" },
@@ -69,7 +70,7 @@ public class ClassPathScannerTest {
   }
   
   /**
-   * Test method for {@link org.camunda.bpm.container.impl.jmx.deployment.scanning.ClassPathProcessApplicationScanner#scanClassPath(java.lang.ClassLoader)}.
+   * Test method for {@link org.camunda.bpm.container.impl.deployment.scanning.ClassPathProcessApplicationScanner#scanClassPath(java.lang.ClassLoader)}.
    * @throws MalformedURLException 
    */
   @Test
@@ -151,6 +152,19 @@ public class ClassPathScannerTest {
       assertFalse("'testDeployProcessArchive.bpmn20.xml' found", contains(scanResult, "testDeployProcessArchive.bpmn20.xml"));
       assertFalse("'testDeployProcessArchive.png' found", contains(scanResult, "testDeployProcessArchive.png"));
       assertEquals(0, scanResult.size());
+    }
+  }
+
+  @Test
+  public void testScanClassPathWithAdditionalResourceSuffixes() throws MalformedURLException {
+    URLClassLoader classLoader = getClassloader();
+
+    String[] additionalResourceSuffixes = new String[] {"py", "rb", "groovy"};
+
+    Map<String, byte[]> scanResult = scanner.findResources(classLoader, null, new URL(url + "/META-INF/processes.xml"), additionalResourceSuffixes);
+
+    if (url.contains("AdditionalResourceSuffixes")) {
+      assertEquals(5, scanResult.size());
     }
   }
   

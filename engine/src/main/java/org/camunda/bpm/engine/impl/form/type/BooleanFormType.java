@@ -14,19 +14,39 @@
 package org.camunda.bpm.engine.impl.form.type;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.value.BooleanValue;
+import org.camunda.bpm.engine.variable.value.TypedValue;
 
 /**
  * @author Frederik Heremans
  */
-public class BooleanFormType extends AbstractFormFieldType {
+public class BooleanFormType extends SimpleFormFieldType {
+
+  public final static String TYPE_NAME = "boolean";
 
   public String getName() {
-    return "boolean";
+    return TYPE_NAME;
   }
 
-  public String getMimeType() {
-    return "plain/text";
+  public TypedValue convertValue(TypedValue propertyValue) {
+    if(propertyValue instanceof BooleanValue) {
+      return propertyValue;
+    }
+    else {
+      Object value = propertyValue.getValue();
+      if(value == null) {
+        return Variables.booleanValue(null);
+      }
+      else if((value instanceof Boolean) || (value instanceof String)) {
+        return Variables.booleanValue(new Boolean(value.toString()));
+      }
+      else {
+        throw new ProcessEngineException("Value '"+value+"' is not of type Boolean.");
+      }
+    }
   }
+  // deprecated /////////////////////////////////////////////////
 
   public Object convertFormValueToModelValue(Object propertyValue) {
     if (propertyValue==null || "".equals(propertyValue)) {
@@ -47,4 +67,5 @@ public class BooleanFormType extends AbstractFormFieldType {
     }
     throw new ProcessEngineException("Model value is not of type boolean, but of type " + modelValue.getClass().getName());
   }
+
 }

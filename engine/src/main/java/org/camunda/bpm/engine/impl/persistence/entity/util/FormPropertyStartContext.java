@@ -12,19 +12,11 @@
  */
 package org.camunda.bpm.engine.impl.persistence.entity.util;
 
-import java.util.Map;
-
-import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.form.handler.StartFormHandler;
-import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
-import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
-import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
-import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.form.FormPropertyHelper;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoryAwareStartContext;
-import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
+import org.camunda.bpm.engine.variable.VariableMap;
 
 /**
  * @author Daniel Meyer
@@ -32,7 +24,7 @@ import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
  */
 public class FormPropertyStartContext extends HistoryAwareStartContext {
 
-  protected Map<String, Object> formProperties;
+  protected VariableMap formProperties;
 
   public FormPropertyStartContext(ActivityImpl selectedInitial) {
     super(selectedInitial);
@@ -41,34 +33,12 @@ public class FormPropertyStartContext extends HistoryAwareStartContext {
   /**
    * @param properties
    */
-  public void setFormProperties(Map<String, Object> properties) {
+  public void setFormProperties(VariableMap properties) {
     this.formProperties = properties;
   }
 
   public void initialStarted(PvmExecutionImpl execution) {
-
-    final ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
-    int historyLevel = processEngineConfiguration.getHistoryLevel();
-    if (historyLevel >= ProcessEngineConfigurationImpl.HISTORYLEVEL_ACTIVITY) {
-
-      if (historyLevel >= ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT) {
-
-        final HistoryEventProducer eventProducer = processEngineConfiguration.getHistoryEventProducer();
-        final HistoryEventHandler eventHandler = processEngineConfiguration.getHistoryEventHandler();
-
-        for (String propertyId : formProperties.keySet()) {
-          Object propertyValue = formProperties.get(propertyId);
-          HistoryEvent evt = eventProducer.createFormPropertyUpdateEvt((ExecutionEntity) execution, propertyId, propertyValue, null);
-          eventHandler.handleEvent(evt);
-        }
-
-      }
-    }
-
-
-    ProcessDefinitionEntity pd = (ProcessDefinitionEntity) execution.getProcessDefinition();
-    StartFormHandler startFormHandler = pd.getStartFormHandler();
-    startFormHandler.submitFormProperties(formProperties, (ExecutionEntity) execution);
+    FormPropertyHelper.initFormPropertiesOnScope(formProperties, execution);
 
     // make sure create events are fired after form is submitted
     super.initialStarted(execution);

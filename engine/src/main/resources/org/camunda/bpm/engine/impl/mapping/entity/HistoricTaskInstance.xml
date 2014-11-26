@@ -17,15 +17,18 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="org.camunda.bpm.engine.impl.persistence.entity.HistoricTaskInstanceEntity">
-  
+
   <!-- HISTORIC TASK INSTANCE INSERT -->
-  
+
   <insert id="insertHistoricTaskInstanceEvent" parameterType="org.camunda.bpm.engine.impl.history.event.HistoricTaskInstanceEventEntity">
       insert into ${prefix}ACT_HI_TASKINST (
         ID_,
         PROC_DEF_ID_,
         PROC_INST_ID_,
         EXECUTION_ID_,
+        CASE_DEF_ID_,
+        CASE_INST_ID_,
+        CASE_EXECUTION_ID_,
         ACT_INST_ID_,
         NAME_,
         PARENT_TASK_ID_,
@@ -45,6 +48,9 @@
         #{processDefinitionId, jdbcType=VARCHAR},
         #{processInstanceId, jdbcType=VARCHAR},
         #{executionId, jdbcType=VARCHAR},
+        #{caseDefinitionId, jdbcType=VARCHAR},
+        #{caseInstanceId, jdbcType=VARCHAR},
+        #{caseExecutionId, jdbcType=VARCHAR},
         #{activityInstanceId, jdbcType=VARCHAR},
         #{name ,jdbcType=VARCHAR},
         #{parentTaskId ,jdbcType=VARCHAR},
@@ -63,7 +69,7 @@
   </insert>
 
   <!-- HISTORIC TASK INSTANCE UPDATE -->
-  
+
   <update id="updateHistoricTaskInstanceEvent" parameterType="org.camunda.bpm.engine.impl.persistence.entity.HistoricTaskInstanceEntity">
     update ${prefix}ACT_HI_TASKINST set
       EXECUTION_ID_ = #{executionId, jdbcType=VARCHAR},
@@ -76,24 +82,25 @@
       TASK_DEF_KEY_ = #{taskDefinitionKey ,jdbcType=VARCHAR},
       PRIORITY_ = #{priority, jdbcType=INTEGER},
       DUE_DATE_ = #{dueDate, jdbcType=TIMESTAMP},
-      FOLLOW_UP_DATE_ = #{followUpDate, jdbcType=TIMESTAMP}
+      FOLLOW_UP_DATE_ = #{followUpDate, jdbcType=TIMESTAMP},
+      CASE_INST_ID_ = #{caseInstanceId, jdbcType=VARCHAR}
       <if test="endTime!=null">
         , END_TIME_ = #{endTime, jdbcType=TIMESTAMP}
         , DURATION_ = #{durationInMillis, jdbcType=BIGINT}
-      </if>  
-             
+      </if>
+
     where ID_ = #{id, jdbcType=VARCHAR}
   </update>
-  
+
   <!-- HISTORIC TASK INSTANCE SELECT -->
-  
+
   <select id="selectHistoricTaskInstanceEvent" parameterType="java.lang.String" resultMap="historicTaskInstanceResultMap">
-    select HTI.START_TIME_ from ${prefix}ACT_HI_TASKINST HTI              
+    select HTI.START_TIME_ from ${prefix}ACT_HI_TASKINST HTI
     where HTI.ID_ = #{id, jdbcType=VARCHAR}
   </select>
-    
+
   <!-- HISTORIC TASK INSTANCE DELETE -->
-  
+
   <delete id="deleteHistoricTaskInstance" parameterType="org.camunda.bpm.engine.impl.persistence.entity.HistoricTaskInstanceEntity">
     delete from ${prefix}ACT_HI_TASKINST where ID_ = #{id}
   </delete>
@@ -105,6 +112,9 @@
     <result property="processDefinitionId" column="PROC_DEF_ID_" jdbcType="VARCHAR" />
     <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR" />
     <result property="executionId" column="EXECUTION_ID_" jdbcType="VARCHAR" />
+    <result property="caseDefinitionId" column="CASE_DEF_ID_" jdbcType="VARCHAR" />
+    <result property="caseInstanceId" column="CASE_INST_ID_" jdbcType="VARCHAR" />
+    <result property="caseExecutionId" column="CASE_EXECUTION_ID_" jdbcType="VARCHAR" />
     <result property="activityInstanceId" column="ACT_INST_ID_" jdbcType="VARCHAR" />
     <result property="name" column="NAME_" jdbcType="VARCHAR" />
     <result property="parentTaskId" column="PARENT_TASK_ID_" jdbcType="VARCHAR" />
@@ -122,15 +132,28 @@
   </resultMap>
 
   <!-- HISTORIC TASK INSTANCE SELECT -->
-  
+
   <select id="selectHistoricTaskInstance" resultMap="historicTaskInstanceResultMap">
     select * from ${prefix}ACT_HI_TASKINST where ID_ = #{historicTaskInstanceId}
   </select>
-  
-  <select id="selectHistoricTaskInstanceIdsByProcessInstanceId" resultType="string" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" >
-    select ID_ 
-    from ${prefix}ACT_HI_TASKINST 
-    where PROC_INST_ID_ = #{parameter}
+
+  <select id="selectHistoricTaskInstanceIdsByParameters" resultType="string" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
+    select ID_
+    from ${prefix}ACT_HI_TASKINST
+    <where>
+      <if test="parameter.processInstanceId != null">
+        PROC_INST_ID_ = #{parameter.processInstanceId, jdbcType=VARCHAR}
+      </if>
+      <if test="parameter.processDefinitionId != null">
+        and PROC_DEF_ID_ = #{parameter.processDefinitionId, jdbcType=VARCHAR}
+      </if>
+      <if test="parameter.caseInstanceId != null">
+        and CASE_INST_ID_ = #{parameter.caseInstanceId, jdbcType=VARCHAR}
+      </if>
+      <if test="parameter.caseDefinitionId != null">
+        and CASE_DEF_ID_ = #{parameter.caseDefinitionId, jdbcType=VARCHAR}
+      </if>
+    </where>
   </select>
 
   <select id="selectHistoricTaskInstancesByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.HistoricTaskInstanceQueryImpl" resultMap="historicTaskInstanceResultMap">
@@ -140,12 +163,12 @@
     ${orderBy}
     ${limitAfter}
   </select>
-  
+
   <select id="selectHistoricTaskInstanceCountByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.HistoricTaskInstanceQueryImpl" resultType="long">
     select count(*)
     <include refid="selectHistoricTaskInstancesByQueryCriteriaSql"/>
   </select>
-  
+
   <sql id="selectHistoricTaskInstancesByQueryCriteriaSql">
     from ${prefix}ACT_HI_TASKINST RES
     <if test="processFinished || processUnfinished">
@@ -153,6 +176,9 @@
     </if>
     <if test="processDefinitionKey != null || processDefinitionName != null">
       inner join ${prefix}ACT_RE_PROCDEF D on RES.PROC_DEF_ID_ = D.ID_
+    </if>
+    <if test="caseDefinitionKey != null || caseDefinitionName != null">
+      inner join ${prefix}ACT_RE_CASE_DEF CD on RES.CASE_DEF_ID_ = CD.ID_
     </if>
     <where>
       <if test="taskId != null">
@@ -182,6 +208,21 @@
                  open="(" separator="," close=")">
           #{item}
         </foreach>
+      </if>
+      <if test="caseDefinitionId != null">
+        and RES.CASE_DEF_ID_ = #{caseDefinitionId}
+      </if>
+      <if test="caseDefinitionKey != null">
+        and CD.KEY_ = #{caseDefinitionKey}
+      </if>
+      <if test="caseDefinitionName != null">
+        and CD.NAME_ = #{caseDefinitionName}
+      </if>
+      <if test="caseInstanceId != null">
+        and RES.CASE_INST_ID_ = #{caseInstanceId}
+      </if>
+      <if test="caseExecutionId != null">
+        and RES.CASE_EXECUTION_ID_ = #{caseExecutionId}
       </if>
       <if test="taskName != null">
         and RES.NAME_ = #{taskName}
@@ -255,45 +296,29 @@
       <if test="followUpDate != null || followUpBefore != null || followUpAfter != null">
         and RES.FOLLOW_UP_DATE_ is not null
       </if>
-      <foreach collection="variables" index="index" item="var">
+      <foreach collection="variables" index="index" item="queryVariableValue">
         and exists (
-          select HD.ID_ 
-          from ${prefix}ACT_HI_DETAIL HD 
-          where
-            HD.TYPE_ = 'VariableUpdate' 
-            and HD.NAME_ =  #{var.name}
-            <choose>
-              <when test="var.local">
-                and HD.TASK_ID_ = RES.ID_
-                and HD.REV_ = (select max(HDM.REV_) from ${prefix}ACT_HI_DETAIL HDM where HDM.TASK_ID_ = RES.ID_ and HDM.VAR_TYPE_ = #{var.type} and HDM.NAME_ = #{var.name} and HDM.TYPE_ = 'VariableUpdate')
-                and HD.TIME_ = (select max(HDM.TIME_) from ${prefix}ACT_HI_DETAIL HDM where HDM.TASK_ID_ = RES.ID_ and HDM.VAR_TYPE_ = #{var.type} and HDM.NAME_ = #{var.name} and HDM.TYPE_ = 'VariableUpdate')
-              </when>
-              <otherwise>
-                and HD.PROC_INST_ID_ = RES.PROC_INST_ID_ and HD.TASK_ID_ is null
-                and HD.REV_ = (select max(HDM.REV_) from ${prefix}ACT_HI_DETAIL HDM where HDM.PROC_INST_ID_ = RES.PROC_INST_ID_ and HDM.TASK_ID_ is null and HDM.VAR_TYPE_ = #{var.type} and HDM.NAME_ = #{var.name} and HDM.TYPE_ = 'VariableUpdate')
-                and HD.TIME_ = (select max(HDM.TIME_) from ${prefix}ACT_HI_DETAIL HDM where HDM.PROC_INST_ID_ = RES.PROC_INST_ID_ and HDM.TASK_ID_ is null and HDM.VAR_TYPE_ = #{var.type} and HDM.NAME_ = #{var.name} and HDM.TYPE_ = 'VariableUpdate')
-              </otherwise>
-            </choose>  
-            <if test="!var.type.equals('null')">
-              and HD.VAR_TYPE_ = #{var.type}
-            </if>
-            <!-- Variable value -->
-            <if test="var.textValue != null &amp;&amp; var.longValue == null &amp;&amp; var.doubleValue == null">
-              and HD.TEXT_ =  #{var.textValue}
-            </if>
-            <if test="var.textValue2 != null">
-              and HD.TEXT2_ = #{var.textValue2}
-            </if>
-            <if test="var.longValue != null">
-              and HD.LONG_ = #{var.longValue}
-            </if>
-            <if test="var.doubleValue != null">
-              and HD.DOUBLE_ = #{var.doubleValue}
-            </if>
-            <!-- Null variable type -->
-            <if test="var.textValue == null &amp;&amp; var.textValue2 == null &amp;&amp; var.longValue == null &amp;&amp; var.doubleValue == null">
-              and HD.TEXT_ is null and HD.TEXT2_ is null and HD.LONG_ is null and HD.DOUBLE_ is null and HD.BYTEARRAY_ID_ is null
-            </if>
+          select
+            ID_
+          from
+            ${prefix}ACT_HI_VARINST VAR
+          WHERE
+            NAME_= #{queryVariableValue.name}
+          <choose>
+            <when test="queryVariableValue.local">
+              and TASK_ID_ = RES.ID_
+            </when>
+            <otherwise>
+              and PROC_INST_ID_ = RES.PROC_INST_ID_ and TASK_ID_ is null
+            </otherwise>
+          </choose>
+          
+          <bind name="varTypeField" value="'VAR_TYPE_'"/>
+          <bind name="varPrefix" value="''"/>
+          <if test="queryVariableValue.valueConditions != null">
+            and
+            <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.variableValueConditions"/>
+          </if>
         )
       </foreach>
     </where>
@@ -308,12 +333,12 @@
       ${limitAfter}
     </if>
   </select>
-  
+
   <select id="selectHistoricTaskInstanceByNativeQuery_mssql_or_db2" parameterType="java.util.Map" resultMap="historicTaskInstanceResultMap">
     <if test="resultType == 'LIST_PAGE'">
         ${limitBeforeNativeQuery}
     </if>
-    ${sql} 
+    ${sql}
     <if test="resultType == 'LIST_PAGE'">
       ${limitAfter}
     </if>

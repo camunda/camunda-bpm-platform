@@ -102,14 +102,22 @@
                 <configuration>
                   <target>
 
-                    <!-- create the SQL scripts so that the files existi even if they do not exist in the distribution. (this can be the case if there are no db
+                    <!-- create the SQL scripts so that the files exist even if they do not exist in the distribution. (this can be the case if there are no db
                       upgrades (yet) for a particular release ) -->
 
-                    <mkdir dir="${project.build.directory}/scripts-current/sql/upgrade/"></mkdir>
+                    <mkdir dir="${project.build.directory}/scripts-current/sql/upgrade/"/>
                     <touch
                       file="${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_${test.version.old.major}_to_${test.version.current.major}.sql" />
                     <touch
                       file="${project.build.directory}/scripts-current/sql/upgrade/${database.type}_identity_${test.version.old.major}_to_${test.version.current.major}.sql" />
+                    <touch
+                      file="${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_${test.version.current.major}_patch.sql" />
+                    <touch
+                      file="${project.build.directory}/scripts-current/sql/upgrade/${database.type}_identity_${test.version.current.major}_patch.sql" />
+                    <touch
+                      file="${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_${test.version.old.major}_patch.sql" />
+                    <touch
+                      file="${project.build.directory}/scripts-current/sql/upgrade/${database.type}_identity_${test.version.old.major}_patch.sql" />
 
                   </target>
                 </configuration>
@@ -248,6 +256,20 @@
                 </configuration>
               </execution>
               <execution>
+                <id>patch-old-schema</id>
+                <phase>generate-test-resources</phase>
+                <goals>
+                  <goal>execute</goal>
+                </goals>
+                <configuration>
+                  <srcFiles>
+                    <!-- now patch old version of the schema -->
+                    <srcFile>${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_${test.version.old.major}_patch.sql</srcFile>
+                    <srcFile>${project.build.directory}/scripts-current/sql/upgrade/${database.type}_identity_${test.version.old.major}_patch.sql</srcFile>
+                  </srcFiles>
+                </configuration>
+              </execution>
+              <execution>
                 <id>upgrade-db</id>
                 <phase>generate-test-resources</phase>
                 <goals>
@@ -317,6 +339,12 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.hamcrest</groupId>
+      <artifactId>hamcrest-library</artifactId>
       <scope>test</scope>
     </dependency>
 

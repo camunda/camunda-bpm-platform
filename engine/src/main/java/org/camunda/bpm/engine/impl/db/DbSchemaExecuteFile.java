@@ -19,6 +19,8 @@ import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 /**
  * @author Daniel Meyer
  *
@@ -39,13 +41,8 @@ public class DbSchemaExecuteFile {
     final String configurationFileResourceName = args[0];
     final String schemaFileResourceName = args[1];
 
-    if(configurationFileResourceName == null) {
-      throw new ProcessEngineException("Process engine configuration file name cannot be null.");
-    }
-
-    if(schemaFileResourceName == null) {
-      throw new ProcessEngineException("Schema resource file name cannot be null.");
-    }
+    ensureNotNull("Process engine configuration file name cannot be null", "configurationFileResourceName", configurationFileResourceName);
+    ensureNotNull("Schema resource file name cannot be null", "schemaFileResourceName", schemaFileResourceName);
 
     ProcessEngineConfigurationImpl configuration = (ProcessEngineConfigurationImpl) ProcessEngineConfiguration.createProcessEngineConfigurationFromResource(configurationFileResourceName);
     ProcessEngine processEngine = configuration.buildProcessEngine();

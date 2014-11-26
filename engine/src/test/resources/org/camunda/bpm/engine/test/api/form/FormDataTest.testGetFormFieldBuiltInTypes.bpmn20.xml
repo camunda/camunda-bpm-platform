@@ -30,7 +30,7 @@
                 defaultValue="true" />
             <camunda:formField 
                 id="dateField" label="Date Field" type="date"
-                defaultValue="10-JAN-2013">
+                defaultValue="10/01/2013">
             </camunda:formField>
             <camunda:formField 
                 id="enumField" label="Enum Field" type="enum" 

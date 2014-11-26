@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -12,16 +12,23 @@
  */
 package org.camunda.bpm.engine.impl.form.engine;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 import java.io.UnsupportedEncodingException;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.form.FormData;
 import org.camunda.bpm.engine.form.StartFormData;
 import org.camunda.bpm.engine.form.TaskFormData;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.persistence.entity.ResourceEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
-import org.camunda.bpm.engine.impl.scripting.ScriptingEngines;
+import org.camunda.bpm.engine.impl.scripting.ExecutableScript;
+import org.camunda.bpm.engine.impl.scripting.ScriptFactory;
+import org.camunda.bpm.engine.impl.scripting.engine.ScriptingEngines;
+import org.camunda.bpm.engine.impl.scripting.env.ScriptingEnvironment;
 
 
 /**
@@ -38,32 +45,37 @@ public class JuelFormEngine implements FormEngine {
       return null;
     }
     String formTemplateString = getFormTemplateString(startForm, startForm.getFormKey());
-    ScriptingEngines scriptingEngines = Context.getProcessEngineConfiguration().getScriptingEngines();
-    return scriptingEngines.evaluate(formTemplateString, ScriptingEngines.DEFAULT_SCRIPTING_LANGUAGE, null);
+    return executeScript(formTemplateString, null);
   }
+
 
   public Object renderTaskForm(TaskFormData taskForm) {
     if (taskForm.getFormKey()==null) {
       return null;
     }
     String formTemplateString = getFormTemplateString(taskForm, taskForm.getFormKey());
-    ScriptingEngines scriptingEngines = Context.getProcessEngineConfiguration().getScriptingEngines();
     TaskEntity task = (TaskEntity) taskForm.getTask();
-    return scriptingEngines.evaluate(formTemplateString, ScriptingEngines.DEFAULT_SCRIPTING_LANGUAGE, task.getExecution());
+    return executeScript(formTemplateString, task.getExecution());
+  }
+
+  protected Object executeScript(String scriptSrc, VariableScope scope) {
+    ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
+    ScriptingEnvironment scriptingEnvironment = processEngineConfiguration.getScriptingEnvironment();
+    ScriptFactory scriptFactory = processEngineConfiguration.getScriptFactory();
+    ExecutableScript script = scriptFactory.createScriptFromSource(ScriptingEngines.DEFAULT_SCRIPTING_LANGUAGE, scriptSrc);
+    return scriptingEnvironment.execute(script, scope);
   }
 
   protected String getFormTemplateString(FormData formInstance, String formKey) {
     String deploymentId = formInstance.getDeploymentId();
-    
+
     ResourceEntity resourceStream = Context
       .getCommandContext()
       .getResourceManager()
       .findResourceByDeploymentIdAndResourceName(deploymentId, formKey);
-    
-    if (resourceStream == null) {
-      throw new ProcessEngineException("Form with formKey '"+formKey+"' does not exist");
-    }
-    
+
+    ensureNotNull("Form with formKey '" + formKey + "' does not exist", "resourceStream", resourceStream);
+
     byte[] resourceBytes = resourceStream.getBytes();
     String encoding = "UTF-8";
     String formTemplateString = "";

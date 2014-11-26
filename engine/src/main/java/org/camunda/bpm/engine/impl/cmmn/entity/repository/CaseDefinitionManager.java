@@ -27,42 +27,46 @@ import org.camunda.bpm.engine.repository.CaseDefinition;
 public class CaseDefinitionManager extends AbstractManager {
 
   public void insertCaseDefinition(CaseDefinitionEntity caseDefinition) {
-    getDbSqlSession().insert(caseDefinition);
+    getDbEntityManager().insert(caseDefinition);
   }
 
   public void deleteCaseDefinitionsByDeploymentId(String deploymentId) {
-    getDbSqlSession().delete("deleteCaseDefinitionsByDeploymentId", deploymentId);
+    getDbEntityManager().delete(CaseDefinitionEntity.class, "deleteCaseDefinitionsByDeploymentId", deploymentId);
   }
 
   public CaseDefinitionEntity findCaseDefinitionById(String caseDefinitionId) {
-    return (CaseDefinitionEntity) getDbSqlSession().selectOne("selectCaseDefinitionById", caseDefinitionId);
+    return getDbEntityManager().selectById(CaseDefinitionEntity.class, caseDefinitionId);
   }
 
   public CaseDefinitionEntity findLatestCaseDefinitionByKey(String caseDefinitionKey) {
-    return (CaseDefinitionEntity) getDbSqlSession().selectOne("selectLatestCaseDefinitionByKey", caseDefinitionKey);
+    return (CaseDefinitionEntity) getDbEntityManager().selectOne("selectLatestCaseDefinitionByKey", caseDefinitionKey);
   }
 
   public CaseDefinitionEntity findCaseDefinitionByKeyAndVersion(String caseDefinitionKey, Integer caseDefinitionVersion) {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("caseDefinitionVersion", caseDefinitionVersion);
     parameters.put("caseDefinitionKey", caseDefinitionKey);
-    return (CaseDefinitionEntity) getDbSqlSession().selectOne("selectCaseDefinitionByKeyAndVersion", parameters);
+    return (CaseDefinitionEntity) getDbEntityManager().selectOne("selectCaseDefinitionByKeyAndVersion", parameters);
   }
 
   public CaseDefinitionEntity findCaseDefinitionByDeploymentAndKey(String deploymentId, String caseDefinitionKey) {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("deploymentId", deploymentId);
     parameters.put("caseDefinitionKey", caseDefinitionKey);
-    return (CaseDefinitionEntity) getDbSqlSession().selectOne("selectCaseDefinitionByDeploymentAndKey", parameters);
+    return (CaseDefinitionEntity) getDbEntityManager().selectOne("selectCaseDefinitionByDeploymentAndKey", parameters);
   }
 
   @SuppressWarnings("unchecked")
   public List<CaseDefinition> findCaseDefinitionsByQueryCriteria(CaseDefinitionQueryImpl caseDefinitionQuery, Page page) {
-    return getDbSqlSession().selectList("selectCaseDefinitionsByQueryCriteria", caseDefinitionQuery, page);
+    return getDbEntityManager().selectList("selectCaseDefinitionsByQueryCriteria", caseDefinitionQuery, page);
   }
 
   public long findCaseDefinitionCountByQueryCriteria(CaseDefinitionQueryImpl caseDefinitionQuery) {
-    return (Long) getDbSqlSession().selectOne("selectCaseDefinitionCountByQueryCriteria", caseDefinitionQuery);
+    return (Long) getDbEntityManager().selectOne("selectCaseDefinitionCountByQueryCriteria", caseDefinitionQuery);
   }
 
+  @SuppressWarnings("unchecked")
+  public List<CaseDefinition> findCaseDefinitionByDeploymentId(String deploymentId) {
+    return getDbEntityManager().selectList("selectCaseDefinitionByDeploymentId", deploymentId);
+  }
 }

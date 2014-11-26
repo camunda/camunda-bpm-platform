@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions"
+	xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+	xmlns:camunda="http://activiti.org/bpmn"
+	targetNamespace="Examples">
+
+  <error id="myError" errorCode="MyError" />
+  <error id="myException" errorCode="org.camunda.bpm.engine.test.bpmn.event.error.MyBusinessException" />
+
+	<process id="testProcess" isExecutable="true">
+
+		<startEvent id="start" />
+
+		<sequenceFlow id="flow1" sourceRef="start" targetRef="serviceTask" />
+
+    <serviceTask id="serviceTask" camunda:delegateExpression="${myDelegate}" />
+
+    <sequenceFlow id="flow2" sourceRef="serviceTask" targetRef="end" />
+
+		<endEvent id="end" />
+    
+    <subProcess id="eventSubProcessError" triggeredByEvent="true">
+
+      <startEvent id="catchError">
+        <errorEventDefinition errorRef="myError"/>
+      </startEvent>
+
+      <sequenceFlow id="flow3" sourceRef="catchError" targetRef="userTaskError" />
+
+      <userTask id="userTaskError" name="Error Task" />
+
+      <sequenceFlow id="flow4" sourceRef="userTaskError" targetRef="endError" />
+
+      <endEvent id="endError" />
+
+    </subProcess>
+
+    <subProcess id="eventSubProcessException" triggeredByEvent="true">
+
+      <startEvent id="catchException">
+        <errorEventDefinition errorRef="myException"/>
+      </startEvent>
+
+      <sequenceFlow id="flow5" sourceRef="catchException" targetRef="userTaskException" />
+
+      <userTask id="userTaskException" name="Exception Task" />
+
+      <sequenceFlow id="flow6" sourceRef="userTaskException" targetRef="endException" />
+
+      <endEvent id="endException" />
+
+    </subProcess>
+
+	</process>
+
+</definitions>

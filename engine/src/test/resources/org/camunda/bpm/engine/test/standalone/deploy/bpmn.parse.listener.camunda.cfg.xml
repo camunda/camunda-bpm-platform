@@ -22,7 +22,7 @@
     
     <property name="createDiagramOnDeploy" value="true" />
     
-    <property name="preParseListeners">
+    <property name="customPreBPMNParseListeners">
       <list>
         <bean class="org.camunda.bpm.engine.test.standalone.deploy.TestBPMNParseListener" />
       </list>

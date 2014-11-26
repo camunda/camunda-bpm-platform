@@ -26,6 +26,7 @@ import org.camunda.bpm.engine.rest.dto.converter.BooleanConverter;
 import org.camunda.bpm.engine.rest.dto.converter.VariableListConverter;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.runtime.CaseInstanceQuery;
+import org.codehaus.jackson.map.ObjectMapper;
 
 /**
  * @author Roman Smirnov
@@ -50,14 +51,16 @@ public class CaseInstanceQueryDto extends AbstractQueryDto<CaseInstanceQuery> {
   protected String caseDefinitionKey;
   protected String caseDefinitionId;
   protected Boolean active;
+  protected Boolean completed;
+  protected Boolean terminated;
 
   protected List<VariableQueryParameterDto> variables;
 
   public CaseInstanceQueryDto() {
   }
 
-  public CaseInstanceQueryDto(MultivaluedMap<String, String> queryParameters) {
-    super(queryParameters);
+  public CaseInstanceQueryDto(ObjectMapper objectMapper, MultivaluedMap<String, String> queryParameters) {
+    super(objectMapper, queryParameters);
   }
 
   @CamundaQueryParam("caseInstanceId")
@@ -83,6 +86,16 @@ public class CaseInstanceQueryDto extends AbstractQueryDto<CaseInstanceQuery> {
   @CamundaQueryParam(value = "active", converter = BooleanConverter.class)
   public void setActive(Boolean active) {
     this.active = active;
+  }
+
+  @CamundaQueryParam(value = "completed", converter = BooleanConverter.class)
+  public void setCompleted(Boolean completed) {
+    this.completed = completed;
+  }
+
+  @CamundaQueryParam(value = "terminated", converter = BooleanConverter.class)
+  public void setTerminated(Boolean terminated) {
+    this.terminated = terminated;
   }
 
   @CamundaQueryParam(value = "variables", converter = VariableListConverter.class)
@@ -117,13 +130,19 @@ public class CaseInstanceQueryDto extends AbstractQueryDto<CaseInstanceQuery> {
     if (active != null && active == true) {
       query.active();
     }
+    if (completed != null && completed == true) {
+      query.completed();
+    }
+    if (terminated != null && terminated == true) {
+      query.terminated();
+    }
     if (variables != null) {
 
       for (VariableQueryParameterDto variableQueryParam : variables) {
 
         String variableName = variableQueryParam.getName();
         String op = variableQueryParam.getOperator();
-        Object variableValue = variableQueryParam.getValue();
+        Object variableValue = variableQueryParam.resolveValue(objectMapper);
 
         if (op.equals(VariableQueryParameterDto.EQUALS_OPERATOR_NAME)) {
           query.variableValueEquals(variableName, variableValue);

@@ -16,6 +16,7 @@ package org.camunda.bpm.engine.impl.cmd;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
+import org.camunda.bpm.engine.OptimisticLockingException;
 import org.camunda.bpm.engine.impl.cfg.TransactionContext;
 import org.camunda.bpm.engine.impl.cfg.TransactionState;
 import org.camunda.bpm.engine.impl.context.Context;
@@ -52,7 +53,9 @@ public class DecrementJobRetriesCmd implements Command<Object> {
       job.setExceptionStacktrace(getExceptionStacktrace());
     }
 
-    job.setRetries(job.getRetries() - 1);
+    if (exception == null || shouldDecrementRetriesFor(exception)) {
+      job.setRetries(job.getRetries() - 1);
+    }
 
     JobExecutor jobExecutor = Context.getProcessEngineConfiguration().getJobExecutor();
     MessageAddedNotification messageAddedNotification = new MessageAddedNotification(jobExecutor);
@@ -66,5 +69,9 @@ public class DecrementJobRetriesCmd implements Command<Object> {
     StringWriter stringWriter = new StringWriter();
     exception.printStackTrace(new PrintWriter(stringWriter));
     return stringWriter.toString();
+  }
+
+  protected boolean shouldDecrementRetriesFor(Throwable t) {
+    return !(t instanceof OptimisticLockingException);
   }
 }

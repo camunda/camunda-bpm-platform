@@ -1,0 +1,7 @@
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" targetNamespace="Examples">
+  <process id="simpleProcess">
+    <startEvent id="theStart"/>
+    <sequenceFlow sourceRef="theStart" targetRef="theEnd"/>
+    <endEvent id="theEnd"/>
+  </process>
+</definitions>

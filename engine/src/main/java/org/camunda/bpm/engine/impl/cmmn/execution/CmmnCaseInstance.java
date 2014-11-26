@@ -14,20 +14,37 @@ package org.camunda.bpm.engine.impl.cmmn.execution;
 
 import java.util.Map;
 
+import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
+
 /**
  * @author Roman Smirnov
  *
  */
 public interface CmmnCaseInstance extends CmmnActivityExecution {
 
+  /**
+   * <p><code>This</code> case instance transitions to <code>ACTIVE</code>
+   * state.</p>
+   */
   void create();
 
+  /**
+   * <p><code>This</code> case instance transitions to <code>ACTIVE</code>
+   * state.</p>
+   *
+   * <p>The given <code>variables</code> will be set a case instance variables.</p>
+   */
   void create(Map<String, Object> variables);
 
-  void create(String businessKey);
+  /**
+   * <p>Find a case execution by the given <code>activityId</code>.</p>
+   *
+   * @param activityId the id of the {@link CmmnActivity activity} to
+   *                   which a case execution is associated.
 
-  void create(String businessKey, Map<String, Object> variables);
-
+   * @return returns a case execution or null if a case execution could
+   *         not be found.
+   */
   CmmnActivityExecution findCaseExecution(String activityId);
 
 }

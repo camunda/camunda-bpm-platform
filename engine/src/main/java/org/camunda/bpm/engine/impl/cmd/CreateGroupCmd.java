@@ -14,11 +14,11 @@
 package org.camunda.bpm.engine.impl.cmd;
 
 import java.io.Serializable;
-
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 
 /**
@@ -31,9 +31,7 @@ public class CreateGroupCmd extends AbstractWritableIdentityServiceCmd<Group> im
   protected String groupId;
   
   public CreateGroupCmd(String groupId) {
-    if(groupId == null) {
-      throw new ProcessEngineException("groupId is null");
-    }
+    ensureNotNull("groupId", groupId);
     this.groupId = groupId;
   }
   

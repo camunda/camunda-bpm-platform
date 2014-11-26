@@ -13,6 +13,7 @@
 
 package org.camunda.bpm.engine.impl.cmd;
 
+import java.io.Serializable;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -21,7 +22,7 @@ import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.task.Comment;
 import org.camunda.bpm.engine.task.Event;
 
-import java.io.Serializable;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 
 /**
@@ -47,9 +48,7 @@ public class AddCommentCmd implements Command<Comment>, Serializable {
       throw new ProcessEngineException("Process instance id and task id is null");
     }
 
-    if (message == null) {
-      throw new ProcessEngineException("Message is null");
-    }
+    ensureNotNull("Message", message);
 
     String userId = commandContext.getAuthenticatedUserId();
     CommentEntity comment = new CommentEntity();
@@ -61,8 +60,8 @@ public class AddCommentCmd implements Command<Comment>, Serializable {
     comment.setAction(Event.ACTION_ADD_COMMENT);
 
     String eventMessage = message.replaceAll("\\s+", " ");
-    if (eventMessage.length()>163) {
-      eventMessage = eventMessage.substring(0, 160)+"...";
+    if (eventMessage.length() > 163) {
+      eventMessage = eventMessage.substring(0, 160) + "...";
     }
     comment.setMessage(eventMessage);
 

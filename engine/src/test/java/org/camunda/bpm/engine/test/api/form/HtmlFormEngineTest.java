@@ -165,6 +165,18 @@ public class HtmlFormEngineTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  public void testRenderDateField() {
+
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
+    String renderedForm = (String) formService.getRenderedStartForm(processDefinition.getId());
+
+    String expectedForm = IoUtil.readFileAsString("org/camunda/bpm/engine/test/api/form/HtmlFormEngineTest.testRenderDateField.html");
+
+    assertHtmlEquals(expectedForm, renderedForm);
+
+  }
+
+  @Deployment
   public void testLegacyFormPropertySupport() {
 
     runtimeService.startProcessInstanceByKey("HtmlFormEngineTest.testLegacyFormPropertySupport");

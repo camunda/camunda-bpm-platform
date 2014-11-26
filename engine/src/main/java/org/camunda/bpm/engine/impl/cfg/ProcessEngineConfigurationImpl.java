@@ -13,9 +13,12 @@
 
 package org.camunda.bpm.engine.impl.cfg;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.nio.charset.Charset;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
@@ -43,9 +46,10 @@ import org.apache.ibatis.session.defaults.DefaultSqlSessionFactory;
 import org.apache.ibatis.transaction.TransactionFactory;
 import org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory;
 import org.apache.ibatis.transaction.managed.ManagedTransactionFactory;
-import org.apache.ibatis.type.JdbcType;
+import org.camunda.bpm.engine.ArtifactFactory;
 import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.CaseService;
+import org.camunda.bpm.engine.FilterService;
 import org.camunda.bpm.engine.FormService;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.IdentityService;
@@ -57,6 +61,8 @@ import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.impl.AuthorizationServiceImpl;
+import org.camunda.bpm.engine.impl.DefaultArtifactFactory;
+import org.camunda.bpm.engine.impl.FilterServiceImpl;
 import org.camunda.bpm.engine.impl.FormServiceImpl;
 import org.camunda.bpm.engine.impl.HistoryServiceImpl;
 import org.camunda.bpm.engine.impl.IdentityServiceImpl;
@@ -77,21 +83,27 @@ import org.camunda.bpm.engine.impl.calendar.DurationBusinessCalendar;
 import org.camunda.bpm.engine.impl.calendar.MapBusinessCalendarManager;
 import org.camunda.bpm.engine.impl.cfg.auth.DefaultAuthorizationProvider;
 import org.camunda.bpm.engine.impl.cfg.auth.ResourceAuthorizationProvider;
-import org.camunda.bpm.engine.impl.cfg.standalone.StandaloneMybatisTransactionContextFactory;
+import org.camunda.bpm.engine.impl.cfg.standalone.StandaloneTransactionContextFactory;
 import org.camunda.bpm.engine.impl.cmmn.CaseServiceImpl;
 import org.camunda.bpm.engine.impl.cmmn.deployer.CmmnDeployer;
 import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionManager;
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionManager;
+import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseSentryPartManager;
 import org.camunda.bpm.engine.impl.cmmn.handler.DefaultCmmnElementHandlerRegistry;
 import org.camunda.bpm.engine.impl.cmmn.transformer.CmmnTransformFactory;
+import org.camunda.bpm.engine.impl.cmmn.transformer.CmmnTransformListener;
 import org.camunda.bpm.engine.impl.cmmn.transformer.CmmnTransformer;
-import org.camunda.bpm.engine.impl.cmmn.transformer.DefaultCmmnTranformFactory;
+import org.camunda.bpm.engine.impl.cmmn.transformer.DefaultCmmnTransformFactory;
 import org.camunda.bpm.engine.impl.db.DbIdGenerator;
-import org.camunda.bpm.engine.impl.db.DbSqlSessionFactory;
-import org.camunda.bpm.engine.impl.db.IbatisVariableTypeHandler;
+import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManagerFactory;
+import org.camunda.bpm.engine.impl.db.entitymanager.cache.DbEntityCacheKeyMapping;
+import org.camunda.bpm.engine.impl.db.sql.DbSqlPersistenceProviderFactory;
+import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.delegate.DefaultDelegateInterceptor;
 import org.camunda.bpm.engine.impl.digest.PasswordEncryptor;
 import org.camunda.bpm.engine.impl.digest.ShaHashDigest;
+import org.camunda.bpm.engine.impl.el.CommandContextFunctionMapper;
+import org.camunda.bpm.engine.impl.el.DateTimeFunctionMapper;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
 import org.camunda.bpm.engine.impl.event.CompensationEventHandler;
 import org.camunda.bpm.engine.impl.event.EventHandler;
@@ -114,11 +126,15 @@ import org.camunda.bpm.engine.impl.form.validator.MinLengthValidator;
 import org.camunda.bpm.engine.impl.form.validator.MinValidator;
 import org.camunda.bpm.engine.impl.form.validator.ReadOnlyValidator;
 import org.camunda.bpm.engine.impl.form.validator.RequiredValidator;
+import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.history.handler.DbHistoryEventHandler;
 import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
 import org.camunda.bpm.engine.impl.history.parser.HistoryParseListener;
+import org.camunda.bpm.engine.impl.history.producer.CacheAwareCmmnHistoryEventProducer;
 import org.camunda.bpm.engine.impl.history.producer.CacheAwareHistoryEventProducer;
+import org.camunda.bpm.engine.impl.history.producer.CmmnHistoryEventProducer;
 import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
+import org.camunda.bpm.engine.impl.history.transformer.CmmnHistoryTransformListener;
 import org.camunda.bpm.engine.impl.identity.ReadOnlyIdentityProvider;
 import org.camunda.bpm.engine.impl.identity.WritableIdentityProvider;
 import org.camunda.bpm.engine.impl.identity.db.DbIdentityServiceProvider;
@@ -147,7 +163,6 @@ import org.camunda.bpm.engine.impl.jobexecutor.TimerStartEventJobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerStartEventSubprocessJobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerSuspendJobDefinitionHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerSuspendProcessDefinitionHandler;
-import org.camunda.bpm.engine.impl.mail.MailScanner;
 import org.camunda.bpm.engine.impl.persistence.GenericManagerFactory;
 import org.camunda.bpm.engine.impl.persistence.deploy.Deployer;
 import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
@@ -158,7 +173,10 @@ import org.camunda.bpm.engine.impl.persistence.entity.CommentManager;
 import org.camunda.bpm.engine.impl.persistence.entity.DeploymentManager;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionManager;
+import org.camunda.bpm.engine.impl.persistence.entity.FilterManager;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricActivityInstanceManager;
+import org.camunda.bpm.engine.impl.persistence.entity.HistoricCaseActivityInstanceManager;
+import org.camunda.bpm.engine.impl.persistence.entity.HistoricCaseInstanceManager;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricDetailManager;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricIncidentManager;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricProcessInstanceManager;
@@ -180,30 +198,37 @@ import org.camunda.bpm.engine.impl.persistence.entity.UserOperationLogManager;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceManager;
 import org.camunda.bpm.engine.impl.runtime.CorrelationHandler;
 import org.camunda.bpm.engine.impl.runtime.DefaultCorrelationHandler;
-import org.camunda.bpm.engine.impl.scripting.BeansResolverFactory;
-import org.camunda.bpm.engine.impl.scripting.ResolverFactory;
-import org.camunda.bpm.engine.impl.scripting.ScriptBindingsFactory;
-import org.camunda.bpm.engine.impl.scripting.ScriptingEngines;
-import org.camunda.bpm.engine.impl.scripting.VariableScopeResolverFactory;
+import org.camunda.bpm.engine.impl.scripting.ScriptFactory;
+import org.camunda.bpm.engine.impl.scripting.engine.BeansResolverFactory;
+import org.camunda.bpm.engine.impl.scripting.engine.ResolverFactory;
+import org.camunda.bpm.engine.impl.scripting.engine.ScriptBindingsFactory;
+import org.camunda.bpm.engine.impl.scripting.engine.ScriptingEngines;
+import org.camunda.bpm.engine.impl.scripting.engine.VariableScopeResolverFactory;
+import org.camunda.bpm.engine.impl.scripting.env.ScriptEnvResolver;
+import org.camunda.bpm.engine.impl.scripting.env.ScriptingEnvironment;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
-import org.camunda.bpm.engine.impl.variable.BooleanType;
-import org.camunda.bpm.engine.impl.variable.ByteArrayType;
-import org.camunda.bpm.engine.impl.variable.DateType;
-import org.camunda.bpm.engine.impl.variable.DefaultVariableTypes;
-import org.camunda.bpm.engine.impl.variable.DoubleType;
-import org.camunda.bpm.engine.impl.variable.EntityManagerSession;
-import org.camunda.bpm.engine.impl.variable.EntityManagerSessionFactory;
-import org.camunda.bpm.engine.impl.variable.IntegerType;
-import org.camunda.bpm.engine.impl.variable.JPAEntityVariableType;
-import org.camunda.bpm.engine.impl.variable.LongType;
-import org.camunda.bpm.engine.impl.variable.NullType;
-import org.camunda.bpm.engine.impl.variable.SerializableType;
-import org.camunda.bpm.engine.impl.variable.ShortType;
-import org.camunda.bpm.engine.impl.variable.StringType;
-import org.camunda.bpm.engine.impl.variable.VariableType;
-import org.camunda.bpm.engine.impl.variable.VariableTypes;
+import org.camunda.bpm.engine.impl.variable.ValueTypeResolverImpl;
+import org.camunda.bpm.engine.impl.variable.serializer.BooleanValueSerializer;
+import org.camunda.bpm.engine.impl.variable.serializer.ByteArrayValueSerializer;
+import org.camunda.bpm.engine.impl.variable.serializer.DateValueSerializer;
+import org.camunda.bpm.engine.impl.variable.serializer.DefaultVariableSerializers;
+import org.camunda.bpm.engine.impl.variable.serializer.DeserializedObjectsSessionFactory;
+import org.camunda.bpm.engine.impl.variable.serializer.DoubleValueSerializer;
+import org.camunda.bpm.engine.impl.variable.serializer.IntegerValueSerializer;
+import org.camunda.bpm.engine.impl.variable.serializer.JavaObjectSerializer;
+import org.camunda.bpm.engine.impl.variable.serializer.LongValueSerlializer;
+import org.camunda.bpm.engine.impl.variable.serializer.NullValueSerializer;
+import org.camunda.bpm.engine.impl.variable.serializer.ShortValueSerializer;
+import org.camunda.bpm.engine.impl.variable.serializer.StringValueSerializer;
+import org.camunda.bpm.engine.impl.variable.serializer.TypedValueSerializer;
+import org.camunda.bpm.engine.impl.variable.serializer.VariableSerializers;
+import org.camunda.bpm.engine.impl.variable.serializer.jpa.EntityManagerSession;
+import org.camunda.bpm.engine.impl.variable.serializer.jpa.EntityManagerSessionFactory;
+import org.camunda.bpm.engine.impl.variable.serializer.jpa.JPAVariableSerializer;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
+import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.type.ValueType;
 
 
 /**
@@ -216,10 +241,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   public static final String DB_SCHEMA_UPDATE_CREATE = "create";
   public static final String DB_SCHEMA_UPDATE_DROP_CREATE = "drop-create";
 
-  public static final int HISTORYLEVEL_NONE = 0;
-  public static final int HISTORYLEVEL_ACTIVITY = 1;
-  public static final int HISTORYLEVEL_AUDIT = 2;
-  public static final int HISTORYLEVEL_FULL = 3;
+  public static final int HISTORYLEVEL_NONE = HistoryLevel.HISTORY_LEVEL_NONE.getId();
+  public static final int HISTORYLEVEL_ACTIVITY = HistoryLevel.HISTORY_LEVEL_ACTIVITY.getId();
+  public static final int HISTORYLEVEL_AUDIT = HistoryLevel.HISTORY_LEVEL_AUDIT.getId();
+  public static final int HISTORYLEVEL_FULL = HistoryLevel.HISTORY_LEVEL_FULL.getId();
 
   public static final String DEFAULT_WS_SYNC_FACTORY = "org.camunda.bpm.engine.impl.webservice.CxfWebServiceClientFactory";
 
@@ -236,6 +261,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected ManagementService managementService = new ManagementServiceImpl();
   protected AuthorizationService authorizationService = new AuthorizationServiceImpl();
   protected CaseService caseService = new CaseServiceImpl();
+  protected FilterService filterService = new FilterServiceImpl();
 
   // COMMAND EXECUTORS ////////////////////////////////////////////////////////
 
@@ -280,10 +306,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected Map<String, JobHandler> jobHandlers;
   protected JobExecutor jobExecutor;
 
-  // MAIL SCANNER /////////////////////////////////////////////////////////////
-
-  protected MailScanner mailScanner;
-
   // MYBATIS SQL SESSION FACTORY //////////////////////////////////////////////
 
   protected SqlSessionFactory sqlSessionFactory;
@@ -310,14 +332,20 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected FormValidators formValidators;
   protected Map<String, Class<? extends FormFieldValidator>> customFormFieldValidators;
 
-  protected List<VariableType> customPreVariableTypes;
-  protected List<VariableType> customPostVariableTypes;
-  protected VariableTypes variableTypes;
+  protected List<TypedValueSerializer> customPreVariableSerializers;
+  protected List<TypedValueSerializer> customPostVariableSerializers;
+  protected VariableSerializers variableSerializers;
+  protected String defaultSerializationFormat = Variables.SerializationDataFormats.JAVA.getName();
+  protected String defaultCharsetName = null;
+  protected Charset defaultCharset = null;
 
   protected ExpressionManager expressionManager;
   protected List<String> customScriptingEngineClasses;
   protected ScriptingEngines scriptingEngines;
   protected List<ResolverFactory> resolverFactories;
+  protected ScriptingEnvironment scriptingEnvironment;
+  protected List<ScriptEnvResolver> scriptEnvResolvers;
+  protected ScriptFactory scriptFactory;
   protected boolean autoStoreScriptVariables = false;
   protected boolean enableScriptCompilation = true;
   protected boolean cmmnEnabled = true;
@@ -334,10 +362,19 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected CmmnTransformFactory cmmnTransformFactory;
   protected DefaultCmmnElementHandlerRegistry cmmnElementHandlerRegistry;
 
-  protected int historyLevel;
+  protected HistoryLevel historyLevel;
+
+  /** a list of supported history levels */
+  protected List<HistoryLevel> historyLevels;
+
+  /** a list of supported custom history levels */
+  protected List<HistoryLevel> customHistoryLevels;
 
   protected List<BpmnParseListener> preParseListeners;
   protected List<BpmnParseListener> postParseListeners;
+
+  protected List<CmmnTransformListener> customPreCmmnTransformListeners;
+  protected List<CmmnTransformListener> customPostCmmnTransformListeners;
 
   protected Map<Object, Object> beans;
 
@@ -383,6 +420,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected HistoryEventProducer historyEventProducer;
 
+  protected CmmnHistoryEventProducer cmmnHistoryEventProducer;
+
   protected HistoryEventHandler historyEventHandler;
 
   protected boolean isExecutionTreePrefetchEnabled = true;
@@ -392,10 +431,22 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
    */
   protected boolean isDeploymentLockUsed = true;
 
+  /** Allows setting whether the process engine should try reusing the first level entity cache.
+   * Default setting is false, enabling it improves performance of asynchronous continuations.
+   */
+  protected boolean isDbEntityCacheReuseEnabled = false;
+
+  protected boolean isInvokeCustomVariableListeners = true;
+
   /**
    * The process engine created by this configuration.
    */
   protected ProcessEngineImpl processEngine;
+
+  /** used to create instances for listeners, JavaDelegates, etc */
+  protected ArtifactFactory artifactFactory;
+
+  protected DbEntityCacheKeyMapping dbEntityCacheKeyMapping = DbEntityCacheKeyMapping.defaultEntityCacheKeyMapping();
 
   // buildProcessEngine ///////////////////////////////////////////////////////
 
@@ -410,16 +461,18 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected void init() {
     invokePreInit();
+    initDefaultCharset();
     initHistoryLevel();
     initHistoryEventProducer();
+    initCmmnHistoryEventProducer();
     initHistoryEventHandler();
     initExpressionManager();
-    initVariableTypes();
     initBeans();
+    initArtifactFactory();
     initFormEngines();
     initFormTypes();
     initFormFieldValidators();
-    initScriptingEngines();
+    initScripting();
     initBusinessCalendarManager();
     initCommandContextFactory();
     initTransactionContextFactory();
@@ -428,12 +481,13 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     initIdGenerator();
     initDeployers();
     initJobExecutor();
-    initMailScanner();
     initDataSource();
     initTransactionFactory();
     initSqlSessionFactory();
     initIdentityProviderSessionFactory();
     initSessionFactories();
+    initValueTypeResolver();
+    initSerialization();
     initJpa();
     initDelegateInterceptor();
     initEventHandlers();
@@ -444,8 +498,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     initPasswordDigest();
     initDeploymentRegistration();
     initResourceAuthorizationProvider();
+
     invokePostInit();
   }
+
 
   protected void invokePreInit() {
     for (ProcessEnginePlugin plugin : processEnginePlugins) {
@@ -585,6 +641,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     initService(managementService);
     initService(authorizationService);
     initService(caseService);
+    initService(filterService);
   }
 
   protected void initService(Object service) {
@@ -684,12 +741,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       connection = dataSource.getConnection();
       DatabaseMetaData databaseMetaData = connection.getMetaData();
       String databaseProductName = databaseMetaData.getDatabaseProductName();
-      log.fine("database product name: '"+databaseProductName+"'");
+      log.fine("database product name: '" + databaseProductName + "'");
       databaseType = databaseTypeMappings.getProperty(databaseProductName);
-      if (databaseType==null) {
-        throw new ProcessEngineException("couldn't deduct database type from database product name '"+databaseProductName+"'");
-      }
-      log.fine("using database type: "+databaseType);
+      ensureNotNull("couldn't deduct database type from database product name '" + databaseProductName + "'", "databaseType", databaseType);
+      log.fine("using database type: " + databaseType);
 
     } catch (SQLException e) {
       e.printStackTrace();
@@ -731,16 +786,13 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
           properties.put("limitBefore" , DbSqlSessionFactory.databaseSpecificLimitBeforeStatements.get(databaseType));
           properties.put("limitAfter" , DbSqlSessionFactory.databaseSpecificLimitAfterStatements.get(databaseType));
           properties.put("limitBetween" , DbSqlSessionFactory.databaseSpecificLimitBetweenStatements.get(databaseType));
+          properties.put("limitBetweenClob" , DbSqlSessionFactory.databaseSpecificLimitBetweenClobStatements.get(databaseType));
           properties.put("orderBy" , DbSqlSessionFactory.databaseSpecificOrderByStatements.get(databaseType));
           properties.put("limitBeforeNativeQuery" , DbSqlSessionFactory.databaseSpecificLimitBeforeNativeQueryStatements.get(databaseType));
 
           properties.put("bitand1" , DbSqlSessionFactory.databaseSpecificBitAnd1.get(databaseType));
           properties.put("bitand2" , DbSqlSessionFactory.databaseSpecificBitAnd2.get(databaseType));
           properties.put("bitand3" , DbSqlSessionFactory.databaseSpecificBitAnd3.get(databaseType));
-
-          properties.put("dateDiff1" , DbSqlSessionFactory.databaseSpecificDateDiff1.get(databaseType));
-          properties.put("dateDiff2" , DbSqlSessionFactory.databaseSpecificDateDiff2.get(databaseType));
-          properties.put("dateDiff3" , DbSqlSessionFactory.databaseSpecificDateDiff3.get(databaseType));
 
           properties.put("trueConstant", DbSqlSessionFactory.databaseSpecificTrueConstant.get(databaseType));
           properties.put("falseConstant", DbSqlSessionFactory.databaseSpecificFalseConstant.get(databaseType));
@@ -756,7 +808,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         XMLConfigBuilder parser = new XMLConfigBuilder(reader,"", properties);
         Configuration configuration = parser.getConfiguration();
         configuration.setEnvironment(environment);
-        configuration.getTypeHandlerRegistry().register(VariableType.class, JdbcType.VARCHAR, new IbatisVariableTypeHandler());
         configuration = parser.parse();
 
         sqlSessionFactory = new DefaultSqlSessionFactory(configuration);
@@ -785,25 +836,20 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     if (sessionFactories==null) {
       sessionFactories = new HashMap<Class<?>, SessionFactory>();
 
-      dbSqlSessionFactory = new DbSqlSessionFactory();
-      dbSqlSessionFactory.setDatabaseType(databaseType);
-      dbSqlSessionFactory.setIdGenerator(idGenerator);
-      dbSqlSessionFactory.setSqlSessionFactory(sqlSessionFactory);
-      dbSqlSessionFactory.setDbIdentityUsed(isDbIdentityUsed);
-      dbSqlSessionFactory.setDbHistoryUsed(isDbHistoryUsed);
-      dbSqlSessionFactory.setCmmnEnabled(cmmnEnabled);
-      dbSqlSessionFactory.setDatabaseTablePrefix(databaseTablePrefix);
-      dbSqlSessionFactory.setDatabaseSchema(databaseSchema);
-      addSessionFactory(dbSqlSessionFactory);
+      initPersistenceProviders();
+
+      addSessionFactory(new DbEntityManagerFactory(idGenerator));
 
       addSessionFactory(new GenericManagerFactory(AttachmentManager.class));
       addSessionFactory(new GenericManagerFactory(CommentManager.class));
       addSessionFactory(new GenericManagerFactory(DeploymentManager.class));
       addSessionFactory(new GenericManagerFactory(ExecutionManager.class));
       addSessionFactory(new GenericManagerFactory(HistoricActivityInstanceManager.class));
+      addSessionFactory(new GenericManagerFactory(HistoricCaseActivityInstanceManager.class));
       addSessionFactory(new GenericManagerFactory(HistoricStatisticsManager.class));
       addSessionFactory(new GenericManagerFactory(HistoricDetailManager.class));
       addSessionFactory(new GenericManagerFactory(HistoricProcessInstanceManager.class));
+      addSessionFactory(new GenericManagerFactory(HistoricCaseInstanceManager.class));
       addSessionFactory(new GenericManagerFactory(UserOperationLogManager.class));
       addSessionFactory(new GenericManagerFactory(HistoricTaskInstanceManager.class));
       addSessionFactory(new GenericManagerFactory(HistoricVariableInstanceManager.class));
@@ -823,9 +869,13 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       addSessionFactory(new GenericManagerFactory(StatisticsManager.class));
       addSessionFactory(new GenericManagerFactory(IncidentManager.class));
       addSessionFactory(new GenericManagerFactory(AuthorizationManager.class));
+      addSessionFactory(new GenericManagerFactory(FilterManager.class));
 
       addSessionFactory(new GenericManagerFactory(CaseDefinitionManager.class));
       addSessionFactory(new GenericManagerFactory(CaseExecutionManager.class));
+      addSessionFactory(new GenericManagerFactory(CaseSentryPartManager.class));
+
+      addSessionFactory(new DeserializedObjectsSessionFactory());
 
       sessionFactories.put(ReadOnlyIdentityProvider.class, identityProviderSessionFactory);
 
@@ -841,6 +891,20 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         addSessionFactory(sessionFactory);
       }
     }
+  }
+
+  protected void initPersistenceProviders() {
+    dbSqlSessionFactory = new DbSqlSessionFactory();
+    dbSqlSessionFactory.setDatabaseType(databaseType);
+    dbSqlSessionFactory.setIdGenerator(idGenerator);
+    dbSqlSessionFactory.setSqlSessionFactory(sqlSessionFactory);
+    dbSqlSessionFactory.setDbIdentityUsed(isDbIdentityUsed);
+    dbSqlSessionFactory.setDbHistoryUsed(isDbHistoryUsed);
+    dbSqlSessionFactory.setCmmnEnabled(cmmnEnabled);
+    dbSqlSessionFactory.setDatabaseTablePrefix(databaseTablePrefix);
+    dbSqlSessionFactory.setDatabaseSchema(databaseSchema);
+    addSessionFactory(dbSqlSessionFactory);
+    addSessionFactory(new DbSqlPersistenceProviderFactory());
   }
 
   protected void addSessionFactory(SessionFactory sessionFactory) {
@@ -915,7 +979,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected List<BpmnParseListener> getDefaultBPMNParseListeners() {
     List<BpmnParseListener> defaultListeners = new ArrayList<BpmnParseListener>();
-    if (historyLevel>=ProcessEngineConfigurationImpl.HISTORYLEVEL_ACTIVITY) {
+    if (!historyLevel.equals(HistoryLevel.HISTORY_LEVEL_NONE)) {
       defaultListeners.add(new HistoryParseListener(historyLevel, historyEventProducer));
     }
     return defaultListeners;
@@ -927,7 +991,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     cmmnDeployer.setIdGenerator(idGenerator);
 
     if (cmmnTransformFactory == null) {
-      cmmnTransformFactory = new DefaultCmmnTranformFactory();
+      cmmnTransformFactory = new DefaultCmmnTransformFactory();
     }
 
     if (cmmnElementHandlerRegistry == null) {
@@ -936,11 +1000,25 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     CmmnTransformer cmmnTransformer = new CmmnTransformer(expressionManager, cmmnElementHandlerRegistry, cmmnTransformFactory);
 
-    // TODO: pre- and postParseListener
+    if (customPreCmmnTransformListeners != null) {
+      cmmnTransformer.getTransformListeners().addAll(customPreCmmnTransformListeners);
+    }
+    cmmnTransformer.getTransformListeners().addAll(getDefaultCmmnTransformListeners());
+    if (customPostCmmnTransformListeners != null) {
+      cmmnTransformer.getTransformListeners().addAll(customPostCmmnTransformListeners);
+    }
 
     cmmnDeployer.setTransformer(cmmnTransformer);
 
     return cmmnDeployer;
+  }
+
+  protected List<CmmnTransformListener> getDefaultCmmnTransformListeners() {
+    List<CmmnTransformListener> defaultListener = new ArrayList<CmmnTransformListener>();
+    if (!historyLevel.equals(HistoryLevel.HISTORY_LEVEL_NONE)) {
+      defaultListener.add(new CmmnHistoryTransformListener(historyLevel, cmmnHistoryEventProducer));
+    }
+    return defaultListener;
   }
 
   // job executor /////////////////////////////////////////////////////////////
@@ -1000,31 +1078,40 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   }
 
-  protected void initMailScanner() {
-    if (mailScanner==null) {
-      mailScanner = new MailScanner();
-    }
-    mailScanner.setCommandExecutor(commandExecutorTxRequired);
-  }
-
   // history //////////////////////////////////////////////////////////////////
 
   public void initHistoryLevel() {
-    if (HISTORY_NONE.equalsIgnoreCase(history)) {
-      historyLevel = 0;
-    } else if (HISTORY_ACTIVITY.equalsIgnoreCase(history)) {
-      historyLevel = 1;
-    } else if (HISTORY_VARIABLE.equalsIgnoreCase(history)) {
-      historyLevel = 1;
-      log.warning("Using deprecated history level 'variable'. " +
-      		"This history level is deprecated and replaced by 'activity'. " +
-      		"Consider using 'ACTIVITY' instead.");
-    } else if (HISTORY_AUDIT.equalsIgnoreCase(history)) {
-      historyLevel = 2;
-    } else if (HISTORY_FULL.equalsIgnoreCase(history)) {
-      historyLevel = 3;
-    } else {
-      throw new ProcessEngineException("invalid history level: "+history);
+    if(historyLevel == null) {
+      if(historyLevels == null) {
+        historyLevels = new ArrayList<HistoryLevel>();
+        historyLevels.add(HistoryLevel.HISTORY_LEVEL_NONE);
+        historyLevels.add(HistoryLevel.HISTORY_LEVEL_ACTIVITY);
+        historyLevels.add(HistoryLevel.HISTORY_LEVEL_AUDIT);
+        historyLevels.add(HistoryLevel.HISTORY_LEVEL_FULL);
+      }
+
+      if(customHistoryLevels != null) {
+        historyLevels.addAll(customHistoryLevels);
+      }
+
+      if(HISTORY_VARIABLE.equalsIgnoreCase(history)) {
+        historyLevel = HistoryLevel.HISTORY_LEVEL_ACTIVITY;
+        log.warning("Using deprecated history level 'variable'. " +
+            "This history level is deprecated and replaced by 'activity'. " +
+            "Consider using 'ACTIVITY' instead.");
+
+      } else {
+        for (HistoryLevel historyLevel : historyLevels) {
+          if(historyLevel.getName().equalsIgnoreCase(history)) {
+            this.historyLevel = historyLevel;
+          }
+        }
+
+      }
+
+      if(historyLevel == null) {
+        throw new ProcessEngineException("invalid history level: "+history);
+      }
     }
   }
 
@@ -1067,33 +1154,54 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected void initTransactionContextFactory() {
     if (transactionContextFactory==null) {
-      transactionContextFactory = new StandaloneMybatisTransactionContextFactory();
+      transactionContextFactory = new StandaloneTransactionContextFactory();
     }
   }
 
-  protected void initVariableTypes() {
-    if (variableTypes==null) {
-      variableTypes = new DefaultVariableTypes();
-      if (customPreVariableTypes!=null) {
-        for (VariableType customVariableType: customPreVariableTypes) {
-          variableTypes.addType(customVariableType);
+  protected void initValueTypeResolver() {
+    if(valueTypeResolver == null) {
+      valueTypeResolver = new ValueTypeResolverImpl();
+    }
+  }
+
+  protected void initDefaultCharset() {
+    if(defaultCharset == null) {
+      if(defaultCharsetName == null) {
+        defaultCharsetName = "UTF-8";
+      }
+      defaultCharset = Charset.forName(defaultCharsetName);
+    }
+
+  }
+
+  protected void initSerialization() {
+    if (variableSerializers==null) {
+      variableSerializers = new DefaultVariableSerializers();
+
+      if (customPreVariableSerializers!=null) {
+        for (TypedValueSerializer<?> customVariableType: customPreVariableSerializers) {
+          variableSerializers.addSerializer(customVariableType);
         }
       }
-      variableTypes.addType(new NullType());
-      variableTypes.addType(new StringType());
-      variableTypes.addType(new BooleanType());
-      variableTypes.addType(new ShortType());
-      variableTypes.addType(new IntegerType());
-      variableTypes.addType(new LongType());
-      variableTypes.addType(new DateType());
-      variableTypes.addType(new DoubleType());
-      variableTypes.addType(new ByteArrayType());
-      variableTypes.addType(new SerializableType());
-      if (customPostVariableTypes!=null) {
-        for (VariableType customVariableType: customPostVariableTypes) {
-          variableTypes.addType(customVariableType);
+
+      // register built-in serializers
+      variableSerializers.addSerializer(new NullValueSerializer());
+      variableSerializers.addSerializer(new StringValueSerializer());
+      variableSerializers.addSerializer(new BooleanValueSerializer());
+      variableSerializers.addSerializer(new ShortValueSerializer());
+      variableSerializers.addSerializer(new IntegerValueSerializer());
+      variableSerializers.addSerializer(new LongValueSerlializer());
+      variableSerializers.addSerializer(new DateValueSerializer());
+      variableSerializers.addSerializer(new DoubleValueSerializer());
+      variableSerializers.addSerializer(new ByteArrayValueSerializer());
+      variableSerializers.addSerializer(new JavaObjectSerializer());
+
+      if (customPostVariableSerializers!=null) {
+        for (TypedValueSerializer<?> customVariableType: customPostVariableSerializers) {
+          variableSerializers.addSerializer(customVariableType);
         }
       }
+
     }
   }
 
@@ -1148,7 +1256,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   }
 
-  protected void initScriptingEngines() {
+  protected void initScripting() {
     if (resolverFactories==null) {
       resolverFactories = new ArrayList<ResolverFactory>();
       resolverFactories.add(new VariableScopeResolverFactory());
@@ -1157,12 +1265,26 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     if (scriptingEngines==null) {
       scriptingEngines = new ScriptingEngines(new ScriptBindingsFactory(resolverFactories));
     }
+    if(scriptFactory == null) {
+      scriptFactory = new ScriptFactory();
+    }
+    if(scriptEnvResolvers == null) {
+      scriptEnvResolvers = new ArrayList<ScriptEnvResolver>();
+    }
+    if(scriptingEnvironment == null) {
+      scriptingEnvironment = new ScriptingEnvironment(scriptFactory, scriptEnvResolvers, scriptingEngines);
+    }
   }
 
   protected void initExpressionManager() {
     if (expressionManager==null) {
       expressionManager = new ExpressionManager(beans);
     }
+
+    // add function mapper for command context (eg currentUser(), currentUserGroups())
+    expressionManager.addFunctionMapper(new CommandContextFunctionMapper());
+    // add function mapper for date time (eg now(), dateTime())
+    expressionManager.addFunctionMapper(new DateTimeFunctionMapper());
   }
 
   protected void initBusinessCalendarManager() {
@@ -1211,15 +1333,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     }
     if(jpaEntityManagerFactory!=null) {
       sessionFactories.put(EntityManagerSession.class, new EntityManagerSessionFactory(jpaEntityManagerFactory, jpaHandleTransaction, jpaCloseEntityManager));
-      VariableType jpaType = variableTypes.getVariableType(JPAEntityVariableType.TYPE_NAME);
+      JPAVariableSerializer jpaType = (JPAVariableSerializer) variableSerializers.getSerializerByName(JPAVariableSerializer.NAME);
       // Add JPA-type
       if(jpaType == null) {
-        // We try adding the variable right before SerializableType, if available
-        int serializableIndex = variableTypes.getTypeIndex(SerializableType.TYPE_NAME);
+        // We try adding the variable right after byte serializer, if available
+        int serializableIndex = variableSerializers.getSerializerIndexByName(ValueType.BYTES.getName());
         if(serializableIndex > -1) {
-          variableTypes.addType(new JPAEntityVariableType(), serializableIndex);
+          variableSerializers.addSerializer(new JPAVariableSerializer(), serializableIndex);
         } else {
-          variableTypes.addType(new JPAEntityVariableType());
+          variableSerializers.addSerializer(new JPAVariableSerializer());
         }
       }
     }
@@ -1228,6 +1350,12 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected void initBeans() {
     if (beans == null) {
       beans = new HashMap<Object, Object>();
+    }
+  }
+
+  protected void initArtifactFactory() {
+    if (artifactFactory == null) {
+      artifactFactory = new DefaultArtifactFactory();
     }
   }
 
@@ -1250,6 +1378,12 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected void initHistoryEventProducer() {
     if(historyEventProducer == null) {
       historyEventProducer = new CacheAwareHistoryEventProducer();
+    }
+  }
+
+  protected void initCmmnHistoryEventProducer() {
+    if(cmmnHistoryEventProducer == null) {
+      cmmnHistoryEventProducer = new CacheAwareCmmnHistoryEventProducer();
     }
   }
 
@@ -1288,11 +1422,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     return processEngineName;
   }
 
-  public int getHistoryLevel() {
+  public HistoryLevel getHistoryLevel() {
     return historyLevel;
   }
 
-  public void setHistoryLevel(int historyLevel) {
+  public void setHistoryLevel(HistoryLevel historyLevel) {
     this.historyLevel = historyLevel;
   }
 
@@ -1448,6 +1582,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     this.caseService = caseService;
   }
 
+  public FilterService getFilterService() {
+    return filterService;
+  }
+
+  public void setFilterService(FilterService filterService) {
+    this.filterService = filterService;
+  }
+
   public Map<Class< ? >, SessionFactory> getSessionFactories() {
     return sessionFactories;
   }
@@ -1520,12 +1662,12 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     return this;
   }
 
-  public VariableTypes getVariableTypes() {
-    return variableTypes;
+  public VariableSerializers getVariableSerializers() {
+    return variableSerializers;
   }
 
-  public ProcessEngineConfigurationImpl setVariableTypes(VariableTypes variableTypes) {
-    this.variableTypes = variableTypes;
+  public ProcessEngineConfigurationImpl setVariableTypes(VariableSerializers variableSerializers) {
+    this.variableSerializers = variableSerializers;
     return this;
   }
 
@@ -1676,24 +1818,24 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     return this;
   }
 
-  public List<VariableType> getCustomPreVariableTypes() {
-    return customPreVariableTypes;
+  public List<TypedValueSerializer> getCustomPreVariableSerializers() {
+    return customPreVariableSerializers;
   }
 
 
-  public ProcessEngineConfigurationImpl setCustomPreVariableTypes(List<VariableType> customPreVariableTypes) {
-    this.customPreVariableTypes = customPreVariableTypes;
+  public ProcessEngineConfigurationImpl setCustomPreVariableSerializers(List<TypedValueSerializer> customPreVariableTypes) {
+    this.customPreVariableSerializers = customPreVariableTypes;
     return this;
   }
 
 
-  public List<VariableType> getCustomPostVariableTypes() {
-    return customPostVariableTypes;
+  public List<TypedValueSerializer> getCustomPostVariableSerializers() {
+    return customPostVariableSerializers;
   }
 
 
-  public ProcessEngineConfigurationImpl setCustomPostVariableTypes(List<VariableType> customPostVariableTypes) {
-    this.customPostVariableTypes = customPostVariableTypes;
+  public ProcessEngineConfigurationImpl setCustomPostVariableSerializers(List<TypedValueSerializer> customPostVariableTypes) {
+    this.customPostVariableSerializers = customPostVariableTypes;
     return this;
   }
 
@@ -1713,20 +1855,52 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     this.postParseListeners = postParseListeners;
   }
 
+  /**
+   * @deprecated use {@link #getCustomPreBPMNParseListeners} instead.
+   */
+  @Deprecated
   public List<BpmnParseListener> getPreParseListeners() {
     return preParseListeners;
   }
 
+  /**
+   * @deprecated use {@link #setCustomPreBPMNParseListeners} instead.
+   */
+  @Deprecated
   public void setPreParseListeners(List<BpmnParseListener> preParseListeners) {
     this.preParseListeners = preParseListeners;
   }
 
+  /**
+   * @deprecated use {@link #getCustomPostBPMNParseListeners} instead.
+   */
+  @Deprecated
   public List<BpmnParseListener> getPostParseListeners() {
     return postParseListeners;
   }
 
+  /**
+   * @deprecated use {@link #setCustomPostBPMNParseListeners} instead.
+   */
+  @Deprecated
   public void setPostParseListeners(List<BpmnParseListener> postParseListeners) {
     this.postParseListeners = postParseListeners;
+  }
+
+  public List<CmmnTransformListener> getCustomPreCmmnTransformListeners() {
+    return customPreCmmnTransformListeners;
+  }
+
+  public void setCustomPreCmmnTransformListeners(List<CmmnTransformListener> customPreCmmnTransformListeners) {
+    this.customPreCmmnTransformListeners = customPreCmmnTransformListeners;
+  }
+
+  public List<CmmnTransformListener> getCustomPostCmmnTransformListeners() {
+    return customPostCmmnTransformListeners;
+  }
+
+  public void setCustomPostCmmnTransformListeners(List<CmmnTransformListener> customPostCmmnTransformListeners) {
+    this.customPostCmmnTransformListeners = customPostCmmnTransformListeners;
   }
 
   public Map<Object, Object> getBeans() {
@@ -1914,7 +2088,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     this.isDbIdentityUsed = isDbIdentityUsed;
   }
 
-
   public boolean isDbHistoryUsed() {
     return isDbHistoryUsed;
   }
@@ -1929,14 +2102,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public void setResolverFactories(List<ResolverFactory> resolverFactories) {
     this.resolverFactories = resolverFactories;
-  }
-
-  public MailScanner getMailScanner() {
-    return mailScanner;
-  }
-
-  public void setMailScanner(MailScanner mailScanner) {
-    this.mailScanner = mailScanner;
   }
 
   public DeploymentCache getDeploymentCache() {
@@ -2085,7 +2250,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   public IncidentHandler getIncidentHandler(String incidentType) {
     return incidentHandlers.get(incidentType);
   }
-    public Map<String, IncidentHandler> getIncidentHandlers() {
+
+  public Map<String, IncidentHandler> getIncidentHandlers() {
     return incidentHandlers;
   }
 
@@ -2141,13 +2307,22 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     this.processEnginePlugins = processEnginePlugins;
   }
 
-  public ProcessEngineConfigurationImpl setHistoryEventProducer(HistoryEventProducer historyEventProducerFactory) {
-    this.historyEventProducer = historyEventProducerFactory;
+  public ProcessEngineConfigurationImpl setHistoryEventProducer(HistoryEventProducer historyEventProducer) {
+    this.historyEventProducer = historyEventProducer;
     return this;
   }
 
   public HistoryEventProducer getHistoryEventProducer() {
     return historyEventProducer;
+  }
+
+  public ProcessEngineConfigurationImpl setCmmnHistoryEventProducer(CmmnHistoryEventProducer cmmnHistoryEventProducer) {
+    this.cmmnHistoryEventProducer = cmmnHistoryEventProducer;
+    return this;
+  }
+
+  public CmmnHistoryEventProducer getCmmnHistoryEventProducer() {
+    return cmmnHistoryEventProducer;
   }
 
   public Map<String, Class<? extends FormFieldValidator>> getCustomFormFieldValidators() {
@@ -2231,4 +2406,97 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   public void setCmmnEnabled(boolean cmmnEnabled) {
     this.cmmnEnabled = cmmnEnabled;
   }
+
+  public ScriptFactory getScriptFactory() {
+    return scriptFactory;
+  }
+
+  public ScriptingEnvironment getScriptingEnvironment() {
+    return scriptingEnvironment;
+  }
+
+  public void setScriptFactory(ScriptFactory scriptFactory) {
+    this.scriptFactory = scriptFactory;
+  }
+
+  public void setScriptingEnvironment(ScriptingEnvironment scriptingEnvironment) {
+    this.scriptingEnvironment = scriptingEnvironment;
+  }
+
+  public List<ScriptEnvResolver> getEnvScriptResolvers() {
+    return scriptEnvResolvers;
+  }
+
+  public void setEnvScriptResolvers(List<ScriptEnvResolver> scriptEnvResolvers) {
+    this.scriptEnvResolvers = scriptEnvResolvers;
+  }
+
+  public ProcessEngineConfiguration setArtifactFactory(ArtifactFactory artifactFactory) {
+    this.artifactFactory = artifactFactory;
+    return this;
+  }
+
+  public ArtifactFactory getArtifactFactory() {
+    return artifactFactory;
+  }
+
+  public String getDefaultSerializationFormat() {
+    return defaultSerializationFormat;
+  }
+
+  public ProcessEngineConfigurationImpl setDefaultSerializationFormat(String defaultSerializationFormat) {
+    this.defaultSerializationFormat = defaultSerializationFormat;
+    return this;
+  }
+
+  public ProcessEngineConfigurationImpl setDefaultCharsetName(String defaultCharsetName) {
+    this.defaultCharsetName = defaultCharsetName;
+    return this;
+  }
+
+  public ProcessEngineConfigurationImpl setDefaultCharset(Charset defautlCharset) {
+    this.defaultCharset = defautlCharset;
+    return this;
+  }
+
+  public Charset getDefaultCharset() {
+    return defaultCharset;
+  }
+
+  public boolean isDbEntityCacheReuseEnabled() {
+    return isDbEntityCacheReuseEnabled;
+  }
+
+  public ProcessEngineConfigurationImpl setDbEntityCacheReuseEnabled(boolean isDbEntityCacheReuseEnabled) {
+    this.isDbEntityCacheReuseEnabled = isDbEntityCacheReuseEnabled;
+    return this;
+  }
+
+  public DbEntityCacheKeyMapping getDbEntityCacheKeyMapping() {
+    return dbEntityCacheKeyMapping;
+  }
+
+  public ProcessEngineConfigurationImpl setDbEntityCacheKeyMapping(DbEntityCacheKeyMapping dbEntityCacheKeyMapping) {
+    this.dbEntityCacheKeyMapping = dbEntityCacheKeyMapping;
+    return this;
+  }
+
+  public ProcessEngineConfigurationImpl setCustomHistoryLevels(List<HistoryLevel> customHistoryLevels) {
+    this.customHistoryLevels = customHistoryLevels;
+    return this;
+  }
+
+  public List<HistoryLevel> getCustomHistoryLevels() {
+    return customHistoryLevels;
+  }
+
+  public boolean isInvokeCustomVariableListeners() {
+    return isInvokeCustomVariableListeners;
+  }
+
+  public ProcessEngineConfigurationImpl setInvokeCustomVariableListeners(boolean isInvokeCustomVariableListeners) {
+    this.isInvokeCustomVariableListeners = isInvokeCustomVariableListeners;
+    return this;
+  }
+
 }

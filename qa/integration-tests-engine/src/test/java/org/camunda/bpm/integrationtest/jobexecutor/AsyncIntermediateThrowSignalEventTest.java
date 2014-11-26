@@ -13,21 +13,21 @@ import org.junit.runner.RunWith;
 
 @RunWith(Arquillian.class)
 public class AsyncIntermediateThrowSignalEventTest extends AbstractFoxPlatformIntegrationTest {
-  
+
   @Deployment
   public static WebArchive processArchive() {
     return initWebArchiveDeployment()
             .addAsResource("org/camunda/bpm/integrationtest/jobexecutor/AsyncIntermediateThrowSignalEventTest.catchAlertSignalBoundaryWithBoundarySignalEvent.bpmn20.xml")
             .addAsResource("org/camunda/bpm/integrationtest/jobexecutor/AsyncIntermediateThrowSignalEventTest.throwAlertSignalWithIntermediateCatchSignalEvent.bpmn20.xml");
   }
-  
+
   @Test
   public void testAsyncSignalEvent() throws InterruptedException {
     ProcessInstance piCatchSignal = runtimeService.startProcessInstanceByKey("catchSignal");
 
     ProcessInstance piThrowSignal = runtimeService.startProcessInstanceByKey("throwSignal");
 
-    waitForJobExecutorToProcessAllJobs(2000);
+    waitForJobExecutorToProcessAllJobs();
 
     assertEquals(1, runtimeService.createExecutionQuery().processInstanceId(piCatchSignal.getProcessInstanceId()).activityId("receiveTask").count());
     assertEquals(1, runtimeService.createExecutionQuery().processInstanceId(piThrowSignal.getProcessInstanceId()).activityId("receiveTask").count());

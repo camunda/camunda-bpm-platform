@@ -12,13 +12,14 @@
  */
 package org.camunda.bpm.engine.impl;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.form.FormData;
 import org.camunda.bpm.engine.impl.cmd.ActivateProcessInstanceCmd;
@@ -27,6 +28,7 @@ import org.camunda.bpm.engine.impl.cmd.DeleteProcessInstanceCmd;
 import org.camunda.bpm.engine.impl.cmd.FindActiveActivityIdsCmd;
 import org.camunda.bpm.engine.impl.cmd.GetActivityInstanceCmd;
 import org.camunda.bpm.engine.impl.cmd.GetExecutionVariableCmd;
+import org.camunda.bpm.engine.impl.cmd.GetExecutionVariableTypedCmd;
 import org.camunda.bpm.engine.impl.cmd.GetExecutionVariablesCmd;
 import org.camunda.bpm.engine.impl.cmd.GetStartFormCmd;
 import org.camunda.bpm.engine.impl.cmd.MessageEventReceivedCmd;
@@ -48,6 +50,8 @@ import org.camunda.bpm.engine.runtime.NativeProcessInstanceQuery;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.camunda.bpm.engine.runtime.VariableInstanceQuery;
+import org.camunda.bpm.engine.variable.VariableMap;
+import org.camunda.bpm.engine.variable.value.TypedValue;
 
 /**
  * @author Tom Baeyens
@@ -56,39 +60,59 @@ import org.camunda.bpm.engine.runtime.VariableInstanceQuery;
 public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
 
   public ProcessInstance startProcessInstanceByKey(String processDefinitionKey) {
-    return commandExecutor.execute(new StartProcessInstanceCmd(processDefinitionKey, null, null, null));
+    return commandExecutor.execute(new StartProcessInstanceCmd(processDefinitionKey, null, null, null, null));
   }
 
   public ProcessInstance startProcessInstanceByKey(String processDefinitionKey, String businessKey) {
-    return commandExecutor.execute(new StartProcessInstanceCmd(processDefinitionKey, null, businessKey, null));
+    return commandExecutor.execute(new StartProcessInstanceCmd(processDefinitionKey, null, businessKey, null, null));
+  }
+
+  public ProcessInstance startProcessInstanceByKey(String processDefinitionKey, String businessKey, String caseInstanceId) {
+    return commandExecutor.execute(new StartProcessInstanceCmd(processDefinitionKey, null, businessKey, caseInstanceId, null));
   }
 
   public ProcessInstance startProcessInstanceByKey(String processDefinitionKey, Map<String, Object> variables) {
-    return commandExecutor.execute(new StartProcessInstanceCmd(processDefinitionKey, null, null, variables));
+    return commandExecutor.execute(new StartProcessInstanceCmd(processDefinitionKey, null, null, null, variables));
   }
 
   public ProcessInstance startProcessInstanceByKey(String processDefinitionKey, String businessKey, Map<String, Object> variables) {
-    return commandExecutor.execute(new StartProcessInstanceCmd(processDefinitionKey, null, businessKey, variables));
+    return commandExecutor.execute(new StartProcessInstanceCmd(processDefinitionKey, null, businessKey, null, variables));
+  }
+
+  public ProcessInstance startProcessInstanceByKey(String processDefinitionKey, String businessKey, String caseInstanceId, Map<String, Object> variables) {
+    return commandExecutor.execute(new StartProcessInstanceCmd(processDefinitionKey, null, businessKey, caseInstanceId, variables));
   }
 
   public ProcessInstance startProcessInstanceById(String processDefinitionId) {
-    return commandExecutor.execute(new StartProcessInstanceCmd(null, processDefinitionId, null, null));
+    return commandExecutor.execute(new StartProcessInstanceCmd(null, processDefinitionId, null, null, null));
   }
 
   public ProcessInstance startProcessInstanceById(String processDefinitionId, String businessKey) {
-    return commandExecutor.execute(new StartProcessInstanceCmd(null, processDefinitionId, businessKey, null));
+    return commandExecutor.execute(new StartProcessInstanceCmd(null, processDefinitionId, businessKey, null, null));
+  }
+
+  public ProcessInstance startProcessInstanceById(String processDefinitionId, String businessKey, String caseInstanceId) {
+    return commandExecutor.execute(new StartProcessInstanceCmd(null, processDefinitionId, businessKey, caseInstanceId, null));
   }
 
   public ProcessInstance startProcessInstanceById(String processDefinitionId, Map<String, Object> variables) {
-    return commandExecutor.execute(new StartProcessInstanceCmd(null, processDefinitionId, null, variables));
+    return commandExecutor.execute(new StartProcessInstanceCmd(null, processDefinitionId, null, null, variables));
   }
 
   public ProcessInstance startProcessInstanceById(String processDefinitionId, String businessKey, Map<String, Object> variables) {
-    return commandExecutor.execute(new StartProcessInstanceCmd(null, processDefinitionId, businessKey, variables));
+    return commandExecutor.execute(new StartProcessInstanceCmd(null, processDefinitionId, businessKey, null, variables));
+  }
+
+  public ProcessInstance startProcessInstanceById(String processDefinitionId, String businessKey, String caseInstanceId, Map<String, Object> variables) {
+    return commandExecutor.execute(new StartProcessInstanceCmd(null, processDefinitionId, businessKey, caseInstanceId, variables));
   }
 
   public void deleteProcessInstance(String processInstanceId, String deleteReason) {
-    commandExecutor.execute(new DeleteProcessInstanceCmd(processInstanceId, deleteReason));
+    commandExecutor.execute(new DeleteProcessInstanceCmd(processInstanceId, deleteReason, false));
+  }
+
+  public void deleteProcessInstance(String processInstanceId, String deleteReason, boolean skipCustomListeners) {
+    commandExecutor.execute(new DeleteProcessInstanceCmd(processInstanceId, deleteReason, skipCustomListeners));
   }
 
   public ExecutionQuery createExecutionQuery() {
@@ -116,24 +140,64 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
     return new VariableInstanceQueryImpl(commandExecutor);
   }
 
-  public Map<String, Object> getVariables(String executionId) {
-    return commandExecutor.execute(new GetExecutionVariablesCmd(executionId, null, false));
+  public VariableMap getVariables(String executionId) {
+    return getVariablesTyped(executionId);
   }
 
-  public Map<String, Object> getVariablesLocal(String executionId) {
-    return commandExecutor.execute(new GetExecutionVariablesCmd(executionId, null, true));
+  public VariableMap getVariablesTyped(String executionId) {
+    return getVariablesTyped(executionId, true);
   }
 
-  public Map<String, Object> getVariables(String executionId, Collection<String> variableNames) {
-    return commandExecutor.execute(new GetExecutionVariablesCmd(executionId, variableNames, false));
+  public VariableMap getVariablesTyped(String executionId, boolean deserializeObjectValues) {
+    return commandExecutor.execute(new GetExecutionVariablesCmd(executionId, null, false, deserializeObjectValues));
   }
 
-  public Map<String, Object> getVariablesLocal(String executionId, Collection<String> variableNames) {
-    return commandExecutor.execute(new GetExecutionVariablesCmd(executionId, variableNames, true));
+  public VariableMap getVariablesLocal(String executionId) {
+    return getVariablesLocalTyped(executionId);
+  }
+
+  public VariableMap getVariablesLocalTyped(String executionId) {
+    return getVariablesLocalTyped(executionId, true);
+  }
+
+  public VariableMap getVariablesLocalTyped(String executionId, boolean deserializeObjectValues) {
+    return commandExecutor.execute(new GetExecutionVariablesCmd(executionId, null, true, deserializeObjectValues));
+  }
+
+  public VariableMap getVariables(String executionId, Collection<String> variableNames) {
+    return getVariablesTyped(executionId, variableNames, true);
+  }
+
+  public VariableMap getVariablesTyped(String executionId, Collection<String> variableNames, boolean deserializeObjectValues) {
+    return commandExecutor.execute(new GetExecutionVariablesCmd(executionId, variableNames, false, deserializeObjectValues));
+  }
+
+  public VariableMap getVariablesLocal(String executionId, Collection<String> variableNames) {
+    return getVariablesLocalTyped(executionId, variableNames, true);
+  }
+
+  public VariableMap getVariablesLocalTyped(String executionId, Collection<String> variableNames, boolean deserializeObjectValues) {
+    return commandExecutor.execute(new GetExecutionVariablesCmd(executionId, variableNames, true, deserializeObjectValues));
   }
 
   public Object getVariable(String executionId, String variableName) {
     return commandExecutor.execute(new GetExecutionVariableCmd(executionId, variableName, false));
+  }
+
+  public <T extends TypedValue> T getVariableTyped(String executionId, String variableName) {
+    return getVariableTyped(executionId, variableName, true);
+  }
+
+  public <T extends TypedValue> T getVariableTyped(String executionId, String variableName, boolean deserializeObjectValue) {
+    return commandExecutor.execute(new GetExecutionVariableTypedCmd<T>(executionId, variableName, false, deserializeObjectValue));
+  }
+
+  public <T extends TypedValue> T getVariableLocalTyped(String executionId, String variableName) {
+    return getVariableLocalTyped(executionId, variableName, true);
+  }
+
+  public <T extends TypedValue> T getVariableLocalTyped(String executionId, String variableName, boolean deserializeObjectValue) {
+    return commandExecutor.execute(new GetExecutionVariableTypedCmd<T>(executionId, variableName, true, deserializeObjectValue));
   }
 
   public Object getVariableLocal(String executionId, String variableName) {
@@ -141,18 +205,14 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
   }
 
   public void setVariable(String executionId, String variableName, Object value) {
-    if(variableName == null) {
-      throw new ProcessEngineException("variableName is null");
-    }
+    ensureNotNull("variableName", variableName);
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put(variableName, value);
     commandExecutor.execute(new SetExecutionVariablesCmd(executionId, variables, false));
   }
 
   public void setVariableLocal(String executionId, String variableName, Object value) {
-    if(variableName == null) {
-      throw new ProcessEngineException("variableName is null");
-    }
+    ensureNotNull("variableName", variableName);
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put(variableName, value);
     commandExecutor.execute(new SetExecutionVariablesCmd(executionId, variables, true));
@@ -198,7 +258,7 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
   public void signal(String executionId) {
     commandExecutor.execute(new SignalCmd(executionId, null, null, null));
   }
-  
+
   public void signal(String executionId, String signalName, Object signalData, Map<String, Object> processVariables) {
     commandExecutor.execute(new SignalCmd(executionId, signalName, signalData, processVariables));
   }
@@ -280,10 +340,12 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
   }
 
   public void messageEventReceived(String messageName, String executionId) {
+    ensureNotNull("messageName", messageName);
     commandExecutor.execute(new MessageEventReceivedCmd(messageName, executionId, null));
   }
 
   public void messageEventReceived(String messageName, String executionId, Map<String, Object> processVariables) {
+    ensureNotNull("messageName", messageName);
     commandExecutor.execute(new MessageEventReceivedCmd(messageName, executionId, processVariables));
   }
 

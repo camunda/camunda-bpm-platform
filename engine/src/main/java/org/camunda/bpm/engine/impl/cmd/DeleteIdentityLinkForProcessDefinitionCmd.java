@@ -14,12 +14,13 @@
 package org.camunda.bpm.engine.impl.cmd;
 
 import java.io.Serializable;
-
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 
 /**
@@ -43,10 +44,8 @@ public class DeleteIdentityLinkForProcessDefinitionCmd implements Command<Object
   }
   
   protected void validateParams(String userId, String groupId, String processDefinitionId) {
-    if(processDefinitionId == null) {
-      throw new ProcessEngineException("processDefinitionId is null");
-    }
-    
+    ensureNotNull("processDefinitionId", processDefinitionId);
+
     if (userId == null && groupId == null) {
       throw new ProcessEngineException("userId and groupId cannot both be null");
     }
@@ -54,17 +53,15 @@ public class DeleteIdentityLinkForProcessDefinitionCmd implements Command<Object
   
   public Void execute(CommandContext commandContext) {
     ProcessDefinitionEntity processDefinition = Context
-        .getCommandContext()
-        .getProcessDefinitionManager()
-        .findLatestProcessDefinitionById(processDefinitionId);
-      
-    if (processDefinition == null) {
-      throw new ProcessEngineException("Cannot find process definition with id " + processDefinitionId);
-    }
-    
+      .getCommandContext()
+      .getProcessDefinitionManager()
+      .findLatestProcessDefinitionById(processDefinitionId);
+
+    ensureNotNull("Cannot find process definition with id " + processDefinitionId, "processDefinition", processDefinition);
+
     processDefinition.deleteIdentityLink(userId, groupId);
-    
-    return null;  
+
+    return null;
   }
   
 }

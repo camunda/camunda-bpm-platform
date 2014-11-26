@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.engine.impl.interceptor;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -21,21 +23,23 @@ import java.util.concurrent.Callable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.apache.ibatis.exceptions.PersistenceException;
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.OptimisticLockingException;
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.TaskAlreadyClaimedException;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.TransactionContext;
 import org.camunda.bpm.engine.impl.cfg.TransactionContextFactory;
 import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionManager;
+import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionManager;
+import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseSentryPartManager;
+import org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.context.ProcessApplicationContextUtil;
-import org.camunda.bpm.engine.impl.db.DbSqlSession;
+import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
+import org.camunda.bpm.engine.impl.db.sql.DbSqlSession;
 import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.engine.impl.identity.ReadOnlyIdentityProvider;
 import org.camunda.bpm.engine.impl.identity.WritableIdentityProvider;
@@ -48,7 +52,10 @@ import org.camunda.bpm.engine.impl.persistence.entity.DeploymentManager;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionManager;
+import org.camunda.bpm.engine.impl.persistence.entity.FilterManager;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricActivityInstanceManager;
+import org.camunda.bpm.engine.impl.persistence.entity.HistoricCaseActivityInstanceManager;
+import org.camunda.bpm.engine.impl.persistence.entity.HistoricCaseInstanceManager;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricDetailManager;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricIncidentManager;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricProcessInstanceManager;
@@ -79,23 +86,20 @@ public class CommandContext {
 
   private static Logger log = Logger.getLogger(CommandContext.class.getName());
 
-  protected Command< ? > command;
   protected TransactionContext transactionContext;
   protected Map<Class< ? >, SessionFactory> sessionFactories;
   protected Map<Class< ? >, Session> sessions = new HashMap<Class< ? >, Session>();
-  protected Throwable exception = null;
-  protected LinkedList<AtomicOperation> nextOperations = new LinkedList<AtomicOperation>();
+  protected List<Session> sessionList = new ArrayList<Session>();
   protected ProcessEngineConfigurationImpl processEngineConfiguration;
   protected FailedJobCommandFactory failedJobCommandFactory;
 
-  protected List<CommandContextCloseListener> commandContextCloseListeners = new LinkedList<CommandContextCloseListener>();
+  protected List<CommandContextListener> commandContextListeners = new LinkedList<CommandContextListener>();
 
-  public CommandContext(Command<?> command, ProcessEngineConfigurationImpl processEngineConfiguration) {
-    this(command, processEngineConfiguration, processEngineConfiguration.getTransactionContextFactory());
+  public CommandContext(ProcessEngineConfigurationImpl processEngineConfiguration) {
+    this(processEngineConfiguration, processEngineConfiguration.getTransactionContextFactory());
   }
 
-  public CommandContext(Command<?> cmd, ProcessEngineConfigurationImpl processEngineConfiguration, TransactionContextFactory transactionContextFactory) {
-    this.command = cmd;
+  public CommandContext(ProcessEngineConfigurationImpl processEngineConfiguration, TransactionContextFactory transactionContextFactory) {
     this.processEngineConfiguration = processEngineConfiguration;
     this.failedJobCommandFactory = processEngineConfiguration.getFailedJobCommandFactory();
     sessionFactories = processEngineConfiguration.getSessionFactories();
@@ -106,7 +110,7 @@ public class CommandContext {
 
     ProcessApplicationReference targetProcessApplication = getTargetProcessApplication(execution);
 
-    if(requiresContextSwitch(executionOperation, targetProcessApplication)) {
+    if(requiresContextSwitch(targetProcessApplication)) {
 
       Context.executeWithinProcessApplication(new Callable<Void>() {
         public Void call() throws Exception {
@@ -117,37 +121,58 @@ public class CommandContext {
       }, targetProcessApplication);
 
     } else {
-      nextOperations.add(executionOperation);
-      if (nextOperations.size()==1) {
-        try {
-          Context.setExecutionContext(execution);
-          while (!nextOperations.isEmpty()) {
-            AtomicOperation currentOperation = nextOperations.removeFirst();
-            if (log.isLoggable(Level.FINEST)) {
-              log.finest("AtomicOperation: " + currentOperation + " on " + this);
-            }
-            currentOperation.execute(execution);
-          }
-        } finally {
-          Context.removeExecutionContext();
+      try {
+        Context.setExecutionContext(execution);
+        if (log.isLoggable(Level.FINEST)) {
+          log.finest("AtomicOperation: " + executionOperation + " on " + this);
         }
+        executionOperation.execute(execution);
+      } finally {
+        Context.removeExecutionContext();
       }
-
     }
 
   }
 
-  protected ProcessApplicationReference getTargetProcessApplication(ExecutionEntity execution) {
+  public void performOperation(final CmmnAtomicOperation executionOperation, final CaseExecutionEntity execution) {
+    ProcessApplicationReference targetProcessApplication = getTargetProcessApplication(execution);
 
+    if(requiresContextSwitch(targetProcessApplication)) {
+
+      Context.executeWithinProcessApplication(new Callable<Void>() {
+        public Void call() throws Exception {
+          performOperation(executionOperation, execution);
+          return null;
+        }
+
+      }, targetProcessApplication);
+
+    } else {
+      try {
+        Context.setExecutionContext(execution);
+        if (log.isLoggable(Level.FINEST)) {
+          log.finest("AtomicOperation: " + executionOperation + " on " + this);
+        }
+        executionOperation.execute(execution);
+      } finally {
+        Context.removeExecutionContext();
+      }
+    }
+  }
+
+  protected ProcessApplicationReference getTargetProcessApplication(ExecutionEntity execution) {
     return ProcessApplicationContextUtil.getTargetProcessApplication(execution);
   }
 
-  protected boolean requiresContextSwitch(final AtomicOperation executionOperation, ProcessApplicationReference processApplicationReference) {
+  protected ProcessApplicationReference getTargetProcessApplication(CaseExecutionEntity execution) {
+    return ProcessApplicationContextUtil.getTargetProcessApplication(execution);
+  }
 
+  protected boolean requiresContextSwitch(ProcessApplicationReference processApplicationReference) {
     return ProcessApplicationContextUtil.requiresContextSwitch(processApplicationReference);
   }
 
-  public void close() {
+  public void close(CommandInvocationContext commandInvocationContext) {
     // the intention of this method is that all resources are closed properly,
     // even
     // if exceptions occur in close or flush methods of the sessions or the
@@ -157,59 +182,51 @@ public class CommandContext {
       try {
         try {
 
-          if (exception == null) {
+          if (commandInvocationContext.getThrowable() == null) {
             fireCommandContextClose();
             flushSessions();
           }
 
         } catch (Throwable exception) {
-          exception(exception);
+          commandInvocationContext.trySetThrowable(exception);
         } finally {
 
           try {
-            if (exception == null) {
+            if (commandInvocationContext.getThrowable() == null) {
               transactionContext.commit();
             }
           } catch (Throwable exception) {
-            exception(exception);
+            commandInvocationContext.trySetThrowable(exception);
           }
 
-          if (exception != null) {
+          if (commandInvocationContext.getThrowable() != null) {
+            // fire command failed (must not fail itself)
+            fireCommandFailed(commandInvocationContext.getThrowable());
+
             Level loggingLevel = Level.SEVERE;
-            if (shouldLogInfo(exception)) {
+            if (shouldLogInfo(commandInvocationContext.getThrowable())) {
               loggingLevel = Level.INFO; // reduce log level, because this is not really a technical exception
             }
-            else if (shouldLogFine(exception)) {
+            else if (shouldLogFine(commandInvocationContext.getThrowable())) {
               loggingLevel = Level.FINE;
             }
             if (log.isLoggable(loggingLevel)) {
-              log.log(loggingLevel, "Error while closing command context", exception);
+              log.log(loggingLevel, "Error while closing command context", commandInvocationContext.getThrowable());
             }
             transactionContext.rollback();
           }
         }
       } catch (Throwable exception) {
-        exception(exception);
+        commandInvocationContext.trySetThrowable(exception);
       } finally {
-        closeSessions();
-
+        closeSessions(commandInvocationContext);
       }
     } catch (Throwable exception) {
-      exception(exception);
+      commandInvocationContext.trySetThrowable(exception);
     }
 
     // rethrow the original exception if there was one
-    if (exception != null) {
-      if (exception instanceof Error) {
-        throw (Error) exception;
-      } else if (exception instanceof PersistenceException) {
-        throw new ProcessEngineException("Process engine persistence exception", exception);
-      } else if (exception instanceof RuntimeException) {
-        throw (RuntimeException) exception;
-      } else {
-        throw new ProcessEngineException("exception while executing command " + command, exception);
-      }
-    }
+    commandInvocationContext.rethrow();
   }
 
   protected boolean shouldLogInfo(Throwable exception) {
@@ -221,34 +238,34 @@ public class CommandContext {
   }
 
   protected void fireCommandContextClose() {
-    for (CommandContextCloseListener listener : commandContextCloseListeners) {
+    for (CommandContextListener listener : commandContextListeners) {
       listener.onCommandContextClose(this);
     }
   }
 
-  protected void flushSessions() {
-    List<Session> sessions = new ArrayList<Session>(this.sessions.values());
-    for (Session session : sessions) {
-      session.flush();
-    }
-  }
-
-  protected void closeSessions() {
-    List<Session> sessions = new ArrayList<Session>(this.sessions.values());
-    for (Session session : sessions) {
+  protected void fireCommandFailed(Throwable t) {
+    for (CommandContextListener listener : commandContextListeners) {
       try {
-        session.close();
-      } catch (Throwable exception) {
-        exception(exception);
+        listener.onCommandFailed(this, t);
+      } catch(Throwable ex) {
+        log.log(Level.SEVERE, "Exception while invoking onCommandFailed()", t);
       }
     }
   }
 
-  public void exception(Throwable exception) {
-    if (this.exception == null) {
-      this.exception = exception;
-    } else {
-      log.log(Level.SEVERE, "masked exception in command context. for root cause, see below as it will be rethrown later.", exception);
+  protected void flushSessions() {
+    for (int i = 0; i< sessionList.size(); i++) {
+      sessionList.get(i).flush();
+    }
+  }
+
+  protected void closeSessions(CommandInvocationContext commandInvocationContext) {
+    for (Session session : sessionList) {
+      try {
+        session.close();
+      } catch (Throwable exception) {
+        commandInvocationContext.trySetThrowable(exception);
+      }
     }
   }
 
@@ -257,14 +274,17 @@ public class CommandContext {
     Session session = sessions.get(sessionClass);
     if (session == null) {
       SessionFactory sessionFactory = sessionFactories.get(sessionClass);
-      if (sessionFactory==null) {
-        throw new ProcessEngineException("no session factory configured for "+sessionClass.getName());
-      }
+      ensureNotNull("no session factory configured for " + sessionClass.getName(), "sessionFactory", sessionFactory);
       session = sessionFactory.openSession();
       sessions.put(sessionClass, session);
+      sessionList.add(0, session);
     }
 
     return (T) session;
+  }
+
+  public DbEntityManager getDbEntityManager() {
+    return getSession(DbEntityManager.class);
   }
 
   public DbSqlSession getDbSqlSession() {
@@ -307,6 +327,10 @@ public class CommandContext {
     return getSession(HistoricProcessInstanceManager.class);
   }
 
+  public HistoricCaseInstanceManager getHistoricCaseInstanceManager() {
+    return getSession(HistoricCaseInstanceManager.class);
+  }
+
   public HistoricDetailManager getHistoricDetailManager() {
     return getSession(HistoricDetailManager.class);
   }
@@ -321,6 +345,10 @@ public class CommandContext {
 
   public HistoricActivityInstanceManager getHistoricActivityInstanceManager() {
     return getSession(HistoricActivityInstanceManager.class);
+  }
+
+  public HistoricCaseActivityInstanceManager getHistoricCaseActivityInstanceManager() {
+    return getSession(HistoricCaseActivityInstanceManager.class);
   }
 
   public HistoricTaskInstanceManager getHistoricTaskInstanceManager() {
@@ -401,26 +429,32 @@ public class CommandContext {
     return getSession(CaseExecutionManager.class);
   }
 
+  public CaseSentryPartManager getCaseSentryPartManager() {
+    return getSession(CaseSentryPartManager.class);
+  }
+
+  // Filter ////////////////////////////////////////////////////////////////////
+
+  public FilterManager getFilterManager() {
+    return getSession(FilterManager.class);
+  }
+
   // getters and setters //////////////////////////////////////////////////////
 
-  public void registerCommandContextCloseListener(CommandContextCloseListener commandContextCloseListener) {
-    if(!commandContextCloseListeners.contains(commandContextCloseListener)) {
-      commandContextCloseListeners.add(commandContextCloseListener);
+  public void registerCommandContextListener(CommandContextListener commandContextListener) {
+    if(!commandContextListeners.contains(commandContextListener)) {
+      commandContextListeners.add(commandContextListener);
     }
   }
 
   public TransactionContext getTransactionContext() {
     return transactionContext;
   }
-  public Command< ? > getCommand() {
-    return command;
-  }
+
   public Map<Class< ? >, Session> getSessions() {
     return sessions;
   }
-  public Throwable getException() {
-    return exception;
-  }
+
   public FailedJobCommandFactory getFailedJobCommandFactory() {
     return failedJobCommandFactory;
   }

@@ -26,7 +26,10 @@ import java.util.logging.Logger;
 
 import org.apache.ibatis.session.RowBounds;
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.filter.Filter;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
+import org.camunda.bpm.engine.history.HistoricCaseActivityInstance;
+import org.camunda.bpm.engine.history.HistoricCaseInstance;
 import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.history.HistoricFormProperty;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
@@ -34,7 +37,7 @@ import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.history.HistoricVariableUpdate;
 import org.camunda.bpm.engine.impl.TablePageQueryImpl;
-import org.camunda.bpm.engine.impl.db.PersistentObject;
+import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoricDetailEventEntity;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 import org.camunda.bpm.engine.management.TableMetaData;
@@ -56,7 +59,7 @@ public class TableDataManager extends AbstractManager {
   private static Logger log = Logger.getLogger(TableDataManager.class.getName());
 
   public static Map<Class<?>, String> apiTypeToTableNameMap = new HashMap<Class<?>, String>();
-  public static Map<Class<? extends PersistentObject>, String> persistentObjectToTableNameMap = new HashMap<Class<? extends PersistentObject>, String>();
+  public static Map<Class<? extends DbEntity>, String> persistentObjectToTableNameMap = new HashMap<Class<? extends DbEntity>, String>();
 
   static {
     // runtime
@@ -76,6 +79,8 @@ public class TableDataManager extends AbstractManager {
     persistentObjectToTableNameMap.put(MessageEventSubscriptionEntity.class, "ACT_RU_EVENT_SUBSCRIPTION");
     persistentObjectToTableNameMap.put(SignalEventSubscriptionEntity.class, "ACT_RU_EVENT_SUBSCRIPTION");
 
+    persistentObjectToTableNameMap.put(FilterEntity.class, "ACT_RU_FILTER");
+
     // repository
     persistentObjectToTableNameMap.put(DeploymentEntity.class, "ACT_RE_DEPLOYMENT");
     persistentObjectToTableNameMap.put(ProcessDefinitionEntity.class, "ACT_RE_PROCDEF");
@@ -87,6 +92,9 @@ public class TableDataManager extends AbstractManager {
     persistentObjectToTableNameMap.put(AttachmentEntity.class, "ACT_HI_ATTACHMEN");
     persistentObjectToTableNameMap.put(HistoricProcessInstanceEntity.class, "ACT_HI_PROCINST");
     persistentObjectToTableNameMap.put(HistoricTaskInstanceEntity.class, "ACT_HI_TASKINST");
+
+    persistentObjectToTableNameMap.put(HistoricCaseInstanceEntity.class, "ACT_HI_CASEINST");
+    persistentObjectToTableNameMap.put(HistoricCaseActivityInstanceEntity.class, "ACT_HI_CASEACTINST");
 
     // a couple of stuff goes to the same table
     persistentObjectToTableNameMap.put(HistoricFormPropertyEntity.class, "ACT_HI_DETAIL");
@@ -113,6 +121,7 @@ public class TableDataManager extends AbstractManager {
     apiTypeToTableNameMap.put(Deployment.class, "ACT_RE_DEPLOYMENT");
     apiTypeToTableNameMap.put(Job.class, "ACT_RU_JOB");
     apiTypeToTableNameMap.put(Incident.class, "ACT_RU_INCIDENT");
+    apiTypeToTableNameMap.put(Filter.class, "ACT_RU_FILTER");
 
 
     // history
@@ -123,6 +132,9 @@ public class TableDataManager extends AbstractManager {
     apiTypeToTableNameMap.put(HistoricFormProperty.class, "ACT_HI_DETAIL");
     apiTypeToTableNameMap.put(HistoricTaskInstance.class, "ACT_HI_TASKINST");
     apiTypeToTableNameMap.put(HistoricVariableInstance.class, "ACT_HI_VARINST");
+
+    apiTypeToTableNameMap.put(HistoricCaseInstance.class, "ACT_HI_CASEINST");
+    apiTypeToTableNameMap.put(HistoricCaseActivityInstance.class, "ACT_HI_CASEACTINST");
 
     // TODO: Identity skipped for the moment as no SQL injection is provided here
   }
@@ -175,7 +187,7 @@ public class TableDataManager extends AbstractManager {
 
   protected long getTableCount(String tableName) {
     log.fine("selecting table count for "+tableName);
-    Long count = (Long) getDbSqlSession().selectOne("selectTableCount",
+    Long count = (Long) getDbEntityManager().selectOne("selectTableCount",
             Collections.singletonMap("tableName", tableName));
     return count;
   }
@@ -201,7 +213,7 @@ public class TableDataManager extends AbstractManager {
     String databaseTablePrefix = getDbSqlSession().getDbSqlSessionFactory().getDatabaseTablePrefix();
     String tableName = null;
 
-    if (PersistentObject.class.isAssignableFrom(entityClass)) {
+    if (DbEntity.class.isAssignableFrom(entityClass)) {
       tableName = persistentObjectToTableNameMap.get(entityClass);
     }
     else {

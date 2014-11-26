@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,18 +15,18 @@ package org.camunda.bpm.engine.impl.persistence.entity;
 import java.io.Serializable;
 
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.db.HasRevision;
-import org.camunda.bpm.engine.impl.db.PersistentObject;
+import org.camunda.bpm.engine.impl.db.HasDbRevision;
+import org.camunda.bpm.engine.impl.db.DbEntity;
 
 
 
 /**
  * @author Tom Baeyens
  */
-public class PropertyEntity implements PersistentObject, HasRevision, Serializable {
+public class PropertyEntity implements DbEntity, HasDbRevision, Serializable {
 
   private static final long serialVersionUID = 1L;
-  
+
   String name;
   int revision;
   String value;
@@ -42,19 +42,27 @@ public class PropertyEntity implements PersistentObject, HasRevision, Serializab
   public String getName() {
     return name;
   }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
   public int getRevision() {
     return revision;
   }
+
   public void setRevision(int revision) {
     this.revision = revision;
   }
+
   public String getValue() {
     return value;
   }
+
   public void setValue(String value) {
     this.value = value;
   }
-  
+
   // persistent object methods ////////////////////////////////////////////////
 
   public String getId() {
@@ -68,7 +76,7 @@ public class PropertyEntity implements PersistentObject, HasRevision, Serializab
   public void setId(String id) {
     throw new ProcessEngineException("only provided id generation allowed for properties");
   }
-  
+
   public int getRevisionNext() {
     return revision+1;
   }

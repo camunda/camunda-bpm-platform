@@ -26,6 +26,8 @@ import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 /**
  * @author Daniel Meyer
  * @author Falko Menge
@@ -39,10 +41,8 @@ public abstract class AbstractEventHandler implements EventHandler {
     ExecutionEntity execution = eventSubscription.getExecution();
     ActivityImpl activity = eventSubscription.getActivity();
 
-    if (activity == null) {
-      throw new ProcessEngineException("Error while sending signal for event subscription '" + eventSubscription.getId() + "': "
-              + "no activity associated with event subscription");
-    }
+    ensureNotNull("Error while sending signal for event subscription '" + eventSubscription.getId() + "': "
+      + "no activity associated with event subscription", "activity", activity);
 
     if (payload instanceof Map) {
       @SuppressWarnings("unchecked")
@@ -83,7 +83,7 @@ public abstract class AbstractEventHandler implements EventHandler {
         }
       }
 
-      if (!activity.equals( execution.getActivity() )) {
+      if (!activity.equals(execution.getActivity())) {
         execution.setActivity(activity);
       }
       execution.signal("signal", null);

@@ -30,6 +30,9 @@ public interface VariableInstanceQuery extends Query<VariableInstanceQuery, Vari
   /** Only select variable instances which have the variable name. **/
   VariableInstanceQuery variableName(String variableName);
 
+  /** Only select variable instances which have one of the variables names. **/
+  VariableInstanceQuery variableNameIn(String... variableNames);
+
   /** Only select variable instances which have the name like the assigned variable name.
    * The string can include the wildcard character '%' to express like-strategy:
    * starts with (string%), ends with (%string) or contains (%string%).
@@ -51,13 +54,16 @@ public interface VariableInstanceQuery extends Query<VariableInstanceQuery, Vari
   /** Only select variable instances which have one of the task ids. **/
   VariableInstanceQuery taskIdIn(String... taskIds);
 
+  /** Only select variables instances which have on of the variable scope ids. **/
+  VariableInstanceQuery variableScopeIdIn(String... variableScopeIds);
+
   /** Only select variable instances which have one of the activity instance ids. **/
   VariableInstanceQuery activityInstanceIdIn(String... activityInstanceIds);
 
   /**
    * Only select variables instances which have the given name and value. The type
    * of variable is determined based on the value, using types configured in
-   * {@link ProcessEngineConfiguration#getVariableTypes()}.
+   * {@link ProcessEngineConfiguration#getVariableSerializers()}.
    * Byte-arrays and {@link Serializable} objects (which are not primitive type wrappers)
    * are not supported.
    * @param name name of the variable, cannot be null.
@@ -118,6 +124,14 @@ public interface VariableInstanceQuery extends Query<VariableInstanceQuery, Vari
    * @return the query builder
    */
   VariableInstanceQuery disableBinaryFetching();
+
+  /**
+   * Disable deserialization of variable values that are custom objects. By default, the query
+   * will attempt to deserialize the value of these variables. By calling this method you can
+   * prevent such attempts in environments where their classes are not available.
+   * Independent of this setting, variable serialized values are accessible.
+   */
+  VariableInstanceQuery disableCustomObjectDeserialization();
 
   /**
    * Only select variable instances which value is like the given value.

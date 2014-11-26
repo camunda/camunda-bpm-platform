@@ -13,11 +13,13 @@
 
 package org.camunda.bpm.engine.impl;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 import java.io.Serializable;
 import java.util.List;
 import java.util.Set;
 
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
@@ -47,6 +49,7 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
   protected String incidentId;
   protected String incidentMessage;
   protected String incidentMessageLike;
+  protected String caseInstanceId;
 
   // Unused, see dynamic query
   protected String activityId;
@@ -64,53 +67,38 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
   }
 
   public ProcessInstanceQueryImpl processInstanceId(String processInstanceId) {
-    if (processInstanceId == null) {
-      throw new ProcessEngineException("Process instance id is null");
-    }
+    ensureNotNull("Process instance id", processInstanceId);
     this.executionId = processInstanceId;
     return this;
   }
 
   public ProcessInstanceQuery processInstanceIds(Set<String> processInstanceIds) {
-    if (processInstanceIds == null) {
-      throw new ProcessEngineException("Set of process instance ids is null");
-    }
-    if (processInstanceIds.isEmpty()) {
-      throw new ProcessEngineException("Set of process instance ids is empty");
-    }
+    ensureNotEmpty("Set of process instance ids", processInstanceIds);
     this.processInstanceIds = processInstanceIds;
     return this;
   }
 
   public ProcessInstanceQuery processInstanceBusinessKey(String businessKey) {
-    if (businessKey == null) {
-      throw new ProcessEngineException("Business key is null");
-    }
+    ensureNotNull("Business key", businessKey);
     this.businessKey = businessKey;
     return this;
   }
 
   public ProcessInstanceQuery processInstanceBusinessKey(String businessKey, String processDefinitionKey) {
-    if (businessKey == null) {
-      throw new ProcessEngineException("Business key is null");
-    }
+    ensureNotNull("Business key", businessKey);
     this.businessKey = businessKey;
     this.processDefinitionKey = processDefinitionKey;
     return this;
   }
 
   public ProcessInstanceQueryImpl processDefinitionId(String processDefinitionId) {
-    if (processDefinitionId == null) {
-      throw new ProcessEngineException("Process definition id is null");
-    }
+    ensureNotNull("Process definition id", processDefinitionId);
     this.processDefinitionId = processDefinitionId;
     return this;
   }
 
   public ProcessInstanceQueryImpl processDefinitionKey(String processDefinitionKey) {
-    if (processDefinitionKey == null) {
-      throw new ProcessEngineException("Process definition key is null");
-    }
+    ensureNotNull("Process definition key", processDefinitionKey);
     this.processDefinitionKey = processDefinitionKey;
     return this;
   }
@@ -125,6 +113,11 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
     return this;
   }
 
+  public ProcessInstanceQuery caseInstanceId(String caseInstanceId) {
+    ensureNotNull("caseInstanceId", caseInstanceId);
+    this.caseInstanceId = caseInstanceId;
+    return this;
+  }
 
   public ProcessInstanceQuery orderByProcessInstanceId() {
     this.orderProperty = ProcessInstanceQueryProperty.PROCESS_INSTANCE_ID;
@@ -152,25 +145,25 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
   }
 
   public ProcessInstanceQuery incidentType(String incidentType) {
-    assertParamNotNull("incident type", incidentType);
+    ensureNotNull("incident type", incidentType);
     this.incidentType = incidentType;
     return this;
   }
 
   public ProcessInstanceQuery incidentId(String incidentId) {
-    assertParamNotNull("incident id", incidentId);
+    ensureNotNull("incident id", incidentId);
     this.incidentId = incidentId;
     return this;
   }
 
   public ProcessInstanceQuery incidentMessage(String incidentMessage) {
-    assertParamNotNull("incident message", incidentMessage);
+    ensureNotNull("incident message", incidentMessage);
     this.incidentMessage = incidentMessage;
     return this;
   }
 
   public ProcessInstanceQuery incidentMessageLike(String incidentMessageLike) {
-    assertParamNotNull("incident messageLike", incidentMessageLike);
+    ensureNotNull("incident messageLike", incidentMessageLike);
     this.incidentMessageLike = incidentMessageLike;
     return this;
   }
@@ -198,33 +191,43 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
   public boolean getOnlyProcessInstances() {
     return true; // See dynamic query in runtime.mapping.xml
   }
+
   public String getProcessInstanceId() {
     return executionId;
   }
+
   public Set<String> getProcessInstanceIds() {
     return processInstanceIds;
   }
+
   public String getBusinessKey() {
     return businessKey;
   }
+
   public String getProcessDefinitionId() {
     return processDefinitionId;
   }
+
   public String getProcessDefinitionKey() {
     return processDefinitionKey;
   }
+
   public String getActivityId() {
     return null; // Unused, see dynamic query
   }
+
   public String getSuperProcessInstanceId() {
     return superProcessInstanceId;
   }
+
   public String getSubProcessInstanceId() {
     return subProcessInstanceId;
   }
+
   public SuspensionState getSuspensionState() {
     return suspensionState;
   }
+
   public void setSuspensionState(SuspensionState suspensionState) {
     this.suspensionState = suspensionState;
   }
@@ -251,6 +254,10 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
 
   public String getIncidentMessageLike() {
     return incidentMessageLike;
+  }
+
+  public String getCaseInstanceId() {
+    return caseInstanceId;
   }
 
 }

@@ -19,29 +19,75 @@ import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.COMP
 import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.DISABLED;
 import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.ENABLED;
 import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.FAILED;
+import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.NEW;
 import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.SUSPENDED;
+import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.SUSPENDING_ON_PARENT_SUSPENSION;
+import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.SUSPENDING_ON_SUSPENSION;
 import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.TERMINATED;
+import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.TERMINATING_ON_EXIT;
+import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.TERMINATING_ON_PARENT_TERMINATION;
+import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.TERMINATING_ON_TERMINATION;
+import static org.camunda.bpm.engine.impl.cmmn.model.CmmnSentryDeclaration.IF_PART;
+import static org.camunda.bpm.engine.impl.cmmn.model.CmmnSentryDeclaration.PLAN_ITEM_ON_PART;
+import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_COMPLETE;
+import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_CREATE;
 import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_DELETE_CASCADE;
-import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_NOTIFY_LISTENER_COMPLETE;
-import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_NOTIFY_LISTENER_CREATE;
-import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_NOTIFY_LISTENER_DISABLE;
-import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_NOTIFY_LISTENER_ENABLE;
-import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_NOTIFY_LISTENER_MANUAL_START;
-import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_NOTIFY_LISTENER_RE_ENABLE;
-import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_NOTIFY_LISTENER_START;
-import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_INSTANCE_NOTIFY_LISTENER_CREATE;
+import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_DISABLE;
+import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_ENABLE;
+import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_EXIT;
+import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_FIRE_ENTRY_CRITERIA;
+import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_FIRE_EXIT_CRITERIA;
+import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_MANUAL_COMPLETE;
+import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_MANUAL_START;
+import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_OCCUR;
+import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_PARENT_RESUME;
+import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_PARENT_SUSPEND;
+import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_PARENT_TERMINATE;
+import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_RESUME;
+import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_RE_ACTIVATE;
+import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_RE_ENABLE;
+import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_START;
+import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_SUSPEND;
+import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_SUSPENDING_ON_PARENT_SUSPENSION;
+import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_SUSPENDING_ON_SUSPENSION;
+import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_TERMINATE;
+import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_TERMINATING_ON_EXIT;
+import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_TERMINATING_ON_PARENT_TERMINATION;
+import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_TERMINATING_ON_TERMINATION;
+import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_INSTANCE_CLOSE;
+import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_INSTANCE_CREATE;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureInstanceOf;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
+import java.util.Queue;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.delegate.CaseVariableListener;
+import org.camunda.bpm.engine.delegate.Expression;
+import org.camunda.bpm.engine.delegate.TaskListener;
+import org.camunda.bpm.engine.delegate.VariableListener;
+import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseSentryPartEntity;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
-import org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation;
+import org.camunda.bpm.engine.impl.cmmn.model.CmmnIfPartDeclaration;
+import org.camunda.bpm.engine.impl.cmmn.model.CmmnOnPartDeclaration;
+import org.camunda.bpm.engine.impl.cmmn.model.CmmnSentryDeclaration;
+import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
-import org.camunda.bpm.engine.impl.core.variable.CoreVariableScope;
+import org.camunda.bpm.engine.impl.core.variable.event.VariableEvent;
+import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
+import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
+import org.camunda.bpm.engine.impl.pvm.PvmException;
+import org.camunda.bpm.engine.impl.pvm.PvmProcessDefinition;
+import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
+import org.camunda.bpm.engine.impl.task.TaskDecorator;
+import org.camunda.bpm.engine.impl.variable.listener.CaseVariableListenerInvocation;
+import org.camunda.bpm.engine.impl.variable.listener.DelegateCaseVariableInstanceImpl;
+import org.camunda.bpm.engine.task.Task;
 
 /**
  * @author Roman Smirnov
@@ -50,8 +96,6 @@ import org.camunda.bpm.engine.impl.core.variable.CoreVariableScope;
 public abstract class CmmnExecution extends CoreExecution implements CmmnCaseInstance {
 
   private static final long serialVersionUID = 1L;
-
-  private static Logger log = Logger.getLogger(CmmnExecution.class.getName());
 
   protected transient CmmnCaseDefinition caseDefinition;
 
@@ -63,9 +107,17 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
   /** the activity which is to be started next */
   protected transient CmmnActivity nextActivity;
 
+  protected boolean required;
+
   protected int previousState;
 
-  protected int currentState;
+  protected int currentState = NEW.getStateCode();
+
+  protected List<String> satisfiedSentries;
+
+  protected Queue<VariableEvent> variableEventsQueue;
+
+  protected transient TaskEntity task;
 
   public CmmnExecution() {
   }
@@ -73,6 +125,8 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
   // plan items ///////////////////////////////////////////////////////////////
 
   public abstract List<? extends CmmnExecution> getCaseExecutions();
+
+  protected abstract List<? extends CmmnExecution> getCaseExecutionsInternal();
 
   public CmmnExecution findCaseExecution(String activityId) {
     if ((getActivity()!=null) && (getActivity().getId().equals(activityId))) {
@@ -85,6 +139,395 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
      }
    }
    return null;
+  }
+
+  // task /////////////////////////////////////////////////////////////////////
+
+  public TaskEntity getTask() {
+    return this.task;
+  }
+
+  public void setTask(Task task) {
+    this.task = (TaskEntity) task;
+  }
+
+  public TaskEntity createTask(TaskDecorator taskDecorator) {
+    TaskEntity task = TaskEntity.createAndInsert(this);
+
+    task.setCaseExecution(this);
+    setTask(task);
+
+    taskDecorator.decorate(task, this);
+
+    Context.getCommandContext()
+      .getHistoricTaskInstanceManager()
+      .createHistoricTask(task);
+
+    // All properties set, now firing 'create' event
+    task.fireEvent(TaskListener.EVENTNAME_CREATE);
+
+    return task;
+  }
+
+  // sub process instance ////////////////////////////////////////////////////
+
+  public abstract PvmExecutionImpl getSubProcessInstance();
+
+  public abstract void setSubProcessInstance(PvmExecutionImpl subProcessInstance);
+
+  public abstract PvmExecutionImpl createSubProcessInstance(PvmProcessDefinition processDefinition);
+
+  public abstract PvmExecutionImpl createSubProcessInstance(PvmProcessDefinition processDefinition, String businessKey);
+
+  public abstract PvmExecutionImpl createSubProcessInstance(PvmProcessDefinition processDefinition, String businessKey, String caseInstanceId);
+
+  // sub-/super- case instance ////////////////////////////////////////////////////
+
+  public abstract CmmnExecution getSubCaseInstance();
+
+  public abstract void setSubCaseInstance(CmmnExecution subCaseInstance);
+
+  public abstract CmmnExecution createSubCaseInstance(CmmnCaseDefinition caseDefinition);
+
+  public abstract CmmnExecution createSubCaseInstance(CmmnCaseDefinition caseDefinition, String businessKey);
+
+  public abstract CmmnExecution getSuperCaseExecution();
+
+  public abstract void setSuperCaseExecution(CmmnExecution superCaseExecution);
+
+  // sentry //////////////////////////////////////////////////////////////////
+
+  // sentry: (1) create and initialize sentry parts
+
+  protected abstract CmmnSentryPart newSentryPart();
+
+  protected abstract void addSentryPart(CmmnSentryPart sentryPart);
+
+  public void createSentryParts() {
+    CmmnActivity activity = getActivity();
+    ensureNotNull("Case execution '"+id+"': has no current activity", "activity", activity);
+
+    List<CmmnSentryDeclaration> sentries = activity.getSentries();
+
+    if (sentries != null && !sentries.isEmpty()) {
+
+      for (CmmnSentryDeclaration sentryDeclaration : sentries) {
+
+        CmmnIfPartDeclaration ifPartDeclaration = sentryDeclaration.getIfPart();
+        if (ifPartDeclaration != null) {
+          CmmnSentryPart ifPart = createIfPart(sentryDeclaration, ifPartDeclaration);
+          addSentryPart(ifPart);
+        }
+
+        List<CmmnOnPartDeclaration> onPartDeclarations = sentryDeclaration.getOnParts();
+
+        for (CmmnOnPartDeclaration onPartDeclaration : onPartDeclarations) {
+          CmmnSentryPart onPart = createOnPart(sentryDeclaration, onPartDeclaration);
+          addSentryPart(onPart);
+        }
+
+      }
+    }
+  }
+
+  protected CmmnSentryPart createOnPart(CmmnSentryDeclaration sentryDeclaration, CmmnOnPartDeclaration onPartDeclaration) {
+    CmmnSentryPart sentryPart = createSentryPart(sentryDeclaration, PLAN_ITEM_ON_PART);
+
+    // set the standard event
+    String standardEvent = onPartDeclaration.getStandardEvent();
+    sentryPart.setStandardEvent(standardEvent);
+
+    // set source case execution
+    CmmnActivity source = onPartDeclaration.getSource();
+    ensureNotNull("The source of sentry '"+sentryDeclaration.getId()+"' is null.", "source", source);
+
+    String sourceActivityId = source.getId();
+
+    CmmnExecution sourceCaseExecution = findCaseExecution(sourceActivityId);
+    sentryPart.setSourceCaseExecution(sourceCaseExecution);
+
+    // TODO: handle also sentryRef!!! (currently not implemented on purpose)
+
+    return sentryPart;
+  }
+
+  protected CmmnSentryPart createIfPart(CmmnSentryDeclaration sentryDeclaration, CmmnIfPartDeclaration ifPartDeclaration) {
+    return createSentryPart(sentryDeclaration, IF_PART);
+  }
+
+  protected CmmnSentryPart createSentryPart(CmmnSentryDeclaration sentryDeclaration, String type) {
+    CmmnSentryPart newSentryPart = newSentryPart();
+
+    // set the type
+    newSentryPart.setType(type);
+
+    // set the case instance and case execution
+    newSentryPart.setCaseInstance(getCaseInstance());
+    newSentryPart.setCaseExecution(this);
+
+    // set sentry id
+    String sentryId = sentryDeclaration.getId();
+    newSentryPart.setSentryId(sentryId);
+
+    return newSentryPart;
+  }
+
+  // sentry: (2) handle transitions
+
+  public void handleChildTransition(CmmnExecution child, String transition) {
+    // Step 1: collect all affected sentries
+    List<String> affectedSentries = collectAffectedSentries(child, transition);
+
+    // Step 2: fire force update on all case sentry part
+    // contained by a affected sentry to provoke an
+    // OptimisticLockingException
+    forceUpdateOnCaseSentryPart(affectedSentries);
+
+    // Step 3: check each affected sentry whether it is satisfied.
+    // the returned list contains all satisfied sentries
+    List<String> satisfiedSentries = getSatisfiedSentries(affectedSentries);
+
+    // Step 4: fire satisfied sentries
+    fireSentries(satisfiedSentries);
+
+    // the following steps are a workaround, because setVariable()
+    // does not check nor fire a sentry!!!
+
+    // Step 5: get all not affected sentries to avoid that a
+    // sentry will be checked twice;
+    // notAffectedSentries = getSentries().keySet() / affectedSentries
+    Map<String, List<CmmnSentryPart>> sentries = getSentries();
+    List<String> notAffectedSentries = new ArrayList<String>();
+    for (String sentryId : sentries.keySet()) {
+      // but only those ones which has an ifPart defined
+      if (!affectedSentries.contains(sentryId) && containsIfPart(sentryId)) {
+        notAffectedSentries.add(sentryId);
+      }
+    }
+
+    // Step 6: check each not affected sentry whether it is satisfied
+    satisfiedSentries = getSatisfiedSentries(notAffectedSentries);
+
+    // Step 7: fire satisfied sentries
+    fireSentries(satisfiedSentries);
+  }
+
+  protected List<String> collectAffectedSentries(CmmnExecution child, String transition) {
+    List<? extends CmmnSentryPart> sentryParts = getCaseSentryParts();
+
+    List<String> affectedSentries = new ArrayList<String>();
+
+    for (CmmnSentryPart sentryPart : sentryParts) {
+
+      // check the ids not the references itself to avoid a select!
+      String sourceCaseExecutionId = sentryPart.getSourceCaseExecutionId();
+      if (child.getId().equals(sourceCaseExecutionId)) {
+
+        String standardEvent = sentryPart.getStandardEvent();
+
+        if (transition.equals(standardEvent)) {
+
+          if (!sentryPart.isSatisfied()) {
+            // if it is not already satisfied, then set the
+            // current case sentry part to satisfied (=true).
+            String sentryId = sentryPart.getSentryId();
+            sentryPart.setSatisfied(true);
+
+            // collect the id of affected sentry.
+            if (!affectedSentries.contains(sentryId)) {
+              affectedSentries.add(sentryId);
+            }
+          }
+        }
+      }
+    }
+
+    return affectedSentries;
+  }
+
+  protected void forceUpdateOnCaseSentryPart(List<String> sentryIds) {
+    for (String sentryId : sentryIds) {
+      List<? extends CmmnSentryPart> sentryParts = findSentry(sentryId);
+      // set for each case sentry part forceUpdate flag to true to provoke
+      // an OptimisticLockingException if different case sentry parts of the
+      // same sentry has been satisfied concurrently.
+      for (CmmnSentryPart sentryPart : sentryParts) {
+        if (sentryPart instanceof CaseSentryPartEntity) {
+          CaseSentryPartEntity sentryPartEntity = (CaseSentryPartEntity) sentryPart;
+          sentryPartEntity.forceUpdate();
+        }
+      }
+    }
+  }
+
+  /**
+   * Checks for each given sentry id whether the corresponding
+   * sentry is satisfied.
+   */
+  protected List<String> getSatisfiedSentries(List<String> sentryIds) {
+    List<String> result = new ArrayList<String>();
+
+    if (sentryIds != null) {
+
+      for (String sentryId : sentryIds) {
+
+        if (isSentrySatisfied(sentryId)) {
+          result.add(sentryId);
+        }
+      }
+    }
+
+    return result;
+  }
+
+  protected void fireSentries(List<String> satisfiedSentries) {
+    if (satisfiedSentries != null && !satisfiedSentries.isEmpty()) {
+      // if there are satisfied sentries, trigger the associated
+      // case executions
+
+      // 1. propagate to child case executions ///////////////////////////////////////////
+
+      // returns a copy of the list of child case executions!
+      List<? extends CmmnExecution> children = getCaseExecutions();
+
+      for (CmmnExecution currentChild : children) {
+
+        // check and fire first exitCriteria
+        currentChild.checkAndFireExitCriteria(satisfiedSentries);
+
+        // then trigger entryCriteria
+        currentChild.checkAndFireEntryCriteria(satisfiedSentries);
+      }
+
+      // 2. check exit criteria of the case instance //////////////////////////////////////////
+
+      if (isCaseInstanceExecution() && isActive()) {
+        checkAndFireExitCriteria(satisfiedSentries);
+      }
+
+    }
+  }
+
+  protected void checkAndFireExitCriteria(List<String> satisfiedSentries) {
+    if (!isNew() && !isCompleted() && !isTerminated()) {
+      CmmnActivity activity = getActivity();
+      ensureNotNull(PvmException.class, "Case execution '"+getId()+"': has no current activity.", "activity", activity);
+
+      // trigger first exitCriteria
+      List<CmmnSentryDeclaration> exitCriteria = activity.getExitCriteria();
+      for (CmmnSentryDeclaration sentryDeclaration : exitCriteria) {
+
+        if (satisfiedSentries.contains(sentryDeclaration.getId())) {
+          fireExitCriteria();
+          break;
+        }
+      }
+    }
+  }
+
+  protected void checkAndFireEntryCriteria(List<String> satisfiedSentries) {
+    if (isAvailable()) {
+      // do that only, when this child case execution
+      // is available
+
+      CmmnActivity activity = getActivity();
+      ensureNotNull(PvmException.class, "Case execution '"+getId()+"': has no current activity.", "activity", activity);
+
+      List<CmmnSentryDeclaration> entryCriteria = activity.getEntryCriteria();
+      for (CmmnSentryDeclaration sentryDeclaration : entryCriteria) {
+
+        if (satisfiedSentries.contains(sentryDeclaration.getId())) {
+          fireEntryCriteria();
+          break;
+        }
+      }
+    }
+  }
+
+  public void fireExitCriteria() {
+    performOperation(CASE_EXECUTION_FIRE_EXIT_CRITERIA);
+  }
+
+  public void fireEntryCriteria() {
+    performOperation(CASE_EXECUTION_FIRE_ENTRY_CRITERIA);
+  }
+
+  // sentry: (3) helper
+
+  public abstract List<? extends CmmnSentryPart> getCaseSentryParts();
+
+  protected abstract List<? extends CmmnSentryPart> findSentry(String sentryId);
+
+  protected abstract Map<String, List<CmmnSentryPart>> getSentries();
+
+  public boolean isSentrySatisfied(String sentryId) {
+    List<? extends CmmnSentryPart> sentryParts = findSentry(sentryId);
+
+    // if part will be evaluated in the end
+    CmmnSentryPart ifPart = null;
+
+    if (sentryParts != null && !sentryParts.isEmpty()) {
+      for (CmmnSentryPart sentryPart : sentryParts) {
+
+        if (PLAN_ITEM_ON_PART.equals(sentryPart.getType())) {
+
+          if (!sentryPart.isSatisfied()) {
+            return false;
+          }
+
+        } else { /* IF_PART.equals(sentryPart.getType) == true */
+
+          ifPart = sentryPart;
+
+          // once the ifPart has been satisfied the whole sentry is satisfied
+          if (ifPart.isSatisfied()) {
+            return true;
+          }
+
+        }
+
+      }
+    }
+
+    if (ifPart != null) {
+
+      CmmnActivity activity = getActivity();
+      ensureNotNull("Case execution '"+id+"': has no current activity", "activity", activity);
+
+      CmmnSentryDeclaration sentryDeclaration = activity.getSentry(sentryId);
+      ensureNotNull("Case execution '"+id+"': has no declaration for sentry '"+sentryId+"'", "sentryDeclaration", sentryDeclaration);
+
+      CmmnIfPartDeclaration ifPartDeclaration = sentryDeclaration.getIfPart();
+      ensureNotNull("Sentry declaration '"+sentryId+"' has no definied ifPart, but there should be one defined for case execution '"+id+"'.", "ifPartDeclaration", ifPartDeclaration);
+
+      Expression condition = ifPartDeclaration.getCondition();
+      ensureNotNull("A condition was expected for ifPart of Sentry declaration '"+sentryId+"' for case execution '"+id+"'.", "condition", condition);
+
+      Object result = condition.getValue(this);
+      ensureInstanceOf("condition expression returns non-Boolean", "result", result, Boolean.class);
+
+      Boolean booleanResult = (Boolean) result;
+      ifPart.setSatisfied(booleanResult);
+      return booleanResult;
+
+    }
+
+    // if all onParts are satisfied and there is no
+    // ifPart then the whole sentry is satisfied.
+    return true;
+
+  }
+
+  protected boolean containsIfPart(String sentryId) {
+    List<? extends CmmnSentryPart> sentries = findSentry(sentryId);
+
+    for (CmmnSentryPart part : sentries) {
+      if (IF_PART.equals(part.getType())) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   // business key ////////////////////////////////////////////////////////////
@@ -151,7 +594,12 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
 
   // variables ////////////////////////////////////////////
 
-  protected CoreVariableScope getParentVariableScope() {
+  @Override
+  public String getVariableScopeKey() {
+    return "caseExecution";
+  }
+
+  public AbstractVariableScope getParentVariableScope() {
     return getParent();
   }
 
@@ -164,23 +612,46 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
   public void remove() {
    CmmnExecution parent = getParent();
    if (parent!=null) {
-     parent.getCaseExecutions().remove(this);
+     parent.getCaseExecutionsInternal().remove(this);
    }
+  }
+
+  // required //////////////////////////////////////////////////
+
+  public boolean isRequired() {
+    return required;
+  }
+
+  public void setRequired(boolean required) {
+    this.required = required;
   }
 
   // state /////////////////////////////////////////////////////
 
-  public int getCurrentState() {
-    return currentState;
+  public CaseExecutionState getCurrentState() {
+    return CaseExecutionState.CASE_EXECUTION_STATES.get(getState());
   }
 
   public void setCurrentState(CaseExecutionState currentState) {
-    previousState = this.currentState;
+    if (!isSuspending() && !isTerminating()) {
+      // do not reset the previous state, if this case execution
+      // is currently terminating or suspending. otherwise the
+      // "real" previous state is lost.
+      previousState = this.currentState;
+    }
     this.currentState = currentState.getStateCode();
   }
 
-  public void setCurrentState(int currentState) {
-    this.currentState = currentState;
+  public int getState() {
+    return currentState;
+  }
+
+  public void setState(int state) {
+    this.currentState = state;
+  }
+
+  public boolean isNew() {
+    return currentState == NEW.getStateCode();
   }
 
   public boolean isAvailable() {
@@ -207,8 +678,19 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
     return currentState == SUSPENDED.getStateCode();
   }
 
+  public boolean isSuspending() {
+    return currentState == SUSPENDING_ON_SUSPENSION.getStateCode()
+        || currentState == SUSPENDING_ON_PARENT_SUSPENSION.getStateCode();
+  }
+
   public boolean isTerminated() {
     return currentState == TERMINATED.getStateCode();
+  }
+
+  public boolean isTerminating() {
+    return currentState == TERMINATING_ON_TERMINATION.getStateCode()
+        || currentState == TERMINATING_ON_PARENT_TERMINATION.getStateCode()
+        || currentState == TERMINATING_ON_EXIT.getStateCode();
   }
 
   public boolean isFailed() {
@@ -221,67 +703,59 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
 
   // previous state /////////////////////////////////////////////
 
-  public int getPreviousState() {
+  public CaseExecutionState getPreviousState() {
+    return CaseExecutionState.CASE_EXECUTION_STATES.get(getPrevious());
+  }
+
+  public int getPrevious() {
     return previousState;
   }
 
-  public void setPreviousState(int previousState) {
-    this.previousState = currentState;
+  public void setPrevious(int previous) {
+    this.previousState = previous;
   }
 
   // state transition ///////////////////////////////////////////
 
-  /** Creates new case instance without businessKey and variables */
   public void create() {
-    create(null, null);
+    create(null);
   }
 
-  /** Creates new case instance with variables but without businessKey */
   public void create(Map<String, Object> variables) {
-    create(null, variables);
-  }
-
-  /** Creates new case instance with businessKey but without variables */
-  public void create(String businessKey) {
-    create(businessKey, null);
-  }
-
-  /** Creates new case instance with businessKey and variables */
-  public void create(String businessKey, Map<String, Object> variables) {
-
     if(variables != null) {
       setVariables(variables);
     }
 
-    if(businessKey != null) {
-      setBusinessKey(businessKey);
-    }
-
-    // the case instance is "ACTIVE" after creation
-    setCurrentState(ACTIVE);
-
-    performOperation(CASE_INSTANCE_NOTIFY_LISTENER_CREATE);
+    performOperation(CASE_INSTANCE_CREATE);
   }
 
-  public void create(List<CmmnActivity> activities) {
-    // this execution must be in the active state
-    if (!isActive()) {
-      // TODO: provide a proper exception message
-      throw new ProcessEngineException();
-    }
-
+  public List<CmmnExecution> createChildExecutions(List<CmmnActivity> activities) {
     List<CmmnExecution> children = new ArrayList<CmmnExecution>();
 
+    // first create new child case executions
     for (CmmnActivity currentActivity : activities) {
       CmmnExecution child = createCaseExecution(currentActivity);
       children.add(child);
     }
 
+    return children;
+  }
+
+
+  public void triggerChildExecutionsLifecycle(List<CmmnExecution> children) {
+    // then notify create listener for each created
+    // child case execution
     for (CmmnExecution child : children) {
+
       if (isActive()) {
-        child.performOperation(CASE_EXECUTION_NOTIFY_LISTENER_CREATE);
+        if (child.isNew()) {
+          child.performOperation(CASE_EXECUTION_CREATE);
+        }
       } else {
-        log.fine("Not taking child '" + child + "', parent plan item has ended.");
+        // if this case execution is not active anymore,
+        // then stop notifying create listener and executing
+        // of each child case execution
+        break;
       }
     }
   }
@@ -291,51 +765,182 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
   protected abstract CmmnExecution newCaseExecution();
 
   public void enable() {
-    transition(AVAILABLE, ENABLED, CASE_EXECUTION_NOTIFY_LISTENER_ENABLE);
+    performOperation(CASE_EXECUTION_ENABLE);
   }
 
   public void disable() {
-    transition(ENABLED, DISABLED, CASE_EXECUTION_NOTIFY_LISTENER_DISABLE);
+    performOperation(CASE_EXECUTION_DISABLE);
   }
 
   public void reenable() {
-    transition(DISABLED, ENABLED, CASE_EXECUTION_NOTIFY_LISTENER_RE_ENABLE);
+    performOperation(CASE_EXECUTION_RE_ENABLE);
   }
 
   public void manualStart() {
-    transition(ENABLED, ACTIVE, CASE_EXECUTION_NOTIFY_LISTENER_MANUAL_START);
+    performOperation(CASE_EXECUTION_MANUAL_START);
   }
 
   public void start() {
-    transition(AVAILABLE, ACTIVE, CASE_EXECUTION_NOTIFY_LISTENER_START);
+    performOperation(CASE_EXECUTION_START);
   }
 
   public void complete() {
-    transition(ACTIVE, COMPLETED, CASE_EXECUTION_NOTIFY_LISTENER_COMPLETE);
+    performOperation(CASE_EXECUTION_COMPLETE);
   }
 
-  protected void transition(CaseExecutionState from, CaseExecutionState to, CmmnAtomicOperation nextOperation) {
-    // is this execution in the expected state
-    if (currentState != from.getStateCode()) {
-      // if not throw an exception
-      // TODO: provide proper exception message
-      throw new ProcessEngineException();
-    }
+  public void manualComplete() {
+    performOperation(CASE_EXECUTION_MANUAL_COMPLETE);
+  }
 
-    // perform transition: set the new state
-    setCurrentState(to);
+  public void occur() {
+    performOperation(CASE_EXECUTION_OCCUR);
+  }
 
-    // if a next operation is provided, execute it.
-    if (nextOperation != null) {
-      performOperation(nextOperation);
+  public void terminate() {
+    performOperation(CASE_EXECUTION_TERMINATING_ON_TERMINATION);
+  }
+
+  public void performTerminate() {
+    performOperation(CASE_EXECUTION_TERMINATE);
+  }
+
+  public void parentTerminate() {
+    performOperation(CASE_EXECUTION_TERMINATING_ON_PARENT_TERMINATION);
+  }
+
+  public void performParentTerminate() {
+    performOperation(CASE_EXECUTION_PARENT_TERMINATE);
+  }
+
+  public void exit() {
+    performOperation(CASE_EXECUTION_TERMINATING_ON_EXIT);
+  }
+
+  public void performExit() {
+    performOperation(CASE_EXECUTION_EXIT);
+  }
+
+  public void suspend() {
+    performOperation(CASE_EXECUTION_SUSPENDING_ON_SUSPENSION);
+  }
+
+  public void performSuspension() {
+    performOperation(CASE_EXECUTION_SUSPEND);
+  }
+
+  public void parentSuspend() {
+    performOperation(CASE_EXECUTION_SUSPENDING_ON_PARENT_SUSPENSION);
+  }
+
+  public void performParentSuspension() {
+    performOperation(CASE_EXECUTION_PARENT_SUSPEND);
+  }
+
+  public void resume() {
+    performOperation(CASE_EXECUTION_RESUME);
+  }
+
+  public void parentResume() {
+    performOperation(CASE_EXECUTION_PARENT_RESUME);
+  }
+
+  public void reactivate() {
+    performOperation(CASE_EXECUTION_RE_ACTIVATE);
+  }
+
+  public void close() {
+    performOperation(CASE_INSTANCE_CLOSE);
+  }
+
+  // variable listeners
+  public void dispatchEvent(VariableEvent variableEvent) {
+    boolean invokeCustomListeners =
+        Context
+          .getProcessEngineConfiguration()
+          .isInvokeCustomVariableListeners();
+
+    Map<String, List<VariableListener<?>>> listeners = getActivity()
+        .getVariableListeners(variableEvent.getEventName(), invokeCustomListeners);
+
+    // only attempt to invoke listeners if there are any (as this involves resolving the upwards execution hierarchy)
+    if (!listeners.isEmpty()) {
+      getCaseInstance().queueVariableEvent(variableEvent, invokeCustomListeners);
     }
   }
 
-  // toString() /////////////////////////////////////////////////
+  protected void queueVariableEvent(VariableEvent variableEvent, boolean includeCustomerListeners) {
+
+    Queue<VariableEvent> variableEventsQueue = getVariableEventQueue();
+
+    variableEventsQueue.add(variableEvent);
+
+    // if this is the first event added, trigger listener invocation
+    if (variableEventsQueue.size() == 1) {
+      invokeVariableListeners(includeCustomerListeners);
+    }
+  }
+
+  protected void invokeVariableListeners(boolean includeCustomerListeners) {
+    Queue<VariableEvent> variableEventsQueue = getVariableEventQueue();
+
+    while (!variableEventsQueue.isEmpty()) {
+      // do not remove the event yet, as otherwise new events will immediately be dispatched
+      VariableEvent nextEvent = variableEventsQueue.peek();
+
+      CmmnExecution sourceExecution = (CmmnExecution) nextEvent.getSourceScope();
+
+      DelegateCaseVariableInstanceImpl delegateVariable =
+          DelegateCaseVariableInstanceImpl.fromVariableInstance(nextEvent.getVariableInstance());
+      delegateVariable.setEventName(nextEvent.getEventName());
+      delegateVariable.setSourceExecution(sourceExecution);
+
+      Map<String, List<VariableListener<?>>> listenersByActivity =
+          sourceExecution.getActivity().getVariableListeners(delegateVariable.getEventName(), includeCustomerListeners);
+
+      CmmnExecution currentExecution = sourceExecution;
+      while (currentExecution != null) {
+
+        if (currentExecution.getActivityId() != null) {
+          List<VariableListener<?>> listeners = listenersByActivity.get(currentExecution.getActivityId());
+
+          if (listeners != null) {
+            delegateVariable.setScopeExecution(currentExecution);
+
+            for (VariableListener<?> listener : listeners) {
+              try {
+                CaseVariableListener caseVariableListener = (CaseVariableListener) listener;
+                CaseVariableListenerInvocation invocation = new CaseVariableListenerInvocation(caseVariableListener, delegateVariable, currentExecution);
+                Context.getProcessEngineConfiguration()
+                  .getDelegateInterceptor()
+                  .handleInvocation(invocation);
+              } catch (Exception e) {
+                throw new ProcessEngineException("Variable listener invocation failed: "+e.getMessage(), e);
+              }
+            }
+          }
+        }
+
+        currentExecution = currentExecution.getParent();
+      }
+
+      // finally remove the event from the queue
+      variableEventsQueue.remove();
+    }
+  }
+
+  protected Queue<VariableEvent> getVariableEventQueue() {
+    if (variableEventsQueue == null) {
+      variableEventsQueue = new LinkedList<VariableEvent>();
+    }
+
+    return variableEventsQueue;
+  }
+
+  // toString() //////////////////////////////////////  ///////////
 
   public String toString() {
     if (isCaseInstanceExecution()) {
-      return "CaseInstance[" + getToStringIdentity() + "]";
+      return "CaseInstance["+getToStringIdentity()+"]";
     } else {
       return "CmmnExecution["+getToStringIdentity() + "]";
     }

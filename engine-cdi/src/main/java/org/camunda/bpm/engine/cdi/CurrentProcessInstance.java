@@ -14,6 +14,7 @@
 package org.camunda.bpm.engine.cdi;
 
 import javax.enterprise.inject.Produces;
+import javax.enterprise.inject.Typed;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -50,6 +51,7 @@ public class CurrentProcessInstance {
   /* Makes the current ProcessInstance available for injection */
   @Produces
   @Named
+  @Typed(ProcessInstance.class)
   public ProcessInstance getProcessInstance() {
     return businessProcess.getProcessInstance();
   }

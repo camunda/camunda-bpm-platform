@@ -10,6 +10,7 @@ create table ACT_HI_PROCINST (
     START_ACT_ID_ nvarchar(255),
     END_ACT_ID_ nvarchar(255),
     SUPER_PROCESS_INSTANCE_ID_ nvarchar(64),
+    CASE_INST_ID_ nvarchar(64),
     DELETE_REASON_ nvarchar(4000),
     primary key (ID_),
     unique (PROC_INST_ID_)
@@ -40,6 +41,9 @@ create table ACT_HI_TASKINST (
     TASK_DEF_KEY_ nvarchar(255),
     PROC_INST_ID_ nvarchar(64),
     EXECUTION_ID_ nvarchar(64),
+    CASE_DEF_ID_ nvarchar(64),
+    CASE_INST_ID_ nvarchar(64),
+    CASE_EXECUTION_ID_ nvarchar(64),
     ACT_INST_ID_ nvarchar(64),
     NAME_ nvarchar(255),
     PARENT_TASK_ID_ nvarchar(64),
@@ -60,6 +64,8 @@ create table ACT_HI_VARINST (
     ID_ nvarchar(64) not null,
     PROC_INST_ID_ nvarchar(64),
     EXECUTION_ID_ nvarchar(64),
+    CASE_INST_ID_ nvarchar(64),
+    CASE_EXECUTION_ID_ nvarchar(64),
     ACT_INST_ID_ nvarchar(64),
     TASK_ID_ nvarchar(64),
     NAME_ nvarchar(255) not null,
@@ -78,6 +84,8 @@ create table ACT_HI_DETAIL (
     TYPE_ nvarchar(255) not null,
     PROC_INST_ID_ nvarchar(64),
     EXECUTION_ID_ nvarchar(64),
+    CASE_INST_ID_ nvarchar(64),
+    CASE_EXECUTION_ID_ nvarchar(64),
     TASK_ID_ nvarchar(64),
     ACT_INST_ID_ nvarchar(64),
     VAR_INST_ID_ nvarchar(64),
@@ -123,8 +131,12 @@ create table ACT_HI_ATTACHMENT (
 create table ACT_HI_OP_LOG (
     ID_ nvarchar(64) not null,
     PROC_DEF_ID_ nvarchar(64),
+    PROC_DEF_KEY_ nvarchar(255),
     PROC_INST_ID_ nvarchar(64),
     EXECUTION_ID_ nvarchar(64),
+    CASE_DEF_ID_ nvarchar(64),
+    CASE_INST_ID_ nvarchar(64),
+    CASE_EXECUTION_ID_ nvarchar(64),
     TASK_ID_ nvarchar(64),
     USER_ID_ nvarchar(255),
     TIMESTAMP_ datetime2 not null,
@@ -161,9 +173,12 @@ create index ACT_IDX_HI_ACT_INST_END on ACT_HI_ACTINST(END_TIME_);
 create index ACT_IDX_HI_ACT_INST_COMP on ACT_HI_ACTINST(EXECUTION_ID_, ACT_ID_, END_TIME_, ID_);
 create index ACT_IDX_HI_DETAIL_PROC_INST on ACT_HI_DETAIL(PROC_INST_ID_);
 create index ACT_IDX_HI_DETAIL_ACT_INST on ACT_HI_DETAIL(ACT_INST_ID_);
+create index ACT_IDX_HI_DETAIL_CASE_INST on ACT_HI_DETAIL(CASE_INST_ID_);
+create index ACT_IDX_HI_DETAIL_CASE_EXEC on ACT_HI_DETAIL(CASE_EXECUTION_ID_);
 create index ACT_IDX_HI_DETAIL_TIME on ACT_HI_DETAIL(TIME_);
 create index ACT_IDX_HI_DETAIL_NAME on ACT_HI_DETAIL(NAME_);
 create index ACT_IDX_HI_DETAIL_TASK_ID on ACT_HI_DETAIL(TASK_ID_);
 create index ACT_IDX_HI_PROCVAR_PROC_INST on ACT_HI_VARINST(PROC_INST_ID_);
+create index ACT_IDX_HI_CASEVAR_CASE_INST on ACT_HI_VARINST(CASE_INST_ID_);
 create index ACT_IDX_HI_PROCVAR_NAME_TYPE on ACT_HI_VARINST(NAME_, VAR_TYPE_);
 create index ACT_IDX_HI_ACT_INST_PROCINST on ACT_HI_ACTINST(PROC_INST_ID_, ACT_ID_);

@@ -15,8 +15,8 @@ package org.camunda.bpm.engine.rest.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriInfo;
 
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.rest.ProcessInstanceRestService;
@@ -29,23 +29,20 @@ import org.camunda.bpm.engine.rest.sub.runtime.ProcessInstanceResource;
 import org.camunda.bpm.engine.rest.sub.runtime.impl.ProcessInstanceResourceImpl;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
+import org.codehaus.jackson.map.ObjectMapper;
 
 public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAware implements
     ProcessInstanceRestService {
 
-  public ProcessInstanceRestServiceImpl() {
-    super();
-  }
-
-  public ProcessInstanceRestServiceImpl(String engineName) {
-    super(engineName);
+  public ProcessInstanceRestServiceImpl(String engineName, ObjectMapper objectMapper) {
+    super(engineName, objectMapper);
   }
 
 
   @Override
   public List<ProcessInstanceDto> getProcessInstances(
       UriInfo uriInfo, Integer firstResult, Integer maxResults) {
-    ProcessInstanceQueryDto queryDto = new ProcessInstanceQueryDto(uriInfo.getQueryParameters());
+    ProcessInstanceQueryDto queryDto = new ProcessInstanceQueryDto(getObjectMapper(), uriInfo.getQueryParameters());
     return queryProcessInstances(queryDto, firstResult, maxResults);
   }
 
@@ -53,6 +50,7 @@ public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAwa
   public List<ProcessInstanceDto> queryProcessInstances(
       ProcessInstanceQueryDto queryDto, Integer firstResult, Integer maxResults) {
     ProcessEngine engine = getProcessEngine();
+    queryDto.setObjectMapper(getObjectMapper());
     ProcessInstanceQuery query = queryDto.toQuery(engine);
 
     List<ProcessInstance> matchingInstances;
@@ -82,13 +80,14 @@ public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAwa
 
   @Override
   public CountResultDto getProcessInstancesCount(UriInfo uriInfo) {
-    ProcessInstanceQueryDto queryDto = new ProcessInstanceQueryDto(uriInfo.getQueryParameters());
+    ProcessInstanceQueryDto queryDto = new ProcessInstanceQueryDto(getObjectMapper(), uriInfo.getQueryParameters());
     return queryProcessInstancesCount(queryDto);
   }
 
   @Override
   public CountResultDto queryProcessInstancesCount(ProcessInstanceQueryDto queryDto) {
     ProcessEngine engine = getProcessEngine();
+    queryDto.setObjectMapper(getObjectMapper());
     ProcessInstanceQuery query = queryDto.toQuery(engine);
 
     long count = query.count();
@@ -100,7 +99,7 @@ public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAwa
 
   @Override
   public ProcessInstanceResource getProcessInstance(String processInstanceId) {
-    return new ProcessInstanceResourceImpl(getProcessEngine(), processInstanceId);
+    return new ProcessInstanceResourceImpl(getProcessEngine(), processInstanceId, getObjectMapper());
   }
 
   public void updateSuspensionState(ProcessInstanceSuspensionStateDto dto) {

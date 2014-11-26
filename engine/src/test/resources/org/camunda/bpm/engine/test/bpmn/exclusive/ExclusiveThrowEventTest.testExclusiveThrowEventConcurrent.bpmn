@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:activiti="http://activiti.org/bpmn"
+  targetNamespace="Examples">
+
+  <process id="exclusive">
+  
+    <startEvent id="theStart" />
+
+    <sequenceFlow sourceRef="theStart" targetRef="parallelGateway" />
+
+    <parallelGateway id="parallelGateway" name="parallelGateway" />
+
+    <sequenceFlow sourceRef="parallelGateway" targetRef="intermediateThrowEvent1" />
+    <sequenceFlow sourceRef="parallelGateway" targetRef="intermediateThrowEvent2" />
+
+    <intermediateThrowEvent id="intermediateThrowEvent1" name="intermediateThrowEvent1" activiti:async="true">
+      <messageEventDefinition id="testMessageDef1" messageRef="testMessage1" />
+    </intermediateThrowEvent>
+
+    <intermediateThrowEvent id="intermediateThrowEvent2" name="intermediateThrowEvent2" activiti:async="true">
+      <messageEventDefinition id="testMessageDef2" messageRef="testMessage2" />
+    </intermediateThrowEvent>
+
+    <sequenceFlow sourceRef="intermediateThrowEvent1" targetRef="theEnd1" />
+    <sequenceFlow sourceRef="intermediateThrowEvent2" targetRef="theEnd2" />
+
+    <endEvent id="theEnd1" />
+    <endEvent id="theEnd2" />
+
+  </process>
+
+</definitions>

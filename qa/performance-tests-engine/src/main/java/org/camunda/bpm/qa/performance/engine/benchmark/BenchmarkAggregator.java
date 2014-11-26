@@ -55,7 +55,7 @@ public class BenchmarkAggregator extends TabularResultAggregator {
     // add duration
     row.add(passResult.getDuration());
 
-    // add throughput per minute
+    // add throughput per second
     long duration = passResult.getDuration();
     float numberOfRuns = results.getConfiguration().getNumberOfRuns();
     float throughput = (numberOfRuns / duration) * 1000;
@@ -69,9 +69,9 @@ public class BenchmarkAggregator extends TabularResultAggregator {
       }
     }
     double speedUp = durationForSequential / passResult.getDuration();
-    BigDecimal bigDecimal = new BigDecimal(speedUp);
-    bigDecimal.setScale(1, BigDecimal.ROUND_HALF_UP);
-    row.add(bigDecimal.doubleValue());
+    BigDecimal bigDecimalSpeedUp = new BigDecimal(speedUp);
+    bigDecimalSpeedUp.setScale(1, BigDecimal.ROUND_HALF_UP);
+    row.add(bigDecimalSpeedUp.doubleValue());
   }
 
   protected void postProcessResultSet(TabularResultSet tabularResultSet) {
@@ -82,7 +82,8 @@ public class BenchmarkAggregator extends TabularResultAggregator {
       columnNames.add(TEST_NAME);
       for (int i = 1; i < columnSize; i++) {
         if((i-1)%3 == 0) {
-          columnNames.add("T = "+(i/3));
+          int numberOfThreads = (i/3) + 1;
+          columnNames.add("T = "+numberOfThreads);
         } else {
           columnNames.add(" ");
         }

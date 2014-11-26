@@ -12,10 +12,13 @@
  */
 package org.camunda.bpm.engine.impl.cmmn.cmd;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureAtLeastOneNotNull;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 import java.io.Serializable;
 import java.util.Map;
 
-import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.exception.cmmn.CaseDefinitionNotFoundException;
 import org.camunda.bpm.engine.impl.cmmn.CaseInstanceBuilderImpl;
 import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
@@ -45,36 +48,30 @@ public class CreateCaseInstanceCmd implements Command<CaseInstance>, Serializabl
   }
 
   public CaseInstance execute(CommandContext commandContext) {
-
     DeploymentCache deploymentCache = Context
         .getProcessEngineConfiguration()
         .getDeploymentCache();
 
-      // Find the case definition
-      CaseDefinitionEntity caseDefinition = null;
+    // Find the case definition
+    CaseDefinitionEntity caseDefinition = null;
 
-      if (caseDefinitionId!=null) {
-        caseDefinition = deploymentCache.findDeployedCaseDefinitionById(caseDefinitionId);
+    ensureAtLeastOneNotNull("caseDefinition and caseDefinitionKey are null", caseDefinitionId, caseDefinitionKey);
 
-        if (caseDefinition == null) {
-          throw new ProcessEngineException("No case definition found for id = '" + caseDefinitionId + "'");
-        }
+    if (caseDefinitionId!=null) {
+      caseDefinition = deploymentCache.findDeployedCaseDefinitionById(caseDefinitionId);
 
-      } else if(caseDefinitionKey != null){
-        caseDefinition = deploymentCache.findDeployedLatestCaseDefinitionByKey(caseDefinitionKey);
+      ensureNotNull(CaseDefinitionNotFoundException.class, "No case definition found for id = '" + caseDefinitionId + "'", "caseDefinition", caseDefinition);
 
-        if (caseDefinition == null) {
-          throw new ProcessEngineException("No case definition found for key '" + caseDefinitionKey +"'");
-        }
+    } else {
+      caseDefinition = deploymentCache.findDeployedLatestCaseDefinitionByKey(caseDefinitionKey);
 
-      } else {
-        throw new ProcessEngineException("caseDefinitionKey and caseDefinitionId are null");
-      }
+      ensureNotNull(CaseDefinitionNotFoundException.class, "No case definition found for key '" + caseDefinitionKey + "'", "caseDefinition", caseDefinition);
+    }
 
-      // Start the case instance
-      CaseExecutionEntity caseInstance = (CaseExecutionEntity) caseDefinition.createCaseInstance();
-      caseInstance.create(businessKey, variables);
-      return caseInstance;
+    // Start the case instance
+    CaseExecutionEntity caseInstance = (CaseExecutionEntity) caseDefinition.createCaseInstance(businessKey);
+    caseInstance.create(variables);
+    return caseInstance;
   }
 
 }

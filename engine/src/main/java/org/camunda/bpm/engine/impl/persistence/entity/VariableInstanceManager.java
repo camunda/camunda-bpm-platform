@@ -18,6 +18,7 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.VariableInstanceQueryImpl;
+import org.camunda.bpm.engine.impl.core.variable.CoreVariableInstance;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 import org.camunda.bpm.engine.runtime.VariableInstance;
 
@@ -29,35 +30,35 @@ public class VariableInstanceManager extends AbstractManager {
 
   @SuppressWarnings("unchecked")
   public List<VariableInstanceEntity> findVariableInstancesByTaskId(String taskId) {
-    return getDbSqlSession().selectList("selectVariablesByTaskId", taskId);
+    return getDbEntityManager().selectList("selectVariablesByTaskId", taskId);
   }
 
   @SuppressWarnings("unchecked")
   public List<VariableInstanceEntity> findVariableInstancesByExecutionId(String executionId) {
-    return getDbSqlSession().selectList("selectVariablesByExecutionId", executionId);
+    return getDbEntityManager().selectList("selectVariablesByExecutionId", executionId);
   }
 
   @SuppressWarnings("unchecked")
   public List<VariableInstanceEntity> findVariableInstancesByCaseExecutionId(String caseExecutionId) {
-    return getDbSqlSession().selectList("selectVariablesByCaseExecutionId", caseExecutionId);
+    return getDbEntityManager().selectList("selectVariablesByCaseExecutionId", caseExecutionId);
   }
 
   public void deleteVariableInstanceByTask(TaskEntity task) {
-    Map<String, VariableInstanceEntity> variableInstances = task.getVariableInstances();
+    Map<String, CoreVariableInstance> variableInstances = task.getVariableInstancesLocal();
     if (variableInstances!=null) {
-      for (VariableInstanceEntity variableInstance: variableInstances.values()) {
-        variableInstance.delete();
+      for (CoreVariableInstance variableInstance: variableInstances.values()) {
+        ((VariableInstanceEntity) variableInstance).delete();
       }
     }
   }
 
   public long findVariableInstanceCountByQueryCriteria(VariableInstanceQueryImpl variableInstanceQuery) {
-    return (Long) getDbSqlSession().selectOne("selectVariableInstanceCountByQueryCriteria", variableInstanceQuery);
+    return (Long) getDbEntityManager().selectOne("selectVariableInstanceCountByQueryCriteria", variableInstanceQuery);
   }
 
   @SuppressWarnings("unchecked")
   public List<VariableInstance> findVariableInstanceByQueryCriteria(VariableInstanceQueryImpl variableInstanceQuery, Page page) {
-    return getDbSqlSession().selectList("selectVariableInstanceByQueryCriteria", variableInstanceQuery, page);
+    return getDbEntityManager().selectList("selectVariableInstanceByQueryCriteria", variableInstanceQuery, page);
   }
 
 }

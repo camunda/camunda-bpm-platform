@@ -16,8 +16,7 @@ package org.camunda.bpm.engine.impl.cmd;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.Serializable;
-
-import org.camunda.bpm.engine.impl.db.DbSqlSession;
+import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.AttachmentEntity;
@@ -37,15 +36,15 @@ public class GetAttachmentContentCmd implements Command<InputStream>, Serializab
   }
 
   public InputStream execute(CommandContext commandContext) {
-    DbSqlSession dbSqlSession = commandContext.getDbSqlSession();
-    AttachmentEntity attachment = dbSqlSession.selectById(AttachmentEntity.class, attachmentId);
+    DbEntityManager dbEntityManger = commandContext.getDbEntityManager();
+    AttachmentEntity attachment = dbEntityManger.selectById(AttachmentEntity.class, attachmentId);
     
     String contentId = attachment.getContentId();
     if (contentId==null) {
       return null;
     }
     
-    ByteArrayEntity byteArray = dbSqlSession.selectById(ByteArrayEntity.class, contentId);
+    ByteArrayEntity byteArray = dbEntityManger.selectById(ByteArrayEntity.class, contentId);
     byte[] bytes = byteArray.getBytes();
     
     return new ByteArrayInputStream(bytes);

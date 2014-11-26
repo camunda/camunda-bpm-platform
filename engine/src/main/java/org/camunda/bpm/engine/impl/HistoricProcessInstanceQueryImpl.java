@@ -13,12 +13,15 @@
 
 package org.camunda.bpm.engine.impl;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotContainsEmptyString;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotContainsNull;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
+
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -43,6 +46,7 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
   protected boolean unfinished = false;
   protected String startedBy;
   protected String superProcessInstanceId;
+  protected String subProcessInstanceId;
   protected List<String> processKeyNotIn;
   protected Date startedBefore;
   protected Date startedAfter;
@@ -50,6 +54,8 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
   protected Date finishedAfter;
   protected String processDefinitionKey;
   protected Set<String> processInstanceIds;
+
+  protected String caseInstanceId;
 
   public HistoricProcessInstanceQueryImpl() {
   }
@@ -68,12 +74,7 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
   }
 
   public HistoricProcessInstanceQuery processInstanceIds(Set<String> processInstanceIds) {
-    if (processInstanceIds == null) {
-      throw new ProcessEngineException("Set of process instance ids is null");
-    }
-    if (processInstanceIds.isEmpty()) {
-      throw new ProcessEngineException("Set of process instance ids is empty");
-    }
+    ensureNotEmpty("Set of process instance ids", processInstanceIds);
     this.processInstanceIds = processInstanceIds;
     return this;
   }
@@ -124,6 +125,8 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
   }
 
   public HistoricProcessInstanceQuery processDefinitionKeyNotIn(List<String> processDefinitionKeys) {
+    ensureNotContainsNull("processDefinitionKeys", processDefinitionKeys);
+    ensureNotContainsEmptyString("processDefinitionKeys", processDefinitionKeys);
     this.processKeyNotIn = processDefinitionKeys;
     return this;
   }
@@ -153,6 +156,16 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
   public HistoricProcessInstanceQuery superProcessInstanceId(String superProcessInstanceId) {
 	 this.superProcessInstanceId = superProcessInstanceId;
 	 return this;
+  }
+
+  public HistoricProcessInstanceQuery subProcessInstanceId(String subProcessInstanceId) {
+    this.subProcessInstanceId = subProcessInstanceId;
+    return this;
+  }
+
+  public HistoricProcessInstanceQuery caseInstanceId(String caseInstanceId) {
+    this.caseInstanceId = caseInstanceId;
+    return this;
   }
 
 	public HistoricProcessInstanceQuery orderByProcessInstanceBusinessKey() {
@@ -198,39 +211,51 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
   public String getBusinessKey() {
     return businessKey;
   }
+
   public String getBusinessKeyLike() {
     return businessKeyLike;
   }
+
   public boolean isOpen() {
     return unfinished;
   }
+
   public String getProcessDefinitionId() {
     return processDefinitionId;
   }
+
   public String getProcessDefinitionKey() {
     return processDefinitionKey;
   }
+
   public String getProcessDefinitionIdLike() {
     return processDefinitionKey + ":%:%";
   }
+
   public String getProcessDefinitionName() {
     return processDefinitionName;
   }
+
   public String getProcessDefinitionNameLike() {
     return processDefinitionNameLike;
   }
+
   public String getProcessInstanceId() {
     return processInstanceId;
   }
+
   public Set<String> getProcessInstanceIds() {
     return processInstanceIds;
   }
+
   public String getStartedBy() {
     return startedBy;
   }
+
   public String getSuperProcessInstanceId() {
     return superProcessInstanceId;
   }
+
   public void setSuperProcessInstanceId(String superProcessInstanceId) {
     this.superProcessInstanceId = superProcessInstanceId;
   }
@@ -238,17 +263,25 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
   public List<String> getProcessKeyNotIn() {
     return processKeyNotIn;
   }
+
   public Date getStartedAfter() {
     return startedAfter;
   }
+
   public Date getStartedBefore() {
     return startedBefore;
   }
+
   public Date getFinishedAfter() {
     return finishedAfter;
   }
+
   public Date getFinishedBefore() {
     return finishedBefore;
+  }
+
+  public String getCaseInstanceId() {
+    return caseInstanceId;
   }
 
   // below is deprecated and to be removed in 5.12
@@ -264,7 +297,7 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
 
   @Deprecated
   public HistoricProcessInstanceQuery startDateBy(Date date) {
-    this.startDateBy = this.calculateMidnight(date);;
+    this.startDateBy = this.calculateMidnight(date);
     return this;
   }
 
@@ -309,4 +342,9 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
     cal.set(Calendar.HOUR, 0);
     return cal.getTime();
   }
+
+  public String getSubProcessInstanceId() {
+    return subProcessInstanceId;
+  }
+
 }

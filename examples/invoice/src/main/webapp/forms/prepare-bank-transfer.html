@@ -1,31 +1,48 @@
+<form class="form-horizontal"
+      role="form">
 
-<p>
-    You can prepare the bank transfer for the following invoice
-</p>
+  <div class="panel panel-info">You can prepare the bank transfer for the following invoice</div>
 
-<form class="form-horizontal">
   <div class="control-group">
     <label class="control-label">Creditor</label>
     <div class="controls">
-      <input form-field type="string" name="creditor" readonly="true" />
+      <input cam-variable-name="creditor"
+             type="text"
+             name="creditor"
+             readonly="true"
+             class="form-control" />
     </div>
   </div>
   <div class="control-group">
     <label class="control-label">Amount</label>
     <div class="controls">
-      <input form-field type="string" name="amount" readonly="true" />
+      <input cam-variable-name="amount"
+             type="text"
+             name="amount"
+             readonly="true"
+             class="form-control" />
     </div>
   </div>
   <div class="control-group">
     <label class="control-label">Invoice Number</label>
     <div class="controls">
-      <input form-field type="string" name="invoiceNumber" readonly="true" />
+      <input cam-variable-name="invoiceNumber"
+             type="text"
+             name="invoiceNumber"
+             readonly="true"
+             class="form-control" />
     </div>
   </div>
   <div class="control-group">
-    <label class="control-label">Approved by: </label>
+    <label class="control-label">Approved by </label>
     <div class="controls">
-      <input form-field type="string" name="approver" readonly="true" />
+      <input cam-variable-name="approver"
+             type="text"
+             name="approved"
+             readonly="true"
+             class="form-control"></input>
+             <p></p>
     </div>
   </div>
 </form>
+

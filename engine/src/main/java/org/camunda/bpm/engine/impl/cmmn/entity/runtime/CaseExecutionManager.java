@@ -16,6 +16,8 @@ import java.util.List;
 
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.impl.Page;
+import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.CaseInstance;
@@ -27,20 +29,27 @@ import org.camunda.bpm.engine.runtime.CaseInstance;
 public class CaseExecutionManager extends AbstractManager {
 
   public void insertCaseExecution(CaseExecutionEntity caseExecution) {
-    getDbSqlSession().insert(caseExecution);
+    getDbEntityManager().insert(caseExecution);
   }
 
   public void deleteCaseExecution(CaseExecutionEntity caseExecution) {
-    getDbSqlSession().delete(caseExecution);
+    getDbEntityManager().delete(caseExecution);
   }
 
   @SuppressWarnings("unchecked")
   public void deleteCaseInstancesByCaseDefinition(String caseDefinitionId, String deleteReason, boolean cascade) {
-    List<String> caseInstanceIds = getDbSqlSession()
+    List<String> caseInstanceIds = getDbEntityManager()
         .selectList("selectCaseInstanceIdsByCaseDefinitionId", caseDefinitionId);
 
     for (String caseInstanceId: caseInstanceIds) {
       deleteCaseInstance(caseInstanceId, deleteReason, cascade);
+    }
+
+    if (cascade) {
+      Context
+        .getCommandContext()
+        .getHistoricCaseInstanceManager()
+        .deleteHistoricCaseInstanceByCaseDefinitionId(caseDefinitionId);
     }
 
   }
@@ -56,34 +65,55 @@ public class CaseExecutionManager extends AbstractManager {
       throw new BadUserRequestException("No case instance found for id '" + caseInstanceId + "'");
     }
 
+    CommandContext commandContext = Context.getCommandContext();
+    commandContext
+      .getTaskManager()
+      .deleteTasksByCaseInstanceId(caseInstanceId, deleteReason, cascade);
+
     execution.deleteCascade();
+
+    if (cascade) {
+      Context
+        .getCommandContext()
+        .getHistoricCaseInstanceManager()
+        .deleteHistoricCaseInstanceById(caseInstanceId);
+    }
   }
 
   public CaseExecutionEntity findCaseExecutionById(String caseExecutionId) {
-    return (CaseExecutionEntity) getDbSqlSession().selectById(CaseExecutionEntity.class, caseExecutionId);
+    return getDbEntityManager().selectById(CaseExecutionEntity.class, caseExecutionId);
+  }
+
+  public CaseExecutionEntity findSubCaseInstanceBySuperCaseExecutionId(String superCaseExecutionId) {
+    return (CaseExecutionEntity) getDbEntityManager().selectOne("selectSubCaseInstanceBySuperCaseExecutionId", superCaseExecutionId);
   }
 
   public long findCaseExecutionCountByQueryCriteria(CaseExecutionQueryImpl caseExecutionQuery) {
-    return (Long) getDbSqlSession().selectOne("selectCaseExecutionCountByQueryCriteria", caseExecutionQuery);
+    return (Long) getDbEntityManager().selectOne("selectCaseExecutionCountByQueryCriteria", caseExecutionQuery);
   }
 
   @SuppressWarnings("unchecked")
   public List<CaseExecution> findCaseExecutionsByQueryCriteria(CaseExecutionQueryImpl caseExecutionQuery, Page page) {
-    return getDbSqlSession().selectList("selectCaseExecutionsByQueryCriteria", caseExecutionQuery, page);
+    return getDbEntityManager().selectList("selectCaseExecutionsByQueryCriteria", caseExecutionQuery, page);
   }
 
   public long findCaseInstanceCountByQueryCriteria(CaseInstanceQueryImpl caseInstanceQuery) {
-    return (Long) getDbSqlSession().selectOne("selectCaseInstanceCountByQueryCriteria", caseInstanceQuery);
+    return (Long) getDbEntityManager().selectOne("selectCaseInstanceCountByQueryCriteria", caseInstanceQuery);
   }
 
   @SuppressWarnings("unchecked")
   public List<CaseInstance> findCaseInstanceByQueryCriteria(CaseInstanceQueryImpl caseInstanceQuery, Page page) {
-    return getDbSqlSession().selectList("selectCaseInstanceByQueryCriteria", caseInstanceQuery, page);
+    return getDbEntityManager().selectList("selectCaseInstanceByQueryCriteria", caseInstanceQuery, page);
   }
 
   @SuppressWarnings("unchecked")
   public List<CaseExecutionEntity> findChildCaseExecutionsByParentCaseExecutionId(String parentCaseExecutionId) {
-    return getDbSqlSession().selectList("selectCaseExecutionsByParentCaseExecutionId", parentCaseExecutionId);
+    return getDbEntityManager().selectList("selectCaseExecutionsByParentCaseExecutionId", parentCaseExecutionId);
+  }
+
+  @SuppressWarnings("unchecked")
+  public List<CaseExecutionEntity> findChildCaseExecutionsByCaseInstanceId(String caseInstanceId) {
+    return getDbEntityManager().selectList("selectCaseExecutionsByCaseInstanceId", caseInstanceId);
   }
 
 }

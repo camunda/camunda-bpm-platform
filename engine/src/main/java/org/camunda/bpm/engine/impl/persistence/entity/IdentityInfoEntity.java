@@ -17,15 +17,15 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.camunda.bpm.engine.impl.db.HasRevision;
-import org.camunda.bpm.engine.impl.db.PersistentObject;
+import org.camunda.bpm.engine.impl.db.HasDbRevision;
+import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.identity.Account;
 
 
 /**
  * @author Tom Baeyens
  */
-public class IdentityInfoEntity implements PersistentObject, HasRevision, Account, Serializable {
+public class IdentityInfoEntity implements DbEntity, HasDbRevision, Account, Serializable {
   
   private static final long serialVersionUID = 1L;
   

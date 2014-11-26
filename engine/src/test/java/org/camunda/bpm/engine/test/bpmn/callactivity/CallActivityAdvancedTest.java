@@ -13,6 +13,11 @@
 
 package org.camunda.bpm.engine.test.bpmn.callactivity;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -21,6 +26,7 @@ import org.camunda.bpm.engine.runtime.EventSubscription;
 import org.camunda.bpm.engine.runtime.EventSubscriptionQuery;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
 import org.camunda.bpm.engine.test.Deployment;
@@ -31,14 +37,11 @@ import org.camunda.bpm.model.bpmn.instance.CallActivity;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaIn;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaOut;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 /**
  * @author Joram Barrez
  * @author Nils Preusker
  * @author Bernd Ruecker
+ * @author Falko Menge
  */
 public class CallActivityAdvancedTest extends PluggableProcessEngineTestCase {
 
@@ -352,6 +355,212 @@ public class CallActivityAdvancedTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  /**
+   * Test case for handing over a null process variables to a sub process
+   */
+  @Deployment(resources = {
+    "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testSubProcessDataInputOutput.bpmn20.xml",
+    "org/camunda/bpm/engine/test/bpmn/callactivity/dataSubProcess.bpmn20.xml" })
+  public void testSubProcessWithNullDataInput() {
+    String processInstanceId = runtimeService.startProcessInstanceByKey("subProcessDataInputOutput").getId();
+
+    // the variable named "subVariable" is not set on process instance
+    VariableInstance variable = runtimeService
+        .createVariableInstanceQuery()
+        .processInstanceIdIn(processInstanceId)
+        .variableName("subVariable")
+        .singleResult();
+    assertNull(variable);
+
+    variable = runtimeService
+        .createVariableInstanceQuery()
+        .processInstanceIdIn(processInstanceId)
+        .variableName("superVariable")
+        .singleResult();
+    assertNull(variable);
+
+    // the sub process instance is in the task
+    Task task = taskService.createTaskQuery().singleResult();
+    assertNotNull(task);
+    assertEquals("Task in subprocess", task.getName());
+
+    // the value of "subVariable" is null
+    assertNull(taskService.getVariable(task.getId(), "subVariable"));
+
+    String subProcessInstanceId = task.getProcessInstanceId();
+    assertFalse(processInstanceId.equals(subProcessInstanceId));
+
+    // the variable "subVariable" is set on the sub process instance
+    variable = runtimeService
+        .createVariableInstanceQuery()
+        .processInstanceIdIn(subProcessInstanceId)
+        .variableName("subVariable")
+        .singleResult();
+
+    assertNotNull(variable);
+    assertNull(variable.getValue());
+    assertEquals("subVariable", variable.getName());
+  }
+
+  /**
+   * Test case for handing over a null process variables to a sub process
+   */
+  @Deployment(resources = {
+    "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testSubProcessDataInputOutputAsExpression.bpmn20.xml",
+    "org/camunda/bpm/engine/test/bpmn/callactivity/dataSubProcess.bpmn20.xml" })
+  public void testSubProcessWithNullDataInputAsExpression() {
+    Map<String, Object> params = new HashMap<String, Object>();
+    params.put("superVariable", null);
+    String processInstanceId = runtimeService.startProcessInstanceByKey("subProcessDataInputOutput", params).getId();
+
+    // the variable named "subVariable" is not set on process instance
+    VariableInstance variable = runtimeService
+        .createVariableInstanceQuery()
+        .processInstanceIdIn(processInstanceId)
+        .variableName("subVariable")
+        .singleResult();
+    assertNull(variable);
+
+    variable = runtimeService
+        .createVariableInstanceQuery()
+        .processInstanceIdIn(processInstanceId)
+        .variableName("superVariable")
+        .singleResult();
+    assertNotNull(variable);
+    assertNull(variable.getValue());
+
+    // the sub process instance is in the task
+    Task task = taskService.createTaskQuery().singleResult();
+    assertNotNull(task);
+    assertEquals("Task in subprocess", task.getName());
+
+    // the value of "subVariable" is null
+    assertNull(taskService.getVariable(task.getId(), "subVariable"));
+
+    String subProcessInstanceId = task.getProcessInstanceId();
+    assertFalse(processInstanceId.equals(subProcessInstanceId));
+
+    // the variable "subVariable" is set on the sub process instance
+    variable = runtimeService
+        .createVariableInstanceQuery()
+        .processInstanceIdIn(subProcessInstanceId)
+        .variableName("subVariable")
+        .singleResult();
+
+    assertNotNull(variable);
+    assertNull(variable.getValue());
+    assertEquals("subVariable", variable.getName());
+  }
+
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testSubProcessDataInputOutput.bpmn20.xml",
+      "org/camunda/bpm/engine/test/bpmn/callactivity/dataSubProcess.bpmn20.xml" })
+  public void testSubProcessWithNullDataOutput() {
+    String processInstanceId = runtimeService.startProcessInstanceByKey("subProcessDataInputOutput").getId();
+
+    // the variable named "subVariable" is not set on process instance
+    VariableInstance variable = runtimeService
+        .createVariableInstanceQuery()
+        .processInstanceIdIn(processInstanceId)
+        .variableName("subVariable")
+        .singleResult();
+    assertNull(variable);
+
+    variable = runtimeService
+        .createVariableInstanceQuery()
+        .processInstanceIdIn(processInstanceId)
+        .variableName("superVariable")
+        .singleResult();
+    assertNull(variable);
+
+    // the sub process instance is in the task
+    Task task = taskService.createTaskQuery().singleResult();
+    assertNotNull(task);
+    assertEquals("Task in subprocess", task.getName());
+
+    taskService.complete(task.getId());
+
+    variable = runtimeService
+        .createVariableInstanceQuery()
+        .processInstanceIdIn(processInstanceId)
+        .variableName("subVariable")
+        .singleResult();
+    assertNull(variable);
+
+    variable = runtimeService
+        .createVariableInstanceQuery()
+        .processInstanceIdIn(processInstanceId)
+        .variableName("superVariable")
+        .singleResult();
+    assertNotNull(variable);
+    assertNull(variable.getValue());
+
+    variable = runtimeService
+        .createVariableInstanceQuery()
+        .processInstanceIdIn(processInstanceId)
+        .variableName("hisLocalVariable")
+        .singleResult();
+    assertNotNull(variable);
+    assertNull(variable.getValue());
+
+  }
+
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testSubProcessDataInputOutputAsExpression.bpmn20.xml",
+      "org/camunda/bpm/engine/test/bpmn/callactivity/dataSubProcess.bpmn20.xml" })
+  public void testSubProcessWithNullDataOutputAsExpression() {
+    Map<String, Object> params = new HashMap<String, Object>();
+    params.put("superVariable", null);
+    String processInstanceId = runtimeService.startProcessInstanceByKey("subProcessDataInputOutput", params).getId();
+
+    // the variable named "subVariable" is not set on process instance
+    VariableInstance variable = runtimeService
+        .createVariableInstanceQuery()
+        .processInstanceIdIn(processInstanceId)
+        .variableName("subVariable")
+        .singleResult();
+    assertNull(variable);
+
+    variable = runtimeService
+        .createVariableInstanceQuery()
+        .processInstanceIdIn(processInstanceId)
+        .variableName("superVariable")
+        .singleResult();
+    assertNotNull(variable);
+    assertNull(variable.getValue());
+
+    // the sub process instance is in the task
+    Task task = taskService.createTaskQuery().singleResult();
+    assertNotNull(task);
+    assertEquals("Task in subprocess", task.getName());
+
+    taskService.complete(task.getId());
+
+    variable = runtimeService
+        .createVariableInstanceQuery()
+        .processInstanceIdIn(processInstanceId)
+        .variableName("subVariable")
+        .singleResult();
+    assertNull(variable);
+
+    variable = runtimeService
+        .createVariableInstanceQuery()
+        .processInstanceIdIn(processInstanceId)
+        .variableName("superVariable")
+        .singleResult();
+    assertNotNull(variable);
+    assertNull(variable.getValue());
+
+    variable = runtimeService
+        .createVariableInstanceQuery()
+        .processInstanceIdIn(processInstanceId)
+        .variableName("hisLocalVariable")
+        .singleResult();
+    assertNotNull(variable);
+    assertNull(variable.getValue());
+
+  }
+
   private void deployAndExpectException(BpmnModelInstance modelInstance) {
     String deploymentId = null;
     try {
@@ -451,6 +660,61 @@ public class CallActivityAdvancedTest extends PluggableProcessEngineTestCase {
   }
 
   /**
+   * Test case for handing all over process variables to a sub process
+   */
+  @Deployment(resources = {
+    "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testSubProcessAllDataInputOutputWithAdditionalInputMapping.bpmn20.xml",
+    "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml" })
+  public void testSubProcessAllDataInputOutputWithAdditionalInputMapping() {
+    Map<String, Object> vars = new HashMap<String, Object>();
+    vars.put("superVariable", "Hello from the super process.");
+    vars.put("testVariable", "Only a test.");
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("subProcessAllDataInputOutput", vars);
+
+    // one task in the super process should be active after starting the process instance
+    TaskQuery taskQuery = taskService.createTaskQuery();
+    Task taskBeforeSubProcess = taskQuery.singleResult();
+    assertEquals("Task before subprocess", taskBeforeSubProcess.getName());
+    assertEquals("Hello from the super process.", runtimeService.getVariable(taskBeforeSubProcess.getProcessInstanceId(), "superVariable"));
+    assertEquals("Hello from the super process.", taskService.getVariable(taskBeforeSubProcess.getId(), "superVariable"));
+    assertEquals("Only a test.", runtimeService.getVariable(taskBeforeSubProcess.getProcessInstanceId(), "testVariable"));
+    assertEquals("Only a test.", taskService.getVariable(taskBeforeSubProcess.getId(), "testVariable"));
+
+    taskService.complete(taskBeforeSubProcess.getId());
+
+    // one task in sub process should be active after starting sub process instance
+    taskQuery = taskService.createTaskQuery();
+    Task taskInSubProcess = taskQuery.singleResult();
+    assertEquals("Task in subprocess", taskInSubProcess.getName());
+    assertEquals("Hello from the super process.", runtimeService.getVariable(taskInSubProcess.getProcessInstanceId(), "superVariable"));
+    assertEquals("Hello from the super process.", runtimeService.getVariable(taskInSubProcess.getProcessInstanceId(), "subVariable"));
+    assertEquals("Hello from the super process.", taskService.getVariable(taskInSubProcess.getId(), "superVariable"));
+    assertEquals("Only a test.", runtimeService.getVariable(taskInSubProcess.getProcessInstanceId(), "testVariable"));
+    assertEquals("Only a test.", taskService.getVariable(taskInSubProcess.getId(), "testVariable"));
+
+    // changed variables in sub process
+    runtimeService.setVariable(taskInSubProcess.getProcessInstanceId(), "superVariable", "Hello from sub process.");
+    runtimeService.setVariable(taskInSubProcess.getProcessInstanceId(), "testVariable", "Variable changed in sub process.");
+
+    taskService.complete(taskInSubProcess.getId());
+
+    // task after sub process in super process
+    taskQuery = taskService.createTaskQuery();
+    Task taskAfterSubProcess = taskQuery.singleResult();
+    assertEquals("Task after subprocess", taskAfterSubProcess.getName());
+
+    // variables are changed after finished sub process
+    assertEquals("Hello from sub process.", runtimeService.getVariable(processInstance.getId(), "superVariable"));
+    assertEquals("Variable changed in sub process.", runtimeService.getVariable(processInstance.getId(), "testVariable"));
+
+    taskService.complete(taskAfterSubProcess.getId());
+
+    assertProcessEnded(processInstance.getId());
+    assertEquals(0, runtimeService.createExecutionQuery().list().size());
+  }
+
+  /**
    * This testcase verifies that <camunda:out variables="all" /> works also in case super process has no variables
    *
    * https://app.camunda.com/jira/browse/CAM-1617
@@ -514,7 +778,7 @@ public class CallActivityAdvancedTest extends PluggableProcessEngineTestCase {
 
     taskService.complete(taskBeforeSubProcess.getId());
 
-    if(processEngineConfiguration.getHistoryLevel() > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
+    if(processEngineConfiguration.getHistoryLevel().getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
       // called process started so businesskey should be written in history
       HistoricProcessInstance hpi = historyService.createHistoricProcessInstanceQuery().superProcessInstanceId(processInstance.getId()).singleResult();
       assertEquals(businessKey, hpi.getBusinessKey());
@@ -541,7 +805,7 @@ public class CallActivityAdvancedTest extends PluggableProcessEngineTestCase {
     assertProcessEnded(processInstance.getId());
     assertEquals(0, runtimeService.createExecutionQuery().list().size());
 
-    if(processEngineConfiguration.getHistoryLevel() > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
+    if(processEngineConfiguration.getHistoryLevel().getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
       HistoricProcessInstance hpi = historyService.createHistoricProcessInstanceQuery().superProcessInstanceId(processInstance.getId()).finished().singleResult();
       assertEquals(businessKey, hpi.getBusinessKey());
 
@@ -596,7 +860,7 @@ public class CallActivityAdvancedTest extends PluggableProcessEngineTestCase {
     EventSubscriptionQuery eventSubscriptionQuery = runtimeService.createEventSubscriptionQuery().processInstanceId(calledProcessInstanceId);
     List<EventSubscription> subscriptions = eventSubscriptionQuery.list();
     assertEquals(2, subscriptions.size());
-    
+
     // start the message interrupting event sub process
     runtimeService.correlateMessage("newMessage");
     Task taskAfterMessageStartEvent = taskQuery.processInstanceId(calledProcessInstanceId).singleResult();

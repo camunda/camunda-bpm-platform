@@ -38,11 +38,11 @@ public class TimerStartEventJobHandler implements JobHandler {
     DeploymentCache deploymentCache = Context
             .getProcessEngineConfiguration()
             .getDeploymentCache();
-    
+
     ProcessDefinition processDefinition = deploymentCache.findDeployedLatestProcessDefinitionByKey(configuration);
     try {
       if(!processDefinition.isSuspended()) {
-        new StartProcessInstanceCmd(configuration, null, null, null).execute(commandContext);
+        new StartProcessInstanceCmd(configuration, null, null, null, null).execute(commandContext);
       } else {
         log.log(Level.FINE, "ignoring timer of suspended process definition " + processDefinition.getName());
       }

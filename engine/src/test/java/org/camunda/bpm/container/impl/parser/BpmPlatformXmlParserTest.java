@@ -143,4 +143,26 @@ public class BpmPlatformXmlParserTest extends TestCase {
 
   }
 
+  public void testParseProcessesXmlAntStyleProperties() {
+
+    BpmPlatformXml platformXml = parser.createParse()
+        .sourceUrl(getStreamUrl("bpmplatform_xml_ant_style_properties.xml"))
+        .execute()
+        .getBpmPlatformXml();
+
+    assertNotNull(platformXml);
+
+    ProcessEngineXml engineXml = platformXml.getProcessEngines().get(0);
+
+    assertEquals(1, engineXml.getPlugins().size());
+    ProcessEnginePluginXml pluginXml = engineXml.getPlugins().get(0);
+
+    Map<String, String> properties = pluginXml.getProperties();
+    assertEquals(2, properties.size());
+
+    // these two system properties are guaranteed to be set
+    assertEquals(System.getProperty("java.version"), properties.get("prop1"));
+    assertEquals("prefix-" + System.getProperty("os.name"), properties.get("prop2"));
+  }
+
 }

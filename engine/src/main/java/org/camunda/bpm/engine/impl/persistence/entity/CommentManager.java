@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.camunda.bpm.engine.impl.db.ListQueryParameterObject;
-import org.camunda.bpm.engine.impl.db.PersistentObject;
+import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.persistence.AbstractHistoricManager;
 import org.camunda.bpm.engine.task.Comment;
 import org.camunda.bpm.engine.task.Event;
@@ -29,20 +29,20 @@ import org.camunda.bpm.engine.task.Event;
  */
 public class CommentManager extends AbstractHistoricManager {
 
-  public void delete(PersistentObject persistentObject) {
+  public void delete(DbEntity dbEntity) {
     checkHistoryEnabled();
-    super.delete(persistentObject);
+    super.delete(dbEntity);
   }
 
-  public void insert(PersistentObject persistentObject) {
+  public void insert(DbEntity dbEntity) {
     checkHistoryEnabled();
-    super.insert(persistentObject);
+    super.insert(dbEntity);
   }
 
   @SuppressWarnings("unchecked")
   public List<Comment> findCommentsByTaskId(String taskId) {
     checkHistoryEnabled();
-    return getDbSqlSession().selectList("selectCommentsByTaskId", taskId);
+    return getDbEntityManager().selectList("selectCommentsByTaskId", taskId);
   }
 
   @SuppressWarnings("unchecked")
@@ -53,18 +53,18 @@ public class CommentManager extends AbstractHistoricManager {
     query.setParameter(taskId);
     query.setOrderBy("RES.TIME_ desc");
 
-    return getDbSqlSession().selectList("selectEventsByTaskId", query);
+    return getDbEntityManager().selectList("selectEventsByTaskId", query);
   }
 
   public void deleteCommentsByTaskId(String taskId) {
     checkHistoryEnabled();
-    getDbSqlSession().delete("deleteCommentsByTaskId", taskId);
+    getDbEntityManager().delete(CommentEntity.class, "deleteCommentsByTaskId", taskId);
   }
 
   @SuppressWarnings("unchecked")
   public List<Comment> findCommentsByProcessInstanceId(String processInstanceId) {
     checkHistoryEnabled();
-    return getDbSqlSession().selectList("selectCommentsByProcessInstanceId", processInstanceId);
+    return getDbEntityManager().selectList("selectCommentsByProcessInstanceId", processInstanceId);
   }
 
   public CommentEntity findCommentByTaskIdAndCommentId(String taskId, String commentId) {
@@ -74,7 +74,7 @@ public class CommentManager extends AbstractHistoricManager {
     parameters.put("taskId", taskId);
     parameters.put("id", commentId);
 
-    return (CommentEntity) getDbSqlSession().selectOne("selectCommentByTaskIdAndCommentId", parameters);
+    return (CommentEntity) getDbEntityManager().selectOne("selectCommentByTaskIdAndCommentId", parameters);
   }
 
 }

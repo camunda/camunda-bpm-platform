@@ -13,12 +13,26 @@
 
 package org.camunda.bpm.engine.test.api.mgmt;
 
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
 import junit.framework.Assert;
+
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.history.HistoricIncident;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.cmd.AcquireJobsCmd;
+import org.camunda.bpm.engine.impl.incident.FailedJobIncidentHandler;
+import org.camunda.bpm.engine.impl.interceptor.Command;
+import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
+import org.camunda.bpm.engine.impl.persistence.entity.HistoricIncidentEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.HistoricIncidentManager;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.JobManager;
+import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.management.JobDefinition;
@@ -27,10 +41,6 @@ import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.JobQuery;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
-
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Map;
 
 
 /**
@@ -261,6 +271,131 @@ public class ManagementServiceTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  public void testSetJobRetriesUnlocksInconsistentJob() {
+    // case 1
+    // given an inconsistent job that is never again picked up by a job executor
+    createJob(0, "owner", ClockUtil.getCurrentTime());
+
+    // when the job retries are reset
+    JobEntity job = (JobEntity) managementService.createJobQuery().singleResult();
+    managementService.setJobRetries(job.getId(), 3);
+
+    // then the job can be picked up again
+    job = (JobEntity) managementService.createJobQuery().singleResult();
+    assertNotNull(job);
+    assertNull(job.getLockOwner());
+    assertNull(job.getLockExpirationTime());
+    assertEquals(3, job.getRetries());
+
+    deleteJobAndIncidents(job);
+
+    // case 2
+    // given an inconsistent job that is never again picked up by a job executor
+    createJob(2, "owner", null);
+
+    // when the job retries are reset
+    job = (JobEntity) managementService.createJobQuery().singleResult();
+    managementService.setJobRetries(job.getId(), 3);
+
+    // then the job can be picked up again
+    job = (JobEntity) managementService.createJobQuery().singleResult();
+    assertNotNull(job);
+    assertNull(job.getLockOwner());
+    assertNull(job.getLockExpirationTime());
+    assertEquals(3, job.getRetries());
+
+    deleteJobAndIncidents(job);
+
+    // case 3
+    // given a consistent job
+    createJob(2, "owner", ClockUtil.getCurrentTime());
+
+    // when the job retries are reset
+    job = (JobEntity) managementService.createJobQuery().singleResult();
+    managementService.setJobRetries(job.getId(), 3);
+
+    // then the lock owner and expiration should not change
+    job = (JobEntity) managementService.createJobQuery().singleResult();
+    assertNotNull(job);
+    assertNotNull(job.getLockOwner());
+    assertNotNull(job.getLockExpirationTime());
+    assertEquals(3, job.getRetries());
+
+    deleteJobAndIncidents(job);
+  }
+
+  protected void createJob(final int retries, final String owner, final Date lockExpirationTime) {
+    CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutorTxRequired();
+    commandExecutor.execute(new Command<Void>() {
+      public Void execute(CommandContext commandContext) {
+        JobManager jobManager = commandContext.getJobManager();
+        MessageEntity job = new MessageEntity();
+        job.setJobHandlerType("any");
+        job.setLockOwner(owner);
+        job.setLockExpirationTime(lockExpirationTime);
+        job.setRetries(retries);
+
+        jobManager.send(job);
+        return null;
+      }
+    });
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/ManagementServiceTest.testGetJobExceptionStacktrace.bpmn20.xml"})
+  public void testSetJobRetriesByDefinitionUnlocksInconsistentJobs() {
+    // given a job definition
+    final JobDefinition jobDefinition = managementService.createJobDefinitionQuery().singleResult();
+
+    // and an inconsistent job that is never again picked up by a job executor
+    CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutorTxRequired();
+    commandExecutor.execute(new Command<Void>() {
+      public Void execute(CommandContext commandContext) {
+        JobManager jobManager = commandContext.getJobManager();
+        MessageEntity job = new MessageEntity();
+        job.setJobDefinitionId(jobDefinition.getId());
+        job.setJobHandlerType("any");
+        job.setLockOwner("owner");
+        job.setLockExpirationTime(ClockUtil.getCurrentTime());
+        job.setRetries(0);
+
+        jobManager.send(job);
+        return null;
+      }
+    });
+
+    // when the job retries are reset
+    managementService.setJobRetriesByJobDefinitionId(jobDefinition.getId(), 3);
+
+    // then the job can be picked up again
+    JobEntity job = (JobEntity) managementService.createJobQuery().singleResult();
+    assertNotNull(job);
+    assertNull(job.getLockOwner());
+    assertNull(job.getLockExpirationTime());
+    assertEquals(3, job.getRetries());
+
+    deleteJobAndIncidents(job);
+  }
+
+  protected void deleteJobAndIncidents(final Job job) {
+    final List<HistoricIncident> incidents =
+        historyService.createHistoricIncidentQuery()
+        .incidentType(FailedJobIncidentHandler.INCIDENT_HANDLER_TYPE).list();
+
+    CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutorTxRequired();
+    commandExecutor.execute(new Command<Void>() {
+      public Void execute(CommandContext commandContext) {
+        ((JobEntity) job).delete();
+
+        HistoricIncidentManager historicIncidentManager = commandContext.getHistoricIncidentManager();
+        for (HistoricIncident incident : incidents) {
+          HistoricIncidentEntity incidentEntity = (HistoricIncidentEntity) incident;
+          historicIncidentManager.delete(incidentEntity);
+        }
+        return null;
+      }
+    });
+  }
+
   public void testDeleteJobNullJobId() {
     try {
       managementService.deleteJob(null);
@@ -440,7 +575,7 @@ public class ManagementServiceTest extends PluggableProcessEngineTestCase {
 
   public void testGetHistoryLevel() {
     int historyLevel = managementService.getHistoryLevel();
-    assertEquals(processEngineConfiguration.getHistoryLevel(), historyLevel);
+    assertEquals(processEngineConfiguration.getHistoryLevel().getId(), historyLevel);
   }
 
 }

@@ -22,12 +22,13 @@ import java.util.logging.Logger;
 
 import org.camunda.bpm.BpmPlatform;
 import org.camunda.bpm.ProcessEngineService;
-import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.CaseService;
 import org.camunda.bpm.engine.FormService;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
@@ -36,7 +37,6 @@ import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.runtime.Job;
-import org.camunda.bpm.integrationtest.util.TestContainer;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
@@ -44,7 +44,7 @@ import org.junit.Before;
 
 
 public abstract class AbstractFoxPlatformIntegrationTest {
-  
+
   protected Logger logger = Logger.getLogger(AbstractFoxPlatformIntegrationTest.class.getName());
 
   protected ProcessEngineService processEngineService;
@@ -58,7 +58,8 @@ public abstract class AbstractFoxPlatformIntegrationTest {
   protected RepositoryService repositoryService;
   protected RuntimeService runtimeService;
   protected TaskService taskService;
-  
+  protected CaseService caseService;
+
   public static WebArchive initWebArchiveDeployment(String name, String processesXmlPath) {
     WebArchive archive = ShrinkWrap.create(WebArchive.class, name)
               .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
@@ -66,16 +67,16 @@ public abstract class AbstractFoxPlatformIntegrationTest {
               .addAsResource(processesXmlPath, "META-INF/processes.xml")
               .addClass(AbstractFoxPlatformIntegrationTest.class)
               .addClass(TestContainer.class);
-    
+
     TestContainer.addContainerSpecificResources(archive);
-    
+
     return archive;
   }
-  
+
   public static WebArchive initWebArchiveDeployment(String name) {
     return initWebArchiveDeployment(name, "META-INF/processes.xml");
   }
-  
+
   public static WebArchive initWebArchiveDeployment() {
     return initWebArchiveDeployment("test.war");
   }
@@ -94,20 +95,25 @@ public abstract class AbstractFoxPlatformIntegrationTest {
     repositoryService = processEngine.getRepositoryService();
     runtimeService = processEngine.getRuntimeService();
     taskService = processEngine.getTaskService();
+    caseService = processEngine.getCaseService();
+  }
+
+  public void waitForJobExecutorToProcessAllJobs() {
+    waitForJobExecutorToProcessAllJobs(12000);
   }
 
   public void waitForJobExecutorToProcessAllJobs(long maxMillisToWait) {
-    
+
     JobExecutor jobExecutor = processEngineConfiguration.getJobExecutor();
     waitForJobExecutorToProcessAllJobs(jobExecutor, maxMillisToWait);
   }
-  
+
   public void waitForJobExecutorToProcessAllJobs(JobExecutor jobExecutor, long maxMillisToWait) {
-    
+
     int checkInterval = 1000;
 
     jobExecutor.start();
-    
+
     try {
       Timer timer = new Timer();
       InteruptTask task = new InteruptTask(Thread.currentThread());

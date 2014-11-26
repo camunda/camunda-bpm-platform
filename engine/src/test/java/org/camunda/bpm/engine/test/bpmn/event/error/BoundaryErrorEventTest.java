@@ -12,6 +12,9 @@
  */
 package org.camunda.bpm.engine.test.bpmn.event.error;
 
+import static org.camunda.bpm.engine.test.bpmn.event.error.ThrowErrorDelegate.throwError;
+import static org.camunda.bpm.engine.test.bpmn.event.error.ThrowErrorDelegate.throwException;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,8 +25,12 @@ import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.CollectionUtil;
+import org.camunda.bpm.engine.runtime.EventSubscription;
+import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.variable.VariableMap;
+import org.camunda.bpm.engine.variable.Variables;
 
 
 /**
@@ -168,8 +175,8 @@ public class BoundaryErrorEventTest extends PluggableProcessEngineTestCase {
     assertProcessEnded(procId);
 
     HistoricProcessInstance hip;
-    int historyLevel = processEngineConfiguration.getHistoryLevel();
-    if (historyLevel>ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
+    int historyLevel = processEngineConfiguration.getHistoryLevel().getId();
+    if (historyLevel> ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
       hip = historyService.createHistoricProcessInstanceQuery().processInstanceId(procId).singleResult();
       assertEquals("processEnd1", hip.getEndActivityId());
     }
@@ -178,7 +185,7 @@ public class BoundaryErrorEventTest extends PluggableProcessEngineTestCase {
             CollectionUtil.singletonMap("input", 1)).getId();
     assertProcessEnded(procId);
 
-    if (historyLevel>ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
+    if (historyLevel> ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
       hip = historyService.createHistoricProcessInstanceQuery().processInstanceId(procId).singleResult();
       assertEquals("processEnd1", hip.getEndActivityId());
     }
@@ -202,6 +209,28 @@ public class BoundaryErrorEventTest extends PluggableProcessEngineTestCase {
     // Completing the task will end the process instance
     taskService.complete(task.getId());
     assertProcessEnded(procId);
+  }
+
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/event/error/BoundaryErrorEventTest.testCatchErrorOnCallActivity-parent.bpmn20.xml",
+      "org/camunda/bpm/engine/test/bpmn/event/error/BoundaryErrorEventTest.subprocess.bpmn20.xml"
+  })
+  public void FAILING_testCatchErrorOnCallActivityShouldEndCalledProcessProperly() {
+    // given a process instance that has instantiated (called) a sub process instance
+    runtimeService.startProcessInstanceByKey("catchErrorOnCallActivity").getId();
+    Task task = taskService.createTaskQuery().singleResult();
+    assertEquals("Task in subprocess", task.getName());
+
+    // when an error end event is triggered in the sub process instance and catched in the super process instance
+    taskService.complete(task.getId());
+    task = taskService.createTaskQuery().singleResult();
+    assertEquals("Escalated Task", task.getName());
+
+    // then the called historic process instance should have properly ended
+    HistoricProcessInstance historicSubProcessInstance = historyService.createHistoricProcessInstanceQuery().processDefinitionKey("simpleSubProcess").singleResult();
+    assertNotNull(historicSubProcessInstance);
+    assertNull(historicSubProcessInstance.getDeleteReason());
+    assertEquals("theEnd", historicSubProcessInstance.getEndActivityId());
   }
 
   @Deployment(resources = {
@@ -384,6 +413,209 @@ public class BoundaryErrorEventTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  @Deployment( resources = {
+    "org/camunda/bpm/engine/test/bpmn/event/error/BoundaryErrorEventTest.testCatchErrorThrownByAbstractBpmnActivityBehavior.bpmn20.xml"
+  })
+  public void testCatchExceptionThrownByExecuteOfAbstractBpmnActivityBehavior() {
+    String pi = runtimeService.startProcessInstanceByKey("testProcess", throwException()).getId();
+
+    assertTrue((Boolean) runtimeService.getVariable(pi, "executed"));
+    assertNull(runtimeService.getVariable(pi, "signaled"));
+
+    Task userTask = taskService.createTaskQuery().processInstanceId(pi).singleResult();
+    assertNotNull(userTask);
+    assertEquals("userTaskException", userTask.getTaskDefinitionKey());
+
+    taskService.complete(userTask.getId());
+  }
+
+  @Deployment( resources = {
+    "org/camunda/bpm/engine/test/bpmn/event/error/BoundaryErrorEventTest.testCatchErrorThrownByAbstractBpmnActivityBehavior.bpmn20.xml"
+  })
+  public void testCatchErrorThrownByExecuteOfAbstractBpmnActivityBehavior() {
+    String pi = runtimeService.startProcessInstanceByKey("testProcess", throwError()).getId();
+
+    assertTrue((Boolean) runtimeService.getVariable(pi, "executed"));
+    assertNull(runtimeService.getVariable(pi, "signaled"));
+
+    Task userTask = taskService.createTaskQuery().processInstanceId(pi).singleResult();
+    assertNotNull(userTask);
+    assertEquals("userTaskError", userTask.getTaskDefinitionKey());
+
+    taskService.complete(userTask.getId());
+  }
+
+  @Deployment( resources = {
+    "org/camunda/bpm/engine/test/bpmn/event/error/BoundaryErrorEventTest.testCatchErrorThrownByAbstractBpmnActivityBehavior.bpmn20.xml"
+  })
+  public void testCatchExceptionThrownBySignalMethodOfAbstractBpmnActivityBehavior() {
+    String pi = runtimeService.startProcessInstanceByKey("testProcess").getId();
+
+    assertTrue((Boolean) runtimeService.getVariable(pi, "executed"));
+    assertNull(runtimeService.getVariable(pi, "signaled"));
+
+    Execution serviceTask = runtimeService.createExecutionQuery().processInstanceId(pi).activityId("serviceTask").singleResult();
+    assertNotNull(serviceTask);
+
+    runtimeService.setVariables(pi, throwException());
+    runtimeService.signal(serviceTask.getId());
+
+    assertTrue((Boolean) runtimeService.getVariable(pi, "executed"));
+    assertTrue((Boolean) runtimeService.getVariable(pi, "signaled"));
+
+    Task userTask = taskService.createTaskQuery().processInstanceId(pi).singleResult();
+    assertNotNull(userTask);
+    assertEquals("userTaskException", userTask.getTaskDefinitionKey());
+
+    taskService.complete(userTask.getId());
+  }
+
+  /**
+   * See CAM-3031
+   */
+  @Deployment
+  public void FAILING_testCatchExceptionExpressionThrownByFollowUpTask() {
+    try {
+      Map<String, Object> vars = throwException();
+      runtimeService.startProcessInstanceByKey("testProcess", vars).getId();
+      fail("should fail and not catch the error on the first task");
+    } catch (ProcessEngineException e) {
+      // happy path
+    }
+
+    assertNull(taskService.createTaskQuery().singleResult());
+  }
+
+  /**
+   * See CAM-3031
+   */
+  @Deployment
+  public void FAILING_testCatchExceptionClassDelegateThrownByFollowUpTask() {
+    try {
+      Map<String, Object> vars = throwException();
+      runtimeService.startProcessInstanceByKey("testProcess", vars).getId();
+      fail("should fail");
+    } catch (ProcessEngineException e) {
+      // happy path
+    }
+
+    assertNull(taskService.createTaskQuery().singleResult());
+  }
+
+
+  @Deployment( resources = {
+    "org/camunda/bpm/engine/test/bpmn/event/error/BoundaryErrorEventTest.testCatchErrorThrownByAbstractBpmnActivityBehavior.bpmn20.xml"
+  })
+  public void testCatchErrorThrownBySignalOfAbstractBpmnActivityBehavior() {
+    String pi = runtimeService.startProcessInstanceByKey("testProcess").getId();
+
+    assertTrue((Boolean) runtimeService.getVariable(pi, "executed"));
+    assertNull(runtimeService.getVariable(pi, "signaled"));
+
+    Execution serviceTask = runtimeService.createExecutionQuery().processInstanceId(pi).activityId("serviceTask").singleResult();
+    assertNotNull(serviceTask);
+
+    runtimeService.setVariables(pi, throwError());
+    runtimeService.signal(serviceTask.getId());
+
+    assertTrue((Boolean) runtimeService.getVariable(pi, "executed"));
+    assertTrue((Boolean) runtimeService.getVariable(pi, "signaled"));
+
+    Task userTask = taskService.createTaskQuery().processInstanceId(pi).singleResult();
+    assertNotNull(userTask);
+    assertEquals("userTaskError", userTask.getTaskDefinitionKey());
+
+    taskService.complete(userTask.getId());
+  }
+
+  @Deployment( resources = {
+    "org/camunda/bpm/engine/test/bpmn/event/error/BoundaryErrorEventTest.testCatchErrorThrownByDelegateExpression.bpmn20.xml"
+  })
+  public void testCatchExceptionThrownByExecuteOfDelegateExpression() {
+    VariableMap variables = Variables.createVariables().putValue("myDelegate", new ThrowErrorDelegate());
+    variables.putAll(throwException());
+    String pi = runtimeService.startProcessInstanceByKey("testProcess", variables).getId();
+
+    assertTrue((Boolean) runtimeService.getVariable(pi, "executed"));
+    assertNull(runtimeService.getVariable(pi, "signaled"));
+
+    Task userTask = taskService.createTaskQuery().processInstanceId(pi).singleResult();
+    assertNotNull(userTask);
+    assertEquals("userTaskException", userTask.getTaskDefinitionKey());
+
+    taskService.complete(userTask.getId());
+  }
+
+  @Deployment( resources = {
+    "org/camunda/bpm/engine/test/bpmn/event/error/BoundaryErrorEventTest.testCatchErrorThrownByDelegateExpression.bpmn20.xml"
+  })
+  public void testCatchErrorThrownByExecuteOfDelegateExpression() {
+    VariableMap variables = Variables.createVariables().putValue("myDelegate", new ThrowErrorDelegate());
+    variables.putAll(throwError());
+    String pi = runtimeService.startProcessInstanceByKey("testProcess", variables).getId();
+
+    assertTrue((Boolean) runtimeService.getVariable(pi, "executed"));
+    assertNull(runtimeService.getVariable(pi, "signaled"));
+
+    Task userTask = taskService.createTaskQuery().processInstanceId(pi).singleResult();
+    assertNotNull(userTask);
+    assertEquals("userTaskError", userTask.getTaskDefinitionKey());
+
+    taskService.complete(userTask.getId());
+  }
+
+  @Deployment( resources = {
+    "org/camunda/bpm/engine/test/bpmn/event/error/BoundaryErrorEventTest.testCatchErrorThrownByDelegateExpression.bpmn20.xml"
+  })
+  public void testCatchExceptionThrownBySignalMethodOfDelegateExpression() {
+    VariableMap variables = Variables.createVariables().putValue("myDelegate", new ThrowErrorDelegate());
+    String pi = runtimeService.startProcessInstanceByKey("testProcess", variables).getId();
+
+    assertTrue((Boolean) runtimeService.getVariable(pi, "executed"));
+    assertNull(runtimeService.getVariable(pi, "signaled"));
+
+    Execution serviceTask = runtimeService.createExecutionQuery().processInstanceId(pi).activityId("serviceTask").singleResult();
+    assertNotNull(serviceTask);
+
+    runtimeService.setVariables(pi, throwException());
+    runtimeService.signal(serviceTask.getId());
+
+    assertTrue((Boolean) runtimeService.getVariable(pi, "executed"));
+    assertTrue((Boolean) runtimeService.getVariable(pi, "signaled"));
+
+    Task userTask = taskService.createTaskQuery().processInstanceId(pi).singleResult();
+    assertNotNull(userTask);
+    assertEquals("userTaskException", userTask.getTaskDefinitionKey());
+
+    taskService.complete(userTask.getId());
+  }
+
+  @Deployment( resources = {
+    "org/camunda/bpm/engine/test/bpmn/event/error/BoundaryErrorEventTest.testCatchErrorThrownByDelegateExpression.bpmn20.xml"
+  })
+  public void testCatchErrorThrownBySignalOfDelegateExpression() {
+    VariableMap variables = Variables.createVariables().putValue("myDelegate", new ThrowErrorDelegate());
+    String pi = runtimeService.startProcessInstanceByKey("testProcess", variables).getId();
+
+    assertTrue((Boolean) runtimeService.getVariable(pi, "executed"));
+    assertNull(runtimeService.getVariable(pi, "signaled"));
+
+    Execution serviceTask = runtimeService.createExecutionQuery().processInstanceId(pi).activityId("serviceTask").singleResult();
+    assertNotNull(serviceTask);
+
+    runtimeService.setVariables(pi, throwError());
+    runtimeService.signal(serviceTask.getId());
+
+    assertTrue((Boolean) runtimeService.getVariable(pi, "executed"));
+    assertTrue((Boolean) runtimeService.getVariable(pi, "signaled"));
+
+    Task userTask = taskService.createTaskQuery().processInstanceId(pi).singleResult();
+    assertNotNull(userTask);
+    assertEquals("userTaskError", userTask.getTaskDefinitionKey());
+
+    taskService.complete(userTask.getId());
+  }
+
   @Deployment(resources = {
           "org/camunda/bpm/engine/test/bpmn/event/error/BoundaryErrorEventTest.testUncaughtErrorThrownByJavaDelegateOnCallActivity-parent.bpmn20.xml",
           "org/camunda/bpm/engine/test/bpmn/event/error/BoundaryErrorEventTest.testCatchErrorThrownByJavaDelegateOnCallActivity-child.bpmn20.xml"
@@ -534,4 +766,50 @@ public class BoundaryErrorEventTest extends PluggableProcessEngineTestCase {
       assertEquals("couldn't execute activity <serviceTask id=\"serviceTask\" ...>: Business Exception", e.getMessage());
     }
   }
+
+  @Deployment
+  public void testCatchErrorOnSubprocessThrownByNonInterruptingEventSubprocess() {
+    runtimeService.startProcessInstanceByKey("testProcess");
+    EventSubscription messageSubscription = runtimeService.createEventSubscriptionQuery().singleResult();
+    runtimeService.messageEventReceived("message", messageSubscription.getExecutionId());
+
+    // should successfully have reached the task following the boundary event
+    Execution taskExecution = runtimeService.createExecutionQuery().activityId("afterBoundaryTask").singleResult();
+    assertNotNull(taskExecution);
+    Task task = taskService.createTaskQuery().executionId(taskExecution.getId()).singleResult();
+    assertNotNull(task);
+  }
+
+  @Deployment
+  public void testCatchErrorOnSubprocessThrownByInterruptingEventSubprocess() {
+    runtimeService.startProcessInstanceByKey("testProcess");
+    EventSubscription messageSubscription = runtimeService.createEventSubscriptionQuery().singleResult();
+    runtimeService.messageEventReceived("message", messageSubscription.getExecutionId());
+
+    // should successfully have reached the task following the boundary event
+    Execution taskExecution = runtimeService.createExecutionQuery().activityId("afterBoundaryTask").singleResult();
+    assertNotNull(taskExecution);
+    Task task = taskService.createTaskQuery().executionId(taskExecution.getId()).singleResult();
+    assertNotNull(task);
+  }
+
+  @Deployment
+  public void testCatchErrorOnSubprocessThrownByNestedEventSubprocess() {
+    runtimeService.startProcessInstanceByKey("testProcess");
+
+    // trigger outer event subprocess
+    EventSubscription messageSubscription = runtimeService.createEventSubscriptionQuery().singleResult();
+    runtimeService.messageEventReceived("outerMessage", messageSubscription.getExecutionId());
+
+    // trigger inner event subprocess
+    messageSubscription = runtimeService.createEventSubscriptionQuery().singleResult();
+    runtimeService.messageEventReceived("innerMessage", messageSubscription.getExecutionId());
+
+    // should successfully have reached the task following the boundary event
+    Execution taskExecution = runtimeService.createExecutionQuery().activityId("afterBoundaryTask").singleResult();
+    assertNotNull(taskExecution);
+    Task task = taskService.createTaskQuery().executionId(taskExecution.getId()).singleResult();
+    assertNotNull(task);
+  }
+
 }

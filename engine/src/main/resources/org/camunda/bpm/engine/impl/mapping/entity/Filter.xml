@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!--
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~       http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.camunda.bpm.engine.impl.persistence.entity.FilterEntity">
+
+  <!-- FILTER INSERT -->
+
+  <insert id="insertFilter" parameterType="org.camunda.bpm.engine.impl.persistence.entity.FilterEntity">
+    insert into ${prefix}ACT_RU_FILTER (ID_, RESOURCE_TYPE_, NAME_, OWNER_, QUERY_, PROPERTIES_, REV_)
+    values (
+      #{id ,jdbcType=VARCHAR},
+      #{resourceType ,jdbcType=VARCHAR},
+      #{name ,jdbcType=VARCHAR},
+      #{owner ,jdbcType=VARCHAR},
+      #{queryInternal ,jdbcType=CLOB},
+      #{propertiesInternal ,jdbcType=CLOB},
+      1
+    )
+  </insert>
+
+  <!-- FILTER UPDATE -->
+
+  <update id="updateFilter" parameterType="org.camunda.bpm.engine.impl.persistence.entity.FilterEntity">
+    update ${prefix}ACT_RU_FILTER
+    set
+      REV_ = #{revisionNext, jdbcType=INTEGER},
+      NAME_ = #{name, jdbcType=VARCHAR},
+      OWNER_ = #{owner, jdbcType=VARCHAR},
+      QUERY_ = #{queryInternal, jdbcType=CLOB},
+      PROPERTIES_ = #{propertiesInternal, jdbcType=CLOB}
+    where ID_ = #{id}
+      and REV_ = #{revision, jdbcType=INTEGER}
+  </update>
+
+  <!-- FILTER DELETE -->
+
+  <delete id="deleteFilter" parameterType="org.camunda.bpm.engine.impl.persistence.entity.FilterEntity">
+    delete from ${prefix}ACT_RU_FILTER
+    where ID_ = #{id} and REV_ = #{revision}
+  </delete>
+  
+  <!-- FILTER RESULTMAP -->
+
+  <resultMap id="filterResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.FilterEntity">
+    <id property="id" column="ID_" jdbcType="VARCHAR" />
+    <result property="revision" column="REV_" jdbcType="INTEGER" />
+    <result property="resourceType" column="RESOURCE_TYPE_" jdbcType="VARCHAR" />
+    <result property="name" column="NAME_" jdbcType="VARCHAR" />
+    <result property="owner" column="OWNER_" jdbcType="VARCHAR" />
+    <result property="queryInternal" column="QUERY_" jdbcType="CLOB" />
+    <result property="propertiesInternal" column="PROPERTIES_" jdbcType="CLOB" />
+  </resultMap>
+
+  <resultMap id="filterResultMap_postgres" type="org.camunda.bpm.engine.impl.persistence.entity.FilterEntity">
+    <id property="id" column="ID_" jdbcType="VARCHAR" />
+    <result property="revision" column="REV_" jdbcType="INTEGER" />
+    <result property="resourceType" column="RESOURCE_TYPE_" jdbcType="VARCHAR" />
+    <result property="name" column="NAME_" jdbcType="VARCHAR" />
+    <result property="owner" column="OWNER_" jdbcType="VARCHAR" />
+    <result property="queryInternal" column="QUERY_" jdbcType="BINARY" />
+    <result property="propertiesInternal" column="PROPERTIES_" jdbcType="BINARY" />
+  </resultMap>
+
+  <!-- FILTER SELECT -->
+
+  <select id="selectFilter" parameterType="string" resultMap="filterResultMap">
+    select * from ${prefix}ACT_RU_FILTER where ID_ = #{id, jdbcType=VARCHAR}
+  </select>
+
+  <select id="selectFilter_postgres" parameterType="string" resultMap="filterResultMap_postgres">
+    select * from ${prefix}ACT_RU_FILTER where ID_ = #{id, jdbcType=VARCHAR}
+  </select>
+
+  <select id="selectFilterByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.filter.FilterQueryImpl" resultMap="filterResultMap">
+  	${limitBefore}
+    select RES.* ${limitBetweenClob}
+    <include refid="selectFilterByQueryCriteriaSql" />
+    ${orderBy}
+    ${limitAfter}
+  </select>
+
+  <select id="selectFilterByQueryCriteria_postgres" parameterType="org.camunda.bpm.engine.impl.filter.FilterQueryImpl" resultMap="filterResultMap_postgres">
+    ${limitBefore}
+    select RES.* ${limitBetweenClob}
+    <include refid="selectFilterByQueryCriteriaSql" />
+    ${orderBy}
+    ${limitAfter}
+  </select>
+
+   <select id="selectFilterCountByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.filter.FilterQueryImpl" resultType="long">
+    select count(RES.ID_)
+    <include refid="selectFilterByQueryCriteriaSql" />
+  </select>
+
+  <sql id="selectFilterByQueryCriteriaSql">
+    from ${prefix}ACT_RU_FILTER RES
+    <where>
+      <if test="filterId != null">
+        RES.ID_ = #{filterId}
+      </if>
+      <if test="resourceType != null">
+        and RES.RESOURCE_TYPE_ = #{resourceType}
+      </if>
+      <if test="name != null">
+        and RES.NAME_ = #{name}
+      </if>
+      <if test="nameLike != null">
+        and RES.NAME_ like #{nameLike}
+      </if>
+      <if test="owner != null">
+        and RES.OWNER_ = #{owner}
+      </if>
+
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck" />
+
+    </where>
+  </sql>
+
+</mapper>

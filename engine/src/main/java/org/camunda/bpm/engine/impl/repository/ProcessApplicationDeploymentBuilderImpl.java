@@ -18,6 +18,7 @@ import java.util.zip.ZipInputStream;
 
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.engine.impl.RepositoryServiceImpl;
+import org.camunda.bpm.engine.repository.DeploymentBuilder;
 import org.camunda.bpm.engine.repository.ProcessApplicationDeployment;
 import org.camunda.bpm.engine.repository.ProcessApplicationDeploymentBuilder;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
@@ -88,6 +89,11 @@ public class ProcessApplicationDeploymentBuilderImpl extends DeploymentBuilderIm
   @Override
   public ProcessApplicationDeploymentBuilderImpl enableDuplicateFiltering() {
     return (ProcessApplicationDeploymentBuilderImpl) super.enableDuplicateFiltering();
+  }
+
+  @Override
+  public ProcessApplicationDeploymentBuilderImpl enableDuplicateFiltering(boolean deployChangedOnly) {
+    return (ProcessApplicationDeploymentBuilderImpl) super.enableDuplicateFiltering(deployChangedOnly);
   }
 
   // getters / setters ///////////////////////////////////////////////

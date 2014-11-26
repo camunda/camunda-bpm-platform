@@ -13,20 +13,43 @@
 
 package org.camunda.bpm.engine.impl.form.type;
 
+import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.value.LongValue;
+import org.camunda.bpm.engine.variable.value.TypedValue;
+
 
 
 /**
  * @author Tom Baeyens
  */
-public class LongFormType extends AbstractFormFieldType {
+public class LongFormType extends SimpleFormFieldType {
+
+  public final static String TYPE_NAME = "long";
 
   public String getName() {
-    return "long";
+    return TYPE_NAME;
   }
 
-  public String getMimeType() {
-    return "plain/text";
+  public TypedValue convertValue(TypedValue propertyValue) {
+    if(propertyValue instanceof LongValue) {
+      return propertyValue;
+    }
+    else {
+      Object value = propertyValue.getValue();
+      if(value == null) {
+        return Variables.longValue(null);
+      }
+      else if((value instanceof Number) || (value instanceof String)) {
+        return Variables.longValue(new Long(value.toString()));
+      }
+      else {
+        throw new ProcessEngineException("Value '"+value+"' is not of type Long.");
+      }
+    }
   }
+
+  // deprecated ////////////////////////////////////////////
 
   public Object convertFormValueToModelValue(Object propertyValue) {
     if (propertyValue==null || "".equals(propertyValue)) {
@@ -41,4 +64,6 @@ public class LongFormType extends AbstractFormFieldType {
     }
     return modelValue.toString();
   }
+
+
 }

@@ -3,14 +3,16 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.camunda.bpm</groupId>
-    <artifactId>camunda-parent</artifactId>
-    <relativePath>../parent/</relativePath>
-    <version>7.2.0-SNAPSHOT</version>
+    <groupId>org.camunda</groupId>
+    <artifactId>camunda-release-parent</artifactId>
+    <version>2.5</version>
+    <!-- do not remove empty tag - http://jira.codehaus.org/browse/MNG-4687 -->
+    <relativePath />
   </parent>
 
   <groupId>org.camunda.bpm</groupId>
   <artifactId>camunda-bom</artifactId>
+  <version>7.3.0-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>camunda BPM - Bom</name>
   <url>http://camunda.org</url>
@@ -29,26 +31,36 @@
     <url>http://www.camunda.com</url>
   </organization>
 
+  <properties>
+    <version.mybatis>3.2.8</version.mybatis>
+    <version.joda-time>2.1</version.joda-time>
+    <version.uuid-generator>3.1.2</version.uuid-generator>
+    <version.camunda.commons>1.0.6</version.camunda.commons>
+    <version.camunda.connect>1.0.0</version.camunda.connect>
+    <version.camunda.spin>1.0.0</version.camunda.spin>
+    <version.camunda.template-engines>1.0.1</version.camunda.template-engines>
+  </properties>
+
   <dependencyManagement>
     <dependencies>
       <!-- external dependencies -->
       <dependency>
         <groupId>org.mybatis</groupId>
         <artifactId>mybatis</artifactId>
-        <version>3.1.1</version>
+        <version>${version.mybatis}</version>
       </dependency>
       <dependency>
         <groupId>joda-time</groupId>
         <artifactId>joda-time</artifactId>
-        <version>2.1</version>
+        <version>${version.joda-time}</version>
       </dependency>
       <dependency>
         <groupId>com.fasterxml.uuid</groupId>
         <artifactId>java-uuid-generator</artifactId>
-        <version>3.1.2</version>
+        <version>${version.uuid-generator}</version>
       </dependency>
-  
-      <!-- camunda BPM public artifacts -->       
+
+      <!-- camunda BPM public artifacts -->
       <dependency>
         <groupId>org.camunda.bpm</groupId>
         <artifactId>camunda-engine</artifactId>
@@ -75,18 +87,71 @@
         <version>${project.version}</version>
       </dependency>
       <dependency>
+        <groupId>org.camunda.bpm</groupId>
+        <artifactId>camunda-engine-plugin-spin</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.camunda.bpm</groupId>
+        <artifactId>camunda-engine-plugin-connect</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
         <groupId>org.camunda.bpm.javaee</groupId>
         <artifactId>camunda-ejb-client</artifactId>
         <version>${project.version}</version>
       </dependency>
-      
-      <!-- BPMN Model API -->
+
+      <dependency>
+        <groupId>org.camunda.bpm.model</groupId>
+        <artifactId>camunda-xml-model</artifactId>
+        <version>${project.version}</version>
+      </dependency>
       <dependency>
         <groupId>org.camunda.bpm.model</groupId>
         <artifactId>camunda-bpmn-model</artifactId>
         <version>${project.version}</version>
       </dependency>
-      
+      <dependency>
+        <groupId>org.camunda.bpm.model</groupId>
+        <artifactId>camunda-cmmn-model</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+        <!--
+            make sure everybody uses the same commons version
+        -->
+        <groupId>org.camunda.commons</groupId>
+        <artifactId>camunda-commons-bom</artifactId>
+        <scope>import</scope>
+        <type>pom</type>
+        <version>${version.camunda.commons}</version>
+      </dependency>
+
+      <!-- optional dependencies -->
+      <dependency>
+        <groupId>org.camunda.connect</groupId>
+        <artifactId>camunda-connect-bom</artifactId>
+        <version>${version.camunda.connect}</version>
+        <scope>import</scope>
+        <type>pom</type>
+      </dependency>
+      <dependency>
+        <groupId>org.camunda.spin</groupId>
+        <artifactId>camunda-spin-bom</artifactId>
+        <version>${version.camunda.spin}</version>
+        <scope>import</scope>
+        <type>pom</type>
+      </dependency>
+      <dependency>
+        <groupId>org.camunda.template-engines</groupId>
+        <artifactId>camunda-template-engines-bom</artifactId>
+        <version>${version.camunda.template-engines}</version>
+        <scope>import</scope>
+        <type>pom</type>
+      </dependency>
+
     </dependencies>
   </dependencyManagement>
 

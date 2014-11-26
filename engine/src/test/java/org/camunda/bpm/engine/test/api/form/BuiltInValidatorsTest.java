@@ -16,6 +16,7 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.form.validator.FormFieldValidator;
 import org.camunda.bpm.engine.impl.form.validator.FormFieldValidatorContext;
@@ -168,6 +169,10 @@ public class BuiltInValidatorsTest extends PluggableProcessEngineTestCase {
     }
 
     public Map<String, Object> getSubmittedValues() {
+      return null;
+    }
+
+    public VariableScope getVariableScope() {
       return null;
     }
   }

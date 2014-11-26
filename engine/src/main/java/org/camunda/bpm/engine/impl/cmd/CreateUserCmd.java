@@ -14,11 +14,11 @@
 package org.camunda.bpm.engine.impl.cmd;
 
 import java.io.Serializable;
-
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 
 /**
@@ -31,9 +31,7 @@ public class CreateUserCmd extends AbstractWritableIdentityServiceCmd<User> impl
   protected String userId;
   
   public CreateUserCmd(String userId) {
-    if(userId == null) {
-      throw new ProcessEngineException("userId is null");
-    }
+    ensureNotNull("userId", userId);
     this.userId = userId;
   }
   

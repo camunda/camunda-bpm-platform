@@ -28,6 +28,7 @@ public class HistoricProcessInstanceDto {
   private String startActivityId;
   private String deleteReason;
   private String superProcessInstanceId;
+  private String caseInstanceId;
 
   public String getId() {
     return id;
@@ -69,6 +70,10 @@ public class HistoricProcessInstanceDto {
     return superProcessInstanceId;
   }
 
+  public String getCaseInstanceId() {
+    return caseInstanceId;
+  }
+
   public static HistoricProcessInstanceDto fromHistoricProcessInstance(HistoricProcessInstance historicProcessInstance) {
 
     HistoricProcessInstanceDto dto = new HistoricProcessInstanceDto();
@@ -83,6 +88,7 @@ public class HistoricProcessInstanceDto {
     dto.startActivityId = historicProcessInstance.getStartActivityId();
     dto.deleteReason = historicProcessInstance.getDeleteReason();
     dto.superProcessInstanceId = historicProcessInstance.getSuperProcessInstanceId();
+    dto.caseInstanceId = historicProcessInstance.getCaseInstanceId();
 
     return dto;
   }

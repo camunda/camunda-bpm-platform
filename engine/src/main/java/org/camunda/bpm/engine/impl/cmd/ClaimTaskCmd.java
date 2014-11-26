@@ -13,13 +13,13 @@
 package org.camunda.bpm.engine.impl.cmd;
 
 import java.io.Serializable;
-
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.TaskAlreadyClaimedException;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 
 /**
@@ -38,21 +38,17 @@ public class ClaimTaskCmd implements Command<Void>, Serializable {
   }
 
   public Void execute(CommandContext commandContext) {
-    if(taskId == null) {
-      throw new ProcessEngineException("taskId is null");
-    }
+    ensureNotNull("taskId", taskId);
 
     TaskEntity task = commandContext
       .getTaskManager()
       .findTaskById(taskId);
 
-    if (task == null) {
-      throw new ProcessEngineException("Cannot find task with id " + taskId);
-    }
+    ensureNotNull("Cannot find task with id " + taskId, "task", task);
 
-    if(userId != null) {
+    if (userId != null) {
       if (task.getAssignee() != null) {
-        if(!task.getAssignee().equals(userId)) {
+        if (!task.getAssignee().equals(userId)) {
           // When the task is already claimed by another user, throw exception. Otherwise, ignore
           // this, post-conditions of method already met.
           throw new TaskAlreadyClaimedException(task.getId(), task.getAssignee());

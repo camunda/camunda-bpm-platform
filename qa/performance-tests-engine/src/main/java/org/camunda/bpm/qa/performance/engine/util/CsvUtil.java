@@ -26,15 +26,25 @@ import org.camunda.bpm.qa.performance.engine.framework.aggregate.TabularResultSe
 public class CsvUtil {
 
   public static String resultSetAsCsv(TabularResultSet resultSet) {
-    StringBuilder builder = new StringBuilder();
+    return resultSetAsCsv(resultSet, true);
+  }
+  
+  public static String resultSetAsCsvLine(TabularResultSet resultSet) {
+    return resultSetAsCsv(resultSet, false);
+  }
 
-    // write headline
-    List<String> resultColumnNames = resultSet.getResultColumnNames();
-    for (int i = 0; i < resultColumnNames.size(); i++) {
-      builder.append(resultColumnNames.get(i));
-      builder.append(";");
+  private static String resultSetAsCsv(TabularResultSet resultSet, boolean writeHeadline) {
+    StringBuilder builder = new StringBuilder();
+  
+    if (writeHeadline) {
+      // write headline
+      List<String> resultColumnNames = resultSet.getResultColumnNames();
+      for (int i = 0; i < resultColumnNames.size(); i++) {
+        builder.append(resultColumnNames.get(i));
+        builder.append(";");
+      }
+      builder.append("\n");
     }
-    builder.append("\n");
 
     // write results
     List<List<Object>> results = resultSet.getResults();

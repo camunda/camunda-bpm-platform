@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,15 +28,12 @@ import org.camunda.bpm.engine.rest.dto.task.GroupDto;
 import org.camunda.bpm.engine.rest.dto.task.GroupInfoDto;
 import org.camunda.bpm.engine.rest.dto.task.UserDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
+import org.codehaus.jackson.map.ObjectMapper;
 
 public class IdentityRestServiceImpl extends AbstractRestProcessEngineAware implements IdentityRestService {
 
-  public IdentityRestServiceImpl() {
-    super();
-  }
-  
-  public IdentityRestServiceImpl(String engineName) {
-    super(engineName);
+  public IdentityRestServiceImpl(String engineName, ObjectMapper objectMapper) {
+    super(engineName, objectMapper);
   }
 
   @Override
@@ -44,7 +41,7 @@ public class IdentityRestServiceImpl extends AbstractRestProcessEngineAware impl
     if (userId == null) {
       throw new InvalidRequestException(Status.BAD_REQUEST, "No user id was supplied");
     }
-    
+
     IdentityService identityService = getProcessEngine().getIdentityService();
 
     GroupQuery query = identityService.createGroupQuery();

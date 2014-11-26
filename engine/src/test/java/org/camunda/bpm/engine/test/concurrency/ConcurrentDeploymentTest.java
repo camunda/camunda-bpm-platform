@@ -95,7 +95,7 @@ public class ConcurrentDeploymentTest extends ConcurrencyTestCase {
 
       DeploymentBuilder deploymentBuilder = new DeploymentBuilderImpl(null)
         .name("some-deployment-name")
-        .enableDuplicateFiltering()
+        .enableDuplicateFiltering(false)
         .addString("foo.bpmn", processResource);
 
       monitor.sync();  // thread will block here until makeContinue() is called form main thread

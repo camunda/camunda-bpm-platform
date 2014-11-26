@@ -12,18 +12,11 @@
  */
 package org.camunda.bpm.application.impl.metadata;
 
-import static org.camunda.bpm.container.impl.metadata.DeploymentMetadataConstants.NAME;
-import static org.camunda.bpm.container.impl.metadata.DeploymentMetadataConstants.PROCESS;
-import static org.camunda.bpm.container.impl.metadata.DeploymentMetadataConstants.PROCESS_ARCHIVE;
-import static org.camunda.bpm.container.impl.metadata.DeploymentMetadataConstants.PROCESS_ENGINE;
-import static org.camunda.bpm.container.impl.metadata.DeploymentMetadataConstants.PROPERTIES;
-
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.camunda.bpm.application.impl.metadata.spi.ProcessArchiveXml;
 import org.camunda.bpm.application.impl.metadata.spi.ProcessesXml;
 import org.camunda.bpm.container.impl.metadata.DeploymentMetadataParse;
@@ -31,6 +24,8 @@ import org.camunda.bpm.container.impl.metadata.spi.ProcessEngineXml;
 import org.camunda.bpm.engine.impl.util.xml.Element;
 import org.camunda.bpm.engine.impl.util.xml.Parse;
 import org.camunda.bpm.engine.impl.util.xml.Parser;
+
+import static org.camunda.bpm.container.impl.metadata.DeploymentMetadataConstants.*;
 
 /**
  * <p>{@link Parse} object for the <code>processes.xml</code> file.</p>
@@ -95,7 +90,7 @@ public class ProcessesXmlParse extends DeploymentMetadataParse {
       if(PROCESS_ENGINE.equals(childElement.getTagName())) {
         processArchive.setProcessEngineName(childElement.getText());
         
-      } else if(PROCESS.equals(childElement.getTagName())) {
+      } else if(PROCESS.equals(childElement.getTagName()) || RESOURCE.equals(childElement.getTagName())) {
         processResourceNames.add(childElement.getText());
         
       } else if(PROPERTIES.equals(childElement.getTagName())) {

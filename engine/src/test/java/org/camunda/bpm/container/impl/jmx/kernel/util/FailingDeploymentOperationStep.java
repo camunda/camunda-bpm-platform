@@ -1,7 +1,7 @@
 package org.camunda.bpm.container.impl.jmx.kernel.util;
 
-import org.camunda.bpm.container.impl.jmx.kernel.MBeanDeploymentOperation;
-import org.camunda.bpm.container.impl.jmx.kernel.MBeanDeploymentOperationStep;
+import org.camunda.bpm.container.impl.spi.DeploymentOperation;
+import org.camunda.bpm.container.impl.spi.DeploymentOperationStep;
 
 /**
  * Deployment operation step that throws an exception.
@@ -9,7 +9,7 @@ import org.camunda.bpm.container.impl.jmx.kernel.MBeanDeploymentOperationStep;
  * @author Daniel Meyer
  *
  */
-public class FailingDeploymentOperationStep extends MBeanDeploymentOperationStep {
+public class FailingDeploymentOperationStep extends DeploymentOperationStep {
 
   @Override
   public String getName() {
@@ -17,7 +17,7 @@ public class FailingDeploymentOperationStep extends MBeanDeploymentOperationStep
   }
 
   @Override
-  public void performOperationStep(MBeanDeploymentOperation operationContext) {
+  public void performOperationStep(DeploymentOperation operationContext) {
     
     throw new RuntimeException("Big time failure.");
 

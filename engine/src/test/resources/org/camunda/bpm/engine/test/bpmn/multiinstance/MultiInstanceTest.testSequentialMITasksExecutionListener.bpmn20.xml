@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definition" 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:camunda="http://activiti.org/bpmn"
+  targetNamespace="Examples">
+  
+  <process id="miSequentialListener">
+  
+    <startEvent id="theStart" />
+    <sequenceFlow id="flow1" sourceRef="theStart" targetRef="miTasks" />
+    
+    <userTask id="miTasks" name="My Task">
+      <extensionElements>
+        <camunda:executionListener
+          event="start"
+          class="org.camunda.bpm.engine.test.bpmn.multiinstance.RecordInvocationListener" />
+        <camunda:executionListener
+          event="end"
+          class="org.camunda.bpm.engine.test.bpmn.multiinstance.RecordInvocationListener" />
+      </extensionElements>
+      <multiInstanceLoopCharacteristics isSequential="true">
+        <loopCardinality>${nrOfLoops}</loopCardinality>
+      </multiInstanceLoopCharacteristics>
+    </userTask>
+    
+    <sequenceFlow id="flow2" sourceRef="miTasks" targetRef="taskAfterMI" />
+    
+    <userTask id="taskAfterMI" />
+    
+    <sequenceFlow id="flow4" sourceRef="taskAfterMI" targetRef="theEnd" />
+    <endEvent id="theEnd" />
+    
+  </process>
+
+</definitions>

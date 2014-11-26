@@ -13,6 +13,7 @@
 
 package org.camunda.bpm.engine.test.standalone.testing;
 
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.task.Task;
@@ -38,7 +39,7 @@ public class ActivitiTestCaseTest extends ProcessEngineTestCase {
 
     ProcessEngineConfigurationImpl configuration = ((ProcessEngineImpl)processEngine).getProcessEngineConfiguration();
 
-    if (configuration.getHistoryLevel() > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
+    if (configuration.getHistoryLevel().getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
       assertEquals(1, historyService.createHistoricProcessInstanceQuery().count());
     }
   }

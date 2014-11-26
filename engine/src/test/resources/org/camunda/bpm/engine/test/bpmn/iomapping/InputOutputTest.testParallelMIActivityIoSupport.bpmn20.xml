@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definition" 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:camunda="http://activiti.org/bpmn"
+  targetNamespace="Examples">
+  
+  <process id="miParallelActivity">
+  
+    <startEvent id="theStart" />
+    <sequenceFlow id="flow1" sourceRef="theStart" targetRef="miTask" />
+    
+    <userTask id="miTask" name="My Task" camunda:assignee="kermit_${loopCounter}">
+      <extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="miCounterValue">${counter.incrementAndGet()}</camunda:inputParameter>
+        </camunda:inputOutput>
+      </extensionElements>
+      <multiInstanceLoopCharacteristics isSequential="false">
+        <loopCardinality>${nrOfLoops}</loopCardinality>
+      </multiInstanceLoopCharacteristics>
+    </userTask>
+    
+    <sequenceFlow id="flow2" sourceRef="miTask" targetRef="task2" />
+    
+    <userTask id="task2" name = "After MI"/>
+    
+    <sequenceFlow id="flow4" sourceRef="task2" targetRef="theEnd" />
+    <endEvent id="theEnd" />
+    
+  </process>
+
+</definitions>

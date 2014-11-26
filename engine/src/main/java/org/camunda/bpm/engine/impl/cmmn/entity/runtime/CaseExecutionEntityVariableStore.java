@@ -15,13 +15,13 @@ package org.camunda.bpm.engine.impl.cmmn.entity.runtime;
 import java.util.List;
 
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
-import org.camunda.bpm.engine.impl.variable.AbstractVariableStore;
+import org.camunda.bpm.engine.impl.variable.AbstractPersistentVariableStore;
 
 /**
  * @author Roman Smirnov
  *
  */
-public class CaseExecutionEntityVariableStore extends AbstractVariableStore {
+public class CaseExecutionEntityVariableStore extends AbstractPersistentVariableStore {
 
   private static final long serialVersionUID = 1L;
 
@@ -37,11 +37,6 @@ public class CaseExecutionEntityVariableStore extends AbstractVariableStore {
 
   protected void initializeVariableInstanceBackPointer(VariableInstanceEntity variableInstance) {
     caseExecutionEntity.initializeVariableInstanceBackPointer(variableInstance);
-  }
-
-  @Override
-  protected boolean isAutoFireHistoryEvents() {
-    return false;
   }
 
 }

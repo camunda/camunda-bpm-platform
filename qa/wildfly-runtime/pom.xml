@@ -1,0 +1,382 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <artifactId>camunda-qa-wildfly-runtime</artifactId>
+  <packaging>jar</packaging>
+
+  <name>camunda BPM - QA Wildfly Test Runtime</name>
+
+  <properties>
+    <jboss.assembly.location>../../distro/wildfly/assembly/target/assembly-${project.version}/assembly-${project.version}/server</jboss.assembly.location>
+  </properties>
+
+  <parent>
+    <groupId>org.camunda.bpm.qa</groupId>
+    <artifactId>camunda-qa</artifactId>
+    <version>7.3.0-SNAPSHOT</version>
+  </parent>
+
+  <dependencies>
+    <dependency>
+      <!-- make sure it comes after assembly in the build -->
+      <groupId>org.camunda.bpm.wildfly</groupId>
+      <artifactId>camunda-wildfly-assembly</artifactId>
+      <version>${project.version}</version>      
+      <type>pom</type>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>mysql</groupId>
+      <artifactId>mysql-connector-java</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.ibm.db2.jcc</groupId>
+      <artifactId>db2jcc4</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.oracle.jdbc</groupId>
+      <artifactId>ojdbc6</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.microsoft.sqlserver</groupId>
+      <artifactId>sqljdbc4</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.postgresql</groupId>
+      <artifactId>postgresql</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.python</groupId>
+      <artifactId>jython</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.jruby</groupId>
+      <artifactId>jruby-complete</artifactId>
+      <scope>test</scope>
+    </dependency>
+    
+    <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <resources>
+      <resource>
+        <directory>src/main/standalone</directory>
+        <filtering>true</filtering>
+        <includes>
+          <include>configuration/standalone.xml</include>
+          <include>deployments/${jboss.datasource.filename}</include>
+        </includes>
+      </resource> 
+      <resource>
+        <directory>src/main/modules</directory>
+        <filtering>true</filtering>
+      </resource>
+      <resource>
+        <directory>src/main/domain</directory>
+        <filtering>true</filtering>
+        <includes>
+          <include>configuration/domain.xml</include>
+          <include>configuration/host.xml</include>
+        </includes>
+      </resource>
+    </resources>
+    <plugins>
+      <!-- create sources to be used by camunda-bpm-platform-ee -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>add-resources</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>add-resource</goal>
+            </goals>
+            <configuration>
+              <resources>
+                <resource>
+                  <directory>src/main</directory>
+                  <includes>
+                    <include>**/*.xml</include>
+                  </includes>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>attach-sources</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>jar-no-fork</goal>
+            </goals>
+            <configuration>
+              <forceCreation>true</forceCreation>
+              <!-- exclude otherwise there would be duplicates in -sources.jar -->
+              <excludes>
+                <exclude>deployments/**/*</exclude>
+                <exclude>configuration/**/*</exclude>
+                <exclude>**/configuration/**/*</exclude>
+              </excludes>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+  <profiles>
+    <profile>
+      <id>wildfly</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-dependency-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>unpack-server</id>
+                <phase>generate-resources</phase>
+                <goals>
+                  <goal>unpack</goal>
+                </goals>
+                <inherited>false</inherited>
+                <configuration>
+                  <artifactItems>
+                    <artifactItem>
+                      <groupId>org.camunda.bpm.wildfly</groupId>
+                      <artifactId>camunda-wildfly-assembly</artifactId>
+                      <version>${project.version}</version>
+                      <type>tar.gz</type>
+                      <overWrite>true</overWrite>
+                      <outputDirectory>target/</outputDirectory>
+                    </artifactItem>
+                  </artifactItems>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>copy-distro</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+                <configuration>
+                  <target unless="maven.test.skip">
+                    <copy todir="${wildfly.runtime.location}/modules" overwrite="true">
+                      <fileset dir="src/main/modules" />
+                    </copy>
+
+                  </target>
+                </configuration>
+              </execution>
+              <execution>
+                <id>copy-test-dependencies</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+                <configuration>
+                  <target unless="maven.test.skip">
+                    <dependencyfilesets scopes="test" />
+
+                    <copy todir="${wildfly.runtime.location}/modules" flatten="false" overwrite="true">
+                      <fileset refid="maven.project.dependencies" />
+                      <regexpmapper from="^(.*)/([^/]+)/([^/]*)$$" to="\1/main/\3" handledirsep="yes" />
+                    </copy>
+                    
+                    <replace dir="${wildfly.runtime.location}/modules" token="@project.version@" value="${project.version}">
+                      <include name="**/module.xml" />
+                    </replace>
+
+                  </target>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <!-- copy filtered configuration resources -->
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-resources-plugin</artifactId>
+            <configuration>
+              <delimiters>
+                <delimiter>${*}</delimiter>
+              </delimiters>
+              <useDefaultDelimiters>false</useDefaultDelimiters>
+            </configuration>
+            <executions>
+              <execution>
+                <id>copy-resources</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>resources</goal>
+                </goals>
+                <configuration>
+                  <overwrite>true</overwrite>
+                  <outputDirectory>${wildfly.runtime.location}/standalone</outputDirectory>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    
+    <profile>
+      <id>wildfly-domain</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-dependency-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>unpack-server</id>
+                <phase>generate-resources</phase>
+                <goals>
+                  <goal>unpack</goal>
+                </goals>
+                <inherited>false</inherited>
+                <configuration>
+                  <artifactItems>
+                    <artifactItem>
+                      <groupId>org.camunda.bpm.wildfly</groupId>
+                      <artifactId>camunda-wildfly-assembly</artifactId>
+                      <version>${project.version}</version>
+                      <type>tar.gz</type>
+                      <overWrite>true</overWrite>
+                      <outputDirectory>target/</outputDirectory>
+                    </artifactItem>
+                  </artifactItems>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>copy-distro</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+                <configuration>
+                  <target unless="maven.test.skip">
+                    <copy todir="${wildfly.runtime.location}/modules" overwrite="true">
+                      <fileset dir="src/main/modules" />
+                    </copy>
+
+                  </target>
+                </configuration>
+              </execution>
+              <execution>
+                <id>copy-test-dependencies</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+                <configuration>
+                  <target unless="maven.test.skip">
+                    <dependencyfilesets scopes="test" />
+
+                    <copy todir="${wildfly.runtime.location}/modules" flatten="false">
+                      <fileset refid="maven.project.dependencies" />
+                      <regexpmapper from="^(.*)/([^/]+)/([^/]*)$$" to="\1/main/\3" handledirsep="yes" />
+                    </copy>
+
+                    <replace dir="${wildfly.runtime.location}/modules" token="@project.version@" value="${project.version}">
+                      <include name="**/module.xml" />
+                    </replace>
+
+                    <delete dir="${wildfly.runtime.location}/modules/system/layers/base/com/h2database/" />
+
+                  </target>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <!-- copy filtered configuration resources -->
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-resources-plugin</artifactId>
+            <configuration>
+              <delimiters>
+                <delimiter>${*}</delimiter>
+              </delimiters>
+              <useDefaultDelimiters>false</useDefaultDelimiters>
+            </configuration>
+            <executions>
+              <execution>
+                <id>copy-resources</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>resources</goal>
+                </goals>
+                <configuration>
+                  <overwrite>true</overwrite>
+                  <outputDirectory>${wildfly.runtime.location}/domain</outputDirectory>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <profile>
+      <id>install-test-runtime</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-assembly-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>assemble</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>single</goal>
+                </goals>
+                <configuration>
+                  <descriptors>
+                    <descriptor>assembly.xml</descriptor>
+                  </descriptors>
+                  <finalName>camunda-qa-wildfly-runtime-${project.version}</finalName>
+                  <appendAssemblyId>false</appendAssemblyId>
+                  <outputDirectory>target/</outputDirectory>
+                  <workDirectory>target/assembly/work</workDirectory>
+                  <tarLongFileMode>gnu</tarLongFileMode>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+</project>

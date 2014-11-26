@@ -12,7 +12,6 @@
  */
 package org.camunda.bpm.engine.rest.dto.runtime;
 
-import org.camunda.bpm.engine.impl.persistence.entity.ActivityInstanceImpl;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 
 /**

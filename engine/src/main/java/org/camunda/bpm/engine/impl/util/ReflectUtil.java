@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -12,18 +12,27 @@
  */
 package org.camunda.bpm.engine.impl.util;
 
+import java.io.InputStream;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.logging.Logger;
 import org.camunda.bpm.engine.ClassLoadingException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 
-import java.io.InputStream;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.net.URL;
-import java.util.*;
-import java.util.logging.Logger;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 
 /**
@@ -43,7 +52,7 @@ public abstract class ReflectUtil {
     charEncodings.put("Ö", "%C3%96");
     charEncodings.put("Ü", "%C3%9C");
   }
-  
+
   public static ClassLoader getClassLoader() {
     ClassLoader loader = getCustomClassLoader();
     if(loader == null) {
@@ -51,14 +60,14 @@ public abstract class ReflectUtil {
     }
     return loader;
   }
-  
+
   public static Class<?> loadClass(String className) {
    Class<?> clazz = null;
    ClassLoader classLoader = getCustomClassLoader();
-   
+
    // First exception in chain of classloaders will be used as cause when no class is found in any of them
    Throwable throwable = null;
-   
+
    if(classLoader != null) {
      try {
        LOG.finest("Trying to load class with custom classloader: " + className);
@@ -90,20 +99,20 @@ public abstract class ReflectUtil {
        }
      }
    }
-  
+
    if(clazz == null) {
      throw new ClassLoadingException(className, throwable);
    }
    return clazz;
   }
-  
+
   public static InputStream getResourceAsStream(String name) {
     InputStream resourceStream = null;
     ClassLoader classLoader = getCustomClassLoader();
     if(classLoader != null) {
       resourceStream = classLoader.getResourceAsStream(name);
     }
-    
+
     if(resourceStream == null) {
       // Try the current Thread context classloader
       classLoader = Thread.currentThread().getContextClassLoader();
@@ -135,7 +144,7 @@ public abstract class ReflectUtil {
     }
 
     return url;
-  }
+   }
 
   public static String getResourceUrlAsString(String name) {
     String url = getResource(name).toString();
@@ -145,6 +154,21 @@ public abstract class ReflectUtil {
     return url;
   }
 
+  /**
+   * Converts an url to an uri. Escapes whitespaces if needed.
+   *
+   * @param url  the url to convert
+   * @return the resulting uri
+   * @throws ProcessEngineException if the url has invalid syntax
+   */
+  public static URI urlToURI(URL url) {
+    try {
+      return url.toURI();
+    } catch (URISyntaxException e) {
+      throw new ProcessEngineException("couldn't convert URL to URI " + url, e);
+    }
+  }
+
 
   public static Object instantiate(String className) {
     try {
@@ -152,6 +176,14 @@ public abstract class ReflectUtil {
       return clazz.newInstance();
     } catch (Exception e) {
       throw new ProcessEngineException("couldn't instantiate class "+className, e);
+    }
+  }
+
+  public static <T> T instantiate(Class<T> type) {
+    try {
+      return type.newInstance();
+    } catch (Exception e) {
+      throw new ProcessEngineException("couldn't instantiate class "+type, e);
     }
   }
 
@@ -165,14 +197,14 @@ public abstract class ReflectUtil {
       throw new ProcessEngineException("couldn't invoke "+methodName+" on "+target, e);
     }
   }
-  
+
   /**
    * Returns the field of the given object or null if it doesnt exist.
    */
   public static Field getField(String fieldName, Object object) {
     return getField(fieldName, object.getClass());
   }
-  
+
   /**
    * Returns the field of the given class or null if it doesnt exist.
    */
@@ -192,7 +224,7 @@ public abstract class ReflectUtil {
     }
     return field;
   }
-  
+
   public static void setField(Field field, Object object, Object value) {
     try {
       field.setAccessible(true);
@@ -203,7 +235,7 @@ public abstract class ReflectUtil {
       throw new ProcessEngineException("Could not set field " + field.toString(), e);
     }
   }
-  
+
   /**
    * Returns the setter-method for the given field name or null if no setter exists.
    */
@@ -226,7 +258,7 @@ public abstract class ReflectUtil {
       throw new ProcessEngineException("Not allowed to access method " + setterName + " on class " + clazz.getCanonicalName());
     }
   }
-  
+
   /**
    * Returns a setter method based on the fieldName and the java beans setter naming convention or null if none exists.
    * If multiple setters with different parameter types are present, an exception is thrown.
@@ -243,27 +275,27 @@ public abstract class ReflectUtil {
       for(Method method : methods) {
         if(method.getName().equals(setterName)) {
           Class<?>[] paramTypes = method.getParameterTypes();
-          
+
           if(paramTypes != null && paramTypes.length == 1) {
             candidates.add(method);
             parameterTypes.add(paramTypes[0]);
           }
         }
       }
-      
+
       if (parameterTypes.size() > 1) {
         throw new ProcessEngineException("There exists more than one setter method with different argument types named " + setterName + " on class " + clazz.getCanonicalName());
       }
       if (candidates.size() >= 1) {
         return candidates.get(0);
       }
-      
+
       return null;
     } catch (SecurityException e) {
       throw new ProcessEngineException("Not allowed to access method " + setterName + " on class " + clazz.getCanonicalName());
     }
   }
-  
+
   private static String buildSetterName(String fieldName) {
     return "set" + Character.toTitleCase(fieldName.charAt(0)) +
         fieldName.substring(1, fieldName.length());
@@ -286,15 +318,13 @@ public abstract class ReflectUtil {
   }
 
   public static Object instantiate(String className, Object[] args) {
-    Class< ? > clazz = loadClass(className);
-    Constructor< ? > constructor = findMatchingConstructor(clazz, args);
-    if (constructor==null) {
-      throw new ProcessEngineException("couldn't find constructor for "+className+" with args "+Arrays.asList(args));
-    } 
+    Class<?> clazz = loadClass(className);
+    Constructor<?> constructor = findMatchingConstructor(clazz, args);
+    ensureNotNull("couldn't find constructor for " + className + " with args " + Arrays.asList(args), "constructor", constructor);
     try {
       return constructor.newInstance(args);
     } catch (Exception e) {
-      throw new ProcessEngineException("couldn't find constructor for "+className+" with args "+Arrays.asList(args), e);
+      throw new ProcessEngineException("couldn't find constructor for " + className + " with args " + Arrays.asList(args), e);
     }
   }
 
@@ -330,7 +360,7 @@ public abstract class ReflectUtil {
     }
     return true;
   }
-  
+
   private static ClassLoader getCustomClassLoader() {
     ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
     if(processEngineConfiguration != null) {
@@ -340,5 +370,16 @@ public abstract class ReflectUtil {
       }
     }
     return null;
+  }
+
+  /**
+   * Finds a method by name and parameter types.
+   *
+   * @param declaringType the name of the class
+   * @param methodName the name of the method to look for
+   * @param parameterTypes the types of the parameters
+   */
+  public static Method getMethod(Class declaringType, String methodName, Class<?>... parameterTypes) {
+    return findMethod(declaringType, methodName, parameterTypes);
   }
 }

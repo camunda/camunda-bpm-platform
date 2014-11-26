@@ -14,14 +14,14 @@
 package org.camunda.bpm.engine.impl.cmd;
 
 import java.io.Serializable;
-
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.AttachmentEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 
 /**
@@ -44,12 +44,10 @@ public class DeleteTaskAttachmentCmd implements Command<Object>, Serializable {
       .getAttachmentManager()
       .findAttachmentByTaskIdAndAttachmentId(taskId, attachmentId);
 
-    if (attachment == null) {
-      throw new ProcessEngineException("No attachment exist for task id '" + taskId + " and attachmentId '" + attachmentId + "'.");
-    }
+    ensureNotNull("No attachment exist for task id '" + taskId + " and attachmentId '" + attachmentId + "'.", "attachment", attachment);
 
     commandContext
-      .getDbSqlSession()
+      .getDbEntityManager()
       .delete(attachment);
 
     if (attachment.getContentId() != null) {
@@ -58,15 +56,15 @@ public class DeleteTaskAttachmentCmd implements Command<Object>, Serializable {
         .deleteByteArrayById(attachment.getContentId());
     }
 
-    if (attachment.getTaskId()!=null) {
+    if (attachment.getTaskId() != null) {
       TaskEntity task = commandContext
-          .getTaskManager()
-          .findTaskById(attachment.getTaskId());
+        .getTaskManager()
+        .findTaskById(attachment.getTaskId());
 
       PropertyChange propertyChange = new PropertyChange("name", null, attachment.getName());
 
       commandContext.getOperationLogManager()
-          .logAttachmentOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE_ATTACHMENT, task, propertyChange);
+        .logAttachmentOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE_ATTACHMENT, task, propertyChange);
     }
 
     return null;

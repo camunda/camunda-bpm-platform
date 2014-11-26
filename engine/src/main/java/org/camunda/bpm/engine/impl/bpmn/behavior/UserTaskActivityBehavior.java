@@ -12,89 +12,38 @@
  */
 package org.camunda.bpm.engine.impl.bpmn.behavior;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-
-import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.delegate.TaskListener;
-import org.camunda.bpm.engine.impl.calendar.BusinessCalendar;
-import org.camunda.bpm.engine.impl.calendar.DueDateBusinessCalendar;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
+import org.camunda.bpm.engine.impl.task.TaskDecorator;
 import org.camunda.bpm.engine.impl.task.TaskDefinition;
 
 /**
  * activity implementation for the user task.
  *
  * @author Joram Barrez
+ * @author Roman Smirnov
  */
 public class UserTaskActivityBehavior extends TaskActivityBehavior {
 
-  protected TaskDefinition taskDefinition;
-  protected ExpressionManager expressionManager;
+  protected TaskDecorator taskDecorator;
 
+  @Deprecated
   public UserTaskActivityBehavior(ExpressionManager expressionManager, TaskDefinition taskDefinition) {
-    this.expressionManager = expressionManager;
-    this.taskDefinition = taskDefinition;
+    this.taskDecorator = new TaskDecorator(taskDefinition, expressionManager);
+  }
+
+  public UserTaskActivityBehavior(TaskDecorator taskDecorator) {
+    this.taskDecorator = taskDecorator;
   }
 
   public void execute(ActivityExecution execution) throws Exception {
     TaskEntity task = TaskEntity.createAndInsert(execution);
     task.setExecution(execution);
-    task.setTaskDefinition(taskDefinition);
 
-    if (taskDefinition.getNameExpression() != null) {
-      String name = (String) taskDefinition.getNameExpression().getValue(execution);
-      task.setName(name);
-    }
-
-    if (taskDefinition.getDescriptionExpression() != null) {
-      String description = (String) taskDefinition.getDescriptionExpression().getValue(execution);
-      task.setDescription(description);
-    }
-
-    if(taskDefinition.getDueDateExpression() != null) {
-      Object dueDate = taskDefinition.getDueDateExpression().getValue(execution);
-      if(dueDate != null) {
-        if (dueDate instanceof Date) {
-          task.setDueDate((Date) dueDate);
-        } else if (dueDate instanceof String) {
-          BusinessCalendar businessCalendar = Context
-            .getProcessEngineConfiguration()
-            .getBusinessCalendarManager()
-            .getBusinessCalendar(DueDateBusinessCalendar.NAME);
-          task.setDueDate(businessCalendar.resolveDuedate((String) dueDate));
-        } else {
-          throw new ProcessEngineException("Due date expression does not resolve to a Date or Date string: " +
-              taskDefinition.getDueDateExpression().getExpressionText());
-        }
-      }
-    }
-
-    if (taskDefinition.getPriorityExpression() != null) {
-      final Object priority = taskDefinition.getPriorityExpression().getValue(execution);
-      if (priority != null) {
-        if (priority instanceof String) {
-          try {
-            task.setPriority(Integer.valueOf((String) priority));
-          } catch (NumberFormatException e) {
-            throw new ProcessEngineException("Priority does not resolve to a number: " + priority, e);
-          }
-        } else if (priority instanceof Number) {
-          task.setPriority(((Number) priority).intValue());
-        } else {
-          throw new ProcessEngineException("Priority expression does not resolve to a number: " +
-                  taskDefinition.getPriorityExpression().getExpressionText());
-        }
-      }
-    }
-
-    handleAssignments(task, execution);
+    taskDecorator.decorate(task, execution);
 
     Context.getCommandContext()
       .getHistoricTaskInstanceManager()
@@ -108,59 +57,18 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
     leave(execution);
   }
 
-  @SuppressWarnings({ "unchecked", "rawtypes" })
-  protected void handleAssignments(TaskEntity task, ActivityExecution execution) {
-    if (taskDefinition.getAssigneeExpression() != null) {
-      task.setAssignee((String) taskDefinition.getAssigneeExpression().getValue(execution));
-    }
-
-    if (!taskDefinition.getCandidateGroupIdExpressions().isEmpty()) {
-      for (Expression groupIdExpr : taskDefinition.getCandidateGroupIdExpressions()) {
-        Object value = groupIdExpr.getValue(execution);
-        if (value instanceof String) {
-          List<String> candiates = extractCandidates((String) value);
-          task.addCandidateGroups(candiates);
-        } else if (value instanceof Collection) {
-          task.addCandidateGroups((Collection) value);
-        } else {
-          throw new ProcessEngineException("Expression did not resolve to a string or collection of strings");
-        }
-      }
-    }
-
-    if (!taskDefinition.getCandidateUserIdExpressions().isEmpty()) {
-      for (Expression userIdExpr : taskDefinition.getCandidateUserIdExpressions()) {
-        Object value = userIdExpr.getValue(execution);
-        if (value instanceof String) {
-          List<String> candiates = extractCandidates((String) value);
-          task.addCandidateUsers(candiates);
-        } else if (value instanceof Collection) {
-          task.addCandidateUsers((Collection) value);
-        } else {
-          throw new ProcessEngineException("Expression did not resolve to a string or collection of strings");
-        }
-      }
-    }
-  }
-
-  /**
-   * Extract a candidate list from a string.
-   *
-   * @param str
-   * @return
-   */
-  protected List<String> extractCandidates(String str) {
-    return Arrays.asList(str.split("[\\s]*,[\\s]*"));
-  }
-
-  // getters and setters //////////////////////////////////////////////////////
+  // getters
 
   public TaskDefinition getTaskDefinition() {
-    return taskDefinition;
+    return taskDecorator.getTaskDefinition();
   }
 
   public ExpressionManager getExpressionManager() {
-    return expressionManager;
+    return taskDecorator.getExpressionManager();
+  }
+
+  public TaskDecorator getTaskDecorator() {
+    return taskDecorator;
   }
 
 }

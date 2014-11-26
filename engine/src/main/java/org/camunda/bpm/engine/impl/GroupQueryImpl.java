@@ -13,7 +13,8 @@
 
 package org.camunda.bpm.engine.impl;
 
-import org.camunda.bpm.engine.ProcessEngineException;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.GroupQuery;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -27,6 +28,7 @@ public abstract class GroupQueryImpl extends AbstractQuery<GroupQuery, Group> im
   
   private static final long serialVersionUID = 1L;
   protected String id;
+  protected String[] ids;
   protected String name;
   protected String nameLike;
   protected String type;
@@ -46,49 +48,43 @@ public abstract class GroupQueryImpl extends AbstractQuery<GroupQuery, Group> im
   }
 
   public GroupQuery groupId(String id) {
-    if (id == null) {
-      throw new ProcessEngineException("Provided id is null");
-    }
+    ensureNotNull("Provided id", id);
     this.id = id;
+    return this;
+  }
+
+  public GroupQuery groupIdIn(String... ids) {
+    ensureNotNull("Provided ids", ids);
+    this.ids = ids;
     return this;
   }
   
   public GroupQuery groupName(String name) {
-    if (name == null) {
-      throw new ProcessEngineException("Provided name is null");
-    }
+    ensureNotNull("Provided name", name);
     this.name = name;
     return this;
   }
   
   public GroupQuery groupNameLike(String nameLike) {
-    if (nameLike == null) {
-      throw new ProcessEngineException("Provided nameLike is null");
-    }
+    ensureNotNull("Provided nameLike", nameLike);
     this.nameLike = nameLike;
     return this;
   }
   
   public GroupQuery groupType(String type) {
-    if (type == null) {
-      throw new ProcessEngineException("Provided type is null");
-    }
+    ensureNotNull("Provided type", type);
     this.type = type;
     return this;
   }
   
   public GroupQuery groupMember(String userId) {
-    if (userId == null) {
-      throw new ProcessEngineException("Provided userId is null");
-    }
+    ensureNotNull("Provided userId", userId);
     this.userId = userId;
     return this;
   }
 
   public GroupQuery potentialStarter(String procDefId) {
-    if (procDefId == null) {
-      throw new ProcessEngineException("Provided processDefinitionId is null or empty");
-    }
+    ensureNotNull("Provided processDefinitionId", procDefId);
     this.procDefId = procDefId;
     return this;
     

@@ -57,12 +57,14 @@ public class GetIdentityLinksForTaskCmd implements Command<List<IdentityLink>>, 
     if (task.getAssignee() != null) {
       IdentityLinkEntity identityLink = new IdentityLinkEntity();
       identityLink.setUserId(task.getAssignee());
+      identityLink.setTask(task);
       identityLink.setType(IdentityLinkType.ASSIGNEE);
       identityLinks.add(identityLink);
     }
     if (task.getOwner() != null) {
       IdentityLinkEntity identityLink = new IdentityLinkEntity();
       identityLink.setUserId(task.getOwner());
+      identityLink.setTask(task);
       identityLink.setType(IdentityLinkType.OWNER);
       identityLinks.add(identityLink);
     }

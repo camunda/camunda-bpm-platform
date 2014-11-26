@@ -22,6 +22,36 @@ import org.camunda.bpm.engine.impl.core.operation.AbstractEventAtomicOperation;
  */
 public abstract class AbstractCmmnEventAtomicOperation extends AbstractEventAtomicOperation<CmmnExecution> implements CmmnAtomicOperation {
 
-  protected abstract CmmnActivity getScope(CmmnExecution instance);
+  protected CmmnActivity getScope(CmmnExecution execution) {
+    return execution.getActivity();
+  }
+
+  public boolean isAsync(CmmnExecution execution) {
+    return false;
+  }
+
+  protected final void eventNotificationsCompleted(CmmnExecution execution) {
+    preTransitionNotification(execution);
+    performTransitionNotification(execution);
+    postTransitionNotification(execution);
+  }
+
+  protected void preTransitionNotification(CmmnExecution execution) {
+
+  }
+
+  protected void performTransitionNotification(CmmnExecution execution) {
+    String eventName = getEventName();
+
+    CmmnExecution parent = execution.getParent();
+
+    if (parent != null) {
+      parent.handleChildTransition(execution, eventName);
+    }
+  }
+
+  protected void postTransitionNotification(CmmnExecution execution) {
+    // noop
+  }
 
 }

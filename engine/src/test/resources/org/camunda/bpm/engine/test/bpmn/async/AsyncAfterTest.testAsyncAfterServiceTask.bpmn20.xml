@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:camunda="http://activiti.org/bpmn"
+  targetNamespace="Examples">
+
+  <process id="testProcess">
+
+    <startEvent id="theStart" />
+
+    <sequenceFlow id="flow1"  sourceRef="theStart" targetRef="service" />
+
+    <serviceTask id="service" camunda:expression="${execution.setVariable('behaviorInvoked', true)}" camunda:asyncAfter="true">
+
+      <extensionElements>
+
+          <camunda:executionListener
+              event="start"
+              expression="${execution.setVariable('listenerStartInvoked', true)}" />
+
+          <camunda:executionListener
+              event="end"
+              expression="${execution.setVariable('listenerEndInvoked', true)}" />
+
+        </extensionElements>
+
+    </serviceTask>
+
+    <sequenceFlow id="flow2" sourceRef="service" targetRef="theEnd" />
+
+    <endEvent id="theEnd" />
+
+  </process>
+
+</definitions>

@@ -1,0 +1,6 @@
+-- indexes for deadlock problems - https://app.camunda.com/jira/browse/CAM-2567 --
+create index ACT_IDX_INC_CAUSEINCID on ACT_RU_INCIDENT(CAUSE_INCIDENT_ID_);
+create index ACT_IDX_INC_EXID on ACT_RU_INCIDENT(EXECUTION_ID_);
+create index ACT_IDX_INC_PROCDEFID on ACT_RU_INCIDENT(PROC_DEF_ID_);
+create index ACT_IDX_INC_PROCINSTID on ACT_RU_INCIDENT(PROC_INST_ID_);
+create index ACT_IDX_INC_ROOTCAUSEINCID on ACT_RU_INCIDENT(ROOT_CAUSE_INCIDENT_ID_);

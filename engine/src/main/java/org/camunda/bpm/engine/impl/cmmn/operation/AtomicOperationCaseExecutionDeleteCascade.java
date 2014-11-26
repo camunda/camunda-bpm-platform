@@ -42,7 +42,7 @@ public class AtomicOperationCaseExecutionDeleteCascade implements CmmnAtomicOper
 
     CmmnExecution parent = firstLeaf.getParent();
     if (parent != null) {
-      parent.performOperation(CASE_EXECUTION_DELETE_CASCADE);
+      parent.deleteCascade();
     }
   }
 

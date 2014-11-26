@@ -35,7 +35,7 @@ public class SaveAttachmentCmd implements Command<Object>, Serializable {
 
   public Object execute(CommandContext commandContext) {
     AttachmentEntity updateAttachment = commandContext
-      .getDbSqlSession()
+      .getDbEntityManager()
       .selectById(AttachmentEntity.class, attachment.getId());
     
     updateAttachment.setName(attachment.getName());

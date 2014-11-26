@@ -14,10 +14,10 @@
 package org.camunda.bpm.engine.impl.cmd;
 
 import java.io.Serializable;
-
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 /**
  * @author Tom Baeyens
@@ -33,9 +33,7 @@ public class DeleteHistoricTaskInstanceCmd implements Command<Object>, Serializa
 
   public Object execute(CommandContext commandContext) {
 
-    if (taskId == null) {
-      throw new ProcessEngineException("taskId is null");
-    }
+    ensureNotNull("taskId", taskId);
     commandContext
       .getHistoricTaskInstanceManager()
       .deleteHistoricTaskInstanceById(taskId);

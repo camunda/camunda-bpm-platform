@@ -35,7 +35,7 @@ public class GetAttachmentCmd implements Command<Attachment>, Serializable {
 
   public Attachment execute(CommandContext commandContext) {
     return commandContext
-      .getDbSqlSession()
+      .getDbEntityManager()
       .selectById(AttachmentEntity.class, attachmentId);
   }
 

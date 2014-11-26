@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:camunda="http://activiti.org/bpmn"
+  targetNamespace="Examples">
+
+  <process id="testExclusiveGateway">
+
+    <startEvent id="theStart" />
+
+    <sequenceFlow id="flow1"  sourceRef="theStart" targetRef="exclusiveGateway" />
+
+    <exclusiveGateway id="exclusiveGateway"
+                      default="flow2"
+                      camunda:asyncBefore="true"
+                      camunda:asyncAfter="true">
+
+      <extensionElements>
+
+          <camunda:executionListener
+              event="start"
+              expression="${execution.setVariable('listenerStartInvoked', true)}" />
+
+          <camunda:executionListener
+              event="end"
+              expression="${execution.setVariable('listenerEndInvoked', true)}" />
+
+        </extensionElements>
+
+    </exclusiveGateway>
+
+    <sequenceFlow id="flow2" sourceRef="exclusiveGateway" targetRef="userTask1" />
+    <sequenceFlow id="flow3" sourceRef="exclusiveGateway" targetRef="userTask2" >
+      <conditionExpression xsi:type="tFormalExpression">${flow == true}</conditionExpression>
+    </sequenceFlow>
+
+    <userTask id="userTask1" />
+    <userTask id="userTask2" />
+
+    <sequenceFlow sourceRef="userTask1" targetRef="theEnd" />
+    <sequenceFlow sourceRef="userTask2" targetRef="theEnd2" />
+
+    <endEvent id="theEnd" />
+    <endEvent id="theEnd2" />
+
+  </process>
+
+</definitions>

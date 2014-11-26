@@ -12,13 +12,13 @@
  */
 package org.camunda.bpm.engine.impl.form.handler;
 
-import java.util.Map;
-
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.form.FormFieldValidationConstraint;
 import org.camunda.bpm.engine.impl.form.FormFieldValidationConstraintImpl;
 import org.camunda.bpm.engine.impl.form.validator.FormFieldValidator;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.variable.VariableMap;
 
 /**
  * <p>Wrapper for a validation constraint</p>
@@ -38,8 +38,8 @@ public class FormFieldValidationConstraintHandler {
 
   // submit /////////////////////////////////
 
-  public void validate(Object submittedValue, Map<String, Object> submittedValues, FormFieldHandler formFieldHandler, ExecutionEntity execution) {
-    boolean isValid = validator.validate(submittedValue, new DefaultFormFieldValidatorContext(execution, config, submittedValues));
+  public void validate(Object submittedValue, VariableMap submittedValues, FormFieldHandler formFieldHandler, VariableScope variableScope) {
+    boolean isValid = validator.validate(submittedValue, new DefaultFormFieldValidatorContext(variableScope, config, submittedValues));
     if(!isValid) {
       throw new ProcessEngineException("Invalid value submitted for form field '"+formFieldHandler.getId()+"': validation of "+this+" failed.");
     }

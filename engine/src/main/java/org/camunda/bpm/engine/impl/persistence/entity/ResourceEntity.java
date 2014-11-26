@@ -15,14 +15,14 @@ package org.camunda.bpm.engine.impl.persistence.entity;
 
 import java.io.Serializable;
 
-import org.camunda.bpm.engine.impl.db.PersistentObject;
+import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.repository.Resource;
 
 
 /**
  * @author Tom Baeyens
  */
-public class ResourceEntity implements Serializable, PersistentObject, Resource {
+public class ResourceEntity implements Serializable, DbEntity, Resource {
 
   private static final long serialVersionUID = 1L;
 

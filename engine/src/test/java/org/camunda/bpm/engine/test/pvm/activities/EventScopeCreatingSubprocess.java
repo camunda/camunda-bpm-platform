@@ -16,12 +16,10 @@ package org.camunda.bpm.engine.test.pvm.activities;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.PvmTransition;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.engine.impl.pvm.delegate.CompositeActivityBehavior;
-import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 
 
@@ -52,7 +50,7 @@ public class EventScopeCreatingSubprocess implements CompositeActivityBehavior {
 
     ActivityExecution outgoingExecution = execution.getParent().createExecution();
     outgoingExecution.setConcurrent(false);
-    ((PvmExecutionImpl)outgoingExecution).setActivity((ActivityImpl) execution.getActivity());
+    outgoingExecution.setActivity(execution.getActivity());
 
     // eventscope execution
     execution.setConcurrent(false);

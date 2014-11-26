@@ -1,6 +1,27 @@
 #!/bin/sh
 
+export JBOSS_HOME="$(dirname "$0")/server/jboss-as-${version.jboss.as}"
+
 BROWSERS="gnome-www-browser x-www-browser firefox chromium chromium-browser google-chrome"
+
+if type -p java; then
+    echo "found java executable in PATH"
+    _java=java
+elif [[ -n "$JAVA_HOME" ]] && [[ -x "$JAVA_HOME/bin/java" ]];  then
+    echo "found java executable in JAVA_HOME"
+    _java="$JAVA_HOME/bin/java"
+else
+    echo "no java found"
+fi
+
+if [[ "$_java" ]]; then
+    version=$("$_java" -version 2>&1 | awk -F '"' '/version/ {print $2}')
+    echo "version $version"
+    if ! [[ "$version" < "1.8" ]]; then
+        echo "Your java version is greater than JDK 1.7. Cannot start JBoss AS ${version.jboss.as}"
+        exit 1;
+    fi
+fi
 
 echo "starting camunda BPM ${project.version}  on JBoss Application Server ${version.jboss.as}";
 

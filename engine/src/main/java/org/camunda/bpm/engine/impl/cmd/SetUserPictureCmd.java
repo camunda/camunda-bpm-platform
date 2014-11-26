@@ -14,13 +14,13 @@
 package org.camunda.bpm.engine.impl.cmd;
 
 import java.io.Serializable;
-
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.identity.Picture;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.IdentityInfoEntity;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 
 /**
@@ -40,34 +40,32 @@ public class SetUserPictureCmd implements Command<Void>, Serializable {
   }
 
   public Void execute(CommandContext commandContext) {
-    if(userId == null) {
-      throw new ProcessEngineException("userId is null");
-    }
-    
+    ensureNotNull("userId", userId);
+
     IdentityInfoEntity pictureInfo = commandContext.getIdentityInfoManager()
-        .findUserInfoByUserIdAndKey(userId, "picture");
-    
-    if(pictureInfo != null) {
+      .findUserInfoByUserIdAndKey(userId, "picture");
+
+    if (pictureInfo != null) {
       String byteArrayId = pictureInfo.getValue();
-      if(byteArrayId != null) {
+      if (byteArrayId != null) {
         commandContext.getByteArrayManager()
           .deleteByteArrayById(byteArrayId);
       }
-      
+
     } else {
       pictureInfo = new IdentityInfoEntity();
       pictureInfo.setUserId(userId);
       pictureInfo.setKey("picture");
-      commandContext.getDbSqlSession().insert(pictureInfo);
+      commandContext.getDbEntityManager().insert(pictureInfo);
     }
-    
+
     ByteArrayEntity byteArrayEntity = new ByteArrayEntity(picture.getMimeType(), picture.getBytes());
 
-    commandContext.getDbSqlSession()
+    commandContext.getDbEntityManager()
       .insert(byteArrayEntity);
-    
+
     pictureInfo.setValue(byteArrayEntity.getId());
-    
+
     return null;
   }
   

@@ -16,6 +16,7 @@ import java.util.List;
 
 import org.camunda.bpm.engine.delegate.BaseDelegateExecution;
 import org.camunda.bpm.engine.impl.core.delegate.CoreActivityBehavior;
+import org.camunda.bpm.engine.impl.core.variable.mapping.IoMapping;
 
 /**
  * @author Daniel Meyer
@@ -26,6 +27,8 @@ import org.camunda.bpm.engine.impl.core.delegate.CoreActivityBehavior;
 public abstract class CoreActivity extends CoreModelElement {
 
   private static final long serialVersionUID = 1L;
+
+  protected IoMapping ioMapping;
 
   public CoreActivity(String id) {
     super(id);
@@ -58,6 +61,14 @@ public abstract class CoreActivity extends CoreModelElement {
   public abstract List<? extends CoreActivity> getActivities();
 
   public abstract CoreActivityBehavior<? extends BaseDelegateExecution> getActivityBehavior();
+
+  public IoMapping getIoMapping() {
+    return ioMapping;
+  }
+
+  public void setIoMapping(IoMapping ioMapping) {
+    this.ioMapping = ioMapping;
+  }
 
   public String toString() {
     return "Activity("+id+")";

@@ -23,6 +23,7 @@ import org.camunda.bpm.engine.rest.dto.runtime.IncidentDto;
 import org.camunda.bpm.engine.rest.dto.runtime.IncidentQueryDto;
 import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.runtime.IncidentQuery;
+import org.codehaus.jackson.map.ObjectMapper;
 
 /**
  * @author Roman Smirnov
@@ -30,17 +31,13 @@ import org.camunda.bpm.engine.runtime.IncidentQuery;
  */
 public class IncidentRestServiceImpl extends AbstractRestProcessEngineAware implements IncidentRestService {
 
-  public IncidentRestServiceImpl() {
-    super();
-  }
-
-  public IncidentRestServiceImpl(String engineName) {
-    super(engineName);
+  public IncidentRestServiceImpl(String engineName, ObjectMapper objectMapper) {
+    super(engineName, objectMapper);
   }
 
   @Override
   public List<IncidentDto> getIncidents(UriInfo uriInfo, Integer firstResult, Integer maxResults) {
-    IncidentQueryDto queryDto = new IncidentQueryDto(uriInfo.getQueryParameters());
+    IncidentQueryDto queryDto = new IncidentQueryDto(getObjectMapper(), uriInfo.getQueryParameters());
     IncidentQuery query = queryDto.toQuery(processEngine);
 
     List<Incident> queryResult;
@@ -61,7 +58,7 @@ public class IncidentRestServiceImpl extends AbstractRestProcessEngineAware impl
 
   @Override
   public CountResultDto getIncidentsCount(UriInfo uriInfo) {
-    IncidentQueryDto queryDto = new IncidentQueryDto(uriInfo.getQueryParameters());
+    IncidentQueryDto queryDto = new IncidentQueryDto(getObjectMapper(), uriInfo.getQueryParameters());
     IncidentQuery query = queryDto.toQuery(processEngine);
 
     long count = query.count();

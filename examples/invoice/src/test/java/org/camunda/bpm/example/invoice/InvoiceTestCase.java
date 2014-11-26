@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
@@ -39,7 +40,11 @@ public class InvoiceTestCase extends ProcessEngineTestCase {
 		assertEquals(1, tasks.size());
 		assertEquals("prepareBankTransfer", tasks.get(0).getTaskDefinitionKey());
 		taskService.complete(tasks.get(0).getId());
-		
+
+		Job archiveInvoiceJob = managementService.createJobQuery().singleResult();
+		assertNotNull(archiveInvoiceJob);
+		managementService.executeJob(archiveInvoiceJob.getId());
+
 		assertProcessEnded(pi.getId());
 	}
 

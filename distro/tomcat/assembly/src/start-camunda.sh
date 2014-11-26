@@ -1,5 +1,7 @@
 #!/bin/sh
 
+export CATALINA_HOME="$(dirname "$0")/server/apache-tomcat-${version.tomcat}"
+
 BROWSERS="gnome-www-browser x-www-browser firefox chromium chromium-browser google-chrome"
 
 echo "starting camunda BPM platform on Tomcat Application Server";

@@ -13,7 +13,6 @@
 package org.camunda.bpm.qa.performance.engine.benchmark;
 
 import java.io.File;
-
 import org.camunda.bpm.qa.performance.engine.framework.aggregate.TabularResultAggregator;
 import org.camunda.bpm.qa.performance.engine.framework.aggregate.TabularResultSet;
 import org.camunda.bpm.qa.performance.engine.framework.report.HtmlReportBuilder;
@@ -22,7 +21,7 @@ import org.camunda.bpm.qa.performance.engine.util.FileUtil;
 import org.camunda.bpm.qa.performance.engine.util.JsonUtil;
 
 /**
- * @author Daniel Meyer
+ * @author Daniel Meyer, Ingo Richtsmeier
  *
  */
 public class BenchmarkReport {
@@ -31,6 +30,33 @@ public class BenchmarkReport {
 
     final String resultsFolder = "target"+File.separatorChar+"results";
     final String reportsFolder = "target"+File.separatorChar+"reports";
+    
+    String longTermBenchmarkResultFilename = System.getProperty("longTermBenchmarkResultFile");
+    if (longTermBenchmarkResultFilename != null) {
+      File longTermBenchmarkResultFile = new File(longTermBenchmarkResultFilename);
+      longTermBenchmarkResultFile.getParentFile().mkdirs();
+      if (longTermBenchmarkResultFile.exists()) {
+        // Do nothing, append current results later 
+      } else {
+        FileUtil.appendStringToFile(
+            "name;"
+            + "number of runs;"
+            + "database;"
+            + "history level;"
+            + "starttime;"
+            + "platform;"
+            + "number of threads;"
+            + "duration;"
+            + "throughput", 
+            longTermBenchmarkResultFilename);
+      }
+      TabularResultSet longTermResultTable = 
+          new BenchmarkLongtermAggregator(resultsFolder)
+              .execute();
+      FileUtil.appendStringToFile(
+          CsvUtil.resultSetAsCsv(longTermResultTable), 
+          longTermBenchmarkResultFilename);
+    }
 
     writeReport(
         resultsFolder,

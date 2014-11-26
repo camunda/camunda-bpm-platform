@@ -13,6 +13,7 @@
 
 package org.camunda.bpm.engine.impl.runtime;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -31,6 +32,7 @@ import org.camunda.bpm.engine.runtime.Execution;
 /**
  * @author Thorben Lindhauer
  * @author Daniel Meyer
+ * @author Michael Scholz
  */
 public class DefaultCorrelationHandler implements CorrelationHandler {
 
@@ -39,18 +41,39 @@ public class DefaultCorrelationHandler implements CorrelationHandler {
   public MessageCorrelationResult correlateMessage(CommandContext commandContext, String messageName, CorrelationSet correlationSet) {
 
     // first try to correlate to execution
-    MessageCorrelationResult result = tryCorrelateMessageToExecution(commandContext, messageName, correlationSet);
+    List<MessageCorrelationResult> correlations = correlateMessageToExecutions(commandContext, messageName, correlationSet);
+
+    if(correlations.size() > 1) {
+      throw new MismatchingMessageCorrelationException(messageName, correlationSet.getBusinessKey(), correlationSet.getCorrelationKeys(),
+          String.valueOf(correlations.size()) + " executions match the correlation keys. Should be one or zero.");
+    }
+    else if(!correlations.isEmpty()) {
+      return correlations.get(0);
+    }
 
     // if unsuccessful, correlate to process definition
-    if(result == null) {
-      result = tryCorrelateMessageToProcessDefinition(commandContext, messageName, correlationSet);
+    return tryCorrelateMessageToProcessDefinition(commandContext, messageName, correlationSet);
+  }
+
+  public List<MessageCorrelationResult> correlateMessages(CommandContext commandContext, String messageName, CorrelationSet correlationSet) {
+
+    List<MessageCorrelationResult> result = new ArrayList<MessageCorrelationResult>();
+
+    // first collect correlations to executions
+    result.addAll(correlateMessageToExecutions(commandContext, messageName, correlationSet));
+
+    // now collect a potential correlation to process definition
+    MessageCorrelationResult processDefinitionCorrelation = tryCorrelateMessageToProcessDefinition(commandContext, messageName, correlationSet);
+    if(processDefinitionCorrelation != null) {
+      result.add(processDefinitionCorrelation);
     }
 
     return result;
   }
 
-  protected MessageCorrelationResult tryCorrelateMessageToExecution(CommandContext commandContext, String messageName,
+  protected List<MessageCorrelationResult> correlateMessageToExecutions(CommandContext commandContext, String messageName,
       CorrelationSet correlationSet) {
+
     ExecutionQueryImpl query = new ExecutionQueryImpl();
 
     Map<String, Object> correlationKeys = correlationSet.getCorrelationKeys();
@@ -70,24 +93,27 @@ public class DefaultCorrelationHandler implements CorrelationHandler {
       query.processInstanceId(processInstanceId);
     }
 
-    query.messageEventSubscriptionName(messageName);
-    List<Execution> matchingExecutions = query.executeList(commandContext, null);
-
-    if (matchingExecutions.size() > 1) {
-      throw new MismatchingMessageCorrelationException(messageName, businessKey, correlationKeys,
-          String.valueOf(matchingExecutions.size()) + " executions match the correlation keys. Should be one or zero.");
-
-    } else if (!matchingExecutions.isEmpty()) {
-      Execution matchingExecution = matchingExecutions.get(0);
-      return MessageCorrelationResult.matchedExecution((ExecutionEntity) matchingExecution);
-
+    if (messageName != null) {
+      query.messageEventSubscriptionName(messageName);
     } else {
-      return null;
-
+      query.messageEventSubscription();
     }
+
+    List<Execution> matchingExecutions = query.evaluateExpressionsAndExecuteList(commandContext, null);
+
+    List<MessageCorrelationResult> result = new ArrayList<MessageCorrelationResult>(matchingExecutions.size());
+
+    for(Execution matchingExecution: matchingExecutions) {
+      result.add(MessageCorrelationResult.matchedExecution((ExecutionEntity) matchingExecution));
+    }
+
+    return result;
   }
 
   protected MessageCorrelationResult tryCorrelateMessageToProcessDefinition(CommandContext commandContext, String messageName, CorrelationSet correlationSet) {
+    if (messageName == null) {
+      return null;
+    }
 
     MessageEventSubscriptionEntity messageEventSubscription = commandContext.getEventSubscriptionManager()
       .findMessageStartEventSubscriptionByName(messageName);

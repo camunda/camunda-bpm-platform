@@ -15,8 +15,8 @@ package org.camunda.bpm.engine.test.cmmn.handler;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
+import org.camunda.bpm.engine.impl.cmmn.behavior.CmmnActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
-import org.camunda.bpm.engine.impl.cmmn.execution.CmmnActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.handler.CaseHandler;
 import org.camunda.bpm.engine.impl.cmmn.handler.CmmnHandlerContext;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;

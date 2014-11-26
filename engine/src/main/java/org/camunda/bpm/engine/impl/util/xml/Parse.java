@@ -22,6 +22,7 @@ import java.util.logging.Logger;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
+import org.camunda.bpm.engine.BpmnParseException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.util.io.InputStreamSource;
 import org.camunda.bpm.engine.impl.util.io.ResourceStreamSource;
@@ -150,6 +151,10 @@ public class Parse extends DefaultHandler {
   
   public void addError(String errorMessage, Element element) {
     errors.add(new Problem(errorMessage, name, element));
+  }
+
+  public void addError(BpmnParseException e) {
+    errors.add(new Problem(e, name));
   }
   
   public boolean hasErrors() {

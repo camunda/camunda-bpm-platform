@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,21 +16,21 @@ package org.camunda.bpm.engine.test.el;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 
 /**
  * @author Frederik Heremans
  */
 public class ExpressionManagerTest extends PluggableProcessEngineTestCase {
-  
+
   @Override
   protected void setUp() throws Exception {
     super.setUp();
   }
-  
+
   @Deployment
   public void testMethodExpressions() {
     // Process contains 2 service tasks. one containing a method with no params, the other
@@ -39,30 +39,30 @@ public class ExpressionManagerTest extends PluggableProcessEngineTestCase {
     Map<String, Object> vars = new HashMap<String, Object>();
     vars.put("aString", "abcdefgh");
     runtimeService.startProcessInstanceByKey("methodExpressionProcess", vars);
-    
+
     assertEquals(0, runtimeService.createProcessInstanceQuery().processDefinitionKey("methodExpressionProcess").count());
   }
-  
+
   @Deployment
   public void testExecutionAvailable() {
     Map<String, Object> vars = new HashMap<String, Object>();
-   
+
     vars.put("myVar", new ExecutionTestVariable());
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testExecutionAvailableProcess", vars);
-    
+
     // Check of the testMethod has been called with the current execution
     String value = (String) runtimeService.getVariable(processInstance.getId(), "testVar");
     assertNotNull(value);
     assertEquals("myValue", value);
   }
-  
+
   @Deployment
   public void testAuthenticatedUserIdAvailable() {
     try {
       // Setup authentication
       identityService.setAuthenticatedUserId("frederik");
       ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testAuthenticatedUserIdAvailableProcess");
-      
+
       // Check if the variable that has been set in service-task is the authenticated user
       String value = (String) runtimeService.getVariable(processInstance.getId(), "theUser");
       assertNotNull(value);
@@ -71,5 +71,20 @@ public class ExpressionManagerTest extends PluggableProcessEngineTestCase {
       // Cleanup
       identityService.clearAuthentication();
     }
+  }
+
+  @Deployment
+  public void testResolvesVariablesFromDifferentScopes() {
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("assignee", "michael");
+
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables);
+    Task task = taskService.createTaskQuery().singleResult();
+    assertEquals("michael", task.getAssignee());
+
+    variables.put("assignee", "johnny");
+    ProcessInstance secondInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", variables);
+    task = taskService.createTaskQuery().processInstanceId(secondInstance.getId()).singleResult();
+    assertEquals("johnny", task.getAssignee());
   }
 }

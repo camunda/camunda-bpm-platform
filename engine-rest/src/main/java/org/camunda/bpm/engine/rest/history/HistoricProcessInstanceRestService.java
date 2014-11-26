@@ -25,6 +25,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
 
+import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricProcessInstanceQueryDto;
@@ -40,7 +41,7 @@ public interface HistoricProcessInstanceRestService {
   HistoricProcessInstanceResource getHistoricProcessInstance(@PathParam("id") String processInstanceId);
 
   /**
-   * Exposes the {@link HistoriProcessInstanceQuery} interface as a REST
+   * Exposes the {@link HistoricProcessInstanceQuery} interface as a REST
    * service.
    *
    * @param query

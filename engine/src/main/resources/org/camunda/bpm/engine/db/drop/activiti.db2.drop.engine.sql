@@ -1,9 +1,11 @@
 drop index ACT_IDX_EXEC_BUSKEY;
 drop index ACT_IDX_TASK_CREATE;
+drop index ACT_IDX_TASK_ASSIGNEE;
 drop index ACT_IDX_IDENT_LNK_USER;
 drop index ACT_IDX_IDENT_LNK_GROUP;
 drop index ACT_IDX_VARIABLE_TASK_ID;
 drop index ACT_IDX_INC_CONFIGURATION;
+drop index ACT_IDX_JOB_PROCINST;
 drop index ACT_UNIQ_AUTH_USER;
 drop index ACT_UNIQ_AUTH_GROUP;
 drop index ACT_UNIQ_VARIABLE;
@@ -104,3 +106,4 @@ drop table ACT_RU_JOBDEF;
 drop table ACT_RU_EVENT_SUBSCR;
 drop table ACT_RU_INCIDENT;
 drop table ACT_RU_AUTHORIZATION;
+drop table ACT_RU_FILTER;

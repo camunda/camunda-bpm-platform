@@ -17,6 +17,8 @@ import static com.jayway.restassured.RestAssured.given;
 import static com.jayway.restassured.path.json.JsonPath.from;
 import static org.fest.assertions.Assertions.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.mockito.Matchers.argThat;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -30,6 +32,7 @@ import java.util.Map;
 import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.rest.helper.MockProvider;
+import org.camunda.bpm.engine.rest.helper.variable.EqualsPrimitiveValue;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.runtime.CaseInstanceQuery;
 import org.junit.Before;
@@ -44,7 +47,7 @@ import com.jayway.restassured.response.Response;
  * @author Roman Smirnov
  *
  */
-public class AbstractCaseInstanceRestServiceQueryTest extends AbstractRestServiceTest {
+public abstract class AbstractCaseInstanceRestServiceQueryTest extends AbstractRestServiceTest {
 
   protected static final String CASE_INSTANCE_QUERY_URL = TEST_RESOURCE_ROOT_PATH + "/case-instance";
   protected static final String CASE_INSTANCE_COUNT_QUERY_URL = CASE_INSTANCE_QUERY_URL + "/count";
@@ -278,11 +281,15 @@ public class AbstractCaseInstanceRestServiceQueryTest extends AbstractRestServic
     String returnedCaseDefinitionId = from(content).getString("[0].caseDefinitionId");
     String returnedBusinessKeyKey = from(content).getString("[0].businessKey");
     boolean returnedActiveState = from(content).getBoolean("[0].active");
+    boolean returnedCompletedState = from(content).getBoolean("[0].completed");
+    boolean returnedTerminatedState = from(content).getBoolean("[0].terminated");
 
     assertThat(returnedId).isEqualTo(MockProvider.EXAMPLE_CASE_INSTANCE_ID);
     assertThat(returnedCaseDefinitionId).isEqualTo(MockProvider.EXAMPLE_CASE_INSTANCE_CASE_DEFINITION_ID);
     assertThat(returnedBusinessKeyKey).isEqualTo(MockProvider.EXAMPLE_CASE_INSTANCE_BUSINESS_KEY);
     assertThat(returnedActiveState).isEqualTo(MockProvider.EXAMPLE_CASE_INSTANCE_IS_ACTIVE);
+    assertThat(returnedCompletedState).isEqualTo(MockProvider.EXAMPLE_CASE_INSTANCE_IS_COMPLETED);
+    assertThat(returnedTerminatedState).isEqualTo(MockProvider.EXAMPLE_CASE_INSTANCE_IS_TERMINATED);
   }
 
   @Test
@@ -316,11 +323,15 @@ public class AbstractCaseInstanceRestServiceQueryTest extends AbstractRestServic
     String returnedCaseDefinitionId = from(content).getString("[0].caseDefinitionId");
     String returnedBusinessKeyKey = from(content).getString("[0].businessKey");
     boolean returnedActiveState = from(content).getBoolean("[0].active");
+    boolean returnedCompletedState = from(content).getBoolean("[0].completed");
+    boolean returnedTerminatedState = from(content).getBoolean("[0].terminated");
 
     assertThat(returnedId).isEqualTo(MockProvider.EXAMPLE_CASE_INSTANCE_ID);
     assertThat(returnedCaseDefinitionId).isEqualTo(MockProvider.EXAMPLE_CASE_INSTANCE_CASE_DEFINITION_ID);
     assertThat(returnedBusinessKeyKey).isEqualTo(MockProvider.EXAMPLE_CASE_INSTANCE_BUSINESS_KEY);
     assertThat(returnedActiveState).isEqualTo(MockProvider.EXAMPLE_CASE_INSTANCE_IS_ACTIVE);
+    assertThat(returnedCompletedState).isEqualTo(MockProvider.EXAMPLE_CASE_INSTANCE_IS_COMPLETED);
+    assertThat(returnedTerminatedState).isEqualTo(MockProvider.EXAMPLE_CASE_INSTANCE_IS_TERMINATED);
   }
 
   @Test
@@ -332,6 +343,8 @@ public class AbstractCaseInstanceRestServiceQueryTest extends AbstractRestServic
     queryParameters.put("caseDefinitionKey", "aCaseDefKey");
     queryParameters.put("businessKey", "aBusinessKey");
     queryParameters.put("active", "true");
+    queryParameters.put("completed", "true");
+    queryParameters.put("terminated", "true");
 
     given()
       .queryParams(queryParameters)
@@ -346,6 +359,8 @@ public class AbstractCaseInstanceRestServiceQueryTest extends AbstractRestServic
     verify(mockedQuery).caseDefinitionKey(queryParameters.get("caseDefinitionKey"));
     verify(mockedQuery).caseInstanceBusinessKey(queryParameters.get("businessKey"));
     verify(mockedQuery).active();
+    verify(mockedQuery).completed();
+    verify(mockedQuery).terminated();
     verify(mockedQuery).list();
   }
 
@@ -363,6 +378,8 @@ public class AbstractCaseInstanceRestServiceQueryTest extends AbstractRestServic
     queryParameters.put("caseDefinitionKey", aCaseDefKey);
     queryParameters.put("businessKey", aBusinessKey);
     queryParameters.put("active", "true");
+    queryParameters.put("completed", "true");
+    queryParameters.put("terminated", "true");
 
     given()
       .contentType(POST_JSON_CONTENT_TYPE)
@@ -378,6 +395,8 @@ public class AbstractCaseInstanceRestServiceQueryTest extends AbstractRestServic
     verify(mockedQuery).caseDefinitionKey(aCaseDefKey);
     verify(mockedQuery).caseInstanceBusinessKey(aBusinessKey);
     verify(mockedQuery).active();
+    verify(mockedQuery).completed();
+    verify(mockedQuery).terminated();
     verify(mockedQuery).list();
   }
 
@@ -648,7 +667,7 @@ public class AbstractCaseInstanceRestServiceQueryTest extends AbstractRestServic
         .post(CASE_INSTANCE_QUERY_URL);
 
     verify(mockedQuery).variableValueEquals(variableName, variableValue);
-    verify(mockedQuery).variableValueNotEquals(anotherVariableName, anotherVariableValue);
+    verify(mockedQuery).variableValueNotEquals(eq(anotherVariableName), argThat(EqualsPrimitiveValue.numberValue(anotherVariableValue)));
   }
 
   @Test

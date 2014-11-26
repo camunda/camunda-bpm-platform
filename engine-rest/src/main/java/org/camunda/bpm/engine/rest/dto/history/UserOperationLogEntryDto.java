@@ -23,27 +23,35 @@ import org.camunda.bpm.engine.history.UserOperationLogEntry;
  */
 public class UserOperationLogEntryDto {
 
-  private String id;
-  private String processDefinitionId;
-  private String processInstanceId;
-  private String executionId;
-  private String taskId;
-  private String userId;
-  private Date timestamp;
-  private String operationId;
-  private String operationType;
-  private String entityType;
-  private String property;
-  private String orgValue;
-  private String newValue;
+  protected String id;
+  protected String processDefinitionId;
+  protected String processDefinitionKey;
+  protected String processInstanceId;
+  protected String executionId;
+  protected String caseDefinitionId;
+  protected String caseInstanceId;
+  protected String caseExecutionId;
+  protected String taskId;
+  protected String userId;
+  protected Date timestamp;
+  protected String operationId;
+  protected String operationType;
+  protected String entityType;
+  protected String property;
+  protected String orgValue;
+  protected String newValue;
 
   public static UserOperationLogEntryDto map(UserOperationLogEntry entry) {
     UserOperationLogEntryDto dto = new UserOperationLogEntryDto();
 
     dto.id = entry.getId();
     dto.processDefinitionId = entry.getProcessDefinitionId();
+    dto.processDefinitionKey = entry.getProcessDefinitionKey();
     dto.processInstanceId = entry.getProcessInstanceId();
     dto.executionId = entry.getExecutionId();
+    dto.caseDefinitionId = entry.getCaseDefinitionId();
+    dto.caseInstanceId = entry.getCaseInstanceId();
+    dto.caseExecutionId = entry.getCaseExecutionId();
     dto.taskId = entry.getTaskId();
     dto.userId = entry.getUserId();
     dto.timestamp = entry.getTimestamp();
@@ -73,12 +81,28 @@ public class UserOperationLogEntryDto {
     return processDefinitionId;
   }
 
+  public String getProcessDefinitionKey() {
+    return processDefinitionKey;
+  }
+
   public String getProcessInstanceId() {
     return processInstanceId;
   }
 
   public String getExecutionId() {
     return executionId;
+  }
+
+  public String getCaseDefinitionId() {
+    return caseDefinitionId;
+  }
+
+  public String getCaseInstanceId() {
+    return caseInstanceId;
+  }
+
+  public String getCaseExecutionId() {
+    return caseExecutionId;
   }
 
   public String getTaskId() {

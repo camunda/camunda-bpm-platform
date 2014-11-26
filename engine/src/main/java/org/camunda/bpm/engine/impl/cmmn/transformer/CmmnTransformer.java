@@ -12,6 +12,7 @@
  */
 package org.camunda.bpm.engine.impl.cmmn.transformer;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.camunda.bpm.engine.impl.cmmn.handler.DefaultCmmnElementHandlerRegistry;
@@ -26,7 +27,7 @@ public class CmmnTransformer implements Transformer<CmmnTransform> {
 
   protected ExpressionManager expressionManager;
   protected CmmnTransformFactory factory;
-  protected List<CmmnTransformListener> transformListener;
+  protected List<CmmnTransformListener> transformListeners = new ArrayList<CmmnTransformListener>();
   protected DefaultCmmnElementHandlerRegistry cmmnElementHandlerRegistry;
 
   public CmmnTransformer(ExpressionManager expressionManager, DefaultCmmnElementHandlerRegistry handlerRegistry, CmmnTransformFactory factory) {
@@ -55,12 +56,12 @@ public class CmmnTransformer implements Transformer<CmmnTransform> {
     this.factory = factory;
   }
 
-  public List<CmmnTransformListener> getTransformListener() {
-    return transformListener;
+  public List<CmmnTransformListener> getTransformListeners() {
+    return transformListeners;
   }
 
-  public void setTransformListener(List<CmmnTransformListener> transformListener) {
-    this.transformListener = transformListener;
+  public void setTransformListeners(List<CmmnTransformListener> transformListeners) {
+    this.transformListeners = transformListeners;
   }
 
   public DefaultCmmnElementHandlerRegistry getCmmnElementHandlerRegistry() {

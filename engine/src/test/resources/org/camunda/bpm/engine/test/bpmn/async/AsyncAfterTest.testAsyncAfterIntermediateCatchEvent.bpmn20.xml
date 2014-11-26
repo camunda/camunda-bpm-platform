@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:camunda="http://activiti.org/bpmn"
+  targetNamespace="Examples">
+
+  <process id="testIntermediateCatchEvent">
+
+    <startEvent id="theStart" />
+
+    <sequenceFlow id="flow1"  sourceRef="theStart" targetRef="intermediateCatchEvent" />
+
+    <intermediateCatchEvent id="intermediateCatchEvent" camunda:asyncAfter="true">
+
+
+      <extensionElements>
+
+          <camunda:executionListener
+              event="start"
+              expression="${execution.setVariable('listenerStartInvoked', true)}" />
+
+          <camunda:executionListener
+              event="end"
+              expression="${execution.setVariable('listenerEndInvoked', true)}" />
+
+        </extensionElements>
+
+      <messageEventDefinition id="testMessage" messageRef="testMessage1" />
+
+    </intermediateCatchEvent>
+
+    <sequenceFlow id="flow2" sourceRef="intermediateCatchEvent" targetRef="theEnd" />
+
+    <endEvent id="theEnd" />
+
+  </process>
+
+  <message id="testMessage1" name="testMessage1" />
+
+</definitions>

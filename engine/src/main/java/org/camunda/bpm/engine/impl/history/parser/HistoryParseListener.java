@@ -20,7 +20,8 @@ import org.camunda.bpm.engine.delegate.TaskListener;
 import org.camunda.bpm.engine.impl.bpmn.behavior.UserTaskActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseListener;
-import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.history.HistoryLevel;
+import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
 import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
 import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
@@ -64,26 +65,26 @@ public class HistoryParseListener implements BpmnParseListener {
   protected TaskListener USER_TASK_ID_HANDLER;
 
   // The history level set in the process engine configuration
-  protected int historyLevel;
+  protected HistoryLevel historyLevel;
 
-  public HistoryParseListener(int historyLevel, HistoryEventProducer historyEventProducer) {
+  public HistoryParseListener(HistoryLevel historyLevel, HistoryEventProducer historyEventProducer) {
     this.historyLevel = historyLevel;
-    initExecutionListeners(historyEventProducer);
+    initExecutionListeners(historyEventProducer, historyLevel);
   }
 
-  protected void initExecutionListeners(HistoryEventProducer historyEventProducer) {
-    PROCESS_INSTANCE_START_LISTENER = new ProcessInstanceStartListener(historyEventProducer);
-    PROCESS_INSTANCE_END_LISTENER = new ProcessInstanceEndListener(historyEventProducer);
+  protected void initExecutionListeners(HistoryEventProducer historyEventProducer, HistoryLevel historyLevel) {
+    PROCESS_INSTANCE_START_LISTENER = new ProcessInstanceStartListener(historyEventProducer, historyLevel);
+    PROCESS_INSTANCE_END_LISTENER = new ProcessInstanceEndListener(historyEventProducer, historyLevel);
 
-    ACTIVITY_INSTANCE_START_LISTENER = new ActivityInstanceStartListener(historyEventProducer);
-    ACTIVITY_INSTANCE_END_LISTENER = new ActivityInstanceEndListener(historyEventProducer);
+    ACTIVITY_INSTANCE_START_LISTENER = new ActivityInstanceStartListener(historyEventProducer, historyLevel);
+    ACTIVITY_INSTANCE_END_LISTENER = new ActivityInstanceEndListener(historyEventProducer, historyLevel);
 
-    USER_TASK_ASSIGNMENT_HANDLER = new ActivityInstanceUpdateListener(historyEventProducer);
+    USER_TASK_ASSIGNMENT_HANDLER = new ActivityInstanceUpdateListener(historyEventProducer, historyLevel);
     USER_TASK_ID_HANDLER = USER_TASK_ASSIGNMENT_HANDLER;
   }
 
   public void parseProcess(Element processElement, ProcessDefinitionEntity processDefinition) {
-    if (activityHistoryEnabled(processDefinition, historyLevel)) {
+    if (historyLevel.isHistoryEventProduced(HistoryEventTypes.PROCESS_INSTANCE_END, null)) {
       processDefinition.addExecutionListener(PvmEvent.EVENTNAME_END, PROCESS_INSTANCE_END_LISTENER);
     }
   }
@@ -119,7 +120,7 @@ public class HistoryParseListener implements BpmnParseListener {
   public void parseUserTask(Element userTaskElement, ScopeImpl scope, ActivityImpl activity) {
     addActivityHandlers(activity);
 
-    if (activityHistoryEnabled(scope, historyLevel)) {
+    if (historyLevel.isHistoryEventProduced(HistoryEventTypes.TASK_INSTANCE_CREATE, null)) {
       TaskDefinition taskDefinition = ((UserTaskActivityBehavior) activity.getActivityBehavior()).getTaskDefinition();
       taskDefinition.addTaskListener(TaskListener.EVENTNAME_ASSIGNMENT, USER_TASK_ASSIGNMENT_HANDLER);
       taskDefinition.addTaskListener(TaskListener.EVENTNAME_CREATE, USER_TASK_ID_HANDLER);
@@ -222,26 +223,12 @@ public class HistoryParseListener implements BpmnParseListener {
   // helper methods ///////////////////////////////////////////////////////////
 
   protected void addActivityHandlers(ActivityImpl activity) {
-    if (activityHistoryEnabled(activity, historyLevel)) {
-      activity.addExecutionListener(PvmEvent.EVENTNAME_START, ACTIVITY_INSTANCE_START_LISTENER, 0);
-      activity.addExecutionListener(PvmEvent.EVENTNAME_END, ACTIVITY_INSTANCE_END_LISTENER);
+    if (historyLevel.isHistoryEventProduced(HistoryEventTypes.ACTIVITY_INSTANCE_START, null)) {
+      activity.addBuiltInListener(PvmEvent.EVENTNAME_START, ACTIVITY_INSTANCE_START_LISTENER, 0);
     }
-  }
-
-  public static boolean fullHistoryEnabled(int historyLevel) {
-    return historyLevel >= ProcessEngineConfigurationImpl.HISTORYLEVEL_FULL;
-  }
-
-  public static boolean auditHistoryEnabled(ScopeImpl scopeElement, int historyLevel) {
-    return historyLevel >= ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT;
-  }
-
-  public static boolean variableHistoryEnabled(ScopeImpl scopeElement, int historyLevel) {
-    return historyLevel >= ProcessEngineConfigurationImpl.HISTORYLEVEL_ACTIVITY;
-  }
-
-  public static boolean activityHistoryEnabled(ScopeImpl scopeElement, int historyLevel) {
-    return historyLevel >= ProcessEngineConfigurationImpl.HISTORYLEVEL_ACTIVITY;
+    if (historyLevel.isHistoryEventProduced(HistoryEventTypes.ACTIVITY_INSTANCE_END, null)) {
+      activity.addBuiltInListener(PvmEvent.EVENTNAME_END, ACTIVITY_INSTANCE_END_LISTENER);
+    }
   }
 
 }

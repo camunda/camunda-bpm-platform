@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:camunda="http://activiti.org/bpmn"
+  targetNamespace="Examples">
+
+  <process id="process">
+    <startEvent id="start" />
+    <sequenceFlow id="flow1" sourceRef="start" targetRef="scriptClasspath" />
+    <scriptTask id="scriptClasspath" scriptFormat="python" camunda:resource="org/camunda/bpm/engine/test/bpmn/scripttask/greeting.py" />
+    <sequenceFlow id="flow2" sourceRef="scriptClasspath" targetRef="userTask" />
+    <userTask id="userTask"/>
+    <sequenceFlow id="flow3" sourceRef="userTask" targetRef="end" />
+    <endEvent id="end" />
+  </process>
+
+</definitions>

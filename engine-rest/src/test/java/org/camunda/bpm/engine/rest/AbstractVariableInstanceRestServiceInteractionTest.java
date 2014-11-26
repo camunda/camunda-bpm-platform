@@ -13,31 +13,39 @@
 package org.camunda.bpm.engine.rest;
 
 import static com.jayway.restassured.RestAssured.given;
-import static com.jayway.restassured.path.json.JsonPath.from;
-import static org.mockito.Mockito.*;
-import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.RuntimeService;
-import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
-import org.camunda.bpm.engine.impl.variable.ByteArrayType;
+import org.camunda.bpm.engine.rest.helper.MockObjectValue;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
+import org.camunda.bpm.engine.rest.helper.MockVariableInstanceBuilder;
+import org.camunda.bpm.engine.rest.helper.VariableTypeHelper;
 import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.runtime.VariableInstanceQuery;
+import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.type.ValueType;
+import org.camunda.bpm.engine.variable.value.ObjectValue;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import com.jayway.restassured.http.ContentType;
-import com.jayway.restassured.path.json.JsonPath;
 import com.jayway.restassured.response.Response;
 
 /**
  * @author Daniel Meyer
  *
  */
-public class AbstractVariableInstanceRestServiceInteractionTest extends AbstractRestServiceTest {
+public abstract class AbstractVariableInstanceRestServiceInteractionTest extends AbstractRestServiceTest {
 
   protected static final String SERVICE_URL = TEST_RESOURCE_ROOT_PATH + "/variable-instance";
   protected static final String VARIABLE_INSTANCE_URL = SERVICE_URL + "/{id}";
@@ -60,39 +68,126 @@ public class AbstractVariableInstanceRestServiceInteractionTest extends Abstract
   @Test
   public void testGetSingleVariableInstance() {
 
-    VariableInstance variableInstanceMock = MockProvider.createMockVariableInstance();
+    MockVariableInstanceBuilder builder = MockProvider.mockVariableInstance();
+    VariableInstance variableInstanceMock = builder.build();
+
+    when(variableInstanceQueryMock.variableId(variableInstanceMock.getId())).thenReturn(variableInstanceQueryMock);
+    when(variableInstanceQueryMock.disableBinaryFetching()).thenReturn(variableInstanceQueryMock);
+    when(variableInstanceQueryMock.disableCustomObjectDeserialization()).thenReturn(variableInstanceQueryMock);
+    when(variableInstanceQueryMock.singleResult()).thenReturn(variableInstanceMock);
+
+    given().pathParam("id", MockProvider.EXAMPLE_VARIABLE_INSTANCE_ID)
+    .then().expect().statusCode(Status.OK.getStatusCode())
+    .and()
+      .body("id", equalTo(builder.getId()))
+      .body("name", equalTo(builder.getName()))
+      .body("type", equalTo(VariableTypeHelper.toExpectedValueTypeName(builder.getTypedValue().getType())))
+      .body("value", equalTo(builder.getTypedValue().getValue()))
+      .body("processInstanceId", equalTo(builder.getProcessInstanceId()))
+      .body("executionId", equalTo(builder.getExecutionId()))
+      .body("caseInstanceId", equalTo(builder.getCaseInstanceId()))
+      .body("caseExecutionId", equalTo(builder.getCaseExecutionId()))
+      .body("taskId", equalTo(builder.getTaskId()))
+      .body("activityInstanceId", equalTo(builder.getActivityInstanceId()))
+      .body("errorMessage", equalTo(builder.getErrorMessage()))
+    .when().get(VARIABLE_INSTANCE_URL);
+
+    verify(variableInstanceQueryMock, times(1)).disableBinaryFetching();
+  }
+
+  @Test
+  public void testGetSingleVariableInstanceDeserialized() {
+    ObjectValue serializedValue = MockObjectValue.fromObjectValue(
+        Variables.objectValue("a value").serializationDataFormat("aDataFormat").create())
+        .objectTypeName("aTypeName");
+
+    MockVariableInstanceBuilder builder = MockProvider.mockVariableInstance().typedValue(serializedValue);
+    VariableInstance variableInstanceMock = builder.build();
 
     when(variableInstanceQueryMock.variableId(variableInstanceMock.getId())).thenReturn(variableInstanceQueryMock);
     when(variableInstanceQueryMock.disableBinaryFetching()).thenReturn(variableInstanceQueryMock);
     when(variableInstanceQueryMock.singleResult()).thenReturn(variableInstanceMock);
 
-    Response response = given().pathParam("id", MockProvider.EXAMPLE_VARIABLE_INSTANCE_ID)
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_VARIABLE_INSTANCE_ID)
     .then().expect().statusCode(Status.OK.getStatusCode())
+    .and()
+      .body("id", equalTo(builder.getId()))
+      .body("name", equalTo(builder.getName()))
+      .body("type", equalTo(VariableTypeHelper.toExpectedValueTypeName(builder.getTypedValue().getType())))
+      .body("value", equalTo("a value"))
+      .body("valueInfo.serializationDataFormat", equalTo("aDataFormat"))
+      .body("valueInfo.objectTypeName", equalTo("aTypeName"))
+      .body("processInstanceId", equalTo(builder.getProcessInstanceId()))
+      .body("executionId", equalTo(builder.getExecutionId()))
+      .body("caseInstanceId", equalTo(builder.getCaseInstanceId()))
+      .body("caseExecutionId", equalTo(builder.getCaseExecutionId()))
+      .body("taskId", equalTo(builder.getTaskId()))
+      .body("activityInstanceId", equalTo(builder.getActivityInstanceId()))
+      .body("errorMessage", equalTo(builder.getErrorMessage()))
     .when().get(VARIABLE_INSTANCE_URL);
 
-    verifyResponse(variableInstanceMock, response);
     verify(variableInstanceQueryMock, times(1)).disableBinaryFetching();
+    verify(variableInstanceQueryMock, never()).disableCustomObjectDeserialization();
+  }
 
+  @Test
+  public void testGetSingleVariableInstanceSerialized() {
+    ObjectValue serializedValue = Variables.serializedObjectValue("a serialized value")
+        .serializationDataFormat("aDataFormat").objectTypeName("aTypeName").create();
+
+    MockVariableInstanceBuilder builder = MockProvider.mockVariableInstance().typedValue(serializedValue);
+    VariableInstance variableInstanceMock = builder.build();
+
+    when(variableInstanceQueryMock.variableId(variableInstanceMock.getId())).thenReturn(variableInstanceQueryMock);
+    when(variableInstanceQueryMock.disableBinaryFetching()).thenReturn(variableInstanceQueryMock);
+    when(variableInstanceQueryMock.disableCustomObjectDeserialization()).thenReturn(variableInstanceQueryMock);
+    when(variableInstanceQueryMock.singleResult()).thenReturn(variableInstanceMock);
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_VARIABLE_INSTANCE_ID)
+      .queryParam("deserializeValue", false)
+    .then().expect().statusCode(Status.OK.getStatusCode())
+    .and()
+      .body("id", equalTo(builder.getId()))
+      .body("name", equalTo(builder.getName()))
+      .body("type", equalTo(VariableTypeHelper.toExpectedValueTypeName(builder.getTypedValue().getType())))
+      .body("value", equalTo("a serialized value"))
+      .body("valueInfo.serializationDataFormat", equalTo("aDataFormat"))
+      .body("valueInfo.objectTypeName", equalTo("aTypeName"))
+      .body("processInstanceId", equalTo(builder.getProcessInstanceId()))
+      .body("executionId", equalTo(builder.getExecutionId()))
+      .body("caseInstanceId", equalTo(builder.getCaseInstanceId()))
+      .body("caseExecutionId", equalTo(builder.getCaseExecutionId()))
+      .body("taskId", equalTo(builder.getTaskId()))
+      .body("activityInstanceId", equalTo(builder.getActivityInstanceId()))
+      .body("errorMessage", equalTo(builder.getErrorMessage()))
+    .when().get(VARIABLE_INSTANCE_URL);
+
+    verify(variableInstanceQueryMock, times(1)).disableBinaryFetching();
+    verify(variableInstanceQueryMock, times(1)).disableCustomObjectDeserialization();
   }
 
   @Test
   public void testGetSingleVariableInstanceForBinaryVariable() {
-    final ByteArrayType type = new ByteArrayType();
-
-    VariableInstanceEntity variableInstanceMock = (VariableInstanceEntity) MockProvider.createMockVariableInstance();
-    when(variableInstanceMock.getType()).thenReturn(type);
-    when(variableInstanceMock.getTypeName()).thenReturn(type.getTypeNameForValue(null));
-    when(variableInstanceMock.getValue()).thenReturn(null);
+    MockVariableInstanceBuilder builder = MockProvider.mockVariableInstance();
+    VariableInstance variableInstanceMock =
+        builder
+          .typedValue(Variables.byteArrayValue(null))
+          .build();
 
     when(variableInstanceQueryMock.variableId(variableInstanceMock.getId())).thenReturn(variableInstanceQueryMock);
     when(variableInstanceQueryMock.disableBinaryFetching()).thenReturn(variableInstanceQueryMock);
+    when(variableInstanceQueryMock.disableCustomObjectDeserialization()).thenReturn(variableInstanceQueryMock);
     when(variableInstanceQueryMock.singleResult()).thenReturn(variableInstanceMock);
 
-    Response response = given().pathParam("id", MockProvider.EXAMPLE_VARIABLE_INSTANCE_ID)
+    given().pathParam("id", MockProvider.EXAMPLE_VARIABLE_INSTANCE_ID)
     .then().expect().statusCode(Status.OK.getStatusCode())
+    .and()
+      .body("type", equalTo(VariableTypeHelper.toExpectedValueTypeName(ValueType.BYTES)))
+      .body("value", nullValue())
     .when().get(VARIABLE_INSTANCE_URL);
 
-    verifyResponse(variableInstanceMock, response);
     verify(variableInstanceQueryMock, times(1)).disableBinaryFetching();
 
   }
@@ -104,6 +199,7 @@ public class AbstractVariableInstanceRestServiceInteractionTest extends Abstract
 
     when(variableInstanceQueryMock.variableId(nonExistingId)).thenReturn(variableInstanceQueryMock);
     when(variableInstanceQueryMock.disableBinaryFetching()).thenReturn(variableInstanceQueryMock);
+    when(variableInstanceQueryMock.disableCustomObjectDeserialization()).thenReturn(variableInstanceQueryMock);
     when(variableInstanceQueryMock.singleResult()).thenReturn(null);
 
     given().pathParam("id", nonExistingId)
@@ -112,20 +208,19 @@ public class AbstractVariableInstanceRestServiceInteractionTest extends Abstract
     .when().get(VARIABLE_INSTANCE_URL);
 
     verify(variableInstanceQueryMock, times(1)).disableBinaryFetching();
-
   }
 
   @Test
   public void testBinaryDataForBinaryVariable() {
-    final ByteArrayType type = new ByteArrayType();
     final byte[] byteContent = "some bytes".getBytes();
 
-    VariableInstanceEntity variableInstanceMock = (VariableInstanceEntity) MockProvider.createMockVariableInstance();
-    when(variableInstanceMock.getType()).thenReturn(type);
-    when(variableInstanceMock.getTypeName()).thenReturn(type.getTypeNameForValue(null));
-    when(variableInstanceMock.getValue()).thenReturn(byteContent);
+    VariableInstance variableInstanceMock =
+        MockProvider.mockVariableInstance()
+          .typedValue(Variables.byteArrayValue(byteContent))
+          .build();
 
     when(variableInstanceQueryMock.variableId(variableInstanceMock.getId())).thenReturn(variableInstanceQueryMock);
+    when(variableInstanceQueryMock.disableCustomObjectDeserialization()).thenReturn(variableInstanceQueryMock);
     when(variableInstanceQueryMock.singleResult()).thenReturn(variableInstanceMock);
 
     Response response = given().pathParam("id", MockProvider.EXAMPLE_VARIABLE_INSTANCE_ID)
@@ -137,23 +232,26 @@ public class AbstractVariableInstanceRestServiceInteractionTest extends Abstract
     byte[] responseBytes = response.getBody().asByteArray();
     Assert.assertEquals(new String(byteContent), new String(responseBytes));
     verify(variableInstanceQueryMock, never()).disableBinaryFetching();
+    verify(variableInstanceQueryMock).disableCustomObjectDeserialization();
 
   }
 
   @Test
   public void testBinaryDataForNonBinaryVariable() {
-    VariableInstanceEntity variableInstanceMock = (VariableInstanceEntity) MockProvider.createMockVariableInstance();
+    VariableInstance variableInstanceMock = MockProvider.createMockVariableInstance();
 
     when(variableInstanceQueryMock.variableId(variableInstanceMock.getId())).thenReturn(variableInstanceQueryMock);
+    when(variableInstanceQueryMock.disableCustomObjectDeserialization()).thenReturn(variableInstanceQueryMock);
     when(variableInstanceQueryMock.singleResult()).thenReturn(variableInstanceMock);
 
     given().pathParam("id", MockProvider.EXAMPLE_VARIABLE_INSTANCE_ID)
     .then().expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode())
-      .body(containsString("Variable instance with Id '"+variableInstanceMock.getId()+"' is not a binary variable"))
+      .body(containsString("Value of variable aVariableInstanceId is not a binary value"))
     .when().get(VARIABLE_INSTANCE_BINARY_DATA_URL);
 
     verify(variableInstanceQueryMock, never()).disableBinaryFetching();
+    verify(variableInstanceQueryMock).disableCustomObjectDeserialization();
 
   }
 
@@ -163,6 +261,7 @@ public class AbstractVariableInstanceRestServiceInteractionTest extends Abstract
     String nonExistingId = "nonExistingId";
 
     when(variableInstanceQueryMock.variableId(nonExistingId)).thenReturn(variableInstanceQueryMock);
+    when(variableInstanceQueryMock.disableCustomObjectDeserialization()).thenReturn(variableInstanceQueryMock);
     when(variableInstanceQueryMock.singleResult()).thenReturn(null);
 
     given().pathParam("id", nonExistingId)
@@ -171,31 +270,7 @@ public class AbstractVariableInstanceRestServiceInteractionTest extends Abstract
     .when().get(VARIABLE_INSTANCE_BINARY_DATA_URL);
 
     verify(variableInstanceQueryMock, never()).disableBinaryFetching();
-
-  }
-
-
-  private void verifyResponse(VariableInstance variableInstanceMock, Response response) {
-    String content = response.asString();
-
-    JsonPath path = from(content);
-    String returnedId = path.getString("id");
-    String returnedName = path.getString("name");
-    String returnedType = path.getString("type");
-    String returnedValue = path.getString("value");
-    String returnedProcessInstanceId = path.getString("processInstanceId");
-    String returnedExecutionId = path.getString("executionId");
-    String returnedTaskId = path.getString("taskId");
-    String returnedActivityInstanceId = path.getString("activityInstanceId");
-
-    Assert.assertEquals(variableInstanceMock.getId(), returnedId);
-    Assert.assertEquals(variableInstanceMock.getName(), returnedName);
-    Assert.assertEquals(variableInstanceMock.getTypeName(), returnedType);
-    Assert.assertEquals(variableInstanceMock.getValue(), returnedValue);
-    Assert.assertEquals(variableInstanceMock.getProcessInstanceId(), returnedProcessInstanceId);
-    Assert.assertEquals(variableInstanceMock.getExecutionId(), returnedExecutionId);
-    Assert.assertEquals(variableInstanceMock.getTaskId(), returnedTaskId);
-    Assert.assertEquals(variableInstanceMock.getActivityInstanceId(), returnedActivityInstanceId);
+    verify(variableInstanceQueryMock).disableCustomObjectDeserialization();
   }
 
 }

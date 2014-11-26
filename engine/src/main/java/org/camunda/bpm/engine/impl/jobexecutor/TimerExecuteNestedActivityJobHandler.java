@@ -20,6 +20,8 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 
 /**
  * @author Tom Baeyens
@@ -38,9 +40,7 @@ public class TimerExecuteNestedActivityJobHandler implements JobHandler {
   public void execute(String configuration, ExecutionEntity execution, CommandContext commandContext) {
     ActivityImpl borderEventActivity = execution.getProcessDefinition().findActivity(configuration);
 
-    if (borderEventActivity == null) {
-      throw new ProcessEngineException("Error while firing timer: border event activity " + configuration + " not found");
-    }
+    ensureNotNull("Error while firing timer: border event activity " + configuration + " not found", "borderEventActivity", borderEventActivity);
 
     try {
 
@@ -52,7 +52,7 @@ public class TimerExecuteNestedActivityJobHandler implements JobHandler {
 
     } catch (Exception e) {
       log.log(Level.SEVERE, "exception during timer execution", e);
-      throw new ProcessEngineException("exception during timer execution: "+e.getMessage(), e);
+      throw new ProcessEngineException("exception during timer execution: " + e.getMessage(), e);
     }
   }
 }

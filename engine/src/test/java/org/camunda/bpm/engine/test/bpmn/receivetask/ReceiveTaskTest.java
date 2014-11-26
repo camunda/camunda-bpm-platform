@@ -58,7 +58,7 @@ public class ReceiveTaskTest extends PluggableProcessEngineTestCase {
     assertEquals(0, getEventSubscriptionList().size());
 
     // then: we can signal the waiting receive task
-    runtimeService.signal(getExecutionId(processInstance.getId(), "waitState"));
+    runtimeService.signal(processInstance.getId());
 
     // expect: this ends the process instance
     assertProcessEnded(processInstance.getId());

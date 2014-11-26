@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -12,14 +12,15 @@
  */
 package org.camunda.bpm.engine.impl.cfg.auth;
 
+import org.camunda.bpm.engine.filter.Filter;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity;
 
 /**
- * 
+ *
  * @author Daniel Meyer
- * 
+ *
  */
 public interface ResourceAuthorizationProvider {
 
@@ -27,7 +28,7 @@ public interface ResourceAuthorizationProvider {
 
   /**
    * <p>Invoked whenever a new user is created</p>
-   * 
+   *
    * @param user
    *          a newly created user
    * @return a list of authorizations to be automatically added when a new user
@@ -37,7 +38,7 @@ public interface ResourceAuthorizationProvider {
 
   /**
    * <p>Invoked whenever a new group is created</p>
-   * 
+   *
    * @param user
    *          a newly created {@link User}
    * @return a list of authorizations to be automatically added when a new
@@ -47,7 +48,7 @@ public interface ResourceAuthorizationProvider {
 
   /**
    * <p>Invoked whenever a user is added to a group</p>
-   * 
+   *
    * @param userId
    *          the id of the user who is added to a group a newly created
    *          {@link User}
@@ -57,5 +58,16 @@ public interface ResourceAuthorizationProvider {
    *         {@link User} is created.
    */
   public AuthorizationEntity[] groupMembershipCreated(String groupId, String userId);
+
+  // Filter ////////////////////////////////////////////////
+
+  /**
+   * <p>Invoked whenever a new filter is created</p>
+   *
+   * @param filter the newly created filter
+   * @return a list of authorizations to be automatically added when a new
+   *         {@link Filter} is created.
+   */
+  public AuthorizationEntity[] newFilter(Filter filter);
 
 }

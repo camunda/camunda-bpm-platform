@@ -1,31 +1,27 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <!-- Required for OSS maven repository deployment -->
   <parent>
-    <groupId>org.sonatype.oss</groupId>
-    <artifactId>oss-parent</artifactId>
-    <version>7</version>
-    <!-- do not remove empty tag - http://jira.codehaus.org/browse/MNG-4687 -->
-    <relativePath />
+    <groupId>org.camunda.bpm</groupId>
+    <artifactId>camunda-bom</artifactId>
+    <version>7.3.0-SNAPSHOT</version>
+    <relativePath>../bom</relativePath>
   </parent>
 
-  <groupId>org.camunda.bpm</groupId>
   <artifactId>camunda-parent</artifactId>
-  <version>7.2.0-SNAPSHOT</version>
-  <packaging>pom</packaging>
   <name>camunda BPM - Parent Pom</name>
+  <packaging>pom</packaging>
 
   <description>
     This pom is the parent of all camunda BPM platform projects
   </description>
 
   <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-
-    <spring.framework.version>3.1.2.RELEASE</spring.framework.version>
-    <cxf.version>2.6.1</cxf.version>
-    <junit.version>4.11</junit.version>
+    <version.spring.framework>3.1.2.RELEASE</version.spring.framework>
+    <version.cxf>2.6.1</version.cxf>
+    <version.junit>4.11</version.junit>
+    <version.assertj>1.5.0</version.assertj>
+    <version.logback>1.1.2</version.logback>
     <version.resteasy>2.3.5.Final</version.resteasy>
 
     <version.commonj>1.1.0</version.commonj>
@@ -33,6 +29,7 @@
 
     <!-- application servers -->
     <version.jboss.as>7.2.0.Final</version.jboss.as>
+    <version.wildfly>8.1.0.Final</version.wildfly>
     <version.glassfish>3.1.2</version.glassfish>
     <version.tomcat>7.0.50</version.tomcat>
 
@@ -42,8 +39,7 @@
 
     <version.jboss-javaee-spec>3.0.2.Final</version.jboss-javaee-spec>
 
-    <version.ejb>3.1</version.ejb>
-    <version.java>1.6</version.java>
+    <version.java.wildfly>1.7</version.java.wildfly>
 
     <!-- database drivers -->
     <version.h2>1.3.168</version.h2>
@@ -57,6 +53,8 @@
 
     <!-- OSGi bundles properties -->
     <camunda.artifact />
+    <camunda.osgi.import.camunda.spin.version>version="[$(version;==;${camunda.spin.version.clean}),$(version;=+;${camunda.spin.version.clean}))"</camunda.osgi.import.camunda.spin.version>
+    <camunda.osgi.import.camunda.connect.version>version="[$(version;==;${camunda.connect.version.clean}),$(version;=+;${camunda.connect.version.clean}))"</camunda.osgi.import.camunda.connect.version>
     <camunda.osgi.import.camunda.version>version="[$(version;==;${camunda.osgi.version.clean}),$(version;=+;${camunda.osgi.version.clean}))"</camunda.osgi.import.camunda.version>
     <camunda.osgi.import.strict.version>version="[$(version;===;${camunda.osgi.version.clean}),$(version;==+;${camunda.osgi.version.clean}))"</camunda.osgi.import.strict.version>
     <camunda.osgi.import.default.version>[$(version;==;$(@)),$(version;+;$(@)))</camunda.osgi.import.default.version>
@@ -65,15 +63,15 @@
     <camunda.osgi.import.before.defaults />
     <camunda.osgi.import.additional />
     <camunda.osgi.import.pkg>
-      org.camunda.*;${camunda.osgi.import.camunda.version},
       ${camunda.osgi.import.before.defaults},
       ${camunda.osgi.import.defaults},
       ${camunda.osgi.import.additional},
+      org.camunda.*;${camunda.osgi.import.camunda.version},
       *
     </camunda.osgi.import.pkg>
     <camunda.osgi.activator />
     <camunda.osgi.failok>false</camunda.osgi.failok>
-    <camunda.osgi.export>!org.camunda.bpm.model*, ${camunda.osgi.export.pkg};${camunda.osgi.version};-noimport:=true</camunda.osgi.export>
+    <camunda.osgi.export>${camunda.osgi.export.pkg};${camunda.osgi.version};-noimport:=true</camunda.osgi.export>
     <!--
     <camunda.osgi.export.pkg>!*.impl;${camunda.artifact}*</camunda.osgi.export.pkg>
     <camunda.osgi.private.pkg>${camunda.artifact}*.impl</camunda.osgi.private.pkg>
@@ -96,7 +94,7 @@
       <dependency>
         <groupId>cglib</groupId>
         <artifactId>cglib</artifactId>
-        <version>2.2</version>
+        <version>2.2.2</version>
       </dependency>
       <dependency>
         <groupId>commons-dbcp</groupId>
@@ -207,7 +205,17 @@
       <dependency>
         <groupId>junit</groupId>
         <artifactId>junit</artifactId>
-        <version>${junit.version}</version>
+        <version>${version.junit}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.assertj</groupId>
+        <artifactId>assertj-core</artifactId>
+        <version>${version.assertj}</version>
+      </dependency>
+      <dependency>
+        <groupId>ch.qos.logback</groupId>
+        <artifactId>logback-classic</artifactId>
+        <version>${version.logback}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.ant</groupId>
@@ -225,22 +233,22 @@
       <dependency>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-rt-frontend-jaxws</artifactId>
-        <version>${cxf.version}</version>
+        <version>${version.cxf}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-rt-transports-http</artifactId>
-        <version>${cxf.version}</version>
+        <version>${version.cxf}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-rt-transports-http-jetty</artifactId>
-        <version>${cxf.version}</version>
+        <version>${version.cxf}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-rt-bindings-soap</artifactId>
-        <version>${cxf.version}</version>
+        <version>${version.cxf}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.geronimo.specs</groupId>
@@ -269,6 +277,13 @@
         <version>20070829</version>
       </dependency>
       <dependency>
+        <groupId>org.hamcrest</groupId>
+        <artifactId>hamcrest-library</artifactId>
+        <scope>test</scope>
+        <version>1.3</version>
+      </dependency>
+
+      <dependency>
         <!-- required for building with JDK 5 -->
         <groupId>org.livetribe</groupId>
         <artifactId>livetribe-jsr223</artifactId>
@@ -285,11 +300,6 @@
         <groupId>org.mule.tests</groupId>
         <artifactId>mule-tests-functional</artifactId>
         <version>${mule.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.mybatis</groupId>
-        <artifactId>mybatis</artifactId>
-        <version>3.2.3</version>
       </dependency>
       <dependency>
         <groupId>org.mockito</groupId>
@@ -318,52 +328,52 @@
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-jdk14</artifactId>
-        <version>1.6.1</version>
+        <version>1.7.5</version>
       </dependency>
       <dependency>
         <groupId>org.springframework</groupId>
         <artifactId>spring-beans</artifactId>
-        <version>${spring.framework.version}</version>
+        <version>${version.spring.framework}</version>
       </dependency>
       <dependency>
         <groupId>org.springframework</groupId>
         <artifactId>spring-core</artifactId>
-        <version>${spring.framework.version}</version>
+        <version>${version.spring.framework}</version>
       </dependency>
       <dependency>
         <groupId>org.springframework</groupId>
         <artifactId>spring-context</artifactId>
-        <version>${spring.framework.version}</version>
+        <version>${version.spring.framework}</version>
       </dependency>
       <dependency>
         <groupId>org.springframework</groupId>
         <artifactId>spring-aop</artifactId>
-        <version>${spring.framework.version}</version>
+        <version>${version.spring.framework}</version>
       </dependency>
       <dependency>
         <groupId>org.springframework</groupId>
         <artifactId>spring-jdbc</artifactId>
-        <version>${spring.framework.version}</version>
+        <version>${version.spring.framework}</version>
       </dependency>
       <dependency>
         <groupId>org.springframework</groupId>
         <artifactId>spring-orm</artifactId>
-        <version>${spring.framework.version}</version>
+        <version>${version.spring.framework}</version>
       </dependency>
       <dependency>
         <groupId>org.springframework</groupId>
         <artifactId>spring-tx</artifactId>
-        <version>${spring.framework.version}</version>
+        <version>${version.spring.framework}</version>
       </dependency>
       <dependency>
         <groupId>org.springframework</groupId>
         <artifactId>spring-web</artifactId>
-        <version>${spring.framework.version}</version>
+        <version>${version.spring.framework}</version>
       </dependency>
       <dependency>
         <groupId>org.springframework</groupId>
         <artifactId>spring-test</artifactId>
-        <version>${spring.framework.version}</version>
+        <version>${version.spring.framework}</version>
       </dependency>
       <dependency>
         <groupId>org.subethamail</groupId>
@@ -381,11 +391,6 @@
         <artifactId>xercesImpl</artifactId>
         <version>2.9.1</version>
       </dependency>
-      <dependency>
-        <groupId>joda-time</groupId>
-        <artifactId>joda-time</artifactId>
-        <version>2.1</version>
-      </dependency>
       <!-- Camel integration -->
       <dependency>
         <groupId>org.apache.camel</groupId>
@@ -398,41 +403,6 @@
         <artifactId>jug</artifactId>
         <classifier>lgpl</classifier>
         <version>2.0.0</version>
-      </dependency>
-      <dependency>
-        <groupId>com.fasterxml.uuid</groupId>
-        <artifactId>java-uuid-generator</artifactId>
-        <version>3.1.2</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.camunda.bpm.javaee</groupId>
-        <artifactId>camunda-ejb-client</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.camunda.bpm</groupId>
-        <artifactId>camunda-engine</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.camunda.bpm</groupId>
-        <artifactId>camunda-engine-spring</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.camunda.bpm</groupId>
-        <artifactId>camunda-engine-cdi</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.camunda.bpm.identity</groupId>
-        <artifactId>camunda-identity-ldap</artifactId>
-        <version>${project.version}</version>
       </dependency>
 
       <dependency>
@@ -509,24 +479,6 @@
       </dependency>
 
       <dependency>
-        <groupId>org.camunda.bpm.model</groupId>
-        <artifactId>camunda-bpmn-model</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.camunda.bpm.model</groupId>
-        <artifactId>camunda-cmmn-model</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.camunda.bpm.model</groupId>
-        <artifactId>camunda-xml-model</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
-      <dependency>
         <groupId>org.python</groupId>
         <artifactId>jython</artifactId>
         <version>2.5.3</version>
@@ -538,22 +490,19 @@
         <version>1.7.12</version>
       </dependency>
 
+      <dependency>
+        <groupId>org.freemarker</groupId>
+        <artifactId>freemarker</artifactId>
+        <version>2.3.20</version>
+      </dependency>
+
     </dependencies>
+
   </dependencyManagement>
 
    <build>
     <pluginManagement>
       <plugins>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-compiler-plugin</artifactId>
-          <version>3.1</version>
-          <configuration>
-            <source>${version.java}</source>
-            <target>${version.java}</target>
-          </configuration>
-        </plugin>
-
         <!-- test plugins -->
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -588,77 +537,11 @@
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-source-plugin</artifactId>
-          <version>2.2.1</version>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-resources-plugin</artifactId>
           <version>2.6</version>
         </plugin>
 
         <!-- artifact plugins -->
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-jar-plugin</artifactId>
-          <version>2.4</version>
-          <configuration>
-            <archive>
-              <manifest>
-                <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-              </manifest>
-            </archive>
-          </configuration>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-ejb-plugin</artifactId>
-          <version>2.3</version>
-          <configuration>
-            <ejbVersion>${version.ejb}</ejbVersion>
-            <archive>
-              <manifest>
-                <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-              </manifest>
-            </archive>
-          </configuration>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-rar-plugin</artifactId>
-          <version>2.3</version>
-          <configuration>
-            <archive>
-              <manifest>
-                <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-              </manifest>
-            </archive>
-          </configuration>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-war-plugin</artifactId>
-          <version>2.4</version>
-          <configuration>
-            <archive>
-              <manifest>
-                <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-              </manifest>
-            </archive>
-          </configuration>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-ear-plugin</artifactId>
-          <version>2.9</version>
-          <configuration>
-            <archive>
-              <manifest>
-                <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-              </manifest>
-            </archive>
-          </configuration>
-        </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-shade-plugin</artifactId>
@@ -677,18 +560,6 @@
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-assembly-plugin</artifactId>
-          <version>2.4</version>
-          <configuration>
-            <archive>
-              <manifest>
-                <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-              </manifest>
-            </archive>
-          </configuration>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-antrun-plugin</artifactId>
           <version>1.7</version>
         </plugin>
@@ -700,8 +571,6 @@
         <plugin>
           <groupId>org.apache.felix</groupId>
           <artifactId>maven-bundle-plugin</artifactId>
-          <version>2.3.7</version>
-          <extensions>true</extensions>
           <configuration>
            <excludeDependencies>${camunda.osgi.exclude.dependencies}</excludeDependencies>
            <instructions>
@@ -724,6 +593,8 @@
             </instructions>
            <versions>
             <camunda.osgi.version.clean>${project.version}</camunda.osgi.version.clean>
+            <camunda.connect.version.clean>${version.camunda.connect}</camunda.connect.version.clean>
+            <camunda.spin.version.clean>${version.camunda.spin}</camunda.spin.version.clean>
            </versions>
           </configuration>
         </plugin>
@@ -749,17 +620,6 @@
         </plugin>
       </plugins>
     </pluginManagement>
-
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <configuration>
-            <source>${version.java}</source>
-            <target>${version.java}</target>
-          </configuration>
-      </plugin>
-    </plugins>
   </build>
 
   <repositories>
@@ -790,24 +650,4 @@
 
   <url>http://www.camunda.org</url>
 
-  <developers>
-    <developer>
-      <id>camunda.org</id>
-      <name>camunda BPM Community</name>
-      <organization>camunda.org</organization>
-      <organizationUrl>http://camunda.org</organizationUrl>
-    </developer>
-  </developers>
-
-  <scm>
-    <url>https://github.com/camunda/camunda-bpm-platform</url>
-    <connection>scm:git:git@github.com:camunda/camunda-bpm-platform.git</connection>
-    <developerConnection>scm:git:git@github.com:camunda/camunda-bpm-platform.git</developerConnection>
-    <tag>HEAD</tag>
-  </scm>
-
-  <issueManagement>
-    <system>Jira</system>
-    <url>https://app.camunda.com/jira/browse/CAM/</url>
-  </issueManagement>
 </project>

@@ -15,6 +15,8 @@ package org.camunda.bpm;
 import java.util.logging.Logger;
 
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
 import org.junit.After;
 import org.junit.Before;
 
@@ -55,7 +57,9 @@ public abstract class AbstractWebappIntegrationTest {
     client = ApacheHttpClient4.create(clientConfig);
 
     defaultHttpClient = (DefaultHttpClient) client.getClientHandler().getHttpClient();
-
+    HttpParams params = defaultHttpClient.getParams();
+    HttpConnectionParams.setConnectionTimeout(params, 3 * 60 * 1000);
+    HttpConnectionParams.setSoTimeout(params, 10 * 60 * 1000);
   }
 
   @After

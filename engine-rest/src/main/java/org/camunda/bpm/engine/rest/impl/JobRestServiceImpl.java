@@ -30,16 +30,13 @@ import org.camunda.bpm.engine.rest.sub.runtime.JobResource;
 import org.camunda.bpm.engine.rest.sub.runtime.impl.JobResourceImpl;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.JobQuery;
+import org.codehaus.jackson.map.ObjectMapper;
 
 public class JobRestServiceImpl extends AbstractRestProcessEngineAware
 		implements JobRestService {
 
-	public JobRestServiceImpl() {
-		super();
-	}
-
-	public JobRestServiceImpl(String engineName) {
-		super(engineName);
+	public JobRestServiceImpl(String engineName, ObjectMapper objectMapper) {
+		super(engineName, objectMapper);
 	}
 
 	@Override
@@ -50,7 +47,7 @@ public class JobRestServiceImpl extends AbstractRestProcessEngineAware
 	@Override
 	public List<JobDto> getJobs(UriInfo uriInfo, Integer firstResult,
 			Integer maxResults) {
-		JobQueryDto queryDto = new JobQueryDto(uriInfo.getQueryParameters());
+		JobQueryDto queryDto = new JobQueryDto(getObjectMapper(), uriInfo.getQueryParameters());
 		return queryJobs(queryDto, firstResult, maxResults);
 	}
 
@@ -58,6 +55,7 @@ public class JobRestServiceImpl extends AbstractRestProcessEngineAware
 	public List<JobDto> queryJobs(JobQueryDto queryDto, Integer firstResult,
 			Integer maxResults) {
 		ProcessEngine engine = getProcessEngine();
+		queryDto.setObjectMapper(getObjectMapper());
 		JobQuery query = queryDto.toQuery(engine);
 
 		List<Job> matchingJobs;
@@ -77,13 +75,14 @@ public class JobRestServiceImpl extends AbstractRestProcessEngineAware
 
   @Override
   public CountResultDto getJobsCount(@Context UriInfo uriInfo) {
-    JobQueryDto queryDto = new JobQueryDto(uriInfo.getQueryParameters());
+    JobQueryDto queryDto = new JobQueryDto(getObjectMapper(), uriInfo.getQueryParameters());
     return queryJobsCount(queryDto);
   }
 
   @Override
   public CountResultDto queryJobsCount(JobQueryDto queryDto) {
     ProcessEngine engine = getProcessEngine();
+    queryDto.setObjectMapper(getObjectMapper());
     JobQuery query = queryDto.toQuery(engine);
 
     long count = query.count();

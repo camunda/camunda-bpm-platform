@@ -12,6 +12,14 @@
  */
 package org.camunda.bpm.engine.rest.sub.task.impl;
 
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import javax.ws.rs.HttpMethod;
+import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriInfo;
+
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
@@ -19,19 +27,8 @@ import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.rest.TaskRestService;
 import org.camunda.bpm.engine.rest.dto.task.CommentDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
-import org.camunda.bpm.engine.rest.mapper.MultipartFormData;
 import org.camunda.bpm.engine.rest.sub.task.TaskCommentResource;
 import org.camunda.bpm.engine.task.Comment;
-
-import javax.ws.rs.HttpMethod;
-import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.UriInfo;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import static org.camunda.bpm.engine.rest.mapper.MultipartFormData.FormPart;
 
 public class TaskCommentResourceImpl implements TaskCommentResource {
 
@@ -73,21 +70,14 @@ public class TaskCommentResourceImpl implements TaskCommentResource {
     return CommentDto.fromComment(comment);
   }
 
-  public CommentDto createComment(UriInfo uriInfo, MultipartFormData payload) {
+  public CommentDto createComment(UriInfo uriInfo, CommentDto commentDto) {
     ensureHistoryEnabled(Status.FORBIDDEN);
     ensureTaskExists(Status.BAD_REQUEST);
-
-    FormPart messagePart = payload.getNamedPart("message");
-
-    String message = null;
-    if (messagePart != null) {
-      message = messagePart.getTextContent();
-    }
 
     Comment comment;
 
     try {
-      comment = engine.getTaskService().addComment(taskId, null, message);
+      comment = engine.getTaskService().createComment(taskId, null, commentDto.getMessage());
     }
     catch (ProcessEngineException e) {
       throw new InvalidRequestException(Status.BAD_REQUEST, e, "Not enough parameters submitted");
@@ -95,16 +85,16 @@ public class TaskCommentResourceImpl implements TaskCommentResource {
 
     URI uri = uriInfo.getBaseUriBuilder()
       .path(rootResourcePath)
-      .path(TaskRestService.class)
+      .path(TaskRestService.PATH)
       .path(taskId + "/comment/" + comment.getId())
       .build();
 
-    CommentDto commentDto = CommentDto.fromComment(comment);
+    CommentDto resultDto = CommentDto.fromComment(comment);
 
     // GET /
-    commentDto.addReflexiveLink(uri, HttpMethod.GET, "self");
+    resultDto.addReflexiveLink(uri, HttpMethod.GET, "self");
 
-    return commentDto;
+    return resultDto;
   }
 
   private boolean isHistoryEnabled() {

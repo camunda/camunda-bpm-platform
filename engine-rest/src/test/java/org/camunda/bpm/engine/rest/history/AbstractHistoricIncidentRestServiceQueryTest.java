@@ -1,22 +1,11 @@
 package org.camunda.bpm.engine.rest.history;
 
-import static com.jayway.restassured.RestAssured.expect;
-import static com.jayway.restassured.RestAssured.given;
-import static com.jayway.restassured.path.json.JsonPath.from;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.equalTo;
-import static org.mockito.Mockito.inOrder;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
-
+import com.jayway.restassured.http.ContentType;
+import com.jayway.restassured.response.Response;
 import java.util.Date;
 import java.util.List;
-
 import javax.ws.rs.core.Response.Status;
 import javax.xml.registry.InvalidRequestException;
-
 import org.camunda.bpm.engine.history.HistoricIncident;
 import org.camunda.bpm.engine.history.HistoricIncidentQuery;
 import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
@@ -28,15 +17,23 @@ import org.junit.Test;
 import org.mockito.InOrder;
 import org.mockito.Mockito;
 
-import com.jayway.restassured.http.ContentType;
-import com.jayway.restassured.response.Response;
+import static com.jayway.restassured.RestAssured.expect;
+import static com.jayway.restassured.RestAssured.given;
+import static com.jayway.restassured.path.json.JsonPath.from;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.equalTo;
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
 /**
  *
  * @author Roman Smirnov
  *
  */
-public class AbstractHistoricIncidentRestServiceQueryTest extends AbstractRestServiceTest {
+public abstract class AbstractHistoricIncidentRestServiceQueryTest extends AbstractRestServiceTest {
 
   protected static final String HISTORY_INCIDENT_QUERY_URL = TEST_RESOURCE_ROOT_PATH + "/history/incident";
   protected static final String HISTORY_INCIDENT_COUNT_QUERY_URL = HISTORY_INCIDENT_QUERY_URL + "/count";
@@ -302,8 +299,8 @@ public class AbstractHistoricIncidentRestServiceQueryTest extends AbstractRestSe
     String returnedProcessDefinitionId = from(content).getString("[0].processDefinitionId");
     String returnedProcessInstanceId = from(content).getString("[0].processInstanceId");
     String returnedExecutionId = from(content).getString("[0].executionId");
-    Date returnedCreateTime = DateTimeUtil.parseDateTime(from(content).getString("[0].createTime")).toDate();
-    Date returnedEndTime = DateTimeUtil.parseDateTime(from(content).getString("[0].endTime")).toDate();
+    Date returnedCreateTime = DateTimeUtil.parseDate(from(content).getString("[0].createTime"));
+    Date returnedEndTime = DateTimeUtil.parseDate(from(content).getString("[0].endTime"));
     String returnedIncidentType = from(content).getString("[0].incidentType");
     String returnedActivityId = from(content).getString("[0].activityId");
     String returnedCauseIncidentId = from(content).getString("[0].causeIncidentId");
@@ -316,8 +313,8 @@ public class AbstractHistoricIncidentRestServiceQueryTest extends AbstractRestSe
 
     Assert.assertEquals(MockProvider.EXAMPLE_HIST_INCIDENT_ID, returnedId);
     Assert.assertEquals(MockProvider.EXAMPLE_HIST_INCIDENT_PROC_INST_ID, returnedProcessInstanceId);
-    Assert.assertEquals(DateTimeUtil.parseDateTime(MockProvider.EXAMPLE_HIST_INCIDENT_CREATE_TIME).toDate(), returnedCreateTime);
-    Assert.assertEquals(DateTimeUtil.parseDateTime(MockProvider.EXAMPLE_HIST_INCIDENT_END_TIME).toDate(), returnedEndTime);
+    Assert.assertEquals(DateTimeUtil.parseDate(MockProvider.EXAMPLE_HIST_INCIDENT_CREATE_TIME), returnedCreateTime);
+    Assert.assertEquals(DateTimeUtil.parseDate(MockProvider.EXAMPLE_HIST_INCIDENT_END_TIME), returnedEndTime);
     Assert.assertEquals(MockProvider.EXAMPLE_HIST_INCIDENT_EXECUTION_ID, returnedExecutionId);
     Assert.assertEquals(MockProvider.EXAMPLE_HIST_INCIDENT_PROC_DEF_ID, returnedProcessDefinitionId);
     Assert.assertEquals(MockProvider.EXAMPLE_HIST_INCIDENT_TYPE, returnedIncidentType);

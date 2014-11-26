@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -14,96 +14,71 @@
 package org.camunda.bpm.engine.impl;
 
 import java.io.Serializable;
+import java.util.List;
 
-import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
-import org.camunda.bpm.engine.impl.variable.ByteArrayType;
-import org.camunda.bpm.engine.impl.variable.JPAEntityVariableType;
-import org.camunda.bpm.engine.impl.variable.VariableType;
-import org.camunda.bpm.engine.impl.variable.VariableTypes;
+import org.camunda.bpm.engine.impl.variable.serializer.VariableSerializers;
+import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.value.TypedValue;
 
 
 /**
  * Represents a variable value used in queries.
- * 
+ *
  * @author Frederik Heremans
  */
 public class QueryVariableValue implements Serializable {
-  private static final long serialVersionUID = 1L;
-  private String name;
-  private Object value;
-  private QueryOperator operator;
-  
-  private VariableInstanceEntity variableInstanceEntity;
-  private boolean local;
-    
+  protected static final long serialVersionUID = 1L;
+  protected String name;
+  protected TypedValue value;
+  protected QueryOperator operator;
+  protected boolean local;
+
+  protected AbstractQueryVariableValueCondition valueCondition;
+
   public QueryVariableValue(String name, Object value, QueryOperator operator, boolean local) {
     this.name = name;
-    this.value = value;
+    this.value = Variables.untypedValue(value);
     this.operator = operator;
     this.local = local;
   }
-  
-  public void initialize(VariableTypes types) {
-    if(variableInstanceEntity == null) {
-      VariableType type = types.findVariableType(value);
-      if(type instanceof ByteArrayType) {
-        throw new ProcessEngineException("Variables of type ByteArray cannot be used to query");
-      } else if(type instanceof JPAEntityVariableType && operator != QueryOperator.EQUALS) {
-        throw new ProcessEngineException("JPA entity variables can only be used in 'variableValueEquals'");
-      } else {
-        // Type implementation determines which fields are set on the entity
-        variableInstanceEntity = VariableInstanceEntity.create(name, type, value);
-      }
+
+  public void initialize(VariableSerializers serializers) {
+    if (value.getType() != null && value.getType().isAbstract()) {
+      valueCondition = new CompositeQueryVariableValueCondition(this);
+    } else {
+      valueCondition = new SingleQueryVariableValueCondition(this);
     }
+
+    valueCondition.initializeValue(serializers);
   }
-  
+
+  public List<SingleQueryVariableValueCondition> getValueConditions() {
+    return valueCondition.getDisjunctiveConditions();
+  }
+
   public String getName() {
     return name;
   }
-  
-  public String getOperator() {
+
+  public QueryOperator getOperator() {
     if(operator != null) {
-      return operator.toString();      
+      return operator;
     }
-    return QueryOperator.EQUALS.toString();
-  }
-  
-  public String getTextValue() {
-    if(variableInstanceEntity != null) {
-      return variableInstanceEntity.getTextValue();
-    }
-    return null;
-  }
-  
-  public Long getLongValue() {
-    if(variableInstanceEntity != null) {
-      return variableInstanceEntity.getLongValue();
-    }
-    return null;
-  }
-  
-  public Double getDoubleValue() {
-    if(variableInstanceEntity != null) {
-      return variableInstanceEntity.getDoubleValue();
-    }
-    return null;
-  }
-  
-  public String getTextValue2() {
-    if(variableInstanceEntity != null) {
-      return variableInstanceEntity.getTextValue2();
-    }
-    return null;
+    return QueryOperator.EQUALS;
   }
 
-  public String getType() {
-    if(variableInstanceEntity != null) {
-      return variableInstanceEntity.getType().getTypeName();
-    }
-    return null;
+  public String getOperatorName() {
+    return getOperator().toString();
   }
-  
+
+  public Object getValue() {
+    return value.getValue();
+  }
+
+  public TypedValue getTypedValue() {
+    return value;
+  }
+
   public boolean isLocal() {
     return local;
   }

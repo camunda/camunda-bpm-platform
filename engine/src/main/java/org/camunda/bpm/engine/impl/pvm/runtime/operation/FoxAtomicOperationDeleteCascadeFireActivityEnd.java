@@ -14,7 +14,7 @@ public class FoxAtomicOperationDeleteCascadeFireActivityEnd extends PvmAtomicOpe
 
   @Override
   protected void eventNotificationsCompleted(PvmExecutionImpl execution) {
-    ActivityImpl activity = (ActivityImpl) execution.getActivity();
+    ActivityImpl activity = execution.getActivity();
     if ( (execution.isScope())
             && (activity!=null)
             && (!activity.isScope())

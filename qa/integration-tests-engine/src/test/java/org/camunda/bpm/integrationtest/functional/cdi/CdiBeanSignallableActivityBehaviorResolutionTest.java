@@ -59,13 +59,8 @@ public class CdiBeanSignallableActivityBehaviorResolutionTest extends AbstractFo
   @Test
   @OperateOnDeployment("clientDeployment")
   public void testResolveClass() {
-    try {
-      // assert that we cannot resolve the bean here:
-      ProgrammaticBeanLookup.lookup("exampleSignallableActivityBehaviorBean");
-      Assert.fail("exception expected");
-    }catch (Exception e) {
-      // expected
-    }
+    // assert that we cannot resolve the bean here:
+    Assert.assertNull(ProgrammaticBeanLookup.lookup("exampleSignallableActivityBehaviorBean"));
 
     // but the process can since it performs context switch to the process archive for execution
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testResolveBean");

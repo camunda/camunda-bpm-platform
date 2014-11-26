@@ -6,7 +6,7 @@
 
   <process-archive name="pa">
     
-    <process>org/camunda/bpm/integrationtest/deployment/cfg/invoice-it.bpmn20.xml</process>
+    <resource>org/camunda/bpm/integrationtest/deployment/cfg/invoice-it.bpmn20.xml</resource>
   
     <properties>      
       <property name="isDeleteUponUndeploy">true</property>

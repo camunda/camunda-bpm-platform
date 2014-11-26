@@ -22,6 +22,7 @@ import org.camunda.bpm.application.impl.DefaultElResolverLookup;
 import org.camunda.bpm.container.RuntimeContainerDelegate;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.delegate.TaskListener;
+import org.camunda.bpm.engine.impl.javax.el.BeanELResolver;
 import org.camunda.bpm.engine.impl.javax.el.ELResolver;
 import org.camunda.bpm.engine.impl.util.ClassLoaderUtil;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
@@ -36,6 +37,7 @@ public abstract class AbstractProcessApplication implements ProcessApplicationIn
   private final static Logger LOGGER = Logger.getLogger(AbstractProcessApplication.class.getName());
 
   protected ELResolver processApplicationElResolver;
+  protected BeanELResolver processApplicationBeanElResolver;
 
   protected boolean isDeployed = false;
 
@@ -133,6 +135,17 @@ public abstract class AbstractProcessApplication implements ProcessApplicationIn
     }
     return processApplicationElResolver;
 
+  }
+
+  public BeanELResolver getBeanElResolver() {
+    if(processApplicationBeanElResolver == null) {
+      synchronized (this) {
+        if(processApplicationBeanElResolver == null) {
+          processApplicationBeanElResolver = new BeanELResolver();
+        }
+      }
+    }
+    return processApplicationBeanElResolver;
   }
 
   /**

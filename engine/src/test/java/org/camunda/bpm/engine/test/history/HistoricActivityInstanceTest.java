@@ -15,8 +15,11 @@ package org.camunda.bpm.engine.test.history;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricActivityInstanceQuery;
@@ -150,7 +153,7 @@ public class HistoricActivityInstanceTest extends PluggableProcessEngineTestCase
 
     assertEquals(0, historyService.createHistoricActivityInstanceQuery().executionId("nonExistingExecutionId").list().size());
 
-    if (processEngineConfiguration.getHistoryLevel() >= ProcessEngineConfigurationImpl.HISTORYLEVEL_ACTIVITY) {
+    if (processEngineConfiguration.getHistoryLevel().getId() >= ProcessEngineConfigurationImpl.HISTORYLEVEL_ACTIVITY) {
       assertEquals(3, historyService.createHistoricActivityInstanceQuery().executionId(processInstance.getId()).list().size());
     } else {
       assertEquals(0, historyService.createHistoricActivityInstanceQuery().executionId(processInstance.getId()).list().size());
@@ -158,7 +161,7 @@ public class HistoricActivityInstanceTest extends PluggableProcessEngineTestCase
 
     assertEquals(0, historyService.createHistoricActivityInstanceQuery().processInstanceId("nonExistingProcessInstanceId").list().size());
 
-    if (processEngineConfiguration.getHistoryLevel() >= ProcessEngineConfigurationImpl.HISTORYLEVEL_ACTIVITY) {
+    if (processEngineConfiguration.getHistoryLevel().getId() >= ProcessEngineConfigurationImpl.HISTORYLEVEL_ACTIVITY) {
       assertEquals(3, historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstance.getId()).list().size());
     } else {
       assertEquals(0, historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstance.getId()).list().size());
@@ -166,7 +169,7 @@ public class HistoricActivityInstanceTest extends PluggableProcessEngineTestCase
 
     assertEquals(0, historyService.createHistoricActivityInstanceQuery().processDefinitionId("nonExistingProcessDefinitionId").list().size());
 
-    if (processEngineConfiguration.getHistoryLevel() >= ProcessEngineConfigurationImpl.HISTORYLEVEL_ACTIVITY) {
+    if (processEngineConfiguration.getHistoryLevel().getId() >= ProcessEngineConfigurationImpl.HISTORYLEVEL_ACTIVITY) {
       assertEquals(3, historyService.createHistoricActivityInstanceQuery().processDefinitionId(processInstance.getProcessDefinitionId()).list().size());
     } else {
       assertEquals(0, historyService.createHistoricActivityInstanceQuery().processDefinitionId(processInstance.getProcessDefinitionId()).list().size());
@@ -174,13 +177,13 @@ public class HistoricActivityInstanceTest extends PluggableProcessEngineTestCase
 
     assertEquals(0, historyService.createHistoricActivityInstanceQuery().unfinished().list().size());
 
-    if (processEngineConfiguration.getHistoryLevel() >= ProcessEngineConfigurationImpl.HISTORYLEVEL_ACTIVITY) {
+    if (processEngineConfiguration.getHistoryLevel().getId() >= ProcessEngineConfigurationImpl.HISTORYLEVEL_ACTIVITY) {
       assertEquals(3, historyService.createHistoricActivityInstanceQuery().finished().list().size());
     } else {
       assertEquals(0, historyService.createHistoricActivityInstanceQuery().finished().list().size());
     }
 
-    if (processEngineConfiguration.getHistoryLevel() >= ProcessEngineConfigurationImpl.HISTORYLEVEL_ACTIVITY) {
+    if (processEngineConfiguration.getHistoryLevel().getId() >= ProcessEngineConfigurationImpl.HISTORYLEVEL_ACTIVITY) {
       HistoricActivityInstance historicActivityInstance = historyService.createHistoricActivityInstanceQuery().list().get(0);
       assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityInstanceId(historicActivityInstance.getId()).list().size());
     }
@@ -253,7 +256,7 @@ public class HistoricActivityInstanceTest extends PluggableProcessEngineTestCase
     runtimeService.startProcessInstanceByKey("process");
 
     int expectedActivityInstances = -1;
-    if (processEngineConfiguration.getHistoryLevel() >= ProcessEngineConfigurationImpl.HISTORYLEVEL_ACTIVITY) {
+    if (processEngineConfiguration.getHistoryLevel().getId() >= ProcessEngineConfigurationImpl.HISTORYLEVEL_ACTIVITY) {
       expectedActivityInstances = 2;
     } else {
       expectedActivityInstances = 0;
@@ -455,6 +458,7 @@ public class HistoricActivityInstanceTest extends PluggableProcessEngineTestCase
     historicActivityInstanceQuery = historyService.createHistoricActivityInstanceQuery().activityId("timerEvent");
     assertEquals(1, historicActivityInstanceQuery.count());
     assertNotNull(historicActivityInstanceQuery.singleResult().getEndTime());
+    assertEquals("intermediateTimer", historicActivityInstanceQuery.singleResult().getActivityType());
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricActivityInstanceTest.testHistoricActivityInstanceTimerEvent.bpmn20.xml"})
@@ -481,6 +485,7 @@ public class HistoricActivityInstanceTest extends PluggableProcessEngineTestCase
     historicActivityInstanceQuery = historyService.createHistoricActivityInstanceQuery().activityId("messageEvent");
     assertEquals(1, historicActivityInstanceQuery.count());
     assertNotNull(historicActivityInstanceQuery.singleResult().getEndTime());
+    assertEquals("intermediateMessageCatch", historicActivityInstanceQuery.singleResult().getActivityType());
   }
 
   @Deployment
@@ -521,6 +526,7 @@ public class HistoricActivityInstanceTest extends PluggableProcessEngineTestCase
     query.activityId("message");
     assertEquals(1, query.count());
     assertNotNull(query.singleResult().getEndTime());
+    assertEquals("boundaryMessage", query.singleResult().getActivityType());
 
     Task task = taskService.createTaskQuery().singleResult();
     taskService.complete(task.getId());
@@ -541,6 +547,7 @@ public class HistoricActivityInstanceTest extends PluggableProcessEngineTestCase
     query.activityId("message");
     assertEquals(1, query.count());
     assertNotNull(query.singleResult().getEndTime());
+    assertEquals("boundaryMessage", query.singleResult().getActivityType());
 
     List<Task> tasks = taskService.createTaskQuery().list();
     for (Task task : tasks) {
@@ -563,6 +570,7 @@ public class HistoricActivityInstanceTest extends PluggableProcessEngineTestCase
     query.activityId("signal");
     assertEquals(1, query.count());
     assertNotNull(query.singleResult().getEndTime());
+    assertEquals("boundarySignal", query.singleResult().getActivityType());
 
     Task task = taskService.createTaskQuery().singleResult();
     taskService.complete(task.getId());
@@ -583,6 +591,7 @@ public class HistoricActivityInstanceTest extends PluggableProcessEngineTestCase
     query.activityId("signal");
     assertEquals(1, query.count());
     assertNotNull(query.singleResult().getEndTime());
+    assertEquals("boundarySignal", query.singleResult().getActivityType());
 
     List<Task> tasks = taskService.createTaskQuery().list();
     for (Task task : tasks) {
@@ -606,6 +615,7 @@ public class HistoricActivityInstanceTest extends PluggableProcessEngineTestCase
     query.activityId("timer");
     assertEquals(1, query.count());
     assertNotNull(query.singleResult().getEndTime());
+    assertEquals("boundaryTimer", query.singleResult().getActivityType());
 
     Task task = taskService.createTaskQuery().singleResult();
     taskService.complete(task.getId());
@@ -627,6 +637,7 @@ public class HistoricActivityInstanceTest extends PluggableProcessEngineTestCase
     query.activityId("timer");
     assertEquals(1, query.count());
     assertNotNull(query.singleResult().getEndTime());
+    assertEquals("boundaryTimer", query.singleResult().getActivityType());
 
     List<Task> tasks = taskService.createTaskQuery().list();
     for (Task task : tasks) {
@@ -645,6 +656,7 @@ public class HistoricActivityInstanceTest extends PluggableProcessEngineTestCase
     query.activityId("error");
     assertEquals(1, query.count());
     assertNotNull(query.singleResult().getEndTime());
+    assertEquals("boundaryError", query.singleResult().getActivityType());
 
     Task task = taskService.createTaskQuery().singleResult();
     taskService.complete(task.getId());
@@ -661,6 +673,7 @@ public class HistoricActivityInstanceTest extends PluggableProcessEngineTestCase
     query.activityId("catchCancel");
     assertEquals(1, query.count());
     assertNotNull(query.singleResult().getEndTime());
+    assertEquals("cancelBoundaryCatch", query.singleResult().getActivityType());
 
     Task task = taskService.createTaskQuery().singleResult();
     taskService.complete(task.getId());
@@ -682,7 +695,7 @@ public class HistoricActivityInstanceTest extends PluggableProcessEngineTestCase
   }
 
   @Deployment(resources="org/camunda/bpm/engine/test/history/HistoricActivityInstanceTest.testBoundaryCompensateEvent.bpmn20.xml")
-  public void FAILING_testCompensationServiceTaskHasEndTime() {
+  public void testCompensationServiceTaskHasEndTime() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("process");
 
     HistoricActivityInstanceQuery query = historyService.createHistoricActivityInstanceQuery();
@@ -769,4 +782,157 @@ public class HistoricActivityInstanceTest extends PluggableProcessEngineTestCase
 
   }
 
+  @Deployment(resources="org/camunda/bpm/engine/test/history/HistoricActivityInstanceTest.testEvents.bpmn")
+  public void testIntermediateCatchEventTypes() {
+    HistoricActivityInstanceQuery query = startEventTestProcess("");
+
+    query.activityId("intermediateSignalCatchEvent");
+    assertEquals(1, query.count());
+    assertEquals("intermediateSignalCatch", query.singleResult().getActivityType());
+
+    query.activityId("intermediateMessageCatchEvent");
+    assertEquals(1, query.count());
+    assertEquals("intermediateMessageCatch", query.singleResult().getActivityType());
+
+    query.activityId("intermediateTimerCatchEvent");
+    assertEquals(1, query.count());
+    assertEquals("intermediateTimer", query.singleResult().getActivityType());
+  }
+
+  @Deployment(resources="org/camunda/bpm/engine/test/history/HistoricActivityInstanceTest.testEvents.bpmn")
+  public void testIntermediateThrowEventTypes() {
+    HistoricActivityInstanceQuery query = startEventTestProcess("");
+
+    query.activityId("intermediateSignalThrowEvent");
+    assertEquals(1, query.count());
+    assertEquals("intermediateSignalThrow", query.singleResult().getActivityType());
+
+    query.activityId("intermediateMessageThrowEvent");
+    assertEquals(1, query.count());
+    assertEquals("intermediateMessageThrowEvent", query.singleResult().getActivityType());
+
+    query.activityId("intermediateNoneThrowEvent");
+    assertEquals(1, query.count());
+    assertEquals("intermediateNoneThrowEvent", query.singleResult().getActivityType());
+
+    query.activityId("intermediateCompensationThrowEvent");
+    assertEquals(1, query.count());
+    assertEquals("intermediateCompensationThrowEvent", query.singleResult().getActivityType());
+  }
+
+  @Deployment(resources="org/camunda/bpm/engine/test/history/HistoricActivityInstanceTest.testEvents.bpmn")
+  public void testStartEventTypes() {
+    HistoricActivityInstanceQuery query = startEventTestProcess("");
+
+    query.activityId("timerStartEvent");
+    assertEquals(1, query.count());
+    assertEquals("startTimerEvent", query.singleResult().getActivityType());
+
+    query.activityId("noneStartEvent");
+    assertEquals(1, query.count());
+    assertEquals("startEvent", query.singleResult().getActivityType());
+
+    query = startEventTestProcess("CAM-2365");
+    query.activityId("messageStartEvent");
+    assertEquals(1, query.count());
+    assertEquals("messageStartEvent", query.singleResult().getActivityType());
+  }
+
+  @Deployment(resources="org/camunda/bpm/engine/test/history/HistoricActivityInstanceTest.testEvents.bpmn")
+  public void testEndEventTypes() {
+    HistoricActivityInstanceQuery query = startEventTestProcess("");
+
+    /*
+    TODO: wait for CAM-2761 to be done
+    query.activityId("cancellationEndEvent");
+    assertEquals(1, query.count());
+    assertEquals("cancelEndEvent", query.singleResult().getActivityType());
+    */
+
+    query.activityId("messageEndEvent");
+    assertEquals(1, query.count());
+    assertEquals("messageEndEvent", query.singleResult().getActivityType());
+
+    query.activityId("errorEndEvent");
+    assertEquals(1, query.count());
+    assertEquals("errorEndEvent", query.singleResult().getActivityType());
+
+    query.activityId("signalEndEvent");
+    assertEquals(1, query.count());
+    assertEquals("signalEndEvent", query.singleResult().getActivityType());
+
+    query.activityId("terminationEndEvent");
+    assertEquals(1, query.count());
+    assertEquals("terminateEndEvent", query.singleResult().getActivityType());
+
+    query.activityId("noneEndEvent");
+    assertEquals(1, query.count());
+    assertEquals("noneEndEvent", query.singleResult().getActivityType());
+  }
+
+  private HistoricActivityInstanceQuery startEventTestProcess(String message) {
+    ProcessInstance pi;
+    if(message.equals("")) {
+      pi = runtimeService.startProcessInstanceByKey("testEvents");
+    } else {
+      pi = runtimeService.startProcessInstanceByMessage("CAM-2365");
+    }
+
+    return historyService.createHistoricActivityInstanceQuery();
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/history/HistoricActivityInstanceTest.startEventTypesForEventSubprocess.bpmn20.xml")
+  public void testMessageEventSubprocess() {
+    Map<String, Object> vars = new HashMap<String, Object>();
+    vars.put("shouldThrowError", false);
+    runtimeService.startProcessInstanceByKey("process", vars);
+
+    runtimeService.correlateMessage("newMessage");
+
+    HistoricActivityInstance historicActivity = historyService.createHistoricActivityInstanceQuery()
+        .activityId("messageStartEvent").singleResult();
+
+    assertEquals("messageStartEvent", historicActivity.getActivityType());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/history/HistoricActivityInstanceTest.startEventTypesForEventSubprocess.bpmn20.xml")
+  public void testSignalEventSubprocess() {
+    Map<String, Object> vars = new HashMap<String, Object>();
+    vars.put("shouldThrowError", false);
+    runtimeService.startProcessInstanceByKey("process", vars);
+
+    runtimeService.signalEventReceived("newSignal");
+
+    HistoricActivityInstance historicActivity = historyService.createHistoricActivityInstanceQuery()
+        .activityId("signalStartEvent").singleResult();
+
+    assertEquals("signalStartEvent", historicActivity.getActivityType());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/history/HistoricActivityInstanceTest.startEventTypesForEventSubprocess.bpmn20.xml")
+  public void testTimerEventSubprocess() {
+    Map<String, Object> vars = new HashMap<String, Object>();
+    vars.put("shouldThrowError", false);
+    runtimeService.startProcessInstanceByKey("process", vars);
+
+    Job timerJob = managementService.createJobQuery().singleResult();
+    managementService.executeJob(timerJob.getId());
+
+    HistoricActivityInstance historicActivity = historyService.createHistoricActivityInstanceQuery()
+        .activityId("timerStartEvent").singleResult();
+
+    assertEquals("startTimerEvent", historicActivity.getActivityType());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/history/HistoricActivityInstanceTest.startEventTypesForEventSubprocess.bpmn20.xml")
+  public void testErrorEventSubprocess() {
+    Map<String, Object> vars = new HashMap<String, Object>();
+    vars.put("shouldThrowError", true);
+    runtimeService.startProcessInstanceByKey("process", vars);
+
+    HistoricActivityInstance historicActivity = historyService.createHistoricActivityInstanceQuery()
+        .activityId("errorStartEvent").singleResult();
+
+    assertEquals("errorStartEvent", historicActivity.getActivityType());
+  }
 }

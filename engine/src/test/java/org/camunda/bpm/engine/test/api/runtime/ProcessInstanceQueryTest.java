@@ -16,6 +16,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -25,11 +26,13 @@ import java.util.Set;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.impl.test.TestHelper;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.variable.Variables;
 import org.junit.Assert;
 
 /**
@@ -956,7 +959,7 @@ public class ProcessInstanceQueryTest extends PluggableProcessEngineTestCase {
         .list();
       fail("Expected exception");
     } catch(ProcessEngineException ae) {
-      assertTextPresent("Variables of type ByteArray cannot be used to query", ae.getMessage());
+      assertTextPresent("Object values cannot be used to query", ae.getMessage());
     }
 
     runtimeService.deleteProcessInstance(processInstance.getId(), "test");
@@ -1111,6 +1114,9 @@ public class ProcessInstanceQueryTest extends PluggableProcessEngineTestCase {
     repositoryService.suspendProcessDefinitionByKey("oneTaskProcess", true, null);
 
     assertEquals(1, processInstanceQuery.active().count());
+
+    // db cleanup
+    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
   public void testQueryBySuspeded() throws Exception {
@@ -1125,6 +1131,9 @@ public class ProcessInstanceQueryTest extends PluggableProcessEngineTestCase {
     repositoryService.suspendProcessDefinitionByKey("oneTaskProcess", true, null);
 
     assertEquals(4, processInstanceQuery.suspended().count());
+
+    // db cleanup
+    TestHelper.clearOpLog(processEngineConfiguration);
 }
 
   public void testNativeQuery() {
@@ -1327,6 +1336,172 @@ public class ProcessInstanceQueryTest extends PluggableProcessEngineTestCase {
 
     assertEquals(1, processInstanceList.size());
     assertEquals(processInstance.getId(), processInstanceList.get(0).getId());
+  }
+
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/cmmn/oneProcessTaskCase.cmmn",
+      "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"
+    })
+  public void testQueryByCaseInstanceId() {
+    String caseInstanceId = caseService
+      .withCaseDefinitionByKey("oneProcessTaskCase")
+      .create()
+      .getId();
+
+    String processTaskId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_ProcessTask_1")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(processTaskId)
+      .manualStart();
+
+    ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery();
+
+    query.caseInstanceId(caseInstanceId);
+
+    assertEquals(1, query.count());
+
+    List<ProcessInstance> result = query.list();
+    assertEquals(1, result.size());
+
+    ProcessInstance processInstance = result.get(0);
+    assertEquals(caseInstanceId, processInstance.getCaseInstanceId());
+  }
+
+  public void testQueryByInvalidCaseInstanceId() {
+    ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery();
+
+    query.caseInstanceId("invalid");
+
+    assertEquals(0, query.count());
+
+    try {
+      query.caseInstanceId(null);
+      fail("The passed case instance should not be null.");
+    } catch (Exception e) {}
+
+  }
+
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/runtime/superCase.cmmn",
+      "org/camunda/bpm/engine/test/api/runtime/superProcessWithCallActivityInsideSubProcess.bpmn20.xml",
+      "org/camunda/bpm/engine/test/api/runtime/subProcess.bpmn20.xml"
+    })
+  public void testQueryByCaseInstanceIdHierarchy() {
+    String caseInstanceId = caseService
+      .withCaseDefinitionByKey("oneProcessTaskCase")
+      .businessKey("aBusinessKey")
+      .create()
+      .getId();
+
+    String processTaskId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_ProcessTask_1")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(processTaskId)
+      .manualStart();
+
+    ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery();
+
+    query.caseInstanceId(caseInstanceId);
+
+    assertEquals(2, query.count());
+
+    List<ProcessInstance> result = query.list();
+    assertEquals(2, result.size());
+
+    ProcessInstance firstProcessInstance = result.get(0);
+    assertEquals(caseInstanceId, firstProcessInstance.getCaseInstanceId());
+
+    ProcessInstance secondProcessInstance = result.get(1);
+    assertEquals(caseInstanceId, secondProcessInstance.getCaseInstanceId());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
+  public void testProcessVariableValueEqualsNumber() throws Exception {
+    // long
+    runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Collections.<String, Object>singletonMap("var", 123L));
+
+    // non-matching long
+    runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Collections.<String, Object>singletonMap("var", 12345L));
+
+    // short
+    runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Collections.<String, Object>singletonMap("var", (short) 123));
+
+    // double
+    runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Collections.<String, Object>singletonMap("var", 123.0d));
+
+    // integer
+    runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Collections.<String, Object>singletonMap("var", 123));
+
+    // untyped null (should not match)
+    runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Collections.<String, Object>singletonMap("var", null));
+
+    // typed null (should not match)
+    runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Collections.<String, Object>singletonMap("var", Variables.longValue(null)));
+
+    runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Collections.<String, Object>singletonMap("var", "123"));
+
+    assertEquals(4, runtimeService.createProcessInstanceQuery().variableValueEquals("var", Variables.numberValue(123)).count());
+    assertEquals(4, runtimeService.createProcessInstanceQuery().variableValueEquals("var", Variables.numberValue(123L)).count());
+    assertEquals(4, runtimeService.createProcessInstanceQuery().variableValueEquals("var", Variables.numberValue(123.0d)).count());
+    assertEquals(4, runtimeService.createProcessInstanceQuery().variableValueEquals("var", Variables.numberValue((short) 123)).count());
+
+    assertEquals(1, runtimeService.createProcessInstanceQuery().variableValueEquals("var", Variables.numberValue(null)).count());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
+  public void testProcessVariableValueNumberComparison() throws Exception {
+    // long
+    runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Collections.<String, Object>singletonMap("var", 123L));
+
+    // non-matching long
+    runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Collections.<String, Object>singletonMap("var", 12345L));
+
+    // short
+    runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Collections.<String, Object>singletonMap("var", (short) 123));
+
+    // double
+    runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Collections.<String, Object>singletonMap("var", 123.0d));
+
+    // integer
+    runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Collections.<String, Object>singletonMap("var", 123));
+
+    // untyped null
+    runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Collections.<String, Object>singletonMap("var", null));
+
+    // typed null
+    runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Collections.<String, Object>singletonMap("var", Variables.longValue(null)));
+
+    runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Collections.<String, Object>singletonMap("var", "123"));
+
+    assertEquals(3, runtimeService.createProcessInstanceQuery().variableValueNotEquals("var", Variables.numberValue(123)).count());
+    assertEquals(1, runtimeService.createProcessInstanceQuery().variableValueGreaterThan("var", Variables.numberValue(123)).count());
+    assertEquals(5, runtimeService.createProcessInstanceQuery().variableValueGreaterThanOrEqual("var", Variables.numberValue(123)).count());
+    assertEquals(0, runtimeService.createProcessInstanceQuery().variableValueLessThan("var", Variables.numberValue(123)).count());
+    assertEquals(4, runtimeService.createProcessInstanceQuery().variableValueLessThanOrEqual("var", Variables.numberValue(123)).count());
   }
 
 }

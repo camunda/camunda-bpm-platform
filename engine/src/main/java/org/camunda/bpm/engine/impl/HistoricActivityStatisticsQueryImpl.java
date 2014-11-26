@@ -13,12 +13,12 @@
 package org.camunda.bpm.engine.impl;
 
 import java.util.List;
-
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.HistoricActivityStatistics;
 import org.camunda.bpm.engine.history.HistoricActivityStatisticsQuery;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 /**
  *
@@ -77,9 +77,7 @@ public class HistoricActivityStatisticsQueryImpl extends AbstractQuery<HistoricA
 
   protected void checkQueryOk() {
     super.checkQueryOk();
-    if (processDefinitionId == null) {
-      throw new ProcessEngineException("No valid process definition id supplied.");
-    }
+    ensureNotNull("No valid process definition id supplied", "processDefinitionId", processDefinitionId);
   }
 
   // getters /////////////////////////////////////////////////

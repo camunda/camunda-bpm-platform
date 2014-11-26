@@ -12,14 +12,16 @@
  */
 package org.camunda.bpm.engine.rest.dto.history;
 
-import javax.ws.rs.core.MultivaluedMap;
 import java.util.Date;
+
+import javax.ws.rs.core.MultivaluedMap;
 
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.history.UserOperationLogQuery;
 import org.camunda.bpm.engine.rest.dto.AbstractQueryDto;
 import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
 import org.camunda.bpm.engine.rest.dto.converter.DateConverter;
+import org.codehaus.jackson.map.ObjectMapper;
 
 /**
  * @author Danny Gräf
@@ -28,20 +30,24 @@ public class UserOperationLogQueryDto extends AbstractQueryDto<UserOperationLogQ
 
   public static final String TIMESTAMP = "timestamp";
 
-  private String processDefinitionId;
-  private String processInstanceId;
-  private String executionId;
-  private String taskId;
-  private String userId;
-  private String operationId;
-  private String operationType;
-  private String entityType;
-  private String property;
-  private Date afterTimestamp;
-  private Date beforeTimestamp;
+  protected String processDefinitionId;
+  protected String processDefinitionKey;
+  protected String processInstanceId;
+  protected String executionId;
+  protected String caseDefinitionId;
+  protected String caseInstanceId;
+  protected String caseExecutionId;
+  protected String taskId;
+  protected String userId;
+  protected String operationId;
+  protected String operationType;
+  protected String entityType;
+  protected String property;
+  protected Date afterTimestamp;
+  protected Date beforeTimestamp;
 
-  public UserOperationLogQueryDto(MultivaluedMap<String, String> queryParameters) {
-    super(queryParameters);
+  public UserOperationLogQueryDto(ObjectMapper objectMapper, MultivaluedMap<String, String> queryParameters) {
+    super(objectMapper, queryParameters);
   }
 
   @Override
@@ -59,11 +65,23 @@ public class UserOperationLogQueryDto extends AbstractQueryDto<UserOperationLogQ
     if (processDefinitionId != null) {
       query.processDefinitionId(processDefinitionId);
     }
+    if (processDefinitionKey != null) {
+      query.processDefinitionKey(processDefinitionKey);
+    }
     if (processInstanceId != null) {
       query.processInstanceId(processInstanceId);
     }
     if (executionId != null) {
       query.executionId(executionId);
+    }
+    if (caseDefinitionId != null) {
+      query.caseDefinitionId(caseDefinitionId);
+    }
+    if (caseInstanceId != null) {
+      query.caseInstanceId(caseInstanceId);
+    }
+    if (caseExecutionId != null) {
+      query.caseExecutionId(caseExecutionId);
     }
     if (taskId != null) {
       query.taskId(taskId);
@@ -109,6 +127,11 @@ public class UserOperationLogQueryDto extends AbstractQueryDto<UserOperationLogQ
     this.processDefinitionId = processDefinitionId;
   }
 
+  @CamundaQueryParam("processDefinitionKey")
+  public void setProcessDefinitionKey(String processDefinitionKey) {
+    this.processDefinitionKey = processDefinitionKey;
+  }
+
   @CamundaQueryParam("processInstanceId")
   public void setProcessInstanceId(String processInstanceId) {
     this.processInstanceId = processInstanceId;
@@ -117,6 +140,21 @@ public class UserOperationLogQueryDto extends AbstractQueryDto<UserOperationLogQ
   @CamundaQueryParam("executionId")
   public void setExecutionId(String executionId) {
     this.executionId = executionId;
+  }
+
+  @CamundaQueryParam("caseDefinitionId")
+  public void setCaseDefinitionId(String caseDefinitionId) {
+    this.caseDefinitionId = caseDefinitionId;
+  }
+
+  @CamundaQueryParam("caseInstanceId")
+  public void setCaseInstanceId(String caseInstanceId) {
+    this.caseInstanceId = caseInstanceId;
+  }
+
+  @CamundaQueryParam("caseExecutionId")
+  public void setCaseExecutionId(String caseExecutionId) {
+    this.caseExecutionId = caseExecutionId;
   }
 
   @CamundaQueryParam("taskId")

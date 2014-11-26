@@ -12,12 +12,11 @@
  */
 package org.camunda.bpm.engine.test.history;
 
+import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
-
-import static org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl.*;
 
 /**
  * validates history level settings, see CAM-1844
@@ -35,7 +34,7 @@ public abstract class HistoryLevelTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoryLevelTest.bpmn20.xml"})
   public void testLevelNone() {
-    processEngineConfiguration.setHistoryLevel(HISTORYLEVEL_NONE);
+    processEngineConfiguration.setHistoryLevel(HistoryLevel.HISTORY_LEVEL_NONE);
     ProcessInstance process = startProcessAndCompleteUserTask();
     assertProcessEnded(process.getId());
 
@@ -50,7 +49,7 @@ public abstract class HistoryLevelTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoryLevelTest.bpmn20.xml"})
   public void testLevelActivity() {
-    processEngineConfiguration.setHistoryLevel(HISTORYLEVEL_ACTIVITY);
+    processEngineConfiguration.setHistoryLevel(HistoryLevel.HISTORY_LEVEL_ACTIVITY);
     ProcessInstance process = startProcessAndCompleteUserTask();
     assertProcessEnded(process.getId());
 
@@ -65,7 +64,7 @@ public abstract class HistoryLevelTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoryLevelTest.bpmn20.xml"})
   public void testLevelAudit() {
-    processEngineConfiguration.setHistoryLevel(HISTORYLEVEL_AUDIT);
+    processEngineConfiguration.setHistoryLevel(HistoryLevel.HISTORY_LEVEL_AUDIT);
     ProcessInstance process = startProcessAndCompleteUserTask();
     assertProcessEnded(process.getId());
 
@@ -78,7 +77,7 @@ public abstract class HistoryLevelTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoryLevelTest.bpmn20.xml"})
   public void testLevelFull() {
-    processEngineConfiguration.setHistoryLevel(HISTORYLEVEL_FULL);
+    processEngineConfiguration.setHistoryLevel(HistoryLevel.HISTORY_LEVEL_FULL);
     ProcessInstance process = startProcessAndCompleteUserTask();
     assertProcessEnded(process.getId());
 

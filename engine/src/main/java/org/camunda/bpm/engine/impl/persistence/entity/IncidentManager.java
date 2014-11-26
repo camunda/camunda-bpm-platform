@@ -27,12 +27,17 @@ import org.camunda.bpm.engine.runtime.Incident;
 public class IncidentManager extends AbstractManager {
 
   @SuppressWarnings("unchecked")
-  public List<Incident> findIncidentsByExecution(String id) {
-    return getDbSqlSession().selectList("selectIncidentsByExecutionId", id);
+  public List<IncidentEntity> findIncidentsByExecution(String id) {
+    return getDbEntityManager().selectList("selectIncidentsByExecutionId", id);
   }
 
-  public long findIncidentCountByQueryCriteria(IncidentQueryImpl jobQuery) {
-    return (Long) getDbSqlSession().selectOne("selectIncidentCountByQueryCriteria", jobQuery);
+  @SuppressWarnings("unchecked")
+  public List<IncidentEntity> findIncidentsByProcessInstance(String id) {
+    return getDbEntityManager().selectList("selectIncidentsByProcessInstanceId", id);
+  }
+
+  public long findIncidentCountByQueryCriteria(IncidentQueryImpl incidentQuery) {
+    return (Long) getDbEntityManager().selectOne("selectIncidentCountByQueryCriteria", incidentQuery);
   }
 
   public List<Incident> findIncidentByConfiguration(String configuration) {
@@ -44,12 +49,12 @@ public class IncidentManager extends AbstractManager {
     Map<String,Object> params = new HashMap<String, Object>();
     params.put("configuration", configuration);
     params.put("incidentType", incidentType);
-    return getDbSqlSession().selectList("selectIncidentsByConfiguration", params);
+    return getDbEntityManager().selectList("selectIncidentsByConfiguration", params);
   }
 
   @SuppressWarnings("unchecked")
-  public List<Incident> findIncidentByQueryCriteria(IncidentQueryImpl jobQuery, Page page) {
-    return getDbSqlSession().selectList("selectIncidentByQueryCriteria", jobQuery, page);
+  public List<Incident> findIncidentByQueryCriteria(IncidentQueryImpl incidentQuery, Page page) {
+    return getDbEntityManager().selectList("selectIncidentByQueryCriteria", incidentQuery, page);
   }
 
 }

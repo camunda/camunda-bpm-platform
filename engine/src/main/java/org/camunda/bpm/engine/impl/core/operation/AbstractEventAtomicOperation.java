@@ -13,13 +13,13 @@
 
 package org.camunda.bpm.engine.impl.core.operation;
 
+import java.util.List;
+
 import org.camunda.bpm.engine.delegate.BaseDelegateExecution;
 import org.camunda.bpm.engine.delegate.DelegateListener;
 import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
 import org.camunda.bpm.engine.impl.core.model.CoreActivity;
 import org.camunda.bpm.engine.impl.pvm.PvmException;
-
-import java.util.List;
 
 
 /**
@@ -31,56 +31,64 @@ public abstract class AbstractEventAtomicOperation<T extends CoreExecution> impl
     return false;
   }
 
-  public void execute(T instance) {
+  public void execute(T execution) {
 
-    CoreActivity scope = getScope(instance);
-    List<DelegateListener<? extends BaseDelegateExecution>> listeners = scope.getListeners(getEventName());
-    int listenerIndex = instance.getListenerIndex();
+    CoreActivity scope = getScope(execution);
+    List<DelegateListener<? extends BaseDelegateExecution>> listeners = getListeners(scope, execution);
+    int listenerIndex = execution.getListenerIndex();
 
     if(listenerIndex == 0) {
-      instance = eventNotificationsStarted(instance);
+      execution = eventNotificationsStarted(execution);
     }
 
-    if(!isSkipNotifyListeners(instance)) {
+    if(!isSkipNotifyListeners(execution)) {
 
       if (listeners.size()>listenerIndex) {
-        instance.setEventName(getEventName());
-        instance.setEventSource(scope);
+        execution.setEventName(getEventName());
+        execution.setEventSource(scope);
         DelegateListener<? extends BaseDelegateExecution> listener = listeners.get(listenerIndex);
         try {
-          instance.invokeListener(listener);
+          execution.invokeListener(listener);
         } catch (RuntimeException e) {
           throw e;
         } catch (Exception e) {
           throw new PvmException("couldn't execute event listener : "+e.getMessage(), e);
         }
-        instance.setListenerIndex(listenerIndex+1);
-        instance.performOperationSync(this);
+        execution.setListenerIndex(listenerIndex+1);
+        execution.performOperationSync(this);
 
       } else {
-        instance.setListenerIndex(0);
-        instance.setEventName(null);
-        instance.setEventSource(null);
+        execution.setListenerIndex(0);
+        execution.setEventName(null);
+        execution.setEventSource(null);
 
-        eventNotificationsCompleted(instance);
+        eventNotificationsCompleted(execution);
       }
 
     } else {
-      eventNotificationsCompleted(instance);
+      eventNotificationsCompleted(execution);
 
     }
   }
 
-  protected boolean isSkipNotifyListeners(T instance) {
+  protected List<DelegateListener<? extends BaseDelegateExecution>> getListeners(CoreActivity scope, T execution) {
+    if(execution.isSkipCustomListeners()) {
+      return scope.getBuiltInListeners(getEventName());
+    } else {
+      return scope.getListeners(getEventName());
+    }
+  }
+
+  protected boolean isSkipNotifyListeners(T execution) {
     return false;
   }
 
-  protected T eventNotificationsStarted(T instance) {
+  protected T eventNotificationsStarted(T execution) {
     // do nothing
-    return instance;
+    return execution;
   }
 
-  protected abstract CoreActivity getScope(T instance);
+  protected abstract CoreActivity getScope(T execution);
   protected abstract String getEventName();
-  protected abstract void eventNotificationsCompleted(T instance);
+  protected abstract void eventNotificationsCompleted(T execution);
 }

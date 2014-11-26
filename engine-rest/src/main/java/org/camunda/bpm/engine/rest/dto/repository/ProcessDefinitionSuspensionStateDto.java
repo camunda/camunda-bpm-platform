@@ -61,7 +61,7 @@ public class ProcessDefinitionSuspensionStateDto extends SuspensionStateDto {
 
     Date delayedExecutionDate = null;
     if (executionDate != null && !executionDate.equals("")) {
-      delayedExecutionDate = DateTimeUtil.parseDateTime(executionDate).toDate();
+      delayedExecutionDate = DateTimeUtil.parseDate(executionDate);
     }
 
     if (processDefinitionId != null) {

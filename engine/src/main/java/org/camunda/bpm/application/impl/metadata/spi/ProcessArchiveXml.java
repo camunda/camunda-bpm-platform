@@ -35,6 +35,13 @@ public interface ProcessArchiveXml {
   public static final String PROP_IS_RESUME_PREVIOUS_VERSIONS = "isResumePreviousVersions";
 
   /**
+   * Indicates whether only changed resources should be part of the deployment.
+   * This is independent of the setting that if no resources change, no deployment
+   * takes place but the previous deployment is resumed.
+   */
+  public static final String PROP_IS_DEPLOY_CHANGED_ONLY = "isDeployChangedOnly";
+
+  /**
    * <p> The resource root of the proccess archive. This property is used when scanning for process definitions
    * (if {@link #PROP_IS_SCAN_FOR_PROCESS_DEFINITIONS} is set to true).</p>
    *
@@ -77,6 +84,12 @@ public interface ProcessArchiveXml {
   public static final String PROP_RESOURCE_ROOT_PATH = "resourceRootPath";
 
   /**
+   * A semicolon separated list of additional suffixes for resources to scan for.
+   */
+  public static final String PROP_ADDITIONAL_RESOURCE_SUFFIXES = "additionalResourceSuffixes";
+  public static final String PROP_ADDITIONAL_RESOURCE_SUFFIXES_SEPARATOR = ",";
+
+  /**
    * @return the name of the process archive. Must not be null.
    */
   public String getName();
@@ -97,6 +110,7 @@ public interface ProcessArchiveXml {
    * @see #PROP_IS_DELETE_UPON_UNDEPLOY
    * @see #PROP_IS_SCAN_FOR_PROCESS_DEFINITIONS
    * @see #PROP_RESOURCE_ROOT_PATH
+   * @see #PROP_IS_DEPLOY_CHANGED_ONLY
    */
   public Map<String, String> getProperties();
 

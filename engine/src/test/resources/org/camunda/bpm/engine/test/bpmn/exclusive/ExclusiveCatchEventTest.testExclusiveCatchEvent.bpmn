@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:activiti="http://activiti.org/bpmn"
+  targetNamespace="Examples">
+
+  <process id="exclusive">
+  
+    <startEvent id="theStart" />
+    
+    <sequenceFlow sourceRef="theStart" targetRef="intermediateCatchEvent" />
+
+    <intermediateCatchEvent id="intermediateCatchEvent" name="intermediateCatchEvent" activiti:async="true">
+      <messageEventDefinition id="testMessageDef1" messageRef="testMessage1" />
+    </intermediateCatchEvent>
+
+    <sequenceFlow sourceRef="intermediateCatchEvent" targetRef="theEnd" />
+    
+    <endEvent id="theEnd" />
+    
+  </process>
+
+  <message id="testMessage1" name="testMessage1" />
+
+</definitions>

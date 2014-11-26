@@ -7,7 +7,7 @@
   <!-- CASEDEFINITION INSERT -->
 
   <insert id="insertCaseDefinition" parameterType="org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity">
-    insert into ${prefix}ACT_RE_CASE_DEF(ID_, CATEGORY_, NAME_, KEY_, VERSION_, DEPLOYMENT_ID_, RESOURCE_NAME_, REV_)
+    insert into ${prefix}ACT_RE_CASE_DEF(ID_, CATEGORY_, NAME_, KEY_, VERSION_, DEPLOYMENT_ID_, RESOURCE_NAME_, DGRM_RESOURCE_NAME_, REV_)
     values (#{id, jdbcType=VARCHAR},
             #{category, jdbcType=VARCHAR},
             #{name, jdbcType=VARCHAR},
@@ -15,6 +15,7 @@
             #{version, jdbcType=INTEGER},
             #{deploymentId, jdbcType=VARCHAR},
             #{resourceName, jdbcType=VARCHAR},
+            #{diagramResourceName, jdbcType=VARCHAR},
             1
            )
   </insert>
@@ -45,12 +46,17 @@
     <result property="version" column="VERSION_" jdbcType="INTEGER"/>
     <result property="deploymentId" column="DEPLOYMENT_ID_" jdbcType="VARCHAR"/>
     <result property="resourceName" column="RESOURCE_NAME_" jdbcType="VARCHAR"/>
+    <result property="diagramResourceName" column="DGRM_RESOURCE_NAME_" jdbcType="VARCHAR"/>    
   </resultMap>
 
   <!-- CASEDEFINITION SELECT -->
 
-  <select id="selectCaseDefinitionById" parameterType="string" resultMap="caseDefinitionResultMap">
+  <select id="selectCaseDefinition" parameterType="string" resultMap="caseDefinitionResultMap">
     select * from ${prefix}ACT_RE_CASE_DEF where ID_ = #{caseDefinitionId}
+  </select>
+
+  <select id="selectCaseDefinitionByDeploymentId" parameterType="string" resultMap="caseDefinitionResultMap">
+    select * from ${prefix}ACT_RE_CASE_DEF where DEPLOYMENT_ID_ = #{parameter}
   </select>
 
   <select id="selectCaseDefinitionByDeploymentAndKey" parameterType="map" resultMap="caseDefinitionResultMap">
@@ -107,6 +113,13 @@
     <where>
       <if test="id != null">
         RES.ID_ = #{id}
+      </if>
+      <if test="ids != null &amp;&amp; ids.length > 0">
+        and RES.ID_ in
+        <foreach item="item" index="index" collection="ids"
+                 open="(" separator="," close=")">
+          #{item}
+        </foreach>
       </if>
       <if test="category != null">
         and RES.CATEGORY_ = #{category}

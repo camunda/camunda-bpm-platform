@@ -12,12 +12,12 @@
  */
 package org.camunda.bpm.engine.impl.jobexecutor;
 
-import java.io.Serializable;
-
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
+
+import java.io.Serializable;
 
 /**
  * <p>A job declaration is associated with an activity in the process definition graph.
@@ -39,7 +39,6 @@ public abstract class JobDeclaration<T extends JobEntity> implements Serializabl
   protected String jobConfiguration;
 
   protected boolean exclusive = JobEntity.DEFAULT_EXCLUSIVE;
-  protected int retries = JobEntity.DEFAULT_RETRIES;
 
   protected String activityId;
 
@@ -80,7 +79,7 @@ public abstract class JobDeclaration<T extends JobEntity> implements Serializabl
     job.setJobHandlerType(jobHandlerType);
     job.setJobHandlerConfiguration(jobHandlerConfiguration);
     job.setExclusive(exclusive);
-    job.setRetries(retries);
+    job.setRetries(Context.getProcessEngineConfiguration().getDefaultNumberOfRetries());
 
     return job;
   }
@@ -115,14 +114,6 @@ public abstract class JobDeclaration<T extends JobEntity> implements Serializabl
 
   public void setExclusive(boolean exclusive) {
     this.exclusive = exclusive;
-  }
-
-  public int getRetries() {
-    return retries;
-  }
-
-  public void setRetries(int retries) {
-    this.retries = retries;
   }
 
   public void setJobHandlerType(String jobHandlerType) {

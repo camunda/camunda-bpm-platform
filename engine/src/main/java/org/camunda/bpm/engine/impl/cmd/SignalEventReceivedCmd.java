@@ -23,6 +23,8 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.SignalEventSubscriptionEntity;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 
 /**
  * @author Daniel Meyer
@@ -48,18 +50,16 @@ public class SignalEventReceivedCmd implements Command<Void> {
        signalEvents = commandContext.getEventSubscriptionManager()
         .findSignalEventSubscriptionsByEventName(eventName);              
     } else {
-      
+
       ExecutionEntity execution = commandContext.getExecutionManager().findExecutionById(executionId);
-      
-      if (execution == null) {
-        throw new ProcessEngineException("Cannot find execution with id '" + executionId + "'");
-      }
-      
+
+      ensureNotNull("Cannot find execution with id '" + executionId + "'", "execution", execution);
+
       signalEvents = commandContext.getEventSubscriptionManager()
         .findSignalEventSubscriptionsByNameAndExecution(eventName, executionId);
-      
-      if(signalEvents.isEmpty()) {
-        throw new ProcessEngineException("Execution '"+executionId+"' has not subscribed to a signal event with name '"+eventName+"'.");      
+
+      if (signalEvents.isEmpty()) {
+        throw new ProcessEngineException("Execution '" + executionId + "' has not subscribed to a signal event with name '" + eventName + "'.");
       }
     }
         

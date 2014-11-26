@@ -7,16 +7,30 @@
   <!-- CASE EXECUTION INSERT -->
 
   <insert id="insertCaseExecution" parameterType="org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity">
-    insert into ${prefix}ACT_RU_CASE_EXECUTION (ID_, CASE_INST_ID_, BUSINESS_KEY_, CASE_DEF_ID_, ACT_ID_, PARENT_ID_, CURRENT_STATE_, PREV_STATE_, REV_)
-    values (
+    insert into ${prefix}ACT_RU_CASE_EXECUTION
+    (
+      ID_,
+      CASE_INST_ID_,
+      BUSINESS_KEY_,
+      CASE_DEF_ID_,
+      ACT_ID_,
+      PARENT_ID_,
+      SUPER_CASE_EXEC_,
+      CURRENT_STATE_,
+      PREV_STATE_,
+      REV_
+    )
+    values
+    (
       #{id, jdbcType=VARCHAR},
       #{caseInstanceId, jdbcType=VARCHAR},
       #{businessKey, jdbcType=VARCHAR},
       #{caseDefinitionId, jdbcType=VARCHAR},
       #{activityId, jdbcType=VARCHAR},
       #{parentId, jdbcType=VARCHAR},
-      #{currentState, jdbcType=INTEGER},
-      #{previousState, jdbcType=INTEGER},
+      #{superCaseExecutionId, jdbcType=VARCHAR},
+      #{state, jdbcType=INTEGER},
+      #{previous, jdbcType=INTEGER},
       1
     )
   </insert>
@@ -26,8 +40,8 @@
   <update id="updateCaseExecution" parameterType="org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity">
     update ${prefix}ACT_RU_CASE_EXECUTION set
       REV_ = #{revisionNext, jdbcType=INTEGER},
-      STATE_ = #{state, jdbcType=INTEGER},
-      PREV_STATE_ = #{previousState, jdbcType=INTEGER}
+      CURRENT_STATE_ = #{state, jdbcType=INTEGER},
+      PREV_STATE_ = #{previous, jdbcType=INTEGER}
     where ID_ = #{id, jdbcType=VARCHAR}
       and REV_ = #{revision, jdbcType=INTEGER}
   </update>
@@ -48,8 +62,9 @@
     <result property="caseDefinitionId" column="CASE_DEF_ID_" jdbcType="VARCHAR" />
     <result property="activityId" column="ACT_ID_" jdbcType="VARCHAR" />
     <result property="parentId" column="PARENT_ID_" jdbcType="VARCHAR" />
-    <result property="currentState" column="CURRENT_STATE_" jdbcType="INTEGER"/>
-    <result property="previousStage" column="PREVIOUS_STATE_" jdbcType="INTEGER"/>
+    <result property="superCaseExecutionId" column="SUPER_CASE_EXEC_" jdbcType="VARCHAR" />
+    <result property="state" column="CURRENT_STATE_" jdbcType="INTEGER" />
+    <result property="previous" column="PREV_STATE_" jdbcType="INTEGER" />
   </resultMap>
 
   <!-- CASE EXECUTION SELECT -->
@@ -62,11 +77,21 @@
     select * from ${prefix}ACT_RU_CASE_EXECUTION
     where PARENT_ID_ = #{parameter}
   </select>
+  
+  <select id="selectCaseExecutionsByCaseInstanceId" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="caseExecutionResultMap">
+    select * from ${prefix}ACT_RU_CASE_EXECUTION
+    where CASE_INST_ID_ = #{parameter}
+  </select>
 
   <select id="selectCaseInstanceIdsByCaseDefinitionId" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultType="string">
     select ID_
     from ${prefix}ACT_RU_CASE_EXECUTION
     where CASE_DEF_ID_ = #{parameter} and PARENT_ID_ is null
+  </select>
+
+  <select id="selectSubCaseInstanceBySuperCaseExecutionId" parameterType="string" resultMap="caseExecutionResultMap">
+    select * from ${prefix}ACT_RU_CASE_EXECUTION
+    where SUPER_CASE_EXEC_ = #{id}
   </select>
 
   <select id="selectCaseExecutionsByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionQueryImpl" resultMap="caseExecutionResultMap">
@@ -139,77 +164,26 @@
         where
           NAME_= #{queryVariableValue.name}
 
-          <choose>
-            <when test="queryVariableValue.local">
-              and RES.ID_ = CASE_EXECUTION_ID_
-            </when>
-            <otherwise>
-              and RES.CASE_INST_ID_ = CASE_INST_ID_
-              <!-- When case instance variable is queried for, only case variables are taken into account -->
-              and CASE_EXECUTION_ID_ = CASE_INST_ID_
-            </otherwise>
-          </choose>
+        <choose>
+          <when test="queryVariableValue.local">
+            and RES.ID_ = CASE_EXECUTION_ID_
+          </when>
+          <otherwise>
+            and RES.CASE_INST_ID_ = CASE_INST_ID_
+            <!-- When case instance variable is queried for, only case variables are taken into account -->
+            and CASE_EXECUTION_ID_ = CASE_INST_ID_
+          </otherwise>
+        </choose>
 
-          <if test="!queryVariableValue.type.equals('null')">
-          <!-- When operator is not-equals or type of value is null, type doesn't matter! -->
-          and TYPE_ = #{queryVariableValue.type}
-          </if>
-  
-          <if test="queryVariableValue.textValue != null &amp;&amp; queryVariableValue.longValue == null &amp;&amp; queryVariableValue.doubleValue == null">
-            and TEXT_
-          <choose>
-            <when test="queryVariableValue.operator.equals('LIKE')">LIKE</when>
-            <otherwise><include refid="executionVariableOperator" /></otherwise>
-          </choose>
-            #{queryVariableValue.textValue}
-          </if>
-          <if test="queryVariableValue.textValue2 != null">
-            and TEXT2_
-          <choose>
-            <when test="queryVariableValue.operator.equals('LIKE')">LIKE</when>
-            <otherwise><include refid="executionVariableOperator" /></otherwise>
-          </choose>
-            #{queryVariableValue.textValue2}
-          </if>
-  
-          <!-- Have a look in both columns -->
-          <if test="queryVariableValue.longValue != null">
-            and LONG_
-            <include refid="executionVariableOperator" />
-            #{queryVariableValue.longValue}
-          </if>
-  
-          <if test="queryVariableValue.doubleValue != null">
-            and DOUBLE_
-            <include refid="executionVariableOperator" />
-            #{queryVariableValue.doubleValue}
-          </if>
-  
-          <!-- Null variable type -->
-          <if test="queryVariableValue.textValue == null &amp;&amp; queryVariableValue.textValue2 == null &amp;&amp; queryVariableValue.longValue == null &amp;&amp; queryVariableValue.doubleValue == null">
-            <choose>
-            <when test="queryVariableValue.operator.equals('NOT_EQUALS')">
-              and (TEXT_ is not null or TEXT2_ is not null or LONG_ is not null or DOUBLE_ is not null or BYTEARRAY_ID_ is not null)
-            </when>
-            <otherwise>
-              and TEXT_ is null and TEXT2_ is null and LONG_ is null and DOUBLE_ is null and BYTEARRAY_ID_ is null
-            </otherwise>
-          </choose>
-          </if>
+        <bind name="varTypeField" value="'TYPE_'"/>
+        <bind name="varPrefix" value="''"/>
+        <if test="queryVariableValue.valueConditions != null">
+        and
+        <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.variableValueConditions"/>
+        </if>
       )
       </foreach>
     </where>
-  </sql>
-
-  <sql id="executionVariableOperator">
-    <choose>
-      <when test="queryVariableValue.operator.equals('EQUALS')">=</when>
-      <when test="queryVariableValue.operator.equals('NOT_EQUALS')">&lt;&gt;</when>
-      <when test="queryVariableValue.operator.equals('GREATER_THAN')">&gt;</when>
-      <when test="queryVariableValue.operator.equals('GREATER_THAN_OR_EQUAL')">&gt;=</when>
-      <when test="queryVariableValue.operator.equals('LESS_THAN')">&lt;</when>
-      <when test="queryVariableValue.operator.equals('LESS_THAN_OR_EQUAL')">&lt;=</when>
-   </choose>
   </sql>
 
 </mapper>

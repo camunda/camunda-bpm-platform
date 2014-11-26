@@ -28,7 +28,7 @@ public class BoundaryEventPerformanceTest extends ProcessEnginePerformanceTestCa
   @Test
   @Deployment
   public void interruptingOnTask() {
-    perfomanceTest()
+    performanceTest()
       .step(new StartProcessInstanceStep(engine, "process"))
       .step(new CorrelateMessageStep(engine, "message", PROCESS_INSTANCE_ID))
     .run();
@@ -37,7 +37,7 @@ public class BoundaryEventPerformanceTest extends ProcessEnginePerformanceTestCa
   @Test
   @Deployment
   public void interruptingOnConcurrentTask() {
-    perfomanceTest()
+    performanceTest()
       .step(new StartProcessInstanceStep(engine, "process"))
       .step(new CorrelateMessageStep(engine, "message", PROCESS_INSTANCE_ID))
     .run();
@@ -46,7 +46,7 @@ public class BoundaryEventPerformanceTest extends ProcessEnginePerformanceTestCa
   @Test
   @Deployment
   public void nonInterruptingOnTask() {
-    perfomanceTest()
+    performanceTest()
       .step(new StartProcessInstanceStep(engine, "process"))
       .step(new CorrelateMessageStep(engine, "message", PROCESS_INSTANCE_ID))
     .run();
@@ -55,7 +55,7 @@ public class BoundaryEventPerformanceTest extends ProcessEnginePerformanceTestCa
   @Test
   @Deployment
   public void nonInterruptingOnConcurrentTask() {
-    perfomanceTest()
+    performanceTest()
       .step(new StartProcessInstanceStep(engine, "process"))
       .step(new CorrelateMessageStep(engine, "message", PROCESS_INSTANCE_ID))
     .run();

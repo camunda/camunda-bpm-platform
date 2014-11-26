@@ -28,18 +28,15 @@ import org.camunda.bpm.engine.rest.dto.management.JobDefinitionSuspensionStateDt
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.sub.management.JobDefinitionResource;
 import org.camunda.bpm.engine.rest.sub.management.JobDefinitionResourceImpl;
+import org.codehaus.jackson.map.ObjectMapper;
 
 /**
  * @author roman.smirnov
  */
 public class JobDefinitionRestServiceImpl extends AbstractRestProcessEngineAware implements JobDefinitionRestService {
 
-  public JobDefinitionRestServiceImpl() {
-    super();
-  }
-
-  public JobDefinitionRestServiceImpl(String engineName) {
-    super(engineName);
+  public JobDefinitionRestServiceImpl(String engineName, ObjectMapper objectMapper) {
+    super(engineName, objectMapper);
   }
 
   public JobDefinitionResource getJobDefinition(String jobDefinitionId) {
@@ -48,17 +45,18 @@ public class JobDefinitionRestServiceImpl extends AbstractRestProcessEngineAware
 
   public List<JobDefinitionDto> getJobDefinitions(UriInfo uriInfo, Integer firstResult,
       Integer maxResults) {
-    JobDefinitionQueryDto queryDto = new JobDefinitionQueryDto(uriInfo.getQueryParameters());
+    JobDefinitionQueryDto queryDto = new JobDefinitionQueryDto(getObjectMapper(), uriInfo.getQueryParameters());
     return queryJobDefinitions(queryDto, firstResult, maxResults);
 
   }
 
   public CountResultDto getJobDefinitionsCount(UriInfo uriInfo) {
-    JobDefinitionQueryDto queryDto = new JobDefinitionQueryDto(uriInfo.getQueryParameters());
+    JobDefinitionQueryDto queryDto = new JobDefinitionQueryDto(getObjectMapper(), uriInfo.getQueryParameters());
     return queryJobDefinitionsCount(queryDto);
   }
 
   public List<JobDefinitionDto> queryJobDefinitions(JobDefinitionQueryDto queryDto, Integer firstResult, Integer maxResults) {
+    queryDto.setObjectMapper(getObjectMapper());
     JobDefinitionQuery query = queryDto.toQuery(getProcessEngine());
 
     List<JobDefinition> matchingJobDefinitions;
@@ -78,6 +76,7 @@ public class JobDefinitionRestServiceImpl extends AbstractRestProcessEngineAware
   }
 
   public CountResultDto queryJobDefinitionsCount(JobDefinitionQueryDto queryDto) {
+    queryDto.setObjectMapper(getObjectMapper());
     JobDefinitionQuery query = queryDto.toQuery(getProcessEngine());
 
     long count = query.count();

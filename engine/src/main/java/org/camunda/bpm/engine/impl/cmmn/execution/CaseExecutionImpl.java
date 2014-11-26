@@ -14,17 +14,20 @@ package org.camunda.bpm.engine.impl.cmmn.execution;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineServices;
 import org.camunda.bpm.engine.delegate.CmmnModelExecutionContext;
 import org.camunda.bpm.engine.delegate.ProcessEngineServicesAware;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
-import org.camunda.bpm.engine.impl.core.variable.CoreVariableStore;
-import org.camunda.bpm.engine.impl.core.variable.SimpleVariableStrore;
+import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
+import org.camunda.bpm.engine.impl.core.variable.scope.CoreVariableStore;
+import org.camunda.bpm.engine.impl.core.variable.scope.SimpleVariableStore;
+import org.camunda.bpm.engine.impl.pvm.PvmProcessDefinition;
+import org.camunda.bpm.engine.impl.pvm.runtime.ExecutionImpl;
+import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 import org.camunda.bpm.model.cmmn.CmmnModelInstance;
 import org.camunda.bpm.model.cmmn.instance.CmmnElement;
 
@@ -36,21 +39,25 @@ public class CaseExecutionImpl extends CmmnExecution implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
-  private static Logger log = Logger.getLogger(CaseExecutionImpl.class.getName());
-
-  private static AtomicInteger idGenerator = new AtomicInteger();
-
   // current position /////////////////////////////////////////////////////////
 
   protected List<CaseExecutionImpl> caseExecutions;
+
+  protected List<CaseSentryPartImpl> caseSentryParts;
 
   protected CaseExecutionImpl caseInstance;
 
   protected CaseExecutionImpl parent;
 
+  protected ExecutionImpl subProcessInstance;
+
+  protected CaseExecutionImpl subCaseInstance;
+
+  protected CaseExecutionImpl superCaseExecution;
+
   // variables ////////////////////////////////////////////////////////////////
 
-  protected SimpleVariableStrore variableStrore = new SimpleVariableStrore();
+  protected SimpleVariableStore variableStore = new SimpleVariableStore();
 
   public CaseExecutionImpl() {
   }
@@ -88,6 +95,10 @@ public class CaseExecutionImpl extends CmmnExecution implements Serializable {
   // case executions ////////////////////////////////////////////////////////////////
 
   public List<CaseExecutionImpl> getCaseExecutions() {
+    return new ArrayList<CaseExecutionImpl>(getCaseExecutionsInternal());
+  }
+
+  protected List<CaseExecutionImpl> getCaseExecutionsInternal() {
     if (caseExecutions == null) {
       caseExecutions = new ArrayList<CaseExecutionImpl>();
     }
@@ -104,20 +115,125 @@ public class CaseExecutionImpl extends CmmnExecution implements Serializable {
     this.caseInstance = (CaseExecutionImpl) caseInstance;
   }
 
+  // sub process instance ////////////////////////////////////////////////////////
 
-  // new case executions /////////////////////////////////////////////////////////
+  public ExecutionImpl getSubProcessInstance() {
+    return subProcessInstance;
+  }
+
+  public void setSubProcessInstance(PvmExecutionImpl subProcessInstance) {
+    this.subProcessInstance = (ExecutionImpl) subProcessInstance;
+  }
+
+  public PvmExecutionImpl createSubProcessInstance(PvmProcessDefinition processDefinition) {
+    return createSubProcessInstance(processDefinition, null);
+  }
+
+  public PvmExecutionImpl createSubProcessInstance(PvmProcessDefinition processDefinition, String businessKey) {
+    return createSubProcessInstance(processDefinition, businessKey, getCaseInstanceId());
+  }
+
+  public PvmExecutionImpl createSubProcessInstance(PvmProcessDefinition processDefinition, String businessKey, String caseInstanceId) {
+    ExecutionImpl subProcessInstance = (ExecutionImpl) processDefinition.createProcessInstance(businessKey, caseInstanceId);
+
+    // manage bidirectional super-subprocess relation
+    subProcessInstance.setSuperCaseExecution(this);
+    setSubProcessInstance(subProcessInstance);
+
+    return subProcessInstance;
+  }
+
+  // sub-/super- case instance ////////////////////////////////////////////////////
+
+  public CaseExecutionImpl getSubCaseInstance() {
+    return subCaseInstance;
+  }
+
+  public void setSubCaseInstance(CmmnExecution subCaseInstance) {
+    this.subCaseInstance = (CaseExecutionImpl) subCaseInstance;
+  }
+
+  public CaseExecutionImpl createSubCaseInstance(CmmnCaseDefinition caseDefinition) {
+    return createSubCaseInstance(caseDefinition, null);
+  }
+
+  public CaseExecutionImpl createSubCaseInstance(CmmnCaseDefinition caseDefinition, String businessKey) {
+    CaseExecutionImpl caseInstance = (CaseExecutionImpl) caseDefinition.createCaseInstance(businessKey);
+
+    // manage bidirectional super-sub-case-instances relation
+    subCaseInstance.setSuperCaseExecution(this);
+    setSubCaseInstance(subCaseInstance);
+
+    return caseInstance;
+  }
+
+  public CaseExecutionImpl getSuperCaseExecution() {
+    return superCaseExecution;
+  }
+
+  public void setSuperCaseExecution(CmmnExecution superCaseExecution) {
+    this.superCaseExecution = (CaseExecutionImpl) superCaseExecution;
+  }
+
+  // sentry /////////////////////////////////////////////////////////////////////////
+
+  public List<CaseSentryPartImpl> getCaseSentryParts() {
+    if (caseSentryParts == null) {
+      caseSentryParts = new ArrayList<CaseSentryPartImpl>();
+    }
+    return caseSentryParts;
+  }
+
+  protected Map<String, List<CmmnSentryPart>> getSentries() {
+    Map<String, List<CmmnSentryPart>> sentries = new HashMap<String, List<CmmnSentryPart>>();
+
+    for (CaseSentryPartImpl sentryPart : getCaseSentryParts()) {
+
+      String sentryId = sentryPart.getSentryId();
+      List<CmmnSentryPart> parts = sentries.get(sentryId);
+
+      if (parts == null) {
+        parts = new ArrayList<CmmnSentryPart>();
+        sentries.put(sentryId, parts);
+      }
+
+      parts.add(sentryPart);
+    }
+
+    return sentries;
+  }
+
+  protected List<CaseSentryPartImpl> findSentry(String sentryId) {
+    List<CaseSentryPartImpl> result = new ArrayList<CaseSentryPartImpl>();
+
+    for (CaseSentryPartImpl sentryPart : getCaseSentryParts()) {
+      if (sentryPart.getSentryId().equals(sentryId)) {
+        result.add(sentryPart);
+      }
+    }
+
+    return result;
+  }
+
+  protected void addSentryPart(CmmnSentryPart sentryPart) {
+    getCaseSentryParts().add((CaseSentryPartImpl) sentryPart);
+  }
+
+  protected CmmnSentryPart newSentryPart() {
+    return new CaseSentryPartImpl();
+  }
+
+  // new case executions ////////////////////////////////////////////////////////////
 
   protected CaseExecutionImpl createCaseExecution(CmmnActivity activity) {
     CaseExecutionImpl child = newCaseExecution();
-
-    // TODO: evaluate "RepetitionRule" and "RequiredRule"
 
     // set activity to execute
     child.setActivity(activity);
 
     // handle child/parent-relation
     child.setParent(this);
-    getCaseExecutions().add(child);
+    getCaseExecutionsInternal().add(child);
 
     // set case instance
     child.setCaseInstance(getCaseInstance());
@@ -125,15 +241,8 @@ public class CaseExecutionImpl extends CmmnExecution implements Serializable {
     // set case definition
     child.setCaseDefinition(getCaseDefinition());
 
-    // set state to available
-    child.setCurrentState(CaseExecutionState.AVAILABLE);
-
-    if (log.isLoggable(Level.FINE)) {
-      log.fine("Child caseExecution " + child + " created with parent " + this);
-    }
-
     return child;
-  };
+  }
 
   protected CaseExecutionImpl newCaseExecution() {
     return new CaseExecutionImpl();
@@ -142,7 +251,7 @@ public class CaseExecutionImpl extends CmmnExecution implements Serializable {
   // variables //////////////////////////////////////////////////////////////
 
   protected CoreVariableStore getVariableStore() {
-    return variableStrore;
+    return variableStore;
   }
 
   // toString /////////////////////////////////////////////////////////////////

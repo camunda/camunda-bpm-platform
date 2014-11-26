@@ -17,7 +17,7 @@ public class FoxFailedJobParseListener extends AbstractBpmnParseListener {
   private static final String FAILED_JOB_RETRY_TIME_CYCLE = "failedJobRetryTimeCycle";
   public static final String FOX_ENGINE_NS = "http://www.camunda.com/fox";
   public static final String FOX_FAILED_JOB_CONFIGURATION = "FOX_FAILED_JOB_CONFIGURATION";
-  
+
   @Override
   public void parseStartEvent(Element startEventElement, ScopeImpl scope, ActivityImpl startEventActivity) {
     String type = (String) startEventActivity.getProperty(TYPE);
@@ -25,7 +25,7 @@ public class FoxFailedJobParseListener extends AbstractBpmnParseListener {
       this.setFailedJobRetryTimeCycleValue(startEventElement, startEventActivity);
     }
   }
-  
+
   @Override
   public void parseBoundaryEvent(Element boundaryEventElement, ScopeImpl scopeElement, ActivityImpl nestedActivity) {
     String type = (String) nestedActivity.getProperty(TYPE);
@@ -56,72 +56,76 @@ public class FoxFailedJobParseListener extends AbstractBpmnParseListener {
 
   @Override
   public void parseScriptTask(Element scriptTaskElement, ScopeImpl scope, ActivityImpl activity) {
-    if (activity.isAsync()) {
+    if (isAsync(activity)) {
       this.setFailedJobRetryTimeCycleValue(scriptTaskElement, activity);
     }
   }
 
   @Override
   public void parseServiceTask(Element serviceTaskElement, ScopeImpl scope, ActivityImpl activity) {
-    if (activity.isAsync()) {
+    if (isAsync(activity)) {
       this.setFailedJobRetryTimeCycleValue(serviceTaskElement, activity);
     }
   }
 
   @Override
   public void parseBusinessRuleTask(Element businessRuleTaskElement, ScopeImpl scope, ActivityImpl activity) {
-    if (activity.isAsync()) {
+    if (isAsync(activity)) {
       this.setFailedJobRetryTimeCycleValue(businessRuleTaskElement, activity);
     }
   }
 
   @Override
   public void parseTask(Element taskElement, ScopeImpl scope, ActivityImpl activity) {
-    if (activity.isAsync()) {
+    if (isAsync(activity)) {
       this.setFailedJobRetryTimeCycleValue(taskElement, activity);
     }
   }
 
   @Override
   public void parseUserTask(Element userTaskElement, ScopeImpl scope, ActivityImpl activity) {
-    if (activity.isAsync()) {
+    if (isAsync(activity)) {
       this.setFailedJobRetryTimeCycleValue(userTaskElement, activity);
     }
   }
 
   @Override
   public void parseCallActivity(Element callActivityElement, ScopeImpl scope, ActivityImpl activity) {
-    if (activity.isAsync()) {
+    if (isAsync(activity)) {
       this.setFailedJobRetryTimeCycleValue(callActivityElement, activity);
     }
   }
 
   @Override
   public void parseReceiveTask(Element receiveTaskElement, ScopeImpl scope, ActivityImpl activity) {
-    if (activity.isAsync()) {
+    if (isAsync(activity)) {
       this.setFailedJobRetryTimeCycleValue(receiveTaskElement, activity);
     }
   }
 
   @Override
   public void parseSendTask(Element sendTaskElement, ScopeImpl scope, ActivityImpl activity) {
-    if (activity.isAsync()) {
+    if (isAsync(activity)) {
       this.setFailedJobRetryTimeCycleValue(sendTaskElement, activity);
     }
   }
 
   @Override
   public void parseSubProcess(Element subProcessElement, ScopeImpl scope, ActivityImpl activity) {
-    if (activity.isAsync()) {
+    if (isAsync(activity)) {
       this.setFailedJobRetryTimeCycleValue(subProcessElement, activity);
     }
   }
 
   @Override
   public void parseTransaction(Element transactionElement, ScopeImpl scope, ActivityImpl activity) {
-    if (activity.isAsync()) {
+    if (activity.isAsyncBefore()) {
       this.setFailedJobRetryTimeCycleValue(transactionElement, activity);
     }
+  }
+
+  protected boolean isAsync(ActivityImpl activity) {
+    return activity.isAsyncBefore() || activity.isAsyncAfter();
   }
 
   private void setFailedJobRetryTimeCycleValue(Element element, ActivityImpl activity) {

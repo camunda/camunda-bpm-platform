@@ -35,9 +35,9 @@ public class AsyncJobExecutionTest extends AbstractFoxPlatformIntegrationTest {
       HashMap<String, Object> variables = new HashMap<String, Object>();
       variables.put("serialnumber", "23");
       runtimeService.startProcessInstanceByKey("configure-router", variables);
-      
-      waitForJobExecutorToProcessAllJobs(6000);
-      
+
+      waitForJobExecutorToProcessAllJobs();
+
     } catch (Exception ex) {
       Assert.fail("Unexpected exception!");
     }

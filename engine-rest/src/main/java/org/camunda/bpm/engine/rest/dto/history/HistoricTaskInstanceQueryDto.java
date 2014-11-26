@@ -12,19 +12,25 @@
  */
 package org.camunda.bpm.engine.rest.dto.history;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response.Status;
+
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.history.HistoricTaskInstanceQuery;
 import org.camunda.bpm.engine.rest.dto.AbstractQueryDto;
 import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
 import org.camunda.bpm.engine.rest.dto.VariableQueryParameterDto;
-import org.camunda.bpm.engine.rest.dto.converter.*;
+import org.camunda.bpm.engine.rest.dto.converter.BooleanConverter;
+import org.camunda.bpm.engine.rest.dto.converter.DateConverter;
+import org.camunda.bpm.engine.rest.dto.converter.IntegerConverter;
+import org.camunda.bpm.engine.rest.dto.converter.StringArrayConverter;
+import org.camunda.bpm.engine.rest.dto.converter.VariableListConverter;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
-
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response.Status;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import org.codehaus.jackson.map.ObjectMapper;
 
 /**
  * @author Roman Smirnov
@@ -37,6 +43,9 @@ public class HistoricTaskInstanceQueryDto extends AbstractQueryDto<HistoricTaskI
   private static final String SORT_BY_PROC_DEF_ID = "processDefinitionId";
   private static final String SORT_BY_PROC_INST_ID = "processInstanceId";
   private static final String SORT_BY_EXEC_ID = "executionId";
+  private static final String SORT_BY_CASE_DEF_ID = "caseDefinitionId";
+  private static final String SORT_BY_CASE_INST_ID = "caseInstanceId";
+  private static final String SORT_BY_CASE_EXEC_ID = "caseExecutionId";
   private static final String SORT_BY_TASK_DURATION = "duration";
   private static final String SORT_BY_END_TIME = "endTime";
   private static final String SORT_BY_START_TIME = "startTime";
@@ -58,6 +67,9 @@ public class HistoricTaskInstanceQueryDto extends AbstractQueryDto<HistoricTaskI
     VALID_SORT_BY_VALUES.add(SORT_BY_PROC_DEF_ID);
     VALID_SORT_BY_VALUES.add(SORT_BY_PROC_INST_ID);
     VALID_SORT_BY_VALUES.add(SORT_BY_EXEC_ID);
+    VALID_SORT_BY_VALUES.add(SORT_BY_CASE_DEF_ID);
+    VALID_SORT_BY_VALUES.add(SORT_BY_CASE_INST_ID);
+    VALID_SORT_BY_VALUES.add(SORT_BY_CASE_EXEC_ID);
     VALID_SORT_BY_VALUES.add(SORT_BY_TASK_DURATION);
     VALID_SORT_BY_VALUES.add(SORT_BY_TASK_DURATION);
     VALID_SORT_BY_VALUES.add(SORT_BY_END_TIME);
@@ -104,13 +116,19 @@ public class HistoricTaskInstanceQueryDto extends AbstractQueryDto<HistoricTaskI
   protected Date taskFollowUpDateBefore;
   protected Date taskFollowUpDateAfter;
 
+  protected String caseDefinitionId;
+  protected String caseDefinitionKey;
+  protected String caseDefinitionName;
+  protected String caseInstanceId;
+  protected String caseExecutionId;
+
   protected List<VariableQueryParameterDto> taskVariables;
   protected List<VariableQueryParameterDto> processVariables;
 
   public HistoricTaskInstanceQueryDto() {}
 
-  public HistoricTaskInstanceQueryDto(MultivaluedMap<String, String> queryParameters) {
-    super(queryParameters);
+  public HistoricTaskInstanceQueryDto(ObjectMapper objectMapper, MultivaluedMap<String, String> queryParameters) {
+    super(objectMapper, queryParameters);
   }
 
   @CamundaQueryParam("taskId")
@@ -273,6 +291,31 @@ public class HistoricTaskInstanceQueryDto extends AbstractQueryDto<HistoricTaskI
     this.processVariables = processVariables;
   }
 
+  @CamundaQueryParam("caseDefinitionId")
+  public void setCaseDefinitionId(String caseDefinitionId) {
+    this.caseDefinitionId = caseDefinitionId;
+  }
+
+  @CamundaQueryParam("caseDefinitionKey")
+  public void setCaseDefinitionKey(String caseDefinitionKey) {
+    this.caseDefinitionKey = caseDefinitionKey;
+  }
+
+  @CamundaQueryParam("caseDefinitionName")
+  public void setCaseDefinitionName(String caseDefinitionName) {
+    this.caseDefinitionName = caseDefinitionName;
+  }
+
+  @CamundaQueryParam("caseInstanceId")
+  public void setCaseInstanceId(String caseInstanceId) {
+    this.caseInstanceId = caseInstanceId;
+  }
+
+  @CamundaQueryParam("caseExecutionId")
+  public void setCaseExecutionId(String caseExecutionId) {
+    this.caseExecutionId = caseExecutionId;
+  }
+
   @Override
   protected boolean isValidSortByValue(String value) {
     return VALID_SORT_BY_VALUES.contains(value);
@@ -375,12 +418,27 @@ public class HistoricTaskInstanceQueryDto extends AbstractQueryDto<HistoricTaskI
     if (taskFollowUpDateAfter != null) {
       query.taskFollowUpAfter(taskFollowUpDateAfter);
     }
+    if (caseDefinitionId != null) {
+      query.caseDefinitionId(caseDefinitionId);
+    }
+    if (caseDefinitionKey != null) {
+      query.caseDefinitionKey(caseDefinitionKey);
+    }
+    if (caseDefinitionName != null) {
+      query.caseDefinitionName(caseDefinitionName);
+    }
+    if (caseInstanceId != null) {
+      query.caseInstanceId(caseInstanceId);
+    }
+    if (caseExecutionId != null) {
+      query.caseExecutionId(caseExecutionId);
+    }
 
     if (taskVariables != null) {
       for (VariableQueryParameterDto variableQueryParam : taskVariables) {
         String variableName = variableQueryParam.getName();
         String op = variableQueryParam.getOperator();
-        Object variableValue = variableQueryParam.getValue();
+        Object variableValue = variableQueryParam.resolveValue(objectMapper);
 
         if (op.equals(VariableQueryParameterDto.EQUALS_OPERATOR_NAME)) {
           query.taskVariableValueEquals(variableName, variableValue);
@@ -394,7 +452,7 @@ public class HistoricTaskInstanceQueryDto extends AbstractQueryDto<HistoricTaskI
       for (VariableQueryParameterDto variableQueryParam : processVariables) {
         String variableName = variableQueryParam.getName();
         String op = variableQueryParam.getOperator();
-        Object variableValue = variableQueryParam.getValue();
+        Object variableValue = variableQueryParam.resolveValue(objectMapper);
 
         if (op.equals(VariableQueryParameterDto.EQUALS_OPERATOR_NAME)) {
           query.processVariableValueEquals(variableName, variableValue);
@@ -442,6 +500,12 @@ public class HistoricTaskInstanceQueryDto extends AbstractQueryDto<HistoricTaskI
         query.orderByTaskDefinitionKey();
       } else if (sortBy.equals(SORT_BY_PRIORITY)) {
         query.orderByTaskPriority();
+      } else if (sortBy.equals(SORT_BY_CASE_DEF_ID)) {
+        query.orderByCaseDefinitionId();
+      } else if (sortBy.equals(SORT_BY_CASE_INST_ID)) {
+        query.orderByCaseInstanceId();
+      } else if (sortBy.equals(SORT_BY_CASE_EXEC_ID)) {
+        query.orderByCaseExecutionId();
       }
     }
 

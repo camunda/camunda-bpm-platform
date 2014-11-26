@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -34,17 +34,17 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
 public class SpringProcessEngineTestCase extends AbstractProcessEngineTestCase implements ApplicationContextAware {
 
   protected static Map<String, ProcessEngine> cachedProcessEngines = new HashMap<String, ProcessEngine>();
-  
+
   protected TestContextManager testContextManager;
-  
+
   @Autowired
   protected ApplicationContext applicationContext;
-  
+
   public SpringProcessEngineTestCase() {
     super();
     this.testContextManager = new TestContextManager(getClass());
   }
-  
+
   @Override
   public void runBare() throws Throwable {
     testContextManager.prepareTestInstance(this); // this will initialize all dependencies
@@ -54,21 +54,37 @@ public class SpringProcessEngineTestCase extends AbstractProcessEngineTestCase i
   @Override
   protected void initializeProcessEngine() {
     ContextConfiguration contextConfiguration = getClass().getAnnotation(ContextConfiguration.class);
-    String[] value = contextConfiguration.value();
-    if (value==null) {
-      throw new ProcessEngineException("value is mandatory in ContextConfiguration");
-    }
-    if (value.length!=1) {
-      throw new ProcessEngineException("SpringProcessEngineTestCase requires exactly one value in annotation ContextConfiguration");
-    }
-    String configurationFile = value[0];
-    processEngine = cachedProcessEngines.get(configurationFile);
+    String processEngineKey = createProcessEngineKey(contextConfiguration);
+
+    processEngine = cachedProcessEngines.get(processEngineKey);
     if (processEngine==null) {
       processEngine = applicationContext.getBean(ProcessEngine.class);
-      cachedProcessEngines.put(configurationFile, processEngine);
+      cachedProcessEngines.put(processEngineKey, processEngine);
     }
   }
-  
+
+  protected String createProcessEngineKey(ContextConfiguration contextConfiguration) {
+    String processEngineKey = null;
+    String[] value = contextConfiguration.value();
+    Class<?>[] classes = contextConfiguration.classes();
+
+    if (value.length > 1 || classes.length > 1) {
+      throw new ProcessEngineException("SpringProcessEngineTestCase requires exactly one value in annotation ContextConfiguration");
+    }
+
+    if (value != null && value.length == 1) {
+      processEngineKey = value[0];
+
+    } else if (classes != null && classes.length == 1) {
+      processEngineKey = classes[0].getName();
+    }
+
+    if (processEngineKey == null) {
+      throw new ProcessEngineException("value or classes is mandatory in ContextConfiguration");
+    }
+    return processEngineKey;
+  }
+
   public void setApplicationContext(ApplicationContext applicationContext) {
     this.applicationContext = applicationContext;
   }

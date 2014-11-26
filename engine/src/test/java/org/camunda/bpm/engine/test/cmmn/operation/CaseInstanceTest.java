@@ -16,9 +16,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.camunda.bpm.engine.impl.cmmn.behavior.StageActivityBehavior;
+import org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionImpl;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnCaseInstance;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
-import org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionImpl;
 import org.camunda.bpm.engine.impl.cmmn.model.CaseDefinitionBuilder;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
 import org.camunda.bpm.engine.impl.test.PvmTestCase;
@@ -54,7 +54,7 @@ public class CaseInstanceTest extends PvmTestCase {
         .listener("create", stateTransitionCollector)
         .listener("enable", stateTransitionCollector)
         .listener("manualStart", stateTransitionCollector)
-        .behavior(new WaitState())
+        .behavior(new TaskWaitState())
       .endActivity()
       .buildCaseDefinition();
 
@@ -139,13 +139,13 @@ public class CaseInstanceTest extends PvmTestCase {
           .listener("create", stateTransitionCollector)
           .listener("enable", stateTransitionCollector)
           .listener("manualStart", stateTransitionCollector)
-          .behavior(new WaitState())
+          .behavior(new TaskWaitState())
         .endActivity()
         .createActivity("B")
           .listener("create", stateTransitionCollector)
           .listener("enable", stateTransitionCollector)
           .listener("manualStart", stateTransitionCollector)
-          .behavior(new WaitState())
+          .behavior(new TaskWaitState())
         .endActivity()
       .endActivity()
       .buildCaseDefinition();
@@ -289,7 +289,7 @@ public class CaseInstanceTest extends PvmTestCase {
         .listener("create", stateTransitionCollector)
         .listener("enable", stateTransitionCollector)
         .listener("manualStart", stateTransitionCollector)
-        .behavior(new WaitState())
+        .behavior(new TaskWaitState())
       .endActivity()
       .createActivity("X1")
         .listener("create", stateTransitionCollector)
@@ -300,13 +300,13 @@ public class CaseInstanceTest extends PvmTestCase {
           .listener("create", stateTransitionCollector)
           .listener("enable", stateTransitionCollector)
           .listener("manualStart", stateTransitionCollector)
-          .behavior(new WaitState())
+          .behavior(new TaskWaitState())
         .endActivity()
         .createActivity("B1")
           .listener("create", stateTransitionCollector)
           .listener("enable", stateTransitionCollector)
           .listener("manualStart", stateTransitionCollector)
-          .behavior(new WaitState())
+          .behavior(new TaskWaitState())
         .endActivity()
       .endActivity()
       .createActivity("Y")
@@ -318,7 +318,7 @@ public class CaseInstanceTest extends PvmTestCase {
           .listener("create", stateTransitionCollector)
           .listener("enable", stateTransitionCollector)
           .listener("manualStart", stateTransitionCollector)
-          .behavior(new WaitState())
+          .behavior(new TaskWaitState())
         .endActivity()
         .createActivity("X2")
           .listener("create", stateTransitionCollector)
@@ -329,13 +329,13 @@ public class CaseInstanceTest extends PvmTestCase {
             .listener("create", stateTransitionCollector)
             .listener("enable", stateTransitionCollector)
             .listener("manualStart", stateTransitionCollector)
-            .behavior(new WaitState())
+            .behavior(new TaskWaitState())
           .endActivity()
           .createActivity("B2")
             .listener("create", stateTransitionCollector)
             .listener("enable", stateTransitionCollector)
             .listener("manualStart", stateTransitionCollector)
-            .behavior(new WaitState())
+            .behavior(new TaskWaitState())
           .endActivity()
         .endActivity()
       .endActivity()

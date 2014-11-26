@@ -33,7 +33,7 @@ public class GetPropertiesCmd implements Command<Map<String, String>>, Serializa
   @SuppressWarnings("unchecked")
   public Map<String, String> execute(CommandContext commandContext) {
     List<PropertyEntity> propertyEntities = commandContext
-      .getDbSqlSession()
+      .getDbEntityManager()
       .selectList("selectProperties");
     
     Map<String, String> properties = new HashMap<String, String>();

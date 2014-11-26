@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!--
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~       http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.camunda.bpm.engine.impl.persistence.entity.HistoricCaseActivityInstanceEntity">
+
+  <!-- HISTORIC CASE ACTIVITY INSTANCE INSERT -->
+
+  <insert id="insertHistoricCaseActivityInstanceEvent" parameterType="org.camunda.bpm.engine.impl.history.event.HistoricCaseActivityInstanceEventEntity">
+      insert into ${prefix}ACT_HI_CASEACTINST (
+        ID_,
+        PARENT_ACT_INST_ID_,
+        CASE_DEF_ID_,
+        CASE_INST_ID_,
+        CASE_ACT_ID_,
+        TASK_ID_,
+        CALL_PROC_INST_ID_,
+        CALL_CASE_INST_ID_,
+        CASE_ACT_NAME_,
+        CASE_ACT_TYPE_,
+        CREATE_TIME_,
+        END_TIME_,
+        DURATION_,
+        STATE_
+      ) values (
+        #{id, jdbcType=VARCHAR},
+        #{parentCaseActivityInstanceId, jdbcType=VARCHAR},
+        #{caseDefinitionId, jdbcType=VARCHAR},
+        #{caseInstanceId, jdbcType=VARCHAR},
+        #{caseActivityId, jdbcType=VARCHAR},
+        #{taskId, jdbcType=VARCHAR},
+        #{calledProcessInstanceId, jdbcType=VARCHAR},
+        #{calledCaseInstanceId, jdbcType=VARCHAR},
+        #{caseActivityName, jdbcType=VARCHAR},
+        #{caseActivityType, jdbcType=VARCHAR},
+        #{startTime, jdbcType=TIMESTAMP},
+        #{endTime, jdbcType=TIMESTAMP},
+        #{durationInMillis, jdbcType=BIGINT},
+        #{caseActivityInstanceState, jdbcType=INTEGER}
+      )
+  </insert>
+
+  <!-- HISTORIC CASE ACTIVITY INSTANCE UPDATE -->
+
+  <update id="updateHistoricCaseActivityInstanceEvent" parameterType="org.camunda.bpm.engine.impl.persistence.entity.HistoricCaseActivityInstanceEntity">
+    UPDATE
+        ${prefix}ACT_HI_CASEACTINST
+    SET
+      STATE_ = #{caseActivityInstanceState, jdbcType=INTEGER}
+
+      <if test="eventType == 'update'">
+        , TASK_ID_ = #{taskId, jdbcType=VARCHAR}
+        , CALL_PROC_INST_ID_ = #{calledProcessInstanceId, jdbcType=VARCHAR}
+        , CALL_CASE_INST_ID_ = #{calledCaseInstanceId, jdbcType=VARCHAR}
+      </if>
+      <if test="endTime!=null">
+        , END_TIME_ = #{endTime, jdbcType=TIMESTAMP}
+        , DURATION_ = #{durationInMillis, jdbcType=BIGINT}
+      </if>
+    WHERE
+      ID_ = #{id, jdbcType=VARCHAR}
+  </update>
+
+  <!-- HISTORIC CASE ACTIVITY INSTANCE SELECT -->
+
+  <select id="selectHistoricCaseActivityInstanceEvent" parameterType="java.lang.String" resultMap="historicCaseActivityInstanceResultMap">
+    select HCAI.CREATE_TIME_ from ${prefix}ACT_HI_CASEACTINST HCAI
+    where HCAI.ID_ = #{id, jdbcType=VARCHAR}
+  </select>
+
+  <!-- HISTORIC CASE ACTIVITY INSTANCE DELETE -->
+
+  <delete id="deleteHistoricCaseActivityInstancesByCaseInstanceId">
+    delete from ${prefix}ACT_HI_CASEACTINST where CASE_INST_ID_ = #{caseInstanceId}
+  </delete>
+
+  <!-- HISTORIC CASE ACTIVITY INSTANCE RESULT MAP -->
+
+  <resultMap id="historicCaseActivityInstanceResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.HistoricCaseActivityInstanceEntity">
+    <id property="id" column="ID_" jdbcType="VARCHAR" />
+    <result property="parentCaseActivityInstanceId" column="PARENT_ACT_INST_ID_" jdbcType="VARCHAR" />
+    <result property="caseDefinitionId" column="CASE_DEF_ID_" jdbcType="VARCHAR" />
+    <result property="caseInstanceId" column="CASE_INST_ID_" jdbcType="VARCHAR" />
+    <result property="caseActivityId" column="CASE_ACT_ID_" jdbcType="VARCHAR" />
+    <result property="taskId" column="TASK_ID_" jdbcType="VARCHAR" />
+    <result property="calledProcessInstanceId" column="CALL_PROC_INST_ID_" jdbcType="VARCHAR" />
+    <result property="calledCaseInstanceId" column="CALL_CASE_INST_ID_" jdbcType="VARCHAR" />
+    <result property="caseActivityName" column="CASE_ACT_NAME_" jdbcType="VARCHAR" />
+    <result property="caseActivityType" column="CASE_ACT_TYPE_" jdbcType="VARCHAR" />
+    <result property="startTime" column="CREATE_TIME_" jdbcType="TIMESTAMP" />
+    <result property="endTime" column="END_TIME_" jdbcType="TIMESTAMP" />
+    <result property="durationInMillis" column="DURATION_" jdbcType="BIGINT" />
+    <result property="caseActivityInstanceState" column="STATE_" jdbcType="INTEGER" />
+  </resultMap>
+
+  <!-- HISTORIC CASE ACTIVITY INSTANCE SELECT -->
+
+  <select id="selectHistoricCaseActivityInstance" resultMap="historicCaseActivityInstanceResultMap">
+    select * from ${prefix}ACT_HI_CASEACTINST where Id_ = #{id}
+  </select>
+
+  <select id="selectHistoricCaseActivityInstancesByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.HistoricCaseActivityInstanceQueryImpl" resultMap="historicCaseActivityInstanceResultMap">
+    ${limitBefore}
+    select RES.* ${limitBetween}
+    <include refid="selectHistoricCaseActivityInstancesByQueryCriteriaSql"/>
+    ${orderBy}
+    ${limitAfter}
+  </select>
+
+  <select id="selectHistoricCaseActivityInstanceCountByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.HistoricCaseActivityInstanceQueryImpl" resultType="long">
+    select count(*)
+    <include refid="selectHistoricCaseActivityInstancesByQueryCriteriaSql"/>
+  </select>
+
+  <sql id="selectHistoricCaseActivityInstancesByQueryCriteriaSql">
+    from ${prefix}ACT_HI_CASEACTINST RES
+    <where>
+      <if test="caseInstanceId != null">
+        RES.CASE_INST_ID_ = #{caseInstanceId}
+      </if>
+      <if test="caseActivityInstanceId != null">
+        and RES.ID_ = #{caseActivityInstanceId}
+      </if>
+      <if test="caseDefinitionId != null">
+        and RES.CASE_DEF_ID_ = #{caseDefinitionId}
+      </if>
+      <if test="caseActivityId != null">
+        and RES.CASE_ACT_ID_ = #{caseActivityId}
+      </if>
+      <if test="caseActivityName != null">
+        and RES.CASE_ACT_NAME_ = #{caseActivityName}
+      </if>
+      <if test="caseActivityType != null">
+        and RES.CASE_ACT_TYPE_ = #{caseActivityType}
+      </if>
+      <if test="ended != null &amp;&amp; ended">
+        and RES.END_TIME_ is not null
+      </if>
+      <if test="ended != null &amp;&amp; !ended">
+        and RES.END_TIME_ is null
+      </if>
+      <if test="createdBefore != null">
+        and RES.CREATE_TIME_ &lt;= #{createdBefore}
+      </if>
+      <if test="createdAfter != null">
+        and RES.CREATE_TIME_ &gt;= #{createdAfter}
+      </if>
+      <if test="endedBefore != null">
+        and RES.END_TIME_ &lt;= #{endedBefore}
+      </if>
+      <if test="endedAfter != null">
+        and RES.END_TIME_ &gt;= #{endedAfter}
+      </if>
+      <if test="caseActivityInstanceState != null">
+        and RES.STATE_ = #{caseActivityInstanceState}
+      </if>
+    </where>
+  </sql>
+
+  <select id="selectHistoricCaseActivityInstanceByNativeQuery" parameterType="java.util.Map" resultMap="historicCaseActivityInstanceResultMap">
+    <if test="resultType == 'LIST_PAGE'">
+      ${limitBefore}
+    </if>
+    ${sql}
+    <if test="resultType == 'LIST_PAGE'">
+      ${limitAfter}
+    </if>
+  </select>
+
+  <select id="selectHistoricCaseActivityInstanceByNativeQuery_mssql_or_db2" parameterType="java.util.Map" resultMap="historicCaseActivityInstanceResultMap">
+    <if test="resultType == 'LIST_PAGE'">
+        ${limitBeforeNativeQuery}
+    </if>
+    ${sql}
+    <if test="resultType == 'LIST_PAGE'">
+      ${limitAfter}
+    </if>
+  </select>
+
+  <select id="selectHistoricCaseActivityInstanceCountByNativeQuery" parameterType="java.util.Map" resultType="long">
+    ${sql}
+  </select>
+
+</mapper>

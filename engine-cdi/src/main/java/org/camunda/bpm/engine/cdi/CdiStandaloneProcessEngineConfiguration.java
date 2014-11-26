@@ -24,4 +24,8 @@ public class CdiStandaloneProcessEngineConfiguration extends StandaloneProcessEn
     expressionManager = new CdiExpressionManager();
   }
 
+  @Override
+  protected void initArtifactFactory() {
+    artifactFactory = new CdiArtifactFactory();
+  }
 }

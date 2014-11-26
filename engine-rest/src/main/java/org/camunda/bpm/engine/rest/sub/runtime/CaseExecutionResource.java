@@ -12,11 +12,16 @@
  */
 package org.camunda.bpm.engine.rest.sub.runtime;
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import org.camunda.bpm.engine.rest.dto.runtime.CaseExecutionDto;
+import org.camunda.bpm.engine.rest.dto.runtime.CaseExecutionTriggerDto;
+import org.camunda.bpm.engine.rest.sub.VariableResource;
 
 
 /**
@@ -29,5 +34,32 @@ public interface CaseExecutionResource {
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   CaseExecutionDto getCaseExecution();
+
+  @POST
+  @Path("/manual-start")
+  @Consumes(MediaType.APPLICATION_JSON)
+  void manualStart(CaseExecutionTriggerDto triggerDto);
+
+  @POST
+  @Path("/disable")
+  @Consumes(MediaType.APPLICATION_JSON)
+  void disable(CaseExecutionTriggerDto triggerDto);
+
+  @POST
+  @Path("/reenable")
+  @Consumes(MediaType.APPLICATION_JSON)
+  void reenable(CaseExecutionTriggerDto triggerDto);
+
+  @POST
+  @Path("/complete")
+  @Consumes(MediaType.APPLICATION_JSON)
+  void complete(CaseExecutionTriggerDto triggerDto);
+
+  @Path("/localVariables")
+  VariableResource getVariablesLocal();
+
+  @Path("/variables")
+  VariableResource getVariables();
+
 
 }

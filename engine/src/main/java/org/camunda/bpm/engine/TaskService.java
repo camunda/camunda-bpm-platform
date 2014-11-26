@@ -28,11 +28,15 @@ import org.camunda.bpm.engine.task.IdentityLinkType;
 import org.camunda.bpm.engine.task.NativeTaskQuery;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
+import org.camunda.bpm.engine.variable.VariableMap;
+import org.camunda.bpm.engine.variable.value.SerializableValue;
+import org.camunda.bpm.engine.variable.value.TypedValue;
 
 /** Service which provides access to {@link Task} and form related operations.
  *
  * @author Tom Baeyens
  * @author Joram Barrez
+ * @author Thorben Lindhauer
  */
 public interface TaskService {
 
@@ -60,7 +64,7 @@ public interface TaskService {
 	 * @param taskId The id of the task that will be deleted, cannot be null. If no task
 	 * exists with the given taskId, the operation is ignored.
 	 * @throws ProcessEngineException when an error occurs while deleting the task or in case the task is part
-   *   of a running process.
+   *   of a running process or case instance.
 	 */
 	void deleteTask(String taskId);
 
@@ -70,7 +74,7 @@ public interface TaskService {
 	 * @param taskIds The id's of the tasks that will be deleted, cannot be null. All
 	 * id's in the list that don't have an existing task will be ignored.
 	 * @throws ProcessEngineException when an error occurs while deleting the tasks or in case one of the tasks
-   *  is part of a running process.
+   *  is part of a running process or case instance.
 	 */
 	void deleteTasks(Collection<String> taskIds);
 
@@ -80,7 +84,7 @@ public interface TaskService {
    * exists with the given taskId, the operation is ignored.
    * @param cascade If cascade is true, also the historic information related to this task is deleted.
    * @throws ProcessEngineException when an error occurs while deleting the task or in case the task is part
-   *   of a running process.
+   *   of a running process or case instance.
    */
   void deleteTask(String taskId, boolean cascade);
 
@@ -92,7 +96,7 @@ public interface TaskService {
    * @throws ProcessEngineException when an error occurs while deleting the tasks or in case one of the tasks
    *  is part of a running process.
    * @throws ProcessEngineException when an error occurs while deleting the tasks or in case one of the tasks
-   *  is part of a running process.
+   *  is part of a running process or case instance.
    */
   void deleteTasks(Collection<String> taskIds, boolean cascade);
 
@@ -102,7 +106,7 @@ public interface TaskService {
    * exists with the given taskId, the operation is ignored.
    * @param deleteReason reason the task is deleted. Is recorded in history, if enabled.
    * @throws ProcessEngineException when an error occurs while deleting the task or in case the task is part
-   *  of a running process
+   *  of a running process or case instance.
    */
   void deleteTask(String taskId, String deleteReason);
 
@@ -112,7 +116,7 @@ public interface TaskService {
    * id's in the list that don't have an existing task will be ignored.
    * @param deleteReason reason the task is deleted. Is recorded in history, if enabled.
    * @throws ProcessEngineException when an error occurs while deleting the tasks or in case one of the tasks
-   *  is part of a running process.
+   *  is part of a running process or case instance.
    */
   void deleteTasks(Collection<String> taskIds, String deleteReason);
 
@@ -336,24 +340,141 @@ public interface TaskService {
   /** get a variables and search in the task scope and if available also the execution scopes. */
   Object getVariable(String taskId, String variableName);
 
+  /** get a variables and search in the task scope and if available also the execution scopes.
+   *
+   * @param taskId the id of the task
+   * @param variableName the name of the variable to fetch
+   *
+   * @return the TypedValue for the variable or 'null' in case no such variable exists.
+   *
+   * @throws ClassCastException in case the value is not of the requested type
+   *
+   * @since 7.2
+   */
+  <T extends TypedValue> T getVariableTyped(String taskId, String variableName);
+
+  /** get a variables and search in the task scope and if available also the execution scopes.
+   *
+   * @param taskId the id of the task
+   * @param variableName the name of the variable to fetch
+   * @param deserializeValue if false a, {@link SerializableValue} will not be deserialized.
+   *
+   * @return the TypedValue for the variable or 'null' in case no such variable exists.
+   *
+   * @throws ClassCastException in case the value is not of the requested type
+   *
+   * @since 7.2
+   */
+  <T extends TypedValue> T getVariableTyped(String taskId, String variableName, boolean deserializeValue);
+
   /** get a variables and only search in the task scope.  */
   Object getVariableLocal(String taskId, String variableName);
+
+  /** get a variables and only search in the task scope.
+  *
+  * @param taskId the id of the task
+  * @param variableName the name of the variable to fetch
+  *
+  * @return the TypedValue for the variable or 'null' in case no such variable exists.
+  *
+  * @throws ClassCastException in case the value is not of the requested type
+  *
+  * @since 7.2
+  */
+  <T extends TypedValue> T getVariableLocalTyped(String taskId, String variableName);
+
+  /** get a variables and only search in the task scope.
+   *
+   * @param taskId the id of the task
+   * @param variableName the name of the variable to fetch
+   * @param deserializeValue if false a, {@link SerializableValue} will not be deserialized.
+   *
+   * @return the TypedValue for the variable or 'null' in case no such variable exists.
+   *
+   * @throws ClassCastException in case the value is not of the requested type
+   *
+   * @since 7.2
+   */
+  <T extends TypedValue> T getVariableLocalTyped(String taskId, String variableName, boolean deserializeValue);
 
   /** get all variables and search in the task scope and if available also the execution scopes.
    * If you have many variables and you only need a few, consider using {@link #getVariables(String, Collection)}
    * for better performance.*/
   Map<String, Object> getVariables(String taskId);
 
+  /** get all variables and search in the task scope and if available also the execution scopes.
+   * If you have many variables and you only need a few, consider using {@link #getVariables(String, Collection)}
+   * for better performance.
+   *
+   * @param taskId the id of the task
+   *
+   * @since 7.2
+   * */
+  VariableMap getVariablesTyped(String taskId);
+
+  /** get all variables and search in the task scope and if available also the execution scopes.
+   * If you have many variables and you only need a few, consider using {@link #getVariables(String, Collection)}
+   * for better performance.
+   *
+   * @param taskId the id of the task
+   * @param deserializeValues if false, {@link SerializableValue SerializableValues} will not be deserialized.
+   *
+   * @since 7.2
+   * */
+  VariableMap getVariablesTyped(String taskId, boolean deserializeValues);
+
   /** get all variables and search only in the task scope.
   * If you have many task local variables and you only need a few, consider using {@link #getVariablesLocal(String, Collection)}
   * for better performance.*/
   Map<String, Object> getVariablesLocal(String taskId);
 
-  /** get values for all given variableNames and search only in the task scope. */
+  /** get all variables and search only in the task scope.
+  * If you have many task local variables and you only need a few, consider using {@link #getVariablesLocal(String, Collection)}
+  * for better performance.
+  *
+  * @param taskId the id of the task
+  * @param deserializeValues if false, {@link SerializableValue SerializableValues} will not be deserialized.
+  *
+  * @since 7.2
+  * */
+  VariableMap getVariablesLocalTyped(String taskId);
+
+  /** get all variables and search only in the task scope.
+  * If you have many task local variables and you only need a few, consider using {@link #getVariablesLocal(String, Collection)}
+  * for better performance.
+  *
+  * @param taskId the id of the task
+  * @param deserializeValues if false, {@link SerializableValue SerializableValues} will not be deserialized.
+  *
+  * @since 7.2
+  * */
+  VariableMap getVariablesLocalTyped(String taskId, boolean deserializeValues);
+
+  /** get values for all given variableNames */
   Map<String, Object> getVariables(String taskId, Collection<String> variableNames);
 
+  /** get values for all given variableName
+   *
+   * @param taskId the id of the task
+   * @param variableNames only fetch variables whose names are in the collection.
+   * @param deserializeValues if false, {@link SerializableValue SerializableValues} will not be deserialized.
+   *
+   * @since 7.2
+   * */
+  VariableMap getVariablesTyped(String taskId, Collection<String> variableNames, boolean deserializeValues);
+
   /** get a variable on a task */
-  Map<String, Object> getVariablesLocal(String taskId, Collection<String> variableNames);
+  Map<String,Object> getVariablesLocal(String taskId, Collection<String> variableNames);
+
+  /** get values for all given variableName. Only search in the local task scope.
+  *
+  * @param taskId the id of the task
+  * @param variableNames only fetch variables whose names are in the collection.
+  * @param deserializeValues if false, {@link SerializableValue SerializableValues} will not be deserialized.
+  *
+  * @since 7.2
+  * */
+  VariableMap getVariablesLocalTyped(String taskId, Collection<String> variableNames, boolean deserializeValues);
 
   /**
    * Removes the variable from the task.
@@ -379,8 +500,16 @@ public interface TaskService {
    */
   void removeVariablesLocal(String taskId, Collection<String> variableNames);
 
-  /** Add a comment to a task and/or process instance. */
-  Comment addComment(String taskId, String processInstanceId, String message);
+  /**
+   * Add a comment to a task and/or process instance.
+   *
+   * @deprecated Use {@link #createComment(String, String, String)} instead
+   */
+  @Deprecated
+  void addComment(String taskId, String processInstanceId, String message);
+
+  /** Creates a comment to a task and/or process instance and returns the comment. */
+  Comment createComment(String taskId, String processInstanceId, String message);
 
   /** The comments related to the given task. */
   List<Comment> getTaskComments(String taskId);

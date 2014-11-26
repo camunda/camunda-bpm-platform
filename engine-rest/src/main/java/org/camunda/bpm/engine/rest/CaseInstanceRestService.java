@@ -35,7 +35,6 @@ import org.camunda.bpm.engine.runtime.CaseInstanceQuery;
  * @author Roman Smirnov
  *
  */
-@Path(CaseInstanceRestService.PATH)
 @Produces(MediaType.APPLICATION_JSON)
 public interface CaseInstanceRestService {
 

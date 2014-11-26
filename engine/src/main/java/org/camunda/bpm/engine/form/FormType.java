@@ -30,5 +30,4 @@ public interface FormType {
    * and what return type they give. */
   Object getInformation(String key);
 
-
 }

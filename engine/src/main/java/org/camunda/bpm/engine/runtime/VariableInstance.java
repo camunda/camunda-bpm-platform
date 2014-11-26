@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.engine.runtime;
 
+import org.camunda.bpm.engine.variable.value.TypedValue;
+
 /**
  * A {@link VariableInstance} represents a variable in the execution of
  * a process instance.
@@ -27,20 +29,26 @@ public interface VariableInstance {
   String getId();
 
   /**
-   * Returns the name of <code>this</code> variable instance.
+   * Returns the name of this variable instance.
    */
   String getName();
 
   /**
-   * Returns the name of the type of <code>this</code> variable instance
-   * @return
+   * Returns the name of the type of this variable instance
+   *
+   * @return the type name of the variable
    */
   String getTypeName();
 
   /**
-   * Returns the value of <code>this</code> variable instance.
+   * Returns the value of this variable instance.
    */
   Object getValue();
+
+  /**
+   * Returns the TypedValue of this variable instance.
+   */
+  TypedValue getTypedValue();
 
   /**
    * Returns the corresponding process instance id.

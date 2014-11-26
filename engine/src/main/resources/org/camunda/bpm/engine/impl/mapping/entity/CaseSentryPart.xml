@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
+
+<mapper namespace="org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseSentryPartEntity">
+
+  <!-- CASE SENTRY PART INSERT -->
+
+  <insert id="insertCaseSentryPart" parameterType="org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseSentryPartEntity">
+    insert into ${prefix}ACT_RU_CASE_SENTRY_PART
+    (
+      ID_,
+      REV_,
+      CASE_INST_ID_,
+      CASE_EXEC_ID_,
+      SENTRY_ID_,
+      TYPE_,
+      SOURCE_CASE_EXEC_ID_,
+      STANDARD_EVENT_,
+      SATISFIED_
+    )
+    values
+    (
+      #{id, jdbcType=VARCHAR},
+      1,
+      #{caseInstanceId, jdbcType=VARCHAR},
+      #{caseExecutionId, jdbcType=VARCHAR},
+      #{sentryId, jdbcType=VARCHAR},
+      #{type, jdbcType=VARCHAR},
+      #{sourceCaseExecutionId, jdbcType=VARCHAR},
+      #{standardEvent, jdbcType=VARCHAR},
+      #{satisfied, jdbcType=BOOLEAN}
+    )
+  </insert>
+
+  <!-- CASE SENTRY PART UPDATE -->
+
+  <update id="updateCaseSentryPart" parameterType="org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseSentryPartEntity">
+    update ${prefix}ACT_RU_CASE_SENTRY_PART set
+      REV_ = #{revisionNext, jdbcType=INTEGER},
+      SATISFIED_ = #{satisfied, jdbcType=BOOLEAN}
+    where ID_ = #{id, jdbcType=VARCHAR}
+      and REV_ = #{revision, jdbcType=INTEGER}
+  </update>
+
+  <!-- CASE SENTRY PART DELETE -->
+
+  <delete id="deleteCaseSentryPart" parameterType="org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseSentryPartEntity">
+    delete from ${prefix}ACT_RU_CASE_SENTRY_PART where ID_ = #{id} and REV_ = #{revision}
+  </delete>
+
+  <!-- CASE SENTRY PART RESULTMAP -->
+
+  <resultMap id="caseSentryPartResultMap" type="org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseSentryPartEntity">
+    <id property="id" column="ID_" jdbcType="VARCHAR" />
+    <result property="revision" column="REV_" jdbcType="INTEGER" />
+    <result property="caseInstanceId" column="CASE_INST_ID_" jdbcType="VARCHAR" />
+    <result property="caseExecutionId" column="CASE_EXEC_ID_" jdbcType="VARCHAR" />
+    <result property="sentryId" column="SENTRY_ID_" jdbcType="VARCHAR" />
+    <result property="type" column="TYPE_" jdbcType="VARCHAR" />
+    <result property="sourceCaseExecutionId" column="SOURCE_CASE_EXEC_ID_" jdbcType="VARCHAR" />
+    <result property="standardEvent" column="STANDARD_EVENT_" jdbcType="VARCHAR" />
+    <result property="satisfied" column="SATISFIED_" jdbcType="BOOLEAN" />
+  </resultMap>
+
+  <!-- CASE SENTRY PART SELECT -->
+
+  <select id="selectCaseSentryPart" parameterType="string" resultMap="caseSentryPartResultMap">
+    select * from ${prefix}ACT_RU_CASE_SENTRY_PART
+    where ID_ = #{id}
+  </select>
+
+  <select id="selectCaseSentryPartsByCaseExecutionId" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="caseSentryPartResultMap">
+    select * from ${prefix}ACT_RU_CASE_SENTRY_PART
+    where CASE_EXEC_ID_ = #{parameter}
+  </select>
+
+  <select id="selectCaseSentryPartsByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseSentryPartQueryImpl" resultMap="caseSentryPartResultMap">
+    ${limitBefore}
+    select RES.* ${limitBetween}
+    <include refid="selectCaseSentryPartsByQueryCriteriaSql"/>
+    ${orderBy}
+    ${limitAfter}
+  </select>
+
+  <select id="selectCaseSentryPartsCountByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseSentryPartQueryImpl" resultType="long">
+    select count(*)
+    <include refid="selectCaseSentryPartsByQueryCriteriaSql"/>
+  </select>
+
+  <sql id="selectCaseSentryPartsByQueryCriteriaSql">
+    from ${prefix}ACT_RU_CASE_SENTRY_PART RES
+    <where>
+      <!-- id -->
+      <if test="id != null">
+        RES.ID_ = #{id}
+      </if>
+
+      <!-- caseInstanceId -->
+      <if test="caseInstanceId != null">
+        and RES.CASE_INST_ID_ = #{caseInstanceId}
+      </if>
+
+      <!-- caseExecutionId -->
+      <if test="caseExecutionId != null">
+        and RES.CASE_EXEC_ID_ = #{caseExecutionId}
+      </if>
+
+      <!-- sentryId -->
+      <if test="sentryId != null">
+        and RES.SENTRY_ID_ = #{sentryId}
+      </if>
+
+      <!-- type -->
+      <if test="type != null">
+        and RES.TYPE_ = #{type}
+      </if>
+
+      <!-- sourceCaseExecutionId -->
+      <if test="sourceCaseExecutionId != null">
+        and RES.SOURCE_CASE_EXEC_ID_ = #{sourceCaseExecutionId}
+      </if>
+
+      <!-- standardEvent -->
+      <if test="standardEvent != null">
+        and RES.STANDARD_EVENT_ = #{standardEvent}
+      </if>
+
+      <!-- satisfied -->
+      <if test="satisfied">
+        and RES.SATISFIED_ = ${trueConstant}
+      </if>
+
+    </where>
+  </sql>
+
+</mapper>

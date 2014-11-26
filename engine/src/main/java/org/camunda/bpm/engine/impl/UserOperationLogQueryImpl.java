@@ -14,11 +14,12 @@ package org.camunda.bpm.engine.impl;
 
 import java.util.Date;
 import java.util.List;
-
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.history.UserOperationLogQuery;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 
 /**
@@ -28,8 +29,12 @@ public class UserOperationLogQueryImpl extends AbstractQuery<UserOperationLogQue
 
   private static final long serialVersionUID = 1L;
   protected String processDefinitionId;
+  protected String processDefinitionKey;
   protected String processInstanceId;
   protected String executionId;
+  protected String caseDefinitionId;
+  protected String caseInstanceId;
+  protected String caseExecutionId;
   protected String taskId;
   protected String userId;
   protected String operationId;
@@ -39,60 +44,88 @@ public class UserOperationLogQueryImpl extends AbstractQuery<UserOperationLogQue
   protected Date timestampAfter;
   protected Date timestampBefore;
 
+  public UserOperationLogQueryImpl() {
+  }
+
   public UserOperationLogQueryImpl(CommandExecutor commandExecutor) {
     super(commandExecutor);
   }
 
   public UserOperationLogQuery processDefinitionId(String processDefinitionId) {
-    assertParamNotNull("processDefinitionId", processDefinitionId);
+    ensureNotNull("processDefinitionId", processDefinitionId);
     this.processDefinitionId = processDefinitionId;
     return this;
   }
 
+  public UserOperationLogQuery processDefinitionKey(String processDefinitionKey) {
+    ensureNotNull("processDefinitionKey", processDefinitionKey);
+    this.processDefinitionKey = processDefinitionKey;
+    return this;
+  }
+
   public UserOperationLogQuery processInstanceId(String processInstanceId) {
-    assertParamNotNull("processInstanceId", processInstanceId);
+    ensureNotNull("processInstanceId", processInstanceId);
     this.processInstanceId = processInstanceId;
     return this;
   }
 
   public UserOperationLogQuery executionId(String executionId) {
-    assertParamNotNull("executionId", executionId);
+    ensureNotNull("executionId", executionId);
     this.executionId = executionId;
     return this;
   }
 
+  public UserOperationLogQuery caseDefinitionId(String caseDefinitionId) {
+    ensureNotNull("caseDefinitionId", caseDefinitionId);
+    this.caseDefinitionId = caseDefinitionId;
+    return this;
+  }
+
+  public UserOperationLogQuery caseInstanceId(String caseInstanceId) {
+    ensureNotNull("caseInstanceId", caseInstanceId);
+    this.caseInstanceId = caseInstanceId;
+    return this;
+  }
+
+  public UserOperationLogQuery caseExecutionId(String caseExecutionId) {
+    ensureNotNull("caseExecutionId", caseExecutionId);
+    this.caseExecutionId = caseExecutionId;
+    return this;
+  }
+
+
   public UserOperationLogQuery taskId(String taskId) {
-    assertParamNotNull("taskId", taskId);
+    ensureNotNull("taskId", taskId);
     this.taskId = taskId;
     return this;
   }
 
   public UserOperationLogQuery userId(String userId) {
-    assertParamNotNull("userId", userId);
+    ensureNotNull("userId", userId);
     this.userId = userId;
     return this;
   }
 
   public UserOperationLogQuery operationId(String operationId) {
-    assertParamNotNull("operationId", operationId);
+    ensureNotNull("operationId", operationId);
     this.operationId = operationId;
     return this;
   }
 
   public UserOperationLogQuery operationType(String operationType) {
-    assertParamNotNull("operationType", operationType);
+    ensureNotNull("operationType", operationType);
     this.operationType = operationType;
     return this;
   }
 
   public UserOperationLogQuery property(String property) {
-    assertParamNotNull("property", property);
+    ensureNotNull("property", property);
     this.property = property;
     return this;
   }
 
   public UserOperationLogQuery entityType(String entityType) {
-    assertParamNotNull("entityType", entityType);
+    ensureNotNull("entityType", entityType);
     this.entityType = entityType;
     return this;
   }

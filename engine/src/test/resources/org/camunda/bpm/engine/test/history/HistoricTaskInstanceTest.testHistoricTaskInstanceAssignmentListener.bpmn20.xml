@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="taskAssigneeExample" 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:camunda="http://activiti.org/bpmn"
+  targetNamespace="Examples">
+  
+  <process id="testProcess">
+  
+    <startEvent id="start" />
+    
+    <sequenceFlow id="flow1" sourceRef="start" targetRef="task" />
+
+    <userTask id="task" name="Clean up">
+      <extensionElements>
+        <camunda:taskListener event="create" class="org.camunda.bpm.engine.test.history.SetAssigneeListener" />
+      </extensionElements>
+    </userTask>
+    
+    <sequenceFlow id="flow2" sourceRef="task" targetRef="end" />
+    
+    <endEvent id="end" />
+    
+  </process>
+
+</definitions>

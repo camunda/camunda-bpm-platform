@@ -12,9 +12,11 @@
  */
 package org.camunda.bpm.engine.history;
 
+import org.camunda.bpm.engine.variable.value.TypedValue;
+
 /**
  * A single process variable containing the last value when its process instance has finished.
- * It is only available when HISTORY_LEVEL is set >= VARIABLE
+ * It is only available when HISTORY_LEVEL is set >= AUDIT
  *
  * @author Christian Lipphardt (camunda)
  * @author ruecker
@@ -27,20 +29,44 @@ public interface HistoricVariableInstance {
   String getId();
 
   /**
-   * Returns the name of <code>this</code> variable instance.
+   * Returns the name of this variable instance.
    */
+  String getName();
+
+  /**
+   * Returns the name of the type of this variable instance
+   *
+   * @return the type name of the variable
+   */
+  String getTypeName();
+
+  /**
+   * Returns the value of this variable instance.
+   */
+  Object getValue();
+
+  /**
+   * Returns the {@link TypedValue} of this variable instance.
+   */
+  TypedValue getTypedValue();
+
+  /**
+   * Returns the name of this variable instance.
+   *
+   * <p>Deprecated since 7.2: use {@link #getName()} instead.</p>
+   *
+   */
+   @Deprecated
   String getVariableName();
 
   /**
-   * Returns the name of the type of <code>this</code> variable instance
+   * <p>Returns the name of the type of this variable instance</p>
+   *
+   * <p>Deprecated since 7.2: use {@link #getTypeName()} instead.</p>
    *
    */
+  @Deprecated
   String getVariableTypeName();
-
-  /**
-   * Returns the value of <code>this</code> variable instance.
-   */
-  Object getValue();
 
   /**
    * The process instance reference.
@@ -50,12 +76,27 @@ public interface HistoricVariableInstance {
   /**
    * Returns the corresponding activity instance id.
    */
+  @Deprecated
   String getActivtyInstanceId();
+
+  /**
+   * Returns the corresponding activity instance id.
+   */
+  String getActivityInstanceId();
+
+  /**
+   * The case instance reference.
+   */
+  String getCaseInstanceId();
+
+  /**
+   * Return the corresponding case execution id.
+   */
+  String getCaseExecutionId();
 
   /**
    * If the variable value could not be loaded, this returns the error message.
    * @return an error message indicating why the variable value could not be loaded.
    */
   String getErrorMessage();
-
 }

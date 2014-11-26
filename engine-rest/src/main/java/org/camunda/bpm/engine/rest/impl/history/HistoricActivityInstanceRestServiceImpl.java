@@ -24,23 +24,33 @@ import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricActivityInstanceDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricActivityInstanceQueryDto;
 import org.camunda.bpm.engine.rest.history.HistoricActivityInstanceRestService;
+import org.camunda.bpm.engine.rest.sub.history.HistoricActivityInstanceResource;
+import org.camunda.bpm.engine.rest.sub.history.impl.HistoricActivityInstanceResourceImpl;
+import org.codehaus.jackson.map.ObjectMapper;
 
 public class HistoricActivityInstanceRestServiceImpl implements HistoricActivityInstanceRestService {
 
+  protected ObjectMapper objectMapper;
   protected ProcessEngine processEngine;
 
-  public HistoricActivityInstanceRestServiceImpl(ProcessEngine processEngine) {
+  public HistoricActivityInstanceRestServiceImpl(ObjectMapper objectMapper, ProcessEngine processEngine) {
+    this.objectMapper = objectMapper;
     this.processEngine = processEngine;
+  }
+
+  public HistoricActivityInstanceResource getHistoricCaseInstance(String activityInstanceId) {
+    return new HistoricActivityInstanceResourceImpl(processEngine, activityInstanceId);
   }
 
   @Override
   public List<HistoricActivityInstanceDto> getHistoricActivityInstances(UriInfo uriInfo, Integer firstResult, Integer maxResults) {
-    HistoricActivityInstanceQueryDto queryHistoricActivityInstanceDto = new HistoricActivityInstanceQueryDto(uriInfo.getQueryParameters());
+    HistoricActivityInstanceQueryDto queryHistoricActivityInstanceDto = new HistoricActivityInstanceQueryDto(objectMapper, uriInfo.getQueryParameters());
     return queryHistoricActivityInstances(queryHistoricActivityInstanceDto, firstResult, maxResults);
   }
 
   @Override
   public List<HistoricActivityInstanceDto> queryHistoricActivityInstances(HistoricActivityInstanceQueryDto queryDto, Integer firstResult, Integer maxResults) {
+    queryDto.setObjectMapper(objectMapper);
     HistoricActivityInstanceQuery query = queryDto.toQuery(processEngine);
 
     List<HistoricActivityInstance> matchingHistoricActivityInstances;
@@ -70,12 +80,13 @@ public class HistoricActivityInstanceRestServiceImpl implements HistoricActivity
 
   @Override
   public CountResultDto getHistoricActivityInstancesCount(UriInfo uriInfo) {
-    HistoricActivityInstanceQueryDto queryDto = new HistoricActivityInstanceQueryDto(uriInfo.getQueryParameters());
+    HistoricActivityInstanceQueryDto queryDto = new HistoricActivityInstanceQueryDto(objectMapper, uriInfo.getQueryParameters());
     return queryHistoricActivityInstancesCount(queryDto);
   }
 
   @Override
   public CountResultDto queryHistoricActivityInstancesCount(HistoricActivityInstanceQueryDto queryDto) {
+    queryDto.setObjectMapper(objectMapper);
     HistoricActivityInstanceQuery query = queryDto.toQuery(processEngine);
 
     long count = query.count();

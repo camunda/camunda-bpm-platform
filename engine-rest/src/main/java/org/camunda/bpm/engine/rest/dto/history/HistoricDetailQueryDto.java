@@ -22,6 +22,7 @@ import org.camunda.bpm.engine.history.HistoricDetailQuery;
 import org.camunda.bpm.engine.rest.dto.AbstractQueryDto;
 import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
 import org.camunda.bpm.engine.rest.dto.converter.BooleanConverter;
+import org.codehaus.jackson.map.ObjectMapper;
 
 /**
  * @author Roman Smirnov
@@ -50,6 +51,8 @@ public class HistoricDetailQueryDto extends AbstractQueryDto<HistoricDetailQuery
   protected String processInstanceId;
   protected String executionId;
   protected String activityInstanceId;
+  protected String caseInstanceId;
+  protected String caseExecutionId;
   protected String variableInstanceId;
   protected String taskId;
   protected Boolean formFields;
@@ -59,8 +62,8 @@ public class HistoricDetailQueryDto extends AbstractQueryDto<HistoricDetailQuery
   public HistoricDetailQueryDto() {
   }
 
-  public HistoricDetailQueryDto(MultivaluedMap<String, String> queryParameters) {
-    super(queryParameters);
+  public HistoricDetailQueryDto(ObjectMapper objectMapper, MultivaluedMap<String, String> queryParameters) {
+    super(objectMapper, queryParameters);
   }
 
   @CamundaQueryParam(value = "processInstanceId")
@@ -76,6 +79,16 @@ public class HistoricDetailQueryDto extends AbstractQueryDto<HistoricDetailQuery
   @CamundaQueryParam(value = "activityInstanceId")
   public void setActivityInstanceId(String activityInstanceId) {
     this.activityInstanceId = activityInstanceId;
+  }
+
+  @CamundaQueryParam(value = "caseInstanceId")
+  public void setCaseInstanceId(String caseInstanceId) {
+    this.caseInstanceId = caseInstanceId;
+  }
+
+  @CamundaQueryParam(value = "caseExecutionId")
+  public void setCaseExecutionId(String caseExecutionId) {
+    this.caseExecutionId = caseExecutionId;
   }
 
   @CamundaQueryParam(value = "variableInstanceId")
@@ -123,6 +136,12 @@ public class HistoricDetailQueryDto extends AbstractQueryDto<HistoricDetailQuery
     }
     if (activityInstanceId != null) {
       query.activityInstanceId(activityInstanceId);
+    }
+    if (caseInstanceId != null) {
+      query.caseInstanceId(caseInstanceId);
+    }
+    if (caseExecutionId != null) {
+      query.caseExecutionId(caseExecutionId);
     }
     if (variableInstanceId != null) {
       query.variableInstanceId(variableInstanceId);

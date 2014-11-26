@@ -13,6 +13,7 @@
 
 package org.camunda.bpm.engine;
 
+import java.util.Collection;
 import java.util.Map;
 
 import org.camunda.bpm.engine.form.StartFormData;
@@ -21,6 +22,7 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
+import org.camunda.bpm.engine.variable.VariableMap;
 
 
 /** Access to form data and rendered forms for starting new process instances and completing tasks.
@@ -96,6 +98,62 @@ public interface FormService {
    * @param properties
    */
   void submitTaskForm(String taskId, Map<String, Object> properties);
+
+  /**
+   * Retrieves a list of all variables for rendering a start from. The method takes into account
+   * FormData specified for the start event. This allows defining default values for form fields.
+   *
+   * @param processDefinitionId the id of the process definition for which the start form should be retrieved.
+   * @return a map of VariableInstances.
+   */
+  VariableMap getStartFormVariables(String processDefinitionId);
+
+  /**
+   * Retrieves a list of requested variables for rendering a start from. The method takes into account
+   * FormData specified for the start event. This allows defining default values for form fields.
+   *
+   * @param processDefinitionId the id of the process definition for which the start form should be retrieved.
+   * @param formVariables a Collection of the names of the variables to retrieve. Allows restricting the set of retrieved variables.
+   * @param deserializeObjectValues if false object values are not deserialized
+   * @return a map of VariableInstances.
+   */
+  VariableMap getStartFormVariables(String processDefinitionId, Collection<String> formVariables, boolean deserializeObjectValues);
+
+  /**
+   * <p>Retrieves a list of all variables for rendering a task form. In addition to the task variables and process variables,
+   * the method takes into account FormData specified for the task. This allows defining default values for form fields.</p>
+   *
+   * <p>A variable is resolved in the following order:
+   * <ul>
+   *   <li>First, the method collects all form fields and creates variable instances for the form fields.</li>
+   *   <li>Next, the task variables are collected.</li>
+   *   <li>Next, process variables from the parent scopes of the task are collected, until the process instance scope is reached.</li>
+   * </ul>
+   * </p>
+   *
+   * @param taskId the id of the task for which the variables should be retrieved.
+   * @return a map of VariableInstances.
+   */
+  VariableMap getTaskFormVariables(String taskId);
+
+  /**
+   * <p>Retrieves a list of requested variables for rendering a task form. In addition to the task variables and process variables,
+   * the method takes into account FormData specified for the task. This allows defining default values for form fields.</p>
+   *
+   * <p>A variable is resolved in the following order:
+   * <ul>
+   *   <li>First, the method collects all form fields and creates variable instances for the form fields.</li>
+   *   <li>Next, the task variables are collected.</li>
+   *   <li>Next, process variables from the parent scopes of the task are collected, until the process instance scope is reached.</li>
+   * </ul>
+   * </p>
+   *
+   * @param taskId the id of the task for which the variables should be retrieved.
+   * @param formVariables a Collection of the names of the variables to retrieve. Allows restricting the set of retrieved variables.
+   * @param deserializeObjectValues if false object values are not deserialized
+   * @return a map of VariableInstances.
+   */
+  VariableMap getTaskFormVariables(String taskId, Collection<String> formVariables, boolean deserializeObjectValues);
 
   /**
    * Retrieves a user defined reference to a start form.

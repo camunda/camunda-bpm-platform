@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,32 +18,32 @@ import javax.persistence.EntityManagerFactory;
 
 import org.camunda.bpm.engine.impl.interceptor.Session;
 import org.camunda.bpm.engine.impl.interceptor.SessionFactory;
-import org.camunda.bpm.engine.impl.variable.EntityManagerSession;
-import org.camunda.bpm.engine.impl.variable.EntityManagerSessionImpl;
+import org.camunda.bpm.engine.impl.variable.serializer.jpa.EntityManagerSession;
+import org.camunda.bpm.engine.impl.variable.serializer.jpa.EntityManagerSessionImpl;
 import org.springframework.orm.jpa.EntityManagerFactoryUtils;
 
 
 /**
  * Session Factory for {@link EntityManagerSession}.
- * 
+ *
  * Must be used when the {@link EntityManagerFactory} is managed by Spring.
- * This implementation will retrieve the {@link EntityManager} bound to the 
+ * This implementation will retrieve the {@link EntityManager} bound to the
  * thread by Spring in case a transaction already started.
- * 
+ *
  * @author Joram Barrez
  */
 public class SpringEntityManagerSessionFactory implements SessionFactory {
-  
+
   protected EntityManagerFactory entityManagerFactory;
   protected boolean handleTransactions;
   protected boolean closeEntityManager;
-  
+
   public SpringEntityManagerSessionFactory(Object entityManagerFactory, boolean handleTransactions, boolean closeEntityManager) {
     this.entityManagerFactory = (EntityManagerFactory) entityManagerFactory;
     this.handleTransactions = handleTransactions;
     this.closeEntityManager = closeEntityManager;
   }
-  
+
   public Class< ? > getSessionType() {
     return EntityManagerFactory.class;
   }

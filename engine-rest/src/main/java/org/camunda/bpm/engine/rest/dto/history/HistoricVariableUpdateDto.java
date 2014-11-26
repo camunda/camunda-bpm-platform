@@ -12,10 +12,10 @@
  */
 package org.camunda.bpm.engine.rest.dto.history;
 
+import java.util.Map;
+
 import org.camunda.bpm.engine.history.HistoricVariableUpdate;
-import org.camunda.bpm.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity;
-import org.camunda.bpm.engine.impl.variable.SerializableType;
-import org.camunda.bpm.engine.rest.dto.runtime.SerializedObjectDto;
+import org.camunda.bpm.engine.rest.dto.VariableValueDto;
 
 /**
  * @author Roman Smirnov
@@ -24,8 +24,10 @@ import org.camunda.bpm.engine.rest.dto.runtime.SerializedObjectDto;
 public class HistoricVariableUpdateDto extends HistoricDetailDto {
 
   protected String variableName;
-  protected String variableTypeName;
+  protected String variableType;
   protected Object value;
+  protected Map<String, Object> valueInfo;
+
   protected int revision;
   protected String errorMessage;
 
@@ -33,8 +35,8 @@ public class HistoricVariableUpdateDto extends HistoricDetailDto {
     return variableName;
   }
 
-  public String getVariableTypeName() {
-    return variableTypeName;
+  public String getVariableType() {
+    return variableType;
   }
 
   public Object getValue() {
@@ -49,24 +51,27 @@ public class HistoricVariableUpdateDto extends HistoricDetailDto {
     return errorMessage;
   }
 
-  public static HistoricVariableUpdateDto fromHistoricVariableUpdate(HistoricVariableUpdate historicVariableUpdate) {
+  public Map<String, Object> getValueInfo() {
+    return valueInfo;
+  }
 
-    HistoricDetailVariableInstanceUpdateEntity entity = (HistoricDetailVariableInstanceUpdateEntity) historicVariableUpdate;
+  public static HistoricVariableUpdateDto fromHistoricVariableUpdate(HistoricVariableUpdate historicVariableUpdate) {
 
     HistoricVariableUpdateDto dto = new HistoricVariableUpdateDto();
 
-    dto.revision = entity.getRevision();
-    dto.variableName = entity.getVariableName();
-    dto.variableTypeName = entity.getVariableTypeName();
-    if(SerializableType.TYPE_NAME.equals(entity.getVariableType().getTypeName())) {
-      if(entity.getValue() != null) {
-        dto.value = new SerializedObjectDto(entity.getValue());
-      }
-    } else {
-      dto.value = entity.getValue();
+    dto.revision = historicVariableUpdate.getRevision();
+    dto.variableName = historicVariableUpdate.getVariableName();
+
+    if(historicVariableUpdate.getErrorMessage() == null) {
+      VariableValueDto variableValueDto = VariableValueDto.fromTypedValue(historicVariableUpdate.getTypedValue());
+      dto.value = variableValueDto.getValue();
+      dto.variableType = variableValueDto.getType();
+      dto.valueInfo = variableValueDto.getValueInfo();
     }
-    dto.variableTypeName = entity.getVariableType().getTypeNameForValue(entity.getValue());
-    dto.errorMessage = entity.getErrorMessage();
+    else {
+      dto.errorMessage = historicVariableUpdate.getErrorMessage();
+      dto.variableType = VariableValueDto.toRestApiTypeName(historicVariableUpdate.getTypeName());
+    }
 
     return dto;
   }

@@ -21,6 +21,8 @@ public class ListQueryParameterObject extends AuthorizationCheck {
 
   private static final long serialVersionUID = 1L;
 
+  public static final String DEFAULT_ORDER_BY = "RES.ID_ asc";
+
   protected int maxResults = Integer.MAX_VALUE;
   protected int firstResult = 0;
   protected String orderBy;
@@ -74,7 +76,7 @@ public class ListQueryParameterObject extends AuthorizationCheck {
   public String getOrderBy() {
     if(orderBy == null) {
       // the default order column
-      return "RES.ID_ asc";
+      return DEFAULT_ORDER_BY;
 
     }else {
       return orderBy;

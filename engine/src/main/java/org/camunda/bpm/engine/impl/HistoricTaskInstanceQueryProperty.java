@@ -45,6 +45,9 @@ public class HistoricTaskInstanceQueryProperty implements QueryProperty {
   public static final HistoricTaskInstanceQueryProperty TASK_PRIORITY = new HistoricTaskInstanceQueryProperty("PRIORITY_");
   public static final HistoricTaskInstanceQueryProperty TASK_DUE_DATE = new HistoricTaskInstanceQueryProperty("DUE_DATE_");
   public static final HistoricTaskInstanceQueryProperty TASK_FOLLOW_UP_DATE = new HistoricTaskInstanceQueryProperty("FOLLOW_UP_DATE_");
+  public static final HistoricTaskInstanceQueryProperty CASE_DEFINITION_ID = new HistoricTaskInstanceQueryProperty("CASE_DEFINITION_ID_");
+  public static final HistoricTaskInstanceQueryProperty CASE_INSTANCE_ID = new HistoricTaskInstanceQueryProperty("CASE_INSTANCE_ID_");
+  public static final HistoricTaskInstanceQueryProperty CASE_EXECUTION_ID = new HistoricTaskInstanceQueryProperty("CASE_EXECUTION_ID_");
 
   private String name;
 

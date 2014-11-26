@@ -12,9 +12,10 @@
  */
 package org.camunda.bpm.engine.impl.persistence.entity;
 
-import org.camunda.bpm.engine.impl.variable.AbstractVariableStore;
-
 import java.util.List;
+import java.util.Map;
+
+import org.camunda.bpm.engine.impl.variable.AbstractPersistentVariableStore;
 
 /**
  * @author Daniel Meyer
@@ -22,7 +23,7 @@ import java.util.List;
  * @author Sebastian Menski
  *
  */
-public class ExecutionEntityVariableStore extends AbstractVariableStore {
+public class ExecutionEntityVariableStore extends AbstractPersistentVariableStore {
 
   private static final long serialVersionUID = 1L;
 
@@ -43,4 +44,9 @@ public class ExecutionEntityVariableStore extends AbstractVariableStore {
   protected boolean isAutoFireHistoryEvents() {
     return executionEntity.isAutoFireHistoryEvents();
   }
+
+  public Map<String, VariableInstanceEntity> getVariableInstancesWithoutInitialization() {
+    return variableInstances;
+  }
+
 }

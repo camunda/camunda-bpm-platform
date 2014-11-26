@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -12,64 +12,50 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 import java.io.Serializable;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.core.variable.VariableMapImpl;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.variable.VariableMap;
 
 
 /**
  * @author Tom Baeyens
+ * @author Daniel Meyer
  */
-public class GetExecutionVariablesCmd implements Command<Map<String, Object>>, Serializable {
+public class GetExecutionVariablesCmd implements Command<VariableMap>, Serializable {
 
   private static final long serialVersionUID = 1L;
   protected String executionId;
   protected Collection<String> variableNames;
   protected boolean isLocal;
+  protected boolean deserializeValues;
 
-  public GetExecutionVariablesCmd(String executionId, Collection<String> variableNames, boolean isLocal) {
+  public GetExecutionVariablesCmd(String executionId, Collection<String> variableNames, boolean isLocal, boolean deserializeValues) {
     this.executionId = executionId;
     this.variableNames = variableNames;
     this.isLocal = isLocal;
+    this.deserializeValues = deserializeValues;
   }
 
-  public Map<String, Object> execute(CommandContext commandContext) {
-    if(executionId == null) {
-      throw new ProcessEngineException("executionId is null");
-    }
-    
+  public VariableMap execute(CommandContext commandContext) {
+    ensureNotNull("executionId", executionId);
+
     ExecutionEntity execution = commandContext
       .getExecutionManager()
       .findExecutionById(executionId);
-    
-    if (execution==null) {
-      throw new ProcessEngineException("execution "+executionId+" doesn't exist");
-    }
 
-    Map<String, Object> executionVariables;
-    if (isLocal) {
-      executionVariables = execution.getVariablesLocal();
-    } else {
-      executionVariables = execution.getVariables();
-    }
-    
-    if (variableNames != null && variableNames.size() > 0) {
-      // if variableNames is not empty, return only variable names mentioned in it
-      Map<String, Object> tempVariables = new HashMap<String, Object>();
-      for (String variableName: variableNames) {
-        if (executionVariables.containsKey(variableName)) {
-          tempVariables.put(variableName, executionVariables.get(variableName));
-        }
-      }
-      executionVariables = tempVariables;
-    }
-    
+    ensureNotNull("execution " + executionId + " doesn't exist", "execution", execution);
+
+    VariableMapImpl executionVariables = new VariableMapImpl();
+
+    // collect variables from execution
+    execution.collectVariables(executionVariables, variableNames, isLocal, deserializeValues);
+
     return executionVariables;
   }
 }

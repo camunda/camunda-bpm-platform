@@ -24,6 +24,7 @@ import org.camunda.bpm.engine.rest.dto.AbstractQueryDto;
 import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
 import org.camunda.bpm.engine.rest.dto.converter.BooleanConverter;
 import org.camunda.bpm.engine.rest.dto.converter.DateConverter;
+import org.codehaus.jackson.map.ObjectMapper;
 
 public class HistoricActivityInstanceQueryDto extends AbstractQueryDto<HistoricActivityInstanceQuery> {
 
@@ -73,8 +74,8 @@ public class HistoricActivityInstanceQueryDto extends AbstractQueryDto<HistoricA
   public HistoricActivityInstanceQueryDto() {
   }
 
-  public HistoricActivityInstanceQueryDto(MultivaluedMap<String, String> queryParameters) {
-    super(queryParameters);
+  public HistoricActivityInstanceQueryDto(ObjectMapper objectMapper, MultivaluedMap<String, String> queryParameters) {
+    super(objectMapper, queryParameters);
   }
 
   @CamundaQueryParam("activityInstanceId")

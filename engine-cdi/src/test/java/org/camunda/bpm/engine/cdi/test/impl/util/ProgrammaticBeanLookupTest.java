@@ -3,7 +3,7 @@ package org.camunda.bpm.engine.cdi.test.impl.util;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.*;
 
 import javax.enterprise.inject.Alternative;
 import javax.inject.Named;
@@ -21,9 +21,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
- * 
+ *
  * @author Ronny Bräunlich
- * 
+ *
  */
 @RunWith(Arquillian.class)
 public class ProgrammaticBeanLookupTest {
@@ -60,6 +60,15 @@ public class ProgrammaticBeanLookupTest {
         .addAsManifestResource("org/camunda/bpm/engine/cdi/test/impl/util/beans.xml", "beans.xml");
   }
 
+  @Deployment(name = "withProducerMethod", managed = false)
+  public static JavaArchive createDeploymentWithProducerMethod() {
+    return ShrinkWrap.create(JavaArchive.class)
+        .addClass(ProgrammaticBeanLookup.class)
+        .addClass(ProcessEngineServicesProducer.class)
+        .addClass(BeanWithProducerMethods.class)
+        .addAsManifestResource("org/camunda/bpm/engine/cdi/test/impl/util/beans.xml", "beans.xml");
+  }
+
   @Test
   public void testLookupBean() {
     deployer.deploy("normal");
@@ -84,6 +93,13 @@ public class ProgrammaticBeanLookupTest {
     assertThat(lookup.getClass().getName(),
         is(equalTo(SpecializedTestBean.class.getName())));
     deployer.undeploy("withSpecialization");
+  }
+
+  @Test
+  public void testLookupShouldSupportProducerMethods() {
+    deployer.deploy("withProducerMethod");
+    assertEquals("exampleString", ProgrammaticBeanLookup.lookup("producedString"));
+    deployer.undeploy("withProducerMethod");
   }
 
   @Named("testOnly")

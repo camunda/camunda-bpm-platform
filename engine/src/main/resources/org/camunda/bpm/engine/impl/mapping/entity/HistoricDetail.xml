@@ -37,18 +37,20 @@
   
   <insert id="insertHistoricVariableUpdateEvent" parameterType="org.camunda.bpm.engine.impl.history.event.HistoricVariableUpdateEventEntity">
   
-    insert into ${prefix}ACT_HI_DETAIL (ID_, TYPE_, PROC_INST_ID_, EXECUTION_ID_, ACT_INST_ID_, TASK_ID_, NAME_, REV_, VAR_INST_ID_, VAR_TYPE_, TIME_, BYTEARRAY_ID_, DOUBLE_, LONG_ , TEXT_, TEXT2_)
+    insert into ${prefix}ACT_HI_DETAIL (ID_, TYPE_, PROC_INST_ID_, EXECUTION_ID_, ACT_INST_ID_, CASE_INST_ID_, CASE_EXECUTION_ID_, TASK_ID_, NAME_, REV_, VAR_INST_ID_, VAR_TYPE_, TIME_, BYTEARRAY_ID_, DOUBLE_, LONG_ , TEXT_, TEXT2_)
     values (
       #{id, jdbcType=VARCHAR},
       'VariableUpdate',
       #{processInstanceId, jdbcType=VARCHAR},
       #{executionId, jdbcType=VARCHAR},
       #{activityInstanceId, jdbcType=VARCHAR},
-      #{taskId, jdbcType=VARCHAR},      
+      #{caseInstanceId, jdbcType=VARCHAR},
+      #{caseExecutionId, jdbcType=VARCHAR},
+      #{taskId, jdbcType=VARCHAR},
       #{variableName, jdbcType=VARCHAR},
       #{revision, jdbcType=VARCHAR},
       #{variableInstanceId, jdbcType=VARCHAR},
-      #{variableTypeName, jdbcType=VARCHAR},      
+      #{serializerName, jdbcType=VARCHAR},   
       #{timestamp, jdbcType=TIMESTAMP},     
       #{byteArrayId, jdbcType=VARCHAR},
       #{doubleValue, jdbcType=DOUBLE},
@@ -63,24 +65,6 @@
   <delete id="deleteHistoricDetailVariableInstanceUpdate">
     delete from ${prefix}ACT_HI_DETAIL where ID_ = #{id}
   </delete>
-  
-  <delete id="deleteHistoricDetailsByProcessInstanceId_byteArray" >
-    delete from ${prefix}ACT_GE_BYTEARRAY where ID_ in
-        (select BYTEARRAY_ID_ from ${prefix}ACT_HI_DETAIL where PROC_INST_ID_ = #{id})
-  </delete>
-  
-  <delete id="deleteHistoricDetailsByProcessInstanceId">
-    delete from ${prefix}ACT_HI_DETAIL where PROC_INST_ID_ = #{id}
-  </delete>
-  
-  <delete id="deleteHistoricDetailsByTaskId">
-    delete from ${prefix}ACT_HI_DETAIL where TASK_ID_ = #{id}
-  </delete>
-  
-  <delete id="deleteHistoricDetailsByTaskId_byteArray" >
-    delete from ${prefix}ACT_GE_BYTEARRAY where ID_ in
-        (select BYTEARRAY_ID_ from ${prefix}ACT_HI_DETAIL where TASK_ID_ = #{id})
-  </delete>
     
   <delete id="deleteHistoricFormProperty">
     delete from ${prefix}ACT_HI_DETAIL where ID_ = #{id}
@@ -91,6 +75,8 @@
     <id property="id" column="ID_" jdbcType="VARCHAR" />
     <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR" />
     <result property="executionId" column="EXECUTION_ID_" jdbcType="VARCHAR" />
+    <result property="caseInstanceId" column="CASE_INST_ID_" jdbcType="VARCHAR" />
+    <result property="caseExecutionId" column="CASE_EXECUTION_ID_" jdbcType="VARCHAR" />
     <result property="timestamp" column="TIME_" jdbcType="TIMESTAMP" />
     <result property="activityInstanceId" column="ACT_INST_ID_" jdbcType="VARCHAR" />
     <result property="taskId" column="TASK_ID_" jdbcType="VARCHAR" />
@@ -103,7 +89,7 @@
   <resultMap id="historicVariableUpdateResultMap" extends="historicDetailResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity">
     <result property="variableName" column="NAME_" javaType="String" jdbcType="VARCHAR" />
     <result property="revision" column="REV_" jdbcType="INTEGER" />
-    <result property="variableType" column="VAR_TYPE_" javaType="org.camunda.bpm.engine.impl.variable.VariableType" jdbcType="VARCHAR"/>
+    <result property="serializerName" column="VAR_TYPE_" jdbcType="VARCHAR"/>
     <result property="byteArrayId" column="BYTEARRAY_ID_" jdbcType="VARCHAR" />
     <result property="doubleValue" column="DOUBLE_" jdbcType="DOUBLE" />
     <result property="textValue" column="TEXT_" jdbcType="VARCHAR" />
@@ -116,6 +102,8 @@
     <id property="id" column="ID_" jdbcType="VARCHAR" />
     <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR" />
     <result property="executionId" column="EXECUTION_ID_" jdbcType="VARCHAR" />
+    <result property="caseInstanceId" column="CASE_INST_ID_" jdbcType="VARCHAR" />
+    <result property="caseExecutionId" column="CASE_EXECUTION_ID_" jdbcType="VARCHAR" />
     <result property="processDefinitionId" column="PROC_DEF_ID_" jdbcType="VARCHAR" />
     <result property="timestamp" column="TIME_" jdbcType="TIMESTAMP" />
     <result property="activityInstanceId" column="ACT_INST_ID_" jdbcType="VARCHAR" />
@@ -130,7 +118,7 @@
     <result property="variableName" column="NAME_" javaType="String" jdbcType="VARCHAR" />
     <result property="variableInstanceId" column="VAR_INST_ID_" javaType="String" jdbcType="VARCHAR" />
     <result property="revision" column="REV_" jdbcType="INTEGER" />
-    <result property="variableType" column="VAR_TYPE_" javaType="org.camunda.bpm.engine.impl.variable.VariableType" jdbcType="VARCHAR"/>
+    <result property="serializerName" column="VAR_TYPE_" jdbcType="VARCHAR"/>
     <result property="byteArrayId" column="BYTEARRAY_ID_" jdbcType="VARCHAR" />
     <result property="doubleValue" column="DOUBLE_" jdbcType="DOUBLE" />
     <result property="textValue" column="TEXT_" jdbcType="VARCHAR" />
@@ -144,6 +132,21 @@
   </resultMap>
 
   <!-- HISTORIC VARIABLE UPDATE SELECT -->
+  
+  <select id="selectHistoricDetailsByProcessInstanceId" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="historicDetailResultMap">
+    select * from ${prefix}ACT_HI_DETAIL 
+    where PROC_INST_ID_ = #{parameter, jdbcType=VARCHAR}
+  </select>
+
+  <select id="selectHistoricDetailsByCaseInstanceId" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="historicDetailResultMap">
+    select * from ${prefix}ACT_HI_DETAIL
+    where CASE_INST_ID_ = #{parameter, jdbcType=VARCHAR}
+  </select>
+
+  <select id="selectHistoricDetailsByTaskId" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="historicDetailResultMap">
+    select * from ${prefix}ACT_HI_DETAIL 
+    where TASK_ID_ = #{parameter, jdbcType=VARCHAR}
+  </select>
 
   <select id="selectHistoricDetailsByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.HistoricDetailQueryImpl" resultMap="historicDetailResultMap">
   	${limitBefore}
@@ -175,8 +178,14 @@
       <if test="processInstanceId != null">
         RES.PROC_INST_ID_ = #{processInstanceId}
       </if>
+      <if test="caseInstanceId != null">
+        RES.CASE_INST_ID_ = #{caseInstanceId}
+      </if>
       <if test="executionId != null">
         RES.EXECUTION_ID_ = #{executionId}
+      </if>
+      <if test="caseExecutionId != null">
+        RES.CASE_EXECUTION_ID_ = #{caseExecutionId}
       </if>
       <if test="activityId != null">
         and RES.ACT_INST_ID_ = #{activityId}
