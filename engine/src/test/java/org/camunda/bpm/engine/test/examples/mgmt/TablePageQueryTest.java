@@ -79,7 +79,9 @@ public class TablePageQueryTest extends PluggableProcessEngineTestCase {
     String columnKey = "NAME_";
 
     // mybatis will return the correct case for postgres table columns from version 3.0.6 on
-    if (processEngineConfiguration.getDatabaseType().equals("postgres")) {
+    // informix meta data is not case sensitive, always lower case
+    if (processEngineConfiguration.getDatabaseType().equals("postgres")
+     || processEngineConfiguration.getDatabaseType().equals("informix")) {
       columnKey = "name_";
     }
     

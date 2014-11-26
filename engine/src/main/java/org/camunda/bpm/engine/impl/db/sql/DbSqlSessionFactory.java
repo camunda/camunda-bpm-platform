@@ -38,6 +38,7 @@ public class DbSqlSessionFactory implements SessionFactory {
   private static final String H2 = "h2";
   private static final String MYSQL = "mysql";
   private static final String POSTGRES = "postgres";
+  private static final String INFORMIX = "informix";
 
   protected static final Map<String, Map<String, String>> databaseSpecificStatements = new HashMap<String, Map<String,String>>();
 
@@ -225,6 +226,26 @@ public class DbSqlSessionFactory implements SessionFactory {
     constants.put("constant.event", "'event'");
     constants.put("constant.op_message", "NEW_VALUE_ + '_|_' + PROPERTY_");
     dbSpecificConstants.put(MSSQL, constants);
+
+    // informix
+    databaseSpecificLimitBeforeStatements.put(INFORMIX, "SELECT SKIP #{firstResult} FIRST #{maxResults} * FROM (");
+    databaseSpecificLimitAfterStatements.put(INFORMIX, ")");
+    databaseSpecificLimitBetweenStatements.put(INFORMIX, "");
+    databaseSpecificLimitBetweenClobStatements.put(INFORMIX, databaseSpecificLimitBetweenStatements.get(INFORMIX));
+    databaseSpecificOrderByStatements.put(INFORMIX, defaultOrderBy);
+    databaseSpecificLimitBeforeNativeQueryStatements.put(INFORMIX, "");
+    databaseSpecificBitAnd1.put(INFORMIX, "BITAND(");
+    databaseSpecificBitAnd2.put(INFORMIX, ",");
+    databaseSpecificBitAnd3.put(INFORMIX, ")");
+    databaseSpecificDummyTable.put(INFORMIX, "FROM SYSMASTER:SYSDUAL");
+    databaseSpecificTrueConstant.put(INFORMIX, "'t'");
+    databaseSpecificFalseConstant.put(INFORMIX, "'f'");
+
+    constants = new HashMap<String, String>();
+    constants.put("constant.event", "'event'");
+    constants.put("constant.op_message", "NEW_VALUE_ || '_|_' || PROPERTY_");
+    constants.put("constant.for.update", "for update");
+    dbSpecificConstants.put(INFORMIX, constants);
   }
 
   protected String databaseType;
