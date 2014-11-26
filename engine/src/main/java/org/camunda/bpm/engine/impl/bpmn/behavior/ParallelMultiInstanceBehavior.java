@@ -18,13 +18,13 @@ import java.util.logging.Level;
 
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.bpmn.parser.EventSubscriptionDeclaration;
+import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerDeclarationImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
-
 
 /**
  * @author Joram Barrez
@@ -36,10 +36,10 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
   }
 
   /**
-   * Handles the parallel case of spawning the instances.
-   * Will create child executions accordingly for every instance needed.
+   * Handles the parallel case of spawning the instances. Will create child
+   * executions accordingly for every instance needed.
    */
-   protected void createInstances(ActivityExecution execution, int nrOfInstances) throws Exception {
+  protected void createInstances(ActivityExecution execution, int nrOfInstances) throws Exception {
 
     setLoopVariable(execution, NUMBER_OF_INSTANCES, nrOfInstances);
     setLoopVariable(execution, NUMBER_OF_COMPLETED_INSTANCES, 0);
@@ -48,13 +48,14 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
     fixMiRootActivityInstanceId(execution);
 
     List<ActivityExecution> concurrentExecutions = new ArrayList<ActivityExecution>();
-    for (int loopCounter=0; loopCounter<nrOfInstances; loopCounter++) {
+    for (int loopCounter = 0; loopCounter < nrOfInstances; loopCounter++) {
       ActivityExecution concurrentExecution = execution.createExecution(loopCounter != 0);
       concurrentExecution.setActive(true);
       concurrentExecution.setConcurrent(true);
       concurrentExecution.setScope(false);
 
-      // In case of an embedded subprocess, and extra child execution is required
+      // In case of an embedded subprocess, and extra child execution is
+      // required
       // Otherwise, all child executions would end up under the same parent,
       // without any differentiation to which embedded subprocess they belong
       if (isExtraScopeNeeded()) {
@@ -75,8 +76,9 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
       }
 
       // create timer job for the current execution
-      List<TimerDeclarationImpl> timerDeclarations = (List<TimerDeclarationImpl>) concurrentExecution.getActivity().getProperty(BpmnParse.PROPERTYNAME_TIMER_DECLARATION);
-      if (timerDeclarations!=null) {
+      List<TimerDeclarationImpl> timerDeclarations = (List<TimerDeclarationImpl>) concurrentExecution.getActivity().getProperty(
+          BpmnParse.PROPERTYNAME_TIMER_DECLARATION);
+      if (timerDeclarations != null) {
         for (TimerDeclarationImpl timerDeclaration : timerDeclarations) {
           timerDeclaration.createTimerInstanceForParallelMultiInstance((ExecutionEntity) concurrentExecution);
         }
@@ -86,19 +88,27 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
       logLoopDetails(concurrentExecution, "initialized", loopCounter, 0, nrOfInstances, nrOfInstances);
     }
 
-    // Before the activities are executed, all executions MUST be created up front
-    // Do not try to merge this loop with the previous one, as it will lead to bugs,
+    // Before the activities are executed, all executions MUST be created up
+    // front
+    // Do not try to merge this loop with the previous one, as it will lead to
+    // bugs,
     // due to possible child execution pruning.
-    for (int loopCounter=0; loopCounter<nrOfInstances; loopCounter++) {
+    for (int loopCounter = 0; loopCounter < nrOfInstances; loopCounter++) {
       ActivityExecution concurrentExecution = concurrentExecutions.get(loopCounter);
-      // executions can be inactive, if instances are all automatics (no-waitstate)
+      // executions can be inactive, if instances are all automatics
+      // (no-waitstate)
       // and completionCondition has been met in the meantime
-      if (concurrentExecution.isActive() && !concurrentExecution.isEnded()
-              && concurrentExecution.getParent().isActive()
-              && !concurrentExecution.getParent().isEnded()) {
-
-        setLoopVariable(concurrentExecution, LOOP_COUNTER, loopCounter);
-        executeOriginalBehavior(concurrentExecution, loopCounter);
+      if (concurrentExecution.isActive() && !concurrentExecution.isEnded() && concurrentExecution.getParent().isActive()
+          && !concurrentExecution.getParent().isEnded()) {
+        try {
+          setLoopVariable(concurrentExecution, LOOP_COUNTER, loopCounter);
+          //push execution on stack so we can access the local variables
+          Context.setExecutionContext((ExecutionEntity) concurrentExecution);
+          executeOriginalBehavior(concurrentExecution, loopCounter);
+        } finally {
+          //make sure execution is removed again
+          Context.removeExecutionContext();
+        }
       }
     }
 
@@ -115,7 +125,7 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
    */
   public void leave(ActivityExecution execution) {
 
-    if(!isExtraScopeNeeded() && !execution.getActivityInstanceId().equals(execution.getParent().getActivityInstanceId())) {
+    if (!isExtraScopeNeeded() && !execution.getActivityInstanceId().equals(execution.getParent().getActivityInstanceId())) {
       callActivityEndListeners(execution);
     }
 
@@ -126,7 +136,8 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
 
     if (isExtraScopeNeeded()) {
       resetMiRootActivityInstanceId(execution);
-      // In case an extra scope was created, it must be destroyed first before going further
+      // In case an extra scope was created, it must be destroyed first before
+      // going further
       ExecutionEntity extraScope = (ExecutionEntity) execution;
       execution = execution.getParent();
       extraScope.remove();
@@ -148,7 +159,8 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
 
       resetMiRootActivityInstanceId(execution);
 
-      // Removing all active child executions (ie because completionCondition is true)
+      // Removing all active child executions (ie because completionCondition is
+      // true)
       List<ExecutionEntity> executionsToRemove = new ArrayList<ExecutionEntity>();
       for (ActivityExecution childExecution : executionEntity.getParent().getExecutions()) {
         if (childExecution.isActive()) {
@@ -157,8 +169,7 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
       }
       for (ExecutionEntity executionToRemove : executionsToRemove) {
         if (LOGGER.isLoggable(Level.FINE)) {
-          LOGGER.fine("Execution " + executionToRemove + " still active, "
-                  + "but multi-instance is completed. Removing this execution.");
+          LOGGER.fine("Execution " + executionToRemove + " still active, " + "but multi-instance is completed. Removing this execution.");
         }
         executionToRemove.inactivate();
         executionToRemove.deleteCascade("multi-instance completed");
@@ -166,14 +177,13 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
 
       executionEntity.takeAll(activity.getOutgoingTransitions(), joinedExecutions);
     } else {
-      if(isExtraScopeNeeded()) {
+      if (isExtraScopeNeeded()) {
         callActivityEndListeners(execution);
       } else {
         executionEntity.setActivityInstanceId(null);
       }
     }
   }
-
 
   protected void fixMiRootActivityInstanceId(ActivityExecution execution) {
     ActivityExecution miRoot = execution.getParent();
@@ -185,6 +195,5 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
     ActivityExecution miRoot = miEnteringExecution.getParent();
     miRoot.setActivityInstanceId(miEnteringExecution.getActivityInstanceId());
   }
-
 
 }
