@@ -12,7 +12,12 @@
  */
 package org.camunda.bpm.engine.cdi.test.api;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.Collections;
 
@@ -24,6 +29,9 @@ import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.type.ValueType;
+import org.camunda.bpm.engine.variable.value.TypedValue;
 import org.junit.Test;
 
 /**
@@ -49,8 +57,23 @@ public class BusinessProcessBeanTest extends CdiProcessEngineTestCase {
     assertNotNull(task);
 
     String value = "value";
-    businessProcess.setVariable("key", value);
+    businessProcess.setVariable("key", Variables.stringValue(value));
     assertEquals(value, businessProcess.getVariable("key"));
+
+    // Typed variable API
+    TypedValue typedValue = businessProcess.getVariableTyped("key");
+    assertEquals(ValueType.STRING, typedValue.getType());
+    assertEquals(value, typedValue.getValue());
+
+    // Local variables
+    String localValue = "localValue";
+    businessProcess.setVariableLocal("localKey", Variables.stringValue(localValue));
+    assertEquals(localValue, businessProcess.getVariableLocal("localKey"));
+
+    // Local typed variable API
+    TypedValue typedLocalValue = businessProcess.getVariableLocalTyped("localKey");
+    assertEquals(ValueType.STRING, typedLocalValue.getType());
+    assertEquals(localValue, typedLocalValue.getValue());
 
     // complete the task
     assertEquals(task.getId(), businessProcess.startTask(task.getId()).getId());
@@ -120,6 +143,7 @@ public class BusinessProcessBeanTest extends CdiProcessEngineTestCase {
 
   @Test
   @Deployment(resources = "org/camunda/bpm/engine/cdi/test/api/BusinessProcessBeanTest.test.bpmn20.xml")
+  @SuppressWarnings("deprecation")
   public void testGetVariableCache() {
     BusinessProcess businessProcess = getBeanInstance(BusinessProcess.class);
 
@@ -149,6 +173,36 @@ public class BusinessProcessBeanTest extends CdiProcessEngineTestCase {
 
   @Test
   @Deployment(resources = "org/camunda/bpm/engine/cdi/test/api/BusinessProcessBeanTest.test.bpmn20.xml")
+  public void testGetCachedVariableMap() {
+    BusinessProcess businessProcess = getBeanInstance(BusinessProcess.class);
+
+    // initially the variable cache is empty
+    assertEquals(Collections.EMPTY_MAP, businessProcess.getCachedVariableMap());
+
+    // set a variable
+    businessProcess.setVariable("aVariableName", "aVariableValue");
+
+    // now the variable is set
+    assertEquals(Collections.singletonMap("aVariableName", "aVariableValue"), businessProcess.getCachedVariableMap());
+
+    // getting the variable cache does not empty it:
+    assertEquals(Collections.singletonMap("aVariableName", "aVariableValue"), businessProcess.getCachedVariableMap());
+
+    businessProcess.startProcessByKey("businessProcessBeanTest");
+
+    // now the variable cache is empty again:
+    assertEquals(Collections.EMPTY_MAP, businessProcess.getCachedVariableMap());
+
+    // set a variable
+    businessProcess.setVariable("anotherVariableName", "aVariableValue");
+
+    // now the variable is set
+    assertEquals(Collections.singletonMap("anotherVariableName", "aVariableValue"), businessProcess.getCachedVariableMap());
+  }
+
+  @Test
+  @Deployment(resources = "org/camunda/bpm/engine/cdi/test/api/BusinessProcessBeanTest.test.bpmn20.xml")
+  @SuppressWarnings("deprecation")
   public void testGetAndClearVariableCache() {
     BusinessProcess businessProcess = getBeanInstance(BusinessProcess.class);
 
@@ -178,6 +232,36 @@ public class BusinessProcessBeanTest extends CdiProcessEngineTestCase {
 
   @Test
   @Deployment(resources = "org/camunda/bpm/engine/cdi/test/api/BusinessProcessBeanTest.test.bpmn20.xml")
+  public void testGetAndClearCachedVariableMap() {
+    BusinessProcess businessProcess = getBeanInstance(BusinessProcess.class);
+
+    // initially the variable cache is empty
+    assertEquals(Collections.EMPTY_MAP, businessProcess.getAndClearCachedVariableMap());
+
+    // set a variable
+    businessProcess.setVariable("aVariableName", "aVariableValue");
+
+    // now the variable is set
+    assertEquals(Collections.singletonMap("aVariableName", "aVariableValue"), businessProcess.getAndClearCachedVariableMap());
+
+    // now the variable cache is empty
+    assertEquals(Collections.EMPTY_MAP, businessProcess.getAndClearCachedVariableMap());
+
+    businessProcess.startProcessByKey("businessProcessBeanTest");
+
+    // now the variable cache is empty again:
+    assertEquals(Collections.EMPTY_MAP, businessProcess.getAndClearCachedVariableMap());
+
+    // set a variable
+    businessProcess.setVariable("anotherVariableName", "aVariableValue");
+
+    // now the variable is set
+    assertEquals(Collections.singletonMap("anotherVariableName", "aVariableValue"), businessProcess.getAndClearCachedVariableMap());
+  }
+
+  @Test
+  @Deployment(resources = "org/camunda/bpm/engine/cdi/test/api/BusinessProcessBeanTest.test.bpmn20.xml")
+  @SuppressWarnings("deprecation")
   public void testGetVariableLocalCache() {
     BusinessProcess businessProcess = getBeanInstance(BusinessProcess.class);
 
@@ -186,7 +270,7 @@ public class BusinessProcessBeanTest extends CdiProcessEngineTestCase {
 
     // set a variable - this should fail before the process is started
     try {
-    	businessProcess.setVariableLocal("aVariableName", "aVariableValue");
+      businessProcess.setVariableLocal("aVariableName", "aVariableValue");
       fail("exception expected!");
     }
     catch(ProcessEngineCdiException e) {
@@ -210,6 +294,38 @@ public class BusinessProcessBeanTest extends CdiProcessEngineTestCase {
 
   @Test
   @Deployment(resources = "org/camunda/bpm/engine/cdi/test/api/BusinessProcessBeanTest.test.bpmn20.xml")
+  public void testGetCachedLocalVariableMap() {
+    BusinessProcess businessProcess = getBeanInstance(BusinessProcess.class);
+
+    // initially the variable cache is empty
+    assertEquals(Collections.EMPTY_MAP, businessProcess.getCachedLocalVariableMap());
+
+    // set a variable - this should fail before the process is started
+    try {
+      businessProcess.setVariableLocal("aVariableName", "aVariableValue");
+      fail("exception expected!");
+    }
+    catch(ProcessEngineCdiException e) {
+      assertEquals("Cannot set a local cached variable: neither a Task nor an Execution is associated.", e.getMessage());
+    }
+
+    businessProcess.startProcessByKey("businessProcessBeanTest");
+
+    // now the variable cache is empty again:
+    assertEquals(Collections.EMPTY_MAP, businessProcess.getCachedLocalVariableMap());
+
+    // set a variable
+    businessProcess.setVariableLocal("anotherVariableName", "aVariableValue");
+
+    // now the variable is set
+    assertEquals(Collections.singletonMap("anotherVariableName", "aVariableValue"), businessProcess.getCachedLocalVariableMap());
+
+    // getting the variable cache does not empty it:
+    assertEquals(Collections.singletonMap("anotherVariableName", "aVariableValue"), businessProcess.getCachedLocalVariableMap());
+  }
+
+  @Test
+  @Deployment(resources = "org/camunda/bpm/engine/cdi/test/api/BusinessProcessBeanTest.test.bpmn20.xml")
   public void testGetVariableLocal()
   {
     BusinessProcess businessProcess = getBeanInstance(BusinessProcess.class);
@@ -226,12 +342,13 @@ public class BusinessProcessBeanTest extends CdiProcessEngineTestCase {
 
     // Flushing and re-getting should retain the value (CAM-1806):
     businessProcess.flushVariableCache();
-    assertTrue(businessProcess.getVariableLocalCache().isEmpty());
+    assertTrue(businessProcess.getCachedLocalVariableMap().isEmpty());
     assertEquals("aVariableValue", businessProcess.getVariableLocal("aVariableName"));
   }
 
   @Test
   @Deployment(resources = "org/camunda/bpm/engine/cdi/test/api/BusinessProcessBeanTest.test.bpmn20.xml")
+  @SuppressWarnings("deprecation")
   public void testGetAndClearVariableLocalCache() {
     BusinessProcess businessProcess = getBeanInstance(BusinessProcess.class);
 
@@ -240,7 +357,7 @@ public class BusinessProcessBeanTest extends CdiProcessEngineTestCase {
 
     // set a variable - this should fail before the process is started
     try {
-    	businessProcess.setVariableLocal("aVariableName", "aVariableValue");
+      businessProcess.setVariableLocal("aVariableName", "aVariableValue");
       fail("exception expected!");
     }
     catch(ProcessEngineCdiException e) {
@@ -260,6 +377,38 @@ public class BusinessProcessBeanTest extends CdiProcessEngineTestCase {
 
     // now the variable is set
     assertEquals(Collections.singletonMap("anotherVariableName", "aVariableValue"), businessProcess.getVariableLocalCache());
+  }
+
+  @Test
+  @Deployment(resources = "org/camunda/bpm/engine/cdi/test/api/BusinessProcessBeanTest.test.bpmn20.xml")
+  public void testGetAndClearCachedLocalVariableMap() {
+    BusinessProcess businessProcess = getBeanInstance(BusinessProcess.class);
+
+    // initially the variable cache is empty
+    assertEquals(Collections.EMPTY_MAP, businessProcess.getAndClearCachedLocalVariableMap());
+
+    // set a variable - this should fail before the process is started
+    try {
+      businessProcess.setVariableLocal("aVariableName", "aVariableValue");
+      fail("exception expected!");
+    }
+    catch(ProcessEngineCdiException e) {
+      assertEquals("Cannot set a local cached variable: neither a Task nor an Execution is associated.", e.getMessage());
+    }
+
+    // the variable cache is still empty
+    assertEquals(Collections.EMPTY_MAP, businessProcess.getAndClearCachedLocalVariableMap());
+
+    businessProcess.startProcessByKey("businessProcessBeanTest");
+
+    // now the variable cache is empty again:
+    assertEquals(Collections.EMPTY_MAP, businessProcess.getAndClearCachedLocalVariableMap());
+
+    // set a variable
+    businessProcess.setVariableLocal("anotherVariableName", "aVariableValue");
+
+    // now the variable is set
+    assertEquals(Collections.singletonMap("anotherVariableName", "aVariableValue"), businessProcess.getAndClearCachedLocalVariableMap());
   }
 
   @Test
@@ -301,10 +450,10 @@ public class BusinessProcessBeanTest extends CdiProcessEngineTestCase {
     assertNotNull(runtimeService.getVariable(businessProcess.getExecutionId(), "aVariableLocalName"));
 
     // the cache is empty
-    assertEquals(Collections.EMPTY_MAP, businessProcess.getVariableCache());
+    assertEquals(Collections.EMPTY_MAP, businessProcess.getCachedVariableMap());
 
     // the cache is empty
-    assertEquals(Collections.EMPTY_MAP, businessProcess.getVariableLocalCache());
+    assertEquals(Collections.EMPTY_MAP, businessProcess.getCachedLocalVariableMap());
 
   }
 
