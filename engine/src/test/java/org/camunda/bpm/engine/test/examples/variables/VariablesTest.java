@@ -18,6 +18,7 @@ import static org.camunda.bpm.engine.variable.Variables.objectValue;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -221,4 +222,51 @@ public class VariablesTest extends PluggableProcessEngineTestCase {
     // assertions are part of the java delegate AssertVariableInstancesDelegate
     // only there we can access the VariableScope methods
   }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/examples/variables/VariablesTest.testSetVariableInScope.bpmn20.xml")
+  public void testSetVariableInScopeExplicitUpdate() {
+    // when a process instance is started and the task after the subprocess reached
+    runtimeService.startProcessInstanceByKey("testProcess",
+        Collections.<String, Object>singletonMap("shouldExplicitlyUpdateVariable", true));
+
+    // then there should be only the "shouldExplicitlyUpdateVariable" variable
+    VariableInstance variableInstance = runtimeService.createVariableInstanceQuery().singleResult();
+    assertNotNull(variableInstance);
+    assertEquals("shouldExplicitlyUpdateVariable", variableInstance.getName());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/examples/variables/VariablesTest.testSetVariableInScope.bpmn20.xml")
+  public void testSetVariableInScopeImplicitUpdate() {
+    // when a process instance is started and the task after the subprocess reached
+    runtimeService.startProcessInstanceByKey("testProcess",
+        Collections.<String, Object>singletonMap("shouldExplicitlyUpdateVariable", true));
+
+    // then there should be only the "shouldExplicitlyUpdateVariable" variable
+    VariableInstance variableInstance = runtimeService.createVariableInstanceQuery().singleResult();
+    assertNotNull(variableInstance);
+    assertEquals("shouldExplicitlyUpdateVariable", variableInstance.getName());
+  }
+
+  @Deployment
+  public void testUpdateVariableInProcessWithoutWaitstate() {
+    // when a process instance is started
+    runtimeService.startProcessInstanceByKey("oneScriptTaskProcess",
+        Collections.<String, Object>singletonMap("var", new SimpleSerializableBean(10)));
+
+    // then it should succeeds successfully
+    ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().singleResult();
+    assertNull(processInstance);
+  }
+
+  @Deployment
+  public void testSetUpdateAndDeleteComplexVariable() {
+    // when a process instance is started
+    runtimeService.startProcessInstanceByKey("oneUserTaskProcess",
+        Collections.<String, Object>singletonMap("var", new SimpleSerializableBean(10)));
+
+    // then it should wait at the user task
+    ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().singleResult();
+    assertNotNull(processInstance);
+  }
+
 }

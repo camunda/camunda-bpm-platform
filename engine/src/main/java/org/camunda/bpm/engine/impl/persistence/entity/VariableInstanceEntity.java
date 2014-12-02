@@ -283,6 +283,7 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
     this.doubleValue = null;
     this.textValue = null;
     this.textValue2 = null;
+    this.cachedValue = null;
 
     if(this.byteArrayValueId != null) {
       deleteByteArrayValue();
