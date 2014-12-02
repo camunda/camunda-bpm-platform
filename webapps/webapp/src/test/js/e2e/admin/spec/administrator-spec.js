@@ -8,6 +8,7 @@
 'use strict';
 
 var usersPage = require('../pages/users');
+var cockpitPage = require('../../cockpit/pages/dashboard');
 
 describe('admin user -', function() {
 
@@ -88,7 +89,7 @@ describe('admin user -', function() {
     });
 
 
-    it('should login page as Admin', function() {
+    it('should login as new Admin', function() {
 
       // when
       usersPage.navigateToWebapp('Admin');
@@ -96,6 +97,28 @@ describe('admin user -', function() {
 
       // then
       expect(usersPage.userFirstNameAndLastName(0)).toBe('Über Admin');
+    });
+
+  });
+
+
+  describe('webapp switch', function () {
+
+    afterEach(function() {
+
+      usersPage.navigateToWebapp('Admin');
+    });
+
+
+    it('should go to cockpit', function () {
+
+      // when
+      usersPage.switchWebapp('cockpit');
+      browser.sleep(500);
+      
+      // then
+      expect(cockpitPage.navBarHeaderName()).toBe('camunda Cockpit');
+
     });
 
   });
