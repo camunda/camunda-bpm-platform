@@ -59,10 +59,15 @@ public abstract class CmmnElementHandlerTest {
     context.setExpressionManager(expressionManager);
   }
 
-  protected <T extends CmmnModelElementInstance> T createElement(CmmnModelElementInstance parentElement, String id, Class<T> elementClass) {
+  protected <T extends CmmnModelElementInstance> T createElement(CmmnModelElementInstance parentElement, Class<T> elementClass) {
     T element = modelInstance.newInstance(elementClass);
-    element.setAttributeValue("id", id, true);
     parentElement.addChildElement(element);
+    return element;
+  }
+
+  protected <T extends CmmnModelElementInstance> T createElement(CmmnModelElementInstance parentElement, String id, Class<T> elementClass) {
+    T element = createElement(parentElement, elementClass);
+    element.setAttributeValue("id", id, true);
     return element;
   }
 

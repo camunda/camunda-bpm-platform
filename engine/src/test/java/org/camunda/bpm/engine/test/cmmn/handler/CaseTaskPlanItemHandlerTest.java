@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.test.cmmn.handler;
 import static org.camunda.bpm.engine.impl.cmmn.handler.ItemHandler.PROPERTY_ACTIVITY_TYPE;
 import static org.camunda.bpm.engine.impl.cmmn.handler.ItemHandler.PROPERTY_ACTIVITY_DESCRIPTION;
 import static org.camunda.bpm.engine.impl.cmmn.handler.ItemHandler.PROPERTY_IS_BLOCKING;
+import static org.camunda.bpm.engine.impl.cmmn.handler.ItemHandler.PROPERTY_MANUAL_ACTIVATION_RULE;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
@@ -24,6 +25,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
+import org.camunda.bpm.engine.impl.cmmn.CaseControlRule;
 import org.camunda.bpm.engine.impl.cmmn.behavior.CallableElement;
 import org.camunda.bpm.engine.impl.cmmn.behavior.CallableElement.CallableElementBinding;
 import org.camunda.bpm.engine.impl.cmmn.behavior.CallableElementParameter;
@@ -38,12 +40,16 @@ import org.camunda.bpm.engine.impl.cmmn.model.CmmnSentryDeclaration;
 import org.camunda.bpm.engine.impl.core.variable.mapping.value.ConstantValueProvider;
 import org.camunda.bpm.engine.impl.core.variable.mapping.value.ParameterValueProvider;
 import org.camunda.bpm.engine.impl.el.ElValueProvider;
+import org.camunda.bpm.model.cmmn.Cmmn;
 import org.camunda.bpm.model.cmmn.impl.instance.Body;
 import org.camunda.bpm.model.cmmn.impl.instance.ConditionExpression;
+import org.camunda.bpm.model.cmmn.impl.instance.DefaultControl;
 import org.camunda.bpm.model.cmmn.instance.CaseTask;
 import org.camunda.bpm.model.cmmn.instance.ExtensionElements;
 import org.camunda.bpm.model.cmmn.instance.IfPart;
+import org.camunda.bpm.model.cmmn.instance.ManualActivationRule;
 import org.camunda.bpm.model.cmmn.instance.PlanItem;
+import org.camunda.bpm.model.cmmn.instance.PlanItemControl;
 import org.camunda.bpm.model.cmmn.instance.Sentry;
 import org.camunda.bpm.model.cmmn.instance.camunda.CamundaIn;
 import org.camunda.bpm.model.cmmn.instance.camunda.CamundaOut;
@@ -797,6 +803,47 @@ public class CaseTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
     assertEquals(1, newActivity.getEntryCriteria().size());
     assertEquals(sentryDeclaration, newActivity.getEntryCriteria().get(0));
 
+  }
+
+  @Test
+  public void testManualActivationRule() {
+    // given
+    PlanItemControl itemControl = createElement(planItem, "ItemControl_1", PlanItemControl.class);
+    ManualActivationRule manualActivationRule = createElement(itemControl, "ManualActivationRule_1", ManualActivationRule.class);
+    ConditionExpression expression = createElement(manualActivationRule, "Expression_1", ConditionExpression.class);
+    Body body = createElement(expression, Body.class);
+    body.setTextContent("${true}");
+
+    // xml is not valid; fix CAM-3170 first
+    // Cmmn.validateModel(modelInstance);
+
+    // when
+    CmmnActivity newActivity = handler.handleElement(planItem, context);
+
+    // then
+    Object rule = newActivity.getProperty(PROPERTY_MANUAL_ACTIVATION_RULE);
+    assertNotNull(rule);
+    assertTrue(rule instanceof CaseControlRule);
+  }
+
+  @Test
+  public void testManualActivationRuleByDefaultPlanItemControl() {
+    // given
+    PlanItemControl defaultControl = createElement(caseTask, "ItemControl_1", DefaultControl.class);
+    ManualActivationRule manualActivationRule = createElement(defaultControl, "ManualActivationRule_1", ManualActivationRule.class);
+    ConditionExpression expression = createElement(manualActivationRule, "Expression_1", ConditionExpression.class);
+    Body body = createElement(expression, Body.class);
+    body.setTextContent("${true}");
+
+    Cmmn.validateModel(modelInstance);
+
+    // when
+    CmmnActivity newActivity = handler.handleElement(planItem, context);
+
+    // then
+    Object rule = newActivity.getProperty(PROPERTY_MANUAL_ACTIVATION_RULE);
+    assertNotNull(rule);
+    assertTrue(rule instanceof CaseControlRule);
   }
 
 }
