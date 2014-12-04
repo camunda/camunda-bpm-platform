@@ -3,11 +3,11 @@
 //        v  login
 //  - Dashboard View
 //        |
-//        v  select Process Defintion
+//        v  select Process Defintion (CallingCallActivity)
 //  - Process Defintion View
 //    - Called Process Definitions tab
 //        |
-//        v  open Called Process
+//        v  open Called Process (CallActivity)
 //    - Called Process Definitions tab
 //        |
 //        v  switch tab
@@ -77,7 +77,7 @@ describe('cockpit - ', function() {
     });
 
 
-    function clickFirstCalledProceesDefintion() {
+    function clickFirstCalledProcessDefintion() {
       return processDefinitionPage.table.calledProcessDefinitionsTab.calledProcessDefintionName(0).then(function(title) {
         processDefinitionPage.table.calledProcessDefinitionsTab.selectCalledProcessDefinitions(0);
         return title;
@@ -89,7 +89,7 @@ describe('cockpit - ', function() {
       var processName;
 
       // when
-      clickFirstCalledProceesDefintion().then(function(name) {
+      clickFirstCalledProcessDefintion().then(function(name) {
         processName = name;
       })
       .then(processDefinitionPage.pageHeaderProcessDefinitionName)
@@ -98,7 +98,7 @@ describe('cockpit - ', function() {
         // then
         expect(processName).toBe(headerName);
       });
-      // check URL
+      // TODO check URL
     });
 
 
@@ -115,11 +115,19 @@ describe('cockpit - ', function() {
     
     it('should go deeper', function () {
 
-      // when
-      processDefinitionPage.table.calledProcessDefinitionsTab.selectCalledProcessDefinitions(0);
+      var processName;
 
-      // then
-      expect(processDefinitionPage.pageHeaderProcessDefinitionName()).toBe('FailingProcess');
+      // when
+      clickFirstCalledProcessDefintion().then(function(name) {
+        processName = name;
+      })
+          .then(processDefinitionPage.pageHeaderProcessDefinitionName)
+          .then(function(headerName) {
+
+            // then
+            expect(processName).toBe(headerName);
+          });
+      // TODO check URL
     });
 
 
@@ -159,7 +167,7 @@ describe('cockpit - ', function() {
 
 
     function clickFirstProcessInstance() {
-      return processDefinitionPage.table.processInstancesTab.processInstanceName(0).then(function(title) {
+      return processDefinitionPage.table.processInstancesTab.processInstanceId(0).then(function(title) {
         processDefinitionPage.table.processInstancesTab.selectProcessInstance(0);
         return title;
       });
@@ -187,7 +195,8 @@ describe('cockpit - ', function() {
   });
 
 
-  describe('cockpit navigation', function () {
+  // disabled by CAM-3171
+  xdescribe('cockpit navigation', function () {
 
     it('should call dashboard by bread crumb', function () {
 
@@ -249,68 +258,111 @@ describe('cockpit - ', function() {
 
   describe('process instance view', function () {
 
-    it('should select process and goto instance view', function () {
 
-      // given
-      dashboardPage.clickNavBarHeader();
+    describe('variables tab -', function () {
 
-      // when
-      dashboardPage.deployedProcessesList.selectProcess(4);  // change variable process
+      it('should select change variable process and open instance view', function () {
 
-      // then
-      processDefinitionPage.table.processInstancesTab.selectProcessInstance(0);
+        // given
+        dashboardPage.clickNavBarHeader();
+
+        // when
+        dashboardPage.deployedProcessesList.selectProcess(4);  // change variable process
+
+        // then
+        processDefinitionPage.table.processInstancesTab.selectProcessInstance(0);
+      });
+
+
+      it('should open Variables tab', function () {
+
+        // when
+        processInstancePage.table.variablesTab.selectTab();
+
+        // then
+        processInstancePage.table.variablesTab.checkTabName();
+      });
+
     });
 
 
-    it('should select Incident tab', function () {
+    describe('user task tab -', function () {
 
-      // when
-      processInstancePage.table.incidentTab.selectTab();
+      it('should open User Task tab', function () {
 
-      // then
-      processInstancePage.table.incidentTab.checkTabName();
+        // when
+        processInstancePage.table.userTaskTab.selectTab();
+
+        // then
+        processInstancePage.table.userTaskTab.checkTabName();
+      });
+
+
+      it('should select user task in table', function () {
+
+        // when
+        processInstancePage.table.userTaskTab.selectUserTask(0);
+
+        // then
+        processInstancePage.diagram.isActivitySelected('userTask');
+
+        processInstancePage.diagram.deselectActivity('userTask');
+      });
+
     });
 
 
-    it('should open Called Process Instances tab', function () {
+    describe('incidents tab -', function () {
 
-      // when
-      processInstancePage.table.calledProcessInstancesTab.selectTab();
+      it('should select Another Failing Process and open instance view', function () {
 
-      // then
-      processInstancePage.table.calledProcessInstancesTab.checkTabName();
+        // given
+        dashboardPage.clickNavBarHeader();
+
+        // when
+        dashboardPage.deployedProcessesList.selectProcess(0);  // Another Failing Process
+
+        // then
+        processDefinitionPage.table.processInstancesTab.selectProcessInstance(0);
+      });
+
+
+      it('should select Incident tab', function () {
+
+        // when
+        processInstancePage.table.incidentTab.selectTab();
+
+        // then
+        processInstancePage.table.incidentTab.checkTabName();
+      });
+
     });
 
 
-    it('should open Variables tab', function () {
+    describe('called process instances tab -', function () {
 
-      // when
-      processInstancePage.table.variablesTab.selectTab();
+      it('should select CallActivity Process and open instance view', function () {
 
-      // then
-      processInstancePage.table.variablesTab.checkTabName();
-    });
+        // given
+        dashboardPage.clickNavBarHeader();
 
+        // when
+        dashboardPage.deployedProcessesList.selectProcess(2);  // CallActivity Process
 
-    it('should open User Task tab', function () {
-
-      // when
-      processInstancePage.table.userTaskTab.selectTab();
-
-      // then
-      processInstancePage.table.userTaskTab.checkTabName();
-    });
+        // then
+        processDefinitionPage.table.processInstancesTab.selectProcessInstance(0);
+      });
 
 
-    it('should select user task in table', function () {
+      it('should open Called Process Instances tab', function () {
 
-      // when
-      processInstancePage.table.userTaskTab.selectUserTask(0);
+        // when
+        processInstancePage.table.calledProcessInstancesTab.selectTab();
 
-      // then
-      processInstancePage.diagram.isActivitySelected('userTask');
+        // then
+        processInstancePage.table.calledProcessInstancesTab.checkTabName();
+      });
 
-      processInstancePage.diagram.deselectActivity('userTask');
     });
 
 
@@ -325,22 +377,24 @@ describe('cockpit - ', function() {
 
 
     it('should select diagram element', function() {
+      // used process: CallActivity
 
       // when
-      processInstancePage.diagram.selectActivity('userTask');
+      processInstancePage.diagram.selectActivity('CallActivity_1');
 
       // then
-      processInstancePage.diagram.isActivitySelected('userTask');
+      processInstancePage.diagram.isActivitySelected('CallActivity_1');
     });
 
 
     it('should deselect diagram element', function() {
+      // used process: CallActivity
 
       // when
-      processInstancePage.diagram.deselectActivity('userTask');
+      processInstancePage.diagram.deselectActivity('CallActivity_1');
 
       // then
-      processInstancePage.diagram.isActivityNotSelected('userTask');
+      processInstancePage.diagram.isActivityNotSelected('CallActivity_1');
 
     });
 
