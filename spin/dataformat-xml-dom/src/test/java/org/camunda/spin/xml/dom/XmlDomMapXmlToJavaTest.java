@@ -18,7 +18,6 @@ import static org.camunda.spin.xml.XmlTestConstants.EXAMPLE_VALIDATION_XML;
 import static org.camunda.spin.xml.XmlTestConstants.assertIsExampleOrder;
 
 import org.camunda.spin.xml.SpinXmlDataFormatException;
-import org.camunda.spin.xml.mapping.Customer;
 import org.camunda.spin.xml.mapping.Order;
 import org.junit.Test;
 
@@ -28,16 +27,6 @@ public class XmlDomMapXmlToJavaTest {
   public void shouldMapXmlObjectToJavaObject() {
     Order order = XML(EXAMPLE_VALIDATION_XML).mapTo(Order.class);
     assertIsExampleOrder(order);
-  }
-
-  @Test
-  public void shouldFailMappingToMismatchingClass() {
-    try {
-      XML(EXAMPLE_VALIDATION_XML).mapTo(Customer.class);
-      fail("Expected SpinXmlDataFormatException");
-    } catch (SpinXmlDataFormatException e) {
-      // happy path
-    }
   }
 
   @Test

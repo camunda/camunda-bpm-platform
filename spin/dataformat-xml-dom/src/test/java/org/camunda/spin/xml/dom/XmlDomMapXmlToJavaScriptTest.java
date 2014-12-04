@@ -37,13 +37,6 @@ public abstract class XmlDomMapXmlToJavaScriptTest extends ScriptTest {
   @Test(expected = SpinXmlDataFormatException.class)
   @Script(execute = false)
   @ScriptVariable(name = "input", file = EXAMPLE_VALIDATION_XML_FILE_NAME)
-  public void shouldFailMappingToMismatchingClass() throws Throwable {
-    failingWithException();
-  }
-
-  @Test(expected = SpinXmlDataFormatException.class)
-  @Script(execute = false)
-  @ScriptVariable(name = "input", file = EXAMPLE_VALIDATION_XML_FILE_NAME)
   public void shouldFailMappingMalformedTypeString() throws Throwable {
     failingWithException();
   }

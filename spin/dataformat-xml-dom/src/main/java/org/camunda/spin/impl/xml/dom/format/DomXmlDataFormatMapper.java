@@ -14,10 +14,15 @@ package org.camunda.spin.impl.xml.dom.format;
 
 import static org.camunda.commons.utils.EnsureUtil.ensureNotNull;
 
+import java.beans.Introspector;
+
+import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
+import javax.xml.namespace.QName;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 
@@ -44,12 +49,8 @@ public class DomXmlDataFormatMapper implements DataFormatMapper {
   }
 
   public boolean canMap(Object parameter) {
-    if(parameter == null) {
-      return false;
-    } else {
-      // Check for @XmlRootElement to be present on the type
-      return parameter.getClass().getAnnotation(XmlRootElement.class) != null;
-    }
+    // TODO: can JAX-B tell us whether it is capable of mapping a class?
+    return parameter != null;
   }
 
   public String getCanonicalTypeName(Object object) {
@@ -59,11 +60,22 @@ public class DomXmlDataFormatMapper implements DataFormatMapper {
 
   public Object mapJavaToInternal(Object parameter) {
     ensureNotNull("Parameter", parameter);
-    try {
-      Marshaller marshaller = getMarshaller(parameter.getClass());
 
+    final Class<?> parameterClass = parameter.getClass();
+
+    try {
+      Marshaller marshaller = getMarshaller(parameterClass);
+
+      // handle case where we are not annotated with XmlRootElement:
       DOMResult domResult = new DOMResult();
-      marshaller.marshal(parameter, domResult);
+
+      boolean isRootElement = parameterClass.getAnnotation(XmlRootElement.class) != null;
+      if(isRootElement) {
+        marshalRootElement(parameter, marshaller, domResult);
+      }
+      else {
+        marshalNonRootElement(parameter, marshaller, domResult);
+      }
 
       Node node = domResult.getNode();
       return ((Document)node).getDocumentElement();
@@ -71,6 +83,21 @@ public class DomXmlDataFormatMapper implements DataFormatMapper {
     } catch (JAXBException e) {
       throw LOG.unableToMapInput(parameter, e);
     }
+  }
+
+  protected void marshalRootElement(Object parameter, Marshaller marshaller, DOMResult domResult) throws JAXBException {
+    marshaller.marshal(parameter, domResult);
+  }
+
+  @SuppressWarnings({ "rawtypes", "unchecked" })
+  protected void marshalNonRootElement(Object parameter,  Marshaller marshaller, DOMResult domResult) throws JAXBException {
+    Class<?> parameterClass = parameter.getClass();
+    String simpleName = Introspector.decapitalize(parameterClass.getSimpleName());
+
+    XmlType annotation = parameterClass.getAnnotation(XmlType.class);
+
+    JAXBElement<?> root = new JAXBElement(new QName(simpleName), parameterClass, parameter);
+    marshaller.marshal(root, domResult);
   }
 
   @SuppressWarnings("unchecked")
@@ -82,7 +109,9 @@ public class DomXmlDataFormatMapper implements DataFormatMapper {
     try {
       Unmarshaller unmarshaller = getUnmarshaller(javaClass);
 
-      return (T) unmarshaller.unmarshal(new DOMSource(xmlNode));
+      JAXBElement<T> root = unmarshaller.unmarshal(new DOMSource(xmlNode), javaClass);
+      return root.getValue();
+
     } catch (JAXBException e) {
       throw LOG.unableToDeserialize(parameter, javaClass.getCanonicalName(), e);
     }

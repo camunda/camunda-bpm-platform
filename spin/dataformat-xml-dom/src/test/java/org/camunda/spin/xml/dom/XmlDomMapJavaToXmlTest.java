@@ -12,13 +12,16 @@
  */
 package org.camunda.spin.xml.dom;
 
-import org.camunda.spin.xml.mapping.Order;
-import org.junit.Test;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Fail.fail;
 import static org.camunda.spin.Spin.XML;
-import static org.camunda.spin.xml.XmlTestConstants.*;
+import static org.camunda.spin.xml.XmlTestConstants.EXAMPLE_VALIDATION_XML;
+import static org.camunda.spin.xml.XmlTestConstants.createExampleOrder;
+import static org.camunda.spin.xml.XmlTestConstants.replaceLineBreaks;
+
+import org.camunda.spin.xml.mapping.NonXmlRootElementType;
+import org.camunda.spin.xml.mapping.Order;
+import org.junit.Test;
 
 public class XmlDomMapJavaToXmlTest {
 
@@ -27,6 +30,17 @@ public class XmlDomMapJavaToXmlTest {
     Order order = createExampleOrder();
     String orderAsString = XML(order).toString();
     assertThat(replaceLineBreaks(orderAsString)).isEqualTo(replaceLineBreaks(EXAMPLE_VALIDATION_XML));
+  }
+
+  @Test
+  public void shouldMapNonXmlRootElementToXml() {
+    NonXmlRootElementType nonXmlRootElementType = new NonXmlRootElementType();
+    nonXmlRootElementType.setProperty("propValue");
+
+    String orderAsString = XML(nonXmlRootElementType).toString();
+
+    NonXmlRootElementType nonXmlRootElementType2 = XML(orderAsString).mapTo(NonXmlRootElementType.class);
+    assertThat(nonXmlRootElementType).isEqualTo(nonXmlRootElementType2);
   }
 
   @Test
