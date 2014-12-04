@@ -13,8 +13,16 @@ module.exports = Table.extend({
     this.tableItem(item, 'processInstance.id').click();
   },
 
-  processInstanceName: function(item) {
+  processInstanceId: function(item) {
     return this.table().get(item).element(by.css('[title]')).getAttribute('title');
+  },
+
+  processInstanceStartTime: function(item) {
+    return this.tableItem(item, 'processInstance.startTime').getText();
+  },
+
+  processInstanceBusinessKey: function(item) {
+    return this.tableItem(item, 'processInstance.businessKey').getText();
   }
 
 });
