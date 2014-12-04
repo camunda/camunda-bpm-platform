@@ -21,7 +21,6 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
 import javax.xml.namespace.QName;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
@@ -63,12 +62,10 @@ public class DomXmlDataFormatMapper implements DataFormatMapper {
     ensureNotNull("Parameter", parameter);
 
     final Class<?> parameterClass = parameter.getClass();
+    final DOMResult domResult = new DOMResult();
 
     try {
       Marshaller marshaller = getMarshaller(parameterClass);
-
-      // handle case where we are not annotated with XmlRootElement:
-      DOMResult domResult = new DOMResult();
 
       boolean isRootElement = parameterClass.getAnnotation(XmlRootElement.class) != null;
       if(isRootElement) {
@@ -94,9 +91,6 @@ public class DomXmlDataFormatMapper implements DataFormatMapper {
   protected void marshalNonRootElement(Object parameter,  Marshaller marshaller, DOMResult domResult) throws JAXBException {
     Class<?> parameterClass = parameter.getClass();
     String simpleName = Introspector.decapitalize(parameterClass.getSimpleName());
-
-    XmlType annotation = parameterClass.getAnnotation(XmlType.class);
-
     JAXBElement<?> root = new JAXBElement(new QName(simpleName), parameterClass, parameter);
     marshaller.marshal(root, domResult);
   }
