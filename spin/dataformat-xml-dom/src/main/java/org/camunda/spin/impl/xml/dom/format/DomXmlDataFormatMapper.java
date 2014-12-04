@@ -26,6 +26,7 @@ import javax.xml.namespace.QName;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 
+import org.camunda.spin.impl.util.SpinReflectUtil;
 import org.camunda.spin.impl.xml.dom.DomXmlLogger;
 import org.camunda.spin.impl.xml.dom.format.spi.JaxBContextProvider;
 import org.camunda.spin.spi.DataFormatMapper;
@@ -40,12 +41,12 @@ import org.w3c.dom.Node;
  */
 public class DomXmlDataFormatMapper implements DataFormatMapper {
 
-  protected DomXmlDataFormat format;
+  protected DomXmlDataFormat dataFormat;
 
   private static final DomXmlLogger LOG = DomXmlLogger.XML_DOM_LOGGER;
 
   public DomXmlDataFormatMapper(DomXmlDataFormat format) {
-    this.format = format;
+    this.dataFormat = format;
   }
 
   public boolean canMap(Object parameter) {
@@ -123,20 +124,21 @@ public class DomXmlDataFormatMapper implements DataFormatMapper {
     ensureNotNull("classIdentifier", classIdentifier);
 
     try {
-      Class<?> javaClass = Class.forName(classIdentifier);
+      Class<?> javaClass = SpinReflectUtil.loadClass(classIdentifier, dataFormat);
       return (T) mapInternalToJava(parameter, javaClass);
-    } catch (ClassNotFoundException e) {
+    }
+    catch (Exception e) {
       throw LOG.unableToDeserialize(parameter, classIdentifier, e);
     }
   }
 
   protected Marshaller getMarshaller(Class<?> parameter) throws JAXBException {
-    JaxBContextProvider jaxBContextProvider = format.getJaxBContextProvider();
+    JaxBContextProvider jaxBContextProvider = dataFormat.getJaxBContextProvider();
     return jaxBContextProvider.createMarshaller(parameter);
   }
 
   protected Unmarshaller getUnmarshaller(Class<?> parameter) throws JAXBException {
-    JaxBContextProvider jaxBContextProvider = format.getJaxBContextProvider();
+    JaxBContextProvider jaxBContextProvider = dataFormat.getJaxBContextProvider();
     return jaxBContextProvider.createUnmarshaller(parameter);
   }
 }

@@ -101,4 +101,13 @@ public class SpinCoreLogger extends SpinLogger {
           configurator.getClass(), configurator.getDataFormatClass().getName());
     }
   }
+
+
+  public SpinDataFormatException classNotFound(String classname, ClassNotFoundException cause) {
+    return new SpinDataFormatException(exceptionMessage("012", "Class {} not found ", classname), cause);
+  }
+
+  public void tryLoadingClass(String classname, ClassLoader cl) {
+    logDebug("013", "Try loading class '{}' using classloader '{}'.", classname, cl);
+  }
 }
