@@ -17,7 +17,9 @@ package org.camunda.bpm.engine.test.variables;
 import static org.camunda.bpm.engine.variable.Variables.*;
 import static org.camunda.bpm.engine.test.variables.TypedValueAssert.*;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
 import org.camunda.bpm.engine.impl.digest._apacheCommonsCodec.Base64;
@@ -79,6 +81,65 @@ public class JavaSerializationTest extends PluggableProcessEngineTestCase {
     assertObjectValueDeserialized(typedValue, javaSerializable);
     assertObjectValueSerializedJava(typedValue, javaSerializable);
   }
+
+  @Deployment
+  public void testJavaObjectDeserializedInFirstCommand() throws Exception {
+
+    // this test makes sure that if a serialized value is set, it can be deserialized in the same command in which it is set.
+
+    // given
+    // a serialized Java Object
+    JavaSerializable javaSerializable = new JavaSerializable("foo");
+    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    new ObjectOutputStream(baos).writeObject(javaSerializable);
+    String serializedObject = StringUtil.fromBytes(Base64.encodeBase64(baos.toByteArray()), processEngine);
+
+    // if
+    // I start a process instance in which a Java Delegate reads the value in its deserialized form
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", Variables.createVariables()
+      .putValue("varName", serializedObjectValue(serializedObject)
+        .serializationDataFormat(JAVA_DATA_FORMAT)
+        .objectTypeName(JavaSerializable.class.getName())
+        .create()));
+
+    // then
+    // it does not fail
+  }
+
+  @Deployment
+  public void testJavaObjectNotDeserializedIfNotRequested() throws Exception {
+
+    // this test makes sure that if a serialized value is set, it is not automatically deserialized if deserialization is not requested
+
+    // given
+    // a serialized Java Object
+    FailingJavaSerializable javaSerializable = new FailingJavaSerializable("foo");
+    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    new ObjectOutputStream(baos).writeObject(javaSerializable);
+    byte[] serializedObjectBytes = baos.toByteArray();
+    String serializedObject = StringUtil.fromBytes(Base64.encodeBase64(serializedObjectBytes), processEngine);
+
+    // which cannot be deserialized
+    try {
+      ObjectInputStream objectInputStream = new ObjectInputStream(new ByteArrayInputStream(serializedObjectBytes));
+      objectInputStream.readObject();
+      fail("Exception expected");
+    } catch(RuntimeException e) {
+      assertTextPresent("Exception while deserializing object", e.getMessage());
+    }
+
+    // if
+    // I start a process instance in which a Java Delegate reads the value in its serialized form
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", Variables.createVariables()
+      .putValue("varName", serializedObjectValue(serializedObject)
+        .serializationDataFormat(JAVA_DATA_FORMAT)
+        .objectTypeName(JavaSerializable.class.getName())
+        .create()));
+    
+    // then
+    // it does not fail
+  }
+
 
   @Deployment(resources = ONE_TASK_PROCESS)
   public void testSetJavaOjectNullDeserialized() throws Exception {

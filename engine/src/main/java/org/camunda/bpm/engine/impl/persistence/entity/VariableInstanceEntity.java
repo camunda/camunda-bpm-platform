@@ -28,6 +28,7 @@ import org.camunda.bpm.engine.impl.variable.serializer.TypedValueSerializer;
 import org.camunda.bpm.engine.impl.variable.serializer.VariableSerializers;
 import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.variable.type.ValueType;
+import org.camunda.bpm.engine.variable.value.SerializableValue;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
 /**
@@ -241,6 +242,15 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
   }
 
   public TypedValue getTypedValue(boolean deserializeValue) {
+
+    if (cachedValue != null && cachedValue instanceof SerializableValue && Context.getCommandContext() != null) {
+      SerializableValue serializableValue = (SerializableValue) cachedValue;
+      if(deserializeValue && !serializableValue.isDeserialized()) {
+        // clear cached value in case it is not deserialized and user requests deserialized value
+        cachedValue = null;
+      }
+    }
+
     if (cachedValue == null && errorMessage == null) {
       try {
         cachedValue = getSerializer().readValue(this, deserializeValue);
@@ -251,6 +261,7 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
         throw e;
       }
     }
+
     return cachedValue;
   }
 
