@@ -238,7 +238,7 @@ public class DemoDataGenerator {
 
       filterProperties.clear();
       filterProperties.put("description", "Tasks for Group Accounting");
-      filterProperties.put("priority", -5);
+      filterProperties.put("priority", -3);
       addVariables(filterProperties);
       query = taskService.createTaskQuery().taskCandidateGroupIn(Arrays.asList("accounting")).taskUnassigned();
       Filter candidateGroupTasksFilter = filterService.newTaskFilter().setName("Accounting").setProperties(filterProperties).setOwner("demo").setQuery(query);
@@ -255,7 +255,7 @@ public class DemoDataGenerator {
 
       filterProperties.clear();
       filterProperties.put("description", "Tasks assigned to John");
-      filterProperties.put("priority", -5);
+      filterProperties.put("priority", -1);
       addVariables(filterProperties);
       query = taskService.createTaskQuery().taskAssignee("john");
       Filter johnsTasksFilter = filterService.newTaskFilter().setName("John's Tasks").setProperties(filterProperties).setOwner("demo").setQuery(query);
@@ -265,7 +265,7 @@ public class DemoDataGenerator {
 
       filterProperties.clear();
       filterProperties.put("description", "Tasks assigned to Mary");
-      filterProperties.put("priority", -5);
+      filterProperties.put("priority", -1);
       addVariables(filterProperties);
       query = taskService.createTaskQuery().taskAssignee("mary");
       Filter marysTasksFilter = filterService.newTaskFilter().setName("Mary's Tasks").setProperties(filterProperties).setOwner("demo").setQuery(query);
@@ -275,7 +275,7 @@ public class DemoDataGenerator {
 
       filterProperties.clear();
       filterProperties.put("description", "Tasks assigned to Peter");
-      filterProperties.put("priority", -5);
+      filterProperties.put("priority", -1);
       addVariables(filterProperties);
       query = taskService.createTaskQuery().taskAssignee("peter");
       Filter petersTasksFilter = filterService.newTaskFilter().setName("Peter's Tasks").setProperties(filterProperties).setOwner("demo").setQuery(query);
@@ -285,7 +285,7 @@ public class DemoDataGenerator {
 
       filterProperties.clear();
       filterProperties.put("description", "All Tasks - Not recommended to be used in production :)");
-      filterProperties.put("priority", -5);
+      filterProperties.put("priority", 10);
       addVariables(filterProperties);
       query = taskService.createTaskQuery();
       Filter allTasksFilter = filterService.newTaskFilter().setName("All Tasks").setProperties(filterProperties).setOwner("demo").setQuery(query);
