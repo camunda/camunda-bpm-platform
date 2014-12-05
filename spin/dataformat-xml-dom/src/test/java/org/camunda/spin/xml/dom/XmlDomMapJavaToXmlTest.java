@@ -37,13 +37,14 @@ public class XmlDomMapJavaToXmlTest {
     NonXmlRootElementType nonXmlRootElementType = new NonXmlRootElementType();
     nonXmlRootElementType.setProperty("propValue");
 
-    String orderAsString = XML(nonXmlRootElementType).toString();
+    String xmlString = XML(nonXmlRootElementType).toString();
 
-    NonXmlRootElementType nonXmlRootElementType2 = XML(orderAsString).mapTo(NonXmlRootElementType.class);
+    NonXmlRootElementType nonXmlRootElementType2 = XML(xmlString).mapTo(NonXmlRootElementType.class);
     assertThat(nonXmlRootElementType).isEqualTo(nonXmlRootElementType2);
   }
 
   @Test
+  @SuppressWarnings("unused")
   public void shouldFailWithNull() {
     try {
       String s = XML(null).toString();

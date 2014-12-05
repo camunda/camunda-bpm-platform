@@ -44,5 +44,4 @@ public class XmlDomMapXmlToJavaTest {
       // happy path
     }
   }
-
 }

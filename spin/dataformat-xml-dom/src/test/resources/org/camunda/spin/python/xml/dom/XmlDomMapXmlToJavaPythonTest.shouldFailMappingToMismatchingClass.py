@@ -1,1 +1,0 @@
-order = S(input, "application/xml").mapTo("org.camunda.spin.xml.mapping.Customer")

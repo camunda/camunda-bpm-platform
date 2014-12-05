@@ -95,7 +95,6 @@ public class DomXmlDataFormatMapper implements DataFormatMapper {
     marshaller.marshal(root, domResult);
   }
 
-  @SuppressWarnings("unchecked")
   public <T> T mapInternalToJava(Object parameter, Class<T> javaClass) {
     ensureNotNull("Parameter", parameter);
     ensureNotNull("Type", javaClass);
