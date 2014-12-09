@@ -27,7 +27,7 @@ module.exports = Page.extend({
 
     item = item + 1;
     if(item == 2)
-      return element(by.css('.breadcrumbs-panel ul li:nth-child(' + item + ')')).element(by.css('[ng-click="crumb.callback(index, breadcrumbs)"]'));
+      return element(by.css('.breadcrumbs-panel ul li:nth-child(' + item + ')')).element(by.css('a'));
     else
       return element(by.css('.breadcrumbs-panel ul li:nth-child(' + item + ')'));
   },

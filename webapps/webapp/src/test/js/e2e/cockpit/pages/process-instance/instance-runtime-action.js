@@ -10,24 +10,36 @@ module.exports = ActionBar.extend({
     return this.getActionButton(0);
   },
 
-  clickCancelButton: function() {
-    this.clickActionButton(0);
-  },
-
   retryButton: function() {
     return this.getActionButton(1);
-  },
-
-  clickRetryButton: function() {
-    this.clickActionButton(1);
   },
 
   addVariableButton: function() {
     return this.getActionButton(2);
   },
 
-  clickAddVariableButton: function() {
-    this.clickActionButton(2);
+  addVariableModalAddButton: function() {
+    return element(by.css('[ng-click="save()"]'));
+  },
+
+  addVariableModalOkButton: function() {
+    return element(by.css('.modal-footer [ng-click="close()"]:not(.ng-hide)'));
+  },
+
+  addVariable: function(name, type, value) {
+    var that = this;
+
+    this.addVariableButton().click().then(function() {
+      element(by.model('newVariable.name')).sendKeys(name).then(function() {
+        element(by.css('.modal-body [ng-model="newVariable.type"]')).element(by.cssContainingText('option', type)).click().then(function() {
+          element(by.model('variable.value')).sendKeys(value).then(function() {
+            that.addVariableModalAddButton().click().then(function() {
+              that.addVariableModalOkButton().click();
+            });
+          });
+        });
+      });
+    });
   },
 
   suspendButton: function() {
@@ -35,10 +47,6 @@ module.exports = ActionBar.extend({
   },
 
   clickSuspendButton: function() {
-    this.clickActionButton(3);
-  },
-
-  clickActivateButton: function() {
     this.clickActionButton(3);
   },
 
