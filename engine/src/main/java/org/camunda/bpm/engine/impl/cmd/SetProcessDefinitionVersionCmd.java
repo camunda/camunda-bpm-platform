@@ -129,7 +129,7 @@ public class SetProcessDefinitionVersionCmd implements Command<Void>, Serializab
     }
 
     // switch all jobs to the new process definition version
-    List<JobEntity> jobs = commandContext.getJobManager().findJobsByExecutionId(processInstanceId);
+    List<JobEntity> jobs = commandContext.getJobManager().findJobsByProcessInstanceId(processInstanceId);
     List<JobDefinitionEntity> currentJobDefinitions =
         commandContext.getJobDefinitionManager().findByProcessDefinitionId(currentProcessDefinition.getId());
     List<JobDefinitionEntity> newVersionJobDefinitions =

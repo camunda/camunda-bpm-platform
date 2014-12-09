@@ -54,6 +54,8 @@ public class ProcessInstanceMigrationTest extends PluggableProcessEngineTestCase
 
   private static final String TEST_PROCESS_ONE_JOB = "org/camunda/bpm/engine/test/db/ProcessInstanceMigrationTest.oneJobProcess.bpmn20.xml";
   private static final String TEST_PROCESS_TWO_JOBS = "org/camunda/bpm/engine/test/db/ProcessInstanceMigrationTest.twoJobsProcess.bpmn20.xml";
+  
+  private static final String TEST_PROCESS_ATTACHED_TIMER = "org/camunda/bpm/engine/test/db/ProcessInstanceMigrationTest.testAttachedTimer.bpmn20.xml";
 
   public void testSetProcessDefinitionVersionEmptyArguments() {
     try {
@@ -523,6 +525,33 @@ public class ProcessInstanceMigrationTest extends PluggableProcessEngineTestCase
     assertEquals(newDefinition.getId(), migratedIncident.getProcessDefinitionId());
     assertEquals(instance.getId(), migratedIncident.getProcessInstanceId());
     assertEquals(instance.getId(), migratedIncident.getExecutionId());
+
+    repositoryService.deleteDeployment(deployment.getId(), true);
+  }
+  
+  @Deployment(resources = TEST_PROCESS_ATTACHED_TIMER)
+  public void testSetProcessDefinitionVersionAttachedTimer() {
+    // given a process instance
+    ProcessInstance instance =
+        runtimeService.startProcessInstanceByKey("attachedTimer");
+
+    // and a second deployment of the process
+    org.camunda.bpm.engine.repository.Deployment deployment = repositoryService
+      .createDeployment()
+      .addClasspathResource(TEST_PROCESS_ATTACHED_TIMER)
+      .deploy();
+
+    ProcessDefinition newDefinition =
+        repositoryService.createProcessDefinitionQuery().deploymentId(deployment.getId()).singleResult();
+    assertNotNull(newDefinition);
+
+    // when the process instance is migrated
+    CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutorTxRequired();
+    commandExecutor.execute(new SetProcessDefinitionVersionCmd(instance.getId(), 2));
+
+    Job job = managementService.createJobQuery().singleResult();
+    assertNotNull(job);
+    assertEquals(newDefinition.getId(), job.getProcessDefinitionId());
 
     repositoryService.deleteDeployment(deployment.getId(), true);
   }
