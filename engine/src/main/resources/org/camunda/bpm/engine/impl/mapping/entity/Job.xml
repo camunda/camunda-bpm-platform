@@ -154,7 +154,7 @@
   <select id="selectJobsByProcessInstanceId" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
     select *
     from ${prefix}ACT_RU_JOB J
-    where J.PROC_INST_ID_ = #{parameter}
+    where J.PROCESS_INSTANCE_ID_ = #{parameter}
   </select>
 
   <select id="selectJobByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.JobQueryImpl" resultMap="jobResultMap">
