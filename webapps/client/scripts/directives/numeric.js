@@ -1,5 +1,5 @@
-/* global ngDefine: false */
-ngDefine('cockpit.directives', function(module) {
+/* global define: false */
+define([], function() {
   'use strict';
 
   var Directive = function () {
@@ -55,7 +55,6 @@ ngDefine('cockpit.directives', function(module) {
     };
   };
 
-  module
-    .directive('numeric', Directive);
+  return Directive;
 
 });

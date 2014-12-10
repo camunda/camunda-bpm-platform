@@ -1,8 +1,8 @@
-/* global ngDefine: false */
-ngDefine('cockpit.services.breadcrumbTrails', function(module) {
+/* global define: false */
+define([], function() {
   'use strict';
 
-  module.factory('breadcrumbTrails', [
+  return [
     'ProcessDefinitionResource',
     'page',
   function(ProcessDefinitionResource, page) {
@@ -47,5 +47,5 @@ ngDefine('cockpit.services.breadcrumbTrails', function(module) {
     }
 
     return breadcrumbTrails;
-  }]);
+  }];
 });

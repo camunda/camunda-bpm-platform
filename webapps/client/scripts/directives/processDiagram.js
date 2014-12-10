@@ -1,11 +1,11 @@
-/* global ngDefine: false, console: false */
-ngDefine('cockpit.directives', [
+/* global define: false, console: false */
+define([
   'angular',
   'jquery',
   'bpmn/Bpmn',
   'jquery-overscroll',
   'jquery-mousewheel'
-], function(module, angular, $, Bpmn) {
+], function(angular, $, Bpmn) {
   'use strict';
   /* jshint unused: false */
   var _unique = 0;
@@ -14,7 +14,8 @@ ngDefine('cockpit.directives', [
     return (prefix ? prefix +'_' : '') + _unique;
   }
 
-  function DirectiveController($scope, $element, $attrs, $filter, $q, $window, $compile, Views) {
+  var DirectiveController = ['$scope', '$element', '$attrs', '$filter', '$q', '$window', '$compile', 'Views',
+                    function( $scope,   $element,   $attrs,   $filter,   $q,   $window,   $compile,   Views) {
 
     var w = angular.element($window);
 
@@ -375,7 +376,7 @@ ngDefine('cockpit.directives', [
       return bpmnRenderer;
     };
 
-  }
+  }];
 
   var Directive = function ($window, $compile, Views) {
     return {
@@ -394,7 +395,5 @@ ngDefine('cockpit.directives', [
 
   Directive.$inject = [ '$window', '$compile', 'Views'];
 
-  module
-    .directive('processDiagram', Directive);
-
+  return Directive;
 });

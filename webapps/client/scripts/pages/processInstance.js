@@ -1,14 +1,12 @@
-/* global ngDefine: false */
-ngDefine('cockpit.pages.processInstance', [
+define([
   'require',
   'angular',
   'cockpit/util/routeUtil',
-  'module:cam.commons:camunda-commons-ui',
-  'module:dataDepend:angular-data-depend'
-], function(module, require, angular) {
-  'use strict';
-
-  var routeUtil = require('cockpit/util/routeUtil');
+  'camunda-commons-ui',
+  'angular-data-depend',
+  'text!./process-instance.html'
+], function(require, angular, routeUtil, camCommoms, dataDepend, template) {
+    var module = angular.module('cam.cockpit.pages.processInstance', [camCommoms.name, dataDepend.name]);
 
   var Controller = [
           '$scope', '$filter', 'search', 'ProcessDefinitionResource', 'ProcessInstanceResource', 'IncidentResource', 'Views', 'Data', 'Transform', 'processInstance', 'dataDepend', 'page', 'breadcrumbTrails',
@@ -636,7 +634,7 @@ ngDefine('cockpit.pages.processInstance', [
     });
 
     $routeProvider.when('/process-instance/:id/runtime', {
-      templateUrl: require.toUrl('./pages/process-instance.html'),
+      template: template,
       controller: Controller,
       authentication: 'required',
       resolve: {
@@ -667,4 +665,6 @@ ngDefine('cockpit.pages.processInstance', [
     .config(RouteConfig)
     .config(ViewConfig)
   ;
+
+  return module;
 });

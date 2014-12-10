@@ -1,5 +1,5 @@
-/* global ngDefine: false */
-ngDefine('cockpit.resources', function(module) {
+/* global define: false */
+define([], function() {
   'use strict';
   var TaskResource = [ '$resource', 'Uri', function ($resource, Uri) {
     var endpoint = Uri.appUri('engine://engine/:engine/task/:id/:action/:subAction');
@@ -40,5 +40,5 @@ ngDefine('cockpit.resources', function(module) {
     });
   }];
 
-  module.factory('TaskResource', TaskResource);
+  return TaskResource;
 });

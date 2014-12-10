@@ -1,5 +1,5 @@
-/* global ngDefine: false */
-ngDefine('cockpit.services', [ 'bpmn/Transformer' ], function(module, Transformer) {
+/* global define: false */
+define([ 'bpmn/Transformer' ], function(Transformer) {
   'use strict';
 
   var Service = function () {
@@ -9,10 +9,5 @@ ngDefine('cockpit.services', [ 'bpmn/Transformer' ], function(module, Transforme
       }
     };
   };
-
-  module
-    .factory('Transform', Service);
-
-  return module;
-
+  return Service;
 });

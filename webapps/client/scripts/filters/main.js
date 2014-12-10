@@ -1,10 +1,25 @@
-/* global ngDefine: false */
+define([
+  'angular',
 
-/**
- * @namespace cam.cockpit.filters
- */
-ngDefine('cockpit.filters', [
-  'module:cockpit.filters.shorten:./shorten',
-  'module:cockpit.filters.abbreviate.number:./abbreviateNumber',
-  'module:cockpit.filters.duration:./duration'
-], function() {});
+  './shorten',
+  './abbreviateNumber',
+  './duration'
+
+], function(
+  angular,
+
+   shorten,
+   abbreviateNumber,
+   duration
+) {
+
+  'use strict';
+
+  var filtersModule = angular.module('cam.cockpit.filters', []);
+
+  filtersModule.filter('shorten', shorten);
+  filtersModule.filter('abbreviateNumber', abbreviateNumber);
+  filtersModule.filter('duration', duration);
+
+  return filtersModule;
+});

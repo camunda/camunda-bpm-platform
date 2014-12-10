@@ -1,7 +1,4 @@
-/* global ngDefine: false */
-ngDefine('cockpit.filters.abbreviate.number', function(module) {
-  'use strict';
-
+define([], function() {
   var AbbreviateNumberFilter = function() {
     return function(number, decimal) {
 
@@ -19,7 +16,7 @@ ngDefine('cockpit.filters.abbreviate.number', function(module) {
 
       return abbreviateNumber(number,decimal);
     };
-    
+
     function abbreviateNumber(number, decimal) {
       // 2 decimal places => 100, 3 => 1000, etc
       decimal = Math.pow(10, decimal);
@@ -51,9 +48,8 @@ ngDefine('cockpit.filters.abbreviate.number', function(module) {
           return number;
         }
       }
-      return number; 
-    };
+      return number;
+    }
   };
-
-  module.filter('abbreviateNumber', AbbreviateNumberFilter);
+  return AbbreviateNumberFilter;
 });

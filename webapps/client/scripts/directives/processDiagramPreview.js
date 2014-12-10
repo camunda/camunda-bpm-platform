@@ -1,5 +1,5 @@
-/* global ngDefine: false */
-ngDefine('cockpit.directives', [ 'angular', 'bpmn/Bpmn' ], function(module, angular, Bpmn) {
+/* global define: false */
+define([ 'angular', 'bpmn/Bpmn'], function(angular, Bpmn) {
   'use strict';
 
   var Directive = function (ProcessDefinitionResource) {
@@ -42,7 +42,5 @@ ngDefine('cockpit.directives', [ 'angular', 'bpmn/Bpmn' ], function(module, angu
 
   Directive.$inject = [ 'ProcessDefinitionResource' ];
 
-  module
-    .directive('processDiagramPreview', Directive);
-
+  return Directive;
 });

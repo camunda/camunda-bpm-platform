@@ -1,6 +1,6 @@
-/* global ngDefine: false */
+/* global define: false */
 
-ngDefine('cockpit.services.page', ['angular'], function(module, angular) {
+define(['angular'], function(angular) {
   'use strict';
 
   /**
@@ -12,9 +12,8 @@ ngDefine('cockpit.services.page', ['angular'], function(module, angular) {
    *
    * @module cam.cockpit.services.page
    */
-  module.service('page', [
-    '$rootScope',
-  function(
+
+  return ['$rootScope', function(
     $rootScope
   ) {
 
@@ -133,5 +132,5 @@ ngDefine('cockpit.services.page', ['angular'], function(module, angular) {
         return this;
       }
     };
-  }]);
+  }];
 });

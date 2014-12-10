@@ -57,7 +57,7 @@
    * {@link http://requirejs.org/docs/api.html#config-baseUrl|See the require.js docs for **baseUrl** configuration}
    * @type {string}
    */
-  conf.baseUrl = '';
+  conf.baseUrl = './';
 
   /**
    * Arguments (query string) used by require.js to build the URL
@@ -68,7 +68,9 @@
    */
   conf.urlArgs = ''/* cache-busting +'bust=' + CACHE_BUSTER /* */;
 
-  var vendor = 'assets/vendor';
+  //var vendor = 'assets/vendor';
+  var vendor = 'bower_components';
+  var dojoVendor = 'vendor/dojo';
 
   /**
    * Keys are module names and values are paths or URLs.
@@ -98,7 +100,10 @@
 
     'angular-data-depend':   vendor +'/angular-data-depend/src/dataDepend',
 
-    'camunda-commons-ui':    vendor +'/camunda-commons-ui/lib'
+    'camunda-commons-ui':    vendor +'/camunda-commons-ui/lib',
+
+    'camunda-cockpit-ui':    'scripts/cockpit',
+    'camunda-cockpit':       'scripts/cockpit-bootstrap'
   };
 
   /**
@@ -139,7 +144,27 @@
     'jquery-ui/ui/jquery.ui.draggable': [
                                           'jquery-ui/ui/jquery.ui.widget',
                                           'jquery-ui/ui/jquery.ui.mouse'
-                                        ]
+                                        ],
+
+    'camunda-cockpit-ui':               [
+                                          './services/main',
+                                          './pages/main',
+                                          './directives/main',
+                                          './filters/main',
+                                          './resources/main'
+                                        ],
+    'camunda-cockpit':                  [
+      'angular',
+      'angular-resource',
+      'angular-sanitize',
+      'angular-ui',
+      'ngDefine',
+      // 'bootstrap',
+      'jquery-ui/ui/jquery.ui.draggable',
+      'camunda-cockpit-ui',
+      'domReady!'
+    ]
+
   };
 
   /**
@@ -148,11 +173,6 @@
    * @type {Object.<string, Object>}
    */
   conf.packages = [
-    {
-      name: 'cockpit',
-      location: '.',
-      main: 'cockpit'
-    },
     {
       name: 'camunda-commons-ui',
       location: './'+ vendor +'/camunda-commons-ui/lib',
@@ -165,61 +185,44 @@
     },
     {
       name: 'bpmn',
-      location : './'+ vendor +'/camunda-bpmn.js/src/bpmn'
+      location : './'+ vendor +'/camunda-bpmn.js/src/bpmn',
+      main: 'Bpmn'
     },
     {
       name: 'dojo',
-      location : './'+ vendor +'/dojo'
+      location : './'+ dojoVendor +'/dojo'
     },
     {
       name: 'dojox',
-      location : './'+ vendor +'/dojox'
+      location : './'+ dojoVendor +'/dojox'
+    },
+    {
+      name: 'services',
+      location: './scripts/services',
+    },
+    {
+      name: 'pages',
+      location: './scripts/pages',
+    },
+    {
+      name: 'directives',
+      location: './scripts/directives',
+    },
+    {
+      name: 'filters',
+      location: './scripts/filters',
+    },
+    {
+      name: 'resources',
+      location: './scripts/resources',
+    },
+    {
+      name: 'util',
+      location: './scripts/util',
+      main: 'routeUtil'
     }
   ];
 
-
-  /**
-   * A set of utilities to bootstrap applications
-   */
-  conf.utils = {};
-
-  /**
-   * Utility to ensure compatibility of test scenarios loaded with require.js
-   * {@link http://stackoverflow.com/questions/15499997/how-to-use-angular-scenario-with-requirejs}
-   *
-   * @param {string} appName - The "angular app name"
-   */
-  conf.utils.ensureScenarioCompatibility = function (appName) {
-    var html = document.getElementsByTagName('html')[0];
-
-    html.setAttribute('ng-app', appName);
-    if (html.dataset) {
-      html.dataset.ngApp = appName;
-    }
-
-    if (top !== window) {
-      window.parent.postMessage({ type: 'loadamd' }, '*');
-    }
-  };
-
-  /**
-   * Utility function to bootsrap angular applications
-   *
-   * @param angular {Object} - angular, obviously
-   * @param appName {string} - the package name of the application
-   */
-  conf.utils.bootAngular = function(angular, appName) {
-    angular.bootstrap(document, [ appName ]);
-
-    conf.utils.ensureScenarioCompatibility(appName);
-  };
-
-  /* live-reload
-  // loads livereload client library (without breaking other scripts execution)
-  require(['jquery'], function($) {
-    $('body').append('<script src="//localhost:LIVERELOAD_PORT/livereload.js?snipver=1"></script>');
-  });
-  /* */
 
   return conf;
 }));

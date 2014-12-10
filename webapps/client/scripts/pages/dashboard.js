@@ -1,8 +1,6 @@
 /* global define: false */
-define(['angular'], function(angular) {
+define(['angular', 'text!./dashboard.html'], function(angular, template) {
   'use strict';
-
-  var module = angular.module('cockpit.pages');
 
   var Controller = ['$scope', '$rootScope', 'Views', 'Data', 'dataDepend', 'page', function ($scope, $rootScope, Views, Data, dataDepend, page) {
 
@@ -24,11 +22,11 @@ define(['angular'], function(angular) {
 
   var RouteConfig = [ '$routeProvider', function($routeProvider) {
     $routeProvider.when('/dashboard', {
-      templateUrl: require.toUrl('./pages/dashboard.html'),
+      template: template,
       controller: Controller,
       authentication: 'required'
     });
   }];
 
-  module.config(RouteConfig);
+  return RouteConfig;
 });

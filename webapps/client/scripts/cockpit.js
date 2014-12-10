@@ -1,12 +1,10 @@
-/* global ngDefine: false */
-
 /**
  * Cockpit app
  *
  * TODO:
  * - describe the plugin mechanisms
  *
- * @module cockpit
+ * @module cam.cockpit
  */
 
 /**
@@ -20,11 +18,11 @@
    * @name cockpit
    */
   var cockpitCore = [
-    'module:cockpit.services:./services/main',
-    'module:cockpit.pages:./pages/main',
-    'module:cockpit.directives:./directives/main',
-    'module:cockpit.filters:./filters/main',
-    'module:cockpit.resources:./resources/main' ];
+    './services/main',
+    './pages/main',
+    './directives/main',
+    './filters/main',
+    './resources/main' ];
 
   var commons = [
     'camunda-commons-ui'
@@ -32,9 +30,16 @@
 
   var plugins = window.PLUGIN_DEPENDENCIES || [];
 
-  var dependencies = [ 'jquery', 'angular', 'module:ng', 'module:ngResource', 'module:ui.bootstrap:angular-ui' ].concat(commons, cockpitCore, plugins);
+  var otherDependencies = [ 'jquery', 'angular', 'angular-ui'];
 
-  ngDefine('cockpit', dependencies, function(module, $) {
+  var dependencies = otherDependencies.concat(commons, cockpitCore);
+  define('camunda-cockpit-ui', dependencies, function($, angular) {
+
+    var moduleDependencies = [];
+    for(var i = otherDependencies.length; i < arguments.length; i++) {
+      moduleDependencies.push(arguments[i].name);
+    }
+    var cockpitModule = angular.module("cam.cockpit", ['ng', 'ngResource', 'ui.bootstrap'].concat(moduleDependencies, plugins.map(function(el){ return el.ngModuleName; })));
 
     var ModuleConfig = [ '$routeProvider', 'UriProvider', function($routeProvider, UriProvider) {
 
@@ -69,9 +74,9 @@
       }]);
     }];
 
-    module.config(ModuleConfig);
+    cockpitModule.config(ModuleConfig);
 
-    return module;
+    return cockpitModule;
   });
 
 })(window || this);

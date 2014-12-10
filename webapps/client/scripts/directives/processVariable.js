@@ -1,8 +1,8 @@
-/* global ngDefine: false */
-ngDefine('cockpit.directives', function(module) {
+/* global define: false */
+define([], function() {
   'use strict';
 
-  module.directive('processVariable', [ 'Variables', function(Variables) {
+  return ['Variables', function(Variables) {
 
     return {
 
@@ -27,5 +27,5 @@ ngDefine('cockpit.directives', function(module) {
       }
     };
 
-  }]);
+  }];
 });

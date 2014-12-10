@@ -1,8 +1,8 @@
-/* global ngDefine: false */
-ngDefine('cockpit.directives', [ 'angular' ], function(module) {
+/* global define: false */
+define([ 'angular' ], function(angular) {
   'use strict';
 
-  module.directive('date', function () {
+  return function () {
     return {
       restrict: 'A',
       require: 'ngModel',
@@ -49,5 +49,5 @@ ngDefine('cockpit.directives', [ 'angular' ], function(module) {
         model.$formatters.push(dateFormatter);
       }
     };
-  });
+  };
 });

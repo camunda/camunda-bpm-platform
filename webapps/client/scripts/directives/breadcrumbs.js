@@ -1,9 +1,9 @@
-/* global ngDefine: false, require: false */
+/* global require: false */
 /* jshint unused: false */
-ngDefine('cockpit.directives', ['angular'], function(module, angular) {
+define(['angular', 'text!./breadcrumbs.html'], function(angular, template) {
   'use strict';
 
-  module.directive('camBreadcrumbsPanel', [function () {
+  return [function () {
     return {
       scope: {
         divider: '@'
@@ -11,7 +11,7 @@ ngDefine('cockpit.directives', ['angular'], function(module, angular) {
 
       restrict: 'A',
 
-      templateUrl: require.toUrl('./directives/breadcrumbs.html'),
+      template: template,
 
       link: function(scope) {
         // event triggered by the breadcrumbs service when the breadcrumbs are alterated
@@ -31,6 +31,6 @@ ngDefine('cockpit.directives', ['angular'], function(module, angular) {
         $scope.breadcrumbs = page.breadcrumbsGet();
       }]
     };
-  }]);
+  }];
 
 });

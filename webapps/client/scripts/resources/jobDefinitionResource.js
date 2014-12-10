@@ -1,5 +1,5 @@
-/* global ngDefine: false */
-ngDefine('cockpit.resources', function(module) {
+/* global define: false */
+define([], function() {
   'use strict';
   var Resource = [ '$resource', 'Uri', function ($resource, Uri) {
 
@@ -10,6 +10,6 @@ ngDefine('cockpit.resources', function(module) {
     });
   }];
 
-  module.factory('JobDefinitionResource', Resource);
+  return Resource;
 
 });

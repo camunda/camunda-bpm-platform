@@ -193,9 +193,7 @@ ngDefine('cockpit.services', function(module) {
 
   };
 
-  module.factory('ActivityInstance', [ '$filter' , Service ]);
+  return [ '$filter' , Service ];
   // end config
-
-  return module;
 
 });

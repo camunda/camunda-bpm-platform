@@ -1,8 +1,8 @@
-/* global ngDefine: false */
-ngDefine('cockpit.directives', ['jquery'], function(module, $) {
+/* global define: false */
+define(['jquery'], function($) {
   'use strict';
 
-  module.directive('ctnCollapsableParent', function() {
+  return function() {
 
     return {
       restrict: 'CA',
@@ -177,5 +177,5 @@ ngDefine('cockpit.directives', ['jquery'], function(module, $) {
         initResize();
       }
     };
-  });
+  };
 });

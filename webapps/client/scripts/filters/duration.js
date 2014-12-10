@@ -1,4 +1,3 @@
-/* global ngDefine: false */
 /**
   Defines a filter to convert given milliseconds into
   human readable time lapse.
@@ -9,7 +8,7 @@
 
   @author Roman Smirnov <roman.smirnov@camunda.com>
  */
-ngDefine('cockpit.filters.duration', function(module) {
+define([], function() {
   'use strict';
 
   var Filter = function() {
@@ -36,7 +35,7 @@ ngDefine('cockpit.filters.duration', function(module) {
       addValue(seconds, 'second', result);
 
       return result.join(', ');
-      
+
     };
 
     function addValue(value, unit, array) {
@@ -49,6 +48,5 @@ ngDefine('cockpit.filters.duration', function(module) {
     }
 
   };
-
-  module.filter('duration', Filter);
+  return Filter;
 });

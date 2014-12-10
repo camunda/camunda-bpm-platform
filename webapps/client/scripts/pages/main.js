@@ -1,8 +1,24 @@
-/* global ngDefine: false */
-ngDefine('cockpit.pages', [
+define([
+  'angular',
+
   './dashboard',
-  'module:ngRoute:angular-route',
-  'module:camunda.common.services:camunda-commons-ui/services/index',
-  'module:cockpit.pages.processInstance:./processInstance',
-  'module:cockpit.pages.processDefinition:./processDefinition'
-], function() {});
+  './processDefinition',
+  './processInstance'
+
+], function(
+  angular,
+
+   dashboard,
+   processDefinitionModule,
+   processInstanceModule
+) {
+
+  'use strict';
+
+  var pagesModule = angular.module('cam.cockpit.pages', [processDefinitionModule.name, processInstanceModule.name]);
+
+  pagesModule.config(dashboard);
+
+  return pagesModule;
+
+});

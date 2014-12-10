@@ -1,4 +1,4 @@
-/* global ngDefine: false, require: false */
+/* global define: false, require: false */
 /**
   Defines a widget to filter activity instances in the activity tree
 
@@ -17,10 +17,10 @@
          item-selector=".tree-node-group">
     </div>
  */
-ngDefine('cockpit.directives', ['jquery'], function(module, $) {
+define(['jquery', 'text!./quick-filter.html'], function($, template) {
   'use strict';
 
-  module.directive('camQuickFilter', function() {
+  return function() {
 
     /**
       determine if an element has to be schown
@@ -59,7 +59,7 @@ ngDefine('cockpit.directives', ['jquery'], function(module, $) {
 
       restrict: 'A',
 
-      templateUrl: require.toUrl('./directives/quick-filter.html'),
+      template: template,
 
       link: function(scope, element, attrs) {
         if (!scope.holderSelector) {
@@ -122,5 +122,5 @@ ngDefine('cockpit.directives', ['jquery'], function(module, $) {
         };
       }
     };
-  });
+  };
 });

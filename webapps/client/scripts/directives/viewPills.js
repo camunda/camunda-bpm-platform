@@ -1,12 +1,10 @@
-/* global ngDefine: false */
-ngDefine('cockpit.directives', [
+/* global define: false */
+define([
   'cockpit/util/routeUtil'
-  ], function(module) {
+  ], function(routeUtil) {
   'use strict';
 
-  var routeUtil = require('cockpit/util/routeUtil');
-
-  module.directive('viewPills', [
+  return [
   function() {
     var ViewPillsController = [
       '$scope',
@@ -45,5 +43,5 @@ ngDefine('cockpit.directives', [
       replace: true,
       controller: ViewPillsController
     };
-  }]);
+  }];
 });

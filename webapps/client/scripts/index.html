@@ -12,6 +12,7 @@
 
     <!-- settings the base path for relative links -->
     <base href="$BASE" cockpit-api="$APP_ROOT/api/cockpit/" engine-api="$APP_ROOT/api/engine/" app-root="$APP_ROOT" />
+
     <!-- an example of plugin/feature exclusion -->
     <!--
     <base href="$BASE"
@@ -28,20 +29,6 @@
     <!-- favicon -->
     <link href="$APP_ROOT/app/cockpit/assets/images/favicon.ico" rel="shortcut icon" type="image/x-icon" />
 
-    <!-- scripts -->
-
-    <!-- For IE6-8 support of HTML5 elements -->
-    <!--[if lt IE 9]>
-      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-    <!--[if IE]>
-        <link href="$APP_ROOT/app/cockpit/assets/vendor/better-dom/dist/better-dom-legacy.htc" rel="htc"/>
-        <script src="$APP_ROOT/app/cockpit/assets/vendor/better-dom/dist/better-dom-legacy.js"></script>
-    <![endif]-->
-
-    <script src="$APP_ROOT/app/cockpit/assets/vendor/requirejs/require.js"></script>
-
-    <script src="$APP_ROOT/app/cockpit/cockpit-bootstrap.js?bust=CACHE_BUSTER"></script>
   </head>
   <body>
     <!-- navigation -->
@@ -58,7 +45,75 @@
             <span class="icon-bar"></span>
           </a>
 
-          <div ng-include="'$APP_ROOT/app/cockpit/templates/navigation.html'"></div>
+          <!--div ng-include="'$APP_ROOT/app/cockpit/templates/navigation.html'"></div-->
+          <!-- # CE - camunda-cockpit-ui client/scripts/templates/navigation.html -->
+          <div class="nav-collapse collapse"
+               ng-cloak>
+            <ul class="nav pull-right"
+                ng-controller="AuthenticationController">
+
+              <li engine-select></li>
+
+              <li class="dropdown"
+                cam-if-logged-in
+                ng-cloak>
+                <a href
+                   sem-show-user-actions
+                   class="dropdown-toggle"
+                   data-toggle="dropdown">
+                  <i class="icon-user icon-white"></i>
+                  {{ authentication.name }}
+                </a>
+
+                <ul class="dropdown-menu">
+                  <li>
+                    <a sem-jump-to-profile
+                       ng-href="{{ '../../admin/:engine/#/users/' + authentication.name + '?tab=profile' | uri }}">
+                      My Profile
+                    </a>
+                  </li>
+
+                  <li class="divider"></li>
+
+                  <li>
+                    <a href
+                       sem-log-out
+                       ng-click="logout()">
+                      Sign out
+                    </a>
+                  </li>
+                </ul>
+              </li>
+
+              <li class="divider-vertical"
+                  cam-if-logged-in
+                  ng-cloak></li>
+
+              <li class="app-switch dropdown">
+                <a href
+                   sem-show-applications
+                   class="dropdown-toggle"
+                   data-toggle="dropdown">
+                  <i class="icon-home icon-white"></i>
+                  <b class="caret"></b>
+                </a>
+
+                <ul class="dropdown-menu">
+                  <li ng-if="!authentication || authentication.canAccess('admin')">
+                    <a sem-jump-to-admin
+                       ng-href="{{ '../../admin/:engine/' | uri }}">Admin</a>
+                  </li>
+
+                  <li ng-if="!authentication || authentication.canAccess('tasklist')">
+                    <a sem-jump-to-tasklist
+                       ng-href="{{ '../../tasklist/:engine/' | uri }}">Tasklist</a>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+          <!-- / CE - camunda-cockpit-ui client/scripts/templates/navigation.html -->
+
         </div>
       </div>
     </div>
@@ -83,7 +138,14 @@
         </div>
       </footer>
     </div>
-    <script src="$APP_ROOT/app/cockpit/assets/vendor/better-dom/dist/better-dom.js"></script>
-    <script src="$APP_ROOT/app/cockpit/assets/vendor/better-placeholder-polyfill/dist/better-placeholder-polyfill.js"></script>
+
+    <script type="application/javascript">
+      window.PLUGIN_DEPENDENCIES = $PLUGIN_DEPENDENCIES || [];
+      window.PLUGIN_PACKAGES = $PLUGIN_PACKAGES || [];
+    </script>
+
+    <script type="application/javascript"
+            src="$APP_ROOT/app/cockpit/scripts/deps.js"
+            data-main="$APP_ROOT/app/cockpit/scripts/camunda-cockpit-ui"></script>
   </body>
 </html>

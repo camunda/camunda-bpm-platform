@@ -8,24 +8,43 @@ module.exports = function(config) {
   var rjsConf = require(rjsConfPath);
 
   var deps = [
-    'camunda-cockpit-ui/require-conf',
+    'scripts/require-conf',
     './../node_modules/requirejs/require',
     'jquery',
     'angular',
-    'moment',
+    //'moment',
     'angular-bootstrap',
     'angular-route',
     'angular-animate',
-    'angular-moment'
+    'camunda-commons-ui',
+    //'angular-moment',
+    'angular-resource',
+    'angular-sanitize',
+    'angular-ui',
+    'ngDefine',
+    'jquery-ui/ui/jquery.ui.draggable',
+    'domReady!',
+    'bpmn',
+    'bpmn/Bpmn',
+    'bpmn/Transformer',
+    'dojo',
+    'dojox/gfx',
+    'angular-data-depend'
   ];
 
   _.extend(rjsConf.paths, {
-    'require-conf': 'scripts/require-conf'
+    'require-conf': 'scripts/require-conf',
+    'cockpit/util/routeUtil': 'scripts/util/routeUtil',
+    //'bpmn': 'empty:',
+    //'bpmn/Bpmn': 'empty:',
+    'dojox/gfx': 'empty:',
+    'cockpit-plugin-base': 'plugin'
   });
+
 
   var rConf = {
     options: {
-      stubModules: ['text'],
+      //stubModules: ['text'],
 
       optimize: '<%= (buildTarget === "dist" ? "uglify2" : "none") %>',
       preserveLicenseComments: false,
@@ -36,27 +55,7 @@ module.exports = function(config) {
 
       paths: rjsConf.paths,
       shim: rjsConf.shim,
-      packages: rjsConf.packages,
-
-      onModuleBundleComplete: function (data) {
-        /*
-        data.name: the bundle name.
-        data.path: the bundle path relative to the output directory.
-        data.included: an array of items included in the build bundle.
-        If a file path, it is relative to the output directory. Loader
-        plugin IDs are also included in this array, but depending
-        on the plugin, may or may not have something inlined in the
-        module bundle.
-        */
-        console.info('onModuleBundleComplete', data.path+':\n\n'+data.included.join('\n') +'\n');
-
-        // // add a timestamp to the sourcemap URL to prevent caching
-        // fs.readFile(data.path, {encoding: 'utf8'}, function(err, content) {
-        //   // console.info('onModuleBundleComplete', data.name, content);
-        //   content = content + '?' + (new Date()).getTime();
-        //   fs.writeFileSync(data.path, content);
-        // });
-      }
+      packages: rjsConf.packages
     },
 
 
@@ -65,20 +64,16 @@ module.exports = function(config) {
         create: true,
         name: '<%= pkg.name %>-deps',
         out: '<%= buildTarget %>/scripts/deps.js',
-        include: deps.concat([
-          'camunda-cockpit-ui/require-conf'
-        ])
+        include: deps
       }
     },
 
     scripts: {
       options: {
-        name: 'camunda-cockpit-ui',
+        name: 'camunda-cockpit',
         out: '<%= buildTarget %>/scripts/<%= pkg.name %>.js',
-        exclude: deps.concat([
-          'camunda-cockpit-ui/require-conf'
-        ]),
-        include: rjsConf.shim['camunda-cockpit-ui']
+        exclude: deps,
+        include: rjsConf.shim['camunda-cockpit']
       }
     }
   };

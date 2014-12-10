@@ -1,8 +1,8 @@
-/* global ngDefine: false */
-ngDefine('cockpit.directives', function(module) {
+/* global define: false */
+define(function() {
   'use strict';
 
-  module.directive('stateCircle', function () {
+  return function () {
     return {
       restrict: 'EAC',
       link: function(scope, element, attrs) {
@@ -54,5 +54,5 @@ ngDefine('cockpit.directives', function(module) {
         }
       }
     };
-  });
+  };
 });

@@ -1,5 +1,5 @@
-/* global ngDefine: false */
-ngDefine('cockpit.services', function(module) {
+/* global define: false */
+define([], function() {
   'use strict';
 
   var VariablesFactory = [ function() {
@@ -131,6 +131,5 @@ ngDefine('cockpit.services', function(module) {
       operators: keys(SYM_TO_OPS)
     };
   }];
-
-  module.factory('Variables', VariablesFactory);
+  return VariablesFactory;
 });

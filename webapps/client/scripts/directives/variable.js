@@ -1,7 +1,5 @@
-'use strict';
-
-ngDefine('cockpit.directives', [ 'angular' ], function(module, angular) {
-  
+define([ 'angular' ], function(angular) {
+  'use strict';
   var template =
     '<div>' +
 
@@ -19,7 +17,7 @@ ngDefine('cockpit.directives', [ 'angular' ], function(module, angular) {
 
     '  <!-- handle integer/short/long values -->' +
     '  <input ng-if="isInteger(variable) || isShort(variable) || isLong(variable)" name="editIntegerValue" type="text" ' +
-    '         numeric integer="true" ng-model="variable.value" ng-class="{\'in-place-edit\': isInPlaceEdit() }" ' + 
+    '         numeric integer="true" ng-model="variable.value" ng-class="{\'in-place-edit\': isInPlaceEdit() }" ' +
     '         focus="autofocus" required>' +
 
     '  <!-- handle double/float values -->' +
@@ -35,7 +33,7 @@ ngDefine('cockpit.directives', [ 'angular' ], function(module, angular) {
     '         type="text" ng-class="{\'in-place-edit\': isInPlaceEdit() }" focus="autofocus" required>' +
     '</div>';
 
-  var Directive = function ($compile) {
+  var Directive = ['$compile', function ($compile) {
     return {
       restrict: 'EAC',
       scope: {
@@ -50,7 +48,7 @@ ngDefine('cockpit.directives', [ 'angular' ], function(module, angular) {
             oldVariableValueBoolean = true;
 
         scope.autofocus = !!(element.attr('autofocus') !== undefined);
-     
+
         var isBoolean = scope.isBoolean = function (variable) {
           return variable.type === 'boolean' || variable.type === 'Boolean';
         };
@@ -89,7 +87,7 @@ ngDefine('cockpit.directives', [ 'angular' ], function(module, angular) {
 
         scope.isInPlaceEdit = function () {
           return inPlaceEdit;
-        };   
+        };
 
         scope.$watch('variable.type', function (newValue, oldValue) {
           if (oldValue === newValue) {
@@ -113,27 +111,7 @@ ngDefine('cockpit.directives', [ 'angular' ], function(module, angular) {
 
       }
     };
-  };
-  
-  module
-    .directive('variable', Directive);
-  
+  }];
 
-  var FocusDirective = function ($compile) {
-    return {
-      restrict: 'A',
-      link: function(scope, element, attrs) {
-
-        var focus = attrs['focus'];
-
-        if (focus) {
-          element.focus();
-        }
-
-      }
-    };
-  };
-  
-  module
-    .directive('focus', FocusDirective);
+  return Directive;
 });

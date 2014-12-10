@@ -1,5 +1,5 @@
-/* global ngDefine: false */
-ngDefine('cockpit.directives', [ 'angular' ], function(module, angular) {
+/* global define: false */
+define([ 'angular' ], function(angular) {
   'use strict';
 
   /**
@@ -20,7 +20,7 @@ ngDefine('cockpit.directives', [ 'angular' ], function(module, angular) {
       ....
     </div>
    */
-  module.directive('camDynamicName', [ '$interpolate', '$compile', function($interpolate, $compile) {
+  return [ '$interpolate', '$compile', function($interpolate, $compile) {
 
     return {
       restrict: 'A',
@@ -33,5 +33,5 @@ ngDefine('cockpit.directives', [ 'angular' ], function(module, angular) {
         $compile(element, null, 9999)(scope);
       }
     };
-  }]);
+  }];
 });

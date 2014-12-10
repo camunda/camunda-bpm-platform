@@ -1,9 +1,8 @@
-/* global ngDefine: false */
-ngDefine('cockpit.directives', [ 'angular', 'require' ], function(module, angular, require) {
+/* global define: false */
+define([ 'angular', 'require', 'text!./activity-instance-tree.html' ], function(angular, require, template) {
   'use strict';
 
   // QUESTION: Shouldn't we use the templateUrl property instead?
-  var TEMPLATE_URL = require.toUrl('./activity-instance-tree.html');
 
   var Directive = [
     '$compile',
@@ -27,12 +26,7 @@ ngDefine('cockpit.directives', [ 'angular', 'require' ], function(module, angula
             nodeOpenedEventName = 'node.opened';
 
         function withTemplate(fn) {
-          $http.get(TEMPLATE_URL, { cache: $templateCache })
-            .success(function(content) {
-              fn(content);
-            }).error(function(response, code, headers, config) {
-              throw new Error('Failed to load template: ' + config.url);
-            });
+          fn(template);
         }
 
         scope.$watch('node', function (newValue) {
@@ -158,7 +152,5 @@ ngDefine('cockpit.directives', [ 'angular', 'require' ], function(module, angula
     };
   }];
 
-  module
-    .directive('activityInstanceTree', Directive);
-
+  return Directive;
 });

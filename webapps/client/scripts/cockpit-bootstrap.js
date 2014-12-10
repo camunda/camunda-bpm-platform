@@ -1,36 +1,43 @@
 (function(document, window, require) {
   'use strict';
-
   var baseUrl = document.getElementsByTagName('base')[0].getAttribute('app-root') +'/';
-  var APP_NAME = 'cockpit';
-  baseUrl += 'app/' + APP_NAME + '/';
+  var APP_NAME = 'cam.cockpit';
+  baseUrl += 'app/cockpit/';
   var pluginPackages = window.PLUGIN_PACKAGES || [];
-
-  require([baseUrl + '/require-conf.js'], function(rjsConf) {
     require({
-      baseUrl:    baseUrl,
-      urlArgs:    rjsConf.urlArgs,
-      paths:      rjsConf.paths,
-      shim:       rjsConf.shim,
-      packages:   rjsConf.packages.concat(pluginPackages)
+      baseUrl:    baseUrl + 'assets/vendor', // for dojo
+      packages:   pluginPackages
     });
 
-    require([
+  var pluginDependencies = window.PLUGIN_DEPENDENCIES || [];
+  var dependencies = [
       'angular',
       'angular-resource',
       'angular-sanitize',
       'angular-ui',
       'ngDefine',
-      // 'bootstrap',
-      'jquery-ui/ui/jquery.ui.draggable'
-    ], function(angular) {
+      'jquery-ui/ui/jquery.ui.draggable']
+  .concat(pluginDependencies.map(function(plugin) {
+      return plugin.requirePackageName;
+  }));
+
+    require(dependencies, function(angular) {
       require([
-        APP_NAME,
+        'camunda-cockpit-ui',
         'domReady!'
       ], function() {
-        rjsConf.utils.bootAngular(angular, APP_NAME);
+        angular.bootstrap(document, [ APP_NAME ]);
+        var html = document.getElementsByTagName('html')[0];
+
+        html.setAttribute('ng-app', APP_NAME);
+        if (html.dataset) {
+          html.dataset.ngApp = APP_NAME;
+        }
+
+        if (top !== window) {
+          window.parent.postMessage({ type: 'loadamd' }, '*');
+        }
       });
-    });
   });
 
 })(document, window || this, require);
