@@ -1,6 +1,7 @@
 package org.camunda.bpm.webapp.impl.engine;
 
 import static org.fest.assertions.Assertions.assertThat;
+import static org.junit.Assert.fail;
 
 import java.util.Collections;
 import java.util.Set;
@@ -12,11 +13,8 @@ import org.camunda.bpm.cockpit.impl.DefaultCockpitRuntimeDelegate;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.rest.spi.ProcessEngineProvider;
 import org.camunda.bpm.webapp.impl.IllegalWebAppConfigurationException;
-import org.camunda.bpm.webapp.impl.engine.ProcessEnginesFilter;
 import org.junit.After;
 import org.junit.Test;
-
-import static org.junit.Assert.*;
 
 /**
  *
