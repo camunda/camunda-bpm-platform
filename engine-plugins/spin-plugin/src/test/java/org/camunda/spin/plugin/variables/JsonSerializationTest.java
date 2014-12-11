@@ -14,10 +14,11 @@
 
 package org.camunda.spin.plugin.variables;
 
+import static org.camunda.bpm.engine.variable.Variables.objectValue;
+import static org.camunda.bpm.engine.variable.Variables.serializedObjectValue;
 import static org.camunda.spin.plugin.variables.TypedValueAssert.assertObjectValueDeserializedNull;
 import static org.camunda.spin.plugin.variables.TypedValueAssert.assertObjectValueSerializedNull;
 import static org.camunda.spin.plugin.variables.TypedValueAssert.assertUntypedNullValue;
-import static org.camunda.bpm.engine.variable.Variables.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +30,7 @@ import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.engine.variable.value.ObjectValue;
 import org.camunda.bpm.engine.variable.value.TypedValue;
@@ -40,6 +42,7 @@ import org.skyscreamer.jsonassert.JSONAssert;
 public class JsonSerializationTest extends PluggableProcessEngineTestCase {
 
   protected static final String ONE_TASK_PROCESS = "org/camunda/spin/plugin/oneTaskProcess.bpmn20.xml";
+  protected static final String SERVICE_TASK_PROCESS = "org/camunda/spin/plugin/serviceTaskProcess.bpmn20.xml";
 
   protected static final String JSON_FORMAT_NAME = DataFormats.JSON_DATAFORMAT_NAME;
 
@@ -506,5 +509,29 @@ public class JsonSerializationTest extends PluggableProcessEngineTestCase {
     assertNull(runtimeService.getVariable(instance.getId(), "simpleBean"));
     assertNull(runtimeService.getVariableTyped(instance.getId(), "simpleBean"));
     assertNull(runtimeService.getVariableTyped(instance.getId(), "simpleBean", false));
+  }
+
+
+  /**
+   * CAM-3222
+   */
+  @Deployment(resources = SERVICE_TASK_PROCESS)
+  public void FAILING_testImplicitlyUpdateEmptyList() {
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("serviceTaskProcess",
+        Variables.createVariables()
+          .putValueTyped("listVar",
+            Variables.objectValue(new ArrayList<JsonSerializable>())
+              .serializationDataFormat("application/json").create())
+          .putValue("delegate", new UpdateValueDelegate()));
+
+    ObjectValue typedValue = runtimeService.getVariableTyped(instance.getId(), "listVar");
+    // this should match Jackson's format
+    String expectedTypeName = ArrayList.class.getName() + "<" + JsonSerializable.class.getName() + ">";
+    assertEquals(expectedTypeName, typedValue.getObjectTypeName());
+
+    List<JsonSerializable> list = (List<JsonSerializable>) typedValue.getValue();
+    assertEquals(1, list.size());
+    assertTrue(list.get(0) instanceof JsonSerializable);
+    assertEquals(UpdateValueDelegate.STRING_PROPERTY, list.get(0).getStringProperty());
   }
 }
