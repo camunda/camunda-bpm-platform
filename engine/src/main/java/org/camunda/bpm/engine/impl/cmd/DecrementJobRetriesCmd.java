@@ -28,6 +28,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 
 /**
  * @author Tom Baeyens
+ * @author Daniel Meyer
  */
 public class DecrementJobRetriesCmd implements Command<Object> {
 
@@ -45,27 +46,34 @@ public class DecrementJobRetriesCmd implements Command<Object> {
       .getCommandContext()
       .getJobManager()
       .findJobById(jobId);
-    job.setLockOwner(null);
-    job.setLockExpirationTime(null);
 
-    if(exception != null) {
-      job.setExceptionMessage(exception.getMessage());
-      job.setExceptionStacktrace(getExceptionStacktrace());
-    }
-
-    if (exception == null || shouldDecrementRetriesFor(exception)) {
-      job.setRetries(job.getRetries() - 1);
-    }
-
-    JobExecutor jobExecutor = Context.getProcessEngineConfiguration().getJobExecutor();
-    MessageAddedNotification messageAddedNotification = new MessageAddedNotification(jobExecutor);
-    TransactionContext transactionContext = commandContext.getTransactionContext();
-    transactionContext.addTransactionListener(TransactionState.COMMITTED, messageAddedNotification);
+    unlockJob(job);
+    logException(job);
+    decrementRetries(job);
+    notifyAcquisition(commandContext);
 
     return null;
   }
 
-  private String getExceptionStacktrace() {
+  protected void unlockJob(JobEntity job) {
+    job.setLockOwner(null);
+    job.setLockExpirationTime(null);
+  }
+
+  protected void logException(JobEntity job) {
+    if(exception != null) {
+      job.setExceptionMessage(exception.getMessage());
+      job.setExceptionStacktrace(getExceptionStacktrace());
+    }
+  }
+
+  protected void decrementRetries(JobEntity job) {
+    if (exception == null || shouldDecrementRetriesFor(exception)) {
+      job.setRetries(job.getRetries() - 1);
+    }
+  }
+
+  protected String getExceptionStacktrace() {
     StringWriter stringWriter = new StringWriter();
     exception.printStackTrace(new PrintWriter(stringWriter));
     return stringWriter.toString();
@@ -73,5 +81,12 @@ public class DecrementJobRetriesCmd implements Command<Object> {
 
   protected boolean shouldDecrementRetriesFor(Throwable t) {
     return !(t instanceof OptimisticLockingException);
+  }
+
+  protected void notifyAcquisition(CommandContext commandContext) {
+    JobExecutor jobExecutor = Context.getProcessEngineConfiguration().getJobExecutor();
+    MessageAddedNotification messageAddedNotification = new MessageAddedNotification(jobExecutor);
+    TransactionContext transactionContext = commandContext.getTransactionContext();
+    transactionContext.addTransactionListener(TransactionState.COMMITTED, messageAddedNotification);
   }
 }
