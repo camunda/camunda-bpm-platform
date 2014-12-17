@@ -77,8 +77,6 @@ ngDefine('cockpit.plugin.base.views', function(module) {
         processInstanceId: processInstance.id,
         withException: true
       }).$promise.then(function(data) {
-        // jobPages.total = (Math.ceil(data.data.count / jobPages.size));
-        // jobPages.total = (Math.ceil(data.count / jobPages.size));
         jobPages.total = data.count;
       });
     }
@@ -137,7 +135,7 @@ ngDefine('cockpit.plugin.base.views', function(module) {
     $scope.retryFailedJobs = function (selectedFailedJobIds) {
       $scope.status = PERFORM;
 
-      summarizePages.total = (Math.ceil(selectedFailedJobIds.length / summarizePages.size));
+      summarizePages.total = selectedFailedJobIds.length;
       summarizePages.current = 1;
 
       doRetry(selectedFailedJobIds).then(function () {

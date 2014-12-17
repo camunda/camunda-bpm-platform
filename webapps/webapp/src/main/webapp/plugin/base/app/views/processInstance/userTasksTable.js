@@ -118,8 +118,6 @@ ngDefine('cockpit.plugin.base.views', function(module) {
       taskCopies = {};
 
       TaskResource.count(params).$promise.then(function (response) {
-        // pages.total = Math.ceil(response.data.count / pages.size);
-        // pages.total = Math.ceil(response.count / pages.size);
         pages.total = response.count;
       });
 

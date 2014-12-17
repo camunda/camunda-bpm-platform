@@ -85,7 +85,6 @@ ngDefine('cockpit.plugin.base.views', function(module) {
           });
 
           PluginProcessInstanceResource.count(countParams).$promise.then(function(data) {
-            // pages.total = Math.ceil(data.data.count / pages.size);
             pages.total = data.count;
           });
         }

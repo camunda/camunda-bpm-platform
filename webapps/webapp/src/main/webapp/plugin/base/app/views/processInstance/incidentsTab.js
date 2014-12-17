@@ -66,7 +66,6 @@ ngDefine('cockpit.plugin.base.views', ['require'], function(module, require) {
 
           // get the 'count' of incidents
           $http.post(Uri.appUri('plugin://base/:engine/incident/count'), params).success(function(data) {
-            // pages.total = Math.ceil(data.count / pages.size);
             pages.total = data.count;
           });
 
