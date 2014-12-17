@@ -73,21 +73,12 @@ public class ScriptingEnvironment {
     // create bindings
     Bindings bindings = scriptingEngines.createBindings(scriptEngine, scope);
 
-    return execute(script, scope, bindings);
+    return execute(script, scope, bindings, scriptEngine);
   }
 
-  /**
-   * @param executableScript
-   * @param sharedInstance
-   * @param globalScriptBindings
-   * @return
-   */
-  public Object execute(ExecutableScript script, VariableScope scope, Bindings bindings) {
+  public Object execute(ExecutableScript script, VariableScope scope, Bindings bindings, ScriptEngine scriptEngine) {
 
     final String scriptLanguage = script.getLanguage();
-
-    // get script engine
-    ScriptEngine scriptEngine = scriptingEngines.getScriptEngineForLanguage(scriptLanguage);
 
     // first, evaluate the env scripts (if any)
     List<ExecutableScript> envScripts = getEnvScripts(scriptLanguage);
