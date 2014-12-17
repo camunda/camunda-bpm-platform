@@ -23,9 +23,9 @@ import java.util.logging.Logger;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.BpmnError;
-import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.delegate.Expression;
+import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.bpmn.delegate.ExecutionListenerInvocation;
 import org.camunda.bpm.engine.impl.bpmn.helper.ErrorPropagation;
 import org.camunda.bpm.engine.impl.bpmn.helper.ScopeUtil;
@@ -139,7 +139,7 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
   }
 
   // required for supporting external subprocesses
-  public void completing(DelegateExecution execution, DelegateExecution subProcessInstance) throws Exception {
+  public void completing(VariableScope execution, VariableScope subProcessInstance) throws Exception {
   }
 
   // required for supporting external subprocesses
