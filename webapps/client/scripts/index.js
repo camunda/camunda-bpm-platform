@@ -46,6 +46,27 @@ define('camunda-tasklist-ui', [
   }
 
 
+  function bootstrapApp() {
+    var angular = require('angular');
+    var $ = angular.element;
+
+    $(document).ready(function() {
+      angular.bootstrap(document, [
+        'cam.tasklist',
+        'cam.embedded.forms',
+        'cam.tasklist.custom'
+      ]);
+
+      setTimeout(function() {
+        var $aufocused = $('[autofocus]');
+        if ($aufocused.length) {
+          $aufocused[0].focus();
+        }
+      }, 300);
+    });
+  }
+
+
   function loaded() {
     var angular = require('angular');
     var $ = angular.element;
@@ -101,16 +122,57 @@ define('camunda-tasklist-ui', [
     tasklistApp.controller('camTasklistViewCtrl', require('camunda-tasklist-ui/controller/cam-tasklist-view-ctrl'));
 
 
-    $(document).ready(function() {
-      angular.bootstrap(document, ['cam.tasklist', 'cam.embedded.forms']);
+    // The `cam.tasklist` AngularJS module is now available but not yet bootstraped,
+    // it is the right moment to load plugins
+    if (typeof window.camTasklistConf !== 'undefined' && window.camTasklistConf.customScripts) {
+      var custom = window.camTasklistConf.customScripts || {};
 
-      setTimeout(function() {
-        var $aufocused = $('[autofocus]');
-        if ($aufocused.length) {
-          $aufocused[0].focus();
+      // copy the relevant RequireJS configuration in a empty object
+      // see: http://requirejs.org/docs/api.html#config
+      var conf = {};
+      [
+        'baseUrl',
+        'paths',
+        'bundles',
+        'shim',
+        'map',
+        'config',
+        'packages',
+        // 'nodeIdCompat',
+        'waitSeconds',
+        'context',
+        // 'deps', // not relevant in this case
+        'callback',
+        'enforceDefine',
+        'xhtml',
+        'urlArgs',
+        'scriptType'
+        // 'skipDataMain' // not relevant either
+      ].forEach(function (prop) {
+        if (custom[prop]) {
+          conf[prop] = custom[prop];
         }
-      }, 300);
-    });
+      });
+
+      // configure RequireJS
+      require.config(conf);
+
+      // load the dependencies and bootstrap the AngularJS application
+      require(custom.deps || [], function() {
+
+        // create a AngularJS module (with possible AngularJS module dependencies)
+        // on which the custom scripts can register their
+        // directives, controllers, services and all when loaded
+        angular.module('cam.tasklist.custom', custom.ngDeps);
+
+        bootstrapApp.apply(this, arguments);
+      });
+    }
+    else {
+      // for consistency, also create a empty module
+      angular.module('cam.tasklist.custom', []);
+      bootstrapApp();
+    }
   }
 
 
