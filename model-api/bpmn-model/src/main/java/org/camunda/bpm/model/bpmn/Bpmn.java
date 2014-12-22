@@ -392,6 +392,7 @@ public class Bpmn {
     ParticipantMultiplicityImpl.registerType(bpmnModelBuilder);
     ParticipantRef.registerType(bpmnModelBuilder);
     PartitionElement.registerType(bpmnModelBuilder);
+    PerformerImpl.registerType(bpmnModelBuilder);
     ProcessImpl.registerType(bpmnModelBuilder);
     PropertyImpl.registerType(bpmnModelBuilder);
     ReceiveTaskImpl.registerType(bpmnModelBuilder);
