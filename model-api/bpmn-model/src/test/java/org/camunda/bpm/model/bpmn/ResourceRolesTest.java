@@ -19,6 +19,7 @@ import java.util.Collection;
 
 import org.camunda.bpm.model.bpmn.instance.HumanPerformer;
 import org.camunda.bpm.model.bpmn.instance.Performer;
+import org.camunda.bpm.model.bpmn.instance.PotentialOwner;
 import org.camunda.bpm.model.bpmn.instance.ResourceRole;
 import org.camunda.bpm.model.bpmn.instance.UserTask;
 import org.junit.BeforeClass;
@@ -54,6 +55,16 @@ public class ResourceRolesTest {
     ResourceRole resourceRole = resourceRoles.iterator().next();
     assertThat(resourceRole instanceof HumanPerformer).isTrue();
     assertThat(resourceRole.getName()).isEqualTo("Task human performer");
+  }
+
+  @Test
+  public void testGetPotentialOwner() {
+    UserTask userTask = modelInstance.getModelElementById("_9");
+    Collection<ResourceRole> resourceRoles = userTask.getResourceRoles();
+    assertThat(resourceRoles.size()).isEqualTo(1);
+    ResourceRole resourceRole = resourceRoles.iterator().next();
+    assertThat(resourceRole instanceof PotentialOwner).isTrue();
+    assertThat(resourceRole.getName()).isEqualTo("Task potential owner");
   }
 
 }

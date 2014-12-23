@@ -27,8 +27,16 @@
                 <semantics:resourceRef>_resource_user</semantics:resourceRef>
             </semantics:humanPerformer>
         </semantics:userTask>
+        <semantics:userTask id='_9' name='User Task _9' implementation="##unspecified">
+            <semantics:incoming>_8</semantics:incoming>
+            <semantics:outgoing>_10</semantics:outgoing>
+            <semantics:potentialOwner id="_po9" name="Task potential owner">
+                <semantics:resourceRef>_resource_Batman</semantics:resourceRef>
+            </semantics:potentialOwner>
+        </semantics:userTask>
         <semantics:sequenceFlow id='_4' sourceRef='_2' targetRef='_3'></semantics:sequenceFlow>
         <semantics:sequenceFlow id='_6' sourceRef='_3' targetRef='_7'></semantics:sequenceFlow>
-        <semantics:sequenceFlow id='_8' sourceRef='_7' targetRef='_5'></semantics:sequenceFlow>
+        <semantics:sequenceFlow id='_8' sourceRef='_7' targetRef='_9'></semantics:sequenceFlow>
+        <semantics:sequenceFlow id='_10' sourceRef='_9' targetRef='_5'></semantics:sequenceFlow>
     </semantics:process>
 </semantics:definitions>
