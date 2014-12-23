@@ -17,6 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Collection;
 
+import org.camunda.bpm.model.bpmn.instance.HumanPerformer;
 import org.camunda.bpm.model.bpmn.instance.Performer;
 import org.camunda.bpm.model.bpmn.instance.ResourceRole;
 import org.camunda.bpm.model.bpmn.instance.UserTask;
@@ -43,6 +44,16 @@ public class ResourceRolesTest {
     ResourceRole resourceRole = resourceRoles.iterator().next();
     assertThat(resourceRole instanceof Performer).isTrue();
     assertThat(resourceRole.getName()).isEqualTo("Task performer");
+  }
+
+  @Test
+  public void testGetHumanPerformer() {
+    UserTask userTask = modelInstance.getModelElementById("_7");
+    Collection<ResourceRole> resourceRoles = userTask.getResourceRoles();
+    assertThat(resourceRoles.size()).isEqualTo(1);
+    ResourceRole resourceRole = resourceRoles.iterator().next();
+    assertThat(resourceRole instanceof HumanPerformer).isTrue();
+    assertThat(resourceRole.getName()).isEqualTo("Task human performer");
   }
 
 }

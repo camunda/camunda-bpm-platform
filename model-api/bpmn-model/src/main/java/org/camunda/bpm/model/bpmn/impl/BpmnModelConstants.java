@@ -115,6 +115,7 @@ public final class BpmnModelConstants {
   public static final String BPMN_ELEMENT_RESOURCE_ROLE = "resourceRole";
   public static final String BPMN_ELEMENT_RESOURCE_REF = "resourceRef";
   public static final String BPMN_ELEMENT_PERFORMER = "performer";
+  public static final String BPMN_ELEMENT_HUMAN_PERFORMER = "humanPerformer";
   public static final String BPMN_ELEMENT_ACTIVITY = "activity";
   public static final String BPMN_ELEMENT_IO_BINDING = "ioBinding";
   public static final String BPMN_ELEMENT_INTERFACE = "interface";

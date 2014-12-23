@@ -342,6 +342,7 @@ public class Bpmn {
     From.registerType(bpmnModelBuilder);
     GatewayImpl.registerType(bpmnModelBuilder);
     GlobalConversationImpl.registerType(bpmnModelBuilder);
+    HumanPerformerImpl.registerType(bpmnModelBuilder);
     ImportImpl.registerType(bpmnModelBuilder);
     InclusiveGatewayImpl.registerType(bpmnModelBuilder);
     Incoming.registerType(bpmnModelBuilder);

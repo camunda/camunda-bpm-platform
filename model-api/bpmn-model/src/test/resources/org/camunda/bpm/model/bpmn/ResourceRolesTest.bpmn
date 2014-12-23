@@ -20,7 +20,15 @@
                 <semantics:resourceRef>_resource_user</semantics:resourceRef>
             </semantics:performer>
         </semantics:userTask>
+        <semantics:userTask id='_7' name='User Task _7' implementation="##unspecified">
+            <semantics:incoming>_6</semantics:incoming>
+            <semantics:outgoing>_8</semantics:outgoing>
+            <semantics:humanPerformer id="_hp7" name="Task human performer">
+                <semantics:resourceRef>_resource_user</semantics:resourceRef>
+            </semantics:humanPerformer>
+        </semantics:userTask>
         <semantics:sequenceFlow id='_4' sourceRef='_2' targetRef='_3'></semantics:sequenceFlow>
-        <semantics:sequenceFlow id='_6' sourceRef='_3' targetRef='_5'></semantics:sequenceFlow>
+        <semantics:sequenceFlow id='_6' sourceRef='_3' targetRef='_7'></semantics:sequenceFlow>
+        <semantics:sequenceFlow id='_8' sourceRef='_7' targetRef='_5'></semantics:sequenceFlow>
     </semantics:process>
 </semantics:definitions>
