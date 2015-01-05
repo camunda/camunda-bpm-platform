@@ -20,31 +20,23 @@ import org.camunda.bpm.engine.impl.jobexecutor.AcquiredJobs;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
-import org.camunda.bpm.engine.impl.test.AbstractProcessEngineTestCase;
+import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.test.Deployment;
 import org.junit.Assert;
 
-public class DeploymentAwareJobExecutorTest extends AbstractProcessEngineTestCase {
+public class DeploymentAwareJobExecutorTest extends PluggableProcessEngineTestCase {
 
-  @Override
-  protected void initializeProcessEngine() {
-    try {
-      processEngine = ProcessEngineConfiguration
-        .createProcessEngineConfigurationFromResource("camunda.cfg.xml")
-        .setJobExecutorDeploymentAware(true)
-        .buildProcessEngine();
-    } catch (RuntimeException ex) {
-      if (ex.getCause() != null && ex.getCause() instanceof FileNotFoundException) {
-        processEngine = ProcessEngineConfiguration
-            .createProcessEngineConfigurationFromResource("activiti.cfg.xml")
-            .buildProcessEngine();
-      } else {
-        throw ex;
-      }
-    }
+  public void setUp() throws Exception {
+    super.setUp();
+    processEngineConfiguration.setJobExecutorDeploymentAware(true);
+  }
+
+  public void tearDown() throws Exception {
+    processEngineConfiguration.setJobExecutorDeploymentAware(false);
+    super.tearDown();
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/jobexecutor/simpleAsyncProcess.bpmn20.xml")

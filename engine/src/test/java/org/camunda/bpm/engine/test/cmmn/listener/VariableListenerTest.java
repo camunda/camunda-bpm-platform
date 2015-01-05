@@ -12,21 +12,18 @@
  */
 package org.camunda.bpm.engine.test.cmmn.listener;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.CaseVariableListener;
 import org.camunda.bpm.engine.delegate.DelegateCaseVariableInstance;
 import org.camunda.bpm.engine.delegate.VariableListener;
 import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.history.HistoricVariableUpdate;
-import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.CaseExecutionContext;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
-import org.camunda.bpm.engine.impl.test.AbstractProcessEngineTestCase;
+import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.CaseInstance;
@@ -36,25 +33,15 @@ import org.camunda.bpm.engine.test.Deployment;
  * @author Thorben Lindhauer
  *
  */
-public class VariableListenerTest extends AbstractProcessEngineTestCase {
+public class VariableListenerTest extends PluggableProcessEngineTestCase {
 
-  protected Map<Object, Object> beans = new HashMap<Object, Object>();
+  protected Map<Object, Object> beans = null;
 
   protected void setUp() throws Exception {
     super.setUp();
 
     LogVariableListener.reset();
-  }
-
-  protected void initializeProcessEngine() {
-    if (processEngine == null) {
-      ProcessEngineConfigurationImpl engineConfig =
-          (ProcessEngineConfigurationImpl) ProcessEngineConfiguration.createProcessEngineConfigurationFromResource("camunda.cfg.xml");
-
-      engineConfig.setBeans(beans);
-
-      processEngine = engineConfig.buildProcessEngine();
-    }
+    beans = processEngineConfiguration.getBeans();
   }
 
   @Deployment
@@ -731,9 +718,9 @@ public class VariableListenerTest extends AbstractProcessEngineTestCase {
 
 
   protected void tearDown() throws Exception {
-    super.tearDown();
-
     beans.clear();
+
+    super.tearDown();
   }
 
 }
