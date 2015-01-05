@@ -85,6 +85,16 @@ module.exports = function(config) {
             '**/*.*'
           ],
           dest: '<%= buildTarget %>/assets/vendor'
+        },
+
+        // bootstrap fonts
+        {
+          expand: true,
+          cwd: 'node_modules/camunda-commons-ui/node_modules/bootstrap/fonts',
+          src: [
+            '*.{eot,ttf,svg,woff}'
+          ],
+          dest: '<%= buildTarget %>/fonts/'
         }
       ]
     },
