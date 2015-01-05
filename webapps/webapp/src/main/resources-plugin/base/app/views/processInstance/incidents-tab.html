@@ -1,4 +1,4 @@
-<!-- # CE - src/main/webapp/plugin/base/views/processInstance/incidents-tab.html -->
+<!-- # CE - webapp/src/main/resources-plugin/base/app/views/processInstance/incidents-tab.html -->
 <table class="table table-bordered table-hover table-condensed">
   <thead>
     <tr>
@@ -69,17 +69,19 @@
         {{ getIncidentType(incident) }}
       </td>
       <td>
-        <a class="btn action-button" ng-click="openJobRetryDialog(incident)" ng-show="incident.incidentType === 'failedJob' && incident.configuration"
+        <a class="btn btn-default action-button"
+           ng-click="openJobRetryDialog(incident)"
+           ng-show="incident.incidentType === 'failedJob' && incident.configuration"
            tooltip="Increment Number of Retries of Failed Job"
            tooltip-placement="left">
-          <i class="icon-repeat"></i>
+          <i class="glyphicon glyphicon-repeat"></i>
         </a>
       </td>
     </tr>
 
     <tr ng-if="!incidents">
       <td colspan="7">
-        <i class="icon-loading"></i> loading incidents...
+        <i class="glyphicon glyphicon-loading"></i> loading incidents...
       </td>
     </tr>
 
@@ -103,4 +105,4 @@
 
             max-size="7"
             boundary-links="true"></pagination>
-<!-- / CE - src/main/webapp/plugin/base/views/processInstance/incidents-tab.html -->
+<!-- / CE - webapp/src/main/resources-plugin/base/app/views/processInstance/incidents-tab.html -->

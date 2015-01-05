@@ -35,7 +35,7 @@
 
           <tr ng-if="!failedJobs">
             <td colspan="4">
-              <i class="icon-loading"></i> loading failed jobs...
+              <i class="glyphicon glyphicon-loading"></i> loading failed jobs...
             </td>
           </tr>
 
@@ -77,13 +77,13 @@
           <td>{{ job.instance.name }}</td>
           <td>
             <span ng-show="job.status && job.status === 'performing'">
-              <i class="icon-loading"></i>
+              <i class="glyphicon glyphicon-loading"></i>
             </span>
             <span ng-show="job.status && job.status === 'successful'">
-              <i class="icon-ok"></i>&nbsp;Successful
+              <i class="glyphicon glyphicon-ok"></i>&nbsp;Successful
             </span>
             <span ng-show="job.status && job.status === 'failed'">
-              <i class="icon-remove"></i>&nbsp;Failed
+              <i class="glyphicon glyphicon-remove"></i>&nbsp;Failed
             </span>
           </td>
         </tr>

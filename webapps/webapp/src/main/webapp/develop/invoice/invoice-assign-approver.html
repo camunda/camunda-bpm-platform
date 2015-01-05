@@ -1,9 +1,18 @@
 <form class="form-horizontal"
       role="form">
+<!--
+camunda-bpm-webapp/webapp/src/main/webapp/develop/invoice/invoice-assign-approver.html
+-->
+    <div ng-controller="customController">
+      papi papo
+      <div custom-directive>
+        yada yada
+      </div>
+    </div>
 
     <div class="panel panel-info">Who should approve this invoice?</div>
 
-    <div class="control-group">
+    <div class="form-group">
         <label class="control-label">Creditor</label>
         <div class="controls">
             <input cam-variable-name="creditor"
@@ -13,7 +22,7 @@
                    class="form-control" />
         </div>
     </div>
-    <div class="control-group">
+    <div class="form-group">
         <label class="control-label">Amount</label>
         <div class="controls">
             <input cam-variable-name="amount"
@@ -23,7 +32,7 @@
                    class="form-control" />
         </div>
     </div>
-    <div class="control-group">
+    <div class="form-group">
         <label class="control-label">Invoice Number</label>
         <div class="controls">
             <input cam-variable-name="invoiceNumber"
@@ -33,7 +42,7 @@
                    class="form-control" />
         </div>
     </div>
-    <div class="control-group">
+    <div class="form-group">
         <label class="control-label">Approver: </label>
         <div class="controls">
             <select cam-variable-name="approver"
@@ -52,4 +61,15 @@
             <p>Who should approve this invoice?</p>
         </div>
     </div>
+
+    <!-- Example of script inclusion in a embedded form -->
+
+<!--
+    <div class="custom-ng-app"
+         ng-controller="customController">
+      <div custom-directive>
+        Should be overwritten by a custom directive.
+      </div>
+    </div>
+-->
 </form>

@@ -9,14 +9,14 @@
   <form class="form-horizontal" name="addVariableForm" novalidate ng-submit="save()" ng-hide="status === 'SUCCESS' || status === 'FAIL'" request-aware>
     <fieldset>
 
-      <div class="control-group">
+      <div class="form-group">
         <label class="control-label" for="variableName">Variable Name*</label>
         <div class="controls">
           <input id="variableNameId" name="variableName" type="text" ng-model="newVariable.name" autofocus required>
         </div>
       </div>
 
-      <div class="control-group">
+      <div class="form-group">
         <label class="control-label" for="variableType">Variable Type*</label>
         <div class="controls">
           <select id="variableTypeId" name="variableType" ng-options="variableType for variableType in variableTypes" ng-model="newVariable.type" ng-change="changeVariableType(variableType)">
@@ -24,7 +24,7 @@
         </div>
       </div>
 
-      <div class="control-group">
+      <div class="form-group">
         <label class="control-label" for="variableValue">Variable Value*</label>
         <div class="controls">
           <div variable="newVariable"></div>

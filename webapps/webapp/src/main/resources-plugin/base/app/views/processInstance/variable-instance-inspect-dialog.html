@@ -42,7 +42,7 @@
         </textarea>
       </div>
       <div ng-if="selectedTab === 'deserialized'">
-        <div class="alert alert-error" ng-show="deserializationError">
+        <div class="alert alert-danger" ng-show="deserializationError">
           <strong>Deserialization Error</strong>:
           {{deserializationError}}
         </div>
@@ -59,7 +59,7 @@
   </form>
 
   <div class="alert alert-block" ng-show="status === 'confirmChange'">
-    <i class="icon-warning-sign"></i>
+    <i class="glyphicon glyphicon-warning-sign"></i>
     <strong>Warning:</strong>
     Are you sure you want to change the value of this Object? Changing the variable in an incompatible way may lead to severe runtime problems.
   </div>

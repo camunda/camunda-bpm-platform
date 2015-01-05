@@ -20,11 +20,11 @@
         <div ng-if="isPrimitive(variable) && !variable.inEditMode && !variable.errorMessage">
           {{ variable.value }}
           <span ng-if="isEditable(variable)" class="edit-toggle" ng-click="editVariable(variable)">
-            <i class="icon-pencil"></i>
+            <i class="glyphicon glyphicon-pencil"></i>
           </span>
         </div>
 
-        <div ng-if="!!variable.errorMessage" class="muted">
+        <div ng-if="!!variable.errorMessage" class="text-muted">
           <span
             tooltip="Object which cannot be de-serialized"
             tooltip-placement="right">
@@ -34,7 +34,7 @@
 
         <!-- binary variables -->
         <div ng-if="isBinary(variable)">
-          <a class="muted"
+          <a class="text-muted"
              href="{{getBinaryVariableDownloadLink(variable)}}"
              target="_blank"
              tooltip="Click to Download"
@@ -46,13 +46,13 @@
              ng-click="openUploadDialog(variable)"
              tooltip="Upload"
              tooltip-placement="right">
-            <i class="icon-upload"></i>
+            <i class="glyphicon glyphicon-upload"></i>
           </a>
         </div>
 
         <!-- object variable -->
         <div ng-if="isObject(variable) && !variable.errorMessage">
-          <a class="muted"
+          <a class="text-muted"
              ng-click="openInspectDialog(variable)"
              href
              tooltip="Click to Inspect"
@@ -84,10 +84,10 @@
 
             <div class="btn-group">
               <button type="submit" class="btn btn-primary" ng-disabled="!isValid(this.editVariableForm)">
-                <i class="icon-ok icon-white"></i>
+                <i class="glyphicon glyphicon-ok "></i>
               </button>
               <button type="button" class="btn" ng-click="closeInPlaceEditing(variable)">
-                <i class="icon-ban-circle"></i>
+                <i class="glyphicon glyphicon-ban-circle"></i>
               </button>
             </div>
           </div>
@@ -112,7 +112,7 @@
 
     <tr ng-if="!variables">
       <td colspan="4">
-        <i class="icon-loading"></i> loading process variables ...
+        <i class="glyphicon glyphicon-loading"></i> loading process variables ...
       </td>
     </tr>
 
