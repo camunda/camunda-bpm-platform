@@ -3,33 +3,33 @@
       class="quick-filters">
   <div class="quick-filter name-filter"
        ng-if="showNameFilter">
-    <label class="input-append">
+    <label class="input-group">
       <input ng-keyup="search()"
           ng-model="name"
           name="name"
           type="text" />
-      <span class="add-on"
+      <span class="input-group-addon"
             tooltip="Click here to clear the field value.">
-      <i class="icon-search"
+      <i class="glyphicon glyphicon-search"
         ng-click="clearName()"></i>
       </span>
     </label>
-    <button class="btn btn-small btn-link btn-control-link"
+    <button class="btn btn-sm btn-link btn-control-link"
             type="button"
             tooltip="Filters activity instances that have the entered name.">
-      <i class="icon-question-sign"></i>
+      <i class="glyphicon glyphicon-question-sign"></i>
     </button>
   </div>
 
   <div class="quick-filter state-filter"
        ng-if="showStateFilter">
     <span class="name">State</span>
-    <ul class="inline">
+    <ul class="list-inline">
       <li>
-        <label class="btn btn-mini running"
+        <label class="btn btn-default btn-xs running"
                tooltip="Running Activity Instance"
                tooltip-placement="bottom">
-          <i class="icon-adjust"></i>
+          <i class="glyphicon glyphicon-adjust"></i>
           <input ng-change="search()"
                  ng-model="running"
                  name="running"
@@ -37,10 +37,10 @@
         </label>
       </li>
       <li>
-        <label class="btn btn-mini completed"
+        <label class="btn btn-default btn-xs completed"
                tooltip="Completed Activity Instance"
                tooltip-placement="bottom">
-          <i class="icon-ok-circle"></i>
+          <i class="glyphicon glyphicon-ok-circle"></i>
           <input ng-change="search()"
                  ng-model="completed"
                  name="completed"
@@ -48,10 +48,10 @@
         </label>
       </li>
       <li>
-        <label class="btn btn-mini canceled"
+        <label class="btn btn-default btn-xs canceled"
                tooltip="Canceled Activity Instance"
                tooltip-placement="bottom">
-          <i class="icon-ban-circle"></i>
+          <i class="glyphicon glyphicon-ban-circle"></i>
           <input ng-change="search()"
                  ng-model="canceled"
                  name="canceled"

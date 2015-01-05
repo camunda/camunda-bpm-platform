@@ -3,7 +3,7 @@
   <div class="ctn-header">
     <h1>
       <!--
-      <i class="icon-type icon-inbox"
+      <i class="glyphicon glyphicon-type glyphicon glyphicon-inbox"
                   tooltip="Process instance"></i>
       -->
       <span class="process-name-prefix">
@@ -25,7 +25,7 @@
             ng-show="processInstance.suspended"
             tooltip="Currently suspended"
             tooltip-placement="top">
-        <i class="icon-suspended white"></i>
+        <i class="glyphicon glyphicon-pause white"></i>
       </span>
     </h1>
 
@@ -51,9 +51,9 @@
         <h5>
           Filter
 
-          <button class="btn btn-small btn-link btn-control btn-control-link"
+          <button class="btn btn-sm btn-link btn-control btn-control-link"
                   tooltip="The activity instance tree with all currently selected activity instances. You may change the selection via (CTRL +) click.">
-            <i class="icon-question-sign"></i>
+            <i class="glyphicon glyphicon-question-sign"></i>
           </button>
         </h5>
 
@@ -65,10 +65,10 @@
         </div>
 
         <div class="filter">
-          <button class="btn btn-link btn-mini btn-control"
+          <button class="btn btn-link btn-xs btn-control"
                   ng-show="filterData.activityInstanceCount"
                   ng-click="clearSelection()">
-            <i class="icon-remove"></i>
+            <i class="glyphicon glyphicon-remove"></i>
           </button>
 
           <ng-pluralize count="filterData.activityInstanceCount"

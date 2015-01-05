@@ -13,7 +13,7 @@
 
       <button class="btn btn-link btn-control-link btn-control remove"
               ng-click="deselect($event)">
-        <i class="icon-remove"></i>
+        <i class="glyphicon glyphicon-remove"></i>
       </button>
 
       <a ng-click="select($event)"
@@ -29,7 +29,7 @@
           class="tree-node-addon activity-instance-running"
           tooltip="Running Activity Instance"
           tooltip-placement="right">
-      <i class="icon-adjust"></i>
+      <i class="glyphicon glyphicon-adjust"></i>
     </span>
 
     <!-- completed -->
@@ -37,7 +37,7 @@
           class="tree-node-addon activity-instance-completed"
           tooltip="Completed Activity Instance"
           tooltip-placement="right">
-      <i class="icon-ok-circle"></i>
+      <i class="glyphicon glyphicon-ok-circle"></i>
     </span>
 
     <!-- canceled -->
@@ -45,12 +45,12 @@
           class="tree-node-addon activity-instance-canceled"
           tooltip="Canceled Activity Instance"
           tooltip-placement="right">
-      <i class="icon-ban-circle"></i>
+      <i class="glyphicon glyphicon-ban-circle"></i>
     </span>
 
   </div>
 
-  <ul class="unstyled" ng-show="node.isOpen" ng-if="node.children.length">
+  <ul class="list-unstyled" ng-show="node.isOpen" ng-if="node.children.length">
     <li ng-repeat="child in node.children | orderBy:orderPropertyValue">
       <div activity-instance-tree="child"
            selection="selection"

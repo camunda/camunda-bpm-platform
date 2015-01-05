@@ -4,7 +4,7 @@
   <div class="ctn-header">
     <h1>
       <!--
-      <i class="icon-type icon-inbox"
+      <i class="glyphicon glyphicon-type glyphicon glyphicon-inbox"
                   tooltip="Process definition"></i>
       -->
       <span class="process-name-prefix">
@@ -17,7 +17,7 @@
             ng-show="processDefinition.suspended"
             tooltip="Currently suspended"
             tooltip-placement="top">
-        <i class="icon-suspended white"></i>
+        <i class="glyphicon glyphicon-pause white"></i>
       </span>
     </h1>
 
@@ -42,9 +42,9 @@
         <h5>
           Filter
           <div class="btn-group btn-control dropdown">
-            <button class="btn btn-mini dropdown-toggle"
+            <button class="btn btn-default btn-xs dropdown-toggle"
                     data-toggle="dropdown">
-              <i class="icon-plus"></i>
+              <i class="glyphicon glyphicon-plus"></i>
             </button>
 
             <ul class="dropdown-menu pull-right">
@@ -68,7 +68,7 @@
         </h5>
 
         <form name="filterForm" novalidate ng-submit="filterChanged()">
-          <ul class="unstyled">
+          <ul class="list-unstyled">
 
             <li class="version-filter filter">
               <span class="name">
@@ -76,7 +76,7 @@
               </span>
 
               <div class="btn-group dropdown">
-                <button class="btn btn-mini dropdown-toggle"
+                <button class="btn btn-default btn-xs dropdown-toggle"
                         data-toggle="dropdown">
                   {{ processDefinition.version }} <span class="caret"></span>
                 </button>
@@ -98,9 +98,9 @@
 
               <div class="search search-text">
 
-                <button class="btn btn-link btn-mini btn-control remove"
+                <button class="btn btn-link btn-xs btn-control remove"
                         ng-click="removeParentFilter()">
-                  <i class="icon-remove"></i>
+                  <i class="glyphicon glyphicon-remove"></i>
                 </button>
 
                 <a ng-href="#/process-definition/{{ filterData.parent.id }}">
@@ -115,9 +115,9 @@
               </div>
 
               <div class="search">
-                <button class="btn btn-link btn-mini btn-control remove"
+                <button class="btn btn-link btn-xs btn-control remove"
                         ng-click="removeBusinessKeyFilter()">
-                  <i class="icon-remove"></i>
+                  <i class="glyphicon glyphicon-remove"></i>
                 </button>
                 <input type="text" required placeholder="Filter Business Key"
                        name="businessKey"
@@ -152,9 +152,9 @@
                          ng-model="date.value"
                          cam-dynamic-name="startDateFilterValue{{$index}}" />
 
-                  <button class="btn btn-link btn-mini btn-control remove-date-filter"
+                  <button class="btn btn-link btn-xs btn-control remove-date-filter"
                           ng-click="removeStartDateFilter(date)">
-                    <i class="icon-remove"></i>
+                    <i class="glyphicon glyphicon-remove"></i>
                   </button>
                 </div>
 
@@ -176,23 +176,23 @@
                 </div>
               </div>
 
-              <button class="btn btn-mini pull-right"
+              <button class="btn btn-default btn-xs pull-right"
                       ng-click="addStartDateFilter()"
                       ng-disabled="filterData.start.length === 2">
-                <i class="icon-plus"></i>
+                <i class="glyphicon glyphicon-plus"></i>
               </button>
             </li>
 
             <li class="variable-filter filter" ng-if="filterData.variables.length">
               <div class="name">
-                Variables <a href ng-click="toggleVariableFilterHelp()" title="Get help on variable filters"><i class="icon-question-sign"></i></a>
+                Variables <a href ng-click="toggleVariableFilterHelp()" title="Get help on variable filters"><i class="glyphicon glyphicon-question-sign"></i></a>
               </div>
 
               <div class="search" ng-repeat="variable in filterData.variables">
 
-                <button class="btn btn-link btn-mini btn-control remove"
+                <button class="btn btn-link btn-xs btn-control remove"
                         ng-click="removeVariableFilter(variable)">
-                  <i class="icon-remove"></i>
+                  <i class="glyphicon glyphicon-remove"></i>
                 </button>
 
                 <input type="text"
@@ -216,9 +216,9 @@
                 </div>
               </div>
 
-              <button class="btn btn-mini pull-right"
+              <button class="btn btn-default btn-xs pull-right"
                       ng-click="addVariableFilter()">
-                <i class="icon-plus"></i>
+                <i class="glyphicon glyphicon-plus"></i>
               </button>
 
               <div class="note" ng-show="showVariableFilterHelp">
@@ -247,9 +247,9 @@
               </div>
 
               <div class="search search-text" ng-repeat="activity in filterData.activities">
-                <button class="btn btn-link btn-mini btn-control remove"
+                <button class="btn btn-link btn-xs btn-control remove"
                         ng-click="removeActivityFilter(activity)">
-                  <i class="icon-remove"></i>
+                  <i class="glyphicon glyphicon-remove"></i>
                 </button>
                 {{ activity.name }}
               </div>
@@ -259,7 +259,7 @@
 
         <div class="footer" ng-show="filterChanged.$loading">
           <span>
-            <i class="icon-loading"></i> refreshing...
+            <i class="glyphicon glyphicon-loading"></i> refreshing...
           </span>
         </div>
       </div>
@@ -274,7 +274,7 @@
             <strong>All Versions</strong> {{ instanceStatistics.all.count }}
           </li>
         </ul>
-        <i ng-hide="instanceStatistics.$loaded" class="icon-loading"></i>
+        <i ng-hide="instanceStatistics.$loaded" class="glyphicon glyphicon-loading"></i>
       </div>
 
       <a class="hide-collapsable pull-right"></a>

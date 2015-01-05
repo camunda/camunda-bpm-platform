@@ -6,7 +6,7 @@ define([ 'angular', 'bpmn/Bpmn'], function(angular, Bpmn) {
     return {
       restrict: 'EAC',
       template: '<span ng-hide="$loaded">' +
-                '  <i class="icon-loading"></i> loading process diagram...' +
+                '  <i class="glyphicon glyphicon-loading"></i> loading process diagram...' +
                 '</span>',
       link: function(scope, element, attrs) {
 

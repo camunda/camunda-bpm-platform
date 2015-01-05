@@ -34,14 +34,14 @@ define(['jquery'], function($) {
           compensateElement
             .children('.show-collapsable')
               .addClass('expand-collapse')
-              .append('<i class="icon-chevron-right"></i>')
+              .append('<i class="glyphicon glyphicon-chevron-right"></i>')
               .attr('title', 'Show sidebar');
 
         var hideHandle =
           collapsableElement
             .children('.hide-collapsable')
               .addClass('expand-collapse')
-              .append('<i class="icon-chevron-left"></i>')
+              .append('<i class="glyphicon glyphicon-chevron-left"></i>')
               .attr('title', 'Hide sidebar');
 
         /**
