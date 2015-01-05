@@ -57,14 +57,6 @@ module.exports = function(config) {
             '{app,plugin,develop,common}/**/*.{js,html}'
           ],
           dest: '<%= buildTarget %>/'
-        },
-        {
-          expand: true,
-          cwd: '<%= pkg.gruntConfig.clientDir %>/scripts/',
-          src: [
-            'assets/fonts/**/*.{css,eot,svg,ttf,woff}'
-          ],
-          dest: '<%= buildTarget %>/'
         }
       ]
     },
@@ -140,9 +132,19 @@ module.exports = function(config) {
           cwd: '<%= pkg.gruntConfig.clientDir %>/bower_components',
           src: [
             '!jquery.ui/{demos,external,tests,themes}/**/*',
-            '**/*.{js,css,jpg,png,gif,html,eot,ttf,svg,woff,htc}'
+            '**/*.{js,css,jpg,png,gif,html,htc}'
           ],
           dest: '<%= buildTarget %>/assets/vendor'
+        },
+
+        // bootstrap fonts
+        {
+          expand: true,
+          cwd: 'node_modules/camunda-commons-ui/node_modules/bootstrap/fonts',
+          src: [
+            '*.{eot,ttf,svg,woff}'
+          ],
+          dest: '<%= buildTarget %>/fonts/'
         }
       ]
     },
