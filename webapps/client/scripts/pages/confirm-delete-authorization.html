@@ -3,8 +3,8 @@
 </div>
 
 <div class="modal-body">
-  <div notifications-panel></div>                
-            
+  <div notifications-panel></div>
+
   <div ng-hide="status === 'SUCCESS' || status === 'FAILED'">
     <p>Are you sure you want to delete the following authorization?</p>
 
@@ -14,17 +14,17 @@
       <dt>User</dt>
       <dd>
         {{authorizationToDelete.userId}} &nbsp;
-      </dd>    
+      </dd>
       <dt>Group</dt>
       <dd>
         {{authorizationToDelete.groupId}} &nbsp;
-      </dd>                     
+      </dd>
       <dt>Permissions</dt>
       <dd>{{formatPermissions(authorizationToDelete.permissions)}}</dd>
       <dt>Resource</dt>
       <dd>{{getResource(authorizationToDelete.resourceType)}}</dd>
       <dt>Resource Id</dt>
-      <dd>{{authorizationToDelete.resourceId}}</dd>        
+      <dd>{{authorizationToDelete.resourceId}}</dd>
     </dl>
   </div>
 
@@ -39,8 +39,8 @@
           ng-disabled="status === 'performCreate'"
           ng-hide="status === 'SUCCESS' || status === 'FAILED'">Close</button>
   <button class="btn btn-primary" ng-click="close(status)"
-          ng-show="status === 'SUCCESS' || status === 'FAILED'">OK</button>        
+          ng-show="status === 'SUCCESS' || status === 'FAILED'">OK</button>
   <button class="btn btn-primary" ng-click="performDelete()"
           ng-hide="status === 'SUCCESS' || status === 'FAILED'">Delete</button>
-  
+
 </div>

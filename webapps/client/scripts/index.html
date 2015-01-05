@@ -51,21 +51,23 @@
   <body>
     <!-- navigation -->
     <div class="navbar navbar-inverse navbar-fixed-top">
-      <div class="navbar-inner">
-        <div class="container-fluid">
-          <a class="brand ir" href="#/">
-            camunda Admin
-          </a>
+      <div class="navbar-header">
+        <button type="button"
+                class="navbar-toggle collapsed"
+                data-toggle="collapse"
+                data-target="#navbar-collapse">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
 
-          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </a>
-
-          <div ng-include="'$APP_ROOT/app/admin/templates/navigation.html'"></div>
-        </div>
+        <a class="navbar-brand" href="#/">
+          camunda Admin
+        </a>
       </div>
+
+      <div ng-include="'$APP_ROOT/app/admin/templates/navigation.html'"></div>
     </div>
 
     <!-- content -->

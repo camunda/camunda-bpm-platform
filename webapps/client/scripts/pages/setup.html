@@ -2,11 +2,11 @@
   <section id="users" ng-switch on="created">
     <div class="row">
       <div class="page-header">
-        <h1><i class="icon-user-large"></i> Setup</h1>
+        <h1><i class="glyphicon glyphicon-user-large"></i> Setup</h1>
       </div>
     </div>
     <div class="row" ng-switch-when="true">
-      <div class="span12">
+      <div class="col-md-12">
 
         <div class="alert alert-success">
           <strong>User created</strong>
@@ -18,14 +18,14 @@
     </div>
 
     <div class="row" ng-switch-when="false">
-      <div class="span8 box">
+      <div class="col-md-8 box">
 
         <div notifications-panel class="notifications-panel"></div>
 
         <form class="form-horizontal" name="createUserForm">
           <legend>User Account</legend>
 
-          <div class="control-group">
+          <div class="form-group">
             <label class="control-label" for="inputUserId">User id*</label>
             <div class="controls">
               <input id="inputUserId" name="userId" type="text" ng-model="profile.id" novalidate required></input>
@@ -33,7 +33,7 @@
             </div>
           </div>
 
-          <div class="control-group">
+          <div class="form-group">
             <label class="control-label" for="inputPassword">Password*:</label>
             <div class="controls">
               <input id="inputPassword" name="inputPassword" type="password" ng-model="credentials.password" data-password required></input>
@@ -42,7 +42,7 @@
             </div>
           </div>
 
-          <div class="control-group">
+          <div class="form-group">
             <label class="control-label" for="inputPasswordRepeat">Password (repeat)*:</label>
             <div class="controls">
               <input id="inputPasswordRepeat" name="inputPasswordRepeat" type="password" ng-model="credentials.password2" data-password-repeat="credentials.password"></input>
@@ -52,15 +52,15 @@
 
           <legend>User Profile</legend>
 
-          <div class="control-group">
+          <div class="form-group">
             <label class="control-label" for="inputFirstname">Firstname*</label>
             <div class="controls">
               <input id="inputFirstname" name="firstname" type="text" ng-model="profile.firstName" novalidate required></input>
-              <span class="help-inline"="text-error" ng-show="createUserForm.firstname.$error.required">Firstname is required.</span>
+              <span class="help-inline"="text-danger" ng-show="createUserForm.firstname.$error.required">Firstname is required.</span>
             </div>
           </div>
 
-          <div class="control-group">
+          <div class="form-group">
             <label class="control-label" for="inputLastname">Lastname*</label>
             <div class="controls">
               <input id="inputLastname" type="text" ng-model="profile.lastName" novalidate required></input>
@@ -68,7 +68,7 @@
             </div>
           </div>
 
-          <div class="control-group">
+          <div class="form-group">
             <label class="control-label" for="inputEmail">Email</label>
             <div class="controls">
               <input id="inputEmail" name="email" type="text" ng-model="profile.email" data-email></input>
@@ -76,7 +76,7 @@
             </div>
           </div>
 
-          <div class="control-group">
+          <div class="form-group">
             <div class="controls">
               <button type="submit" class="btn btn-primary"  data-ng-disabled="!createUserForm.$valid" data-ng-click="createUser()">Create new User</button>
             </div>
@@ -84,7 +84,7 @@
 
         </form>
       </div>
-      <div class="span4 well">
+      <div class="col-md-4 well">
         <legend>Why is this page shown?</legend>
         <p>You are trying to access the process engine &quot;<strong>{{ engineName }}</strong>&quot;.
         This process engine is configured to use the built-in identity service (database) but has no administrative users configured.

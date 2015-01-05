@@ -6,7 +6,7 @@
       </div>
     </div>
     <div class="row">
-      <div class="span3">
+      <div class="col-md-3">
         <div class="well sidebar-nav">
           <ul class="nav nav-list">
             <li ng-class="activeClass('tab=group')">
@@ -16,33 +16,33 @@
         </div>
       </div>
 
-      <div class="span9">
+      <div class="col-md-9">
 
         <div ng-show="show('group')">
           <div class="box">
             <p ng-if="!group">
-              <i class="icon-loading"></i> loading group...
+              <i class="glyphicon glyphicon-loading"></i> loading group...
             </p>
             <form class="form-horizontal" name="editGroupForm" ng-if="group">
 
               <legend>Group</legend>
 
-              <div class="control-group">
+              <div class="form-group">
                 <label class="control-label" for="inputName">Group Name*</label>
                 <div class="controls">
                   <input id="inputName" name="groupName" type="text" ng-model="group.name" novalidate required ng-disabled="!availableOperations.update"></input>
-                  <p class="text-error" ng-show="createGroupForm.groupName.$error.required">Name is required.</p>
+                  <p class="text-danger" ng-show="createGroupForm.groupName.$error.required">Name is required.</p>
                 </div>
               </div>
 
-              <div class="control-group">
+              <div class="form-group">
                 <label class="control-label" for="inputType">Group Type</label>
                 <div class="controls">
                   <input id="inputType" name="groupType" type="text" ng-model="group.type" ng-disabled="!availableOperations.update"></input>
                 </div>
               </div>
 
-              <div class="control-group" ng-show="availableOperations.update">
+              <div class="form-group" ng-show="availableOperations.update">
                 <div class="controls">
                   <button type="submit" class="btn"  data-ng-disabled="!canSubmit(editGroupForm, 'group')" data-ng-click="updateGroup()">Update Group</button>
                 </div>
@@ -54,7 +54,7 @@
             <form class="form-horizontal">
 
               <legend>Delete Group</legend>
-              <div class="alert alert-error">
+              <div class="alert alert-danger">
                 <strong>Warning:</strong> deleting a group cannot be undone.
               </div>
 

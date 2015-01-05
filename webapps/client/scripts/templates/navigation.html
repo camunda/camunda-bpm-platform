@@ -1,99 +1,98 @@
 <!-- # CE - camunda-admin-ui client/scripts/templates/navigation.html -->
-<div class="nav-collapse collapse"
-     ng-cloak>
-  <ul class="nav ng-scope"
-      ng-controller="NavigationController"
-      cam-if-logged-in>
+<ul ng-cloak
+    cam-if-logged-in
+    class="nav navbar-nav"
+    ng-controller="NavigationController">
 
-    <li class="dropdown"
-        ng-class="activeClass('#/user')">
-      <a sem-show-users
-         href="#/users">Users</a>
-    </li>
+  <li class="dropdown"
+      ng-class="activeClass('#/user')">
+    <a sem-show-users
+       href="#/users">Users</a>
+  </li>
 
-    <li class="dropdown"
-        ng-class="activeClass('#/group')">
-      <a sem-show-groups
-         href="#/groups">Groups</a>
-    </li>
+  <li class="dropdown"
+      ng-class="activeClass('#/group')">
+    <a sem-show-groups
+       href="#/groups">Groups</a>
+  </li>
 
-    <li class="dropdown"
-        ng-class="activeClass('#/authorization')"
-        show-if-authorized
-        auth-permission="ALL"
-        auth-resource-name="authorization">
-      <a sem-show-authorizations
-         href="#/authorization?resource=0">Authorizations</a>
-    </li>
-    <li class="dropdown"
-        ng-class="activeClass('#/system')">
-      <a sem-show-systems
-         href="#/system?section=system-settings-general">System</a>
-    </li>
-  </ul>
-
+  <li class="dropdown"
+      ng-class="activeClass('#/authorization')"
+      show-if-authorized
+      auth-permission="ALL"
+      auth-resource-name="authorization">
+    <a sem-show-authorizations
+       href="#/authorization?resource=0">Authorizations</a>
+  </li>
+  <li class="dropdown"
+      ng-class="activeClass('#/system')">
+    <a sem-show-systems
+       href="#/system?section=system-settings-general">System</a>
+  </li>
+</ul>
 
 
-  <ul class="nav pull-right"
-      ng-controller="AuthenticationController">
 
-    <li engine-select></li>
+<ul class="nav navbar-nav pull-right"
+    ng-controller="AuthenticationController">
 
-    <li class="dropdown"
-        cam-if-logged-in
-        ng-cloak>
-      <a href
-         sem-show-user-actions
-         class="dropdown-toggle"
-         data-toggle="dropdown">
-        <i class="icon-user icon-white"></i>
-        {{ authentication.name }}
-      </a>
+  <li engine-select></li>
 
-      <ul class="dropdown-menu">
-        <li>
-          <a sem-jump-to-profile
-             ng-href="{{ '../../admin/:engine/#/users/' + authentication.name + '?tab=profile' | uri }}">
-            My Profile
-          </a>
-        </li>
+  <li class="dropdown"
+      cam-if-logged-in
+      ng-cloak>
+    <a href
+       sem-show-user-actions
+       class="dropdown-toggle"
+       data-toggle="dropdown">
+      <i class="glyphicon glyphicon-user "></i>
+      {{ authentication.name }}
+    </a>
 
-        <li class="divider"></li>
+    <ul class="dropdown-menu dropdown-menu-right">
+      <li>
+        <a sem-jump-to-profile
+           ng-href="{{ '../../admin/:engine/#/users/' + authentication.name + '?tab=profile' | uri }}">
+          My Profile
+        </a>
+      </li>
 
-        <li>
-          <a href sem-log-out
-             ng-click="logout()">
-            Sign out
-          </a>
-        </li>
-      </ul>
-    </li>
+      <li class="divider"></li>
 
-    <li class="divider-vertical"
-        cam-if-logged-in
-        ng-cloak></li>
+      <li>
+        <a href sem-log-out
+           ng-click="logout()">
+          Sign out
+        </a>
+      </li>
+    </ul>
+  </li>
 
-    <li class="app-switch dropdown">
-      <a href
-         sem-show-applications
-         class="dropdown-toggle"
-         data-toggle="dropdown">
-        <i class="icon-home icon-white"></i>
-        <b class="caret"></b>
-      </a>
+  <li class="divider-vertical"
+      cam-if-logged-in
+      ng-cloak></li>
 
-      <ul class="dropdown-menu">
-        <li ng-show="!authentication || authentication.canAccess('cockpit')">
-          <a sem-jump-to-cockpit
-             ng-href="{{ '../../cockpit/:engine/' | uri }}">Cockpit</a>
-        </li>
+  <li class="app-switch dropdown"
+      cam-app-switch>
+    <a href
+       sem-show-applications
+       class="dropdown-toggle"
+       data-toggle="dropdown">
+      <i class="glyphicon glyphicon-home "></i>
+      <b class="caret"></b>
+    </a>
 
-        <li ng-show="!authentication || authentication.canAccess('tasklist')">
-          <a sem-jump-to-tasklist
-             ng-href="{{ '../../tasklist/:engine/' | uri }}">Tasklist</a>
-        </li>
-      </ul>
-    </li>
-  </ul>
-</div>
+    <ul class="dropdown-menu dropdown-menu-right">
+      <li ng-show="!authentication || authentication.canAccess('cockpit')">
+        <a sem-jump-to-cockpit
+           ng-href="{{ '../../cockpit/:engine/' | uri }}">Cockpit</a>
+      </li>
+
+      <li ng-show="!authentication || authentication.canAccess('tasklist')">
+        <a sem-jump-to-tasklist
+           ng-href="{{ '../../tasklist/:engine/' | uri }}">Tasklist</a>
+      </li>
+    </ul>
+  </li>
+</ul>
 <!-- / CE - camunda-admin-ui client/scripts/templates/authorizations.html -->

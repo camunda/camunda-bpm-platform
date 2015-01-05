@@ -1,5 +1,4 @@
-@import "../bower_components/bootstrap/less/variables";
-@import "../bower_components/bootstrap/less/mixins";
+@import "../../node_modules/camunda-commons-ui/resources/less/_vars";
 
 /********************************************************************\
  * Web interface customization variables                            *
@@ -17,8 +16,6 @@
 // slightly darker variant
 // @main-darker: #9c3930;
 @main-darker:   darken(@main-color, 25%);
-
-@link-color: #08c;
 
 @important-color: #b94a48;
 @important-darker: darken(@important-color, 45%);
@@ -39,13 +36,4 @@
 
 // Logos -------------------------------------------------------------
 
-@logo-admin:    '../assets/images/app-logo.png';
-
-// Logos -------------------------------------------------------------
-
-@fonts-path: '../fonts';
-
-// bootstrap overrides -----------------------------------------------
-// bootstrap pagination ----------------------------------------------
-@pagination-active-bg: @gray-light;
-@pagination-active-border: @gray-light;
+@brand-logo:    '../assets/images/app-logo.png';
