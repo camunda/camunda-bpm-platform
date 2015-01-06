@@ -1,4 +1,4 @@
-package org.camunda.bpm.engine.test.jobexecutor.tobemerged;
+package org.camunda.bpm.engine.test.jobexecutor;
 
 import java.text.DateFormat.Field;
 import java.util.Calendar;
