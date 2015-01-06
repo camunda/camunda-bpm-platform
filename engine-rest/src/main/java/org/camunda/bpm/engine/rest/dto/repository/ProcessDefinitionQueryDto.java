@@ -107,12 +107,30 @@ public class ProcessDefinitionQueryDto extends AbstractQueryDto<ProcessDefinitio
     this.keyLike = keyLike;
   }
 
+  /**
+   * @deprecated use {@link #setVersion(Integer)}
+   */
+  @Deprecated
   @CamundaQueryParam(value = "ver", converter = IntegerConverter.class)
+  public void setVer(Integer ver) {
+    setVersion(ver);
+  }
+
+  @CamundaQueryParam(value = "version", converter = IntegerConverter.class)
   public void setVersion(Integer version) {
     this.version = version;
   }
 
+  /**
+   * @deprecated use {@link #setLatestVersion(Boolean)}
+   */
+  @Deprecated
   @CamundaQueryParam(value = "latest", converter = BooleanConverter.class)
+  public void setLatest(Boolean latest) {
+    setLatestVersion(latest);
+  }
+
+  @CamundaQueryParam(value = "latestVersion", converter = BooleanConverter.class)
   public void setLatestVersion(Boolean latestVersion) {
     this.latestVersion = latestVersion;
   }
