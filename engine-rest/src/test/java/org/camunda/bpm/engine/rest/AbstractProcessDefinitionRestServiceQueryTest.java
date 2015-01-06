@@ -63,7 +63,7 @@ public abstract class AbstractProcessDefinitionRestServiceQueryTest extends Abst
     given().queryParam("version", anInvalidIntegerQueryParam)
       .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
       .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
-      .body("message", equalTo("Cannot set query parameter 'ver' to value 'aString': "
+      .body("message", equalTo("Cannot set query parameter 'version' to value 'aString': "
           + "Cannot convert value aString to java type java.lang.Integer"))
       .when().get(PROCESS_DEFINITION_QUERY_URL);
   }
