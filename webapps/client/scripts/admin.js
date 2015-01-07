@@ -30,7 +30,8 @@
 
   var plugins = window.PLUGIN_DEPENDENCIES || [];
 
-  var dependencies = [ 'jquery', 'angular', 'module:ng', 'module:ngResource', 'module:ui.bootstrap:angular-ui' ].concat(commons, adminCore, plugins);
+  var dependencies = [ 'jquery', 'angular', 'module:ng', 'module:ngResource', 'module:ui.bootstrap:angular-ui' ].concat(commons, adminCore,
+                       plugins.map(function(plugin) { return 'module:' + plugin.ngModuleName + ':' + plugin.requirePackageName; }));
 
   ngDefine('admin', dependencies, function(module, $) {
 

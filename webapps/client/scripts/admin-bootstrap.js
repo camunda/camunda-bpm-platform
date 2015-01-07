@@ -25,11 +25,16 @@
       // 'bootstrap',
       'jquery-ui/ui/jquery.ui.draggable'
     ], function(angular) {
-      require([
-        APP_NAME,
-        'domReady!'
-      ], function() {
-        rjsConf.utils.bootAngular(angular, APP_NAME);
+      var pluginDependencies = window.PLUGIN_DEPENDENCIES || [];
+      require(pluginDependencies.map(function(plugin) {
+        return plugin.requirePackageName;
+      }), function() {
+        require([
+          APP_NAME,
+          'domReady!'
+        ], function() {
+          rjsConf.utils.bootAngular(angular, APP_NAME);
+        });
       });
     });
   });

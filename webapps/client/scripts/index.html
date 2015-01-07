@@ -39,6 +39,11 @@
         <script src="$APP_ROOT/app/cockpit/assets/vendor/better-dom/dist/better-dom-legacy.js"></script>
     <![endif]-->
 
+    <script type="application/javascript">
+      window.PLUGIN_DEPENDENCIES = $PLUGIN_DEPENDENCIES || [];
+      window.PLUGIN_PACKAGES = $PLUGIN_PACKAGES || [];
+    </script>
+
     <script src="$APP_ROOT/app/admin/assets/vendor/requirejs/require.js"></script>
 
     <script src="$APP_ROOT/app/admin/admin-bootstrap.js?bust=CACHE_BUSTER"></script>
@@ -83,11 +88,6 @@
         </div>
       </footer>
     </div>
-
-    <script type="application/javascript">
-      window.PLUGIN_DEPENDENCIES = $PLUGIN_DEPENDENCIES || [];
-      window.PLUGIN_PACKAGES = $PLUGIN_PACKAGES || [];
-    </script>
 
     <script src="$APP_ROOT/app/admin/assets/vendor/better-dom/dist/better-dom.js"></script>
     <script src="$APP_ROOT/app/admin/assets/vendor/better-placeholder-polyfill/dist/better-placeholder-polyfill.js"></script>
