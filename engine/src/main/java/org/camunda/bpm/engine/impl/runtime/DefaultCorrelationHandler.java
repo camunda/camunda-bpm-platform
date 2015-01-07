@@ -99,6 +99,9 @@ public class DefaultCorrelationHandler implements CorrelationHandler {
       query.messageEventSubscription();
     }
 
+    // query only after active executions
+    query.active();
+
     List<Execution> matchingExecutions = query.evaluateExpressionsAndExecuteList(commandContext, null);
 
     List<MessageCorrelationResult> result = new ArrayList<MessageCorrelationResult>(matchingExecutions.size());
@@ -127,7 +130,8 @@ public class DefaultCorrelationHandler implements CorrelationHandler {
 
       String processDefinitionId = messageEventSubscription.getConfiguration();
       ProcessDefinitionEntity processDefinition = deploymentCache.findDeployedProcessDefinitionById(processDefinitionId);
-      if (processDefinition == null) {
+      // only an active process definition will be returned
+      if (processDefinition == null || processDefinition.isSuspended()) {
         LOGGER.log(Level.FINE, "Found event subscription with {0} but process definition {1} could not be found.",
             new Object[]{messageEventSubscription, processDefinitionId});
         return null;
