@@ -20,44 +20,7 @@ Simple API for connecting HTTP Services and other things.
 # Using a Connector
 
 camunda Connect API aims at two usage scenarios, usage in a generic system such as camunda BPM
-process engine and standalone usage via API.
-
-## Standalone: Programmer friendly fluent API
-For standalone usage in Java or Scripting Languages, the connectors expose a fluent API:
-
-```java
-// use connectors provider
-SoapHttpConnector soapConnector = Connectors.getConnector(SoapHttpConnector.ID);
-// or instantiate a new connector
-soapConnector = new SoapHttpConnector();
-
-SoapHttpResponse response = soapConnector.createRequest()
-  .url("https://examaple.com/api/soap/21.0/")
-  .soapAction("Login")
-  .payload(requestMessage)
-  .execute();
-```
-
-## Embedded: Generic API
-For usage in a generic system such as camunda BPM process engine, the connectors expose a generic,
-property-based API:
-
-```java
-SoapHttpConnector soapConnector = new SoapHttpConnector();
-
-// create the request
-SoapHttpRequest request = soapConnector.createRequest();
-
-// configure the request
-request.setRequestParameter(HttpBaseRequest.PARAM_NAME_REQUEST_URL, "https://examaple.com/api/soap/21.0/");
-HashMap<String, String> headers = new HashMap<String, String>();
-headers.put(SoapHttpRequest.HEADER_SOAP_ACTION, "Login");
-request.setRequestParameter(HttpBaseRequest.PARAM_NAME_REQUEST_HEADERS, headers);
-request.setRequestParameter(HttpBaseRequest.PARAM_NAME_REQUEST_PAYLOAD, requestMessage);
-
-// execute the request
-SoapHttpResponse response = request.execute();
-```
+process engine and standalone usage via API. Please see the [official documentation](http://docs.camunda.org/latest/api-references/connect/) for more information.
 
 # Contributing
 
