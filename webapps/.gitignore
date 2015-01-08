@@ -20,3 +20,4 @@ dependency-reduced-pom.xml
 *.lock.db
 node_modules
 test.*.log
+webapp/*.log
