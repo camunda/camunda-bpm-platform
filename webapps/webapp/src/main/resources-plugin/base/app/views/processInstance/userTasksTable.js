@@ -109,9 +109,7 @@ define(['angular', 'text!./identity-links-modal.html', 'text!./user-tasks-table.
           maxResults: count
         };
 
-        TaskResource.count(params).$promise.then(function (response) {
-          pages.total = response.count;
-        });
+        var params = angular.extend({}, filter, defaultParams);
 
         // fix missmatch -> activityInstanceIds -> activityInstanceIdIn
         params.activityInstanceIdIn = params.activityInstanceIds;
@@ -123,8 +121,6 @@ define(['angular', 'text!./identity-links-modal.html', 'text!./user-tasks-table.
         taskCopies = {};
 
         TaskResource.count(params).$promise.then(function (response) {
-          // pages.total = Math.ceil(response.data.count / pages.size);
-          // pages.total = Math.ceil(response.count / pages.size);
           pages.total = response.count;
         });
 
