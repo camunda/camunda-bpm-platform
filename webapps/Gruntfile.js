@@ -190,10 +190,6 @@ module.exports = function(grunt) {
           autoBuild('camunda-cockpit-ui', verbose, stack),
           autoBuild('camunda-tasklist-ui', verbose, stack),
           {
-            cmd: 'webdriver-manager',
-            args: ['start']
-          },
-          {
             opts: {},
             cmd: 'grunt',
             args: ['watch']
