@@ -17,7 +17,7 @@ module.exports = function(config) {
 
       paths: {
         'angular': 'empty:',
-        'text': 'bower_components/requirejs-text/text'
+        'text': '<%= pkg.gruntConfig.pluginDir.split("/").map(function () { return ".." }).join("/") %>/node_modules/requirejs-text/text'
       }
     },
 
