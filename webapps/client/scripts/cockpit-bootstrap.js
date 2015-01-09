@@ -16,6 +16,7 @@
       'angular-sanitize',
       'angular-ui',
       'ngDefine',
+      'jquery',
       'jquery-ui/ui/jquery.ui.draggable']
   .concat(pluginDependencies.map(function(plugin) {
       return plugin.requirePackageName;
