@@ -1,7 +1,4 @@
 {
-  "name": "camunda-plugins",
-  "version": "7.3.0-SNAPSHOT",
-  "private": true,
   "gruntConfig": {
     "buildTarget": "target/webapp/plugin",
     "pluginDir": "src/main/resources-plugin"
