@@ -49,9 +49,74 @@
         </a>
       </div>
 
-      <div ng-include="'$APP_ROOT/app/cockpit/templates/navigation.html'"
-           class="navbar-collapse"
-           id="navbar-collapse"></div>
+      <div class="navbar-collapse"
+           id="navbar-collapse">
+        <!-- # CE - camunda-cockpit-ui client/scripts/templates/navigation.html -->
+        <ul ng-cloak
+            class="nav navbar-nav pull-right"
+            ng-controller="AuthenticationController">
+
+          <li engine-select></li>
+
+          <li class="dropdown"
+            cam-if-logged-in
+            ng-cloak>
+            <a href
+               sem-show-user-actions
+               class="dropdown-toggle"
+               data-toggle="dropdown">
+              <i class="glyphicon glyphicon-user "></i>
+              {{ authentication.name }}
+            </a>
+
+            <ul class="dropdown-menu dropdown-menu-right">
+              <li>
+                <a sem-jump-to-profile
+                   ng-href="{{ '../../admin/:engine/#/users/' + authentication.name + '?tab=profile' | uri }}">
+                  My Profile
+                </a>
+              </li>
+
+              <li class="divider"></li>
+
+              <li>
+                <a href
+                   sem-log-out
+                   ng-click="logout()">
+                  Sign out
+                </a>
+              </li>
+            </ul>
+          </li>
+
+          <li class="divider-vertical"
+              cam-if-logged-in
+              ng-cloak></li>
+
+          <li class="app-switch dropdown">
+            <a href
+               sem-show-applications
+               class="dropdown-toggle"
+               data-toggle="dropdown">
+              <i class="glyphicon glyphicon-home "></i>
+              <b class="caret"></b>
+            </a>
+
+            <ul class="dropdown-menu dropdown-menu-right">
+              <li ng-if="!authentication || authentication.canAccess('admin')">
+                <a sem-jump-to-admin
+                   ng-href="{{ '../../admin/:engine/' | uri }}">Admin</a>
+              </li>
+
+              <li ng-if="!authentication || authentication.canAccess('tasklist')">
+                <a sem-jump-to-tasklist
+                   ng-href="{{ '../../tasklist/:engine/' | uri }}">Tasklist</a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+        <!-- / CE - camunda-cockpit-ui client/scripts/templates/navigation.html -->
+      </div>
     </div>
 
     <!-- content -->
