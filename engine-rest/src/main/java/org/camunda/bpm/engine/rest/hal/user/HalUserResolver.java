@@ -19,16 +19,19 @@ import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.rest.hal.HalResource;
-import org.camunda.bpm.engine.rest.hal.HalLinkResolver;
+import org.camunda.bpm.engine.rest.hal.cache.HalIdResourceCacheLinkResolver;
 
 /**
  * @author Daniel Meyer
  *
  */
-public class HalUserResolver implements HalLinkResolver {
+public class HalUserResolver extends HalIdResourceCacheLinkResolver {
 
-  public List<HalResource<?>> resolveLinks(String[] linkedIds, ProcessEngine processEngine) {
+  protected Class<?> getHalResourceClass() {
+    return HalUser.class;
+  }
 
+  protected List<HalResource<?>> resolveNotCachedLinks(String[] linkedIds, ProcessEngine processEngine) {
     IdentityService identityService = processEngine.getIdentityService();
 
     List<User> users = identityService.createUserQuery()

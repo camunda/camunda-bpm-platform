@@ -70,6 +70,7 @@ public class HistoricCaseActivityInstanceTest extends CmmnProcessEngineTestCase 
     assertEquals(stage.getCaseInstanceId(), historicStage.getCaseInstanceId());
     assertEquals(stage.getActivityId(), historicStage.getCaseActivityId());
     assertEquals(stage.getActivityName(), historicStage.getCaseActivityName());
+    assertEquals(stage.getActivityType(), historicStage.getCaseActivityType());
 
     manualStart(stage.getId());
 
@@ -170,54 +171,63 @@ public class HistoricCaseActivityInstanceTest extends CmmnProcessEngineTestCase 
   }
 
   @Deployment
-  public void testHistoricCaseActivityEventListenerAndMilestoneStates() {
-    String milestoneId = "PI_Milestone";
-    String userEventId1 = "PI_UserEvent_1";
-    String userEventId2 = "PI_UserEvent_2";
+  public void testHistoricCaseActivityMilestoneStates() {
+    String milestoneId1 = "PI_Milestone_1";
+    String milestoneId2 = "PI_Milestone_2";
+    String humanTaskId1 = "PI_HumanTask_1";
+    String humanTaskId2 = "PI_HumanTask_2";
 
     // given
     String caseInstanceId = createCaseInstance().getId();
-    String eventInstance1 = queryCaseExecutionByActivityId(userEventId1).getId();
-    String eventInstance2 = queryCaseExecutionByActivityId(userEventId2).getId();
+    String milestoneInstance1 = queryCaseExecutionByActivityId(milestoneId1).getId();
+    String milestoneInstance2 = queryCaseExecutionByActivityId(milestoneId2).getId();
+    String humanTaskInstance1 = queryCaseExecutionByActivityId(humanTaskId1).getId();
 
-    // then milestone and user event 1 and 2 are available
-    assertHistoricState(milestoneId, AVAILABLE);
-    assertHistoricState(userEventId1, AVAILABLE);
-    assertHistoricState(userEventId2, AVAILABLE);
-    assertStateQuery(AVAILABLE, AVAILABLE, AVAILABLE);
+    // then milestone 1 and 2 are available and
+    // humanTask 1 and 2 are enabled
+    assertHistoricState(milestoneId1, AVAILABLE);
+    assertHistoricState(milestoneId2, AVAILABLE);
+    assertHistoricState(humanTaskId1, ENABLED);
+    assertHistoricState(humanTaskId2, ENABLED);
+    assertStateQuery(AVAILABLE, AVAILABLE, ENABLED, ENABLED);
 
-    // suspend event user event 1 and 2
-    suspend(eventInstance1);
-    suspend(eventInstance2);
-    assertHistoricState(milestoneId, AVAILABLE);
-    assertHistoricState(userEventId1, SUSPENDED);
-    assertHistoricState(userEventId2, SUSPENDED);
-    assertStateQuery(AVAILABLE, SUSPENDED, SUSPENDED);
+    // suspend event milestone 1 and 2
+    suspend(milestoneInstance1);
+    suspend(milestoneInstance2);
+    assertHistoricState(milestoneId1, SUSPENDED);
+    assertHistoricState(milestoneId2, SUSPENDED);
+    assertHistoricState(humanTaskId1, ENABLED);
+    assertHistoricState(humanTaskId2, ENABLED);
+    assertStateQuery(SUSPENDED, SUSPENDED, ENABLED, ENABLED);
 
-    // resume user event 1
-    resume(eventInstance1);
-    assertHistoricState(milestoneId, AVAILABLE);
-    assertHistoricState(userEventId1, AVAILABLE);
-    assertHistoricState(userEventId2, SUSPENDED);
-    assertStateQuery(AVAILABLE, AVAILABLE, SUSPENDED);
+    // resume user milestone 1
+    resume(milestoneInstance1);
+    assertHistoricState(milestoneId1, AVAILABLE);
+    assertHistoricState(milestoneId2, SUSPENDED);
+    assertHistoricState(humanTaskId1, ENABLED);
+    assertHistoricState(humanTaskId2, ENABLED);
+    assertStateQuery(AVAILABLE, SUSPENDED, ENABLED, ENABLED);
 
-    // when user event 1 is terminated
-    terminate(eventInstance1);
+    // when humanTask 1 is terminated
+    manualStart(humanTaskInstance1);
+    terminate(humanTaskInstance1);
 
-    // then user event 1 is terminated and milestone is completed caused by its entryCriteria
-    assertHistoricState(milestoneId, COMPLETED);
-    assertHistoricState(userEventId1, TERMINATED);
-    assertHistoricState(userEventId2, SUSPENDED);
-    assertStateQuery(COMPLETED, TERMINATED, SUSPENDED);
+    // then humanTask 1 is terminated and milestone 1 is completed caused by its entryCriteria
+    assertHistoricState(milestoneId1, COMPLETED);
+    assertHistoricState(milestoneId2, SUSPENDED);
+    assertHistoricState(humanTaskId1, TERMINATED);
+    assertHistoricState(humanTaskId2, ENABLED);
+    assertStateQuery(COMPLETED, SUSPENDED, TERMINATED, ENABLED);
 
     // when the case instance is terminated
     terminate(caseInstanceId);
 
-    // then user event 2 is terminated
-    assertHistoricState(milestoneId, COMPLETED);
-    assertHistoricState(userEventId1, TERMINATED);
-    assertHistoricState(userEventId2, TERMINATED);
-    assertStateQuery(COMPLETED, TERMINATED, TERMINATED);
+    // then milestone 2 is terminated
+    assertHistoricState(milestoneId1, COMPLETED);
+    assertHistoricState(milestoneId2, TERMINATED);
+    assertHistoricState(humanTaskId1, TERMINATED);
+    assertHistoricState(humanTaskId2, TERMINATED);
+    assertStateQuery(COMPLETED, TERMINATED, TERMINATED, TERMINATED);
   }
 
   @Deployment
@@ -225,9 +235,9 @@ public class HistoricCaseActivityInstanceTest extends CmmnProcessEngineTestCase 
     String taskId1 = "PI_HumanTask_1";
     String taskId2 = "PI_HumanTask_2";
     String taskId3 = "PI_HumanTask_3";
-    String eventId1 = "PI_UserEvent_1";
-    String eventId2 = "PI_UserEvent_2";
-    String eventId3 = "PI_UserEvent_3";
+    String milestoneId1 = "PI_Milestone_1";
+    String milestoneId2 = "PI_Milestone_2";
+    String milestoneId3 = "PI_Milestone_3";
 
     // create test dates
     long duration = 72 * 3600 * 1000;
@@ -239,15 +249,15 @@ public class HistoricCaseActivityInstanceTest extends CmmnProcessEngineTestCase 
     String taskInstance1 = queryCaseExecutionByActivityId(taskId1).getId();
     String taskInstance2 = queryCaseExecutionByActivityId(taskId2).getId();
     String taskInstance3 = queryCaseExecutionByActivityId(taskId3).getId();
-    String eventInstance1 = queryCaseExecutionByActivityId(eventId1).getId();
-    String eventInstance2 = queryCaseExecutionByActivityId(eventId2).getId();
-    String eventInstance3 = queryCaseExecutionByActivityId(eventId3).getId();
+    String milestoneInstance1 = queryCaseExecutionByActivityId(milestoneId1).getId();
+    String milestoneInstance2 = queryCaseExecutionByActivityId(milestoneId2).getId();
+    String milestoneInstance3 = queryCaseExecutionByActivityId(milestoneId3).getId();
 
     // assert create time of all historic instances
     assertHistoricCreateTime(taskId1, created);
     assertHistoricCreateTime(taskId2, created);
-    assertHistoricCreateTime(eventId1, created);
-    assertHistoricCreateTime(eventId2, created);
+    assertHistoricCreateTime(milestoneId1, created);
+    assertHistoricCreateTime(milestoneId2, created);
 
     // complete human task 1
     manualStart(taskInstance1);
@@ -258,13 +268,13 @@ public class HistoricCaseActivityInstanceTest extends CmmnProcessEngineTestCase 
     assertHistoricEndTime(taskId1, ended);
     assertHistoricDuration(taskId1, duration);
 
-    // complete user event 1
+    // complete milestone 1
     ClockUtil.setCurrentTime(ended);
-    occur(eventInstance1);
+    occur(milestoneInstance1);
 
-    // assert end time of user event 1
-    assertHistoricEndTime(eventId1, ended);
-    assertHistoricDuration(eventId1, duration);
+    // assert end time of milestone 1
+    assertHistoricEndTime(milestoneId1, ended);
+    assertHistoricDuration(milestoneId1, duration);
 
     // terminate human task 2
     manualStart(taskInstance2);
@@ -275,27 +285,27 @@ public class HistoricCaseActivityInstanceTest extends CmmnProcessEngineTestCase 
     assertHistoricEndTime(taskId2, ended);
     assertHistoricDuration(taskId2, duration);
 
-    // terminate user event 2
+    // terminate milestone 2
     ClockUtil.setCurrentTime(ended);
-    terminate(eventInstance2);
+    terminate(milestoneInstance2);
 
     // assert end time of user event 2
-    assertHistoricEndTime(eventId2, ended);
-    assertHistoricDuration(eventId2, duration);
+    assertHistoricEndTime(milestoneId2, ended);
+    assertHistoricDuration(milestoneId2, duration);
 
-    // disable human task 3 and suspend user event 3
+    // disable human task 3 and suspend milestone 3
     disable(taskInstance3);
-    suspend(eventInstance3);
+    suspend(milestoneInstance3);
 
     // when terminate case instance
     ClockUtil.setCurrentTime(ended);
     terminate(caseInstanceId);
 
-    // then human task 3 and user event 3 should be terminated and a end time is set
+    // then human task 3 and milestone 3 should be terminated and a end time is set
     assertHistoricEndTime(taskId3, ended);
-    assertHistoricEndTime(eventId3, ended);
+    assertHistoricEndTime(milestoneId3, ended);
     assertHistoricDuration(taskId3, duration);
-    assertHistoricDuration(eventId3, duration);
+    assertHistoricDuration(milestoneId3, duration);
 
     // test queries
     Date beforeCreate = new Date(created.getTime() - 3600 * 1000);
@@ -450,6 +460,9 @@ public class HistoricCaseActivityInstanceTest extends CmmnProcessEngineTestCase 
 
     assertCount(1, historicQuery().caseActivityName(stageName));
     assertCount(1, historicQuery().caseActivityName(taskName));
+
+    assertCount(1, historicQuery().caseActivityType("stage"));
+    assertCount(1, historicQuery().caseActivityType("humanTask"));
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
@@ -529,6 +542,15 @@ public class HistoricCaseActivityInstanceTest extends CmmnProcessEngineTestCase 
     // sort by durations times
     assertQuerySorting("durationInMillis", historicQuery().orderByHistoricCaseActivityInstanceDuration(),
       historicTask1.getDurationInMillis(), historicTask2.getDurationInMillis(), historicTask3.getDurationInMillis());
+  }
+
+  @Deployment
+  public void testQuerySortingCaseActivityType() {
+    createCaseInstance().getId();
+
+    // sort by case activity type
+    assertQuerySorting("caseActivityType", historicQuery().orderByCaseActivityType(),
+      "milestone", "processTask", "humanTask");
   }
 
   public void testInvalidSorting() {

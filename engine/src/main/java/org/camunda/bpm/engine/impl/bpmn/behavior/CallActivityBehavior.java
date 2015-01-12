@@ -17,16 +17,18 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
-import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.Expression;
+import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.bpmn.parser.DataAssociation;
+import org.camunda.bpm.engine.impl.cmmn.behavior.CallableElement.CallableElementBinding;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessInstance;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.engine.impl.pvm.delegate.SubProcessActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
+import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 
 
 /**
@@ -40,9 +42,9 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
   protected String processDefinitionKey;
   protected String binding;
   protected Integer version;
-  private List<DataAssociation> dataInputAssociations = new ArrayList<DataAssociation>();
-  private List<DataAssociation> dataOutputAssociations = new ArrayList<DataAssociation>();
-  private Expression processDefinitionExpression;
+  protected List<DataAssociation> dataInputAssociations = new ArrayList<DataAssociation>();
+  protected List<DataAssociation> dataOutputAssociations = new ArrayList<DataAssociation>();
+  protected Expression processDefinitionExpression;
 
   public enum CalledElementBinding {
     LATEST("latest"),
@@ -82,107 +84,190 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
     this.version = version;
   }
 
+  // behavior //////////////////////////////////////////////////////////////////////////////////////////
+
+  public void execute(ActivityExecution execution) throws Exception {
+    Map<String, Object> variables = getVariables(dataInputAssociations, execution);
+    String businessKey = getBusinessKey(dataInputAssociations, execution);
+
+    startInstance(execution, variables, businessKey);
+  }
+
+  protected void startInstance(ActivityExecution execution, Map<String, Object> variables, String businessKey) {
+    String processDefinitionKey = getProcessDefinitionKey(execution);
+
+    DeploymentCache deploymentCache = getDeploymentCache();
+
+    ProcessDefinitionImpl processDefinition = null;
+
+    if (isLatestBinding()) {
+      processDefinition = deploymentCache.findDeployedLatestProcessDefinitionByKey(processDefinitionKey);
+
+    } else if (isDeploymentBinding()) {
+      String deploymentId = getDeploymentId(execution);
+      processDefinition = deploymentCache.findDeployedProcessDefinitionByDeploymentAndKey(deploymentId, processDefinitionKey);
+
+    } else if (isVersionBinding()) {
+      processDefinition = deploymentCache.findDeployedProcessDefinitionByKeyAndVersion(processDefinitionKey, version);
+    }
+
+    PvmProcessInstance subProcessInstance = execution.createSubProcessInstance(processDefinition, businessKey);
+    subProcessInstance.start(variables);
+  }
+
+  public void completing(VariableScope execution, VariableScope subProcessInstance) throws Exception {
+    // only data.  no control flow available on this execution.
+    Map<String, Object> variables = getVariables(dataOutputAssociations, subProcessInstance);
+    execution.setVariables(variables);
+  }
+
+  public void completed(ActivityExecution execution) throws Exception {
+    // only control flow.  no sub process instance data available
+    leave(execution);
+  }
+
+  // getter // setter /////////////////////////////////////////////////////////////////////////////
+
+  public String getProcessDefinitionKey() {
+    return processDefinitionKey;
+  }
+
+  public void setProcessDefinitionKey(String processDefinitionKey) {
+    this.processDefinitionKey = processDefinitionKey;
+  }
+
+  public Expression getProcessDefinitionExpression() {
+    return processDefinitionExpression;
+  }
+
+  public void setProcessDefinitionExpression(Expression processDefinitionExpression) {
+    this.processDefinitionExpression = processDefinitionExpression;
+  }
+
+  public Integer getVersion() {
+    return version;
+  }
+
+  public void setVersion(Integer version) {
+    this.version = version;
+  }
+
+  public String getBinding() {
+    return binding;
+  }
+
+  public void setBinding(String binding) {
+    this.binding = binding;
+  }
+
   public void addDataInputAssociation(DataAssociation dataInputAssociation) {
     this.dataInputAssociations.add(dataInputAssociation);
+  }
+
+  public List<DataAssociation> getDataInputAssociations() {
+    return dataInputAssociations;
+  }
+
+  public void setDataInputAssociations(List<DataAssociation> dataInputAssociations) {
+    this.dataInputAssociations = dataInputAssociations;
   }
 
   public void addDataOutputAssociation(DataAssociation dataOutputAssociation) {
     this.dataOutputAssociations.add(dataOutputAssociation);
   }
 
-  public void execute(ActivityExecution execution) throws Exception {
-
-	String processDefinitionKey = this.processDefinitionKey;
-	String binding = this.binding;
-	Integer version = this.version;
-    if (processDefinitionExpression != null) {
-      processDefinitionKey = (String) processDefinitionExpression.getValue(execution);
-    }
-
-    ProcessDefinitionImpl processDefinition = null;
-    if (binding == null || CalledElementBinding.LATEST.getValue().equals(binding)) {
-      processDefinition = Context
-        .getProcessEngineConfiguration()
-        .getDeploymentCache()
-        .findDeployedLatestProcessDefinitionByKey(processDefinitionKey);
-    } else if (binding != null && CalledElementBinding.DEPLOYMENT.getValue().equals(binding)) {
-      processDefinition = Context
-        .getProcessEngineConfiguration()
-        .getDeploymentCache()
-        .findDeployedProcessDefinitionByDeploymentAndKey(Context.getExecutionContext().getExecution().getProcessDefinition().getDeploymentId(), processDefinitionKey);
-    } else if (binding != null && CalledElementBinding.VERSION.getValue().equals(binding) && version != null) {
-      processDefinition = Context
-        .getProcessEngineConfiguration()
-        .getDeploymentCache()
-        .findDeployedProcessDefinitionByKeyAndVersion(processDefinitionKey, version);
-    }
-
-    // copy process variables / businessKey
-    String businessKey = null;
-    Map<String, Object> callActivityVariables = new HashMap<String, Object>();
-
-    for (DataAssociation dataInputAssociation : dataInputAssociations) {
-      Object value;
-
-      if (dataInputAssociation.getBusinessKeyExpression() != null) {
-        // set business key
-        businessKey = (String) dataInputAssociation.getBusinessKeyExpression().getValue(execution);
-      }
-      else if (dataInputAssociation.getVariables() != null) {
-        // set all variables
-        Map<String, Object> variables = execution.getVariables();
-        if (variables != null && !variables.isEmpty()) {
-          Set<String> variableKeys = variables.keySet();
-          for (String variableKey : variableKeys) {
-            callActivityVariables.put(variableKey, variables.get(variableKey));
-          }
-        }
-      }
-      else {
-        // set single variable
-        if (dataInputAssociation.getSourceExpression() != null) {
-          value = dataInputAssociation.getSourceExpression().getValue(execution);
-        } else {
-          value = execution.getVariable(dataInputAssociation.getSource());
-        }
-
-        callActivityVariables.put(dataInputAssociation.getTarget(), value);
-      }
-    }
-
-    PvmProcessInstance subProcessInstance = execution.createSubProcessInstance(processDefinition, businessKey);
-    subProcessInstance.start(callActivityVariables);
+  public List<DataAssociation> getDataOutputAssociations() {
+    return dataOutputAssociations;
   }
 
-  public void completing(DelegateExecution execution, DelegateExecution subProcessInstance) throws Exception {
-    // only data.  no control flow available on this execution.
+  public void setDataOutputAssociations(List<DataAssociation> dataOutputAssociations) {
+    this.dataOutputAssociations = dataOutputAssociations;
+  }
 
-    // copy process variables
-    for (DataAssociation dataOutputAssociation : dataOutputAssociations) {
-      Object value = null;
-        if (dataOutputAssociation.getVariables() != null) {
-          // set all variables
-          Map<String, Object> variables = subProcessInstance.getVariables();
-          if (variables != null && !variables.isEmpty()) {
-            execution.setVariables(variables);
-          }
+  // helper ////////////////////////////////////////////////////////////////////////////////
+
+  protected boolean isLatestBinding() {
+    String binding = getBinding();
+    return binding == null || CallableElementBinding.LATEST.getValue().equals(binding);
+  }
+
+  protected boolean isDeploymentBinding() {
+    String binding = getBinding();
+    return CallableElementBinding.DEPLOYMENT.getValue().equals(binding);
+  }
+
+  protected boolean isVersionBinding() {
+    String binding = getBinding();
+    return CallableElementBinding.VERSION.getValue().equals(binding);
+  }
+
+  protected String getProcessDefinitionKey(VariableScope variableScope) {
+    if (processDefinitionExpression != null) {
+      return (String) processDefinitionExpression.getValue(variableScope);
+    }
+    return processDefinitionKey;
+  }
+
+  protected DeploymentCache getDeploymentCache() {
+    return Context
+        .getProcessEngineConfiguration()
+        .getDeploymentCache();
+  }
+
+  protected String getDeploymentId(ActivityExecution execution) {
+    PvmExecutionImpl exec = (PvmExecutionImpl) execution;
+    ProcessDefinitionImpl definition = exec.getProcessDefinition();
+    return definition.getDeploymentId();
+  }
+
+  protected Map<String, Object> getVariables(List<DataAssociation> params, VariableScope variableScope) {
+    Map<String, Object> result = new HashMap<String, Object>();
+
+    for (DataAssociation param : params) {
+
+      // ignore business key
+      if (param.getBusinessKeyExpression() == null) {
+
+
+        if (param.getVariables() != null) {
+          Map<String, Object> allVariables = variableScope.getVariables();
+          result.putAll(allVariables);
+
         } else {
-          // set single variable
-          if (dataOutputAssociation.getSourceExpression()!=null) {
-            value = dataOutputAssociation.getSourceExpression().getValue(subProcessInstance);
+
+          String targetVariableName = param.getTarget();
+          Object value = null;
+          Expression sourceExpression = param.getSourceExpression();
+
+          if (sourceExpression != null) {
+            value = sourceExpression.getValue(variableScope);
 
           } else {
-            value = subProcessInstance.getVariable(dataOutputAssociation.getSource());
+            String source = param.getSource();
+            value = variableScope.getVariable(source);
           }
 
-          execution.setVariable(dataOutputAssociation.getTarget(), value);
+          result.put(targetVariableName, value);
         }
-
+      }
     }
+
+    return result;
   }
 
-  public void completed(ActivityExecution execution) throws Exception {
-    // only control flow.  no sub process instance data available
-    leave(execution);
+  protected String getBusinessKey(List<DataAssociation> params, VariableScope variableScope) {
+
+    String result = null;
+
+    for (DataAssociation param : params) {
+
+      Expression businessKeyExpression = param.getBusinessKeyExpression();
+      if (businessKeyExpression != null) {
+        result = (String) businessKeyExpression.getValue(variableScope);
+      }
+
+    }
+
+    return result;
   }
 }

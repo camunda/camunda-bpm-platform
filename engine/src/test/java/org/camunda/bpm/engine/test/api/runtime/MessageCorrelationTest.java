@@ -883,4 +883,84 @@ public class MessageCorrelationTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testCatchingMessageEventCorrelation.bpmn20.xml")
+  public void testSuspendedProcessInstance() {
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("aKey", "aValue");
+    String processInstance = runtimeService.startProcessInstanceByKey("process", variables).getId();
+
+    // suspend process instance
+    runtimeService.suspendProcessInstanceById(processInstance);
+
+    String messageName = "newInvoiceMessage";
+    Map<String, Object> correlationKeys = new HashMap<String, Object>();
+    correlationKeys.put("aKey", "aValue");
+
+    try {
+      runtimeService.correlateMessage(messageName, correlationKeys);
+      fail("It should not be possible to correlate a message to a suspended process instance.");
+    } catch (MismatchingMessageCorrelationException e) {
+      // expected
+    }
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testCatchingMessageEventCorrelation.bpmn20.xml")
+  public void testOneMatchingAndOneSuspendedProcessInstance() {
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("aKey", "aValue");
+    String firstProcessInstance = runtimeService.startProcessInstanceByKey("process", variables).getId();
+
+    variables = new HashMap<String, Object>();
+    variables.put("aKey", "aValue");
+    String secondProcessInstance = runtimeService.startProcessInstanceByKey("process", variables).getId();
+
+    // suspend second process instance
+    runtimeService.suspendProcessInstanceById(secondProcessInstance);
+
+    String messageName = "newInvoiceMessage";
+    Map<String, Object> correlationKeys = new HashMap<String, Object>();
+    correlationKeys.put("aKey", "aValue");
+
+    Map<String, Object> messagePayload = new HashMap<String, Object>();
+    messagePayload.put("aNewKey", "aNewVariable");
+
+    runtimeService.correlateMessage(messageName, correlationKeys, messagePayload);
+
+    // there exists an uncorrelated executions (the second process instance)
+    long uncorrelatedExecutions = runtimeService
+        .createExecutionQuery()
+        .processInstanceId(secondProcessInstance)
+        .processVariableValueEquals("aKey", "aValue")
+        .messageEventSubscriptionName("newInvoiceMessage")
+        .count();
+    assertEquals(1, uncorrelatedExecutions);
+
+    // the execution that has been correlated should have advanced
+    long correlatedExecutions = runtimeService
+        .createExecutionQuery()
+        .processInstanceId(firstProcessInstance)
+        .activityId("task")
+        .processVariableValueEquals("aKey", "aValue")
+        .processVariableValueEquals("aNewKey", "aNewVariable")
+        .count();
+    assertEquals(1, correlatedExecutions);
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testMessageStartEventCorrelation.bpmn20.xml")
+  public void testSuspendedProcessDefinition() {
+    String processDefinitionId = repositoryService.createProcessDefinitionQuery().singleResult().getId();
+
+    repositoryService.suspendProcessDefinitionById(processDefinitionId);
+
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("aKey", "aValue");
+
+    try {
+      runtimeService.correlateMessage("newInvoiceMessage", new HashMap<String, Object>(), variables);
+      fail("It should not be possible to correlate a message to a suspended process definition.");
+    } catch (MismatchingMessageCorrelationException e) {
+      // expected
+    }
+  }
+
 }

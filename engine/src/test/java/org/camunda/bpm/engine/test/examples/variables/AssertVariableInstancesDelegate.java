@@ -19,7 +19,7 @@ import static org.junit.Assert.assertNull;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.variable.serializer.JavaObjectSerializer;
+import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.engine.variable.value.ObjectValue;
 
@@ -54,7 +54,7 @@ public class AssertVariableInstancesDelegate implements JavaDelegate {
     assertEquals(10, objectValue.getIntProperty());
     ObjectValue variableTyped = execution.getVariableTyped("anObjectValue");
     assertEquals(10, variableTyped.getValue(SimpleSerializableBean.class).getIntProperty());
-    assertEquals(JavaObjectSerializer.SERIALIZATION_DATA_FORMAT, variableTyped.getSerializationDataFormat());
+    assertEquals(Variables.SerializationDataFormats.JAVA.getName(), variableTyped.getSerializationDataFormat());
 
     objectValue = (SimpleSerializableBean) execution.getVariable("anUntypedObjectValue");
     assertNotNull(objectValue);

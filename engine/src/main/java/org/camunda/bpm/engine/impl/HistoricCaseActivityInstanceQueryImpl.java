@@ -45,6 +45,7 @@ public class HistoricCaseActivityInstanceQueryImpl extends AbstractQuery<Histori
   protected String caseExecutionId;
   protected String caseActivityId;
   protected String caseActivityName;
+  protected String caseActivityType;
   protected Date createdBefore;
   protected Date createdAfter;
   protected Date endedBefore;
@@ -110,6 +111,12 @@ public class HistoricCaseActivityInstanceQueryImpl extends AbstractQuery<Histori
   public HistoricCaseActivityInstanceQuery caseActivityName(String caseActivityName) {
     ensureNotNull(NotValidException.class, "caseActivityName", caseActivityName);
     this.caseActivityName = caseActivityName;
+    return this;
+  }
+
+  public HistoricCaseActivityInstanceQuery caseActivityType(String caseActivityType) {
+    ensureNotNull(NotValidException.class, "caseActivityType", caseActivityType);
+    this.caseActivityType = caseActivityType;
     return this;
   }
 
@@ -216,6 +223,11 @@ public class HistoricCaseActivityInstanceQueryImpl extends AbstractQuery<Histori
     return this;
   }
 
+  public HistoricCaseActivityInstanceQuery orderByCaseActivityType() {
+    orderBy(HistoricCaseActivityInstanceQueryProperty.CASE_ACTIVITY_TYPE);
+    return this;
+  }
+
   public HistoricCaseActivityInstanceQuery orderByHistoricCaseActivityInstanceCreateTime() {
     orderBy(HistoricCaseActivityInstanceQueryProperty.CREATE);
     return this;
@@ -256,6 +268,10 @@ public class HistoricCaseActivityInstanceQueryImpl extends AbstractQuery<Histori
 
   public String getCaseActivityName() {
     return caseActivityName;
+  }
+
+  public String getCaseActivityType() {
+    return caseActivityType;
   }
 
   public Date getCreatedBefore() {

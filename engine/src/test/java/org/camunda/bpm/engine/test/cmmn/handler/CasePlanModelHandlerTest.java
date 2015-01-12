@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.engine.test.cmmn.handler;
 
+import static org.camunda.bpm.engine.impl.cmmn.handler.ItemHandler.PROPERTY_ACTIVITY_TYPE;
+import static org.camunda.bpm.engine.impl.cmmn.handler.ItemHandler.PROPERTY_ACTIVITY_DESCRIPTION;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
@@ -50,6 +52,31 @@ public class CasePlanModelHandlerTest extends CmmnElementHandlerTest {
 
     // then
     assertEquals(name, activity.getName());
+  }
+
+  @Test
+  public void testCasePlanModelActivityType() {
+    // given
+
+    // when
+    CmmnActivity activity = handler.handleElement(casePlanModel, context);
+
+    // then
+    String activityType = (String) activity.getProperty(PROPERTY_ACTIVITY_TYPE);
+    assertEquals("casePlanModel", activityType);
+  }
+
+  @Test
+  public void testCasePlanModelDescription() {
+    // given
+    String description = "This is a casePlanModal";
+    casePlanModel.setDescription(description);
+
+    // when
+    CmmnActivity activity = handler.handleElement(casePlanModel, context);
+
+    // then
+    assertEquals(description, (String) activity.getProperty(PROPERTY_ACTIVITY_DESCRIPTION));
   }
 
   @Test

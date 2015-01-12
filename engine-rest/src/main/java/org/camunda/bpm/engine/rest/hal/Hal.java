@@ -14,13 +14,17 @@ package org.camunda.bpm.engine.rest.hal;
 
 import java.util.HashMap;
 import java.util.Map;
-
 import javax.ws.rs.core.MediaType;
 
 import org.camunda.bpm.engine.rest.CaseDefinitionRestService;
+import org.camunda.bpm.engine.rest.GroupRestService;
+import org.camunda.bpm.engine.rest.IdentityRestService;
 import org.camunda.bpm.engine.rest.ProcessDefinitionRestService;
 import org.camunda.bpm.engine.rest.UserRestService;
-import org.camunda.bpm.engine.rest.hal.processDefinition.HalCaseDefinitionResolver;
+import org.camunda.bpm.engine.rest.cache.Cache;
+import org.camunda.bpm.engine.rest.hal.caseDefinition.HalCaseDefinitionResolver;
+import org.camunda.bpm.engine.rest.hal.group.HalGroupResolver;
+import org.camunda.bpm.engine.rest.hal.identitylink.HalIdentityLinkResolver;
 import org.camunda.bpm.engine.rest.hal.processDefinition.HalProcessDefinitionResolver;
 import org.camunda.bpm.engine.rest.hal.user.HalUserResolver;
 
@@ -36,12 +40,15 @@ public class Hal {
   public static Hal instance = new Hal();
 
   protected Map<Class<?>, HalLinkResolver> halLinkResolvers = new HashMap<Class<?>, HalLinkResolver>();
+  protected Map<Class<?>, Cache> halRelationCaches = new HashMap<Class<?>, Cache>();
 
   public Hal() {
     // register the built-in resolvers
     halLinkResolvers.put(UserRestService.class, new HalUserResolver());
+    halLinkResolvers.put(GroupRestService.class, new HalGroupResolver());
     halLinkResolvers.put(ProcessDefinitionRestService.class, new HalProcessDefinitionResolver());
     halLinkResolvers.put(CaseDefinitionRestService.class, new HalCaseDefinitionResolver());
+    halLinkResolvers.put(IdentityRestService.class, new HalIdentityLinkResolver());
   }
 
   public static Hal getInstance() {
@@ -54,6 +61,21 @@ public class Hal {
 
   public HalLinkResolver getLinkResolver(Class<?> resourceClass) {
     return halLinkResolvers.get(resourceClass);
+  }
+
+  public void registerHalRelationCache(Class<?> entityClass, Cache cache) {
+    halRelationCaches.put(entityClass, cache);
+  }
+
+  public Cache getHalRelationCache(Class<?> resourceClass) {
+    return halRelationCaches.get(resourceClass);
+  }
+
+  public void destroyHalRelationCaches() {
+    for (Cache cache : halRelationCaches.values()) {
+      cache.destroy();
+    }
+    halRelationCaches.clear();
   }
 
 }

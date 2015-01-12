@@ -77,6 +77,7 @@ public class JsonTaskQueryConverter extends JsonObjectConverter<TaskQuery> {
   public static final String FOLLOW_UP = "followUp";
   public static final String FOLLOW_UP_DATE = "followUpDate";
   public static final String FOLLOW_UP_BEFORE = "followUpBefore";
+  public static final String FOLLOW_UP_NULL_ACCEPTED = "followUpNullAccepted";
   public static final String FOLLOW_UP_AFTER = "followUpAfter";
   public static final String EXCLUDE_SUBTASKS = "excludeSubtasks";
   public static final String CASE_DEFINITION_KEY = "caseDefinitionKey";
@@ -138,6 +139,7 @@ public class JsonTaskQueryConverter extends JsonObjectConverter<TaskQuery> {
     addDateField(json, DUE_AFTER, query.getDueAfter());
     addDateField(json, FOLLOW_UP, query.getFollowUpDate());
     addDateField(json, FOLLOW_UP_BEFORE, query.getFollowUpBefore());
+    addDefaultField(json, FOLLOW_UP_NULL_ACCEPTED, false, query.isFollowUpNullAccepted());
     addDateField(json, FOLLOW_UP_AFTER, query.getFollowUpAfter());
     addDefaultField(json, EXCLUDE_SUBTASKS, false, query.isExcludeSubtasks());
     addSuspensionState(json, query.getSuspensionState());
@@ -349,6 +351,9 @@ public class JsonTaskQueryConverter extends JsonObjectConverter<TaskQuery> {
     }
     if (json.has(FOLLOW_UP_AFTER)) {
       query.followUpAfter(new Date(json.getLong(FOLLOW_UP_AFTER)));
+    }
+    if (json.has(FOLLOW_UP_NULL_ACCEPTED)) {
+      query.setFollowUpNullAccepted(json.getBoolean(FOLLOW_UP_NULL_ACCEPTED));
     }
     if (json.has(EXCLUDE_SUBTASKS) && json.getBoolean(EXCLUDE_SUBTASKS)) {
       query.excludeSubtasks();

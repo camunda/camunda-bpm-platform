@@ -25,6 +25,7 @@ import org.camunda.bpm.engine.impl.core.variable.type.PrimitiveValueTypeImpl.Lon
 import org.camunda.bpm.engine.impl.core.variable.type.PrimitiveValueTypeImpl.NullTypeImpl;
 import org.camunda.bpm.engine.impl.core.variable.type.PrimitiveValueTypeImpl.ShortTypeImpl;
 import org.camunda.bpm.engine.impl.core.variable.type.PrimitiveValueTypeImpl.StringTypeImpl;
+import org.camunda.bpm.engine.impl.core.variable.type.PrimitiveValueTypeImpl.NumberTypeImpl;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
 /**
@@ -53,6 +54,8 @@ public interface ValueType extends Serializable {
   public static final PrimitiveValueType DATE = new DateTypeImpl();
 
   public static final PrimitiveValueType BYTES = new BytesTypeImpl();
+
+  public static final PrimitiveValueType NUMBER = new NumberTypeImpl();
 
   public static final SerializableValueType OBJECT = new ObjectTypeImpl();
 
@@ -83,5 +86,39 @@ public interface ValueType extends Serializable {
    * @return the typed value for the value
    */
   public TypedValue createValue(Object value, Map<String, Object> valueInfo);
+
+  /**
+   * <p>Gets the parent value type.</p>
+   *
+   * <p>Value type hierarchy is only relevant for queries and has the
+   * following meaning: When a value query is made
+   * (e.g. all tasks with a certain variable value), a "child" type's value
+   * also matches a parameter value of the parent type. This is only
+   * supported when the parent value type's implementation of {@link #isAbstract()}
+   * returns <code>true</code>.</p>
+   */
+  ValueType getParent();
+
+  /**
+   * Determines whether the argument typed value can be converted to a
+   * typed value of this value type.
+   */
+  boolean canConvertFromTypedValue(TypedValue typedValue);
+
+  /**
+   * Converts a typed value to a typed value of this type.
+   * This does not suceed if {@link #canConvertFromTypedValue(TypedValue)}
+   * returns <code>false</code>.
+   */
+  TypedValue convertFromTypedValue(TypedValue typedValue);
+
+  /**
+   * <p>Returns whether the value type is abstract. This is <b>not related
+   * to the term <i>abstract</i> in the Java language.</b></p>
+   *
+   * Abstract value types cannot be used as types for variables but only used for querying.
+   */
+  boolean isAbstract();
+
 
 }

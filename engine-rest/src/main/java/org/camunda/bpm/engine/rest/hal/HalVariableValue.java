@@ -32,7 +32,8 @@ import org.camunda.bpm.engine.runtime.VariableInstance;
  */
 public class HalVariableValue extends HalResource<HalVariableValue> {
 
-  public static HalRelation REL_SELF = HalRelation.build("self", VariableResource.class, UriBuilder.fromPath("{scopeResourcePath}").path("{scopeId}").path("{variablesName}").path("{variableName}"));
+  // add leading / by hand because otherwise it will be encoded as %2F (see CAM-3091)
+  public static HalRelation REL_SELF = HalRelation.build("self", VariableResource.class, UriBuilder.fromPath("/{scopeResourcePath}").path("{scopeId}").path("{variablesName}").path("{variableName}"));
 
   protected String name;
   protected Object value;
@@ -86,6 +87,10 @@ public class HalVariableValue extends HalResource<HalVariableValue> {
   }
 
   private HalVariableValue link(HalRelation relation, String resourcePath, String resourceId, String variablesPath) {
+    if (resourcePath.startsWith("/")) {
+      // trim leading / because otherwise it will be encode as %2F (see CAM-3091)
+      resourcePath = resourcePath.substring(1);
+    }
     this.linker.createLink(relation, resourcePath, resourceId, variablesPath, this.name);
     return this;
   }

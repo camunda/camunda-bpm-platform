@@ -16,6 +16,7 @@ import javax.ws.rs.core.UriBuilder;
 
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.rest.UserRestService;
+import org.camunda.bpm.engine.rest.hal.HalIdResource;
 import org.camunda.bpm.engine.rest.hal.HalRelation;
 import org.camunda.bpm.engine.rest.hal.HalResource;
 
@@ -23,7 +24,7 @@ import org.camunda.bpm.engine.rest.hal.HalResource;
  * @author Daniel Meyer
  *
  */
-public class HalUser extends HalResource<HalUser> {
+public class HalUser extends HalResource<HalUser> implements HalIdResource {
 
   public final static HalRelation REL_SELF =
     HalRelation.build("self", UserRestService.class, UriBuilder.fromPath(UserRestService.PATH).path("{id}"));

@@ -12,19 +12,30 @@
  */
 package org.camunda.bpm.engine.test.cmmn.handler;
 
+import static org.camunda.bpm.engine.impl.cmmn.handler.ItemHandler.PROPERTY_ACTIVITY_TYPE;
+import static org.camunda.bpm.engine.impl.cmmn.handler.ItemHandler.PROPERTY_ACTIVITY_DESCRIPTION;
 import static org.camunda.bpm.engine.impl.cmmn.handler.ItemHandler.PROPERTY_DISCRETIONARY;
 import static org.camunda.bpm.engine.impl.cmmn.handler.ItemHandler.PROPERTY_IS_BLOCKING;
+import static org.camunda.bpm.engine.impl.cmmn.handler.ItemHandler.PROPERTY_MANUAL_ACTIVATION_RULE;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import org.camunda.bpm.engine.impl.cmmn.CaseControlRule;
 import org.camunda.bpm.engine.impl.cmmn.behavior.CmmnActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.behavior.HumanTaskActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.handler.HumanTaskItemHandler;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
+import org.camunda.bpm.model.cmmn.Cmmn;
+import org.camunda.bpm.model.cmmn.impl.instance.Body;
+import org.camunda.bpm.model.cmmn.impl.instance.ConditionExpression;
+import org.camunda.bpm.model.cmmn.impl.instance.DefaultControl;
 import org.camunda.bpm.model.cmmn.instance.DiscretionaryItem;
 import org.camunda.bpm.model.cmmn.instance.HumanTask;
+import org.camunda.bpm.model.cmmn.instance.ManualActivationRule;
+import org.camunda.bpm.model.cmmn.instance.PlanItemControl;
 import org.camunda.bpm.model.cmmn.instance.PlanningTable;
 import org.junit.Before;
 import org.junit.Test;
@@ -63,6 +74,44 @@ public class HumanTaskDicretionaryItemHandlerTest extends CmmnElementHandlerTest
 
     // then
     assertEquals(name, activity.getName());
+  }
+
+  @Test
+  public void testHumanTaskActivityType() {
+    // given
+
+    // when
+    CmmnActivity activity = handler.handleElement(discretionaryItem, context);
+
+    // then
+    String activityType = (String) activity.getProperty(PROPERTY_ACTIVITY_TYPE);
+    assertEquals("humanTask", activityType);
+  }
+
+  @Test
+  public void testHumanTaskDescription() {
+    // given
+    String description = "This is a humanTask";
+    humanTask.setDescription(description);
+
+    // when
+    CmmnActivity activity = handler.handleElement(discretionaryItem, context);
+
+    // then
+    assertEquals(description, (String) activity.getProperty(PROPERTY_ACTIVITY_DESCRIPTION));
+  }
+
+  @Test
+  public void testDiscretionaryItemDescription() {
+    // given
+    String description = "This is a discretionaryItem";
+    discretionaryItem.setDescription(description);
+
+    // when
+    CmmnActivity activity = handler.handleElement(discretionaryItem, context);
+
+    // then
+    assertEquals(description, (String) activity.getProperty(PROPERTY_ACTIVITY_DESCRIPTION));
   }
 
   @Test
@@ -145,6 +194,47 @@ public class HumanTaskDicretionaryItemHandlerTest extends CmmnElementHandlerTest
     // then
     assertEquals(parent, activity.getParent());
     assertTrue(parent.getActivities().contains(activity));
+  }
+
+  @Test
+  public void testManualActivationRule() {
+    // given
+    PlanItemControl itemControl = createElement(discretionaryItem, "ItemControl_1", PlanItemControl.class);
+    ManualActivationRule manualActivationRule = createElement(itemControl, "ManualActivationRule_1", ManualActivationRule.class);
+    ConditionExpression expression = createElement(manualActivationRule, "Expression_1", ConditionExpression.class);
+    Body body = createElement(expression, Body.class);
+    body.setTextContent("${true}");
+
+    // xml is not valid; fix CAM-3170 first
+    // Cmmn.validateModel(modelInstance);
+
+    // when
+    CmmnActivity newActivity = handler.handleElement(discretionaryItem, context);
+
+    // then
+    Object rule = newActivity.getProperty(PROPERTY_MANUAL_ACTIVATION_RULE);
+    assertNotNull(rule);
+    assertTrue(rule instanceof CaseControlRule);
+  }
+
+  @Test
+  public void testManualActivationRuleByDefaultPlanItemControl() {
+    // given
+    PlanItemControl defaultControl = createElement(humanTask, "ItemControl_1", DefaultControl.class);
+    ManualActivationRule manualActivationRule = createElement(defaultControl, "ManualActivationRule_1", ManualActivationRule.class);
+    ConditionExpression expression = createElement(manualActivationRule, "Expression_1", ConditionExpression.class);
+    Body body = createElement(expression, Body.class);
+    body.setTextContent("${true}");
+
+    Cmmn.validateModel(modelInstance);
+
+    // when
+    CmmnActivity newActivity = handler.handleElement(discretionaryItem, context);
+
+    // then
+    Object rule = newActivity.getProperty(PROPERTY_MANUAL_ACTIVATION_RULE);
+    assertNotNull(rule);
+    assertTrue(rule instanceof CaseControlRule);
   }
 
 }

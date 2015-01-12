@@ -9,7 +9,7 @@
     <groupId>org.camunda.bpm</groupId>
     <artifactId>camunda-parent</artifactId>
     <relativePath>../parent</relativePath>
-    <version>7.2.0-SNAPSHOT</version>
+    <version>7.3.0-SNAPSHOT</version>
   </parent>
 
   <dependencies>
@@ -441,6 +441,7 @@
                 <exclude>**/HistoricIncident*Test.java</exclude>
                 <exclude>**/HistoricVariableDataFormatTest.java</exclude>
                 <exclude>**/HistoricVariableInstanceScopeTest.java</exclude>
+                <exclude>**/HistoricTaskInstanceQueryTest.java</exclude>
               </excludes>
             </configuration>
           </plugin>
@@ -471,6 +472,7 @@
                 <exclude>**/HistoricVariableInstanceScopeTest.java</exclude>
                 <exclude>**/HistoricIncident*Test.java</exclude>
                 <exclude>**/HistoricVariableDataFormatTest.java</exclude>
+                <exclude>**/Historic*QueryTest.java</exclude>
               </excludes>
             </configuration>
           </plugin>

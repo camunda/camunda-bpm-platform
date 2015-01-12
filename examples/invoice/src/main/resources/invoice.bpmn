@@ -51,7 +51,7 @@ If data is missing, provide it.]]></documentation>
       <outgoing>reviewSuccessful</outgoing>
     </exclusiveGateway>
     <userTask id="prepareBankTransfer" activiti:formKey="embedded:app:forms/prepare-bank-transfer.html" activiti:candidateGroups="accounting" activiti:dueDate="${dateTime().plusWeeks(1).toDate()}" name="Prepare&#xD;&#xA;Bank&#xD;&#xA;Transfer">
-      <documentation>Prepate the bank transfer.</documentation>
+      <documentation>Prepare the bank transfer.</documentation>
       <incoming>invoiceApproved</incoming>
       <outgoing>SequenceFlow_2</outgoing>
     </userTask>

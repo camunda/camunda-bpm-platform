@@ -49,6 +49,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.Response.Status;
 
@@ -245,6 +246,22 @@ public abstract class AbstractFilterRestServiceInteractionTest extends AbstractR
       .body("query.containsKey('candidateGroups')", is(false))
   .when()
       .get(SINGLE_FILTER_URL);
+  }
+
+  @Test
+  public void testGetFilterWithFollowUpBeforeOrNotExistentExpression() {
+    TaskQueryImpl query = new TaskQueryImpl();
+    query.followUpBeforeOrNotExistentExpression("#{now()}");
+    Filter filter = new FilterEntity("Task").setName("test").setQuery(query);
+    when(filterServiceMock.getFilter(EXAMPLE_FILTER_ID)).thenReturn(filter);
+
+    given()
+      .pathParam("id", EXAMPLE_FILTER_ID)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+      .body("query.followUpBeforeOrNotExistentExpression", equalTo("#{now()}"))
+    .when()
+        .get(SINGLE_FILTER_URL);
   }
 
   @Test

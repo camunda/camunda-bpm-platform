@@ -180,8 +180,8 @@ public class CaseExecutionQueryImpl extends AbstractVariableQueryImpl<CaseExecut
 
     for (CaseExecution caseExecution : result) {
       CaseExecutionEntity caseExecutionEntity = (CaseExecutionEntity) caseExecution;
-      // initializes the name of the activity
-      // on current case execution
+      // initializes the name, type and description
+      // of the activity on current case execution
       caseExecutionEntity.getActivity();
     }
 

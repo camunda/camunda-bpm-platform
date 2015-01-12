@@ -12,6 +12,11 @@
  */
 package org.camunda.bpm.engine.rest.dto.repository;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.ws.rs.core.MultivaluedMap;
+
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.repository.CaseDefinitionQuery;
 import org.camunda.bpm.engine.rest.dto.AbstractQueryDto;
@@ -19,11 +24,6 @@ import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
 import org.camunda.bpm.engine.rest.dto.converter.BooleanConverter;
 import org.camunda.bpm.engine.rest.dto.converter.IntegerConverter;
 import org.codehaus.jackson.map.ObjectMapper;
-
-import javax.ws.rs.core.MultivaluedMap;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  *
@@ -127,7 +127,16 @@ public class CaseDefinitionQueryDto extends AbstractQueryDto<CaseDefinitionQuery
     this.version = version;
   }
 
+  /**
+   * @deprecated use {@link #setLatestVersion(Boolean)}
+   */
+  @Deprecated
   @CamundaQueryParam(value = "latest", converter = BooleanConverter.class)
+  public void setLatest(Boolean latest) {
+    setLatestVersion(latest);
+  }
+
+  @CamundaQueryParam(value = "latestVersion", converter = BooleanConverter.class)
   public void setLatestVersion(Boolean latestVersion) {
     this.latestVersion = latestVersion;
   }

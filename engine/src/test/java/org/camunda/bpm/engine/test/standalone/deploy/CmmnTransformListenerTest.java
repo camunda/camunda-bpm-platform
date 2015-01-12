@@ -62,11 +62,12 @@ public class CmmnTransformListenerTest extends ResourceProcessEngineTestCase {
     // 1x CasePlanModel, 1x Stage
     assertEquals(2, numberOfRegistered(Stage.class));
     assertEquals(1, numberOfRegistered(Milestone.class));
-    assertEquals(1, numberOfRegistered(EventListener.class));
+    // Note: EventListener is currently not supported!
+    assertEquals(0, numberOfRegistered(EventListener.class));
     assertEquals(3, numberOfRegistered(Sentry.class));
 
-    assertEquals(11, TestCmmnTransformListener.cmmnActivities.size());
-    assertEquals(24, TestCmmnTransformListener.modelElementInstances.size());
+    assertEquals(10, TestCmmnTransformListener.cmmnActivities.size());
+    assertEquals(22, TestCmmnTransformListener.modelElementInstances.size());
     assertEquals(3, TestCmmnTransformListener.sentryDeclarations.size());
   }
 

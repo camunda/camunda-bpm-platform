@@ -8,11 +8,15 @@
     <groupId>org.camunda.bpm</groupId>
     <artifactId>camunda-parent</artifactId>
     <relativePath>../parent</relativePath>
-    <version>7.2.0-SNAPSHOT</version>
+    <version>7.3.0-SNAPSHOT</version>
   </parent>
 
   <properties>
     <rest.http.port>8080</rest.http.port>
+    <jackson.version>1.9.11</jackson.version>
+    <!-- use inherited version as default -->
+    <resteasy.version>${version.resteasy}</resteasy.version>
+    <resteasy.netty.version>2.3.6.Final</resteasy.netty.version>
   </properties>
 
   <dependencies>
@@ -33,24 +37,12 @@
       <artifactId>commons-fileupload</artifactId>
     </dependency>
 
-    <dependency>
-      <groupId>org.jboss.spec</groupId>
-      <artifactId>jboss-javaee-6.0</artifactId>
-      <type>pom</type>
-      <scope>provided</scope>
-      <exclusions>
-        <exclusion>
-          <artifactId>xalan</artifactId>
-          <groupId>org.apache.xalan</groupId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-
     <!-- test -->
     <!-- resteasy -->
     <dependency>
       <groupId>org.jboss.resteasy</groupId>
       <artifactId>resteasy-jaxrs</artifactId>
+      <version>${resteasy.version}</version>
       <scope>test</scope>
       <exclusions>
         <exclusion>
@@ -63,6 +55,7 @@
     <dependency>
       <groupId>org.jboss.resteasy</groupId>
       <artifactId>resteasy-netty</artifactId>
+      <version>${resteasy.netty.version}</version>
       <scope>test</scope>
     </dependency>
 
@@ -108,6 +101,20 @@
       <artifactId>tomcat-embed-logging-juli</artifactId>
       <version>${version.tomcat}</version>
       <scope>test</scope>
+    </dependency>
+
+    <!-- has to be below resteasy otherwise a wrong class is loaded for reasteasy 3.0.8.Final -->
+    <dependency>
+      <groupId>org.jboss.spec</groupId>
+      <artifactId>jboss-javaee-6.0</artifactId>
+      <type>pom</type>
+      <scope>provided</scope>
+      <exclusions>
+        <exclusion>
+          <artifactId>xalan</artifactId>
+          <groupId>org.apache.xalan</groupId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <!-- only included to prevent java.lang.ClassNotFoundException: org.apache.jasper.servlet.JspServlet -->
@@ -318,9 +325,6 @@
   <profiles>
     <profile>
       <id>distro</id>
-      <properties>
-        <jackson.version>1.9.11</jackson.version>
-      </properties>
       <build>
         <plugins>
           <plugin>
@@ -341,7 +345,6 @@
       </activation>
       <properties>
         <rest.http.port>38080</rest.http.port>
-        <jackson.version>1.9.11</jackson.version>
       </properties>
       <build>
         <plugins>
@@ -507,6 +510,53 @@
           <version>1.2.1</version>
         </dependency>
       </dependencies>
+    </profile>
+
+    <profile>
+      <id>wildfly-compatibility</id>
+      <properties>
+        <resteasy.version>3.0.8.Final</resteasy.version>
+        <resteasy.netty.version>${resteasy.version}</resteasy.netty.version>
+      </properties>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <systemPropertyVariables>
+                <org.apache.maven.user-settings>../settings/maven/nexus-settings.xml</org.apache.maven.user-settings>
+              </systemPropertyVariables>
+              <excludes>
+                <exclude>**/Abstract*</exclude>
+              </excludes>
+              <redirectTestOutputToFile>true</redirectTestOutputToFile>
+            </configuration>
+            <executions>
+              <execution>
+                <id>default-test</id>
+                <goals>
+                  <goal>test</goal>
+                </goals>
+                <phase>test</phase>
+                <configuration>
+                  <includes>
+                    <include>**/rest/standalone/**</include>
+                    <include>**/rest/resteasy/**</include>
+                    <include>**/rest/history/resteasy/**</include>
+                  </includes>
+                  <excludes>
+                    <exclude>**/rest/wink/**</exclude>
+                    <exclude>**/rest/history/wink/**</exclude>
+                    <exclude>**/rest/jersey/**</exclude>
+                    <exclude>**/rest/history/jersey/**</exclude>
+                  </excludes>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
     </profile>
 
   </profiles>

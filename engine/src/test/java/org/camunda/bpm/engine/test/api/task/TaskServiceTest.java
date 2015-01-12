@@ -29,6 +29,7 @@ import java.util.Set;
 import org.camunda.bpm.engine.OptimisticLockingException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.TaskAlreadyClaimedException;
+import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.identity.Group;
@@ -38,7 +39,6 @@ import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.IoUtil;
-import org.camunda.bpm.engine.impl.variable.serializer.JavaObjectSerializer;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -135,6 +135,42 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
 
     // Finally, delete task
     taskService.deleteTask(task.getId(), true);
+  }
+
+  public void testSaveTaskSetParentTaskId() {
+    // given
+    Task parent = taskService.newTask("parent");
+    taskService.saveTask(parent);
+
+    Task task = taskService.newTask("subTask");
+
+    // when
+    task.setParentTaskId("parent");
+
+    // then
+    taskService.saveTask(task);
+
+    // update task
+    task = taskService.createTaskQuery().taskId("subTask").singleResult();
+
+    assertEquals(parent.getId(), task.getParentTaskId());
+
+    taskService.deleteTask("parent", true);
+    taskService.deleteTask("subTask", true);
+  }
+
+  public void testSaveTaskWithNonExistingParentTask() {
+    // given
+    Task task = taskService.newTask();
+
+    // when
+    task.setParentTaskId("non-existing");
+
+    // then
+    try {
+      taskService.saveTask(task);
+      fail("It should not be possible to save a task with a non existing parent task.");
+    } catch (NotValidException e) {}
   }
 
   public void testTaskOwner() {
@@ -1628,7 +1664,7 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
     runtimeService.startProcessInstanceByKey("oneTaskProcess",
         Variables.createVariables()
           .putValue("broken", Variables.serializedObjectValue("broken")
-              .serializationDataFormat(JavaObjectSerializer.SERIALIZATION_DATA_FORMAT)
+              .serializationDataFormat(Variables.SerializationDataFormats.JAVA)
               .objectTypeName("unexisting").create()));
     String taskId = taskService.createTaskQuery().singleResult().getId();
 
@@ -1676,7 +1712,7 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
     String taskId = taskService.createTaskQuery().singleResult().getId();
     taskService.setVariablesLocal(taskId, Variables.createVariables()
           .putValue("broken", Variables.serializedObjectValue("broken")
-              .serializationDataFormat(JavaObjectSerializer.SERIALIZATION_DATA_FORMAT)
+              .serializationDataFormat(Variables.SerializationDataFormats.JAVA)
               .objectTypeName("unexisting").create()));
 
     // this works

@@ -20,12 +20,14 @@ import javax.lang.model.type.NullType;
 
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.type.PrimitiveValueType;
+import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.engine.variable.value.BooleanValue;
 import org.camunda.bpm.engine.variable.value.BytesValue;
 import org.camunda.bpm.engine.variable.value.DateValue;
 import org.camunda.bpm.engine.variable.value.DoubleValue;
 import org.camunda.bpm.engine.variable.value.IntegerValue;
 import org.camunda.bpm.engine.variable.value.LongValue;
+import org.camunda.bpm.engine.variable.value.NumberValue;
 import org.camunda.bpm.engine.variable.value.ShortValue;
 import org.camunda.bpm.engine.variable.value.StringValue;
 import org.camunda.bpm.engine.variable.value.TypedValue;
@@ -123,6 +125,30 @@ public abstract class PrimitiveValueTypeImpl extends AbstractValueTypeImpl imple
       return Variables.doubleValue((Double) value);
     }
 
+    public ValueType getParent() {
+      return ValueType.NUMBER;
+    }
+
+    public boolean canConvertFromTypedValue(TypedValue typedValue) {
+      if (typedValue.getType() != ValueType.NUMBER) {
+        return false;
+      }
+
+      return true;
+    }
+
+    public DoubleValue convertFromTypedValue(TypedValue typedValue) {
+      if (typedValue.getType() != ValueType.NUMBER) {
+        throw unsupportedConversion(typedValue.getType());
+      }
+
+      NumberValue numberValue = (NumberValue) typedValue;
+      if (numberValue.getValue() != null) {
+        return Variables.doubleValue(numberValue.getValue().doubleValue());
+      } else {
+        return Variables.doubleValue(null);
+      }
+    }
   }
 
   public static class IntegerTypeImpl extends PrimitiveValueTypeImpl {
@@ -137,6 +163,41 @@ public abstract class PrimitiveValueTypeImpl extends AbstractValueTypeImpl imple
       return Variables.integerValue((Integer) value);
     }
 
+    public ValueType getParent() {
+      return ValueType.NUMBER;
+    }
+
+    public boolean canConvertFromTypedValue(TypedValue typedValue) {
+      if (typedValue.getType() != ValueType.NUMBER) {
+        return false;
+      }
+
+      if (typedValue.getValue() != null) {
+        NumberValue numberValue = (NumberValue) typedValue;
+        double doubleValue = numberValue.getValue().doubleValue();
+
+        // returns false if the value changes due to conversion (e.g. by overflows
+        // or by loss in precision)
+        if (numberValue.getValue().intValue() != doubleValue) {
+          return false;
+        }
+      }
+
+      return true;
+    }
+
+    public IntegerValue convertFromTypedValue(TypedValue typedValue) {
+      if (typedValue.getType() != ValueType.NUMBER) {
+        throw unsupportedConversion(typedValue.getType());
+      }
+
+      NumberValue numberValue = (NumberValue) typedValue;
+      if (numberValue.getValue() != null) {
+        return Variables.integerValue(numberValue.getValue().intValue());
+      } else {
+        return Variables.integerValue(null);
+      }
+    }
   }
 
   public static class LongTypeImpl extends PrimitiveValueTypeImpl {
@@ -151,6 +212,42 @@ public abstract class PrimitiveValueTypeImpl extends AbstractValueTypeImpl imple
       return Variables.longValue((Long) value);
     }
 
+    public ValueType getParent() {
+      return ValueType.NUMBER;
+    }
+
+    public boolean canConvertFromTypedValue(TypedValue typedValue) {
+      if (typedValue.getType() != ValueType.NUMBER) {
+        return false;
+      }
+
+      if (typedValue.getValue() != null) {
+        NumberValue numberValue = (NumberValue) typedValue;
+        double doubleValue = numberValue.getValue().doubleValue();
+
+        // returns false if the value changes due to conversion (e.g. by overflows
+        // or by loss in precision)
+        if (numberValue.getValue().longValue() != doubleValue) {
+          return false;
+        }
+      }
+
+      return true;
+    }
+
+    public LongValue convertFromTypedValue(TypedValue typedValue) {
+      if (typedValue.getType() != ValueType.NUMBER) {
+        throw unsupportedConversion(typedValue.getType());
+      }
+
+      NumberValue numberValue = (NumberValue) typedValue;
+
+      if (numberValue.getValue() != null) {
+        return Variables.longValue(numberValue.getValue().longValue());
+      } else {
+        return Variables.longValue(null);
+      }
+    }
   }
 
   public static class NullTypeImpl extends PrimitiveValueTypeImpl {
@@ -178,6 +275,42 @@ public abstract class PrimitiveValueTypeImpl extends AbstractValueTypeImpl imple
     public ShortValue createValue(Object value, Map<String, Object> valueInfo) {
       return Variables.shortValue((Short) value);
     }
+
+    public ValueType getParent() {
+      return ValueType.NUMBER;
+    }
+
+    public ShortValue convertFromTypedValue(TypedValue typedValue) {
+      if (typedValue.getType() != ValueType.NUMBER) {
+        throw unsupportedConversion(typedValue.getType());
+      }
+
+      NumberValue numberValue = (NumberValue) typedValue;
+      if (numberValue.getValue() != null) {
+        return Variables.shortValue(numberValue.getValue().shortValue());
+      } else {
+        return Variables.shortValue(null);
+      }
+    }
+
+    public boolean canConvertFromTypedValue(TypedValue typedValue) {
+      if (typedValue.getType() != ValueType.NUMBER) {
+        return false;
+      }
+
+      if (typedValue.getValue() != null) {
+        NumberValue numberValue = (NumberValue) typedValue;
+        double doubleValue = numberValue.getValue().doubleValue();
+
+        // returns false if the value changes due to conversion (e.g. by overflows
+        // or by loss in precision)
+        if (numberValue.getValue().shortValue() != doubleValue) {
+          return false;
+        }
+      }
+
+      return true;
+    }
   }
 
   public static class StringTypeImpl extends PrimitiveValueTypeImpl {
@@ -192,5 +325,23 @@ public abstract class PrimitiveValueTypeImpl extends AbstractValueTypeImpl imple
       return Variables.stringValue((String) value);
     }
   }
+
+  public static class NumberTypeImpl extends PrimitiveValueTypeImpl {
+
+    private static final long serialVersionUID = 1L;
+
+    public NumberTypeImpl() {
+      super(Number.class);
+    }
+
+    public NumberValue createValue(Object value, Map<String, Object> valueInfo) {
+      return Variables.numberValue((Number) value);
+    }
+
+    public boolean isAbstract() {
+      return true;
+    }
+  }
+
 
 }

@@ -179,6 +179,7 @@ public class DefaultCmmnHistoryEventProducer implements CmmnHistoryEventProducer
 
     evt.setCaseActivityId(caseExecutionEntity.getActivityId());
     evt.setCaseActivityName(caseExecutionEntity.getActivityName());
+    evt.setCaseActivityType(caseExecutionEntity.getActivityType());
   }
 
 }

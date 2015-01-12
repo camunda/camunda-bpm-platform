@@ -536,7 +536,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess",
         Variables.createVariables()
           .putValue("broken", Variables.serializedObjectValue("broken")
-              .serializationDataFormat(JavaObjectSerializer.SERIALIZATION_DATA_FORMAT)
+              .serializationDataFormat(Variables.SerializationDataFormats.JAVA)
               .objectTypeName("unexisting").create()));
 
     // this works
@@ -579,7 +579,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess",
         Variables.createVariables()
           .putValue("broken", Variables.serializedObjectValue("broken")
-              .serializationDataFormat(JavaObjectSerializer.SERIALIZATION_DATA_FORMAT)
+              .serializationDataFormat(Variables.SerializationDataFormats.JAVA)
               .objectTypeName("unexisting").create()));
 
     // this works
@@ -1090,7 +1090,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
-  public void FAILING_testChangeVariableType() {
+  public void testChangeVariableType() {
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
     DummySerializable dummy = new DummySerializable();
@@ -1179,6 +1179,28 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
 
     assertEquals(caseInstanceId, secondInstance.getCaseInstanceId());
 
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
+  public void testSetAbstractNumberValueFails() {
+    try {
+      runtimeService.startProcessInstanceByKey("oneTaskProcess",
+          Variables.createVariables().putValueTyped("var", Variables.numberValue(42)));
+      fail("exception expected");
+    } catch (ProcessEngineException e) {
+      // happy path
+      assertTextPresentIgnoreCase("cannot serialize value of abstract type number", e.getMessage());
+    }
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+    try {
+      runtimeService.setVariable(processInstance.getId(), "var", Variables.numberValue(42));
+      fail("exception expected");
+    } catch (ProcessEngineException e) {
+      // happy path
+      assertTextPresentIgnoreCase("cannot serialize value of abstract type number", e.getMessage());
+    }
   }
 
 }

@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.script.Bindings;
 import javax.script.ScriptEngine;
 
@@ -66,13 +67,18 @@ public class ScriptingEnvironment {
    */
   public Object execute(ExecutableScript script, VariableScope scope) {
 
-    final String scriptLanguage = script.getLanguage();
-
     // get script engine
-    ScriptEngine scriptEngine = scriptingEngines.getScriptEngineForLanguage(scriptLanguage);
+    ScriptEngine scriptEngine = scriptingEngines.getScriptEngineForLanguage(script.getLanguage());
 
-    // get bindings
+    // create bindings
     Bindings bindings = scriptingEngines.createBindings(scriptEngine, scope);
+
+    return execute(script, scope, bindings, scriptEngine);
+  }
+
+  public Object execute(ExecutableScript script, VariableScope scope, Bindings bindings, ScriptEngine scriptEngine) {
+
+    final String scriptLanguage = script.getLanguage();
 
     // first, evaluate the env scripts (if any)
     List<ExecutableScript> envScripts = getEnvScripts(scriptLanguage);

@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.engine.test.cmmn.handler;
 
+import static org.camunda.bpm.engine.impl.cmmn.handler.ItemHandler.PROPERTY_ACTIVITY_TYPE;
+import static org.camunda.bpm.engine.impl.cmmn.handler.ItemHandler.PROPERTY_ACTIVITY_DESCRIPTION;
 import static org.camunda.bpm.engine.impl.cmmn.handler.ItemHandler.PROPERTY_DISCRETIONARY;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -62,6 +64,44 @@ public class MilestoneDiscretionaryItemHandlerTest extends CmmnElementHandlerTes
 
     // then
     assertEquals(name, activity.getName());
+  }
+
+  @Test
+  public void testMilestoneActivityType() {
+    // given
+
+    // when
+    CmmnActivity activity = handler.handleElement(discretionaryItem, context);
+
+    // then
+    String activityType = (String) activity.getProperty(PROPERTY_ACTIVITY_TYPE);
+    assertEquals("milestone", activityType);
+  }
+
+  @Test
+  public void testMilestoneDescription() {
+    // given
+    String description = "This is a milestone";
+    milestone.setDescription(description);
+
+    // when
+    CmmnActivity activity = handler.handleElement(discretionaryItem, context);
+
+    // then
+    assertEquals(description, (String) activity.getProperty(PROPERTY_ACTIVITY_DESCRIPTION));
+  }
+
+  @Test
+  public void testDiscretionaryItemDescription() {
+    // given
+    String description = "This is a discretionaryItem";
+    discretionaryItem.setDescription(description);
+
+    // when
+    CmmnActivity activity = handler.handleElement(discretionaryItem, context);
+
+    // then
+    assertEquals(description, (String) activity.getProperty(PROPERTY_ACTIVITY_DESCRIPTION));
   }
 
   @Test

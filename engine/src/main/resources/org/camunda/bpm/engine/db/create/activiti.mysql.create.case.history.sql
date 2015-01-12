@@ -23,6 +23,7 @@ create table ACT_HI_CASEACTINST (
     CALL_PROC_INST_ID_ varchar(64),
     CALL_CASE_INST_ID_ varchar(64),
     CASE_ACT_NAME_ varchar(255),
+    CASE_ACT_TYPE_ varchar(255),
     CREATE_TIME_ datetime not null,
     END_TIME_ datetime,
     DURATION_ bigint,

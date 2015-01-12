@@ -54,7 +54,7 @@ import org.codehaus.jackson.map.ObjectMapper;
 public abstract class AbstractProcessEngineRestServiceImpl {
 
   @Context
-  public Providers providers;
+  protected Providers providers;
 
   public ProcessDefinitionRestService getProcessDefinitionService(String engineName) {
     String rootResourcePath = getRelativeEngineUri(engineName).toASCIIString();

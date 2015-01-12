@@ -22,6 +22,7 @@ import org.camunda.bpm.engine.variable.value.DateValue;
 import org.camunda.bpm.engine.variable.value.DoubleValue;
 import org.camunda.bpm.engine.variable.value.IntegerValue;
 import org.camunda.bpm.engine.variable.value.LongValue;
+import org.camunda.bpm.engine.variable.value.NumberValue;
 import org.camunda.bpm.engine.variable.value.PrimitiveValue;
 import org.camunda.bpm.engine.variable.value.ShortValue;
 import org.camunda.bpm.engine.variable.value.StringValue;
@@ -145,6 +146,15 @@ public class PrimitiveTypeValueImpl<T> extends AbstractTypedValue<T> implements 
 
     public StringValueImpl(String value) {
       super(value, ValueType.STRING);
+    }
+  }
+
+  public static class NumberValueImpl extends PrimitiveTypeValueImpl<Number> implements NumberValue {
+
+    private static final long serialVersionUID = 1L;
+
+    public NumberValueImpl(Number value) {
+      super(value, ValueType.NUMBER);
     }
   }
 

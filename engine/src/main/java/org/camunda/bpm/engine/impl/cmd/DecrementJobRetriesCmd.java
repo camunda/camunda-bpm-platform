@@ -13,65 +13,28 @@
 
 package org.camunda.bpm.engine.impl.cmd;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-
-import org.camunda.bpm.engine.OptimisticLockingException;
-import org.camunda.bpm.engine.impl.cfg.TransactionContext;
-import org.camunda.bpm.engine.impl.cfg.TransactionState;
-import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
-import org.camunda.bpm.engine.impl.jobexecutor.MessageAddedNotification;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 
 /**
  * @author Tom Baeyens
+ * @author Daniel Meyer
  */
-public class DecrementJobRetriesCmd implements Command<Object> {
-
-  private static final long serialVersionUID = 1L;
-  protected String jobId;
-  protected Throwable exception;
+public class DecrementJobRetriesCmd extends JobRetryCmd {
 
   public DecrementJobRetriesCmd(String jobId, Throwable exception) {
-    this.jobId = jobId;
-    this.exception = exception;
+    super(jobId, exception);
   }
 
   public Object execute(CommandContext commandContext) {
-    JobEntity job = Context
-      .getCommandContext()
-      .getJobManager()
-      .findJobById(jobId);
-    job.setLockOwner(null);
-    job.setLockExpirationTime(null);
+    JobEntity job = getJob();
 
-    if(exception != null) {
-      job.setExceptionMessage(exception.getMessage());
-      job.setExceptionStacktrace(getExceptionStacktrace());
-    }
-
-    if (exception == null || shouldDecrementRetriesFor(exception)) {
-      job.setRetries(job.getRetries() - 1);
-    }
-
-    JobExecutor jobExecutor = Context.getProcessEngineConfiguration().getJobExecutor();
-    MessageAddedNotification messageAddedNotification = new MessageAddedNotification(jobExecutor);
-    TransactionContext transactionContext = commandContext.getTransactionContext();
-    transactionContext.addTransactionListener(TransactionState.COMMITTED, messageAddedNotification);
+    unlockJob(job);
+    logException(job);
+    decrementRetries(job);
+    notifyAcquisition(commandContext);
 
     return null;
   }
 
-  private String getExceptionStacktrace() {
-    StringWriter stringWriter = new StringWriter();
-    exception.printStackTrace(new PrintWriter(stringWriter));
-    return stringWriter.toString();
-  }
-
-  protected boolean shouldDecrementRetriesFor(Throwable t) {
-    return !(t instanceof OptimisticLockingException);
-  }
 }

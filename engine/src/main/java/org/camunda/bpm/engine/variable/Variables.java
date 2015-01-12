@@ -12,6 +12,7 @@
  */
 package org.camunda.bpm.engine.variable;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.Map;
 
@@ -23,6 +24,7 @@ import org.camunda.bpm.engine.impl.core.variable.value.PrimitiveTypeValueImpl.Da
 import org.camunda.bpm.engine.impl.core.variable.value.PrimitiveTypeValueImpl.DoubleValueImpl;
 import org.camunda.bpm.engine.impl.core.variable.value.PrimitiveTypeValueImpl.IntegerValueImpl;
 import org.camunda.bpm.engine.impl.core.variable.value.PrimitiveTypeValueImpl.LongValueImpl;
+import org.camunda.bpm.engine.impl.core.variable.value.PrimitiveTypeValueImpl.NumberValueImpl;
 import org.camunda.bpm.engine.impl.core.variable.value.PrimitiveTypeValueImpl.ShortValueImpl;
 import org.camunda.bpm.engine.impl.core.variable.value.PrimitiveTypeValueImpl.StringValueImpl;
 import org.camunda.bpm.engine.impl.core.variable.value.UntypedValueImpl;
@@ -34,6 +36,8 @@ import org.camunda.bpm.engine.variable.value.DateValue;
 import org.camunda.bpm.engine.variable.value.DoubleValue;
 import org.camunda.bpm.engine.variable.value.IntegerValue;
 import org.camunda.bpm.engine.variable.value.LongValue;
+import org.camunda.bpm.engine.variable.value.NumberValue;
+import org.camunda.bpm.engine.variable.value.SerializationDataFormat;
 import org.camunda.bpm.engine.variable.value.ShortValue;
 import org.camunda.bpm.engine.variable.value.StringValue;
 import org.camunda.bpm.engine.variable.value.TypedValue;
@@ -42,11 +46,76 @@ import org.camunda.bpm.engine.variable.value.builder.SerializedObjectValueBuilde
 import org.camunda.bpm.engine.variable.value.builder.TypedValueBuilder;
 
 /**
+ * <p>This class is the entry point to the process engine's typed variables API.
+ * Users can import the methods provided by this class using a static import:</p>
+ *
+ * <code>
+ * import static org.camunda.bpm.engine.variable.Variables.*;
+ * </code>
  *
  * @author Daniel Meyer
  *
  */
 public class Variables {
+
+  /**
+   * <p>A set of builtin serialization dataformat constants. These constants can be used to specify
+   * how java object variables should be serialized by the process engine:</p>
+   *
+   * <pre>
+   * CustomerData customerData = new CustomerData();
+   * // ...
+   * ObjectValue customerDataValue = Variables.objectValue(customerData)
+   *   .serializationDataFormat(Variables.SerializationDataFormats.JSON)
+   *   .create();
+   *
+   * execution.setVariable("someVariable", customerDataValue);
+   * </pre>
+   *
+   * <p>Note that not all of the formats provided here are supported out of the box.</p>
+   *
+   * @author Daniel Meyer
+   */
+  public static enum SerializationDataFormats implements SerializationDataFormat {
+
+    /**
+     * <p>The Java Serialization Data format. If this data format is used for serializing an object,
+     * the object is serialized using default Java {@link Serializable}.</p>
+     *
+     * <p>The process engine provides a serializer for this dataformat out of the box.</p>
+     */
+    JAVA("application/x-java-serialized-object"),
+
+    /**
+     * <p>The Json Serialization Data format. If this data format is used for serializing an object,
+     * the object is serialized as Json text.</p>
+     *
+     * <p><strong>NOTE:</strong> the process does NOT provide a serializer for this dataformat out of the box.
+     * If you want to serialize objects using the Json dataformat, you need to provide a serializer. The optinal
+     * camunda Spin process engine plugin provides such a serializer.</p>
+     */
+    JSON("application/json"),
+
+    /**
+     * <p>The Xml Serialization Data format. If this data format is used for serializing an object,
+     * the object is serialized as Xml text.</p>
+     *
+     * <p><strong>NOTE:</strong> the process does NOT provide a serializer for this dataformat out of the box.
+     * If you want to serialize objects using the Xml dataformat, you need to provide a serializer. The optinal
+     * camunda Spin process engine plugin provides such a serializer.</p>
+     */
+    XML("application/xml");
+
+    private final String name;
+
+    private SerializationDataFormats(String name) {
+      this.name = name;
+    }
+
+    public String getName() {
+      return name;
+    }
+  }
 
   public static VariableMap createVariables() {
     return new VariableMapImpl();
@@ -103,6 +172,15 @@ public class Variables {
 
   public static DoubleValue doubleValue(Double doubleValue) {
     return new DoubleValueImpl(doubleValue);
+  }
+
+  /**
+   * Creates an abstract Number value. Note that this value cannot be used to set variables.
+   * Use the specific methods {@link Variables#integerValue(Integer)}, {@link #shortValue(Short)},
+   * {@link #longValue(Long)} and {@link #doubleValue(Double)} instead.
+   */
+  public static NumberValue numberValue(Number numberValue) {
+    return new NumberValueImpl(numberValue);
   }
 
   public static TypedValue untypedNullValue() {

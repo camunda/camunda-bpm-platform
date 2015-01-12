@@ -36,6 +36,7 @@ import org.camunda.bpm.engine.impl.test.CmmnProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.variable.Variables;
 
 /**
  * @author Sebastian Menski
@@ -262,6 +263,63 @@ public class HistoricCaseInstanceTest extends CmmnProcessEngineTestCase {
     assertCount(0, historicQuery().variableValueGreaterThan("number", 20));
     assertCount(1, historicQuery().variableValueLessThanOrEqual("number", 10));
     assertCount(0, historicQuery().variableValueGreaterThan("number", 10));
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn")
+  public void testCaseVariableValueEqualsNumber() throws Exception {
+    // long
+    caseService
+      .withCaseDefinitionByKey("oneTaskCase")
+      .setVariable("var", 123L)
+      .create();
+
+    // non-matching long
+    caseService
+      .withCaseDefinitionByKey("oneTaskCase")
+      .setVariable("var", 12345L)
+      .create();
+
+    // short
+    caseService
+      .withCaseDefinitionByKey("oneTaskCase")
+      .setVariable("var", (short) 123)
+      .create();
+
+    // double
+    caseService
+      .withCaseDefinitionByKey("oneTaskCase")
+      .setVariable("var", 123.0d)
+      .create();
+
+    // integer
+    caseService
+      .withCaseDefinitionByKey("oneTaskCase")
+      .setVariable("var", 123)
+      .create();
+
+    // untyped null (should not match)
+    caseService
+      .withCaseDefinitionByKey("oneTaskCase")
+      .setVariable("var", null)
+      .create();
+
+    // typed null (should not match)
+    caseService
+      .withCaseDefinitionByKey("oneTaskCase")
+      .setVariable("var", Variables.longValue(null))
+      .create();
+
+    caseService
+      .withCaseDefinitionByKey("oneTaskCase")
+      .setVariable("var", "123")
+      .create();
+
+    assertEquals(4, historicQuery().variableValueEquals("var", Variables.numberValue(123)).count());
+    assertEquals(4, historicQuery().variableValueEquals("var", Variables.numberValue(123L)).count());
+    assertEquals(4, historicQuery().variableValueEquals("var", Variables.numberValue(123.0d)).count());
+    assertEquals(4, historicQuery().variableValueEquals("var", Variables.numberValue((short) 123)).count());
+
+    assertEquals(1, historicQuery().variableValueEquals("var", Variables.numberValue(null)).count());
   }
 
 

@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.engine.impl.jobexecutor;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -21,8 +23,6 @@ import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.TransitionImpl;
 import org.camunda.bpm.engine.impl.pvm.runtime.operation.PvmAtomicOperation;
-
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 /**
  *
@@ -54,16 +54,21 @@ public class AsyncContinuationJobHandler implements JobHandler {
 
     String operationName = null;
     String transitionId = null;
-    if (configuration.contains("$")) {
-      String[] configParts = configuration.split("\\$");
-      if (configParts.length != 2) {
-        throw new ProcessEngineException("Illegal async continuation job handler configuration: '" + configuration + "': exprecting two parts seperated by '$'.");
-      }
-      operationName = configParts[0];
-      transitionId = configParts[1];
 
-    } else {
-      operationName = configuration;
+    if (configuration != null ) {
+
+      if (configuration.contains("$")) {
+        String[] configParts = configuration.split("\\$");
+        if (configParts.length != 2) {
+          throw new ProcessEngineException("Illegal async continuation job handler configuration: '" + configuration + "': exprecting two parts seperated by '$'.");
+        }
+        operationName = configParts[0];
+        transitionId = configParts[1];
+
+      } else {
+        operationName = configuration;
+      }
+
     }
 
     PvmAtomicOperation atomicOperation = findMatchingAtomicOperation(operationName);

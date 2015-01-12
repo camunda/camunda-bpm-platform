@@ -31,24 +31,26 @@
         CALL_PROC_INST_ID_,
         CALL_CASE_INST_ID_,
         CASE_ACT_NAME_,
+        CASE_ACT_TYPE_,
         CREATE_TIME_,
         END_TIME_,
         DURATION_,
         STATE_
       ) values (
-        #{id ,jdbcType=VARCHAR},
-        #{parentCaseActivityInstanceId ,jdbcType=VARCHAR},
+        #{id, jdbcType=VARCHAR},
+        #{parentCaseActivityInstanceId, jdbcType=VARCHAR},
         #{caseDefinitionId, jdbcType=VARCHAR},
         #{caseInstanceId, jdbcType=VARCHAR},
-        #{caseActivityId ,jdbcType=VARCHAR},
-        #{taskId ,jdbcType=VARCHAR},
-        #{calledProcessInstanceId ,jdbcType=VARCHAR},
-        #{calledCaseInstanceId ,jdbcType=VARCHAR},
-        #{caseActivityName ,jdbcType=VARCHAR},
+        #{caseActivityId, jdbcType=VARCHAR},
+        #{taskId, jdbcType=VARCHAR},
+        #{calledProcessInstanceId, jdbcType=VARCHAR},
+        #{calledCaseInstanceId, jdbcType=VARCHAR},
+        #{caseActivityName, jdbcType=VARCHAR},
+        #{caseActivityType, jdbcType=VARCHAR},
         #{startTime, jdbcType=TIMESTAMP},
         #{endTime, jdbcType=TIMESTAMP},
-        #{durationInMillis ,jdbcType=BIGINT},
-        #{caseActivityInstanceState,jdbcType=INTEGER}
+        #{durationInMillis, jdbcType=BIGINT},
+        #{caseActivityInstanceState, jdbcType=INTEGER}
       )
   </insert>
 
@@ -98,6 +100,7 @@
     <result property="calledProcessInstanceId" column="CALL_PROC_INST_ID_" jdbcType="VARCHAR" />
     <result property="calledCaseInstanceId" column="CALL_CASE_INST_ID_" jdbcType="VARCHAR" />
     <result property="caseActivityName" column="CASE_ACT_NAME_" jdbcType="VARCHAR" />
+    <result property="caseActivityType" column="CASE_ACT_TYPE_" jdbcType="VARCHAR" />
     <result property="startTime" column="CREATE_TIME_" jdbcType="TIMESTAMP" />
     <result property="endTime" column="END_TIME_" jdbcType="TIMESTAMP" />
     <result property="durationInMillis" column="DURATION_" jdbcType="BIGINT" />
@@ -140,6 +143,9 @@
       </if>
       <if test="caseActivityName != null">
         and RES.CASE_ACT_NAME_ = #{caseActivityName}
+      </if>
+      <if test="caseActivityType != null">
+        and RES.CASE_ACT_TYPE_ = #{caseActivityType}
       </if>
       <if test="ended != null &amp;&amp; ended">
         and RES.END_TIME_ is not null

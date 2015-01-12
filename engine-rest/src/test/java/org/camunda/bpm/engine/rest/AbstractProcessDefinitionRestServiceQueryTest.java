@@ -60,10 +60,10 @@ public abstract class AbstractProcessDefinitionRestServiceQueryTest extends Abst
   @Test
   public void testInvalidNumericParameter() {
     String anInvalidIntegerQueryParam = "aString";
-    given().queryParam("ver", anInvalidIntegerQueryParam)
+    given().queryParam("version", anInvalidIntegerQueryParam)
       .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
       .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
-      .body("message", equalTo("Cannot set query parameter 'ver' to value 'aString': "
+      .body("message", equalTo("Cannot set query parameter 'version' to value 'aString': "
           + "Cannot convert value aString to java type java.lang.Integer"))
       .when().get(PROCESS_DEFINITION_QUERY_URL);
   }
@@ -212,7 +212,7 @@ public abstract class AbstractProcessDefinitionRestServiceQueryTest extends Abst
     verify(mockedQuery).deploymentId(queryParameters.get("deploymentId"));
     verify(mockedQuery).processDefinitionKey(queryParameters.get("key"));
     verify(mockedQuery).processDefinitionKeyLike(queryParameters.get("keyLike"));
-    verify(mockedQuery).processDefinitionVersion(Integer.parseInt(queryParameters.get("ver")));
+    verify(mockedQuery).processDefinitionVersion(Integer.parseInt(queryParameters.get("version")));
     verify(mockedQuery).latestVersion();
     verify(mockedQuery).processDefinitionResourceName(queryParameters.get("resourceName"));
     verify(mockedQuery).processDefinitionResourceNameLike(queryParameters.get("resourceNameLike"));
@@ -236,8 +236,8 @@ public abstract class AbstractProcessDefinitionRestServiceQueryTest extends Abst
     parameters.put("deploymentId", "depId");
     parameters.put("key", "key");
     parameters.put("keyLike", "keylike");
-    parameters.put("ver", "0");
-    parameters.put("latest", "true");
+    parameters.put("version", "0");
+    parameters.put("latestVersion", "true");
     parameters.put("resourceName", "res");
     parameters.put("resourceNameLike", "resLike");
     parameters.put("startableBy", "kermit");

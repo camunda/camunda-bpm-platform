@@ -12,18 +12,33 @@
       <planItem id="PI_HumanTask_1" definitionRef="HumanTask_1" />
       <planItem id="PI_HumanTask_2" definitionRef="HumanTask_2" />
       <planItem id="PI_HumanTask_3" definitionRef="HumanTask_3" />
+      <planItem id="PI_Milestone_1" definitionRef="Milestone" entryCriteriaRefs="Sentry_1" />
+      <planItem id="PI_Milestone_2" definitionRef="Milestone" entryCriteriaRefs="Sentry_2" />
+      <planItem id="PI_Milestone_3" definitionRef="Milestone" entryCriteriaRefs="Sentry_3" />
 
-      <planItem id="PI_UserEvent_1" definitionRef="UserEvent_1" />
-      <planItem id="PI_UserEvent_2" definitionRef="UserEvent_2" />
-      <planItem id="PI_UserEvent_3" definitionRef="UserEvent_3" />
+      <sentry id="Sentry_1">
+        <planItemOnPart sourceRef="PI_HumanTask_1">
+          <standardEvent>terminate</standardEvent>
+        </planItemOnPart>
+      </sentry>
+
+      <sentry id="Sentry_2">
+        <planItemOnPart sourceRef="PI_HumanTask_2">
+          <standardEvent>complete</standardEvent>
+        </planItemOnPart>
+      </sentry>
+
+      <sentry id="Sentry_3">
+        <planItemOnPart sourceRef="PI_HumanTask_3">
+          <standardEvent>complete</standardEvent>
+        </planItemOnPart>
+      </sentry>
 
       <humanTask id="HumanTask_1" />
       <humanTask id="HumanTask_2" />
       <humanTask id="HumanTask_3" />
 
-      <userEvent id="UserEvent_1" />
-      <userEvent id="UserEvent_2" />
-      <userEvent id="UserEvent_3" />
+      <milestone id="Milestone" />
 
     </casePlanModel>
 

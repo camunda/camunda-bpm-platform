@@ -6,7 +6,7 @@
   <case id="oneTaskCase" name="One Task Case">
   
     <casePlanModel id="CasePlanModel_1">
-      <planItem id="PI_HumanTask_1" definitionRef="HumanTask_1" />
+      <planItem id="PI_HumanTask_1" definitionRef="HumanTask_1" description="This is a description..."/>
       <humanTask id="HumanTask_1" name="A HumanTask" />
     </casePlanModel>
   </case>

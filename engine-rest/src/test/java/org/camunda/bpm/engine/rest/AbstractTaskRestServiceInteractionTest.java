@@ -5,6 +5,8 @@ import static com.jayway.restassured.path.json.JsonPath.from;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_CASE_DEFINITION_ID;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_CASE_EXECUTION_ID;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_CASE_INSTANCE_ID;
+import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_GROUP_ID;
+import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_GROUP_ID2;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_TASK_ASSIGNEE_NAME;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_TASK_ATTACHMENT_DESCRIPTION;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_TASK_ATTACHMENT_ID;
@@ -29,6 +31,8 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
@@ -68,9 +72,12 @@ import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.form.TaskFormData;
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.history.HistoricTaskInstanceQuery;
+import org.camunda.bpm.engine.identity.Group;
+import org.camunda.bpm.engine.identity.GroupQuery;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.identity.UserQuery;
 import org.camunda.bpm.engine.impl.TaskServiceImpl;
@@ -164,7 +171,8 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
   private ManagementService managementServiceMock;
   private RepositoryService repositoryServiceMock;
 
-  private IdentityLink mockUserAssigneeIdentityLink;
+  private IdentityLink mockAssigneeIdentityLink;
+  private IdentityLink mockOwnerIdentityLink;
   private IdentityLink mockCandidateGroupIdentityLink;
   private IdentityLink mockCandidateGroup2IdentityLink;
 
@@ -189,8 +197,10 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     when(taskServiceMock.createTaskQuery()).thenReturn(mockQuery);
 
     List<IdentityLink> identityLinks = new ArrayList<IdentityLink>();
-    mockUserAssigneeIdentityLink = MockProvider.createMockUserAssigneeIdentityLink();
-    identityLinks.add(mockUserAssigneeIdentityLink);
+    mockAssigneeIdentityLink = MockProvider.createMockUserAssigneeIdentityLink();
+    identityLinks.add(mockAssigneeIdentityLink);
+    mockOwnerIdentityLink = MockProvider.createMockUserOwnerIdentityLink();
+    identityLinks.add(mockOwnerIdentityLink);
     mockCandidateGroupIdentityLink = MockProvider.createMockCandidateGroupIdentityLink();
     identityLinks.add(mockCandidateGroupIdentityLink);
     mockCandidateGroup2IdentityLink = MockProvider.createAnotherMockCandidateGroupIdentityLink();
@@ -219,7 +229,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     when(formServiceMock.getTaskFormData(anyString())).thenReturn(mockFormData);
 
     VariableMap variablesMock = MockProvider.createMockFormVariables();
-    when(formServiceMock.getTaskFormVariables(eq(EXAMPLE_TASK_ID), Matchers.<Collection<String>>any(), eq(true))).thenReturn(variablesMock);
+    when(formServiceMock.getTaskFormVariables(eq(EXAMPLE_TASK_ID), Matchers.<Collection<String>>any(), anyBoolean())).thenReturn(variablesMock);
 
     repositoryServiceMock = mock(RepositoryService.class);
     when(processEngine.getRepositoryService()).thenReturn(repositoryServiceMock);
@@ -291,16 +301,30 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
   }
 
   @Test
+  @SuppressWarnings("unchecked")
   public void testGetSingleTaskHal() {
 
     // setup user query mock
-    List<User> mockUsers = MockProvider.createMockUsers();
+    List<User> mockUsers = Arrays.asList(
+      MockProvider.mockUser().id(EXAMPLE_TASK_ASSIGNEE_NAME).build(),
+      MockProvider.mockUser().id(EXAMPLE_TASK_OWNER).build()
+    );
     UserQuery sampleUserQuery = mock(UserQuery.class);
-    when(sampleUserQuery.listPage(0, 1)).thenReturn(mockUsers);
-    when(sampleUserQuery.userIdIn(MockProvider.EXAMPLE_TASK_ASSIGNEE_NAME)).thenReturn(sampleUserQuery);
-    when(sampleUserQuery.userIdIn(MockProvider.EXAMPLE_TASK_OWNER)).thenReturn(sampleUserQuery);
-    when(sampleUserQuery.count()).thenReturn(1l);
+    when(sampleUserQuery.userIdIn(eq(EXAMPLE_TASK_ASSIGNEE_NAME), eq(EXAMPLE_TASK_OWNER))).thenReturn(sampleUserQuery);
+    when(sampleUserQuery.listPage(eq(0), eq(2))).thenReturn(mockUsers);
+    when(sampleUserQuery.count()).thenReturn((long) mockUsers.size());
     when(processEngine.getIdentityService().createUserQuery()).thenReturn(sampleUserQuery);
+
+    // setup group query mock
+    List<Group> mockGroups = Arrays.asList(
+      MockProvider.mockGroup().id(mockCandidateGroupIdentityLink.getGroupId()).build(),
+      MockProvider.mockGroup().id(mockCandidateGroup2IdentityLink.getGroupId()).build()
+    );
+    GroupQuery sampleGroupQuery = mock(GroupQuery.class);
+    when(sampleGroupQuery.groupIdIn(eq(EXAMPLE_GROUP_ID), eq(EXAMPLE_GROUP_ID2))).thenReturn(sampleGroupQuery);
+    when(sampleGroupQuery.listPage(eq(0), eq(2))).thenReturn(mockGroups);
+    when(sampleGroupQuery.count()).thenReturn((long) mockGroups.size());
+    when(processEngine.getIdentityService().createGroupQuery()).thenReturn(sampleGroupQuery);
 
     // setup process definition query mock
     List<ProcessDefinition> mockDefinitions = MockProvider.createMockDefinitions();
@@ -310,7 +334,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     when(sampleProcessDefinitionQuery.count()).thenReturn(1l);
     when(processEngine.getRepositoryService().createProcessDefinitionQuery()).thenReturn(sampleProcessDefinitionQuery);
 
-    // setup case defintion query mock
+    // setup case definition query mock
     List<CaseDefinition> mockCaseDefinitions = MockProvider.createMockCaseDefinitions();
     CaseDefinitionQuery sampleCaseDefinitionQuery = mock(CaseDefinitionQuery.class);
     when(sampleCaseDefinitionQuery.listPage(0, 1)).thenReturn(mockCaseDefinitions);
@@ -351,31 +375,62 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
       .body("_links.parentTask.href", endsWith(EXAMPLE_TASK_PARENT_TASK_ID))
       .body("_links.processDefinition.href", endsWith(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID))
       .body("_links.processInstance.href", endsWith(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID))
+      .body("_links.identityLink.href", endsWith("/task/" + EXAMPLE_TASK_ID + "/identity-links"))
       .body("_links.self.href", endsWith(EXAMPLE_TASK_ID))
 
       .when().get(SINGLE_TASK_URL);
 
     String content = response.asString();
 
-    // validate embedded assignees:
-    List<Map<String,Object>> embeddedAssignees = from(content).getList("_embedded.assignee");
-    Assert.assertEquals("There should be one assignee returned.", 1, embeddedAssignees.size());
-    Map<String, Object> embeddedAssignee = embeddedAssignees.get(0);
-    Assert.assertNotNull("The returned assignee should not be null.", embeddedAssignee);
-    Assert.assertEquals(MockProvider.EXAMPLE_USER_ID, embeddedAssignee.get("id"));
-    Assert.assertEquals(MockProvider.EXAMPLE_USER_FIRST_NAME, embeddedAssignee.get("firstName"));
-    Assert.assertEquals(MockProvider.EXAMPLE_USER_LAST_NAME, embeddedAssignee.get("lastName"));
-    Assert.assertEquals(MockProvider.EXAMPLE_USER_EMAIL, embeddedAssignee.get("email"));
+    // validate embedded users:
+    List<Map<String,Object>> embeddedUsers = from(content).getList("_embedded.user");
+    Assert.assertEquals("There should be two users returned.", 2, embeddedUsers.size());
 
-    // validate embedded owners:
-    List<Map<String,Object>> embeddedOwners = from(content).getList("_embedded.owner");
-    Assert.assertEquals("There should be one owner returned.", 1, embeddedOwners.size());
-    Map<String, Object> embeddedOwner = embeddedOwners.get(0);
-    Assert.assertNotNull("The returned owner should not be null.", embeddedOwner);
-    Assert.assertEquals(MockProvider.EXAMPLE_USER_ID, embeddedOwner.get("id"));
-    Assert.assertEquals(MockProvider.EXAMPLE_USER_FIRST_NAME, embeddedOwner.get("firstName"));
-    Assert.assertEquals(MockProvider.EXAMPLE_USER_LAST_NAME, embeddedOwner.get("lastName"));
-    Assert.assertEquals(MockProvider.EXAMPLE_USER_EMAIL, embeddedOwner.get("email"));
+    Map<String, Object> embeddedUser = embeddedUsers.get(0);
+    assertNotNull("The returned user should not be null.", embeddedUser);
+    assertEquals(MockProvider.EXAMPLE_TASK_ASSIGNEE_NAME, embeddedUser.get("id"));
+    assertEquals(MockProvider.EXAMPLE_USER_FIRST_NAME, embeddedUser.get("firstName"));
+    assertEquals(MockProvider.EXAMPLE_USER_LAST_NAME, embeddedUser.get("lastName"));
+    assertEquals(MockProvider.EXAMPLE_USER_EMAIL, embeddedUser.get("email"));
+    assertNull(embeddedUser.get("_embedded"));
+    Map<String, Object> links = (Map<String, Object>) embeddedUser.get("_links");
+    assertEquals(1, links.size());
+    assertHalLink(links, "self", UserRestService.PATH + "/" + MockProvider.EXAMPLE_TASK_ASSIGNEE_NAME);
+
+    embeddedUser = embeddedUsers.get(1);
+    assertNotNull("The returned user should not be null.", embeddedUser);
+    assertEquals(MockProvider.EXAMPLE_TASK_OWNER, embeddedUser.get("id"));
+    assertEquals(MockProvider.EXAMPLE_USER_FIRST_NAME, embeddedUser.get("firstName"));
+    assertEquals(MockProvider.EXAMPLE_USER_LAST_NAME, embeddedUser.get("lastName"));
+    assertEquals(MockProvider.EXAMPLE_USER_EMAIL, embeddedUser.get("email"));
+    assertNull(embeddedUser.get("_embedded"));
+    links = (Map<String, Object>) embeddedUser.get("_links");
+    assertEquals(1, links.size());
+    assertHalLink(links, "self", UserRestService.PATH + "/" + MockProvider.EXAMPLE_TASK_OWNER);
+
+    // validate embedded groups:
+    List<Map<String, Object>> embeddedGroups = from(content).getList("_embedded.group");
+    Assert.assertEquals("There should be two groups returned.", 2, embeddedGroups.size());
+
+    Map<String, Object> embeddedGroup = embeddedGroups.get(0);
+    assertNotNull("The returned group should not be null.", embeddedGroup);
+    assertEquals(MockProvider.EXAMPLE_GROUP_ID, embeddedGroup.get("id"));
+    assertEquals(MockProvider.EXAMPLE_GROUP_NAME, embeddedGroup.get("name"));
+    assertEquals(MockProvider.EXAMPLE_GROUP_TYPE, embeddedGroup.get("type"));
+    assertNull(embeddedGroup.get("_embedded"));
+    links = (Map<String, Object>) embeddedGroup.get("_links");
+    assertEquals(1, links.size());
+    assertHalLink(links, "self", GroupRestService.PATH + "/" + MockProvider.EXAMPLE_GROUP_ID);
+
+    embeddedGroup = embeddedGroups.get(1);
+    assertNotNull("The returned group should not be null.", embeddedGroup);
+    assertEquals(MockProvider.EXAMPLE_GROUP_ID2, embeddedGroup.get("id"));
+    assertEquals(MockProvider.EXAMPLE_GROUP_NAME, embeddedGroup.get("name"));
+    assertEquals(MockProvider.EXAMPLE_GROUP_TYPE, embeddedGroup.get("type"));
+    assertNull(embeddedGroup.get("_embedded"));
+    links = (Map<String, Object>) embeddedGroup.get("_links");
+    assertEquals(1, links.size());
+    assertHalLink(links, "self", GroupRestService.PATH + "/" + MockProvider.EXAMPLE_GROUP_ID2);
 
     // validate embedded processDefinitions:
     List<Map<String,Object>> embeddedDefinitions = from(content).getList("_embedded.processDefinition");
@@ -394,7 +449,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_DEFINITION_IS_SUSPENDED, embeddedProcessDefinition.get("suspended"));
     Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_APPLICATION_CONTEXT_PATH, embeddedProcessDefinition.get("contextPath"));
 
-    Map<String, Object> links = (Map<String, Object>) embeddedProcessDefinition.get("_links");
+    links = (Map<String, Object>) embeddedProcessDefinition.get("_links");
     Assert.assertEquals(3, links.size());
     assertHalLink(links, "self", "/process-definition/" +  MockProvider.EXAMPLE_PROCESS_DEFINITION_ID);
     assertHalLink(links, "deployment", "/deployment/" +  MockProvider.EXAMPLE_DEPLOYMENT_ID);
@@ -422,14 +477,45 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     assertHalLink(links, "deployment", "/deployment/" +  MockProvider.EXAMPLE_DEPLOYMENT_ID);
     assertHalLink(links, "resource", "/deployment/" +  MockProvider.EXAMPLE_DEPLOYMENT_ID + "/resources/"
         + MockProvider.EXAMPLE_CASE_DEFINITION_RESOURCE_NAME);
+
+    // validate embedded identity links
+    List<Map<String, Object>> embeddedIdentityLinks = from(content).getList("_embedded.identityLink");
+    assertEquals("There should be three identityLink returned", 4, embeddedIdentityLinks.size());
+    assertEmbeddedIdentityLink(mockAssigneeIdentityLink, embeddedIdentityLinks.get(0));
+    assertEmbeddedIdentityLink(mockOwnerIdentityLink, embeddedIdentityLinks.get(1));
+    assertEmbeddedIdentityLink(mockCandidateGroupIdentityLink, embeddedIdentityLinks.get(2));
+    assertEmbeddedIdentityLink(mockCandidateGroup2IdentityLink, embeddedIdentityLinks.get(3));
+
   }
 
+  @SuppressWarnings("unchecked")
   protected void assertHalLink(Map<String, Object> links, String key, String expectedLink) {
     Map<String, Object> linkObject = (Map<String, Object>) links.get(key);
     Assert.assertNotNull(linkObject);
 
     String actualLink = (String) linkObject.get("href");
     Assert.assertEquals(expectedLink, actualLink);
+  }
+
+  @SuppressWarnings("unchecked")
+  protected void assertEmbeddedIdentityLink(IdentityLink expected, Map<String, Object> actual) {
+    assertNotNull("Embedded indentity link should not be null", actual);
+    assertEquals(expected.getType(), actual.get("type"));
+    assertEquals(expected.getUserId(), actual.get("userId"));
+    assertEquals(expected.getGroupId(), actual.get("groupId"));
+    assertEquals(expected.getTaskId(), actual.get("taskId"));
+    assertNull(actual.get("_embedded"));
+
+    Map<String, Object> links = (Map<String, Object>) actual.get("_links");
+    if (expected.getUserId() != null) {
+      assertHalLink(links, "user", UserRestService.PATH + "/" + expected.getUserId());
+    }
+    if (expected.getGroupId() != null) {
+      assertHalLink(links, "group", GroupRestService.PATH + "/" + expected.getGroupId());
+    }
+    if (expected.getTaskId() != null) {
+      assertHalLink(links, "task", TaskRestService.PATH + "/" + expected.getTaskId());
+    }
   }
 
   @Test
@@ -483,6 +569,17 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
       .header("accept", MediaType.APPLICATION_JSON)
       .then().expect().statusCode(Status.OK.getStatusCode())
       .body("key", equalTo("embedded:engine://engine/:engine/task/" + EXAMPLE_TASK_ID + "/rendered-form"))
+      .body("contextPath", equalTo(MockProvider.EXAMPLE_PROCESS_APPLICATION_CONTEXT_PATH))
+      .when().get(TASK_FORM_URL);
+  }
+
+  @Test
+  public void testGetForm__FormDataEqualsNull() {
+    when(formServiceMock.getTaskFormData(EXAMPLE_TASK_ID)).thenReturn(null);
+
+    given().pathParam("id", EXAMPLE_TASK_ID)
+      .header("accept", MediaType.APPLICATION_JSON)
+      .then().expect().statusCode(Status.OK.getStatusCode())
       .body("contextPath", equalTo(MockProvider.EXAMPLE_PROCESS_APPLICATION_CONTEXT_PATH))
       .when().get(TASK_FORM_URL);
   }
@@ -735,6 +832,39 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
   }
 
   @Test
+  public void testGetTaskFormVariablesAndDoNotDeserializeVariables() {
+
+    given()
+      .pathParam("id", EXAMPLE_TASK_ID)
+      .queryParam("deserializeValues", false)
+      .header("accept", MediaType.APPLICATION_JSON)
+      .then().expect()
+        .statusCode(Status.OK.getStatusCode()).contentType(ContentType.JSON)
+        .body(MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME+".type",
+            equalTo(VariableTypeHelper.toExpectedValueTypeName(MockProvider.EXAMPLE_PRIMITIVE_VARIABLE_VALUE.getType())))
+        .body(MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME+".value",
+            equalTo(MockProvider.EXAMPLE_PRIMITIVE_VARIABLE_VALUE.getValue()))
+      .when().get(FORM_VARIABLES_URL)
+      .body();
+
+    verify(formServiceMock, times(1)).getTaskFormVariables(EXAMPLE_TASK_ID, null, false);
+  }
+
+  @Test
+  public void testGetTaskFormVariablesVarNamesAndDoNotDeserializeVariables() {
+    given()
+      .pathParam("id", EXAMPLE_TASK_ID)
+      .queryParam("deserializeValues", false)
+      .queryParam("variableNames", "a,b,c")
+      .header("accept", MediaType.APPLICATION_JSON)
+      .then().expect()
+        .statusCode(Status.OK.getStatusCode()).contentType(ContentType.JSON)
+      .when().get(FORM_VARIABLES_URL);
+
+    verify(formServiceMock, times(1)).getTaskFormVariables(EXAMPLE_TASK_ID, Arrays.asList(new String[]{"a","b","c"}), false);
+  }
+
+  @Test
   public void testClaimTask() {
     Map<String, Object> json = new HashMap<String, Object>();
     json.put("userId", EXAMPLE_USER_ID);
@@ -856,7 +986,8 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
 
   @Test
   public void testGetIdentityLinks() {
-    Map<String, Object> expectedUserIdentityLink = toExpectedJsonMap(mockUserAssigneeIdentityLink);
+    Map<String, Object> expectedAssigneeIdentityLink = toExpectedJsonMap(mockAssigneeIdentityLink);
+    Map<String, Object> expectedOwnerIdentityLink = toExpectedJsonMap(mockOwnerIdentityLink);
     Map<String, Object> expectedGroupIdentityLink = toExpectedJsonMap(mockCandidateGroupIdentityLink);
     Map<String, Object> expectedGroupIdentityLink2 = toExpectedJsonMap(mockCandidateGroup2IdentityLink);
 
@@ -864,8 +995,9 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
       .header("accept", MediaType.APPLICATION_JSON)
       .then().expect()
         .statusCode(Status.OK.getStatusCode()).contentType(ContentType.JSON)
-        .body("$.size()", equalTo(3))
-        .body("$", hasItem(expectedUserIdentityLink))
+        .body("$.size()", equalTo(4))
+        .body("$", hasItem(expectedAssigneeIdentityLink))
+        .body("$", hasItem(expectedOwnerIdentityLink))
         .body("$", hasItem(expectedGroupIdentityLink))
         .body("$", hasItem(expectedGroupIdentityLink2))
       .when().get(TASK_IDENTITY_LINKS_URL);
@@ -3092,6 +3224,29 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     verify(taskServiceMock).newTask(null);
     verify(newTask).setDelegationState(DelegationState.PENDING);
     verify(taskServiceMock).saveTask(newTask);
+  }
+
+  @Test
+  public void testPostCreateTask_NotValidValueException() {
+    Map<String, Object> json = new HashMap<String, Object>();
+
+    json.put("id", "anyTaskId");
+
+    Task newTask = mock(Task.class);
+    when(taskServiceMock.newTask(anyString())).thenReturn(newTask);
+
+    doThrow(new NotValidException("parent task is null")).when(taskServiceMock).saveTask(newTask);
+
+    given()
+      .body(json)
+      .contentType(ContentType.JSON)
+      .header("accept", MediaType.APPLICATION_JSON)
+    .then()
+      .expect()
+        .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
+        .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+        .body("message", equalTo("Could not save task: parent task is null"))
+      .when().post(TASK_CREATE_URL);
   }
 
   @Test

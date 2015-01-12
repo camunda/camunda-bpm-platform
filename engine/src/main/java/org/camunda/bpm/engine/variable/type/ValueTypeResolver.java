@@ -12,10 +12,20 @@
  */
 package org.camunda.bpm.engine.variable.type;
 
+import java.util.Collection;
+
 /**
  * @author Thorben Lindhauer
  */
 public interface ValueTypeResolver {
 
   ValueType typeForName(String typeName);
+
+  /**
+   * Returns all (transitive) sub types of the provided type
+   * given they are not abstract
+   *
+   * @return
+   */
+  Collection<ValueType> getSubTypes(ValueType type);
 }

@@ -239,7 +239,7 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
       TaskQueryVariableValue variable = variables.get(i);
       assertEquals(variableNames[i], variable.getName());
       assertEquals(variableValues[i], variable.getValue());
-      assertEquals(variableOperators[i].toString(), variable.getOperator());
+      assertEquals(variableOperators[i], variable.getOperator());
       assertEquals(isTaskVariable[i], variable.isLocal());
       assertEquals(isProcessVariable[i], variable.isProcessInstanceVariable());
     }
@@ -269,6 +269,116 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
 
     // ordering
     assertEquals(testOrderBy, query.getOrderBy());
+  }
+
+  public void testTaskQueryByFollowUpBeforeOrNotExistent() {
+    // create query
+    TaskQueryImpl query = new TaskQueryImpl();
+
+    query.followUpBeforeOrNotExistent(testDate);
+
+    // save filter
+    filter.setQuery(query);
+    filterService.saveFilter(filter);
+
+    // fetch from db
+    filter = filterService.createTaskFilterQuery().singleResult();
+
+    // test query
+    query = filter.getQuery();
+    assertTrue(query.isFollowUpNullAccepted());
+    assertEquals(testDate, query.getFollowUpBefore());
+  }
+
+  public void testTaskQueryByFollowUpBeforeOrNotExistentExtendingQuery() {
+    // create query
+    TaskQueryImpl query = new TaskQueryImpl();
+
+    query.followUpBeforeOrNotExistent(testDate);
+
+    // save filter without query
+    filterService.saveFilter(filter);
+
+    // fetch from db
+    filter = filterService.createTaskFilterQuery().singleResult();
+
+    // use query as extending query
+    List<Task> tasks = filterService.list(filter.getId(), query);
+    assertEquals(3, tasks.size());
+
+    // set as filter query and save filter
+    filter.setQuery(query);
+    filterService.saveFilter(filter);
+
+    // fetch from db
+    filter = filterService.createTaskFilterQuery().singleResult();
+
+    tasks = filterService.list(filter.getId());
+    assertEquals(3, tasks.size());
+
+    TaskQuery extendingQuery = taskService.createTaskQuery();
+
+    extendingQuery
+      .orderByTaskCreateTime()
+      .asc();
+
+    tasks = filterService.list(filter.getId(), extendingQuery);
+    assertEquals(3, tasks.size());
+  }
+
+  public void testTaskQueryByFollowUpBeforeOrNotExistentExpression() {
+    // create query
+    TaskQueryImpl query = new TaskQueryImpl();
+
+    query.followUpBeforeOrNotExistentExpression(testString);
+
+    // save filter
+    filter.setQuery(query);
+    filterService.saveFilter(filter);
+
+    // fetch from db
+    filter = filterService.createTaskFilterQuery().singleResult();
+
+    // test query
+    query = filter.getQuery();
+    assertTrue(query.isFollowUpNullAccepted());
+    assertEquals(testString, query.getExpressions().get("followUpBeforeOrNotExistent"));
+  }
+
+  public void testTaskQueryByFollowUpBeforeOrNotExistentExpressionExtendingQuery() {
+    // create query
+    TaskQueryImpl query = new TaskQueryImpl();
+
+    query.followUpBeforeOrNotExistentExpression("${dateTime().withMillis(0)}");
+
+    // save filter without query
+    filterService.saveFilter(filter);
+
+    // fetch from db
+    filter = filterService.createTaskFilterQuery().singleResult();
+
+    // use query as extending query
+    List<Task> tasks = filterService.list(filter.getId(), query);
+    assertEquals(3, tasks.size());
+
+    // set as filter query and save filter
+    filter.setQuery(query);
+    filterService.saveFilter(filter);
+
+    // fetch from db
+    filter = filterService.createTaskFilterQuery().singleResult();
+
+    tasks = filterService.list(filter.getId());
+    assertEquals(3, tasks.size());
+
+    TaskQuery extendingQuery = taskService.createTaskQuery();
+
+    extendingQuery
+      .orderByTaskCreateTime()
+      .asc();
+
+    tasks = filterService.list(filter.getId(), extendingQuery);
+    assertEquals(3, tasks.size());
   }
 
   public void testTaskQueryCandidateUser() {
@@ -564,17 +674,17 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
     // assert variables (ordering: extending variables are inserted first)
     assertEquals("hello", variables.get(0).getName());
     assertEquals("world", variables.get(0).getValue());
-    assertEquals(QueryOperator.EQUALS.toString(), variables.get(0).getOperator());
+    assertEquals(QueryOperator.EQUALS, variables.get(0).getOperator());
     assertFalse(variables.get(0).isProcessInstanceVariable());
     assertTrue(variables.get(0).isLocal());
     assertEquals("hello", variables.get(1).getName());
     assertEquals("world", variables.get(1).getValue());
-    assertEquals(QueryOperator.EQUALS.toString(), variables.get(1).getOperator());
+    assertEquals(QueryOperator.EQUALS, variables.get(1).getOperator());
     assertFalse(variables.get(1).isProcessInstanceVariable());
     assertFalse(variables.get(1).isLocal());
     assertEquals("hello", variables.get(2).getName());
     assertEquals("world", variables.get(2).getValue());
-    assertEquals(QueryOperator.EQUALS.toString(), variables.get(2).getOperator());
+    assertEquals(QueryOperator.EQUALS, variables.get(2).getOperator());
     assertTrue(variables.get(2).isProcessInstanceVariable());
     assertFalse(variables.get(2).isLocal());
 
@@ -593,17 +703,17 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
     // assert variables (ordering: extending variables are inserted first)
     assertEquals("hello", variables.get(0).getName());
     assertEquals(42, variables.get(0).getValue());
-    assertEquals(QueryOperator.LESS_THAN.toString(), variables.get(0).getOperator());
+    assertEquals(QueryOperator.LESS_THAN, variables.get(0).getOperator());
     assertTrue(variables.get(0).isProcessInstanceVariable());
     assertFalse(variables.get(0).isLocal());
     assertEquals("hello", variables.get(1).getName());
     assertEquals(42, variables.get(1).getValue());
-    assertEquals(QueryOperator.LESS_THAN.toString(), variables.get(1).getOperator());
+    assertEquals(QueryOperator.LESS_THAN, variables.get(1).getOperator());
     assertFalse(variables.get(1).isProcessInstanceVariable());
     assertTrue(variables.get(1).isLocal());
     assertEquals("hello", variables.get(2).getName());
     assertEquals(42, variables.get(2).getValue());
-    assertEquals(QueryOperator.LESS_THAN.toString(), variables.get(2).getOperator());
+    assertEquals(QueryOperator.LESS_THAN, variables.get(2).getOperator());
     assertFalse(variables.get(2).isProcessInstanceVariable());
     assertFalse(variables.get(2).isLocal());
   }

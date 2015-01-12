@@ -43,6 +43,9 @@ public interface HistoricCaseActivityInstanceQuery extends Query<HistoricCaseAct
   /** Only select historic case activity instances for activities with the given name */
   HistoricCaseActivityInstanceQuery caseActivityName(String caseActivityName);
 
+  /** Only select historic case activity instances for activities with the given type */
+  HistoricCaseActivityInstanceQuery caseActivityType(String caseActivityType);
+
   /** Only select historic case activity instances that were created before the given date. */
   HistoricCaseActivityInstanceQuery createdBefore(Date date);
 
@@ -94,6 +97,9 @@ public interface HistoricCaseActivityInstanceQuery extends Query<HistoricCaseAct
 
   /** Order by caseActivityName (needs to be followed by {@link #asc()} or {@link #desc()}). */
   HistoricCaseActivityInstanceQuery orderByCaseActivityName();
+
+  /** Order by caseActivityType (needs to be followed by {@link #asc()} or {@link #desc()}). */
+  HistoricCaseActivityInstanceQuery orderByCaseActivityType();
 
   /** Order by create time (needs to be followed by {@link #asc()} or {@link #desc()}). */
   HistoricCaseActivityInstanceQuery orderByHistoricCaseActivityInstanceCreateTime();

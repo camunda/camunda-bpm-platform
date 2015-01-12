@@ -18,6 +18,7 @@ import org.camunda.bpm.engine.impl.cmmn.behavior.CmmnActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.behavior.StageActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
 import org.camunda.bpm.model.cmmn.instance.CmmnElement;
+import org.camunda.bpm.model.cmmn.instance.PlanItemDefinition;
 import org.camunda.bpm.model.cmmn.instance.Stage;
 
 /**
@@ -26,8 +27,12 @@ import org.camunda.bpm.model.cmmn.instance.Stage;
  */
 public class StageItemHandler extends ItemHandler {
 
-  protected void initializeAutoComplete(Stage stage, CmmnActivity activity, CmmnHandlerContext context) {
-    activity.setProperty(PROPERTY_AUTO_COMPLETE, stage.isAutoComplete());
+  protected void initializeAutoComplete(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context) {
+    PlanItemDefinition definition = getDefinition(element);
+    if (definition instanceof Stage) {
+      Stage stage = (Stage) definition;
+      activity.setProperty(PROPERTY_AUTO_COMPLETE, stage.isAutoComplete());
+    }
   }
 
   protected CmmnActivityBehavior getActivityBehavior() {

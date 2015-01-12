@@ -34,7 +34,9 @@ public class BeansConfigurationHelper {
     xmlBeanDefinitionReader.setValidationMode(XmlBeanDefinitionReader.VALIDATION_XSD);
     xmlBeanDefinitionReader.loadBeanDefinitions(springResource);
     ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl) beanFactory.getBean(beanName);
-    processEngineConfiguration.setBeans(new SpringBeanFactoryProxyMap(beanFactory));
+    if (processEngineConfiguration.getBeans() == null) {
+      processEngineConfiguration.setBeans(new SpringBeanFactoryProxyMap(beanFactory));
+    }
     return processEngineConfiguration;
   }
 

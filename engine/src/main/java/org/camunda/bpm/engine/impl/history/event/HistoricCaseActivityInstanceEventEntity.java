@@ -38,6 +38,9 @@ public class HistoricCaseActivityInstanceEventEntity extends HistoricScopeInstan
   /** the name of the case activity */
   protected String caseActivityName;
 
+  /** the type of the case activity */
+  protected String caseActivityType;
+
   /** the state of this case activity instance */
   protected int caseActivityInstanceState;
 
@@ -74,6 +77,14 @@ public class HistoricCaseActivityInstanceEventEntity extends HistoricScopeInstan
 
   public void setCaseActivityName(String caseActivityName) {
     this.caseActivityName = caseActivityName;
+  }
+
+  public String getCaseActivityType() {
+    return caseActivityType;
+  }
+
+  public void setCaseActivityType(String caseActivityType) {
+    this.caseActivityType = caseActivityType;
   }
 
   public int getCaseActivityInstanceState() {

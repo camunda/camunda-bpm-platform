@@ -22,6 +22,7 @@ public class HistoricCaseActivityInstanceDto {
   private String parentCaseActivityInstanceId;
   private String caseActivityId;
   private String caseActivityName;
+  private String caseActivityType;
   private String caseDefinitionId;
   private String caseInstanceId;
   private String caseExecutionId;
@@ -52,6 +53,10 @@ public class HistoricCaseActivityInstanceDto {
 
   public String getCaseActivityName() {
     return caseActivityName;
+  }
+
+  public String getCaseActivityType() {
+    return caseActivityType;
   }
 
   public String getCaseDefinitionId() {
@@ -122,6 +127,7 @@ public class HistoricCaseActivityInstanceDto {
     dto.parentCaseActivityInstanceId = historicCaseActivityInstance.getParentCaseActivityInstanceId();
     dto.caseActivityId = historicCaseActivityInstance.getCaseActivityId();
     dto.caseActivityName = historicCaseActivityInstance.getCaseActivityName();
+    dto.caseActivityType = historicCaseActivityInstance.getCaseActivityType();
     dto.caseDefinitionId = historicCaseActivityInstance.getCaseDefinitionId();
     dto.caseInstanceId = historicCaseActivityInstance.getCaseInstanceId();
     dto.caseExecutionId = historicCaseActivityInstance.getCaseExecutionId();

@@ -15,7 +15,7 @@ package org.camunda.bpm.engine.test.pvm.activities;
 
 import java.util.List;
 
-import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessDefinition;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessInstance;
 import org.camunda.bpm.engine.impl.pvm.PvmTransition;
@@ -42,7 +42,7 @@ public class ReusableSubProcess implements SubProcessActivityBehavior {
     subProcessInstance.start();
   }
 
-  public void completing(DelegateExecution execution, DelegateExecution subProcessInstance) throws Exception {
+  public void completing(VariableScope execution, VariableScope subProcessInstance) throws Exception {
     // TODO extract information from the subprocess and inject it into the superprocess
   }
 

@@ -33,6 +33,7 @@ import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javax.naming.InitialContext;
 import javax.sql.DataSource;
 
@@ -226,6 +227,7 @@ import org.camunda.bpm.engine.impl.variable.serializer.jpa.EntityManagerSession;
 import org.camunda.bpm.engine.impl.variable.serializer.jpa.EntityManagerSessionFactory;
 import org.camunda.bpm.engine.impl.variable.serializer.jpa.JPAVariableSerializer;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
+import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.type.ValueType;
 
 
@@ -333,7 +335,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected List<TypedValueSerializer> customPreVariableSerializers;
   protected List<TypedValueSerializer> customPostVariableSerializers;
   protected VariableSerializers variableSerializers;
-  protected String defaultSerializationFormat = JavaObjectSerializer.SERIALIZATION_DATA_FORMAT;
+  protected String defaultSerializationFormat = Variables.SerializationDataFormats.JAVA.getName();
   protected String defaultCharsetName = null;
   protected Charset defaultCharset = null;
 
@@ -1277,11 +1279,12 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected void initExpressionManager() {
     if (expressionManager==null) {
       expressionManager = new ExpressionManager(beans);
-      // add function mapper for command context (eg currentUser(), currentUserGroups())
-      expressionManager.addFunctionMapper(new CommandContextFunctionMapper());
-      // add function mapper for date time (eg now(), dateTime())
-      expressionManager.addFunctionMapper(new DateTimeFunctionMapper());
     }
+
+    // add function mapper for command context (eg currentUser(), currentUserGroups())
+    expressionManager.addFunctionMapper(new CommandContextFunctionMapper());
+    // add function mapper for date time (eg now(), dateTime())
+    expressionManager.addFunctionMapper(new DateTimeFunctionMapper());
   }
 
   protected void initBusinessCalendarManager() {

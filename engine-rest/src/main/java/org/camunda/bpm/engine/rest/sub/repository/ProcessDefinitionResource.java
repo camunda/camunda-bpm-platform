@@ -89,5 +89,5 @@ public interface ProcessDefinitionResource {
   @Path("/form-variables")
   @Produces(MediaType.APPLICATION_JSON)
   Map<String, VariableValueDto> getFormVariables(@QueryParam("variableNames") String variableNames,
-      @QueryParam(VariableResource.DESERIALIZE_VALUE_QUERY_PARAM) @DefaultValue("true") boolean deserializeValues);
+      @QueryParam(VariableResource.DESERIALIZE_VALUES_QUERY_PARAM) @DefaultValue("true") boolean deserializeValues);
 }

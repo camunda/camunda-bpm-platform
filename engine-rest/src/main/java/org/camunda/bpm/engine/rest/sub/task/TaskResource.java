@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.rest.sub.task;
 
 import java.util.List;
 import java.util.Map;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -113,7 +114,7 @@ public interface TaskResource {
   @Path("/form-variables")
   @Produces(MediaType.APPLICATION_JSON)
   Map<String, VariableValueDto> getFormVariables(@QueryParam("variableNames") String variableNames,
-      @QueryParam(VariableResource.DESERIALIZE_VALUE_QUERY_PARAM) @DefaultValue("true") boolean deserializeValues);
+      @QueryParam(VariableResource.DESERIALIZE_VALUES_QUERY_PARAM) @DefaultValue("true") boolean deserializeValues);
 
   @PUT
   @Consumes(MediaType.APPLICATION_JSON)

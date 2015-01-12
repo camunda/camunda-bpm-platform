@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!--
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~       http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.camunda.bpm.engine.impl.persistence.entity.Commons">
+
+  <!-- SQL snippets that are reused in different mappers -->
+  
+  <!-- This snippet is used by all queries that allow filtering by variable values -->
+  <sql id="variableValueConditions">
+    <if test="queryVariableValue.operatorName.equals('NOT_EQUALS')">NOT</if><!-- NOT_EQUALS uses the same conditions as EQUALS -->
+    (
+    <foreach collection="queryVariableValue.valueConditions" item="valueCondition" separator="or">
+      <trim prefix="(" prefixOverrides="and" suffix=")">
+        <if test="!valueCondition.type.equals('null')">
+        <!-- When type of value is null, type doesn't matter! -->
+        and ${varPrefix}${varTypeField} = #{valueCondition.type}
+        </if>
+         
+        <if test="valueCondition.textValue != null &amp;&amp; valueCondition.longValue == null &amp;&amp; valueCondition.doubleValue == null">
+          and ${varPrefix}TEXT_
+        <choose>
+          <when test="queryVariableValue.operatorName.equals('LIKE')">LIKE</when>
+          <otherwise><include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.executionVariableOperator" /></otherwise>
+        </choose>
+          #{valueCondition.textValue}
+        </if>
+        <if test="valueCondition.textValue2 != null">
+          and ${varPrefix}TEXT2_
+        <choose>
+          <when test="queryVariableValue.operatorName.equals('LIKE')">LIKE</when>
+          <otherwise><include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.executionVariableOperator" /></otherwise>
+        </choose>
+          #{valueCondition.textValue2}
+        </if>
+    
+        <if test="valueCondition.longValue != null">
+          and ${varPrefix}LONG_
+          <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.executionVariableOperator" />
+          #{valueCondition.longValue}
+        </if>
+    
+        <if test="valueCondition.doubleValue != null">
+          and ${varPrefix}DOUBLE_
+          <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.executionVariableOperator" />
+          #{valueCondition.doubleValue}
+        </if>
+  
+        <!-- Null variable type -->
+        <if test="valueCondition.textValue == null &amp;&amp; valueCondition.textValue2 == null &amp;&amp; valueCondition.longValue == null &amp;&amp; valueCondition.doubleValue == null">
+          and ${varPrefix}TEXT_ is null and ${varPrefix}TEXT2_ is null and ${varPrefix}LONG_ is null and ${varPrefix}DOUBLE_ is null and ${varPrefix}BYTEARRAY_ID_ is null
+        </if>
+      </trim>
+    </foreach>
+    )
+  </sql>
+  
+  <sql id="executionVariableOperator">
+    <choose>
+      <when test="queryVariableValue.operatorName.equals('EQUALS')">=</when>
+      <when test="queryVariableValue.operatorName.equals('NOT_EQUALS')">=</when><!-- Note: NOT_EQUALS is handled by negating the condition -->
+      <when test="queryVariableValue.operatorName.equals('GREATER_THAN')">&gt;</when>
+      <when test="queryVariableValue.operatorName.equals('GREATER_THAN_OR_EQUAL')">&gt;=</when>
+      <when test="queryVariableValue.operatorName.equals('LESS_THAN')">&lt;</when>
+      <when test="queryVariableValue.operatorName.equals('LESS_THAN_OR_EQUAL')">&lt;=</when>
+   </choose>
+  </sql>
+
+</mapper>

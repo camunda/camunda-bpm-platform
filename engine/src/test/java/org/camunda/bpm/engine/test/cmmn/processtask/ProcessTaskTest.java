@@ -1790,6 +1790,18 @@ public class ProcessTaskTest extends CmmnProcessEngineTestCase {
     assertCaseEnded(caseInstanceId);
   }
 
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/cmmn/oneProcessTaskCase.cmmn"})
+  public void testActivityType() {
+    // given
+    createCaseInstanceByKey(ONE_PROCESS_TASK_CASE).getId();
+
+    // when
+    CaseExecution processTask = queryCaseExecutionByActivityId(PROCESS_TASK);
+
+    // then
+    assertEquals("processTask", processTask.getActivityType());
+  }
+
   protected ProcessInstance queryProcessInstance() {
     return runtimeService
         .createProcessInstanceQuery()

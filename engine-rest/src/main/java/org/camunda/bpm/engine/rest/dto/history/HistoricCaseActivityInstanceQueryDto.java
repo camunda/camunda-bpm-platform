@@ -33,6 +33,7 @@ public class HistoricCaseActivityInstanceQueryDto extends AbstractQueryDto<Histo
   protected static final String SORT_BY_CASE_EXECUTION_ID_VALUE = "caseExecutionId";
   protected static final String SORT_BY_CASE_ACTIVITY_ID_VALUE = "caseActivityId";
   protected static final String SORT_BY_CASE_ACTIVITY_NAME_VALUE = "caseActivityName";
+  protected static final String SORT_BY_CASE_ACTIVITY_TYPE_VALUE = "caseActivityType";
   protected static final String SORT_BY_HISTORIC_CASE_ACTIVITY_INSTANCE_CREATE_TIME_VALUE = "createTime";
   protected static final String SORT_BY_HISTORIC_CASE_ACTIVITY_INSTANCE_END_TIME_VALUE = "endTime";
   protected static final String SORT_BY_HISTORIC_CASE_ACTIVITY_INSTANCE_DURATION_VALUE = "duration";
@@ -46,6 +47,7 @@ public class HistoricCaseActivityInstanceQueryDto extends AbstractQueryDto<Histo
     VALID_SORT_BY_VALUES.add(SORT_BY_CASE_EXECUTION_ID_VALUE);
     VALID_SORT_BY_VALUES.add(SORT_BY_CASE_ACTIVITY_ID_VALUE);
     VALID_SORT_BY_VALUES.add(SORT_BY_CASE_ACTIVITY_NAME_VALUE);
+    VALID_SORT_BY_VALUES.add(SORT_BY_CASE_ACTIVITY_TYPE_VALUE);
     VALID_SORT_BY_VALUES.add(SORT_BY_HISTORIC_CASE_ACTIVITY_INSTANCE_CREATE_TIME_VALUE);
     VALID_SORT_BY_VALUES.add(SORT_BY_HISTORIC_CASE_ACTIVITY_INSTANCE_END_TIME_VALUE);
     VALID_SORT_BY_VALUES.add(SORT_BY_HISTORIC_CASE_ACTIVITY_INSTANCE_DURATION_VALUE);
@@ -58,6 +60,7 @@ public class HistoricCaseActivityInstanceQueryDto extends AbstractQueryDto<Histo
   protected String caseExecutionId;
   protected String caseActivityId;
   protected String caseActivityName;
+  protected String caseActivityType;
   protected Date createdBefore;
   protected Date createdAfter;
   protected Date endedBefore;
@@ -106,6 +109,11 @@ public class HistoricCaseActivityInstanceQueryDto extends AbstractQueryDto<Histo
   @CamundaQueryParam("caseActivityName")
   public void setCaseActivityName(String caseActivityName) {
     this.caseActivityName = caseActivityName;
+  }
+
+  @CamundaQueryParam("caseActivityType")
+  public void setCaseActivityType(String caseActivityType) {
+    this.caseActivityType = caseActivityType;
   }
 
   @CamundaQueryParam(value = "createdBefore", converter = DateConverter.class)
@@ -198,6 +206,9 @@ public class HistoricCaseActivityInstanceQueryDto extends AbstractQueryDto<Histo
     if (caseActivityName != null) {
       query.caseActivityName(caseActivityName);
     }
+    if (caseActivityType != null) {
+      query.caseActivityType(caseActivityType);
+    }
     if (createdBefore != null) {
       query.createdBefore(createdBefore);
     }
@@ -248,6 +259,8 @@ public class HistoricCaseActivityInstanceQueryDto extends AbstractQueryDto<Histo
         query.orderByCaseActivityId();
       } else if (sortBy.equals(SORT_BY_CASE_ACTIVITY_NAME_VALUE)) {
         query.orderByCaseActivityName();
+      } else if (sortBy.equals(SORT_BY_CASE_ACTIVITY_TYPE_VALUE)) {
+        query.orderByCaseActivityType();
       } else if (sortBy.equals(SORT_BY_HISTORIC_CASE_ACTIVITY_INSTANCE_CREATE_TIME_VALUE)) {
         query.orderByHistoricCaseActivityInstanceCreateTime();
       } else if (sortBy.equals(SORT_BY_HISTORIC_CASE_ACTIVITY_INSTANCE_END_TIME_VALUE)) {

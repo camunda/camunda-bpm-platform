@@ -5,6 +5,8 @@ import static com.jayway.restassured.RestAssured.given;
 import static com.jayway.restassured.path.json.JsonPath.from;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
+import static org.mockito.Matchers.argThat;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -19,6 +21,7 @@ import javax.ws.rs.core.Response.Status;
 import javax.xml.registry.InvalidRequestException;
 
 import org.camunda.bpm.engine.rest.helper.MockProvider;
+import org.camunda.bpm.engine.rest.helper.variable.EqualsPrimitiveValue;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ExecutionQuery;
 import org.junit.Assert;
@@ -350,7 +353,7 @@ public abstract class AbstractExecutionRestServiceQueryTest extends
       .when().post(EXECUTION_QUERY_URL);
 
     verify(mockedQuery).variableValueEquals(variableName, variableValue);
-    verify(mockedQuery).variableValueNotEquals(anotherVariableName, anotherVariableValue);
+    verify(mockedQuery).variableValueNotEquals(eq(anotherVariableName), argThat(EqualsPrimitiveValue.numberValue(anotherVariableValue)));
 
   }
 
@@ -383,7 +386,7 @@ public abstract class AbstractExecutionRestServiceQueryTest extends
       .when().post(EXECUTION_QUERY_URL);
 
     verify(mockedQuery).processVariableValueEquals(variableName, variableValue);
-    verify(mockedQuery).processVariableValueNotEquals(anotherVariableName, anotherVariableValue);
+    verify(mockedQuery).processVariableValueNotEquals(eq(anotherVariableName), argThat(EqualsPrimitiveValue.numberValue(anotherVariableValue)));
 
   }
 

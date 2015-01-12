@@ -12,16 +12,7 @@
  */
 package org.camunda.bpm.engine.test.api.variable;
 
-import static org.camunda.bpm.engine.variable.Variables.booleanValue;
-import static org.camunda.bpm.engine.variable.Variables.byteArrayValue;
-import static org.camunda.bpm.engine.variable.Variables.createVariables;
-import static org.camunda.bpm.engine.variable.Variables.dateValue;
-import static org.camunda.bpm.engine.variable.Variables.doubleValue;
-import static org.camunda.bpm.engine.variable.Variables.integerValue;
-import static org.camunda.bpm.engine.variable.Variables.objectValue;
-import static org.camunda.bpm.engine.variable.Variables.shortValue;
-import static org.camunda.bpm.engine.variable.Variables.stringValue;
-import static org.camunda.bpm.engine.variable.Variables.untypedNullValue;
+import static org.camunda.bpm.engine.variable.Variables.*;
 import static org.camunda.bpm.engine.variable.type.ValueType.BOOLEAN;
 import static org.camunda.bpm.engine.variable.type.ValueType.BYTES;
 import static org.camunda.bpm.engine.variable.type.ValueType.DATE;
@@ -30,6 +21,8 @@ import static org.camunda.bpm.engine.variable.type.ValueType.INTEGER;
 import static org.camunda.bpm.engine.variable.type.ValueType.NULL;
 import static org.camunda.bpm.engine.variable.type.ValueType.SHORT;
 import static org.camunda.bpm.engine.variable.type.ValueType.STRING;
+
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -312,6 +305,18 @@ public class VariableApiOfflineTest {
     // entry set
     assertEquals(map1.entrySet(), map2.entrySet());
     assertEquals(map2.entrySet(), map3.entrySet());
+  }
+
+  @Test
+  public void testSerializationDataFormats() {
+    ObjectValue objectValue = objectValue(DESERIALIZED_OBJECT_VAR_VALUE).serializationDataFormat(SerializationDataFormats.JAVA).create();
+    assertEquals(SerializationDataFormats.JAVA.getName(), objectValue.getSerializationDataFormat());
+
+    objectValue = objectValue(DESERIALIZED_OBJECT_VAR_VALUE).serializationDataFormat(SerializationDataFormats.JSON).create();
+    assertEquals(SerializationDataFormats.JSON.getName(), objectValue.getSerializationDataFormat());
+
+    objectValue = objectValue(DESERIALIZED_OBJECT_VAR_VALUE).serializationDataFormat(SerializationDataFormats.XML).create();
+    assertEquals(SerializationDataFormats.XML.getName(), objectValue.getSerializationDataFormat());
   }
 
 }

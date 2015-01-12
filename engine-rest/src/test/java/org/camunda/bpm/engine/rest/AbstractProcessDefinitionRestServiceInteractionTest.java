@@ -295,6 +295,17 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
   }
 
   @Test
+  public void testGetStartForm_StartFormDataEqualsNull() {
+    ProcessDefinition mockDefinition = MockProvider.createMockDefinition();
+    when(formServiceMock.getStartFormData(mockDefinition.getId())).thenReturn(null);
+
+    given().pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
+      .then().expect().statusCode(Status.OK.getStatusCode())
+      .body("contextPath", equalTo(MockProvider.EXAMPLE_PROCESS_APPLICATION_CONTEXT_PATH))
+      .when().get(START_FORM_URL);
+  }
+
+  @Test
   public void testGetRenderedStartForm() {
     String expectedResult = "<formField>anyContent</formField>";
 
@@ -623,6 +634,38 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
     .when().get(START_FORM_VARIABLES_URL);
 
     verify(formServiceMock, times(1)).getStartFormVariables(EXAMPLE_PROCESS_DEFINITION_ID, Arrays.asList(new String[]{"a","b","c"}), true);
+  }
+
+  @Test
+  public void testGetStartFormVariablesAndDoNotDeserializeVariables() {
+
+    given()
+      .pathParam("id", EXAMPLE_PROCESS_DEFINITION_ID)
+      .queryParam("deserializeValues", false)
+     .then()
+       .expect()
+        .statusCode(Status.OK.getStatusCode()).contentType(ContentType.JSON)
+        .body(MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME+".value", equalTo(MockProvider.EXAMPLE_PRIMITIVE_VARIABLE_VALUE.getValue()))
+        .body(MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME+".type",
+            equalTo(VariableTypeHelper.toExpectedValueTypeName(MockProvider.EXAMPLE_PRIMITIVE_VARIABLE_VALUE.getType())))
+      .when().get(START_FORM_VARIABLES_URL)
+      .body();
+
+    verify(formServiceMock, times(1)).getStartFormVariables(EXAMPLE_PROCESS_DEFINITION_ID, null, false);
+  }
+
+  @Test
+  public void testGetStartFormVariablesVarNamesAndDoNotDeserializeVariables() {
+
+    given()
+      .pathParam("id", EXAMPLE_PROCESS_DEFINITION_ID)
+      .queryParam("deserializeValues", false)
+      .queryParam("variableNames", "a,b,c")
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode()).contentType(ContentType.JSON)
+    .when().get(START_FORM_VARIABLES_URL);
+
+    verify(formServiceMock, times(1)).getStartFormVariables(EXAMPLE_PROCESS_DEFINITION_ID, Arrays.asList(new String[]{"a","b","c"}), false);
   }
 
   @Test

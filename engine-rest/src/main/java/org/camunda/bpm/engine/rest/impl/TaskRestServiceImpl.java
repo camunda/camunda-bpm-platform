@@ -14,14 +14,17 @@ package org.camunda.bpm.engine.rest.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Variant;
 
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.rest.TaskRestService;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.task.TaskDto;
@@ -148,7 +151,13 @@ public class TaskRestServiceImpl extends AbstractRestProcessEngineAware implemen
 
     Task newTask = taskService.newTask(taskDto.getId());
     taskDto.updateTask(newTask);
-    taskService.saveTask(newTask);
+
+    try {
+      taskService.saveTask(newTask);
+
+    } catch (NotValidException e) {
+      throw new InvalidRequestException(Status.BAD_REQUEST, e, "Could not save task: " + e.getMessage());
+    }
 
   }
 }

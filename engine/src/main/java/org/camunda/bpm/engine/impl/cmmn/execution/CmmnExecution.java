@@ -466,25 +466,27 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
     // if part will be evaluated in the end
     CmmnSentryPart ifPart = null;
 
-    for (CmmnSentryPart sentryPart : sentryParts) {
+    if (sentryParts != null && !sentryParts.isEmpty()) {
+      for (CmmnSentryPart sentryPart : sentryParts) {
 
-      if (PLAN_ITEM_ON_PART.equals(sentryPart.getType())) {
+        if (PLAN_ITEM_ON_PART.equals(sentryPart.getType())) {
 
-        if (!sentryPart.isSatisfied()) {
-          return false;
-        }
+          if (!sentryPart.isSatisfied()) {
+            return false;
+          }
 
-      } else { /* IF_PART.equals(sentryPart.getType) == true */
+        } else { /* IF_PART.equals(sentryPart.getType) == true */
 
-        ifPart = sentryPart;
+          ifPart = sentryPart;
 
-        // once the ifPart has been satisfied the whole sentry is satisfied
-        if (ifPart.isSatisfied()) {
-          return true;
+          // once the ifPart has been satisfied the whole sentry is satisfied
+          if (ifPart.isSatisfied()) {
+            return true;
+          }
+
         }
 
       }
-
     }
 
     if (ifPart != null) {
@@ -513,6 +515,7 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
     // if all onParts are satisfied and there is no
     // ifPart then the whole sentry is satisfied.
     return true;
+
   }
 
   protected boolean containsIfPart(String sentryId) {

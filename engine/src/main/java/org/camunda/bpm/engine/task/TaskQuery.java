@@ -471,7 +471,7 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
    * Only select tasks which have no follow-up date or a follow-up date before the described date by the given expression.
    * Serves the typical use case "give me all tasks without follow-up or follow-up date which is already due"
    */
-  TaskQuery followUpBeforeExpressionOrNotExistent(String followUpDateExpression);
+  TaskQuery followUpBeforeOrNotExistentExpression(String followUpDateExpression);
   
   /**
    * Only select tasks which have a follow-up date after the given date.

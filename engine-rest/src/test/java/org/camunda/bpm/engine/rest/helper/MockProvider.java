@@ -277,6 +277,7 @@ public abstract class MockProvider {
   public static final String EXAMPLE_JOB_DEFINITION_DELAYED_EXECUTION = "2013-04-23T13:42:43";
 
   // Jobs
+  public static final String EXAMPLE_JOB_ACTIVITY_ID = "aJobActivityId";
   public static final String EXAMPLE_JOB_ID = "aJobId";
   public static final String NON_EXISTING_JOB_ID = "aNonExistingJobId";
   public static final int EXAMPLE_NEGATIVE_JOB_RETRIES = -3;
@@ -363,6 +364,7 @@ public abstract class MockProvider {
   public static final String EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_PARENT_CASE_ACTIVITY_INSTANCE_ID = "aParentCaseActivityId";
   public static final String EXAMPLE_HISTORIC_CASE_ACTIVITY_ID = "aCaseActivityId";
   public static final String EXAMPLE_HISTORIC_CASE_ACTIVITY_NAME = "aCaseActivityName";
+  public static final String EXAMPLE_HISTORIC_CASE_ACTIVITY_TYPE = "aCaseActivityType";
   public static final String EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_CALLED_PROCESS_INSTANCE_ID = "aCalledProcessInstanceId";
   public static final String EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_CALLED_CASE_INSTANCE_ID = "aCalledCaseInstanceId";
   public static final String EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_CREATE_TIME = "2014-04-23T18:42:42";
@@ -498,6 +500,8 @@ public abstract class MockProvider {
   public static final String EXAMPLE_CASE_EXECUTION_CASE_DEFINITION_ID = "aCaseDefinitionId";
   public static final String EXAMPLE_CASE_EXECUTION_ACTIVITY_ID = "anActivityId";
   public static final String EXAMPLE_CASE_EXECUTION_ACTIVITY_NAME = "anActivityName";
+  public static final String EXAMPLE_CASE_EXECUTION_ACTIVITY_TYPE = "anActivityType";
+  public static final String EXAMPLE_CASE_EXECUTION_ACTIVITY_DESCRIPTION = "anActivityDescription";
   public static final boolean EXAMPLE_CASE_EXECUTION_IS_ENABLED = true;
   public static final boolean EXAMPLE_CASE_EXECUTION_IS_ACTIVE = true;
   public static final boolean EXAMPLE_CASE_EXECUTION_IS_DISABLED = true;
@@ -853,12 +857,14 @@ public abstract class MockProvider {
   // user & groups
 
   public static Group createMockGroup() {
-    Group mockGroup = mock(Group.class);
-    when(mockGroup.getId()).thenReturn(EXAMPLE_GROUP_ID);
-    when(mockGroup.getName()).thenReturn(EXAMPLE_GROUP_NAME);
-    when(mockGroup.getType()).thenReturn(EXAMPLE_GROUP_TYPE);
+    return mockGroup().build();
+  }
 
-    return mockGroup;
+  public static MockGroupBuilder mockGroup() {
+    return new MockGroupBuilder()
+      .id(EXAMPLE_GROUP_ID)
+      .name(EXAMPLE_GROUP_NAME)
+      .type(EXAMPLE_GROUP_TYPE);
   }
 
   public static Group createMockGroupUpdate() {
@@ -876,13 +882,16 @@ public abstract class MockProvider {
   }
 
   public static User createMockUser() {
-    User mockUser = mock(User.class);
-    when(mockUser.getId()).thenReturn(EXAMPLE_USER_ID);
-    when(mockUser.getFirstName()).thenReturn(EXAMPLE_USER_FIRST_NAME);
-    when(mockUser.getLastName()).thenReturn(EXAMPLE_USER_LAST_NAME);
-    when(mockUser.getEmail()).thenReturn(EXAMPLE_USER_EMAIL);
-    when(mockUser.getPassword()).thenReturn(EXAMPLE_USER_PASSWORD);
-    return mockUser;
+    return mockUser().build();
+  }
+
+  public static MockUserBuilder mockUser() {
+    return new MockUserBuilder()
+      .id(EXAMPLE_USER_ID)
+      .firstName(EXAMPLE_USER_FIRST_NAME)
+      .lastName(EXAMPLE_USER_LAST_NAME)
+      .email(EXAMPLE_USER_EMAIL)
+      .password(EXAMPLE_USER_PASSWORD);
   }
 
   public static Authentication createMockAuthentication() {
@@ -916,8 +925,7 @@ public abstract class MockProvider {
   }
 
   public static List<Job> createMockEmptyJobList() {
-    List<Job> mockList = new ArrayList<Job>();
-    return mockList;
+    return new ArrayList<Job>();
   }
 
   public static User createMockUserUpdate() {
@@ -1080,6 +1088,7 @@ public abstract class MockProvider {
     when(mock.getParentCaseActivityInstanceId()).thenReturn(EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_PARENT_CASE_ACTIVITY_INSTANCE_ID);
     when(mock.getCaseActivityId()).thenReturn(EXAMPLE_HISTORIC_CASE_ACTIVITY_ID);
     when(mock.getCaseActivityName()).thenReturn(EXAMPLE_HISTORIC_CASE_ACTIVITY_NAME);
+    when(mock.getCaseActivityType()).thenReturn(EXAMPLE_HISTORIC_CASE_ACTIVITY_TYPE);
     when(mock.getCaseDefinitionId()).thenReturn(EXAMPLE_CASE_DEFINITION_ID);
     when(mock.getCaseInstanceId()).thenReturn(EXAMPLE_CASE_INSTANCE_ID);
     when(mock.getCaseExecutionId()).thenReturn(EXAMPLE_CASE_EXECUTION_ID);
@@ -1272,7 +1281,16 @@ public abstract class MockProvider {
     IdentityLink identityLink = mock(IdentityLink.class);
     when(identityLink.getTaskId()).thenReturn(EXAMPLE_TASK_ID);
     when(identityLink.getType()).thenReturn(IdentityLinkType.ASSIGNEE);
-    when(identityLink.getUserId()).thenReturn(EXAMPLE_USER_ID);
+    when(identityLink.getUserId()).thenReturn(EXAMPLE_TASK_ASSIGNEE_NAME);
+
+    return identityLink;
+  }
+
+  public static IdentityLink createMockUserOwnerIdentityLink() {
+    IdentityLink identityLink = mock(IdentityLink.class);
+    when(identityLink.getTaskId()).thenReturn(EXAMPLE_TASK_ID);
+    when(identityLink.getType()).thenReturn(IdentityLinkType.OWNER);
+    when(identityLink.getUserId()).thenReturn(EXAMPLE_TASK_OWNER);
 
     return identityLink;
   }
@@ -1543,6 +1561,8 @@ public abstract class MockProvider {
     when(mock.getCaseDefinitionId()).thenReturn(EXAMPLE_CASE_EXECUTION_CASE_DEFINITION_ID);
     when(mock.getActivityId()).thenReturn(EXAMPLE_CASE_EXECUTION_ACTIVITY_ID);
     when(mock.getActivityName()).thenReturn(EXAMPLE_CASE_EXECUTION_ACTIVITY_NAME);
+    when(mock.getActivityType()).thenReturn(EXAMPLE_CASE_EXECUTION_ACTIVITY_TYPE);
+    when(mock.getActivityDescription()).thenReturn(EXAMPLE_CASE_EXECUTION_ACTIVITY_DESCRIPTION);
     when(mock.isActive()).thenReturn(EXAMPLE_CASE_EXECUTION_IS_ACTIVE);
     when(mock.isEnabled()).thenReturn(EXAMPLE_CASE_EXECUTION_IS_ENABLED);
     when(mock.isDisabled()).thenReturn(EXAMPLE_CASE_EXECUTION_IS_DISABLED);

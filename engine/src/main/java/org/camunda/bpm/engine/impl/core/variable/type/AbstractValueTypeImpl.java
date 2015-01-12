@@ -12,7 +12,9 @@
  */
 package org.camunda.bpm.engine.impl.core.variable.type;
 
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.variable.type.ValueType;
+import org.camunda.bpm.engine.variable.value.TypedValue;
 
 /**
  * @author Thorben Lindhauer
@@ -34,6 +36,26 @@ public abstract class AbstractValueTypeImpl implements ValueType {
 
   public String toString() {
     return name;
+  }
+
+  public boolean isAbstract() {
+    return false;
+  }
+
+  public ValueType getParent() {
+    return null;
+  }
+
+  public boolean canConvertFromTypedValue(TypedValue typedValue) {
+    return false;
+  }
+
+  public TypedValue convertFromTypedValue(TypedValue typedValue) {
+    throw unsupportedConversion(typedValue.getType());
+  }
+
+  protected ProcessEngineException unsupportedConversion(ValueType typeToConvertTo) {
+    return new ProcessEngineException("The type " + getName() + " supports no conversion from type: " + typeToConvertTo.getName());
   }
 
 }

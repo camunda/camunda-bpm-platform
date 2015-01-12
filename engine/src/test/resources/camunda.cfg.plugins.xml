@@ -14,6 +14,11 @@
     <!-- Database configurations -->
     <property name="databaseSchemaUpdate" value="true" />
 
+    <!-- Empty beans map to for testing purpose -->
+    <property name="beans">
+      <map/>
+    </property>
+
     <!-- job executor configurations -->
     <property name="jobExecutorActivate" value="false" />
 

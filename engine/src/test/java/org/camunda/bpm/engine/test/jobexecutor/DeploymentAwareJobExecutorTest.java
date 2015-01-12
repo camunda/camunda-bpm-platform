@@ -9,6 +9,7 @@ import java.util.Set;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.ProcessEngines;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.cmd.AcquireJobsCmd;
@@ -20,30 +21,33 @@ import org.camunda.bpm.engine.impl.jobexecutor.AcquiredJobs;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
-import org.camunda.bpm.engine.impl.test.AbstractProcessEngineTestCase;
+import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.test.Deployment;
 import org.junit.Assert;
 
-public class DeploymentAwareJobExecutorTest extends AbstractProcessEngineTestCase {
+public class DeploymentAwareJobExecutorTest extends PluggableProcessEngineTestCase {
 
-  @Override
-  protected void initializeProcessEngine() {
-    try {
-      processEngine = ProcessEngineConfiguration
-        .createProcessEngineConfigurationFromResource("camunda.cfg.xml")
-        .setJobExecutorDeploymentAware(true)
-        .buildProcessEngine();
-    } catch (RuntimeException ex) {
-      if (ex.getCause() != null && ex.getCause() instanceof FileNotFoundException) {
-        processEngine = ProcessEngineConfiguration
-            .createProcessEngineConfigurationFromResource("activiti.cfg.xml")
-            .buildProcessEngine();
-      } else {
-        throw ex;
-      }
+  protected ProcessEngine otherProcessEngine = null;
+
+  public void setUp() throws Exception {
+    super.setUp();
+    processEngineConfiguration.setJobExecutorDeploymentAware(true);
+  }
+
+  public void tearDown() throws Exception {
+    processEngineConfiguration.setJobExecutorDeploymentAware(false);
+    super.tearDown();
+  }
+
+  protected void closeDownProcessEngine() {
+    super.closeDownProcessEngine();
+    if (otherProcessEngine != null) {
+      otherProcessEngine.close();
+      ProcessEngines.unregister(otherProcessEngine);
+      otherProcessEngine = null;
     }
   }
 
@@ -168,25 +172,23 @@ public class DeploymentAwareJobExecutorTest extends AbstractProcessEngineTestCas
   }
 
   private String deployAndInstantiateWithNewEngineConfiguration(String resource) {
-    // 1. create another process engine confguration
-    ProcessEngineConfiguration otherProcessEngineConfiguration = null;
+    // 1. create another process engine
     try {
-      otherProcessEngineConfiguration = ProcessEngineConfiguration
-          .createProcessEngineConfigurationFromResource("camunda.cfg.xml")
-          .setJobExecutorDeploymentAware(true);
+      otherProcessEngine = ProcessEngineConfiguration
+        .createProcessEngineConfigurationFromResource("camunda.cfg.xml")
+        .buildProcessEngine();
     } catch (RuntimeException ex) {
       if (ex.getCause() != null && ex.getCause() instanceof FileNotFoundException) {
-        otherProcessEngineConfiguration = ProcessEngineConfiguration
-            .createProcessEngineConfigurationFromResource("activiti.cfg.xml")
-            .setJobExecutorDeploymentAware(true);
+        otherProcessEngine = ProcessEngineConfiguration
+          .createProcessEngineConfigurationFromResource("activiti.cfg.xml")
+          .buildProcessEngine();
       } else {
         throw ex;
       }
     }
-    ProcessEngine otherEngine = otherProcessEngineConfiguration.buildProcessEngine();
 
     // 2. deploy again
-    RepositoryService otherRepositoryService = otherEngine.getRepositoryService();
+    RepositoryService otherRepositoryService = otherProcessEngine.getRepositoryService();
 
     String deploymentId = otherRepositoryService.createDeployment()
       .addClasspathResource(resource)
@@ -194,7 +196,7 @@ public class DeploymentAwareJobExecutorTest extends AbstractProcessEngineTestCas
 
     // 3. start instance (i.e. create job)
     ProcessDefinition newDefinition = otherRepositoryService.createProcessDefinitionQuery().deploymentId(deploymentId).singleResult();
-    otherEngine.getRuntimeService().startProcessInstanceById(newDefinition.getId());
+    otherProcessEngine.getRuntimeService().startProcessInstanceById(newDefinition.getId());
 
     return deploymentId;
   }

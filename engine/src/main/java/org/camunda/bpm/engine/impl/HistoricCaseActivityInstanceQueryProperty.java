@@ -35,6 +35,7 @@ public class HistoricCaseActivityInstanceQueryProperty implements QueryProperty 
   public static final HistoricCaseActivityInstanceQueryProperty CASE_INSTANCE_ID = new HistoricCaseActivityInstanceQueryProperty("CASE_INST_ID_");
   public static final HistoricCaseActivityInstanceQueryProperty CASE_ACTIVITY_ID = new HistoricCaseActivityInstanceQueryProperty("CASE_ACT_ID_");
   public static final HistoricCaseActivityInstanceQueryProperty CASE_ACTIVITY_NAME = new HistoricCaseActivityInstanceQueryProperty("CASE_ACT_NAME_");
+  public static final HistoricCaseActivityInstanceQueryProperty CASE_ACTIVITY_TYPE = new HistoricCaseActivityInstanceQueryProperty("CASE_ACT_TYPE_");
   public static final HistoricCaseActivityInstanceQueryProperty CASE_DEFINITION_ID = new HistoricCaseActivityInstanceQueryProperty("CASE_DEF_ID_");
   public static final HistoricCaseActivityInstanceQueryProperty CREATE = new HistoricCaseActivityInstanceQueryProperty("CREATE_TIME_");
   public static final HistoricCaseActivityInstanceQueryProperty END = new HistoricCaseActivityInstanceQueryProperty("END_TIME_");

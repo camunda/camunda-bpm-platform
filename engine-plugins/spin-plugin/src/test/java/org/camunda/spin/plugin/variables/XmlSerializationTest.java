@@ -257,21 +257,7 @@ public class XmlSerializationTest extends PluggableProcessEngineTestCase {
       runtimeService.getVariable(instance.getId(), "simpleBean");
       fail("Exception expected.");
     }
-    catch(Exception e) {
-      // happy path
-    }
-
-    serializedValue = serializedObjectValue(beanAsXml)
-      .serializationDataFormat(XML_FORMAT_NAME)
-      .objectTypeName(XmlSerializationTest.class.getName()); // < not the right type name
-
-    runtimeService.setVariable(instance.getId(), "simpleBean", serializedValue);
-
-    try {
-      runtimeService.getVariable(instance.getId(), "simpleBean");
-      fail("Exception expected.");
-    }
-    catch(Exception e) {
+    catch(ProcessEngineException e) {
       // happy path
     }
   }

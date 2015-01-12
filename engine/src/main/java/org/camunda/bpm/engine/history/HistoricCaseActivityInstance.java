@@ -34,6 +34,9 @@ public interface HistoricCaseActivityInstance {
    /** The display name for the case activity. */
    String getCaseActivityName();
 
+   /** The display type for the case activity. */
+   String getCaseActivityType();
+
    /** The case definition reference. */
    String getCaseDefinitionId();
 
