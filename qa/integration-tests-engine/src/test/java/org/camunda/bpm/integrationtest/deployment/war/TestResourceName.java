@@ -89,12 +89,12 @@ public class TestResourceName extends AbstractFoxPlatformIntegrationTest {
   public static WebArchive processArchive() {
 
     Asset pa1ProcessesXml = TestHelper.getStringAsAssetWithReplacements(
-            PROCESSES_XML,
-            new String[][]{new String[]{"PA_NAME","PA0"}});
+        PROCESSES_XML,
+        new String[][]{new String[]{"PA_NAME","PA0"}});
 
     Asset pa2ProcessesXml = TestHelper.getStringAsAssetWithReplacements(
-            PROCESSES_XML,
-            new String[][]{new String[]{"PA_NAME","PA1"}});
+        PROCESSES_XML,
+        new String[][]{new String[]{"PA_NAME","PA1"}});
 
     Asset pa3ProcessesXml = TestHelper.getStringAsAssetWithReplacements(
         PROCESSES_XML_WITH_RESOURCE_ROOT_PATH,

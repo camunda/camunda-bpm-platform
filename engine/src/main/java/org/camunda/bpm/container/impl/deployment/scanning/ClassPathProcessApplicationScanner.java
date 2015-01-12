@@ -86,7 +86,7 @@ public class ClassPathProcessApplicationScanner implements ProcessApplicationSca
 
       String strippedPaResourceRootPath = null;
       if(paResourceRootPath != null) {
-        // "classpath:directory" -> "directory"
+        // "pa:directory" -> "directory"
         strippedPaResourceRootPath = paResourceRootPath.replace("pa:", "");
         // "directory" -> "directory/"
         strippedPaResourceRootPath = strippedPaResourceRootPath.endsWith("/") ? strippedPaResourceRootPath : strippedPaResourceRootPath +"/";

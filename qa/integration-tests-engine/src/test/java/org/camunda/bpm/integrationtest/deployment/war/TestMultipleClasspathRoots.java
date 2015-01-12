@@ -55,7 +55,7 @@ public class TestMultipleClasspathRoots extends AbstractFoxPlatformIntegrationTe
    *   |-- test.war
    *       |-- WEB-INF
    *           |-- classes
-   *               |-- META-INF/processes.xml                   resourceRootPath: classpath:alternateDirectory
+   *               |-- META-INF/processes.xml                   resourceRootPath: classpath:directory
    *               |-- directory/processes/process.bpmn         (1)
    *           |-- lib/
    *               |-- pa0.jar
