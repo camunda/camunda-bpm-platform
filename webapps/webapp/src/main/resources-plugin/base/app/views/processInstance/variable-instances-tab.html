@@ -1,5 +1,5 @@
-<!-- # CE - src/main/webapp/plugin/base/app/views/processInstance/variable-instances-tab.html -->
-<table class="table table-bordered table-hover table-condensed">
+<!-- # CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/base/app/views/processInstance/variable-instances-tab.html -->
+<table class="table table-striped table-hover table-condensed">
   <thead>
     <tr>
       <th class="variable-name">Name</th>
@@ -11,15 +11,18 @@
   <tbody>
     <tr ng-repeat="variable in variables"
         data-variable-name="{{ variable.name }}"
-        data-variable-type="{{ variable.value.type }}">
+        data-variable-type="{{ variable.value.type }}"
+        ng-class="'variable-type-' + variable.value.type">
       <td class="variable-name">
         {{ variable.name }}
       </td>
-      <td class="variable-value">
 
+      <td class="variable-value">
         <div ng-if="isPrimitive(variable) && !variable.inEditMode && !variable.errorMessage">
           {{ variable.value }}
-          <span ng-if="isEditable(variable)" class="edit-toggle" ng-click="editVariable(variable)">
+          <span ng-if="isEditable(variable)"
+                class="edit-toggle"
+                ng-click="editVariable(variable)">
             <i class="glyphicon glyphicon-pencil"></i>
           </span>
         </div>
@@ -61,50 +64,66 @@
           </a>
         </div>
 
-        <form class="inline-edit" name="editVariableForm" ng-if="variable.inEditMode" ng-submit="submit(variable, this.editVariableForm)" novalidate request-aware>
+        <form class="inline-edit"
+              name="editVariableForm"
+              ng-if="variable.inEditMode"
+              ng-submit="submit(variable, this.editVariableForm)"
+              novalidate
+              request-aware>
 
           <fieldset>
-
-            <div variable="getCopy(variable.id)" inline-edit autofocus></div>
-
+            <div variable="getCopy(variable.id)"
+                 inline-edit
+                 autofocus></div>
           </fieldset>
 
           <div class="inline-edit-footer">
 
-            <p class="invalid" ng-show="this.editVariableForm.editDateValue.$error.date">
+            <p class="invalid"
+               ng-show="this.editVariableForm.editDateValue.$error.date">
               Invalid date: The date should have the pattern 'yyyy-MM-ddTHH:mm:ss'.
             </p>
-            <p class="invalid" ng-show="this.editVariableForm.editIntegerValue.$error.numeric || this.editVariableForm.editFloatValue.$error.numeric">
+
+            <p class="invalid"
+               ng-show="this.editVariableForm.editIntegerValue.$error.numeric || this.editVariableForm.editFloatValue.$error.numeric">
               Invalid value: Only a {{ getCopy(variable.id).type }} value is allowed.
             </p>
 
-            <p class="invalid" ng-show="getExceptionForVariableId(variable.id)">
+            <p class="invalid"
+               ng-show="getExceptionForVariableId(variable.id)">
               The passed value could not be stored, see error message: {{ getExceptionForVariableId(variable.id).message }}.
             </p>
 
             <div class="btn-group">
-              <button type="submit" class="btn btn-primary" ng-disabled="!isValid(this.editVariableForm)">
-                <i class="glyphicon glyphicon-ok "></i>
+              <button type="submit"
+                      class="btn btn-sm btn-primary"
+                      ng-disabled="!isValid(this.editVariableForm)">
+                <i class="glyphicon glyphicon-ok"></i>
               </button>
-              <button type="button" class="btn" ng-click="closeInPlaceEditing(variable)">
+              <button type="button"
+                      class="btn btn-sm"
+                      ng-click="closeInPlaceEditing(variable)">
                 <i class="glyphicon glyphicon-ban-circle"></i>
               </button>
             </div>
           </div>
 
         </form>
-
       </td>
+
       <td class="variable-type">
-        <select ng-show="variable.inEditMode" name="variableType"
-                ng-options="variableType for variableType in variableTypes" ng-model="getCopy(variable.id).type"
-                class="select-variable-type">
+        <select ng-show="variable.inEditMode"
+                name="variableType"
+                ng-options="variableType for variableType in variableTypes"
+                ng-model="getCopy(variable.id).type"
+                class="form-control select-variable-type">
         </select>
         <span ng-hide="variable.inEditMode">{{ variable.type }}</span>
       </td>
       <td class="variable-scope">
         <a cam-select-activity-instance="variable.instance.id"
-           ng-href="#/process-instance/{{ processInstance.id }}?detailsTab=variables-tab&activityInstanceIds={{ variable.instance.id }}" title="{{ variable.instance.id }}">
+           ng-href="#/process-instance/{{ processInstance.id }}?detailsTab=variables-tab&activityInstanceIds={{ variable.instance.id }}"
+           title="{{ variable.instance.id }}">
           {{ variable.instance.name }}
         </a>
       </td>
@@ -112,7 +131,8 @@
 
     <tr ng-if="!variables">
       <td colspan="4">
-        <i class="glyphicon glyphicon-loading"></i> loading process variables ...
+        <i class="glyphicon glyphicon-loading"></i>
+        loading process variables ...
       </td>
     </tr>
 
@@ -135,4 +155,4 @@
 
             max-size="7"
             boundary-links="true"></pagination>
-<!-- / CE - src/main/webapp/plugin/base/app/views/processInstance/variable-instances-tab.html -->
+<!-- / CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/base/app/views/processInstance/variable-instances-tab.html -->

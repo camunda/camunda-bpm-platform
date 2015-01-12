@@ -1,4 +1,4 @@
-<!-- # CE - src/main/webapp/plugin/base/views/processInstance/job-retry-bulk-dialog.html -->
+<!-- # CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/base/app/views/processInstance/job-retry-bulk-dialog.html -->
 <div class="modal-header">
   <h3>Increment Number of Retries</h3>
 </div>
@@ -9,7 +9,7 @@
   <form name="selectFailedJobsForm" ng-hide="status === 'finished' || status === 'performing'">
     <fieldset>
       <p>Select one of the following failed jobs to increment their number of retries:</p>
-      <table class="table table-bordered table-hover table-condensed">
+      <table class="table table-striped table-hover table-condensed">
         <thead>
           <th class="row-select">
             <input type="checkbox"
@@ -65,7 +65,7 @@
 
   <div ng-show="status === 'finished' || status === 'performing'">
 
-    <table class="table table-bordered table-hover table-condensed">
+    <table class="table table-striped table-hover table-condensed">
       <thead>
         <th>ID</th>
         <th>Scope</th>
@@ -118,4 +118,4 @@
           ng-disabled="status === 'performing'"
           ng-show="status === 'performing' || status === 'finished'">OK</button>
 </div>
-<!-- / CE - src/main/webapp/plugin/base/views/processInstance/job-retry-bulk-dialog.html -->
+<!-- / CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/base/app/views/processInstance/job-retry-bulk-dialog.html -->

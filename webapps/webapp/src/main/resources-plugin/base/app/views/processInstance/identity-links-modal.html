@@ -1,4 +1,4 @@
-<!-- # CE - src/main/webapp/plugin/base/views/processInstance/identity-links-modal.html -->
+<!-- # CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/base/app/views/processInstance/identity-links-modal.html -->
 <div class="modal-header">
   <h3>{{ title }}</h3>
 </div>
@@ -6,16 +6,19 @@
 <div class="modal-body">
   <div notifications-panel></div>
 
-  <form name="editForm" ng-submit="addFormItem()">
+  <form name="editForm"
+        ng-submit="addFormItem()">
     <fieldset ng-show="groups.length">
       <legend>Current group(s)</legend>
-      <table class="table table-striped table-bordered table-condensed">
-         <thead>
+
+      <table class="table table-striped table-condensed">
+        <thead>
           <tr>
             <th>Group ID</th>
             <th class="text-right">Action</th>
           </tr>
         </thead>
+
         <tbody>
           <tr ng-repeat="(delta, group) in groups">
             <td>{{ group.groupId }}</td>
@@ -34,15 +37,15 @@
       <legend>Add a group</legend>
       <div class="input-group">
         <input type="text"
+               class="form-control"
                ng-model="newItem"
                name="newItem"
                required />
-        <button ng-click="addItem()"
-                type="submit"
-                class="btn btn-primary"
-                ng-disabled="invalid()">
-          <i class="glyphicon glyphicon-plus "></i>
-        </button>
+        <span ng-click="addItem()"
+              class="btn btn-primary input-group-addon"
+              ng-disabled="invalid()">
+          <i class="glyphicon glyphicon-plus"></i>
+        </span>
       </div>
     </fieldset>
   </form>
@@ -51,8 +54,9 @@
 <div class="modal-footer">
   <button ng-repeat="btn in buttons"
           ng-click="close(btn.result)"
-          class="btn" ng-class="btn.cssClass">
+          class="btn"
+          ng-class="btn.cssClass">
     {{ btn.label }}
   </button>
 </div>
-<!-- / CE - src/main/webapp/plugin/base/views/processInstance/identity-links-modal.html -->
+<!-- / CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/base/app/views/processInstance/identity-links-modal.html -->
