@@ -1,7 +1,48 @@
-// @import "./bootstrap.patched.less";
-
 @import "_vars.less";
+@import "../../node_modules/camunda-commons-ui/resources/less/common";
 
-@import "../../node_modules/camunda-commons-ui/resources/less/common.less";
+@import "./../node_modules/camunda-commons-ui/lib/auth/page/login";
+@import "./../node_modules/camunda-commons-ui/resources/less/directives/notifications-panel";
+@import "./../node_modules/camunda-commons-ui/resources/less/directives/cam-breadcrumbs-panel";
+@import "./../node_modules/camunda-commons-ui/resources/less/directives/pagination";
 
-@import "app.less";
+
+.box {
+  padding: 19px;
+  position: relative;
+  background-color: @body-bg;
+  border: 1px solid #ddd;
+  border-radius: @border-radius-base;
+  margin-bottom: 20px;
+}
+
+.controls .help-inline {
+  color: @important-color;
+}
+
+td .select-auth-type {
+  width:95px;
+}
+
+.input-auth-name {
+  width: 140px;
+}
+
+div.auth-box {
+  min-width: 720px;
+}
+
+a.select-identity-type {
+  width: 50px;
+}
+
+span.permissions-editor {
+  color: rgb(85, 85, 85);
+  cursor: auto;
+  background-color: @body-bg;
+}
+
+.monospaced {
+  font-family:'Courier New', Courier, monospace;
+}
+

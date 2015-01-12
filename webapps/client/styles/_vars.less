@@ -1,4 +1,4 @@
-@import "../../node_modules/camunda-commons-ui/resources/less/_vars";
+@import "../../node_modules/camunda-commons-ui/resources/less/common-variables";
 
 /********************************************************************\
  * Web interface customization variables                            *
@@ -6,33 +6,6 @@
  * You can find some information about less variables here:         *
  * http://lesscss.org/features/#features-overview-feature-variables *
 \********************************************************************/
-
-// Colors ------------------------------------------------------------
-
-// this is the "main" color (like in the header)
-@main-color:    #b5152b;
-@brand-primary: @main-color;
-
-// slightly darker variant
-// @main-darker: #9c3930;
-@main-darker:   darken(@main-color, 25%);
-
-@important-color: #b94a48;
-@important-darker: darken(@important-color, 45%);
-
-@warning-color: #f89406;
-@warning-darker: #c67605;//darken(@warning-color, 45%);
-
-
-// process state colors
-@running-color: desaturate(lighten(@link-color, 25%), 40%);
-@running-darker: darken(@running-color, 45%);
-
-@completed-color: #bbb;
-@completed-darker: darken(@completed-color, 45%);
-
-@canceled-color: desaturate(lighten(#f89406, 20%), 25%);
-@canceled-darker: darken(@canceled-color, 45%);
 
 // Logos -------------------------------------------------------------
 
