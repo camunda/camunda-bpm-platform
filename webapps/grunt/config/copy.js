@@ -21,17 +21,8 @@ module.exports = function(config) {
                 .replace(/CACHE_BUSTER/g, requireConfExp.test(srcpath) ? '\''+ cacheBuster +'\'' : cacheBuster);
 
       return content;
-    } else {
-      /* jshint validthis: true */
-      var liveReloadPort = this.config.get('pkg.gruntConfig.livereloadPort');
-      /* jshint validthis: false */
-
-      if (requireConfExp.test(srcpath)) {
-        content = content
-                  .replace(/\/\* live-reload/, '/* live-reload */')
-                  .replace(/LIVERELOAD_PORT/g, liveReloadPort);
-      }
-
+    }
+    else {
       content = content
                 .replace(/\/\* cache-busting/, '/* cache-busting */')
                 .replace(/CACHE_BUSTER/g, (new Date()).getTime());
