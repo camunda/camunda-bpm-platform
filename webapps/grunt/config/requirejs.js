@@ -1,7 +1,6 @@
 module.exports = function(config) {
   'use strict';
   var _ = require('underscore');
-  var fs = require('fs');
   var path = require('path');
   var grunt = config.grunt;
   var rjsConfPath = path.resolve('./client/scripts/require-conf');
@@ -73,7 +72,22 @@ module.exports = function(config) {
         name: 'camunda-cockpit',
         out: '<%= buildTarget %>/scripts/<%= pkg.name %>.js',
         exclude: deps,
-        include: rjsConf.shim['camunda-cockpit']
+        include: rjsConf.shim['camunda-cockpit'],
+
+        onModuleBundleComplete: function (data) {
+          var buildTarget = grunt.config('buildTarget');
+          var livereloadPort = grunt.config('pkg.gruntConfig.livereloadPort');
+          if (buildTarget !== 'dist' && livereloadPort) {
+            grunt.log.writeln('Enabling livereload for ' + data.name + ' on port: ' + livereloadPort);
+            var contents = grunt.file.read(data.path);
+
+            contents = contents
+                        .replace(/\/\* live-reload/, '/* live-reload */')
+                        .replace(/LIVERELOAD_PORT/g, livereloadPort);
+
+            grunt.file.write(data.path, contents);
+          }
+        }
       }
     }
   };
