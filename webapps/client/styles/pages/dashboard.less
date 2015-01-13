@@ -1,5 +1,19 @@
+.dashboard-view {
+  margin: 10px;
+
+  h1 {
+    font-size: 30px;
+    font-weight: normal;
+  }
+
+  .diagram-rendering-error {
+    margin-top: 88px;
+  }
+}
+
+
 .tile-grid {
-   overflow: hidden;
+  overflow: hidden;
 }
 
 .tile {
@@ -11,10 +25,7 @@
   display: block;
   margin: 0 10px 10px 0;
   position: relative;
-
-  -webkit-box-sizing: border-box;
-     -moz-box-sizing: border-box;
-          box-sizing: border-box;
+  .box-sizing(border-box);
 }
 
 .tile-header {
@@ -32,10 +43,7 @@
   padding: 2px;
   height: 218px;
   min-width: inherit;
-
-  -webkit-box-sizing: border-box;
-     -moz-box-sizing: border-box;
-          box-sizing: border-box;
+  .box-sizing(border-box);
 }
 
 .tile-footer {
@@ -49,41 +57,35 @@
   border-bottom-right-radius: 2px;
 }
 
-span.tile-header, span.tile-body, span.tile-footer {
-  display: block;
+span {
+  &.tile-header,
+  &.tile-body,
+  &.tile-footer {
+    display: block;
+  }
 }
 
 a.tile {
   color: black;
   text-decoration: none;
-}
 
-a.tile:hover,
-a.tile:focus {
-  border-color: #0088cc;
-  -webkit-box-shadow: 0 1px 4px rgba(0, 105, 214, 0.25);
-  -moz-box-shadow: 0 1px 4px rgba(0, 105, 214, 0.25);
-  box-shadow: 0 1px 4px rgba(0, 105, 214, 0.25);
-}
+  &:hover,
+  &:focus {
+    border-color: #0088cc;
+    .box-shadow(~"0 1px 4px rgba(0, 105, 214, 0.25)");
+  }
 
-@media only screen and (max-width : 480px) {
-  .tile {
+  @media only screen and (max-width : @screen-xs) {
     width: 98%;
     margin: 0 0 10px 0;
   }
-}
-@media only screen and (max-width : 650px) and (min-width : 481px) {
-  .tile {
+  @media only screen and (max-width : @screen-sm) and (min-width : (@screen-xs + 1)) {
     width: 49%;
   }
-}
-@media only screen and (max-width : 1050px) and (min-width : 651px) {
-  .tile {
+  @media only screen and (max-width : @screen-md) and (min-width : @screen-sm + 1) {
     width: 33.3%;
   }
-}
-@media only screen and (max-width : 1290px) and (min-width : 1051px) {
-  .tile {
+  @media only screen and (max-width : @screen-lg) and (min-width : @screen-md + 1) {
     width: 25%;
   }
 }

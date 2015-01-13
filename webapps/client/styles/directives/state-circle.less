@@ -1,0 +1,12 @@
+[state-circle] {
+  display: block;
+  width: (@grid-gutter-width / 2);
+  height: (@grid-gutter-width / 2);
+  border-radius: @grid-gutter-width;
+  &.circle-red {
+    background-color: @state-error-color;
+  }
+  &.circle-green {
+    background-color: @state-ok-color;
+  }
+}

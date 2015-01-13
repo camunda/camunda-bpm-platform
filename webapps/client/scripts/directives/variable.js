@@ -1,37 +1,5 @@
-define([ 'angular' ], function(angular) {
+define([ 'angular', 'text!./variable.html' ], function(angular, template) {
   'use strict';
-  var template =
-    '<div>' +
-
-    '  <!-- handle boolean values -->' +
-    '  <div ng-if="isBoolean(variable)">' +
-    '    <label class="radio">' +
-    '      <input ng-model="variable.value" ng-value="true" type="radio" name="booleanValue">' +
-    '      true' +
-    '    </label>' +
-    '    <label class="radio">' +
-    '      <input ng-model="variable.value" ng-value="false" type="radio" name="booleanValue">' +
-    '      false' +
-    '    </label>' +
-    '  </div>' +
-
-    '  <!-- handle integer/short/long values -->' +
-    '  <input ng-if="isInteger(variable) || isShort(variable) || isLong(variable)" name="editIntegerValue" type="text" ' +
-    '         numeric integer="true" ng-model="variable.value" ng-class="{\'in-place-edit\': isInPlaceEdit() }" ' +
-    '         focus="autofocus" required>' +
-
-    '  <!-- handle double/float values -->' +
-    '  <input ng-if="isDouble(variable) || isFloat(variable)" name="editFloatValue" type="text" ' +
-    '         numeric ng-model="variable.value" ng-class="{\'in-place-edit\': isInPlaceEdit() }" focus="autofocus" required>' +
-
-    '  <!-- handle string values -->' +
-    '  <textarea ng-if="isString(variable) || isNull(variable)" rows="5" ng-model="variable.value" class="variable-type-string"' +
-    '            ng-class="{\'in-place-edit\': isInPlaceEdit() }" focus="autofocus" required></textarea>' +
-
-    '  <!-- handle date values -->' +
-    '  <input ng-if="isDate(variable)" date name="editDateValue" ng-model="variable.value"' +
-    '         type="text" ng-class="{\'in-place-edit\': isInPlaceEdit() }" focus="autofocus" required>' +
-    '</div>';
 
   var Directive = ['$compile', function ($compile) {
     return {
@@ -50,39 +18,39 @@ define([ 'angular' ], function(angular) {
         scope.autofocus = !!(element.attr('autofocus') !== undefined);
 
         var isBoolean = scope.isBoolean = function (variable) {
-          return variable.type === 'boolean' || variable.type === 'Boolean';
+          return variable.type.toLowerCase() === 'boolean';
         };
 
         var isInteger = scope.isInteger = function (variable) {
-          return variable.type === 'integer' || variable.type === 'Integer';
+          return variable.type.toLowerCase() === 'integer';
         };
 
         var isShort = scope.isShort = function (variable) {
-          return variable.type === 'short' || variable.type === 'Short';
+          return variable.type.toLowerCase() === 'short';
         };
 
         var isLong = scope.isLong = function (variable) {
-          return variable.type === 'long' || variable.type === 'Long';
+          return variable.type.toLowerCase() === 'long';
         };
 
         var isDouble = scope.isDouble = function (variable) {
-          return variable.type === 'double' || variable.type === 'Double';
+          return variable.type.toLowerCase() === 'double';
         };
 
         var isFloat = scope.isFloat = function (variable) {
-          return variable.type === 'float' || variable.type === 'Float';
+          return variable.type.toLowerCase() === 'float';
         };
 
         var isString = scope.isString = function (variable) {
-          return variable.type === 'string' || variable.type === 'String';
+          return variable.type.toLowerCase() === 'string';
         };
 
         var isDate = scope.isDate = function (variable) {
-          return variable.type === 'date' || variable.type === 'Date';
+          return variable.type.toLowerCase() === 'date';
         };
 
         var isNull = scope.isNull = function (variable) {
-          return variable.type === 'null' || variable.type === 'Null';
+          return variable.type.toLowerCase() === 'null';
         };
 
         scope.isInPlaceEdit = function () {
@@ -94,14 +62,14 @@ define([ 'angular' ], function(angular) {
             return;
           }
 
-          if (newValue === 'boolean' || newValue === 'Boolean') {
+          if (newValue.toLowerCase() === 'boolean') {
             oldVariableValue = scope.variable.value;
 
             scope.variable.value = oldVariableValueBoolean;
             return;
           }
 
-          if (oldValue === 'boolean' || oldValue === 'Boolean') {
+          if (oldValue.toLowerCase() === 'boolean') {
             oldVariableValueBoolean = scope.variable.value;
 
             scope.variable.value = oldVariableValue;

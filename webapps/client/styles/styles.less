@@ -1,7 +1,23 @@
 @import "_vars.less";
+@import "../../node_modules/camunda-commons-ui/resources/less/common";
 
-@import "../../node_modules/camunda-commons-ui/resources/less/common.less";
+// @import "app.less";
 
-@import "app.less";
+@import "./../node_modules/camunda-commons-ui/lib/auth/page/login";
+@import "./../node_modules/camunda-commons-ui/resources/less/directives/notifications-panel";
+@import "./../node_modules/camunda-commons-ui/resources/less/directives/cam-breadcrumbs-panel";
+@import "./../node_modules/camunda-commons-ui/resources/less/directives/pagination";
+@import "./../node_modules/camunda-commons-ui/resources/less/directives/cam-in-place-text-field";
+
+@import "_ctn";
+@import "_filters";
+
 
 @import "pages/dashboard";
+
+@import "directives/process-diagram";
+@import "directives/process-diagram-preview";
+@import "directives/activity-instance-tree";
+@import "directives/variables";
+@import "directives/state-circle";
+@import "directives/view-pills";

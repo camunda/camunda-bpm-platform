@@ -1,4 +1,4 @@
-<!-- # CE - src/main/webapp/app/cockpit/directives/activity-instance-tree.html -->
+<!-- # CE - camunda-cockpit-ui/client/scripts/directives/activity-instance-tree.html -->
 <div class="tree-node" >
 
   <div id="{{ node.id }}" ng-class="{ 'state-running': !node.endTime, 'state-completed' : node.endTime && !node.canceled, 'state-canceled': node.endTime && node.canceled }"
@@ -8,7 +8,8 @@
           ng-class="{ 'selected' : node.isSelected, 'has-children': node.children.length }">
 
       <button class="btn btn-link btn-control-link btn-toggle" ng-if="node.children.length" ng-click="toggleOpen()">
-        <i ng-class="{ 'icon-chevron-right' : !node.isOpen, 'icon-chevron-down' : node.isOpen }"></i>
+        <i class="glyphicon"
+           ng-class="{ 'glyphicon-chevron-right' : !node.isOpen, 'glyphicon-chevron-down' : node.isOpen }"></i>
       </button>
 
       <button class="btn btn-link btn-control-link btn-control remove"
@@ -59,4 +60,4 @@
     </li>
   </ul>
 </div>
-<!-- / CE - src/main/webapp/app/cockpit/directives/activity-instance-tree.html -->
+<!-- / CE - camunda-cockpit-ui/client/scripts/directives/activity-instance-tree.html -->

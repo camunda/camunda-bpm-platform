@@ -1,0 +1,89 @@
+[process-diagram] {
+  overflow: hidden;
+  height: 100%;
+
+  /* disable text selection */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+
+  .activity-highlight  {
+    .box-shadow(~"0 0 @{border-radius-base} @{border-radius-base} @{highlihgt-shadow-color}");
+    border-radius: @border-radius-base;
+    cursor: pointer;
+  }
+
+  .process-diagram {
+  }
+
+  .activity-top-right-position,
+  .activity-bottom-right-position {
+    position: absolute;
+    right: -1.3em;
+  }
+
+  .activity-top-right-position {
+    top: -0.85em;
+  }
+
+  .activity-bottom-right-position {
+    bottom: -0.65em;
+  }
+
+  .activity-bottom-left-position {
+    position: absolute;
+    left: -0.9em;
+    bottom: -0.65em;
+  }
+
+  /* IE Highlight Fix */
+  .bpmnElement {
+    background-color: rgba(255,255,255,0);
+  }
+
+
+  .diagram-rendering-error {
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 20px;
+    text-align: center;
+    max-width: 300px;
+  }
+
+  .badge {
+    font-size: 12px;
+    border-width: 1px;
+    border-style: solid;
+
+    background-color: @running-color;
+    border-color: @running-darker;
+    color: @running-darker;
+
+    &.badge-warning {
+      background-color: @warning-color;
+      border-color: @warning-darker;
+      color: @warning-darker;
+    }
+
+    &.badge-important {
+      background-color: @important-color;
+      border-color: @important-darker;
+      color: @important-darker;
+    }
+
+    &.activity-instance-completed {
+      background-color: @completed-color;
+      border-color: @completed-darker;
+      color: @completed-darker;
+    }
+
+    &.activity-instance-canceled {
+      background-color: @canceled-color;
+      border-color: @canceled-darker;
+      color: @canceled-darker;
+    }
+  }
+}

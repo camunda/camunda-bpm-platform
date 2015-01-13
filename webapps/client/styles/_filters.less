@@ -1,0 +1,160 @@
+@filters-bg: #f5d99c;
+
+.filters {
+  border: solid 1px @filters-bg;
+  border-radius: 5px;
+
+  background: lighten(@filters-bg, 15%);
+  padding: 10px;
+
+  ul {
+    margin-bottom: 0;
+  }
+
+  h5 {
+    margin: 0 0 5px 0;
+    padding-bottom: 8px;
+    border-bottom: solid 1px @filters-bg;
+  }
+
+  .footer {
+    border-top: solid 1px @filters-bg;
+    padding-top: 8px;
+  }
+
+  .dropdown-menu {
+    min-width: 50px;
+  }
+
+  .note {
+    line-height: 1.5em;
+    margin-bottom: 10px;
+  }
+
+  .note-small {
+    font-size: 0.83em;
+  }
+
+  .note-error {
+    color: @brand-danger;
+  }
+
+  .note code {
+    padding: 0;
+    color: inherit;
+    font-size: inherit;
+    white-space: normal;
+    background-color: mix(@gray-light, @gray-lighter);
+    border: none;
+    border-radius: 0;
+  }
+
+  form {
+    margin-bottom: 0;
+    overflow: visible;
+  }
+}
+
+.filter {
+  line-height: 25px;
+  padding: 5px 0;
+  border-bottom: dotted 1px @filters-bg;
+  overflow: visible;
+
+  select,
+  input[type=text] {
+    margin: 0 0 5px 0;
+    width: 100%;
+    height: 26px;
+  }
+
+  .search-date {
+    overflow: hidden;
+    select {
+      width: 80px;
+    }
+  }
+
+  .removable-input {
+    display: inline-block;
+    width: 185px;
+    padding-right: 30px;
+    position: relative;
+  }
+
+  .removable-input button {
+    position: absolute;
+    top: 0;
+    right: 0;
+  }
+
+  &:last-child {
+    border-style: none;
+  }
+
+  .search {
+    position: relative;
+  }
+
+  .search.search-text {
+    padding-right: 25px;
+    line-height: 20px;
+    margin-bottom: 5px;
+  }
+
+  .search .remove {
+    position: absolute;
+    height: 26px;
+    right: 0;
+    opacity: 0.1;
+  }
+
+  .search:hover .remove,
+  .search.search-date:hover .remove-date-filter {
+    opacity: 0.9;
+  }
+
+  .search.search-date .remove-date-filter {
+    height: 26px;
+    display: inline-block;
+    float: none;
+    opacity: 0.1;
+  }
+
+  .alert {
+    font-size: 0.83em;
+    margin-bottom: 0;
+    line-height: 20px;
+    padding: 8px 14px;
+  }
+
+
+
+  &.version-filter {
+
+  }
+  &.parent-filter {
+
+  }
+  &.business-key-filter {
+
+  }
+  &.date-filter {
+    overflow: hidden;
+  }
+  &.variable-filter {
+    overflow: hidden;
+  }
+  &.activity-filter {
+
+  }
+
+  label.radio {
+    display: inline-block;
+    input {
+      margin-left: 4px;
+      vertical-align: middle;
+      float: none;
+    }
+  }
+}

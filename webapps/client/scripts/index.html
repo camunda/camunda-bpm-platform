@@ -51,7 +51,6 @@
 
       <div class="navbar-collapse"
            id="navbar-collapse">
-        <!-- # CE - camunda-cockpit-ui client/scripts/templates/navigation.html -->
         <ul ng-cloak
             class="nav navbar-nav pull-right"
             ng-controller="AuthenticationController">
@@ -115,7 +114,6 @@
             </ul>
           </li>
         </ul>
-        <!-- / CE - camunda-cockpit-ui client/scripts/templates/navigation.html -->
       </div>
     </div>
 
@@ -123,22 +121,19 @@
     <div class="ctn-main">
       <div class="ctn-wrapper">
         <div cam-breadcrumbs-panel divider="&raquo;" class="breadcrumbs-panel"></div>
-        <div notifications-panel class="notifications-panel"></div>
+        <div notifications-panel class="page-notifications"></div>
 
         <!-- view body provided by ngView -->
-        <div ng-view>
-        </div>
-
-        <div class="ctn-push-down"></div>
+        <div ng-view></div>
       </div>
-
-      <!-- footer -->
-      <footer>
-        <div>
-          Powered by <a href="http://camunda.org">camunda BPM</a> / <span class="version">v${project.version}</span>
-        </div>
-      </footer>
     </div>
+
+    <!-- footer -->
+    <footer>
+      <div>
+        Powered by <a href="http://camunda.org">camunda BPM</a> / <span class="version">v${project.version}</span>
+      </div>
+    </footer>
 
     <script type="application/javascript">
       window.PLUGIN_DEPENDENCIES = $PLUGIN_DEPENDENCIES || [];

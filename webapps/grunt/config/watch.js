@@ -39,6 +39,7 @@ module.exports = function(config) {
 
     dependencies: {
       files: [
+        './../camunda-bpm-webapp/webapp/target/webapp/plugin/**/*.js',
         'node_modules/{camunda-commons-ui,camunda-bpm-sdk-js}/lib/**/*.{js,html}'
       ],
       tasks: [
