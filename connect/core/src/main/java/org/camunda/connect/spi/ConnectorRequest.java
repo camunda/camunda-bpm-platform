@@ -43,8 +43,9 @@ import java.util.Map;
  * This makes it easy to use the connector in a standalone way.
  * </p>
  *
- * <p>The request may return a value representing the output of the connector
- * invocation. Requests not returning a value should be of type {@link Void}.</p>
+ * <p>A request must return a {@link ConnectorResponse} that contains response
+ * data. Requests for which the response contains no payload or is not relevant should
+ * return an empty response that provides no data.</p>
  *
  * @author Daniel Meyer
  *
