@@ -1,4 +1,4 @@
-/* global define, require, console, document: false */
+/* global define, require, console, document, window, setTimeout: false */
 'use strict';
 
 define('snap-win', ['snap-svg'], function(snap) {
@@ -105,6 +105,9 @@ define('camunda-tasklist-ui', [
 
     var compileTemplate = require('camunda-commons-ui/directives/compileTemplate');
     tasklistApp.directive('compileTemplate', compileTemplate);
+
+    var camWidgetInlineField = require('camunda-commons-ui/widgets/inline-field/cam-widget-inline-field');
+    tasklistApp.directive('camWidgetInlineField', camWidgetInlineField);
 
 
     tasklistApp.factory('assignNotification', require('camunda-tasklist-ui/services/cam-tasklist-assign-notification'));

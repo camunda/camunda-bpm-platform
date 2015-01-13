@@ -65,7 +65,6 @@ define([
   var taskModule = angular.module('cam.tasklist.task', [
     require('camunda-tasklist-ui/api').name,
     'ui.bootstrap',
-    'cam.widget',
     'cam.tasklist.form',
     'angularMoment'
   ]);

@@ -14,7 +14,8 @@
 define([
   'angular',
   './directives/cam-tasklist-variables',
-  './modals/cam-tasklist-variables-detail-modal'
+  './modals/cam-tasklist-variables-detail-modal',
+  'angular-moment'
 ], function(
   angular,
   camTasklistVariables,

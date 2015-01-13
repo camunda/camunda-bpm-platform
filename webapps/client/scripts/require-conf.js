@@ -94,7 +94,6 @@ define(function() {
 
                                       'camunda-tasklist-ui/api',
                                       'camunda-tasklist-ui/user',
-                                      'camunda-tasklist-ui/widgets',
                                       'camunda-tasklist-ui/filter',
                                       'camunda-tasklist-ui/tasklist',
                                       'camunda-tasklist-ui/variable',
@@ -114,6 +113,7 @@ define(function() {
                                       'camunda-commons-ui/directives/autoFill',
                                       'camunda-commons-ui/directives/nl2br',
                                       'camunda-commons-ui/directives/compileTemplate',
+                                      'camunda-commons-ui/widgets/inline-field/cam-widget-inline-field',
 
                                       'placeholders-js/utils',
                                       'placeholders-js/main',
