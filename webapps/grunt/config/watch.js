@@ -30,61 +30,28 @@ module.exports = function(config) {
 
     scripts: {
       files: [
-        'node_modules/camunda-*/client/scripts/**/*.{js,html}',
         '<%= pkg.gruntConfig.clientDir %>/scripts/**/*.{js,html}'
       ],
       tasks: [
-        // 'newer:jshint:scripts',
-        // 'requirejs:dependencies',
         'requirejs:scripts'
       ]
     },
 
-    // sdk: {
-    //   files: [
-    //     'node_modules/camunda-bpm-sdk-js/dist/**/*.js'
-    //   ],
-    //   tasks: [
-    //     'copy:sdk',
-    //     'requirejs:scripts'
-    //   ]
-    // },
-
-    // commons: {
-    //   files: [
-    //     'node_modules/camunda-commons/lib/**/*.{js,html}'
-    //   ],
-    //   tasks: [
-    //     'requirejs:scripts'
-    //   ]
-    // },
-
-    // unitTest: {
-    //   files: [
-    //     'grunt/config/jasmine_node.js',
-    //     'test/unit/**/*Spec.js'
-    //   ],
-    //   tasks: [
-    //     'jasmine_node:unit'
-    //   ]
-    // },
-
-    // integrationTest: {
-    //   files: [
-    //     'grunt/config/karma.js',
-    //     'test/integration/main.js',
-    //     'test/integration/**/*Spec.js'
-    //   ],
-    //   tasks: [
-    //     'karma:integration'
-    //   ]
-    // },
+    dependencies: {
+      files: [
+        'node_modules/{camunda-commons-ui,camunda-bpm-sdk-js}/lib/**/*.{js,html}'
+      ],
+      tasks: [
+        'requirejs:dependencies'
+      ]
+    },
 
     served: {
-      files: ['<%= buildTarget %>/**/*.*'],
       options: {
+        cwd: '<%= buildTarget %>/',
         livereload: config.livereloadPort || false
-      }
+      },
+      files: '**/*'
     }
   };
 };

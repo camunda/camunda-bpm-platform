@@ -100,7 +100,7 @@
 
     'angular-data-depend':   vendor +'/angular-data-depend/src/dataDepend',
 
-    'camunda-commons-ui':    vendor +'/camunda-commons-ui/lib',
+    'camunda-commons-ui':    './../node_modules/camunda-commons-ui/lib',
 
     'camunda-cockpit-ui':    'scripts/cockpit',
     'camunda-cockpit':       'scripts/cockpit-bootstrap'
@@ -175,12 +175,12 @@
   conf.packages = [
     {
       name: 'camunda-commons-ui',
-      location: './'+ vendor +'/camunda-commons-ui/lib',
+      location: './../node_modules/camunda-commons-ui/lib',
       main: 'index'
     },
     {
       name: 'camunda-commons-ui/util',
-      location: './'+ vendor +'/camunda-commons-ui/lib/util',
+      location: './../node_modules/camunda-commons-ui/lib/util',
       main: 'index'
     },
     {
