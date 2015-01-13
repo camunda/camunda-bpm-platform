@@ -13,13 +13,14 @@
 
 package org.camunda.bpm.model.xml.instance;
 
-import org.w3c.dom.Document;
-
-import javax.xml.transform.dom.DOMSource;
 import java.util.List;
 
+import javax.xml.transform.dom.DOMSource;
+
+import org.w3c.dom.Document;
+
 /**
- * Encapsulates a {@link Document}
+ * Encapsulates a {@link Document}. Implementations of this interface must be thread-safe.
  *
  * @author Sebastian Menski
  */
@@ -67,6 +68,10 @@ public interface DomDocument {
 
   /**
    * Returns a new {@link DOMSource} of the document.
+   *
+   * Note that a {@link DOMSource} wraps the underlying {@link Document} which is
+   * not thread-safe. Multiple DOMSources of the same document should be synchronized
+   * by the calling application.
    *
    * @return the new {@link DOMSource}
    */

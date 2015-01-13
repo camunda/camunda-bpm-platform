@@ -37,6 +37,8 @@ import java.util.logging.Logger;
 
 /**
  * Helper methods which abstract some gruesome DOM specifics.
+ * It does not provide synchronization when invoked in parallel with
+ * the same objects.
  *
  * @author Daniel Meyer
  * @author Sebastian Menski
@@ -128,7 +130,6 @@ public final class DomUtil {
    * @param filter the {@link NodeListFilter} to apply to the {@link NodeList}
    * @return the List of all Nodes which match the filter
    */
-  @SuppressWarnings("unchecked")
   public static List<DomElement> filterNodeList(NodeList nodeList, NodeListFilter filter) {
 
     List<DomElement> filteredList = new ArrayList<DomElement>();
@@ -228,6 +229,7 @@ public final class DomUtil {
    * @throws ModelParseException if a parsing or IO error is triggered
    */
   public static DomDocument parseInputStream(DocumentBuilderFactory documentBuilderFactory, InputStream inputStream) {
+
     try {
       DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
       documentBuilder.setErrorHandler(new DomErrorHandler());

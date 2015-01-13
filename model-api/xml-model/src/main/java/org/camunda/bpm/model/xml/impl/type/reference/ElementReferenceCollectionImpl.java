@@ -52,7 +52,6 @@ public class ElementReferenceCollectionImpl<Target extends ModelElementInstance,
     referenceSourceElement.setTextContent(referenceIdentifier);
   }
 
-  @SuppressWarnings("unchecked")
   private void performAddOperation(ModelElementInstanceImpl referenceSourceParentElement, Target referenceTargetElement) {
     ModelInstanceImpl modelInstance = referenceSourceParentElement.getModelInstance();
     String referenceTargetIdentifier = referenceTargetAttribute.getValue(referenceTargetElement);
@@ -112,7 +111,6 @@ public class ElementReferenceCollectionImpl<Target extends ModelElementInstance,
     return referenceSourceType;
   }
 
-  @SuppressWarnings("unchecked")
   private Collection<DomElement> getView(ModelElementInstanceImpl referenceSourceParentElement) {
     DomDocument document = referenceSourceParentElement.getModelInstance().getDocument();
     Collection<Source> referenceSourceElements = referenceSourceCollection.get(referenceSourceParentElement);

@@ -13,14 +13,14 @@
 
 package org.camunda.bpm.model.xml.instance;
 
+import java.util.List;
+
 import org.camunda.bpm.model.xml.ModelException;
 import org.camunda.bpm.model.xml.impl.ModelInstanceImpl;
 import org.w3c.dom.Element;
 
-import java.util.List;
-
 /**
- * Encapsulates {@link Element}
+ * Encapsulates {@link Element}. Implementations of this interface must be thread-safe.
  *
  * @author Sebastian Menski
  */

@@ -53,14 +53,24 @@ public abstract class AbstractModelParser {
   }
 
   public ModelInstance parseModelFromStream(InputStream inputStream) {
-    DomDocument document = DomUtil.parseInputStream(documentBuilderFactory, inputStream);
+    DomDocument document = null;
+
+    synchronized(documentBuilderFactory) {
+      document = DomUtil.parseInputStream(documentBuilderFactory, inputStream);
+    }
+
     validateModel(document);
     return createModelInstance(document);
 
   }
 
   public ModelInstance getEmptyModel() {
-    DomDocument document = DomUtil.getEmptyDocument(documentBuilderFactory);
+    DomDocument document = null;
+
+    synchronized(documentBuilderFactory) {
+      document = DomUtil.getEmptyDocument(documentBuilderFactory);
+    }
+
     return createModelInstance(document);
   }
 
@@ -76,7 +86,9 @@ public abstract class AbstractModelParser {
 
     Validator validator = schema.newValidator();
     try {
-      validator.validate(document.getDomSource());
+      synchronized(document) {
+        validator.validate(document.getDomSource());
+      }
     } catch (IOException e) {
       throw new ModelValidationException("Error during DOM document validation", e);
     } catch (SAXException e) {

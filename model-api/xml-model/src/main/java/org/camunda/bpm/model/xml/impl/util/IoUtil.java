@@ -124,7 +124,10 @@ public final class IoUtil {
       transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
       transformer.setOutputProperty(OutputKeys.INDENT, "yes");
       transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
-      transformer.transform(document.getDomSource(), result);
+
+      synchronized(document) {
+        transformer.transform(document.getDomSource(), result);
+      }
     } catch (TransformerConfigurationException e) {
       throw new ModelIoException("Unable to create a transformer for the model", e);
     } catch (TransformerException e) {
