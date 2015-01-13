@@ -16,6 +16,7 @@ import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -336,14 +337,24 @@ public class DefaultContextAssociationManager implements ContextAssociationManag
     getScopedAssociation().setTask(task);
   }
 
-  public VariableMap getCachedVariables() {
+  public VariableMap getCachedVariableMap() {
     ensureCommandContextNotActive();
     return getScopedAssociation().getCachedVariables();
   }
 
-  public VariableMap getCachedVariablesLocal() {
+  @Deprecated
+  public Map<String, Object> getCachedVariables() {
+    return getCachedVariableMap();
+  }
+
+  public VariableMap getCachedLocalVariableMap() {
     ensureCommandContextNotActive();
     return getScopedAssociation().getCachedVariablesLocal();
+  }
+
+  @Deprecated
+  public Map<String, Object> getCachedVariablesLocal() {
+    return getCachedLocalVariableMap();
   }
 
   public void flushVariableCache() {

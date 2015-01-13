@@ -92,7 +92,7 @@ public class BusinessProcess implements Serializable {
   public ProcessInstance startProcessById(String processDefinitionId) {
     assertCommandContextNotActive();
 
-    ProcessInstance instance = processEngine.getRuntimeService().startProcessInstanceById(processDefinitionId, getAndClearVariableCache());
+    ProcessInstance instance = processEngine.getRuntimeService().startProcessInstanceById(processDefinitionId, getAndClearCachedVariableMap());
     if (!instance.isEnded()) {
       setExecution(instance);
     }
@@ -102,7 +102,7 @@ public class BusinessProcess implements Serializable {
   public ProcessInstance startProcessById(String processDefinitionId, String businessKey) {
     assertCommandContextNotActive();
 
-    ProcessInstance instance = processEngine.getRuntimeService().startProcessInstanceById(processDefinitionId, businessKey, getAndClearVariableCache());
+    ProcessInstance instance = processEngine.getRuntimeService().startProcessInstanceById(processDefinitionId, businessKey, getAndClearCachedVariableMap());
     if (!instance.isEnded()) {
       setExecution(instance);
     }
@@ -112,7 +112,7 @@ public class BusinessProcess implements Serializable {
   public ProcessInstance startProcessById(String processDefinitionId, Map<String, Object> variables) {
     assertCommandContextNotActive();
 
-    VariableMap cachedVariables = getAndClearVariableCache();
+    VariableMap cachedVariables = getAndClearCachedVariableMap();
     cachedVariables.putAll(variables);
     ProcessInstance instance = processEngine.getRuntimeService().startProcessInstanceById(processDefinitionId, cachedVariables);
     if (!instance.isEnded()) {
@@ -124,7 +124,7 @@ public class BusinessProcess implements Serializable {
   public ProcessInstance startProcessById(String processDefinitionId, String businessKey, Map<String, Object> variables) {
     assertCommandContextNotActive();
 
-    VariableMap cachedVariables = getAndClearVariableCache();
+    VariableMap cachedVariables = getAndClearCachedVariableMap();
     cachedVariables.putAll(variables);
     ProcessInstance instance = processEngine.getRuntimeService().startProcessInstanceById(processDefinitionId, businessKey, cachedVariables);
     if (!instance.isEnded()) {
@@ -136,7 +136,7 @@ public class BusinessProcess implements Serializable {
   public ProcessInstance startProcessByKey(String key) {
     assertCommandContextNotActive();
 
-    ProcessInstance instance = processEngine.getRuntimeService().startProcessInstanceByKey(key, getAndClearVariableCache());
+    ProcessInstance instance = processEngine.getRuntimeService().startProcessInstanceByKey(key, getAndClearCachedVariableMap());
     if (!instance.isEnded()) {
       setExecution(instance);
     }
@@ -146,7 +146,7 @@ public class BusinessProcess implements Serializable {
   public ProcessInstance startProcessByKey(String key, String businessKey) {
     assertCommandContextNotActive();
 
-    ProcessInstance instance = processEngine.getRuntimeService().startProcessInstanceByKey(key, businessKey, getAndClearVariableCache());
+    ProcessInstance instance = processEngine.getRuntimeService().startProcessInstanceByKey(key, businessKey, getAndClearCachedVariableMap());
     if (!instance.isEnded()) {
       setExecution(instance);
     }
@@ -156,7 +156,7 @@ public class BusinessProcess implements Serializable {
   public ProcessInstance startProcessByKey(String key, Map<String, Object> variables) {
     assertCommandContextNotActive();
 
-    Map<String, Object> cachedVariables = getAndClearVariableCache();
+    Map<String, Object> cachedVariables = getAndClearCachedVariableMap();
     cachedVariables.putAll(variables);
     ProcessInstance instance = processEngine.getRuntimeService().startProcessInstanceByKey(key, cachedVariables);
     if (!instance.isEnded()) {
@@ -168,7 +168,7 @@ public class BusinessProcess implements Serializable {
   public ProcessInstance startProcessByKey(String key, String businessKey, Map<String, Object> variables) {
     assertCommandContextNotActive();
 
-    Map<String, Object> cachedVariables = getAndClearVariableCache();
+    Map<String, Object> cachedVariables = getAndClearCachedVariableMap();
     cachedVariables.putAll(variables);
     ProcessInstance instance = processEngine.getRuntimeService().startProcessInstanceByKey(key, businessKey, cachedVariables);
     if (!instance.isEnded()) {
@@ -180,7 +180,7 @@ public class BusinessProcess implements Serializable {
   public ProcessInstance startProcessByMessage(String messageName) {
     assertCommandContextNotActive();
 
-    Map<String, Object> cachedVariables = getAndClearVariableCache();
+    Map<String, Object> cachedVariables = getAndClearCachedVariableMap();
     ProcessInstance instance =  processEngine.getRuntimeService().startProcessInstanceByMessage(messageName, cachedVariables);
     if (!instance.isEnded()) {
       setExecution(instance);
@@ -191,7 +191,7 @@ public class BusinessProcess implements Serializable {
   public ProcessInstance startProcessByMessage(String messageName, Map<String, Object> processVariables) {
     assertCommandContextNotActive();
 
-    Map<String, Object> cachedVariables = getAndClearVariableCache();
+    Map<String, Object> cachedVariables = getAndClearCachedVariableMap();
     cachedVariables.putAll(processVariables);
     ProcessInstance instance =  processEngine.getRuntimeService().startProcessInstanceByMessage(messageName, cachedVariables);
     if (!instance.isEnded()) {
@@ -203,7 +203,7 @@ public class BusinessProcess implements Serializable {
   public ProcessInstance startProcessByMessage(String messageName, String businessKey, Map<String, Object> processVariables) {
     assertCommandContextNotActive();
 
-    Map<String, Object> cachedVariables = getAndClearVariableCache();
+    Map<String, Object> cachedVariables = getAndClearCachedVariableMap();
     cachedVariables.putAll(processVariables);
     ProcessInstance instance =  processEngine.getRuntimeService().startProcessInstanceByMessage(messageName, businessKey, cachedVariables);
     if (!instance.isEnded()) {
@@ -255,8 +255,8 @@ public class BusinessProcess implements Serializable {
    */
   public void signalExecution() {
     assertExecutionAssociated();
-    processEngine.getRuntimeService().setVariablesLocal(associationManager.getExecutionId(), getAndClearVariableLocalCache());
-    processEngine.getRuntimeService().signal(associationManager.getExecutionId(), getAndClearVariableCache());
+    processEngine.getRuntimeService().setVariablesLocal(associationManager.getExecutionId(), getAndClearCachedLocalVariableMap());
+    processEngine.getRuntimeService().signal(associationManager.getExecutionId(), getAndClearCachedVariableMap());
     associationManager.disAssociate();
   }
 
@@ -329,8 +329,8 @@ public class BusinessProcess implements Serializable {
    */
   public void completeTask() {
     assertTaskAssociated();
-    processEngine.getTaskService().setVariablesLocal(getTask().getId(), getAndClearVariableLocalCache());
-    processEngine.getTaskService().setVariables(getTask().getId(), getAndClearVariableCache());
+    processEngine.getTaskService().setVariablesLocal(getTask().getId(), getAndClearCachedLocalVariableMap());
+    processEngine.getTaskService().setVariables(getTask().getId(), getAndClearCachedVariableMap());
     processEngine.getTaskService().complete(getTask().getId());
     associationManager.disAssociate();
   }
@@ -462,24 +462,46 @@ public class BusinessProcess implements Serializable {
   }
 
   /**
-   * Get the map of cached variables and clear the internal variable cache.
+   * Get the {@link VariableMap} of cached variables and clear the internal variable cache.
    *
-   * @return the map of cached variables
+   * @return the {@link VariableMap} of cached variables
    */
-  public VariableMap getAndClearVariableCache() {
-    VariableMap cachedVariables = associationManager.getCachedVariables();
+  public VariableMap getAndClearCachedVariableMap() {
+    VariableMap cachedVariables = associationManager.getCachedVariableMap();
     VariableMap copy = new VariableMapImpl(cachedVariables);
     cachedVariables.clear();
     return copy;
   }
 
   /**
+   * Get the map of cached variables and clear the internal variable cache.
+   *
+   * @return the map of cached variables
+   * @deprecated use {@link #getAndClearCachedVariableMap()} instead
+   */
+  @Deprecated
+  public Map<String, Object> getAndClearVariableCache() {
+    return getAndClearCachedVariableMap();
+  }
+
+  /**
+   * Get a copy of the {@link VariableMap} of cached variables.
+   *
+   * @return a copy of the {@link VariableMap} of cached variables.
+   */
+  public VariableMap getCachedVariableMap() {
+    return new VariableMapImpl(associationManager.getCachedVariableMap());
+  }
+
+  /**
    * Get a copy of the map of cached variables.
    *
    * @return a copy of the map of cached variables.
+   * @deprecated use {@link #getCachedVariableMap()} instead
    */
-  public VariableMap getVariableCache() {
-    return new VariableMapImpl(associationManager.getCachedVariables());
+  @Deprecated
+  public Map<String, Object> getVariableCache() {
+    return getCachedVariableMap();
   }
 
   /**
@@ -537,24 +559,46 @@ public class BusinessProcess implements Serializable {
   }
 
   /**
-   * Get the map of local cached variables and clear the internal variable cache.
+   * Get the {@link VariableMap} of local cached variables and clear the internal variable cache.
    *
-   * @return the map of cached variables
+   * @return the {@link VariableMap} of cached variables
    */
-  public VariableMap getAndClearVariableLocalCache() {
-    VariableMap cachedVariablesLocal = associationManager.getCachedVariablesLocal();
+  public VariableMap getAndClearCachedLocalVariableMap() {
+    VariableMap cachedVariablesLocal = associationManager.getCachedLocalVariableMap();
     VariableMap copy = new VariableMapImpl(cachedVariablesLocal);
     cachedVariablesLocal.clear();
     return copy;
   }
 
   /**
+   * Get the map of local cached variables and clear the internal variable cache.
+   *
+   * @return the map of cached variables
+   * @deprecated use {@link #getAndClearCachedLocalVariableMap()} instead
+   */
+  @Deprecated
+  public Map<String, Object> getAndClearVariableLocalCache() {
+    return getAndClearCachedLocalVariableMap();
+  }
+
+  /**
+   * Get a copy of the {@link VariableMap} of local cached variables.
+   *
+   * @return a copy of the {@link VariableMap} of local cached variables.
+   */
+  public VariableMap getCachedLocalVariableMap() {
+    return new VariableMapImpl(associationManager.getCachedLocalVariableMap());
+  }
+
+  /**
    * Get a copy of the map of local cached variables.
    *
    * @return a copy of the map of local cached variables.
+   * @deprecated use {@link #getCachedLocalVariableMap()} instead
    */
-  public VariableMap getVariableLocalCache() {
-    return new VariableMapImpl(associationManager.getCachedVariablesLocal());
+  @Deprecated
+  public Map<String, Object> getVariableLocalCache() {
+    return getCachedLocalVariableMap();
   }
 
   /**
