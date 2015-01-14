@@ -30,8 +30,10 @@
   "dependencies": {
     "angular": "~1.2.16",
     "angular-animate": "~1.2.16",
+    "angular-moment": "0.7.0",
     "angular-bootstrap": "~0.11.0",
     "angular-cookies": "~1.2.16",
+    "angular-translate": "2.4.2",
     "angular-data-depend": "camunda/angular-data-depend",
     "angular-resource": "~1.2.16",
     "angular-route": "~1.2.16",

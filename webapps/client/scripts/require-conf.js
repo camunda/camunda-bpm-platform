@@ -94,13 +94,15 @@
     'angular-route':         vendor +'/angular-route/angular-route',
     'angular-animate':       vendor +'/angular-animate/angular-animate',
     'angular-sanitize':      vendor +'/angular-sanitize/angular-sanitize',
+    'angular-translate':     vendor +'/angular-translate/angular-translate',
     'angular-ui':            vendor +'/angular-ui/build/angular-ui',
     'angular-bootstrap':     vendor +'/angular-bootstrap/ui-bootstrap-tpls',
     'jquery-ui':             vendor +'/jquery.ui',
+    'moment':                vendor +'/moment/moment',
 
     'angular-data-depend':   vendor +'/angular-data-depend/src/dataDepend',
 
-    'camunda-commons-ui':    './../node_modules/camunda-commons-ui/lib',
+    'camunda-commons-ui':    '../node_modules/camunda-commons-ui/lib',
 
     'camunda-cockpit-ui':    'scripts/cockpit',
     'camunda-cockpit':       'scripts/cockpit-bootstrap'
@@ -157,6 +159,7 @@
       'angular',
       'angular-resource',
       'angular-sanitize',
+      'angular-translate',
       'angular-ui',
       'ngDefine',
       // 'bootstrap',
@@ -175,12 +178,12 @@
   conf.packages = [
     {
       name: 'camunda-commons-ui',
-      location: './../node_modules/camunda-commons-ui/lib',
+      location: '../node_modules/camunda-commons-ui/lib',
       main: 'index'
     },
     {
       name: 'camunda-commons-ui/util',
-      location: './../node_modules/camunda-commons-ui/lib/util',
+      location: '../node_modules/camunda-commons-ui/lib/util',
       main: 'index'
     },
     {

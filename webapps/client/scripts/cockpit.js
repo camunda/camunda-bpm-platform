@@ -39,7 +39,7 @@
     for(var i = otherDependencies.length; i < arguments.length; i++) {
       moduleDependencies.push(arguments[i].name);
     }
-    var cockpitModule = angular.module("cam.cockpit", ['ng', 'ngResource', 'ui.bootstrap'].concat(moduleDependencies, plugins.map(function(el){ return el.ngModuleName; })));
+    var cockpitModule = angular.module("cam.cockpit", ['ng', 'ngResource', 'pascalprecht.translate', 'ui.bootstrap'].concat(moduleDependencies, plugins.map(function(el){ return el.ngModuleName; })));
 
     var ModuleConfig = [ '$routeProvider', 'UriProvider', function($routeProvider, UriProvider) {
 
