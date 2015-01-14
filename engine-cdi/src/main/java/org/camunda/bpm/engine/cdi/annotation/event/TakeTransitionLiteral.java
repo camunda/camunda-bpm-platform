@@ -17,13 +17,13 @@ import javax.enterprise.util.AnnotationLiteral;
 
 public class TakeTransitionLiteral extends AnnotationLiteral<TakeTransition> implements TakeTransition {  
   
-  protected final String transitionName;   
-  
+  protected final String transitionName;
+    public TakeTransitionLiteral(){this(null);}
   public TakeTransitionLiteral(String transitionName) {
     this.transitionName = transitionName;
   }
   @Override
   public String value() {
-    return transitionName != null ? transitionName : "";
+    return transitionName != null ? transitionName : "*";
   }
 }

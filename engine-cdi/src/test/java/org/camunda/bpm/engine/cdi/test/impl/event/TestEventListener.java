@@ -12,19 +12,27 @@
  */
 package org.camunda.bpm.engine.cdi.test.impl.event;
 
-import org.camunda.bpm.engine.cdi.BusinessProcessEvent;
-import org.camunda.bpm.engine.cdi.annotation.event.*;
+import static org.junit.Assert.assertNotNull;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.event.Observes;
 import java.util.HashSet;
 import java.util.Set;
 
-import static org.junit.Assert.assertNotNull;
+import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.event.Observes;
+
+import org.camunda.bpm.engine.cdi.BusinessProcessEvent;
+import org.camunda.bpm.engine.cdi.annotation.event.AssignTask;
+import org.camunda.bpm.engine.cdi.annotation.event.BusinessProcessDefinition;
+import org.camunda.bpm.engine.cdi.annotation.event.CompleteTask;
+import org.camunda.bpm.engine.cdi.annotation.event.CreateTask;
+import org.camunda.bpm.engine.cdi.annotation.event.DeleteTask;
+import org.camunda.bpm.engine.cdi.annotation.event.EndActivity;
+import org.camunda.bpm.engine.cdi.annotation.event.StartActivity;
+import org.camunda.bpm.engine.cdi.annotation.event.TakeTransition;
 
 @ApplicationScoped
 public class TestEventListener {
-  
+
   public void reset() {
     startActivityService1 = 0;
     endActivityService1 = 0;
@@ -39,7 +47,7 @@ public class TestEventListener {
   }
 
   private final Set<BusinessProcessEvent> eventsReceivedByKey = new HashSet<BusinessProcessEvent>();
-  
+
   // receives all events related to "process1"
   public void onProcessEventByKey(@Observes @BusinessProcessDefinition("process1") BusinessProcessEvent businessProcessEvent) {
     eventsReceivedByKey.add(businessProcessEvent);
@@ -49,11 +57,10 @@ public class TestEventListener {
     return eventsReceivedByKey;
   }
 
-  
   // ---------------------------------------------------------
-  
+
   private final Set<BusinessProcessEvent> eventsReceived = new HashSet<BusinessProcessEvent>();
-  
+
   // receives all events
   public void onProcessEvent(@Observes BusinessProcessEvent businessProcessEvent) {
     eventsReceived.add(businessProcessEvent);
@@ -62,14 +69,14 @@ public class TestEventListener {
   public Set<BusinessProcessEvent> getEventsReceived() {
     return eventsReceived;
   }
-  
+
   // ---------------------------------------------------------
-  
+
   private int startActivityService1 = 0;
   private int endActivityService1 = 0;
   private int takeTransition1 = 0;
-    
-  public void onStartActivityService1(@Observes @StartActivity("service1") BusinessProcessEvent businessProcessEvent) {    
+
+  public void onStartActivityService1(@Observes @StartActivity("service1") BusinessProcessEvent businessProcessEvent) {
     startActivityService1 += 1;
   }
 
@@ -80,19 +87,18 @@ public class TestEventListener {
   public void takeTransition1(@Observes @TakeTransition("t1") BusinessProcessEvent businessProcessEvent) {
     takeTransition1 += 1;
   }
-    
+
   public int getEndActivityService1() {
     return endActivityService1;
   }
-    
+
   public int getStartActivityService1() {
     return startActivityService1;
   }
-    
+
   public int getTakeTransition1() {
     return takeTransition1;
   }
-
 
   // ---------------------------------------------------------
 
@@ -100,6 +106,11 @@ public class TestEventListener {
   private int assignTaskUser1 = 0;
   private int completeTaskUser1 = 0;
   private int deleteTaskUser1 = 0;
+
+  private int createdTasks = 0;
+  private int assignedTasks = 0;
+  private int completedTasks = 0;
+  private int deletedTasks = 0;
 
   public void onCreateTask(@Observes @CreateTask("user1") BusinessProcessEvent businessProcessEvent) {
     assertNotNull(businessProcessEvent.getTask());
@@ -121,6 +132,26 @@ public class TestEventListener {
     deleteTaskUser1++;
   }
 
+  public void onCreateAnyTask(@Observes @CreateTask BusinessProcessEvent businessProcessEvent) {
+    assertNotNull(businessProcessEvent.getTask());
+    createdTasks++;
+  }
+
+  public void onAssignAnyTask(@Observes @AssignTask BusinessProcessEvent businessProcessEvent) {
+    assertNotNull(businessProcessEvent.getTask());
+    assignedTasks++;
+  }
+
+  public void onCompleteAnyTask(@Observes @CompleteTask BusinessProcessEvent businessProcessEvent) {
+    assertNotNull(businessProcessEvent.getTask());
+    completedTasks++;
+  }
+
+  public void onDeleteAnyTask(@Observes @DeleteTask BusinessProcessEvent businessProcessEvent) {
+    assertNotNull(businessProcessEvent.getTask());
+    deletedTasks++;
+  }
+
   public int getCreateTaskUser1() {
     return createTaskUser1;
   }
@@ -135,5 +166,21 @@ public class TestEventListener {
 
   public int getDeleteTaskUser1() {
     return deleteTaskUser1;
+  }
+
+  public int getCreatedTasks() {
+    return createdTasks;
+  }
+
+  public int getAssignedTasks() {
+    return assignedTasks;
+  }
+
+  public int getCompletedTasks() {
+    return completedTasks;
+  }
+
+  public int getDeletedTasks() {
+    return deletedTasks;
   }
 }

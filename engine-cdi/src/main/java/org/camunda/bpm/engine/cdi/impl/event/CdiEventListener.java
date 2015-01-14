@@ -12,11 +12,26 @@
  */
 package org.camunda.bpm.engine.cdi.impl.event;
 
+import java.io.Serializable;
+import java.lang.annotation.Annotation;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Logger;
+
+import javax.enterprise.inject.spi.BeanManager;
+
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.cdi.BusinessProcessEvent;
 import org.camunda.bpm.engine.cdi.BusinessProcessEventType;
-import org.camunda.bpm.engine.cdi.annotation.event.*;
+import org.camunda.bpm.engine.cdi.annotation.event.AssignTaskLiteral;
+import org.camunda.bpm.engine.cdi.annotation.event.BusinessProcessDefinitionLiteral;
+import org.camunda.bpm.engine.cdi.annotation.event.CompleteTaskLiteral;
+import org.camunda.bpm.engine.cdi.annotation.event.CreateTaskLiteral;
+import org.camunda.bpm.engine.cdi.annotation.event.DeleteTaskLiteral;
+import org.camunda.bpm.engine.cdi.annotation.event.EndActivityLiteral;
+import org.camunda.bpm.engine.cdi.annotation.event.StartActivityLiteral;
+import org.camunda.bpm.engine.cdi.annotation.event.TakeTransitionLiteral;
 import org.camunda.bpm.engine.cdi.impl.util.BeanManagerLookup;
 import org.camunda.bpm.engine.cdi.impl.util.ProgrammaticBeanLookup;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
@@ -29,13 +44,6 @@ import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 
-import javax.enterprise.inject.spi.BeanManager;
-import java.io.Serializable;
-import java.lang.annotation.Annotation;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Logger;
-
 /**
  * Generic {@link ExecutionListener} publishing events using the cdi event
  * infrastructure.
@@ -47,33 +55,45 @@ public class CdiEventListener implements TaskListener, ExecutionListener, Serial
   private static final long serialVersionUID = 1L;
   private static final Logger LOGGER = Logger.getLogger(CdiEventListener.class.getName());
 
+  @Override
   public void notify(DelegateExecution execution) throws Exception {
-    // test whether cdi is setup correctly. (if not, just do not deliver the event)
+    // test whether cdi is setup correctly. (if not, just do not deliver the
+    // event)
     if (!testCdiSetup()) {
       return;
     }
 
-    BusinessProcessEvent event = createEvent(execution);
-    Annotation[] qualifiers = getQualifiers(event);
-    getBeanManager().fireEvent(event, qualifiers);
+    fireEvent(createEvent(execution));
+
   }
 
-  public void notify(DelegateTask task) {
-    // test whether cdi is setup correctly. (if not, just do not deliver the event)
+  @Override
+  public void notify(final DelegateTask task) {
+    // test whether cdi is setup correctly. (if not, just do not deliver the
+    // event)
     if (!testCdiSetup()) {
       return;
     }
+    final BusinessProcessEvent event = createEvent(task);
+    fireEvent(event);
+  }
 
-    BusinessProcessEvent event = createEvent(task);
-    Annotation[] qualifiers = getQualifiers(event);
-    getBeanManager().fireEvent(event, qualifiers);
+  /**
+   * for every qualifier annotation, fire one event.
+   *
+   * @param event
+   *          the event to fire
+   */
+  private void fireEvent(BusinessProcessEvent event) {
+    for (List<Annotation> qualifiers : getQualifiers(event)) {
+      getBeanManager().fireEvent(event, qualifiers.toArray(new Annotation[qualifiers.size()]));
+    }
   }
 
   private boolean testCdiSetup() {
     try {
       ProgrammaticBeanLookup.lookup(ProcessEngine.class);
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       LOGGER.fine("CDI was not setup correctly");
       return false;
     }
@@ -86,15 +106,16 @@ public class CdiEventListener implements TaskListener, ExecutionListener, Serial
     // map type
     String eventName = execution.getEventName();
     BusinessProcessEventType type = null;
-    if(ExecutionListener.EVENTNAME_START.equals(eventName)) {
+    if (ExecutionListener.EVENTNAME_START.equals(eventName)) {
       type = BusinessProcessEventType.START_ACTIVITY;
-    } else if(ExecutionListener.EVENTNAME_END.equals(eventName)) {
+    } else if (ExecutionListener.EVENTNAME_END.equals(eventName)) {
       type = BusinessProcessEventType.END_ACTIVITY;
-    } else if(ExecutionListener.EVENTNAME_TAKE.equals(eventName)) {
+    } else if (ExecutionListener.EVENTNAME_TAKE.equals(eventName)) {
       type = BusinessProcessEventType.TAKE;
     }
 
-    return new CdiBusinessProcessEvent(execution.getCurrentActivityId(), execution.getCurrentTransitionId(), processDefinition, execution, type, ClockUtil.getCurrentTime());
+    return new CdiBusinessProcessEvent(execution.getCurrentActivityId(), execution.getCurrentTransitionId(), processDefinition, execution, type,
+        ClockUtil.getCurrentTime());
   }
 
   protected BusinessProcessEvent createEvent(DelegateTask task) {
@@ -109,20 +130,16 @@ public class CdiEventListener implements TaskListener, ExecutionListener, Serial
     BusinessProcessEventType type = null;
     if (TaskListener.EVENTNAME_CREATE.equals(eventName)) {
       type = BusinessProcessEventType.CREATE_TASK;
-    }
-    else if (TaskListener.EVENTNAME_ASSIGNMENT.equals(eventName)) {
+    } else if (TaskListener.EVENTNAME_ASSIGNMENT.equals(eventName)) {
       type = BusinessProcessEventType.ASSIGN_TASK;
-    }
-    else if (TaskListener.EVENTNAME_COMPLETE.equals(eventName)) {
+    } else if (TaskListener.EVENTNAME_COMPLETE.equals(eventName)) {
       type = BusinessProcessEventType.COMPLETE_TASK;
-    }
-    else if (TaskListener.EVENTNAME_DELETE.equals(eventName)) {
+    } else if (TaskListener.EVENTNAME_DELETE.equals(eventName)) {
       type = BusinessProcessEventType.DELETE_TASK;
     }
 
     return new CdiBusinessProcessEvent(task, processDefinition, type, ClockUtil.getCurrentTime());
   }
-
 
   protected BeanManager getBeanManager() {
     BeanManager bm = BeanManagerLookup.getBeanManager();
@@ -132,34 +149,78 @@ public class CdiEventListener implements TaskListener, ExecutionListener, Serial
     return bm;
   }
 
-  protected Annotation[] getQualifiers(BusinessProcessEvent event) {
-    ProcessDefinition processDefinition = event.getProcessDefinition();
-    List<Annotation> annotations = new ArrayList<Annotation>();
+  protected List<List<Annotation>> getQualifiers(BusinessProcessEvent event) {
+    final ProcessDefinition processDefinition = event.getProcessDefinition();
+
+    final List<Annotation> withActivityName = new ArrayList<Annotation>();
+    final List<Annotation> withoutActivityName = new ArrayList<Annotation>();
+
+    final List<List<Annotation>> both = new ArrayList<List<Annotation>>() {
+      {
+        add(withActivityName);
+        add(withoutActivityName);
+      }
+    };
+
     if (processDefinition != null) {
-      annotations.add(new BusinessProcessDefinitionLiteral(processDefinition.getKey()));
+      final BusinessProcessDefinitionLiteral processDefinitionLiteral = new BusinessProcessDefinitionLiteral(processDefinition.getKey());
+      withActivityName.add(processDefinitionLiteral);
+      withoutActivityName.add(processDefinitionLiteral);
     }
 
     if (event.getType() == BusinessProcessEventType.TAKE) {
+<<<<<<< HEAD
+      withActivityName.add(new TakeTransitionLiteral(event.getTransitionName()));
+      withoutActivityName.add(new TakeTransitionLiteral());
+    } else if (event.getType() == BusinessProcessEventType.START_ACTIVITY) {
+      withActivityName.add(new StartActivityLiteral(event.getActivityId()));
+      withoutActivityName.add(new StartActivityLiteral());
+    } else if (event.getType() == BusinessProcessEventType.END_ACTIVITY) {
+      withActivityName.add(new EndActivityLiteral(event.getActivityId()));
+      withoutActivityName.add(new EndActivityLiteral());
+    } else if (event.getType() == BusinessProcessEventType.CREATE_TASK) {
+      withActivityName.add(new CreateTaskLiteral(event.getTaskDefinitionKey()));
+      withoutActivityName.add(new CreateTaskLiteral());
+    } else if (event.getType() == BusinessProcessEventType.ASSIGN_TASK) {
+      withActivityName.add(new AssignTaskLiteral(event.getTaskDefinitionKey()));
+      withoutActivityName.add(new AssignTaskLiteral());
+    } else if (event.getType() == BusinessProcessEventType.COMPLETE_TASK) {
+      withActivityName.add(new CompleteTaskLiteral(event.getTaskDefinitionKey()));
+      withoutActivityName.add(new CompleteTaskLiteral());
+    } else if (event.getType() == BusinessProcessEventType.DELETE_TASK) {
+      withActivityName.add(new DeleteTaskLiteral(event.getTaskDefinitionKey()));
+      withoutActivityName.add(new DeleteTaskLiteral());
+    }
+    return both;
+=======
       annotations.add(new TakeTransitionLiteral(event.getTransitionName()));
+      annotations.add(new TakeTransitionLiteral(""));
     }
     else if (event.getType() == BusinessProcessEventType.START_ACTIVITY) {
       annotations.add(new StartActivityLiteral(event.getActivityId()));
+      annotations.add(new StartActivityLiteral(""));
     }
     else if (event.getType() == BusinessProcessEventType.END_ACTIVITY) {
       annotations.add(new EndActivityLiteral(event.getActivityId()));
+      annotations.add(new EndActivityLiteral(""));
     }
     else if (event.getType() == BusinessProcessEventType.CREATE_TASK) {
       annotations.add(new CreateTaskLiteral(event.getTaskDefinitionKey()));
+      annotations.add(new CreateTaskLiteral(""));
     }
     else if (event.getType() == BusinessProcessEventType.ASSIGN_TASK) {
       annotations.add(new AssignTaskLiteral(event.getTaskDefinitionKey()));
+      annotations.add(new AssignTaskLiteral(""));
     }
     else if (event.getType() == BusinessProcessEventType.COMPLETE_TASK) {
       annotations.add(new CompleteTaskLiteral(event.getTaskDefinitionKey()));
+      annotations.add(new CompleteTaskLiteral(""));
     }
     else if (event.getType() == BusinessProcessEventType.DELETE_TASK) {
       annotations.add(new DeleteTaskLiteral(event.getTaskDefinitionKey()));
+      annotations.add(new DeleteTaskLiteral(""));
     }
     return annotations.toArray(new Annotation[annotations.size()]);
+>>>>>>> 79016c5fba8ba634a9299e09cc7d7313cb905d3b
   }
 }

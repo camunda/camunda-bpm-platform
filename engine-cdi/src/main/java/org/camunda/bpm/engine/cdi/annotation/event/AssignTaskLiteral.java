@@ -19,11 +19,14 @@ public class AssignTaskLiteral extends AnnotationLiteral<AssignTask> implements 
 
   protected final String taskDefinitionKey;
 
+    public AssignTaskLiteral() {
+        this(null);
+    }
   public AssignTaskLiteral(String taskDefinitionKey) {
     this.taskDefinitionKey = taskDefinitionKey;
   }
   @Override
   public String value() {
-    return taskDefinitionKey != null ? taskDefinitionKey : "";
+    return taskDefinitionKey != null ? taskDefinitionKey : "*";
   }
 }

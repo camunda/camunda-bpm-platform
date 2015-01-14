@@ -32,5 +32,5 @@ import java.lang.annotation.RetentionPolicy;
 @Qualifier
 public @interface CreateTask {
   /** the definition key (id of the task in BPMN XML) of the task which was created */
-  public String value();
+  public String value() default "*";
 }

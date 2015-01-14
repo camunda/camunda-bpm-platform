@@ -87,6 +87,11 @@ public class EventNotificationTest extends CdiProcessEngineTestCase {
     assertEquals(0, listenerBean.getCompleteTaskUser1());
     assertEquals(0, listenerBean.getDeleteTaskUser1());
 
+      assertEquals(0, listenerBean.getCreatedTasks());
+    assertEquals(0, listenerBean.getAssignedTasks());
+    assertEquals(0, listenerBean.getCompletedTasks());
+    assertEquals(0, listenerBean.getDeletedTasks());
+
     // assert that the bean has received 0 events
     assertEquals(0, listenerBean.getEventsReceived().size());
     runtimeService.startProcessInstanceByKey("process1");
@@ -101,8 +106,13 @@ public class EventNotificationTest extends CdiProcessEngineTestCase {
     assertEquals(1, listenerBean.getCompleteTaskUser1());
     assertEquals(0, listenerBean.getDeleteTaskUser1());
 
+      assertEquals(1, listenerBean.getCreatedTasks());
+    assertEquals(1, listenerBean.getAssignedTasks());
+    assertEquals(1, listenerBean.getCompletedTasks());
+    assertEquals(0, listenerBean.getDeletedTasks());
+
     listenerBean.reset();
-    assertEquals(0, listenerBean.getDeleteTaskUser1());
+    assertEquals(0, listenerBean.getDeletedTasks());
 
     // assert that the bean has received 0 events
     assertEquals(0, listenerBean.getEventsReceived().size());
@@ -111,6 +121,7 @@ public class EventNotificationTest extends CdiProcessEngineTestCase {
     runtimeService.deleteProcessInstance(processInstance.getId(), "test");
 
     assertEquals(1, listenerBean.getDeleteTaskUser1());
+    assertEquals(1, listenerBean.getDeletedTasks());
   }
 
 }

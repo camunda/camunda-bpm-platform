@@ -32,5 +32,5 @@ import java.lang.annotation.RetentionPolicy;
 @Qualifier
 public @interface CompleteTask {
   /** the definition key (id of the task in BPMN XML) of the task which was completed */
-  public String value();
+  public String value() default "*";
 }

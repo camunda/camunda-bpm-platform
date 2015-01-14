@@ -16,8 +16,9 @@ import javax.enterprise.util.AnnotationLiteral;
 
 public class BusinessProcessDefinitionLiteral extends AnnotationLiteral<BusinessProcessDefinition> implements BusinessProcessDefinition {
   
-  protected final String key;   
-  
+  protected final String key;
+
+
   public BusinessProcessDefinitionLiteral(String key) {
     this.key = key;
   }

@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.cdi.test.impl.beans;
 import org.camunda.bpm.engine.cdi.annotation.CompleteTask;
 import org.camunda.bpm.engine.cdi.annotation.ProcessVariable;
 import org.camunda.bpm.engine.cdi.annotation.StartProcess;
+import org.camunda.bpm.engine.cdi.annotation.event.BusinessProcessDefinition;
 
 /**
  * 
