@@ -30,6 +30,8 @@ import org.camunda.bpm.cockpit.Cockpit;
 import org.camunda.bpm.cockpit.CockpitRuntimeDelegate;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.authorization.Groups;
+import org.camunda.bpm.tasklist.Tasklist;
+import org.camunda.bpm.tasklist.TasklistRuntimeDelegate;
 import org.camunda.bpm.webapp.impl.IllegalWebAppConfigurationException;
 import org.camunda.bpm.webapp.impl.filter.AbstractTemplateFilter;
 import org.camunda.bpm.webapp.impl.security.SecurityActions;
@@ -48,6 +50,7 @@ public class ProcessEnginesFilter extends AbstractTemplateFilter {
 
   protected static final String COCKPIT_APP_NAME = "cockpit";
   protected static final String ADMIN_APP_NAME = "admin";
+  protected static final String TASKLIST_APP_NAME = "tasklist";
 
   protected static final String DEFAULT_APP = COCKPIT_APP_NAME;
   protected static final String INDEX_PAGE = "index.html";
@@ -64,6 +67,7 @@ public class ProcessEnginesFilter extends AbstractTemplateFilter {
 
   protected final CockpitRuntimeDelegate cockpitRuntimeDelegate;
   protected final AdminRuntimeDelegate adminRuntimeDelegate;
+  protected final TasklistRuntimeDelegate tasklistRuntimeDelegate;
 
   // accepts two times the plugin name
   protected final String pluginPackageFormat;
@@ -74,6 +78,7 @@ public class ProcessEnginesFilter extends AbstractTemplateFilter {
   public ProcessEnginesFilter() {
     this.cockpitRuntimeDelegate = Cockpit.getRuntimeDelegate();
     this.adminRuntimeDelegate = Admin.getRuntimeDelegate();
+    this.tasklistRuntimeDelegate = Tasklist.getRuntimeDelegate();
     this.pluginPackageFormat = "{ name: '%s-plugin-%s', location: '%s/api/%s/plugin/%s/static/app', main: 'plugin.js' }";
     this.pluginDependencyFormat = "{ ngModuleName: '%s.plugin.%s', requirePackageName: '%s-plugin-%s' }";
   }
@@ -279,6 +284,9 @@ public class ProcessEnginesFilter extends AbstractTemplateFilter {
 
     } else if (ADMIN_APP_NAME.equals(appName)) {
       return (List<T>) adminRuntimeDelegate.getAppPluginRegistry().getPlugins();
+
+    } else if (TASKLIST_APP_NAME.equals(appName)) {
+        return (List<T>) tasklistRuntimeDelegate.getAppPluginRegistry().getPlugins();
 
     } else {
       return Collections.emptyList();

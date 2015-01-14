@@ -12,19 +12,21 @@
  */
 package org.camunda.bpm.cockpit.test.util;
 
+import java.io.File;
+
 import org.camunda.bpm.admin.Admin;
 import org.camunda.bpm.admin.plugin.spi.AdminPlugin;
 import org.camunda.bpm.admin.test.sample.simple.SimpleAdminPlugin;
-import org.camunda.bpm.cockpit.test.sample.TestProcessApplication;
-
-import java.io.File;
-
 import org.camunda.bpm.cockpit.Cockpit;
 import org.camunda.bpm.cockpit.core.test.util.TestContainer;
 import org.camunda.bpm.cockpit.plugin.spi.CockpitPlugin;
 import org.camunda.bpm.cockpit.plugin.test.application.TestProcessEngineProvider;
+import org.camunda.bpm.cockpit.test.sample.TestProcessApplication;
 import org.camunda.bpm.cockpit.test.sample.plugin.simple.SimpleCockpitPlugin;
 import org.camunda.bpm.engine.rest.spi.ProcessEngineProvider;
+import org.camunda.bpm.tasklist.Tasklist;
+import org.camunda.bpm.tasklist.plugin.spi.TasklistPlugin;
+import org.camunda.bpm.tasklist.test.sample.simple.SimpleTasklistPlugin;
 import org.camunda.bpm.webapp.AppRuntimeDelegate;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.exporter.ZipExporter;
@@ -133,6 +135,36 @@ public class DeploymentHelper {
     return archive;
   }
 
+  public static WebArchive getTasklistWar(String archiveName) {
+    String cockpitPkg = Cockpit.class.getPackage().getName();
+    String adminPkg = Admin.class.getPackage().getName();
+    String tasklistPkg = Tasklist.class.getPackage().getName();
+    String commonPkg = AppRuntimeDelegate.class.getPackage().getName();
+
+    final WebArchive archive =
+        ShrinkWrap
+          .create(WebArchive.class, archiveName)
+
+            .addPackages(true, commonPkg)
+
+            .addPackage(cockpitPkg)
+            .addPackages(true, cockpitPkg + ".db")
+            .addPackages(true, cockpitPkg + ".impl")
+            .addPackages(true, cockpitPkg + ".plugin")
+            .addPackages(true, cockpitPkg + ".test.sample.web")
+
+            .addPackages(true, adminPkg)
+
+            .addPackages(true, tasklistPkg)
+
+            .addAsLibraries(getMavenDependencies("org.camunda.bpm:camunda-engine-rest:jar:classes"))
+            .addAsServiceProvider(ProcessEngineProvider.class, TestProcessEngineProvider.class);
+
+
+    TestContainer.addContainerSpecificResources(archive);
+
+    return archive;
+  }
 
   public static JavaArchive getTestProcessArchiveAsFiles() {
     JavaArchive archive = ShrinkWrap.create(JavaArchive.class, "test-process-application.jar")
@@ -148,6 +180,13 @@ public class DeploymentHelper {
         .exportTo(new File("target/test-process-archive.jar"), true);
 
     return new File[] { new File("target/test-process-archive.jar") };
+  }
+
+  public static File[] getCockpitTestPluginJar() {
+    getCockpitTestPluginAsFiles().as(ZipExporter.class)
+        .exportTo(new File("target/test-plugin.jar"), true);
+
+    return new File[] { new File("target/test-plugin.jar") };
   }
 
   public static JavaArchive getCockpitTestPluginAsFiles() {
@@ -180,11 +219,21 @@ public class DeploymentHelper {
     return archive;
   }
 
-  public static File[] getCockpitTestPluginJar() {
-    getCockpitTestPluginAsFiles().as(ZipExporter.class)
+  public static File[] getTasklistTestPluginJar() {
+    getTasklistTestPluginAsFiles().as(ZipExporter.class)
         .exportTo(new File("target/test-plugin.jar"), true);
 
     return new File[] { new File("target/test-plugin.jar") };
+  }
+
+  public static JavaArchive getTasklistTestPluginAsFiles() {
+    JavaArchive archive = ShrinkWrap.create(JavaArchive.class, "test-plugin.jar")
+        .addPackages(true, SimpleTasklistPlugin.class.getPackage())
+        .addAsServiceProvider(TasklistPlugin.class, SimpleTasklistPlugin.class);
+
+    addFiles(archive, "plugin-webapp", new File("src/test/resources/plugin-webapp"));
+
+    return archive;
   }
 
   public static void addFiles(JavaArchive archive, String prefix, File dir) {
