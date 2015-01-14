@@ -12,13 +12,8 @@
  */
 package org.camunda.bpm.engine.cdi.impl;
 
-import java.util.Collection;
-import java.util.Map;
-import java.util.Set;
-
-import javax.inject.Inject;
-
 import org.camunda.bpm.engine.cdi.BusinessProcess;
+import org.camunda.bpm.engine.variable.value.TypedValue;
 
 /**
  * Allows to expose the process variables of the current business process as a
@@ -31,78 +26,20 @@ import org.camunda.bpm.engine.cdi.BusinessProcess;
  * 
  * @author Daniel Meyer
  */
-public class ProcessVariableMap implements Map<String, Object> {
-  
-  @Inject private BusinessProcess businessProcess;
+public class ProcessVariableMap extends AbstractVariableMap {
   
   @Override
-  public Object get(Object key) {
-    if(key == null) {
-      throw new IllegalArgumentException("This map does not support 'null' keys.");
-    }
-    return businessProcess.getVariable(key.toString());
+  protected Object getVariable(String variableName) {
+    return businessProcess.getVariable(variableName);
   }
 
   @Override
-  public Object put(String key, Object value) {
-    if(key == null) {
-      throw new IllegalArgumentException("This map does not support 'null' keys.");
-    }
-    Object variableBefore = businessProcess.getVariable(key);
-    businessProcess.setVariable(key, value);
-    return variableBefore;
-  }
-  
-  @Override
-  public void putAll(Map< ? extends String, ? extends Object> m) {
-    for (java.util.Map.Entry< ? extends String, ? extends Object> newEntry : m.entrySet()) {
-      businessProcess.setVariable(newEntry.getKey(), newEntry.getValue());      
-    }
+  protected <T extends TypedValue> T getVariableTyped(String variableName) {
+    return businessProcess.getVariableTyped(variableName);
   }
 
   @Override
-  public int size() {
-    throw new UnsupportedOperationException(ProcessVariableMap.class.getName()+".size() is not supported.");
+  protected void setVariable(String variableName, Object value) {
+    businessProcess.setVariable(variableName, value);
   }
-
-  @Override
-  public boolean isEmpty() {
-    throw new UnsupportedOperationException(ProcessVariableMap.class.getName()+".isEmpty() is not supported.");
-  }
-
-  @Override
-  public boolean containsKey(Object key) {
-    throw new UnsupportedOperationException(ProcessVariableMap.class.getName()+".containsKey() is not supported.");
-  }
-
-  @Override
-  public boolean containsValue(Object value) {
-    throw new UnsupportedOperationException(ProcessVariableMap.class.getName()+".containsValue() is not supported.");
-  }
-
-  @Override
-  public Object remove(Object key) {
-    throw new UnsupportedOperationException("ProcessVariableMap.remove is unsupported. Use ProcessVariableMap.put(key, null)");    
-  }
-
-  @Override
-  public void clear() {
-    throw new UnsupportedOperationException(ProcessVariableMap.class.getName()+".clear() is not supported.");
-  }
-
-  @Override
-  public Set<String> keySet() {
-    throw new UnsupportedOperationException(ProcessVariableMap.class.getName()+".keySet() is not supported.");
-  }
-
-  @Override
-  public Collection<Object> values() {
-    throw new UnsupportedOperationException(ProcessVariableMap.class.getName()+".values() is not supported.");
-  }
-
-  @Override
-  public Set<java.util.Map.Entry<String, Object>> entrySet() {
-    throw new UnsupportedOperationException(ProcessVariableMap.class.getName()+".entrySet() is not supported.");
-  }
-
 }

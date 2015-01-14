@@ -23,8 +23,11 @@ import javax.inject.Named;
 
 import org.camunda.bpm.engine.cdi.annotation.ProcessVariable;
 import org.camunda.bpm.engine.cdi.annotation.ProcessVariableLocal;
+import org.camunda.bpm.engine.cdi.annotation.Typed;
 import org.camunda.bpm.engine.cdi.impl.ProcessVariableLocalMap;
 import org.camunda.bpm.engine.cdi.impl.ProcessVariableMap;
+import org.camunda.bpm.engine.variable.VariableMap;
+import org.camunda.bpm.engine.variable.value.TypedValue;
 
 /**
  * Allows to access the process variables of a managed process instance.
@@ -61,8 +64,27 @@ public class ProcessVariables {
   }
 
   @Produces
+  @ProcessVariable
+  @Typed
+  protected TypedValue getProcessVariableTyped(InjectionPoint ip) {
+    String processVariableName = getVariableName(ip);
+
+    if (logger.isLoggable(Level.FINE)) {
+      logger.fine("Getting typed process variable '" + processVariableName + "' from ProcessInstance[" + businessProcess.getProcessInstanceId() + "].");
+    }
+
+    return businessProcess.getVariableTyped(processVariableName);
+  }
+
+  @Produces
   @Named
   protected Map<String, Object> processVariables() {
+    return processVariableMap;     
+  }
+  
+  @Produces
+  @Named
+  protected VariableMap processVariableMap() {
     return processVariableMap;     
   }
   
@@ -87,8 +109,27 @@ public class ProcessVariables {
   }
 
   @Produces
+  @ProcessVariableLocal
+  @Typed
+  protected TypedValue getProcessVariableLocalTyped(InjectionPoint ip) {
+    String processVariableName = getVariableLocalName(ip);
+
+    if (logger.isLoggable(Level.FINE)) {
+      logger.fine("Getting local typed process variable '" + processVariableName + "' from ProcessInstance[" + businessProcess.getProcessInstanceId() + "].");
+    }
+
+    return businessProcess.getVariableLocalTyped(processVariableName);
+  }
+
+  @Produces
   @Named
   protected Map<String, Object> processVariablesLocal() {
+    return processVariableLocalMap;     
+  }
+
+  @Produces
+  @Named
+  protected VariableMap processVariableMapLocal() {
     return processVariableLocalMap;     
   }
 

@@ -15,7 +15,6 @@ package org.camunda.bpm.engine.cdi.impl.context;
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -33,11 +32,14 @@ import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.cdi.ProcessEngineCdiException;
 import org.camunda.bpm.engine.cdi.impl.util.ProgrammaticBeanLookup;
+import org.camunda.bpm.engine.impl.context.BpmnExecutionContext;
 import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.context.ExecutionContext;
+import org.camunda.bpm.engine.impl.core.variable.VariableMapImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.task.Task;
+import org.camunda.bpm.engine.variable.VariableMap;
+import org.camunda.bpm.engine.variable.value.TypedValue;
 
 /**
  * Default implementation of the business process association manager. Uses a
@@ -62,8 +64,8 @@ public class DefaultContextAssociationManager implements ContextAssociationManag
     @Inject
     private TaskService taskService;
 
-    protected Map<String, Object> cachedVariables = new HashMap<String, Object>();
-    protected Map<String, Object> cachedVariablesLocal = new HashMap<String, Object>();
+    protected VariableMap cachedVariables = new VariableMapImpl();
+    protected VariableMap cachedVariablesLocal = new VariableMapImpl();
     protected Execution execution;
     protected Task task;
 
@@ -84,10 +86,15 @@ public class DefaultContextAssociationManager implements ContextAssociationManag
     }
 
     public <T> T getVariable(String variableName) {
-      Object value = cachedVariables.get(variableName);
+      TypedValue variableTyped = getVariableTyped(variableName);
+      return variableTyped != null ? (T) variableTyped.getValue() : null;
+    }
+
+    public <T extends TypedValue> T getVariableTyped(String variableName) {
+      TypedValue value = cachedVariables.getValueTyped(variableName);
       if(value == null) {
         if(execution != null) {
-          value = runtimeService.getVariable(execution.getId(), variableName);
+          value = runtimeService.getVariableTyped(execution.getId(), variableName);
           cachedVariables.put(variableName, value);
         }
       }
@@ -98,18 +105,23 @@ public class DefaultContextAssociationManager implements ContextAssociationManag
       cachedVariables.put(variableName, value);
     }
 
-    public Map<String, Object> getCachedVariables() {
+    public VariableMap getCachedVariables() {
       return cachedVariables;
     }
 
     public <T> T getVariableLocal(String variableName) {
-      Object value = cachedVariablesLocal.get(variableName);
+      TypedValue variableTyped = getVariableLocalTyped(variableName);
+      return variableTyped != null ? (T) variableTyped.getValue() : null;
+    }
+
+    public <T extends TypedValue> T getVariableLocalTyped(String variableName) {
+      TypedValue value = cachedVariablesLocal.getValueTyped(variableName);
       if (value == null) {
         if (task != null) {
-          value = taskService.getVariableLocal(task.getId(), variableName);
+          value = taskService.getVariableLocalTyped(task.getId(), variableName);
           cachedVariablesLocal.put(variableName, value);
         } else if (execution != null) {
-          value = runtimeService.getVariableLocal(execution.getId(), variableName);
+          value = runtimeService.getVariableLocalTyped(execution.getId(), variableName);
           cachedVariablesLocal.put(variableName, value);
         }
       }
@@ -120,11 +132,10 @@ public class DefaultContextAssociationManager implements ContextAssociationManag
       if (execution == null && task == null) {
         throw new ProcessEngineCdiException("Cannot set a local cached variable: neither a Task nor an Execution is associated.");
       }
-
       cachedVariablesLocal.put(variableName, value);
     }
 
-    public Map<String, Object> getCachedVariablesLocal() {
+    public VariableMap getCachedVariablesLocal() {
       return cachedVariablesLocal;
     }
 
@@ -255,6 +266,16 @@ public class DefaultContextAssociationManager implements ContextAssociationManag
   }
 
   @Override
+  public TypedValue getVariableTyped(String variableName) {
+    ExecutionEntity execution = getExecutionFromContext();
+    if (execution != null) {
+      return execution.getVariableTyped(variableName);
+    } else {
+      return getScopedAssociation().getVariableTyped(variableName);
+    }
+  }
+
+  @Override
   public void setVariable(String variableName, Object value) {
     ExecutionEntity execution = getExecutionFromContext();
     if(execution != null) {
@@ -276,6 +297,16 @@ public class DefaultContextAssociationManager implements ContextAssociationManag
   }
 
   @Override
+  public TypedValue getVariableLocalTyped(String variableName) {
+    ExecutionEntity execution = getExecutionFromContext();
+    if (execution != null) {
+      return execution.getVariableLocalTyped(variableName);
+    } else {
+      return getScopedAssociation().getVariableLocalTyped(variableName);
+    }
+  }
+
+  @Override
   public void setVariableLocal(String variableName, Object value) {
     ExecutionEntity execution = getExecutionFromContext();
     if(execution != null) {
@@ -288,7 +319,7 @@ public class DefaultContextAssociationManager implements ContextAssociationManag
 
   protected ExecutionEntity getExecutionFromContext() {
     if(Context.getCommandContext() != null) {
-      ExecutionContext executionContext = Context.getExecutionContext();
+      BpmnExecutionContext executionContext = Context.getBpmnExecutionContext();
       if(executionContext != null) {
         return executionContext.getExecution();
       }
@@ -306,14 +337,24 @@ public class DefaultContextAssociationManager implements ContextAssociationManag
     getScopedAssociation().setTask(task);
   }
 
-  public Map<String, Object> getCachedVariables() {
+  public VariableMap getCachedVariableMap() {
     ensureCommandContextNotActive();
     return getScopedAssociation().getCachedVariables();
   }
 
-  public Map<String, Object> getCachedVariablesLocal() {
+  @Deprecated
+  public Map<String, Object> getCachedVariables() {
+    return getCachedVariableMap();
+  }
+
+  public VariableMap getCachedLocalVariableMap() {
     ensureCommandContextNotActive();
     return getScopedAssociation().getCachedVariablesLocal();
+  }
+
+  @Deprecated
+  public Map<String, Object> getCachedVariablesLocal() {
+    return getCachedLocalVariableMap();
   }
 
   public void flushVariableCache() {
