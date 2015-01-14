@@ -131,6 +131,12 @@ public abstract class ProcessEngineConfiguration {
   protected String history = HISTORY_AUDIT;
   protected boolean jobExecutorActivate;
   protected boolean jobExecutorDeploymentAware = false;
+  
+  /**
+   * The flag will be used inside the method "JobManager#send()". It will be used to decide whether to notify the 
+   * job executor that a new job has been created. It will be used for performance improvement, so that the new job could 
+   * be executed in some situations immediately.
+   */ 
   protected boolean hintJobExecutor = true;
 
   protected String mailServerHost = "localhost";
