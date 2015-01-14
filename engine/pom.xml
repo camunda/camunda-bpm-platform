@@ -716,6 +716,23 @@
        </dependencies>
     </profile>
 
+    <profile>
+      <id>informix</id>
+      <activation>
+        <property>
+          <name>database</name>
+          <value>informix</value>
+        </property>
+      </activation>
+      <dependencies>
+        <dependency>
+          <groupId>com.ibm.informix.jdbc</groupId>
+          <artifactId>ifxjdbc</artifactId>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
+    </profile>
+
     <!-- check for api differences between latest minor release -->
     <profile>
       <id>check-api-compatibility</id>

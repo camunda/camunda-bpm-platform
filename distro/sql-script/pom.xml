@@ -112,6 +112,10 @@
                   <filelist dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/create" files="activiti.postgres.create.engine.sql activiti.postgres.create.case.engine.sql activiti.postgres.create.history.sql activiti.postgres.create.case.history.sql" />
                 </concat>
 
+                <concat destfile="target/sql/create/informix_engine_${project.version}.sql" fixlastline="yes">
+                  <filelist dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/create" files="activiti.informix.create.engine.sql activiti.informix.create.case.engine.sql activiti.informix.create.history.sql activiti.informix.create.case.history.sql" />
+                </concat>
+
                 <copy todir="target/sql/create" flatten="false">
                   <fileset dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/create" />
                   <mapper>
@@ -147,6 +151,10 @@
 
                 <concat destfile="target/sql/drop/postgres_engine_${project.version}.sql" fixlastline="yes">
                   <filelist dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/drop" files="activiti.postgres.drop.case.engine.sql activiti.postgres.drop.engine.sql activiti.postgres.drop.case.history.sql activiti.postgres.drop.history.sql" />
+                </concat>
+
+                <concat destfile="target/sql/drop/informix_engine_${project.version}.sql" fixlastline="yes">
+                  <filelist dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/drop" files="activiti.informix.drop.case.engine.sql activiti.informix.drop.engine.sql activiti.informix.drop.case.history.sql activiti.informix.drop.history.sql" />
                 </concat>
 
                 <copy todir="target/sql/drop" flatten="false">
