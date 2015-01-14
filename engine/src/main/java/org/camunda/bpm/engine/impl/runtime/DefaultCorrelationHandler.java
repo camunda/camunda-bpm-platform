@@ -99,7 +99,7 @@ public class DefaultCorrelationHandler implements CorrelationHandler {
       query.messageEventSubscription();
     }
 
-    // query only after active executions
+    // restrict to active executions
     query.active();
 
     List<Execution> matchingExecutions = query.evaluateExpressionsAndExecuteList(commandContext, null);
