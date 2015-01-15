@@ -24,43 +24,73 @@
             <p ng-if="!group">
               <i class="glyphicon glyphicon-loading"></i> loading group...
             </p>
-            <form class="form-horizontal" name="editGroupForm" ng-if="group">
+            <form class="form-horizontal"
+                  name="editGroupForm"
+                  ng-if="group">
 
               <legend>Group</legend>
 
               <div class="form-group">
-                <label class="control-label" for="inputName">Group Name*</label>
-                <div class="controls">
-                  <input id="inputName" name="groupName" type="text" ng-model="group.name" novalidate required ng-disabled="!availableOperations.update"></input>
-                  <p class="text-danger" ng-show="createGroupForm.groupName.$error.required">Name is required.</p>
+                <label class="control-label col-sm-4"
+                       for="inputName">Group Name*</label>
+
+                <div class="col-sm-8">
+                  <input id="inputName"
+                         name="groupName"
+                         class="form-control"
+                         type="text"
+                         ng-model="group.name"
+                         novalidate
+                         required
+                         ng-disabled="!availableOperations.update" />
+
+                  <p class="text-danger"
+                     ng-show="createGroupForm.groupName.$error.required">
+                    Name is required.
+                  </p>
                 </div>
               </div>
 
               <div class="form-group">
-                <label class="control-label" for="inputType">Group Type</label>
-                <div class="controls">
-                  <input id="inputType" name="groupType" type="text" ng-model="group.type" ng-disabled="!availableOperations.update"></input>
+                <label class="control-label col-sm-4"
+                       for="inputType">Group Type</label>
+
+                <div class="col-sm-8">
+                  <input id="inputType"
+                         name="groupType"
+                         class="form-control"
+                         type="text"
+                         ng-model="group.type"
+                         ng-disabled="!availableOperations.update" />
                 </div>
               </div>
 
-              <div class="form-group" ng-show="availableOperations.update">
-                <div class="controls">
-                  <button type="submit" class="btn"  data-ng-disabled="!canSubmit(editGroupForm, 'group')" data-ng-click="updateGroup()">Update Group</button>
+              <div class="form-group"
+                   ng-show="availableOperations.update">
+                <div class="col-sm-8 col-sm-offset-4">
+                  <button type="submit"
+                          class="btn"
+                          data-ng-disabled="!canSubmit(editGroupForm, 'group')"
+                          data-ng-click="updateGroup()">Update Group</button>
                 </div>
               </div>
 
             </form>
           </div>
-          <div class="box" ng-show="availableOperations.delete">
+
+          <div class="box"
+               ng-show="availableOperations.delete">
             <form class="form-horizontal">
 
               <legend>Delete Group</legend>
+
               <div class="alert alert-danger">
                 <strong>Warning:</strong> deleting a group cannot be undone.
               </div>
 
-              <button type="submit" class="btn btn-danger" data-ng-click="deleteGroup()">Delete Group</button>
-
+              <button type="submit"
+                      class="btn btn-danger"
+                      data-ng-click="deleteGroup()">Delete Group</button>
             </form>
           </div>
         </div>

@@ -6,36 +6,64 @@
         <h1>Create New Group</h1>
       </div>
     </div>
+
     <div class="row">
-      <form class="form-horizontal" name="createGroupForm">
+      <form class="form-horizontal"
+            name="createGroupForm">
 
         <div class="form-group">
-          <label class="control-label" for="inputGroupId">Group Id*</label>
-          <div class="controls">
-            <input id="inputGroupId" name="groupId" type="text" ng-model="group.id" novalidate required></input>
-            <span class="help-inline" ng-show="createGroupForm.groupId.$error.required">Group Id is required.</span>
+          <label class="control-label col-sm-4"
+                 for="inputGroupId">Group Id*</label>
+
+          <div class="col-sm-8">
+            <input id="inputGroupId"
+                   name="groupId"
+                   class="form-control"
+                   type="text"
+                   ng-model="group.id"
+                   novalidate required />
+            <span class="help-inline"
+                ng-show="createGroupForm.groupId.$error.required">Group Id is required.</span>
           </div>
         </div>
 
         <div class="form-group">
-          <label class="control-label" for="inputName">Group Name*</label>
-          <div class="controls">
-            <input id="inputName" name="groupName" type="text" ng-model="group.name" novalidate required></input>
-            <span class="help-inline" ng-show="createGroupForm.groupName.$error.required">Name is required.</span>
+          <label class="control-label col-sm-4"
+                 for="inputName">Group Name*</label>
+
+          <div class="col-sm-8">
+            <input id="inputName"
+                   name="groupName"
+                   type="text"
+                   class="form-control"
+                   ng-model="group.name"
+                   novalidate required />
+            <span class="help-inline"
+                  ng-show="createGroupForm.groupName.$error.required">Name is required.</span>
           </div>
         </div>
 
         <div class="form-group">
-          <label class="control-label" for="inputType">Group Type</label>
-          <div class="controls">
-            <input id="inputType" name="groupType" type="text" ng-model="group.type"></input>
+          <label class="control-label col-sm-4"
+                 for="inputType">Group Type</label>
+          <div class="col-sm-8">
+            <input id="inputType"
+                   name="groupType"
+                   class="form-control"
+                   type="text"
+                   ng-model="group.type" />
           </div>
         </div>
 
         <div class="form-group">
-          <div class="controls">
-            <a class="btn" href="#/groups">Cancel</a>
-            <button type="submit" class="btn btn-primary"  data-ng-disabled="!createGroupForm.$valid" data-ng-click="createGroup()">Create new Group</button>
+          <div class="col-sm-8 col-sm-offset-4">
+            <a class="btn"
+               href="#/groups">Cancel</a>
+
+            <button type="submit"
+                    class="btn btn-primary"
+                    data-ng-disabled="!createGroupForm.$valid"
+                    data-ng-click="createGroup()">Create new Group</button>
           </div>
         </div>
 

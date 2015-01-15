@@ -36,12 +36,15 @@
 </div>
 
 <div class="modal-footer">
-  <button class="btn" ng-click="close()"
+  <button class="btn"
+          ng-click="close()"
           ng-disabled="status === 'performCreate'"
           ng-hide="status === 'SUCCESS' || status === 'FAILED'">Close</button>
-  <button class="btn btn-primary" ng-click="close(status)"
+  <button class="btn btn-primary"
+          ng-click="close(status)"
           ng-show="status === 'SUCCESS' || status === 'FAILED'">OK</button>
-  <button class="btn btn-primary" ng-click="performDelete()"
+  <button class="btn btn-primary"
+          ng-click="performDelete()"
           ng-hide="status === 'SUCCESS' || status === 'FAILED'">Delete</button>
 
 </div>

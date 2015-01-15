@@ -1,5 +1,6 @@
 <!-- # CE - camunda-admin-ui/client/scripts/pages/authorizations.html -->
-<div class="container" ng-cloak>
+<div class="container"
+     ng-cloak>
   <section id="groups">
     <div class="row">
       <div class="page-header">
@@ -11,7 +12,8 @@
         <div class="well sidebar-nav">
           <ul class="nav nav-list">
             <li class="nav-header">Resources</li>
-            <li ng-class="activeClass('resource='+res.id)" ng-repeat="res in resourceList | orderBy:'name':false">
+            <li ng-class="activeClass('resource='+res.id)"
+                ng-repeat="res in resourceList | orderBy:'name':false">
               <a href="#/authorization/?resource={{res.id}}">{{res.name}}</a>
             </li>
           </ul>
@@ -23,7 +25,9 @@
         <div>
           <div class="box auth-box">
 
-          <form class="form-horizontal" name="createAuthForm" ng-controller="AuthorizationCreateController">
+          <form class="form-horizontal"
+                name="createAuthForm"
+                ng-controller="AuthorizationCreateController">
 
           <legend>{{title}} Authorizations</legend>
 
@@ -60,15 +64,20 @@
                       {{authorization.resourceId}}
                     </td>
                     <td>
-                      <a class="btn btn-link btn-sm" ng-click="deleteAuthorization(authorization)">
+                      <a class="btn btn-link btn-sm"
+                        ng-click="deleteAuthorization(authorization)">
                         delete</a>
                     </td>
                   </tr>
 
-                  <tr class="warning" id="createNew" ng-show="isCreateNewAuthorization">
+                  <tr class="warning"
+                      id="createNew"
+                      ng-show="isCreateNewAuthorization">
 
                     <td class="inline-edit">
-                      <select id="selectType" ng-model="newAuthorization.type" class="select-auth-type">
+                      <select id="selectType"
+                              ng-model="newAuthorization.type"
+                              class="select-auth-type form-control">
                         <option value="0">GLOBAL</option>
                         <option value="1">ALLOW</option>
                         <option value="2">DENY</option>
@@ -79,8 +88,8 @@
                       <div class="input-group">
                         <div class="btn-group dropdown">
                           <a class="btn btn-default dropdown-toggle select-identity-type"
-                            ng-disabled="isIdentityIdDisabled()"
-                            data-toggle="dropdown">
+                             ng-disabled="isIdentityIdDisabled()"
+                             data-toggle="dropdown">
                             {{identityType}}
                             <span class="caret"></span>
                           </a>
@@ -93,47 +102,67 @@
                             </li>
                           </ul>
                         </div>
-                        <input type="text" id="inputIdentityId"
-                           class="input-auth-name"
-                           placeholder="User / Group Id"
-                           ng-disabled="isIdentityIdDisabled()"
-                           ng-model="identityId"
-                           required></input>
+
+                        <input type="text"
+                               id="inputIdentityId"
+                               class="input-auth-name form-control"
+                               placeholder="User / Group Id"
+                               ng-disabled="isIdentityIdDisabled()"
+                               ng-model="identityId"
+                               required />
                       </div>
                     </td>
 
                     <td class="inline-edit">
                       <div class="input-group">
-                      <span id="selectPermission" class="input-xlarge uneditable-input col-md-2 permissions-editor">
-                        <a ng-click="addAllPermissions()" ng-show="selectedPermissions != 'ALL'"><i class="glyphicon glyphicon-remove"></i></a>
+                      <span id="selectPermission"
+                            class="input-xlarge uneditable-input col-md-2 permissions-editor">
+                        <a ng-click="addAllPermissions()"
+                           ng-show="selectedPermissions != 'ALL'">
+                          <i class="glyphicon glyphicon-remove"></i>
+                        </a>
+
                         {{formatPermissions(selectedPermissions)}}
                       </span>
+
                       <div class="btn-group dropdown">
                         <a class="btn btn-default dropdown-toggle"
                            data-toggle="dropdown">
                           <i class="glyphicon glyphicon-pencil"></i>
                         </a>
+
                         <ul class="dropdown-menu">
-                          <li ng-repeat="perm in availablePermissions"><a ng-click="addPermission(perm)">{{perm}}</a></li>
+                          <li ng-repeat="perm in availablePermissions">
+                            <a ng-click="addPermission(perm)">{{perm}}</a>
+                          </li>
                         </ul>
                       </div>
                     </td>
 
                     <td class="inline-edit">
-                      <input type="text" id="inputResourceId" ng-model="newAuthorization.resourceId" class="in-place-edit"
-                      required></input>
-                      <span ng-show="selectedResourceType==0" class="text-muted">(cockpit or tasklist or *)</span>
+                      <input type="text"
+                             id="inputResourceId"
+                             ng-model="newAuthorization.resourceId"
+                             class="in-place-edit form-control"
+                             required />
+
+                      <span ng-show="selectedResourceType==0"
+                            class="text-muted">(cockpit or tasklist or *)</span>
                     </td>
 
                     <td>
                       <div class="btn-group">
-                        <button type="submit" class="btn btn-primary" ng-disabled="createAuthForm.$invalid" ng-click="createAuthorization()">
+                        <button type="submit"
+                                class="btn btn-primary"
+                                ng-disabled="createAuthForm.$invalid"
+                                ng-click="createAuthorization()">
                             <i class="glyphicon glyphicon-ok "></i>
                         </button>
 
-                        <a type="submit" class="btn"
-                          ng-click="toggleCreateNewForm()">
-                            <i class="glyphicon glyphicon-ban-circle"></i>
+                        <a type="submit"
+                           class="btn"
+                           ng-click="toggleCreateNewForm()">
+                          <i class="glyphicon glyphicon-ban-circle"></i>
                         </a>
                       </div>
 
@@ -143,7 +172,7 @@
                   <tr ng-hide="isCreateNewAuthorization">
                     <td colspan="5">
                       <a class="btn btn-link"
-                        ng-click="toggleCreateNewForm()">
+                         ng-click="toggleCreateNewForm()">
                         <i class="glyphicon glyphicon-plus"></i> Create New
                       </a>
                     </td>

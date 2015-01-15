@@ -1,5 +1,6 @@
 <!-- # CE - camunda-admin-ui/client/scripts/pages/system.html -->
-<div class="container" ng-cloak>
+<div class="container"
+     ng-cloak>
   <section id="groups">
     <div class="row">
       <div class="page-header">
@@ -12,8 +13,11 @@
           <ul class="nav nav-list">
             <li class="nav-header">Categrories</li>
 
-            <li ng-class="activeClass('section='+systemSettingsProvider.id)" ng-repeat="systemSettingsProvider in systemSettingsProviders">
-              <a href="#/system/?section={{systemSettingsProvider.id}}">{{systemSettingsProvider.label}}</a>
+            <li ng-class="activeClass('section='+systemSettingsProvider.id)"
+                ng-repeat="systemSettingsProvider in systemSettingsProviders">
+              <a href="#/system/?section={{systemSettingsProvider.id}}">
+                {{systemSettingsProvider.label}}
+              </a>
             </li>
           </ul>
         </div>

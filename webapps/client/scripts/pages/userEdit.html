@@ -6,6 +6,7 @@
         <h1><i class="glyphicon glyphicon-user-large"></i> {{user.firstName}} {{user.lastName}}</h1>
       </div>
     </div>
+
     <div class="row">
       <div class="col-md-3">
         <div class="well sidebar-nav">
@@ -13,7 +14,8 @@
             <li ng-class="activeClass('profile')">
               <a href="#/users/{{user.id | escape}}?tab=profile">Profile</a>
             </li>
-            <li ng-class="activeClass('account')" ng-show="availableOperations.update">
+            <li ng-class="activeClass('account')"
+                ng-show="availableOperations.update">
               <a href="#/users/{{user.id | escape}}?tab=account">Account</a>
             </li>
             <li ng-class="activeClass('groups')">
@@ -30,39 +32,83 @@
             <p ng-if="!profile">
               <i class="glyphicon glyphicon-loading"></i> loading profile...
             </p>
-            <form class="form-horizontal" name="editProfileForm" ng-if="profile">
+
+            <form class="form-horizontal"
+                  name="editProfileForm"
+                  ng-if="profile">
 
               <legend>Profile</legend>
 
               <div>
 
                 <div class="form-group">
-                  <label class="control-label" for="inputFirstname">Firstname*</label>
-                  <div class="controls">
-                    <input id="inputFirstname" name="firstname" type="text" ng-model="profile.firstName" novalidate required ng-disabled="!availableOperations.update"></input>
-                    <p class="help-block" ng-show="editProfileForm.firstname.$error.required">Firstname is required.</p>
+                  <label class="control-label col-sm-4"
+                         for="inputFirstname">Firstname*</label>
+
+                  <div class="col-sm-8">
+                    <input id="inputFirstname"
+                           name="firstname"
+                           class="form-control"
+                           type="text"
+                           ng-model="profile.firstName"
+                           ng-disabled="!availableOperations.update"
+                           novalidate
+                           required/>
+
+                    <p class="help-block"
+                       ng-show="editProfileForm.firstname.$error.required">
+                      Firstname is required.
+                    </p>
                   </div>
                 </div>
 
                 <div class="form-group">
-                  <label class="control-label" for="inputLastname">Lastname*</label>
-                  <div class="controls">
-                    <input id="inputLastname" type="text" ng-model="profile.lastName" novalidate required ng-disabled="!availableOperations.update"></input>
-                    <p class="help-block" ng-show="editProfileForm.firstname.$error.required">Lastname is required.</p>
+                  <label class="control-label col-sm-4"
+                         for="inputLastname">Lastname*</label>
+
+                  <div class="col-sm-8">
+                    <input id="inputLastname"
+                           type="text"
+                           class="form-control"
+                           ng-model="profile.lastName"
+                           ng-disabled="!availableOperations.update"
+                           novalidate
+                           required />
+
+                    <p class="help-block"
+                       ng-show="editProfileForm.firstname.$error.required">
+                      Lastname is required.
+                    </p>
                   </div>
                 </div>
 
                 <div class="form-group">
-                  <label class="control-label" for="inputEmail">Email</label>
-                  <div class="controls">
-                    <input id="inputEmail" name="email" type="text" ng-model="profile.email" data-email ng-disabled="!availableOperations.update"></input>
-                    <p class="help-block" ng-show="editProfileForm.email.$error.email">Not a valid email address</p>
+                  <label class="control-label col-sm-4"
+                         for="inputEmail">Email</label>
+
+                  <div class="col-sm-8">
+                    <input id="inputEmail"
+                           name="email"
+                           class="form-control"
+                           type="text"
+                           ng-model="profile.email"
+                           ng-disabled="!availableOperations.update"
+                           data-email />
+
+                    <p class="help-block"
+                       ng-show="editProfileForm.email.$error.email">
+                      Not a valid email address.
+                    </p>
                   </div>
                 </div>
 
-                <div class="form-group" ng-show="availableOperations.update">
-                  <div class="controls">
-                    <button type="submit" class="btn"  data-ng-disabled="!canSubmit(editProfileForm, 'profile')" data-ng-click="updateProfile()">Update Profile</button>
+                <div class="form-group"
+                     ng-show="availableOperations.update">
+                  <div class="col-sm-8 col-sm-offset-4">
+                    <button type="submit"
+                            class="btn"
+                            data-ng-disabled="!canSubmit(editProfileForm, 'profile')"
+                            data-ng-click="updateProfile()">Update Profile</button>
                   </div>
                 </div>
 
@@ -72,47 +118,86 @@
           </div>
         </div>
 
-        <div ng-show="show('account')" ng-show="availableOperations.update">
+        <div ng-show="show('account')"
+            ng-show="availableOperations.update">
           <div class="box">
-            <form class="form-horizontal" name="updateCredentialsForm">
+            <form class="form-horizontal"
+                name="updateCredentialsForm">
 
               <legend>Change Password</legend>
 
               <p>Type a new password to change the existing account password.</p>
 
               <div class="form-group">
-                <label class="control-label" for="inputAuthenticationUserPassword" ng-if="userId === authenticatedUser">Old Password*:</label>
-                <label class="control-label" for="inputAuthenticationUserPassword" ng-if="userId !== authenticatedUser">My Password*:</label>
-                <div class="controls">
-                  <input id="inputAuthenticationUserPassword" name="inputAuthenticationUserPassword" type="password" ng-model="credentials.authenticatedUserPassword" required>
+                <label class="control-label col-sm-4"
+                    for="inputAuthenticationUserPassword"
+                    ng-if="userId === authenticatedUser">Old Password*:</label>
+                <label class="control-label col-sm-4"
+                    for="inputAuthenticationUserPassword"
+                    ng-if="userId !== authenticatedUser">My Password*:</label>
+
+                <div class="col-sm-8">
+                  <input id="inputAuthenticationUserPassword"
+                         name="inputAuthenticationUserPassword"
+                         class="form-control"
+                         type="password"
+                         ng-model="credentials.authenticatedUserPassword"
+                         required />
                 </div>
               </div>
 
               <div class="form-group">
-                <label class="control-label" for="inputPassword">New Password*:</label>
-                <div class="controls">
-                  <input id="inputPassword" name="inputPassword" type="password" ng-model="credentials.password" data-password required></input>
-                  <p class="text-danger" ng-show="updateCredentialsForm.inputPassword.$error.password">Password must have at least 8 characters.</p>
+                <label class="control-label col-sm-4"
+                       for="inputPassword">New Password*:</label>
+
+                <div class="col-sm-8">
+                  <input id="inputPassword"
+                         name="inputPassword"
+                         class="form-control"
+                         type="password"
+                         ng-model="credentials.password"
+                         data-password
+                         required />
+
+                  <p class="text-danger"
+                     ng-show="updateCredentialsForm.inputPassword.$error.password">
+                    Password must have at least 8 characters.
+                  </p>
                 </div>
               </div>
 
               <div class="form-group">
-                <label class="control-label" for="inputPasswordRepeat">New Password (repeat)*:</label>
-                <div class="controls">
-                  <input id="inputPasswordRepeat" name="inputPasswordRepeat" type="password" ng-model="credentials.password2" data-password-repeat="credentials.password"></input>
-                  <p class="text-danger" ng-show="updateCredentialsForm.inputPasswordRepeat.$error.passwordRepeat">Passwords must match.</p>
+                <label class="control-label col-sm-4"
+                    for="inputPasswordRepeat">New Password (repeat)*:</label>
+
+                <div class="col-sm-8">
+                  <input id="inputPasswordRepeat"
+                         name="inputPasswordRepeat"
+                         class="form-control"
+                         type="password"
+                         ng-model="credentials.password2"
+                         data-password-repeat="credentials.password" />
+
+                  <p class="text-danger"
+                     ng-show="updateCredentialsForm.inputPasswordRepeat.$error.passwordRepeat">
+                    Passwords must match.
+                  </p>
                 </div>
               </div>
 
               <div class="form-group">
-                <div class="controls">
-                  <button type="submit" class="btn" data-ng-click="updateCredentials()" data-ng-disabled="!canSubmit(updateCredentialsForm)">Change Password</button>
+                <div class="col-sm-8 col-sm-offset-4">
+                  <button type="submit"
+                          class="btn"
+                          data-ng-disabled="!canSubmit(updateCredentialsForm)"
+                          data-ng-click="updateCredentials()">Change Password</button>
                 </div>
               </div>
 
             </form>
           </div>
-          <div class="box" ng-show="availableOperations.delete">
+          <div class="box"
+               ng-show="availableOperations.delete">
             <form class="form-horizontal">
 
               <legend>Delete User</legend>
@@ -120,7 +205,9 @@
                 <strong>Warning:</strong> deleting a user account cannot be undone.
               </div>
 
-              <button type="submit" class="btn btn-danger" data-ng-click="deleteUser()">Delete User</button>
+              <button type="submit"
+                      class="btn btn-danger"
+                      data-ng-click="deleteUser()">Delete User</button>
 
             </form>
           </div>
@@ -129,15 +216,23 @@
         <div ng-show="show('groups')">
           <div class="box">
 
-            <form class="form-horizontal" name="updateGroupMemberships">
+            <form class="form-horizontal"
+                  name="updateGroupMemberships">
 
               <legend>{{user.firstName}} {{user.lastName}}&#39;s Groups</legend>
 
-              <div show-if-authorized auth-permission="CREATE" auth-resource-name="group membership">
-                <a class="btn btn-default pull-right" data-ng-click="openCreateGroupMembershipDialog()"><i class="glyphicon glyphicon-plus"></i> Add</a>
+              <div show-if-authorized
+                   auth-permission="CREATE"
+                   auth-resource-name="group membership">
+                <a class="btn btn-default pull-right"
+                   data-ng-click="openCreateGroupMembershipDialog()">
+                  <i class="glyphicon glyphicon-plus"></i>
+                  Add
+                </a>
               </div>
 
-              <table class="table" ng-hide="groupList.length == 0">
+              <table class="table table-condensed table-striped"
+                     ng-hide="groupList.length == 0">
                 <thead>
                   <tr>
                     <th><!-- icons --></th>
@@ -162,13 +257,16 @@
                       {{group.type}}
                     </td>
                     <td ng-show="availableOperations.removeGroup">
-                      <a class="btn btn-default btn-sm" data-ng-click="removeGroup(group.id)">Remove</a>
+                      <a class="btn btn-default btn-sm"
+                         data-ng-click="removeGroup(group.id)">Remove</a>
                     </td>
                   </tr>
                 </tbody>
               </table>
 
-              <p ng-show="groupList.length == 0">User {{user.firstName}} {{user.lastName}} is currently not member of any groups</p>
+              <p ng-show="groupList.length == 0">
+                User {{user.firstName}} {{user.lastName}} is currently not member of any groups
+              </p>
 
             </form>
           </div>
