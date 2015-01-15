@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions" 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:camunda="http://activiti.org/bpmn"
+  targetNamespace="Examples">
+
+  <process id="process">
+
+    <startEvent id="startEvent" />
+
+    <sequenceFlow id="flow1" sourceRef="startEvent" targetRef="pw1" />
+
+    <parallelGateway id="pw1" />
+
+    <sequenceFlow id="flow2" sourceRef="pw1" targetRef="userTask1" />
+
+    <userTask id="userTask1" />
+
+    <sequenceFlow id="flow3" sourceRef="userTask1" targetRef="endEvent1" />
+
+    <endEvent id="endEvent1" />
+
+    <sequenceFlow id="flow4" sourceRef="pw1" targetRef="userTask2" />
+
+    <userTask id="userTask2" />
+
+    <sequenceFlow id="flow5" sourceRef="userTask2" targetRef="endEvent2" />
+
+    <endEvent id="endEvent2" />
+
+  </process>
+
+</definitions>

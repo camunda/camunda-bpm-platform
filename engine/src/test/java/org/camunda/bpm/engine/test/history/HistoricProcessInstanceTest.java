@@ -330,13 +330,13 @@ public class HistoricProcessInstanceTest extends PluggableProcessEngineTestCase 
     assertEquals(1, historyService.createHistoricProcessInstanceQuery().orderByProcessDefinitionId().desc().count());
     assertEquals(1, historyService.createHistoricProcessInstanceQuery().orderByProcessInstanceBusinessKey().desc().count());
   }
-  
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/runtime/superProcess.bpmn20.xml", 
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/runtime/superProcess.bpmn20.xml",
       "org/camunda/bpm/engine/test/api/runtime/subProcess.bpmn20.xml"})
   public void testHistoricProcessInstanceSubProcess() {
-    ProcessInstance superPi = runtimeService.startProcessInstanceByKey("subProcessQueryTest");    
+    ProcessInstance superPi = runtimeService.startProcessInstanceByKey("subProcessQueryTest");
     ProcessInstance subPi = runtimeService.createProcessInstanceQuery().superProcessInstanceId(superPi.getProcessInstanceId()).singleResult();
-    
+
     HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().subProcessInstanceId(subPi.getProcessInstanceId()).singleResult();
     assertNotNull(historicProcessInstance);
     assertEquals(historicProcessInstance.getId(), superPi.getId());
@@ -638,7 +638,7 @@ public class HistoricProcessInstanceTest extends PluggableProcessEngineTestCase 
     assertEquals(caseInstanceId, secondInstance.getCaseInstanceId());
 
   }
- 
+
   @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
   public void testStartByIdWithCaseInstanceId() {
     String processDefinitionId = repositoryService
@@ -672,5 +672,37 @@ public class HistoricProcessInstanceTest extends PluggableProcessEngineTestCase 
 
     assertEquals(caseInstanceId, secondInstance.getCaseInstanceId());
 
+  }
+
+  @Deployment
+  public void testEndTimeAndEndActivity() {
+    // given
+    String processInstanceId = runtimeService.startProcessInstanceByKey("process").getId();
+
+    String taskId = taskService
+        .createTaskQuery()
+        .taskDefinitionKey("userTask2")
+        .singleResult()
+        .getId();
+
+    HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery();
+
+    // when (1)
+    taskService.complete(taskId);
+
+    // then (1)
+    HistoricProcessInstance historicProcessInstance = query.singleResult();
+
+    assertNull(historicProcessInstance.getEndActivityId());
+    assertNull(historicProcessInstance.getEndTime());
+
+    // when (2)
+    runtimeService.deleteProcessInstance(processInstanceId, null);
+
+    // then (2)
+    historicProcessInstance = query.singleResult();
+
+    assertNull(historicProcessInstance.getEndActivityId());
+    assertNotNull(historicProcessInstance.getEndTime());
   }
 }
