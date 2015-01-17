@@ -182,23 +182,29 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
         collection = (Collection) execution.getVariable(collectionVariable);
       }
 
-      Object value = null;
-      int index = 0;
-      Iterator it = collection.iterator();
-      while (index <= loopCounter) {
-        value = it.next();
-        index++;
-      }
+      Object value = getElementAtIndex(loopCounter, collection);
       setLoopVariable(execution, collectionElementVariable, value);
     }
+    doExecuteOriginalBehavior(execution, loopCounter);
+  }
 
-    // If loopcounter == 1, then historic activity instance already created, no need to
-    // pass through executeActivity again since it will create a new historic activity
-    if (loopCounter == 0) {
-      innerActivityBehavior.execute(execution);
-    } else {
-      execution.executeActivity(activity);
+  /**
+   * Subclasses get the chance to adapt their behavior according to the current loop counter.
+   * @param execution
+   * @param loopCounter
+   * @throws Exception
+   */
+  protected abstract void doExecuteOriginalBehavior(ActivityExecution execution, int loopCounter) throws Exception;
+
+  protected Object getElementAtIndex(int i, Collection<?> collection) {
+    Object value = null;
+    int index = 0;
+    Iterator<?> it = collection.iterator();
+    while (index <= i) {
+      value = it.next();
+      index++;
     }
+    return value;
   }
 
   protected boolean usesCollection() {

@@ -17,14 +17,12 @@ import java.util.Arrays;
 import org.camunda.bpm.engine.cdi.BusinessProcess;
 import org.camunda.bpm.engine.cdi.test.CdiProcessEngineTestCase;
 import org.camunda.bpm.engine.test.Deployment;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
  * @author Daniel Meyer
  *
  */
-@Ignore("see: https://app.camunda.com/jira/browse/CAM-986")
 public class MultiInstanceTest extends CdiProcessEngineTestCase {
   
   @Test

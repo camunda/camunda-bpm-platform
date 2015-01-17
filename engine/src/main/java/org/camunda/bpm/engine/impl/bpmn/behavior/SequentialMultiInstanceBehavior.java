@@ -30,6 +30,7 @@ import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 /**
  * @author Joram Barrez
  * @author Falko Menge
+ * @author Ronny Bräunlich
  */
 public class SequentialMultiInstanceBehavior extends MultiInstanceActivityBehavior {
 
@@ -76,24 +77,10 @@ public class SequentialMultiInstanceBehavior extends MultiInstanceActivityBehavi
         declaration.handleSequentialMultiInstanceLeave((ExecutionEntity) execution);
       }
 
-      // delete all existing jobs
-      List<JobEntity> jobs = ((ExecutionEntity)execution).getJobs();
-      for (JobEntity jobEntity : jobs) {
-        jobEntity.delete();
-      }
-
+      deleteExistingJobs(execution);
       callActivityEndListeners(execution);
-
       executeIoMapping((AbstractVariableScope) execution);
-
-      // create timer job for the current execution
-      List<TimerDeclarationImpl> timerDeclarations = (List<TimerDeclarationImpl>) execution.getActivity().getProperty(BpmnParse.PROPERTYNAME_TIMER_DECLARATION);
-      if (timerDeclarations!=null) {
-        for (TimerDeclarationImpl timerDeclaration : timerDeclarations) {
-          timerDeclaration.createTimerInstance((ExecutionEntity) execution);
-        }
-      }
-
+      createTimerJobsForExecution(execution);
 
       try {
         executeOriginalBehavior(execution, loopCounter);
@@ -103,6 +90,34 @@ public class SequentialMultiInstanceBehavior extends MultiInstanceActivityBehavi
       } catch (Exception e) {
         throw new ProcessEngineException("Could not execute inner activity behavior of multi instance behavior", e);
       }
+    }
+  }
+
+  @Override
+  protected void doExecuteOriginalBehavior(ActivityExecution execution, int loopCounter) throws Exception {
+    // If loopcounter == 0, then historic activity instance already created, no need to
+    // pass through executeActivity again since it will create a new historic activity
+    if (loopCounter == 0) {
+      innerActivityBehavior.execute(execution);
+    } else {
+      execution.executeActivity(activity);
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  protected void createTimerJobsForExecution(ActivityExecution execution) {
+    List<TimerDeclarationImpl> timerDeclarations = (List<TimerDeclarationImpl>) execution.getActivity().getProperty(BpmnParse.PROPERTYNAME_TIMER_DECLARATION);
+    if (timerDeclarations!=null) {
+      for (TimerDeclarationImpl timerDeclaration : timerDeclarations) {
+        timerDeclaration.createTimerInstance((ExecutionEntity) execution);
+      }
+    }
+  }
+
+  protected void deleteExistingJobs(ActivityExecution execution) {
+    List<JobEntity> jobs = ((ExecutionEntity)execution).getJobs();
+    for (JobEntity jobEntity : jobs) {
+      jobEntity.delete();
     }
   }
 
