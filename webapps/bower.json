@@ -35,6 +35,7 @@
     "angular-route": "1.2.16",
     "angular-translate": "2.4.2",
     "angular-sanitize": "1.2.16",
+    "angular-resource": "1.2.16",
     "bootstrap": "3.1.1",
     "jquery": "2.1.1",
     "bpmn-js": "0.5.1-1-viewer-fixes",

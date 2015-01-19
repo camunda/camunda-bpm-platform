@@ -15,6 +15,7 @@ define(function() {
       'angular-route':              'bower_components/angular-route/angular-route',
       'angular-sanitize':           'bower_components/angular-sanitize/angular-sanitize',
       'angular-animate':            'bower_components/angular-animate/angular-animate',
+      'angular-resource':           'bower_components/angular-resource/angular-resource',
       'angular-data-depend':        'bower_components/angular-data-depend/src/dataDepend',
 
       'moment':                     'bower_components/moment/moment',
@@ -55,6 +56,7 @@ define(function() {
 
       'angular-route':              ['angular'],
       'angular-animate':            ['angular'],
+      'angular-resource':           ['angular'],
 
       'angular-data-depend':        ['angular'],
 
@@ -74,6 +76,7 @@ define(function() {
       'camunda-tasklist-ui':        [
                                       'angular-route',
                                       'angular-animate',
+                                      'angular-resource',
 
                                       'angular-translate',
                                       'angular-data-depend',

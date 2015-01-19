@@ -5,10 +5,20 @@ define('snap-win', ['snap-svg'], function(snap) {
   window.Snap = snap;
 });
 
+var pluginPackages = window.PLUGIN_PACKAGES || [];
+var pluginDependencies = window.PLUGIN_DEPENDENCIES || [];
+
+require({
+  packages:   pluginPackages
+});
+
 define('camunda-tasklist-ui', [
   'camunda-tasklist-ui/require-conf',
+  'angular',
   'snap-win'
-], function(
+].concat(pluginDependencies.map(function(plugin) {
+      return plugin.requirePackageName;
+  })), function(
   rjsConf
 ) {
   /**
@@ -25,12 +35,11 @@ define('camunda-tasklist-ui', [
 
   var appModules = rjsConf.shim['camunda-tasklist-ui'];
 
-
+  
   var deps = [
     'angular',
     'text!camunda-tasklist-ui/index.html'
   ].concat(appModules);
-
 
 
   // converts AMD paths to angular module names
@@ -85,7 +94,7 @@ define('camunda-tasklist-ui', [
       'pascalprecht.translate',
       'ngRoute',
       'dataDepend'
-    ]);
+    ], pluginDependencies.map(function(el){ return el.ngModuleName; }));
 
     var uriConfig = parseUriConfig();
 
