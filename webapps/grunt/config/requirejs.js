@@ -27,6 +27,7 @@ module.exports = function() {
     'angular-moment',
     'angular-data-depend',
     'angular-translate',
+    'angular-resource',
     'bpmn-js',
     'lodash',
     'sax',
