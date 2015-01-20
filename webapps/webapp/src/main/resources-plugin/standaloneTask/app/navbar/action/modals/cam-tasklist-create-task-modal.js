@@ -20,6 +20,7 @@ define([
 
     var NEW_TASK = {
       name: null,
+      assignee: null,
       description: null,
       priority: 50 // default value
     };

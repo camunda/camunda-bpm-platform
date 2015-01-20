@@ -11,7 +11,7 @@
 
     <div class="form-group">
       <label for="filter-form-color"
-             class="col-xs-2 control-label">Name</label>
+             class="col-xs-2 control-label">{{ 'NEW_TASK_NAME' | translate }}</label>
       <div class="col-xs-10">
         <input class="form-control"
                name="taskName"
@@ -29,7 +29,18 @@
 
     <div class="form-group">
       <label for="filter-form-color"
-             class="col-xs-2 control-label">Description</label>
+             class="col-xs-2 control-label">{{ 'NEW_TASK_ASSIGNEE' | translate }}</label>
+      <div class="col-xs-10">
+        <input class="form-control"
+               name="taskAssignee"
+               ng-model="task.assignee"
+               type="text" />
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="filter-form-color"
+             class="col-xs-2 control-label">{{ 'NEW_TASK_DESCRIPTION' | translate }}</label>
       <div class="col-xs-10">
         <textarea class="form-control"
                   name="taskDescription"
