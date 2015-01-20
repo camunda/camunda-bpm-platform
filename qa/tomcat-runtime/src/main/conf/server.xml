@@ -56,7 +56,7 @@
               uniqueResourceName="process-engine"
               driverClassName="${database.driver}" 
               url="${database.url}"
-              username="${database.user}"  
+              username="${database.username}"
               password="${database.password}"  
               maxPoolSize="20"  
               minPoolSize="5" />

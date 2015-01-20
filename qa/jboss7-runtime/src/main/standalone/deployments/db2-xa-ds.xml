@@ -3,8 +3,8 @@
 	  <connection-url>jdbc:h2:mem:test;DB_CLOSE_DELAY=-1</connection-url>
 	  <driver>h2</driver>
 	  <security>
-		<user-name>sa</user-name>
-		<password>sa</password>
+			<user-name>sa</user-name>
+			<password>sa</password>
 	  </security>
 	</datasource>
 	<xa-datasource jndi-name="java:jboss/datasources/ProcessEngine" pool-name="ProcessEngine" enabled="true" use-ccm="false">
@@ -12,7 +12,7 @@
 		${database.host}
 	  </xa-datasource-property>
 	  <xa-datasource-property name="PortNumber">
-		50000
+		${database.port}
 	  </xa-datasource-property>
 	  <xa-datasource-property name="DatabaseName">
 		${database.name}
@@ -21,20 +21,20 @@
 		4
 	  </xa-datasource-property>
 	  <xa-datasource-property name="User">
-		${database.user}
+		${database.username}
 	  </xa-datasource-property>
 	  <xa-datasource-property name="Password">
 		${database.password}
 	  </xa-datasource-property>
 	  <driver>db2</driver>
 	  <xa-pool>
-		<is-same-rm-override>false</is-same-rm-override>
-		<no-tx-separate-pools>true</no-tx-separate-pools>
+			<is-same-rm-override>false</is-same-rm-override>
+			<no-tx-separate-pools>true</no-tx-separate-pools>
 	  </xa-pool>
 	  <validation>
-		<valid-connection-checker class-name="org.jboss.jca.adapters.jdbc.extensions.db2.DB2ValidConnectionChecker"/>
-		<stale-connection-checker class-name="org.jboss.jca.adapters.jdbc.extensions.db2.DB2StaleConnectionChecker"/>
-		<exception-sorter class-name="org.jboss.jca.adapters.jdbc.extensions.db2.DB2ExceptionSorter"/>
+			<valid-connection-checker class-name="org.jboss.jca.adapters.jdbc.extensions.db2.DB2ValidConnectionChecker"/>
+			<stale-connection-checker class-name="org.jboss.jca.adapters.jdbc.extensions.db2.DB2StaleConnectionChecker"/>
+			<exception-sorter class-name="org.jboss.jca.adapters.jdbc.extensions.db2.DB2ExceptionSorter"/>
 	  </validation>
 	</xa-datasource>
 </datasources>

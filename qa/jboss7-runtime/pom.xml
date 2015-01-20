@@ -41,6 +41,11 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <groupId>com.oracle.jdbc</groupId>
+      <artifactId>ojdbc14</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>com.microsoft.sqlserver</groupId>
       <artifactId>sqljdbc4</artifactId>
       <scope>test</scope>
@@ -203,8 +208,16 @@
                       <regexpmapper from="^(.*)/([^/]+)/([^/]*)$$" to="\1/main/\3" handledirsep="yes" />
                     </copy>
                     
-                    <replace dir="${jboss.runtime.location}/modules" token="@project.version@" value="${project.version}">
+                    <replace dir="${jboss.runtime.location}/modules">
                       <include name="**/module.xml" />
+                      <replacefilter token="@project.version@" value="${project.version}" />
+                      <replacefilter token="@version.db2@" value="${version.db2}" />
+                      <replacefilter token="@version.h2@" value="${version.h2}" />
+                      <replacefilter token="@version.mysql@" value="${version.mysql}" />
+                      <replacefilter token="@version.oracle-11@" value="${version.oracle-11}" />
+                      <replacefilter token="@version.oracle-10@" value="${version.oracle-10}" />
+                      <replacefilter token="@version.postgresql@" value="${version.postgresql}" />
+                      <replacefilter token="@version.sqlserver@" value="${version.sqlserver}" />
                     </replace>
 
                   </target>
@@ -304,8 +317,16 @@
                       <regexpmapper from="^(.*)/([^/]+)/([^/]*)$$" to="\1/main/\3" handledirsep="yes" />
                     </copy>
 
-                    <replace dir="${jboss.runtime.location}/modules" token="@project.version@" value="${project.version}">
+                    <replace dir="${jboss.runtime.location}/modules">
                       <include name="**/module.xml" />
+                      <replacefilter token="@project.version@" value="${project.version}" />
+                      <replacefilter token="@version.db2@" value="${version.db2}" />
+                      <replacefilter token="@version.h2@" value="${version.h2}" />
+                      <replacefilter token="@version.mysql@" value="${version.mysql}" />
+                      <replacefilter token="@version.oracle-11@" value="${version.oracle-11}" />
+                      <replacefilter token="@version.oracle-10@" value="${version.oracle-10}" />
+                      <replacefilter token="@version.postgresql@" value="${version.postgresql}" />
+                      <replacefilter token="@version.sqlserver@" value="${version.sqlserver}" />
                     </replace>
 
                   </target>

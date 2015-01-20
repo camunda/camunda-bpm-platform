@@ -25,7 +25,7 @@
 <module xmlns="urn:jboss:module:1.1" name="com.ibm.db2.jcc.db2jcc4">
 
     <resources>
-        <resource-root path="db2jcc4-9.7.jar"/>
+        <resource-root path="db2jcc4-@version.db2@.jar"/>
         <!-- Insert resources here -->
     </resources>
     <dependencies>

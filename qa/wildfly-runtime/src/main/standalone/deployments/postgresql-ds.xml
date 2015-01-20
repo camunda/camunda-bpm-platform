@@ -17,7 +17,7 @@
 			<flush-strategy>FailingConnectionOnly</flush-strategy>
 		</pool>
 		<security>
-			<user-name>${database.user}</user-name>
+			<user-name>${database.username}</user-name>
 			<password>${database.password}</password>
 		</security>
 		<validation>

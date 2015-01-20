@@ -22,10 +22,10 @@
   ~ 02110-1301 USA, or see the FSF site: http://www.fsf.org.
   -->
 
-<module xmlns="urn:jboss:module:1.1" name="com.oracle.jdbc.ojdbc6">
+<module xmlns="urn:jboss:module:1.1" name="com.oracle.jdbc.ojdbc14">
 
     <resources>
-        <resource-root path="ojdbc6-@version.oracle-11@.jar"/>
+        <resource-root path="ojdbc14-@version.oracle-10@.jar"/>
         <!-- Insert resources here -->
     </resources>
     <dependencies>

@@ -9,8 +9,8 @@
 	</datasource>
 	<xa-datasource jndi-name="java:jboss/datasources/ProcessEngine" pool-name="ProcessEngine" enabled="true" use-ccm="false">
 		<driver>com.mysql</driver>
-		<xa-datasource-property name="URL">jdbc:mysql://${database.host}:3306/${database.name}</xa-datasource-property>
-		<xa-datasource-property name="User">${database.user}</xa-datasource-property>
+		<xa-datasource-property name="URL">jdbc:mysql://${database.host}:${database.port}/${database.name}</xa-datasource-property>
+		<xa-datasource-property name="User">${database.username}</xa-datasource-property>
 		<xa-datasource-property name="Password">${database.password}</xa-datasource-property>
 		<xa-pool>
 			<min-pool-size>1</min-pool-size>

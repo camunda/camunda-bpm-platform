@@ -113,44 +113,6 @@
       <classifier>classes</classifier>
       <version>${project.version}</version>
     </dependency>
-
-    <!-- db drivers for maven sql -->
-    <dependency>
-      <groupId>com.h2database</groupId>
-      <artifactId>h2</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>mysql</groupId>
-      <artifactId>mysql-connector-java</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.oracle.jdbc</groupId>
-      <artifactId>ojdbc6</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.oracle.jdbc</groupId>
-      <artifactId>ojdbc14</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.ibm.db2.jcc</groupId>
-      <artifactId>db2jcc4</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.microsoft.sqlserver</groupId>
-      <artifactId>sqljdbc4</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.postgresql</groupId>
-      <artifactId>postgresql</artifactId>
-      <scope>test</scope>
-    </dependency>
-
   </dependencies>
 
 
@@ -653,7 +615,7 @@
                       <filterset>
                         <filter token="@database.url@" value="${database.url}" />
                         <filter token="@database.driver@" value="${database.driver}" />
-                        <filter token="@database.user@" value="${database.user}" />
+                        <filter token="@database.user@" value="${database.username}" />
                         <filter token="@database.password@" value="${database.password}" />
                       </filterset>
                     </copy>
@@ -697,49 +659,6 @@
           <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>sql-maven-plugin</artifactId>
-            <dependencies>
-              <dependency>
-                <groupId>mysql</groupId>
-                <artifactId>mysql-connector-java</artifactId>
-                <version>${version.mysql}</version>
-              </dependency>
-              <dependency>
-                <groupId>com.oracle.jdbc</groupId>
-                <artifactId>ojdbc6</artifactId>
-                <version>${version.oracle11g}</version>
-              </dependency>
-              <dependency>
-                <groupId>com.oracle.jdbc</groupId>
-                <artifactId>ojdbc14</artifactId>
-                <version>${version.oracle10g}</version>
-              </dependency>
-              <dependency>
-                <groupId>com.ibm.db2.jcc</groupId>
-                <artifactId>db2jcc4</artifactId>
-                <version>${version.db2.97}</version>
-              </dependency>
-              <dependency>
-                <groupId>com.microsoft.sqlserver</groupId>
-                <artifactId>sqljdbc4</artifactId>
-                <version>${version.mssql}</version>
-              </dependency>
-              <dependency>
-                <groupId>org.postgresql</groupId>
-                <artifactId>postgresql</artifactId>
-                <version>${version.postgre}</version>
-              </dependency>
-              <dependency>
-                <groupId>com.h2database</groupId>
-                <artifactId>h2</artifactId>
-                <version>${version.h2}</version>
-              </dependency>
-            </dependencies>
-            <configuration>
-              <driver>${database.driver}</driver>
-              <url>${database.url}</url>
-              <username>${database.user}</username>
-              <password>${database.password}</password>
-            </configuration>
             <executions>
               <execution>
                 <id>drop-db-if-present</id>

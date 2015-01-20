@@ -41,11 +41,11 @@
     <jdbc-connection-pool 
           is-isolation-level-guaranteed="false"
           datasource-classname="${database.datasource.class}" 
-          res-type="${database.datasource.class.type}" non-transactional-connections="${glassfish.transactions.noxa}" 
+          res-type="javax.sql.DataSource" non-transactional-connections="true"
           name="ProcessEnginePool">
       <property name="Url" value="${database.url}"></property>
       <property name="serverName" value="${database.host}"></property>
-      <property name="User" value="${database.user}"></property>
+      <property name="User" value="${database.username}"></property>
       <property name="Password" value="${database.password}"></property>
       <property name="driverType" value="4"></property>
       <property name="databaseName" value="${database.name}"></property>

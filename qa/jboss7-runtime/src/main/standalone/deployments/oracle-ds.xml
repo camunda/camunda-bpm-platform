@@ -9,7 +9,7 @@
 	</datasource>
 	<datasource jta="true" jndi-name="java:jboss/datasources/ProcessEngine" pool-name="ProcessEngine" enabled="true" use-java-context="true" use-ccm="true">
 		<connection-url>${database.url}</connection-url>
-		<driver>com.oracle</driver>
+		<driver>${jboss.driver}</driver>
 		<transaction-isolation>TRANSACTION_READ_COMMITTED</transaction-isolation>
 		<pool>
 			<prefill>false</prefill>
@@ -17,7 +17,7 @@
 			<flush-strategy>FailingConnectionOnly</flush-strategy>
 		</pool>
 		<security>
-			<user-name>${database.user}</user-name>
+			<user-name>${database.username}</user-name>
 			<password>${database.password}</password>
 		</security>
 		<validation>

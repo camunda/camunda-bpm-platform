@@ -9,8 +9,8 @@
 
   <parent>
     <groupId>org.camunda.bpm</groupId>
-    <artifactId>camunda-parent</artifactId>
-    <relativePath>../parent</relativePath>
+    <artifactId>camunda-database-settings</artifactId>
+    <relativePath>../database</relativePath>
     <version>7.3.0-SNAPSHOT</version>
   </parent>
   
@@ -25,6 +25,7 @@
     <!-- jboss -->
     <jboss.runtime.location>../jboss7-runtime/target/server/jboss-as-${version.jboss.as}/</jboss.runtime.location>
     <jboss.datasource.filename>h2-ds.xml</jboss.datasource.filename>
+
     <jboss.http.port>38080</jboss.http.port>
     <jboss.ajp.port>38009</jboss.ajp.port>
     <jboss.https.port>38443</jboss.https.port>
@@ -53,21 +54,17 @@
     <glassfish.JAVA_DEBUGGER_PORT>29009</glassfish.JAVA_DEBUGGER_PORT>
     
     	
-	<!-- tomcat -->
-	<tomcat6.connector.http.port>48080</tomcat6.connector.http.port>
-	<tomcat6.connector.http.redirectPort>48443</tomcat6.connector.http.redirectPort>
-	<tomcat6.connector.ajp.port>48009</tomcat6.connector.ajp.port>
-	<tomcat6.connector.ajp.redirectPort>48443</tomcat6.connector.ajp.redirectPort>
+    <!-- tomcat -->
+    <tomcat6.connector.http.port>48080</tomcat6.connector.http.port>
+    <tomcat6.connector.http.redirectPort>48443</tomcat6.connector.http.redirectPort>
+    <tomcat6.connector.ajp.port>48009</tomcat6.connector.ajp.port>
+    <tomcat6.connector.ajp.redirectPort>48443</tomcat6.connector.ajp.redirectPort>
     <tomcat6.server.port>48005</tomcat6.server.port>
-	<tomcat6.runtime.location>../tomcat-runtime/target/server/apache-tomcat-${version.tomcat}</tomcat6.runtime.location>
 
+	  <tomcat6.runtime.location>../tomcat-runtime/target/server/apache-tomcat-${version.tomcat}</tomcat6.runtime.location>
 
-    <database.datasource.class.type>javax.sql.DataSource</database.datasource.class.type>
-    <database.datasource.class.type.xa>javax.sql.XADataSource</database.datasource.class.type.xa>
-    
-    <h2.server.port>18080</h2.server.port>
   </properties>
-  
+
   <profiles>
 
     <profile>
@@ -156,265 +153,113 @@
         <module>test-db-upgrade</module>
       </modules>
     </profile>
-    
-    <!-- db profiles -->
-    
+
+
+    <!--
+      database profiles
+      - ordering is important:
+      <database> profile must be before the corresponding <database>-xa profile
+    -->
+
     <profile>
       <id>db2</id>
       <properties>
-        <database.type>db2</database.type>
-        <glassfish.transactions.noxa>true</glassfish.transactions.noxa>
         <jboss.datasource.filename>db2-ds.xml</jboss.datasource.filename>
-        <database.host>${env.db2.database.host}</database.host>
-        <database.name>${env.db2.database.name}</database.name>
-        <database.user>${env.db2.database.user}</database.user>
-        <database.password>${env.db2.database.password}</database.password>
-        <database.driver>com.ibm.db2.jcc.DB2Driver</database.driver>
-        <database.datasource.class>com.ibm.db2.jcc.DB2SimpleDataSource</database.datasource.class>        
-        <database.port>${env.db2.database.port}</database.port>
-        <database.url>jdbc:db2://${database.host}:${database.port}/${database.name}</database.url>
+        <glassfish.domain.xml>domain.xml</glassfish.domain.xml>
       </properties>
     </profile>
-    
+
     <profile>
       <id>db2-xa</id>
       <properties>
-        <database.type>db2</database.type>
-        <glassfish.transactions.noxa>false</glassfish.transactions.noxa>
         <jboss.datasource.filename>db2-xa-ds.xml</jboss.datasource.filename>
-        <database.host>${env.db2.database.host}</database.host>
-        <database.name>${env.db2.database.name}</database.name>
-        <database.user>${env.db2.database.user}</database.user>
-        <database.password>${env.db2.database.password}</database.password>
-        <database.driver>com.ibm.db2.jcc.DB2Driver</database.driver>
-        <database.datasource.class>com.ibm.db2.jcc.DB2XADataSource</database.datasource.class>
-        <database.datasource.class.type>${database.datasource.class.type.xa}</database.datasource.class.type>
-        <database.port>${env.db2.database.port}</database.port>
-        <database.url>jdbc:db2://${database.host}:${database.port}/${database.name}</database.url>
+        <glassfish.domain.xml>domain-xa.xml</glassfish.domain.xml>
       </properties>
     </profile>
-    
+
     <profile>
       <id>h2</id>
       <properties>
-        <database.type>h2</database.type>
         <jboss.datasource.filename>h2-ds.xml</jboss.datasource.filename>
-        <database.user>sa</database.user>
-        <database.password>sa</database.password>
-        <database.driver>org.h2.Driver</database.driver>
-        <database.datasource.class>org.h2.jdbcx.JdbcDataSource</database.datasource.class>
-        <!-- This url has to consistent for the subprojects: {server}-runtime and webapp-integration-tests -->
-        <database.url>jdbc:h2:${project.parent.basedir}/target/h2/process-engine;MVCC=TRUE;AUTO_SERVER=TRUE;AUTO_SERVER_PORT=${h2.server.port}</database.url>
-      </properties>
-    </profile>
-   
-    <profile>
-      <id>mssql</id>
-      <properties>
-        <database.type>mssql</database.type>
-        <glassfish.transactions.noxa>true</glassfish.transactions.noxa>
-        <jboss.datasource.filename>mssql-ds.xml</jboss.datasource.filename>
-        <database.host>${env.mssql.database.host}</database.host>
-        <database.name>${env.mssql.database.name}</database.name>
-        <database.user>${env.mssql.database.user}</database.user>
-        <database.password>${env.mssql.database.password}</database.password>
-        <database.driver>com.microsoft.sqlserver.jdbc.SQLServerDriver</database.driver>
-        <database.datasource.class>com.microsoft.sqlserver.jdbc.SQLServerDataSource</database.datasource.class>
-        <database.port>${env.mssql.database.port}</database.port>
-        <database.url>jdbc:sqlserver://${database.host}:${database.port};DatabaseName=${database.name}</database.url>
-      </properties>
-    </profile>
-    
-    <profile>
-      <id>mssql-xa</id>
-      <properties>
-        <database.type>mssql</database.type>
-        <glassfish.transactions.noxa>false</glassfish.transactions.noxa>
-        <jboss.datasource.filename>mssql-xa-ds.xml</jboss.datasource.filename>
-        <database.host>${env.mssql.database.host}</database.host>
-        <database.name>${env.mssql.database.name}</database.name>
-        <database.user>${env.mssql.database.user}</database.user>
-        <database.password>${env.mssql.database.password}</database.password>
-        <database.driver>com.microsoft.sqlserver.jdbc.SQLServerDriver</database.driver>
-        <database.datasource.class>com.microsoft.sqlserver.jdbc.SQLServerXADataSource</database.datasource.class>
-        <database.datasource.class.type>${database.datasource.class.type.xa}</database.datasource.class.type>
-        <database.port>${env.mssql.database.port}</database.port>
-        <database.url>jdbc:sqlserver://${database.host}:${database.port};DatabaseName=${database.name}</database.url>
-      </properties>
-    </profile>
-    
-    <profile>
-      <id>mssql12</id>
-      <properties>
-        <database.type>mssql</database.type>
-        <glassfish.transactions.noxa>true</glassfish.transactions.noxa>
-        <jboss.datasource.filename>mssql-ds.xml</jboss.datasource.filename>
-        <database.host>${env.mssql12.database.host}</database.host>
-        <database.name>${env.mssql12.database.name}</database.name>
-        <database.user>${env.mssql12.database.user}</database.user>
-        <database.password>${env.mssql12.database.password}</database.password>
-        <database.driver>com.microsoft.sqlserver.jdbc.SQLServerDriver</database.driver>
-        <database.datasource.class>com.microsoft.sqlserver.jdbc.SQLServerDataSource</database.datasource.class>
-        <database.port>${env.mssql12.database.port}</database.port>
-        <database.url>jdbc:sqlserver://${database.host}:${database.port};DatabaseName=${database.name}</database.url>
-      </properties>
-    </profile>
-    
-    <profile>
-      <id>mssql12-xa</id>
-      <properties>
-        <database.type>mssql</database.type>
-        <glassfish.transactions.noxa>false</glassfish.transactions.noxa>
-        <jboss.datasource.filename>mssql-xa-ds.xml</jboss.datasource.filename>
-        <database.host>${env.mssql12.database.host}</database.host>
-        <database.name>${env.mssql12.database.name}</database.name>
-        <database.user>${env.mssql12.database.user}</database.user>
-        <database.password>${env.mssql12.database.password}</database.password>
-        <database.driver>com.microsoft.sqlserver.jdbc.SQLServerDriver</database.driver>
-        <database.datasource.class>com.microsoft.sqlserver.jdbc.SQLServerXADataSource</database.datasource.class>
-        <database.datasource.class.type>${database.datasource.class.type.xa}</database.datasource.class.type>
-        <database.port>${env.mssql12.database.port}</database.port>
-        <database.url>jdbc:sqlserver://${database.host}:${database.port};DatabaseName=${database.name}</database.url>
-      </properties>
-    </profile>
-    
-    <profile>
-      <id>oracle</id>
-      <properties>
-        <database.type>oracle</database.type>
-        <glassfish.transactions.noxa>true</glassfish.transactions.noxa>
-        <jboss.datasource.filename>oracle-ds.xml</jboss.datasource.filename>
-        <database.host>${env.oracle.database.host}</database.host>
-        <database.name>${env.oracle.database.name}</database.name>
-        <database.user>${env.oracle.database.user}</database.user>
-        <database.password>${env.oracle.database.password}</database.password>
-        <database.driver>oracle.jdbc.OracleDriver</database.driver>
-        <database.datasource.class>oracle.jdbc.pool.OracleDataSource</database.datasource.class>
-        <database.port>${env.oracle.database.port}</database.port>
-        <database.url>jdbc:oracle:thin:@${database.host}:${database.port}:xe</database.url>
-      </properties>
-    </profile>
-    
-    <profile>
-      <id>oracle-xa</id>
-      <properties>
-        <database.type>oracle</database.type>
-        <glassfish.transactions.noxa>false</glassfish.transactions.noxa>
-        <jboss.datasource.filename>oracle-xa-ds.xml</jboss.datasource.filename>
-        <database.host>${env.oracle.database.host}</database.host>
-        <database.name>${env.oracle.database.name}</database.name>
-        <database.user>${env.oracle.database.user}</database.user>
-        <database.password>${env.oracle.database.password}</database.password>
-        <database.driver>oracle.jdbc.OracleDriver</database.driver>
-        <database.datasource.class>oracle.jdbc.xa.client.OracleXADataSource</database.datasource.class>
-        <database.datasource.class.type>${database.datasource.class.type.xa}</database.datasource.class.type>
-        <database.port>${env.oracle.database.port}</database.port>
-        <database.url>jdbc:oracle:thin:@${database.host}:${database.port}:xe</database.url>
-      </properties>
-    </profile>
-    
-    <profile>
-      <id>postgres</id>
-      <properties>
-        <database.type>postgres</database.type>
-        <glassfish.transactions.noxa>true</glassfish.transactions.noxa>
-        <jboss.datasource.filename>postgres-ds.xml</jboss.datasource.filename>
-        <database.host>${env.postgres.database.host}</database.host>
-        <database.name>${env.postgres.database.name}</database.name>
-        <database.user>${env.postgres.database.user}</database.user>
-        <database.password>${env.postgres.database.password}</database.password>
-        <database.driver>org.postgresql.Driver</database.driver>
-        <database.datasource.class>org.postgresql.ds.PGSimpleDataSource</database.datasource.class>
-        <database.port>${env.postgres.database.port}</database.port>
-        <database.url>jdbc:postgresql://${database.host}:${database.port}/${database.name}</database.url>
-      </properties>
-    </profile>
-    
-    <profile>
-      <id>postgres-xa</id>
-      <properties>
-        <database.type>postgres</database.type>
-        <glassfish.transactions.noxa>false</glassfish.transactions.noxa>
-        <jboss.datasource.filename>postgres-xa-ds.xml</jboss.datasource.filename>
-        <database.host>${env.postgres.database.host}</database.host>
-        <database.name>${env.postgres.database.name}</database.name>
-        <database.user>${env.postgres.database.user}</database.user>
-        <database.password>${env.postgres.database.password}</database.password>
-        <database.driver>org.postgresql.Driver</database.driver>
-        <database.datasource.class>org.postgresql.xa.PGXADataSource</database.datasource.class>
-        <database.datasource.class.type>${database.datasource.class.type.xa}</database.datasource.class.type>
-        <database.port>${env.postgres.database.port}</database.port>
-        <database.url>jdbc:postgresql://${database.host}:${database.port}/${database.name}</database.url>
-      </properties>
-    </profile>
-
-    <profile>
-      <id>postgres93</id>
-      <properties>
-        <database.type>postgres</database.type>
-        <glassfish.transactions.noxa>true</glassfish.transactions.noxa>
-        <jboss.datasource.filename>postgres-ds.xml</jboss.datasource.filename>
-        <database.host>${env.postgres93.database.host}</database.host>
-        <database.name>${env.postgres93.database.name}</database.name>
-        <database.user>${env.postgres93.database.user}</database.user>
-        <database.password>${env.postgres93.database.password}</database.password>
-        <database.driver>org.postgresql.Driver</database.driver>
-        <database.datasource.class>org.postgresql.ds.PGSimpleDataSource</database.datasource.class>
-        <database.port>${env.postgres93.database.port}</database.port>
-        <database.url>jdbc:postgresql://${database.host}:${database.port}/${database.name}</database.url>
-      </properties>
-    </profile>
-
-    <profile>
-      <id>postgres93-xa</id>
-      <properties>
-        <database.type>postgres</database.type>
-        <glassfish.transactions.noxa>false</glassfish.transactions.noxa>
-        <jboss.datasource.filename>postgres-xa-ds.xml</jboss.datasource.filename>
-        <database.host>${env.postgres93.database.host}</database.host>
-        <database.name>${env.postgres93.database.name}</database.name>
-        <database.user>${env.postgres93.database.user}</database.user>
-        <database.password>${env.postgres93.database.password}</database.password>
-        <database.driver>org.postgresql.Driver</database.driver>
-        <database.datasource.class>org.postgresql.xa.PGXADataSource</database.datasource.class>
-        <database.datasource.class.type>${database.datasource.class.type.xa}</database.datasource.class.type>
-        <database.port>${env.postgres93.database.port}</database.port>
-        <database.url>jdbc:postgresql://${database.host}:${database.port}/${database.name}</database.url>
+        <glassfish.domain.xml>domain.xml</glassfish.domain.xml>
       </properties>
     </profile>
     
     <profile>
       <id>mysql</id>
       <properties>
-        <database.type>mysql</database.type>
-        <glassfish.transactions.noxa>true</glassfish.transactions.noxa>
         <jboss.datasource.filename>mysql-ds.xml</jboss.datasource.filename>
-        <database.host>${env.mysql.database.host}</database.host>
-        <database.name>${env.mysql.database.name}</database.name>
-        <database.user>${env.mysql.database.user}</database.user>
-        <database.password>${env.mysql.database.password}</database.password>
-        <database.driver>com.mysql.jdbc.Driver</database.driver>
-        <database.datasource.class>com.mysql.jdbc.jdbc2.optional.MysqlDataSource</database.datasource.class>
-        <database.port>${env.mysql.database.port}</database.port>
-        <database.url>jdbc:mysql://${database.host}:${database.port}/${database.name}</database.url>
+        <glassfish.domain.xml>domain-xa.xml</glassfish.domain.xml>
       </properties>
     </profile>
     
     <profile>
       <id>mysql-xa</id>
       <properties>
-        <database.type>mysql</database.type>
-        <glassfish.transactions.noxa>false</glassfish.transactions.noxa>
         <jboss.datasource.filename>mysql-xa-ds.xml</jboss.datasource.filename>
-        <database.host>${env.mysql.database.host}</database.host>
-        <database.name>${env.mysql.database.name}</database.name>
-        <database.user>${env.mysql.database.user}</database.user>
-        <database.password>${env.mysql.database.password}</database.password>
-        <database.driver>com.mysql.jdbc.Driver</database.driver>
-        <database.datasource.class>com.mysql.jdbc.jdbc2.optional.MysqlXADataSource</database.datasource.class>
-        <database.datasource.class.type>${database.datasource.class.type.xa}</database.datasource.class.type>
-        <database.port>${env.mysql.database.port}</database.port>
-        <database.url>jdbc:mysql://${database.host}:${database.port}/${database.name}</database.url>
+        <glassfish.domain.xml>domain-xa.xml</glassfish.domain.xml>
+      </properties>
+    </profile>
+
+    <profile>
+      <id>oracle</id>
+      <properties>
+        <jboss.datasource.filename>oracle-ds.xml</jboss.datasource.filename>
+        <glassfish.domain.xml>domain.xml</glassfish.domain.xml>
+      </properties>
+    </profile>
+
+    <profile>
+      <id>oracle-xa</id>
+      <properties>
+        <jboss.datasource.filename>oracle-xa-ds.xml</jboss.datasource.filename>
+        <glassfish.domain.xml>domain-xa.xml</glassfish.domain.xml>
+      </properties>
+    </profile>
+
+    <profile>
+      <id>oracle-11</id>
+      <properties>
+        <jboss.driver>com.oracle.jdbc.ojdbc6</jboss.driver>
+      </properties>
+    </profile>
+
+    <profile>
+      <id>oracle-10</id>
+      <properties>
+        <jboss.driver>com.oracle.jdbc.ojdbc14</jboss.driver>
+      </properties>
+    </profile>
+
+    <profile>
+      <id>postgresql</id>
+      <properties>
+        <jboss.datasource.filename>postgresql-ds.xml</jboss.datasource.filename>
+        <glassfish.domain.xml>domain.xml</glassfish.domain.xml>
+      </properties>
+    </profile>
+
+    <profile>
+      <id>postgresql-xa</id>
+      <properties>
+        <jboss.datasource.filename>postgresql-xa-ds.xml</jboss.datasource.filename>
+        <glassfish.domain.xml>domain-xa.xml</glassfish.domain.xml>
+      </properties>
+    </profile>
+
+    <profile>
+      <id>sqlserver</id>
+      <properties>
+        <jboss.datasource.filename>sqlserver-ds.xml</jboss.datasource.filename>
+        <glassfish.domain.xml>domain.xml</glassfish.domain.xml>
+      </properties>
+    </profile>
+
+    <profile>
+      <id>sqlserver-xa</id>
+      <properties>
+        <jboss.datasource.filename>sqlserver-xa-ds.xml</jboss.datasource.filename>
+        <glassfish.domain.xml>domain-xa.xml</glassfish.domain.xml>
       </properties>
     </profile>
            	

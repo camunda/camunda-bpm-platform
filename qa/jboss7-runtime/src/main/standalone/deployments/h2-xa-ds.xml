@@ -8,9 +8,9 @@
 		</security>
 	</datasource>
 	<xa-datasource jndi-name="java:jboss/datasources/ProcessEngine" enabled="true" use-ccm="true" pool-name="ProcessEngine">
-		<xa-datasource-property name="URL">jdbc:h2:./camunda-h2-dbs/process-engine;DB_CLOSE_DELAY=-1;MVCC=TRUE;DB_CLOSE_ON_EXIT=FALSE</xa-datasource-property>
+		<xa-datasource-property name="URL">${database.url}</xa-datasource-property>
 		<driver>h2</driver>
-		<xa-datasource-property name="User">sa</xa-datasource-property>
-		<xa-datasource-property name="password">sa</xa-datasource-property>                   
+		<xa-datasource-property name="User">${database.username}</xa-datasource-property>
+		<xa-datasource-property name="password">${database.password}</xa-datasource-property>
 	</xa-datasource>               
 </datasources>

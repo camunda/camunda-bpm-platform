@@ -109,7 +109,7 @@
             <executions>
               <execution>
                 <id>copy-resources</id>
-                <phase>package</phase>
+                <phase>generate-test-resources</phase>
                 <goals>
                   <goal>copy-resources</goal>
                 </goals>
@@ -118,10 +118,33 @@
                   <resources>          
                     <resource>
                       <directory>src/main/domains</directory>
+                      <includes>
+                        <include>**/${glassfish.domain.xml}</include>
+                      </includes>
                       <filtering>true</filtering>
                     </resource>
                   </resources>              
                 </configuration>            
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>copy-camunda-database-cfg</id>
+                <phase>generate-test-resources</phase>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+                <configuration>
+                  <target>
+                    <echo message="Copying ${glassfish.domain.xml} to domain.xml" />
+                    <copy file="${project.build.directory}/server/glassfish3/glassfish/domains/domain1/config/${glassfish.domain.xml}"
+                          tofile="${project.build.directory}/server/glassfish3/glassfish/domains/domain1/config/domain.xml"
+                          overwrite="true" />
+                  </target>
+                </configuration>
               </execution>
             </executions>
           </plugin>

@@ -12,7 +12,7 @@
 		${database.host}
 	  </xa-datasource-property>
 	  <xa-datasource-property name="PortNumber">
-		50000
+		${database.port}
 	  </xa-datasource-property>
 	  <xa-datasource-property name="DatabaseName">
 		${database.name}
@@ -21,7 +21,7 @@
 		4
 	  </xa-datasource-property>
 	  <xa-datasource-property name="User">
-		${database.user}
+		${database.username}
 	  </xa-datasource-property>
 	  <xa-datasource-property name="Password">
 		${database.password}

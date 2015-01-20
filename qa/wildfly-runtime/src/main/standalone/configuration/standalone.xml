@@ -151,7 +151,10 @@
           <driver name="com.mysql" module="mysql.mysql-connector-java">
             <xa-datasource-class>com.mysql.jdbc.jdbc2.optional.MysqlXADataSource</xa-datasource-class>
           </driver>
-          <driver name="com.oracle" module="com.oracle.jdbc.ojdbc6">
+          <driver name="com.oracle.jdbc.ojdbc6" module="com.oracle.jdbc.ojdbc6">
+            <xa-datasource-class>oracle.jdbc.xa.client.OracleXADataSource</xa-datasource-class>
+          </driver>
+          <driver name="com.oracle.jdbc.ojdbc14" module="com.oracle.jdbc.ojdbc14">
             <xa-datasource-class>oracle.jdbc.xa.client.OracleXADataSource</xa-datasource-class>
           </driver>
           <driver name="postgresql" module="org.postgresql.postgresql">
