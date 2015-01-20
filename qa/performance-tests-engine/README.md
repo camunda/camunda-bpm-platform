@@ -157,8 +157,8 @@ Databases are selected using maven profiles:
 ```Shell
 mvn clean install -Pbenchmark,h2
 mvn clean install -Pbenchmark,mysql
-mvn clean install -Pbenchmark,postgres
-mvn clean install -Pbenchmark,oracle
+mvn clean install -Pbenchmark,postgresql
+mvn clean install -Pbenchmark,oracle,oracle-11
 mvn clean install -Pbenchmark,db2
 ```
 
@@ -174,7 +174,7 @@ Example for command line parameters:
 mvn clean install -Pbenchmark,mysql \
                   -Ddatabase.driver=com.mysql.jdbc.Driver \
                   -Ddatabase.url=jdbc:mysql://localhost:3306:camunda \
-                  -Ddatabase.user=oscar \
+                  -Ddatabase.username=oscar \
                   -Ddatabase.password=s3cret \
 ```
 

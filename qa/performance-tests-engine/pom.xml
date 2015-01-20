@@ -194,7 +194,7 @@
       <id>h2</id>
       <properties>
         <database.type>h2</database.type>
-        <database.user>sa</database.user>
+        <database.username>sa</database.username>
         <database.password>sa</database.password>
         <database.driver>org.h2.Driver</database.driver>
         <database.datasource.class>org.h2.jdbcx.JdbcDataSource</database.datasource.class>
@@ -227,7 +227,7 @@
     </profile>
     
     <profile>
-      <id>postgres</id>
+      <id>postgresql</id>
       <dependencies>
         <dependency>
           <groupId>org.postgresql</groupId>
@@ -237,7 +237,7 @@
     </profile>
     
     <profile>
-      <id>mssql</id>
+      <id>sqlserver</id>
       <dependencies>
         <dependency>
           <groupId>com.microsoft.sqlserver</groupId>
@@ -259,11 +259,22 @@
     </profile>
 
     <profile>
-      <id>oracle</id>
+      <id>oracle-11</id>
       <dependencies>
          <dependency>
           <groupId>com.oracle.jdbc</groupId>
           <artifactId>ojdbc6</artifactId>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
+    </profile>
+
+    <profile>
+      <id>oracle-10</id>
+      <dependencies>
+         <dependency>
+          <groupId>com.oracle.jdbc</groupId>
+          <artifactId>ojdbc14</artifactId>
           <scope>test</scope>
         </dependency>
       </dependencies>

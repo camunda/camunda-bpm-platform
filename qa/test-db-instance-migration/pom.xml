@@ -27,13 +27,7 @@
     </profile>
     
     <profile>
-      <id>oracle</id>
-      <activation>
-        <property>
-          <name>database</name>
-          <value>oracle</value>
-        </property>
-      </activation>
+      <id>oracle-11</id>
       <dependencies>
         <dependency>
           <groupId>com.oracle.jdbc</groupId>
@@ -43,13 +37,7 @@
     </profile>
 
     <profile>
-      <id>oracle10g</id>
-      <activation>
-        <property>
-          <name>database</name>
-          <value>oracle10g</value>
-        </property>
-      </activation>
+      <id>oracle-10</id>
       <dependencies>
         <dependency>
           <groupId>com.oracle.jdbc</groupId>
@@ -60,12 +48,6 @@
 
     <profile>
       <id>db2</id>
-      <activation>
-        <property>
-          <name>database</name>
-          <value>db2</value>
-        </property>
-      </activation>
       <dependencies>
         <dependency>
           <groupId>com.ibm.db2.jcc</groupId>
@@ -75,29 +57,7 @@
     </profile>
 
     <profile>
-      <id>mssql</id>
-      <activation>
-        <property>
-          <name>database</name>
-          <value>mssql</value>
-        </property>
-      </activation>
-      <dependencies>
-        <dependency>
-          <groupId>com.microsoft.sqlserver</groupId>
-          <artifactId>sqljdbc4</artifactId>
-        </dependency>
-      </dependencies>
-    </profile>
-    
-    <profile>
-      <id>mssql12</id>
-      <activation>
-        <property>
-          <name>database</name>
-          <value>mssql12</value>
-        </property>
-      </activation>
+      <id>sqlserver</id>
       <dependencies>
         <dependency>
           <groupId>com.microsoft.sqlserver</groupId>
@@ -108,12 +68,6 @@
 
     <profile>
       <id>mysql</id>
-      <activation>
-        <property>
-          <name>database</name>
-          <value>mysql</value>
-        </property>
-      </activation>
       <dependencies>
         <dependency>
           <groupId>mysql</groupId>
@@ -123,29 +77,7 @@
     </profile>
 
     <profile>
-      <id>postgres</id>
-      <activation>
-        <property>
-          <name>database</name>
-          <value>postgres</value>
-        </property>
-      </activation>
-      <dependencies>
-        <dependency>
-          <groupId>org.postgresql</groupId>
-          <artifactId>postgresql</artifactId>
-        </dependency>
-      </dependencies>
-    </profile>
-
-    <profile>
-      <id>postgres93</id>
-      <activation>
-        <property>
-          <name>database</name>
-          <value>postgres93</value>
-        </property>
-      </activation>
+      <id>postgresql</id>
       <dependencies>
         <dependency>
           <groupId>org.postgresql</groupId>

@@ -8,7 +8,7 @@
   
     <property name="jdbcUrl" value="${database.url}" />
     <property name="jdbcDriver" value="${database.driver}" />
-    <property name="jdbcUsername" value="${database.user}" />
+    <property name="jdbcUsername" value="${database.username}" />
     <property name="jdbcPassword" value="${database.password}" />
     
     <!-- Database configurations -->
