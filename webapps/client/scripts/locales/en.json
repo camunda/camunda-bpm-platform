@@ -102,6 +102,9 @@
   "NEW_TASK_NAME" :
         "Name",
 
+  "NEW_TASK_ASSIGNEE" :
+        "Assignee",
+
   "NEW_TASK_DESCRIPTION" :
         "Description",
 
