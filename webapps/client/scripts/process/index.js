@@ -1,11 +1,22 @@
 define([
   'angular',
-  './controller/cam-tasklist-process-start-ctrl',
-  './modals/cam-tasklist-process-start-modal-ctrl'
+
+    /* action plugins */
+  './plugins/action/cam-tasklist-navbar-action-start-process-plugin',
+
+    /* action plugin controller */
+  './plugins/action/modals/cam-tasklist-process-start-modal'
+
 ], function(
   angular,
-  camProcessStartCtrl,
+
+  /* action plugins */
+  camNavbarActionStartProcessPlugin,
+
+  /* action plugin controller */
   camProcessStartModalCtrl
+
+
 ) {
 
   'use strict';
@@ -17,7 +28,10 @@ define([
   ]);
 
 
-  processModule.controller('camProcessStartCtrl', camProcessStartCtrl);
+  /* action plugins */
+  processModule.config(camNavbarActionStartProcessPlugin);
+
+  /* action plugin controller */
   processModule.controller('camProcessStartModalCtrl', camProcessStartModalCtrl);
 
   return processModule;

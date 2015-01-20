@@ -42,5 +42,36 @@
       }
     }
   }
-}
 
+  .nav > li > view > a {
+    position: relative;
+    display: block;
+    padding: @nav-link-padding;
+  }
+
+  .navbar-nav > li > view > a {
+    padding-top: 10px;
+    padding-bottom: 10px;
+    line-height: @line-height-computed;
+  }
+
+  @media (min-width: @grid-float-breakpoint) {
+    .navbar-nav > li > view > a {
+      padding-top: @navbar-padding-vertical;
+      padding-bottom: @navbar-padding-vertical;
+    }
+  }
+
+  .navbar-nav > li > view > a {
+    &:hover,
+    &:focus {
+      color: @navbar-default-link-hover-color;
+      background-color: transparent;
+    }
+  }
+
+  .nav > li > view > a {
+    color: @navbar-default-link-color;
+  }
+
+}

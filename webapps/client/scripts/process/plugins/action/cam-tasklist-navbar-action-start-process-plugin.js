@@ -1,13 +1,13 @@
 define([
-  'text!camunda-tasklist-ui/process/modals/cam-tasklist-process-start-modal.html'
-
+  'text!./cam-tasklist-navbar-action-start-process-plugin.html',
+  'text!./modals/cam-tasklist-process-start-modal.html'
 ], function(
+  startProcessActionTemplate,
   template
 ) {
-
   'use strict';
 
-  return [
+  var Controller = [
     '$scope',
     '$modal',
     '$q',
@@ -88,8 +88,20 @@ define([
       });
     };
 
-
-
   }];
+
+  var Configuration = function PluginConfiguration(ViewsProvider) {
+
+    ViewsProvider.registerDefaultView('tasklist.navbar.action', {
+      id: 'start-process-action',
+      template: startProcessActionTemplate,
+      controller: Controller,
+      priority: 100
+    });
+  };
+
+  Configuration.$inject = ['ViewsProvider'];
+
+  return Configuration;
 
 });

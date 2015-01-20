@@ -26,16 +26,12 @@
        id="cam-tasklist-navigation">
     <ul class="nav navbar-nav navbar-right">
 
-      <li cam-if-logged-in
-          ng-cloak
-          class="process-definitions">
-        <a tooltip-placement="bottom"
-           tooltip="{{ 'START_PROCESS' | translate }}"
-           ng-controller="camProcessStartCtrl"
-           ng-click="open()"
-           href>
-          <i class="glyphicon glyphicon-list-alt"></i>
-        </a>
+      <li ng-repeat="actionProvider in navbarActions">
+        <view cam-if-logged-in
+              ng-cloak
+              provider="actionProvider"
+              vars="navbarVars">
+        </view>
       </li>
 
 

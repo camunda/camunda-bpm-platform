@@ -94,5 +94,17 @@
       "dow": 1,
       "doy": 4
     }
-  }
+  },
+
+  "CREATE_TASK" :
+        "Create task",
+
+  "NEW_TASK_NAME" :
+        "Name",
+
+  "NEW_TASK_DESCRIPTION" :
+        "Description",
+
+   "TASK_SAVE_ERROR":
+        "Something went wrong while saving the task"
 }
