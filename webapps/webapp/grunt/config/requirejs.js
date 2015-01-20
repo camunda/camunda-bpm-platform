@@ -36,7 +36,15 @@ module.exports = function(config) {
         exclude: ['text'],
         insertRequire: ['jobDefinition/app/plugin']
       }
-    }
+    },
+    standaloneTask: {
+	  options: {
+	    out: '<%= pkg.gruntConfig.buildTarget %>/standaloneTask/app/plugin.js',
+	    include: ['standaloneTask/app/plugin'],
+	    exclude: ['text'],
+	    insertRequire: ['standaloneTask/app/plugin']
+	  }
+	}
 
   };
 
