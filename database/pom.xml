@@ -78,12 +78,14 @@
         <database.type>db2</database.type>
         <database.driver>com.ibm.db2.jcc.DB2Driver</database.driver>
         <database.datasource.class>com.ibm.db2.jcc.DB2SimpleDataSource</database.datasource.class>
+        <jboss.datasource.filename>db2-ds.xml</jboss.datasource.filename>
       </properties>
     </profile>
     <profile>
       <id>db2-xa</id>
       <properties>
         <database.datasource.class>com.ibm.db2.jcc.DB2XADataSource</database.datasource.class>
+        <jboss.datasource.filename>db2-xa-ds.xml</jboss.datasource.filename>
       </properties>
     </profile>
     <profile>
@@ -100,6 +102,7 @@
         <database.type>h2</database.type>
         <database.driver>org.h2.Driver</database.driver>
         <database.datasource.class>org.h2.jdbcx.JdbcDataSource</database.datasource.class>
+        <jboss.datasource.filename>h2-ds.xml</jboss.datasource.filename>
       </properties>
     </profile>
     <profile>
@@ -108,12 +111,14 @@
         <database.type>mysql</database.type>
         <database.driver>com.mysql.jdbc.Driver</database.driver>
         <database.datasource.class>com.mysql.jdbc.jdbc2.optional.MysqlDataSource</database.datasource.class>
+        <jboss.datasource.filename>mysql-ds.xml</jboss.datasource.filename>
       </properties>
     </profile>
     <profile>
       <id>mysql-xa</id>
       <properties>
         <database.datasource.class>com.mysql.jdbc.jdbc2.optional.MysqlXADataSource</database.datasource.class>
+        <jboss.datasource.filename>mysql-xa-ds.xml</jboss.datasource.filename>
       </properties>
     </profile>
     <profile>
@@ -122,12 +127,26 @@
         <database.type>oracle</database.type>
         <database.driver>oracle.jdbc.OracleDriver</database.driver>
         <database.datasource.class>oracle.jdbc.pool.OracleDataSource</database.datasource.class>
+        <jboss.datasource.filename>oracle-ds.xml</jboss.datasource.filename>
       </properties>
     </profile>
     <profile>
       <id>oracle-xa</id>
       <properties>
         <database.datasource.class>oracle.jdbc.xa.client.OracleXADataSource</database.datasource.class>
+        <jboss.datasource.filename>oracle-xa-ds.xml</jboss.datasource.filename>
+      </properties>
+    </profile>
+    <profile>
+      <id>oracle-11</id>
+      <properties>
+        <jboss.driver>com.oracle.jdbc.ojdbc6</jboss.driver>
+      </properties>
+    </profile>
+    <profile>
+      <id>oracle-10</id>
+      <properties>
+        <jboss.driver>com.oracle.jdbc.ojdbc14</jboss.driver>
       </properties>
     </profile>
     <profile>
@@ -136,12 +155,14 @@
         <database.type>postgres</database.type>
         <database.driver>org.postgresql.Driver</database.driver>
         <database.datasource.class>org.postgresql.ds.PGSimpleDataSource</database.datasource.class>
+        <jboss.datasource.filename>postgresql-ds.xml</jboss.datasource.filename>
       </properties>
     </profile>
     <profile>
       <id>postgresql-xa</id>
       <properties>
         <database.datasource.class>org.postgresql.xa.PGXADataSource</database.datasource.class>
+        <jboss.datasource.filename>postgresql-xa-ds.xml</jboss.datasource.filename>
       </properties>
     </profile>
     <profile>
@@ -150,12 +171,14 @@
         <database.type>mssql</database.type>
         <database.driver>com.microsoft.sqlserver.jdbc.SQLServerDriver</database.driver>
         <database.datasource.class>com.microsoft.sqlserver.jdbc.SQLServerDataSource</database.datasource.class>
+        <jboss.datasource.filename>sqlserver-ds.xml</jboss.datasource.filename>
       </properties>
     </profile>
     <profile>
       <id>sqlserver-xa</id>
       <properties>
         <database.datasource.class>com.microsoft.sqlserver.jdbc.SQLServerXADataSource</database.datasource.class>
+        <jboss.datasource.filename>sqlserver-xa-ds.xml</jboss.datasource.filename>
       </properties>
     </profile>
   </profiles>

@@ -55,6 +55,7 @@
         <module>distro/tomcat</module>
         <module>distro/sql-script</module>
 
+        <module>database</module>
         <module>parent</module>
         <module>bom</module>
       </modules>
@@ -90,6 +91,7 @@
 
         <module>distro/sql-script</module>
 
+        <module>database</module>
         <module>parent</module>
         <module>bom</module>
       </modules>
@@ -150,6 +152,7 @@
         <module>engine-spring</module>
         <module>engine-rest</module>
 
+        <module>database</module>
         <module>parent</module>
         <module>bom</module>
       </modules>
@@ -174,6 +177,7 @@
 
         <module>engine-plugins</module>
 
+        <module>database</module>
         <module>parent</module>
         <module>bom</module>
       </modules>
