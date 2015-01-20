@@ -14,8 +14,6 @@ package org.camunda.spin.impl.xml.dom;
 
 import java.util.NoSuchElementException;
 
-import javax.xml.xpath.XPathExpressionException;
-
 import org.camunda.commons.logging.BaseLogger;
 import org.camunda.spin.impl.logging.SpinLogger;
 import org.camunda.spin.xml.SpinXPathException;
@@ -127,10 +125,6 @@ public class DomXmlLogger extends SpinLogger {
 
   public SpinXmlElementException unableToTransformElement(Node element, Exception cause) {
     return new SpinXmlElementException(exceptionMessage("022", "Unable to transform element '{}:{}'", element.getNamespaceURI(), element.getNodeName()), cause);
-  }
-
-  public SpinXPathException unableToCompileXPathQuery(String expression, XPathExpressionException cause) {
-    return new SpinXPathException(exceptionMessage("023", "Unable to compile xPath query '{}'", expression), cause);
   }
 
   public SpinXPathException unableToEvaluateXPathExpressionOnElement(SpinXmlElement element, Exception cause) {

@@ -13,8 +13,8 @@
 
 package org.camunda.spin.impl.xml.dom.query;
 
+import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 
 import org.camunda.spin.SpinList;
@@ -31,6 +31,10 @@ import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+import java.util.Map;
+
+import static org.camunda.commons.utils.EnsureUtil.ensureNotNull;
+
 /**
  * @author Sebastian Menski
  */
@@ -39,18 +43,22 @@ public class DomXPathQuery extends SpinXPathQuery {
   private static final DomXmlLogger LOG = DomXmlLogger.XML_DOM_LOGGER;
 
   protected final DomXmlElement domElement;
-  protected final XPathExpression query;
-  private final DomXmlDataFormat dataFormat;
+  protected final XPath query;
+  protected final String expression;
+  protected final DomXmlDataFormat dataFormat;
+  protected DomXPathNamespaceResolver resolver;
 
-  public DomXPathQuery(DomXmlElement domElement, XPathExpression query, DomXmlDataFormat dataFormat) {
+  public DomXPathQuery(DomXmlElement domElement, XPath query, String expression, DomXmlDataFormat dataFormat) {
     this.domElement = domElement;
     this.query = query;
+    this.expression = expression;
     this.dataFormat = dataFormat;
+    this.resolver = new DomXPathNamespaceResolver(this.domElement);
   }
 
   public SpinXmlElement element() {
     try {
-      Element element = (Element) query.evaluate(domElement.unwrap(), XPathConstants.NODE);
+      Element element = (Element) query.evaluate(expression, domElement.unwrap(), XPathConstants.NODE);
       return dataFormat.createElementWrapper(element);
     } catch (XPathExpressionException e) {
       throw LOG.unableToEvaluateXPathExpressionOnElement(domElement, e);
@@ -61,7 +69,7 @@ public class DomXPathQuery extends SpinXPathQuery {
 
   public SpinList<SpinXmlElement> elementList() {
     try {
-      NodeList nodeList = (NodeList) query.evaluate(domElement.unwrap(), XPathConstants.NODESET);
+      NodeList nodeList = (NodeList) query.evaluate(expression, domElement.unwrap(), XPathConstants.NODESET);
       return new SpinListImpl<SpinXmlElement>(new DomXmlElementIterable(nodeList, dataFormat));
     } catch (XPathExpressionException e) {
       throw LOG.unableToEvaluateXPathExpressionOnElement(domElement, e);
@@ -72,7 +80,7 @@ public class DomXPathQuery extends SpinXPathQuery {
 
   public SpinXmlAttribute attribute() {
     try {
-      Attr attribute = (Attr) query.evaluate(domElement.unwrap(), XPathConstants.NODE);
+      Attr attribute = (Attr) query.evaluate(expression, domElement.unwrap(), XPathConstants.NODE);
       return dataFormat.createAttributeWrapper(attribute);
     } catch (XPathExpressionException e) {
       throw LOG.unableToEvaluateXPathExpressionOnElement(domElement, e);
@@ -83,7 +91,7 @@ public class DomXPathQuery extends SpinXPathQuery {
 
   public SpinList<SpinXmlAttribute> attributeList() {
     try {
-      NodeList nodeList = (NodeList) query.evaluate(domElement.unwrap(), XPathConstants.NODESET);
+      NodeList nodeList = (NodeList) query.evaluate(expression, domElement.unwrap(), XPathConstants.NODESET);
       return new SpinListImpl<SpinXmlAttribute>(new DomXmlAttributeIterable(nodeList, dataFormat));
     } catch (XPathExpressionException e) {
       throw LOG.unableToEvaluateXPathExpressionOnElement(domElement, e);
@@ -94,7 +102,7 @@ public class DomXPathQuery extends SpinXPathQuery {
 
   public String string() {
     try {
-      return (String) query.evaluate(domElement.unwrap(), XPathConstants.STRING);
+      return (String) query.evaluate(expression, domElement.unwrap(), XPathConstants.STRING);
     } catch (XPathExpressionException e) {
       throw LOG.unableToEvaluateXPathExpressionOnElement(domElement, e);
     } catch (ClassCastException e) {
@@ -104,7 +112,7 @@ public class DomXPathQuery extends SpinXPathQuery {
 
   public Double number() {
     try {
-      return (Double) query.evaluate(domElement.unwrap(), XPathConstants.NUMBER);
+      return (Double) query.evaluate(expression, domElement.unwrap(), XPathConstants.NUMBER);
     } catch (XPathExpressionException e) {
       throw LOG.unableToEvaluateXPathExpressionOnElement(domElement, e);
     } catch (ClassCastException e) {
@@ -114,12 +122,32 @@ public class DomXPathQuery extends SpinXPathQuery {
 
   public Boolean bool() {
     try {
-      return (Boolean) query.evaluate(domElement.unwrap(), XPathConstants.BOOLEAN);
+      return (Boolean) query.evaluate(expression, domElement.unwrap(), XPathConstants.BOOLEAN);
     } catch (XPathExpressionException e) {
       throw LOG.unableToEvaluateXPathExpressionOnElement(domElement, e);
     } catch (ClassCastException e) {
       throw LOG.unableToCastXPathResultTo(Boolean.class, e);
     }
+  }
+
+  public SpinXPathQuery ns(String prefix, String namespace) {
+    ensureNotNull("Prefix", prefix);
+    resolver.setNamespace(prefix, namespace);
+    query.setNamespaceContext(resolver);
+    return this;
+  }
+
+  public SpinXPathQuery ns(Map<String, String> namespaces) {
+    ensureNotNull("Namespace Map", namespaces);
+    resolver.setNamespaces(namespaces);
+    query.setNamespaceContext(resolver);
+    return this;
+  }
+
+  public SpinXPathQuery detectNamespaces() {
+    resolver.autodetectNamespaces();
+    query.setNamespaceContext(resolver);
+    return this;
   }
 
 }

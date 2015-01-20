@@ -15,6 +15,8 @@ package org.camunda.spin.xml;
 
 import org.camunda.spin.SpinList;
 
+import java.util.Map;
+
 /**
  * @author Sebastian Menski
  */
@@ -68,5 +70,28 @@ public abstract class SpinXPathQuery {
    * @return the boolean result
    */
   public abstract Boolean bool();
+
+  /**
+   * Detects all namespaces used in the element and its children.
+   *
+   * @return itself
+   */
+  public abstract SpinXPathQuery detectNamespaces();
+
+  /**
+   * Maps a prefix, uri pair to a namespace.
+   *
+   * @param prefix prefix for the namespace.
+   * @param namespace uri of the namespace
+   * @return itself
+   */
+  public abstract SpinXPathQuery ns(String prefix, String namespace);
+
+  /**
+   * Maps a map of prefix, uri pairs to namespaces
+   * @param namespaces Map of the prefix, uri pairs.
+   * @return itself
+   */
+  public abstract SpinXPathQuery ns(Map<String, String> namespaces);
 
 }

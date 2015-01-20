@@ -63,6 +63,19 @@ public class DomXmlAttribute extends SpinXmlAttribute {
     return attributeNode.getNamespaceURI();
   }
 
+  public String prefix() {
+    return attributeNode.getPrefix();
+  }
+
+  public boolean hasPrefix(String prefix) {
+    String attributePrefix = attributeNode.getPrefix();
+    if(attributePrefix == null) {
+      return prefix == null;
+    } else {
+      return attributePrefix.equals(prefix);
+    }
+  }
+
   public boolean hasNamespace(String namespace) {
     String attributeNamespace = attributeNode.getNamespaceURI();
     if (attributeNamespace == null) {

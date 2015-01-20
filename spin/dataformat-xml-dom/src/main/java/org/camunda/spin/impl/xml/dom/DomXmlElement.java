@@ -24,8 +24,7 @@ import java.util.Collection;
 import java.util.List;
 
 import javax.xml.transform.Transformer;
-import javax.xml.xpath.XPathExpression;
-import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathFactory;
 
 import org.camunda.spin.SpinList;
@@ -77,6 +76,19 @@ public class DomXmlElement extends SpinXmlElement {
 
   public String namespace() {
     return domElement.getNamespaceURI();
+  }
+
+  public String prefix() {
+    return domElement.getPrefix();
+  }
+
+  public boolean hasPrefix(String prefix) {
+    String elementPrefix = prefix();
+    if(elementPrefix == null) {
+      return prefix == null;
+    } else {
+      return elementPrefix.equals(prefix);
+    }
   }
 
   public boolean hasNamespace(String namespace) {
@@ -330,12 +342,8 @@ public class DomXmlElement extends SpinXmlElement {
   }
 
   public SpinXPathQuery xPath(String expression) {
-    try {
-      XPathExpression query = getXPathFactory().newXPath().compile(expression);
-      return new DomXPathQuery(this, query, dataFormat);
-    } catch (XPathExpressionException e) {
-      throw LOG.unableToCompileXPathQuery(expression, e);
-    }
+    XPath query = getXPathFactory().newXPath();
+    return new DomXPathQuery(this, query, expression, dataFormat);
   }
 
   /**

@@ -38,6 +38,21 @@ public abstract class SpinXmlNode<T extends SpinXmlNode<?>> extends Spin<T> {
   public abstract String namespace();
 
   /**
+   * Returns the prefix of the node and not the namespace uri.
+   *
+   * @return the prefix of the node
+   */
+  public abstract String prefix();
+
+  /**
+   * Checks if the node has a given prefix.
+   *
+   * @param prefix the prefix to check
+   * @return true if the name has the same prefix
+   */
+  public abstract boolean hasPrefix(String prefix);
+
+  /**
    * Checks if the node has a given namespace.
    *
    * @param namespace the namespace to check
