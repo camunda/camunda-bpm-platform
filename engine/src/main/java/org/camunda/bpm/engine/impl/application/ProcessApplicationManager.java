@@ -25,6 +25,7 @@ import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.application.ProcessApplicationRegistration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.ProcessDefinitionQueryImpl;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.TransactionState;
 import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
 import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionQueryImpl;
@@ -140,6 +141,8 @@ public class ProcessApplicationManager {
       List<CaseDefinition> caseDefinitions = new ArrayList<CaseDefinition>();
 
       CommandContext commandContext = Context.getCommandContext();
+      ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
+      boolean cmmnEnabled = processEngineConfiguration.isCmmnEnabled();
 
       for (String deploymentId : deploymentIds) {
 
@@ -151,13 +154,18 @@ public class ProcessApplicationManager {
 
           processDefinitions.addAll(getDeployedProcessDefinitionArtifacts(deployment));
 
-          caseDefinitions.addAll(getDeployedCaseDefinitionArtifacts(deployment));
+          if (cmmnEnabled) {
+            caseDefinitions.addAll(getDeployedCaseDefinitionArtifacts(deployment));
+          }
 
         }
       }
 
       logProcessDefinitionRegistrations(builder, processDefinitions);
-      logCaseDefinitionRegistrations(builder, caseDefinitions);
+
+      if (cmmnEnabled) {
+        logCaseDefinitionRegistrations(builder, caseDefinitions);
+      }
 
       LOGGER.info(builder.toString());
 

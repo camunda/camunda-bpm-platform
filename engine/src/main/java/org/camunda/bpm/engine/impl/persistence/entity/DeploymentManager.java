@@ -17,7 +17,7 @@ import java.util.List;
 
 import org.camunda.bpm.engine.impl.DeploymentQueryImpl;
 import org.camunda.bpm.engine.impl.Page;
-import org.camunda.bpm.engine.impl.ProcessDefinitionQueryImpl;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.event.MessageEventHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerStartEventJobHandler;
@@ -140,34 +140,36 @@ public class DeploymentManager extends AbstractManager {
   }
 
   protected void deleteCaseDeployment(String deploymentId, boolean cascade) {
-    List<CaseDefinition> caseDefinitions = getCaseDefinitionManager().findCaseDefinitionByDeploymentId(deploymentId);
+    ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
+    if (processEngineConfiguration.isCmmnEnabled()) {
+      List<CaseDefinition> caseDefinitions = getCaseDefinitionManager().findCaseDefinitionByDeploymentId(deploymentId);
 
-    if (cascade) {
+      if (cascade) {
 
-      // delete case instances
-      for (CaseDefinition caseDefinition: caseDefinitions) {
-        String caseDefinitionId = caseDefinition.getId();
+        // delete case instances
+        for (CaseDefinition caseDefinition: caseDefinitions) {
+          String caseDefinitionId = caseDefinition.getId();
 
-        getCaseInstanceManager()
-          .deleteCaseInstancesByCaseDefinition(caseDefinitionId, "deleted deployment", cascade);
+          getCaseInstanceManager()
+            .deleteCaseInstancesByCaseDefinition(caseDefinitionId, "deleted deployment", cascade);
 
+        }
+      }
+
+      // delete case definitions from db
+      getCaseDefinitionManager()
+        .deleteCaseDefinitionsByDeploymentId(deploymentId);
+
+      for (CaseDefinition caseDefinition : caseDefinitions) {
+        String processDefinitionId = caseDefinition.getId();
+
+        // remove case definitions from cache:
+        Context
+          .getProcessEngineConfiguration()
+          .getDeploymentCache()
+          .removeCaseDefinition(processDefinitionId);
       }
     }
-
-    // delete case definitions from db
-    getCaseDefinitionManager()
-      .deleteCaseDefinitionsByDeploymentId(deploymentId);
-
-    for (CaseDefinition caseDefinition : caseDefinitions) {
-      String processDefinitionId = caseDefinition.getId();
-
-      // remove case definitions from cache:
-      Context
-        .getProcessEngineConfiguration()
-        .getDeploymentCache()
-        .removeCaseDefinition(processDefinitionId);
-    }
-
   }
 
 
