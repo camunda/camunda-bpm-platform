@@ -167,7 +167,6 @@
         <glassfish.domain.xml>domain.xml</glassfish.domain.xml>
       </properties>
     </profile>
-
     <profile>
       <id>db2-xa</id>
       <properties>
@@ -188,7 +187,6 @@
         <glassfish.domain.xml>domain-xa.xml</glassfish.domain.xml>
       </properties>
     </profile>
-    
     <profile>
       <id>mysql-xa</id>
       <properties>
@@ -202,7 +200,6 @@
         <glassfish.domain.xml>domain.xml</glassfish.domain.xml>
       </properties>
     </profile>
-
     <profile>
       <id>oracle-xa</id>
       <properties>
@@ -216,7 +213,6 @@
         <glassfish.domain.xml>domain.xml</glassfish.domain.xml>
       </properties>
     </profile>
-
     <profile>
       <id>postgresql-xa</id>
       <properties>
@@ -230,7 +226,6 @@
         <glassfish.domain.xml>domain.xml</glassfish.domain.xml>
       </properties>
     </profile>
-
     <profile>
       <id>sqlserver-xa</id>
       <properties>
