@@ -716,6 +716,38 @@ public class VariableListenerTest extends PluggableProcessEngineTestCase {
     assertTrue(processEngineConfiguration.isInvokeCustomVariableListeners());
   }
 
+  @Deployment(resources={
+      "org/camunda/bpm/engine/test/cmmn/listener/VariableListenerTest.testVariableListenerWithProcessTask.cmmn",
+      "org/camunda/bpm/engine/test/cmmn/listener/VariableListenerTest.testVariableListenerWithProcessTask.bpmn20.xml"
+      })
+  public void testVariableListenerWithProcessTask() {
+    CaseInstance caseInstance = caseService.createCaseInstanceByKey("case");
+
+    CaseExecution processTask = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_ProcessTask_1")
+        .singleResult();
+
+    String processTaskId = processTask.getId();
+
+    caseService
+      .withCaseExecution(processTaskId)
+      .manualStart();
+
+    // then the listener is invoked
+    assertEquals(1, LogVariableListener.getInvocations().size());
+
+    DelegateVariableInstanceSpec
+      .fromCaseExecution(caseInstance)
+      .sourceExecution(processTask)
+      .event(VariableListener.CREATE)
+      .name("aVariable")
+      .value("aValue")
+      .matches(LogVariableListener.getInvocations().get(0));
+
+    LogVariableListener.reset();
+  }
+
 
   protected void tearDown() throws Exception {
     beans.clear();

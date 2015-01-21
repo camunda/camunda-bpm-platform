@@ -13,10 +13,9 @@
 package org.camunda.bpm.engine.impl.variable.listener;
 
 import org.camunda.bpm.engine.delegate.BaseDelegateExecution;
-import org.camunda.bpm.engine.delegate.DelegateCaseVariableInstance;
 import org.camunda.bpm.engine.delegate.CaseVariableListener;
+import org.camunda.bpm.engine.delegate.DelegateCaseVariableInstance;
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
-import org.camunda.bpm.engine.impl.context.CaseExecutionContext;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.delegate.DelegateInvocation;
 
@@ -41,18 +40,21 @@ public class CaseVariableListenerInvocation extends DelegateInvocation {
   }
 
   protected void invoke() throws Exception {
-    CaseExecutionContext executionContext = Context.getCaseExecutionContext();
     try {
-      if (executionContext == null && contextExecution instanceof CaseExecutionEntity) {
+      if (isCaseExecution()) {
         Context.setExecutionContext((CaseExecutionEntity) contextExecution);
       }
       variableListenerInstance.notify(variableInstance);
     }
     finally {
-      if (executionContext == null) {
+      if (isCaseExecution()) {
         Context.removeExecutionContext();
       }
     }
+  }
+
+  protected boolean isCaseExecution() {
+    return contextExecution != null && contextExecution instanceof CaseExecutionEntity;
   }
 
   public Object getTarget() {

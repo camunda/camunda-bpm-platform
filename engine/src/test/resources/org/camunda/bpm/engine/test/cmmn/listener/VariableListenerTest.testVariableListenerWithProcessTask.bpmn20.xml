@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  targetNamespace="Examples">
+
+  <process id="process">
+
+    <startEvent id="theStart" />
+
+    <sequenceFlow sourceRef="theStart" targetRef="script" />
+
+    <scriptTask id="script" scriptFormat="javascript">
+      <script><![CDATA[
+        execution.setVariable("aVariable", "aValue");
+      ]]></script>
+    </scriptTask>
+
+    <sequenceFlow sourceRef="script" targetRef="theEnd" />
+
+    <endEvent id="theEnd" />
+
+  </process>
+
+</definitions>
