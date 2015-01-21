@@ -42,6 +42,7 @@ import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.task.Attachment;
 import org.camunda.bpm.engine.task.Comment;
 import org.camunda.bpm.engine.task.DelegationState;
@@ -1737,4 +1738,89 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
 
   }
 
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testHumanTaskCompleteWithVariables() {
+    // given
+    caseService.createCaseInstanceByKey("oneTaskCase");
+
+    String humanTaskId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(humanTaskId)
+      .manualStart();
+
+    String taskId = taskService.createTaskQuery().singleResult().getId();
+
+    String variableName = "aVariable";
+    String variableValue = "aValue";
+
+    // when
+    taskService.complete(taskId, Variables.createVariables().putValue(variableName, variableValue));
+
+    // then
+    VariableInstance variable = runtimeService.createVariableInstanceQuery().singleResult();
+
+    assertEquals(variable.getName(), variableName);
+    assertEquals(variable.getValue(), variableValue);
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testHumanTaskWithLocalVariablesCompleteWithVariable() {
+    // given
+    caseService.createCaseInstanceByKey("oneTaskCase");
+
+    String humanTaskId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(humanTaskId)
+      .manualStart();
+
+    String variableName = "aVariable";
+    String variableValue = "aValue";
+    String variableAnotherValue = "anotherValue";
+
+    String taskId = taskService.createTaskQuery().singleResult().getId();
+
+    taskService.setVariableLocal(taskId, variableName, variableValue);
+
+    // when
+    taskService.complete(taskId, Variables.createVariables().putValue(variableName, variableAnotherValue));
+
+    // then
+    VariableInstance variable = runtimeService.createVariableInstanceQuery().singleResult();
+
+    assertEquals(variable.getName(), variableName);
+    assertEquals(variable.getValue(), variableAnotherValue);
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/twoTasksProcess.bpmn20.xml"})
+  public void testUserTaskWithLocalVariablesCompleteWithVariable() {
+    // given
+    runtimeService.startProcessInstanceByKey("twoTasksProcess");
+
+    String variableName = "aVariable";
+    String variableValue = "aValue";
+    String variableAnotherValue = "anotherValue";
+
+    String taskId = taskService.createTaskQuery().singleResult().getId();
+
+    taskService.setVariableLocal(taskId, variableName, variableValue);
+
+    // when
+    taskService.complete(taskId, Variables.createVariables().putValue(variableName, variableAnotherValue));
+
+    // then
+    VariableInstance variable = runtimeService.createVariableInstanceQuery().singleResult();
+
+    assertEquals(variable.getName(), variableName);
+    assertEquals(variable.getValue(), variableAnotherValue);
+  }
 }
