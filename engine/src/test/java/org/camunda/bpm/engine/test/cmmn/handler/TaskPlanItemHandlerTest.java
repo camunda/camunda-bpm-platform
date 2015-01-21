@@ -36,6 +36,7 @@ import org.camunda.bpm.model.cmmn.Cmmn;
 import org.camunda.bpm.model.cmmn.impl.instance.Body;
 import org.camunda.bpm.model.cmmn.impl.instance.ConditionExpression;
 import org.camunda.bpm.model.cmmn.impl.instance.DefaultControl;
+import org.camunda.bpm.model.cmmn.impl.instance.ItemControl;
 import org.camunda.bpm.model.cmmn.instance.IfPart;
 import org.camunda.bpm.model.cmmn.instance.ManualActivationRule;
 import org.camunda.bpm.model.cmmn.instance.PlanItem;
@@ -397,7 +398,7 @@ public class TaskPlanItemHandlerTest extends CmmnElementHandlerTest {
   @Test
   public void testManualActivationRule() {
     // given
-    PlanItemControl itemControl = createElement(planItem, "ItemControl_1", PlanItemControl.class);
+    ItemControl itemControl = createElement(planItem, "ItemControl_1", ItemControl.class);
     ManualActivationRule manualActivationRule = createElement(itemControl, "ManualActivationRule_1", ManualActivationRule.class);
     ConditionExpression expression = createElement(manualActivationRule, "Expression_1", ConditionExpression.class);
     Body body = createElement(expression, Body.class);

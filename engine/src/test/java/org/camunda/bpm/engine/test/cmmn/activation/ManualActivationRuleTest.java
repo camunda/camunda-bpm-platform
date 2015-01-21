@@ -28,7 +28,7 @@ public class ManualActivationRuleTest extends CmmnProcessEngineTestCase {
    * CAM-3170
    */
   @Deployment(resources = "org/camunda/bpm/engine/test/cmmn/activation/ManualActivationRuleTest.testVariableBasedRule.cmmn")
-  public void FAILING_testManualActivationRuleEvaluatesToTrue() {
+  public void testManualActivationRuleEvaluatesToTrue() {
     caseService.createCaseInstanceByKey("case", Collections.<String, Object>singletonMap("manualActivation", true));
 
     CaseExecution taskExecution = caseService.createCaseExecutionQuery().activityId("PI_HumanTask_1").singleResult();
@@ -41,7 +41,7 @@ public class ManualActivationRuleTest extends CmmnProcessEngineTestCase {
    * CAM-3170
    */
   @Deployment(resources = "org/camunda/bpm/engine/test/cmmn/activation/ManualActivationRuleTest.testVariableBasedRule.cmmn")
-  public void FAILING_testManualActivationRuleEvaluatesToFalse() {
+  public void testManualActivationRuleEvaluatesToFalse() {
     caseService.createCaseInstanceByKey("case", Collections.<String, Object>singletonMap("manualActivation", false));
 
     CaseExecution taskExecution = caseService.createCaseExecutionQuery().activityId("PI_HumanTask_1").singleResult();

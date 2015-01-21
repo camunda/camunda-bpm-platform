@@ -12,8 +12,8 @@
  */
 package org.camunda.bpm.engine.test.cmmn.handler;
 
-import static org.camunda.bpm.engine.impl.cmmn.handler.ItemHandler.PROPERTY_ACTIVITY_TYPE;
 import static org.camunda.bpm.engine.impl.cmmn.handler.ItemHandler.PROPERTY_ACTIVITY_DESCRIPTION;
+import static org.camunda.bpm.engine.impl.cmmn.handler.ItemHandler.PROPERTY_ACTIVITY_TYPE;
 import static org.camunda.bpm.engine.impl.cmmn.handler.ItemHandler.PROPERTY_MANUAL_ACTIVATION_RULE;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -30,6 +30,7 @@ import org.camunda.bpm.model.cmmn.Cmmn;
 import org.camunda.bpm.model.cmmn.impl.instance.Body;
 import org.camunda.bpm.model.cmmn.impl.instance.ConditionExpression;
 import org.camunda.bpm.model.cmmn.impl.instance.DefaultControl;
+import org.camunda.bpm.model.cmmn.impl.instance.ItemControl;
 import org.camunda.bpm.model.cmmn.instance.DiscretionaryItem;
 import org.camunda.bpm.model.cmmn.instance.ManualActivationRule;
 import org.camunda.bpm.model.cmmn.instance.PlanItemControl;
@@ -153,7 +154,7 @@ public class StageDiscretionaryItemHandlerTest extends CmmnElementHandlerTest {
   @Test
   public void testManualActivationRule() {
     // given
-    PlanItemControl itemControl = createElement(discretionaryItem, "ItemControl_1", PlanItemControl.class);
+    ItemControl itemControl = createElement(discretionaryItem, "ItemControl_1", ItemControl.class);
     ManualActivationRule manualActivationRule = createElement(itemControl, "ManualActivationRule_1", ManualActivationRule.class);
     ConditionExpression expression = createElement(manualActivationRule, "Expression_1", ConditionExpression.class);
     Body body = createElement(expression, Body.class);
