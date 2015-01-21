@@ -39,6 +39,7 @@
     <version.camunda.connect>1.0.0</version.camunda.connect>
     <version.camunda.spin>1.0.1</version.camunda.spin>
     <version.camunda.template-engines>1.0.1</version.camunda.template-engines>
+    <version.camunda.ee.xslt-plugin>1.0.1</version.camunda.ee.xslt-plugin>
   </properties>
 
   <dependencyManagement>
@@ -150,6 +151,11 @@
         <version>${version.camunda.template-engines}</version>
         <scope>import</scope>
         <type>pom</type>
+      </dependency>
+      <dependency>
+        <groupId>org.camunda.bpm.extension.xslt</groupId>
+        <artifactId>camunda-bpm-xslt</artifactId>
+        <version>${version.camunda.ee.xslt-plugin}</version>
       </dependency>
 
     </dependencies>
