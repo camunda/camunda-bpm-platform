@@ -10,22 +10,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.model.cmmn.instance;
+package org.camunda.bpm.model.cmmn.impl.instance;
 
-import org.camunda.bpm.model.cmmn.impl.instance.ItemControl;
+import java.util.Collection;
+
+import org.camunda.bpm.model.cmmn.instance.CmmnModelElementInstanceTest;
+import org.camunda.bpm.model.cmmn.instance.PlanItemControl;
 
 /**
  * @author Roman Smirnov
  *
  */
-public interface DiscretionaryItem extends TableItem {
+public class ItemControlTest extends CmmnModelElementInstanceTest {
 
-  PlanItemDefinition getDefinition();
+  public TypeAssumption getTypeAssumption() {
+    return new TypeAssumption(PlanItemControl.class, false);
+  }
 
-  void setDefinition(PlanItemDefinition definition);
+  public Collection<ChildElementAssumption> getChildElementAssumptions() {
+    return null;
+  }
 
-  ItemControl getItemControl();
-
-  void setItemControl(ItemControl itemControl);
+  public Collection<AttributeAssumption> getAttributesAssumptions() {
+    return null;
+  }
 
 }

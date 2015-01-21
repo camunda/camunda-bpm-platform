@@ -23,7 +23,6 @@ import java.util.Collection;
 
 import org.camunda.bpm.model.cmmn.instance.CmmnElement;
 import org.camunda.bpm.model.cmmn.instance.PlanItem;
-import org.camunda.bpm.model.cmmn.instance.PlanItemControl;
 import org.camunda.bpm.model.cmmn.instance.PlanItemDefinition;
 import org.camunda.bpm.model.cmmn.instance.Sentry;
 import org.camunda.bpm.model.xml.ModelBuilder;
@@ -46,7 +45,7 @@ public class PlanItemImpl extends CmmnElementImpl implements PlanItem {
   protected static AttributeReference<PlanItemDefinition> planItemDefinitionRefAttribute;
   protected static AttributeReferenceCollection<Sentry> entryCriteriaRefCollection;
   protected static AttributeReferenceCollection<Sentry> exitCriteriaRefCollection;
-  protected static ChildElement<PlanItemControl> itemControlChild;
+  protected static ChildElement<ItemControl> itemControlChild;
 
   public PlanItemImpl(ModelTypeInstanceContext instanceContext) {
     super(instanceContext);
@@ -76,11 +75,11 @@ public class PlanItemImpl extends CmmnElementImpl implements PlanItem {
     return exitCriteriaRefCollection.getReferenceTargetElements(this);
   }
 
-  public PlanItemControl getItemControl() {
+  public ItemControl getItemControl() {
     return itemControlChild.getChild(this);
   }
 
-  public void setItemControl(PlanItemControl itemControl) {
+  public void setItemControl(ItemControl itemControl) {
     itemControlChild.setChild(this, itemControl);
   }
 
@@ -111,7 +110,7 @@ public class PlanItemImpl extends CmmnElementImpl implements PlanItem {
 
     SequenceBuilder sequenceBuilder = typeBuilder.sequence();
 
-    itemControlChild = sequenceBuilder.element(PlanItemControl.class)
+    itemControlChild = sequenceBuilder.element(ItemControl.class)
         .build();
 
     typeBuilder.build();

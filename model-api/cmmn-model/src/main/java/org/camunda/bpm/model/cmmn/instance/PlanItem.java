@@ -14,6 +14,8 @@ package org.camunda.bpm.model.cmmn.instance;
 
 import java.util.Collection;
 
+import org.camunda.bpm.model.cmmn.impl.instance.ItemControl;
+
 
 /**
  * @author Roman Smirnov
@@ -33,9 +35,9 @@ public interface PlanItem extends CmmnElement {
 
   Collection<Sentry> getExitCriterias();
 
-  PlanItemControl getItemControl();
+  ItemControl getItemControl();
 
-  void setItemControl(PlanItemControl itemControl);
+  void setItemControl(ItemControl itemControl);
 
 
 }

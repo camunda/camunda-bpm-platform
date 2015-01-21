@@ -17,7 +17,6 @@ import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ATTRIBUTE_
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ELEMENT_DISCRETIONARY_ITEM;
 
 import org.camunda.bpm.model.cmmn.instance.DiscretionaryItem;
-import org.camunda.bpm.model.cmmn.instance.PlanItemControl;
 import org.camunda.bpm.model.cmmn.instance.PlanItemDefinition;
 import org.camunda.bpm.model.cmmn.instance.TableItem;
 import org.camunda.bpm.model.xml.ModelBuilder;
@@ -35,7 +34,7 @@ import org.camunda.bpm.model.xml.type.reference.AttributeReference;
 public class DiscretionaryItemImpl extends TableItemImpl implements DiscretionaryItem {
 
   protected static AttributeReference<PlanItemDefinition> definitionRefAttribute;
-  protected static ChildElement<PlanItemControl> itemControlChild;
+  protected static ChildElement<ItemControl> itemControlChild;
 
   public DiscretionaryItemImpl(ModelTypeInstanceContext instanceContext) {
     super(instanceContext);
@@ -49,11 +48,11 @@ public class DiscretionaryItemImpl extends TableItemImpl implements Discretionar
     definitionRefAttribute.setReferenceTargetElement(this, definition);
   }
 
-  public PlanItemControl getItemControl() {
+  public ItemControl getItemControl() {
     return itemControlChild.getChild(this);
   }
 
-  public void setItemControl(PlanItemControl itemControl) {
+  public void setItemControl(ItemControl itemControl) {
     itemControlChild.setChild(this, itemControl);
   }
 
@@ -73,7 +72,7 @@ public class DiscretionaryItemImpl extends TableItemImpl implements Discretionar
 
     SequenceBuilder sequenceBuilder = typeBuilder.sequence();
 
-    itemControlChild = sequenceBuilder.element(PlanItemControl.class)
+    itemControlChild = sequenceBuilder.element(ItemControl.class)
         .build();
 
     typeBuilder.build();

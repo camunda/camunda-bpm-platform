@@ -50,6 +50,7 @@ import org.camunda.bpm.model.cmmn.impl.instance.ImportImpl;
 import org.camunda.bpm.model.cmmn.impl.instance.InputCaseParameter;
 import org.camunda.bpm.model.cmmn.impl.instance.InputProcessParameter;
 import org.camunda.bpm.model.cmmn.impl.instance.InputsCaseParameter;
+import org.camunda.bpm.model.cmmn.impl.instance.ItemControl;
 import org.camunda.bpm.model.cmmn.impl.instance.ManualActivationRuleImpl;
 import org.camunda.bpm.model.cmmn.impl.instance.MilestoneImpl;
 import org.camunda.bpm.model.cmmn.impl.instance.OnPartImpl;
@@ -292,6 +293,7 @@ public class Cmmn {
     InputCaseParameter.registerType(modelBuilder);
     InputProcessParameter.registerType(modelBuilder);
     InputsCaseParameter.registerType(modelBuilder);
+    ItemControl.registerType(modelBuilder);
     ManualActivationRuleImpl.registerType(modelBuilder);
     MilestoneImpl.registerType(modelBuilder);
     ModelElementInstanceImpl.registerType(modelBuilder);

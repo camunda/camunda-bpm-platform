@@ -15,6 +15,8 @@ package org.camunda.bpm.model.cmmn.instance;
 import java.util.Arrays;
 import java.util.Collection;
 
+import org.camunda.bpm.model.cmmn.impl.instance.ItemControl;
+
 /**
  * @author Roman Smirnov
  *
@@ -27,7 +29,7 @@ public class PlanItemTest extends CmmnModelElementInstanceTest {
 
   public Collection<ChildElementAssumption> getChildElementAssumptions() {
     return Arrays.asList(
-          new ChildElementAssumption(PlanItemControl.class, 0, 1)
+          new ChildElementAssumption(ItemControl.class, 0, 1)
         );
   }
 

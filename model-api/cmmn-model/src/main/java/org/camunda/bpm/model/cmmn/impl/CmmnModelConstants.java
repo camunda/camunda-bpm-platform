@@ -77,6 +77,7 @@ public class CmmnModelConstants {
   // plan item control
   public static final String CMMN_ELEMENT_PLAN_ITEM_CONTROL = "planItemControl";
   public static final String CMMN_ELEMENT_DEFAULT_CONTROL = "defaultControl";
+  public static final String CMMN_ELEMENT_ITEM_CONTROL = "itemControl";
 
   // plan item definitions
   public static final String CMMN_ELEMENT_PLAN_ITEM_DEFINITION = "planItemDefinition";
