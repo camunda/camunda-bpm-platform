@@ -8,7 +8,7 @@
 	  </security>
 	</datasource>
 	<xa-datasource jndi-name="java:jboss/datasources/ProcessEngine" pool-name="ProcessEngine" enabled="true" use-ccm="false">
-	  <driver>${jboss.driver}</driver>
+	  <driver>com.oracle.jdbc.ojdbc6</driver>
 	  <xa-datasource-property name="URL">jdbc:oracle:thin:@${database.host}:${database.port}:${database.name}</xa-datasource-property>
 	  <xa-datasource-property name="User">${database.username}</xa-datasource-property>
 	  <xa-datasource-property name="Password">${database.password}</xa-datasource-property>

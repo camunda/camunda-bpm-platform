@@ -211,20 +211,6 @@
     </profile>
 
     <profile>
-      <id>oracle-11</id>
-      <properties>
-        <jboss.driver>com.oracle.jdbc.ojdbc6</jboss.driver>
-      </properties>
-    </profile>
-
-    <profile>
-      <id>oracle-10</id>
-      <properties>
-        <jboss.driver>com.oracle.jdbc.ojdbc14</jboss.driver>
-      </properties>
-    </profile>
-
-    <profile>
       <id>postgresql</id>
       <properties>
         <glassfish.domain.xml>domain.xml</glassfish.domain.xml>

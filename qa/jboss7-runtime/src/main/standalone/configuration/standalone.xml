@@ -115,9 +115,6 @@
                     <driver name="com.oracle.jdbc.ojdbc6" module="com.oracle.jdbc.ojdbc6">
                         <xa-datasource-class>oracle.jdbc.xa.client.OracleXADataSource</xa-datasource-class>
                     </driver>
-                    <driver name="com.oracle.jdbc.ojdbc14" module="com.oracle.jdbc.ojdbc14">
-                        <xa-datasource-class>oracle.jdbc.xa.client.OracleXADataSource</xa-datasource-class>
-                    </driver>
                     <driver name="postgresql" module="org.postgresql.postgresql">
                       <xa-datasource-class>org.postgresql.xa.PGXADataSource</xa-datasource-class>
                     </driver>

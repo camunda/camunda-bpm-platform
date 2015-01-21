@@ -13,6 +13,7 @@
   <artifactId>camunda-database-settings</artifactId>
   <packaging>pom</packaging>
   <name>camunda BPM - database settings</name>
+  <description>Provides general dependencies and profiles for database testing</description>
 
   <properties>
   </properties>
@@ -88,6 +89,7 @@
         <jboss.datasource.filename>db2-xa-ds.xml</jboss.datasource.filename>
       </properties>
     </profile>
+
     <profile>
       <id>h2</id>
       <properties>
@@ -105,6 +107,7 @@
         <jboss.datasource.filename>h2-ds.xml</jboss.datasource.filename>
       </properties>
     </profile>
+
     <profile>
       <id>mysql</id>
       <properties>
@@ -121,6 +124,7 @@
         <jboss.datasource.filename>mysql-xa-ds.xml</jboss.datasource.filename>
       </properties>
     </profile>
+
     <profile>
       <id>oracle</id>
       <properties>
@@ -137,18 +141,7 @@
         <jboss.datasource.filename>oracle-xa-ds.xml</jboss.datasource.filename>
       </properties>
     </profile>
-    <profile>
-      <id>oracle-11</id>
-      <properties>
-        <jboss.driver>com.oracle.jdbc.ojdbc6</jboss.driver>
-      </properties>
-    </profile>
-    <profile>
-      <id>oracle-10</id>
-      <properties>
-        <jboss.driver>com.oracle.jdbc.ojdbc14</jboss.driver>
-      </properties>
-    </profile>
+
     <profile>
       <id>postgresql</id>
       <properties>
@@ -165,6 +158,7 @@
         <jboss.datasource.filename>postgresql-xa-ds.xml</jboss.datasource.filename>
       </properties>
     </profile>
+
     <profile>
       <id>sqlserver</id>
       <properties>
