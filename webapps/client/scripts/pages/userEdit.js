@@ -1,12 +1,9 @@
 /* global define: false */
-define([ 'angular', 'require' ], function(angular, require) {
+define([ 'angular', 'text!./userEdit.html', 'text!./create-group-membership.html' ], function(angular, template, groupTemplate) {
   'use strict';
-
-  var module = angular.module('admin.pages');
-
-  var RouteConfig = [ '$routeProvider', function($routeProvider) {
+  return [ '$routeProvider', function($routeProvider) {
     $routeProvider.when('/users/:userId', {
-      templateUrl: require.toUrl('./pages/userEdit.html'),
+      template: template,
       controller: [
               '$scope', '$window', '$routeParams', 'UserResource', 'GroupResource', 'GroupMembershipResource', 'Notifications', '$location', '$modal', 'AuthorizationResource', 'authentication',
       function($scope,   $window,   $routeParams,   UserResource,   GroupResource,   GroupMembershipResource,   Notifications,   $location,   $modal,   AuthorizationResource,   authentication) {
@@ -166,7 +163,7 @@ define([ 'angular', 'require' ], function(angular, require) {
         $scope.openCreateGroupMembershipDialog = function() {
           var dialog = $modal.open({
             controller: 'GroupMembershipDialogController',
-            templateUrl: require.toUrl('./create-group-membership.html'),
+            template: groupTemplate,
             resolve: {
               user: function() {
                 return $scope.user;
@@ -222,8 +219,4 @@ define([ 'angular', 'require' ], function(angular, require) {
       reloadOnSearch: false
     });
   }];
-
-  module
-    .config(RouteConfig);
-
 });

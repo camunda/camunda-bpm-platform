@@ -15,13 +15,14 @@
    * @memberof cam
    * @name admin
    */
+
   var adminCore = [
-    'module:ngRoute:angular-route',
-    'module:admin.pages:./pages/main',
-    'module:admin.directives:./directives/main',
-    'module:admin.filters:./filters/main',
-    'module:admin.services:./services/main',
-    'module:admin.resources:./resources/main'
+    'angular-route',
+    './pages/main',
+    './directives/main',
+    './filters/main',
+    './services/main',
+    './resources/main'
   ];
 
   var commons = [
@@ -30,10 +31,14 @@
 
   var plugins = window.PLUGIN_DEPENDENCIES || [];
 
-  var dependencies = [ 'jquery', 'angular', 'module:ng', 'module:ngResource', 'module:ui.bootstrap:angular-ui' ].concat(commons, adminCore,
-                       plugins.map(function(plugin) { return 'module:' + plugin.ngModuleName + ':' + plugin.requirePackageName; }));
+  var dependencies = [ 'jquery', 'angular', 'angular-ui' ].concat(commons, adminCore,
+                       plugins.map(function(plugin) { return plugin.requirePackageName; }));
 
-  ngDefine('admin', dependencies, function(module, $) {
+  define(dependencies, function($, angular) {
+
+    var ngModule = angular.module('admin', ['ngRoute', 'admin.pages', 'admin.directives', 'admin.filters', 'admin.services', 'admin.resources', 'ng', 'ngResource', 'ui.bootstrap'].concat(plugins.map(function(plugin){
+      return plugin.ngModuleName;
+    })));
 
     var ModuleConfig = [ '$routeProvider', 'UriProvider', function($routeProvider, UriProvider) {
 
@@ -67,9 +72,9 @@
       }]);
     }];
 
-    module.config(ModuleConfig);
+    ngModule.config(ModuleConfig);
 
-    return module;
+    return ngModule;
   });
 
 })(window || this);

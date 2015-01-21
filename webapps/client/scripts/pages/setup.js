@@ -1,9 +1,5 @@
-'use strict';
-
-define(['angular'], function(angular) {
-
-  var module = angular.module('admin.pages');
-
+define(['text!./setup.html'], function(template) {
+  'use strict';
   var Controller = ['$scope', 'InitialUserResource', 'Notifications', '$location', 'Uri', function ($scope, InitialUserResource, Notifications, $location, Uri) {
 
     if (!/.*\/app\/admin\/(\w+)\/setup\/.*/.test($location.absUrl())) {
@@ -19,7 +15,7 @@ define(['angular'], function(angular) {
       firstName : "",
       lastName : "",
       email : ""
-    }
+    };
 
     $scope.created = false;
 
@@ -43,18 +39,14 @@ define(['angular'], function(angular) {
           Notifications.addError({ status: "Error", message: "Could not create initial user." });
         }
       );
-    }
+    };
 
   }];
 
-  var RouteConfig = [ '$routeProvider', function($routeProvider) {
+  return [ '$routeProvider', function($routeProvider) {
     $routeProvider.when('/setup', {
-      templateUrl: require.toUrl('./pages/setup.html'),
+      template: template,
       controller: Controller
     });
   }];
-
-  module
-    .config(RouteConfig);
-
 });

@@ -1,6 +1,6 @@
-ngDefine('admin.resources', function(module) {
+define([], function() {
 
-  var GroupResource = [ '$resource', 'Uri', function ($resource, Uri) {
+  return [ '$resource', 'Uri', function ($resource, Uri) {
 
     return $resource(Uri.appUri('engine://engine/:engine/group/:groupId/:action'), { groupId: '@id' }, {
       createGroup : {method:'POST', params: { 'groupId' : 'create'}},
@@ -8,6 +8,4 @@ ngDefine('admin.resources', function(module) {
       OPTIONS : {method:'OPTIONS', params: {}}
     });
   }];
-
-  module.factory('GroupResource', GroupResource);
 });

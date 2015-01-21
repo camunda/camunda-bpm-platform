@@ -1,6 +1,6 @@
-ngDefine('admin.pages', function(module, $) {
+define([], function() {
 
-  function AuthorizationCreateController ($scope, $q, $location, Uri, Notifications, AuthorizationResource) {
+  return [ '$scope', '$q', '$location', 'Uri', 'Notifications', 'AuthorizationResource', function AuthorizationCreateController ($scope, $q, $location, Uri, Notifications, AuthorizationResource) {
 
     $scope.isCreateNewAuthorization = false;
 
@@ -14,8 +14,8 @@ ngDefine('admin.pages', function(module, $) {
         if($scope.selectedPermissions.indexOf(resourcePermissions[i]) < 0) {
           $scope.availablePermissions.push(resourcePermissions[i]);
         }
-      };
-    }
+      }
+    };
 
     var resetForm = function() {
       newAuthorization = $scope.newAuthorization = {
@@ -29,7 +29,7 @@ ngDefine('admin.pages', function(module, $) {
       $scope.identityId =undefined;
       $scope.identityType = 'User';
       updatePermissions();
-    }
+    };
 
     resetForm();
 
@@ -38,15 +38,15 @@ ngDefine('admin.pages', function(module, $) {
       if(!$scope.isCreateNewAuthorization) {
         resetForm();
       }
-    }
+    };
 
     var isIdentityIdDisabled = $scope.isIdentityIdDisabled = function() {
       return newAuthorization.type == 0;
-    }
+    };
 
     $scope.setIdentityType = function(identityType) {
       $scope.identityType = identityType;
-    }
+    };
 
 
     $scope.addPermission = function(perm) {
@@ -56,12 +56,12 @@ ngDefine('admin.pages', function(module, $) {
       }
       $scope.selectedPermissions.push(perm);
       updatePermissions();
-    }
+    };
 
     $scope.addAllPermissions = function() {
       $scope.selectedPermissions = [ "ALL" ];
       updatePermissions();
-    }
+    };
 
     $scope.$watch('newAuthorization.type', function() {
       if(newAuthorization.type == 0) {
@@ -92,14 +92,5 @@ ngDefine('admin.pages', function(module, $) {
 
     };
 
-  };
-
-  module.controller('AuthorizationCreateController', [ '$scope',
-                                                         '$q',
-                                                         '$location',
-                                                         'Uri',
-                                                         'Notifications',
-                                                         'AuthorizationResource',
-                                                         AuthorizationCreateController ]);
-
+  }];
 });

@@ -1,5 +1,3 @@
-ngDefine('admin.filters', [
-	
-], function(module) {
-
+define(['angular'], function(angular) {
+  return angular.module('admin.filters', []);
 });

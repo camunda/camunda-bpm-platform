@@ -25,15 +25,17 @@
       // 'bootstrap',
       'jquery-ui/ui/jquery.ui.draggable'
     ], function(angular) {
-      var pluginDependencies = window.PLUGIN_DEPENDENCIES || [];
-      require(pluginDependencies.map(function(plugin) {
-        return plugin.requirePackageName;
-      }), function() {
-        require([
-          APP_NAME,
-          'domReady!'
-        ], function() {
-          rjsConf.utils.bootAngular(angular, APP_NAME);
+      require(['angular-translate'], function(){
+        var pluginDependencies = window.PLUGIN_DEPENDENCIES || [];
+        require(pluginDependencies.map(function(plugin) {
+          return plugin.requirePackageName;
+        }), function() {
+          require([
+            APP_NAME,
+            'domReady!'
+          ], function() {
+            rjsConf.utils.bootAngular(angular, APP_NAME);
+          });
         });
       });
     });

@@ -1,5 +1,3 @@
-ngDefine('admin.services', [
-	
-], function(module) {
-
+define(['angular'], function(angular) {
+  return angular.module('admin.services', []);
 });

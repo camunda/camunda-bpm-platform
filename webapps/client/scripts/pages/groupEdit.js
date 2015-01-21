@@ -1,8 +1,5 @@
-'use strict';
-
-define(['angular'], function(angular) {
-
-  var module = angular.module('admin.pages');
+define(['angular', 'text!./groupEdit.html'], function(angular, template) {
+  'use strict';
 
   var Controller = ['$scope', '$routeParams', 'GroupResource', 'AuthorizationResource', 'Notifications', '$location', '$window',
     function ($scope, $routeParams, GroupResource, AuthorizationResource, Notifications, $location, $window) {
@@ -35,7 +32,7 @@ define(['angular'], function(angular) {
         $scope.groupName = (!!response.name ? response.name : response.id);
         $scope.groupCopy = angular.copy(response);
       });
-    }
+    };
 
     GroupResource.OPTIONS({groupId : $scope.encodedGroupId}).$promise.then(function(response) {
       // angular.forEach(response.data.links, function(link){
@@ -55,7 +52,7 @@ define(['angular'], function(angular) {
           Notifications.addError({ status: "Failed", message: "Failed to update group" });
         }
       );
-    }
+    };
 
     // delete group form /////////////////////////////
 
@@ -75,7 +72,7 @@ define(['angular'], function(angular) {
           $location.path("/groups");
         }
       );
-    }
+    };
 
     // page controls ////////////////////////////////////
 
@@ -99,16 +96,12 @@ define(['angular'], function(angular) {
 
   }];
 
-  var RouteConfig = [ '$routeProvider', function($routeProvider) {
+  return [ '$routeProvider', function($routeProvider) {
     $routeProvider.when('/groups/:groupId', {
-      templateUrl: require.toUrl('./pages/groupEdit.html'),
+      template: template,
       controller: Controller,
       authentication: 'required',
       reloadOnSearch: false
     });
   }];
-
-  module
-    .config(RouteConfig);
-
 });

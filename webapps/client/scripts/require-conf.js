@@ -87,11 +87,13 @@
     'angular':               vendor +'/angular/angular',
     'angular-resource':      vendor +'/angular-resource/angular-resource',
     'angular-route':         vendor +'/angular-route/angular-route',
+    'angular-translate':     vendor +'/angular-translate/angular-translate',
     'angular-animate':       vendor +'/angular-animate/angular-animate',
     'angular-sanitize':      vendor +'/angular-sanitize/angular-sanitize',
     'angular-ui':            vendor +'/angular-ui/build/angular-ui',
     'angular-bootstrap':     vendor +'/angular-bootstrap/ui-bootstrap-tpls',
     'jquery-ui':             vendor +'/jquery.ui',
+    'moment':                vendor +'/moment/moment',
 
     'angular-data-depend':   vendor +'/angular-data-depend/src/dataDepend',
 

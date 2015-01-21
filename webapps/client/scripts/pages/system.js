@@ -1,9 +1,5 @@
-'use strict';
-
-define(['angular'], function(angular) {
-
-  var module = angular.module('admin.pages');
-
+define(['text!./system.html'], function(template) {
+  'use strict';
   var Controller = [
     '$scope',
     '$location',
@@ -32,15 +28,11 @@ define(['angular'], function(angular) {
 
   }];
 
-  var RouteConfig = [ '$routeProvider', function($routeProvider) {
+  return [ '$routeProvider', function($routeProvider) {
     $routeProvider.when('/system', {
-      templateUrl: require.toUrl('./pages/system.html'),
+      template: template,
       controller: Controller,
       authentication: 'required'
     });
   }];
-
-  module
-    .config(RouteConfig);
-
 });

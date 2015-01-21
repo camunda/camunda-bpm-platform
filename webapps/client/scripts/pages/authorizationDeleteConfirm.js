@@ -1,8 +1,8 @@
-/* global ngDefine: false */
-ngDefine('admin.pages', function(module) {
+/* global define: false */
+define([], function() {
   'use strict';
 
-  module.controller('ConfirmDeleteAuthorizationController', [
+  return [
           '$scope', '$q', '$location', 'Uri', 'Notifications', 'AuthorizationResource', '$modalInstance', 'authorizationToDelete', 'formatPermissions', 'getResource', 'getType',
   function($scope,   $q,   $location,   Uri,   Notifications,   AuthorizationResource,   $modalInstance,   authorizationToDelete,   formatPermissions,   getResource,   getType) {
 
@@ -30,6 +30,6 @@ ngDefine('admin.pages', function(module) {
         $scope.status = DELETE_SUCCESS;
       });
     };
-  }]);
+  }];
 
 });

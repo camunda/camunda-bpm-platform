@@ -1,11 +1,9 @@
 /* global define: false */
-define([ 'angular', 'require' ], function(angular, require) {
+define(['text!./authorizations.html', 'text!./confirm-delete-authorization.html' ], function(template, confirmTemplate) {
   'use strict';
-  var module = angular.module('admin.pages');
-
-  var RouteConfig = [ '$routeProvider', function($routeProvider) {
+  return [ '$routeProvider', function($routeProvider) {
     $routeProvider.when('/authorization', {
-      templateUrl: require.toUrl('./pages/authorizations.html'),
+      template: template,
       controller: [
                '$scope', '$routeParams', '$modal', 'AuthorizationResource', 'Notifications', '$location',
       function ($scope,   $routeParams,   $modal,   AuthorizationResource,   Notifications,   $location) {
@@ -88,7 +86,7 @@ define([ 'angular', 'require' ], function(angular, require) {
 
           var dialog = $modal.open({
             controller: 'ConfirmDeleteAuthorizationController',
-            templateUrl: require.toUrl('./confirm-delete-authorization.html'),
+            template: confirmTemplate,
             resolve: {
               authorizationToDelete: function() { return authorization; },
               formatPermissions: function() { return formatPermissions; },
@@ -154,8 +152,4 @@ define([ 'angular', 'require' ], function(angular, require) {
       reloadOnSearch: false
     });
   }];
-
-  module
-    .config(RouteConfig);
-
 });

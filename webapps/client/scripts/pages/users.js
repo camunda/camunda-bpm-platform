@@ -1,9 +1,5 @@
-'use strict';
-
-define(['angular'], function(angular) {
-
-  var module = angular.module('admin.pages');
-
+define(['angular', 'text!./users.html'], function(angular, template) {
+  'use strict';
   var Controller = ['$scope', 'UserResource', function ($scope, UserResource) {
 
     $scope.availableOperations={};
@@ -22,15 +18,11 @@ define(['angular'], function(angular) {
 
   }];
 
-  var RouteConfig = [ '$routeProvider', function($routeProvider) {
+  return [ '$routeProvider', function($routeProvider) {
     $routeProvider.when('/users', {
-      templateUrl: require.toUrl('./pages/users.html'),
+      template: template,
       controller: Controller,
       authentication: 'required'
     });
   }];
-
-  module
-    .config(RouteConfig);
-
 });

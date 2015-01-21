@@ -1,9 +1,9 @@
-/* global ngDefine: false, angular: false */
+/* global define: false, angular: false */
 /* jshint browser: true */
-ngDefine('admin.pages', function(module) {
+define(['angular'], function(angular) {
   'use strict';
 
-  module.controller('GroupMembershipDialogController', [
+  return [
             '$scope', '$q', '$location', 'Uri', 'Notifications', 'GroupMembershipResource', 'GroupResource', '$modalInstance', 'user', 'userId', 'groupIdList',
     function($scope,   $q,   $location,   Uri,   Notifications,   GroupMembershipResource,   GroupResource,   $modalInstance,   user,   userId,   groupIdList) {
 
@@ -92,6 +92,6 @@ ngDefine('admin.pages', function(module) {
     $scope.close = function (status) {
       $modalInstance.close(status);
     };
-  }]);
+  }];
 
 });

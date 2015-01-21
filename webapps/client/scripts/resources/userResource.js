@@ -1,6 +1,6 @@
-ngDefine('admin.resources', function(module) {
+define([], function() {
 
-  var UserResource = [ '$resource', 'Uri', function ($resource, Uri) {
+  return [ '$resource', 'Uri', function ($resource, Uri) {
 
     return $resource(Uri.appUri('engine://engine/:engine/user/:userId/:action'), { userId: '@id' }, {
       profile : {method:'GET', params: { 'action' : 'profile'}},
@@ -10,6 +10,4 @@ ngDefine('admin.resources', function(module) {
       OPTIONS : {method:'OPTIONS', params: {}}
     });
   }];
-
-  module.factory('UserResource', UserResource);
 });

@@ -1,9 +1,5 @@
-'use strict';
-
-define(['angular'], function(angular) {
-
-  var module = angular.module('admin.pages');
-
+define(['text!./groupCreate.html'], function(template) {
+  'use strict';
   var Controller = ['$scope', 'GroupResource', 'Notifications', '$location', function ($scope, GroupResource, Notifications, $location) {
 
     // data model for new group
@@ -11,7 +7,7 @@ define(['angular'], function(angular) {
       id : "",
       name : "",
       type : ""
-    }
+    };
 
     $scope.createGroup = function() {
       var group = $scope.group;
@@ -24,19 +20,15 @@ define(['angular'], function(angular) {
           Notifications.addError({ status: "Failed", message: "Could not create group " + group.id + ". Check if it already exists." });
         }
       );
-    }
+    };
 
   }];
 
-  var RouteConfig = [ '$routeProvider', function($routeProvider) {
+  return [ '$routeProvider', function($routeProvider) {
     $routeProvider.when('/group-create', {
-      templateUrl: require.toUrl('./pages/groupCreate.html'),
+      template: template,
       controller: Controller,
       authentication: 'required'
     });
   }];
-
-  module
-    .config(RouteConfig);
-
 });

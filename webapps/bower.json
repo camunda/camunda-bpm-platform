@@ -30,11 +30,13 @@
   "dependencies": {
     "angular": "~1.2.16",
     "angular-animate": "~1.2.16",
+    "angular-moment": "0.7.0",
     "angular-bootstrap": "~0.11.0",
     "angular-cookies": "~1.2.16",
     "angular-data-depend": "camunda/angular-data-depend",
     "angular-resource": "~1.2.16",
     "angular-route": "~1.2.16",
+    "angular-translate": "2.4.2",
     "angular-sanitize": "~1.2.16",
     "angular-ui": "~0.4.0",
     "better-dom": "1.6.6",
@@ -48,9 +50,6 @@
     "requirejs-angular-define": "camunda/requirejs-angular-define",
     "requirejs-domready": "http://cdnjs.cloudflare.com/ajax/libs/require-domReady/2.0.1/domReady.min.js",
     "requirejs-text": "~2.0.12",
-    "bootstrap": "~3.1.1",
-    "angular": "~1.2.16",
-    "jquery": "~2.1.0",
     "jquery.ui": "~1.10.4"
   },
   "devDependencies": {
