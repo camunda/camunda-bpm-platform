@@ -194,22 +194,6 @@ public abstract class XmlDomXPathScriptTest extends ScriptTest {
   @Script(
     variables = {
       @ScriptVariable(name = "input", value = xmlWithNamespace),
-      @ScriptVariable(name = "expression", value = "/root/foo:child")
-    }
-  )
-  public void canQueryElementWithNamespaceDetection() {
-    SpinXPathQuery query = script.getVariable("query");
-    SpinXmlElement child = query.element();
-
-    assertThat(child.name()).isEqualTo("child");
-    assertThat(child.namespace()).isEqualTo("http://camunda.com");
-    assertThat(child.attr("id").value()).isEqualTo("child");
-  }
-
-  @Test
-  @Script(
-    variables = {
-      @ScriptVariable(name = "input", value = xmlWithNamespace),
       @ScriptVariable(name = "expression", value = "/root/a:child")
     }
   )
@@ -227,7 +211,7 @@ public abstract class XmlDomXPathScriptTest extends ScriptTest {
     name = "XmlDomXPathScriptTest.canQueryElementWithNamespace",
     variables = {
       @ScriptVariable(name = "input", value = xmlWithDefaultNamespace),
-      @ScriptVariable(name = "expression", value = "/DEFAULT:root/a:child")
+      @ScriptVariable(name = "expression", value = "/:root/a:child")
     }
   )
   public void canQueryElementWithDefaultNamespace() {

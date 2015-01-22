@@ -14,11 +14,10 @@ package org.camunda.spin.impl.xml.dom.query;
 
 import org.camunda.spin.xml.SpinXmlElement;
 
-import javax.swing.plaf.PanelUI;
+import javax.xml.XMLConstants;
 import javax.xml.namespace.NamespaceContext;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
+
 
 /**
  * Resolves the namespaces of the given element.
@@ -37,15 +36,47 @@ public class DomXPathNamespaceResolver implements NamespaceContext {
 
   public String getNamespaceURI(String prefix) {
 
-    // using 'DEFAULT' as prefix for xmlns="<URI>" namespace
-    if(prefix.equals("DEFAULT")) {
+    if(prefix == null) {
+      throw new IllegalArgumentException("Prefix cannot be null.");
+    }
+
+    if(prefix.equals(XMLConstants.XML_NS_PREFIX)) {
+      return XMLConstants.XML_NS_URI;
+    }
+
+    if(prefix.equals(XMLConstants.XMLNS_ATTRIBUTE)) {
+      return XMLConstants.XMLNS_ATTRIBUTE_NS_URI;
+    }
+
+    /**
+     * TODO: This only works for the root element. Every child element with a 'xmlns'-attribute will be ignored
+     * So you need to specify an own prefix for the child elements default namespace uri
+     */
+    if(prefix.equals(XMLConstants.DEFAULT_NS_PREFIX)) {
       return element.namespace();
-    } else {
+    }
+
+    if(namespaces.containsKey(prefix)) {
       return namespaces.get(prefix);
+    } else {
+      return XMLConstants.NULL_NS_URI;
     }
   }
 
   public String getPrefix(String namespaceURI) {
+
+    if(namespaceURI == null) {
+      throw new IllegalArgumentException("Namespace URI cannot be null.");
+    }
+
+    if(namespaceURI.equals(XMLConstants.XML_NS_URI)) {
+      return XMLConstants.XML_NS_PREFIX;
+    }
+
+    if(namespaceURI.equals(XMLConstants.XMLNS_ATTRIBUTE_NS_URI)) {
+      return XMLConstants.XMLNS_ATTRIBUTE;
+    }
+
     String key = null;
     if(namespaces.containsValue(namespaceURI)) {
       for(Map.Entry<String, String> entry : namespaces.entrySet()) {
@@ -56,10 +87,43 @@ public class DomXPathNamespaceResolver implements NamespaceContext {
       }
     }
     return key;
+
   }
 
   public Iterator getPrefixes(String namespaceURI) {
-    return namespaces.entrySet().iterator();
+
+    if(namespaceURI == null) {
+      throw new IllegalArgumentException("Namespace URI cannot be null.");
+    }
+
+    List<String> list = new ArrayList<String>();
+    if(namespaceURI.equals(XMLConstants.XML_NS_URI)) {
+      list.add(XMLConstants.XML_NS_PREFIX);
+      return Collections.unmodifiableList(list).iterator();
+    }
+
+
+    if(namespaceURI.equals(XMLConstants.XMLNS_ATTRIBUTE_NS_URI)) {
+      list.add(XMLConstants.XMLNS_ATTRIBUTE);
+      return Collections.unmodifiableList(list).iterator();
+    }
+
+    if(namespaces.containsValue(namespaceURI)) {
+      // default namespace
+      if(namespaceURI.equals(element.namespace())) {
+        list.add(XMLConstants.DEFAULT_NS_PREFIX);
+      }
+
+      // all other namespaces
+      for(Map.Entry<String, String> entry : namespaces.entrySet()) {
+        if(namespaceURI.equals(entry.getValue())) {
+          list.add(entry.getKey());
+        }
+      }
+      return Collections.unmodifiableList(list).iterator();
+    } else {
+      return Collections.emptyIterator();
+    }
   }
 
   /**
@@ -83,29 +147,5 @@ public class DomXPathNamespaceResolver implements NamespaceContext {
    */
   public void setNamespaces(Map<String, String> namespaces) {
     this.namespaces = namespaces;
-  }
-
-  /**
-   * This enables the detection of the namespaces.
-   */
-  public void autodetectNamespaces() {
-    detectNamespaces(element);
-  }
-
-  /**
-   * Detects the namespaces of the element and all children.
-   *
-   * @param element the parent element for detection
-   */
-  protected void detectNamespaces(SpinXmlElement element) {
-    if(!namespaces.containsKey(element.prefix())) {
-      if(element.namespace() != null && element.prefix() != null) {
-        namespaces.put(element.prefix(), element.namespace());
-      }
-
-      for (SpinXmlElement childElement : element.childElements()) {
-        detectNamespaces(childElement);
-      }
-    }
   }
 }

@@ -72,13 +72,6 @@ public abstract class SpinXPathQuery {
   public abstract Boolean bool();
 
   /**
-   * Detects all namespaces used in the element and its children.
-   *
-   * @return itself
-   */
-  public abstract SpinXPathQuery detectNamespaces();
-
-  /**
    * Maps a prefix, uri pair to a namespace.
    *
    * @param prefix prefix for the namespace.

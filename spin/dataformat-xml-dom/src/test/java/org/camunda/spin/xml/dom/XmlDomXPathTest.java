@@ -114,25 +114,6 @@ public class XmlDomXPathTest {
   }
 
   @Test
-  public void canQueryElementWithNamespaceAutoDetect() {
-    SpinXmlElement child = elementWithNamespace.xPath("/root/foo:child")
-      .detectNamespaces()
-      .element();
-
-    assertThat(child.name()).isEqualTo("child");
-    assertThat(child.namespace()).isEqualTo("http://camunda.com");
-    assertThat(child.attr("id").value()).isEqualTo("child");
-
-    SpinXmlElement child2 = child.xPath("foo:b")
-      .ns("foo", "http://camunda.com")
-      .element();
-
-    assertThat(child2.name()).isEqualTo("b");
-    assertThat(child2.namespace()).isEqualTo("http://camunda.com");
-    assertThat(child2.attr("id").value()).isEqualTo("b");
-  }
-
-  @Test
   public void canQueryElementWithNamespaceMap() {
     Map<String, String> namespaces = new HashMap<String, String>();
     namespaces.put("a", "http://camunda.com");
@@ -149,7 +130,7 @@ public class XmlDomXPathTest {
 
   @Test
   public void canQueryElementWithDefaultNamespace() {
-    SpinXmlElement child = elementWithDefaultNamespace.xPath("/DEFAULT:root/a:child")
+    SpinXmlElement child = elementWithDefaultNamespace.xPath("/:root/a:child")
       .ns("a", "http://camunda.com")
       .element();
 
@@ -157,5 +138,4 @@ public class XmlDomXPathTest {
     assertThat(child.namespace()).isEqualTo("http://camunda.com");
     assertThat(child.attr("id").value()).isEqualTo("child");
   }
-
 }

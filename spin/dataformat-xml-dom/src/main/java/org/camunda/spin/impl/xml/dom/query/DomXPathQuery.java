@@ -54,6 +54,8 @@ public class DomXPathQuery extends SpinXPathQuery {
     this.expression = expression;
     this.dataFormat = dataFormat;
     this.resolver = new DomXPathNamespaceResolver(this.domElement);
+
+    this.query.setNamespaceContext(this.resolver);
   }
 
   public SpinXmlElement element() {
@@ -140,12 +142,6 @@ public class DomXPathQuery extends SpinXPathQuery {
   public SpinXPathQuery ns(Map<String, String> namespaces) {
     ensureNotNull("Namespace Map", namespaces);
     resolver.setNamespaces(namespaces);
-    query.setNamespaceContext(resolver);
-    return this;
-  }
-
-  public SpinXPathQuery detectNamespaces() {
-    resolver.autodetectNamespaces();
     query.setNamespaceContext(resolver);
     return this;
   }
