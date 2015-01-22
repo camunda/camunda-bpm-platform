@@ -12,6 +12,7 @@
 
     <!-- settings the base path for relative links -->
     <base href="$BASE" admin-api="$APP_ROOT/api/admin/" engine-api="$APP_ROOT/api/engine/" app-root="$APP_ROOT" />
+
     <!-- an example of plugin/feature exclusion -->
     <!--
     <base href="$BASE"
@@ -28,16 +29,6 @@
     <!-- favicon -->
     <link href="$APP_ROOT/app/cockpit/assets/images/favicon.ico" rel="shortcut icon" type="image/x-icon" />
 
-    <!-- scripts -->
-
-    <script type="application/javascript">
-      window.PLUGIN_DEPENDENCIES = $PLUGIN_DEPENDENCIES || [];
-      window.PLUGIN_PACKAGES = $PLUGIN_PACKAGES || [];
-    </script>
-
-    <script src="$APP_ROOT/app/admin/assets/vendor/requirejs/require.js"></script>
-
-    <script src="$APP_ROOT/app/admin/admin-bootstrap.js?bust=CACHE_BUSTER"></script>
   </head>
   <body>
     <!-- navigation -->
@@ -131,13 +122,12 @@
             cam-if-logged-in
             ng-cloak></li>
 
-        <li class="app-switch dropdown"
-            cam-app-switch>
+        <li class="app-switch dropdown">
           <a href
              sem-show-applications
              class="dropdown-toggle"
              data-toggle="dropdown">
-            <i class="glyphicon glyphicon-home "></i>
+            <i class="glyphicon glyphicon-home"></i>
             <b class="caret"></b>
           </a>
 
@@ -178,7 +168,14 @@
       </div>
     </footer>
 
-    <script src="$APP_ROOT/app/admin/assets/vendor/better-dom/dist/better-dom.js"></script>
-    <script src="$APP_ROOT/app/admin/assets/vendor/better-placeholder-polyfill/dist/better-placeholder-polyfill.js"></script>
+    <script type="application/javascript">
+      window.PLUGIN_DEPENDENCIES = $PLUGIN_DEPENDENCIES || [];
+      window.PLUGIN_PACKAGES = $PLUGIN_PACKAGES || [];
+    </script>
+
+    <script type="application/javascript"
+            src="$APP_ROOT/app/admin/scripts/deps.js"
+            data-main="$APP_ROOT/app/admin/scripts/camunda-admin-ui"></script>
+
   </body>
 </html>
