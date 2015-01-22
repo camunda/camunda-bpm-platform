@@ -47,7 +47,7 @@
     </profile>
   </profiles>
 
-  <properties> 
+  <properties>
     <version.tomcat>7.0.50</version.tomcat>
     <tomcat6.connector.http.port>48080</tomcat6.connector.http.port>
     <tomcat6.connector.http.redirectPort>48443</tomcat6.connector.http.redirectPort>
@@ -130,5 +130,19 @@
       </plugins>
     </pluginManagement>
   </build>
+
+  <repositories>
+    <repository>
+      <id>camunda-nexus</id>
+      <name>camunda BPM Maven Repository</name>
+      <url>https://app.camunda.com/nexus/content/groups/public</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </repository>
+  </repositories>
 
 </project>
