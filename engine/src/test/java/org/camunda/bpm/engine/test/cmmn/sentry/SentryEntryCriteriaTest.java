@@ -789,7 +789,7 @@ public class SentryEntryCriteriaTest extends CmmnProcessEngineTestCase {
    * CAM-3226
    */
   @Deployment
-  public void FAILING_testSentryShouldNotBeEvaluatedAfterStageComplete() {
+  public void testSentryShouldNotBeEvaluatedAfterStageComplete() {
     // given
     String caseInstanceId = createCaseInstance().getId();
 

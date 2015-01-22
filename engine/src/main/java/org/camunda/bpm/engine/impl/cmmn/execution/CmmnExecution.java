@@ -290,26 +290,29 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
     // Step 4: fire satisfied sentries
     fireSentries(satisfiedSentries);
 
-    // the following steps are a workaround, because setVariable()
-    // does not check nor fire a sentry!!!
+    if (isActive()) {
+      // the following steps are a workaround, because setVariable()
+      // does not check nor fire a sentry!!!
 
-    // Step 5: get all not affected sentries to avoid that a
-    // sentry will be checked twice;
-    // notAffectedSentries = getSentries().keySet() / affectedSentries
-    Map<String, List<CmmnSentryPart>> sentries = getSentries();
-    List<String> notAffectedSentries = new ArrayList<String>();
-    for (String sentryId : sentries.keySet()) {
-      // but only those ones which has an ifPart defined
-      if (!affectedSentries.contains(sentryId) && containsIfPart(sentryId)) {
-        notAffectedSentries.add(sentryId);
+      // Step 5: get all not affected sentries to avoid that a
+      // sentry will be checked twice;
+      // notAffectedSentries = getSentries().keySet() / affectedSentries
+      Map<String, List<CmmnSentryPart>> sentries = getSentries();
+      List<String> notAffectedSentries = new ArrayList<String>();
+      for (String sentryId : sentries.keySet()) {
+        // but only those ones which has an ifPart defined
+        if (!affectedSentries.contains(sentryId) && containsIfPart(sentryId)) {
+          notAffectedSentries.add(sentryId);
+        }
       }
+
+      // Step 6: check each not affected sentry whether it is satisfied
+      satisfiedSentries = getSatisfiedSentries(notAffectedSentries);
+
+      // Step 7: fire satisfied sentries
+      fireSentries(satisfiedSentries);
     }
 
-    // Step 6: check each not affected sentry whether it is satisfied
-    satisfiedSentries = getSatisfiedSentries(notAffectedSentries);
-
-    // Step 7: fire satisfied sentries
-    fireSentries(satisfiedSentries);
   }
 
   protected List<String> collectAffectedSentries(CmmnExecution child, String transition) {
