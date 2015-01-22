@@ -1,7 +1,6 @@
 'use strict';
 
 var commentLineExp =  /^[\s]*<!-- (\/|#) (CE|EE)/;
-var requireConfExp =  /require-conf.js$/;
 
 function distFileProcessing(content, srcpath) {
   // removes the template comments
@@ -10,11 +9,11 @@ function distFileProcessing(content, srcpath) {
               return !commentLineExp.test(line);
             }).join('\n');
 
-  var date = new Date();
-  var cacheBuster = [date.getFullYear(), date.getMonth(), date.getDate()].join('-');
-  content = content
-            .replace(/\/\* cache-busting /, '/* cache-busting */')
-            .replace(/CACHE_BUSTER/g, requireConfExp.test(srcpath) ? '\''+ cacheBuster +'\'' : cacheBuster);
+  // var date = new Date();
+  // var cacheBuster = [date.getFullYear(), date.getMonth(), date.getDate()].join('-');
+  // content = content
+  //           .replace(/\/\* cache-busting /, '/* cache-busting */')
+  //           .replace(/CACHE_BUSTER/g, requireConfExp.test(srcpath) ? '\''+ cacheBuster +'\'' : cacheBuster);
 
   return content;
 }
@@ -24,15 +23,13 @@ function devFileProcessing(content, srcpath) {
   var liveReloadPort = this.config.get('pkg.gruntConfig.livereloadPort');
   /* jshint validthis: false */
 
-  if (requireConfExp.test(srcpath)) {
-    content = content
-              .replace(/\/\* live-reload/, '/* live-reload */')
-              .replace(/LIVERELOAD_PORT/g, liveReloadPort);
-  }
-
   content = content
-            .replace(/\/\* cache-busting/, '/* cache-busting */')
-            .replace(/CACHE_BUSTER/g, (new Date()).getTime());
+            .replace(/\/\* live-reload/, '/* live-reload */')
+            .replace(/LIVERELOAD_PORT/g, liveReloadPort);
+
+  // content = content
+  //           .replace(/\/\* cache-busting/, '/* cache-busting */')
+  //           .replace(/CACHE_BUSTER/g, (new Date()).getTime());
 
   return content;
 }
@@ -44,7 +41,7 @@ module.exports = function(config) {
     development: {
       options: {
         process: function() {
-          devFileProcessing.apply(grunt, arguments);
+          return devFileProcessing.apply(grunt, arguments);
         }
       },
       files: [
@@ -52,9 +49,7 @@ module.exports = function(config) {
           expand: true,
           cwd: '<%= pkg.gruntConfig.clientDir %>/scripts/',
           src: [
-            'require-conf.js',
-            'index.html',
-            '{app,plugin,develop,common}/**/*.{js,html}'
+            'index.html'
           ],
           dest: '<%= buildTarget %>/'
         }
@@ -64,7 +59,7 @@ module.exports = function(config) {
     dist: {
       options: {
         process: function() {
-          distFileProcessing.apply(grunt, arguments);
+          return distFileProcessing.apply(grunt, arguments);
         }
       },
       files: [
@@ -78,16 +73,7 @@ module.exports = function(config) {
           expand: true,
           cwd: '<%= pkg.gruntConfig.clientDir %>/scripts/',
           src: [
-            'require-conf.js',
             'index.html'
-          ],
-          dest: '<%= buildTarget %>/'
-        },
-        {
-          expand: true,
-          cwd: '<%= pkg.gruntConfig.clientDir %>/scripts/',
-          src: [
-            '{app,plugin,develop,common}/**/*.{js,html}'
           ],
           dest: '<%= buildTarget %>/'
         }
@@ -95,10 +81,6 @@ module.exports = function(config) {
     },
 
     assets: {
-      process: function(content, srcpath) {
-        grunt.log.ok('Copy '+ srcpath);
-        return content;
-      },
       files: [
         // images, fonts & stuff
         {
@@ -108,33 +90,6 @@ module.exports = function(config) {
             '{fonts,images}/**/*.*'
           ],
           dest: '<%= buildTarget %>/assets'
-        },
-
-        // dojo & dojox
-        {
-          expand: true,
-          cwd: '<%= pkg.gruntConfig.clientDir %>/vendor/dojo',
-          src:  [
-            '**/*.*'
-          ],
-          dest: '<%= buildTarget %>/assets/vendor'
-        },
-
-        // requirejs
-        {
-          src: 'node_modules/requirejs/require.js',
-          dest: '<%= buildTarget %>/assets/vendor/requirejs/require.js'
-        },
-
-        // others
-        {
-          expand: true,
-          cwd: '<%= pkg.gruntConfig.clientDir %>/bower_components',
-          src: [
-            '!jquery.ui/{demos,external,tests,themes}/**/*',
-            '**/*.{js,css,jpg,png,gif,html,htc}'
-          ],
-          dest: '<%= buildTarget %>/assets/vendor'
         },
 
         // bootstrap fonts
@@ -147,27 +102,6 @@ module.exports = function(config) {
           dest: '<%= buildTarget %>/fonts/'
         }
       ]
-    },
-
-    sdk: {
-      files: [
-        {
-          src: 'node_modules/camunda-bpm-sdk-js/dist/camunda-embedded-forms.js',
-          dest: '<%= pkg.gruntConfig.clientDir %>/bower_components/camunda-bpm-form/index.js'
-        },
-        {
-          src: 'node_modules/camunda-bpm-sdk-js/dist/camunda-bpm-sdk.js',
-          dest: '<%= pkg.gruntConfig.clientDir %>/bower_components/camunda-bpm-sdk-js/index.js'
-        },
-        {
-          src: 'node_modules/camunda-bpm-sdk-js/dist/camunda-bpm-sdk-mock.js',
-          dest: '<%= pkg.gruntConfig.clientDir %>/bower_components/camunda-bpm-sdk-js-mock/index.js'
-        }
-      ]
     }
   };
 };
-
-
-module.exports.devFileProcessing = devFileProcessing;
-module.exports.distFileProcessing = distFileProcessing;
