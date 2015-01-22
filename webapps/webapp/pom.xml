@@ -450,25 +450,16 @@
     <!-- database QA profiles -->
     <profile>
       <id>database</id>
-
-      <properties>
-        <db.properties.file>${user.home}/.camunda/jdbc/cockpit.${database}.properties</db.properties.file>
-      </properties>
-
-      <activation>
-        <property>
-          <name>database</name>
-        </property>
-      </activation>
       <build>
+        <testResources>
+          <testResource>
+            <directory>src/test/resources</directory>
+            <filtering>true</filtering>
+          </testResource>
+        </testResources>
         <plugins>
           <plugin>
             <artifactId>maven-antrun-plugin</artifactId>
-            <!--
-              only worked with this version, there might be a bug with antrun
-              see http://jira.codehaus.org/browse/MANTRUN-109
-            -->
-            <version>1.4</version>
             <executions>
               <execution>
                 <id>database-test-create-schema</id>
@@ -477,15 +468,13 @@
                   <goal>run</goal>
                 </goals>
                 <configuration>
-                  <tasks>
-                    <echo message="updating activiti configuration to db ${database}" />
-                    <copy file="target/test-classes/camunda.cfg.db.xml" tofile="target/test-classes/camunda.cfg.xml" overwrite="true">
-                      <filterset filtersfile="${db.properties.file}" />
-                    </copy>
+                  <target>
+                    <echo message="updating configuration to db ${database.type}" />
+                    <copy file="target/test-classes/camunda.cfg.db.xml" tofile="target/test-classes/camunda.cfg.xml" overwrite="true"/>
 
-                    <echo message="dropping schema in ${database}" />
+                    <echo message="dropping schema in ${database.type}" />
                     <java classname="org.camunda.bpm.engine.impl.db.DbSchemaDrop" classpathref="maven.test.classpath" />
-                  </tasks>
+                  </target>
                 </configuration>
               </execution>
               <execution>
@@ -495,10 +484,10 @@
                   <goal>run</goal>
                 </goals>
                 <configuration>
-                  <tasks>
-                    <echo message="dropping schema in ${database}" />
+                  <target>
+                    <echo message="dropping schema in ${database.type}" />
                     <java classname="org.camunda.bpm.engine.impl.db.DbSchemaDrop" classpathref="maven.test.classpath" />
-                  </tasks>
+                  </target>
                 </configuration>
               </execution>
             </executions>
@@ -508,13 +497,7 @@
     </profile>
 
     <profile>
-      <id>oracle</id>
-      <activation>
-        <property>
-          <name>database</name>
-          <value>oracle</value>
-        </property>
-      </activation>
+      <id>oracle-11</id>
       <dependencies>
         <dependency>
           <groupId>com.oracle.jdbc</groupId>
@@ -525,13 +508,7 @@
     </profile>
 
     <profile>
-      <id>oracle10g</id>
-      <activation>
-        <property>
-          <name>database</name>
-          <value>oracle10g</value>
-        </property>
-      </activation>
+      <id>oracle-10</id>
       <dependencies>
         <dependency>
           <groupId>com.oracle.jdbc</groupId>
@@ -543,12 +520,6 @@
 
     <profile>
       <id>db2</id>
-      <activation>
-        <property>
-          <name>database</name>
-          <value>db2</value>
-        </property>
-      </activation>
       <dependencies>
         <dependency>
           <groupId>com.ibm.db2.jcc</groupId>
@@ -559,30 +530,7 @@
     </profile>
 
     <profile>
-      <id>mssql</id>
-        <activation>
-          <property>
-            <name>database</name>
-            <value>mssql</value>
-          </property>
-        </activation>
-        <dependencies>
-          <dependency>
-            <groupId>com.microsoft.sqlserver</groupId>
-            <artifactId>sqljdbc4</artifactId>
-            <scope>test</scope>
-          </dependency>
-       </dependencies>
-    </profile>
-
-    <profile>
-      <id>mssql12</id>
-        <activation>
-          <property>
-            <name>database</name>
-            <value>mssql12</value>
-          </property>
-        </activation>
+      <id>sqlserver</id>
         <dependencies>
           <dependency>
             <groupId>com.microsoft.sqlserver</groupId>
@@ -594,12 +542,6 @@
 
     <profile>
       <id>mysql</id>
-        <activation>
-          <property>
-            <name>database</name>
-            <value>mysql</value>
-          </property>
-        </activation>
         <dependencies>
           <dependency>
             <groupId>mysql</groupId>
@@ -611,29 +553,6 @@
 
     <profile>
       <id>postgresql</id>
-        <activation>
-        <property>
-          <name>database</name>
-          <value>postgresql</value>
-        </property>
-      </activation>
-      <dependencies>
-        <dependency>
-          <groupId>org.postgresql</groupId>
-          <artifactId>postgresql</artifactId>
-          <scope>test</scope>
-        </dependency>
-       </dependencies>
-    </profile>
-
-    <profile>
-      <id>postgresql93</id>
-        <activation>
-        <property>
-          <name>database</name>
-          <value>postgresql93</value>
-        </property>
-      </activation>
       <dependencies>
         <dependency>
           <groupId>org.postgresql</groupId>
@@ -650,11 +569,6 @@
         <plugins>
           <plugin>
             <artifactId>maven-antrun-plugin</artifactId>
-            <!--
-              only worked with this version, there might be a bug with antrun
-              see http://jira.codehaus.org/browse/MANTRUN-109
-            -->
-            <version>1.4</version>
             <executions>
               <execution>
                 <id>database-test-create-schema</id>
@@ -663,9 +577,9 @@
                   <goal>run</goal>
                 </goals>
                 <configuration>
-                  <tasks>
+                  <target>
                     <copy file="target/test-classes/camunda.cfg.prefix.xml" tofile="target/test-classes/camunda.cfg.xml" overwrite="true" />
-                  </tasks>
+                  </target>
                 </configuration>
               </execution>
             </executions>
@@ -694,7 +608,7 @@
                 </goals>
                 <inherited>false</inherited>
                 <configuration>
-                  <tasks>
+                  <target>
                     <!-- run node build -->
                     <exec executable="cmd" failonerror="true">
                       <arg value="/c" />
@@ -714,7 +628,7 @@
                       <arg value="build" />
                       <arg value="--color=false" />
                     </exec>
-                  </tasks>
+                  </target>
                 </configuration>
               </execution>
             </executions>
@@ -744,7 +658,7 @@
                 </goals>
                 <inherited>false</inherited>
                 <configuration>
-                  <tasks>
+                  <target>
                     <!-- run node build -->
                     <exec executable="npm" failonerror="true">
                       <arg value="install" />
@@ -758,7 +672,7 @@
                       <arg value="build" />
                       <arg value="--color=false" />
                     </exec>
-                  </tasks>
+                  </target>
                 </configuration>
               </execution>
             </executions>
