@@ -1,5 +1,5 @@
 define([
-  'text!camunda-tasklist-ui/filter/modals/cam-tasklist-filter-modal.html'
+  'text!./../modals/cam-tasklist-filter-modal.html'
 ], function(
   template
 ) {
@@ -66,7 +66,7 @@ define([
 
     $scope.openModal = function ($event, filter) {
       $event.stopPropagation();
-      
+
       $modal.open({
         windowClass: 'filter-modal',
         size: 'lg',

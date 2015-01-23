@@ -86,7 +86,7 @@ module.exports = function(config) {
         },
         {
           expand: true,
-          cwd: '<%= pkg.gruntConfig.clientDir %>/bower_components/bootstrap/fonts',
+          cwd: 'node_modules/camunda-commons-ui/node_modules/bootstrap/fonts',
           src: ['**'],
           dest: '<%= buildTarget %>/fonts/bootstrap/'
         },

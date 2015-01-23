@@ -8,8 +8,8 @@ define([
 
   return function(ngModule, config) {
 
-  ngModule.config([
-    'UriProvider',
+    ngModule.config([
+      'UriProvider',
       function(
         UriProvider
       ) {

@@ -30,7 +30,7 @@ define([
   /* modals */
   './modals/cam-tasklist-groups-modal',
 
-  'camunda-tasklist-ui/api',
+  '../api/index',
   'angular-bootstrap'
 
 ], function(
@@ -59,11 +59,14 @@ define([
   camCommentCreateModalCtrl,
 
   /* modals */
-  camGroupEditModalCtrl
+  camGroupEditModalCtrl,
+
+  /* API */
+  apiClient
 ) {
 
   var taskModule = angular.module('cam.tasklist.task', [
-    require('camunda-tasklist-ui/api').name,
+    apiClient.name,
     'ui.bootstrap',
     'cam.tasklist.form',
     'angularMoment'

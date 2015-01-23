@@ -2,7 +2,7 @@
 
 define([
   'angular',
-  'camunda-bpm-sdk'
+  'camunda-bpm-sdk-js'
 ],
 function(
   angular,
