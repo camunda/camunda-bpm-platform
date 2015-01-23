@@ -78,6 +78,13 @@ public class DomXPathNamespaceResolver implements NamespaceContext {
       return XMLConstants.XMLNS_ATTRIBUTE;
     }
 
+    /**
+     * TODO: This only works for the root element. Every child element with a 'xmlns'-attribute will be ignored.
+     */
+    if (namespaceURI.equals(element.name())) {
+      return XMLConstants.DEFAULT_NS_PREFIX;
+    }
+
     String key = null;
     if(namespaces.containsValue(namespaceURI)) {
       for(Map.Entry<String, String> entry : namespaces.entrySet()) {
@@ -106,18 +113,21 @@ public class DomXPathNamespaceResolver implements NamespaceContext {
       return Collections.unmodifiableList(list).iterator();
     }
 
-    if(namespaces.containsValue(namespaceURI)) {
-      // default namespace
-      if(namespaceURI.equals(element.namespace())) {
-        list.add(XMLConstants.DEFAULT_NS_PREFIX);
-      }
+    // default namespace
+    if(namespaceURI.equals(element.namespace())) {
+      list.add(XMLConstants.DEFAULT_NS_PREFIX);
+    }
 
+    if(namespaces.containsValue(namespaceURI)) {
       // all other namespaces
-      for(Map.Entry<String, String> entry : namespaces.entrySet()) {
-        if(namespaceURI.equals(entry.getValue())) {
+      for (Map.Entry<String, String> entry : namespaces.entrySet()) {
+        if (namespaceURI.equals(entry.getValue())) {
           list.add(entry.getKey());
         }
       }
+    }
+
+    if (!list.isEmpty()) {
       return Collections.unmodifiableList(list).iterator();
     } else {
       return Collections.emptyIterator();
