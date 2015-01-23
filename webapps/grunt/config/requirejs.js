@@ -1,57 +1,19 @@
 module.exports = function() {
   'use strict';
-  var _ = require('underscore');
-  var path = require('path');
-  var rjsConfPath = path.resolve('./client/scripts/require-conf');
-  var rjsConf = require(rjsConfPath);
-
-  // NOTE: we use "./../" in this file, because the "working directory"
-  // a.k.a. "basePath" property is actually "./client"
-  var deps = [
-    'camunda-tasklist-ui/require-conf',
-    './../node_modules/requirejs/require',
-    // 'require-conf',
-    // 'require',
-
-    'camunda-commons-ui/auth',
-    'jquery',
-    'angular',
-    'moment',
-
-    'camunda-bpm-sdk',
-
-    'angular-bootstrap',
-    'bootstrap/collapse',
-    'angular-route',
-    'angular-animate',
-    'angular-moment',
-    'angular-data-depend',
-    'angular-translate',
-    'angular-resource',
-    'bpmn-js',
-    'lodash',
-    'sax',
-    'snap-svg',
-    'placeholders-js/utils',
-    'placeholders-js/main',
-    'placeholders-js/adapters/placeholders.jquery'
-  ];
-
-
-
-
-  _.extend(rjsConf.paths, {
-    'camunda-bpm-sdk-js':   './../node_modules/camunda-bpm-sdk-js/dist',
-    'camunda-commons-ui':   './../node_modules/camunda-commons-ui/lib',
-
-    'require':              './../node_modules/requirejs/require',
-    'require-conf':         './../client/scripts/require-conf',
-
-    // the localescompile task puts the generated files in the build directory
-    // and we want them to be included in the build
-    'locales':              './../<%= buildTarget %>/locales'
+  var commons = require('camunda-commons-ui');
+  var _ = commons.utils._;
+  var rjsConf = commons.requirejs({
+    // pathPrefix: '../node_modules/camunda-commons-ui'
   });
 
+  var deps = [
+    'requirejs',
+    'camunda-commons-ui',
+    'angular-resource',
+    'angular-sanitize',
+    'angular-route',
+    'angular-bootstrap'
+  ];
 
   var rConf = {
     options: {
@@ -66,9 +28,54 @@ module.exports = function() {
 
       baseUrl: './<%= pkg.gruntConfig.clientDir %>',
 
-      paths: rjsConf.paths,
-      shim: rjsConf.shim,
-      packages: rjsConf.packages
+      paths: _.extend(rjsConf.paths, {
+        'camunda-tasklist-ui': 'scripts/camunda-tasklist-ui',
+      }),
+
+      shim: _.extend(rjsConf.shim, {}),
+
+      packages: rjsConf.packages.concat([
+        {
+          name: 'camunda-commons-ui/auth',
+          main: 'index'
+        },
+        {
+          name: 'api',
+          main: 'index'
+        },
+        {
+          name: 'process',
+          main: 'index'
+        },
+        {
+          name: 'filter',
+          main: 'index'
+        },
+        {
+          name: 'tasklist',
+          main: 'index'
+        },
+        {
+          name: 'task',
+          main: 'index'
+        },
+        {
+          name: 'variable',
+          main: 'index'
+        },
+        {
+          name: 'user',
+          main: 'index'
+        },
+        {
+          name: 'widgets',
+          main: 'index'
+        },
+        {
+          name: 'form',
+          main: 'index'
+        }
+      ])
     },
 
 
@@ -86,7 +93,28 @@ module.exports = function() {
         name: 'camunda-tasklist-ui',
         out: '<%= buildTarget %>/scripts/<%= pkg.name %>.js',
         exclude: deps,
-        include: rjsConf.shim['camunda-tasklist-ui']
+        include: [
+          'scripts/config/date',
+          'scripts/config/routes',
+          'scripts/config/locales',
+          'scripts/config/tooltip',
+          'scripts/config/uris',
+
+          'scripts/controller/cam-tasklist-app-ctrl',
+          'scripts/controller/cam-tasklist-view-ctrl',
+          'scripts/services/cam-tasklist-assign-notification',
+          'scripts/services/cam-tasklist-configuration',
+
+          'scripts/user/index',
+          'scripts/variable/index',
+          'scripts/tasklist/index',
+          'scripts/task/index',
+          'scripts/process/index',
+          'scripts/navigation/index',
+          'scripts/form/index',
+          'scripts/filter/index',
+          'scripts/api/index'
+        ]
       }
     }
   };
