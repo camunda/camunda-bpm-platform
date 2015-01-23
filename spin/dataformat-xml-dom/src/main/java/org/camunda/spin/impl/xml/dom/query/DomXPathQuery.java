@@ -13,6 +13,7 @@
 
 package org.camunda.spin.impl.xml.dom.query;
 
+import java.util.Map;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
@@ -30,10 +31,6 @@ import org.camunda.spin.xml.SpinXmlElement;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
-
-import java.util.Map;
-
-import static org.camunda.commons.utils.EnsureUtil.ensureNotNull;
 
 /**
  * @author Sebastian Menski
@@ -133,14 +130,12 @@ public class DomXPathQuery extends SpinXPathQuery {
   }
 
   public SpinXPathQuery ns(String prefix, String namespace) {
-    ensureNotNull("Prefix", prefix);
     resolver.setNamespace(prefix, namespace);
     query.setNamespaceContext(resolver);
     return this;
   }
 
   public SpinXPathQuery ns(Map<String, String> namespaces) {
-    ensureNotNull("Namespace Map", namespaces);
     resolver.setNamespaces(namespaces);
     query.setNamespaceContext(resolver);
     return this;

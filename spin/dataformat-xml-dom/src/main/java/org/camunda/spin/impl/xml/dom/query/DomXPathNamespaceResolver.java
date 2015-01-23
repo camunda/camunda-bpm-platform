@@ -12,11 +12,18 @@
  */
 package org.camunda.spin.impl.xml.dom.query;
 
-import org.camunda.spin.xml.SpinXmlElement;
+import static org.camunda.commons.utils.EnsureUtil.ensureNotNull;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import javax.xml.XMLConstants;
 import javax.xml.namespace.NamespaceContext;
-import java.util.*;
+
+import org.camunda.spin.xml.SpinXmlElement;
 
 
 /**
@@ -35,10 +42,7 @@ public class DomXPathNamespaceResolver implements NamespaceContext {
   }
 
   public String getNamespaceURI(String prefix) {
-
-    if(prefix == null) {
-      throw new IllegalArgumentException("Prefix cannot be null.");
-    }
+    ensureNotNull("Prefix", prefix);
 
     if(prefix.equals(XMLConstants.XML_NS_PREFIX)) {
       return XMLConstants.XML_NS_URI;
@@ -64,10 +68,7 @@ public class DomXPathNamespaceResolver implements NamespaceContext {
   }
 
   public String getPrefix(String namespaceURI) {
-
-    if(namespaceURI == null) {
-      throw new IllegalArgumentException("Namespace URI cannot be null.");
-    }
+    ensureNotNull("Namespace URI", namespaceURI);
 
     if(namespaceURI.equals(XMLConstants.XML_NS_URI)) {
       return XMLConstants.XML_NS_PREFIX;
@@ -80,7 +81,7 @@ public class DomXPathNamespaceResolver implements NamespaceContext {
     String key = null;
     if(namespaces.containsValue(namespaceURI)) {
       for(Map.Entry<String, String> entry : namespaces.entrySet()) {
-        if(entry.getValue().equals(namespaceURI)) {
+        if(namespaceURI.equals(entry.getValue())) {
           key = entry.getKey();
           break;
         }
@@ -91,10 +92,7 @@ public class DomXPathNamespaceResolver implements NamespaceContext {
   }
 
   public Iterator getPrefixes(String namespaceURI) {
-
-    if(namespaceURI == null) {
-      throw new IllegalArgumentException("Namespace URI cannot be null.");
-    }
+    ensureNotNull("Namespace URI", namespaceURI);
 
     List<String> list = new ArrayList<String>();
     if(namespaceURI.equals(XMLConstants.XML_NS_URI)) {
@@ -131,21 +129,23 @@ public class DomXPathNamespaceResolver implements NamespaceContext {
    *
    * @param prefix the prefix to use
    * @param namespaceURI the URI to use
+   * @throws IllegalArgumentException if prefix or namespaceURI is null
    */
   public void setNamespace(String prefix, String namespaceURI) {
-    if(namespaceURI != null) {
-      namespaces.put(prefix, namespaceURI);
-    } else {
-      namespaces.remove(prefix);
-    }
+    ensureNotNull("Prefix", prefix);
+    ensureNotNull("Namespace URI", namespaceURI);
+
+    namespaces.put(prefix, namespaceURI);
   }
 
   /**
    * Maps a map of prefix, uri pairs as namespaces.
    *
    * @param namespaces the map of namespaces
+   * @throws IllegalArgumentException if namespaces is null
    */
   public void setNamespaces(Map<String, String> namespaces) {
+    ensureNotNull("Namespaces", namespaces);
     this.namespaces = namespaces;
   }
 }
