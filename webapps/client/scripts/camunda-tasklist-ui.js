@@ -44,14 +44,16 @@ define('camunda-tasklist-ui', [
 
   require.config({
     // baseUrl: './',
-    packages: pluginPackages.concat([])
+    packages: pluginPackages
   });
 
   var tasklistApp;
 
   var deps = [
     'camunda-commons-ui'
-  ];
+  ].concat(pluginDependencies.map(function(plugin) {
+    return plugin.requirePackageName;
+  }));
 
 
   // converts AMD paths to angular module names
