@@ -30,17 +30,19 @@ module.exports = function(config) {
 
     scripts: {
       files: [
+        'node_modules/camunda-commons-ui/index.js',
+        'grunt/config/requirejs.js',
         '<%= pkg.gruntConfig.clientDir %>/scripts/**/*.{js,html}'
       ],
       tasks: [
-        'requirejs:scripts'
+        'requirejs'
       ]
     },
 
     dependencies: {
       files: [
-        './../camunda-bpm-webapp/webapp/target/webapp/plugin/**/*.js',
-        'node_modules/camunda-bpm-sdk-js/lib/**/*.{js,html}'
+        'node_modules/camunda-commons-ui/index.js',
+        'grunt/config/requirejs.js'
       ],
       tasks: [
         'requirejs:dependencies'

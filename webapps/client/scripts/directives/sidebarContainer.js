@@ -1,5 +1,8 @@
 /* global define: false */
-define(['jquery'], function($) {
+define([
+  'jquery',
+  'jquery-ui-draggable'
+], function($) {
   'use strict';
 
   return function() {
