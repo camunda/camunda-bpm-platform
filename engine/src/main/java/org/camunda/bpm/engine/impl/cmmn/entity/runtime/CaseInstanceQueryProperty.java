@@ -12,38 +12,17 @@
  */
 package org.camunda.bpm.engine.impl.cmmn.entity.runtime;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import org.camunda.bpm.engine.impl.QueryPropertyImpl;
 import org.camunda.bpm.engine.query.QueryProperty;
 
 /**
  * @author Roman Smirnov
  *
  */
-public class CaseInstanceQueryProperty implements QueryProperty {
+public interface CaseInstanceQueryProperty {
 
-  private static final long serialVersionUID = 1L;
-
-  private static final Map<String, CaseInstanceQueryProperty> properties = new HashMap<String, CaseInstanceQueryProperty>();
-
-  public static final CaseInstanceQueryProperty CASE_INSTANCE_ID = new CaseInstanceQueryProperty("RES.ID_");
-  public static final CaseInstanceQueryProperty CASE_DEFINITION_KEY = new CaseInstanceQueryProperty("KEY_");
-  public static final CaseInstanceQueryProperty CASE_DEFINITION_ID = new CaseInstanceQueryProperty("RES.CASE_DEF_ID_");
-
-  private String name;
-
-  public CaseInstanceQueryProperty(String name) {
-    this.name = name;
-    properties.put(name, this);
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public static CaseInstanceQueryProperty findByName(String propertyName) {
-    return properties.get(propertyName);
-  }
+  public static final QueryProperty CASE_INSTANCE_ID = new QueryPropertyImpl("ID_");
+  public static final QueryProperty CASE_DEFINITION_KEY = new QueryPropertyImpl("KEY_");
+  public static final QueryProperty CASE_DEFINITION_ID = new QueryPropertyImpl("CASE_DEF_ID_");
 
 }

@@ -158,12 +158,15 @@
   </select>
 
   <select id="selectTaskByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.TaskQueryImpl" resultMap="taskResultMap">
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
     select distinct
+    <include refid="columnSelection"/>
+    ${limitBetween}
     <if test="taskNameCaseInsensitive">
-      lower(RES.NAME_) LOWER_NAME_,
+      , lower(RES.NAME_) LOWER_NAME_
     </if>
-    RES.* ${limitBetween}
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.orderBySelection"/> 
     <include refid="selectTaskByQueryCriteriaSql"/>
     ${orderBy}
     ${limitAfter}
@@ -173,6 +176,14 @@
     select count(distinct RES.ID_)
     <include refid="selectTaskByQueryCriteriaSql"/>
   </select>
+  
+  <sql id="columnSelection">
+    RES.REV_, RES.ID_, RES.NAME_, RES.PARENT_TASK_ID_, RES.DESCRIPTION_, RES.PRIORITY_,
+    RES.CREATE_TIME_, RES.OWNER_, RES.ASSIGNEE_, RES.DELEGATION_, RES.EXECUTION_ID_,
+    RES.PROC_INST_ID_, RES.PROC_DEF_ID_, RES.CASE_EXECUTION_ID_, RES.CASE_INST_ID_,
+    RES.CASE_DEF_ID_, RES.TASK_DEF_KEY_, RES.DUE_DATE_, RES.FOLLOW_UP_DATE_,
+    RES.SUSPENSION_STATE_
+  </sql>
 
   <sql id="selectTaskByQueryCriteriaSql">
     from ${prefix}ACT_RU_TASK RES
@@ -194,6 +205,16 @@
     <if test="activityInstanceIdIn != null &amp;&amp; activityInstanceIdIn.length > 0">
         left join ${prefix}ACT_RU_EXECUTION E1 on RES.EXECUTION_ID_ = E1.ID_
     </if>
+    <foreach collection="orderingProperties" item="orderingProperty" index="i">
+      <bind name="tableAlias" value="@org.camunda.bpm.engine.impl.db.sql.MybatisJoinHelper@tableAlias(orderingProperty.relation, i)"/>
+      <if test="orderingProperty.relation != null">
+        left join 
+        ${prefix}${@org.camunda.bpm.engine.impl.db.sql.MybatisJoinHelper@tableMapping(orderingProperty.relation)} 
+        ${tableAlias}
+        on
+        <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.filterOrderByRelations"/>
+      </if>
+    </foreach>
     <where>
       <if test="taskId != null">
         RES.ID_ = #{taskId}
@@ -360,7 +381,7 @@
       <if test="involvedUser != null">
         and I.USER_ID_ = #{involvedUser}
       </if>
-
+      
       <!-- queryVariables -->
       <!-- PLEASE NOTE: If you change anything have a look into the HistoricVariableInstance & HistoricProcessInstance, the same query object is used there! -->
       <foreach collection="variables" index="index" item="queryVariableValue">

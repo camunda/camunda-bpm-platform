@@ -18,6 +18,7 @@ import java.util.List;
 
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.impl.AbstractVariableQueryImpl;
+import org.camunda.bpm.engine.impl.QueryOrderingProperty;
 import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -128,7 +129,8 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
   }
 
   public CaseInstanceQuery orderByCaseDefinitionKey() {
-    orderBy(CaseInstanceQueryProperty.CASE_DEFINITION_KEY);
+    orderBy(new QueryOrderingProperty(QueryOrderingProperty.RELATION_CASE_DEFINITION,
+        CaseInstanceQueryProperty.CASE_DEFINITION_KEY));
     return this;
   }
 

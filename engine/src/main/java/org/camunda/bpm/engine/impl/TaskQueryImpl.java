@@ -33,6 +33,7 @@ import org.camunda.bpm.engine.impl.variable.serializer.VariableSerializers;
 import org.camunda.bpm.engine.task.DelegationState;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
+import org.camunda.bpm.engine.variable.type.ValueType;
 
 /**
  * @author Joram Barrez
@@ -75,6 +76,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   protected String processInstanceBusinessKey;
   protected String processInstanceBusinessKeyLike;
   protected List<TaskQueryVariableValue> variables = new ArrayList<TaskQueryVariableValue>();
+  protected List<QueryOrderingProperty> variableSortings = new ArrayList<QueryOrderingProperty>();
   protected Date dueDate;
   protected Date dueBefore;
   protected Date dueAfter;
@@ -793,6 +795,31 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
     return orderBy(TaskQueryProperty.FOLLOW_UP_DATE);
   }
 
+  public TaskQuery orderByProcessVariable(String variableName, ValueType valueType) {
+    orderBy(VariableOrderProperty.forProcessInstanceVariable(variableName, valueType));
+    return this;
+  }
+
+  public TaskQuery orderByExecutionVariable(String variableName, ValueType valueType) {
+    orderBy(VariableOrderProperty.forExecutionVariable(variableName, valueType));
+    return this;
+  }
+
+  public TaskQuery orderByTaskVariable(String variableName, ValueType valueType) {
+    orderBy(VariableOrderProperty.forTaskVariable(variableName, valueType));
+    return this;
+  }
+
+  public TaskQuery orderByCaseExecutionVariable(String variableName, ValueType valueType) {
+    orderBy(VariableOrderProperty.forCaseExecutionVariable(variableName, valueType));
+    return this;
+  }
+
+  public TaskQuery orderByCaseInstanceVariable(String variableName, ValueType valueType) {
+    orderBy(VariableOrderProperty.forCaseInstanceVariable(variableName, valueType));
+    return this;
+  }
+
   //results ////////////////////////////////////////////////////////////////
 
   public List<Task> executeList(CommandContext commandContext, Page page) {
@@ -937,6 +964,10 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
 
   public List<TaskQueryVariableValue> getVariables() {
     return variables;
+  }
+
+  public List<QueryOrderingProperty> getVariableSortings() {
+    return variableSortings;
   }
 
   public String getProcessDefinitionKey() {
@@ -1453,5 +1484,6 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   public boolean isFollowUpNullAccepted() {
     return followUpNullAccepted;
   }
+
 
 }

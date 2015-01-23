@@ -18,20 +18,24 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
+import org.camunda.bpm.engine.EntityTypes;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.filter.Filter;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.User;
-import org.camunda.bpm.engine.impl.AbstractQuery;
 import org.camunda.bpm.engine.impl.Direction;
+import org.camunda.bpm.engine.impl.QueryEntityRelationCondition;
 import org.camunda.bpm.engine.impl.QueryOperator;
+import org.camunda.bpm.engine.impl.QueryOrderingProperty;
 import org.camunda.bpm.engine.impl.TaskQueryImpl;
 import org.camunda.bpm.engine.impl.TaskQueryProperty;
 import org.camunda.bpm.engine.impl.TaskQueryVariableValue;
+import org.camunda.bpm.engine.impl.db.ListQueryParameterObject;
 import org.camunda.bpm.engine.impl.json.JsonTaskQueryConverter;
 import org.camunda.bpm.engine.impl.persistence.entity.FilterEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.impl.util.json.JSONObject;
 import org.camunda.bpm.engine.query.Query;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.DelegationState;
@@ -58,7 +62,6 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
   protected QueryOperator[] variableOperators = new QueryOperator[] {QueryOperator.EQUALS, QueryOperator.GREATER_THAN_OR_EQUAL, QueryOperator.LESS_THAN, QueryOperator.LIKE, QueryOperator.NOT_EQUALS, QueryOperator.LESS_THAN_OR_EQUAL};
   protected boolean[] isTaskVariable = new boolean[] {true, true, false, false, false, false};
   protected boolean[] isProcessVariable = new boolean[] {false, false, true, true, false, false};
-  protected String testOrderBy = TaskQueryProperty.EXECUTION_ID.getName() + " " + Direction.DESCENDING.getName() + ", " + TaskQueryProperty.DUE_DATE.getName() + " " + Direction.ASCENDING.getName();
   protected User testUser;
   protected Group testGroup;
 
@@ -183,6 +186,8 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
     query.orderByExecutionId().desc();
     query.orderByDueDate().asc();
 
+    List<QueryOrderingProperty> expectedOrderingProperties = query.getOrderingProperties();
+
     // save filter
     filter.setQuery(query);
     filterService.saveFilter(filter);
@@ -268,7 +273,42 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(testString, query.getCaseExecutionId());
 
     // ordering
-    assertEquals(testOrderBy, query.getOrderBy());
+    verifyOrderingProperties(expectedOrderingProperties, query.getOrderingProperties());
+  }
+
+  protected void verifyOrderingProperties(List<QueryOrderingProperty> expectedProperties,
+      List<QueryOrderingProperty> actualProperties) {
+    assertEquals(expectedProperties.size(), actualProperties.size());
+
+    for (int i = 0; i < expectedProperties.size(); i++) {
+      QueryOrderingProperty expectedProperty = expectedProperties.get(i);
+      QueryOrderingProperty actualProperty = actualProperties.get(i);
+
+      assertEquals(expectedProperty.getRelation(), actualProperty.getRelation());
+      assertEquals(expectedProperty.getDirection(), actualProperty.getDirection());
+      assertEquals(expectedProperty.isContainedProperty(), actualProperty.isContainedProperty());
+      assertEquals(expectedProperty.getQueryProperty(), actualProperty.getQueryProperty());
+
+      List<QueryEntityRelationCondition> expectedRelationConditions = expectedProperty.getRelationConditions();
+      List<QueryEntityRelationCondition> actualRelationConditions = expectedProperty.getRelationConditions();
+
+      if (expectedRelationConditions != null && actualRelationConditions != null) {
+        assertEquals(expectedRelationConditions.size(), actualRelationConditions.size());
+
+        for (int j = 0; j < expectedRelationConditions.size(); j++) {
+          QueryEntityRelationCondition expectedFilteringProperty = expectedRelationConditions.get(j);
+          QueryEntityRelationCondition actualFilteringProperty = expectedRelationConditions.get(j);
+
+          assertEquals(expectedFilteringProperty.getProperty(), actualFilteringProperty.getProperty());
+          assertEquals(expectedFilteringProperty.getComparisonProperty(), actualFilteringProperty.getComparisonProperty());
+          assertEquals(expectedFilteringProperty.getScalarValue(), actualFilteringProperty.getScalarValue());
+        }
+      } else if ((expectedRelationConditions == null && actualRelationConditions != null) ||
+          (expectedRelationConditions != null && actualRelationConditions == null)) {
+        fail("Expected filtering properties: " + expectedRelationConditions + ". "
+            + "Actual filtering properties: " + actualRelationConditions);
+      }
+    }
   }
 
   public void testTaskQueryByFollowUpBeforeOrNotExistent() {
@@ -599,42 +639,155 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
   }
 
   public void testExtendingSorting() {
-    String sortByNameAsc = TaskQueryProperty.NAME.getName() + " " + Direction.ASCENDING.getName();
-    String sortByAssigneeDesc = TaskQueryProperty.ASSIGNEE.getName() + " " + Direction.DESCENDING.getName();
-
     // create empty query
     TaskQueryImpl query = (TaskQueryImpl) taskService.createTaskQuery();
     saveQuery(query);
 
     // assert default sorting
     query = filter.getQuery();
-    String orderBy = query.getOrderBy();
-    assertEquals(AbstractQuery.DEFAULT_ORDER_BY, orderBy);
+    assertTrue(query.getOrderingProperties().isEmpty());
 
     // extend query by new task query with sorting
-    TaskQuery sortQuery = taskService.createTaskQuery().orderByTaskName().asc();
+    TaskQueryImpl sortQuery = (TaskQueryImpl) taskService.createTaskQuery().orderByTaskName().asc();
     Filter extendedFilter = filter.extend(sortQuery);
     query = extendedFilter.getQuery();
-    orderBy = query.getOrderBy();
 
-    assertEquals(sortByNameAsc, orderBy);
+    List<QueryOrderingProperty> expectedOrderingProperties =
+        new ArrayList<QueryOrderingProperty>(sortQuery.getOrderingProperties());
+
+    verifyOrderingProperties(expectedOrderingProperties, query.getOrderingProperties());
 
     // extend query by new task query with additional sorting
-    TaskQuery extendingQuery = taskService.createTaskQuery().orderByTaskAssignee().desc();
+    TaskQueryImpl extendingQuery = (TaskQueryImpl) taskService.createTaskQuery().orderByTaskAssignee().desc();
     extendedFilter = extendedFilter.extend(extendingQuery);
     query = extendedFilter.getQuery();
-    orderBy = query.getOrderBy();
 
-    assertEquals(sortByNameAsc + ", " + sortByAssigneeDesc, orderBy);
+    expectedOrderingProperties.addAll(extendingQuery.getOrderingProperties());
 
-    // extend query by incomplete sorting query (sorting should not change)
-    sortQuery = taskService.createTaskQuery().orderByCaseExecutionId();
+    verifyOrderingProperties(expectedOrderingProperties, query.getOrderingProperties());
+
+    // extend query by incomplete sorting query (should add sorting anyway)
+    sortQuery = (TaskQueryImpl) taskService.createTaskQuery().orderByCaseExecutionId();
     extendedFilter = extendedFilter.extend(sortQuery);
     query = extendedFilter.getQuery();
-    orderBy = query.getOrderBy();
 
-    assertEquals(sortByNameAsc + ", " + sortByAssigneeDesc, orderBy);
+    expectedOrderingProperties.addAll(sortQuery.getOrderingProperties());
+
+    verifyOrderingProperties(expectedOrderingProperties, query.getOrderingProperties());
   }
+
+  /**
+   * Tests compatibility with serialization format that was used in 7.2
+   */
+  @SuppressWarnings("deprecation")
+  public void testDeprecatedOrderingFormatDeserializationDefault() {
+    String defaultOrderBy = ListQueryParameterObject.DEFAULT_ORDER_BY;
+
+    JsonTaskQueryConverter converter = (JsonTaskQueryConverter) FilterEntity.queryConverter.get(EntityTypes.TASK);
+    JSONObject queryJson = converter.toJsonObject(filter.<TaskQuery>getQuery());
+
+    // when I apply default ordering in its deprecated format (i.e. ORDER_BY property is missing)
+    TaskQueryImpl deserializedTaskQuery = (TaskQueryImpl) converter.toObject(queryJson);
+
+    // then the default ordering is applied to the query
+    assertTrue(deserializedTaskQuery.getOrderingProperties().isEmpty());
+    assertEquals(defaultOrderBy, deserializedTaskQuery.getOrderBy());
+  }
+
+  /**
+   * Tests compatibility with serialization format that was used in 7.2
+   */
+  @SuppressWarnings("deprecation")
+  public void testDeprecatedOrderingFormatDeserializationSingleOrdering() {
+    String sortByNameAsc = "RES." + TaskQueryProperty.NAME.getName() + " " + Direction.ASCENDING.getName();
+
+    JsonTaskQueryConverter converter = (JsonTaskQueryConverter) FilterEntity.queryConverter.get(EntityTypes.TASK);
+    JSONObject queryJson = converter.toJsonObject(filter.<TaskQuery>getQuery());
+
+    // when I apply a specific ordering by one dimension
+    queryJson.put(JsonTaskQueryConverter.ORDER_BY, sortByNameAsc);
+    TaskQueryImpl deserializedTaskQuery = (TaskQueryImpl) converter.toObject(queryJson);
+
+    // then the ordering is applied accordingly
+    assertEquals(1, deserializedTaskQuery.getOrderingProperties().size());
+
+    QueryOrderingProperty orderingProperty =
+        deserializedTaskQuery.getOrderingProperties().get(0);
+    assertNull(orderingProperty.getRelation());
+    assertEquals("asc", orderingProperty.getDirection().getName());
+    assertNull(orderingProperty.getRelationConditions());
+    assertFalse(orderingProperty.isContainedProperty());
+    assertEquals(TaskQueryProperty.NAME.getName(), orderingProperty.getQueryProperty().getName());
+    assertNull(orderingProperty.getQueryProperty().getFunction());
+
+  }
+
+  /**
+   * Tests compatibility with serialization format that was used in 7.2
+   */
+  @SuppressWarnings("deprecation")
+  public void testDeprecatedOrderingFormatDeserializationSecondaryOrdering() {
+    String sortByNameAsc = "RES." + TaskQueryProperty.NAME.getName() + " " + Direction.ASCENDING.getName();
+    String secondaryOrdering = sortByNameAsc + ", RES." + TaskQueryProperty.ASSIGNEE.getName() + " " + Direction.DESCENDING.getName();
+
+    JsonTaskQueryConverter converter = (JsonTaskQueryConverter) FilterEntity.queryConverter.get(EntityTypes.TASK);
+    JSONObject queryJson = converter.toJsonObject(filter.<TaskQuery>getQuery());
+
+    // when I apply a secondary ordering
+    queryJson.put(JsonTaskQueryConverter.ORDER_BY, secondaryOrdering);
+    TaskQueryImpl deserializedTaskQuery = (TaskQueryImpl) converter.toObject(queryJson);
+
+    // then the ordering is applied accordingly
+    assertEquals(2, deserializedTaskQuery.getOrderingProperties().size());
+
+    QueryOrderingProperty orderingProperty1 =
+        deserializedTaskQuery.getOrderingProperties().get(0);
+    assertNull(orderingProperty1.getRelation());
+    assertEquals("asc", orderingProperty1.getDirection().getName());
+    assertNull(orderingProperty1.getRelationConditions());
+    assertFalse(orderingProperty1.isContainedProperty());
+    assertEquals(TaskQueryProperty.NAME.getName(), orderingProperty1.getQueryProperty().getName());
+    assertNull(orderingProperty1.getQueryProperty().getFunction());
+
+    QueryOrderingProperty orderingProperty2 =
+        deserializedTaskQuery.getOrderingProperties().get(1);
+    assertNull(orderingProperty2.getRelation());
+    assertEquals("desc", orderingProperty2.getDirection().getName());
+    assertNull(orderingProperty2.getRelationConditions());
+    assertFalse(orderingProperty2.isContainedProperty());
+    assertEquals(TaskQueryProperty.ASSIGNEE.getName(), orderingProperty2.getQueryProperty().getName());
+    assertNull(orderingProperty2.getQueryProperty().getFunction());
+  }
+
+  /**
+   * Tests compatibility with serialization format that was used in 7.2
+   */
+  @SuppressWarnings("deprecation")
+  public void testDeprecatedOrderingFormatDeserializationFunctionOrdering() {
+    String orderingWithFunction = "LOWER(RES." + TaskQueryProperty.NAME.getName() + ") asc";
+
+    JsonTaskQueryConverter converter = (JsonTaskQueryConverter) FilterEntity.queryConverter.get(EntityTypes.TASK);
+    JSONObject queryJson = converter.toJsonObject(filter.<TaskQuery>getQuery());
+
+    // when I apply an ordering with a function
+    queryJson.put(JsonTaskQueryConverter.ORDER_BY, orderingWithFunction);
+    TaskQueryImpl deserializedTaskQuery = (TaskQueryImpl) converter.toObject(queryJson);
+
+    assertEquals(1, deserializedTaskQuery.getOrderingProperties().size());
+
+    // then the ordering is applied accordingly
+    QueryOrderingProperty orderingProperty =
+        deserializedTaskQuery.getOrderingProperties().get(0);
+    assertNull(orderingProperty.getRelation());
+    assertEquals("asc", orderingProperty.getDirection().getName());
+    assertNull(orderingProperty.getRelationConditions());
+    assertFalse(orderingProperty.isContainedProperty());
+    assertEquals(TaskQueryProperty.NAME_CASE_INSENSITIVE.getName(),
+        orderingProperty.getQueryProperty().getName());
+    assertEquals(TaskQueryProperty.NAME_CASE_INSENSITIVE.getFunction(),
+        orderingProperty.getQueryProperty().getFunction());
+  }
+
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/task/oneTaskWithFormKeyProcess.bpmn20.xml"})
     public void testInitializeFormKeysEnabled() {

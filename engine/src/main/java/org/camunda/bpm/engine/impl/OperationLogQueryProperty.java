@@ -14,36 +14,14 @@ package org.camunda.bpm.engine.impl;
 
 import org.camunda.bpm.engine.query.QueryProperty;
 
-import java.util.HashMap;
-import java.util.Map;
-
 
 /**
  * Contains sortable properties which can be used in a {@link org.camunda.bpm.engine.history.UserOperationLogQuery}.
  *
  * @author Danny Gräf
  */
-public class OperationLogQueryProperty implements QueryProperty {
+public class OperationLogQueryProperty {
 
-  private static final long serialVersionUID = 1L;
-
-  private static final Map<String, OperationLogQueryProperty> properties = new HashMap<String, OperationLogQueryProperty>();
-
-  public static final OperationLogQueryProperty TIMESTAMP = new OperationLogQueryProperty("TIMESTAMP_");
-
-  private String name;
-
-  public OperationLogQueryProperty(String name) {
-    this.name = name;
-    properties.put(name, this);
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public static OperationLogQueryProperty findByName(String propertyName) {
-    return properties.get(propertyName);
-  }
+  public static final QueryProperty TIMESTAMP = new QueryPropertyImpl("TIMESTAMP_");
 
 }

@@ -87,16 +87,20 @@
   </select>
 
   <select id="selectFilterByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.filter.FilterQueryImpl" resultMap="filterResultMap">
-  	${limitBefore}
-    select RES.* ${limitBetweenClob}
+  	<include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
+    ${limitBefore}
+    select RES.* 
+    ${limitBetweenClob}
     <include refid="selectFilterByQueryCriteriaSql" />
     ${orderBy}
     ${limitAfter}
   </select>
 
   <select id="selectFilterByQueryCriteria_postgres" parameterType="org.camunda.bpm.engine.impl.filter.FilterQueryImpl" resultMap="filterResultMap_postgres">
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
-    select RES.* ${limitBetweenClob}
+    select RES.* 
+    ${limitBetweenClob}
     <include refid="selectFilterByQueryCriteriaSql" />
     ${orderBy}
     ${limitAfter}

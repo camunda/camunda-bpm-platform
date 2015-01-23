@@ -101,8 +101,10 @@
   </select>
   
   <select id="selectJobDefinitionByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.JobDefinitionQueryImpl" resultMap="jobDefinitionResultMap">
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
-    select RES.* ${limitBetween}
+    select RES.* 
+    ${limitBetween}
     <include refid="selectJobDefinitionByQueryCriteriaSql"/>
     ${orderBy}
     ${limitAfter}

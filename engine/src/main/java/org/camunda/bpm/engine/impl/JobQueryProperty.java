@@ -13,9 +13,6 @@
 
 package org.camunda.bpm.engine.impl;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.camunda.bpm.engine.query.QueryProperty;
 import org.camunda.bpm.engine.runtime.JobQuery;
 
@@ -24,33 +21,14 @@ import org.camunda.bpm.engine.runtime.JobQuery;
  *
  * @author Joram Barrez
  */
-public class JobQueryProperty implements QueryProperty {
+public interface JobQueryProperty {
 
-  private static final long serialVersionUID = 1L;
-
-  private static final Map<String, JobQueryProperty> properties = new HashMap<String, JobQueryProperty>();
-
-  public static final JobQueryProperty JOB_ID = new JobQueryProperty("ID_");
-  public static final JobQueryProperty PROCESS_INSTANCE_ID = new JobQueryProperty("RES.PROCESS_INSTANCE_ID_");
-  public static final JobQueryProperty EXECUTION_ID = new JobQueryProperty("RES.EXECUTION_ID_");
-  public static final JobQueryProperty PROCESS_DEFINITION_ID = new JobQueryProperty("RES.PROCESS_DEF_ID_");
-  public static final JobQueryProperty PROCESS_DEFINITION_KEY = new JobQueryProperty("RES.PROCESS_DEF_KEY_");
-  public static final JobQueryProperty DUEDATE = new JobQueryProperty("RES.DUEDATE_");
-  public static final JobQueryProperty RETRIES = new JobQueryProperty("RES.RETRIES_");
-
-  private String name;
-
-  public JobQueryProperty(String name) {
-    this.name = name;
-    properties.put(name, this);
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public static JobQueryProperty findByName(String propertyName) {
-    return properties.get(propertyName);
-  }
+  public static final QueryProperty JOB_ID = new QueryPropertyImpl("ID_");
+  public static final QueryProperty PROCESS_INSTANCE_ID = new QueryPropertyImpl("PROCESS_INSTANCE_ID_");
+  public static final QueryProperty EXECUTION_ID = new QueryPropertyImpl("EXECUTION_ID_");
+  public static final QueryProperty PROCESS_DEFINITION_ID = new QueryPropertyImpl("PROCESS_DEF_ID_");
+  public static final QueryProperty PROCESS_DEFINITION_KEY = new QueryPropertyImpl("PROCESS_DEF_KEY_");
+  public static final QueryProperty DUEDATE = new QueryPropertyImpl("DUEDATE_");
+  public static final QueryProperty RETRIES = new QueryPropertyImpl("RETRIES_");
 
 }

@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -14,9 +14,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -26,9 +26,6 @@
 
 package org.camunda.bpm.engine.impl;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.camunda.bpm.engine.query.QueryProperty;
 import org.camunda.bpm.engine.repository.DeploymentQuery;
 
@@ -36,33 +33,13 @@ import org.camunda.bpm.engine.repository.DeploymentQuery;
 
 /**
  * Contains the possible properties that can be used in a {@link DeploymentQuery}.
- * 
+ *
  * @author Joram Barrez
  */
-public class DeploymentQueryProperty implements QueryProperty {
+public interface DeploymentQueryProperty {
 
-  private static final long serialVersionUID = 1L;
+  public static final QueryProperty DEPLOYMENT_ID = new QueryPropertyImpl("ID_");
+  public static final QueryProperty DEPLOYMENT_NAME = new QueryPropertyImpl("NAME_");
+  public static final QueryProperty DEPLOY_TIME = new QueryPropertyImpl("DEPLOY_TIME_");
 
-  private static final Map<String, DeploymentQueryProperty> properties = new HashMap<String, DeploymentQueryProperty>();
-
-  public static final DeploymentQueryProperty DEPLOYMENT_ID = new DeploymentQueryProperty("RES.ID_");
-  public static final DeploymentQueryProperty DEPLOYMENT_NAME = new DeploymentQueryProperty("RES.NAME_");
-  public static final DeploymentQueryProperty DEPLOY_TIME = new DeploymentQueryProperty("RES.DEPLOY_TIME_");
-  
-  private String name;
-
-  public DeploymentQueryProperty(String name) {
-    this.name = name;
-    properties.put(name, this);
-  }
-
-  public String getName() {
-    return name;
-  }
-  
-  public static DeploymentQueryProperty findByName(String propertyName) {
-    return properties.get(propertyName);
-  }
-
-  
 }

@@ -174,7 +174,7 @@ public class DbSqlSessionFactory implements SessionFactory {
 
     // db2
     databaseSpecificLimitBeforeStatements.put(DB2, "SELECT SUB.* FROM (");
-    databaseSpecificLimitAfterStatements.put(DB2, ")RES ) SUB WHERE SUB.rnk >= #{firstRow} AND SUB.rnk < #{lastRow}");
+    databaseSpecificLimitAfterStatements.put(DB2, ")RES ) SUB WHERE SUB.rnk >= #{firstRow} AND SUB.rnk < #{lastRow} ORDER BY SUB.rnk");
     databaseSpecificLimitBetweenStatements.put(DB2, ", row_number() over (ORDER BY ${orderBy}) rnk FROM ( select distinct RES.* ");
     databaseSpecificLimitBetweenClobStatements.put(DB2, ", row_number() over (ORDER BY ${orderBy}) rnk FROM ( select RES.* ");
     databaseSpecificOrderByStatements.put(DB2, "");
@@ -200,8 +200,9 @@ public class DbSqlSessionFactory implements SessionFactory {
     dbSpecificConstants.put(DB2, constants);
 
     // mssql
+
     databaseSpecificLimitBeforeStatements.put(MSSQL, "SELECT SUB.* FROM (");
-    databaseSpecificLimitAfterStatements.put(MSSQL, ")RES ) SUB WHERE SUB.rnk >= #{firstRow} AND SUB.rnk < #{lastRow}");
+    databaseSpecificLimitAfterStatements.put(MSSQL, ")RES ) SUB WHERE SUB.rnk >= #{firstRow} AND SUB.rnk < #{lastRow} ORDER BY SUB.rnk");
     databaseSpecificLimitBetweenStatements.put(MSSQL, ", row_number() over (ORDER BY ${orderBy}) rnk FROM ( select distinct RES.* ");
     databaseSpecificLimitBetweenClobStatements.put(MSSQL, databaseSpecificLimitBetweenStatements.get(MSSQL));
     databaseSpecificOrderByStatements.put(MSSQL, "");

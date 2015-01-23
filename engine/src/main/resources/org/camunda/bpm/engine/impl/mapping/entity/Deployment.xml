@@ -34,8 +34,10 @@
   </select>
 
   <select id="selectDeploymentsByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.DeploymentQueryImpl" resultMap="deploymentResultMap">
-  	${limitBefore}
-    select distinct RES.* ${limitBetween}
+  	<include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
+    ${limitBefore}
+    select distinct RES.* 
+    ${limitBetween}
     <include refid="selectDeploymentsByQueryCriteriaSql"/>
     ${orderBy}
     ${limitAfter}
@@ -73,8 +75,10 @@
 
   <!-- mysql specific -->
   <select id="selectDeploymentsByQueryCriteria_mysql" parameterType="org.camunda.bpm.engine.impl.DeploymentQueryImpl" resultMap="deploymentResultMap">
-  	${limitBefore}
-    select distinct RES.* ${limitBetween}
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
+    ${limitBefore}
+    select distinct RES.* 
+    ${limitBetween}
     <include refid="selectDeploymentsByQueryCriteriaSql"/>
    	${orderBy}
     ${limitAfter}

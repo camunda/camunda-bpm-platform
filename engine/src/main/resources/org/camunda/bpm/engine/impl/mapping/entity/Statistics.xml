@@ -51,8 +51,10 @@
   <!-- Process Definition Statistics -->  
   <select id ="selectProcessDefinitionStatistics" resultMap="processDefinitionStatisticsResultMap" 
     parameterType="org.camunda.bpm.engine.impl.ProcessDefinitionStatisticsQueryImpl">
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
-    select RES.* ${limitBetween}
+    select RES.* 
+    ${limitBetween}
     <include refid="selectProcessDefinitionStatisticsByQueryCriteriaSql"/>
     ${orderBy}
     ${limitAfter}
@@ -131,8 +133,10 @@
   <!-- Deployment statistics -->
   <select id ="selectDeploymentStatistics" resultMap="deploymentStatisticsResultMap" 
     parameterType="org.camunda.bpm.engine.impl.DeploymentStatisticsQueryImpl">
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
-    select RES.* ${limitBetween}
+    select RES.* 
+    ${limitBetween}
     <include refid="selectDeploymentStatisticsByQueryCriteriaSql"/>
     ${orderBy}
     ${limitAfter}
@@ -224,8 +228,10 @@
 
   <select id ="selectActivityStatistics" resultMap="activityStatisticsResultMap" 
     parameterType="org.camunda.bpm.engine.impl.ActivityStatisticsQueryImpl">
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
-    select RES.* ${limitBetween}
+    select RES.* 
+    ${limitBetween}
     <include refid="selectActivityStatisticsByQueryCriteriaSql"/>
     ${orderBy}
     ${limitAfter}

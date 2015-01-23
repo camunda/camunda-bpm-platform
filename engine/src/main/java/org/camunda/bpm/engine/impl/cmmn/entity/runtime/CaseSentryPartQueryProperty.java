@@ -12,39 +12,18 @@
  */
 package org.camunda.bpm.engine.impl.cmmn.entity.runtime;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import org.camunda.bpm.engine.impl.QueryPropertyImpl;
 import org.camunda.bpm.engine.query.QueryProperty;
 
 /**
  * @author Roman Smirnov
  *
  */
-public class CaseSentryPartQueryProperty implements QueryProperty {
+public interface CaseSentryPartQueryProperty {
 
-  private static final long serialVersionUID = 1L;
-
-  private static final Map<String, CaseSentryPartQueryProperty> properties = new HashMap<String, CaseSentryPartQueryProperty>();
-
-  public static final CaseExecutionQueryProperty CASE_SENTRY_PART_ID = new CaseExecutionQueryProperty("RES.ID_");
-  public static final CaseExecutionQueryProperty CASE_INSTANCE_ID = new CaseExecutionQueryProperty("RES.CASE_INST_ID_");
-  public static final CaseExecutionQueryProperty CASE_EXECUTION_ID = new CaseExecutionQueryProperty("RES.CASE_EXEC_ID");
-  public static final CaseExecutionQueryProperty SENTRY_ID = new CaseExecutionQueryProperty("RES.SENTRY_ID_");
-  public static final CaseExecutionQueryProperty SOURCE = new CaseExecutionQueryProperty("RES.SOURCE");
-
-  private String name;
-
-  public CaseSentryPartQueryProperty(String name) {
-    this.name = name;
-    properties.put(name, this);
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public static CaseSentryPartQueryProperty findByName(String propertyName) {
-    return properties.get(propertyName);
-  }
+  public static final QueryProperty CASE_SENTRY_PART_ID = new QueryPropertyImpl("ID_");
+  public static final QueryProperty CASE_INSTANCE_ID = new QueryPropertyImpl("CASE_INST_ID_");
+  public static final QueryProperty CASE_EXECUTION_ID = new QueryPropertyImpl("CASE_EXEC_ID");
+  public static final QueryProperty SENTRY_ID = new QueryPropertyImpl("SENTRY_ID_");
+  public static final QueryProperty SOURCE = new QueryPropertyImpl("SOURCE");
 }

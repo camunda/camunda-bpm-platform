@@ -13,40 +13,19 @@
 
 package org.camunda.bpm.engine.impl.filter;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import org.camunda.bpm.engine.impl.QueryPropertyImpl;
 import org.camunda.bpm.engine.query.QueryProperty;
 
 /**
  * @author Sebastian Menski
  */
-public class FilterQueryProperty implements QueryProperty {
+public interface FilterQueryProperty {
 
-  private static final long serialVersionUID = 1L;
-
-  private static final Map<String, FilterQueryProperty> properties = new HashMap<String, FilterQueryProperty>();
-
-  public static final FilterQueryProperty FILTER_ID = new FilterQueryProperty("RES.ID_");
-  public static final FilterQueryProperty RESOURCE_TYPE = new FilterQueryProperty("RES.RESOURCE_TYPE_");
-  public static final FilterQueryProperty NAME = new FilterQueryProperty("RES.NAME_");
-  public static final FilterQueryProperty OWNER = new FilterQueryProperty("RES.OWNER_");
-  public static final FilterQueryProperty QUERY = new FilterQueryProperty("RES.QUERY_");
-  public static final FilterQueryProperty PROPERTIES = new FilterQueryProperty("RES.PROPERTIES_");
-
-  private String name;
-
-  public FilterQueryProperty(String name) {
-    this.name = name;
-    properties.put(name, this);
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public static FilterQueryProperty findByName(String propertyName) {
-    return properties.get(propertyName);
-  }
+  public static final QueryProperty FILTER_ID = new QueryPropertyImpl("ID_");
+  public static final QueryProperty RESOURCE_TYPE = new QueryPropertyImpl("RESOURCE_TYPE_");
+  public static final QueryProperty NAME = new QueryPropertyImpl("NAME_");
+  public static final QueryProperty OWNER = new QueryPropertyImpl("OWNER_");
+  public static final QueryProperty QUERY = new QueryPropertyImpl("QUERY_");
+  public static final QueryProperty PROPERTIES = new QueryPropertyImpl("PROPERTIES_");
 
 }

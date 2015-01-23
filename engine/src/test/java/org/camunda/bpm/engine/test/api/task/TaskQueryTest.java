@@ -17,13 +17,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.ibatis.logging.LogFactory;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.filter.Filter;
@@ -33,6 +33,8 @@ import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.repository.CaseDefinition;
+import org.camunda.bpm.engine.runtime.CaseExecution;
+import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.DelegationState;
@@ -40,6 +42,7 @@ import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.type.ValueType;
 
 /**
  * @author Joram Barrez
@@ -3807,6 +3810,590 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     // then the task query should be able to filter by both variables and return both tasks
     assertEquals(2, taskService.createTaskQuery().processVariableValueEquals("var", 12345).count());
     assertEquals(2, taskService.createTaskQuery().processVariableValueEquals("var", 12345L).count());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/task/TaskQueryTest.testProcessDefinition.bpmn20.xml")
+  public void testQueryResultOrderingByProcessVariables() {
+    // given three tasks with String process instance variables
+    ProcessInstance instance1 = runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Collections.<String, Object>singletonMap("var", "bValue"));
+    ProcessInstance instance2 = runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Collections.<String, Object>singletonMap("var", "cValue"));
+    ProcessInstance instance3 = runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Collections.<String, Object>singletonMap("var", "aValue"));
+
+    // when I make a task query with ascending variable ordering by String values
+    List<Task> tasks = taskService.createTaskQuery()
+      .processDefinitionKey("oneTaskProcess")
+      .orderByProcessVariable("var", ValueType.STRING)
+      .asc()
+      .list();
+
+    // then the tasks are ordered correctly
+    assertEquals(3, tasks.size());
+    // then in alphabetical order
+    assertEquals(instance3.getId(), tasks.get(0).getProcessInstanceId());
+    assertEquals(instance1.getId(), tasks.get(1).getProcessInstanceId());
+    assertEquals(instance2.getId(), tasks.get(2).getProcessInstanceId());
+
+    // when I make a task query with descending variable ordering by String values
+    tasks = taskService.createTaskQuery()
+      .processDefinitionKey("oneTaskProcess")
+      .orderByProcessVariable("var", ValueType.STRING)
+      .desc()
+      .list();
+
+    // then the tasks are ordered correctly
+    assertEquals(3, tasks.size());
+    // then in alphabetical order
+    assertEquals(instance2.getId(), tasks.get(0).getProcessInstanceId());
+    assertEquals(instance1.getId(), tasks.get(1).getProcessInstanceId());
+    assertEquals(instance3.getId(), tasks.get(2).getProcessInstanceId());
+
+
+    // when I make a task query with variable ordering by Integer values
+    List<Task> unorderedTasks = taskService.createTaskQuery()
+      .processDefinitionKey("oneTaskProcess")
+      .orderByProcessVariable("var", ValueType.INTEGER)
+      .asc()
+      .list();
+
+    // then the tasks are in no particular ordering
+    assertEquals(3, unorderedTasks.size());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/task/TaskQueryTest.testLocalExecutionVariable.bpmn20.xml")
+  public void testQueryResultOrderingByExecutionVariables() {
+    // given three tasks with String process instance variables
+    ProcessInstance instance1 = runtimeService.startProcessInstanceByKey("parallelGateway",
+      Collections.<String, Object>singletonMap("var", "aValue"));
+    ProcessInstance instance2 = runtimeService.startProcessInstanceByKey("parallelGateway",
+      Collections.<String, Object>singletonMap("var", "bValue"));
+    ProcessInstance instance3 = runtimeService.startProcessInstanceByKey("parallelGateway",
+      Collections.<String, Object>singletonMap("var", "cValue"));
+
+    // and some local variables on the tasks
+    Task task1 = taskService.createTaskQuery().processInstanceId(instance1.getId()).singleResult();
+    runtimeService.setVariableLocal(task1.getExecutionId(), "var", "cValue");
+
+    Task task2 = taskService.createTaskQuery().processInstanceId(instance2.getId()).singleResult();
+    runtimeService.setVariableLocal(task2.getExecutionId(), "var", "bValue");
+
+    Task task3 = taskService.createTaskQuery().processInstanceId(instance3.getId()).singleResult();
+    runtimeService.setVariableLocal(task3.getExecutionId(), "var", "aValue");
+
+    // when I make a task query with ascending variable ordering by tasks variables
+    List<Task> tasks = taskService.createTaskQuery()
+      .processDefinitionKey("parallelGateway")
+      .orderByExecutionVariable("var", ValueType.STRING)
+      .asc()
+      .list();
+
+    // then the tasks are ordered correctly by their local variables
+    assertEquals(3, tasks.size());
+    assertEquals(instance3.getId(), tasks.get(0).getProcessInstanceId());
+    assertEquals(instance2.getId(), tasks.get(1).getProcessInstanceId());
+    assertEquals(instance1.getId(), tasks.get(2).getProcessInstanceId());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/task/TaskQueryTest.testProcessDefinition.bpmn20.xml")
+  public void testQueryResultOrderingByTaskVariables() {
+    // given three tasks with String process instance variables
+    ProcessInstance instance1 = runtimeService.startProcessInstanceByKey("oneTaskProcess",
+      Collections.<String, Object>singletonMap("var", "aValue"));
+    ProcessInstance instance2 = runtimeService.startProcessInstanceByKey("oneTaskProcess",
+      Collections.<String, Object>singletonMap("var", "bValue"));
+    ProcessInstance instance3 = runtimeService.startProcessInstanceByKey("oneTaskProcess",
+      Collections.<String, Object>singletonMap("var", "cValue"));
+
+    // and some local variables on the tasks
+    Task task1 = taskService.createTaskQuery().processInstanceId(instance1.getId()).singleResult();
+    taskService.setVariableLocal(task1.getId(), "var", "cValue");
+
+    Task task2 = taskService.createTaskQuery().processInstanceId(instance2.getId()).singleResult();
+    taskService.setVariableLocal(task2.getId(), "var", "bValue");
+
+    Task task3 = taskService.createTaskQuery().processInstanceId(instance3.getId()).singleResult();
+    taskService.setVariableLocal(task3.getId(), "var", "aValue");
+
+    // when I make a task query with ascending variable ordering by tasks variables
+    List<Task> tasks = taskService.createTaskQuery()
+      .processDefinitionKey("oneTaskProcess")
+      .orderByTaskVariable("var", ValueType.STRING)
+      .asc()
+      .list();
+
+    // then the tasks are ordered correctly by their local variables
+    assertEquals(3, tasks.size());
+    assertEquals(instance3.getId(), tasks.get(0).getProcessInstanceId());
+    assertEquals(instance2.getId(), tasks.get(1).getProcessInstanceId());
+    assertEquals(instance1.getId(), tasks.get(2).getProcessInstanceId());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn")
+  public void testQueryResultOrderingByCaseInstanceVariables() {
+    // given three tasks with String case instance variables
+    CaseInstance instance1 = caseService.createCaseInstanceByKey("oneTaskCase",
+        Collections.<String, Object>singletonMap("var", "cValue"));
+    CaseInstance instance2 = caseService.createCaseInstanceByKey("oneTaskCase",
+        Collections.<String, Object>singletonMap("var", "aValue"));
+    CaseInstance instance3 = caseService.createCaseInstanceByKey("oneTaskCase",
+        Collections.<String, Object>singletonMap("var", "bValue"));
+
+    List<CaseExecution> caseExecutions = caseService.createCaseExecutionQuery()
+      .activityId("PI_HumanTask_1")
+      .list();
+
+    for (CaseExecution caseExecution : caseExecutions) {
+      caseService
+        .withCaseExecution(caseExecution.getId())
+        .manualStart();
+    }
+
+    // when I make a task query with ascending variable ordering by tasks variables
+    List<Task> tasks = taskService.createTaskQuery()
+      .caseDefinitionKey("oneTaskCase")
+      .orderByCaseInstanceVariable("var", ValueType.STRING)
+      .asc()
+      .list();
+
+    // then the tasks are ordered correctly by their local variables
+    assertEquals(3, tasks.size());
+    assertEquals(instance2.getId(), tasks.get(0).getCaseInstanceId());
+    assertEquals(instance3.getId(), tasks.get(1).getCaseInstanceId());
+    assertEquals(instance1.getId(), tasks.get(2).getCaseInstanceId());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn")
+  public void testQueryResultOrderingByCaseExecutionVariables() {
+    // given three tasks with String case instance variables
+    CaseInstance instance1 = caseService.createCaseInstanceByKey("oneTaskCase",
+        Collections.<String, Object>singletonMap("var", "cValue"));
+    CaseInstance instance2 = caseService.createCaseInstanceByKey("oneTaskCase",
+        Collections.<String, Object>singletonMap("var", "aValue"));
+    CaseInstance instance3 = caseService.createCaseInstanceByKey("oneTaskCase",
+        Collections.<String, Object>singletonMap("var", "bValue"));
+
+    // and local case execution variables
+    CaseExecution caseExecution1 = caseService.createCaseExecutionQuery()
+      .activityId("PI_HumanTask_1")
+      .caseInstanceId(instance1.getId())
+      .singleResult();
+
+    caseService
+      .withCaseExecution(caseExecution1.getId())
+      .setVariableLocal("var", "aValue")
+      .manualStart();
+
+    CaseExecution caseExecution2 = caseService.createCaseExecutionQuery()
+      .activityId("PI_HumanTask_1")
+      .caseInstanceId(instance2.getId())
+      .singleResult();
+
+    caseService
+      .withCaseExecution(caseExecution2.getId())
+      .setVariableLocal("var", "bValue")
+      .manualStart();
+
+    CaseExecution caseExecution3 = caseService.createCaseExecutionQuery()
+      .activityId("PI_HumanTask_1")
+      .caseInstanceId(instance3.getId())
+      .singleResult();
+
+    caseService
+      .withCaseExecution(caseExecution3.getId())
+      .setVariableLocal("var", "cValue")
+      .manualStart();
+
+    // when I make a task query with ascending variable ordering by tasks variables
+    List<Task> tasks = taskService.createTaskQuery()
+        .caseDefinitionKey("oneTaskCase")
+        .orderByCaseExecutionVariable("var", ValueType.STRING)
+        .asc()
+        .list();
+
+    // then the tasks are ordered correctly by their local variables
+    assertEquals(3, tasks.size());
+    assertEquals(instance1.getId(), tasks.get(0).getCaseInstanceId());
+    assertEquals(instance2.getId(), tasks.get(1).getCaseInstanceId());
+    assertEquals(instance3.getId(), tasks.get(2).getCaseInstanceId());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/task/TaskQueryTest.testProcessDefinition.bpmn20.xml")
+  public void testQueryResultOrderingByVariablesWithNullValues() {
+    // given three tasks with String process instance variables
+    ProcessInstance instance1 = runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Collections.<String, Object>singletonMap("var", "bValue"));
+    ProcessInstance instance2 = runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Collections.<String, Object>singletonMap("var", "cValue"));
+    ProcessInstance instance3 = runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Collections.<String, Object>singletonMap("var", "aValue"));
+    ProcessInstance instance4 = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+    // when I make a task query with variable ordering by String values
+    List<Task> tasks = taskService.createTaskQuery()
+        .processDefinitionKey("oneTaskProcess")
+        .orderByProcessVariable("var", ValueType.STRING)
+        .asc()
+        .list();
+
+    Task firstTask = tasks.get(0);
+
+    // the null-valued task should be either first or last
+    if (firstTask.getProcessInstanceId().equals(instance4.getId())) {
+      // then the others in ascending order
+      assertEquals(instance3.getId(), tasks.get(1).getProcessInstanceId());
+      assertEquals(instance1.getId(), tasks.get(2).getProcessInstanceId());
+      assertEquals(instance2.getId(), tasks.get(3).getProcessInstanceId());
+    } else {
+      assertEquals(instance3.getId(), tasks.get(0).getProcessInstanceId());
+      assertEquals(instance1.getId(), tasks.get(1).getProcessInstanceId());
+      assertEquals(instance2.getId(), tasks.get(2).getProcessInstanceId());
+      assertEquals(instance4.getId(), tasks.get(3).getProcessInstanceId());
+    }
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/task/TaskQueryTest.testProcessDefinition.bpmn20.xml")
+  public void testQueryResultOrderingByVariablesWithMixedTypes() {
+    // given three tasks with String and Integer process instance variables
+    ProcessInstance instance1 = runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Collections.<String, Object>singletonMap("var", 42));
+    ProcessInstance instance2 = runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Collections.<String, Object>singletonMap("var", "cValue"));
+    ProcessInstance instance3 = runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Collections.<String, Object>singletonMap("var", "aValue"));
+
+    // when I make a task query with variable ordering by String values
+    List<Task> tasks = taskService.createTaskQuery()
+      .processDefinitionKey("oneTaskProcess")
+      .orderByProcessVariable("var", ValueType.STRING)
+      .asc()
+      .list();
+
+    Task firstTask = tasks.get(0);
+
+    // the numeric-valued task should be either first or last
+    if (firstTask.getProcessInstanceId().equals(instance1.getId())) {
+      // then the others in ascending order
+      assertEquals(instance3.getId(), tasks.get(1).getProcessInstanceId());
+      assertEquals(instance2.getId(), tasks.get(2).getProcessInstanceId());
+    } else {
+      assertEquals(instance3.getId(), tasks.get(0).getProcessInstanceId());
+      assertEquals(instance2.getId(), tasks.get(1).getProcessInstanceId());
+      assertEquals(instance1.getId(), tasks.get(2).getProcessInstanceId());
+    }
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/task/TaskQueryTest.testProcessDefinition.bpmn20.xml")
+  public void testQueryResultOrderingByStringVariableWithMixedCase() {
+    // given three tasks with String and Integer process instance variables
+    ProcessInstance instance1 = runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Collections.<String, Object>singletonMap("var", "a"));
+    ProcessInstance instance2 = runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Collections.<String, Object>singletonMap("var", "B"));
+    ProcessInstance instance3 = runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Collections.<String, Object>singletonMap("var", "c"));
+
+    // when I make a task query with variable ordering by String values
+    List<Task> tasks = taskService.createTaskQuery()
+      .processDefinitionKey("oneTaskProcess")
+      .orderByProcessVariable("var", ValueType.STRING)
+      .asc()
+      .list();
+
+    // then the tasks are ordered correctly
+    assertEquals(3, tasks.size());
+    // first the numeric valued task (since it is treated like null-valued)
+    assertEquals(instance1.getId(), tasks.get(0).getProcessInstanceId());
+    // then the others in alphabetical order
+    assertEquals(instance2.getId(), tasks.get(1).getProcessInstanceId());
+    assertEquals(instance3.getId(), tasks.get(2).getProcessInstanceId());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/task/TaskQueryTest.testProcessDefinition.bpmn20.xml")
+  public void testQueryResultOrderingByVariablesOfAllPrimitiveTypes() {
+    // given three tasks with String and Integer process instance variables
+    ProcessInstance booleanInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Collections.<String, Object>singletonMap("var", true));
+    ProcessInstance shortInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Collections.<String, Object>singletonMap("var", (short) 16));
+    ProcessInstance longInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Collections.<String, Object>singletonMap("var", 500L));
+    ProcessInstance intInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Collections.<String, Object>singletonMap("var", 400));
+    ProcessInstance stringInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Collections.<String, Object>singletonMap("var", "300"));
+    ProcessInstance dateInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Collections.<String, Object>singletonMap("var", new Date(1000L)));
+    ProcessInstance doubleInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Collections.<String, Object>singletonMap("var", 42.5d));
+
+    // when I make a task query with variable ordering by String values
+    List<Task> tasks = taskService.createTaskQuery()
+      .processDefinitionKey("oneTaskProcess")
+      .orderByProcessVariable("var", ValueType.BOOLEAN)
+      .asc()
+      .list();
+
+    verifyFirstOrLastTask(tasks, booleanInstance);
+
+    tasks = taskService.createTaskQuery()
+      .processDefinitionKey("oneTaskProcess")
+      .orderByProcessVariable("var", ValueType.SHORT)
+      .asc()
+      .list();
+
+    verifyFirstOrLastTask(tasks, shortInstance);
+
+    tasks = taskService.createTaskQuery()
+      .processDefinitionKey("oneTaskProcess")
+      .orderByProcessVariable("var", ValueType.LONG)
+      .asc()
+      .list();
+
+    verifyFirstOrLastTask(tasks, longInstance);
+
+    tasks = taskService.createTaskQuery()
+      .processDefinitionKey("oneTaskProcess")
+      .orderByProcessVariable("var", ValueType.INTEGER)
+      .asc()
+      .list();
+
+    verifyFirstOrLastTask(tasks, intInstance);
+
+    tasks = taskService.createTaskQuery()
+      .processDefinitionKey("oneTaskProcess")
+      .orderByProcessVariable("var", ValueType.STRING)
+      .asc()
+      .list();
+
+    verifyFirstOrLastTask(tasks, stringInstance);
+
+    tasks = taskService.createTaskQuery()
+      .processDefinitionKey("oneTaskProcess")
+      .orderByProcessVariable("var", ValueType.DATE)
+      .asc()
+      .list();
+
+    verifyFirstOrLastTask(tasks, dateInstance);
+
+    tasks = taskService.createTaskQuery()
+      .processDefinitionKey("oneTaskProcess")
+      .orderByProcessVariable("var", ValueType.DOUBLE)
+      .asc()
+      .list();
+
+    verifyFirstOrLastTask(tasks, doubleInstance);
+  }
+
+  public void testQueryByUnsupportedValueTypes() {
+    try {
+      taskService.createTaskQuery().orderByProcessVariable("var", ValueType.BYTES);
+      fail("this type is not supported");
+    } catch (ProcessEngineException e) {
+      // happy path
+      assertTextPresent("Cannot order by variables of type byte", e.getMessage());
+    }
+
+    try {
+      taskService.createTaskQuery().orderByProcessVariable("var", ValueType.NULL);
+      fail("this type is not supported");
+    } catch (ProcessEngineException e) {
+      // happy path
+      assertTextPresent("Cannot order by variables of type null", e.getMessage());
+    }
+
+    try {
+      taskService.createTaskQuery().orderByProcessVariable("var", ValueType.NUMBER);
+      fail("this type is not supported");
+    } catch (ProcessEngineException e) {
+      // happy path
+      assertTextPresent("Cannot order by variables of type number", e.getMessage());
+    }
+
+    try {
+      taskService.createTaskQuery().orderByProcessVariable("var", ValueType.OBJECT);
+      fail("this type is not supported");
+    } catch (ProcessEngineException e) {
+      // happy path
+      assertTextPresent("Cannot order by variables of type object", e.getMessage());
+    }
+  }
+
+  /**
+   * verify that either the first or the last task of the list belong to the given process instance
+   */
+  protected void verifyFirstOrLastTask(List<Task> tasks, ProcessInstance belongingProcessInstance) {
+    if (tasks.size() == 0) {
+      fail("no tasks given");
+    }
+
+    int numTasks = tasks.size();
+    boolean matches = tasks.get(0).getProcessInstanceId().equals(belongingProcessInstance.getId());
+    matches = matches || tasks.get(numTasks - 1).getProcessInstanceId()
+        .equals(belongingProcessInstance.getId());
+
+    assertTrue("neither first nor last task belong to process instance " + belongingProcessInstance.getId(),
+        matches);
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/task/TaskQueryTest.testProcessDefinition.bpmn20.xml")
+  public void testQueryResultOrderingByVariablesWithMixedTypesAndSameColumn() {
+    // given three tasks with Integer and Long process instance variables
+    ProcessInstance instance1 = runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Collections.<String, Object>singletonMap("var", 42));
+    ProcessInstance instance2 = runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Collections.<String, Object>singletonMap("var", 800));
+    ProcessInstance instance3 = runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Collections.<String, Object>singletonMap("var", 500L));
+
+    // when I make a task query with variable ordering by String values
+    List<Task> tasks = taskService.createTaskQuery()
+        .processDefinitionKey("oneTaskProcess")
+        .orderByProcessVariable("var", ValueType.INTEGER)
+        .asc()
+        .list();
+
+    // then the tasks are ordered correctly
+    assertEquals(3, tasks.size());
+
+    Task firstTask = tasks.get(0);
+
+    // the Long-valued task should be either first or last
+    if (firstTask.getProcessInstanceId().equals(instance3.getId())) {
+      // then the others in ascending order
+      assertEquals(instance1.getId(), tasks.get(1).getProcessInstanceId());
+      assertEquals(instance2.getId(), tasks.get(2).getProcessInstanceId());
+    } else {
+      assertEquals(instance1.getId(), tasks.get(0).getProcessInstanceId());
+      assertEquals(instance2.getId(), tasks.get(1).getProcessInstanceId());
+      assertEquals(instance3.getId(), tasks.get(2).getProcessInstanceId());
+    }
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/task/TaskQueryTest.testProcessDefinition.bpmn20.xml")
+  public void testQueryResultOrderingByTwoVariables() {
+    // given three tasks with String process instance variables
+    ProcessInstance bInstance1 = runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Variables.createVariables().putValue("var", "b").putValue("var2", 14));
+    ProcessInstance bInstance2 = runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Variables.createVariables().putValue("var", "b").putValue("var2", 30));
+    ProcessInstance cInstance1 = runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Variables.createVariables().putValue("var", "c").putValue("var2", 50));
+    ProcessInstance cInstance2 = runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Variables.createVariables().putValue("var", "c").putValue("var2", 30));
+    ProcessInstance aInstance1 = runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Variables.createVariables().putValue("var", "a").putValue("var2", 14));
+    ProcessInstance aInstance2 = runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Variables.createVariables().putValue("var", "a").putValue("var2", 50));
+
+    // when I make a task query with variable primary ordering by var values
+    // and secondary ordering by var2 values
+    List<Task> tasks = taskService.createTaskQuery()
+        .processDefinitionKey("oneTaskProcess")
+        .orderByProcessVariable("var", ValueType.STRING)
+        .desc()
+        .orderByProcessVariable("var2", ValueType.INTEGER)
+        .asc()
+        .list();
+
+    // then the tasks are ordered correctly
+    assertEquals(6, tasks.size());
+    // var = c; var2 = 30
+    assertEquals(cInstance2.getId(), tasks.get(0).getProcessInstanceId());
+    // var = c; var2 = 50
+    assertEquals(cInstance1.getId(), tasks.get(1).getProcessInstanceId());
+    // var = b; var2 = 14
+    assertEquals(bInstance1.getId(), tasks.get(2).getProcessInstanceId());
+    // var = b; var2 = 30
+    assertEquals(bInstance2.getId(), tasks.get(3).getProcessInstanceId());
+    // var = a; var2 = 14
+    assertEquals(aInstance1.getId(), tasks.get(4).getProcessInstanceId());
+    // var = a; var2 = 50
+    assertEquals(aInstance2.getId(), tasks.get(5).getProcessInstanceId());
+
+    // when I make a task query with variable primary ordering by var2 values
+    // and secondary ordering by var values
+    tasks = taskService.createTaskQuery()
+        .processDefinitionKey("oneTaskProcess")
+        .orderByProcessVariable("var2", ValueType.INTEGER)
+        .desc()
+        .orderByProcessVariable("var", ValueType.STRING)
+        .asc()
+        .list();
+
+    // then the tasks are ordered correctly
+    assertEquals(6, tasks.size());
+    // var = a; var2 = 50
+    assertEquals(aInstance2.getId(), tasks.get(0).getProcessInstanceId());
+    // var = c; var2 = 50
+    assertEquals(cInstance1.getId(), tasks.get(1).getProcessInstanceId());
+    // var = b; var2 = 30
+    assertEquals(bInstance2.getId(), tasks.get(2).getProcessInstanceId());
+    // var = c; var2 = 30
+    assertEquals(cInstance2.getId(), tasks.get(3).getProcessInstanceId());
+    // var = a; var2 = 14
+    assertEquals(aInstance1.getId(), tasks.get(4).getProcessInstanceId());
+    // var = b; var2 = 14
+    assertEquals(bInstance1.getId(), tasks.get(5).getProcessInstanceId());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/task/TaskQueryTest.testProcessDefinition.bpmn20.xml")
+  public void testQueryResultOrderingByVariablesWithSecondaryOrderingByProcessInstanceId() {
+    // given three tasks with String process instance variables
+    ProcessInstance bInstance1 = runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Variables.createVariables().putValue("var", "b"));
+    ProcessInstance bInstance2 = runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Variables.createVariables().putValue("var", "b"));
+    ProcessInstance cInstance1 = runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Variables.createVariables().putValue("var", "c"));
+    ProcessInstance cInstance2 = runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Variables.createVariables().putValue("var", "c"));
+    ProcessInstance aInstance1 = runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Variables.createVariables().putValue("var", "a"));
+    ProcessInstance aInstance2 = runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Variables.createVariables().putValue("var", "a"));
+
+    // when I make a task query with variable ordering by String values
+    List<Task> tasks = taskService.createTaskQuery()
+        .processDefinitionKey("oneTaskProcess")
+        .orderByProcessVariable("var", ValueType.STRING)
+        .asc()
+        .orderByProcessInstanceId()
+        .asc()
+        .list();
+
+    // then the tasks are ordered correctly
+    assertEquals(6, tasks.size());
+
+    // var = a
+    verifyTasksSortedByProcessInstanceId(Arrays.asList(aInstance1, aInstance2),
+        tasks.subList(0, 2));
+
+    // var = b
+    verifyTasksSortedByProcessInstanceId(Arrays.asList(bInstance1, bInstance2),
+        tasks.subList(2, 4));
+
+    // var = c
+    verifyTasksSortedByProcessInstanceId(Arrays.asList(cInstance1, cInstance2),
+        tasks.subList(4, 6));
+  }
+
+  protected void verifyTasksSortedByProcessInstanceId(List<ProcessInstance> expectedProcessInstances,
+      List<Task> actualTasks) {
+
+    assertEquals(expectedProcessInstances.size(), actualTasks.size());
+    List<ProcessInstance> instances = new ArrayList<ProcessInstance>(expectedProcessInstances);
+
+    Collections.sort(instances, new Comparator<ProcessInstance>() {
+      public int compare(ProcessInstance p1, ProcessInstance p2) {
+        return p1.getId().compareTo(p2.getId());
+      }
+    });
+
+    for (int i = 0; i < instances.size(); i++) {
+      assertEquals(instances.get(i).getId(), actualTasks.get(i).getProcessInstanceId());
+    }
   }
 
   private void verifyQueryResults(TaskQuery query, int countExpected) {

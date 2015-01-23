@@ -13,9 +13,6 @@
 
 package org.camunda.bpm.engine.impl;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.camunda.bpm.engine.history.HistoricCaseActivityInstanceQuery;
 import org.camunda.bpm.engine.query.QueryProperty;
 
@@ -25,34 +22,16 @@ import org.camunda.bpm.engine.query.QueryProperty;
  *
  * @author Sebastian Menski
  */
-public class HistoricCaseActivityInstanceQueryProperty implements QueryProperty {
+public interface HistoricCaseActivityInstanceQueryProperty {
 
-  private static final long serialVersionUID = 1L;
+  public static final QueryProperty HISTORIC_CASE_ACTIVITY_INSTANCE_ID = new QueryPropertyImpl("ID_");
+  public static final QueryProperty CASE_INSTANCE_ID = new QueryPropertyImpl("CASE_INST_ID_");
+  public static final QueryProperty CASE_ACTIVITY_ID = new QueryPropertyImpl("CASE_ACT_ID_");
+  public static final QueryProperty CASE_ACTIVITY_NAME = new QueryPropertyImpl("CASE_ACT_NAME_");
+  public static final QueryProperty CASE_ACTIVITY_TYPE = new QueryPropertyImpl("CASE_ACT_TYPE_");
+  public static final QueryProperty CASE_DEFINITION_ID = new QueryPropertyImpl("CASE_DEF_ID_");
+  public static final QueryProperty CREATE = new QueryPropertyImpl("CREATE_TIME_");
+  public static final QueryProperty END = new QueryPropertyImpl("END_TIME_");
+  public static final QueryProperty DURATION = new QueryPropertyImpl("DURATION_");
 
-  private static final Map<String, HistoricCaseActivityInstanceQueryProperty> properties = new HashMap<String, HistoricCaseActivityInstanceQueryProperty>();
-
-  public static final HistoricCaseActivityInstanceQueryProperty HISTORIC_CASE_ACTIVITY_INSTANCE_ID = new HistoricCaseActivityInstanceQueryProperty("ID_");
-  public static final HistoricCaseActivityInstanceQueryProperty CASE_INSTANCE_ID = new HistoricCaseActivityInstanceQueryProperty("CASE_INST_ID_");
-  public static final HistoricCaseActivityInstanceQueryProperty CASE_ACTIVITY_ID = new HistoricCaseActivityInstanceQueryProperty("CASE_ACT_ID_");
-  public static final HistoricCaseActivityInstanceQueryProperty CASE_ACTIVITY_NAME = new HistoricCaseActivityInstanceQueryProperty("CASE_ACT_NAME_");
-  public static final HistoricCaseActivityInstanceQueryProperty CASE_ACTIVITY_TYPE = new HistoricCaseActivityInstanceQueryProperty("CASE_ACT_TYPE_");
-  public static final HistoricCaseActivityInstanceQueryProperty CASE_DEFINITION_ID = new HistoricCaseActivityInstanceQueryProperty("CASE_DEF_ID_");
-  public static final HistoricCaseActivityInstanceQueryProperty CREATE = new HistoricCaseActivityInstanceQueryProperty("CREATE_TIME_");
-  public static final HistoricCaseActivityInstanceQueryProperty END = new HistoricCaseActivityInstanceQueryProperty("END_TIME_");
-  public static final HistoricCaseActivityInstanceQueryProperty DURATION = new HistoricCaseActivityInstanceQueryProperty("DURATION_");
-
-  private String name;
-
-  public HistoricCaseActivityInstanceQueryProperty(String name) {
-    this.name = name;
-    properties.put(name, this);
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public static HistoricCaseActivityInstanceQueryProperty findByName(String propertyName) {
-    return properties.get(propertyName);
-  }
 }

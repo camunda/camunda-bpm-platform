@@ -134,17 +134,19 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
   }
 
   public ProcessInstanceQuery orderByProcessInstanceId() {
-    this.orderProperty = ProcessInstanceQueryProperty.PROCESS_INSTANCE_ID;
+    orderBy(ProcessInstanceQueryProperty.PROCESS_INSTANCE_ID);
     return this;
   }
 
   public ProcessInstanceQuery orderByProcessDefinitionId() {
-    this.orderProperty = ProcessInstanceQueryProperty.PROCESS_DEFINITION_ID;
+    orderBy(new QueryOrderingProperty(QueryOrderingProperty.RELATION_PROCESS_DEFINITION,
+        ProcessInstanceQueryProperty.PROCESS_DEFINITION_ID));
     return this;
   }
 
   public ProcessInstanceQuery orderByProcessDefinitionKey() {
-    this.orderProperty = ProcessInstanceQueryProperty.PROCESS_DEFINITION_KEY;
+    orderBy(new QueryOrderingProperty(QueryOrderingProperty.RELATION_PROCESS_DEFINITION,
+        ProcessInstanceQueryProperty.PROCESS_DEFINITION_KEY));
     return this;
   }
 

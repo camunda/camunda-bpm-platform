@@ -14,6 +14,8 @@
 package org.camunda.bpm.engine.impl.util;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -80,5 +82,36 @@ public final class JsonUtil {
       return list;
     }
   }
+
+  public static void addField(JSONObject json, String name, Object value) {
+    if (value != null) {
+      json.put(name, value);
+    }
+  }
+
+  public static void addDefaultField(JSONObject json, String name, Object defaultValue, Object value) {
+    if (value != null && !value.equals(defaultValue)) {
+      json.put(name, value);
+    }
+  }
+
+  public static void addListField(JSONObject json, String name, List<String> list) {
+    if (list != null) {
+      json.put(name, new JSONArray(list));
+    }
+  }
+
+  public static void addArrayField(JSONObject json, String name, String[] array) {
+    if (array != null) {
+      addListField(json, name, Arrays.asList(array));
+    }
+  }
+
+  public static void addDateField(JSONObject json, String name, Date date) {
+    if (date != null) {
+      json.put(name, date.getTime());
+    }
+  }
+
 
 }

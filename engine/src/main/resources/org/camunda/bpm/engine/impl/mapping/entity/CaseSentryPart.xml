@@ -76,8 +76,10 @@
   </select>
 
   <select id="selectCaseSentryPartsByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseSentryPartQueryImpl" resultMap="caseSentryPartResultMap">
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
-    select RES.* ${limitBetween}
+    select RES.* 
+    ${limitBetween}
     <include refid="selectCaseSentryPartsByQueryCriteriaSql"/>
     ${orderBy}
     ${limitAfter}

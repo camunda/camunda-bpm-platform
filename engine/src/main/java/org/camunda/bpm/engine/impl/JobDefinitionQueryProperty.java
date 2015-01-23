@@ -12,9 +12,6 @@
  */
 package org.camunda.bpm.engine.impl;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.camunda.bpm.engine.management.JobDefinitionQuery;
 import org.camunda.bpm.engine.query.QueryProperty;
 
@@ -23,32 +20,13 @@ import org.camunda.bpm.engine.query.QueryProperty;
  *
  * @author roman.smirnov
  */
-public class JobDefinitionQueryProperty implements QueryProperty {
+public interface JobDefinitionQueryProperty {
 
-  private static final long serialVersionUID = 1L;
-
-  private static final Map<String, JobDefinitionQueryProperty> properties = new HashMap<String, JobDefinitionQueryProperty>();
-
-  public static final JobDefinitionQueryProperty JOB_DEFINITION_ID = new JobDefinitionQueryProperty("ID_");
-  public static final JobDefinitionQueryProperty ACTIVITY_ID = new JobDefinitionQueryProperty("RES.ACT_ID_");
-  public static final JobDefinitionQueryProperty PROCESS_DEFINITION_ID = new JobDefinitionQueryProperty("RES.PROC_DEF_ID_");
-  public static final JobDefinitionQueryProperty PROCESS_DEFINITION_KEY = new JobDefinitionQueryProperty("RES.PROC_DEF_KEY_");
-  public static final JobDefinitionQueryProperty JOB_TYPE = new JobDefinitionQueryProperty("RES.JOB_TYPE_");
-  public static final JobDefinitionQueryProperty JOB_CONFIGURATION = new JobDefinitionQueryProperty("RES.JOB_CONFIGURATION_");
-
-  private String name;
-
-  public JobDefinitionQueryProperty(String name) {
-    this.name = name;
-    properties.put(name, this);
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public static JobDefinitionQueryProperty findByName(String propertyName) {
-    return properties.get(propertyName);
-  }
+  public static final QueryProperty JOB_DEFINITION_ID = new QueryPropertyImpl("ID_");
+  public static final QueryProperty ACTIVITY_ID = new QueryPropertyImpl("ACT_ID_");
+  public static final QueryProperty PROCESS_DEFINITION_ID = new QueryPropertyImpl("PROC_DEF_ID_");
+  public static final QueryProperty PROCESS_DEFINITION_KEY = new QueryPropertyImpl("PROC_DEF_KEY_");
+  public static final QueryProperty JOB_TYPE = new QueryPropertyImpl("JOB_TYPE_");
+  public static final QueryProperty JOB_CONFIGURATION = new QueryPropertyImpl("JOB_CONFIGURATION_");
 
 }

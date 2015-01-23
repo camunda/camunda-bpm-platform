@@ -13,54 +13,33 @@
 
 package org.camunda.bpm.engine.impl;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.camunda.bpm.engine.query.QueryProperty;
 
 
 /**
  * @author Tom Baeyens
  */
-public class HistoricTaskInstanceQueryProperty implements QueryProperty {
+public interface HistoricTaskInstanceQueryProperty {
 
-  private static final long serialVersionUID = 1L;
+  public static final QueryProperty HISTORIC_TASK_INSTANCE_ID = new QueryPropertyImpl("ID_");
+  public static final QueryProperty PROCESS_DEFINITION_ID = new QueryPropertyImpl("PROC_DEF_ID_");
+  public static final QueryProperty PROCESS_INSTANCE_ID = new QueryPropertyImpl("PROC_INST_ID_");
+  public static final QueryProperty EXECUTION_ID = new QueryPropertyImpl("EXECUTION_ID_");
+  public static final QueryProperty ACTIVITY_INSTANCE_ID = new QueryPropertyImpl("ACT_INST_ID_");
+  public static final QueryProperty TASK_NAME = new QueryPropertyImpl("NAME_");
+  public static final QueryProperty TASK_DESCRIPTION = new QueryPropertyImpl("DESCRIPTION_");
+  public static final QueryProperty TASK_ASSIGNEE = new QueryPropertyImpl("ASSIGNEE_");
+  public static final QueryProperty TASK_OWNER = new QueryPropertyImpl("OWNER_");
+  public static final QueryProperty TASK_DEFINITION_KEY = new QueryPropertyImpl("TASK_DEF_KEY_");
+  public static final QueryProperty DELETE_REASON = new QueryPropertyImpl("DELETE_REASON_");
+  public static final QueryProperty START = new QueryPropertyImpl("START_TIME_");
+  public static final QueryProperty END = new QueryPropertyImpl("END_TIME_");
+  public static final QueryProperty DURATION = new QueryPropertyImpl("DURATION_");
+  public static final QueryProperty TASK_PRIORITY = new QueryPropertyImpl("PRIORITY_");
+  public static final QueryProperty TASK_DUE_DATE = new QueryPropertyImpl("DUE_DATE_");
+  public static final QueryProperty TASK_FOLLOW_UP_DATE = new QueryPropertyImpl("FOLLOW_UP_DATE_");
+  public static final QueryProperty CASE_DEFINITION_ID = new QueryPropertyImpl("CASE_DEFINITION_ID_");
+  public static final QueryProperty CASE_INSTANCE_ID = new QueryPropertyImpl("CASE_INSTANCE_ID_");
+  public static final QueryProperty CASE_EXECUTION_ID = new QueryPropertyImpl("CASE_EXECUTION_ID_");
 
-  private static final Map<String, HistoricTaskInstanceQueryProperty> properties = new HashMap<String, HistoricTaskInstanceQueryProperty>();
-
-  public static final HistoricTaskInstanceQueryProperty HISTORIC_TASK_INSTANCE_ID = new HistoricTaskInstanceQueryProperty("ID_");
-  public static final HistoricTaskInstanceQueryProperty PROCESS_DEFINITION_ID = new HistoricTaskInstanceQueryProperty("PROC_DEF_ID_");
-  public static final HistoricTaskInstanceQueryProperty PROCESS_INSTANCE_ID = new HistoricTaskInstanceQueryProperty("PROC_INST_ID_");
-  public static final HistoricTaskInstanceQueryProperty EXECUTION_ID = new HistoricTaskInstanceQueryProperty("EXECUTION_ID_");
-  public static final HistoricTaskInstanceQueryProperty ACTIVITY_INSTANCE_ID = new HistoricTaskInstanceQueryProperty("ACT_INST_ID_");
-  public static final HistoricTaskInstanceQueryProperty TASK_NAME = new HistoricTaskInstanceQueryProperty("NAME_");
-  public static final HistoricTaskInstanceQueryProperty TASK_DESCRIPTION = new HistoricTaskInstanceQueryProperty("DESCRIPTION_");
-  public static final HistoricTaskInstanceQueryProperty TASK_ASSIGNEE = new HistoricTaskInstanceQueryProperty("ASSIGNEE_");
-  public static final HistoricTaskInstanceQueryProperty TASK_OWNER = new HistoricTaskInstanceQueryProperty("OWNER_");
-  public static final HistoricTaskInstanceQueryProperty TASK_DEFINITION_KEY = new HistoricTaskInstanceQueryProperty("TASK_DEF_KEY_");
-  public static final HistoricTaskInstanceQueryProperty DELETE_REASON = new HistoricTaskInstanceQueryProperty("DELETE_REASON_");
-  public static final HistoricTaskInstanceQueryProperty START = new HistoricTaskInstanceQueryProperty("RES.START_TIME_");
-  public static final HistoricTaskInstanceQueryProperty END = new HistoricTaskInstanceQueryProperty("RES.END_TIME_");
-  public static final HistoricTaskInstanceQueryProperty DURATION = new HistoricTaskInstanceQueryProperty("DURATION_");
-  public static final HistoricTaskInstanceQueryProperty TASK_PRIORITY = new HistoricTaskInstanceQueryProperty("PRIORITY_");
-  public static final HistoricTaskInstanceQueryProperty TASK_DUE_DATE = new HistoricTaskInstanceQueryProperty("DUE_DATE_");
-  public static final HistoricTaskInstanceQueryProperty TASK_FOLLOW_UP_DATE = new HistoricTaskInstanceQueryProperty("FOLLOW_UP_DATE_");
-  public static final HistoricTaskInstanceQueryProperty CASE_DEFINITION_ID = new HistoricTaskInstanceQueryProperty("CASE_DEFINITION_ID_");
-  public static final HistoricTaskInstanceQueryProperty CASE_INSTANCE_ID = new HistoricTaskInstanceQueryProperty("CASE_INSTANCE_ID_");
-  public static final HistoricTaskInstanceQueryProperty CASE_EXECUTION_ID = new HistoricTaskInstanceQueryProperty("CASE_EXECUTION_ID_");
-
-  private String name;
-
-  public HistoricTaskInstanceQueryProperty(String name) {
-    this.name = name;
-    properties.put(name, this);
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public static HistoricTaskInstanceQueryProperty findByName(String propertyName) {
-    return properties.get(propertyName);
-  }
 }

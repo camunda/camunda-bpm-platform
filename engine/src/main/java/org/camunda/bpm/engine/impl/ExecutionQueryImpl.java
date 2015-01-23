@@ -180,17 +180,17 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
   //ordering ////////////////////////////////////////////////////
 
   public ExecutionQueryImpl orderByProcessInstanceId() {
-    this.orderProperty = ExecutionQueryProperty.PROCESS_INSTANCE_ID;
+    orderBy(ExecutionQueryProperty.PROCESS_INSTANCE_ID);
     return this;
   }
 
   public ExecutionQueryImpl orderByProcessDefinitionId() {
-    this.orderProperty = ExecutionQueryProperty.PROCESS_DEFINITION_ID;
+    orderBy(new QueryOrderingProperty(QueryOrderingProperty.RELATION_PROCESS_DEFINITION, ExecutionQueryProperty.PROCESS_DEFINITION_ID));
     return this;
   }
 
   public ExecutionQueryImpl orderByProcessDefinitionKey() {
-    this.orderProperty = ExecutionQueryProperty.PROCESS_DEFINITION_KEY;
+    orderBy(new QueryOrderingProperty(QueryOrderingProperty.RELATION_PROCESS_DEFINITION, ExecutionQueryProperty.PROCESS_DEFINITION_KEY));
     return this;
   }
 

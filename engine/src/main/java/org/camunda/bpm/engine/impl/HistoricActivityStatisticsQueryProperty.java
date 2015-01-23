@@ -12,9 +12,6 @@
  */
 package org.camunda.bpm.engine.impl;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.camunda.bpm.engine.query.QueryProperty;
 
 /**
@@ -22,27 +19,8 @@ import org.camunda.bpm.engine.query.QueryProperty;
  * @author Roman Smirnov
  *
  */
-public class HistoricActivityStatisticsQueryProperty implements QueryProperty {
+public interface HistoricActivityStatisticsQueryProperty {
 
-  private static final long serialVersionUID = 1L;
-
-  private static final Map<String, HistoricActivityStatisticsQueryProperty> properties = new HashMap<String, HistoricActivityStatisticsQueryProperty>();
-
-  public static final HistoricProcessInstanceQueryProperty ACTIVITY_ID_ = new HistoricProcessInstanceQueryProperty("ID_");
-
-  private String name;
-
-  public HistoricActivityStatisticsQueryProperty(String name) {
-    this.name = name;
-    properties.put(name, this);
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public static HistoricActivityStatisticsQueryProperty findByName(String propertyName) {
-    return properties.get(propertyName);
-  }
+  public static final QueryProperty ACTIVITY_ID_ = new QueryPropertyImpl("ID_");
 
 }

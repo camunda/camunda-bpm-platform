@@ -26,9 +26,6 @@
 
 package org.camunda.bpm.engine.impl;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.camunda.bpm.engine.query.QueryProperty;
 import org.camunda.bpm.engine.task.TaskQuery;
 
@@ -39,39 +36,20 @@ import org.camunda.bpm.engine.task.TaskQuery;
  *
  * @author Joram Barrez
  */
-public class TaskQueryProperty implements QueryProperty {
+public interface TaskQueryProperty {
 
-  private static final long serialVersionUID = 1L;
-
-  private static final Map<String, TaskQueryProperty> properties = new HashMap<String, TaskQueryProperty>();
-
-  public static final TaskQueryProperty TASK_ID = new TaskQueryProperty("RES.ID_");
-  public static final TaskQueryProperty NAME = new TaskQueryProperty("RES.NAME_");
-  public static final TaskQueryProperty NAME_CASE_INSENSITIVE = new TaskQueryProperty("LOWER(RES.NAME_)");
-  public static final TaskQueryProperty DESCRIPTION = new TaskQueryProperty("RES.DESCRIPTION_");
-  public static final TaskQueryProperty PRIORITY = new TaskQueryProperty("RES.PRIORITY_");
-  public static final TaskQueryProperty ASSIGNEE = new TaskQueryProperty("RES.ASSIGNEE_");
-  public static final TaskQueryProperty CREATE_TIME = new TaskQueryProperty("RES.CREATE_TIME_");
-  public static final TaskQueryProperty PROCESS_INSTANCE_ID = new TaskQueryProperty("RES.PROC_INST_ID_");
-  public static final TaskQueryProperty CASE_INSTANCE_ID = new TaskQueryProperty("RES.CASE_INST_ID_");
-  public static final TaskQueryProperty EXECUTION_ID = new TaskQueryProperty("RES.EXECUTION_ID_");
-  public static final TaskQueryProperty CASE_EXECUTION_ID = new TaskQueryProperty("RES.CASE_EXECUTION_ID_");
-  public static final TaskQueryProperty DUE_DATE = new TaskQueryProperty("RES.DUE_DATE_");
-  public static final TaskQueryProperty FOLLOW_UP_DATE = new TaskQueryProperty("RES.FOLLOW_UP_DATE_");
-
-  private String name;
-
-  public TaskQueryProperty(String name) {
-    this.name = name;
-    properties.put(name, this);
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public static TaskQueryProperty findByName(String propertyName) {
-    return properties.get(propertyName);
-  }
+  public static final QueryProperty TASK_ID = new QueryPropertyImpl("ID_");
+  public static final QueryProperty NAME = new QueryPropertyImpl("NAME_");
+  public static final QueryProperty NAME_CASE_INSENSITIVE = new QueryPropertyImpl("NAME_", "LOWER");
+  public static final QueryProperty DESCRIPTION = new QueryPropertyImpl("DESCRIPTION_");
+  public static final QueryProperty PRIORITY = new QueryPropertyImpl("PRIORITY_");
+  public static final QueryProperty ASSIGNEE = new QueryPropertyImpl("ASSIGNEE_");
+  public static final QueryProperty CREATE_TIME = new QueryPropertyImpl("CREATE_TIME_");
+  public static final QueryProperty PROCESS_INSTANCE_ID = new QueryPropertyImpl("PROC_INST_ID_");
+  public static final QueryProperty CASE_INSTANCE_ID = new QueryPropertyImpl("CASE_INST_ID_");
+  public static final QueryProperty EXECUTION_ID = new QueryPropertyImpl("EXECUTION_ID_");
+  public static final QueryProperty CASE_EXECUTION_ID = new QueryPropertyImpl("CASE_EXECUTION_ID_");
+  public static final QueryProperty DUE_DATE = new QueryPropertyImpl("DUE_DATE_");
+  public static final QueryProperty FOLLOW_UP_DATE = new QueryPropertyImpl("FOLLOW_UP_DATE_");
 
 }

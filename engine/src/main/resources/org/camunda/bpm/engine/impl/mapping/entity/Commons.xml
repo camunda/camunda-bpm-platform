@@ -79,5 +79,58 @@
       <when test="queryVariableValue.operatorName.equals('LESS_THAN_OR_EQUAL')">&lt;=</when>
    </choose>
   </sql>
-
+  
+  <!-- Ordering -->
+  
+  <!-- Input: property "orderingProperties", a collection of OrderingProperty objects -->
+  <!-- Output: property "orderBy", filled with ordering constraints -->
+  <!-- Example Output: V0_TEXT_ asc, RES.ID_ desc, RES.NAME_ asc -->
+  <sql id="bindOrderBy">
+    <foreach collection="orderingProperties" item="orderingProperty" index="index">
+      <bind name="newOrderBy" value="
+        @org.camunda.bpm.engine.impl.db.sql.MybatisJoinHelper@orderBy(orderingProperty, index)" />
+      
+      <if test="index == 0">
+        <bind name="orderBy" value="newOrderBy"/>
+      </if>
+      <if test="index > 0">
+        <bind name="orderBy" value="orderBy + ', ' + newOrderBy"/>
+      </if>
+    </foreach>
+  </sql>
+  
+  <!-- Input: property "orderingProperties", a collection of OrderingProperty objects -->
+  <!-- Output: a comma-separated list of the ordering columns with aliases; the aliases avoid 
+  name clashes with other columns -->
+  <!-- Example Output: V0.TEXT_ as V0_TEXT_, V1.DOUBLE_ as V1_DOUBLE_ -->
+  <sql id="orderBySelection">
+    <foreach collection="orderingProperties" item="orderingProperty" index="index">
+      <if test="!orderingProperty.containedProperty">
+        <bind name="tableAlias" value="@org.camunda.bpm.engine.impl.db.sql.MybatisJoinHelper@tableAlias(orderingProperty.relation, index)"/>
+        ,
+        ${@org.camunda.bpm.engine.impl.db.sql.MybatisJoinHelper@orderBySelection(orderingProperty, index)}
+        as
+        ${tableAlias}_${orderingProperty.queryProperty.name}
+      </if>
+    </foreach>
+  </sql>
+  
+  <!-- Input: "orderingProperty": an OrderingProperty object; 
+              "tableAlias": the table alias for which the filtering conditions apply -->
+  <!-- Output: a conjunction of filtering conditions based on the conditions specified in the ordering properties -->
+  <!-- Example Output: V0.PROC_INST_ID_ = RES.PROC_INST_ID_ and V0.TEXT_ = 'some value' -->
+  <sql id="filterOrderByRelations">
+    <if test="orderingProperty.relationConditions != null">
+      <foreach collection="orderingProperty.relationConditions" item="relationCondition" separator="and">
+        ${tableAlias}.${relationCondition.property.name} 
+        = 
+        <if test="relationCondition.propertyComparison">
+          RES.${relationCondition.comparisonProperty.name} 
+        </if>
+        <if test="!relationCondition.propertyComparison">
+          #{relationCondition.scalarValue}
+        </if>
+      </foreach>
+    </if>
+  </sql>
 </mapper>

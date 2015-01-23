@@ -108,8 +108,11 @@
   </select>
 
   <select id="selectCaseExecutionsByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionQueryImpl" resultMap="caseExecutionResultMap">
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
-    select RES.* ${limitBetween}, P.KEY_
+    select RES.* 
+    ${limitBetween}
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.orderBySelection"/>
     <include refid="selectCaseExecutionsByQueryCriteriaSql"/>
     ${orderBy}
     ${limitAfter}
@@ -122,8 +125,11 @@
 
   <!--  same as selectCaseExecutionByQueryCriteria, but with different parameterType -->
   <select id="selectCaseInstanceByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseInstanceQueryImpl" resultMap="caseExecutionResultMap">
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
-    select RES.* ${limitBetween}, P.KEY_
+    select RES.* 
+    ${limitBetween}
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.orderBySelection"/>
     <include refid="selectCaseExecutionsByQueryCriteriaSql"/>
     ${orderBy}
     ${limitAfter}

@@ -149,16 +149,20 @@
   </select>
 
   <select id="selectHistoricDetailsByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.HistoricDetailQueryImpl" resultMap="historicDetailResultMap">
-  	${limitBefore}
-    select RES.* ${limitBetween}
+  	<include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
+    ${limitBefore}
+    select RES.* 
+    ${limitBetween}
     <include refid="selectHistoricDetailsByQueryCriteriaSql"/>
     ${orderBy}
     ${limitAfter}
   </select>
   
   <select id="selectHistoricDetailsByQueryCriteria_postgres" parameterType="org.camunda.bpm.engine.impl.HistoricDetailQueryImpl" resultMap="historicDetailResultMap_postgres">
-  	${limitBefore}
-    select RES.* ${limitBetween}
+  	<include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
+    ${limitBefore}
+    select RES.* 
+    ${limitBetween}
     <include refid="selectHistoricDetailsByQueryCriteriaSql"/>
     ${orderBy}
     ${limitAfter}

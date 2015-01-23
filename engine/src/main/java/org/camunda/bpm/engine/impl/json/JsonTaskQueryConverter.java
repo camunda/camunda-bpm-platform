@@ -13,19 +13,22 @@
 
 package org.camunda.bpm.engine.impl.json;
 
+import static org.camunda.bpm.engine.impl.util.JsonUtil.addArrayField;
+import static org.camunda.bpm.engine.impl.util.JsonUtil.addDateField;
+import static org.camunda.bpm.engine.impl.util.JsonUtil.addDefaultField;
+import static org.camunda.bpm.engine.impl.util.JsonUtil.addField;
+import static org.camunda.bpm.engine.impl.util.JsonUtil.addListField;
+
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.camunda.bpm.engine.exception.NotValidException;
-import org.camunda.bpm.engine.impl.Direction;
 import org.camunda.bpm.engine.impl.QueryOperator;
+import org.camunda.bpm.engine.impl.QueryOrderingProperty;
 import org.camunda.bpm.engine.impl.TaskQueryImpl;
 import org.camunda.bpm.engine.impl.TaskQueryVariableValue;
-import org.camunda.bpm.engine.impl.db.ListQueryParameterObject;
 import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
 import org.camunda.bpm.engine.impl.util.json.JSONArray;
 import org.camunda.bpm.engine.impl.util.json.JSONObject;
@@ -88,14 +91,19 @@ public class JsonTaskQueryConverter extends JsonObjectConverter<TaskQuery> {
   public static final String CASE_INSTANCE_BUSINESS_KEY = "caseInstanceBusinessKey";
   public static final String CASE_INSTANCE_BUSINESS_KEY_LIKE = "caseInstanceBusinessKeyLike";
   public static final String CASE_EXECUTION_ID = "caseExecutionId";
-  public static final String ORDER_BY = "orderBy";
   public static final String ACTIVE = "active";
   public static final String SUSPENDED = "suspended";
   public static final String PROCESS_VARIABLES = "processVariables";
   public static final String TASK_VARIABLES = "taskVariables";
   public static final String CASE_INSTANCE_VARIABLES = "caseInstanceVariables";
-  public static final String SORT_BY = "sortBy";
-  public static final String SORT_ORDER = "sortOrder";
+  public static final String ORDERING_PROPERTIES = "orderingProperties";
+
+  /**
+   * Exists for backwards compatibility with 7.2; deprecated since 7.3
+   */
+  @Deprecated
+  public static final String ORDER_BY = "orderBy";
+
   protected static JsonTaskQueryVariableValueConverter variableValueConverter = new JsonTaskQueryVariableValueConverter();
 
   public JSONObject toJsonObject(TaskQuery taskQuery) {
@@ -151,7 +159,11 @@ public class JsonTaskQueryConverter extends JsonObjectConverter<TaskQuery> {
     addField(json, CASE_INSTANCE_BUSINESS_KEY, query.getCaseInstanceBusinessKey());
     addField(json, CASE_INSTANCE_BUSINESS_KEY_LIKE, query.getCaseInstanceBusinessKeyLike());
     addField(json, CASE_EXECUTION_ID, query.getCaseExecutionId());
-    addDefaultField(json, ORDER_BY, ListQueryParameterObject.DEFAULT_ORDER_BY, query.getOrderBy());
+    if (query.getOrderingProperties() != null && !query.getOrderingProperties().isEmpty()) {
+      addField(json, ORDERING_PROPERTIES,
+          JsonQueryOrderingPropertyConverter.ARRAY_CONVERTER.toJsonArray(query.getOrderingProperties()));
+    }
+
 
     // expressions
     for (Map.Entry<String, String> expressionEntry : query.getExpressions().entrySet()) {
@@ -159,36 +171,6 @@ public class JsonTaskQueryConverter extends JsonObjectConverter<TaskQuery> {
     }
 
     return json;
-  }
-
-  protected void addField(JSONObject json, String name, Object value) {
-    if (value != null) {
-      json.put(name, value);
-    }
-  }
-
-  protected void addDefaultField(JSONObject json, String name, Object defaultValue, Object value) {
-    if (value != null && !value.equals(defaultValue)) {
-      json.put(name, value);
-    }
-  }
-
-  protected void addListField(JSONObject json, String name, List<String> list) {
-    if (list != null) {
-      json.put(name, new JSONArray(list));
-    }
-  }
-
-  protected void addArrayField(JSONObject json, String name, String[] array) {
-    if (array != null) {
-      addListField(json, name, Arrays.asList(array));
-    }
-  }
-
-  protected void addDateField(JSONObject json, String name, Date date) {
-    if (date != null) {
-      json.put(name, date.getTime());
-    }
   }
 
   private void addSuspensionState(JSONObject json, SuspensionState suspensionState) {
@@ -389,22 +371,14 @@ public class JsonTaskQueryConverter extends JsonObjectConverter<TaskQuery> {
       query.caseExecutionId(json.getString(CASE_EXECUTION_ID));
     }
     if (json.has(ORDER_BY)) {
-      query.setOrderBy(json.getString(ORDER_BY));
+      List<QueryOrderingProperty> orderingProperties = 
+          JsonLegacyQueryOrderingPropertyConverter.INSTANCE.fromOrderByString(json.getString(ORDER_BY));
+
+      query.setOrderingProperties(orderingProperties);
     }
-    if (json.has(SORT_BY)) {
-      setSortBy(query, json.getString(SORT_BY));
-    }
-    if (json.has(SORT_ORDER)) {
-      String sortOrder = json.getString(SORT_ORDER);
-      if (Direction.ASCENDING.getName().equals(sortOrder)) {
-        query.asc();
-      }
-      else if (Direction.DESCENDING.getName().equals(sortOrder)) {
-        query.desc();
-      }
-      else {
-        throw new NotValidException("Unknown sort ordering '" + sortOrder + "' in query");
-      }
+    if (json.has(ORDERING_PROPERTIES)) {
+      JSONArray jsonArray = json.getJSONArray(ORDERING_PROPERTIES);
+      query.setOrderingProperties(JsonQueryOrderingPropertyConverter.ARRAY_CONVERTER.toObject(jsonArray));
     }
 
     // expressions
@@ -442,46 +416,5 @@ public class JsonTaskQueryConverter extends JsonObjectConverter<TaskQuery> {
     }
   }
 
-  protected void setSortBy(TaskQuery query, String sortBy) {
-    if (ID.equals(sortBy)) {
-      query.orderByTaskId();
-    }
-    else if (NAME.equals(sortBy)) {
-      query.orderByTaskName();
-    }
-    else if (DESCRIPTION.equals(sortBy)) {
-      query.orderByTaskDescription();
-    }
-    else if (PRIORITY.equals(sortBy)) {
-      query.orderByTaskPriority();
-    }
-    else if (INSTANCE_ID.equals(sortBy)) {
-      query.orderByProcessInstanceId();
-    }
-    else if (CASE_INSTANCE_ID.equals(sortBy)) {
-      query.orderByCaseInstanceId();
-    }
-    else if (EXECUTION_ID.equals(sortBy)) {
-      query.orderByExecutionId();
-    }
-    else if (CASE_EXECUTION_ID.equals(sortBy)) {
-      query.orderByCaseExecutionId();
-    }
-    else if (ASSIGNEE.equals(sortBy)) {
-      query.orderByTaskAssignee();
-    }
-    else if (CREATED.equals(sortBy)) {
-      query.orderByTaskCreateTime();
-    }
-    else if (DUE_DATE.equals(sortBy)) {
-      query.orderByDueDate();
-    }
-    else if (FOLLOW_UP_DATE.equals(sortBy)) {
-      query.orderByFollowUpDate();
-    }
-    else {
-      throw new NotValidException("Unknown sort by '" + sortBy + "' in query");
-    }
-  }
 
 }

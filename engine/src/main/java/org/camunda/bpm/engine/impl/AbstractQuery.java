@@ -13,6 +13,7 @@
 package org.camunda.bpm.engine.impl;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNull;
 
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
@@ -53,7 +54,8 @@ public abstract class AbstractQuery<T extends Query<?,?>, U> extends ListQueryPa
   protected transient CommandContext commandContext;
 
   protected ResultType resultType;
-  protected QueryProperty orderProperty;
+
+  protected List<QueryOrderingProperty> orderingProperties = new ArrayList<QueryOrderingProperty>();
 
   protected Map<String, String> expressions = new HashMap<String, String>();
 
@@ -73,9 +75,13 @@ public abstract class AbstractQuery<T extends Query<?,?>, U> extends ListQueryPa
     return this;
   }
 
-  @SuppressWarnings("unchecked")
   public T orderBy(QueryProperty property) {
-    this.orderProperty = property;
+    return orderBy(new QueryOrderingProperty(null, property));
+  }
+
+  @SuppressWarnings("unchecked")
+  public T orderBy(QueryOrderingProperty orderProperty) {
+    this.orderingProperties.add(orderProperty);
     return (T) this;
   }
 
@@ -89,15 +95,29 @@ public abstract class AbstractQuery<T extends Query<?,?>, U> extends ListQueryPa
 
   @SuppressWarnings("unchecked")
   public T direction(Direction direction) {
-    ensureNotNull(NotValidException.class, "You should call any of the orderBy methods first before specifying a direction", "orderProperty", orderProperty);
-    addOrder(orderProperty.getName(), direction.getName());
-    orderProperty = null;
+    QueryOrderingProperty currentOrderingProperty = null;
+
+    if (!orderingProperties.isEmpty()) {
+      currentOrderingProperty = orderingProperties.get(orderingProperties.size() - 1);
+    }
+
+    ensureNotNull(NotValidException.class, "You should call any of the orderBy methods first before specifying a direction", "currentOrderingProperty", currentOrderingProperty);
+
+    if (currentOrderingProperty.getDirection() != null) {
+      ensureNull(NotValidException.class, "Invalid query: can specify only one direction desc() or asc() for an ordering constraint", "direction", direction);
+    }
+
+    currentOrderingProperty.setDirection(direction);
     return (T) this;
   }
 
   protected void checkQueryOk() {
-    if (orderProperty != null) {
-      throw new NotValidException("Invalid query: call asc() or desc() after using orderByXX()");
+//    if (orderProperty != null) {
+//      throw new NotValidException("Invalid query: call asc() or desc() after using orderByXX()");
+//    }
+
+    for (QueryOrderingProperty orderingProperty : orderingProperties) {
+      ensureNotNull(NotValidException.class, "Invalid query: call asc() or desc() after using orderByXX()", "direction", orderingProperty.getDirection());
     }
   }
 
@@ -187,6 +207,7 @@ public abstract class AbstractQuery<T extends Query<?,?>, U> extends ListQueryPa
     orderBy = orderBy+column+" "+sortOrder;
   }
 
+  @Deprecated
   public String getOrderBy() {
     if(orderBy == null) {
       return super.getOrderBy();
@@ -195,8 +216,12 @@ public abstract class AbstractQuery<T extends Query<?,?>, U> extends ListQueryPa
     }
   }
 
-  public QueryProperty getOrderProperty() {
-    return orderProperty;
+  public List<QueryOrderingProperty> getOrderingProperties() {
+    return orderingProperties;
+  }
+
+  public void setOrderingProperties(List<QueryOrderingProperty> orderingProperties) {
+    this.orderingProperties = orderingProperties;
   }
 
   public Map<String, String> getExpressions() {
@@ -262,13 +287,13 @@ public abstract class AbstractQuery<T extends Query<?,?>, U> extends ListQueryPa
   }
 
   protected void mergeOrdering(AbstractQuery<?, ?> extendedQuery, AbstractQuery<?, ?> extendingQuery) {
-    extendedQuery.orderBy = this.orderBy;
-    if (extendingQuery.orderBy != null) {
-       if (extendedQuery.orderBy == null) {
-         extendedQuery.orderBy = extendingQuery.orderBy;
+    extendedQuery.orderingProperties = this.orderingProperties;
+    if (extendingQuery.orderingProperties != null) {
+       if (extendedQuery.orderingProperties == null) {
+         extendedQuery.orderingProperties = extendingQuery.orderingProperties;
        }
        else {
-         extendedQuery.orderBy += ", " + extendingQuery.orderBy;
+         extendedQuery.orderingProperties.addAll(extendingQuery.orderingProperties);
        }
     }
   }

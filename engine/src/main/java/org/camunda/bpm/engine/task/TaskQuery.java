@@ -19,6 +19,7 @@ import java.util.List;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.query.Query;
+import org.camunda.bpm.engine.variable.type.ValueType;
 
 /**
  * Allows programmatic querying of {@link Task}s;
@@ -460,7 +461,7 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
    * Only select tasks which have a follow-up date before the described date by the given expression.
    */
   TaskQuery followUpBeforeExpression(String followUpDateExpression);
-  
+
   /**
    * Only select tasks which have no follow-up date or a follow-up date before the given date.
    * Serves the typical use case "give me all tasks without follow-up or follow-up date which is already due"
@@ -472,7 +473,7 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
    * Serves the typical use case "give me all tasks without follow-up or follow-up date which is already due"
    */
   TaskQuery followUpBeforeOrNotExistentExpression(String followUpDateExpression);
-  
+
   /**
    * Only select tasks which have a follow-up date after the given date.
    */
@@ -541,5 +542,40 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
 
   /** Order by follow-up date (needs to be followed by {@link #asc()} or {@link #desc()}). */
   TaskQuery orderByFollowUpDate();
+
+  /**
+   * Order by a process instance variable value of a certain type. Calling this method multiple times
+   * specifies secondary, tertiary orderings, etc. The ordering of variables with <code>null</code>
+   * values is database-specific.
+   */
+  TaskQuery orderByProcessVariable(String variableName, ValueType valueType);
+
+  /**
+   * Order by an execution variable value of a certain type. Calling this method multiple times
+   * specifies secondary, tertiary orderings, etc. The ordering of variables with <code>null</code>
+   * values is database-specific.
+   */
+  TaskQuery orderByExecutionVariable(String variableName, ValueType valueType);
+
+  /**
+   * Order by a task variable value of a certain type. Calling this method multiple times
+   * specifies secondary, tertiary orderings, etc. The ordering of variables with <code>null</code>
+   * values is database-specific.
+   */
+  TaskQuery orderByTaskVariable(String variableName, ValueType valueType);
+
+  /**
+   * Order by a task variable value of a certain type. Calling this method multiple times
+   * specifies secondary, tertiary orderings, etc. The ordering of variables with <code>null</code>
+   * values is database-specific.
+   */
+  TaskQuery orderByCaseExecutionVariable(String variableName, ValueType valueType);
+
+  /**
+   * Order by a task variable value of a certain type. Calling this method multiple times
+   * specifies secondary, tertiary orderings, etc. The ordering of variables with <code>null</code>
+   * values is database-specific.
+   */
+  TaskQuery orderByCaseInstanceVariable(String variableName, ValueType valueType);
 
 }

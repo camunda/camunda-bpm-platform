@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -29,7 +29,7 @@ import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 public class AuthorizationQueryImpl extends AbstractQuery<AuthorizationQuery, Authorization> implements AuthorizationQuery {
 
   private static final long serialVersionUID = 1L;
-  
+
   protected String id;
   protected String[] userIds;
   protected String[] groupIds;
@@ -39,20 +39,20 @@ public class AuthorizationQueryImpl extends AbstractQuery<AuthorizationQuery, Au
   protected Integer authorizationType;
   protected boolean queryByPermission = false;
   protected boolean queryByResourceType = false;
-  
+
   public AuthorizationQueryImpl(CommandExecutor commandExecutor) {
     super(commandExecutor);
   }
-  
+
   public AuthorizationQueryImpl(CommandContext commandContext) {
     super(commandContext);
   }
 
   public AuthorizationQuery authorizationId(String id) {
-    this.id = id;    
+    this.id = id;
     return this;
   }
-  
+
   public AuthorizationQuery userIdIn(String... userIdIn) {
     if(groupIds != null) {
       throw new ProcessEngineException("Cannot query for user and group authorizations at the same time.");
@@ -72,7 +72,7 @@ public class AuthorizationQueryImpl extends AbstractQuery<AuthorizationQuery, Au
   public AuthorizationQuery resourceType(Resource resource) {
     return resourceType(resource.resourceType());
   }
-  
+
   public AuthorizationQuery resourceType(int resourceType) {
     this.resourceType = resourceType;
     queryByResourceType = true;
@@ -89,12 +89,12 @@ public class AuthorizationQueryImpl extends AbstractQuery<AuthorizationQuery, Au
     this.permission |= p.getValue();
     return this;
   }
-  
+
   public AuthorizationQuery authorizationType(Integer type) {
     this.authorizationType = type;
     return this;
   }
-  
+
 
   public long executeCount(CommandContext commandContext) {
     checkQueryOk();
@@ -107,13 +107,13 @@ public class AuthorizationQueryImpl extends AbstractQuery<AuthorizationQuery, Au
     return commandContext.getAuthorizationManager()
         .selectAuthorizationByQueryCriteria(this);
   }
-  
+
   // getters ////////////////////////////
 
   public String getId() {
     return id;
   }
-  
+
   public boolean isQueryByPermission() {
     return queryByPermission;
   }
@@ -137,19 +137,19 @@ public class AuthorizationQueryImpl extends AbstractQuery<AuthorizationQuery, Au
   public int getPermission() {
     return permission;
   }
-  
+
   public boolean isQueryByResourceType() {
     return queryByResourceType;
   }
 
   public AuthorizationQuery orderByResourceType() {
-    this.orderProperty = AuthorizationQueryProperty.RESOURCE_TYPE;
+    orderBy(AuthorizationQueryProperty.RESOURCE_TYPE);
     return this;
   }
 
   public AuthorizationQuery orderByResourceId() {
-    this.orderProperty = AuthorizationQueryProperty.RESOURCE_ID;
+    orderBy(AuthorizationQueryProperty.RESOURCE_ID);
     return this;
   }
-  
+
 }

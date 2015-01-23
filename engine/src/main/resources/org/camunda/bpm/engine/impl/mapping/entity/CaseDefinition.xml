@@ -81,8 +81,10 @@
   </select>
 
   <select id="selectCaseDefinitionsByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionQueryImpl" resultMap="caseDefinitionResultMap">
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
-    select RES.* ${limitBetween}
+    select RES.* 
+    ${limitBetween}
     <include refid="selectCaseDefinitionsByQueryCriteriaSql"/>
     ${orderBy}
     ${limitAfter}
@@ -95,8 +97,10 @@
 
   <!-- mysql specific sql -->
   <select id="selectCaseDefinitionsByQueryCriteria_mysql" parameterType="org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionQueryImpl" resultMap="caseDefinitionResultMap">
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
-    select distinct RES.* ${limitBetween}
+    select distinct RES.* 
+    ${limitBetween}
     <include refid="selectCaseDefinitionsByQueryCriteriaSql"/>
     ${orderBy}
     ${limitAfter}

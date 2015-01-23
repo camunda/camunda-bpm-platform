@@ -66,8 +66,10 @@
   </select>
   
   <select id="selectGroupByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.GroupQueryImpl" resultMap="groupResultMap">
-  	${limitBefore}
-    select RES.* ${limitBetween}
+  	<include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
+    ${limitBefore}
+    select RES.* 
+    ${limitBetween}
     <include refid="selectGroupByQueryCriteriaSql" />
     ${orderBy}
     ${limitAfter}

@@ -38,6 +38,8 @@ import org.camunda.bpm.engine.history.HistoricCaseActivityInstance;
 import org.camunda.bpm.engine.history.HistoricCaseActivityInstanceQuery;
 import org.camunda.bpm.engine.history.HistoricCaseInstance;
 import org.camunda.bpm.engine.impl.AbstractQuery;
+import org.camunda.bpm.engine.impl.Direction;
+import org.camunda.bpm.engine.impl.QueryOrderingProperty;
 import org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState;
 import org.camunda.bpm.engine.impl.history.event.HistoricCaseActivityInstanceEventEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricCaseActivityInstanceEntity;
@@ -826,8 +828,8 @@ public class HistoricCaseActivityInstanceTest extends CmmnProcessEngineTestCase 
   protected void assertQuerySorting(String property, Query<?, ?> query, Comparable... items) {
     AbstractQuery<?, ?> queryImpl = (AbstractQuery<?, ?>) query;
 
-    // save order property to later reverse ordering
-    QueryProperty orderProperty = queryImpl.getOrderProperty();
+    // save order properties to later reverse ordering
+    List<QueryOrderingProperty> orderProperties = queryImpl.getOrderingProperties();
 
     List<? extends Comparable> sortedList = Arrays.asList(items);
     Collections.sort(sortedList);
@@ -842,13 +844,14 @@ public class HistoricCaseActivityInstanceTest extends CmmnProcessEngineTestCase 
     assertThat(instances, contains(matchers.toArray(new Matcher[matchers.size()])));
 
     // reverse ordering
-    queryImpl.setOrderBy(null);
-    queryImpl.orderBy(orderProperty);
+    for (QueryOrderingProperty orderingProperty : orderProperties) {
+      orderingProperty.setDirection(Direction.DESCENDING);
+    }
 
     // reverse matchers
     Collections.reverse(matchers);
 
-    instances = query.desc().list();
+    instances = query.list();
     assertEquals(sortedList.size(), instances.size());
     assertThat(instances, contains(matchers.toArray(new Matcher[matchers.size()])));
   }

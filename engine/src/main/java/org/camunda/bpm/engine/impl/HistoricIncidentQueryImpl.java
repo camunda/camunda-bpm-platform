@@ -140,57 +140,57 @@ public class HistoricIncidentQueryImpl extends AbstractVariableQueryImpl<Histori
   // ordering ////////////////////////////////////////////////////
 
   public HistoricIncidentQuery orderByIncidentId() {
-    this.orderProperty = HistoricIncidentQueryProperty.INCIDENT_ID;
+    orderBy(HistoricIncidentQueryProperty.INCIDENT_ID);
     return this;
   }
 
   public HistoricIncidentQuery orderByCreateTime() {
-    this.orderProperty = HistoricIncidentQueryProperty.INCIDENT_CREATE_TIME;
+    orderBy(HistoricIncidentQueryProperty.INCIDENT_CREATE_TIME);
     return this;
   }
 
   public HistoricIncidentQuery orderByEndTime() {
-    this.orderProperty = HistoricIncidentQueryProperty.INCIDENT_END_TIME;
+    orderBy(HistoricIncidentQueryProperty.INCIDENT_END_TIME);
     return this;
   }
 
   public HistoricIncidentQuery orderByIncidentType() {
-    this.orderProperty = HistoricIncidentQueryProperty.INCIDENT_TYPE;
+    orderBy(HistoricIncidentQueryProperty.INCIDENT_TYPE);
     return this;
   }
 
   public HistoricIncidentQuery orderByExecutionId() {
-    this.orderProperty = HistoricIncidentQueryProperty.EXECUTION_ID;
+    orderBy(HistoricIncidentQueryProperty.EXECUTION_ID);
     return this;
   }
 
   public HistoricIncidentQuery orderByActivityId() {
-    this.orderProperty = HistoricIncidentQueryProperty.ACTIVITY_ID;
+    orderBy(HistoricIncidentQueryProperty.ACTIVITY_ID);
     return this;
   }
 
   public HistoricIncidentQuery orderByProcessInstanceId() {
-    this.orderProperty = HistoricIncidentQueryProperty.PROCESS_INSTANCE_ID;
+    orderBy(HistoricIncidentQueryProperty.PROCESS_INSTANCE_ID);
     return this;
   }
 
   public HistoricIncidentQuery orderByProcessDefinitionId() {
-    this.orderProperty = HistoricIncidentQueryProperty.PROCESS_DEFINITION_ID;
+    orderBy(HistoricIncidentQueryProperty.PROCESS_DEFINITION_ID);
     return this;
   }
 
   public HistoricIncidentQuery orderByCauseIncidentId() {
-    this.orderProperty = HistoricIncidentQueryProperty.CAUSE_INCIDENT_ID;
+    orderBy(HistoricIncidentQueryProperty.CAUSE_INCIDENT_ID);
     return this;
   }
 
   public HistoricIncidentQuery orderByRootCauseIncidentId() {
-    this.orderProperty = HistoricIncidentQueryProperty.ROOT_CAUSE_INCIDENT_ID;
+    orderBy(HistoricIncidentQueryProperty.ROOT_CAUSE_INCIDENT_ID);
     return this;
   }
 
   public HistoricIncidentQuery orderByConfiguration() {
-    this.orderProperty = HistoricIncidentQueryProperty.CONFIGURATION;
+    orderBy(HistoricIncidentQueryProperty.CONFIGURATION);
     return this;
   }
 
