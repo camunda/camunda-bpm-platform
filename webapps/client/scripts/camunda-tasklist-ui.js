@@ -198,7 +198,17 @@ define('camunda-tasklist-ui', [
     else {
       // for consistency, also create a empty module
       angular.module('cam.tasklist.custom', []);
-      bootstrapApp();
+
+      // make sure that we are at the end of the require-js callback queue.
+      // Why? => the plugins will also execute require(..) which will place new
+      // entries into the queue.  if we bootstrap the angular app
+      // synchronously, the plugins' require callbacks will not have been
+      // executed yet and the angular modules provided by those plugins will
+      // not have been defined yet. Placing a new require call here will put
+      // the bootstrapping of the angular app at the end of the queue
+      require([], function() {
+        bootstrapApp();
+      });
     }
   }
 
