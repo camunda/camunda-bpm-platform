@@ -15,7 +15,6 @@ package org.camunda.bpm.engine.impl.bpmn.behavior;
 
 import static org.camunda.bpm.engine.impl.util.CallableElementUtil.getProcessDefinitionToCall;
 
-import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessInstance;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
@@ -32,8 +31,7 @@ import org.camunda.bpm.engine.variable.VariableMap;
 public class CallActivityBehavior extends CallableElementActivityBehavior {
 
   protected void startInstance(ActivityExecution execution, VariableMap variables, String businessKey) {
-    AbstractVariableScope variableScope = (AbstractVariableScope) execution;
-    ProcessDefinitionImpl definition = getProcessDefinitionToCall(variableScope, getCallableElement());
+    ProcessDefinitionImpl definition = getProcessDefinitionToCall(execution, getCallableElement());
     PvmProcessInstance processInstance = execution.createSubProcessInstance(definition, businessKey);
     processInstance.start(variables);
   }

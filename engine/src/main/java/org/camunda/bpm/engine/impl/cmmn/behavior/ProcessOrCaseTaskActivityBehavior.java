@@ -19,7 +19,6 @@ import org.camunda.bpm.engine.impl.cmmn.execution.CmmnActivityExecution;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
 import org.camunda.bpm.engine.impl.core.model.CallableElement;
 import org.camunda.bpm.engine.impl.core.model.CallableElement.CallableElementBinding;
-import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
 import org.camunda.bpm.engine.variable.VariableMap;
 
 /**
@@ -54,17 +53,15 @@ public abstract class ProcessOrCaseTaskActivityBehavior extends TaskActivityBeha
   }
 
   protected String getBusinessKey(CmmnActivityExecution execution) {
-    AbstractVariableScope variableScope = (AbstractVariableScope) execution;
-    return getCallableElement().getBusinessKey(variableScope);
+    return getCallableElement().getBusinessKey(execution);
   }
 
   protected VariableMap getInputVariables(CmmnActivityExecution execution) {
-    AbstractVariableScope variableScope = (AbstractVariableScope) execution;
-    return getCallableElement().getInputVariables(variableScope);
+    return getCallableElement().getInputVariables(execution);
   }
 
   protected VariableMap getOutputVariables(VariableScope variableScope) {
-    return getCallableElement().getOutputVariables((AbstractVariableScope) variableScope);
+    return getCallableElement().getOutputVariables(variableScope);
   }
 
   protected String getDefinitionKey(CmmnActivityExecution execution) {

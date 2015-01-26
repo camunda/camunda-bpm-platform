@@ -15,7 +15,6 @@ package org.camunda.bpm.engine.impl.bpmn.behavior;
 import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.core.model.CallableElement;
 import org.camunda.bpm.engine.impl.core.model.CallableElement.CallableElementBinding;
-import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.engine.impl.pvm.delegate.SubProcessActivityBehavior;
 import org.camunda.bpm.engine.variable.VariableMap;
@@ -54,21 +53,19 @@ public abstract class CallableElementActivityBehavior extends AbstractBpmnActivi
   }
 
   protected String getBusinessKey(ActivityExecution execution) {
-    AbstractVariableScope variableScope = (AbstractVariableScope) execution;
-    return getCallableElement().getBusinessKey(variableScope);
+    return getCallableElement().getBusinessKey(execution);
   }
 
   protected VariableMap getInputVariables(ActivityExecution execution) {
-    AbstractVariableScope variableScope = (AbstractVariableScope) execution;
-    return getCallableElement().getInputVariables(variableScope);
+    return getCallableElement().getInputVariables(execution);
   }
 
   protected VariableMap getOutputVariables(VariableScope variableScope) {
-    return getCallableElement().getOutputVariables((AbstractVariableScope) variableScope);
+    return getCallableElement().getOutputVariables(variableScope);
   }
 
   protected Integer getVersion(ActivityExecution execution) {
-    return getCallableElement().getVersion((AbstractVariableScope) execution);
+    return getCallableElement().getVersion(execution);
   }
 
   protected String getDeploymentId(ActivityExecution execution) {

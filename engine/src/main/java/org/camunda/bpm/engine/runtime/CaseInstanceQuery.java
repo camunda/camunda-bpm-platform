@@ -71,8 +71,8 @@ public interface CaseInstanceQuery extends Query<CaseInstanceQuery, CaseInstance
   CaseInstanceQuery superProcessInstanceId(String superProcessInstanceId);
 
   /**
-   * Select the case instance that have as sub process instance the given
-   * process instance. Note that there will always be maximum only <b>one</b>
+   * Select the case instance that has as sub process instance the given
+   * process instance. Note that there will always be at most <b>one</b>
    * such case instance that can be the result of this query.
    *
    * @since 7.3
@@ -88,8 +88,8 @@ public interface CaseInstanceQuery extends Query<CaseInstanceQuery, CaseInstance
   CaseInstanceQuery superCaseInstanceId(String superCaseInstanceId);
 
   /**
-   * Select the case instance that have as sub case instance the given
-   * case instance. Note that there will always be maximum only <b>one</b>
+   * Select the case instance that has as sub case instance the given
+   * case instance. Note that there will always be at most <b>one</b>
    * such process instance that can be the result of this query.
    *
    * @since 7.3

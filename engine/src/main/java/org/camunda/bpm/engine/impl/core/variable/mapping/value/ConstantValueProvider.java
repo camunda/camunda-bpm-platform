@@ -12,7 +12,7 @@
  */
 package org.camunda.bpm.engine.impl.core.variable.mapping.value;
 
-import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
+import org.camunda.bpm.engine.delegate.VariableScope;
 
 /**
  * A constant parameter value.
@@ -28,7 +28,7 @@ public class ConstantValueProvider implements ParameterValueProvider {
     this.value = value;
   }
 
-  public Object getValue(AbstractVariableScope scope) {
+  public Object getValue(VariableScope scope) {
     return value;
   }
 

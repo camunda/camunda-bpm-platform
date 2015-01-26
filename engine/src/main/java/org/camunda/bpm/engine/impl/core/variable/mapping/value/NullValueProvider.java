@@ -12,7 +12,7 @@
  */
 package org.camunda.bpm.engine.impl.core.variable.mapping.value;
 
-import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
+import org.camunda.bpm.engine.delegate.VariableScope;
 
 /**
  * @author Daniel Meyer
@@ -20,7 +20,7 @@ import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
  */
 public class NullValueProvider implements ParameterValueProvider {
 
-  public Object getValue(AbstractVariableScope variableScope) {
+  public Object getValue(VariableScope variableScope) {
     return null;
   }
 

@@ -12,7 +12,7 @@
  */
 package org.camunda.bpm.engine.impl.core.variable.mapping.value;
 
-import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
+import org.camunda.bpm.engine.delegate.VariableScope;
 
 /**
  *
@@ -25,6 +25,6 @@ public interface ParameterValueProvider {
    * @param variableScope the scope in which the value is to be resolved.
    * @return the value
    */
-  Object getValue(AbstractVariableScope variableScope);
+  Object getValue(VariableScope variableScope);
 
 }

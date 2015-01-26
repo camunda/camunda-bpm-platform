@@ -12,10 +12,10 @@
  */
 package org.camunda.bpm.engine.impl.scripting;
 
+import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.core.variable.mapping.IoParameter;
 import org.camunda.bpm.engine.impl.core.variable.mapping.value.ParameterValueProvider;
-import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
 
 /**
  * Makes it possible to use scripts in {@link IoParameter} mappings.
@@ -31,7 +31,7 @@ public class ScriptValueProvider implements ParameterValueProvider {
     this.script = script;
   }
 
-  public Object getValue(AbstractVariableScope variableScope) {
+  public Object getValue(VariableScope variableScope) {
     return Context.getProcessEngineConfiguration()
       .getScriptingEnvironment()
       .execute(script, variableScope);

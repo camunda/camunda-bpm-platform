@@ -13,10 +13,10 @@
 package org.camunda.bpm.engine.impl.core.variable.mapping.value;
 
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 
-import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
+import org.camunda.bpm.engine.delegate.VariableScope;
 
 /**
  * @author Daniel Meyer
@@ -30,7 +30,7 @@ public class MapValueProvider implements ParameterValueProvider {
     this.providerMap = providerMap;
   }
 
-  public Object getValue(AbstractVariableScope variableScope) {
+  public Object getValue(VariableScope variableScope) {
     Map<String, Object> valueMap = new TreeMap<String, Object>();
     for (Entry<String, ParameterValueProvider> entry : providerMap.entrySet()) {
       valueMap.put(entry.getKey(), entry.getValue().getValue(variableScope));

@@ -17,9 +17,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.core.variable.VariableMapImpl;
 import org.camunda.bpm.engine.impl.core.variable.mapping.value.ParameterValueProvider;
-import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
 import org.camunda.bpm.engine.variable.VariableMap;
 
 /**
@@ -59,7 +59,7 @@ public class CallableElement {
 
   // definitionKey ////////////////////////////////////////////////////////////////
 
-  public String getDefinitionKey(AbstractVariableScope variableScope) {
+  public String getDefinitionKey(VariableScope variableScope) {
     Object result = definitionKeyValueProvider.getValue(variableScope);
 
     if (result != null && !(result instanceof String)) {
@@ -104,7 +104,7 @@ public class CallableElement {
 
   // version //////////////////////////////////////////////////////////////////////
 
-  public Integer getVersion(AbstractVariableScope variableScope) {
+  public Integer getVersion(VariableScope variableScope) {
     Object result = versionValueProvider.getValue(variableScope);
 
     if (result != null) {
@@ -130,7 +130,7 @@ public class CallableElement {
 
   // businessKey /////////////////////////////////////////////////////////////////
 
-  public String getBusinessKey(AbstractVariableScope variableScope) {
+  public String getBusinessKey(VariableScope variableScope) {
     if (businessKeyValueProvider == null) {
       return null;
     }
@@ -166,7 +166,7 @@ public class CallableElement {
     this.inputs.addAll(inputs);
   }
 
-  public VariableMap getInputVariables(AbstractVariableScope variableScope) {
+  public VariableMap getInputVariables(VariableScope variableScope) {
     List<CallableElementParameter> inputs = getInputs();
     return getVariables(inputs, variableScope);
   }
@@ -185,14 +185,14 @@ public class CallableElement {
     this.outputs.addAll(outputs);
   }
 
-  public VariableMap getOutputVariables(AbstractVariableScope variableScope) {
+  public VariableMap getOutputVariables(VariableScope variableScope) {
     List<CallableElementParameter> outputs = getOutputs();
     return getVariables(outputs, variableScope);
   }
 
   // variables //////////////////////////////////////////////////////////////////
 
-  protected VariableMap getVariables(List<CallableElementParameter> params, AbstractVariableScope variableScope) {
+  protected VariableMap getVariables(List<CallableElementParameter> params, VariableScope variableScope) {
     VariableMap result = new VariableMapImpl();
 
     for (CallableElementParameter param : params) {

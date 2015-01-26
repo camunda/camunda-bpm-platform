@@ -1002,7 +1002,7 @@ public class CaseCallActivityTest extends CmmnProcessEngineTestCase {
     caseService
       .withCaseExecution(subCaseInstanceId)
       .setVariable("aVariable", "abc")
-      .setVariable("anotherVariable", 999)
+      .setVariable("anotherVariable", 1000)
       .execute();
 
     String humanTaskId = queryCaseExecutionByActivityId(HUMAN_TASK_ID).getId();
@@ -1027,7 +1027,7 @@ public class CaseCallActivityTest extends CmmnProcessEngineTestCase {
         assertEquals("abc", variable.getValue());
       } else if ("anotherVariable".equals(name)) {
         assertEquals("anotherVariable", name);
-        assertEquals(999, variable.getValue());
+        assertEquals(1000, variable.getValue());
       } else {
         fail("Found an unexpected variable: '"+name+"'");
       }

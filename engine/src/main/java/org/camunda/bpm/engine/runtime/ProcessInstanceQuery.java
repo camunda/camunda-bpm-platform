@@ -78,8 +78,8 @@ public interface ProcessInstanceQuery extends Query<ProcessInstanceQuery, Proces
   ProcessInstanceQuery superCaseInstanceId(String superCaseInstanceId);
 
   /**
-   * Select the process instance that have as sub case instance the given
-   * case instance. Note that there will always be maximum only <b>one</b>
+   * Select the process instance that has as sub case instance the given
+   * case instance. Note that there will always be at most <b>one</b>
    * such process instance that can be the result of this query.
    *
    * @since 7.3

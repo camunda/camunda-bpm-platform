@@ -17,7 +17,6 @@ import static org.camunda.bpm.engine.impl.util.CallableElementUtil.getProcessDef
 import java.util.Map;
 
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnActivityExecution;
-import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessInstance;
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 
@@ -28,8 +27,7 @@ import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 public class ProcessTaskActivityBehavior extends ProcessOrCaseTaskActivityBehavior {
 
   protected void triggerCallableElement(CmmnActivityExecution execution, Map<String, Object> variables, String businessKey) {
-    AbstractVariableScope variableScope = (AbstractVariableScope) execution;
-    ProcessDefinitionImpl definition = getProcessDefinitionToCall(variableScope, getCallableElement());
+    ProcessDefinitionImpl definition = getProcessDefinitionToCall(execution, getCallableElement());
     PvmProcessInstance processInstance = execution.createSubProcessInstance(definition, businessKey);
     processInstance.start(variables);
   }

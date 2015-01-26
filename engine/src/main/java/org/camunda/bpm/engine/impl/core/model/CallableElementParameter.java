@@ -12,9 +12,9 @@
  */
 package org.camunda.bpm.engine.impl.core.model;
 
+import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.core.variable.mapping.value.ConstantValueProvider;
 import org.camunda.bpm.engine.impl.core.variable.mapping.value.ParameterValueProvider;
-import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
 
 /**
  * @author Roman Smirnov
@@ -28,7 +28,7 @@ public class CallableElementParameter {
 
   // source ////////////////////////////////////////////////////////
 
-  public Object getSource(AbstractVariableScope variableScope) {
+  public Object getSource(VariableScope variableScope) {
     if (sourceValueProvider instanceof ConstantValueProvider) {
       String variableName = (String) sourceValueProvider.getValue(variableScope);
       return variableScope.getVariable(variableName);

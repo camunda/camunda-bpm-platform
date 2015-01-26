@@ -13,9 +13,9 @@
 package org.camunda.bpm.engine.impl.el;
 
 import org.camunda.bpm.engine.delegate.Expression;
+import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.core.variable.mapping.IoParameter;
 import org.camunda.bpm.engine.impl.core.variable.mapping.value.ParameterValueProvider;
-import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
 
 /**
  * Makes it possible to use expression in {@link IoParameter} mappings.
@@ -31,7 +31,7 @@ public class ElValueProvider implements ParameterValueProvider {
     this.expression = expression;
   }
 
-  public Object getValue(AbstractVariableScope variableScope) {
+  public Object getValue(VariableScope variableScope) {
     return expression.getValue(variableScope);
   }
 

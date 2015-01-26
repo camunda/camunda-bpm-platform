@@ -1487,7 +1487,7 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTestCase {
   public void testQueryByInvalidSubProcessInstanceId() {
     CaseInstanceQuery query = caseService
         .createCaseInstanceQuery()
-        .subCaseInstanceId("invalid");
+        .subProcessInstanceId("invalid");
 
     verifyQueryResults(query, 0);
 

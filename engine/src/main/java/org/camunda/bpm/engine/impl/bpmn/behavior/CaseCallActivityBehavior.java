@@ -16,7 +16,6 @@ import static org.camunda.bpm.engine.impl.util.CallableElementUtil.getCaseDefini
 
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnCaseInstance;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
-import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.variable.VariableMap;
@@ -30,8 +29,7 @@ import org.camunda.bpm.engine.variable.VariableMap;
 public class CaseCallActivityBehavior extends CallableElementActivityBehavior {
 
   protected void startInstance(ActivityExecution execution, VariableMap variables, String businessKey) {
-    AbstractVariableScope variableScope = (AbstractVariableScope) execution;
-    CmmnCaseDefinition definition = getCaseDefinitionToCall(variableScope, getCallableElement());
+    CmmnCaseDefinition definition = getCaseDefinitionToCall(execution, getCallableElement());
     CmmnCaseInstance caseInstance = execution.createSubCaseInstance(definition, businessKey);
     caseInstance.create(variables);
   }

@@ -19,7 +19,6 @@ import java.util.Map;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnActivityExecution;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnCaseInstance;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
-import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
 
 /**
  * @author Roman Smirnov
@@ -28,8 +27,7 @@ import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
 public class CaseTaskActivityBehavior extends ProcessOrCaseTaskActivityBehavior {
 
   protected void triggerCallableElement(CmmnActivityExecution execution, Map<String, Object> variables, String businessKey) {
-    AbstractVariableScope variableScope = (AbstractVariableScope) execution;
-    CmmnCaseDefinition definition = getCaseDefinitionToCall(variableScope, getCallableElement());
+    CmmnCaseDefinition definition = getCaseDefinitionToCall(execution, getCallableElement());
     CmmnCaseInstance caseInstance = execution.createSubCaseInstance(definition, businessKey);
     caseInstance.create(variables);
   }

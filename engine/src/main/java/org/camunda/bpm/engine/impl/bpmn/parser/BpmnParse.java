@@ -2810,10 +2810,10 @@ public class BpmnParse extends Parse {
     parseVersion(callActivityElement, activity, callableElement, isProcess);
 
     // parse input parameter
-    parseInputParameter(callActivityElement, activity, callableElement, isProcess);;
+    parseInputParameter(callActivityElement, activity, callableElement, isProcess);
 
     // parse output parameter
-    parseOutputParameter(callActivityElement, activity, callableElement, isProcess);;
+    parseOutputParameter(callActivityElement, activity, callableElement, isProcess);
 
     activity.setScope(true);
     activity.setActivityBehavior(behavior);

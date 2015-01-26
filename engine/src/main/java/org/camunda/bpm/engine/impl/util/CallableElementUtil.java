@@ -12,10 +12,10 @@
  */
 package org.camunda.bpm.engine.impl.util;
 
+import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.core.model.CallableElement;
-import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
 import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 
@@ -31,7 +31,7 @@ public class CallableElementUtil {
         .getDeploymentCache();
   }
 
-  public static ProcessDefinitionImpl getProcessDefinitionToCall(AbstractVariableScope execution, CallableElement callableElement) {
+  public static ProcessDefinitionImpl getProcessDefinitionToCall(VariableScope execution, CallableElement callableElement) {
     String processDefinitionKey = callableElement.getDefinitionKey(execution);
 
     DeploymentCache deploymentCache = getDeploymentCache();
@@ -53,7 +53,7 @@ public class CallableElementUtil {
     return processDefinition;
   }
 
-  public static CmmnCaseDefinition getCaseDefinitionToCall(AbstractVariableScope execution, CallableElement callableElement) {
+  public static CmmnCaseDefinition getCaseDefinitionToCall(VariableScope execution, CallableElement callableElement) {
     String caseDefinitionKey = callableElement.getDefinitionKey(execution);
 
     DeploymentCache deploymentCache = getDeploymentCache();

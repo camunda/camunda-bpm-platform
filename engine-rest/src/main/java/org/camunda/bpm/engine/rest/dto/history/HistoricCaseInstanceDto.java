@@ -26,7 +26,7 @@ public class HistoricCaseInstanceDto {
   protected Long durationInMillis;
   protected String createUserId;
   protected String superCaseInstanceId;
-  private String superProcessInstanceId;
+  protected String superProcessInstanceId;
   protected Boolean active;
   protected Boolean completed;
   protected Boolean terminated;
