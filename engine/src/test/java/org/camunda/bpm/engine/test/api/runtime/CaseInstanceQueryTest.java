@@ -1418,4 +1418,162 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(4, caseService.createCaseInstanceQuery().variableValueLessThanOrEqual("var", Variables.numberValue((short) 123)).count());
   }
 
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/runtime/superProcessWithCaseCallActivity.bpmn20.xml"})
+  public void testQueryBySuperProcessInstanceId() {
+    String superProcessInstanceId = runtimeService.startProcessInstanceByKey("subProcessQueryTest").getId();
+
+    CaseInstanceQuery query = caseService
+        .createCaseInstanceQuery()
+        .superProcessInstanceId(superProcessInstanceId);
+
+    verifyQueryResults(query, 1);
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/runtime/superProcessWithCaseCallActivityInsideSubProcess.bpmn20.xml"})
+  public void testQueryBySuperProcessInstanceIdNested() {
+    String superProcessInstanceId = runtimeService.startProcessInstanceByKey("subProcessQueryTest").getId();
+
+    CaseInstanceQuery query = caseService
+        .createCaseInstanceQuery()
+        .superProcessInstanceId(superProcessInstanceId);
+
+    verifyQueryResults(query, 1);
+  }
+
+  public void testQueryByInvalidSuperProcessInstanceId() {
+    CaseInstanceQuery query = caseService
+        .createCaseInstanceQuery()
+        .superProcessInstanceId("invalid");
+
+    verifyQueryResults(query, 0);
+
+    try {
+      query.superProcessInstanceId(null);
+      fail();
+    } catch (NotValidException e) {}
+
+  }
+
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/cmmn/oneProcessTaskCase.cmmn",
+      "org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
+  public void testQueryBySubProcessInstanceId() {
+    String superCaseInstanceId = caseService.createCaseInstanceByKey("oneProcessTaskCase").getId();
+
+    String processTaskId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_ProcessTask_1")
+        .singleResult()
+        .getId();
+
+    caseService.manuallyStartCaseExecution(processTaskId);
+
+    String subProcessInstanceId = runtimeService
+        .createProcessInstanceQuery()
+        .superCaseInstanceId(superCaseInstanceId)
+        .singleResult()
+        .getId();
+
+    CaseInstanceQuery query = caseService
+        .createCaseInstanceQuery()
+        .subProcessInstanceId(subProcessInstanceId);
+
+    verifyQueryResults(query, 1);
+
+    CaseInstance caseInstance = query.singleResult();
+    assertEquals(superCaseInstanceId, caseInstance.getId());
+  }
+
+  public void testQueryByInvalidSubProcessInstanceId() {
+    CaseInstanceQuery query = caseService
+        .createCaseInstanceQuery()
+        .subCaseInstanceId("invalid");
+
+    verifyQueryResults(query, 0);
+
+    try {
+      query.subProcessInstanceId(null);
+      fail();
+    } catch (NotValidException e) {
+      // expected
+    }
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/cmmn/oneCaseTaskCase.cmmn"})
+  public void testQueryBySuperCaseInstanceId() {
+    String superCaseInstanceId = caseService.createCaseInstanceByKey("oneCaseTaskCase").getId();
+
+    String caseTaskId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_CaseTask_1")
+        .singleResult()
+        .getId();
+
+    caseService.manuallyStartCaseExecution(caseTaskId);
+
+    CaseInstanceQuery query = caseService
+        .createCaseInstanceQuery()
+        .superCaseInstanceId(superCaseInstanceId);
+
+    verifyQueryResults(query, 1);
+  }
+
+  public void testQueryByInvalidSuperCaseInstanceId() {
+    CaseInstanceQuery query = caseService
+        .createCaseInstanceQuery()
+        .superCaseInstanceId("invalid");
+
+    verifyQueryResults(query, 0);
+
+    try {
+      query.superCaseInstanceId(null);
+      fail();
+    } catch (NotValidException e) {
+      // expected
+    }
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/cmmn/oneCaseTaskCase.cmmn"})
+  public void testQueryBySubCaseInstanceId() {
+    String superCaseInstanceId = caseService.createCaseInstanceByKey("oneCaseTaskCase").getId();
+
+    String caseTaskId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_CaseTask_1")
+        .singleResult()
+        .getId();
+
+    caseService.manuallyStartCaseExecution(caseTaskId);
+
+    String subCaseInstanceId = caseService
+        .createCaseInstanceQuery()
+        .superCaseInstanceId(superCaseInstanceId)
+        .singleResult()
+        .getId();
+
+    CaseInstanceQuery query = caseService
+        .createCaseInstanceQuery()
+        .subCaseInstanceId(subCaseInstanceId);
+
+    verifyQueryResults(query, 1);
+
+    CaseInstance caseInstance = query.singleResult();
+    assertEquals(superCaseInstanceId, caseInstance.getId());
+  }
+
+  public void testQueryByInvalidSubCaseInstanceId() {
+    CaseInstanceQuery query = caseService
+        .createCaseInstanceQuery()
+        .subCaseInstanceId("invalid");
+
+    verifyQueryResults(query, 0);
+
+    try {
+      query.subCaseInstanceId(null);
+      fail();
+    } catch (NotValidException e) {
+      // expected
+    }
+  }
+
 }

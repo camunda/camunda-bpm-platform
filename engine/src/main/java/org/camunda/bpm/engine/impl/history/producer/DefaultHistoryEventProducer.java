@@ -21,6 +21,7 @@ import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.history.IncidentState;
 import org.camunda.bpm.engine.history.UserOperationLogContext;
 import org.camunda.bpm.engine.impl.cfg.IdGenerator;
+import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.history.event.HistoricActivityInstanceEventEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoricFormPropertyEventEntity;
@@ -320,6 +321,24 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     return evt;
   }
 
+  public HistoryEvent createProcessInstanceUpdateEvt(DelegateExecution execution) {
+    final ExecutionEntity executionEntity = (ExecutionEntity) execution;
+
+    // create event instance
+    HistoricProcessInstanceEventEntity evt = loadProcessInstanceEventEntity(executionEntity);
+
+    // initialize event
+    initProcessInstanceEvent(evt, executionEntity, HistoryEventTypes.PROCESS_INSTANCE_UPDATE);
+
+    // set super case instance id
+    CaseExecutionEntity superCaseExecution = executionEntity.getSuperCaseExecution();
+    if (superCaseExecution != null) {
+      evt.setSuperCaseInstanceId(superCaseExecution.getCaseInstanceId());
+    }
+
+    return evt;
+  }
+
   public HistoryEvent createProcessInstanceEndEvt(DelegateExecution execution) {
     final ExecutionEntity executionEntity = (ExecutionEntity) execution;
 
@@ -378,6 +397,12 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     ExecutionEntity subProcessInstance = executionEntity.getSubProcessInstance();
     if (subProcessInstance != null) {
       evt.setCalledProcessInstanceId(subProcessInstance.getId());
+    }
+
+    // update sub case reference
+    CaseExecutionEntity subCaseInstance = executionEntity.getSubCaseInstance();
+    if (subCaseInstance != null) {
+      evt.setCalledCaseInstanceId(subCaseInstance.getId());
     }
 
     return evt;

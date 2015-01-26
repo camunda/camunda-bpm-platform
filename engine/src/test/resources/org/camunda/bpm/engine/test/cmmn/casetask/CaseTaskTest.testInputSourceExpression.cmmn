@@ -10,8 +10,8 @@
       <planItem id="PI_CaseTask_1" definitionRef="CaseTask_1" />
       <caseTask id="CaseTask_1" name="A Case Task" caseRef="oneTaskCase">
         <extensionElements>
-          <camunda:in source="${aVariable}" target="aVariable" />
-          <camunda:in source="${anotherVariable + 1}" target="anotherVariable" />
+          <camunda:in sourceExpression="${aVariable}" target="aVariable" />
+          <camunda:in sourceExpression="${anotherVariable + 1}" target="anotherVariable" />
         </extensionElements>
       </caseTask>
     </casePlanModel>

@@ -187,11 +187,23 @@ public interface HistoricProcessInstanceQuery extends Query<HistoricProcessInsta
 
   /** Only select historic process instances having a sub process instance
    * with the given process instance id.
-   * 
+   *
    * Note that there will always be maximum only <b>one</b>
    * such process instance that can be the result of this query.
    */
   HistoricProcessInstanceQuery subProcessInstanceId(String subProcessInstanceId);
+
+  /** Only select historic process instances started by the given case
+   * instance. */
+  HistoricProcessInstanceQuery superCaseInstanceId(String superCaseInstanceId);
+
+  /** Only select historic process instances having a sub case instance
+   * with the given case instance id.
+   *
+   * Note that there will always be maximum only <b>one</b>
+   * such process instance that can be the result of this query.
+   */
+  HistoricProcessInstanceQuery subCaseInstanceId(String subCaseInstanceId);
 
   // below is deprecated and should be removed in 5.12
 

@@ -17,17 +17,24 @@ import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.COMP
 import static org.camunda.bpm.engine.impl.util.ActivityBehaviorUtil.getActivityBehavior;
 
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.cmmn.behavior.CmmnActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.behavior.CompositeActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.behavior.TransferVariablesActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
+import org.camunda.bpm.engine.impl.pvm.delegate.SubProcessActivityBehavior;
+import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 
 /**
  * @author Roman Smirnov
  *
  */
 public abstract class AbstractAtomicOperationCaseExecutionComplete extends AbstractCmmnEventAtomicOperation {
+
+  private static Logger log = Logger.getLogger(AbstractAtomicOperationCaseExecutionComplete.class.getName());
 
   protected String getEventName() {
     return COMPLETE;
@@ -52,15 +59,45 @@ public abstract class AbstractAtomicOperationCaseExecutionComplete extends Abstr
   protected void postTransitionNotification(CmmnExecution execution) {
     if (!execution.isCaseInstanceExecution()) {
       execution.remove();
+
     } else {
       CmmnExecution superCaseExecution = execution.getSuperCaseExecution();
-      TransferVariablesActivityBehavior behavior = null;
+      PvmExecutionImpl superExecution = execution.getSuperExecution();
 
       if (superCaseExecution != null) {
-        behavior = (TransferVariablesActivityBehavior) getActivityBehavior(superCaseExecution);
+        TransferVariablesActivityBehavior behavior = (TransferVariablesActivityBehavior) getActivityBehavior(superCaseExecution);
         behavior.transferVariables(execution, superCaseExecution);
         superCaseExecution.complete();
+
+      } else if (superExecution != null) {
+        SubProcessActivityBehavior behavior = (SubProcessActivityBehavior) getActivityBehavior(superExecution);
+
+        try {
+          behavior.completing(superExecution, execution);
+        } catch (RuntimeException e) {
+            log.log(Level.SEVERE, "Error while completing sub case of case execution " + execution, e);
+            throw e;
+        } catch (Exception e) {
+            log.log(Level.SEVERE, "Error while completing sub case of case execution " + execution, e);
+            throw new ProcessEngineException("Error while completing sub case of case execution " + execution, e);
+        }
+
+        // set sub case instance to null
+        superExecution.setSubCaseInstance(null);
+
+        try {
+          behavior.completed(superExecution);
+        } catch (RuntimeException e) {
+            log.log(Level.SEVERE, "Error while completing sub case of case execution " + execution, e);
+            throw e;
+        } catch (Exception e) {
+            log.log(Level.SEVERE, "Error while completing sub case of case execution " + execution, e);
+            throw new ProcessEngineException("Error while completing sub case of case execution " + execution, e);
+        }
       }
+
+      execution.setSuperCaseExecution(null);
+      execution.setSuperExecution(null);
     }
 
     CmmnExecution parent = execution.getParent();

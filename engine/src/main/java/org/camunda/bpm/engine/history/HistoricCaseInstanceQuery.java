@@ -93,6 +93,17 @@ public interface HistoricCaseInstanceQuery extends Query<HistoricCaseInstanceQue
    */
   HistoricCaseInstanceQuery subCaseInstanceId(String subCaseInstanceId);
 
+  /** Only select historic case instances started by the given process instance. */
+  HistoricCaseInstanceQuery superProcessInstanceId(String superProcessInstanceId);
+
+  /** Only select historic case instances having a sub process instance
+   * with the given process instance id.
+   *
+   * Note that there will always be maximum only <b>one</b>
+   * such case instance that can be the result of this query.
+   */
+  HistoricCaseInstanceQuery subProcessInstanceId(String subProcessInstanceId);
+
   /** Only select historic case instances which are active */
   HistoricCaseInstanceQuery active();
 

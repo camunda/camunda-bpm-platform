@@ -20,7 +20,7 @@ import org.camunda.bpm.engine.impl.pvm.runtime.ActivityInstanceState;
  *
  * @author Daniel Meyer
  * @author Marcel Wieczorek
- * @author roman.smirnov
+ * @author Roman Smirnov
  *
  */
 public class HistoricActivityInstanceEventEntity extends HistoricScopeInstanceEvent {
@@ -45,8 +45,11 @@ public class HistoricActivityInstanceEventEntity extends HistoricScopeInstanceEv
   /** the id of the parent activity instance */
   protected String parentActivityInstanceId;
 
-  /** the id of the child activity instance */
+  /** the id of the child process instance */
   protected String calledProcessInstanceId;
+
+  /** the id of the child case instance */
+  protected String calledCaseInstanceId;
 
   protected String taskId;
   protected String taskAssignee;
@@ -106,6 +109,14 @@ public class HistoricActivityInstanceEventEntity extends HistoricScopeInstanceEv
     this.calledProcessInstanceId = calledProcessInstanceId;
   }
 
+  public String getCalledCaseInstanceId() {
+    return calledCaseInstanceId;
+  }
+
+  public void setCalledCaseInstanceId(String calledCaseInstanceId) {
+    this.calledCaseInstanceId = calledCaseInstanceId;
+  }
+
   public String getTaskId() {
     return taskId;
   }
@@ -148,6 +159,7 @@ public class HistoricActivityInstanceEventEntity extends HistoricScopeInstanceEv
            + ", activityInstanceState=" + activityInstanceState
            + ", parentActivityInstanceId=" + parentActivityInstanceId
            + ", calledProcessInstanceId=" + calledProcessInstanceId
+           + ", calledCaseInstanceId=" + calledCaseInstanceId
            + ", taskId=" + taskId
            + ", taskAssignee=" + taskAssignee
            + ", durationInMillis=" + durationInMillis

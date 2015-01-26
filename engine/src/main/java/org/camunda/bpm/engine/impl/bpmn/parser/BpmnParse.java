@@ -12,10 +12,10 @@
  */
 package org.camunda.bpm.engine.impl.bpmn.parser;
 
-import static org.camunda.bpm.engine.impl.util.ClassDelegateUtil.instantiateDelegate;
 import static org.camunda.bpm.engine.impl.util.BpmnParseUtil.findCamundaExtensionElement;
 import static org.camunda.bpm.engine.impl.util.BpmnParseUtil.parseCamundaScript;
 import static org.camunda.bpm.engine.impl.util.BpmnParseUtil.parseInputOutput;
+import static org.camunda.bpm.engine.impl.util.ClassDelegateUtil.instantiateDelegate;
 
 import java.io.InputStream;
 import java.net.URL;
@@ -37,8 +37,10 @@ import org.camunda.bpm.engine.impl.Condition;
 import org.camunda.bpm.engine.impl.bpmn.behavior.AbstractBpmnActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.BoundaryEventActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.CallActivityBehavior;
+import org.camunda.bpm.engine.impl.bpmn.behavior.CallableElementActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.CancelBoundaryEventActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.CancelEndEventActivityBehavior;
+import org.camunda.bpm.engine.impl.bpmn.behavior.CaseCallActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.ClassDelegateActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.ErrorEndEventActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.EventBasedGatewayActivityBehavior;
@@ -73,7 +75,14 @@ import org.camunda.bpm.engine.impl.bpmn.listener.ClassDelegateExecutionListener;
 import org.camunda.bpm.engine.impl.bpmn.listener.DelegateExpressionExecutionListener;
 import org.camunda.bpm.engine.impl.bpmn.listener.ExpressionExecutionListener;
 import org.camunda.bpm.engine.impl.bpmn.listener.ScriptExecutionListener;
+import org.camunda.bpm.engine.impl.core.model.CallableElement;
+import org.camunda.bpm.engine.impl.core.model.CallableElement.CallableElementBinding;
+import org.camunda.bpm.engine.impl.core.model.CallableElementParameter;
 import org.camunda.bpm.engine.impl.core.variable.mapping.IoMapping;
+import org.camunda.bpm.engine.impl.core.variable.mapping.value.ConstantValueProvider;
+import org.camunda.bpm.engine.impl.core.variable.mapping.value.NullValueProvider;
+import org.camunda.bpm.engine.impl.core.variable.mapping.value.ParameterValueProvider;
+import org.camunda.bpm.engine.impl.el.ElValueProvider;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
 import org.camunda.bpm.engine.impl.el.FixedValue;
 import org.camunda.bpm.engine.impl.el.UelExpressionCondition;
@@ -116,6 +125,7 @@ import org.camunda.bpm.engine.impl.task.listener.ExpressionTaskListener;
 import org.camunda.bpm.engine.impl.task.listener.ScriptTaskListener;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
 import org.camunda.bpm.engine.impl.util.ScriptUtil;
+import org.camunda.bpm.engine.impl.util.StringUtil;
 import org.camunda.bpm.engine.impl.util.xml.Element;
 import org.camunda.bpm.engine.impl.util.xml.Parse;
 import org.camunda.bpm.engine.impl.variable.VariableDeclaration;
@@ -2755,87 +2765,58 @@ public class BpmnParse extends Parse {
   public ActivityImpl parseCallActivity(Element callActivityElement, ScopeImpl scope) {
     ActivityImpl activity = createActivityOnScope(callActivityElement, scope);
 
+    // parse async
     parseAsynchronousContinuation(callActivityElement, activity);
 
+    // parse definition key (and behavior)
     String calledElement = callActivityElement.attribute("calledElement");
-    String calledElementBinding = callActivityElement.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "calledElementBinding");
-    String calledElementVersion = callActivityElement.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "calledElementVersion");
-    if (calledElement == null) {
-      addError("Missing attribute 'calledElement'", callActivityElement);
-    }
-    if (calledElementBinding != null &&
-        calledElementBinding.equals(CallActivityBehavior.CalledElementBinding.VERSION.getValue()) &&
-        calledElementVersion == null) {
-        addError("Missing attribute 'calledElementVersion' when calledElementBinding has value '" + CallActivityBehavior.CalledElementBinding.VERSION.getValue() + "'", callActivityElement);
+    String caseRef = callActivityElement.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "caseRef");
+
+    if (calledElement == null && caseRef == null) {
+      addError("Missing attribute 'calledElement' or 'caseRef'", callActivityElement);
+
+    } else if (calledElement != null && caseRef != null) {
+      addError("The attributes 'calledElement' or 'caseRef' cannot be used together: Use either 'calledElement' or 'caseRef'", callActivityElement);
     }
 
-    Integer processDefinitionVersion = null;
-    if (calledElementVersion != null) {
-      processDefinitionVersion = Integer.parseInt(calledElementVersion);
-    }
+    boolean isProcess = false;
 
-    CallActivityBehavior callActivityBehaviour = null;
-    String expressionRegex = "(\\$|#)(\\{.+\\})";
-    if (calledElement != null && calledElement.matches(expressionRegex)) {
-      if (calledElementBinding == null) {
-        callActivityBehaviour = new CallActivityBehavior(expressionManager.createExpression(calledElement));
-      } else {
-        callActivityBehaviour = new CallActivityBehavior(expressionManager.createExpression(calledElement), calledElementBinding, processDefinitionVersion);
-      }
+    String deploymentId = deployment.getId();
+
+    CallableElement callableElement = new CallableElement();
+    callableElement.setDeploymentId(deploymentId);
+
+    CallableElementActivityBehavior behavior = null;
+
+    if (calledElement != null) {
+      behavior = new CallActivityBehavior();
+      ParameterValueProvider definitionKeyProvider = createParameterValueProvider(calledElement, expressionManager);
+      callableElement.setDefinitionKeyValueProvider(definitionKeyProvider);
+      isProcess = true;
+
     } else {
-      if (calledElementBinding == null) {
-        callActivityBehaviour = new CallActivityBehavior(calledElement);
-      } else {
-        callActivityBehaviour = new CallActivityBehavior(calledElement, calledElementBinding, processDefinitionVersion);
-      }
+      behavior = new CaseCallActivityBehavior();
+      ParameterValueProvider definitionKeyProvider = createParameterValueProvider(caseRef, expressionManager);
+      callableElement.setDefinitionKeyValueProvider(definitionKeyProvider);
+      isProcess = false;
     }
 
-    Element extensionsElement = callActivityElement.element("extensionElements");
-    if (extensionsElement != null) {
-      // input data elements
-      for (Element inElement : extensionsElement.elementsNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "in")) {
-        String source = inElement.attribute("source");
-        String sourceExpression = inElement.attribute("sourceExpression");
-        String target = inElement.attribute("target");
-        String variables = inElement.attribute("variables");
-        String businessKeyExpression = inElement.attribute("businessKey");
-        if ((source != null || sourceExpression != null) && target == null) {
-          addError("Missing attribute 'target' when attribute source or sourceExpression is set", inElement);
-        }
-        else if (sourceExpression != null) {
-          Expression expression = expressionManager.createExpression(sourceExpression.trim());
-          callActivityBehaviour.addDataInputAssociation(new DataAssociation(expression, target));
-        } else if (variables != null && ("all").equals(variables)) {
-          callActivityBehaviour.addDataInputAssociation(new DataAssociation(variables));
-        } else if (businessKeyExpression != null) {
-          Expression expression = expressionManager.createExpression(businessKeyExpression.trim());
-          callActivityBehaviour.addDataInputAssociation(new DataAssociation(expression));
-        } else {
-          callActivityBehaviour.addDataInputAssociation(new DataAssociation(source, target));
-        }
-      }
-      // output data elements
-      for (Element outElement : extensionsElement.elementsNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "out")) {
-        String source = outElement.attribute("source");
-        String sourceExpression = outElement.attribute("sourceExpression");
-        String target = outElement.attribute("target");
-        String variables = outElement.attribute("variables");
-        if ((source != null || sourceExpression != null) && target == null) {
-          addError("Missing attribute 'target' when attribute source or sourceExpression is set", outElement);
-        }
-        else if (sourceExpression != null) {
-          Expression expression = expressionManager.createExpression(sourceExpression.trim());
-          callActivityBehaviour.addDataOutputAssociation(new DataAssociation(expression, target));
-        } else if (variables != null && ("all").equals(variables)) {
-          callActivityBehaviour.addDataOutputAssociation(new DataAssociation(variables));
-        } else {
-          callActivityBehaviour.addDataOutputAssociation(new DataAssociation(source, target));
-        }
-      }
-    }
+    behavior.setCallableElement(callableElement);
+
+    // parse binding
+    parseBinding(callActivityElement, activity, callableElement, isProcess);
+
+    // parse version
+    parseVersion(callActivityElement, activity, callableElement, isProcess);
+
+    // parse input parameter
+    parseInputParameter(callActivityElement, activity, callableElement, isProcess);;
+
+    // parse output parameter
+    parseOutputParameter(callActivityElement, activity, callableElement, isProcess);;
 
     activity.setScope(true);
-    activity.setActivityBehavior(callActivityBehaviour);
+    activity.setActivityBehavior(behavior);
 
     parseExecutionListenersOnScope(callActivityElement, activity);
 
@@ -2843,6 +2824,132 @@ public class BpmnParse extends Parse {
       parseListener.parseCallActivity(callActivityElement, scope, activity);
     }
     return activity;
+  }
+
+  protected void parseBinding(Element callActivityElement, ActivityImpl activity, CallableElement callableElement, boolean isProcess) {
+    String binding = null;
+
+    if (isProcess) {
+      binding = callActivityElement.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "calledElementBinding");
+    } else {
+      binding = callActivityElement.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "caseBinding");
+    }
+
+    if (CallableElementBinding.DEPLOYMENT.getValue().equals(binding)) {
+      callableElement.setBinding(CallableElementBinding.DEPLOYMENT);
+    } else if (CallableElementBinding.LATEST.getValue().equals(binding)) {
+      callableElement.setBinding(CallableElementBinding.LATEST);
+    } else if (CallableElementBinding.VERSION.getValue().equals(binding)) {
+      callableElement.setBinding(CallableElementBinding.VERSION);
+    }
+  }
+
+  protected void parseVersion(Element callActivityElement, ActivityImpl activity, CallableElement callableElement, boolean isProcess) {
+    String version = null;
+
+    CallableElementBinding binding = callableElement.getBinding();
+    if (isProcess) {
+      version = callActivityElement.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "calledElementVersion");
+
+      if (binding != null &&
+          binding.equals(CallableElement.CallableElementBinding.VERSION) && version == null) {
+        addError("Missing attribute 'calledElementVersion' when 'calledElementBinding' has value '" + CallableElement.CallableElementBinding.VERSION.getValue() + "'", callActivityElement);
+      }
+
+    } else {
+      version = callActivityElement.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "caseVersion");
+
+      if (binding != null &&
+          binding.equals(CallableElement.CallableElementBinding.VERSION) && version == null) {
+          addError("Missing attribute 'caseVersion' when 'caseBinding' has value '" + CallableElement.CallableElementBinding.VERSION.getValue() + "'", callActivityElement);
+      }
+    }
+
+    ParameterValueProvider versionProvider = createParameterValueProvider(version, expressionManager);
+    callableElement.setVersionValueProvider(versionProvider);
+  }
+
+  protected void parseInputParameter(Element callActivityElement, ActivityImpl activity, CallableElement callableElement, boolean isProcess) {
+    Element extensionsElement = callActivityElement.element("extensionElements");
+
+    if (extensionsElement != null) {
+      // input data elements
+      for (Element inElement : extensionsElement.elementsNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "in")) {
+
+        String businessKey = inElement.attribute("businessKey");
+
+        if (businessKey != null && !businessKey.isEmpty()) {
+          ParameterValueProvider businessKeyValueProvider = createParameterValueProvider(businessKey, expressionManager);
+          callableElement.setBusinessKeyValueProvider(businessKeyValueProvider);
+
+        } else {
+
+          CallableElementParameter parameter = new CallableElementParameter();
+          callableElement.addInput(parameter);
+
+          String variables = inElement.attribute("variables");
+
+          if ("all".equals(variables)) {
+            parameter.setAllVariables(true);
+            continue;
+          }
+
+          String source = inElement.attribute("source");
+          if (source == null || source.isEmpty()) {
+            source = inElement.attribute("sourceExpression");
+          }
+
+          ParameterValueProvider sourceValueProvider = createParameterValueProvider(source, expressionManager);
+          parameter.setSourceValueProvider(sourceValueProvider);
+
+          String target = inElement.attribute("target");
+          if (target != null && !target.isEmpty()) {
+            parameter.setTarget(target);
+
+          } else {
+            addError("Missing attribute 'target' when attribute 'source' or 'sourceExpression' is set", inElement);
+          }
+
+        }
+      }
+    }
+  }
+
+  protected void parseOutputParameter(Element callActivityElement, ActivityImpl activity, CallableElement callableElement, boolean isProcess) {
+    Element extensionsElement = callActivityElement.element("extensionElements");
+
+    if (extensionsElement != null) {
+      // output data elements
+      for (Element outElement : extensionsElement.elementsNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "out")) {
+
+        CallableElementParameter parameter = new CallableElementParameter();
+        callableElement.addOutput(parameter);
+
+        String variables = outElement.attribute("variables");
+
+        if ("all".equals(variables)) {
+          parameter.setAllVariables(true);
+          continue;
+        }
+
+        String source = outElement.attribute("source");
+        if (source == null || source.isEmpty()) {
+          source = outElement.attribute("sourceExpression");
+        }
+
+        ParameterValueProvider sourceValueProvider = createParameterValueProvider(source, expressionManager);
+        parameter.setSourceValueProvider(sourceValueProvider);
+
+        String target = outElement.attribute("target");
+        if (target != null && !target.isEmpty()) {
+          parameter.setTarget(target);
+
+        } else {
+          addError("Missing attribute 'target' when attribute source or sourceExpression is set", outElement);
+        }
+
+      }
+    }
   }
 
   /**
@@ -3464,6 +3571,19 @@ public class BpmnParse extends Parse {
     Element inputOutput = findCamundaExtensionElement(element, "inputOutput");
     if (inputOutput != null) {
       addError("camunda:inputOutput mapping unsupported for element type '" + element.getTagName() + "'.", element);
+    }
+  }
+
+  protected ParameterValueProvider createParameterValueProvider(String value, ExpressionManager expressionManager) {
+    if (value == null) {
+      return new NullValueProvider();
+
+    } else if (StringUtil.isExpression(value)) {
+      Expression expression = expressionManager.createExpression(value);
+      return new ElValueProvider(expression);
+
+    } else {
+      return new ConstantValueProvider(value);
     }
   }
 

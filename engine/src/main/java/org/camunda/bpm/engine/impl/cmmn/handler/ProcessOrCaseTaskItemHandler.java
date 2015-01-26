@@ -15,17 +15,18 @@ package org.camunda.bpm.engine.impl.cmmn.handler;
 import java.util.List;
 
 import org.camunda.bpm.engine.delegate.Expression;
-import org.camunda.bpm.engine.impl.cmmn.behavior.CallableElement;
-import org.camunda.bpm.engine.impl.cmmn.behavior.CallableElement.CallableElementBinding;
-import org.camunda.bpm.engine.impl.cmmn.behavior.CallableElementParameter;
 import org.camunda.bpm.engine.impl.cmmn.behavior.ProcessOrCaseTaskActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
+import org.camunda.bpm.engine.impl.core.model.CallableElement;
+import org.camunda.bpm.engine.impl.core.model.CallableElement.CallableElementBinding;
+import org.camunda.bpm.engine.impl.core.model.CallableElementParameter;
 import org.camunda.bpm.engine.impl.core.variable.mapping.value.ConstantValueProvider;
 import org.camunda.bpm.engine.impl.core.variable.mapping.value.NullValueProvider;
 import org.camunda.bpm.engine.impl.core.variable.mapping.value.ParameterValueProvider;
 import org.camunda.bpm.engine.impl.el.ElValueProvider;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
 import org.camunda.bpm.engine.impl.util.StringUtil;
+import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.model.cmmn.instance.CmmnElement;
 import org.camunda.bpm.model.cmmn.instance.PlanItemDefinition;
 import org.camunda.bpm.model.cmmn.instance.camunda.CamundaIn;
@@ -44,7 +45,14 @@ public abstract class ProcessOrCaseTaskItemHandler extends TaskItemHandler {
   }
 
   protected void initializeCallableElement(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context) {
+    Deployment deployment = context.getDeployment();
+    String deploymentId = null;
+    if (deployment != null) {
+      deploymentId = deployment.getId();
+    }
+
     CallableElement callableElement = new CallableElement();
+    callableElement.setDeploymentId(deploymentId);
 
     // set callableElement on behavior
     ProcessOrCaseTaskActivityBehavior behavior = (ProcessOrCaseTaskActivityBehavior) activity.getActivityBehavior();

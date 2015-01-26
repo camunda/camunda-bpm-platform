@@ -33,6 +33,7 @@
         START_ACT_ID_,
         END_ACT_ID_,
         SUPER_PROCESS_INSTANCE_ID_,
+        SUPER_CASE_INSTANCE_ID_,
         CASE_INST_ID_,
         DELETE_REASON_
       ) values (
@@ -47,6 +48,7 @@
         #{startActivityId, jdbcType=VARCHAR},
         #{endActivityId, jdbcType=VARCHAR},
         #{superProcessInstanceId, jdbcType=VARCHAR},
+        #{superCaseInstanceId, jdbcType=VARCHAR},
         #{caseInstanceId, jdbcType=VARCHAR},
         #{deleteReason, jdbcType=VARCHAR}
       )
@@ -58,7 +60,8 @@
     update ${prefix}ACT_HI_PROCINST set
       PROC_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR},
       END_ACT_ID_ = #{endActivityId, jdbcType=VARCHAR},
-      DELETE_REASON_ = #{deleteReason, jdbcType=VARCHAR}
+      DELETE_REASON_ = #{deleteReason, jdbcType=VARCHAR},
+      SUPER_CASE_INSTANCE_ID_ = #{superCaseInstanceId, jdbcType=VARCHAR}
 
       <if test="endTime!=null">
         , END_TIME_ = #{endTime, jdbcType=TIMESTAMP}
@@ -95,6 +98,7 @@
     <result property="startActivityId" column="START_ACT_ID_" jdbcType="VARCHAR" />
     <result property="endActivityId" column="END_ACT_ID_" jdbcType="VARCHAR" />
     <result property="superProcessInstanceId" column="SUPER_PROCESS_INSTANCE_ID_" jdbcType="VARCHAR" />
+    <result property="superCaseInstanceId" column="SUPER_CASE_INSTANCE_ID_" jdbcType="VARCHAR" />
     <result property="caseInstanceId" column="CASE_INST_ID_" jdbcType="VARCHAR" />
     <result property="deleteReason" column="DELETE_REASON_" jdbcType="VARCHAR" />
   </resultMap>
@@ -212,7 +216,13 @@
       </if>
       <if test="subProcessInstanceId != null">
         and RES.PROC_INST_ID_ = (select SUPER_PROCESS_INSTANCE_ID_ from ${prefix}ACT_HI_PROCINST where PROC_INST_ID_ = #{subProcessInstanceId})
-      </if>      
+      </if>
+      <if test="superCaseInstanceId != null">
+        and RES.SUPER_CASE_INSTANCE_ID_ = #{superCaseInstanceId}
+      </if>
+      <if test="subCaseInstanceId != null">
+        and RES.PROC_INST_ID_ = (select SUPER_PROCESS_INSTANCE_ID_ from ${prefix}ACT_HI_CASEINST where CASE_INST_ID_ = #{subCaseInstanceId})
+      </if>
       <foreach collection="queryVariableValues" index="index" item="queryVariableValue">
         and EXISTS (
           select
@@ -222,7 +232,7 @@
           WHERE
             NAME_= #{queryVariableValue.name}
           AND PROC_INST_ID_ = RES.PROC_INST_ID_
-          
+
         <bind name="varTypeField" value="'VAR_TYPE_'"/>
         <bind name="varPrefix" value="''"/>
         <if test="queryVariableValue.valueConditions != null">

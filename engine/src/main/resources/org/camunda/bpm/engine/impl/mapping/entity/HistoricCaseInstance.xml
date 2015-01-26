@@ -31,7 +31,8 @@
         DURATION_,
         STATE_,
         CREATE_USER_ID_,
-        SUPER_CASE_INSTANCE_ID_
+        SUPER_CASE_INSTANCE_ID_,
+        SUPER_PROCESS_INSTANCE_ID_
       ) values (
         #{id ,jdbcType=VARCHAR},
         #{caseInstanceId, jdbcType=VARCHAR},
@@ -42,7 +43,8 @@
         #{durationInMillis ,jdbcType=BIGINT},
         #{state, jdbcType=INTEGER},
         #{createUserId, jdbcType=VARCHAR},
-        #{superCaseInstanceId, jdbcType=VARCHAR}
+        #{superCaseInstanceId, jdbcType=VARCHAR},
+        #{superProcessInstanceId, jdbcType=VARCHAR}
       )
   </insert>
 
@@ -87,6 +89,7 @@
     <result property="state" column="STATE_" jdbcType="INTEGER" />
     <result property="createUserId" column="CREATE_USER_ID_" jdbcType="VARCHAR" />
     <result property="superCaseInstanceId" column="SUPER_CASE_INSTANCE_ID_" jdbcType="VARCHAR" />
+    <result property="superProcessInstanceId" column="SUPER_PROCESS_INSTANCE_ID_" jdbcType="VARCHAR" />
   </resultMap>
 
   <!-- HISTORIC CASE INSTANCE SELECT -->
@@ -182,6 +185,12 @@
       <if test="subCaseInstanceId != null">
         and RES.CASE_INST_ID_ = (select SUPER_CASE_INSTANCE_ID_ from ${prefix}ACT_HI_CASEINST where CASE_INST_ID_ = #{subCaseInstanceId})
       </if>
+      <if test="superProcessInstanceId != null">
+        and RES.SUPER_PROCESS_INSTANCE_ID_ = #{superProcessInstanceId}
+      </if>
+      <if test="subProcessInstanceId != null">
+        and RES.CASE_INST_ID_ = (select SUPER_CASE_INSTANCE_ID_ from ${prefix}ACT_HI_PROCINST where PROC_INST_ID_ = #{subProcessInstanceId})
+      </if>
       <foreach collection="queryVariableValues" index="index" item="queryVariableValue">
         and EXISTS (
           select
@@ -191,7 +200,7 @@
           WHERE
             NAME_= #{queryVariableValue.name}
           AND CASE_INST_ID_ = RES.CASE_INST_ID_
-          
+
         <bind name="varTypeField" value="'VAR_TYPE_'"/>
         <bind name="varPrefix" value="''"/>
         <if test="queryVariableValue.valueConditions != null">

@@ -70,6 +70,23 @@ public interface ProcessInstanceQuery extends Query<ProcessInstanceQuery, Proces
   ProcessInstanceQuery caseInstanceId(String caseInstanceId);
 
   /**
+   * Select the process instances which are a sub process instance of the given
+   * super case instance.
+   *
+   * @since 7.3
+   */
+  ProcessInstanceQuery superCaseInstanceId(String superCaseInstanceId);
+
+  /**
+   * Select the process instance that have as sub case instance the given
+   * case instance. Note that there will always be maximum only <b>one</b>
+   * such process instance that can be the result of this query.
+   *
+   * @since 7.3
+   */
+  ProcessInstanceQuery subCaseInstanceId(String subCaseInstanceId);
+
+  /**
    * Only select process instances which have a global variable with the given value. The type
    * of variable is determined based on the value, using types configured in
    * {@link ProcessEngineConfiguration#getVariableSerializers()}.

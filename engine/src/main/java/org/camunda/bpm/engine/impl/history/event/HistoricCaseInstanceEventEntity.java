@@ -41,6 +41,9 @@ public class HistoricCaseInstanceEventEntity extends HistoricScopeInstanceEvent 
   /** the case instance which started this case instance */
   protected String superCaseInstanceId;
 
+  /** the process instance which started this case instance */
+  protected String superProcessInstanceId;
+
   public String getBusinessKey() {
     return businessKey;
   }
@@ -81,6 +84,14 @@ public class HistoricCaseInstanceEventEntity extends HistoricScopeInstanceEvent 
     this.superCaseInstanceId = superCaseInstanceId;
   }
 
+  public String getSuperProcessInstanceId() {
+    return superProcessInstanceId;
+  }
+
+  public void setSuperProcessInstanceId(String superProcessInstanceId) {
+    this.superProcessInstanceId = superProcessInstanceId;
+  }
+
   public int getState() {
     return state;
   }
@@ -119,6 +130,7 @@ public class HistoricCaseInstanceEventEntity extends HistoricScopeInstanceEvent 
       + "[businessKey=" + businessKey
       + ", startUserId=" + createUserId
       + ", superCaseInstanceId=" + superCaseInstanceId
+      + ", superProcessInstanceId=" + superProcessInstanceId
       + ", durationInMillis=" + durationInMillis
       + ", createTime=" + startTime
       + ", closeTime=" + endTime

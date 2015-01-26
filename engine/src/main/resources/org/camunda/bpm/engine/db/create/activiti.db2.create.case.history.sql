@@ -9,6 +9,7 @@ create table ACT_HI_CASEINST (
     STATE_ integer,
     CREATE_USER_ID_ varchar(255),
     SUPER_CASE_INSTANCE_ID_ varchar(64),
+    SUPER_PROCESS_INSTANCE_ID_ varchar(64),
     primary key (ID_)
 );
 

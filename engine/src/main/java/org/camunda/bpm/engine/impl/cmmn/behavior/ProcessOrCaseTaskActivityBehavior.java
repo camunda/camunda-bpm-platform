@@ -12,17 +12,15 @@
  */
 package org.camunda.bpm.engine.impl.cmmn.behavior;
 
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.camunda.bpm.engine.delegate.VariableScope;
-import org.camunda.bpm.engine.impl.cmmn.behavior.CallableElement.CallableElementBinding;
-import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnActivityExecution;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
-import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
+import org.camunda.bpm.engine.impl.core.model.CallableElement;
+import org.camunda.bpm.engine.impl.core.model.CallableElement.CallableElementBinding;
 import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
+import org.camunda.bpm.engine.variable.VariableMap;
 
 /**
  * @author Roman Smirnov
@@ -33,48 +31,18 @@ public abstract class ProcessOrCaseTaskActivityBehavior extends TaskActivityBeha
   protected CallableElement callableElement;
 
   protected void performStart(CmmnActivityExecution execution) {
-    CmmnExecution caseExecution = (CmmnExecution) execution;
+    VariableMap variables = getInputVariables(execution);
+    String businessKey = getBusinessKey(execution);
+    triggerCallableElement(execution, variables, businessKey);
 
-    List<CallableElementParameter> inputs = callableElement.getInputs();
-    Map<String, Object> variables = getVariables(inputs, caseExecution);
-
-    String businessKey = callableElement.getBusinessKey(caseExecution);
-
-    triggerCallableElement(caseExecution, variables, businessKey);
-
-    if (caseExecution.isActive() && !isBlocking(caseExecution)) {
-      caseExecution.complete();
+    if (execution.isActive() && !isBlocking(execution)) {
+      execution.complete();
     }
-
   }
 
   public void transferVariables(VariableScope from, VariableScope to) {
-    AbstractVariableScope fromVariableScope = (AbstractVariableScope) from;
-
-    List<CallableElementParameter> outputs = callableElement.getOutputs();
-    Map<String, Object> variables = getVariables(outputs, fromVariableScope);
-
+    VariableMap variables = getOutputVariables(from);
     to.setVariables(variables);
-  }
-
-  protected Map<String, Object> getVariables(List<CallableElementParameter> params, AbstractVariableScope variableScope) {
-    Map<String, Object> result = new HashMap<String, Object>();
-
-    for (CallableElementParameter param : params) {
-
-      if (param.isAllVariables()) {
-        Map<String, Object> allVariables = variableScope.getVariables();
-        result.putAll(allVariables);
-
-      } else {
-        String targetVariableName = param.getTarget();
-        Object value = param.getSource(variableScope);
-        result.put(targetVariableName, value);
-      }
-
-    }
-
-    return result;
   }
 
   public CallableElement getCallableElement() {
@@ -85,13 +53,23 @@ public abstract class ProcessOrCaseTaskActivityBehavior extends TaskActivityBeha
     this.callableElement = callableElement;
   }
 
+  protected String getBusinessKey(CmmnActivityExecution execution) {
+    AbstractVariableScope variableScope = (AbstractVariableScope) execution;
+    return getCallableElement().getBusinessKey(variableScope);
+  }
+
+  protected VariableMap getInputVariables(CmmnActivityExecution execution) {
+    AbstractVariableScope variableScope = (AbstractVariableScope) execution;
+    return getCallableElement().getInputVariables(variableScope);
+  }
+
+  protected VariableMap getOutputVariables(VariableScope variableScope) {
+    return getCallableElement().getOutputVariables((AbstractVariableScope) variableScope);
+  }
+
   protected String getDefinitionKey(CmmnActivityExecution execution) {
     CmmnExecution caseExecution = (CmmnExecution) execution;
     return getCallableElement().getDefinitionKey(caseExecution);
-  }
-
-  protected CallableElementBinding getBinding() {
-    return getCallableElement().getBinding();
   }
 
   protected Integer getVersion(CmmnActivityExecution execution) {
@@ -100,28 +78,23 @@ public abstract class ProcessOrCaseTaskActivityBehavior extends TaskActivityBeha
   }
 
   protected String getDeploymentId(CmmnActivityExecution execution) {
-    CmmnExecution caseExecution = (CmmnExecution) execution;
-    CmmnCaseDefinition definition = caseExecution.getCaseDefinition();
-    if (definition instanceof CaseDefinitionEntity) {
-      CaseDefinitionEntity caseDefinition = (CaseDefinitionEntity) definition;
-      return caseDefinition.getDeploymentId();
-    }
-    return null;
+    return getCallableElement().getDeploymentId();
+  }
+
+  protected CallableElementBinding getBinding() {
+    return getCallableElement().getBinding();
   }
 
   protected boolean isLatestBinding() {
-    CallableElementBinding binding = getBinding();
-    return binding == null || CallableElementBinding.LATEST.equals(binding);
+    return getCallableElement().isLatestBinding();
   }
 
   protected boolean isDeploymentBinding() {
-    CallableElementBinding binding = getBinding();
-    return CallableElementBinding.DEPLOYMENT.equals(binding);
+    return getCallableElement().isDeploymentBinding();
   }
 
   protected boolean isVersionBinding() {
-    CallableElementBinding binding = getBinding();
-    return CallableElementBinding.VERSION.equals(binding);
+    return getCallableElement().isVersionBinding();
   }
 
   protected abstract void triggerCallableElement(CmmnActivityExecution execution, Map<String, Object> variables, String businessKey);

@@ -17,7 +17,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -30,6 +29,8 @@ import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.variable.VariableMap;
+import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.builder.CallActivityBuilder;
@@ -534,7 +535,8 @@ public class CallActivityAdvancedTest extends PluggableProcessEngineTestCase {
     assertNotNull(task);
     assertEquals("Task in subprocess", task.getName());
 
-    taskService.complete(task.getId());
+    VariableMap variables = Variables.createVariables().putValue("myLocalVariable", null);
+    taskService.complete(task.getId(), variables);
 
     variable = runtimeService
         .createVariableInstanceQuery()

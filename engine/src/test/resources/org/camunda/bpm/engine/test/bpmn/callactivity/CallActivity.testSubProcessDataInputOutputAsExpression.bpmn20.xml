@@ -12,9 +12,9 @@
 
     <callActivity id="callSubProcess" calledElement="simpleSubProcess" >
 	  <extensionElements>
-	    <activiti:in source="${superVariable}" target="subVariable" />
-	    <activiti:out source="${subVariable}" target="superVariable" />
-      <activiti:out source ="${myLocalVariable}" target="hisLocalVariable" />
+	    <activiti:in sourceExpression="${superVariable}" target="subVariable" />
+	    <activiti:out sourceExpression="${subVariable}" target="superVariable" />
+      <activiti:out sourceExpression ="${myLocalVariable}" target="hisLocalVariable" />
 	  </extensionElements>
       <!--
         Warning: The following code abuses the syntax of Data Associations

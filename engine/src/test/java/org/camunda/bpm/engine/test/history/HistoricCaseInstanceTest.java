@@ -560,6 +560,179 @@ public class HistoricCaseInstanceTest extends CmmnProcessEngineTestCase {
     assertCount(0, historicQuery());
   }
 
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/runtime/superProcessWithCaseCallActivity.bpmn20.xml",
+      "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"
+      })
+  public void testQueryBySuperProcessInstanceId() {
+    String superProcessInstanceId = runtimeService.startProcessInstanceByKey("subProcessQueryTest").getId();
+
+    HistoricCaseInstanceQuery query = historyService
+        .createHistoricCaseInstanceQuery()
+        .superProcessInstanceId(superProcessInstanceId);
+
+    assertEquals(1, query.list().size());
+    assertEquals(1, query.count());
+
+    HistoricCaseInstance subCaseInstance = query.singleResult();
+    assertNotNull(subCaseInstance);
+    assertEquals(superProcessInstanceId, subCaseInstance.getSuperProcessInstanceId());
+    assertNull(subCaseInstance.getSuperCaseInstanceId());
+  }
+
+  public void testQueryByInvalidSuperProcessInstanceId() {
+    HistoricCaseInstanceQuery query = historyService.createHistoricCaseInstanceQuery();
+
+    query.superProcessInstanceId("invalid");
+
+    assertEquals(0, query.count());
+    assertEquals(0, query.list().size());
+
+    query.caseInstanceId(null);
+
+    assertEquals(0, query.count());
+    assertEquals(0, query.list().size());
+
+  }
+
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/cmmn/oneProcessTaskCase.cmmn",
+      "org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
+  public void testQueryBySubProcessInstanceId() {
+    String superCaseInstanceId = caseService.createCaseInstanceByKey("oneProcessTaskCase").getId();
+
+    String processTaskId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_ProcessTask_1")
+        .singleResult()
+        .getId();
+
+    caseService.manuallyStartCaseExecution(processTaskId);
+
+    String subProcessInstanceId = runtimeService
+        .createProcessInstanceQuery()
+        .superCaseInstanceId(superCaseInstanceId)
+        .singleResult()
+        .getId();
+
+    HistoricCaseInstanceQuery query = historyService
+        .createHistoricCaseInstanceQuery()
+        .subProcessInstanceId(subProcessInstanceId);
+
+    assertEquals(1, query.list().size());
+    assertEquals(1, query.count());
+
+    HistoricCaseInstance caseInstance = query.singleResult();
+    assertEquals(superCaseInstanceId, caseInstance.getId());
+    assertNull(caseInstance.getSuperCaseInstanceId());
+    assertNull(caseInstance.getSuperProcessInstanceId());
+  }
+
+  public void testQueryByInvalidSubProcessInstanceId() {
+    HistoricCaseInstanceQuery query = historyService.createHistoricCaseInstanceQuery();
+
+    query.subProcessInstanceId("invalid");
+
+    assertEquals(0, query.count());
+    assertEquals(0, query.list().size());
+
+    query.caseInstanceId(null);
+
+    assertEquals(0, query.count());
+    assertEquals(0, query.list().size());
+
+  }
+
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/cmmn/oneCaseTaskCase.cmmn",
+      "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"
+      })
+  public void testQueryBySuperCaseInstanceId() {
+    String superCaseInstanceId = caseService.createCaseInstanceByKey("oneCaseTaskCase").getId();
+
+    String caseTaskId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_CaseTask_1")
+        .singleResult()
+        .getId();
+
+    caseService.manuallyStartCaseExecution(caseTaskId);
+
+    HistoricCaseInstanceQuery query = historyService
+        .createHistoricCaseInstanceQuery()
+        .superCaseInstanceId(superCaseInstanceId);
+
+    assertEquals(1, query.list().size());
+    assertEquals(1, query.count());
+
+    HistoricCaseInstance caseInstance = query.singleResult();
+    assertEquals(superCaseInstanceId, caseInstance.getSuperCaseInstanceId());
+    assertNull(caseInstance.getSuperProcessInstanceId());
+  }
+
+  public void testQueryByInvalidSuperCaseInstanceId() {
+    HistoricCaseInstanceQuery query = historyService.createHistoricCaseInstanceQuery();
+
+    query.superCaseInstanceId("invalid");
+
+    assertEquals(0, query.count());
+    assertEquals(0, query.list().size());
+
+    query.caseInstanceId(null);
+
+    assertEquals(0, query.count());
+    assertEquals(0, query.list().size());
+
+  }
+
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/cmmn/oneCaseTaskCase.cmmn",
+      "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"
+      })
+  public void testQueryBySubCaseInstanceId() {
+    String superCaseInstanceId = caseService.createCaseInstanceByKey("oneCaseTaskCase").getId();
+
+    String caseTaskId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_CaseTask_1")
+        .singleResult()
+        .getId();
+
+    caseService.manuallyStartCaseExecution(caseTaskId);
+
+    String subCaseInstanceId = caseService
+        .createCaseInstanceQuery()
+        .superCaseInstanceId(superCaseInstanceId)
+        .singleResult()
+        .getId();
+
+    HistoricCaseInstanceQuery query = historyService
+        .createHistoricCaseInstanceQuery()
+        .subCaseInstanceId(subCaseInstanceId);
+
+    assertEquals(1, query.list().size());
+    assertEquals(1, query.count());
+
+    HistoricCaseInstance caseInstance = query.singleResult();
+    assertEquals(superCaseInstanceId, caseInstance.getId());
+    assertNull(caseInstance.getSuperProcessInstanceId());
+    assertNull(caseInstance.getSuperCaseInstanceId());
+  }
+
+  public void testQueryByInvalidSubCaseInstanceId() {
+    HistoricCaseInstanceQuery query = historyService.createHistoricCaseInstanceQuery();
+
+    query.subCaseInstanceId("invalid");
+
+    assertEquals(0, query.count());
+    assertEquals(0, query.list().size());
+
+    query.caseInstanceId(null);
+
+    assertEquals(0, query.count());
+    assertEquals(0, query.list().size());
+  }
+
   protected HistoricCaseInstance queryHistoricCaseInstance(String caseInstanceId) {
     HistoricCaseInstance historicCaseInstance = historicQuery()
       .caseInstanceId(caseInstanceId)

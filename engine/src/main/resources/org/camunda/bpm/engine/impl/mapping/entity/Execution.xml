@@ -221,6 +221,12 @@
       <if test="caseInstanceId != null">
         and RES.CASE_INST_ID_ = #{caseInstanceId}
       </if>
+      <if test="superCaseInstanceId != null">
+        and RES.SUPER_CASE_EXEC_ IN (select ID_ from ${prefix}ACT_RU_CASE_EXECUTION where CASE_INST_ID_ = #{superCaseInstanceId})
+      </if>
+      <if test="subCaseInstanceId != null">
+        and RES.ID_ = (select PROC_INST_ID_ from ${prefix}ACT_RU_EXECUTION where ID_ = (select SUPER_EXEC_ from ${prefix}ACT_RU_CASE_EXECUTION where ID_ = #{subCaseInstanceId}))
+      </if>
       <!-- PLEASE NOTE: If you change anything have a look into the HistoricVariableInstance & HistoricProcessInstance, the same query object is used there! -->
       <foreach collection="queryVariableValues" index="index" item="queryVariableValue">
         and EXISTS (

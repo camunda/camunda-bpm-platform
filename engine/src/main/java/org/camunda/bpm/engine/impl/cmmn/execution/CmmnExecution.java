@@ -169,6 +169,12 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
     return task;
   }
 
+  // super execution  ////////////////////////////////////////////////////////
+
+  public abstract PvmExecutionImpl getSuperExecution();
+
+  public abstract void setSuperExecution(PvmExecutionImpl superExecution);
+
   // sub process instance ////////////////////////////////////////////////////
 
   public abstract PvmExecutionImpl getSubProcessInstance();

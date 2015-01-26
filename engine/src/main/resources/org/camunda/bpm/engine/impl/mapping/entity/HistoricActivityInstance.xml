@@ -30,6 +30,7 @@
         ACT_ID_,
         TASK_ID_,
         CALL_PROC_INST_ID_,
+        CALL_CASE_INST_ID_,
         ACT_NAME_,
         ACT_TYPE_,
         ASSIGNEE_,
@@ -46,6 +47,7 @@
         #{activityId ,jdbcType=VARCHAR},
         #{taskId ,jdbcType=VARCHAR},
         #{calledProcessInstanceId ,jdbcType=VARCHAR},
+        #{calledCaseInstanceId ,jdbcType=VARCHAR},
         #{activityName ,jdbcType=VARCHAR},
         #{activityType ,jdbcType=VARCHAR},
         #{taskAssignee ,jdbcType=VARCHAR},
@@ -100,6 +102,7 @@
     <result property="activityId" column="ACT_ID_" jdbcType="VARCHAR" />
     <result property="taskId" column="TASK_ID_" jdbcType="VARCHAR" />
     <result property="calledProcessInstanceId" column="CALL_PROC_INST_ID_" jdbcType="VARCHAR" />
+    <result property="calledCaseInstanceId" column="CALL_CASE_INST_ID_" jdbcType="VARCHAR" />
     <result property="activityName" column="ACT_NAME_" jdbcType="VARCHAR" />
     <result property="activityType" column="ACT_TYPE_" jdbcType="VARCHAR" />
     <result property="taskAssignee" column="ASSIGNEE_" jdbcType="VARCHAR" />

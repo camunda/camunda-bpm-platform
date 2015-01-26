@@ -12,11 +12,12 @@
  */
 package org.camunda.bpm.engine.impl.cmmn.behavior;
 
+import static org.camunda.bpm.engine.impl.util.CallableElementUtil.getProcessDefinitionToCall;
+
 import java.util.Map;
 
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnActivityExecution;
-import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
+import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessInstance;
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 
@@ -27,29 +28,10 @@ import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 public class ProcessTaskActivityBehavior extends ProcessOrCaseTaskActivityBehavior {
 
   protected void triggerCallableElement(CmmnActivityExecution execution, Map<String, Object> variables, String businessKey) {
-    String processDefinitionKey = getDefinitionKey(execution);
-
-    DeploymentCache deploymentCache = Context
-      .getProcessEngineConfiguration()
-      .getDeploymentCache();
-
-    ProcessDefinitionImpl processDefinition = null;
-
-    if (isLatestBinding()) {
-      processDefinition = deploymentCache.findDeployedLatestProcessDefinitionByKey(processDefinitionKey);
-
-    } else if (isDeploymentBinding()) {
-      String deploymentId = getDeploymentId(execution);
-      processDefinition = deploymentCache.findDeployedProcessDefinitionByDeploymentAndKey(deploymentId, processDefinitionKey);
-
-    } else if (isVersionBinding()) {
-      Integer version = getVersion(execution);
-
-      processDefinition = deploymentCache.findDeployedProcessDefinitionByKeyAndVersion(processDefinitionKey, version);
-    }
-
-    PvmProcessInstance caseInstance = execution.createSubProcessInstance(processDefinition, businessKey);
-    caseInstance.start(variables);
+    AbstractVariableScope variableScope = (AbstractVariableScope) execution;
+    ProcessDefinitionImpl definition = getProcessDefinitionToCall(variableScope, getCallableElement());
+    PvmProcessInstance processInstance = execution.createSubProcessInstance(definition, businessKey);
+    processInstance.start(variables);
   }
 
   public void onManualCompletion(CmmnActivityExecution execution) {

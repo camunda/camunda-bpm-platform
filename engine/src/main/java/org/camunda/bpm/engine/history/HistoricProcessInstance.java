@@ -69,5 +69,10 @@ public interface HistoricProcessInstance {
   /**
    * The case instance id of a potential super case instance or null if no super case instance exists
    */
+  String getSuperCaseInstanceId();
+
+  /**
+   * The case instance id of a potential super case instance or null if no super case instance exists
+   */
   String getCaseInstanceId();
 }

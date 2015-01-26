@@ -30,6 +30,7 @@ import org.camunda.bpm.engine.impl.bpmn.parser.EventSubscriptionDeclaration;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
+import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
 import org.camunda.bpm.engine.impl.core.operation.CoreAtomicOperation;
@@ -97,6 +98,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements
   public static final int INCIDENT_STATE_BIT = 4;
   public static final int VARIABLES_STATE_BIT = 5;
   public static final int SUB_PROCESS_INSTANCE_STATE_BIT = 6;
+  public static final int SUB_CASE_INSTANCE_STATE_BIT = 7;
 
   // current position /////////////////////////////////////////////////////////
 
@@ -119,7 +121,12 @@ public class ExecutionEntity extends PvmExecutionImpl implements
   /** reference to a subprocessinstance, not-null if currently subprocess is started from this execution */
   protected transient ExecutionEntity subProcessInstance;
 
+  /** reference to a subcaseinstance, not-null if currently subcase is started from this execution */
+  protected transient CaseExecutionEntity subCaseInstance;
+
   protected boolean shouldQueryForSubprocessInstance = false;
+
+  protected boolean shouldQueryForSubCaseInstance = false;
 
   // associated entities /////////////////////////////////////////////////////
 
@@ -241,6 +248,8 @@ public class ExecutionEntity extends PvmExecutionImpl implements
     return createdExecution;
   }
 
+  // sub process instance /////////////////////////////////////////////////////////////
+
   public ExecutionEntity createSubProcessInstance(PvmProcessDefinition processDefinition) {
     return createSubProcessInstance(processDefinition, null);
   }
@@ -293,21 +302,8 @@ public class ExecutionEntity extends PvmExecutionImpl implements
       subProcessInstance.setCaseInstanceId(caseInstanceId);
     }
 
-    ProcessEngineConfigurationImpl configuration = Context.getProcessEngineConfiguration();
-    HistoryLevel historyLevel = configuration.getHistoryLevel();
-    if (historyLevel.isHistoryEventProduced(HistoryEventTypes.ACTIVITY_INSTANCE_UPDATE, this)) {
-
-      final HistoryEventProducer eventFactory = configuration.getHistoryEventProducer();
-      final HistoryEventHandler eventHandler = configuration.getHistoryEventHandler();
-
-      // publish start event for sub process instance
-      HistoryEvent hpise = eventFactory.createProcessInstanceStartEvt(subProcessInstance);
-      eventHandler.handleEvent(hpise);
-
-      // publish update event for current activity instance (containing the id of the sub process)
-      HistoryEvent haie = eventFactory.createActivityInstanceUpdateEvt(this, null);
-      eventHandler.handleEvent(haie);
-    }
+    fireHistoricSubProcessInstanceCreate();
+    fireHistoricActivityInstanceUpdate();
 
     return subProcessInstance;
   }
@@ -325,6 +321,53 @@ public class ExecutionEntity extends PvmExecutionImpl implements
     return newExecution;
   }
 
+  // sub case instance ////////////////////////////////////////////////////////
+
+  public CaseExecutionEntity createSubCaseInstance(CmmnCaseDefinition caseDefinition) {
+    return createSubCaseInstance(caseDefinition, null);
+  }
+
+  public CaseExecutionEntity createSubCaseInstance(CmmnCaseDefinition caseDefinition, String businessKey) {
+    CaseExecutionEntity subCaseInstance = (CaseExecutionEntity) caseDefinition.createCaseInstance(businessKey);
+
+    // manage bidirectional super-process-sub-case-instances relation
+    subCaseInstance.setSuperExecution(this);
+    setSubCaseInstance(subCaseInstance);
+
+    fireHistoricActivityInstanceUpdate();
+
+    return subCaseInstance;
+  }
+
+  // helper ///////////////////////////////////////////////////////////////////
+
+  public void fireHistoricSubProcessInstanceCreate() {
+    ProcessEngineConfigurationImpl configuration = Context.getProcessEngineConfiguration();
+    HistoryLevel historyLevel = configuration.getHistoryLevel();
+    if (historyLevel.isHistoryEventProduced(HistoryEventTypes.PROCESS_INSTANCE_START, this)) {
+
+      final HistoryEventProducer eventFactory = configuration.getHistoryEventProducer();
+      final HistoryEventHandler eventHandler = configuration.getHistoryEventHandler();
+
+      // publish start event for sub process instance
+      HistoryEvent hpise = eventFactory.createProcessInstanceStartEvt(subProcessInstance);
+      eventHandler.handleEvent(hpise);
+    }
+  }
+
+  public void fireHistoricActivityInstanceUpdate() {
+    ProcessEngineConfigurationImpl configuration = Context.getProcessEngineConfiguration();
+    HistoryLevel historyLevel = configuration.getHistoryLevel();
+    if (historyLevel.isHistoryEventProduced(HistoryEventTypes.ACTIVITY_INSTANCE_UPDATE, this)) {
+
+      final HistoryEventProducer eventFactory = configuration.getHistoryEventProducer();
+      final HistoryEventHandler eventHandler = configuration.getHistoryEventHandler();
+
+      // publish update event for current activity instance (containing the id of the sub process/case)
+      HistoryEvent haie = eventFactory.createActivityInstanceUpdateEvt(this, null);
+      eventHandler.handleEvent(haie);
+    }
+  }
 
   // scopes ///////////////////////////////////////////////////////////////////
 
@@ -793,6 +836,28 @@ public class ExecutionEntity extends PvmExecutionImpl implements
         .getCommandContext()
         .getCaseExecutionManager()
         .findCaseExecutionById(superCaseExecutionId);
+    }
+  }
+
+  // sub case execution //////////////////////////////////////////////////////
+
+  public CaseExecutionEntity getSubCaseInstance() {
+    ensureSubCaseInstanceInitialized();
+    return subCaseInstance;
+
+  }
+
+  public void setSubCaseInstance(CmmnExecution subCaseInstance) {
+    shouldQueryForSubCaseInstance = subCaseInstance != null;
+    this.subCaseInstance = (CaseExecutionEntity) subCaseInstance;
+  }
+
+  protected void ensureSubCaseInstanceInitialized() {
+    if (shouldQueryForSubCaseInstance && subCaseInstance == null) {
+      subCaseInstance = Context
+        .getCommandContext()
+        .getCaseExecutionManager()
+        .findSubCaseInstanceBySuperExecutionId(id);
     }
   }
 
@@ -1293,6 +1358,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements
       variableStore.setVariableInstances(new HashMap<String, VariableInstanceEntity>());
     }
     shouldQueryForSubprocessInstance = BitMaskUtil.isBitOn(cachedEntityState, SUB_PROCESS_INSTANCE_STATE_BIT);
+    shouldQueryForSubCaseInstance = BitMaskUtil.isBitOn(cachedEntityState, SUB_CASE_INSTANCE_STATE_BIT);
   }
 
   public int getCachedEntityState() {
@@ -1307,6 +1373,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements
     cachedEntityState = BitMaskUtil.setBit(cachedEntityState, INCIDENT_STATE_BIT, (incidents == null || incidents.size() > 0));
     cachedEntityState = BitMaskUtil.setBit(cachedEntityState, VARIABLES_STATE_BIT, (variableInstances == null || variableInstances.size() > 0));
     cachedEntityState = BitMaskUtil.setBit(cachedEntityState, SUB_PROCESS_INSTANCE_STATE_BIT, shouldQueryForSubprocessInstance);
+    cachedEntityState = BitMaskUtil.setBit(cachedEntityState, SUB_CASE_INSTANCE_STATE_BIT, shouldQueryForSubCaseInstance);
 
     return cachedEntityState;
   }

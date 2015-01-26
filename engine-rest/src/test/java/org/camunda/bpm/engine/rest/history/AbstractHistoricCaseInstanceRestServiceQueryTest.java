@@ -288,6 +288,7 @@ public abstract class AbstractHistoricCaseInstanceRestServiceQueryTest extends A
     long returnedDurationInMillis = from(content).getLong("[0].durationInMillis");
     String returnedCreateUserId = from(content).getString("[0].createUserId");
     String returnedSuperCaseInstanceId = from(content).getString("[0].superCaseInstanceId");
+    String returnedSuperProcessInstanceId = from(content).getString("[0].superProcessInstanceId");
     boolean active = from(content).getBoolean("[0].active");
     boolean completed = from(content).getBoolean("[0].completed");
     boolean terminated = from(content).getBoolean("[0].terminated");
@@ -301,6 +302,7 @@ public abstract class AbstractHistoricCaseInstanceRestServiceQueryTest extends A
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_CASE_INSTANCE_DURATION_MILLIS, returnedDurationInMillis);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_CASE_INSTANCE_CREATE_USER_ID, returnedCreateUserId);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_CASE_INSTANCE_SUPER_CASE_INSTANCE_ID, returnedSuperCaseInstanceId);
+    Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_CASE_INSTANCE_SUPER_PROCESS_INSTANCE_ID, returnedSuperProcessInstanceId);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_CASE_INSTANCE_IS_ACTIVE, active);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_CASE_INSTANCE_IS_COMPLETED, completed);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_CASE_INSTANCE_IS_TERMINATED, terminated);
@@ -839,6 +841,8 @@ public abstract class AbstractHistoricCaseInstanceRestServiceQueryTest extends A
     parameters.put("createdBy", "createdBySomeone");
     parameters.put("superCaseInstanceId", MockProvider.EXAMPLE_HISTORIC_CASE_INSTANCE_SUPER_CASE_INSTANCE_ID);
     parameters.put("subCaseInstanceId", MockProvider.EXAMPLE_HISTORIC_CASE_INSTANCE_SUB_CASE_INSTANCE_ID);
+    parameters.put("superProcessInstanceId", MockProvider.EXAMPLE_HISTORIC_CASE_INSTANCE_SUPER_PROCESS_INSTANCE_ID);
+    parameters.put("subProcessInstanceId", MockProvider.EXAMPLE_HISTORIC_CASE_INSTANCE_SUB_PROCESS_INSTANCE_ID);
 
     return parameters;
   }
@@ -856,6 +860,8 @@ public abstract class AbstractHistoricCaseInstanceRestServiceQueryTest extends A
     verify(mockedQuery).createdBy(stringQueryParameters.get("createdBy"));
     verify(mockedQuery).superCaseInstanceId(stringQueryParameters.get("superCaseInstanceId"));
     verify(mockedQuery).subCaseInstanceId(stringQueryParameters.get("subCaseInstanceId"));
+    verify(mockedQuery).superProcessInstanceId(stringQueryParameters.get("superProcessInstanceId"));
+    verify(mockedQuery).subProcessInstanceId(stringQueryParameters.get("subProcessInstanceId"));
     verify(mockedQuery).caseInstanceId(stringQueryParameters.get("caseInstanceId"));
 
     verify(mockedQuery).list();

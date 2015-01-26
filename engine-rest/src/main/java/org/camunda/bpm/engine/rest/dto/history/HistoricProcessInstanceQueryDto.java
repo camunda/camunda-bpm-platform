@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
+
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response.Status;
 
@@ -70,6 +71,8 @@ public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricPr
   private String startedBy;
   private String superProcessInstanceId;
   private String subProcessInstanceId;
+  private String superCaseInstanceId;
+  private String subCaseInstanceId;
   private String caseInstanceId;
 
   private List<VariableQueryParameterDto> variables;
@@ -170,6 +173,16 @@ public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricPr
     this.subProcessInstanceId = subProcessInstanceId;
   }
 
+  @CamundaQueryParam("superCaseInstanceId")
+  public void setSuperCaseInstanceId(String superCaseInstanceId) {
+    this.superCaseInstanceId = superCaseInstanceId;
+  }
+
+  @CamundaQueryParam("subCaseInstanceId")
+  public void setSubCaseInstanceId(String subCaseInstanceId) {
+    this.subCaseInstanceId = subCaseInstanceId;
+  }
+
   @CamundaQueryParam("caseInstanceId")
   public void setCaseInstanceId(String caseInstanceId) {
     this.caseInstanceId = caseInstanceId;
@@ -246,6 +259,12 @@ public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricPr
     }
     if (subProcessInstanceId != null) {
       query.subProcessInstanceId(subProcessInstanceId);
+    }
+    if (superCaseInstanceId != null) {
+      query.superCaseInstanceId(superCaseInstanceId);
+    }
+    if (subCaseInstanceId != null) {
+      query.subCaseInstanceId(subCaseInstanceId);
     }
     if (caseInstanceId != null) {
       query.caseInstanceId(caseInstanceId);

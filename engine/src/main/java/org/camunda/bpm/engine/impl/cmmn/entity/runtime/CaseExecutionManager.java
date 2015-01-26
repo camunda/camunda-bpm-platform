@@ -88,6 +88,10 @@ public class CaseExecutionManager extends AbstractManager {
     return (CaseExecutionEntity) getDbEntityManager().selectOne("selectSubCaseInstanceBySuperCaseExecutionId", superCaseExecutionId);
   }
 
+  public CaseExecutionEntity findSubCaseInstanceBySuperExecutionId(String superExecutionId) {
+    return (CaseExecutionEntity) getDbEntityManager().selectOne("selectSubCaseInstanceBySuperExecutionId", superExecutionId);
+  }
+
   public long findCaseExecutionCountByQueryCriteria(CaseExecutionQueryImpl caseExecutionQuery) {
     return (Long) getDbEntityManager().selectOne("selectCaseExecutionCountByQueryCriteria", caseExecutionQuery);
   }

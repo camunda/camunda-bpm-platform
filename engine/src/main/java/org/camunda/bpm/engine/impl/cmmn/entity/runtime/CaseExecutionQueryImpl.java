@@ -42,6 +42,12 @@ public class CaseExecutionQueryImpl extends AbstractVariableQueryImpl<CaseExecut
   protected String businessKey;
   protected CaseExecutionState state;
 
+  // Not used by end-users, but needed for dynamic ibatis query
+  protected String superProcessInstanceId;
+  protected String subProcessInstanceId;
+  protected String superCaseInstanceId;
+  protected String subCaseInstanceId;
+
   public CaseExecutionQueryImpl() {
   }
 
@@ -220,6 +226,22 @@ public class CaseExecutionQueryImpl extends AbstractVariableQueryImpl<CaseExecut
 
   public boolean isCaseInstancesOnly() {
     return false;
+  }
+
+  public String getSuperProcessInstanceId() {
+    return superProcessInstanceId;
+  }
+
+  public String getSubProcessInstanceId() {
+    return subProcessInstanceId;
+  }
+
+  public String getSuperCaseInstanceId() {
+    return superCaseInstanceId;
+  }
+
+  public String getSubCaseInstanceId() {
+    return subCaseInstanceId;
   }
 
 }

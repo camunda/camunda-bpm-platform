@@ -731,7 +731,7 @@ public interface CmmnActivityExecution extends DelegateCaseExecution {
    * <p><code>This</code> case execution will be the super case execution of the
    * created sub case instance.</p>
    *
-   * @param caseDefinition The {@link CmmnCaseDefinition} of the subprocess.
+   * @param caseDefinition The {@link CmmnCaseDefinition} of the sub case instance.
    */
   CmmnCaseInstance createSubCaseInstance(CmmnCaseDefinition caseDefinition);
 
@@ -741,7 +741,7 @@ public interface CmmnActivityExecution extends DelegateCaseExecution {
    * <p><code>This</code> case execution will be the super case execution of the
    * created sub case instance.</p>
    *
-   * @param caseDefinition The {@link CmmnCaseDefinition} of the subprocess.
+   * @param caseDefinition The {@link CmmnCaseDefinition} of the sub case instance.
    * @param businessKey The businessKey to be set on sub case instance.
    */
   CmmnCaseInstance createSubCaseInstance(CmmnCaseDefinition caseDefinition, String businessKey);

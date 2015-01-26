@@ -19,7 +19,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricActivityInstanceQuery;
@@ -934,5 +933,44 @@ public class HistoricActivityInstanceTest extends PluggableProcessEngineTestCase
         .activityId("errorStartEvent").singleResult();
 
     assertEquals("errorStartEvent", historicActivity.getActivityType());
+  }
+
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/history/HistoricActivityInstanceTest.testCaseCallActivity.bpmn20.xml",
+      "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"
+  })
+  public void testCaseCallActivity() {
+    runtimeService.startProcessInstanceByKey("process");
+
+    String subCaseInstanceId = caseService
+        .createCaseInstanceQuery()
+        .singleResult()
+        .getId();
+
+
+    HistoricActivityInstance historicCallActivity = historyService
+        .createHistoricActivityInstanceQuery()
+        .activityId("callActivity")
+        .singleResult();
+
+    assertEquals(subCaseInstanceId, historicCallActivity.getCalledCaseInstanceId());
+    assertNull(historicCallActivity.getEndTime());
+
+    String humanTaskId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    caseService.manuallyStartCaseExecution(humanTaskId);
+    caseService.completeCaseExecution(humanTaskId);
+
+    historicCallActivity = historyService
+        .createHistoricActivityInstanceQuery()
+        .activityId("callActivity")
+        .singleResult();
+
+    assertEquals(subCaseInstanceId, historicCallActivity.getCalledCaseInstanceId());
+    assertNotNull(historicCallActivity.getEndTime());
   }
 }

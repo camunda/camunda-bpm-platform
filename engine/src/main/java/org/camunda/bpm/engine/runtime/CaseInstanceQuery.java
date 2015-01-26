@@ -62,6 +62,40 @@ public interface CaseInstanceQuery extends Query<CaseInstanceQuery, CaseInstance
    */
   CaseInstanceQuery caseDefinitionId(String caseDefinitionId);
 
+  /**
+   * Select the case instances which are a sub case instance of the given
+   * super process instance.
+   *
+   * @since 7.3
+   */
+  CaseInstanceQuery superProcessInstanceId(String superProcessInstanceId);
+
+  /**
+   * Select the case instance that have as sub process instance the given
+   * process instance. Note that there will always be maximum only <b>one</b>
+   * such case instance that can be the result of this query.
+   *
+   * @since 7.3
+   */
+  CaseInstanceQuery subProcessInstanceId(String subProcessInstanceId);
+
+  /**
+   * Select the case instances which are a sub case instance of the given
+   * super case instance.
+   *
+   * @since 7.3
+   */
+  CaseInstanceQuery superCaseInstanceId(String superCaseInstanceId);
+
+  /**
+   * Select the case instance that have as sub case instance the given
+   * case instance. Note that there will always be maximum only <b>one</b>
+   * such process instance that can be the result of this query.
+   *
+   * @since 7.3
+   */
+  CaseInstanceQuery subCaseInstanceId(String subCaseInstanceId);
+
   /** Only select case instances which are active. **/
   CaseInstanceQuery active();
 

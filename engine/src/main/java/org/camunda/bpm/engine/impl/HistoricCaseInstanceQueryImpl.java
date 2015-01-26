@@ -48,6 +48,8 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
   protected String createdBy;
   protected String superCaseInstanceId;
   protected String subCaseInstanceId;
+  protected String superProcessInstanceId;
+  protected String subProcessInstanceId;
   protected List<String> caseKeyNotIn;
   protected Date createdBefore;
   protected Date createdAfter;
@@ -146,6 +148,16 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
 
   public HistoricCaseInstanceQuery subCaseInstanceId(String subCaseInstanceId) {
     this.subCaseInstanceId = subCaseInstanceId;
+    return this;
+  }
+
+  public HistoricCaseInstanceQuery superProcessInstanceId(String superProcessInstanceId) {
+    this.superProcessInstanceId = superProcessInstanceId;
+    return this;
+  }
+
+  public HistoricCaseInstanceQuery subProcessInstanceId(String subProcessInstanceId) {
+    this.subProcessInstanceId = subProcessInstanceId;
     return this;
   }
 
@@ -300,6 +312,14 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
 
   public String getSubCaseInstanceId() {
     return subCaseInstanceId;
+  }
+
+  public String getSuperProcessInstanceId() {
+    return superProcessInstanceId;
+  }
+
+  public String getSubProcessInstanceId() {
+    return subProcessInstanceId;
   }
 
 }

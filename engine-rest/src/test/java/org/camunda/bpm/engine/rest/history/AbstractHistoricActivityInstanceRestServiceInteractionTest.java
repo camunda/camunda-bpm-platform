@@ -79,6 +79,7 @@ public abstract class AbstractHistoricActivityInstanceRestServiceInteractionTest
     String returnedExecutionId = from(content).getString("executionId");
     String returnedTaskId = from(content).getString("taskId");
     String returnedCalledProcessInstanceId = from(content).getString("calledProcessInstanceId");
+    String returnedCalledCaseInstanceId = from(content).getString("calledCaseInstanceId");
     String returnedAssignee = from(content).getString("assignee");
     String returnedStartTime = from(content).getString("startTime");
     String returnedEndTime = from(content).getString("endTime");
@@ -96,6 +97,7 @@ public abstract class AbstractHistoricActivityInstanceRestServiceInteractionTest
     Assert.assertEquals(MockProvider.EXAMPLE_EXECUTION_ID, returnedExecutionId);
     Assert.assertEquals(MockProvider.EXAMPLE_TASK_ID, returnedTaskId);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_CALLED_PROCESS_INSTANCE_ID, returnedCalledProcessInstanceId);
+    Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_CALLED_CASE_INSTANCE_ID, returnedCalledCaseInstanceId);
     Assert.assertEquals(MockProvider.EXAMPLE_TASK_ASSIGNEE_NAME, returnedAssignee);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_START_TIME, returnedStartTime);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_END_TIME, returnedEndTime);

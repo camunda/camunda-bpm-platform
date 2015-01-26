@@ -50,6 +50,8 @@ public class ProcessInstanceQueryDto extends AbstractQueryDto<ProcessInstanceQue
   private String processDefinitionId;
   private String superProcessInstance;
   private String subProcessInstance;
+  private String superCaseInstance;
+  private String subCaseInstance;
   private Boolean active;
   private Boolean suspended;
   private Set<String> processInstanceIds;
@@ -105,6 +107,16 @@ public class ProcessInstanceQueryDto extends AbstractQueryDto<ProcessInstanceQue
   @CamundaQueryParam("subProcessInstance")
   public void setSubProcessInstance(String subProcessInstance) {
     this.subProcessInstance = subProcessInstance;
+  }
+
+  @CamundaQueryParam("superCaseInstance")
+  public void setSuperCaseInstance(String superCaseInstance) {
+    this.superCaseInstance = superCaseInstance;
+  }
+
+  @CamundaQueryParam("subCaseInstance")
+  public void setSubCaseInstance(String subCaseInstance) {
+    this.subCaseInstance = subCaseInstance;
   }
 
   @CamundaQueryParam(value = "active", converter = BooleanConverter.class)
@@ -175,6 +187,12 @@ public class ProcessInstanceQueryDto extends AbstractQueryDto<ProcessInstanceQue
     }
     if (subProcessInstance != null) {
       query.subProcessInstanceId(subProcessInstance);
+    }
+    if (superCaseInstance != null) {
+      query.superCaseInstanceId(superCaseInstance);
+    }
+    if (subCaseInstance != null) {
+      query.subCaseInstanceId(subCaseInstance);
     }
     if (active != null && active == true) {
       query.active();

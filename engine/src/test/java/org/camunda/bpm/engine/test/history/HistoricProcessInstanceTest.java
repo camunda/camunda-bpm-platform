@@ -705,4 +705,86 @@ public class HistoricProcessInstanceTest extends PluggableProcessEngineTestCase 
     assertNull(historicProcessInstance.getEndActivityId());
     assertNotNull(historicProcessInstance.getEndTime());
   }
+
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/cmmn/oneProcessTaskCase.cmmn",
+      "org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"
+  })
+  public void testQueryBySuperCaseInstanceId() {
+    String superCaseInstanceId = caseService.createCaseInstanceByKey("oneProcessTaskCase").getId();
+
+    String processTaskId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_ProcessTask_1")
+        .singleResult()
+        .getId();
+
+    caseService.manuallyStartCaseExecution(processTaskId);
+
+    HistoricProcessInstanceQuery query = historyService
+        .createHistoricProcessInstanceQuery()
+        .superCaseInstanceId(superCaseInstanceId);
+
+    assertEquals(1, query.list().size());
+    assertEquals(1, query.count());
+
+    HistoricProcessInstance subProcessInstance = query.singleResult();
+    assertNotNull(subProcessInstance);
+    assertEquals(superCaseInstanceId, subProcessInstance.getSuperCaseInstanceId());
+    assertNull(subProcessInstance.getSuperProcessInstanceId());
+  }
+
+  public void testQueryByInvalidSuperCaseInstanceId() {
+    HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery();
+
+    query.superCaseInstanceId("invalid");
+
+    assertEquals(0, query.count());
+    assertEquals(0, query.list().size());
+
+    query.caseInstanceId(null);
+
+    assertEquals(0, query.count());
+    assertEquals(0, query.list().size());
+  }
+
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/runtime/superProcessWithCaseCallActivity.bpmn20.xml",
+      "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn" })
+  public void testQueryBySubCaseInstanceId() {
+    String superProcessInstanceId = runtimeService.startProcessInstanceByKey("subProcessQueryTest").getId();
+
+    String subCaseInstanceId = caseService
+        .createCaseInstanceQuery()
+        .superProcessInstanceId(superProcessInstanceId)
+        .singleResult()
+        .getId();
+
+    HistoricProcessInstanceQuery query = historyService
+        .createHistoricProcessInstanceQuery()
+        .subCaseInstanceId(subCaseInstanceId);
+
+    assertEquals(1, query.list().size());
+    assertEquals(1, query.count());
+
+    HistoricProcessInstance superProcessInstance = query.singleResult();
+    assertNotNull(superProcessInstance);
+    assertEquals(superProcessInstanceId, superProcessInstance.getId());
+    assertNull(superProcessInstance.getSuperCaseInstanceId());
+    assertNull(superProcessInstance.getSuperProcessInstanceId());
+  }
+
+  public void testQueryByInvalidSubCaseInstanceId() {
+    HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery();
+
+    query.subCaseInstanceId("invalid");
+
+    assertEquals(0, query.count());
+    assertEquals(0, query.list().size());
+
+    query.caseInstanceId(null);
+
+    assertEquals(0, query.count());
+    assertEquals(0, query.list().size());
+  }
 }

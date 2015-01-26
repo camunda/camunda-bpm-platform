@@ -19,6 +19,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
+import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
 import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
 import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
@@ -113,6 +114,8 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
 
   public abstract PvmExecutionImpl createExecution(boolean initStartContext);
 
+  // sub process instance
+
   public PvmExecutionImpl createSubProcessInstance(PvmProcessDefinition processDefinition) {
     return createSubProcessInstance(processDefinition, null);
   }
@@ -120,6 +123,12 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
   public abstract PvmExecutionImpl createSubProcessInstance(PvmProcessDefinition processDefinition, String businessKey);
 
   public abstract PvmExecutionImpl createSubProcessInstance(PvmProcessDefinition processDefinition, String businessKey, String caseInstanceId);
+
+  // sub case instance
+
+  public abstract CmmnExecution createSubCaseInstance(CmmnCaseDefinition caseDefinition);
+
+  public abstract CmmnExecution createSubCaseInstance(CmmnCaseDefinition caseDefinition, String businessKey);
 
   public abstract void initialize();
 
@@ -674,6 +683,12 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
   public abstract CmmnExecution getSuperCaseExecution();
 
   public abstract void setSuperCaseExecution(CmmnExecution superCaseExecution);
+
+  // sub case execution ///////////////////////////////////////////////////////
+
+  public abstract CmmnExecution getSubCaseInstance();
+
+  public abstract void setSubCaseInstance(CmmnExecution subCaseInstance);
 
   // scopes ///////////////////////////////////////////////////////////////////
 

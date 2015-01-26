@@ -12,13 +12,13 @@
  */
 package org.camunda.bpm.engine.rest.dto.history;
 
-import static javax.ws.rs.core.Response.Status;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
+
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.history.HistoricCaseInstanceQuery;
@@ -64,6 +64,8 @@ public class HistoricCaseInstanceQueryDto extends AbstractQueryDto<HistoricCaseI
   public String caseInstanceBusinessKeyLike;
   public String superCaseInstanceId;
   public String subCaseInstanceId;
+  private String superProcessInstanceId;
+  private String subProcessInstanceId;
   public String createdBy;
 
   public Date createdBefore;
@@ -138,6 +140,16 @@ public class HistoricCaseInstanceQueryDto extends AbstractQueryDto<HistoricCaseI
   @CamundaQueryParam("subCaseInstanceId")
   public void setSubCaseInstanceId(String subCaseInstanceId) {
     this.subCaseInstanceId = subCaseInstanceId;
+  }
+
+  @CamundaQueryParam("superProcessInstanceId")
+  public void setSuperProcessInstanceId(String superProcessInstanceId) {
+    this.superProcessInstanceId = superProcessInstanceId;
+  }
+
+  @CamundaQueryParam("subProcessInstanceId")
+  public void setSubProcessInstanceId(String subProcessInstanceId) {
+    this.subProcessInstanceId = subProcessInstanceId;
   }
 
   @CamundaQueryParam("createdBy")
@@ -240,6 +252,12 @@ public class HistoricCaseInstanceQueryDto extends AbstractQueryDto<HistoricCaseI
     }
     if (subCaseInstanceId != null) {
       query.subCaseInstanceId(subCaseInstanceId);
+    }
+    if (superProcessInstanceId != null) {
+      query.superProcessInstanceId(superProcessInstanceId);
+    }
+    if (subProcessInstanceId != null) {
+      query.subProcessInstanceId(subProcessInstanceId);
     }
     if (createdBy != null) {
       query.createdBy(createdBy);

@@ -12,15 +12,16 @@
  */
 package org.camunda.bpm.engine.impl;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 import java.util.ArrayList;
 import java.util.List;
+
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ExecutionQuery;
-
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 
 /**
@@ -48,6 +49,8 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
   // Not used by end-users, but needed for dynamic ibatis query
   protected String superProcessInstanceId;
   protected String subProcessInstanceId;
+  protected String superCaseInstanceId;
+  protected String subCaseInstanceId;
   protected String caseInstanceId;
   private String businessKey;
 
@@ -215,36 +218,55 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
   public boolean getOnlyProcessInstances() {
     return false;
   }
+
   public String getProcessDefinitionKey() {
     return processDefinitionKey;
   }
+
   public String getProcessDefinitionId() {
     return processDefinitionId;
   }
+
   public String getActivityId() {
     return activityId;
   }
+
   public String getProcessInstanceId() {
     return processInstanceId;
   }
+
   public String getProcessInstanceIds() {
     return null;
   }
+
   public String getBusinessKey() {
     return businessKey;
   }
+
   public String getExecutionId() {
     return executionId;
   }
+
   public String getSuperProcessInstanceId() {
     return superProcessInstanceId;
   }
+
   public String getSubProcessInstanceId() {
     return subProcessInstanceId;
   }
+
+  public String getSuperCaseInstanceId() {
+    return superCaseInstanceId;
+  }
+
+  public String getSubCaseInstanceId() {
+    return subCaseInstanceId;
+  }
+
   public SuspensionState getSuspensionState() {
     return suspensionState;
   }
+
   public void setSuspensionState(SuspensionState suspensionState) {
     this.suspensionState = suspensionState;
   }

@@ -38,6 +38,10 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
   protected String caseDefinitionId;
   protected String caseDefinitionKey;
   protected CaseExecutionState state;
+  protected String superProcessInstanceId;
+  protected String subProcessInstanceId;
+  protected String superCaseInstanceId;
+  protected String subCaseInstanceId;
 
   public CaseInstanceQueryImpl() {
   }
@@ -71,6 +75,30 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
   public CaseInstanceQuery caseDefinitionId(String caseDefinitionId) {
     ensureNotNull(NotValidException.class, "caseDefinitionId", caseDefinitionId);
     this.caseDefinitionId = caseDefinitionId;
+    return this;
+  }
+
+  public CaseInstanceQuery superProcessInstanceId(String superProcessInstanceId) {
+    ensureNotNull(NotValidException.class, "superProcessInstanceId", superProcessInstanceId);
+    this.superProcessInstanceId = superProcessInstanceId;
+    return this;
+  }
+
+  public CaseInstanceQuery subProcessInstanceId(String subProcessInstanceId) {
+    ensureNotNull(NotValidException.class, "subProcessInstanceId", subProcessInstanceId);
+    this.subProcessInstanceId = subProcessInstanceId;
+    return this;
+  }
+
+  public CaseInstanceQuery superCaseInstanceId(String superCaseInstanceId) {
+    ensureNotNull(NotValidException.class, "superCaseInstanceId", superCaseInstanceId);
+    this.superCaseInstanceId = superCaseInstanceId;
+    return this;
+  }
+
+  public CaseInstanceQuery subCaseInstanceId(String subCaseInstanceId) {
+    ensureNotNull(NotValidException.class, "subCaseInstanceId", subCaseInstanceId);
+    this.subCaseInstanceId = subCaseInstanceId;
     return this;
   }
 
@@ -156,6 +184,22 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
 
   public boolean isCaseInstancesOnly() {
     return true;
+  }
+
+  public String getSuperProcessInstanceId() {
+    return superProcessInstanceId;
+  }
+
+  public String getSubProcessInstanceId() {
+    return subProcessInstanceId;
+  }
+
+  public String getSuperCaseInstanceId() {
+    return superCaseInstanceId;
+  }
+
+  public String getSubCaseInstanceId() {
+    return subCaseInstanceId;
   }
 
 }

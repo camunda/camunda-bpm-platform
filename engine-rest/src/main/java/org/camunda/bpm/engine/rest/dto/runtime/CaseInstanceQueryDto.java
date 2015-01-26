@@ -50,6 +50,10 @@ public class CaseInstanceQueryDto extends AbstractQueryDto<CaseInstanceQuery> {
   protected String businessKey;
   protected String caseDefinitionKey;
   protected String caseDefinitionId;
+  protected String superProcessInstance;
+  protected String subProcessInstance;
+  protected String superCaseInstance;
+  protected String subCaseInstance;
   protected Boolean active;
   protected Boolean completed;
   protected Boolean terminated;
@@ -81,6 +85,26 @@ public class CaseInstanceQueryDto extends AbstractQueryDto<CaseInstanceQuery> {
   @CamundaQueryParam("caseDefinitionId")
   public void setCaseDefinitionId(String caseDefinitionId) {
     this.caseDefinitionId = caseDefinitionId;
+  }
+
+  @CamundaQueryParam("superProcessInstance")
+  public void setSuperProcessInstance(String superProcessInstance) {
+    this.superProcessInstance = superProcessInstance;
+  }
+
+  @CamundaQueryParam("subProcessInstance")
+  public void setSubProcessInstance(String subProcessInstance) {
+    this.subProcessInstance = subProcessInstance;
+  }
+
+  @CamundaQueryParam("superCaseInstance")
+  public void setSuperCaseInstance(String superCaseInstance) {
+    this.superCaseInstance = superCaseInstance;
+  }
+
+  @CamundaQueryParam("subCaseInstance")
+  public void setSubCaseInstance(String subCaseInstance) {
+    this.subCaseInstance = subCaseInstance;
   }
 
   @CamundaQueryParam(value = "active", converter = BooleanConverter.class)
@@ -126,6 +150,18 @@ public class CaseInstanceQueryDto extends AbstractQueryDto<CaseInstanceQuery> {
     }
     if (caseDefinitionId != null) {
       query.caseDefinitionId(caseDefinitionId);
+    }
+    if (superProcessInstance != null) {
+      query.superProcessInstanceId(superProcessInstance);
+    }
+    if (subProcessInstance != null) {
+      query.subProcessInstanceId(subProcessInstance);
+    }
+    if (superCaseInstance != null) {
+      query.superCaseInstanceId(superCaseInstance);
+    }
+    if (subCaseInstance != null) {
+      query.subCaseInstanceId(subCaseInstance);
     }
     if (active != null && active == true) {
       query.active();

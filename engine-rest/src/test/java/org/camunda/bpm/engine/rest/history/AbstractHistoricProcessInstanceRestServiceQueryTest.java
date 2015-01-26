@@ -344,6 +344,7 @@ public abstract class AbstractHistoricProcessInstanceRestServiceQueryTest extend
     String returnedStartActivityId = from(content).getString("[0].startActivityId");
     String returnedDeleteReason = from(content).getString("[0].deleteReason");
     String returnedSuperProcessInstanceId = from(content).getString("[0].superProcessInstanceId");
+    String returnedSuperCaseInstanceId = from(content).getString("[0].superCaseInstanceId");
     String returnedCaseInstanceId = from(content).getString("[0].caseInstanceId");
 
     Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID, returnedProcessInstanceId);
@@ -356,6 +357,7 @@ public abstract class AbstractHistoricProcessInstanceRestServiceQueryTest extend
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_START_ACTIVITY_ID, returnedStartActivityId);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_DELETE_REASON, returnedDeleteReason);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_SUPER_PROCESS_INSTANCE_ID, returnedSuperProcessInstanceId);
+    Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_SUPER_CASE_INSTANCE_ID, returnedSuperCaseInstanceId);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_CASE_INSTANCE_ID, returnedCaseInstanceId);
   }
 
@@ -403,6 +405,8 @@ public abstract class AbstractHistoricProcessInstanceRestServiceQueryTest extend
     parameters.put("startedBy", "startedBySomeone");
     parameters.put("superProcessInstanceId", MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_SUPER_PROCESS_INSTANCE_ID);
     parameters.put("subProcessInstanceId", MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_SUB_PROCESS_INSTANCE_ID);
+    parameters.put("superCaseInstanceId", MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_SUPER_CASE_INSTANCE_ID);
+    parameters.put("subCaseInstanceId", MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_SUB_CASE_INSTANCE_ID);
     parameters.put("caseInstanceId", MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_CASE_INSTANCE_ID);
 
     return parameters;
@@ -421,6 +425,8 @@ public abstract class AbstractHistoricProcessInstanceRestServiceQueryTest extend
     verify(mockedQuery).startedBy(stringQueryParameters.get("startedBy"));
     verify(mockedQuery).superProcessInstanceId(stringQueryParameters.get("superProcessInstanceId"));
     verify(mockedQuery).subProcessInstanceId(stringQueryParameters.get("subProcessInstanceId"));
+    verify(mockedQuery).superCaseInstanceId(stringQueryParameters.get("superCaseInstanceId"));
+    verify(mockedQuery).subCaseInstanceId(stringQueryParameters.get("subCaseInstanceId"));
     verify(mockedQuery).caseInstanceId(stringQueryParameters.get("caseInstanceId"));
 
     verify(mockedQuery).list();

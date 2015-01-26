@@ -54,6 +54,9 @@ public interface HistoricActivityInstance {
   /** The called process instance in case of call activity */
   String getCalledProcessInstanceId();
 
+  /** The called case instance in case of (case) call activity */
+  String getCalledCaseInstanceId();
+
   /** Assignee in case of user task activity */
   String getAssignee();
 

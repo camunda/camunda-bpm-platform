@@ -51,6 +51,8 @@ public class CaseExecutionImpl extends CmmnExecution implements Serializable {
 
   protected ExecutionImpl subProcessInstance;
 
+  protected ExecutionImpl superExecution;
+
   protected CaseExecutionImpl subCaseInstance;
 
   protected CaseExecutionImpl superCaseExecution;
@@ -113,6 +115,16 @@ public class CaseExecutionImpl extends CmmnExecution implements Serializable {
 
   public void setCaseInstance(CmmnExecution caseInstance) {
     this.caseInstance = (CaseExecutionImpl) caseInstance;
+  }
+
+  // super execution /////////////////////////////////////////////////////////////
+
+  public ExecutionImpl getSuperExecution() {
+    return superExecution;
+  }
+
+  public void setSuperExecution(PvmExecutionImpl superExecution) {
+    this.superExecution = (ExecutionImpl) superExecution;
   }
 
   // sub process instance ////////////////////////////////////////////////////////

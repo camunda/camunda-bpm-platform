@@ -22,6 +22,8 @@ public enum HistoryEventTypes implements HistoryEventType {
 
   /** fired when a process instance is started. */
   PROCESS_INSTANCE_START("process-instance", "start"),
+  /** fired when a process instance is updated. */
+  PROCESS_INSTANCE_UPDATE("process-instance", "update"),
   /** fired when a process instance is ended. */
   PROCESS_INSTANCE_END("process-instance", "end"),
 

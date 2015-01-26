@@ -21,6 +21,7 @@ import org.camunda.bpm.engine.impl.history.event.HistoricCaseActivityInstanceEve
 import org.camunda.bpm.engine.impl.history.event.HistoricCaseInstanceEventEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 
 /**
@@ -47,6 +48,12 @@ public class DefaultCmmnHistoryEventProducer implements CmmnHistoryEventProducer
     CmmnExecution superCaseExecution = caseExecutionEntity.getSuperCaseExecution();
     if (superCaseExecution != null) {
       evt.setSuperCaseInstanceId(superCaseExecution.getCaseInstanceId());
+    }
+
+    // set super process instance id
+    ExecutionEntity superExecution = caseExecutionEntity.getSuperExecution();
+    if (superExecution != null) {
+      evt.setSuperProcessInstanceId(superExecution.getProcessInstanceId());
     }
 
     return evt;

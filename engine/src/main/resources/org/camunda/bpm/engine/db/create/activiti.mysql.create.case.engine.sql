@@ -18,6 +18,7 @@ create table ACT_RU_CASE_EXECUTION (
     REV_ integer,
     CASE_INST_ID_ varchar(64),
     SUPER_CASE_EXEC_ varchar(64),
+    SUPER_EXEC_ varchar(64),
     BUSINESS_KEY_ varchar(255),
     PARENT_ID_ varchar(64),
     CASE_DEF_ID_ varchar(64),

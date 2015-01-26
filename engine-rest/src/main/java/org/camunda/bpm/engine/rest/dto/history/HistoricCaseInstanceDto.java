@@ -26,6 +26,7 @@ public class HistoricCaseInstanceDto {
   protected Long durationInMillis;
   protected String createUserId;
   protected String superCaseInstanceId;
+  private String superProcessInstanceId;
   protected Boolean active;
   protected Boolean completed;
   protected Boolean terminated;
@@ -63,6 +64,10 @@ public class HistoricCaseInstanceDto {
     return superCaseInstanceId;
   }
 
+  public String getSuperProcessInstanceId() {
+    return superProcessInstanceId;
+  }
+
   public Boolean getActive() {
     return active;
   }
@@ -91,6 +96,7 @@ public class HistoricCaseInstanceDto {
     dto.durationInMillis = historicCaseInstance.getDurationInMillis();
     dto.createUserId = historicCaseInstance.getCreateUserId();
     dto.superCaseInstanceId = historicCaseInstance.getSuperCaseInstanceId();
+    dto.superProcessInstanceId = historicCaseInstance.getSuperProcessInstanceId();
     dto.active = historicCaseInstance.isActive();
     dto.completed = historicCaseInstance.isCompleted();
     dto.terminated = historicCaseInstance.isTerminated();

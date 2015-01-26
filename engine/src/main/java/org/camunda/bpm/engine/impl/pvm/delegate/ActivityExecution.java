@@ -15,6 +15,8 @@ package org.camunda.bpm.engine.impl.pvm.delegate;
 import java.util.List;
 
 import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.camunda.bpm.engine.impl.cmmn.execution.CmmnCaseInstance;
+import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessDefinition;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessInstance;
@@ -93,6 +95,27 @@ public interface ActivityExecution extends DelegateExecution {
    * @param caseInstanceId the case instance id of the process instance
    */
   PvmProcessInstance createSubProcessInstance(PvmProcessDefinition processDefinition, String businessKey, String caseInstanceId);
+
+  /**
+   * <p>Creates a new sub case instance.</p>
+   *
+   * <p><code>This</code> execution will be the super execution of the
+   * created sub case instance.</p>
+   *
+   * @param caseDefinition The {@link CmmnCaseDefinition} of the sub case instance.
+   */
+  CmmnCaseInstance createSubCaseInstance(CmmnCaseDefinition caseDefinition);
+
+  /**
+   * <p>Creates a new sub case instance.</p>
+   *
+   * <p><code>This</code> execution will be the super execution of the
+   * created sub case instance.</p>
+   *
+   * @param caseDefinition The {@link CmmnCaseDefinition} of the sub case instance.
+   * @param businessKey The businessKey to be set on sub case instance.
+   */
+  CmmnCaseInstance createSubCaseInstance(CmmnCaseDefinition caseDefinition, String businessKey);
 
   /**
    * returns the parent of this execution, or null if there no parent.

@@ -24,6 +24,7 @@ import org.camunda.bpm.engine.delegate.BpmnModelExecutionContext;
 import org.camunda.bpm.engine.delegate.ProcessEngineServicesAware;
 import org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionImpl;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
+import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
 import org.camunda.bpm.engine.impl.core.variable.scope.CoreVariableStore;
 import org.camunda.bpm.engine.impl.core.variable.scope.SimpleVariableStore;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessDefinition;
@@ -72,6 +73,9 @@ public class ExecutionImpl extends PvmExecutionImpl implements
 
   /** super case execution, not-null if this execution is part of a case execution */
   protected CaseExecutionImpl superCaseExecution;
+
+  /** reference to a subcaseinstance, not-null if currently subcase is started from this execution */
+  protected CaseExecutionImpl subCaseInstance;
 
   protected ExecutionImpl replacedBy;
 
@@ -201,6 +205,30 @@ public class ExecutionImpl extends PvmExecutionImpl implements
 
   public void setSuperCaseExecution(CmmnExecution superCaseExecution) {
     this.superCaseExecution = (CaseExecutionImpl) superCaseExecution;
+  }
+
+  // sub case execution ////////////////////////////////////////////////////////
+
+  public CaseExecutionImpl getSubCaseInstance() {
+    return subCaseInstance;
+  }
+
+  public void setSubCaseInstance(CmmnExecution subCaseInstance) {
+    this.subCaseInstance = (CaseExecutionImpl) subCaseInstance;
+  }
+
+  public CaseExecutionImpl createSubCaseInstance(CmmnCaseDefinition caseDefinition) {
+    return createSubCaseInstance(caseDefinition, null);
+  }
+
+  public CaseExecutionImpl createSubCaseInstance(CmmnCaseDefinition caseDefinition, String businessKey) {
+    CaseExecutionImpl caseInstance = (CaseExecutionImpl) caseDefinition.createCaseInstance(businessKey);
+
+    // manage bidirectional super-process-sub-case-instances relation
+    subCaseInstance.setSuperExecution(this);
+    setSubCaseInstance(subCaseInstance);
+
+    return caseInstance;
   }
 
   // process definition ///////////////////////////////////////////////////////

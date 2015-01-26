@@ -50,6 +50,9 @@ public interface HistoricCaseInstance {
   /** The case instance id of a potential super case instance or null if no super case instance exists. */
   String getSuperCaseInstanceId();
 
+  /** The process instance id of a potential super process instance or null if no super process instance exists. */
+  String getSuperProcessInstanceId();
+
   /** Check if the case is active. */
   boolean isActive();
 

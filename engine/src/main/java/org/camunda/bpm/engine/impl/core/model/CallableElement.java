@@ -10,14 +10,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.impl.cmmn.behavior;
+package org.camunda.bpm.engine.impl.core.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.core.variable.VariableMapImpl;
 import org.camunda.bpm.engine.impl.core.variable.mapping.value.ParameterValueProvider;
 import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
+import org.camunda.bpm.engine.variable.VariableMap;
 
 /**
  * @author Roman Smirnov
@@ -31,6 +34,7 @@ public class CallableElement {
   protected ParameterValueProvider businessKeyValueProvider;
   protected List<CallableElementParameter> inputs;
   protected List<CallableElementParameter> outputs;
+  protected String deploymentId;
 
   public enum CallableElementBinding {
     LATEST("latest"),
@@ -81,6 +85,21 @@ public class CallableElement {
 
   public void setBinding(CallableElementBinding binding) {
     this.binding = binding;
+  }
+
+  public boolean isLatestBinding() {
+    CallableElementBinding binding = getBinding();
+    return binding == null || CallableElementBinding.LATEST.equals(binding);
+  }
+
+  public boolean isDeploymentBinding() {
+    CallableElementBinding binding = getBinding();
+    return CallableElementBinding.DEPLOYMENT.equals(binding);
+  }
+
+  public boolean isVersionBinding() {
+    CallableElementBinding binding = getBinding();
+    return CallableElementBinding.VERSION.equals(binding);
   }
 
   // version //////////////////////////////////////////////////////////////////////
@@ -147,6 +166,11 @@ public class CallableElement {
     this.inputs.addAll(inputs);
   }
 
+  public VariableMap getInputVariables(AbstractVariableScope variableScope) {
+    List<CallableElementParameter> inputs = getInputs();
+    return getVariables(inputs, variableScope);
+  }
+
   // outputs /////////////////////////////////////////////////////////////////////
 
   public List<CallableElementParameter> getOutputs() {
@@ -159,6 +183,43 @@ public class CallableElement {
 
   public void addOutputs(List<CallableElementParameter> outputs) {
     this.outputs.addAll(outputs);
+  }
+
+  public VariableMap getOutputVariables(AbstractVariableScope variableScope) {
+    List<CallableElementParameter> outputs = getOutputs();
+    return getVariables(outputs, variableScope);
+  }
+
+  // variables //////////////////////////////////////////////////////////////////
+
+  protected VariableMap getVariables(List<CallableElementParameter> params, AbstractVariableScope variableScope) {
+    VariableMap result = new VariableMapImpl();
+
+    for (CallableElementParameter param : params) {
+
+      if (param.isAllVariables()) {
+        Map<String, Object> allVariables = variableScope.getVariables();
+        result.putAll(allVariables);
+
+      } else {
+        String targetVariableName = param.getTarget();
+        Object value = param.getSource(variableScope);
+        result.put(targetVariableName, value);
+      }
+
+    }
+
+    return result;
+  }
+
+  // deployment id //////////////////////////////////////////////////////////////
+
+  public String getDeploymentId() {
+    return deploymentId;
+  }
+
+  public void setDeploymentId(String deploymentId) {
+    this.deploymentId = deploymentId;
   }
 
 }
