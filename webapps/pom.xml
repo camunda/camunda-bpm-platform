@@ -46,7 +46,7 @@
                     <exec executable="cmd" failonerror="true">
                       <arg value="/c" />
                       <arg value="npm" />
-                      <arg value="runscript" />
+                      <arg value="run-script" />
                       <arg value="win-build-sdk" />
                     </exec>
                     <exec executable="cmd" failonerror="true">
@@ -91,7 +91,7 @@
                       <arg value="install" />
                     </exec>
                     <exec executable="npm" failonerror="true">
-                      <arg value="runscript" />
+                      <arg value="run-script" />
                       <arg value="build-sdk" />
                     </exec>
                     <exec executable="./node_modules/grunt-cli/bin/grunt" failonerror="true">
