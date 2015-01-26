@@ -54,10 +54,10 @@
       </build>
     </profile>
     <profile>
-      <id>72</id>
+      <id>73</id>
       <properties>
         <test.version.current>${project.version}</test.version.current>
-        <test.version.current.major>7.2</test.version.current.major>
+        <test.version.current.major>7.3</test.version.current.major>
       </properties>
       <dependencies>
         <dependency>
