@@ -19,61 +19,82 @@
       This process definition will be suspended, so that it will not be possible to start new process instances based on this process definition.
     </p>
 
-    <form class="form-horizontal" name="updateSuspensionStateForm" novalidate request-aware ng-submit="updateSuspensionState()">
+    <form class="form-horizontal"
+          name="updateSuspensionStateForm"
+          novalidate
+          request-aware
+          ng-submit="updateSuspensionState()">
       <fieldset>
         <div class="form-group">
-          <label class="control-label" for="includeInstancesValue">Include Instances
+          <label class="control-label col-xs-4"
+                 for="includeInstancesValue">Include Instances
             <!-- activation -->
-            <span class="btn btn-sm btn-link btn-control btn-control-link"
-                  tooltip="Including the process instances means that all existing process instances of this process definition will be activated too, if the value is set to true."
+            <span tooltip="Including the process instances means that all existing process instances of this process definition will be activated too, if the value is set to true."
                   tooltip-placement="right"
                   ng-show="processDefinition.suspended">
               <i class="glyphicon glyphicon-question-sign"></i>
             </span>
 
             <!-- suspension -->
-            <span class="btn btn-sm btn-link btn-control btn-control-link"
-                  tooltip="Including the process instances means that all existing process instances of this process definition will be suspended too, if the value is set to true."
+            <span tooltip="Including the process instances means that all existing process instances of this process definition will be suspended too, if the value is set to true."
                   tooltip-placement="right"
                   ng-hide="processDefinition.suspended">
               <i class="glyphicon glyphicon-question-sign"></i>
             </span>
           </label>
-          <div class="controls">
-            <input id="includeInstancesValueId" name="includeInstancesValue" type="checkbox" ng-model="data.includeInstances">
+          <div class="col-xs-8">
+            <label class="checkbox">
+              <input id="includeInstancesValueId"
+                     name="includeInstancesValue"
+                     type="checkbox"
+                     ng-model="data.includeInstances">
+            </label>
           </div>
         </div>
 
         <div class="form-group">
-          <label class="control-label" for="executeImmediately">Execute
-            <span class="btn btn-sm btn-link btn-control btn-control-link"
-                  tooltip="Decide whether the activation of this process definition should be executed immediately or delayed. If the activation should happen delayed then an execution date must be provided on which the activation will be scheduled."
+          <label class="control-label col-xs-4" for="executeImmediately">Execute
+            <span tooltip="Decide whether the activation of this process definition should be executed immediately or delayed. If the activation should happen delayed then an execution date must be provided on which the activation will be scheduled."
                   tooltip-placement="right"
                   ng-show="processDefinition.suspended">
               <i class="glyphicon glyphicon-question-sign"></i>
             </span>
-            <span class="btn btn-sm btn-link btn-control btn-control-link"
-                  tooltip="Decide whether the suspension of this process definition should be executed immediately or delayed. If the suspension should happen delayed then an execution date must be provided on which the suspension will be scheduled."
+            <span tooltip="Decide whether the suspension of this process definition should be executed immediately or delayed. If the suspension should happen delayed then an execution date must be provided on which the suspension will be scheduled."
                   tooltip-placement="right"
                   ng-hide="processDefinition.suspended">
               <i class="glyphicon glyphicon-question-sign"></i>
             </span>
           </label>
-          <div class="controls">
+          <div class="col-xs-8">
             <label class="radio">
-              <input ng-model="data.executeImmediately" ng-value="true" type="radio" name="execute">
+              <input ng-model="data.executeImmediately"
+                     ng-value="true"
+                     type="radio"
+                     name="execute">
               Immediately
             </label>
+
             <label class="radio">
-              <input ng-model="data.executeImmediately" ng-value="false" type="radio" name="execute">
+              <input ng-model="data.executeImmediately"
+                     ng-value="false"
+                     type="radio"
+                     name="execute">
               Delayed
             </label>
           </div>
-          <label class="control-label" for="executionDateValue" ng-show="!data.executeImmediately">Schedule at</label>
-          <div class="controls" ng-show="!data.executeImmediately">
-            <input date name="executionDateValue" ng-model="data.executionDate" type="text" required>
+          <label class="control-label col-xs-4"
+                 for="executionDateValue"
+                 ng-show="!data.executeImmediately">Schedule at</label>
+          <div class="col-xs-8"
+               ng-show="!data.executeImmediately">
+            <input date
+                   name="executionDateValue"
+                   ng-model="data.executionDate"
+                   type="text"
+                   required />
 
-            <p class="invalid" ng-show="this.updateSuspensionStateForm.executionDateValue.$error.date">
+            <p class="invalid"
+               ng-show="this.updateSuspensionStateForm.executionDateValue.$error.date">
               Supported pattern 'yyyy-MM-ddTHH:mm:ss'.
             </p>
           </div>
@@ -126,11 +147,14 @@
 
 </div>
 <div class="modal-footer">
-  <button class="btn" ng-click="close(status)"
+  <button class="btn"
+          ng-click="close(status)"
           ng-disabled="status === 'PERFORM_UDPATE'"
           ng-hide="status === 'SUCCESS' || status === 'FAIL'">Close</button>
 
-  <button type="submit" class="btn btn-primary" ng-click="updateSuspensionState()"
+  <button type="submit"
+          class="btn btn-primary"
+          ng-click="updateSuspensionState()"
           ng-hide="status === 'SUCCESS' || status === 'FAIL'"
           ng-disabled="!isValid() || status === 'PERFORM_UDPATE'">
     <span ng-hide="processDefinition.suspended">Suspend</span>
@@ -138,7 +162,8 @@
     <span></span>
   </button>
 
-  <button class="btn btn-primary" ng-click="close(status)"
+  <button class="btn btn-primary"
+          ng-click="close(status)"
           ng-show="status === 'SUCCESS' || status === 'FAIL'">OK</button>
 </div>
 <!-- / CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/base/app/views/processDefinition/update-suspension-state-dialog.html -->
