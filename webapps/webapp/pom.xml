@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.camunda.bpm.webapp</groupId>
     <artifactId>camunda-webapp-root</artifactId>
-    <version>7.3.0-SNAPSHOT</version>
+    <version>7.3.0-alpha1</version>
   </parent>
 
   <artifactId>camunda-webapp</artifactId>
@@ -470,7 +470,7 @@
                 <configuration>
                   <target>
                     <echo message="updating configuration to db ${database.type}" />
-                    <copy file="target/test-classes/camunda.cfg.db.xml" tofile="target/test-classes/camunda.cfg.xml" overwrite="true"/>
+                    <copy file="target/test-classes/camunda.cfg.db.xml" tofile="target/test-classes/camunda.cfg.xml" overwrite="true" />
 
                     <echo message="dropping schema in ${database.type}" />
                     <java classname="org.camunda.bpm.engine.impl.db.DbSchemaDrop" classpathref="maven.test.classpath" />
