@@ -29,6 +29,7 @@ create table ACT_HI_CASEACTINST (
     END_TIME_ datetime,
     DURATION_ bigint,
     STATE_ integer,
+    REQUIRED_ boolean,
     primary key (ID_)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 

@@ -29,6 +29,7 @@ create table ACT_HI_CASEACTINST (
     END_TIME_ timestamp,
     DURATION_ bigint,
     STATE_ integer,
+    REQUIRED_ boolean,
     primary key (ID_)
 );
 

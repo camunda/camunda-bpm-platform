@@ -107,7 +107,7 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
   /** the activity which is to be started next */
   protected transient CmmnActivity nextActivity;
 
-  protected boolean required;
+  protected boolean required = false;
 
   protected int previousState;
 

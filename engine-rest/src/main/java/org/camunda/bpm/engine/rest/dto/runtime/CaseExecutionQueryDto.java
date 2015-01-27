@@ -52,6 +52,7 @@ public class CaseExecutionQueryDto extends AbstractQueryDto<CaseExecutionQuery> 
   protected String caseInstanceId;
   protected String businessKey;
   protected String activityId;
+  protected Boolean required;
   protected Boolean enabled;
   protected Boolean active;
   protected Boolean disabled;
@@ -94,6 +95,11 @@ public class CaseExecutionQueryDto extends AbstractQueryDto<CaseExecutionQuery> 
   @CamundaQueryParam("activityId")
   public void setActivityId(String activityId) {
     this.activityId = activityId;
+  }
+
+  @CamundaQueryParam(value="required", converter = BooleanConverter.class)
+  public void setRequired(Boolean required) {
+    this.required = required;
   }
 
   @CamundaQueryParam(value="enabled", converter = BooleanConverter.class)
@@ -155,6 +161,10 @@ public class CaseExecutionQueryDto extends AbstractQueryDto<CaseExecutionQuery> 
 
     if (activityId != null) {
       query.activityId(activityId);
+    }
+
+    if (required != null && required == true) {
+      query.required();
     }
 
     if (active != null && active == true) {

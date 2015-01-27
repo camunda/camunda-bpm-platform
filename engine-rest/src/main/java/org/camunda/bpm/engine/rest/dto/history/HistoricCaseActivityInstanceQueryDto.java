@@ -65,6 +65,7 @@ public class HistoricCaseActivityInstanceQueryDto extends AbstractQueryDto<Histo
   protected Date createdAfter;
   protected Date endedBefore;
   protected Date endedAfter;
+  protected Boolean required;
   protected Boolean finished;
   protected Boolean unfinished;
   protected Boolean available;
@@ -134,6 +135,11 @@ public class HistoricCaseActivityInstanceQueryDto extends AbstractQueryDto<Histo
   @CamundaQueryParam(value = "endedAfter", converter = DateConverter.class)
   public void setEndedAfter(Date endedAfter) {
     this.endedAfter = endedAfter;
+  }
+
+  @CamundaQueryParam(value = "required", converter = BooleanConverter.class)
+  public void setRequired(Boolean required) {
+    this.required = required;
   }
 
   @CamundaQueryParam(value = "finished", converter = BooleanConverter.class)
@@ -220,6 +226,9 @@ public class HistoricCaseActivityInstanceQueryDto extends AbstractQueryDto<Histo
     }
     if (endedAfter != null) {
       query.endedAfter(endedAfter);
+    }
+    if (required != null && required) {
+      query.required();
     }
     if (finished != null && finished) {
       query.ended();

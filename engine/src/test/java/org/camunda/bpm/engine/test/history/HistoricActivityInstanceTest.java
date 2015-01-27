@@ -14,6 +14,7 @@
 package org.camunda.bpm.engine.test.history;
 
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -22,6 +23,8 @@ import java.util.Map;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricActivityInstanceQuery;
+import org.camunda.bpm.engine.history.HistoricCaseActivityInstance;
+import org.camunda.bpm.engine.history.HistoricCaseActivityInstanceQuery;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.history.event.HistoricActivityInstanceEventEntity;
@@ -973,4 +976,47 @@ public class HistoricActivityInstanceTest extends PluggableProcessEngineTestCase
     assertEquals(subCaseInstanceId, historicCallActivity.getCalledCaseInstanceId());
     assertNotNull(historicCallActivity.getEndTime());
   }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/cmmn/required/RequiredRuleTest.testVariableBasedRule.cmmn")
+  public void testRequiredRuleEvaluatesToTrue() {
+    caseService.createCaseInstanceByKey("case", Collections.<String, Object>singletonMap("required", true));
+
+    HistoricCaseActivityInstance task = historyService
+        .createHistoricCaseActivityInstanceQuery()
+        .caseActivityId("PI_HumanTask_1")
+        .singleResult();
+
+    assertNotNull(task);
+    assertTrue(task.isRequired());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/cmmn/required/RequiredRuleTest.testVariableBasedRule.cmmn")
+  public void testRequiredRuleEvaluatesToFalse() {
+    caseService.createCaseInstanceByKey("case", Collections.<String, Object>singletonMap("required", false));
+
+    HistoricCaseActivityInstance task = historyService
+        .createHistoricCaseActivityInstanceQuery()
+        .caseActivityId("PI_HumanTask_1")
+        .singleResult();
+
+    assertNotNull(task);
+    assertFalse(task.isRequired());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/cmmn/required/RequiredRuleTest.testVariableBasedRule.cmmn")
+  public void testQueryByRequired() {
+    caseService.createCaseInstanceByKey("case", Collections.<String, Object>singletonMap("required", true));
+
+    HistoricCaseActivityInstanceQuery query = historyService
+        .createHistoricCaseActivityInstanceQuery()
+        .required();
+
+    assertEquals(1, query.count());
+    assertEquals(1, query.list().size());
+
+    HistoricCaseActivityInstance activityInstance = query.singleResult();
+    assertNotNull(activityInstance);
+    assertTrue(activityInstance.isRequired());
+  }
+
 }

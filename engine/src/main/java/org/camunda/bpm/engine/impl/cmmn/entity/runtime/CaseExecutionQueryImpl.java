@@ -41,6 +41,7 @@ public class CaseExecutionQueryImpl extends AbstractVariableQueryImpl<CaseExecut
   protected String caseInstanceId;
   protected String businessKey;
   protected CaseExecutionState state;
+  protected Boolean required = false;
 
   // Not used by end-users, but needed for dynamic ibatis query
   protected String superProcessInstanceId;
@@ -92,6 +93,11 @@ public class CaseExecutionQueryImpl extends AbstractVariableQueryImpl<CaseExecut
   public CaseExecutionQuery activityId(String activityId) {
     ensureNotNull(NotValidException.class, "activityId", activityId);
     this.activityId = activityId;
+    return this;
+  }
+
+  public CaseExecutionQuery required() {
+    this.required = true;
     return this;
   }
 
@@ -244,4 +250,7 @@ public class CaseExecutionQueryImpl extends AbstractVariableQueryImpl<CaseExecut
     return subCaseInstanceId;
   }
 
+  public Boolean isRequired() {
+    return required;
+  }
 }

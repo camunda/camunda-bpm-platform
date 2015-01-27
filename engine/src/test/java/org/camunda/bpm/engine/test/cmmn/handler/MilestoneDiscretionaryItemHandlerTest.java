@@ -12,21 +12,31 @@
  */
 package org.camunda.bpm.engine.test.cmmn.handler;
 
-import static org.camunda.bpm.engine.impl.cmmn.handler.ItemHandler.PROPERTY_ACTIVITY_TYPE;
 import static org.camunda.bpm.engine.impl.cmmn.handler.ItemHandler.PROPERTY_ACTIVITY_DESCRIPTION;
+import static org.camunda.bpm.engine.impl.cmmn.handler.ItemHandler.PROPERTY_ACTIVITY_TYPE;
 import static org.camunda.bpm.engine.impl.cmmn.handler.ItemHandler.PROPERTY_DISCRETIONARY;
+import static org.camunda.bpm.engine.impl.cmmn.handler.ItemHandler.PROPERTY_REQUIRED_RULE;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import org.camunda.bpm.engine.impl.cmmn.CaseControlRule;
 import org.camunda.bpm.engine.impl.cmmn.behavior.CmmnActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.behavior.MilestoneActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.handler.MilestoneItemHandler;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
+import org.camunda.bpm.model.cmmn.Cmmn;
+import org.camunda.bpm.model.cmmn.impl.instance.Body;
+import org.camunda.bpm.model.cmmn.impl.instance.ConditionExpression;
+import org.camunda.bpm.model.cmmn.impl.instance.DefaultControl;
+import org.camunda.bpm.model.cmmn.impl.instance.ItemControl;
 import org.camunda.bpm.model.cmmn.instance.DiscretionaryItem;
 import org.camunda.bpm.model.cmmn.instance.Milestone;
+import org.camunda.bpm.model.cmmn.instance.PlanItemControl;
 import org.camunda.bpm.model.cmmn.instance.PlanningTable;
+import org.camunda.bpm.model.cmmn.instance.RequiredRule;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -153,6 +163,46 @@ public class MilestoneDiscretionaryItemHandlerTest extends CmmnElementHandlerTes
     // then
     assertEquals(parent, activity.getParent());
     assertTrue(parent.getActivities().contains(activity));
+  }
+
+  @Test
+  public void testRequiredRule() {
+    // given
+    ItemControl itemControl = createElement(discretionaryItem, "ItemControl_1", ItemControl.class);
+    RequiredRule requiredRule = createElement(itemControl, "RequiredRule_1", RequiredRule.class);
+    ConditionExpression expression = createElement(requiredRule, "Expression_1", ConditionExpression.class);
+    Body body = createElement(expression, Body.class);
+    body.setTextContent("${true}");
+
+    Cmmn.validateModel(modelInstance);
+
+    // when
+    CmmnActivity newActivity = handler.handleElement(discretionaryItem, context);
+
+    // then
+    Object rule = newActivity.getProperty(PROPERTY_REQUIRED_RULE);
+    assertNotNull(rule);
+    assertTrue(rule instanceof CaseControlRule);
+  }
+
+  @Test
+  public void testRequiredRuleByDefaultPlanItemControl() {
+    // given
+    PlanItemControl defaultControl = createElement(milestone, "ItemControl_1", DefaultControl.class);
+    RequiredRule requiredRule = createElement(defaultControl, "RequiredRule_1", RequiredRule.class);
+    ConditionExpression expression = createElement(requiredRule, "Expression_1", ConditionExpression.class);
+    Body body = createElement(expression, Body.class);
+    body.setTextContent("${true}");
+
+    Cmmn.validateModel(modelInstance);
+
+    // when
+    CmmnActivity newActivity = handler.handleElement(discretionaryItem, context);
+
+    // then
+    Object rule = newActivity.getProperty(PROPERTY_REQUIRED_RULE);
+    assertNotNull(rule);
+    assertTrue(rule instanceof CaseControlRule);
   }
 
 }

@@ -58,6 +58,9 @@ public interface HistoricCaseActivityInstanceQuery extends Query<HistoricCaseAct
   /** Only select historic case activity instances that were ended (ie. completed or terminated) after the given date. */
   HistoricCaseActivityInstanceQuery endedAfter(Date date);
 
+  /** Only select historic case activity instances which are required. */
+  HistoricCaseActivityInstanceQuery required();
+
   /** Only select historic case activity instances which are already ended (ie. completed or terminated). */
   HistoricCaseActivityInstanceQuery ended();
 

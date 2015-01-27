@@ -29,6 +29,7 @@ create table ACT_HI_CASEACTINST (
     END_TIME_ TIMESTAMP(6),
     DURATION_ NUMBER(19,0),
     STATE_ INTEGER,
+    REQUIRED_ NUMBER(1,0) CHECK (SATISFIED_ IN (1,0)),
     primary key (ID_)
 );
 

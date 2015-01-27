@@ -27,6 +27,7 @@ create table ACT_RU_CASE_EXECUTION (
     ACT_ID_ NVARCHAR2(255),
     PREV_STATE_ INTEGER,
     CURRENT_STATE_ INTEGER,
+    REQUIRED_ NUMBER(1,0) CHECK (SATISFIED_ IN (1,0)),
     primary key (ID_)
 );
 

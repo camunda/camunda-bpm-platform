@@ -56,6 +56,8 @@ public class HistoricCaseActivityInstanceEventEntity extends HistoricScopeInstan
   /** the id of the called case in case of a case task */
   protected String calledCaseInstanceId;
 
+  /** the flag whether this case activity is required */
+  protected boolean required = false;
 
   // getters and setters //////////////////////////////////////////////////////
 
@@ -135,6 +137,14 @@ public class HistoricCaseActivityInstanceEventEntity extends HistoricScopeInstan
     setStartTime(createTime);
   }
 
+  public boolean isRequired() {
+    return required;
+  }
+
+  public void setRequired(boolean required) {
+    this.required = required;
+  }
+
   public boolean isAvailable() {
     return caseActivityInstanceState == AVAILABLE.getStateCode();
   }
@@ -163,7 +173,6 @@ public class HistoricCaseActivityInstanceEventEntity extends HistoricScopeInstan
     return caseActivityInstanceState == TERMINATED.getStateCode();
   }
 
-  @Override
   public String toString() {
     return this.getClass().getSimpleName()
            + "[caseActivityId=" + caseActivityId

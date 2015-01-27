@@ -83,6 +83,7 @@ public abstract class AbstractHistoricCaseActivityInstanceRestServiceInteraction
     String returnedCreateTime = from(content).getString("createTime");
     String returnedEndTime = from(content).getString("endTime");
     long returnedDurationInMillis = from(content).getLong("durationInMillis");
+    boolean required = from(content).getBoolean("required");
     boolean available = from(content).getBoolean("available");
     boolean enabled = from(content).getBoolean("enabled");
     boolean disabled = from(content).getBoolean("disabled");
@@ -104,6 +105,7 @@ public abstract class AbstractHistoricCaseActivityInstanceRestServiceInteraction
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_CREATE_TIME, returnedCreateTime);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_END_TIME, returnedEndTime);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_DURATION, returnedDurationInMillis);
+    Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_IS_REQUIRED, required);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_IS_AVAILABLE, available);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_IS_ENABLED, enabled);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_IS_DISABLED, disabled);

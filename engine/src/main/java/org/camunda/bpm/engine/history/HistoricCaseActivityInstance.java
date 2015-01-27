@@ -64,6 +64,9 @@ public interface HistoricCaseActivityInstance {
    /** Difference between {@link #getEndTime()} and {@link #getCreateTime()}.  */
    Long getDurationInMillis();
 
+   /** Check if the case activity is required. */
+   boolean isRequired();
+
     /** Check if the case activity is available. */
    boolean isAvailable();
 

@@ -52,6 +52,7 @@ public class HistoricCaseActivityInstanceQueryImpl extends AbstractQuery<Histori
   protected Date endedAfter;
   protected Boolean ended;
   protected Integer caseActivityInstanceState;
+  protected Boolean required;
 
   public HistoricCaseActivityInstanceQueryImpl() {
   }
@@ -141,6 +142,11 @@ public class HistoricCaseActivityInstanceQueryImpl extends AbstractQuery<Histori
   public HistoricCaseActivityInstanceQuery endedAfter(Date date) {
     ensureNotNull(NotValidException.class, "finishedAfter", date);
     this.endedAfter = date;
+    return this;
+  }
+
+  public HistoricCaseActivityInstanceQuery required() {
+    this.required = true;
     return this;
   }
 
@@ -296,6 +302,10 @@ public class HistoricCaseActivityInstanceQueryImpl extends AbstractQuery<Histori
 
   public Integer getCaseActivityInstanceState() {
     return caseActivityInstanceState;
+  }
+
+  public Boolean isRequired() {
+    return required;
   }
 
 }

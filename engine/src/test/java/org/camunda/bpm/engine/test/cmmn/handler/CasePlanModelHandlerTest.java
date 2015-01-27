@@ -12,10 +12,12 @@
  */
 package org.camunda.bpm.engine.test.cmmn.handler;
 
-import static org.camunda.bpm.engine.impl.cmmn.handler.ItemHandler.PROPERTY_ACTIVITY_TYPE;
 import static org.camunda.bpm.engine.impl.cmmn.handler.ItemHandler.PROPERTY_ACTIVITY_DESCRIPTION;
+import static org.camunda.bpm.engine.impl.cmmn.handler.ItemHandler.PROPERTY_ACTIVITY_TYPE;
+import static org.camunda.bpm.engine.impl.cmmn.handler.ItemHandler.PROPERTY_AUTO_COMPLETE;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
@@ -200,6 +202,20 @@ public class CasePlanModelHandlerTest extends CmmnElementHandlerTest {
     assertTrue(newActivity.getExitCriteria().contains(firstSentryDeclaration));
     assertTrue(newActivity.getExitCriteria().contains(secondSentryDeclaration));
 
+  }
+
+  @Test
+  public void testAutoComplete() {
+    // given
+    casePlanModel.setAutoComplete(true);
+
+    // when
+    CmmnActivity newActivity = handler.handleElement(casePlanModel, context);
+
+    // then
+    Object autoComplete = newActivity.getProperty(PROPERTY_AUTO_COMPLETE);
+    assertNotNull(autoComplete);
+    assertTrue((Boolean) autoComplete);
   }
 
 }

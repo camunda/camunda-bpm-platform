@@ -19,6 +19,7 @@
       SUPER_EXEC_,
       CURRENT_STATE_,
       PREV_STATE_,
+      REQUIRED_,
       REV_
     )
     values
@@ -33,6 +34,7 @@
       #{superExecutionId, jdbcType=VARCHAR},
       #{state, jdbcType=INTEGER},
       #{previous, jdbcType=INTEGER},
+      #{required, jdbcType=BOOLEAN},
       1
     )
   </insert>
@@ -70,6 +72,7 @@
     <result property="superExecutionId" column="SUPER_EXEC_" jdbcType="VARCHAR" />
     <result property="state" column="CURRENT_STATE_" jdbcType="INTEGER" />
     <result property="previous" column="PREV_STATE_" jdbcType="INTEGER" />
+    <result property="required" column="REQUIRED_" jdbcType="BOOLEAN" />
   </resultMap>
 
   <!-- CASE EXECUTION SELECT -->
@@ -161,6 +164,9 @@
       </if>
       <if test="state != null">
         and RES.CURRENT_STATE_ = #{state.stateCode}
+      </if>
+      <if test="required">
+        and RES.REQUIRED_ = ${trueConstant}
       </if>
 
       <if test="superProcessInstanceId != null">

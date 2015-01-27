@@ -25,6 +25,7 @@ create table ACT_RU_CASE_EXECUTION (
     ACT_ID_ nvarchar(255),
     PREV_STATE_ int,
     CURRENT_STATE_ int,
+    REQUIRED_ tinyint,
     primary key (ID_)
 );
 

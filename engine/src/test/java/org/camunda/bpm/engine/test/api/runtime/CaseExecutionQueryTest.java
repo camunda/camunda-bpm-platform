@@ -13,6 +13,7 @@
 package org.camunda.bpm.engine.test.api.runtime;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -2506,5 +2507,20 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
     assertEquals("humanTask", task.getActivityType());
     assertNotNull(task.getActivityDescription());
     assertNotNull(task.getId());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/cmmn/required/RequiredRuleTest.testVariableBasedRule.cmmn")
+  public void testQueryByRequired() {
+    caseService.createCaseInstanceByKey("case", Collections.<String, Object>singletonMap("required", true));
+
+    CaseExecutionQuery query = caseService
+        .createCaseExecutionQuery()
+        .required();
+
+    verifyQueryResults(query, 1);
+
+    CaseExecution execution = query.singleResult();
+    assertNotNull(execution);
+    assertTrue(execution.isRequired());
   }
 }

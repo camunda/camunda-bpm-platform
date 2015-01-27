@@ -30,6 +30,7 @@ create table ACT_HI_CASEACTINST (
     END_TIME_ timestamp,
     DURATION_ bigint,
     STATE_ integer,
+    REQUIRED_ smallint check(REQUIRED_ in (1,0)),
     primary key (ID_)
 );
 

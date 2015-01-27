@@ -17,6 +17,7 @@ import static org.camunda.bpm.engine.impl.cmmn.handler.ItemHandler.PROPERTY_ACTI
 import static org.camunda.bpm.engine.impl.cmmn.handler.ItemHandler.PROPERTY_DISCRETIONARY;
 import static org.camunda.bpm.engine.impl.cmmn.handler.ItemHandler.PROPERTY_IS_BLOCKING;
 import static org.camunda.bpm.engine.impl.cmmn.handler.ItemHandler.PROPERTY_MANUAL_ACTIVATION_RULE;
+import static org.camunda.bpm.engine.impl.cmmn.handler.ItemHandler.PROPERTY_REQUIRED_RULE;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -38,6 +39,7 @@ import org.camunda.bpm.model.cmmn.instance.HumanTask;
 import org.camunda.bpm.model.cmmn.instance.ManualActivationRule;
 import org.camunda.bpm.model.cmmn.instance.PlanItemControl;
 import org.camunda.bpm.model.cmmn.instance.PlanningTable;
+import org.camunda.bpm.model.cmmn.instance.RequiredRule;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -206,8 +208,7 @@ public class HumanTaskDicretionaryItemHandlerTest extends CmmnElementHandlerTest
     Body body = createElement(expression, Body.class);
     body.setTextContent("${true}");
 
-    // xml is not valid; fix CAM-3170 first
-    // Cmmn.validateModel(modelInstance);
+    Cmmn.validateModel(modelInstance);
 
     // when
     CmmnActivity newActivity = handler.handleElement(discretionaryItem, context);
@@ -234,6 +235,46 @@ public class HumanTaskDicretionaryItemHandlerTest extends CmmnElementHandlerTest
 
     // then
     Object rule = newActivity.getProperty(PROPERTY_MANUAL_ACTIVATION_RULE);
+    assertNotNull(rule);
+    assertTrue(rule instanceof CaseControlRule);
+  }
+
+  @Test
+  public void testRequiredRule() {
+    // given
+    ItemControl itemControl = createElement(discretionaryItem, "ItemControl_1", ItemControl.class);
+    RequiredRule requiredRule = createElement(itemControl, "RequiredRule_1", RequiredRule.class);
+    ConditionExpression expression = createElement(requiredRule, "Expression_1", ConditionExpression.class);
+    Body body = createElement(expression, Body.class);
+    body.setTextContent("${true}");
+
+    Cmmn.validateModel(modelInstance);
+
+    // when
+    CmmnActivity newActivity = handler.handleElement(discretionaryItem, context);
+
+    // then
+    Object rule = newActivity.getProperty(PROPERTY_REQUIRED_RULE);
+    assertNotNull(rule);
+    assertTrue(rule instanceof CaseControlRule);
+  }
+
+  @Test
+  public void testRequiredRuleByDefaultPlanItemControl() {
+    // given
+    PlanItemControl defaultControl = createElement(humanTask, "ItemControl_1", DefaultControl.class);
+    RequiredRule requiredRule = createElement(defaultControl, "RequiredRule_1", RequiredRule.class);
+    ConditionExpression expression = createElement(requiredRule, "Expression_1", ConditionExpression.class);
+    Body body = createElement(expression, Body.class);
+    body.setTextContent("${true}");
+
+    Cmmn.validateModel(modelInstance);
+
+    // when
+    CmmnActivity newActivity = handler.handleElement(discretionaryItem, context);
+
+    // then
+    Object rule = newActivity.getProperty(PROPERTY_REQUIRED_RULE);
     assertNotNull(rule);
     assertTrue(rule instanceof CaseControlRule);
   }

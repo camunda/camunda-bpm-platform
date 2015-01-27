@@ -313,6 +313,7 @@ public abstract class AbstractHistoricCaseActivityInstanceRestServiceQueryTest e
     Date returnedCreateTime = DateTimeUtil.parseDate(from(content).getString("[0].createTime"));
     Date returnedEndTime = DateTimeUtil.parseDate(from(content).getString("[0].endTime"));
     long returnedDurationInMillis = from(content).getLong("[0].durationInMillis");
+    boolean required = from(content).getBoolean("[0].required");
     boolean available = from(content).getBoolean("[0].available");
     boolean enabled = from(content).getBoolean("[0].enabled");
     boolean disabled = from(content).getBoolean("[0].disabled");
@@ -334,6 +335,7 @@ public abstract class AbstractHistoricCaseActivityInstanceRestServiceQueryTest e
     Assert.assertEquals(DateTimeUtil.parseDate(MockProvider.EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_CREATE_TIME), returnedCreateTime);
     Assert.assertEquals(DateTimeUtil.parseDate(MockProvider.EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_END_TIME), returnedEndTime);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_DURATION, returnedDurationInMillis);
+    Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_IS_REQUIRED, required);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_IS_AVAILABLE, available);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_IS_ENABLED, enabled);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_IS_DISABLED, disabled);
@@ -401,6 +403,7 @@ public abstract class AbstractHistoricCaseActivityInstanceRestServiceQueryTest e
   protected Map<String, Boolean> getCompleteBooleanQueryParameters() {
     Map<String, Boolean> parameters = new HashMap<String, Boolean>();
 
+    parameters.put("required", MockProvider.EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_IS_REQUIRED);
     parameters.put("finished", MockProvider.EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_IS_FINISHED);
     parameters.put("unfinished", MockProvider.EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_IS_UNFINISHED);
     parameters.put("available", MockProvider.EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_IS_AVAILABLE);
@@ -415,6 +418,7 @@ public abstract class AbstractHistoricCaseActivityInstanceRestServiceQueryTest e
 
   protected void verifyBooleanParameterQueryInvocations() {
     Map<String, Boolean> booleanParams = getCompleteBooleanQueryParameters();
+    Boolean required = booleanParams.get("required");
     Boolean finished = booleanParams.get("finished");
     Boolean unfinished = booleanParams.get("unfinished");
     Boolean available = booleanParams.get("available");
@@ -424,6 +428,9 @@ public abstract class AbstractHistoricCaseActivityInstanceRestServiceQueryTest e
     Boolean completed = booleanParams.get("completed");
     Boolean terminated = booleanParams.get("terminated");
 
+    if (required != null && required) {
+      verify(mockedQuery).required();
+    }
     if (finished != null && finished) {
       verify(mockedQuery).ended();
     }

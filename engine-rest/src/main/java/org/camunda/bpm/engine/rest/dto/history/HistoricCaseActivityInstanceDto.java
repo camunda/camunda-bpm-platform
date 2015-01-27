@@ -32,6 +32,7 @@ public class HistoricCaseActivityInstanceDto {
   private Date createTime;
   private Date endTime;
   private Long durationInMillis;
+  private Boolean required;
   private Boolean available;
   private Boolean enabled;
   private Boolean disabled;
@@ -95,6 +96,10 @@ public class HistoricCaseActivityInstanceDto {
     return durationInMillis;
   }
 
+  public Boolean getRequired() {
+    return required;
+  }
+
   public Boolean getAvailable() {
     return available;
   }
@@ -137,6 +142,7 @@ public class HistoricCaseActivityInstanceDto {
     dto.createTime = historicCaseActivityInstance.getCreateTime();
     dto.endTime = historicCaseActivityInstance.getEndTime();
     dto.durationInMillis = historicCaseActivityInstance.getDurationInMillis();
+    dto.required = historicCaseActivityInstance.isRequired();
     dto.available = historicCaseActivityInstance.isAvailable();
     dto.enabled = historicCaseActivityInstance.isEnabled();
     dto.disabled = historicCaseActivityInstance.isDisabled();

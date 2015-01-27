@@ -43,6 +43,9 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
   protected String superCaseInstanceId;
   protected String subCaseInstanceId;
 
+  // Not used by end-users, but needed for dynamic ibatis query
+  protected Boolean required;
+
   public CaseInstanceQueryImpl() {
   }
 
@@ -200,6 +203,10 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
 
   public String getSubCaseInstanceId() {
     return subCaseInstanceId;
+  }
+
+  public Boolean isRequired() {
+    return required;
   }
 
 }

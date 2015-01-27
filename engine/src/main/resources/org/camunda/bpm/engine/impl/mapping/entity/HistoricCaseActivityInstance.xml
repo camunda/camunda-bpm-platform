@@ -35,7 +35,8 @@
         CREATE_TIME_,
         END_TIME_,
         DURATION_,
-        STATE_
+        STATE_,
+        REQUIRED_
       ) values (
         #{id, jdbcType=VARCHAR},
         #{parentCaseActivityInstanceId, jdbcType=VARCHAR},
@@ -50,7 +51,8 @@
         #{startTime, jdbcType=TIMESTAMP},
         #{endTime, jdbcType=TIMESTAMP},
         #{durationInMillis, jdbcType=BIGINT},
-        #{caseActivityInstanceState, jdbcType=INTEGER}
+        #{caseActivityInstanceState, jdbcType=INTEGER},
+        #{required, jdbcType=BOOLEAN}
       )
   </insert>
 
@@ -105,6 +107,7 @@
     <result property="endTime" column="END_TIME_" jdbcType="TIMESTAMP" />
     <result property="durationInMillis" column="DURATION_" jdbcType="BIGINT" />
     <result property="caseActivityInstanceState" column="STATE_" jdbcType="INTEGER" />
+    <result property="required" column="REQUIRED_" jdbcType="BOOLEAN" />
   </resultMap>
 
   <!-- HISTORIC CASE ACTIVITY INSTANCE SELECT -->
@@ -167,6 +170,9 @@
       </if>
       <if test="caseActivityInstanceState != null">
         and RES.STATE_ = #{caseActivityInstanceState}
+      </if>
+      <if test="required">
+        and RES.REQUIRED_ = ${trueConstant}
       </if>
     </where>
   </sql>
