@@ -19,12 +19,12 @@ This feature is unsupported in your Browser.
     <p>Select a file containing the binary content for  the variable:</p>
 
     <p>
-      <input
-        name="data" type="file"
-        size="50"
-        maxlength="100000"
-        accept="*/*"
-        onchange="angular.element(this).scope().setFile(this)" />
+      <input name="data"
+             type="file"
+             size="50"
+             maxlength="100000"
+             accept="*/*"
+             onchange="angular.element(this).scope().setFile(this)" />
     </p>
 
   </div>
@@ -47,11 +47,14 @@ This feature is unsupported in your Browser.
 </div>
 
 <div class="modal-footer">
-  <button class="btn" ng-click="close(status)"
+  <button class="btn"
+          ng-click="close(status)"
           ng-hide="status === 'uploadSuccess' || status === 'uploadFailed'">Close</button>
-  <button class="btn btn-primary" ng-click="close(status)"
+  <button class="btn btn-primary"
+          ng-click="close(status)"
           ng-show="status === 'uploadSuccess' || status === 'uploadFailed'">OK</button>
-  <button class="btn btn-primary" ng-click="upload()"
+  <button class="btn btn-primary"
+          ng-click="upload()"
           ng-disabled="status !== 'beforeUpload'"
           ng-hide="status === 'uploadSuccess' || status === 'uploadFailed'">Upload</button>
 </div>

@@ -57,12 +57,15 @@
 </div>
 
 <div class="modal-footer">
-  <button class="btn" ng-click="close(status)"
+  <button class="btn"
+          ng-click="close(status)"
           ng-disabled="status === 'performCancellation'"
           ng-hide="status === 'cancellationSuccess' || status === 'cancellationFailed' || status === 'loadingFailed'">Close</button>
-  <button class="btn btn-primary" ng-click="close(status)"
+  <button class="btn btn-primary"
+          ng-click="close(status)"
           ng-show="status === 'cancellationSuccess' || status === 'cancellationFailed' || status === 'loadingFailed'">OK</button>
-  <button class="btn btn-primary" ng-click="cancelProcessInstance()"
+  <button class="btn btn-primary"
+          ng-click="cancelProcessInstance()"
           ng-disabled="status !== 'beforeCancellation'"
           ng-hide="status === 'cancellationSuccess' || status === 'cancellationFailed' || status === 'loadingFailed'">Cancel Process Instance</button>
 </div>

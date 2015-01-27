@@ -6,7 +6,8 @@
 <div class="modal-body">
   <div notifications-panel></div>
 
-  <form name="selectFailedJobsForm" ng-hide="status === 'finished' || status === 'performing'">
+  <form name="selectFailedJobsForm"
+        ng-hide="status === 'finished' || status === 'performing'">
     <fieldset>
       <p>Select one of the following failed jobs to increment their number of retries:</p>
       <table class="table table-striped table-hover table-condensed">
@@ -107,14 +108,17 @@
 </div>
 
 <div class="modal-footer">
-  <button class="btn" ng-click="close()"
+  <button class="btn"
+          ng-click="close()"
           ng-hide="status === 'finished' || status === 'performing'">Close</button>
 
-  <button class="btn btn-primary" ng-click="retryFailedJobs(selectedFailedJobIds)"
+  <button class="btn btn-primary"
+          ng-click="retryFailedJobs(selectedFailedJobIds)"
           ng-disabled="!failedJobs || !failedJobs.length || !selectedFailedJobIds.length"
           ng-hide="status === 'finished' || status === 'performing'">Retry</button>
 
-  <button class="btn btn-primary" ng-click="close()"
+  <button class="btn btn-primary"
+          ng-click="close()"
           ng-disabled="status === 'performing'"
           ng-show="status === 'performing' || status === 'finished'">OK</button>
 </div>

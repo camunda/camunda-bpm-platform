@@ -26,10 +26,12 @@
 
     <ul class="nav nav-tabs">
       <li ng-class="{ active: selectedTab === 'serialized' }">
-        <a href ng-click="selectTab('serialized')">Serialized</a>
+        <a href
+           ng-click="selectTab('serialized')">Serialized</a>
       </li>
       <li ng-class="{ active: selectedTab === 'deserialized' }">
-        <a href ng-click="selectTab('deserialized')">Deserialized</a>
+        <a href
+           ng-click="selectTab('deserialized')">Deserialized</a>
       </li>
     </ul>
     <div>
@@ -42,7 +44,8 @@
         </textarea>
       </div>
       <div ng-if="selectedTab === 'deserialized'">
-        <div class="alert alert-danger" ng-show="deserializationError">
+        <div class="alert alert-danger"
+             ng-show="deserializationError">
           <strong>Deserialization Error</strong>:
           {{deserializationError}}
         </div>
@@ -58,7 +61,8 @@
     </div>
   </form>
 
-  <div class="alert alert-block" ng-show="status === 'confirmChange'">
+  <div class="alert alert-block"
+       ng-show="status === 'confirmChange'">
     <i class="glyphicon glyphicon-warning-sign"></i>
     <strong>Warning:</strong>
     Are you sure you want to change the value of this Object? Changing the variable in an incompatible way may lead to severe runtime problems.
@@ -74,20 +78,20 @@
 </div>
 
 <div class="modal-footer">
-  <button class="btn" ng-click="$dismiss()"
+  <button class="btn"
+          ng-click="$dismiss()"
           ng-hide="status === 'changeSuccess'">Close</button>
   <![if gt IE 9]>
-    <button class="btn btn-primary" ng-click="$close()"
+    <button class="btn btn-primary"
+            ng-click="$close()"
             ng-show="status === 'changeSuccess'">OK</button>
-    <button class="btn btn-primary" ng-click="change()"
+    <button class="btn btn-primary"
+            ng-click="change()"
             ng-disabled="status !== 'beforeChange' || !hasChanged()"
             ng-hide="status != 'beforeChange'">Change</button>
-    <button class="btn btn-warning" ng-click="change()"
+    <button class="btn btn-warning"
+            ng-click="change()"
             ng-hide="status != 'confirmChange'">Confirm Change</button>
   <![endif]>
 </div>
-
-
-
-
 <!-- / CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/base/app/views/processInstance/variable-instance-inspect-dialog.html -->
