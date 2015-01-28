@@ -1,0 +1,30 @@
+td {
+  &.authorization-type {
+    max-width: 80px;
+    select {
+      padding-left: 3px;
+    }
+  }
+
+  &.identity-id {
+    width: 180px;
+  }
+
+  &.resource-id,
+  &.permissions {
+    max-width: 120px;
+  }
+
+  &.permissions {
+    .form-control-static {
+      .border-left-radius(@input-border-radius);
+      background-color: @body-bg;
+      padding-left: 7px;
+      padding-right: 7px;
+    }
+  }
+
+  &.actions {
+    width: 90px;
+  }
+}
