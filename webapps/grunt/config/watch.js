@@ -54,7 +54,7 @@ module.exports = function(config) {
         cwd: '<%= buildTarget %>/',
         livereload: config.livereloadPort || false
       },
-      files: '**/*'
+      files: '**/*.{css,html,js}'
     }
   };
 };
