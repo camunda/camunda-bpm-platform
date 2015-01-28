@@ -643,6 +643,48 @@ public class HistoricCaseActivityInstanceTest extends CmmnProcessEngineTestCase 
     assertNotNull(caseInstance);
   }
 
+  @Deployment(resources = "org/camunda/bpm/engine/test/cmmn/required/RequiredRuleTest.testVariableBasedRule.cmmn")
+  public void testRequiredRuleEvaluatesToTrue() {
+    caseService.createCaseInstanceByKey("case", Collections.<String, Object>singletonMap("required", true));
+
+    HistoricCaseActivityInstance task = historyService
+        .createHistoricCaseActivityInstanceQuery()
+        .caseActivityId("PI_HumanTask_1")
+        .singleResult();
+
+    assertNotNull(task);
+    assertTrue(task.isRequired());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/cmmn/required/RequiredRuleTest.testVariableBasedRule.cmmn")
+  public void testRequiredRuleEvaluatesToFalse() {
+    caseService.createCaseInstanceByKey("case", Collections.<String, Object>singletonMap("required", false));
+
+    HistoricCaseActivityInstance task = historyService
+        .createHistoricCaseActivityInstanceQuery()
+        .caseActivityId("PI_HumanTask_1")
+        .singleResult();
+
+    assertNotNull(task);
+    assertFalse(task.isRequired());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/cmmn/required/RequiredRuleTest.testVariableBasedRule.cmmn")
+  public void testQueryByRequired() {
+    caseService.createCaseInstanceByKey("case", Collections.<String, Object>singletonMap("required", true));
+
+    HistoricCaseActivityInstanceQuery query = historyService
+        .createHistoricCaseActivityInstanceQuery()
+        .required();
+
+    assertEquals(1, query.count());
+    assertEquals(1, query.list().size());
+
+    HistoricCaseActivityInstance activityInstance = query.singleResult();
+    assertNotNull(activityInstance);
+    assertTrue(activityInstance.isRequired());
+  }
+
   protected HistoricCaseActivityInstanceQuery historicQuery() {
     return historyService.createHistoricCaseActivityInstanceQuery();
   }
