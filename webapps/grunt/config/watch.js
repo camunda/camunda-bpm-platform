@@ -60,10 +60,11 @@ module.exports = function(config) {
     },
 
     served: {
-      files: ['<%= buildTarget %>/**/*'],
       options: {
+        cwd: '<%= buildTarget %>/',
         livereload: config.livereloadPort || false
-      }
+      },
+      files: '**/*.{css,html,js}'
     }
   };
 };
