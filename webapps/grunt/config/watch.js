@@ -18,8 +18,8 @@ module.exports = function(config) {
 
     styles: {
       files: [
+        'node_modules/camunda-commons-ui/lib/widgets/**/*.less',
         'node_modules/camunda-commons-ui/resources/less/**/*.less',
-        'node_modules/camunda-*/client/styles/**/*.{css,less}',
         '<%= pkg.gruntConfig.clientDir %>/styles/**/*.{css,less}',
         '<%= pkg.gruntConfig.clientDir %>/scripts/*/*.{css,less}'
       ],
