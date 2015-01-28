@@ -36,6 +36,7 @@ import java.util.List;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.HistoricCaseActivityInstance;
 import org.camunda.bpm.engine.history.HistoricCaseActivityInstanceQuery;
+import org.camunda.bpm.engine.history.HistoricCaseInstance;
 import org.camunda.bpm.engine.impl.AbstractQuery;
 import org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState;
 import org.camunda.bpm.engine.impl.history.event.HistoricCaseActivityInstanceEventEntity;
@@ -683,6 +684,33 @@ public class HistoricCaseActivityInstanceTest extends CmmnProcessEngineTestCase 
     HistoricCaseActivityInstance activityInstance = query.singleResult();
     assertNotNull(activityInstance);
     assertTrue(activityInstance.isRequired());
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/stage/AutoCompleteTest.testCasePlanModel.cmmn"})
+  public void testAutoCompleteEnabled() {
+    String caseInstanceId = createCaseInstanceByKey("case").getId();
+
+    HistoricCaseInstance caseInstance = historyService
+        .createHistoricCaseInstanceQuery()
+        .caseInstanceId(caseInstanceId)
+        .singleResult();
+    assertNotNull(caseInstance);
+    assertTrue(caseInstance.isCompleted());
+
+    HistoricCaseActivityInstanceQuery query = historyService.createHistoricCaseActivityInstanceQuery();
+
+    HistoricCaseActivityInstance humanTask1 = query.caseActivityId("PI_HumanTask_1").singleResult();
+    assertNotNull(humanTask1);
+    assertTrue(humanTask1.isEnabled());
+    assertNull(humanTask1.getEndTime());
+    assertNull(humanTask1.getDurationInMillis());
+
+
+    HistoricCaseActivityInstance humanTask2 = query.caseActivityId("PI_HumanTask_2").singleResult();
+    assertNotNull(humanTask2);
+    assertTrue(humanTask2.isEnabled());
+    assertNull(humanTask2.getEndTime());
+    assertNull(humanTask2.getDurationInMillis());
   }
 
   protected HistoricCaseActivityInstanceQuery historicQuery() {

@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.test.cmmn.handler;
 
 import static org.camunda.bpm.engine.impl.cmmn.handler.ItemHandler.PROPERTY_ACTIVITY_DESCRIPTION;
 import static org.camunda.bpm.engine.impl.cmmn.handler.ItemHandler.PROPERTY_ACTIVITY_TYPE;
+import static org.camunda.bpm.engine.impl.cmmn.handler.ItemHandler.PROPERTY_AUTO_COMPLETE;
 import static org.camunda.bpm.engine.impl.cmmn.handler.ItemHandler.PROPERTY_MANUAL_ACTIVATION_RULE;
 import static org.camunda.bpm.engine.impl.cmmn.handler.ItemHandler.PROPERTY_REQUIRED_RULE;
 import static org.junit.Assert.assertEquals;
@@ -231,6 +232,20 @@ public class StageDiscretionaryItemHandlerTest extends CmmnElementHandlerTest {
     Object rule = newActivity.getProperty(PROPERTY_REQUIRED_RULE);
     assertNotNull(rule);
     assertTrue(rule instanceof CaseControlRule);
+  }
+
+  @Test
+  public void testAutoComplete() {
+    // given
+    stage.setAutoComplete(true);
+
+    // when
+    CmmnActivity newActivity = handler.handleElement(discretionaryItem, context);
+
+    // then
+    Object autoComplete = newActivity.getProperty(PROPERTY_AUTO_COMPLETE);
+    assertNotNull(autoComplete);
+    assertTrue((Boolean) autoComplete);
   }
 
 }

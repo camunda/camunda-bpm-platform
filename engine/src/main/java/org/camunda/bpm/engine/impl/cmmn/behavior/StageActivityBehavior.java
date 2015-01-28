@@ -51,6 +51,14 @@ public class StageActivityBehavior extends StageOrTaskActivityBehavior implement
       List<CmmnExecution> children = execution.createChildExecutions(childActivities);
       execution.createSentryParts();
       execution.triggerChildExecutionsLifecycle(children);
+
+      if (execution.isActive()) {
+        // if "autoComplete == true" and there are no
+        // required nor active child activities,
+        // then the stage will be completed.
+        checkAndCompleteCaseExecution(execution);
+      }
+
     } else {
       execution.complete();
     }
@@ -93,7 +101,7 @@ public class StageActivityBehavior extends StageOrTaskActivityBehavior implement
 
   public void onCompletion(CmmnActivityExecution execution) {
     ensureTransitionAllowed(execution, ACTIVE, COMPLETED, "complete");
-    canComplete(execution, false, true);
+    canComplete(execution, true);
     completing(execution);
   }
 
@@ -103,7 +111,16 @@ public class StageActivityBehavior extends StageOrTaskActivityBehavior implement
     completing(execution);
   }
 
-  protected boolean canComplete(CmmnActivityExecution execution, boolean manualCompletion, boolean throwException) {
+  protected boolean canComplete(CmmnActivityExecution execution) {
+    return canComplete(execution, false);
+  }
+
+  protected boolean canComplete(CmmnActivityExecution execution, boolean throwException) {
+    boolean autoComplete = evaluateAutoComplete(execution);
+    return canComplete(execution, throwException, autoComplete);
+  }
+
+  protected boolean canComplete(CmmnActivityExecution execution, boolean throwException, boolean autoComplete) {
     String id = execution.getId();
 
     List<? extends CmmnExecution> children = execution.getCaseExecutions();
@@ -127,10 +144,7 @@ public class StageActivityBehavior extends StageOrTaskActivityBehavior implement
       }
     }
 
-
-    boolean autoComplete = evaluateAutoComplete(execution);
-
-    if (autoComplete || manualCompletion) {
+    if (autoComplete) {
       // ensure that all required children are DISABLED, COMPLETED and/or TERMINATED
       // available in the case execution tree.
 
@@ -444,18 +458,7 @@ public class StageActivityBehavior extends StageOrTaskActivityBehavior implement
   }
 
   protected void checkAndCompleteCaseExecution(CmmnActivityExecution execution) {
-    String id = execution.getId();
-
-    CmmnActivity activity = getActivity(execution);
-    Object property = activity.getProperty(PROPERTY_AUTO_COMPLETE);
-
-    boolean autoComplete = false;
-    if (property != null) {
-      ensureInstanceOf("Cannot evaluate autoComplete property for case execution '"+id+"': autoComplete property must evaluate to boolean.", "autoComplete", property, Boolean.class);
-      autoComplete = Boolean.valueOf((Boolean) property) ;
-    }
-
-    if (canComplete(execution, autoComplete, false)) {
+    if (canComplete(execution)) {
       execution.complete();
     }
   }
