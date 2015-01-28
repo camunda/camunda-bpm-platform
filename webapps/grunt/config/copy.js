@@ -82,6 +82,14 @@ module.exports = function(config) {
 
     assets: {
       files: [
+        // custom styles and/or other css files
+        {
+          expand: true,
+          cwd: '<%= pkg.gruntConfig.clientDir %>/styles',
+          src: ['*.css'],
+          dest: '<%= buildTarget %>/styles/'
+        },
+
         // images, fonts & stuff
         {
           expand: true,
