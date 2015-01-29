@@ -12,11 +12,11 @@
  */
 package org.camunda.bpm.engine.impl.pvm.runtime.operation;
 
+import java.util.List;
+
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
-
-import java.util.List;
 
 /**
  * <p>Base atomic operation used for implementing atomic operations which
@@ -140,31 +140,81 @@ public abstract class PvmAtomicOperationCreateConcurrentExecution implements Pvm
         && execution.getActivity() == null
         && !execution.isActive()) {
 
-      // Add new child execution and set concurrent flag to true
-      // for already existing child execution
-      //
-      //        ...                         ...
-      //         |                           |
-      //      +------+ s=tt              +-------+ s=tt
-      //      |  e   | cc=ff     =>      |   e   | cc=ff
-      //      +------+                   +-------+
-      //         |                           ^
-      //         |                          / \
-      //         |                         /   \
-      //         |                        /     \          Both:
-      //      +------+ s=tt        +-------+   +--------+    s=ff
-      //      |child | cc=ff       | child |   |  PPE   |   cc=tt
-      //      +------+             +-------+   +--------+
-      //
+        // Add new child execution and set concurrent flag to true
+        // for already existing child execution
+        //
+        // Case (1)
+        //
+        //        ...                         ...
+        //         |                           |
+        //      +------+ s=tt              +-------+ s=tt
+        //      |  e   | cc=ff     =>      |   e   | cc=ff
+        //      +------+                   +-------+
+        //         |                           ^
+        //         |                          / \
+        //         |                         /   \
+        //         |                        /     \          Both:
+        //      +------+ s=tt        +-------+   +--------+    s=ff
+        //      |child | cc=ff       | child |   |  PPE   |   cc=tt
+        //      +------+             +-------+   +--------+
+        //
+        // Case (2)
+        //
+        //        ...                         ...
+        //         |     s=tt                  |     s=tt
+        //      +------+ cc=?              +-------+ cc=?
+        //      |parent|           =>      |parent |<-------------+
+        //      +------+                   +-------+              |
+        //         |                           |                  |
+        //      +------+ s=tt              +-------+ s=tt     +-------+ s=ff
+        //      |  e   | cc=ff     =>      |   e   | cc=ff    |  PPE  | cc=tt
+        //      +------+                   +-------+          +-------+
+        //         |                           |
+        //      +------+ s=tt              +-------+ s=tt
+        //      |child | cc=ff             | child | cc=ff
+        //      +------+                   +-------+
+        //
 
-      // 1) mark existing child concurrent
-      PvmExecutionImpl existingChild = childExecutions.get(0);
-      existingChild.setConcurrent(true);
+        // Case 1: parentScope == concurrencyScope
+        // e.g. non interrupting event sub process inside an embedded sub process:
+        // - concurrentActivity: is the non interrupting event sub process
+        // - concurrentActivity.getParent(): returns the embedded sub process
+        // - concurrencyScope: is also the embedded sub process
+        // => the given execution is concurrentRoot and a new execution sibling of
+        //    the existing child will be created (Case 1)
+        //
+        // Case 2: parentScope != concurrencyScope
+        // e.g. non interrupting boundary event attached to an embedded sub process:
+        // - concurrentActivity: is the non interrupting boundary event
+        // - concurrentActivity.getParent(): returns the embedded sub process
+        // - concurrenyScope: is the scope that contains the non interrupting
+        //   boundary event (e.g. the process definition or an embedded sub process)
+        // => the concurrentRoot will be set to concurrentRoot.getParent(), because
+        //    the given execution should be the concurrent sibling of the new
+        //    execution which will be created (Case 2)
+        //
+        // ==> this distinction is necessary to use the correct execution as concurentRoot!
 
-      // 2) create new concurrent execution (PPE) for new activity instance
-      propagatingExecution = createConcurrentExecution(execution, concurrentActivity);
+        // Case (1)
+        PvmExecutionImpl concurrentRoot = execution;
 
+        ScopeImpl parentScope = concurrentActivity.getParent();
 
+        if(parentScope == concurrencyScope) {
+          // mark existing child concurrent
+          PvmExecutionImpl existingChild = childExecutions.get(0);
+          existingChild.setConcurrent(true);
+        } else {
+          // Case (2)
+          // the parent of the given execution will
+          // be used as concurrentRoot
+          concurrentRoot = concurrentRoot.getParent();
+          // set the given execution as concurrent
+          execution.setConcurrent(true);
+        }
+
+        // create new concurrent execution (PPE) for new activity instance
+        propagatingExecution = createConcurrentExecution(concurrentRoot, concurrentActivity);
 
       } else { /* execution.getExecutions().size() > 1 */
 

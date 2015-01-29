@@ -406,8 +406,6 @@ public class ExecutionEntity extends PvmExecutionImpl implements
     }
   }
 
-
-
   protected void initializeAssociations(ExecutionEntity execution) {
     // initialize the lists of referenced objects (prevents db queries)
     execution.executions = new ArrayList<ExecutionEntity>();
@@ -421,30 +419,46 @@ public class ExecutionEntity extends PvmExecutionImpl implements
     execution.cachedEntityState = 0;
   }
 
-   public void startWithFormProperties(VariableMap properties) {
-     if(isProcessInstanceExecution()) {
-       ActivityImpl initial = processDefinition.getInitial();
-       if(processInstanceStartContext != null) {
-         initial = processInstanceStartContext.getInitial();
-       }
-       FormPropertyStartContext formPropertyStartContext = new FormPropertyStartContext(initial);
-       formPropertyStartContext.setFormProperties(properties);
-       processInstanceStartContext = formPropertyStartContext;
-     }
-     performOperation(PvmAtomicOperation.PROCESS_START);
-   }
+  public void startWithFormProperties(VariableMap properties) {
+    if(isProcessInstanceExecution()) {
+      ActivityImpl initial = processDefinition.getInitial();
+      if(processInstanceStartContext != null) {
+        initial = processInstanceStartContext.getInitial();
+      }
+      FormPropertyStartContext formPropertyStartContext = new FormPropertyStartContext(initial);
+      formPropertyStartContext.setFormProperties(properties);
+      processInstanceStartContext = formPropertyStartContext;
+    }
+    performOperation(PvmAtomicOperation.PROCESS_START);
+  }
 
-   public void destroy() {
-     super.destroy();
-     ensureParentInitialized();
+  public void destroy() {
+    super.destroy();
+    ensureParentInitialized();
 
-     // execute Output Mappings (if they exist).
-     ensureActivityInitialized();
-     if (activity != null && activity.getIoMapping() != null) {
-       activity.getIoMapping().executeOutputParameters(this);
-     }
-     variableStore.removeVariablesWithoutFiringEvents();
-   }
+    // execute Output Mappings (if they exist).
+    ensureActivityInitialized();
+    if (activity != null && activity.getIoMapping() != null) {
+      activity.getIoMapping().executeOutputParameters(this);
+    }
+
+    clearExecution();
+    removeEventSubscriptionsExceptCompensation();
+  }
+
+  protected void clearExecution() {
+    // delete all the variable instances
+    variableStore.removeVariablesWithoutFiringEvents();
+
+    // delete all the tasks
+    removeTasks(null);
+
+    // remove all jobs
+    removeJobs();
+
+    // remove all incidents
+    removeIncidents();
+  }
 
   public void cancelScope(String reason) {
 
@@ -866,17 +880,9 @@ public class ExecutionEntity extends PvmExecutionImpl implements
   public void remove() {
     super.remove();
 
-    // delete all the variable instances
-    variableStore.removeVariablesWithoutFiringEvents();
-
-    // delete all the tasks
-    removeTasks(null);
-
-    // remove all jobs
-    removeJobs();
-
-    // remove all incidents
-    removeIncidents();
+    // removes jobs, incidents and tasks, and
+    // clears the variable store
+    clearExecution();
 
     // remove all event subscriptions for this scope, if the scope has event subscriptions:
     removeEventSubscriptions();
@@ -891,6 +897,10 @@ public class ExecutionEntity extends PvmExecutionImpl implements
     // remove Jobs
     removeJobs();
 
+    removeEventSubscriptionsExceptCompensation();
+  }
+
+  protected void removeEventSubscriptionsExceptCompensation() {
     // remove event subscriptions which are not compensate event subscriptions
     List<EventSubscriptionEntity> eventSubscriptions = getEventSubscriptions();
     for (EventSubscriptionEntity eventSubscriptionEntity : eventSubscriptions) {

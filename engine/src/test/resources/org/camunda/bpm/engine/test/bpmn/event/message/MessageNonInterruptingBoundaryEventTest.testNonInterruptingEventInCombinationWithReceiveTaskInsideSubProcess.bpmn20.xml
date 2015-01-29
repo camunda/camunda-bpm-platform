@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions" 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  targetNamespace="Examples"
+  xmlns:tns="Examples">
+
+  <message id="firstMessageId" name="firstMessage" />
+  <message id="secondMessageId" name="secondMessage" />
+
+  <process id="process">
+
+    <startEvent id="theStart" />
+
+    <sequenceFlow sourceRef="theStart" targetRef="subProcess" />
+
+    <subProcess id="subProcess">
+
+      <startEvent id="theStart1" />
+
+      <sequenceFlow sourceRef="theStart1" targetRef="innerSubProcess" />
+
+      <subProcess id="innerSubProcess">
+
+        <startEvent id="innerStart" />
+
+        <sequenceFlow sourceRef="innerStart" targetRef="receiveTask" />
+
+        <receiveTask id="receiveTask" messageRef="secondMessageId" />
+
+        <sequenceFlow sourceRef="receiveTask" targetRef="innerEnd" />
+
+        <endEvent id="innerEnd" />
+
+      </subProcess>
+
+      <boundaryEvent id="messageBoundary" attachedToRef="innerSubProcess" cancelActivity="false">
+        <messageEventDefinition messageRef="firstMessageId" />
+      </boundaryEvent>
+
+      <sequenceFlow sourceRef="messageBoundary" targetRef="task1" />
+
+      <userTask id="task1" />
+
+      <sequenceFlow sourceRef="task1" targetRef="theEnd1" />
+
+      <endEvent id="theEnd1" />
+
+      <sequenceFlow sourceRef="innerSubProcess" targetRef="task2" />
+
+      <userTask id="task2" />
+
+      <sequenceFlow sourceRef="task2" targetRef="theEnd2" />
+
+      <endEvent id="theEnd2" />
+
+    </subProcess>
+
+    <sequenceFlow sourceRef="subProcess" targetRef="theEnd" />
+
+    <endEvent id="theEnd" />
+
+  </process>
+
+</definitions>

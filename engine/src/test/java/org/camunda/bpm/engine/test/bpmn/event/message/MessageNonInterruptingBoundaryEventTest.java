@@ -13,6 +13,7 @@
 
 package org.camunda.bpm.engine.test.bpmn.event.message;
 
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.task.Task;
@@ -111,9 +112,9 @@ public class MessageNonInterruptingBoundaryEventTest extends PluggableProcessEng
   }
 
   @Deployment
-  public void FAILING_testNonInterruptingEventInCombinationWithReceiveTask() {
+  public void testNonInterruptingEventInCombinationWithReceiveTask() {
     // given
-    runtimeService.startProcessInstanceByKey("process");
+    String processInstanceId = runtimeService.startProcessInstanceByKey("process").getId();
 
     // when (1)
     runtimeService.correlateMessage("firstMessage");
@@ -126,6 +127,13 @@ public class MessageNonInterruptingBoundaryEventTest extends PluggableProcessEng
         .singleResult();
     assertNotNull(task1);
 
+    Execution task1Execution = runtimeService
+        .createExecutionQuery()
+        .activityId("task1")
+        .singleResult();
+
+    assertEquals(processInstanceId, ((ExecutionEntity) task1Execution).getParentId());
+
     // when (2)
     runtimeService.correlateMessage("secondMessage");
 
@@ -137,16 +145,101 @@ public class MessageNonInterruptingBoundaryEventTest extends PluggableProcessEng
         .singleResult();
     assertNotNull(task1);
 
+    task1Execution = runtimeService
+        .createExecutionQuery()
+        .activityId("task1")
+        .singleResult();
+
+    assertEquals(processInstanceId, ((ExecutionEntity) task1Execution).getParentId());
+
     Task task2 = taskService.createTaskQuery()
         .taskDefinitionKey("task2")
         .singleResult();
     assertNotNull(task2);
+
+    Execution task2Execution = runtimeService
+        .createExecutionQuery()
+        .activityId("task1")
+        .singleResult();
+
+    assertEquals(processInstanceId, ((ExecutionEntity) task2Execution).getParentId());
+
+    assertEquals(0, runtimeService.createEventSubscriptionQuery().count());
+
+    taskService.complete(task1.getId());
+    taskService.complete(task2.getId());
+
+    assertProcessEnded(processInstanceId);
+
+  }
+
+  @Deployment
+  public void testNonInterruptingEventInCombinationWithReceiveTaskInsideSubProcess() {
+    // given
+    String processInstanceId = runtimeService.startProcessInstanceByKey("process").getId();
+
+    // when (1)
+    runtimeService.correlateMessage("firstMessage");
+
+    // then (1)
+    assertEquals(1, taskService.createTaskQuery().count());
+
+    Task task1 = taskService.createTaskQuery()
+        .taskDefinitionKey("task1")
+        .singleResult();
+    assertNotNull(task1);
+
+    Execution task1Execution = runtimeService
+        .createExecutionQuery()
+        .activityId("task1")
+        .singleResult();
+
+    assertFalse(processInstanceId.equals(((ExecutionEntity) task1Execution).getParentId()));
+
+    // when (2)
+    runtimeService.correlateMessage("secondMessage");
+
+    // then (2)
+    assertEquals(2, taskService.createTaskQuery().count());
+
+    task1 = taskService.createTaskQuery()
+        .taskDefinitionKey("task1")
+        .singleResult();
+    assertNotNull(task1);
+
+    task1Execution = runtimeService
+        .createExecutionQuery()
+        .activityId("task1")
+        .singleResult();
+
+    assertFalse(processInstanceId.equals(((ExecutionEntity) task1Execution).getParentId()));
+
+    Task task2 = taskService.createTaskQuery()
+        .taskDefinitionKey("task2")
+        .singleResult();
+    assertNotNull(task2);
+
+    Execution task2Execution = runtimeService
+        .createExecutionQuery()
+        .activityId("task1")
+        .singleResult();
+
+    assertFalse(processInstanceId.equals(((ExecutionEntity) task2Execution).getParentId()));
+
+    assertTrue(((ExecutionEntity) task1Execution).getParentId().equals(((ExecutionEntity) task2Execution).getParentId()));
+
+    assertEquals(0, runtimeService.createEventSubscriptionQuery().count());
+
+    taskService.complete(task1.getId());
+    taskService.complete(task2.getId());
+
+    assertProcessEnded(processInstanceId);
   }
 
   @Deployment
   public void testNonInterruptingEventInCombinationWithUserTask() {
     // given
-    runtimeService.startProcessInstanceByKey("process");
+    String processInstanceId = runtimeService.startProcessInstanceByKey("process").getId();
 
     // when (1)
     runtimeService.correlateMessage("firstMessage");
@@ -159,10 +252,24 @@ public class MessageNonInterruptingBoundaryEventTest extends PluggableProcessEng
         .singleResult();
     assertNotNull(task1);
 
+    Execution task1Execution = runtimeService
+        .createExecutionQuery()
+        .activityId("task1")
+        .singleResult();
+
+    assertEquals(processInstanceId, ((ExecutionEntity) task1Execution).getParentId());
+
     Task innerTask = taskService.createTaskQuery()
         .taskDefinitionKey("innerTask")
         .singleResult();
     assertNotNull(innerTask);
+
+    Execution task2Execution = runtimeService
+        .createExecutionQuery()
+        .activityId("innerTask")
+        .singleResult();
+
+    assertEquals(processInstanceId, ((ExecutionEntity) task2Execution).getParentId());
 
     // when (2)
     taskService.complete(innerTask.getId());
@@ -175,10 +282,181 @@ public class MessageNonInterruptingBoundaryEventTest extends PluggableProcessEng
         .singleResult();
     assertNotNull(task1);
 
+    task1Execution = runtimeService
+        .createExecutionQuery()
+        .activityId("task1")
+        .singleResult();
+
+    assertEquals(processInstanceId, ((ExecutionEntity) task1Execution).getParentId());
+
     Task task2 = taskService.createTaskQuery()
         .taskDefinitionKey("task2")
         .singleResult();
     assertNotNull(task2);
+
+    task2Execution = runtimeService
+        .createExecutionQuery()
+        .activityId("task2")
+        .singleResult();
+
+    assertEquals(processInstanceId, ((ExecutionEntity) task2Execution).getParentId());
+
+    assertEquals(0, runtimeService.createEventSubscriptionQuery().count());
+
+    taskService.complete(task1.getId());
+    taskService.complete(task2.getId());
+
+    assertProcessEnded(processInstanceId);
+  }
+
+  @Deployment
+  public void testNonInterruptingEventInCombinationWithUserTaskInsideSubProcess() {
+    // given
+    String processInstanceId = runtimeService.startProcessInstanceByKey("process").getId();
+
+    // when (1)
+    runtimeService.correlateMessage("firstMessage");
+
+    // then (1)
+    assertEquals(2, taskService.createTaskQuery().count());
+
+    Task task1 = taskService.createTaskQuery()
+        .taskDefinitionKey("task1")
+        .singleResult();
+    assertNotNull(task1);
+
+    Execution task1Execution = runtimeService
+        .createExecutionQuery()
+        .activityId("task1")
+        .singleResult();
+
+    assertFalse(processInstanceId.equals(((ExecutionEntity) task1Execution).getParentId()));
+
+    Task innerTask = taskService.createTaskQuery()
+        .taskDefinitionKey("innerTask")
+        .singleResult();
+    assertNotNull(innerTask);
+
+    Execution task2Execution = runtimeService
+        .createExecutionQuery()
+        .activityId("innerTask")
+        .singleResult();
+
+    assertFalse(processInstanceId.equals(((ExecutionEntity) task2Execution).getParentId()));
+
+    assertTrue(((ExecutionEntity) task1Execution).getParentId().equals(((ExecutionEntity) task2Execution).getParentId()));
+
+    // when (2)
+    taskService.complete(innerTask.getId());
+
+    // then (2)
+    assertEquals(2, taskService.createTaskQuery().count());
+
+    task1 = taskService.createTaskQuery()
+        .taskDefinitionKey("task1")
+        .singleResult();
+    assertNotNull(task1);
+
+    task1Execution = runtimeService
+        .createExecutionQuery()
+        .activityId("task1")
+        .singleResult();
+
+    assertFalse(processInstanceId.equals(((ExecutionEntity) task1Execution).getParentId()));
+
+    Task task2 = taskService.createTaskQuery()
+        .taskDefinitionKey("task2")
+        .singleResult();
+    assertNotNull(task2);
+
+    task2Execution = runtimeService
+        .createExecutionQuery()
+        .activityId("task2")
+        .singleResult();
+
+    assertFalse(processInstanceId.equals(((ExecutionEntity) task2Execution).getParentId()));
+
+    assertTrue(((ExecutionEntity) task1Execution).getParentId().equals(((ExecutionEntity) task2Execution).getParentId()));
+
+    assertEquals(0, runtimeService.createEventSubscriptionQuery().count());
+
+    taskService.complete(task1.getId());
+    taskService.complete(task2.getId());
+
+    assertProcessEnded(processInstanceId);
+  }
+
+  @Deployment
+  public void testNonInterruptingWithUserTaskAndBoundaryEvent() {
+    // given
+    String processInstanceId = runtimeService.startProcessInstanceByKey("process").getId();
+
+    // when (1)
+    runtimeService.correlateMessage("firstMessage");
+
+    // then (1)
+    assertEquals(2, taskService.createTaskQuery().count());
+
+    Task task1 = taskService.createTaskQuery()
+        .taskDefinitionKey("task1")
+        .singleResult();
+    assertNotNull(task1);
+
+    Execution task1Execution = runtimeService
+        .createExecutionQuery()
+        .activityId("task1")
+        .singleResult();
+
+    assertEquals(processInstanceId, ((ExecutionEntity) task1Execution).getParentId());
+
+    Task task2 = taskService.createTaskQuery()
+        .taskDefinitionKey("innerTask")
+        .singleResult();
+    assertNotNull(task2);
+
+    Execution task2Execution = runtimeService
+        .createExecutionQuery()
+        .activityId("innerTask")
+        .singleResult();
+
+    assertFalse(processInstanceId.equals(((ExecutionEntity) task2Execution).getParentId()));
+
+    // when (2)
+    taskService.complete(task2.getId());
+
+    // then (2)
+    assertEquals(2, taskService.createTaskQuery().count());
+
+    task1 = taskService.createTaskQuery()
+        .taskDefinitionKey("task1")
+        .singleResult();
+    assertNotNull(task1);
+
+    task1Execution = runtimeService
+        .createExecutionQuery()
+        .activityId("task1")
+        .singleResult();
+
+    assertEquals(processInstanceId, ((ExecutionEntity) task1Execution).getParentId());
+
+    task2 = taskService.createTaskQuery()
+        .taskDefinitionKey("task2")
+        .singleResult();
+    assertNotNull(task2);
+
+    task2Execution = runtimeService
+        .createExecutionQuery()
+        .activityId("tasks")
+        .singleResult();
+
+    assertEquals(processInstanceId, ((ExecutionEntity) task1Execution).getParentId());
+
+    assertEquals(0, runtimeService.createEventSubscriptionQuery().count());
+
+    taskService.complete(task1.getId());
+    taskService.complete(task2.getId());
+
+    assertProcessEnded(processInstanceId);
   }
 
 }
