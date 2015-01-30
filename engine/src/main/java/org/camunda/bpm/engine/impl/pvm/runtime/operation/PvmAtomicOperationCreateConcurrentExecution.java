@@ -278,22 +278,31 @@ public abstract class PvmAtomicOperationCreateConcurrentExecution implements Pvm
         //
 
 
+        // 1) if parentScope == concurrencyScope
+        // => something like non interrupting event subprocess
+        //
+        // 2) if parentScope != concurrencyScope
+        // => something like non interrupting boundary event
+
         // Case (1)
         PvmExecutionImpl concurrentRoot = execution;
 
         ScopeImpl parentScope = concurrentActivity.getParent();
-        if(parentScope instanceof ActivityImpl) {
-          ActivityImpl parentActivity = (ActivityImpl) parentScope;
-          if (execution.getActivity() != null || execution.isActive()) {
-            if(parentActivity.isScope()) {
-              // Case (2)
-              concurrentRoot = execution.getParent();
-              if (!concurrentRoot.isConcurrent()) {
-                execution.setConcurrent(true);
 
-              } else {
-                // Case (3)
-                concurrentRoot = concurrentRoot.getParent();
+        if (parentScope != concurrencyScope) {
+          if(parentScope instanceof ActivityImpl) {
+            ActivityImpl parentActivity = (ActivityImpl) parentScope;
+            if (execution.getActivity() != null || execution.isActive()) {
+              if(parentActivity.isScope()) {
+                // Case (2)
+                concurrentRoot = execution.getParent();
+                if (!concurrentRoot.isConcurrent()) {
+                  execution.setConcurrent(true);
+
+                } else {
+                  // Case (3)
+                  concurrentRoot = concurrentRoot.getParent();
+                }
               }
             }
           }

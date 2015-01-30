@@ -582,7 +582,7 @@ public class MessageEventSubprocessTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
-  public void FAILING_testNonInterruptingWithParallelForkInsideEmbeddedSubProcess() {
+  public void testNonInterruptingWithParallelForkInsideEmbeddedSubProcess() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
     runtimeService.messageEventReceived("newMessage", runtimeService.createEventSubscriptionQuery().singleResult().getExecutionId());
 
