@@ -26,11 +26,19 @@
 
 package org.camunda.bpm.engine.test.api.runtime;
 
+import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.executionByProcessDefinitionId;
+import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.executionByProcessDefinitionKey;
+import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.executionByProcessInstanceId;
+import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.hierarchical;
+import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.inverted;
+import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.verifySorting;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -152,21 +160,46 @@ public class ExecutionQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(12, runtimeService.createExecutionQuery().processDefinitionKey(CONCURRENT_PROCESS_KEY).listPage(0, 20).size());
   }
 
+  @SuppressWarnings("unchecked")
   public void testQuerySorting() {
 
     // 13 executions: 3 for each concurrent, 1 for the sequential
-    assertEquals(13, runtimeService.createExecutionQuery().orderByProcessInstanceId().asc().list().size());
-    assertEquals(13, runtimeService.createExecutionQuery().orderByProcessDefinitionId().asc().list().size());
-    assertEquals(13, runtimeService.createExecutionQuery().orderByProcessDefinitionKey().asc().list().size());
+    List<Execution> executions = runtimeService.createExecutionQuery().orderByProcessInstanceId().asc().list();
+    assertEquals(13, executions.size());
+    verifySorting(executions, executionByProcessInstanceId());
 
-    assertEquals(13, runtimeService.createExecutionQuery().orderByProcessInstanceId().desc().list().size());
-    assertEquals(13, runtimeService.createExecutionQuery().orderByProcessDefinitionId().desc().list().size());
-    assertEquals(13, runtimeService.createExecutionQuery().orderByProcessDefinitionKey().desc().list().size());
+    executions = runtimeService.createExecutionQuery().orderByProcessDefinitionId().asc().list();
+    assertEquals(13, executions.size());
+    verifySorting(executions, executionByProcessDefinitionId(processEngine));
 
-    assertEquals(12, runtimeService.createExecutionQuery().processDefinitionKey(CONCURRENT_PROCESS_KEY).orderByProcessDefinitionId().asc().list().size());
-    assertEquals(12, runtimeService.createExecutionQuery().processDefinitionKey(CONCURRENT_PROCESS_KEY).orderByProcessDefinitionId().desc().list().size());
+    executions = runtimeService.createExecutionQuery().orderByProcessDefinitionKey().asc().list();
+    assertEquals(13, executions.size());
+    verifySorting(executions, executionByProcessDefinitionKey(processEngine));
 
-    assertEquals(12,  runtimeService.createExecutionQuery().processDefinitionKey(CONCURRENT_PROCESS_KEY).orderByProcessDefinitionKey().asc().orderByProcessInstanceId().desc().list().size());
+    executions = runtimeService.createExecutionQuery().orderByProcessInstanceId().desc().list();
+    assertEquals(13, executions.size());
+    verifySorting(executions, inverted(executionByProcessInstanceId()));
+
+    executions = runtimeService.createExecutionQuery().orderByProcessDefinitionId().desc().list();
+    assertEquals(13, executions.size());
+    verifySorting(executions, inverted(executionByProcessDefinitionId(processEngine)));
+
+    executions = runtimeService.createExecutionQuery().orderByProcessDefinitionKey().desc().list();
+    assertEquals(13, executions.size());
+    verifySorting(executions, inverted(executionByProcessDefinitionKey(processEngine)));
+
+    executions = runtimeService.createExecutionQuery().processDefinitionKey(CONCURRENT_PROCESS_KEY).orderByProcessDefinitionId().asc().list();
+    assertEquals(12, executions.size());
+    verifySorting(executions, executionByProcessDefinitionId(processEngine));
+
+    executions = runtimeService.createExecutionQuery().processDefinitionKey(CONCURRENT_PROCESS_KEY).orderByProcessDefinitionId().desc().list();
+    assertEquals(12, executions.size());
+    verifySorting(executions, executionByProcessDefinitionId(processEngine));
+
+    executions = runtimeService.createExecutionQuery().processDefinitionKey(CONCURRENT_PROCESS_KEY).orderByProcessDefinitionKey().asc()
+        .orderByProcessInstanceId().desc().list();
+    assertEquals(12, executions.size());
+    verifySorting(executions, hierarchical(executionByProcessDefinitionKey(processEngine), inverted(executionByProcessInstanceId())));
   }
 
   public void testQueryInvalidSorting() {

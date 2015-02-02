@@ -42,6 +42,7 @@ import org.camunda.bpm.engine.task.DelegationState;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.variable.type.ValueType;
 
 /**
  * @author Sebastian Menski
@@ -185,6 +186,7 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
     // ordering
     query.orderByExecutionId().desc();
     query.orderByDueDate().asc();
+    query.orderByProcessVariable("var", ValueType.STRING).desc();
 
     List<QueryOrderingProperty> expectedOrderingProperties = query.getOrderingProperties();
 
@@ -716,7 +718,7 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
     assertNull(orderingProperty.getRelation());
     assertEquals("asc", orderingProperty.getDirection().getName());
     assertNull(orderingProperty.getRelationConditions());
-    assertFalse(orderingProperty.isContainedProperty());
+    assertTrue(orderingProperty.isContainedProperty());
     assertEquals(TaskQueryProperty.NAME.getName(), orderingProperty.getQueryProperty().getName());
     assertNull(orderingProperty.getQueryProperty().getFunction());
 
@@ -745,7 +747,7 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
     assertNull(orderingProperty1.getRelation());
     assertEquals("asc", orderingProperty1.getDirection().getName());
     assertNull(orderingProperty1.getRelationConditions());
-    assertFalse(orderingProperty1.isContainedProperty());
+    assertTrue(orderingProperty1.isContainedProperty());
     assertEquals(TaskQueryProperty.NAME.getName(), orderingProperty1.getQueryProperty().getName());
     assertNull(orderingProperty1.getQueryProperty().getFunction());
 
@@ -754,7 +756,7 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
     assertNull(orderingProperty2.getRelation());
     assertEquals("desc", orderingProperty2.getDirection().getName());
     assertNull(orderingProperty2.getRelationConditions());
-    assertFalse(orderingProperty2.isContainedProperty());
+    assertTrue(orderingProperty2.isContainedProperty());
     assertEquals(TaskQueryProperty.ASSIGNEE.getName(), orderingProperty2.getQueryProperty().getName());
     assertNull(orderingProperty2.getQueryProperty().getFunction());
   }

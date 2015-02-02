@@ -12,6 +12,11 @@
  */
 package org.camunda.bpm.engine.test.api.runtime;
 
+import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.caseExecutionByDefinitionId;
+import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.caseExecutionByDefinitionKey;
+import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.caseExecutionById;
+import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.inverted;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -24,6 +29,7 @@ import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.CaseExecutionQuery;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.NullTolerantComparator;
 import org.camunda.bpm.engine.variable.Variables;
 
 /**
@@ -76,6 +82,11 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
     } else if (countExpected == 0) {
       assertNull(query.singleResult());
     }
+  }
+
+  protected void verifyQueryWithOrdering(CaseExecutionQuery query, int countExpected, NullTolerantComparator<CaseExecution> expectedOrdering) {
+    verifyQueryResults(query, countExpected);
+    TestOrderingUtil.verifySorting(query.list(), expectedOrdering);
   }
 
   private void verifySingleResultFails(CaseExecutionQuery query) {
@@ -2435,21 +2446,22 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
     query
       .orderByCaseDefinitionId()
       .asc();
-    verifyQueryResults(query, 11);
+    verifyQueryWithOrdering(query, 11, caseExecutionByDefinitionId());
 
     query = caseService.createCaseExecutionQuery();
 
     query
       .orderByCaseDefinitionKey()
       .asc();
-    verifyQueryResults(query, 11);
+    verifyQueryWithOrdering(query, 11, caseExecutionByDefinitionKey(processEngine));
 
     query = caseService.createCaseExecutionQuery();
 
     query
       .orderByCaseExecutionId()
       .asc();
-    verifyQueryResults(query, 11);
+    verifyQueryWithOrdering(query, 11, caseExecutionById());
+
 
     // desc
 
@@ -2458,21 +2470,21 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
     query
       .orderByCaseDefinitionId()
       .desc();
-    verifyQueryResults(query, 11);
+    verifyQueryWithOrdering(query, 11, inverted(caseExecutionByDefinitionId()));
 
     query = caseService.createCaseExecutionQuery();
 
     query
       .orderByCaseDefinitionKey()
       .desc();
-    verifyQueryResults(query, 11);
+    verifyQueryWithOrdering(query, 11, inverted(caseExecutionByDefinitionKey(processEngine)));
 
     query = caseService.createCaseExecutionQuery();
 
     query
       .orderByCaseExecutionId()
       .desc();
-    verifyQueryResults(query, 11);
+    verifyQueryWithOrdering(query, 11, inverted(caseExecutionById()));
 
     query = caseService.createCaseExecutionQuery();
 

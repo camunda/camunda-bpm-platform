@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.engine.test.api.task;
 
+import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.*;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -1308,34 +1310,36 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
   }
 
   public void testQuerySorting() {
-    assertEquals(12, taskService.createTaskQuery().orderByTaskId().asc().list().size());
-    assertEquals(12, taskService.createTaskQuery().orderByTaskName().asc().list().size());
-    assertEquals(12, taskService.createTaskQuery().orderByTaskPriority().asc().list().size());
-    assertEquals(12, taskService.createTaskQuery().orderByTaskAssignee().asc().list().size());
-    assertEquals(12, taskService.createTaskQuery().orderByTaskDescription().asc().list().size());
-    assertEquals(12, taskService.createTaskQuery().orderByProcessInstanceId().asc().list().size());
-    assertEquals(12, taskService.createTaskQuery().orderByExecutionId().asc().list().size());
-    assertEquals(12, taskService.createTaskQuery().orderByTaskCreateTime().asc().list().size());
-    assertEquals(12, taskService.createTaskQuery().orderByDueDate().asc().list().size());
-    assertEquals(12, taskService.createTaskQuery().orderByFollowUpDate().asc().list().size());
-    assertEquals(12, taskService.createTaskQuery().orderByCaseInstanceId().asc().list().size());
-    assertEquals(12, taskService.createTaskQuery().orderByCaseExecutionId().asc().list().size());
+    // default ordering is by id
+    verifySortingAndCount(taskService.createTaskQuery(), 12, taskById());
+    verifySortingAndCount(taskService.createTaskQuery().orderByTaskId().asc(), 12, taskById());
+    verifySortingAndCount(taskService.createTaskQuery().orderByTaskName().asc(), 12, taskByName());
+    verifySortingAndCount(taskService.createTaskQuery().orderByTaskPriority().asc(), 12, taskByPriority());
+    verifySortingAndCount(taskService.createTaskQuery().orderByTaskAssignee().asc(), 12, taskByAssignee());
+    verifySortingAndCount(taskService.createTaskQuery().orderByTaskDescription().asc(), 12, taskByDescription());
+    verifySortingAndCount(taskService.createTaskQuery().orderByProcessInstanceId().asc(), 12, taskByProcessInstanceId());
+    verifySortingAndCount(taskService.createTaskQuery().orderByExecutionId().asc(), 12, taskByExecutionId());
+    verifySortingAndCount(taskService.createTaskQuery().orderByTaskCreateTime().asc(), 12, taskByCreateTime());
+    verifySortingAndCount(taskService.createTaskQuery().orderByDueDate().asc(), 12, taskByDueDate());
+    verifySortingAndCount(taskService.createTaskQuery().orderByFollowUpDate().asc(), 12, taskByFollowUpDate());
+    verifySortingAndCount(taskService.createTaskQuery().orderByCaseInstanceId().asc(), 12, taskByCaseInstanceId());
+    verifySortingAndCount(taskService.createTaskQuery().orderByCaseExecutionId().asc(), 12, taskByCaseExecutionId());
 
-    assertEquals(12, taskService.createTaskQuery().orderByTaskId().desc().list().size());
-    assertEquals(12, taskService.createTaskQuery().orderByTaskName().desc().list().size());
-    assertEquals(12, taskService.createTaskQuery().orderByTaskPriority().desc().list().size());
-    assertEquals(12, taskService.createTaskQuery().orderByTaskAssignee().desc().list().size());
-    assertEquals(12, taskService.createTaskQuery().orderByTaskDescription().desc().list().size());
-    assertEquals(12, taskService.createTaskQuery().orderByProcessInstanceId().desc().list().size());
-    assertEquals(12, taskService.createTaskQuery().orderByExecutionId().desc().list().size());
-    assertEquals(12, taskService.createTaskQuery().orderByTaskCreateTime().desc().list().size());
-    assertEquals(12, taskService.createTaskQuery().orderByDueDate().desc().list().size());
-    assertEquals(12, taskService.createTaskQuery().orderByFollowUpDate().desc().list().size());
-    assertEquals(12, taskService.createTaskQuery().orderByCaseInstanceId().desc().list().size());
-    assertEquals(12, taskService.createTaskQuery().orderByCaseExecutionId().desc().list().size());
+    verifySortingAndCount(taskService.createTaskQuery().orderByTaskId().desc(), 12, inverted(taskById()));
+    verifySortingAndCount(taskService.createTaskQuery().orderByTaskName().desc(), 12, inverted(taskByName()));
+    verifySortingAndCount(taskService.createTaskQuery().orderByTaskPriority().desc(), 12, inverted(taskByPriority()));
+    verifySortingAndCount(taskService.createTaskQuery().orderByTaskAssignee().desc(), 12, inverted(taskByAssignee()));
+    verifySortingAndCount(taskService.createTaskQuery().orderByTaskDescription().desc(), 12, inverted(taskByDescription()));
+    verifySortingAndCount(taskService.createTaskQuery().orderByProcessInstanceId().desc(), 12, inverted(taskByProcessInstanceId()));
+    verifySortingAndCount(taskService.createTaskQuery().orderByExecutionId().desc(), 12, inverted(taskByExecutionId()));
+    verifySortingAndCount(taskService.createTaskQuery().orderByTaskCreateTime().desc(), 12, inverted(taskByCreateTime()));
+    verifySortingAndCount(taskService.createTaskQuery().orderByDueDate().desc(), 12, inverted(taskByDueDate()));
+    verifySortingAndCount(taskService.createTaskQuery().orderByFollowUpDate().desc(), 12, inverted(taskByFollowUpDate()));
+    verifySortingAndCount(taskService.createTaskQuery().orderByCaseInstanceId().desc(), 12, inverted(taskByCaseInstanceId()));
+    verifySortingAndCount(taskService.createTaskQuery().orderByCaseExecutionId().desc(), 12, inverted(taskByCaseExecutionId()));
 
-    assertEquals(6, taskService.createTaskQuery().orderByTaskId().taskName("testTask").asc().list().size());
-    assertEquals(6, taskService.createTaskQuery().orderByTaskId().taskName("testTask").desc().list().size());
+    verifySortingAndCount(taskService.createTaskQuery().orderByTaskId().taskName("testTask").asc(), 6, taskById());
+    verifySortingAndCount(taskService.createTaskQuery().orderByTaskId().taskName("testTask").desc(), 6, inverted(taskById()));
   }
 
   public void testQuerySortingByNameShouldBeCaseInsensitive() {
