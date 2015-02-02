@@ -14,8 +14,10 @@ package org.camunda.bpm.engine.test.cmmn.required;
 
 import java.util.Collections;
 
+import org.camunda.bpm.engine.exception.NotAllowedException;
 import org.camunda.bpm.engine.impl.test.CmmnProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.CaseExecution;
+import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.test.Deployment;
 
 /**
@@ -26,20 +28,28 @@ public class RequiredRuleTest extends CmmnProcessEngineTestCase {
 
   @Deployment(resources = "org/camunda/bpm/engine/test/cmmn/required/RequiredRuleTest.testVariableBasedRule.cmmn")
   public void testRequiredRuleEvaluatesToTrue() {
-    caseService.createCaseInstanceByKey("case", Collections.<String, Object>singletonMap("required", true));
+    CaseInstance caseInstance =
+        caseService.createCaseInstanceByKey("case", Collections.<String, Object>singletonMap("required", true));
 
     CaseExecution taskExecution = caseService
         .createCaseExecutionQuery()
         .activityId("PI_HumanTask_1")
         .singleResult();
-
     assertNotNull(taskExecution);
     assertTrue(taskExecution.isRequired());
+
+    try {
+      caseService.completeCaseExecution(caseInstance.getId());
+      fail("completing the containing stage should not be allowed");
+    } catch (NotAllowedException e) {
+      // happy path
+    }
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/cmmn/required/RequiredRuleTest.testVariableBasedRule.cmmn")
   public void testRequiredRuleEvaluatesToFalse() {
-    caseService.createCaseInstanceByKey("case", Collections.<String, Object>singletonMap("required", false));
+    CaseInstance caseInstance =
+        caseService.createCaseInstanceByKey("case", Collections.<String, Object>singletonMap("required", false));
 
     CaseExecution taskExecution = caseService
         .createCaseExecutionQuery()
@@ -48,11 +58,15 @@ public class RequiredRuleTest extends CmmnProcessEngineTestCase {
 
     assertNotNull(taskExecution);
     assertFalse(taskExecution.isRequired());
+
+    // completing manually should be allowed
+    caseService.completeCaseExecution(caseInstance.getId());
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/cmmn/required/RequiredRuleTest.testDefaultVariableBasedRule.cmmn")
   public void testDefaultRequiredRuleEvaluatesToTrue() {
-    caseService.createCaseInstanceByKey("case", Collections.<String, Object>singletonMap("required", true));
+    CaseInstance caseInstance =
+        caseService.createCaseInstanceByKey("case", Collections.<String, Object>singletonMap("required", true));
 
     CaseExecution taskExecution = caseService
         .createCaseExecutionQuery()
@@ -61,11 +75,19 @@ public class RequiredRuleTest extends CmmnProcessEngineTestCase {
 
     assertNotNull(taskExecution);
     assertTrue(taskExecution.isRequired());
+
+    try {
+      caseService.completeCaseExecution(caseInstance.getId());
+      fail("completing the containing stage should not be allowed");
+    } catch (NotAllowedException e) {
+      // happy path
+    }
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/cmmn/required/RequiredRuleTest.testDefaultVariableBasedRule.cmmn")
   public void testDefaultRequiredRuleEvaluatesToFalse() {
-    caseService.createCaseInstanceByKey("case", Collections.<String, Object>singletonMap("required", false));
+    CaseInstance caseInstance =
+        caseService.createCaseInstanceByKey("case", Collections.<String, Object>singletonMap("required", false));
 
     CaseExecution taskExecution = caseService
         .createCaseExecutionQuery()
@@ -74,6 +96,9 @@ public class RequiredRuleTest extends CmmnProcessEngineTestCase {
 
     assertNotNull(taskExecution);
     assertFalse(taskExecution.isRequired());
+
+    // completing manually should be allowed
+    caseService.completeCaseExecution(caseInstance.getId());
   }
 
 }
