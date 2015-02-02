@@ -37,7 +37,6 @@ describe('cockpit - ', function() {
 
       // then
       dashboardPage.isActive();
-      expect(dashboardPage.navBarHeaderName()).toBe('camunda Cockpit');
     });
 
   });
@@ -264,7 +263,7 @@ describe('cockpit - ', function() {
       it('should select change variable process and open instance view', function () {
 
         // given
-        dashboardPage.clickNavBarHeader();
+        dashboardPage.navbarBrand().click();
 
         // when
         dashboardPage.deployedProcessesList.selectProcess(4);  // change variable process
@@ -317,7 +316,7 @@ describe('cockpit - ', function() {
       it('should select Another Failing Process and open instance view', function () {
 
         // given
-        dashboardPage.clickNavBarHeader();
+        dashboardPage.navbarBrand().click();
 
         // when
         dashboardPage.deployedProcessesList.selectProcess(0);  // Another Failing Process
@@ -344,7 +343,7 @@ describe('cockpit - ', function() {
       it('should select CallActivity Process and open instance view', function () {
 
         // given
-        dashboardPage.clickNavBarHeader();
+        dashboardPage.navbarBrand().click();
 
         // when
         dashboardPage.deployedProcessesList.selectProcess(2);  // CallActivity Process
