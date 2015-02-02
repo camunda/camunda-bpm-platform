@@ -117,8 +117,7 @@ describe('admin user -', function() {
       browser.sleep(500);
       
       // then
-      expect(cockpitPage.navBarHeaderName()).toBe('camunda Cockpit');
-
+      expect(cockpitPage.navbarBrand().getText()).toBe('camunda Cockpit');
     });
 
   });

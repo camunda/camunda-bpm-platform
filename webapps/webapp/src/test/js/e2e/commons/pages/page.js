@@ -41,8 +41,11 @@ Page.prototype.navigateToWebapp = function(appName) {
   browser.get('camunda/app/' + appName.toLowerCase() + '/');
   browser.driver.manage().window().maximize();
 
-  var navbarName = element(by.css('.brand'));
-  expect(navbarName.getText()).toEqual('camunda ' + appName);
+  expect(this.navbarBrand().getText()).toEqual('camunda ' + appName);
+};
+
+Page.prototype.navbarBrand = function() {
+  return element(by.css('.navbar-brand'));
 };
 
 Page.prototype.waitForElementToBePresent = function(selector, max) {
