@@ -169,7 +169,7 @@ public class TestOrderingUtil {
   public static NullTolerantComparator<Task> taskByPriority() {
     return new NullTolerantComparator<Task>() {
       public int compare(Task o1, Task o2) {
-        return Integer.compare(o1.getPriority(), o2.getPriority());
+        return o1.getPriority() - o2.getPriority();
       }
 
       public boolean hasNullProperty(Task object) {
