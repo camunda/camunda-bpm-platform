@@ -343,10 +343,22 @@ public class IncidentTest extends PluggableProcessEngineTestCase {
     JobQuery jobQuery = managementService.createJobQuery();
     assertEquals(1, jobQuery.count());
 
-    executeAvailableJobs();
+    Job job = jobQuery.singleResult();
+    String jobId = job.getId();
+
+    while(0 != job.getRetries()) {
+      try {
+        managementService.executeJob(jobId);
+        fail();
+      } catch (Exception e) {
+        // expected
+      }
+      job = jobQuery.jobId(jobId).singleResult();
+
+    }
 
     // job exists
-    Job job = managementService.createJobQuery().singleResult();
+    job = jobQuery.singleResult();
     assertNotNull(job);
 
     assertEquals(0, job.getRetries());

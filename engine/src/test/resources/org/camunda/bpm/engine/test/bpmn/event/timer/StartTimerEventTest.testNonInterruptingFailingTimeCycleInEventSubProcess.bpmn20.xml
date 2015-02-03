@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions" xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:camunda="http://activiti.org/bpmn" targetNamespace="Examples">
+
+  <process id="process">
+
+    <startEvent id="startEvent" />
+
+    <sequenceFlow id="sequenceFlow_1" sourceRef="startEvent" targetRef="userTask" />
+
+    <userTask id="userTask" name="NonInterruptingUserTask" />
+
+    <sequenceFlow id="sequenceFlow_5" sourceRef="userTask" targetRef="endEvent" />
+
+    <endEvent id="endEvent" />
+
+    <subProcess id="subProcess" name="Subprocess" triggeredByEvent="true">
+
+      <startEvent id="subprocessStartEvent" isInterrupting="false">
+        <timerEventDefinition>
+          <timeCycle>0 0/5 * * * ?</timeCycle>
+        </timerEventDefinition>
+      </startEvent>
+
+      <sequenceFlow id="sequenceFlow_2" sourceRef="subprocessStartEvent" targetRef="failingService" />
+
+      <serviceTask id="failingService" camunda:class="org.camunda.bpm.engine.test.api.runtime.FailingDelegate" />
+
+      <sequenceFlow id="sequenceFlow_3" sourceRef="failingService" targetRef="subprocessEndEvent" />
+
+      <endEvent id="subprocessEndEvent" />
+
+    </subProcess>
+
+  </process>
+
+</definitions>

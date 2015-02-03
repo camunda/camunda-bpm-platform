@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions"
+	xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+	xmlns:activiti="http://activiti.org/bpmn" 
+	targetNamespace="org.camunda.bpm.engine.test.enginge.test.api.mgmt">
+
+	<process id="process">
+
+		<startEvent id="theStart">
+      <timerEventDefinition>
+        <timeCycle>0 0/5 * * * ?</timeCycle>
+      </timerEventDefinition>
+    </startEvent>
+
+		<sequenceFlow id="flow1" sourceRef="theStart" targetRef="firstLineSupport" />
+
+		<userTask id="firstLineSupport" name="First line support" />
+
+		<sequenceFlow id="flow2" sourceRef="firstLineSupport" targetRef="normalEnd" />
+
+		<endEvent id="normalEnd" />
+
+	</process>
+
+</definitions>

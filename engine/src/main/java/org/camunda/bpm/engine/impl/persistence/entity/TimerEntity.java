@@ -18,9 +18,14 @@ import java.util.logging.Logger;
 
 import org.camunda.bpm.engine.impl.calendar.BusinessCalendar;
 import org.camunda.bpm.engine.impl.calendar.CycleBusinessCalendar;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
+import org.camunda.bpm.engine.impl.jobexecutor.JobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerDeclarationImpl;
+import org.camunda.bpm.engine.impl.jobexecutor.TimerEventJobHandler;
 
 
 /**
@@ -41,7 +46,7 @@ public class TimerEntity extends JobEntity {
     repeat = timerDeclaration.getRepeat();
   }
 
-  private TimerEntity(TimerEntity te) {
+  protected TimerEntity(TimerEntity te) {
     jobHandlerConfiguration = te.jobHandlerConfiguration;
     jobHandlerType = te.jobHandlerType;
     isExclusive = te.isExclusive;
@@ -52,35 +57,39 @@ public class TimerEntity extends JobEntity {
     jobDefinitionId = te.jobDefinitionId;
     suspensionState = te.suspensionState;
     deploymentId = te.deploymentId;
+    processDefinitionId = te.processDefinitionId;
+    processDefinitionKey = te.processDefinitionKey;
   }
 
   @Override
   public void execute(CommandContext commandContext) {
-
-    super.execute(commandContext);
-
-    if (repeat == null) {
-
-      if (log.isLoggable(Level.FINE)) {
-        log.fine("Timer " + getId() + " fired. Deleting timer.");
-      }
-      delete(true);
-    } else {
-      delete(true);
-      Date newTimer = calculateRepeat();
-      if (newTimer != null) {
-        TimerEntity te = new TimerEntity(this);
-        te.setDuedate(newTimer);
-        Context
-            .getCommandContext()
-            .getJobManager()
-            .schedule(te);
+    if (repeat != null) {
+      // this timer is a repeating timer
+      JobHandler jobHandler = getJobHandler();
+      TimerEventJobHandler timerEventJobHandler = (TimerEventJobHandler) jobHandler;
+      if (!timerEventJobHandler.isFollowUpJobCreated(jobHandlerConfiguration)) {
+        // a follow up timer job has not been scheduled yet
+        createNewTimerJob(timerEventJobHandler);
       }
     }
 
+    super.execute(commandContext);
+
+    if (log.isLoggable(Level.FINE)) {
+      log.fine("Timer " + getId() + " fired. Deleting timer.");
+    }
+
+    delete(true);
   }
 
-  private Date calculateRepeat() {
+  protected void createNewTimerJob(final TimerEventJobHandler timerEventJobHandler) {
+    ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
+    CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutorTxRequiresNew();
+    CreateNewTimerJobCommand command = new CreateNewTimerJobCommand(this, timerEventJobHandler);
+    commandExecutor.execute(command);
+  }
+
+  protected Date calculateRepeat() {
     BusinessCalendar businessCalendar = Context
         .getProcessEngineConfiguration()
         .getBusinessCalendarManager()
@@ -116,5 +125,48 @@ public class TimerEntity extends JobEntity {
            + ", exceptionMessage=" + exceptionMessage
            + ", deploymentId=" + deploymentId
            + "]";
+  }
+
+  protected class CreateNewTimerJobCommand implements Command<Void> {
+
+    protected TimerEntity outerTimer;
+    protected TimerEventJobHandler timerEventJobHandler;
+
+    public CreateNewTimerJobCommand(TimerEntity outerTimer, TimerEventJobHandler timerEventJobHandler) {
+      this.outerTimer = outerTimer;
+      this.timerEventJobHandler = timerEventJobHandler;
+    }
+
+    public Void execute(CommandContext commandContext) {
+
+      // load timer job into the cache of this inner command
+      // to provoke a possible OptimisticLockingException
+      // when e.g. someone else changes this job in parallel
+      TimerEntity innerTimer = (TimerEntity) commandContext
+          .getJobManager()
+          .findJobById(outerTimer.getId());
+
+      Date newDueDate = calculateRepeat();
+
+      if (newDueDate != null) {
+        // create new timer job
+        TimerEntity newTimer = new TimerEntity(innerTimer);
+        newTimer.setDuedate(newDueDate);
+        commandContext
+          .getJobManager()
+          .schedule(newTimer);
+
+        // update job handler configuration
+        timerEventJobHandler.setFollowUpJobCreated(innerTimer);
+        outerTimer.setJobHandlerConfiguration(innerTimer.getJobHandlerConfiguration());
+
+        // increment revision to avoid an OptimisticLockingException
+        // in the outer command
+        outerTimer.setRevision(outerTimer.getRevisionNext());
+      }
+
+      return null;
+    }
+
   }
 }

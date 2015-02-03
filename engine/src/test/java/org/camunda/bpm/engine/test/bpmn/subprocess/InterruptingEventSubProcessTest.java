@@ -152,4 +152,33 @@ public class InterruptingEventSubProcessTest extends PluggableProcessEngineTestC
     assertProcessEnded(pi.getId());
   }
 
+  @Deployment
+  public void testTimeCycle() {
+    String processInstanceId = runtimeService.startProcessInstanceByKey("process").getId();
+
+    EventSubscriptionQuery eventSubscriptionQuery = runtimeService.createEventSubscriptionQuery();
+    assertEquals(0, eventSubscriptionQuery.count());
+
+    TaskQuery taskQuery = taskService.createTaskQuery();
+    assertEquals(1, taskQuery.count());
+    Task task = taskQuery.singleResult();
+    assertEquals("task", task.getTaskDefinitionKey());
+
+    JobQuery jobQuery = managementService.createJobQuery().timers();
+    assertEquals(1, jobQuery.count());
+
+    String jobId = jobQuery.singleResult().getId();
+    managementService.executeJob(jobId);
+
+    assertEquals(0, jobQuery.count());
+
+    assertEquals(1, taskQuery.count());
+    task = taskQuery.singleResult();
+    assertEquals("eventSubProcessTask", task.getTaskDefinitionKey());
+
+    taskService.complete(task.getId());
+
+    assertProcessEnded(processInstanceId);
+  }
+
 }

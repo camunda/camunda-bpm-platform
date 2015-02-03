@@ -815,7 +815,6 @@ public class BpmnParse extends Parse {
       ((ActivityImpl)scope).setCancelScope(interrupting);
       ((ActivityImpl)scope).setConcurrent(!interrupting);
 
-
       // the scope of the event subscription is the parent of the event
       // subprocess (subscription must be created when parent is initialized).
       ScopeImpl catchingScope = ((ActivityImpl) scope).getParent();
@@ -848,7 +847,7 @@ public class BpmnParse extends Parse {
         parseEventDefinitionForSubprocess(eventSubscriptionDeclaration, startEventActivity, catchingScope, signalEventDefinition);
 
       } else if (timerEventDefinition != null) {
-        parseTimerStartEventDefinitionForEventSubprocess(timerEventDefinition, startEventActivity, catchingScope);
+        parseTimerStartEventDefinitionForEventSubprocess(timerEventDefinition, startEventActivity, catchingScope, interrupting);
 
       } else {
         addError("start event of event subprocess must be of type 'error', 'message', 'timer' or 'signal'", startEventElement);
@@ -2435,6 +2434,11 @@ public class BpmnParse extends Parse {
     // ACT-1427
     if (interrupting) {
       timerDeclaration.setInterruptingTimer(true);
+
+      Element timeCycleElement = timerEventDefinition.element("timeCycle");
+      if (timeCycleElement != null) {
+        addTimeCycleWarning(timeCycleElement, "cancelling boundary");
+      }
     }
 
     addTimerDeclaration(timerActivity.getParent(), timerDeclaration);
@@ -2511,12 +2515,26 @@ public class BpmnParse extends Parse {
   }
 
   protected void parseTimerStartEventDefinitionForEventSubprocess(Element timerEventDefinition, ActivityImpl timerActivity, ScopeImpl catchingScope) {
+    parseTimerStartEventDefinitionForEventSubprocess(timerEventDefinition, timerActivity, catchingScope, false);
+  }
+
+  protected void parseTimerStartEventDefinitionForEventSubprocess(Element timerEventDefinition, ActivityImpl timerActivity, ScopeImpl catchingScope, boolean interrupting) {
     timerActivity.setProperty("type", "startTimerEvent");
 
     TimerDeclarationImpl timerDeclaration = parseTimer(timerEventDefinition, timerActivity, TimerStartEventSubprocessJobHandler.TYPE);
+
     timerDeclaration.setActivityId(timerActivity.getId());
     timerDeclaration.setEventScopeActivityId(catchingScope.getId());
     timerDeclaration.setJobHandlerConfiguration(timerActivity.getParent().getId());
+    timerDeclaration.setInterruptingTimer(interrupting);
+
+    if (interrupting) {
+      Element timeCycleElement = timerEventDefinition.element("timeCycle");
+      if (timeCycleElement != null) {
+        addTimeCycleWarning(timeCycleElement, "interrupting start");
+      }
+
+    }
 
     addTimerDeclaration(catchingScope, timerDeclaration);
   }
@@ -2580,6 +2598,12 @@ public class BpmnParse extends Parse {
   protected void parseIntermediateTimerEventDefinition(Element timerEventDefinition, ActivityImpl timerActivity, boolean isAfterEventBasedGateway) {
     timerActivity.setProperty("type", "intermediateTimer");
     TimerDeclarationImpl timerDeclaration = parseTimer(timerEventDefinition, timerActivity, TimerCatchIntermediateEventJobHandler.TYPE);
+
+    Element timeCycleElement = timerEventDefinition.element("timeCycle");
+    if (timeCycleElement != null) {
+      addTimeCycleWarning(timeCycleElement, "intermediate catch");
+    }
+
     if(isAfterEventBasedGateway) {
       addTimerDeclaration(timerActivity.getParent(), timerDeclaration);
     }else {
@@ -3585,6 +3609,11 @@ public class BpmnParse extends Parse {
     } else {
       return new ConstantValueProvider(value);
     }
+  }
+
+  protected void addTimeCycleWarning(Element timeCycleElement, String type) {
+    String warning = "It is not recommended to use a " + type + " timer event with a time cycle.";
+    addWarning(warning, timeCycleElement);
   }
 
 }

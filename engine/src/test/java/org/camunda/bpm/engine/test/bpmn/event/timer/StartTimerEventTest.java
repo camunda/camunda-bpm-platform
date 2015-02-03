@@ -1101,6 +1101,146 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
 
   }
 
+  @Deployment
+  public void testTimeCycle() {
+    // given
+    JobQuery jobQuery = managementService.createJobQuery();
+    assertEquals(1, jobQuery.count());
+
+    String jobId = jobQuery.singleResult().getId();
+
+    // when
+    managementService.executeJob(jobId);
+
+    // then
+    assertEquals(1, jobQuery.count());
+
+    String anotherJobId = jobQuery.singleResult().getId();
+    assertFalse(jobId.equals(anotherJobId));
+  }
+
+  @Deployment
+  public void testFailingTimeCycle() throws Exception {
+    // given
+    JobQuery query = managementService.createJobQuery();
+    JobQuery failedJobQuery = managementService.createJobQuery();
+
+    // a job to start a process instance
+    assertEquals(1, query.count());
+
+    String jobId = query.singleResult().getId();
+    failedJobQuery.jobId(jobId);
+
+    moveByMinutes(5);
+
+    // when (1)
+    try {
+      managementService.executeJob(jobId);
+    } catch (Exception e) {
+      // expected
+    }
+
+    // then (1)
+    Job failedJob = failedJobQuery.singleResult();
+    assertEquals(2, failedJob.getRetries());
+
+    // a new timer job has been created
+    assertEquals(2, query.count());
+
+    assertEquals(1, managementService.createJobQuery().withException().count());
+    assertEquals(0, managementService.createJobQuery().noRetriesLeft().count());
+    assertEquals(2, managementService.createJobQuery().withRetriesLeft().count());
+
+    // when (2)
+    try {
+      managementService.executeJob(jobId);
+    } catch (Exception e) {
+      // expected
+    }
+
+    // then (2)
+    failedJob = failedJobQuery.singleResult();
+    assertEquals(1, failedJob.getRetries());
+
+    // there are still two jobs
+    assertEquals(2, query.count());
+
+    assertEquals(1, managementService.createJobQuery().withException().count());
+    assertEquals(0, managementService.createJobQuery().noRetriesLeft().count());
+    assertEquals(2, managementService.createJobQuery().withRetriesLeft().count());
+  }
+
+  @Deployment
+  public void testNonInterruptingTimeCycleInEventSubProcess() {
+    // given
+    runtimeService.startProcessInstanceByKey("process");
+
+    JobQuery jobQuery = managementService.createJobQuery();
+    assertEquals(1, jobQuery.count());
+
+    String jobId = jobQuery.singleResult().getId();
+
+    // when
+    managementService.executeJob(jobId);
+
+    // then
+    assertEquals(1, jobQuery.count());
+
+    String anotherJobId = jobQuery.singleResult().getId();
+    assertFalse(jobId.equals(anotherJobId));
+  }
+
+  @Deployment
+  public void testNonInterruptingFailingTimeCycleInEventSubProcess() {
+    // given
+    runtimeService.startProcessInstanceByKey("process");
+
+    JobQuery failedJobQuery = managementService.createJobQuery();
+    JobQuery jobQuery = managementService.createJobQuery();
+
+    assertEquals(1, jobQuery.count());
+    String jobId = jobQuery.singleResult().getId();
+
+    failedJobQuery.jobId(jobId);
+
+    // when (1)
+    try {
+      managementService.executeJob(jobId);
+      fail();
+    } catch (Exception e) {
+      // expected
+    }
+
+    // then (1)
+    Job failedJob = failedJobQuery.singleResult();
+    assertEquals(2, failedJob.getRetries());
+
+    // a new timer job has been created
+    assertEquals(2, jobQuery.count());
+
+    assertEquals(1, managementService.createJobQuery().withException().count());
+    assertEquals(0, managementService.createJobQuery().noRetriesLeft().count());
+    assertEquals(2, managementService.createJobQuery().withRetriesLeft().count());
+
+    // when (2)
+    try {
+      managementService.executeJob(jobId);
+    } catch (Exception e) {
+      // expected
+    }
+
+    // then (2)
+    failedJob = failedJobQuery.singleResult();
+    assertEquals(1, failedJob.getRetries());
+
+    // there are still two jobs
+    assertEquals(2, jobQuery.count());
+
+    assertEquals(1, managementService.createJobQuery().withException().count());
+    assertEquals(0, managementService.createJobQuery().noRetriesLeft().count());
+    assertEquals(2, managementService.createJobQuery().withRetriesLeft().count());
+  }
+
   // util methods ////////////////////////////////////////
 
   /**

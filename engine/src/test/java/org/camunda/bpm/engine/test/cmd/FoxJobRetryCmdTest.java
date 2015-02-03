@@ -9,39 +9,53 @@ import org.camunda.bpm.engine.test.Deployment;
 
 public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
 
-  private void waitForExecutedJobWithRetriesLeft(final int retriesLeft) {
+  protected void waitForExecutedJobWithRetriesLeft(int retriesLeft, String jobId) {
+    JobQuery jobQuery = managementService.createJobQuery();
 
-    Job job = managementService.createJobQuery().singleResult();
+    if (jobId != null) {
+      jobQuery.jobId(jobId);
+    }
+
+    Job job = jobQuery.singleResult();
 
     try {
       managementService.executeJob(job.getId());
     } catch (Exception e) {}
 
     // update job
-    job = managementService.createJobQuery().singleResult();
+    job = jobQuery.singleResult();
 
     if (job.getRetries() != retriesLeft) {
-      waitForExecutedJobWithRetriesLeft(retriesLeft);
+      waitForExecutedJobWithRetriesLeft(retriesLeft, jobId);
     }
   }
 
-  private ExecutionEntity refreshExecutionEntity(String executionId) {
+  protected void waitForExecutedJobWithRetriesLeft(final int retriesLeft) {
+    waitForExecutedJobWithRetriesLeft(retriesLeft, null);
+  }
+
+  protected ExecutionEntity refreshExecutionEntity(String executionId) {
     return (ExecutionEntity) runtimeService.createExecutionQuery().executionId(executionId).singleResult();
   }
 
-  private ExecutionEntity fetchExecutionEntity(String processInstanceId) {
+  protected ExecutionEntity fetchExecutionEntity(String processInstanceId) {
     return (ExecutionEntity) runtimeService.createExecutionQuery().processInstanceId(processInstanceId).singleResult();
   }
 
-  private Job refreshJob(String jobId) {
+  protected Job refreshJob(String jobId) {
     return managementService.createJobQuery().jobId(jobId).singleResult();
   }
 
-  private Job fetchJob(String processInstanceId) {
+  protected Job fetchJob(String processInstanceId) {
     return managementService.createJobQuery().processInstanceId(processInstanceId).singleResult();
   }
 
-  private void stillOneJobWithExceptionAndRetriesLeft() {
+  protected void stillOneJobWithExceptionAndRetriesLeft(String jobId) {
+    assertEquals(1, managementService.createJobQuery().jobId(jobId).withException().count());
+    assertEquals(1, managementService.createJobQuery().jobId(jobId).withRetriesLeft().count());
+  }
+
+  protected void stillOneJobWithExceptionAndRetriesLeft() {
     assertEquals(1, managementService.createJobQuery().withException().count());
     assertEquals(1, managementService.createJobQuery().withRetriesLeft().count());
   }
@@ -624,39 +638,40 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
 
     Job job = managementService.createJobQuery().list().get(0);
     assertNotNull(job);
+    String jobId = job.getId();
 
-    waitForExecutedJobWithRetriesLeft(4);
-    stillOneJobWithExceptionAndRetriesLeft();
+    waitForExecutedJobWithRetriesLeft(4, jobId);
+    stillOneJobWithExceptionAndRetriesLeft(jobId);
 
-    job = refreshJob(job.getId());
+    job = refreshJob(jobId);
     assertNotNull(job);
 
     assertEquals(4, job.getRetries());
 
-    waitForExecutedJobWithRetriesLeft(3);
+    waitForExecutedJobWithRetriesLeft(3, jobId);
 
-    job = refreshJob(job.getId());
+    job = refreshJob(jobId);
     assertEquals(3, job.getRetries());
-    stillOneJobWithExceptionAndRetriesLeft();
+    stillOneJobWithExceptionAndRetriesLeft(jobId);
 
-    waitForExecutedJobWithRetriesLeft(2);
+    waitForExecutedJobWithRetriesLeft(2, jobId);
 
-    job = refreshJob(job.getId());
+    job = refreshJob(jobId);
     assertEquals(2, job.getRetries());
-    stillOneJobWithExceptionAndRetriesLeft();
+    stillOneJobWithExceptionAndRetriesLeft(jobId);
 
-    waitForExecutedJobWithRetriesLeft(1);
+    waitForExecutedJobWithRetriesLeft(1, jobId);
 
-    job = refreshJob(job.getId());
+    job = refreshJob(jobId);
     assertEquals(1, job.getRetries());
-    stillOneJobWithExceptionAndRetriesLeft();
+    stillOneJobWithExceptionAndRetriesLeft(jobId);
 
-    waitForExecutedJobWithRetriesLeft(0);
+    waitForExecutedJobWithRetriesLeft(0, jobId);
 
-    job = refreshJob(job.getId());
+    job = refreshJob(jobId);
     assertEquals(0, job.getRetries());
     assertEquals(1, managementService.createJobQuery().withException().count());
-    assertEquals(0, managementService.createJobQuery().withRetriesLeft().count());
+    assertEquals(0, managementService.createJobQuery().jobId(jobId).withRetriesLeft().count());
     assertEquals(1, managementService.createJobQuery().noRetriesLeft().count());
   }
 
@@ -769,7 +784,7 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
     assertNotNull(job);
     assertEquals(3, job.getRetries());
 
-    waitForExecutedJobWithRetriesLeft(0);
+    waitForExecutedJobWithRetriesLeft(0, job.getId());
     job = refreshJob(job.getId());
     assertEquals(0, job.getRetries());
     assertEquals(1, managementService.createJobQuery().noRetriesLeft().count());

@@ -12,6 +12,16 @@
  */
 package org.camunda.bpm.engine.impl.persistence.entity;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
+import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Logger;
+
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
@@ -24,16 +34,6 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobHandler;
 import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.runtime.Job;
-
-import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Logger;
-
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 /**
  * Stub of the common parts of a Job. You will normally work with a subclass of
@@ -101,9 +101,7 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
       ensureNotNull("Cannot find execution with id '" + executionId + "' referenced from job '" + this + "'", "execution", execution);
     }
 
-    Map<String, JobHandler> jobHandlers = Context.getProcessEngineConfiguration().getJobHandlers();
-    JobHandler jobHandler = jobHandlers.get(jobHandlerType);
-
+    JobHandler jobHandler = getJobHandler();
     jobHandler.execute(jobHandlerConfiguration, execution, commandContext);
   }
 
@@ -163,6 +161,7 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
     persistentState.put("processDefinitionId", processDefinitionId);
     persistentState.put("jobDefinitionId", jobDefinitionId);
     persistentState.put("deploymentId", deploymentId);
+    persistentState.put("jobHandlerConfiguration", jobHandlerConfiguration);
     if(exceptionByteArrayId != null) {
       persistentState.put("exceptionByteArrayId", exceptionByteArrayId);
     }
@@ -364,6 +363,11 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
     } else {
       byteArray.setBytes(exceptionBytes);
     }
+  }
+
+  public JobHandler getJobHandler() {
+    Map<String, JobHandler> jobHandlers = Context.getProcessEngineConfiguration().getJobHandlers();
+    return jobHandlers.get(jobHandlerType);
   }
 
   public String getJobHandlerType() {

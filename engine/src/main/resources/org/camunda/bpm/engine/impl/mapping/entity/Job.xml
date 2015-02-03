@@ -60,7 +60,6 @@
     </where>
   </update>
 
-
   <!-- JOB RESULTMAP (FOR TIMER AND MESSAGE) -->
 
   <resultMap id="jobResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.JobEntity">
@@ -142,7 +141,10 @@
   <select id="selectJobsByConfiguration" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
       select * from ${prefix}ACT_RU_JOB
       where HANDLER_TYPE_ = #{parameter.handlerType}
-      and HANDLER_CFG_ =  #{parameter.handlerConfiguration}
+      and (HANDLER_CFG_ = #{parameter.handlerConfiguration}
+      <if test="parameter.handlerConfigurationWithFollowUpJobCreatedProperty != null">
+      or HANDLER_CFG_ = #{parameter.handlerConfigurationWithFollowUpJobCreatedProperty}
+      </if>)
   </select>
 
   <select id="selectJobsByExecutionId" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
@@ -350,7 +352,8 @@
        SUSPENSION_STATE_ = #{suspensionState, jdbcType=INTEGER},
        PROCESS_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR},
        JOB_DEF_ID_ = #{jobDefinitionId, jdbcType=VARCHAR},
-       DEPLOYMENT_ID_ = #{deploymentId, jdbcType=VARCHAR}
+       DEPLOYMENT_ID_ = #{deploymentId, jdbcType=VARCHAR},
+       HANDLER_CFG_ = #{jobHandlerConfiguration, jdbcType=VARCHAR}
     </set>
     where ID_= #{id, jdbcType=VARCHAR}
       and REV_ = #{revision, jdbcType=INTEGER}
@@ -436,7 +439,8 @@
        SUSPENSION_STATE_ = #{suspensionState, jdbcType=INTEGER},
        PROCESS_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR},
        JOB_DEF_ID_ = #{jobDefinitionId, jdbcType=VARCHAR},
-       DEPLOYMENT_ID_ = #{deploymentId, jdbcType=VARCHAR}
+       DEPLOYMENT_ID_ = #{deploymentId, jdbcType=VARCHAR},
+       HANDLER_CFG_ = #{jobHandlerConfiguration, jdbcType=VARCHAR}
     </set>
     where ID_= #{id, jdbcType=VARCHAR}
       and REV_ = #{revision, jdbcType=INTEGER}

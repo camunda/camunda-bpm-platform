@@ -20,7 +20,9 @@ import org.camunda.bpm.engine.impl.calendar.DurationHelper;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.AsyncContinuationJobHandler;
+import org.camunda.bpm.engine.impl.jobexecutor.JobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerCatchIntermediateEventJobHandler;
+import org.camunda.bpm.engine.impl.jobexecutor.TimerEventJobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerExecuteNestedActivityJobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerStartEventJobHandler;
 import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
@@ -93,19 +95,26 @@ public class FoxJobRetryCmd extends JobRetryCmd {
   }
 
   protected ActivityImpl getCurrentActivity(CommandContext commandContext, JobEntity job) {
+    JobHandler jobHandler = job.getJobHandler();
     String type = job.getJobHandlerType();
     ActivityImpl activity = null;
+
+    String configuration = job.getJobHandlerConfiguration();
 
     if (TimerExecuteNestedActivityJobHandler.TYPE.equals(type)
         || TimerCatchIntermediateEventJobHandler.TYPE.equals(type)) {
       ExecutionEntity execution = fetchExecutionEntity(job.getExecutionId());
       if (execution != null) {
-        activity = execution.getProcessDefinition().findActivity(job.getJobHandlerConfiguration());
+        TimerEventJobHandler timerEventJobHandler = (TimerEventJobHandler) jobHandler;
+        String acitivtyId = timerEventJobHandler.getKey(configuration);
+        activity = execution.getProcessDefinition().findActivity(acitivtyId);
       }
 
     } else if (TimerStartEventJobHandler.TYPE.equals(type)) {
       DeploymentCache deploymentCache = Context.getProcessEngineConfiguration().getDeploymentCache();
-      ProcessDefinitionEntity processDefinition = deploymentCache.findDeployedLatestProcessDefinitionByKey(job.getJobHandlerConfiguration());
+      TimerEventJobHandler timerEventJobHandler = (TimerEventJobHandler) jobHandler;
+      String definitionKey = timerEventJobHandler.getKey(configuration);
+      ProcessDefinitionEntity processDefinition = deploymentCache.findDeployedLatestProcessDefinitionByKey(definitionKey);
       if (processDefinition != null) {
         activity = processDefinition.getInitial();
       }

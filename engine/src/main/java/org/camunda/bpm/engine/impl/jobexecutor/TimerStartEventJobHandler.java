@@ -24,7 +24,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 
 
-public class TimerStartEventJobHandler implements JobHandler {
+public class TimerStartEventJobHandler extends TimerEventJobHandler {
 
   private static Logger log = Logger.getLogger(TimerStartEventJobHandler.class.getName());
 
@@ -39,10 +39,11 @@ public class TimerStartEventJobHandler implements JobHandler {
             .getProcessEngineConfiguration()
             .getDeploymentCache();
 
-    ProcessDefinition processDefinition = deploymentCache.findDeployedLatestProcessDefinitionByKey(configuration);
+    String definitionKey = getKey(configuration);
+    ProcessDefinition processDefinition = deploymentCache.findDeployedLatestProcessDefinitionByKey(definitionKey);
     try {
       if(!processDefinition.isSuspended()) {
-        new StartProcessInstanceCmd(configuration, null, null, null, null).execute(commandContext);
+        new StartProcessInstanceCmd(definitionKey, null, null, null, null).execute(commandContext);
       } else {
         log.log(Level.FINE, "ignoring timer of suspended process definition " + processDefinition.getName());
       }

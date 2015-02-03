@@ -112,7 +112,7 @@ public class TimerDeclarationImpl extends JobDeclaration<TimerEntity> {
       timer.setExecution(execution);
     }
 
-    if (type == TimerDeclarationType.CYCLE) {
+    if (type == TimerDeclarationType.CYCLE && jobHandlerType != TimerCatchIntermediateEventJobHandler.TYPE) {
 
       // See ACT-1427: A boundary timer with a cancelActivity='true', doesn't need to repeat itself
       if (!isInterruptingTimer) {
