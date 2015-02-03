@@ -7,8 +7,7 @@ define([
   'angular',
 
   // dashboard
-  './dashboard/processDefinitionList',
-  './dashboard/processDefinitionTiles',
+  './dashboard/process-definitions',
 
   // process definition
   './processDefinition/processInstanceTable',
@@ -38,8 +37,7 @@ define([
   angular,
 
   // dashboard
-  processDefinitionList,
-  processDefinitionTiles,
+  processDefinitions,
 
   // process definition
   processInstanceTable,
@@ -65,11 +63,10 @@ define([
   updateSuspensionStateActionPI,
   updateSuspensionStateDialogPI,
   activityInstanceStatisticsOverlayPI) {
-
+  'use strict';
   var ngModule = angular.module('cockpit.plugin.base.views', []);
 
-  ngModule.config(processDefinitionList);
-  ngModule.config(processDefinitionTiles);
+  ngModule.config(processDefinitions);
 
   ngModule.config(processInstanceTable);
   ngModule.config(calledProcessDefinitionTable);

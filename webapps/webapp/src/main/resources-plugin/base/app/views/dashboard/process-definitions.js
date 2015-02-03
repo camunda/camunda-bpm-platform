@@ -1,8 +1,13 @@
-define(['text!./process-definition-list.html'], function(template) {
+define([
+  'text!./process-definitions.html'
+], function(
+  template
+) {
   'use strict';
-  return [ 'ViewsProvider', function PluginConfiguration(ViewsProvider) {
+
+  return [ 'ViewsProvider', function (ViewsProvider) {
     ViewsProvider.registerDefaultView('cockpit.dashboard', {
-      id: 'process-definition-list',
+      id: 'process-definition',
       label: 'Deployed Processes',
       template: template,
       controller: [
@@ -17,8 +22,14 @@ define(['text!./process-definition-list.html'], function(template) {
         processData.observe('processDefinitionStatistics', function (processDefinitionStatistics) {
           $scope.statistics = processDefinitionStatistics;
         });
+
+        $scope.selected = 'list';
+        $scope.selectTab = function (which) {
+          $scope.selected = which;
+        };
       }],
-      priority: 5
+
+      priority: 0
     });
   }];
 });
