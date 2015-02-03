@@ -47,19 +47,7 @@ public class ProcessDefinitionManager extends AbstractManager {
 
   @SuppressWarnings("unchecked")
   public List<ProcessDefinition> findProcessDefinitionsByQueryCriteria(ProcessDefinitionQueryImpl processDefinitionQuery, Page page) {
-//    List<ProcessDefinition> processDefinitions =
     return getDbEntityManager().selectList("selectProcessDefinitionsByQueryCriteria", processDefinitionQuery, page);
-
-    //skipped this after discussion within the team
-//    // retrieve process definitions from cache (http://jira.codehaus.org/browse/ACT-1020) to have all available information
-//    ArrayList<ProcessDefinition> result = new ArrayList<ProcessDefinition>();
-//    for (ProcessDefinition processDefinitionEntity : processDefinitions) {
-//      ProcessDefinitionEntity fullProcessDefinition = Context
-//              .getProcessEngineConfiguration()
-//              .getDeploymentCache().resolveProcessDefinition((ProcessDefinitionEntity)processDefinitionEntity);
-//      result.add(fullProcessDefinition);
-//    }
-//    return result;
   }
 
   public long findProcessDefinitionCountByQueryCriteria(ProcessDefinitionQueryImpl processDefinitionQuery) {
