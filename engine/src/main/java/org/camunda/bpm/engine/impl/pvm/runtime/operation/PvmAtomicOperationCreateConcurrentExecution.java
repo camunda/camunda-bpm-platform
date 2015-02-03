@@ -174,6 +174,28 @@ public abstract class PvmAtomicOperationCreateConcurrentExecution implements Pvm
         //      |child | cc=ff             | child | cc=ff
         //      +------+                   +-------+
         //
+        // Case (3)
+        //
+        //                 ...                                   ...
+        //                  |     s=tt                            |     s=tt
+        //              +-------+ cc=?                        +-------+ cc=?
+        //              |   pp  |<-----------+                |  pp   |<---------------------------+
+        //              +-------+            |                +-------+            |               |
+        //                  |                |  all:              |                |  all:         |
+        //                  |     s=tt       |   s=?              |     s=tt       |   s=?         |
+        //              +-------+ cc=tt     ...  cc=tt        +-------+ cc=tt     ...  cc=tt   +-------+ s=ff
+        //              | parent|                             | parent|                        |  PPE  | cc=tt
+        //              +-------+                             +-------+                        +-------+
+        //                  |                                     |
+        //              +-------+ s=tt                        +-------+ s=tt
+        //              |   e   | cc=?                        |   e   | cc=?
+        //              +-------+                             +-------+
+        //                  |                                     |
+        //              +------+ s=tt                         +-------+ s=tt
+        //              |child | cc=ff                        | child | cc=ff
+        //              +------+                              +-------+
+        //
+        //
 
         // Case 1: parentScope == concurrencyScope
         // e.g. non interrupting event sub process inside an embedded sub process:
@@ -195,6 +217,12 @@ public abstract class PvmAtomicOperationCreateConcurrentExecution implements Pvm
         //
         // ==> this distinction is necessary to use the correct execution as concurentRoot!
 
+        // Case 3: parentScope != concurrencyScope
+        //         and the parent execution is itself concurrent, i.e. the new execution
+        //         should be added one level higher
+        // Example: Like Case 2, but when the embedded subprocess is concurrent (e.g. following
+        //         a parallel gateway)
+
         // Case (1)
         PvmExecutionImpl concurrentRoot = execution;
 
@@ -209,8 +237,15 @@ public abstract class PvmAtomicOperationCreateConcurrentExecution implements Pvm
           // the parent of the given execution will
           // be used as concurrentRoot
           concurrentRoot = concurrentRoot.getParent();
-          // set the given execution as concurrent
-          execution.setConcurrent(true);
+
+          if (!concurrentRoot.isConcurrent()) {
+            // Case (2)
+            // set the given execution as concurrent as it is going to be a concurrent sibling of the new execution
+            execution.setConcurrent(true);
+          } else {
+            // Case (3)
+            concurrentRoot = concurrentRoot.getParent();
+          }
         }
 
         // create new concurrent execution (PPE) for new activity instance

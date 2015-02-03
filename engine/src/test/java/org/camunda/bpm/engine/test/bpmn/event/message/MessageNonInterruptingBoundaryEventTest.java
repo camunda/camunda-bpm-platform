@@ -174,6 +174,61 @@ public class MessageNonInterruptingBoundaryEventTest extends PluggableProcessEng
   }
 
   @Deployment
+  public void testNonInterruptingEventInCombinationWithReceiveTaskInConcurrentSubprocess() {
+    // given
+    String processInstanceId = runtimeService.startProcessInstanceByKey("process").getId();
+
+    // when (1)
+    runtimeService.correlateMessage("firstMessage");
+
+    // then (1)
+    assertEquals(2, taskService.createTaskQuery().count());
+
+    Task task1 = taskService.createTaskQuery()
+        .taskDefinitionKey("task1")
+        .singleResult();
+    assertNotNull(task1);
+
+    Execution task1Execution = runtimeService
+        .createExecutionQuery()
+        .activityId("task1")
+        .singleResult();
+
+    assertEquals(processInstanceId, ((ExecutionEntity) task1Execution).getParentId());
+
+
+    // when (2)
+    runtimeService.correlateMessage("secondMessage");
+
+    // then (2)
+    assertEquals(3, taskService.createTaskQuery().count());
+    assertEquals(0, runtimeService.createEventSubscriptionQuery().count());
+
+    Task afterFork = taskService.createTaskQuery()
+        .taskDefinitionKey("afterFork")
+        .singleResult();
+    taskService.complete(afterFork.getId());
+
+    Task task2 = taskService.createTaskQuery()
+        .taskDefinitionKey("task2")
+        .singleResult();
+    assertNotNull(task2);
+
+    Execution task2Execution = runtimeService
+      .createExecutionQuery()
+      .activityId("task2")
+      .singleResult();
+
+    assertEquals(processInstanceId, ((ExecutionEntity) task2Execution).getParentId());
+
+    taskService.complete(task2.getId());
+    taskService.complete(task1.getId());
+
+    assertProcessEnded(processInstanceId);
+
+  }
+
+  @Deployment
   public void testNonInterruptingEventInCombinationWithReceiveTaskInsideSubProcess() {
     // given
     String processInstanceId = runtimeService.startProcessInstanceByKey("process").getId();
