@@ -1,5 +1,4 @@
-/* global define: false */
-define([ 'angular', 'bpmn/Bpmn'], function(angular, Bpmn) {
+define(['bpmn/Bpmn'], function(Bpmn) {
   'use strict';
 
   var Directive = function (ProcessDefinitionResource) {
@@ -9,7 +8,6 @@ define([ 'angular', 'bpmn/Bpmn'], function(angular, Bpmn) {
                 '  <i class="glyphicon glyphicon-loading"></i> loading process diagram...' +
                 '</span>',
       link: function(scope, element, attrs) {
-
         scope.$watch(attrs.processDefinitionId, function(processDefinitionId) {
           if (processDefinitionId) {
             // set the element id to processDiagram_*
@@ -17,24 +15,23 @@ define([ 'angular', 'bpmn/Bpmn'], function(angular, Bpmn) {
             element.attr('id', elementId);
 
             ProcessDefinitionResource.getBpmn20Xml({ id : processDefinitionId }).$promise.then(function(response) {
-                // var xml = response.data.bpmn20Xml;
-                var xml = response.bpmn20Xml;
-                scope.$loaded = true;
+              var xml = response.bpmn20Xml;
+              scope.$loaded = true;
 
-                try {
-                  new Bpmn().render(xml, {
-                    diagramElement : element.attr('id'),
-                    width : parseInt(element.parent().css('min-width')),
-                    height : element.parent().height(),
-                    skipOverlays: true
-                  });
-                } catch (exception) {
-                  // console.log('Unable to render diagram for process definition ' + processDefinitionId + ', reason: ' + exception.message)
-                  element.html('<div class="alert alert-error diagram-rendering-error">Unable to render process diagram.</div>');
-                }
-              });
-            }
-          });
+              try {
+                new Bpmn().render(xml, {
+                  diagramElement : element.attr('id'),
+                  width : parseInt(element.parent().width(), 10),
+                  height : element.parent().height(),
+                  skipOverlays: true
+                });
+              }
+              catch (exception) {
+                element.html('<div class="alert alert-danger alert-error diagram-rendering-error">Unable to render process diagram.</div>');
+              }
+            });
+          }
+        });
 
       }
     };
