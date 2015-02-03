@@ -1,5 +1,3 @@
-'use strict';
-
 define([
   'angular',
   'camunda-bpm-sdk-js'
@@ -8,6 +6,8 @@ function(
   angular,
   CamSDK
 ) {
+  'use strict';
+
   var apiModule = angular.module('cam.tasklist.client', []);
 
   apiModule.value('HttpClient', CamSDK.Client);

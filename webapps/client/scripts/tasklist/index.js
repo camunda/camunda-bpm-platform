@@ -1,5 +1,3 @@
-'use strict';
-
 define([
   'angular',
 
@@ -23,6 +21,8 @@ define([
   camQueryComponent
 
 ) {
+  'use strict';
+
   var module = angular.module('cam.tasklist.tasklist', [
     'ui.bootstrap'
   ]);

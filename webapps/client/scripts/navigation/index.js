@@ -1,5 +1,3 @@
-'use strict';
-
 define([
   'angular',
   './directives/cam-tasklist-navigation',
@@ -10,6 +8,8 @@ define([
   camTasklistNavigation,
   camLayoutCtrl
 ) {
+  'use strict';
+
   var navigationModule = angular.module('cam.tasklist.navigation', [
     require('camunda-commons-ui/util/index').name,
     'ui.bootstrap',

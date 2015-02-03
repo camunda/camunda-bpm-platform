@@ -1,6 +1,3 @@
-'use strict';
-
-
 define([
   'angular',
   'moment',
@@ -64,6 +61,7 @@ define([
   /* API */
   apiClient
 ) {
+  'use strict';
 
   var taskModule = angular.module('cam.tasklist.task', [
     apiClient.name,

@@ -1,7 +1,3 @@
-'use strict';
-
-
-
 /**
  * @module  cam.tasklist.variables
  * @belongsto cam.tasklist
@@ -21,6 +17,7 @@ define([
   camTasklistVariables,
   camTasklistVariablesDetailsModalCtrl
 ) {
+  'use strict';
 
   var variableModule = angular.module('cam.tasklist.variables', [
     'ui.bootstrap',

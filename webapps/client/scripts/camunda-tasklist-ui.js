@@ -1,7 +1,3 @@
-/* global define, require, console, document, window, setTimeout: false */
-'use strict';
-
-
 define('camunda-tasklist-ui', [
   'camunda-commons-ui',
   'camunda-bpm-sdk-js',
@@ -30,6 +26,7 @@ define('camunda-tasklist-ui', [
 
   'text!scripts/index.html'
 ], function() {
+  'use strict';
   /**
    * @namespace cam
    */

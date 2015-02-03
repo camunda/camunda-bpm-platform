@@ -1,7 +1,3 @@
-'use strict';
-
-
-
 /**
  * @module  cam.tasklist.filter
  * @belongsto cam.tasklist
@@ -45,6 +41,7 @@ define([
   /* modals */
   camTasklistFilterModal
 ) {
+  'use strict';
 
   var filterModule = angular.module('cam.tasklist.filter', [
     'ui.bootstrap',

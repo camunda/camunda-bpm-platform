@@ -1,6 +1,3 @@
-'use strict';
-
-
 define([
   'angular',
   'camunda-commons-ui/auth/index',
@@ -16,6 +13,8 @@ define([
   camUserLogoutCtrl,
   camUserLoginCtrl
 ) {
+  'use strict';
+
   /**
    * @module cam.tasklist.user
    */

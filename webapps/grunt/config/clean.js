@@ -1,5 +1,5 @@
-module.exports = function(config) {
-  config = config || {};
+module.exports = function() {
+  'use strict';
 
   return {
     build: {
@@ -7,13 +7,7 @@ module.exports = function(config) {
         'doc',
         'dist',
         'target',
-        '.tmp',
-        '.bower_packages'
-      ]
-    },
-    sdk: {
-      src: [
-        '.bower_packages'
+        '.tmp'
       ]
     }
   };

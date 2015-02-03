@@ -1,5 +1,3 @@
-'use strict';
-
 define([
   'angular',
   './directives/cam-tasklist-form',
@@ -18,6 +16,7 @@ define([
   camTasklistFormExternal,
   camTasklistUniqueValue
 ) {
+  'use strict';
 
   var formModule = angular.module('cam.tasklist.form', [
     'ui.bootstrap'

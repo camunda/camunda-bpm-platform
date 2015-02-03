@@ -4,7 +4,7 @@ module.exports = function(config) {
   var productionRemoveExp = /<!-- #production-remove([\s\S.]*)\/production-remove -->/igm;
   function prod () {
     return grunt.config('buildTarget') === 'dist';
-  };
+  }
 
 
   function productionRemove(content) {
