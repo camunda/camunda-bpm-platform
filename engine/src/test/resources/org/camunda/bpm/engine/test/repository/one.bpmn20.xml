@@ -5,7 +5,7 @@
              targetNamespace="Examples">
 
   <process id="one" name="One">
-  
+    <documentation>Desc one</documentation>
     <startEvent id="start" />
     <sequenceFlow id="flow1" sourceRef="start" targetRef="end" />
     <endEvent id="end" />

@@ -19,8 +19,11 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensurePositive;
 import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
+import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
+import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinitionQuery;
@@ -238,9 +241,22 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
 
   public List<ProcessDefinition> executeList(CommandContext commandContext, Page page) {
     checkQueryOk();
-    return commandContext
+    List<ProcessDefinition> list = commandContext
       .getProcessDefinitionManager()
       .findProcessDefinitionsByQueryCriteria(this, page);
+
+    for (ProcessDefinition processDefinition : list) {
+
+      ProcessDefinition processDefinitionFromCache = Context.getProcessEngineConfiguration()
+              .getDeploymentCache()
+              .findDeployedProcessDefinitionById(processDefinition.getId());
+
+      ProcessDefinitionEntity processDefinitionEntity = (ProcessDefinitionEntity) processDefinition;
+      processDefinitionEntity.setProperty(BpmnParse.PROPERTYNAME_DOCUMENTATION, processDefinitionFromCache.getDescription());
+
+    }
+
+    return list;
   }
 
   public void checkQueryOk() {
