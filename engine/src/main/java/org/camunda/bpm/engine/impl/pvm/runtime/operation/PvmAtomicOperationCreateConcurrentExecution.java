@@ -167,7 +167,7 @@ public abstract class PvmAtomicOperationCreateConcurrentExecution implements Pvm
         //      +------+                   +-------+              |
         //         |                           |                  |
         //      +------+ s=tt              +-------+ s=tt     +-------+ s=ff
-        //      |  e   | cc=ff     =>      |   e   | cc=ff    |  PPE  | cc=tt
+        //      |  e   | cc=ff     =>      |   e   | cc=tt    |  PPE  | cc=tt
         //      +------+                   +-------+          +-------+
         //         |                           |
         //      +------+ s=tt              +-------+ s=tt

@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions id="definitions"
-	xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:activiti="http://activiti.org/bpmn"
-	targetNamespace="Examples" xmlns:tns="Examples">
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:activiti="http://activiti.org/bpmn"
+  targetNamespace="Examples" xmlns:tns="Examples">
 
-	<message id="messageId" name="newMessage" />
+  <message id="messageId" name="newMessage" />
 
-	<process id="process">
+  <process id="process">
 
-		<startEvent id="theStart" />
+    <startEvent id="theStart" />
 
-		<sequenceFlow sourceRef="theStart" targetRef="subProcess" />
+    <sequenceFlow sourceRef="theStart" targetRef="subProcess" />
 
     <subProcess id="subProcess">
 
@@ -17,34 +17,36 @@
 
       <sequenceFlow sourceRef="innerStart" targetRef="task" />
 
-          <!--  this is a scope -->
-  		<userTask id="task" name="Task" />
+      <!-- this is a scope -->
+      <userTask id="task" name="Task" />
 
       <boundaryEvent id="timer" attachedToRef="task">
         <timerEventDefinition>
-            <timeDuration>PT10S</timeDuration>
+          <timeDuration>PT10S</timeDuration>
         </timerEventDefinition>
       </boundaryEvent>
 
-  		<sequenceFlow sourceRef="task" targetRef="innerEnd" />
+      <sequenceFlow sourceRef="task" targetRef="innerEnd" />
 
-  		<endEvent id="innerEnd" />
+      <endEvent id="innerEnd" />
 
-  		<subProcess id="eventSubProcess" triggeredByEvent="true">
+      <subProcess id="eventSubProcess" triggeredByEvent="true">
 
-  			<startEvent id="eventProcessStart" isInterrupting="false">
-  				<messageEventDefinition messageRef="messageId" />
-  			</startEvent>
+        <startEvent id="eventProcessStart" isInterrupting="false">
+          <messageEventDefinition messageRef="messageId" />
+        </startEvent>
 
-  			<sequenceFlow sourceRef="eventProcessStart" targetRef="eventSubProcessTask" />
+        <sequenceFlow sourceRef="eventProcessStart"
+          targetRef="eventSubProcessTask" />
 
-  			<userTask id="eventSubProcessTask" name="Task" />
+        <userTask id="eventSubProcessTask" name="Task" />
 
-  			<sequenceFlow sourceRef="eventSubProcessTask" targetRef="eventSubProcessEnd" />
+        <sequenceFlow sourceRef="eventSubProcessTask"
+          targetRef="eventSubProcessEnd" />
 
-  			<endEvent id="eventSubProcessEnd" />
+        <endEvent id="eventSubProcessEnd" />
 
-  		</subProcess>
+      </subProcess>
 
     </subProcess>
 
@@ -53,6 +55,6 @@
     <endEvent id="theEnd" />
 
 
-	</process>
+  </process>
 
 </definitions>
