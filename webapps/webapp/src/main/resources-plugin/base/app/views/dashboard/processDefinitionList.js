@@ -1,4 +1,3 @@
-/* global define: false */
 define(['text!./process-definition-list.html'], function(template) {
   'use strict';
   return [ 'ViewsProvider', function PluginConfiguration(ViewsProvider) {
