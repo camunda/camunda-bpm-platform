@@ -14,9 +14,6 @@ describe('tasklist dashboard - ', function() {
       // when
       dashboardPage.navigateTo();
       dashboardPage.authentication.userLogin('jonny1', 'jonny1');
-
-      // then
-      dashboardPage.isActive();
     });
 
   });

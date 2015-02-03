@@ -9,11 +9,8 @@ describe('tasklist filter -', function() {
     it('should login', function () {
 
       // when
-      dashboardPage.navigateTo();
+      dashboardPage.navigateToWebapp('Tasklist');
       dashboardPage.authentication.userLogin('jonny1', 'jonny1');
-
-      // then
-      dashboardPage.isActive();
     });
 
   });
