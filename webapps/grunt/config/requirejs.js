@@ -1,4 +1,4 @@
-module.exports = function() {
+module.exports = function(config) {
   'use strict';
   var commons = require('camunda-commons-ui');
   var _ = commons.utils._;
@@ -114,7 +114,9 @@ module.exports = function() {
           'scripts/form/index',
           'scripts/filter/index',
           'scripts/api/index'
-        ]
+        ],
+
+        onModuleBundleComplete: commons.livereloadSnippet(config.grunt)
       }
     }
   };
