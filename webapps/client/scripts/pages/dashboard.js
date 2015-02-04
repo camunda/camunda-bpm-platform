@@ -24,7 +24,8 @@ define(['angular', 'text!./dashboard.html'], function(angular, template) {
     $routeProvider.when('/dashboard', {
       template: template,
       controller: Controller,
-      authentication: 'required'
+      authentication: 'required',
+      reloadOnSearch: false
     });
   }];
 
