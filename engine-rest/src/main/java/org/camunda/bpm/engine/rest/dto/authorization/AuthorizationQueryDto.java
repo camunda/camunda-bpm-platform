@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.rest.dto.authorization;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.core.MultivaluedMap;
 
@@ -117,21 +118,11 @@ public class AuthorizationQueryDto extends AbstractQueryDto<AuthorizationQuery> 
   }
 
   @Override
-  protected void applySortingOptions(AuthorizationQuery query) {
-    if (sortBy != null) {
-      if (sortBy.equals(SORT_BY_RESOURCE_ID)) {
-        query.orderByResourceId();
-      } else if (sortBy.equals(SORT_BY_RESOURCE_TYPE)) {
-        query.orderByResourceType();
-      }
-    }
-
-    if (sortOrder != null) {
-      if (sortOrder.equals(SORT_ORDER_ASC_VALUE)) {
-        query.asc();
-      } else if (sortOrder.equals(SORT_ORDER_DESC_VALUE)) {
-        query.desc();
-      }
+  protected void applySortBy(AuthorizationQuery query, String sortBy, Map<String, Object> parameters, ProcessEngine engine) {
+    if (sortBy.equals(SORT_BY_RESOURCE_ID)) {
+      query.orderByResourceId();
+    } else if (sortBy.equals(SORT_BY_RESOURCE_TYPE)) {
+      query.orderByResourceType();
     }
   }
 

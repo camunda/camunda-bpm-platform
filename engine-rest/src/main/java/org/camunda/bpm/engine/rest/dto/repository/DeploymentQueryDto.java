@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.rest.dto.repository;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.core.MultivaluedMap;
 
@@ -22,8 +23,8 @@ import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.repository.DeploymentQuery;
 import org.camunda.bpm.engine.rest.dto.AbstractQueryDto;
 import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.camunda.bpm.engine.rest.dto.converter.DateConverter;
+import org.codehaus.jackson.map.ObjectMapper;
 
 public class DeploymentQueryDto extends AbstractQueryDto<DeploymentQuery> {
 
@@ -107,23 +108,13 @@ public class DeploymentQueryDto extends AbstractQueryDto<DeploymentQuery> {
   }
 
   @Override
-  protected void applySortingOptions(DeploymentQuery query) {
-    if (sortBy != null) {
-      if (sortBy.equals(SORT_BY_ID_VALUE)) {
-        query.orderByDeploymentId();
-      } else if (sortBy.equals(SORT_BY_NAME_VALUE)) {
-        query.orderByDeploymentName();
-      } else if (sortBy.equals(SORT_BY_DEPLOYMENT_TIME_VALUE)) {
-        query.orderByDeploymenTime();
-      }
-    }
-
-    if (sortOrder != null) {
-      if (sortOrder.equals(SORT_ORDER_ASC_VALUE)) {
-        query.asc();
-      } else if (sortOrder.equals(SORT_ORDER_DESC_VALUE)) {
-        query.desc();
-      }
+  protected void applySortBy(DeploymentQuery query, String sortBy, Map<String, Object> parameters, ProcessEngine engine) {
+    if (sortBy.equals(SORT_BY_ID_VALUE)) {
+      query.orderByDeploymentId();
+    } else if (sortBy.equals(SORT_BY_NAME_VALUE)) {
+      query.orderByDeploymentName();
+    } else if (sortBy.equals(SORT_BY_DEPLOYMENT_TIME_VALUE)) {
+      query.orderByDeploymenTime();
     }
   }
 

@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.rest.dto.history;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.ws.rs.core.MultivaluedMap;
@@ -317,29 +318,19 @@ public class HistoricCaseInstanceQueryDto extends AbstractQueryDto<HistoricCaseI
   }
 
   @Override
-  protected void applySortingOptions(HistoricCaseInstanceQuery query) {
-    if (sortBy != null) {
-      if (sortBy.equals(SORT_BY_CASE_INSTANCE_ID_VALUE)) {
-        query.orderByCaseInstanceId();
-      } else if (sortBy.equals(SORT_BY_CASE_DEFINITION_ID_VALUE)) {
-        query.orderByCaseDefinitionId();
-      } else if (sortBy.equals(SORT_BY_CASE_INSTANCE_BUSINESS_KEY_VALUE)) {
-        query.orderByCaseInstanceBusinessKey();
-      } else if (sortBy.equals(SORT_BY_CASE_INSTANCE_CREATE_TIME_VALUE)) {
-        query.orderByCaseInstanceCreateTime();
-      } else if (sortBy.equals(SORT_BY_CASE_INSTANCE_CLOSE_TIME_VALUE)) {
-        query.orderByCaseInstanceCloseTime();
-      } else if (sortBy.equals(SORT_BY_CASE_INSTANCE_DURATION_VALUE)) {
-        query.orderByCaseInstanceDuration();
-      }
-    }
-
-    if (sortOrder != null) {
-      if (sortOrder.equals(SORT_ORDER_ASC_VALUE)) {
-        query.asc();
-      } else if (sortOrder.equals(SORT_ORDER_DESC_VALUE)) {
-        query.desc();
-      }
+  protected void applySortBy(HistoricCaseInstanceQuery query, String sortBy, Map<String, Object> parameters, ProcessEngine engine) {
+    if (sortBy.equals(SORT_BY_CASE_INSTANCE_ID_VALUE)) {
+      query.orderByCaseInstanceId();
+    } else if (sortBy.equals(SORT_BY_CASE_DEFINITION_ID_VALUE)) {
+      query.orderByCaseDefinitionId();
+    } else if (sortBy.equals(SORT_BY_CASE_INSTANCE_BUSINESS_KEY_VALUE)) {
+      query.orderByCaseInstanceBusinessKey();
+    } else if (sortBy.equals(SORT_BY_CASE_INSTANCE_CREATE_TIME_VALUE)) {
+      query.orderByCaseInstanceCreateTime();
+    } else if (sortBy.equals(SORT_BY_CASE_INSTANCE_CLOSE_TIME_VALUE)) {
+      query.orderByCaseInstanceCloseTime();
+    } else if (sortBy.equals(SORT_BY_CASE_INSTANCE_DURATION_VALUE)) {
+      query.orderByCaseInstanceDuration();
     }
   }
 

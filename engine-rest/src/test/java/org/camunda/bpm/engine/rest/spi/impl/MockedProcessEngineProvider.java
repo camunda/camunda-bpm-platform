@@ -14,7 +14,6 @@ package org.camunda.bpm.engine.rest.spi.impl;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mockito.Matchers.eq;
 
 import java.util.HashMap;
 import java.util.HashSet;

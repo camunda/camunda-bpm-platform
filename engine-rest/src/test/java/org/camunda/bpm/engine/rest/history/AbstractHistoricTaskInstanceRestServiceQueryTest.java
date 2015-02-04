@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 import javax.xml.registry.InvalidRequestException;
 
@@ -25,6 +26,7 @@ import org.camunda.bpm.engine.history.HistoricTaskInstanceQuery;
 import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
 import org.camunda.bpm.engine.rest.AbstractRestServiceTest;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
+import org.camunda.bpm.engine.rest.util.OrderingBuilder;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -322,6 +324,25 @@ public abstract class AbstractHistoricTaskInstanceRestServiceQueryTest extends A
     executeAndVerifySorting("caseExecutionId", "desc", Status.OK);
     inOrder.verify(mockedQuery).orderByCaseExecutionId();
     inOrder.verify(mockedQuery).desc();
+  }
+
+  @Test
+  public void testSecondarySortingAsPost() {
+    InOrder inOrder = Mockito.inOrder(mockedQuery);
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("sorting", OrderingBuilder.create()
+      .orderBy("owner").desc()
+      .orderBy("priority").asc()
+      .getJson());
+    given().contentType(POST_JSON_CONTENT_TYPE).body(json)
+      .header("accept", MediaType.APPLICATION_JSON)
+      .then().expect().statusCode(Status.OK.getStatusCode())
+      .when().post(HISTORIC_TASK_INSTANCE_RESOURCE_URL);
+
+    inOrder.verify(mockedQuery).orderByTaskOwner();
+    inOrder.verify(mockedQuery).desc();
+    inOrder.verify(mockedQuery).orderByTaskPriority();
+    inOrder.verify(mockedQuery).asc();
   }
 
   @Test

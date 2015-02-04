@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.rest.dto.runtime;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.core.MultivaluedMap;
 
@@ -108,29 +109,18 @@ public class FilterQueryDto extends AbstractQueryDto<FilterQuery> {
     }
   }
 
-  protected void applySortingOptions(FilterQuery query) {
-    if (sortBy != null) {
-      if (sortBy.equals(SORT_BY_ID_VALUE)) {
-        query.orderByFilterId();
-      }
-      else if (sortBy.equals(SORT_BY_RESOURCE_TYPE_VALUE)) {
-        query.orderByFilterResourceType();
-      }
-      else if (sortBy.equals(SORT_BY_NAME_VALUE)) {
-        query.orderByFilterName();
-      }
-      else if (sortBy.equals(SORT_BY_OWNER_VALUE)) {
-        query.orderByFilterOwner();
-      }
+  protected void applySortBy(FilterQuery query, String sortBy, Map<String, Object> parameters, ProcessEngine engine) {
+    if (sortBy.equals(SORT_BY_ID_VALUE)) {
+      query.orderByFilterId();
     }
-
-    if (sortOrder != null){
-      if (sortOrder.equals(SORT_ORDER_ASC_VALUE)) {
-        query.asc();
-      }
-      else if (sortOrder.equals(SORT_ORDER_DESC_VALUE)) {
-        query.desc();
-      }
+    else if (sortBy.equals(SORT_BY_RESOURCE_TYPE_VALUE)) {
+      query.orderByFilterResourceType();
+    }
+    else if (sortBy.equals(SORT_BY_NAME_VALUE)) {
+      query.orderByFilterName();
+    }
+    else if (sortBy.equals(SORT_BY_OWNER_VALUE)) {
+      query.orderByFilterOwner();
     }
   }
 

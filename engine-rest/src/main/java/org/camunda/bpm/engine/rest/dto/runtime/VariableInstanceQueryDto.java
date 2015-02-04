@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.rest.dto.runtime;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response.Status;
@@ -188,23 +189,13 @@ public class VariableInstanceQueryDto extends AbstractQueryDto<VariableInstanceQ
   }
 
   @Override
-  protected void applySortingOptions(VariableInstanceQuery query) {
-    if (sortBy != null) {
-      if (sortBy.equals(SORT_BY_VARIABLE_NAME_VALUE)) {
-        query.orderByVariableName();
-      } else if (sortBy.equals(SORT_BY_VARIABLE_TYPE_VALUE)) {
-        query.orderByVariableType();
-      } else if (sortBy.equals(SORT_BY_ACTIVITY_INSTANCE_ID_VALUE)) {
-        query.orderByActivityInstanceId();
-      }
-    }
-
-    if (sortOrder != null) {
-      if (sortOrder.equals(SORT_ORDER_ASC_VALUE)) {
-        query.asc();
-      } else if (sortOrder.equals(SORT_ORDER_DESC_VALUE)) {
-        query.desc();
-      }
+  protected void applySortBy(VariableInstanceQuery query, String sortBy, Map<String, Object> parameters, ProcessEngine engine) {
+    if (sortBy.equals(SORT_BY_VARIABLE_NAME_VALUE)) {
+      query.orderByVariableName();
+    } else if (sortBy.equals(SORT_BY_VARIABLE_TYPE_VALUE)) {
+      query.orderByVariableType();
+    } else if (sortBy.equals(SORT_BY_ACTIVITY_INSTANCE_ID_VALUE)) {
+      query.orderByActivityInstanceId();
     }
   }
 

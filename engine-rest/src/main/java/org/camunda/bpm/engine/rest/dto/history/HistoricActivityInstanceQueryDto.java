@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.rest.dto.history;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.core.MultivaluedMap;
 
@@ -221,37 +222,27 @@ public class HistoricActivityInstanceQueryDto extends AbstractQueryDto<HistoricA
   }
 
   @Override
-  protected void applySortingOptions(HistoricActivityInstanceQuery query) {
-    if (sortBy != null) {
-      if (sortBy.equals(SORT_BY_HISTORIC_ACTIVITY_INSTANCE_ID_VALUE)) {
-        query.orderByHistoricActivityInstanceId();
-      } else if (sortBy.equals(SORT_BY_PROCESS_INSTANCE_ID_VALUE)) {
-        query.orderByProcessInstanceId();
-      } else if (sortBy.equals(SORT_BY_PROCESS_DEFINITION_ID_VALUE)) {
-        query.orderByProcessDefinitionId();
-      } else if (sortBy.equals(SORT_BY_EXECUTION_ID_VALUE)) {
-        query.orderByExecutionId();
-      } else if (sortBy.equals(SORT_BY_ACTIVITY_ID_VALUE)) {
-        query.orderByActivityId();
-      } else if (sortBy.equals(SORT_BY_ACTIVITY_NAME_VALUE)) {
-        query.orderByActivityName();
-      } else if (sortBy.equals(SORT_BY_ACTIVITY_TYPE_VALUE)) {
-        query.orderByActivityType();
-      } else if (sortBy.equals(SORT_BY_HISTORIC_ACTIVITY_INSTANCE_START_TIME_VALUE)) {
-        query.orderByHistoricActivityInstanceStartTime();
-      } else if (sortBy.equals(SORT_BY_HISTORIC_ACTIVITY_INSTANCE_END_TIME_VALUE)) {
-        query.orderByHistoricActivityInstanceEndTime();
-      } else if (sortBy.equals(SORT_BY_HISTORIC_ACTIVITY_INSTANCE_DURATION_VALUE)) {
-        query.orderByHistoricActivityInstanceDuration();
-      }
-    }
-
-    if (sortOrder != null) {
-      if (sortOrder.equals(SORT_ORDER_ASC_VALUE)) {
-        query.asc();
-      } else if (sortOrder.equals(SORT_ORDER_DESC_VALUE)) {
-        query.desc();
-      }
+  protected void applySortBy(HistoricActivityInstanceQuery query, String sortBy, Map<String, Object> parameters, ProcessEngine engine) {
+    if (sortBy.equals(SORT_BY_HISTORIC_ACTIVITY_INSTANCE_ID_VALUE)) {
+      query.orderByHistoricActivityInstanceId();
+    } else if (sortBy.equals(SORT_BY_PROCESS_INSTANCE_ID_VALUE)) {
+      query.orderByProcessInstanceId();
+    } else if (sortBy.equals(SORT_BY_PROCESS_DEFINITION_ID_VALUE)) {
+      query.orderByProcessDefinitionId();
+    } else if (sortBy.equals(SORT_BY_EXECUTION_ID_VALUE)) {
+      query.orderByExecutionId();
+    } else if (sortBy.equals(SORT_BY_ACTIVITY_ID_VALUE)) {
+      query.orderByActivityId();
+    } else if (sortBy.equals(SORT_BY_ACTIVITY_NAME_VALUE)) {
+      query.orderByActivityName();
+    } else if (sortBy.equals(SORT_BY_ACTIVITY_TYPE_VALUE)) {
+      query.orderByActivityType();
+    } else if (sortBy.equals(SORT_BY_HISTORIC_ACTIVITY_INSTANCE_START_TIME_VALUE)) {
+      query.orderByHistoricActivityInstanceStartTime();
+    } else if (sortBy.equals(SORT_BY_HISTORIC_ACTIVITY_INSTANCE_END_TIME_VALUE)) {
+      query.orderByHistoricActivityInstanceEndTime();
+    } else if (sortBy.equals(SORT_BY_HISTORIC_ACTIVITY_INSTANCE_DURATION_VALUE)) {
+      query.orderByHistoricActivityInstanceDuration();
     }
   }
 

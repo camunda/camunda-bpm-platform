@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.rest.dto.runtime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response.Status;
@@ -261,31 +262,21 @@ public class JobQueryDto extends AbstractQueryDto<JobQuery> {
   }
 
   @Override
-  protected void applySortingOptions(JobQuery query) {
-    if (sortBy != null) {
-      if (sortBy.equals(SORT_BY_JOB_ID_VALUE)) {
-        query.orderByJobId();
-      } else if (sortBy.equals(SORT_BY_EXECUTION_ID_VALUE)) {
-        query.orderByExecutionId();
-      } else if (sortBy.equals(SORT_BY_PROCESS_INSTANCE_ID_VALUE)) {
-        query.orderByProcessInstanceId();
-      } else if (sortBy.equals(SORT_BY_PROCESS_DEFINITION_ID_VALUE)) {
-        query.orderByProcessDefinitionId();
-      } else if (sortBy.equals(SORT_BY_PROCESS_DEFINITION_KEY_VALUE)) {
-        query.orderByProcessDefinitionKey();
-      } else if (sortBy.equals(SORT_BY_JOB_RETRIES_VALUE)) {
-        query.orderByJobRetries();
-      } else if (sortBy.equals(SORT_BY_JOB_DUEDATE_VALUE)) {
-        query.orderByJobDuedate();
-      }
-    }
-
-    if (sortOrder != null) {
-      if (sortOrder.equals(SORT_ORDER_ASC_VALUE)) {
-        query.asc();
-      } else if (sortOrder.equals(SORT_ORDER_DESC_VALUE)) {
-        query.desc();
-      }
+  protected void applySortBy(JobQuery query, String sortBy, Map<String, Object> parameters, ProcessEngine engine) {
+    if (sortBy.equals(SORT_BY_JOB_ID_VALUE)) {
+      query.orderByJobId();
+    } else if (sortBy.equals(SORT_BY_EXECUTION_ID_VALUE)) {
+      query.orderByExecutionId();
+    } else if (sortBy.equals(SORT_BY_PROCESS_INSTANCE_ID_VALUE)) {
+      query.orderByProcessInstanceId();
+    } else if (sortBy.equals(SORT_BY_PROCESS_DEFINITION_ID_VALUE)) {
+      query.orderByProcessDefinitionId();
+    } else if (sortBy.equals(SORT_BY_PROCESS_DEFINITION_KEY_VALUE)) {
+      query.orderByProcessDefinitionKey();
+    } else if (sortBy.equals(SORT_BY_JOB_RETRIES_VALUE)) {
+      query.orderByJobRetries();
+    } else if (sortBy.equals(SORT_BY_JOB_DUEDATE_VALUE)) {
+      query.orderByJobDuedate();
     }
 
   }

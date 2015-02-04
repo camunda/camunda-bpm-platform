@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.rest.dto.identity;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.core.MultivaluedMap;
 
@@ -153,25 +154,15 @@ public class UserQueryDto extends AbstractQueryDto<UserQuery> {
   }
 
   @Override
-  protected void applySortingOptions(UserQuery query) {
-    if (sortBy != null) {
-      if (sortBy.equals(SORT_BY_USER_ID_VALUE)) {
-        query.orderByUserId();
-      } else if (sortBy.equals(SORT_BY_USER_FIRSTNAME_VALUE)) {
-        query.orderByUserFirstName();
-      } else if (sortBy.equals(SORT_BY_USER_LASTNAME_VALUE)) {
-        query.orderByUserLastName();
-      } else if (sortBy.equals(SORT_BY_USER_EMAIL_VALUE)) {
-        query.orderByUserEmail();
-      }
-    }
-
-    if (sortOrder != null) {
-      if (sortOrder.equals(SORT_ORDER_ASC_VALUE)) {
-        query.asc();
-      } else if (sortOrder.equals(SORT_ORDER_DESC_VALUE)) {
-        query.desc();
-      }
+  protected void applySortBy(UserQuery query, String sortBy, Map<String, Object> parameters, ProcessEngine engine) {
+    if (sortBy.equals(SORT_BY_USER_ID_VALUE)) {
+      query.orderByUserId();
+    } else if (sortBy.equals(SORT_BY_USER_FIRSTNAME_VALUE)) {
+      query.orderByUserFirstName();
+    } else if (sortBy.equals(SORT_BY_USER_LASTNAME_VALUE)) {
+      query.orderByUserLastName();
+    } else if (sortBy.equals(SORT_BY_USER_EMAIL_VALUE)) {
+      query.orderByUserEmail();
     }
   }
 

@@ -58,6 +58,8 @@ public abstract class AbstractQueryDto<T extends Query<?, ?>> {
   protected String sortBy;
   protected String sortOrder;
 
+  protected List<SortingDto> sortings;
+
   protected Map<String, String> expressions = new HashMap<String, String>();
 
   // required for populating via jackson
@@ -96,6 +98,10 @@ public abstract class AbstractQueryDto<T extends Query<?, ?>> {
       throw new InvalidRequestException(Status.BAD_REQUEST, "sortOrder parameter has invalid value: " + sortOrder);
     }
     this.sortOrder = sortOrder;
+  }
+
+  public void setSorting(List<SortingDto> sorting) {
+    this.sortings = sorting;
   }
 
   protected abstract boolean isValidSortByValue(String value);
@@ -178,7 +184,7 @@ public abstract class AbstractQueryDto<T extends Query<?, ?>> {
       throw new InvalidRequestException(Status.BAD_REQUEST, "Only a single sorting parameter specified. sortBy and sortOrder required");
     }
 
-    applySortingOptions(query);
+    applySortingOptions(query, engine);
 
     return query;
   }
@@ -187,5 +193,39 @@ public abstract class AbstractQueryDto<T extends Query<?, ?>> {
 
   protected abstract void applyFilters(T query);
 
-  protected abstract void applySortingOptions(T query);
+  protected void applySortingOptions(T query, ProcessEngine engine) {
+    if (sortBy != null) {
+      applySortBy(query, sortBy, null, engine);
+    }
+    if (sortOrder != null) {
+      applySortOrder(query, sortOrder);
+    }
+
+    if (sortings != null) {
+      for (SortingDto sorting : sortings) {
+        String sortingOrder = sorting.getSortOrder();
+        String sortingBy = sorting.getSortBy();
+
+        if (sortingBy != null) {
+          applySortBy(query, sortingBy, sorting.getParameters(), engine);
+        }
+        if (sortingOrder != null) {
+          applySortOrder(query, sortingOrder);
+        }
+      }
+    }
+  }
+
+  protected abstract void applySortBy(T query, String sortBy, Map<String, Object> parameters, ProcessEngine engine);
+
+  protected void applySortOrder(T query, String sortOrder) {
+    if (sortOrder != null) {
+      if (sortOrder.equals(SORT_ORDER_ASC_VALUE)) {
+        query.asc();
+      } else if (sortOrder.equals(SORT_ORDER_DESC_VALUE)) {
+        query.desc();
+      }
+    }
+  }
+
 }

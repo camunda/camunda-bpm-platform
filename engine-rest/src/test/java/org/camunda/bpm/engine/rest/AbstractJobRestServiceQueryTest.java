@@ -14,9 +14,11 @@ package org.camunda.bpm.engine.rest;
 
 import com.jayway.restassured.http.ContentType;
 import com.jayway.restassured.response.Response;
+
 import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
+import org.camunda.bpm.engine.rest.util.OrderingBuilder;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.JobQuery;
 import org.junit.Assert;
@@ -25,7 +27,9 @@ import org.junit.Test;
 import org.mockito.InOrder;
 import org.mockito.Mockito;
 
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -445,6 +449,25 @@ public abstract class AbstractJobRestServiceQueryTest extends AbstractRestServic
 				.then().expect().statusCode(expectedStatus.getStatusCode())
 				.when().get(JOBS_RESOURCE_URL);
 	}
+
+	@Test
+  public void testSecondarySortingAsPost() {
+    InOrder inOrder = Mockito.inOrder(mockQuery);
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("sorting", OrderingBuilder.create()
+      .orderBy("jobRetries").desc()
+      .orderBy("jobDueDate").asc()
+      .getJson());
+    given().contentType(POST_JSON_CONTENT_TYPE).body(json)
+      .header("accept", MediaType.APPLICATION_JSON)
+      .then().expect().statusCode(Status.OK.getStatusCode())
+      .when().post(JOBS_RESOURCE_URL);
+
+    inOrder.verify(mockQuery).orderByJobRetries();
+    inOrder.verify(mockQuery).desc();
+    inOrder.verify(mockQuery).orderByJobDuedate();
+    inOrder.verify(mockQuery).asc();
+  }
 
 	@Test
 	public void testSuccessfulPagination() {

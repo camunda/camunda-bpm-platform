@@ -38,6 +38,8 @@ import org.camunda.bpm.engine.rest.dto.converter.VariableListConverter;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.task.DelegationState;
 import org.camunda.bpm.engine.task.TaskQuery;
+import org.camunda.bpm.engine.variable.type.ValueType;
+import org.camunda.bpm.engine.variable.type.ValueTypeResolver;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
@@ -57,6 +59,12 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
   private static final String SORT_BY_NAME_VALUE = "name";
   private static final String SORT_BY_NAME_CASE_INSENSITIVE_VALUE = "nameCaseInsensitive";
   private static final String SORT_BY_PRIORITY_VALUE = "priority";
+
+  private static final String SORT_BY_PROCESS_VARIABLE = "processVariable";
+  private static final String SORT_BY_EXECUTION_VARIABLE = "executionVariable";
+  private static final String SORT_BY_TASK_VARIABLE = "taskVariable";
+  private static final String SORT_BY_CASE_INSTANCE_VARIABLE = "caseInstanceVariable";
+  private static final String SORT_BY_CASE_EXECUTION_VARIABLE = "caseExecutionVariable";
 
   private static final List<String> VALID_SORT_BY_VALUES;
   static {
@@ -1050,46 +1058,72 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
   }
 
   @Override
-  protected void applySortingOptions(TaskQuery query) {
-    if (sortBy != null) {
-      if (sortBy.equals(SORT_BY_PROCESS_INSTANCE_ID_VALUE)) {
-        query.orderByProcessInstanceId();
-      } else if (sortBy.equals(SORT_BY_CASE_INSTANCE_ID_VALUE)) {
-        query.orderByCaseInstanceId();
-      } else if (sortBy.equals(SORT_BY_DUE_DATE_VALUE)) {
-        query.orderByDueDate();
-      } else if (sortBy.equals(SORT_BY_FOLLOW_UP_VALUE)) {
-        query.orderByFollowUpDate();
-      } else if (sortBy.equals(SORT_BY_EXECUTION_ID_VALUE)) {
-        query.orderByExecutionId();
-      } else if (sortBy.equals(SORT_BY_CASE_EXECUTION_ID_VALUE)) {
-        query.orderByCaseExecutionId();
-      } else if (sortBy.equals(SORT_BY_ASSIGNEE_VALUE)) {
-        query.orderByTaskAssignee();
-      } else if (sortBy.equals(SORT_BY_CREATE_TIME_VALUE)) {
-        query.orderByTaskCreateTime();
-      } else if (sortBy.equals(SORT_BY_DESCRIPTION_VALUE)) {
-        query.orderByTaskDescription();
-      } else if (sortBy.equals(SORT_BY_ID_VALUE)) {
-        query.orderByTaskId();
-      } else if (sortBy.equals(SORT_BY_NAME_VALUE)) {
-        query.orderByTaskName();
-      } else if (sortBy.equals(SORT_BY_NAME_CASE_INSENSITIVE_VALUE)) {
-        query.orderByTaskNameCaseInsensitive();
-      } else if (sortBy.equals(SORT_BY_PRIORITY_VALUE)) {
-        query.orderByTaskPriority();
-      }
-    }
+  protected void applySortBy(TaskQuery query, String sortBy, Map<String, Object> parameters, ProcessEngine engine) {
+    if (sortBy.equals(SORT_BY_PROCESS_INSTANCE_ID_VALUE)) {
+      query.orderByProcessInstanceId();
+    } else if (sortBy.equals(SORT_BY_CASE_INSTANCE_ID_VALUE)) {
+      query.orderByCaseInstanceId();
+    } else if (sortBy.equals(SORT_BY_DUE_DATE_VALUE)) {
+      query.orderByDueDate();
+    } else if (sortBy.equals(SORT_BY_FOLLOW_UP_VALUE)) {
+      query.orderByFollowUpDate();
+    } else if (sortBy.equals(SORT_BY_EXECUTION_ID_VALUE)) {
+      query.orderByExecutionId();
+    } else if (sortBy.equals(SORT_BY_CASE_EXECUTION_ID_VALUE)) {
+      query.orderByCaseExecutionId();
+    } else if (sortBy.equals(SORT_BY_ASSIGNEE_VALUE)) {
+      query.orderByTaskAssignee();
+    } else if (sortBy.equals(SORT_BY_CREATE_TIME_VALUE)) {
+      query.orderByTaskCreateTime();
+    } else if (sortBy.equals(SORT_BY_DESCRIPTION_VALUE)) {
+      query.orderByTaskDescription();
+    } else if (sortBy.equals(SORT_BY_ID_VALUE)) {
+      query.orderByTaskId();
+    } else if (sortBy.equals(SORT_BY_NAME_VALUE)) {
+      query.orderByTaskName();
+    } else if (sortBy.equals(SORT_BY_NAME_CASE_INSENSITIVE_VALUE)) {
+      query.orderByTaskNameCaseInsensitive();
+    } else if (sortBy.equals(SORT_BY_PRIORITY_VALUE)) {
+      query.orderByTaskPriority();
 
-    if (sortOrder != null) {
-      if (sortOrder.equals(SORT_ORDER_ASC_VALUE)) {
-        query.asc();
-      } else if (sortOrder.equals(SORT_ORDER_DESC_VALUE)) {
-        query.desc();
-      }
+    } else if (sortBy.equals(SORT_BY_PROCESS_VARIABLE)) {
+      String variableName = (String) getValue(parameters, "variable");
+      String valueTypeName = (String) getValue(parameters, "type");
+      query.orderByProcessVariable(variableName, getValueTypeByName(valueTypeName, engine));
+
+    } else if (sortBy.equals(SORT_BY_EXECUTION_VARIABLE)) {
+      String variableName = (String) getValue(parameters, "variable");
+      String valueTypeName = (String) getValue(parameters, "type");
+      query.orderByExecutionVariable(variableName, getValueTypeByName(valueTypeName, engine));
+
+    } else if (sortBy.equals(SORT_BY_TASK_VARIABLE)) {
+      String variableName = (String) getValue(parameters, "variable");
+      String valueTypeName = (String) getValue(parameters, "type");
+      query.orderByTaskVariable(variableName, getValueTypeByName(valueTypeName, engine));
+
+    } else if (sortBy.equals(SORT_BY_CASE_INSTANCE_VARIABLE)) {
+      String variableName = (String) getValue(parameters, "variable");
+      String valueTypeName = (String) getValue(parameters, "type");
+      query.orderByCaseInstanceVariable(variableName, getValueTypeByName(valueTypeName, engine));
+
+    } else if (sortBy.equals(SORT_BY_CASE_EXECUTION_VARIABLE)) {
+      String variableName = (String) getValue(parameters, "variable");
+      String valueTypeName = (String) getValue(parameters, "type");
+      query.orderByCaseExecutionVariable(variableName, getValueTypeByName(valueTypeName, engine));
     }
   }
 
+  protected Object getValue(Map<String, Object> map, String key) {
+    if (map != null) {
+      return map.get(key);
+    }
+    return null;
+  }
+
+  protected ValueType getValueTypeByName(String name, ProcessEngine engine) {
+    ValueTypeResolver valueTypeResolver = engine.getProcessEngineConfiguration().getValueTypeResolver();
+    return valueTypeResolver.typeForName(name);
+  }
 
   public static TaskQueryDto fromQuery(Query<?, ?> query) {
     TaskQueryImpl taskQuery = (TaskQueryImpl) query;

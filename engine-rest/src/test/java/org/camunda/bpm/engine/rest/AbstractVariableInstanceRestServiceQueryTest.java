@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 import javax.xml.registry.InvalidRequestException;
 
@@ -28,6 +29,7 @@ import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.camunda.bpm.engine.rest.helper.MockVariableInstanceBuilder;
 import org.camunda.bpm.engine.rest.helper.VariableTypeHelper;
 import org.camunda.bpm.engine.rest.helper.variable.EqualsPrimitiveValue;
+import org.camunda.bpm.engine.rest.util.OrderingBuilder;
 import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.runtime.VariableInstanceQuery;
 import org.junit.Assert;
@@ -189,6 +191,25 @@ public abstract class AbstractVariableInstanceRestServiceQueryTest extends Abstr
 
     inOrder = Mockito.inOrder(mockedQuery);
     executeAndVerifySorting("activityInstanceId", "asc", Status.OK);
+    inOrder.verify(mockedQuery).orderByActivityInstanceId();
+    inOrder.verify(mockedQuery).asc();
+  }
+
+  @Test
+  public void testSecondarySortingAsPost() {
+    InOrder inOrder = Mockito.inOrder(mockedQuery);
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("sorting", OrderingBuilder.create()
+      .orderBy("variableName").desc()
+      .orderBy("activityInstanceId").asc()
+      .getJson());
+    given().contentType(POST_JSON_CONTENT_TYPE).body(json)
+      .header("accept", MediaType.APPLICATION_JSON)
+      .then().expect().statusCode(Status.OK.getStatusCode())
+      .when().post(VARIABLE_INSTANCE_QUERY_URL);
+
+    inOrder.verify(mockedQuery).orderByVariableName();
+    inOrder.verify(mockedQuery).desc();
     inOrder.verify(mockedQuery).orderByActivityInstanceId();
     inOrder.verify(mockedQuery).asc();
   }

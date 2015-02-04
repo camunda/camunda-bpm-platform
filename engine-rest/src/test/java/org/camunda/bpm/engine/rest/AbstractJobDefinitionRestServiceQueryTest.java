@@ -15,10 +15,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
+
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.management.JobDefinitionQuery;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
+import org.camunda.bpm.engine.rest.util.OrderingBuilder;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InOrder;
@@ -181,6 +184,25 @@ public abstract class AbstractJobDefinitionRestServiceQueryTest extends Abstract
     executeAndVerifySorting("jobConfiguration", "desc", Status.OK);
     inOrder.verify(mockedQuery).orderByJobConfiguration();
     inOrder.verify(mockedQuery).desc();
+  }
+
+  @Test
+  public void testSecondarySortingAsPost() {
+    InOrder inOrder = Mockito.inOrder(mockedQuery);
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("sorting", OrderingBuilder.create()
+      .orderBy("jobType").desc()
+      .orderBy("jobConfiguration").asc()
+      .getJson());
+    given().contentType(POST_JSON_CONTENT_TYPE).body(json)
+      .header("accept", MediaType.APPLICATION_JSON)
+      .then().expect().statusCode(Status.OK.getStatusCode())
+      .when().post(JOB_DEFINITION_QUERY_URL);
+
+    inOrder.verify(mockedQuery).orderByJobType();
+    inOrder.verify(mockedQuery).desc();
+    inOrder.verify(mockedQuery).orderByJobConfiguration();
+    inOrder.verify(mockedQuery).asc();
   }
 
   @Test

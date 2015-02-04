@@ -29,10 +29,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.camunda.bpm.engine.rest.helper.variable.EqualsPrimitiveValue;
+import org.camunda.bpm.engine.rest.util.OrderingBuilder;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.runtime.CaseInstanceQuery;
 import org.junit.Before;
@@ -199,6 +201,25 @@ public abstract class AbstractCaseInstanceRestServiceQueryTest extends AbstractR
     executeAndVerifySorting("caseDefinitionId", "desc", Status.OK);
     inOrder.verify(mockedQuery).orderByCaseDefinitionId();
     inOrder.verify(mockedQuery).desc();
+  }
+
+  @Test
+  public void testSecondarySortingAsPost() {
+    InOrder inOrder = Mockito.inOrder(mockedQuery);
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("sorting", OrderingBuilder.create()
+      .orderBy("caseInstanceId").desc()
+      .orderBy("caseDefinitionId").asc()
+      .getJson());
+    given().contentType(POST_JSON_CONTENT_TYPE).body(json)
+      .header("accept", MediaType.APPLICATION_JSON)
+      .then().expect().statusCode(Status.OK.getStatusCode())
+      .when().post(CASE_INSTANCE_QUERY_URL);
+
+    inOrder.verify(mockedQuery).orderByCaseInstanceId();
+    inOrder.verify(mockedQuery).desc();
+    inOrder.verify(mockedQuery).orderByCaseDefinitionId();
+    inOrder.verify(mockedQuery).asc();
   }
 
   @Test

@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.rest.dto.history;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response.Status;
@@ -464,57 +465,47 @@ public class HistoricTaskInstanceQueryDto extends AbstractQueryDto<HistoricTaskI
   }
 
   @Override
-  protected void applySortingOptions(HistoricTaskInstanceQuery query) {
-    if (sortBy != null) {
-      if (sortBy.equals(SORT_BY_TASK_ID)) {
-        query.orderByTaskId();
-      } else if (sortBy.equals(SORT_BY_ACT_INSTANCE_ID)) {
-        query.orderByHistoricActivityInstanceId();
-      } else if (sortBy.equals(SORT_BY_PROC_DEF_ID)) {
-        query.orderByProcessDefinitionId();
-      } else if (sortBy.equals(SORT_BY_PROC_INST_ID)) {
-        query.orderByProcessInstanceId();
-      } else if (sortBy.equals(SORT_BY_EXEC_ID)) {
-        query.orderByExecutionId();
-      } else if (sortBy.equals(SORT_BY_TASK_DURATION)) {
-        query.orderByHistoricTaskInstanceDuration();
-      } else if (sortBy.equals(SORT_BY_END_TIME)) {
-        query.orderByHistoricTaskInstanceEndTime();
-      } else if (sortBy.equals(SORT_BY_START_TIME)) {
-        query.orderByHistoricActivityInstanceStartTime();
-      } else if (sortBy.equals(SORT_BY_TASK_NAME)) {
-        query.orderByTaskName();
-      } else if (sortBy.equals(SORT_BY_TASK_DESC)) {
-        query.orderByTaskDescription();
-      } else if (sortBy.equals(SORT_BY_ASSIGNEE)) {
-        query.orderByTaskAssignee();
-      } else if (sortBy.equals(SORT_BY_OWNER)) {
-        query.orderByTaskOwner();
-      } else if (sortBy.equals(SORT_BY_DUE_DATE)) {
-        query.orderByTaskDueDate();
-      } else if (sortBy.equals(SORT_BY_FOLLOW_UP_DATE)) {
-        query.orderByTaskFollowUpDate();
-      } else if (sortBy.equals(SORT_BY_DELETE_REASON)) {
-        query.orderByDeleteReason();
-      } else if (sortBy.equals(SORT_BY_TASK_DEF_KEY)) {
-        query.orderByTaskDefinitionKey();
-      } else if (sortBy.equals(SORT_BY_PRIORITY)) {
-        query.orderByTaskPriority();
-      } else if (sortBy.equals(SORT_BY_CASE_DEF_ID)) {
-        query.orderByCaseDefinitionId();
-      } else if (sortBy.equals(SORT_BY_CASE_INST_ID)) {
-        query.orderByCaseInstanceId();
-      } else if (sortBy.equals(SORT_BY_CASE_EXEC_ID)) {
-        query.orderByCaseExecutionId();
-      }
-    }
-
-    if (sortOrder != null) {
-      if (sortOrder.equals(SORT_ORDER_ASC_VALUE)) {
-        query.asc();
-      } else if (sortOrder.equals(SORT_ORDER_DESC_VALUE)) {
-        query.desc();
-      }
+  protected void applySortBy(HistoricTaskInstanceQuery query, String sortBy, Map<String, Object> parameters, ProcessEngine engine) {
+    if (sortBy.equals(SORT_BY_TASK_ID)) {
+      query.orderByTaskId();
+    } else if (sortBy.equals(SORT_BY_ACT_INSTANCE_ID)) {
+      query.orderByHistoricActivityInstanceId();
+    } else if (sortBy.equals(SORT_BY_PROC_DEF_ID)) {
+      query.orderByProcessDefinitionId();
+    } else if (sortBy.equals(SORT_BY_PROC_INST_ID)) {
+      query.orderByProcessInstanceId();
+    } else if (sortBy.equals(SORT_BY_EXEC_ID)) {
+      query.orderByExecutionId();
+    } else if (sortBy.equals(SORT_BY_TASK_DURATION)) {
+      query.orderByHistoricTaskInstanceDuration();
+    } else if (sortBy.equals(SORT_BY_END_TIME)) {
+      query.orderByHistoricTaskInstanceEndTime();
+    } else if (sortBy.equals(SORT_BY_START_TIME)) {
+      query.orderByHistoricActivityInstanceStartTime();
+    } else if (sortBy.equals(SORT_BY_TASK_NAME)) {
+      query.orderByTaskName();
+    } else if (sortBy.equals(SORT_BY_TASK_DESC)) {
+      query.orderByTaskDescription();
+    } else if (sortBy.equals(SORT_BY_ASSIGNEE)) {
+      query.orderByTaskAssignee();
+    } else if (sortBy.equals(SORT_BY_OWNER)) {
+      query.orderByTaskOwner();
+    } else if (sortBy.equals(SORT_BY_DUE_DATE)) {
+      query.orderByTaskDueDate();
+    } else if (sortBy.equals(SORT_BY_FOLLOW_UP_DATE)) {
+      query.orderByTaskFollowUpDate();
+    } else if (sortBy.equals(SORT_BY_DELETE_REASON)) {
+      query.orderByDeleteReason();
+    } else if (sortBy.equals(SORT_BY_TASK_DEF_KEY)) {
+      query.orderByTaskDefinitionKey();
+    } else if (sortBy.equals(SORT_BY_PRIORITY)) {
+      query.orderByTaskPriority();
+    } else if (sortBy.equals(SORT_BY_CASE_DEF_ID)) {
+      query.orderByCaseDefinitionId();
+    } else if (sortBy.equals(SORT_BY_CASE_INST_ID)) {
+      query.orderByCaseInstanceId();
+    } else if (sortBy.equals(SORT_BY_CASE_EXEC_ID)) {
+      query.orderByCaseExecutionId();
     }
   }
 

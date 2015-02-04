@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.rest.dto.runtime;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.core.MultivaluedMap;
 
@@ -168,37 +169,27 @@ public class IncidentQueryDto extends AbstractQueryDto<IncidentQuery>{
   }
 
   @Override
-  protected void applySortingOptions(IncidentQuery query) {
-    if (sortBy != null) {
-      if (sortBy.equals(SORT_BY_INCIDENT_ID)) {
-        query.orderByIncidentId();
-      } else if (sortBy.equals(SORT_BY_INCIDENT_TIMESTAMP)) {
-        query.orderByIncidentTimestamp();
-      } else if (sortBy.equals(SORT_BY_INCIDENT_TYPE)) {
-        query.orderByIncidentType();
-      } else if (sortBy.equals(SORT_BY_EXECUTION_ID)) {
-        query.orderByExecutionId();
-      } else if (sortBy.equals(SORT_BY_ACTIVITY_ID)) {
-        query.orderByActivityId();
-      } else if (sortBy.equals(SORT_BY_PROCESS_INSTANCE_ID)) {
-        query.orderByProcessInstanceId();
-      } else if (sortBy.equals(SORT_BY_PROCESS_DEFINITION_ID)) {
-        query.orderByProcessDefinitionId();
-      } else if (sortBy.equals(SORT_BY_CAUSE_INCIDENT_ID)) {
-        query.orderByCauseIncidentId();
-      } else if (sortBy.equals(SORT_BY_ROOT_CAUSE_INCIDENT_ID)) {
-        query.orderByRootCauseIncidentId();
-      } else if (sortBy.equals(SORT_BY_CONFIGURATION)) {
-        query.orderByConfiguration();
-      }
-    }
-
-    if (sortOrder != null) {
-      if (sortOrder.equals(SORT_ORDER_ASC_VALUE)) {
-        query.asc();
-      } else if (sortOrder.equals(SORT_ORDER_DESC_VALUE)) {
-        query.desc();
-      }
+  protected void applySortBy(IncidentQuery query, String sortBy, Map<String, Object> parameters, ProcessEngine engine) {
+    if (sortBy.equals(SORT_BY_INCIDENT_ID)) {
+      query.orderByIncidentId();
+    } else if (sortBy.equals(SORT_BY_INCIDENT_TIMESTAMP)) {
+      query.orderByIncidentTimestamp();
+    } else if (sortBy.equals(SORT_BY_INCIDENT_TYPE)) {
+      query.orderByIncidentType();
+    } else if (sortBy.equals(SORT_BY_EXECUTION_ID)) {
+      query.orderByExecutionId();
+    } else if (sortBy.equals(SORT_BY_ACTIVITY_ID)) {
+      query.orderByActivityId();
+    } else if (sortBy.equals(SORT_BY_PROCESS_INSTANCE_ID)) {
+      query.orderByProcessInstanceId();
+    } else if (sortBy.equals(SORT_BY_PROCESS_DEFINITION_ID)) {
+      query.orderByProcessDefinitionId();
+    } else if (sortBy.equals(SORT_BY_CAUSE_INCIDENT_ID)) {
+      query.orderByCauseIncidentId();
+    } else if (sortBy.equals(SORT_BY_ROOT_CAUSE_INCIDENT_ID)) {
+      query.orderByRootCauseIncidentId();
+    } else if (sortBy.equals(SORT_BY_CONFIGURATION)) {
+      query.orderByConfiguration();
     }
   }
 

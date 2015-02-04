@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.rest.dto.history;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.ws.rs.core.MultivaluedMap;
@@ -298,29 +299,19 @@ public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricPr
   }
 
   @Override
-  protected void applySortingOptions(HistoricProcessInstanceQuery query) {
-    if (sortBy != null) {
-      if (sortBy.equals(SORT_BY_PROCESS_INSTANCE_ID_VALUE)) {
-        query.orderByProcessInstanceId();
-      } else if (sortBy.equals(SORT_BY_PROCESS_DEFINITION_ID_VALUE)) {
-        query.orderByProcessDefinitionId();
-      } else if (sortBy.equals(SORT_BY_PROCESS_INSTANCE_BUSINESS_KEY_VALUE)) {
-        query.orderByProcessInstanceBusinessKey();
-      } else if (sortBy.equals(SORT_BY_PROCESS_INSTANCE_START_TIME_VALUE)) {
-        query.orderByProcessInstanceStartTime();
-      } else if (sortBy.equals(SORT_BY_PROCESS_INSTANCE_END_TIME_VALUE)) {
-        query.orderByProcessInstanceEndTime();
-      } else if (sortBy.equals(SORT_BY_PROCESS_INSTANCE_DURATION_VALUE)) {
-        query.orderByProcessInstanceDuration();
-      }
-    }
-
-    if (sortOrder != null) {
-      if (sortOrder.equals(SORT_ORDER_ASC_VALUE)) {
-        query.asc();
-      } else if (sortOrder.equals(SORT_ORDER_DESC_VALUE)) {
-        query.desc();
-      }
+  protected void applySortBy(HistoricProcessInstanceQuery query, String sortBy, Map<String, Object> parameters, ProcessEngine engine) {
+    if (sortBy.equals(SORT_BY_PROCESS_INSTANCE_ID_VALUE)) {
+      query.orderByProcessInstanceId();
+    } else if (sortBy.equals(SORT_BY_PROCESS_DEFINITION_ID_VALUE)) {
+      query.orderByProcessDefinitionId();
+    } else if (sortBy.equals(SORT_BY_PROCESS_INSTANCE_BUSINESS_KEY_VALUE)) {
+      query.orderByProcessInstanceBusinessKey();
+    } else if (sortBy.equals(SORT_BY_PROCESS_INSTANCE_START_TIME_VALUE)) {
+      query.orderByProcessInstanceStartTime();
+    } else if (sortBy.equals(SORT_BY_PROCESS_INSTANCE_END_TIME_VALUE)) {
+      query.orderByProcessInstanceEndTime();
+    } else if (sortBy.equals(SORT_BY_PROCESS_INSTANCE_DURATION_VALUE)) {
+      query.orderByProcessInstanceDuration();
     }
   }
 

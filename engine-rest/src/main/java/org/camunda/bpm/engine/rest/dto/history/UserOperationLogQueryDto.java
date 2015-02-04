@@ -13,6 +13,7 @@
 package org.camunda.bpm.engine.rest.dto.history;
 
 import java.util.Date;
+import java.util.Map;
 
 import javax.ws.rs.core.MultivaluedMap;
 
@@ -110,15 +111,9 @@ public class UserOperationLogQueryDto extends AbstractQueryDto<UserOperationLogQ
   }
 
   @Override
-  protected void applySortingOptions(UserOperationLogQuery query) {
+  protected void applySortBy(UserOperationLogQuery query, String sortBy, Map<String, Object> parameters, ProcessEngine engine) {
     if (TIMESTAMP.equals(sortBy)) {
       query.orderByTimestamp();
-    }
-    if (SORT_ORDER_ASC_VALUE.equals(sortOrder)) {
-      query.asc();
-    }
-    if (SORT_ORDER_DESC_VALUE.equals(sortOrder)) {
-      query.desc();
     }
   }
 

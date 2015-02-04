@@ -17,11 +17,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 import javax.xml.registry.InvalidRequestException;
 
 import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.camunda.bpm.engine.rest.helper.variable.EqualsPrimitiveValue;
+import org.camunda.bpm.engine.rest.util.OrderingBuilder;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ExecutionQuery;
 import org.junit.Assert;
@@ -429,6 +431,25 @@ public abstract class AbstractExecutionRestServiceQueryTest extends
     inOrder = Mockito.inOrder(mockedQuery);
     executeAndVerifySorting("definitionId", "asc", Status.OK);
     inOrder.verify(mockedQuery).orderByProcessDefinitionId();
+    inOrder.verify(mockedQuery).asc();
+  }
+
+  @Test
+  public void testSecondarySortingAsPost() {
+    InOrder inOrder = Mockito.inOrder(mockedQuery);
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("sorting", OrderingBuilder.create()
+      .orderBy("definitionKey").desc()
+      .orderBy("instanceId").asc()
+      .getJson());
+    given().contentType(POST_JSON_CONTENT_TYPE).body(json)
+      .header("accept", MediaType.APPLICATION_JSON)
+      .then().expect().statusCode(Status.OK.getStatusCode())
+      .when().post(EXECUTION_QUERY_URL);
+
+    inOrder.verify(mockedQuery).orderByProcessDefinitionKey();
+    inOrder.verify(mockedQuery).desc();
+    inOrder.verify(mockedQuery).orderByProcessInstanceId();
     inOrder.verify(mockedQuery).asc();
   }
 

@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.rest.dto.runtime;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response.Status;
@@ -236,23 +237,13 @@ public class CaseExecutionQueryDto extends AbstractQueryDto<CaseExecutionQuery> 
     }
   }
 
-  protected void applySortingOptions(CaseExecutionQuery query) {
-    if (sortBy != null) {
-      if (sortBy.equals(SORT_BY_EXECUTION_ID_VALUE)) {
-        query.orderByCaseExecutionId();
-      } else if (sortBy.equals(SORT_BY_DEFINITION_KEY_VALUE)) {
-        query.orderByCaseDefinitionKey();
-      } else if (sortBy.equals(SORT_BY_DEFINITION_ID_VALUE)) {
-        query.orderByCaseDefinitionId();
-      }
-    }
-
-    if (sortOrder != null) {
-      if (sortOrder.equals(SORT_ORDER_ASC_VALUE)) {
-        query.asc();
-      } else if (sortOrder.equals(SORT_ORDER_DESC_VALUE)) {
-        query.desc();
-      }
+  protected void applySortBy(CaseExecutionQuery query, String sortBy, Map<String, Object> parameters, ProcessEngine engine) {
+    if (sortBy.equals(SORT_BY_EXECUTION_ID_VALUE)) {
+      query.orderByCaseExecutionId();
+    } else if (sortBy.equals(SORT_BY_DEFINITION_KEY_VALUE)) {
+      query.orderByCaseDefinitionKey();
+    } else if (sortBy.equals(SORT_BY_DEFINITION_ID_VALUE)) {
+      query.orderByCaseDefinitionId();
     }
   }
 

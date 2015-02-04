@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.rest.dto.history;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.core.MultivaluedMap;
 
@@ -161,29 +162,19 @@ public class HistoricDetailQueryDto extends AbstractQueryDto<HistoricDetailQuery
   }
 
   @Override
-  protected void applySortingOptions(HistoricDetailQuery query) {
-    if (sortBy != null) {
-      if (sortBy.equals(SORT_BY_PROCESS_INSTANCE_ID)) {
-        query.orderByProcessInstanceId();
-      } else if (sortBy.equals(SORT_BY_VARIABLE_NAME)) {
-        query.orderByVariableName();
-      } else if (sortBy.equals(SORT_BY_VARIABLE_TYPE)) {
-        query.orderByVariableType();
-      } else if (sortBy.equals(SORT_BY_VARIABLE_REVISION)) {
-        query.orderByVariableRevision();
-      } else if (sortBy.equals(SORT_BY_FORM_PROPERTY_ID)) {
-        query.orderByFormPropertyId();
-      } else if (sortBy.equals(SORT_BY_TIME)) {
-        query.orderByTime();
-      }
-    }
-
-    if (sortOrder != null) {
-      if (sortOrder.equals(SORT_ORDER_ASC_VALUE)) {
-        query.asc();
-      } else if (sortOrder.equals(SORT_ORDER_DESC_VALUE)) {
-        query.desc();
-      }
+  protected void applySortBy(HistoricDetailQuery query, String sortBy, Map<String, Object> parameters, ProcessEngine engine) {
+    if (sortBy.equals(SORT_BY_PROCESS_INSTANCE_ID)) {
+      query.orderByProcessInstanceId();
+    } else if (sortBy.equals(SORT_BY_VARIABLE_NAME)) {
+      query.orderByVariableName();
+    } else if (sortBy.equals(SORT_BY_VARIABLE_TYPE)) {
+      query.orderByVariableType();
+    } else if (sortBy.equals(SORT_BY_VARIABLE_REVISION)) {
+      query.orderByVariableRevision();
+    } else if (sortBy.equals(SORT_BY_FORM_PROPERTY_ID)) {
+      query.orderByFormPropertyId();
+    } else if (sortBy.equals(SORT_BY_TIME)) {
+      query.orderByTime();
     }
   }
 

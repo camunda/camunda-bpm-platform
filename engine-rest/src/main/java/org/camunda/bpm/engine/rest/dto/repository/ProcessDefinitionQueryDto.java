@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.rest.dto.repository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.core.MultivaluedMap;
 
@@ -249,29 +250,19 @@ public class ProcessDefinitionQueryDto extends AbstractQueryDto<ProcessDefinitio
   }
 
   @Override
-  protected void applySortingOptions(ProcessDefinitionQuery query) {
-    if (sortBy != null) {
-      if (sortBy.equals(SORT_BY_CATEGORY_VALUE)) {
-        query.orderByProcessDefinitionCategory();
-      } else if (sortBy.equals(SORT_BY_KEY_VALUE)) {
-        query.orderByProcessDefinitionKey();
-      } else if (sortBy.equals(SORT_BY_ID_VALUE)) {
-        query.orderByProcessDefinitionId();
-      } else if (sortBy.equals(SORT_BY_VERSION_VALUE)) {
-        query.orderByProcessDefinitionVersion();
-      } else if (sortBy.equals(SORT_BY_NAME_VALUE)) {
-        query.orderByProcessDefinitionName();
-      } else if (sortBy.equals(SORT_BY_DEPLOYMENT_ID_VALUE)) {
-        query.orderByDeploymentId();
-      }
-    }
-
-    if (sortOrder != null) {
-      if (sortOrder.equals(SORT_ORDER_ASC_VALUE)) {
-        query.asc();
-      } else if (sortOrder.equals(SORT_ORDER_DESC_VALUE)) {
-        query.desc();
-      }
+  protected void applySortBy(ProcessDefinitionQuery query, String sortBy, Map<String, Object> parameters, ProcessEngine engine) {
+    if (sortBy.equals(SORT_BY_CATEGORY_VALUE)) {
+      query.orderByProcessDefinitionCategory();
+    } else if (sortBy.equals(SORT_BY_KEY_VALUE)) {
+      query.orderByProcessDefinitionKey();
+    } else if (sortBy.equals(SORT_BY_ID_VALUE)) {
+      query.orderByProcessDefinitionId();
+    } else if (sortBy.equals(SORT_BY_VERSION_VALUE)) {
+      query.orderByProcessDefinitionVersion();
+    } else if (sortBy.equals(SORT_BY_NAME_VALUE)) {
+      query.orderByProcessDefinitionName();
+    } else if (sortBy.equals(SORT_BY_DEPLOYMENT_ID_VALUE)) {
+      query.orderByDeploymentId();
     }
   }
 }

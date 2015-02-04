@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.rest.dto.runtime;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response.Status;
@@ -238,26 +239,13 @@ public class ExecutionQueryDto extends AbstractQueryDto<ExecutionQuery> {
   }
 
   @Override
-  protected void applySortingOptions(ExecutionQuery query) {
-    if (sortBy != null) {
-      if (sortBy.equals(SORT_BY_INSTANCE_ID_VALUE)) {
-        query.orderByProcessInstanceId();
-      } else if (sortBy.equals(SORT_BY_DEFINITION_KEY_VALUE)) {
-        query.orderByProcessDefinitionKey();
-      } else if (sortBy.equals(SORT_BY_DEFINITION_ID_VALUE)) {
-        query.orderByProcessDefinitionId();
-      }
-    }
-
-    if (sortOrder != null) {
-      if (sortOrder.equals(SORT_ORDER_ASC_VALUE)) {
-        query.asc();
-      } else if (sortOrder.equals(SORT_ORDER_DESC_VALUE)) {
-        query.desc();
-      }
+  protected void applySortBy(ExecutionQuery query, String sortBy, Map<String, Object> parameters, ProcessEngine engine) {
+    if (sortBy.equals(SORT_BY_INSTANCE_ID_VALUE)) {
+      query.orderByProcessInstanceId();
+    } else if (sortBy.equals(SORT_BY_DEFINITION_KEY_VALUE)) {
+      query.orderByProcessDefinitionKey();
+    } else if (sortBy.equals(SORT_BY_DEFINITION_ID_VALUE)) {
+      query.orderByProcessDefinitionId();
     }
   }
-
-
-
 }

@@ -38,9 +38,11 @@ import org.camunda.bpm.engine.rest.helper.EqualsList;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.camunda.bpm.engine.rest.helper.ValueGenerator;
 import org.camunda.bpm.engine.rest.helper.variable.EqualsPrimitiveValue;
+import org.camunda.bpm.engine.rest.util.OrderingBuilder;
 import org.camunda.bpm.engine.task.DelegationState;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
+import org.camunda.bpm.engine.variable.type.ValueType;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -682,11 +684,69 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
 
   }
 
-  private void executeAndVerifySorting(String sortBy, String sortOrder, Status expectedStatus) {
+  protected void executeAndVerifySorting(String sortBy, String sortOrder, Status expectedStatus) {
     given().queryParam("sortBy", sortBy).queryParam("sortOrder", sortOrder)
       .header("accept", MediaType.APPLICATION_JSON)
       .then().expect().statusCode(expectedStatus.getStatusCode())
       .when().get(TASK_QUERY_URL);
+  }
+
+  protected void executeAndVerifySortingAsPost(List<Map<String, Object>> sortingJson, Status expectedStatus) {
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("sorting", sortingJson);
+
+    given().contentType(POST_JSON_CONTENT_TYPE).body(json)
+      .header("accept", MediaType.APPLICATION_JSON)
+      .then().expect().statusCode(Status.OK.getStatusCode())
+      .when().post(TASK_QUERY_URL);
+  }
+
+  @Test
+  public void testSecondarySortingAsPost() {
+    InOrder inOrder = Mockito.inOrder(mockQuery);
+    executeAndVerifySortingAsPost(
+      OrderingBuilder.create()
+        .orderBy("dueDate").desc()
+        .orderBy("caseExecutionId").asc()
+        .getJson(),
+      Status.OK);
+
+    inOrder.verify(mockQuery).orderByDueDate();
+    inOrder.verify(mockQuery).desc();
+    inOrder.verify(mockQuery).orderByCaseExecutionId();
+    inOrder.verify(mockQuery).asc();
+
+    inOrder = Mockito.inOrder(mockQuery);
+    executeAndVerifySortingAsPost(
+      OrderingBuilder.create()
+        .orderBy("processVariable").desc()
+          .parameter("variable", "var")
+          .parameter("type", "string")
+        .orderBy("executionVariable").asc()
+          .parameter("variable", "var2")
+          .parameter("type", "integer")
+        .orderBy("taskVariable").desc()
+          .parameter("variable", "var3")
+          .parameter("type", "double")
+        .orderBy("caseInstanceVariable").asc()
+          .parameter("variable", "var4")
+          .parameter("type", "long")
+        .orderBy("caseExecutionVariable").desc()
+          .parameter("variable", "var5")
+          .parameter("type", "date")
+        .getJson(),
+      Status.OK);
+
+    inOrder.verify(mockQuery).orderByProcessVariable("var", ValueType.STRING);
+    inOrder.verify(mockQuery).desc();
+    inOrder.verify(mockQuery).orderByExecutionVariable("var2", ValueType.INTEGER);
+    inOrder.verify(mockQuery).asc();
+    inOrder.verify(mockQuery).orderByTaskVariable("var3", ValueType.DOUBLE);
+    inOrder.verify(mockQuery).desc();
+    inOrder.verify(mockQuery).orderByCaseInstanceVariable("var4", ValueType.LONG);
+    inOrder.verify(mockQuery).asc();
+    inOrder.verify(mockQuery).orderByCaseExecutionVariable("var5", ValueType.DATE);
+    inOrder.verify(mockQuery).desc();
   }
 
   @Test
