@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.pa.rest;
 
+import static org.camunda.spin.Spin.JSON;
+
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
@@ -25,15 +27,21 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.camunda.bpm.BpmPlatform;
+import org.camunda.bpm.admin.impl.web.SetupResource;
+import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.authorization.Authorization;
+import org.camunda.bpm.engine.authorization.Groups;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.db.PersistenceSession;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
-import static org.camunda.spin.Spin.*;
+import org.camunda.bpm.engine.rest.dto.identity.UserCredentialsDto;
+import org.camunda.bpm.engine.rest.dto.identity.UserDto;
+import org.camunda.bpm.engine.rest.dto.identity.UserProfileDto;
 
 /**
  *
@@ -66,8 +74,12 @@ public class TestServlet extends HttpServlet {
     String engineName = requestURI.substring(lastSlash+1, requestURI.length());
 
     ProcessEngine processEngine = BpmPlatform.getProcessEngineService().getProcessEngine(engineName);
+
+    deleteAdminUser(processEngine);
+
     ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration();
     ManagementService managementService = processEngine.getManagementService();
+
 
     log.fine("verifying that db is clean after test");
     Map<String, Long> tableCounts = managementService.getTableCount();
@@ -99,10 +111,44 @@ public class TestServlet extends HttpServlet {
         }
       });
 
+      createAdminUser(processEngine);
       resp.getWriter().write((JSON("{}").prop("clean", false).toString()));
-    } else {
+    }
+    else {
       log.info("database was clean");
+
+      createAdminUser(processEngine);
       resp.getWriter().write((JSON("{}").prop("clean", true).toString()));
+    }
+
+  }
+
+  protected void createAdminUser(ProcessEngine processEngine) {
+    UserDto user = new UserDto();
+    UserCredentialsDto userCredentialsDto = new UserCredentialsDto();
+    userCredentialsDto.setPassword("admin");
+    user.setCredentials(userCredentialsDto);
+
+    UserProfileDto userProfileDto = new UserProfileDto();
+    userProfileDto.setId("admin");
+    user.setProfile(userProfileDto);
+
+    new SetupResource().createInitialUser(processEngine.getName(), user);
+  }
+
+  protected void deleteAdminUser(ProcessEngine processEngine) {
+
+    IdentityService identityService = processEngine.getIdentityService();
+
+    identityService.deleteMembership("admin", Groups.CAMUNDA_ADMIN);
+
+    identityService.deleteGroup(Groups.CAMUNDA_ADMIN);
+    identityService.deleteUser("admin");
+
+    List<Authorization> list = processEngine.getAuthorizationService().createAuthorizationQuery().groupIdIn(Groups.CAMUNDA_ADMIN).list();
+
+    for (Authorization auth : list) {
+      processEngine.getAuthorizationService().deleteAuthorization(auth.getId());
     }
 
   }
