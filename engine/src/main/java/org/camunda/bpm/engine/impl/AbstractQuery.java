@@ -198,15 +198,6 @@ public abstract class AbstractQuery<T extends Query<?,?>, U> extends ListQueryPa
     return null;
   }
 
-  protected void addOrder(String column, String sortOrder) {
-    if (orderBy==null) {
-      orderBy = "";
-    } else {
-      orderBy = orderBy+", ";
-    }
-    orderBy = orderBy+column+" "+sortOrder;
-  }
-
   @Deprecated
   public String getOrderBy() {
     if(orderBy == null) {
