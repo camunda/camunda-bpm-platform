@@ -796,26 +796,41 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   }
 
   public TaskQuery orderByProcessVariable(String variableName, ValueType valueType) {
+    ensureNotNull("variableName", variableName);
+    ensureNotNull("valueType", valueType);
+
     orderBy(VariableOrderProperty.forProcessInstanceVariable(variableName, valueType));
     return this;
   }
 
   public TaskQuery orderByExecutionVariable(String variableName, ValueType valueType) {
+    ensureNotNull("variableName", variableName);
+    ensureNotNull("valueType", valueType);
+
     orderBy(VariableOrderProperty.forExecutionVariable(variableName, valueType));
     return this;
   }
 
   public TaskQuery orderByTaskVariable(String variableName, ValueType valueType) {
+    ensureNotNull("variableName", variableName);
+    ensureNotNull("valueType", valueType);
+
     orderBy(VariableOrderProperty.forTaskVariable(variableName, valueType));
     return this;
   }
 
   public TaskQuery orderByCaseExecutionVariable(String variableName, ValueType valueType) {
+    ensureNotNull("variableName", variableName);
+    ensureNotNull("valueType", valueType);
+
     orderBy(VariableOrderProperty.forCaseExecutionVariable(variableName, valueType));
     return this;
   }
 
   public TaskQuery orderByCaseInstanceVariable(String variableName, ValueType valueType) {
+    ensureNotNull("variableName", variableName);
+    ensureNotNull("valueType", valueType);
+
     orderBy(VariableOrderProperty.forCaseInstanceVariable(variableName, valueType));
     return this;
   }

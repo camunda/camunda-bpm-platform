@@ -28,6 +28,8 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.exception.NotAllowedException;
+import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.filter.Filter;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
@@ -4381,6 +4383,78 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     // var = c
     verifyTasksSortedByProcessInstanceId(Arrays.asList(cInstance1, cInstance2),
         tasks.subList(4, 6));
+  }
+
+  public void testQueryResultOrderingWithInvalidParameters() {
+    try {
+      taskService.createTaskQuery().orderByProcessVariable(null, ValueType.STRING).asc().list();
+      fail("should not succeed");
+    } catch (NullValueException e) {
+      // happy path
+    }
+
+    try {
+      taskService.createTaskQuery().orderByProcessVariable("var", null).asc().list();
+      fail("should not succeed");
+    } catch (NullValueException e) {
+      // happy path
+    }
+
+    try {
+      taskService.createTaskQuery().orderByExecutionVariable(null, ValueType.STRING).asc().list();
+      fail("should not succeed");
+    } catch (NullValueException e) {
+      // happy path
+    }
+
+    try {
+      taskService.createTaskQuery().orderByExecutionVariable("var", null).asc().list();
+      fail("should not succeed");
+    } catch (NullValueException e) {
+      // happy path
+    }
+
+    try {
+      taskService.createTaskQuery().orderByTaskVariable(null, ValueType.STRING).asc().list();
+      fail("should not succeed");
+    } catch (NullValueException e) {
+      // happy path
+    }
+
+    try {
+      taskService.createTaskQuery().orderByTaskVariable("var", null).asc().list();
+      fail("should not succeed");
+    } catch (NullValueException e) {
+      // happy path
+    }
+
+    try {
+      taskService.createTaskQuery().orderByCaseInstanceVariable(null, ValueType.STRING).asc().list();
+      fail("should not succeed");
+    } catch (NullValueException e) {
+      // happy path
+    }
+
+    try {
+      taskService.createTaskQuery().orderByCaseInstanceVariable("var", null).asc().list();
+      fail("should not succeed");
+    } catch (NullValueException e) {
+      // happy path
+    }
+
+    try {
+      taskService.createTaskQuery().orderByCaseExecutionVariable(null, ValueType.STRING).asc().list();
+      fail("should not succeed");
+    } catch (NullValueException e) {
+      // happy path
+    }
+
+    try {
+      taskService.createTaskQuery().orderByCaseExecutionVariable("var", null).asc().list();
+      fail("should not succeed");
+    } catch (NullValueException e) {
+      // happy path
+    }
   }
 
   protected void verifyTasksSortedByProcessInstanceId(List<ProcessInstance> expectedProcessInstances,
