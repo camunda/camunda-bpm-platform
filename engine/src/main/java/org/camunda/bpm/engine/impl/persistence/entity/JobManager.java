@@ -14,7 +14,7 @@
 package org.camunda.bpm.engine.impl.persistence.entity;
 
 import static org.camunda.bpm.engine.impl.jobexecutor.TimerEventJobHandler.JOB_HANDLER_CONFIG_PROPERTY_DELIMITER;
-import static org.camunda.bpm.engine.impl.jobexecutor.TimerEventJobHandler.JOB_HANDLER_CONFIG_PROPERTY_FOLLOW_UP_TIMER_JOB_CREATED;
+import static org.camunda.bpm.engine.impl.jobexecutor.TimerEventJobHandler.JOB_HANDLER_CONFIG_PROPERTY_FOLLOW_UP_JOB_CREATED;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.util.Date;
@@ -170,7 +170,7 @@ public class JobManager extends AbstractManager {
       || TimerStartEventJobHandler.TYPE.equals(jobHandlerType)
       || TimerStartEventSubprocessJobHandler.TYPE.equals(jobHandlerType)) {
 
-      String queryValue = jobHandlerConfiguration + JOB_HANDLER_CONFIG_PROPERTY_DELIMITER + JOB_HANDLER_CONFIG_PROPERTY_FOLLOW_UP_TIMER_JOB_CREATED;
+      String queryValue = jobHandlerConfiguration + JOB_HANDLER_CONFIG_PROPERTY_DELIMITER + JOB_HANDLER_CONFIG_PROPERTY_FOLLOW_UP_JOB_CREATED;
       params.put("handlerConfigurationWithFollowUpJobCreatedProperty", queryValue);
     }
 

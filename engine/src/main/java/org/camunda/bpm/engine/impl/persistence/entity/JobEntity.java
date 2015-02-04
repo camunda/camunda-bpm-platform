@@ -365,7 +365,7 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
     }
   }
 
-  public JobHandler getJobHandler() {
+  protected JobHandler getJobHandler() {
     Map<String, JobHandler> jobHandlers = Context.getProcessEngineConfiguration().getJobHandlers();
     return jobHandlers.get(jobHandlerType);
   }

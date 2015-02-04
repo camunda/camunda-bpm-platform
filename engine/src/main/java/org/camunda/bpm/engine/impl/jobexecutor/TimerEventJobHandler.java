@@ -13,7 +13,6 @@
 package org.camunda.bpm.engine.impl.jobexecutor;
 
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.persistence.entity.TimerEntity;
 
 
 /**
@@ -23,9 +22,9 @@ import org.camunda.bpm.engine.impl.persistence.entity.TimerEntity;
 public abstract class TimerEventJobHandler implements JobHandler {
 
   public static final String JOB_HANDLER_CONFIG_PROPERTY_DELIMITER = "$";
-  public static final String JOB_HANDLER_CONFIG_PROPERTY_FOLLOW_UP_TIMER_JOB_CREATED = "followUpJobCreated";
+  public static final String JOB_HANDLER_CONFIG_PROPERTY_FOLLOW_UP_JOB_CREATED = "followUpJobCreated";
 
-  public String getKey(String configuration) {
+  public static String getKey(String configuration) {
     if (containsDelimiter(configuration)) {
       String[] configParts = getConfigParts(configuration);
       return configParts[0];
@@ -34,34 +33,30 @@ public abstract class TimerEventJobHandler implements JobHandler {
     return configuration;
   }
 
-  public boolean isFollowUpJobCreated(String configuration) {
+  public static boolean isFollowUpJobCreated(String configuration) {
     if (containsDelimiter(configuration)) {
       String[] configParts = getConfigParts(configuration);
       String property = configParts[1];
 
-      return JOB_HANDLER_CONFIG_PROPERTY_FOLLOW_UP_TIMER_JOB_CREATED.equals(property);
+      return JOB_HANDLER_CONFIG_PROPERTY_FOLLOW_UP_JOB_CREATED.equals(property);
     }
 
     return false;
   }
 
-  public void setFollowUpJobCreated(TimerEntity timer) {
-    String configuration = timer.getJobHandlerConfiguration();
-
+  public static String createJobHandlerConfigurationWithFollowUpJobCreated(String configuration) {
     if (configuration == null) {
       configuration = "";
     }
 
-    configuration += JOB_HANDLER_CONFIG_PROPERTY_DELIMITER + JOB_HANDLER_CONFIG_PROPERTY_FOLLOW_UP_TIMER_JOB_CREATED;
-
-    timer.setJobHandlerConfiguration(configuration);
+    return configuration += JOB_HANDLER_CONFIG_PROPERTY_DELIMITER + JOB_HANDLER_CONFIG_PROPERTY_FOLLOW_UP_JOB_CREATED;
   }
 
-  protected boolean containsDelimiter(String configuration) {
+  protected static boolean containsDelimiter(String configuration) {
     return configuration != null && configuration.contains(JOB_HANDLER_CONFIG_PROPERTY_DELIMITER);
   }
 
-  protected String[] getConfigParts(String configuration) {
+  protected static String[] getConfigParts(String configuration) {
     String[] configParts = configuration.split("\\" + JOB_HANDLER_CONFIG_PROPERTY_DELIMITER);
 
     if (configParts.length != 2) {

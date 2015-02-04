@@ -20,7 +20,6 @@ import org.camunda.bpm.engine.impl.calendar.DurationHelper;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.AsyncContinuationJobHandler;
-import org.camunda.bpm.engine.impl.jobexecutor.JobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerCatchIntermediateEventJobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerEventJobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerExecuteNestedActivityJobHandler;
@@ -95,7 +94,6 @@ public class FoxJobRetryCmd extends JobRetryCmd {
   }
 
   protected ActivityImpl getCurrentActivity(CommandContext commandContext, JobEntity job) {
-    JobHandler jobHandler = job.getJobHandler();
     String type = job.getJobHandlerType();
     ActivityImpl activity = null;
 
@@ -105,15 +103,13 @@ public class FoxJobRetryCmd extends JobRetryCmd {
         || TimerCatchIntermediateEventJobHandler.TYPE.equals(type)) {
       ExecutionEntity execution = fetchExecutionEntity(job.getExecutionId());
       if (execution != null) {
-        TimerEventJobHandler timerEventJobHandler = (TimerEventJobHandler) jobHandler;
-        String acitivtyId = timerEventJobHandler.getKey(configuration);
+        String acitivtyId = TimerEventJobHandler.getKey(configuration);
         activity = execution.getProcessDefinition().findActivity(acitivtyId);
       }
 
     } else if (TimerStartEventJobHandler.TYPE.equals(type)) {
       DeploymentCache deploymentCache = Context.getProcessEngineConfiguration().getDeploymentCache();
-      TimerEventJobHandler timerEventJobHandler = (TimerEventJobHandler) jobHandler;
-      String definitionKey = timerEventJobHandler.getKey(configuration);
+      String definitionKey = TimerEventJobHandler.getKey(configuration);
       ProcessDefinitionEntity processDefinition = deploymentCache.findDeployedLatestProcessDefinitionByKey(definitionKey);
       if (processDefinition != null) {
         activity = processDefinition.getInitial();
