@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.ServiceLoader;
+import java.util.logging.Logger;
 
 import org.camunda.bpm.application.AbstractProcessApplication;
 import org.camunda.bpm.application.ProcessApplicationElResolver;
@@ -27,31 +28,47 @@ import org.camunda.bpm.engine.impl.javax.el.ELResolver;
  *
  */
 public class DefaultElResolverLookup {
-  
+
+  private final static Logger LOGGER = Logger.getLogger(DefaultElResolverLookup.class.getName());
+
   public final static ELResolver lookupResolver(AbstractProcessApplication processApplication) {
-    
+
     ServiceLoader<ProcessApplicationElResolver> providers = ServiceLoader.load(ProcessApplicationElResolver.class);
     List<ProcessApplicationElResolver> sortedProviders = new ArrayList<ProcessApplicationElResolver>();
     for (ProcessApplicationElResolver provider : providers) {
-      sortedProviders.add(provider);      
+      sortedProviders.add(provider);
     }
-    
+
     if(sortedProviders.isEmpty()) {
       return null;
-      
+
     } else {
       // sort providers first
       Collections.sort(sortedProviders, new ProcessApplicationElResolver.ProcessApplicationElResolverSorter());
-      
+
       // add all providers to a composite resolver
-      CompositeELResolver compositeResolver = new CompositeELResolver();      
+      CompositeELResolver compositeResolver = new CompositeELResolver();
+      StringBuilder summary = new StringBuilder();
+      summary.append(String.format("ElResolvers found for Process Application %s", processApplication.getName()));
+
       for (ProcessApplicationElResolver processApplicationElResolver : sortedProviders) {
-        compositeResolver.add(processApplicationElResolver.getElResolver(processApplication));        
+        ELResolver elResolver = processApplicationElResolver.getElResolver(processApplication);
+
+        if (elResolver != null) {
+          compositeResolver.add(elResolver);
+          summary.append(String.format("Class %s", processApplicationElResolver.getClass().getName()));
+        } else {
+          LOGGER.warning(String.format("Process Application '%s': No ELResolver provided by ProcessApplicationElResolver %s",
+            processApplication.getName(),
+            processApplicationElResolver.getClass().getName()));
+        }
       }
-      
+
+      LOGGER.info(summary.toString());
+
       return compositeResolver;
     }
-    
+
   }
 
 }

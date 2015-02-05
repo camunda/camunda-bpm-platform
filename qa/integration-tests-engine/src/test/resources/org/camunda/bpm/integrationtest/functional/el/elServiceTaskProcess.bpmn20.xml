@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:camunda="http://activiti.org/bpmn"
+  targetNamespace="Examples">
+
+  <process id="elServiceTaskProcess" name="The One Failing Service Task Process">
+    <startEvent id="theStart" />
+    <sequenceFlow id="flow1" sourceRef="theStart" targetRef="theServiceTask" />
+    <serviceTask id="theServiceTask" camunda:expression="${resolveExpressionBean.getValue()}" />
+    <sequenceFlow id="flow2" sourceRef="theServiceTask" targetRef="userTask" />
+    <userTask id="userTask"/>
+    <sequenceFlow id="flow3" sourceRef="userTask" targetRef="theEnd" />
+    <endEvent id="theEnd" />
+  </process>
+
+</definitions>
