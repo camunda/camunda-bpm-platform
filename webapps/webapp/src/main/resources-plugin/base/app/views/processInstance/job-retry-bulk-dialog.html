@@ -3,25 +3,29 @@
   <h3>Increment Number of Retries</h3>
 </div>
 
-<div class="modal-body">
+<div class="job-retry-bulk modal-body">
   <div notifications-panel></div>
 
   <form name="selectFailedJobsForm"
         ng-hide="status === 'finished' || status === 'performing'">
     <fieldset>
       <p>Select one of the following failed jobs to increment their number of retries:</p>
-      <table class="table table-striped table-hover table-condensed">
+
+      <table class="cam-table">
         <thead>
-          <th class="row-select">
-            <input type="checkbox"
-                   title="Select all"
-                   ng-model="allJobsSelected"
-                   ng-change="selectAllJobs(allJobsSelected)">
-          </th>
-          <th>ID</th>
-          <th>Scope</th>
-          <th>Exception</th>
+          <tr>
+            <th class="row-select">
+              <input type="checkbox"
+                     title="Select all"
+                     ng-model="allJobsSelected"
+                     ng-change="selectAllJobs(allJobsSelected)">
+            </th>
+            <th class="job-id uuid">ID</th>
+            <th class="scope">Scope</th>
+            <th class="exception">Exception</th>
+          </tr>
         </thead>
+
         <tbody>
           <tr ng-repeat="job in failedJobs">
             <td class="row-select">
@@ -29,14 +33,18 @@
                      ng-model="job.selected"
                      ng-change="selectFailedJob(job)">
             </td>
-            <td>{{ job.id | shorten:8 }}</td>
-            <td>{{ job.instance.name }}</td>
-            <td>{{ job.exceptionMessage }}</td>
+
+            <td class="job-id uuid">{{ job.id }}</td>
+
+            <td class="scope">{{ job.instance.name }}</td>
+
+            <td class="exception">{{ job.exceptionMessage }}</td>
           </tr>
 
           <tr ng-if="!failedJobs">
             <td colspan="4">
-              <i class="glyphicon glyphicon-loading"></i> loading failed jobs...
+              <span class="glyphicon glyphicon-loading"></span>
+              loading failed jobs...
             </td>
           </tr>
 
@@ -66,25 +74,30 @@
 
   <div ng-show="status === 'finished' || status === 'performing'">
 
-    <table class="table table-striped table-hover table-condensed">
+    <table class="cam-table">
       <thead>
-        <th>ID</th>
-        <th>Scope</th>
-        <th>Status</th>
+        <tr>
+          <th class="job-id uuid">ID</th>
+          <th class="scope">Scope</th>
+          <th class="status">Status</th>
+        </tr>
       </thead>
+
       <tbody>
         <tr ng-repeat="job in showJobsRetried">
-          <td>{{ job.id | shorten:8 }}</td>
-          <td>{{ job.instance.name }}</td>
-          <td>
+          <td class="job-id uuid">{{ job.id }}</td>
+
+          <td class="scope">{{ job.instance.name }}</td>
+
+          <td class="status">
             <span ng-show="job.status && job.status === 'performing'">
-              <i class="glyphicon glyphicon-loading"></i>
+              <span class="glyphicon glyphicon-loading"></span>
             </span>
             <span ng-show="job.status && job.status === 'successful'">
-              <i class="glyphicon glyphicon-ok"></i>&nbsp;Successful
+              <span class="glyphicon glyphicon-ok"></span>&nbsp;Successful
             </span>
             <span ng-show="job.status && job.status === 'failed'">
-              <i class="glyphicon glyphicon-remove"></i>&nbsp;Failed
+              <span class="glyphicon glyphicon-remove"></span>&nbsp;Failed
             </span>
           </td>
         </tr>
@@ -108,18 +121,24 @@
 </div>
 
 <div class="modal-footer">
-  <button class="btn"
+  <button class="btn btn-default"
           ng-click="close()"
-          ng-hide="status === 'finished' || status === 'performing'">Close</button>
+          ng-hide="status === 'finished' || status === 'performing'">
+    Close
+  </button>
 
   <button class="btn btn-primary"
           ng-click="retryFailedJobs(selectedFailedJobIds)"
           ng-disabled="!failedJobs || !failedJobs.length || !selectedFailedJobIds.length"
-          ng-hide="status === 'finished' || status === 'performing'">Retry</button>
+          ng-hide="status === 'finished' || status === 'performing'">
+    Retry
+  </button>
 
   <button class="btn btn-primary"
           ng-click="close()"
           ng-disabled="status === 'performing'"
-          ng-show="status === 'performing' || status === 'finished'">OK</button>
+          ng-show="status === 'performing' || status === 'finished'">
+    OK
+  </button>
 </div>
 <!-- / CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/base/app/views/processInstance/job-retry-bulk-dialog.html -->

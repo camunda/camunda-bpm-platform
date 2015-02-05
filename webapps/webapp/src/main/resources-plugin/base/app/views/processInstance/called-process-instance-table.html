@@ -1,23 +1,28 @@
 <!-- # CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/base/app/views/processInstance/called-process-instance-table.html -->
-<table class="table table-striped table-hover table-condensed">
+<table class="called-process-instance cam-table">
   <thead>
-    <th>Called Process Instance</th>
-    <th>Process Definition</th>
-    <th>Activity</th>
+    <tr>
+      <th class="called-process-instance uuid">Called Process Instance</th>
+      <th class="process-definition">Process Definition</th>
+      <th class="activity">Activity</th>
+    </tr>
   </thead>
+
   <tbody>
     <tr ng-repeat="calledProcessInstance in calledProcessInstances">
-      <td>
+      <td class="called-process-instance uuid">
         <a href="#/process-instance/{{ calledProcessInstance.id }}">
-          {{ calledProcessInstance.id | shorten:8 }}
+          {{ calledProcessInstance.id }}
         </a>
       </td>
-      <td>
+
+      <td class="process-definition">
         <a href="#/process-definition/{{ calledProcessInstance.processDefinitionId }}?parentProcessDefinitionId={{ processInstance.definitionId }}">
           {{ calledProcessInstance.processDefinitionName }}
         </a>
       </td>
-      <td>
+
+      <td class="activity">
         <a cam-select-activity-instance="calledProcessInstance.instance.id"
            ng-href="#/process-instance/{{ processInstance.id }}?detailsTab=called-process-instances-tab&activityInstanceIds={{ calledProcessInstance.instance.id }}">
           {{ calledProcessInstance.instance.name }}
@@ -27,7 +32,8 @@
 
     <tr ng-if="!calledProcessInstances">
       <td colspan="3">
-        <i class="glyphicon glyphicon-loading"></i> loading called process instances...
+        <span class="glyphicon glyphicon-loading"></span>
+        loading called process instances...
       </td>
     </tr>
 

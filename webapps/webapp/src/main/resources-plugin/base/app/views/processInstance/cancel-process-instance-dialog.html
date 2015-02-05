@@ -3,37 +3,43 @@
   <h3>Cancel Process Instance</h3>
 </div>
 
-<div class="modal-body">
+<div class="cancel-process-instance modal-body">
   <div notifications-panel></div>
 
   <div ng-hide="status === 'cancellationSuccess' || status === 'cancellationFailed' || status === 'beforeCancellation' || status === 'loadingFailed'">
-    <i class="glyphicon glyphicon-loading"></i> loading process instance information...
+    <span class="glyphicon glyphicon-loading"></span>
+    loading process instance information...
   </div>
 
-  <div ng-show="status === 'loadingFailed'">
-    <p>It was not possible to get further process instance informations to be able to cancel this process instance. Refresh the current page by pressing F5 and try once again to cancel this process instance.</p>
-  </div>
+  <p ng-show="status === 'loadingFailed'">
+    It was not possible to get further process instance informations to be able to cancel this process instance. Refresh the current page by pressing F5 and try once again to cancel this process instance.
+  </p>
 
   <div ng-show="status === 'beforeCancellation'">
-
     <div ng-show="subProcessInstances.length > 0">
       <p>
         If you cancel this process instance the following sub process instances will also be canceled:
       </p>
-      <table class="table table-striped table-condensed">
+
+      <table class="table cam-table">
         <thead>
-          <tr><th>ID</th></tr>
+          <tr>
+            <th class="instance-id uuid">ID</th>
+          </tr>
         </thead>
+
         <tbody>
           <tr ng-repeat="subProcessInstance in subProcessInstances">
-            <td>
-              <a target="__blank" ng-href="#/process-instance/{{ subProcessInstance.id }}">
-                {{ subProcessInstance.id | shorten:8 }}
+            <td class="instance-id uuid">
+              <a target="_blank"
+                 ng-href="#/process-instance/{{ subProcessInstance.id }}">
+                {{ subProcessInstance.id }}
               </a>
             </td>
           </tr>
+
           <tr>
-            <td colspan="2" ng-hide="subProcessInstances.length === subProcessInstancesCount">
+            <td ng-hide="subProcessInstances.length === subProcessInstancesCount">
               and {{ subProcessInstancesCount - subProcessInstances.length }} other process instances.
             </td>
           </tr>
@@ -42,7 +48,6 @@
     </div>
 
     <p>Do you really want to cancel this process instance?</p>
-
   </div>
 
   <div ng-show="status === 'cancellationSuccess'">
@@ -57,16 +62,24 @@
 </div>
 
 <div class="modal-footer">
-  <button class="btn"
+  <button class="btn btn-default"
           ng-click="close(status)"
           ng-disabled="status === 'performCancellation'"
-          ng-hide="status === 'cancellationSuccess' || status === 'cancellationFailed' || status === 'loadingFailed'">Close</button>
+          ng-hide="status === 'cancellationSuccess' || status === 'cancellationFailed' || status === 'loadingFailed'">
+    Close
+  </button>
+
   <button class="btn btn-primary"
           ng-click="close(status)"
-          ng-show="status === 'cancellationSuccess' || status === 'cancellationFailed' || status === 'loadingFailed'">OK</button>
+          ng-show="status === 'cancellationSuccess' || status === 'cancellationFailed' || status === 'loadingFailed'">
+    OK
+  </button>
+
   <button class="btn btn-primary"
           ng-click="cancelProcessInstance()"
           ng-disabled="status !== 'beforeCancellation'"
-          ng-hide="status === 'cancellationSuccess' || status === 'cancellationFailed' || status === 'loadingFailed'">Cancel Process Instance</button>
+          ng-hide="status === 'cancellationSuccess' || status === 'cancellationFailed' || status === 'loadingFailed'">
+    Cancel Process Instance
+  </button>
 </div>
 <!-- / CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/base/app/views/processInstance/cancel-process-instance-dialog.html -->

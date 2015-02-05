@@ -1,43 +1,48 @@
 <!-- # CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/base/app/views/processDefinition/called-process-definition-table.html -->
-<table class="table table-striped table-hover table-condensed">
+<table class="called-process-definition cam-table">
   <thead>
-    <th>Called Process Definition</th>
-    <th>Activity</th>
+    <tr>
+      <th class="process-definition">Called Process Definition</th>
+      <th class="activity">Activity</th>
+    </tr>
   </thead>
+
   <tbody>
     <tr ng-repeat="calledProcessDefinition in calledProcessDefinitions">
-      <td>
+      <td class="process-definition">
         <a ng-href="#/process-definition/{{ calledProcessDefinition.id }}?parentProcessDefinitionId={{ processDefinition.id }}">
           {{ calledProcessDefinition.name }}
         </a>
       </td>
-      <td>
-        <span ng-show="calledProcessDefinition.calledFromActivities.length === 1">
-          <a cam-select-activity="calledProcessDefinition.calledFromActivities[0].id"
-             ng-href="#/process-definition/{{ processDefinition.id }}?activityIds={{ calledProcessDefinition.calledFromActivities[0].id }}&amp;detailsTab=call-process-definitions-table">
-            {{ calledProcessDefinition.calledFromActivities[0].name }}
-          </a>
-        </span>
-        <span ng-show="calledProcessDefinition.calledFromActivities.length > 1">
-          <ul>
-            <li ng-repeat="activity in calledProcessDefinition.calledFromActivities">
-              <a cam-select-activity="activity.id"
-                 ng-href="#/process-definition/{{ processDefinition.id }}?activityIds={{ activity.id }}&amp;detailsTab=call-process-definitions-table">
-                {{ activity.name }}
-              </a>
-            </li>
-          <ul>
-        </span>
+
+      <td class="activity">
+        <a ng-show="calledProcessDefinition.calledFromActivities.length === 1"
+           cam-select-activity="calledProcessDefinition.calledFromActivities[0].id"
+           ng-href="#/process-definition/{{ processDefinition.id }}?activityIds={{ calledProcessDefinition.calledFromActivities[0].id }}&amp;detailsTab=call-process-definitions-table">
+          {{ calledProcessDefinition.calledFromActivities[0].name }}
+        </a>
+
+        <ul ng-show="calledProcessDefinition.calledFromActivities.length > 1">
+          <li ng-repeat="activity in calledProcessDefinition.calledFromActivities">
+            <a cam-select-activity="activity.id"
+               ng-href="#/process-definition/{{ processDefinition.id }}?activityIds={{ activity.id }}&amp;detailsTab=call-process-definitions-table">
+              {{ activity.name }}
+            </a>
+          </li>
+        <ul>
       </td>
     </tr>
 
-    <tr ng-if="!calledProcessDefinitions">
+    <tr ng-if="!calledProcessDefinitions"
+        class="loading">
       <td colspan="2">
-        <i class="glyphicon glyphicon-loading"></i> loading called process definitions...
+        <span class="glyphicon glyphicon-loading"></span>
+        loading called process definitions...
       </td>
     </tr>
 
-    <tr ng-if="calledProcessDefinitions && !calledProcessDefinitions.length">
+    <tr ng-if="calledProcessDefinitions && !calledProcessDefinitions.length"
+        class="no-result">
       <td  colspan="2">
         No called process definitions
       </td>

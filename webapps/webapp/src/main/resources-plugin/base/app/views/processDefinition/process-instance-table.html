@@ -1,23 +1,16 @@
 <!-- # CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/base/app/views/processDefinition/process-instance-table.html -->
-<table class="table table-striped table-hover table-condensed table-filter">
+<table class="process-instances cam-table">
   <thead>
     <tr>
-      <th>ID</th>
-      <th>Start Time</th>
-      <th>Business Key</th>
-      <th>State</th>
+      <th class="state">State</th>
+      <th class="instance-id uuid">ID</th>
+      <th class="start-time">Start Time</th>
+      <th class="business-key">Business Key</th>
     </tr>
   </thead>
   <tbody>
     <tr ng-repeat="processInstance in processInstances">
-      <td>
-        <a href="#/process-instance/{{ processInstance.id }}" title="{{ processInstance.id }}">
-          {{ processInstance.id | shorten:8 }}
-        </a>
-      </td>
-      <td>{{ processInstance.startTime }}</td>
-      <td>{{ processInstance.businessKey }}</td>
-      <td colspan="2">
+      <td class="state">
         <a state-circle
            incidents="processInstance.incidents"
            ng-href="#/process-instance/{{ processInstance.id }}?detailsTab=incidents-tab"></a>
@@ -25,14 +18,29 @@
               ng-show="processInstance.suspended"
               tooltip="Currently suspended"
               tooltip-placement="left">
-          <i class="glyphicon glyphicon-pause white"></i>
+          <span class="glyphicon glyphicon-pause white"></span>
         </span>
+      </td>
+
+      <td class="instance-id uuid">
+        <a href="#/process-instance/{{ processInstance.id }}" title="{{ processInstance.id }}">
+          {{ processInstance.id }}
+        </a>
+      </td>
+
+      <td class="start-time">
+        {{ processInstance.startTime | camDate }}
+      </td>
+
+      <td class="business-key">
+        {{ processInstance.businessKey }}
       </td>
     </tr>
 
     <tr ng-if="!processInstances">
       <td colspan="4">
-        <i class="glyphicon glyphicon-loading"></i> loading process instances...
+        <span class="glyphicon glyphicon-loading"></span>
+        loading process instances...
       </td>
     </tr>
 
@@ -41,7 +49,6 @@
         No process instances matched by current filter.
       </td>
     </tr>
-
   </tbody>
 </table>
 

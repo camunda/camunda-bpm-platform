@@ -1,29 +1,18 @@
 <!-- # CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/jobDefinition/app/views/processDefinition/job-definition-table.html -->
-<table class="table table-striped table-hover table-condensed table-filter">
+<table class="job-definition cam-table">
   <thead>
     <tr>
-      <th>Activity</th>
-      <th>Type</th>
-      <th>Configuration</th>
-      <th>State</th>
-      <th>Action</th>
+      <th class="state">State</th>
+      <th class="activity">Activity</th>
+      <th class="type">Type</th>
+      <th class="configuration">Configuration</th>
+      <th class="action">Action</th>
     </tr>
   </thead>
+
   <tbody>
     <tr ng-repeat="jobDefinition in jobDefinitions">
-      <td>
-        <a cam-select-activity="jobDefinition.activityId"
-           ng-href="#/process-definition/{{ processDefinition.id }}?activityIds={{ jobDefinition.activityId }}&amp;detailsTab=job-definition-table">
-          {{ jobDefinition.activityName }}
-        </a>
-      </td>
-      <td>
-        {{ jobDefinition.jobType }}
-      </td>
-      <td>
-        {{ jobDefinition.jobConfiguration }}
-      </td>
-      <td>
+      <td class="state">
         <span ng-show="jobDefinition.suspended">
           Suspended
         </span>
@@ -31,7 +20,19 @@
           Active
         </span>
       </td>
-      <td>
+      <td class="activity">
+        <a cam-select-activity="jobDefinition.activityId"
+           ng-href="#/process-definition/{{ processDefinition.id }}?activityIds={{ jobDefinition.activityId }}&amp;detailsTab=job-definition-table">
+          {{ jobDefinition.activityName }}
+        </a>
+      </td>
+      <td class="type">
+        {{ jobDefinition.jobType }}
+      </td>
+      <td class="configuration">
+        {{ jobDefinition.jobConfiguration }}
+      </td>
+      <td class="action">
         <span ng-repeat="actionProvider in jobDefinitionActions">
           <view provider="actionProvider" vars="jobDefinitionVars"/>
         </span>
@@ -40,7 +41,8 @@
 
     <tr ng-if="!jobDefinitions">
       <td colspan="5">
-        <i class="glyphicon glyphicon-loading"></i> loading job definitions...
+        <span class="glyphicon glyphicon-loading"></span>
+        loading job definitions...
       </td>
     </tr>
 

@@ -11,7 +11,7 @@ This feature is unsupported in your Browser.
 
 <![if gt IE 9]>
 
-<div class="modal-body">
+<div class="variable-instance-upload modal-body">
   <div notifications-panel></div>
 
   <div ng-show="status === 'beforeUpload'">
@@ -47,16 +47,24 @@ This feature is unsupported in your Browser.
 </div>
 
 <div class="modal-footer">
-  <button class="btn"
+  <button class="btn btn-default"
           ng-click="close(status)"
-          ng-hide="status === 'uploadSuccess' || status === 'uploadFailed'">Close</button>
+          ng-hide="status === 'uploadSuccess' || status === 'uploadFailed'">
+    Close
+  </button>
+
   <button class="btn btn-primary"
           ng-click="close(status)"
-          ng-show="status === 'uploadSuccess' || status === 'uploadFailed'">OK</button>
+          ng-show="status === 'uploadSuccess' || status === 'uploadFailed'">
+    OK
+  </button>
+
   <button class="btn btn-primary"
           ng-click="upload()"
           ng-disabled="status !== 'beforeUpload'"
-          ng-hide="status === 'uploadSuccess' || status === 'uploadFailed'">Upload</button>
+          ng-hide="status === 'uploadSuccess' || status === 'uploadFailed'">
+    Upload
+  </button>
 </div>
 
 <![endif]>

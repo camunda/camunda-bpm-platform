@@ -3,7 +3,7 @@
   <h3>Increment Number of Retries</h3>
 </div>
 
-<div class="modal-body">
+<div class="job-retry modal-body">
   <div notifications-panel></div>
 
   <div ng-hide="status === 'finished' || status === 'failed'">
@@ -22,15 +22,25 @@
 </div>
 
 <div class="modal-footer">
-  <button class="btn" ng-click="close(status)"
+  <button class="btn btn-default"
+          ng-click="close(status)"
           ng-disabled="status === 'performing'"
-          ng-hide="status === 'finished' || status === 'failed'">Close</button>
+          ng-hide="status === 'finished' || status === 'failed'">
+    Close
+  </button>
 
-  <button type="submit" class="btn btn-primary" ng-click="incrementRetry()"
+  <button type="submit"
+          class="btn btn-primary"
+          ng-click="incrementRetry()"
           ng-hide="status === 'finished' || status === 'failed'"
-          ng-disabled="status === 'performing'">Retry</button>
+          ng-disabled="status === 'performing'">
+    Retry
+  </button>
 
-  <button class="btn btn-primary" ng-click="close(status)"
-          ng-show="status === 'finished' || status === 'failed'">OK</button>
+  <button class="btn btn-primary"
+          ng-click="close(status)"
+          ng-show="status === 'finished' || status === 'failed'">
+    OK
+  </button>
 </div>
 <!-- / CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/base/app/views/processInstance/job-retry-dialog.html -->

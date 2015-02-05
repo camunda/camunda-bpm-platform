@@ -1,5 +1,5 @@
 <!-- # CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/base/app/views/processInstance/variable-instances-tab.html -->
-<table class="table table-striped table-hover table-condensed">
+<table class="variable-instances-tab cam-table">
   <thead>
     <tr>
       <th class="variable-name">Name</th>
@@ -8,6 +8,7 @@
       <th class="variable-scope">Scope</th>
     </tr>
   </thead>
+
   <tbody>
     <tr ng-repeat="variable in variables"
         data-variable-name="{{ variable.name }}"
@@ -23,7 +24,7 @@
           <span ng-if="isEditable(variable)"
                 class="edit-toggle"
                 ng-click="editVariable(variable)">
-            <i class="glyphicon glyphicon-pencil"></i>
+            <span class="glyphicon glyphicon-pencil"></span>
           </span>
         </div>
 
@@ -49,7 +50,7 @@
              ng-click="openUploadDialog(variable)"
              tooltip="Upload"
              tooltip-placement="right">
-            <i class="glyphicon glyphicon-upload"></i>
+            <span class="glyphicon glyphicon-upload"></span>
           </a>
         </div>
 
@@ -98,12 +99,12 @@
               <button type="submit"
                       class="btn btn-sm btn-primary"
                       ng-disabled="!isValid(this.editVariableForm)">
-                <i class="glyphicon glyphicon-ok"></i>
+                <span class="glyphicon glyphicon-ok"></span>
               </button>
               <button type="button"
-                      class="btn btn-sm"
+                      class="btn btn-sm btn-default"
                       ng-click="closeInPlaceEditing(variable)">
-                <i class="glyphicon glyphicon-ban-circle"></i>
+                <span class="glyphicon glyphicon-ban-circle"></span>
               </button>
             </div>
           </div>
@@ -120,9 +121,10 @@
         </select>
         <span ng-hide="variable.inEditMode">{{ variable.type }}</span>
       </td>
+
       <td class="variable-scope">
         <a cam-select-activity-instance="variable.instance.id"
-           ng-href="#/process-instance/{{ processInstance.id }}?detailsTab=variables-tab&activityInstanceIds={{ variable.instance.id }}"
+           ng-href="#/process-instance/{{ processInstance.id }}?detailsTab=variables-tab&amp;activityInstanceIds={{ variable.instance.id }}"
            title="{{ variable.instance.id }}">
           {{ variable.instance.name }}
         </a>
@@ -131,7 +133,7 @@
 
     <tr ng-if="!variables">
       <td colspan="4">
-        <i class="glyphicon glyphicon-loading"></i>
+        <span class="glyphicon glyphicon-loading"></span>
         loading process variables ...
       </td>
     </tr>

@@ -1,10 +1,9 @@
 <!-- # CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/base/app/views/processInstance/update-suspension-state-dialog.html -->
 <div class="modal-header">
-  <h3 ng-show="processInstance.suspended">Activate Process Instance</h3>
-  <h3 ng-hide="processInstance.suspended">Suspend Process Instance</h3>
+  <h3>{{ (processInstance.suspended ? 'Activate' : 'Suspend') }} Process Instance</h3>
 </div>
 
-<div class="modal-body update-suspension-state-dialog">
+<div class="process-instance update-suspension-state modal-body">
   <div notifications-panel></div>
 
   <div ng-hide="status === 'SUCCESS' || status === 'FAIL'">
@@ -80,7 +79,7 @@
 
 </div>
 <div class="modal-footer">
-  <button class="btn"
+  <button class="btn btn-default"
           ng-click="close(status)"
           ng-disabled="status === 'PERFORM_UDPATE'"
           ng-hide="status === 'SUCCESS' || status === 'FAIL'">Close</button>
@@ -90,9 +89,7 @@
           ng-click="updateSuspensionState()"
           ng-hide="status === 'SUCCESS' || status === 'FAIL'"
           ng-disabled="status === 'PERFORM_UDPATE'">
-    <span ng-hide="processInstance.suspended">Suspend</span>
-    <span ng-show="processInstance.suspended">Activate</span>
-    <span></span>
+    {{ (processInstance.suspended ? 'Suspend' : 'Activate') }}
   </button>
 
   <button class="btn btn-primary"

@@ -1,22 +1,23 @@
 <!-- # CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/base/app/views/processInstance/user-tasks-table.html -->
-<table class="table table-striped table-hover table-condensed">
+<table class="process-instance user-tasks cam-table">
   <thead>
     <tr>
-      <th>Activity</th>
-      <th>Assignee</th>
-      <th>Owner</th>
-      <th>Creation Date</th>
-      <th>Due Date</th>
-      <th>Follow Up Date</th>
-      <th>Priority</th>
-      <th>Delegation State</th>
-      <th>Task ID</th>
-      <th>Action</th>
+      <th class="activity uuid">Activity</th>
+      <th class="assignee">Assignee</th>
+      <th class="owner">Owner</th>
+      <th class="created">Creation Date</th>
+      <th class="due">Due Date</th>
+      <th class="follow-up">Follow Up Date</th>
+      <th class="priority">Priority</th>
+      <th class="delegation-state">Delegation State</th>
+      <th class="task-id uuid">Task ID</th>
+      <th class="action">Action</th>
     </tr>
   </thead>
+
   <tbody>
     <tr ng-repeat="userTask in userTasks">
-      <td>
+      <td class="activity">
         <a cam-select-activity-instance="userTask.instance.id"
            ng-href="{{ getHref(userTask) }}">{{ userTask.instance.name || userTask.instance.id }}</a>
       </td>
@@ -47,17 +48,17 @@
       <td class="delegation-state">
         {{ userTask.delegationState }}
       </td>
-      <td class="id">
+      <td class="task-id uuid">
         {{ userTask.id }}
       </td>
 
-      <td class="group">
+      <td class="action">
         <a ng-click="changeGroups()"
            ng-model="userTask"
            class="btn btn-default action-button"
            tooltip-placement="left"
            tooltip="Manage group(s) for '{{ userTask.name || userTask.id }}'">
-          <i class="glyphicon glyphicon-user"></i>
+          <span class="glyphicon glyphicon-user"></span>
         </a>
       </td>
     </tr>
@@ -65,7 +66,8 @@
     <tr ng-if="!userTasks">
       <td class="tasks-loading"
           colspan="10">
-        <i class="glyphicon glyphicon-loading"></i> loading user tasks...
+        <span class="glyphicon glyphicon-loading"></span>
+        loading user tasks...
       </td>
     </tr>
 

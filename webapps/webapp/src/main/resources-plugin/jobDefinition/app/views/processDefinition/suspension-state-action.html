@@ -1,12 +1,16 @@
 <!-- # CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/jobDefinition/app/views/processDefinition/suspension-state-action.html -->
-<a class="btn btn-default action-button" ng-click="openSuspensionStateDialog(jobDefinition)" ng-show="jobDefinition.suspended"
+<a class="btn btn-default action-button"
+   ng-click="openSuspensionStateDialog(jobDefinition)"
+   ng-show="jobDefinition.suspended"
    tooltip="Activate Job Definition"
    tooltip-placement="left">
-  <i class="glyphicon glyphicon-play"></i>
+  <span class="glyphicon glyphicon-play"></span>
 </a>
-<a class="btn btn-default action-button" ng-click="openSuspensionStateDialog(jobDefinition)" ng-hide="jobDefinition.suspended"
+<a class="btn btn-default action-button"
+   ng-click="openSuspensionStateDialog(jobDefinition)"
+   ng-hide="jobDefinition.suspended"
    tooltip="Suspend Job Definition"
    tooltip-placement="left">
-  <i class="glyphicon glyphicon-pause"></i>
+  <span class="glyphicon glyphicon-pause"></span>
 </a>
 <!-- / CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/jobDefinition/app/views/processDefinition/suspension-state-action.html -->

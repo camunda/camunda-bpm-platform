@@ -1,46 +1,48 @@
 <!-- # CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/base/app/views/processInstance/incidents-tab.html -->
-<table class="table table-striped table-hover table-condensed">
+<table class="incidents-tab cam-table">
   <thead>
     <tr>
-      <th>Message</th>
-      <th>Timestamp</th>
-      <th>Activity</th>
-      <th>Cause Process Instance Id</th>
-      <th>Root Cause Process Instance Id</th>
-      <th>Type</th>
-      <th>Action</th>
+      <th class="message">Message</th>
+      <th class="timestamp">Timestamp</th>
+      <th class="activity">Activity</th>
+      <th class="cause instance-id uuid">Cause Process Instance Id</th>
+      <th class="cause-root instance-id uuid">Root Cause Process Instance Id</th>
+      <th class="type">Type</th>
+      <th class="action">Action</th>
     </tr>
   </thead>
+
   <tbody>
     <tr ng-repeat="incident in incidents">
-      <td>
-        <div>
-          <span ng-show="incident.incidentType === 'failedJob'">
-            <a href="{{ getJobStacktraceUrl(incident) }}"
-               target="_blank"
-               ng-show="incident.rootCauseIncidentMessage"
-               tooltip="Open stacktrace in new window"
-               tooltip-placement="top">
-              {{ incident.rootCauseIncidentMessage }}
-            </a>
-            <a href="{{ getJobStacktraceUrl(incident) }}"
-               target="_blank"
-               ng-hide="incident.rootCauseIncidentMessage"
-               tooltip="Open stacktrace in new window"
-               tooltip-placement="top">
-              <i>Message is null.</i>
-            </a>
-          </span>
-          <span ng-hide="incident.incidentType === 'failedJob'">
-            <span ng-show="incident.rootCauseIncidentMessage">{{ incident.rootCauseIncidentMessage }}</span>
-            <span ng-hide="incident.rootCauseIncidentMessage"><i>Message is null.</i></span>
-          </span>
-        </div>
+      <td class="message">
+        <span ng-show="incident.incidentType === 'failedJob'">
+          <a href="{{ getJobStacktraceUrl(incident) }}"
+             target="_blank"
+             ng-show="incident.rootCauseIncidentMessage"
+             tooltip="Open stacktrace in new window"
+             tooltip-placement="top">
+            {{ incident.rootCauseIncidentMessage }}
+          </a>
+          <a href="{{ getJobStacktraceUrl(incident) }}"
+             target="_blank"
+             ng-hide="incident.rootCauseIncidentMessage"
+             tooltip="Open stacktrace in new window"
+             tooltip-placement="top">
+            <i>Message is null.</i>
+          </a>
+        </span>
+
+        <span ng-hide="incident.incidentType === 'failedJob'">
+          <span ng-show="incident.rootCauseIncidentMessage">{{ incident.rootCauseIncidentMessage }}</span>
+          <span ng-hide="incident.rootCauseIncidentMessage"><i>Message is null.</i></span>
+        </span>
       </td>
-      <td>
+
+      <td class="timestamp">
         {{ incident.incidentTimestamp }}
       </td>
-      <td>
+
+      <td class="activity">
         <span ng-show="incident.linkable">
           <a cam-select-activity="incident.activityId"
              ng-href="#/process-instance/{{ processInstance.id }}?activityIds={{ incident.activityId }}&amp;detailsTab=incidents-tab">
@@ -51,37 +53,42 @@
           {{ incident.activityName }}
         </span>
       </td>
-      <td>
+
+      <td class="cause instance-id uuid">
         <span ng-show="incident.causeIncidentProcessInstanceId !== incident.processInstanceId" >
           <a href="#/process-instance/{{incident.causeIncidentProcessInstanceId}}?activityIds={{ incident.causeIncidentActivityId }}&amp;detailsTab=incidents-tab">
-            {{ incident.causeIncidentProcessInstanceId | shorten:8 }}
+            {{ incident.causeIncidentProcessInstanceId }}
           </a>
         </span>
       </td>
-      <td>
+
+      <td class="cause-root instance-id uuid">
         <span ng-show="incident.rootCauseIncidentProcessInstanceId !== incident.processInstanceId" >
           <a href="#/process-instance/{{incident.rootCauseIncidentProcessInstanceId}}?activityIds={{ incident.rootCauseIncidentActivityId }}&amp;detailsTab=incidents-tab">
-            {{ incident.rootCauseIncidentProcessInstanceId | shorten:8 }}
+            {{ incident.rootCauseIncidentProcessInstanceId }}
           </a>
         </span>
       </td>
-      <td>
+
+      <td class="type">
         {{ getIncidentType(incident) }}
       </td>
-      <td>
+
+      <td class="action">
         <a class="btn btn-default action-button"
            ng-click="openJobRetryDialog(incident)"
            ng-show="incident.incidentType === 'failedJob' && incident.configuration"
            tooltip="Increment Number of Retries of Failed Job"
            tooltip-placement="left">
-          <i class="glyphicon glyphicon-repeat"></i>
+          <span class="glyphicon glyphicon-repeat"></span>
         </a>
       </td>
     </tr>
 
     <tr ng-if="!incidents">
       <td colspan="7">
-        <i class="glyphicon glyphicon-loading"></i> loading incidents...
+        <span class="glyphicon glyphicon-loading"></span>
+        loading incidents...
       </td>
     </tr>
 

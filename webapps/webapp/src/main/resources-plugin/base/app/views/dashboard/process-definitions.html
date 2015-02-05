@@ -7,7 +7,7 @@
   <tabset ng-if="statistics && statistics.length">
     <tab heading="List"
          select="selectTab('list')">
-      <table class="table table-striped table-hover table-condensed processes-list">
+      <table class="process-definitions-list cam-table">
         <thead>
           <tr>
             <th class="state">State</th>
@@ -15,15 +15,18 @@
             <th class="name">Name</th>
           </tr>
         </thead>
+
         <tbody>
           <tr data-ng-repeat="statistic in statistics | orderBy:orderByPredicate:orderByReverse">
             <td class="state">
               <div state-circle
                    incidents="statistic.incidents"></div>
             </td>
+
             <td class="instances">
               {{ statistic.instances }}
             </td>
+
             <td class="name">
               <a href="#/process-definition/{{ statistic.definition.id }}">
                 {{ statistic.definition.name }}
@@ -66,10 +69,6 @@
       </div>
     </tab><!-- grid tab -->
   </tabset>
-
-  <div class="no-process"
-       ng-if="statistics && !statistics.length">
-  </div>
 
 </div>
 <!-- / CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/base/app/views/dashboard/process-definitions.html -->
