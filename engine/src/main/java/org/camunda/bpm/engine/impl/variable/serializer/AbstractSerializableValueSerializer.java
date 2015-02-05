@@ -13,10 +13,8 @@
 package org.camunda.bpm.engine.impl.variable.serializer;
 
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.core.variable.value.UntypedValueImpl;
 import org.camunda.bpm.engine.impl.digest._apacheCommonsCodec.Base64;
-import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.camunda.bpm.engine.impl.util.StringUtil;
 import org.camunda.bpm.engine.variable.type.SerializableValueType;
 import org.camunda.bpm.engine.variable.value.SerializableValue;
@@ -51,9 +49,6 @@ public abstract class AbstractSerializableValueSerializer<T extends Serializable
         try {
           serializedByteValue = serializeToByteArray(objectToSerialize);
           serializedStringValue = getSerializedStringValue(serializedByteValue);
-          if(valueFields.getByteArrayValue() == null && objectToSerialize != null) {
-            dirtyCheckOnFlush(objectToSerialize, serializedByteValue, valueFields);
-          }
         } catch(Exception e) {
           throw new ProcessEngineException("Cannot serialize object in variable '"+valueFields.getName()+"': "+e.getMessage(), e);
         }
@@ -87,9 +82,6 @@ public abstract class AbstractSerializableValueSerializer<T extends Serializable
         }
       }
       T value = createDeserializedValue(deserializedObject, serializedStringValue, valueFields);
-      if(deserializedObject != null) {
-        dirtyCheckOnFlush(deserializedObject, serializedByteValue, valueFields);
-      }
       return value;
     }
     else {
@@ -183,17 +175,6 @@ public abstract class AbstractSerializableValueSerializer<T extends Serializable
    * @return true if the serializer can handle the object.
    */
   protected abstract boolean canSerializeValue(Object value);
-
-  protected void dirtyCheckOnFlush(Object deserializedObject, byte[] serializedValue, ValueFields valueFields) {
-    // make sure changes to the object are flushed in case it is
-    // further modified in the context of the same command
-    if(valueFields instanceof VariableInstanceEntity) {
-      Context
-        .getCommandContext()
-        .getSession(DeserializedObjectsSession.class)
-        .addDeserializedObject(this, deserializedObject, serializedValue, (VariableInstanceEntity)valueFields);
-    }
-  }
 
   // methods to be implemented by subclasses ////////////
 

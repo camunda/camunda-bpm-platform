@@ -13,6 +13,7 @@
 package org.camunda.bpm.engine.impl.persistence.entity;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,8 +24,11 @@ import org.camunda.bpm.engine.impl.core.variable.value.UntypedValueImpl;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.DbEntityLifecycleAware;
 import org.camunda.bpm.engine.impl.db.HasDbRevision;
-import org.camunda.bpm.engine.impl.variable.serializer.ValueFields;
+import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.interceptor.CommandContextListener;
+import org.camunda.bpm.engine.impl.variable.serializer.ByteArrayValueSerializer;
 import org.camunda.bpm.engine.impl.variable.serializer.TypedValueSerializer;
+import org.camunda.bpm.engine.impl.variable.serializer.ValueFields;
 import org.camunda.bpm.engine.impl.variable.serializer.VariableSerializers;
 import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.variable.type.ValueType;
@@ -34,7 +38,8 @@ import org.camunda.bpm.engine.variable.value.TypedValue;
 /**
  * @author Tom Baeyens
  */
-public class VariableInstanceEntity implements VariableInstance, CoreVariableInstance, ValueFields, DbEntity, DbEntityLifecycleAware, HasDbRevision, Serializable {
+public class VariableInstanceEntity implements VariableInstance, CoreVariableInstance, ValueFields, DbEntity, DbEntityLifecycleAware, HasDbRevision, Serializable,
+  CommandContextListener {
 
   private static final long serialVersionUID = 1L;
 
@@ -241,6 +246,7 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
     return getTypedValue(true);
   }
 
+  @SuppressWarnings("unchecked")
   public TypedValue getTypedValue(boolean deserializeValue) {
 
     if (cachedValue != null && cachedValue instanceof SerializableValue && Context.getCommandContext() != null) {
@@ -254,6 +260,10 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
     if (cachedValue == null && errorMessage == null) {
       try {
         cachedValue = getSerializer().readValue(this, deserializeValue);
+
+        if (serializer.isMutableValue(cachedValue)) {
+          Context.getCommandContext().registerCommandContextListener(this);
+        }
       }
       catch(RuntimeException e) {
         // intercept the error message
@@ -286,8 +296,15 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
     // cache the value
     cachedValue = value;
 
+    // ensure that we serialize the object on command context flush
+    // if it can be implicitly changed
+    if (serializer.isMutableValue(cachedValue)) {
+      Context.getCommandContext().registerCommandContextListener(this);
+    }
+
     return value;
   }
+
 
   public void clearValueFields() {
     this.longValue = null;
@@ -299,6 +316,30 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
     if(this.byteArrayValueId != null) {
       deleteByteArrayValue();
       setByteArrayValueId(null);
+    }
+  }
+
+  public void onCommandContextClose(CommandContext commandContext) {
+    updateFields();
+  }
+
+  public void onCommandFailed(CommandContext commandContext, Throwable t) {
+    // ignore
+  }
+
+  @SuppressWarnings("unchecked")
+  public void updateFields() {
+    if (cachedValue != null && serializer.isMutableValue(cachedValue)) {
+      byte[] byteArray = ByteArrayValueSerializer.getBytes(this);
+
+      serializer.writeValue(cachedValue, this);
+
+      byte[] byteArrayAfter = ByteArrayValueSerializer.getBytes(this);
+
+      if (Arrays.equals(byteArray, byteArrayAfter)) {
+        // avoids an UPDATE statement when the byte array has not changed, cf ByteArrayEntity#getPersistentState
+        ByteArrayValueSerializer.setBytes(this, byteArray);
+      }
     }
   }
 

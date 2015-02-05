@@ -36,9 +36,8 @@ public class UpdateValueDelegate implements JavaDelegate, Serializable {
     List<JsonSerializable> var = (List<JsonSerializable>) typedValue.getValue();
     JsonSerializable newElement = new JsonSerializable();
     newElement.setStringProperty(STRING_PROPERTY);
+    // implicit update of the list, so no execution.setVariable call
     var.add(newElement);
-//    execution.setVariable("var", Variables.objectValue(var)
-//        .serializationDataFormat("application/json").create());
 
   }
 

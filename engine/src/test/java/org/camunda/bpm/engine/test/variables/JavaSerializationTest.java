@@ -135,7 +135,7 @@ public class JavaSerializationTest extends PluggableProcessEngineTestCase {
         .serializationDataFormat(JAVA_DATA_FORMAT)
         .objectTypeName(JavaSerializable.class.getName())
         .create()));
-    
+
     // then
     // it does not fail
   }

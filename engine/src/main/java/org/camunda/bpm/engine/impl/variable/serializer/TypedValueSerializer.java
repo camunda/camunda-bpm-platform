@@ -84,4 +84,10 @@ public interface TypedValueSerializer<T extends TypedValue> {
    */
   String getSerializationDataformat();
 
+  /**
+   * @return whether values serialized by this serializer can be mutable and
+   * should be re-serialized if changed
+   */
+  boolean isMutableValue(T typedValue);
+
 }

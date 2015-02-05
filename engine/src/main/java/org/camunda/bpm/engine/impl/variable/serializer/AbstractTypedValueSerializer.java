@@ -47,4 +47,9 @@ public abstract class AbstractTypedValueSerializer<T extends TypedValue> impleme
 
   protected abstract boolean canWriteValue(TypedValue value);
 
+  public boolean isMutableValue(T typedValue) {
+    // default
+    return false;
+  }
+
 }

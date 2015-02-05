@@ -213,7 +213,6 @@ import org.camunda.bpm.engine.impl.variable.serializer.BooleanValueSerializer;
 import org.camunda.bpm.engine.impl.variable.serializer.ByteArrayValueSerializer;
 import org.camunda.bpm.engine.impl.variable.serializer.DateValueSerializer;
 import org.camunda.bpm.engine.impl.variable.serializer.DefaultVariableSerializers;
-import org.camunda.bpm.engine.impl.variable.serializer.DeserializedObjectsSessionFactory;
 import org.camunda.bpm.engine.impl.variable.serializer.DoubleValueSerializer;
 import org.camunda.bpm.engine.impl.variable.serializer.IntegerValueSerializer;
 import org.camunda.bpm.engine.impl.variable.serializer.JavaObjectSerializer;
@@ -874,8 +873,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       addSessionFactory(new GenericManagerFactory(CaseDefinitionManager.class));
       addSessionFactory(new GenericManagerFactory(CaseExecutionManager.class));
       addSessionFactory(new GenericManagerFactory(CaseSentryPartManager.class));
-
-      addSessionFactory(new DeserializedObjectsSessionFactory());
 
       sessionFactories.put(ReadOnlyIdentityProvider.class, identityProviderSessionFactory);
 

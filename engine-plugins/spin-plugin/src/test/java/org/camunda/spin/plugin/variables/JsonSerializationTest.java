@@ -516,7 +516,7 @@ public class JsonSerializationTest extends PluggableProcessEngineTestCase {
    * CAM-3222
    */
   @Deployment(resources = SERVICE_TASK_PROCESS)
-  public void FAILING_testImplicitlyUpdateEmptyList() {
+  public void testImplicitlyUpdateEmptyList() {
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("serviceTaskProcess",
         Variables.createVariables()
           .putValueTyped("listVar",
