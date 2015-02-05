@@ -40,7 +40,6 @@ define('camunda-tasklist-ui', [
   var pluginDependencies = window.PLUGIN_DEPENDENCIES || [];
 
   require.config({
-    // baseUrl: './',
     packages: pluginPackages
   });
 
@@ -51,19 +50,6 @@ define('camunda-tasklist-ui', [
   ].concat(pluginDependencies.map(function(plugin) {
     return plugin.requirePackageName;
   }));
-
-
-  // converts AMD paths to angular module names
-  // "./filter" will be "cam.tasklist.filter"
-  // function rj2ngNames(names) {
-  //   var name, translated = [];
-  //   for (var n = 0; n < names.length; n++) {
-  //     if(names[n].indexOf("!") !== -1) continue;
-  //     name = (require(names[n]) || {}).name;
-  //     if (name) translated.push(name);
-  //   }
-  //   return translated;
-  // }
 
 
   function bootstrapApp() {
@@ -115,14 +101,6 @@ define('camunda-tasklist-ui', [
       require('scripts/form/index').name,
       require('scripts/filter/index').name,
       require('scripts/api/index').name,
-      // 'cam.tasklist.user',
-      // 'cam.tasklist.variables',
-      // 'cam.tasklist.tasklist',
-      // 'cam.tasklist.task',
-      // 'cam.tasklist.process',
-      // 'cam.tasklist.form',
-      // 'cam.tasklist.filter',
-      // 'cam.tasklist.client'
     ].concat(pluginDependencies.map(function(el){
       return el.ngModuleName;
     }));
