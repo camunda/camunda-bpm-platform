@@ -456,62 +456,15 @@
           <scope>runtime</scope>
         </dependency>
         <dependency>
-          <groupId>org.camunda.bpm</groupId>
-          <artifactId>camunda-engine</artifactId>
-        </dependency>
-        <dependency>
-          <groupId>org.camunda.bpm</groupId>
-          <artifactId>camunda-engine-plugin-spin</artifactId>
-        </dependency>
-        <dependency>
-          <groupId>org.camunda.spin</groupId>
-          <artifactId>camunda-spin-dataformat-json-jackson</artifactId>
-        </dependency>
-        <dependency>
-          <groupId>org.camunda.spin</groupId>
-          <artifactId>camunda-spin-dataformat-xml-dom</artifactId>
-        </dependency>
-        <dependency>
-          <groupId>org.camunda.bpm</groupId>
-          <artifactId>camunda-engine-plugin-connect</artifactId>
-        </dependency>
-        <dependency>
-          <groupId>org.camunda.connect</groupId>
-          <artifactId>camunda-connect-http-client</artifactId>
-        </dependency>
-        <dependency>
-          <groupId>org.camunda.connect</groupId>
-          <artifactId>camunda-connect-soap-http-client</artifactId>
-        </dependency>
-        <dependency>
-          <groupId>org.camunda.bpm.identity</groupId>
-          <artifactId>camunda-identity-ldap</artifactId>
-          <version>${project.version}</version>
-        </dependency>
-        <dependency>
-          <groupId>org.slf4j</groupId>
-          <artifactId>slf4j-jdk14</artifactId>
-        </dependency>
-        <dependency>
-          <groupId>com.h2database</groupId>
-          <artifactId>h2</artifactId>
-        </dependency>
-        <dependency>
-          <groupId>com.fasterxml.uuid</groupId>
-          <artifactId>java-uuid-generator</artifactId>
-        </dependency>
-
-        <dependency>
-          <groupId>org.apache.tomcat</groupId>
-          <artifactId>tomcat-jdbc</artifactId>
-          <version>7.0.33</version>
-        </dependency>
-
-        <dependency>
-          <groupId>org.apache.tomcat</groupId>
-          <artifactId>tomcat-juli</artifactId>
-          <version>7.0.33</version>
-        </dependency>
+                <groupId>org.apache.tomcat</groupId>
+                <artifactId>tomcat-jdbc</artifactId>
+                <version>7.0.33</version>
+              </dependency>
+              <dependency>
+                <groupId>org.apache.tomcat</groupId>
+                <artifactId>tomcat-juli</artifactId>
+                <version>7.0.33</version>
+              </dependency>
       </dependencies>
       <build>
         <plugins>
@@ -528,7 +481,41 @@
                   <resourceBase>${project.basedir}/src/main/webapp</resourceBase>
                 </resourceBases>
               </webAppConfig>
+              <contextHandlers>
+                <contextHandler implementation="org.eclipse.jetty.webapp.WebAppContext">
+                  <war>${basedir}/target/engine-rest.war</war>
+                  <contextPath>/engine-rest</contextPath>
+                </contextHandler>
+              </contextHandlers>
             </configuration>
+            <dependencies>
+              <dependency>
+                <groupId>org.camunda.bpm</groupId>
+                <artifactId>camunda-engine</artifactId>
+                <version>${project.version}</version>
+              </dependency>
+              <dependency>
+                <groupId>org.camunda.bpm.identity</groupId>
+                <artifactId>camunda-identity-ldap</artifactId>
+                <version>${project.version}</version>
+              </dependency>
+              <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-jdk14</artifactId>
+                <version>1.7.7</version>
+              </dependency>
+              <dependency>
+                <groupId>com.h2database</groupId>
+                <artifactId>h2</artifactId>
+                <version>1.4.181</version>
+              </dependency>
+              <dependency>
+                <groupId>com.fasterxml.uuid</groupId>
+                <artifactId>java-uuid-generator</artifactId>
+                <version>3.1.2</version>
+              </dependency>
+              
+            </dependencies>
           </plugin>
           <plugin>
             <groupId>org.codehaus.mojo</groupId>
@@ -557,9 +544,37 @@
                     </resource>
                   </resources>
                 </configuration>
-              </execution>
+              </execution>              
             </executions>
           </plugin>
+          <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <version>2.10</version>
+        <executions>
+          <execution>
+            <id>copy</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>copy</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.camunda.bpm</groupId>
+                  <artifactId>camunda-engine-rest</artifactId>
+                  <version>${project.version}</version>
+                  <type>war</type>
+                  <classifier>tomcat</classifier>
+                  <overWrite>true</overWrite>
+                  <outputDirectory>${project.build.directory}/</outputDirectory>
+                  <destFileName>engine-rest.war</destFileName>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
         </plugins>
       </build>
       <properties>

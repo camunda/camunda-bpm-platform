@@ -11,14 +11,6 @@
       <property name="history">full</property>
     </properties>
 
-    <plugins>
-      <plugin>
-        <class>org.camunda.spin.plugin.impl.SpinProcessEnginePlugin</class>
-      </plugin>
-      <plugin>
-        <class>org.camunda.connect.plugin.impl.ConnectProcessEnginePlugin</class>
-      </plugin>
-    </plugins>
   </process-engine>
 
   <process-engine name="engine2">
@@ -28,14 +20,6 @@
       <property name="authorizationEnabled">true</property>
     </properties>
 
-    <plugins>
-      <plugin>
-        <class>org.camunda.spin.plugin.impl.SpinProcessEnginePlugin</class>
-      </plugin>
-      <plugin>
-        <class>org.camunda.connect.plugin.impl.ConnectProcessEnginePlugin</class>
-      </plugin>
-    </plugins>
   </process-engine>
 
   <process-engine name="engine3">
@@ -45,17 +29,6 @@
       <property name="authorizationEnabled">true</property>
     </properties>
 
-    <plugins>
-      <plugin>
-        <class>org.camunda.spin.plugin.impl.SpinProcessEnginePlugin</class>
-      </plugin>
-      <plugin>
-        <class>org.camunda.connect.plugin.impl.ConnectProcessEnginePlugin</class>
-      </plugin>
-    </plugins>
   </process-engine>
 
-  <process-archive name="test-processes">
-
-  </process-archive>
 </process-application>

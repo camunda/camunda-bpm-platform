@@ -12,8 +12,6 @@
  */
 package org.camunda.bpm.pa.rest;
 
-import static org.camunda.spin.Spin.JSON;
-
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
@@ -31,7 +29,6 @@ import org.camunda.bpm.admin.impl.web.SetupResource;
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.authorization.Groups;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -61,7 +58,8 @@ public class TestServlet extends HttpServlet {
   public final static Logger log = Logger.getLogger(TestServlet.class.getName());
 
   private static final List<String> TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK = Arrays.asList(
-      "ACT_GE_PROPERTY"
+      "ACT_GE_PROPERTY",
+      "ACT_RU_AUTHORIZATION"
     );
 
   protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -112,13 +110,13 @@ public class TestServlet extends HttpServlet {
       });
 
       createAdminUser(processEngine);
-      resp.getWriter().write((JSON("{}").prop("clean", false).toString()));
+      resp.getWriter().write("{\"clean\": false}");
     }
     else {
       log.info("database was clean");
 
       createAdminUser(processEngine);
-      resp.getWriter().write((JSON("{}").prop("clean", true).toString()));
+      resp.getWriter().write("{\"clean\": true}");
     }
 
   }
@@ -144,12 +142,6 @@ public class TestServlet extends HttpServlet {
 
     identityService.deleteGroup(Groups.CAMUNDA_ADMIN);
     identityService.deleteUser("admin");
-
-    List<Authorization> list = processEngine.getAuthorizationService().createAuthorizationQuery().groupIdIn(Groups.CAMUNDA_ADMIN).list();
-
-    for (Authorization auth : list) {
-      processEngine.getAuthorizationService().deleteAuthorization(auth.getId());
-    }
 
   }
 
