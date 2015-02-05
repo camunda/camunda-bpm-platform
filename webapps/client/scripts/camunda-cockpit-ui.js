@@ -1,6 +1,3 @@
-/* jshint browser: true */
-/* global define: false*/
-'use strict';
 define('camunda-cockpit-ui', [
   './directives/main',
   './filters/main',
@@ -8,8 +5,10 @@ define('camunda-cockpit-ui', [
   './resources/main',
   './services/main',
   'camunda-commons-ui',
+  'camunda-bpm-sdk-js',
   'ngDefine'
 ], function () {
+  'use strict';
   var APP_NAME = 'cam.cockpit';
 
   var pluginPackages = window.PLUGIN_PACKAGES || [];
