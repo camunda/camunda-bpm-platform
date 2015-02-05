@@ -24,6 +24,7 @@ import org.camunda.bpm.engine.ScriptEvaluationException;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 
@@ -541,12 +542,47 @@ public class ScriptTaskTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  public void testShouldNotDeployProcessWithMissingScriptElementAndResource() {
+    try {
+      deployProcess(Bpmn.createExecutableProcess("testProcess")
+        .startEvent()
+        .scriptTask()
+          .scriptFormat(RUBY)
+        .userTask()
+        .endEvent()
+      .done());
+
+      fail("this process should not be deployable");
+    } catch (ProcessEngineException e) {
+      // happy path
+    }
+  }
+
+  public void testShouldUseJuelAsDefaultScriptLanguage() {
+    deployProcess(Bpmn.createExecutableProcess("testProcess")
+      .startEvent()
+      .scriptTask()
+        .scriptText("${true}")
+      .userTask()
+      .endEvent()
+    .done());
+
+    runtimeService.startProcessInstanceByKey("testProcess");
+
+    Task task = taskService.createTaskQuery().singleResult();
+    assertNotNull(task);
+  }
+
+  protected void deployProcess(BpmnModelInstance process) {
+    Deployment deployment = repositoryService.createDeployment()
+        .addModelInstance("testProcess.bpmn", process)
+        .deploy();
+      deploymentIds.add(deployment.getId());
+  }
+
   protected void deployProcess(String scriptFormat, String scriptText) {
     BpmnModelInstance process = createProcess(scriptFormat, scriptText);
-    Deployment deployment = repositoryService.createDeployment()
-      .addModelInstance("testProcess.bpmn", process)
-      .deploy();
-    deploymentIds.add(deployment.getId());
+    deployProcess(process);
   }
 
   protected BpmnModelInstance createProcess(String scriptFormat, String scriptText) {
