@@ -456,15 +456,15 @@
           <scope>runtime</scope>
         </dependency>
         <dependency>
-                <groupId>org.apache.tomcat</groupId>
-                <artifactId>tomcat-jdbc</artifactId>
-                <version>7.0.33</version>
-              </dependency>
-              <dependency>
-                <groupId>org.apache.tomcat</groupId>
-                <artifactId>tomcat-juli</artifactId>
-                <version>7.0.33</version>
-              </dependency>
+          <groupId>org.apache.tomcat</groupId>
+          <artifactId>tomcat-jdbc</artifactId>
+          <version>7.0.33</version>
+        </dependency>
+        <dependency>
+          <groupId>org.apache.tomcat</groupId>
+          <artifactId>tomcat-juli</artifactId>
+          <version>7.0.33</version>
+        </dependency>
       </dependencies>
       <build>
         <plugins>
@@ -475,7 +475,7 @@
             <configuration>
               <webAppConfig>
                 <contextPath>/camunda</contextPath>
-                <defaultsDescriptor>${project.basedir}/src/main/runtime/develop/jetty/webdefault.xml</defaultsDescriptor>
+                <defaultsDescriptor>${project.basedir}/src/main/runtime/test/jetty/webdefault.xml</defaultsDescriptor>
                 <resourceBases>
                   <resourceBase>${project.basedir}/target/webapp</resourceBase>
                   <resourceBase>${project.basedir}/src/main/webapp</resourceBase>
@@ -514,7 +514,6 @@
                 <artifactId>java-uuid-generator</artifactId>
                 <version>3.1.2</version>
               </dependency>
-              
             </dependencies>
           </plugin>
           <plugin>
