@@ -10,24 +10,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.variable.type;
+package org.camunda.spin.plugin.variable.value;
 
-import java.util.Collection;
+import org.camunda.spin.spi.DataFormat;
+import org.camunda.spin.xml.SpinXmlElement;
+
 
 /**
- * @author Thorben Lindhauer
+ * @author Roman Smirnov
+ *
  */
-public interface ValueTypeResolver {
+public interface XmlValue extends SpinValue {
 
-  void addType(ValueType type);
+  public SpinXmlElement getValue();
 
-  ValueType typeForName(String typeName);
+  public DataFormat<SpinXmlElement> getDataFormat();
 
-  /**
-   * Returns all (transitive) sub types of the provided type
-   * given they are not abstract
-   *
-   * @return
-   */
-  Collection<ValueType> getSubTypes(ValueType type);
 }

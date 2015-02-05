@@ -99,7 +99,7 @@ public class SpinObjectValueSerializer extends AbstractObjectValueSerializer {
     }
   }
 
-  protected boolean canSerializeObject(Object value) {
+  protected boolean canSerializeValue(Object value) {
     return dataFormat.getMapper().canMap(value);
   }
 

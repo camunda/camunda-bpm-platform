@@ -37,7 +37,7 @@ public abstract class AbstractTypedValueSerializer<T extends TypedValue> impleme
   }
 
   public boolean canHandle(TypedValue value) {
-    if(value.getType() != null && !valueType.equals(value.getType())) {
+    if(value.getType() != null && !valueType.getClass().isAssignableFrom(value.getType().getClass())) {
       return false;
     }
     else {

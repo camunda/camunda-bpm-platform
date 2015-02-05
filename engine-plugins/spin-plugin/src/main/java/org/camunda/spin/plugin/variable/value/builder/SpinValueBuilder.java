@@ -10,24 +10,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.variable.type;
+package org.camunda.spin.plugin.variable.value.builder;
 
-import java.util.Collection;
+import org.camunda.bpm.engine.variable.value.SerializationDataFormat;
+import org.camunda.spin.plugin.variable.value.SpinValue;
 
 /**
- * @author Thorben Lindhauer
+ * @author Roman Smirnov
+ *
  */
-public interface ValueTypeResolver {
+public interface SpinValueBuilder<T extends SpinValue> {
 
-  void addType(ValueType type);
+  SpinValueBuilder<T> serializationDataFormat(String dataFormatName);
 
-  ValueType typeForName(String typeName);
+  SpinValueBuilder<T> serializationDataFormat(SerializationDataFormat dataFormat);
 
-  /**
-   * Returns all (transitive) sub types of the provided type
-   * given they are not abstract
-   *
-   * @return
-   */
-  Collection<ValueType> getSubTypes(ValueType type);
+  T create();
+
 }

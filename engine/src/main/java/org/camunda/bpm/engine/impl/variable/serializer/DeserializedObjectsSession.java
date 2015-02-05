@@ -30,7 +30,7 @@ public class DeserializedObjectsSession implements Session {
     deserializedObjects.add(deserializedObject);
   }
 
-  public void addDeserializedObject(AbstractObjectValueSerializer serializer, Object deserializedObject, byte[] serializedBytes, VariableInstanceEntity variableInstanceEntity) {
+  public void addDeserializedObject(AbstractSerializableValueSerializer<?> serializer, Object deserializedObject, byte[] serializedBytes, VariableInstanceEntity variableInstanceEntity) {
     addDeserializedObject(new DeserializedObject(serializer, deserializedObject, serializedBytes, variableInstanceEntity));
   }
 

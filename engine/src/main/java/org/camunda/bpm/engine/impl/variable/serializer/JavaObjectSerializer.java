@@ -23,7 +23,7 @@ import java.io.Serializable;
 
 import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
-import static org.camunda.bpm.engine.variable.Variables.SerializationDataFormats;
+import org.camunda.bpm.engine.variable.Variables.SerializationDataFormats;
 
 /**
  * Uses default java serialization to serialize java objects as byte streams.
@@ -78,7 +78,7 @@ public class JavaObjectSerializer extends AbstractObjectValueSerializer {
     return deserializedObject.getClass().getName();
   }
 
-  protected boolean canSerializeObject(Object value) {
+  protected boolean canSerializeValue(Object value) {
     return value instanceof Serializable;
   }
 

@@ -25,12 +25,12 @@ import org.camunda.bpm.engine.variable.value.TypedValue;
  */
 public class DeserializedObject {
 
-  protected AbstractObjectValueSerializer serializer;
+  protected AbstractSerializableValueSerializer<?> serializer;
   Object deserializedObject;
   byte[] originalBytes;
   VariableInstanceEntity variableInstanceEntity;
 
-  public DeserializedObject(AbstractObjectValueSerializer serializer, Object deserializedObject, byte[] serializedBytes, VariableInstanceEntity variableInstanceEntity) {
+  public DeserializedObject(AbstractSerializableValueSerializer<?> serializer, Object deserializedObject, byte[] serializedBytes, VariableInstanceEntity variableInstanceEntity) {
     this.serializer = serializer;
     this.deserializedObject = deserializedObject;
     this.originalBytes = serializedBytes;

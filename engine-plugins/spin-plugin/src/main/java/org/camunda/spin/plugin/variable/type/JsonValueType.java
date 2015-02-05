@@ -10,24 +10,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.variable.type;
-
-import java.util.Collection;
+package org.camunda.spin.plugin.variable.type;
 
 /**
- * @author Thorben Lindhauer
+ * @author Roman Smirnov
+ *
  */
-public interface ValueTypeResolver {
+public interface JsonValueType extends SpinValueType {
 
-  void addType(ValueType type);
+  public static final String TYPE_NAME = "json";
 
-  ValueType typeForName(String typeName);
-
-  /**
-   * Returns all (transitive) sub types of the provided type
-   * given they are not abstract
-   *
-   * @return
-   */
-  Collection<ValueType> getSubTypes(ValueType type);
 }

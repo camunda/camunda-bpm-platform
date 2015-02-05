@@ -59,7 +59,7 @@ public class ValueTypeResolverImpl implements ValueTypeResolver {
     addType(NUMBER);
   }
 
-  protected void addType(ValueType type) {
+  public void addType(ValueType type) {
     knownTypes.put(type.getName(), type);
   }
 

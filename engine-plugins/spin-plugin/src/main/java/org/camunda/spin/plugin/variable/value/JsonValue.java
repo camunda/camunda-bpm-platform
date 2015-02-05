@@ -10,24 +10,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.variable.type;
+package org.camunda.spin.plugin.variable.value;
 
-import java.util.Collection;
+import org.camunda.spin.json.SpinJsonNode;
+import org.camunda.spin.plugin.variable.type.JsonValueType;
+import org.camunda.spin.spi.DataFormat;
 
 /**
- * @author Thorben Lindhauer
+ * @author Roman Smirnov
+ *
  */
-public interface ValueTypeResolver {
+public interface JsonValue extends SpinValue {
 
-  void addType(ValueType type);
+  public SpinJsonNode getValue();
 
-  ValueType typeForName(String typeName);
+  public DataFormat<SpinJsonNode> getDataFormat();
 
-  /**
-   * Returns all (transitive) sub types of the provided type
-   * given they are not abstract
-   *
-   * @return
-   */
-  Collection<ValueType> getSubTypes(ValueType type);
+  public JsonValueType getType();
+
 }
