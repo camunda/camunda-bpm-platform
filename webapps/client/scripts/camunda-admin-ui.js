@@ -1,6 +1,3 @@
-/* jshint browser: true */
-/* global define: false*/
-'use strict';
 define('camunda-admin-ui', [
   './pages/main',
   './directives/main',
@@ -10,6 +7,7 @@ define('camunda-admin-ui', [
   'camunda-commons-ui',
   'ngDefine'
 ], function () {
+  'use strict';
   var APP_NAME = 'cam.admin';
 
   var pluginPackages = window.PLUGIN_PACKAGES || [];
@@ -88,7 +86,7 @@ define('camunda-admin-ui', [
     require([
       'domReady!'
     ], function () {
-      angular.bootstrap(document, [ appNgModule.name, ]);
+      angular.bootstrap(document, [ appNgModule.name ]);
       var html = document.getElementsByTagName('html')[0];
 
       html.setAttribute('ng-app', appNgModule.name);
