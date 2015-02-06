@@ -12,6 +12,8 @@
  */
 package org.camunda.spin.plugin.variable.value.impl;
 
+import static org.camunda.spin.Spin.S;
+
 import org.camunda.bpm.engine.impl.core.variable.value.AbstractTypedValue;
 import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.spin.DataFormats;
@@ -51,7 +53,14 @@ public abstract class SpinValueImpl extends AbstractTypedValue<Spin<?>> implemen
       return super.getValue();
     }
     else {
-      throw new IllegalStateException("Spin value is not deserialized.");
+      // deserialize the serialized value by using
+      // the given data format
+      value = S(getValueSerialized(), getSerializationDataFormat());
+      isDeserialized = true;
+
+      setValueSerialized(null);
+
+      return value;
     }
   }
 
