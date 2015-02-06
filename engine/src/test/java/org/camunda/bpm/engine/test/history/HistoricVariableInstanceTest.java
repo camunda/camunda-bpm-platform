@@ -13,6 +13,7 @@
 
 package org.camunda.bpm.engine.test.history;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,6 +35,7 @@ import org.camunda.bpm.engine.task.TaskQuery;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.api.runtime.util.CustomSerializable;
 import org.camunda.bpm.engine.test.api.runtime.util.FailingSerializable;
+import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.value.ObjectValue;
 
 
@@ -630,6 +632,32 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTestCase
       }
     }
 
+  }
+
+  /**
+   * CAM-3442
+   */
+  @Deployment
+  @SuppressWarnings("unchecked")
+  public void FAILING_testImplicitVariableObjectValueUpdate() {
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("serviceTaskProcess",
+        Variables.createVariables()
+          .putValue("listVar", new ArrayList<String>())
+          .putValue("delegate", new UpdateValueDelegate()));
+
+    List<String> list = (List<String>) runtimeService.getVariable(instance.getId(), "listVar");
+    assertNotNull(list);
+    assertEquals(1, list.size());
+    assertEquals(UpdateValueDelegate.NEW_ELEMENT, list.get(0));
+
+    HistoricVariableInstance historicVariableInstance = historyService
+        .createHistoricVariableInstanceQuery()
+        .variableName("listVar").singleResult();
+
+    List<String> historicList = (List<String>) historicVariableInstance.getValue();
+    assertNotNull(historicList);
+    assertEquals(1, historicList.size());
+    assertEquals(UpdateValueDelegate.NEW_ELEMENT, historicList.get(0));
   }
 
   protected boolean isFullHistoryEnabled() {

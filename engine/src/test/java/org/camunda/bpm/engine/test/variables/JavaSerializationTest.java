@@ -14,8 +14,13 @@
 
 package org.camunda.bpm.engine.test.variables;
 
-import static org.camunda.bpm.engine.variable.Variables.*;
-import static org.camunda.bpm.engine.test.variables.TypedValueAssert.*;
+import static org.camunda.bpm.engine.test.variables.TypedValueAssert.assertObjectValueDeserialized;
+import static org.camunda.bpm.engine.test.variables.TypedValueAssert.assertObjectValueDeserializedNull;
+import static org.camunda.bpm.engine.test.variables.TypedValueAssert.assertObjectValueSerializedJava;
+import static org.camunda.bpm.engine.test.variables.TypedValueAssert.assertObjectValueSerializedNull;
+import static org.camunda.bpm.engine.test.variables.TypedValueAssert.assertUntypedNullValue;
+import static org.camunda.bpm.engine.variable.Variables.objectValue;
+import static org.camunda.bpm.engine.variable.Variables.serializedObjectValue;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
