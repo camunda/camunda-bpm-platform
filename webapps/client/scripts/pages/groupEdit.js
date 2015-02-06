@@ -1,8 +1,8 @@
 define(['angular', 'text!./groupEdit.html'], function(angular, template) {
   'use strict';
 
-  var Controller = ['$scope', '$routeParams', 'GroupResource', 'AuthorizationResource', 'Notifications', '$location', '$window',
-    function ($scope, $routeParams, GroupResource, AuthorizationResource, Notifications, $location, $window) {
+  var Controller = ['$scope', '$routeParams', 'GroupResource', 'UserResource', 'AuthorizationResource', 'Notifications', '$location', '$window',
+    function ($scope, $routeParams, GroupResource, UserResource, AuthorizationResource, Notifications, $location, $window) {
 
     $scope.group = null;
     $scope.groupName = null;
@@ -11,6 +11,7 @@ define(['angular', 'text!./groupEdit.html'], function(angular, template) {
                                             .replace(/\\/g, '%5C');
 
     $scope.availableOperations = {};
+    $scope.groupUserList = null;
 
     // common form validation //////////////////////////
 
@@ -31,6 +32,12 @@ define(['angular', 'text!./groupEdit.html'], function(angular, template) {
         $scope.group = response;
         $scope.groupName = (!!response.name ? response.name : response.id);
         $scope.groupCopy = angular.copy(response);
+      });
+    };
+
+    var loadGroupUsers = $scope.loadGroupUsers = function() {
+      UserResource.query({'memberOfGroup' : $scope.encodedGroupId}).$promise.then(function(response) {
+      $scope.groupUserList = response;
       });
     };
 
@@ -88,6 +95,7 @@ define(['angular', 'text!./groupEdit.html'], function(angular, template) {
     // initialization ///////////////////////////////////
 
     loadGroup();
+    loadGroupUsers();
 
     if(!$location.search().tab) {
       $location.search({'tab': 'group'});
