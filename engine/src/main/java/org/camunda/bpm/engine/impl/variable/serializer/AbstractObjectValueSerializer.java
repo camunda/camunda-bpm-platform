@@ -45,14 +45,15 @@ public abstract class AbstractObjectValueSerializer extends AbstractSerializable
   protected String getObjectTypeName(ObjectValue value, ValueFields valueFields) {
     String objectTypeName = value.getObjectTypeName();
 
-    if(objectTypeName == null) {
-      if(!value.isDeserialized() && value.getValueSerialized() != null) {
-        throw new ProcessEngineException("Cannot write serialized value for variable '" + valueFields.getName() + "': no 'objectTypeName' provided for non-null value.");
-      }
-      if(value.isDeserialized() && value.getValue() != null) {
-        objectTypeName = getTypeNameForDeserialized(value.getValue());
-      }
+    if (objectTypeName == null && !value.isDeserialized() && value.getValueSerialized() != null) {
+      throw new ProcessEngineException("Cannot write serialized value for variable '" + valueFields.getName() + "': no 'objectTypeName' provided for non-null value.");
     }
+
+    // update type name if the object is deserialized
+    if (value.isDeserialized() && value.getValue() != null) {
+      objectTypeName = getTypeNameForDeserialized(value.getValue());
+    }
+
     return objectTypeName;
   }
 
