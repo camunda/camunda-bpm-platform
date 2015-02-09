@@ -51,6 +51,8 @@ public class TaskDecorator {
     initializeTaskDescription(task, variableScope);
     // dueDate
     initializeTaskDueDate(task, variableScope);
+    // followUpDate
+    initializeTaskFollowUpDate(task, variableScope);
     // priority
     initializeTaskPriority(task, variableScope);
     // assignments
@@ -82,16 +84,32 @@ public class TaskDecorator {
           task.setDueDate((Date) dueDate);
 
         } else if (dueDate instanceof String) {
-          BusinessCalendar businessCalendar = Context
-            .getProcessEngineConfiguration()
-            .getBusinessCalendarManager()
-            .getBusinessCalendar(DueDateBusinessCalendar.NAME);
-
+          BusinessCalendar businessCalendar = getBusinessCalender();
           task.setDueDate(businessCalendar.resolveDuedate((String) dueDate));
 
         } else {
           throw new ProcessEngineException("Due date expression does not resolve to a Date or Date string: " +
               dueDateExpression.getExpressionText());
+        }
+      }
+    }
+  }
+
+  protected void initializeTaskFollowUpDate(TaskEntity task, VariableScope variableScope) {
+    Expression followUpDateExpression = taskDefinition.getFollowUpDateExpression();
+    if(followUpDateExpression != null) {
+      Object followUpDate = followUpDateExpression.getValue(variableScope);
+      if(followUpDate != null) {
+        if (followUpDate instanceof Date) {
+          task.setFollowUpDate((Date) followUpDate);
+
+        } else if (followUpDate instanceof String) {
+          BusinessCalendar businessCalendar = getBusinessCalender();
+          task.setFollowUpDate(businessCalendar.resolveDuedate((String) followUpDate));
+
+        } else {
+          throw new ProcessEngineException("Follow up date expression does not resolve to a Date or Date string: " +
+              followUpDateExpression.getExpressionText());
         }
       }
     }
@@ -192,6 +210,13 @@ public class TaskDecorator {
 
   public ExpressionManager getExpressionManager() {
     return expressionManager;
+  }
+
+  protected BusinessCalendar getBusinessCalender() {
+    return Context
+        .getProcessEngineConfiguration()
+        .getBusinessCalendarManager()
+        .getBusinessCalendar(DueDateBusinessCalendar.NAME);
   }
 
 }

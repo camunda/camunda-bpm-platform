@@ -322,6 +322,24 @@ public class HumanTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
   }
 
   @Test
+  public void testTaskDefinitionFollowUpDateExpression() {
+    // given
+    String aFollowUpDate = "aFollowDate";
+    humanTask.setCamundaFollowUpDate(aFollowUpDate);
+
+    // when
+    CmmnActivity activity = handler.handleElement(planItem, context);
+
+    // then
+    HumanTaskActivityBehavior behavior = (HumanTaskActivityBehavior) activity.getActivityBehavior();
+    TaskDefinition taskDefinition = behavior.getTaskDefinition();
+
+    Expression followUpDateExpression = taskDefinition.getFollowUpDateExpression();
+    assertNotNull(followUpDateExpression);
+    assertEquals(aFollowUpDate, followUpDateExpression.getExpressionText());
+  }
+
+  @Test
   public void testTaskDefinitionPriorityExpression() {
     // given
     String aPriority = "aPriority";

@@ -101,6 +101,8 @@ public class HumanTaskItemHandler extends TaskItemHandler {
     initializeTaskDefinitionName(element, taskDefinition, context);
     // dueDate
     initializeTaskDefinitionDueDate(element, taskDefinition, context);
+    // followUp
+    initializeTaskDefinitionFollowUpDate(element, taskDefinition, context);
     // priority
     initializeTaskDefinitionPriority(element, taskDefinition, context);
     // assignee
@@ -191,6 +193,17 @@ public class HumanTaskItemHandler extends TaskItemHandler {
       ExpressionManager expressionManager = context.getExpressionManager();
       Expression dueDateExpression = expressionManager.createExpression(dueDate);
       taskDefinition.setDueDateExpression(dueDateExpression);
+    }
+  }
+
+  protected void initializeTaskDefinitionFollowUpDate(CmmnElement element, TaskDefinition taskDefinition, CmmnHandlerContext context) {
+    HumanTask definition = getDefinition(element);
+
+    String followUpDate = definition.getCamundaFollowUpDate();
+    if (followUpDate != null) {
+      ExpressionManager expressionManager = context.getExpressionManager();
+      Expression dueDateExpression = expressionManager.createExpression(followUpDate);
+      taskDefinition.setFollowUpDateExpression(dueDateExpression);
     }
   }
 

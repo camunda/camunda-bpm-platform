@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
+
 import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
@@ -147,6 +148,37 @@ public class TaskDecoratorTest extends PluggableProcessEngineTestCase {
 
     // then
     assertEquals(dueDate, task.getDueDate());
+  }
+
+  public void testDecorateFollowUpDate() {
+    // given
+    String aFollowUpDate = "2014-06-01";
+    Date followUpDate = DateTimeUtil.parseDate(aFollowUpDate);
+
+    Expression followUpDateExpression = expressionManager.createExpression(aFollowUpDate);
+    taskDefinition.setFollowUpDateExpression(followUpDateExpression);
+
+    // when
+    decorate(task, taskDecorator);
+
+    // then
+    assertEquals(followUpDate, task.getFollowUpDate());
+  }
+
+  public void testDecorateFollowUpDateFromVariable() {
+    // given
+    String aFollowUpDateDate = "2014-06-01";
+    Date followUpDate = DateTimeUtil.parseDate(aFollowUpDateDate);
+    taskService.setVariable(task.getId(), "followUpDate", followUpDate);
+
+    Expression followUpDateExpression = expressionManager.createExpression("${followUpDate}");
+    taskDefinition.setFollowUpDateExpression(followUpDateExpression);
+
+    // when
+    decorate(task, taskDecorator);
+
+    // then
+    assertEquals(followUpDate, task.getFollowUpDate());
   }
 
   public void testDecoratePriority() {
