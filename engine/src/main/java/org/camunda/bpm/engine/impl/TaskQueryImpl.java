@@ -76,7 +76,6 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   protected String processInstanceBusinessKey;
   protected String processInstanceBusinessKeyLike;
   protected List<TaskQueryVariableValue> variables = new ArrayList<TaskQueryVariableValue>();
-  protected List<QueryOrderingProperty> variableSortings = new ArrayList<QueryOrderingProperty>();
   protected Date dueDate;
   protected Date dueBefore;
   protected Date dueAfter;
@@ -979,10 +978,6 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
 
   public List<TaskQueryVariableValue> getVariables() {
     return variables;
-  }
-
-  public List<QueryOrderingProperty> getVariableSortings() {
-    return variableSortings;
   }
 
   public String getProcessDefinitionKey() {

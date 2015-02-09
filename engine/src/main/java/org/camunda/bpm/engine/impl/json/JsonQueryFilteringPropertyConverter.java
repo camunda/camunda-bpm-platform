@@ -41,11 +41,15 @@ public class JsonQueryFilteringPropertyConverter extends JsonObjectConverter<Que
 
     JsonUtil.addField(jsonObject, BASE_PROPERTY, filteringProperty.getProperty().getName());
 
-    if (filteringProperty.getComparisonProperty() != null) {
-      JsonUtil.addField(jsonObject, COMPARISON_PROPERTY, filteringProperty.getScalarValue());
+    QueryProperty comparisonProperty = filteringProperty.getComparisonProperty();
+    if (comparisonProperty != null) {
+      JsonUtil.addField(jsonObject, COMPARISON_PROPERTY, comparisonProperty.getName());
     }
 
-    JsonUtil.addField(jsonObject, SCALAR_VALUE, filteringProperty.getScalarValue());
+    Object scalarValue = filteringProperty.getScalarValue();
+    if (scalarValue != null) {
+      JsonUtil.addField(jsonObject, SCALAR_VALUE, scalarValue);
+    }
 
     return jsonObject;
   }

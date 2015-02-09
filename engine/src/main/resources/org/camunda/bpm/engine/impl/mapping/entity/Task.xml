@@ -206,8 +206,8 @@
         left join ${prefix}ACT_RU_EXECUTION E1 on RES.EXECUTION_ID_ = E1.ID_
     </if>
     <foreach collection="orderingProperties" item="orderingProperty" index="i">
-      <bind name="tableAlias" value="@org.camunda.bpm.engine.impl.db.sql.MybatisJoinHelper@tableAlias(orderingProperty.relation, i)"/>
       <if test="orderingProperty.relation != null">
+        <bind name="tableAlias" value="@org.camunda.bpm.engine.impl.db.sql.MybatisJoinHelper@tableAlias(orderingProperty.relation, i)"/>
         left join 
         ${prefix}${@org.camunda.bpm.engine.impl.db.sql.MybatisJoinHelper@tableMapping(orderingProperty.relation)} 
         ${tableAlias}
