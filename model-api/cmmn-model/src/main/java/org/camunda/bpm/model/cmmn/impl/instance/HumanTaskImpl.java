@@ -16,6 +16,7 @@ import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CAMUNDA_ATTRIBU
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CAMUNDA_ATTRIBUTE_CANDIDATE_GROUPS;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CAMUNDA_ATTRIBUTE_CANDIDATE_USERS;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CAMUNDA_ATTRIBUTE_DUE_DATE;
+import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CAMUNDA_ATTRIBUTE_FOLLOW_UP_DATE;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CAMUNDA_ATTRIBUTE_FORM_KEY;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CAMUNDA_ATTRIBUTE_PRIORITY;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CAMUNDA_NS;
@@ -54,6 +55,7 @@ public class HumanTaskImpl extends TaskImpl implements HumanTask {
   protected static Attribute<String> camundaCandidateGroupsAttribute;
   protected static Attribute<String> camundaCandidateUsersAttribute;
   protected static Attribute<String> camundaDueDateAttribute;
+  protected static Attribute<String> camundaFollowUpDateAttribute;
   protected static Attribute<String> camundaFormKeyAttribute;
   protected static Attribute<String> camundaPriorityAttribute;
 
@@ -127,6 +129,14 @@ public class HumanTaskImpl extends TaskImpl implements HumanTask {
     camundaDueDateAttribute.setValue(this, camundaDueDate);
   }
 
+  public String getCamundaFollowUpDate() {
+    return camundaFollowUpDateAttribute.getValue(this);
+  }
+
+  public void setCamundaFollowUpDate(String camundaFollowUpDate) {
+    camundaFollowUpDateAttribute.setValue(this, camundaFollowUpDate);
+  }
+
   public String getCamundaFormKey() {
     return camundaFormKeyAttribute.getValue(this);
   }
@@ -172,6 +182,10 @@ public class HumanTaskImpl extends TaskImpl implements HumanTask {
       .build();
 
     camundaDueDateAttribute = typeBuilder.stringAttribute(CAMUNDA_ATTRIBUTE_DUE_DATE)
+      .namespace(CAMUNDA_NS)
+      .build();
+
+    camundaFollowUpDateAttribute = typeBuilder.stringAttribute(CAMUNDA_ATTRIBUTE_FOLLOW_UP_DATE)
       .namespace(CAMUNDA_NS)
       .build();
 

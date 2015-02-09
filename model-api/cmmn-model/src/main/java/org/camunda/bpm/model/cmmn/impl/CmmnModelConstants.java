@@ -190,6 +190,7 @@ public class CmmnModelConstants {
   public static final String CAMUNDA_ATTRIBUTE_CANDIDATE_GROUPS = "candidateGroups";
   public static final String CAMUNDA_ATTRIBUTE_CANDIDATE_USERS = "candidateUsers";
   public static final String CAMUNDA_ATTRIBUTE_DUE_DATE = "dueDate";
+  public static final String CAMUNDA_ATTRIBUTE_FOLLOW_UP_DATE = "followUpDate";
   public static final String CAMUNDA_ATTRIBUTE_FORM_KEY = "formKey";
   public static final String CAMUNDA_ATTRIBUTE_PRIORITY = "priority";
   public static final String CAMUNDA_ATTRIBUTE_SOURCE = "source";

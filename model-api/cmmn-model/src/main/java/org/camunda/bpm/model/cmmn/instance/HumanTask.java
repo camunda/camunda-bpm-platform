@@ -53,6 +53,10 @@ public interface HumanTask extends Task {
 
   void setCamundaDueDate(String camundaDueDate);
 
+  String getCamundaFollowUpDate();
+
+  void setCamundaFollowUpDate(String camundaFollowUpDate);
+
   String getCamundaFormKey();
 
   void setCamundaFormKey(String camundaFormKey);

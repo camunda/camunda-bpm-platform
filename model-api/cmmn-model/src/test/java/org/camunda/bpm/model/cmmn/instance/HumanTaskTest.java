@@ -41,6 +41,7 @@ public class HumanTaskTest extends CmmnModelElementInstanceTest {
           new AttributeAssumption(CAMUNDA_NS, "candidateGroups"),
           new AttributeAssumption(CAMUNDA_NS, "candidateUsers"),
           new AttributeAssumption(CAMUNDA_NS, "dueDate"),
+          new AttributeAssumption(CAMUNDA_NS, "followUpDate"),
           new AttributeAssumption(CAMUNDA_NS, "formKey"),
           new AttributeAssumption(CAMUNDA_NS, "priority")
         );
