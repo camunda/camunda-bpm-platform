@@ -28,6 +28,7 @@ import org.camunda.bpm.engine.query.Query;
 import org.camunda.bpm.engine.rest.dto.AbstractQueryDto;
 import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
 import org.camunda.bpm.engine.rest.dto.VariableQueryParameterDto;
+import org.camunda.bpm.engine.rest.dto.VariableValueDto;
 import org.camunda.bpm.engine.rest.dto.converter.BooleanConverter;
 import org.camunda.bpm.engine.rest.dto.converter.DateConverter;
 import org.camunda.bpm.engine.rest.dto.converter.DelegationStateConverter;
@@ -1089,26 +1090,41 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     } else if (sortBy.equals(SORT_BY_PROCESS_VARIABLE)) {
       String variableName = (String) getValue(parameters, "variable");
       String valueTypeName = (String) getValue(parameters, "type");
+      if (valueTypeName != null) {
+        valueTypeName = VariableValueDto.fromRestApiTypeName(valueTypeName);
+      }
       query.orderByProcessVariable(variableName, getValueTypeByName(valueTypeName, engine));
 
     } else if (sortBy.equals(SORT_BY_EXECUTION_VARIABLE)) {
       String variableName = (String) getValue(parameters, "variable");
       String valueTypeName = (String) getValue(parameters, "type");
+      if (valueTypeName != null) {
+        valueTypeName = VariableValueDto.fromRestApiTypeName(valueTypeName);
+      }
       query.orderByExecutionVariable(variableName, getValueTypeByName(valueTypeName, engine));
 
     } else if (sortBy.equals(SORT_BY_TASK_VARIABLE)) {
       String variableName = (String) getValue(parameters, "variable");
       String valueTypeName = (String) getValue(parameters, "type");
+      if (valueTypeName != null) {
+        valueTypeName = VariableValueDto.fromRestApiTypeName(valueTypeName);
+      }
       query.orderByTaskVariable(variableName, getValueTypeByName(valueTypeName, engine));
 
     } else if (sortBy.equals(SORT_BY_CASE_INSTANCE_VARIABLE)) {
       String variableName = (String) getValue(parameters, "variable");
       String valueTypeName = (String) getValue(parameters, "type");
+      if (valueTypeName != null) {
+        valueTypeName = VariableValueDto.fromRestApiTypeName(valueTypeName);
+      }
       query.orderByCaseInstanceVariable(variableName, getValueTypeByName(valueTypeName, engine));
 
     } else if (sortBy.equals(SORT_BY_CASE_EXECUTION_VARIABLE)) {
       String variableName = (String) getValue(parameters, "variable");
       String valueTypeName = (String) getValue(parameters, "type");
+      if (valueTypeName != null) {
+        valueTypeName = VariableValueDto.fromRestApiTypeName(valueTypeName);
+      }
       query.orderByCaseExecutionVariable(variableName, getValueTypeByName(valueTypeName, engine));
     }
   }
