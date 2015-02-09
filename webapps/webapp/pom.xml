@@ -29,6 +29,7 @@
     <exec.arg>-c</exec.arg>
 
     <grunt.target>development</grunt.target>
+    <skip.frontend.build>false</skip.frontend.build>
   </properties>
 
   <dependencies>
@@ -669,6 +670,7 @@
                 </goals>
                 <inherited>false</inherited>
                 <configuration>
+                  <skip>${skip.frontend.build}</skip>
                   <target>
                     <!-- run node build -->
                     <exec executable="cmd" failonerror="true">
@@ -719,6 +721,7 @@
                 </goals>
                 <inherited>false</inherited>
                 <configuration>
+                  <skip>${skip.frontend.build}</skip>
                   <target>
                     <!-- run node build -->
                     <exec executable="npm" failonerror="true">
