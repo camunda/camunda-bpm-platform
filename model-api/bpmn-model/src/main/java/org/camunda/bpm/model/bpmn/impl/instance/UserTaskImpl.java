@@ -13,6 +13,22 @@
 
 package org.camunda.bpm.model.bpmn.impl.instance;
 
+import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.BPMN20_NS;
+import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.BPMN_ATTRIBUTE_IMPLEMENTATION;
+import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.BPMN_ELEMENT_USER_TASK;
+import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_ATTRIBUTE_ASSIGNEE;
+import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_ATTRIBUTE_CANDIDATE_GROUPS;
+import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_ATTRIBUTE_CANDIDATE_USERS;
+import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_ATTRIBUTE_DUE_DATE;
+import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_ATTRIBUTE_FOLLOW_UP_DATE;
+import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_ATTRIBUTE_FORM_HANDLER_CLASS;
+import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_ATTRIBUTE_FORM_KEY;
+import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_ATTRIBUTE_PRIORITY;
+import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_NS;
+
+import java.util.Collection;
+import java.util.List;
+
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.builder.UserTaskBuilder;
 import org.camunda.bpm.model.bpmn.instance.Rendering;
@@ -22,15 +38,10 @@ import org.camunda.bpm.model.xml.ModelBuilder;
 import org.camunda.bpm.model.xml.impl.instance.ModelTypeInstanceContext;
 import org.camunda.bpm.model.xml.impl.util.StringUtil;
 import org.camunda.bpm.model.xml.type.ModelElementTypeBuilder;
+import org.camunda.bpm.model.xml.type.ModelElementTypeBuilder.ModelTypeInstanceProvider;
 import org.camunda.bpm.model.xml.type.attribute.Attribute;
 import org.camunda.bpm.model.xml.type.child.ChildElementCollection;
 import org.camunda.bpm.model.xml.type.child.SequenceBuilder;
-
-import java.util.Collection;
-import java.util.List;
-
-import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.*;
-import static org.camunda.bpm.model.xml.type.ModelElementTypeBuilder.ModelTypeInstanceProvider;
 
 /**
  * The BPMN userTask element
@@ -48,6 +59,7 @@ public class UserTaskImpl extends TaskImpl implements UserTask {
   protected static Attribute<String> camundaCandidateGroupsAttribute;
   protected static Attribute<String> camundaCandidateUsersAttribute;
   protected static Attribute<String> camundaDueDateAttribute;
+  protected static Attribute<String> camundaFollowUpDateAttribute;
   protected static Attribute<String> camundaFormHandlerClassAttribute;
   protected static Attribute<String> camundaFormKeyAttribute;
   protected static Attribute<String> camundaPriorityAttribute;
@@ -86,6 +98,10 @@ public class UserTaskImpl extends TaskImpl implements UserTask {
       .build();
 
     camundaDueDateAttribute = typeBuilder.stringAttribute(CAMUNDA_ATTRIBUTE_DUE_DATE)
+      .namespace(CAMUNDA_NS)
+      .build();
+
+    camundaFollowUpDateAttribute = typeBuilder.stringAttribute(CAMUNDA_ATTRIBUTE_FOLLOW_UP_DATE)
       .namespace(CAMUNDA_NS)
       .build();
 
@@ -177,6 +193,14 @@ public class UserTaskImpl extends TaskImpl implements UserTask {
 
   public void setCamundaDueDate(String camundaDueDate) {
     camundaDueDateAttribute.setValue(this, camundaDueDate);
+  }
+
+  public String getCamundaFollowUpDate() {
+    return camundaFollowUpDateAttribute.getValue(this);
+  }
+
+  public void setCamundaFollowUpDate(String camundaFollowUpDate) {
+    camundaFollowUpDateAttribute.setValue(this, camundaFollowUpDate);
   }
 
   public String getCamundaFormHandlerClass() {

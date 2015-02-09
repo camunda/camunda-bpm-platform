@@ -13,10 +13,10 @@
 
 package org.camunda.bpm.model.bpmn.builder;
 
+import java.util.List;
+
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.instance.UserTask;
-
-import java.util.List;
 
 /**
  * @author Sebastian Menski
@@ -103,6 +103,17 @@ public abstract class AbstractUserTaskBuilder<B extends AbstractUserTaskBuilder<
    */
   public B camundaDueDate(String camundaDueDate) {
     element.setCamundaDueDate(camundaDueDate);
+    return myself;
+  }
+
+  /**
+   * Sets the camunda follow up date attribute.
+   *
+   * @param camundaFollowUpDate  the follow up date of the user task
+   * @return the builder object
+   */
+  public B camundaFollowUpDate(String camundaFollowUpDate) {
+    element.setCamundaFollowUpDate(camundaFollowUpDate);
     return myself;
   }
 

@@ -13,6 +13,26 @@
 
 package org.camunda.bpm.model.bpmn.builder;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Fail.fail;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.CALL_ACTIVITY_ID;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.SERVICE_TASK_ID;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.START_EVENT_ID;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.SUB_PROCESS_ID;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TASK_ID;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_CLASS_API;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_DELEGATE_EXPRESSION_API;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_DUE_DATE_API;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_EXPRESSION_API;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_FOLLOW_UP_DATE_API;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_GROUPS_API;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_GROUPS_LIST_API;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_PRIORITY_API;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_STRING_API;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_USERS_API;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_USERS_LIST_API;
+import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.BPMN20_NS;
+
 import java.io.IOException;
 
 import org.camunda.bpm.model.bpmn.Bpmn;
@@ -40,25 +60,6 @@ import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Fail.fail;
-import static org.camunda.bpm.model.bpmn.BpmnTestConstants.CALL_ACTIVITY_ID;
-import static org.camunda.bpm.model.bpmn.BpmnTestConstants.SERVICE_TASK_ID;
-import static org.camunda.bpm.model.bpmn.BpmnTestConstants.START_EVENT_ID;
-import static org.camunda.bpm.model.bpmn.BpmnTestConstants.SUB_PROCESS_ID;
-import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TASK_ID;
-import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_CLASS_API;
-import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_DELEGATE_EXPRESSION_API;
-import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_DUE_DATE_API;
-import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_EXPRESSION_API;
-import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_GROUPS_API;
-import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_GROUPS_LIST_API;
-import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_PRIORITY_API;
-import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_STRING_API;
-import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_USERS_API;
-import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_USERS_LIST_API;
-import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.BPMN20_NS;
-
 /**
  * @author Sebastian Menski
  */
@@ -83,7 +84,7 @@ public class ProcessBuilderTest {
   public void testCreateEmptyProcess() {
     modelInstance = Bpmn.createProcess()
       .done();
-    
+
     Definitions definitions = modelInstance.getDefinitions();
     assertThat(definitions).isNotNull();
     assertThat(definitions.getTargetNamespace()).isEqualTo(BPMN20_NS);
@@ -442,6 +443,7 @@ public class ProcessBuilderTest {
         .camundaCandidateGroups(TEST_GROUPS_API)
         .camundaCandidateUsers(TEST_USERS_LIST_API)
         .camundaDueDate(TEST_DUE_DATE_API)
+        .camundaFollowUpDate(TEST_FOLLOW_UP_DATE_API)
         .camundaFormHandlerClass(TEST_CLASS_API)
         .camundaFormKey(TEST_STRING_API)
         .camundaPriority(TEST_PRIORITY_API)
@@ -455,6 +457,7 @@ public class ProcessBuilderTest {
     assertThat(userTask.getCamundaCandidateUsers()).isEqualTo(TEST_USERS_API);
     assertThat(userTask.getCamundaCandidateUsersList()).containsAll(TEST_USERS_LIST_API);
     assertThat(userTask.getCamundaDueDate()).isEqualTo(TEST_DUE_DATE_API);
+    assertThat(userTask.getCamundaFollowUpDate()).isEqualTo(TEST_FOLLOW_UP_DATE_API);
     assertThat(userTask.getCamundaFormHandlerClass()).isEqualTo(TEST_CLASS_API);
     assertThat(userTask.getCamundaFormKey()).isEqualTo(TEST_STRING_API);
     assertThat(userTask.getCamundaPriority()).isEqualTo(TEST_PRIORITY_API);

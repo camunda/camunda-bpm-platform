@@ -57,6 +57,7 @@ public final class BpmnTestConstants {
   public static final List<String> TEST_USERS_LIST_API = Arrays.asList("#{user1( c,d)}", "user5");
   public static final String TEST_DUE_DATE_XML = "2014-02-27";
   public static final String TEST_DUE_DATE_API = "2015-03-28";
+  public static final String TEST_FOLLOW_UP_DATE_API = "2015-01-01";
   public static final String TEST_PRIORITY_XML = "12";
   public static final String TEST_PRIORITY_API = "${dateVariable}";
   public static final String TEST_TYPE_XML = "mail";

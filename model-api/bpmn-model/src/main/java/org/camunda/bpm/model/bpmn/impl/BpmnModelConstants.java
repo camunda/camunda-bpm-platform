@@ -412,6 +412,7 @@ public final class BpmnModelConstants {
   public static final String CAMUNDA_ATTRIBUTE_DEFAULT_VALUE = "defaultValue";
   public static final String CAMUNDA_ATTRIBUTE_DELEGATE_EXPRESSION = "delegateExpression";
   public static final String CAMUNDA_ATTRIBUTE_DUE_DATE = "dueDate";
+  public static final String CAMUNDA_ATTRIBUTE_FOLLOW_UP_DATE = "followUpDate";
   public static final String CAMUNDA_ATTRIBUTE_ELEMENT_VARIABLE = "elementVariable";
   public static final String CAMUNDA_ATTRIBUTE_EVENT = "event";
   public static final String CAMUNDA_ATTRIBUTE_EXCLUSIVE = "exclusive";

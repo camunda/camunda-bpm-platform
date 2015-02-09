@@ -13,10 +13,10 @@
 
 package org.camunda.bpm.model.bpmn.instance;
 
-import org.camunda.bpm.model.bpmn.builder.UserTaskBuilder;
-
 import java.util.Collection;
 import java.util.List;
+
+import org.camunda.bpm.model.bpmn.builder.UserTaskBuilder;
 
 /**
  * The BPMN userTask element
@@ -58,6 +58,10 @@ public interface UserTask extends Task {
   String getCamundaDueDate();
 
   void setCamundaDueDate(String camundaDueDate);
+
+  String getCamundaFollowUpDate();
+
+  void setCamundaFollowUpDate(String camundaFollowUpDate);
 
   String getCamundaFormHandlerClass();
 
