@@ -822,4 +822,14 @@ public class SentryEntryCriteriaTest extends CmmnProcessEngineTestCase {
     caseService.closeCaseInstance(caseInstanceId);
   }
 
+  @Deployment
+  public void testCaseFileItemOnPart() {
+    createCaseInstance().getId();
+
+    CaseExecution humanTask = queryCaseExecutionByActivityId("PI_HumanTask_1");
+
+    // sentry has been ignored
+    assertTrue(humanTask.isEnabled());
+  }
+
 }

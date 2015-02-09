@@ -76,11 +76,12 @@ public abstract class PlanItemDefinitionActivityBehavior implements CmmnActivity
 
     for (CmmnSentryDeclaration sentryDeclaration : sentryDeclarations) {
 
-      String sentryId = sentryDeclaration.getId();
-      if (parent.isSentrySatisfied(sentryId)) {
-        return true;
+      if (sentryDeclaration != null) {
+        String sentryId = sentryDeclaration.getId();
+        if (parent.isSentrySatisfied(sentryId)) {
+          return true;
+        }
       }
-
     }
 
     return false;

@@ -553,7 +553,9 @@ public abstract class ItemHandler extends CmmnElementHandler<CmmnElement, CmmnAc
         for (Sentry sentry : entryCriterias) {
           String sentryId = sentry.getId();
           CmmnSentryDeclaration sentryDeclaration = parent.getSentry(sentryId);
-          activity.addEntryCriteria(sentryDeclaration);
+          if (sentryDeclaration != null) {
+            activity.addEntryCriteria(sentryDeclaration);
+          }
         }
       }
     }
@@ -568,7 +570,9 @@ public abstract class ItemHandler extends CmmnElementHandler<CmmnElement, CmmnAc
         for (Sentry sentry : exitCriterias) {
           String sentryId = sentry.getId();
           CmmnSentryDeclaration sentryDeclaration = parent.getSentry(sentryId);
-          activity.addExitCriteria(sentryDeclaration);
+          if (sentryDeclaration != null) {
+            activity.addExitCriteria(sentryDeclaration);
+          }
         }
       }
     }

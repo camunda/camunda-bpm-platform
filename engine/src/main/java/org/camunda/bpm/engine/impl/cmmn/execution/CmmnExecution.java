@@ -426,7 +426,7 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
       List<CmmnSentryDeclaration> exitCriteria = activity.getExitCriteria();
       for (CmmnSentryDeclaration sentryDeclaration : exitCriteria) {
 
-        if (satisfiedSentries.contains(sentryDeclaration.getId())) {
+        if (sentryDeclaration != null && satisfiedSentries.contains(sentryDeclaration.getId())) {
           fireExitCriteria();
           break;
         }
@@ -445,7 +445,7 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
       List<CmmnSentryDeclaration> entryCriteria = activity.getEntryCriteria();
       for (CmmnSentryDeclaration sentryDeclaration : entryCriteria) {
 
-        if (satisfiedSentries.contains(sentryDeclaration.getId())) {
+        if (sentryDeclaration != null && satisfiedSentries.contains(sentryDeclaration.getId())) {
           fireEntryCriteria();
           break;
         }
