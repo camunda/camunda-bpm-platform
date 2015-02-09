@@ -14,33 +14,24 @@
 
   <dependencies>
     <dependency>
-      <!-- make sure it comes after assembly in the build -->
+      <!--
+        Make sure it comes after assembly in the build.
+        Leave scope test, otherwise libs from pom will be copied into Tomcat's lib folder
+      -->
       <groupId>org.camunda.bpm.tomcat</groupId>
       <artifactId>camunda-tomcat-assembly</artifactId>
       <version>${project.version}</version>
       <type>pom</type>
       <scope>test</scope>
-    </dependency>   
-    
-    <!-- database dependencies -->
-    <dependency>
-      <groupId>com.h2database</groupId>
-      <artifactId>h2</artifactId>
-      <scope>runtime</scope>
     </dependency>
+
+    <!--
+      database drivers
+      we deploy all and only activate one through server.xml
+    -->
     <dependency>
       <groupId>mysql</groupId>
       <artifactId>mysql-connector-java</artifactId>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.oracle.jdbc</groupId>
-      <artifactId>ojdbc6</artifactId>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.oracle.jdbc</groupId>
-      <artifactId>ojdbc14</artifactId>
       <scope>runtime</scope>
     </dependency>
     <dependency>
@@ -64,7 +55,6 @@
       <artifactId>jython</artifactId>
       <scope>runtime</scope>
     </dependency>
-
     <dependency>
       <groupId>org.jruby</groupId>
       <artifactId>jruby-complete</artifactId>
@@ -74,6 +64,26 @@
   </dependencies>
 
   <profiles>
+    <profile>
+      <id>oracle-11</id>
+      <dependencies>
+        <dependency>
+          <groupId>com.oracle.jdbc</groupId>
+          <artifactId>ojdbc6</artifactId>
+          <scope>runtime</scope>
+        </dependency>
+      </dependencies>
+    </profile>
+    <profile>
+      <id>oracle-10</id>
+      <dependencies>
+        <dependency>
+          <groupId>com.oracle.jdbc</groupId>
+          <artifactId>ojdbc14</artifactId>
+          <scope>runtime</scope>
+        </dependency>
+      </dependencies>
+    </profile>
     <profile>
       <id>tomcat</id>
       <build>
@@ -135,7 +145,7 @@
             <executions>
               <execution>
                 <id>copy-resources</id>
-                <phase>package</phase>
+                <phase>generate-test-resources</phase>
                 <goals>
                   <goal>resources</goal>
                 </goals>

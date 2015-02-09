@@ -316,7 +316,7 @@ public class DbSqlSession extends AbstractPersistenceSession {
       }
     }
 
-    log.fine("activiti db schema check successful");
+    log.fine("database schema check successful");
   }
 
   protected String addMissingComponent(String missingComponents, String component) {
@@ -516,7 +516,7 @@ public class DbSqlSession extends AbstractPersistenceSession {
         throw exception;
       }
 
-      log.fine("activiti db schema " + operation + " for component "+component+" successful");
+      log.fine("database schema " + operation + " for component "+component+" successful");
 
     } catch (Exception e) {
       throw new ProcessEngineException("couldn't "+operation+" db schema: "+exceptionSqlStatement, e);

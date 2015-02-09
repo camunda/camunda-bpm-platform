@@ -21,6 +21,11 @@
       <scope>test</scope>
       <type>pom</type>
     </dependency>
+
+    <!--
+      database drivers
+      we deploy all and only activate one within domain.xml
+    -->
     <dependency>
       <groupId>mysql</groupId>
       <artifactId>mysql-connector-java</artifactId>
@@ -52,7 +57,6 @@
       <artifactId>jython</artifactId>
       <scope>runtime</scope>
     </dependency>
-
     <dependency>
       <groupId>org.jruby</groupId>
       <artifactId>jruby-complete</artifactId>

@@ -23,54 +23,53 @@
       <artifactId>camunda-wildfly-assembly</artifactId>
       <version>${project.version}</version>      
       <type>pom</type>
-      <scope>provided</scope>
+      <scope>test</scope>
     </dependency>
 
+    <!--
+      database drivers
+      we deploy all and only activate one with a *-ds.xml database deployment
+    -->
+    <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+      <scope>runtime</scope>
+    </dependency>
     <dependency>
       <groupId>mysql</groupId>
       <artifactId>mysql-connector-java</artifactId>
-      <scope>test</scope>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>com.ibm.db2.jcc</groupId>
       <artifactId>db2jcc4</artifactId>
-      <scope>test</scope>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>com.oracle.jdbc</groupId>
       <artifactId>ojdbc6</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.oracle.jdbc</groupId>
-      <artifactId>ojdbc14</artifactId>
-      <scope>test</scope>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>com.microsoft.sqlserver</groupId>
       <artifactId>sqljdbc4</artifactId>
-      <scope>test</scope>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.postgresql</groupId>
       <artifactId>postgresql</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.h2database</groupId>
-      <artifactId>h2</artifactId>
-      <scope>test</scope>
+      <scope>runtime</scope>
     </dependency>
 
     <dependency>
       <groupId>org.python</groupId>
       <artifactId>jython</artifactId>
-      <scope>test</scope>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.jruby</groupId>
       <artifactId>jruby-complete</artifactId>
-      <scope>test</scope>
+      <scope>runtime</scope>
     </dependency>
   </dependencies>
 
@@ -205,7 +204,7 @@
                 </goals>
                 <configuration>
                   <target unless="maven.test.skip">
-                    <dependencyfilesets scopes="test" />
+                    <dependencyfilesets scopes="runtime" />
 
                     <copy todir="${wildfly.runtime.location}/modules" flatten="false" overwrite="true">
                       <fileset refid="maven.project.dependencies" />
@@ -219,7 +218,6 @@
                       <replacefilter token="@version.h2@" value="${version.h2}" />
                       <replacefilter token="@version.mysql@" value="${version.mysql}" />
                       <replacefilter token="@version.oracle-11@" value="${version.oracle-11}" />
-                      <replacefilter token="@version.oracle-10@" value="${version.oracle-10}" />
                       <replacefilter token="@version.postgresql@" value="${version.postgresql}" />
                       <replacefilter token="@version.sqlserver@" value="${version.sqlserver}" />
                     </replace>
@@ -314,7 +312,7 @@
                 </goals>
                 <configuration>
                   <target unless="maven.test.skip">
-                    <dependencyfilesets scopes="test" />
+                    <dependencyfilesets scopes="runtime" />
 
                     <copy todir="${wildfly.runtime.location}/modules" flatten="false">
                       <fileset refid="maven.project.dependencies" />
@@ -328,11 +326,11 @@
                       <replacefilter token="@version.h2@" value="${version.h2}" />
                       <replacefilter token="@version.mysql@" value="${version.mysql}" />
                       <replacefilter token="@version.oracle-11@" value="${version.oracle-11}" />
-                      <replacefilter token="@version.oracle-10@" value="${version.oracle-10}" />
                       <replacefilter token="@version.postgresql@" value="${version.postgresql}" />
                       <replacefilter token="@version.sqlserver@" value="${version.sqlserver}" />
                     </replace>
 
+                    <!-- delete h2 shipped with wildfly because it causes deadlocks -->
                     <delete dir="${wildfly.runtime.location}/modules/system/layers/base/com/h2database/" />
 
                   </target>

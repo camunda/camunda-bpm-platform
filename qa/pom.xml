@@ -24,7 +24,6 @@
 
     <!-- jboss -->
     <jboss.runtime.location>../jboss7-runtime/target/server/jboss-as-${version.jboss.as}/</jboss.runtime.location>
-    <jboss.datasource.filename>h2-ds.xml</jboss.datasource.filename>
 
     <jboss.http.port>38080</jboss.http.port>
     <jboss.ajp.port>38009</jboss.ajp.port>
@@ -176,6 +175,9 @@
 
     <profile>
       <id>h2</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
       <properties>
         <glassfish.domain.xml>domain.xml</glassfish.domain.xml>
       </properties>

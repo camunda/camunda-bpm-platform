@@ -41,15 +41,6 @@
 
     <version.java.wildfly>1.7</version.java.wildfly>
 
-    <!-- database drivers -->
-    <version.h2>1.3.168</version.h2>
-    <version.oracle-11>11.2.0.3</version.oracle-11>
-    <version.oracle-10>10.2.0.5</version.oracle-10>
-    <version.mysql>5.1.21</version.mysql>
-    <version.sqlserver.oss>1.3.1</version.sqlserver.oss>
-    <version.sqlserver>4.0</version.sqlserver>
-    <version.db2>9.7</version.db2>
-    <version.postgresql>9.3-1102-jdbc4</version.postgresql>
 
     <!-- OSGi bundles properties -->
     <camunda.artifact />
@@ -121,54 +112,6 @@
         <groupId>commons-fileupload</groupId>
         <artifactId>commons-fileupload</artifactId>
         <version>1.2.2</version>
-      </dependency>
-
-      <!-- database drivers -->
-      <dependency>
-        <groupId>com.h2database</groupId>
-        <artifactId>h2</artifactId>
-        <version>${version.h2}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.oracle.jdbc</groupId>
-        <artifactId>ojdbc6</artifactId>
-        <version>${version.oracle-11}</version>
-        <scope>test</scope>
-      </dependency>
-      <dependency>
-        <groupId>com.oracle.jdbc</groupId>
-        <artifactId>ojdbc14</artifactId>
-        <version>${version.oracle-10}</version>
-        <scope>test</scope>
-      </dependency>
-      <dependency>
-        <groupId>mysql</groupId>
-        <artifactId>mysql-connector-java</artifactId>
-        <version>${version.mysql}</version>
-        <scope>test</scope>
-      </dependency>
-      <dependency>
-        <groupId>net.sourceforge.jtds</groupId>
-        <artifactId>jtds</artifactId>
-        <version>${version.sqlserver.oss}</version>
-        <scope>test</scope>
-      </dependency>
-      <dependency>
-        <groupId>com.microsoft.sqlserver</groupId>
-        <artifactId>sqljdbc4</artifactId>
-        <version>${version.sqlserver}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.ibm.db2.jcc</groupId>
-        <artifactId>db2jcc4</artifactId>
-        <version>${version.db2}</version>
-        <scope>test</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.postgresql</groupId>
-        <artifactId>postgresql</artifactId>
-        <version>${version.postgresql}</version>
-        <scope>test</scope>
       </dependency>
 
       <dependency>

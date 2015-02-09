@@ -18,12 +18,6 @@
 
   <dependencies>
 
-    <dependency>
-      <groupId>org.camunda.bpm</groupId>
-      <artifactId>camunda-engine</artifactId>
-      <scope>provided</scope>
-    </dependency>
-
     <!-- LDAP Libraries to start test server -->
     <dependency>
       <groupId>org.apache.directory.server</groupId>
@@ -42,18 +36,6 @@
       <artifactId>slf4j-simple</artifactId>
       <version>1.5.6</version>
       <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>com.h2database</groupId>
-      <artifactId>h2</artifactId>
-      <scope>test</scope>
     </dependency>
 
   </dependencies>
