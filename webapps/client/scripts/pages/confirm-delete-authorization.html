@@ -3,7 +3,7 @@
   <h3>Confirm Delete</h3>
 </div>
 
-<div class="modal-body">
+<div class="confirm-delete-authorization modal-body">
   <div notifications-panel></div>
 
   <div ng-hide="status === 'SUCCESS' || status === 'FAILED'">
@@ -36,16 +36,23 @@
 </div>
 
 <div class="modal-footer">
-  <button class="btn"
+  <button class="btn btn-default"
           ng-click="close()"
           ng-disabled="status === 'performCreate'"
-          ng-hide="status === 'SUCCESS' || status === 'FAILED'">Close</button>
+          ng-hide="status === 'SUCCESS' || status === 'FAILED'">
+    Close
+  </button>
+
   <button class="btn btn-primary"
           ng-click="close(status)"
-          ng-show="status === 'SUCCESS' || status === 'FAILED'">OK</button>
+          ng-show="status === 'SUCCESS' || status === 'FAILED'">
+    OK
+  </button>
+
   <button class="btn btn-primary"
           ng-click="performDelete()"
-          ng-hide="status === 'SUCCESS' || status === 'FAILED'">Delete</button>
-
+          ng-hide="status === 'SUCCESS' || status === 'FAILED'">
+    Delete
+  </button>
 </div>
 <!-- / CE - camunda-admin-ui/client/scripts/pages/confirm-delete-authorization.html -->

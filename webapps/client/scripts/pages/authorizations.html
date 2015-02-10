@@ -31,55 +31,56 @@
 
             <legend>{{title}} Authorizations</legend>
 
-            <table class="table table-condensed table-striped">
+            <table class="cam-table">
               <thead>
                 <tr>
-                  <th>Type</th>
-                  <th>User / Group</th>
-                  <th>Permissions</th>
-                  <th>Resource Id</th>
-                  <th>Action</th>
+                  <th class="type">Type</th>
+                  <th class="user group">User / Group</th>
+                  <th class="permissions">Permissions</th>
+                  <th class="resource-id uuid">Resource Id</th>
+                  <th class="action">Action</th>
                 </tr>
               </thead>
 
               <tbody>
                 <tr ng-repeat="authorization in authorizations | orderBy:getIdentityId:false">
-                  <td>
+                  <td class="type">
                     {{getType(authorization)}}
                   </td>
 
-                  <td>
+                  <td class="user group">
                     <span ng-show="authorization.userId"
                           tooltip="User">
-                      <i class="glyphicon glyphicon-user"></i>
+                      <span class="glyphicon glyphicon-user"></span>
                       {{authorization.userId}}
                     </span>
+
                     <span ng-show="authorization.groupId"
                           tooltip="Group">
-                      <i class="glyphicon glyphicon-th"></i>
+                      <span class="glyphicon glyphicon-th"></span>
                       {{authorization.groupId}}
                     </span>
                   </td>
 
-                  <td>
+                  <td class="permissions">
                     {{formatPermissions(authorization.permissions)}}
                   </td>
 
-                  <td>
+                  <td class="resource-id uuid">
                     {{authorization.resourceId}}
                   </td>
 
-                  <td>
+                  <td class="action">
                     <a class="btn btn-link btn-sm"
                        ng-click="deleteAuthorization(authorization)">
-                      delete</a>
+                      delete
+                    </a>
                   </td>
                 </tr>
 
                 <tr class="warning"
                     id="createNew"
                     ng-show="isCreateNewAuthorization">
-
                   <td class="authorization-type">
                     <select id="selectType"
                             ng-model="newAuthorization.type"
@@ -157,25 +158,23 @@
                           class="text-muted">(cockpit or tasklist or *)</span>
                   </td>
 
-                  <td class="actions">
+                  <td class="action">
                     <div class="btn-group">
                       <button type="submit"
                               class="btn btn-primary"
                               ng-disabled="createAuthForm.$invalid"
                               ng-click="createAuthorization()">
-                          <span class="glyphicon glyphicon-ok "></span>
+                        <span class="glyphicon glyphicon-ok "></span>
                       </button>
 
-                      <a type="submit"
-                         class="btn btn-default"
+                      <a class="btn btn-default"
                          ng-click="toggleCreateNewForm()">
                         <span class="glyphicon glyphicon-ban-circle"></span>
                       </a>
                     </div>
-
                   </td>
-
                 </tr>
+
                 <tr ng-hide="isCreateNewAuthorization">
                   <td colspan="5">
                     <a class="btn btn-link"

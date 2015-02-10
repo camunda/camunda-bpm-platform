@@ -18,16 +18,16 @@
       </div>
 
       <div class="col-md-9">
-
         <div ng-show="show('group')">
           <div class="box">
             <p ng-if="!group">
-              <i class="glyphicon glyphicon-loading"></i> loading group...
+              <span class="glyphicon glyphicon-loading"></span>
+              loading group...
             </p>
+
             <form class="form-horizontal"
                   name="editGroupForm"
                   ng-if="group">
-
               <legend>Group</legend>
 
               <div class="form-group">
@@ -69,19 +69,17 @@
                    ng-show="availableOperations.update">
                 <div class="col-sm-8 col-sm-offset-4">
                   <button type="submit"
-                          class="btn"
+                          class="btn btn-default"
                           data-ng-disabled="!canSubmit(editGroupForm, 'group')"
                           data-ng-click="updateGroup()">Update Group</button>
                 </div>
               </div>
-
             </form>
           </div>
 
           <div class="box"
                ng-show="availableOperations.delete">
             <form class="form-horizontal">
-
               <legend>Delete Group</legend>
 
               <div class="alert alert-danger">
@@ -90,7 +88,9 @@
 
               <button type="submit"
                       class="btn btn-danger"
-                      data-ng-click="deleteGroup()">Delete Group</button>
+                      data-ng-click="deleteGroup()">
+                Delete Group
+              </button>
             </form>
           </div>
         </div>

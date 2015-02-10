@@ -5,29 +5,38 @@
   </div>
 
   <div ng-show="availableOperations.create">
-    <a class="btn btn-default pull-right" href="#/user-create"><i class="glyphicon glyphicon-plus"></i> New User</a>
+    <a class="btn btn-default pull-right" href="#/user-create">
+      <span class="glyphicon glyphicon-plus"></span>
+      New User
+    </a>
   </div>
 
-  <table class="table table-condensed table-striped">
+  <table class="cam-table">
     <thead>
       <tr>
-        <th><!-- pictures --></th>
-        <th>Name</th>
-        <th>Username</th>
-        <th><!-- actions --></th>
+        <th class="picture"><!-- pictures --></th>
+        <th class="name">Name</th>
+        <th class="username">Username</th>
+        <th class="action"><!-- actions --></th>
       </tr>
     </thead>
+
     <tbody>
       <tr ng-repeat="user in userList">
-        <td>
+        <td class="picture">
           <!-- add user pictures later -->
-          <i class="glyphicon glyphicon-user"></i>
+          <span class="glyphicon glyphicon-user"></span>
         </td>
-        <td>
+
+        <td class="name">
           <a ng-href="#/users/{{user.id | escape}}">{{user.firstName}} {{user.lastName}}</a>
         </td>
-        <td>{{user.id}}</td>
-        <td>
+
+        <td class="username">
+          {{user.id}}
+        </td>
+
+        <td class="action">
           <a ng-href="#/users/{{user.id | escape}}">Edit</a>
         </td>
       </tr>

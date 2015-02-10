@@ -3,32 +3,36 @@
   <h3>Select Groups</h3>
 </div>
 
-<div class="modal-body">
+<div class="create-group-membership modal-body">
   <div notifications-panel></div>
 
-  <table class="table table-condensed table-striped"
+  <table class="cam-table"
          ng-hide="status !== 'beforeCreate' || availableGroups.length == 0">
     <thead>
       <tr>
-        <th></th>
-        <th>Group Id</th>
-        <th>Group Name</th>
-        <th>Group Type</th>
+        <th class="select"></th>
+        <th class="group-id">Group Id</th>
+        <th class="group-name">Group Name</th>
+        <th class="group-type">Group Type</th>
       </tr>
     </thead>
+
     <tbody>
       <tr ng-repeat="group in availableGroups">
         <td class="row-select">
           <input type="checkbox"
                  ng-model="group.checked" />
         </td>
-        <td>
+
+        <td class="group-id">
           <a href="#/groups/{{group.id | escape}}">{{group.id}}</a>
         </td>
-        <td>
+
+        <td class="group-name">
           {{group.name}}
         </td>
-        <td>
+
+        <td class="group-type">
           {{group.type}}
         </td>
       </tr>
@@ -47,17 +51,24 @@
 </div>
 
 <div class="modal-footer">
-  <button class="btn"
+  <button class="btn btn-default"
           ng-click="close()"
           ng-disabled="status === 'performCreate'"
-          ng-hide="status === 'SUCCESS' || status === 'FAILED' || status === 'loadingFailed'">Close</button>
+          ng-hide="status === 'SUCCESS' || status === 'FAILED' || status === 'loadingFailed'">
+    Close
+  </button>
+
   <button class="btn btn-primary"
           ng-click="close(status)"
-          ng-show="status === 'SUCCESS' || status === 'FAILED' || status === 'loadingFailed'">OK</button>
+          ng-show="status === 'SUCCESS' || status === 'FAILED' || status === 'loadingFailed'">
+    OK
+  </button>
+
   <button class="btn btn-primary"
           ng-click="createGroupMemberships()"
           ng-disabled="status !== 'beforeCreate'"
-          ng-hide="status === 'SUCCESS' || status === 'FAILED' || status === 'loadingFailed' || availableGroups.length == 0">Add Groups</button>
-
+          ng-hide="status === 'SUCCESS' || status === 'FAILED' || status === 'loadingFailed' || availableGroups.length == 0">
+    Add Groups
+  </button>
 </div>
 <!-- / CE - camunda-admin-ui/client/scripts/pages/create-group-membership.html -->

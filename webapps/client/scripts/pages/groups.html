@@ -5,34 +5,43 @@
   </div>
 
   <div ng-show="availableOperations.create">
-    <a class="btn btn-default pull-right" href="#/group-create"><i class="glyphicon glyphicon-plus"></i> New Group</a>
+    <a class="btn btn-default pull-right"
+       href="#/group-create">
+      <span class="glyphicon glyphicon-plus"></span>
+      New Group
+    </a>
   </div>
 
-  <table class="table table-condensed table-striped">
+  <table class="cam-table">
     <thead>
       <tr>
-        <th><!-- icons --></th>
-        <th>Group Id</th>
-        <th>Group Name</th>
-        <th>Group Type</th>
-        <th><!-- actions --></th>
+        <th class="icon"><!-- icons --></th>
+        <th class="group-id">Group Id</th>
+        <th class="group-name">Group Name</th>
+        <th class="group-type">Group Type</th>
+        <th class="action"><!-- actions --></th>
       </tr>
     </thead>
+
     <tbody>
       <tr ng-repeat="group in groupList">
-        <td>
-          <i class="glyphicon glyphicon-th"></i>
+        <td class="icon">
+          <span class="glyphicon glyphicon-th"></span>
         </td>
-        <td>
+
+        <td class="group-id">
           <a href="#/groups/{{group.id | escape}}">{{group.id}}</a>
         </td>
-        <td>
+
+        <td class="group-name">
           {{group.name}}
         </td>
-        <td>
+
+        <td class="group-type">
           {{group.type}}
         </td>
-        <td>
+
+        <td class="action">
           <a href="#/groups/{{group.id | escape}}">Edit</a>
         </td>
       </tr>
