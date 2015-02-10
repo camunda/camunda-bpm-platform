@@ -1,20 +1,23 @@
 <!-- # CE - camunda-cockpit-ui/client/scripts/directives/activity-instance-tree.html -->
 <div class="tree-node" >
 
-  <div id="{{ node.id }}" ng-class="{ 'state-running': !node.endTime, 'state-completed' : node.endTime && !node.canceled, 'state-canceled': node.endTime && node.canceled }"
+  <div id="{{ node.id }}"
+       ng-class="{ 'state-running': !node.endTime, 'state-completed' : node.endTime && !node.canceled, 'state-canceled': node.endTime && node.canceled }"
        class="tree-node-group">
 
     <span class="tree-node-label"
           ng-class="{ 'selected' : node.isSelected, 'has-children': node.children.length }">
 
-      <button class="btn btn-link btn-control-link btn-toggle" ng-if="node.children.length" ng-click="toggleOpen()">
-        <i class="glyphicon"
-           ng-class="{ 'glyphicon-chevron-right' : !node.isOpen, 'glyphicon-chevron-down' : node.isOpen }"></i>
+      <button class="btn btn-link btn-control-link btn-toggle"
+              ng-if="node.children.length"
+              ng-click="toggleOpen()">
+        <span class="glyphicon"
+           ng-class="{ 'glyphicon-chevron-right' : !node.isOpen, 'glyphicon-chevron-down' : node.isOpen }"></span>
       </button>
 
       <button class="btn btn-link btn-control-link btn-control remove"
               ng-click="deselect($event)">
-        <i class="glyphicon glyphicon-remove"></i>
+        <span class="glyphicon glyphicon-remove"></span>
       </button>
 
       <a ng-click="select($event)"
@@ -30,7 +33,7 @@
           class="tree-node-addon activity-instance-running"
           tooltip="Running Activity Instance"
           tooltip-placement="right">
-      <i class="glyphicon glyphicon-adjust"></i>
+      <span class="glyphicon glyphicon-adjust"></span>
     </span>
 
     <!-- completed -->
@@ -38,7 +41,7 @@
           class="tree-node-addon activity-instance-completed"
           tooltip="Completed Activity Instance"
           tooltip-placement="right">
-      <i class="glyphicon glyphicon-ok-circle"></i>
+      <span class="glyphicon glyphicon-ok-circle"></span>
     </span>
 
     <!-- canceled -->
@@ -46,7 +49,7 @@
           class="tree-node-addon activity-instance-canceled"
           tooltip="Canceled Activity Instance"
           tooltip-placement="right">
-      <i class="glyphicon glyphicon-ban-circle"></i>
+      <span class="glyphicon glyphicon-ban-circle"></span>
     </span>
 
   </div>

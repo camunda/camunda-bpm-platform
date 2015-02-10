@@ -22,7 +22,7 @@
             ng-show="processInstance.suspended"
             tooltip="Currently suspended"
             tooltip-placement="top">
-        <i class="glyphicon glyphicon-pause white"></i>
+        <span class="glyphicon glyphicon-pause white"></span>
       </span>
     </h1>
 
@@ -55,7 +55,7 @@
 
           <button class="btn btn-sm btn-link btn-control btn-control-link"
                   tooltip="The activity instance tree with all currently selected activity instances. You may change the selection via (CTRL +) click.">
-            <i class="glyphicon glyphicon-question-sign"></i>
+            <span class="glyphicon glyphicon-question-sign"></span>
           </button>
         </h5>
 
@@ -70,7 +70,7 @@
           <button class="btn btn-link btn-xs btn-control"
                   ng-show="filterData.activityInstanceCount"
                   ng-click="clearSelection()">
-            <i class="glyphicon glyphicon-remove"></i>
+            <span class="glyphicon glyphicon-remove"></span>
           </button>
 
           <ng-pluralize count="filterData.activityInstanceCount"

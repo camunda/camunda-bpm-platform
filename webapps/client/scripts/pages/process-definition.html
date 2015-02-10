@@ -14,7 +14,7 @@
             ng-show="processDefinition.suspended"
             tooltip="Currently suspended"
             tooltip-placement="top">
-        <i class="glyphicon glyphicon-pause white"></i>
+        <span class="glyphicon glyphicon-pause white"></span>
       </span>
     </h1>
 
@@ -45,7 +45,7 @@
           <div class="btn-group btn-control dropdown">
             <button class="btn btn-default btn-xs dropdown-toggle"
                     data-toggle="dropdown">
-              <i class="glyphicon glyphicon-plus"></i>
+              <span class="glyphicon glyphicon-plus"></span>
             </button>
 
             <ul class="dropdown-menu">
@@ -106,7 +106,7 @@
 
                 <button class="btn btn-link btn-xs btn-control remove"
                         ng-click="removeParentFilter()">
-                  <i class="glyphicon glyphicon-remove"></i>
+                  <span class="glyphicon glyphicon-remove"></span>
                 </button>
 
                 <a ng-href="#/process-definition/{{ filterData.parent.id }}">
@@ -123,7 +123,7 @@
               <div class="search">
                 <button class="btn btn-link btn-xs btn-control remove"
                         ng-click="removeBusinessKeyFilter()">
-                  <i class="glyphicon glyphicon-remove"></i>
+                  <span class="glyphicon glyphicon-remove"></span>
                 </button>
                 <input type="text"
                        required
@@ -164,7 +164,7 @@
 
                   <button class="btn btn-link btn-xs btn-control remove-date-filter"
                           ng-click="removeStartDateFilter(date)">
-                    <i class="glyphicon glyphicon-remove"></i>
+                    <span class="glyphicon glyphicon-remove"></span>
                   </button>
                 </div>
 
@@ -191,7 +191,7 @@
               <button class="btn btn-default btn-xs pull-right"
                       ng-click="addStartDateFilter()"
                       ng-disabled="filterData.start.length === 2">
-                <i class="glyphicon glyphicon-plus"></i>
+                <span class="glyphicon glyphicon-plus"></span>
               </button>
             </li>
 
@@ -202,7 +202,7 @@
                 <a href
                    ng-click="toggleVariableFilterHelp()"
                    title="Get help on variable filters">
-                    <i class="glyphicon glyphicon-question-sign"></i>
+                    <span class="glyphicon glyphicon-question-sign"></span>
                 </a>
               </div>
 
@@ -211,7 +211,7 @@
 
                 <button class="btn btn-link btn-xs btn-control remove"
                         ng-click="removeVariableFilter(variable)">
-                  <i class="glyphicon glyphicon-remove"></i>
+                  <span class="glyphicon glyphicon-remove"></span>
                 </button>
 
                 <input type="text"
@@ -239,7 +239,7 @@
 
               <button class="btn btn-default btn-xs pull-right"
                       ng-click="addVariableFilter()">
-                <i class="glyphicon glyphicon-plus"></i>
+                <span class="glyphicon glyphicon-plus"></span>
               </button>
 
               <div class="note"
@@ -279,7 +279,7 @@
                    ng-repeat="activity in filterData.activities">
                 <button class="btn btn-link btn-xs btn-control remove"
                         ng-click="removeActivityFilter(activity)">
-                  <i class="glyphicon glyphicon-remove"></i>
+                  <span class="glyphicon glyphicon-remove"></span>
                 </button>
                 {{ activity.name }}
               </div>
@@ -290,7 +290,8 @@
         <div class="footer"
              ng-show="filterChanged.$loading">
           <span>
-            <i class="glyphicon glyphicon-loading"></i> refreshing...
+            <span class="glyphicon glyphicon-loading"></span>
+            refreshing...
           </span>
         </div>
       </div>
@@ -301,12 +302,13 @@
           <li>
             <strong>Selected Version</strong> {{ instanceStatistics.current.count }}
           </li>
+
           <li>
             <strong>All Versions</strong> {{ instanceStatistics.all.count }}
           </li>
         </ul>
-        <i ng-hide="instanceStatistics.$loaded"
-           class="glyphicon glyphicon-loading"></i>
+        <span ng-hide="instanceStatistics.$loaded"
+           class="glyphicon glyphicon-loading"></span>
       </div>
 
       <a class="hide-collapsable pull-right"></a>
