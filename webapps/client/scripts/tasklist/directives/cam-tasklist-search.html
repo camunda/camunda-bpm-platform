@@ -2,66 +2,19 @@
   <form class="search-field" ng-submit="createSearch()">
     <div class="form-container search-container">
 
-      <span class="search-label"
+      <span cam-widget-search-pill
             ng-repeat="search in searches"
-            ng-class="{'invalid': invalidSearch(search)}">
-        <a href
-           tooltip-placement="top"
-           tooltip="{{ 'DELETE_SEARCH' | translate }}"
-           ng-click="deleteSearch($index)"
-           class="remove-search glyphicon glyphicon-remove">
-        </a>
-
-        <span class="glyphicon glyphicon-exclamation-sign valid-hide"
-              tooltip-placement="top"
-              tooltip="{{'INVALID_SEARCH' | translate}}"></span>
-
-        <span cam-widget-inline-field
-              class="set-value"
-              type="option"
-              options="types"
-              change="changeSearch($index, 'type', varValue)"
-              value="search.type">
-          <span tooltip-placement="top"
-                tooltip="{{'VARIABLE_TYPE' | translate}}">
-            {{ search.type | camQueryComponent }}
-          </span>
-        </span>:
-
-        <span cam-widget-inline-field
-              class="set-value"
-              type="text"
-              change="changeSearch($index, 'name', varValue)"
-              value="search.name">
-          <span tooltip-placement="top"
-                tooltip="{{'PROPERTY' | translate}}">
-            {{ search.name | camQueryComponent }}
-          </span>
-        </span>
-
-        <span cam-widget-inline-field
-              class="set-value"
-              type="option"
-              options="search.operators"
-              change="changeSearch($index, 'operator', varValue)"
-              value="search.operator">
-          <span tooltip-placement="top"
-                tooltip="{{'OPERATOR' | translate}}">
-            {{ search.operator | camQueryComponent | translate }}
-          </span>
-        </span>
-
-        <span cam-widget-inline-field
-              class="set-value"
-              type="text"
-              change="changeSearch($index, 'value', varValue)"
-              value="search.value"
-              flexible="true">
-          <span class="visible-whitespace"
-                tooltip-placement="top"
-                tooltip="{{'VALUE' | translate}}">{{ search.value | camQueryComponent }}</span>
-        </span>
-      </span>
+            extended="true"
+            allow-dates="true"
+            enforce-dates="false"
+            valid="isValid(search)"
+            type="search.type"
+            name="search.name"
+            operator="search.operator"
+            value="search.value"
+            invalid-text="{{'INVALID_SEARCH' | translate}}"
+            on-change="changeSearch($index, field, before, value)"
+            on-delete="deleteSearch($index)" />
 
       <input class="form-control"
              type="text"

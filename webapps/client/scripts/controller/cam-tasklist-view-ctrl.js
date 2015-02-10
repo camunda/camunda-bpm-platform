@@ -11,24 +11,6 @@ define([
     };
   }
 
-  var operatorTable = {
-    "<" : "lt",
-    ">" : "gt",
-    "=" : "eq",
-    "!=": "neq",
-    ">=": "gteq",
-    "<=": "lteq",
-    "like":"like",
-    "BEFORE":"lteq",
-    "AFTER":"gteq"
-  };
-
-  var typeTable = {
-    "Process Variable" : "processVariables",
-    "Task Variable" : "taskVariables",
-    "Case Variable" : "caseInstanceVariables"
-  };
-
   var sanitizeValue = function(value, operator) {
     if(operator === 'like') {
       return '%'+value+'%';
@@ -162,9 +144,9 @@ define([
 
       angular.forEach(searches, function(search) {
 
-         query[typeTable[search.type]].push({
+         query[search.type].push({
            name: search.name,
-           operator: operatorTable[search.operator],
+           operator: search.operator,
            value: sanitizeValue(search.value, search.operator)
          });
 

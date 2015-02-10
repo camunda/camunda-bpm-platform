@@ -1,43 +1,53 @@
 define([
   'angular',
-  'text!./cam-tasklist-search.html'
+  'text!./cam-tasklist-search.html',
+  'text!./cam-tasklist-search-config.json'
 ], function(
   angular,
-  template
+  template,
+  searchConfigJSON
 ) {
   'use strict';
+
+  var searchConfig = JSON.parse(searchConfigJSON);
+
+  function getOperatorObjectFromString(operatorString) {
+    switch(operatorString) {
+      case '!=': return {key: 'neq', value: operatorString};
+      case '<=': return {key: 'lteq', value: operatorString};
+      case '>=': return {key: 'gteq', value: operatorString};
+      case 'like': return {key: 'like', value: operatorString};
+      case '=': return {key: 'eq', value: operatorString};
+      case '<': return {key: 'lt', value: operatorString};
+      case '>': return {key: 'gt', value: operatorString};
+    }
+  }
+
+  function getTypeObjectFromString(typeString) {
+    switch(typeString) {
+      case 'Process Variable': return searchConfig.types[0];
+      case 'Task Variable': return searchConfig.types[1];
+      case 'Case Variable': return searchConfig.types[2];
+
+    }
+  }
 
   function parseSearch(search, query) {
     var searchRegEx = /^\s*(.*?)\s*(!=|<=|>=|like|[=<>])\s*(.*?)\s*$/;
 
     var match = searchRegEx.exec(query);
     if(match && match.length === 4) {
-      search.name = match[1].trim();
-      search.operator = match[2];
-      search.value = match[3];
-      search.operators = getOperators(getType(parseValue(search.value)));
+      search.name.value = match[1].trim();
+      search.value.value = match[3];
+      search.operator.value = getOperatorObjectFromString(match[2]);
+      search.operator.values = getOperators(getType(parseValue(search.value.value)));
       return true;
     }
-
     return false;
   }
 
-  function createSearchObj(type) {
-    return {
-      type : type,
-      operator: '=',
-      operators: getOperators()
-    };
-  }
-
   function getOperators(varType) {
-    switch(varType) {
-      case 'date':    return ['BEFORE', 'AFTER'];
-      case 'boolean':
-      case 'object':  return ['=', '!='];
-      case 'number':  return ['=', '!=', '<', '>', '<=', '>='];
-      default:        return ['=', '!=', '<', '>', '<=', '>=', 'like'];
-    }
+    return searchConfig.operators[varType];
   }
 
   var dateRegex = /(\d\d\d\d)-(\d\d)-(\d\d)T(\d\d):(\d\d):(\d\d)(?:.(\d\d\d)| )?$/;
@@ -46,13 +56,6 @@ define([
       return 'date';
     }
     return typeof value;
-  }
-
-  function getDefaultOperator(valueType) {
-    switch(valueType) {
-      case 'date': return 'AFTER';
-      default:     return '=';
-    }
   }
 
   function parseValue(value) {
@@ -75,12 +78,24 @@ define([
   return [
     '$timeout',
     '$location',
+    '$translate',
     'search',
   function(
     $timeout,
     $location,
+    $translate,
     search
   ) {
+
+    function createSearchObj(type) {
+      var translated = $translate.instant(['VARIABLE_TYPE', 'PROPERTY', 'OPERATOR', 'VALUE']);
+      return {
+        type : {value: getTypeObjectFromString(type), values: searchConfig.types, tooltip: translated.VARIABLE_TYPE},
+        name : {tooltip: translated.PROPERTY},
+        operator : {values: searchConfig.operators, tooltip: translated.OPERATOR},
+        value : {tooltip: translated.VALUE}
+      };
+    }
 
     return {
       restrict: 'A',
@@ -96,17 +111,15 @@ define([
           return search[property] || null;
          }
 
-        $scope.types = ['Process Variable', 'Task Variable', 'Case Variable'];
         $scope.dropdownOpen = false;
+        $scope.types = searchConfig.types.map(function(el) {
+          return el.value;
+        });
 
         $scope.searches = [];
 
-        $scope.invalidSearch = function(search) {
-          return !isValid(search);
-        };
-
         $scope.deleteSearch = function(idx) {
-          var needsUpdate = isValid($scope.searches[idx]);
+          var needsUpdate = $scope.isValid($scope.searches[idx]);
           $scope.searches.splice(idx,1);
           if(needsUpdate) {
             updateQuery();
@@ -116,11 +129,11 @@ define([
         $scope.createSearch = function(type){
           var search = createSearchObj(type);
           if(!parseSearch(search, $scope.inputQuery)) {
-            search.value = $scope.inputQuery;
-            search.operators = getOperators(getType(parseValue(search.value)));
+            search.value.value = $scope.inputQuery;
+            search.operator.values = getOperators(getType(parseValue(search.value)));
           }
           $scope.searches.push(search);
-          if(isValid(search)) {
+          if($scope.isValid(search)) {
             updateQuery();
           }
 
@@ -131,30 +144,38 @@ define([
           $scope.inputQuery = '';
         };
 
-        $scope.changeSearch = function(idx, field, value) {
+        $scope.changeSearch = function(idx, field, before, value) {
+
           var search = $scope.searches[idx];
-          var needsUpdate = isValid(search);
+
+          // temporarily restore the old state to check if the field needs an update
+          search[field].value = before;
+          var needsUpdate = $scope.isValid(search);
+
           if(field === 'name') {
             // trim the variable name for the model (needed for the *validation*)
-            search[field] = value.trim();
+            search[field].value = value.trim();
 
             // trim the name again AFTER the inline field widget overwrites it with the
             // entered value (which may contain whitespace) - needed for *style*
-            $timeout(function(){search[field] = value.trim();});
+            $timeout(function(){
+              search[field].value = value.trim();
+            });
           } else {
-            search[field] = value;
+            search[field].value = value;
           }
 
-          var valueType = getType(parseValue(search.value));
-          search.operators = getOperators(valueType);
-          if(search.operators.indexOf(search.operator) === -1) {
-            // if the current value type does not allow the selected operator,
-            // fall back to default operator
-            search.operator = getDefaultOperator(valueType);
+          var valueType = getType(parseValue(search.value.value));
+          search.operator.values = getOperators(valueType);
+          if(search.operator.value && search.operator.values.map(function(el){
+            return el.key;
+          }).indexOf(search.operator.value.key) === -1) {
+            search.operator.value = search.operator.values[0];
           }
-          if(needsUpdate || isValid(search)) {
+          if(needsUpdate || $scope.isValid(search)) {
             updateQuery();
           }
+
         };
 
         $scope.selectType = function(type) {
@@ -173,24 +194,24 @@ define([
           evt.preventDefault();
         };
 
-        function isValid(search) {
-          return $scope.types.indexOf(search.type) !== -1 &&
-             search.operators.indexOf(search.operator) !== -1 &&
-             !!search.name &&
-             !!search.value;
-        }
+        $scope.isValid = function(search) {
+          return !!search.type.value &&
+             !!search.operator.value &&
+             !!search.name.value &&
+             !!search.value.value;
+        };
 
         var searchData = $scope.tasklistData.newChild($scope);
 
         function updateQuery() {
           var outArray = [];
           angular.forEach($scope.searches, function(search) {
-            if(isValid(search)) {
+            if($scope.isValid(search)) {
               outArray.unshift({
-                name: search.name,
-                operator: search.operator,
-                value: parseValue(search.value),
-                type: search.type
+                name: search.name.value,
+                operator: search.operator.value.key,
+                value: parseValue(search.value.value),
+                type: search.type.value.key
               });
             }
           });
@@ -202,12 +223,26 @@ define([
           searchData.changed('taskListQuery');
         }
 
+        function createSearchFromURL(urlSearch) {
+          var search = createSearchObj();
+          search.type.value = searchConfig.types.reduce(function(done, el) {
+              return done || (el.key === urlSearch.type ? el : null);
+            }, null);
+          search.name.value = urlSearch.name;
+          search.value.value = urlSearch.value === null ? "NULL" : urlSearch.value.toString();
+          search.operator.value = getOperators(getType(search.value.value)).reduce(function(done, el) {
+              return done || (el.key === urlSearch.operator ? el : null);
+            }, null);
+          search.operator.values = getOperators(getType(search.value.value));
+          return search;
+        }
+
          searchData.observe('taskListQuery', function(taskListQuery) {
 
            var search, i;
            for(i = 0; i < $scope.searches.length; i++) {
              search = $scope.searches[i];
-             if(isValid(search)) {
+             if($scope.isValid(search)) {
                 $scope.searches.splice(i, 1);
                 i--;
              }
@@ -217,15 +252,7 @@ define([
 
            if(searches) {
              for(i=0; i < searches.length; i++) {
-               search = searches[i];
-               search.operators = getOperators(getType(search.value));
-               if(search.value === null) {
-                 search.value = "NULL";
-               } else {
-                 search.value = search.value.toString();
-               }
-               search.type = search.type;
-               $scope.searches.unshift(search);
+               $scope.searches.unshift(createSearchFromURL(searches[i]));
              }
            }
 
