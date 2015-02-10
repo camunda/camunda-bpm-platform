@@ -21,8 +21,8 @@ import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.impl.cmmn.behavior.TransferVariablesActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnActivityExecution;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
+import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.delegate.SubProcessActivityBehavior;
-import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 
@@ -55,7 +55,7 @@ public class PvmAtomicOperationProcessEnd extends PvmAtomicOperationActivityInst
 
     // copy variables before destroying the ended sub process instance
     if (superExecution!=null) {
-      ActivityImpl activity = superExecution.getActivity();
+      PvmActivity activity = superExecution.getActivity();
       subProcessActivityBehavior = (SubProcessActivityBehavior) activity.getActivityBehavior();
       try {
         subProcessActivityBehavior.completing(superExecution, execution);

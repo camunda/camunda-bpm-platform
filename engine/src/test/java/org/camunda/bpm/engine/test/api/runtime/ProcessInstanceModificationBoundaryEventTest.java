@@ -779,7 +779,7 @@ public class ProcessInstanceModificationBoundaryEventTest extends PluggableProce
 
     assertThat(executionTree)
       .matches(
-        describeExecutionTree("fork").scope()
+        describeExecutionTree(null).scope()
           .child("task1").concurrent().noScope().up()
           .child("taskAfterBoundaryEvent").concurrent().noScope()
         .done());
@@ -813,7 +813,7 @@ public class ProcessInstanceModificationBoundaryEventTest extends PluggableProce
 
     assertThat(executionTree)
       .matches(
-        describeExecutionTree("fork").scope()
+        describeExecutionTree(null).scope()
           .child("task1").concurrent().noScope().up()
           .child(null).concurrent().noScope()
             .child("task2").scope().up().up()
@@ -851,7 +851,7 @@ public class ProcessInstanceModificationBoundaryEventTest extends PluggableProce
     assertThat(executionTree)
       .matches(
         describeExecutionTree(null).scope()
-          .child("fork").scope()
+          .child(null).scope()
             .child("task1").concurrent().noScope().up()
             .child("taskAfterBoundaryEvent").concurrent().noScope()
         .done());
@@ -888,7 +888,7 @@ public class ProcessInstanceModificationBoundaryEventTest extends PluggableProce
     assertThat(executionTree)
       .matches(
         describeExecutionTree(null).scope()
-          .child("fork").scope()
+          .child(null).scope()
             .child("task1").concurrent().noScope().up()
             .child(null).concurrent().noScope()
               .child("task2").scope().up().up()

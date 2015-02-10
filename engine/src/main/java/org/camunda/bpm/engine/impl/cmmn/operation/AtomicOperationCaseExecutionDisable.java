@@ -17,7 +17,7 @@ import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.DISA
 import static org.camunda.bpm.engine.impl.util.ActivityBehaviorUtil.getActivityBehavior;
 
 import org.camunda.bpm.engine.impl.cmmn.behavior.CmmnActivityBehavior;
-import org.camunda.bpm.engine.impl.cmmn.behavior.CompositeActivityBehavior;
+import org.camunda.bpm.engine.impl.cmmn.behavior.CmmnCompositeActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
 
 /**
@@ -47,8 +47,8 @@ public class AtomicOperationCaseExecutionDisable extends AbstractCmmnEventAtomic
     CmmnExecution parent = execution.getParent();
     if (parent != null) {
       CmmnActivityBehavior behavior = getActivityBehavior(parent);
-      if (behavior instanceof CompositeActivityBehavior) {
-        CompositeActivityBehavior compositeBehavior = (CompositeActivityBehavior) behavior;
+      if (behavior instanceof CmmnCompositeActivityBehavior) {
+        CmmnCompositeActivityBehavior compositeBehavior = (CmmnCompositeActivityBehavior) behavior;
         compositeBehavior.handleChildDisabled(parent, execution);
       }
     }

@@ -12,8 +12,8 @@
  */
 package org.camunda.bpm.engine.impl.pvm.runtime.operation;
 
+import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.delegate.CompositeActivityBehavior;
-import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 
 
@@ -42,7 +42,7 @@ public abstract class PvmAtomicOperationActivityInstanceStart extends AbstractPv
     // hack around execution tree structure not being in sync with activity instance concept:
     // if we start a scope activity, remember current activity instance in parent
     PvmExecutionImpl parent = execution.getParent();
-    ActivityImpl activity = execution.getActivity();
+    PvmActivity activity = execution.getActivity();
     if(parent != null && execution.isScope() && activity.isScope() && (activity.getActivityBehavior() instanceof CompositeActivityBehavior)) {
       parent.setActivityInstanceId(execution.getActivityInstanceId());
     }

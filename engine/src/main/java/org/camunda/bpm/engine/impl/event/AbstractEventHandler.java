@@ -13,20 +13,15 @@
 
 package org.camunda.bpm.engine.impl.event;
 
-import java.util.Map;
-import java.util.logging.Logger;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
-import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.bpmn.behavior.BoundaryEventActivityBehavior;
+import java.util.Map;
+
 import org.camunda.bpm.engine.impl.bpmn.behavior.EventSubProcessStartEventActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.IntermediateCatchEventActivityBehavior;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
-import org.camunda.bpm.engine.impl.pvm.delegate.ActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
-
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 
 /**
  * @author Daniel Meyer
@@ -34,11 +29,9 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
  */
 public abstract class AbstractEventHandler implements EventHandler {
 
-  private static Logger log = Logger.getLogger(AbstractEventHandler.class.getName());
-
   public void handleEvent(EventSubscriptionEntity eventSubscription, Object payload, CommandContext commandContext) {
 
-    ExecutionEntity execution = eventSubscription.getExecution();
+    PvmExecutionImpl execution = eventSubscription.getExecution();
     ActivityImpl activity = eventSubscription.getActivity();
 
     ensureNotNull("Error while sending signal for event subscription '" + eventSubscription.getId() + "': "
@@ -50,44 +43,17 @@ public abstract class AbstractEventHandler implements EventHandler {
       execution.setVariables(processVariables);
     }
 
-    ActivityBehavior activityBehavior = activity.getActivityBehavior();
-    if (activityBehavior instanceof BoundaryEventActivityBehavior) {
-
-      try {
-        execution.executeActivity(activity);
-
-      } catch (RuntimeException e) {
-        throw e;
-      } catch (Exception e) {
-        throw new ProcessEngineException("exception while sending signal for event subscription '" + eventSubscription + "':" + e.getMessage(), e);
-      }
-
-    } else if (activityBehavior instanceof EventSubProcessStartEventActivityBehavior) {
-
-      try {
-        execution.executeActivity(activity.getParentActivity());
-
-      } catch (RuntimeException e) {
-        throw e;
-      } catch (Exception e) {
-        throw new ProcessEngineException("exception while sending signal for event subscription '" + eventSubscription + "':" + e.getMessage(), e);
-      }
-
-    } else { // not boundary
-      if (activityBehavior instanceof IntermediateCatchEventActivityBehavior) {
-        IntermediateCatchEventActivityBehavior catchBehavior = (IntermediateCatchEventActivityBehavior) activityBehavior;
-
-        if (catchBehavior.isAfterEventBasedGateway()) {
-          execution.executeActivity(activity);
-          return;
-        }
-      }
-
-      if (!activity.equals(execution.getActivity())) {
-        execution.setActivity(activity);
-      }
+    if(activity.equals(execution.getActivity())) {
       execution.signal("signal", null);
     }
+    else {
+      // hack around the fact that the start event is refrenced by event subscriptions for event subprocesses
+      // and not the subprocess itself
+      if (activity.getActivityBehavior() instanceof EventSubProcessStartEventActivityBehavior) {
+        activity = (ActivityImpl) activity.getFlowScope();
+      }
 
+      execution.executeEventHandlerActivity(activity);
+    }
   }
 }

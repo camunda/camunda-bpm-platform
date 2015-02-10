@@ -162,13 +162,34 @@ public class ParallelGatewayTest extends PluggableProcessEngineTestCase {
       .list();
     assertEquals(2, list.size());
 
-    waitForJobExecutorToProcessAllJobs(6000);
+    managementService.executeJob(list.get(0).getId());
+    managementService.executeJob(list.get(1).getId());
 
     assertNull(runtimeService.createProcessInstanceQuery().singleResult());
   }
 
   @Deployment
-  public void FAILING_testCompletingJoinInSubProcess() {
+  public void testAsyncParallelGatewayAfterScopeTask() {
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+    assertFalse(processInstance.isEnded());
+
+    Task task = taskService.createTaskQuery().singleResult();
+    taskService.complete(task.getId());
+
+    // there are two jobs to continue the gateway:
+    List<Job> list = managementService.createJobQuery()
+      .list();
+    assertEquals(2, list.size());
+
+    managementService.executeJob(list.get(0).getId());
+    managementService.executeJob(list.get(1).getId());
+
+    assertNull(runtimeService.createProcessInstanceQuery().singleResult());
+  }
+
+  @Deployment
+  public void testCompletingJoinInSubProcess() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
 
     assertTrue(processInstance.isEnded());

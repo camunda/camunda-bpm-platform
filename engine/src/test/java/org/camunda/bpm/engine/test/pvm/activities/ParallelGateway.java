@@ -42,7 +42,7 @@ public class ParallelGateway implements ActivityBehavior {
     
     if (nbrOfExecutionsJoined==nbrOfExecutionsToJoin) {
       log.fine("parallel gateway '"+activity.getId()+"' activates: "+nbrOfExecutionsJoined+" of "+nbrOfExecutionsToJoin+" joined");
-      execution.takeAll(outgoingTransitions, joinedExecutions);
+      execution.leaveActivityViaTransitions(outgoingTransitions, joinedExecutions);
       
     } else if (log.isLoggable(Level.FINE)){
       log.fine("parallel gateway '"+activity.getId()+"' does not activate: "+nbrOfExecutionsJoined+" of "+nbrOfExecutionsToJoin+" joined");

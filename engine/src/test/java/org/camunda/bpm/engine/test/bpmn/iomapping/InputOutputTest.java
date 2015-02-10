@@ -780,13 +780,13 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
     variables.put("nrOfLoops", 2);
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("miParallelSubprocess", variables);
 
-    // first sequential mi execution
+    // first parallel mi execution
     Execution miScopeExecution1 = runtimeService.createExecutionQuery().activityId("task")
         .variableValueEquals("loopCounter", 0).singleResult();
     assertNotNull(miScopeExecution1);
     assertEquals(1, runtimeService.getVariableLocal(miScopeExecution1.getId(), "miCounterValue"));
 
-    // second sequential mi execution
+    // second parallel mi execution
     Execution miScopeExecution2 = runtimeService.createExecutionQuery().activityId("task")
         .variableValueEquals("loopCounter", 1).singleResult();
     assertNotNull(miScopeExecution2);

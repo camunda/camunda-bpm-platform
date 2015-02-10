@@ -13,6 +13,7 @@
 package org.camunda.bpm.engine.impl.cmd;
 
 import org.camunda.bpm.engine.impl.core.model.CoreModelElement;
+import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
@@ -36,7 +37,7 @@ public class ActivityBeforeInstantiationCmd extends AbstractInstantiationCmd {
   }
 
   protected ScopeImpl getTargetFlowScope(ProcessDefinitionImpl processDefinition) {
-    ActivityImpl activity = processDefinition.findActivity(activityId);
+    PvmActivity activity = processDefinition.findActivity(activityId);
     return activity.getFlowScope();
   }
 

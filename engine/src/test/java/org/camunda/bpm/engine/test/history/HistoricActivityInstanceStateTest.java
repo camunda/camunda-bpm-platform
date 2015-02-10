@@ -152,15 +152,18 @@ public class HistoricActivityInstanceStateTest extends PluggableProcessEngineTes
 
     List<HistoricActivityInstance> activityInstances = getEndActivityInstances();
 
-    assertEquals(4, activityInstances.size());
+    assertEquals(7, activityInstances.size());
 
     List<HistoricActivityInstance> allInstances = getAllActivityInstances();
 
-    assertNonCompletingActivityInstance(allInstances, "intermediateSubprocess");
+    assertIsCompletingActivityInstances(allInstances, "intermediateSubprocess", 3);
     assertNonCanceledActivityInstance(allInstances, "intermediateSubprocess");
 
     assertIsCompletingActivityInstances(allInstances, "subprocessEnd", 3);
     assertNonCanceledActivityInstance(allInstances, "subprocessEnd");
+
+    assertNonCompletingActivityInstance(allInstances, "intermediateSubprocess$multiInstanceBody", 1);
+    assertNonCanceledActivityInstance(allInstances, "intermediateSubprocess$multiInstanceBody");
 
     assertIsCompletingActivityInstances(allInstances, "end", 1);
     assertNonCanceledActivityInstance(allInstances, "end");
@@ -172,15 +175,18 @@ public class HistoricActivityInstanceStateTest extends PluggableProcessEngineTes
 
     List<HistoricActivityInstance> activityInstances = getEndActivityInstances();
 
-    assertEquals(4, activityInstances.size());
+    assertEquals(7, activityInstances.size());
 
     List<HistoricActivityInstance> allInstances = getAllActivityInstances();
 
-    assertNonCompletingActivityInstance(allInstances, "intermediateSubprocess");
+    assertIsCompletingActivityInstances(allInstances, "intermediateSubprocess", 3);
     assertNonCanceledActivityInstance(allInstances, "intermediateSubprocess");
 
     assertIsCompletingActivityInstances(allInstances, "subprocessEnd", 3);
     assertNonCanceledActivityInstance(allInstances, "subprocessEnd");
+
+    assertNonCompletingActivityInstance(allInstances, "intermediateSubprocess$multiInstanceBody", 1);
+    assertNonCanceledActivityInstance(allInstances, "intermediateSubprocess$multiInstanceBody");
 
     assertIsCompletingActivityInstances(allInstances, "end", 1);
     assertNonCanceledActivityInstance(allInstances, "end");

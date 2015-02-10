@@ -159,9 +159,7 @@ public class ExecutionImpl extends PvmExecutionImpl implements
   }
 
   public void initialize() {
-  }
-
-  public void interruptScope(String reason) {
+    executeIoMapping();
   }
 
   // parent ///////////////////////////////////////////////////////////////////
@@ -357,6 +355,10 @@ public class ExecutionImpl extends PvmExecutionImpl implements
 
   public ProcessEngineServices getProcessEngineServices() {
     throw new UnsupportedOperationException(ProcessEngineServicesAware.class.getName() +" is unsupported in transient ExecutionImpl");
+  }
+
+  public void forceUpdate() {
+    // nothing to do
   }
 
 }

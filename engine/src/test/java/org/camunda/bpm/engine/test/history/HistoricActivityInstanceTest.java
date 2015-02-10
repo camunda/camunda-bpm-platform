@@ -747,13 +747,16 @@ public class HistoricActivityInstanceTest extends PluggableProcessEngineTestCase
 
     HistoricActivityInstanceQuery query = historyService.createHistoricActivityInstanceQuery();
 
+    HistoricActivityInstance miBodyInstance = query.activityId("userTask$multiInstanceBody").singleResult();
+
     query.activityId("userTask");
     assertEquals(5, query.count());
+
 
     List<HistoricActivityInstance> result = query.list();
 
     for (HistoricActivityInstance instance : result) {
-      assertEquals(pi.getId(), instance.getParentActivityInstanceId());
+      assertEquals(miBodyInstance.getId(), instance.getParentActivityInstanceId());
     }
 
     List<Task> tasks = taskService.createTaskQuery().list();
@@ -769,6 +772,7 @@ public class HistoricActivityInstanceTest extends PluggableProcessEngineTestCase
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("process");
 
     HistoricActivityInstanceQuery query = historyService.createHistoricActivityInstanceQuery();
+    HistoricActivityInstance miBodyInstance = query.activityId("receiveTask$multiInstanceBody").singleResult();
 
     query.activityId("receiveTask");
     assertEquals(5, query.count());
@@ -776,7 +780,7 @@ public class HistoricActivityInstanceTest extends PluggableProcessEngineTestCase
     List<HistoricActivityInstance> result = query.list();
 
     for (HistoricActivityInstance instance : result) {
-      assertEquals(pi.getId(), instance.getParentActivityInstanceId());
+      assertEquals(miBodyInstance.getId(), instance.getParentActivityInstanceId());
     }
 
   }

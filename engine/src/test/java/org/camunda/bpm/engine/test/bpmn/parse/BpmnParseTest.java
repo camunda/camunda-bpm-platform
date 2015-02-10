@@ -21,6 +21,7 @@ import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
+import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.PvmTransition;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.TransitionImpl;
@@ -334,7 +335,7 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
 
     // Test that the process definition has been deployed
     assertNotNull(processDefinitionEntity);
-    ActivityImpl activity = processDefinitionEntity.findActivity("ExclusiveGateway_1");
+    PvmActivity activity = processDefinitionEntity.findActivity("ExclusiveGateway_1");
     assertNotNull(activity);
 
     // Test that the conditions has been resolved

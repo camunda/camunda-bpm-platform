@@ -77,7 +77,7 @@ public class ActivityCancellationCmd extends AbstractProcessInstanceModification
 
     while (scope != null) {
       parentScopeIds.add(scope.getId());
-      scope = scope.getParentScope();
+      scope = scope.getFlowScope();
     }
 
     return parentScopeIds;

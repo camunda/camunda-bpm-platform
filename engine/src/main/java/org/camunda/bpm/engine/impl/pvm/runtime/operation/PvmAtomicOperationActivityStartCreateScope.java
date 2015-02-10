@@ -12,7 +12,7 @@
  */
 package org.camunda.bpm.engine.impl.pvm.runtime.operation;
 
-import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
+import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 
 /**
@@ -22,7 +22,7 @@ import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 public class PvmAtomicOperationActivityStartCreateScope extends PvmAtomicOperationCreateScope {
 
   public boolean isAsync(PvmExecutionImpl execution) {
-    ActivityImpl activity = execution.getActivity();
+    PvmActivity activity = execution.getActivity();
     return activity.isAsyncBefore();
   }
 

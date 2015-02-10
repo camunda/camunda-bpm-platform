@@ -5,6 +5,7 @@ import org.camunda.bpm.engine.impl.pvm.ProcessDefinitionBuilder;
 import org.camunda.bpm.engine.impl.pvm.PvmExecution;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessDefinition;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessInstance;
+import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 import org.camunda.bpm.engine.impl.test.PvmTestCase;
 import org.camunda.bpm.engine.test.pvm.activities.Automatic;
 import org.camunda.bpm.engine.test.pvm.activities.EmbeddedSubProcess;
@@ -93,7 +94,7 @@ public class PvmActivityInstanceCompleteTest extends PvmTestCase {
     processInstance.start();
 
     verifier.assertNonCompletingActivityInstance("start", 1);
-    verifier.assertNonCompletingActivityInstance("fork", 2);
+    verifier.assertNonCompletingActivityInstance("fork", 1);
     verifier.assertIsCompletingActivityInstance("end1", 1);
     verifier.assertIsCompletingActivityInstance("end2", 1);
   }
@@ -152,7 +153,7 @@ public class PvmActivityInstanceCompleteTest extends PvmTestCase {
     processInstance.start();
 
     verifier.assertNonCompletingActivityInstance("start", 1);
-    verifier.assertNonCompletingActivityInstance("fork", 2);
+    verifier.assertNonCompletingActivityInstance("fork", 1);
     verifier.assertNonCompletingActivityInstance("a1", 1);
     verifier.assertNonCompletingActivityInstance("a2", 1);
     verifier.assertNonCompletingActivityInstance("join", 2);
@@ -216,11 +217,11 @@ public class PvmActivityInstanceCompleteTest extends PvmTestCase {
    *           +----------+
    *           | userTask |
    *           |          |
-   * +-----+   | +-----+  |    +------+
-   * |start|-->| |timer|  |--->| end1 |
-   * +-----+   | +-----+  |    +------+
-   *           +----|-----+
-   *                |
+   * +-----+   |          |    +------+
+   * |start|-->|          |--->| end1 |
+   * +-----+   | +-----+  |
+   *           +-|timer|--+
+   *             +-----+
    *                |          +------+
    *                +--------->| end2 |
    *                           +------+
@@ -240,12 +241,13 @@ public class PvmActivityInstanceCompleteTest extends PvmTestCase {
         .scope()
         .behavior(new EmbeddedSubProcess())
         .executionListener(ExecutionListener.EVENTNAME_END, verifier)
-        .createActivity("timer")
-          .behavior(new WaitState())
-          .executionListener(ExecutionListener.EVENTNAME_END, verifier)
-          .transition("end2")
-        .endActivity()
         .transition("end1")
+      .endActivity()
+      .createActivity("timer")
+        .behavior(new WaitState())
+        .executionListener(ExecutionListener.EVENTNAME_END, verifier)
+        .attachedTo("userTask", true)
+        .transition("end2")
       .endActivity()
       .createActivity("end1")
         .behavior(new End())
@@ -259,6 +261,9 @@ public class PvmActivityInstanceCompleteTest extends PvmTestCase {
 
     PvmProcessInstance processInstance = processDefinition.createProcessInstance();
     processInstance.start();
+
+    PvmExecution userTaskExecution = processInstance.findExecution("userTask");
+    ((PvmExecutionImpl) userTaskExecution).executeActivity(processDefinition.findActivity("timer"));
 
     PvmExecution timerExecution = processInstance.findExecution("timer");
     timerExecution.signal(null, null);

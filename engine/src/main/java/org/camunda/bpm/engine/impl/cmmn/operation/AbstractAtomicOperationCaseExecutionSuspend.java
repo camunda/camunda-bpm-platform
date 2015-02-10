@@ -16,7 +16,7 @@ import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.SUSP
 import static org.camunda.bpm.engine.impl.util.ActivityBehaviorUtil.getActivityBehavior;
 
 import org.camunda.bpm.engine.impl.cmmn.behavior.CmmnActivityBehavior;
-import org.camunda.bpm.engine.impl.cmmn.behavior.CompositeActivityBehavior;
+import org.camunda.bpm.engine.impl.cmmn.behavior.CmmnCompositeActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
 
 /**
@@ -41,8 +41,8 @@ public abstract class AbstractAtomicOperationCaseExecutionSuspend extends Abstra
 
   protected void notifyParent(CmmnExecution parent, CmmnExecution execution) {
     CmmnActivityBehavior behavior = getActivityBehavior(parent);
-    if (behavior instanceof CompositeActivityBehavior) {
-      CompositeActivityBehavior compositeBehavior = (CompositeActivityBehavior) behavior;
+    if (behavior instanceof CmmnCompositeActivityBehavior) {
+      CmmnCompositeActivityBehavior compositeBehavior = (CmmnCompositeActivityBehavior) behavior;
       compositeBehavior.handleChildSuspension(parent, execution);
     }
   }

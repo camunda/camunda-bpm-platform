@@ -12,29 +12,37 @@
  */
 package org.camunda.bpm.engine.impl.pvm.runtime.operation;
 
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.impl.core.model.CoreModelElement;
-import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
-import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
-import org.camunda.bpm.engine.impl.pvm.process.TransitionImpl;
+import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 
 
 /**
+ *
  * @author Tom Baeyens
+ * @author Daniel Meyer
+ * @author Thorben Lindhauer
  */
 public abstract class AbstractPvmAtomicOperationTransitionNotifyListenerTake extends AbstractPvmEventAtomicOperation {
 
   protected void eventNotificationsCompleted(PvmExecutionImpl execution) {
-    TransitionImpl transition = execution.getTransition();
-    ActivityImpl activity = execution.getActivity();
-    ActivityImpl nextScope = findNextScope(activity.getFlowScope(), transition.getDestination());
-    execution.setActivity(nextScope);
+    PvmActivity destination = execution.getTransition().getDestination();
 
-    if (nextScope.isCancelScope()) {
-      execution.performOperation(TRANSITION_CANCEL_SCOPE);
-    } else {
+    // check start behavior of next activity
+    switch (destination.getActivityStartBehavior()) {
+    case DEFAULT:
+      execution.setActivity(destination);
       execution.performOperation(TRANSITION_CREATE_SCOPE);
+      break;
+    case INTERRUPT_FLOW_SCOPE:
+      execution.setActivity(null);
+      execution.performOperation(TRANSITION_INTERRUPT_FLOW_SCOPE);
+      break;
+    default:
+      throw new ProcessEngineException("Unsupported start behavior for activity '"+destination
+          +"' started from a sequence flow: "+destination.getActivityStartBehavior());
     }
   }
 
@@ -46,14 +54,4 @@ public abstract class AbstractPvmAtomicOperationTransitionNotifyListenerTake ext
     return ExecutionListener.EVENTNAME_TAKE;
   }
 
-  /** finds the next scope to enter.  the most outer scope is found first */
-  public static ActivityImpl findNextScope(ScopeImpl outerScopeElement, ActivityImpl destination) {
-    ActivityImpl nextScope = destination;
-    while( (nextScope.getParent() instanceof ActivityImpl)
-           && (nextScope.getParent() != outerScopeElement)
-         ) {
-      nextScope = (ActivityImpl) nextScope.getParent();
-    }
-    return nextScope;
-  }
 }

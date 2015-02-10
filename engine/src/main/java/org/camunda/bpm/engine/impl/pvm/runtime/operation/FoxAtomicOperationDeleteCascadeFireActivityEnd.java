@@ -4,8 +4,8 @@ import java.util.List;
 
 import org.camunda.bpm.engine.delegate.BaseDelegateExecution;
 import org.camunda.bpm.engine.delegate.DelegateListener;
+import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.PvmException;
-import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 
@@ -14,12 +14,12 @@ public class FoxAtomicOperationDeleteCascadeFireActivityEnd extends PvmAtomicOpe
 
   @Override
   protected void eventNotificationsCompleted(PvmExecutionImpl execution) {
-    ActivityImpl activity = execution.getActivity();
+    PvmActivity activity = execution.getActivity();
     if ( (execution.isScope())
             && (activity!=null)
             && (!activity.isScope())
           )  {
-      execution.setActivity(activity.getParentActivity());
+      execution.setActivity((PvmActivity) activity.getFlowScope());
       execution.performOperation(this);
 
     } else {

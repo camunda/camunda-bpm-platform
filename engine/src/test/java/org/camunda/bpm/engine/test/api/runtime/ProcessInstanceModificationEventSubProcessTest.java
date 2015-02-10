@@ -65,7 +65,8 @@ public class ProcessInstanceModificationEventSubProcessTest extends PluggablePro
       .matches(
         describeExecutionTree(null).scope()
           .child("task1").concurrent().noScope().up()
-          .child("eventSubProcessTask").concurrent().noScope()
+          .child(null).concurrent().noScope()
+            .child("eventSubProcessTask").scope()
         .done());
 
     completeTasksInOrder("task1", "task2", "eventSubProcessTask");
@@ -99,7 +100,8 @@ public class ProcessInstanceModificationEventSubProcessTest extends PluggablePro
 
     assertThat(executionTree)
       .matches(
-        describeExecutionTree("eventSubProcessTask").scope()
+        describeExecutionTree(null).scope()
+          .child("eventSubProcessTask").scope()
         .done());
 
     completeTasksInOrder("eventSubProcessTask");
@@ -131,7 +133,8 @@ public class ProcessInstanceModificationEventSubProcessTest extends PluggablePro
 
     assertThat(executionTree)
       .matches(
-        describeExecutionTree("eventSubProcessTask").scope()
+        describeExecutionTree(null).scope()
+          .child("eventSubProcessTask").scope()
         .done());
 
     completeTasksInOrder("eventSubProcessTask");
@@ -162,7 +165,8 @@ public class ProcessInstanceModificationEventSubProcessTest extends PluggablePro
 
     assertThat(executionTree)
       .matches(
-        describeExecutionTree("eventSubProcessTask").scope()
+        describeExecutionTree(null).scope()
+          .child("eventSubProcessTask").scope()
         .done());
 
     completeTasksInOrder("eventSubProcessTask");
@@ -196,7 +200,8 @@ public class ProcessInstanceModificationEventSubProcessTest extends PluggablePro
       .matches(
         describeExecutionTree(null).scope()
           .child("task1").concurrent().noScope().up()
-          .child("eventSubProcessTask").concurrent().noScope()
+          .child(null).concurrent().noScope()
+            .child("eventSubProcessTask").scope()
         .done());
 
     completeTasksInOrder("task1", "eventSubProcessTask", "task2");
@@ -230,7 +235,8 @@ public class ProcessInstanceModificationEventSubProcessTest extends PluggablePro
 
     assertThat(executionTree)
       .matches(
-        describeExecutionTree("eventSubProcessTask").scope()
+        describeExecutionTree(null).scope()
+          .child("eventSubProcessTask").scope()
         .done());
 
     completeTasksInOrder("eventSubProcessTask");
@@ -264,7 +270,8 @@ public class ProcessInstanceModificationEventSubProcessTest extends PluggablePro
       .matches(
         describeExecutionTree(null).scope()
           .child("task1").concurrent().noScope().up()
-          .child("eventSubProcessTask").concurrent().noScope()
+          .child(null).concurrent().noScope()
+            .child("eventSubProcessTask").scope()
         .done());
 
     completeTasksInOrder("task1", "task2", "eventSubProcessTask");
@@ -298,7 +305,8 @@ public class ProcessInstanceModificationEventSubProcessTest extends PluggablePro
       .matches(
         describeExecutionTree(null).scope()
           .child("task1").concurrent().noScope().up()
-          .child("eventSubProcessTask").concurrent().noScope()
+          .child(null).concurrent().noScope()
+            .child("eventSubProcessTask").scope()
         .done());
 
     completeTasksInOrder("task1", "eventSubProcessTask", "task2");
@@ -337,7 +345,8 @@ public class ProcessInstanceModificationEventSubProcessTest extends PluggablePro
         describeExecutionTree(null).scope()
           .child("task1").concurrent().noScope().up()
           .child(null).concurrent().noScope()
-            .child("eventSubProcessTask").scope()
+            .child(null).scope()
+              .child("eventSubProcessTask").scope()
         .done());
 
     completeTasksInOrder("task1", "eventSubProcessTask", "task2");
@@ -377,7 +386,8 @@ public class ProcessInstanceModificationEventSubProcessTest extends PluggablePro
         describeExecutionTree(null).scope()
           .child("task1").concurrent().noScope().up()
           .child(null).concurrent().noScope()
-            .child("eventSubProcessTask").scope()
+            .child(null).scope()
+              .child("eventSubProcessTask").scope()
         .done());
 
     completeTasksInOrder("eventSubProcessTask", "task1", "task2");
@@ -415,7 +425,8 @@ public class ProcessInstanceModificationEventSubProcessTest extends PluggablePro
         describeExecutionTree(null).scope()
           .child("task1").concurrent().noScope().up()
           .child(null).concurrent().noScope()
-            .child("eventSubProcessTask").scope()
+            .child(null).scope()
+              .child("eventSubProcessTask").scope()
         .done());
 
     completeTasksInOrder("task1", "eventSubProcessTask", "task2");
@@ -456,7 +467,8 @@ public class ProcessInstanceModificationEventSubProcessTest extends PluggablePro
         describeExecutionTree(null).scope()
           .child(null).scope()
             .child("task2").concurrent().noScope().up()
-            .child("eventSubProcessTask").concurrent().noScope()
+            .child(null).concurrent().noScope()
+              .child("eventSubProcessTask").scope()
         .done());
 
     completeTasksInOrder("task2", "eventSubProcessTask");
@@ -493,7 +505,8 @@ public class ProcessInstanceModificationEventSubProcessTest extends PluggablePro
     assertThat(executionTree)
       .matches(
         describeExecutionTree(null).scope()
-          .child("eventSubProcessTask").scope()
+          .child(null).scope()
+            .child("eventSubProcessTask").scope()
         .done());
 
     completeTasksInOrder("eventSubProcessTask");
@@ -530,7 +543,8 @@ public class ProcessInstanceModificationEventSubProcessTest extends PluggablePro
     assertThat(executionTree)
       .matches(
         describeExecutionTree(null).scope()
-          .child("eventSubProcessTask").scope()
+          .child(null).scope()
+            .child("eventSubProcessTask").scope()
         .done());
 
     completeTasksInOrder("eventSubProcessTask");
@@ -567,7 +581,8 @@ public class ProcessInstanceModificationEventSubProcessTest extends PluggablePro
         describeExecutionTree(null).scope()
           .child("task1").concurrent().noScope().up()
           .child(null).concurrent().noScope()
-            .child("eventSubProcessTask").scope()
+            .child(null).scope()
+              .child("eventSubProcessTask").scope()
         .done());
 
     completeTasksInOrder("task1", "eventSubProcessTask", "task2");
@@ -605,7 +620,8 @@ public class ProcessInstanceModificationEventSubProcessTest extends PluggablePro
         describeExecutionTree(null).scope()
           .child("task1").concurrent().noScope().up()
           .child(null).concurrent().noScope()
-            .child("eventSubProcessTask").scope()
+            .child(null).scope()
+              .child("eventSubProcessTask").scope()
         .done());
 
     completeTasksInOrder("task1", "task2", "eventSubProcessTask");
@@ -644,7 +660,8 @@ public class ProcessInstanceModificationEventSubProcessTest extends PluggablePro
         describeExecutionTree(null).scope()
           .child("task1").concurrent().noScope().up()
           .child(null).concurrent().noScope()
-            .child("eventSubProcessTask").scope()
+            .child(null).scope()
+              .child("eventSubProcessTask").scope()
         .done());
 
     completeTasksInOrder("task1", "task2", "eventSubProcessTask");
@@ -686,7 +703,8 @@ public class ProcessInstanceModificationEventSubProcessTest extends PluggablePro
         describeExecutionTree(null).scope()
           .child(null).scope()
             .child("task2").concurrent().noScope().up()
-            .child("eventSubProcessTask").concurrent().noScope()
+            .child(null).concurrent().noScope()
+              .child("eventSubProcessTask").scope()
         .done());
 
     completeTasksInOrder("task2", "eventSubProcessTask");
@@ -727,7 +745,8 @@ public class ProcessInstanceModificationEventSubProcessTest extends PluggablePro
         describeExecutionTree(null).scope()
           .child(null).scope()
             .child("task2").concurrent().noScope().up()
-            .child("eventSubProcessTask").concurrent().noScope()
+            .child(null).concurrent().noScope()
+              .child("eventSubProcessTask").scope()
         .done());
 
     completeTasksInOrder("task2", "eventSubProcessTask");
@@ -768,7 +787,8 @@ public class ProcessInstanceModificationEventSubProcessTest extends PluggablePro
         describeExecutionTree(null).scope()
           .child(null).scope()
             .child("task2").concurrent().noScope().up()
-            .child("eventSubProcessTask").concurrent().noScope()
+            .child(null).concurrent().noScope()
+              .child("eventSubProcessTask").scope()
         .done());
 
     completeTasksInOrder("task2", "eventSubProcessTask");

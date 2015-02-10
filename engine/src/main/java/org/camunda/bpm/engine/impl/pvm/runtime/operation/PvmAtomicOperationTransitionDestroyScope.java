@@ -12,17 +12,23 @@
  */
 package org.camunda.bpm.engine.impl.pvm.runtime.operation;
 
-import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
-import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
-import org.camunda.bpm.engine.impl.pvm.process.TransitionImpl;
-import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
-
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
+
+import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.pvm.PvmActivity;
+import org.camunda.bpm.engine.impl.pvm.PvmTransition;
+import org.camunda.bpm.engine.impl.pvm.process.TransitionImpl;
+import org.camunda.bpm.engine.impl.pvm.runtime.LegacyBehavior;
+import org.camunda.bpm.engine.impl.pvm.runtime.OutgoingExecution;
+import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 
 
 /**
  * @author Tom Baeyens
+ * @author Daniel Meyer
+ * @author Thorben Lindhauer
  */
 public class PvmAtomicOperationTransitionDestroyScope implements PvmAtomicOperation {
 
@@ -32,68 +38,24 @@ public class PvmAtomicOperationTransitionDestroyScope implements PvmAtomicOperat
     return false;
   }
 
-  @SuppressWarnings("unchecked")
   public void execute(PvmExecutionImpl execution) {
 
     // calculate the propagating execution
     PvmExecutionImpl propagatingExecution = null;
 
-    ActivityImpl activity = execution.getActivity();
-    // if this transition is crossing a scope boundary
+    PvmActivity activity = execution.getActivity();
+    List<PvmTransition> transitionsToTake = execution.getTransitionsToTake();
+    execution.setTransitionsToTake(null);
+
+    // check whether the current scope needs to be destroyed
     if (activity.isScope()) {
 
-      PvmExecutionImpl parentScopeInstance = null;
-      // if this is a concurrent execution crossing a scope boundary
-      if (execution.isConcurrent() && !execution.isScope()) {
-        // first remove the execution from the current root
-        PvmExecutionImpl concurrentRoot = execution.getParent();
-        parentScopeInstance = execution.getParent().getParent();
-
-        log.fine("moving concurrent "+execution+" one scope up under "+parentScopeInstance);
-        List<PvmExecutionImpl> parentScopeInstanceExecutions = (List<PvmExecutionImpl>) parentScopeInstance.getExecutions();
-        List<PvmExecutionImpl> concurrentRootExecutions = (List<PvmExecutionImpl>) concurrentRoot.getExecutions();
-        // if the parent scope had only one single scope child
-        if (parentScopeInstanceExecutions.size()==1) {
-          // it now becomes a concurrent execution
-          parentScopeInstanceExecutions.get(0).setConcurrent(true);
-        }
-
-        concurrentRootExecutions.remove(execution);
-        parentScopeInstanceExecutions.add(execution);
-        execution.setParent(parentScopeInstance);
-        execution.setActivity(activity);
+      if (execution.isConcurrent()) {
+        // legacy behavior
+        LegacyBehavior.get().destroyConcurrentScope(execution);
         propagatingExecution = execution;
-
-        // if there is only a single concurrent execution left
-        // in the concurrent root, auto-prune it.  meaning, the
-        // last concurrent child execution data should be cloned into
-        // the concurrent root.
-        if (concurrentRootExecutions.size()==1) {
-          PvmExecutionImpl lastConcurrent = concurrentRootExecutions.get(0);
-          if (lastConcurrent.isScope()) {
-            lastConcurrent.setConcurrent(false);
-
-          } else {
-            log.fine("merging last concurrent "+lastConcurrent+" into concurrent root "+concurrentRoot);
-
-            // We can't just merge the data of the lastConcurrent into the concurrentRoot.
-            // This is because the concurrent root might be in a takeAll-loop.  So the
-            // concurrent execution is the one that will be receiving the take
-            concurrentRoot.setActivity(lastConcurrent.getActivity());
-            concurrentRoot.setActive(lastConcurrent.isActive());
-            lastConcurrent.setReplacedBy(concurrentRoot);
-            lastConcurrent.remove();
-          }
-        }
-
-      } else if (execution.isConcurrent() && execution.isScope()) {
-        log.fine("scoped concurrent "+execution+" becomes concurrent and remains under "+execution.getParent());
-
-        // TODO!
-        execution.destroy();
-        propagatingExecution = execution;
-
-      } else {
+      }
+      else {
         propagatingExecution = execution.getParent();
         propagatingExecution.setActivity(execution.getActivity());
         propagatingExecution.setTransition(execution.getTransition());
@@ -104,27 +66,61 @@ public class PvmAtomicOperationTransitionDestroyScope implements PvmAtomicOperat
       }
 
     } else {
+      // activity is not scope => nothing to do
       propagatingExecution = execution;
     }
 
-    // if there is another scope element that is ended
-    ScopeImpl nextOuterScopeElement = activity.getParent();
-    TransitionImpl transition = propagatingExecution.getTransition();
-    ActivityImpl destination = transition.getDestination();
-
-    if (transitionLeavesNextOuterScope(nextOuterScopeElement, activity, destination)) {
-      propagatingExecution.setActivity((ActivityImpl) nextOuterScopeElement);
-      propagatingExecution.performOperation(TRANSITION_NOTIFY_LISTENER_END);
-    } else {
-      // while executing the transition, the activityInstance is 'null'
-      // (we are not executing an activity)
-      propagatingExecution.setActivityInstanceId(null);
-      propagatingExecution.performOperation(TRANSITION_NOTIFY_LISTENER_TAKE);
+    // take the specified transitions
+    if (transitionsToTake.isEmpty()) {
+      throw new ProcessEngineException(execution.toString() + ": No outgoing transitions from "
+          + "activity " + activity);
     }
-  }
+    else if (transitionsToTake.size() == 1) {
+      propagatingExecution.setTransition(transitionsToTake.get(0));
+      propagatingExecution.take();
+    }
+    else {
+      propagatingExecution.inactivate();
 
-  public boolean transitionLeavesNextOuterScope(ScopeImpl nextScopeElement, ActivityImpl current, ActivityImpl destination) {
-    return !current.isCancelScope() && !current.isConcurrent() && !nextScopeElement.contains(destination);
+      List<OutgoingExecution> outgoingExecutions = new ArrayList<OutgoingExecution>();
+
+      for (int i = 0; i < transitionsToTake.size(); i++) {
+        PvmTransition transition = transitionsToTake.get(i);
+
+        PvmExecutionImpl scopeExecution = propagatingExecution.isScope() ?
+            propagatingExecution : propagatingExecution.getParent();
+
+        // reuse concurrent, propagating execution for first transition
+        PvmExecutionImpl concurrentExecution = null;
+        if (i == 0) {
+          concurrentExecution = propagatingExecution;
+        }
+        else {
+          concurrentExecution = scopeExecution.createConcurrentExecution();
+
+          if (i == 1 && !propagatingExecution.isConcurrent()) {
+            outgoingExecutions.remove(0);
+            // get ahold of the concurrent execution that replaced the scope propagating execution
+            PvmExecutionImpl replacingExecution = null;
+            for (PvmExecutionImpl concurrentChild : scopeExecution.getExecutions())  {
+              if (!(concurrentChild == propagatingExecution)) {
+                replacingExecution = concurrentChild;
+                break;
+              }
+            }
+
+            outgoingExecutions.add(new OutgoingExecution(replacingExecution, transitionsToTake.get(0)));
+          }
+        }
+
+        outgoingExecutions.add(new OutgoingExecution(concurrentExecution, transition));
+      }
+
+      for (OutgoingExecution outgoingExecution : outgoingExecutions) {
+        outgoingExecution.take();
+      }
+    }
+
   }
 
   public String getCanonicalName() {

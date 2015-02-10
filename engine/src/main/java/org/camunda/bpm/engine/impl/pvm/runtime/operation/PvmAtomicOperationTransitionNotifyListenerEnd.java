@@ -33,6 +33,7 @@ public class PvmAtomicOperationTransitionNotifyListenerEnd extends PvmAtomicOper
   @Override
   protected void eventNotificationsCompleted(PvmExecutionImpl execution) {
     super.eventNotificationsCompleted(execution);
+
     execution.performOperation(TRANSITION_DESTROY_SCOPE);
   }
 

@@ -1852,7 +1852,12 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     Task task1 = tasks.get(0);
     Task task2 = tasks.get(1);
 
-    taskService.complete(task1.getId());
+    try {
+      taskService.complete(task1.getId());
+      fail("this should not be successful, as the execution of a suspended instance is resumed");
+    } catch (SuspendedEntityInteractionException e) {
+      // this is expected to fail
+    }
 
     try {
       taskService.complete(task2.getId());
@@ -1863,6 +1868,7 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
 
     // should be successful after reactivation
     runtimeService.activateProcessInstanceById(instance.getId());
+    taskService.complete(task1.getId());
     taskService.complete(task2.getId());
 
     assertEquals(0, runtimeService.createProcessInstanceQuery().count());
@@ -1878,7 +1884,12 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     Task task1 = tasks.get(0);
     Task task2 = tasks.get(1);
 
-    taskService.complete(task1.getId());
+    try {
+      taskService.complete(task1.getId());
+      fail("this should not be successful, as the execution of a suspended instance is resumed");
+    } catch (SuspendedEntityInteractionException e) {
+      // this is expected to fail
+    }
 
     try {
       taskService.complete(task2.getId());
@@ -1889,6 +1900,7 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
 
     // should be successful after reactivation
     runtimeService.activateProcessInstanceByProcessDefinitionId(instance.getProcessDefinitionId());
+    taskService.complete(task1.getId());
     taskService.complete(task2.getId());
 
     assertEquals(0, runtimeService.createProcessInstanceQuery().count());
@@ -1908,7 +1920,12 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     Task task1 = tasks.get(0);
     Task task2 = tasks.get(1);
 
-    taskService.complete(task1.getId());
+    try {
+      taskService.complete(task1.getId());
+      fail("this should not be successful, as the execution of a suspended instance is resumed");
+    } catch (SuspendedEntityInteractionException e) {
+      // this is expected to fail
+    }
 
     try {
       taskService.complete(task2.getId());
@@ -1919,6 +1936,7 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
 
     // should be successful after reactivation
     runtimeService.activateProcessInstanceByProcessDefinitionKey(processDefinition.getKey());
+    taskService.complete(task1.getId());
     taskService.complete(task2.getId());
 
     assertEquals(0, runtimeService.createProcessInstanceQuery().count());

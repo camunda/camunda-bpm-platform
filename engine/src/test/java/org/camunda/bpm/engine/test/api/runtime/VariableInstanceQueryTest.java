@@ -2080,22 +2080,23 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
 
     ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
     assertNotNull(tree);
-    assertEquals(5, tree.getChildActivityInstances().length);
+    ActivityInstance[] subprocessInstances = tree.getActivityInstances("SubProcess_1");
+    assertEquals(5, subprocessInstances.length);
 
     //when
-    String activityInstanceId1 = tree.getChildActivityInstances()[0].getId();
+    String activityInstanceId1 = subprocessInstances[0].getId();
     VariableInstanceQuery query1 = runtimeService.createVariableInstanceQuery().activityInstanceIdIn(activityInstanceId1);
 
-    String activityInstanceId2 = tree.getChildActivityInstances()[1].getId();
+    String activityInstanceId2 = subprocessInstances[1].getId();
     VariableInstanceQuery query2 = runtimeService.createVariableInstanceQuery().activityInstanceIdIn(activityInstanceId2);
 
-    String activityInstanceId3 = tree.getChildActivityInstances()[2].getId();
+    String activityInstanceId3 = subprocessInstances[2].getId();
     VariableInstanceQuery query3 = runtimeService.createVariableInstanceQuery().activityInstanceIdIn(activityInstanceId3);
 
-    String activityInstanceId4 = tree.getChildActivityInstances()[3].getId();
+    String activityInstanceId4 = subprocessInstances[3].getId();
     VariableInstanceQuery query4 = runtimeService.createVariableInstanceQuery().activityInstanceIdIn(activityInstanceId4);
 
-    String activityInstanceId5 = tree.getChildActivityInstances()[4].getId();
+    String activityInstanceId5 = subprocessInstances[4].getId();
     VariableInstanceQuery query5 = runtimeService.createVariableInstanceQuery().activityInstanceIdIn(activityInstanceId5);
 
     // then
@@ -2184,7 +2185,8 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
     Task task = taskService.createTaskQuery().singleResult();
     taskService.setVariableLocal(task.getId(), "taskVariable", "taskVariableValue");
 
-    ActivityInstance taskActivityInstance = subProcessActivityInstance.getChildActivityInstances()[0];
+    // skip mi body instance
+    ActivityInstance taskActivityInstance = subProcessActivityInstance.getChildActivityInstances()[0].getChildActivityInstances()[0];
     VariableInstanceQuery query3 = runtimeService.createVariableInstanceQuery().activityInstanceIdIn(taskActivityInstance.getId());
 
     // then

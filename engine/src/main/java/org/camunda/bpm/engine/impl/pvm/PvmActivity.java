@@ -15,44 +15,71 @@ package org.camunda.bpm.engine.impl.pvm;
 
 import java.util.List;
 
+import org.camunda.bpm.engine.delegate.ExecutionListener;
+import org.camunda.bpm.engine.impl.core.variable.mapping.IoMapping;
+import org.camunda.bpm.engine.impl.pvm.delegate.ActivityBehavior;
+import org.camunda.bpm.engine.impl.pvm.process.ActivityStartBehavior;
+
 
 /**
+ * Defines an activity insisde a process. Note that the term "activity" is meant to be
+ * understood in a broader sense than in BPMN: everything inside a process which can have incoming
+ * or outgoing sequence flows (transitions) are activities. Examples: events, tasks, gateways,
+ * subprocesses ...
+ *
  * @author Tom Baeyens
  * @author Daniel Meyer
  */
 public interface PvmActivity extends PvmScope {
 
-  boolean isAsync();
+  /**
+   * The inner behavior of an activity. The inner behavior is the logic which is executed after
+   * the {@link ExecutionListener#EVENTNAME_START start} listeners have been executed.
+   *
+   * In case the activity {@link #isScope() is scope}, a new execution will be created
+   *
+   * @return the inner behavior of the activity
+   */
+  ActivityBehavior getActivityBehavior();
 
   /**
-   * Indicates whether this activity is interrupting. If true, the activity
-   * will interrupt and cancel all other activities inside the same scope
-   * before it is executed.
+   * The start behavior of an activity. The start behavior is executed before the
+   * {@link ExecutionListener#EVENTNAME_START start} listeners of the activity are executed.
    *
-   * @return true if this activity is interrupting. False otherwise.
+   * @return the start behavior of an activity.
    */
-  boolean isCancelScope();
+  ActivityStartBehavior getActivityStartBehavior();
 
   /**
-   * Indicates whether this activity is concurrent. If true, the activity
-   * will be executed concurrently to other activities which are part of
-   * the same scope.
-   *
-   * @return true if this activity is concurrent. False otherwise.
+   * Finds and returns an outgoing sequence flow (transition) by it's id.
+   * @param transitionId the id of the transition to find
+   * @return the transition or null in case it cannot be found
    */
-  boolean isConcurrent();
+  PvmTransition findOutgoingTransition(String transitionId);
 
-  /** returns the scope of this activity. Must contain this activity but may or
-   * may not be the direct parent. */
-  PvmScope getScope();
-
-  boolean isScope();
-
-  PvmScope getParent();
-
-  List<PvmTransition> getIncomingTransitions();
-
+  /**
+   * @return the list of outgoing sequence flows (transitions)
+   */
   List<PvmTransition> getOutgoingTransitions();
 
-  PvmTransition findOutgoingTransition(String transitionId);
+  /**
+   * @return the list of incoming sequence flows (transitions)
+   */
+  List<PvmTransition> getIncomingTransitions();
+
+  /**
+   * Indicates whether the activity is executed asynchronously.
+   * This can be done <em>after</em> the {@link #getActivityStartBehavior() activity start behavior} and
+   * <em>before</em> the {@link ExecutionListener#EVENTNAME_START start} listeners are invoked.
+   *
+   * @return true if the activity is executed asynchronously.
+   */
+  boolean isAsyncBefore();
+
+  /**
+   * Indicates whether execution after this execution should continue asynchronously.
+   * This can be done <em>after</em> the {@link ExecutionListener#EVENTNAME_END end} listeners are invoked.
+   * @return true if execution after this activity continues asynchronously.
+   */
+  boolean isAsyncAfter();
 }

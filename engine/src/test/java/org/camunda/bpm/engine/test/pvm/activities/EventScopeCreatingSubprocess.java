@@ -41,12 +41,16 @@ public class EventScopeCreatingSubprocess implements CompositeActivityBehavior {
     }
   }
 
+  public void concurrentChildExecutionEnded(ActivityExecution scopeExecution, ActivityExecution endedExecution) {
+    endedExecution.remove();
+    scopeExecution.tryPruneLastConcurrentChild();
+  }
+
   /*
    * Incoming execution is transformed into an event scope,
    * new, non-concurrent execution leaves activity
    */
-  @SuppressWarnings("unchecked")
-  public void lastExecutionEnded(ActivityExecution execution) {
+  public void complete(ActivityExecution execution) {
 
     ActivityExecution outgoingExecution = execution.getParent().createExecution();
     outgoingExecution.setConcurrent(false);
@@ -61,27 +65,8 @@ public class EventScopeCreatingSubprocess implements CompositeActivityBehavior {
     if(outgoingTransitions.isEmpty()) {
       outgoingExecution.end(true);
     }else {
-      outgoingExecution.takeAll(outgoingTransitions, Collections.EMPTY_LIST);
+      outgoingExecution.leaveActivityViaTransitions(outgoingTransitions, Collections.EMPTY_LIST);
     }
-  }
-
-
-  // used by timers
-  @SuppressWarnings("unchecked")
-  public void timerFires(ActivityExecution execution, String signalName, Object signalData) throws Exception {
-    PvmActivity timerActivity = execution.getActivity();
-    boolean isInterrupting = (Boolean) timerActivity.getProperty("isInterrupting");
-    List<ActivityExecution> recyclableExecutions = null;
-    if (isInterrupting) {
-      recyclableExecutions = removeAllExecutions(execution);
-    } else {
-      recyclableExecutions = Collections.EMPTY_LIST;
-    }
-    execution.takeAll(timerActivity.getOutgoingTransitions(), recyclableExecutions);
-  }
-
-  private List<ActivityExecution> removeAllExecutions(ActivityExecution execution) {
-    return null;
   }
 
 }

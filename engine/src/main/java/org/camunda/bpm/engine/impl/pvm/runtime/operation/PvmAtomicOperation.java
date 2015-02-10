@@ -31,6 +31,7 @@ public interface PvmAtomicOperation extends CoreAtomicOperation<PvmExecutionImpl
   PvmAtomicOperation ACTIVITY_START = new PvmAtomicOperationActivityStart();
   PvmAtomicOperation ACTIVITY_START_CONCURRENT = new PvmAtomicOperationActivityStartConcurrent();
   PvmAtomicOperation ACTIVITY_START_CANCEL_SCOPE = new PvmAtomicOperationActivityStartCancelScope();
+  PvmAtomicOperation ACTIVITY_START_INTERRUPT_SCOPE = new PvmAtomicOperationActivityStartInterruptEventScope();
   PvmAtomicOperation ACTIVITY_START_CREATE_SCOPE = new PvmAtomicOperationActivityStartCreateScope();
   PvmAtomicOperation ACTIVITY_INIT_STACK = new PvmAtomicOperationActivityInitStack();
   PvmAtomicOperation ACTIVITY_INIT_STACK_NOTIFY_LISTENER_START = new PvmAtomicOperationActivityInitStackNotifyListenerStart();
@@ -44,7 +45,7 @@ public interface PvmAtomicOperation extends CoreAtomicOperation<PvmExecutionImpl
   PvmAtomicOperation TRANSITION_NOTIFY_LISTENER_TAKE = new PvmAtomicOperationTransitionNotifyListenerTake();
   PvmAtomicOperation TRANSITION_START_NOTIFY_LISTENER_TAKE = new PvmAtomicOperationStartTransitionNotifyListenerTake();
   PvmAtomicOperation TRANSITION_CREATE_SCOPE = new PvmAtomicOperationTransitionCreateScope();
-  PvmAtomicOperation TRANSITION_CANCEL_SCOPE = new PvmAtomicOperationTransitionCancelScope();
+  PvmAtomicOperation TRANSITION_INTERRUPT_FLOW_SCOPE = new PvmAtomicOperationsTransitionInterruptFlowScope();
   PvmAtomicOperation TRANSITION_NOTIFY_LISTENER_START = new PvmAtomicOperationTransitionNotifyListenerStart();
 
   PvmAtomicOperation DELETE_CASCADE = new PvmAtomicOperationDeleteCascade();

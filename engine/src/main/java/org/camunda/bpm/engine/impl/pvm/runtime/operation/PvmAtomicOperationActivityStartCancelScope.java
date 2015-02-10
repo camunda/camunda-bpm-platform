@@ -12,29 +12,30 @@
  */
 package org.camunda.bpm.engine.impl.pvm.runtime.operation;
 
+import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 
 /**
- * Cancel scope operation performed when an execution starts at an {@link ActivityImpl#isCancelScope()}
+ * Cancel scope operation performed when an execution starts at an {@link ActivityImpl#isCancelActivity()}
  * activity. This is used when an execution is set to the activity without entering it through a transition.
- * See {@link PvmAtomicOperationCancelScope} for more details on "cancel scope" behavior.
+ * See {@link PvmAtomicOperationCancelActivity} for more details on "cancel scope" behavior.
  *
  * @author Daniel Meyer
  * @author Roman Smirnov
  *
  */
-public class PvmAtomicOperationActivityStartCancelScope extends PvmAtomicOperationCancelScope {
+public class PvmAtomicOperationActivityStartCancelScope extends PvmAtomicOperationCancelActivity {
 
   public String getCanonicalName() {
     return "activity-start-cancel-scope";
   }
 
-  protected void scopeCancelled(PvmExecutionImpl execution) {
-    execution.performOperation(ACTIVITY_START);
+  protected void activityCancelled(PvmExecutionImpl execution) {
+    execution.performOperation(ACTIVITY_START_CREATE_SCOPE);
   }
 
-  protected ActivityImpl getCancellingActivity(PvmExecutionImpl execution) {
+  protected PvmActivity getCancellingActivity(PvmExecutionImpl execution) {
     return execution.getNextActivity();
   }
 

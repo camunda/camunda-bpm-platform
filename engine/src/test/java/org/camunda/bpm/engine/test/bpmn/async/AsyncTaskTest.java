@@ -37,6 +37,7 @@ import org.camunda.bpm.engine.variable.Variables;
 public class AsyncTaskTest extends PluggableProcessEngineTestCase {
 
   public static boolean INVOCATION;
+  public static int NUM_INVOCATIONS = 0;
 
   @Deployment
   public void testAsyncServiceNoListeners() {
@@ -95,19 +96,38 @@ public class AsyncTaskTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
-  public void testAsyncServiceMultiInstance() {
-    INVOCATION = false;
+  public void testAsyncServiceSequentialMultiInstance() {
+    NUM_INVOCATIONS = 0;
     // start process
     runtimeService.startProcessInstanceByKey("asyncService");
-    // now there should be one job in the database:
+    // now there should be one job for the multi-instance body:
     assertEquals(1, managementService.createJobQuery().count());
     // the service was not invoked:
-    assertFalse(INVOCATION);
+    assertEquals(0, NUM_INVOCATIONS);
 
     executeAvailableJobs();
 
     // the service was invoked
-    assertTrue(INVOCATION);
+    assertEquals(5, NUM_INVOCATIONS);
+    // and the job is done
+    assertEquals(0, managementService.createJobQuery().count());
+  }
+
+
+  @Deployment
+  public void testAsyncServiceParallelMultiInstance() {
+    NUM_INVOCATIONS = 0;
+    // start process
+    runtimeService.startProcessInstanceByKey("asyncService");
+    // now there should be one job for the multi-instance body:
+    assertEquals(1, managementService.createJobQuery().count());
+    // the service was not invoked:
+    assertEquals(0, NUM_INVOCATIONS);
+
+    executeAvailableJobs();
+
+    // the service was invoked
+    assertEquals(5, NUM_INVOCATIONS);
     // and the job is done
     assertEquals(0, managementService.createJobQuery().count());
   }

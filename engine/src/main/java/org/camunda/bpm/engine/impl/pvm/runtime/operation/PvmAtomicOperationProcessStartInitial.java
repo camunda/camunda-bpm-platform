@@ -14,6 +14,7 @@
 package org.camunda.bpm.engine.impl.pvm.runtime.operation;
 
 import org.camunda.bpm.engine.delegate.ExecutionListener;
+import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
@@ -42,7 +43,7 @@ public class PvmAtomicOperationProcessStartInitial extends PvmAtomicOperationAct
 
     super.eventNotificationsCompleted(execution);
 
-    ActivityImpl activity = execution.getActivity();
+    PvmActivity activity = execution.getActivity();
     ProcessDefinitionImpl processDefinition = execution.getProcessDefinition();
 
     ProcessInstanceStartContext processInstanceStartContext = execution.getProcessInstanceStartContext();

@@ -12,7 +12,7 @@
  */
 package org.camunda.bpm.engine.impl.pvm.runtime.operation;
 
-import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
+import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 
 
@@ -22,12 +22,19 @@ import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 public class PvmAtomicOperationTransitionCreateScope extends PvmAtomicOperationCreateScope {
 
   public boolean isAsync(PvmExecutionImpl execution) {
-    ActivityImpl activity = execution.getActivity();
+    PvmActivity activity = execution.getActivity();
     return activity.isAsyncBefore();
   }
 
   public String getCanonicalName() {
     return "transition-create-scope";
+  }
+
+  public void execute(PvmExecutionImpl execution) {
+
+    // reset activity instance id before creating the scope
+    execution.setActivityInstanceId(execution.getParentActivityInstanceId());
+    super.execute(execution);
   }
 
   protected void scopeCreated(PvmExecutionImpl execution) {

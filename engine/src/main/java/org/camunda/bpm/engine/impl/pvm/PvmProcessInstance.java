@@ -29,6 +29,8 @@ public interface PvmProcessInstance extends PvmExecution {
 
   PvmExecution findExecution(String activityId);
 
+  List<PvmExecution> findExecutions(String activityId);
+
   List<String> findActiveActivityIds();
 
   boolean isEnded();

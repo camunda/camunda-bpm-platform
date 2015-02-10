@@ -41,7 +41,6 @@ public interface AtomicOperation extends CoreAtomicOperation<PvmExecutionImpl> {
   AtomicOperation TRANSITION_DESTROY_SCOPE = PvmAtomicOperation.TRANSITION_DESTROY_SCOPE;
   AtomicOperation TRANSITION_NOTIFY_LISTENER_TAKE = PvmAtomicOperation.TRANSITION_NOTIFY_LISTENER_TAKE;
   AtomicOperation TRANSITION_CREATE_SCOPE = PvmAtomicOperation.TRANSITION_CREATE_SCOPE;
-  AtomicOperation TRANSITION_CANCEL_SCOPE = PvmAtomicOperation.TRANSITION_CANCEL_SCOPE;
   AtomicOperation TRANSITION_NOTIFY_LISTENER_START = PvmAtomicOperation.TRANSITION_NOTIFY_LISTENER_START;
 
   AtomicOperation DELETE_CASCADE = PvmAtomicOperation.DELETE_CASCADE;

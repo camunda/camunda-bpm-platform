@@ -39,7 +39,7 @@ import org.camunda.bpm.engine.impl.pvm.PvmException;
  * @author Roman Smirnov
  *
  */
-public class StageActivityBehavior extends StageOrTaskActivityBehavior implements CompositeActivityBehavior {
+public class StageActivityBehavior extends StageOrTaskActivityBehavior implements CmmnCompositeActivityBehavior {
 
   // start /////////////////////////////////////////////////////////////////////
 

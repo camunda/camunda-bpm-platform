@@ -18,6 +18,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Stack;
 
+import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.persistence.entity.ActivityInstanceImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.TransitionInstanceImpl;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
@@ -129,6 +130,10 @@ public class ActivityInstanceAssert {
       activityInstanceStack.push(newInstance);
 
       return this;
+    }
+
+    public ActivityInstanceTreeBuilder beginMiBody(String activityId) {
+      return beginScope(activityId + BpmnParse.MULTI_INSTANCE_BODY_ID_SUFFIX);
     }
 
     public ActivityInstanceTreeBuilder activity(String activityId) {

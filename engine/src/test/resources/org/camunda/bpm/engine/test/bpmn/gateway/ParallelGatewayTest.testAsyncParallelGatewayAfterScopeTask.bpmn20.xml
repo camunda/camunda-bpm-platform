@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions" 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:camunda="http://activiti.org/bpmn"
+  targetNamespace="Examples">
+  
+  <process id="process">
+  
+    <startEvent id="theStart" />
+    <sequenceFlow id="flow1" sourceRef="theStart" targetRef="fork" />
+    
+    <parallelGateway id="fork" />
+    <sequenceFlow id="flow2" sourceRef="fork" targetRef="join" />
+    
+    <sequenceFlow id="flow3" sourceRef="fork" targetRef="scopeTask" />
+    <userTask id="scopeTask"/>
+    <boundaryEvent id="boundaryTimer" cancelActivity="true" attachedToRef="scopeTask">
+      <timerEventDefinition>
+        <timeDuration>P10D</timeDuration>
+      </timerEventDefinition>
+    </boundaryEvent>
+    <sequenceFlow id="flow6" sourceRef="boundaryTimer" targetRef="theEnd2" />
+    <endEvent id="theEnd2" />
+      
+    <sequenceFlow id="flow4" sourceRef="scopeTask" targetRef="join" />
+    
+    <parallelGateway id="join" camunda:asyncBefore="true" />
+    <sequenceFlow id="flow5" sourceRef="join" targetRef="theEnd" />
+   
+    <endEvent id="theEnd" />
+    
+    
+  </process>
+
+</definitions>

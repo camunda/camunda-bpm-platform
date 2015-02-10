@@ -22,7 +22,7 @@ import java.util.logging.Logger;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.cmmn.behavior.CmmnActivityBehavior;
-import org.camunda.bpm.engine.impl.cmmn.behavior.CompositeActivityBehavior;
+import org.camunda.bpm.engine.impl.cmmn.behavior.CmmnCompositeActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.behavior.TransferVariablesActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
 import org.camunda.bpm.engine.impl.pvm.delegate.SubProcessActivityBehavior;
@@ -103,8 +103,8 @@ public abstract class AbstractAtomicOperationCaseExecutionComplete extends Abstr
     CmmnExecution parent = execution.getParent();
     if (parent != null) {
       CmmnActivityBehavior behavior = getActivityBehavior(parent);
-      if (behavior instanceof CompositeActivityBehavior) {
-        CompositeActivityBehavior compositeBehavior = (CompositeActivityBehavior) behavior;
+      if (behavior instanceof CmmnCompositeActivityBehavior) {
+        CmmnCompositeActivityBehavior compositeBehavior = (CmmnCompositeActivityBehavior) behavior;
         compositeBehavior.handleChildCompletion(parent, execution);
       }
     }

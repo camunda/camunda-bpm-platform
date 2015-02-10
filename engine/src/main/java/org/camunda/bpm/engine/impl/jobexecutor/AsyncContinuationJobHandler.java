@@ -20,7 +20,7 @@ import java.util.Map;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
-import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
+import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.process.TransitionImpl;
 import org.camunda.bpm.engine.impl.pvm.runtime.operation.PvmAtomicOperation;
 
@@ -79,8 +79,8 @@ public class AsyncContinuationJobHandler implements JobHandler {
 
     // reset transition id.
     if (transitionId != null) {
-      ActivityImpl activity = execution.getActivity();
-      TransitionImpl transition = activity.findOutgoingTransition(transitionId);
+      PvmActivity activity = execution.getActivity();
+      TransitionImpl transition = (TransitionImpl) activity.findOutgoingTransition(transitionId);
       execution.setTransition(transition);
     }
 

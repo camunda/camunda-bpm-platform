@@ -12,17 +12,15 @@
  */
 package org.camunda.bpm.engine.impl.bpmn.behavior;
 
-import org.camunda.bpm.engine.impl.pvm.PvmActivity;
-import org.camunda.bpm.engine.impl.pvm.delegate.ActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
+import org.camunda.bpm.engine.impl.pvm.process.ActivityStartBehavior;
 
 /**
  * <p>The BPMN terminate End Event.</p>
  *
- * <p>The hosting activity must be marked {@link PvmActivity#isCancelScope()} since it will
- * cancel the scope in which it is embedded. When this activitiy is executed, the sope execution
- * will have performed "cancel scope" behavior and the {@link ActivityBehavior} will be called on
- * the scope execution.</p>
+ * <p>The start behavior of the event based gateway is {@link ActivityStartBehavior#INTERRUPT_FLOW_SCOPE}.
+ * as a result, the current scope will be interrupted (all concurrent executions cancelled) and this
+ * behavior is entered with the scope execution.</p>
  *
  *
  * @author Daniel Meyer

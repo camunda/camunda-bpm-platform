@@ -11,7 +11,7 @@
     
     <serviceTask id="serviceTask" activiti:class="org.camunda.bpm.engine.test.bpmn.event.error.ThrowBpmnErrorDelegate" />
     
-    <boundaryEvent id="catchError" cancelActivity="false" attachedToRef="serviceTask">
+    <boundaryEvent id="catchError" attachedToRef="serviceTask">
       <errorEventDefinition />
     </boundaryEvent>
     

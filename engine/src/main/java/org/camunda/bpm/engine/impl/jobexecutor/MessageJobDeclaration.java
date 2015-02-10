@@ -14,7 +14,7 @@ package org.camunda.bpm.engine.impl.jobexecutor;
 
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
-import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
+import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.runtime.AtomicOperation;
 
 /**
@@ -46,7 +46,7 @@ public class MessageJobDeclaration extends JobDeclaration<MessageEntity> {
 
   public void setJobHandlerConfiguration(MessageEntity message, ExecutionEntity execution, AtomicOperation executionOperation) {
     String configuration = executionOperation.getCanonicalName();
-    ActivityImpl activity = execution.getActivity();
+    PvmActivity activity = execution.getActivity();
 
     if(activity != null && activity.isAsyncAfter()) {
       if(execution.getTransition() != null) {

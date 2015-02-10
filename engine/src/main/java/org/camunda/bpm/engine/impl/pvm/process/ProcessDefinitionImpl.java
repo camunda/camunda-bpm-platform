@@ -22,8 +22,10 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.delegate.BaseDelegateExecution;
 import org.camunda.bpm.engine.impl.core.delegate.CoreActivityBehavior;
+import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessDefinition;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessInstance;
+import org.camunda.bpm.engine.impl.pvm.PvmScope;
 import org.camunda.bpm.engine.impl.pvm.runtime.ExecutionImpl;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 
@@ -46,6 +48,8 @@ public class ProcessDefinitionImpl extends ScopeImpl implements PvmProcessDefini
   public ProcessDefinitionImpl(String id) {
     super(id, null);
     processDefinition = this;
+    // the process definition is always "a sub process scope"
+    isSubProcessScope = true;
   }
 
   public PvmProcessInstance createProcessInstance() {
@@ -83,7 +87,7 @@ public class ProcessDefinitionImpl extends ScopeImpl implements PvmProcessDefini
 
     List<ActivityImpl> initialActivityStack = getInitialActivityStack(initial);
 
-    for (ActivityImpl initialActivity: initialActivityStack) {
+    for (PvmActivity initialActivity: initialActivityStack) {
       if (initialActivity.isScope()) {
         scopeInstance = scopeInstance.createExecution();
         scopeInstance.setActivity(initialActivity);
@@ -109,7 +113,7 @@ public class ProcessDefinitionImpl extends ScopeImpl implements PvmProcessDefini
       ActivityImpl activity = startActivity;
       while (activity!=null) {
         initialActivityStack.add(0, activity);
-        activity = activity.getParentActivity();
+        activity = activity.getParentFlowScopeActivity();
       }
       initialActivityStacks.put(startActivity, initialActivityStack);
     }
@@ -190,15 +194,23 @@ public class ProcessDefinitionImpl extends ScopeImpl implements PvmProcessDefini
     return participantProcess;
   }
 
-  public ScopeImpl getParentScope() {
-    return null;
-  }
-
-  public ScopeImpl getParent() {
-    return null;
-  }
-
   public boolean isScope() {
+    return true;
+  }
+
+  public PvmScope getEventScope() {
+    return null;
+  }
+
+  public ScopeImpl getFlowScope() {
+    return null;
+  }
+
+  public PvmScope getLevelOfSubprocessScope() {
+    return null;
+  }
+
+  public boolean isSubProcessScope() {
     return true;
   }
 

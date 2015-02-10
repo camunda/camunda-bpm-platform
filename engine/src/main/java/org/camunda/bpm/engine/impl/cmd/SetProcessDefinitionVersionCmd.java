@@ -37,7 +37,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
-import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
+import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 
@@ -198,7 +198,7 @@ public class SetProcessDefinitionVersionCmd implements Command<Void>, Serializab
     // check that the new process definition version contains the current activity
     if (execution.getActivity() != null) {
       String activityId = execution.getActivity().getId();
-      ActivityImpl newActivity = newProcessDefinition.findActivity(activityId);
+      PvmActivity newActivity = newProcessDefinition.findActivity(activityId);
 
       if (newActivity == null) {
         throw new ProcessEngineException(

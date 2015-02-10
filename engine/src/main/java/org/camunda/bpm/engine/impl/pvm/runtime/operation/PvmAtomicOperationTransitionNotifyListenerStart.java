@@ -13,7 +13,7 @@
 package org.camunda.bpm.engine.impl.pvm.runtime.operation;
 
 import org.camunda.bpm.engine.delegate.ExecutionListener;
-import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
+import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 import org.camunda.bpm.engine.impl.pvm.process.TransitionImpl;
 import org.camunda.bpm.engine.impl.pvm.runtime.ExecutionStartContext;
@@ -33,35 +33,27 @@ public class PvmAtomicOperationTransitionNotifyListenerStart extends PvmAtomicOp
     return ExecutionListener.EVENTNAME_START;
   }
 
-  @Override
   protected void eventNotificationsCompleted(PvmExecutionImpl execution) {
 
     super.eventNotificationsCompleted(execution);
 
     TransitionImpl transition = execution.getTransition();
-    ActivityImpl destination;
+    PvmActivity destination;
     if(transition == null) { // this is null after async cont. -> transition is not stored in execution
       destination = execution.getActivity();
     } else {
       destination = transition.getDestination();
     }
-    ActivityImpl activity = execution.getActivity();
-    if (activity!=destination) {
-      ActivityImpl nextScope = PvmAtomicOperationTransitionNotifyListenerTake.findNextScope(activity, destination);
-      execution.setActivity(nextScope);
-      execution.performOperation(TRANSITION_CREATE_SCOPE);
-    } else {
-      execution.setTransition(null);
-      execution.setActivity(destination);
+    execution.setTransition(null);
+    execution.setActivity(destination);
 
-      ExecutionStartContext executionStartContext = execution.getExecutionStartContext();
-      if (executionStartContext != null) {
-        executionStartContext.executionStarted(execution);
-        execution.disposeExecutionStartContext();
-      }
-
-      execution.performOperation(ACTIVITY_EXECUTE);
+    ExecutionStartContext executionStartContext = execution.getExecutionStartContext();
+    if (executionStartContext != null) {
+      executionStartContext.executionStarted(execution);
+      execution.disposeExecutionStartContext();
     }
+
+    execution.performOperation(ACTIVITY_EXECUTE);
   }
 
   public String getCanonicalName() {

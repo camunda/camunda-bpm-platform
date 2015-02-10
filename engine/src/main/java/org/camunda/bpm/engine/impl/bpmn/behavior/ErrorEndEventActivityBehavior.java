@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -12,7 +12,6 @@
  */
 package org.camunda.bpm.engine.impl.bpmn.behavior;
 
-import org.camunda.bpm.engine.impl.bpmn.helper.ErrorPropagation;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 
 
@@ -20,16 +19,16 @@ import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
  * @author Joram Barrez
  * @author Falko Menge
  */
-public class ErrorEndEventActivityBehavior extends FlowNodeActivityBehavior {
-  
+public class ErrorEndEventActivityBehavior extends AbstractBpmnActivityBehavior {
+
   protected String errorCode;
-  
+
   public ErrorEndEventActivityBehavior(String errorCode) {
     this.errorCode = errorCode;
   }
-  
-  public void execute(ActivityExecution execution) throws Exception {    
-    ErrorPropagation.propagateError(errorCode, null, execution);    
+
+  public void execute(ActivityExecution execution) throws Exception {
+    propagateError(errorCode, null, execution);
   }
 
   public String getErrorCode() {
@@ -38,5 +37,5 @@ public class ErrorEndEventActivityBehavior extends FlowNodeActivityBehavior {
   public void setErrorCode(String errorCode) {
     this.errorCode = errorCode;
   }
-  
+
 }

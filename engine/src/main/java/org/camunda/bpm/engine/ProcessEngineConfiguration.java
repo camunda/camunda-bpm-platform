@@ -20,8 +20,8 @@ import javax.sql.DataSource;
 import org.camunda.bpm.engine.impl.cfg.BeansConfigurationHelper;
 import org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.cfg.StandaloneProcessEngineConfiguration;
-import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
+import org.camunda.bpm.engine.impl.pvm.runtime.LegacyBehavior;
 import org.camunda.bpm.engine.variable.type.ValueTypeResolver;
 
 
@@ -131,12 +131,12 @@ public abstract class ProcessEngineConfiguration {
   protected String history = HISTORY_AUDIT;
   protected boolean jobExecutorActivate;
   protected boolean jobExecutorDeploymentAware = false;
-  
+
   /**
-   * The flag will be used inside the method "JobManager#send()". It will be used to decide whether to notify the 
-   * job executor that a new job has been created. It will be used for performance improvement, so that the new job could 
+   * The flag will be used inside the method "JobManager#send()". It will be used to decide whether to notify the
+   * job executor that a new job has been created. It will be used for performance improvement, so that the new job could
    * be executed in some situations immediately.
-   */ 
+   */
   protected boolean hintJobExecutor = true;
 
   protected String mailServerHost = "localhost";
@@ -180,6 +180,8 @@ public abstract class ProcessEngineConfiguration {
   protected boolean authorizationEnabled = false;
 
   protected ValueTypeResolver valueTypeResolver;
+
+  protected boolean legacyBehaviorEnabled = false;
 
   /** use one of the static createXxxx methods instead */
   protected ProcessEngineConfiguration() {
@@ -559,4 +561,18 @@ public abstract class ProcessEngineConfiguration {
     return this;
   }
 
+  /**
+   * @see LegacyBehavior
+   */
+  public ProcessEngineConfiguration setLegacyBehaviorEnabled(boolean legacyBehaviorEnabled) {
+    this.legacyBehaviorEnabled = legacyBehaviorEnabled;
+    return this;
+  }
+
+  /**
+   * @see LegacyBehavior
+   */
+  public boolean isLegacyBehaviorEnabled() {
+    return legacyBehaviorEnabled;
+  }
 }

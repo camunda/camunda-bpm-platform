@@ -130,17 +130,16 @@
 			
 		</transaction>
 
+		<sequenceFlow sourceRef="tx" targetRef="end" />		
 		<endEvent id="end" />
 		
-		<sequenceFlow sourceRef="tx" targetRef="end" />		
 		
 		<boundaryEvent attachedToRef="tx" id="catchCancelTx">
 			<cancelEventDefinition id="calcel"/>			
 		</boundaryEvent>
-		
+		<sequenceFlow sourceRef="catchCancelTx" targetRef="cancelled" />
 		<endEvent id="cancelled" />
 		
-		<sequenceFlow sourceRef="catchCancelTx" targetRef="cancelled" />
 		
 	</process>
 

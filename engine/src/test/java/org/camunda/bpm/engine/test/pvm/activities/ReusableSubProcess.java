@@ -48,6 +48,6 @@ public class ReusableSubProcess implements SubProcessActivityBehavior {
 
   public void completed(ActivityExecution execution) throws Exception {
     List<PvmTransition> outgoingTransitions = execution.getActivity().getOutgoingTransitions();
-    execution.takeAll(outgoingTransitions, null);
+    execution.leaveActivityViaTransitions(outgoingTransitions, null);
   }
 }

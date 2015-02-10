@@ -17,9 +17,9 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 import org.camunda.bpm.engine.impl.cmmn.behavior.CmmnActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
+import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.PvmException;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityBehavior;
-import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 
 /**
@@ -43,7 +43,7 @@ public class ActivityBehaviorUtil {
   public static ActivityBehavior getActivityBehavior(PvmExecutionImpl execution) {
     String id = execution.getId();
 
-    ActivityImpl activity = execution.getActivity();
+    PvmActivity activity = execution.getActivity();
     ensureNotNull(PvmException.class, "Execution '"+id+"' has no current activity.", "activity", activity);
 
     ActivityBehavior behavior = activity.getActivityBehavior();

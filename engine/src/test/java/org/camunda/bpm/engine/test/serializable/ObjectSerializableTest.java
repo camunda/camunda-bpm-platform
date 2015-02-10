@@ -60,7 +60,6 @@ public class ObjectSerializableTest extends TestCase {
    transitionImpl.addExecutionListener(new TestExecutionListener());
    execution.setTransition(transitionImpl);
 
-   execution.setTransitionBeingTaken(transitionImpl);
    execution.getProcessInstanceStartContext().setInitial(activityImpl);
    execution.setSuperExecution(new ExecutionEntity());
 

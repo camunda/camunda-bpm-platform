@@ -18,13 +18,11 @@ import java.util.Date;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.delegate.VariableScope;
-import org.camunda.bpm.engine.impl.bpmn.behavior.ParallelMultiInstanceBehavior;
 import org.camunda.bpm.engine.impl.calendar.BusinessCalendar;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.el.StartProcessVariableScope;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TimerEntity;
-import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 
 /**
@@ -132,36 +130,12 @@ public class TimerDeclarationImpl extends JobDeclaration<TimerEntity> {
     return dueDate;
   }
 
-  private boolean isParallelMultiInstance(ExecutionEntity execution) {
-    if (isParallelMultiInstance == null) { // cache result
-      if (eventScopeActivityId == null) {
-        isParallelMultiInstance = false;
-      } else {
-        ActivityImpl activity = execution.getProcessDefinition().findActivity(eventScopeActivityId);
-        isParallelMultiInstance = activity.getActivityBehavior() instanceof ParallelMultiInstanceBehavior;
-      }
-    }
-    return isParallelMultiInstance;
-  }
-
   public TimerEntity createTimerInstance(ExecutionEntity execution) {
-    if (isParallelMultiInstance(execution)) {
-      return null;
-    } else {
-      return createTimer(execution);
-    }
+    return createTimer(execution);
   }
 
   public TimerEntity createStartTimerInstance(String deploymentId) {
     return createTimer(deploymentId);
-  }
-
-  public TimerEntity createTimerInstanceForParallelMultiInstance(ExecutionEntity execution) {
-    if (isParallelMultiInstance(execution)) {
-      return createTimer(execution);
-    } else {
-      return null;
-    }
   }
 
   public TimerEntity createTimer(String deploymentId) {

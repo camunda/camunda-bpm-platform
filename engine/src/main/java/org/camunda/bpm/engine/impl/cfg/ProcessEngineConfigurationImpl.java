@@ -197,6 +197,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.TableDataManager;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskManager;
 import org.camunda.bpm.engine.impl.persistence.entity.UserOperationLogManager;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceManager;
+import org.camunda.bpm.engine.impl.pvm.runtime.LegacyBehavior;
 import org.camunda.bpm.engine.impl.runtime.CorrelationHandler;
 import org.camunda.bpm.engine.impl.runtime.DefaultCorrelationHandler;
 import org.camunda.bpm.engine.impl.scripting.ScriptFactory;
@@ -448,6 +449,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected DbEntityCacheKeyMapping dbEntityCacheKeyMapping = DbEntityCacheKeyMapping.defaultEntityCacheKeyMapping();
 
+  protected LegacyBehavior configuredLegacyBehavior = null;
+
   // buildProcessEngine ///////////////////////////////////////////////////////
 
   public ProcessEngine buildProcessEngine() {
@@ -461,6 +464,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected void init() {
     invokePreInit();
+    initLegacyBehavior();
     initDefaultCharset();
     initHistoryLevel();
     initHistoryEventProducer();
@@ -502,7 +506,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     invokePostInit();
   }
 
-
   protected void invokePreInit() {
     for (ProcessEnginePlugin plugin : processEnginePlugins) {
 
@@ -525,6 +528,13 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       plugin.postProcessEngineBuild(engine);
     }
   }
+
+  protected void initLegacyBehavior() {
+    if(configuredLegacyBehavior == null) {
+      configuredLegacyBehavior = new LegacyBehavior(isLegacyBehaviorEnabled());
+    }
+  }
+
 
   // failedJobCommandFactory ////////////////////////////////////////////////////////
 
@@ -2504,6 +2514,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       // ACT-233: connection pool of Ibatis is not properely initialized if this is not called!
       ((PooledDataSource)dataSource).forceCloseAll();
     }
+  }
+
+  public LegacyBehavior getConfiguredLegacyBehavior() {
+    return configuredLegacyBehavior;
+  }
+
+  public void setConfiguredLegacyBehavior(LegacyBehavior configuredLegacyBehavior) {
+    this.configuredLegacyBehavior = configuredLegacyBehavior;
   }
 
 }

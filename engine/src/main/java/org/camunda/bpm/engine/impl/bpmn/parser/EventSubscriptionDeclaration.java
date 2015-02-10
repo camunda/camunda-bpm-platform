@@ -18,7 +18,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.bpmn.behavior.ParallelMultiInstanceBehavior;
 import org.camunda.bpm.engine.impl.event.MessageEventHandler;
 import org.camunda.bpm.engine.impl.event.SignalEventHandler;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
@@ -80,18 +79,6 @@ public class EventSubscriptionDeclaration implements Serializable {
     return eventScopeActivityId;
   }
 
-  private boolean isParallelMultiInstance(ExecutionEntity execution) {
-    if (isParallelMultiInstance == null) { // cache result
-      if (eventScopeActivityId == null) {
-        isParallelMultiInstance = false;
-      } else {
-        ActivityImpl activity = execution.getProcessDefinition().findActivity(eventScopeActivityId);
-        isParallelMultiInstance = activity.getActivityBehavior() instanceof ParallelMultiInstanceBehavior;
-      }
-    }
-    return isParallelMultiInstance;
-  }
-
   public boolean isStartEvent() {
     return isStartEvent;
   }
@@ -105,18 +92,10 @@ public class EventSubscriptionDeclaration implements Serializable {
   }
 
   public EventSubscriptionEntity createSubscription(ExecutionEntity execution) {
-    if (isStartEvent() || isParallelMultiInstance(execution)) {
+    if (isStartEvent()) {
       return null;
     } else {
       return createEventSubscription(execution);
-    }
-  }
-
-  public EventSubscriptionEntity createSubscriptionForParallelMultiInstance(ExecutionEntity execution) {
-    if (isParallelMultiInstance) {
-      return createEventSubscription(execution);
-    } else {
-      return null;
     }
   }
 
@@ -155,18 +134,4 @@ public class EventSubscriptionDeclaration implements Serializable {
     }
   }
 
-  /**
-   * Deletes the actual subscription and creates a new one for the next instance.
-   * @param execution
-   */
-  public void handleSequentialMultiInstanceLeave(ExecutionEntity execution) {
-    if (this.getEventType() != null) {
-      for (EventSubscriptionEntity s : execution.getEventSubscriptions()) {
-        if (this.getEventType().equals(s.getEventType())) {
-          s.delete();
-          createEventSubscription(execution);
-        }
-      }
-    }
-  }
 }

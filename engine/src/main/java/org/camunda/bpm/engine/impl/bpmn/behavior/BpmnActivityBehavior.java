@@ -98,15 +98,14 @@ public class BpmnActivityBehavior {
 
     if (transitionsToTake.size() == 1) {
 
-      execution.take(transitionsToTake.get(0));
+      execution.leaveActivityViaTransition(transitionsToTake.get(0));
 
     } else if (transitionsToTake.size() >= 1) {
 
-      execution.inactivate();
       if (reusableExecutions == null || reusableExecutions.isEmpty()) {
-        execution.takeAll(transitionsToTake, Arrays.asList(execution));
+        execution.leaveActivityViaTransitions(transitionsToTake, Arrays.asList(execution));
       } else {
-        execution.takeAll(transitionsToTake, reusableExecutions);
+        execution.leaveActivityViaTransitions(transitionsToTake, reusableExecutions);
       }
 
     } else {
@@ -114,7 +113,7 @@ public class BpmnActivityBehavior {
       if (defaultSequenceFlow != null) {
         PvmTransition defaultTransition = execution.getActivity().findOutgoingTransition(defaultSequenceFlow);
         if (defaultTransition != null) {
-          execution.take(defaultTransition);
+          execution.leaveActivityViaTransition(defaultTransition);
         } else {
           throw new ProcessEngineException("Default sequence flow '" + defaultSequenceFlow + "' could not be not found");
         }

@@ -26,8 +26,10 @@ import org.camunda.bpm.engine.impl.core.variable.VariableMapImpl;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
+import org.camunda.bpm.engine.impl.pvm.PvmScope;
 import org.camunda.bpm.engine.impl.pvm.PvmTransition;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
+import org.camunda.bpm.engine.impl.pvm.process.ActivityStartBehavior;
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 import org.camunda.bpm.engine.impl.tree.ActivityStackCollector;
@@ -110,7 +112,7 @@ public abstract class AbstractInstantiationCmd extends AbstractProcessInstanceMo
     // prepare to walk up the flow scope hierarchy and collect the flow scope activities
     ActivityStackCollector stackCollector = new ActivityStackCollector();
     FlowScopeWalker walker = new FlowScopeWalker(flowScope);
-    walker.addCollector(stackCollector);
+    walker.addPreCollector(stackCollector);
 
     ExecutionEntity scopeExecution = null;
 
@@ -143,7 +145,7 @@ public abstract class AbstractInstantiationCmd extends AbstractProcessInstanceMo
       // determine ancestor activity scope execution and activity
       final ExecutionEntity ancestorScopeExecution = getScopeExecutionForActivityInstance(processInstance,
             mapping, ancestorInstance);
-      final ScopeImpl ancestorScope = getScopeForActivityInstance(processDefinition, ancestorInstance);
+      final PvmScope ancestorScope = getScopeForActivityInstance(processDefinition, ancestorInstance);
 
       // walk until the scope of the ancestor scope execution is reached
       walker.walkWhile(new WalkCondition<ScopeImpl>() {
@@ -181,74 +183,100 @@ public abstract class AbstractInstantiationCmd extends AbstractProcessInstanceMo
       topMostActivity = (ActivityImpl) elementToInstantiate;
     }
 
-    boolean isCancelScope = false;
-    if (topMostActivity != null && topMostActivity.isCancelScope()) {
+    ActivityStartBehavior startBehavior = ActivityStartBehavior.CONCURRENT_IN_FLOW_SCOPE;
+    if (topMostActivity != null) {
+      startBehavior = topMostActivity.getActivityStartBehavior();
+
       if (!activitiesToInstantiate.isEmpty()) {
         // this is in BPMN relevant if there is an interrupting event sub process.
         // we have to distinguish between instantiation of the start event and any other activity.
         // instantiation of the start event means interrupting behavior; instantiation
         // of any other task means no interruption.
-        ActivityImpl initialActivity = (ActivityImpl) topMostActivity.getProperty(BpmnParse.PROPERTYNAME_INITIAL);
-        ActivityImpl secondTopMostActivity = null;
+        PvmActivity initialActivity = (PvmActivity) topMostActivity.getProperty(BpmnParse.PROPERTYNAME_INITIAL);
+        PvmActivity secondTopMostActivity = null;
         if (activitiesToInstantiate.size() > 1) {
-          secondTopMostActivity = (ActivityImpl) activitiesToInstantiate.get(1);
+          secondTopMostActivity = (PvmActivity) activitiesToInstantiate.get(1);
         }
         else if (ActivityImpl.class.isAssignableFrom(elementToInstantiate.getClass())) {
-          secondTopMostActivity = (ActivityImpl) elementToInstantiate;
+          secondTopMostActivity = (PvmActivity) elementToInstantiate;
         }
 
-        if (initialActivity == secondTopMostActivity) {
-          isCancelScope = true;
+        if (initialActivity != secondTopMostActivity) {
+          startBehavior = ActivityStartBehavior.CONCURRENT_IN_FLOW_SCOPE;
         }
-      }
-      else {
-        isCancelScope = true;
       }
     }
 
-    if (isCancelScope) {
-      ScopeImpl scopeToCancel = topMostActivity.getParentScope();
-      Set<ExecutionEntity> executionsToCancel = mapping.getExecutions(scopeToCancel);
-
-      if (!executionsToCancel.isEmpty()) {
-        if (executionsToCancel.size() > 1) {
-          throw new ProcessEngineException("Execution to cancel/interrupt is ambiguous for activity " + topMostActivity);
+    switch (startBehavior) {
+      case CANCEL_EVENT_SCOPE:
+        {
+          ScopeImpl scopeToCancel = topMostActivity.getEventScope();
+          ExecutionEntity executionToCancel = getSingleExecutionForScope(mapping, scopeToCancel);
+          if (executionToCancel != null) {
+            executionToCancel.deleteCascade("Cancelling activity " + topMostActivity + " executed.", skipCustomListeners, skipIoMappings);
+            instantiate(executionToCancel.getParent(), activitiesToInstantiate, elementToInstantiate);
+          }
+          else {
+            ExecutionEntity flowScopeExecution = getSingleExecutionForScope(mapping, topMostActivity.getFlowScope());
+            instantiateConcurrent(flowScopeExecution, activitiesToInstantiate, elementToInstantiate);
+          }
+          break;
         }
-
-        ExecutionEntity interruptedExecution = executionsToCancel.iterator().next();
-
-        // this distinguishes between interruption (e.g. event sub process) and
-        // cancellation (e.g. boundary event)
-        if (scopeToCancel == topMostActivity.getFlowScope()) {
-          // perform interruption
-          interruptedExecution.cancelScope("Interrupting event sub process "+ topMostActivity + " fired.", skipCustomListeners, skipIoMappings);
-          instantiate(scopeExecution, activitiesToInstantiate, elementToInstantiate);
+      case INTERRUPT_EVENT_SCOPE:
+        {
+          ScopeImpl scopeToCancel = topMostActivity.getEventScope();
+          ExecutionEntity executionToCancel = getSingleExecutionForScope(mapping, scopeToCancel);
+          executionToCancel.interrupt("Interrupting activity " + topMostActivity + " executed.", skipCustomListeners, skipIoMappings);
+          executionToCancel.setActivity(null);
+          executionToCancel.leaveActivityInstance();
+          instantiate(executionToCancel, activitiesToInstantiate, elementToInstantiate);
+          break;
         }
-        else {
-          // perform cancellation
-          ExecutionEntity cancellingExecution = interruptedExecution.getParent();
-          cancellingExecution.cancelScope("Cancel scope activity " + topMostActivity + " executed.", skipCustomListeners, skipIoMappings);
-          instantiate(cancellingExecution, activitiesToInstantiate, elementToInstantiate);
+      case INTERRUPT_FLOW_SCOPE:
+        {
+          ScopeImpl scopeToCancel = topMostActivity.getFlowScope();
+          ExecutionEntity executionToCancel = getSingleExecutionForScope(mapping, scopeToCancel);
+          executionToCancel.interrupt("Interrupting activity " + topMostActivity + " executed.", skipCustomListeners, skipIoMappings);
+          executionToCancel.setActivity(null);
+          executionToCancel.leaveActivityInstance();
+          instantiate(executionToCancel, activitiesToInstantiate, elementToInstantiate);
+          break;
         }
-      }
-      else {
-        // if there is nothing to cancel, the activity can simply be instantiated.
-        instantiateConcurrent(scopeExecution, activitiesToInstantiate, elementToInstantiate);
-      }
-    }
-    else {
-      if (scopeExecution.getExecutions().isEmpty() && scopeExecution.getActivity() == null) {
-        // reuse the scope execution
-        instantiate(scopeExecution, activitiesToInstantiate, elementToInstantiate);
-      } else {
-        // if the activity is not cancelling/interrupting, it can simply be instantiated as
-        // a concurrent child of the scopeExecution
-        instantiateConcurrent(scopeExecution, activitiesToInstantiate, elementToInstantiate);
-      }
-
+      default:
+        {
+          if (scopeExecution.getExecutions().isEmpty() && scopeExecution.getActivity() == null) {
+            // reuse the scope execution
+            instantiate(scopeExecution, activitiesToInstantiate, elementToInstantiate);
+          } else {
+            // if the activity is not cancelling/interrupting, it can simply be instantiated as
+            // a concurrent child of the scopeExecution
+            instantiateConcurrent(scopeExecution, activitiesToInstantiate, elementToInstantiate);
+          }
+          break;
+        }
     }
 
     return null;
+  }
+
+  protected ExecutionEntity getSingleExecutionForScope(ActivityExecutionMapping mapping, ScopeImpl scope) {
+    Set<ExecutionEntity> executions = mapping.getExecutions(scope);
+
+    if (!executions.isEmpty()) {
+      if (executions.size() > 1) {
+        throw new ProcessEngineException("Executions for activity " + scope + " ambiguous");
+      }
+
+      return executions.iterator().next();
+    }
+    else {
+      return null;
+    }
+  }
+
+  protected boolean isConcurrentStart(ActivityStartBehavior startBehavior) {
+    return startBehavior == ActivityStartBehavior.DEFAULT
+        || startBehavior == ActivityStartBehavior.CONCURRENT_IN_FLOW_SCOPE;
   }
 
   protected void instantiate(ExecutionEntity ancestorScopeExecution, List<PvmActivity> parentFlowScopes, CoreModelElement targetElement) {

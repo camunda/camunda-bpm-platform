@@ -143,7 +143,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements
 
   /** when execution structure is pruned during a takeAll, then
    * the original execution has to be resolved to the replaced execution.
-   * @see {@link #takeAll(List, List)} {@link OutgoingExecution} */
+   * @see {@link #leaveActivityViaTransitions(List, List)} {@link OutgoingExecution} */
   protected transient ExecutionEntity replacedBy;
 
   protected int suspensionState = SuspensionState.ACTIVE.getStateCode();
@@ -399,12 +399,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements
     }
 
     initializeAssociations(this);
-
-    // execute Input Mappings (if they exist).
-    ensureActivityInitialized();
-    if (activity != null && activity.getIoMapping() != null && !skipIoMapping) {
-      activity.getIoMapping().executeInputParameters(this);
-    }
+    executeIoMapping();
 
     List<TimerDeclarationImpl> timerDeclarations = (List<TimerDeclarationImpl>) scope.getProperty(BpmnParse.PROPERTYNAME_TIMER_DECLARATION);
     if (timerDeclarations!=null) {
@@ -445,6 +440,9 @@ public class ExecutionEntity extends PvmExecutionImpl implements
     performOperation(PvmAtomicOperation.PROCESS_START);
   }
 
+  /**
+   * Method used for destroying a scope in a way that the execution can be removed afterwards.
+   */
   public void destroy() {
     super.destroy();
     ensureParentInitialized();
@@ -473,16 +471,19 @@ public class ExecutionEntity extends PvmExecutionImpl implements
     removeIncidents();
   }
 
-  public void cancelScope(String reason, boolean skipCustomListeners, boolean skipIoMappings) {
+  public void interrupt(String reason, boolean skipCustomListeners, boolean skipIoMappings) {
 
-    // remove all tasks associated with this execution.
+    // remove Jobs
+    if (preserveScope) {
+      removeActivityJobs(reason);
+    } else {
+      removeJobs();
+      removeEventSubscriptionsExceptCompensation();
+    }
+
     removeTasks(reason);
 
-    // removed jobs directly associated with the current activity (e.g. async continuations)
-    removeActivityJobs(reason);
-
-    super.cancelScope(reason, skipCustomListeners, skipIoMappings);
-
+    super.interrupt(reason, skipCustomListeners, skipIoMappings);
   }
 
   protected void removeActivityJobs(String reason) {
@@ -933,13 +934,6 @@ public class ExecutionEntity extends PvmExecutionImpl implements
     Context.getCommandContext()
       .getExecutionManager()
       .deleteExecution(this);
-  }
-
-  public void interruptScope(String reason) {
-    // remove Jobs
-    removeJobs();
-
-    removeEventSubscriptionsExceptCompensation();
   }
 
   protected void removeEventSubscriptionsExceptCompensation() {
@@ -1573,5 +1567,6 @@ public class ExecutionEntity extends PvmExecutionImpl implements
     return Context.getProcessEngineConfiguration()
           .getProcessEngine();
   }
+
 
 }

@@ -18,7 +18,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.bpmn.behavior.IntermediateCatchEventActivityBehavior;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
@@ -41,16 +40,13 @@ public class TimerCatchIntermediateEventJobHandler extends TimerEventJobHandler 
     ensureNotNull("Error while firing timer: intermediate event activity " + configuration + " not found", "intermediateEventActivity", intermediateEventActivity);
 
     try {
-      IntermediateCatchEventActivityBehavior behavior = (IntermediateCatchEventActivityBehavior) intermediateEventActivity.getActivityBehavior();
-
-      if (behavior.isAfterEventBasedGateway()) {
-        execution.executeActivity(intermediateEventActivity);
-
-      } else {
-        if (!execution.getActivity().getId().equals(intermediateEventActivity.getId())) {
-          execution.setActivity(intermediateEventActivity);
-        }
-        execution.signal(null, null);
+      if(activityId.equals(execution.getActivityId())) {
+        // Regular Intermediate timer catch
+        execution.signal("signal", null);
+      }
+      else {
+        // Event based gateway
+        execution.executeEventHandlerActivity(intermediateEventActivity);
       }
 
     } catch (RuntimeException e) {

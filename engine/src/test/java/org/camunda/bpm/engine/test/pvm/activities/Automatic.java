@@ -30,7 +30,7 @@ public class Automatic implements ActivityBehavior {
     if(outgoingTransitions.isEmpty()) {
       execution.end(true);
     } else {
-      execution.take(outgoingTransitions.get(0));
+      execution.leaveActivityViaTransition(outgoingTransitions.get(0));
     }
   }
 

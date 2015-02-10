@@ -117,11 +117,10 @@ public class ExecutionCachedEntityStateTest extends PluggableProcessEngineTestCa
       int cachedEntityStateRaw = ((ExecutionEntity) execution).getCachedEntityStateRaw();
 
       if(!((ExecutionEntity)execution).isScope()) {
-        assertEquals(
-            BitMaskUtil.getMaskForBit(ExecutionEntity.EVENT_SUBSCRIPTIONS_STATE_BIT)
-            | BitMaskUtil.getMaskForBit(ExecutionEntity.VARIABLES_STATE_BIT), cachedEntityStateRaw);
-      } else {
         assertEquals(BitMaskUtil.getMaskForBit(ExecutionEntity.VARIABLES_STATE_BIT), cachedEntityStateRaw);
+      } else {
+        assertEquals(
+            BitMaskUtil.getMaskForBit(ExecutionEntity.EVENT_SUBSCRIPTIONS_STATE_BIT), cachedEntityStateRaw);
       }
     }
 

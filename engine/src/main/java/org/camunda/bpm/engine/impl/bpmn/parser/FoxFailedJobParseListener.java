@@ -12,8 +12,9 @@
  */
 package org.camunda.bpm.engine.impl.bpmn.parser;
 
+import org.camunda.bpm.engine.impl.pvm.PvmActivity;
+import org.camunda.bpm.engine.impl.pvm.PvmScope;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
-import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 import org.camunda.bpm.engine.impl.util.xml.Element;
 
 public class FoxFailedJobParseListener extends AbstractBpmnParseListener {
@@ -31,7 +32,7 @@ public class FoxFailedJobParseListener extends AbstractBpmnParseListener {
   public static final String FOX_FAILED_JOB_CONFIGURATION = "FOX_FAILED_JOB_CONFIGURATION";
 
   @Override
-  public void parseStartEvent(Element startEventElement, ScopeImpl scope, ActivityImpl startEventActivity) {
+  public void parseStartEvent(Element startEventElement, PvmScope scope, ActivityImpl startEventActivity) {
     String type = (String) startEventActivity.getProperty(TYPE);
     if (type != null && type.equals(START_TIMER_EVENT)){
       this.setFailedJobRetryTimeCycleValue(startEventElement, startEventActivity);
@@ -39,7 +40,7 @@ public class FoxFailedJobParseListener extends AbstractBpmnParseListener {
   }
 
   @Override
-  public void parseBoundaryEvent(Element boundaryEventElement, ScopeImpl scopeElement, ActivityImpl nestedActivity) {
+  public void parseBoundaryEvent(Element boundaryEventElement, PvmScope scopeElement, ActivityImpl nestedActivity) {
     String type = (String) nestedActivity.getProperty(TYPE);
     if (type != null && type.equals(BOUNDARY_TIMER)) {
       this.setFailedJobRetryTimeCycleValue(boundaryEventElement, nestedActivity);
@@ -47,7 +48,7 @@ public class FoxFailedJobParseListener extends AbstractBpmnParseListener {
   }
 
   @Override
-  public void parseIntermediateThrowEvent(Element intermediateEventElement, ScopeImpl scope, ActivityImpl activity) {
+  public void parseIntermediateThrowEvent(Element intermediateEventElement, PvmScope scope, ActivityImpl activity) {
     String type = (String) activity.getProperty(TYPE);
     if (type != null && type.equals(INTERMEDIATE_SIGNAL_THROW)) {
       Element signalDefElement = intermediateEventElement.element(SIGNAL_EVENT_DEFINITION);
@@ -59,7 +60,7 @@ public class FoxFailedJobParseListener extends AbstractBpmnParseListener {
   }
 
   @Override
-  public void parseIntermediateCatchEvent(Element intermediateEventElement, ScopeImpl scope, ActivityImpl activity) {
+  public void parseIntermediateCatchEvent(Element intermediateEventElement, PvmScope scope, ActivityImpl activity) {
     String type = (String) activity.getProperty(TYPE);
     if (type != null && type.equals(INTERMEDIATE_TIMER)) {
       this.setFailedJobRetryTimeCycleValue(intermediateEventElement, activity);
@@ -67,76 +68,76 @@ public class FoxFailedJobParseListener extends AbstractBpmnParseListener {
   }
 
   @Override
-  public void parseScriptTask(Element scriptTaskElement, ScopeImpl scope, ActivityImpl activity) {
+  public void parseScriptTask(Element scriptTaskElement, PvmScope scope, ActivityImpl activity) {
     if (isAsync(activity)) {
       this.setFailedJobRetryTimeCycleValue(scriptTaskElement, activity);
     }
   }
 
   @Override
-  public void parseServiceTask(Element serviceTaskElement, ScopeImpl scope, ActivityImpl activity) {
+  public void parseServiceTask(Element serviceTaskElement, PvmScope scope, ActivityImpl activity) {
     if (isAsync(activity)) {
       this.setFailedJobRetryTimeCycleValue(serviceTaskElement, activity);
     }
   }
 
   @Override
-  public void parseBusinessRuleTask(Element businessRuleTaskElement, ScopeImpl scope, ActivityImpl activity) {
+  public void parseBusinessRuleTask(Element businessRuleTaskElement, PvmScope scope, ActivityImpl activity) {
     if (isAsync(activity)) {
       this.setFailedJobRetryTimeCycleValue(businessRuleTaskElement, activity);
     }
   }
 
   @Override
-  public void parseTask(Element taskElement, ScopeImpl scope, ActivityImpl activity) {
+  public void parseTask(Element taskElement, PvmScope scope, ActivityImpl activity) {
     if (isAsync(activity)) {
       this.setFailedJobRetryTimeCycleValue(taskElement, activity);
     }
   }
 
   @Override
-  public void parseUserTask(Element userTaskElement, ScopeImpl scope, ActivityImpl activity) {
+  public void parseUserTask(Element userTaskElement, PvmScope scope, ActivityImpl activity) {
     if (isAsync(activity)) {
       this.setFailedJobRetryTimeCycleValue(userTaskElement, activity);
     }
   }
 
   @Override
-  public void parseCallActivity(Element callActivityElement, ScopeImpl scope, ActivityImpl activity) {
+  public void parseCallActivity(Element callActivityElement, PvmScope scope, ActivityImpl activity) {
     if (isAsync(activity)) {
       this.setFailedJobRetryTimeCycleValue(callActivityElement, activity);
     }
   }
 
   @Override
-  public void parseReceiveTask(Element receiveTaskElement, ScopeImpl scope, ActivityImpl activity) {
+  public void parseReceiveTask(Element receiveTaskElement, PvmScope scope, ActivityImpl activity) {
     if (isAsync(activity)) {
       this.setFailedJobRetryTimeCycleValue(receiveTaskElement, activity);
     }
   }
 
   @Override
-  public void parseSendTask(Element sendTaskElement, ScopeImpl scope, ActivityImpl activity) {
+  public void parseSendTask(Element sendTaskElement, PvmScope scope, ActivityImpl activity) {
     if (isAsync(activity)) {
       this.setFailedJobRetryTimeCycleValue(sendTaskElement, activity);
     }
   }
 
   @Override
-  public void parseSubProcess(Element subProcessElement, ScopeImpl scope, ActivityImpl activity) {
+  public void parseSubProcess(Element subProcessElement, PvmScope scope, ActivityImpl activity) {
     if (isAsync(activity)) {
       this.setFailedJobRetryTimeCycleValue(subProcessElement, activity);
     }
   }
 
   @Override
-  public void parseTransaction(Element transactionElement, ScopeImpl scope, ActivityImpl activity) {
+  public void parseTransaction(Element transactionElement, PvmScope scope, ActivityImpl activity) {
     if (activity.isAsyncBefore()) {
       this.setFailedJobRetryTimeCycleValue(transactionElement, activity);
     }
   }
 
-  protected boolean isAsync(ActivityImpl activity) {
+  protected boolean isAsync(PvmActivity activity) {
     return activity.isAsyncBefore() || activity.isAsyncAfter();
   }
 

@@ -254,8 +254,8 @@ public class GetActivityInstanceCmd implements Command<ActivityInstance> {
       }
       ActivityImpl scope = executionEntity.getActivity();
       for (int j = 0; j < i; j++) {
-        if(scope.getParentActivity() != null) {
-        scope = scope.getParentActivity();
+        if(scope.getParentFlowScopeActivity() != null) {
+        scope = scope.getParentFlowScopeActivity();
         }
       }
       return scope;

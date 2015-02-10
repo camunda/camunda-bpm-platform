@@ -13,28 +13,40 @@
 package org.camunda.bpm.engine.impl.pvm.runtime;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
 import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
 import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.PvmException;
+import org.camunda.bpm.engine.impl.pvm.PvmExecution;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessDefinition;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessInstance;
+import org.camunda.bpm.engine.impl.pvm.PvmScope;
 import org.camunda.bpm.engine.impl.pvm.PvmTransition;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.engine.impl.pvm.delegate.SignallableActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
+import org.camunda.bpm.engine.impl.pvm.process.ActivityStartBehavior;
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 import org.camunda.bpm.engine.impl.pvm.process.TransitionImpl;
 import org.camunda.bpm.engine.impl.pvm.runtime.operation.FoxAtomicOperationDeleteCascadeFireActivityEnd;
 import org.camunda.bpm.engine.impl.pvm.runtime.operation.PvmAtomicOperation;
+import org.camunda.bpm.engine.impl.tree.ExecutionWalker;
+import org.camunda.bpm.engine.impl.tree.FlowScopeWalker;
+import org.camunda.bpm.engine.impl.tree.ScopeCollector;
+import org.camunda.bpm.engine.impl.tree.ScopeExecutionCollector;
+import org.camunda.bpm.engine.impl.util.EnsureUtil;
 
 /**
  * @author Daniel Meyer
@@ -60,13 +72,14 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
   protected transient ActivityImpl activity;
 
   /** the activity which is to be started next */
-  protected transient ActivityImpl nextActivity;
+  protected transient PvmActivity nextActivity;
 
-  /** current sequence flow. is null when there is no transition being taken. */
-  protected transient TransitionImpl transition = null;
+  /** the transition that is currently being taken */
+  protected transient TransitionImpl transition;
 
-  /** transition that will be taken.  is null when there is no transition being taken. */
-  protected transient TransitionImpl transitionBeingTaken = null;
+  /** A list of outgoing transitions from the current activity
+   * that are going to be taken */
+  protected transient List<PvmTransition> transitionsToTake = null;
 
   /** the unique id of the current activity instance */
   protected String activityInstanceId;
@@ -94,6 +107,9 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
   protected boolean isConcurrent = false;
   protected boolean isEnded = false;
   protected boolean isEventScope = false;
+
+  /** transient; used for process instance modification to preserve a scope from getting deleted */
+  protected boolean preserveScope = false;
 
   /** marks the current activity instance */
   protected int activityInstanceState = ActivityInstanceState.DEFAULT.getStateCode();
@@ -135,6 +151,14 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
 
   public abstract void initialize();
 
+  public void executeIoMapping() {
+    // execute Input Mappings (if they exist).
+    ActivityImpl currentActivity = getActivity();
+    if (currentActivity != null && currentActivity.getIoMapping() != null && !skipIoMapping) {
+      currentActivity.getIoMapping().executeInputParameters(this);
+    }
+  }
+
   public void start() {
     start(null);
   }
@@ -164,13 +188,9 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     }
   }
 
-  public void cancelScope(String reason, boolean skipCustomListeners, boolean skipIoMappings) {
+  public void clearScope(String reason, boolean skipCustomListeners, boolean skipIoMappings) {
     this.skipCustomListeners = skipCustomListeners;
     this.skipIoMapping = skipIoMappings;
-
-    if(log.isLoggable(Level.FINE)) {
-      log.fine("performing cancel scope behavior for execution "+this);
-    }
 
     if (getSubProcessInstance() != null) {
       getSubProcessInstance().deleteCascade(reason, skipCustomListeners, skipIoMappings);
@@ -185,23 +205,31 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
       childExecution.deleteCascade(reason, skipCustomListeners, skipIoMappings);
     }
 
-    // set activity instance state to cancel
-    setCanceled(true);
-
     // fire activity end on active activity
-    ActivityImpl activity = getActivity();
+    PvmActivity activity = getActivity();
     if(isActive && activity != null) {
+      // set activity instance state to cancel
+      setCanceled(true);
       performOperation(PvmAtomicOperation.FIRE_ACTIVITY_END);
+      // set activity instance state back to 'default'
+      // -> execution will be reused for executing more activities and we want the state to
+      // be default initially.
+      activityInstanceState = ActivityInstanceState.DEFAULT.getStateCode();
     }
-
-    // set activity instance state back to 'default'
-    // -> execution will be reused for executing more activities and we want the state to
-    // be default initially.
-    activityInstanceState = ActivityInstanceState.DEFAULT.getStateCode();
   }
 
-  public void cancelScope(String reason) {
-    cancelScope(reason, false, false);
+  /**
+   * Interrupts an execution
+   */
+  public void interrupt(String reason) {
+    interrupt(reason, false, false);
+  }
+
+  public void interrupt(String reason, boolean skipCustomListeners, boolean skipIoMappings) {
+    if(log.isLoggable(Level.FINE)) {
+      log.fine("Interrupting execution "+this);
+    }
+    clearScope(reason, skipCustomListeners, skipIoMappings);
   }
 
   /** removes an execution. if there are nested executions, those will be ended recursively.
@@ -252,6 +280,152 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     removeEventScopes();
   }
 
+  public PvmExecutionImpl createConcurrentExecution() {
+    if (!isScope()) {
+      throw new ProcessEngineException("Cannot create concurrent execution for " + this);
+    }
+
+    // The following covers the three cases in which a concurrent execution may be created
+    // (this execution is the root in each scenario).
+    //
+    // Note: this should only consider non-event-scope executions. Event-scope executions
+    // are not relevant for the tree structure and should remain under their original parent.
+    //
+    //
+    // (1) A compacted tree:
+    //
+    // Before:               After:
+    //       -------               -------
+    //       |  e1  |              |  e1 |
+    //       -------               -------
+    //                             /     \
+    //                         -------  -------
+    //                         |  e2 |  |  e3 |
+    //                         -------  -------
+    //
+    // e2 replaces e1; e3 is the new root for the activity stack to instantiate
+    //
+    //
+    // (2) A single child that is a scope execution
+    // Before:               After:
+    //       -------               -------
+    //       |  e1 |               |  e1 |
+    //       -------               -------
+    //          |                  /     \
+    //       -------           -------  -------
+    //       |  e2 |           |  e3 |  |  e4 |
+    //       -------           -------  -------
+    //                            |
+    //                         -------
+    //                         |  e2 |
+    //                         -------
+    //
+    //
+    // e3 is created and is concurrent;
+    // e4 is the new root for the activity stack to instantiate
+    //
+    // (2b: LEGACY behavior)
+    // Before:               After:
+    //       -------               -------
+    //       |  e1 |               |  e1 |
+    //       -------               -------
+    //          |                  /     \
+    //       -------           -------  -------
+    //       |  e2 |           |  e2 |  |  e3 |
+    //       -------           -------  -------
+    //
+    // e2 remains under e1 but is now scope AND concurrent
+    // e3 is a new, non-scope activity
+    //
+    // (3) Existing concurrent execution(s)
+    // Before:               After:
+    //       -------                    ---------
+    //       |  e1 |                    |   e1  |
+    //       -------                    ---------
+    //       /     \                   /    |    \
+    //  -------    -------      -------  -------  -------
+    //  |  e2 | .. |  eX |      |  e2 |..|  eX |  | eX+1|
+    //  -------    -------      -------  -------  -------
+    //
+    // eX+1 is concurrent and the new root for the activity stack to instantiate
+    List<? extends PvmExecutionImpl> children = this.getNonEventScopeExecutions();
+
+    if (children.isEmpty()) {
+      // (1)
+      PvmExecutionImpl replacingExecution = this.createExecution();
+      replacingExecution.setConcurrent(true);
+      replacingExecution.setScope(false);
+      replacingExecution.replace(this);
+      this.setActivity(null);
+
+    }
+    else if (children.size() == 1) {
+      // (2)
+      PvmExecutionImpl child = children.get(0);
+
+      if(LegacyBehavior.get().isConcurrentScopeExecutionEnabled()) {
+        // 2b) legacy behavior
+        LegacyBehavior.get().createConcurrentScope(child);
+      } else {
+        PvmExecutionImpl concurrentReplacingExecution = this.createExecution();
+        concurrentReplacingExecution.setConcurrent(true);
+        concurrentReplacingExecution.setScope(false);
+        child.setParent(concurrentReplacingExecution);
+        ((List<PvmExecutionImpl>) concurrentReplacingExecution.getExecutions()).add(child);
+        this.getExecutions().remove(child);
+      }
+    }
+
+    // (1), (2), and (3)
+    PvmExecutionImpl concurrentExecution = this.createExecution();
+    concurrentExecution.setConcurrent(true);
+    concurrentExecution.setScope(false);
+
+    return concurrentExecution;
+  }
+
+  public boolean tryPruneLastConcurrentChild() {
+
+    if (getNonEventScopeExecutions().size() == 1) {
+      PvmExecutionImpl lastConcurrent = getNonEventScopeExecutions().get(0);
+      if (lastConcurrent.isConcurrent()) {
+        if (!lastConcurrent.isScope()) {
+          setActivity(lastConcurrent.getActivity());
+          setTransition(lastConcurrent.getTransition());
+          lastConcurrent.setReplacedBy(this);
+
+          // Move children of lastConcurrent one level up
+          if (lastConcurrent.getExecutions().size() > 0) {
+            getExecutions().clear();
+            for (PvmExecutionImpl childExecution : lastConcurrent.getExecutions()) {
+              ((List) getExecutions()).add(childExecution);
+              childExecution.setParent(this);
+            }
+            lastConcurrent.getExecutions().clear();
+          }
+
+          // Copy execution-local variables of lastConcurrent
+          setVariablesLocal(lastConcurrent.getVariablesLocal());
+
+          // Make sure parent execution is re-activated when the last concurrent
+          // child execution is active
+          if (!isActive() && lastConcurrent.isActive()) {
+            setActive(true);
+          }
+
+          lastConcurrent.remove();
+        } else {
+          // legacy behavior
+          LegacyBehavior.get().pruneConcurrentScope(lastConcurrent);
+        }
+        return true;
+      }
+    }
+
+    return false;
+
+  }
+
   public void deleteCascade(String deleteReason) {
     deleteCascade(deleteReason, false);
   }
@@ -275,6 +449,26 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     performOperation(new FoxAtomicOperationDeleteCascadeFireActivityEnd());
   }
 
+  public void executeEventHandlerActivity(ActivityImpl eventHandlerActivity) {
+
+    // the target scope
+    ScopeImpl flowScope = eventHandlerActivity.getFlowScope();
+    flowScope = LegacyBehavior.get().normalizeSecondNonScope(flowScope);
+
+    // the event scope (the current activity)
+    ScopeImpl eventScope = eventHandlerActivity.getEventScope();
+
+    if(eventHandlerActivity.getActivityStartBehavior() == ActivityStartBehavior.CONCURRENT_IN_FLOW_SCOPE
+        && flowScope != eventScope) {
+      // the current scope is the event scope of the activity
+      findExecutionForScope(eventScope, flowScope)
+        .executeActivity(eventHandlerActivity);
+    }
+    else {
+      executeActivity(eventHandlerActivity);
+    }
+  }
+
   // tree compaction & expansion ///////////////////////////////////////////
 
   public abstract PvmExecutionImpl getReplacedBy();
@@ -286,6 +480,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
   public void replace(PvmExecutionImpl execution) {
     // activity instance id handling
     this.activityInstanceId = execution.getActivityInstanceId();
+
     execution.leaveActivityInstance();
   }
 
@@ -306,32 +501,71 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     }
   }
 
-  public void take(PvmTransition transition) {
-    if (this.transition!=null) {
-      throw new PvmException("already taking a transition");
+  public void take() {
+    if (this.transition == null) {
+      throw new PvmException(toString() + ": no transition to take specified");
     }
     if (transition==null) {
       throw new PvmException("transition is null");
     }
     TransitionImpl transitionImpl = (TransitionImpl) transition;
     setActivity(transitionImpl.getSource());
-    setTransition(transitionImpl);
-    performOperation(PvmAtomicOperation.TRANSITION_NOTIFY_LISTENER_END);
+    // while executing the transition, the activityInstance is 'null'
+    // (we are not executing an activity)
+    setActivityInstanceId(null);
+    setActive(true);
+    performOperation(PvmAtomicOperation.TRANSITION_NOTIFY_LISTENER_TAKE);
   }
 
+  /**
+   * Execute an activity which is not contained in normal flow (having no incoming sequence flows).
+   * Cannot be called for activities contained in normal flow.
+   *<p>
+   * First, the ActivityStartBehavior is evaluated.
+   * In case the start behavior is not {@link ActivityStartBehavior#DEFAULT}, the corresponding start
+   * behavior is executed before executing the activity.
+   *<p>
+   * For a given activity, the execution on which this method must be called depends on the type of the start behavior:
+   * <ul>
+   * <li>CONCURRENT_IN_FLOW_SCOPE: scope execution for {@link PvmActivity#getFlowScope()}</li>
+   * <li>INTERRUPT_EVENT_SCOPE: scope execution for {@link PvmActivity#getEventScope()}</li>
+   * <li>CANCEL_EVENT_SCOPE: scope execution for {@link PvmActivity#getEventScope()}</li>
+   * </ul>
+   *
+   * @param the activity to start
+   */
   public void executeActivity(PvmActivity activity) {
-    ActivityImpl activityImpl = (ActivityImpl) activity;
-    if(activity.isConcurrent()) {
+    if(!activity.getIncomingTransitions().isEmpty()) {
+      throw new ProcessEngineException("Activity is contained in normal flow and cannot be executed using executeActivity().");
+    }
+
+    ActivityStartBehavior activityStartBehavior = activity.getActivityStartBehavior();
+    if(!isScope() && ActivityStartBehavior.DEFAULT != activityStartBehavior) {
+      throw new ProcessEngineException("Activity '"+activity+"' with start behavior '"+activityStartBehavior+"'"
+            + "cannot be executed by non-scope execution.");
+    }
+
+    PvmActivity activityImpl = (PvmActivity) activity;
+    switch (activityStartBehavior) {
+    case CONCURRENT_IN_FLOW_SCOPE:
       this.nextActivity = activityImpl;
       performOperation(PvmAtomicOperation.ACTIVITY_START_CONCURRENT);
+      break;
 
-    } else if(activity.isCancelScope()) {
+    case CANCEL_EVENT_SCOPE:
       this.nextActivity = activityImpl;
       performOperation(PvmAtomicOperation.ACTIVITY_START_CANCEL_SCOPE);
+      break;
 
-    } else {
+    case INTERRUPT_EVENT_SCOPE:
+      this.nextActivity = activityImpl;
+      performOperation(PvmAtomicOperation.ACTIVITY_START_INTERRUPT_SCOPE);
+      break;
+
+    default:
       setActivity(activityImpl);
-      performOperation(PvmAtomicOperation.ACTIVITY_START);
+      performOperation(PvmAtomicOperation.ACTIVITY_START_CREATE_SCOPE);
+      break;
     }
   }
 
@@ -419,6 +653,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
       child.setParent(concurrentReplacingExecution);
       ((List<PvmExecutionImpl>) concurrentReplacingExecution.getExecutions()).add(child);
       getExecutions().remove(child);
+      leaveActivityInstance();
     }
 
     // (1), (2), and (3)
@@ -545,106 +780,33 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     return childExecutions;
   }
 
-  @SuppressWarnings({ "unchecked", "rawtypes" })
-  public void takeAll(List<PvmTransition> _transitions, List<? extends ActivityExecution> _recyclableExecutions) {
-    ArrayList<TransitionImpl> transitions = new ArrayList<TransitionImpl>((List)_transitions);
-    ArrayList<PvmExecutionImpl> recyclableExecutions = (_recyclableExecutions!=null ? new ArrayList<PvmExecutionImpl>((List)_recyclableExecutions) : new ArrayList<PvmExecutionImpl>());
+  public void leaveActivityViaTransition(PvmTransition outgoingTransition) {
+    leaveActivityViaTransitions(Arrays.asList(outgoingTransition), Collections.<ActivityExecution>emptyList());
+  }
 
-    if (recyclableExecutions.size()>1) {
-      for (PvmExecutionImpl recyclableExecution: recyclableExecutions) {
-        if (recyclableExecution.isScope()) {
-          throw new PvmException("joining scope executions is not allowed");
-        }
-      }
+  public void leaveActivityViaTransitions(List<PvmTransition> _transitions, List<? extends ActivityExecution> _recyclableExecutions) {
+    List<? extends ActivityExecution> recyclableExecutions = Collections.emptyList();
+    if (_recyclableExecutions != null) {
+      recyclableExecutions = new ArrayList<ActivityExecution>(_recyclableExecutions);
     }
 
-    PvmExecutionImpl concurrentRoot = ((isConcurrent && !isScope) ? getParent() : this);
-    List<PvmExecutionImpl> concurrentActiveExecutions = new ArrayList<PvmExecutionImpl>();
-    List<PvmExecutionImpl> concurrentInActiveExecutions = new ArrayList<PvmExecutionImpl>();
-    for (PvmExecutionImpl execution: concurrentRoot.getExecutions()) {
-      if (execution.isActive()) {
-        concurrentActiveExecutions.add(execution);
-      } else {
-        concurrentInActiveExecutions.add(execution);
-      }
+    recyclableExecutions.remove(this);
+    for (ActivityExecution execution : recyclableExecutions) {
+      execution.end(_transitions.isEmpty());
     }
 
-    if (log.isLoggable(Level.FINE)) {
-      log.fine("transitions to take concurrent: " + transitions);
-      log.fine("active concurrent executions: " + concurrentActiveExecutions);
+    // ending a recyclable execution might have replaced this execution as well
+    PvmExecutionImpl propagatingExecution = this;
+    if (getReplacedBy() != null) {
+      propagatingExecution = getReplacedBy();
     }
 
-    if ( (transitions.size()==1)
-         && (concurrentActiveExecutions.isEmpty())
-         && allExecutionsInSameActivity(concurrentInActiveExecutions)
-       ) {
-
-      List<PvmExecutionImpl> recyclableExecutionImpls = recyclableExecutions;
-      recyclableExecutions.remove(concurrentRoot);
-      for (PvmExecutionImpl prunedExecution: recyclableExecutionImpls) {
-        // End the pruned executions if necessary.
-        // Some recyclable executions are inactivated (joined executions)
-        // Others are already ended (end activities)
-        if (!prunedExecution.isEnded()) {
-          log.fine("pruning execution " + prunedExecution);
-          prunedExecution.end(false);
-        }
-      }
-
-      log.fine("activating the concurrent root "+concurrentRoot+" as the single path of execution going forward");
-      concurrentRoot.setActive(true);
-      concurrentRoot.setActivity(activity);
-      concurrentRoot.setConcurrent(hasConcurrentSiblings(concurrentRoot));
-      concurrentRoot.take(transitions.get(0));
-
-    } else {
-
-      List<OutgoingExecution> outgoingExecutions = new ArrayList<OutgoingExecution>();
-
-      recyclableExecutions.remove(concurrentRoot);
-
-      log.fine("recyclable executions for reuse: " + recyclableExecutions);
-
-      // first create the concurrent executions
-      while (!transitions.isEmpty()) {
-        TransitionImpl outgoingTransition = transitions.remove(0);
-
-        PvmExecutionImpl outgoingExecution = null;
-        if (recyclableExecutions.isEmpty()) {
-          outgoingExecution = concurrentRoot.createExecution();
-          log.fine("new "+outgoingExecution+" with parent "
-                  + outgoingExecution.getParent()+" created to take transition "+outgoingTransition);
-        } else {
-          outgoingExecution = recyclableExecutions.remove(0);
-          log.fine("recycled "+outgoingExecution+" to take transition "+outgoingTransition);
-        }
-
-        outgoingExecution.setActive(true);
-        outgoingExecution.setScope(false);
-        outgoingExecution.setConcurrent(true);
-        outgoingExecution.setTransitionBeingTaken(outgoingTransition);
-        outgoingExecutions.add(new OutgoingExecution(outgoingExecution, outgoingTransition, true));
-      }
-
-      concurrentRoot.setActivityInstanceId(concurrentRoot.getParentActivityInstanceId());
-
-      boolean isConcurrentEnd = outgoingExecutions.isEmpty();
-
-      // prune the executions that are not recycled
-      for (PvmExecutionImpl prunedExecution: recyclableExecutions) {
-        log.fine("pruning execution "+prunedExecution);
-        prunedExecution.end(isConcurrentEnd);
-      }
-
-      // then launch all the concurrent executions
-      for (OutgoingExecution outgoingExecution: outgoingExecutions) {
-        outgoingExecution.take();
-      }
-
-      // if no outgoing executions, the concurrent root execution ends
-      if (isConcurrentEnd) {
-        concurrentRoot.end(true);
-      }
+    if (_transitions.isEmpty()) {
+      propagatingExecution.end(!propagatingExecution.isConcurrent());
+    }
+    else {
+      propagatingExecution.setTransitionsToTake(_transitions);
+      propagatingExecution.performOperation(PvmAtomicOperation.TRANSITION_NOTIFY_LISTENER_END);
     }
   }
 
@@ -718,6 +880,25 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
       }
     }
     return null;
+  }
+
+  public List<PvmExecution> findExecutions(String activityId) {
+    List<PvmExecution> matchingExecutions = new ArrayList<PvmExecution>();
+    collectExecutions(activityId, matchingExecutions);
+
+    return matchingExecutions;
+  }
+
+  protected void collectExecutions(String activityId, List<PvmExecution> executions) {
+    if ( (getActivity()!=null)
+        && (getActivity().getId().equals(activityId))
+      ) {
+      executions.add(this);
+    }
+
+    for (PvmExecutionImpl nestedExecution : getExecutions()) {
+      nestedExecution.collectExecutions(activityId, executions);
+    }
   }
 
   public List<String> findActiveActivityIds() {
@@ -839,17 +1020,15 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
       return getId();
 
     } else {
-      PvmExecutionImpl parent = getParent();
-      ActivityImpl activity = getActivity();
-      ActivityImpl parentActivity = parent.getActivity();
-      if (parent.isScope() && !isConcurrent() || parent.isConcurrent
-           && activity != parentActivity
-          ) {
+      ActivityImpl currentActivity = getActivity();
+      if (activityInstanceId == null || (currentActivity != null && !currentActivity.isScope())) {
+        PvmExecutionImpl parent = getParent();
         return parent.getActivityInstanceId();
-      } else {
-        return parent.getParentActivityInstanceId();
       }
-
+      else {
+        PvmExecutionImpl parentScopeExecution = getParentScopeExecution(false);
+        return parentScopeExecution.getActivityInstanceId();
+      }
     }
   }
 
@@ -923,6 +1102,94 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     this.isScope = isScope;
   }
 
+
+  /**
+   * For a given target flow scope, this method returns the corresponding scope execution.
+   *
+   * Precondition: the execution is active and executing an activity.
+   * Can be invoked for scope and non scope executions.
+   *
+   * @param targetFlowScope scope activity or process definition for which the scope execution should be found
+   * @return the scope execution for the provided targetFlowScope
+   */
+  public PvmExecutionImpl findExecutionForFlowScope(PvmScope targetFlowScope) {
+    // if this execution is not a scope execution, use the parent
+    final PvmExecutionImpl scopeExecution = isScope() ? this : getParent();
+
+    ScopeImpl currentActivity = getActivity();
+    EnsureUtil.ensureNotNull("activity of current execution", currentActivity);
+
+    // if this is a scope execution currently executing a non scope activity
+    currentActivity = currentActivity.isScope() ? currentActivity : currentActivity.getFlowScope();
+    currentActivity = LegacyBehavior.get().normalizeSecondNonScope(currentActivity);
+
+    return scopeExecution.findExecutionForScope(currentActivity, (ScopeImpl) targetFlowScope);
+  }
+
+
+  public PvmExecutionImpl findExecutionForScope(ScopeImpl currentScope, ScopeImpl targetScope) {
+
+    if(!targetScope.isScope()) {
+      throw new ProcessEngineException("Target scope must be a scope.");
+    }
+
+    Map<ScopeImpl, PvmExecutionImpl> activityExecutionMapping = createActivityExecutionMapping(currentScope);
+    PvmExecutionImpl scopeExecution = activityExecutionMapping.get(targetScope);
+    if(scopeExecution == null){
+      // the target scope is scope but no corresponding execution was found
+      // => legacy behavior
+      scopeExecution = LegacyBehavior.get().getScopeExecution(targetScope, activityExecutionMapping);
+    }
+    return scopeExecution;
+  }
+
+  public Map<ScopeImpl, PvmExecutionImpl> createActivityExecutionMapping() {
+    ScopeImpl currentActivity = getActivity();
+    EnsureUtil.ensureNotNull("activity of current execution", currentActivity);
+
+    // if this is a scope execution currently executing a non scope activity
+    currentActivity = currentActivity.isScope() ? currentActivity : currentActivity.getFlowScope();
+    currentActivity = LegacyBehavior.get().normalizeSecondNonScope(currentActivity);
+
+    PvmExecutionImpl scopeExecution = isScope() ? this : getParent();
+
+    return scopeExecution.createActivityExecutionMapping(currentActivity);
+  }
+
+  public Map<ScopeImpl, PvmExecutionImpl> createActivityExecutionMapping(ScopeImpl currentScope) {
+    if(!isScope()) {
+      throw new ProcessEngineException("Execution must be a scope execution");
+    }
+    if(!currentScope.isScope()) {
+      throw new ProcessEngineException("Current scope must be a scope.");
+    }
+
+    ScopeExecutionCollector scopeExecutionCollector = new ScopeExecutionCollector();
+    new ExecutionWalker((PvmExecutionImpl) this)
+      .addPreCollector(scopeExecutionCollector)
+      .walkUntil();
+    List<PvmExecutionImpl> scopeExecutions = scopeExecutionCollector.getExecutions();
+
+    ScopeCollector scopeCollector = new ScopeCollector();
+    new FlowScopeWalker((ScopeImpl) currentScope)
+      .addPreCollector(scopeCollector)
+      .walkUntil();
+
+    List<ScopeImpl> scopes = scopeCollector.getScopes();
+    if(scopes.size() == scopeExecutions.size()) {
+      // the trees are in sync
+      Map<ScopeImpl, PvmExecutionImpl> activityExecutionMapping = new HashMap<ScopeImpl, PvmExecutionImpl>();
+      for(int i = 0; i<scopes.size(); i++) {
+        activityExecutionMapping.put(scopes.get(i), scopeExecutions.get(i));
+      }
+      return activityExecutionMapping;
+    }
+    else {
+      // Wounderful! The trees are out of sync. This is due to legacy behavior
+      return LegacyBehavior.get().createActivityExecutionMapping(scopeExecutions, scopes);
+    }
+  }
+
   // toString /////////////////////////////////////////////////////////////////
 
   public String toString() {
@@ -980,6 +1247,14 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     return transition;
   }
 
+  public List<PvmTransition> getTransitionsToTake() {
+    return transitionsToTake;
+  }
+
+  public void setTransitionsToTake(List<PvmTransition> transitionsToTake) {
+    this.transitionsToTake = transitionsToTake;
+  }
+
   public String getCurrentTransitionId() {
     TransitionImpl transition = getTransition();
     if(transition != null) {
@@ -989,16 +1264,8 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     }
   }
 
-  public TransitionImpl getTransitionBeingTaken() {
-    return transitionBeingTaken;
-  }
-
-  public void setTransition(TransitionImpl transition) {
-    this.transition = transition;
-  }
-
-  public void setTransitionBeingTaken(TransitionImpl transitionBeingTaken) {
-    this.transitionBeingTaken = transitionBeingTaken;
+  public void setTransition(PvmTransition transition) {
+    this.transition = (TransitionImpl) transition;
   }
 
   public boolean isConcurrent() {
@@ -1041,6 +1308,14 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     }
   }
 
+  public void setPreserveScope(boolean preserveScope) {
+    this.preserveScope = preserveScope;
+  }
+
+  public boolean isPreserveScope() {
+    return preserveScope;
+  }
+
   public int getActivityInstanceState() {
     return activityInstanceState;
   }
@@ -1065,7 +1340,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     startContext = null;
   }
 
-  public ActivityImpl getNextActivity() {
+  public PvmActivity getNextActivity() {
     return nextActivity;
   }
 
@@ -1079,6 +1354,36 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
 
   public void setStartContext(ExecutionStartContext startContext) {
     this.startContext = startContext;
+  }
+
+  public void setNextActivity(PvmActivity nextActivity) {
+    this.nextActivity = nextActivity;
+  }
+
+  public PvmExecutionImpl getParentScopeExecution(boolean considerSuperExecution) {
+    if(isProcessInstanceExecution()) {
+      if(considerSuperExecution && getSuperExecution() != null) {
+        PvmExecutionImpl superExecution = getSuperExecution();
+        if(superExecution.isScope()) {
+          return superExecution;
+        }
+        else {
+          return superExecution.getParent();
+        }
+      }
+      else {
+        return null;
+      }
+    }
+    else {
+      PvmExecutionImpl parent = getParent();
+      if(parent.isScope()) {
+        return parent;
+      }
+      else {
+        return parent.getParent();
+      }
+    }
   }
 
 }

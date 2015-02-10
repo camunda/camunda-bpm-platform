@@ -83,7 +83,7 @@ public class InclusiveGatewayActivityBehavior extends GatewayActivityBehavior {
       }
 
       // take the flows found
-      execution.takeAll(transitionsToTake, joinedExecutions);
+      execution.leaveActivityViaTransitions(transitionsToTake, joinedExecutions);
     } else {
       if (log.isLoggable(Level.FINE)) {
         log.fine("Inclusive gateway '" + activity.getId() + "' does not activate");
@@ -111,9 +111,8 @@ public class InclusiveGatewayActivityBehavior extends GatewayActivityBehavior {
       for (ActivityExecution concurrentExecution : getLeaveExecutions(execution.getParent())) {
         if (concurrentExecution.isActive()) {
 
-          // TODO: when is transitionBeingTaken cleared? Should we clear it?
           boolean reachable = false;
-          PvmTransition pvmTransition = ((ExecutionEntity) concurrentExecution).getTransitionBeingTaken();
+          PvmTransition pvmTransition = concurrentExecution.getTransition();
           if (pvmTransition != null) {
             reachable = isReachable(pvmTransition.getDestination(), activity, new HashSet<PvmActivity>());
           } else {
@@ -142,10 +141,10 @@ public class InclusiveGatewayActivityBehavior extends GatewayActivityBehavior {
     // if source has no outputs, it is the end of the process, and its parent process should be checked.
     if (srcActivity.getOutgoingTransitions().size() == 0) {
       visitedActivities.add(srcActivity);
-      if (srcActivity.getParent() == null || !(srcActivity.getParent() instanceof PvmActivity)) {
+      if (srcActivity.getFlowScope() == null || !(srcActivity.getFlowScope() instanceof PvmActivity)) {
         return false;
       }
-      srcActivity = (PvmActivity) srcActivity.getParent();
+      srcActivity = (PvmActivity) srcActivity.getFlowScope();
     }
     if (srcActivity.equals(targetActivity)) {
       return true;

@@ -87,7 +87,7 @@ public class ActivityExecutionMapping {
             scopeExecution = scopeExecution.getParent();
           }
 
-          assignToActivity(scopeExecution, activity.getParentScope());
+          assignToActivity(scopeExecution, activity.getFlowScope());
         }
 
 
@@ -111,7 +111,7 @@ public class ActivityExecutionMapping {
     else {
 
       if(!activity.isScope() && execution.isScope()) {
-        assignToActivity(execution, activity.getParentScope());
+        assignToActivity(execution, activity.getFlowScope());
       }
       else {
         ExecutionEntity parent = execution.getParent();
@@ -119,7 +119,7 @@ public class ActivityExecutionMapping {
         if (!parent.isScope()) {
           parent = parent.getParent();
         }
-        assignToActivity(parent, activity.getParentScope());
+        assignToActivity(parent, activity.getFlowScope());
       }
     }
 

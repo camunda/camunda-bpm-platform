@@ -19,7 +19,7 @@ import org.camunda.bpm.engine.impl.cmmn.execution.CmmnActivityExecution;
  * @author Roman Smirnov
  *
  */
-public interface CompositeActivityBehavior extends CmmnActivityBehavior {
+public interface CmmnCompositeActivityBehavior extends CmmnActivityBehavior {
 
   public void handleChildDisabled(CmmnActivityExecution execution, CmmnActivityExecution child);
 

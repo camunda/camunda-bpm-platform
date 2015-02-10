@@ -13,44 +13,67 @@
 
 package org.camunda.bpm.engine.impl.bpmn.behavior;
 
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+import java.util.List;
 
-import org.camunda.bpm.engine.impl.bpmn.helper.ScopeUtil;
+import org.camunda.bpm.engine.impl.bpmn.helper.CompensationUtil;
+import org.camunda.bpm.engine.impl.persistence.entity.CompensateEventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
-import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
+import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
+import org.camunda.bpm.engine.impl.pvm.runtime.LegacyBehavior;
+import org.camunda.bpm.engine.impl.util.EnsureUtil;
 
 
 /**
  * @author Daniel Meyer
  * @author Falko Menge
  */
-public class CancelEndEventActivityBehavior extends FlowNodeActivityBehavior {
+public class CancelEndEventActivityBehavior extends AbstractBpmnActivityBehavior {
+
+  protected PvmActivity cancelBoundaryEvent;
 
   @Override
   public void execute(ActivityExecution execution) throws Exception {
 
-    // find cancel boundary event:
-    ActivityImpl cancelBoundaryEvent = ScopeUtil
-      .findInParentScopesByBehaviorType((ActivityImpl) execution.getActivity(), CancelBoundaryEventActivityBehavior.class);
+    EnsureUtil
+    .ensureNotNull("Could not find cancel boundary event for cancel end event " + execution.getActivity(), "cancelBoundaryEvent", cancelBoundaryEvent);
 
-    ensureNotNull("Could not find cancel boundary event for cancel end event " + execution.getActivity(), "cancelBoundaryEvent", cancelBoundaryEvent);
+    ExecutionEntity executionEntity = (ExecutionEntity) execution;
+    List<CompensateEventSubscriptionEntity> compensateEventSubscriptions = executionEntity.getCompensateEventSubscriptions();
+    if(compensateEventSubscriptions.isEmpty()) {
+      leave(execution);
+    }
+    else {
+      CompensationUtil.throwCompensationEvent(compensateEventSubscriptions, execution, false);
+    }
 
-    ActivityExecution scopeExecution = ScopeUtil.findScopeExecutionForScope((ExecutionEntity) execution, cancelBoundaryEvent.getParentActivity());
+  }
 
-    // end all executions and process instances in the scope of the transaction
-    scopeExecution.cancelScope("cancel end event fired");
-    scopeExecution.interruptScope("cancel end event fired");
+  protected void leave(ActivityExecution execution) {
+    ScopeImpl eventScope = (ScopeImpl) cancelBoundaryEvent.getEventScope();
+    eventScope = LegacyBehavior.get().normalizeSecondNonScope(eventScope);
 
-    // the scope execution executes the boundary event
-    ActivityExecution outgoingExecution = scopeExecution;
-    outgoingExecution.setActivity(cancelBoundaryEvent);
-    outgoingExecution.setActive(true);
+    ActivityExecution boundaryEventScopeExecution = execution.findExecutionForFlowScope(eventScope);
+    boundaryEventScopeExecution.executeActivity(cancelBoundaryEvent);
+  }
 
-    // execute the boundary
-    cancelBoundaryEvent
-      .getActivityBehavior()
-      .execute(outgoingExecution);
+  public void signal(ActivityExecution execution, String signalName, Object signalData) throws Exception {
+
+    // join compensating executions
+    if(execution.getExecutions().isEmpty()) {
+      leave(execution);
+    } else {
+      ((ExecutionEntity)execution).forceUpdate();
+    }
+  }
+
+  public void setCancelBoundaryEvent(PvmActivity cancelBoundaryEvent) {
+    this.cancelBoundaryEvent = cancelBoundaryEvent;
+  }
+
+  public PvmActivity getCancelBoundaryEvent() {
+    return cancelBoundaryEvent;
   }
 
 }

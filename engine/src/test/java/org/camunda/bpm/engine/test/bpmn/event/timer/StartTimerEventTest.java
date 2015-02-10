@@ -485,10 +485,6 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
     // start process instance
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startTimerEventSubProcessWithUserTask");
 
-    // check if execution exists
-    ExecutionQuery executionQuery = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId());
-    assertEquals(1, executionQuery.count());
-
     // check if user task exists
     TaskQuery taskQuery = taskService.createTaskQuery().processInstanceId(processInstance.getId());
     assertEquals(1, taskQuery.count());
@@ -504,10 +500,6 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
     // check if user task of event subprocess named "subProcess" exists
     assertEquals(1, taskQuery.count());
     assertEquals("subprocessUserTask", taskQuery.list().get(0).getTaskDefinitionKey());
-
-    // check if execution exists because subprocess named "subProcess" is
-    // already running
-    assertEquals(1, executionQuery.count());
 
     // check if process instance exists because subprocess named "subProcess" is
     // already running
@@ -616,11 +608,6 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
     // start process instance
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startTimerEventSubProcessInMultiInstanceSubProcess");
 
-    // execute multiInstance loop number 1
-    // check if execution exists
-    ExecutionQuery executionQuery = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId());
-    assertEquals(2, executionQuery.count());
-
     // check if user task exists
     TaskQuery taskQuery = taskService.createTaskQuery();
     assertEquals(1, taskQuery.count());
@@ -635,7 +622,6 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
     DummyServiceTask.wasExecuted = false;
 
     // execute multiInstance loop number 2
-    assertEquals(2, executionQuery.count());
     assertEquals(1, taskQuery.count());
     assertEquals(1, jobQuery.count());
     String jobIdSecondLoop = jobQuery.list().get(0).getId();
@@ -652,10 +638,6 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
     // interrupting
     assertEquals(0, taskQuery.count());
 
-    // check if execution doesn't exist because timer start event is
-    // interrupting
-    assertEquals(0, executionQuery.count());
-
     // check if process instance doesn't exist because timer start event is
     // interrupting
     assertProcessEnded(processInstance.getId());
@@ -669,9 +651,6 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("nonInterruptingStartTimerEventInMultiInstanceEventSubProcess");
 
     // execute multiInstance loop number 1
-    // check if execution exists
-    ExecutionQuery executionQuery = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId());
-    assertEquals(2, executionQuery.count());
 
     // check if user task exists
     TaskQuery taskQuery = taskService.createTaskQuery();
@@ -686,14 +665,12 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
     assertEquals(true, DummyServiceTask.wasExecuted);
     DummyServiceTask.wasExecuted = false;
 
-    assertEquals(2, executionQuery.count());
     assertEquals(1, taskQuery.count());
     // complete existing task to start new execution for multi instance loop
     // number 2
     taskService.complete(taskQuery.list().get(0).getId());
 
     // execute multiInstance loop number 2
-    assertEquals(2, executionQuery.count());
     assertEquals(1, taskQuery.count());
     assertEquals(1, jobQuery.count());
     String jobIdSecondLoop = jobQuery.list().get(0).getId();
@@ -709,10 +686,6 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
     // check if user task doesn't exist because timer start event is
     // interrupting
     assertEquals(1, taskQuery.count());
-
-    // check if execution doesn't exist because timer start event is
-    // interrupting
-    assertEquals(2, executionQuery.count());
 
     // check if process instance doesn't exist because timer start event is
     // interrupting
@@ -815,11 +788,6 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
     // start process instance
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
 
-    // execute multiInstance loop number 1
-    // check if execution exists
-    ExecutionQuery executionQuery = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId());
-    assertEquals(2, executionQuery.count());
-
     // check if user task exists
     TaskQuery taskQuery = taskService.createTaskQuery();
     assertEquals(1, taskQuery.count());
@@ -834,7 +802,6 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
 
     // after first interrupting start timer event sub process execution
     // multiInstance loop number 2
-    assertEquals(2, executionQuery.count());
     assertEquals(1, taskQuery.count());
     assertEquals(2, jobQuery.count());
 
@@ -844,7 +811,6 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
     // after non interrupting boundary timer job execution
     assertEquals(1, jobQuery.count());
     assertEquals(1, taskQuery.count());
-    assertEquals(2, executionQuery.count());
     ProcessInstanceQuery processInstanceQuery = runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId());
     assertEquals(1, processInstanceQuery.count());
 
@@ -864,8 +830,6 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
 
     // execute multiInstance loop number 1
     // check if execution exists
-    ExecutionQuery executionQuery = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId());
-    assertEquals(2, executionQuery.count());
 
     // check if user task exists
     TaskQuery taskQuery = taskService.createTaskQuery();
@@ -881,7 +845,6 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
 
     // after first interrupting start timer event sub process execution
     // multiInstance loop number 2
-    assertEquals(2, executionQuery.count());
     assertEquals(1, taskQuery.count());
     assertEquals(2, jobQuery.count());
 
@@ -891,17 +854,11 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
     // after interrupting boundary timer job execution
     assertEquals(0, jobQuery.count());
     assertEquals(0, taskQuery.count());
-    assertEquals(0, executionQuery.count());
 
     assertProcessEnded(processInstance.getId());
 
   }
 
-  /**
-   * test scenario: - start process instance with multiInstance sequential -
-   * execute non interrupting timer job of event subprocess - execute
-   * interrupting timer boundary event of subprocess
-   */
   @Deployment
   public void testNonInterruptingStartTimerEventSubProcessInMultiInstanceSubProcessWithInterruptingBoundaryTimerEvent() {
     DummyServiceTask.wasExecuted = false;
@@ -912,7 +869,7 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
     // execute multiInstance loop number 1
     // check if execution exists
     ExecutionQuery executionQuery = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId());
-    assertEquals(2, executionQuery.count());
+    assertEquals(3, executionQuery.count());
 
     // check if user task exists
     TaskQuery taskQuery = taskService.createTaskQuery();
@@ -932,7 +889,6 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
 
     // after first non interrupting start timer event sub process execution
     // multiInstance loop number 2
-    assertEquals(2, executionQuery.count());
     assertEquals(1, taskQuery.count());
     assertEquals(2, jobQuery.count());
 

@@ -24,7 +24,6 @@ import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.impl.bpmn.delegate.ActivityBehaviorInvocation;
 import org.camunda.bpm.engine.impl.bpmn.delegate.JavaDelegateInvocation;
-import org.camunda.bpm.engine.impl.bpmn.helper.ErrorPropagation;
 import org.camunda.bpm.engine.impl.bpmn.parser.FieldDeclaration;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.context.ProcessApplicationContextUtil;
@@ -68,10 +67,10 @@ public class ServiceTaskDelegateExpressionActivityBehavior extends TaskActivityB
           ((SignallableActivityBehavior) activityBehaviorInstance).signal(execution, signalName, signalData);
         }
         catch (BpmnError error) {
-          ErrorPropagation.propagateError(error, execution);
+          propagateBpmnError(error, execution);
         }
         catch (Exception exception) {
-          ErrorPropagation.propagateException(exception, execution);
+          propagateExceptionAsError(exception, execution);
         }
       }
 
@@ -83,10 +82,10 @@ public class ServiceTaskDelegateExpressionActivityBehavior extends TaskActivityB
             signal(execution, signalName, signalData);
           }
           catch (BpmnError error) {
-            ErrorPropagation.propagateError(error, execution);
+            propagateBpmnError(error, execution);
           }
           catch (Exception exception) {
-            ErrorPropagation.propagateException(exception, execution);
+            propagateExceptionAsError(exception, execution);
           }
           return null;
         }
@@ -133,9 +132,9 @@ public class ServiceTaskDelegateExpressionActivityBehavior extends TaskActivityB
       }
 
       if (error != null) {
-        ErrorPropagation.propagateError(error, execution);
+        propagateBpmnError(error, execution);
       } else {
-        ErrorPropagation.propagateException(exc, execution);
+        propagateExceptionAsError(exc, execution);
       }
 
     }
@@ -144,21 +143,13 @@ public class ServiceTaskDelegateExpressionActivityBehavior extends TaskActivityB
   protected ActivityBehavior getActivityBehaviorInstance(ActivityExecution execution, Object delegateInstance) {
 
     if (delegateInstance instanceof ActivityBehavior) {
-      return determineBehaviour((ActivityBehavior) delegateInstance, execution);
+      return (ActivityBehavior) delegateInstance;
     } else if (delegateInstance instanceof JavaDelegate) {
-      return determineBehaviour(new ServiceTaskJavaDelegateActivityBehavior((JavaDelegate) delegateInstance), execution);
+      return new ServiceTaskJavaDelegateActivityBehavior((JavaDelegate) delegateInstance);
     } else {
       throw new ProcessEngineException(delegateInstance.getClass().getName() + " doesn't implement " + JavaDelegate.class.getName() + " nor "
           + ActivityBehavior.class.getName());
     }
-  }
-
-  // Adds properties to the given delegation instance (eg multi instance) if needed
-  protected ActivityBehavior determineBehaviour(ActivityBehavior delegateInstance, ActivityExecution execution) {
-    if (hasMultiInstanceCharacteristics()) {
-      ((AbstractBpmnActivityBehavior) delegateInstance).setMultiInstanceActivityBehavior(multiInstanceActivityBehavior);
-    }
-    return delegateInstance;
   }
 
 }

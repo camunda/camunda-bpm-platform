@@ -80,76 +80,6 @@ public class PvmEventTest extends PvmTestCase {
   }
 
   /**
-   *         +--------------+
-   *         |outerscope    |
-   *         | +----------+ |
-   *         | |innerscope| |
-   * +-----+ | | +----+   | | +---+
-   * |start|---->|wait|------>|end|
-   * +-----+ | | +----+   | | +---+
-   *         | +----------+ |
-   *         +--------------+
-   */
-  public void testNestedActivitiesEventsOnTransitionEvents() {
-    EventCollector eventCollector = new EventCollector();
-
-    PvmProcessDefinition processDefinition = new ProcessDefinitionBuilder("events")
-      .executionListener(org.camunda.bpm.engine.impl.pvm.PvmEvent.EVENTNAME_START, eventCollector)
-      .executionListener(org.camunda.bpm.engine.impl.pvm.PvmEvent.EVENTNAME_END, eventCollector)
-      .createActivity("start")
-        .initial()
-        .behavior(new Automatic())
-        .executionListener(org.camunda.bpm.engine.impl.pvm.PvmEvent.EVENTNAME_START, eventCollector)
-        .executionListener(org.camunda.bpm.engine.impl.pvm.PvmEvent.EVENTNAME_END, eventCollector)
-        .startTransition("wait")
-          .executionListener(eventCollector)
-        .endTransition()
-      .endActivity()
-      .createActivity("outerscope")
-        .executionListener(org.camunda.bpm.engine.impl.pvm.PvmEvent.EVENTNAME_START, eventCollector)
-        .executionListener(org.camunda.bpm.engine.impl.pvm.PvmEvent.EVENTNAME_END, eventCollector)
-        .createActivity("innerscope")
-          .scope()
-          .executionListener(org.camunda.bpm.engine.impl.pvm.PvmEvent.EVENTNAME_START, eventCollector)
-          .executionListener(org.camunda.bpm.engine.impl.pvm.PvmEvent.EVENTNAME_END, eventCollector)
-          .createActivity("wait")
-            .behavior(new WaitState())
-            .executionListener(org.camunda.bpm.engine.impl.pvm.PvmEvent.EVENTNAME_START, eventCollector)
-            .executionListener(org.camunda.bpm.engine.impl.pvm.PvmEvent.EVENTNAME_END, eventCollector)
-            .transition("end")
-          .endActivity()
-        .endActivity()
-      .endActivity()
-      .createActivity("end")
-        .behavior(new WaitState())
-      .endActivity()
-    .buildProcessDefinition();
-
-    PvmProcessInstance processInstance = processDefinition.createProcessInstance();
-    processInstance.start();
-
-    List<String> expectedEvents = new ArrayList<String>();
-    expectedEvents.add("start on ProcessDefinition(events)");
-    expectedEvents.add("start on Activity(start)");
-    expectedEvents.add("end on Activity(start)");
-    expectedEvents.add("take on (start)-->(wait)");
-    expectedEvents.add("start on Activity(outerscope)");
-    expectedEvents.add("start on Activity(innerscope)");
-    expectedEvents.add("start on Activity(wait)");
-
-    assertEquals("expected "+expectedEvents+", but was \n"+eventCollector+"\n", expectedEvents, eventCollector.events);
-
-    PvmExecution execution = processInstance.findExecution("wait");
-    execution.signal(null, null);
-
-    expectedEvents.add("end on Activity(wait)");
-    expectedEvents.add("end on Activity(innerscope)");
-    expectedEvents.add("end on Activity(outerscope)");
-
-    assertEquals("expected "+expectedEvents+", but was \n"+eventCollector+"\n", expectedEvents, eventCollector.events);
-  }
-
-  /**
    *           +------------------------------+
    * +-----+   | +-----------+   +----------+ |   +---+
    * |start|-->| |startInside|-->|endInsdide| |-->|end|
@@ -285,7 +215,6 @@ public class PvmEventTest extends PvmTestCase {
     expectedEvents.add("start on Activity(c1)");
     expectedEvents.add("end on Activity(c1)");
     expectedEvents.add("start on Activity(join)");
-    expectedEvents.add("end on Activity(fork)");
     expectedEvents.add("start on Activity(c2)");
     expectedEvents.add("end on Activity(c2)");
     expectedEvents.add("start on Activity(join)");

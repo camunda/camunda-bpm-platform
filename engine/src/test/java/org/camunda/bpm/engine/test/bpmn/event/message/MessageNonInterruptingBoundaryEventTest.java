@@ -13,11 +13,15 @@
 
 package org.camunda.bpm.engine.test.bpmn.event.message;
 
+import static org.camunda.bpm.engine.test.util.ExecutionAssert.assertThat;
+import static org.camunda.bpm.engine.test.util.ExecutionAssert.describeExecutionTree;
+
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.ExecutionTree;
 
 /**
  *
@@ -292,79 +296,6 @@ public class MessageNonInterruptingBoundaryEventTest extends PluggableProcessEng
   }
 
   @Deployment
-  public void testNonInterruptingEventInCombinationWithUserTask() {
-    // given
-    String processInstanceId = runtimeService.startProcessInstanceByKey("process").getId();
-
-    // when (1)
-    runtimeService.correlateMessage("firstMessage");
-
-    // then (1)
-    assertEquals(2, taskService.createTaskQuery().count());
-
-    Task task1 = taskService.createTaskQuery()
-        .taskDefinitionKey("task1")
-        .singleResult();
-    assertNotNull(task1);
-
-    Execution task1Execution = runtimeService
-        .createExecutionQuery()
-        .activityId("task1")
-        .singleResult();
-
-    assertEquals(processInstanceId, ((ExecutionEntity) task1Execution).getParentId());
-
-    Task innerTask = taskService.createTaskQuery()
-        .taskDefinitionKey("innerTask")
-        .singleResult();
-    assertNotNull(innerTask);
-
-    Execution task2Execution = runtimeService
-        .createExecutionQuery()
-        .activityId("innerTask")
-        .singleResult();
-
-    assertEquals(processInstanceId, ((ExecutionEntity) task2Execution).getParentId());
-
-    // when (2)
-    taskService.complete(innerTask.getId());
-
-    // then (2)
-    assertEquals(2, taskService.createTaskQuery().count());
-
-    task1 = taskService.createTaskQuery()
-        .taskDefinitionKey("task1")
-        .singleResult();
-    assertNotNull(task1);
-
-    task1Execution = runtimeService
-        .createExecutionQuery()
-        .activityId("task1")
-        .singleResult();
-
-    assertEquals(processInstanceId, ((ExecutionEntity) task1Execution).getParentId());
-
-    Task task2 = taskService.createTaskQuery()
-        .taskDefinitionKey("task2")
-        .singleResult();
-    assertNotNull(task2);
-
-    task2Execution = runtimeService
-        .createExecutionQuery()
-        .activityId("task2")
-        .singleResult();
-
-    assertEquals(processInstanceId, ((ExecutionEntity) task2Execution).getParentId());
-
-    assertEquals(0, runtimeService.createEventSubscriptionQuery().count());
-
-    taskService.complete(task1.getId());
-    taskService.complete(task2.getId());
-
-    assertProcessEnded(processInstanceId);
-  }
-
-  @Deployment
   public void testNonInterruptingEventInCombinationWithUserTaskInsideSubProcess() {
     // given
     String processInstanceId = runtimeService.startProcessInstanceByKey("process").getId();
@@ -380,26 +311,20 @@ public class MessageNonInterruptingBoundaryEventTest extends PluggableProcessEng
         .singleResult();
     assertNotNull(task1);
 
-    Execution task1Execution = runtimeService
-        .createExecutionQuery()
-        .activityId("task1")
-        .singleResult();
-
-    assertFalse(processInstanceId.equals(((ExecutionEntity) task1Execution).getParentId()));
-
     Task innerTask = taskService.createTaskQuery()
         .taskDefinitionKey("innerTask")
         .singleResult();
     assertNotNull(innerTask);
 
-    Execution task2Execution = runtimeService
-        .createExecutionQuery()
-        .activityId("innerTask")
-        .singleResult();
-
-    assertFalse(processInstanceId.equals(((ExecutionEntity) task2Execution).getParentId()));
-
-    assertTrue(((ExecutionEntity) task1Execution).getParentId().equals(((ExecutionEntity) task2Execution).getParentId()));
+    ExecutionTree executionTree = ExecutionTree.forExecution(processInstanceId, processEngine);
+    assertThat(executionTree)
+    .matches(
+      describeExecutionTree(null).scope()
+        .child(null).scope()
+          .child("task1").noScope().concurrent().up()
+          .child(null).noScope().concurrent()
+            .child("innerTask").scope()
+        .done());
 
     // when (2)
     taskService.complete(innerTask.getId());
@@ -412,26 +337,82 @@ public class MessageNonInterruptingBoundaryEventTest extends PluggableProcessEng
         .singleResult();
     assertNotNull(task1);
 
-    task1Execution = runtimeService
-        .createExecutionQuery()
-        .activityId("task1")
-        .singleResult();
-
-    assertFalse(processInstanceId.equals(((ExecutionEntity) task1Execution).getParentId()));
 
     Task task2 = taskService.createTaskQuery()
         .taskDefinitionKey("task2")
         .singleResult();
     assertNotNull(task2);
 
-    task2Execution = runtimeService
-        .createExecutionQuery()
-        .activityId("task2")
+    assertEquals(0, runtimeService.createEventSubscriptionQuery().count());
+
+    executionTree = ExecutionTree.forExecution(processInstanceId, processEngine);
+    assertThat(executionTree)
+    .matches(
+      describeExecutionTree(null).scope()
+        .child(null).scope()
+          .child("task1").noScope().concurrent().up()
+          .child("task2").noScope().concurrent()
+        .done());
+
+    taskService.complete(task1.getId());
+    taskService.complete(task2.getId());
+
+    assertProcessEnded(processInstanceId);
+  }
+
+  @Deployment
+  public void testNonInterruptingEventInCombinationWithUserTask() {
+    // given
+    String processInstanceId = runtimeService.startProcessInstanceByKey("process").getId();
+
+    // when (1)
+    runtimeService.correlateMessage("firstMessage");
+
+    // then (1)
+    assertEquals(2, taskService.createTaskQuery().count());
+
+    Task task1 = taskService.createTaskQuery()
+        .taskDefinitionKey("task1")
         .singleResult();
+    assertNotNull(task1);
 
-    assertFalse(processInstanceId.equals(((ExecutionEntity) task2Execution).getParentId()));
+    Task innerTask = taskService.createTaskQuery()
+        .taskDefinitionKey("innerTask")
+        .singleResult();
+    assertNotNull(innerTask);
 
-    assertTrue(((ExecutionEntity) task1Execution).getParentId().equals(((ExecutionEntity) task2Execution).getParentId()));
+    ExecutionTree executionTree = ExecutionTree.forExecution(processInstanceId, processEngine);
+    assertThat(executionTree)
+    .matches(
+      describeExecutionTree(null).scope()
+      .child("task1").noScope().concurrent().up()
+      .child(null).noScope().concurrent()
+        .child("innerTask").scope()
+      .done());
+
+    // when (2)
+    taskService.complete(innerTask.getId());
+
+    // then (2)
+    assertEquals(2, taskService.createTaskQuery().count());
+
+    task1 = taskService.createTaskQuery()
+        .taskDefinitionKey("task1")
+        .singleResult();
+    assertNotNull(task1);
+
+    Task task2 = taskService.createTaskQuery()
+        .taskDefinitionKey("task2")
+        .singleResult();
+    assertNotNull(task2);
+
+    executionTree = ExecutionTree.forExecution(processInstanceId, processEngine);
+    assertThat(executionTree)
+    .matches(
+      describeExecutionTree(null).scope()
+      .child("task1").noScope().concurrent().up()
+      .child("task2").noScope().concurrent()
+    .done());
 
     assertEquals(0, runtimeService.createEventSubscriptionQuery().count());
 
@@ -440,6 +421,7 @@ public class MessageNonInterruptingBoundaryEventTest extends PluggableProcessEng
 
     assertProcessEnded(processInstanceId);
   }
+
 
   @Deployment
   public void testNonInterruptingWithUserTaskAndBoundaryEvent() {
@@ -515,7 +497,7 @@ public class MessageNonInterruptingBoundaryEventTest extends PluggableProcessEng
   }
 
   @Deployment
-  public void FAILING_testNestedEvents() {
+  public void testNestedEvents() {
     // given
     String processInstanceId = runtimeService.startProcessInstanceByKey("process").getId();
 
@@ -609,7 +591,7 @@ public class MessageNonInterruptingBoundaryEventTest extends PluggableProcessEng
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/event/message/MessageNonInterruptingBoundaryEventTest.testNestedEvents.bpmn20.xml"})
-  public void FAILING_testNestedEventsAnotherExecutionOrder() {
+  public void testNestedEventsAnotherExecutionOrder() {
     // given
     String processInstanceId = runtimeService.startProcessInstanceByKey("process").getId();
 

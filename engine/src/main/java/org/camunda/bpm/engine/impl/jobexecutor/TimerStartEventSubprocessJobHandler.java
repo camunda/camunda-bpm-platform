@@ -40,7 +40,7 @@ public class TimerStartEventSubprocessJobHandler extends TimerEventJobHandler {
       .findActivity(activityId);
 
     if(eventSubprocessActivity != null) {
-      execution.executeActivity(eventSubprocessActivity);
+      execution.executeEventHandlerActivity(eventSubprocessActivity);
 
     } else {
       throw new ProcessEngineException("Error while triggering event subprocess using timer start event: cannot find activity with id '"+configuration+"'.");

@@ -65,7 +65,7 @@ public class ErrorEventDefinition implements Serializable {
   }
 
   public boolean catchesError(String errorCode) {
-    return errorCode == null || this.errorCode == null || this.errorCode.equals(errorCode) ;
+    return this.errorCode == null || this.errorCode.equals(errorCode);
   }
 
   public boolean catchesException(Exception ex) {

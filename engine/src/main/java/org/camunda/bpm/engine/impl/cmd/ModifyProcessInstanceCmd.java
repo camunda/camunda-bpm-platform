@@ -49,6 +49,8 @@ public class ModifyProcessInstanceCmd implements Command<Void> {
     AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
     authorizationManager.checkUpdateProcessInstance(processInstance);
 
+    processInstance.setPreserveScope(true);
+
     for (AbstractProcessInstanceModificationCommand instruction : builder.getModificationOperations()) {
       instruction.setSkipCustomListeners(builder.isSkipCustomListeners());
       instruction.setSkipIoMappings(builder.isSkipIoMappings());

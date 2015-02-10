@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,14 +15,13 @@ package org.camunda.bpm.engine.impl.bpmn.behavior;
 
 import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.delegate.Expression;
-import org.camunda.bpm.engine.impl.bpmn.helper.ErrorPropagation;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 
 
 /**
- * ActivityBehavior that evaluates an expression when executed. Optionally, it sets the result 
+ * ActivityBehavior that evaluates an expression when executed. Optionally, it sets the result
  * of the expression as a variable on the execution.
- * 
+ *
  * @author Tom Baeyens
  * @author Christian Stettler
  * @author Frederik Heremans
@@ -60,9 +59,9 @@ public class ServiceTaskExpressionActivityBehavior extends TaskActivityBehavior 
       }
 
       if (error != null) {
-        ErrorPropagation.propagateError(error, execution);
+        propagateBpmnError(error, execution);
       } else {
-        ErrorPropagation.propagateException(exc, execution);
+        propagateExceptionAsError(exc, execution);
       }
     }
   }

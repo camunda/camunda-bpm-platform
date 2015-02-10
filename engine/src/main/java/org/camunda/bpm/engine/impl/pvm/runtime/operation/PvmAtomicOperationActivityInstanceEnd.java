@@ -15,8 +15,8 @@ package org.camunda.bpm.engine.impl.pvm.runtime.operation;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.delegate.CompositeActivityBehavior;
-import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 
 
@@ -36,7 +36,7 @@ public abstract class PvmAtomicOperationActivityInstanceEnd extends AbstractPvmE
     // if we end a scope activity, take remembered activity instance from parent and set on
     // execution before calling END listeners.
     PvmExecutionImpl parent = execution.getParent();
-    ActivityImpl activity = execution.getActivity();
+    PvmActivity activity = execution.getActivity();
     if (parent != null && execution.isScope() &&
         activity != null && activity.isScope() &&
         (activity.getActivityBehavior() instanceof CompositeActivityBehavior)) {

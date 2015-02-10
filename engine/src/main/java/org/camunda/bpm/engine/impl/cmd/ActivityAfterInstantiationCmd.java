@@ -16,7 +16,7 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.core.model.CoreModelElement;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
-import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
+import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 import org.camunda.bpm.engine.impl.pvm.process.TransitionImpl;
@@ -43,7 +43,7 @@ public class ActivityAfterInstantiationCmd extends AbstractInstantiationCmd {
     ExecutionEntity processInstance = commandContext.getExecutionManager().findExecutionById(processInstanceId);
     ProcessDefinitionImpl processDefinition = processInstance.getProcessDefinition();
 
-    ActivityImpl activity = processDefinition.findActivity(activityId);
+    PvmActivity activity = processDefinition.findActivity(activityId);
 
     if (activity.getOutgoingTransitions().isEmpty()) {
       throw new ProcessEngineException("Cannot start after activity " + activityId + "; activity "
@@ -58,14 +58,14 @@ public class ActivityAfterInstantiationCmd extends AbstractInstantiationCmd {
   }
 
   protected ScopeImpl getTargetFlowScope(ProcessDefinitionImpl processDefinition) {
-    ActivityImpl sourceActivity = processDefinition.findActivity(activityId);
+    PvmActivity sourceActivity = processDefinition.findActivity(activityId);
     TransitionImpl transition = (TransitionImpl) sourceActivity.getOutgoingTransitions().get(0);
 
     return transition.getDestination().getFlowScope();
   }
 
   protected CoreModelElement getTargetElement(ProcessDefinitionImpl processDefinition) {
-    ActivityImpl sourceActivity = processDefinition.findActivity(activityId);
+    PvmActivity sourceActivity = processDefinition.findActivity(activityId);
     TransitionImpl transition = (TransitionImpl) sourceActivity.getOutgoingTransitions().get(0);
 
     return transition;

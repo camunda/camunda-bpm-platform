@@ -21,6 +21,7 @@ import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.impl.core.model.CoreModelElement;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
+import org.camunda.bpm.engine.impl.pvm.process.ActivityStartBehavior;
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 import org.camunda.bpm.engine.impl.pvm.process.TransitionImpl;
@@ -57,6 +58,21 @@ public class ProcessDefinitionBuilder {
 
     return this;
   }
+
+  public ProcessDefinitionBuilder attachedTo(String id, boolean isInterrupting) {
+    ActivityImpl activity = getActivity();
+    activity.setEventScope(processDefinition.findActivity(id));
+
+    if(isInterrupting) {
+      activity.setActivityStartBehavior(ActivityStartBehavior.INTERRUPT_EVENT_SCOPE);
+    }
+    else {
+      activity.setActivityStartBehavior(ActivityStartBehavior.CONCURRENT_IN_FLOW_SCOPE);
+    }
+
+    return this;
+  }
+
 
   public ProcessDefinitionBuilder endActivity() {
     scopeStack.pop();

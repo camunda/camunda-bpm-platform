@@ -20,7 +20,7 @@ import org.camunda.bpm.engine.impl.pvm.PvmActivity;
  *
  * <p>The corresponding activity must either be
  * <ul>
- *  <li>{@link PvmActivity#isCancelScope()} in case of an interrupting boundary event. In this case
+ *  <li>{@link PvmActivity#isCancelActivity()} in case of an interrupting boundary event. In this case
  *  the scope to which the boundary event is attached will already be cancelled when this behavior is executed.</li>
  *  <li>{@link PvmActivity#isConcurrent()} in case of a non-interrupting boundary event. In this case
  *  the new concurrent execution will already have been created when this behavior is executed.</li>

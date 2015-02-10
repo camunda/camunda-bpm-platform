@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -60,10 +60,10 @@ public class PvmParallelTest extends PvmTestCase {
         .behavior(new End())
       .endActivity()
     .buildProcessDefinition();
-    
-    PvmProcessInstance processInstance = processDefinition.createProcessInstance(); 
+
+    PvmProcessInstance processInstance = processDefinition.createProcessInstance();
     processInstance.start();
-    
+
     assertTrue(processInstance.isEnded());
   }
 
@@ -95,23 +95,23 @@ public class PvmParallelTest extends PvmTestCase {
         .behavior(new WaitState())
       .endActivity()
     .buildProcessDefinition();
-    
-    PvmProcessInstance processInstance = processDefinition.createProcessInstance(); 
+
+    PvmProcessInstance processInstance = processDefinition.createProcessInstance();
     processInstance.start();
-    
+
     PvmExecution activityInstanceC1 = processInstance.findExecution("c1");
     assertNotNull(activityInstanceC1);
-    
+
     PvmExecution activityInstanceC2 = processInstance.findExecution("c2");
     assertNotNull(activityInstanceC2);
-    
+
     activityInstanceC1.signal(null, null);
     activityInstanceC2.signal(null, null);
-    
+
     List<String> activityNames = processInstance.findActiveActivityIds();
     List<String> expectedActivityNames = new ArrayList<String>();
     expectedActivityNames.add("end");
-    
+
     assertEquals(expectedActivityNames, activityNames);
   }
 
@@ -156,10 +156,10 @@ public class PvmParallelTest extends PvmTestCase {
         .behavior(new WaitState())
       .endActivity()
     .buildProcessDefinition();
-    
-    PvmProcessInstance processInstance = processDefinition.createProcessInstance(); 
+
+    PvmProcessInstance processInstance = processDefinition.createProcessInstance();
     processInstance.start();
-    
+
     assertNotNull(processInstance.findExecution("end"));
   }
 
@@ -205,10 +205,10 @@ public class PvmParallelTest extends PvmTestCase {
         .behavior(new WaitState())
       .endActivity()
     .buildProcessDefinition();
-    
-    PvmProcessInstance processInstance = processDefinition.createProcessInstance(); 
+
+    PvmProcessInstance processInstance = processDefinition.createProcessInstance();
     processInstance.start();
-    
+
     assertNotNull(processInstance.findExecution("end"));
   }
 
@@ -263,10 +263,10 @@ public class PvmParallelTest extends PvmTestCase {
         .behavior(new WaitState())
       .endActivity()
     .buildProcessDefinition();
-    
-    PvmProcessInstance processInstance = processDefinition.createProcessInstance(); 
+
+    PvmProcessInstance processInstance = processDefinition.createProcessInstance();
     processInstance.start();
-    
+
     assertNotNull(processInstance.findExecution("end"));
   }
 }

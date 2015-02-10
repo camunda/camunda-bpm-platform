@@ -22,7 +22,7 @@
 
       <userTask id="innerTask2" />
 
-      <sequenceFlow sourceRef="innerTask1" targetRef="innerEnd1" />
+      <sequenceFlow sourceRef="innerTask2" targetRef="innerEnd1" />
 
       <endEvent id="innerEnd1" />
 

@@ -22,7 +22,6 @@ import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
-import org.camunda.bpm.engine.impl.bpmn.helper.ErrorPropagation;
 import org.camunda.bpm.engine.impl.bpmn.parser.FieldDeclaration;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.context.ProcessApplicationContextUtil;
@@ -62,9 +61,9 @@ public class ClassDelegateActivityBehavior extends AbstractBpmnActivityBehavior 
     try {
       activityBehaviorInstance.execute(execution);
     } catch (BpmnError error) {
-      ErrorPropagation.propagateError(error, execution);
+      propagateBpmnError(error, execution);
     } catch (Exception ex) {
-      ErrorPropagation.propagateException(ex, execution);
+      propagateExceptionAsError(ex, execution);
     }
   }
 
@@ -81,10 +80,10 @@ public class ClassDelegateActivityBehavior extends AbstractBpmnActivityBehavior 
           ((SignallableActivityBehavior) activityBehaviorInstance).signal(execution, signalName, signalData);
         }
         catch (BpmnError error) {
-          ErrorPropagation.propagateError(error, execution);
+          propagateBpmnError(error, execution);
         }
         catch (Exception exception) {
-          ErrorPropagation.propagateException(exception, execution);
+          propagateExceptionAsError(exception, execution);
         }
       } else {
         throw new ProcessEngineException("signal() can only be called on a " + SignallableActivityBehavior.class.getName() + " instance");
@@ -98,10 +97,10 @@ public class ClassDelegateActivityBehavior extends AbstractBpmnActivityBehavior 
             signal(execution, signalName, signalData);
           }
           catch (BpmnError error) {
-            ErrorPropagation.propagateError(error, execution);
+            propagateBpmnError(error, execution);
           }
           catch (Exception exception) {
-            ErrorPropagation.propagateException(exception, execution);
+            propagateExceptionAsError(exception, execution);
           }
           return null;
         }
@@ -114,20 +113,12 @@ public class ClassDelegateActivityBehavior extends AbstractBpmnActivityBehavior 
     Object delegateInstance = instantiateDelegate(className, fieldDeclarations);
 
     if (delegateInstance instanceof ActivityBehavior) {
-      return determineBehaviour((ActivityBehavior) delegateInstance, execution);
+      return (ActivityBehavior) delegateInstance;
     } else if (delegateInstance instanceof JavaDelegate) {
-      return determineBehaviour(new ServiceTaskJavaDelegateActivityBehavior((JavaDelegate) delegateInstance), execution);
+      return new ServiceTaskJavaDelegateActivityBehavior((JavaDelegate) delegateInstance);
     } else {
       throw new ProcessEngineException(delegateInstance.getClass().getName()+" doesn't implement "+JavaDelegate.class.getName()+" nor "+ActivityBehavior.class.getName());
     }
-  }
-
-  // Adds properties to the given delegation instance (eg multi instance) if needed
-  protected ActivityBehavior determineBehaviour(ActivityBehavior delegateInstance, ActivityExecution execution) {
-    if (hasMultiInstanceCharacteristics()) {
-      ((AbstractBpmnActivityBehavior) delegateInstance).setMultiInstanceActivityBehavior(multiInstanceActivityBehavior);
-    }
-    return delegateInstance;
   }
 
 }

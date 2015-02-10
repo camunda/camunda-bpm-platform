@@ -17,9 +17,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.ibatis.logging.LogFactory;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.incident.FailedJobIncidentHandler;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.impl.util.LogUtil;
 import org.camunda.bpm.engine.management.ActivityStatistics;
 import org.camunda.bpm.engine.management.IncidentStatistics;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
@@ -360,6 +362,11 @@ public class ActivityStatisticsQueryTest extends PluggableProcessEngineTestCase 
     } catch (ProcessEngineException e) {
       // expected
     }
+  }
+
+  static {
+    LogFactory.useJdkLogging();
+    LogUtil.readJavaUtilLoggingConfigFromClasspath();
   }
 
   @Test

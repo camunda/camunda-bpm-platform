@@ -387,7 +387,7 @@ public class ProcessInstanceModificationAsyncTest extends PluggableProcessEngine
 
     assertThat(executionTree)
     .matches(
-      describeExecutionTree("fork").scope()
+      describeExecutionTree(null).scope()
         .child("outerTask").concurrent().noScope().up()
         .child(null).concurrent().noScope()
           .child("innerTask2").scope()
@@ -441,7 +441,7 @@ public class ProcessInstanceModificationAsyncTest extends PluggableProcessEngine
 
     assertThat(executionTree)
     .matches(
-      describeExecutionTree("fork").scope()
+      describeExecutionTree(null).scope()
         .child("outerTask").concurrent().noScope().up()
         .child(null).concurrent().noScope()
           .child(null).scope()

@@ -18,6 +18,7 @@ import java.util.List;
 
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.impl.core.model.CoreModelElement;
+import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessDefinition;
 import org.camunda.bpm.engine.impl.pvm.PvmTransition;
 
@@ -84,7 +85,7 @@ public class TransitionImpl extends CoreModelElement implements PvmTransition {
     this.source = source;
   }
 
-  public ActivityImpl getDestination() {
+  public PvmActivity getDestination() {
     return destination;
   }
 
