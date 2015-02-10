@@ -202,8 +202,8 @@ public class HumanTaskItemHandler extends TaskItemHandler {
     String followUpDate = definition.getCamundaFollowUpDate();
     if (followUpDate != null) {
       ExpressionManager expressionManager = context.getExpressionManager();
-      Expression dueDateExpression = expressionManager.createExpression(followUpDate);
-      taskDefinition.setFollowUpDateExpression(dueDateExpression);
+      Expression followUpDateExpression = expressionManager.createExpression(followUpDate);
+      taskDefinition.setFollowUpDateExpression(followUpDateExpression);
     }
   }
 
