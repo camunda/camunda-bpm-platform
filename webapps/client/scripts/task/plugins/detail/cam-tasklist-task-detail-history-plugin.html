@@ -2,15 +2,14 @@
 
   <div ng-show="!state.$loaded"
        class="loader">
-    <i class="animate-spin glyphicon glyphicon-refresh"></i>
+    <span class="animate-spin glyphicon glyphicon-refresh"></span>
     {{ 'LOADING' | translate }}
   </div>
 
   <div ng-hide="!state.$loaded">
-
     <div ng-if="!days.length">
       <div class="well">
-        <i class="glyphicon glyphicon-info-sign"></i>
+        <span class="glyphicon glyphicon-info-sign"></span>
         {{ 'NO_HISTORY' | translate }}
       </div>
     </div>
@@ -18,7 +17,6 @@
     <div ng-if="days.length"
          class="day row"
          ng-repeat="day in days | orderBy:'-date'">
-
       <div class="col-xs-2">
         <div class="date-badge">
           <div>
@@ -27,7 +25,6 @@
             <span class="year">{{ day.date | date:'yyyy' }}</span>
           </div>
         </div>
-
       </div>
 
       <div class="col-xs-10">
@@ -56,7 +53,7 @@
                     <span ng-if="subEvent.propertyIsDate">{{ subEvent.newValue | camDate }}</span>
                     <span ng-if="!subEvent.propertyIsDate">{{ subEvent.newValue }}</span>
                   </div>
-                  
+
                   <div class="original-value"
                        ng-if="subEvent.orgValue">
                     <span ng-if="subEvent.propertyIsDate">{{ subEvent.orgValue | camDate }}</span>

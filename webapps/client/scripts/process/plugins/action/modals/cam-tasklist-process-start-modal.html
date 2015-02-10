@@ -27,7 +27,7 @@
 
     <div ng-show="!processDefinitionState.$loaded || lookupProcessDefinitionByName.$loading"
        class="loader">
-      <i class="animate-spin glyphicon glyphicon-refresh"></i>
+      <span class="animate-spin glyphicon glyphicon-refresh"></span>
       {{ 'LOADING' | translate }}
     </div>
 
@@ -35,14 +35,14 @@
 
       <div ng-hide="page.total"
            class="well">
-        <i class="glyphicon glyphicon-info-sign"></i>
+        <span class="glyphicon glyphicon-info-sign"></span>
         {{ 'NO_PROCESS_DEFINITION_AVAILABLE' | translate }}
       </div>
 
       <div ng-show="page.total" class="available-processes">
 
         <div class="text-help">
-          <i class="glyphicon glyphicon-info-sign"></i>
+          <span class="glyphicon glyphicon-info-sign"></span>
           {{ 'CLICK_PROCESS_TO_START' | translate }}
         </div>
 
@@ -109,13 +109,11 @@
        class="row">
 
     <div class="col-xs-4 align-left">
-
       <button class="btn btn-xs btn-link"
               type="button"
               ng-click="back()">
         {{ 'BACK' | translate }}
       </button>
-
     </div>
 
     <div class="col-xs-8">

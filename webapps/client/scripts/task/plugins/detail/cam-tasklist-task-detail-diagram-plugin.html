@@ -1,6 +1,6 @@
 <div ng-show="!processDiagramState.$loaded"
      class="loader">
-  <i class="animate-spin glyphicon glyphicon-refresh"></i>
+  <span class="animate-spin glyphicon glyphicon-refresh"></span>
   {{ 'LOADING' | translate }}
 </div>
 
@@ -8,7 +8,7 @@
 
   <div ng-show="!processDefinition || !processDiagram.bpmn20xml"
        class="well">
-    <i class="glyphicon glyphicon-info-sign"></i>
+    <span class="glyphicon glyphicon-info-sign"></span>
     {{ 'NO_DIAGRAM' | translate }}
   </div>
 

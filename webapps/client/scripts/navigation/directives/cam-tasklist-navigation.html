@@ -15,9 +15,7 @@
     <a class="navbar-brand"
        title="{{ 'APP_VENDOR' | translate }} {{ 'TASKLIST_APP' | translate }}"
        ng-href="{{ 'tasklistbase://' | uri }}">
-<!--
        {{ 'APP_VENDOR' | translate }} {{ 'TASKLIST_APP' | translate }}
--->
     </a>
   </div>
 
@@ -52,7 +50,7 @@
            sem-show-user-actions
            class="dropdown-toggle"
            data-toggle="dropdown">
-          <i class="glyphicon glyphicon-user"></i>
+          <span class="glyphicon glyphicon-user"></span>
           {{ authentication.name }}
         </a>
         <ul class="dropdown-menu">
@@ -87,8 +85,8 @@
            sem-show-applications
            class="dropdown-toggle"
            data-toggle="dropdown">
-          <i class="glyphicon glyphicon-home"></i>
-          <b class="caret"></b>
+          <span class="glyphicon glyphicon-home"></span>
+          <span class="caret"></span>
         </a>
 
         <ul class="dropdown-menu">

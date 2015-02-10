@@ -1,13 +1,13 @@
 <div ng-show="!taskState.$loaded"
      class="loader">
-  <i class="animate-spin glyphicon glyphicon-refresh"></i>
+  <span class="animate-spin glyphicon glyphicon-refresh"></span>
   {{ 'LOADING' | translate }}
 </div>
 
 <div ng-show="taskState.$loaded">
   <div ng-hide="task">
     <div class="no-task well">
-      <i class="glyphicon glyphicon-info-sign"></i>
+      <span class="glyphicon glyphicon-info-sign"></span>
       {{ 'SELECT_TASK_IN_LIST' | translate }}
     </div>
   </div>

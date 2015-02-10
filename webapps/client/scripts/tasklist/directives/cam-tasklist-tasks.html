@@ -1,6 +1,6 @@
 <div ng-show="!state.$loaded && !state.$error"
      class="loader">
-  <i class="animate-spin glyphicon glyphicon-refresh"></i>
+  <span class="animate-spin glyphicon glyphicon-refresh"></span>
   {{ 'LOADING' | translate }}
 </div>
 
@@ -14,12 +14,12 @@
 
   <div ng-hide="totalItems"
        class="well">
-    <i class="glyphicon glyphicon-info-sign"></i>
+    <span class="glyphicon glyphicon-info-sign"></span>
     {{ 'NO_MATCHING_TASK' | translate }}
   </div>
 
   <div ng-show="totalItems && !tasks" class="well">
-    <i class="glyphicon glyphicon-info-sign"></i>
+    <span class="glyphicon glyphicon-info-sign"></span>
     {{ 'RESTRICTION_NOTICE' | translate }}
     <a ng-click="resetPage()">{{ 'RESET_PAGE' | translate }}</a>
   </div>
