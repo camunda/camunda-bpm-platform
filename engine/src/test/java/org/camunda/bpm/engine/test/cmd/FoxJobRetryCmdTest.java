@@ -790,4 +790,27 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
     assertEquals(1, managementService.createJobQuery().noRetriesLeft().count());
   }
 
+  @Deployment
+  public void FAILING_testRetryOnTimerStartEventInEventSubProcess() {
+    runtimeService.startProcessInstanceByKey("process").getId();
+
+    Job job = managementService
+        .createJobQuery()
+        .singleResult();
+
+    assertEquals(3, job.getRetries());
+
+    try {
+      managementService.executeJob(job.getId());
+      fail();
+    } catch (Exception e) {
+      // expected
+    }
+
+    job = managementService
+        .createJobQuery()
+        .singleResult();
+
+    assertEquals(4, job.getRetries());
+  }
 }
