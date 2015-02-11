@@ -236,7 +236,7 @@
                       and INC.INCIDENT_TYPE_ = #{includeIncidentsForType}
                       </if>
                   group by
-                      PROCDEF.DEPLOYMENT_ID_
+                      PROCDEF.DEPLOYMENT_ID_, INC.INCIDENT_TYPE_
                 ) INC
             on
                  DEPLOYMENT.ID_ = INC.DEPLOYMENT_ID_
@@ -317,7 +317,7 @@
                           </if>
                   </if>
 
-                )
+                ) ACTID
           ) ACTID
 
           left outer join
