@@ -1,9 +1,5 @@
-module.exports = function(config) {
+module.exports = function() {
   'use strict';
-
-  var deps = [
-    'angular'
-  ];
 
   var rConf = {
     options: {
@@ -38,14 +34,13 @@ module.exports = function(config) {
       }
     },
     standaloneTask: {
-	  options: {
-	    out: '<%= pkg.gruntConfig.buildTarget %>/standaloneTask/app/plugin.js',
-	    include: ['standaloneTask/app/plugin'],
-	    exclude: ['text'],
-	    insertRequire: ['standaloneTask/app/plugin']
-	  }
-	}
-
+      options: {
+        out: '<%= pkg.gruntConfig.buildTarget %>/standaloneTask/app/plugin.js',
+        include: ['standaloneTask/app/plugin'],
+        exclude: ['text'],
+        insertRequire: ['standaloneTask/app/plugin']
+      }
+    }
   };
 
   return rConf;

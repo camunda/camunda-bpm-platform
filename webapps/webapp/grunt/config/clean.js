@@ -1,7 +1,5 @@
-module.exports = function(config) {
-  config = config || {};
-
-  var grunt = config.grunt;
+module.exports = function() {
+  'use strict';
 
   return {
     plugin: {
