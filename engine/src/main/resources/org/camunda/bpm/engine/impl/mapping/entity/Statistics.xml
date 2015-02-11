@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8" ?> 
 
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
-  
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
 <mapper namespace="org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionStatisticsEntity">
 
   <!-- RESULTMAP -->
 
   <resultMap id="processDefinitionStatisticsResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionStatisticsEntity">
     <id property="id" column="ID_" jdbcType="VARCHAR" />
-    <result property="instances" column="INSTANCE_COUNT" jdbcType="INTEGER" />
-    <result property="failedJobs" column="FAILED_JOBS_COUNT" jdbcType="INTEGER" />
+    <result property="instances" column="INSTANCE_COUNT_" jdbcType="INTEGER" />
+    <result property="failedJobs" column="FAILED_JOBS_COUNT_" jdbcType="INTEGER" />
     <result property="revision" column="REV_" />
     <result property="category" column="CATEGORY_" />
     <result property="name" column="NAME_" />
@@ -22,32 +22,32 @@
     <result property="suspensionState" column="SUSPENSION_STATE_" jdbcType="INTEGER"/>
     <collection property="incidentStatistics" javaType="ArrayList" ofType="org.camunda.bpm.engine.impl.persistence.entity.IncidentStatisticsEntity">
       <result property="incidentType" column="INCIDENT_TYPE_" jdbcType="VARCHAR" />
-      <result property="incidentCount" column="INCIDENT_COUNT" jdbcType="INTEGER"/>
+      <result property="incidentCount" column="INCIDENT_COUNT_" jdbcType="INTEGER"/>
     </collection>
   </resultMap>
-  
+
   <resultMap id="deploymentStatisticsResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.DeploymentStatisticsEntity">
     <id property="id" column="ID_" jdbcType="VARCHAR" />
     <result property="name" column="NAME_" jdbcType="VARCHAR" />
     <result property="deploymentTime" column="DEPLOY_TIME_" jdbcType="TIMESTAMP"/>
-    <result property="instances" column="INSTANCE_COUNT" jdbcType="INTEGER" />
-    <result property="failedJobs" column="FAILED_JOBS_COUNT" jdbcType="INTEGER" />
+    <result property="instances" column="INSTANCE_COUNT_" jdbcType="INTEGER" />
+    <result property="failedJobs" column="FAILED_JOBS_COUNT_" jdbcType="INTEGER" />
     <collection property="incidentStatistics" javaType="ArrayList" ofType="org.camunda.bpm.engine.impl.persistence.entity.IncidentStatisticsEntity">
       <result property="incidentType" column="INCIDENT_TYPE_" jdbcType="VARCHAR" />
-      <result property="incidentCount" column="INCIDENT_COUNT" jdbcType="INTEGER"/>
+      <result property="incidentCount" column="INCIDENT_COUNT_" jdbcType="INTEGER"/>
     </collection>
   </resultMap>
-  
+
   <resultMap id="activityStatisticsResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.ActivityStatisticsImpl">
     <id property="id" column="ID_" jdbcType="VARCHAR" />
-    <result property="instances" column="INSTANCE_COUNT" jdbcType="INTEGER" />
-    <result property="failedJobs" column="FAILED_JOBS_COUNT" jdbcType="INTEGER" />
+    <result property="instances" column="INSTANCE_COUNT_" jdbcType="INTEGER" />
+    <result property="failedJobs" column="FAILED_JOBS_COUNT_" jdbcType="INTEGER" />
     <collection property="incidentStatistics" javaType="ArrayList" ofType="org.camunda.bpm.engine.impl.persistence.entity.IncidentStatisticsEntity">
       <result property="incidentType" column="INCIDENT_TYPE_" jdbcType="VARCHAR" />
-      <result property="incidentCount" column="INCIDENT_COUNT" jdbcType="INTEGER"/>
+      <result property="incidentCount" column="INCIDENT_COUNT_" jdbcType="INTEGER"/>
     </collection>
   </resultMap>
-  
+
   <!-- Process Definition Statistics -->  
   <select id ="selectProcessDefinitionStatistics" resultMap="processDefinitionStatisticsResultMap" 
     parameterType="org.camunda.bpm.engine.impl.ProcessDefinitionStatisticsQueryImpl">
@@ -59,79 +59,92 @@
     ${orderBy}
     ${limitAfter}
   </select>
-  
+
   <select id ="selectProcessDefinitionStatisticsCount" resultType="long" 
     parameterType="org.camunda.bpm.engine.impl.ProcessDefinitionStatisticsQueryImpl">
     select count(RES.ID_) 
     <include refid="selectProcessDefinitionStatisticsByQueryCriteriaSql"/>
   </select>
-  
+
   <sql id="selectProcessDefinitionStatisticsByQueryCriteriaSql">
-    from (
-    select PROCDEF.*, AGG.INSTANCE_COUNT
-    <if test="failedJobsToInclude">
-    , AGG.FAILED_JOBS_COUNT
-    </if>
-    <if test="incidentsToInclude">
-    , AGG.INCIDENT_TYPE_
-    , AGG.INCIDENT_COUNT
-    </if>
-    
-    <!-- Join process definitions with data about running instances and failed jobs -->
-    from ${prefix}ACT_RE_PROCDEF PROCDEF left outer join 
-    ( select INSTANCE.PROC_DEF_ID_ as ID_,
-      INSTANCE_COUNT
-      <if test="failedJobsToInclude">
-      , FAILED_JOBS_COUNT
-      </if>
-      <if test="incidentsToInclude">
-      , INCIDENT_TYPE_
-      , INCIDENT_COUNT
-      </if>
-      
-      from
-      
-      <!-- Count and group all process instances (executions that have ID_ = PROC_INST_ID_) by process definition -->
-      (select PROC_DEF_ID_, count(PROC_INST_ID_) as INSTANCE_COUNT 
-      from ${prefix}ACT_RU_EXECUTION
-      where ID_ = PROC_INST_ID_
-      group by PROC_DEF_ID_) INSTANCE
-      
-      <!-- failed jobs -->
-      <if test="failedJobsToInclude">
-      left outer join
-      
-      <!-- Sum all failed jobs grouped by process definition -->
-      (select PROC_DEF_ID_, count(JOB.ID_) as FAILED_JOBS_COUNT from 
-        <!-- Select all executions and their failed jobs (i.e. RETRIES_ = 0) -->
-        ( select JOB.ID_, PROC_DEF_ID_ 
-        from ${prefix}ACT_RU_EXECUTION EXECUTION, ${prefix}ACT_RU_JOB JOB 
-        where EXECUTION.ID_ = JOB.EXECUTION_ID_ and JOB.RETRIES_ = 0) JOB
-      group by JOB.PROC_DEF_ID_) JOB
-      on JOB.PROC_DEF_ID_ = INSTANCE.PROC_DEF_ID_ 
-      </if>
-      
-      <!-- incidents -->
-      <if test="incidentsToInclude">
-      left outer join
-      
-      <!-- Sum all incidents grouped by process definition and incident type-->
-      (select INC.PROC_DEF_ID_, INC.INCIDENT_TYPE_, count(INC.ID_) as INCIDENT_COUNT
-        from ${prefix}ACT_RU_INCIDENT INC
-        <if test="includeIncidentsForType != null">
-        where INC.INCIDENT_TYPE_ = #{includeIncidentsForType}
-        </if>
-        group by INC.PROC_DEF_ID_, INC.INCIDENT_TYPE_) INC
-      on INC.PROC_DEF_ID_ = INSTANCE.PROC_DEF_ID_ 
-      </if>
-      
-      ) AGG
-    on PROCDEF.ID_ = AGG.ID_
-    ) RES
+    from
+        (
+          select
+              PROCDEF.*
+            , INSTANCE.INSTANCE_COUNT_
+            <if test="failedJobsToInclude">
+            , JOB.FAILED_JOBS_COUNT_
+            </if>
+            <if test="incidentsToInclude">
+            , INC.INCIDENT_TYPE_
+            , INC.INCIDENT_COUNT_
+            </if>
+          <!-- Join process definitions with data about running instances and failed jobs -->
+          from
+              ${prefix}ACT_RE_PROCDEF PROCDEF
+
+          <!-- instances -->
+          left outer join
+              <!-- Count and group all process instances (executions that have ID_ = PROC_INST_ID_) by process definition -->
+              (
+                select
+                    PROC_DEF_ID_
+                  , count(PROC_INST_ID_) as INSTANCE_COUNT_
+                from
+                    ${prefix}ACT_RU_EXECUTION
+                where
+                    ID_ = PROC_INST_ID_
+                group by
+                    PROC_DEF_ID_
+              ) INSTANCE
+          on
+              PROCDEF.ID_ = INSTANCE.PROC_DEF_ID_
+
+          <!-- failed jobs -->
+          <if test="failedJobsToInclude">
+          left outer join
+              <!-- Sum all failed jobs (i.e. RETRIES_ = 0) grouped by process definition -->
+              (
+                select
+                    PROCESS_DEF_ID_ AS PROC_DEF_ID_
+                  , count(ID_) as FAILED_JOBS_COUNT_
+                from
+                    ${prefix}ACT_RU_JOB
+                where
+                    RETRIES_ = 0
+                group by
+                    PROCESS_DEF_ID_
+              ) JOB
+          on
+              PROCDEF.ID_ = JOB.PROC_DEF_ID_
+          </if>
+
+          <!-- incidents -->
+          <if test="incidentsToInclude">
+          left outer join
+              <!-- Sum all incidents grouped by process definition and incident type-->
+              (
+                select
+                    PROC_DEF_ID_
+                  , INCIDENT_TYPE_
+                  , count(ID_) as INCIDENT_COUNT_
+                from
+                    ${prefix}ACT_RU_INCIDENT
+                <if test="includeIncidentsForType != null">
+                where
+                    INCIDENT_TYPE_ = #{includeIncidentsForType}
+                </if>
+                group by
+                    PROC_DEF_ID_, INCIDENT_TYPE_
+              ) INC
+          on
+              PROCDEF.ID_ = INC.PROC_DEF_ID_
+          </if>
+        ) RES
   </sql>
- 
+
   <!-- Deployment statistics -->
-  <select id ="selectDeploymentStatistics" resultMap="deploymentStatisticsResultMap" 
+  <select id ="selectDeploymentStatistics" resultMap="deploymentStatisticsResultMap"
     parameterType="org.camunda.bpm.engine.impl.DeploymentStatisticsQueryImpl">
     <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
@@ -141,87 +154,94 @@
     ${orderBy}
     ${limitAfter}
   </select>
-  
-  <select id ="selectDeploymentStatisticsCount" resultType="long" 
+
+  <select id ="selectDeploymentStatisticsCount" resultType="long"
     parameterType="org.camunda.bpm.engine.impl.DeploymentStatisticsQueryImpl">
     select count(RES.ID_) 
     <include refid="selectDeploymentStatisticsByQueryCriteriaSql"/>
   </select>
-  
+
   <sql id="selectDeploymentStatisticsByQueryCriteriaSql">
     from (
-    <!-- filter out AGG.ID_ column to avoid a collision with PROCDEF.ID_ -->
-    select DEPLOYMENT.*, AGG.INSTANCE_COUNT
-    <if test="failedJobsToInclude">
-    , AGG.FAILED_JOBS_COUNT
-    </if>
-    <if test="incidentsToInclude">
-    , AGG.INCIDENT_TYPE_
-    , AGG.INCIDENT_COUNT
-    </if>
-    
-    <!-- Join process definitions with data about running instances and failed jobs -->
-    from ${prefix}ACT_RE_DEPLOYMENT DEPLOYMENT left outer join 
-    ( select INSTANCE.DEPLOYMENT_ID_ as ID_,
-      INSTANCE_COUNT
-      <if test="failedJobsToInclude">
-      , FAILED_JOBS_COUNT
-      </if>
-      <if test="incidentsToInclude">
-      , INCIDENT_TYPE_
-      , INCIDENT_COUNT
-      </if>
-      
-      from
-      
-      <!-- Count and group all process instances (executions that have ID_ = PROC_INST_ID_) by deployment -->
-      (select DEPLOYMENT.ID_ as DEPLOYMENT_ID_, count(EXECUTION.PROC_INST_ID_) as INSTANCE_COUNT 
-      from ${prefix}ACT_RU_EXECUTION EXECUTION, ${prefix}ACT_RE_PROCDEF PROCDEF, ${prefix}ACT_RE_DEPLOYMENT DEPLOYMENT
-      where EXECUTION.ID_ = EXECUTION.PROC_INST_ID_
-      and EXECUTION.PROC_DEF_ID_ = PROCDEF.ID_
-      and PROCDEF.DEPLOYMENT_ID_ = DEPLOYMENT.ID_
-      group by DEPLOYMENT.ID_) INSTANCE
-      
-      <!-- failed jobs -->
-      <if test="failedJobsToInclude">
-      left outer join
-      
-      <!-- Sum all failed jobs grouped by deployment -->
-      (select DEPLOYMENT.ID_ AS DEPLOYMENT_ID_, count(JOB.ID_) as FAILED_JOBS_COUNT from 
-        ${prefix}ACT_RE_PROCDEF PROCDEF, ${prefix}ACT_RE_DEPLOYMENT DEPLOYMENT,
-        <!-- Select all executions and their failed jobs (i.e. RETRIES_ = 0) -->
-        ( select JOB.ID_, PROC_DEF_ID_ 
-        from ${prefix}ACT_RU_EXECUTION EXECUTION, ${prefix}ACT_RU_JOB JOB 
-        where EXECUTION.ID_ = JOB.EXECUTION_ID_ and JOB.RETRIES_ = 0) JOB
-      where JOB.PROC_DEF_ID_ = PROCDEF.ID_
-      and PROCDEF.DEPLOYMENT_ID_ = DEPLOYMENT.ID_
-      group by DEPLOYMENT.ID_) JOB
-      on JOB.DEPLOYMENT_ID_ = INSTANCE.DEPLOYMENT_ID_
-      </if>
-      
-      <!-- incidents -->
-      <if test="incidentsToInclude">
-      left outer join
-      
-      <!-- Sum all incidents by deployment -->
-      (select DEPLOYMENT.ID_ AS DEPLOYMENT_ID_, INC.INCIDENT_TYPE_, count(INC.ID_) as INCIDENT_COUNT from 
-        ${prefix}ACT_RE_PROCDEF PROCDEF, ${prefix}ACT_RE_DEPLOYMENT DEPLOYMENT,
-        <!-- Select all executions and their incidents -->
-        ( select INC.ID_, INC.INCIDENT_TYPE_, INC.PROC_DEF_ID_ 
-        from ${prefix}ACT_RU_INCIDENT INC 
-        <if test="includeIncidentsForType != null">
-        where INC.INCIDENT_TYPE_ = #{includeIncidentsForType}
-        </if>
-        ) INC
-      where INC.PROC_DEF_ID_ = PROCDEF.ID_
-      and PROCDEF.DEPLOYMENT_ID_ = DEPLOYMENT.ID_
-      group by DEPLOYMENT.ID_, INC.INCIDENT_TYPE_) INC
-      on INC.DEPLOYMENT_ID_ = INSTANCE.DEPLOYMENT_ID_ 
-      </if>      
-      
-      ) AGG
-    on DEPLOYMENT.ID_ = AGG.ID_
-    ) RES
+            select
+                DEPLOYMENT.*
+              , INSTANCE.INSTANCE_COUNT_
+              <if test="failedJobsToInclude">
+              , JOB.FAILED_JOBS_COUNT_
+              </if>
+              <if test="incidentsToInclude">
+              , INC.INCIDENT_TYPE_
+              , INC.INCIDENT_COUNT_
+              </if>
+            from
+                ${prefix}ACT_RE_DEPLOYMENT DEPLOYMENT
+
+            <!-- Join process definitions with data about running instances and failed jobs -->
+
+            left outer join
+
+                <!-- Count and group all process instances (executions that have ID_ = PROC_INST_ID_) by deployment -->
+                (
+                  select
+                      PROCDEF.DEPLOYMENT_ID_
+                    , count(EXECUTION.PROC_INST_ID_) as INSTANCE_COUNT_
+                  from
+                      ${prefix}ACT_RU_EXECUTION EXECUTION,
+                      ${prefix}ACT_RE_PROCDEF PROCDEF
+                  where
+                      EXECUTION.ID_ = EXECUTION.PROC_INST_ID_
+                      and EXECUTION.PROC_DEF_ID_ = PROCDEF.ID_
+                  group by
+                      PROCDEF.DEPLOYMENT_ID_
+                ) INSTANCE
+            on
+                DEPLOYMENT.ID_ = INSTANCE.DEPLOYMENT_ID_
+
+            <!-- failed jobs -->
+            <if test="failedJobsToInclude">
+            left outer join
+
+                <!-- Sum all failed jobs (i.e. RETRIES_ = 0) grouped by deployment -->
+                (
+                  select
+                      DEPLOYMENT_ID_
+                    , count(ID_) as FAILED_JOBS_COUNT_
+                  from
+                      ${prefix}ACT_RU_JOB JOB
+                  where
+                      RETRIES_ = 0
+                  group by
+                      DEPLOYMENT_ID_
+                ) JOB
+            on
+                DEPLOYMENT.ID_ = JOB.DEPLOYMENT_ID_
+            </if>
+
+            <!-- incidents -->
+            <if test="incidentsToInclude">
+            left outer join
+
+                <!-- Sum all incidents by deployment -->
+                (
+                  select
+                      PROCDEF.DEPLOYMENT_ID_
+                    , INC.INCIDENT_TYPE_
+                    , count(INC.ID_) as INCIDENT_COUNT_
+                  from
+                      ${prefix}ACT_RU_INCIDENT INC,
+                      ${prefix}ACT_RE_PROCDEF PROCDEF
+                  where
+                      INC.PROC_DEF_ID_ = PROCDEF.ID_
+                      <if test="includeIncidentsForType != null">
+                      and INC.INCIDENT_TYPE_ = #{includeIncidentsForType}
+                      </if>
+                  group by
+                      PROCDEF.DEPLOYMENT_ID_
+                ) INC
+            on
+                 DEPLOYMENT.ID_ = INC.DEPLOYMENT_ID_
+            </if>
+          ) RES
   </sql>
 
   <!-- Activity statistics -->
@@ -236,67 +256,137 @@
     ${orderBy}
     ${limitAfter}
   </select>
-  
+
   <select id ="selectActivityStatisticsCount" resultType="long" 
     parameterType="org.camunda.bpm.engine.impl.ActivityStatisticsQueryImpl">
     select count(RES.ID_)
     <include refid="selectActivityStatisticsByQueryCriteriaSql"/>
   </select>
-   
+
   <sql id="selectActivityStatisticsByQueryCriteriaSql">
-	  from ( select INSTANCE.ACT_ID_ as ID_,
-      INSTANCE_COUNT
+	  from ( select ACTID.ACT_ID_ as ID_,
+        INSTANCE.INSTANCE_COUNT_
       <if test="failedJobsToInclude">
-      ,
-      FAILED_JOBS_COUNT
+      , JOB.FAILED_JOBS_COUNT_
       </if>
       <if test="incidentsToInclude">
-      , INCIDENT_TYPE_
-      , INCIDENT_COUNT
-      </if>      
-	    
-	    <!-- Count and group all activity instances by activity ids.
-	    The executions that are actual activity instances can be found with the IS_ACTIVE_.
-	    This will not count parent executions such as the process instance itself. -->  
+      , INC.INCIDENT_TYPE_
+      , INC.INCIDENT_COUNT_
+      </if>
+
 	    from
-	    (select ACT_ID_, count(PROC_INST_ID_) as INSTANCE_COUNT 
-	    from ${prefix}ACT_RU_EXECUTION
-	    where PROC_DEF_ID_ = #{processDefinitionId} and IS_ACTIVE_ = ${trueConstant}
-	    group by ACT_ID_) INSTANCE
-	    
-      <!-- failedJobs -->
-	    <if test="failedJobsToInclude">
-	    left outer join
-	    
-	    <!-- Sum all failed jobs grouped by activity id -->
-	    (select ACT_ID_, count(JOB.ID_) as FAILED_JOBS_COUNT from 
-	      <!-- Select all executions and their failed jobs (i.e. RETRIES_ = 0) of the given process definition -->
-	      ( select JOB.ID_, ACT_ID_ 
-	      from ${prefix}ACT_RU_EXECUTION EXECUTION, ${prefix}ACT_RU_JOB JOB 
-	      where EXECUTION.ID_ = JOB.EXECUTION_ID_ and JOB.RETRIES_ = 0
-	      and PROC_DEF_ID_ = #{processDefinitionId}
-	      ) JOB
-	    group by JOB.ACT_ID_) JOB
-	    
-	    on JOB.ACT_ID_ = INSTANCE.ACT_ID_
-	    </if>
-      
-      <!-- incidents -->
-      <if test="incidentsToInclude">
-      left outer join
-      
-      <!-- Sum all incidents grouped by activity id -->
-      (select INC.ACTIVITY_ID_, INC.INCIDENT_TYPE_, count(INC.ID_) as INCIDENT_COUNT
-        from ${prefix}ACT_RU_INCIDENT INC
-        where INC.PROC_DEF_ID_ = #{processDefinitionId}
-        <if test="includeIncidentsForType != null">
-        and INC.INCIDENT_TYPE_ = #{includeIncidentsForType}
+
+          <!-- collect activity ids -->
+          (
+            select
+                distinct ACT_ID_
+            from
+                (
+                  select
+                      distinct ACT_ID_
+                  from
+                      ${prefix}ACT_RU_EXECUTION
+                  where
+                      PROC_DEF_ID_ = #{processDefinitionId}
+                      and IS_ACTIVE_ = ${trueConstant}
+
+                  <if test="failedJobsToInclude">
+                  UNION
+                      select
+                          distinct JOBDEF.ACT_ID_
+                      from
+                          ${prefix}ACT_RU_JOB JOB,
+                          ${prefix}ACT_RU_JOBDEF JOBDEF
+                      where
+                          JOB.PROCESS_DEF_ID_ = #{processDefinitionId}
+                          and JOB.JOB_DEF_ID_ = JOBDEF.ID_
+                          and JOB.RETRIES_ = 0
+                  </if>
+
+                  <if test="incidentsToInclude">
+                  UNION
+                      select
+                          distinct ACTIVITY_ID_ AS ACT_ID_
+                      from
+                          ${prefix}ACT_RU_INCIDENT
+                      where
+                          PROC_DEF_ID_ = #{processDefinitionId}
+                          and ACTIVITY_ID_ is not null
+                          <if test="includeIncidentsForType != null">
+                          and INCIDENT_TYPE_ = #{includeIncidentsForType}
+                          </if>
+                  </if>
+
+                )
+          ) ACTID
+
+          left outer join
+
+        	    <!-- Count and group all activity instances by activity ids.
+        	    The executions that are actual activity instances can be found with the IS_ACTIVE_.
+        	    This will not count parent executions such as the process instance itself. -->
+    	        (
+                 select
+                     ACT_ID_
+                   , count(PROC_INST_ID_) as INSTANCE_COUNT_
+    	           from
+                    ${prefix}ACT_RU_EXECUTION
+    	           where
+                    PROC_DEF_ID_ = #{processDefinitionId}
+                    and IS_ACTIVE_ = ${trueConstant}
+    	           group by
+                    ACT_ID_
+               ) INSTANCE
+          on
+              ACTID.ACT_ID_ = INSTANCE.ACT_ID_
+
+          <!-- failedJobs -->
+    	    <if test="failedJobsToInclude">
+    	    left outer join
+
+        	    <!-- Sum all failed jobs grouped by activity id -->
+        	    (
+                select
+                    JOBDEF.ACT_ID_
+                  , count(JOB.ID_) as FAILED_JOBS_COUNT_
+                from
+                    ${prefix}ACT_RU_JOB JOB,
+                    ${prefix}ACT_RU_JOBDEF JOBDEF
+                where
+                    JOB.PROCESS_DEF_ID_ = #{processDefinitionId}
+                    and JOB.JOB_DEF_ID_ = JOBDEF.ID_
+                    and JOB.RETRIES_ = 0
+                group by
+                    JOBDEF.ACT_ID_
+              ) JOB
+
+    	    on ACTID.ACT_ID_ = JOB.ACT_ID_
+    	    </if>
+
+        <!-- incidents -->
+        <if test="incidentsToInclude">
+        left outer join
+
+            <!-- Sum all incidents grouped by activity id -->
+            (
+              select
+                  ACTIVITY_ID_
+                , INCIDENT_TYPE_
+                , count(ID_) as INCIDENT_COUNT_
+              from
+                  ${prefix}ACT_RU_INCIDENT
+              where
+                  PROC_DEF_ID_ = #{processDefinitionId}
+                  <if test="includeIncidentsForType != null">
+                  and INCIDENT_TYPE_ = #{includeIncidentsForType}
+                  </if>
+              group by
+                  ACTIVITY_ID_, INCIDENT_TYPE_
+            ) INC
+
+        on ACTID.ACT_ID_ = INC.ACTIVITY_ID_
         </if>
-        group by INC.ACTIVITY_ID_, INC.INCIDENT_TYPE_
-      ) INC        
-      on INC.ACTIVITY_ID_ = INSTANCE.ACT_ID_
-      </if>
 	    ) RES
   </sql>
-  
+
 </mapper>

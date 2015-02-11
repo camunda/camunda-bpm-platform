@@ -32,6 +32,7 @@ import org.camunda.bpm.engine.impl.incident.FailedJobIncidentHandler;
 import org.camunda.bpm.engine.impl.incident.IncidentHandler;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobHandler;
+import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.runtime.Job;
 
@@ -245,9 +246,19 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
         }
 
       }
+
+      String activityId = null;
+      if (jobDefinitionId != null) {
+        JobDefinition jobDefinition = Context
+            .getCommandContext()
+            .getJobDefinitionManager()
+            .findById(getJobDefinitionId());
+        activityId = jobDefinition.getActivityId();
+      }
+
       processEngineConfiguration
         .getIncidentHandler(incidentHandlerType)
-        .handleIncident(getProcessDefinitionId(), null, executionId, id, exceptionMessage);
+        .handleIncident(getProcessDefinitionId(), activityId, executionId, id, exceptionMessage);
 
     }
   }

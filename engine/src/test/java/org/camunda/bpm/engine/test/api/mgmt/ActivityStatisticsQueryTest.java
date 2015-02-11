@@ -141,7 +141,7 @@ public class ActivityStatisticsQueryTest extends PluggableProcessEngineTestCase 
   }
 
   @Test
-  @Deployment(resources = "org/camunda/bpm/engine/test/api/mgmt/StatisticesTest.testCallActivityWithIncidentsWithoutFailedJobs.bpmn20.xml")
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/mgmt/StatisticsTest.testCallActivityWithIncidentsWithoutFailedJobs.bpmn20.xml")
   public void testActivityStatisticsQueryWithIncidentsWithoutFailedJobs() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("callExampleSubProcess");
 
@@ -408,9 +408,143 @@ public class ActivityStatisticsQueryTest extends PluggableProcessEngineTestCase 
     }
   }
 
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/mgmt/StatisticsTest.testFailedTimerStartEvent.bpmn20.xml")
+  public void testQueryByIncidentsWithFailedTimerStartEvent() {
+
+    ProcessDefinition definition =
+        repositoryService
+        .createProcessDefinitionQuery()
+        .processDefinitionKey("process")
+        .singleResult();
+
+    executeAvailableJobs();
+
+    List<ActivityStatistics> statistics =
+        managementService
+        .createActivityStatisticsQuery(definition.getId())
+        .includeIncidents()
+        .list();
+
+    assertEquals(1, statistics.size());
+
+    ActivityStatistics result = statistics.get(0);
+
+    assertEquals("theStart", result.getId());
+
+    // there is no running activity instance
+    assertEquals(0, result.getInstances());
+
+    List<IncidentStatistics> incidentStatistics = result.getIncidentStatistics();
+
+    // but there is one incident for the failed timer job
+    assertEquals(1, incidentStatistics.size());
+
+    IncidentStatistics incidentStatistic = incidentStatistics.get(0);
+    assertEquals(1, incidentStatistic.getIncidentCount());
+    assertEquals(FailedJobIncidentHandler.INCIDENT_HANDLER_TYPE, incidentStatistic.getIncidentType());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/mgmt/StatisticsTest.testFailedTimerStartEvent.bpmn20.xml")
+  public void testQueryByIncidentTypeWithFailedTimerStartEvent() {
+
+    ProcessDefinition definition =
+        repositoryService
+        .createProcessDefinitionQuery()
+        .processDefinitionKey("process")
+        .singleResult();
+
+    executeAvailableJobs();
+
+    List<ActivityStatistics> statistics =
+        managementService
+        .createActivityStatisticsQuery(definition.getId())
+        .includeIncidentsForType(FailedJobIncidentHandler.INCIDENT_HANDLER_TYPE)
+        .list();
+
+    assertEquals(1, statistics.size());
+
+    ActivityStatistics result = statistics.get(0);
+
+    // there is no running instance
+    assertEquals(0, result.getInstances());
+
+    List<IncidentStatistics> incidentStatistics = result.getIncidentStatistics();
+
+    // but there is one incident for the failed timer job
+    assertEquals(1, incidentStatistics.size());
+
+    IncidentStatistics incidentStatistic = incidentStatistics.get(0);
+    assertEquals(1, incidentStatistic.getIncidentCount());
+    assertEquals(FailedJobIncidentHandler.INCIDENT_HANDLER_TYPE, incidentStatistic.getIncidentType());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/mgmt/StatisticsTest.testFailedTimerStartEvent.bpmn20.xml")
+  public void testQueryByFailedJobsWithFailedTimerStartEvent() {
+
+    ProcessDefinition definition =
+        repositoryService
+        .createProcessDefinitionQuery()
+        .processDefinitionKey("process")
+        .singleResult();
+
+    executeAvailableJobs();
+
+    List<ActivityStatistics> statistics =
+        managementService
+        .createActivityStatisticsQuery(definition.getId())
+        .includeFailedJobs()
+        .list();
+
+    assertEquals(1, statistics.size());
+
+    ActivityStatistics result = statistics.get(0);
+
+    // there is no running instance
+    assertEquals(0, result.getInstances());
+    // but there is one failed timer job
+    assertEquals(1, result.getFailedJobs());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/mgmt/StatisticsTest.testFailedTimerStartEvent.bpmn20.xml")
+  public void testQueryByFailedJobsAndIncidentsWithFailedTimerStartEvent() {
+
+    ProcessDefinition definition =
+        repositoryService
+        .createProcessDefinitionQuery()
+        .processDefinitionKey("process")
+        .singleResult();
+
+    executeAvailableJobs();
+
+    List<ActivityStatistics> statistics =
+        managementService
+        .createActivityStatisticsQuery(definition.getId())
+        .includeFailedJobs()
+        .includeIncidents()
+        .list();
+
+    assertEquals(1, statistics.size());
+
+    ActivityStatistics result = statistics.get(0);
+
+    // there is no running instance
+    assertEquals(0, result.getInstances());
+    // but there is one failed timer job
+    assertEquals(1, result.getFailedJobs());
+
+    List<IncidentStatistics> incidentStatistics = result.getIncidentStatistics();
+
+    // and there is one incident for the failed timer job
+    assertEquals(1, incidentStatistics.size());
+
+    IncidentStatistics incidentStatistic = incidentStatistics.get(0);
+    assertEquals(1, incidentStatistic.getIncidentCount());
+    assertEquals(FailedJobIncidentHandler.INCIDENT_HANDLER_TYPE, incidentStatistic.getIncidentType());
+  }
+
   @Test
   @Deployment(resources = "org/camunda/bpm/engine/test/api/mgmt/StatisticsTest.testStatisticsQuery.bpmn20.xml")
-  public void failing_testActivityStatisticsQueryWithNoInstances() {
+  public void FAILING_testActivityStatisticsQueryWithNoInstances() {
 
     ProcessDefinition definition =
         repositoryService

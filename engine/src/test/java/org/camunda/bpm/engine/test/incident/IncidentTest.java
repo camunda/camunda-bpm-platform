@@ -479,4 +479,20 @@ public class IncidentTest extends PluggableProcessEngineTestCase {
 
   }
 
+  @Deployment
+  public void testActivityIdProperty() {
+    executeAvailableJobs();
+
+    Incident incident = runtimeService
+      .createIncidentQuery()
+      .singleResult();
+
+    assertNotNull(incident);
+
+    assertNotNull(incident.getActivityId());
+    assertEquals("theStart", incident.getActivityId());
+    assertNull(incident.getProcessInstanceId());
+    assertNull(incident.getExecutionId());
+  }
+
 }
