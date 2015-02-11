@@ -2,9 +2,7 @@ module.exports = function(config) {
   'use strict';
   var commons = require('camunda-commons-ui');
   var _ = commons.utils._;
-  var rjsConf = commons.requirejs({
-    // pathPrefix: '../node_modules/camunda-commons-ui'
-  });
+  var rjsConf = commons.requirejs();
 
   var deps = [
     'requirejs',
