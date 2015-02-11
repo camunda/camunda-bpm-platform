@@ -60,8 +60,7 @@
     update ${prefix}ACT_HI_PROCINST set
       PROC_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR},
       END_ACT_ID_ = #{endActivityId, jdbcType=VARCHAR},
-      DELETE_REASON_ = #{deleteReason, jdbcType=VARCHAR},
-      SUPER_CASE_INSTANCE_ID_ = #{superCaseInstanceId, jdbcType=VARCHAR}
+      DELETE_REASON_ = #{deleteReason, jdbcType=VARCHAR}
 
       <if test="endTime!=null">
         , END_TIME_ = #{endTime, jdbcType=TIMESTAMP}

@@ -787,4 +787,41 @@ public class HistoricProcessInstanceTest extends PluggableProcessEngineTestCase 
     assertEquals(0, query.count());
     assertEquals(0, query.list().size());
   }
+
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/cmmn/oneProcessTaskCase.cmmn",
+      "org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"
+  })
+  public void testSuperCaseInstanceIdProperty() {
+    String superCaseInstanceId = caseService.createCaseInstanceByKey("oneProcessTaskCase").getId();
+
+    String processTaskId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_ProcessTask_1")
+        .singleResult()
+        .getId();
+
+    caseService.manuallyStartCaseExecution(processTaskId);
+
+    HistoricProcessInstance instance = historyService
+        .createHistoricProcessInstanceQuery()
+        .singleResult();
+
+    assertNotNull(instance);
+    assertEquals(superCaseInstanceId, instance.getSuperCaseInstanceId());
+
+    String taskId = taskService
+        .createTaskQuery()
+        .singleResult()
+        .getId();
+    taskService.complete(taskId);
+
+    instance = historyService
+        .createHistoricProcessInstanceQuery()
+        .singleResult();
+
+    assertNotNull(instance);
+    assertEquals(superCaseInstanceId, instance.getSuperCaseInstanceId());
+  }
+
 }
