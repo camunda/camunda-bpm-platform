@@ -13,7 +13,10 @@
 
 package org.camunda.bpm.engine.impl.bpmn.behavior;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -63,18 +66,52 @@ public class ParallelGatewayActivityBehavior extends GatewayActivityBehavior {
     lockConcurrentRoot(execution);
     
     List<ActivityExecution> joinedExecutions = execution.findInactiveConcurrentExecutions(activity);
-    int nbrOfExecutionsToJoin = execution.getActivity().getIncomingTransitions().size();
-    int nbrOfExecutionsJoined = joinedExecutions.size();
+    
+    List<ActivityExecution> finalExecutions = new ArrayList<ActivityExecution>();
+    
+    Map<String, List<ActivityExecution>> mappedExecutions = mapExecutionsToTransitions(joinedExecutions, finalExecutions);
+    
+    List<PvmTransition> incomingTransitions = execution.getActivity().getIncomingTransitions();
+    for (PvmTransition incomingTransition : incomingTransitions) {
+      List<ActivityExecution> sequenceExecutions = mappedExecutions.get(incomingTransition.getId());
+      if (sequenceExecutions == null || sequenceExecutions.isEmpty()){
+        //TODO if required for logging we can go through all of them?
+        break;
+      } else {
+        finalExecutions.add(sequenceExecutions.get(0));
+      }
+    }
+    int nbrOfExecutionsToJoin = incomingTransitions.size();
+    int nbrOfExecutionsJoined = finalExecutions.size();
+    
     
     if (nbrOfExecutionsJoined==nbrOfExecutionsToJoin) {
       
       // Fork
       log.fine("parallel gateway '"+activity.getId()+"' activates: "+nbrOfExecutionsJoined+" of "+nbrOfExecutionsToJoin+" joined");
-      execution.takeAll(outgoingTransitions, joinedExecutions);
+      execution.takeAll(outgoingTransitions, finalExecutions);
       
     } else if (log.isLoggable(Level.FINE)){
       log.fine("parallel gateway '"+activity.getId()+"' does not activate: "+nbrOfExecutionsJoined+" of "+nbrOfExecutionsToJoin+" joined");
     }
   }
 
+  private Map<String, List<ActivityExecution>> mapExecutionsToTransitions(List<ActivityExecution> joinedExecutions, List<ActivityExecution> finalExecutions) {
+    Map<String, List<ActivityExecution>> mapped = new HashMap<String, List<ActivityExecution>>();
+    for (ActivityExecution activityExecution : joinedExecutions) {
+      String transitionId = activityExecution.getTransitionId();
+      if (transitionId != null){
+        List<ActivityExecution> sequenceExecutions = mapped.get(transitionId);
+        if (sequenceExecutions == null){
+          sequenceExecutions = new ArrayList<ActivityExecution>();
+        }
+        sequenceExecutions.add(activityExecution);
+        mapped.put(transitionId, sequenceExecutions);
+      } else {
+        // The us of Id is optional therefore if the transition id is null we include it in the finalExecutions
+        finalExecutions.add(activityExecution);
+      }
+    }
+    return mapped;
+  }
 }

@@ -74,6 +74,9 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
   /** the id of a case associated with this execution */
   protected String caseInstanceId;
 
+  /** the id of the taken transition */
+  protected String transitionId;
+
   // cascade deletion ////////////////////////////////////////////////////////
 
   protected boolean deleteRoot;
@@ -651,6 +654,14 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
   public String getActivityInstanceId() {
     return activityInstanceId;
   }
+  
+  public void setTransitionId(String entrySequenceFlowId){
+	  this.transitionId = entrySequenceFlowId;
+  }
+  
+  public String getTransitionId(){
+	  return transitionId;
+  }
 
   // parent ///////////////////////////////////////////////////////////////////
 
@@ -767,6 +778,9 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
   }
 
   public void setTransition(TransitionImpl transition) {
+    if (transition != null){
+      setTransitionId(transition.getId());
+    }
     this.transition = transition;
   }
 

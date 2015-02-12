@@ -51,6 +51,11 @@ public interface ActivityExecution extends DelegateExecution {
   /** return the Id of the parent activity instance currently executed by this execution */
   String getParentActivityInstanceId();
 
+  void setTransitionId(String id);
+  
+  /** return the Id of the transition that let to this activity*/
+  String getTransitionId();
+  
   /**
    * leaves the current activity by taking the given transition.
    */

@@ -1143,6 +1143,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements
     persistentState.put("caseInstanceId", this.caseInstanceId);
     persistentState.put("suspensionState", this.suspensionState);
     persistentState.put("cachedEntityState", getCachedEntityState());
+    persistentState.put("transitionId", this.transitionId);
     return persistentState;
   }
 

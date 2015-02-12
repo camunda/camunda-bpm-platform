@@ -52,6 +52,7 @@ create table ACT_RU_EXECUTION (
     IS_EVENT_SCOPE_ smallint check(IS_EVENT_SCOPE_ in (1,0)),
     SUSPENSION_STATE_ integer,
     CACHED_ENT_STATE_ integer,
+    TRANSITION_ID_ varchar(255),
     primary key (ID_)
 );
 
