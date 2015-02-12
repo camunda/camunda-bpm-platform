@@ -21,7 +21,7 @@ import org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration
  * @author Daniel Meyer
  *
  */
-public class DevProcessEngineConfiguration extends StandaloneInMemProcessEngineConfiguration {
+public class TestProcessEngineConfiguration extends StandaloneInMemProcessEngineConfiguration {
 
   protected void initDataSource() {
     PoolProperties p = new PoolProperties();
