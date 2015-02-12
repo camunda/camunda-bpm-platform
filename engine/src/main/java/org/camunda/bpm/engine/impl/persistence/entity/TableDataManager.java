@@ -176,8 +176,12 @@ public class TableDataManager extends AbstractManager {
           tableNames.add(tableName);
           log.fine("  retrieved process engine table name "+tableName);
         }
+      } catch (SQLException se) {
+        throw se;
       } finally {
-        tables.close();
+        if (tables != null) {
+          tables.close();
+        }
       }
     } catch (Exception e) {
       throw new ProcessEngineException("couldn't get process engine table names using metadata: "+e.getMessage(), e);
