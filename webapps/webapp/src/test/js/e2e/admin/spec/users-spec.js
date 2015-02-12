@@ -1,13 +1,14 @@
-/*
-* Admin login
-* validate users main page
-* logout 
-* */
 'use strict';
+
+var testSetup = require('../../spec-setup');
+var setupFile = require('./users-setup');
+testSetup(setupFile);
+
+var users = setupFile.user.create;
 
 var usersPage = require('../pages/users');
 
-describe('users page - ', function() {
+describe('Admin - user menu -', function() {
 
   describe('start test', function() {
 
@@ -17,7 +18,7 @@ describe('users page - ', function() {
 
       // when
       usersPage.navigateToWebapp('Admin');
-      usersPage.authentication.userLogin('jonny1', 'jonny1');
+      usersPage.authentication.userLogin('admin', 'admin');
 
       // then
       usersPage.isActive();
@@ -26,7 +27,7 @@ describe('users page - ', function() {
   });
 
 
-  describe('users main page', function() {
+  describe('validate users page', function() {
 
     beforeEach(function() {
 
@@ -45,13 +46,16 @@ describe('users page - ', function() {
       expect(usersPage.newUserButton().isEnabled()).toBe(true);
     });
 
+
     it('should select user name in list', function() {
 
       // when
-      usersPage.selectUserByNameLink(0);
+      usersPage.selectUserByNameLink(2);
 
       // then
-      usersPage.editUserProfile.isActive({ user: 'demo' });
+      usersPage.editUserProfile.isActive({ user: users[1].id });
+      expect(usersPage.editUserProfile.pageHeader()).toBe(users[1].firstName + ' ' + users[1].lastName);
+      expect(usersPage.editUserProfile.emailInput().getAttribute('value')).toBe(users[1].email);
     });
 
 
@@ -61,7 +65,9 @@ describe('users page - ', function() {
       usersPage.selectUserByEditLink(1);
 
       // then
-      usersPage.editUserProfile.isActive({ user: 'john' });
+      usersPage.editUserProfile.isActive({ user: users[0].id });
+      expect(usersPage.editUserProfile.pageHeader()).toBe(users[0].firstName + ' ' + users[0].lastName);
+      expect(usersPage.editUserProfile.emailInput().getAttribute('value')).toBe(users[0].email);
     });    
 
   });
@@ -75,7 +81,7 @@ describe('users page - ', function() {
       usersPage.navigateTo();
 
       // when
-      usersPage.newUserButton().click()
+      usersPage.newUserButton().click();
 
       // then
       usersPage.newUser.isActive();
@@ -87,11 +93,11 @@ describe('users page - ', function() {
     it('should enter new user data', function() {
 
       // when
-      usersPage.newUser.createNewUser('Icke', 'password1234', 'password1234', 'Ädmün', 'Öttö', 'ädmün.öttö@wurstfarbik.de' );
+      usersPage.newUser.createNewUser('Icke', 'password1234', 'password1234', 'Cäm', 'Özdemir', 'cäm.özdemir@gruene.de' );
       usersPage.editUserProfile.navigateTo({ user: 'Icke' });
 
       // then
-      expect(usersPage.editUserProfile.pageHeader()).toBe('Ädmün Öttö');
+      expect(usersPage.editUserProfile.pageHeader()).toBe('Cäm Özdemir');
     });
 
 
@@ -103,7 +109,7 @@ describe('users page - ', function() {
 
       // then
       expect(usersPage.loggedInUser()).toBe('Icke');
-      expect(usersPage.userList().count()).toEqual(1);
+      expect(usersPage.userList().count()).toEqual(1);  //???
     });
 
 
@@ -120,7 +126,7 @@ describe('users page - ', function() {
     it('should validate profile page', function() {
 
       // given
-      usersPage.authentication.userLogin('jonny1', 'jonny1');
+      usersPage.authentication.userLogin('admin', 'admin');
 
       // when
       usersPage.selectUser(0);
@@ -139,7 +145,7 @@ describe('users page - ', function() {
       usersPage.editUserProfile.updateProfileButton().click();
 
       // then
-      expect(usersPage.editUserProfile.pageHeader()).toBe('Ädmüni Öttö');
+      expect(usersPage.editUserProfile.pageHeader()).toBe('Cämi Özdemir');
     });
 
   });
@@ -214,7 +220,7 @@ describe('users page - ', function() {
       usersPage.editUserGroups.selectUserNavbarItem('Groups');
 
       // then
-      expect(usersPage.editUserGroups.subHeader()).toBe("Ädmüni Öttö's Groups");
+      expect(usersPage.editUserGroups.subHeader()).toBe("Cämi Özdemir's Groups");
       expect(usersPage.editUserGroups.addGroupButton().isPresent()).toBeFalsy();
     });
 
@@ -232,7 +238,7 @@ describe('users page - ', function() {
     it('should navigate to Account menu', function() {
 
       // when
-      usersPage.authentication.userLogin('jonny1', 'jonny1');
+      usersPage.authentication.userLogin('admin', 'admin');
       usersPage.selectUser(0);
       usersPage.editUserAccount.selectUserNavbarItem('Account');
 
@@ -246,17 +252,7 @@ describe('users page - ', function() {
       usersPage.editUserAccount.deleteUser();
 
       // then
-      expect(usersPage.userList().count()).toEqual(5);
-    });
-
-  });
-
-
-  describe('end test', function() {
-
-    it('should logout', function() {
-
-      usersPage.logout();
+      expect(usersPage.userList().count()).toEqual(4);
     });
 
   });
