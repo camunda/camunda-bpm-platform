@@ -17,7 +17,7 @@
         </thead>
 
         <tbody>
-          <tr data-ng-repeat="statistic in statistics | orderBy:orderByPredicate:orderByReverse">
+          <tr ng-repeat="statistic in statistics | orderBy:orderByPredicate:orderByReverse">
             <td class="state">
               <div state-circle
                    incidents="statistic.incidents"></div>
