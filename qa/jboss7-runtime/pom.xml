@@ -213,7 +213,7 @@
                       <replacefilter token="@version.db2@" value="${version.db2}" />
                       <replacefilter token="@version.h2@" value="${version.h2}" />
                       <replacefilter token="@version.mysql@" value="${version.mysql}" />
-                      <replacefilter token="@version.oracle-11@" value="${version.oracle-11}" />
+                      <replacefilter token="@version.oracle@" value="${version.oracle}" />
                       <replacefilter token="@version.postgresql@" value="${version.postgresql}" />
                       <replacefilter token="@version.sqlserver@" value="${version.sqlserver}" />
                     </replace>
@@ -321,7 +321,7 @@
                       <replacefilter token="@version.db2@" value="${version.db2}" />
                       <replacefilter token="@version.h2@" value="${version.h2}" />
                       <replacefilter token="@version.mysql@" value="${version.mysql}" />
-                      <replacefilter token="@version.oracle-11@" value="${version.oracle-11}" />
+                      <replacefilter token="@version.oracle@" value="${version.oracle}" />
                       <replacefilter token="@version.postgresql@" value="${version.postgresql}" />
                       <replacefilter token="@version.sqlserver@" value="${version.sqlserver}" />
                     </replace>

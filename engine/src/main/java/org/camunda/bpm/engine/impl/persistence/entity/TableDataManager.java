@@ -233,6 +233,7 @@ public class TableDataManager extends AbstractManager {
 
   public TableMetaData getTableMetaData(String tableName) {
     TableMetaData result = new TableMetaData();
+    ResultSet resultSet = null;
     try {
       result.setTableName(tableName);
       DatabaseMetaData metaData = getDbSqlSession()
@@ -244,7 +245,7 @@ public class TableDataManager extends AbstractManager {
         tableName = tableName.toLowerCase();
       }
 
-      ResultSet resultSet = metaData.getColumns(null, null, tableName, null);
+      resultSet = metaData.getColumns(null, null, tableName, null);
       while(resultSet.next()) {
         String name = resultSet.getString("COLUMN_NAME").toUpperCase();
         String type = resultSet.getString("TYPE_NAME").toUpperCase();
@@ -253,6 +254,14 @@ public class TableDataManager extends AbstractManager {
 
     } catch (SQLException e) {
       throw new ProcessEngineException("Could not retrieve database metadata: " + e.getMessage());
+    } finally {
+      if (resultSet != null) {
+        try {
+          resultSet.close();
+        } catch (SQLException e) {
+          throw new ProcessEngineException("Could not retrieve database metadata: " + e.getMessage());
+        }
+      }
     }
 
     if(result.getColumnNames().size() == 0) {
