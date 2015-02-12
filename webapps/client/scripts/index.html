@@ -53,23 +53,9 @@
   </head>
   <body>
     <!-- navigation -->
-    <div class="navbar navbar-inverse navbar-fixed-top">
-      <div class="navbar-header">
-        <button type="button"
-                class="navbar-toggle collapsed">
-          <span class="sr-only">Toggle navigation</span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-        </button>
-
-        <a class="navbar-brand"
-           href="#/"
-           title="camunda Admin">
-          camunda Admin
-        </a>
-      </div>
-
+    <div cam-widget-header
+         authentication="authentication"
+         brand-name="Camunda Admin">
       <ul ng-cloak
           cam-if-logged-in
           class="nav navbar-nav"
@@ -99,70 +85,6 @@
             ng-class="activeClass('#/system')">
           <a sem-show-systems
              href="#/system?section=system-settings-general">System</a>
-        </li>
-      </ul>
-
-
-
-      <ul class="nav navbar-nav pull-right"
-          ng-controller="AuthenticationController">
-
-        <li engine-select></li>
-
-        <li class="dropdown"
-            cam-if-logged-in
-            ng-cloak>
-          <a href
-             sem-show-user-actions
-             class="dropdown-toggle"
-             data-toggle="dropdown">
-            <span class="glyphicon glyphicon-user "></span>
-            {{ authentication.name }}
-          </a>
-
-          <ul class="dropdown-menu dropdown-menu-right">
-            <li>
-              <a sem-jump-to-profile
-                 ng-href="{{ '../../admin/:engine/#/users/' + authentication.name + '?tab=profile' | uri }}">
-                My Profile
-              </a>
-            </li>
-
-            <li class="divider"></li>
-
-            <li>
-              <a href sem-log-out
-                 ng-click="logout()">
-                Sign out
-              </a>
-            </li>
-          </ul>
-        </li>
-
-        <li class="divider-vertical"
-            cam-if-logged-in
-            ng-cloak></li>
-
-        <li class="app-switch dropdown">
-          <a href
-             sem-show-applications
-             class="dropdown-toggle"
-             data-toggle="dropdown">
-            <span class="glyphicon glyphicon-home"></span>
-            <span class="caret"></span>
-          </a>
-
-          <ul class="dropdown-menu dropdown-menu-right">
-            <li ng-show="!authentication || authentication.canAccess('cockpit')">
-              <a sem-jump-to-cockpit
-                 ng-href="{{ '../../cockpit/:engine/' | uri }}">Cockpit</a>
-            </li>
-
-            <li ng-show="!authentication || authentication.canAccess('tasklist')">
-              <a sem-jump-to-tasklist
-                 ng-href="{{ '../../tasklist/:engine/' | uri }}">Tasklist</a>
-            </li>
-          </ul>
         </li>
       </ul>
     </div>
