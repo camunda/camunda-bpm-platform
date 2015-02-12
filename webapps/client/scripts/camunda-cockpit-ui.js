@@ -85,6 +85,25 @@ define('camunda-cockpit-ui', [
 
     appNgModule.config(ModuleConfig);
 
+    appNgModule.config([
+      'camDateFormatProvider',
+    function(
+      camDateFormatProvider
+    ) {
+      var formats = {
+        monthName: 'MMMM',
+        day: 'DD',
+        abbr: 'lll',
+        normal: 'YYYY-MM-DD[T]HH:mm:SS', // yyyy-MM-dd'T'HH:mm:ss => 2013-01-23T14:42:45
+        long: 'LLLL',
+        short: 'LL'
+      };
+
+      for (var f in formats) {
+        camDateFormatProvider.setDateFormat(formats[f], f);
+      }
+    }]);
+
     require([
       'domReady!'
     ], function () {
