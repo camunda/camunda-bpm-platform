@@ -40,7 +40,7 @@ module.exports = Page.extend({
   },
 
   updateProfileButton: function() { 
-  	return formElement.element(by.css('[data-ng-click="updateProfile()"]'));
+  	return formElement.element(by.css('[ng-click="updateProfile()"]'));
   },
 
   changeUserProfile: function(firstName, lastName) {

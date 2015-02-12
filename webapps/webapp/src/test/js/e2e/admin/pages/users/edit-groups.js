@@ -21,10 +21,10 @@ module.exports = Page.extend({
   },
 
   addGroupButton: function() {
-    return formElement.element(by.css('[data-ng-click="openCreateGroupMembershipDialog()"]'));
+    return formElement.element(by.css('[ng-click="openCreateGroupMembershipDialog()"]'));
   },
 
   removeGroup: function(item) {
-    this.groupList().get(item).element(by.css('[data-ng-click="removeGroup(group.id)"]')).click();
+    this.groupList().get(item).element(by.css('[ng-click="removeGroup(group.id)"]')).click();
   }
 });

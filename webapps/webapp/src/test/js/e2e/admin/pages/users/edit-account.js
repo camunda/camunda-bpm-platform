@@ -45,7 +45,7 @@ module.exports = Page.extend({
   },
 
   changePasswordButton: function() {
-    return changePasswordFormElement.element(by.css('[data-ng-click="updateCredentials()"]'));
+    return changePasswordFormElement.element(by.css('[ng-click="updateCredentials()"]'));
   },
 
   changePassword: function(myPassword, newPassword, newPasswordRepeat) {
@@ -56,7 +56,7 @@ module.exports = Page.extend({
   },
 
   deleteUserButton: function() {
-    return deleteUserFormElement.element(by.css('[data-ng-click="deleteUser()"]'));
+    return deleteUserFormElement.element(by.css('[ng-click="deleteUser()"]'));
   },
 
   deleteUserAlert: function() {
