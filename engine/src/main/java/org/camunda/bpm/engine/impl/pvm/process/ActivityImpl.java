@@ -13,15 +13,15 @@
 
 package org.camunda.bpm.engine.impl.pvm.process;
 
-import org.camunda.bpm.engine.impl.pvm.PvmActivity;
-import org.camunda.bpm.engine.impl.pvm.PvmException;
-import org.camunda.bpm.engine.impl.pvm.PvmTransition;
-import org.camunda.bpm.engine.impl.pvm.delegate.ActivityBehavior;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.camunda.bpm.engine.impl.pvm.PvmActivity;
+import org.camunda.bpm.engine.impl.pvm.PvmException;
+import org.camunda.bpm.engine.impl.pvm.PvmTransition;
+import org.camunda.bpm.engine.impl.pvm.delegate.ActivityBehavior;
 
 
 /**
@@ -225,6 +225,13 @@ public class ActivityImpl extends ScopeImpl implements PvmActivity, HasDIBounds 
     return super.getId();
   }
 
+  /**
+   * @return Event scope of this activity;
+   * An execution of the event scope is responsible for
+   * handling events defined by this activity. This is often
+   * the same as the flow scope (@see {@link #getFlowScope()}
+   * but not necessarily (cf boundary events)
+   */
   public ScopeImpl getParentScope() {
     ScopeImpl parentScope = parent;
     while (parentScope != null && !parentScope.isScope()) {
@@ -259,7 +266,9 @@ public class ActivityImpl extends ScopeImpl implements PvmActivity, HasDIBounds 
 
   /**
    * @return the scope which should be used for traversing
-   * transitions which originate in this activity.
+   * transitions which originate in this activity. This means, the
+   * an execution of the flow scope is used to traverse outgoing transitions (without concurrency,
+   * this would be the scope execution of the flow scope).
    */
   public ScopeImpl getFlowScope() {
     if(flowScope == null) {

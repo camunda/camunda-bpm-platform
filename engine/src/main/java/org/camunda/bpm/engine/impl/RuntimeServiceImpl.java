@@ -48,6 +48,7 @@ import org.camunda.bpm.engine.runtime.MessageCorrelationBuilder;
 import org.camunda.bpm.engine.runtime.NativeExecutionQuery;
 import org.camunda.bpm.engine.runtime.NativeProcessInstanceQuery;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.runtime.ProcessInstanceModificationBuilder;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.camunda.bpm.engine.runtime.VariableInstanceQuery;
 import org.camunda.bpm.engine.variable.VariableMap;
@@ -378,6 +379,10 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
   public void correlateMessage(String messageName, String businessKey,
       Map<String, Object> processVariables) {
     commandExecutor.execute(new CorrelateMessageCmd(messageName, businessKey, null, processVariables));
+  }
+
+  public ProcessInstanceModificationBuilder createProcessInstanceModification(String processInstanceId) {
+    return new ProcessInstanceModificationBuilderImpl(commandExecutor, processInstanceId);
   }
 
 }

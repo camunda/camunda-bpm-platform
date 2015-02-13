@@ -15,11 +15,11 @@ package org.camunda.bpm.engine.impl.pvm.runtime.operation;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 
-
 /**
- * @author Tom Baeyens
+ * @author Thorben Lindhauer
+ *
  */
-public class PvmAtomicOperationTransitionCreateScope extends PvmAtomicOperationCreateScope {
+public class PvmAtomicOperationActivityStartCreateScope extends PvmAtomicOperationCreateScope {
 
   public boolean isAsync(PvmExecutionImpl execution) {
     ActivityImpl activity = execution.getActivity();
@@ -27,11 +27,11 @@ public class PvmAtomicOperationTransitionCreateScope extends PvmAtomicOperationC
   }
 
   public String getCanonicalName() {
-    return "transition-create-scope";
+    return "activity-start-create-scope";
   }
 
   protected void scopeCreated(PvmExecutionImpl execution) {
-    execution.performOperation(TRANSITION_NOTIFY_LISTENER_START);
+    execution.performOperation(ACTIVITY_START);
 
   }
 }

@@ -42,7 +42,6 @@ public class GetActivityInstanceCmd implements Command<ActivityInstance> {
     this.processInstanceId = processInstanceId;
   }
 
-  @SuppressWarnings({ "unchecked", "rawtypes" })
   public ActivityInstance execute(CommandContext commandContext) {
 
     ensureNotNull("processInstanceId", processInstanceId);
@@ -224,7 +223,8 @@ public class GetActivityInstanceCmd implements Command<ActivityInstance> {
     return execution.isScope() && !executions.isEmpty() && executions.get(0).isConcurrent() && !execution.isActive();
   }
 
-  protected ScopeImpl getActivity(ExecutionEntity executionEntity) {
+  // TODO: move somewhere else
+  public static ScopeImpl getActivity(ExecutionEntity executionEntity) {
     if(executionEntity.getActivityId() != null) {
       return executionEntity.getActivity();
 

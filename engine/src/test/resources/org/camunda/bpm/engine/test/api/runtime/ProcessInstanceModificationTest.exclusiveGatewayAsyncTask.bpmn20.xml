@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions" 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:camunda="http://activiti.org/bpmn"
+  targetNamespace="Examples">
+  
+  <process id="exclusiveGateway">
+  
+    <startEvent id="theStart" />
+    <sequenceFlow id="flow1" sourceRef="theStart" targetRef="fork" />
+    
+    <exclusiveGateway id="fork" />
+    <sequenceFlow id="flow2" sourceRef="fork" targetRef="task1">
+      <conditionExpression xsi:type="tFormalExpression">${true}</conditionExpression>
+    </sequenceFlow>
+    <userTask id="task1"/>
+    <sequenceFlow id="flow3" sourceRef="task1" targetRef="join" />
+    
+    <sequenceFlow id="flow4" sourceRef="fork" targetRef="task2">
+      <conditionExpression xsi:type="tFormalExpression">${false}</conditionExpression>
+    </sequenceFlow>
+    <userTask id="task2" camunda:asyncBefore="true"/>
+    <sequenceFlow id="flow5" sourceRef="task2" targetRef="join" />
+    
+    <exclusiveGateway id="join" />
+    <sequenceFlow id="flow6" sourceRef="join" targetRef="theEnd" />
+   
+    <endEvent id="theEnd" />
+    
+  </process>
+
+</definitions>

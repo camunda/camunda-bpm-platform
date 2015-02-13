@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:activiti="http://activiti.org/bpmn"
+  targetNamespace="Examples"
+  xmlns:tns="Examples">
+
+  <process id="process">
+  
+    <startEvent id="theStart" />
+    <sequenceFlow id="flow1" sourceRef="theStart" targetRef="task" />
+    <userTask id="task" name="my task" />    
+    <sequenceFlow id="flow2" sourceRef="task" targetRef="terminateEnd" />
+    <endEvent id="terminateEnd">
+      <terminateEventDefinition id="terminateEndDefinition"/>
+    </endEvent>
+    
+  </process>
+
+</definitions>

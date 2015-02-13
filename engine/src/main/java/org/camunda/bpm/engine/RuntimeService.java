@@ -28,6 +28,7 @@ import org.camunda.bpm.engine.runtime.MessageCorrelationBuilder;
 import org.camunda.bpm.engine.runtime.NativeExecutionQuery;
 import org.camunda.bpm.engine.runtime.NativeProcessInstanceQuery;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.runtime.ProcessInstanceModificationBuilder;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.camunda.bpm.engine.runtime.VariableInstanceQuery;
 import org.camunda.bpm.engine.variable.VariableMap;
@@ -1078,4 +1079,6 @@ public interface RuntimeService {
    * @throws ProcessEngineException if messageName is null and businessKey is null and correlationKeys is null
    */
   void correlateMessage(String messageName, String businessKey, Map<String, Object> correlationKeys, Map<String, Object> processVariables);
+
+  ProcessInstanceModificationBuilder createProcessInstanceModification(String processInstanceId);
 }

@@ -46,14 +46,14 @@
     </subProcess>
     
    	<boundaryEvent id="outerMessageBoundary" attachedToRef="subProcess">
-		<messageEventDefinition messageRef="messageId2" />
-	</boundaryEvent>
-	
-	<sequenceFlow targetRef="taskAfterSubprocess" sourceRef="subProcess" />
-	<sequenceFlow targetRef="taskAfterOuterMessageBoundary" sourceRef="outerMessageBoundary" />
-	
-	<userTask id="taskAfterSubprocess" />
-	<userTask id="taskAfterOuterMessageBoundary" />
+  		<messageEventDefinition messageRef="messageId2" />
+  	</boundaryEvent>
+  	
+  	<sequenceFlow targetRef="taskAfterSubprocess" sourceRef="subProcess" />
+  	<sequenceFlow targetRef="taskAfterOuterMessageBoundary" sourceRef="outerMessageBoundary" />
+  	
+  	<userTask id="taskAfterSubprocess" />
+  	<userTask id="taskAfterOuterMessageBoundary" />
     
     <sequenceFlow targetRef="theEnd" sourceRef="taskAfterSubprocess" />
     <sequenceFlow targetRef="theEnd" sourceRef="taskAfterOuterMessageBoundary" />

@@ -31,6 +31,9 @@ public interface PvmAtomicOperation extends CoreAtomicOperation<PvmExecutionImpl
   PvmAtomicOperation ACTIVITY_START = new PvmAtomicOperationActivityStart();
   PvmAtomicOperation ACTIVITY_START_CONCURRENT = new PvmAtomicOperationActivityStartConcurrent();
   PvmAtomicOperation ACTIVITY_START_CANCEL_SCOPE = new PvmAtomicOperationActivityStartCancelScope();
+  PvmAtomicOperation ACTIVITY_START_CREATE_SCOPE = new PvmAtomicOperationActivityStartCreateScope();
+  PvmAtomicOperation ACTIVITY_INIT_STACK = new PvmAtomicOperationActivityInitStack();
+  PvmAtomicOperation ACTIVITY_INIT_STACK_NOTIFY_LISTENER_START = new PvmAtomicOperationActivityInitStackNotifyListenerStart();
   PvmAtomicOperation ACTIVITY_EXECUTE = new PvmAtomicOperationActivityExecute();
   PvmAtomicOperation ACTIVITY_NOTIFY_LISTENER_END = new PvmAtomicOperationActivityNotifyListenerEnd();
   PvmAtomicOperation ACTIVITY_END = new PvmAtomicOperationActivityEnd();

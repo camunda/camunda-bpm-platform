@@ -111,6 +111,8 @@ public class ExecutionImpl extends PvmExecutionImpl implements
 
     if (initializeExecutionStartContext) {
       createdExecution.setStartContext(new ExecutionStartContext());
+    } else if (startContext != null) {
+      createdExecution.setStartContext(startContext);
     }
 
     return createdExecution;

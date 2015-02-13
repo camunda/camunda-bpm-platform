@@ -239,6 +239,8 @@ public class ExecutionEntity extends PvmExecutionImpl implements
 
     if (initializeExecutionStartContext) {
       createdExecution.setStartContext(new ExecutionStartContext());
+    } else if (startContext != null) {
+      createdExecution.setStartContext(startContext);
     }
 
     if (log.isLoggable(Level.FINE)) {
