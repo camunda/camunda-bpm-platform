@@ -138,6 +138,7 @@
         <database.driver>com.ibm.db2.jcc.DB2Driver</database.driver>
         <database.datasource.class>com.ibm.db2.jcc.DB2SimpleDataSource</database.datasource.class>
         <jboss.datasource.filename>db2-ds.xml</jboss.datasource.filename>
+        <hibernate.dialect>org.hibernate.dialect.DB2Dialect</hibernate.dialect>
       </properties>
 
       <dependencies>
@@ -166,6 +167,7 @@
         <database.driver>org.h2.Driver</database.driver>
         <database.username>sa</database.username>
         <database.password></database.password>
+        <hibernate.dialect>org.hibernate.dialect.H2Dialect</hibernate.dialect>
       </properties>
       <dependencies>
         <dependency>
@@ -191,6 +193,7 @@
         <database.driver>org.h2.Driver</database.driver>
         <database.datasource.class>org.h2.jdbcx.JdbcDataSource</database.datasource.class>
         <jboss.datasource.filename>h2-ds.xml</jboss.datasource.filename>
+        <hibernate.dialect>org.hibernate.dialect.H2Dialect</hibernate.dialect>
       </properties>
       <dependencies>
         <dependency>
@@ -208,6 +211,7 @@
         <database.driver>com.mysql.jdbc.Driver</database.driver>
         <database.datasource.class>com.mysql.jdbc.jdbc2.optional.MysqlDataSource</database.datasource.class>
         <jboss.datasource.filename>mysql-ds.xml</jboss.datasource.filename>
+        <hibernate.dialect>org.hibernate.dialect.MySQL5InnoDBDialect</hibernate.dialect>
       </properties>
 
       <dependencies>
@@ -246,6 +250,7 @@
       <id>oracle-10</id>
       <properties>
         <version.oracle>${version.oracle-10}</version.oracle>
+        <hibernate.dialect>org.hibernate.dialect.Oracle10gDialect</hibernate.dialect>
       </properties>
       <dependencies>
         <dependency>
@@ -259,6 +264,7 @@
       <id>oracle-11</id>
       <properties>
         <version.oracle>${version.oracle-11}</version.oracle>
+        <hibernate.dialect>org.hibernate.dialect.Oracle10gDialect</hibernate.dialect>
       </properties>
       <dependencies>
         <dependency>
@@ -277,6 +283,7 @@
          Exception: java.sql.SQLException: ORA-01000: maximum open cursors exceeded
         -->
         <version.oracle>${version.oracle-11}</version.oracle>
+        <hibernate.dialect>org.hibernate.dialect.Oracle10gDialect</hibernate.dialect>
       </properties>
       <dependencies>
         <dependency>
@@ -294,6 +301,7 @@
         <database.driver>org.postgresql.Driver</database.driver>
         <database.datasource.class>org.postgresql.ds.PGSimpleDataSource</database.datasource.class>
         <jboss.datasource.filename>postgresql-ds.xml</jboss.datasource.filename>
+        <hibernate.dialect>org.hibernate.dialect.PostgreSQL9Dialect</hibernate.dialect>
       </properties>
 
       <dependencies>
@@ -319,6 +327,7 @@
         <database.driver>com.microsoft.sqlserver.jdbc.SQLServerDriver</database.driver>
         <database.datasource.class>com.microsoft.sqlserver.jdbc.SQLServerDataSource</database.datasource.class>
         <jboss.datasource.filename>sqlserver-ds.xml</jboss.datasource.filename>
+        <hibernate.dialect>org.hibernate.dialect.SQLServer2008Dialect</hibernate.dialect>
       </properties>
 
       <dependencies>
