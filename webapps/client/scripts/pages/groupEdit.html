@@ -13,6 +13,9 @@
             <li ng-class="activeClass('tab=group')">
               <a href="#/groups/{{group.id | escape}}?tab=group">Group</a>
             </li>
+            <li ng-class="activeClass('tab=users')">
+              <a href="#/groups/{{group.id | escape}}?tab=users">Users</a>
+            </li>
           </ul>
         </div>
       </div>
@@ -94,8 +97,36 @@
             </form>
           </div>
         </div>
+        <div class="box"
+             ng-show="show('users')">
+            <legend>Users ({{groupUserList.length}})</legend>
 
-      </div>
+            <table class="table" ng-hide="groupUserList.length == 0">
+              <thead>
+                <tr>
+                  <th>
+                    <!-- pictures -->
+                  </th>
+                  <th>Name</th>
+                  <th>Username</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr ng-repeat="user in groupUserList">
+                  <td>
+                    <!-- add user pictures later -->
+                    <span class="glyphicon glyphicon-user"></span>
+                  </td>
+                  <td>{{user.firstName}} {{user.lastName}}</td>
+                  <td>{{user.id}}</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <p ng-show="groupUserList.length == 0">Group {{group.name}}
+              does not currently have any users</p>
+          </div>
+        </div>
     </div>
   </section>
 </div>
