@@ -8,9 +8,15 @@ var camClient = new CamSDK.Client({
   apiUri: 'http://localhost:8080/engine-rest'
 });
 
-module.exports = function (operations) {
+var keys = Object.keys;
+
+module.exports = function (operations, noReset) {
+
   var callbacks = [
     function (cb) {
+      if (noReset) {
+        return cb();
+      }
       request(resetUrl, function(err, res, body) {
         if (err) {
           return cb(err);
@@ -21,19 +27,18 @@ module.exports = function (operations) {
       });
     }
   ];
-
-  for (var resourceName in operations) {
-    for (var methodName in operations[resourceName]) {
-      var resource = new camClient.resource(resourceName);
+  
+  keys(operations).forEach(function (resourceName) {
+    keys(operations[resourceName]).forEach(function (methodName) {
       operations[resourceName][methodName].forEach(function (data) {
+        var resource = new camClient.resource(resourceName);
         callbacks.push(function (cb) {
           console.info('doing '+resourceName+'.'+methodName+'', data);
           resource[methodName](data, cb);
         });
       });
-    }
-  }
-
+    });
+  });
 
   CamSDK.utils.series(callbacks, function (err, results) {
       if (err) {
