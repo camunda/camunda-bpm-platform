@@ -1168,6 +1168,36 @@ public class CaseCallActivityTest extends CmmnProcessEngineTestCase {
     runtimeService.deleteProcessInstance(superProcessInstanceId, null);
   }
 
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/callactivity/CaseCallActivityTest.testCompletionOfCaseWithTwoTasks.bpmn20.xml",
+      "org/camunda/bpm/engine/test/api/cmmn/twoTaskCase.cmmn"
+    })
+  public void testCompletionOfTwoHumanTasks() {
+    // given
+    String superProcessInstanceId = startProcessInstanceByKey(PROCESS_DEFINITION_KEY).getId();
+
+    // when (1)
+    String humanTaskId = queryCaseExecutionByActivityId(HUMAN_TASK_ID).getId();
+    manualStart(humanTaskId);
+    complete(humanTaskId);
+
+    // then (1)
+
+    assertEquals(0, taskService.createTaskQuery().count());
+
+    // when (2)
+    humanTaskId = queryCaseExecutionByActivityId("PI_HumanTask_2").getId();
+    manualStart(humanTaskId);
+    complete(humanTaskId);
+
+    // then (2)
+    Task task = taskService.createTaskQuery().singleResult();
+    assertNotNull(task);
+
+    assertEquals(superProcessInstanceId, task.getProcessInstanceId());
+    assertEquals("userTask", task.getTaskDefinitionKey());
+  }
+
   protected ProcessInstance startProcessInstanceByKey(String processDefinitionKey) {
     return startProcessInstanceByKey(processDefinitionKey, null);
   }
