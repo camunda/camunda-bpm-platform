@@ -1,42 +1,6 @@
-<div class="task-search">
-  <form class="search-field" ng-submit="createSearch()">
-    <div class="form-container search-container">
-
-      <span cam-widget-search-pill
-            ng-repeat="search in searches"
-            extended="true"
-            allow-dates="true"
-            enforce-dates="false"
-            valid="isValid(search)"
-            type="search.type"
-            name="search.name"
-            operator="search.operator"
-            value="search.value"
-            invalid-text="{{'INVALID_SEARCH' | translate}}"
-            on-change="changeSearch($index, field, before, value)"
-            on-delete="deleteSearch($index)" />
-
-      <input class="form-control"
-             type="text"
-             placeholder="{{'SEARCH_PLACEHOLDER' | translate}}"
-             ng-model="inputQuery"
-             ng-focus="onFocus()"
-             ng-blur="onBlur()" />
-
-      <div class="open"
-           ng-if="dropdownOpen"
-           ng-mousedown="dropdownHandler($event)">
-        <ul class="dropdown-menu search-dropdown"
-            role="menu">
-
-          <li ng-repeat="type in types">
-            <a ng-click="selectType(type)">
-              {{type}}
-            </a>
-          </li>
-        </ul>
-      </div>
-
-    </div>
-  </form>
-</div>
+<div cam-widget-search
+     cam-widget-search-valid-searches="searches"
+     cam-widget-search-translations="translations"
+     cam-widget-search-types="types"
+     cam-widget-search-operators="operators"
+/>

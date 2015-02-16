@@ -2,15 +2,15 @@
   "types": [
     {
       "key": "processVariables",
-      "value": "Process Variable"
+      "value": "PROCESS_VARIABLE"
     },
     {
       "key": "taskVariables",
-      "value": "Task Variable"
+      "value": "TASK_VARIABLE"
     },
     {
       "key": "caseInstanceVariables",
-      "value": "Case Variable"
+      "value": "CASE_VARIABLE"
     }
   ],
   "operators": {
@@ -130,5 +130,14 @@
         "value": "like"
       }
     ]
+  },
+  "tooltips": {
+    "inputPlaceholder": "SEARCH_PLACEHOLDER",
+    "invalid": "INVALID_SEARCH",
+    "deleteSearch": "DELETE_SEARCH",
+    "type": "TYPE",
+    "name": "PROPERTY",
+    "operator": "OPERATOR",
+    "value": "VALUE"
   }
 }

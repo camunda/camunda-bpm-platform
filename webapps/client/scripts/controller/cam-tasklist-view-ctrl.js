@@ -11,13 +11,6 @@ define([
     };
   }
 
-  var sanitizeValue = function(value, operator) {
-    if(operator === 'like') {
-      return '%'+value+'%';
-    }
-    return value;
-  };
-
   return [
     '$scope',
     '$q',
@@ -128,29 +121,16 @@ define([
 
     }]);
 
-    tasklistData.provide('taskListQuery', ['currentFilter', function(currentFilter) {
+    tasklistData.provide('searchQuery', {
+        processVariables: [],
+        taskVariables: [],
+        caseInstanceVariables: []
+      });
+
+    tasklistData.provide('taskListQuery', ['currentFilter', 'searchQuery', function(currentFilter, searchQuery) {
       if (!currentFilter) {
         return null;
       }
-
-      var querySearchParam = getPropertyFromLocation('query');
-      var searches = JSON.parse(querySearchParam);
-
-      var query = {};
-
-      query.processVariables = [];
-      query.taskVariables = [];
-      query.caseInstanceVariables = [];
-
-      angular.forEach(searches, function(search) {
-
-         query[search.type].push({
-           name: search.name,
-           operator: search.operator,
-           value: sanitizeValue(search.value, search.operator)
-         });
-
-      });
 
       var firstResult = ((getPropertyFromLocation('page') || 1) - 1) * 15;
       var sortBy = getPropertyFromLocation('sortBy') || 'created';
@@ -163,9 +143,9 @@ define([
         sortBy : sortBy,
         sortOrder: sortOrder,
         active: true,
-        processVariables : query.processVariables,
-        taskVariables : query.taskVariables,
-        caseInstanceVariables : query.caseInstanceVariables
+        processVariables : searchQuery.processVariables,
+        taskVariables : searchQuery.taskVariables,
+        caseInstanceVariables : searchQuery.caseInstanceVariables
       };
 
     }]);
