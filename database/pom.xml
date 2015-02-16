@@ -249,7 +249,6 @@
     <profile>
       <id>oracle-10</id>
       <properties>
-        <version.oracle>${version.oracle-10}</version.oracle>
         <hibernate.dialect>org.hibernate.dialect.Oracle10gDialect</hibernate.dialect>
       </properties>
       <dependencies>
@@ -301,7 +300,7 @@
         <database.driver>org.postgresql.Driver</database.driver>
         <database.datasource.class>org.postgresql.ds.PGSimpleDataSource</database.datasource.class>
         <jboss.datasource.filename>postgresql-ds.xml</jboss.datasource.filename>
-        <hibernate.dialect>org.hibernate.dialect.PostgreSQL9Dialect</hibernate.dialect>
+        <hibernate.dialect>org.hibernate.dialect.PostgreSQLDialect</hibernate.dialect>
       </properties>
 
       <dependencies>
