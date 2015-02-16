@@ -20,6 +20,7 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
 import org.camunda.bpm.engine.test.Deployment;
+import org.junit.Test;
 
 /**
  * @author Joram Barrez
@@ -88,6 +89,54 @@ public class ParallelGatewayTest extends PluggableProcessEngineTestCase {
     taskService.complete(task4.getId());
     
     assertProcessEnded(pi.getId());
+  }
+  
+  /**
+   * https://app.camunda.com/jira/browse/CAM-3472
+   */
+  @Test
+  @Deployment
+  public void testParallelGatewaySpecExecution() {
+	// Start the process
+	ProcessInstance processInstance = runtimeService
+			.startProcessInstanceByKey("ParallelGatewaySpec");
+
+	Task task = taskService.createTaskQuery()
+						   .processInstanceId(processInstance.getId())
+						   .taskDefinitionKey("task1").singleResult();
+	taskService.complete(task.getId());
+
+	task = taskService.createTaskQuery()
+					  .processInstanceId(processInstance.getId())
+					  .taskDefinitionKey("task1").singleResult();
+	taskService.complete(task.getId());
+
+	List<Task> tasks = taskService.createTaskQuery()
+								  .processInstanceId(processInstance.getId())
+								  .taskDefinitionKey("finalTask").list();
+	assertEquals("The parallel gateway should have not been passed", 0,	tasks.size());
+
+	task = taskService.createTaskQuery()
+					  .processInstanceId(processInstance.getId())
+					  .taskDefinitionKey("task2").singleResult();
+	taskService.complete(task.getId());
+
+	tasks = taskService.createTaskQuery()
+					  .processInstanceId(processInstance.getId())
+					  .taskDefinitionKey("finalTask").list();
+	// After the completion of the task2 the parallel gateway would be passed
+	assertEquals("The parallel gateway should have been passed now", 1, tasks.size());
+
+	task = taskService.createTaskQuery()
+					  .processInstanceId(processInstance.getId())
+					  .taskDefinitionKey("task2").singleResult();
+	taskService.complete(task.getId());
+
+	tasks = taskService.createTaskQuery()
+					   .processInstanceId(processInstance.getId())
+					   .taskDefinitionKey("finalTask").list();
+	// After the completion of the task2 the parallel gateway would be passed again
+	assertEquals("The parallel gateway should have been passed now", 2, tasks.size());
   }
   
 }
