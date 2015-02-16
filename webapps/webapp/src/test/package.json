@@ -4,7 +4,7 @@
   "description": "e2e test setup",
   "dependencies": {
     "camunda-bpm-sdk-js": "7.3.0-SNAPSHOT",
-    "request": "^2.53.0"
+    "request": "2.53.0"
   },
   "devDependencies": {}
 }
