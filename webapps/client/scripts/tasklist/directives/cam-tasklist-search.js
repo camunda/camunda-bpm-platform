@@ -33,11 +33,7 @@ define([
     return value;
   };
 
-  return [
-    '$translate',
-  function(
-    $translate
-  ) {
+  return [function() {
 
     return {
       restrict: 'A',
@@ -46,7 +42,7 @@ define([
         tasklistData: '='
       },
 
-      controller: function($scope) {
+      controller: ['$scope', '$translate', function($scope, $translate) {
 
         var searchConfig = JSON.parse(searchConfigJSON);
 
@@ -92,7 +88,7 @@ define([
           searchData.set("searchQuery", query);
         }, true);
 
-      },
+      }],
 
       template: template
     };
