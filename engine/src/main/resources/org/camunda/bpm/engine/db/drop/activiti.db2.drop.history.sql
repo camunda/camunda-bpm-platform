@@ -21,4 +21,4 @@ drop table ACT_HI_COMMENT;
 drop table ACT_HI_ATTACHMENT;
 drop table ACT_HI_OP_LOG;
 drop table ACT_HI_INCIDENT;
-drop table ACT_HI_JOG_LOG;
+drop table ACT_HI_JOB_LOG;
