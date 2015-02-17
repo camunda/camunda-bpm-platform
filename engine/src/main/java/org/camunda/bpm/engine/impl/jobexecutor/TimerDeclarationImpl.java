@@ -152,6 +152,10 @@ public class TimerDeclarationImpl extends JobDeclaration<TimerEntity> {
     }
   }
 
+  public TimerEntity createStartTimerInstance(String deploymentId) {
+    return createTimer(deploymentId);
+  }
+
   public TimerEntity createTimerInstanceForParallelMultiInstance(ExecutionEntity execution) {
     if (isParallelMultiInstance(execution)) {
       return createTimer(execution);
@@ -160,13 +164,24 @@ public class TimerDeclarationImpl extends JobDeclaration<TimerEntity> {
     }
   }
 
+  public TimerEntity createTimer(String deploymentId) {
+    TimerEntity timer = super.createJobInstance(null);
+    timer.setDeploymentId(deploymentId);
+    scheduleTimer(timer);
+    return timer;
+  }
+
   public TimerEntity createTimer(ExecutionEntity execution) {
     TimerEntity timer = super.createJobInstance(execution);
-    Context
-    .getCommandContext()
-    .getJobManager()
-    .schedule(timer);
+    scheduleTimer(timer);
     return timer;
+  }
+
+  protected void scheduleTimer(TimerEntity timer) {
+    Context
+      .getCommandContext()
+      .getJobManager()
+      .schedule(timer);
   }
 
 }

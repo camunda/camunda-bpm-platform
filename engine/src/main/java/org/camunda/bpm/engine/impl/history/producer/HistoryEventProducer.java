@@ -22,6 +22,7 @@ import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.camunda.bpm.engine.runtime.Incident;
+import org.camunda.bpm.engine.runtime.Job;
 
 /**
  * <p>The producer for history events. The history event producer is
@@ -179,5 +180,35 @@ public interface HistoryEventProducer {
   public HistoryEvent createHistoricIncidentResolveEvt(Incident incident);
 
   public HistoryEvent createHistoricIncidentDeleteEvt(Incident incident);
+
+  // Job Log ///////////////////////////////////////////
+
+  /**
+   * Creates the history event fired when a job has been <strong>created</strong>.
+   *
+   * @since 7.3
+   */
+  public HistoryEvent createHistoricJobLogCreateEvt(Job job);
+
+  /**
+   * Creates the history event fired when the execution of a job <strong>failed</strong>.
+   *
+   * @since 7.3
+   */
+  public HistoryEvent createHistoricJobLogFailedEvt(Job job, Throwable exception);
+
+  /**
+   * Creates the history event fired when the execution of a job was <strong>successful</strong>.
+   *
+   * @since 7.3
+   */
+  public HistoryEvent createHistoricJobLogSuccessfulEvt(Job job);
+
+  /**
+   * Creates the history event fired when the a job has been <strong>deleted</strong>.
+   *
+   * @since 7.3
+   */
+  public HistoryEvent createHistoricJobLogDeleteEvt(Job job);
 
 }

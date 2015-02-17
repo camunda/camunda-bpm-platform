@@ -21,6 +21,7 @@ import junit.framework.TestCase;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.history.HistoricJobLog;
 import org.camunda.bpm.engine.query.Query;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
@@ -282,6 +283,132 @@ public class TestOrderingUtil {
 
       public boolean hasNullProperty(Task object) {
         return object.getCaseExecutionId() == null;
+      }
+    };
+  }
+
+  // HISTORIC JOB LOG
+
+  public static NullTolerantComparator<HistoricJobLog> historicJobLogByTimestamp() {
+    return new NullTolerantComparator<HistoricJobLog>() {
+      public int compare(HistoricJobLog o1, HistoricJobLog o2) {
+        return compareDates(o1.getTimestamp(), o2.getTimestamp());
+      }
+
+      public boolean hasNullProperty(HistoricJobLog object) {
+        return false;
+      }
+    };
+  }
+
+  public static NullTolerantComparator<HistoricJobLog> historicJobLogByJobId() {
+    return new NullTolerantComparator<HistoricJobLog>() {
+      public int compare(HistoricJobLog o1, HistoricJobLog o2) {
+        return o1.getJobId().compareTo(o2.getJobId());
+      }
+
+      public boolean hasNullProperty(HistoricJobLog object) {
+        return false;
+      }
+    };
+  }
+
+  public static NullTolerantComparator<HistoricJobLog> historicJobLogByJobDueDate() {
+    return new NullTolerantComparator<HistoricJobLog>() {
+      public int compare(HistoricJobLog o1, HistoricJobLog o2) {
+        return compareDates(o1.getJobDueDate(), o2.getJobDueDate());
+      }
+
+      public boolean hasNullProperty(HistoricJobLog object) {
+        return object.getJobDueDate() == null;
+      }
+    };
+  }
+
+  public static NullTolerantComparator<HistoricJobLog> historicJobLogByJobRetries() {
+    return new NullTolerantComparator<HistoricJobLog>() {
+      public int compare(HistoricJobLog o1, HistoricJobLog o2) {
+        return Integer.valueOf(o1.getJobRetries()).compareTo(Integer.valueOf(o2.getJobRetries()));
+      }
+
+      public boolean hasNullProperty(HistoricJobLog object) {
+        return false;
+      }
+    };
+  }
+
+  public static NullTolerantComparator<HistoricJobLog> historicJobLogByActivityId() {
+    return new NullTolerantComparator<HistoricJobLog>() {
+      public int compare(HistoricJobLog o1, HistoricJobLog o2) {
+        return o1.getActivityId().compareTo(o2.getActivityId());
+      }
+
+      public boolean hasNullProperty(HistoricJobLog object) {
+        return object.getActivityId() == null;
+      }
+    };
+  }
+
+  public static NullTolerantComparator<HistoricJobLog> historicJobLogByExecutionId() {
+    return new NullTolerantComparator<HistoricJobLog>() {
+      public int compare(HistoricJobLog o1, HistoricJobLog o2) {
+        return o1.getExecutionId().compareTo(o2.getExecutionId());
+      }
+
+      public boolean hasNullProperty(HistoricJobLog object) {
+        return false;
+      }
+    };
+  }
+
+  public static NullTolerantComparator<HistoricJobLog> historicJobLogByProcessInstanceId() {
+    return new NullTolerantComparator<HistoricJobLog>() {
+      public int compare(HistoricJobLog o1, HistoricJobLog o2) {
+        return o1.getProcessInstanceId().compareTo(o2.getProcessInstanceId());
+      }
+
+      public boolean hasNullProperty(HistoricJobLog object) {
+        return false;
+      }
+    };
+  }
+
+  public static NullTolerantComparator<HistoricJobLog> historicJobLogByProcessDefinitionId() {
+    return new NullTolerantComparator<HistoricJobLog>() {
+      public int compare(HistoricJobLog o1, HistoricJobLog o2) {
+        return o1.getProcessDefinitionId().compareTo(o2.getProcessDefinitionId());
+      }
+
+      public boolean hasNullProperty(HistoricJobLog object) {
+        return false;
+      }
+    };
+  }
+
+  public static NullTolerantComparator<HistoricJobLog> historicJobLogByProcessDefinitionKey(ProcessEngine processEngine) {
+    final RepositoryService repositoryService = processEngine.getRepositoryService();
+
+    return new NullTolerantComparator<HistoricJobLog>() {
+      public int compare(HistoricJobLog o1, HistoricJobLog o2) {
+        ProcessDefinition processDefinition1 = repositoryService.getProcessDefinition(o1.getProcessDefinitionId());
+        ProcessDefinition processDefinition2 = repositoryService.getProcessDefinition(o1.getProcessDefinitionId());
+        return processDefinition1.getId().compareTo(processDefinition2.getId());
+      }
+
+      public boolean hasNullProperty(HistoricJobLog object) {
+        return false;
+      }
+    };
+  }
+
+  public static NullTolerantComparator<HistoricJobLog> historicJobLogByDeploymentId() {
+    return new NullTolerantComparator<HistoricJobLog>() {
+      public int compare(HistoricJobLog o1, HistoricJobLog o2) {
+        return o1.getDeploymentId().compareTo(o2.getDeploymentId());
+      }
+
+      public boolean hasNullProperty(HistoricJobLog object) {
+        return false;
       }
     };
   }

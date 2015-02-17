@@ -12,14 +12,22 @@
  */
 package org.camunda.bpm.engine.impl.history.producer;
 
+import static org.camunda.bpm.engine.impl.util.JobExceptionUtil.createJobExceptionByteArray;
+import static org.camunda.bpm.engine.impl.util.JobExceptionUtil.getJobExceptionBytes;
+import static org.camunda.bpm.engine.impl.util.JobExceptionUtil.getJobExceptionStacktrace;
+
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.DelegateTask;
 import org.camunda.bpm.engine.delegate.VariableScope;
+import org.camunda.bpm.engine.history.HistoricJobLog;
 import org.camunda.bpm.engine.history.IncidentState;
+import org.camunda.bpm.engine.history.JobState;
 import org.camunda.bpm.engine.history.UserOperationLogContext;
+import org.camunda.bpm.engine.impl.HistoricJobLogQueryImpl;
 import org.camunda.bpm.engine.impl.cfg.IdGenerator;
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
 import org.camunda.bpm.engine.impl.context.Context;
@@ -36,12 +44,15 @@ import org.camunda.bpm.engine.impl.history.event.UserOperationLogEntryEventEntit
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.HistoricJobLogEventEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.camunda.bpm.engine.impl.pvm.PvmScope;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.runtime.Incident;
+import org.camunda.bpm.engine.runtime.Job;
 
 /**
  * @author Daniel Meyer
@@ -208,7 +219,6 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     evt.setIncidentState(incidentState.getStateCode());
   }
 
-
   protected HistoryEvent createHistoricVariableEvent(VariableInstanceEntity variableInstance, VariableScope sourceVariableScope, HistoryEventType eventType) {
     String scopeActivityInstanceId = null;
     String sourceActivityInstanceId = null;
@@ -277,6 +287,10 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
 
   protected HistoricIncidentEventEntity newIncidentEventEntity(Incident incident) {
     return new HistoricIncidentEventEntity();
+  }
+
+  protected HistoricJobLogEventEntity newHistoricJobLogEntity(Job job) {
+    return new HistoricJobLogEventEntity();
   }
 
   protected HistoricProcessInstanceEventEntity loadProcessInstanceEventEntity(ExecutionEntity execution) {
@@ -557,6 +571,107 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     }
 
     return evt;
+  }
+
+  // Job Log
+
+  public HistoryEvent createHistoricJobLogCreateEvt(Job job) {
+    return createHistoricJobLogEvt(job, HistoryEventTypes.JOB_CREATE);
+  }
+
+  public HistoryEvent createHistoricJobLogFailedEvt(Job job, Throwable exception) {
+    HistoricJobLogEventEntity event = (HistoricJobLogEventEntity) createHistoricJobLogEvt(job, HistoryEventTypes.JOB_FAIL);
+
+    if(exception != null) {
+      // exception message
+      event.setJobExceptionMessage(exception.getMessage());
+
+      // stacktrace
+      String exceptionStacktrace = getJobExceptionStacktrace(exception);
+      byte[] exceptionBytes = getJobExceptionBytes(exceptionStacktrace);
+      ByteArrayEntity byteArray = createJobExceptionByteArray(exceptionBytes);
+      event.setExceptionByteArrayId(byteArray.getId());
+    }
+
+    return event;
+  }
+
+  public HistoryEvent createHistoricJobLogSuccessfulEvt(Job job) {
+    return createHistoricJobLogEvt(job, HistoryEventTypes.JOB_SUCCESS);
+  }
+
+  public HistoryEvent createHistoricJobLogDeleteEvt(Job job) {
+    return createHistoricJobLogEvt(job, HistoryEventTypes.JOB_DELETE);
+  }
+
+  protected HistoryEvent createHistoricJobLogEvt(Job job, HistoryEventType eventType) {
+    HistoricJobLogEventEntity event = newHistoricJobLogEntity(job);
+    initHistoricJobLogEvent(event, job, eventType);
+    return event;
+  }
+
+  protected void initHistoricJobLogEvent(HistoricJobLogEventEntity evt, Job job, HistoryEventType eventType) {
+    JobEntity jobEntity = (JobEntity) job;
+
+    Date now = new Date();
+    evt.setTimestamp(now);
+
+    String jobId = jobEntity.getId();
+    evt.setJobId(jobId);
+    evt.setJobDefinitionId(jobEntity.getJobDefinitionId());
+
+    // try to initialize the activityId
+    String activityId = jobEntity.getActivityId();
+    if (activityId == null && !HistoryEventTypes.JOB_CREATE.equals(eventType)) {
+
+      // This must be done in case of an async catching signal
+      // event. In that case there does not exist a JobDefinition
+      // so that it is not easily possible to retrieve the associated
+      // activity id.
+
+      HistoricJobLogQueryImpl query = Context
+          .getCommandContext()
+          .getDbEntityManager()
+          .createHistoricJobLogQuery();
+
+      // query for the job create event
+      HistoricJobLog createJobLog = query
+          .jobId(jobId)
+          .created()
+          .singleResult();
+
+      if (createJobLog != null) {
+        // use already know activity id
+        activityId = createJobLog.getActivityId();
+      }
+    }
+    evt.setActivityId(activityId);
+
+    evt.setJobType(jobEntity.getType());
+    evt.setJobHandlerType(jobEntity.getJobHandlerType());
+    evt.setJobDueDate(jobEntity.getDuedate());
+    evt.setJobRetries(jobEntity.getRetries());
+
+    evt.setExecutionId(jobEntity.getExecutionId());
+    evt.setProcessInstanceId(jobEntity.getProcessInstanceId());
+    evt.setProcessDefinitionId(jobEntity.getProcessDefinitionId());
+    evt.setProcessDefinitionKey(jobEntity.getProcessDefinitionKey());
+    evt.setDeploymentId(jobEntity.getDeploymentId());
+
+    JobState state = null;
+    if (HistoryEventTypes.JOB_CREATE.equals(eventType)) {
+      state = JobState.CREATED;
+    }
+    else if (HistoryEventTypes.JOB_FAIL.equals(eventType)) {
+      state = JobState.FAILED;
+    }
+    else if (HistoryEventTypes.JOB_SUCCESS.equals(eventType)) {
+      state = JobState.SUCCESSFUL;
+    }
+    else if (HistoryEventTypes.JOB_DELETE.equals(eventType)) {
+      state = JobState.DELETED;
+    }
+    evt.setState(state.getStateCode());
   }
 
 }

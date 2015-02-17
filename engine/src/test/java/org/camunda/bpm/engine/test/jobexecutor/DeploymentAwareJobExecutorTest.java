@@ -164,7 +164,7 @@ public class DeploymentAwareJobExecutorTest extends PluggableProcessEngineTestCa
     Assert.assertEquals(1, acquiredJobs.size());
     Assert.assertTrue(acquiredJobs.contains(messageId));
 
-    commandExecutor.execute(new DeleteJobsCmd(messageId));
+    commandExecutor.execute(new DeleteJobsCmd(messageId, true));
   }
 
   private AcquiredJobs getExecutableJobs(JobExecutor jobExecutor) {

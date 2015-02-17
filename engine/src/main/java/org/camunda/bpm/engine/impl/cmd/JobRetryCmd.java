@@ -12,8 +12,7 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
+import static org.camunda.bpm.engine.impl.util.JobExceptionUtil.getJobExceptionStacktrace;
 
 import org.camunda.bpm.engine.OptimisticLockingException;
 import org.camunda.bpm.engine.impl.cfg.TransactionContext;
@@ -24,6 +23,7 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
 import org.camunda.bpm.engine.impl.jobexecutor.MessageAddedNotification;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
+import org.camunda.bpm.engine.runtime.Job;
 
 /**
  * @author Roman Smirnov
@@ -65,9 +65,7 @@ public abstract class JobRetryCmd implements Command<Object> {
   }
 
   protected String getExceptionStacktrace() {
-    StringWriter stringWriter = new StringWriter();
-    exception.printStackTrace(new PrintWriter(stringWriter));
-    return stringWriter.toString();
+    return getJobExceptionStacktrace(exception);
   }
 
   protected boolean shouldDecrementRetriesFor(Throwable t) {
@@ -79,6 +77,10 @@ public abstract class JobRetryCmd implements Command<Object> {
     MessageAddedNotification messageAddedNotification = new MessageAddedNotification(jobExecutor);
     TransactionContext transactionContext = commandContext.getTransactionContext();
     transactionContext.addTransactionListener(TransactionState.COMMITTED, messageAddedNotification);
+  }
+
+  protected void fireHistoricJobFailedEvt(Job job) {
+    Context.getCommandContext().getHistoricJobLogManager().fireJobFailedEvent(job, exception);
   }
 
 }

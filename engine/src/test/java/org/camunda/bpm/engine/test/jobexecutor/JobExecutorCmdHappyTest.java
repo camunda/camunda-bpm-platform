@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.camunda.bpm.engine.history.HistoricJobLog;
 import org.camunda.bpm.engine.impl.cmd.AcquireJobsCmd;
 import org.camunda.bpm.engine.impl.cmd.ExecuteJobsCmd;
 import org.camunda.bpm.engine.impl.interceptor.Command;
@@ -60,6 +61,8 @@ public class JobExecutorCmdHappyTest extends JobExecutorTestCase {
 
     assertEquals("i'm coding a test", tweetHandler.getMessages().get(0));
     assertEquals(1, tweetHandler.getMessages().size());
+
+    clearDatabase();
   }
 
   static final long SOME_TIME = 928374923546L;
@@ -104,5 +107,28 @@ public class JobExecutorCmdHappyTest extends JobExecutorTestCase {
 
     assertEquals("i'm coding a test", tweetHandler.getMessages().get(0));
     assertEquals(1, tweetHandler.getMessages().size());
+
+    clearDatabase();
   }
+
+  protected void clearDatabase() {
+    processEngineConfiguration.getCommandExecutorTxRequired().execute(new Command<Void>() {
+      public Void execute(CommandContext commandContext) {
+
+        List<HistoricJobLog> historicJobLogs = processEngineConfiguration
+            .getHistoryService()
+            .createHistoricJobLogQuery()
+            .list();
+
+        for (HistoricJobLog historicJobLog : historicJobLogs) {
+          commandContext
+            .getHistoricJobLogManager()
+            .deleteHistoricJobLogById(historicJobLog.getId());
+        }
+
+        return null;
+      }
+    });
+  }
+
 }

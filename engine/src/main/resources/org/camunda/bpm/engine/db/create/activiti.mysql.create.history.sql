@@ -168,6 +168,27 @@ create table ACT_HI_INCIDENT (
   primary key (ID_)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 
+create table ACT_HI_JOB_LOG (
+    ID_ varchar(64) not null,
+    TIMESTAMP_ timestamp not null,
+    JOB_ID_ varchar(64) not null,
+    JOB_DEF_ID_ varchar(64),
+    ACT_ID_ varchar(64),
+    TYPE_ varchar(255) not null,
+    HANDLER_TYPE_ varchar(255),
+    DUEDATE_ timestamp,
+    RETRIES_ integer,
+    EXCEPTION_MSG_ varchar(4000),
+    EXCEPTION_STACK_ID_ varchar(64),
+    EXECUTION_ID_ varchar(64),
+    PROCESS_INSTANCE_ID_ varchar(64),
+    PROCESS_DEF_ID_ varchar(64),
+    PROCESS_DEF_KEY_ varchar(64),
+    DEPLOYMENT_ID_ varchar(64),
+    JOB_STATE_ integer,
+    primary key (ID_)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
+
 create index ACT_IDX_HI_PRO_INST_END on ACT_HI_PROCINST(END_TIME_);
 create index ACT_IDX_HI_PRO_I_BUSKEY on ACT_HI_PROCINST(BUSINESS_KEY_);
 

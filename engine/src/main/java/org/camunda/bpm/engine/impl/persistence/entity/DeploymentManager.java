@@ -72,13 +72,9 @@ public class DeploymentManager extends AbstractManager {
       getIdentityLinkManager().deleteIdentityLinksByProcDef(processDefinitionId);
 
       // remove timer start events:
-      List<Job> timerStartJobs = Context.getCommandContext()
-        .getJobManager()
-        .findJobsByConfiguration(TimerStartEventJobHandler.TYPE, processDefinition.getKey());
+      List<Job> timerStartJobs = getJobManager().findJobsByConfiguration(TimerStartEventJobHandler.TYPE, processDefinition.getKey());
 
-      ProcessDefinitionEntity latestVersion = Context.getCommandContext()
-        .getProcessDefinitionManager()
-        .findLatestProcessDefinitionByKey(processDefinition.getKey());
+      ProcessDefinitionEntity latestVersion = getProcessDefinitionManager().findLatestProcessDefinitionByKey(processDefinition.getKey());
 
       // delete timer start event jobs only if this is the latest version of the process definition.
       if(latestVersion != null && latestVersion.getId().equals(processDefinition.getId())) {
@@ -89,22 +85,20 @@ public class DeploymentManager extends AbstractManager {
 
       if (cascade) {
         // remove historic incidents which are not referenced to a process instance
-        Context
-          .getCommandContext()
-          .getHistoricIncidentManager()
-          .deleteHistoricIncidentsByProcessDefinitionId(processDefinitionId);
+        getHistoricIncidentManager().deleteHistoricIncidentsByProcessDefinitionId(processDefinitionId);
 
         // remove historic op log entries which are not related to a process instance
-        Context
-          .getCommandContext()
-          .getOperationLogManager()
-          .deleteOperationLogEntriesByProcessDefinitionId(processDefinitionId);
+        getUserOperationLogManager().deleteOperationLogEntriesByProcessDefinitionId(processDefinitionId);
       }
     }
 
+    if (cascade) {
+      // delete historic job logs (for example for timer start event jobs)
+      getHistoricJobLogManager().deleteHistoricJobLogsByDeploymentId(deploymentId);
+    }
+
     // delete process definitions from db
-    getProcessDefinitionManager()
-      .deleteProcessDefinitionsByDeploymentId(deploymentId);
+    getProcessDefinitionManager().deleteProcessDefinitionsByDeploymentId(deploymentId);
 
     for (ProcessDefinition processDefinition : processDefinitions) {
       String processDefinitionId = processDefinition.getId();
@@ -116,25 +110,21 @@ public class DeploymentManager extends AbstractManager {
         .removeProcessDefinition(processDefinitionId);
 
       // remove message event subscriptions:
-      List<EventSubscriptionEntity> findEventSubscriptionsByConfiguration = Context
-        .getCommandContext()
-        .getEventSubscriptionManager()
+      List<EventSubscriptionEntity> findEventSubscriptionsByConfiguration = getEventSubscriptionManager()
         .findEventSubscriptionsByConfiguration(MessageEventHandler.EVENT_HANDLER_TYPE, processDefinition.getId());
+
       for (EventSubscriptionEntity eventSubscriptionEntity : findEventSubscriptionsByConfiguration) {
         eventSubscriptionEntity.delete();
       }
 
       // delete job definitions
-      Context.getCommandContext()
-        .getJobDefinitionManager()
-        .deleteJobDefinitionsByProcessDefinitionId(processDefinition.getId());
+      getJobDefinitionManager().deleteJobDefinitionsByProcessDefinitionId(processDefinition.getId());
 
     }
 
     deleteCaseDeployment(deploymentId, cascade);
 
-    getResourceManager()
-      .deleteResourcesByDeploymentId(deploymentId);
+    getResourceManager().deleteResourcesByDeploymentId(deploymentId);
 
     getDbEntityManager().delete(DeploymentEntity.class, "deleteDeployment", deploymentId);
   }

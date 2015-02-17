@@ -61,29 +61,26 @@ public class HistoricProcessInstanceManager extends AbstractHistoricManager {
     if (isHistoryEnabled()) {
       CommandContext commandContext = Context.getCommandContext();
 
-      commandContext
-        .getHistoricDetailManager()
+      getHistoricDetailManager()
         .deleteHistoricDetailsByProcessInstanceId(historicProcessInstanceId);
 
-      commandContext
-        .getHistoricVariableInstanceManager()
+      getHistoricVariableInstanceManager()
         .deleteHistoricVariableInstanceByProcessInstanceId(historicProcessInstanceId);
 
-      commandContext
-        .getHistoricActivityInstanceManager()
+      getHistoricActivityInstanceManager()
         .deleteHistoricActivityInstancesByProcessInstanceId(historicProcessInstanceId);
 
-      commandContext
-        .getHistoricTaskInstanceManager()
+      getHistoricTaskInstanceManager()
         .deleteHistoricTaskInstancesByProcessInstanceId(historicProcessInstanceId);
 
-      commandContext
-          .getOperationLogManager()
-          .deleteOperationLogEntriesByProcessInstanceId(historicProcessInstanceId);
+      getUserOperationLogManager()
+        .deleteOperationLogEntriesByProcessInstanceId(historicProcessInstanceId);
 
-      commandContext
-          .getHistoricIncidentManager()
-          .deleteHistoricIncidentsByProcessInstanceId(historicProcessInstanceId);
+      getHistoricIncidentManager()
+        .deleteHistoricIncidentsByProcessInstanceId(historicProcessInstanceId);
+
+      getHistoricJobLogManager()
+        .deleteHistoricJobLogsByProcessInstanceId(historicProcessInstanceId);
 
       commandContext.getDbEntityManager().delete(HistoricProcessInstanceEntity.class, "deleteHistoricProcessInstance", historicProcessInstanceId);
 

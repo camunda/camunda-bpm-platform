@@ -21,6 +21,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
+import org.camunda.bpm.engine.history.HistoricJobLog;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
@@ -62,6 +63,22 @@ public class JobExecutorTest extends JobExecutorTestCase {
     expectedMessages.add("timer-two");
 
     assertEquals(new TreeSet<String>(expectedMessages), new TreeSet<String>(messages));
+
+    commandExecutor.execute(new Command<Void>() {
+      public Void execute(CommandContext commandContext) {
+        List<HistoricJobLog> historicJobLogs = processEngineConfiguration
+            .getHistoryService()
+            .createHistoricJobLogQuery()
+            .list();
+
+        for (HistoricJobLog historicJobLog : historicJobLogs) {
+          commandContext
+            .getHistoricJobLogManager()
+            .deleteHistoricJobLogById(historicJobLog.getId());
+        }
+        return null;
+      }
+    });
   }
 
   public void testJobExecutorHintConfiguration() {

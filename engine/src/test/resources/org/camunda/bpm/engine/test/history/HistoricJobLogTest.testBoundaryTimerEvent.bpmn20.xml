@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions" 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:camunda="http://activiti.org/bpmn"
+  targetNamespace="Examples">
+
+  <process id="process" isExecutable="true">
+
+    <startEvent id="theStart" />
+
+    <sequenceFlow sourceRef="theStart" targetRef="userTask" />
+
+    <userTask id="userTask" />
+
+    <sequenceFlow sourceRef="userTask" targetRef="theEnd1" />
+
+    <endEvent id="theEnd1" />
+
+    <boundaryEvent id="timer" cancelActivity="true" attachedToRef="userTask">
+      <timerEventDefinition>
+        <timeDuration>PT5M</timeDuration>
+      </timerEventDefinition>
+    </boundaryEvent>
+
+    <sequenceFlow sourceRef="timer" targetRef="theEnd2" />
+
+    <endEvent id="theEnd2" />
+
+  </process>
+</definitions>

@@ -1,5 +1,11 @@
 package org.camunda.bpm.engine.test.jobexecutor;
 
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.List;
+
 import org.apache.ibatis.session.SqlSession;
 import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.interceptor.Command;
@@ -10,12 +16,6 @@ import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobManager;
 import org.camunda.bpm.engine.impl.persistence.entity.TimerEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
-
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.List;
 
 /**
  * <p>This testcase verifies that jobs without suspension state are correctly picked up by the job acquisition</p>
@@ -120,6 +120,7 @@ public class JobAcquisitionTest extends PluggableProcessEngineTestCase {
         public Void execute(CommandContext commandContext) {
           final JobEntity newTimer = commandContext.getJobManager().findJobById(timer.getId());
           newTimer.delete();
+          commandContext.getHistoricJobLogManager().deleteHistoricJobLogByJobId(newTimer.getId());
           return null;
         }
       });

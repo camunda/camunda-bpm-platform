@@ -21,3 +21,4 @@ drop table if exists ACT_HI_COMMENT;
 drop table if exists ACT_HI_ATTACHMENT;
 drop table if exists ACT_HI_OP_LOG;
 drop table if exists ACT_HI_INCIDENT;
+drop table if exists ACT_HI_JOB_LOG;

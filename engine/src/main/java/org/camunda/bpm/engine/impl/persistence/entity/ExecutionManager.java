@@ -20,8 +20,6 @@ import java.util.Map;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.impl.AbstractVariableQueryImpl;
 import org.camunda.bpm.engine.impl.Page;
-import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -46,10 +44,7 @@ public class ExecutionManager extends AbstractManager {
     }
 
     if (cascade) {
-      Context
-        .getCommandContext()
-        .getHistoricProcessInstanceManager()
-        .deleteHistoricProcessInstanceByProcessDefinitionId(processDefinitionId);
+      getHistoricProcessInstanceManager().deleteHistoricProcessInstanceByProcessDefinitionId(processDefinitionId);
     }
   }
 
@@ -64,18 +59,13 @@ public class ExecutionManager extends AbstractManager {
       throw new BadUserRequestException("No process instance found for id '" + processInstanceId + "'");
     }
 
-    CommandContext commandContext = Context.getCommandContext();
-    commandContext
-      .getTaskManager()
-      .deleteTasksByProcessInstanceId(processInstanceId, deleteReason, cascade);
+    getTaskManager().deleteTasksByProcessInstanceId(processInstanceId, deleteReason, cascade);
 
     // delete the execution BEFORE we delete the history, otherwise we will produce orphan HistoricVariableInstance instances
     execution.deleteCascade(deleteReason, skipCustomListeners);
 
     if (cascade) {
-      commandContext
-      .getHistoricProcessInstanceManager()
-      .deleteHistoricProcessInstanceById(processInstanceId);
+      getHistoricProcessInstanceManager().deleteHistoricProcessInstanceById(processInstanceId);
     }
   }
 

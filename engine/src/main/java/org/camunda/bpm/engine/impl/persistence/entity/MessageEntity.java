@@ -12,7 +12,6 @@
  */
 package org.camunda.bpm.engine.impl.persistence.entity;
 
-import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.MessageJobDeclaration;
 
 
@@ -23,21 +22,21 @@ import org.camunda.bpm.engine.impl.jobexecutor.MessageJobDeclaration;
  */
 public class MessageEntity extends JobEntity {
 
+  public static final String TYPE = "message";
+
   private static final long serialVersionUID = 1L;
 
   private String repeat = null;
-
-  @Override
-  public void execute(CommandContext commandContext) {
-    super.execute(commandContext);
-    delete(true);
-  }
 
   public String getRepeat() {
     return repeat;
   }
   public void setRepeat(String repeat) {
     this.repeat = repeat;
+  }
+
+  public String getType() {
+    return TYPE;
   }
 
   @Override
@@ -61,4 +60,5 @@ public class MessageEntity extends JobEntity {
            + ", deploymentId=" + deploymentId
            + "]";
   }
+
 }

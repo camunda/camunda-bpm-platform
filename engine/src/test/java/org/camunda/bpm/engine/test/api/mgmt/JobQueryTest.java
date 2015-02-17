@@ -119,7 +119,7 @@ public class JobQueryTest extends PluggableProcessEngineTestCase {
   @Override
   protected void tearDown() throws Exception {
     repositoryService.deleteDeployment(deploymentId, true);
-    commandExecutor.execute(new DeleteJobsCmd(messageId));
+    commandExecutor.execute(new DeleteJobsCmd(messageId, true));
     super.tearDown();
   }
 
@@ -638,6 +638,8 @@ public class JobQueryTest extends PluggableProcessEngineTestCase {
         public Void execute(CommandContext commandContext) {
 
           timerEntity.delete();
+
+          commandContext.getHistoricJobLogManager().deleteHistoricJobLogByJobId(timerEntity.getId());
 
           List<HistoricIncident> historicIncidents = Context
               .getProcessEngineConfiguration()

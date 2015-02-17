@@ -5,6 +5,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.interceptor.Command;
+import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
+import org.camunda.bpm.engine.impl.jobexecutor.TimerActivateJobDefinitionHandler;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.management.JobDefinition;
@@ -16,6 +20,15 @@ import org.camunda.bpm.engine.test.Deployment;
 
 public class ActivateJobDefinitionTest extends PluggableProcessEngineTestCase {
 
+  public void tearDown() throws Exception {
+    CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutorTxRequired();
+    commandExecutor.execute(new Command<Object>() {
+      public Object execute(CommandContext commandContext) {
+        commandContext.getHistoricJobLogManager().deleteHistoricJobLogsByHandlerType(TimerActivateJobDefinitionHandler.TYPE);
+        return null;
+      }
+    });
+  }
 
   // Test ManagementService#activateJobDefinitionById() /////////////////////////
 

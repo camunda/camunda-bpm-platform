@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions" 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:camunda="http://activiti.org/bpmn"
+  targetNamespace="Examples">
+
+  <process id="process">
+
+    <startEvent id="theStart" />
+
+    <sequenceFlow sourceRef="theStart" targetRef="callSubProcess" />
+
+    <callActivity id="callSubProcess" calledElement="simpleSubProcess" />
+
+    <sequenceFlow sourceRef="callSubProcess" targetRef="theEnd" />
+
+    <endEvent id="theEnd" />
+
+    <boundaryEvent id="catchError" attachedToRef="callSubProcess">
+      <errorEventDefinition errorRef="myError" />
+    </boundaryEvent>
+
+    <sequenceFlow sourceRef="catchError" targetRef="escalatedTask" />
+
+    <userTask id="escalatedTask" />
+
+  </process>
+
+</definitions>

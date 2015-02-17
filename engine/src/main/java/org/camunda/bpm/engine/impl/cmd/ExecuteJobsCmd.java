@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 import java.io.Serializable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -25,8 +27,6 @@ import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.jobexecutor.FailedJobListener;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutorContext;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
-
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 /**
  * @author Tom Baeyens
@@ -71,6 +71,9 @@ public class ExecuteJobsCmd implements Command<Object>, Serializable {
       }
 
     }
+
+    // set the given job to executing
+    job.setExecuting(true);
 
     // the failed job listener is responsible for decrementing the retries and logging the exception to the DB.
     FailedJobListener failedJobListener = createFailedJobListener(commandExecutor);

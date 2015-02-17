@@ -106,7 +106,7 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
 
     assertEquals(1, jobQuery.count());
     // have to manually delete pending timer
-    cleanDB();
+//    cleanDB();
 
   }
 
@@ -187,7 +187,7 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
 
     assertEquals(1, jobQuery.count());
 
-    cleanDB();
+//    cleanDB();
     repositoryService.deleteDeployment(id, true);
   }
 
@@ -1272,7 +1272,7 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
   private void cleanDB() {
     String jobId = managementService.createJobQuery().singleResult().getId();
     CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutorTxRequired();
-    commandExecutor.execute(new DeleteJobsCmd(jobId));
+    commandExecutor.execute(new DeleteJobsCmd(jobId, true));
   }
 
 }

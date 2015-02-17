@@ -19,6 +19,11 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.SuspendedEntityInteractionException;
+import org.camunda.bpm.engine.impl.interceptor.Command;
+import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
+import org.camunda.bpm.engine.impl.jobexecutor.TimerActivateProcessDefinitionHandler;
+import org.camunda.bpm.engine.impl.jobexecutor.TimerSuspendProcessDefinitionHandler;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.test.TestHelper;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
@@ -36,6 +41,17 @@ import org.camunda.bpm.engine.test.Deployment;
  * @author Joram Barrez
  */
 public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestCase {
+
+  public void tearDown() throws Exception {
+    CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutorTxRequired();
+    commandExecutor.execute(new Command<Object>() {
+      public Object execute(CommandContext commandContext) {
+        commandContext.getHistoricJobLogManager().deleteHistoricJobLogsByHandlerType(TimerActivateProcessDefinitionHandler.TYPE);
+        commandContext.getHistoricJobLogManager().deleteHistoricJobLogsByHandlerType(TimerSuspendProcessDefinitionHandler.TYPE);
+        return null;
+      }
+    });
+  }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/db/processOne.bpmn20.xml"})
   public void testProcessDefinitionActiveByDefault() {

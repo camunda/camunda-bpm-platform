@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions" 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:camunda="http://activiti.org/bpmn"
+  targetNamespace="Examples">
+
+  <process id="process" isExecutable="true">
+
+    <startEvent id="theStart" />
+
+    <sequenceFlow sourceRef="theStart" targetRef="userTask" />
+
+    <userTask id="userTask" />
+
+    <sequenceFlow sourceRef="userTask" targetRef="theEnd" />
+
+    <endEvent id="theEnd" />
+
+    <subProcess id="subProcess" triggeredByEvent="true">
+
+      <startEvent id="subprocessStartEvent" isInterrupting="true">
+        <timerEventDefinition>
+          <timeDuration>PT1M</timeDuration>
+        </timerEventDefinition>
+      </startEvent>
+
+      <sequenceFlow sourceRef="subprocessStartEvent" targetRef="subprocessEndEvent" />
+
+      <endEvent id="subprocessEndEvent" />
+
+    </subProcess>
+
+  </process>
+</definitions>

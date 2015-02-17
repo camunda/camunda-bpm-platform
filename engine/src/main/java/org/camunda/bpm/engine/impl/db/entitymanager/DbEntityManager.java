@@ -38,6 +38,7 @@ import org.camunda.bpm.engine.impl.ExecutionQueryImpl;
 import org.camunda.bpm.engine.impl.GroupQueryImpl;
 import org.camunda.bpm.engine.impl.HistoricActivityInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.HistoricDetailQueryImpl;
+import org.camunda.bpm.engine.impl.HistoricJobLogQueryImpl;
 import org.camunda.bpm.engine.impl.HistoricProcessInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.HistoricTaskInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.HistoricVariableInstanceQueryImpl;
@@ -504,6 +505,10 @@ public class DbEntityManager implements Session {
 
   public HistoricVariableInstanceQueryImpl createHistoricVariableInstanceQuery() {
     return new HistoricVariableInstanceQueryImpl();
+  }
+
+  public HistoricJobLogQueryImpl createHistoricJobLogQuery() {
+    return new HistoricJobLogQueryImpl();
   }
 
   public UserQueryImpl createUserQuery() {

@@ -47,6 +47,24 @@ import org.camunda.bpm.engine.runtime.Job;
  */
 public class JobManager extends AbstractManager {
 
+  public void insertJob(JobEntity job) {
+    getDbEntityManager().insert(job);
+    getHistoricJobLogManager().fireJobCreatedEvent(job);
+  }
+
+  public void deleteJob(JobEntity job) {
+    deleteJob(job, true);
+  }
+
+  public void deleteJob(JobEntity job, boolean fireDeleteEvent) {
+    getDbEntityManager().delete(job);
+
+    if (fireDeleteEvent) {
+      getHistoricJobLogManager().fireJobDeletedEvent(job);
+    }
+
+  }
+
   public void send(MessageEntity message) {
     message.insert();
     if (Context.getProcessEngineConfiguration().isHintJobExecutor()) {

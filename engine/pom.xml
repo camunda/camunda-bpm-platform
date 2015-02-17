@@ -359,6 +359,7 @@
                 <exclude>**/TaskEventsTest.java</exclude>
                 <exclude>**/OperationLog*.java</exclude>
                 <exclude>**/HistoricIncident*Test.java</exclude>
+                <exclude>**/HistoricJobLog*Test.java</exclude>
               </excludes>
             </configuration>
           </plugin>
@@ -390,6 +391,7 @@
                 <exclude>**/HistoricVariableDataFormatTest.java</exclude>
                 <exclude>**/HistoricVariableInstanceScopeTest.java</exclude>
                 <exclude>**/HistoricTaskInstanceQueryTest.java</exclude>
+                <exclude>**/HistoricJobLog*Test.java</exclude>
               </excludes>
             </configuration>
           </plugin>
@@ -421,6 +423,7 @@
                 <exclude>**/HistoricIncident*Test.java</exclude>
                 <exclude>**/HistoricVariableDataFormatTest.java</exclude>
                 <exclude>**/Historic*QueryTest.java</exclude>
+                <exclude>**/HistoricJobLog*Test.java</exclude>
               </excludes>
             </configuration>
           </plugin>

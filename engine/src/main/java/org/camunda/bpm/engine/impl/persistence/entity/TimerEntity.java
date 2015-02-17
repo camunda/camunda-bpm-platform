@@ -13,8 +13,6 @@
 package org.camunda.bpm.engine.impl.persistence.entity;
 
 import java.util.Date;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.camunda.bpm.engine.impl.calendar.BusinessCalendar;
 import org.camunda.bpm.engine.impl.calendar.CycleBusinessCalendar;
@@ -33,9 +31,9 @@ import org.camunda.bpm.engine.impl.jobexecutor.TimerEventJobHandler;
  */
 public class TimerEntity extends JobEntity {
 
-  private static final long serialVersionUID = 1L;
+  public static final String TYPE = "timer";
 
-  private static Logger log = Logger.getLogger(TimerEntity.class.getName());
+  private static final long serialVersionUID = 1L;
 
   protected String repeat;
 
@@ -61,9 +59,7 @@ public class TimerEntity extends JobEntity {
     processDefinitionKey = te.processDefinitionKey;
   }
 
-  @Override
-  public void execute(CommandContext commandContext) {
-
+  protected void preExecute(CommandContext commandContext) {
     if (repeat != null && !TimerEventJobHandler.isFollowUpJobCreated(getJobHandlerConfiguration())) {
       // this timer is a repeating timer and
       // a follow up timer job has not been scheduled yet
@@ -86,14 +82,6 @@ public class TimerEntity extends JobEntity {
         createNewTimerJob(newDueDate);
       }
     }
-
-    super.execute(commandContext);
-
-    if (log.isLoggable(Level.FINE)) {
-      log.fine("Timer " + getId() + " fired. Deleting timer.");
-    }
-
-    delete(true);
   }
 
   protected RepeatingFailedJobListener createRepeatingFailedJobListener(CommandExecutor commandExecutor) {
@@ -124,6 +112,10 @@ public class TimerEntity extends JobEntity {
 
   public void setRepeat(String repeat) {
     this.repeat = repeat;
+  }
+
+  public String getType() {
+    return TYPE;
   }
 
   @Override

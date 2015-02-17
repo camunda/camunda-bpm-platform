@@ -13,25 +13,27 @@
 package org.camunda.bpm.engine.impl.persistence.entity;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+import static org.camunda.bpm.engine.impl.util.JobExceptionUtil.createJobExceptionByteArray;
+import static org.camunda.bpm.engine.impl.util.JobExceptionUtil.getJobExceptionBytes;
+import static org.camunda.bpm.engine.impl.util.JobExceptionUtil.getJobExceptionStacktrace;
 
 import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.HasDbRevision;
-import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
 import org.camunda.bpm.engine.impl.incident.FailedJobIncidentHandler;
 import org.camunda.bpm.engine.impl.incident.IncidentHandler;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobHandler;
+import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.runtime.Job;
@@ -94,33 +96,52 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
 
   protected String jobDefinitionId;
 
+  // runtime state /////////////////////////////
+  protected boolean executing = false;
+  protected String activityId;
+  protected JobDefinition jobDefinition;
+  protected ExecutionEntity execution;
 
   public void execute(CommandContext commandContext) {
-    ExecutionEntity execution = null;
     if (executionId != null) {
-      execution = commandContext.getExecutionManager().findExecutionById(executionId);
+      ExecutionEntity execution = getExecution();
       ensureNotNull("Cannot find execution with id '" + executionId + "' referenced from job '" + this + "'", "execution", execution);
     }
 
+    preExecute(commandContext);
     JobHandler jobHandler = getJobHandler();
+    ensureNotNull("Cannot find job handler '" + jobHandlerType + "' from job '" + this + "'", "jobHandler", jobHandler);
     jobHandler.execute(jobHandlerConfiguration, execution, commandContext);
+    postExecute(commandContext);
+  }
+
+  protected void preExecute(CommandContext commandContext) {
+    // nothing to do
+  }
+
+  protected void postExecute(CommandContext commandContext) {
+    if (LOG.isLoggable(Level.FINE)) {
+      LOG.fine("Job " + getId() + " executed. Deleting job.");
+    }
+    delete(true);
+    commandContext.getHistoricJobLogManager().fireJobSuccessfulEvent(this);
   }
 
   public void insert() {
-    DbEntityManager dbEntityManger = Context
-      .getCommandContext()
-      .getDbEntityManager();
-
-    dbEntityManger.insert(this);
+    CommandContext commandContext = Context.getCommandContext();
 
     // add link to execution and deployment
-    if(executionId != null) {
-      ExecutionEntity execution = Context.getCommandContext()
-        .getExecutionManager()
-        .findExecutionById(executionId);
+    ExecutionEntity execution = getExecution();
+    if (execution != null) {
       execution.addJob(this);
-      this.deploymentId = execution.getProcessDefinition().getDeploymentId();
+
+      ProcessDefinitionImpl processDefinition = (ProcessDefinitionImpl) execution.getProcessDefinition();
+      this.deploymentId = processDefinition.getDeploymentId();
     }
+
+    commandContext
+      .getJobManager()
+      .insertJob(this);
   }
 
   public void delete() {
@@ -128,22 +149,18 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
   }
 
   public void delete(boolean incidentResolved) {
-    DbEntityManager dbEntityManger = Context
-        .getCommandContext()
-        .getDbEntityManager();
+    CommandContext commandContext = Context.getCommandContext();
 
-    dbEntityManger.delete(this);
+    commandContext.getJobManager().deleteJob(this, !executing);
 
     // Also delete the job's exception byte array
     if (exceptionByteArrayId != null) {
-      Context.getCommandContext().getByteArrayManager().deleteByteArrayById(exceptionByteArrayId);
+      commandContext.getByteArrayManager().deleteByteArrayById(exceptionByteArrayId);
     }
 
     // remove link to execution
-    if(executionId != null) {
-      ExecutionEntity execution = Context.getCommandContext()
-        .getExecutionManager()
-        .findExecutionById(executionId);
+    ExecutionEntity execution = getExecution();
+    if (execution != null) {
       execution.removeJob(this);
     }
 
@@ -187,6 +204,20 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
 
   public void setExecutionId(String executionId) {
     this.executionId = executionId;
+  }
+
+  protected ExecutionEntity getExecution() {
+    ensureExecutionInitialized();
+    return execution;
+  }
+
+  protected void ensureExecutionInitialized() {
+    if (execution == null && executionId != null) {
+      execution = Context
+          .getCommandContext()
+          .getExecutionManager()
+          .findExecutionById(executionId);
+    }
   }
 
   public int getRetries() {
@@ -247,18 +278,9 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
 
       }
 
-      String activityId = null;
-      if (jobDefinitionId != null) {
-        JobDefinition jobDefinition = Context
-            .getCommandContext()
-            .getJobDefinitionManager()
-            .findById(getJobDefinitionId());
-        activityId = jobDefinition.getActivityId();
-      }
-
       processEngineConfiguration
         .getIncidentHandler(incidentHandlerType)
-        .handleIncident(getProcessDefinitionId(), activityId, executionId, id, exceptionMessage);
+        .handleIncident(getProcessDefinitionId(), getActivityId(), executionId, id, exceptionMessage);
 
     }
   }
@@ -276,16 +298,8 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
   }
 
   public String getExceptionStacktrace() {
-    String exception = null;
     ByteArrayEntity byteArray = getExceptionByteArray();
-    if(byteArray != null) {
-      try {
-        exception = new String(byteArray.getBytes(), "UTF-8");
-      } catch (UnsupportedEncodingException e) {
-        throw new ProcessEngineException("UTF-8 is not a supported encoding");
-      }
-    }
-    return exception;
+    return getJobExceptionStacktrace(byteArray);
   }
 
   public void setSuspensionState(int state) {
@@ -303,75 +317,77 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
   public String getLockOwner() {
     return lockOwner;
   }
+
   public void setLockOwner(String claimedBy) {
     this.lockOwner = claimedBy;
   }
+
   public Date getLockExpirationTime() {
     return lockExpirationTime;
   }
+
   public void setLockExpirationTime(Date claimedUntil) {
     this.lockExpirationTime = claimedUntil;
   }
+
   public String getProcessInstanceId() {
     return processInstanceId;
   }
+
   public void setProcessInstanceId(String processInstanceId) {
     this.processInstanceId = processInstanceId;
   }
+
   public String getProcessDefinitionId() {
     return processDefinitionId;
   }
+
   public void setProcessDefinitionId(String processDefinitionId) {
     this.processDefinitionId = processDefinitionId;
   }
+
   public String getProcessDefinitionKey() {
     return processDefinitionKey;
   }
+
   public void setProcessDefinitionKey(String processDefinitionKey) {
     this.processDefinitionKey = processDefinitionKey;
   }
   public boolean isExclusive() {
     return isExclusive;
   }
+
   public void setExclusive(boolean isExclusive) {
     this.isExclusive = isExclusive;
   }
+
   public String getId() {
     return id;
   }
+
   public void setId(String id) {
     this.id = id;
   }
+
   public Date getDuedate() {
     return duedate;
   }
+
   public void setDuedate(Date duedate) {
     this.duedate = duedate;
   }
 
   public void setExceptionStacktrace(String exception) {
-    byte[] exceptionBytes = null;
-    if(exception == null) {
-      exceptionBytes = null;
-    } else {
-
-      try {
-        exceptionBytes = exception.getBytes("UTF-8");
-      } catch (UnsupportedEncodingException e) {
-        throw new ProcessEngineException("UTF-8 is not a supported encoding");
-      }
-    }
+    byte[] exceptionBytes = getJobExceptionBytes(exception);
 
     ByteArrayEntity byteArray = getExceptionByteArray();
+
     if(byteArray == null) {
-      byteArray = new ByteArrayEntity("job.exceptionByteArray", exceptionBytes);
-      Context
-        .getCommandContext()
-        .getDbEntityManager()
-        .insert(byteArray);
+      byteArray = createJobExceptionByteArray(exceptionBytes);
       exceptionByteArrayId = byteArray.getId();
       exceptionByteArray = byteArray;
-    } else {
+    }
+    else {
       byteArray.setBytes(exceptionBytes);
     }
   }
@@ -384,18 +400,23 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
   public String getJobHandlerType() {
     return jobHandlerType;
   }
+
   public void setJobHandlerType(String jobHandlerType) {
     this.jobHandlerType = jobHandlerType;
   }
+
   public String getJobHandlerConfiguration() {
     return jobHandlerConfiguration;
   }
+
   public void setJobHandlerConfiguration(String jobHandlerConfiguration) {
     this.jobHandlerConfiguration = jobHandlerConfiguration;
   }
+
   public int getRevision() {
     return revision;
   }
+
   public void setRevision(int revision) {
     this.revision = revision;
   }
@@ -412,6 +433,20 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
     this.jobDefinitionId = jobDefinitionId;
   }
 
+  protected JobDefinition getJobDefinition() {
+    ensureJobDefinitionInitialized();
+    return jobDefinition;
+  }
+
+  protected void ensureJobDefinitionInitialized() {
+    if (jobDefinition == null && jobDefinitionId != null) {
+      jobDefinition = Context
+          .getCommandContext()
+          .getJobDefinitionManager()
+          .findById(jobDefinitionId);
+    }
+  }
+
   public void setExceptionMessage(String exceptionMessage) {
     if(exceptionMessage != null && exceptionMessage.length() > MAX_EXCEPTION_MESSAGE_LENGTH) {
       this.exceptionMessage = exceptionMessage.substring(0, MAX_EXCEPTION_MESSAGE_LENGTH);
@@ -424,14 +459,18 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
     return exceptionByteArrayId;
   }
 
-  private ByteArrayEntity getExceptionByteArray() {
-    if ((exceptionByteArray == null) && (exceptionByteArrayId != null)) {
+  protected ByteArrayEntity getExceptionByteArray() {
+    ensureExceptionByteArrayInitialized();
+    return exceptionByteArray;
+  }
+
+  protected void ensureExceptionByteArrayInitialized() {
+    if (exceptionByteArray == null && exceptionByteArrayId != null) {
       exceptionByteArray = Context
         .getCommandContext()
         .getDbEntityManager()
         .selectById(ByteArrayEntity.class, exceptionByteArrayId);
     }
-    return exceptionByteArray;
   }
 
   public String getDeploymentId() {
@@ -451,6 +490,34 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
     this.lockOwner = null;
     this.lockExpirationTime = null;
   }
+
+  public boolean isExecuting() {
+    return executing;
+  }
+
+  public void setExecuting(boolean executing) {
+    this.executing = executing;
+  }
+
+  public String getActivityId() {
+    ensureActivityIdInitialized();
+    return activityId;
+  }
+
+  public void setActivityId(String activityId) {
+    this.activityId = activityId;
+  }
+
+  protected void ensureActivityIdInitialized() {
+    if (activityId == null) {
+      JobDefinition jobDefinition = getJobDefinition();
+      if (jobDefinition != null) {
+        activityId = jobDefinition.getActivityId();
+      }
+    }
+  }
+
+  public abstract String getType();
 
   @Override
   public int hashCode() {
@@ -498,4 +565,5 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
            + ", deploymentId=" + deploymentId
            + "]";
   }
+
 }

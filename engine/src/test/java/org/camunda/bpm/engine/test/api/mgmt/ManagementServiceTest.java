@@ -391,6 +391,8 @@ public class ManagementServiceTest extends PluggableProcessEngineTestCase {
           HistoricIncidentEntity incidentEntity = (HistoricIncidentEntity) incident;
           historicIncidentManager.delete(incidentEntity);
         }
+
+        commandContext.getHistoricJobLogManager().deleteHistoricJobLogByJobId(job.getId());
         return null;
       }
     });
