@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.history;
 
 import java.util.Date;
 
+import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.runtime.Job;
 
 /**
@@ -83,6 +84,9 @@ public interface HistoricJobLog {
 
   /**
    * Returns the message of the exception that occurred by executing the associated job.
+   *
+   * To get the full exception stacktrace,
+   * use {@link HistoryService#getHistoricJobLogExceptionStacktrace(String)}
    */
   String getJobExceptionMessage();
 
