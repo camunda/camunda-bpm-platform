@@ -176,7 +176,7 @@ create table ACT_HI_JOB_LOG (
     ACT_ID_ varchar(64),
     TYPE_ varchar(255) not null,
     HANDLER_TYPE_ varchar(255),
-    DUEDATE_ timestamp,
+    DUEDATE_ timestamp NULL,
     RETRIES_ integer,
     EXCEPTION_MSG_ varchar(4000),
     EXCEPTION_STACK_ID_ varchar(64),
