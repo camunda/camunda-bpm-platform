@@ -72,18 +72,18 @@ public class ParallelGatewayActivityBehavior extends GatewayActivityBehavior {
     Map<String, List<ActivityExecution>> mappedExecutions = mapExecutionsToTransitions(joinedExecutions, finalExecutions);
     
     List<PvmTransition> incomingTransitions = execution.getActivity().getIncomingTransitions();
+    int nbrOfExecutionsToJoin = incomingTransitions.size();
     for (PvmTransition incomingTransition : incomingTransitions) {
-      List<ActivityExecution> sequenceExecutions = mappedExecutions.get(incomingTransition.getId());
-      if (sequenceExecutions == null || sequenceExecutions.isEmpty()){
-        //TODO if required for logging we can go through all of them?
+      if(finalExecutions.size() == nbrOfExecutionsToJoin){
         break;
-      } else {
+      }
+      List<ActivityExecution> sequenceExecutions = mappedExecutions.get(incomingTransition.getId());
+      if (sequenceExecutions != null && !sequenceExecutions.isEmpty()){
         finalExecutions.add(sequenceExecutions.get(0));
       }
     }
-    int nbrOfExecutionsToJoin = incomingTransitions.size();
-    int nbrOfExecutionsJoined = finalExecutions.size();
     
+    int nbrOfExecutionsJoined = finalExecutions.size();
     
     if (nbrOfExecutionsJoined==nbrOfExecutionsToJoin) {
       
