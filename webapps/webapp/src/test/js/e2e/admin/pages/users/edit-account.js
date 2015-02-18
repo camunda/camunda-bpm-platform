@@ -60,13 +60,13 @@ module.exports = Page.extend({
   },
 
   deleteUserAlert: function() {
-    var ptor = protractor.getInstance();
-    return ptor.switchTo().alert();
+    return browser.switchTo().alert();
   },
 
   deleteUser: function() {
     this.deleteUserButton().click();
     this.deleteUserAlert().accept();
+    browser.sleep(100);
   }
 
 });

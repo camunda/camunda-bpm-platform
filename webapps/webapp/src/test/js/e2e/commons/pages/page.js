@@ -64,12 +64,12 @@ Page.prototype.notifications = function() {
 
 Page.prototype.notification = function(item) {
   item = item || 0;
-  return this.notifications().get(item).element(by.binding('notification.message')).getText();
+  return this.notifications().get(item).element(by.css('.message')).getText();
 };
 
 Page.prototype.logout = function() {
   element(by.css('[cam-widget-header] .account')).click();
-  element(by.css('[cam-widget-header] [ng-click="authentication.logout()"]')).click();
+  element(by.css('[cam-widget-header] [ng-click="logout()"]')).click();
 };
 
 Page.prototype.loggedInUser = function() {
