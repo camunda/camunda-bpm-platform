@@ -17,7 +17,9 @@ module.exports = function(grunt) {
 
     clean:            require('./grunt/config/clean')(config),
 
-    watch:            require('./grunt/config/watch')(config)
+    watch:            require('./grunt/config/watch')(config),
+
+    protractor:       require('./grunt/config/protractor')(config)
   });
 
   grunt.registerTask('build', function(mode) {
@@ -33,4 +35,6 @@ module.exports = function(grunt) {
   ]);
 
   grunt.registerTask('default', ['build']);
+
+  grunt.registerTask('test-e2e', ['build', 'protractor:e2e']);
 };

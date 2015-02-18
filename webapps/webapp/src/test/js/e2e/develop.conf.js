@@ -6,11 +6,6 @@ global.expect   = chai.expect;
 
 exports.config = {
 
-  // ----- How to setup Selenium -----
-  //
-  // The address of a running selenium server.
-  seleniumAddress: 'http://localhost:4444/wd/hub',
-
   // The timeout for each script run on the browser. This should be longer
   // than the maximum time your application needs to stabilize between tasks.
   allScriptsTimeout: 11000,
@@ -61,11 +56,11 @@ exports.config = {
     includeStackTrace: true // If true, include stack traces in failures.
   }
   */
- 
+
   mochaOpts: {
     timeout: 15000,
     colors: true,
     reporter: "spec",
     slow: 3000
-  } 
+  }
 };
