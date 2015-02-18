@@ -313,6 +313,18 @@ public class TestOrderingUtil {
     };
   }
 
+  public static NullTolerantComparator<HistoricJobLog> historicJobLogByJobDefinitionId() {
+    return new NullTolerantComparator<HistoricJobLog>() {
+      public int compare(HistoricJobLog o1, HistoricJobLog o2) {
+        return o1.getJobDefinitionId().compareTo(o2.getJobDefinitionId());
+      }
+
+      public boolean hasNullProperty(HistoricJobLog object) {
+        return false;
+      }
+    };
+  }
+
   public static NullTolerantComparator<HistoricJobLog> historicJobLogByJobDueDate() {
     return new NullTolerantComparator<HistoricJobLog>() {
       public int compare(HistoricJobLog o1, HistoricJobLog o2) {

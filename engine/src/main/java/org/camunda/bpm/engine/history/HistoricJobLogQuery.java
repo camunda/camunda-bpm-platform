@@ -20,6 +20,9 @@ import org.camunda.bpm.engine.query.Query;
  */
 public interface HistoricJobLogQuery extends Query<HistoricJobLogQuery, HistoricJobLog> {
 
+  /** Only select historic job log entries with the id. */
+  HistoricJobLogQuery logId(String logId);
+
   /** Only select historic job log entries with the given job id. */
   HistoricJobLogQuery jobId(String jobId);
 
@@ -48,40 +51,43 @@ public interface HistoricJobLogQuery extends Query<HistoricJobLogQuery, Historic
   HistoricJobLogQuery deploymentId(String deploymentId);
 
   /** Only select historic job log entries with the given exception message. */
-  HistoricJobLogQuery exceptionMessage(String exceptionMessage);
+  HistoricJobLogQuery jobExceptionMessage(String exceptionMessage);
 
   /**
    * Only select historic job log entries for timers.
-   * Cannot be used together with {@link HistoricJobLogQuery#messages()}.
+   * Cannot be used together with {@link HistoricJobLogQuery#jobMessages()}.
    */
-  HistoricJobLogQuery timers();
+  HistoricJobLogQuery jobTimers();
 
   /**
    * Only select historic job log entries for messages.
-   * Cannot be used together with {@link HistoricJobLogQuery#timers()}.
+   * Cannot be used together with {@link HistoricJobLogQuery#jobTimers()}.
    */
-  HistoricJobLogQuery messages();
+  HistoricJobLogQuery jobMessages();
 
   /** Only select created historic job log entries. */
-  HistoricJobLogQuery created();
+  HistoricJobLogQuery creationLog();
 
   /** Only select failed historic job log entries. */
-  HistoricJobLogQuery failed();
+  HistoricJobLogQuery failureLog();
 
   /**
    * Only select historic job logs which belongs to a
    * <code>successful</code> executed job.
    */
-  HistoricJobLogQuery successful();
+  HistoricJobLogQuery successLog();
 
   /** Only select deleted historic job log entries. */
-  HistoricJobLogQuery deleted();
+  HistoricJobLogQuery deletionLog();
 
   /** Order by timestamp (needs to be followed by {@link #asc()} or {@link #desc()}). */
   HistoricJobLogQuery orderByTimestamp();
 
   /** Order by job id (needs to be followed by {@link #asc()} or {@link #desc()}). */
   HistoricJobLogQuery orderByJobId();
+
+  /** Order by job definition id (needs to be followed by {@link #asc()} or {@link #desc()}). */
+  HistoricJobLogQuery orderByJobDefinitionId();
 
   /** Order by job due date (needs to be followed by {@link #asc()} or {@link #desc()}). */
   HistoricJobLogQuery orderByJobDueDate();

@@ -169,6 +169,9 @@
   <sql id="selectHistoricJobLogByQueryCriteriaSql">
     from ${prefix}ACT_HI_JOB_LOG RES
     <where>
+      <if test="id != null">
+        RES.ID_ = #{id}
+      </if>
       <if test="jobId != null">
         and RES.JOB_ID_ = #{jobId}
       </if>

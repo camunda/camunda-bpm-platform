@@ -48,6 +48,7 @@ import org.camunda.bpm.engine.history.HistoricCaseInstance;
 import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.history.HistoricFormField;
 import org.camunda.bpm.engine.history.HistoricIncident;
+import org.camunda.bpm.engine.history.HistoricJobLog;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
@@ -522,6 +523,28 @@ public abstract class MockProvider {
   public static final Query EXAMPLE_FILTER_QUERY = new TaskQueryImpl().taskName("test").processVariableValueEquals("foo", "bar").caseInstanceVariableValueEquals("foo", "bar").taskVariableValueEquals("foo", "bar");
   public static final TaskQueryDto EXAMPLE_FILTER_QUERY_DTO = TaskQueryDto.fromQuery(EXAMPLE_FILTER_QUERY);
   public static final Map<String, Object> EXAMPLE_FILTER_PROPERTIES = Collections.singletonMap("color", (Object) "#112233");
+
+  // historic job log
+
+  public static final String EXAMPLE_HISTORIC_JOB_LOG_ID = "aHistoricJobLogId";
+  public static final String EXAMPLE_HISTORIC_JOB_LOG_TIMESTAMP = "2015-01-01T00:00:00";
+  public static final String EXAMPLE_HISTORIC_JOB_LOG_JOB_ID = "aJobId";
+  public static final String EXAMPLE_HISTORIC_JOB_LOG_JOB_DEF_ID = "aJobDefId";
+  public static final String EXAMPLE_HISTORIC_JOB_LOG_ACTIVITY_ID = "anActId";
+  public static final String EXAMPLE_HISTORIC_JOB_LOG_JOB_TYPE = "aJobType";
+  public static final String EXAMPLE_HISTORIC_JOB_LOG_JOB_HANDLER_TYPE = "aJobHandlerType";
+  public static final String EXAMPLE_HISTORIC_JOB_LOG_JOB_DUE_DATE = "2015-10-01T00:00:00";
+  public static final int EXAMPLE_HISTORIC_JOB_LOG_JOB_RETRIES = 5;
+  public static final String EXAMPLE_HISTORIC_JOB_LOG_JOB_EXCEPTION_MSG = "aJobExceptionMsg";
+  public static final String EXAMPLE_HISTORIC_JOB_LOG_EXECUTION_ID = "anExecId";
+  public static final String EXAMPLE_HISTORIC_JOB_LOG_PROC_INST_ID = "aProcInstId";
+  public static final String EXAMPLE_HISTORIC_JOB_LOG_PROC_DEF_ID = "aProcDefId";
+  public static final String EXAMPLE_HISTORIC_JOB_LOG_PROC_DEF_KEY = "aProcDefKey";
+  public static final String EXAMPLE_HISTORIC_JOB_LOG_DEPLOYMENT_ID = "aDeploymentId";
+  public static final boolean EXAMPLE_HISTORIC_JOB_LOG_IS_CREATION_LOG= true;
+  public static final boolean EXAMPLE_HISTORIC_JOB_LOG_IS_FAILURE_LOG = true;
+  public static final boolean EXAMPLE_HISTORIC_JOB_LOG_IS_SUCCESS_LOG = true;
+  public static final boolean EXAMPLE_HISTORIC_JOB_LOG_IS_DELETION_LOG = true;
 
   // tasks
   public static Task createMockTask() {
@@ -1646,5 +1669,39 @@ public abstract class MockProvider {
 
     return query;
 
+  }
+
+  // Historic job log
+
+  public static List<HistoricJobLog> createMockHistoricJobLogs() {
+    List<HistoricJobLog> mocks = new ArrayList<HistoricJobLog>();
+    mocks.add(createMockHistoricJobLog());
+    return mocks;
+  }
+
+  public static HistoricJobLog createMockHistoricJobLog() {
+    HistoricJobLog mock = mock(HistoricJobLog.class);
+
+    when(mock.getId()).thenReturn(EXAMPLE_HISTORIC_JOB_LOG_ID);
+    when(mock.getTimestamp()).thenReturn(DateTimeUtil.parseDate(EXAMPLE_HISTORIC_JOB_LOG_TIMESTAMP));
+    when(mock.getJobId()).thenReturn(EXAMPLE_HISTORIC_JOB_LOG_JOB_ID);
+    when(mock.getJobDefinitionId()).thenReturn(EXAMPLE_HISTORIC_JOB_LOG_JOB_DEF_ID);
+    when(mock.getActivityId()).thenReturn(EXAMPLE_HISTORIC_JOB_LOG_ACTIVITY_ID);
+    when(mock.getJobType()).thenReturn(EXAMPLE_HISTORIC_JOB_LOG_JOB_TYPE);
+    when(mock.getJobHandlerType()).thenReturn(EXAMPLE_HISTORIC_JOB_LOG_JOB_HANDLER_TYPE);
+    when(mock.getJobDueDate()).thenReturn(DateTimeUtil.parseDate(EXAMPLE_HISTORIC_JOB_LOG_JOB_DUE_DATE));
+    when(mock.getJobRetries()).thenReturn(EXAMPLE_HISTORIC_JOB_LOG_JOB_RETRIES);
+    when(mock.getJobExceptionMessage()).thenReturn(EXAMPLE_HISTORIC_JOB_LOG_JOB_EXCEPTION_MSG);
+    when(mock.getExecutionId()).thenReturn(EXAMPLE_HISTORIC_JOB_LOG_EXECUTION_ID);
+    when(mock.getProcessInstanceId()).thenReturn(EXAMPLE_HISTORIC_JOB_LOG_PROC_INST_ID);
+    when(mock.getProcessDefinitionId()).thenReturn(EXAMPLE_HISTORIC_JOB_LOG_PROC_DEF_ID);
+    when(mock.getProcessDefinitionKey()).thenReturn(EXAMPLE_HISTORIC_JOB_LOG_PROC_DEF_KEY);
+    when(mock.getDeploymentId()).thenReturn(EXAMPLE_HISTORIC_JOB_LOG_DEPLOYMENT_ID);
+    when(mock.isCreationLog()).thenReturn(EXAMPLE_HISTORIC_JOB_LOG_IS_CREATION_LOG);
+    when(mock.isFailureLog()).thenReturn(EXAMPLE_HISTORIC_JOB_LOG_IS_FAILURE_LOG);
+    when(mock.isSuccessLog()).thenReturn(EXAMPLE_HISTORIC_JOB_LOG_IS_SUCCESS_LOG);
+    when(mock.isDeletionLog()).thenReturn(EXAMPLE_HISTORIC_JOB_LOG_IS_DELETION_LOG);
+
+    return mock;
   }
 }

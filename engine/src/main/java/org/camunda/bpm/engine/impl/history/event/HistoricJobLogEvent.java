@@ -42,7 +42,7 @@ public class HistoricJobLogEvent extends HistoryEvent {
 
   protected Date jobDueDate;
 
-  protected int retries;
+  protected int jobRetries;
 
   protected String jobExceptionMessage;
 
@@ -111,11 +111,11 @@ public class HistoricJobLogEvent extends HistoryEvent {
   }
 
   public int getJobRetries() {
-    return retries;
+    return jobRetries;
   }
 
   public void setJobRetries(int jobRetries) {
-    this.retries = jobRetries;
+    this.jobRetries = jobRetries;
   }
 
   public String getJobExceptionMessage() {
@@ -174,19 +174,19 @@ public class HistoricJobLogEvent extends HistoryEvent {
     this.state = state;
   }
 
-  public boolean isCreated() {
+  public boolean isCreationLog() {
     return state == JobState.CREATED.getStateCode();
   }
 
-  public boolean isFailed() {
+  public boolean isFailureLog() {
     return state == JobState.FAILED.getStateCode();
   }
 
-  public boolean isSuccessful() {
+  public boolean isSuccessLog() {
     return state == JobState.SUCCESSFUL.getStateCode();
   }
 
-  public boolean isDeleted() {
+  public boolean isDeletionLog() {
     return state == JobState.DELETED.getStateCode();
   }
 

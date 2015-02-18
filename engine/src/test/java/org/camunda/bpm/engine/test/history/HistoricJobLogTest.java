@@ -44,7 +44,7 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
 
     HistoricJobLog historicJob = historyService
         .createHistoricJobLogQuery()
-        .created()
+        .creationLog()
         .singleResult();
     assertNotNull(historicJob);
 
@@ -65,10 +65,10 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
     assertEquals(job.getProcessDefinitionKey(), historicJob.getProcessDefinitionKey());
     assertEquals(job.getDeploymentId(), historicJob.getDeploymentId());
 
-    assertTrue(historicJob.isCreated());
-    assertFalse(historicJob.isFailed());
-    assertFalse(historicJob.isSuccessful());
-    assertFalse(historicJob.isDeleted());
+    assertTrue(historicJob.isCreationLog());
+    assertFalse(historicJob.isFailureLog());
+    assertFalse(historicJob.isSuccessLog());
+    assertFalse(historicJob.isDeletionLog());
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuation.bpmn20.xml"})
@@ -88,7 +88,7 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
 
     HistoricJobLog historicJob = historyService
         .createHistoricJobLogQuery()
-        .failed()
+        .failureLog()
         .singleResult();
     assertNotNull(historicJob);
 
@@ -108,10 +108,10 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
     assertEquals(job.getDeploymentId(), historicJob.getDeploymentId());
     assertEquals(FailingDelegate.EXCEPTION_MESSAGE, historicJob.getJobExceptionMessage());
 
-    assertFalse(historicJob.isCreated());
-    assertTrue(historicJob.isFailed());
-    assertFalse(historicJob.isSuccessful());
-    assertFalse(historicJob.isDeleted());
+    assertFalse(historicJob.isCreationLog());
+    assertTrue(historicJob.isFailureLog());
+    assertFalse(historicJob.isSuccessLog());
+    assertFalse(historicJob.isDeletionLog());
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuation.bpmn20.xml"})
@@ -126,7 +126,7 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
 
     HistoricJobLog historicJob = historyService
         .createHistoricJobLogQuery()
-        .successful()
+        .successLog()
         .singleResult();
     assertNotNull(historicJob);
 
@@ -147,10 +147,10 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
     assertEquals(job.getProcessDefinitionKey(), historicJob.getProcessDefinitionKey());
     assertEquals(job.getDeploymentId(), historicJob.getDeploymentId());
 
-    assertFalse(historicJob.isCreated());
-    assertFalse(historicJob.isFailed());
-    assertTrue(historicJob.isSuccessful());
-    assertFalse(historicJob.isDeleted());
+    assertFalse(historicJob.isCreationLog());
+    assertFalse(historicJob.isFailureLog());
+    assertTrue(historicJob.isSuccessLog());
+    assertFalse(historicJob.isDeletionLog());
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuation.bpmn20.xml"})
@@ -165,7 +165,7 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
 
     HistoricJobLog historicJob = historyService
         .createHistoricJobLogQuery()
-        .deleted()
+        .deletionLog()
         .singleResult();
     assertNotNull(historicJob);
 
@@ -186,10 +186,10 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
     assertEquals(job.getProcessDefinitionKey(), historicJob.getProcessDefinitionKey());
     assertEquals(job.getDeploymentId(), historicJob.getDeploymentId());
 
-    assertFalse(historicJob.isCreated());
-    assertFalse(historicJob.isFailed());
-    assertFalse(historicJob.isSuccessful());
-    assertTrue(historicJob.isDeleted());
+    assertFalse(historicJob.isCreationLog());
+    assertFalse(historicJob.isFailureLog());
+    assertFalse(historicJob.isSuccessLog());
+    assertTrue(historicJob.isDeletionLog());
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuation.bpmn20.xml"})
@@ -373,7 +373,7 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
     HistoricJobLog historicJob = historyService
         .createHistoricJobLogQuery()
         .jobId(jobId)
-        .created()
+        .creationLog()
         .singleResult();
     assertNotNull(historicJob);
 
@@ -391,7 +391,7 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
     historicJob = historyService
         .createHistoricJobLogQuery()
         .jobId(jobId)
-        .failed()
+        .failureLog()
         .singleResult();
     assertNotNull(historicJob);
 
@@ -406,7 +406,7 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
     historicJob = historyService
         .createHistoricJobLogQuery()
         .jobId(jobId)
-        .successful()
+        .successLog()
         .singleResult();
     assertNotNull(historicJob);
 
@@ -421,8 +421,8 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
     String jobId = managementService.createJobQuery().singleResult().getId();
 
     HistoricJobLogQuery query = historyService.createHistoricJobLogQuery().jobId(jobId);
-    HistoricJobLogQuery createdQuery = historyService.createHistoricJobLogQuery().jobId(jobId).created();
-    HistoricJobLogQuery failedQuery = historyService.createHistoricJobLogQuery().jobId(jobId).failed().orderByJobRetries().desc();
+    HistoricJobLogQuery createdQuery = historyService.createHistoricJobLogQuery().jobId(jobId).creationLog();
+    HistoricJobLogQuery failedQuery = historyService.createHistoricJobLogQuery().jobId(jobId).failureLog().orderByJobRetries().desc();
 
     // there exists one historic job log entry
     assertEquals(1, query.count());
@@ -532,8 +532,8 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
     String jobId = managementService.createJobQuery().singleResult().getId();
 
     HistoricJobLogQuery query = historyService.createHistoricJobLogQuery().jobId(jobId);
-    HistoricJobLogQuery createdQuery = historyService.createHistoricJobLogQuery().jobId(jobId).created();
-    HistoricJobLogQuery failedQuery = historyService.createHistoricJobLogQuery().jobId(jobId).failed().orderByJobRetries().desc();
+    HistoricJobLogQuery createdQuery = historyService.createHistoricJobLogQuery().jobId(jobId).creationLog();
+    HistoricJobLogQuery failedQuery = historyService.createHistoricJobLogQuery().jobId(jobId).failureLog().orderByJobRetries().desc();
 
     // there exists one historic job log entry
     assertEquals(1, query.count());
@@ -569,8 +569,8 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
     String jobId = managementService.createJobQuery().singleResult().getId();
 
     HistoricJobLogQuery query = historyService.createHistoricJobLogQuery().jobId(jobId);
-    HistoricJobLogQuery createdQuery = historyService.createHistoricJobLogQuery().jobId(jobId).created();
-    HistoricJobLogQuery succeededQuery = historyService.createHistoricJobLogQuery().jobId(jobId).successful();
+    HistoricJobLogQuery createdQuery = historyService.createHistoricJobLogQuery().jobId(jobId).creationLog();
+    HistoricJobLogQuery succeededQuery = historyService.createHistoricJobLogQuery().jobId(jobId).successLog();
 
     // there exists one historic job log entry
     assertEquals(1, query.count());
@@ -600,8 +600,8 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
     String jobId = managementService.createJobQuery().singleResult().getId();
 
     HistoricJobLogQuery query = historyService.createHistoricJobLogQuery().jobId(jobId);
-    HistoricJobLogQuery createdQuery = historyService.createHistoricJobLogQuery().jobId(jobId).created();
-    HistoricJobLogQuery succeededQuery = historyService.createHistoricJobLogQuery().jobId(jobId).successful();
+    HistoricJobLogQuery createdQuery = historyService.createHistoricJobLogQuery().jobId(jobId).creationLog();
+    HistoricJobLogQuery succeededQuery = historyService.createHistoricJobLogQuery().jobId(jobId).successLog();
 
     // there exists one historic job log entry
     assertEquals(1, query.count());
@@ -631,9 +631,9 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
     String jobId = managementService.createJobQuery().singleResult().getId();
 
     HistoricJobLogQuery query = historyService.createHistoricJobLogQuery().jobId(jobId);
-    HistoricJobLogQuery createdQuery = historyService.createHistoricJobLogQuery().jobId(jobId).created();
-    HistoricJobLogQuery failedQuery = historyService.createHistoricJobLogQuery().jobId(jobId).failed().orderByJobRetries().desc();
-    HistoricJobLogQuery succeededQuery = historyService.createHistoricJobLogQuery().jobId(jobId).successful();
+    HistoricJobLogQuery createdQuery = historyService.createHistoricJobLogQuery().jobId(jobId).creationLog();
+    HistoricJobLogQuery failedQuery = historyService.createHistoricJobLogQuery().jobId(jobId).failureLog().orderByJobRetries().desc();
+    HistoricJobLogQuery succeededQuery = historyService.createHistoricJobLogQuery().jobId(jobId).successLog();
 
     // there exists one historic job log entry
     assertEquals(1, query.count());
@@ -719,9 +719,9 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
 
     // serviceTask1
     HistoricJobLogQuery serviceTask1Query = historyService.createHistoricJobLogQuery().jobId(serviceTask1JobId);
-    HistoricJobLogQuery serviceTask1CreatedQuery = historyService.createHistoricJobLogQuery().jobId(serviceTask1JobId).created();
-    HistoricJobLogQuery serviceTask1DeletedQuery = historyService.createHistoricJobLogQuery().jobId(serviceTask1JobId).deleted();
-    HistoricJobLogQuery serviceTask1SuccessfulQuery = historyService.createHistoricJobLogQuery().jobId(serviceTask1JobId).successful();
+    HistoricJobLogQuery serviceTask1CreatedQuery = historyService.createHistoricJobLogQuery().jobId(serviceTask1JobId).creationLog();
+    HistoricJobLogQuery serviceTask1DeletedQuery = historyService.createHistoricJobLogQuery().jobId(serviceTask1JobId).deletionLog();
+    HistoricJobLogQuery serviceTask1SuccessfulQuery = historyService.createHistoricJobLogQuery().jobId(serviceTask1JobId).successLog();
 
     assertEquals(1, serviceTask1Query.count());
     assertEquals(1, serviceTask1CreatedQuery.count());
@@ -732,9 +732,9 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
     String serviceTask2JobId = managementService.createJobQuery().activityId("serviceTask2").singleResult().getId();
 
     HistoricJobLogQuery serviceTask2Query = historyService.createHistoricJobLogQuery().jobId(serviceTask2JobId);
-    HistoricJobLogQuery serviceTask2CreatedQuery = historyService.createHistoricJobLogQuery().jobId(serviceTask2JobId).created();
-    HistoricJobLogQuery serviceTask2DeletedQuery = historyService.createHistoricJobLogQuery().jobId(serviceTask2JobId).deleted();
-    HistoricJobLogQuery serviceTask2SuccessfulQuery = historyService.createHistoricJobLogQuery().jobId(serviceTask2JobId).successful();
+    HistoricJobLogQuery serviceTask2CreatedQuery = historyService.createHistoricJobLogQuery().jobId(serviceTask2JobId).creationLog();
+    HistoricJobLogQuery serviceTask2DeletedQuery = historyService.createHistoricJobLogQuery().jobId(serviceTask2JobId).deletionLog();
+    HistoricJobLogQuery serviceTask2SuccessfulQuery = historyService.createHistoricJobLogQuery().jobId(serviceTask2JobId).successLog();
 
     assertEquals(1, serviceTask2Query.count());
     assertEquals(1, serviceTask2CreatedQuery.count());
@@ -787,9 +787,9 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
     String serviceTask1JobId = managementService.createJobQuery().activityId("serviceTask1").singleResult().getId();
 
     HistoricJobLogQuery serviceTask1Query = historyService.createHistoricJobLogQuery().jobId(serviceTask1JobId);
-    HistoricJobLogQuery serviceTask1CreatedQuery = historyService.createHistoricJobLogQuery().jobId(serviceTask1JobId).created();
-    HistoricJobLogQuery serviceTask1DeletedQuery = historyService.createHistoricJobLogQuery().jobId(serviceTask1JobId).deleted();
-    HistoricJobLogQuery serviceTask1SuccessfulQuery = historyService.createHistoricJobLogQuery().jobId(serviceTask1JobId).successful();
+    HistoricJobLogQuery serviceTask1CreatedQuery = historyService.createHistoricJobLogQuery().jobId(serviceTask1JobId).creationLog();
+    HistoricJobLogQuery serviceTask1DeletedQuery = historyService.createHistoricJobLogQuery().jobId(serviceTask1JobId).deletionLog();
+    HistoricJobLogQuery serviceTask1SuccessfulQuery = historyService.createHistoricJobLogQuery().jobId(serviceTask1JobId).successLog();
 
     assertEquals(1, serviceTask1Query.count());
     assertEquals(1, serviceTask1CreatedQuery.count());
@@ -800,9 +800,9 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
     String serviceTask2JobId = managementService.createJobQuery().activityId("serviceTask2").singleResult().getId();
 
     HistoricJobLogQuery serviceTask2Query = historyService.createHistoricJobLogQuery().jobId(serviceTask2JobId);
-    HistoricJobLogQuery serviceTask2CreatedQuery = historyService.createHistoricJobLogQuery().jobId(serviceTask2JobId).created();
-    HistoricJobLogQuery serviceTask2DeletedQuery = historyService.createHistoricJobLogQuery().jobId(serviceTask2JobId).deleted();
-    HistoricJobLogQuery serviceTask2SuccessfulQuery = historyService.createHistoricJobLogQuery().jobId(serviceTask2JobId).successful();
+    HistoricJobLogQuery serviceTask2CreatedQuery = historyService.createHistoricJobLogQuery().jobId(serviceTask2JobId).creationLog();
+    HistoricJobLogQuery serviceTask2DeletedQuery = historyService.createHistoricJobLogQuery().jobId(serviceTask2JobId).deletionLog();
+    HistoricJobLogQuery serviceTask2SuccessfulQuery = historyService.createHistoricJobLogQuery().jobId(serviceTask2JobId).successLog();
 
     assertEquals(1, serviceTask2Query.count());
     assertEquals(1, serviceTask2CreatedQuery.count());
@@ -851,8 +851,8 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
     String jobId = managementService.createJobQuery().singleResult().getId();
 
     HistoricJobLogQuery query = historyService.createHistoricJobLogQuery().jobId(jobId);
-    HistoricJobLogQuery createdQuery = historyService.createHistoricJobLogQuery().jobId(jobId).created();
-    HistoricJobLogQuery deletedQuery = historyService.createHistoricJobLogQuery().jobId(jobId).deleted();
+    HistoricJobLogQuery createdQuery = historyService.createHistoricJobLogQuery().jobId(jobId).creationLog();
+    HistoricJobLogQuery deletedQuery = historyService.createHistoricJobLogQuery().jobId(jobId).deletionLog();
 
     // there exists one historic job log entry
     assertEquals(1, query.count());
@@ -882,8 +882,8 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
     String jobId = managementService.createJobQuery().singleResult().getId();
 
     HistoricJobLogQuery query = historyService.createHistoricJobLogQuery().jobId(jobId);
-    HistoricJobLogQuery createdQuery = historyService.createHistoricJobLogQuery().jobId(jobId).created();
-    HistoricJobLogQuery deletedQuery = historyService.createHistoricJobLogQuery().jobId(jobId).deleted();
+    HistoricJobLogQuery createdQuery = historyService.createHistoricJobLogQuery().jobId(jobId).creationLog();
+    HistoricJobLogQuery deletedQuery = historyService.createHistoricJobLogQuery().jobId(jobId).deletionLog();
 
     // there exists one historic job log entry
     assertEquals(1, query.count());
@@ -923,7 +923,7 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
     // then
     String failedHistoricJobLogId = historyService
         .createHistoricJobLogQuery()
-        .failed()
+        .failureLog()
         .singleResult()
         .getId();
 
@@ -968,7 +968,7 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
     // then (1)
     HistoricJobLog serviceTask1FailedHistoricJobLog = historyService
         .createHistoricJobLogQuery()
-        .failed()
+        .failureLog()
         .singleResult();
 
     String serviceTask1FailedHistoricJobLogId = serviceTask1FailedHistoricJobLog.getId();
@@ -992,7 +992,7 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
     // then (2)
     HistoricJobLog serviceTask2FailedHistoricJobLog = historyService
         .createHistoricJobLogQuery()
-        .failed()
+        .failureLog()
         .orderByJobRetries()
         .desc()
         .list()
@@ -1028,7 +1028,7 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
     // then
     HistoricJobLog failedHistoricJobLog = historyService
         .createHistoricJobLogQuery()
-        .failed()
+        .failureLog()
         .singleResult();
 
     String failedHistoricJobLogId = failedHistoricJobLog.getId();

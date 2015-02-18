@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.test.history;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.historicJobLogByActivityId;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.historicJobLogByDeploymentId;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.historicJobLogByExecutionId;
+import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.historicJobLogByJobDefinitionId;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.historicJobLogByJobDueDate;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.historicJobLogByJobId;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.historicJobLogByJobRetries;
@@ -47,6 +48,28 @@ public class HistoricJobLogQueryTest extends PluggableProcessEngineTestCase {
     HistoricJobLogQuery query = historyService.createHistoricJobLogQuery();
 
     verifyQueryResults(query, 1);
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuation.bpmn20.xml"})
+  public void testQueryByLogId() {
+    runtimeService.startProcessInstanceByKey("process");
+    String logId = historyService.createHistoricJobLogQuery().singleResult().getId();
+
+    HistoricJobLogQuery query = historyService.createHistoricJobLogQuery().logId(logId);
+
+    verifyQueryResults(query, 1);
+  }
+
+  public void testQueryByInvalidLogId() {
+    HistoricJobLogQuery query = historyService.createHistoricJobLogQuery().logId("invalid");
+
+    verifyQueryResults(query, 0);
+
+    try {
+      query.logId(null);
+      fail();
+    } catch (Exception e) {
+    }
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuation.bpmn20.xml"})
@@ -292,18 +315,18 @@ public class HistoricJobLogQueryTest extends PluggableProcessEngineTestCase {
       // expected
     }
 
-    HistoricJobLogQuery query = historyService.createHistoricJobLogQuery().exceptionMessage(FailingDelegate.EXCEPTION_MESSAGE);
+    HistoricJobLogQuery query = historyService.createHistoricJobLogQuery().jobExceptionMessage(FailingDelegate.EXCEPTION_MESSAGE);
 
     verifyQueryResults(query, 1);
   }
 
   public void testQueryByInvalidExceptionMessage() {
-    HistoricJobLogQuery query = historyService.createHistoricJobLogQuery().exceptionMessage("invalid");
+    HistoricJobLogQuery query = historyService.createHistoricJobLogQuery().jobExceptionMessage("invalid");
 
     verifyQueryResults(query, 0);
 
     try {
-      query.exceptionMessage(null);
+      query.jobExceptionMessage(null);
       fail();
     } catch (Exception e) {
     }
@@ -313,7 +336,7 @@ public class HistoricJobLogQueryTest extends PluggableProcessEngineTestCase {
   public void testQueryByTimers() {
     runtimeService.startProcessInstanceByKey("process");
 
-    HistoricJobLogQuery query = historyService.createHistoricJobLogQuery().timers();
+    HistoricJobLogQuery query = historyService.createHistoricJobLogQuery().jobTimers();
 
     verifyQueryResults(query, 1);
   }
@@ -322,7 +345,7 @@ public class HistoricJobLogQueryTest extends PluggableProcessEngineTestCase {
   public void testQueryByMessages() {
     runtimeService.startProcessInstanceByKey("process");
 
-    HistoricJobLogQuery query = historyService.createHistoricJobLogQuery().messages();
+    HistoricJobLogQuery query = historyService.createHistoricJobLogQuery().jobMessages();
 
     verifyQueryResults(query, 1);
   }
@@ -331,7 +354,7 @@ public class HistoricJobLogQueryTest extends PluggableProcessEngineTestCase {
   public void testQueryByCreated() {
     runtimeService.startProcessInstanceByKey("process");
 
-    HistoricJobLogQuery query = historyService.createHistoricJobLogQuery().created();
+    HistoricJobLogQuery query = historyService.createHistoricJobLogQuery().creationLog();
 
     verifyQueryResults(query, 1);
   }
@@ -347,7 +370,7 @@ public class HistoricJobLogQueryTest extends PluggableProcessEngineTestCase {
       // expected
     }
 
-    HistoricJobLogQuery query = historyService.createHistoricJobLogQuery().failed();
+    HistoricJobLogQuery query = historyService.createHistoricJobLogQuery().failureLog();
 
     verifyQueryResults(query, 1);
   }
@@ -358,7 +381,7 @@ public class HistoricJobLogQueryTest extends PluggableProcessEngineTestCase {
     String jobId = managementService.createJobQuery().singleResult().getId();
     managementService.executeJob(jobId);
 
-    HistoricJobLogQuery query = historyService.createHistoricJobLogQuery().successful();
+    HistoricJobLogQuery query = historyService.createHistoricJobLogQuery().successLog();
 
     verifyQueryResults(query, 1);
   }
@@ -368,7 +391,7 @@ public class HistoricJobLogQueryTest extends PluggableProcessEngineTestCase {
     String processInstanceId = runtimeService.startProcessInstanceByKey("process").getId();
     runtimeService.deleteProcessInstance(processInstanceId, null);
 
-    HistoricJobLogQuery query = historyService.createHistoricJobLogQuery().deleted();
+    HistoricJobLogQuery query = historyService.createHistoricJobLogQuery().deletionLog();
 
     verifyQueryResults(query, 1);
   }
@@ -393,6 +416,13 @@ public class HistoricJobLogQueryTest extends PluggableProcessEngineTestCase {
       .orderByJobId()
       .asc();
     verifyQueryWithOrdering(query, 10, historicJobLogByJobId());
+
+    query = historyService.createHistoricJobLogQuery();
+
+    query
+      .orderByJobDefinitionId()
+      .asc();
+    verifyQueryWithOrdering(query, 10, historicJobLogByJobDefinitionId());
 
     query = historyService.createHistoricJobLogQuery();
 
@@ -462,6 +492,13 @@ public class HistoricJobLogQueryTest extends PluggableProcessEngineTestCase {
       .orderByJobId()
       .desc();
     verifyQueryWithOrdering(query, 10, inverted(historicJobLogByJobId()));
+
+    query = historyService.createHistoricJobLogQuery();
+
+    query
+      .orderByJobDefinitionId()
+      .asc();
+    verifyQueryWithOrdering(query, 10, inverted(historicJobLogByJobDefinitionId()));
 
     query = historyService.createHistoricJobLogQuery();
 

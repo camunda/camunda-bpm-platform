@@ -21,6 +21,7 @@ import org.camunda.bpm.engine.query.QueryProperty;
 public interface HistoricJobLogQueryProperty {
 
   public static final QueryProperty JOB_ID = new QueryPropertyImpl("ID_");
+  public static final QueryProperty JOB_DEFINITION_ID = new QueryPropertyImpl("JOB_DEF_ID_");
   public static final QueryProperty TIMESTAMP = new QueryPropertyImpl("TIMESTAMP_");
   public static final QueryProperty ACTIVITY_ID = new QueryPropertyImpl("ACT_ID_");
   public static final QueryProperty EXECUTION_ID = new QueryPropertyImpl("EXECUTION_ID_");

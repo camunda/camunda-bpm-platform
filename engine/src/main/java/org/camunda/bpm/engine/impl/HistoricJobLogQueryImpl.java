@@ -36,6 +36,7 @@ public class HistoricJobLogQueryImpl extends AbstractQuery<HistoricJobLogQuery, 
 
   private static final long serialVersionUID = 1L;
 
+  protected String id;
   protected String jobId;
   protected String jobDefinitionId;
   protected String[] activityIds;
@@ -50,6 +51,7 @@ public class HistoricJobLogQueryImpl extends AbstractQuery<HistoricJobLogQuery, 
   protected JobState state;
 
 
+
   public HistoricJobLogQueryImpl() {
   }
 
@@ -62,6 +64,12 @@ public class HistoricJobLogQueryImpl extends AbstractQuery<HistoricJobLogQuery, 
   }
 
   // query parameter ////////////////////////////////////////////
+
+  public HistoricJobLogQuery logId(String historicJobLogId) {
+    ensureNotNull(NotValidException.class, "historicJobLogId", historicJobLogId);
+    this.id = historicJobLogId;
+    return this;
+  }
 
   public HistoricJobLogQuery jobId(String jobId) {
     ensureNotNull(NotValidException.class, "jobId", jobId);
@@ -121,13 +129,13 @@ public class HistoricJobLogQueryImpl extends AbstractQuery<HistoricJobLogQuery, 
     return this;
   }
 
-  public HistoricJobLogQuery exceptionMessage(String exceptionMessage) {
+  public HistoricJobLogQuery jobExceptionMessage(String exceptionMessage) {
     ensureNotNull(NotValidException.class, "exceptionMessage", exceptionMessage);
     this.exceptionMessage = exceptionMessage;
     return this;
   }
 
-  public HistoricJobLogQuery timers() {
+  public HistoricJobLogQuery jobTimers() {
     if (type != null && type.equals(MessageEntity.TYPE)) {
       throw new NotValidException("Cannot combine timers() with messages() in the same query.");
     }
@@ -135,7 +143,7 @@ public class HistoricJobLogQueryImpl extends AbstractQuery<HistoricJobLogQuery, 
     return this;
   }
 
-  public HistoricJobLogQuery messages() {
+  public HistoricJobLogQuery jobMessages() {
     if (type != null && type.equals(TimerEntity.TYPE)) {
       throw new NotValidException("Cannot combine messages() with timers() in the same query.");
     }
@@ -143,22 +151,22 @@ public class HistoricJobLogQueryImpl extends AbstractQuery<HistoricJobLogQuery, 
     return this;
   }
 
-  public HistoricJobLogQuery created() {
+  public HistoricJobLogQuery creationLog() {
     setState(JobState.CREATED);
     return this;
   }
 
-  public HistoricJobLogQuery failed() {
+  public HistoricJobLogQuery failureLog() {
     setState(JobState.FAILED);
     return this;
   }
 
-  public HistoricJobLogQuery successful() {
+  public HistoricJobLogQuery successLog() {
     setState(JobState.SUCCESSFUL);
     return this;
   }
 
-  public HistoricJobLogQuery deleted() {
+  public HistoricJobLogQuery deletionLog() {
     setState(JobState.DELETED);
     return this;
   }
@@ -172,6 +180,11 @@ public class HistoricJobLogQueryImpl extends AbstractQuery<HistoricJobLogQuery, 
 
   public HistoricJobLogQuery orderByJobId() {
     orderBy(HistoricJobLogQueryProperty.JOB_ID);
+    return this;
+  }
+
+  public HistoricJobLogQuery orderByJobDefinitionId() {
+    orderBy(HistoricJobLogQueryProperty.JOB_DEFINITION_ID);
     return this;
   }
 

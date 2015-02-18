@@ -119,24 +119,24 @@ public interface HistoricJobLog {
    * Returns <code>true</code> when <code>this</code> log represents
    * the creation of the associated job.
    */
-  boolean isCreated();
+  boolean isCreationLog();
 
   /**
    * Returns <code>true</code> when <code>this</code> log represents
    * the failed execution of the associated job.
    */
-  boolean isFailed();
+  boolean isFailureLog();
 
   /**
    * Returns <code>true</code> when <code>this</code> log represents
    * the successful execution of the associated job.
    */
-  boolean isSuccessful();
+  boolean isSuccessLog();
 
   /**
    * Returns <code>true</code> when <code>this</code> log represents
    * the deletion of the associated job.
    */
-  boolean isDeleted();
+  boolean isDeletionLog();
 
 }

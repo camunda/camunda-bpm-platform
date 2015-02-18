@@ -637,7 +637,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
       // query for the job create event
       HistoricJobLog createJobLog = query
           .jobId(jobId)
-          .created()
+          .creationLog()
           .singleResult();
 
       if (createJobLog != null) {

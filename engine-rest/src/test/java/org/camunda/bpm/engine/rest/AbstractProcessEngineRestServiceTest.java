@@ -53,6 +53,8 @@ import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.history.HistoricDetailQuery;
 import org.camunda.bpm.engine.history.HistoricIncident;
 import org.camunda.bpm.engine.history.HistoricIncidentQuery;
+import org.camunda.bpm.engine.history.HistoricJobLog;
+import org.camunda.bpm.engine.history.HistoricJobLogQuery;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
@@ -130,6 +132,7 @@ public abstract class AbstractProcessEngineRestServiceTest extends
   protected static final String HISTORY_DETAIL_URL = HISTORY_URL + "/detail";
   protected static final String HISTORY_TASK_INSTANCE_URL = HISTORY_URL + "/task";
   protected static final String HISTORY_INCIDENT_URL = HISTORY_URL + "/incident";
+  protected static final String HISTORY_JOB_LOG_URL = HISTORY_URL + "/job-log";
 
   protected String EXAMPLE_ENGINE_NAME = "anEngineName";
 
@@ -187,6 +190,7 @@ public abstract class AbstractProcessEngineRestServiceTest extends
     createHistoricDetailMock();
     createHistoricTaskInstanceMock();
     createHistoricIncidentMock();
+    createHistoricJobLogMock();
   }
 
   private void createProcessDefinitionMock() {
@@ -395,6 +399,13 @@ public abstract class AbstractProcessEngineRestServiceTest extends
     FilterQuery mockFilterQuery = mock(FilterQuery.class);
     when(mockFilterQuery.list()).thenReturn(filters);
     when(mockFilterService.createFilterQuery()).thenReturn(mockFilterQuery);
+  }
+
+  private void createHistoricJobLogMock() {
+    HistoricJobLogQuery mockHistoricJobLogQuery = mock(HistoricJobLogQuery.class);
+    List<HistoricJobLog> historicJobLogs = MockProvider.createMockHistoricJobLogs();
+    when(mockHistoricJobLogQuery.list()).thenReturn(historicJobLogs);
+    when(mockHistoryService.createHistoricJobLogQuery()).thenReturn(mockHistoricJobLogQuery);
   }
 
   @Test
@@ -726,6 +737,20 @@ public abstract class AbstractProcessEngineRestServiceTest extends
         .get(FILTER_URL);
 
     verify(mockFilterService).createFilterQuery();
+    verifyZeroInteractions(processEngine);
+  }
+
+  @Test
+  public void testHistoryServiceEngineAccess_HistoricJobLog() {
+    given()
+      .pathParam("name", EXAMPLE_ENGINE_NAME)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+      .when()
+        .get(HISTORY_JOB_LOG_URL);
+
+    verify(mockHistoryService).createHistoricJobLogQuery();
     verifyZeroInteractions(processEngine);
   }
 }

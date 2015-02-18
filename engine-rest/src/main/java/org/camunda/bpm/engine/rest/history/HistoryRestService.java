@@ -51,4 +51,7 @@ public interface HistoryRestService {
   @Path(HistoricIncidentRestService.PATH)
   HistoricIncidentRestService getIncidentService();
 
+  @Path(HistoricJobLogRestService.PATH)
+  HistoricJobLogRestService getJobLogService();
+
 }
