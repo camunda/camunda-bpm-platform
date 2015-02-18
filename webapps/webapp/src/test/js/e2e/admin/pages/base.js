@@ -21,9 +21,9 @@ module.exports = Page.extend({
     var itemIndex = index.indexOf(navbarItem) + 1;
 
     if (itemIndex)
-      item = navigationSection.element(by.css('.navbar ul li:nth-child(' + itemIndex + ')'));
+      item = navigationSection.element(by.css('[cam-widget-header] ul li:nth-child(' + itemIndex + ')'));
     else
-      item = navigationSection.element(by.css('.navbar ul li:nth-child(1)'));
+      item = navigationSection.element(by.css('[cam-widget-header] ul li:nth-child(1)'));
 
     item.click();
     return item;

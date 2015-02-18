@@ -34,14 +34,14 @@ Page.prototype.navigateTo = function(params) {
 };
 
 Page.prototype.isActive = function(params) {
-  expect(browser.getCurrentUrl()).toBe('http://localhost:8080' + injectParams(this.url, params));
+  expect(browser.getCurrentUrl()).to.eventually.eql('http://localhost:8080' + injectParams(this.url, params));
 };
 
 Page.prototype.navigateToWebapp = function(appName) {
   browser.get('camunda/app/' + appName.toLowerCase() + '/');
   browser.driver.manage().window().maximize();
 
-  expect(this.navbarBrand().getText()).toEqual('camunda ' + appName);
+  expect(this.navbarBrand().getText()).to.eventually.eql('Camunda ' + appName);
 };
 
 Page.prototype.navbarBrand = function() {
@@ -68,12 +68,12 @@ Page.prototype.notification = function(item) {
 };
 
 Page.prototype.logout = function() {
-  element(by.css('.navbar [sem-show-user-actions]')).click();
-  element(by.css('.navbar [sem-log-out]')).click();
+  element(by.css('[cam-widget-header] .account')).click();
+  element(by.css('[cam-widget-header] [ng-click="authentication.logout()"]')).click();
 };
 
 Page.prototype.loggedInUser = function() {
-  return element(by.css('.navbar [sem-show-user-actions]')).getText();
+  return element(by.css('[cam-widget-header] .account')).getText();
 };
 
 Page.prototype.switchWebapp = function(appName) {

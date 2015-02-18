@@ -1,11 +1,8 @@
-/*
- configuration file for cockpit testing
 
- to run test start:
- 1. cockpit
- 2. webdriver-manager start
- 3. protractor conf-file-name.js
- */
+var chai     = require('chai');
+var promised = require('chai-as-promised');
+chai.use(promised);
+global.expect   = chai.expect;
 
 exports.config = {
 
@@ -40,7 +37,7 @@ exports.config = {
   //
   // Spec patterns are relative to the location of the spec file. They may
   // include glob patterns.
-  specs: ['admin/spec/*-spec.js'],
+  specs: ['admin/specs/admin-user-spec.js'],
 
   // A base URL for your application under test. Calls to protractor.get()
   // with relative paths will be prepended with this.
@@ -51,8 +48,9 @@ exports.config = {
   // Jasmine is fully supported as a test and assertion framework.
   // Mocha has limited beta support. You will need to include your own
   // assertion framework if working with mocha.
-  framework: 'jasmine',
+  framework: 'mocha',
 
+/*
   // ----- Options to be passed to minijasminenode -----
   //
   // Options to be passed to Jasmine-node.
@@ -62,4 +60,12 @@ exports.config = {
     showColors: true, // Use colors in the command line report.
     includeStackTrace: true // If true, include stack traces in failures.
   }
+  */
+ 
+  mochaOpts: {
+    timeout: 15000,
+    colors: true,
+    reporter: "spec",
+    slow: 3000
+  } 
 };
