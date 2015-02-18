@@ -11,6 +11,12 @@
     "grunt-contrib-watch": "0.5.0",
     "load-grunt-tasks": "0.4.0",
     "requirejs-angular-define": "git://github.com/camunda/requirejs-angular-define.git",
-    "requirejs-text": "2.0.12"
+    "requirejs-text": "2.0.12",
+    "camunda-bpm-sdk-js": "7.3.0-SNAPSHOT",
+    "request": "2.53.0",
+    "chai": "2.0.0",
+    "chai-as-promised": "4.2.0",
+    "mocha": "2.1.0",
+    "protractor": "1.6.1"
   }
 }
