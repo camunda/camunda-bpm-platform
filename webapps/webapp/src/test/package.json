@@ -4,7 +4,10 @@
   "description": "e2e test setup",
   "dependencies": {
     "camunda-bpm-sdk-js": "7.3.0-SNAPSHOT",
-    "request": "2.53.0"
-  },
-  "devDependencies": {}
+    "request": "2.53.0",
+    "chai": "2.0.0",
+    "chai-as-promised": "4.2.0",
+    "mocha": "2.1.0",
+    "protractor": "1.6.1"
+  }
 }
