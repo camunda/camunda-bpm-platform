@@ -78,10 +78,11 @@ define(['angular', 'text!./process-instance-table.html'], function(angular, temp
           var params = angular.extend({}, countParams, pagingParams);
 
           $scope.processInstances = null;
+          $scope.loadingState = 'LOADING';
 
           PluginProcessInstanceResource.query(pagingParams, params).$promise.then(function(data) {
-            // $scope.processInstances = data.resource;
             $scope.processInstances = data;
+            $scope.loadingState = data.length ? 'LOADED' : 'EMPTY';
           });
 
           PluginProcessInstanceResource.count(countParams).$promise.then(function(data) {

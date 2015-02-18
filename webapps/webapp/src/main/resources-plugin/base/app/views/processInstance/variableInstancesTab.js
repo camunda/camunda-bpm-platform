@@ -73,6 +73,7 @@ function(angular, uploadTemplate, inspectTemplate, instancesTemplate) {
           delete params.activityInstanceIds;
 
           $scope.variables = null;
+          $scope.loadingState = 'LOADING';
 
           // get the 'count' of variables
           $http.post(Uri.appUri('engine://engine/:engine/variable-instance/count'), params).success(function(data) {
@@ -92,6 +93,7 @@ function(angular, uploadTemplate, inspectTemplate, instancesTemplate) {
               variableCopies[currentVariable.id] = angular.copy(currentVariable);
             });
             $scope.variables = data;
+            $scope.loadingState = data.length ? 'LOADED' : 'EMPTY';
           });
         }
 

@@ -49,6 +49,7 @@ define(['angular'], function(angular) {
     function updateJobTable(page) {
       $scope.failedJobs = null;
       $scope.allJobsSelected = false;
+      $scope.loadingState = 'LOADING';
 
       var count = jobPages.size;
       var firstResult = (page - 1) * count;
@@ -70,8 +71,9 @@ define(['angular'], function(angular) {
           var index = selectedFailedJobIds.indexOf(job.id);
           job.selected = index !== -1;
         }
-        // $scope.failedJobs = response.data;
+
         $scope.failedJobs = response;
+        $scope.loadingState = response.length ? 'LOADED' : 'EMPTY';
       });
 
       JobResource.count({

@@ -33,12 +33,14 @@ define(['angular', 'text!./called-process-definition-table.html'], function(angu
           filter.activityIdIn = filter.activityIds;
           delete filter.activityIds;
 
+          $scope.loadingState = 'LOADING';
           return PluginProcessDefinitionResource.getCalledProcessDefinitions({ id: processDefinition.id }, filter).$promise;
         }]);
 
         processData.observe([ 'calledProcessDefinitions', 'bpmnElements' ], function(calledProcessDefinitions, bpmnElements) {
 
           $scope.calledProcessDefinitions = attachCalledFromActivities(calledProcessDefinitions, bpmnElements);
+          $scope.loadingState = $scope.calledProcessDefinitions.length ? 'LOADED' : 'EMPTY';
         });
 
         function attachCalledFromActivities(processDefinitions, bpmnElements) {

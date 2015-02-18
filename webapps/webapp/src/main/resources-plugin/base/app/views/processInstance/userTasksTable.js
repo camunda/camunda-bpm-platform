@@ -116,6 +116,7 @@ define(['angular', 'text!./identity-links-modal.html', 'text!./user-tasks-table.
         delete params.activityInstanceIds;
 
         $scope.userTasks = null;
+        $scope.loadingState = 'LOADING';
 
         taskIdIdToExceptionMessageMap = {};
         taskCopies = {};
@@ -131,8 +132,8 @@ define(['angular', 'text!./identity-links-modal.html', 'text!./user-tasks-table.
             taskCopies[task.id] = angular.copy(task);
           }
 
-          // $scope.userTasks = response.resource;
           $scope.userTasks = response;
+          $scope.loadingState = response.length ? 'LOADED' : 'EMPTY';
         });
 
       }

@@ -1,48 +1,38 @@
 <!-- # CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/base/app/views/processInstance/called-process-instance-table.html -->
-<table class="called-process-instance cam-table">
-  <thead>
-    <tr>
-      <th class="called-process-instance uuid">Called Process Instance</th>
-      <th class="process-definition">Process Definition</th>
-      <th class="activity">Activity</th>
-    </tr>
-  </thead>
+<div cam-widget-loader
+     loading-state="{{ loadingState }}"
+     text-empty="No called process instances">
+  <table class="called-process-instance cam-table">
+    <thead>
+      <tr>
+        <th class="called-process-instance uuid">Called Process Instance</th>
+        <th class="process-definition">Process Definition</th>
+        <th class="activity">Activity</th>
+      </tr>
+    </thead>
 
-  <tbody>
-    <tr ng-repeat="calledProcessInstance in calledProcessInstances">
-      <td class="called-process-instance uuid">
-        <a href="#/process-instance/{{ calledProcessInstance.id }}">
-          {{ calledProcessInstance.id }}
-        </a>
-      </td>
+    <tbody>
+      <tr ng-repeat="calledProcessInstance in calledProcessInstances">
+        <td class="called-process-instance uuid">
+          <a href="#/process-instance/{{ calledProcessInstance.id }}">
+            {{ calledProcessInstance.id }}
+          </a>
+        </td>
 
-      <td class="process-definition">
-        <a href="#/process-definition/{{ calledProcessInstance.processDefinitionId }}?parentProcessDefinitionId={{ processInstance.definitionId }}">
-          {{ calledProcessInstance.processDefinitionName }}
-        </a>
-      </td>
+        <td class="process-definition">
+          <a href="#/process-definition/{{ calledProcessInstance.processDefinitionId }}?parentProcessDefinitionId={{ processInstance.definitionId }}">
+            {{ calledProcessInstance.processDefinitionName }}
+          </a>
+        </td>
 
-      <td class="activity">
-        <a cam-select-activity-instance="calledProcessInstance.instance.id"
-           ng-href="#/process-instance/{{ processInstance.id }}?detailsTab=called-process-instances-tab&activityInstanceIds={{ calledProcessInstance.instance.id }}">
-          {{ calledProcessInstance.instance.name }}
-        <a>
-      </td>
-    </tr>
-
-    <tr ng-if="!calledProcessInstances">
-      <td colspan="3">
-        <span class="glyphicon glyphicon-loading"></span>
-        loading called process instances...
-      </td>
-    </tr>
-
-    <tr ng-if="calledProcessInstances && !calledProcessInstances.length">
-      <td  colspan="3">
-        No called process instances
-      </td>
-    </tr>
-
-  </tbody>
-</table>
+        <td class="activity">
+          <a cam-select-activity-instance="calledProcessInstance.instance.id"
+             ng-href="#/process-instance/{{ processInstance.id }}?detailsTab=called-process-instances-tab&activityInstanceIds={{ calledProcessInstance.instance.id }}">
+            {{ calledProcessInstance.instance.name }}
+          <a>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
 <!-- / CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/base/app/views/processInstance/called-process-instance-table.html -->

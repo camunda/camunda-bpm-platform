@@ -70,6 +70,7 @@ define(['angular', 'text!./incidents-tab.html', 'text!./job-retry-dialog.html'],
           });
 
           // get the incidents
+          $scope.loadingState = 'LOADING';
           $http.post(Uri.appUri('plugin://base/:engine/incident'), params, {params: pagingParams }).success(function(data) {
             angular.forEach(data, function (incident) {
               var activityId = incident.activityId;
@@ -79,6 +80,7 @@ define(['angular', 'text!./incidents-tab.html', 'text!./job-retry-dialog.html'],
             });
 
             $scope.incidents = data;
+            $scope.loadingState = data.length ? 'LOADED' : 'EMPTY';
           });
         }
 

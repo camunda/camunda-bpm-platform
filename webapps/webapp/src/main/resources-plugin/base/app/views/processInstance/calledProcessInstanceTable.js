@@ -31,8 +31,7 @@ define(['angular', 'text!./called-process-instance-table.html'], function(angula
 
           $scope.calledProcessInstances = null;
 
-          // deprecate `getCalledProcessInstances`
-          // PluginProcessInstanceResource.getCalledProcessInstances({id: $scope.processInstance.id}, filter).$promise.then(function(response) {
+          $scope.loadingState = 'LOADING';
           PluginProcessInstanceResource
           .processInstances({
             id: $scope.processInstance.id
@@ -45,7 +44,7 @@ define(['angular', 'text!./called-process-instance-table.html'], function(angula
               calledInstance.instance = instance;
             });
 
-            // $scope.calledProcessInstances = response.data;
+            $scope.loadingState = response.length ? 'LOADED' : 'EMPTY';
             $scope.calledProcessInstances = response;
           });
         }
