@@ -195,7 +195,7 @@ create table ACT_RU_AUTHORIZATION (
   TYPE_ integer not null,
   GROUP_ID_ varchar(255),
   USER_ID_ varchar(255),
-  RESOURCE_TYPE_ varchar(255) not null,
+  RESOURCE_TYPE_ integer not null,
   RESOURCE_ID_ varchar(64),
   PERMS_ integer,
   primary key (ID_)
