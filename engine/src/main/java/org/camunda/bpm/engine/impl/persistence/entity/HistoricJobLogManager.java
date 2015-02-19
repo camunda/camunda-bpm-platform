@@ -28,6 +28,7 @@ import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
 import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
 import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
+import org.camunda.bpm.engine.impl.util.EnsureUtil;
 import org.camunda.bpm.engine.runtime.Job;
 
 /**
@@ -91,6 +92,7 @@ public class HistoricJobLogManager extends AbstractManager {
   // byte array delete ////////////////////////////////////////////////////////
 
   protected void deleteExceptionByteArrayByParameterMap(String key, String value) {
+    EnsureUtil.ensureNotNull(key, value);
     Map<String, String> parameterMap = new HashMap<String, String>();
     parameterMap.put(key, value);
     getDbEntityManager().delete(ByteArrayEntity.class, "deleteExceptionByteArraysByIds", parameterMap);
