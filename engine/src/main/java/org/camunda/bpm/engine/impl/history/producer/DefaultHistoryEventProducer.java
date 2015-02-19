@@ -13,8 +13,8 @@
 package org.camunda.bpm.engine.impl.history.producer;
 
 import static org.camunda.bpm.engine.impl.util.JobExceptionUtil.createJobExceptionByteArray;
-import static org.camunda.bpm.engine.impl.util.JobExceptionUtil.getJobExceptionBytes;
 import static org.camunda.bpm.engine.impl.util.JobExceptionUtil.getJobExceptionStacktrace;
+import static org.camunda.bpm.engine.impl.util.StringUtil.toByteArray;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -23,11 +23,9 @@ import java.util.List;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.DelegateTask;
 import org.camunda.bpm.engine.delegate.VariableScope;
-import org.camunda.bpm.engine.history.HistoricJobLog;
 import org.camunda.bpm.engine.history.IncidentState;
 import org.camunda.bpm.engine.history.JobState;
 import org.camunda.bpm.engine.history.UserOperationLogContext;
-import org.camunda.bpm.engine.impl.HistoricJobLogQueryImpl;
 import org.camunda.bpm.engine.impl.cfg.IdGenerator;
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
 import org.camunda.bpm.engine.impl.context.Context;
@@ -588,7 +586,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
 
       // stacktrace
       String exceptionStacktrace = getJobExceptionStacktrace(exception);
-      byte[] exceptionBytes = getJobExceptionBytes(exceptionStacktrace);
+      byte[] exceptionBytes = toByteArray(exceptionStacktrace);
       ByteArrayEntity byteArray = createJobExceptionByteArray(exceptionBytes);
       event.setExceptionByteArrayId(byteArray.getId());
     }
@@ -619,33 +617,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     String jobId = jobEntity.getId();
     evt.setJobId(jobId);
     evt.setJobDefinitionId(jobEntity.getJobDefinitionId());
-
-    // try to initialize the activityId
-    String activityId = jobEntity.getActivityId();
-    if (activityId == null && !HistoryEventTypes.JOB_CREATE.equals(eventType)) {
-
-      // This must be done in case of an async catching signal
-      // event. In that case there does not exist a JobDefinition
-      // so that it is not easily possible to retrieve the associated
-      // activity id.
-
-      HistoricJobLogQueryImpl query = Context
-          .getCommandContext()
-          .getDbEntityManager()
-          .createHistoricJobLogQuery();
-
-      // query for the job create event
-      HistoricJobLog createJobLog = query
-          .jobId(jobId)
-          .creationLog()
-          .singleResult();
-
-      if (createJobLog != null) {
-        // use already know activity id
-        activityId = createJobLog.getActivityId();
-      }
-    }
-    evt.setActivityId(activityId);
+    evt.setActivityId(jobEntity.getActivityId());
 
     evt.setJobType(jobEntity.getType());
     evt.setJobHandlerType(jobEntity.getJobHandlerType());

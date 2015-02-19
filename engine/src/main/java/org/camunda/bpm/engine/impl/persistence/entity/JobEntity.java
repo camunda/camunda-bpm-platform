@@ -14,8 +14,8 @@ package org.camunda.bpm.engine.impl.persistence.entity;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 import static org.camunda.bpm.engine.impl.util.JobExceptionUtil.createJobExceptionByteArray;
-import static org.camunda.bpm.engine.impl.util.JobExceptionUtil.getJobExceptionBytes;
 import static org.camunda.bpm.engine.impl.util.JobExceptionUtil.getJobExceptionStacktrace;
+import static org.camunda.bpm.engine.impl.util.StringUtil.toByteArray;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -107,6 +107,9 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
       ExecutionEntity execution = getExecution();
       ensureNotNull("Cannot find execution with id '" + executionId + "' referenced from job '" + this + "'", "execution", execution);
     }
+
+    // initialize activity id
+    getActivityId();
 
     preExecute(commandContext);
     JobHandler jobHandler = getJobHandler();
@@ -378,7 +381,7 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
   }
 
   public void setExceptionStacktrace(String exception) {
-    byte[] exceptionBytes = getJobExceptionBytes(exception);
+    byte[] exceptionBytes = toByteArray(exception);
 
     ByteArrayEntity byteArray = getExceptionByteArray();
 
@@ -513,6 +516,12 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
       JobDefinition jobDefinition = getJobDefinition();
       if (jobDefinition != null) {
         activityId = jobDefinition.getActivityId();
+      }
+      else {
+        ExecutionEntity execution = getExecution();
+        if (execution != null) {
+          activityId = execution.getActivityId();
+        }
       }
     }
   }

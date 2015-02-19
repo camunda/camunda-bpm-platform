@@ -56,19 +56,6 @@ public class HistoricJobLogManager extends AbstractManager {
     return (Long) getDbEntityManager().selectOne("selectHistoricJobLogCountByQueryCriteria", query);
   }
 
-  // byte array select /////////////////////////////////////////////////////
-
-  protected List<String> findExceptionByteArrayIds(String key, Object value) {
-    Map<String, Object> parameterMap = new HashMap<String, Object>();
-    parameterMap.put(key, value);
-    return findExceptionByteArrayIdsByParameterMap(parameterMap);
-  }
-
-  @SuppressWarnings("unchecked")
-  protected List<String> findExceptionByteArrayIdsByParameterMap(Map<String, Object> parameterMap) {
-    return getDbEntityManager().selectList("selectExceptionByteArrayIds", parameterMap);
-  }
-
   // delete ///////////////////////////////////////////////////////////////////
 
   public void deleteHistoricJobLogById(String id) {
@@ -103,15 +90,10 @@ public class HistoricJobLogManager extends AbstractManager {
 
   // byte array delete ////////////////////////////////////////////////////////
 
-  protected void deleteExceptionByteArrayByParameterMap(String key, Object value) {
-    List<String> exceptionByteArrayIds = findExceptionByteArrayIds(key, value);
-    deleteExceptionByteArrayByIds(exceptionByteArrayIds);
-  }
-
-  protected void deleteExceptionByteArrayByIds(List<String> ids) {
-    if (ids != null && !ids.isEmpty()) {
-      getDbEntityManager().delete(ByteArrayEntity.class, "deleteExceptionByteArraysByIds", ids);
-    }
+  protected void deleteExceptionByteArrayByParameterMap(String key, String value) {
+    Map<String, String> parameterMap = new HashMap<String, String>();
+    parameterMap.put(key, value);
+    getDbEntityManager().delete(ByteArrayEntity.class, "deleteExceptionByteArraysByIds", parameterMap);
   }
 
   // fire history events ///////////////////////////////////////////////////////

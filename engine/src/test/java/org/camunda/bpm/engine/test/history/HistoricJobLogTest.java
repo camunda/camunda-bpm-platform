@@ -12,17 +12,25 @@
  */
 package org.camunda.bpm.engine.test.history;
 
+import java.util.Date;
+
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.HistoricJobLog;
 import org.camunda.bpm.engine.history.HistoricJobLogQuery;
+import org.camunda.bpm.engine.impl.interceptor.Command;
+import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.AsyncContinuationJobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.ProcessEventJobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerCatchIntermediateEventJobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerExecuteNestedActivityJobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerStartEventJobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerStartEventSubprocessJobHandler;
+import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.HistoricJobLogEventEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.impl.util.JobExceptionUtil;
+import org.camunda.bpm.engine.impl.util.StringUtil;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.api.runtime.FailingDelegate;
@@ -1038,6 +1046,49 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
     String stacktrace = historyService.getHistoricJobLogExceptionStacktrace(failedHistoricJobLogId);
     assertNotNull(stacktrace);
     assertTextPresent(ThrowExceptionWithoutMessageDelegate.class.getName(), stacktrace);
+  }
+
+  public void testDeleteByteArray() {
+    final String processDefinitionId = "myProcessDefition";
+
+    processEngineConfiguration.getCommandExecutorTxRequiresNew().execute(new Command<Void>() {
+
+      public Void execute(CommandContext commandContext) {
+
+        for (int i = 0; i < 1234; i++) {
+          HistoricJobLogEventEntity log = new HistoricJobLogEventEntity();
+          log.setJobId(String.valueOf(i));
+          log.setTimestamp(new Date());
+          log.setJobType(MessageEntity.TYPE);
+          log.setProcessDefinitionId(processDefinitionId);
+
+
+          byte[] aByteValue = StringUtil.toByteArray("abc");
+          ByteArrayEntity byteArray = JobExceptionUtil.createJobExceptionByteArray(aByteValue);
+          log.setExceptionByteArrayId(byteArray.getId());
+
+          commandContext
+            .getHistoricJobLogManager()
+            .insert(log);
+        }
+
+        return null;
+      }
+
+    });
+
+    assertEquals(1234, historyService.createHistoricJobLogQuery().count());
+
+    processEngineConfiguration.getCommandExecutorTxRequiresNew().execute(new Command<Void>() {
+
+      public Void execute(CommandContext commandContext) {
+        commandContext.getHistoricJobLogManager().deleteHistoricJobLogsByProcessDefinitionId(processDefinitionId);
+        return null;
+      }
+
+    });
+
+    assertEquals(0, historyService.createHistoricJobLogQuery().count());
   }
 
 }

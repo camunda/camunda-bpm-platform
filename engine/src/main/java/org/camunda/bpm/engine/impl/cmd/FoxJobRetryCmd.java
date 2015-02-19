@@ -89,7 +89,6 @@ public class FoxJobRetryCmd extends JobRetryCmd {
 
       logException(job);
       decrementRetries(job);
-      fireHistoricJobFailedEvt(job);
       notifyAcquisition(commandContext);
     }
   }

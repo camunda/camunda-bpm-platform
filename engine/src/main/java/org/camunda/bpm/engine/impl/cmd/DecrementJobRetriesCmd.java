@@ -32,7 +32,6 @@ public class DecrementJobRetriesCmd extends JobRetryCmd {
     unlockJob(job);
     logException(job);
     decrementRetries(job);
-    fireHistoricJobFailedEvt(job);
     notifyAcquisition(commandContext);
 
 

@@ -74,15 +74,12 @@
 
   <!-- BYTE ARRAY DELETE -->
 
-  <delete id="deleteExceptionByteArraysByIds" parameterType="java.util.List">
+  <delete id="deleteExceptionByteArraysByIds">
     delete
     from
         ${prefix}ACT_GE_BYTEARRAY
     <where>
-        ID_ in
-        <foreach collection="list" item="id" open="(" close=")" separator=",">
-          #{id}
-        </foreach>
+        ID_ in (<include refid="selectExceptionByteArrayIds"/>)
     </where>
   </delete>
 
@@ -110,42 +107,42 @@
 
   <!-- SELECT -->
 
-  <select id="selectExceptionByteArrayIds" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultType="string">
+  <sql id="selectExceptionByteArrayIds">
     select
         EXCEPTION_STACK_ID_
     from
         ${prefix}ACT_HI_JOB_LOG
     <where>
         EXCEPTION_STACK_ID_ is not null
-        <if test="parameter.id != null">
-        and ID_ = #{parameter.id, jdbcType=VARCHAR}
+        <if test="id != null">
+        and ID_ = #{id, jdbcType=VARCHAR}
         </if>
-        <if test="parameter.jobId != null">
-        and JOB_ID_ = #{parameter.jobId, jdbcType=VARCHAR}
+        <if test="jobId != null">
+        and JOB_ID_ = #{jobId, jdbcType=VARCHAR}
         </if>
-        <if test="parameter.jobDefinitionId != null">
-        and JOB_DEF_ID_ = #{parameter.jobDefinitionId, jdbcType=VARCHAR}
+        <if test="jobDefinitionId != null">
+        and JOB_DEF_ID_ = #{jobDefinitionId, jdbcType=VARCHAR}
         </if>
-        <if test="parameter.executionId != null">
-        and EXECUTION_ID_ = #{parameter.executionId, jdbcType=VARCHAR}
+        <if test="executionId != null">
+        and EXECUTION_ID_ = #{executionId, jdbcType=VARCHAR}
         </if>
-        <if test="parameter.processInstanceId != null">
-        and PROCESS_INSTANCE_ID_ = #{parameter.processInstanceId, jdbcType=VARCHAR}
+        <if test="processInstanceId != null">
+        and PROCESS_INSTANCE_ID_ = #{processInstanceId, jdbcType=VARCHAR}
         </if>
-        <if test="parameter.processDefinitionId != null">
-        and PROCESS_DEF_ID_ = #{parameter.processDefinitionId, jdbcType=VARCHAR}
+        <if test="processDefinitionId != null">
+        and PROCESS_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR}
         </if>
-        <if test="parameter.processDefinitionKey != null">
-        and PROCESS_DEF_KEY_ = #{parameter.processDefinitionKey, jdbcType=VARCHAR}
+        <if test="processDefinitionKey != null">
+        and PROCESS_DEF_KEY_ = #{processDefinitionKey, jdbcType=VARCHAR}
         </if>
-        <if test="parameter.deploymentId != null">
-        and DEPLOYMENT_ID_ = #{parameter.deploymentId, jdbcType=VARCHAR}
+        <if test="deploymentId != null">
+        and DEPLOYMENT_ID_ = #{deploymentId, jdbcType=VARCHAR}
         </if>
-        <if test="parameter.handlerType != null">
-        and HANDLER_TYPE_ = #{parameter.handlerType, jdbcType=VARCHAR}
+        <if test="handlerType != null">
+        and HANDLER_TYPE_ = #{handlerType, jdbcType=VARCHAR}
         </if>
     </where>
-  </select>
+  </sql>
 
   <select id="selectHistoricJobLog" resultMap="historicJobLogMap">
     select * from ${prefix}ACT_HI_JOB_LOG where ID_ = #{id}

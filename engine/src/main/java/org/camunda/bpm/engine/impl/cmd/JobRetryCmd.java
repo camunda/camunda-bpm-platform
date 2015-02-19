@@ -23,7 +23,6 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
 import org.camunda.bpm.engine.impl.jobexecutor.MessageAddedNotification;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
-import org.camunda.bpm.engine.runtime.Job;
 
 /**
  * @author Roman Smirnov
@@ -77,10 +76,6 @@ public abstract class JobRetryCmd implements Command<Object> {
     MessageAddedNotification messageAddedNotification = new MessageAddedNotification(jobExecutor);
     TransactionContext transactionContext = commandContext.getTransactionContext();
     transactionContext.addTransactionListener(TransactionState.COMMITTED, messageAddedNotification);
-  }
-
-  protected void fireHistoricJobFailedEvt(Job job) {
-    Context.getCommandContext().getHistoricJobLogManager().fireJobFailedEvent(job, exception);
   }
 
 }

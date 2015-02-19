@@ -14,9 +14,7 @@ package org.camunda.bpm.engine.impl.util;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
 
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
 
@@ -35,26 +33,8 @@ public class JobExceptionUtil {
   public static String getJobExceptionStacktrace(ByteArrayEntity byteArray) {
     String result = null;
     if(byteArray != null) {
-      try {
-        result = new String(byteArray.getBytes(), "UTF-8");
-      } catch (UnsupportedEncodingException e) {
-        throw new ProcessEngineException("UTF-8 is not a supported encoding.", e);
-      }
+      result = StringUtil.fromBytes(byteArray.getBytes());
     }
-    return result;
-  }
-
-  public static byte[] getJobExceptionBytes(String exception) {
-    byte[] result = null;
-
-    if (exception != null) {
-      try {
-        result = exception.getBytes("UTF-8");
-      } catch (UnsupportedEncodingException e) {
-        throw new ProcessEngineException("UTF-8 is not a supported encoding.", e);
-      }
-    }
-
     return result;
   }
 

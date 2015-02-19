@@ -16,10 +16,12 @@ package org.camunda.bpm.engine.impl.jobexecutor;
 import java.util.logging.Logger;
 
 import org.camunda.bpm.engine.impl.cfg.TransactionListener;
+import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandContextListener;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
+import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 
 
 /**
@@ -46,10 +48,29 @@ public class FailedJobListener implements TransactionListener, CommandContextLis
 
   public void execute(CommandContext commandContext) {
     FailedJobCommandFactory failedJobCommandFactory = commandContext.getFailedJobCommandFactory();
-    Command<Object> cmd = failedJobCommandFactory.getCommand(jobId, exception);
+    final Command<Object> cmd = failedJobCommandFactory.getCommand(jobId, exception);
 
     log.fine("Using FailedJobCommandFactory '" + failedJobCommandFactory.getClass() + "' and command of type '" + cmd.getClass() + "'");
-    commandExecutor.execute(cmd);
+    commandExecutor.execute(new Command<Void>() {
+
+      public Void execute(CommandContext commandContext) {
+        cmd.execute(commandContext);
+        fireHistoricJobFailedEvt(jobId);
+        return null;
+      }
+
+    });
+  }
+
+  protected void fireHistoricJobFailedEvt(String jobId) {
+    CommandContext commandContext = Context.getCommandContext();
+    JobEntity job = commandContext
+        .getJobManager()
+        .findJobById(jobId);
+
+    commandContext
+      .getHistoricJobLogManager()
+      .fireJobFailedEvent(job, exception);
   }
 
   public void setException(Throwable exception) {
