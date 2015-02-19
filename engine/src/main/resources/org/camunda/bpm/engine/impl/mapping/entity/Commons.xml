@@ -28,11 +28,11 @@
       <trim prefix="(" prefixOverrides="and" suffix=")">
         <if test="!valueCondition.type.equals('null')">
         <!-- When type of value is null, type doesn't matter! -->
-        and ${varPrefix}${varTypeField} = #{valueCondition.type}
+        and ${varPrefix}${varTypeField} is not null and ${varPrefix}${varTypeField} = #{valueCondition.type}
         </if>
          
         <if test="valueCondition.textValue != null &amp;&amp; valueCondition.longValue == null &amp;&amp; valueCondition.doubleValue == null">
-          and ${varPrefix}TEXT_
+          and ${varPrefix}TEXT_ is not null and ${varPrefix}TEXT_
         <choose>
           <when test="queryVariableValue.operatorName.equals('LIKE')">LIKE</when>
           <otherwise><include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.executionVariableOperator" /></otherwise>
@@ -40,7 +40,7 @@
           #{valueCondition.textValue}
         </if>
         <if test="valueCondition.textValue2 != null">
-          and ${varPrefix}TEXT2_
+          and ${varPrefix}TEXT2_ is not null and ${varPrefix}TEXT2_
         <choose>
           <when test="queryVariableValue.operatorName.equals('LIKE')">LIKE</when>
           <otherwise><include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.executionVariableOperator" /></otherwise>
@@ -49,13 +49,13 @@
         </if>
     
         <if test="valueCondition.longValue != null">
-          and ${varPrefix}LONG_
+          and ${varPrefix}LONG_ is not null and ${varPrefix}LONG_
           <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.executionVariableOperator" />
           #{valueCondition.longValue}
         </if>
     
         <if test="valueCondition.doubleValue != null">
-          and ${varPrefix}DOUBLE_
+          and ${varPrefix}DOUBLE_ is not null and ${varPrefix}DOUBLE_
           <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.executionVariableOperator" />
           #{valueCondition.doubleValue}
         </if>

@@ -1498,7 +1498,7 @@ public class ProcessInstanceQueryTest extends PluggableProcessEngineTestCase {
     runtimeService.startProcessInstanceByKey("oneTaskProcess",
         Collections.<String, Object>singletonMap("var", "123"));
 
-    assertEquals(3, runtimeService.createProcessInstanceQuery().variableValueNotEquals("var", Variables.numberValue(123)).count());
+    assertEquals(4, runtimeService.createProcessInstanceQuery().variableValueNotEquals("var", Variables.numberValue(123)).count());
     assertEquals(1, runtimeService.createProcessInstanceQuery().variableValueGreaterThan("var", Variables.numberValue(123)).count());
     assertEquals(5, runtimeService.createProcessInstanceQuery().variableValueGreaterThanOrEqual("var", Variables.numberValue(123)).count());
     assertEquals(0, runtimeService.createProcessInstanceQuery().variableValueLessThan("var", Variables.numberValue(123)).count());
@@ -1602,6 +1602,63 @@ public class ProcessInstanceQueryTest extends PluggableProcessEngineTestCase {
     } catch (NullValueException e) {
       // expected
     }
+  }
+
+  @Deployment(resources={
+  "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void testQueryNullValue() {
+    // typed null
+    ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Variables.createVariables().putValueTyped("var", Variables.stringValue(null)));
+
+    // untyped null
+    ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Variables.createVariables().putValueTyped("var", null));
+
+    // non-null String value
+    ProcessInstance processInstance3 = runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Variables.createVariables().putValue("var", "a String Value"));
+
+    ProcessInstance processInstance4 = runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Variables.createVariables().putValue("var", "another String Value"));
+
+    // (1) query for untyped null: should return typed and untyped null (notEquals: the opposite)
+    List<ProcessInstance> instances =
+        runtimeService.createProcessInstanceQuery().variableValueEquals("var", null).list();
+    verifyResultContainsExactly(instances, asSet(processInstance1.getId(), processInstance2.getId()));
+    instances = runtimeService.createProcessInstanceQuery().variableValueNotEquals("var", null).list();
+    verifyResultContainsExactly(instances, asSet(processInstance3.getId(), processInstance4.getId()));
+
+    // (2) query for typed null: should return typed null only (notEquals: the opposite)
+    instances = runtimeService.createProcessInstanceQuery()
+        .variableValueEquals("var", Variables.stringValue(null)).list();
+    verifyResultContainsExactly(instances, asSet(processInstance1.getId()));
+    instances = runtimeService.createProcessInstanceQuery()
+        .variableValueNotEquals("var", Variables.stringValue(null)).list();
+    verifyResultContainsExactly(instances, asSet(processInstance2.getId(), processInstance3.getId(), processInstance4.getId()));
+
+    // (3) query for typed value: should return typed value only (notEquals: the opposite)
+    instances = runtimeService.createProcessInstanceQuery()
+        .variableValueEquals("var", "a String Value").list();
+    verifyResultContainsExactly(instances, asSet(processInstance3.getId()));
+    instances = runtimeService.createProcessInstanceQuery()
+        .variableValueNotEquals("var", "a String Value").list();
+    verifyResultContainsExactly(instances, asSet(processInstance1.getId(), processInstance2.getId(), processInstance4.getId()));
+
+
+  }
+
+  protected <T> Set<T> asSet(T... elements) {
+    return new HashSet<T>(Arrays.asList(elements));
+  }
+
+  protected void verifyResultContainsExactly(List<ProcessInstance> instances, Set<String> processInstanceIds) {
+    Set<String> retrievedInstanceIds = new HashSet<String>();
+    for (ProcessInstance instance : instances) {
+      retrievedInstanceIds.add(instance.getId());
+    }
+
+    assertEquals(processInstanceIds, retrievedInstanceIds);
   }
 
 }
