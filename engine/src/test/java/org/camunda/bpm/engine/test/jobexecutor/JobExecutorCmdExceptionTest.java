@@ -35,7 +35,6 @@ public class JobExecutorCmdExceptionTest extends PluggableProcessEngineTestCase 
     processEngineConfiguration.getJobHandlers().remove(tweetExceptionHandler.getType());
     processEngineConfiguration.getJobHandlers().remove(nestedCommandExceptionHandler.getType());
     clearDatabase();
-    System.out.println("test");
   }
 
   public void testJobCommandsWith2Exceptions() {
