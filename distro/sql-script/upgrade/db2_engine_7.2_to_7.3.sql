@@ -40,3 +40,8 @@ create table ACT_HI_JOB_LOG (
     JOB_STATE_ integer,
     primary key (ID_)
 );
+
+-- remove unused columns
+
+ALTER TABLE ACT_HI_ACTINST
+  DROP COLUMN OWNER_;
