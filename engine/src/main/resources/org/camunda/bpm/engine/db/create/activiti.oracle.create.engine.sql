@@ -157,7 +157,6 @@ create table ACT_RU_VARIABLE (
     TEXT_ NVARCHAR2(2000),
     TEXT2_ NVARCHAR2(2000),
     VAR_SCOPE_ NVARCHAR2(64) not null,
-    DATA_FORMAT_ID_ NVARCHAR2(64),
     primary key (ID_)
 );
 
