@@ -1,5 +1,40 @@
 .dashboard-view {
-  margin: 10px;
+  > view {
+    margin: 10px 10px @grid-gutter-width 10px;
+    overflow: visible;
+    display: block;
+    padding-bottom: @grid-gutter-width;
+    border-bottom: @line-style @line-color 1px;
+  }
+  &:last-child view {
+    border-bottom: 0;
+    margin-bottom: 10px;
+  }
+
+  .search-label {
+    background-color: @gray-lighter;
+    border: 1px solid @gray;
+    border-color: transparent transparent @gray transparent;
+    .remove-search {
+      color: @gray-light;
+      &:hover {
+        color: @gray;
+      }
+    }
+  }
+
+  .has-search .main-field {
+    margin-top: @padding-base-horizontal;
+  }
+
+  .search-results {
+    margin-top: @grid-gutter-width;
+    margin-bottom: 0;
+  }
+
+  .pagination {
+    margin-bottom: 0;
+  }
 }
 
 .deployed-processes .tab-pane {
@@ -27,24 +62,24 @@
   .make-md-column(4);
   .make-lg-column(3);
   margin-bottom: (@grid-gutter-width / 2);
-}
 
-.tile > a {
-  display: block;
-  width: 100%;
-  color: @gray;
+  > a {
+    display: block;
+    width: 100%;
+    color: @gray;
 
-  &:hover,
-  &:focus {
-    .box-shadow(0 1px 4px fade(@link-color, 50));
+    &:hover,
+    &:focus {
+      .box-shadow(0 1px 4px fade(@link-color, 50));
 
-    .tile-header,
-    .tile-footer {
-      border-color: @link-color;
-    }
-    .tile-body {
-      border-left-color: @link-color;
-      border-right-color: @link-color;
+      .tile-header,
+      .tile-footer {
+        border-color: @link-color;
+      }
+      .tile-body {
+        border-left-color: @link-color;
+        border-right-color: @link-color;
+      }
     }
   }
 }
@@ -55,19 +90,19 @@
   margin: 0;
   background: @breadcrumb-bg;
   border: 1px solid @breadcrumb-color;
-  padding: @border-radius-base;
+  padding: @padding-base-vertical;
 }
 
 .tile-header {
   border-bottom: none;
   border-radius: 0;
-  padding: (@border-radius-base * 2) @border-radius-base;
+  padding: @padding-base-vertical;
   .border-top-radius(@border-radius-base);
   .text-overflow();
 }
 
 .tile-body {
-  padding: @border-radius-base;
+  padding: @padding-base-vertical;
   height: 218px;
   border: 1px solid @breadcrumb-color;
   text-align: center;
@@ -98,7 +133,7 @@
     position: absolute;
     top: 50%;
     margin-top: (0 - (@state-circle-size / 2));
-    right: @border-radius-base;
+    right: @padding-base-vertical;
   }
 }
 
