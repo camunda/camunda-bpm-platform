@@ -32,14 +32,6 @@ public class HistoricJobLogEvent extends HistoryEvent {
 
   protected String jobId;
 
-  protected String jobDefinitionId;
-
-  protected String activityId;
-
-  protected String jobType;
-
-  protected String jobHandlerType;
-
   protected Date jobDueDate;
 
   protected int jobRetries;
@@ -47,6 +39,14 @@ public class HistoricJobLogEvent extends HistoryEvent {
   protected String jobExceptionMessage;
 
   protected String exceptionByteArrayId;
+
+  protected String jobDefinitionId;
+
+  protected String jobDefinitionType;
+
+  protected String jobDefinitionConfiguration;
+
+  protected String activityId;
 
   protected String processDefinitionKey;
 
@@ -68,38 +68,6 @@ public class HistoricJobLogEvent extends HistoryEvent {
 
   public void setJobId(String jobId) {
     this.jobId = jobId;
-  }
-
-  public String getJobDefinitionId() {
-    return jobDefinitionId;
-  }
-
-  public void setJobDefinitionId(String jobDefinitionId) {
-    this.jobDefinitionId = jobDefinitionId;
-  }
-
-  public String getActivityId() {
-    return activityId;
-  }
-
-  public void setActivityId(String activityId) {
-    this.activityId = activityId;
-  }
-
-  public String getJobType() {
-    return jobType;
-  }
-
-  public void setJobType(String jobType) {
-    this.jobType = jobType;
-  }
-
-  public String getJobHandlerType() {
-    return jobHandlerType;
-  }
-
-  public void setJobHandlerType(String jobHandlerType) {
-    this.jobHandlerType = jobHandlerType;
   }
 
   public Date getJobDueDate() {
@@ -148,6 +116,38 @@ public class HistoricJobLogEvent extends HistoryEvent {
     }
 
     return null;
+  }
+
+  public String getJobDefinitionId() {
+    return jobDefinitionId;
+  }
+
+  public void setJobDefinitionId(String jobDefinitionId) {
+    this.jobDefinitionId = jobDefinitionId;
+  }
+
+  public String getJobDefinitionType() {
+    return jobDefinitionType;
+  }
+
+  public void setJobDefinitionType(String jobDefinitionType) {
+    this.jobDefinitionType = jobDefinitionType;
+  }
+
+  public String getJobDefinitionConfiguration() {
+    return jobDefinitionConfiguration;
+  }
+
+  public void setJobDefinitionConfiguration(String jobDefinitionConfiguration) {
+    this.jobDefinitionConfiguration = jobDefinitionConfiguration;
+  }
+
+  public String getActivityId() {
+    return activityId;
+  }
+
+  public void setActivityId(String activityId) {
+    this.activityId = activityId;
   }
 
   public String getProcessDefinitionKey() {

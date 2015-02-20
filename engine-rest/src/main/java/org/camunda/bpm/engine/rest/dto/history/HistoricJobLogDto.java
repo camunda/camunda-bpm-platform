@@ -24,14 +24,17 @@ public class HistoricJobLogDto {
 
   protected String id;
   protected Date timestamp;
+
   protected String jobId;
-  protected String jobDefinitionId;
-  protected String activityId;
-  protected String jobType;
-  protected String jobHandlerType;
   protected Date jobDueDate;
   protected int jobRetries;
   protected String jobExceptionMessage;
+
+  protected String jobDefinitionId;
+  protected String jobDefinitionType;
+  protected String jobDefinitionConfiguration;
+
+  protected String activityId;
   protected String executionId;
   protected String processInstanceId;
   protected String processDefinitionId;
@@ -55,22 +58,6 @@ public class HistoricJobLogDto {
     return jobId;
   }
 
-  public String getJobDefinitionId() {
-    return jobDefinitionId;
-  }
-
-  public String getActivityId() {
-    return activityId;
-  }
-
-  public String getJobType() {
-    return jobType;
-  }
-
-  public String getJobHandlerType() {
-    return jobHandlerType;
-  }
-
   public Date getJobDueDate() {
     return jobDueDate;
   }
@@ -81,6 +68,22 @@ public class HistoricJobLogDto {
 
   public String getJobExceptionMessage() {
     return jobExceptionMessage;
+  }
+
+  public String getJobDefinitionId() {
+    return jobDefinitionId;
+  }
+
+  public String getJobDefinitionType() {
+    return jobDefinitionType;
+  }
+
+  public String getJobDefinitionConfiguration() {
+    return jobDefinitionConfiguration;
+  }
+
+  public String getActivityId() {
+    return activityId;
   }
 
   public String getExecutionId() {
@@ -124,14 +127,17 @@ public class HistoricJobLogDto {
 
     result.id = historicJobLog.getId();
     result.timestamp = historicJobLog.getTimestamp();
+
     result.jobId = historicJobLog.getJobId();
-    result.jobDefinitionId = historicJobLog.getJobDefinitionId();
-    result.activityId = historicJobLog.getActivityId();
-    result.jobType = historicJobLog.getJobType();
-    result.jobHandlerType = historicJobLog.getJobHandlerType();
     result.jobDueDate = historicJobLog.getJobDueDate();
     result.jobRetries = historicJobLog.getJobRetries();
     result.jobExceptionMessage = historicJobLog.getJobExceptionMessage();
+
+    result.jobDefinitionId = historicJobLog.getJobDefinitionId();
+    result.jobDefinitionType = historicJobLog.getJobDefinitionType();
+    result.jobDefinitionConfiguration = historicJobLog.getJobDefinitionConfiguration();
+
+    result.activityId = historicJobLog.getActivityId();
     result.executionId = historicJobLog.getExecutionId();
     result.processInstanceId = historicJobLog.getProcessInstanceId();
     result.processDefinitionId = historicJobLog.getProcessDefinitionId();

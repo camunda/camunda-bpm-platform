@@ -26,14 +26,20 @@ public interface HistoricJobLogQuery extends Query<HistoricJobLogQuery, Historic
   /** Only select historic job log entries with the given job id. */
   HistoricJobLogQuery jobId(String jobId);
 
+  /** Only select historic job log entries with the given exception message. */
+  HistoricJobLogQuery jobExceptionMessage(String exceptionMessage);
+
   /** Only select historic job log entries with the given job definition id. */
   HistoricJobLogQuery jobDefinitionId(String jobDefinitionId);
 
+  /** Only select historic job log entries with the given job definition type. */
+  HistoricJobLogQuery jobDefinitionType(String jobDefinitionType);
+
+  /** Only select historic job log entries with the given job definition configuration type. */
+  HistoricJobLogQuery jobDefinitionConfiguration(String jobDefinitionConfiguration);
+
   /** Only select historic job log entries which are associated with one of the given activity ids. **/
   HistoricJobLogQuery activityIdIn(String... activityIds);
-
-  /** Only select historic job log entries with the given job handler type. */
-  HistoricJobLogQuery jobHandlerType(String handlerType);
 
   /** Only select historic job log entries which are associated with one of the given execution ids. **/
   HistoricJobLogQuery executionIdIn(String... executionIds);
@@ -49,21 +55,6 @@ public interface HistoricJobLogQuery extends Query<HistoricJobLogQuery, Historic
 
   /** Only select historic job log entries with the deployment id. */
   HistoricJobLogQuery deploymentId(String deploymentId);
-
-  /** Only select historic job log entries with the given exception message. */
-  HistoricJobLogQuery jobExceptionMessage(String exceptionMessage);
-
-  /**
-   * Only select historic job log entries for timers.
-   * Cannot be used together with {@link HistoricJobLogQuery#jobMessages()}.
-   */
-  HistoricJobLogQuery jobTimers();
-
-  /**
-   * Only select historic job log entries for messages.
-   * Cannot be used together with {@link HistoricJobLogQuery#jobTimers()}.
-   */
-  HistoricJobLogQuery jobMessages();
 
   /** Only select created historic job log entries. */
   HistoricJobLogQuery creationLog();
@@ -86,14 +77,14 @@ public interface HistoricJobLogQuery extends Query<HistoricJobLogQuery, Historic
   /** Order by job id (needs to be followed by {@link #asc()} or {@link #desc()}). */
   HistoricJobLogQuery orderByJobId();
 
-  /** Order by job definition id (needs to be followed by {@link #asc()} or {@link #desc()}). */
-  HistoricJobLogQuery orderByJobDefinitionId();
-
   /** Order by job due date (needs to be followed by {@link #asc()} or {@link #desc()}). */
   HistoricJobLogQuery orderByJobDueDate();
 
   /** Order by job retries (needs to be followed by {@link #asc()} or {@link #desc()}). */
   HistoricJobLogQuery orderByJobRetries();
+
+  /** Order by job definition id (needs to be followed by {@link #asc()} or {@link #desc()}). */
+  HistoricJobLogQuery orderByJobDefinitionId();
 
   /** Order by activity id (needs to be followed by {@link #asc()} or {@link #desc()}). */
   HistoricJobLogQuery orderByActivityId();

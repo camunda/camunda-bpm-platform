@@ -54,8 +54,8 @@ public class FailedJobListener implements TransactionListener, CommandContextLis
     commandExecutor.execute(new Command<Void>() {
 
       public Void execute(CommandContext commandContext) {
-        cmd.execute(commandContext);
         fireHistoricJobFailedEvt(jobId);
+        cmd.execute(commandContext);
         return null;
       }
 

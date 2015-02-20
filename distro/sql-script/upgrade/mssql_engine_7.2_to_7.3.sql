@@ -21,22 +21,22 @@ ALTER TABLE ACT_HI_CASEACTINST
   ADD REQUIRED_ tinyint;
 
 create table ACT_HI_JOB_LOG (
-    ID_ varchar(64) not null,
+    ID_ nvarchar(64) not null,
     TIMESTAMP_ datetime2 not null,
     JOB_ID_ nvarchar(64) not null,
+    JOB_DUEDATE_ datetime2,
+    JOB_RETRIES_ integer,
+    JOB_EXCEPTION_MSG_ nvarchar(4000),
+    JOB_EXCEPTION_STACK_ID_ nvarchar(64),
+    JOB_STATE_ integer,
     JOB_DEF_ID_ nvarchar(64),
+    JOB_DEF_TYPE_ nvarchar(255),
+    JOB_DEF_CONFIGURATION_ nvarchar(255),
     ACT_ID_ nvarchar(64),
-    TYPE_ nvarchar(255) not null,
-    HANDLER_TYPE_ nvarchar(255),
-    DUEDATE_ datetime2,
-    RETRIES_ integer,
-    EXCEPTION_MSG_ nvarchar(4000),
-    EXCEPTION_STACK_ID_ nvarchar(64),
     EXECUTION_ID_ nvarchar(64),
     PROCESS_INSTANCE_ID_ nvarchar(64),
     PROCESS_DEF_ID_ nvarchar(64),
     PROCESS_DEF_KEY_ nvarchar(64),
     DEPLOYMENT_ID_ nvarchar(64),
-    JOB_STATE_ integer,
     primary key (ID_)
 );

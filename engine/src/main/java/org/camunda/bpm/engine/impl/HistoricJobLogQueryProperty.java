@@ -29,7 +29,7 @@ public interface HistoricJobLogQueryProperty {
   public static final QueryProperty PROCESS_DEFINITION_ID = new QueryPropertyImpl("PROCESS_DEF_ID_");
   public static final QueryProperty PROCESS_DEFINITION_KEY = new QueryPropertyImpl("PROCESS_DEF_KEY_");
   public static final QueryProperty DEPLOYMENT_ID = new QueryPropertyImpl("DEPLOYMENT_ID_");
-  public static final QueryProperty DUEDATE = new QueryPropertyImpl("DUEDATE_");
-  public static final QueryProperty RETRIES = new QueryPropertyImpl("RETRIES_");
+  public static final QueryProperty DUEDATE = new QueryPropertyImpl("JOB_DUEDATE_");
+  public static final QueryProperty RETRIES = new QueryPropertyImpl("JOB_RETRIES_");
 
 }

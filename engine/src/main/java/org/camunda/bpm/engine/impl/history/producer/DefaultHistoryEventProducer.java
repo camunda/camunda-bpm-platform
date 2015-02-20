@@ -49,6 +49,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.camunda.bpm.engine.impl.pvm.PvmScope;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
+import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.runtime.Job;
 
@@ -609,21 +610,26 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
   }
 
   protected void initHistoricJobLogEvent(HistoricJobLogEventEntity evt, Job job, HistoryEventType eventType) {
+    evt.setTimestamp(new Date());
+
     JobEntity jobEntity = (JobEntity) job;
-
-    Date now = new Date();
-    evt.setTimestamp(now);
-
-    String jobId = jobEntity.getId();
-    evt.setJobId(jobId);
-    evt.setJobDefinitionId(jobEntity.getJobDefinitionId());
-    evt.setActivityId(jobEntity.getActivityId());
-
-    evt.setJobType(jobEntity.getType());
-    evt.setJobHandlerType(jobEntity.getJobHandlerType());
+    evt.setJobId(jobEntity.getId());
     evt.setJobDueDate(jobEntity.getDuedate());
     evt.setJobRetries(jobEntity.getRetries());
 
+    JobDefinition jobDefinition = jobEntity.getJobDefinition();
+    if (jobDefinition != null) {
+      evt.setJobDefinitionId(jobDefinition.getId());
+      evt.setJobDefinitionType(jobDefinition.getJobType());
+      evt.setJobDefinitionConfiguration(jobDefinition.getJobConfiguration());
+    }
+    else {
+      // in case of async signal there does not exist a job definition
+      // but we use the jobHandlerType as jobDefinitionType
+      evt.setJobDefinitionType(jobEntity.getJobHandlerType());
+    }
+
+    evt.setActivityId(jobEntity.getActivityId());
     evt.setExecutionId(jobEntity.getExecutionId());
     evt.setProcessInstanceId(jobEntity.getProcessInstanceId());
     evt.setProcessDefinitionId(jobEntity.getProcessDefinitionId());

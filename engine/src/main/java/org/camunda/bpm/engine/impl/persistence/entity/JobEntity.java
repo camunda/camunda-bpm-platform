@@ -436,7 +436,7 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
     this.jobDefinitionId = jobDefinitionId;
   }
 
-  protected JobDefinition getJobDefinition() {
+  public JobDefinition getJobDefinition() {
     ensureJobDefinitionInitialized();
     return jobDefinition;
   }

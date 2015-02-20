@@ -386,13 +386,13 @@ public abstract class AbstractHistoricJobLogRestServiceQueryTest extends Abstrac
     String returnedId = from(content).getString("[0].id");
     String returnedTimestamp = from(content).getString("[0].timestamp");
     String returnedJobId = from(content).getString("[0].jobId");
-    String returnedJobDefinitionId = from(content).getString("[0].jobDefinitionId");
-    String returnedActivityId = from(content).getString("[0].activityId");
-    String returnedJobType = from(content).getString("[0].jobType");
-    String returnedJobHanderType = from(content).getString("[0].jobHandlerType");
     String returnedJobDueDate = from(content).getString("[0].jobDueDate");
     int returnedJobRetries = from(content).getInt("[0].jobRetries");
     String returnedJobExceptionMessage = from(content).getString("[0].jobExceptionMessage");
+    String returnedJobDefinitionId = from(content).getString("[0].jobDefinitionId");
+    String returnedJobDefinitionType = from(content).getString("[0].jobDefinitionType");
+    String returnedJobDefinitionConfiguration = from(content).getString("[0].jobDefinitionConfiguration");
+    String returnedActivityId = from(content).getString("[0].activityId");
     String returnedExecutionId = from(content).getString("[0].executionId");
     String returnedProcessInstanceId = from(content).getString("[0].processInstanceId");
     String returnedProcessDefinitionId = from(content).getString("[0].processDefinitionId");
@@ -406,13 +406,13 @@ public abstract class AbstractHistoricJobLogRestServiceQueryTest extends Abstrac
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_JOB_LOG_ID, returnedId);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_JOB_LOG_TIMESTAMP, returnedTimestamp);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_JOB_LOG_JOB_ID, returnedJobId);
-    Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_JOB_LOG_JOB_DEF_ID, returnedJobDefinitionId);
-    Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_JOB_LOG_ACTIVITY_ID, returnedActivityId);
-    Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_JOB_LOG_JOB_TYPE, returnedJobType);
-    Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_JOB_LOG_JOB_HANDLER_TYPE, returnedJobHanderType);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_JOB_LOG_JOB_DUE_DATE, returnedJobDueDate);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_JOB_LOG_JOB_RETRIES, returnedJobRetries);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_JOB_LOG_JOB_EXCEPTION_MSG, returnedJobExceptionMessage);
+    Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_JOB_LOG_JOB_DEF_ID, returnedJobDefinitionId);
+    Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_JOB_LOG_JOB_DEF_TYPE, returnedJobDefinitionType);
+    Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_JOB_LOG_JOB_DEF_CONFIG, returnedJobDefinitionConfiguration);
+    Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_JOB_LOG_ACTIVITY_ID, returnedActivityId);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_JOB_LOG_EXECUTION_ID, returnedExecutionId);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_JOB_LOG_PROC_INST_ID, returnedProcessInstanceId);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_JOB_LOG_PROC_DEF_ID, returnedProcessDefinitionId);
@@ -452,13 +452,13 @@ public abstract class AbstractHistoricJobLogRestServiceQueryTest extends Abstrac
     String returnedId = from(content).getString("[0].id");
     String returnedTimestamp = from(content).getString("[0].timestamp");
     String returnedJobId = from(content).getString("[0].jobId");
-    String returnedJobDefinitionId = from(content).getString("[0].jobDefinitionId");
-    String returnedActivityId = from(content).getString("[0].activityId");
-    String returnedJobType = from(content).getString("[0].jobType");
-    String returnedJobHanderType = from(content).getString("[0].jobHandlerType");
     String returnedJobDueDate = from(content).getString("[0].jobDueDate");
     int returnedJobRetries = from(content).getInt("[0].jobRetries");
     String returnedJobExceptionMessage = from(content).getString("[0].jobExceptionMessage");
+    String returnedJobDefinitionId = from(content).getString("[0].jobDefinitionId");
+    String returnedJobDefinitionType = from(content).getString("[0].jobDefinitionType");
+    String returnedJobDefinitionConfiguration = from(content).getString("[0].jobDefinitionConfiguration");
+    String returnedActivityId = from(content).getString("[0].activityId");
     String returnedExecutionId = from(content).getString("[0].executionId");
     String returnedProcessInstanceId = from(content).getString("[0].processInstanceId");
     String returnedProcessDefinitionId = from(content).getString("[0].processDefinitionId");
@@ -472,13 +472,13 @@ public abstract class AbstractHistoricJobLogRestServiceQueryTest extends Abstrac
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_JOB_LOG_ID, returnedId);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_JOB_LOG_TIMESTAMP, returnedTimestamp);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_JOB_LOG_JOB_ID, returnedJobId);
-    Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_JOB_LOG_JOB_DEF_ID, returnedJobDefinitionId);
-    Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_JOB_LOG_ACTIVITY_ID, returnedActivityId);
-    Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_JOB_LOG_JOB_TYPE, returnedJobType);
-    Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_JOB_LOG_JOB_HANDLER_TYPE, returnedJobHanderType);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_JOB_LOG_JOB_DUE_DATE, returnedJobDueDate);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_JOB_LOG_JOB_RETRIES, returnedJobRetries);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_JOB_LOG_JOB_EXCEPTION_MSG, returnedJobExceptionMessage);
+    Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_JOB_LOG_JOB_DEF_ID, returnedJobDefinitionId);
+    Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_JOB_LOG_JOB_DEF_TYPE, returnedJobDefinitionType);
+    Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_JOB_LOG_JOB_DEF_CONFIG, returnedJobDefinitionConfiguration);
+    Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_JOB_LOG_ACTIVITY_ID, returnedActivityId);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_JOB_LOG_EXECUTION_ID, returnedExecutionId);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_JOB_LOG_PROC_INST_ID, returnedProcessInstanceId);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_JOB_LOG_PROC_DEF_ID, returnedProcessDefinitionId);
@@ -526,9 +526,10 @@ public abstract class AbstractHistoricJobLogRestServiceQueryTest extends Abstrac
 
     parameters.put("logId", MockProvider.EXAMPLE_HISTORIC_JOB_LOG_ID);
     parameters.put("jobId", MockProvider.EXAMPLE_HISTORIC_JOB_LOG_JOB_ID);
-    parameters.put("jobDefinitionId", MockProvider.EXAMPLE_HISTORIC_JOB_LOG_JOB_DEF_ID);
-    parameters.put("jobHandlerType", MockProvider.EXAMPLE_HISTORIC_JOB_LOG_JOB_HANDLER_TYPE);
     parameters.put("jobExceptionMessage", MockProvider.EXAMPLE_HISTORIC_JOB_LOG_JOB_EXCEPTION_MSG);
+    parameters.put("jobDefinitionId", MockProvider.EXAMPLE_HISTORIC_JOB_LOG_JOB_DEF_ID);
+    parameters.put("jobDefinitionType", MockProvider.EXAMPLE_HISTORIC_JOB_LOG_JOB_DEF_CONFIG);
+    parameters.put("jobDefinitionConfiguration", MockProvider.EXAMPLE_HISTORIC_JOB_LOG_JOB_DEF_CONFIG);
     parameters.put("processInstanceId", MockProvider.EXAMPLE_HISTORIC_JOB_LOG_PROC_INST_ID);
     parameters.put("processDefinitionId", MockProvider.EXAMPLE_HISTORIC_JOB_LOG_PROC_DEF_ID);
     parameters.put("processDefinitionKey", MockProvider.EXAMPLE_HISTORIC_JOB_LOG_PROC_DEF_KEY);
@@ -542,9 +543,10 @@ public abstract class AbstractHistoricJobLogRestServiceQueryTest extends Abstrac
 
     verify(mockedQuery).logId(stringQueryParameters.get("logId"));
     verify(mockedQuery).jobId(stringQueryParameters.get("jobId"));
-    verify(mockedQuery).jobDefinitionId(stringQueryParameters.get("jobDefinitionId"));
-    verify(mockedQuery).jobHandlerType(stringQueryParameters.get("jobHandlerType"));
     verify(mockedQuery).jobExceptionMessage(stringQueryParameters.get("jobExceptionMessage"));
+    verify(mockedQuery).jobDefinitionId(stringQueryParameters.get("jobDefinitionId"));
+    verify(mockedQuery).jobDefinitionType(stringQueryParameters.get("jobDefinitionType"));
+    verify(mockedQuery).jobDefinitionConfiguration(stringQueryParameters.get("jobDefinitionConfiguration"));
     verify(mockedQuery).processInstanceId(stringQueryParameters.get("processInstanceId"));
     verify(mockedQuery).processDefinitionId(stringQueryParameters.get("processDefinitionId"));
     verify(mockedQuery).processDefinitionKey(stringQueryParameters.get("processDefinitionKey"));
@@ -652,95 +654,4 @@ public abstract class AbstractHistoricJobLogRestServiceQueryTest extends Abstrac
     verify(mockedQuery).list();
   }
 
-  @Test
-  public void testMessagesParameter() {
-    given()
-      .queryParam("jobMessages", true)
-    .then()
-      .expect()
-        .statusCode(Status.OK.getStatusCode())
-      .when()
-        .get(HISTORIC_JOB_LOG_RESOURCE_URL);
-
-    verify(mockedQuery).jobMessages();
-    verify(mockedQuery).list();
-  }
-
-  @Test
-  public void testMessagesParameterAsPost() {
-    Map<String, Boolean> json = new HashMap<String, Boolean>();
-    json.put("jobMessages", true);
-
-    given()
-      .contentType(POST_JSON_CONTENT_TYPE)
-      .body(json)
-    .then()
-      .expect()
-        .statusCode(Status.OK.getStatusCode())
-      .when()
-        .post(HISTORIC_JOB_LOG_RESOURCE_URL);
-
-    verify(mockedQuery).jobMessages();
-    verify(mockedQuery).list();
-  }
-
-  @Test
-  public void testJobTimersParameter() {
-    given()
-      .queryParam("jobTimers", true)
-    .then()
-      .expect()
-        .statusCode(Status.OK.getStatusCode())
-      .when()
-        .get(HISTORIC_JOB_LOG_RESOURCE_URL);
-
-    verify(mockedQuery).jobTimers();
-    verify(mockedQuery).list();
-  }
-
-  @Test
-  public void testJobTimersParameterAsPost() {
-    Map<String, Boolean> json = new HashMap<String, Boolean>();
-    json.put("jobTimers", true);
-
-    given()
-      .contentType(POST_JSON_CONTENT_TYPE)
-      .body(json)
-    .then()
-      .expect()
-        .statusCode(Status.OK.getStatusCode())
-      .when()
-        .post(HISTORIC_JOB_LOG_RESOURCE_URL);
-
-    verify(mockedQuery).jobTimers();
-    verify(mockedQuery).list();
-  }
-
-  @Test
-  public void testJobTimersAndJobMessagesParameter() {
-    given()
-      .queryParam("jobTimers", true)
-      .queryParam("jobMessages", true)
-    .then()
-      .expect()
-        .statusCode(Status.BAD_REQUEST.getStatusCode())
-      .when()
-        .get(HISTORIC_JOB_LOG_RESOURCE_URL);
-  }
-
-  @Test
-  public void testJobTimersAndJobMessagesParameterAsPost() {
-    Map<String, Boolean> json = new HashMap<String, Boolean>();
-    json.put("jobTimers", true);
-    json.put("jobMessages", true);
-
-    given()
-      .contentType(POST_JSON_CONTENT_TYPE)
-      .body(json)
-    .then()
-      .expect()
-        .statusCode(Status.BAD_REQUEST.getStatusCode())
-      .when()
-        .post(HISTORIC_JOB_LOG_RESOURCE_URL);
-  }
 }

@@ -53,32 +53,13 @@ public interface HistoricJobLog {
   String getJobId();
 
   /**
-   * Returns the id of the job definition on which the associated job was created.
-   */
-  String getJobDefinitionId();
-
-  /**
-   * Returns the id of the activity on which the associated job was created.
-   */
-  String getActivityId();
-
-  /**
-   * Returns the type of the associated job.
-   */
-  String getJobType();
-
-  /**
-   * Returns the handler type of the associated job.
-   */
-  String getJobHandlerType();
-
-  /**
    * Returns the due date of the associated job when <code>this</code> log occurred.
    */
   Date getJobDueDate();
 
   /**
-   * Returns the retries of the associated job when <code>this</code> log occurred.
+   * Returns the retries of the associated job before the associated job has
+   * been executed and when <code>this</code> log occurred.
    */
   int getJobRetries();
 
@@ -89,6 +70,26 @@ public interface HistoricJobLog {
    * use {@link HistoryService#getHistoricJobLogExceptionStacktrace(String)}
    */
   String getJobExceptionMessage();
+
+  /**
+   * Returns the id of the job definition on which the associated job was created.
+   */
+  String getJobDefinitionId();
+
+  /**
+   * Returns the job definition type of the associated job.
+   */
+  String getJobDefinitionType();
+
+  /**
+   * Returns the job definition configuration type of the associated job.
+   */
+  String getJobDefinitionConfiguration();
+
+  /**
+   * Returns the id of the activity on which the associated job was created.
+   */
+  String getActivityId();
 
   /**
    * Returns the specific execution id on which the associated job was created.

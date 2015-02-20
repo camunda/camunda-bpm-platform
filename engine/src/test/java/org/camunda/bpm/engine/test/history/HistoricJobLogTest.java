@@ -20,6 +20,7 @@ import org.camunda.bpm.engine.history.HistoricJobLogQuery;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.AsyncContinuationJobHandler;
+import org.camunda.bpm.engine.impl.jobexecutor.MessageJobDeclaration;
 import org.camunda.bpm.engine.impl.jobexecutor.ProcessEventJobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerCatchIntermediateEventJobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerExecuteNestedActivityJobHandler;
@@ -63,8 +64,8 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
     assertEquals(job.getId(), historicJob.getJobId());
     assertEquals(job.getJobDefinitionId(), historicJob.getJobDefinitionId());
     assertEquals("serviceTask", historicJob.getActivityId());
-    assertEquals(MessageEntity.TYPE, historicJob.getJobType());
-    assertEquals(AsyncContinuationJobHandler.TYPE, historicJob.getJobHandlerType());
+    assertEquals(AsyncContinuationJobHandler.TYPE, historicJob.getJobDefinitionType());
+    assertEquals(MessageJobDeclaration.ASYNC_BEFORE, historicJob.getJobDefinitionConfiguration());
     assertEquals(job.getDuedate(), historicJob.getJobDueDate());
     assertEquals(job.getRetries(), historicJob.getJobRetries());
     assertEquals(job.getExecutionId(), historicJob.getExecutionId());
@@ -105,10 +106,10 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
     assertEquals(job.getId(), historicJob.getJobId());
     assertEquals(job.getJobDefinitionId(), historicJob.getJobDefinitionId());
     assertEquals("serviceTask", historicJob.getActivityId());
-    assertEquals(MessageEntity.TYPE, historicJob.getJobType());
-    assertEquals(AsyncContinuationJobHandler.TYPE, historicJob.getJobHandlerType());
+    assertEquals(AsyncContinuationJobHandler.TYPE, historicJob.getJobDefinitionType());
+    assertEquals(MessageJobDeclaration.ASYNC_BEFORE, historicJob.getJobDefinitionConfiguration());
     assertEquals(job.getDuedate(), historicJob.getJobDueDate());
-    assertEquals(2, historicJob.getJobRetries());
+    assertEquals(3, historicJob.getJobRetries());
     assertEquals(job.getExecutionId(), historicJob.getExecutionId());
     assertEquals(job.getProcessInstanceId(), historicJob.getProcessInstanceId());
     assertEquals(job.getProcessDefinitionId(), historicJob.getProcessDefinitionId());
@@ -145,8 +146,8 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
     assertEquals(job.getId(), historicJob.getJobId());
     assertEquals(job.getJobDefinitionId(), historicJob.getJobDefinitionId());
     assertEquals("serviceTask", historicJob.getActivityId());
-    assertEquals(MessageEntity.TYPE, historicJob.getJobType());
-    assertEquals(AsyncContinuationJobHandler.TYPE, historicJob.getJobHandlerType());
+    assertEquals(AsyncContinuationJobHandler.TYPE, historicJob.getJobDefinitionType());
+    assertEquals(MessageJobDeclaration.ASYNC_BEFORE, historicJob.getJobDefinitionConfiguration());
     assertEquals(job.getDuedate(), historicJob.getJobDueDate());
     assertEquals(job.getRetries(), historicJob.getJobRetries());
     assertEquals(job.getExecutionId(), historicJob.getExecutionId());
@@ -184,8 +185,8 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
     assertEquals(job.getId(), historicJob.getJobId());
     assertEquals(job.getJobDefinitionId(), historicJob.getJobDefinitionId());
     assertEquals("serviceTask", historicJob.getActivityId());
-    assertEquals(MessageEntity.TYPE, historicJob.getJobType());
-    assertEquals(AsyncContinuationJobHandler.TYPE, historicJob.getJobHandlerType());
+    assertEquals(AsyncContinuationJobHandler.TYPE, historicJob.getJobDefinitionType());
+    assertEquals(MessageJobDeclaration.ASYNC_BEFORE, historicJob.getJobDefinitionConfiguration());
     assertEquals(job.getDuedate(), historicJob.getJobDueDate());
     assertEquals(job.getRetries(), historicJob.getJobRetries());
     assertEquals(job.getExecutionId(), historicJob.getExecutionId());
@@ -219,7 +220,8 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
 
     assertEquals(job.getJobDefinitionId(), historicJob.getJobDefinitionId());
     assertEquals("serviceTask", historicJob.getActivityId());
-    assertEquals(AsyncContinuationJobHandler.TYPE, historicJob.getJobHandlerType());
+    assertEquals(AsyncContinuationJobHandler.TYPE, historicJob.getJobDefinitionType());
+    assertEquals(MessageJobDeclaration.ASYNC_BEFORE, historicJob.getJobDefinitionConfiguration());
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuation.bpmn20.xml"})
@@ -249,7 +251,8 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
 
     assertEquals(anotherJob.getJobDefinitionId(), historicJob.getJobDefinitionId());
     assertEquals("serviceTask", historicJob.getActivityId());
-    assertEquals(AsyncContinuationJobHandler.TYPE, historicJob.getJobHandlerType());
+    assertEquals(AsyncContinuationJobHandler.TYPE, historicJob.getJobDefinitionType());
+    assertEquals(MessageJobDeclaration.ASYNC_AFTER, historicJob.getJobDefinitionConfiguration());
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricJobLogTest.testStartTimerEvent.bpmn20.xml"})
@@ -268,7 +271,8 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
     assertEquals(job.getId(), historicJob.getJobId());
     assertEquals(job.getJobDefinitionId(), historicJob.getJobDefinitionId());
     assertEquals("theStart", historicJob.getActivityId());
-    assertEquals(TimerStartEventJobHandler.TYPE, historicJob.getJobHandlerType());
+    assertEquals(TimerStartEventJobHandler.TYPE, historicJob.getJobDefinitionType());
+    assertEquals("CYCLE: 0 0/5 * * * ?", historicJob.getJobDefinitionConfiguration());
     assertEquals(job.getDuedate(), historicJob.getJobDueDate());
   }
 
@@ -290,7 +294,8 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
     assertEquals(job.getId(), historicJob.getJobId());
     assertEquals(job.getJobDefinitionId(), historicJob.getJobDefinitionId());
     assertEquals("subprocessStartEvent", historicJob.getActivityId());
-    assertEquals(TimerStartEventSubprocessJobHandler.TYPE, historicJob.getJobHandlerType());
+    assertEquals(TimerStartEventSubprocessJobHandler.TYPE, historicJob.getJobDefinitionType());
+    assertEquals("DURATION: PT1M", historicJob.getJobDefinitionConfiguration());
     assertEquals(job.getDuedate(), historicJob.getJobDueDate());
   }
 
@@ -312,7 +317,8 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
     assertEquals(job.getId(), historicJob.getJobId());
     assertEquals(job.getJobDefinitionId(), historicJob.getJobDefinitionId());
     assertEquals("timer", historicJob.getActivityId());
-    assertEquals(TimerCatchIntermediateEventJobHandler.TYPE, historicJob.getJobHandlerType());
+    assertEquals(TimerCatchIntermediateEventJobHandler.TYPE, historicJob.getJobDefinitionType());
+    assertEquals("DURATION: PT1M", historicJob.getJobDefinitionConfiguration());
     assertEquals(job.getDuedate(), historicJob.getJobDueDate());
   }
 
@@ -334,7 +340,8 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
     assertEquals(job.getId(), historicJob.getJobId());
     assertEquals(job.getJobDefinitionId(), historicJob.getJobDefinitionId());
     assertEquals("timer", historicJob.getActivityId());
-    assertEquals(TimerExecuteNestedActivityJobHandler.TYPE, historicJob.getJobHandlerType());
+    assertEquals(TimerExecuteNestedActivityJobHandler.TYPE, historicJob.getJobDefinitionType());
+    assertEquals("DURATION: PT5M", historicJob.getJobDefinitionConfiguration());
     assertEquals(job.getDuedate(), historicJob.getJobDueDate());
   }
 
@@ -362,7 +369,8 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
     assertEquals(job.getId(), historicJob.getJobId());
     assertEquals(job.getJobDefinitionId(), historicJob.getJobDefinitionId());
     assertEquals("signalEvent", historicJob.getActivityId());
-    assertEquals(ProcessEventJobHandler.TYPE, historicJob.getJobHandlerType());
+    assertEquals(ProcessEventJobHandler.TYPE, historicJob.getJobDefinitionType());
+    assertNull(historicJob.getJobDefinitionConfiguration());
   }
 
   @Deployment(resources = {
@@ -454,7 +462,7 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
     assertEquals(3, createdJobLogEntry.getJobRetries());
 
     HistoricJobLog failedJobLogEntry = failedQuery.singleResult();
-    assertEquals(2, failedJobLogEntry.getJobRetries());
+    assertEquals(3, failedJobLogEntry.getJobRetries());
 
     // when (2)
     try {
@@ -473,10 +481,10 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
     assertEquals(3, createdJobLogEntry.getJobRetries());
 
     failedJobLogEntry = failedQuery.list().get(0);
-    assertEquals(2, failedJobLogEntry.getJobRetries());
+    assertEquals(3, failedJobLogEntry.getJobRetries());
 
     failedJobLogEntry = failedQuery.list().get(1);
-    assertEquals(1, failedJobLogEntry.getJobRetries());
+    assertEquals(2, failedJobLogEntry.getJobRetries());
 
     // when (3)
     try {
@@ -495,13 +503,13 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
     assertEquals(3, createdJobLogEntry.getJobRetries());
 
     failedJobLogEntry = failedQuery.list().get(0);
-    assertEquals(2, failedJobLogEntry.getJobRetries());
+    assertEquals(3, failedJobLogEntry.getJobRetries());
 
     failedJobLogEntry = failedQuery.list().get(1);
-    assertEquals(1, failedJobLogEntry.getJobRetries());
+    assertEquals(2, failedJobLogEntry.getJobRetries());
 
     failedJobLogEntry = failedQuery.list().get(2);
-    assertEquals(0, failedJobLogEntry.getJobRetries());
+    assertEquals(1, failedJobLogEntry.getJobRetries());
 
     // when (4)
     try {
@@ -520,13 +528,13 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
     assertEquals(3, createdJobLogEntry.getJobRetries());
 
     failedJobLogEntry = failedQuery.list().get(0);
-    assertEquals(2, failedJobLogEntry.getJobRetries());
+    assertEquals(3, failedJobLogEntry.getJobRetries());
 
     failedJobLogEntry = failedQuery.list().get(1);
-    assertEquals(1, failedJobLogEntry.getJobRetries());
+    assertEquals(2, failedJobLogEntry.getJobRetries());
 
     failedJobLogEntry = failedQuery.list().get(2);
-    assertEquals(0, failedJobLogEntry.getJobRetries());
+    assertEquals(1, failedJobLogEntry.getJobRetries());
 
     failedJobLogEntry = failedQuery.list().get(3);
     assertEquals(0, failedJobLogEntry.getJobRetries());
@@ -548,10 +556,10 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
     assertEquals(1, createdQuery.count());
     assertEquals(0, failedQuery.count());
 
-    // when
+    // when (1)
     executeAvailableJobs();
 
-    // then
+    // then (1)
     assertEquals(4, query.count());
     assertEquals(1, createdQuery.count());
     assertEquals(3, failedQuery.count());
@@ -560,12 +568,40 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
     assertEquals(3, createdJobLogEntry.getJobRetries());
 
     HistoricJobLog failedJobLogEntry = failedQuery.list().get(0);
-    assertEquals(2, failedJobLogEntry.getJobRetries());
+    assertEquals(3, failedJobLogEntry.getJobRetries());
 
     failedJobLogEntry = failedQuery.list().get(1);
-    assertEquals(1, failedJobLogEntry.getJobRetries());
+    assertEquals(2, failedJobLogEntry.getJobRetries());
 
     failedJobLogEntry = failedQuery.list().get(2);
+    assertEquals(1, failedJobLogEntry.getJobRetries());
+
+    // when (2)
+    try {
+      managementService.executeJob(jobId);
+      fail();
+    } catch (Exception e) {
+      // expected
+    }
+
+    // then (2)
+    assertEquals(5, query.count());
+    assertEquals(1, createdQuery.count());
+    assertEquals(4, failedQuery.count());
+
+    createdJobLogEntry = createdQuery.singleResult();
+    assertEquals(3, createdJobLogEntry.getJobRetries());
+
+    failedJobLogEntry = failedQuery.list().get(0);
+    assertEquals(3, failedJobLogEntry.getJobRetries());
+
+    failedJobLogEntry = failedQuery.list().get(1);
+    assertEquals(2, failedJobLogEntry.getJobRetries());
+
+    failedJobLogEntry = failedQuery.list().get(2);
+    assertEquals(1, failedJobLogEntry.getJobRetries());
+
+    failedJobLogEntry = failedQuery.list().get(3);
     assertEquals(0, failedJobLogEntry.getJobRetries());
   }
 
@@ -667,7 +703,7 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
     assertEquals(3, createdJobLogEntry.getJobRetries());
 
     HistoricJobLog failedJobLogEntry = failedQuery.singleResult();
-    assertEquals(2, failedJobLogEntry.getJobRetries());
+    assertEquals(3, failedJobLogEntry.getJobRetries());
 
     // when (2)
     try {
@@ -687,10 +723,10 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
     assertEquals(3, createdJobLogEntry.getJobRetries());
 
     failedJobLogEntry = failedQuery.list().get(0);
-    assertEquals(2, failedJobLogEntry.getJobRetries());
+    assertEquals(3, failedJobLogEntry.getJobRetries());
 
     failedJobLogEntry = failedQuery.list().get(1);
-    assertEquals(1, failedJobLogEntry.getJobRetries());
+    assertEquals(2, failedJobLogEntry.getJobRetries());
 
     // when (3)
     runtimeService.setVariable(processInstanceId, "fail", false);
@@ -706,10 +742,10 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
     assertEquals(3, createdJobLogEntry.getJobRetries());
 
     failedJobLogEntry = failedQuery.list().get(0);
-    assertEquals(2, failedJobLogEntry.getJobRetries());
+    assertEquals(3, failedJobLogEntry.getJobRetries());
 
     failedJobLogEntry = failedQuery.list().get(1);
-    assertEquals(1, failedJobLogEntry.getJobRetries());
+    assertEquals(2, failedJobLogEntry.getJobRetries());
 
     HistoricJobLog succeededJobLogEntry = succeededQuery.singleResult();
     assertEquals(1, succeededJobLogEntry.getJobRetries());
@@ -1059,7 +1095,7 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
           HistoricJobLogEventEntity log = new HistoricJobLogEventEntity();
           log.setJobId(String.valueOf(i));
           log.setTimestamp(new Date());
-          log.setJobType(MessageEntity.TYPE);
+          log.setJobDefinitionType(MessageEntity.TYPE);
           log.setProcessDefinitionId(processDefinitionId);
 
 

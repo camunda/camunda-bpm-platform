@@ -25,8 +25,6 @@ import org.camunda.bpm.engine.history.HistoricJobLogQuery;
 import org.camunda.bpm.engine.history.JobState;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
-import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.TimerEntity;
 
 /**
  * @author Roman Smirnov
@@ -38,19 +36,17 @@ public class HistoricJobLogQueryImpl extends AbstractQuery<HistoricJobLogQuery, 
 
   protected String id;
   protected String jobId;
+  protected String jobExceptionMessage;
   protected String jobDefinitionId;
+  protected String jobDefinitionType;
+  protected String jobDefinitionConfiguration;
   protected String[] activityIds;
-  protected String handlerType;
   protected String[] executionIds;
   protected String processInstanceId;
   protected String processDefinitionId;
   protected String processDefinitionKey;
   protected String deploymentId;
-  protected String exceptionMessage;
-  protected String type;
   protected JobState state;
-
-
 
   public HistoricJobLogQueryImpl() {
   }
@@ -77,9 +73,27 @@ public class HistoricJobLogQueryImpl extends AbstractQuery<HistoricJobLogQuery, 
     return this;
   }
 
+  public HistoricJobLogQuery jobExceptionMessage(String jobExceptionMessage) {
+    ensureNotNull(NotValidException.class, "jobExceptionMessage", jobExceptionMessage);
+    this.jobExceptionMessage = jobExceptionMessage;
+    return this;
+  }
+
   public HistoricJobLogQuery jobDefinitionId(String jobDefinitionId) {
     ensureNotNull(NotValidException.class, "jobDefinitionId", jobDefinitionId);
     this.jobDefinitionId = jobDefinitionId;
+    return this;
+  }
+
+  public HistoricJobLogQuery jobDefinitionType(String jobDefinitionType) {
+    ensureNotNull(NotValidException.class, "jobDefinitionType", jobDefinitionType);
+    this.jobDefinitionType = jobDefinitionType;
+    return this;
+  }
+
+  public HistoricJobLogQuery jobDefinitionConfiguration(String jobDefinitionConfiguration) {
+    ensureNotNull(NotValidException.class, "jobDefinitionConfiguration", jobDefinitionConfiguration);
+    this.jobDefinitionConfiguration = jobDefinitionConfiguration;
     return this;
   }
 
@@ -88,12 +102,6 @@ public class HistoricJobLogQueryImpl extends AbstractQuery<HistoricJobLogQuery, 
     ensureNotContainsNull("activityIds", activityIdList);
     ensureNotContainsEmptyString("activityIds", activityIdList);
     this.activityIds = activityIds;
-    return this;
-  }
-
-  public HistoricJobLogQuery jobHandlerType(String handlerType) {
-    ensureNotNull(NotValidException.class, "handlerType", handlerType);
-    this.handlerType = handlerType;
     return this;
   }
 
@@ -129,28 +137,6 @@ public class HistoricJobLogQueryImpl extends AbstractQuery<HistoricJobLogQuery, 
     return this;
   }
 
-  public HistoricJobLogQuery jobExceptionMessage(String exceptionMessage) {
-    ensureNotNull(NotValidException.class, "exceptionMessage", exceptionMessage);
-    this.exceptionMessage = exceptionMessage;
-    return this;
-  }
-
-  public HistoricJobLogQuery jobTimers() {
-    if (type != null && type.equals(MessageEntity.TYPE)) {
-      throw new NotValidException("Cannot combine timers() with messages() in the same query.");
-    }
-    setType(TimerEntity.TYPE);
-    return this;
-  }
-
-  public HistoricJobLogQuery jobMessages() {
-    if (type != null && type.equals(TimerEntity.TYPE)) {
-      throw new NotValidException("Cannot combine messages() with timers() in the same query.");
-    }
-    setType(MessageEntity.TYPE);
-    return this;
-  }
-
   public HistoricJobLogQuery creationLog() {
     setState(JobState.CREATED);
     return this;
@@ -180,6 +166,16 @@ public class HistoricJobLogQueryImpl extends AbstractQuery<HistoricJobLogQuery, 
 
   public HistoricJobLogQuery orderByJobId() {
     orderBy(HistoricJobLogQueryProperty.JOB_ID);
+    return this;
+  }
+
+  public HistoricJobLogQuery orderByJobDueDate() {
+    orderBy(HistoricJobLogQueryProperty.DUEDATE);
+    return this;
+  }
+
+  public HistoricJobLogQuery orderByJobRetries() {
+    orderBy(HistoricJobLogQueryProperty.RETRIES);
     return this;
   }
 
@@ -218,16 +214,6 @@ public class HistoricJobLogQueryImpl extends AbstractQuery<HistoricJobLogQuery, 
     return this;
   }
 
-  public HistoricJobLogQuery orderByJobDueDate() {
-    orderBy(HistoricJobLogQueryProperty.DUEDATE);
-    return this;
-  }
-
-  public HistoricJobLogQuery orderByJobRetries() {
-    orderBy(HistoricJobLogQueryProperty.RETRIES);
-    return this;
-  }
-
   // results //////////////////////////////////////////////////////////////
 
   public long executeCount(CommandContext commandContext) {
@@ -250,23 +236,27 @@ public class HistoricJobLogQueryImpl extends AbstractQuery<HistoricJobLogQuery, 
     return jobId;
   }
 
+  public String getJobExceptionMessage() {
+    return jobExceptionMessage;
+  }
+
   public String getJobDefinitionId() {
     return jobDefinitionId;
+  }
+
+  public String getJobDefinitionType() {
+    return jobDefinitionType;
+  }
+
+  public String getJobDefinitionConfiguration() {
+    return jobDefinitionConfiguration;
   }
 
   public String[] getActivityIds() {
     return activityIds;
   }
 
-  public String getType() {
-    return type;
-  }
-
-  public String getHandlerType() {
-    return handlerType;
-  }
-
-  public String[] getExecutionId() {
+  public String[] getExecutionIds() {
     return executionIds;
   }
 
@@ -286,19 +276,11 @@ public class HistoricJobLogQueryImpl extends AbstractQuery<HistoricJobLogQuery, 
     return deploymentId;
   }
 
-  public String getExceptionMessage() {
-    return exceptionMessage;
-  }
-
   public JobState getState() {
     return state;
   }
 
   // setter //////////////////////////////////
-
-  protected void setType(String type) {
-    this.type = type;
-  }
 
   protected void setState(JobState state) {
     this.state = state;

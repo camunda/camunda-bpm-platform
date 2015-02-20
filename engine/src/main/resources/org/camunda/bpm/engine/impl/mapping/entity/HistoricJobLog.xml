@@ -11,38 +11,38 @@
             ID_,
             TIMESTAMP_,
             JOB_ID_,
+            JOB_DUEDATE_,
+            JOB_RETRIES_,
+            JOB_EXCEPTION_MSG_,
+            JOB_EXCEPTION_STACK_ID_,
+            JOB_STATE_,
             JOB_DEF_ID_,
+            JOB_DEF_TYPE_,
+            JOB_DEF_CONFIGURATION_,
             ACT_ID_,
-            TYPE_,
-            HANDLER_TYPE_,
-            DUEDATE_,
-            RETRIES_,
-            EXCEPTION_MSG_,
-            EXCEPTION_STACK_ID_,
             EXECUTION_ID_,
             PROCESS_INSTANCE_ID_,
             PROCESS_DEF_ID_,
             PROCESS_DEF_KEY_,
-            DEPLOYMENT_ID_,
-            JOB_STATE_
+            DEPLOYMENT_ID_
           )
     values (#{id, jdbcType=VARCHAR},
             #{timestamp, jdbcType=TIMESTAMP},
             #{jobId, jdbcType=VARCHAR},
-            #{jobDefinitionId, jdbcType=VARCHAR},
-            #{activityId, jdbcType=VARCHAR},
-            #{jobType, jdbcType=VARCHAR},
-            #{jobHandlerType, jdbcType=VARCHAR},
             #{jobDueDate, jdbcType=TIMESTAMP},
             #{jobRetries, jdbcType=INTEGER},
             #{jobExceptionMessage, jdbcType=VARCHAR},
             #{exceptionByteArrayId, jdbcType=VARCHAR},
+            #{state, jdbcType=INTEGER},
+            #{jobDefinitionId, jdbcType=VARCHAR},
+            #{jobDefinitionType, jdbcType=VARCHAR},
+            #{jobDefinitionConfiguration, jdbcType=VARCHAR},
+            #{activityId, jdbcType=VARCHAR},
             #{executionId, jdbcType=VARCHAR},
             #{processInstanceId, jdbcType=VARCHAR},
             #{processDefinitionId, jdbcType=VARCHAR},
             #{processDefinitionKey, jdbcType=VARCHAR},
-            #{deploymentId, jdbcType=VARCHAR},
-            #{state, jdbcType=INTEGER}
+            #{deploymentId, jdbcType=VARCHAR}
     )
   </insert>
 
@@ -69,7 +69,7 @@
   </delete>
 
   <delete id="deleteHistoricJobLogByHandlerType">
-    delete from ${prefix}ACT_HI_JOB_LOG where HANDLER_TYPE_ = #{handlerType}
+    delete from ${prefix}ACT_HI_JOB_LOG where JOB_DEF_TYPE_ = #{handlerType}
   </delete>
 
   <!-- BYTE ARRAY DELETE -->
@@ -89,14 +89,14 @@
     <id property="id" column="ID_" jdbcType="VARCHAR" />
     <result property="timestamp" column="TIMESTAMP_" jdbcType="TIMESTAMP" />
     <result property="jobId" column="JOB_ID_" jdbcType="VARCHAR" />
+    <result property="jobDueDate" column="JOB_DUEDATE_" jdbcType="TIMESTAMP" />
+    <result property="jobRetries" column="JOB_RETRIES_" jdbcType="INTEGER" />
+    <result property="jobExceptionMessage" column="JOB_EXCEPTION_MSG_" jdbcType="VARCHAR" />
+    <result property="exceptionByteArrayId" column="JOB_EXCEPTION_STACK_ID_" jdbcType="VARCHAR" />
     <result property="jobDefinitionId" column="JOB_DEF_ID_" jdbcType="VARCHAR" />
+    <result property="jobDefinitionType" column="JOB_DEF_TYPE_" jdbcType="VARCHAR" />
+    <result property="jobDefinitionConfiguration" column="JOB_DEF_CONFIGURATION_" jdbcType="VARCHAR" />
     <result property="activityId" column="ACT_ID_" jdbcType="VARCHAR" />
-    <result property="jobType" column="TYPE_" jdbcType="VARCHAR" />
-    <result property="jobHandlerType" column="HANDLER_TYPE_" jdbcType="VARCHAR" />
-    <result property="jobDueDate" column="DUEDATE_" jdbcType="TIMESTAMP" />
-    <result property="jobRetries" column="RETRIES_" jdbcType="INTEGER" />
-    <result property="jobExceptionMessage" column="EXCEPTION_MSG_" jdbcType="VARCHAR" />
-    <result property="exceptionByteArrayId" column="EXCEPTION_STACK_ID_" jdbcType="VARCHAR" />
     <result property="executionId" column="EXECUTION_ID_" jdbcType="VARCHAR" />
     <result property="processInstanceId" column="PROCESS_INSTANCE_ID_" jdbcType="VARCHAR" />
     <result property="processDefinitionId" column="PROCESS_DEF_ID_" jdbcType="VARCHAR" />
@@ -109,11 +109,11 @@
 
   <sql id="selectExceptionByteArrayIds">
     select
-        EXCEPTION_STACK_ID_
+        JOB_EXCEPTION_STACK_ID_
     from
         ${prefix}ACT_HI_JOB_LOG
     <where>
-        EXCEPTION_STACK_ID_ is not null
+        JOB_EXCEPTION_STACK_ID_ is not null
         <if test="id != null">
         and ID_ = #{id, jdbcType=VARCHAR}
         </if>
@@ -138,8 +138,8 @@
         <if test="deploymentId != null">
         and DEPLOYMENT_ID_ = #{deploymentId, jdbcType=VARCHAR}
         </if>
-        <if test="handlerType != null">
-        and HANDLER_TYPE_ = #{handlerType, jdbcType=VARCHAR}
+        <if test="jobDefinitionType != null">
+        and JOB_DEF_TYPE_ = #{jobDefinitionType, jdbcType=VARCHAR}
         </if>
     </where>
   </sql>
@@ -172,8 +172,17 @@
       <if test="jobId != null">
         and RES.JOB_ID_ = #{jobId}
       </if>
+      <if test="jobExceptionMessage != null">
+        and RES.JOB_EXCEPTION_MSG_ = #{jobExceptionMessage}
+      </if>
       <if test="jobDefinitionId != null">
         and RES.JOB_DEF_ID_ = #{jobDefinitionId}
+      </if>
+      <if test="jobDefinitionType">
+        and RES.JOB_DEF_TYPE_ = #{jobDefinitionType}
+      </if>
+      <if test="jobDefinitionConfiguration">
+        and RES.JOB_DEF_CONFIGURATION_ = #{jobDefinitionConfiguration}
       </if>
       <if test="activityIds != null &amp;&amp; activityIds.length > 0">
         and RES.ACT_ID_ in
@@ -181,12 +190,6 @@
                  open="(" separator="," close=")">
           #{item}
         </foreach>
-      </if>
-      <if test="type">
-        and RES.TYPE_ = #{type}
-      </if>
-      <if test="handlerType">
-        and RES.HANDLER_TYPE_ = #{handlerType}
       </if>
       <if test="executionIds != null &amp;&amp; executionIds.length > 0">
         and RES.EXECUTION_ID_ in
@@ -206,9 +209,6 @@
       </if>
       <if test="deploymentId != null">
         and RES.DEPLOYMENT_ID_ = #{deploymentId}
-      </if>
-      <if test="exceptionMessage != null">
-        and RES.EXCEPTION_MSG_ = #{exceptionMessage}
       </if>
       <if test="state != null">
         and RES.JOB_STATE_ = #{state.stateCode}

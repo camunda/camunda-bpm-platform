@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.history.HistoricJobLogQuery;
@@ -25,7 +24,6 @@ import org.camunda.bpm.engine.rest.dto.AbstractQueryDto;
 import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
 import org.camunda.bpm.engine.rest.dto.converter.BooleanConverter;
 import org.camunda.bpm.engine.rest.dto.converter.StringArrayConverter;
-import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.codehaus.jackson.map.ObjectMapper;
 
 /**
@@ -36,9 +34,9 @@ public class HistoricJobLogQueryDto extends AbstractQueryDto<HistoricJobLogQuery
 
   protected static final String SORT_BY_TIMESTAMP = "timestamp";
   protected static final String SORT_BY_JOB_ID = "jobId";
-  protected static final String SORT_BY_JOB_DEFINITION_ID = "jobDefinitionId";
   protected static final String SORT_BY_JOB_DUE_DATE = "jobDueDate";
   protected static final String SORT_BY_JOB_RETRIES = "jobRetries";
+  protected static final String SORT_BY_JOB_DEFINITION_ID = "jobDefinitionId";
   protected static final String SORT_BY_ACTIVITY_ID = "activityId";
   protected static final String SORT_BY_EXECUTION_ID = "executionId";
   protected static final String SORT_BY_PROCESS_INSTANCE_ID = "processInstanceId";
@@ -46,16 +44,15 @@ public class HistoricJobLogQueryDto extends AbstractQueryDto<HistoricJobLogQuery
   protected static final String SORT_BY_PROCESS_DEFINITION_KEY = "processDefinitionKey";
   protected static final String SORT_BY_DEPLOYMENT_ID = "deploymentId";
 
-
   protected static final List<String> VALID_SORT_BY_VALUES;
   static {
     VALID_SORT_BY_VALUES = new ArrayList<String>();
 
     VALID_SORT_BY_VALUES.add(SORT_BY_TIMESTAMP);
     VALID_SORT_BY_VALUES.add(SORT_BY_JOB_ID);
-    VALID_SORT_BY_VALUES.add(SORT_BY_JOB_DEFINITION_ID);
     VALID_SORT_BY_VALUES.add(SORT_BY_JOB_DUE_DATE);
     VALID_SORT_BY_VALUES.add(SORT_BY_JOB_RETRIES);
+    VALID_SORT_BY_VALUES.add(SORT_BY_JOB_DEFINITION_ID);
     VALID_SORT_BY_VALUES.add(SORT_BY_ACTIVITY_ID);
     VALID_SORT_BY_VALUES.add(SORT_BY_EXECUTION_ID);
     VALID_SORT_BY_VALUES.add(SORT_BY_PROCESS_INSTANCE_ID);
@@ -66,17 +63,16 @@ public class HistoricJobLogQueryDto extends AbstractQueryDto<HistoricJobLogQuery
 
   protected String id;
   protected String jobId;
+  protected String jobExceptionMessage;
   protected String jobDefinitionId;
+  protected String jobDefinitionType;
+  protected String jobDefinitionConfiguration;
   protected String[] activityIds;
-  protected String jobHandlerType;
   protected String[] executionIds;
   protected String processInstanceId;
   protected String processDefinitionId;
   protected String processDefinitionKey;
   protected String deploymentId;
-  protected String jobExceptionMessage;
-  protected Boolean jobTimers;
-  protected Boolean jobMessages;
   protected Boolean creationLog;
   protected Boolean failureLog;
   protected Boolean successLog;
@@ -98,19 +94,29 @@ public class HistoricJobLogQueryDto extends AbstractQueryDto<HistoricJobLogQuery
     this.jobId = jobId;
   }
 
+  @CamundaQueryParam("jobExceptionMessage")
+  public void setJobExceptionMessage(String jobExceptionMessage) {
+    this.jobExceptionMessage = jobExceptionMessage;
+  }
+
   @CamundaQueryParam("jobDefinitionId")
   public void setJobDefinitionId(String jobDefinitionId) {
     this.jobDefinitionId = jobDefinitionId;
   }
 
+  @CamundaQueryParam("jobDefinitionType")
+  public void setJobDefinitionType(String jobDefinitionType) {
+    this.jobDefinitionType = jobDefinitionType;
+  }
+
+  @CamundaQueryParam("jobDefinitionConfiguration")
+  public void setJobDefinitionConfiguration(String jobDefinitionConfiguration) {
+    this.jobDefinitionConfiguration = jobDefinitionConfiguration;
+  }
+
   @CamundaQueryParam(value="activityIdIn", converter = StringArrayConverter.class)
   public void setActivityIdIn(String[] activityIds) {
     this.activityIds = activityIds;
-  }
-
-  @CamundaQueryParam("jobHandlerType")
-  public void setJobHandlerType(String jobHandlerType) {
-    this.jobHandlerType = jobHandlerType;
   }
 
   @CamundaQueryParam(value="executionIdIn", converter = StringArrayConverter.class)
@@ -136,21 +142,6 @@ public class HistoricJobLogQueryDto extends AbstractQueryDto<HistoricJobLogQuery
   @CamundaQueryParam("deploymentId")
   public void setDeploymentId(String deploymentId) {
     this.deploymentId = deploymentId;
-  }
-
-  @CamundaQueryParam("jobExceptionMessage")
-  public void setJobExceptionMessage(String jobExceptionMessage) {
-    this.jobExceptionMessage = jobExceptionMessage;
-  }
-
-  @CamundaQueryParam(value="jobTimers", converter = BooleanConverter.class)
-  public void setJobTimers(Boolean jobTimers) {
-    this.jobTimers = jobTimers;
-  }
-
-  @CamundaQueryParam(value="jobMessages", converter = BooleanConverter.class)
-  public void setJobMessages(Boolean jobMessages) {
-    this.jobMessages = jobMessages;
   }
 
   @CamundaQueryParam(value="creationLog", converter = BooleanConverter.class)
@@ -190,16 +181,24 @@ public class HistoricJobLogQueryDto extends AbstractQueryDto<HistoricJobLogQuery
       query.jobId(jobId);
     }
 
+    if (jobExceptionMessage != null) {
+      query.jobExceptionMessage(jobExceptionMessage);
+    }
+
     if (jobDefinitionId != null) {
       query.jobDefinitionId(jobDefinitionId);
     }
 
-    if (activityIds != null && activityIds.length > 0) {
-      query.activityIdIn(activityIds);
+    if (jobDefinitionType != null) {
+      query.jobDefinitionType(jobDefinitionType);
     }
 
-    if (jobHandlerType != null) {
-      query.jobHandlerType(jobHandlerType);
+    if (jobDefinitionConfiguration != null) {
+      query.jobDefinitionConfiguration(jobDefinitionConfiguration);
+    }
+
+    if (activityIds != null && activityIds.length > 0) {
+      query.activityIdIn(activityIds);
     }
 
     if (executionIds != null && executionIds.length > 0) {
@@ -220,24 +219,6 @@ public class HistoricJobLogQueryDto extends AbstractQueryDto<HistoricJobLogQuery
 
     if (deploymentId != null) {
       query.deploymentId(deploymentId);
-    }
-
-    if (jobExceptionMessage != null) {
-      query.jobExceptionMessage(jobExceptionMessage);
-    }
-
-    if (jobTimers != null && jobTimers) {
-      if (jobMessages != null && jobMessages) {
-        throw new InvalidRequestException(Status.BAD_REQUEST, "Parameter jobTimers cannot be used together with parameter jobMessages.");
-      }
-      query.jobTimers();
-    }
-
-    if (jobMessages != null && jobMessages) {
-      if (jobTimers != null && jobTimers) {
-        throw new InvalidRequestException(Status.BAD_REQUEST, "Parameter jobMessages cannot be used together with parameter jobTimers.");
-      }
-      query.jobMessages();
     }
 
     if (creationLog != null && creationLog) {
@@ -262,12 +243,12 @@ public class HistoricJobLogQueryDto extends AbstractQueryDto<HistoricJobLogQuery
       query.orderByTimestamp();
     } else if (sortBy.equals(SORT_BY_JOB_ID)) {
       query.orderByJobId();
-    } else if (sortBy.equals(SORT_BY_JOB_DEFINITION_ID)) {
-      query.orderByJobDefinitionId();
     } else if (sortBy.equals(SORT_BY_JOB_DUE_DATE)) {
       query.orderByJobDueDate();
     } else if (sortBy.equals(SORT_BY_JOB_RETRIES)) {
       query.orderByJobRetries();
+    } else if (sortBy.equals(SORT_BY_JOB_DEFINITION_ID)) {
+      query.orderByJobDefinitionId();
     } else if (sortBy.equals(SORT_BY_ACTIVITY_ID)) {
       query.orderByActivityId();
     } else if (sortBy.equals(SORT_BY_EXECUTION_ID)) {
