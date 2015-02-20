@@ -7,7 +7,7 @@ module.exports = Page.extend({
   url: '/camunda/app/admin/default/#/groups/:group?tab=group',
 
   updateGroupButton: function() {
-    return element(by.css('[data-ng-click="updateGroup()"]'));
+    return element(by.css('[ng-click="updateGroup()"]'));
   },
 
   groupNameInput: function(inputValue) {
@@ -29,12 +29,11 @@ module.exports = Page.extend({
   },
 
   deleteGroupButton: function() {
-    return element(by.css('[data-ng-click="deleteGroup()"]'));
+    return element(by.css('[ng-click="deleteGroup()"]'));
   },
 
   deleteGroupAlert: function() {
-    var ptor = protractor.getInstance();
-    return ptor.switchTo().alert();
+    return browser.switchTo().alert();
   },
 
   deleteGroup: function() {

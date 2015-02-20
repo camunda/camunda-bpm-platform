@@ -14,8 +14,24 @@ module.exports = Base.extend({
     return element.all(by.repeater('group in groupList'));
   },
 
-  editGroupButton: function(item) {
-    return this.groupList().get(item).element(by.linkText('Edit'));
+  groupId: function(item) {
+    return this.groupList().get(item).element(by.css('.group-id > a'));
+  },
+
+  groupName: function(item) {
+    return this.groupList().get(item).element(by.binding('{{group.name}}'));
+  },
+
+  groupType: function(item) {
+    return this.groupList().get(item).element(by.binding('{{group.type}}'));
+  },
+
+  selectGroupByEditLink: function(item) {
+    return this.groupList().get(item).element(by.linkText('Edit')).click();
+  },
+
+  selectGroupByNameLink: function(item) {
+    return this.groupId(item).click();
   }
 
 });

@@ -34,7 +34,7 @@ module.exports = Base.extend({
   },
 
   createNewGroupButton: function () {
-    return element(by.css('[data-ng-click="createGroup()"]'));
+    return element(by.css('[ng-click="createGroup()"]'));
   },
 
   createNewGroup: function (groupID, groupName, groupType) {
