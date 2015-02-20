@@ -1,6 +1,6 @@
 'use strict';
 
-var testHelper = require('../../spec-setup');
+var testHelper = require('../../test-helper');
 var setupFile = require('./admin-user-setup');
 
 var usersPage = require('../pages/users');
@@ -49,5 +49,5 @@ describe('Admin admin-user Spec', function() {
     // then
     expect(usersPage.userFirstNameAndLastName(0)).to.eventually.eql('Über Admin');
   });
-  
+
 });
