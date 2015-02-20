@@ -3,6 +3,7 @@
 var DashboardPage = require('./dashboard-view');
 var StartProcessPage = require('./start-process');
 var TaskListPage = require('./tasklist/task-list');
+var TaskListSearchPage = require('./tasklist/task-search');
 var CurrentTaskPage = require('./taskview/current-task');
 var FormTabPage = require('./taskview/tabs/form-tab');
 var HistoryTabPage = require('./taskview/tabs/history-tab');
@@ -22,6 +23,7 @@ module.exports.taskFilters.createFilterPage = new CreateFilterPage();
 module.exports.taskFilters.editFilterPage = new EditFilterPage();
 module.exports.taskFilters.deleteFilterPage = new DeleteFilterPage();
 module.exports.taskList = new TaskListPage();
+module.exports.taskList.taskSearch = new TaskListSearchPage();
 module.exports.currentTask = new CurrentTaskPage();
 module.exports.currentTask.form = new FormTabPage();
 module.exports.currentTask.history = new HistoryTabPage();
