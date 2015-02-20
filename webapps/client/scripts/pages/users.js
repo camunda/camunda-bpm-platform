@@ -3,14 +3,14 @@ define(['angular', 'text!./users.html'], function(angular, template) {
   var Controller = ['$scope', 'UserResource', function ($scope, UserResource) {
 
     $scope.availableOperations={};
+    $scope.loadingState = 'LOADING';
 
     UserResource.query().$promise.then(function(response) {
-      // $scope.userList = response.data;
       $scope.userList = response;
+      $scope.loadingState = response.length ? 'LOADED' : 'EMPTY';
     });
 
     UserResource.OPTIONS().$promise.then(function(response) {
-      // angular.forEach(response.data.links, function(link){
       angular.forEach(response.links, function(link){
         $scope.availableOperations[link.rel] = true;
       });

@@ -104,9 +104,12 @@ define(['text!./authorizations.html', 'text!./confirm-delete-authorization.html'
         };
 
         var loadAuthorizations = $scope.loadAuthorizations = function() {
+          $scope.loadingState = 'LOADING';
           AuthorizationResource.query({resourceType : $scope.selectedResourceType}).$promise.then(function(response) {
-            // $scope.authorizations = response.data;
             $scope.authorizations = response;
+            $scope.loadingState = response.length ? 'LOADED' : 'EMPTY';
+          }, function () {
+            $scope.loadingState = 'ERROR';
           });
         };
 

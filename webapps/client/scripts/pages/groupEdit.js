@@ -1,8 +1,25 @@
 define(['angular', 'text!./groupEdit.html'], function(angular, template) {
   'use strict';
 
-  var Controller = ['$scope', '$routeParams', 'GroupResource', 'UserResource', 'AuthorizationResource', 'Notifications', '$location', '$window',
-    function ($scope, $routeParams, GroupResource, UserResource, AuthorizationResource, Notifications, $location, $window) {
+  var Controller = [
+    '$scope',
+    '$routeParams',
+    'GroupResource',
+    'UserResource',
+    'AuthorizationResource',
+    'Notifications',
+    '$location',
+    '$window',
+  function (
+    $scope,
+    $routeParams,
+    GroupResource,
+    UserResource,
+    AuthorizationResource,
+    Notifications,
+    $location,
+    $window
+  ) {
 
     $scope.group = null;
     $scope.groupName = null;
@@ -16,28 +33,33 @@ define(['angular', 'text!./groupEdit.html'], function(angular, template) {
     // common form validation //////////////////////////
 
     /** form must be valid & user must have made some changes */
-    var canSubmit = $scope.canSubmit = function(form, modelObject) {
-      return form.$valid
-        && !form.$pristine
-        && (modelObject == null || !angular.equals($scope[modelObject], $scope[modelObject+'Copy']));
+    $scope.canSubmit = function(form, modelObject) {
+      return form.$valid &&
+             !form.$pristine &&
+             (!modelObject || !angular.equals($scope[modelObject], $scope[modelObject + 'Copy']));
     };
 
     // update group form /////////////////////////////
 
     var loadGroup = $scope.loadGroup = function() {
+      $scope.groupLoadingState = 'LOADING';
       GroupResource.get({groupId : $scope.encodedGroupId}).$promise.then(function(response) {
-        // $scope.group = response.data;
-        // $scope.groupName = (!!response.data.name ? response.data.name : response.data.id);
-        // $scope.groupCopy = angular.copy(response.data);
+        $scope.groupLoadingState = 'LOADED';
         $scope.group = response;
         $scope.groupName = (!!response.name ? response.name : response.id);
         $scope.groupCopy = angular.copy(response);
+      }, function () {
+        $scope.groupLoadingState = 'ERROR';
       });
     };
 
     var loadGroupUsers = $scope.loadGroupUsers = function() {
+      $scope.userLoadingState = 'LOADING';
       UserResource.query({'memberOfGroup' : $scope.encodedGroupId}).$promise.then(function(response) {
-      $scope.groupUserList = response;
+        $scope.groupUserList = response;
+        $scope.userLoadingState = response.length ? 'LOADED' : 'EMPTY';
+      }, function () {
+        $scope.userLoadingState = 'ERROR';
       });
     };
 
@@ -50,13 +72,19 @@ define(['angular', 'text!./groupEdit.html'], function(angular, template) {
 
     $scope.updateGroup = function() {
 
-      GroupResource.update({groupId: $scope.encodedGroupId}, $scope.group).$promise.then(
-        function(){
-          Notifications.addMessage({type:"success", status:"Success", message:"Group successfully updated."});
+      GroupResource.update({groupId: $scope.encodedGroupId}, $scope.group).$promise.then(function(){
+          Notifications.addMessage({
+            type: 'success',
+            status: 'Success',
+            message: 'Group successfully updated.'
+          });
           loadGroup();
         },
         function() {
-          Notifications.addError({ status: "Failed", message: "Failed to update group" });
+          Notifications.addError({
+            status: 'Failed',
+            message: 'Failed to update group'
+          });
         }
       );
     };
@@ -75,8 +103,12 @@ define(['angular', 'text!./groupEdit.html'], function(angular, template) {
 
       GroupResource.delete({'groupId':$scope.encodedGroupId}).$promise.then(
         function(){
-          Notifications.addMessage({type:"success", status:"Success", message:"Group "+$scope.group.id+" successfully deleted."});
-          $location.path("/groups");
+          Notifications.addMessage({
+            type: 'success',
+            status: 'Success',
+            message: 'Group ' + $scope.group.id + ' successfully deleted.'
+          });
+          $location.path('/groups');
         }
       );
     };
@@ -89,7 +121,7 @@ define(['angular', 'text!./groupEdit.html'], function(angular, template) {
 
     $scope.activeClass = function(link) {
       var path = $location.absUrl();
-      return path.indexOf(link) != -1 ? "active" : "";
+      return path.indexOf(link) != -1 ? 'active' : '';
     };
 
     // initialization ///////////////////////////////////
