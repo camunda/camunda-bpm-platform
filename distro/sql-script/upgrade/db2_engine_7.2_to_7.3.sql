@@ -45,3 +45,6 @@ create table ACT_HI_JOB_LOG (
 
 ALTER TABLE ACT_HI_ACTINST
   DROP COLUMN OWNER_;
+  
+CALL Sysproc.admin_cmd ('REORG TABLE ACT_HI_ACTINST');
+
