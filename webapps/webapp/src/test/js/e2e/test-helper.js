@@ -53,4 +53,6 @@ module.exports = function (operations, noReset, done) {
   });
 
   CamSDK.utils.series(callbacks, done);
+
+  browser.manage().deleteAllCookies();
 };
