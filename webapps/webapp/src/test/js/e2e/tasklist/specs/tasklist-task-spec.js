@@ -8,7 +8,7 @@ var setupFile = require('./tasklist-task-setup');
 
 var page = require('../pages/dashboard');
 
-describe.only('Tasklist Search', function() {
+describe('Tasklist Search', function() {
 
   before(function(done) {
     testHelper(setupFile, done);
