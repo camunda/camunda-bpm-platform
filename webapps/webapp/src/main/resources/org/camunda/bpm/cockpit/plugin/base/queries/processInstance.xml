@@ -53,7 +53,7 @@
         </if>
         <include refid="selectProcessInstances"/>
         ${orderBy}
-        ${limitAfter}
+        ${innerLimitAfter}
       ) INSTANCE
     <!-- The set of process instances will be (left) joined with a set of incidents. -->
     left join
