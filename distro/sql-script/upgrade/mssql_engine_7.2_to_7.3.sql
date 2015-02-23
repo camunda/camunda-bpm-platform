@@ -40,3 +40,6 @@ create table ACT_HI_JOB_LOG (
     DEPLOYMENT_ID_ nvarchar(64),
     primary key (ID_)
 );
+
+create index ACT_IDX_HI_JOB_LOG_PROCINST on ACT_HI_JOB_LOG(PROCESS_INSTANCE_ID_);
+create index ACT_IDX_HI_JOB_LOG_PROCDEF on ACT_HI_JOB_LOG(PROCESS_DEF_ID_);
