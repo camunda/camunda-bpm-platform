@@ -12,6 +12,18 @@ module.exports = Page.extend({
     return element.all(by.repeater('group in availableGroups'));
   },
 
+  selectGroup: function(item) {
+    this.groupList().get(item).element(by.model('group.checked')).click();
+  },
+
+  groupId: function(item) {
+    return this.groupList().get(item).element(by.binding('{{group.id}}'));
+  },
+
+  groupName: function(item) {
+    return this.groupList().get(item).element(by.binding('{{group.name}}'));
+  },
+
   addSelectedGroupButton: function() {
     return element(by.css('[ng-click="createGroupMemberships()"]'));
   },
@@ -25,7 +37,7 @@ module.exports = Page.extend({
   },
 
   addGroup: function(item) {
-    this.groupList().get(item).element(by.model('group.checked')).click();
+    this.selectGroup(item);
     this.addSelectedGroupButton().click();
 
     this.okButton().click();

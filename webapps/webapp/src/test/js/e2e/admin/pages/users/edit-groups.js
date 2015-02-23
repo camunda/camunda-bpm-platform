@@ -16,7 +16,7 @@ module.exports = Page.extend({
     return formElement.all(by.repeater('group in groupList'));
   },
 
-  groupName: function(item) {
+  groupId: function(item) {
     return this.groupList().get(item).element(by.binding('{{group.id}}')).getText();
   },
 

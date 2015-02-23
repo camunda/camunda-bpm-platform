@@ -9,67 +9,20 @@ var usersPage = require('../pages/users');
 describe('Admin Groups Spec', function() {
 
 
-	describe('group page navigation', function() {
+  describe('create new group', function() {
 
-		before(function(done) {
-			testHelper(setupFile, done);
-			groupsPage.navigateToWebapp('Admin');
+    before(function(done) {
+      testHelper(setupFile, done);
+
+      groupsPage.navigateToWebapp('Admin');
       groupsPage.authentication.userLogin('admin', 'admin');
-		});
-
-		after(function() {
-			groupsPage.logout();
-		});
-
-		beforeEach(function() {
-			groupsPage.navigateTo();
-		});
+    });
 
 
-		it('should select group by name', function(done) {
+    it('should navigate to new group menu', function() {
 
-			// when
-			groupsPage.groupName(0).getText().then(function(name) {
-				groupsPage.selectGroupByNameLink(0);
-
-				// then
-				expect(groupsPage.editGroup.pageHeader()).to.eventually.eql(name);
-			});
-
-		});
-
-
-		it('should select group by edit link', function (done) {
-
-			// when
-			groupsPage.groupType(1).getText().then(function(type) {
-				groupsPage.selectGroupByEditLink(1);
-
-				// then
-				expect(groupsPage.editGroup.groupTypeInput().getAttribute('value')).to.eventually.eql(type);
-			})
-		});
-
-	});
-
-
-	describe('create new group', function() {
-
-		before(function(done) {
-			testHelper(setupFile, done);
-			groupsPage.navigateToWebapp('Admin');
-      groupsPage.authentication.userLogin('admin', 'admin');
-		});
-
-		after(function() {
-			groupsPage.logout();
-		});
-
-
-		it('should navigate to new group menu', function() {
-
-			// given
-			groupsPage.navigateTo();
+      // given
+      groupsPage.navigateTo();
 
       // when
       groupsPage.newGroupButton().click();
@@ -92,29 +45,79 @@ describe('Admin Groups Spec', function() {
       expect(groupsPage.groupType(0).getText()).to.eventually.eql('Marketing');
     });
 
-	});
+
+    it('should create new group with slash', function (done) {
+
+      // given
+        groupsPage.newGroup.navigateTo();
+
+      // when
+        groupsPage.newGroup.createNewGroup('/göäüp_name', '/üöäüöäü/', 'testgroup/üäö');
+
+      // then
+        expect(groupsPage.groupList().count()).to.eventually.eql(6);
+        expect(groupsPage.groupId(0).getText()).to.eventually.eql('/göäüp_name');
+        expect(groupsPage.groupName(0).getText()).to.eventually.eql('/üöäüöäü/');
+        expect(groupsPage.groupType(0).getText()).to.eventually.eql('testgroup/üäö');
+    });
 
 
-	describe('update/delete group', function() {
+    it('should select group by name', function (done) {
 
-		before(function(done) {
-			testHelper(setupFile, done);
-			groupsPage.navigateToWebapp('Admin');
+      // when
+      groupsPage.groupName(0).getText().then(function(name) {
+        groupsPage.selectGroupByNameLink(0);
+
+        // then
+        expect(groupsPage.editGroup.pageHeader()).to.eventually.eql(name);
+      });
+    });
+
+
+    it('should create new group with backslash', function (done) {
+
+      // given
+        groupsPage.newGroup.navigateTo();
+
+      // when
+        groupsPage.newGroup.createNewGroup('\\göäüp_name', '\\üöäüöäü\\', 'testgroup\\üäö');
+
+      // then
+        expect(groupsPage.groupList().count()).to.eventually.eql(7);
+        expect(groupsPage.groupId(2).getText()).to.eventually.eql('\\göäüp_name');
+        expect(groupsPage.groupName(2).getText()).to.eventually.eql('\\üöäüöäü\\');
+        expect(groupsPage.groupType(2).getText()).to.eventually.eql('testgroup\\üäö');
+    });
+
+
+    it('should select group by edit link', function (done) {
+
+      // when
+      groupsPage.groupType(2).getText().then(function(type) {
+        groupsPage.selectGroupByEditLink(2);
+
+        // then
+        expect(groupsPage.editGroup.groupTypeInput().getAttribute('value')).to.eventually.eql(type);
+      });
+    });
+
+  });
+
+
+  describe('update/delete group', function() {
+
+    before(function(done) {
+      testHelper(setupFile, done);
+
+      groupsPage.navigateToWebapp('Admin');
       groupsPage.authentication.userLogin('admin', 'admin');
-		});
-
-		after(function() {
-			groupsPage.logout();
-		});
+    });
 
 
-		it('should navigate to edit group menu', function (done) {
+    it('should navigate to edit group menu', function (done) {
 
       // given
       groupsPage.navigateTo();
-
-
-			//expect(groupsPage.groupId(1).getText()).to.eventually.eql('camunda-admin');
 
       // when
       groupsPage.selectGroupByNameLink(1);
@@ -146,22 +149,7 @@ describe('Admin Groups Spec', function() {
       // then
       expect(groupsPage.groupList().count()).to.eventually.eql(3);
     });
-	});
 
-
-/*	describe('assign user to group', function() {
-
-		before(function(done) {
-			testHelper(setupFile, done);
-			groupsPage.navigateToWebapp('Admin');
-      groupsPage.authentication.userLogin('admin', 'admin');
-		});
-
-		after(function() {
-			groupsPage.logout();
-		});
-
-
-	});*/
+  });
 
 });

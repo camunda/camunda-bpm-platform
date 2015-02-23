@@ -4,7 +4,7 @@ var setupFile = require('./users-setup');
 var users = setupFile.user.create;
 
 var usersPage = require('../pages/users');
-
+var groupsPage = require('../pages/groups');
 
 describe('Admin Users Spec', function() {
 
@@ -13,12 +13,9 @@ describe('Admin Users Spec', function() {
     before(function(done) {
       testHelper(setupFile, done);
       usersPage.navigateToWebapp('Admin');
-      usersPage.authentication.userLogin('admin', 'admin');      
+      usersPage.authentication.userLogin('admin', 'admin');
     });
 
-    after(function () {
-      usersPage.logout();
-    });
 
     beforeEach(function () {
       usersPage.navigateTo();
@@ -60,23 +57,24 @@ describe('Admin Users Spec', function() {
       expect(usersPage.editUserProfile.emailInput().getAttribute('value')).to.eventually.eql(users[0].email);
     });
 
+
+    it('should validate users groups menu', function (done) {
+
+    });
+
   })
 
 
-	describe('create a new user', function() {
-		
-		before(function(done) {
+  describe('create a new user', function() {
+
+    before(function(done) {
       testHelper(setupFile, done);
       usersPage.navigateToWebapp('Admin');
       usersPage.authentication.userLogin('admin', 'admin');
-		});
-
-    after(function() {
-      usersPage.logout();
     });
 
 
-		it('should open Create New User page', function() {
+    it('should open Create New User page', function() {
 
       // given
       usersPage.navigateTo();
@@ -103,7 +101,7 @@ describe('Admin Users Spec', function() {
 
 
     it('should count users', function(done) {
-      
+
       // when
       usersPage.navigateTo();
 
@@ -125,19 +123,15 @@ describe('Admin Users Spec', function() {
       expect(usersPage.userList().count()).to.eventually.eql(1);
     });
 
-	});
+  });
 
 
-	describe('delete a user', function() {
-		
+  describe('delete a user', function() {
+
     before(function(done) {
       testHelper(setupFile, done);
       usersPage.navigateToWebapp('Admin');
       usersPage.authentication.userLogin('admin', 'admin');
-    });
-
-    after(function() {
-      usersPage.logout();
     });
 
 
@@ -165,20 +159,16 @@ describe('Admin Users Spec', function() {
       expect(usersPage.userFirstNameAndLastName(1)).to.not.eventually.eql(userName);
     });
 
-	});
+  });
 
 
   describe('update a user', function () {
-    
+
     before(function(done) {
       testHelper(setupFile, done);
       usersPage.navigateToWebapp('Admin');
       usersPage.authentication.userLogin('admin', 'admin');
     });
-
-    after(function() {
-      usersPage.logout();
-    });    
 
 
     describe('update user Profile?', function () {
@@ -269,6 +259,133 @@ describe('Admin Users Spec', function() {
 
         // then
         expect(usersPage.userFirstNameAndLastName(0)).to.eventually.eql(users[2].firstName + ' ' + users[2].lastName);
+      });
+
+    });
+
+  });
+
+
+  describe.only('add/delete group', function () {
+
+    before(function (done) {
+      testHelper(setupFile, done);
+
+      usersPage.navigateToWebapp('Admin');
+      usersPage.authentication.userLogin('admin', 'admin');
+    });
+
+    it('should navigate to groups menu', function (done) {
+
+      // when
+      usersPage.selectUserByEditLink(3);
+      usersPage.editUserProfile.selectUserNavbarItem('Groups');
+
+      // then
+      usersPage.editUserGroups.isActive({ user: users[2].id });
+      expect(usersPage.editUserGroups.subHeader()).to.eventually
+        .eql(users[2].firstName + ' ' + users[2].lastName + '\'s' + ' ' + 'Groups');
+      expect(usersPage.editUserGroups.groupId(0)).to.eventually.eql('accounting');
+      expect(usersPage.editUserGroups.groupList().count()).to.eventually.eql(1);
+    });
+
+
+    it('should add new group - select group modal', function (done) {
+
+      // when
+      usersPage.editUserGroups.addGroupButton().click();
+
+      //then
+      expect(usersPage.editUserGroups.selectGroup.pageHeader()).to.eventually.eql('Select Groups');
+      expect(usersPage.editUserGroups.selectGroup.groupList().count()).to.eventually.eql(2);
+    });
+
+
+    it('should add new group', function (done) {
+
+      // when
+      usersPage.editUserGroups.selectGroup.addGroup(1);
+
+      // then
+      expect(usersPage.editUserGroups.groupId(1)).to.eventually.eql('sales');
+      expect(usersPage.editUserGroups.groupList().count()).to.eventually.eql(2);
+    });
+
+
+    it('should remove group', function (done) {
+
+      // when
+      usersPage.editUserGroups.removeGroup(0);
+
+      // then
+      expect(usersPage.editUserGroups.groupId(0)).to.eventually.eql('sales');
+      expect(usersPage.editUserGroups.groupList().count()).to.eventually.eql(1);
+    });
+
+
+    it('should navigate to groups edit menu', function (done) {
+
+      // given
+      usersPage.editUserGroups.navigateTo({ user: users[2].id });
+      usersPage.editUserGroups.addGroupButton().click();
+
+      // when
+      usersPage.editUserGroups.selectGroup.groupName(0).getText().then(function(name) {
+        usersPage.editUserGroups.selectGroup.groupId(0).click();
+
+        // then
+        expect(groupsPage.editGroup.pageHeader()).to.eventually.eql(name);
+      });
+
+    });
+
+
+    describe('use special group names', function () {
+
+      before(function (done) {
+        setupFile.group.create.push({
+          id:   '/göäüp_name',
+          name: '/üöäüöäü/',
+          type: 'testgroup/üäö'
+        },
+        {
+          id:   '\\göäüp_name',
+          name: '\\üöäüöäü\\',
+          type: 'testgroup\\üäö'
+        });
+
+        testHelper(setupFile, done);
+
+        usersPage.navigateToWebapp('Admin');
+        usersPage.authentication.userLogin('admin', 'admin');
+      });
+
+      beforeEach(function (done) {
+        usersPage.editUserGroups.navigateTo({ user: users[2].id });
+      });
+
+
+      it('should add slash group', function (done) {
+
+        // when
+        usersPage.editUserGroups.addGroupButton().click();
+        usersPage.editUserGroups.selectGroup.addGroup(0);
+
+        // then
+        expect(usersPage.editUserGroups.groupId(0)).to.eventually.eql('/göäüp_name');
+        expect(usersPage.editUserGroups.groupList().count()).to.eventually.eql(2);
+      });
+
+
+      it('should add backslash group', function (done) {
+
+        // when
+        usersPage.editUserGroups.addGroupButton().click();
+        usersPage.editUserGroups.selectGroup.addGroup(0);
+
+        // then
+        expect(usersPage.editUserGroups.groupId(1)).to.eventually.eql('\\göäüp_name');
+        expect(usersPage.editUserGroups.groupList().count()).to.eventually.eql(3);
       });
 
     });

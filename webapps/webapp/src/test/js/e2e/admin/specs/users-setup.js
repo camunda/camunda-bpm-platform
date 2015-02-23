@@ -24,3 +24,19 @@ ops.user = {
     email:      'ringo.starr@the-beatles.com'
   }]
 };
+ops.group = {
+  create: [{
+    id:   'accounting',
+    name: 'Accounting',
+    type: 'WORKFLOW'
+  },
+  {
+    id:   'sales',
+    name: 'Sales',
+    type: 'WORKFLOW'
+  }],
+  createMember: [{
+    id:     'accounting',
+    userId: 'ringo'
+  }]
+};
