@@ -80,8 +80,8 @@
 
 
 
-
-
+@layout-transition-timing: ease-in-out;//cubic-bezier(0.49,-0.5,0.56,1.52);
+@layout-transition-duration: 0.536s;//2.18s;
 
 
 
@@ -282,10 +282,10 @@ button.reset-regions {
 
   .columns {
     > .column {
-      transition: left 0.218s ease-in-out,
-                  right 0.218s ease-in-out,
-                  margin-left 0.218s ease-in-out,
-                  margin-right 0.218s ease-in-out;
+      transition: left @layout-transition-duration @layout-transition-timing,
+                  right @layout-transition-duration @layout-transition-timing,
+                  margin-left @layout-transition-duration @layout-transition-timing,
+                  margin-right @layout-transition-duration @layout-transition-timing;
 
       > .cell {
         position: relative;
@@ -299,7 +299,7 @@ button.reset-regions {
 
         &.content {
           padding: (@grid-gutter-width / 2);
-          transition: opacity 0.218s ease-in-out;
+          transition: opacity @layout-transition-duration @layout-transition-timing;
 
           overflow-x: hidden;
           overflow-y: auto;

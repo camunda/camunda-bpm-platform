@@ -1,80 +1,71 @@
-<div class="dropdown">
-  <a href
-     tabindex="-1"
-     role="button"
-     class="dropdown-toggle"
-     data-toggle="dropdown">
-    <span class="hidden-xs hidden-sm hidden-md"
-          translate="SORT_BY"></span>
-    <span class="sort-by">{{ byLabel | lowercase }}</span>
-  </a>
+<span class="sorting-label hidden-xs hidden-sm hidden-md"
+      translate="SORT_BY"></span>
 
-  <a href
-     tabindex="-1"
-     title="{{ order | translate }}"
-     class="sort-direction glyphicon glyphicon-chevron-up"
-     ng-class="{'glyphicon-chevron-up': order === 'asc', 'glyphicon-chevron-down': order === 'desc'}"
-     ng-click="changeOrder()"></a>
+<ol class="sorting-choice list-inline">
+  <li ng-repeat="(index, sorting) in sortings"
+      class="sorting-choice dropdown">
+    <a class="glyphicon glyphicon-minus-sign"
+       ng-if="sortings.length > 1"
+       ng-click="removeSorting(index)"
+       tooltip-placement="bottom"
+       tooltip="{{ 'REMOVE_SORTING' | translate }}"></a>
 
-  <ul class="dropdown-menu"
-      role="menu">
-    <li ng-show="by !== 'priority'">
-      <a href
-         tabindex="-1"
-         sort-by="priority"
-         translate="PRIORITY"
-         ng-click="changeBy('priority')">Priority</a>
-    </li>
+    <a href
+       tabindex="-1"
+       role="button"
+       class="dropdown-toggle"
+       data-toggle="dropdown">
+      <span class="sort-by">{{ sortableProps[sorting.by] | lowercase }}</span>
+    </a>
 
-    <li ng-show="by !== 'created'">
-      <a href
-         tabindex="-1"
-         sort-by="created"
-         translate="CREATION_DATE"
-         ng-click="changeBy('created')">Created</a>
-    </li>
+    <a href
+       tabindex="-1"
+       title="{{ sorting.order | translate }}"
+       class="sort-direction glyphicon glyphicon-chevron-up"
+       ng-class="{'glyphicon-chevron-up': sorting.order === 'asc', 'glyphicon-chevron-down': sorting.order === 'desc'}"
+       ng-click="changeOrder(index)"></a>
 
-    <li ng-show="by !== 'dueDate'">
-      <a href
-         tabindex="-1"
-         sort-by="dueDate"
-         translate="DUE_DATE"
-         ng-click="changeBy('dueDate')">Due date</a>
-    </li>
+    <ul class="dropdown-menu"
+        role="menu">
+      <li ng-repeat="(name, label) in sortableProps"
+          ng-if="sortedOn.indexOf(name) < 0">
+        <a href
+           sort-by="{{ name }}"
+           tabindex="-1"
+           translate="{{ label }}"
+           ng-click="changeBy(index, name)">
+          {{ label }}
+        </a>
+      </li>
+    </ul>
+  </li>
 
-    <li ng-show="by !== 'followUpDate'">
-      <a href
-         tabindex="-1"
-         sort-by="followUpDate"
-         translate="FOLLOW_UP_DATE"
-         ng-click="changeBy('followUpDate')">Follow up date</a>
-    </li>
+  <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  - - -->
 
-    <li ng-show="by !== 'nameCaseInsensitive'">
-      <a href
-         tabindex="-1"
-         sort-by="nameCaseInsensitive"
-         translate="TASK_NAME"
-         ng-click="changeBy('nameCaseInsensitive')">Task name</a>
-    </li>
+  <li class="dropdown new-sort"
+      ng-if="sortedOn.length < sortLimit">
+    <a href
+       role="button"
+       class="dropdown-toggle"
+       data-toggle="dropdown">
+      <span class="glyphicon glyphicon-plus-sign"
+            tooltip="{{ ADD_SORT_BY | translate }}"
+            tooltip-placement="bottom"></span>
+      <span class="hidden-xs hidden-sm hidden-md"
+            translate="ADD_SORT_BY"></span>
+    </a>
 
-    <li ng-show="by !== 'assignee'">
-      <a href
-         tabindex="-1"
-         sort-by="assignee"
-         translate="ASSIGNEE"
-         ng-click="changeBy('assignee')">Assignee</a>
-    </li>
-
-<!--
-    <li ng-show="by !== 'owner'">
-      <a href
-         tabindex="-1"
-         sort-by="owner"
-         translate="OWNER"
-         ng-click="changeBy('owner')">Owner</a>
-    </li>
--->
-
-  </ul>
-</div>
+    <ul class="dropdown-menu"
+        role="menu">
+      <li ng-repeat="(name, label) in sortableProps"
+          ng-if="sortedOn.indexOf(name) < 0">
+        <a href
+           sort-by="{{ name }}"
+           tabindex="-1"
+           translate="{{ label }}"
+           ng-click="addSorting(name)">
+        </a>
+      </li>
+    </ul>
+  </li>
+</ol>

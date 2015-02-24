@@ -1,5 +1,7 @@
 define([
+  'angular'
 ], function(
+  angular
 ) {
   'use strict';
 
@@ -133,15 +135,22 @@ define([
       }
 
       var firstResult = ((getPropertyFromLocation('page') || 1) - 1) * 15;
-      var sortBy = getPropertyFromLocation('sortBy') || 'created';
-      var sortOrder = getPropertyFromLocation('sortOrder') || 'desc';
+      var sorting = getPropertyFromLocation('sorting');
+      try {
+        sorting = JSON.parse(sorting);
+      }
+      catch (err) {
+        sorting = [{}];
+      }
+      sorting = (Array.isArray(sorting) && sorting.length) ? sorting : [{}];
+      sorting[0].sortOrder = sorting[0].sortOrder || 'desc';
+      sorting[0].sortBy = sorting[0].sortBy || 'created';
 
       return {
         id : currentFilter.id,
         firstResult : firstResult,
         maxResults : 15,
-        sortBy : sortBy,
-        sortOrder: sortOrder,
+        sorting: sorting,
         active: true,
         processVariables : searchQuery.processVariables,
         taskVariables : searchQuery.taskVariables,
@@ -248,7 +257,7 @@ define([
     /**
      * Update task if location changes
      */
-    $scope.$on('$routeChanged', function(prev, current) {
+    $scope.$on('$routeChanged', function() {
       var oldTaskId = taskId;
       var oldDetailsTab = detailsTab;
 

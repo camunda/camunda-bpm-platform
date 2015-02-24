@@ -1,6 +1,10 @@
 {
   "SORT_BY":
                   "Sort by",
+  "ADD_SORT_BY":
+                  "Add sorting",
+  "REMOVE_SORTING":
+                  "Remove sorting",
   "PRIORITY":
                   "Priority",
   "CREATION_DATE":
