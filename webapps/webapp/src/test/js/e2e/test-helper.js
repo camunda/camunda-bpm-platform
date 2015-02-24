@@ -13,7 +13,6 @@ var keys = Object.keys;
 module.exports = function (operations, noReset, done) {
   var deferred = protractor.promise.defer();
 
-
   if (arguments.length === 1 && typeof operations === 'function') {
     // testHelper(function(){ console.log('setup complete'); });
     done = operations;
@@ -24,7 +23,7 @@ module.exports = function (operations, noReset, done) {
     noReset = false;
     done = function(){};
   } else if (arguments.length === 2 && typeof noReset === 'function'){
-    // testHelper(setupObject, function(){ console.log('setup complete'); });
+    // testHelper(setupObject, function(err, result){ console.log('setup complete', result); });
     done = noReset;
     noReset = false;
   }
@@ -61,7 +60,8 @@ module.exports = function (operations, noReset, done) {
     });
   });
 
-  CamSDK.utils.series(callbacks, function() {
+  CamSDK.utils.series(callbacks, function(err, result) {
+    done(err, result);
     deferred.fulfill();
   });
 
