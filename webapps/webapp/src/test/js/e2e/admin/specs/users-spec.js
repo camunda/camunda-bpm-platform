@@ -10,10 +10,12 @@ describe('Admin Users Spec', function() {
 
   describe('user page navigation', function() {
 
-    before(function(done) {
-      testHelper(setupFile, done);
-      usersPage.navigateToWebapp('Admin');
-      usersPage.authentication.userLogin('admin', 'admin');
+    before(function() {
+      return testHelper(setupFile, function() {
+
+        usersPage.navigateToWebapp('Admin');
+        usersPage.authentication.userLogin('admin', 'admin');
+      });
     });
 
 
@@ -57,20 +59,17 @@ describe('Admin Users Spec', function() {
       expect(usersPage.editUserProfile.emailInput().getAttribute('value')).to.eventually.eql(users[0].email);
     });
 
-
-    it('should validate users groups menu', function (done) {
-
-    });
-
   })
 
 
   describe('create a new user', function() {
 
-    before(function(done) {
-      testHelper(setupFile, done);
-      usersPage.navigateToWebapp('Admin');
-      usersPage.authentication.userLogin('admin', 'admin');
+    before(function() {
+      return testHelper(setupFile, function() {
+
+        usersPage.navigateToWebapp('Admin');
+        usersPage.authentication.userLogin('admin', 'admin');
+      });
     });
 
 
@@ -100,7 +99,7 @@ describe('Admin Users Spec', function() {
     });
 
 
-    it('should count users', function(done) {
+    it('should count users', function() {
 
       // when
       usersPage.navigateTo();
@@ -128,10 +127,12 @@ describe('Admin Users Spec', function() {
 
   describe('delete a user', function() {
 
-    before(function(done) {
-      testHelper(setupFile, done);
-      usersPage.navigateToWebapp('Admin');
-      usersPage.authentication.userLogin('admin', 'admin');
+    before(function() {
+      return testHelper(setupFile, function() {
+
+        usersPage.navigateToWebapp('Admin');
+        usersPage.authentication.userLogin('admin', 'admin');
+      });
     });
 
 
@@ -162,16 +163,18 @@ describe('Admin Users Spec', function() {
   });
 
 
-  describe('update a user', function () {
+  describe('update a user', function() {
 
-    before(function(done) {
-      testHelper(setupFile, done);
-      usersPage.navigateToWebapp('Admin');
-      usersPage.authentication.userLogin('admin', 'admin');
+    before(function() {
+      return testHelper(setupFile, function() {
+
+        usersPage.navigateToWebapp('Admin');
+        usersPage.authentication.userLogin('admin', 'admin');
+      });
     });
 
 
-    describe('update user Profile?', function () {
+    describe('update user Profile?', function() {
 
       it('should validate profile page', function() {
 
@@ -266,16 +269,17 @@ describe('Admin Users Spec', function() {
   });
 
 
-  describe.only('add/delete group', function () {
+  describe('add/delete group', function () {
 
-    before(function (done) {
-      testHelper(setupFile, done);
+    before(function () {
+      return testHelper(setupFile, function() {
 
-      usersPage.navigateToWebapp('Admin');
-      usersPage.authentication.userLogin('admin', 'admin');
+        usersPage.navigateToWebapp('Admin');
+        usersPage.authentication.userLogin('admin', 'admin');
+      });
     });
 
-    it('should navigate to groups menu', function (done) {
+    it('should navigate to groups menu', function() {
 
       // when
       usersPage.selectUserByEditLink(3);
@@ -290,7 +294,7 @@ describe('Admin Users Spec', function() {
     });
 
 
-    it('should add new group - select group modal', function (done) {
+    it('should add new group - select group modal', function() {
 
       // when
       usersPage.editUserGroups.addGroupButton().click();
@@ -301,7 +305,7 @@ describe('Admin Users Spec', function() {
     });
 
 
-    it('should add new group', function (done) {
+    it('should add new group', function() {
 
       // when
       usersPage.editUserGroups.selectGroup.addGroup(1);
@@ -312,7 +316,7 @@ describe('Admin Users Spec', function() {
     });
 
 
-    it('should remove group', function (done) {
+    it('should remove group', function() {
 
       // when
       usersPage.editUserGroups.removeGroup(0);
@@ -323,7 +327,7 @@ describe('Admin Users Spec', function() {
     });
 
 
-    it('should navigate to groups edit menu', function (done) {
+    it('should navigate to groups edit menu', function() {
 
       // given
       usersPage.editUserGroups.navigateTo({ user: users[2].id });
@@ -340,9 +344,9 @@ describe('Admin Users Spec', function() {
     });
 
 
-    describe('use special group names', function () {
+    describe('use special group names', function() {
 
-      before(function (done) {
+      before(function() {
         setupFile.group.create.push({
           id:   '/göäüp_name',
           name: '/üöäüöäü/',
@@ -354,18 +358,19 @@ describe('Admin Users Spec', function() {
           type: 'testgroup\\üäö'
         });
 
-        testHelper(setupFile, done);
+        return testHelper(setupFile, function() {
 
-        usersPage.navigateToWebapp('Admin');
-        usersPage.authentication.userLogin('admin', 'admin');
+          usersPage.navigateToWebapp('Admin');
+          usersPage.authentication.userLogin('admin', 'admin');
+        });
       });
 
-      beforeEach(function (done) {
+      beforeEach(function() {
         usersPage.editUserGroups.navigateTo({ user: users[2].id });
       });
 
 
-      it('should add slash group', function (done) {
+      it('should add slash group', function() {
 
         // when
         usersPage.editUserGroups.addGroupButton().click();
@@ -377,7 +382,7 @@ describe('Admin Users Spec', function() {
       });
 
 
-      it('should add backslash group', function (done) {
+      it('should add backslash group', function() {
 
         // when
         usersPage.editUserGroups.addGroupButton().click();

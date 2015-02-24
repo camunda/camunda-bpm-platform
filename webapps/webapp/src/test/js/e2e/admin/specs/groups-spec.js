@@ -11,13 +11,13 @@ describe('Admin Groups Spec', function() {
 
   describe('create new group', function() {
 
-    before(function(done) {
-      testHelper(setupFile, done);
+    before(function() {
+      return testHelper(setupFile, function() {
 
-      groupsPage.navigateToWebapp('Admin');
-      groupsPage.authentication.userLogin('admin', 'admin');
+        usersPage.navigateToWebapp('Admin');
+        usersPage.authentication.userLogin('admin', 'admin');
+      });
     });
-
 
     it('should navigate to new group menu', function() {
 
@@ -46,7 +46,7 @@ describe('Admin Groups Spec', function() {
     });
 
 
-    it('should create new group with slash', function (done) {
+    it('should create new group with slash', function() {
 
       // given
         groupsPage.newGroup.navigateTo();
@@ -62,7 +62,7 @@ describe('Admin Groups Spec', function() {
     });
 
 
-    it('should select group by name', function (done) {
+    it('should select group by name', function() {
 
       // when
       groupsPage.groupName(0).getText().then(function(name) {
@@ -74,7 +74,7 @@ describe('Admin Groups Spec', function() {
     });
 
 
-    it('should create new group with backslash', function (done) {
+    it('should create new group with backslash', function() {
 
       // given
         groupsPage.newGroup.navigateTo();
@@ -90,7 +90,7 @@ describe('Admin Groups Spec', function() {
     });
 
 
-    it('should select group by edit link', function (done) {
+    it('should select group by edit link', function() {
 
       // when
       groupsPage.groupType(2).getText().then(function(type) {
@@ -106,15 +106,16 @@ describe('Admin Groups Spec', function() {
 
   describe('update/delete group', function() {
 
-    before(function(done) {
-      testHelper(setupFile, done);
+    before(function() {
+      return testHelper(setupFile, function() {
 
-      groupsPage.navigateToWebapp('Admin');
-      groupsPage.authentication.userLogin('admin', 'admin');
+        usersPage.navigateToWebapp('Admin');
+        usersPage.authentication.userLogin('admin', 'admin');
+      });
     });
 
 
-    it('should navigate to edit group menu', function (done) {
+    it('should navigate to edit group menu', function() {
 
       // given
       groupsPage.navigateTo();

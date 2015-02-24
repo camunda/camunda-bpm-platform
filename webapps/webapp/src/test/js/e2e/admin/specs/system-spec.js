@@ -6,11 +6,12 @@ var systemPage = require('../pages/system');
 
 describe('Admin system Spec', function() {
 
-  before(function(done) {
-    testHelper(done);
+  before(function() {
+    return testHelper(function() {
 
-    systemPage.navigateToWebapp('Admin');
-    systemPage.authentication.userLogin('admin', 'admin');
+      systemPage.navigateToWebapp('Admin');
+      systemPage.authentication.userLogin('admin', 'admin');
+    });
   });
 
 
