@@ -10,8 +10,8 @@ var page = require('../pages/dashboard');
 
 describe('Tasklist Search', function() {
 
-  before(function(done) {
-    testHelper(setupFile, done);
+  before(function() {
+    return testHelper(setupFile);
   });
 
 

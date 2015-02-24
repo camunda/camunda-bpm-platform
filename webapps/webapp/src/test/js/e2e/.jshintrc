@@ -2,6 +2,7 @@
   "globals": {
     "define": false,
     "browser": false,
+    "protractor": false,
     "element": false,
     "by": false,
     "describe": false,

@@ -11,30 +11,37 @@ var camClient = new CamSDK.Client({
 var keys = Object.keys;
 
 module.exports = function (operations, noReset, done) {
+  var deferred = protractor.promise.defer();
 
-  if (arguments.length === 1) {
+
+  if (arguments.length === 1 && typeof operations === 'function') {
+    // testHelper(function(){ console.log('setup complete'); });
     done = operations;
     noReset = false;
     operations = {};
-  }
-
-  if (arguments.length === 2) {
+  } else if (arguments.length === 1 && typeof operations === 'object') {
+    // testHelper(setupObject);
+    noReset = false;
+    done = function(){};
+  } else if (arguments.length === 2 && typeof noReset === 'function'){
+    // testHelper(setupObject, function(){ console.log('setup complete'); });
     done = noReset;
     noReset = false;
   }
-  
-  operations = operations || {};
+
   var callbacks = [
     function (cb) {
       if (noReset) {
         return cb();
       }
+
+      browser.manage().deleteAllCookies();
+
       request(resetUrl, function(err, res, body) {
         if (err) {
           return cb(err);
         }
-
-        var body = JSON.parse(body);
+        body = JSON.parse(body);
         cb(null, body);
       });
     }
@@ -45,14 +52,18 @@ module.exports = function (operations, noReset, done) {
       operations[resourceName][methodName].forEach(function (data) {
         var resource = new camClient.resource(resourceName);
         callbacks.push(function (cb) {
-          console.info('doing '+resourceName+'.'+methodName+'', data);
-          resource[methodName](data, cb);
+          console.info('doing '+resourceName+'.'+methodName, data);
+          resource[methodName](data, function(){
+            cb();
+          });
         });
       });
     });
   });
 
-  CamSDK.utils.series(callbacks, done);
+  CamSDK.utils.series(callbacks, function() {
+    deferred.fulfill();
+  });
 
-  browser.manage().deleteAllCookies();
+  return deferred.promise;
 };
