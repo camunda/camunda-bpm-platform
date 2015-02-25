@@ -27,8 +27,26 @@ section.tasks-list {
     margin-right: (@grid-gutter-width / 2);
   }
 
-  .new-sort .hidden-xs {
-    display: none;
+  // static positioning is needed because otherwise the .dropdown-menu get cropped
+  // by the parent element having overflow: hidden
+  .new-sort {
+    position: static;
+    > .dropdown-menu {
+      top: auto;
+    }
+
+    .hidden-xs {
+      display: none;
+    }
+  }
+
+  .dropdown-menu > li > .variable-inputs {
+    margin: (@grid-gutter-width / 2) 0;
+    padding: 0 20px;
+    .actions {
+      text-align: right;
+      margin-bottom: 0;
+    }
   }
 }
 

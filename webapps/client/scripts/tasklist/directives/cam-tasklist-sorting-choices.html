@@ -3,7 +3,8 @@
 
 <ol class="sorting-choice list-inline">
   <li ng-repeat="(index, sorting) in sortings"
-      class="sorting-choice dropdown">
+      class="sorting-choice dropdown"
+      is-open="openDropdowns[index]">
     <a class="glyphicon glyphicon-minus-sign"
        ng-if="sortings.length > 1"
        ng-click="removeSorting(index)"
@@ -12,60 +13,66 @@
 
     <a href
        tabindex="-1"
-       role="button"
-       class="dropdown-toggle"
-       data-toggle="dropdown">
-      <span class="sort-by">{{ sortableProps[sorting.by] | lowercase }}</span>
+       class="dropdown-toggle">
+      <span class="sort-by">{{ byLabel(index) }}</span>
     </a>
 
     <a href
        tabindex="-1"
-       title="{{ sorting.order | translate }}"
+       tooltip="{{ (sorting.order === 'desc' ? 'DESC' : 'ASC') | translate }}"
        class="sort-direction glyphicon glyphicon-chevron-up"
        ng-class="{'glyphicon-chevron-up': sorting.order === 'asc', 'glyphicon-chevron-down': sorting.order === 'desc'}"
        ng-click="changeOrder(index)"></a>
 
-    <ul class="dropdown-menu"
-        role="menu">
-      <li ng-repeat="(name, label) in sortableProps"
+    <ul class="dropdown-menu">
+      <!-- single time selectable -->
+      <li ng-repeat="(name, label) in uniqueProps"
           ng-if="sortedOn.indexOf(name) < 0">
-        <a href
-           sort-by="{{ name }}"
-           tabindex="-1"
+        <a tabindex="-1"
            translate="{{ label }}"
-           ng-click="changeBy(index, name)">
-          {{ label }}
-        </a>
+           ng-click="changeBy(index, name)"></a>
       </li>
+
+      <li class="divider"
+          ng-if="sortedOn.length < sortLimit"></li>
+
+      <!-- multiple times selectable -->
+      <li class="cam-sorting-variables"
+          sorting="sorting"></li>
     </ul>
   </li>
 
-  <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  - - -->
 
-  <li class="dropdown new-sort"
-      ng-if="sortedOn.length < sortLimit">
+
+
+
+
+
+  <li class="dropdown new-sort">
     <a href
-       role="button"
-       class="dropdown-toggle"
-       data-toggle="dropdown">
+       class="dropdown-toggle">
       <span class="glyphicon glyphicon-plus-sign"
-            tooltip="{{ ADD_SORT_BY | translate }}"
-            tooltip-placement="bottom"></span>
+            tooltip="{{ 'ADD_SORT_BY' | translate }}"></span>
       <span class="hidden-xs hidden-sm hidden-md"
             translate="ADD_SORT_BY"></span>
     </a>
 
-    <ul class="dropdown-menu"
-        role="menu">
-      <li ng-repeat="(name, label) in sortableProps"
+    <ul class="dropdown-menu">
+      <!-- single time selectable -->
+      <li ng-repeat="(name, label) in uniqueProps"
           ng-if="sortedOn.indexOf(name) < 0">
-        <a href
-           sort-by="{{ name }}"
-           tabindex="-1"
+        <a tabindex="-1"
            translate="{{ label }}"
            ng-click="addSorting(name)">
         </a>
       </li>
+
+      <li class="divider"
+          ng-if="sortedOn.length < sortLimit"></li>
+
+      <!-- multiple times selectable -->
+      <li class="cam-sorting-variables"
+          sorting="newSorting"></li>
     </ul>
   </li>
 </ol>

@@ -38,5 +38,11 @@
   "TASK_VARIABLE":
                   "Task Variable",
   "CASE_VARIABLE":
-                  "Case Variable"
+                  "Case Variable",
+  "EXECUTION_VARIABLE":
+                  "Execution Variable",
+  "CASE_EXECUTION_VARIABLE":
+                  "Case Execution Variable",
+  "CASE_INSTANCE_VARIABLE":
+                  "Case Instance Variable"
 }

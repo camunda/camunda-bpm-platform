@@ -7,82 +7,142 @@ define([
 ) {
   'use strict';
 
+  function addCSSRule(sheet, selector, rules, index) {
+    if('insertRule' in sheet) {
+      sheet.insertRule(selector + '{' + rules + '}', index);
+    }
+    else if('addRule' in sheet) {
+      sheet.addRule(selector, rules, index);
+    }
+  }
+
   function stringifySortings(sortingQuery) {
-    var items = sortingQuery.map(function (sorting) {
-      return {
+    return JSON.stringify(sortingQuery.map(function (sorting) {
+      var obj = {
         sortBy: sorting.by,
         sortOrder: sorting.order
       };
-    });
-    return JSON.stringify(items);
+
+      if (sorting.by.indexOf('Variable') > -1) {
+        if (!sorting.parameters) {
+          throw new Error('Variable sorting needs parameters');
+        }
+        obj.parameters = sorting.parameters;
+      }
+
+      return obj;
+    }));
   }
 
   return [
     'search',
     '$translate',
     '$location',
+    '$document',
   function(
     search,
     $translate,
-    $location
+    $location,
+    $document
   ) {
     return {
 
       restrict: 'A',
+
       scope: {
         tasklistData: '='
       },
 
       template: template,
 
+      controller: [function () {}],
+
       link: function(scope, element) {
         var $body = angular.element('body');
 
+        var sorting = {
+          order:    'desc',
+          by:       'created'
+        };
+
+        scope.sortings = [angular.copy(sorting)];
+
+        scope.openDropdowns = [];
+
+        scope.sortedOn = [];
+
+        // var sheets = document.styleSheets;
+        // var sheet = sheets[sheets.length - 1];
+        // var num = sheet.rules.length;
+        // addCSSRule(sheet, '', '', 1);
+
+        // console.info('sheets', sheets, $document, document.styleSheets);
+
         function updateBodyClass(plus) {
+          // if (scope.sortings.length > 1) {
+          // }
+          // console.info('element', element[0], element.height());
           $body
             .removeClass('sort-choices-' + scope.sortings.length)
             .addClass('sort-choices-' + (scope.sortings.length + plus))
           ;
         }
 
-        var tasklistData = scope.tasklistData.newChild(scope);
+        scope.uniqueProps = {
+          priority:               $translate.instant('PRIORITY'),
+          created:                $translate.instant('CREATION_DATE'),
+          dueDate:                $translate.instant('DUE_DATE'),
+          followUpDate:           $translate.instant('FOLLOW_UP_DATE'),
+          nameCaseInsensitive:    $translate.instant('TASK_NAME'),
+          assignee:               $translate.instant('ASSIGNEE')
+        };
 
-        scope.sortableProps = {
-          priority:             $translate.instant('PRIORITY'),
-          created:              $translate.instant('CREATION_DATE'),
-          dueDate:              $translate.instant('DUE_DATE'),
-          followUpDate:         $translate.instant('FOLLOW_UP_DATE'),
-          nameCaseInsensitive:  $translate.instant('TASK_NAME'),
-          assignee:             $translate.instant('ASSIGNEE')
+        scope.byLabel = function (index) {
+          if (!scope.sortings[index]) {
+            return '';
+          }
+
+          var by = scope.sortings[index].by;
+
+          if (scope.uniqueProps[by]) {
+            return scope.uniqueProps[by].toLowerCase();
+          }
+
+          if (!scope.sortings[index] || !scope.sortings[index].parameters) {
+            return '';
+          }
+
+          return scope.sortings[index].parameters.variable;
         };
-        var sorting = {
-          order:    'desc',
-          by:       null,
-          byLabel:  null
-        };
-        scope.sortings = [
-          angular.copy(sorting)
-        ];
-        scope.sortedOn = [];
-        scope.sortLimit = Object.keys(scope.sortableProps).length;
+
+        scope.sortLimit = Object.keys(scope.uniqueProps).length;
 
         /**
          * observe the task list query
          */
+        var tasklistData = scope.tasklistData.newChild(scope);
+
         tasklistData.observe('taskListQuery', function(taskListQuery) {
           if (taskListQuery) {
             var urlSortings = JSON.parse(($location.search() || {}).sorting || '[]');
 
             scope.sortedOn = [];
+            scope.openDropdowns = [];
 
             scope.sortings = urlSortings.map(function (sorting) {
               scope.sortedOn.push(sorting.sortBy);
+              scope.openDropdowns.push(false);
 
-              return {
-                order:    sorting.sortOrder,
-                by:       sorting.sortBy,
-                byLabel:  scope.sortableProps[sorting.sortBy]
+              var returned = {
+                order:      sorting.sortOrder,
+                by:         sorting.sortBy
               };
+
+              if (sorting.parameters) {
+                returned.parameters = sorting.parameters;
+              }
+
+              return returned;
             });
 
             updateBodyClass(0);
@@ -92,6 +152,29 @@ define([
             }
           }
         });
+
+
+        scope.$watch('sortings.length', function (now, before) {
+          if (now !== before) { updateSortings(); }
+        });
+
+
+        // should NOT manipulate the `scope.sortings`!
+        function updateSortings(dontApply) {
+          scope.openDropdowns = [];
+          scope.sortedOn = scope.sortings.map(function (sorting) {
+            scope.openDropdowns.push(false);
+            return sorting.by;
+          });
+
+          if (!dontApply) {
+            search.updateSilently({
+              sorting: stringifySortings(scope.sortings)
+            });
+
+            tasklistData.changed('taskListQuery');
+          }
+        }
 
         /**
          * Invoked when adding a sorting object
@@ -104,15 +187,7 @@ define([
           newSorting.by = by;
           scope.sortings.push(newSorting);
 
-          scope.sortedOn = scope.sortings.map(function (sorting) {
-            return sorting.by;
-          });
-
-          search.updateSilently({
-            sorting: stringifySortings(scope.sortings)
-          });
-
-          tasklistData.changed('taskListQuery');
+          updateSortings();
         };
 
         /**
@@ -129,16 +204,7 @@ define([
           });
           scope.sortings = newSortings;
 
-          scope.sortedOn = scope.sortings.map(function (sorting) {
-            return sorting.by;
-          });
-
-          // update query
-          search.updateSilently({
-            sorting: stringifySortings(scope.sortings)
-          });
-
-          tasklistData.changed('taskListQuery');
+          updateSortings();
         };
 
         /**
@@ -147,34 +213,17 @@ define([
         scope.changeOrder = function(index) {
           scope.sortings[index].order = scope.sortings[index].order === 'asc' ? 'desc' : 'asc';
 
-          // update query
-          search.updateSilently({
-            sorting: stringifySortings(scope.sortings)
-          });
-
-          tasklistData.changed('taskListQuery');
+          updateSortings();
         };
 
         /**
          * invoked when the sort property is changed
          */
         scope.changeBy = function(index, by) {
-          // close dropdown
-          element.find('.dropdown.open').removeClass('open');
           scope.sortings[index].by = by;
 
-          scope.sortedOn = scope.sortings.map(function (sorting) {
-            return sorting.by;
-          });
-
-          // // update query
-          search.updateSilently({
-            sorting: stringifySortings(scope.sortings)
-          });
-
-          tasklistData.changed('taskListQuery');
+          updateSortings();
         };
-
       }
     };
   }];
