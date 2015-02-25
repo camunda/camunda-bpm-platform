@@ -9,8 +9,8 @@ define([
     var module = angular.module('cam.cockpit.pages.processInstance', [camCommoms.name, dataDepend.name]);
 
   var Controller = [
-          '$scope', '$filter', 'search', 'ProcessDefinitionResource', 'ProcessInstanceResource', 'IncidentResource', 'Views', 'Data', 'Transform', 'processInstance', 'dataDepend', 'page', 'breadcrumbTrails',
-  function($scope,   $filter,   search,   ProcessDefinitionResource,   ProcessInstanceResource,   IncidentResource,   Views,   Data,   Transform,   processInstance,   dataDepend,   page,   breadcrumbTrails) {
+          '$scope', '$filter', '$rootScope', 'search', 'ProcessDefinitionResource', 'ProcessInstanceResource', 'IncidentResource', 'Views', 'Data', 'Transform', 'processInstance', 'dataDepend', 'page', 'breadcrumbTrails',
+  function($scope,   $filter,   $rootScope,   search,   ProcessDefinitionResource,   ProcessInstanceResource,   IncidentResource,   Views,   Data,   Transform,   processInstance,   dataDepend,   page,   breadcrumbTrails) {
 
     $scope.processInstance = processInstance;
 
@@ -376,6 +376,8 @@ define([
         done(null, superInstance);
       });
     }
+
+    $rootScope.showBreadcrumbs = true;
 
     processData.observe([
              'processDefinition', 'processInstance', 'superProcessInstanceCount'],

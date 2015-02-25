@@ -17,8 +17,8 @@ define([
   var module = angular.module('cam.cockpit.pages.processDefinition', [dataDepend.name, camCommons.name]);
 
   var Controller = [
-          '$scope', 'search', 'ProcessDefinitionResource', 'ProcessInstanceResource', 'Views', 'Data', 'Transform', 'Variables', 'dataDepend', 'processDefinition', 'page',
-  function($scope,   search,   ProcessDefinitionResource,   ProcessInstanceResource,   Views,   Data,   Transform,   Variables,   dataDepend,   processDefinition,   page
+          '$scope', '$rootScope', 'search', 'ProcessDefinitionResource', 'ProcessInstanceResource', 'Views', 'Data', 'Transform', 'Variables', 'dataDepend', 'processDefinition', 'page',
+  function($scope,   $rootScope,   search,   ProcessDefinitionResource,   ProcessInstanceResource,   Views,   Data,   Transform,   Variables,   dataDepend,   processDefinition,   page
   ) {
 
     var processData = $scope.processData = dataDepend.create($scope);
@@ -236,6 +236,7 @@ define([
 
 
     // begin data usage ////////////////////////////
+    $rootScope.showBreadcrumbs = true;
 
     $scope.breadcrumbData = processData.observe([ 'processDefinition', 'parent' ], function(definition, parent) {
       page.breadcrumbsClear();
