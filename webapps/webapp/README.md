@@ -130,7 +130,7 @@ at the beginning and end of the HTML files used as angular templates, as follow:
 ```
 
 The `#` implies here the beginning and the `/` implies the end of the template. The `CE` is meant to
-indicate that that the file is part of the community edition of the platform.  
+indicate that that the file is part of the community edition of the platform.
 It makes much easier to find which file is used during development.
 
 _Note:_ those comments are removed when the project is build for production.
@@ -151,31 +151,24 @@ the environment variables `(PHANTOMJS|FIREFOX|CHROME|IE)_BIN` for the testing en
 mvn clean test
 ```
 
-#### Client Side - _unit_
-
-```
-grunt test:unit
-```
-
 #### Client Side - _integration_
 
-To test the integration, you will need to have a [running instance](#development-setup) (on, default, port 8080) of the camunda BPM platform.
+To test the integration, you will need to have a running instance of the test backend of the camunda BPM platform.
 
 ```
-grunt test:e2e
+mvn jetty:run -P test-e2e
 ```
 
-If you want to run a specific set of tests (available sets are: `admin`, `cockpit` and `tasklist`), you can run the following command:
+To run the integration test:
 
 ```
-grunt test:e2e:<set name>
+grunt test-e2e
 ```
 
-If you want to work on E2E tests and run only 1 set of tests when a change is made,
-you can do so by setting an environement variable `E2E_TESTS`.
+If you want to run a specific protractor config:
 
 ```
-E2E_TESTS=<set name> grunt auto-build
+grunt test-e2e --protractorConfig src/test/js/e2e/my.conf.js
 ```
 
 
@@ -225,9 +218,9 @@ Read more about [how cockpit plugins work and how to develop them](http://docs.c
 
 #### Extending Admin through plugins
 
-Plugins to the Admin application work in the same way as cockpit plugins. The server side Java plugin SPI interface is `org.camunda.bpm.admin.plugin.spi.AdminPlugin`. 
+Plugins to the Admin application work in the same way as cockpit plugins. The server side Java plugin SPI interface is `org.camunda.bpm.admin.plugin.spi.AdminPlugin`.
 
-On the client side, admin supports the following extension points: 
+On the client side, admin supports the following extension points:
 
 * `admin.system`: Plugins are added to the _System_ section and may provide a settings panel.
 
@@ -274,14 +267,14 @@ angular.module('cockpit.plugin')._camPlugins
 
 #### Overriding a Plugin's Resources (Server Side)
 
-It is possible for one plugin to override some of it's own or other plugin's static resources. 
+It is possible for one plugin to override some of it's own or other plugin's static resources.
 Static resources are web resources like Html views, Java Script assets, CSS, Images ...
 
-This feature is useful for many usecases such as customizing built-in plugins, securing plugins or 
-deactivating plugins. 
+This feature is useful for many usecases such as customizing built-in plugins, securing plugins or
+deactivating plugins.
 
-In order to implement a resource override, a plugin must provide an implementation of the 
-`org.camunda.bpm.webapp.plugin.resource.PluginResourceOverride` interface: 
+In order to implement a resource override, a plugin must provide an implementation of the
+`org.camunda.bpm.webapp.plugin.resource.PluginResourceOverride` interface:
 
 ```java
 public class ExampleResourceOverride implements PluginResourceOverride {
@@ -299,7 +292,7 @@ public class ExampleResourceOverride implements PluginResourceOverride {
 }
 ```
 
-An instance of the implementation can then be returned from a plugin class in the `public List<PluginResourceOverride> getResourceOverrides();` method. 
+An instance of the implementation can then be returned from a plugin class in the `public List<PluginResourceOverride> getResourceOverrides();` method.
 
 ### Generate Documentation for the Application
 

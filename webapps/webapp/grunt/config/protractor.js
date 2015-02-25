@@ -1,10 +1,10 @@
-module.exports = function() {
+module.exports = function(config) {
   'use strict';
 
   return {
     e2e: {
       options: {
-        configFile: 'src/test/js/e2e/develop.conf.js',
+        configFile: config.protractorConfig,
         seleniumAddress: 'http://localhost:4444/wd/hub'
       }
     }

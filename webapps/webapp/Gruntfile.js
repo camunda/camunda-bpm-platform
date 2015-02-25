@@ -4,11 +4,13 @@ module.exports = function(grunt) {
   require('load-grunt-tasks')(grunt);
 
   var pkg = require('./package.json');
+  var protractorConfig = grunt.option('protractorConfig') || 'src/test/js/e2e/ci.conf.js';
 
   var config = pkg.gruntConfig || {};
 
   config.grunt = grunt;
   config.pkg = pkg;
+  config.protractorConfig = protractorConfig;
 
   grunt.initConfig({
     pkg:              pkg,
