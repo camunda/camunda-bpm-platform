@@ -86,14 +86,19 @@ define([
             });
 
             updateBodyClass(0);
+
+            if (!scope.sortings.length) {
+              scope.addSorting('created');
+            }
           }
         });
 
         /**
          * Invoked when adding a sorting object
          */
-        scope.addSorting = function (by) {
+        scope.addSorting = function (by, order) {
           updateBodyClass(1);
+          order = order || 'desc';
 
           var newSorting = angular.copy(sorting);
           newSorting.by = by;
