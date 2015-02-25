@@ -581,7 +581,10 @@
                       <arg value="update" />
                     </exec>
                     <exec executable="grunt" failonerror="true">
+                      <env key="XUNIT_FILE" value="target/xunit.xml" />
+                      <env key="LOG_XUNIT" value="true" />
                       <arg value="test-e2e" />
+                      <arg value="--color=false" />
                     </exec>
                   </target>
                 </configuration>

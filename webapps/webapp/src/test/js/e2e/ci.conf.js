@@ -59,7 +59,7 @@ exports.config = {
   mochaOpts: {
     timeout: 15000,
     colors: false,
-    reporter: "spec",
+    reporter: "xunit-file",
     slow: 3000
   }
 };
