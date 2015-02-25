@@ -20,6 +20,7 @@ module.exports = function(config) {
       files: [
         'node_modules/camunda-commons-ui/lib/widgets/**/*.less',
         'node_modules/camunda-commons-ui/resources/less/**/*.less',
+        'node_modules/camunda-commons-ui/lib/**/*.less',
         'node_modules/camunda-*/client/styles/**/*.{css,less}',
         '<%= pkg.gruntConfig.clientDir %>/styles/**/*.{css,less}',
         '<%= pkg.gruntConfig.clientDir %>/scripts/*/*.{css,less}'
@@ -31,18 +32,19 @@ module.exports = function(config) {
 
     scripts: {
       files: [
-        'node_modules/camunda-commons-ui/index.js',
+        '../camunda-bpm-webapp/webapp/target/webapp/plugin/**/*.{js,html}',
+        '../camunda-bpm-platform-ee/webapps/camunda-webapp/plugins/target/classes/plugin-webapp/**/*.{js,html}',
+        'node_modules/camunda-commons-ui/**/*.{js,html}',
         'grunt/config/requirejs.js',
         '<%= pkg.gruntConfig.clientDir %>/scripts/**/*.{js,html}'
       ],
       tasks: [
-        'requirejs'
+        'requirejs:scripts'
       ]
     },
 
     dependencies: {
       files: [
-        'node_modules/camunda-commons-ui/index.js',
         'grunt/config/requirejs.js'
       ],
       tasks: [
