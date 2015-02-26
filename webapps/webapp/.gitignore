@@ -11,4 +11,4 @@ test-results.xml
 /src/main/webapp/assets/vendor
 /doc
 /selenium
-src/test/js/e2e/develop.conf.js
+/src/test/js/e2e/dev.conf.js
