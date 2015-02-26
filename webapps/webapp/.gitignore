@@ -12,3 +12,4 @@ test-results.xml
 /doc
 /selenium
 /src/test/js/e2e/dev.conf.js
+xunit.xml
