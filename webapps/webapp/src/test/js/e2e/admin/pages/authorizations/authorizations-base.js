@@ -33,6 +33,48 @@ module.exports = Page.extend({
 
   createNewButton: function() {
     return element(by.css('[ng-hide="isCreateNewAuthorization"]')).element(by.css('[ng-click="toggleCreateNewForm()"]'));
+  },
+
+  createNewElement: function() {
+    return element(by.id('createNew'));
+  },
+
+  authorizationType: function(authType) {
+    element(by.cssContainingText('option', authType.toUpperCase())).click();
+  },
+
+  identityIdButton: function() {
+
+  },
+
+  identityIdInputFiled: function(inputValue) {
+    var inputField = this.createNewElement().element(by.model('identityId'));
+
+    if (arguments.length !== 0)
+      inputField.sendKeys(inputValue);
+
+    return inputField;
+  },
+
+  permissions: function() {
+
+  },
+
+  resourceId: function(inputValue) {
+    var inputField = this.createNewElement().element(by.model('newAuthorization.resourceId'));
+
+    if (arguments.length !== 0)
+      inputField.sendKeys(inputValue);
+
+    return inputField;
+  },
+
+  submitNewAuthorizationButton: function() {
+    return this.createNewElement().element(by.css('[ng-click="createAuthorization()"]'));
+  },
+
+  abortNewAuthorizationButton: function() {
+    return this.createNewElement().element(by.css('[ng-click="toggleCreateNewForm()"]'));
   }
 
 });

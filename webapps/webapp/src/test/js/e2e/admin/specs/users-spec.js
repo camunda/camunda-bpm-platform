@@ -1,3 +1,5 @@
+'use strict';
+
 var testHelper = require('../../test-helper');
 var setupFile = require('./users-setup');
 
@@ -19,7 +21,7 @@ describe('Admin Users Spec', function() {
     });
 
 
-    beforeEach(function () {
+    beforeEach(function() {
       usersPage.navigateTo();
     });
 
@@ -254,7 +256,7 @@ describe('Admin Users Spec', function() {
       });
 
 
-      it('should validate new password', function (done) {
+      it('should validate new password', function() {
 
         // when
         usersPage.logout();
@@ -269,9 +271,9 @@ describe('Admin Users Spec', function() {
   });
 
 
-  describe('add/delete group', function () {
+  describe('add/delete group', function() {
 
-    before(function () {
+    before(function() {
       return testHelper(setupFile, function() {
 
         usersPage.navigateToWebapp('Admin');

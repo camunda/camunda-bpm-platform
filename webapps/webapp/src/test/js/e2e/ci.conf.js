@@ -18,19 +18,16 @@ exports.config = {
     }
   },
 
-  /*    multiCapabilities: [{
-   'browserName': 'chrome'
-   }, {
-   'browserName': 'firefox'
-   }],
-   */
-
   // ----- What tests to run -----
   //
   // Spec patterns are relative to the location of the spec file. They may
   // include glob patterns.
   specs: [
-    'admin/specs/admin-user-spec.js'
+    'admin/specs/admin-user-spec.js',
+    'admin/specs/users-spec.js',
+    'admin/specs/groups-spec.js',
+    'admin/specs/system-spec.js',
+    'admin/specs/authorizations-spec.js'
   ],
 
   // A base URL for your application under test. Calls to protractor.get()
@@ -44,17 +41,10 @@ exports.config = {
   // assertion framework if working with mocha.
   framework: 'mocha',
 
-/*
   // ----- Options to be passed to minijasminenode -----
   //
-  // Options to be passed to Jasmine-node.
+  // Options to be passed to Mocha-node.
   // See the full list at https://github.com/juliemr/minijasminenode
-  jasmineNodeOpts: {
-    defaultTimeoutInterval: 15000, // Default time to wait in ms before a test fails.
-    showColors: true, // Use colors in the command line report.
-    includeStackTrace: true // If true, include stack traces in failures.
-  }
-  */
 
   mochaOpts: {
     timeout: 15000,

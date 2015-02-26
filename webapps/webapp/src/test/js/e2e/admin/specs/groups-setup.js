@@ -26,12 +26,12 @@ ops.group = {
   {
     id:   "sales",
     name: "Sales",
-    type: "WORKFLOW"    
+    type: "WORKFLOW"
   },
   {
     id:   "marketing",
     name: "Marketing",
-    type: "WORKFLOW"    
+    type: "WORKFLOW"
   }],
   createMember: [{
     id:     "marketing",
@@ -40,7 +40,7 @@ ops.group = {
   {
     id:     "accounting",
     userId: "john"
-  },  
+  },
   {
     id:     "sales",
     userId: "john"

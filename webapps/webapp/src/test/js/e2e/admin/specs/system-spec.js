@@ -17,7 +17,7 @@ describe('Admin system Spec', function() {
 
   describe('navigate to system pages', function() {
 
-    it('should navigate to system menu', function () {
+    it('should navigate to system menu', function() {
 
       // when
       systemPage.selectNavbarItem('System');

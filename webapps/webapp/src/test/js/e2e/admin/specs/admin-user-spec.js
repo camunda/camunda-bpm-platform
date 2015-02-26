@@ -12,7 +12,7 @@ describe('Admin admin-user Spec', function() {
   });
 
 
-  it('should validate admin setup page', function () {
+  it('should validate admin setup page', function() {
 
     // when
     usersPage.navigateToWebapp('Admin');
