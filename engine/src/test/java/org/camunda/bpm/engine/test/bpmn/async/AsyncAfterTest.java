@@ -17,6 +17,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
+import org.camunda.bpm.engine.impl.pvm.runtime.operation.PvmAtomicOperation;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.Job;
@@ -498,6 +500,76 @@ public class AsyncAfterTest extends PluggableProcessEngineTestCase {
     assertListenerTakeInvoked(processInstance);
   }
 
+  @Deployment
+  public void testAsyncAfterOnParallelGatewayFork() {
+    String configuration = PvmAtomicOperation.TRANSITION_NOTIFY_LISTENER_TAKE.getCanonicalName();
+    String config1 = configuration + "$afterForkFlow1";
+    String config2 = configuration + "$afterForkFlow2";
+
+    runtimeService.startProcessInstanceByKey("process");
+
+    // there are two jobs
+    List<Job> jobs = managementService.createJobQuery().list();
+    assertEquals(2, jobs.size());
+    Job jobToExecute = fetchFirstJobByHandlerConfiguration(jobs, config1);
+    assertNotNull(jobToExecute);
+    managementService.executeJob(jobToExecute.getId());
+
+    Task task1 = taskService.createTaskQuery().taskDefinitionKey("theTask1").singleResult();
+    assertNotNull(task1);
+
+    // there is one left
+    jobs = managementService.createJobQuery().list();
+    assertEquals(1, jobs.size());
+    jobToExecute = fetchFirstJobByHandlerConfiguration(jobs, config2);
+    managementService.executeJob(jobToExecute.getId());
+
+    Task task2 = taskService.createTaskQuery().taskDefinitionKey("theTask2").singleResult();
+    assertNotNull(task2);
+
+    assertEquals(2, taskService.createTaskQuery().count());
+  }
+
+  @Deployment
+  public void FAILING_testAsyncAfterOnParallelGatewayJoin() {
+    String configuration = PvmAtomicOperation.ACTIVITY_END.getCanonicalName();
+
+    runtimeService.startProcessInstanceByKey("process");
+
+    // there are three jobs
+    List<Job> jobs = managementService.createJobQuery().list();
+    assertEquals(3, jobs.size());
+    Job jobToExecute = fetchFirstJobByHandlerConfiguration(jobs, configuration);
+    assertNotNull(jobToExecute);
+    managementService.executeJob(jobToExecute.getId());
+
+    // there are two jobs left
+    jobs = managementService.createJobQuery().list();
+    assertEquals(2, jobs.size());
+    jobToExecute = fetchFirstJobByHandlerConfiguration(jobs, configuration);
+    managementService.executeJob(jobToExecute.getId());
+
+    // there is one job left
+    jobToExecute = managementService.createJobQuery().singleResult();
+    assertNotNull(jobToExecute);
+    managementService.executeJob(jobToExecute.getId());
+
+    // the process should stay in the user task
+    Task task = taskService.createTaskQuery().singleResult();
+    assertNotNull(task);
+  }
+
+  protected Job fetchFirstJobByHandlerConfiguration(List<Job> jobs, String configuration) {
+    for (Job job : jobs) {
+      JobEntity jobEntity = (JobEntity) job;
+      String jobConfig = jobEntity.getJobHandlerConfiguration();
+      if (configuration.equals(jobConfig)) {
+        return job;
+      }
+    }
+
+    return null;
+  }
 
   protected void assertListenerStartInvoked(Execution e) {
     assertTrue((Boolean) runtimeService.getVariable(e.getId(), "listenerStartInvoked"));

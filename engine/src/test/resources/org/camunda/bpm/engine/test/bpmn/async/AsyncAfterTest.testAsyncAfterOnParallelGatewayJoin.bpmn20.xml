@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:camunda="http://activiti.org/bpmn"
+             targetNamespace="Examples">
+
+  <process id="process">
+
+    <startEvent id="theStart" />
+
+    <sequenceFlow sourceRef="theStart" targetRef="theService" />
+
+    <serviceTask id="theService" camunda:expression="${true}" />
+
+    <sequenceFlow sourceRef="theService" targetRef="fork" />
+
+    <parallelGateway id="fork" />
+
+    <sequenceFlow sourceRef="fork" targetRef="theService1" />
+    <serviceTask id="theService1" camunda:expression="${true}" />
+    <sequenceFlow sourceRef="theService1" targetRef="join" />
+
+    <sequenceFlow sourceRef="fork" targetRef="theService2" />
+    <serviceTask id="theService2" camunda:expression="${true}" />
+    <sequenceFlow sourceRef="theService2" targetRef="join" />
+
+    <parallelGateway id="join" camunda:asyncAfter="true" />
+
+    <sequenceFlow id="afterJoinFlow" sourceRef="join" targetRef="theUserTask" />
+
+    <userTask id="theUserTask" />
+
+    <sequenceFlow sourceRef="theUserTask" targetRef="theEnd" />
+
+    <endEvent id="theEnd" />
+
+  </process>
+
+</definitions>
