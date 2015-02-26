@@ -153,13 +153,19 @@ mvn clean test
 
 #### Client Side - _integration_
 
-To test the integration, you will need to have a running instance of the test backend of the camunda BPM platform.
+To test the integration you can run:
 
 ```
-mvn jetty:run -P test-e2e
+mvn clean verify -P test-e2e
 ```
 
-To run the integration test:
+If you want to develop e2e test with live code reload, you will need to have a running instance of the test backend of the camunda BPM platform:
+
+```
+mvn jetty:run -P dev-e2e
+```
+
+After that you can run the integration test:
 
 ```
 grunt test-e2e
