@@ -22,10 +22,12 @@ module.exports = function (operations, noReset, done) {
     // testHelper(setupObject);
     noReset = false;
     done = function(){};
-  } else if (arguments.length === 2 && typeof noReset === 'function'){
+  } else if (arguments.length === 2 && typeof noReset === 'function') {
     // testHelper(setupObject, function(err, result){ console.log('setup complete', result); });
     done = noReset;
     noReset = false;
+  } else if (arguments.length === 2 && typeof noReset === 'boolean') {
+    done = function(){};
   }
 
   var callbacks = [
@@ -45,7 +47,7 @@ module.exports = function (operations, noReset, done) {
       });
     }
   ];
-  
+
   keys(operations).forEach(function (resourceName) {
     keys(operations[resourceName]).forEach(function (methodName) {
       operations[resourceName][methodName].forEach(function (data) {
