@@ -1,25 +1,29 @@
 'use strict';
 
-var Base = require('./dashboard-view');
-
-var tableForm = element(by.css('.table'));
+var Base = require('./deployed-processes-plugin');
 
 module.exports = Base.extend({
 
-  processesList: function () {
-    return tableForm.all(by.repeater('statistic in statistics'));
+  tabLabel: 'List',
+
+  listObject: function() {
+    return this.pluginObject().element(by.css('.process-definitions-list'));
+  },
+
+  processesList: function() {
+    return this.listObject().all(by.repeater('statistic in statistics'));
   },
 
   selectProcess: function(item) {
-    return this.processesList().get(item).element(by.binding('definition.name')).click();
+    return this.processesList().get(item).element(by.binding('{{ statistic.definition.name }}')).click();
   },
 
   processName: function(item) {
-    return this.processesList().get(item).element(by.binding('definition.name')).getText();
+    return this.processesList().get(item).element(by.binding('{{ statistic.definition.name }}')).getText();
   },
 
   runningInstances: function(item) {
-    return this.processesList().get(item).element(by.binding('.instances')).getText();
+    return this.processesList().get(item).element(by.binding('{{ statistic.instances }}')).getText();
   }
 
 });

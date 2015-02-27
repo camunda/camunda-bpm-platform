@@ -27,7 +27,8 @@ exports.config = {
     'admin/specs/users-spec.js',
     'admin/specs/groups-spec.js',
     'admin/specs/system-spec.js',
-    'admin/specs/authorizations-spec.js'
+    'admin/specs/authorizations-spec.js',
+    'cockpit/specs/dashboard-spec.js'
   ],
 
   // A base URL for your application under test. Calls to protractor.get()
