@@ -19,11 +19,13 @@ import org.camunda.bpm.engine.impl.cmd.CompleteTaskCmd;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.task.TaskQuery;
 import org.camunda.bpm.engine.test.Deployment;
+import org.junit.Ignore;
 
 /**
  * @author Roman Smirnov
  *
  */
+@Ignore
 public class CompetingForkTest extends PluggableProcessEngineTestCase {
 
   private static Logger log = Logger.getLogger(CompetingForkTest.class.getName());
