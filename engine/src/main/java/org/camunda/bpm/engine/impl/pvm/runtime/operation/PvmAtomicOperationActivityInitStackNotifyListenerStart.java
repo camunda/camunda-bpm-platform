@@ -12,13 +12,13 @@
  */
 package org.camunda.bpm.engine.impl.pvm.runtime.operation;
 
-import java.util.List;
-
 import org.camunda.bpm.engine.delegate.ExecutionListener;
-import org.camunda.bpm.engine.impl.pvm.PvmActivity;
+import org.camunda.bpm.engine.impl.pvm.PvmTransition;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
+import org.camunda.bpm.engine.impl.pvm.process.TransitionImpl;
 import org.camunda.bpm.engine.impl.pvm.runtime.ExecutionStartContext;
+import org.camunda.bpm.engine.impl.pvm.runtime.InstantiationStack;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 
 /**
@@ -53,17 +53,25 @@ public class PvmAtomicOperationActivityInitStackNotifyListenerStart extends PvmA
     super.eventNotificationsCompleted(execution);
 
     ExecutionStartContext startContext = execution.getExecutionStartContext();
-    List<PvmActivity> activityStack = startContext.getActivityStack();
-    PvmActivity currentActivity = activityStack.get(0);
+    InstantiationStack instantiationStack = startContext.getInstantiationStack();
 
-    if (activityStack.size() == 1) {
-      // if the next activity is the last activity on the stack,
-      // execute it with this execution
+    // if the stack has been instantiated
+    if (instantiationStack.getActivities().isEmpty() && instantiationStack.getTargetActivity() != null) {
+      // execute the target activity with this execution
       startContext.applyVariables(execution);
-      execution.setActivity(currentActivity);
+      execution.setActivity(instantiationStack.getTargetActivity());
       execution.performOperation(ACTIVITY_START_CREATE_SCOPE);
 
-    } else {
+    }
+    else if (instantiationStack.getActivities().isEmpty() && instantiationStack.getTargetTransition() != null) {
+      // execute the target transition with this execution
+      PvmTransition transition = instantiationStack.getTargetTransition();
+      startContext.applyVariables(execution);
+      execution.setActivity(transition.getSource());
+      execution.setTransition((TransitionImpl) transition);
+      execution.performOperation(TRANSITION_START_NOTIFY_LISTENER_TAKE);
+    }
+    else {
       // else instantiate the activity stack further
       execution.setActivity(null);
       execution.performOperation(ACTIVITY_INIT_STACK);

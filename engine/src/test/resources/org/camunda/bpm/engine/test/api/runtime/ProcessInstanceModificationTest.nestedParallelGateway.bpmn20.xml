@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:activiti="http://activiti.org/bpmn"
+  targetNamespace="org.camunda.bpm.engine.test.enginge.test.api.runtime">
+
+  <process id="nestedParallelGateway">
+  
+    <startEvent id="theStart" />
+    <sequenceFlow id="flow1" sourceRef="theStart" targetRef="fork" />
+    <parallelGateway id="fork" />
+    
+    <sequenceFlow id="flow2" sourceRef="fork" targetRef="outerTask" />
+    <userTask id="outerTask" />    
+    <sequenceFlow id="flow3" sourceRef="outerTask" targetRef="outerEnd" />
+    
+    <sequenceFlow id="flow4" sourceRef="fork" targetRef="subProcess" />
+    
+    <subProcess id="subProcess">
+      <startEvent id="subProcessStart" />
+      <sequenceFlow id="flow5" sourceRef="subProcessStart" targetRef="innerFork" />
+      <parallelGateway id="innerFork" />
+      <sequenceFlow id="flow6" sourceRef="innerFork" targetRef="innerTask1" />
+      <userTask id="innerTask1"/>
+      <sequenceFlow id="flow7" sourceRef="innerTask1" targetRef="subProcessEnd1" />
+      <endEvent id="subProcessEnd1" />
+      
+      <sequenceFlow id="flow8" sourceRef="innerFork" targetRef="innerTask2" />
+      <userTask id="innerTask2"/>
+      <sequenceFlow id="flow9" sourceRef="innerTask2" targetRef="subProcessEnd2" />
+      <endEvent id="subProcessEnd2" />
+    </subProcess>
+    <sequenceFlow id="flow11" sourceRef="subProcess" targetRef="outerEnd" />
+    
+    <endEvent id="outerEnd" />
+  </process>
+
+</definitions>

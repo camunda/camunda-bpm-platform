@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:activiti="http://activiti.org/bpmn"
+  targetNamespace="org.camunda.bpm.engine.test.enginge.test.api.runtime">
+
+  <process id="listenerProcess">
+    <extensionElements>
+      <activiti:executionListener event="end" delegateExpression="${listener}" />
+    </extensionElements>
+  
+    <startEvent id="theStart" />
+    <sequenceFlow id="flow1" sourceRef="theStart" targetRef="fork" />
+    <parallelGateway id="fork" />
+    
+    <sequenceFlow id="flow2" sourceRef="fork" targetRef="outerTask" />
+    <userTask id="outerTask">
+      <extensionElements>
+        <activiti:executionListener event="end" delegateExpression="${listener}" />
+      </extensionElements>
+    </userTask>    
+    <sequenceFlow id="flow3" sourceRef="outerTask" targetRef="outerEnd" />
+    
+    <sequenceFlow id="flow4" sourceRef="fork" targetRef="subProcess" />
+    
+    <subProcess id="subProcess">
+      <extensionElements>
+        <activiti:executionListener event="end" delegateExpression="${listener}" />
+      </extensionElements>
+      
+      <startEvent id="subProcessStart" />
+      <sequenceFlow id="flow5" sourceRef="subProcessStart" targetRef="innerFork" />
+      <parallelGateway id="innerFork" />
+      <sequenceFlow id="flow6" sourceRef="innerFork" targetRef="innerTask1" />
+      <userTask id="innerTask1">
+        <extensionElements>
+          <activiti:executionListener event="end" delegateExpression="${listener}" />
+        </extensionElements>
+      </userTask>
+      <sequenceFlow id="flow7" sourceRef="innerTask1" targetRef="innerJoin" />
+      
+      <sequenceFlow id="flow8" sourceRef="innerFork" targetRef="innerTask2" />
+      <userTask id="innerTask2">
+        <extensionElements>
+          <activiti:executionListener event="end" delegateExpression="${listener}" />
+        </extensionElements>
+      </userTask>
+      <sequenceFlow id="flow9" sourceRef="innerTask2" targetRef="innerJoin" />
+      
+      <parallelGateway id="innerJoin" />
+      <sequenceFlow id="flow10" sourceRef="innerJoin" targetRef="subProcessEnd" />
+      <endEvent id="subProcessEnd" />
+      
+      <boundaryEvent id="boundaryTimer1" cancelActivity="true" attachedToRef="innerTask1">
+        <timerEventDefinition>
+          <timeDuration>PT1H</timeDuration>
+        </timerEventDefinition>
+      </boundaryEvent>
+      <sequenceFlow id="flow11" sourceRef="boundaryTimer1" targetRef="afterBoundaryTask1" />
+      <userTask id="afterBoundaryTask1" />
+      <sequenceFlow id="flow12" sourceRef="afterBoundaryTask1" targetRef="boundaryEnd1" />
+      <endEvent id="boundaryEnd1" />
+      
+      <boundaryEvent id="boundaryTimer2" cancelActivity="true" attachedToRef="innerTask2">
+        <timerEventDefinition>
+          <timeDuration>PT1H</timeDuration>
+        </timerEventDefinition>
+      </boundaryEvent>
+      <sequenceFlow id="flow13" sourceRef="boundaryTimer2" targetRef="afterBoundaryTask2" />
+      <userTask id="afterBoundaryTask2" />
+      <sequenceFlow id="flow14" sourceRef="afterBoundaryTask2" targetRef="boundaryEnd2" />
+      <endEvent id="boundaryEnd2" />
+    </subProcess>
+    <sequenceFlow id="flow15" sourceRef="subProcess" targetRef="outerEnd" />
+    
+    <endEvent id="outerEnd" />
+  </process>
+
+</definitions>

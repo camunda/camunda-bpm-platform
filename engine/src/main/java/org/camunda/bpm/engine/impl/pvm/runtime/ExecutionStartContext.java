@@ -25,38 +25,49 @@ import org.camunda.bpm.engine.impl.pvm.PvmActivity;
  */
 public class ExecutionStartContext {
 
-  protected List<PvmActivity> activityStack;
+  protected boolean delayFireHistoricVariableEvents;
+
+  protected InstantiationStack instantiationStack;
   protected Map<String, Object> variables;
   protected Map<String, Object> variablesLocal;
 
-  public void executionStarted(CoreExecution execution) {
-
-    if (execution instanceof ExecutionEntity) {
-      ExecutionEntity executionEntity = (ExecutionEntity) execution;
-      executionEntity.fireHistoricVariableInstanceCreateEvents();
-
-      ExecutionEntity parent = executionEntity;
-      while (parent != null && parent.getExecutionStartContext() != null) {
-        parent.disposeExecutionStartContext();
-        parent = parent.getParent();
-      }
-    }
-
+  public ExecutionStartContext() {
+    this(true);
   }
 
-  // TODO: a hack around the fact that this won't provide history if
-  // the start context is not disposed yet
+  public ExecutionStartContext(boolean delayFireHistoricVariableEvents) {
+    this.delayFireHistoricVariableEvents = delayFireHistoricVariableEvents;
+  }
+
+  public void executionStarted(PvmExecutionImpl execution) {
+
+    if (execution instanceof ExecutionEntity && delayFireHistoricVariableEvents) {
+      ExecutionEntity executionEntity = (ExecutionEntity) execution;
+      executionEntity.fireHistoricVariableInstanceCreateEvents();
+    }
+
+    PvmExecutionImpl parent = execution;
+    while (parent != null && parent.getExecutionStartContext() != null) {
+      parent.disposeExecutionStartContext();
+      parent = parent.getParent();
+    }
+  }
+
   public void applyVariables(CoreExecution execution) {
     execution.setVariables(variables);
     execution.setVariablesLocal(variablesLocal);
   }
 
-  public List<PvmActivity> getActivityStack() {
-    return activityStack;
+  public boolean isDelayFireHistoricVariableEvents() {
+    return delayFireHistoricVariableEvents;
   }
 
-  public void setActivityStack(List<PvmActivity> activityStack) {
-    this.activityStack = activityStack;
+  public InstantiationStack getInstantiationStack() {
+    return instantiationStack;
+  }
+
+  public void setInstantiationStack(InstantiationStack instantiationStack) {
+    this.instantiationStack = instantiationStack;
   }
 
   public void setVariables(Map<String, Object> variables) {

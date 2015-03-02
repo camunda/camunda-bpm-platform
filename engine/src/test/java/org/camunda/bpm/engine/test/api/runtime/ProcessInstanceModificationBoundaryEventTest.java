@@ -17,9 +17,12 @@ import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.describeAc
 import static org.camunda.bpm.engine.test.util.ExecutionAssert.assertThat;
 import static org.camunda.bpm.engine.test.util.ExecutionAssert.describeExecutionTree;
 
+import java.util.List;
+
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.util.ExecutionTree;
 
@@ -68,6 +71,9 @@ public class ProcessInstanceModificationBoundaryEventTest extends PluggableProce
             .child("task1").scope()
         .done());
 
+    completeTasksInOrder("task1", "task2", "taskAfterBoundaryEvent");
+    assertProcessEnded(processInstanceId);
+
   }
 
   @Deployment(resources = INTERRUPTING_BOUNDARY_EVENT)
@@ -95,6 +101,9 @@ public class ProcessInstanceModificationBoundaryEventTest extends PluggableProce
     .matches(
       describeExecutionTree("taskAfterBoundaryEvent").scope()
       .done());
+
+    completeTasksInOrder("taskAfterBoundaryEvent");
+    assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = INTERRUPTING_BOUNDARY_EVENT)
@@ -129,6 +138,9 @@ public class ProcessInstanceModificationBoundaryEventTest extends PluggableProce
           .child("taskAfterBoundaryEvent").concurrent().noScope().up()
           .child("task2").concurrent().noScope()
         .done());
+
+    completeTasksInOrder("task2", "taskAfterBoundaryEvent");
+    assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = INTERRUPTING_BOUNDARY_EVENT)
@@ -162,6 +174,9 @@ public class ProcessInstanceModificationBoundaryEventTest extends PluggableProce
           .child("taskAfterBoundaryEvent").concurrent().noScope().up()
           .child("task2").concurrent().noScope()
         .done());
+
+    completeTasksInOrder("task2", "taskAfterBoundaryEvent");
+    assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = NON_INTERRUPTING_BOUNDARY_EVENT)
@@ -193,6 +208,9 @@ public class ProcessInstanceModificationBoundaryEventTest extends PluggableProce
           .child(null).concurrent().noScope()
             .child("task1").scope()
         .done());
+
+    completeTasksInOrder("task1", "taskAfterBoundaryEvent", "task2");
+    assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = NON_INTERRUPTING_BOUNDARY_EVENT)
@@ -224,6 +242,9 @@ public class ProcessInstanceModificationBoundaryEventTest extends PluggableProce
           .child(null).concurrent().noScope()
             .child("task1").scope()
         .done());
+
+    completeTasksInOrder("task1", "taskAfterBoundaryEvent", "task2");
+    assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = NON_INTERRUPTING_BOUNDARY_EVENT)
@@ -257,6 +278,9 @@ public class ProcessInstanceModificationBoundaryEventTest extends PluggableProce
           .child("taskAfterBoundaryEvent").concurrent().noScope().up()
           .child("task2").concurrent().noScope()
         .done());
+
+    completeTasksInOrder("task2", "taskAfterBoundaryEvent");
+    assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = NON_INTERRUPTING_BOUNDARY_EVENT)
@@ -290,6 +314,9 @@ public class ProcessInstanceModificationBoundaryEventTest extends PluggableProce
           .child("taskAfterBoundaryEvent").concurrent().noScope().up()
           .child("task2").concurrent().noScope()
         .done());
+
+    completeTasksInOrder("task2", "taskAfterBoundaryEvent");
+    assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = INTERRUPTING_BOUNDARY_EVENT_INSIDE_SUBPROCESS)
@@ -324,6 +351,8 @@ public class ProcessInstanceModificationBoundaryEventTest extends PluggableProce
               .child("innerTask1").scope()
         .done());
 
+    completeTasksInOrder("innerTask1", "innerTaskAfterBoundaryEvent", "innerTask2");
+    assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = INTERRUPTING_BOUNDARY_EVENT_INSIDE_SUBPROCESS)
@@ -353,6 +382,9 @@ public class ProcessInstanceModificationBoundaryEventTest extends PluggableProce
         describeExecutionTree(null).scope()
           .child("innerTaskAfterBoundaryEvent").scope()
         .done());
+
+    completeTasksInOrder("innerTaskAfterBoundaryEvent");
+    assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = NON_INTERRUPTING_BOUNDARY_EVENT_INSIDE_SUBPROCESS)
@@ -386,6 +418,9 @@ public class ProcessInstanceModificationBoundaryEventTest extends PluggableProce
             .child(null).concurrent().noScope()
               .child("innerTask1").scope()
         .done());
+
+    completeTasksInOrder("innerTask1", "innerTaskAfterBoundaryEvent", "innerTask2");
+    assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = NON_INTERRUPTING_BOUNDARY_EVENT_INSIDE_SUBPROCESS)
@@ -419,6 +454,9 @@ public class ProcessInstanceModificationBoundaryEventTest extends PluggableProce
             .child(null).concurrent().noScope()
               .child("innerTask1").scope()
         .done());
+
+    completeTasksInOrder("innerTask1", "innerTask2", "innerTaskAfterBoundaryEvent");
+    assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = INTERRUPTING_BOUNDARY_EVENT_INSIDE_SUBPROCESS)
@@ -454,6 +492,9 @@ public class ProcessInstanceModificationBoundaryEventTest extends PluggableProce
             .child("innerTaskAfterBoundaryEvent").concurrent().noScope().up()
             .child("innerTask2").concurrent().noScope()
         .done());
+
+    completeTasksInOrder("innerTask2", "innerTaskAfterBoundaryEvent");
+    assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = INTERRUPTING_BOUNDARY_EVENT_INSIDE_SUBPROCESS)
@@ -489,6 +530,9 @@ public class ProcessInstanceModificationBoundaryEventTest extends PluggableProce
             .child("innerTaskAfterBoundaryEvent").concurrent().noScope().up()
             .child("innerTask2").concurrent().noScope()
         .done());
+
+    completeTasksInOrder("innerTask2", "innerTaskAfterBoundaryEvent");
+    assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = NON_INTERRUPTING_BOUNDARY_EVENT_INSIDE_SUBPROCESS)
@@ -524,6 +568,9 @@ public class ProcessInstanceModificationBoundaryEventTest extends PluggableProce
             .child("innerTaskAfterBoundaryEvent").concurrent().noScope().up()
             .child("innerTask2").concurrent().noScope()
         .done());
+
+    completeTasksInOrder("innerTask2", "innerTaskAfterBoundaryEvent");
+    assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = NON_INTERRUPTING_BOUNDARY_EVENT_INSIDE_SUBPROCESS)
@@ -559,6 +606,9 @@ public class ProcessInstanceModificationBoundaryEventTest extends PluggableProce
             .child("innerTaskAfterBoundaryEvent").concurrent().noScope().up()
             .child("innerTask2").concurrent().noScope()
         .done());
+
+    completeTasksInOrder("innerTask2", "innerTaskAfterBoundaryEvent");
+    assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = INTERRUPTING_BOUNDARY_EVENT_ON_SUBPROCESS)
@@ -592,6 +642,9 @@ public class ProcessInstanceModificationBoundaryEventTest extends PluggableProce
           .child(null).concurrent().noScope()
             .child("innerTask").scope()
         .done());
+
+    completeTasksInOrder("innerTask", "taskAfterBoundaryEvent");
+    assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = INTERRUPTING_BOUNDARY_EVENT_ON_SUBPROCESS)
@@ -619,6 +672,9 @@ public class ProcessInstanceModificationBoundaryEventTest extends PluggableProce
       .matches(
         describeExecutionTree("taskAfterBoundaryEvent").scope()
         .done());
+
+    completeTasksInOrder("taskAfterBoundaryEvent");
+    assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = NON_INTERRUPTING_BOUNDARY_EVENT_ON_SUBPROCESS)
@@ -643,7 +699,6 @@ public class ProcessInstanceModificationBoundaryEventTest extends PluggableProce
           .activity("taskAfterBoundaryEvent")
         .done());
 
-
     ExecutionTree executionTree = ExecutionTree.forExecution(processInstanceId, processEngine);
 
     assertThat(executionTree)
@@ -653,6 +708,9 @@ public class ProcessInstanceModificationBoundaryEventTest extends PluggableProce
           .child(null).concurrent().noScope()
             .child("innerTask").scope()
         .done());
+
+    completeTasksInOrder("innerTask", "taskAfterBoundaryEvent");
+    assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = NON_INTERRUPTING_BOUNDARY_EVENT_ON_SUBPROCESS)
@@ -686,6 +744,18 @@ public class ProcessInstanceModificationBoundaryEventTest extends PluggableProce
           .child(null).concurrent().noScope()
             .child("innerTask").scope()
         .done());
+
+    completeTasksInOrder("innerTask", "taskAfterBoundaryEvent");
+    assertProcessEnded(processInstanceId);
+  }
+
+  protected void completeTasksInOrder(String... taskNames) {
+    for (String taskName : taskNames) {
+      // complete any task with that name
+      List<Task> tasks = taskService.createTaskQuery().taskDefinitionKey(taskName).listPage(0, 1);
+      assertTrue("task for activity " + taskName + " does not exist", !tasks.isEmpty());
+      taskService.complete(tasks.get(0).getId());
+    }
   }
 
 }

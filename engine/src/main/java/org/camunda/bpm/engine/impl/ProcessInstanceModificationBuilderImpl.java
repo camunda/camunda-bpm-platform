@@ -15,15 +15,19 @@ package org.camunda.bpm.engine.impl;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
-import org.camunda.bpm.engine.exception.NotValidException;
+import org.camunda.bpm.engine.impl.cmd.AbstractInstantiationCmd;
+import org.camunda.bpm.engine.impl.cmd.AbstractProcessInstanceModificationCommand;
+import org.camunda.bpm.engine.impl.cmd.ActivityAfterInstantiationCmd;
+import org.camunda.bpm.engine.impl.cmd.ActivityCancellationCmd;
+import org.camunda.bpm.engine.impl.cmd.ActivityInstanceCancellationCmd;
+import org.camunda.bpm.engine.impl.cmd.ActivityInstantiationCmd;
 import org.camunda.bpm.engine.impl.cmd.ModifyProcessInstanceCmd;
-import org.camunda.bpm.engine.impl.cmd.ModifyProcessInstanceCmd;
+import org.camunda.bpm.engine.impl.cmd.TransitionInstantiationCmd;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
+import org.camunda.bpm.engine.runtime.ProcessInstanceActivityInstantiationBuilder;
 import org.camunda.bpm.engine.runtime.ProcessInstanceModificationBuilder;
 
 /**
@@ -36,13 +40,11 @@ public class ProcessInstanceModificationBuilderImpl implements ProcessInstanceMo
   protected CommandContext commandContext;
 
   protected String processInstanceId;
-  protected Set<String> activityInstancesToCancel = new HashSet<String>();
 
-  // TODO: this needs to be a more sophisticated data strucutre:
-  // first, it is possible to instantiate the same activity twice (i.e. no set)
-  // second, it should be possible to add variables to an activity
-  protected List<ActivityInstantiationInstruction> activitiesToStartBefore = new ArrayList<ActivityInstantiationInstruction>();
-  protected ActivityInstantiationInstruction currentActivity;
+  protected boolean skipCustomListeners = false;
+  protected boolean skipIoMappings = false;
+
+  protected List<AbstractProcessInstanceModificationCommand> operations = new ArrayList<AbstractProcessInstanceModificationCommand>();
 
   public ProcessInstanceModificationBuilderImpl(CommandExecutor commandExecutor, String processInstanceId) {
     this(processInstanceId);
@@ -55,38 +57,75 @@ public class ProcessInstanceModificationBuilderImpl implements ProcessInstanceMo
   }
 
   public ProcessInstanceModificationBuilderImpl(String processInstanceId) {
+    ensureNotNull("processInstanceId", processInstanceId);
     this.processInstanceId = processInstanceId;
   }
 
   public ProcessInstanceModificationBuilder cancelActivityInstance(String activityInstanceId) {
-    activityInstancesToCancel.add(activityInstanceId);
+    ensureNotNull("activityInstanceId", activityInstanceId);
+    operations.add(new ActivityInstanceCancellationCmd(processInstanceId, activityInstanceId));
     return this;
   }
 
-  public ProcessInstanceModificationBuilder startBeforeActivity(String activityId) {
-    currentActivity = new ActivityInstantiationInstruction(activityId);
-    activitiesToStartBefore.add(currentActivity);
+  public ProcessInstanceModificationBuilder cancelAllInActivity(String activityId) {
+    ensureNotNull("activityId", activityId);
+    operations.add(new ActivityCancellationCmd(processInstanceId, activityId));
     return this;
   }
 
-
-  public ProcessInstanceModificationBuilder setVariable(String name, Object value) {
-    ensureNotNull(NotValidException.class, "Variable name must not be null", "name", name);
-    ensureNotNull(NotValidException.class, "No activity to start specified", "variable", currentActivity);
-
-    currentActivity.addVariable(name, value);
-    return this;
+  public ProcessInstanceActivityInstantiationBuilder startBeforeActivity(String activityId) {
+    ensureNotNull("activityId", activityId);
+    AbstractInstantiationCmd currentInstantiation = new ActivityInstantiationCmd(processInstanceId, activityId);
+    operations.add(currentInstantiation);
+    return new ProcessInstanceActivityInstantiationBuilderImpl(this, currentInstantiation);
   }
 
-  public ProcessInstanceModificationBuilder setVariableLocal(String name, Object value) {
-    ensureNotNull(NotValidException.class, "Variable name must not be null", "name", name);
-    ensureNotNull(NotValidException.class, "No activity to start specified", "variableLocal", currentActivity);
+  public ProcessInstanceActivityInstantiationBuilder startBeforeActivity(String activityId, String ancestorActivityInstanceId) {
+    ensureNotNull("activityId", activityId);
+    ensureNotNull("ancestorActivityInstanceId", ancestorActivityInstanceId);
+    AbstractInstantiationCmd currentInstantiation = new ActivityInstantiationCmd(processInstanceId, activityId, ancestorActivityInstanceId);
+    operations.add(currentInstantiation);
+    return new ProcessInstanceActivityInstantiationBuilderImpl(this, currentInstantiation);
+  }
 
-    currentActivity.addVariableLocal(name, value);
-    return this;
+  public ProcessInstanceActivityInstantiationBuilder startAfterActivity(String activityId) {
+    ensureNotNull("activityId", activityId);
+    AbstractInstantiationCmd currentInstantiation = new ActivityAfterInstantiationCmd(processInstanceId, activityId);
+    operations.add(currentInstantiation);
+    return new ProcessInstanceActivityInstantiationBuilderImpl(this, currentInstantiation);
+  }
+
+  public ProcessInstanceActivityInstantiationBuilder startAfterActivity(String activityId, String ancestorActivityInstanceId) {
+    ensureNotNull("activityId", activityId);
+    ensureNotNull("ancestorActivityInstanceId", ancestorActivityInstanceId);
+    AbstractInstantiationCmd currentInstantiation = new ActivityAfterInstantiationCmd(processInstanceId, activityId, ancestorActivityInstanceId);
+    operations.add(currentInstantiation);
+    return new ProcessInstanceActivityInstantiationBuilderImpl(this, currentInstantiation);
+  }
+
+  public ProcessInstanceActivityInstantiationBuilder startTransition(String transitionId) {
+    ensureNotNull("transitionId", transitionId);
+    AbstractInstantiationCmd currentInstantiation = new TransitionInstantiationCmd(processInstanceId, transitionId);
+    operations.add(currentInstantiation);
+    return new ProcessInstanceActivityInstantiationBuilderImpl(this, currentInstantiation);
+  }
+
+  public ProcessInstanceActivityInstantiationBuilder startTransition(String transitionId, String ancestorActivityInstanceId) {
+    ensureNotNull("transitionId", transitionId);
+    ensureNotNull("ancestorActivityInstanceId", ancestorActivityInstanceId);
+    AbstractInstantiationCmd currentInstantiation = new TransitionInstantiationCmd(processInstanceId, transitionId, ancestorActivityInstanceId);
+    operations.add(currentInstantiation);
+    return new ProcessInstanceActivityInstantiationBuilderImpl(this, currentInstantiation);
   }
 
   public void execute() {
+    execute(false, false);
+  }
+
+  public void execute(boolean skipCustomListeners, boolean skipIoMappings) {
+    this.skipCustomListeners = skipCustomListeners;
+    this.skipIoMappings = skipIoMappings;
+
     ModifyProcessInstanceCmd cmd = new ModifyProcessInstanceCmd(this);
     if (commandExecutor != null) {
       commandExecutor.execute(cmd);
@@ -107,12 +146,17 @@ public class ProcessInstanceModificationBuilderImpl implements ProcessInstanceMo
     return processInstanceId;
   }
 
-  public Set<String> getActivityInstancesToCancel() {
-    return activityInstancesToCancel;
+  public List<AbstractProcessInstanceModificationCommand> getModificationOperations() {
+    return operations;
   }
 
-  public List<ActivityInstantiationInstruction> getActivitiesToStartBefore() {
-    return activitiesToStartBefore;
+  public boolean isSkipCustomListeners() {
+    return skipCustomListeners;
   }
+
+  public boolean isSkipIoMappings() {
+    return skipIoMappings;
+  }
+
 
 }

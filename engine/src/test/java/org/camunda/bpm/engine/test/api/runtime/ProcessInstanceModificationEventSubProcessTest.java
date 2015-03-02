@@ -17,9 +17,13 @@ import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.describeAc
 import static org.camunda.bpm.engine.test.util.ExecutionAssert.assertThat;
 import static org.camunda.bpm.engine.test.util.ExecutionAssert.describeExecutionTree;
 
+import java.util.List;
+
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
+import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.util.ExecutionTree;
 
@@ -33,6 +37,10 @@ public class ProcessInstanceModificationEventSubProcessTest extends PluggablePro
   protected static final String NON_INTERRUPTING_EVENT_SUBPROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationTest.nonInterruptingEventSubProcess.bpmn20.xml";
   protected static final String INTERRUPTING_EVENT_SUBPROCESS_INSIDE_SUBPROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationTest.interruptingEventSubProcessInsideSubProcess.bpmn20.xml";
   protected static final String NON_INTERRUPTING_EVENT_SUBPROCESS_INSIDE_SUBPROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationTest.nonInterruptingEventSubProcessInsideSubProcess.bpmn20.xml";
+
+  // TODO: test that message event subscription of event subprocess is not lost
+  // when an activity in the same flow scope as the sub process is first cancelled and
+  // another is instantiated (on process instance level)
 
   @Deployment(resources = INTERRUPTING_EVENT_SUBPROCESS)
   public void testStartBeforeTaskInsideEventSubProcess() {
@@ -63,10 +71,13 @@ public class ProcessInstanceModificationEventSubProcessTest extends PluggablePro
           .child("task1").concurrent().noScope().up()
           .child("eventSubProcessTask").concurrent().noScope()
         .done());
+
+    completeTasksInOrder("task1", "task2", "eventSubProcessTask");
+    assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = INTERRUPTING_EVENT_SUBPROCESS)
-  public void FAILING_testStartBeforeTaskInsideEventSubProcessAndCancelTaskOutsideEventSubProcess() {
+  public void testStartBeforeTaskInsideEventSubProcessAndCancelTaskOutsideEventSubProcess() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
     String processInstanceId = processInstance.getId();
 
@@ -94,6 +105,9 @@ public class ProcessInstanceModificationEventSubProcessTest extends PluggablePro
       .matches(
         describeExecutionTree("eventSubProcessTask").scope()
         .done());
+
+    completeTasksInOrder("eventSubProcessTask");
+    assertProcessEnded(processInstanceId);
 
   }
 
@@ -123,6 +137,9 @@ public class ProcessInstanceModificationEventSubProcessTest extends PluggablePro
       .matches(
         describeExecutionTree("eventSubProcessTask").scope()
         .done());
+
+    completeTasksInOrder("eventSubProcessTask");
+    assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = INTERRUPTING_EVENT_SUBPROCESS)
@@ -151,6 +168,9 @@ public class ProcessInstanceModificationEventSubProcessTest extends PluggablePro
       .matches(
         describeExecutionTree("eventSubProcessTask").scope()
         .done());
+
+    completeTasksInOrder("eventSubProcessTask");
+    assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = NON_INTERRUPTING_EVENT_SUBPROCESS)
@@ -182,10 +202,13 @@ public class ProcessInstanceModificationEventSubProcessTest extends PluggablePro
           .child("task1").concurrent().noScope().up()
           .child("eventSubProcessTask").concurrent().noScope()
         .done());
+
+    completeTasksInOrder("task1", "eventSubProcessTask", "task2");
+    assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = NON_INTERRUPTING_EVENT_SUBPROCESS)
-  public void FAILING_testStartBeforeTaskInsideNonInterruptingEventSubProcessAndCancelTaskOutsideEventSubProcess() {
+  public void testStartBeforeTaskInsideNonInterruptingEventSubProcessAndCancelTaskOutsideEventSubProcess() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
     String processInstanceId = processInstance.getId();
 
@@ -213,6 +236,9 @@ public class ProcessInstanceModificationEventSubProcessTest extends PluggablePro
       .matches(
         describeExecutionTree("eventSubProcessTask").scope()
         .done());
+
+    completeTasksInOrder("eventSubProcessTask");
+    assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = NON_INTERRUPTING_EVENT_SUBPROCESS)
@@ -244,6 +270,9 @@ public class ProcessInstanceModificationEventSubProcessTest extends PluggablePro
           .child("task1").concurrent().noScope().up()
           .child("eventSubProcessTask").concurrent().noScope()
         .done());
+
+    completeTasksInOrder("task1", "task2", "eventSubProcessTask");
+    assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = NON_INTERRUPTING_EVENT_SUBPROCESS)
@@ -275,6 +304,9 @@ public class ProcessInstanceModificationEventSubProcessTest extends PluggablePro
           .child("task1").concurrent().noScope().up()
           .child("eventSubProcessTask").concurrent().noScope()
         .done());
+
+    completeTasksInOrder("task1", "eventSubProcessTask", "task2");
+    assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = INTERRUPTING_EVENT_SUBPROCESS_INSIDE_SUBPROCESS)
@@ -311,6 +343,9 @@ public class ProcessInstanceModificationEventSubProcessTest extends PluggablePro
           .child(null).concurrent().noScope()
             .child("eventSubProcessTask").scope()
         .done());
+
+    completeTasksInOrder("task1", "eventSubProcessTask", "task2");
+    assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = INTERRUPTING_EVENT_SUBPROCESS_INSIDE_SUBPROCESS)
@@ -349,6 +384,8 @@ public class ProcessInstanceModificationEventSubProcessTest extends PluggablePro
             .child("eventSubProcessTask").scope()
         .done());
 
+    completeTasksInOrder("eventSubProcessTask", "task1", "task2");
+    assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = INTERRUPTING_EVENT_SUBPROCESS_INSIDE_SUBPROCESS)
@@ -384,6 +421,9 @@ public class ProcessInstanceModificationEventSubProcessTest extends PluggablePro
           .child(null).concurrent().noScope()
             .child("eventSubProcessTask").scope()
         .done());
+
+    completeTasksInOrder("task1", "eventSubProcessTask", "task2");
+    assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = INTERRUPTING_EVENT_SUBPROCESS_INSIDE_SUBPROCESS)
@@ -422,6 +462,9 @@ public class ProcessInstanceModificationEventSubProcessTest extends PluggablePro
             .child("task2").concurrent().noScope().up()
             .child("eventSubProcessTask").concurrent().noScope()
         .done());
+
+    completeTasksInOrder("task2", "eventSubProcessTask");
+    assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = INTERRUPTING_EVENT_SUBPROCESS_INSIDE_SUBPROCESS)
@@ -456,6 +499,9 @@ public class ProcessInstanceModificationEventSubProcessTest extends PluggablePro
         describeExecutionTree(null).scope()
           .child("eventSubProcessTask").scope()
         .done());
+
+    completeTasksInOrder("eventSubProcessTask");
+    assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = INTERRUPTING_EVENT_SUBPROCESS_INSIDE_SUBPROCESS)
@@ -490,6 +536,9 @@ public class ProcessInstanceModificationEventSubProcessTest extends PluggablePro
         describeExecutionTree(null).scope()
           .child("eventSubProcessTask").scope()
         .done());
+
+    completeTasksInOrder("eventSubProcessTask");
+    assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = NON_INTERRUPTING_EVENT_SUBPROCESS_INSIDE_SUBPROCESS)
@@ -524,6 +573,9 @@ public class ProcessInstanceModificationEventSubProcessTest extends PluggablePro
           .child(null).concurrent().noScope()
             .child("eventSubProcessTask").scope()
         .done());
+
+    completeTasksInOrder("task1", "eventSubProcessTask", "task2");
+    assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = NON_INTERRUPTING_EVENT_SUBPROCESS_INSIDE_SUBPROCESS)
@@ -559,6 +611,9 @@ public class ProcessInstanceModificationEventSubProcessTest extends PluggablePro
           .child(null).concurrent().noScope()
             .child("eventSubProcessTask").scope()
         .done());
+
+    completeTasksInOrder("task1", "task2", "eventSubProcessTask");
+    assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = NON_INTERRUPTING_EVENT_SUBPROCESS_INSIDE_SUBPROCESS)
@@ -596,6 +651,9 @@ public class ProcessInstanceModificationEventSubProcessTest extends PluggablePro
             .child("eventSubProcessTask").scope()
         .done());
 
+    completeTasksInOrder("task1", "task2", "eventSubProcessTask");
+    assertProcessEnded(processInstanceId);
+
   }
 
   @Deployment(resources = NON_INTERRUPTING_EVENT_SUBPROCESS_INSIDE_SUBPROCESS)
@@ -625,7 +683,6 @@ public class ProcessInstanceModificationEventSubProcessTest extends PluggablePro
 //            .activity("eventSubProcessTask")
 //      .done());
 
-
     ExecutionTree executionTree = ExecutionTree.forExecution(processInstanceId, processEngine);
 
     assertThat(executionTree)
@@ -635,6 +692,9 @@ public class ProcessInstanceModificationEventSubProcessTest extends PluggablePro
             .child("task2").concurrent().noScope().up()
             .child("eventSubProcessTask").concurrent().noScope()
         .done());
+
+    completeTasksInOrder("task2", "eventSubProcessTask");
+    assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = NON_INTERRUPTING_EVENT_SUBPROCESS_INSIDE_SUBPROCESS)
@@ -673,6 +733,9 @@ public class ProcessInstanceModificationEventSubProcessTest extends PluggablePro
             .child("task2").concurrent().noScope().up()
             .child("eventSubProcessTask").concurrent().noScope()
         .done());
+
+    completeTasksInOrder("task2", "eventSubProcessTask");
+    assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = NON_INTERRUPTING_EVENT_SUBPROCESS_INSIDE_SUBPROCESS)
@@ -711,9 +774,38 @@ public class ProcessInstanceModificationEventSubProcessTest extends PluggablePro
             .child("task2").concurrent().noScope().up()
             .child("eventSubProcessTask").concurrent().noScope()
         .done());
+
+    completeTasksInOrder("task2", "eventSubProcessTask");
+    assertProcessEnded(processInstanceId);
   }
 
-  public String getInstanceIdForActivity(ActivityInstance activityInstance, String activityId) {
+  @Deployment
+  public void testTimerJobPreservationOnCancellationAndStart() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("timerEventSubProcess");
+
+    ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
+
+    Job timerJob = managementService.createJobQuery().singleResult();
+    assertNotNull(timerJob);
+
+    // when the process instance is bare intermediately due to cancellation
+    runtimeService
+      .createProcessInstanceModification(processInstance.getId())
+      .cancelActivityInstance(getInstanceIdForActivity(tree, "task"))
+      .startBeforeActivity("task")
+      .execute();
+
+    // then it is still the same job
+
+    Job remainingTimerJob = managementService.createJobQuery().singleResult();
+    assertNotNull(remainingTimerJob);
+
+    assertEquals(timerJob.getId(), remainingTimerJob.getId());
+    assertEquals(timerJob.getDuedate(), remainingTimerJob.getDuedate());
+
+  }
+
+  protected String getInstanceIdForActivity(ActivityInstance activityInstance, String activityId) {
     ActivityInstance instance = getChildInstanceForActivity(activityInstance, activityId);
     if (instance != null) {
       return instance.getId();
@@ -725,7 +817,7 @@ public class ProcessInstanceModificationEventSubProcessTest extends PluggablePro
    * Important that only the direct children are considered here. If you change this,
    * the test assertions are not as tight anymore.
    */
-  public ActivityInstance getChildInstanceForActivity(ActivityInstance activityInstance, String activityId) {
+  protected ActivityInstance getChildInstanceForActivity(ActivityInstance activityInstance, String activityId) {
     for (ActivityInstance childInstance : activityInstance.getChildActivityInstances()) {
       if (childInstance.getActivityId().equals(activityId)) {
         return childInstance;
@@ -733,5 +825,14 @@ public class ProcessInstanceModificationEventSubProcessTest extends PluggablePro
     }
 
     return null;
+  }
+
+  protected void completeTasksInOrder(String... taskNames) {
+    for (String taskName : taskNames) {
+      // complete any task with that name
+      List<Task> tasks = taskService.createTaskQuery().taskDefinitionKey(taskName).listPage(0, 1);
+      assertTrue("task for activity " + taskName + " does not exist", !tasks.isEmpty());
+      taskService.complete(tasks.get(0).getId());
+    }
   }
 }

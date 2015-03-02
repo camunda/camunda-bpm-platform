@@ -201,6 +201,18 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
     }
   }
 
+  public void assertProcessNotEnded(final String processInstanceId) {
+    ProcessInstance processInstance = processEngine
+      .getRuntimeService()
+      .createProcessInstanceQuery()
+      .processInstanceId(processInstanceId)
+      .singleResult();
+
+    if (processInstance==null) {
+      throw new AssertionFailedError("Expected process instance '"+processInstanceId+"' to be still active but it was not in the db");
+    }
+  }
+
   public void assertCaseEnded(final String caseInstanceId) {
     CaseInstance caseInstance = processEngine
       .getCaseService()

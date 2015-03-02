@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions" xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:camunda="http://activiti.org/bpmn" targetNamespace="Examples">
+
+  <process id="ioMappingProcess">
+
+    <startEvent id="theStart" />
+    <sequenceFlow id="flow1" sourceRef="theStart" targetRef="task1" />
+    <userTask id="task1" />
+    <sequenceFlow id="flow2" sourceRef="task1" targetRef="task2"/>
+    <userTask id="task2" >
+      <extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="inputMappingExecuted">${true}</camunda:inputParameter>
+          <camunda:outputParameter name="outputMappingExecuted">${true}</camunda:outputParameter>
+        </camunda:inputOutput>
+      </extensionElements>
+    </userTask>
+    <sequenceFlow id="flow3" sourceRef="task2" targetRef="theEnd" />
+    <endEvent id="theEnd" />
+  </process>
+
+</definitions>

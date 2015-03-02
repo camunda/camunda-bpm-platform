@@ -20,6 +20,7 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.runtime.EventSubscription;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
@@ -579,6 +580,29 @@ public class MessageBoundaryEventTest extends PluggableProcessEngineTestCase {
     taskService.complete(userTask.getId());
 
     // and we are done
+
+  }
+
+  /**
+   * Triggering one boundary event should not remove the event subscription
+   * of a boundary event for a concurrent task
+   */
+  @Deployment
+  public void testBoundaryMessageEventConcurrent() {
+    runtimeService.startProcessInstanceByKey("boundaryEvent");
+
+    EventSubscription eventSubscriptionTask1 = runtimeService.createEventSubscriptionQuery().activityId("messageBoundary1").singleResult();
+    assertNotNull(eventSubscriptionTask1);
+
+    EventSubscription eventSubscriptionTask2 = runtimeService.createEventSubscriptionQuery().activityId("messageBoundary2").singleResult();
+    assertNotNull(eventSubscriptionTask2);
+
+    // when I trigger the boundary event for task1
+    runtimeService.correlateMessage("task1Message");
+
+    // then the event subscription for task2 still exists
+    assertEquals(1, runtimeService.createEventSubscriptionQuery().count());
+    assertNotNull(runtimeService.createEventSubscriptionQuery().activityId("messageBoundary2").singleResult());
 
   }
 

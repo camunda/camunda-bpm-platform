@@ -21,7 +21,6 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.delegate.BaseDelegateExecution;
 import org.camunda.bpm.engine.delegate.DelegateListener;
-import org.camunda.bpm.engine.delegate.DelegateVariableInstance;
 import org.camunda.bpm.engine.delegate.VariableListener;
 
 /**

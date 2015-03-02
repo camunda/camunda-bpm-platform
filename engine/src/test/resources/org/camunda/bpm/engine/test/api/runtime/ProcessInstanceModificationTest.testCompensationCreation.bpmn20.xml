@@ -1,19 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions id="definitions" xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
-  xmlns:activiti="http://activiti.org/bpmn" targetNamespace="Examples">
+  xmlns:activiti="http://activiti.org/bpmn" 
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+  targetNamespace="Examples">
 
   <process id="compensationProcess">
 
     <startEvent id="theStart" />
-    <sequenceFlow id="flow1" sourceRef="theStart" targetRef="outerTask" />
+    <sequenceFlow id="flow1" sourceRef="theStart" targetRef="fork" />
+    
+    <exclusiveGateway id="fork" />
+    <sequenceFlow id="flow2" sourceRef="fork" targetRef="outerTask">
+      <conditionExpression xsi:type="tFormalExpression">
+        ${true}
+      </conditionExpression>
+    </sequenceFlow>
     <userTask id="outerTask" />
-    <sequenceFlow id="flow2" sourceRef="outerTask" targetRef="subProcess" />
-
+    <sequenceFlow id="flow3" sourceRef="outerTask" targetRef="throwCompensate" />
+    <intermediateThrowEvent id="throwCompensate">
+      <compensateEventDefinition  />
+    </intermediateThrowEvent>
+    <sequenceFlow id="flow4" sourceRef="throwCompensate" targetRef="outerEnd" />
+    <endEvent id="outerEnd" />
+    
+    <sequenceFlow id="flow5" sourceRef="fork" targetRef="subProcess">
+      <conditionExpression xsi:type="tFormalExpression">
+        ${false}
+      </conditionExpression>
+    </sequenceFlow>
     <subProcess id="subProcess">
       <startEvent id="theSubProcessStart" />
-      <sequenceFlow id="flow3" sourceRef="theSubProcessStart" targetRef="innerTask" />
+      <sequenceFlow id="flow6" sourceRef="theSubProcessStart" targetRef="innerTask" />
       <userTask id="innerTask" />
-      <sequenceFlow id="flow4" sourceRef="innerTask" targetRef="theSubProcessEnd" />
+      <sequenceFlow id="flow7" sourceRef="innerTask" targetRef="theSubProcessEnd" />
       <endEvent id="theSubProcessEnd" />
       
       <!-- Compensation event on innerTask -->
@@ -30,9 +49,9 @@
     </boundaryEvent>
     <userTask id="outerAfterBoundaryTask" isForCompensation="true"/>
 
-    <sequenceFlow id="flow9" sourceRef="taskAfterSubprocess" targetRef="theEnd" />
+    <sequenceFlow id="flow8" sourceRef="subProcess" targetRef="taskAfterSubprocess" />
     <userTask id="taskAfterSubprocess" />
-    <sequenceFlow id="flow10" sourceRef="taskAfterSubprocess" targetRef="theEnd" />
+    <sequenceFlow id="flow9" sourceRef="taskAfterSubprocess" targetRef="theEnd" />
     <endEvent id="theEnd" />
     <association associationDirection="One" sourceRef="outerCompensation" targetRef="outerAfterBoundaryTask" />
   </process>

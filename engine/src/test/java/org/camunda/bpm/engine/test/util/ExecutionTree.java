@@ -101,6 +101,10 @@ public class ExecutionTree implements Execution {
     return ((PvmExecutionImpl) wrappedExecution).isConcurrent();
   }
 
+  public Boolean isEventScope() {
+    return ((PvmExecutionImpl) wrappedExecution).isEventScope();
+  }
+
   public Execution getExecution() {
     return wrappedExecution;
   }

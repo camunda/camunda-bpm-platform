@@ -170,7 +170,7 @@ public class GetActivityInstanceCmd implements Command<ActivityInstance> {
           // instance already created -> add executionId
           String[] executionIds = activityInstance.getExecutionIds();
           executionIds = Arrays.copyOf(executionIds, executionIds.length + 1);
-          executionIds[executionIds.length] = execution.getId();
+          executionIds[executionIds.length - 1] = execution.getId();
           activityInstance.setExecutionIds(executionIds);
 
         } else {

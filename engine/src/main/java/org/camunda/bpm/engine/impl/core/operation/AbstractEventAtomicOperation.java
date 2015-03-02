@@ -18,7 +18,7 @@ import java.util.List;
 import org.camunda.bpm.engine.delegate.BaseDelegateExecution;
 import org.camunda.bpm.engine.delegate.DelegateListener;
 import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
-import org.camunda.bpm.engine.impl.core.model.CoreActivity;
+import org.camunda.bpm.engine.impl.core.model.CoreModelElement;
 import org.camunda.bpm.engine.impl.pvm.PvmException;
 
 
@@ -33,7 +33,7 @@ public abstract class AbstractEventAtomicOperation<T extends CoreExecution> impl
 
   public void execute(T execution) {
 
-    CoreActivity scope = getScope(execution);
+    CoreModelElement scope = getScope(execution);
     List<DelegateListener<? extends BaseDelegateExecution>> listeners = getListeners(scope, execution);
     int listenerIndex = execution.getListenerIndex();
 
@@ -71,7 +71,7 @@ public abstract class AbstractEventAtomicOperation<T extends CoreExecution> impl
     }
   }
 
-  protected List<DelegateListener<? extends BaseDelegateExecution>> getListeners(CoreActivity scope, T execution) {
+  protected List<DelegateListener<? extends BaseDelegateExecution>> getListeners(CoreModelElement scope, T execution) {
     if(execution.isSkipCustomListeners()) {
       return scope.getBuiltInListeners(getEventName());
     } else {
@@ -88,7 +88,7 @@ public abstract class AbstractEventAtomicOperation<T extends CoreExecution> impl
     return execution;
   }
 
-  protected abstract CoreActivity getScope(T execution);
+  protected abstract CoreModelElement getScope(T execution);
   protected abstract String getEventName();
   protected abstract void eventNotificationsCompleted(T execution);
 }

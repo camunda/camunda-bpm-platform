@@ -360,6 +360,7 @@
                 <exclude>**/OperationLog*.java</exclude>
                 <exclude>**/HistoricIncident*Test.java</exclude>
                 <exclude>**/HistoricJobLog*Test.java</exclude>
+                <exclude>**/ProcessInstanceModificationHistoryTest.java</exclude>
               </excludes>
             </configuration>
           </plugin>
@@ -392,6 +393,7 @@
                 <exclude>**/HistoricVariableInstanceScopeTest.java</exclude>
                 <exclude>**/HistoricTaskInstanceQueryTest.java</exclude>
                 <exclude>**/HistoricJobLog*Test.java</exclude>
+                <exclude>**/ProcessInstanceModificationHistoryTest.java</exclude>
               </excludes>
             </configuration>
           </plugin>
@@ -424,6 +426,7 @@
                 <exclude>**/HistoricVariableDataFormatTest.java</exclude>
                 <exclude>**/Historic*QueryTest.java</exclude>
                 <exclude>**/HistoricJobLog*Test.java</exclude>
+                <exclude>**/ProcessInstanceModificationHistoryTest.java</exclude>
               </excludes>
             </configuration>
           </plugin>

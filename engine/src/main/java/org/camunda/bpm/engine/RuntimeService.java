@@ -1080,5 +1080,11 @@ public interface RuntimeService {
    */
   void correlateMessage(String messageName, String businessKey, Map<String, Object> correlationKeys, Map<String, Object> processVariables);
 
+  /**
+   * Define a modification of a process instance in terms of activity cancellations
+   * and instantiations via a fluent builder
+   *
+   * @param processInstanceId the process instance to modify
+   */
   ProcessInstanceModificationBuilder createProcessInstanceModification(String processInstanceId);
 }

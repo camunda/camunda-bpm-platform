@@ -164,22 +164,25 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     }
   }
 
-  public void cancelScope(String reason) {
+  public void cancelScope(String reason, boolean skipCustomListeners, boolean skipIoMappings) {
+    this.skipCustomListeners = skipCustomListeners;
+    this.skipIoMapping = skipIoMappings;
+
     if(log.isLoggable(Level.FINE)) {
       log.fine("performing cancel scope behavior for execution "+this);
     }
 
     if (getSubProcessInstance() != null) {
-      getSubProcessInstance().deleteCascade(reason);
+      getSubProcessInstance().deleteCascade(reason, skipCustomListeners, skipIoMappings);
     }
 
     // remove all child executions and sub process instances:
     List<PvmExecutionImpl> executions = new ArrayList<PvmExecutionImpl>(getExecutions());
     for (PvmExecutionImpl childExecution : executions) {
       if (childExecution.getSubProcessInstance()!=null) {
-        childExecution.getSubProcessInstance().deleteCascade(reason);
+        childExecution.getSubProcessInstance().deleteCascade(reason, skipCustomListeners, skipIoMappings);
       }
-      childExecution.deleteCascade(reason);
+      childExecution.deleteCascade(reason, skipCustomListeners, skipIoMappings);
     }
 
     // set activity instance state to cancel
@@ -195,6 +198,10 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     // -> execution will be reused for executing more activities and we want the state to
     // be default initially.
     activityInstanceState = ActivityInstanceState.DEFAULT.getStateCode();
+  }
+
+  public void cancelScope(String reason) {
+    cancelScope(reason, false, false);
   }
 
   /** removes an execution. if there are nested executions, those will be ended recursively.
@@ -245,10 +252,15 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
   }
 
   public void deleteCascade(String deleteReason, boolean skipCustomListeners) {
+    deleteCascade(deleteReason, skipCustomListeners, false);
+  }
+
+  public void deleteCascade(String deleteReason, boolean skipCustomListeners, boolean skipIoMappings) {
     this.deleteReason = deleteReason;
     this.deleteRoot = true;
     this.isEnded = true;
     this.skipCustomListeners = skipCustomListeners;
+    this.skipIoMapping = skipIoMappings;
     performOperation(PvmAtomicOperation.DELETE_CASCADE);
   }
 
@@ -325,15 +337,18 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
    *
    * @param activityStack The most deeply nested activity is the last element in the list
    */
-  public void executeActivitiesConcurrent(List<PvmActivity> activityStack,
-      Map<String, Object> variables, Map<String, Object> localVariables) {
-
-    if (activityStack.isEmpty()) {
-      return;
-    }
+  @SuppressWarnings("unchecked")
+  public void executeActivitiesConcurrent(List<PvmActivity> activityStack, PvmActivity targetActivity,
+      PvmTransition targetTransition, Map<String, Object> variables, Map<String, Object> localVariables,
+      boolean skipCustomListeners, boolean skipIoMappings) {
 
     // The following covers the three cases in which a concurrent execution may be created
-    // (this execution is the root in each scenario):
+    // (this execution is the root in each scenario).
+    //
+    // Note: this should only consider non-event-scope executions. Event-scope executions
+    // are not relevant for the tree structure and should remain under their original parent.
+    //
+    //
     // (1) A compacted tree:
     //
     // Before:               After:
@@ -378,8 +393,8 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     //  -------    -------      -------  -------  -------
     //
     // eX+1 is concurrent and the new root for the activity stack to instantiate
+    List<? extends PvmExecutionImpl> children = getNonEventScopeExecutions();
 
-    List<? extends PvmExecutionImpl> children = getExecutions();
     if (children.isEmpty()) {
       // (1)
       PvmExecutionImpl replacingExecution = createExecution();
@@ -397,7 +412,8 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
       concurrentReplacingExecution.setConcurrent(true);
       concurrentReplacingExecution.setScope(false);
       child.setParent(concurrentReplacingExecution);
-      children.remove(child);
+      ((List<PvmExecutionImpl>) concurrentReplacingExecution.getExecutions()).add(child);
+      getExecutions().remove(child);
     }
 
     // (1), (2), and (3)
@@ -405,7 +421,8 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     propagatingExecution.setConcurrent(true);
     propagatingExecution.setScope(false);
 
-    propagatingExecution.executeActivities(activityStack, variables, localVariables);
+    propagatingExecution.executeActivities(activityStack, targetActivity, targetTransition, variables, localVariables,
+        skipCustomListeners, skipIoMappings);
 
   }
 
@@ -417,24 +434,71 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
    *
    * @param activityStack The most deeply nested activity is the last element in the list
    */
-  public void executeActivities(List<PvmActivity> activityStack,
-      Map<String, Object> variables, Map<String, Object> localVariables) {
+  public void executeActivities(List<PvmActivity> activityStack, PvmActivity targetActivity,
+      PvmTransition targetTransition, Map<String, Object> variables, Map<String, Object> localVariables,
+      boolean skipCustomListeners, boolean skipIoMappings) {
 
-    ExecutionStartContext executionStartContext = new ExecutionStartContext();
-    executionStartContext.setActivityStack(activityStack);
-    executionStartContext.setVariables(variables);
-    executionStartContext.setVariablesLocal(localVariables);
-    setStartContext(executionStartContext);
 
-    if (activityStack.size() > 1) {
+    this.skipCustomListeners = skipCustomListeners;
+    this.skipIoMapping = skipIoMappings;
+
+    if (!activityStack.isEmpty()) {
+      ExecutionStartContext executionStartContext = new ExecutionStartContext(false);
+
+      InstantiationStack instantiationStack = new InstantiationStack(activityStack, targetActivity, targetTransition);
+      executionStartContext.setInstantiationStack(instantiationStack);
+      executionStartContext.setVariables(variables);
+      executionStartContext.setVariablesLocal(localVariables);
+      setStartContext(executionStartContext);
+
       performOperation(PvmAtomicOperation.ACTIVITY_INIT_STACK);
 
-    } else {
+    }
+    else if (targetActivity != null) {
       setVariables(variables);
       setVariablesLocal(localVariables);
-      setActivity(activityStack.get(0));
+      setActivity(targetActivity);
       performOperation(PvmAtomicOperation.ACTIVITY_START_CREATE_SCOPE);
 
+    }
+    else if (targetTransition != null) {
+      setVariables(variables);
+      setVariablesLocal(localVariables);
+      setActivity(targetTransition.getSource());
+      setTransition((TransitionImpl) targetTransition);
+      performOperation(PvmAtomicOperation.TRANSITION_START_NOTIFY_LISTENER_TAKE);
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  public void removeFromParentScope() {
+    PvmExecutionImpl parent = getParent();
+
+    if (isScope()) {
+      destroy();
+    }
+    remove();
+
+    if (parent.isConcurrent()) {
+      parent.remove();
+      parent = parent.getParent();
+    }
+
+    // consolidate the parent scope's execution tree
+    if (parent.getExecutions().size() == 1) {
+      PvmExecutionImpl concurrentChild = parent.getExecutions().get(0);
+      parent.replace(concurrentChild);
+      parent.setActivity(concurrentChild.getActivity());
+      parent.setActive(concurrentChild.isActive());
+
+      if (!concurrentChild.getExecutions().isEmpty()) {
+        // a concurrent execution has exactly one child
+        PvmExecutionImpl childScopeExecution = concurrentChild.getExecutions().get(0);
+        childScopeExecution.setParent(parent);
+        ((List<PvmExecutionImpl>) parent.getExecutions()).add(childScopeExecution);
+      }
+
+      concurrentChild.remove();
     }
   }
 
@@ -622,6 +686,19 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
   // executions ///////////////////////////////////////////////////////////////
 
   public abstract List<? extends PvmExecutionImpl> getExecutions();
+
+  public List<? extends PvmExecutionImpl> getNonEventScopeExecutions() {
+    List<? extends PvmExecutionImpl> children = getExecutions();
+    List<PvmExecutionImpl> result = new ArrayList<PvmExecutionImpl>();
+
+    for (PvmExecutionImpl child : children) {
+      if (!child.isEventScope()) {
+        result.add(child);
+      }
+    }
+
+    return result;
+  }
 
   public PvmExecutionImpl findExecution(String activityId) {
     if ( (getActivity()!=null)

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions" xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:activiti="http://activiti.org/bpmn" targetNamespace="Examples">
+
+  <process id="doubleNestedSubprocess">
+
+    <startEvent id="theStart" />
+    <sequenceFlow id="flow1" sourceRef="theStart" targetRef="subProcess" />
+
+    <subProcess id="subProcess">
+      <startEvent id="theSubProcessStart" />
+      <sequenceFlow id="flow3" sourceRef="theSubProcessStart" targetRef="subProcessTask" />
+      <userTask id="subProcessTask" />
+      <sequenceFlow id="flow4" sourceRef="subProcessTask" targetRef="innerSubProcess" />
+      
+      <subProcess id="innerSubProcess">
+        <startEvent id="innerSubProcessStart" />
+        <sequenceFlow id="flow5" sourceRef="innerSubProcessStart" targetRef="innerSubProcessTask" />
+        <userTask id="innerSubProcessTask" />
+        <sequenceFlow id="flow6" sourceRef="innerSubProcessTask" targetRef="innerSubProcessEnd" />
+        <endEvent id="innerSubProcessEnd" />
+      </subProcess>
+      
+      <sequenceFlow id="flow7" sourceRef="innerSubProcess" targetRef="theSubProcessEnd" />
+      <endEvent id="theSubProcessEnd" />
+    </subProcess>
+
+    <sequenceFlow id="flow8" sourceRef="subProcess" targetRef="theEnd" />
+    <endEvent id="theEnd" />
+  </process>
+
+</definitions>

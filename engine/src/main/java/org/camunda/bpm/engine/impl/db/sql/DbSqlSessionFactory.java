@@ -30,8 +30,6 @@ import org.camunda.bpm.engine.impl.util.ClassNameUtil;
  */
 public class DbSqlSessionFactory implements SessionFactory {
 
-  public static final int ACT_RU_VARIABLE_TEXT_LENGTH = 4000;
-
   public static final String MSSQL = "mssql";
   public static final String DB2 = "db2";
   public static final String ORACLE = "oracle";

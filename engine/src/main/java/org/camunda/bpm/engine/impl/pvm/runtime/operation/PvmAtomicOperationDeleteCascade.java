@@ -34,6 +34,7 @@ public class PvmAtomicOperationDeleteCascade implements PvmAtomicOperation {
     PvmExecutionImpl deleteRoot = getDeleteRoot(execution);
     if(deleteRoot != null) {
       firstLeaf.setSkipCustomListeners(deleteRoot.isSkipCustomListeners());
+      firstLeaf.setSkipIoMappings(deleteRoot.isSkipIoMappings());
     }
 
     if (firstLeaf.getSubProcessInstance()!=null) {

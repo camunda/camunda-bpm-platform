@@ -71,6 +71,12 @@ public class ExecutionAssert {
       return this;
     }
 
+    public ExecutionTreeBuilder eventScope() {
+      ExecutionTreeAssertion currentAssertion = activityInstanceStack.peek();
+      currentAssertion.setExpectedIsEventScope(true);
+      return this;
+    }
+
     public ExecutionTreeBuilder noScope() {
       ExecutionTreeAssertion currentAssertion = activityInstanceStack.peek();
       currentAssertion.setExpectedIsScope(false);

@@ -118,6 +118,9 @@ public class ExecutionImpl extends PvmExecutionImpl implements
       createdExecution.setStartContext(startContext);
     }
 
+    createdExecution.skipCustomListeners = this.skipCustomListeners;
+    createdExecution.skipIoMapping = this.skipIoMapping;
+
     return createdExecution;
   }
 

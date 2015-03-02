@@ -19,10 +19,19 @@
       </boundaryEvent>  
       <userTask id="undoTxTask" isForCompensation="true"/>
       
-      <sequenceFlow sourceRef="txTask" targetRef="cancelEnd" />
+      <sequenceFlow sourceRef="txTask" targetRef="xor" />
+      <exclusiveGateway id="xor" />
+      <sequenceFlow sourceRef="xor" targetRef="success">
+        <conditionExpression>${success}</conditionExpression>
+      </sequenceFlow>
+      <sequenceFlow sourceRef="xor" targetRef="cancelEnd">
+        <conditionExpression>${!success}</conditionExpression>
+      </sequenceFlow>
+      
       <endEvent id="cancelEnd" >
         <cancelEventDefinition id="cancelTx" />
       </endEvent>
+      <endEvent id="success"/>
       
       <association associationDirection="One" id="a1"  sourceRef="innerBoundary" targetRef="undoTxTask" />
     </transaction>
@@ -35,8 +44,9 @@
     <userTask id="afterCancellation" />
     <sequenceFlow sourceRef="afterCancellation" targetRef="end" />
     
-    <sequenceFlow sourceRef="tx" targetRef="end" />
-    
+    <sequenceFlow sourceRef="tx" targetRef="afterSuccess" />
+    <userTask id="afterSuccess" />
+    <sequenceFlow sourceRef="afterSuccess" targetRef="end" />
     <endEvent id="end" />
     
   </process>

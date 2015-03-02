@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions" 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:activiti="http://activiti.org/bpmn"
+  targetNamespace="Examples"
+  xmlns:tns="Examples">
+  
+  <message id="message1" name="task1Message" />
+  <message id="message2" name="task2Message" />
+  
+  <process id="boundaryEvent">
+  
+    <startEvent id="theStart" />
+    
+    <sequenceFlow sourceRef="theStart" targetRef="fork" />
+    <parallelGateway id="fork"/>
+    <sequenceFlow sourceRef="fork" targetRef="task1" />
+    <sequenceFlow sourceRef="fork" targetRef="task2" />
+    
+    <!-- first task with boundary event -->
+    <userTask id="task1" />
+    <boundaryEvent id="messageBoundary1" attachedToRef="task1">
+  		<messageEventDefinition messageRef="message1" />
+  	</boundaryEvent>
+  	<sequenceFlow sourceRef="task1" targetRef="theEnd1" />
+    
+    <sequenceFlow sourceRef="messageBoundary1" targetRef="task1AfterMessage" />
+    <userTask id="task1AfterMessage" />
+    <sequenceFlow sourceRef="task1AfterMessage" targetRef="theEnd1" />
+    <endEvent id="theEnd1" />
+    
+    
+    <!-- second task with boundary event -->
+    <userTask id="task2" />
+    <boundaryEvent id="messageBoundary2" attachedToRef="task2">
+      <messageEventDefinition messageRef="message2" />
+    </boundaryEvent>
+    <sequenceFlow sourceRef="task2" targetRef="theEnd2" />
+    
+    <sequenceFlow sourceRef="messageBoundary2" targetRef="task2AfterMessage" />
+  	<userTask id="task2AfterMessage" />
+    <sequenceFlow sourceRef="task2AfterMessage" targetRef="theEnd2" />
+    <endEvent id="theEnd2" />
+    
+  </process>
+
+</definitions>

@@ -42,6 +42,7 @@ public interface PvmAtomicOperation extends CoreAtomicOperation<PvmExecutionImpl
   PvmAtomicOperation TRANSITION_NOTIFY_LISTENER_END = new PvmAtomicOperationTransitionNotifyListenerEnd();
   PvmAtomicOperation TRANSITION_DESTROY_SCOPE = new PvmAtomicOperationTransitionDestroyScope();
   PvmAtomicOperation TRANSITION_NOTIFY_LISTENER_TAKE = new PvmAtomicOperationTransitionNotifyListenerTake();
+  PvmAtomicOperation TRANSITION_START_NOTIFY_LISTENER_TAKE = new PvmAtomicOperationStartTransitionNotifyListenerTake();
   PvmAtomicOperation TRANSITION_CREATE_SCOPE = new PvmAtomicOperationTransitionCreateScope();
   PvmAtomicOperation TRANSITION_CANCEL_SCOPE = new PvmAtomicOperationTransitionCancelScope();
   PvmAtomicOperation TRANSITION_NOTIFY_LISTENER_START = new PvmAtomicOperationTransitionNotifyListenerStart();

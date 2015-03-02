@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:camunda="http://activiti.org/bpmn"
+  targetNamespace="org.camunda.bpm.engine.test.enginge.test.api.runtime">
+
+  <process id="failingOutputMappingProcess">
+  
+    <startEvent id="theStart" />
+    <sequenceFlow id="flow1" sourceRef="theStart" targetRef="fork" />
+    <parallelGateway id="fork" />
+    
+    <sequenceFlow id="flow2" sourceRef="fork" targetRef="outerTask" />
+    <userTask id="outerTask">
+      <extensionElements>
+        <camunda:inputOutput>
+          <camunda:outputParameter name="outVar">${nonExistingVariable}</camunda:outputParameter>
+        </camunda:inputOutput>
+      </extensionElements>
+    </userTask>    
+    <sequenceFlow id="flow3" sourceRef="outerTask" targetRef="outerEnd" />
+    
+    <sequenceFlow id="flow4" sourceRef="fork" targetRef="subProcess" />
+    
+    <subProcess id="subProcess">
+      <extensionElements>
+        <camunda:inputOutput>
+          <camunda:outputParameter name="outVar">${nonExistingVariable}</camunda:outputParameter>
+        </camunda:inputOutput>
+      </extensionElements>
+      
+      <startEvent id="subProcessStart" />
+      <sequenceFlow id="flow5" sourceRef="subProcessStart" targetRef="innerTask" />
+      <userTask id="innerTask">
+        <extensionElements>
+          <camunda:inputOutput>
+            <camunda:outputParameter name="outVar">${nonExistingVariable}</camunda:outputParameter>
+          </camunda:inputOutput>
+        </extensionElements>
+      </userTask>
+      <sequenceFlow id="flow7" sourceRef="innerTask" targetRef="innerEnd" />
+      <endEvent id="innerEnd" />
+    </subProcess>
+    <sequenceFlow id="flow15" sourceRef="subProcess" targetRef="outerEnd" />
+    
+    <endEvent id="outerEnd" />
+  </process>
+
+</definitions>

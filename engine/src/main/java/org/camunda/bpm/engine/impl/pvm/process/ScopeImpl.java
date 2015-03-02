@@ -22,6 +22,7 @@ import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.impl.core.model.CoreActivity;
 import org.camunda.bpm.engine.impl.pvm.PvmException;
 import org.camunda.bpm.engine.impl.pvm.PvmScope;
+import org.camunda.bpm.engine.impl.pvm.PvmTransition;
 
 
 /**
@@ -44,6 +45,25 @@ public abstract class ScopeImpl extends CoreActivity implements PvmScope {
 
   public ActivityImpl findActivity(String activityId) {
     return (ActivityImpl) super.findActivity(activityId);
+  }
+
+  public TransitionImpl findTransition(String transitionId) {
+    for (ActivityImpl childActivity : activities) {
+      for (PvmTransition transition : childActivity.getOutgoingTransitions()) {
+        if (transitionId.equals(transition.getId())) {
+          return (TransitionImpl) transition;
+        }
+      }
+    }
+
+    for (ActivityImpl childActivity : activities) {
+      TransitionImpl nestedTransition = childActivity.findTransition(transitionId);
+      if (nestedTransition != null) {
+        return nestedTransition;
+      }
+    }
+
+    return null;
   }
 
   /** searches for the activity locally */
