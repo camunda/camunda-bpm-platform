@@ -105,4 +105,7 @@ public interface HistoricActivityInstanceQuery extends Query<HistoricActivityIns
   /** Order by processDefinitionId (needs to be followed by {@link #asc()} or {@link #desc()}). */
   HistoricActivityInstanceQuery orderByProcessDefinitionId();
 
+  /** Order by sequence counter (needs to be followed by {@link #asc()} or {@link #desc()}). */
+  HistoricActivityInstanceQuery orderBySequenceCounter();
+
 }

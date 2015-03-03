@@ -98,6 +98,9 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
   /** marks the current activity instance */
   protected int activityInstanceState = ActivityInstanceState.DEFAULT.getStateCode();
 
+  // sequence counter ////////////////////////////////////////////////////////
+  protected long sequenceCounter = 0;
+
   public PvmExecutionImpl() {
   }
 
@@ -219,6 +222,16 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     PvmExecutionImpl parent = getParent();
     if (parent!=null) {
       parent.getExecutions().remove(this);
+
+      // if the sequence counter is greater than the
+      // sequence counter of the parent, then set
+      // the greater sequence counter on the parent.
+      long parentSequenceCounter = parent.getSequenceCounter();
+      long mySequenceCounter = getSequenceCounter();
+      if (mySequenceCounter > parentSequenceCounter) {
+        parent.setSequenceCounter(mySequenceCounter);
+      }
+
     }
 
     isActive = false;
@@ -709,7 +722,6 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
   }
 
   public void enterActivityInstance() {
-
     ActivityImpl activity = getActivity();
 
     // special treatment for starting process instance
@@ -728,7 +740,6 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
   protected abstract String generateActivityInstanceId(String activityId);
 
   public void leaveActivityInstance() {
-
     if(activityInstanceId != null) {
 
       if(log.isLoggable(Level.FINE)) {
@@ -853,6 +864,21 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
 
   public AbstractVariableScope getParentVariableScope() {
     return getParent();
+  }
+
+  // sequence counter ///////////////////////////////////////////////////////////
+
+  public long getSequenceCounter() {
+    return sequenceCounter;
+  }
+
+  public void setSequenceCounter(long sequenceCounter) {
+    this.sequenceCounter = sequenceCounter;
+  }
+
+  public long incrementSequenceCounter() {
+    sequenceCounter++;
+    return sequenceCounter;
   }
 
   // Getter / Setters ///////////////////////////////////

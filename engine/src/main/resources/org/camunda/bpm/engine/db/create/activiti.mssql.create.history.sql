@@ -34,6 +34,7 @@ create table ACT_HI_ACTINST (
     END_TIME_ datetime2,
     DURATION_ numeric(19,0),
     ACT_INST_STATE_ tinyint,
+    SEQUENCE_COUNTER_ numeric(19,0),
     primary key (ID_)
 );
 

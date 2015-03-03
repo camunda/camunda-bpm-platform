@@ -31,6 +31,7 @@ public abstract class PvmAtomicOperationActivityInstanceStart extends AbstractPv
 
   @Override
   protected PvmExecutionImpl eventNotificationsStarted(PvmExecutionImpl execution) {
+    execution.incrementSequenceCounter();
     execution.enterActivityInstance();
 
     return execution;

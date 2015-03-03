@@ -202,4 +202,6 @@ public interface ExecutionQuery extends Query<ExecutionQuery, Execution>{
   /** Order by process definition id (needs to be followed by {@link #asc()} or {@link #desc()}). */
   ExecutionQuery orderByProcessDefinitionId();
 
+  /** Order by sequence counter (needs to be followed by {@link #asc()} or {@link #desc()}). */
+  ExecutionQuery orderBySequenceCounter();
 }

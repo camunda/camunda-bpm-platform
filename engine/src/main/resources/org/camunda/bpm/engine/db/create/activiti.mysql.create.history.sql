@@ -34,6 +34,7 @@ create table ACT_HI_ACTINST (
     END_TIME_ datetime,
     DURATION_ bigint,
     ACT_INST_STATE_ integer,
+    SEQUENCE_COUNTER_ bigint,
     primary key (ID_)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 

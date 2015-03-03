@@ -15,7 +15,6 @@ package org.camunda.bpm.engine.impl.pvm.runtime.operation;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.camunda.bpm.engine.impl.core.variable.mapping.IoMapping;
 import org.camunda.bpm.engine.impl.pvm.delegate.CompositeActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
@@ -31,6 +30,7 @@ public abstract class PvmAtomicOperationActivityInstanceEnd extends AbstractPvmE
 
   @Override
   protected PvmExecutionImpl eventNotificationsStarted(PvmExecutionImpl execution) {
+    execution.incrementSequenceCounter();
 
     // hack around execution tree structure not being in sync with activity instance concept:
     // if we end a scope activity, take remembered activity instance from parent and set on
@@ -49,6 +49,7 @@ public abstract class PvmAtomicOperationActivityInstanceEnd extends AbstractPvmE
       execution.setActivityInstanceId(parent.getActivityInstanceId());
       // make parent go one scope up.
       parent.leaveActivityInstance();
+
 
     }
 

@@ -25,6 +25,7 @@
       CASE_INST_ID_,
       SUSPENSION_STATE_,
       CACHED_ENT_STATE_,
+      SEQUENCE_COUNTER_,
       REV_
     )
     values
@@ -45,6 +46,7 @@
       #{caseInstanceId, jdbcType=VARCHAR},
       #{suspensionState, jdbcType=INTEGER},
       #{cachedEntityState, jdbcType=INTEGER},
+      #{sequenceCounter, jdbcType=INTEGER},
       1
     )
   </insert>
@@ -64,7 +66,8 @@
       PARENT_ID_ = #{parentId, jdbcType=VARCHAR},
       SUPER_EXEC_ = #{superExecutionId, jdbcType=VARCHAR},
       SUSPENSION_STATE_ = #{suspensionState, jdbcType=INTEGER},
-      CACHED_ENT_STATE_ = #{cachedEntityState, jdbcType=INTEGER}
+      CACHED_ENT_STATE_ = #{cachedEntityState, jdbcType=INTEGER},
+      SEQUENCE_COUNTER_ = #{sequenceCounter, jdbcType=INTEGER}
     where ID_ = #{id, jdbcType=VARCHAR}
       and REV_ = #{revision, jdbcType=INTEGER}
   </update>
@@ -112,6 +115,7 @@
     <result property="caseInstanceId" column="CASE_INST_ID_" jdbcType="VARCHAR" />
     <result property="suspensionState" column="SUSPENSION_STATE_" jdbcType="INTEGER"/>
     <result property="cachedEntityState" column="CACHED_ENT_STATE_" jdbcType="INTEGER"/>
+    <result property="sequenceCounter" column="SEQUENCE_COUNTER_" jdbcType="INTEGER"/>
   </resultMap>
   
   <!-- EXECUTION SELECT -->

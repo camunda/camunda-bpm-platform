@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:camunda="http://activiti.org/bpmn"
+             targetNamespace="Examples">
+
+  <process id="process">
+
+    <startEvent id="theStart" />
+
+    <sequenceFlow sourceRef="theStart" targetRef="theService" />
+
+    <serviceTask id="theService" camunda:expression="${true}" />
+
+    <sequenceFlow sourceRef="theService" targetRef="subProcess" />
+
+    <subProcess id="subProcess">
+
+      <startEvent id="innerStart" />
+
+      <sequenceFlow sourceRef="innerStart" targetRef="innerService1" />
+
+      <serviceTask id="innerService1" camunda:expression="${true}" />
+
+      <sequenceFlow sourceRef="innerService1" targetRef="fork" />
+
+      <parallelGateway id="fork" />
+
+      <sequenceFlow sourceRef="fork" targetRef="innerService2" />
+      <serviceTask id="innerService2" camunda:expression="${true}" />
+      <sequenceFlow sourceRef="innerService2" targetRef="innerEnd1" />
+      <endEvent id="innerEnd1" camunda:asyncBefore="true" />
+
+      <sequenceFlow sourceRef="fork" targetRef="innerService3" />
+      <serviceTask id="innerService3" camunda:expression="${true}" />
+      <sequenceFlow sourceRef="innerService3" targetRef="innerEnd2" />
+      <endEvent id="innerEnd2" camunda:asyncBefore="true" />
+
+    </subProcess>
+
+    <sequenceFlow sourceRef="subProcess" targetRef="theEnd" />
+
+    <endEvent id="theEnd" camunda:asyncBefore="true" />
+
+  </process>
+
+</definitions>

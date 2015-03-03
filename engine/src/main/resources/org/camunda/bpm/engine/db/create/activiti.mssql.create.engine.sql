@@ -52,6 +52,7 @@ create table ACT_RU_EXECUTION (
     IS_EVENT_SCOPE_ tinyint,
     SUSPENSION_STATE_ tinyint,
     CACHED_ENT_STATE_ int,
+    SEQUENCE_COUNTER_ numeric(19,0),
     primary key (ID_)
 );
 

@@ -224,6 +224,9 @@ public class ExecutionEntity extends PvmExecutionImpl implements
     // create the new child execution
     ExecutionEntity createdExecution = newExecution(null);
 
+    // initialize sequence counter
+    createdExecution.setSequenceCounter(getSequenceCounter());
+
     // manage the bidirectional parent-child relation
     ensureExecutionsInitialized();
     executions.add(createdExecution);
@@ -1145,6 +1148,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements
     persistentState.put("caseInstanceId", this.caseInstanceId);
     persistentState.put("suspensionState", this.suspensionState);
     persistentState.put("cachedEntityState", getCachedEntityState());
+    persistentState.put("sequenceCounter", getSequenceCounter());
     return persistentState;
   }
 

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:camunda="http://activiti.org/bpmn"
+             targetNamespace="Examples">
+
+  <message id="messageId" name="newMessage" />
+
+  <process id="process">
+
+    <startEvent id="theStart" />
+
+    <sequenceFlow sourceRef="theStart" targetRef="theService1" />
+
+    <serviceTask id="theService1" camunda:expression="${true}" />
+
+    <sequenceFlow sourceRef="theService1" targetRef="theTask" />
+
+    <userTask id="theTask" />
+
+    <sequenceFlow sourceRef="theTask" targetRef="theEnd1" />
+
+    <endEvent id="theEnd1" camunda:asyncBefore="true" />
+
+    <boundaryEvent id="messageBoundary" attachedToRef="theTask" cancelActivity="false">
+      <messageEventDefinition messageRef="messageId" />
+    </boundaryEvent>
+
+    <sequenceFlow sourceRef="messageBoundary" targetRef="theServiceAfterMessage" />
+
+    <serviceTask id="theServiceAfterMessage" camunda:asyncBefore="true" camunda:expression="${true}" />
+
+    <sequenceFlow sourceRef="theServiceAfterMessage" targetRef="theEnd2" />
+
+    <endEvent id="theEnd2" />
+
+  </process>
+
+</definitions>

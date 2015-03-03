@@ -13,6 +13,7 @@
 package org.camunda.bpm.engine.impl.history.event;
 
 import java.io.Serializable;
+
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
 import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
@@ -104,6 +105,8 @@ public class HistoryEvent implements Serializable, DbEntity {
    * */
   protected String eventType;
 
+  protected long sequenceCounter;
+
   // getters / setters ///////////////////////////////////
 
   public String getProcessInstanceId() {
@@ -168,6 +171,14 @@ public class HistoryEvent implements Serializable, DbEntity {
 
   public void setEventType(String eventType) {
     this.eventType = eventType;
+  }
+
+  public long getSequenceCounter() {
+    return sequenceCounter;
+  }
+
+  public void setSequenceCounter(long sequenceCounter) {
+    this.sequenceCounter = sequenceCounter;
   }
 
   // persistent object implementation ///////////////

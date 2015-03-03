@@ -101,7 +101,6 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     evt.setExecutionId(executionId);
     evt.setBusinessKey(execution.getProcessBusinessKey());
     evt.setCaseInstanceId(caseInstanceId);
-
   }
 
   protected void initTaskInstanceEvent(HistoricTaskInstanceEventEntity evt, TaskEntity taskEntity, HistoryEventType eventType) {
@@ -386,6 +385,9 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     // initialize event
     initActivityInstanceEvent(evt, executionEntity, HistoryEventTypes.ACTIVITY_INSTANCE_START);
 
+    // initialize sequence counter
+    initSequenceCounter(executionEntity, evt);
+
     evt.setStartTime(ClockUtil.getCurrentTime());
 
     return evt;
@@ -650,6 +652,13 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
       state = JobState.DELETED;
     }
     evt.setState(state.getStateCode());
+  }
+
+  // sequence counter //////////////////////////////////////////////////////
+
+  protected void initSequenceCounter(ExecutionEntity execution, HistoryEvent event) {
+    long sequenceCounter = execution.getSequenceCounter();
+    event.setSequenceCounter(sequenceCounter);
   }
 
 }

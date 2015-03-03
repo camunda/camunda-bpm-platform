@@ -194,6 +194,11 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
     return this;
   }
 
+  public ExecutionQuery orderBySequenceCounter() {
+    orderBy(ExecutionQueryProperty.SEQUENCE_COUNTER);
+    return this;
+  }
+
   //results ////////////////////////////////////////////////////
 
   public long executeCount(CommandContext commandContext) {

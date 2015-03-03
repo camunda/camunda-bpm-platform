@@ -25,6 +25,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
+import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 
 
 /**
@@ -76,6 +77,10 @@ public class SequentialMultiInstanceBehavior extends MultiInstanceActivityBehavi
       for (EventSubscriptionDeclaration declaration : EventSubscriptionDeclaration.getDeclarationsForScope(execution.getActivity())) {
         declaration.handleSequentialMultiInstanceLeave((ExecutionEntity) execution);
       }
+
+      // the given execution will not be leaved in that case
+      // that's why we have to increment the sequence counter
+      ((PvmExecutionImpl) execution).incrementSequenceCounter();
 
       deleteExistingJobs(execution);
       callActivityEndListeners(execution);

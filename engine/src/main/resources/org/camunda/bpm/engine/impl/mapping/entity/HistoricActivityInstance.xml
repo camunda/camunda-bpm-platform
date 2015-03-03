@@ -37,7 +37,8 @@
         START_TIME_,
         END_TIME_,
         DURATION_,
-        ACT_INST_STATE_
+        ACT_INST_STATE_,
+        SEQUENCE_COUNTER_
       ) values (
         #{id ,jdbcType=VARCHAR},
         #{parentActivityInstanceId ,jdbcType=VARCHAR},
@@ -54,7 +55,8 @@
         #{startTime, jdbcType=TIMESTAMP},
         #{endTime, jdbcType=TIMESTAMP},
         #{durationInMillis ,jdbcType=BIGINT},
-        #{activityInstanceState,jdbcType=INTEGER}
+        #{activityInstanceState,jdbcType=INTEGER},
+        #{sequenceCounter,jdbcType=INTEGER}
       )
   </insert>
 
@@ -110,6 +112,7 @@
     <result property="endTime" column="END_TIME_" jdbcType="TIMESTAMP" />
     <result property="durationInMillis" column="DURATION_" jdbcType="BIGINT" />
     <result property="activityInstanceState" column="ACT_INST_STATE_" jdbcType="INTEGER" />
+    <result property="sequenceCounter" column="SEQUENCE_COUNTER_" jdbcType="INTEGER" />
   </resultMap>
 
   <!-- HISTORIC ACTIVITY INSTANCE SELECT -->

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:camunda="http://activiti.org/bpmn"
+             targetNamespace="Examples">
+
+  <process id="process">
+
+    <startEvent id="theStart" />
+
+    <sequenceFlow sourceRef="theStart" targetRef="theService1" />
+
+    <serviceTask id="theService1" camunda:expression="${true}" />
+
+    <sequenceFlow sourceRef="theService1" targetRef="join" />
+
+    <exclusiveGateway id="join" />
+
+    <sequenceFlow sourceRef="join" targetRef="theScript" />
+
+    <scriptTask id="theScript" camunda:asyncBefore="true" scriptFormat="groovy">
+      <script>
+        <![CDATA[
+          def counterVar = execution.getVariable("counter")
+          def int counter = 0
+          if (counterVar != null) {
+            counter = counterVar
+          }
+          counter = counter + 1
+          execution.setVariable("counter", counter)
+        ]]>
+      </script>
+    </scriptTask>
+
+    <sequenceFlow sourceRef="theScript" targetRef="fork" />
+
+    <exclusiveGateway id="fork" />
+
+    <sequenceFlow sourceRef="fork" targetRef="join">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${counter < 2}]]></conditionExpression>
+    </sequenceFlow>
+
+    <sequenceFlow sourceRef="fork" targetRef="theService2" >
+      <conditionExpression xsi:type="tFormalExpression">${counter >= 2}</conditionExpression>
+    </sequenceFlow>
+
+    <serviceTask id="theService2" camunda:asyncBefore="true" camunda:expression="${true}" />
+
+    <sequenceFlow sourceRef="theService2" targetRef="theEnd" />
+
+    <endEvent id="theEnd" />
+
+  </process>
+
+</definitions>

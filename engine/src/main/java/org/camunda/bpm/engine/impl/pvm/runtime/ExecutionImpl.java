@@ -97,6 +97,9 @@ public class ExecutionImpl extends PvmExecutionImpl implements
     // create the new child execution
     ExecutionImpl createdExecution = newExecution();
 
+    // initialize sequence counter
+    createdExecution.setSequenceCounter(getSequenceCounter());
+
     // manage the bidirectional parent-child relation
     getExecutions().add(createdExecution);
     createdExecution.setParent(this);
