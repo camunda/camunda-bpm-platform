@@ -138,7 +138,7 @@ define([
 
 
         scope.$watch('sortings.length', function (now, before) {
-          if (now !== before) { updateSortings(); }
+          if (now !== before) { scope.updateSortings(); }
         });
 
         function positionDropdown(el) {
@@ -170,21 +170,19 @@ define([
 
 
         // should NOT manipulate the `scope.sortings`!
-        function updateSortings(dontApply) {
+        scope.updateSortings = function () {
           scope.openDropdowns = [];
           scope.sortedOn = scope.sortings.map(function (sorting) {
             scope.openDropdowns.push(false);
             return sorting.by;
           });
 
-          if (!dontApply) {
-            search.updateSilently({
-              sorting: stringifySortings(scope.sortings)
-            });
+          search.updateSilently({
+            sorting: stringifySortings(scope.sortings)
+          });
 
-            tasklistData.changed('taskListQuery');
-          }
-        }
+          tasklistData.changed('taskListQuery');
+        };
 
         /**
          * Invoked when adding a sorting object
@@ -197,7 +195,7 @@ define([
           newSorting.by = by;
           scope.sortings.push(newSorting);
 
-          updateSortings();
+          scope.updateSortings();
         };
 
         /**
@@ -214,7 +212,7 @@ define([
           });
           scope.sortings = newSortings;
 
-          updateSortings();
+          scope.updateSortings();
         };
 
         /**
@@ -223,7 +221,7 @@ define([
         scope.changeOrder = function(index) {
           scope.sortings[index].order = scope.sortings[index].order === 'asc' ? 'desc' : 'asc';
 
-          updateSortings();
+          scope.updateSortings();
         };
 
         /**
@@ -232,7 +230,7 @@ define([
         scope.changeBy = function(index, by) {
           scope.sortings[index].by = by;
 
-          updateSortings();
+          scope.updateSortings();
         };
       }
     };

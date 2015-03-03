@@ -42,9 +42,14 @@ define([
 
       link: function (scope, element) {
         scope.applySorting = function () {
-          var $sortingsScope = scope.$parent.$parent.$parent.$parent;
+          var $sortingsScope = scope      // inputs (this) directive
+                                .$parent  // repeater
+                                .$parent  // variables directive
+                                .$parent  // repeater
+                                .$parent; // repeater (if editing) or choices directive (if new)
           var index = $sortingsScope.index;
           var op = typeof index === 'number' ? 'update' : 'add';
+
 
           function fillSorting() {
             scope.sorting.by                  = scope.$parent.focusedOn;
@@ -59,6 +64,7 @@ define([
             fillSorting();
             $sortingsScope.sorting = scope.sorting;
             $sortingsScope.$parent.openDropdowns[index] = false;
+            $sortingsScope.$parent.updateSortings();
           }
 
           // adding a new sorting
