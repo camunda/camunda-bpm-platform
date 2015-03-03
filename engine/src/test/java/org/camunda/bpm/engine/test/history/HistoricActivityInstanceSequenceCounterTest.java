@@ -310,8 +310,6 @@ public class HistoricActivityInstanceSequenceCounterTest extends PluggableProces
     executeAvailableJobs();
 
     // then
-    verifyOrder(query, 10, Arrays.asList("theStart", "theService1", "theTask", "messageBoundary", "messageBoundary", "theServiceAfterMessage", "theServiceAfterMessage", "theEnd2", "theEnd2", "theEnd1"));
-
     query.executionId(processInstanceId);
     verifyOrder(query, 3, Arrays.asList("theStart", "theService1", "theEnd1"));
 
@@ -332,6 +330,15 @@ public class HistoricActivityInstanceSequenceCounterTest extends PluggableProces
       query.executionId(historicActivityInstance.getExecutionId());
       verifyOrder(query, 3, Arrays.asList("messageBoundary", "theServiceAfterMessage", "theEnd2"));
     }
+
+    query = historyService
+        .createHistoricActivityInstanceQuery()
+        .orderBySequenceCounter()
+        .asc()
+        .orderByActivityId()
+        .asc();
+
+    verifyOrder(query, 10, Arrays.asList("theStart", "theService1", "messageBoundary", "messageBoundary", "theTask", "theServiceAfterMessage", "theServiceAfterMessage", "theEnd2", "theEnd2", "theEnd1"));
   }
 
   protected void verifyOrder(HistoricActivityInstanceQuery query, int countExpected, List<String> expectedActivityInstanceOrder) {
