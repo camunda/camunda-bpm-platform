@@ -4,6 +4,7 @@
            placeholder="{{ 'VARIABLE_NAME' | translate }}"
            class="form-control"
            name="variableName"
+           ng-model="variableName"
            ng-value="sorting.parameters.variable"
            autofocus />
   </div>
@@ -20,6 +21,7 @@
 
   <div class="form-group actions">
     <button ng-click="applySorting($event)"
+            ng-disabled="!variableName"
             class="btn btn-primary btn-sm">
       {{ (sorting ? 'CHANGE' : 'ADD') | translate }}
     </button>
