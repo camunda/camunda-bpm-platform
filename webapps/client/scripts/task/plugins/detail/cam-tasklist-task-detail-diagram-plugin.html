@@ -14,8 +14,10 @@
 
   <div ng-hide="!processDefinition || !processDiagram.bpmn20xml">
     <div class="diagram-pane"
-         cam-tasklist-task-diagram
-         process-diagram="processDiagram">
+         cam-widget-bpmn-viewer
+         process-diagram="processDiagram.bpmn20xml"
+         on-load="highlightTask()"
+         control="control">
     </div>
   </div>
 

@@ -8,7 +8,7 @@ define([
   var Controller = [
    '$scope',
    '$q',
-   'camAPI', 
+   'camAPI',
   function (
     $scope,
     $q,
@@ -60,6 +60,12 @@ define([
     $scope.processDiagramState = diagramData.observe('processDiagram', function (processDiagram) {
       $scope.processDiagram = processDiagram;
     });
+
+    $scope.control = {};
+
+    $scope.highlightTask = function() {
+      $scope.control.highlight($scope.processDiagram.task.taskDefinitionKey);
+    };
 
   }];
 

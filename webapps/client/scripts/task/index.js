@@ -14,10 +14,6 @@ define([
   './plugins/detail/cam-tasklist-task-detail-diagram-plugin',
   './plugins/detail/cam-tasklist-task-detail-description-plugin',
 
-  /* detail plugin directives */
-  './plugins/detail/directives/cam-tasklist-task-diagram',
-
-
   /* action plugins */
   './plugins/action/cam-tasklist-task-action-comment-plugin',
 
@@ -45,9 +41,6 @@ define([
   camTaskDetailHistoryPlugin,
   camTaskDetailDiagramPlugin,
   camTaskDetailDescriptionPlugin,
-
-  /* detail plugin directives */
-  taskDiagramDirective,
 
   /* action plugins */
   camTaskActionCommentPlugin,
@@ -90,9 +83,6 @@ define([
   taskModule.config(camTaskDetailHistoryPlugin);
   taskModule.config(camTaskDetailDiagramPlugin);
   taskModule.config(camTaskDetailDescriptionPlugin);
-
-  /* detail plugin directives */
-  taskModule.directive('camTasklistTaskDiagram', taskDiagramDirective);
 
     /* action plugins */
   taskModule.config(camTaskActionCommentPlugin);
