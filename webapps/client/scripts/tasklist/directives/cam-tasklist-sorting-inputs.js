@@ -41,6 +41,8 @@ define([
       }],
 
       link: function (scope, element) {
+        scope.variable = scope.sorting ? (scope.sorting.parameters || {}).variable : '';
+
         scope.applySorting = function () {
           var $sortingsScope = scope      // inputs (this) directive
                                 .$parent  // repeater
@@ -50,12 +52,11 @@ define([
           var index = $sortingsScope.index;
           var op = typeof index === 'number' ? 'update' : 'add';
 
-
           function fillSorting() {
             scope.sorting.by                  = scope.$parent.focusedOn;
             scope.sorting.order               = scope.sorting.order || 'desc';
             scope.sorting.parameters          = scope.sorting.parameters || {};
-            scope.sorting.parameters.variable = element.find('input').val();
+            scope.sorting.parameters.variable = scope.variable;
             scope.sorting.parameters.type     = element.find('select').val();
           }
 
