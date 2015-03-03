@@ -7,15 +7,6 @@ define([
 ) {
   'use strict';
 
-  function addCSSRule(sheet, selector, rules, index) {
-    if('insertRule' in sheet) {
-      sheet.insertRule(selector + '{' + rules + '}', index);
-    }
-    else if('addRule' in sheet) {
-      sheet.addRule(selector, rules, index);
-    }
-  }
-
   function stringifySortings(sortingQuery) {
     return JSON.stringify(sortingQuery.map(function (sorting) {
       var obj = {
@@ -59,6 +50,7 @@ define([
 
       link: function(scope, element) {
         var $body = angular.element('body');
+        var $newSort = element.find('.new-sort .dropdown-menu');
 
         var sorting = {
           order:    'desc',
@@ -68,20 +60,11 @@ define([
         scope.sortings = [angular.copy(sorting)];
 
         scope.openDropdowns = [];
+        scope.openDropdownNew = false;
 
         scope.sortedOn = [];
 
-        // var sheets = document.styleSheets;
-        // var sheet = sheets[sheets.length - 1];
-        // var num = sheet.rules.length;
-        // addCSSRule(sheet, '', '', 1);
-
-        // console.info('sheets', sheets, $document, document.styleSheets);
-
         function updateBodyClass(plus) {
-          // if (scope.sortings.length > 1) {
-          // }
-          // console.info('element', element[0], element.height());
           $body
             .removeClass('sort-choices-' + scope.sortings.length)
             .addClass('sort-choices-' + (scope.sortings.length + plus))
@@ -156,6 +139,33 @@ define([
 
         scope.$watch('sortings.length', function (now, before) {
           if (now !== before) { updateSortings(); }
+        });
+
+        function positionDropdown(el) {
+          var edgeLeft = el.parent().position().left;
+          var edgeRight = el.outerWidth() + edgeLeft;
+          if (edgeRight > element.outerWidth()) {
+            el.css('left', (element.outerWidth() - edgeRight) + 'px');
+          }
+        }
+
+        scope.$watch('openDropdowns', function (now, before) {
+          var index = now.indexOf(true);
+          var els = element
+                      .find('li.sorting-choice .dropdown-menu')
+                      .css('left', 'auto');
+          if (index > -1 && els[index]) {
+            positionDropdown(angular.element(els[index]));
+          }
+        }, true);
+
+        scope.$watch('openDropdownNew', function (now, before) {
+          if (now) {
+            positionDropdown($newSort);
+          }
+          else {
+            $newSort.css('left', 'auto');
+          }
         });
 
 
