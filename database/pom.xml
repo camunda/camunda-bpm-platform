@@ -281,7 +281,7 @@
          with the oracle 12 driver version. Default value => OPEN_CURSORS = 300
          Exception: java.sql.SQLException: ORA-01000: maximum open cursors exceeded
         -->
-        <version.oracle>${version.oracle-11}</version.oracle>
+        <version.oracle>${version.oracle-12}</version.oracle>
         <hibernate.dialect>org.hibernate.dialect.Oracle10gDialect</hibernate.dialect>
       </properties>
       <dependencies>

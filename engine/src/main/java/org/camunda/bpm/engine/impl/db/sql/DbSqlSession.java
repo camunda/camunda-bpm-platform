@@ -105,7 +105,7 @@ public class DbSqlSession extends AbstractPersistenceSession {
     // do not perform locking if H2 database is used. H2 uses table level locks
     // by default which may cause deadlocks if the deploy command needs to get a new
     // Id using the DbIdGenerator while performing a deployment.
-    if (!"h2".equals(dbSqlSessionFactory.getDatabaseType())) {
+    if (!DbSqlSessionFactory.H2.equals(dbSqlSessionFactory.getDatabaseType())) {
       String mappedStatement = dbSqlSessionFactory.mapStatement(statement);
       sqlSession.update(mappedStatement);
     }
@@ -411,7 +411,7 @@ public class DbSqlSession extends AbstractPersistenceSession {
 
       String databaseType = dbSqlSessionFactory.getDatabaseType();
 
-      if ("postgres".equals(databaseType)) {
+      if (DbSqlSessionFactory.POSTGRES.equals(databaseType)) {
         tableName = tableName.toLowerCase();
       }
 

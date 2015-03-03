@@ -32,12 +32,12 @@ public class DbSqlSessionFactory implements SessionFactory {
 
   public static final int ACT_RU_VARIABLE_TEXT_LENGTH = 4000;
 
-  private static final String MSSQL = "mssql";
-  private static final String DB2 = "db2";
-  private static final String ORACLE = "oracle";
-  private static final String H2 = "h2";
-  private static final String MYSQL = "mysql";
-  private static final String POSTGRES = "postgres";
+  public static final String MSSQL = "mssql";
+  public static final String DB2 = "db2";
+  public static final String ORACLE = "oracle";
+  public static final String H2 = "h2";
+  public static final String MYSQL = "mysql";
+  public static final String POSTGRES = "postgres";
 
   protected static final Map<String, Map<String, String>> databaseSpecificStatements = new HashMap<String, Map<String,String>>();
 

@@ -13,15 +13,8 @@
 
 package org.camunda.bpm.engine.impl.persistence.entity;
 
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.sql.*;
+import java.util.*;
 import java.util.logging.Logger;
 
 import org.apache.ibatis.session.RowBounds;
@@ -37,7 +30,10 @@ import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.history.HistoricVariableUpdate;
 import org.camunda.bpm.engine.impl.TablePageQueryImpl;
+import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.DbEntity;
+import org.camunda.bpm.engine.impl.db.sql.DbSqlSession;
+import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.history.event.HistoricDetailEventEntity;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 import org.camunda.bpm.engine.management.TableMetaData;
@@ -89,7 +85,7 @@ public class TableDataManager extends AbstractManager {
     persistentObjectToTableNameMap.put(CommentEntity.class, "ACT_HI_COMMENT");
 
     persistentObjectToTableNameMap.put(HistoricActivityInstanceEntity.class, "ACT_HI_ACTINST");
-    persistentObjectToTableNameMap.put(AttachmentEntity.class, "ACT_HI_ATTACHMEN");
+    persistentObjectToTableNameMap.put(AttachmentEntity.class, "ACT_HI_ATTACHMENT");
     persistentObjectToTableNameMap.put(HistoricProcessInstanceEntity.class, "ACT_HI_PROCINST");
     persistentObjectToTableNameMap.put(HistoricTaskInstanceEntity.class, "ACT_HI_TASKINST");
 
@@ -154,38 +150,79 @@ public class TableDataManager extends AbstractManager {
 
   public List<String> getTablesPresentInDatabase() {
     List<String> tableNames = new ArrayList<String>();
-    Connection connection = null;
+
     try {
-      connection = getDbSqlSession().getSqlSession().getConnection();
-      DatabaseMetaData databaseMetaData = connection.getMetaData();
-      ResultSet tables = null;
+      ResultSet tablesRs = null;
+
       try {
-        log.fine("retrieving process engine tables from jdbc metadata");
-        String databaseTablePrefix = getDbSqlSession().getDbSqlSessionFactory().getDatabaseTablePrefix();
-        String tableNameFilter = databaseTablePrefix+"ACT_%";
-        if ("postgres".equals(getDbSqlSession().getDbSqlSessionFactory().getDatabaseType())) {
-          tableNameFilter = databaseTablePrefix+"act_%";
-        }
-        if ("oracle".equals(getDbSqlSession().getDbSqlSessionFactory().getDatabaseType())) {
-          tableNameFilter = databaseTablePrefix+"ACT" + databaseMetaData.getSearchStringEscape() + "_%";
-        }
-        tables = databaseMetaData.getTables(null, null, tableNameFilter, getDbSqlSession().JDBC_METADATA_TABLE_TYPES);
-        while (tables.next()) {
-          String tableName = tables.getString("TABLE_NAME");
-          tableName = tableName.toUpperCase();
-          tableNames.add(tableName);
-          log.fine("  retrieved process engine table name "+tableName);
+        if (DbSqlSessionFactory.ORACLE.equals(getDbSqlSession().getDbSqlSessionFactory().getDatabaseType())) {
+          tableNames = getTablesPresentInOracleDatabase();
+        } else {
+          Connection connection = getDbSqlSession().getSqlSession().getConnection();
+          DatabaseMetaData databaseMetaData = connection.getMetaData();
+
+          log.fine("retrieving process engine tables from jdbc metadata");
+          String databaseTablePrefix = getDbSqlSession().getDbSqlSessionFactory().getDatabaseTablePrefix();
+          String tableNameFilter = databaseTablePrefix+"ACT_%";
+
+          if (DbSqlSessionFactory.POSTGRES.equals(getDbSqlSession().getDbSqlSessionFactory().getDatabaseType())) {
+            tableNameFilter = databaseTablePrefix+"act_%";
+          }
+          tablesRs = databaseMetaData.getTables(null, null, tableNameFilter, DbSqlSession.JDBC_METADATA_TABLE_TYPES);
+
+          while (tablesRs.next()) {
+            String tableName = tablesRs.getString("TABLE_NAME");
+            tableName = tableName.toUpperCase();
+            tableNames.add(tableName);
+            log.fine("  retrieved process engine table name "+tableName);
+          }
         }
       } catch (SQLException se) {
         throw se;
       } finally {
-        if (tables != null) {
-          tables.close();
+        if (tablesRs != null) {
+          tablesRs.close();
         }
       }
     } catch (Exception e) {
-      throw new ProcessEngineException("couldn't get process engine table names using metadata: "+e.getMessage(), e);
+      throw new ProcessEngineException("couldn't get process engine table names: "+e.getMessage(), e);
     }
+
+    return tableNames;
+  }
+
+  protected List<String> getTablesPresentInOracleDatabase() throws SQLException {
+    List<String> tableNames = new ArrayList<String>();
+    Connection connection = null;
+    PreparedStatement prepStat = null;
+    ResultSet tablesRs = null;
+    String selectTableNamesFromOracle = "SELECT table_name FROM all_tables WHERE table_name LIKE ?";
+    String databaseTablePrefix = getDbSqlSession().getDbSqlSessionFactory().getDatabaseTablePrefix();
+
+    try {
+        connection = Context.getProcessEngineConfiguration().getDataSource().getConnection();
+        prepStat = connection.prepareStatement(selectTableNamesFromOracle);
+        prepStat.setString(1, databaseTablePrefix + "ACT_%");
+        log.fine("retrieving process engine tables from oracle all_tables");
+        tablesRs = prepStat.executeQuery();
+        while (tablesRs.next()) {
+          String tableName = tablesRs.getString("TABLE_NAME");
+          tableName = tableName.toUpperCase();
+          tableNames.add(tableName);
+          log.fine("  retrieved process engine table name "+tableName);
+        }
+    } finally {
+      if (tablesRs != null) {
+        tablesRs.close();
+      }
+      if (prepStat != null) {
+        prepStat.close();
+      }
+      if (connection != null) {
+        connection.close();
+      }
+    }
+
     return tableNames;
   }
 
@@ -234,34 +271,35 @@ public class TableDataManager extends AbstractManager {
   public TableMetaData getTableMetaData(String tableName) {
     TableMetaData result = new TableMetaData();
     ResultSet resultSet = null;
+
     try {
-      result.setTableName(tableName);
-      DatabaseMetaData metaData = getDbSqlSession()
-        .getSqlSession()
-        .getConnection()
-        .getMetaData();
+      try {
+        result.setTableName(tableName);
+        DatabaseMetaData metaData = getDbSqlSession()
+            .getSqlSession()
+            .getConnection()
+            .getMetaData();
 
-      if ("postgres".equals(getDbSqlSession().getDbSqlSessionFactory().getDatabaseType())) {
-        tableName = tableName.toLowerCase();
-      }
+        if (DbSqlSessionFactory.POSTGRES.equals(getDbSqlSession().getDbSqlSessionFactory().getDatabaseType())) {
+          tableName = tableName.toLowerCase();
+        }
 
-      resultSet = metaData.getColumns(null, null, tableName, null);
-      while(resultSet.next()) {
-        String name = resultSet.getString("COLUMN_NAME").toUpperCase();
-        String type = resultSet.getString("TYPE_NAME").toUpperCase();
-        result.addColumnMetaData(name, type);
-      }
+        resultSet = metaData.getColumns(null, null, tableName, null);
+        while(resultSet.next()) {
+          String name = resultSet.getString("COLUMN_NAME").toUpperCase();
+          String type = resultSet.getString("TYPE_NAME").toUpperCase();
+          result.addColumnMetaData(name, type);
+        }
 
-    } catch (SQLException e) {
-      throw new ProcessEngineException("Could not retrieve database metadata: " + e.getMessage());
-    } finally {
-      if (resultSet != null) {
-        try {
+      } catch (SQLException se) {
+        throw se;
+      } finally {
+        if (resultSet != null) {
           resultSet.close();
-        } catch (SQLException e) {
-          throw new ProcessEngineException("Could not retrieve database metadata: " + e.getMessage());
         }
       }
+    } catch (Exception e) {
+      throw new ProcessEngineException("Could not retrieve database metadata: " + e.getMessage());
     }
 
     if(result.getColumnNames().size() == 0) {
