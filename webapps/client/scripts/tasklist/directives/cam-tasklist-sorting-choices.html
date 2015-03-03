@@ -20,8 +20,8 @@
     <a href
        tabindex="-1"
        tooltip="{{ (sorting.order === 'desc' ? 'DESC' : 'ASC') | translate }}"
-       class="sort-direction glyphicon glyphicon-chevron-up"
-       ng-class="{'glyphicon-chevron-up': sorting.order === 'asc', 'glyphicon-chevron-down': sorting.order === 'desc'}"
+       class="sort-direction glyphicon"
+       ng-class="sorting.order === 'asc' ? 'glyphicon-chevron-up' : 'glyphicon-chevron-down'"
        ng-click="changeOrder(index)"></a>
 
     <ul class="dropdown-menu">
