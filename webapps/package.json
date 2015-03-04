@@ -1,6 +1,6 @@
 {
   "name": "camunda-cockpit-ui",
-  "version": "7.3.0-alpha2",
+  "version": "7.3.0-SNAPSHOT",
   "private": true,
   "scripts": {
     "win-build-sdk": "cd \"node_modules\\grunt-cli\\bin\" && grunt --gruntfile=..\\..\\camunda-commons-ui\\node_modules\\camunda-bpm-sdk-js\\Gruntfile.js browserify:distAngular",
