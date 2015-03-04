@@ -1823,4 +1823,39 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
     assertEquals(variable.getName(), variableName);
     assertEquals(variable.getValue(), variableAnotherValue);
   }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testHumanTaskLocalVariables() {
+    // given
+    String caseInstanceId = caseService.createCaseInstanceByKey("oneTaskCase").getId();
+
+    String humanTaskId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(humanTaskId)
+      .manualStart();
+
+    String variableName = "aVariable";
+    String variableValue = "aValue";
+
+    String taskId = taskService.createTaskQuery().singleResult().getId();
+
+    // when
+    taskService.setVariableLocal(taskId, variableName, variableValue);
+
+    // then
+    VariableInstance variableInstance = runtimeService
+      .createVariableInstanceQuery()
+      .taskIdIn(taskId)
+      .singleResult();
+    assertNotNull(variableInstance);
+
+    assertEquals(caseInstanceId, variableInstance.getCaseInstanceId());
+    assertEquals(humanTaskId, variableInstance.getCaseExecutionId());
+  }
+
 }
