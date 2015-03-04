@@ -53,6 +53,16 @@
     max-width: 300px;
   }
 
+  .bpmn-overlay {
+    position: absolute;
+    pointer-events:none;
+    filter:Alpha(opacity=0);
+
+    > [view] {
+      pointer-events:all;
+    }
+  }
+
   .badge {
     font-size: 12px;
     border-width: 1px;

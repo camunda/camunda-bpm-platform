@@ -6,6 +6,7 @@ define([
   'angular-data-depend',
   'text!./process-instance.html'
 ], function(require, angular, routeUtil, camCommoms, dataDepend, template) {
+  'use strict';
     var module = angular.module('cam.cockpit.pages.processInstance', [camCommoms.name, dataDepend.name]);
 
   var Controller = [
@@ -179,11 +180,13 @@ define([
       return ProcessDefinitionResource.get({ id: processInstance.definitionId }).$promise;
     }]);
 
+    processData.provide('bpmn20Xml', [ 'processDefinition', function(definition) {
+      return ProcessDefinitionResource.getBpmn20Xml({ id : definition.id}).$promise;
+    }]);
+
     // semantic
-    processData.provide('semantic', ['processDefinition', function (processDefinition) {
-      return ProcessDefinitionResource.getBpmn20Xml({ id: processDefinition.id }).$promise.then(function(response) {
-        return Transform.transformBpmn20Xml(response.bpmn20Xml);
-      });
+    processData.provide('semantic', ['bpmn20Xml', function (bpmn20Xml) {
+      return Transform.transformBpmn20Xml(bpmn20Xml.bpmn20Xml);
     }]);
 
     // bpmnElements
@@ -337,13 +340,14 @@ define([
 
     // processDiagram
     processData.provide('processDiagram', [
-             'semantic', 'processDefinition', 'bpmnElements',
-    function (semantic,   processDefinition,   bpmnElements) {
+             'semantic', 'processDefinition', 'bpmnElements', 'bpmn20Xml',
+    function (semantic,   processDefinition,   bpmnElements,   bpmn20Xml) {
       var processDiagram = {};
 
       processDiagram.semantic = semantic;
       processDiagram.processDefinition = processDefinition;
       processDiagram.bpmnElements = bpmnElements;
+      processDiagram.bpmn20Xml = bpmn20Xml;
 
       return processDiagram;
     }]);

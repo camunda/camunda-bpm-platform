@@ -1,12 +1,10 @@
-define(['bpmn/Bpmn'], function(Bpmn) {
+define(['bpmn/Bpmn', 'text!./processDiagramPreview.html'], function(Bpmn, template) {
   'use strict';
 
-  var Directive = function (ProcessDefinitionResource) {
+  return ['ProcessDefinitionResource', function (ProcessDefinitionResource) {
     return {
       restrict: 'EAC',
-      template: '<span ng-hide="$loaded">' +
-                '  <i class="glyphicon glyphicon-loading"></i> loading process diagram...' +
-                '</span>',
+      template: template,
       link: function(scope, element, attrs) {
         scope.$watch(attrs.processDefinitionId, function(processDefinitionId) {
           if (processDefinitionId) {
@@ -15,29 +13,17 @@ define(['bpmn/Bpmn'], function(Bpmn) {
             element.attr('id', elementId);
 
             ProcessDefinitionResource.getBpmn20Xml({ id : processDefinitionId }).$promise.then(function(response) {
-              var xml = response.bpmn20Xml;
-              scope.$loaded = true;
+              scope.diagramXML = response.bpmn20Xml;
+              element.find('[cam-widget-bpmn-viewer]').css({
+                width : parseInt(element.parent().width(), 10),
+                height : element.parent().height(),
+              });
 
-              try {
-                new Bpmn().render(xml, {
-                  diagramElement : element.attr('id'),
-                  width : parseInt(element.parent().width(), 10),
-                  height : element.parent().height(),
-                  skipOverlays: true
-                });
-              }
-              catch (exception) {
-                element.html('<div class="alert alert-danger alert-error diagram-rendering-error">Unable to render process diagram.</div>');
-              }
             });
           }
         });
 
       }
     };
-  };
-
-  Directive.$inject = [ 'ProcessDefinitionResource' ];
-
-  return Directive;
+  }];
 });

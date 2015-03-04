@@ -204,10 +204,12 @@ define([
       return ProcessInstanceResource.count({ processDefinitionId : definition.id }).$promise;
     }]);
 
-    processData.provide('semantic', [ 'processDefinition', function(definition) {
-      return ProcessDefinitionResource.getBpmn20Xml({ id : definition.id}).$promise.then(function(value) {
-        return Transform.transformBpmn20Xml(value.bpmn20Xml);
-      });
+    processData.provide('bpmn20Xml', [ 'processDefinition', function(definition) {
+      return ProcessDefinitionResource.getBpmn20Xml({ id : definition.id}).$promise;
+    }]);
+
+    processData.provide('semantic', [ 'bpmn20Xml', function(bpmn20Xml) {
+      return Transform.transformBpmn20Xml(bpmn20Xml.bpmn20Xml);
     }]);
 
     processData.provide('bpmnElements', [ 'processDefinition', 'semantic', function(definition, semantic) {
@@ -220,13 +222,14 @@ define([
 
     // processDiagram /////////////////////
 
-    processData.provide('processDiagram', [ 'semantic', 'processDefinition', 'bpmnElements', function (semantic, processDefinition, bpmnElements) {
+    processData.provide('processDiagram', [ 'semantic', 'processDefinition', 'bpmnElements', 'bpmn20Xml', function (semantic, processDefinition, bpmnElements, bpmn20Xml) {
       var diagram = $scope.processDiagram = $scope.processDiagram || {};
 
       angular.extend(diagram, {
         semantic: semantic,
         processDefinition: processDefinition,
-        bpmnElements: bpmnElements
+        bpmnElements: bpmnElements,
+        bpmn20Xml: bpmn20Xml
       });
 
       return diagram;
