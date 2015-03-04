@@ -26,6 +26,7 @@ import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.history.HistoricVariableInstanceQuery;
 import org.camunda.bpm.engine.history.HistoricVariableUpdate;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
+import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.CollectionUtil;
@@ -662,6 +663,373 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTestCase
 
   protected boolean isFullHistoryEnabled() {
     return processEngineConfiguration.getHistoryLevel().equals(HistoryLevel.HISTORY_LEVEL_FULL);
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricVariableInstanceTest.testHistoricVariableInstanceRevision.bpmn20.xml"})
+  public void testVariableUpdateOrder() {
+    // given:
+    // a finished process instance
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+    assertProcessEnded(processInstance.getId());
+
+    // when
+
+    // then
+    HistoricVariableInstance variable = historyService
+      .createHistoricVariableInstanceQuery()
+      .singleResult();
+    assertNotNull(variable);
+
+    if (isFullHistoryEnabled()) {
+
+      List<HistoricDetail> details = historyService
+        .createHistoricDetailQuery()
+        .variableInstanceId(variable.getId())
+        .orderPartiallyByOccurrence()
+        .asc()
+        .list();
+
+      assertEquals(3, details.size());
+
+      HistoricVariableUpdate firstUpdate = (HistoricVariableUpdate) details.get(0);
+      assertEquals(1, firstUpdate.getValue());
+
+      HistoricVariableUpdate secondUpdate = (HistoricVariableUpdate) details.get(1);
+      assertEquals(2, secondUpdate.getValue());
+      assertTrue(((HistoryEvent)secondUpdate).getSequenceCounter() > ((HistoryEvent)firstUpdate).getSequenceCounter());
+
+      HistoricVariableUpdate thirdUpdate = (HistoricVariableUpdate) details.get(2);
+      assertEquals(3, thirdUpdate.getValue());
+      assertTrue(((HistoryEvent)thirdUpdate).getSequenceCounter() > ((HistoryEvent)secondUpdate).getSequenceCounter());
+    }
+
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricVariableInstanceTest.testHistoricVariableInstanceRevisionAsync.bpmn20.xml"})
+  public void testVariableUpdateOrderAsync() {
+    // given:
+    // a finished process instance
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+
+    // when
+    executeAvailableJobs();
+
+    // then
+    assertProcessEnded(processInstance.getId());
+
+    HistoricVariableInstance variable = historyService
+      .createHistoricVariableInstanceQuery()
+      .singleResult();
+    assertNotNull(variable);
+
+    if (isFullHistoryEnabled()) {
+
+      List<HistoricDetail> details = historyService
+        .createHistoricDetailQuery()
+        .variableInstanceId(variable.getId())
+        .orderPartiallyByOccurrence()
+        .asc()
+        .list();
+
+      assertEquals(3, details.size());
+
+      HistoricVariableUpdate firstUpdate = (HistoricVariableUpdate) details.get(0);
+      assertEquals(1, firstUpdate.getValue());
+
+      HistoricVariableUpdate secondUpdate = (HistoricVariableUpdate) details.get(1);
+      assertEquals(2, secondUpdate.getValue());
+      assertTrue(((HistoryEvent)secondUpdate).getSequenceCounter() > ((HistoryEvent)firstUpdate).getSequenceCounter());
+
+      HistoricVariableUpdate thirdUpdate = (HistoricVariableUpdate) details.get(2);
+      assertEquals(3, thirdUpdate.getValue());
+      assertTrue(((HistoryEvent)thirdUpdate).getSequenceCounter() > ((HistoryEvent)secondUpdate).getSequenceCounter());
+    }
+
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void testTaskVariableUpdateOrder() {
+    // given:
+    runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+    String taskId = taskService.createTaskQuery().singleResult().getId();
+
+    // when (1)
+    taskService.setVariableLocal(taskId, "myVariable", 1);
+    taskService.setVariableLocal(taskId, "myVariable", 2);
+    taskService.setVariableLocal(taskId, "myVariable", 3);
+
+    // then (1)
+    HistoricVariableInstance variable = historyService
+      .createHistoricVariableInstanceQuery()
+      .singleResult();
+    assertNotNull(variable);
+
+    String variableInstanceId = variable.getId();
+
+    if (isFullHistoryEnabled()) {
+
+      List<HistoricDetail> details = historyService
+        .createHistoricDetailQuery()
+        .variableInstanceId(variableInstanceId)
+        .orderPartiallyByOccurrence()
+        .asc()
+        .list();
+
+      assertEquals(3, details.size());
+
+      HistoricVariableUpdate firstUpdate = (HistoricVariableUpdate) details.get(0);
+      assertEquals(1, firstUpdate.getValue());
+
+      HistoricVariableUpdate secondUpdate = (HistoricVariableUpdate) details.get(1);
+      assertEquals(2, secondUpdate.getValue());
+      assertTrue(((HistoryEvent)secondUpdate).getSequenceCounter() > ((HistoryEvent)firstUpdate).getSequenceCounter());
+
+      HistoricVariableUpdate thirdUpdate = (HistoricVariableUpdate) details.get(2);
+      assertEquals(3, thirdUpdate.getValue());
+      assertTrue(((HistoryEvent)thirdUpdate).getSequenceCounter() > ((HistoryEvent)secondUpdate).getSequenceCounter());
+    }
+
+    // when (2)
+    taskService.setVariableLocal(taskId, "myVariable", "abc");
+
+    // then (2)
+    variable = historyService
+      .createHistoricVariableInstanceQuery()
+      .singleResult();
+    assertNotNull(variable);
+
+    if (isFullHistoryEnabled()) {
+
+      List<HistoricDetail> details = historyService
+        .createHistoricDetailQuery()
+        .variableInstanceId(variableInstanceId)
+        .orderPartiallyByOccurrence()
+        .asc()
+        .list();
+
+      assertEquals(4, details.size());
+
+      HistoricVariableUpdate firstUpdate = (HistoricVariableUpdate) details.get(0);
+      assertEquals(1, firstUpdate.getValue());
+
+      HistoricVariableUpdate secondUpdate = (HistoricVariableUpdate) details.get(1);
+      assertEquals(2, secondUpdate.getValue());
+      assertTrue(((HistoryEvent)secondUpdate).getSequenceCounter() > ((HistoryEvent)firstUpdate).getSequenceCounter());
+
+      HistoricVariableUpdate thirdUpdate = (HistoricVariableUpdate) details.get(2);
+      assertEquals(3, thirdUpdate.getValue());
+      assertTrue(((HistoryEvent)thirdUpdate).getSequenceCounter() > ((HistoryEvent)secondUpdate).getSequenceCounter());
+
+      HistoricVariableUpdate fourthUpdate = (HistoricVariableUpdate) details.get(3);
+      assertEquals("abc", fourthUpdate.getValue());
+      assertTrue(((HistoryEvent)fourthUpdate).getSequenceCounter() > ((HistoryEvent)thirdUpdate).getSequenceCounter());
+    }
+
+    // when (3)
+    taskService.removeVariable(taskId, "myVariable");
+
+    // then (3)
+    variable = historyService
+      .createHistoricVariableInstanceQuery()
+      .singleResult();
+    assertNull(variable);
+
+    if (isFullHistoryEnabled()) {
+
+      List<HistoricDetail> details = historyService
+        .createHistoricDetailQuery()
+        .variableInstanceId(variableInstanceId)
+        .orderPartiallyByOccurrence()
+        .asc()
+        .list();
+
+      assertEquals(5, details.size());
+
+      HistoricVariableUpdate firstUpdate = (HistoricVariableUpdate) details.get(0);
+      assertEquals(1, firstUpdate.getValue());
+
+      HistoricVariableUpdate secondUpdate = (HistoricVariableUpdate) details.get(1);
+      assertEquals(2, secondUpdate.getValue());
+      assertTrue(((HistoryEvent)secondUpdate).getSequenceCounter() > ((HistoryEvent)firstUpdate).getSequenceCounter());
+
+      HistoricVariableUpdate thirdUpdate = (HistoricVariableUpdate) details.get(2);
+      assertEquals(3, thirdUpdate.getValue());
+      assertTrue(((HistoryEvent)thirdUpdate).getSequenceCounter() > ((HistoryEvent)secondUpdate).getSequenceCounter());
+
+      HistoricVariableUpdate fourthUpdate = (HistoricVariableUpdate) details.get(3);
+      assertEquals("abc", fourthUpdate.getValue());
+      assertTrue(((HistoryEvent)fourthUpdate).getSequenceCounter() > ((HistoryEvent)thirdUpdate).getSequenceCounter());
+
+      HistoricVariableUpdate fifthUpdate = (HistoricVariableUpdate) details.get(4);
+      assertNull(fifthUpdate.getValue());
+      assertTrue(((HistoryEvent)fifthUpdate).getSequenceCounter() > ((HistoryEvent)fourthUpdate).getSequenceCounter());
+    }
+
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testCaseVariableUpdateOrder() {
+    // given:
+    String caseInstanceId = caseService.createCaseInstanceByKey("oneTaskCase").getId();
+
+    // when (1)
+    caseService.setVariable(caseInstanceId, "myVariable", 1);
+    caseService.setVariable(caseInstanceId, "myVariable", 2);
+    caseService.setVariable(caseInstanceId, "myVariable", 3);
+
+    // then (1)
+    HistoricVariableInstance variable = historyService
+      .createHistoricVariableInstanceQuery()
+      .singleResult();
+    assertNotNull(variable);
+
+    String variableInstanceId = variable.getId();
+
+    if (isFullHistoryEnabled()) {
+
+      List<HistoricDetail> details = historyService
+        .createHistoricDetailQuery()
+        .variableInstanceId(variableInstanceId)
+        .orderPartiallyByOccurrence()
+        .asc()
+        .list();
+
+      assertEquals(3, details.size());
+
+      HistoricVariableUpdate firstUpdate = (HistoricVariableUpdate) details.get(0);
+      assertEquals(1, firstUpdate.getValue());
+
+      HistoricVariableUpdate secondUpdate = (HistoricVariableUpdate) details.get(1);
+      assertEquals(2, secondUpdate.getValue());
+      assertTrue(((HistoryEvent)secondUpdate).getSequenceCounter() > ((HistoryEvent)firstUpdate).getSequenceCounter());
+
+      HistoricVariableUpdate thirdUpdate = (HistoricVariableUpdate) details.get(2);
+      assertEquals(3, thirdUpdate.getValue());
+      assertTrue(((HistoryEvent)thirdUpdate).getSequenceCounter() > ((HistoryEvent)secondUpdate).getSequenceCounter());
+    }
+
+    // when (2)
+    caseService.setVariable(caseInstanceId, "myVariable", "abc");
+
+    // then (2)
+    variable = historyService
+      .createHistoricVariableInstanceQuery()
+      .singleResult();
+    assertNotNull(variable);
+
+    if (isFullHistoryEnabled()) {
+
+      List<HistoricDetail> details = historyService
+        .createHistoricDetailQuery()
+        .variableInstanceId(variableInstanceId)
+        .orderPartiallyByOccurrence()
+        .asc()
+        .list();
+
+      assertEquals(4, details.size());
+
+      HistoricVariableUpdate firstUpdate = (HistoricVariableUpdate) details.get(0);
+      assertEquals(1, firstUpdate.getValue());
+
+      HistoricVariableUpdate secondUpdate = (HistoricVariableUpdate) details.get(1);
+      assertEquals(2, secondUpdate.getValue());
+      assertTrue(((HistoryEvent)secondUpdate).getSequenceCounter() > ((HistoryEvent)firstUpdate).getSequenceCounter());
+
+      HistoricVariableUpdate thirdUpdate = (HistoricVariableUpdate) details.get(2);
+      assertEquals(3, thirdUpdate.getValue());
+      assertTrue(((HistoryEvent)thirdUpdate).getSequenceCounter() > ((HistoryEvent)secondUpdate).getSequenceCounter());
+
+      HistoricVariableUpdate fourthUpdate = (HistoricVariableUpdate) details.get(3);
+      assertEquals("abc", fourthUpdate.getValue());
+      assertTrue(((HistoryEvent)fourthUpdate).getSequenceCounter() > ((HistoryEvent)thirdUpdate).getSequenceCounter());
+    }
+
+    // when (3)
+    caseService.removeVariable(caseInstanceId, "myVariable");
+
+    // then (3)
+    variable = historyService
+      .createHistoricVariableInstanceQuery()
+      .singleResult();
+    assertNull(variable);
+
+    if (isFullHistoryEnabled()) {
+
+      List<HistoricDetail> details = historyService
+        .createHistoricDetailQuery()
+        .variableInstanceId(variableInstanceId)
+        .orderPartiallyByOccurrence()
+        .asc()
+        .list();
+
+      assertEquals(5, details.size());
+
+      HistoricVariableUpdate firstUpdate = (HistoricVariableUpdate) details.get(0);
+      assertEquals(1, firstUpdate.getValue());
+
+      HistoricVariableUpdate secondUpdate = (HistoricVariableUpdate) details.get(1);
+      assertEquals(2, secondUpdate.getValue());
+      assertTrue(((HistoryEvent)secondUpdate).getSequenceCounter() > ((HistoryEvent)firstUpdate).getSequenceCounter());
+
+      HistoricVariableUpdate thirdUpdate = (HistoricVariableUpdate) details.get(2);
+      assertEquals(3, thirdUpdate.getValue());
+      assertTrue(((HistoryEvent)thirdUpdate).getSequenceCounter() > ((HistoryEvent)secondUpdate).getSequenceCounter());
+
+      HistoricVariableUpdate fourthUpdate = (HistoricVariableUpdate) details.get(3);
+      assertEquals("abc", fourthUpdate.getValue());
+      assertTrue(((HistoryEvent)fourthUpdate).getSequenceCounter() > ((HistoryEvent)thirdUpdate).getSequenceCounter());
+
+      HistoricVariableUpdate fifthUpdate = (HistoricVariableUpdate) details.get(4);
+      assertNull(fifthUpdate.getValue());
+      assertTrue(((HistoryEvent)fifthUpdate).getSequenceCounter() > ((HistoryEvent)fourthUpdate).getSequenceCounter());
+    }
+
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void testSetSameVariableUpdateOrder() {
+    // given:
+    runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+    String taskId = taskService.createTaskQuery().singleResult().getId();
+
+    // when
+    taskService.setVariable(taskId, "myVariable", 1);
+    taskService.setVariable(taskId, "myVariable", 1);
+    taskService.setVariable(taskId, "myVariable", 2);
+
+    // then
+    HistoricVariableInstance variable = historyService
+      .createHistoricVariableInstanceQuery()
+      .singleResult();
+    assertNotNull(variable);
+
+    String variableInstanceId = variable.getId();
+
+    if (isFullHistoryEnabled()) {
+
+      List<HistoricDetail> details = historyService
+        .createHistoricDetailQuery()
+        .variableInstanceId(variableInstanceId)
+        .orderPartiallyByOccurrence()
+        .asc()
+        .list();
+
+      assertEquals(3, details.size());
+
+      HistoricVariableUpdate firstUpdate = (HistoricVariableUpdate) details.get(0);
+      assertEquals(1, firstUpdate.getValue());
+
+      HistoricVariableUpdate secondUpdate = (HistoricVariableUpdate) details.get(1);
+      assertEquals(1, secondUpdate.getValue());
+      assertTrue(((HistoryEvent)secondUpdate).getSequenceCounter() > ((HistoryEvent)firstUpdate).getSequenceCounter());
+
+      HistoricVariableUpdate thirdUpdate = (HistoricVariableUpdate) details.get(2);
+      assertEquals(2, thirdUpdate.getValue());
+      assertTrue(((HistoryEvent)thirdUpdate).getSequenceCounter() > ((HistoryEvent)secondUpdate).getSequenceCounter());
+    }
+
   }
 
 }

@@ -101,6 +101,7 @@ create table ACT_HI_DETAIL (
     LONG_ NUMBER(19,0),
     TEXT_ NVARCHAR2(2000),
     TEXT2_ NVARCHAR2(2000),
+    SEQUENCE_COUNTER_ NUMBER(19,0),
     primary key (ID_)
 );
 

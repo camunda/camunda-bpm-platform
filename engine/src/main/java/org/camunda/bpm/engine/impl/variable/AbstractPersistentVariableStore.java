@@ -98,7 +98,9 @@ public abstract class AbstractPersistentVariableStore extends AbstractVariableSt
   public CoreVariableInstance removeVariableInstance(String variableName, AbstractVariableScope sourceActivityExecution) {
     ensureVariableInstancesInitialized();
     VariableInstanceEntity variable = variableInstances.remove(variableName);
+
     if(variable != null) {
+      variable.incrementSequenceCounter();
       variable.delete();
 
       // fire DELETE event
@@ -113,6 +115,7 @@ public abstract class AbstractPersistentVariableStore extends AbstractVariableSt
   public void setVariableValue(CoreVariableInstance variableInstance, TypedValue value, AbstractVariableScope sourceActivityExecution) {
     VariableInstanceEntity variableInstanceEntity = (VariableInstanceEntity) variableInstance;
     variableInstanceEntity.setValue(value);
+    variableInstanceEntity.incrementSequenceCounter();
 
     // fire UPDATE event
     if(isAutoFireHistoryEvents()) {

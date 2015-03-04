@@ -75,6 +75,8 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
 
   protected String configuration;
 
+  protected long sequenceCounter = 1;
+
   // Default constructor for SQL mapping
   public VariableInstanceEntity() {
   }
@@ -142,6 +144,9 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
     if (forcedUpdate) {
       persistentState.put("forcedUpdate", Boolean.TRUE);
     }
+
+    persistentState.put("sequenceCounter", getSequenceCounter());
+
     return persistentState;
   }
 
@@ -504,6 +509,20 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
 
   public TypedValue getCachedValue() {
     return cachedValue;
+  }
+
+  //sequence counter ///////////////////////////////////////////////////////////
+
+  public long getSequenceCounter() {
+    return sequenceCounter;
+  }
+
+  public void setSequenceCounter(long sequenceCounter) {
+    this.sequenceCounter = sequenceCounter;
+  }
+
+   public void incrementSequenceCounter() {
+    sequenceCounter++;
   }
 
   @Override

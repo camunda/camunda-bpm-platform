@@ -14,9 +14,11 @@
 package org.camunda.bpm.engine.history;
 
 import org.camunda.bpm.engine.query.Query;
+import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.runtime.VariableInstance;
 
 
 /**
@@ -108,4 +110,59 @@ public interface HistoricDetailQuery extends Query<HistoricDetailQuery, Historic
   HistoricDetailQuery orderByVariableRevision();
 
   HistoricDetailQuery orderByTime();
+
+  /**
+   * <p>Sort the {@link HistoricDetail historic detail events} in the order in which
+   * they occurred and needs to be followed by {@link #asc()} or {@link #desc()}.</p>
+   *
+   * <p>The set of all {@link HistoricVariableUpdate historic variable update events} is
+   * a <strong>partially ordered set</strong>. Due to this fact {@link HistoricVariableUpdate
+   * historic variable update events} for two different {@link VariableInstance variable
+   * instances} are <strong>incomparable</strong>. So that it is not possible to sort
+   * the {@link HistoricDetail historic variable update events} for two {@link VariableInstance
+   * variable instances} in the order they occurred. Just for one {@link VariableInstance variable
+   * instance} the set of {@link HistoricVariableUpdate historic variable update events} can be
+   * <strong>totally ordered</strong> by using {@link #variableInstanceId(String)} and {@link
+   * #orderPartiallyByOccurrence()} which will return a result set ordered by its occurrence.</p>
+   *
+   * <p><strong>For example:</strong><br>
+   * An execution variable <code>myVariable</code> will be updated multiple times:</p>
+   *
+   * <code>
+   * runtimeService.setVariable("anExecutionId", "myVariable", 1000);<br>
+   * execution.setVariable("myVariable", 5000);<br>
+   * runtimeService.setVariable("anExecutionId", "myVariable", 2500);<br>
+   * runtimeService.removeVariable("anExecutionId", "myVariable");
+   * </code>
+   *
+   * <p>As a result there exists four {@link HistoricVariableUpdate historic variable update events}.</p>
+   *
+   * <p>By using {@link #variableInstanceId(String)} and {@link #orderPartiallyByOccurrence()} it
+   * is possible to sort the events in the order in which they occurred. The following query</p>
+   *
+   * <code>
+   * historyService.createHistoricDetailQuery()<br>
+   * &nbsp;&nbsp;.variableInstanceId("myVariableInstId")<br>
+   * &nbsp;&nbsp;.orderBySequenceCounter()<br>
+   * &nbsp;&nbsp;.asc()<br>
+   * &nbsp;&nbsp;.list()
+   * </code>
+   *
+   * <p>will return the following totally ordered result set</p>
+   *
+   * <code>
+   * [<br>
+   * &nbsp;&nbsp;HistoricVariableUpdate[id: "myVariableInstId", variableName: "myVariable", value: 1000],<br>
+   * &nbsp;&nbsp;HistoricVariableUpdate[id: "myVariableInstId", variableName: "myVariable", value: 5000],<br>
+   * &nbsp;&nbsp;HistoricVariableUpdate[id: "myVariableInstId", variableName: "myVariable", value: 2500]<br>
+   * &nbsp;&nbsp;HistoricVariableUpdate[id: "myVariableInstId", variableName: "myVariable", value: null]<br>
+   * ]
+   * </code>
+   *
+   * <p><strong>Note:</strong><br>
+   * Please note that a {@link HistoricFormField historic form field event} can occur only once.</p>
+   *
+   * @since 7.3
+   */
+  HistoricDetailQuery orderPartiallyByOccurrence();
 }

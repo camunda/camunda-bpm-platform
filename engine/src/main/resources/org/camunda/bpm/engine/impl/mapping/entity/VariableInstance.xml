@@ -7,7 +7,25 @@
   <!-- VARIABLE INSTANCE INSERT -->
 
   <insert id="insertVariableInstance" parameterType="org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity">
-    insert into ${prefix}ACT_RU_VARIABLE (ID_, TYPE_, NAME_, PROC_INST_ID_, EXECUTION_ID_, CASE_INST_ID_, CASE_EXECUTION_ID_, TASK_ID_, BYTEARRAY_ID_, DOUBLE_, LONG_ , TEXT_, TEXT2_, VAR_SCOPE_, REV_)
+    insert into ${prefix}ACT_RU_VARIABLE
+    (
+      ID_,
+      TYPE_,
+      NAME_,
+      PROC_INST_ID_,
+      EXECUTION_ID_,
+      CASE_INST_ID_,
+      CASE_EXECUTION_ID_,
+      TASK_ID_,
+      BYTEARRAY_ID_,
+      DOUBLE_,
+      LONG_,
+      TEXT_,
+      TEXT2_,
+      VAR_SCOPE_,
+      SEQUENCE_COUNTER_,
+      REV_
+    )
     values (
       #{id, jdbcType=VARCHAR},
       #{serializerName, jdbcType=VARCHAR},
@@ -23,6 +41,7 @@
       #{textValue, jdbcType=VARCHAR},
       #{textValue2, jdbcType=VARCHAR},
       #{variableScope, jdbcType=VARCHAR},
+      #{sequenceCounter, jdbcType=BIGINT},
       1
     )
   </insert>
@@ -39,7 +58,8 @@
 	    DOUBLE_ = #{doubleValue, jdbcType=DOUBLE},
 	    LONG_ = #{longValue, jdbcType=BIGINT},
 	    TEXT_ = #{textValue, jdbcType=VARCHAR},
-	    TEXT2_ = #{textValue2, jdbcType=VARCHAR}
+	    TEXT2_ = #{textValue2, jdbcType=VARCHAR},
+      SEQUENCE_COUNTER_ = #{sequenceCounter, jdbcType=BIGINT}
     where ID_ = #{id, jdbcType=VARCHAR}
       and REV_ = #{revision, jdbcType=INTEGER}
   </update>
@@ -71,6 +91,7 @@
       <result property="textValue" column="TEXT_" jdbcType="VARCHAR"/>
       <result property="textValue2" column="TEXT2_" jdbcType="VARCHAR"/>
       <result property="longValue" column="LONG_" jdbcType="BIGINT"/>
+      <result property="sequenceCounter" column="SEQUENCE_COUNTER_" jdbcType="BIGINT"/>
 	</resultMap>
 
   <!-- VARIABLE INSTANCE SELECT -->

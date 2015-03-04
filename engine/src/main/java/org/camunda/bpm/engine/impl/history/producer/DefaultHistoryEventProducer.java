@@ -252,6 +252,8 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     HistoricVariableUpdateEventEntity evt = newVariableUpdateEventEntity(sourceExecution);
     // initialize
     initHistoricVariableUpdateEvt(evt, variableInstance, eventType);
+    // initialize sequence counter
+    initSequenceCounter(variableInstance, evt);
 
     // set scope activity instance id
     evt.setScopeActivityInstanceId(scopeActivityInstanceId);
@@ -544,6 +546,9 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     historicFormPropertyEntity.setPropertyValue(propertyValue);
     historicFormPropertyEntity.setTaskId(taskId);
 
+    // initialize sequence counter
+    initSequenceCounter(execution, historicFormPropertyEntity);
+
     return historicFormPropertyEntity;
   }
 
@@ -657,7 +662,14 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
   // sequence counter //////////////////////////////////////////////////////
 
   protected void initSequenceCounter(ExecutionEntity execution, HistoryEvent event) {
-    long sequenceCounter = execution.getSequenceCounter();
+    initSequenceCounter(execution.getSequenceCounter(), event);
+  }
+
+  protected void initSequenceCounter(VariableInstanceEntity variable, HistoryEvent event) {
+    initSequenceCounter(variable.getSequenceCounter(), event);
+  }
+
+  protected void initSequenceCounter(long sequenceCounter, HistoryEvent event) {
     event.setSequenceCounter(sequenceCounter);
   }
 

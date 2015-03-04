@@ -101,6 +101,7 @@ create table ACT_HI_DETAIL (
     LONG_ bigint,
     TEXT_ varchar(4000),
     TEXT2_ varchar(4000),
+    SEQUENCE_COUNTER_ bigint,
     primary key (ID_)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 

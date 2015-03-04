@@ -29,4 +29,5 @@ public interface HistoricDetailQueryProperty {
   public static final QueryProperty VARIABLE_TYPE = new QueryPropertyImpl("TYPE_");
   public static final QueryProperty VARIABLE_REVISION = new QueryPropertyImpl("REV_");
   public static final QueryProperty TIME = new QueryPropertyImpl("TIME_");
+  public static final QueryProperty SEQUENCE_COUNTER = new QueryPropertyImpl("SEQUENCE_COUNTER_");
 }

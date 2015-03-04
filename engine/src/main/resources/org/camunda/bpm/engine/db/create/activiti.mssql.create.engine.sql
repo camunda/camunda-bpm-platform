@@ -158,6 +158,7 @@ create table ACT_RU_VARIABLE (
     TEXT_ nvarchar(4000),
     TEXT2_ nvarchar(4000),
     VAR_SCOPE_ nvarchar(64) not null,
+    SEQUENCE_COUNTER_ numeric(19,0),
     primary key (ID_)
 );
 

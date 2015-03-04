@@ -209,6 +209,11 @@ public class HistoricDetailQueryImpl extends AbstractQuery<HistoricDetailQuery, 
     return this;
   }
 
+  public HistoricDetailQuery orderPartiallyByOccurrence() {
+    orderBy(HistoricDetailQueryProperty.SEQUENCE_COUNTER);
+    return this;
+  }
+
   // getters and setters //////////////////////////////////////////////////////
 
   public String getProcessInstanceId() {
