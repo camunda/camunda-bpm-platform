@@ -44,6 +44,8 @@ import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.type.ValueType;
 
+import static org.junit.Assert.assertThat;
+import static org.hamcrest.CoreMatchers.*;
 
 /**
  * @author Frederik Heremans
@@ -1203,4 +1205,53 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
     }
   }
 
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/messageStartEvent.bpmn20.xml")
+  public void testStartProcessInstanceByMessageWithEarlierVersionOfProcessDefinition() {
+	  String deploymentId = repositoryService.createDeployment().addClasspathResource("org/camunda/bpm/engine/test/api/runtime/messageStartEvent_version2.bpmn20.xml").deploy().getId();
+	  ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionVersion(1).singleResult();
+	   
+	  ProcessInstance processInstance = runtimeService.startProcessInstanceByMessageAndProcessDefinitionId("startMessage", processDefinition.getId());
+	   
+	  assertThat(processInstance, is(notNullValue()));
+	  assertThat(processInstance.getProcessDefinitionId(), is(processDefinition.getId()));
+	   
+	  // clean up 
+	  repositoryService.deleteDeployment(deploymentId, true);
+  }
+  
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/messageStartEvent.bpmn20.xml")
+  public void testStartProcessInstanceByMessageWithLastVersionOfProcessDefinition() {
+	  String deploymentId = repositoryService.createDeployment().addClasspathResource("org/camunda/bpm/engine/test/api/runtime/messageStartEvent_version2.bpmn20.xml").deploy().getId();
+	  ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().latestVersion().singleResult();
+	   
+	  ProcessInstance processInstance = runtimeService.startProcessInstanceByMessageAndProcessDefinitionId("newStartMessage", processDefinition.getId());
+	   
+	  assertThat(processInstance, is(notNullValue()));
+	  assertThat(processInstance.getProcessDefinitionId(), is(processDefinition.getId()));
+	   
+	  // clean up 
+	  repositoryService.deleteDeployment(deploymentId, true);
+   }
+  
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/messageStartEvent.bpmn20.xml")
+  public void testStartProcessInstanceByMessageWithNonExistingMessageStartEvent() {
+	  String deploymentId = null; 
+	  try {
+		 deploymentId = repositoryService.createDeployment().addClasspathResource("org/camunda/bpm/engine/test/api/runtime/messageStartEvent_version2.bpmn20.xml").deploy().getId();
+		 ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionVersion(1).singleResult();
+		   
+		 runtimeService.startProcessInstanceByMessageAndProcessDefinitionId("newStartMessage", processDefinition.getId());
+		 
+		 fail("exeception expected");
+	 } catch(ProcessEngineException e) {
+		 assertThat(e.getMessage(), containsString("no message start event with name 'newStartMessage' found"));
+	 }
+	 finally {
+		 // clean up 
+		 if(deploymentId != null){
+			 repositoryService.deleteDeployment(deploymentId, true);
+		 }
+	 }
+  }
 }

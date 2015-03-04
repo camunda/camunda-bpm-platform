@@ -362,6 +362,104 @@ public interface RuntimeService {
    */
   ProcessInstance startProcessInstanceByMessage(String messageName, String businessKey, Map<String, Object> processVariables);
 
+  /**
+   * <p>Signals the process engine that a message is received and starts a new
+   * {@link ProcessInstance}.</p>
+   *
+   * See {@link #startProcessInstanceByMessage(String)}. In addition, this method allows
+   * specifying the exactly version of the process definition with the given id.
+   *
+   * @param messageName
+   *          the 'name' of the message as specified as an attribute on the
+   *          bpmn20 {@code <message name="messageName" />} element, cannot be null.
+   * @param processDefinitionId 
+   * 		  the id of the process definition, cannot be null.
+   * @return the {@link ProcessInstance} object representing the started process instance
+   *
+   * @throws ProcessEngineException 
+   * 		  if no subscription to a message with the given name exists for the 
+   * 		  specified version of process definition.
+   *
+   * @since 7.3
+   */
+  ProcessInstance startProcessInstanceByMessageAndProcessDefinitionId(String messageName, String processDefinitionId);
+  
+  /**
+   * <p>Signals the process engine that a message is received and starts a new
+   * {@link ProcessInstance}.</p>
+   *
+   * See {@link #startProcessInstanceByMessage(String, String)}. In addition, this method allows
+   * specifying the exactly version of the process definition with the given id.
+   *
+   * @param messageName
+   *          the 'name' of the message as specified as an attribute on the
+   *          bpmn20 {@code <message name="messageName" />} element, cannot be null.
+   * @param processDefinitionId 
+   * 		  the id of the process definition, cannot be null.
+   * @param businessKey
+   *          the business key which is added to the started process instance
+   * @return the {@link ProcessInstance} object representing the started process instance
+   *
+   * @throws ProcessEngineException 
+   * 		  if no subscription to a message with the given name exists for the 
+   * 		  specified version of process definition.
+   *
+   * @since 7.3
+   */
+  ProcessInstance startProcessInstanceByMessageAndProcessDefinitionId(String messageName, String processDefinitionId, String businessKey);
+  
+  /**
+   * <p>Signals the process engine that a message is received and starts a new
+   * {@link ProcessInstance}.</p>
+   *
+   * See {@link #startProcessInstanceByMessage(String, Map)}. In addition, this method allows
+   * specifying the exactly version of the process definition with the given id.
+   *
+   * @param messageName
+   *          the 'name' of the message as specified as an attribute on the
+   *          bpmn20 {@code <message name="messageName" />} element, cannot be null.
+   * @param processDefinitionId 
+   * 		  the id of the process definition, cannot be null.
+   * @param processVariables
+   *          the 'payload' of the message. The variables are added as processes
+   *          variables to the started process instance.
+   * @return the {@link ProcessInstance} object representing the started process instance
+   *
+   * @throws ProcessEngineException 
+   * 		  if no subscription to a message with the given name exists for the 
+   * 		  specified version of process definition.
+   *
+   * @since 7.3
+   */
+  ProcessInstance startProcessInstanceByMessageAndProcessDefinitionId(String messageName, String processDefinitionId, Map<String, Object> processVariables);
+  
+  /**
+   * <p>Signals the process engine that a message is received and starts a new
+   * {@link ProcessInstance}.</p>
+   *
+   * See {@link #startProcessInstanceByMessage(String, String, Map)}. In addition, this method allows
+   * specifying the exactly version of the process definition with the given id.
+   *
+   * @param messageName
+   *          the 'name' of the message as specified as an attribute on the
+   *          bpmn20 {@code <message name="messageName" />} element, cannot be null.
+   * @param processDefinitionId 
+   * 		  the id of the process definition, cannot be null.
+   * @param businessKey
+   *          the business key which is added to the started process instance
+   * @param processVariables
+   *          the 'payload' of the message. The variables are added as processes
+   *          variables to the started process instance.
+   * @return the {@link ProcessInstance} object representing the started process instance
+   *
+   * @throws ProcessEngineException 
+   * 		  if no subscription to a message with the given name exists for the 
+   * 		  specified version of process definition.
+   *
+   * @since 7.3
+   */
+  ProcessInstance startProcessInstanceByMessageAndProcessDefinitionId(String messageName, String processDefinitionId, String businessKey, Map<String, Object> processVariables);
+  
   /** Delete an existing runtime process instance.
    * @param processInstanceId id of process instance to delete, cannot be null.
    * @param deleteReason reason for deleting, which will be stored in the history. Can be null.
