@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.camunda.bpm.webapp</groupId>
   <artifactId>camunda-admin-ui</artifactId>
-  <version>7.3.0-alpha2</version>
+  <version>7.3.0-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>camunda-admin-ui</name>
 
@@ -151,7 +151,7 @@
     <url>https://github.com/camunda/camunda-admin-ui</url>
     <connection>scm:git:git@github.com:camunda/camunda-admin-ui.git</connection>
     <developerConnection>scm:git:git@github.com:camunda/camunda-admin-ui.git</developerConnection>
-    <tag>7.3.0-alpha2</tag>
+    <tag>HEAD</tag>
   </scm>
 
 </project>
