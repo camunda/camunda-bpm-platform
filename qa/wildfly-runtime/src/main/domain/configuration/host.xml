@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 
-<host name="master" xmlns="urn:jboss:domain:2.1">
+<host name="master" xmlns="urn:jboss:domain:2.2">
 
     <management>
         <security-realms>

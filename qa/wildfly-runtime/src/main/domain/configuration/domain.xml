@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 
-<domain xmlns="urn:jboss:domain:2.1">
+<domain xmlns="urn:jboss:domain:2.2">
     <extensions>
         <extension module="org.jboss.as.clustering.infinispan"/>
         <extension module="org.jboss.as.clustering.jgroups"/>
@@ -298,7 +298,7 @@
                 </core-environment>
                 <recovery-environment socket-binding="txn-recovery-environment" status-socket-binding="txn-status-manager"/>
             </subsystem>
-            <subsystem xmlns="urn:jboss:domain:undertow:1.1">
+            <subsystem xmlns="urn:jboss:domain:undertow:1.2">
                 <buffer-cache name="default"/>
                 <server name="default-server">
                     <http-listener name="default" socket-binding="http"/>
@@ -310,6 +310,7 @@
                 </server>
                 <servlet-container name="default">
                     <jsp-config/>
+                    <websockets/>
                 </servlet-container>
                 <handlers>
                     <file name="welcome-content" path="${jboss.home.dir}/welcome-content"/>
@@ -437,7 +438,7 @@
             <subsystem xmlns="urn:jboss:domain:datasources:2.0">
                 <datasources>
                     <datasource jndi-name="java:jboss/datasources/ExampleDS" pool-name="ExampleDS" enabled="true" use-java-context="true">
-                        <connection-url>jdbc:h2:mem:test;DB_CLOSE_DELAY=-1</connection-url>
+                        <connection-url>jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE</connection-url>
                         <driver>h2</driver>
                         <security>
                             <user-name>sa</user-name>
@@ -662,7 +663,7 @@
                 </core-environment>
                 <recovery-environment socket-binding="txn-recovery-environment" status-socket-binding="txn-status-manager"/>
             </subsystem>
-            <subsystem xmlns="urn:jboss:domain:undertow:1.1">
+            <subsystem xmlns="urn:jboss:domain:undertow:1.2">
                 <buffer-cache name="default"/>
                 <server name="default-server">
                     <http-listener name="default" socket-binding="http"/>
@@ -675,6 +676,7 @@
                 </server>
                 <servlet-container name="default">
                     <jsp-config/>
+                    <websockets/>
                 </servlet-container>
                 <handlers>
                     <file name="welcome-content" path="${jboss.home.dir}/welcome-content"/>
@@ -1027,7 +1029,7 @@
                 </core-environment>
                 <recovery-environment socket-binding="txn-recovery-environment" status-socket-binding="txn-status-manager"/>
             </subsystem>
-            <subsystem xmlns="urn:jboss:domain:undertow:1.1">
+            <subsystem xmlns="urn:jboss:domain:undertow:1.2">
                 <buffer-cache name="default"/>
                 <server name="default-server">
                     <http-listener name="default" socket-binding="http"/>
@@ -1039,6 +1041,7 @@
                 </server>
                 <servlet-container name="default">
                     <jsp-config/>
+                    <websockets/>
                 </servlet-container>
                 <handlers>
                     <file name="welcome-content" path="${jboss.home.dir}/welcome-content"/>
@@ -1457,7 +1460,7 @@
                 </core-environment>
                 <recovery-environment socket-binding="txn-recovery-environment" status-socket-binding="txn-status-manager"/>
             </subsystem>
-            <subsystem xmlns="urn:jboss:domain:undertow:1.1">
+            <subsystem xmlns="urn:jboss:domain:undertow:1.2">
                 <buffer-cache name="default"/>
                 <server name="default-server">
                     <http-listener name="default" socket-binding="http"/>
@@ -1470,6 +1473,7 @@
                 </server>
                 <servlet-container name="default">
                     <jsp-config/>
+                    <websockets/>
                 </servlet-container>
                 <handlers>
                     <file name="welcome-content" path="${jboss.home.dir}/welcome-content"/>
