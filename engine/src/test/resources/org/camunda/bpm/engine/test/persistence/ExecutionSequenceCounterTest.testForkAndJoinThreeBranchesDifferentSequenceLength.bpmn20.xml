@@ -33,15 +33,19 @@
     <serviceTask id="theService6" camunda:expression="${true}" />
     <sequenceFlow sourceRef="theService6" targetRef="join" />
 
-    <parallelGateway id="join" camunda:asyncBefore="true">
+    <parallelGateway id="join">
       <extensionElements>
-        <camunda:executionListener event="end" class="org.camunda.bpm.engine.test.persistence.ExecutionOrderListener" />
+        <camunda:executionListener event="start" class="org.camunda.bpm.engine.test.persistence.ExecutionOrderListener" />
       </extensionElements>
     </parallelGateway>
 
     <sequenceFlow sourceRef="join" targetRef="theService7" />
 
-    <serviceTask id="theService7" camunda:asyncBefore="true" camunda:expression="${true}" />
+    <serviceTask id="theService7" camunda:expression="${true}">
+      <extensionElements>
+        <camunda:executionListener event="start" class="org.camunda.bpm.engine.test.persistence.ExecutionOrderListener" />
+      </extensionElements>
+    </serviceTask>
 
     <sequenceFlow sourceRef="theService7" targetRef="theEnd" />
 

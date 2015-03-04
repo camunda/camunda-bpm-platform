@@ -208,7 +208,7 @@ public class HistoricActivityInstanceQueryImpl extends AbstractQuery<HistoricAct
     return this;
   }
 
-  public HistoricActivityInstanceQuery orderBySequenceCounter() {
+  public HistoricActivityInstanceQuery orderPartiallyByOccurrence() {
     orderBy(HistoricActivityInstanceQueryProperty.SEQUENCE_COUNTER);
     return this;
   }

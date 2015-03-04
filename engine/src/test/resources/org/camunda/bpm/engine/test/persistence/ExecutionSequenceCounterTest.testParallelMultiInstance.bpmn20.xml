@@ -5,30 +5,46 @@
 
   <process id="process">
 
-    <startEvent id="theStart" />
+    <startEvent id="theStart">
+      <extensionElements>
+        <camunda:executionListener event="start" class="org.camunda.bpm.engine.test.persistence.ExecutionOrderListener" />
+      </extensionElements>
+    </startEvent>
 
     <sequenceFlow sourceRef="theStart" targetRef="theService1" />
 
-    <serviceTask id="theService1" camunda:expression="${true}" />
-
-    <sequenceFlow sourceRef="theService1" targetRef="theTask" />
-
-    <userTask id="theTask">
+    <serviceTask id="theService1" camunda:expression="${true}">
       <extensionElements>
-        <camunda:executionListener event="end" class="org.camunda.bpm.engine.test.persistence.ExecutionOrderListener" />
+        <camunda:executionListener event="start" class="org.camunda.bpm.engine.test.persistence.ExecutionOrderListener" />
+      </extensionElements>
+    </serviceTask>
+
+    <sequenceFlow sourceRef="theService1" targetRef="theService2" />
+
+    <serviceTask id="theService2" camunda:expression="${true}">
+      <extensionElements>
+        <camunda:executionListener event="start" class="org.camunda.bpm.engine.test.persistence.ExecutionOrderListener" />
       </extensionElements>
       <multiInstanceLoopCharacteristics isSequential="false">
         <loopCardinality>2</loopCardinality>
       </multiInstanceLoopCharacteristics>
-    </userTask>
+    </serviceTask>
 
-    <sequenceFlow sourceRef="theTask" targetRef="theService2" />
+    <sequenceFlow sourceRef="theService2" targetRef="theService3" />
 
-    <serviceTask id="theService2" camunda:asyncBefore="true" camunda:expression="${true}" />
+    <serviceTask id="theService3" camunda:expression="${true}">
+      <extensionElements>
+        <camunda:executionListener event="start" class="org.camunda.bpm.engine.test.persistence.ExecutionOrderListener" />
+      </extensionElements>
+    </serviceTask>
 
-    <sequenceFlow sourceRef="theService2" targetRef="theEnd" />
+    <sequenceFlow sourceRef="theService3" targetRef="theEnd" />
 
-    <endEvent id="theEnd" />
+    <endEvent id="theEnd">
+      <extensionElements>
+        <camunda:executionListener event="start" class="org.camunda.bpm.engine.test.persistence.ExecutionOrderListener" />
+      </extensionElements>
+    </endEvent>
 
   </process>
 

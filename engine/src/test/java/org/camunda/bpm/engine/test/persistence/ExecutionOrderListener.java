@@ -17,6 +17,7 @@ import java.util.List;
 
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 
 /**
  * @author Roman Smirnov
@@ -24,19 +25,43 @@ import org.camunda.bpm.engine.delegate.ExecutionListener;
  */
 public class ExecutionOrderListener implements ExecutionListener {
 
-  @SuppressWarnings("unchecked")
-  public void notify(DelegateExecution execution) throws Exception {
-    Object var = execution.getVariable("executionOrder");
+  protected static List<ActivitySequenceCounterMap> activityExecutionOrder = new ArrayList<ActivitySequenceCounterMap>();
 
-    List<String> executionOrder = null;
-    if (var != null) {
-      executionOrder = (List<String>) var;
+  public void notify(DelegateExecution execution) throws Exception {
+    ExecutionEntity executionEntity = (ExecutionEntity) execution;
+
+    long sequenceCounter = executionEntity.getSequenceCounter();
+    String activityId = executionEntity.getActivityId();
+
+    activityExecutionOrder.add(new ActivitySequenceCounterMap(activityId, sequenceCounter));
+  }
+
+  public static void clearActivityExecutionOrder() {
+    activityExecutionOrder.clear();
+  }
+
+  public static List<ActivitySequenceCounterMap> getActivityExecutionOrder() {
+    return activityExecutionOrder;
+  }
+
+  protected class ActivitySequenceCounterMap {
+
+    protected String activityId;
+    protected long sequenceCounter;
+
+    public ActivitySequenceCounterMap(String activityId, long sequenceCounter) {
+      this.activityId = activityId;
+      this.sequenceCounter = sequenceCounter;
     }
-    else {
-      executionOrder = new ArrayList<String>();
+
+    public String getActivityId() {
+      return activityId;
     }
-    executionOrder.add(execution.getId());
-    execution.setVariable("executionOrder", executionOrder);
+
+    public long getSequenceCounter() {
+      return sequenceCounter;
+    }
+
   }
 
 }

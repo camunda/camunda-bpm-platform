@@ -876,9 +876,8 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     this.sequenceCounter = sequenceCounter;
   }
 
-  public long incrementSequenceCounter() {
+  public void incrementSequenceCounter() {
     sequenceCounter++;
-    return sequenceCounter;
   }
 
   // Getter / Setters ///////////////////////////////////

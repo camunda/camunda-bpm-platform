@@ -105,7 +105,20 @@ public interface HistoricActivityInstanceQuery extends Query<HistoricActivityIns
   /** Order by processDefinitionId (needs to be followed by {@link #asc()} or {@link #desc()}). */
   HistoricActivityInstanceQuery orderByProcessDefinitionId();
 
-  /** Order by sequence counter (needs to be followed by {@link #asc()} or {@link #desc()}). */
-  HistoricActivityInstanceQuery orderBySequenceCounter();
+  /**
+   * <p>Sort the {@link HistoricActivityInstance activity instances} in the order in which
+   * they occurred (ie. started) and needs to be followed by {@link #asc()} or {@link #desc()}.</p>
+   *
+   * <p>The set of all {@link HistoricActivityInstance activity instances} is a <strong>partially
+   * ordered set</strong>. Due to this fact {@link HistoricActivityInstance activity instances}
+   * with different {@link HistoricActivityInstance#getExecutionId() execution ids} are
+   * <strong>incomparable</strong>. Only {@link HistoricActivityInstance activity instances} with
+   * the same {@link HistoricActivityInstance#getExecutionId() execution id} can be <strong>totally
+   * ordered</strong> by using {@link #executionId(String)} and {@link #orderPartiallyByOccurrence()}
+   * which will return a result set ordered by its occurrence.</p>
+   *
+   * @since 7.3
+   */
+  HistoricActivityInstanceQuery orderPartiallyByOccurrence();
 
 }

@@ -12,15 +12,11 @@
  */
 package org.camunda.bpm.engine.test.history;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricActivityInstanceQuery;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
-import org.camunda.bpm.engine.runtime.Job;
-import org.camunda.bpm.engine.runtime.JobQuery;
-import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 
 /**
@@ -34,56 +30,41 @@ public class HistoricActivityInstanceSequenceCounterTest extends PluggableProces
     // given
     HistoricActivityInstanceQuery query = historyService
         .createHistoricActivityInstanceQuery()
-        .orderBySequenceCounter()
+        .orderPartiallyByOccurrence()
         .asc();
 
     // when
     runtimeService.startProcessInstanceByKey("process");
-    String jobId = managementService.createJobQuery().singleResult().getId();
-    managementService.executeJob(jobId);
 
     // then
-    verifyOrder(query, 4, Arrays.asList("theStart", "theService1", "theService2", "theEnd"));
+    verifyOrder(query, "theStart", "theService1", "theService2", "theEnd");
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/persistence/ExecutionSequenceCounterTest.testForkSameSequenceLength.bpmn20.xml"})
+  @Deployment(resources = {"org/camunda/bpm/engine/test/persistence/ExecutionSequenceCounterTest.testForkSameSequenceLengthWithoutWaitStates.bpmn20.xml"})
   public void testFork() {
     // given
-    HistoricActivityInstanceQuery query = historyService
-        .createHistoricActivityInstanceQuery()
-        .orderBySequenceCounter()
-        .asc();
-
-    JobQuery jobQuery = managementService.createJobQuery();
-
-    // when
     String processInstanceId = runtimeService.startProcessInstanceByKey("process").getId();
 
-    Job firstJob = jobQuery.activityId("theEnd1").singleResult();
-    String firstExecutionId = firstJob.getExecutionId();
-    Job secondJob = jobQuery.activityId("theEnd2").singleResult();
-    String secondExecutionId = secondJob.getExecutionId();
+    HistoricActivityInstanceQuery query = historyService
+        .createHistoricActivityInstanceQuery()
+        .orderPartiallyByOccurrence()
+        .asc();
 
-    managementService.executeJob(firstJob.getId());
-    managementService.executeJob(secondJob.getId());
+    // when
 
     // then
     query.executionId(processInstanceId);
-    verifyOrder(query, 3, Arrays.asList("theStart", "theService", "theEnd2"));
+    verifyOrder(query, "theStart", "theService", "fork", "theService2", "theEnd2");
 
+    String firstExecutionId = historyService.createHistoricActivityInstanceQuery().activityId("theService1").singleResult().getExecutionId();
     query.executionId(firstExecutionId);
-    verifyOrder(query, 2, Arrays.asList("theService1", "theEnd1"));
-
-    query.executionId(secondExecutionId);
-    verifyOrder(query, 2, Arrays.asList("fork", "theService2"));
+    verifyOrder(query, "theService1", "theEnd1");
 
     query = historyService
       .createHistoricActivityInstanceQuery()
-      .orderBySequenceCounter()
-      .asc()
-      .orderByActivityId()
+      .orderPartiallyByOccurrence()
       .asc();
-    verifyOrder(query, 7, Arrays.asList("theStart", "theService", "fork", "theService1", "theService2", "theEnd1", "theEnd2"));
+    verifyOrder(query, "theStart", "theService", "fork", "theService1", "theEnd1", "theService2", "theEnd2");
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/persistence/ExecutionSequenceCounterTest.testForkAndJoinDifferentSequenceLength.bpmn20.xml"})
@@ -91,16 +72,15 @@ public class HistoricActivityInstanceSequenceCounterTest extends PluggableProces
     // given
     HistoricActivityInstanceQuery query = historyService
         .createHistoricActivityInstanceQuery()
-        .orderBySequenceCounter()
+        .orderPartiallyByOccurrence()
         .asc();
 
     // when
     String processInstanceId = runtimeService.startProcessInstanceByKey("process").getId();
-    executeAvailableJobs();
 
     // then
     query.executionId(processInstanceId);
-    verifyOrder(query, 5, Arrays.asList("theStart", "theService", "join", "theService4", "theEnd"));
+    verifyOrder(query, "theStart", "theService", "join", "theService4", "theEnd");
 
     String firstExecutionId = historyService
         .createHistoricActivityInstanceQuery()
@@ -115,27 +95,18 @@ public class HistoricActivityInstanceSequenceCounterTest extends PluggableProces
         .getExecutionId();
 
     query.executionId(firstExecutionId);
-    if (query.count() == 1) {
+    verifyOrder(query, "theService1", "join");
 
-      verifyOrder(query, 1, Arrays.asList("theService1"));
-
-      query.executionId(secondExecutionId);
-      verifyOrder(query, 4, Arrays.asList("fork", "theService2", "theService3", "join"));
-    }
-    else {
-      verifyOrder(query, 2, Arrays.asList("theService1", "join"));
-
-      query.executionId(secondExecutionId);
-      verifyOrder(query, 3, Arrays.asList("fork", "theService2", "theService3"));
-    }
+    query.executionId(secondExecutionId);
+    verifyOrder(query, "fork", "theService2", "theService3");
 
     query = historyService
       .createHistoricActivityInstanceQuery()
-      .orderBySequenceCounter()
+      .orderPartiallyByOccurrence()
       .asc()
       .orderByActivityId()
       .asc();
-    verifyOrder(query, 10, Arrays.asList("theStart", "theService", "fork", "theService1", "theService2", "join", "theService3", "join", "theService4", "theEnd"));
+    verifyOrder(query, "theStart", "theService", "fork", "theService1", "theService2", "join", "theService3", "join", "theService4", "theEnd");
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/persistence/ExecutionSequenceCounterTest.testSequenceInsideSubProcess.bpmn20.xml"})
@@ -143,16 +114,15 @@ public class HistoricActivityInstanceSequenceCounterTest extends PluggableProces
     // given
     HistoricActivityInstanceQuery query = historyService
         .createHistoricActivityInstanceQuery()
-        .orderBySequenceCounter()
+        .orderPartiallyByOccurrence()
         .asc();
 
     // when
     String processInstanceId = runtimeService.startProcessInstanceByKey("process").getId();
-    executeAvailableJobs();
 
     // then
     query.executionId(processInstanceId);
-    verifyOrder(query, 4, Arrays.asList("theStart", "theService1", "theService2", "theEnd"));
+    verifyOrder(query, "theStart", "theService1", "theService2", "theEnd");
 
     String subProcessExecutionId = historyService
         .createHistoricActivityInstanceQuery()
@@ -161,13 +131,13 @@ public class HistoricActivityInstanceSequenceCounterTest extends PluggableProces
         .getExecutionId();
 
     query.executionId(subProcessExecutionId);
-    verifyOrder(query, 4, Arrays.asList("subProcess", "innerStart", "innerService", "innerEnd"));
+    verifyOrder(query, "subProcess", "innerStart", "innerService", "innerEnd");
 
     query = historyService
         .createHistoricActivityInstanceQuery()
-        .orderBySequenceCounter()
+        .orderPartiallyByOccurrence()
         .asc();
-    verifyOrder(query, 8, Arrays.asList("theStart", "theService1", "subProcess", "innerStart", "innerService", "innerEnd", "theService2", "theEnd"));
+    verifyOrder(query, "theStart", "theService1", "subProcess", "innerStart", "innerService", "innerEnd", "theService2", "theEnd");
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/persistence/ExecutionSequenceCounterTest.testSequentialMultiInstance.bpmn20.xml"})
@@ -175,39 +145,31 @@ public class HistoricActivityInstanceSequenceCounterTest extends PluggableProces
     // given
     HistoricActivityInstanceQuery query = historyService
         .createHistoricActivityInstanceQuery()
-        .orderBySequenceCounter()
+        .orderPartiallyByOccurrence()
         .asc();
 
     // when
     String processInstanceId = runtimeService.startProcessInstanceByKey("process").getId();
 
-    String taskId = taskService.createTaskQuery().singleResult().getId();
-    taskService.complete(taskId);
-
-    taskId = taskService.createTaskQuery().singleResult().getId();
-    taskService.complete(taskId);
-
-    executeAvailableJobs();
-
     // then
     query.executionId(processInstanceId);
-    verifyOrder(query, 4, Arrays.asList("theStart", "theService1", "theService2", "theEnd"));
+    verifyOrder(query, "theStart", "theService1", "theService3", "theEnd");
 
     String taskExecutionId = historyService
         .createHistoricActivityInstanceQuery()
-        .activityId("theTask")
+        .activityId("theService2")
         .list()
         .get(0)
         .getExecutionId();
 
     query.executionId(taskExecutionId);
-    verifyOrder(query, 2, Arrays.asList("theTask", "theTask"));
+    verifyOrder(query, "theService2", "theService2");
 
     query = historyService
         .createHistoricActivityInstanceQuery()
-        .orderBySequenceCounter()
+        .orderPartiallyByOccurrence()
         .asc();
-    verifyOrder(query, 6, Arrays.asList("theStart", "theService1", "theTask", "theTask", "theService2", "theEnd"));
+    verifyOrder(query, "theStart", "theService1", "theService2", "theService2", "theService3", "theEnd");
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/persistence/ExecutionSequenceCounterTest.testParallelMultiInstance.bpmn20.xml"})
@@ -215,35 +177,30 @@ public class HistoricActivityInstanceSequenceCounterTest extends PluggableProces
     // given
     HistoricActivityInstanceQuery query = historyService
         .createHistoricActivityInstanceQuery()
-        .orderBySequenceCounter()
+        .orderPartiallyByOccurrence()
         .asc();
 
     // when
     String processInstanceId = runtimeService.startProcessInstanceByKey("process").getId();
-    List<Task> tasks = taskService.createTaskQuery().list();
-    for (Task task : tasks) {
-      taskService.complete(task.getId());
-    }
-    executeAvailableJobs();
 
     // then
     query.executionId(processInstanceId);
-    verifyOrder(query, 4, Arrays.asList("theStart", "theService1", "theService2", "theEnd"));
+    verifyOrder(query, "theStart", "theService1", "theService3", "theEnd");
 
     List<HistoricActivityInstance> taskActivityInstances = historyService
         .createHistoricActivityInstanceQuery()
-        .activityId("theTask")
+        .activityId("theService2")
         .list();
     for (HistoricActivityInstance activityInstance : taskActivityInstances) {
       query.executionId(activityInstance.getExecutionId());
-      verifyOrder(query, 1, Arrays.asList("theTask"));
+      verifyOrder(query, "theService2");
     }
 
     query = historyService
         .createHistoricActivityInstanceQuery()
-        .orderBySequenceCounter()
+        .orderPartiallyByOccurrence()
         .asc();
-    verifyOrder(query, 6, Arrays.asList("theStart", "theService1", "theTask", "theTask", "theService2", "theEnd"));
+    verifyOrder(query, "theStart", "theService1", "theService2", "theService2", "theService3", "theEnd");
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/persistence/ExecutionSequenceCounterTest.testLoop.bpmn20.xml"})
@@ -251,16 +208,15 @@ public class HistoricActivityInstanceSequenceCounterTest extends PluggableProces
     // given
     HistoricActivityInstanceQuery query = historyService
         .createHistoricActivityInstanceQuery()
-        .orderBySequenceCounter()
+        .orderPartiallyByOccurrence()
         .asc();
 
     // when
     String processInstanceId = runtimeService.startProcessInstanceByKey("process").getId();
-    executeAvailableJobs();
 
     // then
     query.executionId(processInstanceId);
-    verifyOrder(query, 10, Arrays.asList("theStart", "theService1", "join", "theScript", "fork", "join", "theScript", "fork", "theService2", "theEnd"));
+    verifyOrder(query, "theStart", "theService1", "join", "theScript", "fork", "join", "theScript", "fork", "theService2", "theEnd");
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/persistence/ExecutionSequenceCounterTest.testInterruptingBoundaryEvent.bpmn20.xml"})
@@ -268,19 +224,18 @@ public class HistoricActivityInstanceSequenceCounterTest extends PluggableProces
     // given
     HistoricActivityInstanceQuery query = historyService
         .createHistoricActivityInstanceQuery()
-        .orderBySequenceCounter()
+        .orderPartiallyByOccurrence()
         .asc();
 
     // when
     String processInstanceId = runtimeService.startProcessInstanceByKey("process").getId();
     runtimeService.correlateMessage("newMessage");
-    executeAvailableJobs();
 
     // then
-    verifyOrder(query, 6, Arrays.asList("theStart", "theService1", "theTask", "messageBoundary", "theServiceAfterMessage", "theEnd2"));
+    verifyOrder(query, "theStart", "theService1", "theTask", "messageBoundary", "theServiceAfterMessage", "theEnd2");
 
     query.executionId(processInstanceId);
-    verifyOrder(query, 5, Arrays.asList("theStart", "theService1", "messageBoundary", "theServiceAfterMessage", "theEnd2"));
+    verifyOrder(query, "theStart", "theService1", "messageBoundary", "theServiceAfterMessage", "theEnd2");
 
     String taskExecutionId = historyService
         .createHistoricActivityInstanceQuery()
@@ -289,7 +244,7 @@ public class HistoricActivityInstanceSequenceCounterTest extends PluggableProces
         .getExecutionId();
 
     query.executionId(taskExecutionId);
-    verifyOrder(query, 1, Arrays.asList("theTask"));
+    verifyOrder(query, "theTask");
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/persistence/ExecutionSequenceCounterTest.testNonInterruptingBoundaryEvent.bpmn20.xml"})
@@ -297,21 +252,19 @@ public class HistoricActivityInstanceSequenceCounterTest extends PluggableProces
     // given
     HistoricActivityInstanceQuery query = historyService
         .createHistoricActivityInstanceQuery()
-        .orderBySequenceCounter()
+        .orderPartiallyByOccurrence()
         .asc();
 
     // when
     String processInstanceId = runtimeService.startProcessInstanceByKey("process").getId();
     runtimeService.correlateMessage("newMessage");
     runtimeService.correlateMessage("newMessage");
-    executeAvailableJobs();
     String taskId = taskService.createTaskQuery().singleResult().getId();
     taskService.complete(taskId);
-    executeAvailableJobs();
 
     // then
     query.executionId(processInstanceId);
-    verifyOrder(query, 3, Arrays.asList("theStart", "theService1", "theEnd1"));
+    verifyOrder(query, "theStart", "theService1", "theEnd1");
 
     String taskExecutionId = historyService
         .createHistoricActivityInstanceQuery()
@@ -320,7 +273,7 @@ public class HistoricActivityInstanceSequenceCounterTest extends PluggableProces
         .getExecutionId();
 
     query.executionId(taskExecutionId);
-    verifyOrder(query, 1, Arrays.asList("theTask"));
+    verifyOrder(query, "theTask");
 
     List<HistoricActivityInstance> activityInstances = historyService
         .createHistoricActivityInstanceQuery()
@@ -328,29 +281,28 @@ public class HistoricActivityInstanceSequenceCounterTest extends PluggableProces
         .list();
     for (HistoricActivityInstance historicActivityInstance : activityInstances) {
       query.executionId(historicActivityInstance.getExecutionId());
-      verifyOrder(query, 3, Arrays.asList("messageBoundary", "theServiceAfterMessage", "theEnd2"));
+      verifyOrder(query, "messageBoundary", "theServiceAfterMessage", "theEnd2");
     }
 
     query = historyService
         .createHistoricActivityInstanceQuery()
-        .orderBySequenceCounter()
+        .orderPartiallyByOccurrence()
         .asc()
         .orderByActivityId()
         .asc();
 
-    verifyOrder(query, 10, Arrays.asList("theStart", "theService1", "messageBoundary", "messageBoundary", "theTask", "theServiceAfterMessage", "theServiceAfterMessage", "theEnd2", "theEnd2", "theEnd1"));
+    verifyOrder(query, "theStart", "theService1", "messageBoundary", "theTask", "theServiceAfterMessage", "theEnd2", "messageBoundary", "theServiceAfterMessage", "theEnd2", "theEnd1");
   }
 
-  protected void verifyOrder(HistoricActivityInstanceQuery query, int countExpected, List<String> expectedActivityInstanceOrder) {
-    assertEquals(countExpected, query.count());
-    assertEquals(countExpected, expectedActivityInstanceOrder.size());
+  protected void verifyOrder(HistoricActivityInstanceQuery query, String... expectedOrder) {
+    assertEquals(expectedOrder.length, query.count());
 
     List<HistoricActivityInstance> activityInstances = query.list();
 
-    for (int i = 0; i < countExpected; i++) {
+    for (int i = 0; i < expectedOrder.length; i++) {
       HistoricActivityInstance activityInstance = activityInstances.get(i);
       String currentActivityId = activityInstance.getActivityId();
-      String expectedActivityId = expectedActivityInstanceOrder.get(i);
+      String expectedActivityId = expectedOrder[i];
       assertEquals(expectedActivityId, currentActivityId);
     }
 

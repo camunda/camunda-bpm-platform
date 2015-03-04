@@ -56,7 +56,7 @@
         #{endTime, jdbcType=TIMESTAMP},
         #{durationInMillis ,jdbcType=BIGINT},
         #{activityInstanceState,jdbcType=INTEGER},
-        #{sequenceCounter,jdbcType=INTEGER}
+        #{sequenceCounter,jdbcType=BIGINT}
       )
   </insert>
 
@@ -112,7 +112,7 @@
     <result property="endTime" column="END_TIME_" jdbcType="TIMESTAMP" />
     <result property="durationInMillis" column="DURATION_" jdbcType="BIGINT" />
     <result property="activityInstanceState" column="ACT_INST_STATE_" jdbcType="INTEGER" />
-    <result property="sequenceCounter" column="SEQUENCE_COUNTER_" jdbcType="INTEGER" />
+    <result property="sequenceCounter" column="SEQUENCE_COUNTER_" jdbcType="BIGINT" />
   </resultMap>
 
   <!-- HISTORIC ACTIVITY INSTANCE SELECT -->

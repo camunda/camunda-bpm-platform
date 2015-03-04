@@ -6,19 +6,34 @@
 
   <process id="process">
 
-    <startEvent id="theStart" />
+    <startEvent id="theStart">
+      <extensionElements>
+        <camunda:executionListener event="start" class="org.camunda.bpm.engine.test.persistence.ExecutionOrderListener" />
+      </extensionElements>
+    </startEvent>
 
     <sequenceFlow sourceRef="theStart" targetRef="theService1" />
 
-    <serviceTask id="theService1" camunda:expression="${true}" />
+    <serviceTask id="theService1" camunda:expression="${true}">
+      <extensionElements>
+        <camunda:executionListener event="start" class="org.camunda.bpm.engine.test.persistence.ExecutionOrderListener" />
+      </extensionElements>
+    </serviceTask>
 
     <sequenceFlow sourceRef="theService1" targetRef="join" />
 
-    <exclusiveGateway id="join" />
+    <exclusiveGateway id="join">
+      <extensionElements>
+        <camunda:executionListener event="start" class="org.camunda.bpm.engine.test.persistence.ExecutionOrderListener" />
+      </extensionElements>
+    </exclusiveGateway>
 
     <sequenceFlow sourceRef="join" targetRef="theScript" />
 
-    <scriptTask id="theScript" camunda:asyncBefore="true" scriptFormat="groovy">
+    <scriptTask id="theScript" scriptFormat="groovy">
+      <extensionElements>
+        <camunda:executionListener event="start" class="org.camunda.bpm.engine.test.persistence.ExecutionOrderListener" />
+      </extensionElements>
       <script>
         <![CDATA[
           def counterVar = execution.getVariable("counter")
@@ -34,7 +49,11 @@
 
     <sequenceFlow sourceRef="theScript" targetRef="fork" />
 
-    <exclusiveGateway id="fork" />
+    <exclusiveGateway id="fork">
+      <extensionElements>
+        <camunda:executionListener event="start" class="org.camunda.bpm.engine.test.persistence.ExecutionOrderListener" />
+      </extensionElements>
+    </exclusiveGateway>
 
     <sequenceFlow sourceRef="fork" targetRef="join">
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${counter < 2}]]></conditionExpression>
@@ -44,11 +63,19 @@
       <conditionExpression xsi:type="tFormalExpression">${counter >= 2}</conditionExpression>
     </sequenceFlow>
 
-    <serviceTask id="theService2" camunda:asyncBefore="true" camunda:expression="${true}" />
+    <serviceTask id="theService2" camunda:expression="${true}">
+      <extensionElements>
+        <camunda:executionListener event="start" class="org.camunda.bpm.engine.test.persistence.ExecutionOrderListener" />
+      </extensionElements>
+    </serviceTask>
 
     <sequenceFlow sourceRef="theService2" targetRef="theEnd" />
 
-    <endEvent id="theEnd" />
+    <endEvent id="theEnd">
+      <extensionElements>
+        <camunda:executionListener event="start" class="org.camunda.bpm.engine.test.persistence.ExecutionOrderListener" />
+      </extensionElements>
+    </endEvent>
 
   </process>
 

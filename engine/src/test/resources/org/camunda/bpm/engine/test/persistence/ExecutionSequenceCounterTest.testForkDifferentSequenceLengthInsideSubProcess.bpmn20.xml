@@ -28,24 +28,40 @@
       <sequenceFlow sourceRef="fork" targetRef="innerService2" />
       <serviceTask id="innerService2" camunda:expression="${true}" />
       <sequenceFlow sourceRef="innerService2" targetRef="innerService3" />
-      <serviceTask id="innerService3" camunda:asyncBefore="true" camunda:expression="${true}" />
+      <serviceTask id="innerService3" camunda:expression="${true}" />
       <sequenceFlow sourceRef="innerService3" targetRef="innerEnd1" />
-      <endEvent id="innerEnd1" camunda:asyncBefore="true" />
+      <endEvent id="innerEnd1">
+        <extensionElements>
+          <camunda:executionListener event="start" class="org.camunda.bpm.engine.test.persistence.ExecutionOrderListener" />
+        </extensionElements>
+      </endEvent>
 
       <sequenceFlow sourceRef="fork" targetRef="innerService4" />
       <serviceTask id="innerService4" camunda:expression="${true}" />
       <sequenceFlow sourceRef="innerService4" targetRef="innerService5" />
-      <serviceTask id="innerService5" camunda:asyncBefore="true" camunda:expression="${true}" />
+      <serviceTask id="innerService5" camunda:expression="${true}" />
       <sequenceFlow sourceRef="innerService5" targetRef="innerService6" />
       <serviceTask id="innerService6" camunda:expression="${true}" />
       <sequenceFlow sourceRef="innerService6" targetRef="innerEnd2" />
-      <endEvent id="innerEnd2" camunda:asyncBefore="true" />
+      <endEvent id="innerEnd2">
+        <extensionElements>
+          <camunda:executionListener event="start" class="org.camunda.bpm.engine.test.persistence.ExecutionOrderListener" />
+        </extensionElements>
+      </endEvent>
 
     </subProcess>
 
-    <sequenceFlow sourceRef="subProcess" targetRef="theEnd" />
+    <sequenceFlow sourceRef="subProcess" targetRef="theService1" />
 
-    <endEvent id="theEnd" camunda:asyncBefore="true" />
+    <serviceTask id="theService1" camunda:expression="${true}">
+      <extensionElements>
+        <camunda:executionListener event="start" class="org.camunda.bpm.engine.test.persistence.ExecutionOrderListener" />
+      </extensionElements>
+    </serviceTask>
+
+    <sequenceFlow sourceRef="theService1" targetRef="theEnd" />
+
+    <endEvent id="theEnd" />
 
   </process>
 
