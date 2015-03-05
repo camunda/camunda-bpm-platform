@@ -25,7 +25,8 @@
          ng-switch-when="false">
       <div class="col-md-8 box">
 
-        <div notifications-panel class="notifications-panel"></div>
+        <div notifications-panel
+             class="notifications-panel"></div>
 
         <form class="form-horizontal"
               name="createUserForm">
@@ -33,7 +34,7 @@
 
           <div class="form-group">
             <label class="control-label col-sm-4"
-                for="inputUserId">User id*</label>
+                   for="inputUserId">User id*</label>
 
             <div class="col-sm-8">
               <input id="inputUserId"
@@ -44,7 +45,7 @@
                      novalidate required></input>
 
               <span class="help-inline"
-                  ng-show="createUserForm.userId.$error.required">
+                    ng-show="createUserForm.userId.$error.required">
                 User id is required.
               </span>
             </div>
@@ -52,7 +53,7 @@
 
           <div class="form-group">
             <label class="control-label col-sm-4"
-                for="inputPassword">Password*:</label>
+                   for="inputPassword">Password*:</label>
 
             <div class="col-sm-8">
               <input id="inputPassword"
@@ -60,7 +61,8 @@
                      class="form-control"
                      type="password"
                      ng-model="credentials.password"
-                     data-password required></input>
+                     data-password
+                     required></input>
 
               <span class="help-inline"
                     ng-show="createUserForm.inputPassword.$error.password">
@@ -80,6 +82,7 @@
             <div class="col-sm-8">
               <input id="inputPasswordRepeat"
                   name="inputPasswordRepeat"
+                  class="form-control"
                   type="password"
                   ng-model="credentials.password2"
                   data-password-repeat="credentials.password"></input>
@@ -99,10 +102,12 @@
 
             <div class="col-sm-8">
               <input id="inputFirstname"
-                  name="firstname"
-                  type="text"
-                  ng-model="profile.firstName"
-                  novalidate required></input>
+                     name="firstname"
+                     type="text"
+                     class="form-control"
+                     ng-model="profile.firstName"
+                     novalidate
+                     required></input>
 
               <span class="help-inline"="text-danger"
                     ng-show="createUserForm.firstname.$error.required">
@@ -118,8 +123,10 @@
             <div class="col-sm-8">
               <input id="inputLastname"
                   type="text"
+                  class="form-control"
                   ng-model="profile.lastName"
-                  novalidate required></input>
+                  novalidate
+                  required></input>
 
               <span class="help-inline"
                     ng-show="createUserForm.firstname.$error.required">
@@ -136,6 +143,7 @@
               <input id="inputEmail"
                   name="email"
                   type="text"
+                  class="form-control"
                   ng-model="profile.email"
                   data-email></input>
 
