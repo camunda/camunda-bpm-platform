@@ -214,6 +214,11 @@ public class HistoricJobLogQueryImpl extends AbstractQuery<HistoricJobLogQuery, 
     return this;
   }
 
+  public HistoricJobLogQuery orderPartiallyByOccurrence() {
+    orderBy(HistoricJobLogQueryProperty.SEQUENCE_COUNTER);
+    return this;
+  }
+
   // results //////////////////////////////////////////////////////////////
 
   public long executeCount(CommandContext commandContext) {

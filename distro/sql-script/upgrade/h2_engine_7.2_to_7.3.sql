@@ -38,6 +38,7 @@ create table ACT_HI_JOB_LOG (
     PROCESS_DEF_ID_ varchar(64),
     PROCESS_DEF_KEY_ varchar(64),
     DEPLOYMENT_ID_ varchar(64),
+    SEQUENCE_COUNTER_ integer,
     primary key (ID_)
 );
 
@@ -57,4 +58,7 @@ ALTER TABLE ACT_RU_VARIABLE
   ADD SEQUENCE_COUNTER_ integer;
 
 ALTER TABLE ACT_HI_DETAIL
+  ADD SEQUENCE_COUNTER_ integer;
+
+ALTER TABLE ACT_RU_JOB
   ADD SEQUENCE_COUNTER_ integer;

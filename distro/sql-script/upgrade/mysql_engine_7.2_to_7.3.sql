@@ -38,6 +38,7 @@ create table ACT_HI_JOB_LOG (
     PROCESS_DEF_ID_ varchar(64),
     PROCESS_DEF_KEY_ varchar(64),
     DEPLOYMENT_ID_ varchar(64),
+    SEQUENCE_COUNTER_ bigint,
     primary key (ID_)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 
@@ -56,4 +57,7 @@ ALTER TABLE ACT_RU_VARIABLE
   ADD SEQUENCE_COUNTER_ bigint;
 
 ALTER TABLE ACT_HI_DETAIL
+  ADD SEQUENCE_COUNTER_ bigint;
+
+ALTER TABLE ACT_RU_JOB
   ADD SEQUENCE_COUNTER_ bigint;

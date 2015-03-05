@@ -189,6 +189,7 @@ create table ACT_HI_JOB_LOG (
     PROCESS_DEF_ID_ varchar(64),
     PROCESS_DEF_KEY_ varchar(64),
     DEPLOYMENT_ID_ varchar(64),
+    SEQUENCE_COUNTER_ bigint,
     primary key (ID_)
 );
 

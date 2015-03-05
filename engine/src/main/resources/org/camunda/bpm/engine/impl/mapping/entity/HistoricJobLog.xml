@@ -24,7 +24,8 @@
             PROCESS_INSTANCE_ID_,
             PROCESS_DEF_ID_,
             PROCESS_DEF_KEY_,
-            DEPLOYMENT_ID_
+            DEPLOYMENT_ID_,
+            SEQUENCE_COUNTER_
           )
     values (#{id, jdbcType=VARCHAR},
             #{timestamp, jdbcType=TIMESTAMP},
@@ -42,7 +43,8 @@
             #{processInstanceId, jdbcType=VARCHAR},
             #{processDefinitionId, jdbcType=VARCHAR},
             #{processDefinitionKey, jdbcType=VARCHAR},
-            #{deploymentId, jdbcType=VARCHAR}
+            #{deploymentId, jdbcType=VARCHAR},
+            #{sequenceCounter, jdbcType=BIGINT}
     )
   </insert>
 
@@ -103,6 +105,7 @@
     <result property="processDefinitionKey" column="PROCESS_DEF_KEY_" jdbcType="VARCHAR" />
     <result property="deploymentId" column="DEPLOYMENT_ID_" jdbcType="VARCHAR" />
     <result property="state" column="JOB_STATE_" jdbcType="INTEGER" />
+    <result property="sequenceCounter" column="SEQUENCE_COUNTER_" jdbcType="BIGINT" />
   </resultMap>
 
   <!-- SELECT -->

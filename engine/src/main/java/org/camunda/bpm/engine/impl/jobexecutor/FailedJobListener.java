@@ -68,6 +68,11 @@ public class FailedJobListener implements TransactionListener, CommandContextLis
         .getJobManager()
         .findJobById(jobId);
 
+    // the given job failed and a rollback happened,
+    // that's why we have to increment the job
+    // sequence counter once again
+    job.incrementSequenceCounter();
+
     commandContext
       .getHistoricJobLogManager()
       .fireJobFailedEvent(job, exception);

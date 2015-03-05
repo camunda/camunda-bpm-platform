@@ -643,6 +643,9 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     evt.setProcessDefinitionKey(jobEntity.getProcessDefinitionKey());
     evt.setDeploymentId(jobEntity.getDeploymentId());
 
+    // initialize sequence counter
+    initSequenceCounter(jobEntity, evt);
+
     JobState state = null;
     if (HistoryEventTypes.JOB_CREATE.equals(eventType)) {
       state = JobState.CREATED;
@@ -667,6 +670,10 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
 
   protected void initSequenceCounter(VariableInstanceEntity variable, HistoryEvent event) {
     initSequenceCounter(variable.getSequenceCounter(), event);
+  }
+
+  protected void initSequenceCounter(JobEntity job, HistoryEvent event) {
+    initSequenceCounter(job.getSequenceCounter(), event);
   }
 
   protected void initSequenceCounter(long sequenceCounter, HistoryEvent event) {

@@ -23,6 +23,7 @@ import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.historicJ
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.historicJobLogByProcessDefinitionKey;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.historicJobLogByProcessInstanceId;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.historicJobLogByTimestamp;
+import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.historicJobLogPartiallyByOccurence;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.inverted;
 
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -559,6 +560,62 @@ public class HistoricJobLogQueryTest extends PluggableProcessEngineTestCase {
       .orderByDeploymentId()
       .desc();
     verifyQueryWithOrdering(query, 10, inverted(historicJobLogByDeploymentId()));
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuation.bpmn20.xml"})
+  public void testQuerySortingPartiallyByOccurrence() {
+    String processInstanceId = runtimeService.startProcessInstanceByKey("process").getId();
+    String jobId = managementService.createJobQuery().singleResult().getId();
+
+    executeAvailableJobs();
+    runtimeService.setVariable(processInstanceId, "fail", false);
+    managementService.executeJob(jobId);
+
+    // asc
+    HistoricJobLogQuery query = historyService
+      .createHistoricJobLogQuery()
+      .jobId(jobId)
+      .orderPartiallyByOccurrence()
+      .asc();
+
+    verifyQueryWithOrdering(query, 5, historicJobLogPartiallyByOccurence());
+
+    // desc
+    query = historyService
+        .createHistoricJobLogQuery()
+        .jobId(jobId)
+        .orderPartiallyByOccurrence()
+        .desc();
+
+    verifyQueryWithOrdering(query, 5, inverted(historicJobLogPartiallyByOccurence()));
+
+    runtimeService.deleteProcessInstance(processInstanceId, null);
+
+    // delete job /////////////////////////////////////////////////////////
+
+    processInstanceId = runtimeService.startProcessInstanceByKey("process").getId();
+    jobId = managementService.createJobQuery().singleResult().getId();
+
+    executeAvailableJobs();
+    managementService.deleteJob(jobId);
+
+    // asc
+    query = historyService
+      .createHistoricJobLogQuery()
+      .jobId(jobId)
+      .orderPartiallyByOccurrence()
+      .asc();
+
+    verifyQueryWithOrdering(query, 5, historicJobLogPartiallyByOccurence());
+
+    // desc
+    query = historyService
+        .createHistoricJobLogQuery()
+        .jobId(jobId)
+        .orderPartiallyByOccurrence()
+        .desc();
+
+    verifyQueryWithOrdering(query, 5, inverted(historicJobLogPartiallyByOccurence()));
   }
 
   protected void verifyQueryResults(HistoricJobLogQuery query, int countExpected) {

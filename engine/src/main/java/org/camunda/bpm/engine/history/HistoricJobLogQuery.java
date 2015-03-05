@@ -104,4 +104,19 @@ public interface HistoricJobLogQuery extends Query<HistoricJobLogQuery, Historic
   /** Order by deployment id (needs to be followed by {@link #asc()} or {@link #desc()}). */
   HistoricJobLogQuery orderByDeploymentId();
 
+  /**
+   * <p>Sort the {@link HistoricJobLog historic job logs} in the order in which
+   * they occurred and needs to be followed by {@link #asc()} or {@link #desc()}.</p>
+   *
+   * <p>The set of all {@link HistoricJobLog historic job logs} is a <strong>partially ordered
+   * set</strong>. Due to this fact {@link HistoricJobLog historic job logs} with different
+   * {@link HistoricJobLog#getJobId() job ids} are <strong>incomparable</strong>. Only {@link
+   * HistoricJobLog historic job logs} with the same {@link HistoricJobLog#getJobId() job id} can
+   * be <strong>totally ordered</strong> by using {@link #jobId(String)} and {@link #orderPartiallyByOccurrence()}
+   * which will return a result set ordered by its occurrence.</p>
+   *
+   * @since 7.3
+   */
+  HistoricJobLogQuery orderPartiallyByOccurrence();
+
 }

@@ -102,6 +102,9 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
   protected JobDefinition jobDefinition;
   protected ExecutionEntity execution;
 
+  // sequence counter //////////////////////////
+  protected long sequenceCounter = 1;
+
   public void execute(CommandContext commandContext) {
     if (executionId != null) {
       ExecutionEntity execution = getExecution();
@@ -110,6 +113,9 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
 
     // initialize activity id
     getActivityId();
+
+    // increment sequence counter before job execution
+    incrementSequenceCounter();
 
     preExecute(commandContext);
     JobHandler jobHandler = getJobHandler();
@@ -154,6 +160,7 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
   public void delete(boolean incidentResolved) {
     CommandContext commandContext = Context.getCommandContext();
 
+    incrementSequenceCounter();
     commandContext.getJobManager().deleteJob(this, !executing);
 
     // Also delete the job's exception byte array
@@ -197,6 +204,20 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
     executionId = execution.getId();
     processInstanceId = execution.getProcessInstanceId();
     execution.addJob(this);
+  }
+
+  // sequence counter /////////////////////////////////////////////////////////
+
+  public long getSequenceCounter() {
+    return sequenceCounter;
+  }
+
+  public void setSequenceCounter(long sequenceCounter) {
+    this.sequenceCounter = sequenceCounter;
+  }
+
+  public void incrementSequenceCounter() {
+    sequenceCounter++;
   }
 
   // getters and setters //////////////////////////////////////////////////////

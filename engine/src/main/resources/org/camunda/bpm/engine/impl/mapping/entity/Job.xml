@@ -80,9 +80,10 @@
     <result property="deploymentId" column="DEPLOYMENT_ID_" jdbcType="VARCHAR" />
     <result property="suspensionState" column="SUSPENSION_STATE_" jdbcType="INTEGER"/>
     <result property="jobDefinitionId" column="JOB_DEF_ID_" jdbcType="VARCHAR" />
+    <result property="sequenceCounter" column="SEQUENCE_COUNTER_" jdbcType="BIGINT" />
     <discriminator javaType="string" column="TYPE_">
-      <case value="message" resultMap="messageResultMap"/> 
-      <case value="timer" resultMap="timerResultMap"/> 
+      <case value="message" resultMap="messageResultMap"/>
+      <case value="timer" resultMap="timerResultMap"/>
     </discriminator>
   </resultMap>
 
@@ -310,7 +311,8 @@
             HANDLER_CFG_,
             DEPLOYMENT_ID_,
             SUSPENSION_STATE_,
-            JOB_DEF_ID_, 
+            JOB_DEF_ID_,
+            SEQUENCE_COUNTER_,
             REV_
           )
     values (#{id, jdbcType=VARCHAR},
@@ -332,6 +334,7 @@
             #{deploymentId, jdbcType=VARCHAR},
             #{suspensionState, jdbcType=INTEGER},
             #{jobDefinitionId, jdbcType=VARCHAR},
+            #{sequenceCounter, jdbcType=BIGINT},
             1
     )
   </insert>
@@ -353,7 +356,8 @@
        PROCESS_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR},
        JOB_DEF_ID_ = #{jobDefinitionId, jdbcType=VARCHAR},
        DEPLOYMENT_ID_ = #{deploymentId, jdbcType=VARCHAR},
-       HANDLER_CFG_ = #{jobHandlerConfiguration, jdbcType=VARCHAR}
+       HANDLER_CFG_ = #{jobHandlerConfiguration, jdbcType=VARCHAR},
+       SEQUENCE_COUNTER_ = #{sequenceCounter, jdbcType=BIGINT}
     </set>
     where ID_= #{id, jdbcType=VARCHAR}
       and REV_ = #{revision, jdbcType=INTEGER}
@@ -401,6 +405,7 @@
             DEPLOYMENT_ID_,
             SUSPENSION_STATE_,
             JOB_DEF_ID_,
+            SEQUENCE_COUNTER_,
             REV_
             )
     values (#{id, jdbcType=VARCHAR},
@@ -420,6 +425,7 @@
             #{deploymentId, jdbcType=VARCHAR},
             #{suspensionState, jdbcType=INTEGER},
             #{jobDefinitionId, jdbcType=VARCHAR},
+            #{sequenceCounter, jdbcType=BIGINT},
             1
     )
   </insert>
@@ -440,7 +446,8 @@
        PROCESS_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR},
        JOB_DEF_ID_ = #{jobDefinitionId, jdbcType=VARCHAR},
        DEPLOYMENT_ID_ = #{deploymentId, jdbcType=VARCHAR},
-       HANDLER_CFG_ = #{jobHandlerConfiguration, jdbcType=VARCHAR}
+       HANDLER_CFG_ = #{jobHandlerConfiguration, jdbcType=VARCHAR},
+       SEQUENCE_COUNTER_ = #{sequenceCounter, jdbcType=BIGINT}
     </set>
     where ID_= #{id, jdbcType=VARCHAR}
       and REV_ = #{revision, jdbcType=INTEGER}

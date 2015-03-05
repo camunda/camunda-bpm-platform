@@ -22,6 +22,7 @@ import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.history.HistoricJobLog;
+import org.camunda.bpm.engine.impl.persistence.entity.HistoricJobLogEventEntity;
 import org.camunda.bpm.engine.query.Query;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
@@ -417,6 +418,20 @@ public class TestOrderingUtil {
     return new NullTolerantComparator<HistoricJobLog>() {
       public int compare(HistoricJobLog o1, HistoricJobLog o2) {
         return o1.getDeploymentId().compareTo(o2.getDeploymentId());
+      }
+
+      public boolean hasNullProperty(HistoricJobLog object) {
+        return false;
+      }
+    };
+  }
+
+  public static NullTolerantComparator<HistoricJobLog> historicJobLogPartiallyByOccurence() {
+    return new NullTolerantComparator<HistoricJobLog>() {
+      public int compare(HistoricJobLog o1, HistoricJobLog o2) {
+        Long firstCounter = Long.valueOf(((HistoricJobLogEventEntity)o1).getSequenceCounter());
+        Long secondCounter = Long.valueOf(((HistoricJobLogEventEntity)o2).getSequenceCounter());
+        return firstCounter.compareTo(secondCounter);
       }
 
       public boolean hasNullProperty(HistoricJobLog object) {
