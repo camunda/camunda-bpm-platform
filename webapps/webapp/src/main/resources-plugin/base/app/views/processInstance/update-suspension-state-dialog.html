@@ -89,7 +89,7 @@
           ng-click="updateSuspensionState()"
           ng-hide="status === 'SUCCESS' || status === 'FAIL'"
           ng-disabled="status === 'PERFORM_UDPATE'">
-    {{ (processInstance.suspended ? 'Suspend' : 'Activate') }}
+    {{ (processInstance.suspended ? 'Activate' : 'Suspend') }}
   </button>
 
   <button class="btn btn-primary"
