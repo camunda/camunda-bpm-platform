@@ -1,4 +1,3 @@
-
 var chai     = require('chai');
 var promised = require('chai-as-promised');
 chai.use(promised);
@@ -28,7 +27,9 @@ exports.config = {
     'admin/specs/groups-spec.js',
     'admin/specs/system-spec.js',
     'admin/specs/authorizations-spec.js',
-    'cockpit/specs/dashboard-spec.js'
+    'cockpit/specs/dashboard-spec.js',
+    'tasklist/specs/tasklist-task-spec.js',
+    'tasklist/specs/tasklist-sorting-spec.js'
   ],
 
   // A base URL for your application under test. Calls to protractor.get()

@@ -9,8 +9,8 @@ ops.filter = {
     query: {},
     properties: {
       variables: [{
-        name: "testVar",
-        label: "varTest"
+        name: 'testVar',
+        label: 'varTest'
       }],
       showUndefinedVariable: true
     },
@@ -31,7 +31,7 @@ ops.authorization = {
   create: [
     {
       type : 1,
-      permissions: ["ALL"],
+      permissions: ['ALL'],
       userId: 'test',
       groupId: null,
       resourceType: 0,
@@ -39,7 +39,7 @@ ops.authorization = {
     },
     {
       type : 1,
-      permissions: ["ALL"],
+      permissions: ['ALL'],
       userId: 'test',
       groupId: null,
       resourceType: 5,
@@ -47,7 +47,39 @@ ops.authorization = {
     }]
 };
 
-ops.deployment = {
+ops.task = {
+  create: [
+    {
+      id: '1',
+      name: 'Task 1',
+      assignee: 'test',
+      due: '2016-09-15T15:45:48'
+    },
+    {
+      id: '2',
+      name: 'Task 2',
+      assignee: 'test',
+      due: '2016-09-16T15:45:48'
+    },
+    {
+      id: 'abc123',
+      name: 'My Task',
+      assignee: 'test',
+      due: '2016-09-15T15:46:48'
+    },
+  ],
+
+  localVariable: [
+    {
+      id: '1',
+      varId: 'testVar',
+      value: 42,
+      type: 'Integer'
+    }
+  ]
+};
+
+/*ops.deployment = {
   create: [{
     deploymentName:  'user-tasks',
     files:           [{
@@ -88,5 +120,5 @@ ops['process-definition'] = {
       }
     }
   }]
-};
+};*/
 

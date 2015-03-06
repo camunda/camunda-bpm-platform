@@ -1,3 +1,4 @@
+'use strict';
 
 var chai     = require('chai');
 var promised = require('chai-as-promised');
@@ -34,7 +35,13 @@ exports.config = {
   // include glob patterns.
   specs: [
     'admin/specs/admin-user-spec.js',
-    'tasklist/specs/tasklist-task-spec.js'
+    'admin/specs/users-spec.js',
+    'admin/specs/groups-spec.js',
+    'admin/specs/system-spec.js',
+    'admin/specs/authorizations-spec.js',
+    'cockpit/specs/dashboard-spec.js',
+    'tasklist/specs/tasklist-task-spec.js',
+    'tasklist/specs/tasklist-sorting-spec.js'
   ],
 
   // A base URL for your application under test. Calls to protractor.get()
@@ -63,7 +70,7 @@ exports.config = {
   mochaOpts: {
     timeout: 15000,
     colors: true,
-    reporter: "spec",
+    reporter: 'spec',
     slow: 3000
   }
 };
