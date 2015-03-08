@@ -11,6 +11,7 @@
     <module name="org.camunda.commons.camunda-commons-utils" />
 
     <module name="com.fasterxml.jackson.core.jackson-databind" />
+    <module name="com.fasterxml.jackson.core.jackson-core" />
     <module name="com.jayway.jsonpath.json-path" />
   </dependencies>
 
