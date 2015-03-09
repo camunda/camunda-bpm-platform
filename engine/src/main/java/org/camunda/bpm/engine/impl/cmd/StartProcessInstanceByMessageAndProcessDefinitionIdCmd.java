@@ -16,13 +16,16 @@ package org.camunda.bpm.engine.impl.cmd;
 import java.util.Map;
 
 import org.camunda.bpm.engine.RepositoryService;
+import org.camunda.bpm.engine.impl.bpmn.parser.EventSubscriptionDeclaration;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.event.MessageEventHandler;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
+import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.instance.MessageEventDefinition;
@@ -65,12 +68,14 @@ public class StartProcessInstanceByMessageAndProcessDefinitionIdCmd implements C
     ProcessDefinitionEntity processDefinition = deploymentCache.findDeployedProcessDefinitionById(processDefinitionId);
     ensureNotNull("No process definition found for id '" + processDefinitionId + "'", "processDefinition", processDefinition);
 
-    String activityId = findStartActivityIdByMessage(messageName);
+    String activityId = findStartActivityIdByMessage(processDefinition);
     ensureNotNull("Cannot start process instance by message: no message start event with name '" + messageName + "' found for process definition with id '" + processDefinitionId + "'", "activityId", activityId);
+    
+     
     
     ActivityImpl startActivity = processDefinition.findActivity(activityId);
     ExecutionEntity processInstance = processDefinition.createProcessInstance(businessKey, startActivity);
-
+    
     if (processVariables != null) {
       processInstance.setVariables(processVariables);
     }
@@ -79,20 +84,18 @@ public class StartProcessInstanceByMessageAndProcessDefinitionIdCmd implements C
 
     return processInstance;
   }
+  
+  private String findStartActivityIdByMessage(ProcessDefinitionEntity processDefinition){
+	  for (EventSubscriptionDeclaration declaration : EventSubscriptionDeclaration.getDeclarationsForScope(processDefinition)) {
+		  if(isMessageEventDeclaration(declaration) && messageName.equals(declaration.getEventName())) {
+			  return declaration.getActivityId();
+		  }
+		} 
+	  return null;
+  }
 
-  private String findStartActivityIdByMessage(String messageName) {
-	RepositoryService repositoryService = Context.getProcessEngineConfiguration().getRepositoryService();
-	BpmnModelInstance modelInstance = repositoryService.getBpmnModelInstance(processDefinitionId);
-	   
-	for(StartEvent startEvent : modelInstance.getModelElementsByType(StartEvent.class)){
-		for(MessageEventDefinition messageEventDefinition : startEvent.getChildElementsByType(MessageEventDefinition.class)) {
-			String name = messageEventDefinition.getMessage().getName();
-			if(messageName.equals(name)){
-				return startEvent.getId();
-			}
-		}
-	}
-	return null;
+  private boolean isMessageEventDeclaration(EventSubscriptionDeclaration declaration) {
+	return MessageEventHandler.EVENT_HANDLER_TYPE.equals(declaration.getEventType()) ;
   }
 
 }
