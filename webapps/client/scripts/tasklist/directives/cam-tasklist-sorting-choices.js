@@ -29,12 +29,10 @@ define([
     'search',
     '$translate',
     '$location',
-    '$document',
   function(
     search,
     $translate,
-    $location,
-    $document
+    $location
   ) {
     return {
 
@@ -49,7 +47,6 @@ define([
       controller: [function () {}],
 
       link: function(scope, element) {
-        var $body = angular.element('body');
         var $newSort = element.find('.new-sort .dropdown-menu');
 
         var sorting = {
@@ -64,11 +61,19 @@ define([
 
         scope.sortedOn = [];
 
-        function updateBodyClass(plus) {
-          $body
-            .removeClass('sort-choices-' + scope.sortings.length)
-            .addClass('sort-choices-' + (scope.sortings.length + plus))
-          ;
+        function updateBodyClass() {
+          element.css('height', 'auto');
+          var height = element.height();
+          var columnTop = element.parent();
+          columnTop.height(height);
+          var columnTopHeight = height;//columnTop.outerHeight();
+
+          var columns = element.parents('.columns');
+          var headers = columns.find('.cell.top');
+          var bodies = columns.find('.cell.content');
+
+          headers.height(columnTopHeight);
+          bodies.css('top', columnTopHeight + 30);
         }
 
         scope.uniqueProps = {
@@ -149,7 +154,7 @@ define([
           }
         }
 
-        scope.$watch('openDropdowns', function (now, before) {
+        scope.$watch('openDropdowns', function (now) {
           var index = now.indexOf(true);
           var els = element
                       .find('li.sorting-choice .dropdown-menu')
@@ -159,7 +164,7 @@ define([
           }
         }, true);
 
-        scope.$watch('openDropdownNew', function (now, before) {
+        scope.$watch('openDropdownNew', function (now) {
           if (now) {
             positionDropdown($newSort);
           }
