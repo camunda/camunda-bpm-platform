@@ -42,6 +42,7 @@ import org.camunda.bpm.engine.task.DelegationState;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.type.ValueType;
 
 /**
@@ -871,6 +872,98 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(QueryOperator.LESS_THAN, variables.get(2).getOperator());
     assertFalse(variables.get(2).isProcessInstanceVariable());
     assertFalse(variables.get(2).isLocal());
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void testExtendTaskQueryByOrderByProcessVariable() {
+    ProcessInstance instance500 = runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Variables.createVariables().putValue("var", 500));
+    ProcessInstance instance1000 = runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Variables.createVariables().putValue("var", 1000));
+    ProcessInstance instance250 = runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Variables.createVariables().putValue("var", 250));
+
+    TaskQuery query = taskService.createTaskQuery().processDefinitionKey("oneTaskProcess");
+    saveQuery(query);
+
+    // asc
+    TaskQuery extendingQuery = taskService
+        .createTaskQuery()
+        .orderByProcessVariable("var", ValueType.INTEGER)
+        .asc();
+
+    List<Task> tasks = filterService.list(filter.getId(), extendingQuery);
+
+    assertEquals(3, tasks.size());
+    assertEquals(instance250.getId(), tasks.get(0).getProcessInstanceId());
+    assertEquals(instance500.getId(), tasks.get(1).getProcessInstanceId());
+    assertEquals(instance1000.getId(), tasks.get(2).getProcessInstanceId());
+
+    // desc
+    extendingQuery = taskService
+        .createTaskQuery()
+        .orderByProcessVariable("var", ValueType.INTEGER)
+        .desc();
+
+    tasks = filterService.list(filter.getId(), extendingQuery);
+
+    assertEquals(3, tasks.size());
+    assertEquals(instance1000.getId(), tasks.get(0).getProcessInstanceId());
+    assertEquals(instance500.getId(), tasks.get(1).getProcessInstanceId());
+    assertEquals(instance250.getId(), tasks.get(2).getProcessInstanceId());
+
+    runtimeService.deleteProcessInstance(instance250.getId(), null);
+    runtimeService.deleteProcessInstance(instance500.getId(), null);
+    runtimeService.deleteProcessInstance(instance1000.getId(), null);
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void testExtendTaskQueryByOrderByTaskVariable() {
+    ProcessInstance instance1 = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    ProcessInstance instance2 = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    ProcessInstance instance3 = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+    Task task500 = taskService.createTaskQuery().processInstanceId(instance1.getId()).singleResult();
+    taskService.setVariableLocal(task500.getId(), "var", 500);
+
+    Task task250 = taskService.createTaskQuery().processInstanceId(instance2.getId()).singleResult();
+    taskService.setVariableLocal(task250.getId(), "var", 250);
+
+    Task task1000 = taskService.createTaskQuery().processInstanceId(instance3.getId()).singleResult();
+    taskService.setVariableLocal(task1000.getId(), "var", 1000);
+
+    TaskQuery query = taskService.createTaskQuery().processDefinitionKey("oneTaskProcess");
+    saveQuery(query);
+
+    // asc
+    TaskQuery extendingQuery = taskService
+        .createTaskQuery()
+        .orderByProcessVariable("var", ValueType.INTEGER)
+        .asc();
+
+    List<Task> tasks = filterService.list(filter.getId(), extendingQuery);
+
+    assertEquals(3, tasks.size());
+    assertEquals(task250.getId(), tasks.get(0).getId());
+    assertEquals(task500.getId(), tasks.get(1).getId());
+    assertEquals(task1000.getId(), tasks.get(2).getId());
+
+    // desc
+    extendingQuery = taskService
+        .createTaskQuery()
+        .orderByProcessVariable("var", ValueType.INTEGER)
+        .desc();
+
+    tasks = filterService.list(filter.getId(), extendingQuery);
+
+    assertEquals(3, tasks.size());
+    assertEquals(task1000.getId(), tasks.get(0).getId());
+    assertEquals(task500.getId(), tasks.get(1).getId());
+    assertEquals(task250.getId(), tasks.get(2).getId());
+
+    runtimeService.deleteProcessInstance(instance1.getId(), null);
+    runtimeService.deleteProcessInstance(instance2.getId(), null);
+    runtimeService.deleteProcessInstance(instance3.getId(), null);
   }
 
   protected void saveQuery(Query query) {

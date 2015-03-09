@@ -12,7 +12,20 @@
  */
 package org.camunda.bpm.engine.test.api.task;
 
-import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.*;
+import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.inverted;
+import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.taskByAssignee;
+import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.taskByCaseExecutionId;
+import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.taskByCaseInstanceId;
+import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.taskByCreateTime;
+import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.taskByDescription;
+import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.taskByDueDate;
+import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.taskByExecutionId;
+import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.taskByFollowUpDate;
+import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.taskById;
+import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.taskByName;
+import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.taskByPriority;
+import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.taskByProcessInstanceId;
+import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.verifySortingAndCount;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -28,7 +41,6 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.exception.NotAllowedException;
 import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.filter.Filter;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
@@ -4519,6 +4531,80 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     } catch (BadUserRequestException e) {
       assertEquals("The form key is not initialized. You must call initializeFormKeys() on the task query prior to retrieving the form key.", e.getMessage());
     }
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/task/TaskQueryTest.testProcessDefinition.bpmn20.xml")
+  public void testQueryOrderByProcessVariableInteger() {
+    ProcessInstance instance500 = runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Variables.createVariables().putValue("var", 500));
+    ProcessInstance instance1000 = runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Variables.createVariables().putValue("var", 1000));
+    ProcessInstance instance250 = runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Variables.createVariables().putValue("var", 250));
+
+    // asc
+    List<Task> tasks = taskService.createTaskQuery()
+      .processDefinitionKey("oneTaskProcess")
+      .orderByProcessVariable("var", ValueType.INTEGER)
+      .asc()
+      .list();
+
+    assertEquals(3, tasks.size());
+    assertEquals(instance250.getId(), tasks.get(0).getProcessInstanceId());
+    assertEquals(instance500.getId(), tasks.get(1).getProcessInstanceId());
+    assertEquals(instance1000.getId(), tasks.get(2).getProcessInstanceId());
+
+    // desc
+    tasks = taskService.createTaskQuery()
+      .processDefinitionKey("oneTaskProcess")
+      .orderByProcessVariable("var", ValueType.INTEGER)
+      .desc()
+      .list();
+
+    assertEquals(3, tasks.size());
+    assertEquals(instance1000.getId(), tasks.get(0).getProcessInstanceId());
+    assertEquals(instance500.getId(), tasks.get(1).getProcessInstanceId());
+    assertEquals(instance250.getId(), tasks.get(2).getProcessInstanceId());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/task/TaskQueryTest.testProcessDefinition.bpmn20.xml")
+  public void testQueryOrderByTaskVariableInteger() {
+    ProcessInstance instance1 = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    ProcessInstance instance2 = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    ProcessInstance instance3 = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+    Task task500 = taskService.createTaskQuery().processInstanceId(instance1.getId()).singleResult();
+    taskService.setVariableLocal(task500.getId(), "var", 500);
+
+    Task task250 = taskService.createTaskQuery().processInstanceId(instance2.getId()).singleResult();
+    taskService.setVariableLocal(task250.getId(), "var", 250);
+
+    Task task1000 = taskService.createTaskQuery().processInstanceId(instance3.getId()).singleResult();
+    taskService.setVariableLocal(task1000.getId(), "var", 1000);
+
+    // asc
+    List<Task> tasks = taskService.createTaskQuery()
+      .processDefinitionKey("oneTaskProcess")
+      .orderByTaskVariable("var", ValueType.INTEGER)
+      .asc()
+      .list();
+
+    assertEquals(3, tasks.size());
+    assertEquals(task250.getId(), tasks.get(0).getId());
+    assertEquals(task500.getId(), tasks.get(1).getId());
+    assertEquals(task1000.getId(), tasks.get(2).getId());
+
+    // desc
+    tasks = taskService.createTaskQuery()
+      .processDefinitionKey("oneTaskProcess")
+      .orderByProcessVariable("var", ValueType.INTEGER)
+      .desc()
+      .list();
+
+    assertEquals(3, tasks.size());
+    assertEquals(task1000.getId(), tasks.get(0).getId());
+    assertEquals(task500.getId(), tasks.get(1).getId());
+    assertEquals(task250.getId(), tasks.get(2).getId());
   }
 
   /**
