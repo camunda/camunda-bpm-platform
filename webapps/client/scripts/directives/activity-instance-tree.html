@@ -55,10 +55,11 @@
   </div>
 
   <ul class="list-unstyled" ng-show="node.isOpen" ng-if="node.children.length">
-    <li ng-repeat="child in node.children | orderBy:orderPropertyValue">
+    <li ng-repeat="child in node.children">
       <div activity-instance-tree="child"
            selection="selection"
-           on-element-click="propogateSelection(id, activityId, $event)">
+           on-element-click="propogateSelection(id, activityId, $event)"
+           order-children-by="orderChildrenBy()">
       </div>
     </li>
   </ul>

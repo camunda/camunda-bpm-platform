@@ -7,8 +7,9 @@ define([ 'angular', 'require', 'text!./activity-instance-tree.html' ], function(
   var Directive = [
     '$compile',
     '$http',
+    '$filter',
     '$templateCache',
-  function ($compile, $http, $templateCache) {
+  function ($compile, $http, $filter, $templateCache) {
     return {
       restrict: 'EAC',
 
@@ -16,14 +17,17 @@ define([ 'angular', 'require', 'text!./activity-instance-tree.html' ], function(
         node: '=activityInstanceTree',
         onElementClick: '&',
         selection: '=',
-        quickFilters: '='
+        quickFilters: '=',
+        orderChildrenBy: '&'
       },
 
-      link: function(scope, element /*, attrs, processDiagram */ ) {
+      link: function(scope, element) {
 
         var $nodeElement = element,
             nodeSelectedEventName = 'node.selected',
             nodeOpenedEventName = 'node.opened';
+
+        var orderChildrenBy = scope.orderChildrenBy();
 
         function withTemplate(fn) {
           fn(template);
@@ -34,7 +38,13 @@ define([ 'angular', 'require', 'text!./activity-instance-tree.html' ], function(
             return;
           }
 
-          newValue.children = (newValue.childActivityInstances || []).concat(newValue.childTransitionInstances || []);
+          var children = (newValue.childActivityInstances || []).concat(newValue.childTransitionInstances || []);
+
+          if (orderChildrenBy) {
+            children = $filter('orderBy')(children, orderChildrenBy);
+          }
+
+          newValue.children = children;
 
           createTreeNode(newValue);
         });
@@ -139,13 +149,6 @@ define([ 'angular', 'require', 'text!./activity-instance-tree.html' ], function(
         scope.toggleOpen = function() {
           var node = scope.node;
           node.isOpen = !node.isOpen;
-        };
-
-        scope.orderPropertyValue = function (elem) {
-          var id = elem.id,
-              idx = id.indexOf(':');
-
-          return idx !== -1 ? id.substr(idx + 1, id.length) : id;
         };
 
       }

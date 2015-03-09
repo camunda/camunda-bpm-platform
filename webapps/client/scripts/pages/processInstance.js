@@ -545,6 +545,17 @@ define([
       processData.set('filter', newFilter);
     };
 
+    $scope.orderChildrenBy = function () {
+
+      return function (elem) {
+        var id = elem.id,
+            idx = id.indexOf(':');
+
+        return idx !== -1 ? id.substr(idx + 1, id.length) : id;
+      };
+
+    };
+
     $scope.$on('$routeChangeStart', function () {
       page.breadcrumbsClear();
     });
@@ -588,6 +599,7 @@ define([
     }
 
     setDefaultTab($scope.processInstanceTabs);
+
   }];
 
 
