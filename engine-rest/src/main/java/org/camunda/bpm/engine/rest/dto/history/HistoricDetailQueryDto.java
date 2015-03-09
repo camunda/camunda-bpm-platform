@@ -37,6 +37,7 @@ public class HistoricDetailQueryDto extends AbstractQueryDto<HistoricDetailQuery
   private static final String SORT_BY_VARIABLE_REVISION = "variableRevision";
   private static final String SORT_BY_FORM_PROPERTY_ID = "formPropertyId";
   private static final String SORT_BY_TIME = "time";
+  private static final String SORT_PARTIALLY_BY_OCCURENCE = "occurrence";
 
   private static final List<String> VALID_SORT_BY_VALUES;
   static {
@@ -47,6 +48,7 @@ public class HistoricDetailQueryDto extends AbstractQueryDto<HistoricDetailQuery
     VALID_SORT_BY_VALUES.add(SORT_BY_VARIABLE_REVISION);
     VALID_SORT_BY_VALUES.add(SORT_BY_FORM_PROPERTY_ID);
     VALID_SORT_BY_VALUES.add(SORT_BY_TIME);
+    VALID_SORT_BY_VALUES.add(SORT_PARTIALLY_BY_OCCURENCE);
   }
 
   protected String processInstanceId;
@@ -175,6 +177,8 @@ public class HistoricDetailQueryDto extends AbstractQueryDto<HistoricDetailQuery
       query.orderByFormPropertyId();
     } else if (sortBy.equals(SORT_BY_TIME)) {
       query.orderByTime();
+    } else if (sortBy.equals(SORT_PARTIALLY_BY_OCCURENCE)) {
+      query.orderPartiallyByOccurrence();
     }
   }
 

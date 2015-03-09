@@ -39,6 +39,7 @@ public class HistoricActivityInstanceQueryDto extends AbstractQueryDto<HistoricA
   private static final String SORT_BY_HISTORIC_ACTIVITY_INSTANCE_END_TIME_VALUE = "endTime";
   private static final String SORT_BY_HISTORIC_ACTIVITY_INSTANCE_DURATION_VALUE = "duration";
   private static final String SORT_BY_PROCESS_DEFINITION_ID_VALUE = "definitionId";
+  private static final String SORT_PARTIALLY_BY_OCCURRENCE = "occurrence";
 
   private static final List<String> VALID_SORT_BY_VALUES;
   static {
@@ -53,6 +54,7 @@ public class HistoricActivityInstanceQueryDto extends AbstractQueryDto<HistoricA
     VALID_SORT_BY_VALUES.add(SORT_BY_HISTORIC_ACTIVITY_INSTANCE_END_TIME_VALUE);
     VALID_SORT_BY_VALUES.add(SORT_BY_HISTORIC_ACTIVITY_INSTANCE_DURATION_VALUE);
     VALID_SORT_BY_VALUES.add(SORT_BY_PROCESS_DEFINITION_ID_VALUE);
+    VALID_SORT_BY_VALUES.add(SORT_PARTIALLY_BY_OCCURRENCE);
   }
 
   private String activityInstanceId;
@@ -243,6 +245,8 @@ public class HistoricActivityInstanceQueryDto extends AbstractQueryDto<HistoricA
       query.orderByHistoricActivityInstanceEndTime();
     } else if (sortBy.equals(SORT_BY_HISTORIC_ACTIVITY_INSTANCE_DURATION_VALUE)) {
       query.orderByHistoricActivityInstanceDuration();
+    } else if (sortBy.equals(SORT_PARTIALLY_BY_OCCURRENCE)) {
+      query.orderPartiallyByOccurrence();
     }
   }
 

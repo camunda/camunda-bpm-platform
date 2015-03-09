@@ -268,6 +268,16 @@ public abstract class AbstractHistoricJobLogRestServiceQueryTest extends Abstrac
     executeAndVerifySorting("deploymentId", "desc", Status.OK);
     inOrder.verify(mockedQuery).orderByDeploymentId();
     inOrder.verify(mockedQuery).desc();
+
+    inOrder = Mockito.inOrder(mockedQuery);
+    executeAndVerifySorting("occurrence", "asc", Status.OK);
+    inOrder.verify(mockedQuery).orderPartiallyByOccurrence();
+    inOrder.verify(mockedQuery).asc();
+
+    inOrder = Mockito.inOrder(mockedQuery);
+    executeAndVerifySorting("occurrence", "desc", Status.OK);
+    inOrder.verify(mockedQuery).orderPartiallyByOccurrence();
+    inOrder.verify(mockedQuery).desc();
   }
 
   @Test

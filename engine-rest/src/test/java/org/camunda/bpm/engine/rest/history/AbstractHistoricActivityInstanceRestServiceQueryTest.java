@@ -241,6 +241,16 @@ public abstract class AbstractHistoricActivityInstanceRestServiceQueryTest exten
     executeAndVerifySorting("definitionId", "desc", Status.OK);
     inOrder.verify(mockedQuery).orderByProcessDefinitionId();
     inOrder.verify(mockedQuery).desc();
+
+    inOrder = Mockito.inOrder(mockedQuery);
+    executeAndVerifySorting("occurrence", "asc", Status.OK);
+    inOrder.verify(mockedQuery).orderPartiallyByOccurrence();
+    inOrder.verify(mockedQuery).asc();
+
+    inOrder = Mockito.inOrder(mockedQuery);
+    executeAndVerifySorting("occurrence", "desc", Status.OK);
+    inOrder.verify(mockedQuery).orderPartiallyByOccurrence();
+    inOrder.verify(mockedQuery).desc();
   }
 
   @Test

@@ -43,6 +43,7 @@ public class HistoricJobLogQueryDto extends AbstractQueryDto<HistoricJobLogQuery
   protected static final String SORT_BY_PROCESS_DEFINITION_ID = "processDefinitionId";
   protected static final String SORT_BY_PROCESS_DEFINITION_KEY = "processDefinitionKey";
   protected static final String SORT_BY_DEPLOYMENT_ID = "deploymentId";
+  protected static final String SORT_PARTIALLY_BY_OCCURRENCE = "occurrence";
 
   protected static final List<String> VALID_SORT_BY_VALUES;
   static {
@@ -59,6 +60,7 @@ public class HistoricJobLogQueryDto extends AbstractQueryDto<HistoricJobLogQuery
     VALID_SORT_BY_VALUES.add(SORT_BY_PROCESS_DEFINITION_ID);
     VALID_SORT_BY_VALUES.add(SORT_BY_PROCESS_DEFINITION_KEY);
     VALID_SORT_BY_VALUES.add(SORT_BY_DEPLOYMENT_ID);
+    VALID_SORT_BY_VALUES.add(SORT_PARTIALLY_BY_OCCURRENCE);
   }
 
   protected String id;
@@ -261,6 +263,8 @@ public class HistoricJobLogQueryDto extends AbstractQueryDto<HistoricJobLogQuery
       query.orderByProcessDefinitionKey();
     } else if (sortBy.equals(SORT_BY_DEPLOYMENT_ID)) {
       query.orderByDeploymentId();
+    } else if (sortBy.equals(SORT_PARTIALLY_BY_OCCURRENCE)) {
+      query.orderPartiallyByOccurrence();
     }
   }
 
