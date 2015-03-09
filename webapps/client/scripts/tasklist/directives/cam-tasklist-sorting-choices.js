@@ -47,6 +47,7 @@ define([
       controller: [function () {}],
 
       link: function(scope, element) {
+        var $bdy = angular.element('body');
         var $newSort = element.find('.new-sort .dropdown-menu');
 
         var sorting = {
@@ -62,19 +63,30 @@ define([
         scope.sortedOn = [];
 
         function updateBodyClass() {
-          element.css('height', 'auto');
-          var height = element.height();
-          var columnTop = element.parent();
-          columnTop.height(height);
-          var columnTopHeight = height;//columnTop.outerHeight();
-
           var columns = element.parents('.columns');
           var headers = columns.find('.cell.top');
           var bodies = columns.find('.cell.content');
+          var shown = $bdy.hasClass('list-column-close');
+
+          element.css('height', 'auto');
+
+          if (shown) {
+            var minHeight = parseInt(headers.css('min-height'), 10);
+            headers.css('height', minHeight);
+            bodies.css('top', minHeight);
+            return;
+          }
+
+          var height = element.height();
+          var columnTop = element.parent();
+          columnTop.height(height);
+          var columnTopHeight = height;
 
           headers.height(columnTopHeight);
           bodies.css('top', columnTopHeight + 30);
         }
+
+        scope.$on('layout:change', updateBodyClass);
 
         scope.uniqueProps = {
           priority:               $translate.instant('PRIORITY'),

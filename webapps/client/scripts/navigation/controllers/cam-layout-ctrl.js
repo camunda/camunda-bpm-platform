@@ -9,8 +9,10 @@ define([
 
   return [
     '$scope',
+    '$timeout',
   function(
-    $scope
+    $scope,
+    $timeout
   ) {
     $scope.toggleVariableSearch = function($event) {
       if ($event && $event.preventDefault) {
@@ -60,6 +62,9 @@ define([
       }
 
       $bdy.toggleClass(target +'-column-close');
+      $timeout(function () {
+        $scope.$root.$broadcast('layout:change');
+      }, 600);
     };
 
     $scope.maximizeRegion = function($event) {
