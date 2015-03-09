@@ -94,6 +94,14 @@ module.exports = function(config) {
             '*.{eot,ttf,svg,woff}'
           ],
           dest: '<%= buildTarget %>/fonts/'
+        },
+
+        // placeholder shims
+        {
+          expand: true,
+          cwd: 'node_modules/camunda-commons-ui/vendor',
+          src: ['placeholders.*'],
+          dest: '<%= buildTarget %>/scripts/'
         }
       ]
     },
