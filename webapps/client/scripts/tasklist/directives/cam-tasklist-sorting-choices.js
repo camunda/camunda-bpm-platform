@@ -145,7 +145,7 @@ define([
               return returned;
             });
 
-            updateBodyClass(0);
+            updateBodyClass();
 
             if (!scope.sortings.length) {
               scope.addSorting('created');
@@ -185,6 +185,14 @@ define([
           }
         });
 
+        scope.newSortingToggle = function (open) {
+          if (open) {
+            var newSortingScope = element.find('[sorting="newSorting"]').scope();
+            newSortingScope.$parent.focusedOn = null;
+            newSortingScope.sorting = {};
+          }
+        };
+
 
         // should NOT manipulate the `scope.sortings`!
         scope.updateSortings = function () {
@@ -205,7 +213,7 @@ define([
          * Invoked when adding a sorting object
          */
         scope.addSorting = function (by, order) {
-          updateBodyClass(1);
+          updateBodyClass();
           order = order || 'desc';
 
           var newSorting = angular.copy(sorting);
@@ -219,7 +227,7 @@ define([
          * Invoked when removing a sorting object
          */
         scope.removeSorting = function (index) {
-          updateBodyClass(-1);
+          updateBodyClass();
 
           var newSortings = [];
           scope.sortings.forEach(function (sorting, i) {
