@@ -7,53 +7,64 @@ camunda-bpm-webapp/webapp/src/main/webapp/develop/invoice/invoice-assign-approve
     <div class="panel panel-info">Who should approve this invoice?</div>
 
     <div class="form-group">
-        <label class="control-label">Creditor</label>
-        <div class="controls">
-            <input cam-variable-name="creditor"
-                   type="text"
-                   name="creditor"
-                   readonly="true"
-                   class="form-control" />
-        </div>
+      <label for="input-1"
+             class="control-label col-xs-3">Creditor</label>
+      <div class="col-xs-9">
+        <input cam-variable-name="creditor"
+               id="input-1"
+               type="text"
+               name="creditor"
+               readonly="true"
+               class="form-control" />
+      </div>
     </div>
+
     <div class="form-group">
-        <label class="control-label">Amount</label>
-        <div class="controls">
-            <input cam-variable-name="amount"
-                   type="text"
-                   name="amount"
-                   readonly="true"
-                   class="form-control" />
-        </div>
+      <label for="input-2"
+             class="control-label col-xs-3">Amount</label>
+      <div class="col-xs-9">
+        <input cam-variable-name="amount"
+               id="input-2"
+               type="text"
+               name="amount"
+               readonly="true"
+               class="form-control" />
+      </div>
     </div>
+
     <div class="form-group">
-        <label class="control-label">Invoice Number</label>
-        <div class="controls">
-            <input cam-variable-name="invoiceNumber"
-                   type="text"
-                   name="invoiceNumber"
-                   readonly="true"
-                   class="form-control" />
-        </div>
+      <label for="input-3"
+             class="control-label col-xs-3">Invoice Number</label>
+      <div class="col-xs-9">
+        <input cam-variable-name="invoiceNumber"
+               id="input-3"
+               type="text"
+               name="invoiceNumber"
+               readonly="true"
+               class="form-control" />
+      </div>
     </div>
+
     <div class="form-group">
-        <label class="control-label">Approver: </label>
-        <div class="controls">
-            <select cam-variable-name="approver"
-                    cam-variable-type="String"
-                    type="text"
-                    name="approver"
-                    class="form-control"
-                    required>
-                <option></option>
-                <option value="jonny1">Jonny</option>
-                <option value="demo">Demo</option>
-                <option value="john">John</option>
-                <option value="peter">Peter</option>
-                <option value="mary">Mary</option>
-            </select>
-            <p>Who should approve this invoice?</p>
-        </div>
+      <label for="input-4"
+             class="control-label col-xs-3">Approver: </label>
+      <div class="col-xs-9">
+        <select cam-variable-name="approver"
+                cam-variable-type="String"
+                id="input-4"
+                type="text"
+                name="approver"
+                class="form-control"
+                required>
+          <option></option>
+          <option value="jonny1">Jonny</option>
+          <option value="demo">Demo</option>
+          <option value="john">John</option>
+          <option value="peter">Peter</option>
+          <option value="mary">Mary</option>
+        </select>
+        <p>Who should approve this invoice?</p>
+      </div>
     </div>
 
     <!-- Example of script inclusion in a embedded form -->

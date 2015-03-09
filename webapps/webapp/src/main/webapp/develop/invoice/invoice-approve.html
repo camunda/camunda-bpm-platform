@@ -4,9 +4,11 @@
     <div class="panel panel-info">Who should approve this invoice?</div>
 
     <div class="form-group">
-        <label class="control-label">Creditor</label>
-        <div class="controls">
+        <label for="input-1"
+               class="control-label col-xs-3">Creditor</label>
+        <div class="col-xs-9">
             <input cam-variable-name="creditor"
+                   id="input-1"
                    type="text"
                    name="creditor"
                    readonly="true"
@@ -14,9 +16,11 @@
         </div>
     </div>
     <div class="form-group">
-        <label class="control-label">Amount</label>
-        <div class="controls">
+        <label for="input-2"
+               class="control-label col-xs-3">Amount</label>
+        <div class="col-xs-9">
             <input cam-variable-name="amount"
+                   id="input-2"
                    type="text"
                    name="amount"
                    readonly="true"
@@ -24,9 +28,11 @@
         </div>
     </div>
     <div class="form-group">
-        <label class="control-label">Invoice Number</label>
-        <div class="controls">
+        <label for="input-3"
+               class="control-label col-xs-3">Invoice Number</label>
+        <div class="col-xs-9">
             <input cam-variable-name="invoiceNumber"
+                   id="input-3"
                    type="text"
                    name="invoiceNumber"
                    readonly="true"
@@ -34,11 +40,13 @@
         </div>
     </div>
     <div class="form-group">
-        <label class="control-label">Do you approve?</label>
-        <div class="controls">
+        <label for="input-4"
+               class="control-label col-xs-3">Do you approve?</label>
+        <div class="col-xs-9">
             <input cam-variable-name="approved"
                    cam-variable-type="Boolean"
                    type="checkbox"
+                   id="input-4"
                    name="approved"
                    class="form-control" />
             (yes/no)
