@@ -1,5 +1,8 @@
+'use strict';
+
 var chai     = require('chai');
 var promised = require('chai-as-promised');
+
 chai.use(promised);
 global.expect   = chai.expect;
 
@@ -7,7 +10,7 @@ exports.config = {
 
   // The timeout for each script run on the browser. This should be longer
   // than the maximum time your application needs to stabilize between tasks.
-  allScriptsTimeout: 11000,
+  allScriptsTimeout: 15000,
 
   // Capabilities to be passed to the webdriver instance.
   capabilities: {
@@ -28,7 +31,7 @@ exports.config = {
     'admin/specs/system-spec.js',
     'admin/specs/authorizations-spec.js',
     'cockpit/specs/dashboard-spec.js',
-    'tasklist/specs/tasklist-task-spec.js',
+    'tasklist/specs/tasklist-search-spec.js',
     'tasklist/specs/tasklist-sorting-spec.js'
   ],
 
@@ -51,7 +54,7 @@ exports.config = {
   mochaOpts: {
     timeout: 15000,
     colors: false,
-    reporter: "xunit-file",
+    reporter: 'xunit-file',
     slow: 3000
   }
 };

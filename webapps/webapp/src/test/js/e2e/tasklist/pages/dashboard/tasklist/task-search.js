@@ -11,18 +11,36 @@ module.exports = Page.extend({
     return element(by.css('[cam-widget-search]'));
   },
 
-  createSearch: function(type, name, operator, value) {
-    this.formElement().click();
-    this.formElement().element(by.cssContainingText('ul > li', type)).click();
-    this.formElement().element(by.css('input')).sendKeys(name, protractor.Key.ENTER);
-    this.formElement().element(by.css('[cam-widget-inline-field][value="operator.value"]')).click();
-    this.formElement().element(by.cssContainingText('ul > li', operator)).click();
-    this.formElement().element(by.css('[cam-widget-inline-field][value="value.value"]')).click();
-    this.formElement().element(by.css('input')).sendKeys(value, protractor.Key.ENTER);
+  searchList: function() {
+    return this.formElement().all(by.repeater('search in searches'));
   },
 
-  deleteSearch: function(idx) {
-    this.formElement().all(by.css('[cam-widget-search-pill]')).get(idx).element(by.css('.remove-search')).click();
+  createSearch: function(type, name, operator, value) {
+    this.formElement().element(by.css('.main-field')).click();
+    this.formElement().element(by.cssContainingText('ul > li', type)).click();
+    this.searchList().last().element(by.model('editValue')).sendKeys(name, protractor.Key.ENTER);
+    this.searchList().last().element(by.model('editValue')).sendKeys(value, protractor.Key.ENTER);
+    this.searchList().last().element(by.css('[value="operator.value"]')).click();
+    this.searchList().last().element(by.cssContainingText('[value="operator.value"] .dropdown-menu li', operator)).click();
+  },
+
+  deleteSearch: function(index) {
+    this.searchList().get(index).element(by.css('.remove-search')).click();
+  },
+
+  changeType: function(index, type) {
+    this.searchList().get(index).element(by.css('[cam-widget-inline-field][value="type.value"]')).click();
+    this.searchList().get(index).element(by.cssContainingText('ul > li', type)).click();
+  },
+
+  changeOperator: function(index, operator) {
+    this.searchList().get(index).element(by.css('[cam-widget-inline-field][value="operator.value"]')).click();
+    this.searchList().get(index).element(by.cssContainingText('ul > li', operator)).click();
+  },
+
+  changeValue: function(index, value) {
+    this.searchList().get(index).element(by.css('[cam-widget-inline-field][value="value.value"]')).click();
+    this.searchList().get(index).element(by.cssContainingText('ul > li', value)).click();
   }
 
 });
