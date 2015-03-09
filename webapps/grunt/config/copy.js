@@ -101,6 +101,14 @@ module.exports = function(config) {
           cwd: '<%= pkg.gruntConfig.clientDir %>/styles',
           src: ['*.css'],
           dest: '<%= buildTarget %>/styles/'
+        },
+
+        // placeholder shims
+        {
+          expand: true,
+          cwd: 'node_modules/camunda-commons-ui/vendor',
+          src: ['placeholders.*'],
+          dest: '<%= buildTarget %>/scripts/'
         }
       ]
     },

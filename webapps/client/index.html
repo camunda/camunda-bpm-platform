@@ -29,11 +29,6 @@
         type="text/css"
         href="$APP_ROOT/app/tasklist/styles/user-styles.css">
 
-  <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
-  <!--[if lt IE 9]>
-  <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
-  <![endif]-->
-
   <!-- favicon -->
   <link rel="shortcut icon"
         href="$APP_ROOT/app/tasklist/images/favicon.ico"
@@ -93,6 +88,15 @@
   <script type="text/javascript"
           src="$APP_ROOT/app/tasklist/scripts/deps.js"
           data-main="$APP_ROOT/app/tasklist/scripts/camunda-tasklist-ui"></script>
+
+  <!--[if lte IE 9]>
+  <script type="text/javascript"
+          src="$APP_ROOT/app/tasklist/scripts/placeholders.utils.js"></script>
+  <script type="text/javascript"
+          src="$APP_ROOT/app/tasklist/scripts/placeholders.main.js"></script>
+  <script type="text/javascript"
+          src="$APP_ROOT/app/tasklist/scripts/placeholders.jquery.js"></script>
+  <![endif]-->
 
   <!-- #production-remove -->
   <script type="text/javascript">
