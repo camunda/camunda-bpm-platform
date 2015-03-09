@@ -87,15 +87,16 @@ public class StartProcessInstanceByMessageAndProcessDefinitionIdCmd implements C
   
   private String findStartActivityIdByMessage(ProcessDefinitionEntity processDefinition){
 	  for (EventSubscriptionDeclaration declaration : EventSubscriptionDeclaration.getDeclarationsForScope(processDefinition)) {
-		  if(isMessageEventDeclaration(declaration) && messageName.equals(declaration.getEventName())) {
+		  if(isMessageStartEventWithName(declaration, messageName)) {
 			  return declaration.getActivityId();
 		  }
 		} 
 	  return null;
   }
 
-  private boolean isMessageEventDeclaration(EventSubscriptionDeclaration declaration) {
-	return MessageEventHandler.EVENT_HANDLER_TYPE.equals(declaration.getEventType()) ;
+  private boolean isMessageStartEventWithName(EventSubscriptionDeclaration declaration, String messageName) {
+	return MessageEventHandler.EVENT_HANDLER_TYPE.equals(declaration.getEventType()) 
+			&& declaration.isStartEvent() && messageName.equals(declaration.getEventName());
   }
 
 }
