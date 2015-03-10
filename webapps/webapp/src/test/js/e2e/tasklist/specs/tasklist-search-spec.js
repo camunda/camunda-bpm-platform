@@ -88,7 +88,7 @@ describe('Tasklist Search', function() {
     it('should add String search and find one task', function(done) {
 
       // when
-      page.taskList.taskSearch.createSearch('Task Variable', 'testString', 'like', '%hans%');
+      page.taskList.taskSearch.createSearch('Task Variable', 'testString', 'like', 'hans');
 
       // then
       expect(page.taskList.taskList().count()).to.eventually.eql(1);
@@ -140,5 +140,4 @@ describe('Tasklist Search', function() {
     });
 
   });
-
 });
