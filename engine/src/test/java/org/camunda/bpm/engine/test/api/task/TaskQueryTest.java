@@ -1398,6 +1398,52 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     filterService.deleteFilter(filter.getId());
   }
 
+  public void testQueryOrderByTaskName() {
+
+    // asc
+    List<Task> tasks = taskService.createTaskQuery()
+      .orderByTaskName()
+      .asc()
+      .list();
+    assertEquals(12, tasks.size());
+
+
+    List<String> taskNames = getTaskNamesFromTasks(tasks);
+    assertEquals("accountancy description", taskNames.get(0));
+    assertEquals("accountancy description", taskNames.get(1));
+    assertEquals("gonzoTask", taskNames.get(2));
+    assertEquals("managementAndAccountancyTask", taskNames.get(3));
+    assertEquals("managementTask", taskNames.get(4));
+    assertEquals("managementTask", taskNames.get(5));
+    assertEquals("testTask", taskNames.get(6));
+    assertEquals("testTask", taskNames.get(7));
+    assertEquals("testTask", taskNames.get(8));
+    assertEquals("testTask", taskNames.get(9));
+    assertEquals("testTask", taskNames.get(10));
+    assertEquals("testTask", taskNames.get(11));
+
+    // desc
+    tasks = taskService.createTaskQuery()
+      .orderByTaskName()
+      .desc()
+      .list();
+    assertEquals(12, tasks.size());
+
+    taskNames = getTaskNamesFromTasks(tasks);
+    assertEquals("testTask", taskNames.get(0));
+    assertEquals("testTask", taskNames.get(1));
+    assertEquals("testTask", taskNames.get(2));
+    assertEquals("testTask", taskNames.get(3));
+    assertEquals("testTask", taskNames.get(4));
+    assertEquals("testTask", taskNames.get(5));
+    assertEquals("managementTask", taskNames.get(6));
+    assertEquals("managementTask", taskNames.get(7));
+    assertEquals("managementAndAccountancyTask", taskNames.get(8));
+    assertEquals("gonzoTask", taskNames.get(9));
+    assertEquals("accountancy description", taskNames.get(10));
+    assertEquals("accountancy description", taskNames.get(11));
+  }
+
   public List<String> getTaskNamesFromTasks(List<Task> tasks) {
     List<String> names = new ArrayList<String>();
     for (Task task : tasks) {
