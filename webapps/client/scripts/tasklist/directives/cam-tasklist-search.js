@@ -81,7 +81,7 @@ define([
             query[search.type.value.key].push({
               name: search.name.value,
               operator: search.operator.value.key,
-              value: sanitizeValue(parseValue(search.value.value, search.operator.value.key))
+              value: sanitizeValue(parseValue(search.value.value), search.operator.value.key)
             });
           });
 
