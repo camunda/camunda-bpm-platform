@@ -283,21 +283,11 @@
     <profile>
       <id>check-sql</id>
 
-      <properties>
-        <h2.server.port>18080</h2.server.port>
-      </properties>
-
       <build>
         <plugins>
           <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>sql-maven-plugin</artifactId>
-            <configuration>
-              <driver>org.h2.Driver</driver>
-              <url>jdbc:h2:${project.basedir}/target/h2/process-engine;MVCC=TRUE;AUTO_SERVER=TRUE;AUTO_SERVER_PORT=${h2.server.port}</url>
-              <username>sa</username>
-              <password>sa</password>
-            </configuration>
             <executions>
               <execution>
                 <id>create-engine</id>
@@ -307,7 +297,7 @@
                 </goals>
                 <configuration>
                   <srcFiles>
-                    <srcFile>${project.build.directory}/sql/create/h2_engine_${project.version}.sql</srcFile>
+                    <srcFile>${project.build.directory}/sql/create/${database.type}_engine_${project.version}.sql</srcFile>
                   </srcFiles>
                   <autocommit>true</autocommit>
                 </configuration>
@@ -320,7 +310,7 @@
                 </goals>
                 <configuration>
                   <srcFiles>
-                    <srcFile>${project.build.directory}/sql/create/h2_identity_${project.version}.sql</srcFile>
+                    <srcFile>${project.build.directory}/sql/create/${database.type}_identity_${project.version}.sql</srcFile>
                   </srcFiles>
                   <autocommit>true</autocommit>
                 </configuration>
@@ -333,7 +323,7 @@
                 </goals>
                 <configuration>
                   <srcFiles>
-                    <srcFile>${project.build.directory}/sql/drop/h2_engine_${project.version}.sql</srcFile>
+                    <srcFile>${project.build.directory}/sql/drop/${database.type}_engine_${project.version}.sql</srcFile>
                   </srcFiles>
                   <autocommit>true</autocommit>
                 </configuration>
@@ -346,7 +336,7 @@
                 </goals>
                 <configuration>
                   <srcFiles>
-                    <srcFile>${project.build.directory}/sql/drop/h2_identity_${project.version}.sql</srcFile>
+                    <srcFile>${project.build.directory}/sql/drop/${database.type}_identity_${project.version}.sql</srcFile>
                   </srcFiles>
                   <autocommit>true</autocommit>
                 </configuration>
