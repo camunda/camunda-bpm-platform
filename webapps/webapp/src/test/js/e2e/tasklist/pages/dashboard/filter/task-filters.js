@@ -12,6 +12,10 @@ module.exports = Page.extend({
     return this.formElement().all(by.repeater('(delta, filter) in filters'));
   },
 
+  filterListInfoText: function() {
+    return this.formElement().getText();
+  },
+
   findFilter: function(filterName) {
 
     this.filterList().then(function(arr) {
@@ -39,11 +43,12 @@ module.exports = Page.extend({
   },
 
   isFilterSelected: function(item) {
-    expect(this.filterStatus(item)).toMatch('active');
-  },
-
-  isFilterNotSelected: function(item) {
-    expect(this.filterStatus(item)).not.toMatch('active');
+    return this.filterStatus(item).then(function(matcher) {
+      if (matcher.indexOf('active') !== -1) {
+        return true;
+      }
+      return false;
+    });
   },
 
   filterNameElement: function(item) {
@@ -55,7 +60,7 @@ module.exports = Page.extend({
   },
 
   filterDescriptionElement: function(item) {
-    protractor.getInstance().actions().mouseMove(this.filterNameElement(item)).perform();
+    browser.actions().mouseMove(this.filterNameElement(item)).perform();
 
     browser.sleep(1000);
 

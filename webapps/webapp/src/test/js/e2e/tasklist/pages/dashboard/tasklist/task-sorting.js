@@ -51,7 +51,7 @@ module.exports = Page.extend({
   },
 
   sortingSelectionListElement: function(index, sortingType) {
-    return this.sortingList().get(index).element(by.css('.dropdown-menu')).element(by.cssContainingText('a.ng-scope', sortingType));
+    return this.sortingList().get(index).element(by.css('.sorting-choice .dropdown-menu')).element(by.cssContainingText('a.ng-scope', sortingType));
   },
 
   newSortingSelectionListElement: function(sortingType) {
