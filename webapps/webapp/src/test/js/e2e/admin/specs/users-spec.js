@@ -271,7 +271,7 @@ describe('Admin Users Spec', function() {
   });
 
 
-  describe('add/delete group', function() {
+  describe.only('add/delete group', function() {
 
     before(function() {
       return testHelper(setupFile, function() {
@@ -367,15 +367,24 @@ describe('Admin Users Spec', function() {
         });
       });
 
-      beforeEach(function() {
+
+      it('should validate group selection modal', function() {
+
+        // given
         usersPage.editUserGroups.navigateTo({ user: users[2].id });
+
+        // when
+        usersPage.editUserGroups.addGroupButton().click();
+
+        // then
+        expect(usersPage.editUserGroups.selectGroup.groupId(0).getText()).to.eventually.eql('/göäüp_name');
+        expect(usersPage.editUserGroups.selectGroup.groupId(1).getText()).to.eventually.eql('\\göäüp_name');
       });
 
 
       it('should add slash group', function() {
 
         // when
-        usersPage.editUserGroups.addGroupButton().click();
         usersPage.editUserGroups.selectGroup.addGroup(0);
 
         // then
@@ -384,10 +393,22 @@ describe('Admin Users Spec', function() {
       });
 
 
-      it('should add backslash group', function() {
+      it('should open group selection modal and validate the rest', function() {
+
+        // given
+        usersPage.editUserGroups.navigateTo({ user: users[2].id });
 
         // when
         usersPage.editUserGroups.addGroupButton().click();
+
+        // then
+        expect(usersPage.editUserGroups.selectGroup.groupId(0).getText()).to.eventually.eql('\\göäüp_name');
+      });
+
+
+      it('should add backslash group', function() {
+
+        // when
         usersPage.editUserGroups.selectGroup.addGroup(0);
 
         // then

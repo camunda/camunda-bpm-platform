@@ -37,10 +37,11 @@ module.exports = Page.extend({
   },
 
   addGroup: function(item) {
+    var that = this;
     this.selectGroup(item);
-    this.addSelectedGroupButton().click();
-
-    this.okButton().click();
+    this.addSelectedGroupButton().click().then(function() {
+      that.okButton().click();
+    });
   }
 
 });
