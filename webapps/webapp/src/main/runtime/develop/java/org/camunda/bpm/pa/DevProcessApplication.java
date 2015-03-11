@@ -170,6 +170,8 @@ public class DevProcessApplication extends ServletProcessApplication {
     runtimeService.startProcessInstanceByKey("changeVariablesProcess");
     runtimeService.startProcessInstanceByKey("changeVariablesProcess");
 
+    runtimeService.startProcessInstanceByKey("asyncAfter");
+
     ClockUtil.reset();
 
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("changeVariablesProcess");
