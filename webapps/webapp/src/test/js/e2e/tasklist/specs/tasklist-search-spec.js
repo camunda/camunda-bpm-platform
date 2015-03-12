@@ -85,7 +85,7 @@ describe('Tasklist Search', function() {
     });
 
 
-    it('should add String search and find one task', function(done) {
+    it('should add String search and find Task 2', function(done) {
 
       // when
       page.taskList.taskSearch.createSearch('Task Variable', 'testString', 'like', 'hans');
@@ -93,6 +93,17 @@ describe('Tasklist Search', function() {
       // then
       expect(page.taskList.taskList().count()).to.eventually.eql(1);
       expect(page.taskList.taskName(0)).to.eventually.eql('Task 2');
+    });
+
+
+    xit('should change String search value and find Task 3', function(done) {
+
+      // when
+      page.taskList.taskSearch.changeValue(2, '4711');
+
+      // then
+      expect(page.taskList.taskList().count()).to.eventually.eql(1);
+      expect(page.taskList.taskName(0)).to.eventually.eql('Task 3');
     });
 
 

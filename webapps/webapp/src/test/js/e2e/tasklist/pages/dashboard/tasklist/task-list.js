@@ -12,6 +12,10 @@ module.exports = Page.extend({
     return this.formElement().all(by.repeater('(delta, task) in tasks'));
   },
 
+  taskListInfoText: function() {
+    return this.formElement().getText();
+  },
+
   selectTask: function(item) {
     this.taskList().get(item).element(by.binding('task.name')).click();
   },

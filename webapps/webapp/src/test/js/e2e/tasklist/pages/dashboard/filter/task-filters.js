@@ -79,7 +79,7 @@ module.exports = Page.extend({
 
     browser.sleep(1000);
 
-    protractor.getInstance().actions().mouseMove(this.filterNameElement(item)).perform();
+    browser.actions().mouseMove(this.filterNameElement(item)).perform();
 
     browser.sleep(1000);
 

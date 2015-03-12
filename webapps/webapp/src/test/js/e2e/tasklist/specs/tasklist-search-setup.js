@@ -93,6 +93,12 @@ ops.task = {
       varId: 'testString',
       value: 'asdfhans dampf',
       type: 'String'
-    }
+    },
+    {
+      id: '3',
+      varId: 'testString',
+      value: '4711',
+      type: 'String'
+    },
   ]
 };
