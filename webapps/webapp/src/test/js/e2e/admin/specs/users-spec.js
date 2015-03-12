@@ -271,7 +271,7 @@ describe('Admin Users Spec', function() {
   });
 
 
-  describe.only('add/delete group', function() {
+  describe('add/delete group', function() {
 
     before(function() {
       return testHelper(setupFile, function() {
