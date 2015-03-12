@@ -27,8 +27,12 @@
     margin-top: @padding-base-horizontal;
   }
 
-  .search-results {
+  .search-results-sorting {
     margin-top: @grid-gutter-width;
+    margin-bottom: 0;
+  }
+  .search-results {
+    margin-top: 0;
     margin-bottom: 0;
   }
 
@@ -102,7 +106,6 @@
 }
 
 .tile-body {
-  padding: @padding-base-vertical;
   height: 218px;
   border: 1px solid @breadcrumb-color;
   text-align: center;
@@ -147,9 +150,20 @@ span {
 
 table {
   th {
-    &.state {
-      width: 70px;
+    &.start-time,
+    &.end-time {
+      width: 150px;
     }
+    &.sorting {
+      text-align: right;
+    }
+  }
+  td.definitionId {
+    .monospaced;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    text-align: right;
   }
 }
 
@@ -159,4 +173,8 @@ table.processes-list {
       width: 150px;
     }
   }
+}
+
+.search-results-sorting {
+  text-align: right;
 }
