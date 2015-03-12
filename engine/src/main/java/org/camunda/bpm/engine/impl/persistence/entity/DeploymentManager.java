@@ -61,8 +61,7 @@ public class DeploymentManager extends AbstractManager {
         String processDefinitionId = processDefinition.getId();
 
         getProcessInstanceManager()
-          .deleteProcessInstancesByProcessDefinition(processDefinitionId, "deleted deployment", cascade, skipCustomListeners);
-
+          .deleteProcessInstancesByProcessDefinition(processDefinitionId, "deleted deployment", true, skipCustomListeners);
       }
     }
 
@@ -89,6 +88,7 @@ public class DeploymentManager extends AbstractManager {
 
         // remove historic op log entries which are not related to a process instance
         getUserOperationLogManager().deleteOperationLogEntriesByProcessDefinitionId(processDefinitionId);
+        getUserOperationLogManager().deleteOperationLogEntriesByProcessDefinitionKey(processDefinition.getKey());
       }
     }
 
@@ -141,7 +141,7 @@ public class DeploymentManager extends AbstractManager {
           String caseDefinitionId = caseDefinition.getId();
 
           getCaseInstanceManager()
-            .deleteCaseInstancesByCaseDefinition(caseDefinitionId, "deleted deployment", cascade);
+            .deleteCaseInstancesByCaseDefinition(caseDefinitionId, "deleted deployment", true);
 
         }
       }

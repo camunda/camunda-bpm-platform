@@ -20,6 +20,12 @@ ALTER TABLE ACT_HI_CASEINST
 ALTER TABLE ACT_HI_CASEACTINST
   ADD REQUIRED_ smallint check(REQUIRED_ in (1,0));
 
+ALTER TABLE ACT_HI_OP_LOG
+  ADD JOB_ID_ varchar(64);
+
+ALTER TABLE ACT_HI_OP_LOG
+  ADD JOB_DEF_ID_ varchar(64);
+
 create table ACT_HI_JOB_LOG (
     ID_ varchar(64) not null,
     TIMESTAMP_ timestamp not null,

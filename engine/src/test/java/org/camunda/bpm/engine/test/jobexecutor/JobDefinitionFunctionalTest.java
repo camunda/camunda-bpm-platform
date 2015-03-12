@@ -19,6 +19,7 @@ import org.camunda.bpm.engine.impl.cmd.SuspendJobDefinitionCmd;
 import org.camunda.bpm.engine.impl.jobexecutor.AcquiredJobs;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.impl.test.TestHelper;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Job;
@@ -46,6 +47,8 @@ public class JobDefinitionFunctionalTest extends PluggableProcessEngineTestCase 
     assertNotNull(managementService.createJobQuery().suspended().singleResult());
     assertNull(managementService.createJobQuery().active().singleResult());
 
+    // clean up log
+    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/jobexecutor/simpleAsyncProcess.bpmn20.xml"})
@@ -83,6 +86,8 @@ public class JobDefinitionFunctionalTest extends PluggableProcessEngineTestCase 
     acquiredJobs = acquireJobs();
     assertEquals(1, acquiredJobs.size());
 
+    // clean up log
+    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
   @Deployment
@@ -115,6 +120,8 @@ public class JobDefinitionFunctionalTest extends PluggableProcessEngineTestCase 
 
     assertEquals(0, runtimeService.createProcessInstanceQuery().count());
 
+    // clean up log
+    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
 
@@ -159,6 +166,9 @@ public class JobDefinitionFunctionalTest extends PluggableProcessEngineTestCase 
     // then there are no optimistic locking exceptions
     assertNull(jobSuspensionThread.exception);
     assertNull(acquisitionThread.exception);
+
+    // clean up log
+    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/jobexecutor/simpleAsyncProcess.bpmn20.xml"})
@@ -199,6 +209,8 @@ public class JobDefinitionFunctionalTest extends PluggableProcessEngineTestCase 
     assertNull(jobSuspensionThread.exception);
     assertNull(executionthread.exception);
 
+    // clean up log
+    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/jobexecutor/JobDefinitionFunctionalTest.testRunningInstance.bpmn"})

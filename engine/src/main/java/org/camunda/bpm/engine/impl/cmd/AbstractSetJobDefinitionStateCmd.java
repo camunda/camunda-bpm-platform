@@ -19,10 +19,7 @@ import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerChangeJobDefinitionSuspensionStateJobHandler;
-import org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionManager;
-import org.camunda.bpm.engine.impl.persistence.entity.JobManager;
-import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
-import org.camunda.bpm.engine.impl.persistence.entity.TimerEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.*;
 import org.camunda.bpm.engine.runtime.Job;
 
 /**
@@ -30,6 +27,8 @@ import org.camunda.bpm.engine.runtime.Job;
  * @author roman.smirnov
  */
 public abstract class AbstractSetJobDefinitionStateCmd implements Command<Void>{
+
+  protected static final String SUSPENSION_STATE_PROPERTY = "suspensionState";
 
   protected String jobDefinitionId;
   protected String processDefinitionId;
@@ -52,22 +51,33 @@ public abstract class AbstractSetJobDefinitionStateCmd implements Command<Void>{
       throw new ProcessEngineException("Job definition id, process definition id nor process definition key cannot be null");
     }
 
+    SuspensionState suspensionState = getSuspensionState();
+
     if (executionDate == null) {
       // Job definition suspension state is changed now
-      updateSuspensionState(commandContext);
+      updateSuspensionState(commandContext, suspensionState);
     } else {
       // Job definition suspension state change is delayed
       scheduleSuspensionStateUpdate(commandContext);
     }
 
+    if(jobDefinitionId != null) {
+      JobDefinitionEntity jobDefinitionEntity = commandContext.getJobDefinitionManager().findById(jobDefinitionId);
+      processDefinitionId = jobDefinitionEntity.getProcessDefinitionId();
+      processDefinitionKey = jobDefinitionEntity.getProcessDefinitionKey();
+    }
+
+    PropertyChange propertyChange = new PropertyChange(SUSPENSION_STATE_PROPERTY, null, suspensionState.getName());
+    commandContext.getOperationLogManager().logJobDefinitionOperation(getLogEntryOperation(), jobDefinitionId,
+      processDefinitionId, processDefinitionKey, propertyChange);
+
     return null;
   }
 
-  private void updateSuspensionState(CommandContext commandContext) {
+  private void updateSuspensionState(CommandContext commandContext, SuspensionState suspensionState) {
     JobDefinitionManager jobDefinitionManager = commandContext.getJobDefinitionManager();
     JobManager jobManager = commandContext.getJobManager();
 
-    SuspensionState suspensionState = getSuspensionState();
 
     if (jobDefinitionId != null) {
       jobDefinitionManager.updateJobDefinitionSuspensionStateById(jobDefinitionId, suspensionState);
@@ -133,4 +143,5 @@ public abstract class AbstractSetJobDefinitionStateCmd implements Command<Void>{
    */
   protected abstract AbstractSetJobStateCmd getSetJobStateCmd();
 
+  protected abstract String getLogEntryOperation();
 }

@@ -36,6 +36,8 @@ public class UserOperationLogContext {
   protected List<PropertyChange> propertyChanges;
   protected String userId;
   protected String operationId;
+  protected String jobDefinitionId;
+  protected String jobId;
 
   public String getProcessDefinitionId() {
     return processDefinitionId;
@@ -139,5 +141,21 @@ public class UserOperationLogContext {
 
   public void setProcessDefinitionKey(String processDefinitionKey) {
     this.processDefinitionKey = processDefinitionKey;
+  }
+
+  public String getJobDefinitionId() {
+    return jobDefinitionId;
+  }
+
+  public void setJobDefinitionId(String jobDefinitionId) {
+    this.jobDefinitionId = jobDefinitionId;
+  }
+
+  public String getJobId() {
+    return jobId;
+  }
+
+  public void setJobId(String jobId) {
+    this.jobId = jobId;
   }
 }

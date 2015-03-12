@@ -37,10 +37,7 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 /**
  * @author Danny Gräf
@@ -85,6 +82,8 @@ public abstract class AbstractUserOperationLogRestServiceQueryTest extends Abstr
     verify(queryMock, never()).caseInstanceId(anyString());
     verify(queryMock, never()).caseExecutionId(anyString());
     verify(queryMock, never()).taskId(anyString());
+    verify(queryMock, never()).jobId(anyString());
+    verify(queryMock, never()).jobDefinitionId(anyString());
     verify(queryMock, never()).userId(anyString());
     verify(queryMock, never()).operationId(anyString());
     verify(queryMock, never()).operationType(anyString());
@@ -109,6 +108,8 @@ public abstract class AbstractUserOperationLogRestServiceQueryTest extends Abstr
         .queryParam("caseInstanceId", "y")
         .queryParam("caseExecutionId", "z")
         .queryParam("taskId", "4")
+        .queryParam("jobId", "7")
+        .queryParam("jobDefinitionId", "8")
         .queryParam("userId", "icke")
         .queryParam("operationId", "5")
         .queryParam("operationType", OPERATION_TYPE_CLAIM)
@@ -125,6 +126,8 @@ public abstract class AbstractUserOperationLogRestServiceQueryTest extends Abstr
     verify(queryMock).caseInstanceId("y");
     verify(queryMock).caseExecutionId("z");
     verify(queryMock).taskId("4");
+    verify(queryMock).jobId("7");
+    verify(queryMock).jobDefinitionId("8");
     verify(queryMock).userId("icke");
     verify(queryMock).operationId("5");
     verify(queryMock).operationType(OPERATION_TYPE_CLAIM);
@@ -143,6 +146,8 @@ public abstract class AbstractUserOperationLogRestServiceQueryTest extends Abstr
     assertEquals(MockProvider.EXAMPLE_CASE_INSTANCE_ID, actual.getCaseInstanceId());
     assertEquals(MockProvider.EXAMPLE_CASE_EXECUTION_ID, actual.getCaseExecutionId());
     assertEquals(MockProvider.EXAMPLE_TASK_ID, actual.getTaskId());
+    assertEquals(MockProvider.EXAMPLE_JOB_ID, actual.getJobId());
+    assertEquals(MockProvider.EXAMPLE_JOB_DEFINITION_ID, actual.getJobDefinitionId());
     assertEquals(MockProvider.EXAMPLE_USER_ID, actual.getUserId());
     assertEquals(MockProvider.EXAMPLE_USER_OPERATION_TIMESTAMP, from(json).getString("[0].timestamp"));
     assertEquals(MockProvider.EXAMPLE_USER_OPERATION_ID, actual.getOperationId());

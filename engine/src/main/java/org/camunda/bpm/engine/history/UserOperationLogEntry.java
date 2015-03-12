@@ -88,6 +88,8 @@ public interface UserOperationLogEntry {
   public static String OPERATION_TYPE_DELETE_GROUP_LINK = "DeleteGroupLink";
   public static String OPERATION_TYPE_ADD_ATTACHMENT = "AddAttachment";
   public static String OPERATION_TYPE_DELETE_ATTACHMENT = "DeleteAttachment";
+  public static String OPERATION_TYPE_RETRY = "Retry";
+  public static String OPERATION_TYPE_EXECUTE_JOB ="ExecuteJob";
 
   /** The unique identifier of this log entry. */
   String getId();
@@ -117,6 +119,12 @@ public interface UserOperationLogEntry {
 
   /** Task instance reference. */
   String getTaskId();
+
+  /** Job instance reference. */
+  String getJobId();
+
+  /** Job definition reference. */
+  String getJobDefinitionId();
 
   /** The User who performed the operation */
   String getUserId();

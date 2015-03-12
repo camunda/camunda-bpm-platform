@@ -28,5 +28,8 @@ public class EntityTypes {
   public static final String TASK = "Task";
   public static final String USER = "User";
   public static final String PROCESS_INSTANCE = "ProcessInstance";
+  public static final String PROCESS_DEFINITION = "ProcessDefinition";
+  public static final String JOB = "Job";
+  public static final String JOB_DEFINITION = "JobDefinition";
 
 }

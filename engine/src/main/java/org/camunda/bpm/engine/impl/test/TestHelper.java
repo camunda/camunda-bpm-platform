@@ -24,6 +24,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Logger;
 
+import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -322,4 +323,9 @@ public abstract class TestHelper {
       });
   }
 
+  public static void removeDelayedJobFromOpLog(ProcessEngineConfigurationImpl processEngineConfiguration, String jobId) {
+    HistoryService historyService = processEngineConfiguration.getHistoryService();
+    UserOperationLogEntry entry = historyService.createUserOperationLogQuery().jobId(jobId).singleResult();
+    historyService.deleteUserOperationLogEntry(entry.getId());
+  }
 }

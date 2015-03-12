@@ -20,6 +20,12 @@ ALTER TABLE ACT_HI_CASEINST
 ALTER TABLE ACT_HI_CASEACTINST
   ADD REQUIRED_ tinyint;
 
+ALTER TABLE ACT_HI_OP_LOG
+  ADD JOB_ID_ nvarchar(64);
+
+ALTER TABLE ACT_HI_OP_LOG
+  ADD JOB_DEF_ID_ nvarchar(64);
+
 create table ACT_HI_JOB_LOG (
     ID_ nvarchar(64) not null,
     TIMESTAMP_ datetime2 not null,

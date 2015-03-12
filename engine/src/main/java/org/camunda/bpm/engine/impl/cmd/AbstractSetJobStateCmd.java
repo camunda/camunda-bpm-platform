@@ -15,13 +15,15 @@ package org.camunda.bpm.engine.impl.cmd;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.persistence.entity.JobManager;
-import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
+import org.camunda.bpm.engine.impl.persistence.entity.*;
+import org.camunda.bpm.engine.runtime.Job;
 
 /**
  * @author roman.smirnov
  */
 public abstract class AbstractSetJobStateCmd implements Command<Void> {
+
+  protected static final String SUSPENSION_STATE_PROPERTY = "suspensionState";
 
   protected String jobId;
   protected String jobDefinitionId;
@@ -48,10 +50,19 @@ public abstract class AbstractSetJobStateCmd implements Command<Void> {
 
     if (jobId != null) {
       jobManager.updateJobSuspensionStateById(jobId, suspensionState);
+      Job job = jobManager.findJobById(jobId);
+      jobDefinitionId = job.getJobDefinitionId();
+      processInstanceId = job.getProcessInstanceId();
+      processDefinitionId = job.getProcessDefinitionId();
+      processDefinitionKey = job.getProcessDefinitionKey();
     } else
 
     if (jobDefinitionId != null) {
       jobManager.updateJobSuspensionStateByJobDefinitionId(jobDefinitionId, suspensionState);
+      JobDefinitionManager jobDefinitionManager = commandContext.getJobDefinitionManager();
+      JobDefinitionEntity jobDefinition = jobDefinitionManager.findById(jobDefinitionId);
+      processDefinitionId = jobDefinition.getProcessDefinitionId();
+      processDefinitionKey = jobDefinition.getProcessDefinitionKey();
     } else
 
     if (processInstanceId != null) {
@@ -66,6 +77,10 @@ public abstract class AbstractSetJobStateCmd implements Command<Void> {
       jobManager.updateJobSuspensionStateByProcessDefinitionKey(processDefinitionKey, suspensionState);
     }
 
+    PropertyChange propertyChange = new PropertyChange(SUSPENSION_STATE_PROPERTY, null, suspensionState.getName());
+    commandContext.getOperationLogManager().logJobOperation(getLogEntryOperation(), jobId, jobDefinitionId,
+      processInstanceId, processDefinitionId, processDefinitionKey, propertyChange);
+
     return null;
   }
 
@@ -73,5 +88,7 @@ public abstract class AbstractSetJobStateCmd implements Command<Void> {
    * Subclasses should return the wanted {@link SuspensionState} here.
    */
   protected abstract SuspensionState getSuspensionState();
+
+  protected abstract String getLogEntryOperation();
 
 }

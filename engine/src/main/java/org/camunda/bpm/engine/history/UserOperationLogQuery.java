@@ -67,6 +67,12 @@ public interface UserOperationLogQuery extends Query<UserOperationLogQuery, User
   /** Query entries which are existing for the task. */
   UserOperationLogQuery taskId(String taskId);
 
+  /** Query entries which are existing for the job. */
+  UserOperationLogQuery jobId(String jobId);
+
+  /** Query entries which are existing for the job definition. */
+  UserOperationLogQuery jobDefinitionId(String jobDefinitionId);
+
   /** Query entries which are existing for the user. */
   UserOperationLogQuery userId(String userId);
 

@@ -16,9 +16,12 @@ package org.camunda.bpm.engine.impl.cmd;
 import java.io.Serializable;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 
 
 /**
@@ -27,6 +30,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 public class SetJobRetriesCmd implements Command<Void>, Serializable {
 
   private static final long serialVersionUID = 1L;
+  protected static final String RETRY_STATE_PROPERTY = "retryState";
 
   protected final String jobId;
   protected final String jobDefinitionId;
@@ -65,8 +69,13 @@ public class SetJobRetriesCmd implements Command<Void>, Serializable {
       if (job.isInInconsistentLockState()) {
         job.resetLock();
       }
-
+      int oldRetries = job.getRetries();
       job.setRetries(retries);
+
+      PropertyChange propertyChange = new PropertyChange(RETRY_STATE_PROPERTY, oldRetries, job.getRetries());
+      commandContext.getOperationLogManager().logJobRetryOperation(getLogEntryOperation(), job.getId(),
+        job.getJobDefinitionId(), job.getProcessInstanceId(), job.getProcessDefinitionId(),
+        job.getProcessDefinitionKey(), propertyChange);
     } else {
       throw new ProcessEngineException("No job found with id '" + jobId + "'.");
     }
@@ -76,5 +85,14 @@ public class SetJobRetriesCmd implements Command<Void>, Serializable {
     commandContext
         .getJobManager()
         .updateFailedJobRetriesByJobDefinitionId(jobDefinitionId, retries);
+
+    JobDefinitionEntity jobDefinitionEntity = commandContext.getJobDefinitionManager().findById(jobDefinitionId);
+    PropertyChange propertyChange = new PropertyChange(RETRY_STATE_PROPERTY, null, retries);
+    commandContext.getOperationLogManager().logJobRetryOperation(getLogEntryOperation(), null, jobDefinitionId, null,
+      jobDefinitionEntity.getProcessDefinitionId(), jobDefinitionEntity.getProcessDefinitionKey(), propertyChange);
+  }
+
+  protected String getLogEntryOperation() {
+    return UserOperationLogEntry.OPERATION_TYPE_RETRY;
   }
 }

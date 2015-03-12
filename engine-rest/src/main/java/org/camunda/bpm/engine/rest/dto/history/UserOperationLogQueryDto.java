@@ -39,6 +39,8 @@ public class UserOperationLogQueryDto extends AbstractQueryDto<UserOperationLogQ
   protected String caseInstanceId;
   protected String caseExecutionId;
   protected String taskId;
+  protected String jobId;
+  protected String jobDefinitionId;
   protected String userId;
   protected String operationId;
   protected String operationType;
@@ -86,6 +88,12 @@ public class UserOperationLogQueryDto extends AbstractQueryDto<UserOperationLogQ
     }
     if (taskId != null) {
       query.taskId(taskId);
+    }
+    if (jobId != null) {
+      query.jobId(jobId);
+    }
+    if (jobDefinitionId != null) {
+      query.jobDefinitionId(jobDefinitionId);
     }
     if (userId != null) {
       query.userId(userId);
@@ -155,6 +163,16 @@ public class UserOperationLogQueryDto extends AbstractQueryDto<UserOperationLogQ
   @CamundaQueryParam("taskId")
   public void setTaskId(String taskId) {
     this.taskId = taskId;
+  }
+
+  @CamundaQueryParam("jobId")
+  public void setJobId(String jobId) {
+    this.jobId = jobId;
+  }
+
+  @CamundaQueryParam("jobDefinitionId")
+  public void setJobDefinitionId(String jobDefinitionId) {
+    this.jobDefinitionId = jobDefinitionId;
   }
 
   @CamundaQueryParam("userId")

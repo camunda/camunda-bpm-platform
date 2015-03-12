@@ -31,6 +31,8 @@
         CASE_INST_ID_,
         CASE_EXECUTION_ID_,
         TASK_ID_,
+        JOB_ID_,
+        JOB_DEF_ID_,
         USER_ID_,
         TIMESTAMP_,
         OPERATION_ID_ ,
@@ -49,6 +51,8 @@
         #{caseInstanceId, jdbcType=VARCHAR},
         #{caseExecutionId, jdbcType=VARCHAR},
         #{taskId ,jdbcType=VARCHAR},
+        #{jobId, jdbcType=VARCHAR},
+        #{jobDefinitionId, jdbcType=VARCHAR},
         #{userId ,jdbcType=VARCHAR},
         #{timestamp ,jdbcType=TIMESTAMP},
         #{operationId ,jdbcType=VARCHAR},
@@ -86,6 +90,18 @@
     delete from ${prefix}ACT_HI_OP_LOG where PROC_DEF_ID_ = #{id}
   </delete>
 
+  <delete id="deleteUserOperationLogEntriesByProcessDefinitionKey">
+    delete from ${prefix}ACT_HI_OP_LOG where PROC_DEF_KEY_ = #{id}
+  </delete>
+
+  <delete id="deleteUserOperationLogEntriesByJobId">
+    delete from ${prefix}ACT_HI_OP_LOG where JOB_ID_ = #{id}
+  </delete>
+
+  <delete id="deleteUserOperationLogEntriesByJobDefinitionId">
+    delete from ${prefix}ACT_HI_OP_LOG where JOB_DEF_ID_ = #{id}
+  </delete>
+
   <!--OPERATION LOG ENTRY RESULT MAP -->
 
   <resultMap id="UserOperationLogResultMap" type="org.camunda.bpm.engine.impl.history.event.UserOperationLogEntryEventEntity">
@@ -98,6 +114,8 @@
     <result property="caseInstanceId" column="CASE_INST_ID_" jdbcType="VARCHAR" />
     <result property="caseExecutionId" column="CASE_EXECUTION_ID_" jdbcType="VARCHAR" />
     <result property="taskId" column="TASK_ID_" jdbcType="VARCHAR" />
+    <result property="jobId" column="JOB_ID_" jdbcType="VARCHAR" />
+    <result property="jobDefinitionId" column="JOB_DEF_ID_" jdbcType="VARCHAR" />
     <result property="userId" column="USER_ID_" jdbcType="VARCHAR" />
     <result property="timestamp" column="TIMESTAMP_" jdbcType="TIMESTAMP" />
     <result property="operationId" column="OPERATION_ID_" jdbcType="VARCHAR" />
@@ -155,6 +173,12 @@
       </if>
       <if test="taskId != null">
         and RES.TASK_ID_ = #{taskId}
+      </if>
+      <if test="jobId != null">
+        and RES.JOB_ID_ = #{jobId}
+      </if>
+      <if test="jobDefinitionId != null">
+        and RES.JOB_DEF_ID_ = #{jobDefinitionId}
       </if>
       <if test="userId != null">
         and RES.USER_ID_ = #{userId}

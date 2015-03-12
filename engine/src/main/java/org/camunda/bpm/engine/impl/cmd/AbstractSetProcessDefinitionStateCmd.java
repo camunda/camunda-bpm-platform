@@ -18,10 +18,7 @@ import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerChangeProcessDefinitionSuspensionStateJobHandler;
-import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionManager;
-import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
-import org.camunda.bpm.engine.impl.persistence.entity.TimerEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.*;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 
@@ -31,6 +28,8 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
  * @author roman.smirnov
  */
 public abstract class AbstractSetProcessDefinitionStateCmd implements Command<Void> {
+
+  protected static final String SUSPENSION_STATE_PROPERTY = "suspensionState";
 
   protected String processDefinitionId;
   protected String processDefinitionKey;
@@ -111,6 +110,11 @@ public abstract class AbstractSetProcessDefinitionStateCmd implements Command<Vo
     }
 
     getSetJobDefinitionStateCmd().execute(commandContext);
+
+    PropertyChange propertyChange = new PropertyChange(SUSPENSION_STATE_PROPERTY, null, suspensionState.getName());
+    commandContext.getOperationLogManager()
+      .logProcessDefinitionOperation(getLogEntryOperation(), processDefinitionId, processDefinitionKey, propertyChange);
+
     if (includeProcessInstances) {
       getSetProcessInstanceStateCmd().execute(commandContext);
     }
@@ -141,4 +145,5 @@ public abstract class AbstractSetProcessDefinitionStateCmd implements Command<Vo
    */
   protected abstract AbstractSetProcessInstanceStateCmd getSetProcessInstanceStateCmd();
 
+  protected abstract String getLogEntryOperation();
 }
