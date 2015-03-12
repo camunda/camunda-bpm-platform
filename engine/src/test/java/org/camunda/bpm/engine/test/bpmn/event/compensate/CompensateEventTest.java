@@ -71,7 +71,7 @@ public class CompensateEventTest extends PluggableProcessEngineTestCase {
     assertEquals(5, compensationHandlerTasks.size());
 
     ActivityInstance rootActivityInstance = runtimeService.getActivityInstance(processInstance.getId());
-    List<ActivityInstance> compensationHandlerInstances = getInstancesForActivitiyId(rootActivityInstance, "undoBookHotel");
+    List<ActivityInstance> compensationHandlerInstances = getInstancesForActivityId(rootActivityInstance, "undoBookHotel");
     assertEquals(5, compensationHandlerInstances.size());
 
     for (Task task : compensationHandlerTasks) {

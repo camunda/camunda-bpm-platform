@@ -215,7 +215,7 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
       Task task = taskService.createTaskQuery().taskAssignee("kermit").singleResult();
       assertEquals("My Task", task.getName());
       ActivityInstance processInstance = runtimeService.getActivityInstance(procId);
-      List<ActivityInstance> instancesForActivitiyId = getInstancesForActivitiyId(processInstance, "miTasks");
+      List<ActivityInstance> instancesForActivitiyId = getInstancesForActivityId(processInstance, "miTasks");
       assertEquals(1, instancesForActivitiyId.size());
       ActivityInstance userTaskActInst = instancesForActivitiyId.get(0);
       taskService.complete(task.getId());

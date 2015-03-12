@@ -130,8 +130,8 @@ public class TransactionSubProcessTest extends PluggableProcessEngineTestCase {
     assertEquals(1,undoBookFlight.size());
 
     ActivityInstance rootActivityInstance = runtimeService.getActivityInstance(processInstance.getId());
-    List<ActivityInstance> undoBookHotelInstances = getInstancesForActivitiyId(rootActivityInstance, "undoBookHotel");
-    List<ActivityInstance> undoBookFlightInstances = getInstancesForActivitiyId(rootActivityInstance, "undoBookFlight");
+    List<ActivityInstance> undoBookHotelInstances = getInstancesForActivityId(rootActivityInstance, "undoBookHotel");
+    List<ActivityInstance> undoBookFlightInstances = getInstancesForActivityId(rootActivityInstance, "undoBookFlight");
     assertEquals(5, undoBookHotelInstances.size());
     assertEquals(1, undoBookFlightInstances.size());
 

@@ -230,7 +230,7 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
 
     try {
       Timer timer = new Timer();
-      InteruptTask task = new InteruptTask(Thread.currentThread());
+      InterruptTask task = new InterruptTask(Thread.currentThread());
       timer.schedule(task, maxMillisToWait);
       boolean areJobsAvailable = true;
       try {
@@ -272,7 +272,7 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
 
     try {
       Timer timer = new Timer();
-      InteruptTask task = new InteruptTask(Thread.currentThread());
+      InterruptTask task = new InterruptTask(Thread.currentThread());
       timer.schedule(task, maxMillisToWait);
       boolean conditionIsViolated = true;
       try {
@@ -321,10 +321,18 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
     return false;
   }
 
-  private static class InteruptTask extends TimerTask {
+  @Deprecated
+  private static class InteruptTask extends InterruptTask {
+    public InteruptTask(Thread thread) {
+      super(thread);
+    }
+  }
+
+
+  private static class InterruptTask extends TimerTask {
     protected boolean timeLimitExceeded = false;
     protected Thread thread;
-    public InteruptTask(Thread thread) {
+    public InterruptTask(Thread thread) {
       this.thread = thread;
     }
     public boolean isTimeLimitExceeded() {
@@ -336,13 +344,18 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
     }
   }
 
+  @Deprecated
   protected List<ActivityInstance> getInstancesForActivitiyId(ActivityInstance activityInstance, String activityId) {
+    return getInstancesForActivityId(activityInstance, activityId);
+  }
+
+  protected List<ActivityInstance> getInstancesForActivityId(ActivityInstance activityInstance, String activityId) {
     List<ActivityInstance> result = new ArrayList<ActivityInstance>();
     if(activityInstance.getActivityId().equals(activityId)) {
       result.add(activityInstance);
     }
     for (ActivityInstance childInstance : activityInstance.getChildActivityInstances()) {
-      result.addAll(getInstancesForActivitiyId(childInstance,activityId));
+      result.addAll(getInstancesForActivityId(childInstance, activityId));
     }
     return result;
   }
