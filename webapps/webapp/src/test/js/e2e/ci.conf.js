@@ -31,6 +31,7 @@ exports.config = {
     'admin/specs/system-spec.js',
     'admin/specs/authorizations-spec.js',
     'cockpit/specs/dashboard-spec.js',
+    'tasklist/specs/filter-spec.js',
     'tasklist/specs/tasklist-search-spec.js',
     'tasklist/specs/tasklist-sorting-spec.js'
   ],
