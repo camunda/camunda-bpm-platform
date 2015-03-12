@@ -46,6 +46,7 @@ public class CompensateEventTest extends PluggableProcessEngineTestCase {
 
   }
 
+
   @Deployment
   public void testCompensateParallelSubprocess() {
 
@@ -122,6 +123,22 @@ public class CompensateEventTest extends PluggableProcessEngineTestCase {
     runtimeService.signal(processInstance.getId());
     assertProcessEnded(processInstance.getId());
 
+  }
+
+  /**
+   * CAM-3628
+   */
+  @Deployment
+  public void FAILING_testCompensateSubprocessWithBoundaryEvent() {
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("compensateProcess");
+
+    Task compensationTask = taskService.createTaskQuery().singleResult();
+    assertNotNull(compensationTask);
+    assertEquals("undoSubprocess", compensationTask.getTaskDefinitionKey());
+
+    taskService.complete(compensationTask.getId());
+    runtimeService.signal(instance.getId());
+    assertProcessEnded(instance.getId());
   }
 
   @Deployment(resources={

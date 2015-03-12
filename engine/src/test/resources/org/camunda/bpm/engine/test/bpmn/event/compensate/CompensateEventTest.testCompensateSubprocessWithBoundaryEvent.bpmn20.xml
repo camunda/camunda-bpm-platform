@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions" 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:activiti="http://activiti.org/bpmn"
+  targetNamespace="Examples">
+	
+	<process id="compensateProcess">
+
+		<startEvent id="start" />
+		
+		<sequenceFlow sourceRef="start"	targetRef="subprocess" />
+
+		<subProcess id="subprocess">
+			<startEvent id="startInScope" />
+			<sequenceFlow sourceRef="startInScope" targetRef="endInScope" />
+			<endEvent id="endInScope" />
+		</subProcess>
+    
+    <boundaryEvent id="compensateSubProcess" name="Boundary event" attachedToRef="subprocess">
+      <compensateEventDefinition />
+    </boundaryEvent>
+    <userTask id="undoSubprocess" isForCompensation="true"/>
+
+		<sequenceFlow sourceRef="subprocess" targetRef="throwCompensate" />
+		
+		<intermediateThrowEvent id="throwCompensate">
+			<compensateEventDefinition activityRef="subprocess" />
+		</intermediateThrowEvent>
+		
+		<sequenceFlow sourceRef="throwCompensate" targetRef="beforeEnd" />
+		<receiveTask id="beforeEnd" />
+		<sequenceFlow sourceRef="beforeEnd" targetRef="end" />
+		<endEvent id="end" />
+    
+    <association associationDirection="One" sourceRef="compensateSubProcess" targetRef="undoSubprocess" />
+	</process>
+
+</definitions>
