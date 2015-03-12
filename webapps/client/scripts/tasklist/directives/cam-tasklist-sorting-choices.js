@@ -29,10 +29,12 @@ define([
     'search',
     '$translate',
     '$location',
+    '$timeout',
   function(
     search,
     $translate,
-    $location
+    $location,
+    $timeout
   ) {
     return {
 
@@ -62,31 +64,39 @@ define([
 
         scope.sortedOn = [];
 
-        function updateBodyClass() {
-          var columns = element.parents('.columns');
-          var headers = columns.find('.cell.top');
-          var bodies = columns.find('.cell.content');
-          var shown = $bdy.hasClass('list-column-close');
-
-          element.css('height', 'auto');
-
-          if (shown) {
-            var minHeight = parseInt(headers.css('min-height'), 10);
-            headers.css('height', minHeight);
-            bodies.css('top', minHeight);
-            return;
+        var plannedRefresh;
+        function updateColumns() {
+          if (plannedRefresh) {
+            $timeout.cancel(plannedRefresh);
           }
 
-          var height = element.height();
-          var columnTop = element.parent();
-          columnTop.height(height);
-          var columnTopHeight = height;
+          plannedRefresh = $timeout(function () {
+            var columns = element.parents('.columns');
+            var headers = columns.find('.cell.top');
+            var bodies = columns.find('.cell.content');
+            var shown = $bdy.hasClass('list-column-close');
 
-          headers.height(columnTopHeight);
-          bodies.css('top', columnTopHeight + 30);
+            element.css('height', 'auto');
+
+            if (shown) {
+              var minHeight = parseInt(headers.css('min-height'), 10);
+              headers.css('height', minHeight);
+              bodies.css('top', minHeight);
+              return;
+            }
+
+            var height = element.height();
+            var columnTop = element.parent();
+            columnTop.height(height);
+            var columnTopHeight = height;
+
+            headers.height(columnTopHeight);
+            bodies.css('top', columnTopHeight + 30);
+            plannedRefresh = null;
+          }, 100);
         }
 
-        scope.$on('layout:change', updateBodyClass);
+        scope.$on('layout:change', updateColumns);
 
         scope.uniqueProps = {
           priority:               $translate.instant('PRIORITY'),
@@ -145,11 +155,12 @@ define([
               return returned;
             });
 
-            updateBodyClass();
 
             if (!scope.sortings.length) {
               scope.addSorting('created');
             }
+
+            updateColumns();
           }
         });
 
@@ -157,6 +168,8 @@ define([
         scope.$watch('sortings.length', function (now, before) {
           if (now !== before) { scope.updateSortings(); }
         });
+
+        scope.$watch('sortings', updateColumns, true);
 
         function positionDropdown(el) {
           var edgeLeft = el.parent().position().left;
@@ -207,13 +220,14 @@ define([
           });
 
           tasklistData.changed('taskListQuery');
+
+          updateColumns();
         };
 
         /**
          * Invoked when adding a sorting object
          */
         scope.addSorting = function (by, order) {
-          updateBodyClass();
           order = order || 'desc';
 
           var newSorting = angular.copy(sorting);
@@ -227,8 +241,6 @@ define([
          * Invoked when removing a sorting object
          */
         scope.removeSorting = function (index) {
-          updateBodyClass();
-
           var newSortings = [];
           scope.sortings.forEach(function (sorting, i) {
             if (i != index) {
