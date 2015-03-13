@@ -129,6 +129,7 @@
                        required
                        placeholder="Filter Business Key"
                        name="businessKey"
+                       class="form-control"
                        ng-model="filterData.businessKey.value"
                        ng-change="filterChanged()" />
               </div>
@@ -156,6 +157,7 @@
 
                 <div class="removable-input">
                   <input type="text"
+                         class="form-control"
                          date
                          required
                          ng-change="filterChanged()"
@@ -216,6 +218,7 @@
 
                 <input type="text"
                        required
+                       class="form-control"
                        cam-dynamic-name="variableFilter{{$index}}"
                        placeholder="Filter Variable"
                        ng-model="variable.value"
