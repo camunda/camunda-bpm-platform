@@ -34,7 +34,7 @@ module.exports = function(config) {
       files: [
         '../camunda-bpm-webapp/webapp/target/webapp/plugin/**/*.{js,html}',
         '../camunda-bpm-platform-ee/webapps/camunda-webapp/plugins/target/classes/plugin-webapp/**/*.{js,html}',
-        'node_modules/camunda-commons-ui/**/*.{js,html}',
+        'node_modules/camunda-commons-ui/lib/**/*.{js,html}',
         'grunt/config/requirejs.js',
         '<%= pkg.gruntConfig.clientDir %>/scripts/**/*.{js,html}'
       ],
