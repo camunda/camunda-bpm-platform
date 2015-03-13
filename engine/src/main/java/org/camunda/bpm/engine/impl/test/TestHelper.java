@@ -37,6 +37,7 @@ import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cmmn.deployer.CmmnDeployer;
 import org.camunda.bpm.engine.impl.db.PersistenceSession;
 import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
+import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
@@ -324,8 +325,13 @@ public abstract class TestHelper {
   }
 
   public static void removeDelayedJobFromOpLog(ProcessEngineConfigurationImpl processEngineConfiguration, String jobId) {
-    HistoryService historyService = processEngineConfiguration.getHistoryService();
-    UserOperationLogEntry entry = historyService.createUserOperationLogQuery().jobId(jobId).singleResult();
-    historyService.deleteUserOperationLogEntry(entry.getId());
+    if(processEngineConfiguration.getHistoryLevel().equals(HistoryLevel.HISTORY_LEVEL_FULL)) {
+      HistoryService historyService = processEngineConfiguration.getHistoryService();
+      UserOperationLogEntry entry = historyService.createUserOperationLogQuery().jobId(jobId).singleResult();
+      if(entry != null) {
+        historyService.deleteUserOperationLogEntry(entry.getId());
+      }
+    }
+
   }
 }
