@@ -274,5 +274,8 @@ define(function() {
       ]
     }
   ];
-  return criteria;
+  return criteria.map(function (item) {
+    item.name = item.group.toLowerCase().replace(/[^a-z0-9-]+/g, '-');
+    return item;
+  });
 });

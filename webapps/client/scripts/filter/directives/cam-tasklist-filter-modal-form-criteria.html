@@ -49,7 +49,8 @@
 
                 <option ng-repeat="criterion in criteriaGroup.options"
                         ng-selected="criterion.name === getCriterionName(queryParam.key)"
-                        ng-value="criterion.name">
+                        ng-value="criterion.name"
+                        sem-id="{{criteriaGroup.group}} {{criterion.label}}">
 
                   {{ criterion.label | translate }}
                   {{ (criterion.expressionSupport ? '*' : '') }}
