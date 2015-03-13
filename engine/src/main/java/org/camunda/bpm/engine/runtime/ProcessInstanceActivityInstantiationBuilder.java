@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.engine.runtime;
 
+import java.util.Map;
+
 public interface ProcessInstanceActivityInstantiationBuilder extends ProcessInstanceModificationBuilder {
 
   /**
@@ -23,5 +25,17 @@ public interface ProcessInstanceActivityInstantiationBuilder extends ProcessInst
    * Adds a local variable to be set when the current instruction is executed.
    */
   ProcessInstanceActivityInstantiationBuilder setVariableLocal(String name, Object value);
+
+  /**
+   * Adds all variables to be set when the current instruction is executed
+   */
+  ProcessInstanceActivityInstantiationBuilder setVariables(Map<String, Object> variables);
+
+  /**
+   * Adds all local variables to be set when the current instruction is executed
+   */
+  ProcessInstanceActivityInstantiationBuilder setVariablesLocal(Map<String, Object> variables);
+
+
 
 }

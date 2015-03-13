@@ -14,6 +14,8 @@ package org.camunda.bpm.engine.impl;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
+import java.util.Map;
+
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.impl.cmd.AbstractInstantiationCmd;
 import org.camunda.bpm.engine.runtime.ProcessInstanceActivityInstantiationBuilder;
@@ -36,7 +38,6 @@ public class ProcessInstanceActivityInstantiationBuilderImpl implements ProcessI
 
   public ProcessInstanceActivityInstantiationBuilder setVariable(String name, Object value) {
     ensureNotNull(NotValidException.class, "Variable name must not be null", "name", name);
-    ensureNotNull(NotValidException.class, "No activity to start specified", "variable", currentInstantiation);
 
     currentInstantiation.addVariable(name, value);
     return this;
@@ -44,11 +45,25 @@ public class ProcessInstanceActivityInstantiationBuilderImpl implements ProcessI
 
   public ProcessInstanceActivityInstantiationBuilder setVariableLocal(String name, Object value) {
     ensureNotNull(NotValidException.class, "Variable name must not be null", "name", name);
-    ensureNotNull(NotValidException.class, "No activity to start specified", "variableLocal", currentInstantiation);
 
     currentInstantiation.addVariableLocal(name, value);
     return this;
   }
+
+  public ProcessInstanceActivityInstantiationBuilder setVariables(Map<String, Object> variables) {
+    ensureNotNull(NotValidException.class, "Variable map must not be null", "variables", variables);
+
+    currentInstantiation.addVariables(variables);
+    return this;
+  }
+
+  public ProcessInstanceActivityInstantiationBuilder setVariablesLocal(Map<String, Object> variables) {
+    ensureNotNull(NotValidException.class, "Variable map must not be null", "variablesLocal", variables);
+
+    currentInstantiation.addVariablesLocal(variables);
+    return this;
+  }
+
 
   public ProcessInstanceModificationBuilder cancelActivityInstance(String activityInstanceId) {
     return builder.cancelActivityInstance(activityInstanceId);

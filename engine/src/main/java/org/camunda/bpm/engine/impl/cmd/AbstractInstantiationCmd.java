@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.impl.cmd;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -58,6 +59,14 @@ public abstract class AbstractInstantiationCmd extends AbstractProcessInstanceMo
 
   public void addVariableLocal(String name, Object value) {
     this.variablesLocal.put(name, value);
+  }
+
+  public void addVariables(Map<String, Object> variables) {
+    this.variables.putAll(variables);
+  }
+
+  public void addVariablesLocal(Map<String, Object> variables) {
+    this.variablesLocal.putAll(variables);
   }
 
   public VariableMap getVariables() {

@@ -1216,6 +1216,8 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
       .startBeforeActivity("task2")
       .setVariable("procInstVar", "procInstValue")
       .setVariableLocal("localVar", "localValue")
+      .setVariables(Variables.createVariables().putValue("procInstMapVar", "procInstMapValue"))
+      .setVariablesLocal(Variables.createVariables().putValue("localMapVar", "localMapValue"))
       .execute();
 
     ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstance.getId());
@@ -1231,8 +1233,11 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
     assertEquals(1, task2Instance.getExecutionIds().length);
     String task2ExecutionId = task2Instance.getExecutionIds()[0];
 
+    assertEquals(4, runtimeService.createVariableInstanceQuery().count());
     assertEquals("procInstValue", runtimeService.getVariableLocal(processInstance.getId(), "procInstVar"));
     assertEquals("localValue", runtimeService.getVariableLocal(task2ExecutionId, "localVar"));
+    assertEquals("procInstMapValue", runtimeService.getVariableLocal(processInstance.getId(), "procInstMapVar"));
+    assertEquals("localMapValue", runtimeService.getVariableLocal(task2ExecutionId, "localMapVar"));
 
     completeTasksInOrder("task1", "task2");
     assertProcessEnded(processInstance.getId());
