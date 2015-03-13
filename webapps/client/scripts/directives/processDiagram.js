@@ -61,15 +61,28 @@ define([
       }
     };
 
+    $scope.onMouseEnter = function(element, $event) {
+      if(bpmnElements[element.businessObject.id] && bpmnElements[element.businessObject.id].isSelectable) {
+        $scope.control.getViewer().get('canvas').addMarker(element.businessObject.id, 'selectable');
+        $scope.control.highlight(element.businessObject.id);
+      }
+    };
+
+    $scope.onMouseLeave = function(element, $event) {
+      if(bpmnElements[element.businessObject.id] && bpmnElements[element.businessObject.id].isSelectable && (!selection || selection.indexOf(element.businessObject.id) === -1)) {
+        $scope.control.clearHighlight(element.businessObject.id);
+      }
+    };
+
     /*------------------- Decorate diagram ---------------------*/
 
     function decorateDiagram(bpmnElements) {
       angular.forEach(bpmnElements, function (bpmnElement) {
-        decorateBpmnElementWithOverlays(bpmnElement);
+        decorateBpmnElement(bpmnElement);
       });
     }
 
-    function decorateBpmnElementWithOverlays(bpmnElement) {
+    function decorateBpmnElement(bpmnElement) {
 
       var elem = $scope.control.getElement(bpmnElement.id);
 
@@ -111,13 +124,17 @@ define([
       if ($scope.control.isLoaded()) {
         if (selection) {
           angular.forEach(selection, function(elementId) {
-            $scope.control.clearHighlight(elementId);
+            if(bpmnElements[elementId] && bpmnElements[elementId].isSelectable) {
+              $scope.control.clearHighlight(elementId);
+            }
           });
         }
 
         if (newSelection) {
           angular.forEach(newSelection, function(elementId) {
-            $scope.control.highlight(elementId);
+            if(bpmnElements[elementId] && bpmnElements[elementId].isSelectable) {
+              $scope.control.highlight(elementId);
+            }
           });
         }
       }
@@ -143,7 +160,9 @@ define([
     }
 
     function scrollTo(elementId) {
-      $scope.control.scrollToElement(elementId);
+      if(bpmnElements[elementId]) {
+        $scope.control.scrollToElement(elementId);
+      }
     }
 
   }];
