@@ -69,18 +69,16 @@ module.exports = Base.extend({
   },
 
   // authorizations
-
   authorizationnList: function() {
     return this.formElement().all(by.repeater('(delta, authorization) in authorizations'));
   },
 
   // criteria
-
   addCriterionButton: function() {
     return this.formElement().element(by.css('[ng-click="addCriterion()"]'));
   },
 
-  removeCriterionButton: function() {
+  removeCriterionButton: function(item) {
     return this.criterionList().get(item).element(by.css('[ng-click="removeCriterion(delta)"]'));
   },
 
@@ -88,11 +86,15 @@ module.exports = Base.extend({
     return this.formElement().all(by.repeater('(delta, queryParam) in query'));
   },
 
-  criterionKeyInput: function(item, inputValue) {
+  selectCriterionKey: function(item, group, key) {
+    this.criterionList().get(item).element(by.css('[sem-id="' + group + ' ' + key.replace(/\s*\*/, '') + '"]')).click();
+  },
+
+  criterionKeyInput: function(item, inputKey) {
     var inputField = this.criterionList().get(item).element(by.model('queryParam.key'));
 
     if (arguments.length !== 0)
-      inputField.sendKeys(inputValue);
+      inputField.sendKeys(inputKey);
 
     return inputField;
   },
@@ -106,20 +108,24 @@ module.exports = Base.extend({
     return inputField;
   },
 
-  addCriteria: function(key, value) {
+  addCriteria: function(group, key, value) {
     var self = this;
 
     this.addCriterionButton().then(function(button) {
       button.click();
       self.criterionList().count().then(function(items) {
         items = items -1;
-        self.criterionKeyInput(items, key);
+        self.selectCriterionKey(items, group, key);
         self.criterionValueInput(items, value);
       });
     });
   },
 
   // variables
+  showUndefinedVariablesCheckBox: function() {
+    return element(by.css('[cam-tasklist-filter-modal-form-variable]'))
+                            .element(by.model('filter.properties.showUndefinedVariable'));
+  },
 
   addVariableButton: function() {
     return this.formElement().element(by.css('[ng-click="addVariable()"]'));

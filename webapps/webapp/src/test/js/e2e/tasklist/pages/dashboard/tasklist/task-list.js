@@ -38,6 +38,30 @@ module.exports = Page.extend({
 
   taskAssignee: function(item) {
     return this.taskList().get(item).element(by.binding('task.assignee')).getText();
+  },
+
+  taskVariables: function(taskItem) {
+    return this.taskList().get(taskItem).all(by.repeater('(delta, info) in variableDefinitions'));
+  },
+
+  taskVariableNameElement: function(taskItem, variableItem) {
+    browser.actions().mouseMove(this.taskVariables(taskItem).get(variableItem).element(by.css('.variable-label'))).perform();
+
+    browser.sleep(1000);
+
+    return this.taskVariables(taskItem).get(variableItem).element(by.css('.variable-label')).getAttribute('tooltip');
+  },
+
+  taskVariableName: function(taskItem, variableItem) {
+    return this.taskVariableNameElement(taskItem, variableItem);
+  },
+
+  taskVariableLabel: function(taskItem, variableItem) {
+    return this.taskVariables(taskItem).get(variableItem).element(by.css('.variable-label'));
+  },
+
+  taskVariableValue: function(taskItem, variableItem) {
+    return this.taskVariables(taskItem).get(variableItem).element(by.css('.variable-value'));
   }
 
 });

@@ -8,7 +8,8 @@ ops.filter = {
     name:         'All',
     query: {},
     properties: {
-      priority: '100',
+      priority: 100,
+      description:  'blaw',
       variables: [{
         name: 'testVar',
         label: 'varTest'
@@ -23,7 +24,7 @@ ops.filter = {
       assigneeExpression: '${ currentUser() }'
     },
     properties: {
-      priority: '10',
+      priority: 10,
       variables: [{
         name: 'testVar',
         label: 'test Variable'
@@ -37,6 +38,14 @@ ops.filter = {
         label: 'test String'
       }],
       showUndefinedVariable: true
+    },
+    resourceType: 'Task'
+  },
+  {
+    name:         'Test Filter',
+    query: {},
+    properties: {
+      priority: 110
     },
     resourceType: 'Task'
   }]
@@ -136,4 +145,36 @@ ops.task = {
       type: 'String'
     }
   ]
+};
+
+ops.deployment = {
+  create: [{
+    deploymentName:  'user-tasks',
+    files:           [{
+      name: 'user-tasks.bpmn',
+      content: fs.readFileSync(__dirname + '/../../resources/user-tasks.bpmn').toString()
+    }]
+  }]
+};
+ops['process-definition'] = {
+  start: [{
+    key: 'user-tasks',
+    businessKey: 'Instance1',
+    variables: {
+      test : {
+        value: 1.5,
+        type: 'Double'
+      }
+    }
+  },
+  {
+    key: 'user-tasks',
+    businessKey: 'myBusinessKey',
+    variables: {
+      test : {
+        value: 1.49,
+        type: 'Double'
+      }
+    }
+  }]
 };
