@@ -614,6 +614,7 @@ public class OperationLogQueryTest extends PluggableProcessEngineTestCase {
     assertEquals("3", jobRetryEntry.getOrgValue());
     assertEquals("10", jobRetryEntry.getNewValue());
     assertEquals("retryState", jobRetryEntry.getProperty());
+    assertEquals(job.getJobDefinitionId(), jobRetryEntry.getJobDefinitionId());
     assertEquals(job.getProcessInstanceId(), jobRetryEntry.getProcessInstanceId());
     assertEquals(job.getProcessDefinitionKey(), jobRetryEntry.getProcessDefinitionKey());
     assertEquals(job.getProcessDefinitionId(), jobRetryEntry.getProcessDefinitionId());
@@ -637,12 +638,14 @@ public class OperationLogQueryTest extends PluggableProcessEngineTestCase {
     UserOperationLogEntry jobExecutionEntry = query().
       entityType(JOB)
       .jobId(job.getId())
+      .jobDefinitionId(job.getJobDefinitionId())
       .operationType(OPERATION_TYPE_EXECUTE_JOB)
       .singleResult();
 
     assertNull(jobExecutionEntry.getOrgValue());
     assertNull(jobExecutionEntry.getNewValue());
     assertNull(jobExecutionEntry.getProperty());
+    assertEquals(job.getJobDefinitionId(), jobExecutionEntry.getJobDefinitionId());
     assertEquals(job.getProcessInstanceId(), jobExecutionEntry.getProcessInstanceId());
     assertEquals(job.getProcessDefinitionKey(), jobExecutionEntry.getProcessDefinitionKey());
     assertEquals(job.getProcessDefinitionId(), jobExecutionEntry.getProcessDefinitionId());
