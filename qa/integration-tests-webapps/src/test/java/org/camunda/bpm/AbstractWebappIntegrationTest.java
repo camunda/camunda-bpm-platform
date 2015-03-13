@@ -12,18 +12,18 @@
  */
 package org.camunda.bpm;
 
-import java.util.logging.Logger;
-
+import com.sun.jersey.api.client.config.ClientConfig;
+import com.sun.jersey.api.json.JSONConfiguration;
+import com.sun.jersey.client.apache4.ApacheHttpClient4;
+import com.sun.jersey.client.apache4.config.DefaultApacheHttpClient4Config;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 import org.junit.After;
 import org.junit.Before;
+import org.openqa.selenium.chrome.ChromeDriverService;
 
-import com.sun.jersey.api.client.config.ClientConfig;
-import com.sun.jersey.api.json.JSONConfiguration;
-import com.sun.jersey.client.apache4.ApacheHttpClient4;
-import com.sun.jersey.client.apache4.config.DefaultApacheHttpClient4Config;
+import java.util.logging.Logger;
 
 /**
  *
@@ -43,6 +43,7 @@ public abstract class AbstractWebappIntegrationTest {
   public DefaultHttpClient defaultHttpClient;
 
   protected TestProperties testProperties;
+  protected static ChromeDriverService service;
 
   @Before
   public void createClient() throws Exception {

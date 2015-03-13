@@ -1,11 +1,14 @@
 package org.camunda.bpm.util;
 
 import org.apache.commons.io.FileUtils;
-import org.junit.rules.TestWatcher;
+import org.junit.rules.TestRule;
 import org.junit.runner.Description;
+import org.junit.runners.model.Statement;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.remote.Augmenter;
+import org.openqa.selenium.remote.RemoteWebDriver;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,41 +18,58 @@ import java.util.Date;
 import java.util.logging.Logger;
 
 /**
- * Allows to take screenshots in case of an selenium2 test error.
- *
- * @author Christian Lipphardt
+ * Allows to take screenshots in case of an selenium test error.
  */
-public class SeleniumScreenshotRule extends TestWatcher {
+public class SeleniumScreenshotRule implements TestRule {
 
   private static Logger log = Logger.getAnonymousLogger();
 
-  private WebDriver webDriver;
+  protected WebDriver webDriver;
 
-  public SeleniumScreenshotRule(WebDriver webDriver) {
-    this.webDriver = webDriver;
-  }
-
-  @Override
-  protected void failed(Throwable e, Description description) {
-    File scrFile = ((TakesScreenshot) webDriver).getScreenshotAs(
-        OutputType.FILE);
-    String now = new SimpleDateFormat("yyyyMMdd-HHmmss").format(new Date());
-    String scrFilename = "screenshot-" + description.getClassName() + "-" + description.getMethodName() + "-" + now + ".png";
-    File outputFile = new File(computeScreenshotsRoot(description.getTestClass()), scrFilename);
-    log.info(scrFilename + " screenshot created.");
-    try {
-      FileUtils.copyFile(scrFile, outputFile);
-    } catch (IOException ioe) {
-      log.severe("Error copying screenshot after exception.");
+  public SeleniumScreenshotRule(WebDriver driver) {
+    if (driver instanceof RemoteWebDriver) {
+      webDriver = new Augmenter().augment(driver);
+    } else {
+      webDriver = driver;
     }
   }
 
-  public static File computeScreenshotsRoot(Class anyTestClass) {
-       final String clsUri = anyTestClass.getName().replace('.','/') + ".class";
-       final URL url = anyTestClass.getClassLoader().getResource(clsUri);
-       final String clsPath = url.getPath();
-       final File root = new File(clsPath.substring(0, clsPath.length() - clsUri.length()));
-       final File clsFile = new File(root, clsUri);
-       return new File(root.getParentFile(), "screenshots");
+  @Override
+  public Statement apply(final Statement base, final Description description) {
+    return new Statement() {
+
+      @Override
+      public void evaluate() throws Throwable {
+        try {
+          base.evaluate();
+        } catch (Throwable t) {
+          captureScreenShot(description);
+          throw t;
+        }
+      }
+
+      public void captureScreenShot(Description describe) {
+        File scrFile = ((TakesScreenshot) webDriver).getScreenshotAs(OutputType.FILE);
+        String now = new SimpleDateFormat("yyyyMMdd-HHmmss").format(new Date());
+        String scrFilename = describe.getClassName() + "-" + describe.getMethodName() + "-" + now + ".png";
+        File outputFile = new File(computeScreenshotsRoot(describe.getTestClass()), scrFilename);
+        log.info(scrFilename + " screenshot created.");
+        try {
+          FileUtils.copyFile(scrFile, outputFile);
+        } catch (IOException ioe) {
+          log.severe("Error copying screenshot after exception.");
+        }
+      }
+
+      public File computeScreenshotsRoot(Class anyTestClass) {
+        final String clsUri = anyTestClass.getName().replace('.','/') + ".class";
+        final URL url = anyTestClass.getClassLoader().getResource(clsUri);
+        final String clsPath = url.getPath();
+        final File root = new File(clsPath.substring(0, clsPath.length() - clsUri.length()));
+        final File clsFile = new File(root, clsUri);
+        return new File(root.getParentFile(), "screenshots");
+      }
+
+    };
   }
 }
