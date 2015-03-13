@@ -1,4 +1,4 @@
-package org.camunda.bpm.tasklist.test;
+package org.camunda.bpm.cockpit;
 
 
 import org.camunda.bpm.AbstractWebappUiIntegrationTest;
@@ -8,16 +8,19 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 
-public class TasklistIT extends AbstractWebappUiIntegrationTest {
 
-  public TasklistIT() {
-    super("/camunda/app/tasklist");
+public class DashboardIT extends AbstractWebappUiIntegrationTest {
+
+  public DashboardIT() {
+    super("/camunda/app/cockpit");
   }
 
   @Test
-  public void testLogin() {
-    driver.get(appUrl + "/#/login");
+  public void testLogin() throws URISyntaxException {
+    driver.get(appUrl+"/#/login");
 
     WebDriverWait wait = new WebDriverWait(driver, 10);
 
@@ -29,6 +32,10 @@ public class TasklistIT extends AbstractWebappUiIntegrationTest {
 
     WebElement submit = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("button[type=\"submit\"]")));
     submit.submit();
+
+    wait.until(ExpectedConditions.textToBePresentInElementLocated(By.tagName("h3"), "1 process deployed"));
+
+    wait.until(currentURIIs(new URI(appUrl + "/default/#/dashboard")));
   }
 
 }

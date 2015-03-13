@@ -1,14 +1,7 @@
-package org.camunda.bpm.rest.test;
+package org.camunda.bpm.rest;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.logging.Logger;
-import javax.ws.rs.core.MediaType;
-
+import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.WebResource;
 import org.camunda.bpm.AbstractWebappIntegrationTest;
 import org.camunda.bpm.engine.rest.hal.Hal;
 import org.codehaus.jettison.json.JSONArray;
@@ -17,8 +10,14 @@ import org.codehaus.jettison.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.WebResource;
+import javax.ws.rs.core.MediaType;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Logger;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class RestIT extends AbstractWebappIntegrationTest {
 

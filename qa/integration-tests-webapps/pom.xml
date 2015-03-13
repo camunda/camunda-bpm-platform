@@ -13,6 +13,7 @@
   <properties>
     <cargo.timeout>120000</cargo.timeout>
     <cargo.deploy.timeout>60000</cargo.deploy.timeout>
+    <version.chromedriver>2.14</version.chromedriver>
   </properties>
 
   <dependencies>
@@ -602,31 +603,6 @@
               <redirectTestOutputToFile>true</redirectTestOutputToFile>
             </configuration>
           </plugin>
-          <plugin>
-            <artifactId>maven-antrun-plugin</artifactId>
-            <version>1.4</version>
-            <executions>
-              <execution>
-                <id>database-test-config</id>
-                <phase>process-test-classes</phase>
-                <goals>
-                  <goal>run</goal>
-                </goals>
-                <configuration>
-                  <target>
-                    <copy file="${basedir}/src/test/resources/camunda.cfg.xml" tofile="target/test-classes/camunda.cfg.xml" overwrite="true">
-                      <filterset>
-                        <filter token="@database.url@" value="${database.url}" />
-                        <filter token="@database.driver@" value="${database.driver}" />
-                        <filter token="@database.user@" value="${database.username}" />
-                        <filter token="@database.password@" value="${database.password}" />
-                      </filterset>
-                    </copy>
-                  </target>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
         </plugins>
       </build>
     </profile>
@@ -688,6 +664,119 @@
       </build>
     </profile>
 
+    <profile>
+      <id>chromedriver-windows</id>
+      <activation>
+        <os>
+          <family>windows</family>
+        </os>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-dependency-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>unpack-chromedriver</id>
+                <goals>
+                  <goal>unpack</goal>
+                </goals>
+                <configuration>
+                  <artifactItems>
+                    <artifactItem>
+                      <groupId>chromedriver</groupId>
+                      <artifactId>chromedriver</artifactId>
+                      <version>${version.chromedriver}</version>
+                      <classifier>windows</classifier>
+                      <type>zip</type>
+                      <overWrite>true</overWrite>
+                      <outputDirectory>${project.build.directory}/chromedriver</outputDirectory>
+                    </artifactItem>
+                  </artifactItems>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <profile>
+      <id>chromedriver-osx</id>
+      <activation>
+        <os>
+          <family>mac</family>
+        </os>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-dependency-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>unpack-chromedriver</id>
+                <goals>
+                  <goal>unpack</goal>
+                </goals>
+                <configuration>
+                  <artifactItems>
+                    <artifactItem>
+                      <groupId>chromedriver</groupId>
+                      <artifactId>chromedriver</artifactId>
+                      <version>${version.chromedriver}</version>
+                      <classifier>osx</classifier>
+                      <type>zip</type>
+                      <overWrite>true</overWrite>
+                      <outputDirectory>${project.build.directory}/chromedriver</outputDirectory>
+                    </artifactItem>
+                  </artifactItems>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <profile>
+      <id>chromedriver-linux</id>
+      <activation>
+        <os>
+          <family>linux</family>
+        </os>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-dependency-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>unpack-chromedriver</id>
+                <goals>
+                  <goal>unpack</goal>
+                </goals>
+                <configuration>
+                  <artifactItems>
+                    <artifactItem>
+                      <groupId>chromedriver</groupId>
+                      <artifactId>chromedriver</artifactId>
+                      <version>${version.chromedriver}</version>
+                      <classifier>linux</classifier>
+                      <type>zip</type>
+                      <overWrite>true</overWrite>
+                      <outputDirectory>${project.build.directory}/chromedriver</outputDirectory>
+                    </artifactItem>
+                  </artifactItems>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
   </profiles>
 
   <build>
