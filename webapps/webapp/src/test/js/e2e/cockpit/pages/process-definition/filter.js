@@ -8,6 +8,14 @@ module.exports = Filter.extend({
     return element(by.css('.ctn-sidebar'));
   },
 
+  activityFilter: function(activityName) {
+    return this.filterSideBarElement().element(by.cssContainingText('.activity-filter >.search', activityName));
+  },
+
+  removeFilterButton: function(activityName) {
+    return this.activityFilter(activityName).element(by.css('button'));
+  },
+
   addFilterButton: function() {
     return this.filterSideBarElement().element(by.css('.icon-plus'));
   },

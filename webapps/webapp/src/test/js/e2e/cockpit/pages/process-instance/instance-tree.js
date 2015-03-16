@@ -30,17 +30,23 @@ module.exports = Base.extend({
   },
 
   selectInstance: function(activityName) {
-    this.formElement().element(by.css()).click();
+    this.formElement().element(by.cssContainingText('.tree-node-label', activityName)).click();
   },
 
   deselectInstance: function(activityName) {
-
+    this.formElement().element(by.cssContainingText('.tree-node-label', activityName)).element(by.css('button')).click();
   },
 
-  instanceSelectionState: function(activityName) {},
+  isInstanceSelected: function(activityName) {
+    return this.formElement().element(by.cssContainingText('.tree-node-label', activityName)).getAttribute('class').then(function(classes) {
+      return classes.indexOf('selected') !== -1;
+    });
+  },
 
-  isInstanceSelected: function(activityName) {},
-
-  isInstanceNotSelected: function(activityName) {}
+  isInstanceNotSelected: function(activityName) {
+    return this.formElement().element(by.cssContainingText('.tree-node-label', activityName)).getAttribute('class').then(function(classes) {
+      return classes.indexOf('selected') === -1;
+    });
+  }
 
 });

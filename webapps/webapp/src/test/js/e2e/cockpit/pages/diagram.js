@@ -4,35 +4,36 @@ var Base = require('./base');
 
 module.exports = Base.extend({
 
+  diagramElement: function() {
+    return element(by.css('[cam-widget-bpmn-viewer]'));
+  },
+
+  instancesBadgeFor: function(activityName) {
+    return element(by.css('.djs-overlays-'+activityName+' .badge[tooltip="Running Activity Instances"]'));
+  },
+
   diagramActivity: function(activityName) {
-    return element(by.css('.process-diagram *[data-activity-id=' + '"' + activityName + '"' + ']'));
+    return element(by.css('*[data-element-id=' + '"' + activityName + '"' + ']'));
   },
 
   selectActivity: function(activityName) {
     this.diagramActivity(activityName).click();
   },
 
-  deselectActivity: function(activityName) {
-    var selectedActivity = this.isActivitySelected(activityName);
-
-    protractor.getInstance().actions()
-        .keyDown(protractor.Key.CONTROL)
-        .click(selectedActivity)
-        .keyUp(protractor.Key.CONTROL)
-        .perform();
-  },
-
-  activitiySelectionState: function(activityName) {
-    return this.diagramActivity(activityName).getAttribute('class');
+  deselectAll: function() {
+    this.diagramElement().click();
   },
 
   isActivitySelected: function(activityName) {
-    //return this.diagramActivity(activityName).getAttribute('class');
-    expect(this.activitiySelectionState(activityName)).toMatch('activity-highlight');
+    return this.diagramActivity(activityName).getAttribute('class').then(function(classes) {
+      return classes.indexOf('highlight') !== -1;
+    });
   },
 
   isActivityNotSelected: function(activityName) {
-    expect(this.activitiySelectionState(activityName)).not.toMatch('activity-highlight');
+    return this.diagramActivity(activityName).getAttribute('class').then(function(classes) {
+      return classes.indexOf('highlight') === -1;
+    });
   }
 
 });
