@@ -27,8 +27,7 @@ module.exports = Base.extend({
     else
       item = this.formElement().element(by.css('accordion .panel:nth-child(1) [ng-click="toggleOpen()"]'));
 
-    item.click();
-    return item;
+    return item.click();
   },
 
   // general
@@ -75,6 +74,7 @@ module.exports = Base.extend({
 
   // criteria
   addCriterionButton: function() {
+    this.waitForElementToBePresent('[ng-click="addCriterion()"]', 2000);
     return this.formElement().element(by.css('[ng-click="addCriterion()"]'));
   },
 
@@ -114,7 +114,6 @@ module.exports = Base.extend({
     this.addCriterionButton().click().then(function() {
       self.criterionList().count().then(function(items) {
         items = items -1;
-        console.log(items);
         self.selectCriterionKey(items, group, key);
         self.criterionValueInput(items, value);
       });
