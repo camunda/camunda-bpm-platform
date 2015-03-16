@@ -20,6 +20,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.inOrder;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -40,6 +41,7 @@ import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.helper.EqualsList;
 import org.camunda.bpm.engine.rest.helper.EqualsMap;
+import org.camunda.bpm.engine.rest.helper.EqualsVariableMap;
 import org.camunda.bpm.engine.rest.helper.ErrorMessageHelper;
 import org.camunda.bpm.engine.rest.helper.ExampleVariableObject;
 import org.camunda.bpm.engine.rest.helper.MockObjectValue;
@@ -49,8 +51,10 @@ import org.camunda.bpm.engine.rest.helper.variable.EqualsNullValue;
 import org.camunda.bpm.engine.rest.helper.variable.EqualsObjectValue;
 import org.camunda.bpm.engine.rest.helper.variable.EqualsPrimitiveValue;
 import org.camunda.bpm.engine.rest.helper.variable.EqualsUntypedValue;
+import org.camunda.bpm.engine.rest.util.ModificationInstructionBuilder;
 import org.camunda.bpm.engine.rest.util.VariablesBuilder;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.runtime.ProcessInstanceActivityInstantiationBuilder;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
@@ -61,6 +65,7 @@ import org.codehaus.jackson.map.type.TypeFactory;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.InOrder;
 
 import com.jayway.restassured.http.ContentType;
 import com.jayway.restassured.response.Response;
@@ -77,6 +82,7 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
   private static final String EXAMPLE_PROCESS_INSTANCE_ID_WITH_NULL_VALUE_AS_VARIABLE = "aProcessInstanceWithNullValueAsVariable";
   protected static final String SINGLE_PROCESS_INSTANCE_SUSPENDED_URL = SINGLE_PROCESS_INSTANCE_URL + "/suspended";
   protected static final String PROCESS_INSTANCE_SUSPENDED_URL = PROCESS_INSTANCE_URL + "/suspended";
+  protected static final String PROCESS_INSTANCE_MODIFICATION_URL = SINGLE_PROCESS_INSTANCE_URL + "/modification";
 
   protected static final VariableMap EXAMPLE_OBJECT_VARIABLES = Variables.createVariables();
   static {
@@ -1432,5 +1438,226 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
         .body("message", is(message))
       .when()
         .put(PROCESS_INSTANCE_SUSPENDED_URL);
+  }
+
+  @Test
+  public void testProcessInstanceModification() {
+    ProcessInstanceActivityInstantiationBuilder mockModificationBuilder = setUpMockModificationBuilder();
+    when(runtimeServiceMock.createProcessInstanceModification(anyString())).thenReturn(mockModificationBuilder);
+
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("skipCustomListeners", true);
+    json.put("skipIoMappings", true);
+
+    List<Map<String, Object>> instructions = new ArrayList<Map<String, Object>>();
+
+    instructions.add(ModificationInstructionBuilder.cancellation().activityId("activityId").getJson());
+    instructions.add(ModificationInstructionBuilder.cancellation().activityInstanceId("activityInstanceId").getJson());
+    instructions.add(ModificationInstructionBuilder.startBefore().activityId("activityId").getJson());
+    instructions.add(ModificationInstructionBuilder.startBefore()
+        .activityId("activityId").ancestorActivityInstanceId("ancestorActivityInstanceId").getJson());
+    instructions.add(ModificationInstructionBuilder.startAfter().activityId("activityId").getJson());
+    instructions.add(ModificationInstructionBuilder.startAfter()
+        .activityId("activityId").ancestorActivityInstanceId("ancestorActivityInstanceId").getJson());
+    instructions.add(ModificationInstructionBuilder.startTransition().activityId("activityId").getJson());
+    instructions.add(ModificationInstructionBuilder.startTransition()
+        .activityId("activityId").ancestorActivityInstanceId("ancestorActivityInstanceId").getJson());
+
+    json.put("instructions", instructions);
+
+    given()
+      .pathParam("id", EXAMPLE_PROCESS_INSTANCE_ID)
+      .contentType(ContentType.JSON)
+      .body(json)
+    .then()
+      .expect()
+        .statusCode(Status.NO_CONTENT.getStatusCode())
+      .when()
+        .post(PROCESS_INSTANCE_MODIFICATION_URL);
+
+    verify(runtimeServiceMock).createProcessInstanceModification(eq(EXAMPLE_PROCESS_INSTANCE_ID));
+
+    InOrder inOrder = inOrder(mockModificationBuilder);
+    inOrder.verify(mockModificationBuilder).cancelAllInActivity("activityId");
+    inOrder.verify(mockModificationBuilder).cancelActivityInstance("activityInstanceId");
+    inOrder.verify(mockModificationBuilder).startBeforeActivity("activityId");
+    inOrder.verify(mockModificationBuilder).startBeforeActivity("activityId", "ancestorActivityInstanceId");
+    inOrder.verify(mockModificationBuilder).startAfterActivity("activityId");
+    inOrder.verify(mockModificationBuilder).startAfterActivity("activityId", "ancestorActivityInstanceId");
+    inOrder.verify(mockModificationBuilder).startTransition("activityId");
+    inOrder.verify(mockModificationBuilder).startTransition("activityId", "ancestorActivityInstanceId");
+
+    inOrder.verify(mockModificationBuilder).execute(true, true);
+
+    inOrder.verifyNoMoreInteractions();
+  }
+
+  @Test
+  public void testProcessInstanceModificationWithVariables() {
+    ProcessInstanceActivityInstantiationBuilder mockModificationBuilder = setUpMockModificationBuilder();
+    when(runtimeServiceMock.createProcessInstanceModification(anyString())).thenReturn(mockModificationBuilder);
+
+    Map<String, Object> json = new HashMap<String, Object>();
+
+    List<Map<String, Object>> instructions = new ArrayList<Map<String, Object>>();
+
+    instructions.add(
+        ModificationInstructionBuilder.startBefore()
+          .activityId("activityId")
+          .variables(VariablesBuilder.create()
+              .variable("var", "value", "String", false)
+              .variable("varLocal", "valueLocal", "String", true)
+              .getVariables())
+          .getJson());
+    instructions.add(
+        ModificationInstructionBuilder.startAfter()
+          .activityId("activityId")
+          .variables(VariablesBuilder.create()
+              .variable("var", 52, "Integer", false)
+              .variable("varLocal", 74, "Integer", true)
+              .getVariables())
+          .getJson());
+
+    json.put("instructions", instructions);
+
+    given()
+      .pathParam("id", EXAMPLE_PROCESS_INSTANCE_ID)
+      .contentType(ContentType.JSON)
+      .body(json)
+    .then()
+      .expect()
+        .statusCode(Status.NO_CONTENT.getStatusCode())
+      .when()
+        .post(PROCESS_INSTANCE_MODIFICATION_URL);
+
+    verify(runtimeServiceMock).createProcessInstanceModification(eq(EXAMPLE_PROCESS_INSTANCE_ID));
+
+    InOrder inOrder = inOrder(mockModificationBuilder);
+    inOrder.verify(mockModificationBuilder).startBeforeActivity("activityId");
+
+    verify(mockModificationBuilder).setVariableLocal(eq("varLocal"), argThat(EqualsPrimitiveValue.stringValue("valueLocal")));
+    verify(mockModificationBuilder).setVariable(eq("var"), argThat(EqualsPrimitiveValue.stringValue("value")));
+
+    inOrder.verify(mockModificationBuilder).startAfterActivity("activityId");
+
+    verify(mockModificationBuilder).setVariable(eq("var"), argThat(EqualsPrimitiveValue.integerValue(52)));
+    verify(mockModificationBuilder).setVariableLocal(eq("varLocal"), argThat(EqualsPrimitiveValue.integerValue(74)));
+
+    inOrder.verify(mockModificationBuilder).execute(false, false);
+
+    inOrder.verifyNoMoreInteractions();
+  }
+
+  @Test
+  public void testInvalidModification() {
+    Map<String, Object> json = new HashMap<String, Object>();
+
+    // start before: missing activity id
+    List<Map<String, Object>> instructions = new ArrayList<Map<String, Object>>();
+    instructions.add(ModificationInstructionBuilder.startBefore().getJson());
+    json.put("instructions", instructions);
+
+    given()
+      .pathParam("id", EXAMPLE_PROCESS_INSTANCE_ID)
+      .contentType(ContentType.JSON)
+      .body(json)
+    .then()
+    .expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+      .body("type", is(InvalidRequestException.class.getSimpleName()))
+      .body("message", containsString("'activityId' must be set"))
+    .when()
+      .post(PROCESS_INSTANCE_MODIFICATION_URL);
+
+    // start after: missing ancestor activity instance id
+    instructions = new ArrayList<Map<String, Object>>();
+    instructions.add(ModificationInstructionBuilder.startAfter().getJson());
+    json.put("instructions", instructions);
+
+    given()
+      .pathParam("id", EXAMPLE_PROCESS_INSTANCE_ID)
+      .contentType(ContentType.JSON)
+      .body(json)
+    .then()
+    .expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+      .body("type", is(InvalidRequestException.class.getSimpleName()))
+      .body("message", containsString("'activityId' must be set"))
+    .when()
+      .post(PROCESS_INSTANCE_MODIFICATION_URL);
+
+    // start transition: missing ancestor activity instance id
+    instructions = new ArrayList<Map<String, Object>>();
+    instructions.add(ModificationInstructionBuilder.startTransition().getJson());
+    json.put("instructions", instructions);
+
+    given()
+      .pathParam("id", EXAMPLE_PROCESS_INSTANCE_ID)
+      .contentType(ContentType.JSON)
+      .body(json)
+    .then()
+    .expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+      .body("type", is(InvalidRequestException.class.getSimpleName()))
+      .body("message", containsString("'activityId' must be set"))
+    .when()
+      .post(PROCESS_INSTANCE_MODIFICATION_URL);
+
+    // cancel: missing activity id and activity instance id
+    instructions = new ArrayList<Map<String, Object>>();
+    instructions.add(ModificationInstructionBuilder.cancellation().getJson());
+    json.put("instructions", instructions);
+
+    given()
+      .pathParam("id", EXAMPLE_PROCESS_INSTANCE_ID)
+      .contentType(ContentType.JSON)
+      .body(json)
+    .then()
+    .expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+      .body("type", is(InvalidRequestException.class.getSimpleName()))
+      .body("message", containsString("'activityId' or 'activityInstanceId' is required"))
+    .when()
+      .post(PROCESS_INSTANCE_MODIFICATION_URL);
+
+    // cancel: both, activity id and activity instance id, set
+    instructions = new ArrayList<Map<String, Object>>();
+    instructions.add(ModificationInstructionBuilder.cancellation().activityId("anActivityId")
+        .activityInstanceId("anActivityInstanceId").getJson());
+    json.put("instructions", instructions);
+
+    given()
+      .pathParam("id", EXAMPLE_PROCESS_INSTANCE_ID)
+      .contentType(ContentType.JSON)
+      .body(json)
+    .then()
+    .expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+      .body("type", is(InvalidRequestException.class.getSimpleName()))
+      .body("message", containsString("only one, 'activityId' or 'activityInstanceId', can be set"))
+    .when()
+      .post(PROCESS_INSTANCE_MODIFICATION_URL);
+
+  }
+
+
+  @SuppressWarnings("unchecked")
+  protected ProcessInstanceActivityInstantiationBuilder setUpMockModificationBuilder() {
+    ProcessInstanceActivityInstantiationBuilder mockModificationBuilder =
+        mock(ProcessInstanceActivityInstantiationBuilder.class);
+
+    when(mockModificationBuilder.cancelActivityInstance(anyString())).thenReturn(mockModificationBuilder);
+    when(mockModificationBuilder.cancelAllInActivity(anyString())).thenReturn(mockModificationBuilder);
+    when(mockModificationBuilder.startAfterActivity(anyString())).thenReturn(mockModificationBuilder);
+    when(mockModificationBuilder.startAfterActivity(anyString(), anyString())).thenReturn(mockModificationBuilder);
+    when(mockModificationBuilder.startBeforeActivity(anyString())).thenReturn(mockModificationBuilder);
+    when(mockModificationBuilder.startBeforeActivity(anyString(), anyString())).thenReturn(mockModificationBuilder);
+    when(mockModificationBuilder.startTransition(anyString())).thenReturn(mockModificationBuilder);
+    when(mockModificationBuilder.startTransition(anyString(), anyString())).thenReturn(mockModificationBuilder);
+    when(mockModificationBuilder.setVariables(any(Map.class))).thenReturn(mockModificationBuilder);
+    when(mockModificationBuilder.setVariablesLocal(any(Map.class))).thenReturn(mockModificationBuilder);
+
+    return mockModificationBuilder;
+
   }
 }

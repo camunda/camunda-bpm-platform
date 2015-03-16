@@ -19,12 +19,14 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.rest.dto.runtime.ActivityInstanceDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceDto;
+import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceModificationDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceSuspensionStateDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.sub.VariableResource;
 import org.camunda.bpm.engine.rest.sub.runtime.ProcessInstanceResource;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.runtime.ProcessInstanceModificationBuilder;
 import org.codehaus.jackson.map.ObjectMapper;
 
 public class ProcessInstanceResourceImpl implements ProcessInstanceResource {
@@ -91,5 +93,17 @@ public class ProcessInstanceResourceImpl implements ProcessInstanceResource {
   public void updateSuspensionState(ProcessInstanceSuspensionStateDto dto) {
     dto.setProcessInstanceId(processInstanceId);
     dto.updateSuspensionState(engine);
+  }
+
+  @Override
+  public void modifyProcessInstance(ProcessInstanceModificationDto dto) {
+    if (dto.getInstructions() != null && !dto.getInstructions().isEmpty()) {
+      ProcessInstanceModificationBuilder modificationBuilder =
+          engine.getRuntimeService().createProcessInstanceModification(processInstanceId);
+
+      dto.applyTo(modificationBuilder, engine, objectMapper);
+
+      modificationBuilder.execute(dto.isSkipCustomListeners(), dto.isSkipIoMappings());
+    }
   }
 }
