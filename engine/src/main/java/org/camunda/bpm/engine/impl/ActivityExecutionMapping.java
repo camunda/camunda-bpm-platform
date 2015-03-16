@@ -82,7 +82,12 @@ public class ActivityExecutionMapping {
         else {
           // if current execution has no activity instance id, it is not actually executing its assigned activity
           // but for example async before
-          assignToActivity(leaf, activity.getParentScope());
+          ExecutionEntity scopeExecution = leaf;
+          if (!leaf.isScope()) {
+            scopeExecution = scopeExecution.getParent();
+          }
+
+          assignToActivity(scopeExecution, activity.getParentScope());
         }
 
 

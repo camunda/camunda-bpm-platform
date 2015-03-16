@@ -39,6 +39,7 @@ public class ProcessInstanceModificationAsyncTest extends PluggableProcessEngine
   protected static final String EXCLUSIVE_GATEWAY_ASYNC_TASK_PROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationTest.exclusiveGatewayAsyncTask.bpmn20.xml";
   protected static final String NESTED_ASYNC_TASK_PROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationTest.nestedParallelAsyncOneTaskProcess.bpmn20.xml";
   protected static final String NESTED_ASYNC_SCOPE_TASK_PROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationTest.nestedParallelAsyncOneScopeTaskProcess.bpmn20.xml";
+  protected static final String NESTED_PARALLEL_ASYNC_SCOPE_TASK_PROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationTest.nestedParallelAsyncConcurrentScopeTaskProcess.bpmn20.xml";
 
 
   @Deployment(resources = EXCLUSIVE_GATEWAY_ASYNC_TASK_PROCESS)
@@ -160,6 +161,39 @@ public class ProcessInstanceModificationAsyncTest extends PluggableProcessEngine
   public void testCancelParentScopeOfAsyncScopeActivity() {
     // given a process instance with an async task in a subprocess
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("nestedOneTaskProcess");
+
+    ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
+
+    // when I cancel the subprocess
+    runtimeService.createProcessInstanceModification(processInstance.getId())
+      .cancelActivityInstance(getInstanceIdForActivity(tree, "subProcess"))
+      .execute();
+
+    // then the process instance is in a valid state
+    ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstance.getId());
+    assertNotNull(updatedTree);
+
+    assertThat(updatedTree).hasStructure(
+      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+        .activity("outerTask")
+      .done());
+
+    ExecutionTree executionTree = ExecutionTree.forExecution(processInstance.getId(), processEngine);
+
+    assertThat(executionTree)
+    .matches(
+      describeExecutionTree("outerTask").scope()
+      .done());
+
+    completeTasksInOrder("outerTask");
+    assertProcessEnded(processInstance.getId());
+
+  }
+
+  @Deployment(resources = NESTED_PARALLEL_ASYNC_SCOPE_TASK_PROCESS)
+  public void testCancelParentScopeOfParallelAsyncScopeActivity() {
+    // given a process instance with two concurrent async scope tasks in a subprocess
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("nestedConcurrentTasksProcess");
 
     ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
 
