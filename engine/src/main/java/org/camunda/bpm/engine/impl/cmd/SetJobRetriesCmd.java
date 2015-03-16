@@ -30,7 +30,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 public class SetJobRetriesCmd implements Command<Void>, Serializable {
 
   private static final long serialVersionUID = 1L;
-  protected static final String RETRY_STATE_PROPERTY = "retryState";
+  protected static final String RETRIES = "retries";
 
   protected final String jobId;
   protected final String jobDefinitionId;
@@ -72,7 +72,7 @@ public class SetJobRetriesCmd implements Command<Void>, Serializable {
       int oldRetries = job.getRetries();
       job.setRetries(retries);
 
-      PropertyChange propertyChange = new PropertyChange(RETRY_STATE_PROPERTY, oldRetries, job.getRetries());
+      PropertyChange propertyChange = new PropertyChange(RETRIES, oldRetries, job.getRetries());
       commandContext.getOperationLogManager().logJobRetryOperation(getLogEntryOperation(), job.getId(),
         job.getJobDefinitionId(), job.getProcessInstanceId(), job.getProcessDefinitionId(),
         job.getProcessDefinitionKey(), propertyChange);
@@ -87,7 +87,7 @@ public class SetJobRetriesCmd implements Command<Void>, Serializable {
         .updateFailedJobRetriesByJobDefinitionId(jobDefinitionId, retries);
 
     JobDefinitionEntity jobDefinitionEntity = commandContext.getJobDefinitionManager().findById(jobDefinitionId);
-    PropertyChange propertyChange = new PropertyChange(RETRY_STATE_PROPERTY, null, retries);
+    PropertyChange propertyChange = new PropertyChange(RETRIES, null, retries);
     commandContext.getOperationLogManager().logJobRetryOperation(getLogEntryOperation(), null, jobDefinitionId, null,
       jobDefinitionEntity.getProcessDefinitionId(), jobDefinitionEntity.getProcessDefinitionKey(), propertyChange);
   }

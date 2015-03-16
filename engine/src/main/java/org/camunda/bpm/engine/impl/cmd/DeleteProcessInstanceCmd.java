@@ -47,7 +47,7 @@ public class DeleteProcessInstanceCmd implements Command<Void>, Serializable {
       .deleteProcessInstance(processInstanceId, deleteReason, false, skipCustomListeners);
 
     commandContext.getOperationLogManager()
-      .logProcessInstanceOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE, processInstanceId,
+      .logProcessInstanceOperation(null, UserOperationLogEntry.OPERATION_TYPE_DELETE, processInstanceId,
           null, null, PropertyChange.EMPTY_CHANGE);
 
     return null;

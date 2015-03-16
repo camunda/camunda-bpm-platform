@@ -13,7 +13,13 @@
 package org.camunda.bpm.engine.impl.cmd;
 
 import java.util.Date;
+import java.util.List;
+
+import org.camunda.bpm.engine.EntityTypes;
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.history.HistoryLevel;
+import org.camunda.bpm.engine.impl.history.event.UserOperationLogEntryEventEntity;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobHandler;
@@ -116,8 +122,32 @@ public abstract class AbstractSetProcessDefinitionStateCmd implements Command<Vo
       .logProcessDefinitionOperation(getLogEntryOperation(), processDefinitionId, processDefinitionKey, propertyChange);
 
     if (includeProcessInstances) {
-      getSetProcessInstanceStateCmd().execute(commandContext);
+      if(isHistoryLevelFullEnabled()) {
+        getSetProcessInstanceStateCmd().execute(commandContext, getLogEntryOperationId(commandContext));
+      } else {
+        getSetProcessInstanceStateCmd().execute(commandContext);
+      }
     }
+  }
+
+  protected String getLogEntryOperationId(CommandContext commandContext) {
+    List<UserOperationLogEntryEventEntity> userOperationLogEntryEntityList = commandContext
+      .getDbEntityManager()
+      .getCachedEntitiesByType(UserOperationLogEntryEventEntity.class);
+
+    String operationId = null;
+    for (UserOperationLogEntryEventEntity entity : userOperationLogEntryEntityList) {
+      if(EntityTypes.PROCESS_DEFINITION.equals(entity.getEntityType())) {
+        operationId = entity.getOperationId();
+        break;
+      }
+    }
+
+    return operationId;
+  }
+
+  protected Boolean isHistoryLevelFullEnabled() {
+    return Context.getProcessEngineConfiguration().getHistoryLevel().equals(HistoryLevel.HISTORY_LEVEL_FULL);
   }
 
   // ABSTRACT METHODS ////////////////////////////////////////////////////////////////////

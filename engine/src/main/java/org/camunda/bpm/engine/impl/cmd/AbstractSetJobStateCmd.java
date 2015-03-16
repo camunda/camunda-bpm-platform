@@ -16,7 +16,6 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.*;
-import org.camunda.bpm.engine.runtime.Job;
 
 /**
  * @author roman.smirnov
@@ -41,6 +40,10 @@ public abstract class AbstractSetJobStateCmd implements Command<Void> {
   }
 
   public Void execute(CommandContext commandContext) {
+    return execute(commandContext, null);
+  }
+
+  public Void execute(CommandContext commandContext, String operationId) {
     if(jobId == null && jobDefinitionId == null && processInstanceId == null && processDefinitionId == null && processDefinitionKey == null) {
       throw new ProcessEngineException("Job id, job definition id, process instance id, process definition id nor process definition key cannot be null");
     }
@@ -50,19 +53,10 @@ public abstract class AbstractSetJobStateCmd implements Command<Void> {
 
     if (jobId != null) {
       jobManager.updateJobSuspensionStateById(jobId, suspensionState);
-      Job job = jobManager.findJobById(jobId);
-      jobDefinitionId = job.getJobDefinitionId();
-      processInstanceId = job.getProcessInstanceId();
-      processDefinitionId = job.getProcessDefinitionId();
-      processDefinitionKey = job.getProcessDefinitionKey();
     } else
 
     if (jobDefinitionId != null) {
       jobManager.updateJobSuspensionStateByJobDefinitionId(jobDefinitionId, suspensionState);
-      JobDefinitionManager jobDefinitionManager = commandContext.getJobDefinitionManager();
-      JobDefinitionEntity jobDefinition = jobDefinitionManager.findById(jobDefinitionId);
-      processDefinitionId = jobDefinition.getProcessDefinitionId();
-      processDefinitionKey = jobDefinition.getProcessDefinitionKey();
     } else
 
     if (processInstanceId != null) {
@@ -78,7 +72,7 @@ public abstract class AbstractSetJobStateCmd implements Command<Void> {
     }
 
     PropertyChange propertyChange = new PropertyChange(SUSPENSION_STATE_PROPERTY, null, suspensionState.getName());
-    commandContext.getOperationLogManager().logJobOperation(getLogEntryOperation(), jobId, jobDefinitionId,
+    commandContext.getOperationLogManager().logJobOperation(operationId, getLogEntryOperation(), jobId, jobDefinitionId,
       processInstanceId, processDefinitionId, processDefinitionKey, propertyChange);
 
     return null;

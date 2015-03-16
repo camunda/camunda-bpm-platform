@@ -502,7 +502,9 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     context.setUserId(userId);
 
     String operationId = Context.getProcessEngineConfiguration().getIdGenerator().getNextId();
-    context.setOperationId(operationId);
+    if(context.getOperationId() == null || context.getOperationId().equals("")) {
+      context.setOperationId(operationId);
+    }
 
     for (PropertyChange propertyChange : context.getPropertyChanges()) {
       UserOperationLogEntryEventEntity evt = new UserOperationLogEntryEventEntity();
