@@ -43,7 +43,6 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
 
   protected static final String PARALLEL_GATEWAY_PROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationTest.parallelGateway.bpmn20.xml";
   protected static final String EXCLUSIVE_GATEWAY_PROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationTest.exclusiveGateway.bpmn20.xml";
-  protected static final String EXCLUSIVE_GATEWAY_ASYNC_TASK_PROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationTest.exclusiveGatewayAsyncTask.bpmn20.xml";
   protected static final String SUBPROCESS_PROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationTest.subprocess.bpmn20.xml";
   protected static final String SUBPROCESS_LISTENER_PROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationTest.subprocessListeners.bpmn20.xml";
   protected static final String SUBPROCESS_BOUNDARY_EVENTS_PROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationTest.subprocessBoundaryEvents.bpmn20.xml";
@@ -852,87 +851,7 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
     assertProcessEnded(processInstanceId);
   }
 
-  @Deployment(resources = EXCLUSIVE_GATEWAY_ASYNC_TASK_PROCESS)
-  public void testStartBeforeAsync() {
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("exclusiveGateway");
-    String processInstanceId = processInstance.getId();
 
-    runtimeService
-      .createProcessInstanceModification(processInstance.getId())
-      .startBeforeActivity("task2")
-      .execute();
-
-    // the task does not yet exist because it is started asynchronously
-    Task task = taskService.createTaskQuery().taskDefinitionKey("task2").singleResult();
-    assertNull(task);
-
-    // and there is no activity instance for task2 yet
-    ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstanceId);
-    assertNotNull(updatedTree);
-    assertEquals(processInstanceId, updatedTree.getProcessInstanceId());
-
-    assertThat(updatedTree).hasStructure(
-      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-        .activity("task1")
-      .done());
-
-    ExecutionTree executionTree = ExecutionTree.forExecution(processInstanceId, processEngine);
-
-    assertThat(executionTree)
-    .matches(
-      describeExecutionTree(null).scope()
-        .child("task1").concurrent().noScope().up()
-        .child("task2").concurrent().noScope()
-      .done());
-
-    // when the async job is executed
-    Job job = managementService.createJobQuery().singleResult();
-    assertNotNull(job);
-    executeAvailableJobs();
-
-    // then there is the task
-    task = taskService.createTaskQuery().taskDefinitionKey("task2").singleResult();
-    assertNotNull(task);
-
-    // and there is an activity instance for task2
-    updatedTree = runtimeService.getActivityInstance(processInstanceId);
-    assertNotNull(updatedTree);
-
-    assertThat(updatedTree).hasStructure(
-      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-        .activity("task1")
-        .activity("task2")
-      .done());
-
-    completeTasksInOrder("task1", "task2");
-    assertProcessEnded(processInstanceId);
-  }
-
-  /**
-   * starting after a task should not respect that tasks asyncAfter setting
-   */
-  @Deployment
-  public void testStartAfterAsync() {
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("exclusiveGateway");
-    String processInstanceId = processInstance.getId();
-
-    runtimeService
-      .createProcessInstanceModification(processInstance.getId())
-      .startAfterActivity("task2")
-      .execute();
-
-    // there is now a job for the end event after task2
-    Job job = managementService.createJobQuery().singleResult();
-    assertNotNull(job);
-
-    Execution jobExecution = runtimeService.createExecutionQuery().activityId("end2").executionId(job.getExecutionId()).singleResult();
-    assertNotNull(jobExecution);
-
-    // end process
-    completeTasksInOrder("task1");
-    managementService.executeJob(job.getId());
-    assertProcessEnded(processInstanceId);
-  }
 
   @Deployment(resources = SUBPROCESS_BOUNDARY_EVENTS_PROCESS)
   public void testStartBeforeEventSubscription() {

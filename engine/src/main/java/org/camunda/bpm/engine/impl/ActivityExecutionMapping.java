@@ -76,9 +76,18 @@ public class ActivityExecutionMapping {
       ScopeImpl activity = leaf.getActivity();
 
       if (activity != null) {
-        assignToActivity(leaf, activity);
+        if (leaf.getActivityInstanceId() != null) {
+          assignToActivity(leaf, activity);
+        }
+        else {
+          // if current execution has no activity instance id, it is not actually executing its assigned activity
+          // but for example async before
+          assignToActivity(leaf, activity.getParentScope());
+        }
 
-      } else if (leaf.isProcessInstanceExecution()) {
+
+      }
+      else if (leaf.isProcessInstanceExecution()) {
         assignToActivity(leaf, leaf.getProcessDefinition());
 
       }
@@ -87,7 +96,7 @@ public class ActivityExecutionMapping {
   }
 
   protected void assignToActivity(ExecutionEntity execution, ScopeImpl activity) {
-    EnsureUtil.ensureNotNull("activityId", activity);
+    EnsureUtil.ensureNotNull("activity", activity);
     submitExecution(execution, activity);
 
     if (execution.isProcessInstanceExecution()) {
