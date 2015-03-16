@@ -40,15 +40,6 @@ module.exports = function(config) {
           main: 'Bpmn'
         },
         {
-          name: 'dojo',
-          location : 'vendor/dojo/dojo'
-        },
-        {
-          name: 'dojox',
-          location : 'vendor/dojo/dojox'
-        },
-
-        {
           name: 'services',
           location: './scripts/services',
         },
