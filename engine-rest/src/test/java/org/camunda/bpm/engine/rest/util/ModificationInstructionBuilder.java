@@ -26,7 +26,6 @@ public class ModificationInstructionBuilder {
   }
 
   protected Map<String, Object> variables;
-  protected Map<String, Object> variablesLocal;
 
   protected String type;
   protected String activityId;
@@ -52,11 +51,6 @@ public class ModificationInstructionBuilder {
 
   public ModificationInstructionBuilder variables(Map<String, Object> variables) {
     this.variables = variables;
-    return this;
-  }
-
-  public ModificationInstructionBuilder variablesLocal(Map<String, Object> variablesLocal) {
-    this.variablesLocal = variablesLocal;
     return this;
   }
 
@@ -88,7 +82,6 @@ public class ModificationInstructionBuilder {
     json.put("activityInstanceId", activityInstanceId);
     json.put("ancestorActivityInstanceId", ancestorActivityInstanceId);
     json.put("variables", variables);
-    json.put("variablesLocal", variablesLocal);
     json.put("transitionId", transitionId);
 
     return json;
