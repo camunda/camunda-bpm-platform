@@ -98,7 +98,7 @@ describe('Tasklist Filter Spec', function() {
   });
 
 
-  describe('edit filter', function() {
+  describe.only('edit filter', function() {
 
     before(function() {
       return testHelper(setupFile, function() {
@@ -111,7 +111,7 @@ describe('Tasklist Filter Spec', function() {
     });
 
 
-    describe('general panel', function() {
+    describe.skip('general panel', function() {
 
       it('should edit general panel of My Filter', function() {
 
@@ -155,7 +155,7 @@ describe('Tasklist Filter Spec', function() {
     });
 
 
-    describe('variable panel', function() {
+    describe.skip('variable panel', function() {
 
       it('should edit variable panel of Test Filter', function() {
 
@@ -189,6 +189,7 @@ describe('Tasklist Filter Spec', function() {
     describe('criteria panel', function() {
 
       beforeEach(function() {
+        dashboardPage.navigateTo();
         dashboardPage.taskFilters.selectFilter(2);
         dashboardPage.taskFilters.editFilter(2);
         dashboardPage.taskFilters.editFilterPage.selectPanel('Criteria');

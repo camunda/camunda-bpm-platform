@@ -111,10 +111,10 @@ module.exports = Base.extend({
   addCriteria: function(group, key, value) {
     var self = this;
 
-    this.addCriterionButton().then(function(button) {
-      button.click();
+    this.addCriterionButton().click().then(function() {
       self.criterionList().count().then(function(items) {
         items = items -1;
+        console.log(items);
         self.selectCriterionKey(items, group, key);
         self.criterionValueInput(items, value);
       });
