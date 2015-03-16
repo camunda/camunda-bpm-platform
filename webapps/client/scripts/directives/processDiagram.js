@@ -1,12 +1,11 @@
-/* global define: false, console: false */
+/* global define: false */
 define([
   'angular',
   'jquery',
-  'bpmn/Bpmn',
   'text!./processDiagram.html',
   'jquery-overscroll',
   'jquery-mousewheel'
-], function(angular, $, Bpmn, template) {
+], function(angular, $, template) {
   'use strict';
   /* jshint unused: false */
   var _unique = 0;

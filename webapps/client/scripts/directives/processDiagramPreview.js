@@ -1,4 +1,4 @@
-define(['bpmn/Bpmn', 'text!./processDiagramPreview.html'], function(Bpmn, template) {
+define(['text!./processDiagramPreview.html'], function(template) {
   'use strict';
 
   return ['ProcessDefinitionResource', function (ProcessDefinitionResource) {
