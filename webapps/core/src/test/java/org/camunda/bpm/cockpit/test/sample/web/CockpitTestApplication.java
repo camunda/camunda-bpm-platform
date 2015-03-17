@@ -22,7 +22,8 @@ import org.camunda.bpm.cockpit.Cockpit;
 import org.camunda.bpm.cockpit.plugin.spi.CockpitPlugin;
 import org.camunda.bpm.engine.rest.exception.ExceptionHandler;
 import org.camunda.bpm.engine.rest.mapper.JacksonConfigurator;
-import org.codehaus.jackson.jaxrs.JacksonJsonProvider;
+
+import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
 /**
  *
@@ -46,7 +47,7 @@ public class CockpitTestApplication extends Application {
   private void addPluginResourceClasses(Set<Class<?>> classes) {
 
     List<CockpitPlugin> plugins = Cockpit.getRuntimeDelegate().getPluginRegistry().getPlugins();
-    
+
     for (CockpitPlugin plugin : plugins) {
       classes.addAll(plugin.getResourceClasses());
     }

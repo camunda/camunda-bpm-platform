@@ -23,7 +23,8 @@ import org.camunda.bpm.engine.rest.exception.RestExceptionHandler;
 import org.camunda.bpm.engine.rest.mapper.JacksonConfigurator;
 import org.camunda.bpm.tasklist.Tasklist;
 import org.camunda.bpm.tasklist.plugin.spi.TasklistPlugin;
-import org.codehaus.jackson.jaxrs.JacksonJsonProvider;
+
+import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
 /**
  * @author Roman Smirnov

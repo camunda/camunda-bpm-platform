@@ -24,7 +24,8 @@ import org.camunda.bpm.engine.rest.exception.ExceptionHandler;
 import org.camunda.bpm.engine.rest.exception.RestExceptionHandler;
 import org.camunda.bpm.engine.rest.mapper.JacksonConfigurator;
 import org.camunda.bpm.webapp.impl.security.auth.UserAuthenticationResource;
-import org.codehaus.jackson.jaxrs.JacksonJsonProvider;
+
+import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
 /**
  * The rest api exposed by the admin application

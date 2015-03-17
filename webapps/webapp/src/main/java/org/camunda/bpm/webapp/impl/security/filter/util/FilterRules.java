@@ -29,7 +29,8 @@ import org.camunda.bpm.webapp.impl.security.filter.SecurityFilterConfig;
 import org.camunda.bpm.webapp.impl.security.filter.SecurityFilterConfig.PathFilterConfig;
 import org.camunda.bpm.webapp.impl.security.filter.SecurityFilterConfig.PathMatcherConfig;
 import org.camunda.bpm.webapp.impl.security.filter.SecurityFilterRule;
-import org.codehaus.jackson.map.ObjectMapper;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Utility to load and match filter rules.
@@ -75,7 +76,6 @@ public class FilterRules {
 
     if (pathMatcherConfig.getAuthorizer() != null) {
       String authorizeCls = pathMatcherConfig.getAuthorizer();
-      Object[] params = new Object[] { };
       requestAuthorizer = (RequestAuthorizer) ReflectUtil.instantiate(authorizeCls);
     }
 
