@@ -208,12 +208,16 @@ define([
       return ProcessDefinitionResource.getBpmn20Xml({ id : definition.id}).$promise;
     }]);
 
-    processData.provide('semantic', [ 'bpmn20Xml', function(bpmn20Xml) {
+    processData.provide('parsedBpmn20', [ 'bpmn20Xml', function(bpmn20Xml) {
       return Transform.transformBpmn20Xml(bpmn20Xml.bpmn20Xml);
     }]);
 
-    processData.provide('bpmnElements', [ 'processDefinition', 'semantic', function(definition, semantic) {
-      return getBpmnElements(definition, semantic);
+    processData.provide('bpmnElements', [ 'parsedBpmn20', function(parsedBpmn20) {
+      return parsedBpmn20.bpmnElements;
+    }]);
+
+    processData.provide('bpmnDefinition', [ 'parsedBpmn20', function(parsedBpmn20) {
+      return parsedBpmn20.definitions;
     }]);
 
     processData.provide('allProcessDefinitions', [ 'processDefinition', function(definition) {
@@ -222,14 +226,12 @@ define([
 
     // processDiagram /////////////////////
 
-    processData.provide('processDiagram', [ 'semantic', 'processDefinition', 'bpmnElements', 'bpmn20Xml', function (semantic, processDefinition, bpmnElements, bpmn20Xml) {
+    processData.provide('processDiagram', [ 'bpmnDefinition', 'bpmnElements', function (bpmnDefinition, bpmnElements) {
       var diagram = $scope.processDiagram = $scope.processDiagram || {};
 
       angular.extend(diagram, {
-        semantic: semantic,
-        processDefinition: processDefinition,
-        bpmnElements: bpmnElements,
-        bpmn20Xml: bpmn20Xml
+        bpmnDefinition: bpmnDefinition,
+        bpmnElements: bpmnElements
       });
 
       return diagram;
@@ -307,39 +309,6 @@ define([
 
       processData.set('filter', newFilter);
     };
-
-    function getBpmnElements (processDefinition, semantic) {
-      var result = {};
-
-      var key = processDefinition.key;
-
-      var diagram = null;
-
-      for (var i = 0; i < semantic.length; i++) {
-        var currentDiagram = semantic[i];
-        if (currentDiagram.type === 'process') {
-
-          if (currentDiagram.id === key) {
-            diagram = currentDiagram;
-            break;
-          }
-        }
-      }
-
-      getBpmnElementsHelper(diagram, result);
-
-      return result;
-    }
-
-    function getBpmnElementsHelper(element, result) {
-      result[element.id] = element;
-
-      if (element.baseElements) {
-        angular.forEach(element.baseElements, function(baseElement) {
-          getBpmnElementsHelper(baseElement, result);
-        });
-      }
-    }
 
     $scope.processDefinition = processDefinition;
 

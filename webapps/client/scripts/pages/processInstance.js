@@ -184,42 +184,17 @@ define([
       return ProcessDefinitionResource.getBpmn20Xml({ id : definition.id}).$promise;
     }]);
 
-    // semantic
-    processData.provide('semantic', ['bpmn20Xml', function (bpmn20Xml) {
+    // bpmnElements
+    processData.provide('parsedBpmn20', [ 'bpmn20Xml', function(bpmn20Xml) {
       return Transform.transformBpmn20Xml(bpmn20Xml.bpmn20Xml);
     }]);
 
-    // bpmnElements
-    processData.provide('bpmnElements', ['semantic', 'processDefinition', function (semantic, processDefinition) {
-      var bpmnElements = {},
-          key = processDefinition.key,
-          model = null;
+    processData.provide('bpmnElements', [ 'parsedBpmn20', function(parsedBpmn20) {
+      return parsedBpmn20.bpmnElements;
+    }]);
 
-      for (var i = 0, currentSemantic; !!(currentSemantic = semantic[i]); i++) {
-        var id = currentSemantic.id,
-            type = currentSemantic.type;
-
-        if (id === key && type === 'process') {
-          model = currentSemantic;
-          break;
-        }
-      }
-
-      function collectBpmnElements(element, result) {
-        result[element.id] = element;
-
-        var baseElements = element.baseElements;
-        if (baseElements && baseElements.length > 0) {
-          for (var i = 0, child; !!(child = baseElements[i]); i++) {
-            collectBpmnElements(child, result);
-          }
-        }
-      }
-
-      collectBpmnElements(model, bpmnElements);
-
-      return bpmnElements;
-
+    processData.provide('bpmnDefinition', [ 'parsedBpmn20', function(parsedBpmn20) {
+      return parsedBpmn20.definitions;
     }]);
 
     // activityInstances
@@ -340,14 +315,12 @@ define([
 
     // processDiagram
     processData.provide('processDiagram', [
-             'semantic', 'processDefinition', 'bpmnElements', 'bpmn20Xml',
-    function (semantic,   processDefinition,   bpmnElements,   bpmn20Xml) {
+             'bpmnDefinition', 'bpmnElements',
+    function (bpmnDefinition,   bpmnElements) {
       var processDiagram = {};
 
-      processDiagram.semantic = semantic;
-      processDiagram.processDefinition = processDefinition;
+      processDiagram.bpmnDefinition = bpmnDefinition;
       processDiagram.bpmnElements = bpmnElements;
-      processDiagram.bpmn20Xml = bpmn20Xml;
 
       return processDiagram;
     }]);

@@ -38,7 +38,7 @@ define([
     $scope.$watch('processDiagram', function(newValue) {
       if (newValue && newValue.$loaded !== false) {
         bpmnElements = newValue.bpmnElements;
-        $scope.diagramXML = newValue.bpmn20Xml.bpmn20Xml;
+        $scope.diagramData = newValue.bpmnDefinition;
       }
     });
 
