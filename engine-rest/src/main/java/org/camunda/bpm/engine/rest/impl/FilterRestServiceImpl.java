@@ -64,7 +64,7 @@ public class FilterRestServiceImpl extends AbstractAuthorizedRestResource implem
 
     List<FilterDto> filters = new ArrayList<FilterDto>();
     for (Filter filter : matchingFilters) {
-      FilterDto dto = FilterDto.fromFilter(filter, getObjectMapper());
+      FilterDto dto = FilterDto.fromFilter(filter);
       if (itemCount != null && itemCount) {
         dto.setItemCount(filterService.count(filter.getId()));
       }
@@ -113,7 +113,7 @@ public class FilterRestServiceImpl extends AbstractAuthorizedRestResource implem
     }
 
     try {
-      filterDto.updateFilter(filter, getProcessEngine(), getObjectMapper());
+      filterDto.updateFilter(filter, getProcessEngine());
     }
     catch (NotValidException e) {
       throw new InvalidRequestException(Response.Status.BAD_REQUEST, e, "Unable to create filter with invalid content");
@@ -121,7 +121,7 @@ public class FilterRestServiceImpl extends AbstractAuthorizedRestResource implem
 
     filterService.saveFilter(filter);
 
-    return FilterDto.fromFilter(filter, getObjectMapper());
+    return FilterDto.fromFilter(filter);
   }
 
   protected FilterQuery getQueryFromQueryParameters(MultivaluedMap<String, String> queryParameters) {

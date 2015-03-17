@@ -314,6 +314,7 @@ public abstract class AbstractHistoricDetailRestServiceQueryTest extends Abstrac
           .body("[0].time", equalTo(historicUpdateBuilder.getTime()))
           .body("[0].taskId", equalTo(historicUpdateBuilder.getTaskId()))
           .body("[0].executionId", equalTo(historicUpdateBuilder.getExecutionId()))
+          .body("[0].type", equalTo("variableUpdate"))
         .when()
           .get(HISTORIC_DETAIL_RESOURCE_URL);
 
@@ -336,6 +337,7 @@ public abstract class AbstractHistoricDetailRestServiceQueryTest extends Abstrac
     Date returnedTime2 = DateTimeUtil.parseDate(from(content).getString("[1].time"));
     String returnedFieldId = from(content).getString("[1].fieldId");
     String returnedFieldValue = from(content).getString("[1].fieldValue");
+    String returnedType = from(content).getString("[1].type");
 
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_FORM_FIELD_ID, returnedId2);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_FORM_FIELD_PROC_INST_ID, returnedProcessInstanceId2);
@@ -345,6 +347,8 @@ public abstract class AbstractHistoricDetailRestServiceQueryTest extends Abstrac
     Assert.assertEquals(DateTimeUtil.parseDate(MockProvider.EXAMPLE_HISTORIC_FORM_FIELD_TIME), returnedTime2);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_FORM_FIELD_FIELD_ID, returnedFieldId);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_FORM_FIELD_VALUE, returnedFieldValue);
+    Assert.assertEquals("formField", returnedType);
+
   }
 
   @Test

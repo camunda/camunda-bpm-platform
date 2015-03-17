@@ -12,16 +12,18 @@
  */
 package org.camunda.bpm.engine.rest.mapper;
 
-import com.fasterxml.jackson.databind.*;
-import org.camunda.bpm.engine.rest.dto.StatisticsResultDto;
-import org.camunda.bpm.engine.rest.dto.history.HistoricDetailDto;
-import org.camunda.bpm.engine.rest.hal.Hal;
+import java.text.SimpleDateFormat;
 
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.Provider;
-import java.text.SimpleDateFormat;
+
+import org.camunda.bpm.engine.rest.hal.Hal;
+
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 
 @Provider
 @Produces({MediaType.APPLICATION_JSON, Hal.APPLICATION_HAL_JSON})
@@ -32,10 +34,6 @@ public class JacksonConfigurator implements ContextResolver<ObjectMapper> {
     mapper.setDateFormat(dateFormat);
     mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-
-    // mixIns for polymorphy inheritance
-    mapper.addMixInAnnotations(HistoricDetailDto.class, PolymorphicHistoricDetailDtoMixIn.class);
-    mapper.addMixInAnnotations(StatisticsResultDto.class, PolymorphicStatisticsResultDtoMixIn.class);
 
     return mapper;
   }

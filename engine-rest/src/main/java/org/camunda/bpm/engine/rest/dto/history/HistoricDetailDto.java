@@ -16,12 +16,23 @@ import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.history.HistoricFormField;
 import org.camunda.bpm.engine.history.HistoricVariableUpdate;
 
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
+
 import java.util.Date;
 
 /**
  * @author Roman Smirnov
  *
  */
+@JsonTypeInfo(
+    use = JsonTypeInfo.Id.NAME, include=JsonTypeInfo.As.PROPERTY, property="type"
+)
+@JsonSubTypes({
+    @Type(value = HistoricFormFieldDto.class),
+    @Type(value = HistoricVariableUpdateDto.class)
+})
 public abstract class HistoricDetailDto {
 
   protected String id;

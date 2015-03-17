@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
@@ -98,11 +99,10 @@ public class HalRelationCacheConfiguration {
   protected void parseCacheConfigurations(JsonNode jsonConfiguration) {
     JsonNode jsonNode = jsonConfiguration.get(CONFIG_CACHES);
     if (jsonNode != null) {
-      Iterator<String> halResourceClassNames = jsonNode.fieldNames();
-      while (halResourceClassNames.hasNext()) {
-        String halResourceClassName = halResourceClassNames.next();
-        JsonNode cacheConfiguration = jsonNode.get(halResourceClassName);
-        parseCacheConfiguration(halResourceClassName, cacheConfiguration);
+      Iterator<Entry<String, JsonNode>> cacheConfigurations = jsonNode.fields();
+      while (cacheConfigurations.hasNext()) {
+        Entry<String, JsonNode> cacheConfiguration = cacheConfigurations.next();
+        parseCacheConfiguration(cacheConfiguration.getKey(), cacheConfiguration.getValue());
       }
     }
   }

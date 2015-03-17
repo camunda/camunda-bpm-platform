@@ -71,7 +71,7 @@ public class FilterResourceImpl extends AbstractAuthorizedRestResource implement
 
   public FilterDto getFilter(Boolean itemCount) {
     Filter filter = getDbFilter();
-    FilterDto dto = FilterDto.fromFilter(filter, getObjectMapper());
+    FilterDto dto = FilterDto.fromFilter(filter);
     if (itemCount != null && itemCount) {
       dto.setItemCount(filterService.count(filter.getId()));
     }
@@ -102,7 +102,7 @@ public class FilterResourceImpl extends AbstractAuthorizedRestResource implement
     Filter filter = getDbFilter();
 
     try {
-      filterDto.updateFilter(filter, processEngine, getObjectMapper());
+      filterDto.updateFilter(filter, processEngine);
     }
     catch (NotValidException e) {
       throw new InvalidRequestException(Status.BAD_REQUEST, e, "Unable to update filter with invalid content");

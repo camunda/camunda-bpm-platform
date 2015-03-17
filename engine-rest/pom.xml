@@ -453,6 +453,33 @@
         </plugins>
       </build>
     </profile>
+    
+    <!-- Execute tests with Jersey only; sufficient in 99% of cases to find errors -->
+    <profile>
+      <id>develop</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <includes>
+                <include>**/rest/jersey/**</include>
+                <include>**/rest/history/jersey/**</include>
+                <include>**/rest/standalone/**</include>
+              </includes>
+              <excludes>
+                <exclude>**/Abstract*</exclude>
+                <exclude>**/rest/resteasy/**</exclude>
+                <exclude>**/rest/history/resteasy/**</exclude>
+                <exclude>**/rest/wink/**</exclude>
+                <exclude>**/rest/history/wink/**</exclude>
+              </excludes>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
 
     <profile>
       <id>wls-compatibility</id>

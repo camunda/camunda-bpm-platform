@@ -14,10 +14,13 @@ package org.camunda.bpm.engine.rest.dto.history;
 
 import org.camunda.bpm.engine.history.HistoricFormField;
 
+import com.fasterxml.jackson.annotation.JsonTypeName;
+
 /**
  * @author Roman Smirnov
  *
  */
+@JsonTypeName("formField")
 public class HistoricFormFieldDto extends HistoricDetailDto {
 
   protected String fieldId;

@@ -15,12 +15,15 @@ package org.camunda.bpm.engine.rest.dto.history;
 import org.camunda.bpm.engine.history.HistoricVariableUpdate;
 import org.camunda.bpm.engine.rest.dto.VariableValueDto;
 
+import com.fasterxml.jackson.annotation.JsonTypeName;
+
 import java.util.Map;
 
 /**
  * @author Roman Smirnov
  *
  */
+@JsonTypeName("variableUpdate")
 public class HistoricVariableUpdateDto extends HistoricDetailDto {
 
   protected String variableName;

@@ -13,23 +13,21 @@
 
 package org.camunda.bpm.engine.rest.dto.runtime;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import java.util.Map;
+
+import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.EntityTypes;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.filter.Filter;
-import org.camunda.bpm.engine.query.Query;
 import org.camunda.bpm.engine.rest.dto.AbstractQueryDto;
 import org.camunda.bpm.engine.rest.dto.task.TaskQueryDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 
-import javax.ws.rs.core.Response.Status;
-
-import java.util.Map;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 public class FilterDto {
 
@@ -37,8 +35,7 @@ public class FilterDto {
   protected String resourceType;
   protected String name;
   protected String owner;
-  protected JsonNode query;
-  protected AbstractQueryDto<?> resolvedQuery;
+  protected AbstractQueryDto<?> query;
   protected Map<String, Object> properties;
 
   protected Long itemCount;
@@ -75,23 +72,15 @@ public class FilterDto {
     this.owner = owner;
   }
 
-  public JsonNode getQuery() {
+  public AbstractQueryDto<?> getQuery() {
     return query;
   }
 
-  public AbstractQueryDto<?> resolveQuery(ObjectMapper objectMapper) {
-    if (resolvedQuery == null) {
-      try {
-        this.resolvedQuery = objectMapper.treeToValue(query, TaskQueryDto.class);
-      } catch (Exception e) {
-        throw new InvalidRequestException(Status.BAD_REQUEST, e, "Unable to convert query");
-      }
-    }
-
-    return resolvedQuery;
-  }
-
-  public void setQuery(JsonNode query) {
+  @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXTERNAL_PROPERTY,
+      property = "resourceType", defaultImpl=TaskQueryDto.class)
+    @JsonSubTypes(value = {
+    @JsonSubTypes.Type(value = TaskQueryDto.class, name = EntityTypes.TASK)})
+  public void setQuery(AbstractQueryDto<?> query) {
     this.query = query;
   }
 
@@ -112,7 +101,7 @@ public class FilterDto {
     this.itemCount = itemCount;
   }
 
-  public static FilterDto fromFilter(Filter filter, ObjectMapper objectMapper) {
+  public static FilterDto fromFilter(Filter filter) {
     FilterDto dto = new FilterDto();
     dto.id = filter.getId();
     dto.resourceType = filter.getResourceType();
@@ -120,21 +109,20 @@ public class FilterDto {
     dto.owner = filter.getOwner();
 
     if (EntityTypes.TASK.equals(filter.getResourceType())) {
-      dto.query = objectMapper.valueToTree(TaskQueryDto.fromQuery(filter.getQuery()));
+      dto.query = TaskQueryDto.fromQuery(filter.getQuery());
     }
 
     dto.properties = filter.getProperties();
     return dto;
   }
 
-  public void updateFilter(Filter filter, ProcessEngine engine, ObjectMapper objectMapper) {
+  public void updateFilter(Filter filter, ProcessEngine engine) {
     if (getResourceType() != null && !getResourceType().equals(filter.getResourceType())) {
       throw new InvalidRequestException(Status.BAD_REQUEST, "Unable to update filter from resource type '" + filter.getResourceType() + "' to '" + getResourceType() + "'");
     }
     filter.setName(getName());
     filter.setOwner(getOwner());
-    Query<?, ?> query = resolveQuery(objectMapper).toQuery(engine);
-    filter.setQuery(query);
+    filter.setQuery(query.toQuery(engine));
     filter.setProperties(getProperties());
   }
 
