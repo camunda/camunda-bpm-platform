@@ -14,16 +14,16 @@ package org.camunda.bpm.cockpit.impl.plugin.base.dto.query;
 
 import javax.ws.rs.core.MultivaluedMap;
 
-import org.camunda.bpm.cockpit.impl.plugin.base.dto.ProcessInstanceDto;
+import org.camunda.bpm.cockpit.impl.plugin.base.dto.CalledProcessInstanceDto;
 
-public class ProcessInstanceQueryDto extends AbstractProcessInstanceQueryDto<ProcessInstanceDto> {
+public class CalledProcessInstanceQueryDto extends AbstractProcessInstanceQueryDto<CalledProcessInstanceDto> {
 
   private static final long serialVersionUID = 1L;
 
-  public ProcessInstanceQueryDto() {
+  public CalledProcessInstanceQueryDto() {
   }
 
-  public ProcessInstanceQueryDto(MultivaluedMap<String, String> queryParameter) {
+  public CalledProcessInstanceQueryDto(MultivaluedMap<String, String> queryParameter) {
     super(queryParameter);
   }
 }

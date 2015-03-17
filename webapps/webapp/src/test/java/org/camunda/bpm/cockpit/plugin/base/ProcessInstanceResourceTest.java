@@ -18,7 +18,7 @@ import java.util.List;
 
 import org.camunda.bpm.cockpit.impl.plugin.base.dto.CalledProcessInstanceDto;
 import org.camunda.bpm.cockpit.impl.plugin.base.dto.ProcessInstanceDto;
-import org.camunda.bpm.cockpit.impl.plugin.base.dto.query.ProcessInstanceQueryDto;
+import org.camunda.bpm.cockpit.impl.plugin.base.dto.query.CalledProcessInstanceQueryDto;
 import org.camunda.bpm.cockpit.impl.plugin.base.sub.resources.ProcessInstanceResource;
 import org.camunda.bpm.cockpit.plugin.test.AbstractCockpitPluginTest;
 import org.camunda.bpm.engine.ProcessEngine;
@@ -74,9 +74,9 @@ public class ProcessInstanceResourceTest extends AbstractCockpitPluginTest {
         .processDefinitionKey("anotherUserTaskProcess")
         .singleResult();
 
-    ProcessInstanceQueryDto queryParameter = new ProcessInstanceQueryDto();
+    CalledProcessInstanceQueryDto queryParameter = new CalledProcessInstanceQueryDto();
 
-    List<ProcessInstanceDto> result = resource.queryCalledProcessInstances(queryParameter);
+    List<CalledProcessInstanceDto> result = resource.queryCalledProcessInstances(queryParameter);
     assertThat(result).isNotEmpty();
     assertThat(result).hasSize(2);
 
@@ -129,28 +129,28 @@ public class ProcessInstanceResourceTest extends AbstractCockpitPluginTest {
 
     executeAvailableJobs();
 
-    ProcessInstanceQueryDto queryParameter1 = new ProcessInstanceQueryDto();
+    CalledProcessInstanceQueryDto queryParameter1 = new CalledProcessInstanceQueryDto();
 
     String[] activityInstanceIds1 = {firstActivityInstanceId};
     queryParameter1.setActivityInstanceIdIn(activityInstanceIds1);
 
-    List<ProcessInstanceDto> result1 = resource.queryCalledProcessInstances(queryParameter1);
+    List<CalledProcessInstanceDto> result1 = resource.queryCalledProcessInstances(queryParameter1);
     assertThat(result1).isNotEmpty();
     assertThat(result1).hasSize(1);
 
-    ProcessInstanceQueryDto queryParameter2 = new ProcessInstanceQueryDto();
+    CalledProcessInstanceQueryDto queryParameter2 = new CalledProcessInstanceQueryDto();
     String[] activityInstanceIds2 = {secondActivityInstanceId};
     queryParameter2.setActivityInstanceIdIn(activityInstanceIds2);
 
-    List<ProcessInstanceDto> result2 = resource.queryCalledProcessInstances(queryParameter2);
+    List<CalledProcessInstanceDto> result2 = resource.queryCalledProcessInstances(queryParameter2);
     assertThat(result2).isNotEmpty();
     assertThat(result2).hasSize(1);
 
-    ProcessInstanceQueryDto queryParameter3 = new ProcessInstanceQueryDto();
+    CalledProcessInstanceQueryDto queryParameter3 = new CalledProcessInstanceQueryDto();
     String[] activityInstanceIds3 = {firstActivityInstanceId, secondActivityInstanceId};
     queryParameter3.setActivityInstanceIdIn(activityInstanceIds3);
 
-    List<ProcessInstanceDto> result3 = resource.queryCalledProcessInstances(queryParameter3);
+    List<CalledProcessInstanceDto> result3 = resource.queryCalledProcessInstances(queryParameter3);
     assertThat(result3).isNotEmpty();
     assertThat(result3).hasSize(2);
   }
