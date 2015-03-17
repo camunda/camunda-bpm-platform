@@ -65,6 +65,16 @@
 
   <profiles>
     <profile>
+      <id>oracle-12</id>
+      <dependencies>
+        <dependency>
+          <groupId>com.oracle.jdbc</groupId>
+          <artifactId>ojdbc6</artifactId>
+          <scope>runtime</scope>
+        </dependency>
+      </dependencies>
+    </profile>
+    <profile>
       <id>oracle-11</id>
       <dependencies>
         <dependency>
