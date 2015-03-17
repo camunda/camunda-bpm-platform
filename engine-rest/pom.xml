@@ -455,53 +455,6 @@
     </profile>
 
     <profile>
-      <id>was-compatibility</id>
-      <properties>
-        <rest.http.port>38080</rest.http.port>
-        <jackson.version>1.6.2</jackson.version>
-      </properties>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <configuration>
-              <systemPropertyVariables>
-                <org.apache.maven.user-settings>../settings/maven/nexus-settings.xml</org.apache.maven.user-settings>
-              </systemPropertyVariables>
-              <excludes>
-                <exclude>**/Abstract*</exclude>
-              </excludes>
-              <redirectTestOutputToFile>true</redirectTestOutputToFile>
-            </configuration>
-            <executions>
-              <execution>
-                <id>default-test</id>
-                <goals>
-                  <goal>test</goal>
-                </goals>
-                <phase>test</phase>
-                <configuration>
-                  <includes>
-                    <include>**/rest/wink/**</include>
-                    <include>**/rest/history/wink/**</include>
-                  </includes>
-                  <excludes>
-                    <exclude>**/rest/resteasy/**</exclude>
-                    <exclude>**/rest/history/resteasy/**</exclude>
-                    <exclude>**/rest/jersey/**</exclude>
-                    <exclude>**/rest/history/jersey/**</exclude>
-                    <exclude>**/rest/standalone/**</exclude>
-                  </excludes>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-
-    <profile>
       <id>wls-compatibility</id>
       <dependencies>
         <dependency>

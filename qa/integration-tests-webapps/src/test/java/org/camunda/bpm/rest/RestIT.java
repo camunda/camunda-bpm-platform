@@ -2,6 +2,7 @@ package org.camunda.bpm.rest;
 
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
+
 import org.camunda.bpm.AbstractWebappIntegrationTest;
 import org.camunda.bpm.engine.rest.hal.Hal;
 import org.codehaus.jettison.json.JSONArray;
@@ -11,6 +12,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import javax.ws.rs.core.MediaType;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -30,6 +32,11 @@ public class RestIT extends AbstractWebappIntegrationTest {
   private static final String TASK_PATH = ENGINE_DEFAULT_PATH + "/task";
 
   private static final String FILTER_PATH = ENGINE_DEFAULT_PATH + "/filter";
+
+  private static final String HISTORIC_DETAIL_PATH = ENGINE_DEFAULT_PATH + "/history/detail";
+
+  private static final String PROCESS_INSTANCE_PATH = ENGINE_DEFAULT_PATH + "/process-instance";
+
 
   private final static Logger log = Logger.getLogger(RestIT.class.getName());
 
@@ -164,12 +171,53 @@ public class RestIT extends AbstractWebappIntegrationTest {
     response.close();
   }
 
+  /**
+   * Tests that a feature implemented via Jackson-2 annotations works:
+   * polymorphic serialization of historic details
+   */
+  @Test
+  public void testPolymorphicSerialization() throws JSONException {
+    JSONObject historicVariableUpdate = getFirstHistoricVariableUpdates();
+
+    // variable update specific property
+    assertTrue(historicVariableUpdate.has("variableName"));
+
+  }
+
+  /**
+   * Uses Jackson's object mapper directly
+   */
+  @Test
+  public void testProcessInstanceQuery() {
+    WebResource resource = client.resource(APP_BASE_PATH + PROCESS_INSTANCE_PATH);
+    ClientResponse response = resource.queryParam("variables", "invoiceNumber_eq_GPFE-23232323").accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+
+    JSONArray instancesJson = response.getEntity(JSONArray.class);
+    response.close();
+
+    assertEquals(200, response.getStatus());
+    // invoice example instance
+    assertEquals(1, instancesJson.length());
+
+  }
+
   protected JSONObject getFirstTask() throws JSONException {
     ClientResponse response = client.resource(APP_BASE_PATH + TASK_PATH).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
     JSONArray tasks = response.getEntity(JSONArray.class);
     JSONObject firstTask = tasks.getJSONObject(0);
     response.close();
     return firstTask;
+  }
+
+  protected JSONObject getFirstHistoricVariableUpdates() throws JSONException {
+    ClientResponse response = client.resource(APP_BASE_PATH + HISTORIC_DETAIL_PATH)
+        .queryParam("variableUpdates", "true")
+        .accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+
+    JSONArray updates = response.getEntity(JSONArray.class);
+    JSONObject firstUpdate = updates.getJSONObject(0);
+    response.close();
+    return firstUpdate;
   }
 
   protected void assertMediaTypesOfResource(String resourcePath, boolean postSupported) {
