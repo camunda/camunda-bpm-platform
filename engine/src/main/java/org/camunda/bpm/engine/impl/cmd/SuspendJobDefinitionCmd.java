@@ -41,7 +41,7 @@ public class SuspendJobDefinitionCmd extends AbstractSetJobDefinitionStateCmd {
 
   @Override
   protected String getLogEntryOperation() {
-    return UserOperationLogEntry.OPERATION_TYPE_SUSPEND;
+    return UserOperationLogEntry.OPERATION_TYPE_SUSPEND_JOB_DEFINITION;
   }
 
 }

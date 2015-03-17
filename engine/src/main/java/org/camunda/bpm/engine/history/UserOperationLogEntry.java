@@ -90,6 +90,13 @@ public interface UserOperationLogEntry {
   public static String OPERATION_TYPE_DELETE_ATTACHMENT = "DeleteAttachment";
   public static String OPERATION_TYPE_RETRY = "Retry";
   public static String OPERATION_TYPE_EXECUTE_JOB ="ExecuteJob";
+  public static String OPERATION_TYPE_SUSPEND_JOB_DEFINITION = "SuspendJobDefinition";
+  public static String OPERATION_TYPE_ACTIVATE_JOB_DEFINITION = "ActivateJobDefinition";
+  public static String OPERATION_TYPE_SUSPEND_PROCESS_DEFINITION = "SuspendProcessDefinition";
+  public static String OPERATION_TYPE_ACTIVATE_PROCESS_DEFINITION = "ActivateProcessDefinition";
+  public static String OPERATION_TYPE_SUSPEND_JOB = "SuspendJob";
+  public static String OPERATION_TYPE_ACTIVATE_JOB = "ActivateJob";
+
 
   /** The unique identifier of this log entry. */
   String getId();

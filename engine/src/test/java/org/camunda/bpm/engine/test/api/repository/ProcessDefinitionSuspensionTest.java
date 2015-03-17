@@ -51,6 +51,8 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
         return null;
       }
     });
+
+    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/db/processOne.bpmn20.xml"})

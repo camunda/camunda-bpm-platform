@@ -54,7 +54,7 @@ public class ActivateProcessDefinitionCmd extends AbstractSetProcessDefinitionSt
 
   @Override
   protected String getLogEntryOperation() {
-    return UserOperationLogEntry.OPERATION_TYPE_ACTIVATE;
+    return UserOperationLogEntry.OPERATION_TYPE_ACTIVATE_PROCESS_DEFINITION;
   }
 
 }

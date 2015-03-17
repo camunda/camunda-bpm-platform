@@ -13,13 +13,8 @@
 package org.camunda.bpm.engine.impl.cmd;
 
 import java.util.Date;
-import java.util.List;
 
-import org.camunda.bpm.engine.EntityTypes;
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.history.HistoryLevel;
-import org.camunda.bpm.engine.impl.history.event.UserOperationLogEntryEventEntity;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobHandler;
@@ -42,6 +37,8 @@ public abstract class AbstractSetJobDefinitionStateCmd implements Command<Void>{
   protected boolean includeJobs = false;
   protected Date executionDate;
 
+  protected boolean preventLogUserOperation = false;
+
   public AbstractSetJobDefinitionStateCmd(String jobDefinitionId, String processDefinitionId, String processDefinitionKey, boolean includeJobs, Date executionDate) {
     this.jobDefinitionId = jobDefinitionId;
     this.processDefinitionId = processDefinitionId;
@@ -49,6 +46,12 @@ public abstract class AbstractSetJobDefinitionStateCmd implements Command<Void>{
     this.includeJobs = includeJobs;
     this.executionDate = executionDate;
   }
+
+  public AbstractSetJobDefinitionStateCmd disableLogUserOperation() {
+    this.preventLogUserOperation = true;
+    return this;
+  }
+
 
   public Void execute(CommandContext commandContext) {
 
@@ -58,22 +61,25 @@ public abstract class AbstractSetJobDefinitionStateCmd implements Command<Void>{
 
     SuspensionState suspensionState = getSuspensionState();
 
-    PropertyChange propertyChange = new PropertyChange(SUSPENSION_STATE_PROPERTY, null, suspensionState.getName());
-    commandContext.getOperationLogManager().logJobDefinitionOperation(getLogEntryOperation(), jobDefinitionId,
-      processDefinitionId, processDefinitionKey, propertyChange);
-
     if (executionDate == null) {
       // Job definition suspension state is changed now
       updateSuspensionState(commandContext, suspensionState);
+
     } else {
       // Job definition suspension state change is delayed
       scheduleSuspensionStateUpdate(commandContext);
     }
 
+    if(!preventLogUserOperation) {
+      PropertyChange propertyChange = new PropertyChange(SUSPENSION_STATE_PROPERTY, null, suspensionState.getName());
+      commandContext.getOperationLogManager().logJobDefinitionOperation(getLogEntryOperation(), jobDefinitionId,
+        processDefinitionId, processDefinitionKey, propertyChange);
+    }
+
     return null;
   }
 
-  private void updateSuspensionState(CommandContext commandContext, SuspensionState suspensionState) {
+  protected void updateSuspensionState(CommandContext commandContext, SuspensionState suspensionState) {
     JobDefinitionManager jobDefinitionManager = commandContext.getJobDefinitionManager();
     JobManager jobManager = commandContext.getJobManager();
 
@@ -93,15 +99,12 @@ public abstract class AbstractSetJobDefinitionStateCmd implements Command<Void>{
     }
 
     if (includeJobs) {
-      if(isHistoryLevelFullEnabled()) {
-        getSetJobStateCmd().execute(commandContext, getLogEntryOperationId(commandContext));
-      } else {
-        getSetJobStateCmd().execute(commandContext);
-      }
+      getSetJobStateCmd().disableLogUserOperation().execute(commandContext);
     }
+
   }
 
-  private void scheduleSuspensionStateUpdate(CommandContext commandContext) {
+  protected void scheduleSuspensionStateUpdate(CommandContext commandContext) {
     TimerEntity timer = new TimerEntity();
 
     timer.setDuedate(executionDate);
@@ -127,26 +130,6 @@ public abstract class AbstractSetJobDefinitionStateCmd implements Command<Void>{
     timer.setJobHandlerConfiguration(jobConfiguration);
 
     commandContext.getJobManager().schedule(timer);
-  }
-
-  protected String getLogEntryOperationId(CommandContext commandContext) {
-    List<UserOperationLogEntryEventEntity> userOperationLogEntryEntityList = commandContext
-      .getDbEntityManager()
-      .getCachedEntitiesByType(UserOperationLogEntryEventEntity.class);
-
-    String operationId = null;
-    for (UserOperationLogEntryEventEntity entity : userOperationLogEntryEntityList) {
-      if(EntityTypes.JOB_DEFINITION.equals(entity.getEntityType())) {
-        operationId = entity.getOperationId();
-        break;
-      }
-    }
-
-    return operationId;
-  }
-
-  protected Boolean isHistoryLevelFullEnabled() {
-    return Context.getProcessEngineConfiguration().getHistoryLevel().equals(HistoryLevel.HISTORY_LEVEL_FULL);
   }
 
   /**

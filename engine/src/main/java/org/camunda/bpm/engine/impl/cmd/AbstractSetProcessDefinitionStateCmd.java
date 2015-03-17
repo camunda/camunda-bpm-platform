@@ -13,13 +13,8 @@
 package org.camunda.bpm.engine.impl.cmd;
 
 import java.util.Date;
-import java.util.List;
 
-import org.camunda.bpm.engine.EntityTypes;
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.history.HistoryLevel;
-import org.camunda.bpm.engine.impl.history.event.UserOperationLogEntryEventEntity;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobHandler;
@@ -43,6 +38,8 @@ public abstract class AbstractSetProcessDefinitionStateCmd implements Command<Vo
   protected boolean includeProcessInstances = false;
   protected Date executionDate;
 
+  protected boolean preventLogUserOperation = false;
+
   public AbstractSetProcessDefinitionStateCmd(ProcessDefinitionEntity processDefinitionEntity,
           boolean includeProcessInstances, Date executionDate) {
     // If process definition is already provided (eg. when command is called through the DeployCmd),
@@ -61,6 +58,11 @@ public abstract class AbstractSetProcessDefinitionStateCmd implements Command<Vo
     this.executionDate = executionDate;
   }
 
+  public AbstractSetProcessDefinitionStateCmd disableLogUserOperation() {
+    this.preventLogUserOperation = true;
+    return this;
+  }
+
   public Void execute(CommandContext commandContext) {
 
     // Validation of input parameters
@@ -68,12 +70,20 @@ public abstract class AbstractSetProcessDefinitionStateCmd implements Command<Vo
       throw new ProcessEngineException("Process definition id / key cannot be null");
     }
 
+    SuspensionState suspensionState = getProcessDefinitionSuspensionState();
+
     if (executionDate == null) {
       // Process definition state is changed now
-      updateSuspensionState(commandContext);
+      updateSuspensionState(commandContext, suspensionState);
     } else {
       // Process definition state change is delayed
       scheduleSuspensionStateUpdate(commandContext);
+    }
+
+    if(!preventLogUserOperation) {
+      PropertyChange propertyChange = new PropertyChange(SUSPENSION_STATE_PROPERTY, null, suspensionState.getName());
+      commandContext.getOperationLogManager()
+        .logProcessDefinitionOperation(getLogEntryOperation(), processDefinitionId, processDefinitionKey, propertyChange);
     }
 
     return null;
@@ -102,10 +112,8 @@ public abstract class AbstractSetProcessDefinitionStateCmd implements Command<Vo
     commandContext.getJobManager().schedule(timer);
   }
 
-  protected void updateSuspensionState(CommandContext commandContext) {
+  protected void updateSuspensionState(CommandContext commandContext, SuspensionState suspensionState) {
     ProcessDefinitionManager processDefinitionManager = commandContext.getProcessDefinitionManager();
-
-    SuspensionState suspensionState = getProcessDefinitionSuspensionState();
 
     if (processDefinitionId != null) {
       processDefinitionManager.updateProcessDefinitionSuspensionStateById(processDefinitionId, suspensionState);
@@ -115,39 +123,11 @@ public abstract class AbstractSetProcessDefinitionStateCmd implements Command<Vo
       processDefinitionManager.updateProcessDefinitionSuspensionStateByKey(processDefinitionKey, suspensionState);
     }
 
-    getSetJobDefinitionStateCmd().execute(commandContext);
-
-    PropertyChange propertyChange = new PropertyChange(SUSPENSION_STATE_PROPERTY, null, suspensionState.getName());
-    commandContext.getOperationLogManager()
-      .logProcessDefinitionOperation(getLogEntryOperation(), processDefinitionId, processDefinitionKey, propertyChange);
+    getSetJobDefinitionStateCmd().disableLogUserOperation().execute(commandContext);
 
     if (includeProcessInstances) {
-      if(isHistoryLevelFullEnabled()) {
-        getSetProcessInstanceStateCmd().execute(commandContext, getLogEntryOperationId(commandContext));
-      } else {
-        getSetProcessInstanceStateCmd().execute(commandContext);
-      }
+      getSetProcessInstanceStateCmd().disableLogUserOperation().execute(commandContext);
     }
-  }
-
-  protected String getLogEntryOperationId(CommandContext commandContext) {
-    List<UserOperationLogEntryEventEntity> userOperationLogEntryEntityList = commandContext
-      .getDbEntityManager()
-      .getCachedEntitiesByType(UserOperationLogEntryEventEntity.class);
-
-    String operationId = null;
-    for (UserOperationLogEntryEventEntity entity : userOperationLogEntryEntityList) {
-      if(EntityTypes.PROCESS_DEFINITION.equals(entity.getEntityType())) {
-        operationId = entity.getOperationId();
-        break;
-      }
-    }
-
-    return operationId;
-  }
-
-  protected Boolean isHistoryLevelFullEnabled() {
-    return Context.getProcessEngineConfiguration().getHistoryLevel().equals(HistoryLevel.HISTORY_LEVEL_FULL);
   }
 
   // ABSTRACT METHODS ////////////////////////////////////////////////////////////////////

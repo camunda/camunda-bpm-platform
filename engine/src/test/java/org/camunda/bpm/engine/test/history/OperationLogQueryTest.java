@@ -18,7 +18,9 @@ import static org.camunda.bpm.engine.impl.persistence.entity.TaskEntity.ASSIGNEE
 import static org.camunda.bpm.engine.impl.persistence.entity.TaskEntity.OWNER;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.camunda.bpm.engine.EntityTypes;
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -26,10 +28,18 @@ import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.history.UserOperationLogQuery;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
+import org.camunda.bpm.engine.impl.jobexecutor.TimerActivateJobDefinitionHandler;
+import org.camunda.bpm.engine.impl.jobexecutor.TimerSuspendProcessDefinitionHandler;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.impl.test.TestHelper;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
+import org.camunda.bpm.engine.management.JobDefinition;
+import org.camunda.bpm.engine.management.JobDefinitionQuery;
+import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.Job;
+import org.camunda.bpm.engine.runtime.JobQuery;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Attachment;
 import org.camunda.bpm.engine.task.Task;
@@ -363,6 +373,8 @@ public class OperationLogQueryTest extends PluggableProcessEngineTestCase {
     assertEquals("suspensionState", activateEntry.getProperty());
     assertEquals("active", activateEntry.getNewValue());
     assertNull(activateEntry.getOrgValue());
+
+    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
   /**
@@ -379,13 +391,12 @@ public class OperationLogQueryTest extends PluggableProcessEngineTestCase {
 
     // then
     assertEquals(2, query().entityType(PROCESS_DEFINITION).count());
-    assertEquals(2, query().entityType(PROCESS_INSTANCE).count());
 
     // Process Definition Suspension
     UserOperationLogEntry suspendDefinitionEntry = query()
       .entityType(PROCESS_DEFINITION)
       .processDefinitionId(process.getProcessDefinitionId())
-      .operationType(OPERATION_TYPE_SUSPEND)
+      .operationType(OPERATION_TYPE_SUSPEND_PROCESS_DEFINITION)
       .singleResult();
 
     assertNotNull(suspendDefinitionEntry);
@@ -396,29 +407,10 @@ public class OperationLogQueryTest extends PluggableProcessEngineTestCase {
     assertEquals("suspended", suspendDefinitionEntry.getNewValue());
     assertNull(suspendDefinitionEntry.getOrgValue());
 
-    String processDefinitionOperationId = suspendDefinitionEntry.getOperationId();
-
-    // Process Instance Suspension
-    UserOperationLogEntry suspendEntry = query()
-      .entityType(PROCESS_INSTANCE)
-      .processDefinitionId(process.getProcessDefinitionId())
-      .operationType(OPERATION_TYPE_SUSPEND)
-      .singleResult();
-
-    assertNotNull(suspendEntry);
-    assertNull(suspendEntry.getProcessInstanceId());
-    assertEquals(process.getProcessDefinitionId(), suspendEntry.getProcessDefinitionId());
-    assertNull(suspendEntry.getProcessDefinitionKey());
-    assertEquals(processDefinitionOperationId, suspendEntry.getOperationId());
-
-    assertEquals("suspensionState", suspendEntry.getProperty());
-    assertEquals("suspended", suspendEntry.getNewValue());
-    assertNull(suspendEntry.getOrgValue());
-
     UserOperationLogEntry activateDefinitionEntry = query()
       .entityType(PROCESS_DEFINITION)
       .processDefinitionId(process.getProcessDefinitionId())
-      .operationType(OPERATION_TYPE_ACTIVATE)
+      .operationType(OPERATION_TYPE_ACTIVATE_PROCESS_DEFINITION)
       .singleResult();
 
     assertNotNull(activateDefinitionEntry);
@@ -429,23 +421,6 @@ public class OperationLogQueryTest extends PluggableProcessEngineTestCase {
     assertEquals("active", activateDefinitionEntry.getNewValue());
     assertNull(activateDefinitionEntry.getOrgValue());
 
-    processDefinitionOperationId = activateDefinitionEntry.getOperationId();
-
-      UserOperationLogEntry activateEntry = query()
-        .entityType(PROCESS_INSTANCE)
-        .processDefinitionId(process.getProcessDefinitionId())
-        .operationType(OPERATION_TYPE_ACTIVATE)
-        .singleResult();
-
-    assertNotNull(activateEntry);
-    assertNull(activateEntry.getProcessInstanceId());
-    assertEquals(process.getProcessDefinitionId(), activateEntry.getProcessDefinitionId());
-    assertNull(activateEntry.getProcessDefinitionKey());
-    assertEquals(processDefinitionOperationId, activateEntry.getOperationId());
-
-    assertEquals("suspensionState", activateEntry.getProperty());
-    assertEquals("active", activateEntry.getNewValue());
-    assertNull(activateEntry.getOrgValue());
   }
 
   /**
@@ -462,12 +437,11 @@ public class OperationLogQueryTest extends PluggableProcessEngineTestCase {
 
     // then
     assertEquals(2, query().entityType(PROCESS_DEFINITION).count());
-    assertEquals(2, query().entityType(PROCESS_INSTANCE).count());
 
     UserOperationLogEntry suspendDefinitionEntry = query()
       .entityType(PROCESS_DEFINITION)
       .processDefinitionKey("oneTaskProcess")
-      .operationType(OPERATION_TYPE_SUSPEND)
+      .operationType(OPERATION_TYPE_SUSPEND_PROCESS_DEFINITION)
       .singleResult();
 
     assertNotNull(suspendDefinitionEntry);
@@ -481,7 +455,7 @@ public class OperationLogQueryTest extends PluggableProcessEngineTestCase {
     UserOperationLogEntry activateDefinitionEntry = query()
       .entityType(PROCESS_DEFINITION)
       .processDefinitionKey("oneTaskProcess")
-      .operationType(OPERATION_TYPE_ACTIVATE)
+      .operationType(OPERATION_TYPE_ACTIVATE_PROCESS_DEFINITION)
       .singleResult();
 
     assertNotNull(activateDefinitionEntry);
@@ -492,35 +466,7 @@ public class OperationLogQueryTest extends PluggableProcessEngineTestCase {
     assertEquals("active", activateDefinitionEntry.getNewValue());
     assertNull(activateDefinitionEntry.getOrgValue());
 
-    UserOperationLogEntry suspendInstanceEntry = query()
-        .entityType(PROCESS_INSTANCE)
-        .processDefinitionKey("oneTaskProcess")
-        .operationType(OPERATION_TYPE_SUSPEND)
-        .singleResult();
-
-    assertNotNull(suspendInstanceEntry);
-    assertNull(suspendInstanceEntry.getProcessInstanceId());
-    assertNull(suspendInstanceEntry.getProcessDefinitionId());
-    assertEquals("oneTaskProcess", suspendInstanceEntry.getProcessDefinitionKey());
-
-    assertEquals("suspensionState", suspendInstanceEntry.getProperty());
-    assertEquals("suspended", suspendInstanceEntry.getNewValue());
-    assertNull(suspendInstanceEntry.getOrgValue());
-
-    UserOperationLogEntry activateInstanceEntry = query()
-        .entityType(PROCESS_INSTANCE)
-        .processDefinitionKey("oneTaskProcess")
-        .operationType(OPERATION_TYPE_ACTIVATE)
-        .singleResult();
-
-    assertNotNull(activateInstanceEntry);
-    assertNull(activateInstanceEntry.getProcessInstanceId());
-    assertNull(activateInstanceEntry.getProcessDefinitionId());
-    assertEquals("oneTaskProcess", activateInstanceEntry.getProcessDefinitionKey());
-
-    assertEquals("suspensionState", activateInstanceEntry.getProperty());
-    assertEquals("active", activateInstanceEntry.getNewValue());
-    assertNull(activateInstanceEntry.getOrgValue());
+    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuation.bpmn20.xml"})
@@ -542,7 +488,7 @@ public class OperationLogQueryTest extends PluggableProcessEngineTestCase {
     UserOperationLogEntry activeJobDefninitionEntry = query()
       .entityType(JOB_DEFINITION)
       .processDefinitionId(process.getProcessDefinitionId())
-      .operationType(OPERATION_TYPE_ACTIVATE)
+      .operationType(OPERATION_TYPE_ACTIVATE_JOB_DEFINITION)
       .singleResult();
 
     assertNotNull(activeJobDefninitionEntry);
@@ -556,7 +502,7 @@ public class OperationLogQueryTest extends PluggableProcessEngineTestCase {
     UserOperationLogEntry activateJobIdEntry = query()
       .entityType(JOB)
       .processInstanceId(process.getProcessInstanceId())
-      .operationType(OPERATION_TYPE_ACTIVATE)
+      .operationType(OPERATION_TYPE_ACTIVATE_JOB)
       .singleResult();
 
     assertNotNull(activateJobIdEntry);
@@ -570,7 +516,7 @@ public class OperationLogQueryTest extends PluggableProcessEngineTestCase {
     UserOperationLogEntry suspendJobDefinitionEntry = query()
       .entityType(JOB_DEFINITION)
       .processDefinitionId(process.getProcessDefinitionId())
-      .operationType(OPERATION_TYPE_SUSPEND)
+      .operationType(OPERATION_TYPE_SUSPEND_JOB_DEFINITION)
       .singleResult();
 
     assertNotNull(suspendJobDefinitionEntry);
@@ -584,7 +530,7 @@ public class OperationLogQueryTest extends PluggableProcessEngineTestCase {
     UserOperationLogEntry suspendedJobEntry = query()
       .entityType(JOB)
       .processInstanceId(process.getProcessInstanceId())
-      .operationType(OPERATION_TYPE_SUSPEND)
+      .operationType(OPERATION_TYPE_SUSPEND_JOB)
       .singleResult();
 
     assertNotNull(suspendedJobEntry);
@@ -595,89 +541,6 @@ public class OperationLogQueryTest extends PluggableProcessEngineTestCase {
     assertNull(suspendedJobEntry.getOrgValue());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuation.bpmn20.xml"})
-  public void testQueryCascadingJobDefinitionOperation() {
-    // given
-    process = runtimeService.startProcessInstanceByKey("process");
-    String jobDefinitionId = managementService
-      .createJobDefinitionQuery()
-      .processDefinitionId(process.getProcessDefinitionId())
-      .list()
-      .get(0)
-      .getId();
-
-    // when
-    managementService.suspendJobDefinitionById(jobDefinitionId, true);
-    managementService.activateJobDefinitionById(jobDefinitionId, true);
-    // then
-    assertEquals(2, query().entityType(JOB_DEFINITION).count());
-    assertEquals(2, query().entityType(JOB).count());
-
-    // active job definition
-    UserOperationLogEntry activeJobDefinitionEntry = query()
-      .entityType(JOB_DEFINITION)
-      .processDefinitionId(process.getProcessDefinitionId())
-      .operationType(OPERATION_TYPE_ACTIVATE)
-      .singleResult();
-
-    assertNotNull(activeJobDefinitionEntry);
-    assertEquals(process.getProcessDefinitionId(), activeJobDefinitionEntry.getProcessDefinitionId());
-
-    assertEquals("suspensionState", activeJobDefinitionEntry.getProperty());
-    assertEquals("active", activeJobDefinitionEntry.getNewValue());
-    assertNull(activeJobDefinitionEntry.getOrgValue());
-
-    // save job definition operation id for activated job definition
-    String jobDefinitionOperationId = activeJobDefinitionEntry.getOperationId();
-
-    // active job
-    UserOperationLogEntry activateJobIdEntry = query()
-      .entityType(JOB)
-      .processDefinitionId(process.getProcessDefinitionId())
-      .operationType(OPERATION_TYPE_ACTIVATE)
-      .singleResult();
-
-    assertNotNull(activateJobIdEntry);
-    assertEquals(process.getProcessDefinitionId(), activateJobIdEntry.getProcessDefinitionId());
-    assertEquals(jobDefinitionOperationId, activateJobIdEntry.getOperationId());
-
-    assertEquals("suspensionState", activateJobIdEntry.getProperty());
-    assertEquals("active", activateJobIdEntry.getNewValue());
-    assertNull(activateJobIdEntry.getOrgValue());
-
-
-    // suspended job definition
-    UserOperationLogEntry suspendJobDefinitionEntry = query()
-      .entityType(JOB_DEFINITION)
-      .processDefinitionId(process.getProcessDefinitionId())
-      .operationType(OPERATION_TYPE_SUSPEND)
-      .singleResult();
-
-    assertNotNull(suspendJobDefinitionEntry);
-    assertEquals(process.getProcessDefinitionId(), suspendJobDefinitionEntry.getProcessDefinitionId());
-
-    assertEquals("suspensionState", suspendJobDefinitionEntry.getProperty());
-    assertEquals("suspended", suspendJobDefinitionEntry.getNewValue());
-    assertNull(suspendJobDefinitionEntry.getOrgValue());
-
-    // save job definition operation id for suspended job definition
-    jobDefinitionOperationId = suspendJobDefinitionEntry.getOperationId();
-
-      // suspended job
-    UserOperationLogEntry suspendedJobEntry = query()
-      .entityType(JOB)
-      .processDefinitionId(process.getProcessDefinitionId())
-      .operationType(OPERATION_TYPE_SUSPEND)
-      .singleResult();
-
-    assertNotNull(suspendedJobEntry);
-    assertEquals(process.getProcessDefinitionId(), suspendedJobEntry.getProcessDefinitionId());
-    assertEquals(jobDefinitionOperationId, suspendedJobEntry.getOperationId());
-
-    assertEquals("suspensionState", suspendedJobEntry.getProperty());
-    assertEquals("suspended", suspendedJobEntry.getNewValue());
-    assertNull(suspendedJobEntry.getOrgValue());
-  }
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/cmd/FoxJobRetryCmdTest.testFailedServiceTask.bpmn20.xml" })
   public void testQueryJobRetryOperationsById() {
@@ -738,6 +601,132 @@ public class OperationLogQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(job.getProcessDefinitionKey(), jobExecutionEntry.getProcessDefinitionKey());
     assertEquals(job.getProcessDefinitionId(), jobExecutionEntry.getProcessDefinitionId());
     assertEquals(job.getId(), jobExecutionEntry.getJobId());
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml"})
+  public void testQueryJobDefinitionOperationWithDelayedJobDefinition() {
+    // given
+    // a running process instance
+    ProcessInstance process = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+    // with a process definition id
+    String processDefinitionId = process.getProcessDefinitionId();
+
+    // a job definition (which was created for the asynchronous continuation)
+    JobDefinition jobDefinition = managementService.createJobDefinitionQuery().singleResult();
+    // ...which will be suspended with the corresponding jobs
+    managementService.suspendJobDefinitionByProcessDefinitionId(processDefinitionId, true);
+
+    // one week from now
+    ClockUtil.setCurrentTime(today);
+    long oneWeekFromStartTime = today.getTime() + (7 * 24 * 60 * 60 * 1000);
+
+    // when
+    // activate the job definition
+    managementService.activateJobDefinitionByProcessDefinitionId(processDefinitionId, false, new Date(oneWeekFromStartTime));
+
+    // then
+    // there is a user log entry for the activation
+    Long jobDefinitionEntryCount = query()
+      .entityType(JOB_DEFINITION)
+      .operationType(UserOperationLogEntry.OPERATION_TYPE_ACTIVATE_JOB_DEFINITION)
+      .processDefinitionId(processDefinitionId)
+      .count();
+
+    assertEquals(1, jobDefinitionEntryCount.longValue());
+
+    // there exists a job for the delayed activation execution
+    JobQuery jobQuery = managementService.createJobQuery();
+
+    Job delayedActivationJob = jobQuery.timers().active().singleResult();
+    assertNotNull(delayedActivationJob);
+
+    // execute job
+    managementService.executeJob(delayedActivationJob.getId());
+
+    jobDefinitionEntryCount = query()
+      .entityType(JOB_DEFINITION)
+      .operationType(UserOperationLogEntry.OPERATION_TYPE_ACTIVATE_JOB_DEFINITION)
+      .processDefinitionId(processDefinitionId)
+      .count();
+
+    assertEquals(1, jobDefinitionEntryCount.longValue());
+
+    // Clean up db
+    CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutorTxRequired();
+    commandExecutor.execute(new Command<Object>() {
+      public Object execute(CommandContext commandContext) {
+        commandContext.getHistoricJobLogManager().deleteHistoricJobLogsByHandlerType(TimerActivateJobDefinitionHandler.TYPE);
+        return null;
+      }
+    });
+
+    TestHelper.clearOpLog(processEngineConfiguration);
+  }
+
+  public void testQueryProcessDefinitionOperationWithDelayedProcessDefinition() {
+    // given
+    ClockUtil.setCurrentTime(today);
+    final long hourInMs = 60 * 60 * 1000;
+
+    String key = "oneFailingServiceTaskProcess";
+
+    // Deploy a versions of the a process, so that there exists one
+    repositoryService.createDeployment()
+      .addClasspathResource("org/camunda/bpm/engine/test/api/repository/ProcessDefinitionSuspensionTest.testWithOneAsyncServiceTask.bpmn").deploy();
+
+    // a running process instance with a failed service task
+    Map<String, Object> params = new HashMap<String, Object>();
+    params.put("fail", Boolean.TRUE);
+    runtimeService.startProcessInstanceByKey(key, params);
+
+    // when
+    // the process definition will be suspended
+    repositoryService.suspendProcessDefinitionByKey(key, false, new Date(today.getTime() + (2 * hourInMs)));
+
+    // then
+    // there exists a timer job to suspend the process definition delayed
+    Job timerToSuspendProcessDefinition = managementService.createJobQuery().timers().singleResult();
+    assertNotNull(timerToSuspendProcessDefinition);
+
+    // there is a user log entry for the activation
+    Long processDefinitionEntryCount = query()
+      .entityType(PROCESS_DEFINITION)
+      .operationType(UserOperationLogEntry.OPERATION_TYPE_SUSPEND_PROCESS_DEFINITION)
+      .processDefinitionKey(key)
+      .count();
+
+    assertEquals(1, processDefinitionEntryCount.longValue());
+
+    // when
+    // execute job
+    managementService.executeJob(timerToSuspendProcessDefinition.getId());
+
+    // then
+    // there is a user log entry for the activation
+    processDefinitionEntryCount = query()
+      .entityType(PROCESS_DEFINITION)
+      .operationType(UserOperationLogEntry.OPERATION_TYPE_SUSPEND_PROCESS_DEFINITION)
+      .processDefinitionKey(key)
+      .count();
+
+    assertEquals(1, processDefinitionEntryCount.longValue());
+
+    // Clean DB
+    for (org.camunda.bpm.engine.repository.Deployment deployment : repositoryService.createDeploymentQuery().list()) {
+      repositoryService.deleteDeployment(deployment.getId(), true);
+    }
+
+    // clean up op log
+    CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutorTxRequired();
+    commandExecutor.execute(new Command<Object>() {
+      public Object execute(CommandContext commandContext) {
+        commandContext.getHistoricJobLogManager().deleteHistoricJobLogsByHandlerType(TimerSuspendProcessDefinitionHandler.TYPE);
+        return null;
+      }
+    });
+
+    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
   // --------------- CMMN --------------------

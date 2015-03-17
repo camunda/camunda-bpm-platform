@@ -29,9 +29,11 @@ public abstract class AbstractSetJobStateCmd implements Command<Void> {
   protected String processInstanceId;
   protected String processDefinitionId;
   protected String processDefinitionKey;
+  protected boolean preventLogUserOperation;
 
 
-  public AbstractSetJobStateCmd(String jobId, String jobDefinitionId, String processInstanceId, String processDefinitionId, String processDefinitionKey) {
+  public AbstractSetJobStateCmd(String jobId, String jobDefinitionId, String processInstanceId,
+      String processDefinitionId, String processDefinitionKey) {
     this.jobId = jobId;
     this.jobDefinitionId = jobDefinitionId;
     this.processInstanceId = processInstanceId;
@@ -39,11 +41,12 @@ public abstract class AbstractSetJobStateCmd implements Command<Void> {
     this.processDefinitionKey = processDefinitionKey;
   }
 
-  public Void execute(CommandContext commandContext) {
-    return execute(commandContext, null);
+  public AbstractSetJobStateCmd disableLogUserOperation() {
+    this.preventLogUserOperation = true;
+    return this;
   }
 
-  public Void execute(CommandContext commandContext, String operationId) {
+  public Void execute(CommandContext commandContext) {
     if(jobId == null && jobDefinitionId == null && processInstanceId == null && processDefinitionId == null && processDefinitionKey == null) {
       throw new ProcessEngineException("Job id, job definition id, process instance id, process definition id nor process definition key cannot be null");
     }
@@ -71,9 +74,11 @@ public abstract class AbstractSetJobStateCmd implements Command<Void> {
       jobManager.updateJobSuspensionStateByProcessDefinitionKey(processDefinitionKey, suspensionState);
     }
 
-    PropertyChange propertyChange = new PropertyChange(SUSPENSION_STATE_PROPERTY, null, suspensionState.getName());
-    commandContext.getOperationLogManager().logJobOperation(operationId, getLogEntryOperation(), jobId, jobDefinitionId,
-      processInstanceId, processDefinitionId, processDefinitionKey, propertyChange);
+    if(!preventLogUserOperation) {
+      PropertyChange propertyChange = new PropertyChange(SUSPENSION_STATE_PROPERTY, null, suspensionState.getName());
+      commandContext.getOperationLogManager().logJobOperation(getLogEntryOperation(), jobId, jobDefinitionId,
+        processInstanceId, processDefinitionId, processDefinitionKey, propertyChange);
+    }
 
     return null;
   }

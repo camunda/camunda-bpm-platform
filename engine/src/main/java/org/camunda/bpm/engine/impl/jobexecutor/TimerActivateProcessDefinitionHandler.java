@@ -48,7 +48,7 @@ public class TimerActivateProcessDefinitionHandler extends TimerChangeProcessDef
       cmd = new ActivateProcessDefinitionCmd(null, processDefinitionKey, activateProcessInstances, null);
     }
 
-    cmd.execute(commandContext);
+    cmd.disableLogUserOperation().execute(commandContext);
   }
 
 }

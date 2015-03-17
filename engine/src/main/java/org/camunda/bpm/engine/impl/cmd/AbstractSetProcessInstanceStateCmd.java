@@ -33,12 +33,17 @@ public abstract class AbstractSetProcessInstanceStateCmd implements Command<Void
   protected final String processInstanceId;
   protected String processDefinitionId;
   protected String processDefinitionKey;
-
+  protected boolean preventLogUserOperation = false;
 
   public AbstractSetProcessInstanceStateCmd(String processInstanceId, String processDefinitionId, String processDefinitionKey) {
     this.processInstanceId = processInstanceId;
     this.processDefinitionId = processDefinitionId;
     this.processDefinitionKey = processDefinitionKey;
+  }
+
+  public AbstractSetProcessInstanceStateCmd disableLogUserOperation() {
+    this.preventLogUserOperation = true;
+    return this;
   }
 
   public Void execute(CommandContext commandContext) {
@@ -71,12 +76,14 @@ public abstract class AbstractSetProcessInstanceStateCmd implements Command<Void
       taskManager.updateTaskSuspensionStateByProcessDefinitionKey(processDefinitionKey, suspensionState);
     }
 
-    getSetJobStateCmd().execute(commandContext);
+    getSetJobStateCmd().disableLogUserOperation().execute(commandContext);
 
-    PropertyChange propertyChange = new PropertyChange(SUSPENSION_STATE_PROPERTY, null, suspensionState.getName());
-    commandContext.getOperationLogManager()
-      .logProcessInstanceOperation(operationId, getLogEntryOperation(), processInstanceId, processDefinitionId,
+    if(!preventLogUserOperation) {
+      PropertyChange propertyChange = new PropertyChange(SUSPENSION_STATE_PROPERTY, null, suspensionState.getName());
+      commandContext.getOperationLogManager()
+        .logProcessInstanceOperation(operationId, getLogEntryOperation(), processInstanceId, processDefinitionId,
           processDefinitionKey, propertyChange);
+    }
 
     return null;
   }

@@ -73,7 +73,7 @@ public class SetJobRetriesCmd implements Command<Void>, Serializable {
       job.setRetries(retries);
 
       PropertyChange propertyChange = new PropertyChange(RETRIES, oldRetries, job.getRetries());
-      commandContext.getOperationLogManager().logJobRetryOperation(getLogEntryOperation(), job.getId(),
+      commandContext.getOperationLogManager().logJobOperation(getLogEntryOperation(), job.getId(),
         job.getJobDefinitionId(), job.getProcessInstanceId(), job.getProcessDefinitionId(),
         job.getProcessDefinitionKey(), propertyChange);
     } else {
@@ -88,7 +88,7 @@ public class SetJobRetriesCmd implements Command<Void>, Serializable {
 
     JobDefinitionEntity jobDefinitionEntity = commandContext.getJobDefinitionManager().findById(jobDefinitionId);
     PropertyChange propertyChange = new PropertyChange(RETRIES, null, retries);
-    commandContext.getOperationLogManager().logJobRetryOperation(getLogEntryOperation(), null, jobDefinitionId, null,
+    commandContext.getOperationLogManager().logJobOperation(getLogEntryOperation(), null, jobDefinitionId, null,
       jobDefinitionEntity.getProcessDefinitionId(), jobDefinitionEntity.getProcessDefinitionKey(), propertyChange);
   }
 

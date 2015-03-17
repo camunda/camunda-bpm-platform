@@ -17,6 +17,7 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.impl.test.TestHelper;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Job;
@@ -192,6 +193,8 @@ public class SuspendJobTest extends PluggableProcessEngineTestCase {
 
     assertEquals(job.getId(), suspendedJob.getId());
     assertTrue(suspendedJob.isSuspended());
+
+    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
   public void testMultipleSuspensionByProcessDefinitionKey_shouldSuspendJob() {
@@ -225,6 +228,7 @@ public class SuspendJobTest extends PluggableProcessEngineTestCase {
       repositoryService.deleteDeployment(deployment.getId(), true);
     }
 
+    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
 }

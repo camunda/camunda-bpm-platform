@@ -91,7 +91,7 @@ public class ExecuteJobsCmd implements Command<Object>, Serializable {
     if (jobExecutorContext != null) { // if null, then we are not called by the job executor
       jobExecutorContext.setCurrentJob(job);
     } else {
-      commandContext.getOperationLogManager().logJobRetryOperation(getLogEntryOperation(), job.getId(),
+      commandContext.getOperationLogManager().logJobOperation(getLogEntryOperation(), job.getId(),
         job.getJobDefinitionId(), job.getProcessInstanceId(), job.getProcessDefinitionId(),
         job.getProcessDefinitionKey(), new PropertyChange(null, null, null));
     }

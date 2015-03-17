@@ -45,6 +45,8 @@ public class SuspendJobDefinitionTest extends PluggableProcessEngineTestCase {
         return null;
       }
     });
+
+    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
   // Test ManagementService#suspendJobDefinitionById() /////////////////////////
@@ -1136,9 +1138,6 @@ public class SuspendJobDefinitionTest extends PluggableProcessEngineTestCase {
 
     assertEquals(jobDefinition.getId(), activeJob.getJobDefinitionId());
     assertFalse(activeJob.isSuspended());
-
-    // clean up op log
-    TestHelper.removeDelayedJobFromOpLog(processEngineConfiguration, delayedSuspensionJob.getId());
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/SuspensionTest.testBase.bpmn"})
@@ -1198,9 +1197,6 @@ public class SuspendJobDefinitionTest extends PluggableProcessEngineTestCase {
 
     assertEquals(jobDefinition.getId(), suspendedJob.getJobDefinitionId());
     assertTrue(suspendedJob.isSuspended());
-
-    // clean up op log
-    TestHelper.removeDelayedJobFromOpLog(processEngineConfiguration, delayedSuspensionJob.getId());
   }
 
   // Test ManagementService#suspendJobDefinitionByProcessDefinitionKey() with multiple process definition
@@ -1318,7 +1314,6 @@ public class SuspendJobDefinitionTest extends PluggableProcessEngineTestCase {
     for (org.camunda.bpm.engine.repository.Deployment deployment : repositoryService.createDeploymentQuery().list()) {
       repositoryService.deleteDeployment(deployment.getId(), true);
     }
-
   }
 
   public void testMultipleSuspensionByProcessDefinitionKey_shouldExecuteImmediatelyAndRetainJobs() {
@@ -1454,8 +1449,6 @@ public class SuspendJobDefinitionTest extends PluggableProcessEngineTestCase {
       repositoryService.deleteDeployment(deployment.getId(), true);
     }
 
-    // clean up op log
-    TestHelper.removeDelayedJobFromOpLog(processEngineConfiguration, delayedSuspensionJob.getId());
   }
 
   public void testMultipleSuspensionByProcessDefinitionKey_shouldExecuteDelayedAndSuspendJobs() {
@@ -1515,7 +1508,5 @@ public class SuspendJobDefinitionTest extends PluggableProcessEngineTestCase {
       repositoryService.deleteDeployment(deployment.getId(), true);
     }
 
-    // clean up op log
-    TestHelper.removeDelayedJobFromOpLog(processEngineConfiguration, delayedSuspensionJob.getId());
   }
 }

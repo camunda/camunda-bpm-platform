@@ -40,7 +40,7 @@ public class ActivateJobDefinitionCmd extends AbstractSetJobDefinitionStateCmd {
 
   @Override
   protected String getLogEntryOperation() {
-    return UserOperationLogEntry.OPERATION_TYPE_ACTIVATE;
+    return UserOperationLogEntry.OPERATION_TYPE_ACTIVATE_JOB_DEFINITION;
   }
 
 }

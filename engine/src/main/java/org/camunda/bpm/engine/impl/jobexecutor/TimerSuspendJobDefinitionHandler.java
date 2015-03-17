@@ -52,7 +52,7 @@ public class TimerSuspendJobDefinitionHandler extends TimerChangeJobDefinitionSu
       cmd = new SuspendJobDefinitionCmd(null, null, processDefinitionKey, activateJobs, null);
     }
 
-    cmd.execute(commandContext);
+    cmd.disableLogUserOperation().execute(commandContext);
   }
 
 }

@@ -54,7 +54,7 @@ public class SuspendProcessDefinitionCmd extends AbstractSetProcessDefinitionSta
 
   @Override
   protected String getLogEntryOperation() {
-    return UserOperationLogEntry.OPERATION_TYPE_SUSPEND;
+    return UserOperationLogEntry.OPERATION_TYPE_SUSPEND_PROCESS_DEFINITION;
   }
 
 }

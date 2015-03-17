@@ -33,6 +33,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.JobManager;
 import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TimerEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.impl.test.TestHelper;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
@@ -453,6 +454,8 @@ public class JobQueryTest extends PluggableProcessEngineTestCase {
 
     managementService.suspendJobDefinitionByProcessDefinitionKey("timerOnTask", true);
     verifyQueryResults(query, 3);
+
+    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
   //sorting //////////////////////////////////////////

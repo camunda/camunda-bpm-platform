@@ -137,25 +137,46 @@ public class UserOperationLogManager extends AbstractHistoricManager {
     }
   }
 
-  public void logJobOperation(String operationId, String operation, String jobId, String jobDefinitionId, String processInstanceId,
-      String processDefinitionId, String processDefinitionKey, PropertyChange propertyChange) {
+  public void logJobOperation(String operation, String jobId, String jobDefinitionId, String processInstanceId,
+      String processDefinitionId, String processDefinitionKey,PropertyChange propertyChange) {
     if (isHistoryLevelFullEnabled()) {
 
       if(jobId != null) {
         Job job = getJobManager().findJobById(jobId);
-        jobDefinitionId = job.getJobDefinitionId();
-        processInstanceId = job.getProcessInstanceId();
-        processDefinitionId = job.getProcessDefinitionId();
-        processDefinitionKey = job.getProcessDefinitionKey();
+        // Backward compatibility
+        if(job != null) {
+          jobDefinitionId = job.getJobDefinitionId();
+          processInstanceId = job.getProcessInstanceId();
+          processDefinitionId = job.getProcessDefinitionId();
+          processDefinitionKey = job.getProcessDefinitionKey();
+        }
       } else
 
       if(jobDefinitionId != null) {
         JobDefinitionEntity jobDefinition = getJobDefinitionManager().findById(jobDefinitionId);
-        processDefinitionId = jobDefinition.getProcessDefinitionId();
-        processDefinitionKey = jobDefinition.getProcessDefinitionKey();
+        // Backward compatibility
+        if(jobDefinition != null) {
+          processDefinitionId = jobDefinition.getProcessDefinitionId();
+          processDefinitionKey = jobDefinition.getProcessDefinitionKey();
+        }
+      }
+      else if (processInstanceId != null) {
+        ExecutionEntity processInstance = getProcessInstanceManager().findExecutionById(processInstanceId);
+        // Backward compatibility
+        if(processInstance != null) {
+          processDefinitionId = processInstance.getProcessDefinitionId();
+          processDefinitionKey = ((ProcessDefinitionEntity)processInstance.getProcessDefinition()).getKey();
+        }
+      }
+      else if (processDefinitionId != null) {
+        ProcessDefinitionEntity definition = getProcessDefinitionManager().findLatestProcessDefinitionById(processDefinitionId);
+        // Backward compatibility
+        if(definition != null) {
+          processDefinitionKey = definition.getKey();
+        }
       }
 
-      UserOperationLogContext context = createContextForJob(operationId, operation, jobId, jobDefinitionId, processInstanceId,
+      UserOperationLogContext context = createContextForJob(operation, jobId, jobDefinitionId, processInstanceId,
         processDefinitionId, processDefinitionKey, Arrays.asList(propertyChange));
 
       logUserOperations(context);
@@ -163,25 +184,25 @@ public class UserOperationLogManager extends AbstractHistoricManager {
   }
 
   public void logJobDefinitionOperation(String operation, String jobDefinitionId, String processDefinitionId,
-      String processDefinitionKey, PropertyChange propertyChange) {
-    if (isHistoryLevelFullEnabled()) {
+      String processDefinitionKey,PropertyChange propertyChange) {
+    if(isHistoryLevelFullEnabled()) {
       if(jobDefinitionId != null) {
-        JobDefinitionEntity jobDefinitionEntity = getJobDefinitionManager().findById(jobDefinitionId);
-        processDefinitionId = jobDefinitionEntity.getProcessDefinitionId();
-        processDefinitionKey = jobDefinitionEntity.getProcessDefinitionKey();
+        JobDefinitionEntity jobDefinition = getJobDefinitionManager().findById(jobDefinitionId);
+        // Backward compatibility
+        if(jobDefinition != null) {
+          processDefinitionId = jobDefinition.getProcessDefinitionId();
+          processDefinitionKey = jobDefinition.getProcessDefinitionKey();
+        }
+      }
+      else if (processDefinitionId != null) {
+        ProcessDefinitionEntity definition = getProcessDefinitionManager().findLatestProcessDefinitionById(processDefinitionId);
+        // Backward compatibility
+        if(definition != null) {
+          processDefinitionKey = definition.getKey();
+        }
       }
 
-      UserOperationLogContext context = createContextForJobDefinition(operation, jobDefinitionId, processDefinitionId,
-        processDefinitionKey, Arrays.asList(propertyChange));
-
-      logUserOperations(context);
-    }
-  }
-
-  public void logJobRetryOperation(String operation, String jobId, String jobDefinitionId, String processInstanceId,
-      String processDefinitionId, String processDefinitionKey, PropertyChange propertyChange) {
-    if (isHistoryLevelFullEnabled()) {
-      UserOperationLogContext context = createContextForJobRetry(operation, jobId, jobDefinitionId, processInstanceId,
+      UserOperationLogContext context = createContextForJobDefinition(operation, jobDefinitionId,
         processDefinitionId, processDefinitionKey, Arrays.asList(propertyChange));
 
       logUserOperations(context);
@@ -203,6 +224,7 @@ public class UserOperationLogManager extends AbstractHistoricManager {
         propertyChanges = Arrays.asList(PropertyChange.EMPTY_CHANGE);
       }
     }
+
     context.setPropertyChanges(propertyChanges);
 
     context.setProcessDefinitionId(task.getProcessDefinitionId());
@@ -218,86 +240,54 @@ public class UserOperationLogManager extends AbstractHistoricManager {
 
   protected UserOperationLogContext createContextForProcessDefinition(String operation,
       String processDefinitionId, String processDefinitionKey, List<PropertyChange> propertyChanges) {
-    UserOperationLogContext context = createContext(EntityTypes.PROCESS_DEFINITION, operation);
 
-    context.setProcessDefinitionId(processDefinitionId);
-    context.setProcessDefinitionKey(processDefinitionKey);
-    context.setPropertyChanges(propertyChanges);
-
-    return context;
+    return createContext(EntityTypes.PROCESS_DEFINITION, operation, processDefinitionKey,
+      processDefinitionId, null, null, null, propertyChanges);
   }
 
   protected UserOperationLogContext createContextForProcessInstance(String operationId, String operation,
       String processInstanceId, String processDefinitionId,
       String processDefinitionKey, List<PropertyChange> propertyChanges) {
-    UserOperationLogContext context = createContext(EntityTypes.PROCESS_INSTANCE, operation);
 
-    if(operationId != null) {
-      context.setOperationId(operationId);
-    }
-
-    context.setProcessInstanceId(processInstanceId);
-    context.setProcessDefinitionId(processDefinitionId);
-    context.setProcessDefinitionKey(processDefinitionKey);
-    context.setPropertyChanges(propertyChanges);
-
-    return context;
+    return createContext(EntityTypes.PROCESS_INSTANCE, operation, processDefinitionKey,
+      processDefinitionId, processInstanceId, null, null, propertyChanges);
   }
 
-  protected UserOperationLogContext createContextForJob(String operationId, String operation, String jobId, String jobDefinitionId,
+  protected UserOperationLogContext createContextForJob(String operation, String jobId, String jobDefinitionId,
       String processInstanceId, String processDefinitionId, String processDefinitionKey, List<PropertyChange> propertyChanges) {
-    UserOperationLogContext context = createContext(EntityTypes.JOB, operation);
 
-    if(operationId != null) {
-      context.setOperationId(operationId);
-    }
+    return createContext(EntityTypes.JOB, operation, processDefinitionKey,
+      processDefinitionId, processInstanceId, jobDefinitionId, jobId, propertyChanges);
 
-    context.setProcessInstanceId(processInstanceId);
-    context.setProcessDefinitionId(processDefinitionId);
-    context.setProcessDefinitionKey(processDefinitionKey);
-    context.setJobDefinitionId(jobDefinitionId);
-    context.setJobId(jobId);
-    context.setPropertyChanges(propertyChanges);
-
-    return context;
   }
 
   protected UserOperationLogContext createContextForJobDefinition(String operation, String jobDefinitionId,
       String processDefinitionId, String processDefinitionKey, List<PropertyChange> propertyChanges) {
-    UserOperationLogContext context = createContext(EntityTypes.JOB_DEFINITION, operation);
 
-    context.setProcessDefinitionId(processDefinitionId);
-    context.setProcessDefinitionKey(processDefinitionKey);
-    context.setJobDefinitionId(jobDefinitionId);
-    context.setPropertyChanges(propertyChanges);
-
-    return context;
-  }
-
-  protected UserOperationLogContext createContextForJobRetry(String operation, String jobId, String jobDefinitionId,
-      String processInstanceId, String processDefinitionId, String processDefinitionKey,List<PropertyChange> propertyChanges) {
-    UserOperationLogContext context = createContext(EntityTypes.JOB, operation);
-
-    context.setJobId(jobId);
-    context.setJobDefinitionId(jobDefinitionId);
-    context.setProcessInstanceId(processInstanceId);
-    context.setProcessDefinitionId(processDefinitionId);
-    context.setProcessDefinitionKey(processDefinitionKey);
-
-    if (propertyChanges == null || propertyChanges.isEmpty()) {
-      if (OPERATION_TYPE_CREATE.equals(operation)) {
-        propertyChanges = Arrays.asList(PropertyChange.EMPTY_CHANGE);
-      }
-    }
-    context.setPropertyChanges(propertyChanges);
-
-    return context;
+    return createContext(EntityTypes.JOB_DEFINITION, operation, processDefinitionKey, processDefinitionId, null,
+      jobDefinitionId, null, propertyChanges);
   }
 
   protected UserOperationLogContext createContext(String entityType, String operationType) {
     UserOperationLogContext context = new UserOperationLogContext();
     context.setEntityType(entityType);
     context.setOperationType(operationType);
+
+    return context;
+  }
+
+  protected UserOperationLogContext createContext(String entityType, String operationType, String processDefinitionKey,
+      String processDefinitionId, String processInstanceId, String jobDefinitionId, String jobId,
+      List<PropertyChange> propertyChanges) {
+
+    UserOperationLogContext context = createContext(entityType, operationType);
+
+    context.setProcessDefinitionKey(processDefinitionKey);
+    context.setProcessDefinitionId(processDefinitionId);
+    context.setProcessInstanceId(processInstanceId);
+    context.setJobDefinitionId(jobDefinitionId);
+    context.setJobId(jobId);
+    context.setPropertyChanges(propertyChanges);
 
     return context;
   }
