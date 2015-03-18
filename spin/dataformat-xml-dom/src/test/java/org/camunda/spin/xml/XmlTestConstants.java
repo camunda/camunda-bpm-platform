@@ -156,7 +156,4 @@ public class XmlTestConstants {
     return order;
   }
 
-  public static String replaceLineBreaks(String source) {
-    return source.replace("\n", "").replace("\r", "");
-  }
 }

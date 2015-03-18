@@ -12,26 +12,31 @@
  */
 package org.camunda.spin.xml.dom;
 
+import static org.camunda.spin.xml.XmlTestConstants.EXAMPLE_VALIDATION_XML;
+import static org.camunda.spin.xml.XmlTestConstants.createExampleOrder;
+import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
+
+import java.io.IOException;
+
 import org.camunda.spin.impl.test.Script;
 import org.camunda.spin.impl.test.ScriptTest;
 import org.camunda.spin.xml.mapping.Order;
+import org.custommonkey.xmlunit.XMLAssert;
 import org.junit.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.camunda.spin.xml.XmlTestConstants.*;
+import org.xml.sax.SAXException;
 
 public abstract class XmlDomMapJavaToXmlScriptTest extends ScriptTest{
 
   @Test
   @Script(execute = false)
-  public void shouldMapJavaToXml() {
+  public void shouldMapJavaToXml() throws IOException, SAXException {
     Order order = createExampleOrder();
 
     script.setVariable("input", order);
     script.execute();
     String xml = script.getVariable("xml");
 
-    assertThat(replaceLineBreaks(xml)).isEqualTo(replaceLineBreaks(EXAMPLE_VALIDATION_XML));
+    assertXMLEqual(EXAMPLE_VALIDATION_XML, xml);
   }
 
   @Test(expected = IllegalArgumentException.class)
