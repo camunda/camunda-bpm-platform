@@ -127,11 +127,7 @@ public class DomXPathNamespaceResolver implements NamespaceContext {
       }
     }
 
-    if (!list.isEmpty()) {
-      return Collections.unmodifiableList(list).iterator();
-    } else {
-      return Collections.emptyIterator();
-    }
+    return Collections.unmodifiableList(list).iterator();
   }
 
   /**
