@@ -214,7 +214,7 @@ define([
         var name = bpmnElement.name;
         if (!name) {
           var shortenFilter = $filter('shorten');
-          name = bpmnElement.type + ' (' + shortenFilter(bpmnElement.id, 8) + ')';
+          name = bpmnElement.$type.substr(5) + ' (' + shortenFilter(bpmnElement.id, 8) + ')';
         }
 
         return name;
