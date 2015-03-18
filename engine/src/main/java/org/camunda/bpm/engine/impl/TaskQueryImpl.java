@@ -69,6 +69,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   protected Date createTimeAfter;
   protected String key;
   protected String keyLike;
+  protected String[] taskDefinitionKeys;
   protected String processDefinitionKey;
   protected String processDefinitionId;
   protected String processDefinitionName;
@@ -380,6 +381,11 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   public TaskQuery taskDefinitionKeyLike(String keyLike) {
     this.keyLike = keyLike;
     return this;
+  }
+  
+  public TaskQuery taskDefinitionKeyIn(String... taskDefinitionKeys) {
+	this.taskDefinitionKeys = taskDefinitionKeys;
+	return this;
   }
 
   public TaskQuery caseInstanceId(String caseInstanceId) {

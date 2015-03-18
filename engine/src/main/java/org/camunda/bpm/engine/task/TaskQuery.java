@@ -177,6 +177,9 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
    * &lt;userTask id="xxx" .../&gt;
    **/
   TaskQuery taskDefinitionKeyLike(String keyLike);
+  
+  /** Only select tasks which have one of the taskDefinitionKeys. **/
+  TaskQuery taskDefinitionKeyIn(String... taskDefinitionKeys);
 
   /** Only select tasks for the given case instance id. */
   TaskQuery caseInstanceId(String caseInstanceId);
