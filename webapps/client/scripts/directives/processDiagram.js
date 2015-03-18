@@ -123,7 +123,7 @@ define([
       if ($scope.control.isLoaded()) {
         if (selection) {
           angular.forEach(selection, function(elementId) {
-            if(bpmnElements[elementId] && bpmnElements[elementId].isSelectable) {
+            if(bpmnElements[elementId]) {
               $scope.control.clearHighlight(elementId);
             }
           });
@@ -131,7 +131,7 @@ define([
 
         if (newSelection) {
           angular.forEach(newSelection, function(elementId) {
-            if(bpmnElements[elementId] && bpmnElements[elementId].isSelectable) {
+            if(bpmnElements[elementId]) {
               $scope.control.highlight(elementId);
             }
           });
