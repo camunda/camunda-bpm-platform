@@ -15,32 +15,32 @@ package org.camunda.bpm.engine.test.concurrency;
 import java.util.logging.Logger;
 
 import org.camunda.bpm.engine.OptimisticLockingException;
-import org.camunda.bpm.engine.impl.cmd.CompleteTaskCmd;
+import org.camunda.bpm.engine.impl.cmd.ActivityInstanceCancellationCmd;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
-import org.camunda.bpm.engine.task.TaskQuery;
+import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.test.Deployment;
-import org.junit.Ignore;
 
 /**
  * @author Roman Smirnov
  *
  */
-@Ignore
-public class CompetingForkTest extends PluggableProcessEngineTestCase {
+public class CompetingActivityInstanceCancellationTest extends PluggableProcessEngineTestCase {
 
-  private static Logger log = Logger.getLogger(CompetingForkTest.class.getName());
+  private static Logger log = Logger.getLogger(CompetingActivityInstanceCancellationTest.class.getName());
 
   Thread testThread = Thread.currentThread();
   static ControllableThread activeThread;
   static String jobId;
 
-  public class CompleteTaskThread extends ControllableThread {
+  public class CancelActivityInstance extends ControllableThread {
 
-    String taskId;
+    String processInstanceId;
+    String activityInstanceId;
     OptimisticLockingException exception;
 
-    public CompleteTaskThread(String taskId) {
-      this.taskId = taskId;
+    public CancelActivityInstance(String processInstanceId, String activityInstanceId) {
+      this.processInstanceId = processInstanceId;
+      this.activityInstanceId = activityInstanceId;
     }
     public synchronized void startAndWaitUntilControlIsReturned() {
       activeThread = this;
@@ -51,7 +51,7 @@ public class CompetingForkTest extends PluggableProcessEngineTestCase {
       try {
         processEngineConfiguration
           .getCommandExecutorTxRequired()
-          .execute(new ControlledCommand(activeThread, new CompleteTaskCmd(taskId, null)));
+          .execute(new ControlledCommand(activeThread, new ActivityInstanceCancellationCmd(processInstanceId, activityInstanceId)));
 
       } catch (OptimisticLockingException e) {
         this.exception = e;
@@ -60,37 +60,46 @@ public class CompetingForkTest extends PluggableProcessEngineTestCase {
     }
   }
 
-  @Deployment
-  public void FAILING_testCompetingFork() throws Exception {
-    runtimeService.startProcessInstanceByKey("process");
+  @Deployment(resources = {"org/camunda/bpm/engine/test/concurrency/CompetingForkTest.testCompetingFork.bpmn20.xml"})
+  public void testCompetingCancellation() throws Exception {
+    String processInstanceId = runtimeService.startProcessInstanceByKey("process").getId();
 
-    TaskQuery query = taskService.createTaskQuery();
+    ActivityInstance activityInstance = runtimeService.getActivityInstance(processInstanceId);
+    ActivityInstance[] children = activityInstance.getChildActivityInstances();
 
-    String task1 = query
-        .taskDefinitionKey("task1")
-        .singleResult()
-        .getId();
+    String task1ActivityInstanceId = null;
+    String task2ActivityInstanceId = null;
+    String task3ActivityInstanceId = null;
 
-    String task2 = query
-        .taskDefinitionKey("task2")
-        .singleResult()
-        .getId();
+    for (ActivityInstance currentInstance : children) {
 
-    String task3 = query
-        .taskDefinitionKey("task3")
-        .singleResult()
-        .getId();
+      String id = currentInstance.getId();
+      String activityId = currentInstance.getActivityId();
+
+      if ("task1".equals(activityId)) {
+        task1ActivityInstanceId = id;
+      }
+      else if ("task2".equals(activityId)) {
+        task2ActivityInstanceId = id;
+      }
+      else if ("task3".equals(activityId)) {
+        task3ActivityInstanceId = id;
+      }
+      else {
+        fail();
+      }
+    }
 
     log.fine("test thread starts thread one");
-    CompleteTaskThread threadOne = new CompleteTaskThread(task1);
+    CancelActivityInstance threadOne = new CancelActivityInstance(processInstanceId, task1ActivityInstanceId);
     threadOne.startAndWaitUntilControlIsReturned();
 
     log.fine("test thread thread two");
-    CompleteTaskThread threadTwo = new CompleteTaskThread(task2);
+    CancelActivityInstance threadTwo = new CancelActivityInstance(processInstanceId, task2ActivityInstanceId);
     threadTwo.startAndWaitUntilControlIsReturned();
 
     log.fine("test thread continues to start thread three");
-    CompleteTaskThread threadThree = new CompleteTaskThread(task3);
+    CancelActivityInstance threadThree = new CancelActivityInstance(processInstanceId, task3ActivityInstanceId);
     threadThree.startAndWaitUntilControlIsReturned();
 
     log.fine("test thread notifies thread 1");
@@ -107,4 +116,5 @@ public class CompetingForkTest extends PluggableProcessEngineTestCase {
     assertNotNull(threadThree.exception);
     assertTextPresent("was updated by another transaction concurrently", threadThree.exception.getMessage());
   }
+
 }

@@ -885,6 +885,12 @@ public class ExecutionEntity extends PvmExecutionImpl implements
 
   // customized persistence behavior /////////////////////////////////////////
 
+  public void removeFromParentScope() {
+    // trigger a force update on parent execution
+    getParent().forceUpdate();
+    super.removeFromParentScope();
+  }
+
   public void remove() {
     super.remove();
 
