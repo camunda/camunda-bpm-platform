@@ -910,7 +910,7 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
       query.followUpBeforeOrNotExistent(followUpBeforeOrNotExistent);
     }
     if (followUpBeforeOrNotExistentExpression != null) {
-//      query.followUpBeforeOrNotExistentExpression(followUpBeforeOrNotExistentExpression);
+      query.followUpBeforeOrNotExistentExpression(followUpBeforeOrNotExistentExpression);
     }
     if (followUpDate != null) {
       query.followUpDate(followUpDate);
