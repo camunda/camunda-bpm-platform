@@ -79,11 +79,12 @@ module.exports = Page.extend({
       varInput = true;
     }
     this.addSortingButton().click();
-    this.newSortingSelectionListElement(sortingType).click().then(function() {
+    var listElement = this.newSortingSelectionListElement(sortingType);
+    listElement.click().then(function() {
       if (varInput) {
-        element(by.css('.variable-inputs')).element(by.model('variable')).sendKeys(variableName);
-        element(by.css('.variable-inputs')).element(by.cssContainingText('.ng-scope', variableType)).click();
-        element(by.css('.variable-inputs')).element(by.css('[ng-click="applySorting($event)"]')).click();
+        listElement.element(by.xpath('..')).element(by.model('variable')).sendKeys(variableName);
+        listElement.element(by.xpath('..')).element(by.cssContainingText('.ng-scope', variableType)).click();
+        listElement.element(by.xpath('..')).element(by.css('[ng-click="applySorting($event)"]')).click();
       }
     });
   },
