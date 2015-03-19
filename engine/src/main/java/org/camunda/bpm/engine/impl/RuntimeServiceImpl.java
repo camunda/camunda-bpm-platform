@@ -37,6 +37,7 @@ import org.camunda.bpm.engine.impl.cmd.RemoveExecutionVariablesCmd;
 import org.camunda.bpm.engine.impl.cmd.SetExecutionVariablesCmd;
 import org.camunda.bpm.engine.impl.cmd.SignalCmd;
 import org.camunda.bpm.engine.impl.cmd.SignalEventReceivedCmd;
+import org.camunda.bpm.engine.impl.cmd.StartProcessInstanceByMessageAndProcessDefinitionIdCmd;
 import org.camunda.bpm.engine.impl.cmd.StartProcessInstanceByMessageCmd;
 import org.camunda.bpm.engine.impl.cmd.StartProcessInstanceCmd;
 import org.camunda.bpm.engine.impl.cmd.SuspendProcessInstanceCmd;
@@ -324,6 +325,22 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
     return commandExecutor.execute(new StartProcessInstanceByMessageCmd(messageName, businessKey, processVariables));
   }
 
+  public ProcessInstance startProcessInstanceByMessageAndProcessDefinitionId(String messageName, String processDefinitionId) {
+	return commandExecutor.execute(new StartProcessInstanceByMessageAndProcessDefinitionIdCmd(messageName,processDefinitionId, null, null));
+  }
+  
+  public ProcessInstance startProcessInstanceByMessageAndProcessDefinitionId(String messageName, String processDefinitionId, String businessKey) {
+	return commandExecutor.execute(new StartProcessInstanceByMessageAndProcessDefinitionIdCmd(messageName,processDefinitionId, businessKey, null));
+  }
+  
+  public ProcessInstance startProcessInstanceByMessageAndProcessDefinitionId(String messageName, String processDefinitionId, Map<String, Object> processVariables) {
+	return commandExecutor.execute(new StartProcessInstanceByMessageAndProcessDefinitionIdCmd(messageName,processDefinitionId, null, processVariables));
+  }
+  
+  public ProcessInstance startProcessInstanceByMessageAndProcessDefinitionId(String messageName, String processDefinitionId, String businessKey, Map<String, Object> processVariables) {
+	return commandExecutor.execute(new StartProcessInstanceByMessageAndProcessDefinitionIdCmd(messageName,processDefinitionId, businessKey, processVariables));
+  }
+  
   public void signalEventReceived(String signalName) {
     commandExecutor.execute(new SignalEventReceivedCmd(signalName, null, null));
   }
