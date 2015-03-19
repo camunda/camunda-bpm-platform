@@ -21,6 +21,28 @@ ops['process-definition'] = {
       test : {
         value: 1.5,
         type: 'Double'
+      },
+      myString : {
+          value: '123 dfg',
+          type: 'String'
+      },
+      extraLong : {
+          value: '1234567890987654321',
+          type: 'Long'
+      }
+    }
+  },
+  {
+    key: 'user-tasks',
+    businessKey: 'Instance2',
+    variables: {
+      test : {
+        value: 1.5,
+        type: 'Double'
+      },
+      myString : {
+          value: 'abc dfg',
+          type: 'String'
       }
     }
   },
@@ -31,6 +53,14 @@ ops['process-definition'] = {
       test : {
         value: 1.49,
         type: 'Double'
+      },
+      myString : {
+          value: 'abc dfg',
+          type: 'String'
+      },
+      myDate : {
+          value: '2011-11-11T11:11:11',
+          type: 'Date'
       }
     }
   }]

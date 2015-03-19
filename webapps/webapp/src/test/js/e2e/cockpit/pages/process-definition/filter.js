@@ -8,33 +8,61 @@ module.exports = Filter.extend({
     return element(by.css('.ctn-sidebar'));
   },
 
-  activityFilter: function(activityName) {
-    return this.filterSideBarElement().element(by.cssContainingText('.activity-filter >.search', activityName));
-  },
-
-  removeFilterButton: function(activityName) {
-    return this.activityFilter(activityName).element(by.css('button'));
-  },
-
   addFilterButton: function() {
-    return this.filterSideBarElement().element(by.css('.icon-plus'));
+    return this.filterSideBarElement().element(by.css('.glyphicon-plus'));
   },
 
-  addFilterByVariable: function(filterValue) {
+  dropdownElement: function() {
+    return this.filterSideBarElement().element(by.css('.dropdown-menu'));
+  },
+
+  variableFilters: function() {
+    return this.filterSideBarElement().all(by.repeater('variable in filterData.variables'));
+  },
+
+  removeVariableFilter: function(item) {
+    return this.variableFilters().get(item).element(by.css('.glyphicon-remove')).click();
+  },
+
+  removeBusinessKeyFilter: function() {
+    return this.filterSideBarElement().element(by.css('[ng-click="removeBusinessKeyFilter()"]')).click();
+  },
+
+  addFilterByVariable: function(filterExpression) {
+    var self = this;
+
     this.addFilterButton().click().then(function() {
-      element(by.css('[ng-click="addVariableFilter()"]')).click().then(function() {
-        element(by.model('variable.value')).sendKeys(filterValue);
+      self.dropdownElement().element(by.css('[ng-click="addVariableFilter()"]')).click().then(function() {
+        self.variableFilters().count().then(function(items) {
+          items = items -1;
+          self.variableFilters().get(items).element(by.model('variable.value')).sendKeys(filterExpression);
+        });
       });
     });
   },
 
-  addFilterByBusinessKey: function() {
+  addFilterByBusinessKey: function(filterExpression) {
+    var self = this;
 
+    this.addFilterButton().click().then(function() {
+      self.dropdownElement().element(by.css('[ng-click="addBusinessKeyFilter()"]')).click().then(function() {
+        self.filterSideBarElement().element(by.model('filterData.businessKey.value')).sendKeys(filterExpression);
+      });
+    });
   },
 
-  addFilterByStartDate: function() {
+  addFilterByStartDate: function(direction, filterExpression) {
+    var self = this;
 
+    this.addFilterButton().click().then(function() {
+      self.dropdownElement().element(by.css('[ng-click="addStartDateFilter()"]')).click().then(function() {
+        self.filterSideBarElement().element(by.cssContainingText('option', direction)).click();
+        if (filterExpression !== 0) {
+          self.filterSideBarElement().element(by.model('date.value')).clear();
+          self.filterSideBarElement().element(by.model('date.value')).sendKeys(filterExpression);
+        }
+      });
+    });
   }
-
 
 });
