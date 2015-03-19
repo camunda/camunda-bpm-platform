@@ -21,7 +21,8 @@ define([
       scope: {
         change: '=',
         applyHandler: '&',
-        resetFunction: '='
+        resetFunction: '=',
+        variable: '=',
       },
 
       controller: [
@@ -38,19 +39,11 @@ define([
           'Short':    $translate.instant('SHORT'),
           'String':   $translate.instant('STRING')
         };
-      }],
 
-      link: function (scope, element) {
-
-        scope.resetFunction = function(type, name) {
-          scope.variable = name;
-          element.find('select').val(type);
+        $scope.applySorting = function (evt) {
+          $scope.applyHandler({$event: evt});
         };
-
-        scope.applySorting = function (evt) {
-          scope.applyHandler({$event: evt, type: element.find('select').val(), value: scope.variable});
-        };
-      }
+      }]
     };
   }];
 });

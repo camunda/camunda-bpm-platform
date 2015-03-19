@@ -22,40 +22,41 @@ define([
         resetFunction: '='
       },
 
-      controller: [
-        '$scope',
-      function (
-        $scope
-      ) {
-        $scope.hasOptions = function(){
-          return $scope.options && Object.keys($scope.options).length > 0;
-        };
-      }],
-
       link: function($scope) {
 
         $scope.change = $scope.$eval($scope.change);
+
+        $scope.variable = {
+          varName: '',
+          varType: 'Integer'
+        };
+
+
+        $scope.hasOptions = function(){
+          return $scope.options && Object.keys($scope.options).length > 0;
+        };
 
         // --- CONTROL FUNCTIONS ---
         $scope.resetInputs = {};
         $scope.resetFunction = function(id, type, value){
           if($scope.sortableVariables[id]) {
             $scope.focusedOn = id;
+            $scope.variable.varType = type;
+            $scope.variable.varName = value;
           } else {
             $scope.focusedOn = null;
-          }
-          // reset all inputs
-          for(var key in $scope.resetInputs) {
-            if(key === id) {
-              $scope.resetInputs[key](type, value);
-            } else {
-              $scope.resetInputs[key]('Integer', '');
-            }
+            $scope.variable.varType = 'Integer';
+            $scope.variable.varName = '';
           }
         };
 
-        $scope.handleClick = function(evt, name, type, value) {
-          $scope.clickHandler({$event: evt, id: name, type: type, value: value});
+        $scope.handleClick = function(evt, name) {
+          if($scope.sortableVariables[name]) {
+            $scope.clickHandler({$event: evt, id: name, type: $scope.variable.varType, value: $scope.variable.varName});
+          } else {
+            $scope.clickHandler({$event: evt, id: name});
+          }
+
         };
 
         $scope.sortableVariables = {
