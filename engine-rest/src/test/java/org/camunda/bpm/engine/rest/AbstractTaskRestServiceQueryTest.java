@@ -13,6 +13,7 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
+import static org.camunda.bpm.engine.rest.util.QueryParamUtils.*;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -354,13 +355,13 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
     Map<String, String> stringQueryParameters = getCompleteStringQueryParameters();
     Map<String, Integer> intQueryParameters = getCompleteIntQueryParameters();
 
-    String[] stringArrayQueryParameters = getCompleteStringArrayQueryParameters().get("activityInstanceIdIn");
-    String activityInstanceIds = stringArrayQueryParameters[0] + "," + stringArrayQueryParameters[1];
+    Map<String, String[]> arrayQueryParameters = getCompleteStringArrayQueryParameters();
 
     given()
       .queryParams(stringQueryParameters)
       .queryParams(intQueryParameters)
-      .queryParam("activityInstanceIdIn", activityInstanceIds)
+      .queryParam("activityInstanceIdIn", arrayAsCommaSeperatedList(arrayQueryParameters.get("activityInstanceIdIn")))
+      .queryParam("taskDefinitionKeyIn", arrayAsCommaSeperatedList(arrayQueryParameters.get("taskDefinitionKeyIn")))
       .header("accept", MediaType.APPLICATION_JSON)
       .expect().statusCode(Status.OK.getStatusCode())
       .when().get(TASK_QUERY_URL);
@@ -398,8 +399,10 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
     Map<String, String[]> parameters = new HashMap<String, String[]>();
 
     String[] activityInstanceIds = { "anActivityInstanceId", "anotherActivityInstanceId" };
+    String[] taskDefinitionKeys = { "aTaskDefinitionKey", "anotherTaskDefinitionKey" };
 
     parameters.put("activityInstanceIdIn", activityInstanceIds);
+    parameters.put("taskDefinitionKeyIn", taskDefinitionKeys);
 
     return parameters;
   }
@@ -477,9 +480,10 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
   }
 
   private void verifyStringArrayParametersInvocations() {
-    Map<String, String[]> stringArrayParameter = getCompleteStringArrayQueryParameters();
+    Map<String, String[]> stringArrayParameters = getCompleteStringArrayQueryParameters();
 
-    verify(mockQuery).activityInstanceIdIn(stringArrayParameter.get("activityInstanceIdIn"));
+    verify(mockQuery).activityInstanceIdIn(stringArrayParameters.get("activityInstanceIdIn"));
+    verify(mockQuery).taskDefinitionKeyIn(stringArrayParameters.get("taskDefinitionKeyIn"));
   }
 
   @Test

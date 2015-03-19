@@ -105,6 +105,7 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
   private String candidateUser;
   private String candidateUserExpression;
   private String taskDefinitionKey;
+  private String[] taskDefinitionKeyIn;
   private String taskDefinitionKeyLike;
   private String description;
   private String descriptionLike;
@@ -256,6 +257,11 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
   @CamundaQueryParam("taskDefinitionKey")
   public void setTaskDefinitionKey(String taskDefinitionKey) {
     this.taskDefinitionKey = taskDefinitionKey;
+  }
+
+  @CamundaQueryParam(value = "taskDefinitionKeyIn", converter= StringArrayConverter.class)
+  public void setTaskDefinitionKeyIn(String[] taskDefinitionKeyIn) {
+    this.taskDefinitionKeyIn = taskDefinitionKeyIn;
   }
 
   @CamundaQueryParam("taskDefinitionKeyLike")
@@ -581,6 +587,10 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     return candidateUserExpression;
   }
 
+  public String[] getTaskDefinitionKeyIn() {
+    return taskDefinitionKeyIn;
+  }
+
   public String getTaskDefinitionKey() {
     return taskDefinitionKey;
   }
@@ -833,6 +843,9 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     }
     if (candidateUserExpression != null) {
       query.taskCandidateUserExpression(candidateUserExpression);
+    }
+    if (taskDefinitionKeyIn != null && taskDefinitionKey.length() > 0) {
+      query.taskDefinitionKeyIn(taskDefinitionKeyIn);
     }
     if (taskDefinitionKey != null) {
       query.taskDefinitionKey(taskDefinitionKey);
