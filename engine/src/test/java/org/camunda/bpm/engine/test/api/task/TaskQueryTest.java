@@ -527,6 +527,40 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     Long count = taskService.createTaskQuery().taskDefinitionKeyLike("%unexistingKey%").count();
     assertEquals(0L, count.longValue());
   }
+  
+  @Deployment(resources="org/camunda/bpm/engine/test/api/task/taskDefinitionProcess.bpmn20.xml")
+  public void testTaskDefinitionKeyIn() throws Exception {
+
+    // Start process instance, 2 tasks will be available
+    runtimeService.startProcessInstanceByKey("taskDefinitionKeyProcess");
+    
+    // 1 Task should be found with TaskKey1
+    List<Task> tasks = taskService.createTaskQuery().taskDefinitionKeyIn("taskKey1").list();
+    assertNotNull(tasks);
+    assertEquals(1, tasks.size());
+
+    assertEquals("taskKey1", tasks.get(0).getTaskDefinitionKey());
+
+    // 2 Tasks should be found with TaskKey1 and TaskKey123
+    tasks = taskService.createTaskQuery().taskDefinitionKeyIn("taskKey1", "taskKey123").orderByTaskName().asc().list();
+    assertNotNull(tasks);
+    assertEquals(2, tasks.size());
+
+    assertEquals("taskKey1", tasks.get(0).getTaskDefinitionKey());
+    assertEquals("taskKey123", tasks.get(1).getTaskDefinitionKey());
+    
+    // 2 Tasks should be found with TaskKey1, TaskKey123 and UnexistingKey
+    tasks = taskService.createTaskQuery().taskDefinitionKeyIn("taskKey1", "taskKey123", "unexistingKey").orderByTaskName().asc().list();
+    assertNotNull(tasks);
+    assertEquals(2, tasks.size());
+
+    assertEquals("taskKey1", tasks.get(0).getTaskDefinitionKey());
+    assertEquals("taskKey123", tasks.get(1).getTaskDefinitionKey());
+
+    // No task should be found with UnexistingKey
+    Long count = taskService.createTaskQuery().taskDefinitionKeyIn("unexistingKey").count();
+    assertEquals(0L, count.longValue());
+  }
 
   @Deployment(resources="org/camunda/bpm/engine/test/api/task/taskDefinitionProcess.bpmn20.xml")
   public void testTaskDefinitionKeyIn() throws Exception {
