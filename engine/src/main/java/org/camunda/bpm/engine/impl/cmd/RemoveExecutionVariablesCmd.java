@@ -2,9 +2,13 @@ package org.camunda.bpm.engine.impl.cmd;
 
 import java.io.Serializable;
 import java.util.Collection;
+
+import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
@@ -12,7 +16,7 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
  * @author roman.smirnov
  * @author Joram Barrez
  */
-public class RemoveExecutionVariablesCmd implements Command<Void>, Serializable {
+public class RemoveExecutionVariablesCmd extends AbstractVariableCmd implements Command<Void>, Serializable {
 
   private static final long serialVersionUID = 1L;
 
@@ -42,6 +46,16 @@ public class RemoveExecutionVariablesCmd implements Command<Void>, Serializable 
       execution.removeVariables(variableNames);
     }
 
+    if(!preventLogUserOperation) {
+      String processDefinitionKey = ((ProcessDefinitionEntity) execution.getProcessDefinition()).getKey();
+      commandContext.getOperationLogManager().logVariableOperation(getLogEntryOperation(), execution.getId(),
+        execution.getProcessInstanceId(), execution.getProcessDefinitionId(), processDefinitionKey, PropertyChange.EMPTY_CHANGE);
+    }
+
     return null;
+  }
+
+  public String getLogEntryOperation() {
+    return UserOperationLogEntry.OPERATION_TYPE_REMOVE_EXECUTION_VARIABLE;
   }
 }

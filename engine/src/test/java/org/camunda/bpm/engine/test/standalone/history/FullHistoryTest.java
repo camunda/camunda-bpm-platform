@@ -33,6 +33,7 @@ import org.camunda.bpm.engine.impl.cmd.SubmitStartFormCmd;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.test.ResourceProcessEngineTestCase;
+import org.camunda.bpm.engine.impl.test.TestHelper;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Execution;
@@ -1378,6 +1379,8 @@ public class FullHistoryTest extends ResourceProcessEngineTestCase {
     assertEquals(ValueType.STRING.getName(), ((HistoricVariableUpdate)resultById).getTypeName());
 
     taskService.deleteTask(newTask.getId(), true);
+
+    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
   public void testHistoricDetailQueryByNonExistingId() {
@@ -1393,6 +1396,8 @@ public class FullHistoryTest extends ResourceProcessEngineTestCase {
     assertNull(result);
 
     taskService.deleteTask(newTask.getId(), true);
+
+    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
 
@@ -1413,6 +1418,8 @@ public class FullHistoryTest extends ResourceProcessEngineTestCase {
     assertNotNull(((HistoricVariableUpdate)result).getValue());
 
     taskService.deleteTask(newTask.getId(), true);
+
+    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
   public void testBinaryFetchingDisabled() {
@@ -1431,6 +1438,8 @@ public class FullHistoryTest extends ResourceProcessEngineTestCase {
     assertNull(((HistoricVariableUpdate)result).getValue());
 
     taskService.deleteTask(newTask.getId(), true);
+
+    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
   public void testDisableCustomObjectDeserialization() {
@@ -1470,6 +1479,8 @@ public class FullHistoryTest extends ResourceProcessEngineTestCase {
     }
 
     taskService.deleteTask(newTask.getId(), true);
+
+    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
   public void testErrorMessage() {
@@ -1489,6 +1500,8 @@ public class FullHistoryTest extends ResourceProcessEngineTestCase {
     assertNotNull(((HistoricVariableUpdate)result).getErrorMessage());
 
     taskService.deleteTask(newTask.getId(), true);
+
+    TestHelper.clearOpLog(processEngineConfiguration);
 
   }
 }

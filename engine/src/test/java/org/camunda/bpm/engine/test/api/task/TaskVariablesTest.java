@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.impl.test.TestHelper;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.variable.value.ObjectValue;
@@ -41,6 +42,8 @@ public class TaskVariablesTest extends PluggableProcessEngineTestCase {
     assertEquals("trumpet", taskService.getVariable(taskId, "instrument"));
 
     taskService.deleteTask(taskId, true);
+
+    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
   @Deployment

@@ -39,6 +39,7 @@ import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.form.type.AbstractFormFieldType;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.impl.test.TestHelper;
 import org.camunda.bpm.engine.impl.util.CollectionUtil;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.CaseExecution;
@@ -821,6 +822,8 @@ public class FormServiceTest extends PluggableProcessEngineTestCase {
 
     // Finally, delete task
     taskService.deleteTask(task.getId(), true);
+
+    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })

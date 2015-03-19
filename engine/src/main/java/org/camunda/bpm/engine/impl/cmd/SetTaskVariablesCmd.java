@@ -15,9 +15,11 @@ package org.camunda.bpm.engine.impl.cmd;
 
 import java.io.Serializable;
 import java.util.Map;
+
+import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.*;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
@@ -26,21 +28,21 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
  * @author Tom Baeyens
  * @author Joram Barrez
  */
-public class SetTaskVariablesCmd implements Command<Object>, Serializable {
+public class SetTaskVariablesCmd extends AbstractVariableCmd implements Command<Void>, Serializable {
 
   private static final long serialVersionUID = 1L;
 
   protected Map<String, ? extends Object> variables;
   protected boolean isLocal;
   protected String taskId;
-  
+
   public SetTaskVariablesCmd(String taskId, Map<String, ? extends Object> variables, boolean isLocal) {
     this.taskId = taskId;
     this.variables = variables;
     this.isLocal = isLocal;
   }
-  
-  public Object execute(CommandContext commandContext) {
+
+  public Void execute(CommandContext commandContext) {
     ensureNotNull("taskId", taskId);
 
     TaskEntity task = commandContext
@@ -55,7 +57,22 @@ public class SetTaskVariablesCmd implements Command<Object>, Serializable {
       task.setVariables(variables);
     }
 
+    if(!preventLogUserOperation) {
+      String processDefinitionKey = null;
+      if(task.getExecution() != null) {
+        processDefinitionKey = ((ProcessDefinitionEntity) task.getExecution().getProcessDefinition()).getKey();
+      } else if(task.getProcessInstance() != null) {
+        processDefinitionKey = ((ProcessDefinitionEntity) task.getProcessInstance().getProcessDefinition()).getKey();
+      }
+
+      commandContext.getOperationLogManager().logVariableOperation(getLogEntryOperation(), task.getExecutionId(),
+        task.getProcessInstanceId(), task.getProcessDefinitionId(), processDefinitionKey, PropertyChange.EMPTY_CHANGE);
+    }
+
     return null;
   }
-  
+
+  public String getLogEntryOperation() {
+    return UserOperationLogEntry.OPERATION_TYPE_SET_TASK_VARIABLE;
+  }
 }

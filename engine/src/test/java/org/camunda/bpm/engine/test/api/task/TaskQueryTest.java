@@ -47,6 +47,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.impl.test.TestHelper;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.runtime.CaseExecution;
@@ -97,6 +98,8 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     identityService.deleteUser("gonzo");
     identityService.deleteUser("kermit");
     taskService.deleteTasks(taskIds, true);
+
+    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
   public void tesBasicTaskPropertiesNotNull() {

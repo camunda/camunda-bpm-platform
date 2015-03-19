@@ -41,15 +41,14 @@ import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYP
 import static org.camunda.bpm.engine.impl.persistence.entity.TaskEntity.ASSIGNEE;
 import static org.camunda.bpm.engine.impl.persistence.entity.TaskEntity.OWNER;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.camunda.bpm.engine.EntityTypes;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.history.UserOperationLogQuery;
+import org.camunda.bpm.engine.impl.RuntimeServiceImpl;
+import org.camunda.bpm.engine.impl.TaskServiceImpl;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
@@ -506,18 +505,18 @@ public class OperationLogQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(2, query().entityType(JOB).count());
 
     // active job definition
-    UserOperationLogEntry activeJobDefninitionEntry = query()
+    UserOperationLogEntry activeJobDefinitionEntry = query()
       .entityType(JOB_DEFINITION)
       .processDefinitionId(process.getProcessDefinitionId())
       .operationType(OPERATION_TYPE_ACTIVATE_JOB_DEFINITION)
       .singleResult();
 
-    assertNotNull(activeJobDefninitionEntry);
-    assertEquals(process.getProcessDefinitionId(), activeJobDefninitionEntry.getProcessDefinitionId());
+    assertNotNull(activeJobDefinitionEntry);
+    assertEquals(process.getProcessDefinitionId(), activeJobDefinitionEntry.getProcessDefinitionId());
 
-    assertEquals("suspensionState", activeJobDefninitionEntry.getProperty());
-    assertEquals("active", activeJobDefninitionEntry.getNewValue());
-    assertNull(activeJobDefninitionEntry.getOrgValue());
+    assertEquals("suspensionState", activeJobDefinitionEntry.getProperty());
+    assertEquals("active", activeJobDefinitionEntry.getNewValue());
+    assertNull(activeJobDefinitionEntry.getOrgValue());
 
     // active job
     UserOperationLogEntry activateJobIdEntry = query()
@@ -561,7 +560,6 @@ public class OperationLogQueryTest extends PluggableProcessEngineTestCase {
     assertEquals("suspended", suspendedJobEntry.getNewValue());
     assertNull(suspendedJobEntry.getOrgValue());
   }
-
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/cmd/FoxJobRetryCmdTest.testFailedServiceTask.bpmn20.xml" })
   public void testQueryJobRetryOperationsById() {
@@ -706,6 +704,197 @@ public class OperationLogQueryTest extends PluggableProcessEngineTestCase {
     TestHelper.clearOpLog(processEngineConfiguration);
   }
 
+  // ----- ADD VARIABLES -----
+
+  @Deployment(resources = { "org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml" })
+  public void testQueryAddExecutionVariableOperation() {
+    // given
+    process = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+    // when
+    runtimeService.setVariable(process.getId(), "testVariable1", "THIS IS TESTVARIABLE!!!");
+
+    // then
+    verifyVariableOperationAsserts(1, UserOperationLogEntry.OPERATION_TYPE_SET_EXECUTION_VARIABLE);
+  }
+
+  @Deployment(resources = { "org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml" })
+  public void testQueryAddExecutionVariablesMapOperation() {
+    // given
+    process = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+    // when
+    runtimeService.setVariables(process.getId(), createMapForVariableAddition());
+
+    // then
+    verifyVariableOperationAsserts(1, UserOperationLogEntry.OPERATION_TYPE_SET_EXECUTION_VARIABLE);
+  }
+
+  @Deployment(resources = { "org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml" })
+  public void testQueryAddExecutionVariablesSingleAndMapOperation() {
+    // given
+    process = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+    // when
+    runtimeService.setVariable(process.getId(), "testVariable3", "foo");
+    runtimeService.setVariables(process.getId(), createMapForVariableAddition());
+    runtimeService.setVariable(process.getId(), "testVariable4", "bar");
+
+    // then
+    verifyVariableOperationAsserts(3, UserOperationLogEntry.OPERATION_TYPE_SET_EXECUTION_VARIABLE);
+  }
+
+  @Deployment(resources = { "org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml" })
+  public void testQueryAddTaskVariableOperation() {
+    // given
+    process = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    processTaskId = taskService.createTaskQuery().singleResult().getId();
+
+    // when
+    taskService.setVariable(processTaskId, "testVariable1", "THIS IS TESTVARIABLE!!!");
+
+    // then
+    verifyVariableOperationAsserts(1, UserOperationLogEntry.OPERATION_TYPE_SET_TASK_VARIABLE);
+  }
+
+  @Deployment(resources = { "org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml" })
+  public void testQueryAddTaskVariablesMapOperation() {
+    // given
+    process = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    processTaskId = taskService.createTaskQuery().singleResult().getId();
+
+    // when
+    taskService.setVariables(processTaskId, createMapForVariableAddition());
+
+    // then
+    verifyVariableOperationAsserts(1, UserOperationLogEntry.OPERATION_TYPE_SET_TASK_VARIABLE);
+  }
+
+  @Deployment(resources = { "org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml" })
+  public void testQueryAddTaskVariablesSingleAndMapOperation() {
+    // given
+    process = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    processTaskId = taskService.createTaskQuery().singleResult().getId();
+
+    // when
+    taskService.setVariable(processTaskId, "testVariable3", "foo");
+    taskService.setVariables(processTaskId, createMapForVariableAddition());
+    taskService.setVariable(processTaskId, "testVariable4", "bar");
+
+    // then
+    verifyVariableOperationAsserts(3, UserOperationLogEntry.OPERATION_TYPE_SET_TASK_VARIABLE);
+  }
+
+  // ----- PATCH VARIABLES -----
+
+  @Deployment(resources = { "org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml" })
+  public void testQueryPatchExecutionVariablesOperation() {
+    // given
+    process = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+    // when
+    ((RuntimeServiceImpl) runtimeService)
+      .updateVariables(process.getId(), createMapForVariableAddition(), createCollectionForVariableDeletion());
+
+    // then
+   verifyVariableOperationAsserts(1, UserOperationLogEntry.OPERATION_TYPE_PATCH_EXECUTION_VARIABLE);
+  }
+
+  @Deployment(resources = { "org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml" })
+  public void testQueryPatchTaskVariablesOperation() {
+    // given
+    process = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    processTaskId = taskService.createTaskQuery().singleResult().getId();
+
+    // when
+    ((TaskServiceImpl) taskService)
+      .updateVariablesLocal(processTaskId, createMapForVariableAddition(), createCollectionForVariableDeletion());
+
+    // then
+    verifyVariableOperationAsserts(1, UserOperationLogEntry.OPERATION_TYPE_PATCH_TASK_VARIABLE);
+  }
+
+  // ----- REMOVE VARIABLES -----
+
+  @Deployment(resources = { "org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml" })
+  public void testQueryRemoveExecutionVariableOperation() {
+    // given
+    process = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+    // when
+    runtimeService.removeVariable(process.getId(), "testVariable1");
+
+    // then
+    verifyVariableOperationAsserts(1, UserOperationLogEntry.OPERATION_TYPE_REMOVE_EXECUTION_VARIABLE);
+  }
+
+  @Deployment(resources = { "org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml" })
+  public void testQueryRemoveExecutionVariablesMapOperation() {
+    // given
+    process = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+    // when
+    runtimeService.removeVariables(process.getId(), createCollectionForVariableDeletion());
+
+    // then
+    verifyVariableOperationAsserts(1, UserOperationLogEntry.OPERATION_TYPE_REMOVE_EXECUTION_VARIABLE);
+  }
+
+  @Deployment(resources = { "org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml" })
+  public void testQueryRemoveExecutionVariablesSingleAndMapOperation() {
+    // given
+    process = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+    // when
+    runtimeService.removeVariable(process.getId(), "testVariable1");
+    runtimeService.removeVariables(process.getId(), createCollectionForVariableDeletion());
+    runtimeService.removeVariable(process.getId(), "testVariable2");
+
+    // then
+    verifyVariableOperationAsserts(3, UserOperationLogEntry.OPERATION_TYPE_REMOVE_EXECUTION_VARIABLE);
+  }
+
+  @Deployment(resources = { "org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml" })
+  public void testQueryRemoveTaskVariableOperation() {
+    // given
+    process = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    processTaskId = taskService.createTaskQuery().singleResult().getId();
+
+    // when
+    taskService.removeVariable(processTaskId, "testVariable1");
+
+    // then
+    verifyVariableOperationAsserts(1, UserOperationLogEntry.OPERATION_TYPE_REMOVE_TASK_VARIABLE);
+  }
+
+  @Deployment(resources = { "org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml" })
+  public void testQueryRemoveTaskVariablesMapOperation() {
+    // given
+    process = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    processTaskId = taskService.createTaskQuery().singleResult().getId();
+
+    // when
+    taskService.removeVariables(processTaskId, createCollectionForVariableDeletion());
+
+    // then
+    verifyVariableOperationAsserts(1, UserOperationLogEntry.OPERATION_TYPE_REMOVE_TASK_VARIABLE);
+  }
+
+  @Deployment(resources = { "org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml" })
+  public void testQueryRemoveTaskVariablesSingleAndMapOperation() {
+    // given
+    process = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    processTaskId = taskService.createTaskQuery().singleResult().getId();
+
+    // when
+    taskService.removeVariable(processTaskId, "testVariable3");
+    taskService.removeVariables(processTaskId, createCollectionForVariableDeletion());
+    taskService.removeVariable(processTaskId, "testVariable4");
+
+    // then
+    verifyVariableOperationAsserts(3, UserOperationLogEntry.OPERATION_TYPE_REMOVE_TASK_VARIABLE);
+  }
+
   // --------------- CMMN --------------------
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
@@ -847,6 +1036,41 @@ public class OperationLogQueryTest extends PluggableProcessEngineTestCase {
       query.singleResult();
       fail();
     } catch (ProcessEngineException e) {}
+  }
+
+  private Map<String, Object> createMapForVariableAddition() {
+    Map<String, Object> variables =  new HashMap<String, Object>();
+    variables.put("testVariable1", "THIS IS TESTVARIABLE!!!");
+    variables.put("testVariable2", "OVER 9000!");
+
+    return variables;
+  }
+
+  private Collection<String> createCollectionForVariableDeletion() {
+    Collection<String> variables = new ArrayList<String>();
+    variables.add("testVariable3");
+    variables.add("testVariable4");
+
+    return variables;
+  }
+
+  private void verifyVariableOperationAsserts(int countAssertValue, String operationType) {
+    UserOperationLogQuery logQuery = query().entityType(EntityTypes.VARIABLE).operationType(operationType);
+    assertEquals(countAssertValue, logQuery.count());
+
+    if(countAssertValue > 1) {
+      List<UserOperationLogEntry> logEntryList = logQuery.list();
+
+      for (UserOperationLogEntry logEntry : logEntryList) {
+        assertEquals(process.getProcessDefinitionId(), logEntry.getProcessDefinitionId());
+        assertEquals(process.getProcessInstanceId(), logEntry.getProcessInstanceId());
+      }
+    } else {
+      UserOperationLogEntry logEntry = logQuery.singleResult();
+      assertEquals(process.getProcessDefinitionId(), logEntry.getProcessDefinitionId());
+      assertEquals(process.getProcessInstanceId(), logEntry.getProcessInstanceId());
+    }
+
   }
 
 }

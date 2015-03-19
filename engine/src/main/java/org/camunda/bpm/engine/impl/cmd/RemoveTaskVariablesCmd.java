@@ -2,8 +2,12 @@ package org.camunda.bpm.engine.impl.cmd;
 
 import java.io.Serializable;
 import java.util.Collection;
+
+import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
@@ -12,13 +16,13 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
  * @author roman.smirnov
  * @author Joram Barrez
  */
-public class RemoveTaskVariablesCmd implements Command<Void>, Serializable {
+public class RemoveTaskVariablesCmd extends AbstractVariableCmd implements Command<Void>, Serializable {
   
   private static final long serialVersionUID = 1L;
 
-  private final String taskId;
-  private final Collection<String> variableNames;
-  private final boolean isLocal;
+  protected final String taskId;
+  protected final Collection<String> variableNames;
+  protected final boolean isLocal;
 
   public RemoveTaskVariablesCmd(String taskId, Collection<String> variableNames, boolean isLocal) {
     this.taskId = taskId;
@@ -42,6 +46,22 @@ public class RemoveTaskVariablesCmd implements Command<Void>, Serializable {
       task.removeVariables(variableNames);
     }
 
+    if(!preventLogUserOperation) {
+      String processDefinitionKey = null;
+      if(task.getExecution() != null) {
+        processDefinitionKey = ((ProcessDefinitionEntity) task.getExecution().getProcessDefinition()).getKey();
+      } else if(task.getProcessInstance() != null) {
+        processDefinitionKey = ((ProcessDefinitionEntity) task.getProcessInstance().getProcessDefinition()).getKey();
+      }
+
+      commandContext.getOperationLogManager().logVariableOperation(getLogEntryOperation(), task.getExecutionId(),
+        task.getProcessInstanceId(), task.getProcessDefinitionId(), processDefinitionKey, PropertyChange.EMPTY_CHANGE);
+    }
+
     return null;
+  }
+
+  public String getLogEntryOperation() {
+    return UserOperationLogEntry.OPERATION_TYPE_REMOVE_TASK_VARIABLE;
   }
 }

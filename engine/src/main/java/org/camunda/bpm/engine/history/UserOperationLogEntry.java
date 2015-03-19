@@ -14,7 +14,6 @@
 package org.camunda.bpm.engine.history;
 
 import java.util.Date;
-
 import org.camunda.bpm.engine.EntityTypes;
 
 
@@ -96,6 +95,13 @@ public interface UserOperationLogEntry {
   public static String OPERATION_TYPE_SUSPEND_JOB = "SuspendJob";
   public static String OPERATION_TYPE_ACTIVATE_JOB = "ActivateJob";
   public static String OPERATION_TYPE_SET_JOB_RETRIES = "SetJobRetries";
+  public static String OPERATION_TYPE_SET_EXECUTION_VARIABLE = "SetExecutionVariable";
+  public static String OPERATION_TYPE_SET_TASK_VARIABLE = "SetTaskVariable";
+  public static String OPERATION_TYPE_REMOVE_EXECUTION_VARIABLE = "RemoveExecutionVariable";
+  public static String OPERATION_TYPE_REMOVE_TASK_VARIABLE = "RemoveTaskVariable";
+  public static String OPERATION_TYPE_PATCH_EXECUTION_VARIABLE = "PatchExecutionVariable";
+  public static String OPERATION_TYPE_PATCH_TASK_VARIABLE = "PatchTaskVariable";
+
 
   /** The unique identifier of this log entry. */
   String getId();

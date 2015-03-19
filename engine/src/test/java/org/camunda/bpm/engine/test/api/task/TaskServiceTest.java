@@ -38,6 +38,7 @@ import org.camunda.bpm.engine.impl.TaskServiceImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.impl.test.TestHelper;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.CaseInstance;
@@ -1799,6 +1800,8 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
 
     assertEquals(variable.getName(), variableName);
     assertEquals(variable.getValue(), variableAnotherValue);
+
+    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/twoTasksProcess.bpmn20.xml"})
@@ -1856,6 +1859,8 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
 
     assertEquals(caseInstanceId, variableInstance.getCaseInstanceId());
     assertEquals(humanTaskId, variableInstance.getCaseExecutionId());
+
+    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
 }

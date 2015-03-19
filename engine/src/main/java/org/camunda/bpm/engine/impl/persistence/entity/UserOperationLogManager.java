@@ -218,6 +218,17 @@ public class UserOperationLogManager extends AbstractHistoricManager {
     }
   }
 
+  public void logVariableOperation(String operation, String executionId,
+                                   String processInstanceId, String processDefinitionId, String processDefinitionKey,
+                                   PropertyChange propertyChange) {
+    if(isHistoryLevelFullEnabled()) {
+      UserOperationLogContext context = createContextForVariable(operation, executionId,
+        processInstanceId, processDefinitionId, processDefinitionKey, Arrays.asList(propertyChange));
+
+      logUserOperations(context);
+    }
+  }
+
   protected UserOperationLogContext createContextForTask(String entityType, String operation, TaskEntity task, List<PropertyChange> propertyChanges) {
     UserOperationLogContext context = createContext(entityType, operation);
 
@@ -290,6 +301,17 @@ public class UserOperationLogManager extends AbstractHistoricManager {
     context.setJobDefinitionId(jobDefinitionId);
     context.setJobId(jobId);
     context.setPropertyChanges(propertyChanges);
+
+    return context;
+  }
+
+  protected UserOperationLogContext createContextForVariable(String operation,
+      String executionId, String processInstanceId, String processDefinitionId, String processDefinitionKey,
+                                                             List<PropertyChange> propertyChanges) {
+    UserOperationLogContext context = createContext(EntityTypes.VARIABLE, operation, processDefinitionKey,
+      processDefinitionId, processInstanceId, null, null, propertyChanges);
+
+    context.setExecutionId(executionId);
 
     return context;
   }

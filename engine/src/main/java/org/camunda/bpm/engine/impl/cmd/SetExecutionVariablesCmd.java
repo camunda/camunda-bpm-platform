@@ -12,11 +12,15 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
-import java.io.Serializable;
-import java.util.Map;
+import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
+
+import java.io.Serializable;
+import java.util.Map;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
@@ -25,22 +29,24 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
  * @author Tom Baeyens
  * @author Joram Barrez
  */
-public class SetExecutionVariablesCmd implements Command<Object>, Serializable {
+public class SetExecutionVariablesCmd extends AbstractVariableCmd implements Command<Void>, Serializable {
 
   private static final long serialVersionUID = 1L;
   
   private String executionId;
   protected Map<String, ? extends Object> variables;
   protected boolean isLocal;
+
   
   public SetExecutionVariablesCmd(String executionId, Map<String, ? extends Object> variables, boolean isLocal) {
     this.executionId = executionId;
     this.variables = variables;
     this.isLocal = isLocal;
+
   }
   
   @Override
-  public Object execute(CommandContext commandContext) {
+  public Void execute(CommandContext commandContext) {
     ensureNotNull("executionId", executionId);
 
     ExecutionEntity execution = commandContext
@@ -55,9 +61,17 @@ public class SetExecutionVariablesCmd implements Command<Object>, Serializable {
       execution.setVariables(variables);
     }
 
+    if(!preventLogUserOperation) {
+      String processDefinitionKey = ((ProcessDefinitionEntity) execution.getProcessDefinition()).getKey();
+      commandContext.getOperationLogManager().logVariableOperation(getLogEntryOperation(), execution.getId(),
+        execution.getProcessInstanceId(), execution.getProcessDefinitionId(), processDefinitionKey, PropertyChange.EMPTY_CHANGE);
+    }
+
     return null;
   }
-  
-  
+
+  public String getLogEntryOperation() {
+    return UserOperationLogEntry.OPERATION_TYPE_SET_EXECUTION_VARIABLE;
+  }
 }
 

@@ -21,6 +21,7 @@ import java.util.Map;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.impl.test.TestHelper;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.runtime.Execution;
@@ -100,6 +101,8 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
 
     // delete task
     taskService.deleteTask(task.getId(), true);
+
+    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
   @Test
@@ -2297,6 +2300,8 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
 
     // delete task
     taskService.deleteTask(task.getId(), true);
+
+    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
   @Test
@@ -2337,6 +2342,8 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
 
     // delete task
     taskService.deleteTask(task.getId(), true);
+
+    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
   @Test
@@ -2374,6 +2381,8 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
 
     // delete task
     taskService.deleteTask(task.getId(), true);
+
+    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
   @Test

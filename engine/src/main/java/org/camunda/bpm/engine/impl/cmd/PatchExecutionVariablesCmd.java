@@ -16,8 +16,14 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.Map;
 
+import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 /**
  * Patches execution variables: First, applies modifications to existing variables and then deletes
@@ -26,7 +32,7 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
  * @author Thorben Lindhauer
  *
  */
-public class PatchExecutionVariablesCmd implements Command<Void>, Serializable {
+public class PatchExecutionVariablesCmd extends AbstractVariableCmd implements Command<Void>, Serializable {
 
   private static final long serialVersionUID = 1L;
 
@@ -44,9 +50,29 @@ public class PatchExecutionVariablesCmd implements Command<Void>, Serializable {
   
   @Override
   public Void execute(CommandContext commandContext) {
-    new SetExecutionVariablesCmd(executionId, modifications, isLocal).execute(commandContext);
-    new RemoveExecutionVariablesCmd(executionId, deletions, isLocal).execute(commandContext);
+    ensureNotNull("executionId", executionId);
+
+    ExecutionEntity execution = commandContext
+      .getExecutionManager()
+      .findExecutionById(executionId);
+
+    ensureNotNull("execution " + executionId + " doesn't exist", "execution", execution);
+
+    new SetExecutionVariablesCmd(executionId, modifications, isLocal).disableLogUserOperation().execute(commandContext);
+    new RemoveExecutionVariablesCmd(executionId, deletions, isLocal).disableLogUserOperation().execute(commandContext);
+
+    if(!preventLogUserOperation) {
+      String processDefinitionKey = ((ProcessDefinitionEntity) execution.getProcessDefinition()).getKey();
+      commandContext.getOperationLogManager().logVariableOperation(getLogEntryOperation(), executionId,
+        execution.getProcessInstanceId(), execution.getProcessDefinitionId(), processDefinitionKey,
+        PropertyChange.EMPTY_CHANGE);
+    }
+
     return null;
+  }
+
+  public String getLogEntryOperation() {
+    return UserOperationLogEntry.OPERATION_TYPE_PATCH_EXECUTION_VARIABLE;
   }
 
 }
