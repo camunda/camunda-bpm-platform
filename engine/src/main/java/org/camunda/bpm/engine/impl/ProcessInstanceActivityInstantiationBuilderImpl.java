@@ -69,6 +69,10 @@ public class ProcessInstanceActivityInstantiationBuilderImpl implements ProcessI
     return builder.cancelActivityInstance(activityInstanceId);
   }
 
+  public ProcessInstanceModificationBuilder cancelTransitionInstance(String transitionInstanceId) {
+    return builder.cancelTransitionInstance(transitionInstanceId);
+  }
+
   public ProcessInstanceModificationBuilder cancelAllInActivity(String activityId) {
     return builder.cancelAllInActivity(activityId);
   }
@@ -104,5 +108,6 @@ public class ProcessInstanceActivityInstantiationBuilderImpl implements ProcessI
   public void execute(boolean skipCustomListeners, boolean skipIoMappings) {
     builder.execute(skipCustomListeners, skipIoMappings);
   }
+
 
 }

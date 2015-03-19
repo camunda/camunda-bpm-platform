@@ -24,6 +24,7 @@ import org.camunda.bpm.engine.impl.cmd.ActivityCancellationCmd;
 import org.camunda.bpm.engine.impl.cmd.ActivityInstanceCancellationCmd;
 import org.camunda.bpm.engine.impl.cmd.ActivityBeforeInstantiationCmd;
 import org.camunda.bpm.engine.impl.cmd.ModifyProcessInstanceCmd;
+import org.camunda.bpm.engine.impl.cmd.TransitionInstanceCancellationCmd;
 import org.camunda.bpm.engine.impl.cmd.TransitionInstantiationCmd;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
@@ -64,6 +65,12 @@ public class ProcessInstanceModificationBuilderImpl implements ProcessInstanceMo
   public ProcessInstanceModificationBuilder cancelActivityInstance(String activityInstanceId) {
     ensureNotNull("activityInstanceId", activityInstanceId);
     operations.add(new ActivityInstanceCancellationCmd(processInstanceId, activityInstanceId));
+    return this;
+  }
+
+  public ProcessInstanceModificationBuilder cancelTransitionInstance(String transitionInstanceId) {
+    ensureNotNull("transitionInstanceId", transitionInstanceId);
+    operations.add(new TransitionInstanceCancellationCmd(processInstanceId, transitionInstanceId));
     return this;
   }
 

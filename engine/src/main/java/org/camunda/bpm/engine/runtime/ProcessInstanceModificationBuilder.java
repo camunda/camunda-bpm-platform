@@ -37,6 +37,15 @@ public interface ProcessInstanceModificationBuilder {
   /**
    * <p><i>Submits the instruction:</i></p>
    *
+   * <p>Cancel a transition instance (i.e. an async continuation) in a process.</p>
+   *
+   * @param transitionInstanceId the id of the transition instance to cancel
+   */
+  ProcessInstanceModificationBuilder cancelTransitionInstance(String transitionInstanceId);
+
+  /**
+   * <p><i>Submits the instruction:</i></p>
+   *
    * Cancel all instances of the given activity in an arbitrary order. Behaves like
    * {@link #cancelActivityInstance(String)} for each individual
    * instance.

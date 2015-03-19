@@ -12,36 +12,31 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
-import org.camunda.bpm.engine.impl.ActivityExecutionMapping;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
+import org.camunda.bpm.engine.runtime.TransitionInstance;
 
 /**
  * @author Thorben Lindhauer
  *
  */
-public class ActivityInstanceCancellationCmd extends AbstractInstanceCancellationCmd {
+public class TransitionInstanceCancellationCmd extends AbstractInstanceCancellationCmd {
 
-  protected String activityInstanceId;
+  protected String transitionInstanceId;
 
-  public ActivityInstanceCancellationCmd(String processInstanceId, String activityInstanceId) {
+  public TransitionInstanceCancellationCmd(String processInstanceId, String transitionInstanceId) {
     super(processInstanceId);
-    this.activityInstanceId = activityInstanceId;
+    this.transitionInstanceId = transitionInstanceId;
 
   }
 
   protected ExecutionEntity determineSourceInstanceExecution(CommandContext commandContext) {
-    ExecutionEntity processInstance = commandContext.getExecutionManager().findExecutionById(processInstanceId);
-
-    // rebuild the mapping because the execution tree changes with every iteration
-    ActivityExecutionMapping mapping = new ActivityExecutionMapping(commandContext, processInstanceId);
-
     ActivityInstance instance = new GetActivityInstanceCmd(processInstanceId).execute(commandContext);
-    ActivityInstance instanceToCancel = findActivityInstance(instance, activityInstanceId);
-    ExecutionEntity scopeExecution = getScopeExecutionForActivityInstance(processInstance, mapping, instanceToCancel);
+    TransitionInstance instanceToCancel = findTransitionInstance(instance, transitionInstanceId);
+    ExecutionEntity transitionExecution = commandContext.getExecutionManager().findExecutionById(instanceToCancel.getExecutionId());
 
-    return scopeExecution;
+    return transitionExecution;
   }
 
 

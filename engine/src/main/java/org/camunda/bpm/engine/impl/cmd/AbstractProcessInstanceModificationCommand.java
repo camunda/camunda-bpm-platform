@@ -23,9 +23,11 @@ import org.camunda.bpm.engine.impl.ActivityExecutionMapping;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
+import org.camunda.bpm.engine.runtime.TransitionInstance;
 
 /**
  * @author Thorben Lindhauer
@@ -58,6 +60,23 @@ public abstract class AbstractProcessInstanceModificationCommand implements Comm
         if (matchingChildInstance != null) {
           return matchingChildInstance;
         }
+      }
+    }
+
+    return null;
+  }
+
+  protected TransitionInstance findTransitionInstance(ActivityInstance tree, String transitionInstanceId) {
+    for (TransitionInstance childTransitionInstance : tree.getChildTransitionInstances()) {
+      if (childTransitionInstance.getId().equals(transitionInstanceId)) {
+        return childTransitionInstance;
+      }
+    }
+
+    for (ActivityInstance child : tree.getChildActivityInstances()) {
+      TransitionInstance matchingChildInstance = findTransitionInstance(child, transitionInstanceId);
+      if (matchingChildInstance != null) {
+        return matchingChildInstance;
       }
     }
 

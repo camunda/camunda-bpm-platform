@@ -473,7 +473,23 @@ public class ExecutionEntity extends PvmExecutionImpl implements
     // remove all tasks associated with this execution.
     removeTasks(reason);
 
+    // removed jobs directly associated with the current activity (e.g. async continuations)
+    removeActivityJobs(reason);
+
     super.cancelScope(reason, skipCustomListeners, skipIoMappings);
+
+  }
+
+  protected void removeActivityJobs(String reason) {
+    if (activityId != null) {
+      for (JobEntity job : getJobs()) {
+        if (activityId.equals(job.getActivityId())) {
+          job.delete();
+          removeJob(job);
+        }
+      }
+
+    }
 
   }
 
