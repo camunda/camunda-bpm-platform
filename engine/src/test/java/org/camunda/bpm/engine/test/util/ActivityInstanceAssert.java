@@ -14,11 +14,14 @@ package org.camunda.bpm.engine.test.util;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Stack;
 
 import org.camunda.bpm.engine.impl.persistence.entity.ActivityInstanceImpl;
+import org.camunda.bpm.engine.impl.persistence.entity.TransitionInstanceImpl;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
+import org.camunda.bpm.engine.runtime.TransitionInstance;
 import org.junit.Assert;
 
 /**
@@ -72,6 +75,25 @@ public class ActivityInstanceAssert {
             }
           }
 
+          List<TransitionInstance> unmatchedTransitionInstances =
+              new ArrayList<TransitionInstance>(Arrays.asList(expectedInstance.getChildTransitionInstances()));
+          for (TransitionInstance child : actualInstance.getChildTransitionInstances()) {
+            Iterator<TransitionInstance> expectedTransitionInstanceIt = unmatchedTransitionInstances.iterator();
+
+            boolean matchFound = false;
+            while (expectedTransitionInstanceIt.hasNext() && !matchFound) {
+              TransitionInstance expectedChild = expectedTransitionInstanceIt.next();
+              if (expectedChild.getTargetActivityId().equals(child.getTargetActivityId())) {
+                matchFound = true;
+                expectedTransitionInstanceIt.remove();
+              }
+            }
+
+            if (!matchFound) {
+              return false;
+            }
+          }
+
         }
         return true;
 
@@ -113,6 +135,20 @@ public class ActivityInstanceAssert {
 
       beginScope(activityId);
       endScope();
+
+      return this;
+    }
+
+    public ActivityInstanceTreeBuilder transitionTo(String targetActivityId) {
+
+      TransitionInstanceImpl newInstance = new TransitionInstanceImpl();
+      newInstance.setTargetActivityId(targetActivityId);
+      ActivityInstanceImpl parentInstance = activityInstanceStack.peek();
+
+      List<TransitionInstance> childInstances = new ArrayList<TransitionInstance>(
+          Arrays.asList(parentInstance.getChildTransitionInstances()));
+      childInstances.add(newInstance);
+      parentInstance.setChildTransitionInstances(childInstances.toArray(new TransitionInstance[childInstances.size()]));
 
       return this;
     }

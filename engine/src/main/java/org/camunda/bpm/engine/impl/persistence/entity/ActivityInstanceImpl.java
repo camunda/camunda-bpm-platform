@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,9 +18,9 @@ import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.TransitionInstance;
 
 /**
- * 
+ *
  * @author Daniel Meyer
- * 
+ *
  */
 public class ActivityInstanceImpl extends ProcessElementInstanceImpl implements ActivityInstance {
 
@@ -28,10 +28,10 @@ public class ActivityInstanceImpl extends ProcessElementInstanceImpl implements 
   protected String activityId;
   protected String activityName;
   protected String activityType;
-  
+
   protected ActivityInstance[] childActivityInstances = new ActivityInstance[0];
   protected TransitionInstance[] childTransitionInstances = new TransitionInstance[0];
-  
+
   protected String[] executionIds = new String[0];
 
   public ActivityInstance[] getChildActivityInstances() {
@@ -57,7 +57,7 @@ public class ActivityInstanceImpl extends ProcessElementInstanceImpl implements 
   public void setActivityId(String activityId) {
     this.activityId = activityId;
   }
-    
+
   public String[] getExecutionIds() {
     return executionIds;
   }
@@ -73,11 +73,11 @@ public class ActivityInstanceImpl extends ProcessElementInstanceImpl implements 
   public void setChildTransitionInstances(TransitionInstance[] childTransitionInstances) {
     this.childTransitionInstances = childTransitionInstances;
   }
-  
+
   public String getActivityType() {
     return activityType;
   }
-  
+
   public void setActivityType(String activityType) {
     this.activityType = activityType;
   }
@@ -89,7 +89,7 @@ public class ActivityInstanceImpl extends ProcessElementInstanceImpl implements 
   public void setActivityName(String activityName) {
     this.activityName = activityName;
   }
-  
+
   protected void writeTree(StringWriter writer, String prefix, boolean isTail) {
     writer.append(prefix);
     if(isTail) {
@@ -97,19 +97,37 @@ public class ActivityInstanceImpl extends ProcessElementInstanceImpl implements 
     } else {
       writer.append("├── ");
     }
-    
+
     writer.append(getActivityId()+"=>"+getId() +"\n");
-    
+
+    for (int i = 0; i < childTransitionInstances.length; i++) {
+      TransitionInstance transitionInstance = childTransitionInstances[i];
+      boolean transitionIsTail = (i==(childTransitionInstances.length-1))
+          && (childActivityInstances.length == 0);
+      writeTransition(transitionInstance, writer, prefix +  (isTail ? "    " : "│   "), transitionIsTail);
+    }
+
     for (int i = 0; i < childActivityInstances.length; i++) {
       ActivityInstanceImpl child = (ActivityInstanceImpl) childActivityInstances[i];
-      child.writeTree(writer, prefix + (isTail ? "    " : "│   "), (i==(childActivityInstances.length-1)));      
+      child.writeTree(writer, prefix + (isTail ? "    " : "│   "), (i==(childActivityInstances.length-1)));
     }
   }
-  
+
+  protected void writeTransition(TransitionInstance transition, StringWriter writer, String prefix, boolean isTail) {
+    writer.append(prefix);
+    if(isTail) {
+      writer.append("└── ");
+    } else {
+      writer.append("├── ");
+    }
+
+    writer.append("transition to " + transition.getTargetActivityId() + "=>" + transition.getId() + "\n");
+  }
+
   public String toString() {
     StringWriter writer = new StringWriter();
     writeTree(writer, "", true);
     return writer.toString();
   }
-  
+
 }
