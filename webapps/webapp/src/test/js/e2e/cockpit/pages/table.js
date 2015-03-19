@@ -9,7 +9,7 @@ module.exports = Table.extend({
   },
 
   selectTab: function() {
-    this.tableTabs().get(this.tabIndex).click();
+    return this.tableTabs().get(this.tabIndex).click();
   },
 
   tabSelectionStatus: function() {

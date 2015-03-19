@@ -22,24 +22,46 @@ describe('Cockpit Process Definition Spec', function() {
       });
     });
 
+
     it('should display process diagram', function() {
       expect(processPage.diagram.diagramElement().isDisplayed()).to.eventually.be.true;
     });
+
 
     it('should display the number of running process instances', function() {
       expect(processPage.diagram.instancesBadgeFor('UserTask_1').getText()).to.eventually.eql('2');
     });
 
-    it('should process clicks in diagram', function() {
+
+    it('should select activity', function() {
+
+      // when
       processPage.diagram.selectActivity('UserTask_1');
 
+      // then
       expect(processPage.diagram.isActivitySelected('UserTask_1')).to.eventually.be.true;
       expect(processPage.filter.activityFilter('User Task 1').isPresent()).to.eventually.be.true;
     });
 
+
+    it('should keep selection after page refresh', function() {
+
+      // when
+      browser.getCurrentUrl().then(function (url) {
+        browser.get(url);
+      });
+
+      // then
+      expect(processPage.diagram.isActivitySelected('UserTask_1')).to.eventually.be.true;
+    });
+
+
     it('should process clicks in Filter table', function() {
+
+      // when
       processPage.filter.removeFilterButton('User Task 1').click();
 
+      // then
       expect(processPage.diagram.isActivitySelected('UserTask_1')).to.eventually.be.false;
     });
 
