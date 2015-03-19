@@ -3,7 +3,7 @@ define([
 
   /* directives */
   './directives/cam-tasklist-sorting-choices',
-  './directives/cam-tasklist-sorting-variables',
+  './directives/cam-tasklist-sorting-dropdown',
   './directives/cam-tasklist-sorting-inputs',
   './directives/cam-tasklist-search',
   './directives/cam-tasklist-tasks',
@@ -16,7 +16,7 @@ define([
 
   /* directives */
   camTasklistSortingChoices,
-  camTasklistSortingVariables,
+  camTasklistSortingDropdown,
   camTasklistSortingInputs,
   camTasklistSearch,
   camTasklistTasks,
@@ -33,7 +33,7 @@ define([
 
   /* directives */
   module.directive('camSortingChoices', camTasklistSortingChoices);
-  module.directive('camSortingVariables', camTasklistSortingVariables);
+  module.directive('camSortingDropdown', camTasklistSortingDropdown);
   module.directive('camSortingInputs', camTasklistSortingInputs);
   module.directive('camTaskSearch', camTasklistSearch);
   module.directive('camTasks', camTasklistTasks);

@@ -52,12 +52,10 @@ define([
         var $bdy = angular.element('body');
         var $newSort = element.find('.new-sort .dropdown-menu');
 
-        var sorting = {
+        scope.sortings = [{
           order:    'desc',
           by:       'created'
-        };
-
-        scope.sortings = [angular.copy(sorting)];
+        }];
 
         scope.openDropdowns = [];
         scope.openDropdownNew = false;
@@ -125,8 +123,6 @@ define([
           return scope.sortings[index].parameters.variable;
         };
 
-        scope.sortLimit = Object.keys(scope.uniqueProps).length;
-
         /**
          * observe the task list query
          */
@@ -139,9 +135,13 @@ define([
             scope.sortedOn = [];
             scope.openDropdowns = [];
 
+            scope.availableOptions = angular.copy(scope.uniqueProps);
+
             scope.sortings = urlSortings.map(function (sorting) {
               scope.sortedOn.push(sorting.sortBy);
               scope.openDropdowns.push(false);
+
+              delete scope.availableOptions[sorting.sortBy];
 
               var returned = {
                 order:      sorting.sortOrder,
@@ -198,14 +198,31 @@ define([
           }
         });
 
-        scope.newSortingToggle = function (open) {
-          if (open) {
-            var newSortingScope = element.find('[sorting="newSorting"]').scope();
-            newSortingScope.$parent.focusedOn = null;
-            newSortingScope.sorting = {};
+        scope.changeSorting = function(idx, id, type, value) {
+          scope.sortings[idx].by = id;
+          delete scope.sortings[idx].parameters;
+          if(type) {
+            scope.sortings[idx].parameters = {
+              variable : value,
+              type     : type
+            };
           }
+
+          scope.updateSortings();
         };
 
+        scope.resetFunctions = [];
+        scope.openDropdown = function(idx, open) {
+          if(open) {
+            var sorting = scope.sortings[idx];
+            if(sorting) {
+              scope.resetFunctions[idx](sorting.by, sorting.parameters && sorting.parameters.type, sorting.parameters && sorting.parameters.variable);
+            } else {
+              scope.resetFunctions[idx]();
+            }
+
+          }
+        };
 
         // should NOT manipulate the `scope.sortings`!
         scope.updateSortings = function () {
@@ -227,11 +244,18 @@ define([
         /**
          * Invoked when adding a sorting object
          */
-        scope.addSorting = function (by, order) {
-          order = order || 'desc';
+        scope.addSorting = function (id, type, value) {
 
-          var newSorting = angular.copy(sorting);
-          newSorting.by = by;
+          var newSorting = {
+            order: 'desc',
+            by: id
+          };
+          if(type) {
+            newSorting.parameters = {
+              variable : value,
+              type     : type
+            };
+          }
           scope.sortings.push(newSorting);
 
           scope.updateSortings();
@@ -241,14 +265,7 @@ define([
          * Invoked when removing a sorting object
          */
         scope.removeSorting = function (index) {
-          var newSortings = [];
-          scope.sortings.forEach(function (sorting, i) {
-            if (i != index) {
-              newSortings.push(sorting);
-            }
-          });
-          scope.sortings = newSortings;
-
+          scope.sortings.splice(index, 1);
           scope.updateSortings();
         };
 
@@ -257,15 +274,6 @@ define([
          */
         scope.changeOrder = function(index) {
           scope.sortings[index].order = scope.sortings[index].order === 'asc' ? 'desc' : 'asc';
-
-          scope.updateSortings();
-        };
-
-        /**
-         * invoked when the sort property is changed
-         */
-        scope.changeBy = function(index, by) {
-          scope.sortings[index].by = by;
 
           scope.updateSortings();
         };
