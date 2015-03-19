@@ -13,7 +13,7 @@
 
   <properties>
     <rest.http.port>8080</rest.http.port>
-    <jackson.version>2.4.5</jackson.version>
+    <jackson.version>2.5.1</jackson.version>
     <!-- use inherited version as default -->
     <resteasy.version>${version.resteasy}</resteasy.version>
     <resteasy.netty.version>2.3.6.Final</resteasy.netty.version>
