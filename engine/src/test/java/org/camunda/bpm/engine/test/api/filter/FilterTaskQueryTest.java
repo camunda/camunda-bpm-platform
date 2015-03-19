@@ -57,6 +57,7 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
   protected DelegationState testDelegationState = DelegationState.PENDING;
   protected Date testDate = new Date(0);
   protected String[] testActivityInstances = new String[] {"a", "b", "c"};
+  protected String[] testKeys = new String[] {"d", "e"};
   protected List<String> testCandidateGroups = new ArrayList<String>();
 
   protected String[] variableNames = new String[] {"a", "b", "c", "d", "e", "f"};
@@ -145,6 +146,7 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
     query.taskCreatedAfter(testDate);
     query.taskCreatedAfterExpression(testString);
     query.taskDefinitionKey(testString);
+    query.taskDefinitionKeyIn(testKeys);
     query.taskDefinitionKeyLike(testString);
     query.processDefinitionKey(testString);
     query.processDefinitionId(testString);
@@ -233,6 +235,10 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(testDate, query.getCreateTimeAfter());
     assertEquals(testString, query.getExpressions().get("taskCreatedAfter"));
     assertEquals(testString, query.getKey());
+    assertEquals(testKeys.length, query.getKeys().length);
+    for (int i = 0; i < query.getKeys().length; i++) {
+      assertEquals(testKeys[i], query.getKeys()[i]);
+    }
     assertEquals(testString, query.getKeyLike());
     assertEquals(testString, query.getProcessDefinitionKey());
     assertEquals(testString, query.getProcessDefinitionId());

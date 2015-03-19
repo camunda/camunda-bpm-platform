@@ -66,6 +66,7 @@ public class JsonTaskQueryConverter extends JsonObjectConverter<TaskQuery> {
   public static final String CREATED_BEFORE = "createdBefore";
   public static final String CREATED_AFTER = "createdAfter";
   public static final String KEY = "key";
+  public static final String KEYS = "keys";
   public static final String KEY_LIKE = "keyLike";
   public static final String PROCESS_DEFINITION_KEY = "processDefinitionKey";
   public static final String PROCESS_DEFINITION_ID = "processDefinitionId";
@@ -134,6 +135,7 @@ public class JsonTaskQueryConverter extends JsonObjectConverter<TaskQuery> {
     addDateField(json, CREATED_BEFORE, query.getCreateTimeBefore());
     addDateField(json, CREATED_AFTER, query.getCreateTimeAfter());
     addField(json, KEY, query.getKey());
+    addArrayField(json, KEYS, query.getKeys());
     addField(json, KEY_LIKE, query.getKeyLike());
     addField(json, PROCESS_DEFINITION_KEY, query.getProcessDefinitionKey());
     addField(json, PROCESS_DEFINITION_ID, query.getProcessDefinitionId());
@@ -286,6 +288,9 @@ public class JsonTaskQueryConverter extends JsonObjectConverter<TaskQuery> {
     if (json.has(KEY)) {
       query.taskDefinitionKey(json.getString(KEY));
     }
+    if (json.has(KEYS)) {
+      query.taskDefinitionKeyIn(getArray(json.getJSONArray(KEYS)));
+    }
     if (json.has(KEY_LIKE)) {
       query.taskDefinitionKeyLike(json.getString(KEY_LIKE));
     }
@@ -371,7 +376,7 @@ public class JsonTaskQueryConverter extends JsonObjectConverter<TaskQuery> {
       query.caseExecutionId(json.getString(CASE_EXECUTION_ID));
     }
     if (json.has(ORDER_BY)) {
-      List<QueryOrderingProperty> orderingProperties = 
+      List<QueryOrderingProperty> orderingProperties =
           JsonLegacyQueryOrderingPropertyConverter.INSTANCE.fromOrderByString(json.getString(ORDER_BY));
 
       query.setOrderingProperties(orderingProperties);

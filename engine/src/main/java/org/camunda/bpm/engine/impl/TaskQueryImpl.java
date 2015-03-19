@@ -382,7 +382,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
     this.keyLike = keyLike;
     return this;
   }
-  
+
   public TaskQuery taskDefinitionKeyIn(String... taskDefinitionKeys) {
 	this.taskDefinitionKeys = taskDefinitionKeys;
 	return this;
@@ -976,6 +976,10 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
 
   public String getKey() {
     return key;
+  }
+
+  public String[] getKeys() {
+    return taskDefinitionKeys;
   }
 
   public String getKeyLike() {
