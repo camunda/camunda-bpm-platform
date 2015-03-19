@@ -25,7 +25,6 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerActivateProcessDefinitionHandler;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
-import org.camunda.bpm.engine.impl.test.TestHelper;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.repository.CaseDefinition;
@@ -211,10 +210,6 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
 
     // Cleanup
     repositoryService.deleteDeployment(deployment.getId(), true);
-
-    // clean up op log
-    TestHelper.removeDelayedJobFromOpLog(processEngineConfiguration, jobs.get(0).getId());
-    TestHelper.removeDelayedJobFromOpLog(processEngineConfiguration, jobs.get(1).getId());
   }
 
   public void testDeploymentWithDelayedProcessDefinitionAndJobDefinitionActivation() {
@@ -266,9 +261,6 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
 
     // Cleanup
     repositoryService.deleteDeployment(deployment.getId(), true);
-
-    // clean up op log
-    TestHelper.removeDelayedJobFromOpLog(processEngineConfiguration, job.getId());
   }
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })

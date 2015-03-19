@@ -12,6 +12,11 @@
  */
 package org.camunda.bpm.engine.impl.persistence.entity;
 
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.ENTITY_TYPE_ATTACHMENT;
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.ENTITY_TYPE_IDENTITY_LINK;
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.ENTITY_TYPE_TASK;
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_CREATE;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -27,10 +32,7 @@ import org.camunda.bpm.engine.impl.history.event.UserOperationLogEntryEventEntit
 import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
 import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
 import org.camunda.bpm.engine.impl.persistence.AbstractHistoricManager;
-import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Job;
-
-import static org.camunda.bpm.engine.history.UserOperationLogEntry.*;
 
 /**
  * Manager for {@link UserOperationLogEntryEventEntity} that also provides a generic and some specific log methods.
@@ -108,20 +110,20 @@ public class UserOperationLogManager extends AbstractHistoricManager {
    * The parameters processInstanceId, processDefinitionId and processInstanceKey are interpreted as selection constraints
    * that are affected by the operation.
    */
-  public void logProcessInstanceOperation(String operationId, String operation, String processInstanceId,
-      String processDefinitionId, String processDefinitionKey, PropertyChange propertyChange) {
+  public void logProcessInstanceOperation(String operation, String processInstanceId, String processDefinitionId, String processDefinitionKey, PropertyChange propertyChange) {
     if (isHistoryLevelFullEnabled()) {
 
       if(processInstanceId != null) {
-        ProcessDefinition processDefinition = (ProcessDefinition) getProcessInstanceManager()
-          .findExecutionById(processInstanceId)
-          .getProcessDefinition();
+        ExecutionEntity instance = getProcessInstanceManager().findExecutionById(processInstanceId);
 
-        processDefinitionId = processDefinition.getId();
-        processDefinitionKey = processDefinition.getKey();
+        if (instance != null) {
+          ProcessDefinitionEntity processDefinition = (ProcessDefinitionEntity) instance.getProcessDefinition();
+          processDefinitionId = processDefinition.getId();
+          processDefinitionKey = processDefinition.getKey();
+        }
       }
 
-      UserOperationLogContext context = createContextForProcessInstance(operationId, operation, processInstanceId,
+      UserOperationLogContext context = createContextForProcessInstance(operation, processInstanceId,
         processDefinitionId, processDefinitionKey, Arrays.asList(propertyChange));
       logUserOperations(context);
     }
@@ -184,7 +186,7 @@ public class UserOperationLogManager extends AbstractHistoricManager {
   }
 
   public void logJobDefinitionOperation(String operation, String jobDefinitionId, String processDefinitionId,
-      String processDefinitionKey,PropertyChange propertyChange) {
+      String processDefinitionKey, PropertyChange propertyChange) {
     if(isHistoryLevelFullEnabled()) {
       if(jobDefinitionId != null) {
         JobDefinitionEntity jobDefinition = getJobDefinitionManager().findById(jobDefinitionId);
@@ -245,7 +247,7 @@ public class UserOperationLogManager extends AbstractHistoricManager {
       processDefinitionId, null, null, null, propertyChanges);
   }
 
-  protected UserOperationLogContext createContextForProcessInstance(String operationId, String operation,
+  protected UserOperationLogContext createContextForProcessInstance(String operation,
       String processInstanceId, String processDefinitionId,
       String processDefinitionKey, List<PropertyChange> propertyChanges) {
 

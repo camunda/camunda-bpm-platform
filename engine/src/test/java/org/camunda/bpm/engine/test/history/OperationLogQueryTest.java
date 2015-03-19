@@ -12,8 +12,32 @@
  */
 package org.camunda.bpm.engine.test.history;
 
-import static org.camunda.bpm.engine.EntityTypes.*;
-import static org.camunda.bpm.engine.history.UserOperationLogEntry.*;
+import static org.camunda.bpm.engine.EntityTypes.JOB;
+import static org.camunda.bpm.engine.EntityTypes.JOB_DEFINITION;
+import static org.camunda.bpm.engine.EntityTypes.PROCESS_DEFINITION;
+import static org.camunda.bpm.engine.EntityTypes.PROCESS_INSTANCE;
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.ENTITY_TYPE_ATTACHMENT;
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.ENTITY_TYPE_IDENTITY_LINK;
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.ENTITY_TYPE_TASK;
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_ACTIVATE;
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_ACTIVATE_JOB;
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_ACTIVATE_JOB_DEFINITION;
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_ACTIVATE_PROCESS_DEFINITION;
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_ADD_ATTACHMENT;
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_ADD_GROUP_LINK;
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_ADD_USER_LINK;
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_CREATE;
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_DELETE;
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_DELETE_ATTACHMENT;
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_DELETE_GROUP_LINK;
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_DELETE_USER_LINK;
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_SET_JOB_RETRIES;
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_SET_PRIORITY;
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_SUSPEND;
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_SUSPEND_JOB;
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_SUSPEND_JOB_DEFINITION;
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_SUSPEND_PROCESS_DEFINITION;
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_UPDATE;
 import static org.camunda.bpm.engine.impl.persistence.entity.TaskEntity.ASSIGNEE;
 import static org.camunda.bpm.engine.impl.persistence.entity.TaskEntity.OWNER;
 
@@ -34,9 +58,6 @@ import org.camunda.bpm.engine.impl.jobexecutor.TimerSuspendProcessDefinitionHand
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.test.TestHelper;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
-import org.camunda.bpm.engine.management.JobDefinition;
-import org.camunda.bpm.engine.management.JobDefinitionQuery;
-import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.JobQuery;
@@ -269,7 +290,7 @@ public class OperationLogQueryTest extends PluggableProcessEngineTestCase {
     assertNotNull(suspendEntry.getProcessDefinitionId());
     assertEquals("oneTaskProcess", suspendEntry.getProcessDefinitionKey());
 
-      assertEquals("suspensionState", suspendEntry.getProperty());
+    assertEquals("suspensionState", suspendEntry.getProperty());
     assertEquals("suspended", suspendEntry.getNewValue());
     assertNull(suspendEntry.getOrgValue());
 
@@ -284,7 +305,7 @@ public class OperationLogQueryTest extends PluggableProcessEngineTestCase {
     assertNotNull(activateEntry.getProcessDefinitionId());
     assertEquals("oneTaskProcess", activateEntry.getProcessDefinitionKey());
 
-      assertEquals("suspensionState", activateEntry.getProperty());
+    assertEquals("suspensionState", activateEntry.getProperty());
     assertEquals("active", activateEntry.getNewValue());
     assertNull(activateEntry.getOrgValue());
   }
@@ -551,12 +572,12 @@ public class OperationLogQueryTest extends PluggableProcessEngineTestCase {
     managementService.setJobRetries(job.getId(), 10);
 
     // then
-    assertEquals(1, query().entityType(JOB).operationType(OPERATION_TYPE_RETRY).count());
+    assertEquals(1, query().entityType(JOB).operationType(OPERATION_TYPE_SET_JOB_RETRIES).count());
 
     UserOperationLogEntry jobRetryEntry = query()
       .entityType(JOB)
       .jobId(job.getId())
-      .operationType(OPERATION_TYPE_RETRY)
+      .operationType(OPERATION_TYPE_SET_JOB_RETRIES)
       .singleResult();
 
     assertNotNull(jobRetryEntry);
@@ -571,38 +592,6 @@ public class OperationLogQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(job.getProcessDefinitionId(), jobRetryEntry.getProcessDefinitionId());
   }
 
-  @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/exclusive/ExclusiveTimerEventTest.testCatchingTimerEvent.bpmn20.xml" })
-  public void testQueryJobExecutionOperationsById() {
-    // given
-    process = runtimeService.startProcessInstanceByKey("exclusiveTimers");
-    Job job = managementService.createJobQuery().processInstanceId(process.getProcessInstanceId()).list().get(0);
-
-    // when
-    try {
-      managementService.executeJob(job.getId());
-    } catch(Exception ex) {
-
-    }
-    // then
-    assertEquals(1, query().entityType(JOB).operationType(OPERATION_TYPE_EXECUTE_JOB).count());
-
-    UserOperationLogEntry jobExecutionEntry = query().
-      entityType(JOB)
-      .jobId(job.getId())
-      .jobDefinitionId(job.getJobDefinitionId())
-      .operationType(OPERATION_TYPE_EXECUTE_JOB)
-      .singleResult();
-
-    assertNull(jobExecutionEntry.getOrgValue());
-    assertNull(jobExecutionEntry.getNewValue());
-    assertNull(jobExecutionEntry.getProperty());
-    assertEquals(job.getJobDefinitionId(), jobExecutionEntry.getJobDefinitionId());
-    assertEquals(job.getProcessInstanceId(), jobExecutionEntry.getProcessInstanceId());
-    assertEquals(job.getProcessDefinitionKey(), jobExecutionEntry.getProcessDefinitionKey());
-    assertEquals(job.getProcessDefinitionId(), jobExecutionEntry.getProcessDefinitionId());
-    assertEquals(job.getId(), jobExecutionEntry.getJobId());
-  }
-
   @Deployment(resources = {"org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml"})
   public void testQueryJobDefinitionOperationWithDelayedJobDefinition() {
     // given
@@ -612,8 +601,6 @@ public class OperationLogQueryTest extends PluggableProcessEngineTestCase {
     // with a process definition id
     String processDefinitionId = process.getProcessDefinitionId();
 
-    // a job definition (which was created for the asynchronous continuation)
-    JobDefinition jobDefinition = managementService.createJobDefinitionQuery().singleResult();
     // ...which will be suspended with the corresponding jobs
     managementService.suspendJobDefinitionByProcessDefinitionId(processDefinitionId, true);
 
@@ -660,20 +647,15 @@ public class OperationLogQueryTest extends PluggableProcessEngineTestCase {
         return null;
       }
     });
-
-    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/repository/ProcessDefinitionSuspensionTest.testWithOneAsyncServiceTask.bpmn"})
   public void testQueryProcessDefinitionOperationWithDelayedProcessDefinition() {
     // given
     ClockUtil.setCurrentTime(today);
     final long hourInMs = 60 * 60 * 1000;
 
     String key = "oneFailingServiceTaskProcess";
-
-    // Deploy a versions of the a process, so that there exists one
-    repositoryService.createDeployment()
-      .addClasspathResource("org/camunda/bpm/engine/test/api/repository/ProcessDefinitionSuspensionTest.testWithOneAsyncServiceTask.bpmn").deploy();
 
     // a running process instance with a failed service task
     Map<String, Object> params = new HashMap<String, Object>();
@@ -711,11 +693,6 @@ public class OperationLogQueryTest extends PluggableProcessEngineTestCase {
       .count();
 
     assertEquals(1, processDefinitionEntryCount.longValue());
-
-    // Clean DB
-    for (org.camunda.bpm.engine.repository.Deployment deployment : repositoryService.createDeploymentQuery().list()) {
-      repositoryService.deleteDeployment(deployment.getId(), true);
-    }
 
     // clean up op log
     CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutorTxRequired();

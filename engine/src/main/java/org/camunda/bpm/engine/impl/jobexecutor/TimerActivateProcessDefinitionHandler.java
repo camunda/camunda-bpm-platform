@@ -12,9 +12,8 @@
  */
 package org.camunda.bpm.engine.impl.jobexecutor;
 
+import org.camunda.bpm.engine.impl.cmd.AbstractSetProcessDefinitionStateCmd;
 import org.camunda.bpm.engine.impl.cmd.ActivateProcessDefinitionCmd;
-import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.util.json.JSONObject;
 
 /**
@@ -29,7 +28,7 @@ public class TimerActivateProcessDefinitionHandler extends TimerChangeProcessDef
     return TYPE;
   }
 
-  public void execute(String configuration, ExecutionEntity execution, CommandContext commandContext) {
+  protected AbstractSetProcessDefinitionStateCmd getCommand(String configuration) {
     JSONObject config = new JSONObject(configuration);
 
     boolean activateProcessInstances = getIncludeProcessInstances(config);
@@ -48,7 +47,7 @@ public class TimerActivateProcessDefinitionHandler extends TimerChangeProcessDef
       cmd = new ActivateProcessDefinitionCmd(null, processDefinitionKey, activateProcessInstances, null);
     }
 
-    cmd.disableLogUserOperation().execute(commandContext);
+    return cmd;
   }
 
 }

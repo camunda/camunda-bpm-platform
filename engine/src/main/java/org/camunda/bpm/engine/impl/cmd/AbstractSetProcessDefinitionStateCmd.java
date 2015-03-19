@@ -15,101 +15,48 @@ package org.camunda.bpm.engine.impl.cmd;
 import java.util.Date;
 
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerChangeProcessDefinitionSuspensionStateJobHandler;
-import org.camunda.bpm.engine.impl.persistence.entity.*;
+import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionManager;
+import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
+import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
 import org.camunda.bpm.engine.management.JobDefinition;
-import org.camunda.bpm.engine.runtime.ProcessInstance;
 
 /**
  * @author Daniel Meyer
  * @author Joram Barrez
  * @author roman.smirnov
  */
-public abstract class AbstractSetProcessDefinitionStateCmd implements Command<Void> {
-
-  protected static final String SUSPENSION_STATE_PROPERTY = "suspensionState";
+public abstract class AbstractSetProcessDefinitionStateCmd extends AbstractSetStateCmd {
 
   protected String processDefinitionId;
   protected String processDefinitionKey;
   protected ProcessDefinitionEntity processDefinitionEntity;
-  protected boolean includeProcessInstances = false;
   protected Date executionDate;
 
-  protected boolean preventLogUserOperation = false;
-
-  public AbstractSetProcessDefinitionStateCmd(ProcessDefinitionEntity processDefinitionEntity,
-          boolean includeProcessInstances, Date executionDate) {
+  public AbstractSetProcessDefinitionStateCmd(ProcessDefinitionEntity processDefinitionEntity, boolean includeProcessInstances, Date executionDate) {
+    super(includeProcessInstances, executionDate);
     // If process definition is already provided (eg. when command is called through the DeployCmd),
     // we can simply use the id of the entity and set is as processDefinitionId.
     this.processDefinitionEntity = processDefinitionEntity;
     this.processDefinitionId = processDefinitionEntity.getId();
-    this.includeProcessInstances = includeProcessInstances;
     this.executionDate = executionDate;
   }
 
-  public AbstractSetProcessDefinitionStateCmd(String processDefinitionId, String processDefinitionKey,
-            boolean includeProcessInstances, Date executionDate) {
+  public AbstractSetProcessDefinitionStateCmd(String processDefinitionId, String processDefinitionKey, boolean includeProcessInstances, Date executionDate) {
+    super(includeProcessInstances, executionDate);
     this.processDefinitionId = processDefinitionId;
     this.processDefinitionKey = processDefinitionKey;
-    this.includeProcessInstances = includeProcessInstances;
     this.executionDate = executionDate;
   }
 
-  public AbstractSetProcessDefinitionStateCmd disableLogUserOperation() {
-    this.preventLogUserOperation = true;
-    return this;
-  }
-
-  public Void execute(CommandContext commandContext) {
-
+  protected void checkParameters(CommandContext commandContext) {
     // Validation of input parameters
     if(processDefinitionId == null && processDefinitionKey == null) {
       throw new ProcessEngineException("Process definition id / key cannot be null");
     }
-
-    SuspensionState suspensionState = getProcessDefinitionSuspensionState();
-
-    if (executionDate == null) {
-      // Process definition state is changed now
-      updateSuspensionState(commandContext, suspensionState);
-    } else {
-      // Process definition state change is delayed
-      scheduleSuspensionStateUpdate(commandContext);
-    }
-
-    if(!preventLogUserOperation) {
-      PropertyChange propertyChange = new PropertyChange(SUSPENSION_STATE_PROPERTY, null, suspensionState.getName());
-      commandContext.getOperationLogManager()
-        .logProcessDefinitionOperation(getLogEntryOperation(), processDefinitionId, processDefinitionKey, propertyChange);
-    }
-
-    return null;
-  }
-
-  protected void scheduleSuspensionStateUpdate(CommandContext commandContext) {
-    TimerEntity timer = new TimerEntity();
-
-    timer.setDuedate(executionDate);
-    timer.setJobHandlerType(getDelayedExecutionJobHandlerType());
-
-    String jobConfiguration = null;
-
-    if (processDefinitionId != null) {
-      jobConfiguration = TimerChangeProcessDefinitionSuspensionStateJobHandler
-          .createJobHandlerConfigurationByProcessDefinitionId(processDefinitionId, includeProcessInstances);
-    } else
-
-    if (processDefinitionKey != null) {
-      jobConfiguration = TimerChangeProcessDefinitionSuspensionStateJobHandler
-          .createJobHandlerConfigurationByProcessDefinitionKey(processDefinitionKey, includeProcessInstances);
-    }
-
-    timer.setJobHandlerConfiguration(jobConfiguration);
-
-    commandContext.getJobManager().schedule(timer);
   }
 
   protected void updateSuspensionState(CommandContext commandContext, SuspensionState suspensionState) {
@@ -123,19 +70,34 @@ public abstract class AbstractSetProcessDefinitionStateCmd implements Command<Vo
       processDefinitionManager.updateProcessDefinitionSuspensionStateByKey(processDefinitionKey, suspensionState);
     }
 
-    getSetJobDefinitionStateCmd().disableLogUserOperation().execute(commandContext);
+    AbstractSetJobDefinitionStateCmd jobDefinitionCmd = getSetJobDefinitionStateCmd();
+    jobDefinitionCmd.disableLogUserOperation();
+    jobDefinitionCmd.execute(commandContext);
+  }
 
-    if (includeProcessInstances) {
-      getSetProcessInstanceStateCmd().disableLogUserOperation().execute(commandContext);
+  protected String getJobHandlerConfiguration() {
+    String jobConfiguration = null;
+
+    if (processDefinitionId != null) {
+      jobConfiguration = TimerChangeProcessDefinitionSuspensionStateJobHandler
+          .createJobHandlerConfigurationByProcessDefinitionId(processDefinitionId, isIncludeSubResources());
+    } else
+
+    if (processDefinitionKey != null) {
+      jobConfiguration = TimerChangeProcessDefinitionSuspensionStateJobHandler
+          .createJobHandlerConfigurationByProcessDefinitionKey(processDefinitionKey, isIncludeSubResources());
     }
+
+    return jobConfiguration;
+  }
+
+  protected void logUserOperation(CommandContext commandContext) {
+    PropertyChange propertyChange = new PropertyChange(SUSPENSION_STATE_PROPERTY, null, getNewSuspensionState().getName());
+    commandContext.getOperationLogManager()
+      .logProcessDefinitionOperation(getLogEntryOperation(), processDefinitionId, processDefinitionKey, propertyChange);
   }
 
   // ABSTRACT METHODS ////////////////////////////////////////////////////////////////////
-
-  /**
-   * Subclasses should return the wanted {@link SuspensionState} here.
-   */
-  protected abstract SuspensionState getProcessDefinitionSuspensionState();
 
   /**
    * Subclasses should return the type of the {@link JobHandler} here. it will be used when
@@ -149,11 +111,5 @@ public abstract class AbstractSetProcessDefinitionStateCmd implements Command<Vo
    */
   protected abstract AbstractSetJobDefinitionStateCmd getSetJobDefinitionStateCmd();
 
-  /**
-   * Subclasses should return the type of the {@link AbstractSetProcessInstanceStateCmd} here.
-   * It will be used to suspend or activate the {@link ProcessInstance}s.
-   */
-  protected abstract AbstractSetProcessInstanceStateCmd getSetProcessInstanceStateCmd();
-
-  protected abstract String getLogEntryOperation();
+  protected abstract AbstractSetProcessInstanceStateCmd getNextCommand();
 }

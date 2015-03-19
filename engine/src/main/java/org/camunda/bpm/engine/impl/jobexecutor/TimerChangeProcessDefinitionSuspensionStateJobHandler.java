@@ -12,6 +12,9 @@
  */
 package org.camunda.bpm.engine.impl.jobexecutor;
 
+import org.camunda.bpm.engine.impl.cmd.AbstractSetProcessDefinitionStateCmd;
+import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.util.json.JSONObject;
 
 /**
@@ -46,6 +49,12 @@ public abstract class TimerChangeProcessDefinitionSuspensionStateJobHandler impl
     return json.toString();
   }
 
+  public void execute(String configuration, ExecutionEntity execution, CommandContext commandContext) {
+    AbstractSetProcessDefinitionStateCmd cmd = getCommand(configuration);
+    cmd.disableLogUserOperation();
+    cmd.execute(commandContext);
+  }
+
   protected String getProcessDefinitionId(JSONObject config) {
     return config.getString(JOB_HANDLER_CFG_PROCESS_DEFINITION_ID);
   }
@@ -61,5 +70,7 @@ public abstract class TimerChangeProcessDefinitionSuspensionStateJobHandler impl
   protected boolean getIncludeProcessInstances(JSONObject config) {
     return config.getBoolean(JOB_HANDLER_CFG_INCLUDE_PROCESS_INSTANCES);
   }
+
+  protected abstract AbstractSetProcessDefinitionStateCmd getCommand(String configuration);
 
 }

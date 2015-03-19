@@ -24,11 +24,10 @@ public class SuspendJobCmd extends AbstractSetJobStateCmd {
     super(jobId, jobDefinitionId, processInstanceId, processDefinitionId, processDefinitionKey);
   }
 
-  protected SuspensionState getSuspensionState() {
+  protected SuspensionState getNewSuspensionState() {
     return SuspensionState.SUSPENDED;
   }
 
-  @Override
   protected String getLogEntryOperation() {
     return UserOperationLogEntry.OPERATION_TYPE_SUSPEND_JOB;
   }

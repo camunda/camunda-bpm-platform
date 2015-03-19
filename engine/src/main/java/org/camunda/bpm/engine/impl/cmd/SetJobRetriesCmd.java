@@ -86,13 +86,12 @@ public class SetJobRetriesCmd implements Command<Void>, Serializable {
         .getJobManager()
         .updateFailedJobRetriesByJobDefinitionId(jobDefinitionId, retries);
 
-    JobDefinitionEntity jobDefinitionEntity = commandContext.getJobDefinitionManager().findById(jobDefinitionId);
     PropertyChange propertyChange = new PropertyChange(RETRIES, null, retries);
     commandContext.getOperationLogManager().logJobOperation(getLogEntryOperation(), null, jobDefinitionId, null,
-      jobDefinitionEntity.getProcessDefinitionId(), jobDefinitionEntity.getProcessDefinitionKey(), propertyChange);
+      null, null, propertyChange);
   }
 
   protected String getLogEntryOperation() {
-    return UserOperationLogEntry.OPERATION_TYPE_RETRY;
+    return UserOperationLogEntry.OPERATION_TYPE_SET_JOB_RETRIES;
   }
 }

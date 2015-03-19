@@ -15,74 +15,42 @@ package org.camunda.bpm.engine.impl.cmd;
 import java.util.Date;
 
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerChangeJobDefinitionSuspensionStateJobHandler;
-import org.camunda.bpm.engine.impl.persistence.entity.*;
-import org.camunda.bpm.engine.runtime.Job;
+import org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionManager;
+import org.camunda.bpm.engine.impl.persistence.entity.JobManager;
+import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
+import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
 
 /**
  * @author Daniel Meyer
  * @author roman.smirnov
  */
-public abstract class AbstractSetJobDefinitionStateCmd implements Command<Void>{
-
-  protected static final String SUSPENSION_STATE_PROPERTY = "suspensionState";
+public abstract class AbstractSetJobDefinitionStateCmd extends AbstractSetStateCmd {
 
   protected String jobDefinitionId;
   protected String processDefinitionId;
   protected String processDefinitionKey;
-
-  protected boolean includeJobs = false;
   protected Date executionDate;
 
-  protected boolean preventLogUserOperation = false;
-
   public AbstractSetJobDefinitionStateCmd(String jobDefinitionId, String processDefinitionId, String processDefinitionKey, boolean includeJobs, Date executionDate) {
+    super(includeJobs, executionDate);
     this.jobDefinitionId = jobDefinitionId;
     this.processDefinitionId = processDefinitionId;
     this.processDefinitionKey = processDefinitionKey;
-    this.includeJobs = includeJobs;
     this.executionDate = executionDate;
   }
 
-  public AbstractSetJobDefinitionStateCmd disableLogUserOperation() {
-    this.preventLogUserOperation = true;
-    return this;
-  }
-
-
-  public Void execute(CommandContext commandContext) {
-
+  protected void checkParameters(CommandContext commandContext) {
     if (jobDefinitionId == null && processDefinitionId == null && processDefinitionKey == null) {
       throw new ProcessEngineException("Job definition id, process definition id nor process definition key cannot be null");
     }
-
-    SuspensionState suspensionState = getSuspensionState();
-
-    if (executionDate == null) {
-      // Job definition suspension state is changed now
-      updateSuspensionState(commandContext, suspensionState);
-
-    } else {
-      // Job definition suspension state change is delayed
-      scheduleSuspensionStateUpdate(commandContext);
-    }
-
-    if(!preventLogUserOperation) {
-      PropertyChange propertyChange = new PropertyChange(SUSPENSION_STATE_PROPERTY, null, suspensionState.getName());
-      commandContext.getOperationLogManager().logJobDefinitionOperation(getLogEntryOperation(), jobDefinitionId,
-        processDefinitionId, processDefinitionKey, propertyChange);
-    }
-
-    return null;
   }
 
   protected void updateSuspensionState(CommandContext commandContext, SuspensionState suspensionState) {
     JobDefinitionManager jobDefinitionManager = commandContext.getJobDefinitionManager();
     JobManager jobManager = commandContext.getJobManager();
-
 
     if (jobDefinitionId != null) {
       jobDefinitionManager.updateJobDefinitionSuspensionStateById(jobDefinitionId, suspensionState);
@@ -98,44 +66,34 @@ public abstract class AbstractSetJobDefinitionStateCmd implements Command<Void>{
       jobManager.updateStartTimerJobSuspensionStateByProcessDefinitionKey(processDefinitionKey, suspensionState);
     }
 
-    if (includeJobs) {
-      getSetJobStateCmd().disableLogUserOperation().execute(commandContext);
-    }
-
   }
 
-  protected void scheduleSuspensionStateUpdate(CommandContext commandContext) {
-    TimerEntity timer = new TimerEntity();
-
-    timer.setDuedate(executionDate);
-    timer.setJobHandlerType(getDelayedExecutionJobHandlerType());
-
+  protected String getJobHandlerConfiguration() {
     String jobConfiguration = null;
 
     if (jobDefinitionId != null) {
       jobConfiguration = TimerChangeJobDefinitionSuspensionStateJobHandler
-          .createJobHandlerConfigurationByJobDefinitionId(jobDefinitionId, includeJobs);
+          .createJobHandlerConfigurationByJobDefinitionId(jobDefinitionId, isIncludeSubResources());
     } else
 
     if (processDefinitionId != null) {
       jobConfiguration = TimerChangeJobDefinitionSuspensionStateJobHandler
-          .createJobHandlerConfigurationByProcessDefinitionId(processDefinitionId, includeJobs);
+          .createJobHandlerConfigurationByProcessDefinitionId(processDefinitionId, isIncludeSubResources());
     } else
 
     if (processDefinitionKey != null) {
       jobConfiguration = TimerChangeJobDefinitionSuspensionStateJobHandler
-          .createJobHandlerConfigurationByProcessDefinitionKey(processDefinitionKey, includeJobs);
+          .createJobHandlerConfigurationByProcessDefinitionKey(processDefinitionKey, isIncludeSubResources());
     }
 
-    timer.setJobHandlerConfiguration(jobConfiguration);
-
-    commandContext.getJobManager().schedule(timer);
+    return jobConfiguration;
   }
 
-  /**
-   * Subclasses should return the wanted {@link SuspensionState} here.
-   */
-  protected abstract SuspensionState getSuspensionState();
+  protected void logUserOperation(CommandContext commandContext) {
+    PropertyChange propertyChange = new PropertyChange(SUSPENSION_STATE_PROPERTY, null, getNewSuspensionState().getName());
+    commandContext.getOperationLogManager().logJobDefinitionOperation(getLogEntryOperation(), jobDefinitionId,
+      processDefinitionId, processDefinitionKey, propertyChange);
+  }
 
   /**
    * Subclasses should return the type of the {@link JobHandler} here. it will be used when
@@ -143,11 +101,6 @@ public abstract class AbstractSetJobDefinitionStateCmd implements Command<Void>{
    */
   protected abstract String getDelayedExecutionJobHandlerType();
 
-  /**
-   * Subclasses should return the type of the {@link AbstractSetJobStateCmd} here.
-   * It will be used to suspend or activate the {@link Job}s.
-   */
-  protected abstract AbstractSetJobStateCmd getSetJobStateCmd();
+  protected abstract AbstractSetJobStateCmd getNextCommand();
 
-  protected abstract String getLogEntryOperation();
 }

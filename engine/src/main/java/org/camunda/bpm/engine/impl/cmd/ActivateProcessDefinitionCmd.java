@@ -36,7 +36,7 @@ public class ActivateProcessDefinitionCmd extends AbstractSetProcessDefinitionSt
     super(processDefinitionId, processDefinitionKey, includeProcessInstances, executionDate);
   }
 
-  protected SuspensionState getProcessDefinitionSuspensionState() {
+  protected SuspensionState getNewSuspensionState() {
     return SuspensionState.ACTIVE;
   }
 
@@ -48,11 +48,10 @@ public class ActivateProcessDefinitionCmd extends AbstractSetProcessDefinitionSt
     return new ActivateJobDefinitionCmd(null, processDefinitionId, processDefinitionKey, false, null);
   }
 
-  protected AbstractSetProcessInstanceStateCmd getSetProcessInstanceStateCmd() {
+  protected ActivateProcessInstanceCmd getNextCommand() {
     return new ActivateProcessInstanceCmd(null, processDefinitionId, processDefinitionKey);
   }
 
-  @Override
   protected String getLogEntryOperation() {
     return UserOperationLogEntry.OPERATION_TYPE_ACTIVATE_PROCESS_DEFINITION;
   }

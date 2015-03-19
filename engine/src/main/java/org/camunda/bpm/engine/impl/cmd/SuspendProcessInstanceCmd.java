@@ -25,16 +25,14 @@ public class SuspendProcessInstanceCmd extends AbstractSetProcessInstanceStateCm
     super(executionId, processDefinitionId, processDefinitionKey);
   }
 
-  @Override
   protected SuspensionState getNewSuspensionState() {
     return SuspensionState.SUSPENDED;
   }
 
-  protected AbstractSetJobStateCmd getSetJobStateCmd() {
+  protected SuspendJobCmd getNextCommand() {
     return new SuspendJobCmd(null, null, processInstanceId, processDefinitionId, processDefinitionKey);
   }
 
-  @Override
   protected String getLogEntryOperation() {
     return UserOperationLogEntry.OPERATION_TYPE_SUSPEND;
   }

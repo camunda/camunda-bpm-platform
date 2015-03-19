@@ -23,7 +23,6 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
-import org.camunda.bpm.engine.impl.test.TestHelper;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.Incident;
@@ -62,9 +61,6 @@ public class IncidentTest extends PluggableProcessEngineTestCase {
     assertNotNull(job);
 
     assertEquals(job.getId(), incident.getConfiguration());
-
-    // clean up log
-    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/incident/IncidentTest.testShouldCreateOneIncident.bpmn"})
@@ -92,9 +88,6 @@ public class IncidentTest extends PluggableProcessEngineTestCase {
     // There is still one incident
     assertFalse(incidents.isEmpty());
     assertTrue(incidents.size() == 1);
-
-    // clean up log
-    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/incident/IncidentTest.testShouldCreateOneIncident.bpmn"})
@@ -125,9 +118,6 @@ public class IncidentTest extends PluggableProcessEngineTestCase {
     // There is still one incident
     assertFalse(incidents.isEmpty());
     assertTrue(incidents.size() == 1);
-
-    // clean up log
-    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/incident/IncidentTest.testShouldCreateOneIncidentForNestedExecution.bpmn"})
@@ -156,9 +146,6 @@ public class IncidentTest extends PluggableProcessEngineTestCase {
     assertEquals(incident.getId(), incident.getCauseIncidentId());
     assertEquals(incident.getId(), incident.getRootCauseIncidentId());
     assertEquals(job.getId(), incident.getConfiguration());
-
-    // clean up log
-    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/incident/IncidentTest.testShouldCreateRecursiveIncidents.bpmn",
@@ -213,9 +200,6 @@ public class IncidentTest extends PluggableProcessEngineTestCase {
     assertEquals(causeIncident.getId(), recursiveCreatedIncident.getCauseIncidentId());
     assertEquals(causeIncident.getId(), recursiveCreatedIncident.getRootCauseIncidentId());
     assertNull(recursiveCreatedIncident.getConfiguration());
-
-    // clean up log
-    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/incident/IncidentTest.testShouldCreateRecursiveIncidentsForNestedCallActivity.bpmn",
@@ -289,9 +273,6 @@ public class IncidentTest extends PluggableProcessEngineTestCase {
     assertEquals(causeIncident.getId(), topLevelIncident.getCauseIncidentId());
     assertEquals(rootCauseIncident.getId(), topLevelIncident.getRootCauseIncidentId());
     assertNull(topLevelIncident.getConfiguration());
-
-    // clean up log
-    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/incident/IncidentTest.testShouldCreateOneIncident.bpmn"})
@@ -315,9 +296,6 @@ public class IncidentTest extends PluggableProcessEngineTestCase {
     // the incident has been deleted too.
     incident = runtimeService.createIncidentQuery().incidentId(incident.getId()).singleResult();
     assertNull(incident);
-
-    // clean up log
-    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/incident/IncidentTest.testShouldDeleteIncidentAfterJobWasSuccessfully.bpmn"})
@@ -357,9 +335,6 @@ public class IncidentTest extends PluggableProcessEngineTestCase {
     // there does not exist any incident anymore
     incident = runtimeService.createIncidentQuery().processInstanceId(processInstance.getId()).singleResult();
     assertNull(incident);
-
-    // clean up log
-    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/incident/IncidentTest.testShouldCreateIncidentOnFailedStartTimerEvent.bpmn"})
@@ -394,9 +369,6 @@ public class IncidentTest extends PluggableProcessEngineTestCase {
 
     // manually delete job for timer start event
     managementService.deleteJob(job.getId());
-
-    // clean up log
-    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/incident/IncidentTest.testShouldCreateOneIncident.bpmn"})
@@ -426,9 +398,6 @@ public class IncidentTest extends PluggableProcessEngineTestCase {
     assertEquals(1, query.count());
     tmp = query.singleResult();
     assertEquals(incident.getId(), tmp.getId());
-
-    // clean up log
-    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
   @Deployment
@@ -448,9 +417,6 @@ public class IncidentTest extends PluggableProcessEngineTestCase {
 
     // incident updated with new execution id after execution tree is compacted
     assertEquals(processInstanceId, incident.getExecutionId());
-
-    // clean up log
-    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/incident/IncidentTest.testShouldCreateOneIncident.bpmn"})
@@ -510,9 +476,6 @@ public class IncidentTest extends PluggableProcessEngineTestCase {
       // expected
     }
 
-    // clean up log
-    TestHelper.clearOpLog(processEngineConfiguration);
-
   }
 
   @Deployment
@@ -529,9 +492,6 @@ public class IncidentTest extends PluggableProcessEngineTestCase {
     assertEquals("theStart", incident.getActivityId());
     assertNull(incident.getProcessInstanceId());
     assertNull(incident.getExecutionId());
-
-    // clean up log
-    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
 }

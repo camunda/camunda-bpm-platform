@@ -27,7 +27,6 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.jobexecutor.AcquiredJobs;
 import org.camunda.bpm.engine.impl.persistence.entity.JobManager;
-import org.camunda.bpm.engine.impl.test.TestHelper;
 
 
 /**
@@ -82,8 +81,6 @@ public class JobExecutorTest extends JobExecutorTestCase {
         return null;
       }
     });
-
-    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
   public void testJobExecutorHintConfiguration() {

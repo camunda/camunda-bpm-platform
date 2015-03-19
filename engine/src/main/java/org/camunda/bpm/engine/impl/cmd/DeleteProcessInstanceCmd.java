@@ -12,13 +12,13 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
+import java.io.Serializable;
+
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
-
-import java.io.Serializable;
 
 
 /**
@@ -47,7 +47,7 @@ public class DeleteProcessInstanceCmd implements Command<Void>, Serializable {
       .deleteProcessInstance(processInstanceId, deleteReason, false, skipCustomListeners);
 
     commandContext.getOperationLogManager()
-      .logProcessInstanceOperation(null, UserOperationLogEntry.OPERATION_TYPE_DELETE, processInstanceId,
+      .logProcessInstanceOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE, processInstanceId,
           null, null, PropertyChange.EMPTY_CHANGE);
 
     return null;

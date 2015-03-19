@@ -29,8 +29,6 @@ import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
  */
 public abstract class JobRetryCmd implements Command<Object> {
 
-  protected static final String RETRY_STATE_PROPERTY = "retryState";
-
   protected static final long serialVersionUID = 1L;
   protected String jobId;
   protected Throwable exception;

@@ -27,7 +27,7 @@ public class SuspendJobDefinitionCmd extends AbstractSetJobDefinitionStateCmd {
     super(jobDefinitionId, processDefinitionId, processDefinitionKey, includeJobs, executionDate);
   }
 
-  protected SuspensionState getSuspensionState() {
+  protected SuspensionState getNewSuspensionState() {
     return SuspensionState.SUSPENDED;
   }
 
@@ -35,11 +35,10 @@ public class SuspendJobDefinitionCmd extends AbstractSetJobDefinitionStateCmd {
     return TimerSuspendJobDefinitionHandler.TYPE;
   }
 
-  protected AbstractSetJobStateCmd getSetJobStateCmd() {
+  protected SuspendJobCmd getNextCommand() {
     return new SuspendJobCmd(null, jobDefinitionId, null, processDefinitionId, processDefinitionKey);
   }
 
-  @Override
   protected String getLogEntryOperation() {
     return UserOperationLogEntry.OPERATION_TYPE_SUSPEND_JOB_DEFINITION;
   }

@@ -24,11 +24,10 @@ public class ActivateJobCmd extends AbstractSetJobStateCmd {
     super(jobId, jobDefinitionId, processInstanceId, processDefinitionId, processDefinitionKey);
   }
 
-  protected SuspensionState getSuspensionState() {
+  protected SuspensionState getNewSuspensionState() {
     return SuspensionState.ACTIVE;
   }
 
-  @Override
   protected String getLogEntryOperation() {
     return UserOperationLogEntry.OPERATION_TYPE_ACTIVATE_JOB;
   }

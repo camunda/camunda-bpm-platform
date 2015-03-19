@@ -19,7 +19,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.cfg.TransactionState;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
@@ -28,7 +27,6 @@ import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.jobexecutor.FailedJobListener;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutorContext;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 
 /**
  * @author Tom Baeyens
@@ -90,10 +88,6 @@ public class ExecuteJobsCmd implements Command<Object>, Serializable {
 
     if (jobExecutorContext != null) { // if null, then we are not called by the job executor
       jobExecutorContext.setCurrentJob(job);
-    } else {
-      commandContext.getOperationLogManager().logJobOperation(getLogEntryOperation(), job.getId(),
-        job.getJobDefinitionId(), job.getProcessInstanceId(), job.getProcessDefinitionId(),
-        job.getProcessDefinitionKey(), new PropertyChange(null, null, null));
     }
 
     try {
@@ -121,7 +115,4 @@ public class ExecuteJobsCmd implements Command<Object>, Serializable {
     return new FailedJobListener(commandExecutor, jobId);
   }
 
-  protected String getLogEntryOperation() {
-    return UserOperationLogEntry.OPERATION_TYPE_EXECUTE_JOB;
-  }
 }

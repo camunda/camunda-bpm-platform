@@ -13,27 +13,24 @@
 package org.camunda.bpm.engine.impl.cmd;
 
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.persistence.entity.*;
+import org.camunda.bpm.engine.impl.persistence.entity.JobManager;
+import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
+import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
 
 /**
  * @author roman.smirnov
  */
-public abstract class AbstractSetJobStateCmd implements Command<Void> {
-
-  protected static final String SUSPENSION_STATE_PROPERTY = "suspensionState";
+public abstract class AbstractSetJobStateCmd extends AbstractSetStateCmd {
 
   protected String jobId;
   protected String jobDefinitionId;
   protected String processInstanceId;
   protected String processDefinitionId;
   protected String processDefinitionKey;
-  protected boolean preventLogUserOperation;
 
-
-  public AbstractSetJobStateCmd(String jobId, String jobDefinitionId, String processInstanceId,
-      String processDefinitionId, String processDefinitionKey) {
+  public AbstractSetJobStateCmd(String jobId, String jobDefinitionId, String processInstanceId, String processDefinitionId, String processDefinitionKey) {
+    super(false, null);
     this.jobId = jobId;
     this.jobDefinitionId = jobDefinitionId;
     this.processInstanceId = processInstanceId;
@@ -41,18 +38,14 @@ public abstract class AbstractSetJobStateCmd implements Command<Void> {
     this.processDefinitionKey = processDefinitionKey;
   }
 
-  public AbstractSetJobStateCmd disableLogUserOperation() {
-    this.preventLogUserOperation = true;
-    return this;
-  }
-
-  public Void execute(CommandContext commandContext) {
+  protected void checkParameters(CommandContext commandContext) {
     if(jobId == null && jobDefinitionId == null && processInstanceId == null && processDefinitionId == null && processDefinitionKey == null) {
       throw new ProcessEngineException("Job id, job definition id, process instance id, process definition id nor process definition key cannot be null");
     }
+  }
 
+  protected void updateSuspensionState(CommandContext commandContext, SuspensionState suspensionState) {
     JobManager jobManager = commandContext.getJobManager();
-    SuspensionState suspensionState = getSuspensionState();
 
     if (jobId != null) {
       jobManager.updateJobSuspensionStateById(jobId, suspensionState);
@@ -73,21 +66,12 @@ public abstract class AbstractSetJobStateCmd implements Command<Void> {
     if (processDefinitionKey != null) {
       jobManager.updateJobSuspensionStateByProcessDefinitionKey(processDefinitionKey, suspensionState);
     }
-
-    if(!preventLogUserOperation) {
-      PropertyChange propertyChange = new PropertyChange(SUSPENSION_STATE_PROPERTY, null, suspensionState.getName());
-      commandContext.getOperationLogManager().logJobOperation(getLogEntryOperation(), jobId, jobDefinitionId,
-        processInstanceId, processDefinitionId, processDefinitionKey, propertyChange);
-    }
-
-    return null;
   }
 
-  /**
-   * Subclasses should return the wanted {@link SuspensionState} here.
-   */
-  protected abstract SuspensionState getSuspensionState();
-
-  protected abstract String getLogEntryOperation();
+  protected void logUserOperation(CommandContext commandContext) {
+    PropertyChange propertyChange = new PropertyChange(SUSPENSION_STATE_PROPERTY, null, getNewSuspensionState().getName());
+    commandContext.getOperationLogManager().logJobOperation(getLogEntryOperation(), jobId, jobDefinitionId,
+      processInstanceId, processDefinitionId, processDefinitionKey, propertyChange);
+  }
 
 }

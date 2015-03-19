@@ -13,7 +13,6 @@ import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
-import org.camunda.bpm.engine.impl.test.TestHelper;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.JobQuery;
 import org.camunda.bpm.engine.test.Deployment;
@@ -48,9 +47,6 @@ public class JobExecutorCmdExceptionTest extends PluggableProcessEngineTestCase 
     // the job was successfully executed
     JobQuery query = managementService.createJobQuery().noRetriesLeft();
     assertEquals(0, query.count());
-
-    // clean up log
-    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
   public void testJobCommandsWith3Exceptions() {
@@ -69,9 +65,6 @@ public class JobExecutorCmdExceptionTest extends PluggableProcessEngineTestCase 
     Job job = managementService.createJobQuery().noRetriesLeft().singleResult();
     assertNotNull(job);
     assertEquals(0, job.getRetries());
-
-    // clean up log
-    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
   public void testMultipleFailingJobs() {
@@ -96,9 +89,6 @@ public class JobExecutorCmdExceptionTest extends PluggableProcessEngineTestCase 
       // all jobs have retries exhausted
       assertEquals(0, job.getRetries());
     }
-
-    // clean up log
-    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
   public void testJobCommandsWithNestedFailingCommand() {
@@ -126,9 +116,6 @@ public class JobExecutorCmdExceptionTest extends PluggableProcessEngineTestCase 
     job = managementService.createJobQuery().noRetriesLeft().singleResult();
     assertNotNull(job);
     assertEquals(0, job.getRetries());
-
-    // clean up log
-    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
   @Deployment(resources="org/camunda/bpm/engine/test/jobexecutor/jobFailingOnFlush.bpmn20.xml")
@@ -150,9 +137,6 @@ public class JobExecutorCmdExceptionTest extends PluggableProcessEngineTestCase 
     assertNotNull(job);
     // but has no more retires
     assertEquals(0, job.getRetries());
-
-    // clean up log
-    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
   protected void createJob(final String handlerType) {

@@ -26,7 +26,6 @@ import org.camunda.bpm.engine.impl.jobexecutor.AcquiredJobs;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
 import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TimerEntity;
-import org.camunda.bpm.engine.impl.test.TestHelper;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 
 /**
@@ -64,7 +63,6 @@ public class JobExecutorCmdHappyTest extends JobExecutorTestCase {
     assertEquals(1, tweetHandler.getMessages().size());
 
     clearDatabase();
-    TestHelper.removeDelayedJobFromOpLog(processEngineConfiguration, jobId);
   }
 
   static final long SOME_TIME = 928374923546L;
@@ -111,7 +109,6 @@ public class JobExecutorCmdHappyTest extends JobExecutorTestCase {
     assertEquals(1, tweetHandler.getMessages().size());
 
     clearDatabase();
-    TestHelper.removeDelayedJobFromOpLog(processEngineConfiguration, jobId);
   }
 
   protected void clearDatabase() {

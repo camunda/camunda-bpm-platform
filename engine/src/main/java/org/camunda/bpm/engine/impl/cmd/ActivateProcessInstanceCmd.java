@@ -29,7 +29,7 @@ public class ActivateProcessInstanceCmd extends AbstractSetProcessInstanceStateC
     return SuspensionState.ACTIVE;
   }
 
-  protected AbstractSetJobStateCmd getSetJobStateCmd() {
+  protected ActivateJobCmd getNextCommand() {
     return new ActivateJobCmd(null, null, processInstanceId, processDefinitionId, processDefinitionKey);
   }
 
