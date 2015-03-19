@@ -82,7 +82,7 @@ module.exports = Page.extend({
     var listElement = this.newSortingSelectionListElement(sortingType);
     listElement.click().then(function() {
       if (varInput) {
-        listElement.element(by.xpath('..')).element(by.model('variable')).sendKeys(variableName);
+        listElement.element(by.xpath('..')).element(by.model('variable.varName')).sendKeys(variableName);
         listElement.element(by.xpath('..')).element(by.cssContainingText('.ng-scope', variableType)).click();
         listElement.element(by.xpath('..')).element(by.css('[ng-click="applySorting($event)"]')).click();
       }
@@ -97,7 +97,7 @@ module.exports = Page.extend({
     this.sortingName(index).click();
     this.sortingSelectionListElement(index, sortingType).click().then(function() {
       if (varInput) {
-        element(by.css('.variable-inputs')).element(by.model('variable')).sendKeys(variableName);
+        element(by.css('.variable-inputs')).element(by.model('variable.varName')).sendKeys(variableName);
         element(by.css('.variable-inputs')).element(by.cssContainingText('.ng-scope', variableType)).click();
         element(by.css('.variable-inputs')).element(by.css('[ng-click="applySorting($event)"]')).click();
       }
