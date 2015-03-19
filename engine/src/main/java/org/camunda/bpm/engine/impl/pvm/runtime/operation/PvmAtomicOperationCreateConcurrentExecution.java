@@ -64,7 +64,7 @@ public abstract class PvmAtomicOperationCreateConcurrentExecution implements Pvm
 
         // 1) create new concurrent execution (CCE-1) replacing the the active scope execution (e)
         PvmExecutionImpl replacingExecution = execution.createExecution();
-        replacingExecution.replace(execution); // only copy tasks(?)
+        replacingExecution.replace(execution);
         replacingExecution.setActivity(execution.getActivity());
         replacingExecution.setActive(execution.isActive());
         replacingExecution.setScope(false);

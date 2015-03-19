@@ -22,6 +22,7 @@ import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.EventSubscription;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ExecutionQuery;
+import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
@@ -668,6 +669,37 @@ public class MessageEventSubprocessTest extends PluggableProcessEngineTestCase {
 
     taskService.complete(task1.getId());
     taskService.complete(task2.getId());
+
+    assertProcessEnded(processInstanceId);
+  }
+
+  /**
+   * CAM-3655
+   */
+  @Deployment
+  public void testNonInterruptingWithAsyncConcurrentTask() {
+    // given a process instance with an asyncBefore user task
+    String processInstanceId = runtimeService.startProcessInstanceByKey("process").getId();
+
+    // and a triggered non-interrupting subprocess with a user task
+    runtimeService.correlateMessage("message");
+
+    // then triggering the async job should be successful
+    Job asyncJob = managementService.createJobQuery().singleResult();
+    assertNotNull(asyncJob);
+    managementService.executeJob(asyncJob.getId());
+
+    // and there should be two tasks now that can be completed successfully
+    assertEquals(2, taskService.createTaskQuery().count());
+    Task processTask = taskService.createTaskQuery().taskDefinitionKey("userTask").singleResult();
+    Task eventSubprocessTask = taskService.createTaskQuery().taskDefinitionKey("eventSubProcessTask").singleResult();
+
+    assertNotNull(processTask);
+    assertNotNull(eventSubprocessTask);
+
+    taskService.complete(processTask.getId());
+    taskService.complete(eventSubprocessTask.getId());
+
 
     assertProcessEnded(processInstanceId);
   }

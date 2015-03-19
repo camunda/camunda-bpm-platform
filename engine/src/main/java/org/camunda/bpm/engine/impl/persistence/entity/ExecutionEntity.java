@@ -1048,6 +1048,18 @@ public class ExecutionEntity extends PvmExecutionImpl implements
     }
     replacedExecution.getTasksInternal().clear();
 
+    // update those jobs that are directly related to the argument execution's current activity
+    String replacedActivity = replacedExecution.getActivityId();
+    if (replacedActivity != null) {
+      for (JobEntity job : replacedExecution.getJobs()) {
+
+        if (replacedActivity.equals(job.getActivityId())) {
+          replacedExecution.removeJob(job);
+          job.setExecution(this);
+        }
+      }
+    }
+
     super.replace(replacedExecution);
   }
 
