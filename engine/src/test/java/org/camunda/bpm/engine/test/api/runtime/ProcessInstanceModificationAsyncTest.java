@@ -267,7 +267,7 @@ public class ProcessInstanceModificationAsyncTest extends PluggableProcessEngine
 
   protected TransitionInstance getChildTransitionInstanceForTargetActivity(ActivityInstance activityInstance, String targetActivityId) {
     for (TransitionInstance childTransitionInstance : activityInstance.getChildTransitionInstances()) {
-      if (targetActivityId.equals(childTransitionInstance.getTargetActivityId())) {
+      if (targetActivityId.equals(childTransitionInstance.getActivityId())) {
         return childTransitionInstance;
       }
     }

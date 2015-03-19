@@ -37,6 +37,15 @@ public class PvmAtomicOperationActivityEnd implements PvmAtomicOperation {
 
   @SuppressWarnings({"unchecked", "rawtypes"})
   public void execute(PvmExecutionImpl execution) {
+    // restore activity instance id
+    if (execution.getActivityInstanceId() == null) {
+      if (execution.isProcessInstanceExecution()) {
+        execution.setActivityInstanceId(execution.getId());
+      }
+      else {
+        execution.setActivityInstanceId(execution.getParentActivityInstanceId());
+      }
+    }
 
     ActivityImpl activity = execution.getActivity();
     ActivityImpl parentActivity = activity.getParentActivity();

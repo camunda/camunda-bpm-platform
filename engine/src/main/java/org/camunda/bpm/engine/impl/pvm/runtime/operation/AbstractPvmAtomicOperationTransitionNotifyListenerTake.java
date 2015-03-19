@@ -12,8 +12,6 @@
  */
 package org.camunda.bpm.engine.impl.pvm.runtime.operation;
 
-import java.util.logging.Logger;
-
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.impl.core.model.CoreModelElement;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
@@ -26,13 +24,6 @@ import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
  * @author Tom Baeyens
  */
 public abstract class AbstractPvmAtomicOperationTransitionNotifyListenerTake extends AbstractPvmEventAtomicOperation {
-
-  protected PvmExecutionImpl eventNotificationsStarted(PvmExecutionImpl execution) {
-    // while executing the transition, the activityInstance is 'null'
-    // (we are not executing an activity)
-    execution.setActivityInstanceId(null);
-    return execution;
-  }
 
   protected void eventNotificationsCompleted(PvmExecutionImpl execution) {
     TransitionImpl transition = execution.getTransition();

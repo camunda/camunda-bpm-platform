@@ -159,7 +159,7 @@ public class GetActivityInstanceCmd implements Command<ActivityInstance> {
         // can use execution id as persistent ID for transition as an execution can execute as most one transition at a time.
         transitionInstance.setId(execution.getId());
         transitionInstance.setExecutionId(execution.getId());
-        transitionInstance.setTargetActivityId(execution.getActivityId());
+        transitionInstance.setActivityId(execution.getActivityId());
 
         childTransitionInstances.add(transitionInstance);
 

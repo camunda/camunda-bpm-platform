@@ -13,6 +13,13 @@
 
 package org.camunda.bpm.engine.test.api.runtime;
 
+import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.assertThat;
+import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.describeActivityInstanceTree;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.junit.Assert.assertThat;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -31,11 +38,11 @@ import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.CollectionUtil;
-import org.camunda.bpm.engine.impl.variable.serializer.JavaObjectSerializer;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.runtime.TransitionInstance;
 import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
@@ -43,9 +50,6 @@ import org.camunda.bpm.engine.test.util.TestExecutionListener;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.type.ValueType;
-
-import static org.junit.Assert.assertThat;
-import static org.hamcrest.CoreMatchers.*;
 
 /**
  * @author Frederik Heremans
@@ -1091,6 +1095,175 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
 
   }
 
+  @Deployment
+  public void testActivityInstanceTreeForAsyncBeforeTask() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+    ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
+    assertThat(tree).hasStructure(
+        describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+          .transition("theTask")
+        .done());
+
+    TransitionInstance asyncBeforeTransitionInstance = tree.getChildTransitionInstances()[0];
+    assertEquals(processInstance.getId(), asyncBeforeTransitionInstance.getExecutionId());
+  }
+
+  @Deployment
+  public void testActivityInstanceTreeForConcurrentAsyncBeforeTask() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("concurrentTasksProcess");
+
+    ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
+    assertThat(tree).hasStructure(
+        describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+          .activity("theTask")
+          .transition("asyncTask")
+        .done());
+
+    TransitionInstance asyncBeforeTransitionInstance = tree.getChildTransitionInstances()[0];
+    String asyncExecutionId = managementService.createJobQuery().singleResult().getExecutionId();
+    assertEquals(asyncExecutionId, asyncBeforeTransitionInstance.getExecutionId());
+  }
+
+  @Deployment
+  public void testActivityInstanceTreeForAsyncBeforeStartEvent() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+    ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
+    assertThat(tree).hasStructure(
+        describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+          .transition("theStart")
+        .done());
+
+    TransitionInstance asyncBeforeTransitionInstance = tree.getChildTransitionInstances()[0];
+    assertEquals(processInstance.getId(), asyncBeforeTransitionInstance.getExecutionId());
+  }
+
+  @Deployment
+  public void testActivityInstanceTreeForAsyncAfterTask() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+    Task task = taskService.createTaskQuery().singleResult();
+    taskService.complete(task.getId());
+
+
+    ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
+    assertThat(tree).hasStructure(
+        describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+          .transition("theTask")
+        .done());
+
+    TransitionInstance asyncAfterTransitionInstance = tree.getChildTransitionInstances()[0];
+    assertEquals(processInstance.getId(), asyncAfterTransitionInstance.getExecutionId());
+  }
+
+  @Deployment
+  public void testActivityInstanceTreeForConcurrentAsyncAfterTask() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("concurrentTasksProcess");
+
+    Task asyncTask = taskService.createTaskQuery().taskDefinitionKey("asyncTask").singleResult();
+    assertNotNull(asyncTask);
+    taskService.complete(asyncTask.getId());
+
+    ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
+    assertThat(tree).hasStructure(
+        describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+          .activity("theTask")
+          .transition("asyncTask")
+        .done());
+
+    TransitionInstance asyncBeforeTransitionInstance = tree.getChildTransitionInstances()[0];
+    String asyncExecutionId = managementService.createJobQuery().singleResult().getExecutionId();
+    assertEquals(asyncExecutionId, asyncBeforeTransitionInstance.getExecutionId());
+  }
+
+  @Deployment
+  public void testActivityInstanceTreeForAsyncAfterEndEvent() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("asyncEndEventProcess");
+
+    ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
+    assertThat(tree).hasStructure(
+        describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+          .transition("theEnd")
+        .done());
+
+    TransitionInstance asyncAfterTransitionInstance = tree.getChildTransitionInstances()[0];
+    assertEquals(processInstance.getId(), asyncAfterTransitionInstance.getExecutionId());
+  }
+
+  @Deployment
+  public void testActivityInstanceTreeForNestedAsyncBeforeTask() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+    ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
+    assertThat(tree).hasStructure(
+        describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+          .beginScope("subProcess")
+            .transition("theTask")
+        .done());
+
+    TransitionInstance asyncBeforeTransitionInstance = tree.getChildActivityInstances()[0]
+        .getChildTransitionInstances()[0];
+    String asyncExecutionId = managementService.createJobQuery().singleResult().getExecutionId();
+    assertEquals(asyncExecutionId, asyncBeforeTransitionInstance.getExecutionId());
+  }
+
+  /**
+   * requires fix for CAM-3662
+   */
+  @Deployment
+  public void FAILING_testActivityInstanceTreeForNestedAsyncBeforeStartEvent() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+    ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
+    assertThat(tree).hasStructure(
+        describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+          .beginScope("subProcess")
+            .transition("theSubProcessStart")
+        .done());
+
+    TransitionInstance asyncBeforeTransitionInstance = tree.getChildTransitionInstances()[0];
+    assertEquals(processInstance.getId(), asyncBeforeTransitionInstance.getExecutionId());
+  }
+
+  @Deployment
+  public void testActivityInstanceTreeForNestedAsyncAfterTask() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+    Task task = taskService.createTaskQuery().singleResult();
+    taskService.complete(task.getId());
+
+
+    ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
+    assertThat(tree).hasStructure(
+        describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+          .beginScope("subProcess")
+            .transition("theTask")
+        .done());
+
+    TransitionInstance asyncAfterTransitionInstance = tree.getChildActivityInstances()[0]
+        .getChildTransitionInstances()[0];
+    String asyncExecutionId = managementService.createJobQuery().singleResult().getExecutionId();
+    assertEquals(asyncExecutionId, asyncAfterTransitionInstance.getExecutionId());
+  }
+
+  @Deployment
+  public void testActivityInstanceTreeForNestedAsyncAfterEndEvent() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("asyncEndEventProcess");
+
+    ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
+    assertThat(tree).hasStructure(
+        describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+          .beginScope("subProcess")
+            .transition("theSubProcessEnd")
+        .done());
+
+    TransitionInstance asyncAfterTransitionInstance = tree.getChildActivityInstances()[0]
+        .getChildTransitionInstances()[0];
+    String asyncExecutionId = managementService.createJobQuery().singleResult().getExecutionId();
+    assertEquals(asyncExecutionId, asyncAfterTransitionInstance.getExecutionId());
+  }
+
   @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
   public void testChangeVariableType() {
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
@@ -1210,45 +1383,45 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
   public void testStartProcessInstanceByMessageWithEarlierVersionOfProcessDefinition() {
 	  String deploymentId = repositoryService.createDeployment().addClasspathResource("org/camunda/bpm/engine/test/api/runtime/messageStartEvent_version2.bpmn20.xml").deploy().getId();
 	  ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionVersion(1).singleResult();
-	   
+
 	  ProcessInstance processInstance = runtimeService.startProcessInstanceByMessageAndProcessDefinitionId("startMessage", processDefinition.getId());
-	   
+
 	  assertThat(processInstance, is(notNullValue()));
 	  assertThat(processInstance.getProcessDefinitionId(), is(processDefinition.getId()));
-	   
-	  // clean up 
+
+	  // clean up
 	  repositoryService.deleteDeployment(deploymentId, true);
   }
-  
+
   @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/messageStartEvent.bpmn20.xml")
   public void testStartProcessInstanceByMessageWithLastVersionOfProcessDefinition() {
 	  String deploymentId = repositoryService.createDeployment().addClasspathResource("org/camunda/bpm/engine/test/api/runtime/messageStartEvent_version2.bpmn20.xml").deploy().getId();
 	  ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().latestVersion().singleResult();
-	   
+
 	  ProcessInstance processInstance = runtimeService.startProcessInstanceByMessageAndProcessDefinitionId("newStartMessage", processDefinition.getId());
-	   
+
 	  assertThat(processInstance, is(notNullValue()));
 	  assertThat(processInstance.getProcessDefinitionId(), is(processDefinition.getId()));
-	   
-	  // clean up 
+
+	  // clean up
 	  repositoryService.deleteDeployment(deploymentId, true);
    }
-  
+
   @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/messageStartEvent.bpmn20.xml")
   public void testStartProcessInstanceByMessageWithNonExistingMessageStartEvent() {
-	  String deploymentId = null; 
+	  String deploymentId = null;
 	  try {
 		 deploymentId = repositoryService.createDeployment().addClasspathResource("org/camunda/bpm/engine/test/api/runtime/messageStartEvent_version2.bpmn20.xml").deploy().getId();
 		 ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionVersion(1).singleResult();
-		   
+
 		 runtimeService.startProcessInstanceByMessageAndProcessDefinitionId("newStartMessage", processDefinition.getId());
-		 
+
 		 fail("exeception expected");
 	 } catch(ProcessEngineException e) {
 		 assertThat(e.getMessage(), containsString("no message start event with name 'newStartMessage' found"));
 	 }
 	 finally {
-		 // clean up 
+		 // clean up
 		 if(deploymentId != null){
 			 repositoryService.deleteDeployment(deploymentId, true);
 		 }

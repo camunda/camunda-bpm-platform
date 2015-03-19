@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -19,28 +19,34 @@ import org.camunda.bpm.engine.runtime.TransitionInstance;
  *
  */
 public class TransitionInstanceImpl extends ProcessElementInstanceImpl implements TransitionInstance {
-  
-  protected String targetActivityId;
+
+  protected String activityId;
   protected String executionId;
 
+  public String getActivityId() {
+    return activityId;
+  }
+
+  public void setActivityId(String activityId) {
+    this.activityId = activityId;
+  }
+
   public String getTargetActivityId() {
-    return targetActivityId;
+    return activityId;
   }
-  public void setTargetActivityId(String targetActivityId) {
-    this.targetActivityId = targetActivityId;
-  }
+
   public String getExecutionId() {
     return executionId;
   }
+
   public void setExecutionId(String executionId) {
     this.executionId = executionId;
   }
 
-  @Override
   public String toString() {
     return this.getClass().getSimpleName()
            + "[executionId=" + executionId
-           + ", targetActivityId=" + targetActivityId
+           + ", targetActivityId=" + activityId
            + ", id=" + id
            + ", parentActivityInstanceId=" + parentActivityInstanceId
            + ", processInstanceId=" + processInstanceId

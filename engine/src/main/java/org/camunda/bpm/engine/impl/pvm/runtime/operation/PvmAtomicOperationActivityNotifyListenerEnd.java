@@ -36,6 +36,8 @@ public class PvmAtomicOperationActivityNotifyListenerEnd extends PvmAtomicOperat
     // invoke behavior from abstract AtomicOperationActivityInstanceEnd
     super.eventNotificationsCompleted(execution);
 
+    execution.setActivityInstanceId(null);
+
     // perform activity end behavior
     execution.performOperation(ACTIVITY_END);
   }

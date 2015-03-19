@@ -121,7 +121,7 @@ public class ActivityInstanceImpl extends ProcessElementInstanceImpl implements 
       writer.append("├── ");
     }
 
-    writer.append("transition to " + transition.getTargetActivityId() + "=>" + transition.getId() + "\n");
+    writer.append("transition to/from " + transition.getActivityId() + ":" + transition.getId() + "\n");
   }
 
   public String toString() {

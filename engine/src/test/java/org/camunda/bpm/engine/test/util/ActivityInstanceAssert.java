@@ -83,7 +83,7 @@ public class ActivityInstanceAssert {
             boolean matchFound = false;
             while (expectedTransitionInstanceIt.hasNext() && !matchFound) {
               TransitionInstance expectedChild = expectedTransitionInstanceIt.next();
-              if (expectedChild.getTargetActivityId().equals(child.getTargetActivityId())) {
+              if (expectedChild.getActivityId().equals(child.getActivityId())) {
                 matchFound = true;
                 expectedTransitionInstanceIt.remove();
               }
@@ -139,10 +139,10 @@ public class ActivityInstanceAssert {
       return this;
     }
 
-    public ActivityInstanceTreeBuilder transitionTo(String targetActivityId) {
+    public ActivityInstanceTreeBuilder transition(String activityId) {
 
       TransitionInstanceImpl newInstance = new TransitionInstanceImpl();
-      newInstance.setTargetActivityId(targetActivityId);
+      newInstance.setActivityId(activityId);
       ActivityInstanceImpl parentInstance = activityInstanceStack.peek();
 
       List<TransitionInstance> childInstances = new ArrayList<TransitionInstance>(

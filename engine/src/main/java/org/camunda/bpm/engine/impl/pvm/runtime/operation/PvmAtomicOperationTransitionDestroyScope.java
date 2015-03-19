@@ -111,10 +111,14 @@ public class PvmAtomicOperationTransitionDestroyScope implements PvmAtomicOperat
     ScopeImpl nextOuterScopeElement = activity.getParent();
     TransitionImpl transition = propagatingExecution.getTransition();
     ActivityImpl destination = transition.getDestination();
+
     if (transitionLeavesNextOuterScope(nextOuterScopeElement, activity, destination)) {
       propagatingExecution.setActivity((ActivityImpl) nextOuterScopeElement);
       propagatingExecution.performOperation(TRANSITION_NOTIFY_LISTENER_END);
     } else {
+      // while executing the transition, the activityInstance is 'null'
+      // (we are not executing an activity)
+      propagatingExecution.setActivityInstanceId(null);
       propagatingExecution.performOperation(TRANSITION_NOTIFY_LISTENER_TAKE);
     }
   }

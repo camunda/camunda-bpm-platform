@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:camunda="http://activiti.org/bpmn"
+  targetNamespace="org.camunda.bpm.engine.test.enginge.test.api.runtime">
+
+  <process id="concurrentTasksProcess">
+
+    <startEvent id="theStart" />
+    <sequenceFlow id="flow1" sourceRef="theStart" targetRef="fork" />
+    <parallelGateway id="fork" />
+    
+    <sequenceFlow id="flow2" sourceRef="fork" targetRef="theTask" />
+    <userTask id="theTask" />   
+    <sequenceFlow id="flow3" sourceRef="theTask" targetRef="theEnd" />
+    
+    <sequenceFlow id="flow4" sourceRef="fork" targetRef="asyncTask" />
+    <userTask id="asyncTask" camunda:asyncBefore="true" />
+    <sequenceFlow id="flow5" sourceRef="asyncTask" targetRef="theEnd" />
+      
+    <endEvent id="theEnd" />
+    
+  </process>
+
+</definitions>
