@@ -104,6 +104,7 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
   private String candidateGroupExpression;
   private String candidateUser;
   private String candidateUserExpression;
+  private Boolean candidateAssignedAndNotAssigned;
   private String taskDefinitionKey;
   private String[] taskDefinitionKeyIn;
   private String taskDefinitionKeyLike;
@@ -252,6 +253,11 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
   @CamundaQueryParam("candidateUserExpression")
   public void setCandidateUserExpression(String candidateUserExpression) {
     this.candidateUserExpression = candidateUserExpression;
+  }
+  
+  @CamundaQueryParam("candidateAssignedAndNotAssigned")
+  public void setCandidateAssignedAndNotAssigned(Boolean candidateAssignedAndNotAssigned){
+    this.candidateAssignedAndNotAssigned = candidateAssignedAndNotAssigned;
   }
 
   @CamundaQueryParam("taskDefinitionKey")
@@ -585,6 +591,10 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
 
   public String getCandidateUserExpression() {
     return candidateUserExpression;
+  }
+  
+  public Boolean getCandidateAssignedAndNotAssigned(){
+    return candidateAssignedAndNotAssigned;
   }
 
   public String[] getTaskDefinitionKeyIn() {
@@ -1071,6 +1081,10 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
 
       }
     }
+    
+    if(candidateAssignedAndNotAssigned != null && candidateAssignedAndNotAssigned == true){
+      query.taskCandidateAssignedAndNotAssigned();
+    }
   }
 
   @Override
@@ -1176,6 +1190,7 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     dto.candidateUser = taskQuery.getCandidateUser();
     dto.candidateGroup = taskQuery.getCandidateGroup();
     dto.candidateGroups = taskQuery.getCandidateGroupsInternal();
+    dto.candidateAssignedAndNotAssigned = taskQuery.isCandidateAssignedAndNotAssigned();
 
     dto.processInstanceBusinessKey = taskQuery.getProcessInstanceBusinessKey();
     dto.processInstanceBusinessKeyLike = taskQuery.getProcessInstanceBusinessKeyLike();

@@ -422,6 +422,7 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
     parameters.put("assigneeLike", "anAssigneeLike");
     parameters.put("candidateGroup", "aCandidateGroup");
     parameters.put("candidateUser", "aCandidate");
+    parameters.put("candidateAssignedAndNotAssigned", "true");
     parameters.put("taskDefinitionKey", "aTaskDefKey");
     parameters.put("taskDefinitionKeyLike", "aTaskDefKeyLike");
     parameters.put("description", "aDesc");
@@ -1265,6 +1266,8 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
     candidateGroups.add("worker");
 
     queryParameters.put("candidateGroups", candidateGroups);
+    
+    queryParameters.put("candidateAssignedAndNotAssigned", true);
 
     given().contentType(POST_JSON_CONTENT_TYPE).body(queryParameters)
       .header("accept", MediaType.APPLICATION_JSON)
@@ -1278,6 +1281,7 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
     verify(mockQuery).taskUnassigned();
     verify(mockQuery).active();
     verify(mockQuery).suspended();
+    verify(mockQuery).taskCandidateAssignedAndNotAssigned();
 
     verify(mockQuery).taskCandidateGroupIn(argThat(new EqualsList(candidateGroups)));
   }
