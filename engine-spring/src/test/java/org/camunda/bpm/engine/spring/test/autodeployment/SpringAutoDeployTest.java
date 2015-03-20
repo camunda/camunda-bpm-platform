@@ -13,22 +13,18 @@
 
 package org.camunda.bpm.engine.spring.test.autodeployment;
 
+import org.camunda.bpm.engine.RepositoryService;
+import org.camunda.bpm.engine.impl.test.PvmTestCase;
+import org.camunda.bpm.engine.impl.util.IoUtil;
+import org.camunda.bpm.engine.repository.*;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.AbstractXmlApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
 import java.net.URISyntaxException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import org.camunda.bpm.engine.RepositoryService;
-import org.camunda.bpm.engine.impl.test.PvmTestCase;
-import org.camunda.bpm.engine.impl.util.IoUtil;
-import org.camunda.bpm.engine.repository.CaseDefinition;
-import org.camunda.bpm.engine.repository.Deployment;
-import org.camunda.bpm.engine.repository.DeploymentQuery;
-import org.camunda.bpm.engine.repository.ProcessDefinition;
-import org.camunda.bpm.engine.repository.ProcessDefinitionQuery;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.AbstractXmlApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 
 /**
@@ -46,6 +42,9 @@ public class SpringAutoDeployTest extends PvmTestCase {
 
   protected static final String CTX_CMMN_PATH
     = "org/camunda/bpm/engine/spring/test/autodeployment/SpringAutoDeployCmmnTest-context.xml";
+
+  protected static final String CTX_CMMN_BPMN_TOGETHER_PATH
+      = "org/camunda/bpm/engine/spring/test/autodeployment/SpringAutoDeployCmmnBpmnTest-context.xml";
 
   protected ApplicationContext applicationContext;
   protected RepositoryService repositoryService;
@@ -100,6 +99,16 @@ public class SpringAutoDeployTest extends PvmTestCase {
     List<CaseDefinition> definitions = repositoryService.createCaseDefinitionQuery().list();
 
     assertEquals(1, definitions.size());
+  }
+
+  public void testAutoDeployCmmnAndBpmnTogether() {
+    createAppContext(CTX_CMMN_BPMN_TOGETHER_PATH);
+
+    long caseDefs = repositoryService.createCaseDefinitionQuery().count();
+    long procDefs = repositoryService.createProcessDefinitionQuery().count();
+
+    assertEquals(1, caseDefs);
+    assertEquals(3, procDefs);
   }
 
   // Updating the bpmn20 file should lead to a new deployment when restarting the Spring container
