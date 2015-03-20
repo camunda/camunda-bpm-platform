@@ -17,23 +17,19 @@ import static org.assertj.core.api.Fail.fail;
 import static org.camunda.spin.Spin.XML;
 import static org.camunda.spin.xml.XmlTestConstants.EXAMPLE_VALIDATION_XML;
 import static org.camunda.spin.xml.XmlTestConstants.createExampleOrder;
-import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
-
-import java.io.IOException;
 
 import org.camunda.spin.xml.mapping.NonXmlRootElementType;
 import org.camunda.spin.xml.mapping.Order;
-import org.custommonkey.xmlunit.XMLAssert;
 import org.junit.Test;
-import org.xml.sax.SAXException;
 
 public class XmlDomMapJavaToXmlTest {
 
   @Test
-  public void shouldMapJavaToXml() throws IOException, SAXException {
+  public void shouldMapJavaToXml() {
     Order order = createExampleOrder();
     String orderAsString = XML(order).toString();
-    assertXMLEqual(EXAMPLE_VALIDATION_XML, orderAsString);
+
+    assertThat(orderAsString).isXmlEqualTo(EXAMPLE_VALIDATION_XML);
   }
 
   @Test
