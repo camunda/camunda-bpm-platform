@@ -25,8 +25,6 @@ describe('Cockpit Process Definition Filter Spec', function() {
       // when
       definitionPage.filter.addFilterByVariable('test = 1.5');
 
-      browser.sleep(3000);
-
       // then
       expect(definitionPage.processInstancesTab.table().count()).to.eventually.eql(2);
     });
@@ -36,8 +34,6 @@ describe('Cockpit Process Definition Filter Spec', function() {
 
       // when
       definitionPage.filter.addFilterByVariable('myString = \"abc dfg\"');
-
-      browser.sleep(3000);
 
       // then
       expect(definitionPage.processInstancesTab.table().count()).to.eventually.eql(1);
@@ -63,8 +59,6 @@ describe('Cockpit Process Definition Filter Spec', function() {
       // when
       definitionPage.filter.addFilterByVariable('myString like \"123%\"');
 
-      browser.sleep(3000);
-
       // then
       expect(definitionPage.processInstancesTab.table().count()).to.eventually.eql(1);
       expect(definitionPage.processInstancesTab.instanceBusinessKey(0)).to.eventually.eql('Instance1');
@@ -88,8 +82,6 @@ describe('Cockpit Process Definition Filter Spec', function() {
 
       // when
       definitionPage.filter.addFilterByBusinessKey('myBusinessKey')
-
-      browser.sleep(3000);
 
       // then
       expect(definitionPage.processInstancesTab.table().count()).to.eventually.eql(1);
@@ -145,8 +137,6 @@ describe('Cockpit Process Definition Filter Spec', function() {
       // when
       definitionPage.filter.addFilterByVariable('myDate  =  2011-11-11T11:11:11');
 
-      browser.sleep(3000);
-
       // then
       expect(definitionPage.processInstancesTab.table().count()).to.eventually.eql(1);
       expect(definitionPage.processInstancesTab.instanceBusinessKey(0)).to.eventually.eql('myBusinessKey');
@@ -157,8 +147,6 @@ describe('Cockpit Process Definition Filter Spec', function() {
 
       // when
       definitionPage.filter.addFilterByVariable('extraLong=1234567890987654321');
-
-      browser.sleep(3000);
 
       // then
       expect(definitionPage.processInstancesTab.table().count()).to.eventually.eql(1);

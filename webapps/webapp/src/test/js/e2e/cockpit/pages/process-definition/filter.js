@@ -9,15 +9,23 @@ module.exports = Filter.extend({
   },
 
   addFilterButton: function() {
-    return this.filterSideBarElement().element(by.css('.glyphicon-plus'));
+    return this.filterSideBarElement().all(by.css('.glyphicon-plus')).get(0);
   },
 
   dropdownElement: function() {
-    return this.filterSideBarElement().element(by.css('.dropdown-menu'));
+    return this.filterSideBarElement().all(by.css('.dropdown-menu')).get(0);
+  },
+
+  activitySelection: function(activityName) {
+    return this.filterSideBarElement().element(by.cssContainingText('.activity-filter >.search', activityName));
   },
 
   variableFilters: function() {
     return this.filterSideBarElement().all(by.repeater('variable in filterData.variables'));
+  },
+
+  removeSelectionButton: function(activityName) {
+    return this.activitySelection(activityName).element(by.css('button'));
   },
 
   removeVariableFilter: function(item) {

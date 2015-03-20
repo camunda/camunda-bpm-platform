@@ -29,7 +29,7 @@ describe('Cockpit Process Definition Spec', function() {
 
 
     it('should display the number of running process instances', function() {
-      expect(processPage.diagram.instancesBadgeFor('UserTask_1').getText()).to.eventually.eql('2');
+      expect(processPage.diagram.instancesBadgeFor('UserTask_1').getText()).to.eventually.eql('3');
     });
 
 
@@ -40,7 +40,7 @@ describe('Cockpit Process Definition Spec', function() {
 
       // then
       expect(processPage.diagram.isActivitySelected('UserTask_1')).to.eventually.be.true;
-      expect(processPage.filter.activityFilter('User Task 1').isPresent()).to.eventually.be.true;
+      expect(processPage.filter.activitySelection('User Task 1').isPresent()).to.eventually.be.true;
     });
 
 
@@ -59,7 +59,7 @@ describe('Cockpit Process Definition Spec', function() {
     it('should process clicks in Filter table', function() {
 
       // when
-      processPage.filter.removeFilterButton('User Task 1').click();
+      processPage.filter.removeSelectionButton('User Task 1').click();
 
       // then
       expect(processPage.diagram.isActivitySelected('UserTask_1')).to.eventually.be.false;
