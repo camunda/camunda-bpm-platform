@@ -33,6 +33,7 @@ import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
 import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
 import org.camunda.bpm.engine.impl.persistence.AbstractHistoricManager;
 import org.camunda.bpm.engine.runtime.Job;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
 
 /**
  * Manager for {@link UserOperationLogEntryEventEntity} that also provides a generic and some specific log methods.
@@ -129,6 +130,24 @@ public class UserOperationLogManager extends AbstractHistoricManager {
     }
   }
 
+  public void logProcessInstanceModificationOperation(String operation, String processInstanceId,
+      PropertyChange propertyChange) {
+    if(isHistoryLevelFullEnabled()) {
+      String processDefinitionId = null;
+      String processDefinitionKey = null;
+
+      if(processInstanceId != null) {
+        ProcessInstance processInstance = getProcessInstanceManager().findExecutionById(processInstanceId);
+        processDefinitionId = processInstance.getProcessDefinitionId();
+        processDefinitionKey = getProcessDefinitionManager().findLatestProcessDefinitionById(processDefinitionId).getKey();
+      }
+
+      UserOperationLogContext context = createContextForProcessModification(operation, processInstanceId,
+        processDefinitionId, processDefinitionKey, Arrays.asList(propertyChange));
+
+      logUserOperations(context);
+    }
+  }
   public void logProcessDefinitionOperation(String operation, String processDefinitionId, String processDefinitionKey,
       PropertyChange propertyChange) {
     if (isHistoryLevelFullEnabled()) {
@@ -264,6 +283,12 @@ public class UserOperationLogManager extends AbstractHistoricManager {
 
     return createContext(EntityTypes.PROCESS_INSTANCE, operation, processDefinitionKey,
       processDefinitionId, processInstanceId, null, null, propertyChanges);
+  }
+
+  protected UserOperationLogContext createContextForProcessModification(String operation, String processInstanceId,
+      String processDefinitionId, String processDefinitionKey, List<PropertyChange> propertyChanges) {
+    return createContext(EntityTypes.PROCESS_INSTANCE, operation, processDefinitionKey, processDefinitionId,
+      processInstanceId, null, null, propertyChanges);
   }
 
   protected UserOperationLogContext createContextForJob(String operation, String jobId, String jobDefinitionId,

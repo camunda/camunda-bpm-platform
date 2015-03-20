@@ -13,10 +13,12 @@
 package org.camunda.bpm.engine.impl.cmd;
 
 
+import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.ProcessInstanceModificationBuilderImpl;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 
 /**
  * @author Thorben Lindhauer
@@ -44,8 +46,14 @@ public class ModifyProcessInstanceCmd implements Command<Void> {
       processInstance.deleteCascade("Cancellation due to process instance modification", builder.isSkipCustomListeners(), builder.isSkipIoMappings());
     }
 
+    commandContext.getOperationLogManager().logProcessInstanceModificationOperation(getLogEntryOperation(),
+      processInstanceId, PropertyChange.EMPTY_CHANGE);
+
     return null;
   }
 
 
+  protected String getLogEntryOperation() {
+    return UserOperationLogEntry.OPERATION_TYPE_MODIFY_PROCESS_INSTANCE;
+  }
 }

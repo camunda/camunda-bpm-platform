@@ -16,28 +16,7 @@ import static org.camunda.bpm.engine.EntityTypes.JOB;
 import static org.camunda.bpm.engine.EntityTypes.JOB_DEFINITION;
 import static org.camunda.bpm.engine.EntityTypes.PROCESS_DEFINITION;
 import static org.camunda.bpm.engine.EntityTypes.PROCESS_INSTANCE;
-import static org.camunda.bpm.engine.history.UserOperationLogEntry.ENTITY_TYPE_ATTACHMENT;
-import static org.camunda.bpm.engine.history.UserOperationLogEntry.ENTITY_TYPE_IDENTITY_LINK;
-import static org.camunda.bpm.engine.history.UserOperationLogEntry.ENTITY_TYPE_TASK;
-import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_ACTIVATE;
-import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_ACTIVATE_JOB;
-import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_ACTIVATE_JOB_DEFINITION;
-import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_ACTIVATE_PROCESS_DEFINITION;
-import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_ADD_ATTACHMENT;
-import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_ADD_GROUP_LINK;
-import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_ADD_USER_LINK;
-import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_CREATE;
-import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_DELETE;
-import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_DELETE_ATTACHMENT;
-import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_DELETE_GROUP_LINK;
-import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_DELETE_USER_LINK;
-import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_SET_JOB_RETRIES;
-import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_SET_PRIORITY;
-import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_SUSPEND;
-import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_SUSPEND_JOB;
-import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_SUSPEND_JOB_DEFINITION;
-import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_SUSPEND_PROCESS_DEFINITION;
-import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_UPDATE;
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.*;
 import static org.camunda.bpm.engine.impl.persistence.entity.TaskEntity.ASSIGNEE;
 import static org.camunda.bpm.engine.impl.persistence.entity.TaskEntity.OWNER;
 
@@ -70,6 +49,9 @@ import org.camunda.bpm.engine.test.Deployment;
  */
 public class OperationLogQueryTest extends PluggableProcessEngineTestCase {
 
+  protected static final String ONE_TASK_PROCESS = "org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml";
+  protected static final String ONE_TASK_CASE = "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn";
+
   private ProcessInstance process;
   private Task userTask;
   private Execution execution;
@@ -80,7 +62,7 @@ public class OperationLogQueryTest extends PluggableProcessEngineTestCase {
   private Date tomorrow = new Date(((ClockUtil.getCurrentTime().getTime() + 86400000) / 1000) * 1000);
   private Date yesterday = new Date(((ClockUtil.getCurrentTime().getTime() - 86400000) / 1000) * 1000);
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = {ONE_TASK_PROCESS})
   public void testQuery() {
     createLogEntries();
 
@@ -169,7 +151,7 @@ public class OperationLogQueryTest extends PluggableProcessEngineTestCase {
     });
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = {ONE_TASK_PROCESS})
   public void testQueryWithBackwardCompatibility() {
     createLogEntries();
 
@@ -253,7 +235,7 @@ public class OperationLogQueryTest extends PluggableProcessEngineTestCase {
     taskService.complete(userTask.getId());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = {ONE_TASK_PROCESS})
   public void testQueryProcessInstanceOperationsById() {
     // given
     process = runtimeService.startProcessInstanceByKey("oneTaskProcess");
@@ -309,7 +291,7 @@ public class OperationLogQueryTest extends PluggableProcessEngineTestCase {
     assertNull(activateEntry.getOrgValue());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = {ONE_TASK_PROCESS})
   public void testQueryProcessInstanceOperationsByProcessDefinitionId() {
     // given
     process = runtimeService.startProcessInstanceByKey("oneTaskProcess");
@@ -352,7 +334,7 @@ public class OperationLogQueryTest extends PluggableProcessEngineTestCase {
     assertNull(activateEntry.getOrgValue());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = {ONE_TASK_PROCESS})
   public void testQueryProcessInstanceOperationsByProcessDefinitionKey() {
     // given
     process = runtimeService.startProcessInstanceByKey("oneTaskProcess");
@@ -400,7 +382,7 @@ public class OperationLogQueryTest extends PluggableProcessEngineTestCase {
   /**
    * CAM-1930: add assertions for additional op log entries here
    */
-  @Deployment(resources = {"org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = {ONE_TASK_PROCESS})
   public void testQueryProcessDefinitionOperationsById() {
     // given
     process = runtimeService.startProcessInstanceByKey("oneTaskProcess");
@@ -446,7 +428,7 @@ public class OperationLogQueryTest extends PluggableProcessEngineTestCase {
   /**
    * CAM-1930: add assertions for additional op log entries here
    */
-  @Deployment(resources = {"org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = {ONE_TASK_PROCESS})
   public void testQueryProcessDefinitionOperationsByKey() {
     // given
     process = runtimeService.startProcessInstanceByKey("oneTaskProcess");
@@ -590,7 +572,7 @@ public class OperationLogQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(job.getProcessDefinitionId(), jobRetryEntry.getProcessDefinitionId());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = {ONE_TASK_PROCESS})
   public void testQueryJobDefinitionOperationWithDelayedJobDefinition() {
     // given
     // a running process instance
@@ -704,9 +686,34 @@ public class OperationLogQueryTest extends PluggableProcessEngineTestCase {
     TestHelper.clearOpLog(processEngineConfiguration);
   }
 
+  // ----- PROCESS INSTANCE MODIFICATION -----
+
+  @Deployment(resources = {ONE_TASK_PROCESS})
+  public void testQueryProcessInstanceModificationOperation() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    String processInstanceId = processInstance.getId();
+
+    runtimeService
+      .createProcessInstanceModification(processInstance.getId())
+      .startBeforeActivity("theTask")
+      .execute();
+
+    UserOperationLogQuery logQuery = query()
+      .entityType(EntityTypes.PROCESS_INSTANCE)
+      .operationType(UserOperationLogEntry.OPERATION_TYPE_MODIFY_PROCESS_INSTANCE);
+
+    assertEquals(1, logQuery.count());
+    UserOperationLogEntry logEntry = logQuery.singleResult();
+
+    assertEquals(processInstanceId, logEntry.getProcessInstanceId());
+    assertEquals(processInstance.getProcessDefinitionId(), logEntry.getProcessDefinitionId());
+    assertNull(logEntry.getNewValue());
+    assertEquals(UserOperationLogEntry.OPERATION_TYPE_MODIFY_PROCESS_INSTANCE, logEntry.getOperationType());
+  }
+
   // ----- ADD VARIABLES -----
 
-  @Deployment(resources = { "org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml" })
+  @Deployment(resources = {ONE_TASK_PROCESS})
   public void testQueryAddExecutionVariableOperation() {
     // given
     process = runtimeService.startProcessInstanceByKey("oneTaskProcess");
@@ -718,7 +725,7 @@ public class OperationLogQueryTest extends PluggableProcessEngineTestCase {
     verifyVariableOperationAsserts(1, UserOperationLogEntry.OPERATION_TYPE_SET_EXECUTION_VARIABLE);
   }
 
-  @Deployment(resources = { "org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml" })
+  @Deployment(resources = {ONE_TASK_PROCESS})
   public void testQueryAddExecutionVariablesMapOperation() {
     // given
     process = runtimeService.startProcessInstanceByKey("oneTaskProcess");
@@ -730,7 +737,7 @@ public class OperationLogQueryTest extends PluggableProcessEngineTestCase {
     verifyVariableOperationAsserts(1, UserOperationLogEntry.OPERATION_TYPE_SET_EXECUTION_VARIABLE);
   }
 
-  @Deployment(resources = { "org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml" })
+  @Deployment(resources = {ONE_TASK_PROCESS})
   public void testQueryAddExecutionVariablesSingleAndMapOperation() {
     // given
     process = runtimeService.startProcessInstanceByKey("oneTaskProcess");
@@ -744,7 +751,7 @@ public class OperationLogQueryTest extends PluggableProcessEngineTestCase {
     verifyVariableOperationAsserts(3, UserOperationLogEntry.OPERATION_TYPE_SET_EXECUTION_VARIABLE);
   }
 
-  @Deployment(resources = { "org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml" })
+  @Deployment(resources = {ONE_TASK_PROCESS})
   public void testQueryAddTaskVariableOperation() {
     // given
     process = runtimeService.startProcessInstanceByKey("oneTaskProcess");
@@ -757,7 +764,7 @@ public class OperationLogQueryTest extends PluggableProcessEngineTestCase {
     verifyVariableOperationAsserts(1, UserOperationLogEntry.OPERATION_TYPE_SET_TASK_VARIABLE);
   }
 
-  @Deployment(resources = { "org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml" })
+  @Deployment(resources = {ONE_TASK_PROCESS})
   public void testQueryAddTaskVariablesMapOperation() {
     // given
     process = runtimeService.startProcessInstanceByKey("oneTaskProcess");
@@ -770,7 +777,7 @@ public class OperationLogQueryTest extends PluggableProcessEngineTestCase {
     verifyVariableOperationAsserts(1, UserOperationLogEntry.OPERATION_TYPE_SET_TASK_VARIABLE);
   }
 
-  @Deployment(resources = { "org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml" })
+  @Deployment(resources = {ONE_TASK_PROCESS})
   public void testQueryAddTaskVariablesSingleAndMapOperation() {
     // given
     process = runtimeService.startProcessInstanceByKey("oneTaskProcess");
@@ -787,7 +794,7 @@ public class OperationLogQueryTest extends PluggableProcessEngineTestCase {
 
   // ----- PATCH VARIABLES -----
 
-  @Deployment(resources = { "org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml" })
+  @Deployment(resources = {ONE_TASK_PROCESS})
   public void testQueryPatchExecutionVariablesOperation() {
     // given
     process = runtimeService.startProcessInstanceByKey("oneTaskProcess");
@@ -800,7 +807,7 @@ public class OperationLogQueryTest extends PluggableProcessEngineTestCase {
    verifyVariableOperationAsserts(1, UserOperationLogEntry.OPERATION_TYPE_PATCH_EXECUTION_VARIABLE);
   }
 
-  @Deployment(resources = { "org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml" })
+  @Deployment(resources = {ONE_TASK_PROCESS})
   public void testQueryPatchTaskVariablesOperation() {
     // given
     process = runtimeService.startProcessInstanceByKey("oneTaskProcess");
@@ -816,7 +823,7 @@ public class OperationLogQueryTest extends PluggableProcessEngineTestCase {
 
   // ----- REMOVE VARIABLES -----
 
-  @Deployment(resources = { "org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml" })
+  @Deployment(resources = {ONE_TASK_PROCESS})
   public void testQueryRemoveExecutionVariableOperation() {
     // given
     process = runtimeService.startProcessInstanceByKey("oneTaskProcess");
@@ -828,7 +835,7 @@ public class OperationLogQueryTest extends PluggableProcessEngineTestCase {
     verifyVariableOperationAsserts(1, UserOperationLogEntry.OPERATION_TYPE_REMOVE_EXECUTION_VARIABLE);
   }
 
-  @Deployment(resources = { "org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml" })
+  @Deployment(resources = {ONE_TASK_PROCESS})
   public void testQueryRemoveExecutionVariablesMapOperation() {
     // given
     process = runtimeService.startProcessInstanceByKey("oneTaskProcess");
@@ -840,7 +847,7 @@ public class OperationLogQueryTest extends PluggableProcessEngineTestCase {
     verifyVariableOperationAsserts(1, UserOperationLogEntry.OPERATION_TYPE_REMOVE_EXECUTION_VARIABLE);
   }
 
-  @Deployment(resources = { "org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml" })
+  @Deployment(resources = {ONE_TASK_PROCESS})
   public void testQueryRemoveExecutionVariablesSingleAndMapOperation() {
     // given
     process = runtimeService.startProcessInstanceByKey("oneTaskProcess");
@@ -854,7 +861,7 @@ public class OperationLogQueryTest extends PluggableProcessEngineTestCase {
     verifyVariableOperationAsserts(3, UserOperationLogEntry.OPERATION_TYPE_REMOVE_EXECUTION_VARIABLE);
   }
 
-  @Deployment(resources = { "org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml" })
+  @Deployment(resources = {ONE_TASK_PROCESS})
   public void testQueryRemoveTaskVariableOperation() {
     // given
     process = runtimeService.startProcessInstanceByKey("oneTaskProcess");
@@ -867,7 +874,7 @@ public class OperationLogQueryTest extends PluggableProcessEngineTestCase {
     verifyVariableOperationAsserts(1, UserOperationLogEntry.OPERATION_TYPE_REMOVE_TASK_VARIABLE);
   }
 
-  @Deployment(resources = { "org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml" })
+  @Deployment(resources = {ONE_TASK_PROCESS})
   public void testQueryRemoveTaskVariablesMapOperation() {
     // given
     process = runtimeService.startProcessInstanceByKey("oneTaskProcess");
@@ -880,7 +887,7 @@ public class OperationLogQueryTest extends PluggableProcessEngineTestCase {
     verifyVariableOperationAsserts(1, UserOperationLogEntry.OPERATION_TYPE_REMOVE_TASK_VARIABLE);
   }
 
-  @Deployment(resources = { "org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml" })
+  @Deployment(resources = {ONE_TASK_PROCESS})
   public void testQueryRemoveTaskVariablesSingleAndMapOperation() {
     // given
     process = runtimeService.startProcessInstanceByKey("oneTaskProcess");
@@ -897,7 +904,7 @@ public class OperationLogQueryTest extends PluggableProcessEngineTestCase {
 
   // --------------- CMMN --------------------
 
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Deployment(resources={ONE_TASK_CASE})
   public void testQueryByCaseDefinitionId() {
     // given:
     // a deployed case definition
@@ -937,7 +944,7 @@ public class OperationLogQueryTest extends PluggableProcessEngineTestCase {
     verifyQueryResults(query, 1);
   }
 
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Deployment(resources={ONE_TASK_CASE})
   public void testQueryByCaseInstanceId() {
     // given:
     // a deployed case definition
@@ -978,7 +985,7 @@ public class OperationLogQueryTest extends PluggableProcessEngineTestCase {
     verifyQueryResults(query, 1);
   }
 
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Deployment(resources={ONE_TASK_CASE})
   public void testQueryByCaseExecutionId() {
     // given:
     // a deployed case definition
