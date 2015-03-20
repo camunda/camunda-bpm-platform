@@ -74,7 +74,6 @@ module.exports = Base.extend({
 
   // criteria
   addCriterionButton: function() {
-    this.waitForElementToBePresent('[ng-click="addCriterion()"]', 2000);
     return this.formElement().element(by.css('[ng-click="addCriterion()"]'));
   },
 

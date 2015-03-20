@@ -198,6 +198,9 @@ describe('Tasklist Filter Spec', function() {
 
       it('should add process-definition-key criteria', function() {
 
+        // given
+        expect(dashboardPage.taskFilters.editFilterPage.addCriterionButton().isPresent()).to.eventually.be.true;
+
         // when
         dashboardPage.taskFilters.editFilterPage.addCriteria('Process definition', 'Key', 'user-tasks');
         dashboardPage.taskFilters.editFilterPage.saveButton().click();
@@ -210,6 +213,9 @@ describe('Tasklist Filter Spec', function() {
 
       it('should add Business Key Like criteria', function() {
 
+        // given
+        expect(dashboardPage.taskFilters.editFilterPage.addCriterionButton().isPresent()).to.eventually.be.true;
+
         // when
         dashboardPage.taskFilters.editFilterPage.addCriteria('Process Instance', 'Business Key Like', 'myBus');
         dashboardPage.taskFilters.editFilterPage.saveButton().click();
@@ -221,6 +227,9 @@ describe('Tasklist Filter Spec', function() {
 
       it('should remove process-definition-key criteria', function() {
 
+        // given
+        expect(dashboardPage.taskFilters.editFilterPage.addCriterionButton().isPresent()).to.eventually.be.true;
+
         // when
         dashboardPage.taskFilters.editFilterPage.removeCriterionButton(0).click();
         dashboardPage.taskFilters.editFilterPage.saveButton().click();
@@ -231,6 +240,9 @@ describe('Tasklist Filter Spec', function() {
 
 
       it('should change first criteria to Assignee Like', function() {
+
+        // given
+        expect(dashboardPage.taskFilters.editFilterPage.addCriterionButton().isPresent()).to.eventually.be.true;
 
         // when
         dashboardPage.taskFilters.editFilterPage.selectCriterionKey(0, 'User / Group', 'Assignee Like *');

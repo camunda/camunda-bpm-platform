@@ -76,16 +76,11 @@ module.exports = Page.extend({
   },
 
   editFilter: function(item) {
+    var self = this;
 
-    browser.sleep(1000);
-
-    browser.actions().mouseMove(this.filterNameElement(item)).perform();
-
-    browser.sleep(1000);
-
-    var editFilterElement = this.filterList().get(item).element(by.css('[ng-click="openModal($event, filter)"]'));
-    editFilterElement.click();
-    return editFilterElement;
+    browser.actions().mouseMove(this.filterNameElement(item)).perform().then(function() {
+      self.filterList().get(item).element(by.css('[ng-click="openModal($event, filter)"]')).click();
+    });
   }
 
 });
