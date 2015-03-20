@@ -46,8 +46,7 @@ public class ModifyProcessInstanceCmd implements Command<Void> {
       processInstance.deleteCascade("Cancellation due to process instance modification", builder.isSkipCustomListeners(), builder.isSkipIoMappings());
     }
 
-    commandContext.getOperationLogManager().logProcessInstanceModificationOperation(getLogEntryOperation(),
-      processInstanceId, PropertyChange.EMPTY_CHANGE);
+    commandContext.getOperationLogManager().logProcessInstanceOperation(getLogEntryOperation(), processInstanceId, null, null, PropertyChange.EMPTY_CHANGE);
 
     return null;
   }

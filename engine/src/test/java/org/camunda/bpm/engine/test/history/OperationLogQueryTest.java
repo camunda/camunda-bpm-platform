@@ -16,11 +16,37 @@ import static org.camunda.bpm.engine.EntityTypes.JOB;
 import static org.camunda.bpm.engine.EntityTypes.JOB_DEFINITION;
 import static org.camunda.bpm.engine.EntityTypes.PROCESS_DEFINITION;
 import static org.camunda.bpm.engine.EntityTypes.PROCESS_INSTANCE;
-import static org.camunda.bpm.engine.history.UserOperationLogEntry.*;
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.ENTITY_TYPE_ATTACHMENT;
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.ENTITY_TYPE_IDENTITY_LINK;
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.ENTITY_TYPE_TASK;
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_ACTIVATE;
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_ACTIVATE_JOB;
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_ACTIVATE_JOB_DEFINITION;
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_ACTIVATE_PROCESS_DEFINITION;
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_ADD_ATTACHMENT;
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_ADD_GROUP_LINK;
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_ADD_USER_LINK;
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_CREATE;
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_DELETE;
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_DELETE_ATTACHMENT;
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_DELETE_GROUP_LINK;
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_DELETE_USER_LINK;
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_SET_JOB_RETRIES;
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_SET_PRIORITY;
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_SUSPEND;
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_SUSPEND_JOB;
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_SUSPEND_JOB_DEFINITION;
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_SUSPEND_PROCESS_DEFINITION;
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_UPDATE;
 import static org.camunda.bpm.engine.impl.persistence.entity.TaskEntity.ASSIGNEE;
 import static org.camunda.bpm.engine.impl.persistence.entity.TaskEntity.OWNER;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.camunda.bpm.engine.EntityTypes;
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -36,6 +62,7 @@ import org.camunda.bpm.engine.impl.jobexecutor.TimerSuspendProcessDefinitionHand
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.test.TestHelper;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
+import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.JobQuery;
@@ -693,6 +720,8 @@ public class OperationLogQueryTest extends PluggableProcessEngineTestCase {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
     String processInstanceId = processInstance.getId();
 
+    ProcessDefinition definition = repositoryService.createProcessDefinitionQuery().singleResult();
+
     runtimeService
       .createProcessInstanceModification(processInstance.getId())
       .startBeforeActivity("theTask")
@@ -707,8 +736,12 @@ public class OperationLogQueryTest extends PluggableProcessEngineTestCase {
 
     assertEquals(processInstanceId, logEntry.getProcessInstanceId());
     assertEquals(processInstance.getProcessDefinitionId(), logEntry.getProcessDefinitionId());
-    assertNull(logEntry.getNewValue());
+    assertEquals(definition.getKey(), logEntry.getProcessDefinitionKey());
     assertEquals(UserOperationLogEntry.OPERATION_TYPE_MODIFY_PROCESS_INSTANCE, logEntry.getOperationType());
+    assertEquals(EntityTypes.PROCESS_INSTANCE, logEntry.getEntityType());
+    assertNull(logEntry.getProperty());
+    assertNull(logEntry.getOrgValue());
+    assertNull(logEntry.getNewValue());
   }
 
   // ----- ADD VARIABLES -----
