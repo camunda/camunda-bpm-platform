@@ -61,6 +61,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   protected String candidateUser;
   protected String candidateGroup;
   protected List<String> candidateGroups;
+  protected Boolean candidateAssignedAndNotAssigned = false;
   protected String processInstanceId;
   protected String executionId;
   protected String[] activityInstanceIdIn;
@@ -312,6 +313,16 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
     }
 
     expressions.put("taskCandidateGroupIn", candidateGroupsExpression);
+    return this;
+  }
+
+  public TaskQuery taskCandidateAssignedAndNotAssigned() {
+    if (candidateUser == null && candidateGroup == null && candidateGroups == null && !expressions.containsKey("taskCandidateUser")
+        && !expressions.containsKey("taskCandidateGroup") && !expressions.containsKey("taskCandidateGroupIn")) {
+      throw new ProcessEngineException("Invalud query usage: candidateUser, candidateGroup, candidateGroups or candidateGroupIn must be set prviously.");
+    }
+
+    candidateAssignedAndNotAssigned = true;
     return this;
   }
 
@@ -924,6 +935,10 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
 
   public String getCandidateGroup() {
     return candidateGroup;
+  }
+  
+  public Boolean isCandidateAssignedAndNotAssigned(){
+    return candidateAssignedAndNotAssigned;
   }
 
   public String getProcessInstanceId() {
