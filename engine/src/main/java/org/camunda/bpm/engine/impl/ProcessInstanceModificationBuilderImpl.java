@@ -22,7 +22,7 @@ import org.camunda.bpm.engine.impl.cmd.AbstractProcessInstanceModificationComman
 import org.camunda.bpm.engine.impl.cmd.ActivityAfterInstantiationCmd;
 import org.camunda.bpm.engine.impl.cmd.ActivityCancellationCmd;
 import org.camunda.bpm.engine.impl.cmd.ActivityInstanceCancellationCmd;
-import org.camunda.bpm.engine.impl.cmd.ActivityInstantiationCmd;
+import org.camunda.bpm.engine.impl.cmd.ActivityBeforeInstantiationCmd;
 import org.camunda.bpm.engine.impl.cmd.ModifyProcessInstanceCmd;
 import org.camunda.bpm.engine.impl.cmd.TransitionInstantiationCmd;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -75,7 +75,7 @@ public class ProcessInstanceModificationBuilderImpl implements ProcessInstanceMo
 
   public ProcessInstanceActivityInstantiationBuilder startBeforeActivity(String activityId) {
     ensureNotNull("activityId", activityId);
-    AbstractInstantiationCmd currentInstantiation = new ActivityInstantiationCmd(processInstanceId, activityId);
+    AbstractInstantiationCmd currentInstantiation = new ActivityBeforeInstantiationCmd(processInstanceId, activityId);
     operations.add(currentInstantiation);
     return new ProcessInstanceActivityInstantiationBuilderImpl(this, currentInstantiation);
   }
@@ -83,7 +83,7 @@ public class ProcessInstanceModificationBuilderImpl implements ProcessInstanceMo
   public ProcessInstanceActivityInstantiationBuilder startBeforeActivity(String activityId, String ancestorActivityInstanceId) {
     ensureNotNull("activityId", activityId);
     ensureNotNull("ancestorActivityInstanceId", ancestorActivityInstanceId);
-    AbstractInstantiationCmd currentInstantiation = new ActivityInstantiationCmd(processInstanceId, activityId, ancestorActivityInstanceId);
+    AbstractInstantiationCmd currentInstantiation = new ActivityBeforeInstantiationCmd(processInstanceId, activityId, ancestorActivityInstanceId);
     operations.add(currentInstantiation);
     return new ProcessInstanceActivityInstantiationBuilderImpl(this, currentInstantiation);
   }

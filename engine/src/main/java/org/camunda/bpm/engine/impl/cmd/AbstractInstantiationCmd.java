@@ -216,27 +216,27 @@ public abstract class AbstractInstantiationCmd extends AbstractProcessInstanceMo
         if (scopeToCancel == topMostActivity.getFlowScope()) {
           // perform interruption
           interruptedExecution.cancelScope("Interrupting event sub process "+ topMostActivity + " fired.", skipCustomListeners, skipIoMappings);
-          instantiate(scopeExecution, activitiesToInstantiate);
+          instantiate(scopeExecution, activitiesToInstantiate, elementToInstantiate);
         }
         else {
           // perform cancellation
           scopeExecution.cancelScope("Cancel scope activity " + topMostActivity + " executed.", skipCustomListeners, skipIoMappings);
-          instantiate(scopeExecution, activitiesToInstantiate);
+          instantiate(scopeExecution, activitiesToInstantiate, elementToInstantiate);
         }
       }
       else {
         // if there is nothing to cancel, the activity can simply be instantiated.
-        instantiateConcurrent(scopeExecution, activitiesToInstantiate);
+        instantiateConcurrent(scopeExecution, activitiesToInstantiate, elementToInstantiate);
       }
     }
     else {
       if (scopeExecution.getExecutions().isEmpty() && scopeExecution.getActivity() == null) {
         // reuse the scope execution
-        instantiate(scopeExecution, activitiesToInstantiate);
+        instantiate(scopeExecution, activitiesToInstantiate, elementToInstantiate);
       } else {
         // if the activity is not cancelling/interrupting, it can simply be instantiated as
         // a concurrent child of the scopeExecution
-        instantiateConcurrent(scopeExecution, activitiesToInstantiate);
+        instantiateConcurrent(scopeExecution, activitiesToInstantiate, elementToInstantiate);
       }
 
     }
@@ -244,9 +244,7 @@ public abstract class AbstractInstantiationCmd extends AbstractProcessInstanceMo
     return null;
   }
 
-  protected void instantiate(ExecutionEntity ancestorScopeExecution, List<PvmActivity> parentFlowScopes) {
-    CoreModelElement targetElement = getTargetElement(ancestorScopeExecution.getProcessDefinition());
-
+  protected void instantiate(ExecutionEntity ancestorScopeExecution, List<PvmActivity> parentFlowScopes, CoreModelElement targetElement) {
     if (PvmTransition.class.isAssignableFrom(targetElement.getClass())) {
       ancestorScopeExecution.executeActivities(parentFlowScopes, null, (PvmTransition) targetElement, variables, variablesLocal,
           skipCustomListeners, skipIoMappings);
@@ -262,9 +260,7 @@ public abstract class AbstractInstantiationCmd extends AbstractProcessInstanceMo
   }
 
 
-  protected void instantiateConcurrent(ExecutionEntity ancestorScopeExecution, List<PvmActivity> parentFlowScopes) {
-    CoreModelElement targetElement = getTargetElement(ancestorScopeExecution.getProcessDefinition());
-
+  protected void instantiateConcurrent(ExecutionEntity ancestorScopeExecution, List<PvmActivity> parentFlowScopes, CoreModelElement targetElement) {
     if (PvmTransition.class.isAssignableFrom(targetElement.getClass())) {
       ancestorScopeExecution.executeActivitiesConcurrent(parentFlowScopes, null, (PvmTransition) targetElement, variables,
           variablesLocal, skipCustomListeners, skipIoMappings);

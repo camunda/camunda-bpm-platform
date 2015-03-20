@@ -21,15 +21,15 @@ import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
  * @author Thorben Lindhauer
  *
  */
-public class ActivityInstantiationCmd extends AbstractInstantiationCmd {
+public class ActivityBeforeInstantiationCmd extends AbstractInstantiationCmd {
 
   protected String activityId;
 
-  public ActivityInstantiationCmd(String processInstanceId, String activityId) {
+  public ActivityBeforeInstantiationCmd(String processInstanceId, String activityId) {
     this(processInstanceId, activityId, null);
   }
 
-  public ActivityInstantiationCmd(String processInstanceId, String activityId,
+  public ActivityBeforeInstantiationCmd(String processInstanceId, String activityId,
       String ancestorActivityInstanceId) {
     super(processInstanceId, ancestorActivityInstanceId);
     this.activityId = activityId;
