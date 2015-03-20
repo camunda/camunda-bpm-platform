@@ -120,7 +120,7 @@ public abstract class AbstractRestServiceTest {
     TransitionInstanceImpl childTransition = new TransitionInstanceImpl();
     childTransition.setId(CHILD_EXAMPLE_ACTIVITY_INSTANCE_ID);
     childTransition.setParentActivityInstanceId(CHILD_EXAMPLE_PARENT_ACTIVITY_INSTANCE_ID);
-    childTransition.setTargetActivityId(CHILD_EXAMPLE_ACTIVITY_ID);
+    childTransition.setActivityId(CHILD_EXAMPLE_ACTIVITY_ID);
     childTransition.setProcessInstanceId(CHILD_EXAMPLE_PROCESS_INSTANCE_ID);
     childTransition.setProcessDefinitionId(CHILD_EXAMPLE_PROCESS_DEFINITION_ID);
     childTransition.setExecutionId(EXAMPLE_EXECUTION_ID);

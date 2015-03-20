@@ -24,7 +24,6 @@ public class TransitionInstanceDto {
   protected String parentActivityInstanceId;
   protected String processInstanceId;
   protected String processDefinitionId;
-  protected String targetActivityId;
   protected String activityId;
   protected String executionId;
 
@@ -42,7 +41,7 @@ public class TransitionInstanceDto {
   }
   @Deprecated
   public String getTargetActivityId() {
-    return targetActivityId;
+    return activityId;
   }
   public String getActivityId() {
     return activityId;
@@ -55,7 +54,6 @@ public class TransitionInstanceDto {
     TransitionInstanceDto result = new TransitionInstanceDto();
     result.id = instance.getId();
     result.parentActivityInstanceId = instance.getParentActivityInstanceId();
-    result.targetActivityId = instance.getTargetActivityId();
     result.activityId = instance.getActivityId();
     result.processInstanceId = instance.getProcessInstanceId();
     result.processDefinitionId = instance.getProcessDefinitionId();
