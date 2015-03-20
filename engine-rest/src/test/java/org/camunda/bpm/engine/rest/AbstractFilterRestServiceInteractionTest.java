@@ -334,6 +334,7 @@ public abstract class AbstractFilterRestServiceInteractionTest extends AbstractR
       .statusCode(Status.OK.getStatusCode())
       .body("query.candidateGroup", equalTo("abc"))
       .body("query.containsKey('candidateGroups')", is(false))
+      .body("query.includeAssignedTasks", is(false))
     .when()
       .get(SINGLE_FILTER_URL);
   }
@@ -351,7 +352,26 @@ public abstract class AbstractFilterRestServiceInteractionTest extends AbstractR
       .statusCode(Status.OK.getStatusCode())
       .body("query.candidateUser", equalTo("abc"))
       .body("query.containsKey('candidateGroups')", is(false))
+      .body("query.includeAssignedTasks", is(false))
   .when()
+      .get(SINGLE_FILTER_URL);
+  }
+
+  @Test
+  public void testGetFilterWithCandidateIncludeAssignedTasks() {
+    TaskQueryImpl query = new TaskQueryImpl();
+    query.taskCandidateUser("abc").includeAssignedTasks();
+    Filter filter = new FilterEntity("Task").setName("test").setQuery(query);
+    when(filterServiceMock.getFilter(EXAMPLE_FILTER_ID)).thenReturn(filter);
+
+    given()
+      .pathParam("id", EXAMPLE_FILTER_ID)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+      .body("query.candidateUser", equalTo("abc"))
+      .body("query.containsKey('candidateGroups')", is(false))
+      .body("query.includeAssignedTasks", is(true))
+    .when()
       .get(SINGLE_FILTER_URL);
   }
 

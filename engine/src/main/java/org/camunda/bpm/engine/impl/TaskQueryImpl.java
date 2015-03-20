@@ -62,6 +62,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   protected String candidateUser;
   protected String candidateGroup;
   protected List<String> candidateGroups;
+  protected boolean includeAssignedTasks = false;
   protected String processInstanceId;
   protected String executionId;
   protected String[] activityInstanceIdIn;
@@ -318,6 +319,17 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
     }
 
     expressions.put("taskCandidateGroupIn", candidateGroupsExpression);
+    return this;
+  }
+
+  public TaskQuery includeAssignedTasks() {
+    if (candidateUser == null && candidateGroup == null && candidateGroups == null
+        && !expressions.containsKey("taskCandidateUser") && !expressions.containsKey("taskCandidateGroup")
+        && !expressions.containsKey("taskCandidateGroupIn")) {
+      throw new ProcessEngineException("Invalid query usage: candidateUser, candidateGroup, candidateGroupIn has to be called before 'includeAssignedTasks'.");
+    }
+
+    includeAssignedTasks = true;
     return this;
   }
 
@@ -947,6 +959,10 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
     return candidateGroup;
   }
 
+  public boolean isIncludeAssignedTasks(){
+    return includeAssignedTasks;
+  }
+
   public String getProcessInstanceId() {
     return processInstanceId;
   }
@@ -1195,6 +1211,10 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
     }
     else if (this.getCandidateGroupsInternal() != null) {
       extendedQuery.taskCandidateGroupIn(this.getCandidateGroupsInternal());
+    }
+
+    if (extendingQuery.isIncludeAssignedTasks() || this.isIncludeAssignedTasks()) {
+      extendedQuery.includeAssignedTasks();
     }
 
     if (extendingQuery.getProcessInstanceId() != null) {

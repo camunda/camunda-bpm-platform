@@ -118,6 +118,7 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
   private String candidateGroupExpression;
   private String candidateUser;
   private String candidateUserExpression;
+  private Boolean includeAssignedTasks;
   private String taskDefinitionKey;
   private String[] taskDefinitionKeyIn;
   private String taskDefinitionKeyLike;
@@ -277,6 +278,11 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
   @CamundaQueryParam("candidateUserExpression")
   public void setCandidateUserExpression(String candidateUserExpression) {
     this.candidateUserExpression = candidateUserExpression;
+  }
+
+  @CamundaQueryParam(value = "includeAssignedTasks", converter = BooleanConverter.class)
+  public void setIncludeAssignedTasks(Boolean includeAssignedTasks){
+    this.includeAssignedTasks = includeAssignedTasks;
   }
 
   @CamundaQueryParam("taskDefinitionKey")
@@ -623,6 +629,10 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
 
   public String getCandidateUserExpression() {
     return candidateUserExpression;
+  }
+
+  public Boolean getIncludeAssignedTasks(){
+    return includeAssignedTasks;
   }
 
   public String[] getTaskDefinitionKeyIn() {
@@ -1011,10 +1021,13 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     if (candidateGroupsExpression != null) {
       query.taskCandidateGroupInExpression(candidateGroupsExpression);
     }
-    if (active != null && active == true) {
+    if (includeAssignedTasks != null && includeAssignedTasks){
+      query.includeAssignedTasks();
+    }
+    if (active != null && active) {
       query.active();
     }
-    if (suspended != null && suspended == true) {
+    if (suspended != null && suspended) {
       query.suspended();
     }
     if (caseDefinitionId != null) {
@@ -1222,6 +1235,7 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     dto.candidateUser = taskQuery.getCandidateUser();
     dto.candidateGroup = taskQuery.getCandidateGroup();
     dto.candidateGroups = taskQuery.getCandidateGroupsInternal();
+    dto.includeAssignedTasks = taskQuery.isIncludeAssignedTasks();
 
     dto.processInstanceBusinessKey = taskQuery.getProcessInstanceBusinessKey();
     dto.processInstanceBusinessKeyLike = taskQuery.getProcessInstanceBusinessKeyLike();

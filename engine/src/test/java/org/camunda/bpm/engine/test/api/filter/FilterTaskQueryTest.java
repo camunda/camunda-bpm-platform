@@ -462,6 +462,18 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(testGroup.getId(), query.getExpressions().get("taskCandidateGroup"));
   }
 
+  public void testTaskQueryCandidateIncludeAssignedTasks() {
+    TaskQueryImpl query = new TaskQueryImpl();
+    query.taskCandidateUser(testUser.getId());
+    query.includeAssignedTasks();
+
+    filter.setQuery(query);
+    query = filter.getQuery();
+
+    assertEquals(testUser.getId(), query.getCandidateUser());
+    assertTrue(query.isIncludeAssignedTasks());
+  }
+
   public void testExecuteTaskQueryList() {
     TaskQuery query = taskService.createTaskQuery();
     query.taskNameLike("Task%");
@@ -521,6 +533,26 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
 
     tasks = filterService.list(filter.getId(), extendingQuery);
     assertEquals(1, tasks.size());
+  }
+
+  public void testExtendingTaskQueryListWithIncludeAssignedTasks() {
+    TaskQuery query = taskService.createTaskQuery();
+
+    query.taskCandidateGroup("accounting");
+
+    saveQuery(query);
+
+    List<Task> tasks = filterService.list(filter.getId());
+    assertEquals(1, tasks.size());
+
+    TaskQuery extendingQuery = taskService.createTaskQuery();
+
+    extendingQuery
+      .taskCandidateGroup("accounting")
+      .includeAssignedTasks();
+
+    tasks = filterService.list(filter.getId(), extendingQuery);
+    assertEquals(2, tasks.size());
   }
 
   public void testExecuteTaskQueryListPage() {
@@ -802,7 +834,7 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(TaskQueryProperty.NAME_CASE_INSENSITIVE.getName(),
         orderingProperty.getQueryProperty().getName());
     assertEquals(TaskQueryProperty.NAME_CASE_INSENSITIVE.getFunction(),
-        orderingProperty.getQueryProperty().getFunction());
+      orderingProperty.getQueryProperty().getFunction());
   }
 
 
@@ -891,11 +923,11 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
   public void testExtendTaskQueryByOrderByProcessVariable() {
     ProcessInstance instance500 = runtimeService.startProcessInstanceByKey("oneTaskProcess",
-        Variables.createVariables().putValue("var", 500));
+      Variables.createVariables().putValue("var", 500));
     ProcessInstance instance1000 = runtimeService.startProcessInstanceByKey("oneTaskProcess",
-        Variables.createVariables().putValue("var", 1000));
+      Variables.createVariables().putValue("var", 1000));
     ProcessInstance instance250 = runtimeService.startProcessInstanceByKey("oneTaskProcess",
-        Variables.createVariables().putValue("var", 250));
+      Variables.createVariables().putValue("var", 250));
 
     TaskQuery query = taskService.createTaskQuery().processDefinitionKey("oneTaskProcess");
     saveQuery(query);
@@ -992,15 +1024,15 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
     task.setOwner(testUser.getId());
     task.setDelegationState(DelegationState.PENDING);
     taskService.saveTask(task);
-
-    String taskId = taskService.createTaskQuery().singleResult().getId();
-    taskService.addCandidateGroup(taskId, "accounting");
+    taskService.addCandidateGroup(task.getId(), "accounting");
 
     task = taskService.newTask("task2");
     task.setName("Task 2");
     task.setOwner(testUser.getId());
     task.setDelegationState(DelegationState.RESOLVED);
     taskService.saveTask(task);
+    taskService.setAssignee(task.getId(), "kermit");
+    taskService.addCandidateGroup(task.getId(), "accounting");
 
     task = taskService.newTask("task3");
     task.setName("Task 3");

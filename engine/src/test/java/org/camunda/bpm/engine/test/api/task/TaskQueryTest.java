@@ -306,14 +306,15 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
 
   public void testQueryByUnassigned() {
     TaskQuery query = taskService.createTaskQuery().taskUnassigned();
-    assertEquals(11, query.count());
-    assertEquals(11, query.list().size());
+    assertEquals(10, query.count());
+    assertEquals(10, query.list().size());
   }
 
   public void testQueryByCandidateUser() {
+    // kermit is candidate for 12 tasks, two of them are already assigned
     TaskQuery query = taskService.createTaskQuery().taskCandidateUser("kermit");
-    assertEquals(11, query.count());
-    assertEquals(11, query.list().size());
+    assertEquals(10, query.count());
+    assertEquals(10, query.list().size());
     try {
       query.singleResult();
       fail("expected exception");
@@ -321,15 +322,36 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
       // OK
     }
 
+    // test including assigned tasks
+    query = taskService.createTaskQuery().taskCandidateUser("kermit").includeAssignedTasks();
+    assertEquals(12, query.count());
+    assertEquals(12, query.list().size());
+
+    // fozzie is candidate for 3 tasks, one of them is already assigned
     query = taskService.createTaskQuery().taskCandidateUser("fozzie");
-    assertEquals(3, query.count());
-    assertEquals(3, query.list().size());
+    assertEquals(2, query.count());
+    assertEquals(2, query.list().size());
     try {
       query.singleResult();
       fail("expected exception");
     } catch (ProcessEngineException e) {
       // OK
     }
+
+    // test including assigned tasks
+    query = taskService.createTaskQuery().taskCandidateUser("fozzie").includeAssignedTasks();
+    assertEquals(3, query.count());
+    assertEquals(3, query.list().size());
+
+    // gonzo is candidate for one task, which is already assinged
+    query = taskService.createTaskQuery().taskCandidateUser("gonzo");
+    assertEquals(0, query.count());
+    assertEquals(0, query.list().size());
+
+    // test including assigned tasks
+    query = taskService.createTaskQuery().taskCandidateUser("gonzo").includeAssignedTasks();
+    assertEquals(1, query.count());
+    assertEquals(1, query.list().size());
   }
 
   public void testQueryByNullCandidateUser() {
@@ -339,10 +361,20 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     } catch(ProcessEngineException e) {}
   }
 
+  public void testQueryByIncludeAssignedTasksWithMissingCandidateUserOrGroup() {
+    try {
+      taskService.createTaskQuery().includeAssignedTasks();
+      fail("expected exception");
+    } catch (ProcessEngineException e) {
+      // OK
+    }
+  }
+
   public void testQueryByCandidateGroup() {
+    // management group is candidate for 3 tasks, one of them is already assigned
     TaskQuery query = taskService.createTaskQuery().taskCandidateGroup("management");
-    assertEquals(3, query.count());
-    assertEquals(3, query.list().size());
+    assertEquals(2, query.count());
+    assertEquals(2, query.list().size());
     try {
       query.singleResult();
       fail("expected exception");
@@ -350,7 +382,29 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
       // OK
     }
 
+    // test including assigned tasks
+    query = taskService.createTaskQuery().taskCandidateGroup("management").includeAssignedTasks();
+    assertEquals(3, query.count());
+    assertEquals(3, query.list().size());
+
+
+    // accountancy group is candidate for 3 tasks, one of them is already assigned
+    query = taskService.createTaskQuery().taskCandidateGroup("accountancy");
+    assertEquals(2, query.count());
+    assertEquals(2, query.list().size());
+
+    // test including assigned tasks
+    query = taskService.createTaskQuery().taskCandidateGroup("accountancy").includeAssignedTasks();
+    assertEquals(3, query.count());
+    assertEquals(3, query.list().size());
+
+    // sales group is candidate for no tasks
     query = taskService.createTaskQuery().taskCandidateGroup("sales");
+    assertEquals(0, query.count());
+    assertEquals(0, query.list().size());
+
+    // test including assigned tasks
+    query = taskService.createTaskQuery().taskCandidateGroup("sales").includeAssignedTasks();
     assertEquals(0, query.count());
     assertEquals(0, query.list().size());
   }
@@ -367,8 +421,8 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
   public void testQueryByCandidateGroupIn() {
     List<String> groups = Arrays.asList("management", "accountancy");
     TaskQuery query = taskService.createTaskQuery().taskCandidateGroupIn(groups);
-    assertEquals(5, query.count());
-    assertEquals(5, query.list().size());
+    assertEquals(4, query.count());
+    assertEquals(4, query.list().size());
     try {
       query.singleResult();
       fail("expected exception");
@@ -376,9 +430,19 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
       // OK
     }
 
+    // test including assigned tasks
+    query = taskService.createTaskQuery().taskCandidateGroupIn(groups).includeAssignedTasks();
+    assertEquals(5, query.count());
+    assertEquals(5, query.list().size());
+
     // Unexisting groups or groups that don't have candidate tasks shouldn't influence other results
     groups = Arrays.asList("management", "accountancy", "sales", "unexising");
     query = taskService.createTaskQuery().taskCandidateGroupIn(groups);
+    assertEquals(4, query.count());
+    assertEquals(4, query.list().size());
+
+    // test including assigned tasks
+    query = taskService.createTaskQuery().taskCandidateGroupIn(groups).includeAssignedTasks();
     assertEquals(5, query.count());
     assertEquals(5, query.list().size());
   }
@@ -1416,53 +1480,54 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
   public void testQueryPaging() {
     TaskQuery query = taskService.createTaskQuery().taskCandidateUser("kermit");
 
-    assertEquals(11, query.listPage(0, Integer.MAX_VALUE).size());
+    assertEquals(10, query.listPage(0, Integer.MAX_VALUE).size());
 
     // Verifying the un-paged results
-    assertEquals(11, query.count());
-    assertEquals(11, query.list().size());
+    assertEquals(10, query.count());
+    assertEquals(10, query.list().size());
 
     // Verifying paged results
     assertEquals(2, query.listPage(0, 2).size());
     assertEquals(2, query.listPage(2, 2).size());
     assertEquals(3, query.listPage(4, 3).size());
-    assertEquals(1, query.listPage(10, 3).size());
-    assertEquals(1, query.listPage(10, 1).size());
+    assertEquals(1, query.listPage(9, 3).size());
+    assertEquals(1, query.listPage(9, 1).size());
 
     // Verifying odd usages
     assertEquals(0, query.listPage(-1, -1).size());
-    assertEquals(0, query.listPage(11, 2).size()); // 10 is the last index with a result
-    assertEquals(11, query.listPage(0, 15).size()); // there are only 11 tasks
+    assertEquals(0, query.listPage(10, 2).size()); // 9 is the last index with a result
+    assertEquals(10, query.listPage(0, 15).size()); // there are only 10 tasks
   }
 
   public void testQuerySorting() {
     // default ordering is by id
-    verifySortingAndCount(taskService.createTaskQuery(), 12, taskById());
-    verifySortingAndCount(taskService.createTaskQuery().orderByTaskId().asc(), 12, taskById());
-    verifySortingAndCount(taskService.createTaskQuery().orderByTaskName().asc(), 12, taskByName());
-    verifySortingAndCount(taskService.createTaskQuery().orderByTaskPriority().asc(), 12, taskByPriority());
-    verifySortingAndCount(taskService.createTaskQuery().orderByTaskAssignee().asc(), 12, taskByAssignee());
-    verifySortingAndCount(taskService.createTaskQuery().orderByTaskDescription().asc(), 12, taskByDescription());
-    verifySortingAndCount(taskService.createTaskQuery().orderByProcessInstanceId().asc(), 12, taskByProcessInstanceId());
-    verifySortingAndCount(taskService.createTaskQuery().orderByExecutionId().asc(), 12, taskByExecutionId());
-    verifySortingAndCount(taskService.createTaskQuery().orderByTaskCreateTime().asc(), 12, taskByCreateTime());
-    verifySortingAndCount(taskService.createTaskQuery().orderByDueDate().asc(), 12, taskByDueDate());
-    verifySortingAndCount(taskService.createTaskQuery().orderByFollowUpDate().asc(), 12, taskByFollowUpDate());
-    verifySortingAndCount(taskService.createTaskQuery().orderByCaseInstanceId().asc(), 12, taskByCaseInstanceId());
-    verifySortingAndCount(taskService.createTaskQuery().orderByCaseExecutionId().asc(), 12, taskByCaseExecutionId());
+    int expectedCount = 12;
+    verifySortingAndCount(taskService.createTaskQuery(), expectedCount, taskById());
+    verifySortingAndCount(taskService.createTaskQuery().orderByTaskId().asc(), expectedCount, taskById());
+    verifySortingAndCount(taskService.createTaskQuery().orderByTaskName().asc(), expectedCount, taskByName());
+    verifySortingAndCount(taskService.createTaskQuery().orderByTaskPriority().asc(), expectedCount, taskByPriority());
+    verifySortingAndCount(taskService.createTaskQuery().orderByTaskAssignee().asc(), expectedCount, taskByAssignee());
+    verifySortingAndCount(taskService.createTaskQuery().orderByTaskDescription().asc(), expectedCount, taskByDescription());
+    verifySortingAndCount(taskService.createTaskQuery().orderByProcessInstanceId().asc(), expectedCount, taskByProcessInstanceId());
+    verifySortingAndCount(taskService.createTaskQuery().orderByExecutionId().asc(), expectedCount, taskByExecutionId());
+    verifySortingAndCount(taskService.createTaskQuery().orderByTaskCreateTime().asc(), expectedCount, taskByCreateTime());
+    verifySortingAndCount(taskService.createTaskQuery().orderByDueDate().asc(), expectedCount, taskByDueDate());
+    verifySortingAndCount(taskService.createTaskQuery().orderByFollowUpDate().asc(), expectedCount, taskByFollowUpDate());
+    verifySortingAndCount(taskService.createTaskQuery().orderByCaseInstanceId().asc(), expectedCount, taskByCaseInstanceId());
+    verifySortingAndCount(taskService.createTaskQuery().orderByCaseExecutionId().asc(), expectedCount, taskByCaseExecutionId());
 
-    verifySortingAndCount(taskService.createTaskQuery().orderByTaskId().desc(), 12, inverted(taskById()));
-    verifySortingAndCount(taskService.createTaskQuery().orderByTaskName().desc(), 12, inverted(taskByName()));
-    verifySortingAndCount(taskService.createTaskQuery().orderByTaskPriority().desc(), 12, inverted(taskByPriority()));
-    verifySortingAndCount(taskService.createTaskQuery().orderByTaskAssignee().desc(), 12, inverted(taskByAssignee()));
-    verifySortingAndCount(taskService.createTaskQuery().orderByTaskDescription().desc(), 12, inverted(taskByDescription()));
-    verifySortingAndCount(taskService.createTaskQuery().orderByProcessInstanceId().desc(), 12, inverted(taskByProcessInstanceId()));
-    verifySortingAndCount(taskService.createTaskQuery().orderByExecutionId().desc(), 12, inverted(taskByExecutionId()));
-    verifySortingAndCount(taskService.createTaskQuery().orderByTaskCreateTime().desc(), 12, inverted(taskByCreateTime()));
-    verifySortingAndCount(taskService.createTaskQuery().orderByDueDate().desc(), 12, inverted(taskByDueDate()));
-    verifySortingAndCount(taskService.createTaskQuery().orderByFollowUpDate().desc(), 12, inverted(taskByFollowUpDate()));
-    verifySortingAndCount(taskService.createTaskQuery().orderByCaseInstanceId().desc(), 12, inverted(taskByCaseInstanceId()));
-    verifySortingAndCount(taskService.createTaskQuery().orderByCaseExecutionId().desc(), 12, inverted(taskByCaseExecutionId()));
+    verifySortingAndCount(taskService.createTaskQuery().orderByTaskId().desc(), expectedCount, inverted(taskById()));
+    verifySortingAndCount(taskService.createTaskQuery().orderByTaskName().desc(), expectedCount, inverted(taskByName()));
+    verifySortingAndCount(taskService.createTaskQuery().orderByTaskPriority().desc(), expectedCount, inverted(taskByPriority()));
+    verifySortingAndCount(taskService.createTaskQuery().orderByTaskAssignee().desc(), expectedCount, inverted(taskByAssignee()));
+    verifySortingAndCount(taskService.createTaskQuery().orderByTaskDescription().desc(), expectedCount, inverted(taskByDescription()));
+    verifySortingAndCount(taskService.createTaskQuery().orderByProcessInstanceId().desc(), expectedCount, inverted(taskByProcessInstanceId()));
+    verifySortingAndCount(taskService.createTaskQuery().orderByExecutionId().desc(), expectedCount, inverted(taskByExecutionId()));
+    verifySortingAndCount(taskService.createTaskQuery().orderByTaskCreateTime().desc(), expectedCount, inverted(taskByCreateTime()));
+    verifySortingAndCount(taskService.createTaskQuery().orderByDueDate().desc(), expectedCount, inverted(taskByDueDate()));
+    verifySortingAndCount(taskService.createTaskQuery().orderByFollowUpDate().desc(), expectedCount, inverted(taskByFollowUpDate()));
+    verifySortingAndCount(taskService.createTaskQuery().orderByCaseInstanceId().desc(), expectedCount, inverted(taskByCaseInstanceId()));
+    verifySortingAndCount(taskService.createTaskQuery().orderByCaseExecutionId().desc(), expectedCount, inverted(taskByCaseExecutionId()));
 
     verifySortingAndCount(taskService.createTaskQuery().orderByTaskId().taskName("testTask").asc(), 6, taskById());
     verifySortingAndCount(taskService.createTaskQuery().orderByTaskId().taskName("testTask").desc(), 6, inverted(taskById()));
@@ -4786,10 +4851,12 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
   }
 
   /**
-   * Generates some test tasks. - 6 tasks where kermit is a candidate - 1 tasks
-   * where gonzo is assignee - 2 tasks assigned to management group - 2 tasks
-   * assigned to accountancy group - 1 task assigned to both the management and
-   * accountancy group
+   * Generates some test tasks.
+   * - 6 tasks where kermit is a candidate
+   * - 1 tasks where gonzo is assignee and kermit and gonzo are candidates
+   * - 2 tasks assigned to management group
+   * - 2 tasks assigned to accountancy group
+   * - 1 task assigned to fozzie and to both the management and accountancy group
    */
   private List<String> generateTestTasks() throws Exception {
     List<String> ids = new ArrayList<String>();
@@ -4816,6 +4883,8 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     taskService.saveTask(task);
     taskService.setAssignee(task.getId(), "gonzo");
     taskService.setVariable(task.getId(), "testVar", "someVariable");
+    taskService.addCandidateUser(task.getId(), "kermit");
+    taskService.addCandidateUser(task.getId(), "gonzo");
     ids.add(task.getId());
 
     ClockUtil.setCurrentTime(sdf.parse("03/03/2003 03:03:03.000"));
@@ -4845,6 +4914,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     task = taskService.newTask();
     task.setName("managementAndAccountancyTask");
     taskService.saveTask(task);
+    taskService.setAssignee(task.getId(), "fozzie");
     taskService.addCandidateGroup(task.getId(), "management");
     taskService.addCandidateGroup(task.getId(), "accountancy");
     ids.add(task.getId());

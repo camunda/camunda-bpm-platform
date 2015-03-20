@@ -88,10 +88,36 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
   /** Only select tasks with the given {@link DelegationState}. */
   TaskQuery taskDelegationState(DelegationState delegationState);
 
-  /** Only select tasks for which the given user is a candidate. */
+  /**
+   * Only select tasks for which the given user is a candidate.
+   *
+   * <p>
+   * Per default it only selects tasks which are not already assigned
+   * to a user. To also include assigned task in the result specify
+   * {@link #includeAssignedTasks()} in your query.
+   * </p>
+   *
+   * @throws ProcessEngineException
+   *   When query is executed and {@link #taskCandidateGroup(String)} or
+   *     {@link #taskCandidateGroupIn(List)} has been executed on the query instance.
+   *   When passed user is <code>null</code>.
+   */
   TaskQuery taskCandidateUser(String candidateUser);
 
-  /** Only select tasks for which the described user by the given expression is a candidate. */
+  /**
+   * Only select tasks for which the described user by the given expression is a candidate.
+   *
+   * <p>
+   * Per default it only selects tasks which are not already assigned
+   * to a user. To also include assigned task in the result specify
+   * {@link #includeAssignedTasks()} in your query.
+   * </p>
+   *
+   * @throws ProcessEngineException
+   *   When query is executed and {@link #taskCandidateGroup(String)} or
+   *     {@link #taskCandidateGroupIn(List)} has been executed on the query instance.
+   *   When passed user is <code>null</code>.
+   */
   TaskQuery taskCandidateUserExpression(String candidateUserExpression);
 
   /** Only select tasks for which there exist an {@link IdentityLink} with the given user */
@@ -100,14 +126,46 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
   /** Only select tasks for which there exist an {@link IdentityLink} with the described user by the given expression */
   TaskQuery taskInvolvedUserExpression(String involvedUserExpression);
 
-  /** Only select tasks for which users in the given group are candidates. */
+  /**
+   *  Only select tasks for which users in the given group are candidates.
+   *
+   * <p>
+   * Per default it only selects tasks which are not already assigned
+   * to a user. To also include assigned task in the result specify
+   * {@link #includeAssignedTasks()} in your query.
+   * </p>
+   *
+   * @throws ProcessEngineException
+   *   When query is executed and {@link #taskCandidateUser(String)} or
+   *     {@link #taskCandidateGroupIn(List)} has been executed on the query instance.
+   *   When passed group is <code>null</code>.
+   */
   TaskQuery taskCandidateGroup(String candidateGroup);
 
-  /** Only select tasks for which users in the described group by the given expression are candidates. */
+  /**
+   * Only select tasks for which users in the described group by the given expression are candidates.
+   *
+   * <p>
+   * Per default it only selects tasks which are not already assigned
+   * to a user. To also include assigned task in the result specify
+   * {@link #includeAssignedTasks()} in your query.
+   * </p>
+   *
+   * @throws ProcessEngineException
+   *   When query is executed and {@link #taskCandidateUser(String)} or
+   *     {@link #taskCandidateGroupIn(List)} has been executed on the query instance.
+   *   When passed group is <code>null</code>.
+   */
   TaskQuery taskCandidateGroupExpression(String candidateGroupExpression);
 
   /**
    * Only select tasks for which the 'candidateGroup' is one of the given groups.
+   *
+   * <p>
+   * Per default it only selects tasks which are not already assigned
+   * to a user. To also include assigned task in the result specify
+   * {@link #includeAssignedTasks()} in your query.
+   * </p>
    *
    * @throws ProcessEngineException
    *   When query is executed and {@link #taskCandidateGroup(String)} or
@@ -119,12 +177,30 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
   /**
    * Only select tasks for which the 'candidateGroup' is one of the described groups of the given expression.
    *
+   * <p>
+   * Per default it only selects tasks which are not already assigned
+   * to a user. To also include assigned task in the result specify
+   * {@link #includeAssignedTasks()} in your query.
+   * </p>
+   *
    * @throws ProcessEngineException
    *   When query is executed and {@link #taskCandidateGroup(String)} or
    *     {@link #taskCandidateUser(String)} has been executed on the query instance.
    *   When passed group list is empty or <code>null</code>.
    */
   TaskQuery taskCandidateGroupInExpression(String candidateGroupsExpression);
+
+  /**
+   * Select both assigned and not assigned tasks for candidate user or group queries.
+   * <p>
+   * By default {@link #taskCandidateUser(String)}, {@link #taskCandidateGroup(String)}
+   * and {@link #taskCandidateGroupIn(List)} queries only select not assigned tasks.
+   * </p>
+   *
+   * @throws ProcessEngineException
+   *    When no candidate user or group(s) are specified beforehand
+   */
+  TaskQuery includeAssignedTasks();
 
   /** Only select tasks for the given process instance id. */
   TaskQuery processInstanceId(String processInstanceId);
