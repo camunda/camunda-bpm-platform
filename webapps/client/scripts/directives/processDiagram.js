@@ -52,8 +52,15 @@ define([
       scrollToBpmnElement(scrollToBpmnElementId);
     };
 
+    var isElementSelectable = function(element) {
+      return element.isSelectable || (
+        $scope.selectAll &&
+        element.$instanceOf('bpmn:FlowNode')
+      );
+    };
+
     $scope.onClick = function(element, $event) {
-      if(bpmnElements[element.businessObject.id] && bpmnElements[element.businessObject.id].isSelectable) {
+      if(bpmnElements[element.businessObject.id] && isElementSelectable(bpmnElements[element.businessObject.id])) {
         $scope.onElementClick({id: element.businessObject.id, $event: $event});
       } else {
         $scope.onElementClick({id: null, $event: $event});
@@ -61,14 +68,14 @@ define([
     };
 
     $scope.onMouseEnter = function(element, $event) {
-      if(bpmnElements[element.businessObject.id] && bpmnElements[element.businessObject.id].isSelectable) {
+      if(bpmnElements[element.businessObject.id] && isElementSelectable(bpmnElements[element.businessObject.id])) {
         $scope.control.getViewer().get('canvas').addMarker(element.businessObject.id, 'selectable');
         $scope.control.highlight(element.businessObject.id);
       }
     };
 
     $scope.onMouseLeave = function(element, $event) {
-      if(bpmnElements[element.businessObject.id] && bpmnElements[element.businessObject.id].isSelectable && (!selection || selection.indexOf(element.businessObject.id) === -1)) {
+      if(bpmnElements[element.businessObject.id] && isElementSelectable(bpmnElements[element.businessObject.id]) && (!selection || selection.indexOf(element.businessObject.id) === -1)) {
         $scope.control.clearHighlight(element.businessObject.id);
       }
     };
@@ -175,10 +182,15 @@ define([
         onElementClick: '&',
         selection: '=',
         processData: '=',
-        providerComponent: '@'
+        providerComponent: '@',
+        selectAll: '&'
       },
       controller: DirectiveController,
-      template: template
+      template: template,
+
+      link: function($scope) {
+        $scope.selectAll = $scope.$eval($scope.selectAll);
+      }
     };
   };
 

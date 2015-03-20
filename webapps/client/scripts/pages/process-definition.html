@@ -151,6 +151,7 @@
                 <select ng-model="date.type"
                         ng-options="item as item for item in dateTypeItems"
                         required
+                        class="form-control"
                         cam-dynamic-name="startDateFilterType{{$index}}"
                         ng-change="dateFilterTypeChanged(filterForm['startDateFilterType0'], filterForm['startDateFilterType1'])">
                 </select>

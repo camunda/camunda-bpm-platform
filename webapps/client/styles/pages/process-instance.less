@@ -1,0 +1,120 @@
+@modification-cancel-all-color:   #E8917C;
+@modification-cancel-some-color:  @canceled-color;
+@modification-start-before-color: lighten(@link-color, 5%);
+@modification-start-after-color:  darken(@link-color, 5%);
+.process-instance-modification {
+  .instances-counter {
+    text-align: right;
+  }
+
+  section {
+    .element-name {
+      margin-top: 0;
+      margin-bottom: 0;
+      line-height: 34px;
+    }
+
+    .meta,
+    .modification {
+      padding-top: 5px;
+      padding-bottom: 5px;
+    }
+
+    .meta {
+      line-height: 34px;
+    }
+
+    .modification {
+      border-left: (@grid-gutter-width / 2) solid;
+      .transition(border-color 0.218s ease-in-out);
+      border-top: 1px solid @gray-lighter;
+    }
+
+    &.cancel .modification {
+      border-color: @modification-cancel-all-color;
+    }
+    &.cancelSome .modification {
+      border-color: @modification-cancel-some-color;
+    }
+    &.startAfter .modification {
+      border-color: @modification-start-after-color;
+    }
+    &.startBefore .modification {
+      border-color: @modification-start-before-color;
+    }
+
+    .variables {
+      margin-top: 5px;
+      .actions {
+        text-align: right;
+      }
+      > .row {
+        margin-top: 5px;
+      }
+      > .header {
+        font-weight: bolder;
+        margin-top: 0;
+      }
+    }
+  }
+
+  header,
+  .row.header {
+    line-height: 34px;
+    min-height: 34px;
+    font-weight: bolder;
+    input,
+    select {
+      font-weight: normal;
+    }
+  }
+
+  .activity-instances {
+    margin-top: (@grid-gutter-width / 2);
+    .instance-id {
+      line-height: 34px;
+    }
+  }
+
+  .instance-id,
+  .instance-variables .type {
+    font-family: monospace;
+  }
+
+  > .actions {
+    text-align: right;
+    margin-top: (@grid-gutter-width / 2);
+    .checkbox {
+      margin-top: 10px;
+    }
+  }
+  > .debug {
+    margin-top: (@grid-gutter-width / 2);
+  }
+}
+
+
+.modification-confirmation-dialog {
+  .instruction {
+    line-height: 34px;
+    min-height: 34px;
+
+    .type {
+      border-left: 15px solid;
+    }
+
+    &:first-child {
+      margin-top: (@grid-gutter-width / 2);
+    }
+
+    &.cancel .type {
+      border-color: @modification-cancel-some-color;
+    }
+    &.startAfter .type {
+      border-color: @modification-start-after-color;
+    }
+    &.startBefore .type {
+      border-color: @modification-start-before-color;
+    }
+  }
+}
