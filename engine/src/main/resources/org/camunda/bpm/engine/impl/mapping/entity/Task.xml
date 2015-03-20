@@ -298,10 +298,10 @@
         and RES.TASK_DEF_KEY_ like #{keyLike}
       </if>
       <if test ="taskDefinitionKeys != null &amp;&amp; taskDefinitionKeys.length > 0">
-      	and RES.TASK_DEF_KEY_ in
-      	<foreach item="item" index="index" collection="taskDefinitionKeys"
+        and RES.TASK_DEF_KEY_ in
+        <foreach item="item" index="index" collection="taskDefinitionKeys"
                        open="(" separator="," close=")">
-			#{item}
+          #{item}
         </foreach>
       </if>
       <if test="processDefinitionId != null">
