@@ -19,7 +19,7 @@ describe('Cockpit Process Instance Spec', function() {
         dashboardPage.navigateToWebapp('Cockpit');
         dashboardPage.authentication.userLogin('admin', 'admin');
         dashboardPage.deployedProcessesList.selectProcess(0);
-        definitionPage.table.processInstancesTab.selectProcessInstance(0);
+        definitionPage.processInstancesTab.selectInstance(0);
       });
     });
 
