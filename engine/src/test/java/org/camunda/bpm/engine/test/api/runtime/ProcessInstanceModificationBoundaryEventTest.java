@@ -756,7 +756,7 @@ public class ProcessInstanceModificationBoundaryEventTest extends PluggableProce
   }
 
   @Deployment(resources = INTERRUPTING_BOUNDARY_EVENT_WITH_PARALLEL_GATEWAY)
-  public void FAILING_testStartBeforeInterruptingBoundaryEvent() {
+  public void testStartBeforeInterruptingBoundaryEvent() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
     String processInstanceId = processInstance.getId();
 
@@ -825,7 +825,7 @@ public class ProcessInstanceModificationBoundaryEventTest extends PluggableProce
   }
 
   @Deployment(resources = INTERRUPTING_BOUNDARY_EVENT_WITH_PARALLEL_GATEWAY_INSIDE_SUB_PROCESS)
-  public void FAILING_testStartBeforeInterruptingBoundaryEventInsideSubProcess() {
+  public void testStartBeforeInterruptingBoundaryEventInsideSubProcess() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
     String processInstanceId = processInstance.getId();
 

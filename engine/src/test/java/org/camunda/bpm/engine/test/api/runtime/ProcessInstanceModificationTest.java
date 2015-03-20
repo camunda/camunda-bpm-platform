@@ -52,6 +52,7 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
   protected static final String IO_MAPPING_PROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationTest.ioMapping.bpmn20.xml";
   protected static final String IO_MAPPING_ON_SUB_PROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationTest.ioMappingOnSubProcess.bpmn20.xml";
   protected static final String IO_MAPPING_ON_SUB_PROCESS_AND_NESTED_SUB_PROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationTest.ioMappingOnSubProcessNested.bpmn20.xml";
+  protected static final String LISTENERS_ON_SUB_PROCESS_AND_NESTED_SUB_PROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationTest.listenersOnSubProcessNested.bpmn20.xml";
   protected static final String DOUBLE_NESTED_SUB_PROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationTest.doubleNestedSubprocess.bpmn20.xml";
 
   @Deployment(resources = PARALLEL_GATEWAY_PROCESS)
@@ -1054,8 +1055,13 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
     assertNull(runtimeService.getVariable(processInstance.getId(), "outputMappingExecuted"));
   }
 
+  /**
+   * should also skip io mappings that are defined on already instantiated ancestor
+   * scopes and that may be executed due to the ancestor scope completing within the
+   * modification command.
+   */
   @Deployment(resources = IO_MAPPING_ON_SUB_PROCESS_AND_NESTED_SUB_PROCESS)
-  public void FAILING_testSkipIoMappingsOnSubProcessNested() {
+  public void testSkipIoMappingsOnSubProcessNested() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
 
     runtimeService.createProcessInstanceModification(processInstance.getId())
@@ -1064,6 +1070,23 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
 
     // then the output mapping should not have executed
     assertNull(runtimeService.getVariable(processInstance.getId(), "outputMappingExecuted"));
+  }
+
+  @Deployment(resources = LISTENERS_ON_SUB_PROCESS_AND_NESTED_SUB_PROCESS)
+  public void testSkipListenersOnSubProcessNested() {
+    RecorderExecutionListener.clear();
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process",
+        Variables.createVariables().putValue("listener", new RecorderExecutionListener()));
+
+    runtimeService.createProcessInstanceModification(processInstance.getId())
+      .startBeforeActivity("boundaryEvent")
+      .execute(true, false);
+
+    assertProcessEnded(processInstance.getId());
+
+    // then the output mapping should not have executed
+    assertTrue(RecorderExecutionListener.getRecordedEvents().isEmpty());
   }
 
   @Deployment(resources = TRANSITION_LISTENER_PROCESS)
@@ -1221,12 +1244,6 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
     assertProcessEnded(processInstanceId);
   }
 
-  // TODO: what happens with compensation?
-  // Scenario: Subprocess with two activities
-  // activity 1 is executed successfully, has compensation
-  // activity 2 is entered and then cancelled, such that the complete subprocess
-  // cancels
-  // => should compensation of activity 1 be later on possible? yes
   @Deployment
   public void testCompensationRemovalOnCancellation() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensationProcess");

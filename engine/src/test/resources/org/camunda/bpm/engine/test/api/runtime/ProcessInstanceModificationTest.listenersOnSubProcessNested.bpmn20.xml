@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions" xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:camunda="http://activiti.org/bpmn" targetNamespace="Examples">
+
+  <message id="messageId" name="newMessage" />
+
+  <process id="process">
+    <extensionElements>
+      <camunda:executionListener event="end" delegateExpression="${listener}" />
+    </extensionElements>
+
+    <startEvent id="theStart" />
+
+    <sequenceFlow sourceRef="theStart" targetRef="subProcess" />
+
+    <subProcess id="subProcess">
+      <extensionElements>
+        <camunda:executionListener event="end" delegateExpression="${listener}" />
+      </extensionElements>
+
+      <startEvent id="theStart1" />
+
+      <sequenceFlow sourceRef="theStart1" targetRef="innerSubProcess" />
+
+      <subProcess id="innerSubProcess">
+
+        <startEvent id="innerStart" />
+
+        <sequenceFlow sourceRef="innerStart" targetRef="innerTask1" />
+
+        <userTask id="innerTask1" />
+
+        <sequenceFlow sourceRef="innerTask1" targetRef="innerEnd1" />
+
+        <endEvent id="innerEnd1" />
+
+        <boundaryEvent id="boundaryEvent" attachedToRef="innerTask1">
+          <messageEventDefinition messageRef="messageId" />
+        </boundaryEvent>
+
+        <sequenceFlow sourceRef="boundaryEvent" targetRef="innerEnd2" />
+
+        <endEvent id="innerEnd2" />
+
+      </subProcess>
+
+      <sequenceFlow sourceRef="innerSubProcess" targetRef="theEnd1" />
+
+      <endEvent id="theEnd1" />
+
+    </subProcess>
+
+    <sequenceFlow sourceRef="subProcess" targetRef="theEnd2" />
+
+    <endEvent id="theEnd2" />
+
+  </process>
+
+</definitions>

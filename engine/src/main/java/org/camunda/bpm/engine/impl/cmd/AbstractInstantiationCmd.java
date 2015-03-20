@@ -220,8 +220,9 @@ public abstract class AbstractInstantiationCmd extends AbstractProcessInstanceMo
         }
         else {
           // perform cancellation
-          scopeExecution.cancelScope("Cancel scope activity " + topMostActivity + " executed.", skipCustomListeners, skipIoMappings);
-          instantiate(scopeExecution, activitiesToInstantiate, elementToInstantiate);
+          ExecutionEntity cancellingExecution = interruptedExecution.getParent();
+          cancellingExecution.cancelScope("Cancel scope activity " + topMostActivity + " executed.", skipCustomListeners, skipIoMappings);
+          instantiate(cancellingExecution, activitiesToInstantiate, elementToInstantiate);
         }
       }
       else {

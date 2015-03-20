@@ -38,10 +38,6 @@ public class ProcessInstanceModificationEventSubProcessTest extends PluggablePro
   protected static final String INTERRUPTING_EVENT_SUBPROCESS_INSIDE_SUBPROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationTest.interruptingEventSubProcessInsideSubProcess.bpmn20.xml";
   protected static final String NON_INTERRUPTING_EVENT_SUBPROCESS_INSIDE_SUBPROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationTest.nonInterruptingEventSubProcessInsideSubProcess.bpmn20.xml";
 
-  // TODO: test that message event subscription of event subprocess is not lost
-  // when an activity in the same flow scope as the sub process is first cancelled and
-  // another is instantiated (on process instance level)
-
   @Deployment(resources = INTERRUPTING_EVENT_SUBPROCESS)
   public void testStartBeforeTaskInsideEventSubProcess() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");

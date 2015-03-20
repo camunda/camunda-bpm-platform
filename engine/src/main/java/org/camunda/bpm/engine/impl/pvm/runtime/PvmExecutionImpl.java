@@ -239,6 +239,11 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
         parent.setSequenceCounter(mySequenceCounter);
       }
 
+      // propagate skipping configuration upwards, if it was not initially set on
+      // the root execution
+      parent.skipCustomListeners |= this.skipCustomListeners;
+      parent.skipIoMapping |= this.skipIoMapping;
+
     }
 
     isActive = false;
