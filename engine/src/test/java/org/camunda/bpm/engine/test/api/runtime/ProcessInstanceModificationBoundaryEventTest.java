@@ -41,6 +41,12 @@ public class ProcessInstanceModificationBoundaryEventTest extends PluggableProce
   protected static final String INTERRUPTING_BOUNDARY_EVENT_ON_SUBPROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationTest.interruptingBoundaryEventOnSubProcess.bpmn20.xml";
   protected static final String NON_INTERRUPTING_BOUNDARY_EVENT_ON_SUBPROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationTest.nonInterruptingBoundaryEventOnSubProcess.bpmn20.xml";
 
+  protected static final String INTERRUPTING_BOUNDARY_EVENT_WITH_PARALLEL_GATEWAY = "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationTest.interruptingBoundaryEventWithParallelGateway.bpmn20.xml";
+  protected static final String NON_INTERRUPTING_BOUNDARY_EVENT_WITH_PARALLEL_GATEWAY = "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationTest.nonInterruptingBoundaryEventWithParallelGateway.bpmn20.xml";
+
+  protected static final String INTERRUPTING_BOUNDARY_EVENT_WITH_PARALLEL_GATEWAY_INSIDE_SUB_PROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationTest.interruptingBoundaryEventWithParallelGatewayInsideSubProcess.bpmn20.xml";
+  protected static final String NON_INTERRUPTING_BOUNDARY_EVENT_WITH_PARALLEL_GATEWAY_INSIDE_SUB_PROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationTest.nonInterruptingBoundaryEventWithParallelGatewayInsideSubProcess.bpmn20.xml";
+
   @Deployment(resources = INTERRUPTING_BOUNDARY_EVENT)
   public void testTask1AndStartBeforeTaskAfterBoundaryEvent() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
@@ -746,6 +752,150 @@ public class ProcessInstanceModificationBoundaryEventTest extends PluggableProce
         .done());
 
     completeTasksInOrder("innerTask", "taskAfterBoundaryEvent");
+    assertProcessEnded(processInstanceId);
+  }
+
+  @Deployment(resources = INTERRUPTING_BOUNDARY_EVENT_WITH_PARALLEL_GATEWAY)
+  public void FAILING_testStartBeforeInterruptingBoundaryEvent() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+    String processInstanceId = processInstance.getId();
+
+    runtimeService
+      .createProcessInstanceModification(processInstanceId)
+      .startBeforeActivity("boundaryEvent")
+      .execute();
+
+    ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstanceId);
+    assertNotNull(updatedTree);
+    assertEquals(processInstanceId, updatedTree.getProcessInstanceId());
+
+    assertThat(updatedTree).hasStructure(
+        describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+          .activity("task1")
+          .activity("taskAfterBoundaryEvent")
+        .done());
+
+    ExecutionTree executionTree = ExecutionTree.forExecution(processInstanceId, processEngine);
+
+    assertThat(executionTree)
+      .matches(
+        describeExecutionTree("fork").scope()
+          .child("task1").concurrent().noScope().up()
+          .child("taskAfterBoundaryEvent").concurrent().noScope()
+        .done());
+
+    completeTasksInOrder("task1", "taskAfterBoundaryEvent");
+    assertProcessEnded(processInstanceId);
+  }
+
+  @Deployment(resources = NON_INTERRUPTING_BOUNDARY_EVENT_WITH_PARALLEL_GATEWAY)
+  public void testStartBeforeNonInterruptingBoundaryEvent() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+    String processInstanceId = processInstance.getId();
+
+    runtimeService
+      .createProcessInstanceModification(processInstanceId)
+      .startBeforeActivity("boundaryEvent")
+      .execute();
+
+    ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstanceId);
+    assertNotNull(updatedTree);
+    assertEquals(processInstanceId, updatedTree.getProcessInstanceId());
+
+    assertThat(updatedTree).hasStructure(
+        describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+          .activity("task1")
+          .activity("task2")
+          .activity("taskAfterBoundaryEvent")
+        .done());
+
+    ExecutionTree executionTree = ExecutionTree.forExecution(processInstanceId, processEngine);
+
+    assertThat(executionTree)
+      .matches(
+        describeExecutionTree("fork").scope()
+          .child("task1").concurrent().noScope().up()
+          .child(null).concurrent().noScope()
+            .child("task2").scope().up().up()
+          .child("taskAfterBoundaryEvent").concurrent().noScope()
+        .done());
+
+    completeTasksInOrder("task1", "task2", "taskAfterBoundaryEvent");
+    assertProcessEnded(processInstanceId);
+  }
+
+  @Deployment(resources = INTERRUPTING_BOUNDARY_EVENT_WITH_PARALLEL_GATEWAY_INSIDE_SUB_PROCESS)
+  public void FAILING_testStartBeforeInterruptingBoundaryEventInsideSubProcess() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+    String processInstanceId = processInstance.getId();
+
+    runtimeService
+      .createProcessInstanceModification(processInstanceId)
+      .startBeforeActivity("boundaryEvent")
+      .execute();
+
+    ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstanceId);
+    assertNotNull(updatedTree);
+    assertEquals(processInstanceId, updatedTree.getProcessInstanceId());
+
+    assertThat(updatedTree).hasStructure(
+        describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+          .beginScope("subProcess")
+            .activity("task1")
+            .activity("taskAfterBoundaryEvent")
+          .endScope()
+        .done());
+
+    ExecutionTree executionTree = ExecutionTree.forExecution(processInstanceId, processEngine);
+
+    assertThat(executionTree)
+      .matches(
+        describeExecutionTree(null).scope()
+          .child("fork").scope()
+            .child("task1").concurrent().noScope().up()
+            .child("taskAfterBoundaryEvent").concurrent().noScope()
+        .done());
+
+    completeTasksInOrder("task1", "taskAfterBoundaryEvent");
+    assertProcessEnded(processInstanceId);
+  }
+
+  @Deployment(resources = NON_INTERRUPTING_BOUNDARY_EVENT_WITH_PARALLEL_GATEWAY_INSIDE_SUB_PROCESS)
+  public void testStartBeforeNonInterruptingBoundaryEventInsideSubProcess() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+    String processInstanceId = processInstance.getId();
+
+    runtimeService
+      .createProcessInstanceModification(processInstanceId)
+      .startBeforeActivity("boundaryEvent")
+      .execute();
+
+    ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstanceId);
+    assertNotNull(updatedTree);
+    assertEquals(processInstanceId, updatedTree.getProcessInstanceId());
+
+    assertThat(updatedTree).hasStructure(
+        describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+          .beginScope("subProcess")
+            .activity("task1")
+            .activity("task2")
+            .activity("taskAfterBoundaryEvent")
+          .endScope()
+        .done());
+
+    ExecutionTree executionTree = ExecutionTree.forExecution(processInstanceId, processEngine);
+
+    assertThat(executionTree)
+      .matches(
+        describeExecutionTree(null).scope()
+          .child("fork").scope()
+            .child("task1").concurrent().noScope().up()
+            .child(null).concurrent().noScope()
+              .child("task2").scope().up().up()
+            .child("taskAfterBoundaryEvent").concurrent().noScope()
+        .done());
+
+    completeTasksInOrder("task1", "task2", "taskAfterBoundaryEvent");
     assertProcessEnded(processInstanceId);
   }
 

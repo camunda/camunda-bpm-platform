@@ -50,6 +50,8 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
   protected static final String TRANSITION_LISTENER_PROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationTest.transitionListeners.bpmn20.xml";
   protected static final String TASK_LISTENER_PROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationTest.taskListeners.bpmn20.xml";
   protected static final String IO_MAPPING_PROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationTest.ioMapping.bpmn20.xml";
+  protected static final String IO_MAPPING_ON_SUB_PROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationTest.ioMappingOnSubProcess.bpmn20.xml";
+  protected static final String IO_MAPPING_ON_SUB_PROCESS_AND_NESTED_SUB_PROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationTest.ioMappingOnSubProcessNested.bpmn20.xml";
   protected static final String DOUBLE_NESTED_SUB_PROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationTest.doubleNestedSubprocess.bpmn20.xml";
 
   @Deployment(resources = PARALLEL_GATEWAY_PROCESS)
@@ -1034,6 +1036,30 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
     // when I cancel task2
     runtimeService.createProcessInstanceModification(processInstance.getId())
       .cancelAllInActivity("task2")
+      .execute(false, true);
+
+    // then the output mapping should not have executed
+    assertNull(runtimeService.getVariable(processInstance.getId(), "outputMappingExecuted"));
+  }
+
+  @Deployment(resources = IO_MAPPING_ON_SUB_PROCESS)
+  public void testSkipIoMappingsOnSubProcess() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+
+    runtimeService.createProcessInstanceModification(processInstance.getId())
+      .startBeforeActivity("boundaryEvent")
+      .execute(false, true);
+
+    // then the output mapping should not have executed
+    assertNull(runtimeService.getVariable(processInstance.getId(), "outputMappingExecuted"));
+  }
+
+  @Deployment(resources = IO_MAPPING_ON_SUB_PROCESS_AND_NESTED_SUB_PROCESS)
+  public void FAILING_testSkipIoMappingsOnSubProcessNested() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+
+    runtimeService.createProcessInstanceModification(processInstance.getId())
+      .startBeforeActivity("boundaryEvent")
       .execute(false, true);
 
     // then the output mapping should not have executed
