@@ -7,9 +7,74 @@ var testHelper = require('../../test-helper');
 var setupFile = require('./process-setup');
 
 var dashboardPage = require('../pages/dashboard');
-var processPage = require('../pages/process-definition');
+var definitionPage = require('../pages/process-definition');
 
 describe('Cockpit Process Definition Spec', function() {
+
+  describe('page navigation', function() {
+
+    before(function() {
+      return testHelper(setupFile, function() {
+
+        dashboardPage.navigateToWebapp('Cockpit');
+        dashboardPage.authentication.userLogin('admin', 'admin');
+      });
+    });
+
+
+    it('should go to process definition view', function() {
+
+      // given
+      var runningInstances = dashboardPage.deployedProcessesList.runningInstances(0);
+      dashboardPage.deployedProcessesList.processName(0).then(function(processName) {
+
+        // when
+        dashboardPage.deployedProcessesList.selectProcess(0);
+
+        // then
+        expect(definitionPage.pageHeaderProcessDefinitionName()).to.eventually.eql(processName);
+        expect(definitionPage.processInstancesTab.isTabSelected()).to.eventually.be.true;
+        runningInstances.then(function(noOfInstances) {
+          expect(definitionPage.processInstancesTab.table().count()).to.eventually.eql(parseInt(noOfInstances, 10));
+        });
+      });
+    });
+
+
+    it('should go to Called Process Definitions tab', function() {
+
+      // when
+      definitionPage.calledProcessDefinitionsTab.selectTab();
+
+      // then
+      expect(definitionPage.calledProcessDefinitionsTab.isTabSelected()).to.eventually.be.true;
+      expect(definitionPage.calledProcessDefinitionsTab.tabName()).to.eventually.eql(definitionPage.calledProcessDefinitionsTab.tabLabel)
+    });
+
+
+    it('should go to Job Definitions tab', function() {
+
+      // when
+      definitionPage.jobDefinitionsTab.selectTab();
+
+      // then
+      expect(definitionPage.jobDefinitionsTab.isTabSelected()).to.eventually.be.true;
+      expect(definitionPage.jobDefinitionsTab.tabName()).to.eventually.eql(definitionPage.jobDefinitionsTab.tabLabel)
+    });
+
+
+    it('should go to Process Instances tab', function() {
+
+      // when
+      definitionPage.processInstancesTab.selectTab();
+
+      // then
+      expect(definitionPage.processInstancesTab.isTabSelected()).to.eventually.be.true;
+      expect(definitionPage.processInstancesTab.tabName()).to.eventually.eql(definitionPage.processInstancesTab.tabLabel)
+    });
+
+  });
+
 
   describe('diagram interaction', function() {
 
@@ -24,23 +89,23 @@ describe('Cockpit Process Definition Spec', function() {
 
 
     it('should display process diagram', function() {
-      expect(processPage.diagram.diagramElement().isDisplayed()).to.eventually.be.true;
+      expect(definitionPage.diagram.diagramElement().isDisplayed()).to.eventually.be.true;
     });
 
 
     it('should display the number of running process instances', function() {
-      expect(processPage.diagram.instancesBadgeFor('UserTask_1').getText()).to.eventually.eql('3');
+      expect(definitionPage.diagram.instancesBadgeFor('UserTask_1').getText()).to.eventually.eql('3');
     });
 
 
     it('should select activity', function() {
 
       // when
-      processPage.diagram.selectActivity('UserTask_1');
+      definitionPage.diagram.selectActivity('UserTask_1');
 
       // then
-      expect(processPage.diagram.isActivitySelected('UserTask_1')).to.eventually.be.true;
-      expect(processPage.filter.activitySelection('User Task 1').isPresent()).to.eventually.be.true;
+      expect(definitionPage.diagram.isActivitySelected('UserTask_1')).to.eventually.be.true;
+      expect(definitionPage.filter.activitySelection('User Task 1').isPresent()).to.eventually.be.true;
     });
 
 
@@ -52,17 +117,17 @@ describe('Cockpit Process Definition Spec', function() {
       });
 
       // then
-      expect(processPage.diagram.isActivitySelected('UserTask_1')).to.eventually.be.true;
+      expect(definitionPage.diagram.isActivitySelected('UserTask_1')).to.eventually.be.true;
     });
 
 
     it('should process clicks in Filter table', function() {
 
       // when
-      processPage.filter.removeSelectionButton('User Task 1').click();
+      definitionPage.filter.removeSelectionButton('User Task 1').click();
 
       // then
-      expect(processPage.diagram.isActivitySelected('UserTask_1')).to.eventually.be.false;
+      expect(definitionPage.diagram.isActivitySelected('UserTask_1')).to.eventually.be.false;
     });
 
   });
