@@ -70,6 +70,6 @@ public class ProcessEngineServicesProducer {
 
   @Produces @Named @ApplicationScoped public AuthorizationService authorizationService() { return processEngine().getAuthorizationService(); }
 
-  @Produces @Named @ApplicationScoped public FilterService filterService() { return processEngine().getFilerService(); }
+  @Produces @Named @ApplicationScoped public FilterService filterService() { return processEngine().getFilterService(); }
 
 }
