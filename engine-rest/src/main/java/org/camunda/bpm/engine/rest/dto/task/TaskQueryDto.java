@@ -90,6 +90,7 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
   private String processInstanceBusinessKey;
   private String processInstanceBusinessKeyLike;
   private String processDefinitionKey;
+  private String[] processDefinitionKeyIn;
   private String processDefinitionId;
   private String executionId;
   private String[] activityInstanceIdIn;
@@ -182,6 +183,11 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
   @CamundaQueryParam("processDefinitionKey")
   public void setProcessDefinitionKey(String processDefinitionKey) {
     this.processDefinitionKey = processDefinitionKey;
+  }
+
+  @CamundaQueryParam(value = "processDefinitionKeyIn", converter = StringArrayConverter.class)
+  public void setProcessDefinitionKeyIn(String[] processDefinitionKeyIn) {
+    this.processDefinitionKeyIn = processDefinitionKeyIn;
   }
 
   @CamundaQueryParam("processDefinitionId")
@@ -531,6 +537,10 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     return processDefinitionKey;
   }
 
+  public String[] getProcessDefinitionKeyIn() {
+    return processDefinitionKeyIn;
+  }
+
   public String getProcessDefinitionId() {
     return processDefinitionId;
   }
@@ -801,6 +811,9 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     }
     if (processDefinitionKey != null) {
       query.processDefinitionKey(processDefinitionKey);
+    }
+    if (processDefinitionKeyIn != null && processDefinitionKeyIn.length > 0) {
+      query.processDefinitionKeyIn(processDefinitionKeyIn);
     }
     if (processDefinitionId != null) {
       query.processDefinitionId(processDefinitionId);

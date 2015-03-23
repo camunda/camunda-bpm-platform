@@ -149,6 +149,7 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
     query.taskDefinitionKeyIn(testKeys);
     query.taskDefinitionKeyLike(testString);
     query.processDefinitionKey(testString);
+    query.processDefinitionKeyIn(testKeys);
     query.processDefinitionId(testString);
     query.processDefinitionName(testString);
     query.processDefinitionNameLike(testString);
@@ -241,6 +242,9 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
     }
     assertEquals(testString, query.getKeyLike());
     assertEquals(testString, query.getProcessDefinitionKey());
+    for (int i = 0; i < query.getProcessDefinitionKeys().length; i++) {
+      assertEquals(testKeys[i], query.getProcessDefinitionKeys()[i]);
+    }
     assertEquals(testString, query.getProcessDefinitionId());
     assertEquals(testString, query.getProcessDefinitionName());
     assertEquals(testString, query.getProcessDefinitionNameLike());

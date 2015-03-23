@@ -398,6 +398,12 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
   TaskQuery processDefinitionKey(String processDefinitionKey);
 
   /**
+   * Only select tasks which are part of a process instance which has one of the
+   * given process definition keys.
+   */
+  TaskQuery processDefinitionKeyIn(String... processDefinitionKeys);
+
+  /**
    * Only select tasks which are part of a process instance which has the given
    * process definition id.
    */

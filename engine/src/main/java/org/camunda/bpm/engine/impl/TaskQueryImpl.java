@@ -71,6 +71,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   protected String keyLike;
   protected String[] taskDefinitionKeys;
   protected String processDefinitionKey;
+  protected String[] processDefinitionKeys;
   protected String processDefinitionId;
   protected String processDefinitionName;
   protected String processDefinitionNameLike;
@@ -546,6 +547,11 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
     return this;
   }
 
+  public TaskQuery processDefinitionKeyIn(String... processDefinitionKeys) {
+    this.processDefinitionKeys = processDefinitionKeys;
+    return this;
+  }
+
   public TaskQuery processDefinitionId(String processDefinitionId) {
     this.processDefinitionId = processDefinitionId;
     return this;
@@ -992,6 +998,10 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
 
   public String getProcessDefinitionKey() {
     return processDefinitionKey;
+  }
+
+  public String[] getProcessDefinitionKeys() {
+    return processDefinitionKeys;
   }
 
   public String getProcessDefinitionId() {

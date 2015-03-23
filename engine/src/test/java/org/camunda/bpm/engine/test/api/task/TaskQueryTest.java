@@ -1127,6 +1127,48 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(0, taskService.createTaskQuery().processDefinitionKey("unexisting").count());
   }
 
+  @Deployment(resources = {
+    "org/camunda/bpm/engine/test/api/task/taskDefinitionProcess.bpmn20.xml",
+    "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"
+  })
+  public void testProcessDefinitionKeyIn() throws Exception {
+
+    // Start for each deployed process definition a process instance
+    runtimeService.startProcessInstanceByKey("taskDefinitionKeyProcess");
+    runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+    // 1 task should be found with oneTaskProcess
+    List<Task> tasks = taskService.createTaskQuery().processDefinitionKeyIn("oneTaskProcess").list();
+    assertNotNull(tasks);
+    assertEquals(1, tasks.size());
+
+    assertEquals("theTask", tasks.get(0).getTaskDefinitionKey());
+
+    // 2 Tasks should be found with both process definition keys
+    tasks = taskService.createTaskQuery()
+      .processDefinitionKeyIn("oneTaskProcess", "taskDefinitionKeyProcess")
+      .orderByTaskName()
+      .asc()
+      .list();
+    assertNotNull(tasks);
+    assertEquals(3, tasks.size());
+
+    assertEquals("taskKey1", tasks.get(0).getTaskDefinitionKey());
+    assertEquals("taskKey123", tasks.get(1).getTaskDefinitionKey());
+    assertEquals("theTask", tasks.get(2).getTaskDefinitionKey());
+
+    // 1 Tasks should be found with oneTaskProcess,and NonExistingKey
+    tasks = taskService.createTaskQuery().processDefinitionKeyIn("oneTaskProcess", "NonExistingKey").orderByTaskName().asc().list();
+    assertNotNull(tasks);
+    assertEquals(1, tasks.size());
+
+    assertEquals("theTask", tasks.get(0).getTaskDefinitionKey());
+
+    // No task should be found with NonExistingKey
+    Long count = taskService.createTaskQuery().processDefinitionKeyIn("NonExistingKey").count();
+    assertEquals(0L, count.longValue());
+  }
+
   @Deployment(resources={"org/camunda/bpm/engine/test/api/task/TaskQueryTest.testProcessDefinition.bpmn20.xml"})
   public void testProcessDefinitionName() throws Exception {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");

@@ -362,6 +362,7 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
       .queryParams(intQueryParameters)
       .queryParam("activityInstanceIdIn", arrayAsCommaSeperatedList(arrayQueryParameters.get("activityInstanceIdIn")))
       .queryParam("taskDefinitionKeyIn", arrayAsCommaSeperatedList(arrayQueryParameters.get("taskDefinitionKeyIn")))
+      .queryParam("processDefinitionKeyIn", arrayAsCommaSeperatedList(arrayQueryParameters.get("processDefinitionKeyIn")))
       .header("accept", MediaType.APPLICATION_JSON)
       .expect().statusCode(Status.OK.getStatusCode())
       .when().get(TASK_QUERY_URL);
@@ -400,9 +401,11 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
 
     String[] activityInstanceIds = { "anActivityInstanceId", "anotherActivityInstanceId" };
     String[] taskDefinitionKeys = { "aTaskDefinitionKey", "anotherTaskDefinitionKey" };
+    String[] processDefinitionKeys = { "aProcessDefinitionKey", "anotherProcessDefinitionKey" };
 
     parameters.put("activityInstanceIdIn", activityInstanceIds);
     parameters.put("taskDefinitionKeyIn", taskDefinitionKeys);
+    parameters.put("processDefinitionKeyIn", processDefinitionKeys);
 
     return parameters;
   }
@@ -484,6 +487,7 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
 
     verify(mockQuery).activityInstanceIdIn(stringArrayParameters.get("activityInstanceIdIn"));
     verify(mockQuery).taskDefinitionKeyIn(stringArrayParameters.get("taskDefinitionKeyIn"));
+    verify(mockQuery).processDefinitionKeyIn(stringArrayParameters.get("processDefinitionKeyIn"));
   }
 
   @Test
