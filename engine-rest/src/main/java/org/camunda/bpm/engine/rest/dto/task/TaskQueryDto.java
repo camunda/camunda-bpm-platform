@@ -88,6 +88,7 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
   }
 
   private String processInstanceBusinessKey;
+  private String[] processInstanceBusinessKeyIn;
   private String processInstanceBusinessKeyLike;
   private String processDefinitionKey;
   private String[] processDefinitionKeyIn;
@@ -173,6 +174,11 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
   @CamundaQueryParam("processInstanceBusinessKey")
   public void setProcessInstanceBusinessKey(String businessKey) {
     this.processInstanceBusinessKey = businessKey;
+  }
+
+  @CamundaQueryParam(value = "processInstanceBusinessKeyIn", converter = StringArrayConverter.class)
+  public void setProcessInstanceBusinessKeyIn(String[] processInstanceBusinessKeyIn) {
+    this.processInstanceBusinessKeyIn = processInstanceBusinessKeyIn;
   }
 
   @CamundaQueryParam("processInstanceBusinessKeyLike")
@@ -529,6 +535,10 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     return processInstanceBusinessKey;
   }
 
+  public String[] getProcessInstanceBusinessKeyIn() {
+    return processInstanceBusinessKeyIn;
+  }
+
   public String getProcessInstanceBusinessKeyLike() {
     return processInstanceBusinessKeyLike;
   }
@@ -805,6 +815,9 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
   protected void applyFilters(TaskQuery query) {
     if (processInstanceBusinessKey != null) {
       query.processInstanceBusinessKey(processInstanceBusinessKey);
+    }
+    if (processInstanceBusinessKeyIn != null && processInstanceBusinessKeyIn.length > 0) {
+      query.processInstanceBusinessKeyIn(processInstanceBusinessKeyIn);
     }
     if (processInstanceBusinessKeyLike != null) {
       query.processInstanceBusinessKeyLike(processInstanceBusinessKeyLike);

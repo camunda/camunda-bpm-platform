@@ -132,6 +132,11 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
   /** Only select tasks for the given process instance business key */
   TaskQuery processInstanceBusinessKey(String processInstanceBusinessKey);
 
+  /**
+   * Only select tasks for any of the given the given process instance business keys.
+   */
+  TaskQuery processInstanceBusinessKeyIn(String... processInstanceBusinessKeys);
+
   /** Only select tasks matching the given process instance business key.
    *  The syntax is that of SQL: for example usage: nameLike(%activiti%)*/
   TaskQuery processInstanceBusinessKeyLike(String processInstanceBusinessKey);

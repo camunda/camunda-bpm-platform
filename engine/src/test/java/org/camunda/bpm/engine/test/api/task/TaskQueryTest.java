@@ -1202,6 +1202,42 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/task/TaskQueryTest.testProcessDefinition.bpmn20.xml"})
+  public void testProcessInstanceBusinessKeyIn() throws Exception {
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", "BUSINESS-KEY-1");
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", "BUSINESS-KEY-2");
+
+    // 1 task should be found with BUSINESS-KEY-1
+    List<Task> tasks = taskService.createTaskQuery().processInstanceBusinessKeyIn("BUSINESS-KEY-1").list();
+    assertNotNull(tasks);
+    assertEquals(1, tasks.size());
+
+    assertEquals("theTask", tasks.get(0).getTaskDefinitionKey());
+
+    // 2 tasks should be found with BUSINESS-KEY-1 and BUSINESS-KEY-2
+    tasks = taskService.createTaskQuery()
+      .processInstanceBusinessKeyIn("BUSINESS-KEY-1", "BUSINESS-KEY-2")
+      .orderByTaskName()
+      .asc()
+      .list();
+    assertNotNull(tasks);
+    assertEquals(2, tasks.size());
+
+    assertEquals("theTask", tasks.get(0).getTaskDefinitionKey());
+    assertEquals("theTask", tasks.get(1).getTaskDefinitionKey());
+
+    // 1 tasks should be found with BUSINESS-KEY-1 and NON-EXISTING-KEY
+    tasks = taskService.createTaskQuery()
+      .processInstanceBusinessKeyIn("BUSINESS-KEY-1", "NON-EXISTING-KEY")
+      .orderByTaskName()
+      .asc()
+      .list();
+    assertNotNull(tasks);
+    assertEquals(1, tasks.size());
+
+    assertEquals("theTask", tasks.get(0).getTaskDefinitionKey());
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/task/TaskQueryTest.testProcessDefinition.bpmn20.xml"})
   public void testProcessInstanceBusinessKeyLike() throws Exception {
     runtimeService.startProcessInstanceByKey("oneTaskProcess", "BUSINESS-KEY-1");
 

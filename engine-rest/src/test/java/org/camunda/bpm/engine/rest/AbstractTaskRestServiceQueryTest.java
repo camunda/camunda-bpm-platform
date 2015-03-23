@@ -363,6 +363,7 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
       .queryParam("activityInstanceIdIn", arrayAsCommaSeperatedList(arrayQueryParameters.get("activityInstanceIdIn")))
       .queryParam("taskDefinitionKeyIn", arrayAsCommaSeperatedList(arrayQueryParameters.get("taskDefinitionKeyIn")))
       .queryParam("processDefinitionKeyIn", arrayAsCommaSeperatedList(arrayQueryParameters.get("processDefinitionKeyIn")))
+      .queryParam("processInstanceBusinessKeyIn", arrayAsCommaSeperatedList(arrayQueryParameters.get("processInstanceBusinessKeyIn")))
       .header("accept", MediaType.APPLICATION_JSON)
       .expect().statusCode(Status.OK.getStatusCode())
       .when().get(TASK_QUERY_URL);
@@ -402,10 +403,12 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
     String[] activityInstanceIds = { "anActivityInstanceId", "anotherActivityInstanceId" };
     String[] taskDefinitionKeys = { "aTaskDefinitionKey", "anotherTaskDefinitionKey" };
     String[] processDefinitionKeys = { "aProcessDefinitionKey", "anotherProcessDefinitionKey" };
+    String[] processInstanceBusinessKeys = { "aBusinessKey", "anotherBusinessKey" };
 
     parameters.put("activityInstanceIdIn", activityInstanceIds);
     parameters.put("taskDefinitionKeyIn", taskDefinitionKeys);
     parameters.put("processDefinitionKeyIn", processDefinitionKeys);
+    parameters.put("processInstanceBusinessKeyIn", processInstanceBusinessKeys);
 
     return parameters;
   }
