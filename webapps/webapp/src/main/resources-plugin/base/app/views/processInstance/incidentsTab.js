@@ -76,7 +76,7 @@ define(['angular', 'text!./incidents-tab.html', 'text!./job-retry-dialog.html'],
               var activityId = incident.activityId;
               var bpmnElement = bpmnElements[activityId];
               incident.activityName = bpmnElement.name || bpmnElement.id;
-              incident.linkable = bpmnElements[activityId] && activityIdToInstancesMap[activityId].length > 0;
+              incident.linkable = bpmnElements[activityId] && activityIdToInstancesMap[activityId] && activityIdToInstancesMap[activityId].length > 0;
             });
 
             $scope.incidents = data;
