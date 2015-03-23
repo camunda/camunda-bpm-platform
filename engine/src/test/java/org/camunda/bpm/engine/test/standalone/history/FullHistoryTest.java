@@ -15,7 +15,6 @@ package org.camunda.bpm.engine.test.standalone.history;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -38,13 +37,13 @@ import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.api.runtime.DummySerializable;
 import org.camunda.bpm.engine.test.api.runtime.util.CustomSerializable;
 import org.camunda.bpm.engine.test.api.runtime.util.FailingSerializable;
 import org.camunda.bpm.engine.test.history.SerializableVariable;
-import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.engine.variable.value.ObjectValue;
 import org.junit.Assert;
@@ -1503,5 +1502,32 @@ public class FullHistoryTest extends ResourceProcessEngineTestCase {
 
     TestHelper.clearOpLog(processEngineConfiguration);
 
+  }
+
+  public void testVariableInstance() {
+
+    Task newTask = taskService.newTask();
+    taskService.saveTask(newTask);
+
+    String variableName = "someName";
+    String variableValue = "someValue";
+    taskService.setVariable(newTask.getId(), variableName, variableValue);
+
+    VariableInstance variable = runtimeService
+        .createVariableInstanceQuery()
+        .singleResult();
+    assertNotNull(variable);
+
+    HistoricVariableUpdate result = (HistoricVariableUpdate) historyService
+        .createHistoricDetailQuery()
+        .variableUpdates()
+        .singleResult();
+    assertNotNull(result);
+
+    assertEquals(variable.getId(), result.getVariableInstanceId());
+
+    taskService.deleteTask(newTask.getId(), true);
+
+    TestHelper.clearOpLog(processEngineConfiguration);
   }
 }

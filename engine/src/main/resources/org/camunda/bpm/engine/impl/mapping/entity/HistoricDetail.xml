@@ -117,40 +117,12 @@
     <result property="taskId" column="TASK_ID_" jdbcType="VARCHAR" />
     <result property="sequenceCounter" column="SEQUENCE_COUNTER_" jdbcType="BIGINT" />
     <discriminator javaType="string" column="TYPE_">
-      <case value="VariableUpdate" resultMap="historicVariableUpdateResultMap"/> 
-      <case value="FormProperty" resultMap="historicFormPropertyResultMap"/> 
+      <case value="VariableUpdate" resultMap="historicVariableUpdateResultMap"/>
+      <case value="FormProperty" resultMap="historicFormPropertyResultMap"/>
     </discriminator>
   </resultMap>
 
   <resultMap id="historicVariableUpdateResultMap" extends="historicDetailResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity">
-    <result property="variableName" column="NAME_" javaType="String" jdbcType="VARCHAR" />
-    <result property="revision" column="REV_" jdbcType="INTEGER" />
-    <result property="serializerName" column="VAR_TYPE_" jdbcType="VARCHAR"/>
-    <result property="byteArrayId" column="BYTEARRAY_ID_" jdbcType="VARCHAR" />
-    <result property="doubleValue" column="DOUBLE_" jdbcType="DOUBLE" />
-    <result property="textValue" column="TEXT_" jdbcType="VARCHAR" />
-    <result property="textValue2" column="TEXT2_" jdbcType="VARCHAR" />
-    <result property="longValue" column="LONG_" jdbcType="BIGINT" />
-  </resultMap>
-
-  <resultMap id="historicDetailResultMap_postgres" type="org.camunda.bpm.engine.impl.history.event.HistoricDetailEventEntity">
-    <id property="id" column="ID_" jdbcType="VARCHAR" />
-    <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR" />
-    <result property="executionId" column="EXECUTION_ID_" jdbcType="VARCHAR" />
-    <result property="caseInstanceId" column="CASE_INST_ID_" jdbcType="VARCHAR" />
-    <result property="caseExecutionId" column="CASE_EXECUTION_ID_" jdbcType="VARCHAR" />
-    <result property="processDefinitionId" column="PROC_DEF_ID_" jdbcType="VARCHAR" />
-    <result property="timestamp" column="TIME_" jdbcType="TIMESTAMP" />
-    <result property="activityInstanceId" column="ACT_INST_ID_" jdbcType="VARCHAR" />
-    <result property="taskId" column="TASK_ID_" jdbcType="VARCHAR" />
-    <result property="sequenceCounter" column="SEQUENCE_COUNTER_" jdbcType="BIGINT" />
-    <discriminator javaType="string" column="TYPE_">
-      <case value="VariableUpdate" resultMap="historicVariableUpdateResultMap_postgres"/> 
-      <case value="FormProperty" resultMap="historicFormPropertyResultMap"/> 
-    </discriminator>
-  </resultMap>
-
-  <resultMap id="historicVariableUpdateResultMap_postgres" extends="historicDetailResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity">
     <result property="variableName" column="NAME_" javaType="String" jdbcType="VARCHAR" />
     <result property="variableInstanceId" column="VAR_INST_ID_" javaType="String" jdbcType="VARCHAR" />
     <result property="revision" column="REV_" jdbcType="INTEGER" />
@@ -170,7 +142,7 @@
   <!-- HISTORIC VARIABLE UPDATE SELECT -->
 
   <select id="selectHistoricDetailsByProcessInstanceId" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="historicDetailResultMap">
-    select * from ${prefix}ACT_HI_DETAIL 
+    select * from ${prefix}ACT_HI_DETAIL
     where PROC_INST_ID_ = #{parameter, jdbcType=VARCHAR}
   </select>
 
@@ -180,21 +152,11 @@
   </select>
 
   <select id="selectHistoricDetailsByTaskId" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="historicDetailResultMap">
-    select * from ${prefix}ACT_HI_DETAIL 
+    select * from ${prefix}ACT_HI_DETAIL
     where TASK_ID_ = #{parameter, jdbcType=VARCHAR}
   </select>
 
   <select id="selectHistoricDetailsByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.HistoricDetailQueryImpl" resultMap="historicDetailResultMap">
-  	<include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
-    ${limitBefore}
-    select RES.* 
-    ${limitBetween}
-    <include refid="selectHistoricDetailsByQueryCriteriaSql"/>
-    ${orderBy}
-    ${limitAfter}
-  </select>
-
-  <select id="selectHistoricDetailsByQueryCriteria_postgres" parameterType="org.camunda.bpm.engine.impl.HistoricDetailQueryImpl" resultMap="historicDetailResultMap_postgres">
   	<include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
     select RES.* 

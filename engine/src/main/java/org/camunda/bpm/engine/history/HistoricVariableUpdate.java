@@ -25,6 +25,11 @@ public interface HistoricVariableUpdate extends HistoricDetail {
   String getVariableName();
 
   /**
+   * Returns the id of the corresponding variable instance.
+   */
+  String getVariableInstanceId();
+
+  /**
    * Returns the type name of the variable
    *
    * @return the type name of the variable

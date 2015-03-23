@@ -415,6 +415,7 @@ public abstract class MockProvider {
   public static final String EXAMPLE_HISTORIC_VAR_UPDATE_VALUE_TYPE_NAME = "String";
   public static final int EXAMPLE_HISTORIC_VAR_UPDATE_REVISION = 1;
   public static final String EXAMPLE_HISTORIC_VAR_UPDATE_ERROR = "anErrorMessage";
+  public static final String EXAMPLE_HISTORIC_VAR_UPDATE_VAR_INST_ID = "aVariableInstanceId";
 
   public static final String EXAMPLE_HISTORIC_FORM_FIELD_ID = "anId";
   public static final String EXAMPLE_HISTORIC_FORM_FIELD_PROC_INST_ID = "aProcInst";
@@ -1414,6 +1415,7 @@ public abstract class MockProvider {
         .taskId(EXAMPLE_HISTORIC_VAR_UPDATE_TASK_ID)
         .time(EXAMPLE_HISTORIC_VAR_UPDATE_TIME)
         .name(EXAMPLE_HISTORIC_VAR_UPDATE_NAME)
+        .variableInstanceId(EXAMPLE_HISTORIC_VAR_UPDATE_VAR_INST_ID)
         .typedValue(EXAMPLE_PRIMITIVE_VARIABLE_VALUE)
         .revision(EXAMPLE_HISTORIC_VAR_UPDATE_REVISION)
         .errorMessage(null);

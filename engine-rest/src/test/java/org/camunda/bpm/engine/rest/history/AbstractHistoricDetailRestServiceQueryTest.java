@@ -304,6 +304,7 @@ public abstract class AbstractHistoricDetailRestServiceQueryTest extends Abstrac
         .and()
           .body("[0].id", equalTo(historicUpdateBuilder.getId()))
           .body("[0].variableName", equalTo(historicUpdateBuilder.getName()))
+          .body("[0].variableInstanceId", equalTo(historicUpdateBuilder.getVariableInstanceId()))
           .body("[0].variableType", equalTo(VariableTypeHelper.toExpectedValueTypeName(
               historicUpdateBuilder.getTypedValue().getType())))
           .body("[0].value", equalTo(historicUpdateBuilder.getTypedValue().getValue()))

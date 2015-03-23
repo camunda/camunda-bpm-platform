@@ -12,12 +12,12 @@
  */
 package org.camunda.bpm.engine.rest.dto.history;
 
+import java.util.Map;
+
 import org.camunda.bpm.engine.history.HistoricVariableUpdate;
 import org.camunda.bpm.engine.rest.dto.VariableValueDto;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
-
-import java.util.Map;
 
 /**
  * @author Roman Smirnov
@@ -27,6 +27,7 @@ import java.util.Map;
 public class HistoricVariableUpdateDto extends HistoricDetailDto {
 
   protected String variableName;
+  protected String variableInstanceId;
   protected String variableType;
   protected Object value;
   protected Map<String, Object> valueInfo;
@@ -36,6 +37,10 @@ public class HistoricVariableUpdateDto extends HistoricDetailDto {
 
   public String getVariableName() {
     return variableName;
+  }
+
+  public String getVariableInstanceId() {
+    return variableInstanceId;
   }
 
   public String getVariableType() {
@@ -64,6 +69,7 @@ public class HistoricVariableUpdateDto extends HistoricDetailDto {
 
     dto.revision = historicVariableUpdate.getRevision();
     dto.variableName = historicVariableUpdate.getVariableName();
+    dto.variableInstanceId = historicVariableUpdate.getVariableInstanceId();
 
     if(historicVariableUpdate.getErrorMessage() == null) {
       VariableValueDto variableValueDto = VariableValueDto.fromTypedValue(historicVariableUpdate.getTypedValue());

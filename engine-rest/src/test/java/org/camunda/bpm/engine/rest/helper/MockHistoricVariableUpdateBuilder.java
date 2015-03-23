@@ -28,6 +28,7 @@ public class MockHistoricVariableUpdateBuilder {
 
   protected String id;
   protected String name;
+  protected String variableInstanceId;
   protected TypedValue typedValue;
   protected String processInstanceId;
   protected String errorMessage;
@@ -44,6 +45,11 @@ public class MockHistoricVariableUpdateBuilder {
 
   public MockHistoricVariableUpdateBuilder name(String name) {
     this.name = name;
+    return this;
+  }
+
+  public MockHistoricVariableUpdateBuilder variableInstanceId(String variableInstanceId) {
+    this.variableInstanceId = variableInstanceId;
     return this;
   }
 
@@ -91,6 +97,7 @@ public class MockHistoricVariableUpdateBuilder {
     HistoricVariableUpdate mockVariable = mock(HistoricVariableUpdate.class);
     when(mockVariable.getId()).thenReturn(id);
     when(mockVariable.getVariableName()).thenReturn(name);
+    when(mockVariable.getVariableInstanceId()).thenReturn(variableInstanceId);
     when(mockVariable.getVariableTypeName()).thenReturn(typedValue.getType().getName());
 
     if (ObjectValue.class.isAssignableFrom(typedValue.getClass())) {
@@ -123,6 +130,10 @@ public class MockHistoricVariableUpdateBuilder {
 
   public String getName() {
     return name;
+  }
+
+  public String getVariableInstanceId() {
+    return variableInstanceId;
   }
 
   public Object getValue() {
