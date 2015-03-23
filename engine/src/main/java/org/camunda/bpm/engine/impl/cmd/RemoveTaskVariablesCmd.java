@@ -3,10 +3,8 @@ package org.camunda.bpm.engine.impl.cmd;
 import java.io.Serializable;
 import java.util.Collection;
 
-import org.camunda.bpm.engine.history.UserOperationLogEntry;
+import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
 import org.camunda.bpm.engine.impl.interceptor.Command;
-import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 
@@ -16,52 +14,33 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
  * @author roman.smirnov
  * @author Joram Barrez
  */
-public class RemoveTaskVariablesCmd extends AbstractVariableCmd implements Command<Void>, Serializable {
+public class RemoveTaskVariablesCmd extends AbstractRemoveVariableCmd implements Command<Void>, Serializable {
   
   private static final long serialVersionUID = 1L;
 
-  protected final String taskId;
-  protected final Collection<String> variableNames;
-  protected final boolean isLocal;
-
   public RemoveTaskVariablesCmd(String taskId, Collection<String> variableNames, boolean isLocal) {
-    this.taskId = taskId;
-    this.variableNames = variableNames;
-    this.isLocal = isLocal;
+    super(taskId, variableNames, isLocal);
   }
-  
-  public Void execute(CommandContext commandContext) {
 
-    ensureNotNull("taskId", taskId);
+  @Override
+  public void checkParameters() {
+    ensureNotNull("taskId", entityId);
+  }
 
+  @Override
+  public AbstractVariableScope getEntity() {
     TaskEntity task = commandContext
       .getTaskManager()
-      .findTaskById(taskId);
+      .findTaskById(entityId);
 
-    ensureNotNull("Cannot find task with id " + taskId, "task", task);
+    ensureNotNull("Cannot find task with id " + entityId, "task", task);
 
-    if (isLocal) {
-      task.removeVariablesLocal(variableNames);
-    } else {
-      task.removeVariables(variableNames);
-    }
-
-    if(!preventLogUserOperation) {
-      String processDefinitionKey = null;
-      if(task.getExecution() != null) {
-        processDefinitionKey = ((ProcessDefinitionEntity) task.getExecution().getProcessDefinition()).getKey();
-      } else if(task.getProcessInstance() != null) {
-        processDefinitionKey = ((ProcessDefinitionEntity) task.getProcessInstance().getProcessDefinition()).getKey();
-      }
-
-      commandContext.getOperationLogManager().logVariableOperation(getLogEntryOperation(), task.getExecutionId(),
-        task.getProcessInstanceId(), task.getProcessDefinitionId(), processDefinitionKey, PropertyChange.EMPTY_CHANGE);
-    }
-
-    return null;
+    return task;
   }
 
-  public String getLogEntryOperation() {
-    return UserOperationLogEntry.OPERATION_TYPE_REMOVE_TASK_VARIABLE;
+  @Override
+  public void logVariableOperation(AbstractVariableScope scope) {
+    TaskEntity task = (TaskEntity) scope;
+    commandContext.getOperationLogManager().logVariableOperation(getLogEntryOperation(), task, PropertyChange.EMPTY_CHANGE);
   }
 }

@@ -16,11 +16,9 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.Map;
 
-import org.camunda.bpm.engine.history.UserOperationLogEntry;
+import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
 import org.camunda.bpm.engine.impl.interceptor.Command;
-import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
@@ -32,47 +30,41 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
  * @author Thorben Lindhauer
  *
  */
-public class PatchExecutionVariablesCmd extends AbstractVariableCmd implements Command<Void>, Serializable {
+public class PatchExecutionVariablesCmd extends AbstractPatchVariablesCmd implements Command<Void>, Serializable {
 
   private static final long serialVersionUID = 1L;
 
-  protected String executionId;
-  protected Map<String, ? extends Object> modifications;
-  protected Collection<String> deletions;
-  protected boolean isLocal;
   
   public PatchExecutionVariablesCmd(String executionId, Map<String, ? extends Object> modifications, Collection<String> deletions, boolean isLocal) {
-    this.modifications = modifications;
-    this.deletions = deletions;
-    this.executionId = executionId;
-    this.isLocal = isLocal;
+    super(executionId, modifications, deletions, isLocal);
   }
-  
-  @Override
-  public Void execute(CommandContext commandContext) {
-    ensureNotNull("executionId", executionId);
 
+  @Override
+  public void checkParameters() {
+    ensureNotNull("executionId", entityId);
+  }
+
+  @Override
+  public AbstractVariableScope getEntity() {
     ExecutionEntity execution = commandContext
       .getExecutionManager()
-      .findExecutionById(executionId);
+      .findExecutionById(entityId);
 
-    ensureNotNull("execution " + executionId + " doesn't exist", "execution", execution);
+    ensureNotNull("execution " + entityId + " doesn't exist", "execution", execution);
 
-    new SetExecutionVariablesCmd(executionId, modifications, isLocal).disableLogUserOperation().execute(commandContext);
-    new RemoveExecutionVariablesCmd(executionId, deletions, isLocal).disableLogUserOperation().execute(commandContext);
-
-    if(!preventLogUserOperation) {
-      String processDefinitionKey = ((ProcessDefinitionEntity) execution.getProcessDefinition()).getKey();
-      commandContext.getOperationLogManager().logVariableOperation(getLogEntryOperation(), executionId,
-        execution.getProcessInstanceId(), execution.getProcessDefinitionId(), processDefinitionKey,
-        PropertyChange.EMPTY_CHANGE);
-    }
-
-    return null;
+    return execution;
   }
 
-  public String getLogEntryOperation() {
-    return UserOperationLogEntry.OPERATION_TYPE_PATCH_EXECUTION_VARIABLE;
+  @Override
+  public void logVariableOperation(AbstractVariableScope scope) {
+    ExecutionEntity execution = (ExecutionEntity) scope;
+    commandContext.getOperationLogManager().logVariableOperation(getLogEntryOperation(), execution,
+      PropertyChange.EMPTY_CHANGE);
   }
 
+  @Override
+  public void executeOperation(AbstractVariableScope scope) {
+    new SetExecutionVariablesCmd(entityId, variables, isLocal).disableLogUserOperation().execute(commandContext);
+    new RemoveExecutionVariablesCmd(entityId, deletions, isLocal).disableLogUserOperation().execute(commandContext);
+  }
 }

@@ -16,9 +16,8 @@ package org.camunda.bpm.engine.impl.cmd;
 import java.io.Serializable;
 import java.util.Map;
 
-import org.camunda.bpm.engine.history.UserOperationLogEntry;
+import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
 import org.camunda.bpm.engine.impl.interceptor.Command;
-import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.*;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
@@ -28,51 +27,33 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
  * @author Tom Baeyens
  * @author Joram Barrez
  */
-public class SetTaskVariablesCmd extends AbstractVariableCmd implements Command<Void>, Serializable {
+public class SetTaskVariablesCmd extends AbstractSetVariableCmd implements Command<Void>, Serializable {
 
   private static final long serialVersionUID = 1L;
 
-  protected Map<String, ? extends Object> variables;
-  protected boolean isLocal;
-  protected String taskId;
-
   public SetTaskVariablesCmd(String taskId, Map<String, ? extends Object> variables, boolean isLocal) {
-    this.taskId = taskId;
-    this.variables = variables;
-    this.isLocal = isLocal;
+    super(taskId, variables, isLocal);
   }
 
-  public Void execute(CommandContext commandContext) {
-    ensureNotNull("taskId", taskId);
+  @Override
+  public void checkParameters() {
+    ensureNotNull("taskId", entityId);
+  }
 
-    TaskEntity task = commandContext
+  @Override
+  public AbstractVariableScope getEntity() {
+    TaskEntity task =  commandContext
       .getTaskManager()
-      .findTaskById(taskId);
+      .findTaskById(entityId);
+    ensureNotNull("task " + entityId + " doesn't exist", "task", task);
 
-    ensureNotNull("Cannot find task with id " + taskId, "task", task);
-
-    if (isLocal) {
-      task.setVariablesLocal(variables);
-    } else {
-      task.setVariables(variables);
-    }
-
-    if(!preventLogUserOperation) {
-      String processDefinitionKey = null;
-      if(task.getExecution() != null) {
-        processDefinitionKey = ((ProcessDefinitionEntity) task.getExecution().getProcessDefinition()).getKey();
-      } else if(task.getProcessInstance() != null) {
-        processDefinitionKey = ((ProcessDefinitionEntity) task.getProcessInstance().getProcessDefinition()).getKey();
-      }
-
-      commandContext.getOperationLogManager().logVariableOperation(getLogEntryOperation(), task.getExecutionId(),
-        task.getProcessInstanceId(), task.getProcessDefinitionId(), processDefinitionKey, PropertyChange.EMPTY_CHANGE);
-    }
-
-    return null;
+    return task;
   }
 
-  public String getLogEntryOperation() {
-    return UserOperationLogEntry.OPERATION_TYPE_SET_TASK_VARIABLE;
+  @Override
+  public void logVariableOperation(AbstractVariableScope scope) {
+    TaskEntity task = (TaskEntity) scope;
+    commandContext.getOperationLogManager().logVariableOperation(getLogEntryOperation(), task,
+      PropertyChange.EMPTY_CHANGE);
   }
 }

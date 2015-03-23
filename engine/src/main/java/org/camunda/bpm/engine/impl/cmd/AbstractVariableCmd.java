@@ -12,10 +12,12 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
+import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 
 import java.io.Serializable;
+import java.util.Map;
 
 /**
  * @author Stefan Hentschel.
@@ -23,13 +25,53 @@ import java.io.Serializable;
 public abstract class AbstractVariableCmd implements Command<Void>, Serializable {
 
   protected boolean preventLogUserOperation = false;
+  protected boolean isLocal;
+  protected Map<String, ?> variables;
+  protected String entityId;
+  protected CommandContext commandContext;
+
+  public AbstractVariableCmd(String entityId, Map<String, ?> variables, boolean isLocal) {
+    this.entityId = entityId;
+    this.variables = variables;
+    this.isLocal = isLocal;
+  }
 
   public AbstractVariableCmd disableLogUserOperation() {
     this.preventLogUserOperation = true;
     return this;
   }
 
-  public abstract Void execute(CommandContext commandContext);
+  public void setVariables(AbstractVariableScope scope, Map<String, ?> variables, boolean isLocal) {
+    if (isLocal) {
+      scope.setVariablesLocal(variables);
+    } else {
+      scope.setVariables(variables);
+    }
+  }
+
+
+  public Void execute(CommandContext commandContext) {
+    this.commandContext = commandContext;
+    checkParameters();
+
+    AbstractVariableScope scope = getEntity();
+
+    executeOperation(scope);
+
+    if(!preventLogUserOperation) {
+      logVariableOperation(scope);
+    }
+
+    return null;
+  };
+
+  public abstract void checkParameters();
+
+  public abstract AbstractVariableScope getEntity();
+
+  public abstract void logVariableOperation(AbstractVariableScope scope);
+
+  public abstract void executeOperation(AbstractVariableScope scope);
 
   public abstract String getLogEntryOperation();
 }

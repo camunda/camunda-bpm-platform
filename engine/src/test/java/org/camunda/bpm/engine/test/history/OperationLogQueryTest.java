@@ -755,7 +755,7 @@ public class OperationLogQueryTest extends PluggableProcessEngineTestCase {
     runtimeService.setVariable(process.getId(), "testVariable1", "THIS IS TESTVARIABLE!!!");
 
     // then
-    verifyVariableOperationAsserts(1, UserOperationLogEntry.OPERATION_TYPE_SET_EXECUTION_VARIABLE);
+    verifyVariableOperationAsserts(1, UserOperationLogEntry.OPERATION_TYPE_SET_VARIABLE);
   }
 
   @Deployment(resources = {ONE_TASK_PROCESS})
@@ -767,7 +767,7 @@ public class OperationLogQueryTest extends PluggableProcessEngineTestCase {
     runtimeService.setVariables(process.getId(), createMapForVariableAddition());
 
     // then
-    verifyVariableOperationAsserts(1, UserOperationLogEntry.OPERATION_TYPE_SET_EXECUTION_VARIABLE);
+    verifyVariableOperationAsserts(1, UserOperationLogEntry.OPERATION_TYPE_SET_VARIABLE);
   }
 
   @Deployment(resources = {ONE_TASK_PROCESS})
@@ -781,7 +781,7 @@ public class OperationLogQueryTest extends PluggableProcessEngineTestCase {
     runtimeService.setVariable(process.getId(), "testVariable4", "bar");
 
     // then
-    verifyVariableOperationAsserts(3, UserOperationLogEntry.OPERATION_TYPE_SET_EXECUTION_VARIABLE);
+    verifyVariableOperationAsserts(3, UserOperationLogEntry.OPERATION_TYPE_SET_VARIABLE);
   }
 
   @Deployment(resources = {ONE_TASK_PROCESS})
@@ -794,7 +794,7 @@ public class OperationLogQueryTest extends PluggableProcessEngineTestCase {
     taskService.setVariable(processTaskId, "testVariable1", "THIS IS TESTVARIABLE!!!");
 
     // then
-    verifyVariableOperationAsserts(1, UserOperationLogEntry.OPERATION_TYPE_SET_TASK_VARIABLE);
+    verifyVariableOperationAsserts(1, UserOperationLogEntry.OPERATION_TYPE_SET_VARIABLE);
   }
 
   @Deployment(resources = {ONE_TASK_PROCESS})
@@ -807,7 +807,7 @@ public class OperationLogQueryTest extends PluggableProcessEngineTestCase {
     taskService.setVariables(processTaskId, createMapForVariableAddition());
 
     // then
-    verifyVariableOperationAsserts(1, UserOperationLogEntry.OPERATION_TYPE_SET_TASK_VARIABLE);
+    verifyVariableOperationAsserts(1, UserOperationLogEntry.OPERATION_TYPE_SET_VARIABLE);
   }
 
   @Deployment(resources = {ONE_TASK_PROCESS})
@@ -822,7 +822,7 @@ public class OperationLogQueryTest extends PluggableProcessEngineTestCase {
     taskService.setVariable(processTaskId, "testVariable4", "bar");
 
     // then
-    verifyVariableOperationAsserts(3, UserOperationLogEntry.OPERATION_TYPE_SET_TASK_VARIABLE);
+    verifyVariableOperationAsserts(3, UserOperationLogEntry.OPERATION_TYPE_SET_VARIABLE);
   }
 
   // ----- PATCH VARIABLES -----
@@ -837,7 +837,7 @@ public class OperationLogQueryTest extends PluggableProcessEngineTestCase {
       .updateVariables(process.getId(), createMapForVariableAddition(), createCollectionForVariableDeletion());
 
     // then
-   verifyVariableOperationAsserts(1, UserOperationLogEntry.OPERATION_TYPE_PATCH_EXECUTION_VARIABLE);
+   verifyVariableOperationAsserts(1, UserOperationLogEntry.OPERATION_TYPE_MODIFY_VARIABLE);
   }
 
   @Deployment(resources = {ONE_TASK_PROCESS})
@@ -851,7 +851,7 @@ public class OperationLogQueryTest extends PluggableProcessEngineTestCase {
       .updateVariablesLocal(processTaskId, createMapForVariableAddition(), createCollectionForVariableDeletion());
 
     // then
-    verifyVariableOperationAsserts(1, UserOperationLogEntry.OPERATION_TYPE_PATCH_TASK_VARIABLE);
+    verifyVariableOperationAsserts(1, UserOperationLogEntry.OPERATION_TYPE_MODIFY_VARIABLE);
   }
 
   // ----- REMOVE VARIABLES -----
@@ -865,7 +865,7 @@ public class OperationLogQueryTest extends PluggableProcessEngineTestCase {
     runtimeService.removeVariable(process.getId(), "testVariable1");
 
     // then
-    verifyVariableOperationAsserts(1, UserOperationLogEntry.OPERATION_TYPE_REMOVE_EXECUTION_VARIABLE);
+    verifyVariableOperationAsserts(1, UserOperationLogEntry.OPERATION_TYPE_REMOVE_VARIABLE);
   }
 
   @Deployment(resources = {ONE_TASK_PROCESS})
@@ -877,7 +877,7 @@ public class OperationLogQueryTest extends PluggableProcessEngineTestCase {
     runtimeService.removeVariables(process.getId(), createCollectionForVariableDeletion());
 
     // then
-    verifyVariableOperationAsserts(1, UserOperationLogEntry.OPERATION_TYPE_REMOVE_EXECUTION_VARIABLE);
+    verifyVariableOperationAsserts(1, UserOperationLogEntry.OPERATION_TYPE_REMOVE_VARIABLE);
   }
 
   @Deployment(resources = {ONE_TASK_PROCESS})
@@ -891,7 +891,7 @@ public class OperationLogQueryTest extends PluggableProcessEngineTestCase {
     runtimeService.removeVariable(process.getId(), "testVariable2");
 
     // then
-    verifyVariableOperationAsserts(3, UserOperationLogEntry.OPERATION_TYPE_REMOVE_EXECUTION_VARIABLE);
+    verifyVariableOperationAsserts(3, UserOperationLogEntry.OPERATION_TYPE_REMOVE_VARIABLE);
   }
 
   @Deployment(resources = {ONE_TASK_PROCESS})
@@ -904,7 +904,7 @@ public class OperationLogQueryTest extends PluggableProcessEngineTestCase {
     taskService.removeVariable(processTaskId, "testVariable1");
 
     // then
-    verifyVariableOperationAsserts(1, UserOperationLogEntry.OPERATION_TYPE_REMOVE_TASK_VARIABLE);
+    verifyVariableOperationAsserts(1, UserOperationLogEntry.OPERATION_TYPE_REMOVE_VARIABLE);
   }
 
   @Deployment(resources = {ONE_TASK_PROCESS})
@@ -917,7 +917,7 @@ public class OperationLogQueryTest extends PluggableProcessEngineTestCase {
     taskService.removeVariables(processTaskId, createCollectionForVariableDeletion());
 
     // then
-    verifyVariableOperationAsserts(1, UserOperationLogEntry.OPERATION_TYPE_REMOVE_TASK_VARIABLE);
+    verifyVariableOperationAsserts(1, UserOperationLogEntry.OPERATION_TYPE_REMOVE_VARIABLE);
   }
 
   @Deployment(resources = {ONE_TASK_PROCESS})
@@ -932,7 +932,7 @@ public class OperationLogQueryTest extends PluggableProcessEngineTestCase {
     taskService.removeVariable(processTaskId, "testVariable4");
 
     // then
-    verifyVariableOperationAsserts(3, UserOperationLogEntry.OPERATION_TYPE_REMOVE_TASK_VARIABLE);
+    verifyVariableOperationAsserts(3, UserOperationLogEntry.OPERATION_TYPE_REMOVE_VARIABLE);
   }
 
   // --------------- CMMN --------------------

@@ -4,10 +4,9 @@ import java.io.Serializable;
 import java.util.Collection;
 
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
+import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
 import org.camunda.bpm.engine.impl.interceptor.Command;
-import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
@@ -16,46 +15,38 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
  * @author roman.smirnov
  * @author Joram Barrez
  */
-public class RemoveExecutionVariablesCmd extends AbstractVariableCmd implements Command<Void>, Serializable {
+public class RemoveExecutionVariablesCmd extends AbstractRemoveVariableCmd implements Command<Void>, Serializable {
 
   private static final long serialVersionUID = 1L;
 
-  private String executionId;
-  private Collection<String> variableNames;
-  private boolean isLocal;
-  
   public RemoveExecutionVariablesCmd(String executionId, Collection<String> variableNames, boolean isLocal) {
-    this.executionId = executionId;
-    this.variableNames = variableNames;
-    this.isLocal = isLocal;
+    super(executionId, variableNames, isLocal);
   }
-  
-  @Override
-  public Void execute(CommandContext commandContext) {
-    ensureNotNull("executionId", executionId);
 
+  @Override
+  public void checkParameters() {
+    ensureNotNull("executionId", entityId);
+  }
+
+  @Override
+  public AbstractVariableScope getEntity() {
     ExecutionEntity execution = commandContext
       .getExecutionManager()
-      .findExecutionById(executionId);
+      .findExecutionById(entityId);
 
-    ensureNotNull("execution " + executionId + " doesn't exist", "execution", execution);
+    ensureNotNull("execution " + entityId + " doesn't exist", "execution", execution);
 
-    if (isLocal) {
-      execution.removeVariablesLocal(variableNames);
-    } else {
-      execution.removeVariables(variableNames);
-    }
+    return execution;
+  }
 
-    if(!preventLogUserOperation) {
-      String processDefinitionKey = ((ProcessDefinitionEntity) execution.getProcessDefinition()).getKey();
-      commandContext.getOperationLogManager().logVariableOperation(getLogEntryOperation(), execution.getId(),
-        execution.getProcessInstanceId(), execution.getProcessDefinitionId(), processDefinitionKey, PropertyChange.EMPTY_CHANGE);
-    }
-
-    return null;
+  @Override
+  public void logVariableOperation(AbstractVariableScope scope) {
+    ExecutionEntity execution = (ExecutionEntity) scope;
+    commandContext.getOperationLogManager().logVariableOperation(getLogEntryOperation(), execution,
+      PropertyChange.EMPTY_CHANGE);
   }
 
   public String getLogEntryOperation() {
-    return UserOperationLogEntry.OPERATION_TYPE_REMOVE_EXECUTION_VARIABLE;
+    return UserOperationLogEntry.OPERATION_TYPE_REMOVE_VARIABLE;
   }
 }

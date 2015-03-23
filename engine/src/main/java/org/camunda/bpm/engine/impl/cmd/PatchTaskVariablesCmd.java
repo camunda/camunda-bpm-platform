@@ -17,9 +17,8 @@ import java.util.Collection;
 import java.util.Map;
 
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
+import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
 import org.camunda.bpm.engine.impl.interceptor.Command;
-import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 
@@ -32,52 +31,46 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
  * @author kristin.polenz@camunda.com
  *
  */
-public class PatchTaskVariablesCmd extends AbstractVariableCmd implements Command<Void>, Serializable {
+public class PatchTaskVariablesCmd extends AbstractPatchVariablesCmd implements Command<Void>, Serializable {
 
   private static final long serialVersionUID = 1L;
 
-  protected String taskId;
-  protected Map<String, ? extends Object> modifications;
-  protected Collection<String> deletions;
-  protected boolean isLocal;
-
   public PatchTaskVariablesCmd(String taskId, Map<String, ? extends Object> modifications, Collection<String> deletions, boolean isLocal) {
-    this.modifications = modifications;
-    this.deletions = deletions;
-    this.taskId = taskId;
-    this.isLocal = isLocal;
+    super(taskId, modifications, deletions, isLocal);
   }
 
   @Override
-  public Void execute(CommandContext commandContext) {
-    ensureNotNull("taskId", taskId);
+  public void checkParameters() {
+    ensureNotNull("taskId", entityId);
+  }
 
+  @Override
+  public AbstractVariableScope getEntity() {
     TaskEntity task = commandContext
       .getTaskManager()
-      .findTaskById(taskId);
+      .findTaskById(entityId);
 
-    ensureNotNull("Cannot find task with id " + taskId, "task", task);
+    ensureNotNull("Cannot find task with id " + entityId, "task", task);
 
-    new SetTaskVariablesCmd(taskId, modifications, isLocal).disableLogUserOperation().execute(commandContext);
-    new RemoveTaskVariablesCmd(taskId, deletions, isLocal).disableLogUserOperation().execute(commandContext);
+    return task;
+  }
 
-    if(!preventLogUserOperation) {
-      String processDefinitionKey = null;
-      if(task.getExecution() != null) {
-        processDefinitionKey = ((ProcessDefinitionEntity) task.getExecution().getProcessDefinition()).getKey();
-      } else if(task.getProcessInstance() != null) {
-        processDefinitionKey = ((ProcessDefinitionEntity) task.getProcessInstance().getProcessDefinition()).getKey();
-      }
+  @Override
+  public void logVariableOperation(AbstractVariableScope scope) {
+    TaskEntity task = (TaskEntity) scope;
+    commandContext.getOperationLogManager().logVariableOperation(getLogEntryOperation(), task,
+      PropertyChange.EMPTY_CHANGE);
 
-      commandContext.getOperationLogManager().logVariableOperation(getLogEntryOperation(), task.getExecutionId(),
-        task.getProcessInstanceId(), task.getProcessDefinitionId(), processDefinitionKey,
-        PropertyChange.EMPTY_CHANGE);
-    }
-    return null;
+  }
+
+  @Override
+  public void executeOperation(AbstractVariableScope scope) {
+    new SetTaskVariablesCmd(entityId, variables, isLocal).disableLogUserOperation().execute(commandContext);
+    new RemoveTaskVariablesCmd(entityId, deletions, isLocal).disableLogUserOperation().execute(commandContext);
   }
 
   public String getLogEntryOperation() {
-    return UserOperationLogEntry.OPERATION_TYPE_PATCH_TASK_VARIABLE;
+    return UserOperationLogEntry.OPERATION_TYPE_MODIFY_VARIABLE;
   }
 
 }
