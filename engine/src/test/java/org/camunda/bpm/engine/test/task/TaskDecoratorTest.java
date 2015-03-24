@@ -26,7 +26,6 @@ import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.impl.task.TaskDecorator;
 import org.camunda.bpm.engine.impl.task.TaskDefinition;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
-import org.camunda.bpm.engine.impl.test.TestHelper;
 import org.camunda.bpm.engine.task.IdentityLink;
 import org.camunda.bpm.engine.task.IdentityLinkType;
 
@@ -56,8 +55,6 @@ public class TaskDecoratorTest extends PluggableProcessEngineTestCase {
     processEngineConfiguration
       .getCommandExecutorTxRequired()
       .execute(new DeleteTaskCommand(task));
-
-    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
   protected void decorate(TaskEntity task, TaskDecorator decorator) {

@@ -12,27 +12,26 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
+import java.io.Serializable;
+
 import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-
-import java.io.Serializable;
-import java.util.Map;
 
 /**
  * @author Stefan Hentschel.
  */
 public abstract class AbstractVariableCmd implements Command<Void>, Serializable {
 
-  protected boolean preventLogUserOperation = false;
-  protected boolean isLocal;
-  protected Map<String, ?> variables;
-  protected String entityId;
-  protected CommandContext commandContext;
+  private static final long serialVersionUID = 1L;
 
-  public AbstractVariableCmd(String entityId, Map<String, ?> variables, boolean isLocal) {
+  protected CommandContext commandContext;
+  protected String entityId;
+  protected boolean isLocal;
+  protected boolean preventLogUserOperation = false;
+
+  public AbstractVariableCmd(String entityId, boolean isLocal) {
     this.entityId = entityId;
-    this.variables = variables;
     this.isLocal = isLocal;
   }
 
@@ -41,18 +40,8 @@ public abstract class AbstractVariableCmd implements Command<Void>, Serializable
     return this;
   }
 
-  public void setVariables(AbstractVariableScope scope, Map<String, ?> variables, boolean isLocal) {
-    if (isLocal) {
-      scope.setVariablesLocal(variables);
-    } else {
-      scope.setVariables(variables);
-    }
-  }
-
-
   public Void execute(CommandContext commandContext) {
     this.commandContext = commandContext;
-    checkParameters();
 
     AbstractVariableScope scope = getEntity();
 
@@ -65,13 +54,11 @@ public abstract class AbstractVariableCmd implements Command<Void>, Serializable
     return null;
   };
 
-  public abstract void checkParameters();
+  protected abstract AbstractVariableScope getEntity();
 
-  public abstract AbstractVariableScope getEntity();
+  protected abstract void logVariableOperation(AbstractVariableScope scope);
 
-  public abstract void logVariableOperation(AbstractVariableScope scope);
+  protected abstract void executeOperation(AbstractVariableScope scope);
 
-  public abstract void executeOperation(AbstractVariableScope scope);
-
-  public abstract String getLogEntryOperation();
+  protected abstract String getLogEntryOperation();
 }

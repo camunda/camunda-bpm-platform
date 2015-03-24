@@ -12,24 +12,26 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
+import java.util.Map;
+
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
-import org.camunda.bpm.engine.impl.interceptor.Command;
-
-import java.io.Serializable;
-import java.util.Map;
 
 /**
  * @author Stefan Hentschel.
  */
-public abstract class AbstractSetVariableCmd extends AbstractVariableCmd implements Command<Void>, Serializable {
+public abstract class AbstractSetVariableCmd extends AbstractVariableCmd {
 
-  public AbstractSetVariableCmd(String entityId, Map<String, ?> variables, boolean isLocal) {
-    super(entityId, variables, isLocal);
+  private static final long serialVersionUID = 1L;
+
+  protected Map<String, ? extends Object> variables;
+
+  public AbstractSetVariableCmd(String entityId, Map<String, ? extends Object> variables, boolean isLocal) {
+    super(entityId, isLocal);
+    this.variables = variables;
   }
 
-  @Override
-  public void executeOperation(AbstractVariableScope scope) {
+  protected void executeOperation(AbstractVariableScope scope) {
     if (isLocal) {
       scope.setVariablesLocal(variables);
     } else {
@@ -37,8 +39,7 @@ public abstract class AbstractSetVariableCmd extends AbstractVariableCmd impleme
     }
   }
 
-  @Override
-  public String getLogEntryOperation() {
+  protected String getLogEntryOperation() {
     return UserOperationLogEntry.OPERATION_TYPE_SET_VARIABLE;
   }
 }

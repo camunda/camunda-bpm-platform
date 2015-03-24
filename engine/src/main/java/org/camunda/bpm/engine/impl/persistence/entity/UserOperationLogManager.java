@@ -32,7 +32,6 @@ import org.camunda.bpm.engine.impl.history.event.UserOperationLogEntryEventEntit
 import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
 import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
 import org.camunda.bpm.engine.impl.persistence.AbstractHistoricManager;
-import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Job;
 
 /**
@@ -219,6 +218,20 @@ public class UserOperationLogManager extends AbstractHistoricManager {
     }
   }
 
+  public void logVariableOperation(String operation, String executionId, String taskId, PropertyChange propertyChange) {
+    if(isHistoryLevelFullEnabled()) {
+
+      if (executionId != null) {
+        ExecutionEntity execution = getProcessInstanceManager().findExecutionById(executionId);
+        logVariableOperation(operation, execution, propertyChange);
+      }
+      else if (taskId != null) {
+        TaskEntity task = getTaskManager().findTaskById(taskId);
+        logVariableOperation(operation, task, propertyChange);
+      }
+    }
+  }
+
   public void logVariableOperation(String operation, TaskEntity task, PropertyChange propertyChange) {
     if(isHistoryLevelFullEnabled()) {
       String processDefinitionKey = null;
@@ -230,6 +243,7 @@ public class UserOperationLogManager extends AbstractHistoricManager {
         task.getProcessDefinitionId(), task.getProcessInstanceId(), null, null, Arrays.asList(propertyChange));
 
       context.setTaskId(task.getId());
+      context.setExecutionId(task.getExecutionId());
 
       logUserOperations(context);
     }

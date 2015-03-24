@@ -12,27 +12,48 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
-import org.camunda.bpm.engine.history.UserOperationLogEntry;
-import org.camunda.bpm.engine.impl.interceptor.Command;
-
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Map;
 
+import org.camunda.bpm.engine.history.UserOperationLogEntry;
+import org.camunda.bpm.engine.impl.interceptor.Command;
+import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+
 /**
  * @author Stefan Hentschel.
  */
-public abstract class AbstractPatchVariablesCmd extends AbstractVariableCmd implements Command<Void>, Serializable {
+public abstract class AbstractPatchVariablesCmd implements Command<Void>, Serializable {
 
-  protected final Collection<String> deletions;
+  private static final long serialVersionUID = 1L;
 
-  public AbstractPatchVariablesCmd(String entityId, Map<String, ?> variables, Collection<String> deletions, boolean isLocal) {
-    super(entityId, variables, isLocal);
+  protected String entityId;
+  protected Map<String, ? extends Object> variables;
+  protected Collection<String> deletions;
+  protected boolean isLocal;
+
+  public AbstractPatchVariablesCmd(String entityId, Map<String, ? extends Object> variables, Collection<String> deletions, boolean isLocal) {
+    this.entityId = entityId;
+    this.variables = variables;
     this.deletions = deletions;
+    this.isLocal = isLocal;
   }
 
-  @Override
-  public String getLogEntryOperation() {
+  public Void execute(CommandContext commandContext) {
+    getSetVariableCmd().disableLogUserOperation().execute(commandContext);
+    getRemoveVariableCmd().disableLogUserOperation().execute(commandContext);
+    logVariableOperation(commandContext);
+    return null;
+  }
+
+  protected String getLogEntryOperation() {
     return UserOperationLogEntry.OPERATION_TYPE_MODIFY_VARIABLE;
   }
+
+  protected abstract AbstractSetVariableCmd getSetVariableCmd();
+
+  protected abstract AbstractRemoveVariableCmd getRemoveVariableCmd();
+
+  protected abstract void logVariableOperation(CommandContext commandContext);
+
 }

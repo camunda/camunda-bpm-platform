@@ -29,7 +29,6 @@ import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
-import org.camunda.bpm.engine.impl.test.TestHelper;
 import org.camunda.bpm.engine.impl.util.CollectionUtil;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
@@ -484,8 +483,6 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTestCase
     assertNotNull(variableInstance.getValue());
 
     taskService.deleteTask(newTask.getId(), true);
-
-    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
   public void testBinaryFetchingDisabled() {
@@ -504,8 +501,6 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTestCase
     assertNull(variableInstance.getValue());
 
     taskService.deleteTask(newTask.getId(), true);
-
-    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
   public void testDisableCustomObjectDeserialization() {
@@ -544,8 +539,6 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTestCase
 
     taskService.deleteTask(newTask.getId(), true);
 
-    TestHelper.clearOpLog(processEngineConfiguration);
-
   }
 
   public void testErrorMessage() {
@@ -564,8 +557,6 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTestCase
     assertNotNull(variableInstance.getErrorMessage());
 
     taskService.deleteTask(newTask.getId(), true);
-
-    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
   @Deployment

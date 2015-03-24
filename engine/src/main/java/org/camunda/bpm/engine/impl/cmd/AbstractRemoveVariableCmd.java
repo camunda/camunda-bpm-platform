@@ -12,27 +12,26 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
+import java.util.Collection;
+
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
-import org.camunda.bpm.engine.impl.interceptor.Command;
-
-import java.io.Serializable;
-import java.util.Collection;
 
 /**
  * @author Stefan Hentschel.
  */
-public abstract class AbstractRemoveVariableCmd extends AbstractVariableCmd implements Command<Void>, Serializable {
+public abstract class AbstractRemoveVariableCmd extends AbstractVariableCmd {
+
+  private static final long serialVersionUID = 1L;
 
   protected final Collection<String> variableNames;
 
   public AbstractRemoveVariableCmd(String entityId, Collection<String> variableNames, boolean isLocal) {
-    super(entityId, null, isLocal);
+    super(entityId, isLocal);
     this.variableNames = variableNames;
   }
 
-  @Override
-  public void executeOperation(AbstractVariableScope scope) {
+  protected void executeOperation(AbstractVariableScope scope) {
     if (isLocal) {
       scope.removeVariablesLocal(variableNames);
     } else {
@@ -40,8 +39,7 @@ public abstract class AbstractRemoveVariableCmd extends AbstractVariableCmd impl
     }
   }
 
-  @Override
-  public String getLogEntryOperation() {
+  protected String getLogEntryOperation() {
     return UserOperationLogEntry.OPERATION_TYPE_REMOVE_VARIABLE;
   }
 }
