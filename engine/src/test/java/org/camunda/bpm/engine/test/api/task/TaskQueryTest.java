@@ -1217,25 +1217,21 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     // 2 tasks should be found with BUSINESS-KEY-1 and BUSINESS-KEY-2
     tasks = taskService.createTaskQuery()
       .processInstanceBusinessKeyIn("BUSINESS-KEY-1", "BUSINESS-KEY-2")
-      .orderByTaskName()
-      .asc()
       .list();
     assertNotNull(tasks);
     assertEquals(2, tasks.size());
 
-    assertEquals("theTask", tasks.get(0).getTaskDefinitionKey());
-    assertEquals("theTask", tasks.get(1).getTaskDefinitionKey());
+    for (Task task : tasks) {
+      assertEquals("theTask", task.getTaskDefinitionKey());
+    }
 
     // 1 tasks should be found with BUSINESS-KEY-1 and NON-EXISTING-KEY
-    tasks = taskService.createTaskQuery()
+    Task task = taskService.createTaskQuery()
       .processInstanceBusinessKeyIn("BUSINESS-KEY-1", "NON-EXISTING-KEY")
-      .orderByTaskName()
-      .asc()
-      .list();
-    assertNotNull(tasks);
-    assertEquals(1, tasks.size());
+      .singleResult();
 
-    assertEquals("theTask", tasks.get(0).getTaskDefinitionKey());
+    assertNotNull(tasks);
+    assertEquals("theTask", task.getTaskDefinitionKey());
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/task/TaskQueryTest.testProcessDefinition.bpmn20.xml"})
