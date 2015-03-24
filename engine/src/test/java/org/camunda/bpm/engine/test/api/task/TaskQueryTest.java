@@ -36,8 +36,10 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -1144,15 +1146,17 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     // 2 Tasks should be found with both process definition keys
     tasks = taskService.createTaskQuery()
       .processDefinitionKeyIn("oneTaskProcess", "taskDefinitionKeyProcess")
-      .orderByTaskName()
-      .asc()
       .list();
     assertNotNull(tasks);
     assertEquals(3, tasks.size());
 
-    assertEquals("taskKey1", tasks.get(0).getTaskDefinitionKey());
-    assertEquals("taskKey123", tasks.get(1).getTaskDefinitionKey());
-    assertEquals("theTask", tasks.get(2).getTaskDefinitionKey());
+    Set<String> keysFound = new HashSet<String>();
+    for (Task task : tasks) {
+      keysFound.add(task.getTaskDefinitionKey());
+    }
+    assertTrue(keysFound.contains("taskKey123"));
+    assertTrue(keysFound.contains("theTask"));
+    assertTrue(keysFound.contains("taskKey1"));
 
     // 1 Tasks should be found with oneTaskProcess,and NonExistingKey
     tasks = taskService.createTaskQuery().processDefinitionKeyIn("oneTaskProcess", "NonExistingKey").orderByTaskName().asc().list();
