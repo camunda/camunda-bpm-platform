@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:camunda="http://activiti.org/bpmn"
+  targetNamespace="Examples">
+
+  <process id="elUserTaskProcess" name="The One User Task Process With Form Data">
+    <startEvent id="theStart">
+      <extensionElements>
+        <camunda:formData>
+          <camunda:formField id="someString" label="test" type="string" defaultValue="${resolveFormDataBean.getValue()}">
+          </camunda:formField>
+        </camunda:formData>
+      </extensionElements>
+    </startEvent>
+    <sequenceFlow id="flow1" sourceRef="theStart" targetRef="userTask" />
+    <userTask id="userTask"/>
+    <sequenceFlow id="flow2" sourceRef="userTask" targetRef="theEnd" />
+    <endEvent id="theEnd" />
+  </process>
+
+</definitions>
