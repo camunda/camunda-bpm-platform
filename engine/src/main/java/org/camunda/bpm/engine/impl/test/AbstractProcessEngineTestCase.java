@@ -45,10 +45,12 @@ import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.impl.util.LogUtil.ThreadLogMode;
+import org.camunda.bpm.engine.repository.DeploymentBuilder;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.Assert;
 
 
@@ -383,6 +385,17 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
       identityService.setAuthenticatedUserId(null);
       processEngineConfiguration.setAuthorizationEnabled(false);
     }
+  }
+
+  public void deployment(BpmnModelInstance... bpmnModelInstances) {
+    DeploymentBuilder deploymentBuilder = repositoryService.createDeployment();
+
+    for (int i = 0; i < bpmnModelInstances.length; i++) {
+      BpmnModelInstance bpmnModelInstance = bpmnModelInstances[i];
+      deploymentBuilder.addModelInstance("testProcess-"+i+".bpmn", bpmnModelInstance);
+    }
+
+    deploymentId = deploymentBuilder.deploy().getId();
   }
 
 }

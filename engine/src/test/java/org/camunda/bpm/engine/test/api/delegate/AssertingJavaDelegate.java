@@ -10,7 +10,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.test.bpmn.callactivity;
+package org.camunda.bpm.engine.test.api.delegate;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
@@ -19,12 +23,26 @@ import org.camunda.bpm.engine.delegate.JavaDelegate;
  * @author Daniel Meyer
  *
  */
-public class ServiceTaskParentProcessVariableAccess implements JavaDelegate {
+public class AssertingJavaDelegate implements JavaDelegate {
+
+  public static List<DelegateExecutionAsserter> asserts = new ArrayList<DelegateExecutionAsserter>();
 
   public void execute(DelegateExecution execution) throws Exception {
-	  execution
-	    .getProcessInstance()
-	    .getSuperExecution().setVariable("greeting", "hello");
+    for (DelegateExecutionAsserter a : asserts) {
+      a.doAssert(execution);
+    }
+  }
+
+  public static interface DelegateExecutionAsserter {
+    public void doAssert(DelegateExecution execution);
+  }
+
+  public static void clear() {
+    asserts.clear();
+  }
+
+  public static void addAsserts(DelegateExecutionAsserter... as) {
+    asserts.addAll(Arrays.asList(as));
   }
 
 }

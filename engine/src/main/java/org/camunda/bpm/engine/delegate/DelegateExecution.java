@@ -24,17 +24,20 @@ public interface DelegateExecution extends BaseDelegateExecution, BpmnModelExecu
   String getProcessInstanceId();
 
   /**
-   * The business key for the process instance this execution is associated with.
+   * The business key for the process instance this execution is associated
+   * with.
    */
   String getProcessBusinessKey();
 
   /**
-   * The process definition key for the process instance this execution is associated with.
+   * The process definition key for the process instance this execution is
+   * associated with.
    */
   String getProcessDefinitionId();
 
   /**
-   * Gets the id of the parent of this execution. If null, the execution represents a process-instance.
+   * Gets the id of the parent of this execution. If null, the execution
+   * represents a process-instance.
    */
   String getParentId();
 
@@ -48,13 +51,33 @@ public interface DelegateExecution extends BaseDelegateExecution, BpmnModelExecu
    */
   String getCurrentActivityName();
 
-  /** return the Id of the activity instance currently executed by this execution */
+  /**
+   * return the Id of the activity instance currently executed by this execution
+   */
   String getActivityInstanceId();
 
-  /** return the Id of the parent activity instance currently executed by this execution */
+  /**
+   * return the Id of the parent activity instance currently executed by this
+   * execution
+   */
   String getParentActivityInstanceId();
 
   /** return the Id of the current transition */
   String getCurrentTransitionId();
+
+  /**
+   * Return the process instance execution for this execution. In case this
+   * execution is the process instance execution the method returns itself.
+   */
+  DelegateExecution getProcessInstance();
+
+  /**
+   * In case this delegate execution is the process instance execution
+   * and this process instance was started by a call activity, this method
+   * returns the execution which executed the call activity in the super process instance.
+   *
+   * @return the super execution or null.
+   */
+  DelegateExecution getSuperExecution();
 
 }
