@@ -1,6 +1,9 @@
+/*
+  DEPRECATION WARNING:
+  this directive should not be used anymore, see cam-widget-variable instead
+*/
 define([ 'angular', 'text!./variable.html' ], function(angular, template) {
   'use strict';
-
   var Directive = ['$compile', function ($compile) {
     return {
       restrict: 'EAC',
