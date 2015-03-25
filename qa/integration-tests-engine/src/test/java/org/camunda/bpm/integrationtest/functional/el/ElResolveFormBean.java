@@ -48,7 +48,7 @@ public class ElResolveFormBean extends AbstractFoxPlatformIntegrationTest {
     TypedValue value = startFormData.getFormFields().get(0).getValue();
 
     Assert.assertNotNull(value);
-    Assert.assertEquals("testString123", value.toString());
+    Assert.assertEquals("testString123", value.getValue());
   }
 
 }
