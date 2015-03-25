@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions" 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:camunda="http://activiti.org/bpmn"
+  targetNamespace="Examples">
+
+  <process id="simpleSubProcess">
+
+    <startEvent id="theStart" />
+
+    <sequenceFlow id="flow1" sourceRef="theStart" targetRef="fork" />
+
+    <parallelGateway id="fork" />
+
+    <sequenceFlow sourceRef="fork" targetRef="task" />
+    <sequenceFlow sourceRef="fork" targetRef="task" />
+
+    <serviceTask id="task" camunda:class="org.camunda.bpm.engine.test.bpmn.callactivity.ServiceTaskParentProcessVariableAccess" />
+
+  </process>
+
+</definitions>

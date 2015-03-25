@@ -870,7 +870,7 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     if (candidateUserExpression != null) {
       query.taskCandidateUserExpression(candidateUserExpression);
     }
-    if (taskDefinitionKeyIn != null && taskDefinitionKey.length() > 0) {
+    if (taskDefinitionKeyIn != null && taskDefinitionKeyIn.length > 0) {
       query.taskDefinitionKeyIn(taskDefinitionKeyIn);
     }
     if (taskDefinitionKey != null) {

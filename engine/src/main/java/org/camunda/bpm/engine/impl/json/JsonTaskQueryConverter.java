@@ -69,12 +69,12 @@ public class JsonTaskQueryConverter extends JsonObjectConverter<TaskQuery> {
   public static final String KEYS = "keys";
   public static final String KEY_LIKE = "keyLike";
   public static final String PROCESS_DEFINITION_KEY = "processDefinitionKey";
-  public static final String PROCESS_DEFINITION_KEY_IN = "processDefinitionKeyIn";
+  public static final String PROCESS_DEFINITION_KEYS = "processDefinitionKeys";
   public static final String PROCESS_DEFINITION_ID = "processDefinitionId";
   public static final String PROCESS_DEFINITION_NAME = "processDefinitionName";
   public static final String PROCESS_DEFINITION_NAME_LIKE = "processDefinitionNameLike";
   public static final String PROCESS_INSTANCE_BUSINESS_KEY = "processInstanceBusinessKey";
-  public static final String PROCESS_INSTANCE_BUSINESS_KEY_IN ="processInstanceBusinessKeyIn";
+  public static final String PROCESS_INSTANCE_BUSINESS_KEYS ="processInstanceBusinessKeys";
   public static final String PROCESS_INSTANCE_BUSINESS_KEY_LIKE = "processInstanceBusinessKeyLike";
   public static final String DUE = "due";
   public static final String DUE_DATE = "dueDate";
@@ -140,12 +140,12 @@ public class JsonTaskQueryConverter extends JsonObjectConverter<TaskQuery> {
     addArrayField(json, KEYS, query.getKeys());
     addField(json, KEY_LIKE, query.getKeyLike());
     addField(json, PROCESS_DEFINITION_KEY, query.getProcessDefinitionKey());
-    addArrayField(json, PROCESS_DEFINITION_KEY_IN, query.getProcessDefinitionKeys());
+    addArrayField(json, PROCESS_DEFINITION_KEYS, query.getProcessDefinitionKeys());
     addField(json, PROCESS_DEFINITION_ID, query.getProcessDefinitionId());
     addField(json, PROCESS_DEFINITION_NAME, query.getProcessDefinitionName());
     addField(json, PROCESS_DEFINITION_NAME_LIKE, query.getProcessDefinitionNameLike());
     addField(json, PROCESS_INSTANCE_BUSINESS_KEY, query.getProcessInstanceBusinessKey());
-    addArrayField(json, PROCESS_INSTANCE_BUSINESS_KEY_IN, query.getProcessInstanceBusinessKeys());
+    addArrayField(json, PROCESS_INSTANCE_BUSINESS_KEYS, query.getProcessInstanceBusinessKeys());
     addField(json, PROCESS_INSTANCE_BUSINESS_KEY_LIKE, query.getProcessInstanceBusinessKeyLike());
     addVariablesFields(json, query.getVariables());
     addDateField(json, DUE, query.getDueDate());
@@ -301,8 +301,8 @@ public class JsonTaskQueryConverter extends JsonObjectConverter<TaskQuery> {
     if (json.has(PROCESS_DEFINITION_KEY)) {
       query.processDefinitionKey(json.getString(PROCESS_DEFINITION_KEY));
     }
-    if (json.has(PROCESS_DEFINITION_KEY_IN)) {
-      query.processDefinitionKeyIn(getArray(json.getJSONArray(PROCESS_DEFINITION_KEY_IN)));
+    if (json.has(PROCESS_DEFINITION_KEYS)) {
+      query.processDefinitionKeyIn(getArray(json.getJSONArray(PROCESS_DEFINITION_KEYS)));
     }
     if (json.has(PROCESS_DEFINITION_ID)) {
       query.processDefinitionId(json.getString(PROCESS_DEFINITION_ID));
@@ -316,8 +316,8 @@ public class JsonTaskQueryConverter extends JsonObjectConverter<TaskQuery> {
     if (json.has(PROCESS_INSTANCE_BUSINESS_KEY)) {
       query.processInstanceBusinessKey(json.getString(PROCESS_INSTANCE_BUSINESS_KEY));
     }
-    if (json.has(PROCESS_INSTANCE_BUSINESS_KEY_IN)) {
-      query.processInstanceBusinessKeyIn(getArray(json.getJSONArray(PROCESS_INSTANCE_BUSINESS_KEY_IN)));
+    if (json.has(PROCESS_INSTANCE_BUSINESS_KEYS)) {
+      query.processInstanceBusinessKeyIn(getArray(json.getJSONArray(PROCESS_INSTANCE_BUSINESS_KEYS)));
     }
     if (json.has(PROCESS_INSTANCE_BUSINESS_KEY_LIKE)) {
       query.processInstanceBusinessKeyLike(json.getString(PROCESS_INSTANCE_BUSINESS_KEY_LIKE));

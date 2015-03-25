@@ -2926,22 +2926,26 @@ public class BpmnParse extends Parse {
             continue;
           }
 
+          ParameterValueProvider sourceValueProvider = new NullValueProvider();
           String source = inElement.attribute("source");
-          if (source == null || source.isEmpty()) {
-            source = inElement.attribute("sourceExpression");
-          }
+          if (source != null && !source.isEmpty()) {
+            sourceValueProvider = new ConstantValueProvider(source);
+          } else {
 
-          ParameterValueProvider sourceValueProvider = createParameterValueProvider(source, expressionManager);
+            source = inElement.attribute("sourceExpression");
+
+            if (source != null && !source.isEmpty()) {
+              Expression expression = expressionManager.createExpression(source);
+              sourceValueProvider = new ElValueProvider(expression);
+            }
+          }
           parameter.setSourceValueProvider(sourceValueProvider);
 
           String target = inElement.attribute("target");
-          if (target != null && !target.isEmpty()) {
-            parameter.setTarget(target);
-
-          } else {
+          if (source != null && !source.isEmpty() && target == null) {
             addError("Missing attribute 'target' when attribute 'source' or 'sourceExpression' is set", inElement);
           }
-
+          parameter.setTarget(target);
         }
       }
     }
@@ -2964,22 +2968,26 @@ public class BpmnParse extends Parse {
           continue;
         }
 
+        ParameterValueProvider sourceValueProvider = new NullValueProvider();
         String source = outElement.attribute("source");
-        if (source == null || source.isEmpty()) {
-          source = outElement.attribute("sourceExpression");
-        }
+        if (source != null && !source.isEmpty()) {
+          sourceValueProvider = new ConstantValueProvider(source);
+        } else {
 
-        ParameterValueProvider sourceValueProvider = createParameterValueProvider(source, expressionManager);
+          source = outElement.attribute("sourceExpression");
+
+          if (source != null && !source.isEmpty()) {
+            Expression expression = expressionManager.createExpression(source);
+            sourceValueProvider = new ElValueProvider(expression);
+          }
+        }
         parameter.setSourceValueProvider(sourceValueProvider);
 
         String target = outElement.attribute("target");
-        if (target != null && !target.isEmpty()) {
-          parameter.setTarget(target);
-
-        } else {
-          addError("Missing attribute 'target' when attribute source or sourceExpression is set", outElement);
+        if (source != null && !source.isEmpty() && target == null) {
+          addError("Missing attribute 'target' when attribute 'source' or 'sourceExpression' is set", outElement);
         }
-
+        parameter.setTarget(target);
       }
     }
   }

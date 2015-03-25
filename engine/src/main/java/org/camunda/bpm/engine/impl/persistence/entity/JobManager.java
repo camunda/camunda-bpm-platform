@@ -101,7 +101,7 @@ public class JobManager extends AbstractManager {
       Date currentTime = ClockUtil.getCurrentTime();
       job.setLockExpirationTime(new Date(currentTime.getTime() + jobExecutor.getLockTimeInMillis()));
       job.setLockOwner(jobExecutor.getLockOwner());
-      transactionListener = new ExclusiveJobAddedNotification(job.getId());
+      transactionListener = new ExclusiveJobAddedNotification(job.getId(), jobExecutorContext);
     } else {
       // notify job executor:
       transactionListener = new MessageAddedNotification(jobExecutor);

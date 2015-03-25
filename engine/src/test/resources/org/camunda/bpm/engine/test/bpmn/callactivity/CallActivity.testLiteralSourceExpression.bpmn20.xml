@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions" 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:camunda="http://activiti.org/bpmn"
+  targetNamespace="Examples">
+
+  <process id="process">
+
+    <startEvent id="theStart" />
+
+    <sequenceFlow sourceRef="theStart" targetRef="callSubProcess" />
+
+    <callActivity id="callSubProcess" calledElement="simpleSubProcess">
+      <extensionElements>
+        <camunda:in sourceExpression="inLiteralValue" target="inLiteralVariable" />
+        <camunda:out sourceExpression="outLiteralValue" target="outLiteralVariable"  />
+      </extensionElements>
+    </callActivity>
+
+    <sequenceFlow sourceRef="callSubProcess" targetRef="theTask" />
+
+    <userTask id="theTask" />
+
+    <sequenceFlow sourceRef="theTask" targetRef="theEnd" />
+
+    <endEvent id="theEnd" />
+
+  </process>
+
+</definitions>
