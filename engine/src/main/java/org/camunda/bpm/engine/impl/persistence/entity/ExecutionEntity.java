@@ -798,6 +798,9 @@ public class ExecutionEntity extends PvmExecutionImpl implements
   }
 
   protected void ensureSuperExecutionInitialized() {
+	if(superExecutionId == null){
+	 superExecutionId = getProcessInstance().getSuperExecutionId();
+	}
     if (superExecution == null && superExecutionId != null) {
       superExecution = Context
         .getCommandContext()
