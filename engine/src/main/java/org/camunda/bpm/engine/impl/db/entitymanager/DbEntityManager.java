@@ -263,12 +263,33 @@ public class DbEntityManager implements Session {
 
     // execute the flush
     for (DbOperation dbOperation : operationsToFlush) {
-      persistenceSession.executeDbOperation(dbOperation);
+      try {
+        persistenceSession.executeDbOperation(dbOperation);
+      }
+      catch(Exception e) {
+        throw new ProcessEngineException(formatExceptionMessage(e, dbOperation, operationsToFlush), e);
+      }
       if(dbOperation.isFailed()) {
         handleOptimisticLockingException(dbOperation);
       }
     }
 
+  }
+
+  protected String formatExceptionMessage(Exception e, DbOperation dbOperation, List<DbOperation> operationsToFlush) {
+    StringBuilder exceptionMessage = new StringBuilder();
+    exceptionMessage.append("Exception while executing Database Operation: ");
+    exceptionMessage.append(dbOperation.toString());
+    exceptionMessage.append(":");
+    exceptionMessage.append(e.getMessage());
+    exceptionMessage.append("\nFlush summary:\n[\n");
+    for (DbOperation op : operationsToFlush) {
+      exceptionMessage.append("  ");
+      exceptionMessage.append(op.toString());
+      exceptionMessage.append("\n");
+    }
+    exceptionMessage.append("]");
+    return exceptionMessage.toString();
   }
 
   protected void handleOptimisticLockingException(DbOperation dbOperation) {
