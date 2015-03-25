@@ -2,6 +2,7 @@ package org.camunda.bpm.engine.rest;
 
 import static com.jayway.restassured.RestAssured.given;
 import static com.jayway.restassured.path.json.JsonPath.from;
+import static org.camunda.bpm.engine.rest.util.QueryParamUtils.arrayAsCommaSeperatedList;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
@@ -13,7 +14,6 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
-import static org.camunda.bpm.engine.rest.util.QueryParamUtils.*;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -491,6 +491,7 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
     verify(mockQuery).activityInstanceIdIn(stringArrayParameters.get("activityInstanceIdIn"));
     verify(mockQuery).taskDefinitionKeyIn(stringArrayParameters.get("taskDefinitionKeyIn"));
     verify(mockQuery).processDefinitionKeyIn(stringArrayParameters.get("processDefinitionKeyIn"));
+    verify(mockQuery).processInstanceBusinessKeyIn(stringArrayParameters.get("processInstanceBusinessKeyIn"));
   }
 
   @Test
