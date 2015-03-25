@@ -957,4 +957,38 @@ public class CallActivityAdvancedTest extends PluggableProcessEngineTestCase {
     assertProcessEnded(processInstance.getId());
   }
 
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testLiteralSourceExpression.bpmn20.xml",
+      "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml"
+    })
+  public void testInputParameterLiteralSourceExpression() {
+    runtimeService.startProcessInstanceByKey("process");
+
+    String subInstanceId = runtimeService
+        .createProcessInstanceQuery()
+        .processDefinitionKey("simpleSubProcess")
+        .singleResult()
+        .getId();
+
+    Object variable = runtimeService.getVariable(subInstanceId, "inLiteralVariable");
+    assertEquals("inLiteralValue", variable);
+  }
+
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testLiteralSourceExpression.bpmn20.xml",
+      "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml"
+    })
+  public void testOutputParameterLiteralSourceExpression() {
+    String processInstanceId = runtimeService.startProcessInstanceByKey("process").getId();
+
+    String taskId = taskService
+        .createTaskQuery()
+        .singleResult()
+        .getId();
+    taskService.complete(taskId);
+
+    Object variable = runtimeService.getVariable(processInstanceId, "outLiteralVariable");
+    assertEquals("outLiteralValue", variable);
+  }
+
 }
