@@ -4,17 +4,17 @@
   xmlns:camunda="http://activiti.org/bpmn"
   targetNamespace="Examples">
 
-  <process id="elUserTaskProcess" name="The One User Task Process With Form Data">
-    <startEvent id="theStart">
+  <process id="elTaskFormProcess" name="The One Process With Task Form Data">
+    <startEvent id="theStart" />
+    <sequenceFlow id="flow1" sourceRef="theStart" targetRef="userTask" />
+    <userTask id="userTask">
       <extensionElements>
         <camunda:formData>
-          <camunda:formField id="someString" label="test" type="string" defaultValue="${resolveFormDataBean.getValue()}">
-          </camunda:formField>
+          <camunda:formField id="someString" label="${resolveFormDataBean.getValue()}" type="string"
+                             defaultValue="${resolveFormDataBean.getValue()}" />
         </camunda:formData>
       </extensionElements>
-    </startEvent>
-    <sequenceFlow id="flow1" sourceRef="theStart" targetRef="userTask" />
-    <userTask id="userTask"/>
+    </userTask>
     <sequenceFlow id="flow2" sourceRef="userTask" targetRef="theEnd" />
     <endEvent id="theEnd" />
   </process>

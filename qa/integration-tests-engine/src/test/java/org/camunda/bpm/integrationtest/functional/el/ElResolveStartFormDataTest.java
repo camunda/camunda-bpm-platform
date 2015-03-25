@@ -14,7 +14,6 @@ package org.camunda.bpm.integrationtest.functional.el;
 
 import org.camunda.bpm.engine.form.StartFormData;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
-import org.camunda.bpm.engine.variable.value.TypedValue;
 import org.camunda.bpm.integrationtest.functional.el.beans.ResolveFormDataBean;
 import org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest;
 import org.jboss.arquillian.container.test.api.Deployment;
@@ -29,26 +28,37 @@ import org.junit.runner.RunWith;
  * @author Stefan Hentschel.
  */
 @RunWith(Arquillian.class)
-public class ElResolveFormBean extends AbstractFoxPlatformIntegrationTest {
+public class ElResolveStartFormDataTest extends AbstractFoxPlatformIntegrationTest {
 
   @Deployment(name = "pa")
   public static WebArchive processArchive() {
     return initWebArchiveDeployment()
       .addClass(ResolveFormDataBean.class)
-      .addAsResource("org/camunda/bpm/integrationtest/functional/el/elUserTaskProcessWithFormData.bpmn20.xml");
+      .addAsResource("org/camunda/bpm/integrationtest/functional/el/elStartFormProcessWithFormData.bpmn20.xml");
   }
 
   @Test
   @OperateOnDeployment("pa")
-  public void testFormDataWithExpression() {
-    // The expression should be resolved correctly
-    ProcessInstance instance = runtimeService.startProcessInstanceByKey("elUserTaskProcess");
+  public void testStartFormDataWithDefaultValueExpression() {
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("elStartFormProcess");
 
-    StartFormData startFormData = formService.getStartFormData(instance.getProcessDefinitionId());
-    TypedValue value = startFormData.getFormFields().get(0).getValue();
+    StartFormData formData = formService.getStartFormData(instance.getProcessDefinitionId());
+    Object defaultValue = formData.getFormFields().get(0).getValue().getValue();
 
-    Assert.assertNotNull(value);
-    Assert.assertEquals("testString123", value.getValue());
+    Assert.assertNotNull(defaultValue);
+    Assert.assertEquals("testString123", defaultValue);
+  }
+
+  @Test
+  @OperateOnDeployment("pa")
+  public void testStartFormDataWithLabelExpression() {
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("elStartFormProcess");
+
+    StartFormData formData = formService.getStartFormData(instance.getProcessDefinitionId());
+
+    String label = formData.getFormFields().get(0).getLabel();
+    Assert.assertNotNull(label);
+    Assert.assertEquals("testString123", label);
   }
 
 }
