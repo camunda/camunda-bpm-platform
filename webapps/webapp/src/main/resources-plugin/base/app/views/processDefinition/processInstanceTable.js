@@ -41,6 +41,7 @@ define(['angular', 'text!./process-instance-table.html'], function(angular, temp
           filter = angular.copy(newFilter);
 
           delete filter.page;
+          delete filter.scrollToBpmnElement;
 
           var page = pages.current,
               count = pages.size,
