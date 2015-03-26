@@ -17,7 +17,7 @@ define([
   var DirectiveController = ['$scope', '$compile', 'Views', '$timeout',
                     function( $scope,   $compile,   Views,   $timeout) {
 
-    $scope.overlayVars = { read: [ 'processData', 'bpmnElement' ] };
+    $scope.overlayVars = { read: [ 'processData', 'bpmnElement', 'pageData' ] };
     $scope.overlayProviders = Views.getProviders({ component:  $scope.providerComponent });
     var overlay = '<div class="bpmn-overlay"><div view ng-repeat="overlayProvider in overlayProviders" provider="overlayProvider" vars="overlayVars"></div></div>';
 
@@ -182,6 +182,7 @@ define([
         onElementClick: '&',
         selection: '=',
         processData: '=',
+        pageData: '=',
         providerComponent: '@',
         selectAll: '&'
       },

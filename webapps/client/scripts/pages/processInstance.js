@@ -18,13 +18,12 @@ define([
     var filter;
 
     var processData = $scope.processData = dataDepend.create($scope);
+    var pageData = $scope.pageData = dataDepend.create($scope);
 
     // utilities ///////////////////////
 
     $scope.$on('$routeChanged', function() {
       processData.set('filter', parseFilterFromUri());
-      // update tab selection
-      setDefaultTab($scope.processInstanceTabs);
     });
 
     function parseFilterFromUri() {
@@ -171,6 +170,9 @@ define([
 
     // processInstance
     processData.provide('processInstance', processInstance);
+
+    // modificationInstructions
+    processData.provide('modificationInstructions', []);
 
     // filter
     processData.provide('filter', parseFilterFromUri());
@@ -533,22 +535,36 @@ define([
       page.breadcrumbsClear();
     });
 
-    $scope.processInstanceVars = { read: [ 'processInstance', 'processData', 'filter' ] };
-    $scope.processInstanceTabs = Views.getProviders({ component: 'cockpit.processInstance.runtime.tab' });
+    $scope.processInstanceVars = { read: [ 'processInstance', 'processData', 'filter', 'pageData' ] };
+    var processInstanceTabs = Views.getProviders({ component: 'cockpit.processInstance.runtime.tab' });
 
     $scope.processInstanceActions = Views.getProviders({ component: 'cockpit.processInstance.runtime.action' });
 
     Data.instantiateProviders('cockpit.processInstance.data', {$scope: $scope, processData : processData});
 
-    $scope.selectTab = function(tabProvider) {
-      $scope.selectedTab = tabProvider;
+    // TABS
 
+    pageData.provide('tabs', processInstanceTabs);
+
+    pageData.provide('activeTab', getDefaultTab(processInstanceTabs));
+
+    pageData.observe(['tabs'], function(tabs) {
+      $scope.processInstanceTabs = tabs;
+      pageData.set('activeTab', getDefaultTab(tabs));
+    });
+
+    pageData.observe('activeTab', function(activeTab) {
+      $scope.selectedTab = activeTab;
       search.updateSilently({
-        detailsTab: tabProvider.id
+        detailsTab: activeTab && activeTab.id || null
       });
+    });
+
+    $scope.selectTab = function(tabProvider) {
+      pageData.set('activeTab', tabProvider);
     };
 
-    function setDefaultTab(tabs) {
+    function getDefaultTab(tabs) {
       var selectedTabId = search().detailsTab;
 
       if (!tabs || !tabs.length) {
@@ -559,19 +575,12 @@ define([
         var provider = Views.getProvider({ component: 'cockpit.processInstance.runtime.tab', id: selectedTabId });
 
         if (provider && tabs.indexOf(provider) != -1) {
-          $scope.selectedTab = provider;
-          return;
+          return provider;
         }
       }
 
-      search.updateSilently({
-        detailsTab: null
-      });
-
-      $scope.selectedTab = tabs[0];
+      return tabs[0];
     }
-
-    setDefaultTab($scope.processInstanceTabs);
 
   }];
 
