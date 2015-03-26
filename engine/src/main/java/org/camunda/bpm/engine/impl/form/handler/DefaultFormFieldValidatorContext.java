@@ -29,12 +29,19 @@ public class DefaultFormFieldValidatorContext implements FormFieldValidatorConte
   protected VariableScope variableScope;
   protected String configuration;
   protected VariableMap submittedValues;
+  protected FormFieldHandler formFieldHandler;
 
-  public DefaultFormFieldValidatorContext(VariableScope variableScope, String configuration, VariableMap submittedValues) {
+  public DefaultFormFieldValidatorContext(VariableScope variableScope, String configuration, VariableMap submittedValues,
+    FormFieldHandler formFieldHandler) {
     super();
     this.variableScope = variableScope;
     this.configuration = configuration;
     this.submittedValues = submittedValues;
+    this.formFieldHandler = formFieldHandler;
+  }
+
+  public FormFieldHandler getFormFieldHandler() {
+    return formFieldHandler;
   }
 
   public DelegateExecution getExecution() {

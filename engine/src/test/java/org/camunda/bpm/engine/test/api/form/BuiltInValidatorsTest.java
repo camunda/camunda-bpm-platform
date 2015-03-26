@@ -18,6 +18,10 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
+import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
+import org.camunda.bpm.engine.impl.core.variable.scope.CoreVariableStore;
+import org.camunda.bpm.engine.impl.core.variable.scope.SimpleVariableStore;
+import org.camunda.bpm.engine.impl.form.handler.FormFieldHandler;
 import org.camunda.bpm.engine.impl.form.validator.FormFieldValidator;
 import org.camunda.bpm.engine.impl.form.validator.FormFieldValidatorContext;
 import org.camunda.bpm.engine.impl.form.validator.FormValidators;
@@ -52,14 +56,20 @@ public class BuiltInValidatorsTest extends PluggableProcessEngineTestCase {
 
   public void testRequiredValidator() {
     RequiredValidator validator = new RequiredValidator();
+    TestValidatorContext validatorContext = new TestValidatorContext(null);
 
-    assertTrue(validator.validate("test", null));
-    assertTrue(validator.validate(1, null));
-    assertTrue(validator.validate(true, null));
+    assertTrue(validator.validate("test", validatorContext));
+    assertTrue(validator.validate(1, validatorContext));
+    assertTrue(validator.validate(true, validatorContext));
 
     // empty string and 'null' are invalid
-    assertFalse(validator.validate("", null));
-    assertFalse(validator.validate(null, null));
+    assertFalse(validator.validate("", validatorContext));
+    assertFalse(validator.validate(null, validatorContext));
+
+    // can submit null if the value already exists
+    validatorContext = new TestValidatorContext(null, "fieldName");
+    validatorContext.getVariableScope().setVariable("fieldName", "existingValue");
+    assertTrue(validator.validate(null, validatorContext));
   }
 
   public void testReadOnlyValidator() {
@@ -154,10 +164,21 @@ public class BuiltInValidatorsTest extends PluggableProcessEngineTestCase {
 
   protected static class TestValidatorContext implements FormFieldValidatorContext {
 
+    TestVariableScope variableScope = new TestVariableScope();
+    FormFieldHandler formFieldHandler = new FormFieldHandler();
     String configuration;
 
     public TestValidatorContext(String configuration) {
       this.configuration = configuration;
+    }
+
+    public TestValidatorContext(String configuration, String formFieldId) {
+      this.configuration = configuration;
+      this.formFieldHandler.setId(formFieldId);
+    }
+
+    public FormFieldHandler getFormFieldHandler() {
+      return formFieldHandler;
     }
 
     public DelegateExecution getExecution() {
@@ -173,6 +194,19 @@ public class BuiltInValidatorsTest extends PluggableProcessEngineTestCase {
     }
 
     public VariableScope getVariableScope() {
+      return variableScope;
+    }
+  }
+
+  protected static class TestVariableScope extends AbstractVariableScope {
+
+    protected SimpleVariableStore variableStore = new SimpleVariableStore();
+
+    protected CoreVariableStore getVariableStore() {
+      return variableStore;
+    }
+
+    public AbstractVariableScope getParentVariableScope() {
       return null;
     }
   }

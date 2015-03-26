@@ -16,6 +16,7 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.VariableScope;
+import org.camunda.bpm.engine.impl.form.handler.FormFieldHandler;
 
 /**
  * <p>Object passed in to a {@link FormFieldValidator} providing access to validation properties</p>
@@ -24,6 +25,8 @@ import org.camunda.bpm.engine.delegate.VariableScope;
  *
  */
 public interface FormFieldValidatorContext {
+
+  public FormFieldHandler getFormFieldHandler();
 
   /** @return the execution
    * Deprecated, use {@link #getVariableScope()} */

@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.engine.impl.form.validator;
 
+import org.camunda.bpm.engine.variable.value.TypedValue;
+
 /**
  * @author Daniel Meyer
  *
@@ -19,10 +21,15 @@ package org.camunda.bpm.engine.impl.form.validator;
 public class RequiredValidator implements FormFieldValidator {
 
   public boolean validate(Object submittedValue, FormFieldValidatorContext validatorContext) {
-    if (submittedValue instanceof String) {
-      return submittedValue != null && !((String)submittedValue).isEmpty();
+    if(submittedValue == null) {
+      TypedValue value = validatorContext.getVariableScope().getVariableTyped(validatorContext.getFormFieldHandler().getId());
+      return (value != null && value.getValue() != null);
     } else {
-      return submittedValue != null;
+      if (submittedValue instanceof String) {
+        return submittedValue != null && !((String)submittedValue).isEmpty();
+      } else {
+        return submittedValue != null;
+      }
     }
   }
 

@@ -39,7 +39,8 @@ public class FormFieldValidationConstraintHandler {
   // submit /////////////////////////////////
 
   public void validate(Object submittedValue, VariableMap submittedValues, FormFieldHandler formFieldHandler, VariableScope variableScope) {
-    boolean isValid = validator.validate(submittedValue, new DefaultFormFieldValidatorContext(variableScope, config, submittedValues));
+    boolean isValid = validator.validate(submittedValue, new DefaultFormFieldValidatorContext(variableScope, config,
+      submittedValues, formFieldHandler));
     if(!isValid) {
       throw new ProcessEngineException("Invalid value submitted for form field '"+formFieldHandler.getId()+"': validation of "+this+" failed.");
     }
