@@ -22,6 +22,7 @@ import java.util.Date;
 
 import org.camunda.bpm.engine.impl.calendar.DurationHelper;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
+import org.junit.AfterClass;
 import org.junit.Test;
 
 public class DurationHelperTest {
@@ -66,6 +67,11 @@ public class DurationHelperTest {
     assertEquals(parse("19700101-00:00:40"), dh.getDateAfter());
   }
 
+
+  @AfterClass
+  public static void resetTime() {
+    ClockUtil.setCurrentTime(new Date());
+  }
 
   private Date parse(String str) throws Exception {
     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd-HH:mm:ss");
