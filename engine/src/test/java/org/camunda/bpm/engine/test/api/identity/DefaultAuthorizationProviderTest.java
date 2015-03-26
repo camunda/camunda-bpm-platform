@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -24,8 +24,8 @@ import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 
 /**
  * <p>Test authorizations provided by {@link DefaultAuthorizationProvider}</p>
- * 
- * @author Daniel Meyer  
+ *
+ * @author Daniel Meyer
  *
  */
 public class DefaultAuthorizationProviderTest extends PluggableProcessEngineTestCase {
@@ -39,43 +39,43 @@ public class DefaultAuthorizationProviderTest extends PluggableProcessEngineTest
     jonnyIsGod.setResource(USER);
     jonnyIsGod.setResourceId(ANY);
     jonnyIsGod.addPermission(ALL);
-    authorizationService.saveAuthorization(jonnyIsGod);        
-    
+    authorizationService.saveAuthorization(jonnyIsGod);
+
     jonnyIsGod = authorizationService.createNewAuthorization(AUTH_TYPE_GRANT);
     jonnyIsGod.setUserId("jonny");
     jonnyIsGod.setResource(GROUP);
     jonnyIsGod.setResourceId(ANY);
     jonnyIsGod.addPermission(ALL);
     authorizationService.saveAuthorization(jonnyIsGod);
-    
+
     jonnyIsGod = authorizationService.createNewAuthorization(AUTH_TYPE_GRANT);
     jonnyIsGod.setUserId("jonny");
     jonnyIsGod.setResource(AUTHORIZATION);
     jonnyIsGod.setResourceId(ANY);
     jonnyIsGod.addPermission(ALL);
     authorizationService.saveAuthorization(jonnyIsGod);
-        
+
     // enable authorizations
-    processEngineConfiguration.setAuthorizationEnabled(true);    
+    processEngineConfiguration.setAuthorizationEnabled(true);
     super.setUp();
   }
-  
+
   protected void tearDown() throws Exception {
+    processEngineConfiguration.setAuthorizationEnabled(false);
     List<Authorization> jonnysAuths = authorizationService.createAuthorizationQuery().userIdIn("jonny").list();
     for (Authorization authorization : jonnysAuths) {
       authorizationService.deleteAuthorization(authorization.getId());
     }
-    processEngineConfiguration.setAuthorizationEnabled(false);
     super.tearDown();
   }
-  
+
   public void testCreateUser() {
     // initially there are no authorizations for jonny2:
     assertEquals(0, authorizationService.createAuthorizationQuery().userIdIn("jonny2").count());
-    
+
     // create new user
     identityService.saveUser(identityService.newUser("jonny2"));
-    
+
     // now there is an authorization for jonny2 which grants him ALL permissions on himself
     Authorization authorization = authorizationService.createAuthorizationQuery().userIdIn("jonny2").singleResult();
     assertNotNull(authorization);
@@ -83,21 +83,21 @@ public class DefaultAuthorizationProviderTest extends PluggableProcessEngineTest
     assertEquals(USER.resourceType(), authorization.getResourceType());
     assertEquals("jonny2", authorization.getResourceId());
     assertTrue(authorization.isPermissionGranted(ALL));
-    
+
     // delete the user
     identityService.deleteUser("jonny2");
-    
+
     // the authorization is deleted as well:
     assertEquals(0, authorizationService.createAuthorizationQuery().userIdIn("jonny2").count());
   }
-  
+
   public void testCreateGroup() {
     // initially there are no authorizations for group "sales":
     assertEquals(0, authorizationService.createAuthorizationQuery().groupIdIn("sales").count());
-    
+
     // create new group
     identityService.saveGroup(identityService.newGroup("sales"));
-    
+
     // now there is an authorization for sales which grants all members READ permissions
     Authorization authorization = authorizationService.createAuthorizationQuery().groupIdIn("sales").singleResult();
     assertNotNull(authorization);
@@ -105,12 +105,12 @@ public class DefaultAuthorizationProviderTest extends PluggableProcessEngineTest
     assertEquals(GROUP.resourceType(), authorization.getResourceType());
     assertEquals("sales", authorization.getResourceId());
     assertTrue(authorization.isPermissionGranted(READ));
-    
+
     // delete the group
     identityService.deleteGroup("sales");
-    
+
     // the authorization is deleted as well:
     assertEquals(0, authorizationService.createAuthorizationQuery().groupIdIn("sales").count());
   }
-  
+
 }
