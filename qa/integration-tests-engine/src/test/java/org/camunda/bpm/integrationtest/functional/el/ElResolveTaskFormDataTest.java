@@ -12,15 +12,12 @@
  */
 package org.camunda.bpm.integrationtest.functional.el;
 
-import org.camunda.bpm.engine.form.StartFormData;
 import org.camunda.bpm.engine.form.TaskFormData;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
-import org.camunda.bpm.engine.task.TaskQuery;
 import org.camunda.bpm.integrationtest.functional.el.beans.ResolveFormDataBean;
 import org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest;
 import org.jboss.arquillian.container.test.api.Deployment;
-import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Assert;
@@ -33,7 +30,7 @@ import org.junit.runner.RunWith;
 @RunWith(Arquillian.class)
 public class ElResolveTaskFormDataTest extends AbstractFoxPlatformIntegrationTest {
 
-  @Deployment(name = "pa")
+  @Deployment
   public static WebArchive processArchive() {
     return initWebArchiveDeployment()
       .addClass(ResolveFormDataBean.class)
@@ -41,10 +38,9 @@ public class ElResolveTaskFormDataTest extends AbstractFoxPlatformIntegrationTes
   }
 
   @Test
-  @OperateOnDeployment("pa")
   public void testTaskFormDataWithDefaultValueExpression() {
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("elTaskFormProcess");
-    Task task = taskService.createTaskQuery().executionId(instance.getId()).singleResult();
+    Task task = taskService.createTaskQuery().processInstanceId(instance.getId()).singleResult();
 
     TaskFormData formData = formService.getTaskFormData(task.getId());
     Object defaultValue = formData.getFormFields().get(0).getValue().getValue();
@@ -54,10 +50,9 @@ public class ElResolveTaskFormDataTest extends AbstractFoxPlatformIntegrationTes
   }
 
   @Test
-  @OperateOnDeployment("pa")
   public void testTaskFormDataWithLabelExpression() {
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("elTaskFormProcess");
-    Task task = taskService.createTaskQuery().executionId(instance.getId()).singleResult();
+    Task task = taskService.createTaskQuery().processInstanceId(instance.getId()).singleResult();
 
     TaskFormData formData = formService.getTaskFormData(task.getId());
 

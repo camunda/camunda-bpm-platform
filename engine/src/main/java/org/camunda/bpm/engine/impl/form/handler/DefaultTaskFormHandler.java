@@ -13,6 +13,8 @@
 
 package org.camunda.bpm.engine.impl.form.handler;
 
+import java.util.concurrent.Callable;
+
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.form.TaskFormData;
@@ -20,9 +22,6 @@ import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.context.ProcessApplicationContextUtil;
 import org.camunda.bpm.engine.impl.form.TaskFormDataImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
-import org.camunda.bpm.engine.repository.ProcessDefinition;
-
-import java.util.concurrent.Callable;
 
 
 /**
@@ -31,8 +30,7 @@ import java.util.concurrent.Callable;
 public class DefaultTaskFormHandler extends DefaultFormHandler implements TaskFormHandler {
 
   public TaskFormData createTaskForm(final TaskEntity task) {
-    ProcessDefinition processDefinition = (ProcessDefinition) task.getExecution().getProcessDefinition();
-    ProcessApplicationReference targetProcessApplication = ProcessApplicationContextUtil.getTargetProcessApplication(processDefinition.getDeploymentId());
+    ProcessApplicationReference targetProcessApplication = ProcessApplicationContextUtil.getTargetProcessApplication(deploymentId);
 
     if(targetProcessApplication != null) {
 

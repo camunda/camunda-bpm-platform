@@ -58,8 +58,7 @@ public class DefaultStartFormHandler extends DefaultFormHandler implements Start
   }
 
   public StartFormData createStartFormData(final ProcessDefinitionEntity processDefinition) {
-
-    ProcessApplicationReference targetProcessApplication = ProcessApplicationContextUtil.getTargetProcessApplication(processDefinition.getDeploymentId());
+    ProcessApplicationReference targetProcessApplication = ProcessApplicationContextUtil.getTargetProcessApplication(deploymentId);
 
     if(targetProcessApplication != null) {
 

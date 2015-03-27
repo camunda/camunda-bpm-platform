@@ -13,11 +13,9 @@
 package org.camunda.bpm.integrationtest.functional.el;
 
 import org.camunda.bpm.engine.form.StartFormData;
-import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.integrationtest.functional.el.beans.ResolveFormDataBean;
 import org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest;
 import org.jboss.arquillian.container.test.api.Deployment;
-import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Assert;
@@ -30,7 +28,7 @@ import org.junit.runner.RunWith;
 @RunWith(Arquillian.class)
 public class ElResolveStartFormDataTest extends AbstractFoxPlatformIntegrationTest {
 
-  @Deployment(name = "pa")
+  @Deployment
   public static WebArchive processArchive() {
     return initWebArchiveDeployment()
       .addClass(ResolveFormDataBean.class)
@@ -38,11 +36,10 @@ public class ElResolveStartFormDataTest extends AbstractFoxPlatformIntegrationTe
   }
 
   @Test
-  @OperateOnDeployment("pa")
   public void testStartFormDataWithDefaultValueExpression() {
-    ProcessInstance instance = runtimeService.startProcessInstanceByKey("elStartFormProcess");
+    String processDefinitionId = repositoryService.createProcessDefinitionQuery().singleResult().getId();
 
-    StartFormData formData = formService.getStartFormData(instance.getProcessDefinitionId());
+    StartFormData formData = formService.getStartFormData(processDefinitionId);
     Object defaultValue = formData.getFormFields().get(0).getValue().getValue();
 
     Assert.assertNotNull(defaultValue);
@@ -50,11 +47,10 @@ public class ElResolveStartFormDataTest extends AbstractFoxPlatformIntegrationTe
   }
 
   @Test
-  @OperateOnDeployment("pa")
   public void testStartFormDataWithLabelExpression() {
-    ProcessInstance instance = runtimeService.startProcessInstanceByKey("elStartFormProcess");
+    String processDefinitionId = repositoryService.createProcessDefinitionQuery().singleResult().getId();
 
-    StartFormData formData = formService.getStartFormData(instance.getProcessDefinitionId());
+    StartFormData formData = formService.getStartFormData(processDefinitionId);
 
     String label = formData.getFormFields().get(0).getLabel();
     Assert.assertNotNull(label);
