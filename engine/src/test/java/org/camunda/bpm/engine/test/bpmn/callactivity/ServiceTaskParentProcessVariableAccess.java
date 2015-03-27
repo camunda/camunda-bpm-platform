@@ -23,14 +23,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 public class ServiceTaskParentProcessVariableAccess implements JavaDelegate {
 
   public void execute(DelegateExecution execution) throws Exception {
-
-    // This should work with public API!
-
-    ExecutionEntity executionEntity = (ExecutionEntity) execution;
-
-    executionEntity.getProcessInstance()
-     .getSuperExecution()
-     .setVariable("greeting", "hello");
+	  execution.getSuperExecution().setVariable("greeting", "hello");
   }
 
 }

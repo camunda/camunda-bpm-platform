@@ -56,5 +56,8 @@ public interface DelegateExecution extends BaseDelegateExecution, BpmnModelExecu
 
   /** return the Id of the current transition */
   String getCurrentTransitionId();
+  
+  /** Get access to super process instance */
+  DelegateExecution getSuperExecution();
 
 }
