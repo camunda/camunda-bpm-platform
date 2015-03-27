@@ -322,6 +322,24 @@ define([
     // with process definition data providers
     Data.instantiateProviders('cockpit.processDefinition.data', { $scope: $scope, processData : processData });
 
+    // INITIALIZE PLUGINS
+    var processPlugins = (
+        Views.getProviders({ component: 'cockpit.processDefinition.runtime.tab' })).concat(
+        Views.getProviders({ component: 'cockpit.processDefinition.runtime.action' })).concat(
+        Views.getProviders({ component: 'cockpit.processDefinition.view' })).concat(
+        Views.getProviders({ component: 'cockpit.processDefinition.diagram.overlay' })).concat(
+        Views.getProviders({ component: 'cockpit.jobDefinition.action' }));
+
+    var initData = {
+      processDefinition : processDefinition,
+      processData       : processData
+    };
+
+    for(var i = 0; i < processPlugins.length; i++) {
+      if(typeof processPlugins[i].initialize === 'function') {
+         processPlugins[i].initialize(initData);
+      }
+    }
 
     $scope.selectTab = function(tabProvider) {
       $scope.selectedTab = tabProvider;

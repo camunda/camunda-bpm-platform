@@ -171,9 +171,6 @@ define([
     // processInstance
     processData.provide('processInstance', processInstance);
 
-    // modificationInstructions
-    processData.provide('modificationInstructions', []);
-
     // filter
     processData.provide('filter', parseFilterFromUri());
 
@@ -541,6 +538,26 @@ define([
     $scope.processInstanceActions = Views.getProviders({ component: 'cockpit.processInstance.runtime.action' });
 
     Data.instantiateProviders('cockpit.processInstance.data', {$scope: $scope, processData : processData});
+
+    // INITIALIZE PLUGINS
+    var instancePlugins = (
+        Views.getProviders({ component: 'cockpit.processInstance.runtime.tab' })).concat(
+        Views.getProviders({ component: 'cockpit.processInstance.runtime.action' })).concat(
+        Views.getProviders({ component: 'cockpit.processInstance.view' })).concat(
+        Views.getProviders({ component: 'cockpit.processInstance.diagram.overlay' }));
+
+    var initData = {
+      processInstance : processInstance,
+      processData     : processData,
+      filter          : filter,
+      pageData        : pageData
+    };
+
+    for(var i = 0; i < instancePlugins.length; i++) {
+      if(typeof instancePlugins[i].initialize === 'function') {
+         instancePlugins[i].initialize(initData);
+      }
+    }
 
     // TABS
 

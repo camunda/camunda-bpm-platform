@@ -25,6 +25,20 @@ define(['angular', 'text!./dashboard.html'], function(angular, template) {
 
     Data.instantiateProviders('cockpit.dashboard.data', {$scope: $scope, processData : processData});
 
+    // INITIALIZE PLUGINS
+    var dashboardPlugins = Views.getProviders({ component: 'cockpit.dashboard' });
+
+    var initData = {
+      $scope      : $scope,
+      processData : processData
+    };
+
+    for(var i = 0; i < dashboardPlugins.length; i++) {
+      if(typeof dashboardPlugins[i].initialize === 'function') {
+         dashboardPlugins[i].initialize(initData);
+      }
+    }
+
     $rootScope.showBreadcrumbs = false;
 
     // reset breadcrumbs
