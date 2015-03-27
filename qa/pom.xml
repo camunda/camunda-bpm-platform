@@ -13,10 +13,10 @@
     <relativePath>../database</relativePath>
     <version>7.3.0-SNAPSHOT</version>
   </parent>
-  
+
   <properties>
-    <!-- 
-      all maven properties used in QA/CI 
+    <!--
+      all maven properties used in QA/CI
     -->
 
     <!-- wildfly : uses the same properties as jboss -->
@@ -31,15 +31,15 @@
     <jboss.management-native.port>39999</jboss.management-native.port>
     <jboss.management-http.port>39990</jboss.management-http.port>
     <jboss.management-https.port>39443</jboss.management-https.port>
-    <jboss.osgi-http.port>38090</jboss.osgi-http.port>    
+    <jboss.osgi-http.port>38090</jboss.osgi-http.port>
     <jboss.remoting.port>34447</jboss.remoting.port>
     <jboss.txn-recovery-environment.port>34712</jboss.txn-recovery-environment.port>
     <jboss.txn-status-manager.port>34713</jboss.txn-status-manager.port>
     <jboss.mail-smtp.port>25</jboss.mail-smtp.port>
-    
+
     <!-- glassfish properties -->
     <glassfish.runtime.location>../gf31-runtime/target/server/glassfish3</glassfish.runtime.location>
-    
+
     <glassfish.http.port>28080</glassfish.http.port>
     <glassfish.admin.port>24848</glassfish.admin.port>
     <glassfish.ASADMIN_LISTENER_PORT>24848</glassfish.ASADMIN_LISTENER_PORT>
@@ -51,8 +51,8 @@
     <glassfish.JMX_SYSTEM_CONNECTOR_PORT>28686</glassfish.JMX_SYSTEM_CONNECTOR_PORT>
     <glassfish.OSGI_SHELL_TELNET_PORT>26666</glassfish.OSGI_SHELL_TELNET_PORT>
     <glassfish.JAVA_DEBUGGER_PORT>29009</glassfish.JAVA_DEBUGGER_PORT>
-    
-    	
+
+
     <!-- tomcat -->
     <tomcat6.connector.http.port>48080</tomcat6.connector.http.port>
     <tomcat6.connector.http.redirectPort>48443</tomcat6.connector.http.redirectPort>
@@ -89,23 +89,23 @@
     </profile>
 
     <!-- Server profiles -->
-  	
+
     <profile>
       <id>glassfish</id>
       <modules>
         <module>gf31-runtime</module>
       </modules>
     </profile>
-	
-    <profile>      
-      <id>jboss</id> 
-      <modules>       
+
+    <profile>
+      <id>jboss</id>
+      <modules>
         <module>jboss7-runtime</module>
       </modules>
     </profile>
-    <profile>      
-      <id>jboss-domain</id> 
-      <modules>       
+    <profile>
+      <id>jboss-domain</id>
+      <modules>
         <module>jboss7-runtime</module>
       </modules>
     </profile>
@@ -122,30 +122,30 @@
         <module>wildfly-runtime</module>
       </modules>
     </profile>
-	
+
 	  <profile>
-      <id>tomcat</id>       
+      <id>tomcat</id>
       <modules>
-        <module>tomcat-runtime</module>     
+        <module>tomcat-runtime</module>
       </modules>
-    </profile>  
-    
+    </profile>
+
     <!-- Testsuite profiles -->
 
     <profile>
       <id>webapps-integration</id>
       <modules>
         <module>integration-tests-webapps</module>
-      </modules>      
+      </modules>
     </profile>
-    
+
     <profile>
       <id>engine-integration</id>
       <modules>
         <module>integration-tests-engine</module>
       </modules>
     </profile>
-    
+
     <profile>
       <id>upgrade</id>
       <modules>
@@ -182,7 +182,20 @@
         <glassfish.domain.xml>domain.xml</glassfish.domain.xml>
       </properties>
     </profile>
-    
+
+    <profile>
+      <id>mariadb</id>
+      <properties>
+        <glassfish.domain.xml>domain-xa.xml</glassfish.domain.xml>
+      </properties>
+    </profile>
+    <profile>
+      <id>mariadb-xa</id>
+      <properties>
+        <glassfish.domain.xml>domain-xa.xml</glassfish.domain.xml>
+      </properties>
+    </profile>
+
     <profile>
       <id>mysql</id>
       <properties>
@@ -234,7 +247,7 @@
         <glassfish.domain.xml>domain-xa.xml</glassfish.domain.xml>
       </properties>
     </profile>
-           	
+
   </profiles>
 
 </project>

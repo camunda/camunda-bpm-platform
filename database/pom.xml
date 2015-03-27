@@ -23,6 +23,7 @@
     <version.oracle-11>11.2.0.4</version.oracle-11>
     <version.oracle-10>10.2.0.5</version.oracle-10>
     <version.oracle>${version.oracle-11}</version.oracle>
+    <version.mariadb>1.1.8</version.mariadb>
     <version.mysql>5.1.21</version.mysql>
     <version.sqlserver.oss>1.3.1</version.sqlserver.oss>
     <version.sqlserver>4.0</version.sqlserver>
@@ -47,6 +48,11 @@
         <groupId>com.oracle.jdbc</groupId>
         <artifactId>ojdbc14</artifactId>
         <version>${version.oracle-10}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.mariadb.jdbc</groupId>
+        <artifactId>mariadb-java-client</artifactId>
+        <version>${version.mariadb}</version>
       </dependency>
       <dependency>
         <groupId>mysql</groupId>
@@ -83,6 +89,11 @@
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>sql-maven-plugin</artifactId>
           <dependencies>
+            <dependency>
+              <groupId>org.mariadb.jdbc</groupId>
+              <artifactId>mariadb-java-client</artifactId>
+              <version>${version.mariadb}</version>
+            </dependency>
             <dependency>
               <groupId>mysql</groupId>
               <artifactId>mysql-connector-java</artifactId>
@@ -202,6 +213,32 @@
           <scope>test</scope>
         </dependency>
       </dependencies>
+    </profile>
+
+    <profile>
+      <id>mariadb</id>
+      <properties>
+        <database.type>mysql</database.type>
+        <database.driver>org.mariadb.jdbc.Driver</database.driver>
+        <database.datasource.class>org.mariadb.jdbc.MySQLDataSource</database.datasource.class>
+        <jboss.datasource.filename>mariadb-ds.xml</jboss.datasource.filename>
+        <hibernate.dialect>org.hibernate.dialect.MySQL5InnoDBDialect</hibernate.dialect>
+      </properties>
+
+      <dependencies>
+        <dependency>
+          <groupId>org.mariadb.jdbc</groupId>
+          <artifactId>mariadb-java-client</artifactId>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
+    </profile>
+    <profile>
+      <id>mariadb-xa</id>
+      <properties>
+        <database.datasource.class>org.mariadb.jdbc.MySQLDataSource</database.datasource.class>
+        <jboss.datasource.filename>mariadb-xa-ds.xml</jboss.datasource.filename>
+      </properties>
     </profile>
 
     <profile>

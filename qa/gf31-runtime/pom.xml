@@ -5,7 +5,7 @@
   <packaging>pom</packaging>
 
   <name>camunda BPM - QA Glassfish 3.1.x Test Runtime</name>
-  
+
   <parent>
     <groupId>org.camunda.bpm.qa</groupId>
     <artifactId>camunda-qa</artifactId>
@@ -26,6 +26,16 @@
       database drivers
       we deploy all and only activate one within domain.xml
     -->
+    <dependency>
+      <groupId>org.mariadb.jdbc</groupId>
+      <artifactId>mariadb-java-client</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.mariadb.jdbc</groupId>
+      <artifactId>mariadb-java-client</artifactId>
+      <scope>runtime</scope>
+    </dependency>
     <dependency>
       <groupId>mysql</groupId>
       <artifactId>mysql-connector-java</artifactId>
@@ -50,7 +60,7 @@
       <groupId>org.postgresql</groupId>
       <artifactId>postgresql</artifactId>
       <scope>runtime</scope>
-    </dependency>   
+    </dependency>
 
     <dependency>
       <groupId>org.python</groupId>
@@ -68,7 +78,7 @@
   <profiles>
     <profile>
       <id>glassfish</id>
-      <build>        
+      <build>
         <plugins>
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
@@ -88,10 +98,10 @@
                       <artifactId>camunda-glassfish-assembly</artifactId>
                       <version>${project.version}</version>
                       <type>tar.gz</type>
-                      <overWrite>true</overWrite>                    
+                      <overWrite>true</overWrite>
                       <outputDirectory>target/</outputDirectory>
                     </artifactItem>
-                  </artifactItems>                
+                  </artifactItems>
                 </configuration>
               </execution>
               <execution>
@@ -103,7 +113,7 @@
                 <inherited>false</inherited>
                 <configuration>
                    <includeScope>runtime</includeScope>
-                   <outputDirectory>${project.build.directory}/server/glassfish3/glassfish/lib</outputDirectory>             
+                   <outputDirectory>${project.build.directory}/server/glassfish3/glassfish/lib</outputDirectory>
                 </configuration>
               </execution>
             </executions>
@@ -119,7 +129,7 @@
                 </goals>
                 <configuration>
                   <outputDirectory>${project.build.directory}/server/glassfish3/glassfish/domains</outputDirectory>
-                  <resources>          
+                  <resources>
                     <resource>
                       <directory>src/main/domains</directory>
                       <includes>
@@ -127,8 +137,8 @@
                       </includes>
                       <filtering>true</filtering>
                     </resource>
-                  </resources>              
-                </configuration>            
+                  </resources>
+                </configuration>
               </execution>
             </executions>
           </plugin>
@@ -152,6 +162,6 @@
           </plugin>
         </plugins>
       </build>
-    </profile>    
+    </profile>
   </profiles>
 </project>

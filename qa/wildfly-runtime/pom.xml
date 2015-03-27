@@ -21,7 +21,7 @@
       <!-- make sure it comes after assembly in the build -->
       <groupId>org.camunda.bpm.wildfly</groupId>
       <artifactId>camunda-wildfly-assembly</artifactId>
-      <version>${project.version}</version>      
+      <version>${project.version}</version>
       <type>pom</type>
       <scope>test</scope>
     </dependency>
@@ -33,6 +33,11 @@
     <dependency>
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.mariadb.jdbc</groupId>
+      <artifactId>mariadb-java-client</artifactId>
       <scope>runtime</scope>
     </dependency>
     <dependency>
@@ -82,7 +87,7 @@
           <include>configuration/standalone.xml</include>
           <include>deployments/${jboss.datasource.filename}</include>
         </includes>
-      </resource> 
+      </resource>
       <resource>
         <directory>src/main/modules</directory>
         <filtering>true</filtering>
@@ -210,12 +215,13 @@
                       <fileset refid="maven.project.dependencies" />
                       <regexpmapper from="^(.*)/([^/]+)/([^/]*)$$" to="\1/main/\3" handledirsep="yes" />
                     </copy>
-                    
+
                     <replace dir="${wildfly.runtime.location}/modules">
                       <include name="**/module.xml" />
                       <replacefilter token="@project.version@" value="${project.version}" />
                       <replacefilter token="@version.db2@" value="${version.db2}" />
                       <replacefilter token="@version.h2@" value="${version.h2}" />
+                      <replacefilter token="@version.mariadb@" value="${version.mariadb}" />
                       <replacefilter token="@version.mysql@" value="${version.mysql}" />
                       <replacefilter token="@version.oracle@" value="${version.oracle}" />
                       <replacefilter token="@version.postgresql@" value="${version.postgresql}" />
@@ -254,7 +260,7 @@
         </plugins>
       </build>
     </profile>
-    
+
     <profile>
       <id>wildfly-domain</id>
       <build>
@@ -324,6 +330,7 @@
                       <replacefilter token="@project.version@" value="${project.version}" />
                       <replacefilter token="@version.db2@" value="${version.db2}" />
                       <replacefilter token="@version.h2@" value="${version.h2}" />
+                      <replacefilter token="@version.mariadb@" value="${version.mariadb}" />
                       <replacefilter token="@version.mysql@" value="${version.mysql}" />
                       <replacefilter token="@version.oracle@" value="${version.oracle}" />
                       <replacefilter token="@version.postgresql@" value="${version.postgresql}" />

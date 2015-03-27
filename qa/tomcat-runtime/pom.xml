@@ -4,7 +4,7 @@
   <artifactId>camunda-qa-tomcat-runtime</artifactId>
   <packaging>pom</packaging>
 
-  <name>camunda BPM - QA Tomcat Test Runtime</name>  
+  <name>camunda BPM - QA Tomcat Test Runtime</name>
 
   <parent>
     <groupId>org.camunda.bpm.qa</groupId>
@@ -29,6 +29,11 @@
       database drivers
       we deploy all and only activate one through server.xml
     -->
+    <dependency>
+      <groupId>org.mariadb.jdbc</groupId>
+      <artifactId>mariadb-java-client</artifactId>
+      <scope>runtime</scope>
+    </dependency>
     <dependency>
       <groupId>mysql</groupId>
       <artifactId>mysql-connector-java</artifactId>
@@ -122,10 +127,10 @@
                       <artifactId>camunda-tomcat-assembly</artifactId>
                       <version>${project.version}</version>
                       <type>tar.gz</type>
-                      <overWrite>true</overWrite>                    
+                      <overWrite>true</overWrite>
                       <outputDirectory>target/</outputDirectory>
                     </artifactItem>
-                  </artifactItems>                
+                  </artifactItems>
                 </configuration>
               </execution>
               <execution>
@@ -141,14 +146,14 @@
                 </configuration>
               </execution>
             </executions>
-          </plugin>          
+          </plugin>
           <!-- copy filtered configuration resources -->
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-resources-plugin</artifactId>
             <configuration>
               <delimiters>
-                <delimiter>${*}</delimiter>          
+                <delimiter>${*}</delimiter>
               </delimiters>
               <useDefaultDelimiters>false</useDefaultDelimiters>
             </configuration>
