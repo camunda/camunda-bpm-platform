@@ -313,11 +313,6 @@
     <profile>
       <id>oracle-12</id>
       <properties>
-        <!--
-         We explicitly use the oracle 11 driver because the testsuite leaves open cursors behind
-         with the oracle 12 driver version. Default value => OPEN_CURSORS = 300
-         Exception: java.sql.SQLException: ORA-01000: maximum open cursors exceeded
-        -->
         <version.oracle>${version.oracle-12}</version.oracle>
         <hibernate.dialect>org.hibernate.dialect.Oracle10gDialect</hibernate.dialect>
       </properties>
