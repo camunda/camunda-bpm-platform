@@ -70,7 +70,7 @@ public class DurationHelperTest {
 
   @AfterClass
   public static void resetTime() {
-    ClockUtil.setCurrentTime(new Date());
+    ClockUtil.reset();
   }
 
   private Date parse(String str) throws Exception {
