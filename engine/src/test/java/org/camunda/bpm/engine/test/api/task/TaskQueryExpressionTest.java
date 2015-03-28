@@ -52,7 +52,7 @@ public class TaskQueryExpressionTest extends PluggableProcessEngineTestCase {
     anotherUser = createUser("anotherUser", group3.getId());
     userWithoutGroups = createUser("userWithoutGroups");
 
-    setTime(new DateTime().withMillisOfSecond(0).toDate());
+    setTime(1427547759000l);
     task = createTestTask("task");
     // shift time to force distinguishable create times
     adjustTime(2 * 60);
