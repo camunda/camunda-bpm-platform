@@ -74,7 +74,7 @@ public class ProcessInstanceModificationBuilderImpl implements ProcessInstanceMo
     return this;
   }
 
-  public ProcessInstanceModificationBuilder cancelAllInActivity(String activityId) {
+  public ProcessInstanceModificationBuilder cancelAllForActivity(String activityId) {
     ensureNotNull("activityId", activityId);
     operations.add(new ActivityCancellationCmd(processInstanceId, activityId));
     return this;

@@ -1036,7 +1036,7 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
 
     // when I cancel task2
     runtimeService.createProcessInstanceModification(processInstance.getId())
-      .cancelAllInActivity("task2")
+      .cancelAllForActivity("task2")
       .execute(false, true);
 
     // then the output mapping should not have executed

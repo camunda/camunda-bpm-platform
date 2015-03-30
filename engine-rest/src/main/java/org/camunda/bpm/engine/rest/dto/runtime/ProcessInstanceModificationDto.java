@@ -100,7 +100,7 @@ public class ProcessInstanceModificationDto {
     }
 
     if (activityId != null) {
-      builder.cancelAllInActivity(activityId);
+      builder.cancelAllForActivity(activityId);
     }
     else if (activityInstanceId != null) {
       builder.cancelActivityInstance(activityInstanceId);

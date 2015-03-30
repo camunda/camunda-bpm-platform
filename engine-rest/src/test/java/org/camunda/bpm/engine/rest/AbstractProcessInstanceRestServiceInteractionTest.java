@@ -1478,7 +1478,7 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
     verify(runtimeServiceMock).createProcessInstanceModification(eq(EXAMPLE_PROCESS_INSTANCE_ID));
 
     InOrder inOrder = inOrder(mockModificationBuilder);
-    inOrder.verify(mockModificationBuilder).cancelAllInActivity("activityId");
+    inOrder.verify(mockModificationBuilder).cancelAllForActivity("activityId");
     inOrder.verify(mockModificationBuilder).cancelActivityInstance("activityInstanceId");
     inOrder.verify(mockModificationBuilder).startBeforeActivity("activityId");
     inOrder.verify(mockModificationBuilder).startBeforeActivity("activityId", "ancestorActivityInstanceId");
@@ -1647,7 +1647,7 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
         mock(ProcessInstanceActivityInstantiationBuilder.class);
 
     when(mockModificationBuilder.cancelActivityInstance(anyString())).thenReturn(mockModificationBuilder);
-    when(mockModificationBuilder.cancelAllInActivity(anyString())).thenReturn(mockModificationBuilder);
+    when(mockModificationBuilder.cancelAllForActivity(anyString())).thenReturn(mockModificationBuilder);
     when(mockModificationBuilder.startAfterActivity(anyString())).thenReturn(mockModificationBuilder);
     when(mockModificationBuilder.startAfterActivity(anyString(), anyString())).thenReturn(mockModificationBuilder);
     when(mockModificationBuilder.startBeforeActivity(anyString())).thenReturn(mockModificationBuilder);

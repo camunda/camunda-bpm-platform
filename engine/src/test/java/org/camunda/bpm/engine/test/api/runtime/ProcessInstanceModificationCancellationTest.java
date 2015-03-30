@@ -91,7 +91,7 @@ public class ProcessInstanceModificationCancellationTest extends PluggableProces
     // when
     runtimeService
       .createProcessInstanceModification(processInstanceId)
-      .cancelAllInActivity("theTask")
+      .cancelAllForActivity("theTask")
       .execute();
 
     assertProcessEnded(processInstanceId);
@@ -209,7 +209,7 @@ public class ProcessInstanceModificationCancellationTest extends PluggableProces
     // then
     runtimeService
       .createProcessInstanceModification(processInstance.getId())
-      .cancelAllInActivity("theTask")
+      .cancelAllForActivity("theTask")
       .execute();
 
     assertProcessEnded(processInstanceId);
@@ -348,7 +348,7 @@ public class ProcessInstanceModificationCancellationTest extends PluggableProces
 
     runtimeService
       .createProcessInstanceModification(processInstance.getId())
-      .cancelAllInActivity("task1")
+      .cancelAllForActivity("task1")
       .execute();
 
     assertProcessNotEnded(processInstanceId);
@@ -528,7 +528,7 @@ public class ProcessInstanceModificationCancellationTest extends PluggableProces
     // when
     runtimeService
       .createProcessInstanceModification(processInstance.getId())
-      .cancelAllInActivity("task1")
+      .cancelAllForActivity("task1")
       .execute();
 
     assertProcessNotEnded(processInstanceId);

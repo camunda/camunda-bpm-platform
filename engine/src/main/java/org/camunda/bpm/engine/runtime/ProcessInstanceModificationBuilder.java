@@ -46,13 +46,21 @@ public interface ProcessInstanceModificationBuilder {
   /**
    * <p><i>Submits the instruction:</i></p>
    *
-   * Cancel all instances of the given activity in an arbitrary order. Behaves like
-   * {@link #cancelActivityInstance(String)} for each individual
-   * instance.
+   * <p>Cancel all instances of the given activity in an arbitrary order, which are:
+   * <ul>
+   *   <li>activity instances of that activity
+   *   <li>transition instances entering or leaving that activity
+   * </ul></p>
+   *
+   * <p>Therefore behaves like {@link #cancelActivityInstance(String)} for each individual
+   * activity instance and like {@link #cancelTransitionInstance(String)} for each
+   * individual transition instance.</p>
+   *
+   * <p>The cancellation order of the instances is arbitrary</p>
    *
    * @param activityId the activity for which all instances should be cancelled
    */
-  ProcessInstanceModificationBuilder cancelAllInActivity(String activityId);
+  ProcessInstanceModificationBuilder cancelAllForActivity(String activityId);
 
   /**
    * <p><i>Submits the instruction:</i></p>

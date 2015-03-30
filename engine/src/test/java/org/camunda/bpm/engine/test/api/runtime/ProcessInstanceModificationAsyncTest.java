@@ -602,6 +602,39 @@ public class ProcessInstanceModificationAsyncTest extends PluggableProcessEngine
     RecorderExecutionListener.clear();
   }
 
+  @Deployment(resources = NESTED_ASYNC_BEFORE_TASK_PROCESS)
+  public void testCancelAllCancelsTransitionInstances() {
+    // given a process instance with an async task in a subprocess
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("nestedOneTaskProcess");
+
+    assertEquals(1, managementService.createJobQuery().count());
+
+    // when the async task is cancelled via cancelAll
+    runtimeService.createProcessInstanceModification(processInstance.getId())
+      .cancelAllForActivity("innerTask")
+      .execute();
+
+    // then the job has been removed
+    assertEquals(0, managementService.createJobQuery().count());
+
+    // and the activity instance and execution trees match
+    ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstance.getId());
+    assertThat(updatedTree).hasStructure(
+        describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+          .activity("outerTask")
+        .done());
+
+    ExecutionTree executionTree = ExecutionTree.forExecution(processInstance.getId(), processEngine);
+
+    assertThat(executionTree)
+    .matches(
+      describeExecutionTree("outerTask").scope()
+    .done());
+
+    // and the process can be completed successfully
+    completeTasksInOrder("outerTask");
+    assertProcessEnded(processInstance.getId());
+  }
 
   protected String getInstanceIdForActivity(ActivityInstance activityInstance, String activityId) {
     ActivityInstance instance = getChildInstanceForActivity(activityInstance, activityId);

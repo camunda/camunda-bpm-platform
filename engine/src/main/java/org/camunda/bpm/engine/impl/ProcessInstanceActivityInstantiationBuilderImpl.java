@@ -73,8 +73,8 @@ public class ProcessInstanceActivityInstantiationBuilderImpl implements ProcessI
     return builder.cancelTransitionInstance(transitionInstanceId);
   }
 
-  public ProcessInstanceModificationBuilder cancelAllInActivity(String activityId) {
-    return builder.cancelAllInActivity(activityId);
+  public ProcessInstanceModificationBuilder cancelAllForActivity(String activityId) {
+    return builder.cancelAllForActivity(activityId);
   }
 
   public ProcessInstanceActivityInstantiationBuilder startBeforeActivity(String activityId) {
