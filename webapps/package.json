@@ -9,6 +9,10 @@
     "prodTarget": "dist",
     "devTarget": "dist/app/admin"
   },
+  "scripts": {
+    "win-build-sdk": "cd \"node_modules\\grunt-cli\\bin\" && grunt --gruntfile=..\\..\\camunda-commons-ui\\node_modules\\camunda-bpm-sdk-js\\Gruntfile.js browserify:distTypeUtils",
+    "build-sdk": "node_modules/grunt-cli/bin/grunt --gruntfile=node_modules/camunda-commons-ui/node_modules/camunda-bpm-sdk-js/Gruntfile.js browserify:distTypeUtils"
+  },
   "dependencies": {
     "camunda-commons-ui": "camunda/camunda-commons-ui"
   },
