@@ -22,7 +22,8 @@
 
       <a ng-click="select($event)"
          tooltip-placement="top"
-         tooltip="{{ node.name }}">
+         tooltip="{{ node.name }} {{ node.activityType }}">
+        <span class="icon-{{ dashed(node.activityType) }}"></span>
         {{ node.name }}
       </a>
 

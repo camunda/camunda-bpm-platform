@@ -22,6 +22,11 @@ define([ 'angular', 'require', 'text!./activity-instance-tree.html' ], function(
       },
 
       link: function(scope, element) {
+        scope.dashed = function (str) {
+          return (str || '').replace(/([A-Z])/g, function ($1) {
+            return '-' + $1.toLowerCase();
+          });
+        };
 
         var $nodeElement = element,
             nodeSelectedEventName = 'node.selected',
