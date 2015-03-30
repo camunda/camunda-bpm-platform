@@ -16,15 +16,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.camunda.bpm.engine.authorization.Permissions;
-import org.camunda.bpm.engine.authorization.Resource;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.User;
-import org.camunda.bpm.engine.impl.cfg.auth.ResourceAuthorizationProvider;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.identity.WritableIdentityProvider;
-import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.GroupEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.MembershipEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.UserEntity;
@@ -141,13 +137,13 @@ public class DbIdentityServiceProvider extends DbReadOnlyIdentityServiceProvider
   }
 
   protected void createDefaultAuthorizations(Group group) {
-    if(Context.getProcessEngineConfiguration().isAuthorizationEnabled()) {
+    if(isAuthorizationEnabled()) {
       saveDefaultAuthorizations(getResourceAuthorizationProvider().newGroup(group));
     }
   }
 
   protected void createDefaultMembershipAuthorizations(String userId, String groupId) {
-    if(Context.getProcessEngineConfiguration().isAuthorizationEnabled()) {
+    if(isAuthorizationEnabled()) {
       saveDefaultAuthorizations(getResourceAuthorizationProvider().groupMembershipCreated(groupId, userId));
     }
   }

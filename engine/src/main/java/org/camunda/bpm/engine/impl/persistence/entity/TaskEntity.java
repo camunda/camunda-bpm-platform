@@ -151,11 +151,18 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
   /** creates and initializes a new persistent task. */
   public static TaskEntity createAndInsert(VariableScope execution) {
     TaskEntity task = create();
+
     if (execution instanceof ExecutionEntity) {
+      task.setExecution((DelegateExecution) execution);
       task.insert((ExecutionEntity) execution);
-    } else {
-      task.insert(null);
+      return task;
+
     }
+    else if (execution instanceof CaseExecutionEntity) {
+      task.setCaseExecution((DelegateCaseExecution) execution);
+    }
+
+    task.insert(null);
     return task;
   }
 
@@ -163,8 +170,8 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
     ensureParentTaskActive();
 
     CommandContext commandContext = Context.getCommandContext();
-    DbEntityManager dbEntityManger = commandContext.getDbEntityManager();
-    dbEntityManger.insert(this);
+    TaskManager taskManager = commandContext.getTaskManager();
+    taskManager.insertTask(this);
 
     if(execution != null) {
       execution.addTask(this);

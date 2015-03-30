@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?> 
 
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
-  
+
 <mapper namespace="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity">
 
   <!-- AUTHORIZATION INSERT -->
@@ -27,9 +27,9 @@
       1
     )
   </insert>
-  
+
   <!-- AUTHORIZATION UPDATE -->
-  
+
   <update id="updateAuthorization" parameterType="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity">
     update ${prefix}ACT_RU_AUTHORIZATION set
       REV_ = #{revisionNext, jdbcType=INTEGER},
@@ -38,21 +38,21 @@
       USER_ID_ = #{userId, jdbcType=VARCHAR},
       RESOURCE_TYPE_ = #{resourceType, jdbcType=INTEGER},
       RESOURCE_ID_ = #{resourceId, jdbcType=VARCHAR},
-      PERMS_ = #{permissions, jdbcType=INTEGER}     
+      PERMS_ = #{permissions, jdbcType=INTEGER}
     where ID_ = #{id, jdbcType=VARCHAR}
       and REV_ = #{revision, jdbcType=INTEGER}
   </update>
-  
-    <!-- AUTHORIZATION DELETE -->
-  
+
+  <!-- AUTHORIZATION DELETE -->
+
   <update id="deleteAuthorization" parameterType="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity">
     DELETE FROM 
         ${prefix}ACT_RU_AUTHORIZATION 
-    where  
-        ID_ = #{id}  
+    where
+        ID_ = #{id}
         and REV_ = #{revision}
   </update>
-  
+
   <delete id="deleteAuthorizationsForResourceId" parameterType="map">
     delete from ${prefix}ACT_RU_AUTHORIZATION 
     where 
@@ -72,13 +72,13 @@
     <result property="resourceId" column="RESOURCE_ID_" jdbcType="VARCHAR" />
     <result property="permissions" column="PERMS_" jdbcType="INTEGER" />
   </resultMap>
-  
-  <!-- AUTHORIZATION SELECT -->  
-  
+
+  <!-- AUTHORIZATION SELECT -->
+
   <select id="selectAuthorization" resultMap="authorizationResultMap">
     select * FROM ${prefix}ACT_RU_AUTHORIZATION WHERE ID_ = #{id}
   </select>
-  
+
   <select id="selectAuthorizationByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.AuthorizationQueryImpl" resultMap="authorizationResultMap">
     <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
@@ -93,18 +93,18 @@
     select count(distinct RES.ID_)
     <include refid="selectAuthorizationByQueryCriteriaSql"/>
   </select>
-    
+
   <sql id="selectAuthorizationByQueryCriteriaSql">
     from ${prefix}ACT_RU_AUTHORIZATION RES
     <where>
       <if test="id != null">
         RES.ID_ = #{id}
       </if>
-      
+
       <if test="authorizationType != null">
         and RES.TYPE_ = #{authorizationType}
-      </if>    
-      
+      </if>
+
       <!-- userIds -->
       <if test="userIds != null &amp;&amp; userIds.length > 0">
         and RES.USER_ID_ in
@@ -113,7 +113,7 @@
           #{item}
         </foreach>
       </if>
-      
+
       <!-- groupIds -->
       <if test="groupIds != null &amp;&amp; groupIds.length > 0">
         and RES.GROUP_ID_ in
@@ -122,113 +122,191 @@
           #{item}
         </foreach>
       </if>
-      
+
       <if test="queryByResourceType">
         and RES.RESOURCE_TYPE_ = #{resourceType}
-      </if>      
+      </if>
       <if test="resourceId != null">
         and RES.RESOURCE_ID_ = #{resourceId}
-      </if>     
+      </if>
       <if test="queryByPermission">
         and ${bitand1}RES.PERMS_${bitand2}#{permission}${bitand3} = #{permission}  
       </if>
-      
+
       <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck" />
-      
+
     </where>
   </sql>
-   
+
   <select id="isUserAuthorizedForResource" resultType="integer">
-    
-    <include refid="authCheck"/>
-    
+
+    <if test="permissionChecks != null &amp;&amp; permissionChecks.size() > 1">
+      SELECT
+    </if>
+
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authorizationCheck" />
+
   </select>
-  
-  <sql id="authCheck">    
-    SELECT 
+
+  <sql id="authCheck">
+    SELECT
     CASE
-    
+
       <!-- User GRANT -->
-      <if test="authResourceIdQueryParam != null || (authResourceId != null &amp;&amp; !authResourceId.equals('*')) ">
-        WHEN EXISTS (SELECT ID_ from ${prefix}ACT_RU_AUTHORIZATION A WHERE A.TYPE_ = 1 AND A.USER_ID_ = #{authUserId, jdbcType=VARCHAR} AND ${bitand1}A.PERMS_${bitand2}#{authPerms, jdbcType=INTEGER}${bitand3}=#{authPerms, jdbcType=INTEGER} AND A.RESOURCE_TYPE_ = #{authResourceType, jdbcType=VARCHAR} AND A.RESOURCE_ID_ = <if test="authResourceIdQueryParam != null">${authResourceIdQueryParam}</if><if test="authResourceId != null">#{authResourceId, jdbcType=VARCHAR}</if>   )
+      <if test="permCheck.resourceIdQueryParam != null || (permCheck.resourceId != null &amp;&amp; !permCheck.resourceId.equals('*')) ">
+        WHEN EXISTS (SELECT ID_ from ${prefix}ACT_RU_AUTHORIZATION A WHERE A.TYPE_ = 1 AND A.USER_ID_ = #{authUserId, jdbcType=VARCHAR} AND ${bitand1}A.PERMS_${bitand2}#{permCheck.perms, jdbcType=INTEGER}${bitand3}=#{permCheck.perms, jdbcType=INTEGER} AND A.RESOURCE_TYPE_ = #{permCheck.resourceType, jdbcType=VARCHAR} AND A.RESOURCE_ID_ = <if test="permCheck.resourceIdQueryParam != null">${permCheck.resourceIdQueryParam}</if><if test="permCheck.resourceId != null">#{permCheck.resourceId, jdbcType=VARCHAR}</if>   )
             THEN 1
       </if>
-      WHEN EXISTS (SELECT ID_ from ${prefix}ACT_RU_AUTHORIZATION A WHERE A.TYPE_ = 1 AND A.USER_ID_ = #{authUserId, jdbcType=VARCHAR} AND ${bitand1}A.PERMS_${bitand2}#{authPerms, jdbcType=INTEGER}${bitand3}=#{authPerms, jdbcType=INTEGER} AND A.RESOURCE_TYPE_ = #{authResourceType, jdbcType=VARCHAR} AND A.RESOURCE_ID_ = '*')
-          THEN 1
-          
+
       <!-- User REVOKE -->
-      <if test="authResourceIdQueryParam != null || (authResourceId != null &amp;&amp; !authResourceId.equals('*')) ">
-        WHEN EXISTS (SELECT ID_ from ${prefix}ACT_RU_AUTHORIZATION A WHERE A.TYPE_ = 2 AND A.USER_ID_ = #{authUserId, jdbcType=VARCHAR} AND ${bitand1}A.PERMS_${bitand2}#{authPerms, jdbcType=INTEGER}${bitand3}!=#{authPerms,  jdbcType=INTEGER} AND A.RESOURCE_TYPE_ = #{authResourceType, jdbcType=VARCHAR} AND A.RESOURCE_ID_ = <if test="authResourceIdQueryParam != null">${authResourceIdQueryParam}</if><if test="authResourceId != null">#{authResourceId, jdbcType=VARCHAR}</if>   )
+      <if test="permCheck.resourceIdQueryParam != null || (permCheck.resourceId != null &amp;&amp; !permCheck.resourceId.equals('*')) ">
+        WHEN EXISTS (SELECT ID_ from ${prefix}ACT_RU_AUTHORIZATION A WHERE A.TYPE_ = 2 AND A.USER_ID_ = #{authUserId, jdbcType=VARCHAR} AND ${bitand1}A.PERMS_${bitand2}#{permCheck.perms, jdbcType=INTEGER}${bitand3}!=#{permCheck.perms,  jdbcType=INTEGER} AND A.RESOURCE_TYPE_ = #{permCheck.resourceType, jdbcType=VARCHAR} AND A.RESOURCE_ID_ = <if test="permCheck.resourceIdQueryParam != null">${permCheck.resourceIdQueryParam}</if><if test="permCheck.resourceId != null">#{permCheck.resourceId, jdbcType=VARCHAR}</if>   )
             THEN 0
       </if>
-      WHEN EXISTS (SELECT ID_ from ${prefix}ACT_RU_AUTHORIZATION A WHERE A.TYPE_ = 2 AND A.USER_ID_ = #{authUserId, jdbcType=VARCHAR} AND ${bitand1}A.PERMS_${bitand2}#{authPerms, jdbcType=INTEGER}${bitand3}!=#{authPerms,  jdbcType=INTEGER} AND A.RESOURCE_TYPE_ = #{authResourceType, jdbcType=VARCHAR} AND A.RESOURCE_ID_ = '*')
+
+      <!-- User GRANT -->
+      WHEN EXISTS (SELECT ID_ from ${prefix}ACT_RU_AUTHORIZATION A WHERE A.TYPE_ = 1 AND A.USER_ID_ = #{authUserId, jdbcType=VARCHAR} AND ${bitand1}A.PERMS_${bitand2}#{permCheck.perms, jdbcType=INTEGER}${bitand3}=#{permCheck.perms, jdbcType=INTEGER} AND A.RESOURCE_TYPE_ = #{permCheck.resourceType, jdbcType=VARCHAR} AND A.RESOURCE_ID_ = '*')
+          THEN 1
+
+      <!-- User REVOKE -->
+      WHEN EXISTS (SELECT ID_ from ${prefix}ACT_RU_AUTHORIZATION A WHERE A.TYPE_ = 2 AND A.USER_ID_ = #{authUserId, jdbcType=VARCHAR} AND ${bitand1}A.PERMS_${bitand2}#{permCheck.perms, jdbcType=INTEGER}${bitand3}!=#{permCheck.perms,  jdbcType=INTEGER} AND A.RESOURCE_TYPE_ = #{permCheck.resourceType, jdbcType=VARCHAR} AND A.RESOURCE_ID_ = '*')
           THEN 0
-          
-      ELSE 
+
+      ELSE
           (
-          SELECT 
-            CASE 
+          SELECT
+            CASE
               <if test="authGroupIds != null &amp;&amp; authGroupIds.size() > 0">
-              
-                <!-- Group REVOKES -->
+
+                <!-- Group GRANTS -->
                 <foreach collection="authGroupIds" index="index" item="authGroupId">
-                  <if test="authResourceIdQueryParam != null || (authResourceId != null &amp;&amp; !authResourceId.equals('*')) ">
-                    WHEN EXISTS (SELECT ID_ from ${prefix}ACT_RU_AUTHORIZATION A WHERE A.TYPE_ = 2 AND A.GROUP_ID_ = #{authGroupId, jdbcType=VARCHAR} AND ${bitand1}A.PERMS_${bitand2}#{authPerms, jdbcType=INTEGER}${bitand3}!=#{authPerms, jdbcType=INTEGER} AND A.RESOURCE_TYPE_ = #{authResourceType, jdbcType=VARCHAR} AND A.RESOURCE_ID_ = <if test="authResourceIdQueryParam != null">${authResourceIdQueryParam}</if><if test="authResourceId != null">#{authResourceId, jdbcType=VARCHAR}</if>   )
-                      THEN 0
-                  </if>
-                  WHEN EXISTS (SELECT ID_ from ${prefix}ACT_RU_AUTHORIZATION A WHERE A.TYPE_ = 2 AND A.GROUP_ID_ = #{authGroupId, jdbcType=VARCHAR} AND ${bitand1}A.PERMS_${bitand2}#{authPerms, jdbcType=INTEGER}${bitand3}!=#{authPerms, jdbcType=INTEGER} AND A.RESOURCE_TYPE_ = #{authResourceType, jdbcType=VARCHAR} AND A.RESOURCE_ID_ = '*')
-                    THEN 0
-                </foreach> 
-                
-                <!-- Group GRANTS -->   
-                <foreach collection="authGroupIds" index="index" item="authGroupId">
-                  <if test="authResourceIdQueryParam != null || (authResourceId != null &amp;&amp; !authResourceId.equals('*')) ">
-                    WHEN EXISTS (SELECT ID_ from ${prefix}ACT_RU_AUTHORIZATION A WHERE A.TYPE_ = 1 AND A.GROUP_ID_ = #{authGroupId, jdbcType=VARCHAR} AND ${bitand1}A.PERMS_${bitand2}#{authPerms, jdbcType=INTEGER}${bitand3}=#{authPerms,  jdbcType=INTEGER} AND A.RESOURCE_TYPE_ = #{authResourceType, jdbcType=VARCHAR} AND A.RESOURCE_ID_ = <if test="authResourceIdQueryParam != null">${authResourceIdQueryParam}</if><if test="authResourceId != null">#{authResourceId, jdbcType=VARCHAR}</if>   )
+                  <if test="permCheck.resourceIdQueryParam != null || (permCheck.resourceId != null &amp;&amp; !permCheck.resourceId.equals('*')) ">
+                    WHEN EXISTS (SELECT ID_ from ${prefix}ACT_RU_AUTHORIZATION A WHERE A.TYPE_ = 1 AND A.GROUP_ID_ = #{authGroupId, jdbcType=VARCHAR} AND ${bitand1}A.PERMS_${bitand2}#{permCheck.perms, jdbcType=INTEGER}${bitand3}=#{permCheck.perms,  jdbcType=INTEGER} AND A.RESOURCE_TYPE_ = #{permCheck.resourceType, jdbcType=VARCHAR} AND A.RESOURCE_ID_ = <if test="permCheck.resourceIdQueryParam != null">${permCheck.resourceIdQueryParam}</if><if test="permCheck.resourceId != null">#{permCheck.resourceId, jdbcType=VARCHAR}</if>   )
                       THEN 1
                   </if>
-                  WHEN EXISTS (SELECT ID_ from ${prefix}ACT_RU_AUTHORIZATION A WHERE A.TYPE_ = 1 AND A.GROUP_ID_ = #{authGroupId, jdbcType=VARCHAR} AND ${bitand1}A.PERMS_${bitand2}#{authPerms, jdbcType=INTEGER}${bitand3}=#{authPerms,  jdbcType=INTEGER} AND A.RESOURCE_TYPE_ = #{authResourceType, jdbcType=VARCHAR} AND A.RESOURCE_ID_ = '*')
+                </foreach>
+
+                <!-- Group REVOKES -->
+                <foreach collection="authGroupIds" index="index" item="authGroupId">
+                  <if test="permCheck.resourceIdQueryParam != null || (permCheck.resourceId != null &amp;&amp; !permCheck.resourceId.equals('*')) ">
+                    WHEN EXISTS (SELECT ID_ from ${prefix}ACT_RU_AUTHORIZATION A WHERE A.TYPE_ = 2 AND A.GROUP_ID_ = #{authGroupId, jdbcType=VARCHAR} AND ${bitand1}A.PERMS_${bitand2}#{permCheck.perms, jdbcType=INTEGER}${bitand3}!=#{permCheck.perms, jdbcType=INTEGER} AND A.RESOURCE_TYPE_ = #{permCheck.resourceType, jdbcType=VARCHAR} AND A.RESOURCE_ID_ = <if test="permCheck.resourceIdQueryParam != null">${permCheck.resourceIdQueryParam}</if><if test="permCheck.resourceId != null">#{permCheck.resourceId, jdbcType=VARCHAR}</if>   )
+                      THEN 0
+                  </if>
+                </foreach>
+
+                <!-- Group GRANTS -->
+                <foreach collection="authGroupIds" index="index" item="authGroupId">
+                  WHEN EXISTS (SELECT ID_ from ${prefix}ACT_RU_AUTHORIZATION A WHERE A.TYPE_ = 1 AND A.GROUP_ID_ = #{authGroupId, jdbcType=VARCHAR} AND ${bitand1}A.PERMS_${bitand2}#{permCheck.perms, jdbcType=INTEGER}${bitand3}=#{permCheck.perms,  jdbcType=INTEGER} AND A.RESOURCE_TYPE_ = #{permCheck.resourceType, jdbcType=VARCHAR} AND A.RESOURCE_ID_ = '*')
                     THEN 1
-                </foreach> 
+                </foreach>
+
+                <!-- Group REVOKES -->
+                <foreach collection="authGroupIds" index="index" item="authGroupId">
+                  WHEN EXISTS (SELECT ID_ from ${prefix}ACT_RU_AUTHORIZATION A WHERE A.TYPE_ = 2 AND A.GROUP_ID_ = #{authGroupId, jdbcType=VARCHAR} AND ${bitand1}A.PERMS_${bitand2}#{permCheck.perms, jdbcType=INTEGER}${bitand3}!=#{permCheck.perms, jdbcType=INTEGER} AND A.RESOURCE_TYPE_ = #{permCheck.resourceType, jdbcType=VARCHAR} AND A.RESOURCE_ID_ = '*')
+                    THEN 0
+                </foreach>
                 ELSE (
                       SELECT
                         CASE
               </if>
                           <!-- GLOBAL GRANTS -->
-                          <if test="authResourceIdQueryParam != null || (authResourceId != null &amp;&amp; !authResourceId.equals('*')) ">
-                            WHEN EXISTS (SELECT ID_ from ${prefix}ACT_RU_AUTHORIZATION A WHERE A.TYPE_ = 0 AND A.USER_ID_ = '*' AND ${bitand1}A.PERMS_${bitand2}#{authPerms,  jdbcType=INTEGER}${bitand3}=#{authPerms,  jdbcType=INTEGER} AND A.RESOURCE_TYPE_ = #{authResourceType, jdbcType=VARCHAR} AND A.RESOURCE_ID_ = <if test="authResourceIdQueryParam != null">${authResourceIdQueryParam}</if><if test="authResourceId != null">#{authResourceId, jdbcType=VARCHAR}</if>   )
+                          <if test="permCheck.resourceIdQueryParam != null || (permCheck.resourceId != null &amp;&amp; !permCheck.resourceId.equals('*')) ">
+                            WHEN EXISTS (SELECT ID_ from ${prefix}ACT_RU_AUTHORIZATION A WHERE A.TYPE_ = 0 AND A.USER_ID_ = '*' AND ${bitand1}A.PERMS_${bitand2}#{permCheck.perms,  jdbcType=INTEGER}${bitand3}=#{permCheck.perms,  jdbcType=INTEGER} AND A.RESOURCE_TYPE_ = #{permCheck.resourceType, jdbcType=VARCHAR} AND A.RESOURCE_ID_ = <if test="permCheck.resourceIdQueryParam != null">${permCheck.resourceIdQueryParam}</if><if test="permCheck.resourceId != null">#{permCheck.resourceId, jdbcType=VARCHAR}</if>   )
                                 THEN 1
                           </if>
-                          WHEN EXISTS (SELECT ID_ from ${prefix}ACT_RU_AUTHORIZATION A WHERE A.TYPE_ = 0 AND A.USER_ID_ = '*' AND ${bitand1}A.PERMS_${bitand2}#{authPerms,  jdbcType=INTEGER}${bitand3}=#{authPerms,  jdbcType=INTEGER} AND A.RESOURCE_TYPE_ = #{authResourceType, jdbcType=VARCHAR} AND A.RESOURCE_ID_ = '*')
-                              THEN 1
-                              
+
                           <!-- GLOBAL REVOKES -->
-                          <if test="authResourceIdQueryParam != null || (authResourceId != null &amp;&amp; !authResourceId.equals('*')) ">
-                            WHEN EXISTS (SELECT ID_ from ${prefix}ACT_RU_AUTHORIZATION A WHERE A.TYPE_ = 0 AND A.USER_ID_ = '*' AND ${bitand1}A.PERMS_${bitand2}#{authPerms,  jdbcType=INTEGER}${bitand3}!=#{authPerms,  jdbcType=INTEGER} AND A.RESOURCE_TYPE_ = #{authResourceType, jdbcType=VARCHAR} AND A.RESOURCE_ID_ = <if test="authResourceIdQueryParam != null">${authResourceIdQueryParam}</if><if test="authResourceId != null">#{authResourceId, jdbcType=VARCHAR}</if>   )
+                          <if test="permCheck.resourceIdQueryParam != null || (permCheck.resourceId != null &amp;&amp; !permCheck.resourceId.equals('*')) ">
+                            WHEN EXISTS (SELECT ID_ from ${prefix}ACT_RU_AUTHORIZATION A WHERE A.TYPE_ = 0 AND A.USER_ID_ = '*' AND ${bitand1}A.PERMS_${bitand2}#{permCheck.perms,  jdbcType=INTEGER}${bitand3}!=#{permCheck.perms,  jdbcType=INTEGER} AND A.RESOURCE_TYPE_ = #{permCheck.resourceType, jdbcType=VARCHAR} AND A.RESOURCE_ID_ = <if test="permCheck.resourceIdQueryParam != null">${permCheck.resourceIdQueryParam}</if><if test="permCheck.resourceId != null">#{permCheck.resourceId, jdbcType=VARCHAR}</if>   )
                                 THEN 0
                           </if>
-                          WHEN EXISTS (SELECT ID_ from ${prefix}ACT_RU_AUTHORIZATION A WHERE A.TYPE_ = 0 AND A.USER_ID_ = '*' AND ${bitand1}A.PERMS_${bitand2}#{authPerms,  jdbcType=INTEGER}${bitand3}!=#{authPerms,  jdbcType=INTEGER} AND A.RESOURCE_TYPE_ = #{authResourceType, jdbcType=VARCHAR} AND A.RESOURCE_ID_ = '*')
+
+                          <!-- GLOBAL GRANTS -->
+                          WHEN EXISTS (SELECT ID_ from ${prefix}ACT_RU_AUTHORIZATION A WHERE A.TYPE_ = 0 AND A.USER_ID_ = '*' AND ${bitand1}A.PERMS_${bitand2}#{permCheck.perms,  jdbcType=INTEGER}${bitand3}=#{permCheck.perms,  jdbcType=INTEGER} AND A.RESOURCE_TYPE_ = #{permCheck.resourceType, jdbcType=VARCHAR} AND A.RESOURCE_ID_ = '*')
+                              THEN 1
+
+                          <!-- GLOBAL REVOKES -->
+                          WHEN EXISTS (SELECT ID_ from ${prefix}ACT_RU_AUTHORIZATION A WHERE A.TYPE_ = 0 AND A.USER_ID_ = '*' AND ${bitand1}A.PERMS_${bitand2}#{permCheck.perms,  jdbcType=INTEGER}${bitand3}!=#{permCheck.perms,  jdbcType=INTEGER} AND A.RESOURCE_TYPE_ = #{permCheck.resourceType, jdbcType=VARCHAR} AND A.RESOURCE_ID_ = '*')
                               THEN 0
-                              
+
                           <!-- No matching authorization found: request is not authorized -->
-                          ELSE 0
-                          
-              <if test="authGroupIds != null &amp;&amp; authGroupIds.size() > 0">                          
+                          ELSE
+                          <if test="permCheck.authorizationNotFoundReturnValue != null">
+                            #{permCheck.authorizationNotFoundReturnValue}
+                          </if>
+                          <if test="permCheck.authorizationNotFoundReturnValue == null">
+                            null
+                          </if>
+
+              <if test="authGroupIds != null &amp;&amp; authGroupIds.size() > 0">
                         END ${dbSpecificDummyTable}
                 )
               </if>
             END ${dbSpecificDummyTable}
       )
     END  ${dbSpecificDummyTable}
-  </sql>  
-    
+  </sql>
+
   <!-- reusable authorization check for queries. -->
   <sql id="queryAuthorizationCheck">
     <if test="isAuthorizationCheckEnabled &amp;&amp; authUserId != null">
-        AND  
-        (          
-          <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheck"/>
-        ) = 1
+
+        AND (<include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authorizationCheck" />) = 1
+
     </if>
-  </sql>  
-    
+  </sql>
+
+  <sql id="authorizationCheck">
+
+    <if test="permissionChecks != null &amp;&amp; permissionChecks.size() == 1">
+
+      <bind name="permCheck" value="permissionChecks[0]" />
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheck"/>
+
+    </if>
+
+    <if test="permissionChecks != null &amp;&amp; permissionChecks.size() > 1">
+      COALESCE (
+
+      <foreach item="permCheck" index="index" collection="permissionChecks" separator=",">
+
+        (<include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheck"/>)
+
+      </foreach>
+
+      , 0)
+    </if>
+
+  </sql>
+
+  <sql id="contextualAuthorizationCheck">
+    <if test="isAuthorizationCheckEnabled &amp;&amp; authUserId != null">
+      AND
+        CASE
+
+          WHEN
+            <!-- variable instance or task exists in context of a process instance -->
+            RES.EXECUTION_ID_ is not null
+          THEN
+            (<include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authorizationCheck" />) = 1
+
+          WHEN
+            <!-- variable instance or task exists in context of a case instance -->
+            RES.CASE_EXECUTION_ID_ is not null
+          THEN
+            <!-- everything which exists in context of a case instance is visible to the users -->
+            ${trueConstant}
+
+          ELSE
+            <!-- (1) variable instance exists in context of a standalone task or -->
+            <!-- (2) task is a standalone task and does not exist in context of process or case instance -->
+            (
+              <bind name="permissionChecks" value="taskPermissionChecks" />
+              <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authorizationCheck" />
+            ) = 1
+
+        END
+    </if>
+  </sql>
+
 </mapper>

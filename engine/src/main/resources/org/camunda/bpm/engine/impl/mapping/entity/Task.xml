@@ -207,6 +207,11 @@
     <if test="activityInstanceIdIn != null &amp;&amp; activityInstanceIdIn.length > 0">
         left join ${prefix}ACT_RU_EXECUTION E1 on RES.EXECUTION_ID_ = E1.ID_
     </if>
+
+    <if test="isAuthorizationCheckEnabled &amp;&amp; authUserId != null">
+      left join ${prefix}ACT_RE_PROCDEF PROCDEF on RES.PROC_DEF_ID_ = PROCDEF.ID_
+    </if>
+
     <foreach collection="orderingProperties" item="orderingProperty" index="i">
       <if test="orderingProperty.relation != null">
         <bind name="tableAlias" value="@org.camunda.bpm.engine.impl.db.sql.MybatisJoinHelper@tableAlias(orderingProperty.relation, i)"/>
@@ -451,6 +456,9 @@
             and RES.SUSPENSION_STATE_ = 2
         </if>
       </if>
+
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.contextualAuthorizationCheck" />
+
     </where>
   </sql>
 

@@ -27,6 +27,7 @@ import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.OptimisticLockingException;
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.TaskAlreadyClaimedException;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.TransactionContext;
@@ -469,12 +470,16 @@ public class CommandContext {
     return identityService.getCurrentAuthentication();
   }
 
-  public void runWithoutAuthentication(Runnable runnable) {
+  public <T> T runWithoutAuthentication(Callable<T> runnable) {
     IdentityService identityService = processEngineConfiguration.getIdentityService();
     Authentication currentAuthentication = identityService.getCurrentAuthentication();
     try {
       identityService.clearAuthentication();
-      runnable.run();
+      return runnable.call();
+    } catch (RuntimeException e) {
+      throw e;
+    } catch (Exception e) {
+      throw new ProcessEngineException(e);
     } finally {
       identityService.setAuthentication(currentAuthentication);
     }

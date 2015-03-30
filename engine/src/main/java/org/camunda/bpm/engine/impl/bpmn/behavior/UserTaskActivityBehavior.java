@@ -41,7 +41,6 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
 
   public void execute(ActivityExecution execution) throws Exception {
     TaskEntity task = TaskEntity.createAndInsert(execution);
-    task.setExecution(execution);
 
     taskDecorator.decorate(task, execution);
 

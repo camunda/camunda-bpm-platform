@@ -16,6 +16,7 @@ import org.camunda.bpm.engine.filter.Filter;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity;
+import org.camunda.bpm.engine.task.Task;
 
 /**
  *
@@ -69,5 +70,16 @@ public interface ResourceAuthorizationProvider {
    *         {@link Filter} is created.
    */
   public AuthorizationEntity[] newFilter(Filter filter);
+
+  // Task /////////////////////////////////////////////////
+
+  /**
+   * <p>Invoked whenever a new task is created</p>
+   *
+   * @param task the newly created task
+   * @return a list of authorizations to be automatically added when a new
+   *         {@link Task} is created.
+   */
+  public AuthorizationEntity[] newTask(Task task);
 
 }

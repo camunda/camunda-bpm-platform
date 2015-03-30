@@ -24,7 +24,6 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 import java.util.List;
 
 import org.camunda.bpm.engine.filter.Filter;
-import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.filter.FilterQueryImpl;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 
@@ -89,7 +88,7 @@ public class FilterManager extends AbstractManager {
   // authorization utils /////////////////////////////////
 
   protected void createDefaultAuthorizations(Filter filter) {
-    if(Context.getProcessEngineConfiguration().isAuthorizationEnabled()) {
+    if(isAuthorizationEnabled()) {
       saveDefaultAuthorizations(getResourceAuthorizationProvider().newFilter(filter));
     }
   }

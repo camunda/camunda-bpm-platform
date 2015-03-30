@@ -29,6 +29,7 @@ import org.camunda.bpm.engine.impl.cmd.AssignTaskCmd;
 import org.camunda.bpm.engine.impl.cmd.ClaimTaskCmd;
 import org.camunda.bpm.engine.impl.cmd.CompleteTaskCmd;
 import org.camunda.bpm.engine.impl.cmd.CreateAttachmentCmd;
+import org.camunda.bpm.engine.impl.cmd.CreateTaskCmd;
 import org.camunda.bpm.engine.impl.cmd.DelegateTaskCmd;
 import org.camunda.bpm.engine.impl.cmd.DeleteAttachmentCmd;
 import org.camunda.bpm.engine.impl.cmd.DeleteGroupIdentityLinkCmd;
@@ -58,7 +59,6 @@ import org.camunda.bpm.engine.impl.cmd.SaveTaskCmd;
 import org.camunda.bpm.engine.impl.cmd.SetTaskOwnerCmd;
 import org.camunda.bpm.engine.impl.cmd.SetTaskPriorityCmd;
 import org.camunda.bpm.engine.impl.cmd.SetTaskVariablesCmd;
-import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.task.Attachment;
 import org.camunda.bpm.engine.task.Comment;
 import org.camunda.bpm.engine.task.Event;
@@ -82,9 +82,7 @@ public class TaskServiceImpl extends ServiceImpl implements TaskService {
   }
 
   public Task newTask(String taskId) {
-    TaskEntity task = TaskEntity.create();
-    task.setId(taskId);
-    return task;
+    return commandExecutor.execute(new CreateTaskCmd(taskId));
   }
 
   public void saveTask(Task task) {

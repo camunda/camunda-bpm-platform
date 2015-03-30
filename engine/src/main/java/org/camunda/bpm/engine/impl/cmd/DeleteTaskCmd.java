@@ -14,12 +14,15 @@ package org.camunda.bpm.engine.impl.cmd;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.concurrent.Callable;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.TaskManager;
 
 
 /**
@@ -47,10 +50,10 @@ public class DeleteTaskCmd implements Command<Void>, Serializable {
 
   public Void execute(CommandContext commandContext) {
     if (taskId != null) {
-      deleteTask(taskId);
+      deleteTask(taskId, commandContext);
     } else if (taskIds != null) {
         for (String taskId : taskIds) {
-          deleteTask(taskId);
+          deleteTask(taskId, commandContext);
         }
     } else {
       throw new ProcessEngineException("taskId and taskIds are null");
@@ -60,11 +63,13 @@ public class DeleteTaskCmd implements Command<Void>, Serializable {
     return null;
   }
 
-  protected void deleteTask(String taskId) {
-    TaskEntity task = Context
-      .getCommandContext()
-      .getTaskManager()
-      .findTaskById(taskId);
+  protected void deleteTask(final String taskId, CommandContext commandContext) {
+    final TaskManager taskManager = commandContext.getTaskManager();
+    TaskEntity task = commandContext.runWithoutAuthentication(new Callable<TaskEntity>() {
+      public TaskEntity call() throws Exception {
+        return taskManager.findTaskById(taskId);
+      }
+    });
 
     if (task != null) {
       if(task.getExecutionId() != null) {
@@ -72,6 +77,9 @@ public class DeleteTaskCmd implements Command<Void>, Serializable {
       } else if (task.getCaseExecutionId() != null) {
         throw new ProcessEngineException("The task cannot be deleted because is part of a running case instance");
       }
+
+      AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
+      authorizationManager.checkDeleteTask(task);
 
       String reason = (deleteReason == null || deleteReason.length() == 0) ? TaskEntity.DELETE_REASON_DELETED : deleteReason;
       task.delete(reason, cascade);

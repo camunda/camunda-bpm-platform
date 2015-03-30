@@ -289,6 +289,13 @@ public class FilterAuthorizationsTest extends PluggableProcessEngineTestCase {
     authorization.addPermission(Permissions.ALL);
     authorizationService.saveAuthorization(authorization);
 
+    authorization = authorizationService.createNewAuthorization(Authorization.AUTH_TYPE_GRANT);
+    authorization.setUserId(user.getId());
+    authorization.setResource(Resources.TASK);
+    authorization.setResourceId(Authorization.ANY);
+    authorization.addPermission(Permissions.ALL);
+    authorizationService.saveAuthorization(authorization);
+
     return user;
   }
 
