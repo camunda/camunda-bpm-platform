@@ -16,6 +16,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
+import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
@@ -25,6 +26,8 @@ import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.examples.bpmn.executionlistener.RecorderExecutionListener;
+import org.camunda.bpm.engine.variable.Variables;
 
 /**
  *
@@ -432,6 +435,48 @@ public class AsyncTaskTest extends PluggableProcessEngineTestCase {
 
     String taskId = taskService.createTaskQuery().singleResult().getId();
     taskService.complete(taskId);
+  }
+
+  /**
+   * CAM-3707
+   */
+  @Deployment
+  public void FAILING_testDeleteShouldNotInvokeListeners() {
+    RecorderExecutionListener.clear();
+
+    // given
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("asyncListener",
+        Variables.createVariables().putValue("listener", new RecorderExecutionListener()));
+    assertEquals(1, managementService.createJobQuery().count());
+
+    // when deleting the process instance
+    runtimeService.deleteProcessInstance(instance.getId(), "");
+
+    // then no listeners for the async activity should have been invoked because
+    // it was not active yet
+    assertEquals(0, RecorderExecutionListener.getRecordedEvents().size());
+
+    RecorderExecutionListener.clear();
+  }
+
+  /**
+   * CAM-3708
+   */
+  @Deployment
+  public void FAILING_testDeleteShouldNotInvokeOutputMapping() {
+    // given
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("asyncOutputMapping");
+    assertEquals(1, managementService.createJobQuery().count());
+
+    // when
+    runtimeService.deleteProcessInstance(instance.getId(), "");
+
+    // then the output mapping has not been executed because the
+    // activity was not active yet
+    if (processEngineConfiguration.getHistoryLevel().getId() >= HistoryLevel.HISTORY_LEVEL_AUDIT.getId()) {
+      assertEquals(0, historyService.createHistoricVariableInstanceQuery().count());
+    }
+
   }
 
 }
