@@ -1453,6 +1453,7 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
 
     instructions.add(ModificationInstructionBuilder.cancellation().activityId("activityId").getJson());
     instructions.add(ModificationInstructionBuilder.cancellation().activityInstanceId("activityInstanceId").getJson());
+    instructions.add(ModificationInstructionBuilder.cancellation().transitionInstanceId("transitionInstanceId").getJson());
     instructions.add(ModificationInstructionBuilder.startBefore().activityId("activityId").getJson());
     instructions.add(ModificationInstructionBuilder.startBefore()
         .activityId("activityId").ancestorActivityInstanceId("ancestorActivityInstanceId").getJson());
@@ -1480,6 +1481,7 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
     InOrder inOrder = inOrder(mockModificationBuilder);
     inOrder.verify(mockModificationBuilder).cancelAllForActivity("activityId");
     inOrder.verify(mockModificationBuilder).cancelActivityInstance("activityInstanceId");
+    inOrder.verify(mockModificationBuilder).cancelTransitionInstance("transitionInstanceId");
     inOrder.verify(mockModificationBuilder).startBeforeActivity("activityId");
     inOrder.verify(mockModificationBuilder).startBeforeActivity("activityId", "ancestorActivityInstanceId");
     inOrder.verify(mockModificationBuilder).startAfterActivity("activityId");
@@ -1616,7 +1618,8 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
     .expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode())
       .body("type", is(InvalidRequestException.class.getSimpleName()))
-      .body("message", containsString("'activityId' or 'activityInstanceId' is required"))
+      .body("message", containsString("For instruction type 'cancel': exactly one, "
+          + "'activityId', 'activityInstanceId', or 'transitionInstanceId', is required"))
     .when()
       .post(PROCESS_INSTANCE_MODIFICATION_URL);
 
@@ -1634,7 +1637,8 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
     .expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode())
       .body("type", is(InvalidRequestException.class.getSimpleName()))
-      .body("message", containsString("only one, 'activityId' or 'activityInstanceId', can be set"))
+      .body("message", containsString("For instruction type 'cancel': exactly one, "
+          + "'activityId', 'activityInstanceId', or 'transitionInstanceId', is required"))
     .when()
       .post(PROCESS_INSTANCE_MODIFICATION_URL);
 

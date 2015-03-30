@@ -30,6 +30,7 @@ public class ModificationInstructionBuilder {
   protected String type;
   protected String activityId;
   protected String activityInstanceId;
+  protected String transitionInstanceId;
   protected String ancestorActivityInstanceId;
   protected String transitionId;
 
@@ -64,6 +65,11 @@ public class ModificationInstructionBuilder {
     return this;
   }
 
+  public ModificationInstructionBuilder transitionInstanceId(String transitionInstanceId) {
+    this.transitionInstanceId = transitionInstanceId;
+    return this;
+  }
+
   public ModificationInstructionBuilder ancestorActivityInstanceId(String ancestorActivityInstanceId) {
     this.ancestorActivityInstanceId = ancestorActivityInstanceId;
     return this;
@@ -80,6 +86,7 @@ public class ModificationInstructionBuilder {
     json.put("type", type);
     json.put("activityId", activityId);
     json.put("activityInstanceId", activityInstanceId);
+    json.put("transitionInstanceId", transitionInstanceId);
     json.put("ancestorActivityInstanceId", ancestorActivityInstanceId);
     json.put("variables", variables);
     json.put("transitionId", transitionId);
