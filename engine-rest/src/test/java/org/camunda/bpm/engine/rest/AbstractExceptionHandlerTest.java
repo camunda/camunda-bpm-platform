@@ -15,13 +15,13 @@ import com.jayway.restassured.http.ContentType;
 public abstract class AbstractExceptionHandlerTest extends AbstractRestServiceTest {
 
   private static final String EXCEPTION_RESOURCE_URL = TEST_RESOURCE_ROOT_PATH + "/unannotated";
-  
+
   private static final String GENERAL_EXCEPTION_URL = EXCEPTION_RESOURCE_URL + "/exception";
   private static final String PROCESS_ENGINE_EXCEPTION_URL = EXCEPTION_RESOURCE_URL + "/processEngineException";
   private static final String REST_EXCEPTION_URL = EXCEPTION_RESOURCE_URL + "/restException";
   private static final String AUTH_EXCEPTION_URL = EXCEPTION_RESOURCE_URL + "/authorizationException";
-  
-  
+
+
   @Test
   public void testGeneralExceptionHandler() {
     given().header(ACCEPT_WILDCARD_HEADER)
@@ -31,7 +31,7 @@ public abstract class AbstractExceptionHandlerTest extends AbstractRestServiceTe
       .body("message", equalTo("expected exception"))
     .when().get(GENERAL_EXCEPTION_URL);
   }
-  
+
   @Test
   public void testRestExceptionHandler() {
     given().header(ACCEPT_WILDCARD_HEADER)
@@ -41,7 +41,7 @@ public abstract class AbstractExceptionHandlerTest extends AbstractRestServiceTe
       .body("message", equalTo("expected exception"))
     .when().get(REST_EXCEPTION_URL);
   }
-  
+
   @Test
   public void testProcessEngineExceptionHandler() {
     given().header(ACCEPT_WILDCARD_HEADER)
@@ -51,14 +51,14 @@ public abstract class AbstractExceptionHandlerTest extends AbstractRestServiceTe
       .body("message", equalTo("expected exception"))
     .when().get(PROCESS_ENGINE_EXCEPTION_URL);
   }
-  
+
   @Test
   public void testAuthorizationExceptionHandler() {
     given().header(ACCEPT_WILDCARD_HEADER)
     .expect().contentType(ContentType.JSON)
       .statusCode(Status.FORBIDDEN.getStatusCode())
       .body("type", equalTo(AuthorizationException.class.getSimpleName()))
-      .body("message", equalTo("The user with id 'someUser' does not have 'somePermission' permission on resource 'someResourceId' of type 'someResourceName' ."))
+      .body("message", equalTo("The user with id 'someUser' does not have 'somePermission' permission on resource 'someResourceId' of type 'someResourceName'."))
       .body("userId", equalTo("someUser"))
       .body("resourceName", equalTo("someResourceName"))
       .body("resourceId", equalTo("someResourceId"))
