@@ -3033,6 +3033,302 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     assertEquals(80, task.getPriority());
   }
 
+  // get sub tasks ((standalone) task) ////////////////////////////////////
+
+  public void testStandaloneTaskGetSubTasksWithoutAuthorization() {
+    // given
+    String parentTaskId = "parentTaskId";
+    createTask(parentTaskId);
+
+    disableAuthorization();
+    Task sub1 = taskService.newTask("sub1");
+    sub1.setParentTaskId(parentTaskId);
+    taskService.saveTask(sub1);
+
+    Task sub2 = taskService.newTask("sub2");
+    sub2.setParentTaskId(parentTaskId);
+    taskService.saveTask(sub2);
+    enableAuthorization();
+
+    // when
+    List<Task> subTasks = taskService.getSubTasks(parentTaskId);
+
+    // then
+    assertTrue(subTasks.isEmpty());
+
+    deleteTask(parentTaskId, true);
+  }
+
+  public void testStandaloneTaskGetSubTasksWithReadPermissionOnSub1() {
+    // given
+    String parentTaskId = "parentTaskId";
+    createTask(parentTaskId);
+
+    disableAuthorization();
+    Task sub1 = taskService.newTask("sub1");
+    sub1.setParentTaskId(parentTaskId);
+    taskService.saveTask(sub1);
+
+    Task sub2 = taskService.newTask("sub2");
+    sub2.setParentTaskId(parentTaskId);
+    taskService.saveTask(sub2);
+    enableAuthorization();
+
+    createGrantAuthorization(TASK, "sub1", READ, userId);
+
+    // when
+    List<Task> subTasks = taskService.getSubTasks(parentTaskId);
+
+    // then
+    assertFalse(subTasks.isEmpty());
+    assertEquals(1, subTasks.size());
+
+    assertEquals("sub1", subTasks.get(0).getId());
+
+    deleteTask(parentTaskId, true);
+  }
+
+  public void testStandaloneTaskGetSubTasks() {
+    // given
+    String parentTaskId = "parentTaskId";
+    createTask(parentTaskId);
+
+    disableAuthorization();
+    Task sub1 = taskService.newTask("sub1");
+    sub1.setParentTaskId(parentTaskId);
+    taskService.saveTask(sub1);
+
+    Task sub2 = taskService.newTask("sub2");
+    sub2.setParentTaskId(parentTaskId);
+    taskService.saveTask(sub2);
+    enableAuthorization();
+
+    createGrantAuthorization(TASK, ANY, READ, userId);
+
+    // when
+    List<Task> subTasks = taskService.getSubTasks(parentTaskId);
+
+    // then
+    assertFalse(subTasks.isEmpty());
+    assertEquals(2, subTasks.size());
+
+    deleteTask(parentTaskId, true);
+  }
+
+  // get sub tasks ((process) task) ////////////////////////////////////
+
+  public void testProcessTaskGetSubTasksWithoutAuthorization() {
+    // given
+    startProcessInstanceByKey(PROCESS_KEY);
+    String parentTaskId = selectSingleTask().getId();
+
+    disableAuthorization();
+    Task sub1 = taskService.newTask("sub1");
+    sub1.setParentTaskId(parentTaskId);
+    taskService.saveTask(sub1);
+
+    Task sub2 = taskService.newTask("sub2");
+    sub2.setParentTaskId(parentTaskId);
+    taskService.saveTask(sub2);
+    enableAuthorization();
+
+    // when
+    List<Task> subTasks = taskService.getSubTasks(parentTaskId);
+
+    // then
+    assertTrue(subTasks.isEmpty());
+  }
+
+  public void testProcessTaskGetSubTasksWithReadPermissionOnSub1() {
+    // given
+    startProcessInstanceByKey(PROCESS_KEY);
+    String parentTaskId = selectSingleTask().getId();
+
+    disableAuthorization();
+    Task sub1 = taskService.newTask("sub1");
+    sub1.setParentTaskId(parentTaskId);
+    taskService.saveTask(sub1);
+
+    Task sub2 = taskService.newTask("sub2");
+    sub2.setParentTaskId(parentTaskId);
+    taskService.saveTask(sub2);
+    enableAuthorization();
+
+    createGrantAuthorization(TASK, "sub1", READ, userId);
+
+    // when
+    List<Task> subTasks = taskService.getSubTasks(parentTaskId);
+
+    // then
+    assertFalse(subTasks.isEmpty());
+    assertEquals(1, subTasks.size());
+
+    assertEquals("sub1", subTasks.get(0).getId());
+  }
+
+  public void testProcessTaskGetSubTasks() {
+    // given
+    startProcessInstanceByKey(PROCESS_KEY);
+    String parentTaskId = selectSingleTask().getId();
+
+    disableAuthorization();
+    Task sub1 = taskService.newTask("sub1");
+    sub1.setParentTaskId(parentTaskId);
+    taskService.saveTask(sub1);
+
+    Task sub2 = taskService.newTask("sub2");
+    sub2.setParentTaskId(parentTaskId);
+    taskService.saveTask(sub2);
+    enableAuthorization();
+
+    createGrantAuthorization(TASK, ANY, READ, userId);
+
+    // when
+    List<Task> subTasks = taskService.getSubTasks(parentTaskId);
+
+    // then
+    assertFalse(subTasks.isEmpty());
+    assertEquals(2, subTasks.size());
+  }
+
+  // get sub tasks ((case) task) ////////////////////////////////////
+
+  public void testCaseTaskGetSubTasksWithoutAuthorization() {
+    // given
+    createCaseInstanceByKey(CASE_KEY);
+    String parentTaskId = selectSingleTask().getId();
+
+    disableAuthorization();
+    Task sub1 = taskService.newTask("sub1");
+    sub1.setParentTaskId(parentTaskId);
+    taskService.saveTask(sub1);
+
+    Task sub2 = taskService.newTask("sub2");
+    sub2.setParentTaskId(parentTaskId);
+    taskService.saveTask(sub2);
+    enableAuthorization();
+
+    // when
+    List<Task> subTasks = taskService.getSubTasks(parentTaskId);
+
+    // then
+    assertTrue(subTasks.isEmpty());
+  }
+
+  public void testCaseTaskGetSubTasksWithReadPermissionOnSub1() {
+    // given
+    createCaseInstanceByKey(CASE_KEY);
+    String parentTaskId = selectSingleTask().getId();
+
+    disableAuthorization();
+    Task sub1 = taskService.newTask("sub1");
+    sub1.setParentTaskId(parentTaskId);
+    taskService.saveTask(sub1);
+
+    Task sub2 = taskService.newTask("sub2");
+    sub2.setParentTaskId(parentTaskId);
+    taskService.saveTask(sub2);
+    enableAuthorization();
+
+    createGrantAuthorization(TASK, "sub1", READ, userId);
+
+    // when
+    List<Task> subTasks = taskService.getSubTasks(parentTaskId);
+
+    // then
+    assertFalse(subTasks.isEmpty());
+    assertEquals(1, subTasks.size());
+
+    assertEquals("sub1", subTasks.get(0).getId());
+  }
+
+  public void testCaseTaskGetSubTasks() {
+    // given
+    createCaseInstanceByKey(CASE_KEY);
+    String parentTaskId = selectSingleTask().getId();
+
+    disableAuthorization();
+    Task sub1 = taskService.newTask("sub1");
+    sub1.setParentTaskId(parentTaskId);
+    taskService.saveTask(sub1);
+
+    Task sub2 = taskService.newTask("sub2");
+    sub2.setParentTaskId(parentTaskId);
+    taskService.saveTask(sub2);
+    enableAuthorization();
+
+    createGrantAuthorization(TASK, ANY, READ, userId);
+
+    // when
+    List<Task> subTasks = taskService.getSubTasks(parentTaskId);
+
+    // then
+    assertFalse(subTasks.isEmpty());
+    assertEquals(2, subTasks.size());
+  }
+
+  // clear authorization ((standalone) task) ////////////////////////
+
+  public void testStandaloneTaskClearAuthorization() {
+    // given
+    String taskId = "myTask";
+    createTask(taskId);
+    createGrantAuthorization(TASK, taskId, UPDATE, userId);
+
+    disableAuthorization();
+    Authorization authorization = authorizationService
+        .createAuthorizationQuery()
+        .resourceId(taskId)
+        .singleResult();
+    enableAuthorization();
+    assertNotNull(authorization);
+
+    // when
+    taskService.complete(taskId);
+
+    // then
+    disableAuthorization();
+    authorization = authorizationService
+        .createAuthorizationQuery()
+        .resourceId(taskId)
+        .singleResult();
+    enableAuthorization();
+
+    assertNull(authorization);
+
+    deleteTask(taskId, true);
+  }
+
+  // clear authorization ((process) task) ////////////////////////
+
+  public void testProcessTaskClearAuthorization() {
+    // given
+    startProcessInstanceByKey(PROCESS_KEY);
+    String taskId = selectSingleTask().getId();
+    createGrantAuthorization(TASK, taskId, UPDATE, userId);
+
+    disableAuthorization();
+    Authorization authorization = authorizationService
+        .createAuthorizationQuery()
+        .resourceId(taskId)
+        .singleResult();
+    enableAuthorization();
+    assertNotNull(authorization);
+
+    // when
+    taskService.complete(taskId);
+
+    // then
+    disableAuthorization();
+    authorization = authorizationService
+        .createAuthorizationQuery()
+        .resourceId(taskId)
+        .singleResult();
+    enableAuthorization();
+
+    assertNull(authorization);
+  }
+
   // helper ////////////////////////////////////////////////////////////////////////////////
 
   protected void verifyQueryResults(TaskQuery query, int countExpected) {
