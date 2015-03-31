@@ -286,30 +286,27 @@
   <sql id="contextualAuthorizationCheck">
     <if test="isAuthorizationCheckEnabled &amp;&amp; authUserId != null">
       AND
-        CASE
+        ( CASE
 
           WHEN
             <!-- variable instance or task exists in context of a process instance -->
             RES.EXECUTION_ID_ is not null
           THEN
-            (<include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authorizationCheck" />) = 1
+            (<include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authorizationCheck" />)
 
           WHEN
             <!-- variable instance or task exists in context of a case instance -->
             RES.CASE_EXECUTION_ID_ is not null
           THEN
             <!-- everything which exists in context of a case instance is visible to the users -->
-            ${trueConstant}
+            1
 
           ELSE
             <!-- (1) variable instance exists in context of a standalone task or -->
             <!-- (2) task is a standalone task and does not exist in context of process or case instance -->
-            (
-              <bind name="permissionChecks" value="taskPermissionChecks" />
-              <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authorizationCheck" />
-            ) = 1
-
-        END
+            (<bind name="permissionChecks" value="taskPermissionChecks" />
+            <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authorizationCheck" />)
+        END ) = 1
     </if>
   </sql>
 
