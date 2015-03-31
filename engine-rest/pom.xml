@@ -475,6 +475,7 @@
                 <exclude>**/rest/wink/**</exclude>
                 <exclude>**/rest/history/wink/**</exclude>
               </excludes>
+              <redirectTestOutputToFile>true</redirectTestOutputToFile>
             </configuration>
           </plugin>
         </plugins>

@@ -189,7 +189,7 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
   /**
    * Select the tasks which are sub tasks of the given parent task.
    */
-  TaskQuery parentTaskId(String parentTaskId);
+  TaskQuery taskParentTaskId(String parentTaskId);
 
   /** Only select tasks for the given case instance id. */
   TaskQuery caseInstanceId(String caseInstanceId);

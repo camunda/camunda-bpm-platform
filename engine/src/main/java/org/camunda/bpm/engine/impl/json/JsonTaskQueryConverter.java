@@ -301,7 +301,7 @@ public class JsonTaskQueryConverter extends JsonObjectConverter<TaskQuery> {
       query.taskDefinitionKeyLike(json.getString(KEY_LIKE));
     }
     if (json.has(PARENT_TASK_ID)) {
-      query.parentTaskId(json.getString(PARENT_TASK_ID));
+      query.taskParentTaskId(json.getString(PARENT_TASK_ID));
     }
     if (json.has(PROCESS_DEFINITION_KEY)) {
       query.processDefinitionKey(json.getString(PROCESS_DEFINITION_KEY));

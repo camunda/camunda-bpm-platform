@@ -447,6 +447,7 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
     parameters.put("caseInstanceBusinessKey", "aCaseInstanceBusinessKey");
     parameters.put("caseInstanceBusinessKeyLike", "aCaseInstanceBusinessKeyLike");
     parameters.put("caseExecutionId", "aCaseExecutionId");
+    parameters.put("parentTaskId", "aParentTaskId");
 
     return parameters;
   }
@@ -482,6 +483,7 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
     verify(mockQuery).caseInstanceBusinessKey(stringQueryParameters.get("caseInstanceBusinessKey"));
     verify(mockQuery).caseInstanceBusinessKeyLike(stringQueryParameters.get("caseInstanceBusinessKeyLike"));
     verify(mockQuery).caseExecutionId(stringQueryParameters.get("caseExecutionId"));
+    verify(mockQuery).taskParentTaskId(stringQueryParameters.get("parentTaskId"));
 
   }
 

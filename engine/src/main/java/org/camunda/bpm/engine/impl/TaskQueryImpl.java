@@ -399,8 +399,8 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   	return this;
   }
 
-  public TaskQuery parentTaskId(String parentTaskId) {
-    this.parentTaskId = parentTaskId;
+  public TaskQuery taskParentTaskId(String taskParentTaskId) {
+    this.parentTaskId = taskParentTaskId;
     return this;
   }
 
@@ -1296,10 +1296,10 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
     }
 
     if (extendingQuery.getParentTaskId() != null) {
-      extendedQuery.parentTaskId(extendingQuery.getParentTaskId());
+      extendedQuery.taskParentTaskId(extendingQuery.getParentTaskId());
     }
     else if (this.getParentTaskId() != null) {
-      extendedQuery.parentTaskId(this.getParentTaskId());
+      extendedQuery.taskParentTaskId(this.getParentTaskId());
     }
 
     if (extendingQuery.getProcessDefinitionKey() != null) {

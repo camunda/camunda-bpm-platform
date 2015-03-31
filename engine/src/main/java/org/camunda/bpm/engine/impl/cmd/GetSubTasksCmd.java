@@ -36,7 +36,7 @@ public class GetSubTasksCmd implements Command<List<Task>>, Serializable {
 
   public List<Task> execute(CommandContext commandContext) {
     return new TaskQueryImpl(commandContext)
-      .parentTaskId(parentTaskId)
+      .taskParentTaskId(parentTaskId)
       .list();
   }
 

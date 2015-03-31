@@ -4778,7 +4778,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     sub2.setParentTaskId(parentTaskId);
     taskService.saveTask(sub2);
 
-    TaskQuery query = taskService.createTaskQuery().parentTaskId(parentTaskId);
+    TaskQuery query = taskService.createTaskQuery().taskParentTaskId(parentTaskId);
 
     verifyQueryResults(query, 2);
 
