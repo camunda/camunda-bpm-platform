@@ -1268,6 +1268,24 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
     assertEquals(asyncExecutionId, asyncAfterTransitionInstance.getExecutionId());
   }
 
+  /**
+   * Test for CAM-3572
+   */
+  @Deployment
+  public void testActivityInstanceForConcurrentSubprocess() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("concurrentSubProcess");
+
+    ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
+    assertNotNull(tree);
+
+    assertThat(tree).hasStructure(
+        describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+          .activity("outerTask")
+          .beginScope("subProcess")
+            .activity("innerTask")
+        .done());
+  }
+
   @Deployment
   public void testGetActivityInstancesForActivity() {
     // given
@@ -1386,6 +1404,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
     // ensure that all instances are unique
     assertEquals(expectedAmount, instanceIds.size());
   }
+
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
   public void testChangeVariableType() {

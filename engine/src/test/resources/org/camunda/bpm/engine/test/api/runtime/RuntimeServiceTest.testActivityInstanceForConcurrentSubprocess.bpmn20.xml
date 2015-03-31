@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:camunda="http://activiti.org/bpmn"
+  targetNamespace="org.camunda.bpm.engine.test.enginge.test.api.runtime">
+
+  <message id="message1" name="Message1"/>
+
+  <process id="concurrentSubProcess">
+    <startEvent id="theStart" />
+    <sequenceFlow id="flow1" sourceRef="theStart" targetRef="fork" />
+    <parallelGateway id="fork" />
+    <sequenceFlow id="flow2" sourceRef="fork" targetRef="outerTask" />
+    <userTask id="outerTask" />
+    <sequenceFlow id="flow3" sourceRef="outerTask" targetRef="theEnd1" />
+    <endEvent id="theEnd1" />
+    
+    <sequenceFlow id="flow4" sourceRef="fork" targetRef="subProcess" />
+    <subProcess id="subProcess">
+      <startEvent id="theSubProcessStart" />
+      <sequenceFlow id="flow5" sourceRef="theSubProcessStart" targetRef="innerTask" />
+      <receiveTask id="innerTask" messageRef="message1" />
+      <sequenceFlow id="flow6" sourceRef="innerTask" targetRef="theSubProcessEnd" />
+      <endEvent id="theSubProcessEnd" />
+    </subProcess>
+    <sequenceFlow id="flow7" sourceRef="subProcess" targetRef="theEnd2" />
+    <endEvent id="theEnd2" />
+  </process>
+
+</definitions>
