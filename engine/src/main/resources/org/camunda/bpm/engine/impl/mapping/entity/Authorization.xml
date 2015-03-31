@@ -146,6 +146,10 @@
 
     <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authorizationCheck" />
 
+   <if test="permissionChecks != null &amp;&amp; permissionChecks.size() > 1">
+      ${dbSpecificDummyTable}
+    </if>
+
   </select>
 
   <sql id="authCheck">
