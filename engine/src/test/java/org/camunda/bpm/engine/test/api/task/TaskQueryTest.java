@@ -4765,6 +4765,26 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(task250.getId(), tasks.get(2).getId());
   }
 
+  public void testQueryByParentTaskId() {
+    String parentTaskId = "parentTask";
+    Task parent = taskService.newTask(parentTaskId);
+    taskService.saveTask(parent);
+
+    Task sub1 = taskService.newTask("subTask1");
+    sub1.setParentTaskId(parentTaskId);
+    taskService.saveTask(sub1);
+
+    Task sub2 = taskService.newTask("subTask2");
+    sub2.setParentTaskId(parentTaskId);
+    taskService.saveTask(sub2);
+
+    TaskQuery query = taskService.createTaskQuery().parentTaskId(parentTaskId);
+
+    verifyQueryResults(query, 2);
+
+    taskService.deleteTask(parentTaskId, true);
+  }
+
   /**
    * Generates some test tasks. - 6 tasks where kermit is a candidate - 1 tasks
    * where gonzo is assignee - 2 tasks assigned to management group - 2 tasks

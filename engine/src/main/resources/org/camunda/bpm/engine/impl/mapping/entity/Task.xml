@@ -311,6 +311,9 @@
       <if test="keyLike != null">
         and RES.TASK_DEF_KEY_ like #{keyLike}
       </if>
+      <if test="parentTaskId != null">
+        and RES.PARENT_TASK_ID_ = #{parentTaskId}
+      </if>
       <if test ="taskDefinitionKeys != null &amp;&amp; taskDefinitionKeys.length > 0">
         and RES.TASK_DEF_KEY_ in
         <foreach item="item" index="index" collection="taskDefinitionKeys"

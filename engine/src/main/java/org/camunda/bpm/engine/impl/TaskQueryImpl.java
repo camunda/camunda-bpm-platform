@@ -91,6 +91,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   protected SuspensionState suspensionState;
   protected boolean initializeFormKeys = false;
   protected boolean taskNameCaseInsensitive = false;
+  protected String parentTaskId;
 
   // case management /////////////////////////////
   protected String caseDefinitionKey;
@@ -394,8 +395,13 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   }
 
   public TaskQuery taskDefinitionKeyIn(String... taskDefinitionKeys) {
-	this.taskDefinitionKeys = taskDefinitionKeys;
-	return this;
+  	this.taskDefinitionKeys = taskDefinitionKeys;
+  	return this;
+  }
+
+  public TaskQuery parentTaskId(String parentTaskId) {
+    this.parentTaskId = parentTaskId;
+    return this;
   }
 
   public TaskQuery caseInstanceId(String caseInstanceId) {
@@ -1001,6 +1007,10 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
     return keyLike;
   }
 
+  public String getParentTaskId() {
+    return parentTaskId;
+  }
+
   public List<TaskQueryVariableValue> getVariables() {
     return variables;
   }
@@ -1283,6 +1293,13 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
     }
     else if (this.getKeyLike() != null) {
       extendedQuery.taskDefinitionKeyLike(this.getKeyLike());
+    }
+
+    if (extendingQuery.getParentTaskId() != null) {
+      extendedQuery.parentTaskId(extendingQuery.getParentTaskId());
+    }
+    else if (this.getParentTaskId() != null) {
+      extendedQuery.parentTaskId(this.getParentTaskId());
     }
 
     if (extendingQuery.getProcessDefinitionKey() != null) {

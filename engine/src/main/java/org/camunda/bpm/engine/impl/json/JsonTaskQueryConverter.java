@@ -68,6 +68,7 @@ public class JsonTaskQueryConverter extends JsonObjectConverter<TaskQuery> {
   public static final String KEY = "key";
   public static final String KEYS = "keys";
   public static final String KEY_LIKE = "keyLike";
+  public static final String PARENT_TASK_ID = "parentTaskId";
   public static final String PROCESS_DEFINITION_KEY = "processDefinitionKey";
   public static final String PROCESS_DEFINITION_KEYS = "processDefinitionKeys";
   public static final String PROCESS_DEFINITION_ID = "processDefinitionId";
@@ -139,6 +140,7 @@ public class JsonTaskQueryConverter extends JsonObjectConverter<TaskQuery> {
     addField(json, KEY, query.getKey());
     addArrayField(json, KEYS, query.getKeys());
     addField(json, KEY_LIKE, query.getKeyLike());
+    addField(json, PARENT_TASK_ID, query.getParentTaskId());
     addField(json, PROCESS_DEFINITION_KEY, query.getProcessDefinitionKey());
     addArrayField(json, PROCESS_DEFINITION_KEYS, query.getProcessDefinitionKeys());
     addField(json, PROCESS_DEFINITION_ID, query.getProcessDefinitionId());
@@ -298,6 +300,9 @@ public class JsonTaskQueryConverter extends JsonObjectConverter<TaskQuery> {
     if (json.has(KEY_LIKE)) {
       query.taskDefinitionKeyLike(json.getString(KEY_LIKE));
     }
+    if (json.has(PARENT_TASK_ID)) {
+      query.parentTaskId(json.getString(PARENT_TASK_ID));
+    }
     if (json.has(PROCESS_DEFINITION_KEY)) {
       query.processDefinitionKey(json.getString(PROCESS_DEFINITION_KEY));
     }
@@ -430,6 +435,5 @@ public class JsonTaskQueryConverter extends JsonObjectConverter<TaskQuery> {
       query.addVariable(name, value, operator, isTaskVariable, isProcessVariable);
     }
   }
-
 
 }
