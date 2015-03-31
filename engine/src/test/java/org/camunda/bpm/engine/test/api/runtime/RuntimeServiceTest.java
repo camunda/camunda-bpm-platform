@@ -24,12 +24,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
@@ -41,6 +44,7 @@ import org.camunda.bpm.engine.impl.util.CollectionUtil;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.Execution;
+import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.TransitionInstance;
 import org.camunda.bpm.engine.runtime.VariableInstance;
@@ -1262,6 +1266,125 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
         .getChildTransitionInstances()[0];
     String asyncExecutionId = managementService.createJobQuery().singleResult().getExecutionId();
     assertEquals(asyncExecutionId, asyncAfterTransitionInstance.getExecutionId());
+  }
+
+  @Deployment
+  public void testGetActivityInstancesForActivity() {
+    // given
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("miSubprocess");
+    ProcessDefinition definition = repositoryService.createProcessDefinitionQuery().singleResult();
+
+    // when
+    ActivityInstance tree = runtimeService.getActivityInstance(instance.getId());
+
+    // then
+    ActivityInstance[] processActivityInstances = tree.getActivityInstances(definition.getId());
+    assertEquals(1, processActivityInstances.length);
+    assertEquals(tree.getId(), processActivityInstances[0].getId());
+    assertEquals(definition.getId(), processActivityInstances[0].getActivityId());
+
+    assertActivityInstances(tree.getActivityInstances("subProcess"), 3, "subProcess");
+    assertActivityInstances(tree.getActivityInstances("innerTask"), 3, "innerTask");
+
+    ActivityInstance subProcessInstance = tree.getChildActivityInstances()[0];
+    assertActivityInstances(subProcessInstance.getActivityInstances("subProcess"), 1, "subProcess");
+
+    ActivityInstance[] childInstances = subProcessInstance.getActivityInstances("innerTask");
+    assertEquals(1, childInstances.length);
+    assertEquals(subProcessInstance.getChildActivityInstances()[0].getId(), childInstances[0].getId());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/RuntimeServiceTest.testGetActivityInstancesForActivity.bpmn20.xml")
+  public void testGetInvalidActivityInstancesForActivity() {
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("miSubprocess");
+
+    ActivityInstance tree = runtimeService.getActivityInstance(instance.getId());
+
+    try {
+      tree.getActivityInstances(null);
+      fail("exception expected");
+    } catch (NullValueException e) {
+      // happy path
+    }
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/RuntimeServiceTest.testGetActivityInstancesForActivity.bpmn20.xml")
+  public void testGetActivityInstancesForNonExistingActivity() {
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("miSubprocess");
+
+    ActivityInstance tree = runtimeService.getActivityInstance(instance.getId());
+
+    ActivityInstance[] instances = tree.getActivityInstances("aNonExistingActivityId");
+    assertNotNull(instances);
+    assertEquals(0, instances.length);
+  }
+
+  @Deployment
+  public void testGetTransitionInstancesForActivity() {
+    // given
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("miSubprocess");
+
+    // complete one async task
+    Job job = managementService.createJobQuery().listPage(0, 1).get(0);
+    managementService.executeJob(job.getId());
+    Task task = taskService.createTaskQuery().singleResult();
+    taskService.complete(task.getId());
+
+    // when
+    ActivityInstance tree = runtimeService.getActivityInstance(instance.getId());
+
+    // then
+    assertEquals(0, tree.getTransitionInstances("subProcess").length);
+    TransitionInstance[] asyncBeforeInstances = tree.getTransitionInstances("innerTask");
+    assertEquals(2, asyncBeforeInstances.length);
+
+    assertEquals("innerTask", asyncBeforeInstances[0].getActivityId());
+    assertEquals("innerTask", asyncBeforeInstances[1].getActivityId());
+    assertFalse(asyncBeforeInstances[0].getId().equals(asyncBeforeInstances[1].getId()));
+
+    TransitionInstance[] asyncEndEventInstances = tree.getTransitionInstances("theSubProcessEnd");
+    assertEquals(1, asyncEndEventInstances.length);
+    assertEquals("theSubProcessEnd", asyncEndEventInstances[0].getActivityId());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/RuntimeServiceTest.testGetTransitionInstancesForActivity.bpmn20.xml")
+  public void testGetInvalidTransitionInstancesForActivity() {
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("miSubprocess");
+
+    ActivityInstance tree = runtimeService.getActivityInstance(instance.getId());
+
+    try {
+      tree.getTransitionInstances(null);
+      fail("exception expected");
+    } catch (NullValueException e) {
+      // happy path
+    }
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/RuntimeServiceTest.testGetTransitionInstancesForActivity.bpmn20.xml")
+  public void testGetTransitionInstancesForNonExistingActivity() {
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("miSubprocess");
+
+    ActivityInstance tree = runtimeService.getActivityInstance(instance.getId());
+
+    TransitionInstance[] instances = tree.getTransitionInstances("aNonExistingActivityId");
+    assertNotNull(instances);
+    assertEquals(0, instances.length);
+  }
+
+
+  protected void assertActivityInstances(ActivityInstance[] instances, int expectedAmount, String expectedActivityId) {
+    assertEquals(expectedAmount, instances.length);
+
+    Set<String> instanceIds = new HashSet<String>();
+
+    for (ActivityInstance instance : instances) {
+      assertEquals(expectedActivityId, instance.getActivityId());
+      instanceIds.add(instance.getId());
+    }
+
+    // ensure that all instances are unique
+    assertEquals(expectedAmount, instanceIds.size());
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")

@@ -47,4 +47,14 @@ public interface ActivityInstance extends ProcessElementInstance {
   /** the list of executions that are currently waiting in this activity instance */
   String[] getExecutionIds();
 
+  /**
+   * all descendant (children, grandchildren, etc.) activity instances that are instances of the supplied activity
+   */
+  ActivityInstance[] getActivityInstances(String activityId);
+
+  /**
+   * all descendant (children, grandchildren, etc.) transition instances that are leaving or entering the supplied activity
+   */
+  TransitionInstance[] getTransitionInstances(String transitionId);
+
 }

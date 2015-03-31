@@ -13,7 +13,10 @@
 package org.camunda.bpm.engine.impl.persistence.entity;
 
 import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.List;
 
+import org.camunda.bpm.engine.impl.util.EnsureUtil;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.TransitionInstance;
 
@@ -128,6 +131,52 @@ public class ActivityInstanceImpl extends ProcessElementInstanceImpl implements 
     StringWriter writer = new StringWriter();
     writeTree(writer, "", true);
     return writer.toString();
+  }
+
+  public ActivityInstance[] getActivityInstances(String activityId) {
+    EnsureUtil.ensureNotNull("activityId", activityId);
+
+    List<ActivityInstance> instances = new ArrayList<ActivityInstance>();
+    collectActivityInstances(activityId, instances);
+
+    return instances.toArray(new ActivityInstance[instances.size()]);
+  }
+
+  protected void collectActivityInstances(String activityId, List<ActivityInstance> instances) {
+    if (this.activityId.equals(activityId)) {
+      instances.add(this);
+    }
+    else {
+      for (ActivityInstance childInstance : childActivityInstances) {
+        ((ActivityInstanceImpl) childInstance).collectActivityInstances(activityId, instances);
+      }
+    }
+  }
+
+  public TransitionInstance[] getTransitionInstances(String activityId) {
+    EnsureUtil.ensureNotNull("activityId", activityId);
+
+    List<TransitionInstance> instances = new ArrayList<TransitionInstance>();
+    collectTransitionInstances(activityId, instances);
+
+    return instances.toArray(new TransitionInstance[instances.size()]);
+  }
+
+  protected void collectTransitionInstances(String activityId, List<TransitionInstance> instances) {
+    boolean instanceFound = false;
+
+    for (TransitionInstance childTransitionInstance : childTransitionInstances) {
+      if (activityId.equals(childTransitionInstance.getActivityId())) {
+        instances.add(childTransitionInstance);
+        instanceFound = true;
+      }
+    }
+
+    if (!instanceFound) {
+      for (ActivityInstance childActivityInstance : childActivityInstances) {
+        ((ActivityInstanceImpl) childActivityInstance).collectTransitionInstances(activityId, instances);
+      }
+    }
   }
 
 }
