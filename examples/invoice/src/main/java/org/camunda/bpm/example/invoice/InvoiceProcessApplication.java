@@ -14,12 +14,14 @@ package org.camunda.bpm.example.invoice;
 
 import static org.camunda.bpm.engine.variable.Variables.createVariables;
 
+import java.util.Arrays;
 import java.util.Calendar;
 
 import org.camunda.bpm.application.PostDeploy;
 import org.camunda.bpm.application.ProcessApplication;
 import org.camunda.bpm.application.impl.ServletProcessApplication;
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.authorization.Groups;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
@@ -57,7 +59,7 @@ public class InvoiceProcessApplication extends ServletProcessApplication {
       Calendar calendar = Calendar.getInstance();
       calendar.add(Calendar.DAY_OF_MONTH, -14);
       ClockUtil.setCurrentTime(calendar.getTime());
-      processEngine.getIdentityService().setAuthenticatedUserId("demo");
+      processEngine.getIdentityService().setAuthentication("demo", Arrays.asList(Groups.CAMUNDA_ADMIN));
       Task task = processEngine.getTaskService().createTaskQuery().processInstanceId(pi.getId()).singleResult();
       processEngine.getTaskService().complete(task.getId(), createVariables().putValue("approver", "john"));
     }
@@ -74,7 +76,7 @@ public class InvoiceProcessApplication extends ServletProcessApplication {
       Calendar calendar = Calendar.getInstance();
       calendar.add(Calendar.DAY_OF_MONTH, -5);
       ClockUtil.setCurrentTime(calendar.getTime());
-      processEngine.getIdentityService().setAuthenticatedUserId("demo");
+      processEngine.getIdentityService().setAuthentication("demo", Arrays.asList(Groups.CAMUNDA_ADMIN));
       Task task = processEngine.getTaskService().createTaskQuery().processInstanceId(pi.getId()).singleResult();
       processEngine.getTaskService().complete(task.getId(), createVariables().putValue("approver", "mary"));
     }

@@ -5,8 +5,10 @@ import static org.camunda.bpm.engine.authorization.Authorization.AUTH_TYPE_GRANT
 import static org.camunda.bpm.engine.authorization.Permissions.ACCESS;
 import static org.camunda.bpm.engine.authorization.Permissions.ALL;
 import static org.camunda.bpm.engine.authorization.Permissions.READ;
+import static org.camunda.bpm.engine.authorization.Permissions.UPDATE;
 import static org.camunda.bpm.engine.authorization.Resources.APPLICATION;
 import static org.camunda.bpm.engine.authorization.Resources.FILTER;
+import static org.camunda.bpm.engine.authorization.Resources.TASK;
 import static org.camunda.bpm.engine.authorization.Resources.USER;
 
 import java.util.ArrayList;
@@ -198,6 +200,14 @@ public class DemoDataGenerator {
       accMaryAuth.setResourceId("mary");
       accMaryAuth.addPermission(READ);
       authorizationService.saveAuthorization(accMaryAuth);
+
+      Authorization taskMaryAuth = authorizationService.createNewAuthorization(AUTH_TYPE_GRANT);
+      taskMaryAuth.setUserId("mary");
+      taskMaryAuth.setResource(TASK);
+      taskMaryAuth.setResourceId(ANY);
+      taskMaryAuth.addPermission(READ);
+      taskMaryAuth.addPermission(UPDATE);
+      authorizationService.saveAuthorization(taskMaryAuth);
 
       // create default filters
 
