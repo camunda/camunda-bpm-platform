@@ -291,6 +291,44 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
     }
   }
 
+  /**
+   * CAM-3718
+   */
+  @Deployment(resources = EXCLUSIVE_GATEWAY_PROCESS)
+  public void FAILING_testEndProcessInstanceIntermediately() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("exclusiveGateway");
+    String processInstanceId = processInstance.getId();
+
+    ActivityInstance tree = runtimeService.getActivityInstance(processInstanceId);
+
+    runtimeService
+      .createProcessInstanceModification(processInstance.getId())
+      .cancelActivityInstance(getInstanceIdForActivity(tree, "task1"))
+      .startAfterActivity("task1")
+      .startBeforeActivity("task1")
+      .execute();
+
+    ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstanceId);
+
+    assertThat(updatedTree).hasStructure(
+        describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+          .activity("task1")
+        .done());
+
+    ExecutionTree executionTree = ExecutionTree.forExecution(processInstanceId, processEngine);
+
+    assertThat(executionTree)
+    .matches(
+      describeExecutionTree("task1").scope()
+      .done());
+
+    assertEquals(1, taskService.createTaskQuery().count());
+
+    // complete the process
+    completeTasksInOrder("task1");
+    assertProcessEnded(processInstanceId);
+  }
+
   @Deployment(resources = EXCLUSIVE_GATEWAY_PROCESS)
   public void testStartTransition() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("exclusiveGateway");
