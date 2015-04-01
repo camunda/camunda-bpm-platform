@@ -86,7 +86,7 @@ create table ACT_HI_DETAIL (
     ID_ varchar(64) not null,
     TYPE_ varchar(255) not null,
     TIME_ timestamp not null,
-    NAME_ varchar(255),
+    NAME_ varchar(255) NOT null,
     PROC_INST_ID_ varchar(64),
     EXECUTION_ID_ varchar(64),
     CASE_INST_ID_ varchar(64),
