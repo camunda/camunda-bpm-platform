@@ -215,6 +215,86 @@ public abstract class AbstractFilterRestServiceInteractionTest extends AbstractR
   }
 
   @Test
+  public void testGetFilterWithTaskQuery() {
+    TaskQueryImpl query = mock(TaskQueryImpl.class);
+    when(query.getAssignee()).thenReturn(MockProvider.EXAMPLE_TASK_ASSIGNEE_NAME);
+    when(query.getAssigneeLike()).thenReturn(MockProvider.EXAMPLE_TASK_ASSIGNEE_NAME);
+    when(query.getCaseDefinitionId()).thenReturn(MockProvider.EXAMPLE_CASE_DEFINITION_ID);
+    when(query.getCaseDefinitionKey()).thenReturn(MockProvider.EXAMPLE_CASE_DEFINITION_KEY);
+    when(query.getCaseDefinitionName()).thenReturn(MockProvider.EXAMPLE_CASE_DEFINITION_NAME);
+    when(query.getCaseDefinitionNameLike()).thenReturn(MockProvider.EXAMPLE_CASE_DEFINITION_NAME_LIKE);
+    when(query.getCaseExecutionId()).thenReturn(MockProvider.EXAMPLE_CASE_EXECUTION_ID);
+    when(query.getCaseInstanceBusinessKey()).thenReturn(MockProvider.EXAMPLE_CASE_INSTANCE_BUSINESS_KEY);
+    when(query.getCaseInstanceBusinessKeyLike()).thenReturn(MockProvider.EXAMPLE_CASE_INSTANCE_BUSINESS_KEY_LIKE);
+    when(query.getCaseInstanceId()).thenReturn(MockProvider.EXAMPLE_CASE_INSTANCE_ID);
+    when(query.getCandidateUser()).thenReturn(MockProvider.EXAMPLE_USER_ID);
+    when(query.getCandidateGroup()).thenReturn(MockProvider.EXAMPLE_GROUP_ID);
+    when(query.getProcessInstanceBusinessKey()).thenReturn(MockProvider.EXAMPLE_PROCESS_INSTANCE_BUSINESS_KEY);
+    when(query.getProcessInstanceBusinessKeyLike()).thenReturn(MockProvider.EXAMPLE_PROCESS_INSTANCE_BUSINESS_KEY_LIKE);
+    when(query.getProcessDefinitionKey()).thenReturn(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
+    when(query.getProcessDefinitionId()).thenReturn(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID);
+    when(query.getExecutionId()).thenReturn(MockProvider.EXAMPLE_EXECUTION_ID);
+    when(query.getProcessDefinitionName()).thenReturn(MockProvider.EXAMPLE_PROCESS_DEFINITION_NAME);
+    when(query.getProcessDefinitionNameLike()).thenReturn(MockProvider.EXAMPLE_PROCESS_DEFINITION_NAME_LIKE);
+    when(query.getProcessInstanceId()).thenReturn(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID);
+    when(query.getKey()).thenReturn(MockProvider.EXAMPLE_TASK_DEFINITION_KEY);
+    when(query.getKeyLike()).thenReturn(MockProvider.EXAMPLE_TASK_DEFINITION_KEY);
+    when(query.getDescription()).thenReturn(MockProvider.EXAMPLE_TASK_DESCRIPTION);
+    when(query.getDescriptionLike()).thenReturn(MockProvider.EXAMPLE_TASK_DESCRIPTION);
+    when(query.getInvolvedUser()).thenReturn(MockProvider.EXAMPLE_USER_ID);
+    when(query.getPriority()).thenReturn(1);
+    when(query.getMaxPriority()).thenReturn(2);
+    when(query.getMinPriority()).thenReturn(3);
+    when(query.getName()).thenReturn(MockProvider.EXAMPLE_TASK_NAME);
+    when(query.getNameLike()).thenReturn(MockProvider.EXAMPLE_TASK_NAME);
+    when(query.getOwner()).thenReturn(MockProvider.EXAMPLE_TASK_OWNER);
+    when(query.getParentTaskId()).thenReturn(MockProvider.EXAMPLE_TASK_PARENT_TASK_ID);
+
+    filterMock = MockProvider.createMockFilter(EXAMPLE_FILTER_ID, query);
+    when(filterServiceMock.getFilter(EXAMPLE_FILTER_ID)).thenReturn(filterMock);
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_FILTER_ID)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+      .body("query.assignee", equalTo(MockProvider.EXAMPLE_TASK_ASSIGNEE_NAME))
+      .body("query.assigneeLike", equalTo(MockProvider.EXAMPLE_TASK_ASSIGNEE_NAME))
+      .body("query.caseDefinitionId", equalTo(MockProvider.EXAMPLE_CASE_DEFINITION_ID))
+      .body("query.caseDefinitionKey", equalTo(MockProvider.EXAMPLE_CASE_DEFINITION_KEY))
+      .body("query.caseDefinitionName", equalTo(MockProvider.EXAMPLE_CASE_DEFINITION_NAME))
+      .body("query.caseDefinitionNameLike", equalTo(MockProvider.EXAMPLE_CASE_DEFINITION_NAME_LIKE))
+      .body("query.caseExecutionId", equalTo(MockProvider.EXAMPLE_CASE_EXECUTION_ID))
+      .body("query.caseInstanceBusinessKey", equalTo(MockProvider.EXAMPLE_CASE_INSTANCE_BUSINESS_KEY))
+      .body("query.caseInstanceBusinessKeyLike", equalTo(MockProvider.EXAMPLE_CASE_INSTANCE_BUSINESS_KEY_LIKE))
+      .body("query.caseInstanceId", equalTo(MockProvider.EXAMPLE_CASE_INSTANCE_ID))
+      .body("query.candidateUser", equalTo(MockProvider.EXAMPLE_USER_ID))
+      .body("query.candidateGroup", equalTo(MockProvider.EXAMPLE_GROUP_ID))
+      .body("query.processInstanceBusinessKey", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_BUSINESS_KEY))
+      .body("query.processInstanceBusinessKeyLike", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_BUSINESS_KEY_LIKE))
+      .body("query.processDefinitionKey", equalTo(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY))
+      .body("query.processDefinitionId", equalTo(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID))
+      .body("query.executionId", equalTo(MockProvider.EXAMPLE_EXECUTION_ID))
+      .body("query.processDefinitionName", equalTo(MockProvider.EXAMPLE_PROCESS_DEFINITION_NAME))
+      .body("query.processDefinitionNameLike", equalTo(MockProvider.EXAMPLE_PROCESS_DEFINITION_NAME_LIKE))
+      .body("query.processInstanceId", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID))
+      .body("query.taskDefinitionKey", equalTo(MockProvider.EXAMPLE_TASK_DEFINITION_KEY))
+      .body("query.taskDefinitionKeyLike", equalTo(MockProvider.EXAMPLE_TASK_DEFINITION_KEY))
+      .body("query.description", equalTo(MockProvider.EXAMPLE_TASK_DESCRIPTION))
+      .body("query.descriptionLike", equalTo(MockProvider.EXAMPLE_TASK_DESCRIPTION))
+      .body("query.involvedUser", equalTo(MockProvider.EXAMPLE_USER_ID))
+      .body("query.priority", equalTo(1))
+      .body("query.maxPriority", equalTo(2))
+      .body("query.minPriority", equalTo(3))
+      .body("query.name", equalTo(MockProvider.EXAMPLE_TASK_NAME))
+      .body("query.nameLike", equalTo(MockProvider.EXAMPLE_TASK_NAME))
+      .body("query.owner", equalTo(MockProvider.EXAMPLE_TASK_OWNER))
+      .body("query.parentTaskId", equalTo(MockProvider.EXAMPLE_TASK_PARENT_TASK_ID))
+    .when()
+      .get(SINGLE_FILTER_URL);
+
+  }
+
+  @Test
   public void testGetFilterWithCandidateGroupQuery() {
     TaskQueryImpl query = new TaskQueryImpl();
     query.taskCandidateGroup("abc");

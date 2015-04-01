@@ -1201,8 +1201,6 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     TaskQueryDto dto = new TaskQueryDto();
 
     dto.activityInstanceIdIn = taskQuery.getActivityInstanceIdIn();
-    dto.assignee = taskQuery.getAssignee();
-    dto.assigneeLike = taskQuery.getAssigneeLike();
     dto.caseDefinitionId = taskQuery.getCaseDefinitionId();
     dto.caseDefinitionKey = taskQuery.getCaseDefinitionKey();
     dto.caseDefinitionName = taskQuery.getCaseDefinitionName();
@@ -1239,6 +1237,7 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     dto.owner = taskQuery.getOwner();
     dto.priority = taskQuery.getPriority();
     dto.unassigned = taskQuery.isUnassignedInternal();
+    dto.parentTaskId = taskQuery.getParentTaskId();
 
     dto.dueAfter = taskQuery.getDueAfter();
     dto.dueBefore = taskQuery.getDueBefore();

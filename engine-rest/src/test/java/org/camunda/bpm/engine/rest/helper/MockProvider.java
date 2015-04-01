@@ -1628,12 +1628,16 @@ public abstract class MockProvider {
   }
 
   public static Filter createMockFilter(String id) {
+    return createMockFilter(id, EXAMPLE_FILTER_QUERY);
+  }
+
+  public static Filter createMockFilter(String id, Query<?, ?> query) {
     Filter mock = mockFilter()
       .id(id)
       .resourceType(EXAMPLE_FILTER_RESOURCE_TYPE)
       .name(EXAMPLE_FILTER_NAME)
       .owner(EXAMPLE_FILTER_OWNER)
-      .query(EXAMPLE_FILTER_QUERY)
+      .query(query)
       .properties(EXAMPLE_FILTER_PROPERTIES)
       .build();
 
