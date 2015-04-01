@@ -41,6 +41,7 @@ import org.camunda.bpm.engine.impl.AbstractQuery;
 import org.camunda.bpm.engine.impl.AuthorizationQueryImpl;
 import org.camunda.bpm.engine.impl.EventSubscriptionQueryImpl;
 import org.camunda.bpm.engine.impl.IncidentQueryImpl;
+import org.camunda.bpm.engine.impl.ProcessDefinitionQueryImpl;
 import org.camunda.bpm.engine.impl.TaskQueryImpl;
 import org.camunda.bpm.engine.impl.VariableInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.db.AuthorizationCheck;
@@ -501,6 +502,12 @@ public class AuthorizationManager extends AbstractManager {
   }
 
   /* QUERIES */
+
+  // process definition query ////////////////////////////////
+
+  public void configureProcessDefinitionQuery(ProcessDefinitionQueryImpl query) {
+    configureQuery(query, PROCESS_DEFINITION, "RES.KEY_");
+  }
 
   // execution/process instance query ////////////////////////
 

@@ -16,6 +16,7 @@ import org.camunda.bpm.engine.filter.Filter;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity;
+import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 
@@ -71,6 +72,17 @@ public interface ResourceAuthorizationProvider {
    *         {@link Filter} is created.
    */
   public AuthorizationEntity[] newFilter(Filter filter);
+
+  // Process Definition //////////////////////////////////////
+
+  /**
+   * <p>Invoked whenever a new process definition is created</p>
+   *
+   * @param processDefinition the newly created process definition
+   * @return a list of authorizations to be automatically added when a new
+   *         {@link ProcessDefinition} is created.
+   */
+  public AuthorizationEntity[] newProcessDefinition(ProcessDefinition processDefinition);
 
   // Process Instance ///////////////////////////////////////
 

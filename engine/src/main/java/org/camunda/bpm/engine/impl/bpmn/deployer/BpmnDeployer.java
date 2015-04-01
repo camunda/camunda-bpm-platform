@@ -31,7 +31,6 @@ import org.camunda.bpm.engine.impl.bpmn.parser.EventSubscriptionDeclaration;
 import org.camunda.bpm.engine.impl.cfg.IdGenerator;
 import org.camunda.bpm.engine.impl.cmd.DeleteJobsCmd;
 import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
 import org.camunda.bpm.engine.impl.event.MessageEventHandler;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -145,7 +144,6 @@ public class BpmnDeployer implements Deployer {
     CommandContext commandContext = Context.getCommandContext();
     ProcessDefinitionManager processDefinitionManager = commandContext.getProcessDefinitionManager();
     DeploymentCache deploymentCache = Context.getProcessEngineConfiguration().getDeploymentCache();
-    DbEntityManager dbEntityManager = commandContext.getDbEntityManager();
     for (ProcessDefinitionEntity processDefinition : processDefinitions) {
 
       if (deployment.isNew()) {
@@ -159,9 +157,7 @@ public class BpmnDeployer implements Deployer {
         updateJobDeclarations(declarations, processDefinition, deployment.isNew());
         adjustStartEventSubscriptions(processDefinition, latestProcessDefinition);
 
-        dbEntityManager.insert(processDefinition);
-        deploymentCache.addProcessDefinition(processDefinition);
-        addAuthorizations(processDefinition);
+        processDefinitionManager.insertProcessDefinition(processDefinition);
 
       } else {
 
@@ -174,17 +170,12 @@ public class BpmnDeployer implements Deployer {
 
         List<JobDeclaration<?>> declarations = jobDeclarations.get(processDefinition.getKey());
         updateJobDeclarations(declarations, processDefinition, deployment.isNew());
-
-        deploymentCache.addProcessDefinition(processDefinition);
-        addAuthorizations(processDefinition);
-
       }
 
       // Add to cache
-      Context
-        .getProcessEngineConfiguration()
-        .getDeploymentCache()
-        .addProcessDefinition(processDefinition);
+      deploymentCache.addProcessDefinition(processDefinition);
+      // add "authorizations"
+      addAuthorizations(processDefinition);
 
       // Add to deployment for further usage
       deployment.addDeployedArtifact(processDefinition);
