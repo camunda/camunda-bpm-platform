@@ -2499,4 +2499,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     return this;
   }
 
+  public void close() {
+    if (dataSource instanceof PooledDataSource) {
+      // ACT-233: connection pool of Ibatis is not properely initialized if this is not called!
+      ((PooledDataSource)dataSource).forceCloseAll();
+    }
+  }
+
 }

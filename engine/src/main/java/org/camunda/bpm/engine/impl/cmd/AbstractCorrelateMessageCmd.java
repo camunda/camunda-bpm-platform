@@ -16,8 +16,10 @@ package org.camunda.bpm.engine.impl.cmd;
 import java.util.Map;
 
 import org.camunda.bpm.engine.impl.MessageCorrelationBuilderImpl;
+import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
@@ -66,6 +68,20 @@ public abstract class AbstractCorrelateMessageCmd implements Command<Void> {
     ActivityImpl messageStartEvent = processDefinitionEntity.findActivity(correlationResult.getStartEventActivityId());
     ExecutionEntity processInstance = processDefinitionEntity.createProcessInstance(businessKey, messageStartEvent);
     processInstance.start(processVariables);
+  }
+
+  protected void checkAuthorization(MessageCorrelationResult correlation) {
+    AuthorizationManager authorizationManager = Context.getCommandContext().getAuthorizationManager();
+
+    if (MessageCorrelationResult.TYPE_EXECUTION.equals(correlation.getResultType())) {
+      ExecutionEntity execution = correlation.getExecutionEntity();
+      authorizationManager.checkUpdateProcessInstanceById(execution.getProcessInstanceId());
+    }
+    else {
+      ProcessDefinitionEntity definition = correlation.getProcessDefinitionEntity();
+      authorizationManager.checkCreateProcessInstance(definition);
+    }
+
   }
 
 }

@@ -18,8 +18,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.camunda.bpm.engine.BadUserRequestException;
-import org.camunda.bpm.engine.impl.AbstractVariableQueryImpl;
+import org.camunda.bpm.engine.authorization.Resources;
+import org.camunda.bpm.engine.impl.AbstractQuery;
+import org.camunda.bpm.engine.impl.ExecutionQueryImpl;
 import org.camunda.bpm.engine.impl.Page;
+import org.camunda.bpm.engine.impl.ProcessInstanceQueryImpl;
+import org.camunda.bpm.engine.impl.cfg.auth.ResourceAuthorizationProvider;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -32,6 +36,14 @@ public class ExecutionManager extends AbstractManager {
 
   public void insertExecution(ExecutionEntity execution) {
     getDbEntityManager().insert(execution);
+    createDefaultAuthorizations(execution);
+  }
+
+  public void deleteExecution(ExecutionEntity execution) {
+    getDbEntityManager().delete(execution);
+    if (execution.isProcessInstanceExecution()) {
+      deleteAuthorizations(Resources.PROCESS_INSTANCE, execution.getProcessInstanceId());
+    }
   }
 
   @SuppressWarnings("unchecked")
@@ -91,22 +103,26 @@ public class ExecutionManager extends AbstractManager {
     return getDbEntityManager().selectById(ExecutionEntity.class, executionId);
   }
 
-  public long findExecutionCountByQueryCriteria(AbstractVariableQueryImpl executionQuery) {
+  public long findExecutionCountByQueryCriteria(ExecutionQueryImpl executionQuery) {
+    configureAuthorizationCheck(executionQuery);
     return (Long) getDbEntityManager().selectOne("selectExecutionCountByQueryCriteria", executionQuery);
   }
 
   @SuppressWarnings("unchecked")
-  public List<ExecutionEntity> findExecutionsByQueryCriteria(AbstractVariableQueryImpl executionQuery, Page page) {
+  public List<ExecutionEntity> findExecutionsByQueryCriteria(ExecutionQueryImpl executionQuery, Page page) {
+    configureAuthorizationCheck(executionQuery);
     return getDbEntityManager().selectList("selectExecutionsByQueryCriteria", executionQuery, page);
   }
 
-  public long findProcessInstanceCountByQueryCriteria(AbstractVariableQueryImpl executionQuery) {
-    return (Long) getDbEntityManager().selectOne("selectProcessInstanceCountByQueryCriteria", executionQuery);
+  public long findProcessInstanceCountByQueryCriteria(ProcessInstanceQueryImpl processInstanceQuery) {
+    configureAuthorizationCheck(processInstanceQuery);
+    return (Long) getDbEntityManager().selectOne("selectProcessInstanceCountByQueryCriteria", processInstanceQuery);
   }
 
   @SuppressWarnings("unchecked")
-  public List<ProcessInstance> findProcessInstanceByQueryCriteria(AbstractVariableQueryImpl executionQuery, Page page) {
-    return getDbEntityManager().selectList("selectProcessInstanceByQueryCriteria", executionQuery, page);
+  public List<ProcessInstance> findProcessInstanceByQueryCriteria(ProcessInstanceQueryImpl processInstanceQuery, Page page) {
+    configureAuthorizationCheck(processInstanceQuery);
+    return getDbEntityManager().selectList("selectProcessInstanceByQueryCriteria", processInstanceQuery, page);
   }
 
   @SuppressWarnings("unchecked")
@@ -150,6 +166,20 @@ public class ExecutionManager extends AbstractManager {
     parameters.put("processDefinitionKey", processDefinitionKey);
     parameters.put("suspensionState", suspensionState.getStateCode());
     getDbEntityManager().update(ExecutionEntity.class, "updateExecutionSuspensionStateByParameters", parameters);
+  }
+
+  // helper ///////////////////////////////////////////////////////////
+
+  protected void createDefaultAuthorizations(ExecutionEntity execution) {
+    if(execution.isProcessInstanceExecution() && isAuthorizationEnabled()) {
+      ResourceAuthorizationProvider provider = getResourceAuthorizationProvider();
+      AuthorizationEntity[] authorizations = provider.newProcessInstance(execution);
+      saveDefaultAuthorizations(authorizations);
+    }
+  }
+
+  protected void configureAuthorizationCheck(AbstractQuery<?, ?> query) {
+    getAuthorizationManager().configureExecutionQuery(query);
   }
 
 }

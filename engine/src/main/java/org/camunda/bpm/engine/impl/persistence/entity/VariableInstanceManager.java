@@ -53,12 +53,18 @@ public class VariableInstanceManager extends AbstractManager {
   }
 
   public long findVariableInstanceCountByQueryCriteria(VariableInstanceQueryImpl variableInstanceQuery) {
+    configureAuthorizationCheck(variableInstanceQuery);
     return (Long) getDbEntityManager().selectOne("selectVariableInstanceCountByQueryCriteria", variableInstanceQuery);
   }
 
   @SuppressWarnings("unchecked")
   public List<VariableInstance> findVariableInstanceByQueryCriteria(VariableInstanceQueryImpl variableInstanceQuery, Page page) {
+    configureAuthorizationCheck(variableInstanceQuery);
     return getDbEntityManager().selectList("selectVariableInstanceByQueryCriteria", variableInstanceQuery, page);
+  }
+
+  protected void configureAuthorizationCheck(VariableInstanceQueryImpl query) {
+    getAuthorizationManager().configureVariableInstanceQuery(query);
   }
 
 }

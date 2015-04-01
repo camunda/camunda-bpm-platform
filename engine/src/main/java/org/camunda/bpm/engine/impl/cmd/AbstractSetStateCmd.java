@@ -36,10 +36,12 @@ public abstract class AbstractSetStateCmd implements Command<Void> {
     this.executionDate = executionDate;
   }
 
-  public Void execute(CommandContext commandContext) {
+  public Void execute(final CommandContext commandContext) {
     checkParameters(commandContext);
+    checkAuthorization(commandContext);
 
     if (executionDate == null) {
+
       updateSuspensionState(commandContext, getNewSuspensionState());
 
       if (isIncludeSubResources()) {
@@ -97,6 +99,8 @@ public abstract class AbstractSetStateCmd implements Command<Void> {
   protected AbstractSetStateCmd getNextCommand() {
     return null;
   }
+
+  protected abstract void checkAuthorization(CommandContext commandContext);
 
   protected abstract void checkParameters(CommandContext commandContext);
 

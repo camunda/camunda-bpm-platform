@@ -12,8 +12,14 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
+import java.util.concurrent.Callable;
+
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
+import org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionManager;
+import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobManager;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
@@ -41,6 +47,71 @@ public abstract class AbstractSetJobStateCmd extends AbstractSetStateCmd {
   protected void checkParameters(CommandContext commandContext) {
     if(jobId == null && jobDefinitionId == null && processInstanceId == null && processDefinitionId == null && processDefinitionKey == null) {
       throw new ProcessEngineException("Job id, job definition id, process instance id, process definition id nor process definition key cannot be null");
+    }
+  }
+
+  protected void checkAuthorization(CommandContext commandContext) {
+    AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
+
+    if (jobId != null) {
+
+      final JobManager jobManager = commandContext.getJobManager();
+      JobEntity job = commandContext.runWithoutAuthentication(new Callable<JobEntity>() {
+        public JobEntity call() throws Exception {
+          return jobManager.findJobById(jobId);
+        }
+      });
+
+      job = jobManager.findJobById(jobId);
+
+      if (job != null) {
+
+        String processInstanceId = job.getProcessInstanceId();
+        if (processInstanceId != null) {
+          authorizationManager.checkUpdateProcessInstanceById(processInstanceId);
+          return;
+        }
+
+        // start timer job is not assigned to a specific process
+        // instance, that's why we have to check whether there
+        // exists a UPDATE_INSTANCES permission on process definition
+        String processDefinitionKey = job.getProcessDefinitionKey();
+        if (processDefinitionKey != null) {
+          authorizationManager.checkUpdateInstanceOnProcessDefinitionByKey(processDefinitionKey);
+          return;
+        }
+
+        // job is not assigned to any process instance nor process definition
+        // then it is possible to activate/suspend the corresponding job
+      }
+    } else
+
+    if (jobDefinitionId != null) {
+
+      final JobDefinitionManager jobDefinitionManager = commandContext.getJobDefinitionManager();
+      JobDefinitionEntity jobDefinition = commandContext.runWithoutAuthentication(new Callable<JobDefinitionEntity>() {
+        public JobDefinitionEntity call() throws Exception {
+          return jobDefinitionManager.findById(jobDefinitionId);
+        }
+      });
+
+      if (jobDefinition != null) {
+        String processDefinitionKey = jobDefinition.getProcessDefinitionKey();
+        authorizationManager.checkUpdateInstanceOnProcessDefinitionByKey(processDefinitionKey);
+      }
+
+    } else
+
+    if (processInstanceId != null) {
+      authorizationManager.checkUpdateProcessInstanceById(processInstanceId);
+    } else
+
+    if (processDefinitionId != null) {
+      authorizationManager.checkUpdateInstanceOnProcessDefinitionById(processDefinitionId);
+    } else
+
+    if (processDefinitionKey != null) {
+      authorizationManager.checkUpdateInstanceOnProcessDefinitionByKey(processDefinitionKey);
     }
   }
 

@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
+import java.util.concurrent.Callable;
+
 import org.camunda.bpm.engine.impl.ActivityExecutionMapping;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
@@ -31,13 +33,18 @@ public class ActivityInstanceCancellationCmd extends AbstractInstanceCancellatio
 
   }
 
-  protected ExecutionEntity determineSourceInstanceExecution(CommandContext commandContext) {
+  protected ExecutionEntity determineSourceInstanceExecution(final CommandContext commandContext) {
     ExecutionEntity processInstance = commandContext.getExecutionManager().findExecutionById(processInstanceId);
 
     // rebuild the mapping because the execution tree changes with every iteration
     ActivityExecutionMapping mapping = new ActivityExecutionMapping(commandContext, processInstanceId);
 
-    ActivityInstance instance = new GetActivityInstanceCmd(processInstanceId).execute(commandContext);
+    ActivityInstance instance = commandContext.runWithoutAuthentication(new Callable<ActivityInstance>() {
+      public ActivityInstance call() throws Exception {
+        return new GetActivityInstanceCmd(processInstanceId).execute(commandContext);
+      }
+    });
+
     ActivityInstance instanceToCancel = findActivityInstance(instance, activityInstanceId);
     ExecutionEntity scopeExecution = getScopeExecutionForActivityInstance(processInstance, mapping, instanceToCancel);
 

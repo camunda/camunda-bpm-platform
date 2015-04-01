@@ -37,6 +37,7 @@ public class IncidentManager extends AbstractManager {
   }
 
   public long findIncidentCountByQueryCriteria(IncidentQueryImpl incidentQuery) {
+    configureAuthorizationCheck(incidentQuery);
     return (Long) getDbEntityManager().selectOne("selectIncidentCountByQueryCriteria", incidentQuery);
   }
 
@@ -54,7 +55,12 @@ public class IncidentManager extends AbstractManager {
 
   @SuppressWarnings("unchecked")
   public List<Incident> findIncidentByQueryCriteria(IncidentQueryImpl incidentQuery, Page page) {
+    configureAuthorizationCheck(incidentQuery);
     return getDbEntityManager().selectList("selectIncidentByQueryCriteria", incidentQuery, page);
+  }
+
+  protected void configureAuthorizationCheck(IncidentQueryImpl query) {
+    getAuthorizationManager().configureIncidentQuery(query);
   }
 
 }

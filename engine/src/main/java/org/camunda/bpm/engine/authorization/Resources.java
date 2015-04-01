@@ -29,7 +29,8 @@ public enum Resources implements Resource {
   AUTHORIZATION(EntityTypes.AUTHORIZATION, 4),
   FILTER(EntityTypes.FILTER, 5),
   PROCESS_DEFINITION(EntityTypes.PROCESS_DEFINITION, 6),
-  TASK(EntityTypes.TASK, 7);
+  TASK(EntityTypes.TASK, 7),
+  PROCESS_INSTANCE(EntityTypes.PROCESS_INSTANCE, 8);
 
   String name;
   int id;

@@ -12,9 +12,12 @@
  */
 package org.camunda.bpm.engine.runtime;
 
-import org.camunda.bpm.engine.MismatchingMessageCorrelationException;
-
 import java.util.Map;
+
+import org.camunda.bpm.engine.AuthorizationException;
+import org.camunda.bpm.engine.MismatchingMessageCorrelationException;
+import org.camunda.bpm.engine.authorization.Permissions;
+import org.camunda.bpm.engine.authorization.Resources;
 
 /**
  * <p>A fluent builder for defining message correlation</p>
@@ -85,7 +88,15 @@ public interface MessageCorrelationBuilder {
    * </ul>
    * </p>
    *
-   * @throws MismatchingMessageCorrelationException if none or more than one execution or process definition is matched by the correlation
+   * @throws MismatchingMessageCorrelationException
+   *          if none or more than one execution or process definition is matched by the correlation
+   * @throws AuthorizationException
+   *          if one execution is matched and the user has no {@link Permissions#UPDATE} permission on
+   *          {@link Resources#PROCESS_INSTANCE} or no {@link Permissions#UPDATE_INSTANCE} permission on
+   *          {@link Resources#PROCESS_DEFINITION}.
+   *          if one process definition is matched and the user has no {@link Permissions#CREATE} permission on
+   *          {@link Resources#PROCESS_INSTANCE} and no {@link Permissions#CREATE_INSTANCE} permission on
+   *          {@link Resources#PROCESS_DEFINITION}.
    */
   void correlate();
 
@@ -100,6 +111,15 @@ public interface MessageCorrelationBuilder {
    *     process. The instantiation is performed synchronously.</li>
    * </ul>
    * </p>
+   *
+   * @throws AuthorizationException
+   *          if at least one execution is matched and the user has no {@link Permissions#UPDATE} permission on
+   *          {@link Resources#PROCESS_INSTANCE} or no {@link Permissions#UPDATE_INSTANCE} permission on
+   *          {@link Resources#PROCESS_DEFINITION}.
+   *          if one process definition is matched and the user has no {@link Permissions#CREATE} permission on
+   *          {@link Resources#PROCESS_INSTANCE} and no {@link Permissions#CREATE_INSTANCE} permission on
+   *          {@link Resources#PROCESS_DEFINITION}.
+   *
    */
   void correlateAll();
 

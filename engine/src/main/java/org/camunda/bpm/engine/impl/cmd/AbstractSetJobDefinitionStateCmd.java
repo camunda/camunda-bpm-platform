@@ -13,11 +13,14 @@
 package org.camunda.bpm.engine.impl.cmd;
 
 import java.util.Date;
+import java.util.concurrent.Callable;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerChangeJobDefinitionSuspensionStateJobHandler;
+import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
+import org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionManager;
 import org.camunda.bpm.engine.impl.persistence.entity.JobManager;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
@@ -45,6 +48,47 @@ public abstract class AbstractSetJobDefinitionStateCmd extends AbstractSetStateC
   protected void checkParameters(CommandContext commandContext) {
     if (jobDefinitionId == null && processDefinitionId == null && processDefinitionKey == null) {
       throw new ProcessEngineException("Job definition id, process definition id nor process definition key cannot be null");
+    }
+  }
+
+  protected void checkAuthorization(CommandContext commandContext) {
+    AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
+
+    if (jobDefinitionId != null) {
+
+      final JobDefinitionManager jobDefinitionManager = commandContext.getJobDefinitionManager();
+      JobDefinitionEntity jobDefinition = commandContext.runWithoutAuthentication(new Callable<JobDefinitionEntity>() {
+        public JobDefinitionEntity call() throws Exception {
+          return jobDefinitionManager.findById(jobDefinitionId);
+        }
+      });
+
+      if (jobDefinition != null) {
+        String processDefinitionKey = jobDefinition.getProcessDefinitionKey();
+        authorizationManager.checkUpdateProcessDefinitionByKey(processDefinitionKey);
+
+        if (includeSubResources) {
+          authorizationManager.checkUpdateInstanceOnProcessDefinitionByKey(processDefinitionKey);
+        }
+      }
+
+    } else
+
+    if (processDefinitionId != null) {
+      authorizationManager.checkUpdateProcessDefinitionById(processDefinitionId);
+
+      if (includeSubResources) {
+        authorizationManager.checkUpdateInstanceOnProcessDefinitionById(processDefinitionId);
+      }
+
+    } else
+
+    if (processDefinitionKey != null) {
+      authorizationManager.checkUpdateProcessDefinitionByKey(processDefinitionKey);
+
+      if (includeSubResources) {
+        authorizationManager.checkUpdateInstanceOnProcessDefinitionByKey(processDefinitionKey);
+      }
     }
   }
 

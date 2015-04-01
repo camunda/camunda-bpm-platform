@@ -70,11 +70,13 @@ public class ProcessDefinitionImpl extends ScopeImpl implements PvmProcessDefini
   public PvmProcessInstance createProcessInstanceForInitial(ActivityImpl initial) {
     ensureNotNull("Cannot start process instance, initial activity where the process instance should start is null", "initial", initial);
 
-    PvmExecutionImpl processInstance = newProcessInstance(initial);
+    PvmExecutionImpl processInstance = createProcessInstance(initial);
 
     processInstance.setProcessDefinition(this);
-    processInstance.setProcessInstance(processInstance);
 
+    insertProcessInstance(processInstance);
+
+    processInstance.setProcessInstance(processInstance);
     processInstance.initialize();
 
     PvmExecutionImpl scopeInstance = processInstance;
@@ -114,8 +116,11 @@ public class ProcessDefinitionImpl extends ScopeImpl implements PvmProcessDefini
     return initialActivityStack;
   }
 
-  protected PvmExecutionImpl newProcessInstance(ActivityImpl startActivity) {
+  protected PvmExecutionImpl createProcessInstance(ActivityImpl startActivity) {
     return new ExecutionImpl(startActivity);
+  }
+
+  protected void insertProcessInstance(PvmExecutionImpl processInstance) {
   }
 
   public String getDiagramResourceName() {

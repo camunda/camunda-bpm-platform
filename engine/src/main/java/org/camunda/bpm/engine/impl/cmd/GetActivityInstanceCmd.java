@@ -12,11 +12,20 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
-import java.util.*;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Callable;
+
 import org.camunda.bpm.engine.impl.ExecutionQueryImpl;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ActivityInstanceImpl;
+import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessElementInstanceImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.TransitionInstanceImpl;
@@ -24,8 +33,6 @@ import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.TransitionInstance;
-
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 /**
  * @author Daniel Meyer
@@ -46,11 +53,15 @@ public class GetActivityInstanceCmd implements Command<ActivityInstance> {
 
     ensureNotNull("processInstanceId", processInstanceId);
 
+
     List<ExecutionEntity> executionList = loadProcessInstance(processInstanceId, commandContext);
 
     if (executionList.isEmpty()) {
       return null;
     }
+
+    AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
+    authorizationManager.checkReadProcessInstance(processInstanceId);
 
     ExecutionEntity processInstance = null;
 
@@ -116,10 +127,14 @@ public class GetActivityInstanceCmd implements Command<ActivityInstance> {
   }
 
   @SuppressWarnings({ "unchecked", "rawtypes" })
-  protected List<ExecutionEntity> loadFromDb(String processInstanceId, CommandContext commandContext) {
-    return (List) new ExecutionQueryImpl(commandContext)
-    .processInstanceId(processInstanceId)
-    .list();
+  protected List<ExecutionEntity> loadFromDb(final String processInstanceId, final CommandContext commandContext) {
+    return commandContext.runWithoutAuthentication(new Callable<List<ExecutionEntity>>() {
+      public List<ExecutionEntity> call() throws Exception {
+        return (List) new ExecutionQueryImpl(commandContext)
+          .processInstanceId(processInstanceId)
+          .list();
+      }
+    });
   }
 
   /**

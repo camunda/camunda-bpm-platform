@@ -25,8 +25,8 @@ import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.db.HasDbRevision;
 import org.camunda.bpm.engine.impl.db.DbEntity;
+import org.camunda.bpm.engine.impl.db.HasDbRevision;
 import org.camunda.bpm.engine.impl.form.handler.StartFormHandler;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
@@ -148,10 +148,14 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
   }
 
   @Override
-  protected PvmExecutionImpl newProcessInstance(ActivityImpl activityImpl) {
+  protected PvmExecutionImpl createProcessInstance(ActivityImpl activityImpl) {
     ExecutionEntity processInstance = new ExecutionEntity(activityImpl);
-    processInstance.insert();
     return processInstance;
+  }
+
+  protected void insertProcessInstance(PvmExecutionImpl processInstance) {
+    ExecutionEntity execution = (ExecutionEntity) processInstance;
+    execution.insert();
   }
 
   public IdentityLinkEntity addIdentityLink(String userId, String groupId) {

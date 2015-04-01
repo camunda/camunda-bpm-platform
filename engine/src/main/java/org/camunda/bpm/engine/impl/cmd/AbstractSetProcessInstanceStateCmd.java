@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.impl.cmd;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionManager;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
@@ -40,6 +41,21 @@ public abstract class AbstractSetProcessInstanceStateCmd extends AbstractSetStat
   protected void checkParameters(CommandContext commandContext) {
     if(processInstanceId == null && processDefinitionId == null && processDefinitionKey == null) {
       throw new ProcessEngineException("ProcessInstanceId, ProcessDefinitionId nor ProcessDefinitionKey cannot be null.");
+    }
+  }
+
+  protected void checkAuthorization(CommandContext commandContext) {
+    AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
+    if (processInstanceId != null) {
+      authorizationManager.checkUpdateProcessInstanceById(processInstanceId);
+    } else
+
+    if (processDefinitionId != null) {
+      authorizationManager.checkUpdateInstanceOnProcessDefinitionById(processDefinitionId);
+    } else
+
+    if (processDefinitionKey != null) {
+      authorizationManager.checkUpdateInstanceOnProcessDefinitionByKey(processDefinitionKey);
     }
   }
 

@@ -16,6 +16,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import org.camunda.bpm.engine.authorization.Permissions;
+import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
@@ -47,8 +49,14 @@ public interface RuntimeService {
 
   /**
    * Starts a new process instance in the latest version of the process definition with the given key.
+   *
    * @param processDefinitionKey key of process definition, cannot be null.
-   * @throws ProcessEngineException when no process definition is deployed with the given key.
+   *
+   * @throws ProcessEngineException
+   *          when no process definition is deployed with the given key.
+   * @throws AuthorizationException
+   *          if the user has no {@link Permissions#CREATE} permission on {@link Resources#PROCESS_INSTANCE}
+   *          and no {@link Permissions#CREATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   ProcessInstance startProcessInstanceByKey(String processDefinitionKey);
 
@@ -73,8 +81,12 @@ public interface RuntimeService {
    * @param businessKey
    *          a key that uniquely identifies the process instance in the context
    *          of the given process definition.
+   *
    * @throws ProcessEngineException
-   *           when no process definition is deployed with the given key.
+   *          when no process definition is deployed with the given key.
+   * @throws AuthorizationException
+   *          if the user has no {@link Permissions#CREATE} permission on {@link Resources#PROCESS_INSTANCE}
+   *          and no {@link Permissions#CREATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   ProcessInstance startProcessInstanceByKey(String processDefinitionKey, String businessKey);
 
@@ -102,15 +114,25 @@ public interface RuntimeService {
    * @param caseInstanceId
    *          an id of a case instance to associate the process instance with
    *          a case instance.
+   *
    * @throws ProcessEngineException
-   *           when no process definition is deployed with the given key.
+   *          when no process definition is deployed with the given key.
+   * @throws AuthorizationException
+   *          if the user has no {@link Permissions#CREATE} permission on {@link Resources#PROCESS_INSTANCE}
+   *          and no {@link Permissions#CREATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   ProcessInstance startProcessInstanceByKey(String processDefinitionKey, String businessKey, String caseInstanceId);
 
   /** Starts a new process instance in the latest version of the process definition with the given key
+   *
    * @param processDefinitionKey key of process definition, cannot be null.
    * @param variables the variables to pass, can be null.
-   * @throws ProcessEngineException when no process definition is deployed with the given key.
+   *
+   * @throws ProcessEngineException
+   *          when no process definition is deployed with the given key.
+   * @throws AuthorizationException
+   *          if the user has no {@link Permissions#CREATE} permission on {@link Resources#PROCESS_INSTANCE}
+   *          and no {@link Permissions#CREATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   ProcessInstance startProcessInstanceByKey(String processDefinitionKey, Map<String, Object> variables);
 
@@ -130,11 +152,17 @@ public interface RuntimeService {
    * same business key and the combination of processdefinitionKey-businessKey must be unique.
    *
    * The combination of processdefinitionKey-businessKey must be unique.
+   *
    * @param processDefinitionKey key of process definition, cannot be null.
    * @param variables the variables to pass, can be null.
    * @param businessKey a key that uniquely identifies the process instance in the context of the
    *                    given process definition.
-   * @throws ProcessEngineException when no process definition is deployed with the given key.
+   *
+   * @throws ProcessEngineException
+   *          when no process definition is deployed with the given key.
+   * @throws AuthorizationException
+   *          if the user has no {@link Permissions#CREATE} permission on {@link Resources#PROCESS_INSTANCE}
+   *          and no {@link Permissions#CREATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   ProcessInstance startProcessInstanceByKey(String processDefinitionKey, String businessKey, Map<String, Object> variables);
 
@@ -161,13 +189,24 @@ public interface RuntimeService {
    * @param caseInstanceId
    *          an id of a case instance to associate the process instance with
    *          a case instance.
-   * @throws ProcessEngineException when no process definition is deployed with the given key.
+   *
+   * @throws ProcessEngineException
+   *          when no process definition is deployed with the given key.
+   * @throws AuthorizationException
+   *          if the user has no {@link Permissions#CREATE} permission on {@link Resources#PROCESS_INSTANCE}
+   *          and no {@link Permissions#CREATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   ProcessInstance startProcessInstanceByKey(String processDefinitionKey, String businessKey, String caseInstanceId, Map<String, Object> variables);
 
   /** Starts a new process instance in the exactly specified version of the process definition with the given id.
+   *
    * @param processDefinitionId the id of the process definition, cannot be null.
-   * @throws ProcessEngineException when no process definition is deployed with the given key.
+   *
+   * @throws ProcessEngineException
+   *          when no process definition is deployed with the given key.
+   * @throws AuthorizationException
+   *          if the user has no {@link Permissions#CREATE} permission on {@link Resources#PROCESS_INSTANCE}
+   *          and no {@link Permissions#CREATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   ProcessInstance startProcessInstanceById(String processDefinitionId);
 
@@ -189,7 +228,12 @@ public interface RuntimeService {
    * @param processDefinitionId the id of the process definition, cannot be null.
    * @param businessKey a key that uniquely identifies the process instance in the context of the
    *                    given process definition.
-   * @throws ProcessEngineException when no process definition is deployed with the given key.
+   *
+   * @throws ProcessEngineException
+   *          when no process definition is deployed with the given key.
+   * @throws AuthorizationException
+   *          if the user has no {@link Permissions#CREATE} permission on {@link Resources#PROCESS_INSTANCE}
+   *          and no {@link Permissions#CREATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   ProcessInstance startProcessInstanceById(String processDefinitionId, String businessKey);
 
@@ -214,14 +258,25 @@ public interface RuntimeService {
    * @param caseInstanceId
    *          an id of a case instance to associate the process instance with
    *          a case instance.
-   * @throws ProcessEngineException when no process definition is deployed with the given key.
+   *
+   * @throws ProcessEngineException
+   *          when no process definition is deployed with the given key.
+   * @throws AuthorizationException
+   *          if the user has no {@link Permissions#CREATE} permission on {@link Resources#PROCESS_INSTANCE}
+   *          and no {@link Permissions#CREATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   ProcessInstance startProcessInstanceById(String processDefinitionId, String businessKey, String caseInstanceId);
 
   /** Starts a new process instance in the exactly specified version of the process definition with the given id.
+   *
    * @param processDefinitionId the id of the process definition, cannot be null.
    * @param variables variables to be passed, can be null
-   * @throws ProcessEngineException when no process definition is deployed with the given key.
+   *
+   * @throws ProcessEngineException
+   *          when no process definition is deployed with the given key.
+   * @throws AuthorizationException
+   *          if the user has no {@link Permissions#CREATE} permission on {@link Resources#PROCESS_INSTANCE}
+   *          and no {@link Permissions#CREATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   ProcessInstance startProcessInstanceById(String processDefinitionId, Map<String, Object> variables);
 
@@ -244,7 +299,12 @@ public interface RuntimeService {
    * @param businessKey a key that uniquely identifies the process instance in the context of the
    *                    given process definition.
    * @param variables variables to be passed, can be null
-   * @throws ProcessEngineException when no process definition is deployed with the given key.
+   *
+   * @throws ProcessEngineException
+   *          when no process definition is deployed with the given key.
+   * @throws AuthorizationException
+   *          if the user has no {@link Permissions#CREATE} permission on {@link Resources#PROCESS_INSTANCE}
+   *          and no {@link Permissions#CREATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   ProcessInstance startProcessInstanceById(String processDefinitionId, String businessKey, Map<String, Object> variables);
 
@@ -270,7 +330,12 @@ public interface RuntimeService {
    *          an id of a case instance to associate the process instance with
    *          a case instance.
    * @param variables variables to be passed, can be null
-   * @throws ProcessEngineException when no process definition is deployed with the given key.
+   *
+   * @throws ProcessEngineException
+   *          when no process definition is deployed with the given key.
+   * @throws AuthorizationException
+   *          if the user has no {@link Permissions#CREATE} permission on {@link Resources#PROCESS_INSTANCE}
+   *          and no {@link Permissions#CREATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   ProcessInstance startProcessInstanceById(String processDefinitionId, String businessKey, String caseInstanceId, Map<String, Object> variables);
 
@@ -293,7 +358,11 @@ public interface RuntimeService {
 
    * @return the {@link ProcessInstance} object representing the started process instance
    *
-   * @throws ProcessEngineException if no subscription to a message with the given name exists
+   * @throws ProcessEngineException
+   *          if no subscription to a message with the given name exists
+   * @throws AuthorizationException
+   *          if the user has no {@link Permissions#CREATE} permission on {@link Resources#PROCESS_INSTANCE}
+   *          and no {@link Permissions#CREATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
    *
    * @since 5.9
    */
@@ -312,7 +381,11 @@ public interface RuntimeService {
    * @param businessKey
    *          the business key which is added to the started process instance
    *
-   * @throws ProcessEngineException if no subscription to a message with the given name exists
+   * @throws ProcessEngineException
+   *          if no subscription to a message with the given name exists
+   * @throws AuthorizationException
+   *          if the user has no {@link Permissions#CREATE} permission on {@link Resources#PROCESS_INSTANCE}
+   *          and no {@link Permissions#CREATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
    *
    * @since 5.10
    */
@@ -331,9 +404,14 @@ public interface RuntimeService {
    * @param processVariables
    *          the 'payload' of the message. The variables are added as processes
    *          variables to the started process instance.
+   *
    * @return the {@link ProcessInstance} object representing the started process instance
    *
-   * @throws ProcessEngineException if no subscription to a message with the given name exists
+   * @throws ProcessEngineException
+   *          if no subscription to a message with the given name exists
+   * @throws AuthorizationException
+   *          if the user has no {@link Permissions#CREATE} permission on {@link Resources#PROCESS_INSTANCE}
+   *          and no {@link Permissions#CREATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
    *
    * @since 5.9
    */
@@ -354,9 +432,14 @@ public interface RuntimeService {
    * @param processVariables
    *          the 'payload' of the message. The variables are added as processes
    *          variables to the started process instance.
+   *
    * @return the {@link ProcessInstance} object representing the started process instance
    *
-   * @throws ProcessEngineException if no subscription to a message with the given name exists
+   * @throws ProcessEngineException
+   *          if no subscription to a message with the given name exists
+   * @throws AuthorizationException
+   *          if the user has no {@link Permissions#CREATE} permission on {@link Resources#PROCESS_INSTANCE}
+   *          and no {@link Permissions#CREATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
    *
    * @since 5.9
    */
@@ -372,18 +455,22 @@ public interface RuntimeService {
    * @param messageName
    *          the 'name' of the message as specified as an attribute on the
    *          bpmn20 {@code <message name="messageName" />} element, cannot be null.
-   * @param processDefinitionId 
-   * 		  the id of the process definition, cannot be null.
+   * @param processDefinitionId
+   *      the id of the process definition, cannot be null.
+   *
    * @return the {@link ProcessInstance} object representing the started process instance
    *
-   * @throws ProcessEngineException 
-   * 		  if no subscription to a message with the given name exists for the 
-   * 		  specified version of process definition.
+   * @throws ProcessEngineException
+   *          if no subscription to a message with the given name exists for the
+   *          specified version of process definition.
+   * @throws AuthorizationException
+   *          if the user has no {@link Permissions#CREATE} permission on {@link Resources#PROCESS_INSTANCE}
+   *          and no {@link Permissions#CREATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
    *
    * @since 7.3
    */
   ProcessInstance startProcessInstanceByMessageAndProcessDefinitionId(String messageName, String processDefinitionId);
-  
+
   /**
    * <p>Signals the process engine that a message is received and starts a new
    * {@link ProcessInstance}.</p>
@@ -394,20 +481,24 @@ public interface RuntimeService {
    * @param messageName
    *          the 'name' of the message as specified as an attribute on the
    *          bpmn20 {@code <message name="messageName" />} element, cannot be null.
-   * @param processDefinitionId 
-   * 		  the id of the process definition, cannot be null.
+   * @param processDefinitionId
+   *      the id of the process definition, cannot be null.
    * @param businessKey
    *          the business key which is added to the started process instance
+   *
    * @return the {@link ProcessInstance} object representing the started process instance
    *
-   * @throws ProcessEngineException 
-   * 		  if no subscription to a message with the given name exists for the 
-   * 		  specified version of process definition.
+   * @throws ProcessEngineException
+   *          if no subscription to a message with the given name exists for the
+   *          specified version of process definition.
+   * @throws AuthorizationException
+   *          if the user has no {@link Permissions#CREATE} permission on {@link Resources#PROCESS_INSTANCE}
+   *          and no {@link Permissions#CREATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
    *
    * @since 7.3
    */
   ProcessInstance startProcessInstanceByMessageAndProcessDefinitionId(String messageName, String processDefinitionId, String businessKey);
-  
+
   /**
    * <p>Signals the process engine that a message is received and starts a new
    * {@link ProcessInstance}.</p>
@@ -418,21 +509,26 @@ public interface RuntimeService {
    * @param messageName
    *          the 'name' of the message as specified as an attribute on the
    *          bpmn20 {@code <message name="messageName" />} element, cannot be null.
-   * @param processDefinitionId 
-   * 		  the id of the process definition, cannot be null.
+   * @param processDefinitionId
+   *      the id of the process definition, cannot be null.
    * @param processVariables
    *          the 'payload' of the message. The variables are added as processes
    *          variables to the started process instance.
+   *
    * @return the {@link ProcessInstance} object representing the started process instance
    *
-   * @throws ProcessEngineException 
-   * 		  if no subscription to a message with the given name exists for the 
-   * 		  specified version of process definition.
+   * @throws ProcessEngineException
+   *          if no subscription to a message with the given name exists for the
+   *          specified version of process definition.
+   *
+   * @throws AuthorizationException
+   *          if the user has no {@link Permissions#CREATE} permission on {@link Resources#PROCESS_INSTANCE}
+   *          and no {@link Permissions#CREATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
    *
    * @since 7.3
    */
   ProcessInstance startProcessInstanceByMessageAndProcessDefinitionId(String messageName, String processDefinitionId, Map<String, Object> processVariables);
-  
+
   /**
    * <p>Signals the process engine that a message is received and starts a new
    * {@link ProcessInstance}.</p>
@@ -443,43 +539,68 @@ public interface RuntimeService {
    * @param messageName
    *          the 'name' of the message as specified as an attribute on the
    *          bpmn20 {@code <message name="messageName" />} element, cannot be null.
-   * @param processDefinitionId 
-   * 		  the id of the process definition, cannot be null.
+   * @param processDefinitionId
+   *      the id of the process definition, cannot be null.
    * @param businessKey
    *          the business key which is added to the started process instance
    * @param processVariables
    *          the 'payload' of the message. The variables are added as processes
    *          variables to the started process instance.
+   *
    * @return the {@link ProcessInstance} object representing the started process instance
    *
-   * @throws ProcessEngineException 
-   * 		  if no subscription to a message with the given name exists for the 
-   * 		  specified version of process definition.
+   * @throws ProcessEngineException
+   *          if no subscription to a message with the given name exists for the
+   *          specified version of process definition.
+   * @throws AuthorizationException
+   *          if the user has no {@link Permissions#CREATE} permission on {@link Resources#PROCESS_INSTANCE}
+   *          and no {@link Permissions#CREATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
    *
    * @since 7.3
    */
   ProcessInstance startProcessInstanceByMessageAndProcessDefinitionId(String messageName, String processDefinitionId, String businessKey, Map<String, Object> processVariables);
-  
-  /** Delete an existing runtime process instance.
+
+  /**
+   * Delete an existing runtime process instance.
+   *
    * @param processInstanceId id of process instance to delete, cannot be null.
    * @param deleteReason reason for deleting, which will be stored in the history. Can be null.
-   * @throws BadUserRequestException when no process instance is found with the given id or id is null.
+   *
+   * @throws BadUserRequestException
+   *          when no process instance is found with the given id or id is null.
+   * @throws AuthorizationException
+   *          if the user has no {@link Permissions#DELETE} permission on {@link Resources#PROCESS_INSTANCE}
+   *          or no {@link Permissions#DELETE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   void deleteProcessInstance(String processInstanceId, String deleteReason);
 
-  /** Delete an existing runtime process instance.
+  /**
+   * Delete an existing runtime process instance.
+   *
    * @param processInstanceId id of process instance to delete, cannot be null.
    * @param deleteReason reason for deleting, which will be stored in the history. Can be null.
    * @param skipCustomListeners if true, only the built-in {@link ExecutionListener}s
    * are notified with the {@link ExecutionListener#EVENTNAME_END} event.
-   * @throws BadUserRequestException when no process instance is found with the given id or id is null.
+   *
+   * @throws BadUserRequestException
+   *          when no process instance is found with the given id or id is null.
+   * @throws AuthorizationException
+   *          if the user has no {@link Permissions#DELETE} permission on {@link Resources#PROCESS_INSTANCE}
+   *          or no {@link Permissions#DELETE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   void deleteProcessInstance(String processInstanceId, String deleteReason, boolean skipCustomListeners);
 
-  /** Finds the activity ids for all executions that are waiting in activities.
+  /**
+   * Finds the activity ids for all executions that are waiting in activities.
    * This is a list because a single activity can be active multiple times.
+   *
    * @param executionId id of the process instance or the execution, cannot be null.
-   * @throws ProcessEngineException when no execution exists with the given executionId.
+   *
+   * @throws ProcessEngineException
+   *          when no execution exists with the given executionId.
+   * @throws AuthorizationException
+   *          if the user has no {@link Permissions#READ} permission on {@link Resources#PROCESS_INSTANCE}
+   *          or no {@link Permissions#READ_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   List<String> getActiveActivityIds(String executionId);
 
@@ -522,25 +643,39 @@ public interface RuntimeService {
    * use the activity instance tree as opposed to the execution tree.</strong></p>
    *
    * @param processInstanceId the id of the process instance for which the activity instance tree should be constructed.
+   *
    * @return the activity instance tree for a given process instance or null if no such process instance exists.
-   * @throws ProcessEngineException if processInstanceId is 'null' or an internal error occurs.
+   *
+   * @throws ProcessEngineException
+   *          if processInstanceId is 'null' or an internal error occurs.
+   * @throws AuthorizationException
+   *          if the user has no {@link Permissions#READ} permission on {@link Resources#PROCESS_INSTANCE}
+   *          or no {@link Permissions#READ_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
    *
    * @since 7.0
    */
   ActivityInstance getActivityInstance(String processInstanceId);
 
-  /** Sends an external trigger to an activity instance that is waiting inside the given execution.
+  /**
+   * Sends an external trigger to an activity instance that is waiting inside the given execution.
    *
    * Note that you need to provide the exact execution that is waiting for the signal
    * if the process instance contains multiple executions.
    *
    * @param executionId id of process instance or execution to signal, cannot be null.
-   * @throws BadUserRequestException when no execution is found for the given executionId or id is null.
-   * @throws SuspendedEntityInteractionException when the execution is suspended.
+   *
+   * @throws BadUserRequestException
+   *          when no execution is found for the given executionId or id is null.
+   * @throws SuspendedEntityInteractionException
+   *          when the execution is suspended.
+   * @throws AuthorizationException
+   *          if the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
+   *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   void signal(String executionId);
 
-  /** Sends an external trigger to an activity instance that is waiting inside the given execution.
+  /**
+   * Sends an external trigger to an activity instance that is waiting inside the given execution.
    *
    * Note that you need to provide the exact execution that is waiting for the signal
    * if the process instance contains multiple executions.
@@ -549,215 +684,371 @@ public interface RuntimeService {
    * @param signalName name of the signal (can be null)
    * @param signalData additional data of the signal (can be null)
    * @param processVariables a map of process variables (can be null)
-   * @throws ProcessEngineException when no execution is found for the given executionId.
+   *
+   * @throws ProcessEngineException
+   *          when no execution is found for the given executionId.
+   * @throws AuthorizationException
+   *          if the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
+   *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   void signal(String executionId, String signalName, Object signalData, Map<String, Object> processVariables);
 
- /** Sends an external trigger to an activity instance that is waiting inside the given execution.
+  /**
+   * Sends an external trigger to an activity instance that is waiting inside the given execution.
    *
    * Note that you need to provide the exact execution that is waiting for the signal
    * if the process instance contains multiple executions.
    *
    * @param executionId id of process instance or execution to signal, cannot be null.
    * @param processVariables a map of process variables
-   * @throws BadUserRequestException when no execution is found for the given executionId or id is null.
-   * @throws SuspendedEntityInteractionException when the execution is suspended.
+   *
+   * @throws BadUserRequestException
+   *          when no execution is found for the given executionId or id is null.
+   * @throws SuspendedEntityInteractionException
+   *          when the execution is suspended.
+   * @throws AuthorizationException
+   *          if the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
+   *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   void signal(String executionId, Map<String, Object> processVariables);
 
   // Variables ////////////////////////////////////////////////////////////////////
 
-  /** All variables visible from the given execution scope (including parent scopes).
+  /**
+   * All variables visible from the given execution scope (including parent scopes).
+   *
    * @param executionId id of process instance or execution, cannot be null.
+   *
    * @return the variables or an empty map if no such variables are found.
-   * @throws ProcessEngineException when no execution is found for the given executionId. */
+   *
+   * @throws ProcessEngineException
+   *          when no execution is found for the given executionId.
+   */
   Map<String, Object> getVariables(String executionId);
 
-  /** All variables visible from the given execution scope (including parent scopes).
+  /**
+   * All variables visible from the given execution scope (including parent scopes).
+   *
    * @param executionId id of process instance or execution, cannot be null.
+   *
    * @return the variables or an empty map if no such variables are found.
-   * @throws ProcessEngineException when no execution is found for the given executionId.
-   * @since 7.2 */
+   *
+   * @throws ProcessEngineException
+   *          when no execution is found for the given executionId.
+   *
+   * @since 7.2
+   *
+   */
   VariableMap getVariablesTyped(String executionId);
 
-  /** All variables visible from the given execution scope (including parent scopes).
+  /**
+   * All variables visible from the given execution scope (including parent scopes).
+   *
    * @param executionId id of process instance or execution, cannot be null.
    * @param deserializeValues if false, {@link SerializableValue}s will not be deserialized
+   *
    * @return the variables or an empty map if no such variables are found.
-   * @throws ProcessEngineException when no execution is found for the given executionId.
-   * @since 7.2 */
+   *
+   * @throws ProcessEngineException
+   *          when no execution is found for the given executionId.
+   *
+   * @since 7.2
+   *
+   */
   VariableMap getVariablesTyped(String executionId, boolean deserializeValues);
 
-  /** All variable values that are defined in the execution scope, without taking outer scopes into account.
+  /**
+   * All variable values that are defined in the execution scope, without taking outer scopes into account.
    * If you have many task local variables and you only need a few, consider using {@link #getVariablesLocal(String, Collection)}
    * for better performance.
    * @param executionId id of execution, cannot be null.
+   *
    * @return the variables or an empty map if no such variables are found.
-   * @throws ProcessEngineException when no execution is found for the given executionId. */
+   *
+   * @throws ProcessEngineException
+   *          when no execution is found for the given executionId.
+   */
   Map<String, Object> getVariablesLocal(String executionId);
 
-  /** All variable values that are defined in the execution scope, without taking outer scopes into account.
+  /**
+   * All variable values that are defined in the execution scope, without taking outer scopes into account.
    * If you have many task local variables and you only need a few, consider using {@link #getVariablesLocal(String, Collection)}
    * for better performance.
+   *
    * @param executionId id of execution, cannot be null.
+   *
    * @return the variables or an empty map if no such variables are found.
-   * @throws ProcessEngineException when no execution is found for the given executionId. */
+   *
+   * @throws ProcessEngineException
+   *          when no execution is found for the given executionId.
+   */
   VariableMap getVariablesLocalTyped(String executionId);
 
-  /** All variable values that are defined in the execution scope, without taking outer scopes into account.
+  /**
+   * All variable values that are defined in the execution scope, without taking outer scopes into account.
    * If you have many task local variables and you only need a few, consider using {@link #getVariablesLocal(String, Collection)}
    * for better performance.
+   *
    * @param executionId id of execution, cannot be null.
    * @param deserializeObjectValues if false, {@link SerializableValue}s will not be deserialized
+   *
    * @return the variables or an empty map if no such variables are found.
-   * @throws ProcessEngineException when no execution is found for the given executionId.
-   * @since 7.2 */
+   *
+   * @throws ProcessEngineException
+   *          when no execution is found for the given executionId.
+   *
+   * @since 7.2
+   */
   VariableMap getVariablesLocalTyped(String executionId, boolean deserializeValues);
 
-   /** The variable values for all given variableNames, takes all variables into account which are visible from the given execution scope (including parent scopes).
+  /**
+   * The variable values for all given variableNames, takes all variables into account which are visible from the given execution scope (including parent scopes).
+   *
    * @param executionId id of process instance or execution, cannot be null.
    * @param variableNames the collection of variable names that should be retrieved.
+   *
    * @return the variables or an empty map if no such variables are found.
-   * @throws ProcessEngineException when no execution is found for the given executionId. */
+   *
+   * @throws ProcessEngineException
+   *          when no execution is found for the given executionId.
+   */
   Map<String,Object> getVariables(String executionId, Collection<String> variableNames);
 
-  /** The variable values for all given variableNames, takes all variables into account which are visible from the given execution scope (including parent scopes).
-  * @param executionId id of process instance or execution, cannot be null.
-  * @param variableNames the collection of variable names that should be retrieved.
-  * @param deserializeObjectValues if false, {@link SerializableValue}s will not be deserialized
-  * @return the variables or an empty map if no such variables are found.
-  * @throws ProcessEngineException when no execution is found for the given executionId.
-  * @since 7.2 */
+  /**
+   * The variable values for all given variableNames, takes all variables into account which are visible from the given execution scope (including parent scopes).
+   * @param executionId id of process instance or execution, cannot be null.
+   * @param variableNames the collection of variable names that should be retrieved.
+   * @param deserializeObjectValues if false, {@link SerializableValue}s will not be deserialized
+   *
+   * @return the variables or an empty map if no such variables are found.
+   *
+   * @throws ProcessEngineException
+   *          when no execution is found for the given executionId.
+   *
+   * @since 7.2
+   *
+   */
   VariableMap getVariablesTyped(String executionId, Collection<String> variableNames, boolean deserializeValues);
 
-   /** The variable values for the given variableNames only taking the given execution scope into account, not looking in outer scopes.
+  /**
+   * The variable values for the given variableNames only taking the given execution scope into account, not looking in outer scopes.
+   *
    * @param executionId id of execution, cannot be null.
    * @param variableNames the collection of variable names that should be retrieved.
+   *
    * @return the variables or an empty map if no such variables are found.
-   * @throws ProcessEngineException when no execution is found for the given executionId.  */
+   *
+   * @throws ProcessEngineException
+   *          when no execution is found for the given executionId.
+   */
   Map<String,Object> getVariablesLocal(String executionId, Collection<String> variableNames);
 
-  /** The variable values for the given variableNames only taking the given execution scope into account, not looking in outer scopes.
-  * @param executionId id of execution, cannot be null.
-  * @param variableNames the collection of variable names that should be retrieved.
-  * @param deserializeObjectValues if false, {@link SerializableValue}s will not be deserialized
-  * @return the variables or an empty map if no such variables are found.
-  * @throws ProcessEngineException when no execution is found for the given executionId.
-  * @since 7.2 */
+  /**
+   * The variable values for the given variableNames only taking the given execution scope into account, not looking in outer scopes.
+   * @param executionId id of execution, cannot be null.
+   * @param variableNames the collection of variable names that should be retrieved.
+   * @param deserializeObjectValues if false, {@link SerializableValue}s will not be deserialized
+   *
+   * @return the variables or an empty map if no such variables are found.
+   *
+   * @throws ProcessEngineException
+   *          when no execution is found for the given executionId.
+   *
+   * @since 7.2
+   *
+   */
   VariableMap getVariablesLocalTyped(String executionId, Collection<String> variableNames, boolean deserializeValues);
 
-  /** The variable value.  Searching for the variable is done in all scopes that are visible to the given execution (including parent scopes).
+  /**
+   * The variable value.  Searching for the variable is done in all scopes that are visible to the given execution (including parent scopes).
    * Returns null when no variable value is found with the given name or when the value is set to null.
+   *
    * @param executionId id of process instance or execution, cannot be null.
    * @param variableName name of variable, cannot be null.
+   *
    * @return the variable value or null if the variable is undefined or the value of the variable is null.
-   * @throws ProcessEngineException when no execution is found for the given executionId. */
+   *
+   * @throws ProcessEngineException
+   *          when no execution is found for the given executionId.
+   */
   Object getVariable(String executionId, String variableName);
 
-  /** Returns a {@link TypedValue} for the variable. Searching for the variable is done in all scopes that are visible
+  /**
+   * Returns a {@link TypedValue} for the variable. Searching for the variable is done in all scopes that are visible
    * to the given execution (including parent scopes). Returns null when no variable value is found with the given name.
    *
    * @param executionId id of process instance or execution, cannot be null.
    * @param variableName name of variable, cannot be null.
+   *
    * @return the variable value or null if the variable is undefined.
-   * @throws ProcessEngineException when no execution is found for the given executionId.
-   * @since 7.2 */
+   *
+   * @throws ProcessEngineException
+   *          when no execution is found for the given executionId.
+   * @since 7.2
+   *
+   */
   <T extends TypedValue> T getVariableTyped(String executionId, String variableName);
 
-  /** Returns a {@link TypedValue} for the variable. Searching for the variable is done in all scopes that are visible
+  /**
+   * Returns a {@link TypedValue} for the variable. Searching for the variable is done in all scopes that are visible
    * to the given execution (including parent scopes). Returns null when no variable value is found with the given name.
    *
    * @param executionId id of process instance or execution, cannot be null.
    * @param variableName name of variable, cannot be null.
    * @param deserializeValue if false, a {@link SerializableValue} will not be deserialized
+   *
    * @return the variable value or null if the variable is undefined.
-   * @throws ProcessEngineException when no execution is found for the given executionId.
-   * @since 7.2 */
+   *
+   * @throws ProcessEngineException
+   *          when no execution is found for the given executionId.
+   *
+   * @since 7.2
+   *
+   */
   <T extends TypedValue> T getVariableTyped(String executionId, String variableName, boolean deserializeValue);
 
-  /** The variable value for an execution. Returns the value when the variable is set
-   * for the execution (and not searching parent scopes). Returns null when no variable value is found with the given name or when the value is set to null.  */
+  /**
+   * The variable value for an execution. Returns the value when the variable is set
+   * for the execution (and not searching parent scopes). Returns null when no variable value is found with the given name or when the value is set to null.
+   *
+   * @param executionId id of process instance or execution, cannot be null.
+   * @param variableName name of variable, cannot be null.
+   *
+   * @return the variable value or null if the variable is undefined or the value of the variable is null.
+   *
+   * @throws ProcessEngineException
+   *          when no execution is found for the given executionId.
+   */
   Object getVariableLocal(String executionId, String variableName);
 
-  /** Returns a {@link TypedValue} for the variable. Returns the value when the variable is set
+  /**
+   * Returns a {@link TypedValue} for the variable. Returns the value when the variable is set
    * for the execution (and not searching parent scopes). Returns null when no variable value is found with the given name.
    *
    * @param executionId id of process instance or execution, cannot be null.
    * @param variableName name of variable, cannot be null.
+   *
    * @return the variable value or null if the variable is undefined.
-   * @throws ProcessEngineException when no execution is found for the given executionId.
-   * @since 7.2 */
+   *
+   * @throws ProcessEngineException
+   *          when no execution is found for the given executionId.
+   *
+   * @since 7.2
+   *
+   */
   <T extends TypedValue> T getVariableLocalTyped(String executionId, String variableName);
 
-  /** Returns a {@link TypedValue} for the variable. Searching for the variable is done in all scopes that are visible
+  /**
+   * Returns a {@link TypedValue} for the variable. Searching for the variable is done in all scopes that are visible
    * to the given execution (including parent scopes). Returns null when no variable value is found with the given name.
    *
    * @param executionId id of process instance or execution, cannot be null.
    * @param variableName name of variable, cannot be null.
    * @param deserializeValue if false, a {@link SerializableValue} will not be deserialized
+   *
    * @return the variable value or null if the variable is undefined.
-   * @throws ProcessEngineException when no execution is found for the given executionId.
-   * @since 7.2 */
+   *
+   * @throws ProcessEngineException
+   *          when no execution is found for the given executionId.
+   *
+   * @since 7.2
+   *
+   */
   <T extends TypedValue> T getVariableLocalTyped(String executionId, String variableName, boolean deserializeValue);
 
-  /** Update or create a variable for an execution.  If the variable does not already exist
+  /**
+   * Update or create a variable for an execution.  If the variable does not already exist
    * somewhere in the execution hierarchy (i.e. the specified execution or any ancestor),
    * it will be created in the process instance (which is the root execution).
+   *
    * @param executionId id of process instance or execution to set variable in, cannot be null.
    * @param variableName name of variable to set, cannot be null.
    * @param value value to set. When null is passed, the variable is not removed,
    * only it's value will be set to null.
-   * @throws ProcessEngineException when no execution is found for the given executionId.
+   *
+   * @throws ProcessEngineException
+   *          when no execution is found for the given executionId.
    */
   void setVariable(String executionId, String variableName, Object value);
 
-  /** Update or create a variable for an execution (not considering parent scopes).
+  /**
+   * Update or create a variable for an execution (not considering parent scopes).
    * If the variable does not already exist, it will be created in the given execution.
+   *
    * @param executionId id of execution to set variable in, cannot be null.
    * @param variableName name of variable to set, cannot be null.
    * @param value value to set. When null is passed, the variable is not removed,
    * only it's value will be set to null.
-   * @throws ProcessEngineException when no execution is found for the given executionId.  */
+   *
+   * @throws ProcessEngineException
+   *          when no execution is found for the given executionId.
+   */
   void setVariableLocal(String executionId, String variableName, Object value);
 
-  /** Update or create given variables for an execution (including parent scopes). If the variables are not already existing, they will be created in the process instance
+  /**
+   * Update or create given variables for an execution (including parent scopes). If the variables are not already existing, they will be created in the process instance
    * (which is the root execution).
+   *
    * @param executionId id of the process instance or the execution, cannot be null.
    * @param variables map containing name (key) and value of variables, can be null.
-   * @throws ProcessEngineException when no execution is found for the given executionId.  */
+   *
+   * @throws ProcessEngineException
+   *          when no execution is found for the given executionId.
+   */
   void setVariables(String executionId, Map<String, ? extends Object> variables);
 
-  /** Update or create given variables for an execution (not considering parent scopes). If the variables are not already existing, it will be created in the given execution.
+  /**
+   * Update or create given variables for an execution (not considering parent scopes). If the variables are not already existing, it will be created in the given execution.
+   *
    * @param executionId id of the execution, cannot be null.
    * @param variables map containing name (key) and value of variables, can be null.
-   * @throws ProcessEngineException when no execution is found for the given executionId. */
+   *
+   * @throws ProcessEngineException
+   *          when no execution is found for the given executionId.
+   */
   void setVariablesLocal(String executionId, Map<String, ? extends Object> variables);
 
   /**
    * Removes a variable for an execution.
+   *
    * @param executionId id of process instance or execution to remove variable in.
    * @param variableName name of variable to remove.
+   *
+   * @throws ProcessEngineException
+   *          when no execution is found for the given executionId.
    */
   void removeVariable(String executionId, String variableName);
 
   /**
    * Removes a variable for an execution (not considering parent scopes).
+   *
    * @param executionId id of execution to remove variable in.
    * @param variableName name of variable to remove.
+   *
+   * @throws ProcessEngineException
+   *          when no execution is found for the given executionId.
    */
   void removeVariableLocal(String executionId, String variableName);
 
   /**
    * Removes variables for an execution.
+   *
    * @param executionId id of process instance or execution to remove variable in.
    * @param variableNames collection containing name of variables to remove.
+   *
+   * @throws ProcessEngineException
+   *          when no execution is found for the given executionId.
    */
   void removeVariables(String executionId, Collection<String> variableNames);
 
   /**
    * Remove variables for an execution (not considering parent scopes).
+   *
    * @param executionId id of execution to remove variable in.
    * @param variableNames collection containing name of variables to remove.
+   *
+   * @throws ProcessEngineException
+   *          when no execution is found for the given executionId.
    */
   void removeVariablesLocal(String executionId, Collection<String> variableNames);
 
@@ -830,7 +1121,11 @@ public interface RuntimeService {
    * one process instance from the hierarchy will not suspend other
    * process instances from that hierarchy.</p>
    *
-   *  @throws ProcessEngineException if no such processInstance can be found.
+   * @throws ProcessEngineException
+   *          if no such processInstance can be found.
+   * @throws AuthorizationException
+   *          if the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
+   *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   void suspendProcessInstanceById(String processInstanceId);
 
@@ -859,7 +1154,10 @@ public interface RuntimeService {
    * one process instance from the hierarchy will not suspend other
    * process instances from that hierarchy.</p>
    *
-   *  @throws ProcessEngineException if no such processInstance can be found.
+   * @throws ProcessEngineException
+   *          if no such processInstance can be found.
+   * @throws AuthorizationException
+   *          if the user has no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   void suspendProcessInstanceByProcessDefinitionId(String processDefinitionId);
 
@@ -888,7 +1186,10 @@ public interface RuntimeService {
    * one process instance from the hierarchy will not suspend other
    * process instances from that hierarchy.</p>
    *
-   *  @throws ProcessEngineException if no such processInstance can be found.
+   * @throws ProcessEngineException
+   *          if no such processInstance can be found.
+   * @throws AuthorizationException
+   *          if the user has no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   void suspendProcessInstanceByProcessDefinitionKey(String processDefinitionKey);
 
@@ -899,7 +1200,11 @@ public interface RuntimeService {
    * one process instance from the hierarchy will not activate other
    * process instances from that hierarchy.</p>
    *
-   * @throws ProcessEngineException if no such processInstance can be found.
+   * @throws ProcessEngineException
+   *          if no such processInstance can be found.
+   * @throws AuthorizationException
+   *          if the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
+   *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   void activateProcessInstanceById(String processInstanceId);
 
@@ -910,7 +1215,10 @@ public interface RuntimeService {
    * one process instance from the hierarchy will not activate other
    * process instances from that hierarchy.</p>
    *
-   * @throws ProcessEngineException if the process definition id is null
+   * @throws ProcessEngineException
+   *          if the process definition id is null
+   * @throws AuthorizationException
+   *          if the user has no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   void activateProcessInstanceByProcessDefinitionId(String processDefinitionId);
 
@@ -921,7 +1229,10 @@ public interface RuntimeService {
    * one process instance from the hierarchy will not activate other
    * process instances from that hierarchy.</p>
    *
-   * @throws ProcessEngineException if the process definition id is null
+   * @throws ProcessEngineException
+   *          if the process definition id is null
+   * @throws AuthorizationException
+   *          if the user has no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   void activateProcessInstanceByProcessDefinitionKey(String processDefinitionKey);
 
@@ -936,6 +1247,10 @@ public interface RuntimeService {
    *
    * @param signalName
    *          the name of the signal event
+   *
+   * @throws AuthorizationException
+   *          if the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
+   *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   void signalEventReceived(String signalName);
 
@@ -950,6 +1265,10 @@ public interface RuntimeService {
    *          the name of the signal event
    * @param processVariables
    *          a map of variables added to the execution(s)
+   *
+   * @throws AuthorizationException
+   *          if the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
+   *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   void signalEventReceived(String signalName, Map<String, Object> processVariables);
 
@@ -966,8 +1285,13 @@ public interface RuntimeService {
    *          the name of the signal event
    * @param executionId
    *          id of the process instance or the execution to deliver the signal to
-   * @throws ProcessEngineException if no such execution exists or if the execution
+   *
+   * @throws ProcessEngineException
+   *          if no such execution exists or if the execution
    *          has not subscribed to the signal
+   * @throws AuthorizationException
+   *          if the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
+   *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   void signalEventReceived(String signalName, String executionId);
 
@@ -986,8 +1310,13 @@ public interface RuntimeService {
    *          the id of the process instance or the execution to deliver the signal to
    * @param processVariables
    *          a map of variables added to the execution(s)
-   * @throws ProcessEngineException if no such execution exists or if the execution
+   *
+   * @throws ProcessEngineException
+   *          if no such execution exists or if the execution
    *          has not subscribed to the signal
+   * @throws AuthorizationException
+   *          if the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
+   *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   void signalEventReceived(String signalName, String executionId, Map<String, Object> processVariables);
 
@@ -1004,8 +1333,13 @@ public interface RuntimeService {
    *          the name of the message event
    * @param executionId
    *          the id of the process instance or the execution to deliver the message to
-   * @throws ProcessEngineException if no such execution exists or if the execution
+   *
+   * @throws ProcessEngineException
+   *          if no such execution exists or if the execution
    *          has not subscribed to the signal
+   * @throws AuthorizationException
+   *          if the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
+   *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   void messageEventReceived(String messageName, String executionId);
 
@@ -1024,8 +1358,13 @@ public interface RuntimeService {
    *          the id of the process instance or the execution to deliver the message to
    * @param processVariables
    *          a map of variables added to the execution
-   * @throws ProcessEngineException if no such execution exists or if the execution
+   *
+   * @throws ProcessEngineException
+   *          if no such execution exists or if the execution
    *          has not subscribed to the signal
+   * @throws AuthorizationException
+   *          if the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
+   *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   void messageEventReceived(String messageName, String executionId, Map<String, Object> processVariables);
 
@@ -1048,8 +1387,14 @@ public interface RuntimeService {
    *
    * @param messageName
    *          the name of the message event; if null, matches any event
-   * @throws MismatchingMessageCorrelationException if none or more than one execution or process definition is correlated
-   * @throws ProcessEngineException if messageName is null
+   *
+   * @throws MismatchingMessageCorrelationException
+   *          if none or more than one execution or process definition is correlated
+   * @throws ProcessEngineException
+   *          if messageName is null
+   * @throws AuthorizationException
+   *          if the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
+   *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   void correlateMessage(String messageName);
 
@@ -1070,8 +1415,14 @@ public interface RuntimeService {
    *          the name of the message event; if null, matches any event
    * @param businessKey
    *          the business key of process instances to correlate against
-   * @throws MismatchingMessageCorrelationException if none or more than one execution or process definition is correlated
-   * @throws ProcessEngineException if messageName is null and businessKey is null
+   *
+   * @throws MismatchingMessageCorrelationException
+   *          if none or more than one execution or process definition is correlated
+   * @throws ProcessEngineException
+   *          if messageName is null and businessKey is null
+   * @throws AuthorizationException
+   *          if the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
+   *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   void correlateMessage(String messageName, String businessKey);
 
@@ -1093,8 +1444,14 @@ public interface RuntimeService {
    *          the name of the message event; if null, matches any event
    * @param correlationKeys
    *          a map of key value pairs that are used to correlate the message to an execution
-   * @throws MismatchingMessageCorrelationException if none or more than one execution or process definition is correlated
-   * @throws ProcessEngineException if messageName is null and correlationKeys is null
+   *
+   * @throws MismatchingMessageCorrelationException
+   *          if none or more than one execution or process definition is correlated
+   * @throws ProcessEngineException
+   *          if messageName is null and correlationKeys is null
+   * @throws AuthorizationException
+   *          if the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
+   *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   void correlateMessage(String messageName, Map<String, Object> correlationKeys);
 
@@ -1118,8 +1475,14 @@ public interface RuntimeService {
    *          the business key of process instances to correlate against
    * @param processVariables
    *          a map of variables added to the execution or newly created process instance
-   * @throws MismatchingMessageCorrelationException if none or more than one execution or process definition is correlated
-   * @throws ProcessEngineException if messageName is null and businessKey is null
+   *
+   * @throws MismatchingMessageCorrelationException
+   *          if none or more than one execution or process definition is correlated
+   * @throws ProcessEngineException
+   *          if messageName is null and businessKey is null
+   * @throws AuthorizationException
+   *          if the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
+   *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   void correlateMessage(String messageName, String businessKey, Map<String, Object> processVariables);
 
@@ -1144,8 +1507,14 @@ public interface RuntimeService {
    *          a map of key value pairs that are used to correlate the message to an execution
    * @param processVariables
    *          a map of variables added to the execution or newly created process instance
-   * @throws MismatchingMessageCorrelationException if none or more than one execution or process definition is correlated
-   * @throws ProcessEngineException if messageName is null and correlationKeys is null
+   *
+   * @throws MismatchingMessageCorrelationException
+   *          if none or more than one execution or process definition is correlated
+   * @throws ProcessEngineException
+   *          if messageName is null and correlationKeys is null
+   * @throws AuthorizationException
+   *          if the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
+   *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   void correlateMessage(String messageName, Map<String, Object> correlationKeys, Map<String, Object> processVariables);
 
@@ -1173,8 +1542,14 @@ public interface RuntimeService {
    *          a map of key value pairs that are used to correlate the message to an execution
    * @param processVariables
    *          a map of variables added to the execution or newly created process instance
-   * @throws MismatchingMessageCorrelationException if none or more than one execution or process definition is correlated
-   * @throws ProcessEngineException if messageName is null and businessKey is null and correlationKeys is null
+   *
+   * @throws MismatchingMessageCorrelationException
+   *          if none or more than one execution or process definition is correlated
+   * @throws ProcessEngineException
+   *          if messageName is null and businessKey is null and correlationKeys is null
+   * @throws AuthorizationException
+   *          if the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
+   *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   void correlateMessage(String messageName, String businessKey, Map<String, Object> correlationKeys, Map<String, Object> processVariables);
 

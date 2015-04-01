@@ -276,18 +276,22 @@ public class ExecutionEntity extends PvmExecutionImpl implements
   @SuppressWarnings("unchecked")
   public ExecutionEntity createSubProcessInstance(PvmProcessDefinition processDefinition, String businessKey, String caseInstanceId) {
     ActivityImpl initial = (ActivityImpl) processDefinition.getInitial();
-    ExecutionEntity subProcessInstance = newExecution(initial);
+    ExecutionEntity subProcessInstance = createExecution(initial);
     subProcessInstance.setActivity(initial);
 
     shouldQueryForSubprocessInstance = true;
 
+    // Initialize the new execution
+    subProcessInstance.setProcessDefinition((ProcessDefinitionImpl) processDefinition);
+
+    // persist sub process instance
+    subProcessInstance.insert();
+
+    subProcessInstance.setProcessInstance(subProcessInstance);
+
     // manage bidirectional super-subprocess relation
     subProcessInstance.setSuperExecution(this);
     this.setSubProcessInstance(subProcessInstance);
-
-    // Initialize the new execution
-    subProcessInstance.setProcessDefinition((ProcessDefinitionImpl) processDefinition);
-    subProcessInstance.setProcessInstance(subProcessInstance);
 
     // create event subscriptions for the current scope
     for (EventSubscriptionDeclaration declaration : EventSubscriptionDeclaration.getDeclarationsForScope(subProcessInstance.getScopeActivity())) {
@@ -316,16 +320,17 @@ public class ExecutionEntity extends PvmExecutionImpl implements
     return subProcessInstance;
   }
 
-  protected ExecutionEntity newExecution(ActivityImpl activity) {
+  protected ExecutionEntity createExecution(ActivityImpl activity) {
     ExecutionEntity newExecution = new ExecutionEntity(activity);
-
     initializeAssociations(newExecution);
 
-    Context
-      .getCommandContext()
-      .getExecutionManager()
-      .insertExecution(newExecution);
+    return newExecution;
+  }
 
+
+  protected ExecutionEntity newExecution(ActivityImpl activity) {
+    ExecutionEntity newExecution = createExecution(activity);
+    newExecution.insert();
     return newExecution;
   }
 
@@ -926,8 +931,8 @@ public class ExecutionEntity extends PvmExecutionImpl implements
 
     // finally delete this execution
     Context.getCommandContext()
-      .getDbEntityManager()
-      .delete(this);
+      .getExecutionManager()
+      .deleteExecution(this);
   }
 
   public void interruptScope(String reason) {
@@ -1200,8 +1205,8 @@ public class ExecutionEntity extends PvmExecutionImpl implements
   public void insert() {
     Context
       .getCommandContext()
-      .getDbEntityManager()
-      .insert(this);
+      .getExecutionManager()
+      .insertExecution(this);
   }
 
   public void deleteCascade2(String deleteReason) {

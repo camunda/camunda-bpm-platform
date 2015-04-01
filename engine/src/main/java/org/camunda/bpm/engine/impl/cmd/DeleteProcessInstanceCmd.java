@@ -12,12 +12,18 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 import java.io.Serializable;
+import java.util.concurrent.Callable;
 
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionManager;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 
 
@@ -38,14 +44,28 @@ public class DeleteProcessInstanceCmd implements Command<Void>, Serializable {
   }
 
   public Void execute(CommandContext commandContext) {
-    if(processInstanceId == null) {
-      throw new BadUserRequestException("processInstanceId is null");
-    }
+    ensureNotNull(BadUserRequestException.class, "processInstanceId is null", "processInstanceId", processInstanceId);
 
+    // fetch process instance
+    final ExecutionManager executionManager = commandContext.getExecutionManager();
+    ExecutionEntity execution = commandContext.runWithoutAuthentication(new Callable<ExecutionEntity>() {
+      public ExecutionEntity call() throws Exception {
+        return executionManager.findExecutionById(processInstanceId);
+      }
+    });
+
+    ensureNotNull(BadUserRequestException.class, "No process instance found for id '" + processInstanceId + "'", "processInstance", execution);
+
+    // check authorization
+    AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
+    authorizationManager.checkDeleteProcessInstance(execution);
+
+    // delete process instance
     commandContext
       .getExecutionManager()
       .deleteProcessInstance(processInstanceId, deleteReason, false, skipCustomListeners);
 
+    // create user operation log
     commandContext.getOperationLogManager()
       .logProcessInstanceOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE, processInstanceId,
           null, null, PropertyChange.EMPTY_CHANGE);

@@ -70,8 +70,8 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
   );
 
   protected ProcessEngine processEngine;
-
   protected ThreadLogMode threadRenderingMode = DEFAULT_THREAD_LOG_MODE;
+
   protected String deploymentId;
   protected Throwable exception;
 
@@ -128,6 +128,7 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
 
       // Can't do this in the teardown, as the teardown will be called as part of the super.runBare
       closeDownProcessEngine();
+      clearServiceReferences();
     }
   }
 
@@ -189,6 +190,20 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
     authorizationService = processEngine.getAuthorizationService();
     caseService = processEngine.getCaseService();
     filterService = processEngine.getFilterService();
+  }
+
+  protected void clearServiceReferences() {
+    processEngineConfiguration = null;
+    repositoryService = null;
+    runtimeService = null;
+    taskService = null;
+    formService = null;
+    historyService = null;
+    identityService = null;
+    managementService = null;
+    authorizationService = null;
+    caseService = null;
+    filterService = null;
   }
 
   public void assertProcessEnded(final String processInstanceId) {

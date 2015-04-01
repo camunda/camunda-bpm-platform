@@ -56,7 +56,19 @@ public enum Permissions implements Permission {
   READ_TASK("READ_TASKS", 64),
 
   /** Indicates that UPDATE_TASK interactions are permitted. */
-  UPDATE_TASK("UPDATE_TASKS", 128);
+  UPDATE_TASK("UPDATE_TASKS", 128),
+
+  /** Indicates that CREATE_INSTANCE interactions are permitted. */
+  CREATE_INSTANCE("CREATE_INSTANCE", 256),
+
+  /** Indicates that READ_INSTANCE interactions are permitted. */
+  READ_INSTANCE("READ_INSTANCE", 512),
+
+  /** Indicates that UPDATE_INSTANCE interactions are permitted. */
+  UPDATE_INSTANCE("UPDATE_INSTANCE", 1024),
+
+  /** Indicates that DELETE_INSTANCE interactions are permitted. */
+  DELETE_INSTANCE("DELETE_INSTANCE", 2048);
 
   // 10 additional (32 ... 16384(=2^14)) are reserved
 

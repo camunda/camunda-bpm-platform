@@ -13,18 +13,22 @@
 
 package org.camunda.bpm.engine.impl.cmd;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNumberOfElements;
+
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.camunda.bpm.engine.ProcessEngineException;
+import java.util.concurrent.Callable;
+
 import org.camunda.bpm.engine.impl.event.MessageEventHandler;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
-
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNumberOfElements;
+import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionManager;
 
 
 /**
@@ -49,23 +53,39 @@ public class MessageEventReceivedCmd implements Command<Void>, Serializable {
   public Void execute(CommandContext commandContext) {
     ensureNotNull("executionId", executionId);
 
-    List<EventSubscriptionEntity> eventSubscriptions = null;
+    final EventSubscriptionManager eventSubscriptionManager = commandContext.getEventSubscriptionManager();
+    Callable<List<EventSubscriptionEntity>> callableWithoutAuthoriatzion = null;
     if (messageName != null) {
-      eventSubscriptions = commandContext.getEventSubscriptionManager()
-          .findEventSubscriptionsByNameAndExecution(MessageEventHandler.EVENT_HANDLER_TYPE, messageName, executionId);
+
+      callableWithoutAuthoriatzion = new Callable<List<EventSubscriptionEntity>>() {
+        public List<EventSubscriptionEntity> call() throws Exception {
+          return eventSubscriptionManager
+              .findEventSubscriptionsByNameAndExecution(MessageEventHandler.EVENT_HANDLER_TYPE, messageName, executionId);
+        }
+      };
+
     } else {
-      eventSubscriptions = commandContext.getEventSubscriptionManager()
-          .findEventSubscriptionsByExecutionAndType(executionId, MessageEventHandler.EVENT_HANDLER_TYPE);
+
+      callableWithoutAuthoriatzion = new Callable<List<EventSubscriptionEntity>>() {
+        public List<EventSubscriptionEntity> call() throws Exception {
+          return eventSubscriptionManager
+              .findEventSubscriptionsByExecutionAndType(executionId, MessageEventHandler.EVENT_HANDLER_TYPE);
+        }
+      };
+
     }
 
-    if (eventSubscriptions.isEmpty()) {
-      throw new ProcessEngineException("Execution with id '" + executionId + "' does not have a subscription to a message event with name '" + messageName + "'");
-    }
-    ensureNumberOfElements("More than one matching message subscription found for execution " + executionId,
-        "eventSubscriptions", eventSubscriptions, 1);
+    List<EventSubscriptionEntity> eventSubscriptions = commandContext.runWithoutAuthentication(callableWithoutAuthoriatzion);
+    ensureNotEmpty("Execution with id '" + executionId + "' does not have a subscription to a message event with name '" + messageName + "'", "eventSubscriptions", eventSubscriptions);
+    ensureNumberOfElements("More than one matching message subscription found for execution " + executionId, "eventSubscriptions", eventSubscriptions, 1);
 
     // there can be only one:
     EventSubscriptionEntity eventSubscriptionEntity = eventSubscriptions.get(0);
+
+    // check authorization
+    String processInstanceId = eventSubscriptionEntity.getProcessInstanceId();
+    AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
+    authorizationManager.checkUpdateProcessInstanceById(processInstanceId);
 
     HashMap<String, Object> payload = null;
     if (processVariables != null) {

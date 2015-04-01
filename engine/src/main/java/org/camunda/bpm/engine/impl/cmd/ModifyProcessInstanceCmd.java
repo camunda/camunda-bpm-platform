@@ -13,11 +13,15 @@
 package org.camunda.bpm.engine.impl.cmd;
 
 
+import java.util.concurrent.Callable;
+
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.ProcessInstanceModificationBuilderImpl;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionManager;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 
 /**
@@ -33,7 +37,17 @@ public class ModifyProcessInstanceCmd implements Command<Void> {
   }
 
   public Void execute(CommandContext commandContext) {
-    String processInstanceId = builder.getProcessInstanceId();
+    final String processInstanceId = builder.getProcessInstanceId();
+
+    final ExecutionManager executionManager = commandContext.getExecutionManager();
+    ExecutionEntity processInstance = commandContext.runWithoutAuthentication(new Callable<ExecutionEntity>() {
+      public ExecutionEntity call() throws Exception {
+        return executionManager.findExecutionById(processInstanceId);
+      }
+    });
+
+    AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
+    authorizationManager.checkUpdateProcessInstance(processInstance);
 
     for (AbstractProcessInstanceModificationCommand instruction : builder.getModificationOperations()) {
       instruction.setSkipCustomListeners(builder.isSkipCustomListeners());
@@ -41,8 +55,15 @@ public class ModifyProcessInstanceCmd implements Command<Void> {
       instruction.execute(commandContext);
     }
 
-    ExecutionEntity processInstance = commandContext.getExecutionManager().findExecutionById(processInstanceId);
+
+    processInstance = commandContext.runWithoutAuthentication(new Callable<ExecutionEntity>() {
+      public ExecutionEntity call() throws Exception {
+        return executionManager.findExecutionById(processInstanceId);
+      }
+    });
+
     if (processInstance.getExecutions().isEmpty() && processInstance.getActivity() == null) {
+      authorizationManager.checkDeleteProcessInstance(processInstance);
       processInstance.deleteCascade("Cancellation due to process instance modification", builder.isSkipCustomListeners(), builder.isSkipIoMappings());
     }
 

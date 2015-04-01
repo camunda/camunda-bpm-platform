@@ -13,7 +13,10 @@
 
 package org.camunda.bpm.engine.impl.cmd;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 import java.util.Map;
+import java.util.concurrent.Callable;
 
 import org.camunda.bpm.engine.impl.bpmn.parser.EventSubscriptionDeclaration;
 import org.camunda.bpm.engine.impl.context.Context;
@@ -21,11 +24,11 @@ import org.camunda.bpm.engine.impl.event.MessageEventHandler;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
+import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 /**
  * Command to start a process instance by message.
@@ -50,31 +53,30 @@ public class StartProcessInstanceByMessageAndProcessDefinitionIdCmd implements C
     this.processDefinitionId = processDefinitionId;
   }
 
-  public ProcessInstance execute(CommandContext commandContext) {
+  public ProcessInstance execute(final CommandContext commandContext) {
     ensureNotNull("Cannot start process instance by message and process definition id", "messageName", messageName);
     ensureNotNull("Cannot start process instance by message and process definition id", "processDefinitionId", processDefinitionId);
 
-    DeploymentCache deploymentCache = Context
-      .getProcessEngineConfiguration()
-      .getDeploymentCache();
-
-    ProcessDefinitionEntity processDefinition = deploymentCache.findDeployedProcessDefinitionById(processDefinitionId);
+    ProcessDefinitionEntity processDefinition = commandContext.runWithoutAuthentication(new Callable<ProcessDefinitionEntity>() {
+      public ProcessDefinitionEntity call() throws Exception {
+        DeploymentCache deploymentCache = Context
+            .getProcessEngineConfiguration()
+            .getDeploymentCache();
+        return deploymentCache.findDeployedProcessDefinitionById(processDefinitionId);
+      }
+    });
     ensureNotNull("No process definition found for id '" + processDefinitionId + "'", "processDefinition", processDefinition);
+
+    // check authorization
+    AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
+    authorizationManager.checkCreateProcessInstance(processDefinition);
 
     String activityId = findStartActivityIdByMessage(processDefinition);
     ensureNotNull("Cannot start process instance by message: no message start event with name '" + messageName + "' found for process definition with id '" + processDefinitionId + "'", "activityId", activityId);
 
-
-
     ActivityImpl startActivity = processDefinition.findActivity(activityId);
     ExecutionEntity processInstance = processDefinition.createProcessInstance(businessKey, startActivity);
-
-    if (processVariables != null) {
-      processInstance.setVariables(processVariables);
-    }
-
-    processInstance.start();
-
+    processInstance.start(processVariables);
     return processInstance;
   }
 

@@ -13,8 +13,11 @@
 
 package org.camunda.bpm.engine.impl.cmd;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureAtLeastOneNotNull;
+
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
 
 import org.camunda.bpm.engine.impl.MessageCorrelationBuilderImpl;
 import org.camunda.bpm.engine.impl.context.Context;
@@ -22,8 +25,6 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.runtime.CorrelationHandler;
 import org.camunda.bpm.engine.impl.runtime.CorrelationSet;
 import org.camunda.bpm.engine.impl.runtime.MessageCorrelationResult;
-
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureAtLeastOneNotNull;
 
 /**
  * @author Thorben Lindhauer
@@ -46,17 +47,22 @@ public class CorrelateAllMessageCmd extends AbstractCorrelateMessageCmd {
     super(messageCorrelationBuilderImpl);
   }
 
-  public Void execute(CommandContext commandContext) {
+  public Void execute(final CommandContext commandContext) {
     ensureAtLeastOneNotNull("At least one of the following correlation criteria has to be present: "
         + "messageName, businessKey, correlationKeys, processInstanceId", messageName, businessKey, correlationKeys, processInstanceId);
 
-    CorrelationHandler correlationHandler = Context
-      .getProcessEngineConfiguration()
-      .getCorrelationHandler();
+    final CorrelationHandler correlationHandler = Context.getProcessEngineConfiguration().getCorrelationHandler();
+    final CorrelationSet correlationSet = new CorrelationSet(businessKey, processInstanceId, correlationKeys);
+    List<MessageCorrelationResult> correlationResults = commandContext.runWithoutAuthentication(new Callable<List<MessageCorrelationResult>>() {
+      public List<MessageCorrelationResult> call() throws Exception {
+        return correlationHandler.correlateMessages(commandContext, messageName, correlationSet);
+      }
+    });
 
-    CorrelationSet correlationSet = new CorrelationSet(businessKey, processInstanceId, correlationKeys);
-    List<MessageCorrelationResult> correlationResults = correlationHandler
-      .correlateMessages(commandContext, messageName, correlationSet);
+    // check authorization
+    for (MessageCorrelationResult correlationResult : correlationResults) {
+      checkAuthorization(correlationResult);
+    }
 
     for (MessageCorrelationResult correlationResult : correlationResults) {
       if (MessageCorrelationResult.TYPE_EXECUTION.equals(correlationResult.getResultType())) {

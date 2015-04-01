@@ -16,6 +16,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Callable;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.ActivityExecutionMapping;
@@ -77,7 +78,7 @@ public abstract class AbstractInstantiationCmd extends AbstractProcessInstanceMo
     return variablesLocal;
   }
 
-  public Void execute(CommandContext commandContext) {
+  public Void execute(final CommandContext commandContext) {
     ExecutionEntity processInstance = commandContext.getExecutionManager().findExecutionById(processInstanceId);
     final ProcessDefinitionImpl processDefinition = processInstance.getProcessDefinition();
 
@@ -131,7 +132,12 @@ public abstract class AbstractInstantiationCmd extends AbstractProcessInstanceMo
       scopeExecution = flowScopeExecutions.iterator().next();
     }
     else {
-      ActivityInstance tree = new GetActivityInstanceCmd(processInstanceId).execute(commandContext);
+      ActivityInstance tree = commandContext.runWithoutAuthentication(new Callable<ActivityInstance>() {
+        public ActivityInstance call() throws Exception {
+          return new GetActivityInstanceCmd(processInstanceId).execute(commandContext);
+        }
+      });
+
       ActivityInstance ancestorInstance = findActivityInstance(tree, ancestorActivityInstanceId);
 
       // determine ancestor activity scope execution and activity

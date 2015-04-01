@@ -33,6 +33,7 @@ import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.AbstractQuery;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
@@ -177,6 +178,12 @@ public abstract class AuthorizationTest extends PluggableProcessEngineTestCase {
     return processInstance;
   }
 
+  public void executeAvailableJobs() {
+    disableAuthorization();
+    super.executeAvailableJobs();
+    enableAuthorization();
+  }
+
   protected CaseInstance createCaseInstanceByKey(String key) {
     return createCaseInstanceByKey(key, null);
   }
@@ -230,6 +237,67 @@ public abstract class AuthorizationTest extends PluggableProcessEngineTestCase {
     Task task = taskService.createTaskQuery().singleResult();
     enableAuthorization();
     return task;
+  }
+
+  protected void setTaskVariable(String taskId, String name, Object value) {
+    disableAuthorization();
+    taskService.setVariable(taskId, name, value);
+    enableAuthorization();
+  }
+
+  protected void setTaskVariableLocal(String taskId, String name, Object value) {
+    disableAuthorization();
+    taskService.setVariableLocal(taskId, name, value);
+    enableAuthorization();
+  }
+
+  protected void setExecutionVariable(String executionId, String name, Object value) {
+    disableAuthorization();
+    runtimeService.setVariable(executionId, name, value);
+    enableAuthorization();
+  }
+
+  protected void setExecutionVariableLocal(String executionId, String name, Object value) {
+    disableAuthorization();
+    runtimeService.setVariableLocal(executionId, name, value);
+    enableAuthorization();
+  }
+
+  protected void setCaseVariable(String caseExecution, String name, Object value) {
+    disableAuthorization();
+    caseService.setVariable(caseExecution, name, value);
+    enableAuthorization();
+  }
+
+  protected void setCaseVariableLocal(String caseExecution, String name, Object value) {
+    disableAuthorization();
+    caseService.setVariableLocal(caseExecution, name, value);
+    enableAuthorization();
+  }
+
+  protected ProcessDefinition selectProcessDefinitionByKey(String processDefinitionKey) {
+    disableAuthorization();
+    ProcessDefinition definition = repositoryService
+        .createProcessDefinitionQuery()
+        .processDefinitionKey(processDefinitionKey)
+        .singleResult();
+    enableAuthorization();
+    return definition;
+  }
+
+  protected ProcessInstance selectSingleProcessInstance() {
+    disableAuthorization();
+    ProcessInstance instance = runtimeService
+        .createProcessInstanceQuery()
+        .singleResult();
+    enableAuthorization();
+    return instance;
+  }
+
+  protected void suspendProcessInstanceById(String processInstanceId) {
+    disableAuthorization();
+    runtimeService.suspendProcessInstanceById(processInstanceId);
+    enableAuthorization();
   }
 
   // verify query results ////////////////////////////////////////////////////////

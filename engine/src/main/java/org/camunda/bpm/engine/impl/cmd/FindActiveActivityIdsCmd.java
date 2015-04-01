@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -13,13 +13,17 @@
 
 package org.camunda.bpm.engine.impl.cmd;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 import java.io.Serializable;
 import java.util.List;
+import java.util.concurrent.Callable;
+
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
-
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionManager;
 
 
 /**
@@ -29,20 +33,28 @@ public class FindActiveActivityIdsCmd implements Command<List<String>>, Serializ
 
   private static final long serialVersionUID = 1L;
   protected String executionId;
-  
+
   public FindActiveActivityIdsCmd(String executionId) {
     this.executionId = executionId;
   }
 
-  public List<String> execute(CommandContext commandContext) {
+  public List<String> execute(final CommandContext commandContext) {
     ensureNotNull("executionId", executionId);
 
-    ExecutionEntity execution = commandContext
-      .getExecutionManager()
-      .findExecutionById(executionId);
-
+    // fetch execution
+    final ExecutionManager executionManager = commandContext.getExecutionManager();
+    ExecutionEntity execution = commandContext.runWithoutAuthentication(new Callable<ExecutionEntity>() {
+      public ExecutionEntity call() throws Exception {
+        return executionManager.findExecutionById(executionId);
+      }
+    });
     ensureNotNull("execution " + executionId + " doesn't exist", "execution", execution);
 
+    // check authorization
+    AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
+    authorizationManager.checkReadProcessInstance(execution);
+
+    // fetch active activities
     return execution.findActiveActivityIds();
   }
 }

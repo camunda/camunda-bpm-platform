@@ -13,11 +13,13 @@
 package org.camunda.bpm.engine.impl.cmd;
 
 import java.util.Date;
+import java.util.concurrent.Callable;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerChangeProcessDefinitionSuspensionStateJobHandler;
+import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionManager;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
@@ -59,7 +61,26 @@ public abstract class AbstractSetProcessDefinitionStateCmd extends AbstractSetSt
     }
   }
 
-  protected void updateSuspensionState(CommandContext commandContext, SuspensionState suspensionState) {
+  protected void checkAuthorization(CommandContext commandContext) {
+    AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
+    if (processDefinitionId != null) {
+      authorizationManager.checkUpdateProcessDefinitionById(processDefinitionId);
+
+      if (includeSubResources) {
+        authorizationManager.checkUpdateInstanceOnProcessDefinitionById(processDefinitionId);
+      }
+    } else
+
+    if (processDefinitionKey != null) {
+      authorizationManager.checkUpdateProcessDefinitionByKey(processDefinitionKey);
+
+      if (includeSubResources) {
+        authorizationManager.checkUpdateInstanceOnProcessDefinitionByKey(processDefinitionId);
+      }
+    }
+  }
+
+  protected void updateSuspensionState(final CommandContext commandContext, SuspensionState suspensionState) {
     ProcessDefinitionManager processDefinitionManager = commandContext.getProcessDefinitionManager();
 
     if (processDefinitionId != null) {
@@ -70,9 +91,14 @@ public abstract class AbstractSetProcessDefinitionStateCmd extends AbstractSetSt
       processDefinitionManager.updateProcessDefinitionSuspensionStateByKey(processDefinitionKey, suspensionState);
     }
 
-    AbstractSetJobDefinitionStateCmd jobDefinitionCmd = getSetJobDefinitionStateCmd();
-    jobDefinitionCmd.disableLogUserOperation();
-    jobDefinitionCmd.execute(commandContext);
+    commandContext.runWithoutAuthentication(new Callable<Void>() {
+      public Void call() throws Exception {
+        AbstractSetJobDefinitionStateCmd jobDefinitionCmd = getSetJobDefinitionStateCmd();
+        jobDefinitionCmd.disableLogUserOperation();
+        jobDefinitionCmd.execute(commandContext);
+        return null;
+      }
+    });
   }
 
   protected String getJobHandlerConfiguration() {

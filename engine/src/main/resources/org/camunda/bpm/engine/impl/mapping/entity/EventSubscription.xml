@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?> 
 
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
-  
+
 <mapper namespace="org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity">
 
   <!-- DELETE -->
@@ -9,15 +9,15 @@
   <delete id="deleteSignalEventSubscription" parameterType="org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity">
     delete from ${prefix}ACT_RU_EVENT_SUBSCR where ID_ = #{id} and REV_ = #{revision}
   </delete>
-  
+
   <delete id="deleteCompensateEventSubscription" parameterType="org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity">
     delete from ${prefix}ACT_RU_EVENT_SUBSCR where ID_ = #{id} and REV_ = #{revision}
   </delete>
-  
+
   <delete id="deleteMessageEventSubscription" parameterType="org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity">
     delete from ${prefix}ACT_RU_EVENT_SUBSCR where ID_ = #{id} and REV_ = #{revision}
   </delete>
-  
+
   <!-- RESULTMAP -->
 
   <resultMap id="eventSubscriptionResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity">
@@ -29,19 +29,19 @@
     <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR" />
     <result property="activityId" column="ACTIVITY_ID_" jdbcType="VARCHAR" />
     <result property="configuration" column="CONFIGURATION_" jdbcType="VARCHAR" />
-    <result property="created" column="CREATED_" jdbcType="TIMESTAMP" />           
+    <result property="created" column="CREATED_" jdbcType="TIMESTAMP" />
     <discriminator javaType="string" column="EVENT_TYPE_">
-      <case value="message" resultMap="messageResultMap"/> 
-      <case value="signal" resultMap="signalResultMap"/> 
+      <case value="message" resultMap="messageResultMap"/>
+      <case value="signal" resultMap="signalResultMap"/>
       <case value="compensate" resultMap="compensateResultMap"/>
     </discriminator>
   </resultMap>
 
   <resultMap id="messageResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.MessageEventSubscriptionEntity" extends="eventSubscriptionResultMap"/>
-  <resultMap id="signalResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.SignalEventSubscriptionEntity" extends="eventSubscriptionResultMap"/>   
-  <resultMap id="compensateResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.CompensateEventSubscriptionEntity" extends="eventSubscriptionResultMap"/>   
+  <resultMap id="signalResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.SignalEventSubscriptionEntity" extends="eventSubscriptionResultMap"/>
+  <resultMap id="compensateResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.CompensateEventSubscriptionEntity" extends="eventSubscriptionResultMap"/>
 
-  <!-- SELECT -->  
+  <!-- SELECT -->
 
   <select id="selectEventSubscription" parameterType="string" resultMap="eventSubscriptionResultMap">
     select * from ${prefix}ACT_RU_EVENT_SUBSCR where ID_ = #{id}
@@ -61,9 +61,18 @@
     select count(distinct RES.ID_)
     <include refid="selectEventSubscriptionByQueryCriteriaSql"/>
   </select>
-  
+
   <sql id="selectEventSubscriptionByQueryCriteriaSql">
     from ${prefix}ACT_RU_EVENT_SUBSCR RES
+
+    <if test="isAuthorizationCheckEnabled &amp;&amp; authUserId != null">
+      left join ${prefix}ACT_RU_EXECUTION EXECUTION
+      on RES.EXECUTION_ID_ = EXECUTION.ID_
+
+      left join ${prefix}ACT_RE_PROCDEF PROCDEF
+      on EXECUTION.PROC_DEF_ID_ = PROCDEF.ID_
+    </if>
+
     <where>
       <if test="eventSubscriptionId != null">
         RES.ID_ = #{eventSubscriptionId}
@@ -82,10 +91,13 @@
       </if>
       <if test="eventName != null">
         and RES.EVENT_NAME_ = #{eventName}
-      </if>       
+      </if>
+
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck" />
+
     </where>
   </sql>
-  
+
   <select id="selectSignalEventSubscriptionsByEventName" resultMap="eventSubscriptionResultMap" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
     select EVT.*
     from ${prefix}ACT_RU_EVENT_SUBSCR EVT
@@ -94,79 +106,78 @@
     	and (EVENT_NAME_ = #{parameter})
     	and EXC.SUSPENSION_STATE_ = 1
   </select>
-  
+
   <select id="selectSignalEventSubscriptionsByExecution" resultMap="eventSubscriptionResultMap" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
-    select * 
+    select *
     from ${prefix}ACT_RU_EVENT_SUBSCR
     where (EVENT_TYPE_ = 'signal')
-    	and (EXECUTION_ID_ = #{parameter})  
+    	and (EXECUTION_ID_ = #{parameter})
   </select>
-  
+
   <select id="selectSignalEventSubscriptionsByNameAndExecution" resultMap="eventSubscriptionResultMap" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
-    select * 
+    select *
     from ${prefix}ACT_RU_EVENT_SUBSCR
     where (EVENT_TYPE_ = 'signal')
     	and (EXECUTION_ID_ = #{parameter.executionId})
     	and (EVENT_NAME_ = #{parameter.eventName})
   </select>
-  
+
   <select id="selectEventSubscriptionsByExecution" resultMap="eventSubscriptionResultMap" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
-    select * 
+    select *
     from ${prefix}ACT_RU_EVENT_SUBSCR
     where (EXECUTION_ID_ = #{parameter})
   </select>
-      
+
   <select id="selectEventSubscriptionsByExecutionAndType" resultMap="eventSubscriptionResultMap" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
-    select * 
+    select *
     from ${prefix}ACT_RU_EVENT_SUBSCR
     where (EVENT_TYPE_ = #{parameter.eventType})
     	and (EXECUTION_ID_ = #{parameter.executionId})
   </select>
-  
+
   <select id="selectEventSubscriptionsByExecutionTypeAndActivity" resultMap="eventSubscriptionResultMap" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
-    select * 
+    select *
     from ${prefix}ACT_RU_EVENT_SUBSCR
     where (EVENT_TYPE_ = #{parameter.eventType})
     	and (EXECUTION_ID_ = #{parameter.executionId})
     	and (ACTIVITY_ID_ = #{parameter.activityId})
   </select>
-  
+
   <select id="selectEventSubscriptionsByConfiguration" resultMap="eventSubscriptionResultMap" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
-    select * 
+    select *
     from ${prefix}ACT_RU_EVENT_SUBSCR
     where (EVENT_TYPE_ = #{parameter.eventType})
     	and (CONFIGURATION_ = #{parameter.configuration})
   </select>
-  
+
   <select id="selectEventSubscriptionsByName" resultMap="eventSubscriptionResultMap" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
-    select * 
+    select *
     from ${prefix}ACT_RU_EVENT_SUBSCR
     where (EVENT_TYPE_ = #{parameter.eventType})
     	and (EVENT_NAME_ = #{parameter.eventName})
   </select>
-  
+
   <select id="selectEventSubscriptionsByNameAndExecution" resultMap="eventSubscriptionResultMap" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
-    select * 
+    select *
     from ${prefix}ACT_RU_EVENT_SUBSCR
     where (EVENT_TYPE_ = #{parameter.eventType})
     	and (EVENT_NAME_ = #{parameter.eventName})
     	and (EXECUTION_ID_ = #{parameter.executionId})
   </select>
-  
+
    <select id="selectMessageStartEventSubscriptionByName" resultMap="eventSubscriptionResultMap" parameterType="string">
-    select * 
+    select *
     from ${prefix}ACT_RU_EVENT_SUBSCR
     where (EVENT_TYPE_ = 'message')
     	and (EVENT_NAME_ = #{parameter})
     	and EXECUTION_ID_ is null
   </select>
-  
-  
+
   <!-- MESSAGE INSERT -->
-  
+
   <insert id="insertMessageEventSubscription" parameterType="org.camunda.bpm.engine.impl.persistence.entity.MessageEventSubscriptionEntity">
  	insert into ${prefix}ACT_RU_EVENT_SUBSCR (
-            ID_, 
+            ID_,
             EVENT_TYPE_,
            	EVENT_NAME_,
            	EXECUTION_ID_,
@@ -204,12 +215,12 @@
     where ID_= #{id, jdbcType=VARCHAR}
       and REV_ = #{revision, jdbcType=INTEGER}
   </update>
-  
+
    <!-- SIGNAL INSERT -->
-  
+
   <insert id="insertSignalEventSubscription" parameterType="org.camunda.bpm.engine.impl.persistence.entity.SignalEventSubscriptionEntity">
    insert into ${prefix}ACT_RU_EVENT_SUBSCR (
-            ID_, 
+            ID_,
             EVENT_TYPE_,
            	EVENT_NAME_,
            	EXECUTION_ID_,
@@ -247,12 +258,12 @@
     where ID_= #{id, jdbcType=VARCHAR}
       and REV_ = #{revision, jdbcType=INTEGER}
   </update>
-  
+
    <!-- Compensate INSERT -->
-  
+
   <insert id="insertCompensateEventSubscription" parameterType="org.camunda.bpm.engine.impl.persistence.entity.CompensateEventSubscriptionEntity">
     insert into ${prefix}ACT_RU_EVENT_SUBSCR (
-             ID_, 
+            ID_,
             REV_,
             EVENT_TYPE_,
            	EVENT_NAME_,
@@ -270,10 +281,10 @@
             #{processInstanceId, jdbcType=VARCHAR},
             #{activityId, jdbcType=VARCHAR},
             #{configuration, jdbcType=VARCHAR},
-            #{created, jdbcType=TIMESTAMP}        
+            #{created, jdbcType=TIMESTAMP}
     )
   </insert>
-  
+
   <!-- Compensate UPDATE -->
 
   <update id="updateCompensateEventSubscription" parameterType="org.camunda.bpm.engine.impl.persistence.entity.CompensateEventSubscriptionEntity">
@@ -284,12 +295,11 @@
        EXECUTION_ID_ = #{executionId, jdbcType=INTEGER},
        PROC_INST_ID_ = #{processInstanceId, jdbcType=INTEGER},
        ACTIVITY_ID_ = #{activityId, jdbcType=INTEGER},
-       CONFIGURATION_ = #{configuration, jdbcType=VARCHAR},  
+       CONFIGURATION_ = #{configuration, jdbcType=VARCHAR},
        CREATED_ = #{created, jdbcType=TIMESTAMP}
     </set>
     where ID_= #{id, jdbcType=VARCHAR}
       and REV_ = #{revision, jdbcType=INTEGER}
   </update>
-  
 
 </mapper>
