@@ -107,7 +107,8 @@ public class ProcessEngineRule extends TestWatcher {
 
     initializeServices();
 
-    deploymentId = TestHelper.annotationDeploymentSetUp(processEngine, description.getTestClass(), description.getMethodName());
+    deploymentId = TestHelper.annotationDeploymentSetUp(processEngine, description.getTestClass(), description.getMethodName(),
+        description.getAnnotation(Deployment.class));
   }
 
   protected void initializeProcessEngine() {

@@ -13,35 +13,51 @@
 
 package org.camunda.bpm.engine.test.standalone.testing;
 
-import org.camunda.bpm.engine.ProcessEngineConfiguration;
-import org.camunda.bpm.engine.impl.ProcessEngineImpl;
-import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import static org.junit.Assert.assertEquals;
+
+import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
-import org.camunda.bpm.engine.test.ProcessEngineTestCase;
+import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.junit.Rule;
+import org.junit.Test;
 
 
 /**
+ * Test runners follow the this rule:
+ *   - if the class extends Testcase, run as Junit 3
+ *   - otherwise use Junit 4
+ *
+ * So this test can be included in the regular test suite without problems.
+ *
  * @author Joram Barrez
- * @author Falko Menge (camunda)
  */
-public class ActivitiTestCaseTest extends ProcessEngineTestCase {
+public class ProcessEngineRuleJunit4Test {
 
+  @Rule
+  public ProcessEngineRule engineRule = new ProcessEngineRule();
+
+  @Test
   @Deployment
-  public void testSimpleProcess() {
-    runtimeService.startProcessInstanceByKey("simpleProcess");
+  public void ruleUsageExample() {
+    RuntimeService runtimeService = engineRule.getRuntimeService();
+    runtimeService.startProcessInstanceByKey("ruleUsage");
 
+    TaskService taskService = engineRule.getTaskService();
     Task task = taskService.createTaskQuery().singleResult();
     assertEquals("My Task", task.getName());
 
     taskService.complete(task.getId());
     assertEquals(0, runtimeService.createProcessInstanceQuery().count());
+  }
 
-    ProcessEngineConfigurationImpl configuration = ((ProcessEngineImpl)processEngine).getProcessEngineConfiguration();
-
-    if (configuration.getHistoryLevel().getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
-      assertEquals(1, historyService.createHistoricProcessInstanceQuery().count());
-    }
+  /**
+   * The rule should work with tests that have no deployment annotation
+   */
+  @Test
+  public void testWithoutDeploymentAnnotation() {
+    assertEquals("aString", "aString");
   }
 
 }

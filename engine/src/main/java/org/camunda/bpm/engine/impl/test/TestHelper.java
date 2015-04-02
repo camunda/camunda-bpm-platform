@@ -76,19 +76,26 @@ public abstract class TestHelper {
     ProcessEngineAssert.assertProcessEnded(processEngine, processInstanceId);
   }
 
-  public static String annotationDeploymentSetUp(ProcessEngine processEngine, Class<?> testClass, String methodName) {
+  public static String annotationDeploymentSetUp(ProcessEngine processEngine, Class<?> testClass, String methodName, Deployment deploymentAnnotation) {
     String deploymentId = null;
     Method method = null;
     try {
       method = testClass.getDeclaredMethod(methodName, (Class<?>[])null);
     } catch (Exception e) {
-      return null;
+      if (deploymentAnnotation == null) {
+        // we have neither the annotation, nor can look it up from the method
+        return null;
+      }
     }
-    Deployment deploymentAnnotation = method.getAnnotation(Deployment.class);
+
+    if (deploymentAnnotation == null) {
+      deploymentAnnotation = method.getAnnotation(Deployment.class);
+    }
+
     if (deploymentAnnotation != null) {
       log.fine("annotation @Deployment creates deployment for "+ClassNameUtil.getClassNameWithoutPackage(testClass)+"."+methodName);
       String[] resources = deploymentAnnotation.resources();
-      if (resources.length == 0) {
+      if (resources.length == 0 && method != null) {
         String name = method.getName();
         String resource = getBpmnProcessDefinitionResource(testClass, name);
         resources = new String[]{resource};
@@ -106,6 +113,10 @@ public abstract class TestHelper {
     }
 
     return deploymentId;
+  }
+
+  public static String annotationDeploymentSetUp(ProcessEngine processEngine, Class<?> testClass, String methodName) {
+    return annotationDeploymentSetUp(processEngine, testClass, methodName, null);
   }
 
   public static void annotationDeploymentTearDown(ProcessEngine processEngine, String deploymentId, Class<?> testClass, String methodName) {
