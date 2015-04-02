@@ -24,7 +24,6 @@ import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
@@ -116,9 +115,7 @@ public class ProcessEngineRule extends TestWatcher {
       processEngine = TestHelper.getProcessEngine(configurationResource);
     } catch (RuntimeException ex) {
       if (ex.getCause() != null && ex.getCause() instanceof FileNotFoundException) {
-        processEngine = ProcessEngineConfiguration
-            .createProcessEngineConfigurationFromResource(configurationResourceCompat)
-            .buildProcessEngine();
+        processEngine = TestHelper.getProcessEngine(configurationResourceCompat);
       } else {
         throw ex;
       }

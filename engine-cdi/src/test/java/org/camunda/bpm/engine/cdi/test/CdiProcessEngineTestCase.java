@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -40,6 +40,7 @@ import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.runner.RunWith;
@@ -51,20 +52,20 @@ import org.junit.runner.RunWith;
 public abstract class CdiProcessEngineTestCase {
 
   protected Logger logger = Logger.getLogger(getClass().getName());
-    
+
   @Deployment
   public static JavaArchive createDeployment() {
-    
+
     return ShrinkWrap.create(JavaArchive.class)
       .addPackages(true, "org.camunda.bpm.engine.cdi")
       .addAsManifestResource("META-INF/beans.xml", "beans.xml");
   }
-  
+
   @Rule
-  public ProcessEngineRule activitiRule = new ProcessEngineRule();
+  public ProcessEngineRule processEngineRule = new ProcessEngineRule();
 
   protected BeanManager beanManager;
-  
+
   protected ProcessEngine processEngine;
   protected FormService formService;
   protected HistoryService historyService;
@@ -76,12 +77,12 @@ public abstract class CdiProcessEngineTestCase {
   protected ProcessEngineConfigurationImpl processEngineConfiguration;
 
   @Before
-  public void setUp() throws Exception { 
-    
+  public void setUpCdiProcessEngineTestCase() throws Exception {
+
     if(BpmPlatform.getProcessEngineService().getDefaultProcessEngine() == null) {
-      RuntimeContainerDelegate.INSTANCE.get().registerProcessEngine(activitiRule.getProcessEngine());
+      RuntimeContainerDelegate.INSTANCE.get().registerProcessEngine(processEngineRule.getProcessEngine());
     }
-    
+
     beanManager = ProgrammaticBeanLookup.lookup(BeanManager.class);
     processEngine = ProgrammaticBeanLookup.lookup(ProcessEngine.class);
     processEngineConfiguration = ((ProcessEngineImpl)BpmPlatform.getProcessEngineService().getDefaultProcessEngine()).getProcessEngineConfiguration();
@@ -91,7 +92,23 @@ public abstract class CdiProcessEngineTestCase {
     managementService = processEngine.getManagementService();
     repositoryService = processEngine.getRepositoryService();
     runtimeService = processEngine.getRuntimeService();
-    taskService = processEngine.getTaskService();        
+    taskService = processEngine.getTaskService();
+  }
+
+  @After
+  public void tearDownCdiProcessEngineTestCase() throws Exception {
+    RuntimeContainerDelegate.INSTANCE.get().unregisterProcessEngine(processEngine);
+    beanManager = null;
+    processEngine = null;
+    processEngineConfiguration = null;
+    formService = null;
+    historyService = null;
+    identityService = null;
+    managementService = null;
+    repositoryService = null;
+    runtimeService = null;
+    taskService = null;
+    processEngineRule = null;
   }
 
   protected void endConversationAndBeginNew(String processInstanceId) {
@@ -105,9 +122,9 @@ public abstract class CdiProcessEngineTestCase {
   protected Object getBeanInstance(String name) {
     return ProgrammaticBeanLookup.lookup(name);
   }
-  
+
   //////////////////////// copied from AbstractActivitiTestcase
-  
+
   public void waitForJobExecutorToProcessAllJobs(long maxMillisToWait, long intervalMillis) {
     JobExecutor jobExecutor = processEngineConfiguration.getJobExecutor();
     jobExecutor.start();
@@ -171,7 +188,7 @@ public abstract class CdiProcessEngineTestCase {
       .list()
       .isEmpty();
   }
-  
+
   private static class InteruptTask extends TimerTask {
     protected boolean timeLimitExceeded = false;
     protected Thread thread;
