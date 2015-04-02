@@ -23,6 +23,7 @@ import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -31,13 +32,7 @@ import org.junit.runners.Parameterized.Parameters;
 
 
 /**
- * Test runners follow the this rule:
- *   - if the class extends Testcase, run as Junit 3
- *   - otherwise use Junit 4
- *
- * So this test can be included in the regular test suite without problems.
- *
- * @author Joram Barrez
+ * @author Thorben Lindhauer
  */
 @RunWith(Parameterized.class)
 public class ProcessEngineRuleParameterizedJunit4Test {
@@ -56,9 +51,27 @@ public class ProcessEngineRuleParameterizedJunit4Test {
 
   }
 
+  /**
+   * Unnamed @Deployment annotations don't work with parameterized Unit tests
+   */
+  @Ignore
+  @Test
+  @Deployment
+  public void ruleUsageExample() {
+    RuntimeService runtimeService = engineRule.getRuntimeService();
+    runtimeService.startProcessInstanceByKey("ruleUsage");
+
+    TaskService taskService = engineRule.getTaskService();
+    Task task = taskService.createTaskQuery().singleResult();
+    assertEquals("My Task", task.getName());
+
+    taskService.complete(task.getId());
+    assertEquals(0, runtimeService.createProcessInstanceQuery().count());
+  }
+
   @Test
   @Deployment(resources = "org/camunda/bpm/engine/test/standalone/testing/ProcessEngineRuleParameterizedJunit4Test.ruleUsageExample.bpmn20.xml")
-  public void ruleUsageExample() {
+  public void ruleUsageExampleWithNamedAnnotation() {
     RuntimeService runtimeService = engineRule.getRuntimeService();
     runtimeService.startProcessInstanceByKey("ruleUsage");
 
