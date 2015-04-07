@@ -13,6 +13,7 @@
 package org.camunda.bpm.container.impl.metadata;
 
 import java.util.List;
+import java.util.Map;
 
 import org.camunda.bpm.container.impl.metadata.spi.JobAcquisitionXml;
 import org.camunda.bpm.container.impl.metadata.spi.JobExecutorXml;
@@ -27,6 +28,7 @@ public class JobExecutorXmlImpl implements JobExecutorXml {
   
   protected List<JobAcquisitionXml> jobAcquisitions;
   protected String jobExecutorClass;
+  protected Map<String, String> properties;
 
   public List<JobAcquisitionXml> getJobAcquisitions() {
     return jobAcquisitions;
@@ -42,6 +44,14 @@ public class JobExecutorXmlImpl implements JobExecutorXml {
 
   public void setJobExecutorClass(String jobExecutorClass) {
     this.jobExecutorClass = jobExecutorClass;
+  }
+
+  public void setProperties(Map<String, String> properties){
+    this.properties = properties;
+  }
+  
+  public Map<String, String> getProperties() {
+    return properties;
   }
   
 }

@@ -1,5 +1,8 @@
 package org.camunda.bpm.container.impl.parser;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
@@ -67,6 +70,7 @@ public class BpmPlatformXmlParserTest extends TestCase {
 
     JobExecutorXml jobExecutorXml = bpmPlatformXml.getJobExecutor();
     assertEquals(1, jobExecutorXml.getJobAcquisitions().size());
+    assertThat(jobExecutorXml.getProperties().size(), is(2));
 
     JobAcquisitionXml jobAcquisitionXml = jobExecutorXml.getJobAcquisitions().get(0);
     assertEquals("default", jobAcquisitionXml.getName());

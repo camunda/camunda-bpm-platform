@@ -28,6 +28,8 @@
                 </xsd:complexType>
 
               </xsd:element>
+              
+              <xsd:element name="properties" type="tns:Properties" minOccurs="0" maxOccurs="1" />
 
             </xsd:sequence>
 

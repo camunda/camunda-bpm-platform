@@ -12,8 +12,15 @@
  */
 package org.camunda.bpm.container.impl.ejb.deployment;
 
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.logging.Logger;
+
 import org.camunda.bpm.container.ExecutorService;
 import org.camunda.bpm.container.impl.RuntimeContainerDelegateImpl;
+import org.camunda.bpm.container.impl.deployment.Attachments;
+import org.camunda.bpm.container.impl.metadata.spi.BpmPlatformXml;
+import org.camunda.bpm.container.impl.metadata.spi.JobExecutorXml;
 import org.camunda.bpm.container.impl.spi.DeploymentOperation;
 import org.camunda.bpm.container.impl.spi.DeploymentOperationStep;
 import org.camunda.bpm.container.impl.spi.PlatformServiceContainer;
@@ -29,6 +36,8 @@ import org.camunda.bpm.container.impl.spi.ServiceTypes;
 public class StartJcaExecutorServiceStep extends DeploymentOperationStep {
 
   protected ExecutorService executorService;
+  
+  private static final Logger LOGGER = Logger.getLogger(StartJcaExecutorServiceStep.class.getName());
 
   public StartJcaExecutorServiceStep(ExecutorService executorService) {
     this.executorService = executorService;
@@ -39,10 +48,24 @@ public class StartJcaExecutorServiceStep extends DeploymentOperationStep {
   }
 
   public void performOperationStep(DeploymentOperation operationContext) {
+    BpmPlatformXml bpmPlatformXml = operationContext.getAttachment(Attachments.BPM_PLATFORM_XML);
+    checkConfiguration(bpmPlatformXml.getJobExecutor());
+    
     final PlatformServiceContainer serviceContainer = operationContext.getServiceContainer();
 
     serviceContainer.startService(ServiceTypes.BPM_PLATFORM, RuntimeContainerDelegateImpl.SERVICE_NAME_EXECUTOR, new JcaExecutorServiceDelegate(executorService));
 
+  }
+
+  /**
+   * Checks the validation to see if properties are present, which will be ignored
+   * in this environment so we can log a warning.
+   */
+  private void checkConfiguration(JobExecutorXml jobExecutorXml) {
+    Map<String, String> properties = jobExecutorXml.getProperties();
+    for (Entry<String, String> entry : properties.entrySet()) {
+      LOGGER.warning("Property " + entry.getKey() + " with value " + entry.getValue() + " from bpm-platform.xml will be ignored for JobExecutor.");
+    }
   }
 
 }

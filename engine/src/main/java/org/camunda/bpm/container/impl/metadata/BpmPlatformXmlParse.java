@@ -78,17 +78,21 @@ public class BpmPlatformXmlParse extends DeploymentMetadataParse {
   protected void parseJobExecutor(Element element, JobExecutorXmlImpl jobExecutorXml) {
     
     List<JobAcquisitionXml> jobAcquisitions = new ArrayList<JobAcquisitionXml>();
+    Map<String, String> properties = new HashMap<String, String>();
     
     for (Element childElement : element.elements()) {
       
       if(JOB_ACQUISITION.equals(childElement.getTagName())) {
         parseJobAcquisition(childElement, jobAcquisitions);
         
+      }else if(PROPERTIES.equals(childElement.getTagName())){
+        parseProperties(childElement, properties);
       }
       
     }
     
     jobExecutorXml.setJobAcquisitions(jobAcquisitions);
+    jobExecutorXml.setProperties(properties);
     
   }
     

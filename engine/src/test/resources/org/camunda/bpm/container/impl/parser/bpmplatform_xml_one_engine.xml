@@ -12,7 +12,10 @@
         <property name="name2">value2</property>
       </properties>
     </job-acquisition>
-
+    <properties>
+      <property name="name1">value1</property>
+      <property name="name2">value2</property>
+    </properties>
   </job-executor>
 
   <process-engine name="engine1">
