@@ -77,6 +77,14 @@ ops.authorization = {
       groupId: null,
       resourceType: 5,
       resourceId: '*'
+    },
+    {
+      type : 1,
+      permissions: ['READ'],
+      userId: 'test',
+      groupId: null,
+      resourceType: 7,
+      resourceId: '*'
     }]
 };
 
