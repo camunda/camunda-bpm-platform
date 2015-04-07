@@ -16,12 +16,15 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.io.Serializable;
 import java.util.Map;
+import java.util.concurrent.Callable;
 
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.form.FormPropertyHelper;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
+import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -50,12 +53,16 @@ public class SubmitStartFormCmd implements Command<ProcessInstance>, Serializabl
   @Override
   public ProcessInstance execute(CommandContext commandContext) {
     ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
-
-    ProcessDefinitionEntity processDefinition = processEngineConfiguration
-      .getDeploymentCache()
-      .findDeployedProcessDefinitionById(processDefinitionId);
-
+    final DeploymentCache deploymentCache = processEngineConfiguration.getDeploymentCache();
+    ProcessDefinitionEntity processDefinition = commandContext.runWithoutAuthentication(new Callable<ProcessDefinitionEntity>() {
+      public ProcessDefinitionEntity call() throws Exception {
+        return deploymentCache.findDeployedProcessDefinitionById(processDefinitionId);
+      }
+    });
     ensureNotNull("No process definition found for id = '" + processDefinitionId + "'", "processDefinition", processDefinition);
+
+    AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
+    authorizationManager.checkCreateProcessInstance(processDefinition);
 
     ExecutionEntity processInstance = null;
     if (businessKey != null) {

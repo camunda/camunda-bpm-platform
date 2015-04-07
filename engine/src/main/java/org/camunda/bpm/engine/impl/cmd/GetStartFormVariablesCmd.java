@@ -13,10 +13,15 @@
 package org.camunda.bpm.engine.impl.cmd;
 
 import java.util.Collection;
+import java.util.concurrent.Callable;
+
 import org.camunda.bpm.engine.form.FormField;
 import org.camunda.bpm.engine.form.StartFormData;
 import org.camunda.bpm.engine.impl.core.variable.VariableMapImpl;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
+import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
+import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.variable.VariableMap;
 
 /**
@@ -31,10 +36,16 @@ public class GetStartFormVariablesCmd extends AbstractGetFormVariablesCmd {
     super(resourceId, formVariableNames, deserializeObjectValues);
   }
 
-  public VariableMap execute(CommandContext commandContext) {
+  public VariableMap execute(final CommandContext commandContext) {
+    StartFormData startFormData = commandContext.runWithoutAuthentication(new Callable<StartFormData>() {
+      public StartFormData call() throws Exception {
+        return new GetStartFormCmd(resourceId).execute(commandContext);
+      }
+    });
 
-    StartFormData startFormData = new GetStartFormCmd(resourceId)
-      .execute(commandContext);
+    ProcessDefinition definition = startFormData.getProcessDefinition();
+    AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
+    authorizationManager.checkReadProcessDefinition((ProcessDefinitionEntity) definition);
 
     VariableMap result = new VariableMapImpl();
 

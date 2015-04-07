@@ -12,14 +12,19 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 import java.util.Collection;
+import java.util.concurrent.Callable;
 
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.form.FormField;
 import org.camunda.bpm.engine.form.TaskFormData;
 import org.camunda.bpm.engine.impl.core.variable.VariableMapImpl;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.TaskManager;
 import org.camunda.bpm.engine.impl.task.TaskDefinition;
 import org.camunda.bpm.engine.variable.VariableMap;
 
@@ -36,13 +41,17 @@ public class GetTaskFormVariablesCmd extends AbstractGetFormVariablesCmd {
   }
 
   public VariableMap execute(CommandContext commandContext) {
+    final TaskManager taskManager = commandContext.getTaskManager();
+    TaskEntity task = commandContext.runWithoutAuthentication(new Callable<TaskEntity>() {
+      public TaskEntity call() throws Exception {
+        return taskManager.findTaskById(resourceId);
+      }
+    });
 
-    TaskEntity task = commandContext.getTaskManager()
-      .findTaskById(resourceId);
+    ensureNotNull(BadUserRequestException.class, "Cannot find task with id '" + resourceId + "'.", "task", task);
 
-    if(task == null) {
-      throw new BadUserRequestException("Cannot find task with id '"+resourceId+"'.");
-    }
+    AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
+    authorizationManager.checkReadTask(task);
 
     VariableMapImpl result = new VariableMapImpl();
 

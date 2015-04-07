@@ -53,10 +53,10 @@ public enum Permissions implements Permission {
   ACCESS("ACCESS", 32),
 
   /** Indicates that READ_TASK interactions are permitted. */
-  READ_TASK("READ_TASKS", 64),
+  READ_TASK("READ_TASK", 64),
 
   /** Indicates that UPDATE_TASK interactions are permitted. */
-  UPDATE_TASK("UPDATE_TASKS", 128),
+  UPDATE_TASK("UPDATE_TASK", 128),
 
   /** Indicates that CREATE_INSTANCE interactions are permitted. */
   CREATE_INSTANCE("CREATE_INSTANCE", 256),

@@ -247,6 +247,16 @@ public class AuthorizationManager extends AbstractManager {
 
   /* PROCESS DEFINITION */
 
+  // read permission //////////////////////////////////////////////////
+
+  public void checkReadProcessDefinition(ProcessDefinitionEntity definition) {
+    checkReadProcessDefinition(definition.getKey());
+  }
+
+  public void checkReadProcessDefinition(String processDefinitionKey) {
+    checkAuthorization(READ, PROCESS_DEFINITION, processDefinitionKey);
+  }
+
   // update permission ///////////////////////////////////////////////
 
   public void checkUpdateProcessDefinitionById(String processDefinitionId) {
