@@ -193,11 +193,6 @@ public interface ActivityExecution extends DelegateExecution {
   boolean isCompleteScope();
 
   /**
-   * Returns whether this execution has been canceled.
-   */
-  boolean isCanceled();
-
-  /**
    * Retrieves all executions which are concurrent and inactive at the given activity.
    */
   List<ActivityExecution> findInactiveConcurrentExecutions(PvmActivity activity);

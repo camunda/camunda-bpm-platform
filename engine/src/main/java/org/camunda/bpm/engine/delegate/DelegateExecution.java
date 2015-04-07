@@ -79,5 +79,10 @@ public interface DelegateExecution extends BaseDelegateExecution, BpmnModelExecu
    * @return the super execution or null.
    */
   DelegateExecution getSuperExecution();
+  
+  /**
+   * Returns whether this execution has been canceled.
+   */
+  boolean isCanceled();
 
 }
