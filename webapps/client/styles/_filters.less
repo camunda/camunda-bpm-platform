@@ -1,12 +1,8 @@
-@filters-bg: #f5d99c;
+.ctn-sidebar {
+  background: @filters-bg;
+}
 
 .filters {
-  border: solid 1px @filters-bg;
-  border-radius: 5px;
-
-  background: lighten(@filters-bg, 15%);
-  padding: 10px;
-
   ul {
     margin-bottom: 0;
   }
@@ -14,11 +10,11 @@
   h5 {
     margin: 0 0 5px 0;
     padding-bottom: 8px;
-    border-bottom: solid 1px @filters-bg;
+    border-bottom: solid 1px @filters-color;
   }
 
   .footer {
-    border-top: solid 1px @filters-bg;
+    border-top: solid 1px @filters-color;
     padding-top: 8px;
   }
 
@@ -58,7 +54,7 @@
 .filter {
   line-height: 25px;
   padding: 5px 0;
-  border-bottom: dotted 1px @filters-bg;
+  border-bottom: dotted 1px @filters-color;
   overflow: visible;
 
   select,
@@ -126,25 +122,11 @@
     padding: 8px 14px;
   }
 
-
-
-  &.version-filter {
-
-  }
-  &.parent-filter {
-
-  }
-  &.business-key-filter {
-
-  }
   &.date-filter {
     overflow: hidden;
   }
   &.variable-filter {
     overflow: hidden;
-  }
-  &.activity-filter {
-
   }
 
   label.radio {

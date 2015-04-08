@@ -95,6 +95,15 @@ module.exports = function(config) {
           ],
           dest: '<%= buildTarget %>/fonts/'
         },
+        // bpmn fonts
+        {
+          expand: true,
+          cwd: 'node_modules/bpmn-font/dist/font',
+          src: [
+            '*.{eot,ttf,svg,woff}'
+          ],
+          dest: '<%= buildTarget %>/fonts/'
+        },
 
         // placeholder shims
         {

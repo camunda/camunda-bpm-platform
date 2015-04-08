@@ -20,10 +20,12 @@
         <span class="glyphicon glyphicon-remove"></span>
       </button>
 
+      <span class="{{ symbolIconName(node.activityType) }}"
+            tooltip="{{ node.activityType }}"></span>
+
       <a ng-click="select($event)"
-         tooltip-placement="top"
-         tooltip="{{ node.name }} {{ node.activityType }}">
-        <span class="icon-{{ dashed(node.activityType) }}"></span>
+         tooltip-placement="right"
+         tooltip="{{ node.name }}">
         {{ node.name }}
       </a>
 

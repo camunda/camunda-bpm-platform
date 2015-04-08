@@ -1,5 +1,3 @@
-// [activity-instance-tree] {}
-
 .btn-control,
 .btn-control-link,
 .btn.btn-control {
@@ -19,7 +17,29 @@
   }
   [class^="icon-"],
   [class*=" icon-"] {
-    display: inline;
+    display: inline-block;
+    &:before {
+      position: relative;
+      z-index: 99;
+      background-color: @filters-bg;
+      .transition(transform .218s ease .218s);
+    }
+  }
+
+  li {
+    position: relative;
+    z-index: 10;
+    &:hover {
+      z-index: 99;
+      > .tree-node > .tree-node-group > .tree-node-label {
+        > [class^="icon-"],
+        > [class*=" icon-"] {
+          &:before {
+            .scale(3);
+          }
+        }
+      }
+    }
   }
 
   a {
@@ -41,11 +61,24 @@
   .tree-node {
     padding-left: 20px;
   }
+  > .tree-node {
+    padding: 0;
+  }
+
+  li {
+    margin: -1px 0 0 0;
+    &:last-child {
+      margin: -1px 0 3px 0;
+    }
+  }
 
   .tree-node-group {
     position: relative;
     vertical-align: middle;
     height: 25px;
+    &:hover {
+      z-index: 99;
+    }
   }
 
   .tree-node-label {
@@ -56,7 +89,7 @@
     bottom: 0;
 
     border: 1px solid darken(@gray-lighter, 15%);
-    border-radius: 4px;
+    border-radius: @border-radius-base;
 
     a {
       font-size: 12px;
@@ -66,7 +99,7 @@
       position: absolute;
       z-index: 1;
       top: 0;
-      left: 0;
+      left: 20px;
       right: 20px;
       bottom: 0;
       padding: 0 4px;
@@ -103,6 +136,12 @@
       .box-shadow(~"0 0 2px 2px @{highlihgt-shadow-color}");
       background: lighten(@link-hover-color, 65%);
       border-color: lighten(@link-hover-color, 65%);
+      [class^="icon-"],
+      [class*=" icon-"] {
+        &:before {
+          background: lighten(@link-hover-color, 65%);
+        }
+      }
 
       .remove {
         display: block;
@@ -118,21 +157,21 @@
     padding: 4px;
     border-radius: 0 @border-radius-base @border-radius-base 0;
     background-color: @canceled-color;
-    border: 1px solid @canceled-darker;
+    border: 1px solid darken(@gray-lighter, 15%);
+    border-left: 0;
     position: absolute;
     top: 0;
     bottom: 0;
     right: 0;
     z-index: 2;
 
+
     &.activity-instance-completed {
       background-color: @completed-color;
-      border: 1px solid @completed-darker;
     }
 
     &.activity-instance-running {
       background-color: @running-color;
-      border-color: @running-darker;
     }
   }
 }

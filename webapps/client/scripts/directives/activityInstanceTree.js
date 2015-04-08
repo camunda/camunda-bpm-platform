@@ -4,12 +4,28 @@ define([ 'angular', 'require', 'text!./activity-instance-tree.html' ], function(
 
   // QUESTION: Shouldn't we use the templateUrl property instead?
 
+  function dashed(str) {
+    return (str || '').replace(/([A-Z])/g, function ($1) {
+      return '-' + $1.toLowerCase();
+    });
+  }
+
+  var iconNames = {
+    'start-event':                            'start-event-none',
+    'error-start-event':                      'start-event-error',
+    'cancel-end-event':                       'end-event-cancel',
+    'error-end-event':                        'end-event-error',
+    'none-end-event':                         'end-event-none',
+    'parallel-gateway':                       'gateway-parallel',
+    'intermediate-compensation-throw-event':  'intermediate-event-throw-compensation'
+  };
+
+
   var Directive = [
     '$compile',
     '$http',
     '$filter',
-    '$templateCache',
-  function ($compile, $http, $filter, $templateCache) {
+  function ($compile, $http, $filter) {
     return {
       restrict: 'EAC',
 
@@ -22,10 +38,10 @@ define([ 'angular', 'require', 'text!./activity-instance-tree.html' ], function(
       },
 
       link: function(scope, element) {
-        scope.dashed = function (str) {
-          return (str || '').replace(/([A-Z])/g, function ($1) {
-            return '-' + $1.toLowerCase();
-          });
+        scope.symbolIconName = function (str) {
+          var name = dashed(str);
+          name = iconNames[name] ? iconNames[name] : name;
+          return 'icon-'+ name;
         };
 
         var $nodeElement = element,
