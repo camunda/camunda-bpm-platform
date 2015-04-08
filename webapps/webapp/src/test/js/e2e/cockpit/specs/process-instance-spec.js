@@ -84,6 +84,81 @@ describe('Cockpit Process Instance Spec', function() {
   });
 
 
+  describe('work with process variables', function() {
+
+    before(function() {
+      return testHelper(setupFile, function() {
+        dashboardPage.navigateToWebapp('Cockpit');
+        dashboardPage.authentication.userLogin('admin', 'admin');
+        dashboardPage.deployedProcessesList.selectProcess(0);
+        definitionPage.processInstancesTab.selectInstance(0);
+      });
+    });
+
+
+    it('should add process variable', function() {
+
+      // given
+      expect(instancePage.variablesTab.table().count()).to.eventually.eql(3);
+
+      // when
+      instancePage.actionBar.addVariable('myTestVar', 'String', '12345');
+
+      // then
+      expect(instancePage.variablesTab.table().count()).to.eventually.eql(4);
+      expect(instancePage.variablesTab.variableName(3)).to.eventually.eql('myTestVar');
+      expect(instancePage.variablesTab.variableType(3)).to.eventually.eql('String');
+      expect(instancePage.variablesTab.variableValue(3)).to.eventually.eql('12345');
+      expect(instancePage.variablesTab.variableScopeName(3)).to.eventually.eql('User Tasks');
+    });
+
+
+    it('should change variable', function() {
+
+      // given
+      expect(instancePage.variablesTab.variableType(2)).to.eventually.eql('Double');
+      expect(instancePage.variablesTab.variableValue(2)).to.eventually.eql('1.49');
+
+      // when
+      instancePage.variablesTab.editVariableButton(2).click().then(function() {
+        instancePage.variablesTab.editVariableValue().clear();
+        instancePage.variablesTab.editVariableValue('1.5');
+        instancePage.variablesTab.editVariableType('String');
+        instancePage.variablesTab.editVariableConfirmButton().click();
+      });
+
+      // then
+      expect(instancePage.variablesTab.variableName(2)).to.eventually.eql('test');
+      expect(instancePage.variablesTab.variableValue(2)).to.eventually.eql('1.5');
+      expect(instancePage.variablesTab.variableType(2)).to.eventually.eql('String');
+    });
+
+
+    it('should select wrong variable type', function() {
+
+      // given
+      expect(instancePage.variablesTab.variableType(1)).to.eventually.eql('Date');
+      expect(instancePage.variablesTab.variableValue(1)).to.eventually.eql('2011-11-11T11:11:11');
+
+      // when
+      instancePage.variablesTab.editVariableButton(1).click().then(function() {
+        instancePage.variablesTab.editVariableType('Short');
+      });
+
+      // then
+      expect(instancePage.variablesTab.editVariableErrorText()).to.eventually.eql('Invalid value: Only a Short value is allowed.');
+      expect(instancePage.variablesTab.editVariableConfirmButton().isEnabled()).to.eventually.be.false;
+
+      // finaly
+      instancePage.variablesTab.editVariableCancelButton().click().then(function() {
+        expect(instancePage.variablesTab.inlineEditRow().isPresent()).to.eventually.be.false;
+      });
+
+    });
+
+  });
+
+
   describe('diagram interaction', function() {
 
     before(function() {
@@ -138,8 +213,10 @@ describe('Cockpit Process Instance Spec', function() {
       expect(instancePage.diagram.isActivitySelected('UserTask_1')).to.eventually.be.true;
 
       // when
-      browser.getCurrentUrl().then(function (url) {
-        browser.get(url);
+      browser.getCurrentUrl().then(function(url) {
+        browser.get(url).then(function() {
+          browser.sleep(500);
+        });
       });
 
       // then
