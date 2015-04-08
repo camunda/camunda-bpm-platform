@@ -16,7 +16,7 @@
       <tr ng-repeat="variable in variables"
           data-variable-name="{{ variable.name }}"
           data-variable-type="{{ variable.value.type }}"
-          ng-class="'variable-type-' + variable.value.type">
+          ng-class="'variable-type-' + variable.value.type + (variable.inEditMode ? ' editing' : '')">
         <td class="variable-name">
           {{ variable.name }}
         </td>
