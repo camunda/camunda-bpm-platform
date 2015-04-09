@@ -1,5 +1,7 @@
 package org.camunda.bpm.model.bpmn.instance;
 
+import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_NS;
+
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -11,7 +13,8 @@ public class ErrorEventDefinitionTest extends AbstractEventDefinitionTest {
 
   public Collection<AttributeAssumption> getAttributesAssumptions() {
     return Arrays.asList(
-      new AttributeAssumption("errorRef")
+      new AttributeAssumption("errorRef"),
+      new AttributeAssumption(CAMUNDA_NS, "errorCodeVariable")
     );
   }
 
@@ -21,5 +24,5 @@ public class ErrorEventDefinitionTest extends AbstractEventDefinitionTest {
     assertThat(eventDefinition).isNotNull();
     assertThat(eventDefinition.getError().getId()).isEqualTo("error");
   }
-
+  
 }

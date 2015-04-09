@@ -24,4 +24,7 @@ public interface ErrorEventDefinition extends EventDefinition {
 
   void setError(Error error);
 
+  void setCamundaErrorCodeVariable(String camundaErrorCodeVariable);
+  
+  String getCamundaErrorCodeVariable();
 }

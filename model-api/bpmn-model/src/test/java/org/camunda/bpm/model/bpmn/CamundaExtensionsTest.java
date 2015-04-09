@@ -49,6 +49,7 @@ import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_USERS_LIST_API;
 import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_USERS_LIST_XML;
 import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_USERS_XML;
 import static org.camunda.bpm.model.bpmn.BpmnTestConstants.USER_TASK_ID;
+import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_ATTRIBUTE_ERROR_CODE_VARIABLE;
 import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_NS;
 
 import java.util.ArrayList;
@@ -62,6 +63,7 @@ import org.camunda.bpm.model.bpmn.instance.BaseElement;
 import org.camunda.bpm.model.bpmn.instance.BpmnModelElementInstance;
 import org.camunda.bpm.model.bpmn.instance.CallActivity;
 import org.camunda.bpm.model.bpmn.instance.EndEvent;
+import org.camunda.bpm.model.bpmn.instance.ErrorEventDefinition;
 import org.camunda.bpm.model.bpmn.instance.Expression;
 import org.camunda.bpm.model.bpmn.instance.MessageEventDefinition;
 import org.camunda.bpm.model.bpmn.instance.ParallelGateway;
@@ -278,6 +280,12 @@ public class CamundaExtensionsTest {
     assertThat(userTask.getCamundaDueDate()).isEqualTo(TEST_DUE_DATE_XML);
     userTask.setCamundaDueDate(TEST_DUE_DATE_API);
     assertThat(userTask.getCamundaDueDate()).isEqualTo(TEST_DUE_DATE_API);
+  }
+  
+  @Test
+  public void testErrorCodeVariable(){
+    ErrorEventDefinition errorEventDefinition = startEvent.getChildElementsByType(ErrorEventDefinition.class).iterator().next();
+    assertThat(errorEventDefinition.getAttributeValueNs(CAMUNDA_NS, CAMUNDA_ATTRIBUTE_ERROR_CODE_VARIABLE)).isEqualTo("errorVariable");
   }
 
   @Test
