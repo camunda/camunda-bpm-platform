@@ -26,7 +26,7 @@ define([], function() {
 
       $scope.selectedPermissions = ["ALL"];
 
-      $scope.identityId =undefined;
+      newAuthorization.identityId = undefined;
       $scope.identityType = 'User';
       updatePermissions();
     };
@@ -65,10 +65,10 @@ define([], function() {
 
     $scope.$watch('newAuthorization.type', function() {
       if(newAuthorization.type == 0) {
-        $scope.identityId = '*';
+        newAuthorization.identityId = '*';
         $scope.identityType = 'User';
       } else {
-        $scope.identityId = undefined;
+        newAuthorization.identityId = undefined;
         $scope.identityType = 'Group';
       }
     });
@@ -78,12 +78,14 @@ define([], function() {
       newAuthorization.permissions = $scope.selectedPermissions;
 
       if($scope.identityType == 'User') {
-        newAuthorization.userId = $scope.identityId;
+        newAuthorization.userId = newAuthorization.identityId;
       }
 
       if($scope.identityType == 'Group') {
-        newAuthorization.groupId = $scope.identityId;
+        newAuthorization.groupId = newAuthorization.identityId;
       }
+
+      delete newAuthorization.identityId;
 
       AuthorizationResource.create(newAuthorization).$promise.then(function(response) {
         resetForm();
