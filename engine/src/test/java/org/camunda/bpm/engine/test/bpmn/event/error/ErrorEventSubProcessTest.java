@@ -14,9 +14,13 @@ package org.camunda.bpm.engine.test.bpmn.event.error;
 
 import static org.camunda.bpm.engine.test.bpmn.event.error.ThrowErrorDelegate.throwError;
 import static org.camunda.bpm.engine.test.bpmn.event.error.ThrowErrorDelegate.throwException;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.junit.Assert.assertThat;
 
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.Execution;
+import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.variable.VariableMap;
@@ -272,6 +276,35 @@ public class ErrorEventSubProcessTest extends PluggableProcessEngineTestCase {
     // Completing the Task will end the process instance
     taskService.complete(task.getId());
     assertProcessEnded(procId);
+  }
+  
+  @Deployment
+  public void testCatchErrorEventSubprocessSetErrorCodeVariable(){
+    runtimeService.startProcessInstanceByKey("Process_1");
+    //the name used in "camunda:errorCodeVariable" in the BPMN
+    String variableName = "errorCode";
+    VariableInstance errorVariable = runtimeService.createVariableInstanceQuery().variableName(variableName).singleResult();
+
+    assertThat(errorVariable, is(notNullValue()));
+    //the code we gave the thrown error
+    Object errorCode = "error";
+    assertThat(errorVariable.getValue(), is(errorCode));
+  }
+  
+  @Deployment(resources={
+      "org/camunda/bpm/engine/test/bpmn/event/error/ThrowErrorProcess.bpmn",
+      "org/camunda/bpm/engine/test/bpmn/event/error/ErrorEventSubProcessTest.testCatchErrorFromCallActivitySetsErrorVariable.bpmn"
+  })
+  public void testCatchErrorFromCallActivitySetsErrorVariable(){
+    runtimeService.startProcessInstanceByKey("Process_1");
+    //the name used in "camunda:errorCodeVariable" in the BPMN
+    String variableName = "errorCode";
+    VariableInstance errorVariable = runtimeService.createVariableInstanceQuery().variableName(variableName).singleResult();
+
+    assertThat(errorVariable, is(notNullValue()));
+    //the code we gave the thrown error
+    Object errorCode = "error";
+    assertThat(errorVariable.getValue(), is(errorCode));
   }
 
 }

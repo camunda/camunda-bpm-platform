@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.impl.bpmn.helper;
 
 import java.util.List;
 import java.util.logging.Logger;
+
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.impl.bpmn.behavior.EventSubProcessStartEventActivityBehavior;
@@ -28,7 +29,6 @@ import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
-import org.camunda.bpm.engine.impl.util.EnsureUtil;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.*;
 
@@ -61,11 +61,11 @@ public class ErrorPropagation {
 
   public static void propagateError(String errorCode, Exception origException, ActivityExecution execution) throws Exception {
     // find local error handler
-    String eventHandlerId = findLocalErrorEventHandler(execution, errorCode, origException);
+    ErrorEventDefinition eventHandler = findLocalErrorEventHandler(execution, errorCode, origException);
 
     // TODO: merge two approaches (super process / regular process approach)
-    if(eventHandlerId != null) {
-      executeCatch(eventHandlerId, execution);
+    if(eventHandler != null) {
+      executeCatch(eventHandler, execution, errorCode);
     }else {
       ActivityExecution superExecution = getSuperExecution(execution);
       if (superExecution != null) {
@@ -83,7 +83,7 @@ public class ErrorPropagation {
     }
   }
 
-  private static String findLocalErrorEventHandler(ActivityExecution execution, String errorCode, Exception origException) {
+  private static ErrorEventDefinition findLocalErrorEventHandler(ActivityExecution execution, String errorCode, Exception origException) {
     PvmScope scope = execution.getActivity();
     while (scope != null) {
 
@@ -94,10 +94,10 @@ public class ErrorPropagation {
         for (ErrorEventDefinition errorEventDefinition : definitions) {
           if(origException != null) {
             if(errorEventDefinition.catchesException(origException)) {
-              return errorEventDefinition.getHandlerActivityId();
+              return errorEventDefinition;
             }
           } else if(errorEventDefinition.catchesError(errorCode)) {
-            return errorEventDefinition.getHandlerActivityId();
+            return errorEventDefinition;
           }
         }
       }
@@ -113,9 +113,9 @@ public class ErrorPropagation {
   }
 
   private static void executeCatchInSuperProcess(String errorCode, Exception origException, ActivityExecution superExecution) throws Exception {
-    String errorHandlerId = findLocalErrorEventHandler(superExecution, errorCode, origException);
-    if (errorHandlerId != null) {
-      executeCatch(errorHandlerId, superExecution);
+    ErrorEventDefinition errorHandler = findLocalErrorEventHandler(superExecution, errorCode, origException);
+    if (errorHandler != null) {
+      executeCatch(errorHandler, superExecution, errorCode);
     } else { // no matching catch found, going one level up in process hierarchy
       ActivityExecution superSuperExecution = getSuperExecution(superExecution);
       if (superSuperExecution != null) {
@@ -141,10 +141,10 @@ public class ErrorPropagation {
     return superExecution;
   }
 
-  private static void executeCatch(String errorHandlerId, ActivityExecution execution) {
+  private static void executeCatch(ErrorEventDefinition errorEventDefinition, ActivityExecution execution, String errorCode) {
     ProcessDefinitionImpl processDefinition = ((ExecutionEntity) execution).getProcessDefinition();
-    ActivityImpl errorHandler = processDefinition.findActivity(errorHandlerId);
-    ensureNotNull(errorHandlerId + " not found in process definition", "errorHandler", errorHandler);
+    ActivityImpl errorHandler = processDefinition.findActivity(errorEventDefinition.getHandlerActivityId());
+    ensureNotNull(errorEventDefinition.getHandlerActivityId() + " not found in process definition", "errorHandler", errorHandler);
 
     boolean matchingParentFound = false;
     ActivityExecution leavingExecution = execution;
@@ -159,8 +159,8 @@ public class ErrorPropagation {
     }
 
     if (catchingScope instanceof PvmProcessDefinition) {
-      executeEventHandler(errorHandler, ((ExecutionEntity) execution).getProcessInstance());
-
+      ExecutionEntity processInstance = ((ExecutionEntity) execution).getProcessInstance();
+      executeEventHandler(errorHandler, processInstance, errorEventDefinition, errorCode);
     } else {
       if (currentActivity.getId().equals(catchingScope.getId())) {
         matchingParentFound = true;
@@ -198,19 +198,32 @@ public class ErrorPropagation {
       }
 
       if (matchingParentFound && leavingExecution != null) {
-        executeEventHandler(errorHandler, leavingExecution);
+        executeEventHandler(errorHandler, leavingExecution, errorEventDefinition, errorCode);
       } else {
-        throw new ProcessEngineException("No matching parent execution for activity " + errorHandlerId + " found");
+        throw new ProcessEngineException("No matching parent execution for activity " + errorEventDefinition + " found");
       }
     }
-
   }
 
-  private static void executeEventHandler(ActivityImpl borderEventActivity, ActivityExecution leavingExecution) {
+  private static void executeEventHandler(ActivityImpl borderEventActivity, ActivityExecution leavingExecution, ErrorEventDefinition errorEventDefinition, String errorCode) {
+    setErrorCodeVariable(leavingExecution, errorEventDefinition, errorCode);
     if(borderEventActivity.getActivityBehavior() instanceof EventSubProcessStartEventActivityBehavior) {
       leavingExecution.executeActivity(borderEventActivity.getParentActivity());
     }else {
       leavingExecution.executeActivity(borderEventActivity);
+    }
+  }
+
+  /**
+   * If the attribute camunda:errorCodeVariable is set on the error event definition on the catching boundary event
+   * we set the error code under that name in the parent scope.
+   * @param leavingExecution
+   * @param errorEventDefinition
+   * @param errorCode
+   */
+  private static void setErrorCodeVariable(ActivityExecution leavingExecution, ErrorEventDefinition errorEventDefinition, String errorCode) {
+    if(errorEventDefinition.getErrorCodeVariable() != null){
+      leavingExecution.setVariable(errorEventDefinition.getErrorCodeVariable(), errorCode);
     }
   }
 

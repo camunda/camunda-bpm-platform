@@ -165,6 +165,7 @@ public class BpmnParse extends Parse {
   public static final String PROPERTYNAME_EVENT_SUBSCRIPTION_DECLARATION = "eventDefinitions";
   public static final String PROPERTYNAME_TRIGGERED_BY_EVENT = "triggeredByEvent";
   public static final String PROPERTYNAME_TYPE = "type";
+  public static final String PROPERTYNAME_ERRORCODE_VARIABLE = "errorCodeVariable";
 
   /* process start authorization specific finals */
   protected static final String POTENTIAL_STARTER = "potentialStarter";
@@ -901,7 +902,20 @@ public class BpmnParse extends Parse {
       definition.setErrorCode(errorCode);
     }
     definition.setPrecedence(10);
+    setErrorCodeVariableOnErrorEventDefinition(errorEventDefinition, definition);
     addErrorEventDefinition(definition, scope);
+  }
+
+  /**
+   * Sets the value for "camunda:errorCodeVariable" on the passed definition if it's present.
+   * @param errorEventDefinition the XML errorEventDefinition tag
+   * @param definition the errorEventDefintion that can get the errorCodeVariable value
+   */
+  private void setErrorCodeVariableOnErrorEventDefinition(Element errorEventDefinition, ErrorEventDefinition definition) {
+    String errorCodeVar = errorEventDefinition.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, PROPERTYNAME_ERRORCODE_VARIABLE);
+    if(errorCodeVar != null){
+      definition.setErrorCodeVariable(errorCodeVar);
+    }
   }
 
   protected EventSubscriptionDeclaration parseMessageEventDefinition(Element messageEventDefinition) {
@@ -2680,6 +2694,7 @@ public class BpmnParse extends Parse {
       error = errors.get(errorRef);
       definition.setErrorCode(error == null ? errorRef : error.getErrorCode());
     }
+    setErrorCodeVariableOnErrorEventDefinition(errorEventDefinition, definition);
 
     addErrorEventDefinition(definition, catchingScope);
 

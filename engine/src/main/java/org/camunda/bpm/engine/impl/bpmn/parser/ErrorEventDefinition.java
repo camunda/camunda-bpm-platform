@@ -22,6 +22,7 @@ import org.camunda.bpm.engine.ProcessEngineException;
 
 /**
  * @author Daniel Meyer
+ * @author Ronny Bräunlich
  */
 public class ErrorEventDefinition implements Serializable {
 
@@ -36,6 +37,7 @@ public class ErrorEventDefinition implements Serializable {
   protected final String handlerActivityId;
   protected String errorCode;
   protected Integer precedence =0;
+  protected String errorCodeVariable;
 
   public ErrorEventDefinition(String handlerActivityId) {
     this.handlerActivityId=handlerActivityId;
@@ -89,6 +91,14 @@ public class ErrorEventDefinition implements Serializable {
 
       return false;
     }
+  }
+
+  public void setErrorCodeVariable(String errorCodeVariable) {
+    this.errorCodeVariable = errorCodeVariable;
+  }
+
+  public String getErrorCodeVariable() {
+    return errorCodeVariable;
   }
 
 }
