@@ -79,6 +79,29 @@ public class AuthorizationManager extends AbstractManager {
     return (Long) getDbEntityManager().selectOne("selectAuthorizationCountByQueryCriteria", authorizationQuery);
   }
 
+  public AuthorizationEntity findAuthorizationByUserIdAndResourceId(int type, String userId, Resource resource, String resourceId) {
+    return findAuthorization(type, userId, null, resource, resourceId);
+  }
+
+  public AuthorizationEntity findAuthorizationByGroupIdAndResourceId(int type, String groupId, Resource resource, String resourceId) {
+    return findAuthorization(type, null, groupId, resource, resourceId);
+  }
+
+  public AuthorizationEntity findAuthorization(int type, String userId, String groupId, Resource resource, String resourceId) {
+    Map<String, Object> params = new HashMap<String, Object>();
+
+    params.put("type", type);
+    params.put("userId", userId);
+    params.put("groupId", groupId);
+    params.put("resourceId", resourceId);
+
+    if (resource != null) {
+      params.put("resourceType", resource.resourceType());
+    }
+
+    return (AuthorizationEntity) getDbEntityManager().selectOne("selectAuthorizationByParameters", params);
+  }
+
   public void update(AuthorizationEntity authorization) {
     checkAuthorization(UPDATE, AUTHORIZATION, authorization.getId());
     getDbEntityManager().merge(authorization);

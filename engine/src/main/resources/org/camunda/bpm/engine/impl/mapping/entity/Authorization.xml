@@ -75,6 +75,30 @@
 
   <!-- AUTHORIZATION SELECT -->
 
+  <select id="selectAuthorizationByParameters" resultMap="authorizationResultMap">
+    SELECT
+        *
+    FROM
+        ${prefix}ACT_RU_AUTHORIZATION
+    <where>
+      <if test="type != null">
+        TYPE_ = #{type}
+      </if>
+      <if test="userId != null">
+        AND USER_ID_ = #{userId}
+      </if>
+      <if test="groupId != null">
+        AND GROUP_ID_ = #{groupId}
+      </if>
+      <if test="resourceType != null">
+        AND RESOURCE_TYPE_ = #{resourceType}
+      </if>
+      <if test="resourceId != null">
+        AND RESOURCE_ID_ = #{resourceId}
+      </if>
+    </where>
+  </select>
+
   <select id="selectAuthorization" resultMap="authorizationResultMap">
     select * FROM ${prefix}ACT_RU_AUTHORIZATION WHERE ID_ = #{id}
   </select>

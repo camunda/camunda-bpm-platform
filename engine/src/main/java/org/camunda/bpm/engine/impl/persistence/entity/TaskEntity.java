@@ -36,6 +36,8 @@ import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.delegate.TaskListener;
 import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.exception.NullValueException;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.cfg.auth.ResourceAuthorizationProvider;
 import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
 import org.camunda.bpm.engine.impl.context.Context;
@@ -527,6 +529,9 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
     identityLinkEntity.setUserId(userId);
     identityLinkEntity.setGroupId(groupId);
     identityLinkEntity.setType(type);
+
+    fireAddIdentityLinkAuthorizationProvider(type, userId, groupId);
+
     return identityLinkEntity;
   }
 
@@ -539,6 +544,8 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
       .findIdentityLinkByTaskUserGroupAndType(id, userId, groupId, type);
 
     for (IdentityLinkEntity identityLink: identityLinks) {
+      fireDeleteIdentityLinkAuthorizationProvider(type, userId, groupId);
+
       Context
         .getCommandContext()
         .getDbEntityManager()
@@ -663,18 +670,22 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
     ensureTaskActive();
     registerCommandContextCloseListener();
 
-    if (assignee==null && this.assignee==null) {
+    String oldAssignee = this.assignee;
+    if (assignee==null && oldAssignee==null) {
       return;
     }
 
-    propertyChanged(ASSIGNEE, this.assignee, assignee);
+    propertyChanged(ASSIGNEE, oldAssignee, assignee);
     this.assignee = assignee;
 
     CommandContext commandContext = Context.getCommandContext();
     // if there is no command context, then it means that the user is calling the
     // setAssignee outside a service method.  E.g. while creating a new task.
-    if (commandContext!=null) {
+    if (commandContext != null) {
       fireEvent(TaskListener.EVENTNAME_ASSIGNMENT);
+      if (commandContext.getDbEntityManager().contains(this)) {
+        fireAssigneeAuthorizationProvider(oldAssignee, assignee);
+      }
     }
   }
 
@@ -687,12 +698,20 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
     ensureTaskActive();
     registerCommandContextCloseListener();
 
-    if (owner==null && this.owner==null) {
+    String oldOwner = this.owner;
+    if (owner==null && oldOwner==null) {
       return;
     }
 
-    propertyChanged(OWNER, this.owner, owner);
+    propertyChanged(OWNER, oldOwner, owner);
     this.owner = owner;
+
+    CommandContext commandContext = Context.getCommandContext();
+    // if there is no command context, then it means that the user is calling the
+    // setOwner outside a service method.  E.g. while creating a new task.
+    if (commandContext != null && commandContext.getDbEntityManager().contains(this)) {
+      fireOwnerAuthorizationProvider(oldOwner, owner);
+    }
 
   }
 
@@ -786,6 +805,101 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
           || (orgValue != null && !orgValue.equals(newValue))) // value change
         propertyChanges.put(propertyName, new PropertyChange(propertyName, orgValue, newValue));
     }
+  }
+
+  // authorizations ///////////////////////////////////////////////////////////
+
+  public void fireAuthorizationProvider() {
+    PropertyChange assigneePropertyChange = propertyChanges.get(ASSIGNEE);
+    if (assigneePropertyChange != null) {
+      String oldAssignee = assigneePropertyChange.getOrgValueString();
+      String newAssignee = assigneePropertyChange.getNewValueString();
+      fireAssigneeAuthorizationProvider(oldAssignee, newAssignee);
+    }
+
+    PropertyChange ownerPropertyChange = propertyChanges.get(OWNER);
+    if (ownerPropertyChange != null) {
+      String oldOwner = ownerPropertyChange.getOrgValueString();
+      String newOwner = ownerPropertyChange.getNewValueString();
+      fireOwnerAuthorizationProvider(oldOwner, newOwner);
+    }
+  }
+
+  protected void fireAssigneeAuthorizationProvider(String oldAssignee, String newAssignee) {
+    fireAuthorizationProvider(ASSIGNEE, oldAssignee, newAssignee);
+  }
+
+  protected void fireOwnerAuthorizationProvider(String oldOwner, String newOwner) {
+    fireAuthorizationProvider(OWNER, oldOwner, newOwner);
+  }
+
+  protected void fireAuthorizationProvider(String property, String oldValue, String newValue) {
+    if (isAuthorizationEnabled() && caseExecutionId == null) {
+      ResourceAuthorizationProvider provider = getResourceAuthoriatzionProvider();
+
+      AuthorizationEntity[] authorizations = null;
+      if (ASSIGNEE.equals(property)) {
+        authorizations = provider.newTaskAssignee(this, oldValue, newValue);
+      }
+      else if (OWNER.equals(property)) {
+        authorizations = provider.newTaskOwner(this, oldValue, newValue);
+      }
+
+      saveAuthorizations(authorizations);
+    }
+  }
+
+  protected void fireAddIdentityLinkAuthorizationProvider(String type, String userId, String groupId) {
+    if (isAuthorizationEnabled() && caseExecutionId == null) {
+      ResourceAuthorizationProvider provider = getResourceAuthoriatzionProvider();
+
+      AuthorizationEntity[] authorizations = null;
+      if (userId != null) {
+        authorizations = provider.newTaskUserIdentityLink(this, userId, type);
+      }
+      else if (groupId != null) {
+        authorizations = provider.newTaskGroupIdentityLink(this, groupId, type);
+      }
+
+      saveAuthorizations(authorizations);
+    }
+  }
+
+  protected void fireDeleteIdentityLinkAuthorizationProvider(String type, String userId, String groupId) {
+    if (isAuthorizationEnabled() && caseExecutionId == null) {
+      ResourceAuthorizationProvider provider = getResourceAuthoriatzionProvider();
+
+      AuthorizationEntity[] authorizations = null;
+      if (userId != null) {
+        authorizations = provider.deleteTaskUserIdentityLink(this, userId, type);
+      }
+      else if (groupId != null) {
+        authorizations = provider.deleteTaskGroupIdentityLink(this, groupId, type);
+      }
+
+      deleteAuthorizations(authorizations);
+    }
+  }
+
+  protected ResourceAuthorizationProvider getResourceAuthoriatzionProvider() {
+    ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
+    return processEngineConfiguration.getResourceAuthorizationProvider();
+  }
+
+  protected void saveAuthorizations(AuthorizationEntity[] authorizations) {
+    CommandContext commandContext = Context.getCommandContext();
+    TaskManager taskManager = commandContext.getTaskManager();
+    taskManager.saveDefaultAuthorizations(authorizations);
+  }
+
+  protected void deleteAuthorizations(AuthorizationEntity[] authorizations) {
+    CommandContext commandContext = Context.getCommandContext();
+    TaskManager taskManager = commandContext.getTaskManager();
+    taskManager.deleteDefaultAuthorizations(authorizations);
+  }
+
+  protected boolean isAuthorizationEnabled() {
+    return Context.getProcessEngineConfiguration().isAuthorizationEnabled();
   }
 
   // modified getters and setters /////////////////////////////////////////////

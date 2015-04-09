@@ -18,6 +18,7 @@ import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.task.IdentityLinkType;
 import org.camunda.bpm.engine.task.Task;
 
 /**
@@ -105,5 +106,77 @@ public interface ResourceAuthorizationProvider {
    *         {@link Task} is created.
    */
   public AuthorizationEntity[] newTask(Task task);
+
+  /**
+   * <p>Invoked whenever an user has been assigned to a task.</p>
+   *
+   * @param task the task on which the assignee has been changed
+   * @param oldAssignee the old assignee of the task
+   * @param newAssignee the new assignee of the task
+   *
+   * @return a list of authorizations to be automatically added when an
+   *          assignee of a task changes.
+   */
+  public AuthorizationEntity[] newTaskAssignee(Task task, String oldAssignee, String newAssignee);
+
+  /**
+   * <p>Invoked whenever an user has been set as the owner of a task.</p>
+   *
+   * @param task the task on which the owner has been changed
+   * @param oldOwner the old owner of the task
+   * @param newOwner the new owner of the task
+   *
+   * @return a list of authorizations to be automatically added when the
+   *          owner of a task changes.
+   */
+  public AuthorizationEntity[] newTaskOwner(Task task, String oldOwner, String newOwner);
+
+  /**
+   * <p>Invoked whenever a new user identity link has been added to a task.</p>
+   *
+   * @param task the task on which a new identity link has been added
+   * @param userId the user for which the identity link has been created
+   * @param type the type of the identity link (e.g. {@link IdentityLinkType#CANDIDATE})
+   *
+   * @return a list of authorizations to be automatically added when
+   *          a new user identity link has been added.
+   */
+  public AuthorizationEntity[] newTaskUserIdentityLink(Task task, String userId, String type);
+
+  /**
+   * <p>Invoked whenever a new group identity link has been added to a task.</p>
+   *
+   * @param task the task on which a new identity link has been added
+   * @param groupId the group for which the identity link has been created
+   * @param type the type of the identity link (e.g. {@link IdentityLinkType#CANDIDATE})
+   *
+   * @return a list of authorizations to be automatically added when
+   *          a new group identity link has been added.
+   */
+  public AuthorizationEntity[] newTaskGroupIdentityLink(Task task, String groupId, String type);
+
+  /**
+   * <p>Invoked whenever a user identity link of a task has been deleted.</p>
+   *
+   * @param task the task on which the identity link has been deleted
+   * @param userId the user for which the identity link has been deleted
+   * @param type the type of the identity link (e.g. {@link IdentityLinkType#CANDIDATE})
+   *
+   * @return a list of authorizations to be automatically deleted when
+   *          a user identity link has been deleted.
+   */
+  public AuthorizationEntity[] deleteTaskUserIdentityLink(Task task, String userId, String type);
+
+  /**
+   * <p>Invoked whenever a group identity link of a task has been deleted.</p>
+   *
+   * @param task the task on which the identity link has been deleted
+   * @param groupId the group for which the identity link has been deleted
+   * @param type the type of the identity link (e.g. {@link IdentityLinkType#CANDIDATE})
+   *
+   * @return a list of authorizations to be automatically deleted when
+   *          a group identity link has been deleted.
+   */
+  public AuthorizationEntity[] deleteTaskGroupIdentityLink(Task task, String groupId, String type);
 
 }

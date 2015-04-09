@@ -460,6 +460,10 @@ public class DbEntityManager implements Session {
     return prunedList;
   }
 
+  public boolean contains(DbEntity dbEntity) {
+    return dbEntityCache.contains(dbEntity);
+  }
+
   // getters / setters /////////////////////////////////
 
   public DbOperationManager getDbOperationManager() {

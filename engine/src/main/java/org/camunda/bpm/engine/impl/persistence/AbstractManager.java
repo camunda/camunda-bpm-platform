@@ -217,19 +217,36 @@ public abstract class AbstractManager implements Session {
   }
 
   protected void deleteAuthorizations(Resource resource, String resourceId) {
-    Context.getCommandContext()
-      .getAuthorizationManager()
-      .deleteAuthorizationsByResourceId(resource, resourceId);
+    getAuthorizationManager().deleteAuthorizationsByResourceId(resource, resourceId);
   }
 
-  protected void saveDefaultAuthorizations(final AuthorizationEntity[] authorizations) {
+  public void saveDefaultAuthorizations(final AuthorizationEntity[] authorizations) {
     if(authorizations != null && authorizations.length > 0) {
       Context.getCommandContext().runWithoutAuthentication(new Callable<Void>() {
         public Void call() {
-          AuthorizationManager authorizationManager = Context.getCommandContext()
-              .getAuthorizationManager();
+          AuthorizationManager authorizationManager = getAuthorizationManager();
           for (AuthorizationEntity authorization : authorizations) {
-            authorizationManager.insert(authorization);
+
+            if(authorization.getId() == null) {
+              authorizationManager.insert(authorization);
+            } else {
+              authorizationManager.update(authorization);
+            }
+
+          }
+          return null;
+        }
+      });
+    }
+  }
+
+  public void deleteDefaultAuthorizations(final AuthorizationEntity[] authorizations) {
+    if(authorizations != null && authorizations.length > 0) {
+      Context.getCommandContext().runWithoutAuthentication(new Callable<Void>() {
+        public Void call() {
+          AuthorizationManager authorizationManager = getAuthorizationManager();
+          for (AuthorizationEntity authorization : authorizations) {
+            authorizationManager.delete(authorization);
           }
           return null;
         }

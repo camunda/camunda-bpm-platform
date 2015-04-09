@@ -42,6 +42,7 @@ public class SaveTaskCmd implements Command<Void>, Serializable {
     ensureNotNull("task", task);
 
     AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
+    String operation;
 
     if (task.getRevision() == 0) {
 
@@ -49,7 +50,7 @@ public class SaveTaskCmd implements Command<Void>, Serializable {
         authorizationManager.checkCreateTask();
         task.insert(null);
         commandContext.getHistoricTaskInstanceManager().createHistoricTask(task);
-        task.createHistoricTaskDetails(UserOperationLogEntry.OPERATION_TYPE_CREATE);
+        operation = UserOperationLogEntry.OPERATION_TYPE_CREATE;
       } catch (NullValueException e) {
         throw new NotValidException(e.getMessage(), e);
       }
@@ -57,8 +58,11 @@ public class SaveTaskCmd implements Command<Void>, Serializable {
     } else {
       authorizationManager.checkUpdateTask(task);
       task.update();
-      task.createHistoricTaskDetails(UserOperationLogEntry.OPERATION_TYPE_UPDATE);
+      operation = UserOperationLogEntry.OPERATION_TYPE_UPDATE;
     }
+
+    task.fireAuthorizationProvider();
+    task.createHistoricTaskDetails(operation);
 
     return null;
   }

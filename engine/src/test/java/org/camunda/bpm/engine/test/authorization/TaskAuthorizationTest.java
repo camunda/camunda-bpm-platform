@@ -14,12 +14,14 @@ package org.camunda.bpm.engine.test.authorization;
 
 import static org.camunda.bpm.engine.authorization.Authorization.ANY;
 import static org.camunda.bpm.engine.authorization.Permissions.CREATE;
+import static org.camunda.bpm.engine.authorization.Permissions.CREATE_INSTANCE;
 import static org.camunda.bpm.engine.authorization.Permissions.DELETE;
 import static org.camunda.bpm.engine.authorization.Permissions.READ;
 import static org.camunda.bpm.engine.authorization.Permissions.READ_TASK;
 import static org.camunda.bpm.engine.authorization.Permissions.UPDATE;
 import static org.camunda.bpm.engine.authorization.Permissions.UPDATE_TASK;
 import static org.camunda.bpm.engine.authorization.Resources.PROCESS_DEFINITION;
+import static org.camunda.bpm.engine.authorization.Resources.PROCESS_INSTANCE;
 import static org.camunda.bpm.engine.authorization.Resources.TASK;
 
 import java.util.Arrays;
@@ -42,6 +44,9 @@ public class TaskAuthorizationTest extends AuthorizationTest {
 
   protected static final String PROCESS_KEY = "oneTaskProcess";
   protected static final String CASE_KEY = "oneTaskCase";
+  protected static final String DEMO_ASSIGNEE_PROCESS_KEY = "demoAssigneeProcess";
+  protected static final String CANDIDATE_USERS_PROCESS_KEY = "candidateUsersProcess";
+  protected static final String CANDIDATE_GROUPS_PROCESS_KEY = "candidateGroupsProcess";
 
   protected String deploymentId;
 
@@ -50,6 +55,9 @@ public class TaskAuthorizationTest extends AuthorizationTest {
       .createDeployment()
       .addClasspathResource("org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
       .addClasspathResource("org/camunda/bpm/engine/test/authorization/oneTaskCase.cmmn")
+      .addClasspathResource("org/camunda/bpm/engine/test/authorization/oneTaskProcess.bpmn20.xml")
+      .addClasspathResource("org/camunda/bpm/engine/test/authorization/candidateUsersProcess.bpmn20.xml")
+      .addClasspathResource("org/camunda/bpm/engine/test/authorization/candidateGroupsProcess.bpmn20.xml")
       .deploy()
       .getId();
   }
@@ -3324,6 +3332,1047 @@ public class TaskAuthorizationTest extends AuthorizationTest {
         .createAuthorizationQuery()
         .resourceId(taskId)
         .singleResult();
+    enableAuthorization();
+
+    assertNull(authorization);
+  }
+
+  // set assignee -> an authorization is available (standalone task) /////////////////////////////////////////
+
+  public void testStandaloneTaskSetAssigneeCreateNewAuthorization() {
+    // given
+    String taskId = "myTask";
+    createTask(taskId);
+
+    createGrantAuthorization(TASK, taskId, UPDATE, userId);
+
+    // when
+    taskService.setAssignee(taskId, "demo");
+
+    // then
+    disableAuthorization();
+    Authorization authorization = authorizationService
+      .createAuthorizationQuery()
+      .userIdIn("demo")
+      .singleResult();
+    enableAuthorization();
+
+    assertNotNull(authorization);
+    assertEquals(TASK.resourceType(), authorization.getResourceType());
+    assertEquals(taskId, authorization.getResourceId());
+    assertTrue(authorization.isPermissionGranted(READ));
+    assertTrue(authorization.isPermissionGranted(UPDATE));
+
+    deleteTask(taskId, true);
+  }
+
+  public void testStandaloneTaskSetAssigneeUpdateAuthorization() {
+    // given
+    String taskId = "myTask";
+    createTask(taskId);
+
+    createGrantAuthorization(TASK, taskId, UPDATE, userId);
+    createGrantAuthorization(TASK, taskId, DELETE, "demo");
+
+    // when
+    taskService.setAssignee(taskId, "demo");
+
+    // then
+    disableAuthorization();
+    Authorization authorization = authorizationService
+      .createAuthorizationQuery()
+      .userIdIn("demo")
+      .singleResult();
+    enableAuthorization();
+
+    assertNotNull(authorization);
+    assertEquals(TASK.resourceType(), authorization.getResourceType());
+    assertEquals(taskId, authorization.getResourceId());
+    assertTrue(authorization.isPermissionGranted(READ));
+    assertTrue(authorization.isPermissionGranted(UPDATE));
+
+    deleteTask(taskId, true);
+  }
+
+  public void testStandaloneTaskSetAssigneeToNullAuthorizationStillAvailable() {
+    // given
+    String taskId = "myTask";
+    createTask(taskId);
+    createGrantAuthorization(TASK, taskId, UPDATE, userId);
+
+    // set assignee to demo -> an authorization for demo is available
+    taskService.setAssignee(taskId, "demo");
+
+    // when
+    taskService.setAssignee(taskId, null);
+
+    // then
+    // authorization for demo is still available
+    disableAuthorization();
+    Authorization authorization = authorizationService
+      .createAuthorizationQuery()
+      .userIdIn("demo")
+      .singleResult();
+    enableAuthorization();
+
+    assertNotNull(authorization);
+    assertEquals(TASK.resourceType(), authorization.getResourceType());
+    assertEquals(taskId, authorization.getResourceId());
+    assertTrue(authorization.isPermissionGranted(READ));
+    assertTrue(authorization.isPermissionGranted(UPDATE));
+
+    deleteTask(taskId, true);
+  }
+
+  public void testQueryStandaloneTaskSetAssignee() {
+    // given
+    String taskId = "myTask";
+    createTask(taskId);
+    createGrantAuthorization(TASK, taskId, UPDATE, userId);
+
+    // set assignee to demo -> an authorization for demo is available
+    taskService.setAssignee(taskId, "demo");
+
+    identityService.clearAuthentication();
+    identityService.setAuthentication("demo", null);
+
+    // when
+    Task task = taskService.createTaskQuery().singleResult();
+
+    // then
+    assertNotNull(task);
+    assertEquals(taskId, task.getId());
+
+    identityService.clearAuthentication();
+    identityService.setAuthentication(userId, Arrays.asList(groupId));
+    deleteTask(taskId, true);
+  }
+
+  public void testStandaloneTaskSetAssigneeOutsideCommandContextInsert() {
+    // given
+    String taskId = "myTask";
+    createGrantAuthorization(TASK, ANY, CREATE, userId);
+    createGrantAuthorization(TASK, taskId, UPDATE, userId);
+
+    Task task = taskService.newTask(taskId);
+    task.setAssignee("demo");
+
+    // when
+    taskService.saveTask(task);
+
+    // then
+    disableAuthorization();
+    Authorization authorization = authorizationService
+      .createAuthorizationQuery()
+      .userIdIn("demo")
+      .singleResult();
+    enableAuthorization();
+
+    assertNotNull(authorization);
+    assertEquals(TASK.resourceType(), authorization.getResourceType());
+    assertEquals(taskId, authorization.getResourceId());
+    assertTrue(authorization.isPermissionGranted(READ));
+    assertTrue(authorization.isPermissionGranted(UPDATE));
+
+    deleteTask(taskId, true);
+  }
+
+  public void testStandaloneTaskSetAssigneeOutsideCommandContextSave() {
+    // given
+    String taskId = "myTask";
+    createTask(taskId);
+    createGrantAuthorization(TASK, taskId, UPDATE, userId);
+
+    Task task = selectSingleTask();
+
+    task.setAssignee("demo");
+
+    // when
+    taskService.saveTask(task);
+
+    // then
+    disableAuthorization();
+    Authorization authorization = authorizationService
+      .createAuthorizationQuery()
+      .userIdIn("demo")
+      .singleResult();
+    enableAuthorization();
+
+    assertNotNull(authorization);
+    assertEquals(TASK.resourceType(), authorization.getResourceType());
+    assertEquals(taskId, authorization.getResourceId());
+    assertTrue(authorization.isPermissionGranted(READ));
+    assertTrue(authorization.isPermissionGranted(UPDATE));
+
+    deleteTask(taskId, true);
+  }
+
+  // set assignee -> an authorization is available (process task) /////////////////////////////////////////
+
+  public void testProcessTaskSetAssigneeCreateNewAuthorization() {
+    // given
+    startProcessInstanceByKey(PROCESS_KEY);
+    String taskId = selectSingleTask().getId();
+
+    createGrantAuthorization(TASK, taskId, UPDATE, userId);
+
+    // when
+    taskService.setAssignee(taskId, "demo");
+
+    // then
+    disableAuthorization();
+    Authorization authorization = authorizationService
+      .createAuthorizationQuery()
+      .userIdIn("demo")
+      .singleResult();
+    enableAuthorization();
+
+    assertNotNull(authorization);
+    assertEquals(TASK.resourceType(), authorization.getResourceType());
+    assertEquals(taskId, authorization.getResourceId());
+    assertTrue(authorization.isPermissionGranted(READ));
+    assertTrue(authorization.isPermissionGranted(UPDATE));
+  }
+
+  public void testProcessTaskSetAssigneeUpdateAuthorization() {
+    // given
+    startProcessInstanceByKey(PROCESS_KEY);
+    String taskId = selectSingleTask().getId();
+
+    createGrantAuthorization(TASK, taskId, UPDATE, userId);
+    createGrantAuthorization(TASK, taskId, DELETE, "demo");
+
+    // when
+    taskService.setAssignee(taskId, "demo");
+
+    // then
+    disableAuthorization();
+    Authorization authorization = authorizationService
+      .createAuthorizationQuery()
+      .userIdIn("demo")
+      .singleResult();
+    enableAuthorization();
+
+    assertNotNull(authorization);
+    assertEquals(TASK.resourceType(), authorization.getResourceType());
+    assertEquals(taskId, authorization.getResourceId());
+    assertTrue(authorization.isPermissionGranted(READ));
+    assertTrue(authorization.isPermissionGranted(UPDATE));
+  }
+
+  public void testProcessTaskSetAssigneeToNullAuthorizationStillAvailable() {
+    // given
+    startProcessInstanceByKey(PROCESS_KEY);
+    String taskId = selectSingleTask().getId();
+    createGrantAuthorization(TASK, taskId, UPDATE, userId);
+
+    // set assignee to demo -> an authorization for demo is available
+    taskService.setAssignee(taskId, "demo");
+
+    // when
+    taskService.setAssignee(taskId, null);
+
+    // then
+    // authorization for demo is still available
+    disableAuthorization();
+    Authorization authorization = authorizationService
+      .createAuthorizationQuery()
+      .userIdIn("demo")
+      .singleResult();
+    enableAuthorization();
+
+    assertNotNull(authorization);
+    assertEquals(TASK.resourceType(), authorization.getResourceType());
+    assertEquals(taskId, authorization.getResourceId());
+    assertTrue(authorization.isPermissionGranted(READ));
+    assertTrue(authorization.isPermissionGranted(UPDATE));
+  }
+
+  public void testQueryProcessTaskSetAssignee() {
+    // given
+    startProcessInstanceByKey(PROCESS_KEY);
+    String taskId = selectSingleTask().getId();
+    createGrantAuthorization(TASK, taskId, UPDATE, userId);
+
+    // set assignee to demo -> an authorization for demo is available
+    taskService.setAssignee(taskId, "demo");
+
+    identityService.clearAuthentication();
+    identityService.setAuthentication("demo", null);
+
+    // when
+    Task task = taskService.createTaskQuery().singleResult();
+
+    // then
+    assertNotNull(task);
+    assertEquals(taskId, task.getId());
+
+    identityService.clearAuthentication();
+    identityService.setAuthentication(userId, Arrays.asList(groupId));
+  }
+
+  public void testProcessTaskAssignee() {
+    // given
+    createGrantAuthorization(PROCESS_DEFINITION, DEMO_ASSIGNEE_PROCESS_KEY, CREATE_INSTANCE, userId);
+    createGrantAuthorization(PROCESS_INSTANCE, ANY, CREATE, userId);
+
+    // when
+    runtimeService.startProcessInstanceByKey(DEMO_ASSIGNEE_PROCESS_KEY);
+
+    // then
+    // an authorization for demo has been created
+    String taskId = selectSingleTask().getId();
+    disableAuthorization();
+    Authorization authorization = authorizationService
+      .createAuthorizationQuery()
+      .userIdIn("demo")
+      .singleResult();
+    enableAuthorization();
+
+    assertNotNull(authorization);
+    assertEquals(TASK.resourceType(), authorization.getResourceType());
+    assertEquals(taskId, authorization.getResourceId());
+    assertTrue(authorization.isPermissionGranted(READ));
+    assertTrue(authorization.isPermissionGranted(UPDATE));
+
+    // demo is able to retrieve the task
+    identityService.clearAuthentication();
+    identityService.setAuthentication("demo", null);
+
+    Task task = taskService.createTaskQuery().singleResult();
+
+    assertNotNull(task);
+    assertEquals(taskId, task.getId());
+
+    identityService.clearAuthentication();
+    identityService.setAuthentication(userId, Arrays.asList(groupId));
+  }
+
+  // set assignee -> should not create an authorization (case task) /////////////////////////////////////////
+
+  public void testCaseTaskSetAssigneeNoAuthorization() {
+    // given
+    createCaseInstanceByKey(CASE_KEY);
+    String taskId = selectSingleTask().getId();
+    createGrantAuthorization(TASK, taskId, UPDATE, userId);
+
+    // when
+    taskService.setAssignee(taskId, "demo");
+
+    // then
+    disableAuthorization();
+    Authorization authorization = authorizationService
+      .createAuthorizationQuery()
+      .userIdIn("demo")
+      .singleResult();
+    enableAuthorization();
+
+    assertNull(authorization);
+  }
+
+  // set owner -> an authorization is available (standalone task) /////////////////////////////////////////
+
+  public void testStandaloneTaskSetOwnerCreateNewAuthorization() {
+    // given
+    String taskId = "myTask";
+    createTask(taskId);
+
+    createGrantAuthorization(TASK, taskId, UPDATE, userId);
+
+    // when
+    taskService.setOwner(taskId, "demo");
+
+    // then
+    disableAuthorization();
+    Authorization authorization = authorizationService
+      .createAuthorizationQuery()
+      .userIdIn("demo")
+      .singleResult();
+    enableAuthorization();
+
+    assertNotNull(authorization);
+    assertEquals(TASK.resourceType(), authorization.getResourceType());
+    assertEquals(taskId, authorization.getResourceId());
+    assertTrue(authorization.isPermissionGranted(READ));
+    assertTrue(authorization.isPermissionGranted(UPDATE));
+
+    deleteTask(taskId, true);
+  }
+
+  public void testStandaloneTaskSetOwnerUpdateAuthorization() {
+    // given
+    String taskId = "myTask";
+    createTask(taskId);
+
+    createGrantAuthorization(TASK, taskId, UPDATE, userId);
+    createGrantAuthorization(TASK, taskId, DELETE, "demo");
+
+    // when
+    taskService.setOwner(taskId, "demo");
+
+    // then
+    disableAuthorization();
+    Authorization authorization = authorizationService
+      .createAuthorizationQuery()
+      .userIdIn("demo")
+      .singleResult();
+    enableAuthorization();
+
+    assertNotNull(authorization);
+    assertEquals(TASK.resourceType(), authorization.getResourceType());
+    assertEquals(taskId, authorization.getResourceId());
+    assertTrue(authorization.isPermissionGranted(READ));
+    assertTrue(authorization.isPermissionGranted(UPDATE));
+
+    deleteTask(taskId, true);
+  }
+
+  public void testQueryStandaloneTaskSetOwner() {
+    String taskId = "myTask";
+    createTask(taskId);
+    createGrantAuthorization(TASK, taskId, UPDATE, userId);
+
+    // set owner to demo -> an authorization for demo is available
+    taskService.setOwner(taskId, "demo");
+
+    identityService.clearAuthentication();
+    identityService.setAuthentication("demo", null);
+
+    // when
+    Task task = taskService.createTaskQuery().singleResult();
+
+    // then
+    assertNotNull(task);
+    assertEquals(taskId, task.getId());
+
+    identityService.clearAuthentication();
+    identityService.setAuthentication(userId, Arrays.asList(groupId));
+    deleteTask(taskId, true);
+  }
+
+  public void testStandaloneTaskSetOwnerOutsideCommandContextInsert() {
+    // given
+    String taskId = "myTask";
+    createGrantAuthorization(TASK, ANY, CREATE, userId);
+    createGrantAuthorization(TASK, taskId, UPDATE, userId);
+
+    Task task = taskService.newTask(taskId);
+    task.setOwner("demo");
+
+    // when
+    taskService.saveTask(task);
+
+    // then
+    disableAuthorization();
+    Authorization authorization = authorizationService
+      .createAuthorizationQuery()
+      .userIdIn("demo")
+      .singleResult();
+    enableAuthorization();
+
+    assertNotNull(authorization);
+    assertEquals(TASK.resourceType(), authorization.getResourceType());
+    assertEquals(taskId, authorization.getResourceId());
+    assertTrue(authorization.isPermissionGranted(READ));
+    assertTrue(authorization.isPermissionGranted(UPDATE));
+
+    deleteTask(taskId, true);
+  }
+
+  public void testStandaloneTaskSetOwnerOutsideCommandContextSave() {
+    // given
+    String taskId = "myTask";
+    createTask(taskId);
+    createGrantAuthorization(TASK, taskId, UPDATE, userId);
+
+    Task task = selectSingleTask();
+
+    task.setOwner("demo");
+
+    // when
+    taskService.saveTask(task);
+
+    // then
+    disableAuthorization();
+    Authorization authorization = authorizationService
+      .createAuthorizationQuery()
+      .userIdIn("demo")
+      .singleResult();
+    enableAuthorization();
+
+    assertNotNull(authorization);
+    assertEquals(TASK.resourceType(), authorization.getResourceType());
+    assertEquals(taskId, authorization.getResourceId());
+    assertTrue(authorization.isPermissionGranted(READ));
+    assertTrue(authorization.isPermissionGranted(UPDATE));
+
+    deleteTask(taskId, true);
+  }
+
+  // set owner -> an authorization is available (process task) /////////////////////////////////////////
+
+  public void testProcessTaskSetOwnerCreateNewAuthorization() {
+    // given
+    startProcessInstanceByKey(PROCESS_KEY);
+    String taskId = selectSingleTask().getId();
+
+    createGrantAuthorization(TASK, taskId, UPDATE, userId);
+
+    // when
+    taskService.setOwner(taskId, "demo");
+
+    // then
+    disableAuthorization();
+    Authorization authorization = authorizationService
+      .createAuthorizationQuery()
+      .userIdIn("demo")
+      .singleResult();
+    enableAuthorization();
+
+    assertNotNull(authorization);
+    assertEquals(TASK.resourceType(), authorization.getResourceType());
+    assertEquals(taskId, authorization.getResourceId());
+    assertTrue(authorization.isPermissionGranted(READ));
+    assertTrue(authorization.isPermissionGranted(UPDATE));
+  }
+
+  public void testProcessTaskSetOwnerUpdateAuthorization() {
+    // given
+    startProcessInstanceByKey(PROCESS_KEY);
+    String taskId = selectSingleTask().getId();
+
+    createGrantAuthorization(TASK, taskId, UPDATE, userId);
+    createGrantAuthorization(TASK, taskId, DELETE, "demo");
+
+    // when
+    taskService.setOwner(taskId, "demo");
+
+    // then
+    disableAuthorization();
+    Authorization authorization = authorizationService
+      .createAuthorizationQuery()
+      .userIdIn("demo")
+      .singleResult();
+    enableAuthorization();
+
+    assertNotNull(authorization);
+    assertEquals(TASK.resourceType(), authorization.getResourceType());
+    assertEquals(taskId, authorization.getResourceId());
+    assertTrue(authorization.isPermissionGranted(READ));
+    assertTrue(authorization.isPermissionGranted(UPDATE));
+  }
+
+  public void testQueryProcessTaskSetOwner() {
+    // given
+    startProcessInstanceByKey(PROCESS_KEY);
+    String taskId = selectSingleTask().getId();
+    createGrantAuthorization(TASK, taskId, UPDATE, userId);
+
+    // set owner to demo -> an authorization for demo is available
+    taskService.setOwner(taskId, "demo");
+
+    identityService.clearAuthentication();
+    identityService.setAuthentication("demo", null);
+
+    // when
+    Task task = taskService.createTaskQuery().singleResult();
+
+    // then
+    assertNotNull(task);
+    assertEquals(taskId, task.getId());
+
+    identityService.clearAuthentication();
+    identityService.setAuthentication(userId, Arrays.asList(groupId));
+  }
+
+  // set owner -> should not create an authorization  (case task) /////////////////////////////////
+
+  public void testCaseTaskSetOwnerNoAuthorization() {
+    // given
+    createCaseInstanceByKey(CASE_KEY);
+    String taskId = selectSingleTask().getId();
+    createGrantAuthorization(TASK, taskId, UPDATE, userId);
+
+    // when
+    taskService.setOwner(taskId, "demo");
+
+    // then
+    disableAuthorization();
+    Authorization authorization = authorizationService
+      .createAuthorizationQuery()
+      .userIdIn("demo")
+      .singleResult();
+    enableAuthorization();
+
+    assertNull(authorization);
+  }
+
+  // add candidate user -> an authorization is available (standalone task) /////////////////
+
+  public void testStandaloneTaskAddCandidateUserCreateNewAuthorization() {
+    // given
+    String taskId = "myTask";
+    createTask(taskId);
+    createGrantAuthorization(TASK, taskId, UPDATE, userId);
+
+    // when
+    taskService.addCandidateUser(taskId, "demo");
+
+    // then
+    disableAuthorization();
+    Authorization authorization = authorizationService
+      .createAuthorizationQuery()
+      .userIdIn("demo")
+      .singleResult();
+    enableAuthorization();
+
+    assertNotNull(authorization);
+    assertEquals(TASK.resourceType(), authorization.getResourceType());
+    assertEquals(taskId, authorization.getResourceId());
+    assertTrue(authorization.isPermissionGranted(READ));
+    assertTrue(authorization.isPermissionGranted(UPDATE));
+
+    deleteTask(taskId, true);
+  }
+
+  public void testStandaloneTaskAddCandidateUserUpdateAuthorization() {
+    // given
+    String taskId = "myTask";
+    createTask(taskId);
+
+    createGrantAuthorization(TASK, taskId, UPDATE, userId);
+    createGrantAuthorization(TASK, taskId, DELETE, "demo");
+
+    // when
+    taskService.addCandidateUser(taskId, "demo");
+
+    // then
+    disableAuthorization();
+    Authorization authorization = authorizationService
+      .createAuthorizationQuery()
+      .userIdIn("demo")
+      .singleResult();
+    enableAuthorization();
+
+    assertNotNull(authorization);
+    assertEquals(TASK.resourceType(), authorization.getResourceType());
+    assertEquals(taskId, authorization.getResourceId());
+    assertTrue(authorization.isPermissionGranted(READ));
+    assertTrue(authorization.isPermissionGranted(UPDATE));
+
+    deleteTask(taskId, true);
+  }
+
+  public void testQueryStandaloneTaskAddCandidateUser() {
+    // given
+    String taskId = "myTask";
+    createTask(taskId);
+
+    createGrantAuthorization(TASK, taskId, UPDATE, userId);
+
+    // add candidate user -> an authorization for demo is available
+    taskService.addCandidateUser(taskId, "demo");
+
+    identityService.clearAuthentication();
+    identityService.setAuthentication("demo", null);
+
+    // when
+    Task task = taskService.createTaskQuery().singleResult();
+
+    // then
+    assertNotNull(task);
+    assertEquals(taskId, task.getId());
+
+    identityService.clearAuthentication();
+    identityService.setAuthentication(userId, Arrays.asList(groupId));
+    deleteTask(taskId, true);
+  }
+
+  // add candidate user -> an authorization is available (process task) ////////////////////
+
+  public void testProcessTaskAddCandidateUserCreateNewAuthorization() {
+    // given
+    startProcessInstanceByKey(PROCESS_KEY);
+    String taskId = selectSingleTask().getId();
+    createGrantAuthorization(TASK, taskId, UPDATE, userId);
+
+    // when
+    taskService.addCandidateUser(taskId, "demo");
+
+    // then
+    disableAuthorization();
+    Authorization authorization = authorizationService
+      .createAuthorizationQuery()
+      .userIdIn("demo")
+      .singleResult();
+    enableAuthorization();
+
+    assertNotNull(authorization);
+    assertEquals(TASK.resourceType(), authorization.getResourceType());
+    assertEquals(taskId, authorization.getResourceId());
+    assertTrue(authorization.isPermissionGranted(READ));
+    assertTrue(authorization.isPermissionGranted(UPDATE));
+  }
+
+  public void testProcessTaskAddCandidateUserUpdateAuthorization() {
+    // given
+    startProcessInstanceByKey(PROCESS_KEY);
+    String taskId = selectSingleTask().getId();
+
+    createGrantAuthorization(TASK, taskId, UPDATE, userId);
+    createGrantAuthorization(TASK, taskId, DELETE, "demo");
+
+    // when
+    taskService.addCandidateUser(taskId, "demo");
+
+    // then
+    disableAuthorization();
+    Authorization authorization = authorizationService
+      .createAuthorizationQuery()
+      .userIdIn("demo")
+      .singleResult();
+    enableAuthorization();
+
+    assertNotNull(authorization);
+    assertEquals(TASK.resourceType(), authorization.getResourceType());
+    assertEquals(taskId, authorization.getResourceId());
+    assertTrue(authorization.isPermissionGranted(READ));
+    assertTrue(authorization.isPermissionGranted(UPDATE));
+  }
+
+  public void testQueryProcessTaskAddCandidateUser() {
+    // given
+    startProcessInstanceByKey(PROCESS_KEY);
+    String taskId = selectSingleTask().getId();
+    createGrantAuthorization(TASK, taskId, UPDATE, userId);
+
+    // add candidate user -> an authorization for demo is available
+    taskService.addCandidateUser(taskId, "demo");
+
+    identityService.clearAuthentication();
+    identityService.setAuthentication("demo", null);
+
+    // when
+    Task task = taskService.createTaskQuery().singleResult();
+
+    // then
+    assertNotNull(task);
+    assertEquals(taskId, task.getId());
+
+    identityService.clearAuthentication();
+    identityService.setAuthentication(userId, Arrays.asList(groupId));
+  }
+
+  public void testProcessTaskCandidateUsers() {
+    // given
+    createGrantAuthorization(PROCESS_DEFINITION, CANDIDATE_USERS_PROCESS_KEY, CREATE_INSTANCE, userId);
+    createGrantAuthorization(PROCESS_INSTANCE, ANY, CREATE, userId);
+
+    // when
+    runtimeService.startProcessInstanceByKey(CANDIDATE_USERS_PROCESS_KEY);
+
+    // then
+    // an authorization for demo has been created
+    String taskId = selectSingleTask().getId();
+    disableAuthorization();
+    Authorization authorization = authorizationService
+      .createAuthorizationQuery()
+      .userIdIn("demo")
+      .singleResult();
+    enableAuthorization();
+
+    assertNotNull(authorization);
+    assertEquals(TASK.resourceType(), authorization.getResourceType());
+    assertEquals(taskId, authorization.getResourceId());
+    assertTrue(authorization.isPermissionGranted(READ));
+    assertTrue(authorization.isPermissionGranted(UPDATE));
+
+    // an authorization for test has been created
+    disableAuthorization();
+    authorization = authorizationService
+      .createAuthorizationQuery()
+      .userIdIn("test")
+      .resourceId(taskId)
+      .singleResult();
+    enableAuthorization();
+
+    assertNotNull(authorization);
+    assertEquals(TASK.resourceType(), authorization.getResourceType());
+    assertEquals(taskId, authorization.getResourceId());
+    assertTrue(authorization.isPermissionGranted(READ));
+    assertTrue(authorization.isPermissionGranted(UPDATE));
+
+    // demo is able to retrieve the task
+    identityService.clearAuthentication();
+    identityService.setAuthentication("demo", null);
+
+    Task task = taskService.createTaskQuery().singleResult();
+
+    assertNotNull(task);
+    assertEquals(taskId, task.getId());
+
+    // test is able to retrieve the task
+    identityService.clearAuthentication();
+    identityService.setAuthentication(userId, Arrays.asList(groupId));
+
+    task = taskService.createTaskQuery().singleResult();
+
+    assertNotNull(task);
+    assertEquals(taskId, task.getId());
+  }
+
+  // add candidate user -> should not create an authorization  (case task) /////////////////////////////////
+
+  public void testCaseTaskAddCandidateUserNoAuthorization() {
+    // given
+    createCaseInstanceByKey(CASE_KEY);
+    String taskId = selectSingleTask().getId();
+    createGrantAuthorization(TASK, taskId, UPDATE, userId);
+
+    // when
+    taskService.addCandidateUser(taskId, "demo");
+
+    // then
+    disableAuthorization();
+    Authorization authorization = authorizationService
+      .createAuthorizationQuery()
+      .userIdIn("demo")
+      .singleResult();
+    enableAuthorization();
+
+    assertNull(authorization);
+  }
+
+  // add candidate group -> an authorization is available (standalone task) /////////////////
+
+  public void testStandaloneTaskAddCandidateGroupCreateNewAuthorization() {
+    // given
+    String taskId = "myTask";
+    createTask(taskId);
+    createGrantAuthorization(TASK, taskId, UPDATE, userId);
+
+    // when
+    taskService.addCandidateGroup(taskId, "management");
+
+    // then
+    disableAuthorization();
+    Authorization authorization = authorizationService
+      .createAuthorizationQuery()
+      .groupIdIn("management")
+      .singleResult();
+    enableAuthorization();
+
+    assertNotNull(authorization);
+    assertEquals(TASK.resourceType(), authorization.getResourceType());
+    assertEquals(taskId, authorization.getResourceId());
+    assertTrue(authorization.isPermissionGranted(READ));
+    assertTrue(authorization.isPermissionGranted(UPDATE));
+
+    deleteTask(taskId, true);
+  }
+
+  public void testStandaloneTaskAddCandidateGroupUpdateAuthorization() {
+    // given
+    String taskId = "myTask";
+    createTask(taskId);
+
+    createGrantAuthorization(TASK, taskId, UPDATE, userId);
+    createGrantAuthorization(TASK, taskId, DELETE, "demo");
+
+    // when
+    taskService.addCandidateGroup(taskId, "management");
+
+    // then
+    disableAuthorization();
+    Authorization authorization = authorizationService
+      .createAuthorizationQuery()
+      .groupIdIn("management")
+      .singleResult();
+    enableAuthorization();
+
+    assertNotNull(authorization);
+    assertEquals(TASK.resourceType(), authorization.getResourceType());
+    assertEquals(taskId, authorization.getResourceId());
+    assertTrue(authorization.isPermissionGranted(READ));
+    assertTrue(authorization.isPermissionGranted(UPDATE));
+
+    deleteTask(taskId, true);
+  }
+
+  public void testQueryStandaloneTaskAddCandidateGroup() {
+    // given
+    String taskId = "myTask";
+    createTask(taskId);
+
+    createGrantAuthorization(TASK, taskId, UPDATE, userId);
+
+    // add candidate group -> an authorization for group management is available
+    taskService.addCandidateGroup(taskId, "management");
+
+    identityService.clearAuthentication();
+    identityService.setAuthentication("demo", Arrays.asList("management"));
+
+    // when
+    Task task = taskService.createTaskQuery().singleResult();
+
+    // then
+    assertNotNull(task);
+    assertEquals(taskId, task.getId());
+
+    identityService.clearAuthentication();
+    identityService.setAuthentication(userId, Arrays.asList(groupId));
+    deleteTask(taskId, true);
+  }
+
+  // add candidate group -> an authorization is available (process task) ////////////////////
+
+  public void testProcessTaskAddCandidateGroupCreateNewAuthorization() {
+    // given
+    startProcessInstanceByKey(PROCESS_KEY);
+    String taskId = selectSingleTask().getId();
+    createGrantAuthorization(TASK, taskId, UPDATE, userId);
+
+    // when
+    taskService.addCandidateGroup(taskId, "management");
+
+    // then
+    disableAuthorization();
+    Authorization authorization = authorizationService
+      .createAuthorizationQuery()
+      .groupIdIn("management")
+      .singleResult();
+    enableAuthorization();
+
+    assertNotNull(authorization);
+    assertEquals(TASK.resourceType(), authorization.getResourceType());
+    assertEquals(taskId, authorization.getResourceId());
+    assertTrue(authorization.isPermissionGranted(READ));
+    assertTrue(authorization.isPermissionGranted(UPDATE));
+  }
+
+  public void testProcessTaskAddCandidateGroupUpdateAuthorization() {
+    // given
+    startProcessInstanceByKey(PROCESS_KEY);
+    String taskId = selectSingleTask().getId();
+
+    createGrantAuthorization(TASK, taskId, UPDATE, userId);
+    createGrantAuthorization(TASK, taskId, DELETE, "demo");
+
+    // when
+    taskService.addCandidateGroup(taskId, "management");
+
+    // then
+    disableAuthorization();
+    Authorization authorization = authorizationService
+      .createAuthorizationQuery()
+      .groupIdIn("management")
+      .singleResult();
+    enableAuthorization();
+
+    assertNotNull(authorization);
+    assertEquals(TASK.resourceType(), authorization.getResourceType());
+    assertEquals(taskId, authorization.getResourceId());
+    assertTrue(authorization.isPermissionGranted(READ));
+    assertTrue(authorization.isPermissionGranted(UPDATE));
+  }
+
+  public void testQueryProcessTaskAddCandidateGroup() {
+    // given
+    startProcessInstanceByKey(PROCESS_KEY);
+    String taskId = selectSingleTask().getId();
+    createGrantAuthorization(TASK, taskId, UPDATE, userId);
+
+    // add candidate group -> an authorization for group management is available
+    taskService.addCandidateGroup(taskId, "management");
+
+    identityService.clearAuthentication();
+    identityService.setAuthentication("demo", Arrays.asList("management"));
+
+    // when
+    Task task = taskService.createTaskQuery().singleResult();
+
+    // then
+    assertNotNull(task);
+    assertEquals(taskId, task.getId());
+
+    identityService.clearAuthentication();
+    identityService.setAuthentication(userId, Arrays.asList(groupId));
+  }
+
+  public void testProcessTaskCandidateGroups() {
+    // given
+    createGrantAuthorization(PROCESS_DEFINITION, CANDIDATE_GROUPS_PROCESS_KEY, CREATE_INSTANCE, userId);
+    createGrantAuthorization(PROCESS_INSTANCE, ANY, CREATE, userId);
+
+    // when
+    runtimeService.startProcessInstanceByKey(CANDIDATE_GROUPS_PROCESS_KEY);
+
+    // then
+    // an authorization for management has been created
+    String taskId = selectSingleTask().getId();
+    disableAuthorization();
+    Authorization authorization = authorizationService
+      .createAuthorizationQuery()
+      .groupIdIn("management")
+      .singleResult();
+    enableAuthorization();
+
+    assertNotNull(authorization);
+    assertEquals(TASK.resourceType(), authorization.getResourceType());
+    assertEquals(taskId, authorization.getResourceId());
+    assertTrue(authorization.isPermissionGranted(READ));
+    assertTrue(authorization.isPermissionGranted(UPDATE));
+
+    // an authorization for accounting has been created
+    disableAuthorization();
+    authorization = authorizationService
+      .createAuthorizationQuery()
+      .groupIdIn("accounting")
+      .singleResult();
+    enableAuthorization();
+
+    assertNotNull(authorization);
+    assertEquals(TASK.resourceType(), authorization.getResourceType());
+    assertEquals(taskId, authorization.getResourceId());
+    assertTrue(authorization.isPermissionGranted(READ));
+    assertTrue(authorization.isPermissionGranted(UPDATE));
+
+    // management is able to retrieve the task
+    identityService.clearAuthentication();
+    identityService.setAuthentication("demo", Arrays.asList("management"));
+
+    Task task = taskService.createTaskQuery().singleResult();
+
+    assertNotNull(task);
+    assertEquals(taskId, task.getId());
+
+    // accounting is able to retrieve the task
+    identityService.clearAuthentication();
+    identityService.setAuthentication(userId, Arrays.asList(groupId));
+
+    task = taskService.createTaskQuery().singleResult();
+
+    assertNotNull(task);
+    assertEquals(taskId, task.getId());
+  }
+
+  // add candidate group -> should not create an authorization (case task) /////////////////////////////////
+
+  public void testCaseTaskAddCandidateGroupNoAuthorization() {
+    // given
+    createCaseInstanceByKey(CASE_KEY);
+    String taskId = selectSingleTask().getId();
+    createGrantAuthorization(TASK, taskId, UPDATE, userId);
+
+    // when
+    taskService.addCandidateGroup(taskId, "management");
+
+    // then
+    disableAuthorization();
+    Authorization authorization = authorizationService
+      .createAuthorizationQuery()
+      .groupIdIn("management")
+      .singleResult();
     enableAuthorization();
 
     assertNull(authorization);
