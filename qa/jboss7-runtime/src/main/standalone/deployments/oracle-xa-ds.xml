@@ -10,8 +10,6 @@
   <xa-datasource jndi-name="java:jboss/datasources/ProcessEngine" pool-name="ProcessEngine" enabled="true" use-ccm="false">
     <driver>com.oracle.jdbc.ojdbc6</driver>
     <xa-datasource-property name="URL">jdbc:oracle:thin:@${database.host}:${database.port}:${database.name}</xa-datasource-property>
-    <xa-datasource-property name="User">${database.username}</xa-datasource-property>
-    <xa-datasource-property name="Password">${database.password}</xa-datasource-property>
     <xa-pool>
       <min-pool-size>1</min-pool-size>
       <max-pool-size>60</max-pool-size>
@@ -23,6 +21,10 @@
       <pad-xid>false</pad-xid>
       <wrap-xa-resource>true</wrap-xa-resource>
     </xa-pool>
+    <security>
+      <user-name>${database.username}</user-name>
+      <password>${database.password}</password>
+    </security>
     <validation>
       <valid-connection-checker class-name="org.jboss.jca.adapters.jdbc.extensions.oracle.OracleValidConnectionChecker"/>
       <validate-on-match>false</validate-on-match>
