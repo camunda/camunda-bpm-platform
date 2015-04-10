@@ -98,7 +98,7 @@ module.exports = function(config) {
         // bpmn fonts
         {
           expand: true,
-          cwd: 'node_modules/bpmn-font/dist/font',
+          cwd: 'node_modules/camunda-commons-ui/node_modules/bpmn-font/dist/font',
           src: [
             '*.{eot,ttf,svg,woff}'
           ],
