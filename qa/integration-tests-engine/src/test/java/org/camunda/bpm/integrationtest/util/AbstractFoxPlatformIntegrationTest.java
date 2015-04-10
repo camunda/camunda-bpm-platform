@@ -116,7 +116,7 @@ public abstract class AbstractFoxPlatformIntegrationTest {
 
     try {
       Timer timer = new Timer();
-      InteruptTask task = new InteruptTask(Thread.currentThread());
+      InterruptTask task = new InterruptTask(Thread.currentThread());
       timer.schedule(task, maxMillisToWait);
       boolean areJobsAvailable = true;
       try {
@@ -129,7 +129,7 @@ public abstract class AbstractFoxPlatformIntegrationTest {
         timer.cancel();
       }
       if (areJobsAvailable) {
-        throw new ProcessEngineException("time limit of " + maxMillisToWait + " was exceeded");
+        throw new ProcessEngineException("time limit of " + maxMillisToWait + " was exceeded (still " + numberOfJobsAvailable() + " jobs available)");
       }
 
     } finally {
@@ -140,19 +140,34 @@ public abstract class AbstractFoxPlatformIntegrationTest {
   public boolean areJobsAvailable() {
     List<Job> list = managementService.createJobQuery().list();
     for (Job job : list) {
-      if (job.getRetries() > 0 && (job.getDuedate() == null || ClockUtil.getCurrentTime().after(job.getDuedate()))) {
+      if (isJobAvailable(job)) {
         return true;
       }
     }
     return false;
   }
 
-  private static class InteruptTask extends TimerTask {
+  public boolean isJobAvailable(Job job) {
+    return job.getRetries() > 0 && (job.getDuedate() == null || ClockUtil.getCurrentTime().after(job.getDuedate()));
+  }
+
+  public int numberOfJobsAvailable() {
+    int numberOfJobs = 0;
+    List<Job> jobs = managementService.createJobQuery().list();
+    for (Job job : jobs) {
+      if (isJobAvailable(job)) {
+        numberOfJobs++;
+      }
+    }
+    return numberOfJobs;
+  }
+
+  private static class InterruptTask extends TimerTask {
 
     protected boolean timeLimitExceeded = false;
     protected Thread thread;
 
-    public InteruptTask(Thread thread) {
+    public InterruptTask(Thread thread) {
       this.thread = thread;
     }
     public boolean isTimeLimitExceeded() {
