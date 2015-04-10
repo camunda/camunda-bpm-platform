@@ -835,7 +835,7 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
 
   protected void fireAuthorizationProvider(String property, String oldValue, String newValue) {
     if (isAuthorizationEnabled() && caseExecutionId == null) {
-      ResourceAuthorizationProvider provider = getResourceAuthoriatzionProvider();
+      ResourceAuthorizationProvider provider = getResourceAuthorizationProvider();
 
       AuthorizationEntity[] authorizations = null;
       if (ASSIGNEE.equals(property)) {
@@ -851,7 +851,7 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
 
   protected void fireAddIdentityLinkAuthorizationProvider(String type, String userId, String groupId) {
     if (isAuthorizationEnabled() && caseExecutionId == null) {
-      ResourceAuthorizationProvider provider = getResourceAuthoriatzionProvider();
+      ResourceAuthorizationProvider provider = getResourceAuthorizationProvider();
 
       AuthorizationEntity[] authorizations = null;
       if (userId != null) {
@@ -867,7 +867,7 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
 
   protected void fireDeleteIdentityLinkAuthorizationProvider(String type, String userId, String groupId) {
     if (isAuthorizationEnabled() && caseExecutionId == null) {
-      ResourceAuthorizationProvider provider = getResourceAuthoriatzionProvider();
+      ResourceAuthorizationProvider provider = getResourceAuthorizationProvider();
 
       AuthorizationEntity[] authorizations = null;
       if (userId != null) {
@@ -881,7 +881,7 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
     }
   }
 
-  protected ResourceAuthorizationProvider getResourceAuthoriatzionProvider() {
+  protected ResourceAuthorizationProvider getResourceAuthorizationProvider() {
     ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
     return processEngineConfiguration.getResourceAuthorizationProvider();
   }
