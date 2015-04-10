@@ -22,10 +22,12 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.Variant;
 
 import org.camunda.bpm.engine.FormService;
+import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.form.FormData;
+import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.engine.rest.dto.VariableValueDto;
 import org.camunda.bpm.engine.rest.dto.converter.StringListConverter;
 import org.camunda.bpm.engine.rest.dto.task.CompleteTaskDto;
@@ -166,13 +168,29 @@ public class TaskResourceImpl implements TaskResource {
       }
     }
 
-    String processDefinitionId = task.getProcessDefinitionId();
-    String caseDefinitionId = task.getCaseDefinitionId();
-    if (processDefinitionId != null) {
-      dto.setContextPath(ApplicationContextPathUtil.getApplicationPathByProcessDefinitionId(engine, processDefinitionId));
+    // to get the application context path it is necessary to
+    // execute it without authentication (tries to fetch the
+    // process definition), because:
+    // - user 'demo' has READ permission on a specific task resource
+    // - user 'demo' does not have a READ permission on the corresponding
+    //   process definition
+    // -> running the following lines with authorization would lead
+    // to an AuthorizationException because the user 'demo' does not
+    // have READ permission on the corresponding process definition
+    IdentityService identityService = engine.getIdentityService();
+    Authentication currentAuthentication = identityService.getCurrentAuthentication();
+    try {
+      identityService.clearAuthentication();
+      String processDefinitionId = task.getProcessDefinitionId();
+      String caseDefinitionId = task.getCaseDefinitionId();
+      if (processDefinitionId != null) {
+        dto.setContextPath(ApplicationContextPathUtil.getApplicationPathByProcessDefinitionId(engine, processDefinitionId));
 
-    } else if (caseDefinitionId != null) {
-      dto.setContextPath(ApplicationContextPathUtil.getApplicationPathByCaseDefinitionId(engine, caseDefinitionId));
+      } else if (caseDefinitionId != null) {
+        dto.setContextPath(ApplicationContextPathUtil.getApplicationPathByCaseDefinitionId(engine, caseDefinitionId));
+      }
+    } finally {
+      identityService.setAuthentication(currentAuthentication);
     }
 
     return dto;
