@@ -17,6 +17,9 @@ import static org.camunda.bpm.engine.authorization.Permissions.ALL;
 import static org.camunda.bpm.engine.authorization.Permissions.READ;
 import static org.camunda.bpm.engine.authorization.Resources.PROCESS_DEFINITION;
 
+import java.io.InputStream;
+
+import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.impl.AbstractQuery;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
@@ -61,10 +64,7 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
   public void testQueryWithReadPermissionOnAnyProcessDefinition() {
     // given
     // given user gets read permission on any process definition
-    Authorization authorization = createGrantAuthorization(PROCESS_DEFINITION, ANY);
-    authorization.setUserId(userId);
-    authorization.addPermission(READ);
-    saveAuthorization(authorization);
+    createGrantAuthorization(PROCESS_DEFINITION, ANY, READ, userId);
 
     // when
     ProcessDefinitionQuery query = repositoryService.createProcessDefinitionQuery();
@@ -76,10 +76,7 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
   public void testQueryWithReadPermissionOnOneTaskProcess() {
     // given
     // given user gets read permission on "oneTaskProcess" process definition
-    Authorization authorization = createGrantAuthorization(PROCESS_DEFINITION, ONE_TASK_PROCESS_KEY);
-    authorization.setUserId(userId);
-    authorization.addPermission(READ);
-    saveAuthorization(authorization);
+    createGrantAuthorization(PROCESS_DEFINITION, ONE_TASK_PROCESS_KEY, READ, userId);
 
     // when
     ProcessDefinitionQuery query = repositoryService.createProcessDefinitionQuery();
@@ -95,12 +92,9 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
   public void testQueryWithRevokedReadPermission() {
     // given
     // given user gets all permissions on any process definition
-    Authorization authorization = createGrantAuthorization(PROCESS_DEFINITION, ANY);
-    authorization.setUserId(userId);
-    authorization.addPermission(ALL);
-    saveAuthorization(authorization);
+    createGrantAuthorization(PROCESS_DEFINITION, ANY, ALL, userId);
 
-    authorization = createRevokeAuthorization(PROCESS_DEFINITION, ONE_TASK_PROCESS_KEY);
+    Authorization authorization = createRevokeAuthorization(PROCESS_DEFINITION, ONE_TASK_PROCESS_KEY);
     authorization.setUserId(userId);
     authorization.removePermission(READ);
     saveAuthorization(authorization);
@@ -140,8 +134,108 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
     assertEquals(TWO_TASKS_PROCESS_KEY, definition.getKey());
   }
 
+  // get process definition /////////////////////////////////////////////////////
+
+  public void testGetProcessDefinitionWithoutAuthorizations() {
+    // given
+    String processDefinitionId = selectProcessDefinitionByKey(ONE_TASK_PROCESS_KEY).getId();
+
+    try {
+      // when
+      repositoryService.getProcessDefinition(processDefinitionId);
+      fail("Exception expected: It should not be possible to get the process definition");
+    } catch (AuthorizationException e) {
+      // then
+      String message = e.getMessage();
+      assertTextPresent(userId, message);
+      assertTextPresent(READ.getName(), message);
+      assertTextPresent(ONE_TASK_PROCESS_KEY, message);
+      assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+    }
+  }
+
+  public void testGetProcessDefinition() {
+    // given
+    String processDefinitionId = selectProcessDefinitionByKey(ONE_TASK_PROCESS_KEY).getId();
+    createGrantAuthorization(PROCESS_DEFINITION, ONE_TASK_PROCESS_KEY, READ, userId);
+
+    // when
+    ProcessDefinition definition = repositoryService.getProcessDefinition(processDefinitionId);
+
+    // then
+    assertNotNull(definition);
+  }
+
+  // get process diagram /////////////////////////////////////////////////////
+
+  public void testGetProcessDiagramWithoutAuthorizations() {
+    // given
+    String processDefinitionId = selectProcessDefinitionByKey(ONE_TASK_PROCESS_KEY).getId();
+
+    try {
+      // when
+      repositoryService.getProcessDiagram(processDefinitionId);
+      fail("Exception expected: It should not be possible to get the process diagram");
+    } catch (AuthorizationException e) {
+      // then
+      String message = e.getMessage();
+      assertTextPresent(userId, message);
+      assertTextPresent(READ.getName(), message);
+      assertTextPresent(ONE_TASK_PROCESS_KEY, message);
+      assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+    }
+  }
+
+  public void testGetProcessDiagram() {
+    // given
+    String processDefinitionId = selectProcessDefinitionByKey(ONE_TASK_PROCESS_KEY).getId();
+    createGrantAuthorization(PROCESS_DEFINITION, ONE_TASK_PROCESS_KEY, READ, userId);
+
+    // when
+    InputStream stream = repositoryService.getProcessDiagram(processDefinitionId);
+
+    // then
+    // no process diagram deployed
+    assertNull(stream);
+  }
+
+  // get process model /////////////////////////////////////////////////////
+
+  public void testGetProcessModelWithoutAuthorizations() {
+    // given
+    String processDefinitionId = selectProcessDefinitionByKey(ONE_TASK_PROCESS_KEY).getId();
+
+    try {
+      // when
+      repositoryService.getProcessModel(processDefinitionId);
+      fail("Exception expected: It should not be possible to get the process model");
+    } catch (AuthorizationException e) {
+      // then
+      String message = e.getMessage();
+      assertTextPresent(userId, message);
+      assertTextPresent(READ.getName(), message);
+      assertTextPresent(ONE_TASK_PROCESS_KEY, message);
+      assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+    }
+  }
+
+  public void testGetProcessModel() {
+    // given
+    String processDefinitionId = selectProcessDefinitionByKey(ONE_TASK_PROCESS_KEY).getId();
+    createGrantAuthorization(PROCESS_DEFINITION, ONE_TASK_PROCESS_KEY, READ, userId);
+
+    // when
+    InputStream stream = repositoryService.getProcessModel(processDefinitionId);
+
+    // then
+    assertNotNull(stream);
+  }
+
+  // helper /////////////////////////////////////////////////////////////////////
+
   protected void verifyQueryResults(ProcessDefinitionQuery query, int countExpected) {
     verifyQueryResults((AbstractQuery<?, ?>) query, countExpected);
   }
+
 
 }

@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,26 +15,28 @@ package org.camunda.bpm.engine.impl.cmd;
 
 import java.io.InputStream;
 import java.io.Serializable;
+import java.util.concurrent.Callable;
 import java.util.logging.Logger;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 
 
 /**
  * Gives access to a deployed process diagram, e.g., a PNG image, through a
  * stream of bytes.
- * 
+ *
  * @author Falko Menge
  */
 public class GetDeploymentProcessDiagramCmd implements Command<InputStream>, Serializable {
 
   private static final long serialVersionUID = 1L;
   private static Logger log = Logger.getLogger(GetDeploymentProcessDiagramCmd.class.getName());
-  
+
   protected String processDefinitionId;
 
   public GetDeploymentProcessDiagramCmd(String processDefinitionId) {
@@ -44,20 +46,29 @@ public class GetDeploymentProcessDiagramCmd implements Command<InputStream>, Ser
     this.processDefinitionId = processDefinitionId;
   }
 
-  public InputStream execute(CommandContext commandContext) {
+  public InputStream execute(final CommandContext commandContext) {
     ProcessDefinitionEntity processDefinition = Context
             .getProcessEngineConfiguration()
             .getDeploymentCache()
             .findDeployedProcessDefinitionById(processDefinitionId);
-    String deploymentId = processDefinition.getDeploymentId();
-    String resourceName = processDefinition.getDiagramResourceName();
+
+    AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
+    authorizationManager.checkReadProcessDefinition(processDefinition);
+
+    final String deploymentId = processDefinition.getDeploymentId();
+    final String resourceName = processDefinition.getDiagramResourceName();
+
     if (resourceName == null ) {
       log.info("Resource name is null! No process diagram stream exists.");
       return null;
     } else {
-      InputStream processDiagramStream =
-              new GetDeploymentResourceCmd(deploymentId, resourceName)
-              .execute(commandContext);
+
+      InputStream processDiagramStream = commandContext.runWithoutAuthentication(new Callable<InputStream>() {
+        public InputStream call() throws Exception {
+          return new GetDeploymentResourceCmd(deploymentId, resourceName).execute(commandContext);
+        }
+      });
+
       return processDiagramStream;
     }
   }

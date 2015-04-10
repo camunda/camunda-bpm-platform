@@ -18,6 +18,8 @@ import java.util.Date;
 import java.util.List;
 
 import org.camunda.bpm.application.ProcessApplicationReference;
+import org.camunda.bpm.engine.authorization.Permissions;
+import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.exception.NotValidException;
@@ -237,8 +239,11 @@ public interface RepositoryService {
    *
    * @param processDefinitionId
    *          id of a {@link ProcessDefinition}, cannot be null.
+   *
    * @throws ProcessEngineException
    *           when the process model doesn't exist.
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#READ} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   InputStream getProcessModel(String processDefinitionId);
 
@@ -249,14 +254,20 @@ public interface RepositoryService {
    * @param processDefinitionId
    *          id of a {@link ProcessDefinition}, cannot be null.
    * @return null when the diagram resource name of a {@link ProcessDefinition} is null.
+   *
    * @throws ProcessEngineException
    *           when the process diagram doesn't exist.
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#READ} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   InputStream getProcessDiagram(String processDefinitionId);
 
   /**
    * Returns the {@link ProcessDefinition} including all BPMN information like additional
    * Properties (e.g. documentation).
+   *
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#READ} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   ProcessDefinition getProcessDefinition(String processDefinitionId);
 
