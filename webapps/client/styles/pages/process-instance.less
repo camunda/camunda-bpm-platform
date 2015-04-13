@@ -2,6 +2,7 @@
 @modification-cancel-some-color:  @canceled-color;
 @modification-start-before-color: lighten(@link-color, 5%);
 @modification-start-after-color:  darken(@link-color, 5%);
+@modification-highlight-color: #FFFDAB;
 
 .ctn-content-bottom > div:first-child {
   position: absolute;
@@ -44,6 +45,10 @@
       border-left: (@grid-gutter-width / 2) solid;
       .transition(border-color 0.218s ease-in-out);
       border-top: 1px solid @gray-lighter;
+
+      &.highlight {
+        background-color: @modification-highlight-color;
+      }
     }
 
     &.cancel .modification {
