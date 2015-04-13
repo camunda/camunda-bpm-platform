@@ -114,6 +114,27 @@
   > .debug {
     margin-top: (@grid-gutter-width / 2);
   }
+
+
+  [typeahead-popup] {
+    max-width: 100%;
+    left: 0;
+    right: 0;
+
+    li > a > div {
+      &[bind-html-unsafe] {
+        font-weight: bolder;
+      }
+      overflow: hidden;
+      max-width: 100%;
+      text-overflow: ellipsis;
+    }
+
+    .id {
+      font-family: monospace;
+      color: @gray-dark;
+    }
+  }
 }
 
 
