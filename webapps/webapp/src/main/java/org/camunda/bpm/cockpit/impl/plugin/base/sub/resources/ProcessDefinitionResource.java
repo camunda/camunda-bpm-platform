@@ -12,6 +12,11 @@
  */
 package org.camunda.bpm.cockpit.impl.plugin.base.sub.resources;
 
+import static org.camunda.bpm.engine.authorization.Permissions.READ;
+import static org.camunda.bpm.engine.authorization.Permissions.READ_INSTANCE;
+import static org.camunda.bpm.engine.authorization.Resources.PROCESS_DEFINITION;
+import static org.camunda.bpm.engine.authorization.Resources.PROCESS_INSTANCE;
+
 import java.util.List;
 
 import javax.ws.rs.Consumes;
@@ -58,6 +63,7 @@ public class ProcessDefinitionResource extends AbstractPluginResource {
       public List<ProcessDefinitionDto> execute(CommandContext commandContext) {
         queryParameter.setParentProcessDefinitionId(id);
         injectEngineConfig(queryParameter);
+        configureExecutionQuery(queryParameter);
         return getQueryService().executeQuery("selectCalledProcessDefinitions", queryParameter);
       }
     });
@@ -71,6 +77,12 @@ public class ProcessDefinitionResource extends AbstractPluginResource {
     }
 
     parameter.initQueryVariableValues(processEngineConfiguration.getVariableSerializers());
+  }
+
+  protected void configureExecutionQuery(ProcessDefinitionQueryDto query) {
+    configureAuthorizationCheck(query);
+    addPermissionCheck(query, PROCESS_INSTANCE, "EXEC2.PROC_INST_ID_", READ);
+    addPermissionCheck(query, PROCESS_DEFINITION, "PROCDEF.KEY_", READ_INSTANCE);
   }
 
 }

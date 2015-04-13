@@ -80,12 +80,21 @@
   <sql id="selectProcessInstances">
     from
       ${prefix}ACT_RU_EXECUTION RES
+
     <if test="historyEnabled">
     left join
       ${prefix}ACT_HI_PROCINST HISTORY
     ON
       RES.ID_ = HISTORY.PROC_INST_ID_
     </if>
+
+    <if test="isAuthorizationCheckEnabled &amp;&amp; authUserId != null">
+    inner join
+      ${prefix}ACT_RE_PROCDEF P
+    on
+      RES.PROC_DEF_ID_ = P.ID_
+    </if>
+
     <where>
       RES.ID_ = RES.PROC_INST_ID_
 
@@ -165,7 +174,7 @@
               <!-- When operator is not-equals or type of value is null, type doesn't matter! -->
               and TYPE_ = #{valueCondition.type}
               </if>
-               
+
               <if test="valueCondition.textValue != null &amp;&amp; valueCondition.longValue == null &amp;&amp; valueCondition.doubleValue == null">
                 and TEXT_
               <choose>
@@ -182,19 +191,19 @@
               </choose>
                 #{valueCondition.textValue2}
               </if>
-          
+
               <if test="valueCondition.longValue != null">
                 and LONG_
                 <include refid="executionVariableOperator" />
                 #{valueCondition.longValue}
               </if>
-          
+
               <if test="valueCondition.doubleValue != null">
                 and DOUBLE_
                 <include refid="executionVariableOperator" />
                 #{valueCondition.doubleValue}
               </if>
-        
+
               <!-- Null variable type -->
               <if test="valueCondition.textValue == null &amp;&amp; valueCondition.textValue2 == null &amp;&amp; valueCondition.longValue == null &amp;&amp; valueCondition.doubleValue == null">
                 and TEXT_ is null and TEXT2_ is null and LONG_ is null and DOUBLE_ is null and BYTEARRAY_ID_ is null
@@ -205,6 +214,9 @@
         </if>
       )
       </foreach>
+
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck" />
+
     </where>
   </sql>
 
@@ -226,6 +238,13 @@
       ${prefix}ACT_RE_PROCDEF PROC_
     on
       RES.PROC_DEF_ID_ = PROC_.ID_
+    <if test="isAuthorizationCheckEnabled &amp;&amp; authUserId != null">
+    inner join
+        ${prefix}ACT_RE_PROCDEF PROCDEF
+    on
+        EXEC1.PROC_DEF_ID_ = PROCDEF.ID_
+    </if>
+
     <where>
       <!-- parentProcessInstanceId -->
       <if test="parentProcessInstanceId != null">
@@ -240,6 +259,9 @@
         EXEC1.ACT_INST_ID_ = #{item}
       </foreach>
       </if>
+
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck" />
+
     </where>
   </sql>
 

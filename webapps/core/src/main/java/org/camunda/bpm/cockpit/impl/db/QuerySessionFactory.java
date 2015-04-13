@@ -14,6 +14,8 @@ package org.camunda.bpm.cockpit.impl.db;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
@@ -26,6 +28,12 @@ import org.camunda.bpm.engine.impl.cfg.StandaloneProcessEngineConfiguration;
  *
  */
 public class QuerySessionFactory extends StandaloneProcessEngineConfiguration {
+
+  protected static final String[] DEFAULT_MAPPING_FILES = {
+    // necessary to perform authorization checks
+    "org/camunda/bpm/engine/impl/mapping/entity/Commons.xml",
+    "org/camunda/bpm/engine/impl/mapping/entity/Authorization.xml"
+  };
 
   private List<String> mappingFiles;
 
@@ -70,8 +78,11 @@ public class QuerySessionFactory extends StandaloneProcessEngineConfiguration {
 
   protected String buildMappings(List<String> mappingFiles) {
 
+    List<String> mappings = new ArrayList<String>(mappingFiles);
+    mappings.addAll(Arrays.asList(DEFAULT_MAPPING_FILES));
+
     StringBuilder builder = new StringBuilder();
-    for (String mappingFile: mappingFiles) {
+    for (String mappingFile: mappings) {
       builder.append(String.format("<mapper resource=\"%s\" />\n", mappingFile));
     }
 

@@ -12,10 +12,17 @@
  */
 package org.camunda.bpm.cockpit.plugin.resource;
 
+import java.util.List;
+
 import org.camunda.bpm.cockpit.Cockpit;
 import org.camunda.bpm.cockpit.db.CommandExecutor;
+import org.camunda.bpm.cockpit.db.QueryParameters;
 import org.camunda.bpm.cockpit.db.QueryService;
 import org.camunda.bpm.cockpit.plugin.spi.CockpitPlugin;
+import org.camunda.bpm.engine.authorization.Permission;
+import org.camunda.bpm.engine.authorization.Resource;
+import org.camunda.bpm.engine.impl.db.PermissionCheck;
+import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.webapp.plugin.resource.AbstractAppPluginResource;
 
 /**
@@ -48,6 +55,50 @@ public class AbstractCockpitPluginResource extends AbstractAppPluginResource<Coc
    */
   protected QueryService getQueryService() {
     return Cockpit.getQueryService(engineName);
+  }
+
+  // authorization //////////////////////////////////////////////////////////////
+
+  /**
+   * Return <code>true</code> iff authorization is enabled.
+   */
+  protected boolean isAuthorizationEnabled() {
+    return getProcessEngine().getProcessEngineConfiguration().isAuthorizationEnabled();
+  }
+
+  /**
+   * Return the current authentication.
+   */
+  protected Authentication getCurrentAuthentication() {
+    return getProcessEngine().getIdentityService().getCurrentAuthentication();
+  }
+
+  /**
+   * Configure the authorization check for the given {@link QueryParameters}.
+   */
+  protected void configureAuthorizationCheck(QueryParameters<?> query) {
+    Authentication currentAuthentication = getCurrentAuthentication();
+
+    query.getPermissionChecks().clear();
+
+    if (isAuthorizationEnabled() && currentAuthentication != null) {
+      query.setAuthorizationCheckEnabled(true);
+      String currentUserId = currentAuthentication.getUserId();
+      List<String> currentGroupIds = currentAuthentication.getGroupIds();
+      query.setAuthUserId(currentUserId);
+      query.setAuthGroupIds(currentGroupIds);
+    }
+  }
+
+  /**
+   * Add a new {@link PermissionCheck} with the given values.
+   */
+  protected void addPermissionCheck(QueryParameters<?>  query, Resource resource, String queryParam, Permission permission) {
+    PermissionCheck permCheck = new PermissionCheck();
+    permCheck.setResource(resource);
+    permCheck.setResourceIdQueryParam(queryParam);
+    permCheck.setPermission(permission);
+    query.addPermissionCheck(permCheck);
   }
 
 }

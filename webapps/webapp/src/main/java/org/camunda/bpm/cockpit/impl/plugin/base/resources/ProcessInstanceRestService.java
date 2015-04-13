@@ -12,6 +12,11 @@
  */
 package org.camunda.bpm.cockpit.impl.plugin.base.resources;
 
+import static org.camunda.bpm.engine.authorization.Permissions.READ;
+import static org.camunda.bpm.engine.authorization.Permissions.READ_INSTANCE;
+import static org.camunda.bpm.engine.authorization.Resources.PROCESS_DEFINITION;
+import static org.camunda.bpm.engine.authorization.Resources.PROCESS_INSTANCE;
+
 import java.util.List;
 
 import javax.ws.rs.Consumes;
@@ -67,6 +72,7 @@ public class ProcessInstanceRestService extends AbstractPluginResource {
       public List<ProcessInstanceDto> execute(CommandContext commandContext) {
         injectEngineConfig(queryParameter);
         paginate(queryParameter, firstResult, maxResults);
+        configureExecutionQuery(queryParameter);
         return getQueryService().executeQuery("selectRunningProcessInstancesIncludingIncidents", queryParameter);
       }
     });
@@ -90,6 +96,7 @@ public class ProcessInstanceRestService extends AbstractPluginResource {
     return getCommandExecutor().executeCommand(new Command<CountResultDto>() {
       public CountResultDto execute(CommandContext commandContext) {
         injectEngineConfig(queryParameter);
+        configureExecutionQuery(queryParameter);
         long result = getQueryService().executeQueryRowCount("selectRunningProcessInstancesCount", queryParameter);
         return new CountResultDto(result);
       }
@@ -116,5 +123,11 @@ public class ProcessInstanceRestService extends AbstractPluginResource {
     }
 
     parameter.initQueryVariableValues(processEngineConfiguration.getVariableSerializers());
+  }
+
+  protected void configureExecutionQuery(ProcessInstanceQueryDto query) {
+    configureAuthorizationCheck(query);
+    addPermissionCheck(query, PROCESS_INSTANCE, "RES.PROC_INST_ID_", READ);
+    addPermissionCheck(query, PROCESS_DEFINITION, "P.KEY_", READ_INSTANCE);
   }
 }
