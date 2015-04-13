@@ -82,7 +82,7 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
   public void testQueryWithReadPermissionOnProcessInstance() {
     // given
     String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
-    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, READ, userId);
+    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, READ);
 
     // when
     ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery();
@@ -98,7 +98,7 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
   public void testQueryWithReadInstancesPermissionOnOneTaskProcess() {
     // given
     String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
-    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, READ_INSTANCE, userId);
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, READ_INSTANCE);
 
     // when
     ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery();
@@ -130,7 +130,7 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
 
   public void testStartProcessInstanceByKeyWithCreatePermissionOnProcessInstance() {
     // given
-    createGrantAuthorization(PROCESS_INSTANCE, ANY, CREATE, userId);
+    createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, CREATE);
 
     try {
       // when
@@ -145,7 +145,7 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
 
   public void testStartProcessInstanceByKeyWithCreateInstancesPermissionOnProcessDefinition() {
     // given
-    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, CREATE_INSTANCE, userId);
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, CREATE_INSTANCE);
 
     try {
       // when
@@ -160,8 +160,8 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
 
   public void testStartProcessInstanceByKey() {
     // given
-    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, CREATE_INSTANCE, userId);
-    createGrantAuthorization(PROCESS_INSTANCE, ANY, CREATE, userId);
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, CREATE_INSTANCE);
+    createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, CREATE);
 
     // when
     runtimeService.startProcessInstanceByKey(PROCESS_KEY);
@@ -194,7 +194,7 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
 
   public void testStartProcessInstanceByIdWithCreatePermissionOnProcessInstance() {
     // given
-    createGrantAuthorization(PROCESS_INSTANCE, ANY, CREATE, userId);
+    createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, CREATE);
 
     String processDefinitionId = selectProcessDefinitionByKey(PROCESS_KEY).getId();
 
@@ -211,7 +211,7 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
 
   public void testStartProcessInstanceByIdWithCreateInstancesPermissionOnProcessDefinition() {
     // given
-    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, CREATE_INSTANCE, userId);
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, CREATE_INSTANCE);
 
     String processDefinitionId = selectProcessDefinitionByKey(PROCESS_KEY).getId();
 
@@ -228,8 +228,8 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
 
   public void testStartProcessInstanceById() {
     // given
-    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, CREATE_INSTANCE, userId);
-    createGrantAuthorization(PROCESS_INSTANCE, ANY, CREATE, userId);
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, CREATE_INSTANCE);
+    createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, CREATE);
 
     String processDefinitionId = selectProcessDefinitionByKey(PROCESS_KEY).getId();
 
@@ -262,7 +262,7 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
 
   public void testStartProcessInstanceByMessageWithCreatePermissionOnProcessInstance() {
     // given
-    createGrantAuthorization(PROCESS_INSTANCE, ANY, CREATE, userId);
+    createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, CREATE);
 
     try {
       // when
@@ -277,7 +277,7 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
 
   public void testStartProcessInstanceByMessageWithCreateInstancesPermissionOnProcessDefinition() {
     // given
-    createGrantAuthorization(PROCESS_DEFINITION, MESSAGE_START_PROCESS_KEY, CREATE_INSTANCE, userId);
+    createGrantAuthorization(PROCESS_DEFINITION, MESSAGE_START_PROCESS_KEY, userId, CREATE_INSTANCE);
 
     try {
       // when
@@ -292,8 +292,8 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
 
   public void testStartProcessInstanceByMessage() {
     // given
-    createGrantAuthorization(PROCESS_DEFINITION, MESSAGE_START_PROCESS_KEY, CREATE_INSTANCE, userId);
-    createGrantAuthorization(PROCESS_INSTANCE, ANY, CREATE, userId);
+    createGrantAuthorization(PROCESS_DEFINITION, MESSAGE_START_PROCESS_KEY, userId, CREATE_INSTANCE);
+    createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, CREATE);
 
     // when
     runtimeService.startProcessInstanceByMessage("startInvoiceMessage");
@@ -326,7 +326,7 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
 
   public void testStartProcessInstanceByMessageAndProcDefIdWithCreatePermissionOnProcessInstance() {
     // given
-    createGrantAuthorization(PROCESS_INSTANCE, ANY, CREATE, userId);
+    createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, CREATE);
 
     String processDefinitionId = selectProcessDefinitionByKey(MESSAGE_START_PROCESS_KEY).getId();
 
@@ -343,7 +343,7 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
 
   public void testStartProcessInstanceByMessageAndProcDefIdWithCreateInstancesPermissionOnProcessDefinition() {
     // given
-    createGrantAuthorization(PROCESS_DEFINITION, MESSAGE_START_PROCESS_KEY, CREATE_INSTANCE, userId);
+    createGrantAuthorization(PROCESS_DEFINITION, MESSAGE_START_PROCESS_KEY, userId, CREATE_INSTANCE);
 
     String processDefinitionId = selectProcessDefinitionByKey(MESSAGE_START_PROCESS_KEY).getId();
 
@@ -360,8 +360,8 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
 
   public void testStartProcessInstanceByMessageAndProcDefId() {
     // given
-    createGrantAuthorization(PROCESS_DEFINITION, MESSAGE_START_PROCESS_KEY, CREATE_INSTANCE, userId);
-    createGrantAuthorization(PROCESS_INSTANCE, ANY, CREATE, userId);
+    createGrantAuthorization(PROCESS_DEFINITION, MESSAGE_START_PROCESS_KEY, userId, CREATE_INSTANCE);
+    createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, CREATE);
 
     String processDefinitionId = selectProcessDefinitionByKey(MESSAGE_START_PROCESS_KEY).getId();
 
@@ -404,7 +404,7 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
   public void testDeleteProcessInstanceWithDeletePermissionOnProcessInstance() {
     // given
     String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
-    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, DELETE, userId);
+    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, DELETE);
 
     // when
     runtimeService.deleteProcessInstance(processInstanceId, null);
@@ -418,7 +418,7 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
   public void testDeleteProcessInstanceWithDeletePermissionOnAnyProcessInstance() {
     // given
     String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
-    createGrantAuthorization(PROCESS_INSTANCE, ANY, DELETE, userId);
+    createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, DELETE);
 
     // when
     runtimeService.deleteProcessInstance(processInstanceId, null);
@@ -432,7 +432,7 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
   public void testDeleteProcessInstanceWithDeleteInstancesPermissionOnProcessDefinition() {
     // given
     String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
-    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, DELETE_INSTANCE, userId);
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, DELETE_INSTANCE);
 
     // when
     runtimeService.deleteProcessInstance(processInstanceId, null);
@@ -446,8 +446,8 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
   public void testDeleteProcessInstance() {
     // given
     String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
-    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, DELETE, userId);
-    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, DELETE_INSTANCE, userId);
+    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, DELETE);
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, DELETE_INSTANCE);
 
     // when
     runtimeService.deleteProcessInstance(processInstanceId, null);
@@ -482,7 +482,7 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
   public void testGetActiveActivityIdsWithReadPermissionOnProcessInstance() {
     // given
     String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
-    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, READ, userId);
+    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, READ);
 
     // when
     List<String> activityIds = runtimeService.getActiveActivityIds(processInstanceId);
@@ -495,7 +495,7 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
   public void testGetActiveActivityIdsWithReadPermissionOnAnyProcessInstance() {
     // given
     String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
-    createGrantAuthorization(PROCESS_INSTANCE, ANY, READ, userId);
+    createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, READ);
 
     // when
     List<String> activityIds = runtimeService.getActiveActivityIds(processInstanceId);
@@ -508,7 +508,7 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
   public void testGetActiveActivityIdsWithReadInstancesPermissionOnProcessDefinition() {
     // given
     String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
-    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, READ_INSTANCE, userId);
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, READ_INSTANCE);
 
     // when
     List<String> activityIds = runtimeService.getActiveActivityIds(processInstanceId);
@@ -521,8 +521,8 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
   public void testGetActiveActivityIds() {
     // given
     String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
-    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, READ, userId);
-    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, READ_INSTANCE, userId);
+    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, READ);
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, READ_INSTANCE);
 
     // when
     List<String> activityIds = runtimeService.getActiveActivityIds(processInstanceId);
@@ -559,7 +559,7 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
   public void testGetActivityInstanceWithReadPermissionOnProcessInstance() {
     // given
     String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
-    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, READ, userId);
+    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, READ);
 
     // when
     ActivityInstance activityInstance = runtimeService.getActivityInstance(processInstanceId);
@@ -571,7 +571,7 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
   public void testGetActivityInstanceWithReadPermissionOnAnyProcessInstance() {
     // given
     String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
-    createGrantAuthorization(PROCESS_INSTANCE, ANY, READ, userId);
+    createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, READ);
 
     // when
     ActivityInstance activityInstance = runtimeService.getActivityInstance(processInstanceId);
@@ -583,7 +583,7 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
   public void testGetActivityInstanceWithReadInstancesPermissionOnProcessDefinition() {
     // given
     String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
-    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, READ_INSTANCE, userId);
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, READ_INSTANCE);
 
     // when
     ActivityInstance activityInstance = runtimeService.getActivityInstance(processInstanceId);
@@ -595,8 +595,8 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
   public void testGetActivityInstanceIds() {
     // given
     String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
-    createGrantAuthorization(PROCESS_INSTANCE, ANY, READ, userId);
-    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, READ_INSTANCE, userId);
+    createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, READ);
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, READ_INSTANCE);
 
     // when
     ActivityInstance activityInstance = runtimeService.getActivityInstance(processInstanceId);
@@ -631,7 +631,7 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
   public void testSignalWithUpdatePermissionOnProcessInstance() {
     // given
     String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
-    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, UPDATE, userId);
+    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, UPDATE);
 
     // when
     runtimeService.signal(processInstanceId);
@@ -643,7 +643,7 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
   public void testSignalWithUpdatePermissionOnAnyProcessInstance() {
     // given
     String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
-    createGrantAuthorization(PROCESS_INSTANCE, ANY, UPDATE, userId);
+    createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, UPDATE);
 
     // when
     runtimeService.signal(processInstanceId);
@@ -655,7 +655,7 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
   public void testSignalWithUpdateInstancesPermissionOnProcessDefinition() {
     // given
     String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
-    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, UPDATE_INSTANCE, userId);
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, UPDATE_INSTANCE);
 
     // when
     runtimeService.signal(processInstanceId);
@@ -667,8 +667,8 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
   public void testSignal() {
     // given
     String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
-    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, READ, userId);
-    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, UPDATE_INSTANCE, userId);
+    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, READ);
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, UPDATE_INSTANCE);
 
     // when
     ActivityInstance activityInstance = runtimeService.getActivityInstance(processInstanceId);
@@ -703,7 +703,7 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
   public void testSignalEventReceivedWithUpdatePermissionOnProcessInstance() {
     // given
     String processInstanceId = startProcessInstanceByKey(SIGNAL_BOUNDARY_PROCESS_KEY).getId();
-    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, UPDATE, userId);
+    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, UPDATE);
 
     // when
     runtimeService.signalEventReceived("alert");
@@ -717,7 +717,7 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
   public void testSignalEventReceivedWithUpdatePermissionOnAnyProcessInstance() {
     // given
     startProcessInstanceByKey(SIGNAL_BOUNDARY_PROCESS_KEY);
-    createGrantAuthorization(PROCESS_INSTANCE, ANY, UPDATE, userId);
+    createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, UPDATE);
 
     // when
     runtimeService.signalEventReceived("alert");
@@ -731,7 +731,7 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
   public void testSignalEventReceivedWithUpdateInstancesPermissionOnProcessDefinition() {
     // given
     startProcessInstanceByKey(SIGNAL_BOUNDARY_PROCESS_KEY);
-    createGrantAuthorization(PROCESS_DEFINITION, SIGNAL_BOUNDARY_PROCESS_KEY, UPDATE_INSTANCE, userId);
+    createGrantAuthorization(PROCESS_DEFINITION, SIGNAL_BOUNDARY_PROCESS_KEY, userId, UPDATE_INSTANCE);
 
     // when
     runtimeService.signalEventReceived("alert");
@@ -745,8 +745,8 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
   public void testSignalEventReceived() {
     // given
     String processInstanceId = startProcessInstanceByKey(SIGNAL_BOUNDARY_PROCESS_KEY).getId();
-    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, UPDATE, userId);
-    createGrantAuthorization(PROCESS_DEFINITION, SIGNAL_BOUNDARY_PROCESS_KEY, UPDATE_INSTANCE, userId);
+    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, UPDATE);
+    createGrantAuthorization(PROCESS_DEFINITION, SIGNAL_BOUNDARY_PROCESS_KEY, userId, UPDATE_INSTANCE);
 
     // when
     runtimeService.signalEventReceived("alert");
@@ -762,7 +762,7 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     String firstProcessInstanceId = startProcessInstanceByKey(SIGNAL_BOUNDARY_PROCESS_KEY).getId();
     String secondProcessInstanceId = startProcessInstanceByKey(SIGNAL_BOUNDARY_PROCESS_KEY).getId();
 
-    createGrantAuthorization(PROCESS_INSTANCE, firstProcessInstanceId, UPDATE, userId);
+    createGrantAuthorization(PROCESS_INSTANCE, firstProcessInstanceId, userId, UPDATE);
 
     try {
       // when
@@ -786,8 +786,8 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     String firstProcessInstanceId = startProcessInstanceByKey(SIGNAL_BOUNDARY_PROCESS_KEY).getId();
     String secondProcessInstanceId = startProcessInstanceByKey(SIGNAL_BOUNDARY_PROCESS_KEY).getId();
 
-    createGrantAuthorization(PROCESS_INSTANCE, firstProcessInstanceId, UPDATE, userId);
-    createGrantAuthorization(PROCESS_INSTANCE, secondProcessInstanceId, UPDATE, userId);
+    createGrantAuthorization(PROCESS_INSTANCE, firstProcessInstanceId, userId, UPDATE);
+    createGrantAuthorization(PROCESS_INSTANCE, secondProcessInstanceId, userId, UPDATE);
 
     // when
     runtimeService.signalEventReceived("alert");
@@ -829,7 +829,7 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
   public void testSignalEventReceivedByExecutionIdWithUpdatePermissionOnProcessInstance() {
     // given
     String processInstanceId = startProcessInstanceByKey(SIGNAL_BOUNDARY_PROCESS_KEY).getId();
-    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, UPDATE, userId);
+    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, UPDATE);
 
     String executionId = selectSingleTask().getExecutionId();
 
@@ -845,7 +845,7 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
   public void testSignalEventReceivedByExecutionIdWithUpdatePermissionOnAnyProcessInstance() {
     // given
     startProcessInstanceByKey(SIGNAL_BOUNDARY_PROCESS_KEY);
-    createGrantAuthorization(PROCESS_INSTANCE, ANY, UPDATE, userId);
+    createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, UPDATE);
 
     String executionId = selectSingleTask().getExecutionId();
 
@@ -861,7 +861,7 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
   public void testSignalEventReceivedByExecutionIdWithUpdateInstancesPermissionOnProcessDefinition() {
     // given
     startProcessInstanceByKey(SIGNAL_BOUNDARY_PROCESS_KEY);
-    createGrantAuthorization(PROCESS_DEFINITION, SIGNAL_BOUNDARY_PROCESS_KEY, UPDATE_INSTANCE, userId);
+    createGrantAuthorization(PROCESS_DEFINITION, SIGNAL_BOUNDARY_PROCESS_KEY, userId, UPDATE_INSTANCE);
 
     String executionId = selectSingleTask().getExecutionId();
 
@@ -877,8 +877,8 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
   public void testSignalEventReceivedByExecutionId() {
     // given
     String processInstanceId = startProcessInstanceByKey(SIGNAL_BOUNDARY_PROCESS_KEY).getId();
-    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, UPDATE, userId);
-    createGrantAuthorization(PROCESS_DEFINITION, SIGNAL_BOUNDARY_PROCESS_KEY, UPDATE_INSTANCE, userId);
+    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, UPDATE);
+    createGrantAuthorization(PROCESS_DEFINITION, SIGNAL_BOUNDARY_PROCESS_KEY, userId, UPDATE_INSTANCE);
 
     String executionId = selectSingleTask().getExecutionId();
 
@@ -918,7 +918,7 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
   public void testMessageEventReceivedByExecutionIdWithUpdatePermissionOnProcessInstance() {
     // given
     String processInstanceId = startProcessInstanceByKey(MESSAGE_BOUNDARY_PROCESS_KEY).getId();
-    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, UPDATE, userId);
+    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, UPDATE);
 
     String executionId = selectSingleTask().getExecutionId();
 
@@ -934,7 +934,7 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
   public void testMessageEventReceivedByExecutionIdWithUpdatePermissionOnAnyProcessInstance() {
     // given
     startProcessInstanceByKey(MESSAGE_BOUNDARY_PROCESS_KEY);
-    createGrantAuthorization(PROCESS_INSTANCE, ANY, UPDATE, userId);
+    createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, UPDATE);
 
     String executionId = selectSingleTask().getExecutionId();
 
@@ -950,7 +950,7 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
   public void testMessageEventReceivedByExecutionIdWithUpdateInstancesPermissionOnProcessDefinition() {
     // given
     startProcessInstanceByKey(MESSAGE_BOUNDARY_PROCESS_KEY);
-    createGrantAuthorization(PROCESS_DEFINITION, MESSAGE_BOUNDARY_PROCESS_KEY, UPDATE_INSTANCE, userId);
+    createGrantAuthorization(PROCESS_DEFINITION, MESSAGE_BOUNDARY_PROCESS_KEY, userId, UPDATE_INSTANCE);
 
     String executionId = selectSingleTask().getExecutionId();
 
@@ -966,8 +966,8 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
   public void testMessageEventReceivedByExecutionId() {
     // given
     String processInstanceId = startProcessInstanceByKey(MESSAGE_BOUNDARY_PROCESS_KEY).getId();
-    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, UPDATE, userId);
-    createGrantAuthorization(PROCESS_DEFINITION, MESSAGE_BOUNDARY_PROCESS_KEY, UPDATE_INSTANCE, userId);
+    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, UPDATE);
+    createGrantAuthorization(PROCESS_DEFINITION, MESSAGE_BOUNDARY_PROCESS_KEY, userId, UPDATE_INSTANCE);
 
     String executionId = selectSingleTask().getExecutionId();
 
@@ -1006,7 +1006,7 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
   public void testCorrelateMessageExecutionWithUpdatePermissionOnProcessInstance() {
     // given
     String processInstanceId = startProcessInstanceByKey(MESSAGE_BOUNDARY_PROCESS_KEY).getId();
-    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, UPDATE, userId);
+    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, UPDATE);
 
     // when
     runtimeService.correlateMessage("boundaryInvoiceMessage");
@@ -1020,7 +1020,7 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
   public void testCorrelateMessageExecutionWithUpdatePermissionOnAnyProcessInstance() {
     // given
     startProcessInstanceByKey(MESSAGE_BOUNDARY_PROCESS_KEY);
-    createGrantAuthorization(PROCESS_INSTANCE, ANY, UPDATE, userId);
+    createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, UPDATE);
 
     // when
     runtimeService.correlateMessage("boundaryInvoiceMessage");
@@ -1034,7 +1034,7 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
   public void testCorrelateMessageExecutionWithUpdateInstancesPermissionOnProcessDefinition() {
     // given
     startProcessInstanceByKey(MESSAGE_BOUNDARY_PROCESS_KEY);
-    createGrantAuthorization(PROCESS_DEFINITION, MESSAGE_BOUNDARY_PROCESS_KEY, UPDATE_INSTANCE, userId);
+    createGrantAuthorization(PROCESS_DEFINITION, MESSAGE_BOUNDARY_PROCESS_KEY, userId, UPDATE_INSTANCE);
 
     // when
     runtimeService.correlateMessage("boundaryInvoiceMessage");
@@ -1048,8 +1048,8 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
   public void testCorrelateMessageExecution() {
     // given
     String processInstanceId = startProcessInstanceByKey(MESSAGE_BOUNDARY_PROCESS_KEY).getId();
-    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, UPDATE, userId);
-    createGrantAuthorization(PROCESS_DEFINITION, MESSAGE_BOUNDARY_PROCESS_KEY, UPDATE_INSTANCE, userId);
+    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, UPDATE);
+    createGrantAuthorization(PROCESS_DEFINITION, MESSAGE_BOUNDARY_PROCESS_KEY, userId, UPDATE_INSTANCE);
 
     // when
     runtimeService.correlateMessage("boundaryInvoiceMessage");
@@ -1077,7 +1077,7 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
 
   public void testCorrelateMessageProcessDefinitionWithCreatePermissionOnProcessInstance() {
     // given
-    createGrantAuthorization(PROCESS_INSTANCE, ANY, CREATE, userId);
+    createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, CREATE);
 
     try {
       // when
@@ -1092,7 +1092,7 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
 
   public void testCorrelateMessageProcessDefinitionWithCreateInstancesPermissionOnProcessDefinition() {
     // given
-    createGrantAuthorization(PROCESS_DEFINITION, MESSAGE_START_PROCESS_KEY, CREATE_INSTANCE, userId);
+    createGrantAuthorization(PROCESS_DEFINITION, MESSAGE_START_PROCESS_KEY, userId, CREATE_INSTANCE);
 
     try {
       // when
@@ -1107,8 +1107,8 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
 
   public void testCorrelateMessageProcessDefinition() {
     // given
-    createGrantAuthorization(PROCESS_INSTANCE, ANY, CREATE, userId);
-    createGrantAuthorization(PROCESS_DEFINITION, MESSAGE_START_PROCESS_KEY, CREATE_INSTANCE, userId);
+    createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, CREATE);
+    createGrantAuthorization(PROCESS_DEFINITION, MESSAGE_START_PROCESS_KEY, userId, CREATE_INSTANCE);
 
     // when
     runtimeService.correlateMessage("startInvoiceMessage");
@@ -1147,7 +1147,7 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
   public void testCorrelateAllExecutionWithUpdatePermissionOnProcessInstance() {
     // given
     String processInstanceId = startProcessInstanceByKey(MESSAGE_BOUNDARY_PROCESS_KEY).getId();
-    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, UPDATE, userId);
+    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, UPDATE);
 
     // when
     runtimeService
@@ -1163,7 +1163,7 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
   public void testCorrelateAllExecutionWithUpdatePermissionOnAnyProcessInstance() {
     // given
     startProcessInstanceByKey(MESSAGE_BOUNDARY_PROCESS_KEY);
-    createGrantAuthorization(PROCESS_INSTANCE, ANY, UPDATE, userId);
+    createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, UPDATE);
 
     // when
     runtimeService
@@ -1179,7 +1179,7 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
   public void testCorrelateAllExecutionWithUpdateInstancesPermissionOnProcessDefinition() {
     // given
     startProcessInstanceByKey(MESSAGE_BOUNDARY_PROCESS_KEY);
-    createGrantAuthorization(PROCESS_DEFINITION, MESSAGE_BOUNDARY_PROCESS_KEY, UPDATE_INSTANCE, userId);
+    createGrantAuthorization(PROCESS_DEFINITION, MESSAGE_BOUNDARY_PROCESS_KEY, userId, UPDATE_INSTANCE);
 
     // when
     runtimeService
@@ -1195,8 +1195,8 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
   public void testCorrelateAllExecution() {
     // given
     String processInstanceId = startProcessInstanceByKey(MESSAGE_BOUNDARY_PROCESS_KEY).getId();
-    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, UPDATE, userId);
-    createGrantAuthorization(PROCESS_DEFINITION, MESSAGE_BOUNDARY_PROCESS_KEY, UPDATE_INSTANCE, userId);
+    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, UPDATE);
+    createGrantAuthorization(PROCESS_DEFINITION, MESSAGE_BOUNDARY_PROCESS_KEY, userId, UPDATE_INSTANCE);
 
     // when
     runtimeService
@@ -1214,7 +1214,7 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     String firstProcessInstanceId = startProcessInstanceByKey(MESSAGE_BOUNDARY_PROCESS_KEY).getId();
     String secondProcessInstanceId = startProcessInstanceByKey(MESSAGE_BOUNDARY_PROCESS_KEY).getId();
 
-    createGrantAuthorization(PROCESS_INSTANCE, firstProcessInstanceId, UPDATE, userId);
+    createGrantAuthorization(PROCESS_INSTANCE, firstProcessInstanceId, userId, UPDATE);
 
     try {
       // when
@@ -1240,8 +1240,8 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     String firstProcessInstanceId = startProcessInstanceByKey(MESSAGE_BOUNDARY_PROCESS_KEY).getId();
     String secondProcessInstanceId = startProcessInstanceByKey(MESSAGE_BOUNDARY_PROCESS_KEY).getId();
 
-    createGrantAuthorization(PROCESS_INSTANCE, firstProcessInstanceId, UPDATE, userId);
-    createGrantAuthorization(PROCESS_INSTANCE, secondProcessInstanceId, UPDATE, userId);
+    createGrantAuthorization(PROCESS_INSTANCE, firstProcessInstanceId, userId, UPDATE);
+    createGrantAuthorization(PROCESS_INSTANCE, secondProcessInstanceId, userId, UPDATE);
 
     // when
     runtimeService
@@ -1277,7 +1277,7 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
 
   public void testCorrelateAllProcessDefinitionWithCreatePermissionOnProcessInstance() {
     // given
-    createGrantAuthorization(PROCESS_INSTANCE, ANY, CREATE, userId);
+    createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, CREATE);
 
     try {
       // when
@@ -1294,7 +1294,7 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
 
   public void testCorrelateAllProcessDefinitionWithCreateInstancesPermissionOnProcessDefinition() {
     // given
-    createGrantAuthorization(PROCESS_DEFINITION, MESSAGE_START_PROCESS_KEY, CREATE_INSTANCE, userId);
+    createGrantAuthorization(PROCESS_DEFINITION, MESSAGE_START_PROCESS_KEY, userId, CREATE_INSTANCE);
 
     try {
       // when
@@ -1311,8 +1311,8 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
 
   public void testCorrelateAllProcessDefinition() {
     // given
-    createGrantAuthorization(PROCESS_INSTANCE, ANY, CREATE, userId);
-    createGrantAuthorization(PROCESS_DEFINITION, MESSAGE_START_PROCESS_KEY, CREATE_INSTANCE, userId);
+    createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, CREATE);
+    createGrantAuthorization(PROCESS_DEFINITION, MESSAGE_START_PROCESS_KEY, userId, CREATE_INSTANCE);
 
     // when
     runtimeService
@@ -1352,7 +1352,7 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
   public void testSuspendProcessInstanceByIdWithUpdatePermissionOnProcessInstance() {
     // given
     String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
-    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, UPDATE, userId);
+    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, UPDATE);
 
     // when
     runtimeService.suspendProcessInstanceById(processInstanceId);
@@ -1365,7 +1365,7 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
   public void testSuspendProcessInstanceByIdWithUpdatePermissionOnAnyProcessInstance() {
     // given
     String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
-    createGrantAuthorization(PROCESS_INSTANCE, ANY, UPDATE, userId);
+    createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, UPDATE);
 
     // when
     runtimeService.suspendProcessInstanceById(processInstanceId);
@@ -1378,7 +1378,7 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
   public void testSuspendProcessInstanceByIdWithUpdateInstancesPermissionOnProcessDefinition() {
     // given
     String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
-    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, UPDATE_INSTANCE, userId);
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, UPDATE_INSTANCE);
 
     // when
     runtimeService.suspendProcessInstanceById(processInstanceId);
@@ -1391,8 +1391,8 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
   public void testSuspendProcessInstanceById() {
     // given
     String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
-    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, UPDATE, userId);
-    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, UPDATE_INSTANCE, userId);
+    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, UPDATE);
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, UPDATE_INSTANCE);
 
     // when
     runtimeService.suspendProcessInstanceById(processInstanceId);
@@ -1431,7 +1431,7 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     // given
     String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
     suspendProcessInstanceById(processInstanceId);
-    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, UPDATE, userId);
+    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, UPDATE);
 
     // when
     runtimeService.activateProcessInstanceById(processInstanceId);
@@ -1445,7 +1445,7 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     // given
     String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
     suspendProcessInstanceById(processInstanceId);
-    createGrantAuthorization(PROCESS_INSTANCE, ANY, UPDATE, userId);
+    createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, UPDATE);
 
     // when
     runtimeService.activateProcessInstanceById(processInstanceId);
@@ -1459,7 +1459,7 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     // given
     String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
     suspendProcessInstanceById(processInstanceId);
-    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, UPDATE_INSTANCE, userId);
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, UPDATE_INSTANCE);
 
     // when
     runtimeService.activateProcessInstanceById(processInstanceId);
@@ -1473,8 +1473,8 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     // given
     String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
     suspendProcessInstanceById(processInstanceId);
-    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, UPDATE, userId);
-    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, UPDATE_INSTANCE, userId);
+    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, UPDATE);
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, UPDATE_INSTANCE);
 
     // when
     runtimeService.activateProcessInstanceById(processInstanceId);
@@ -1510,7 +1510,7 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     ProcessInstance instance = startProcessInstanceByKey(PROCESS_KEY);
     String processInstanceId = instance.getId();
     String processDefinitionId = instance.getProcessDefinitionId();
-    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, UPDATE, userId);
+    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, UPDATE);
 
     try {
       // when
@@ -1531,7 +1531,7 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     // given
     ProcessInstance instance = startProcessInstanceByKey(PROCESS_KEY);
     String processDefinitionId = instance.getProcessDefinitionId();
-    createGrantAuthorization(PROCESS_INSTANCE, ANY, UPDATE, userId);
+    createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, UPDATE);
 
     try {
       // when
@@ -1552,7 +1552,7 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     // given
     ProcessInstance instance = startProcessInstanceByKey(PROCESS_KEY);
     String processDefinitionId = instance.getProcessDefinitionId();
-    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, UPDATE_INSTANCE, userId);
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, UPDATE_INSTANCE);
 
     // when
     runtimeService.suspendProcessInstanceByProcessDefinitionId(processDefinitionId);
@@ -1568,8 +1568,8 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     String processInstanceId = instance.getId();
     String processDefinitionId = instance.getProcessDefinitionId();
 
-    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, UPDATE, userId);
-    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, UPDATE_INSTANCE, userId);
+    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, UPDATE);
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, UPDATE_INSTANCE);
 
     // when
     runtimeService.suspendProcessInstanceByProcessDefinitionId(processDefinitionId);
@@ -1610,7 +1610,7 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     String processDefinitionId = instance.getProcessDefinitionId();
     suspendProcessInstanceById(processInstanceId);
 
-    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, UPDATE, userId);
+    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, UPDATE);
 
     try {
       // when
@@ -1634,7 +1634,7 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     String processDefinitionId = instance.getProcessDefinitionId();
     suspendProcessInstanceById(processInstanceId);
 
-    createGrantAuthorization(PROCESS_INSTANCE, ANY, UPDATE, userId);
+    createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, UPDATE);
 
     try {
       // when
@@ -1658,7 +1658,7 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     String processDefinitionId = instance.getProcessDefinitionId();
     suspendProcessInstanceById(processInstanceId);
 
-    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, UPDATE_INSTANCE, userId);
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, UPDATE_INSTANCE);
 
     // when
     runtimeService.activateProcessInstanceByProcessDefinitionId(processDefinitionId);
@@ -1675,8 +1675,8 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     String processDefinitionId = instance.getProcessDefinitionId();
     suspendProcessInstanceById(processInstanceId);
 
-    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, UPDATE, userId);
-    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, UPDATE_INSTANCE, userId);
+    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, UPDATE);
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, UPDATE_INSTANCE);
 
     // when
     runtimeService.activateProcessInstanceByProcessDefinitionId(processDefinitionId);
@@ -1711,7 +1711,7 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     // given
     ProcessInstance instance = startProcessInstanceByKey(PROCESS_KEY);
     String processInstanceId = instance.getId();
-    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, UPDATE, userId);
+    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, UPDATE);
 
     try {
       // when
@@ -1731,7 +1731,7 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
   public void testSuspendProcessInstanceByProcessDefinitionKeyWithUpdatePermissionOnAnyProcessInstance() {
     // given
     startProcessInstanceByKey(PROCESS_KEY);
-    createGrantAuthorization(PROCESS_INSTANCE, ANY, UPDATE, userId);
+    createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, UPDATE);
 
     try {
       // when
@@ -1751,7 +1751,7 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
   public void testSuspendProcessInstanceByProcessDefinitionKeyWithUpdateInstancesPermissionOnProcessDefinition() {
     // given
     ProcessInstance instance = startProcessInstanceByKey(PROCESS_KEY);
-    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, UPDATE_INSTANCE, userId);
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, UPDATE_INSTANCE);
 
     // when
     runtimeService.suspendProcessInstanceByProcessDefinitionKey(PROCESS_KEY);
@@ -1769,8 +1769,8 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     ProcessInstance instance = startProcessInstanceByKey(PROCESS_KEY);
     String processInstanceId = instance.getId();
 
-    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, UPDATE, userId);
-    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, UPDATE_INSTANCE, userId);
+    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, UPDATE);
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, UPDATE_INSTANCE);
 
     // when
     runtimeService.suspendProcessInstanceByProcessDefinitionKey(PROCESS_KEY);
@@ -1812,7 +1812,7 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     String processInstanceId = instance.getId();
     suspendProcessInstanceById(processInstanceId);
 
-    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, UPDATE, userId);
+    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, UPDATE);
 
     try {
       // when
@@ -1835,7 +1835,7 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     String processInstanceId = instance.getId();
     suspendProcessInstanceById(processInstanceId);
 
-    createGrantAuthorization(PROCESS_INSTANCE, ANY, UPDATE, userId);
+    createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, UPDATE);
 
     try {
       // when
@@ -1858,7 +1858,7 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     String processInstanceId = instance.getId();
     suspendProcessInstanceById(processInstanceId);
 
-    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, UPDATE_INSTANCE, userId);
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, UPDATE_INSTANCE);
 
     // when
     runtimeService.activateProcessInstanceByProcessDefinitionKey(PROCESS_KEY);
@@ -1877,8 +1877,8 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     String processInstanceId = instance.getId();
     suspendProcessInstanceById(processInstanceId);
 
-    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, UPDATE, userId);
-    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, UPDATE_INSTANCE, userId);
+    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, UPDATE);
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, UPDATE_INSTANCE);
 
     // when
     runtimeService.activateProcessInstanceByProcessDefinitionKey(PROCESS_KEY);
@@ -1918,7 +1918,7 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
   public void testModifyProcessInstanceWithUpdatePermissionOnProcessInstance() {
     // given
     String processInstanceId = startProcessInstanceByKey(MESSAGE_BOUNDARY_PROCESS_KEY).getId();
-    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, UPDATE, userId);
+    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, UPDATE);
 
     // when
     runtimeService.createProcessInstanceModification(processInstanceId)
@@ -1937,7 +1937,7 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
   public void testModifyProcessInstanceWithUpdatePermissionOnAnyProcessInstance() {
     // given
     String processInstanceId = startProcessInstanceByKey(MESSAGE_BOUNDARY_PROCESS_KEY).getId();
-    createGrantAuthorization(PROCESS_INSTANCE, ANY, UPDATE, userId);
+    createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, UPDATE);
 
     // when
     runtimeService.createProcessInstanceModification(processInstanceId)
@@ -1956,7 +1956,7 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
   public void testModifyProcessInstanceWithUpdateInstancePermissionOnProcessDefinition() {
     // given
     String processInstanceId = startProcessInstanceByKey(MESSAGE_BOUNDARY_PROCESS_KEY).getId();
-    createGrantAuthorization(PROCESS_DEFINITION, MESSAGE_BOUNDARY_PROCESS_KEY, UPDATE_INSTANCE, userId);
+    createGrantAuthorization(PROCESS_DEFINITION, MESSAGE_BOUNDARY_PROCESS_KEY, userId, UPDATE_INSTANCE);
 
     // when
     runtimeService.createProcessInstanceModification(processInstanceId)
@@ -1975,8 +1975,8 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
   public void testModifyProcessInstance() {
     // given
     String processInstanceId = startProcessInstanceByKey(MESSAGE_BOUNDARY_PROCESS_KEY).getId();
-    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, UPDATE, userId);
-    createGrantAuthorization(PROCESS_DEFINITION, MESSAGE_BOUNDARY_PROCESS_KEY, UPDATE_INSTANCE, userId);
+    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, UPDATE);
+    createGrantAuthorization(PROCESS_DEFINITION, MESSAGE_BOUNDARY_PROCESS_KEY, userId, UPDATE_INSTANCE);
 
     // when
     runtimeService.createProcessInstanceModification(processInstanceId)
@@ -1995,7 +1995,7 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
   public void testDeleteProcessInstanceByModifyingWithoutDeleteAuthorization() {
     // given
     String processInstanceId = startProcessInstanceByKey(MESSAGE_BOUNDARY_PROCESS_KEY).getId();
-    createGrantAuthorization(PROCESS_DEFINITION, MESSAGE_BOUNDARY_PROCESS_KEY, UPDATE_INSTANCE, userId);
+    createGrantAuthorization(PROCESS_DEFINITION, MESSAGE_BOUNDARY_PROCESS_KEY, userId, UPDATE_INSTANCE);
 
     try {
       // when
@@ -2018,8 +2018,8 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
   public void testDeleteProcessInstanceByModifyingWithoutDeletePermissionOnProcessInstance() {
     // given
     String processInstanceId = startProcessInstanceByKey(MESSAGE_BOUNDARY_PROCESS_KEY).getId();
-    createGrantAuthorization(PROCESS_DEFINITION, MESSAGE_BOUNDARY_PROCESS_KEY, UPDATE_INSTANCE, userId);
-    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, DELETE, userId);
+    createGrantAuthorization(PROCESS_DEFINITION, MESSAGE_BOUNDARY_PROCESS_KEY, userId, UPDATE_INSTANCE);
+    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, DELETE);
 
     // when
     runtimeService.createProcessInstanceModification(processInstanceId)
@@ -2033,8 +2033,8 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
   public void testDeleteProcessInstanceByModifyingWithoutDeletePermissionOnAnyProcessInstance() {
     // given
     String processInstanceId = startProcessInstanceByKey(MESSAGE_BOUNDARY_PROCESS_KEY).getId();
-    createGrantAuthorization(PROCESS_DEFINITION, MESSAGE_BOUNDARY_PROCESS_KEY, UPDATE_INSTANCE, userId);
-    createGrantAuthorization(PROCESS_INSTANCE, ANY, DELETE, userId);
+    createGrantAuthorization(PROCESS_DEFINITION, MESSAGE_BOUNDARY_PROCESS_KEY, userId, UPDATE_INSTANCE);
+    createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, DELETE);
 
     // when
     runtimeService.createProcessInstanceModification(processInstanceId)
@@ -2068,8 +2068,8 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
   public void testClearProcessInstanceAuthorization() {
     // given
     String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
-    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, ALL, userId);
-    createGrantAuthorization(TASK, ANY, ALL, userId);
+    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, ALL);
+    createGrantAuthorization(TASK, ANY, userId, ALL);
 
     disableAuthorization();
     Authorization authorization = authorizationService
@@ -2098,7 +2098,7 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
   public void testDeleteProcessInstanceClearAuthorization() {
     // given
     String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
-    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, ALL, userId);
+    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, ALL);
 
     disableAuthorization();
     Authorization authorization = authorizationService

@@ -64,7 +64,7 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
   public void testQueryWithReadPermissionOnAnyProcessDefinition() {
     // given
     // given user gets read permission on any process definition
-    createGrantAuthorization(PROCESS_DEFINITION, ANY, READ, userId);
+    createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ);
 
     // when
     ProcessDefinitionQuery query = repositoryService.createProcessDefinitionQuery();
@@ -76,7 +76,7 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
   public void testQueryWithReadPermissionOnOneTaskProcess() {
     // given
     // given user gets read permission on "oneTaskProcess" process definition
-    createGrantAuthorization(PROCESS_DEFINITION, ONE_TASK_PROCESS_KEY, READ, userId);
+    createGrantAuthorization(PROCESS_DEFINITION, ONE_TASK_PROCESS_KEY, userId, READ);
 
     // when
     ProcessDefinitionQuery query = repositoryService.createProcessDefinitionQuery();
@@ -92,7 +92,7 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
   public void testQueryWithRevokedReadPermission() {
     // given
     // given user gets all permissions on any process definition
-    createGrantAuthorization(PROCESS_DEFINITION, ANY, ALL, userId);
+    createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, ALL);
 
     Authorization authorization = createRevokeAuthorization(PROCESS_DEFINITION, ONE_TASK_PROCESS_KEY);
     authorization.setUserId(userId);
@@ -157,7 +157,7 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
   public void testGetProcessDefinition() {
     // given
     String processDefinitionId = selectProcessDefinitionByKey(ONE_TASK_PROCESS_KEY).getId();
-    createGrantAuthorization(PROCESS_DEFINITION, ONE_TASK_PROCESS_KEY, READ, userId);
+    createGrantAuthorization(PROCESS_DEFINITION, ONE_TASK_PROCESS_KEY, userId, READ);
 
     // when
     ProcessDefinition definition = repositoryService.getProcessDefinition(processDefinitionId);
@@ -189,7 +189,7 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
   public void testGetProcessDiagram() {
     // given
     String processDefinitionId = selectProcessDefinitionByKey(ONE_TASK_PROCESS_KEY).getId();
-    createGrantAuthorization(PROCESS_DEFINITION, ONE_TASK_PROCESS_KEY, READ, userId);
+    createGrantAuthorization(PROCESS_DEFINITION, ONE_TASK_PROCESS_KEY, userId, READ);
 
     // when
     InputStream stream = repositoryService.getProcessDiagram(processDefinitionId);
@@ -222,7 +222,7 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
   public void testGetProcessModel() {
     // given
     String processDefinitionId = selectProcessDefinitionByKey(ONE_TASK_PROCESS_KEY).getId();
-    createGrantAuthorization(PROCESS_DEFINITION, ONE_TASK_PROCESS_KEY, READ, userId);
+    createGrantAuthorization(PROCESS_DEFINITION, ONE_TASK_PROCESS_KEY, userId, READ);
 
     // when
     InputStream stream = repositoryService.getProcessModel(processDefinitionId);

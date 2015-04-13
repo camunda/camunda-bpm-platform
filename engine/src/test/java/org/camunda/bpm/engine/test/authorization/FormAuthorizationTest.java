@@ -81,7 +81,7 @@ public class FormAuthorizationTest extends AuthorizationTest {
   public void testGetStartFormData() {
     // given
     String processDefinitionId = selectProcessDefinitionByKey(FORM_KEY_PROCESS_KEY).getId();
-    createGrantAuthorization(PROCESS_DEFINITION, FORM_KEY_PROCESS_KEY, READ, userId);
+    createGrantAuthorization(PROCESS_DEFINITION, FORM_KEY_PROCESS_KEY, userId, READ);
 
     // when
     StartFormData startFormData = formService.getStartFormData(processDefinitionId);
@@ -114,7 +114,7 @@ public class FormAuthorizationTest extends AuthorizationTest {
   public void testGetRenderedStartForm() {
     // given
     String processDefinitionId = selectProcessDefinitionByKey(RENDERED_FORM_PROCESS_KEY).getId();
-    createGrantAuthorization(PROCESS_DEFINITION, RENDERED_FORM_PROCESS_KEY, READ, userId);
+    createGrantAuthorization(PROCESS_DEFINITION, RENDERED_FORM_PROCESS_KEY, userId, READ);
 
     // when
     Object renderedStartForm = formService.getRenderedStartForm(processDefinitionId);
@@ -146,7 +146,7 @@ public class FormAuthorizationTest extends AuthorizationTest {
   public void testGetStartFormVariables() {
     // given
     String processDefinitionId = selectProcessDefinitionByKey(RENDERED_FORM_PROCESS_KEY).getId();
-    createGrantAuthorization(PROCESS_DEFINITION, RENDERED_FORM_PROCESS_KEY, READ, userId);
+    createGrantAuthorization(PROCESS_DEFINITION, RENDERED_FORM_PROCESS_KEY, userId, READ);
 
     // when
     VariableMap variables = formService.getStartFormVariables(processDefinitionId);
@@ -178,7 +178,7 @@ public class FormAuthorizationTest extends AuthorizationTest {
   public void testSubmitStartFormWithCreatePermissionOnProcessInstance() {
     // given
     String processDefinitionId = selectProcessDefinitionByKey(FORM_KEY_PROCESS_KEY).getId();
-    createGrantAuthorization(PROCESS_INSTANCE, ANY, CREATE, userId);
+    createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, CREATE);
 
     try {
       // when
@@ -197,7 +197,7 @@ public class FormAuthorizationTest extends AuthorizationTest {
   public void testSubmitStartFormWithCreateInstancePermissionOnProcessDefinition() {
     // given
     String processDefinitionId = selectProcessDefinitionByKey(FORM_KEY_PROCESS_KEY).getId();
-    createGrantAuthorization(PROCESS_DEFINITION, FORM_KEY_PROCESS_KEY, CREATE_INSTANCE, userId);
+    createGrantAuthorization(PROCESS_DEFINITION, FORM_KEY_PROCESS_KEY, userId, CREATE_INSTANCE);
 
     try {
       // when
@@ -215,8 +215,8 @@ public class FormAuthorizationTest extends AuthorizationTest {
   public void testSubmitStartForm() {
     // given
     String processDefinitionId = selectProcessDefinitionByKey(FORM_KEY_PROCESS_KEY).getId();
-    createGrantAuthorization(PROCESS_DEFINITION, FORM_KEY_PROCESS_KEY, CREATE_INSTANCE, userId);
-    createGrantAuthorization(PROCESS_INSTANCE, ANY, CREATE, userId);
+    createGrantAuthorization(PROCESS_DEFINITION, FORM_KEY_PROCESS_KEY, userId, CREATE_INSTANCE);
+    createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, CREATE);
 
     // when
     ProcessInstance instance = formService.submitStartForm(processDefinitionId, null);
@@ -252,7 +252,7 @@ public class FormAuthorizationTest extends AuthorizationTest {
     // given
     String taskId = "myTask";
     createTask(taskId);
-    createGrantAuthorization(TASK, taskId, READ, userId);
+    createGrantAuthorization(TASK, taskId, userId, READ);
 
     // when
     TaskFormData taskFormData = formService.getTaskFormData(taskId);
@@ -292,7 +292,7 @@ public class FormAuthorizationTest extends AuthorizationTest {
     // given
     startProcessInstanceByKey(FORM_KEY_PROCESS_KEY);
     String taskId = selectSingleTask().getId();
-    createGrantAuthorization(TASK, taskId, READ, userId);
+    createGrantAuthorization(TASK, taskId, userId, READ);
 
     // when
     TaskFormData taskFormData = formService.getTaskFormData(taskId);
@@ -305,7 +305,7 @@ public class FormAuthorizationTest extends AuthorizationTest {
     // given
     startProcessInstanceByKey(FORM_KEY_PROCESS_KEY);
     String taskId = selectSingleTask().getId();
-    createGrantAuthorization(PROCESS_DEFINITION, FORM_KEY_PROCESS_KEY, READ_TASK, userId);
+    createGrantAuthorization(PROCESS_DEFINITION, FORM_KEY_PROCESS_KEY, userId, READ_TASK);
 
     // when
     TaskFormData taskFormData = formService.getTaskFormData(taskId);
@@ -318,8 +318,8 @@ public class FormAuthorizationTest extends AuthorizationTest {
     // given
     startProcessInstanceByKey(FORM_KEY_PROCESS_KEY);
     String taskId = selectSingleTask().getId();
-    createGrantAuthorization(TASK, taskId, READ, userId);
-    createGrantAuthorization(PROCESS_DEFINITION, FORM_KEY_PROCESS_KEY, READ_TASK, userId);
+    createGrantAuthorization(TASK, taskId, userId, READ);
+    createGrantAuthorization(PROCESS_DEFINITION, FORM_KEY_PROCESS_KEY, userId, READ_TASK);
 
     // when
     TaskFormData taskFormData = formService.getTaskFormData(taskId);
@@ -369,7 +369,7 @@ public class FormAuthorizationTest extends AuthorizationTest {
     // given
     String taskId = "myTask";
     createTask(taskId);
-    createGrantAuthorization(TASK, taskId, READ, userId);
+    createGrantAuthorization(TASK, taskId, userId, READ);
 
     try {
       // when
@@ -408,7 +408,7 @@ public class FormAuthorizationTest extends AuthorizationTest {
     // given
     startProcessInstanceByKey(RENDERED_FORM_PROCESS_KEY);
     String taskId = selectSingleTask().getId();
-    createGrantAuthorization(TASK, taskId, READ, userId);
+    createGrantAuthorization(TASK, taskId, userId, READ);
 
     // when
     Object taskForm = formService.getRenderedTaskForm(taskId);
@@ -421,7 +421,7 @@ public class FormAuthorizationTest extends AuthorizationTest {
     // given
     startProcessInstanceByKey(RENDERED_FORM_PROCESS_KEY);
     String taskId = selectSingleTask().getId();
-    createGrantAuthorization(PROCESS_DEFINITION, RENDERED_FORM_PROCESS_KEY, READ_TASK, userId);
+    createGrantAuthorization(PROCESS_DEFINITION, RENDERED_FORM_PROCESS_KEY, userId, READ_TASK);
 
     // when
     Object taskForm = formService.getRenderedTaskForm(taskId);
@@ -434,8 +434,8 @@ public class FormAuthorizationTest extends AuthorizationTest {
     // given
     startProcessInstanceByKey(RENDERED_FORM_PROCESS_KEY);
     String taskId = selectSingleTask().getId();
-    createGrantAuthorization(TASK, taskId, READ, userId);
-    createGrantAuthorization(PROCESS_DEFINITION, RENDERED_FORM_PROCESS_KEY, READ_TASK, userId);
+    createGrantAuthorization(TASK, taskId, userId, READ);
+    createGrantAuthorization(PROCESS_DEFINITION, RENDERED_FORM_PROCESS_KEY, userId, READ_TASK);
 
     // when
     Object taskForm = formService.getRenderedTaskForm(taskId);
@@ -485,7 +485,7 @@ public class FormAuthorizationTest extends AuthorizationTest {
     // given
     String taskId = "myTask";
     createTask(taskId);
-    createGrantAuthorization(TASK, taskId, READ, userId);
+    createGrantAuthorization(TASK, taskId, userId, READ);
 
     // when
     VariableMap variables = formService.getTaskFormVariables(taskId);
@@ -524,7 +524,7 @@ public class FormAuthorizationTest extends AuthorizationTest {
     // given
     startProcessInstanceByKey(RENDERED_FORM_PROCESS_KEY);
     String taskId = selectSingleTask().getId();
-    createGrantAuthorization(TASK, taskId, READ, userId);
+    createGrantAuthorization(TASK, taskId, userId, READ);
 
     // when
     VariableMap variables = formService.getTaskFormVariables(taskId);
@@ -538,7 +538,7 @@ public class FormAuthorizationTest extends AuthorizationTest {
     // given
     startProcessInstanceByKey(RENDERED_FORM_PROCESS_KEY);
     String taskId = selectSingleTask().getId();
-    createGrantAuthorization(PROCESS_DEFINITION, RENDERED_FORM_PROCESS_KEY, READ_TASK, userId);
+    createGrantAuthorization(PROCESS_DEFINITION, RENDERED_FORM_PROCESS_KEY, userId, READ_TASK);
 
     // when
     VariableMap variables = formService.getTaskFormVariables(taskId);
@@ -552,8 +552,8 @@ public class FormAuthorizationTest extends AuthorizationTest {
     // given
     startProcessInstanceByKey(RENDERED_FORM_PROCESS_KEY);
     String taskId = selectSingleTask().getId();
-    createGrantAuthorization(TASK, taskId, READ, userId);
-    createGrantAuthorization(PROCESS_DEFINITION, RENDERED_FORM_PROCESS_KEY, READ_TASK, userId);
+    createGrantAuthorization(TASK, taskId, userId, READ);
+    createGrantAuthorization(PROCESS_DEFINITION, RENDERED_FORM_PROCESS_KEY, userId, READ_TASK);
 
     // when
     VariableMap variables = formService.getTaskFormVariables(taskId);
@@ -605,7 +605,7 @@ public class FormAuthorizationTest extends AuthorizationTest {
     // given
     String taskId = "myTask";
     createTask(taskId);
-    createGrantAuthorization(TASK, taskId, UPDATE, userId);
+    createGrantAuthorization(TASK, taskId, userId, UPDATE);
 
     // when
     formService.submitTaskForm(taskId, null);
@@ -645,8 +645,8 @@ public class FormAuthorizationTest extends AuthorizationTest {
     // given
     startProcessInstanceByKey(FORM_KEY_PROCESS_KEY);
     String taskId = selectSingleTask().getId();
-    createGrantAuthorization(TASK, taskId, UPDATE, userId);
-    createGrantAuthorization(PROCESS_DEFINITION, FORM_KEY_PROCESS_KEY, UPDATE_TASK, userId);
+    createGrantAuthorization(TASK, taskId, userId, UPDATE);
+    createGrantAuthorization(PROCESS_DEFINITION, FORM_KEY_PROCESS_KEY, userId, UPDATE_TASK);
 
     // when
     formService.submitTaskForm(taskId, null);
@@ -660,8 +660,8 @@ public class FormAuthorizationTest extends AuthorizationTest {
     // given
     startProcessInstanceByKey(FORM_KEY_PROCESS_KEY);
     String taskId = selectSingleTask().getId();
-    createGrantAuthorization(TASK, taskId, UPDATE, userId);
-    createGrantAuthorization(PROCESS_DEFINITION, FORM_KEY_PROCESS_KEY, UPDATE_TASK, userId);
+    createGrantAuthorization(TASK, taskId, userId, UPDATE);
+    createGrantAuthorization(PROCESS_DEFINITION, FORM_KEY_PROCESS_KEY, userId, UPDATE_TASK);
 
     // when
     formService.submitTaskForm(taskId, null);
@@ -675,8 +675,8 @@ public class FormAuthorizationTest extends AuthorizationTest {
     // given
     startProcessInstanceByKey(FORM_KEY_PROCESS_KEY);
     String taskId = selectSingleTask().getId();
-    createGrantAuthorization(TASK, taskId, UPDATE, userId);
-    createGrantAuthorization(PROCESS_DEFINITION, FORM_KEY_PROCESS_KEY, UPDATE_TASK, userId);
+    createGrantAuthorization(TASK, taskId, userId, UPDATE);
+    createGrantAuthorization(PROCESS_DEFINITION, FORM_KEY_PROCESS_KEY, userId, UPDATE_TASK);
 
     // when
     formService.submitTaskForm(taskId, null);
@@ -724,7 +724,7 @@ public class FormAuthorizationTest extends AuthorizationTest {
   public void testGetStartFormKey() {
     // given
     String processDefinitionId = selectProcessDefinitionByKey(FORM_KEY_PROCESS_KEY).getId();
-    createGrantAuthorization(PROCESS_DEFINITION, FORM_KEY_PROCESS_KEY, READ, userId);
+    createGrantAuthorization(PROCESS_DEFINITION, FORM_KEY_PROCESS_KEY, userId, READ);
 
     // when
     String formKey = formService.getStartFormKey(processDefinitionId);
@@ -756,7 +756,7 @@ public class FormAuthorizationTest extends AuthorizationTest {
   public void testGetTaskFormKey() {
     // given
     String processDefinitionId = selectProcessDefinitionByKey(FORM_KEY_PROCESS_KEY).getId();
-    createGrantAuthorization(PROCESS_DEFINITION, FORM_KEY_PROCESS_KEY, READ, userId);
+    createGrantAuthorization(PROCESS_DEFINITION, FORM_KEY_PROCESS_KEY, userId, READ);
 
     // when
     String formKey = formService.getTaskFormKey(processDefinitionId, "task");

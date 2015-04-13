@@ -38,10 +38,12 @@ import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resource;
 import org.camunda.bpm.engine.impl.AbstractQuery;
+import org.camunda.bpm.engine.impl.ActivityStatisticsQueryImpl;
 import org.camunda.bpm.engine.impl.AuthorizationQueryImpl;
 import org.camunda.bpm.engine.impl.EventSubscriptionQueryImpl;
 import org.camunda.bpm.engine.impl.IncidentQueryImpl;
 import org.camunda.bpm.engine.impl.ProcessDefinitionQueryImpl;
+import org.camunda.bpm.engine.impl.ProcessDefinitionStatisticsQueryImpl;
 import org.camunda.bpm.engine.impl.TaskQueryImpl;
 import org.camunda.bpm.engine.impl.VariableInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.db.AuthorizationCheck;
@@ -249,7 +251,9 @@ public class AuthorizationManager extends AbstractManager {
 
       query.addPermissionCheck(permCheck);
     }
-  }  // delete authorizations //////////////////////////////////////////////////
+  }
+
+  // delete authorizations //////////////////////////////////////////////////
 
   public void deleteAuthorizationsByResourceId(Resource resource, String resourceId) {
 
@@ -617,6 +621,118 @@ public class AuthorizationManager extends AbstractManager {
       taskPermissionCheck.setAuthorizationNotFoundReturnValue(0l);
 
       query.addTaskPermissionCheck(taskPermissionCheck);
+    }
+  }
+
+  /* STATISTICS QUERY */
+
+  public void configureProcessDefinitionStatisticsQuery(ProcessDefinitionStatisticsQueryImpl query) {
+    configureQuery(query, PROCESS_DEFINITION, "PROCDEF.KEY_");
+
+    query.getProcessInstancePermissionChecks().clear();
+    query.getJobPermissionChecks().clear();
+    query.getIncidentPermissionChecks().clear();
+
+    PermissionCheck firstProcessInstancePermissionCheck = new PermissionCheck();
+    firstProcessInstancePermissionCheck.setResource(PROCESS_INSTANCE);
+    firstProcessInstancePermissionCheck.setPermission(READ);
+    firstProcessInstancePermissionCheck.setResourceIdQueryParam("E.PROC_INST_ID_");
+
+    PermissionCheck secondProcessInstancePermissionCheck = new PermissionCheck();
+    secondProcessInstancePermissionCheck.setResource(PROCESS_DEFINITION);
+    secondProcessInstancePermissionCheck.setPermission(READ_INSTANCE);
+    secondProcessInstancePermissionCheck.setResourceIdQueryParam("P.KEY_");
+    secondProcessInstancePermissionCheck.setAuthorizationNotFoundReturnValue(0l);
+
+    query.addProcessInstancePermissionCheck(firstProcessInstancePermissionCheck);
+    query.addProcessInstancePermissionCheck(secondProcessInstancePermissionCheck);
+
+    if (query.isFailedJobsToInclude()) {
+      PermissionCheck firstJobPermissionCheck = new PermissionCheck();
+      firstJobPermissionCheck.setResource(PROCESS_INSTANCE);
+      firstJobPermissionCheck.setPermission(READ);
+      firstJobPermissionCheck.setResourceIdQueryParam("PROCESS_INSTANCE_ID_");
+
+      PermissionCheck secondJobPermissionCheck = new PermissionCheck();
+      secondJobPermissionCheck.setResource(PROCESS_DEFINITION);
+      secondJobPermissionCheck.setPermission(READ_INSTANCE);
+      secondJobPermissionCheck.setResourceIdQueryParam("PROCESS_DEF_KEY_");
+      secondJobPermissionCheck.setAuthorizationNotFoundReturnValue(0l);
+
+      query.addJobPermissionCheck(firstJobPermissionCheck);
+      query.addJobPermissionCheck(secondJobPermissionCheck);
+    }
+
+    if (query.isIncidentsToInclude()) {
+      PermissionCheck firstIncidentPermissionCheck = new PermissionCheck();
+      firstIncidentPermissionCheck.setResource(PROCESS_INSTANCE);
+      firstIncidentPermissionCheck.setPermission(READ);
+      firstIncidentPermissionCheck.setResourceIdQueryParam("I.PROC_INST_ID_");
+
+      PermissionCheck secondIncidentPermissionCheck = new PermissionCheck();
+      secondIncidentPermissionCheck.setResource(PROCESS_DEFINITION);
+      secondIncidentPermissionCheck.setPermission(READ_INSTANCE);
+      secondIncidentPermissionCheck.setResourceIdQueryParam("PROCDEF.KEY_");
+      secondIncidentPermissionCheck.setAuthorizationNotFoundReturnValue(0l);
+
+      query.addIncidentPermissionCheck(firstIncidentPermissionCheck);
+      query.addIncidentPermissionCheck(secondIncidentPermissionCheck);
+
+    }
+  }
+
+  public void configureActivityStatisticsQuery(ActivityStatisticsQueryImpl query) {
+    configureQuery(query);
+
+    query.getProcessInstancePermissionChecks().clear();
+    query.getJobPermissionChecks().clear();
+    query.getIncidentPermissionChecks().clear();
+
+    PermissionCheck firstProcessInstancePermissionCheck = new PermissionCheck();
+    firstProcessInstancePermissionCheck.setResource(PROCESS_INSTANCE);
+    firstProcessInstancePermissionCheck.setPermission(READ);
+    firstProcessInstancePermissionCheck.setResourceIdQueryParam("E.PROC_INST_ID_");
+
+    PermissionCheck secondProcessInstancePermissionCheck = new PermissionCheck();
+    secondProcessInstancePermissionCheck.setResource(PROCESS_DEFINITION);
+    secondProcessInstancePermissionCheck.setPermission(READ_INSTANCE);
+    secondProcessInstancePermissionCheck.setResourceIdQueryParam("P.KEY_");
+    secondProcessInstancePermissionCheck.setAuthorizationNotFoundReturnValue(0l);
+
+    query.addProcessInstancePermissionCheck(firstProcessInstancePermissionCheck);
+    query.addProcessInstancePermissionCheck(secondProcessInstancePermissionCheck);
+
+    if (query.isFailedJobsToInclude()) {
+      PermissionCheck firstJobPermissionCheck = new PermissionCheck();
+      firstJobPermissionCheck.setResource(PROCESS_INSTANCE);
+      firstJobPermissionCheck.setPermission(READ);
+      firstJobPermissionCheck.setResourceIdQueryParam("JOB.PROCESS_INSTANCE_ID_");
+
+      PermissionCheck secondJobPermissionCheck = new PermissionCheck();
+      secondJobPermissionCheck.setResource(PROCESS_DEFINITION);
+      secondJobPermissionCheck.setPermission(READ_INSTANCE);
+      secondJobPermissionCheck.setResourceIdQueryParam("JOB.PROCESS_DEF_KEY_");
+      secondJobPermissionCheck.setAuthorizationNotFoundReturnValue(0l);
+
+      query.addJobPermissionCheck(firstJobPermissionCheck);
+      query.addJobPermissionCheck(secondJobPermissionCheck);
+    }
+
+    if (query.isIncidentsToInclude()) {
+      PermissionCheck firstIncidentPermissionCheck = new PermissionCheck();
+      firstIncidentPermissionCheck.setResource(PROCESS_INSTANCE);
+      firstIncidentPermissionCheck.setPermission(READ);
+      firstIncidentPermissionCheck.setResourceIdQueryParam("I.PROC_INST_ID_");
+
+      PermissionCheck secondIncidentPermissionCheck = new PermissionCheck();
+      secondIncidentPermissionCheck.setResource(PROCESS_DEFINITION);
+      secondIncidentPermissionCheck.setPermission(READ_INSTANCE);
+      secondIncidentPermissionCheck.setResourceIdQueryParam("PROCDEF.KEY_");
+      secondIncidentPermissionCheck.setAuthorizationNotFoundReturnValue(0l);
+
+      query.addIncidentPermissionCheck(firstIncidentPermissionCheck);
+      query.addIncidentPermissionCheck(secondIncidentPermissionCheck);
+
     }
   }
 

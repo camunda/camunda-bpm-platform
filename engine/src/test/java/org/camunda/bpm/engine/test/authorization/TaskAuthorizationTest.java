@@ -175,7 +175,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
 
   public void testNewTask() {
     // given
-    createGrantAuthorization(TASK, ANY, CREATE, userId);
+    createGrantAuthorization(TASK, ANY, userId, CREATE);
 
     // when
     Task task = taskService.newTask();
@@ -206,7 +206,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     TaskEntity task = TaskEntity.create();
     task.setAssignee("demo");
 
-    createGrantAuthorization(TASK, ANY, CREATE, userId);
+    createGrantAuthorization(TASK, ANY, userId, CREATE);
 
     // when
     taskService.saveTask(task);
@@ -250,7 +250,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     Task task = selectSingleTask();
     task.setAssignee("demo");
 
-    createGrantAuthorization(TASK, taskId, UPDATE, userId);
+    createGrantAuthorization(TASK, taskId, userId, UPDATE);
 
     // when
     taskService.saveTask(task);
@@ -293,7 +293,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     Task task = selectSingleTask();
     task.setAssignee("demo");
 
-    createGrantAuthorization(TASK, task.getId(), UPDATE, userId);
+    createGrantAuthorization(TASK, task.getId(), userId, UPDATE);
 
     // when
     taskService.saveTask(task);
@@ -310,7 +310,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     Task task = selectSingleTask();
     task.setAssignee("demo");
 
-    createGrantAuthorization(TASK, ANY, UPDATE, userId);
+    createGrantAuthorization(TASK, ANY, userId, UPDATE);
 
     // when
     taskService.saveTask(task);
@@ -327,7 +327,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     Task task = selectSingleTask();
     task.setAssignee("demo");
 
-    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, UPDATE_TASK, userId);
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, UPDATE_TASK);
 
     // when
     taskService.saveTask(task);
@@ -379,7 +379,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     String taskId = "myTask";
     createTask(taskId);
 
-    createGrantAuthorization(TASK, taskId, DELETE, userId);
+    createGrantAuthorization(TASK, taskId, userId, DELETE);
 
     // when
     taskService.deleteTask(taskId);
@@ -418,7 +418,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     // given
     String firstTaskId = "myTask1";
     createTask(firstTaskId);
-    createGrantAuthorization(TASK, firstTaskId, DELETE, userId);
+    createGrantAuthorization(TASK, firstTaskId, userId, DELETE);
 
     String secondTaskId = "myTask2";
     createTask(secondTaskId);
@@ -443,7 +443,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     String secondTaskId = "myTask2";
     createTask(secondTaskId);
 
-    createGrantAuthorization(TASK, ANY, DELETE, userId);
+    createGrantAuthorization(TASK, ANY, userId, DELETE);
 
     // when
     taskService.deleteTasks(Arrays.asList(firstTaskId, secondTaskId));
@@ -481,7 +481,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     String taskId = "myTask";
     createTask(taskId);
 
-    createGrantAuthorization(TASK, taskId, UPDATE, userId);
+    createGrantAuthorization(TASK, taskId, userId, UPDATE);
 
     // when
     taskService.setAssignee(taskId, "demo");
@@ -522,7 +522,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     startProcessInstanceByKey(PROCESS_KEY);
     String taskId = selectSingleTask().getId();
 
-    createGrantAuthorization(TASK, taskId, UPDATE, userId);
+    createGrantAuthorization(TASK, taskId, userId, UPDATE);
 
     // when
     taskService.setAssignee(taskId, "demo");
@@ -538,7 +538,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     startProcessInstanceByKey(PROCESS_KEY);
     String taskId = selectSingleTask().getId();
 
-    createGrantAuthorization(TASK, ANY, UPDATE, userId);
+    createGrantAuthorization(TASK, ANY, userId, UPDATE);
 
     // when
     taskService.setAssignee(taskId, "demo");
@@ -554,7 +554,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     startProcessInstanceByKey(PROCESS_KEY);
     String taskId = selectSingleTask().getId();
 
-    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, UPDATE_TASK, userId);
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, UPDATE_TASK);
 
     // when
     taskService.setAssignee(taskId, "demo");
@@ -570,8 +570,8 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     startProcessInstanceByKey(PROCESS_KEY);
     String taskId = selectSingleTask().getId();
 
-    createGrantAuthorization(TASK, taskId, UPDATE, userId);
-    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, UPDATE_TASK, userId);
+    createGrantAuthorization(TASK, taskId, userId, UPDATE);
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, UPDATE_TASK);
 
     // when
     taskService.setAssignee(taskId, "demo");
@@ -622,7 +622,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     String taskId = "myTask";
     createTask(taskId);
 
-    createGrantAuthorization(TASK, taskId, UPDATE, userId);
+    createGrantAuthorization(TASK, taskId, userId, UPDATE);
 
     // when
     taskService.setOwner(taskId, "demo");
@@ -663,7 +663,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     startProcessInstanceByKey(PROCESS_KEY);
     String taskId = selectSingleTask().getId();
 
-    createGrantAuthorization(TASK, taskId, UPDATE, userId);
+    createGrantAuthorization(TASK, taskId, userId, UPDATE);
 
     // when
     taskService.setOwner(taskId, "demo");
@@ -679,7 +679,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     startProcessInstanceByKey(PROCESS_KEY);
     String taskId = selectSingleTask().getId();
 
-    createGrantAuthorization(TASK, ANY, UPDATE, userId);
+    createGrantAuthorization(TASK, ANY, userId, UPDATE);
 
     // when
     taskService.setOwner(taskId, "demo");
@@ -695,7 +695,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     startProcessInstanceByKey(PROCESS_KEY);
     String taskId = selectSingleTask().getId();
 
-    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, UPDATE_TASK, userId);
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, UPDATE_TASK);
 
     // when
     taskService.setOwner(taskId, "demo");
@@ -711,8 +711,8 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     startProcessInstanceByKey(PROCESS_KEY);
     String taskId = selectSingleTask().getId();
 
-    createGrantAuthorization(TASK, taskId, UPDATE, userId);
-    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, UPDATE_TASK, userId);
+    createGrantAuthorization(TASK, taskId, userId, UPDATE);
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, UPDATE_TASK);
 
     // when
     taskService.setOwner(taskId, "demo");
@@ -763,7 +763,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     String taskId = "myTask";
     createTask(taskId);
 
-    createGrantAuthorization(TASK, taskId, UPDATE, userId);
+    createGrantAuthorization(TASK, taskId, userId, UPDATE);
 
     // when
     taskService.addCandidateUser(taskId, "demo");
@@ -813,7 +813,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     startProcessInstanceByKey(PROCESS_KEY);
     String taskId = selectSingleTask().getId();
 
-    createGrantAuthorization(TASK, taskId, UPDATE, userId);
+    createGrantAuthorization(TASK, taskId, userId, UPDATE);
 
     // when
     taskService.addCandidateUser(taskId, "demo");
@@ -838,7 +838,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     startProcessInstanceByKey(PROCESS_KEY);
     String taskId = selectSingleTask().getId();
 
-    createGrantAuthorization(TASK, ANY, UPDATE, userId);
+    createGrantAuthorization(TASK, ANY, userId, UPDATE);
 
     // when
     taskService.addCandidateUser(taskId, "demo");
@@ -863,7 +863,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     startProcessInstanceByKey(PROCESS_KEY);
     String taskId = selectSingleTask().getId();
 
-    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, UPDATE_TASK, userId);
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, UPDATE_TASK);
 
     // when
     taskService.addCandidateUser(taskId, "demo");
@@ -888,8 +888,8 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     startProcessInstanceByKey(PROCESS_KEY);
     String taskId = selectSingleTask().getId();
 
-    createGrantAuthorization(TASK, taskId, UPDATE, userId);
-    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, UPDATE_TASK, userId);
+    createGrantAuthorization(TASK, taskId, userId, UPDATE);
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, UPDATE_TASK);
 
     // when
     taskService.addCandidateUser(taskId, "demo");
@@ -958,7 +958,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     String taskId = "myTask";
     createTask(taskId);
 
-    createGrantAuthorization(TASK, taskId, UPDATE, userId);
+    createGrantAuthorization(TASK, taskId, userId, UPDATE);
 
     // when
     taskService.addCandidateGroup(taskId, "accounting");
@@ -1008,7 +1008,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     startProcessInstanceByKey(PROCESS_KEY);
     String taskId = selectSingleTask().getId();
 
-    createGrantAuthorization(TASK, taskId, UPDATE, userId);
+    createGrantAuthorization(TASK, taskId, userId, UPDATE);
 
     // when
     taskService.addCandidateGroup(taskId, "accounting");
@@ -1033,7 +1033,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     startProcessInstanceByKey(PROCESS_KEY);
     String taskId = selectSingleTask().getId();
 
-    createGrantAuthorization(TASK, ANY, UPDATE, userId);
+    createGrantAuthorization(TASK, ANY, userId, UPDATE);
 
     // when
     taskService.addCandidateGroup(taskId, "accounting");
@@ -1058,7 +1058,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     startProcessInstanceByKey(PROCESS_KEY);
     String taskId = selectSingleTask().getId();
 
-    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, UPDATE_TASK, userId);
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, UPDATE_TASK);
 
     // when
     taskService.addCandidateGroup(taskId, "accounting");
@@ -1083,8 +1083,8 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     startProcessInstanceByKey(PROCESS_KEY);
     String taskId = selectSingleTask().getId();
 
-    createGrantAuthorization(TASK, taskId, UPDATE, userId);
-    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, UPDATE_TASK, userId);
+    createGrantAuthorization(TASK, taskId, userId, UPDATE);
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, UPDATE_TASK);
 
     // when
     taskService.addCandidateGroup(taskId, "accounting");
@@ -1153,7 +1153,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     String taskId = "myTask";
     createTask(taskId);
 
-    createGrantAuthorization(TASK, taskId, UPDATE, userId);
+    createGrantAuthorization(TASK, taskId, userId, UPDATE);
 
     // when
     taskService.addUserIdentityLink(taskId, "demo", IdentityLinkType.CANDIDATE);
@@ -1203,7 +1203,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     startProcessInstanceByKey(PROCESS_KEY);
     String taskId = selectSingleTask().getId();
 
-    createGrantAuthorization(TASK, taskId, UPDATE, userId);
+    createGrantAuthorization(TASK, taskId, userId, UPDATE);
 
     // when
     taskService.addUserIdentityLink(taskId, "demo", IdentityLinkType.CANDIDATE);
@@ -1228,7 +1228,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     startProcessInstanceByKey(PROCESS_KEY);
     String taskId = selectSingleTask().getId();
 
-    createGrantAuthorization(TASK, ANY, UPDATE, userId);
+    createGrantAuthorization(TASK, ANY, userId, UPDATE);
 
     // when
     taskService.addUserIdentityLink(taskId, "demo", IdentityLinkType.CANDIDATE);
@@ -1253,7 +1253,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     startProcessInstanceByKey(PROCESS_KEY);
     String taskId = selectSingleTask().getId();
 
-    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, UPDATE_TASK, userId);
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, UPDATE_TASK);
 
     // when
     taskService.addUserIdentityLink(taskId, "demo", IdentityLinkType.CANDIDATE);
@@ -1278,8 +1278,8 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     startProcessInstanceByKey(PROCESS_KEY);
     String taskId = selectSingleTask().getId();
 
-    createGrantAuthorization(TASK, taskId, UPDATE, userId);
-    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, UPDATE_TASK, userId);
+    createGrantAuthorization(TASK, taskId, userId, UPDATE);
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, UPDATE_TASK);
 
     // when
     taskService.addUserIdentityLink(taskId, "demo", IdentityLinkType.CANDIDATE);
@@ -1348,7 +1348,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     String taskId = "myTask";
     createTask(taskId);
 
-    createGrantAuthorization(TASK, taskId, UPDATE, userId);
+    createGrantAuthorization(TASK, taskId, userId, UPDATE);
 
     // when
     taskService.addGroupIdentityLink(taskId, "accounting", IdentityLinkType.CANDIDATE);
@@ -1398,7 +1398,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     startProcessInstanceByKey(PROCESS_KEY);
     String taskId = selectSingleTask().getId();
 
-    createGrantAuthorization(TASK, taskId, UPDATE, userId);
+    createGrantAuthorization(TASK, taskId, userId, UPDATE);
 
     // when
     taskService.addGroupIdentityLink(taskId, "accounting", IdentityLinkType.CANDIDATE);
@@ -1423,7 +1423,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     startProcessInstanceByKey(PROCESS_KEY);
     String taskId = selectSingleTask().getId();
 
-    createGrantAuthorization(TASK, ANY, UPDATE, userId);
+    createGrantAuthorization(TASK, ANY, userId, UPDATE);
 
     // when
     taskService.addGroupIdentityLink(taskId, "accounting", IdentityLinkType.CANDIDATE);
@@ -1448,7 +1448,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     startProcessInstanceByKey(PROCESS_KEY);
     String taskId = selectSingleTask().getId();
 
-    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, UPDATE_TASK, userId);
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, UPDATE_TASK);
 
     // when
     taskService.addGroupIdentityLink(taskId, "accounting", IdentityLinkType.CANDIDATE);
@@ -1473,8 +1473,8 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     startProcessInstanceByKey(PROCESS_KEY);
     String taskId = selectSingleTask().getId();
 
-    createGrantAuthorization(TASK, taskId, UPDATE, userId);
-    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, UPDATE_TASK, userId);
+    createGrantAuthorization(TASK, taskId, userId, UPDATE);
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, UPDATE_TASK);
 
     // when
     taskService.addGroupIdentityLink(taskId, "accounting", IdentityLinkType.CANDIDATE);
@@ -1545,7 +1545,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     createTask(taskId);
     addCandidateUser(taskId, "demo");
 
-    createGrantAuthorization(TASK, taskId, UPDATE, userId);
+    createGrantAuthorization(TASK, taskId, userId, UPDATE);
 
     // when
     taskService.deleteCandidateUser(taskId, "demo");
@@ -1591,7 +1591,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     String taskId = selectSingleTask().getId();
     addCandidateUser(taskId, "demo");
 
-    createGrantAuthorization(TASK, taskId, UPDATE, userId);
+    createGrantAuthorization(TASK, taskId, userId, UPDATE);
 
     // when
     taskService.deleteCandidateUser(taskId, "demo");
@@ -1611,7 +1611,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     String taskId = selectSingleTask().getId();
     addCandidateUser(taskId, "demo");
 
-    createGrantAuthorization(TASK, ANY, UPDATE, userId);
+    createGrantAuthorization(TASK, ANY, userId, UPDATE);
 
     // when
     taskService.deleteCandidateUser(taskId, "demo");
@@ -1631,7 +1631,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     String taskId = selectSingleTask().getId();
     addCandidateUser(taskId, "demo");
 
-    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, UPDATE_TASK, userId);
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, UPDATE_TASK);
 
     // when
     taskService.deleteCandidateUser(taskId, "demo");
@@ -1651,8 +1651,8 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     String taskId = selectSingleTask().getId();
     addCandidateUser(taskId, "demo");
 
-    createGrantAuthorization(TASK, taskId, UPDATE, userId);
-    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, UPDATE_TASK, userId);
+    createGrantAuthorization(TASK, taskId, userId, UPDATE);
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, UPDATE_TASK);
 
     // when
     taskService.deleteCandidateUser(taskId, "demo");
@@ -1712,7 +1712,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     createTask(taskId);
     addCandidateGroup(taskId, "accounting");
 
-    createGrantAuthorization(TASK, taskId, UPDATE, userId);
+    createGrantAuthorization(TASK, taskId, userId, UPDATE);
 
     // when
     taskService.deleteCandidateGroup(taskId, "accounting");
@@ -1758,7 +1758,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     String taskId = selectSingleTask().getId();
     addCandidateGroup(taskId, "accounting");
 
-    createGrantAuthorization(TASK, taskId, UPDATE, userId);
+    createGrantAuthorization(TASK, taskId, userId, UPDATE);
 
     // when
     taskService.deleteCandidateGroup(taskId, "accounting");
@@ -1778,7 +1778,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     String taskId = selectSingleTask().getId();
     addCandidateGroup(taskId, "accounting");
 
-    createGrantAuthorization(TASK, ANY, UPDATE, userId);
+    createGrantAuthorization(TASK, ANY, userId, UPDATE);
 
     // when
     taskService.deleteCandidateGroup(taskId, "accounting");
@@ -1798,7 +1798,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     String taskId = selectSingleTask().getId();
     addCandidateGroup(taskId, "accounting");
 
-    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, UPDATE_TASK, userId);
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, UPDATE_TASK);
 
     // when
     taskService.deleteCandidateGroup(taskId, "accounting");
@@ -1818,8 +1818,8 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     String taskId = selectSingleTask().getId();
     addCandidateGroup(taskId, "accounting");
 
-    createGrantAuthorization(TASK, taskId, UPDATE, userId);
-    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, UPDATE_TASK, userId);
+    createGrantAuthorization(TASK, taskId, userId, UPDATE);
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, UPDATE_TASK);
 
     // when
     taskService.deleteCandidateGroup(taskId, "accounting");
@@ -1879,7 +1879,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     createTask(taskId);
     addCandidateUser(taskId, "demo");
 
-    createGrantAuthorization(TASK, taskId, UPDATE, userId);
+    createGrantAuthorization(TASK, taskId, userId, UPDATE);
 
     // when
     taskService.deleteUserIdentityLink(taskId, "demo", IdentityLinkType.CANDIDATE);
@@ -1925,7 +1925,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     String taskId = selectSingleTask().getId();
     addCandidateUser(taskId, "demo");
 
-    createGrantAuthorization(TASK, taskId, UPDATE, userId);
+    createGrantAuthorization(TASK, taskId, userId, UPDATE);
 
     // when
     taskService.deleteUserIdentityLink(taskId, "demo", IdentityLinkType.CANDIDATE);
@@ -1945,7 +1945,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     String taskId = selectSingleTask().getId();
     addCandidateUser(taskId, "demo");
 
-    createGrantAuthorization(TASK, ANY, UPDATE, userId);
+    createGrantAuthorization(TASK, ANY, userId, UPDATE);
 
     // when
     taskService.deleteUserIdentityLink(taskId, "demo", IdentityLinkType.CANDIDATE);
@@ -1965,7 +1965,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     String taskId = selectSingleTask().getId();
     addCandidateUser(taskId, "demo");
 
-    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, UPDATE_TASK, userId);
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, UPDATE_TASK);
 
     // when
     taskService.deleteUserIdentityLink(taskId, "demo", IdentityLinkType.CANDIDATE);
@@ -1985,8 +1985,8 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     String taskId = selectSingleTask().getId();
     addCandidateUser(taskId, "demo");
 
-    createGrantAuthorization(TASK, taskId, UPDATE, userId);
-    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, UPDATE_TASK, userId);
+    createGrantAuthorization(TASK, taskId, userId, UPDATE);
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, UPDATE_TASK);
 
     // when
     taskService.deleteUserIdentityLink(taskId, "demo", IdentityLinkType.CANDIDATE);
@@ -2046,7 +2046,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     createTask(taskId);
     addCandidateGroup(taskId, "accounting");
 
-    createGrantAuthorization(TASK, taskId, UPDATE, userId);
+    createGrantAuthorization(TASK, taskId, userId, UPDATE);
 
     // when
     taskService.deleteGroupIdentityLink(taskId, "accounting", IdentityLinkType.CANDIDATE);
@@ -2092,7 +2092,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     String taskId = selectSingleTask().getId();
     addCandidateGroup(taskId, "accounting");
 
-    createGrantAuthorization(TASK, taskId, UPDATE, userId);
+    createGrantAuthorization(TASK, taskId, userId, UPDATE);
 
     // when
     taskService.deleteGroupIdentityLink(taskId, "accounting", IdentityLinkType.CANDIDATE);
@@ -2112,7 +2112,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     String taskId = selectSingleTask().getId();
     addCandidateGroup(taskId, "accounting");
 
-    createGrantAuthorization(TASK, ANY, UPDATE, userId);
+    createGrantAuthorization(TASK, ANY, userId, UPDATE);
 
     // when
     taskService.deleteGroupIdentityLink(taskId, "accounting", IdentityLinkType.CANDIDATE);
@@ -2132,7 +2132,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     String taskId = selectSingleTask().getId();
     addCandidateGroup(taskId, "accounting");
 
-    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, UPDATE_TASK, userId);
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, UPDATE_TASK);
 
     // when
     taskService.deleteGroupIdentityLink(taskId, "accounting", IdentityLinkType.CANDIDATE);
@@ -2152,8 +2152,8 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     String taskId = selectSingleTask().getId();
     addCandidateGroup(taskId, "accounting");
 
-    createGrantAuthorization(TASK, taskId, UPDATE, userId);
-    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, UPDATE_TASK, userId);
+    createGrantAuthorization(TASK, taskId, userId, UPDATE);
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, UPDATE_TASK);
 
     // when
     taskService.deleteGroupIdentityLink(taskId, "accounting", IdentityLinkType.CANDIDATE);
@@ -2213,7 +2213,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     createTask(taskId);
     addCandidateUser(taskId, "demo");
 
-    createGrantAuthorization(TASK, taskId, READ, userId);
+    createGrantAuthorization(TASK, taskId, userId, READ);
 
     // when
     List<IdentityLink> identityLinksForTask = taskService.getIdentityLinksForTask(taskId);
@@ -2255,7 +2255,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     String taskId = selectSingleTask().getId();
     addCandidateUser(taskId, "demo");
 
-    createGrantAuthorization(TASK, taskId, READ, userId);
+    createGrantAuthorization(TASK, taskId, userId, READ);
 
     // when
     List<IdentityLink> identityLinksForTask = taskService.getIdentityLinksForTask(taskId);
@@ -2271,7 +2271,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     String taskId = selectSingleTask().getId();
     addCandidateUser(taskId, "demo");
 
-    createGrantAuthorization(TASK, ANY, READ, userId);
+    createGrantAuthorization(TASK, ANY, userId, READ);
 
     // when
     List<IdentityLink> identityLinksForTask = taskService.getIdentityLinksForTask(taskId);
@@ -2287,7 +2287,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     String taskId = selectSingleTask().getId();
     addCandidateUser(taskId, "demo");
 
-    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, READ_TASK, userId);
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, READ_TASK);
 
     // when
     List<IdentityLink> identityLinksForTask = taskService.getIdentityLinksForTask(taskId);
@@ -2303,8 +2303,8 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     String taskId = selectSingleTask().getId();
     addCandidateUser(taskId, "demo");
 
-    createGrantAuthorization(TASK, taskId, READ, userId);
-    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, READ_TASK, userId);
+    createGrantAuthorization(TASK, taskId, userId, READ);
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, READ_TASK);
 
     // when
     List<IdentityLink> identityLinksForTask = taskService.getIdentityLinksForTask(taskId);
@@ -2354,7 +2354,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     String taskId = "myTask";
     createTask(taskId);
 
-    createGrantAuthorization(TASK, taskId, UPDATE, userId);
+    createGrantAuthorization(TASK, taskId, userId, UPDATE);
 
     // when
     taskService.claim(taskId, "demo");
@@ -2395,7 +2395,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     startProcessInstanceByKey(PROCESS_KEY);
     String taskId = selectSingleTask().getId();
 
-    createGrantAuthorization(TASK, taskId, UPDATE, userId);
+    createGrantAuthorization(TASK, taskId, userId, UPDATE);
 
     // when
     taskService.claim(taskId, "demo");
@@ -2411,7 +2411,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     startProcessInstanceByKey(PROCESS_KEY);
     String taskId = selectSingleTask().getId();
 
-    createGrantAuthorization(TASK, ANY, UPDATE, userId);
+    createGrantAuthorization(TASK, ANY, userId, UPDATE);
 
     // when
     taskService.claim(taskId, "demo");
@@ -2427,7 +2427,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     startProcessInstanceByKey(PROCESS_KEY);
     String taskId = selectSingleTask().getId();
 
-    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, UPDATE_TASK, userId);
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, UPDATE_TASK);
 
     // when
     taskService.claim(taskId, "demo");
@@ -2443,8 +2443,8 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     startProcessInstanceByKey(PROCESS_KEY);
     String taskId = selectSingleTask().getId();
 
-    createGrantAuthorization(TASK, taskId, UPDATE, userId);
-    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, UPDATE_TASK, userId);
+    createGrantAuthorization(TASK, taskId, userId, UPDATE);
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, UPDATE_TASK);
 
     // when
     taskService.claim(taskId, "demo");
@@ -2495,7 +2495,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     String taskId = "myTask";
     createTask(taskId);
 
-    createGrantAuthorization(TASK, taskId, UPDATE, userId);
+    createGrantAuthorization(TASK, taskId, userId, UPDATE);
 
     // when
     taskService.complete(taskId);
@@ -2535,7 +2535,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     startProcessInstanceByKey(PROCESS_KEY);
     String taskId = selectSingleTask().getId();
 
-    createGrantAuthorization(TASK, taskId, UPDATE, userId);
+    createGrantAuthorization(TASK, taskId, userId, UPDATE);
 
     // when
     taskService.complete(taskId);
@@ -2550,7 +2550,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     startProcessInstanceByKey(PROCESS_KEY);
     String taskId = selectSingleTask().getId();
 
-    createGrantAuthorization(TASK, ANY, UPDATE, userId);
+    createGrantAuthorization(TASK, ANY, userId, UPDATE);
 
     // when
     taskService.complete(taskId);
@@ -2565,7 +2565,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     startProcessInstanceByKey(PROCESS_KEY);
     String taskId = selectSingleTask().getId();
 
-    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, UPDATE_TASK, userId);
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, UPDATE_TASK);
 
     // when
     taskService.complete(taskId);
@@ -2580,8 +2580,8 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     startProcessInstanceByKey(PROCESS_KEY);
     String taskId = selectSingleTask().getId();
 
-    createGrantAuthorization(TASK, taskId, UPDATE, userId);
-    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, UPDATE_TASK, userId);
+    createGrantAuthorization(TASK, taskId, userId, UPDATE);
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, UPDATE_TASK);
 
     // when
     taskService.complete(taskId);
@@ -2630,7 +2630,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     String taskId = "myTask";
     createTask(taskId);
 
-    createGrantAuthorization(TASK, taskId, UPDATE, userId);
+    createGrantAuthorization(TASK, taskId, userId, UPDATE);
 
     // when
     taskService.delegateTask(taskId, "demo");
@@ -2671,7 +2671,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     startProcessInstanceByKey(PROCESS_KEY);
     String taskId = selectSingleTask().getId();
 
-    createGrantAuthorization(TASK, taskId, UPDATE, userId);
+    createGrantAuthorization(TASK, taskId, userId, UPDATE);
 
     // when
     taskService.delegateTask(taskId, "demo");
@@ -2687,7 +2687,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     startProcessInstanceByKey(PROCESS_KEY);
     String taskId = selectSingleTask().getId();
 
-    createGrantAuthorization(TASK, ANY, UPDATE, userId);
+    createGrantAuthorization(TASK, ANY, userId, UPDATE);
 
     // when
     taskService.delegateTask(taskId, "demo");
@@ -2703,7 +2703,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     startProcessInstanceByKey(PROCESS_KEY);
     String taskId = selectSingleTask().getId();
 
-    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, UPDATE_TASK, userId);
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, UPDATE_TASK);
 
     // when
     taskService.delegateTask(taskId, "demo");
@@ -2719,8 +2719,8 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     startProcessInstanceByKey(PROCESS_KEY);
     String taskId = selectSingleTask().getId();
 
-    createGrantAuthorization(TASK, taskId, UPDATE, userId);
-    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, UPDATE_TASK, userId);
+    createGrantAuthorization(TASK, taskId, userId, UPDATE);
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, UPDATE_TASK);
 
     // when
     taskService.delegateTask(taskId, "demo");
@@ -2773,7 +2773,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     setAssignee(taskId, userId);
     delegateTask(taskId, "demo");
 
-    createGrantAuthorization(TASK, taskId, UPDATE, userId);
+    createGrantAuthorization(TASK, taskId, userId, UPDATE);
 
     // when
     taskService.resolveTask(taskId);
@@ -2816,7 +2816,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     setAssignee(taskId, userId);
     delegateTask(taskId, "demo");
 
-    createGrantAuthorization(TASK, taskId, UPDATE, userId);
+    createGrantAuthorization(TASK, taskId, userId, UPDATE);
 
     // when
     taskService.resolveTask(taskId);
@@ -2834,7 +2834,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     setAssignee(taskId, userId);
     delegateTask(taskId, "demo");
 
-    createGrantAuthorization(TASK, ANY, UPDATE, userId);
+    createGrantAuthorization(TASK, ANY, userId, UPDATE);
 
     // when
     taskService.resolveTask(taskId);
@@ -2852,7 +2852,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     setAssignee(taskId, userId);
     delegateTask(taskId, "demo");
 
-    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, UPDATE_TASK, userId);
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, UPDATE_TASK);
 
     // when
     taskService.resolveTask(taskId);
@@ -2870,8 +2870,8 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     setAssignee(taskId, userId);
     delegateTask(taskId, "demo");
 
-    createGrantAuthorization(TASK, taskId, UPDATE, userId);
-    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, UPDATE_TASK, userId);
+    createGrantAuthorization(TASK, taskId, userId, UPDATE);
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, UPDATE_TASK);
 
     // when
     taskService.resolveTask(taskId);
@@ -2924,7 +2924,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     String taskId = "myTask";
     createTask(taskId);
 
-    createGrantAuthorization(TASK, taskId, UPDATE, userId);
+    createGrantAuthorization(TASK, taskId, userId, UPDATE);
 
     // when
     taskService.setPriority(taskId, 80);
@@ -2965,7 +2965,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     startProcessInstanceByKey(PROCESS_KEY);
     String taskId = selectSingleTask().getId();
 
-    createGrantAuthorization(TASK, taskId, UPDATE, userId);
+    createGrantAuthorization(TASK, taskId, userId, UPDATE);
 
     // when
     taskService.setPriority(taskId, 80);
@@ -2981,7 +2981,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     startProcessInstanceByKey(PROCESS_KEY);
     String taskId = selectSingleTask().getId();
 
-    createGrantAuthorization(TASK, ANY, UPDATE, userId);
+    createGrantAuthorization(TASK, ANY, userId, UPDATE);
 
     // when
     taskService.setPriority(taskId, 80);
@@ -2997,7 +2997,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     startProcessInstanceByKey(PROCESS_KEY);
     String taskId = selectSingleTask().getId();
 
-    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, UPDATE_TASK, userId);
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, UPDATE_TASK);
 
     // when
     taskService.setPriority(taskId, 80);
@@ -3013,8 +3013,8 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     startProcessInstanceByKey(PROCESS_KEY);
     String taskId = selectSingleTask().getId();
 
-    createGrantAuthorization(TASK, taskId, UPDATE, userId);
-    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, UPDATE_TASK, userId);
+    createGrantAuthorization(TASK, taskId, userId, UPDATE);
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, UPDATE_TASK);
 
     // when
     taskService.setPriority(taskId, 80);
@@ -3082,7 +3082,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     taskService.saveTask(sub2);
     enableAuthorization();
 
-    createGrantAuthorization(TASK, "sub1", READ, userId);
+    createGrantAuthorization(TASK, "sub1", userId, READ);
 
     // when
     List<Task> subTasks = taskService.getSubTasks(parentTaskId);
@@ -3111,7 +3111,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     taskService.saveTask(sub2);
     enableAuthorization();
 
-    createGrantAuthorization(TASK, ANY, READ, userId);
+    createGrantAuthorization(TASK, ANY, userId, READ);
 
     // when
     List<Task> subTasks = taskService.getSubTasks(parentTaskId);
@@ -3162,7 +3162,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     taskService.saveTask(sub2);
     enableAuthorization();
 
-    createGrantAuthorization(TASK, "sub1", READ, userId);
+    createGrantAuthorization(TASK, "sub1", userId, READ);
 
     // when
     List<Task> subTasks = taskService.getSubTasks(parentTaskId);
@@ -3189,7 +3189,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     taskService.saveTask(sub2);
     enableAuthorization();
 
-    createGrantAuthorization(TASK, ANY, READ, userId);
+    createGrantAuthorization(TASK, ANY, userId, READ);
 
     // when
     List<Task> subTasks = taskService.getSubTasks(parentTaskId);
@@ -3238,7 +3238,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     taskService.saveTask(sub2);
     enableAuthorization();
 
-    createGrantAuthorization(TASK, "sub1", READ, userId);
+    createGrantAuthorization(TASK, "sub1", userId, READ);
 
     // when
     List<Task> subTasks = taskService.getSubTasks(parentTaskId);
@@ -3265,7 +3265,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     taskService.saveTask(sub2);
     enableAuthorization();
 
-    createGrantAuthorization(TASK, ANY, READ, userId);
+    createGrantAuthorization(TASK, ANY, userId, READ);
 
     // when
     List<Task> subTasks = taskService.getSubTasks(parentTaskId);
@@ -3281,7 +3281,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     // given
     String taskId = "myTask";
     createTask(taskId);
-    createGrantAuthorization(TASK, taskId, UPDATE, userId);
+    createGrantAuthorization(TASK, taskId, userId, UPDATE);
 
     disableAuthorization();
     Authorization authorization = authorizationService
@@ -3313,7 +3313,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     // given
     startProcessInstanceByKey(PROCESS_KEY);
     String taskId = selectSingleTask().getId();
-    createGrantAuthorization(TASK, taskId, UPDATE, userId);
+    createGrantAuthorization(TASK, taskId, userId, UPDATE);
 
     disableAuthorization();
     Authorization authorization = authorizationService
@@ -3344,7 +3344,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     String taskId = "myTask";
     createTask(taskId);
 
-    createGrantAuthorization(TASK, taskId, UPDATE, userId);
+    createGrantAuthorization(TASK, taskId, userId, UPDATE);
 
     // when
     taskService.setAssignee(taskId, "demo");
@@ -3371,8 +3371,8 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     String taskId = "myTask";
     createTask(taskId);
 
-    createGrantAuthorization(TASK, taskId, UPDATE, userId);
-    createGrantAuthorization(TASK, taskId, DELETE, "demo");
+    createGrantAuthorization(TASK, taskId, userId, UPDATE);
+    createGrantAuthorization(TASK, taskId, "demo", DELETE);
 
     // when
     taskService.setAssignee(taskId, "demo");
@@ -3398,7 +3398,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     // given
     String taskId = "myTask";
     createTask(taskId);
-    createGrantAuthorization(TASK, taskId, UPDATE, userId);
+    createGrantAuthorization(TASK, taskId, userId, UPDATE);
 
     // set assignee to demo -> an authorization for demo is available
     taskService.setAssignee(taskId, "demo");
@@ -3428,7 +3428,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     // given
     String taskId = "myTask";
     createTask(taskId);
-    createGrantAuthorization(TASK, taskId, UPDATE, userId);
+    createGrantAuthorization(TASK, taskId, userId, UPDATE);
 
     // set assignee to demo -> an authorization for demo is available
     taskService.setAssignee(taskId, "demo");
@@ -3451,8 +3451,8 @@ public class TaskAuthorizationTest extends AuthorizationTest {
   public void testStandaloneTaskSetAssigneeOutsideCommandContextInsert() {
     // given
     String taskId = "myTask";
-    createGrantAuthorization(TASK, ANY, CREATE, userId);
-    createGrantAuthorization(TASK, taskId, UPDATE, userId);
+    createGrantAuthorization(TASK, ANY, userId, CREATE);
+    createGrantAuthorization(TASK, taskId, userId, UPDATE);
 
     Task task = taskService.newTask(taskId);
     task.setAssignee("demo");
@@ -3481,7 +3481,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     // given
     String taskId = "myTask";
     createTask(taskId);
-    createGrantAuthorization(TASK, taskId, UPDATE, userId);
+    createGrantAuthorization(TASK, taskId, userId, UPDATE);
 
     Task task = selectSingleTask();
 
@@ -3514,7 +3514,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     startProcessInstanceByKey(PROCESS_KEY);
     String taskId = selectSingleTask().getId();
 
-    createGrantAuthorization(TASK, taskId, UPDATE, userId);
+    createGrantAuthorization(TASK, taskId, userId, UPDATE);
 
     // when
     taskService.setAssignee(taskId, "demo");
@@ -3539,8 +3539,8 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     startProcessInstanceByKey(PROCESS_KEY);
     String taskId = selectSingleTask().getId();
 
-    createGrantAuthorization(TASK, taskId, UPDATE, userId);
-    createGrantAuthorization(TASK, taskId, DELETE, "demo");
+    createGrantAuthorization(TASK, taskId, userId, UPDATE);
+    createGrantAuthorization(TASK, taskId, "demo", DELETE);
 
     // when
     taskService.setAssignee(taskId, "demo");
@@ -3564,7 +3564,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     // given
     startProcessInstanceByKey(PROCESS_KEY);
     String taskId = selectSingleTask().getId();
-    createGrantAuthorization(TASK, taskId, UPDATE, userId);
+    createGrantAuthorization(TASK, taskId, userId, UPDATE);
 
     // set assignee to demo -> an authorization for demo is available
     taskService.setAssignee(taskId, "demo");
@@ -3592,7 +3592,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     // given
     startProcessInstanceByKey(PROCESS_KEY);
     String taskId = selectSingleTask().getId();
-    createGrantAuthorization(TASK, taskId, UPDATE, userId);
+    createGrantAuthorization(TASK, taskId, userId, UPDATE);
 
     // set assignee to demo -> an authorization for demo is available
     taskService.setAssignee(taskId, "demo");
@@ -3613,8 +3613,8 @@ public class TaskAuthorizationTest extends AuthorizationTest {
 
   public void testProcessTaskAssignee() {
     // given
-    createGrantAuthorization(PROCESS_DEFINITION, DEMO_ASSIGNEE_PROCESS_KEY, CREATE_INSTANCE, userId);
-    createGrantAuthorization(PROCESS_INSTANCE, ANY, CREATE, userId);
+    createGrantAuthorization(PROCESS_DEFINITION, DEMO_ASSIGNEE_PROCESS_KEY, userId, CREATE_INSTANCE);
+    createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, CREATE);
 
     // when
     runtimeService.startProcessInstanceByKey(DEMO_ASSIGNEE_PROCESS_KEY);
@@ -3654,7 +3654,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     // given
     createCaseInstanceByKey(CASE_KEY);
     String taskId = selectSingleTask().getId();
-    createGrantAuthorization(TASK, taskId, UPDATE, userId);
+    createGrantAuthorization(TASK, taskId, userId, UPDATE);
 
     // when
     taskService.setAssignee(taskId, "demo");
@@ -3677,7 +3677,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     String taskId = "myTask";
     createTask(taskId);
 
-    createGrantAuthorization(TASK, taskId, UPDATE, userId);
+    createGrantAuthorization(TASK, taskId, userId, UPDATE);
 
     // when
     taskService.setOwner(taskId, "demo");
@@ -3704,8 +3704,8 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     String taskId = "myTask";
     createTask(taskId);
 
-    createGrantAuthorization(TASK, taskId, UPDATE, userId);
-    createGrantAuthorization(TASK, taskId, DELETE, "demo");
+    createGrantAuthorization(TASK, taskId, userId, UPDATE);
+    createGrantAuthorization(TASK, taskId, "demo", DELETE);
 
     // when
     taskService.setOwner(taskId, "demo");
@@ -3730,7 +3730,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
   public void testQueryStandaloneTaskSetOwner() {
     String taskId = "myTask";
     createTask(taskId);
-    createGrantAuthorization(TASK, taskId, UPDATE, userId);
+    createGrantAuthorization(TASK, taskId, userId, UPDATE);
 
     // set owner to demo -> an authorization for demo is available
     taskService.setOwner(taskId, "demo");
@@ -3753,8 +3753,8 @@ public class TaskAuthorizationTest extends AuthorizationTest {
   public void testStandaloneTaskSetOwnerOutsideCommandContextInsert() {
     // given
     String taskId = "myTask";
-    createGrantAuthorization(TASK, ANY, CREATE, userId);
-    createGrantAuthorization(TASK, taskId, UPDATE, userId);
+    createGrantAuthorization(TASK, ANY, userId, CREATE);
+    createGrantAuthorization(TASK, taskId, userId, UPDATE);
 
     Task task = taskService.newTask(taskId);
     task.setOwner("demo");
@@ -3783,7 +3783,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     // given
     String taskId = "myTask";
     createTask(taskId);
-    createGrantAuthorization(TASK, taskId, UPDATE, userId);
+    createGrantAuthorization(TASK, taskId, userId, UPDATE);
 
     Task task = selectSingleTask();
 
@@ -3816,7 +3816,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     startProcessInstanceByKey(PROCESS_KEY);
     String taskId = selectSingleTask().getId();
 
-    createGrantAuthorization(TASK, taskId, UPDATE, userId);
+    createGrantAuthorization(TASK, taskId, userId, UPDATE);
 
     // when
     taskService.setOwner(taskId, "demo");
@@ -3841,8 +3841,8 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     startProcessInstanceByKey(PROCESS_KEY);
     String taskId = selectSingleTask().getId();
 
-    createGrantAuthorization(TASK, taskId, UPDATE, userId);
-    createGrantAuthorization(TASK, taskId, DELETE, "demo");
+    createGrantAuthorization(TASK, taskId, userId, UPDATE);
+    createGrantAuthorization(TASK, taskId, "demo", DELETE);
 
     // when
     taskService.setOwner(taskId, "demo");
@@ -3866,7 +3866,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     // given
     startProcessInstanceByKey(PROCESS_KEY);
     String taskId = selectSingleTask().getId();
-    createGrantAuthorization(TASK, taskId, UPDATE, userId);
+    createGrantAuthorization(TASK, taskId, userId, UPDATE);
 
     // set owner to demo -> an authorization for demo is available
     taskService.setOwner(taskId, "demo");
@@ -3891,7 +3891,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     // given
     createCaseInstanceByKey(CASE_KEY);
     String taskId = selectSingleTask().getId();
-    createGrantAuthorization(TASK, taskId, UPDATE, userId);
+    createGrantAuthorization(TASK, taskId, userId, UPDATE);
 
     // when
     taskService.setOwner(taskId, "demo");
@@ -3913,7 +3913,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     // given
     String taskId = "myTask";
     createTask(taskId);
-    createGrantAuthorization(TASK, taskId, UPDATE, userId);
+    createGrantAuthorization(TASK, taskId, userId, UPDATE);
 
     // when
     taskService.addCandidateUser(taskId, "demo");
@@ -3940,8 +3940,8 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     String taskId = "myTask";
     createTask(taskId);
 
-    createGrantAuthorization(TASK, taskId, UPDATE, userId);
-    createGrantAuthorization(TASK, taskId, DELETE, "demo");
+    createGrantAuthorization(TASK, taskId, userId, UPDATE);
+    createGrantAuthorization(TASK, taskId, "demo", DELETE);
 
     // when
     taskService.addCandidateUser(taskId, "demo");
@@ -3968,7 +3968,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     String taskId = "myTask";
     createTask(taskId);
 
-    createGrantAuthorization(TASK, taskId, UPDATE, userId);
+    createGrantAuthorization(TASK, taskId, userId, UPDATE);
 
     // add candidate user -> an authorization for demo is available
     taskService.addCandidateUser(taskId, "demo");
@@ -3994,7 +3994,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     // given
     startProcessInstanceByKey(PROCESS_KEY);
     String taskId = selectSingleTask().getId();
-    createGrantAuthorization(TASK, taskId, UPDATE, userId);
+    createGrantAuthorization(TASK, taskId, userId, UPDATE);
 
     // when
     taskService.addCandidateUser(taskId, "demo");
@@ -4019,8 +4019,8 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     startProcessInstanceByKey(PROCESS_KEY);
     String taskId = selectSingleTask().getId();
 
-    createGrantAuthorization(TASK, taskId, UPDATE, userId);
-    createGrantAuthorization(TASK, taskId, DELETE, "demo");
+    createGrantAuthorization(TASK, taskId, userId, UPDATE);
+    createGrantAuthorization(TASK, taskId, "demo", DELETE);
 
     // when
     taskService.addCandidateUser(taskId, "demo");
@@ -4044,7 +4044,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     // given
     startProcessInstanceByKey(PROCESS_KEY);
     String taskId = selectSingleTask().getId();
-    createGrantAuthorization(TASK, taskId, UPDATE, userId);
+    createGrantAuthorization(TASK, taskId, userId, UPDATE);
 
     // add candidate user -> an authorization for demo is available
     taskService.addCandidateUser(taskId, "demo");
@@ -4065,8 +4065,8 @@ public class TaskAuthorizationTest extends AuthorizationTest {
 
   public void testProcessTaskCandidateUsers() {
     // given
-    createGrantAuthorization(PROCESS_DEFINITION, CANDIDATE_USERS_PROCESS_KEY, CREATE_INSTANCE, userId);
-    createGrantAuthorization(PROCESS_INSTANCE, ANY, CREATE, userId);
+    createGrantAuthorization(PROCESS_DEFINITION, CANDIDATE_USERS_PROCESS_KEY, userId, CREATE_INSTANCE);
+    createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, CREATE);
 
     // when
     runtimeService.startProcessInstanceByKey(CANDIDATE_USERS_PROCESS_KEY);
@@ -4127,7 +4127,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     // given
     createCaseInstanceByKey(CASE_KEY);
     String taskId = selectSingleTask().getId();
-    createGrantAuthorization(TASK, taskId, UPDATE, userId);
+    createGrantAuthorization(TASK, taskId, userId, UPDATE);
 
     // when
     taskService.addCandidateUser(taskId, "demo");
@@ -4149,7 +4149,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     // given
     String taskId = "myTask";
     createTask(taskId);
-    createGrantAuthorization(TASK, taskId, UPDATE, userId);
+    createGrantAuthorization(TASK, taskId, userId, UPDATE);
 
     // when
     taskService.addCandidateGroup(taskId, "management");
@@ -4176,8 +4176,8 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     String taskId = "myTask";
     createTask(taskId);
 
-    createGrantAuthorization(TASK, taskId, UPDATE, userId);
-    createGrantAuthorization(TASK, taskId, DELETE, "demo");
+    createGrantAuthorization(TASK, taskId, userId, UPDATE);
+    createGrantAuthorization(TASK, taskId, "demo", DELETE);
 
     // when
     taskService.addCandidateGroup(taskId, "management");
@@ -4204,7 +4204,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     String taskId = "myTask";
     createTask(taskId);
 
-    createGrantAuthorization(TASK, taskId, UPDATE, userId);
+    createGrantAuthorization(TASK, taskId, userId, UPDATE);
 
     // add candidate group -> an authorization for group management is available
     taskService.addCandidateGroup(taskId, "management");
@@ -4230,7 +4230,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     // given
     startProcessInstanceByKey(PROCESS_KEY);
     String taskId = selectSingleTask().getId();
-    createGrantAuthorization(TASK, taskId, UPDATE, userId);
+    createGrantAuthorization(TASK, taskId, userId, UPDATE);
 
     // when
     taskService.addCandidateGroup(taskId, "management");
@@ -4255,8 +4255,8 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     startProcessInstanceByKey(PROCESS_KEY);
     String taskId = selectSingleTask().getId();
 
-    createGrantAuthorization(TASK, taskId, UPDATE, userId);
-    createGrantAuthorization(TASK, taskId, DELETE, "demo");
+    createGrantAuthorization(TASK, taskId, userId, UPDATE);
+    createGrantAuthorization(TASK, taskId, "demo", DELETE);
 
     // when
     taskService.addCandidateGroup(taskId, "management");
@@ -4280,7 +4280,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     // given
     startProcessInstanceByKey(PROCESS_KEY);
     String taskId = selectSingleTask().getId();
-    createGrantAuthorization(TASK, taskId, UPDATE, userId);
+    createGrantAuthorization(TASK, taskId, userId, UPDATE);
 
     // add candidate group -> an authorization for group management is available
     taskService.addCandidateGroup(taskId, "management");
@@ -4301,8 +4301,8 @@ public class TaskAuthorizationTest extends AuthorizationTest {
 
   public void testProcessTaskCandidateGroups() {
     // given
-    createGrantAuthorization(PROCESS_DEFINITION, CANDIDATE_GROUPS_PROCESS_KEY, CREATE_INSTANCE, userId);
-    createGrantAuthorization(PROCESS_INSTANCE, ANY, CREATE, userId);
+    createGrantAuthorization(PROCESS_DEFINITION, CANDIDATE_GROUPS_PROCESS_KEY, userId, CREATE_INSTANCE);
+    createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, CREATE);
 
     // when
     runtimeService.startProcessInstanceByKey(CANDIDATE_GROUPS_PROCESS_KEY);
@@ -4362,7 +4362,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     // given
     createCaseInstanceByKey(CASE_KEY);
     String taskId = selectSingleTask().getId();
-    createGrantAuthorization(TASK, taskId, UPDATE, userId);
+    createGrantAuthorization(TASK, taskId, userId, UPDATE);
 
     // when
     taskService.addCandidateGroup(taskId, "management");
