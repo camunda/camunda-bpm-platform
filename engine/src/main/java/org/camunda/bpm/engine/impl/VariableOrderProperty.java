@@ -90,8 +90,6 @@ public class VariableOrderProperty extends QueryOrderingProperty {
       return VariableInstanceQueryProperty.LONG;
     } else if (ValueType.DOUBLE.equals(type)) {
       return VariableInstanceQueryProperty.DOUBLE;
-    } else if (ValueType.DATE.equals(type)) {
-      return VariableInstanceQueryProperty.LONG;
     } else {
       throw new ProcessEngineException("Cannot order by variables of type " + type.getName());
     }

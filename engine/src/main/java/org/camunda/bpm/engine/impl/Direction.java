@@ -37,7 +37,13 @@ public class Direction {
   public String getName() {
     return name;
   }
-  
+
+  public String toString() {
+    return "Direction["
+      + "name=" + name
+      + "]";
+  }
+
   public static Direction findByName(String directionName) {
     return directions.get(directionName);
   }

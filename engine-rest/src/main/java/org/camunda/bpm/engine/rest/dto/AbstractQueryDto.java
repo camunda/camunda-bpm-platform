@@ -12,16 +12,6 @@
  */
 package org.camunda.bpm.engine.rest.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.query.Query;
-import org.camunda.bpm.engine.rest.dto.converter.JacksonAwareStringToTypeConverter;
-import org.camunda.bpm.engine.rest.dto.converter.StringToTypeConverter;
-import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
-import org.camunda.bpm.engine.rest.exception.RestException;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response.Status;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -30,6 +20,22 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response.Status;
+
+import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.impl.Direction;
+import org.camunda.bpm.engine.impl.QueryOrderingProperty;
+import org.camunda.bpm.engine.impl.VariableOrderProperty;
+import org.camunda.bpm.engine.query.Query;
+import org.camunda.bpm.engine.query.QueryProperty;
+import org.camunda.bpm.engine.rest.dto.converter.JacksonAwareStringToTypeConverter;
+import org.camunda.bpm.engine.rest.dto.converter.StringToTypeConverter;
+import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
+import org.camunda.bpm.engine.rest.exception.RestException;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Defines common query operations, such as sorting options and validation.
@@ -41,10 +47,10 @@ import java.util.Map.Entry;
  */
 public abstract class AbstractQueryDto<T extends Query<?, ?>> {
 
-  protected static final String SORT_ORDER_ASC_VALUE = "asc";
-  protected static final String SORT_ORDER_DESC_VALUE = "desc";
+  public static final String SORT_ORDER_ASC_VALUE = "asc";
+  public static final String SORT_ORDER_DESC_VALUE = "desc";
 
-  private static final List<String> VALID_SORT_ORDER_VALUES;
+  public static final List<String> VALID_SORT_ORDER_VALUES;
   static {
     VALID_SORT_ORDER_VALUES = new ArrayList<String>();
     VALID_SORT_ORDER_VALUES.add(SORT_ORDER_ASC_VALUE);
@@ -100,6 +106,10 @@ public abstract class AbstractQueryDto<T extends Query<?, ?>> {
 
   public void setSorting(List<SortingDto> sorting) {
     this.sortings = sorting;
+  }
+
+  public List<SortingDto> getSorting() {
+    return sortings;
   }
 
   protected abstract boolean isValidSortByValue(String value);
@@ -223,6 +233,18 @@ public abstract class AbstractQueryDto<T extends Query<?, ?>> {
       } else if (sortOrder.equals(SORT_ORDER_DESC_VALUE)) {
         query.desc();
       }
+    }
+  }
+
+  public static String sortOrderValueForDirection(Direction direction) {
+    if (Direction.ASCENDING.equals(direction)) {
+      return SORT_ORDER_ASC_VALUE;
+    }
+    else if (Direction.DESCENDING.equals(direction)) {
+      return SORT_ORDER_DESC_VALUE;
+    }
+    else {
+      throw new RestException("Unknown query sorting direction " + direction);
     }
   }
 

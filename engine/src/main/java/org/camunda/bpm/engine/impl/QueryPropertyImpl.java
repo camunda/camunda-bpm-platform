@@ -72,4 +72,12 @@ public class QueryPropertyImpl implements QueryProperty {
       return false;
     return true;
   }
+
+  public String toString() {
+    return "QueryProperty["
+      + "name=" + name
+      + ", function=" + function
+      + "]";
+  }
+
 }

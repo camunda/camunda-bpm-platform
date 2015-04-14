@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.rest.dto.task;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -21,12 +22,19 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.impl.QueryEntityRelationCondition;
+import org.camunda.bpm.engine.impl.QueryOrderingProperty;
 import org.camunda.bpm.engine.impl.TaskQueryImpl;
+import org.camunda.bpm.engine.impl.TaskQueryProperty;
 import org.camunda.bpm.engine.impl.TaskQueryVariableValue;
+import org.camunda.bpm.engine.impl.VariableInstanceQueryProperty;
+import org.camunda.bpm.engine.impl.VariableOrderProperty;
 import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
 import org.camunda.bpm.engine.query.Query;
+import org.camunda.bpm.engine.query.QueryProperty;
 import org.camunda.bpm.engine.rest.dto.AbstractQueryDto;
 import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
+import org.camunda.bpm.engine.rest.dto.SortingDto;
 import org.camunda.bpm.engine.rest.dto.VariableQueryParameterDto;
 import org.camunda.bpm.engine.rest.dto.VariableValueDto;
 import org.camunda.bpm.engine.rest.dto.converter.BooleanConverter;
@@ -37,6 +45,7 @@ import org.camunda.bpm.engine.rest.dto.converter.StringArrayConverter;
 import org.camunda.bpm.engine.rest.dto.converter.StringListConverter;
 import org.camunda.bpm.engine.rest.dto.converter.VariableListConverter;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
+import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.task.DelegationState;
 import org.camunda.bpm.engine.task.TaskQuery;
 import org.camunda.bpm.engine.variable.type.ValueType;
@@ -49,27 +58,27 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @JsonInclude(Include.NON_NULL)
 public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
 
-  private static final String SORT_BY_PROCESS_INSTANCE_ID_VALUE = "instanceId";
-  private static final String SORT_BY_CASE_INSTANCE_ID_VALUE = "caseInstanceId";
-  private static final String SORT_BY_DUE_DATE_VALUE = "dueDate";
-  private static final String SORT_BY_FOLLOW_UP_VALUE = "followUpDate";
-  private static final String SORT_BY_EXECUTION_ID_VALUE = "executionId";
-  private static final String SORT_BY_CASE_EXECUTION_ID_VALUE = "caseExecutionId";
-  private static final String SORT_BY_ASSIGNEE_VALUE = "assignee";
-  private static final String SORT_BY_CREATE_TIME_VALUE = "created";
-  private static final String SORT_BY_DESCRIPTION_VALUE = "description";
-  private static final String SORT_BY_ID_VALUE = "id";
-  private static final String SORT_BY_NAME_VALUE = "name";
-  private static final String SORT_BY_NAME_CASE_INSENSITIVE_VALUE = "nameCaseInsensitive";
-  private static final String SORT_BY_PRIORITY_VALUE = "priority";
+  public static final String SORT_BY_PROCESS_INSTANCE_ID_VALUE = "instanceId";
+  public static final String SORT_BY_CASE_INSTANCE_ID_VALUE = "caseInstanceId";
+  public static final String SORT_BY_DUE_DATE_VALUE = "dueDate";
+  public static final String SORT_BY_FOLLOW_UP_VALUE = "followUpDate";
+  public static final String SORT_BY_EXECUTION_ID_VALUE = "executionId";
+  public static final String SORT_BY_CASE_EXECUTION_ID_VALUE = "caseExecutionId";
+  public static final String SORT_BY_ASSIGNEE_VALUE = "assignee";
+  public static final String SORT_BY_CREATE_TIME_VALUE = "created";
+  public static final String SORT_BY_DESCRIPTION_VALUE = "description";
+  public static final String SORT_BY_ID_VALUE = "id";
+  public static final String SORT_BY_NAME_VALUE = "name";
+  public static final String SORT_BY_NAME_CASE_INSENSITIVE_VALUE = "nameCaseInsensitive";
+  public static final String SORT_BY_PRIORITY_VALUE = "priority";
 
-  private static final String SORT_BY_PROCESS_VARIABLE = "processVariable";
-  private static final String SORT_BY_EXECUTION_VARIABLE = "executionVariable";
-  private static final String SORT_BY_TASK_VARIABLE = "taskVariable";
-  private static final String SORT_BY_CASE_INSTANCE_VARIABLE = "caseInstanceVariable";
-  private static final String SORT_BY_CASE_EXECUTION_VARIABLE = "caseExecutionVariable";
+  public static final String SORT_BY_PROCESS_VARIABLE = "processVariable";
+  public static final String SORT_BY_EXECUTION_VARIABLE = "executionVariable";
+  public static final String SORT_BY_TASK_VARIABLE = "taskVariable";
+  public static final String SORT_BY_CASE_INSTANCE_VARIABLE = "caseInstanceVariable";
+  public static final String SORT_BY_CASE_EXECUTION_VARIABLE = "caseExecutionVariable";
 
-  private static final List<String> VALID_SORT_BY_VALUES;
+  public static final List<String> VALID_SORT_BY_VALUES;
   static {
     VALID_SORT_BY_VALUES = new ArrayList<String>();
     VALID_SORT_BY_VALUES.add(SORT_BY_PROCESS_INSTANCE_ID_VALUE);
@@ -86,6 +95,9 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     VALID_SORT_BY_VALUES.add(SORT_BY_NAME_CASE_INSENSITIVE_VALUE);
     VALID_SORT_BY_VALUES.add(SORT_BY_PRIORITY_VALUE);
   }
+
+  public static final String SORT_PARAMETERS_VARIABLE_NAME = "variable";
+  public static final String SORT_PARAMETERS_VALUE_TYPE = "type";
 
   private String processInstanceBusinessKey;
   private String[] processInstanceBusinessKeyIn;
@@ -1142,45 +1154,42 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
       query.orderByTaskPriority();
 
     } else if (sortBy.equals(SORT_BY_PROCESS_VARIABLE)) {
-      String variableName = (String) getValue(parameters, "variable");
-      String valueTypeName = (String) getValue(parameters, "type");
-      if (valueTypeName != null) {
-        valueTypeName = VariableValueDto.fromRestApiTypeName(valueTypeName);
-      }
+      String variableName = getVariableName(parameters);
+      String valueTypeName = getValueTypeName(parameters);
       query.orderByProcessVariable(variableName, getValueTypeByName(valueTypeName, engine));
 
     } else if (sortBy.equals(SORT_BY_EXECUTION_VARIABLE)) {
-      String variableName = (String) getValue(parameters, "variable");
-      String valueTypeName = (String) getValue(parameters, "type");
-      if (valueTypeName != null) {
-        valueTypeName = VariableValueDto.fromRestApiTypeName(valueTypeName);
-      }
+      String variableName = getVariableName(parameters);
+      String valueTypeName = getValueTypeName(parameters);
       query.orderByExecutionVariable(variableName, getValueTypeByName(valueTypeName, engine));
 
     } else if (sortBy.equals(SORT_BY_TASK_VARIABLE)) {
-      String variableName = (String) getValue(parameters, "variable");
-      String valueTypeName = (String) getValue(parameters, "type");
-      if (valueTypeName != null) {
-        valueTypeName = VariableValueDto.fromRestApiTypeName(valueTypeName);
-      }
+      String variableName = getVariableName(parameters);
+      String valueTypeName = getValueTypeName(parameters);
       query.orderByTaskVariable(variableName, getValueTypeByName(valueTypeName, engine));
 
     } else if (sortBy.equals(SORT_BY_CASE_INSTANCE_VARIABLE)) {
-      String variableName = (String) getValue(parameters, "variable");
-      String valueTypeName = (String) getValue(parameters, "type");
-      if (valueTypeName != null) {
-        valueTypeName = VariableValueDto.fromRestApiTypeName(valueTypeName);
-      }
+      String variableName = getVariableName(parameters);
+      String valueTypeName = getValueTypeName(parameters);
       query.orderByCaseInstanceVariable(variableName, getValueTypeByName(valueTypeName, engine));
 
     } else if (sortBy.equals(SORT_BY_CASE_EXECUTION_VARIABLE)) {
-      String variableName = (String) getValue(parameters, "variable");
-      String valueTypeName = (String) getValue(parameters, "type");
-      if (valueTypeName != null) {
-        valueTypeName = VariableValueDto.fromRestApiTypeName(valueTypeName);
-      }
+      String variableName = getVariableName(parameters);
+      String valueTypeName = getValueTypeName(parameters);
       query.orderByCaseExecutionVariable(variableName, getValueTypeByName(valueTypeName, engine));
     }
+  }
+
+  protected String getValueTypeName(Map<String, Object> parameters) {
+    String valueTypeName = (String) getValue(parameters, SORT_PARAMETERS_VALUE_TYPE);
+    if (valueTypeName != null) {
+      valueTypeName = VariableValueDto.fromRestApiTypeName(valueTypeName);
+    }
+    return valueTypeName;
+  }
+
+  protected String getVariableName(Map<String, Object> parameters) {
+    return (String) getValue(parameters, SORT_PARAMETERS_VARIABLE_NAME);
   }
 
   protected Object getValue(Map<String, Object> map, String key) {
@@ -1280,6 +1289,12 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
       dto.suspended = true;
     }
 
+    // sorting
+    List<QueryOrderingProperty> orderingProperties = taskQuery.getOrderingProperties();
+    if (!orderingProperties.isEmpty()) {
+      dto.setSorting(convertQueryOrderingPropertiesToSortingDtos(orderingProperties));
+    }
+
     // expressions
     Map<String, String> expressions = taskQuery.getExpressions();
     if (expressions.containsKey("taskAssignee")) {
@@ -1335,6 +1350,130 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     }
 
     return dto;
+  }
+
+  public static List<SortingDto> convertQueryOrderingPropertiesToSortingDtos(List<QueryOrderingProperty> orderingProperties) {
+    List<SortingDto> sortingDtos = new ArrayList<SortingDto>();
+    for (QueryOrderingProperty orderingProperty : orderingProperties) {
+      SortingDto sortingDto;
+      if (orderingProperty instanceof VariableOrderProperty) {
+        sortingDto = convertVariableOrderPropertyToSortingDto((VariableOrderProperty) orderingProperty);
+      }
+      else {
+        sortingDto = convertQueryOrderingPropertyToSortingDto(orderingProperty);
+      }
+      sortingDtos.add(sortingDto);
+    }
+    return sortingDtos;
+  }
+
+  public static SortingDto convertVariableOrderPropertyToSortingDto(VariableOrderProperty variableOrderProperty) {
+    SortingDto sortingDto = new SortingDto();
+    sortingDto.setSortBy(sortByValueForVariableOrderProperty(variableOrderProperty));
+    sortingDto.setSortOrder(sortOrderValueForDirection(variableOrderProperty.getDirection()));
+    sortingDto.setParameters(sortParametersForVariableOrderProperty(variableOrderProperty));
+    return sortingDto;
+  }
+
+  public static SortingDto convertQueryOrderingPropertyToSortingDto(QueryOrderingProperty orderingProperty) {
+    SortingDto sortingDto = new SortingDto();
+    sortingDto.setSortBy(sortByValueForQueryProperty(orderingProperty.getQueryProperty()));
+    sortingDto.setSortOrder(sortOrderValueForDirection(orderingProperty.getDirection()));
+    return sortingDto;
+  }
+
+  public static String sortByValueForQueryProperty(QueryProperty queryProperty) {
+    if (TaskQueryProperty.ASSIGNEE.equals(queryProperty)) {
+      return SORT_BY_ASSIGNEE_VALUE;
+    }
+    else if (TaskQueryProperty.CASE_EXECUTION_ID.equals(queryProperty)) {
+      return SORT_BY_CASE_EXECUTION_ID_VALUE;
+    }
+    else if (TaskQueryProperty.CASE_INSTANCE_ID.equals(queryProperty)) {
+      return SORT_BY_CASE_INSTANCE_ID_VALUE;
+    }
+    else if (TaskQueryProperty.CREATE_TIME.equals(queryProperty)) {
+      return SORT_BY_CREATE_TIME_VALUE;
+    }
+    else if (TaskQueryProperty.DESCRIPTION.equals(queryProperty)) {
+      return SORT_BY_DESCRIPTION_VALUE;
+    }
+    else if (TaskQueryProperty.DUE_DATE.equals(queryProperty)) {
+      return SORT_BY_DUE_DATE_VALUE;
+    }
+    else if (TaskQueryProperty.EXECUTION_ID.equals(queryProperty)) {
+      return SORT_BY_EXECUTION_ID_VALUE;
+    }
+    else if (TaskQueryProperty.FOLLOW_UP_DATE.equals(queryProperty)) {
+      return SORT_BY_FOLLOW_UP_VALUE;
+    }
+    else if (TaskQueryProperty.NAME.equals(queryProperty)) {
+      return SORT_BY_NAME_VALUE;
+    }
+    else if (TaskQueryProperty.NAME_CASE_INSENSITIVE.equals(queryProperty)) {
+      return SORT_BY_NAME_CASE_INSENSITIVE_VALUE;
+    }
+    else if (TaskQueryProperty.PRIORITY.equals(queryProperty)) {
+      return SORT_BY_PRIORITY_VALUE;
+    }
+    else if (TaskQueryProperty.PROCESS_INSTANCE_ID.equals(queryProperty)) {
+      return SORT_BY_PROCESS_INSTANCE_ID_VALUE;
+    }
+    else if (TaskQueryProperty.TASK_ID.equals(queryProperty)) {
+      return SORT_BY_ID_VALUE;
+    }
+    else {
+      throw new RestException("Unknown query property for task query " + queryProperty);
+    }
+  }
+
+  public static String sortByValueForVariableOrderProperty(VariableOrderProperty variableOrderProperty) {
+    for (QueryEntityRelationCondition relationCondition : variableOrderProperty.getRelationConditions()) {
+      if (relationCondition.isPropertyComparison()) {
+        return sortByValueForQueryEntityRelationCondition(relationCondition);
+      }
+    }
+
+    // if no property comparison was found throw an exception
+    throw new RestException("Unknown variable order property for task query " + variableOrderProperty);
+  }
+
+  public static String sortByValueForQueryEntityRelationCondition(QueryEntityRelationCondition relationCondition) {
+    QueryProperty property = relationCondition.getProperty();
+    QueryProperty comparisonProperty = relationCondition.getComparisonProperty();
+    if (VariableInstanceQueryProperty.EXECUTION_ID.equals(property) && TaskQueryProperty.PROCESS_INSTANCE_ID.equals(comparisonProperty)) {
+        return SORT_BY_PROCESS_VARIABLE;
+    }
+    else if (VariableInstanceQueryProperty.EXECUTION_ID.equals(property) && TaskQueryProperty.EXECUTION_ID.equals(comparisonProperty)) {
+      return SORT_BY_EXECUTION_VARIABLE;
+    }
+    else if (VariableInstanceQueryProperty.TASK_ID.equals(property) && TaskQueryProperty.TASK_ID.equals(comparisonProperty)) {
+      return SORT_BY_TASK_VARIABLE;
+    }
+    else if (VariableInstanceQueryProperty.CASE_EXECUTION_ID.equals(property) && TaskQueryProperty.CASE_INSTANCE_ID.equals(comparisonProperty)) {
+      return SORT_BY_CASE_INSTANCE_VARIABLE;
+    }
+    else if (VariableInstanceQueryProperty.CASE_EXECUTION_ID.equals(property) && TaskQueryProperty.CASE_EXECUTION_ID.equals(comparisonProperty))  {
+      return SORT_BY_CASE_EXECUTION_VARIABLE;
+    }
+    else {
+      throw new RestException("Unknown relation condition for task query  with query property " + property + " and comparison property " + comparisonProperty);
+    }
+  }
+
+  public static Map<String,Object> sortParametersForVariableOrderProperty(VariableOrderProperty variableOrderProperty) {
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    for (QueryEntityRelationCondition relationCondition : variableOrderProperty.getRelationConditions()) {
+      QueryProperty property = relationCondition.getProperty();
+      if (VariableInstanceQueryProperty.VARIABLE_NAME.equals(property)) {
+        parameters.put(SORT_PARAMETERS_VARIABLE_NAME, relationCondition.getScalarValue());
+      }
+      else if (VariableInstanceQueryProperty.VARIABLE_TYPE.equals(property)) {
+        String type = VariableValueDto.toRestApiTypeName((String) relationCondition.getScalarValue());
+        parameters.put(SORT_PARAMETERS_VALUE_TYPE, type);
+      }
+    }
+    return parameters;
   }
 
 }

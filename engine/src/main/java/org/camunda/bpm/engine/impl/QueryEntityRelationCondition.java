@@ -61,4 +61,12 @@ public class QueryEntityRelationCondition {
   public boolean isPropertyComparison() {
     return comparisonProperty != null;
   }
+
+  public String toString() {
+    return "QueryEntityRelationCondition["
+      + "property=" + property
+      + ", comparisonProperty=" + comparisonProperty
+      + ", scalarValue=" + scalarValue
+      + "]";
+  }
 }

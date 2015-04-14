@@ -113,4 +113,28 @@ public class QueryOrderingProperty implements Serializable {
   public boolean isContainedProperty() {
     return relation == null && queryProperty.getFunction() == null;
   }
+
+  public String toString() {
+
+    return "QueryOrderingProperty["
+      + "relation=" + relation
+      + ", queryProperty=" + queryProperty
+      + ", direction=" + direction
+      + ", relationConditions=" + getRelationConditionsString()
+      + "]";
+  }
+
+  public String getRelationConditionsString() {
+    StringBuilder builder = new StringBuilder();
+    builder.append("[");
+    for (int i = 0; i < relationConditions.size(); i++) {
+      if (i > 0) {
+        builder.append(",");
+      }
+      builder.append(relationConditions.get(i));
+    }
+    builder.append("]");
+    return builder.toString();
+  }
+
 }

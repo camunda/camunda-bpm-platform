@@ -20,6 +20,26 @@ import static org.camunda.bpm.engine.authorization.Permissions.DELETE;
 import static org.camunda.bpm.engine.authorization.Permissions.READ;
 import static org.camunda.bpm.engine.authorization.Permissions.UPDATE;
 import static org.camunda.bpm.engine.authorization.Resources.FILTER;
+import static org.camunda.bpm.engine.rest.dto.AbstractQueryDto.SORT_ORDER_ASC_VALUE;
+import static org.camunda.bpm.engine.rest.dto.AbstractQueryDto.SORT_ORDER_DESC_VALUE;
+import static org.camunda.bpm.engine.rest.dto.task.TaskQueryDto.SORT_BY_ASSIGNEE_VALUE;
+import static org.camunda.bpm.engine.rest.dto.task.TaskQueryDto.SORT_BY_CASE_EXECUTION_ID_VALUE;
+import static org.camunda.bpm.engine.rest.dto.task.TaskQueryDto.SORT_BY_CASE_EXECUTION_VARIABLE;
+import static org.camunda.bpm.engine.rest.dto.task.TaskQueryDto.SORT_BY_CASE_INSTANCE_ID_VALUE;
+import static org.camunda.bpm.engine.rest.dto.task.TaskQueryDto.SORT_BY_CASE_INSTANCE_VARIABLE;
+import static org.camunda.bpm.engine.rest.dto.task.TaskQueryDto.SORT_BY_CREATE_TIME_VALUE;
+import static org.camunda.bpm.engine.rest.dto.task.TaskQueryDto.SORT_BY_DESCRIPTION_VALUE;
+import static org.camunda.bpm.engine.rest.dto.task.TaskQueryDto.SORT_BY_DUE_DATE_VALUE;
+import static org.camunda.bpm.engine.rest.dto.task.TaskQueryDto.SORT_BY_EXECUTION_ID_VALUE;
+import static org.camunda.bpm.engine.rest.dto.task.TaskQueryDto.SORT_BY_EXECUTION_VARIABLE;
+import static org.camunda.bpm.engine.rest.dto.task.TaskQueryDto.SORT_BY_FOLLOW_UP_VALUE;
+import static org.camunda.bpm.engine.rest.dto.task.TaskQueryDto.SORT_BY_ID_VALUE;
+import static org.camunda.bpm.engine.rest.dto.task.TaskQueryDto.SORT_BY_NAME_CASE_INSENSITIVE_VALUE;
+import static org.camunda.bpm.engine.rest.dto.task.TaskQueryDto.SORT_BY_NAME_VALUE;
+import static org.camunda.bpm.engine.rest.dto.task.TaskQueryDto.SORT_BY_PRIORITY_VALUE;
+import static org.camunda.bpm.engine.rest.dto.task.TaskQueryDto.SORT_BY_PROCESS_INSTANCE_ID_VALUE;
+import static org.camunda.bpm.engine.rest.dto.task.TaskQueryDto.SORT_BY_PROCESS_VARIABLE;
+import static org.camunda.bpm.engine.rest.dto.task.TaskQueryDto.SORT_BY_TASK_VARIABLE;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_FILTER_ID;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.mockFilter;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.mockVariableInstance;
@@ -27,7 +47,9 @@ import static org.camunda.bpm.engine.rest.helper.TaskQueryMatcher.hasName;
 import static org.camunda.bpm.engine.variable.Variables.stringValue;
 import static org.fest.assertions.Assertions.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.isEmptyOrNullString;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
@@ -49,7 +71,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.Response.Status;
 
@@ -64,10 +85,13 @@ import org.camunda.bpm.engine.filter.FilterQuery;
 import org.camunda.bpm.engine.impl.AuthorizationServiceImpl;
 import org.camunda.bpm.engine.impl.IdentityServiceImpl;
 import org.camunda.bpm.engine.impl.TaskQueryImpl;
+import org.camunda.bpm.engine.impl.core.variable.type.ObjectTypeImpl;
 import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.engine.impl.persistence.entity.FilterEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.query.Query;
+import org.camunda.bpm.engine.rest.dto.AbstractQueryDto;
+import org.camunda.bpm.engine.rest.dto.VariableValueDto;
 import org.camunda.bpm.engine.rest.dto.task.TaskQueryDto;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.camunda.bpm.engine.rest.helper.MockTaskBuilder;
@@ -75,6 +99,9 @@ import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.runtime.VariableInstanceQuery;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
+import org.camunda.bpm.engine.variable.type.PrimitiveValueType;
+import org.camunda.bpm.engine.variable.type.SerializableValueType;
+import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 import org.junit.Before;
 import org.junit.Test;
@@ -326,6 +353,219 @@ public abstract class AbstractFilterRestServiceInteractionTest extends AbstractR
       .body("query.containsKey('candidateGroups')", is(false))
   .when()
       .get(SINGLE_FILTER_URL);
+  }
+
+  @Test
+  public void testGetFilterWithoutSorting() {
+    TaskQuery query = new TaskQueryImpl();
+    Filter filter = new FilterEntity("Task").setName("test").setQuery(query);
+    when(filterServiceMock.getFilter(EXAMPLE_FILTER_ID)).thenReturn(filter);
+
+    given()
+      .pathParam("id", EXAMPLE_FILTER_ID)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+      .body("query.sorting", isEmptyOrNullString())
+    .when()
+      .get(SINGLE_FILTER_URL);
+  }
+
+  @Test
+  public void testGetFilterWithSingleSorting() {
+    TaskQuery query = new TaskQueryImpl()
+      .orderByTaskName().desc();
+
+    Filter filter = new FilterEntity("Task").setName("test").setQuery(query);
+    when(filterServiceMock.getFilter(EXAMPLE_FILTER_ID)).thenReturn(filter);
+
+    Response response = given()
+      .pathParam("id", EXAMPLE_FILTER_ID)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .get(SINGLE_FILTER_URL);
+
+    // validate sorting content
+    String content = response.asString();
+    List<Map<String, Object>> sortings = from(content).getJsonObject("query.sorting");
+    assertThat(sortings).hasSize(1);
+    assertSorting(sortings.get(0), SORT_BY_NAME_VALUE, SORT_ORDER_DESC_VALUE);
+  }
+
+  @Test
+  public void testGetFilterWithMultipleSorting() {
+    TaskQuery query = new TaskQueryImpl()
+      .orderByDueDate().asc()
+      .orderByCaseExecutionId().desc();
+
+    Filter filter = new FilterEntity("Task").setName("test").setQuery(query);
+    when(filterServiceMock.getFilter(EXAMPLE_FILTER_ID)).thenReturn(filter);
+
+    Response response = given()
+      .pathParam("id", EXAMPLE_FILTER_ID)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .get(SINGLE_FILTER_URL);
+
+    // validate sorting content
+    String content = response.asString();
+    List<Map<String, Object>> sortings = from(content).getJsonObject("query.sorting");
+    assertThat(sortings).hasSize(2);
+    assertSorting(sortings.get(0), SORT_BY_DUE_DATE_VALUE, SORT_ORDER_ASC_VALUE);
+    assertSorting(sortings.get(1), SORT_BY_CASE_EXECUTION_ID_VALUE, SORT_ORDER_DESC_VALUE);
+  }
+
+  @Test
+  public void testGetFilterWithAllPropertiesSorting() {
+    TaskQuery query = new TaskQueryImpl()
+      .orderByProcessInstanceId().asc()
+      .orderByCaseInstanceId().asc()
+      .orderByDueDate().asc()
+      .orderByFollowUpDate().asc()
+      .orderByExecutionId().asc()
+      .orderByCaseExecutionId().asc()
+      .orderByTaskAssignee().asc()
+      .orderByTaskCreateTime().asc()
+      .orderByTaskDescription().asc()
+      .orderByTaskId().asc()
+      .orderByTaskName().asc()
+      .orderByTaskNameCaseInsensitive().asc()
+      .orderByTaskPriority().asc();
+
+    Filter filter = new FilterEntity("Task").setName("test").setQuery(query);
+    when(filterServiceMock.getFilter(EXAMPLE_FILTER_ID)).thenReturn(filter);
+
+    Response response = given()
+      .pathParam("id", EXAMPLE_FILTER_ID)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .get(SINGLE_FILTER_URL);
+
+    // validate sorting content
+    String content = response.asString();
+    List<Map<String, Object>> sortings = from(content).getJsonObject("query.sorting");
+    assertThat(sortings).hasSize(13);
+    assertSorting(sortings.get(0), SORT_BY_PROCESS_INSTANCE_ID_VALUE, SORT_ORDER_ASC_VALUE);
+    assertSorting(sortings.get(1), SORT_BY_CASE_INSTANCE_ID_VALUE, SORT_ORDER_ASC_VALUE);
+    assertSorting(sortings.get(2), SORT_BY_DUE_DATE_VALUE, SORT_ORDER_ASC_VALUE);
+    assertSorting(sortings.get(3), SORT_BY_FOLLOW_UP_VALUE, SORT_ORDER_ASC_VALUE);
+    assertSorting(sortings.get(4), SORT_BY_EXECUTION_ID_VALUE, SORT_ORDER_ASC_VALUE);
+    assertSorting(sortings.get(5), SORT_BY_CASE_EXECUTION_ID_VALUE, SORT_ORDER_ASC_VALUE);
+    assertSorting(sortings.get(6), SORT_BY_ASSIGNEE_VALUE, SORT_ORDER_ASC_VALUE);
+    assertSorting(sortings.get(7), SORT_BY_CREATE_TIME_VALUE, SORT_ORDER_ASC_VALUE);
+    assertSorting(sortings.get(8), SORT_BY_DESCRIPTION_VALUE, SORT_ORDER_ASC_VALUE);
+    assertSorting(sortings.get(9), SORT_BY_ID_VALUE, SORT_ORDER_ASC_VALUE);
+    assertSorting(sortings.get(10), SORT_BY_NAME_VALUE, SORT_ORDER_ASC_VALUE);
+    assertSorting(sortings.get(11), SORT_BY_NAME_CASE_INSENSITIVE_VALUE, SORT_ORDER_ASC_VALUE);
+    assertSorting(sortings.get(12), SORT_BY_PRIORITY_VALUE, SORT_ORDER_ASC_VALUE);
+  }
+
+  @Test
+  public void testGetFilterWithVariableTypeSorting() {
+    TaskQuery query = new TaskQueryImpl()
+      .orderByExecutionVariable("foo", ValueType.STRING).asc()
+      .orderByProcessVariable("foo", ValueType.STRING).asc()
+      .orderByTaskVariable("foo", ValueType.STRING).asc()
+      .orderByCaseExecutionVariable("foo", ValueType.STRING).asc()
+      .orderByCaseInstanceVariable("foo", ValueType.STRING).asc();
+
+    Filter filter = new FilterEntity("Task").setName("test").setQuery(query);
+    when(filterServiceMock.getFilter(EXAMPLE_FILTER_ID)).thenReturn(filter);
+
+    Response response = given()
+      .pathParam("id", EXAMPLE_FILTER_ID)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .get(SINGLE_FILTER_URL);
+
+    // validate sorting content
+    String content = response.asString();
+    List<Map<String, Object>> sortings = from(content).getJsonObject("query.sorting");
+    assertThat(sortings).hasSize(5);
+    assertSorting(sortings.get(0), SORT_BY_EXECUTION_VARIABLE, SORT_ORDER_ASC_VALUE, "foo", ValueType.STRING);
+    assertSorting(sortings.get(1), SORT_BY_PROCESS_VARIABLE, SORT_ORDER_ASC_VALUE, "foo", ValueType.STRING);
+    assertSorting(sortings.get(2), SORT_BY_TASK_VARIABLE, SORT_ORDER_ASC_VALUE, "foo", ValueType.STRING);
+    assertSorting(sortings.get(3), SORT_BY_CASE_EXECUTION_VARIABLE, SORT_ORDER_ASC_VALUE, "foo", ValueType.STRING);
+    assertSorting(sortings.get(4), SORT_BY_CASE_INSTANCE_VARIABLE, SORT_ORDER_ASC_VALUE, "foo", ValueType.STRING);
+  }
+
+  @Test
+  public void testGetFilterWithVariableValueTypeSorting() {
+    TaskQuery query = new TaskQueryImpl()
+      .orderByExecutionVariable("foo", ValueType.STRING).asc()
+      .orderByExecutionVariable("foo", ValueType.INTEGER).asc()
+      .orderByExecutionVariable("foo", ValueType.SHORT).asc()
+      .orderByExecutionVariable("foo", ValueType.DATE).asc()
+      .orderByExecutionVariable("foo", ValueType.BOOLEAN).asc()
+      .orderByExecutionVariable("foo", ValueType.LONG).asc()
+      .orderByExecutionVariable("foo", ValueType.DOUBLE).asc();
+
+    Filter filter = new FilterEntity("Task").setName("test").setQuery(query);
+    when(filterServiceMock.getFilter(EXAMPLE_FILTER_ID)).thenReturn(filter);
+
+    Response response = given()
+      .pathParam("id", EXAMPLE_FILTER_ID)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .get(SINGLE_FILTER_URL);
+
+    // validate sorting content
+    String content = response.asString();
+    List<Map<String, Object>> sortings = from(content).getJsonObject("query.sorting");
+    assertThat(sortings).hasSize(7);
+    assertSorting(sortings.get(0), SORT_BY_EXECUTION_VARIABLE, SORT_ORDER_ASC_VALUE, "foo", ValueType.STRING);
+    assertSorting(sortings.get(1), SORT_BY_EXECUTION_VARIABLE, SORT_ORDER_ASC_VALUE, "foo", ValueType.INTEGER);
+    assertSorting(sortings.get(2), SORT_BY_EXECUTION_VARIABLE, SORT_ORDER_ASC_VALUE, "foo", ValueType.SHORT);
+    assertSorting(sortings.get(3), SORT_BY_EXECUTION_VARIABLE, SORT_ORDER_ASC_VALUE, "foo", ValueType.DATE);
+    assertSorting(sortings.get(4), SORT_BY_EXECUTION_VARIABLE, SORT_ORDER_ASC_VALUE, "foo", ValueType.BOOLEAN);
+    assertSorting(sortings.get(5), SORT_BY_EXECUTION_VARIABLE, SORT_ORDER_ASC_VALUE, "foo", ValueType.LONG);
+    assertSorting(sortings.get(6), SORT_BY_EXECUTION_VARIABLE, SORT_ORDER_ASC_VALUE, "foo", ValueType.DOUBLE);
+  }
+
+  @Test
+  public void testGetFilterWithVariableSortOrderSorting() {
+    TaskQuery query = new TaskQueryImpl()
+      .orderByExecutionVariable("foo", ValueType.STRING).asc()
+      .orderByExecutionVariable("foo", ValueType.STRING).desc();
+
+    Filter filter = new FilterEntity("Task").setName("test").setQuery(query);
+    when(filterServiceMock.getFilter(EXAMPLE_FILTER_ID)).thenReturn(filter);
+
+    Response response = given()
+      .pathParam("id", EXAMPLE_FILTER_ID)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .get(SINGLE_FILTER_URL);
+
+    // validate sorting content
+    String content = response.asString();
+    List<Map<String, Object>> sortings = from(content).getJsonObject("query.sorting");
+    assertThat(sortings).hasSize(2);
+    assertSorting(sortings.get(0), SORT_BY_EXECUTION_VARIABLE, SORT_ORDER_ASC_VALUE, "foo", ValueType.STRING);
+    assertSorting(sortings.get(1), SORT_BY_EXECUTION_VARIABLE, SORT_ORDER_DESC_VALUE, "foo", ValueType.STRING);
+  }
+
+  protected void assertSorting(Map<String, Object> sorting, String sortBy, String sortOrder) {
+    assertSorting(sorting, sortBy, sortOrder, null, null);
+  }
+
+  @SuppressWarnings("unchecked")
+  protected void assertSorting(Map<String, Object> sorting, String sortBy, String sortOrder, String parametersVariable, ValueType parametersType) {
+    assertThat(sorting.get("sortBy")).isEqualTo(sortBy);
+    assertThat(sorting.get("sortOrder")).isEqualTo(sortOrder);
+    if (parametersVariable == null) {
+      assertThat(sorting.containsKey("parameters")).isFalse();
+    }
+    else {
+      Map<String, Object> parameters = (Map<String, Object>) sorting.get("parameters");
+      assertThat(parameters.get("variable")).isEqualTo(parametersVariable);
+      assertThat(parameters.get("type")).isEqualTo(VariableValueDto.toRestApiTypeName(parametersType.getName()));
+    }
   }
 
   @Test

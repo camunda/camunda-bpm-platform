@@ -13,7 +13,12 @@
 package org.camunda.bpm.engine.rest.dto;
 
 
+import static com.fasterxml.jackson.annotation.JsonInclude.Include.*;
+
 import java.util.Map;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 /**
  * @author Thorben Lindhauer
  *
@@ -23,6 +28,7 @@ public class SortingDto {
   protected String sortBy;
   protected String sortOrder;
 
+  @JsonInclude(NON_NULL)
   protected Map<String, Object> parameters;
 
   public String getSortBy() {
