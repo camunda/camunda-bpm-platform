@@ -50,7 +50,7 @@ define([
   directivesModule.directive('activityInstanceTree', activityInstanceTree);
   directivesModule.directive('ctnCollapsableParent', sidebarContainer);
   directivesModule.directive('stateCircle', stateCircle);
-  directivesModule.directive('deprecateVariable', variable);
+  directivesModule.directive('variable', variable);
   directivesModule.directive('focus', focus);
   directivesModule.directive('viewPills', viewPills);
   directivesModule.directive('camSelectActivity', selectActivity);
