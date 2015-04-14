@@ -13,6 +13,9 @@ module.exports = Page.extend({
       'Filter',
       'Group',
       'Group Membership',
+      'Process Definition',
+      'Process Instance',
+      'Task',
       'User'
     ];
     var item;
@@ -48,7 +51,7 @@ module.exports = Page.extend({
   },
 
   identityIdInputFiled: function(inputValue) {
-    var inputField = this.createNewElement().element(by.model('identityId'));
+    var inputField = this.createNewElement().element(by.model('newAuthorization.identityId'));
 
     if (arguments.length !== 0)
       inputField.sendKeys(inputValue);
