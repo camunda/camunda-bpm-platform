@@ -13,6 +13,11 @@
 
 package org.camunda.bpm.engine.test.bpmn.callactivity;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.junit.Assert.assertThat;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -990,5 +995,118 @@ public class CallActivityAdvancedTest extends PluggableProcessEngineTestCase {
     Object variable = runtimeService.getVariable(processInstanceId, "outLiteralVariable");
     assertEquals("outLiteralValue", variable);
   }
+  
+  @Deployment(resources={
+      "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testSubProcessDataOutputOnError.bpmn",
+      "org/camunda/bpm/engine/test/bpmn/callactivity/subProcessWithError.bpmn"
+  })
+  public void testSubProcessDataOutputOnError(){
+    String variableName = "subVariable";
+    Object variableValue = "Hello from Subprocess";
+    
+    runtimeService.startProcessInstanceByKey("Process_1");
+    //first task is the one in the subprocess
+    Task task = taskService.createTaskQuery().singleResult();
+    assertThat(task.getName(), is("SubTask"));
 
+    runtimeService.setVariable(task.getProcessInstanceId(), variableName, variableValue);
+    taskService.complete(task.getId());
+    
+    task = taskService.createTaskQuery().singleResult();
+    assertThat(task.getName(), is("Task after error"));
+    
+    Object variable = runtimeService.getVariable(task.getProcessInstanceId(), variableName);
+    assertThat(variable, is(notNullValue()));
+    assertThat(variable, is(variableValue));
+  }
+  
+  @Deployment(resources={
+      "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testSubProcessDataOutputOnThrownError.bpmn",
+      "org/camunda/bpm/engine/test/bpmn/callactivity/subProcessWithThrownError.bpmn"
+  })
+  public void testSubProcessDataOutputOnThrownError(){
+    String variableName = "subVariable";
+    Object variableValue = "Hello from Subprocess";
+    
+    runtimeService.startProcessInstanceByKey("Process_1");
+    //first task is the one in the subprocess
+    Task task = taskService.createTaskQuery().singleResult();
+    assertThat(task.getName(), is("SubTask"));
+
+    runtimeService.setVariable(task.getProcessInstanceId(), variableName, variableValue);
+    taskService.complete(task.getId());
+    
+    task = taskService.createTaskQuery().singleResult();
+    assertThat(task.getName(), is("Task after error"));
+    
+    Object variable = runtimeService.getVariable(task.getProcessInstanceId(), variableName);
+    assertThat(variable, is(notNullValue()));
+    assertThat(variable, is(variableValue));
+  }
+  
+  @Deployment(resources={
+      "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testTwoSubProcessesDataOutputOnError.bpmn",
+      "org/camunda/bpm/engine/test/bpmn/callactivity/subProcessCallErrorSubProcess.bpmn",
+      "org/camunda/bpm/engine/test/bpmn/callactivity/subProcessWithError.bpmn"
+  })
+  public void testTwoSubProcessesDataOutputOnError(){
+    String variableName = "subVariable";
+    Object variableValue = "Hello from Subprocess";
+    
+    runtimeService.startProcessInstanceByKey("Process_1");
+    //first task is the one in the subprocess
+    Task task = taskService.createTaskQuery().singleResult();
+    assertThat(task.getName(), is("SubTask"));
+
+    runtimeService.setVariable(task.getProcessInstanceId(), variableName, variableValue);
+    taskService.complete(task.getId());
+    
+    task = taskService.createTaskQuery().singleResult();
+    assertThat(task.getName(), is("Task after error"));
+    
+    Object variable = runtimeService.getVariable(task.getProcessInstanceId(), variableName);
+    //both processes have and out mapping for all, so we want the variable to be propagated to the process with the event handler
+    assertThat(variable, is(notNullValue()));
+    assertThat(variable, is(variableValue));
+  }
+  
+  @Deployment(resources={
+      "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testTwoSubProcessesLimitedDataOutputOnError.bpmn",
+      "org/camunda/bpm/engine/test/bpmn/callactivity/subProcessCallErrorSubProcessWithLimitedOutMapping.bpmn",
+      "org/camunda/bpm/engine/test/bpmn/callactivity/subProcessWithError.bpmn"
+  })
+  public void testTwoSubProcessesLimitedDataOutputOnError(){
+    String variableName1 = "subSubVariable1";
+    String variableName2 = "subSubVariable2";
+    String variableName3 = "subVariable";
+    Object variableValue = "Hello from Subsubprocess";
+    Object variableValue2 = "Hello from Subprocess";
+    
+    runtimeService.startProcessInstanceByKey("Process_1");
+    
+    //task in first subprocess (second process in general)
+    Task task = taskService.createTaskQuery().singleResult();
+    assertThat(task.getName(), is("Task"));
+    runtimeService.setVariable(task.getProcessInstanceId(), variableName3, variableValue2);
+    taskService.complete(task.getId());
+    //task in the second subprocess (third process in general)
+    task = taskService.createTaskQuery().singleResult();
+    assertThat(task.getName(), is("SubTask"));
+    runtimeService.setVariable(task.getProcessInstanceId(), variableName1, "foo");
+    runtimeService.setVariable(task.getProcessInstanceId(), variableName2, variableValue);
+    taskService.complete(task.getId());
+
+    task = taskService.createTaskQuery().singleResult();
+    assertThat(task.getName(), is("Task after error"));
+
+    //the two subprocess don't pass all their variables, so we check that not all were passed
+    Object variable = runtimeService.getVariable(task.getProcessInstanceId(), variableName2);
+    assertThat(variable, is(notNullValue()));
+    assertThat(variable, is(variableValue));
+    variable = runtimeService.getVariable(task.getProcessInstanceId(), variableName3);
+    assertThat(variable, is(notNullValue()));
+    assertThat(variable, is(variableValue2));
+    variable = runtimeService.getVariable(task.getProcessInstanceId(), variableName1);
+    assertThat(variable, is(nullValue()));
+  }
 }

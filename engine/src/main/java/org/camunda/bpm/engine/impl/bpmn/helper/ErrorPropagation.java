@@ -13,11 +13,14 @@
 
 package org.camunda.bpm.engine.impl.bpmn.helper;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 import java.util.List;
 import java.util.logging.Logger;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.BpmnError;
+import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.bpmn.behavior.EventSubProcessStartEventActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.bpmn.parser.ErrorEventDefinition;
@@ -26,11 +29,11 @@ import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessDefinition;
 import org.camunda.bpm.engine.impl.pvm.PvmScope;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
+import org.camunda.bpm.engine.impl.pvm.delegate.SubProcessActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
-
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.*;
+import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 
 
 /**
@@ -69,7 +72,7 @@ public class ErrorPropagation {
     }else {
       ActivityExecution superExecution = getSuperExecution(execution);
       if (superExecution != null) {
-        executeCatchInSuperProcess(errorCode, origException, superExecution);
+        executeCatchInSuperProcess(errorCode, origException, superExecution, execution);
       } else {
         if (origException==null) {
           LOG.info(execution.getActivity().getId() + " throws error event with errorCode '"
@@ -112,24 +115,37 @@ public class ErrorPropagation {
     return null;
   }
 
-  private static void executeCatchInSuperProcess(String errorCode, Exception origException, ActivityExecution superExecution) throws Exception {
+  private static void executeCatchInSuperProcess(String errorCode, Exception origException, ActivityExecution superExecution, ActivityExecution execution) throws Exception {
+    completeActivity(superExecution, execution);
     ErrorEventDefinition errorHandler = findLocalErrorEventHandler(superExecution, errorCode, origException);
     if (errorHandler != null) {
       executeCatch(errorHandler, superExecution, errorCode);
     } else { // no matching catch found, going one level up in process hierarchy
       ActivityExecution superSuperExecution = getSuperExecution(superExecution);
       if (superSuperExecution != null) {
-        executeCatchInSuperProcess(errorCode, origException, superSuperExecution);
+        executeCatchInSuperProcess(errorCode, origException, superSuperExecution, superExecution);
       } else {
         if (origException == null) {
           throw new BpmnError(errorCode, "No catching boundary event found for error with errorCode '"
                   + errorCode + "', neither in same process nor in parent process");
         } else {
-          // throw original exception
           throw origException;
         }
       }
     }
+  }
+
+  /**
+   * To pass the out mapping to the parent execution we call {@link SubProcessActivityBehavior#completing(VariableScope, VariableScope)} on
+   * the activity.
+   * @param superExecution the parent of the current execution
+   * @param execution the current execution
+   * @throws Exception if something goes wrong inside completing()
+   */
+  private static void completeActivity(ActivityExecution superExecution, ActivityExecution execution) throws Exception {
+    ActivityImpl activity = ((PvmExecutionImpl)superExecution).getActivity();
+    SubProcessActivityBehavior subProcessActivityBehavior = (SubProcessActivityBehavior) activity.getActivityBehavior();
+    subProcessActivityBehavior.completing(superExecution, execution);
   }
 
   private static ActivityExecution getSuperExecution(ActivityExecution execution) {
