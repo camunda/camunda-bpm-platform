@@ -7,7 +7,7 @@ module.exports = Base.extend({
   url: '/camunda/app/cockpit/default/#/process-instance/:instance/runtime',
 
   pageHeader: function() {
-    return element(by.binding('processInstance.id'));
+    return element(by.binding('{{ processInstance.id }}'));
   },
 
   fullPageHeaderProcessInstanceName: function() {
@@ -15,7 +15,23 @@ module.exports = Base.extend({
   },
 
   pageHeaderProcessInstanceName: function() {
-    return element(by.binding('processInstance.id')).getText().then(function(fullString) {
+    return element(by.binding('{{ processInstance.id }}')).getText().then(function(fullString) {
+      return fullString.replace('<', '').replace('>', '');
+    });
+  },
+
+  processName: function() {
+    return element(by.binding('{{ processDefinition.name || processDefinition.key }}')).getText()
+  },
+
+  instanceId: function() {
+    return element(by.binding('{{ processInstance.id }}')).getText().then(function(fullString) {
+      return fullString.replace('<', '').replace('>', '');
+    });
+  },
+
+  businessKey: function() {
+    return element(by.binding('{{ processInstance.businessKey}}')).getText().then(function(fullString) {
       return fullString.replace('<', '').replace('>', '');
     });
   },

@@ -98,6 +98,18 @@ describe('Cockpit Process Instance Spec', function() {
 
     it('should add process variable', function() {
 
+      instancePage.processName().then(function(headerName) {
+        console.info('process name', headerName);
+      });
+
+      instancePage.instanceId().then(function(headerName) {
+        console.info('instance id', headerName);
+      });
+
+      instancePage.businessKey().then(function(headerName) {
+        console.info('business key', headerName);
+      });
+
       // given
       expect(instancePage.variablesTab.table().count()).to.eventually.eql(3);
 
@@ -114,6 +126,18 @@ describe('Cockpit Process Instance Spec', function() {
 
 
     it('should change variable', function() {
+
+      instancePage.processName().then(function(headerName) {
+        console.info('process name', headerName);
+      });
+
+      instancePage.instanceId().then(function(headerName) {
+        console.info('instance id', headerName);
+      });
+
+      instancePage.businessKey().then(function(headerName) {
+        console.info('business key', headerName);
+      });
 
       // given
       expect(instancePage.variablesTab.variableType(2)).to.eventually.eql('Double');
@@ -135,6 +159,18 @@ describe('Cockpit Process Instance Spec', function() {
 
 
     it('should select wrong variable type', function() {
+
+      instancePage.processName().then(function(headerName) {
+        console.info('process name', headerName);
+      });
+
+      instancePage.instanceId().then(function(headerName) {
+        console.info('instance id', headerName);
+      });
+
+      instancePage.businessKey().then(function(headerName) {
+        console.info('business key', headerName);
+      });
 
       // given
       expect(instancePage.variablesTab.variableType(1)).to.eventually.eql('Date');
@@ -227,7 +263,7 @@ describe('Cockpit Process Instance Spec', function() {
     it('should reflect the tree view selection in diagram', function() {
 
       // given
-      instancePage.instanceTree.selectInstance('User Task 1');
+      //instancePage.instanceTree.selectInstance('User Task 1');
       expect(instancePage.diagram.isActivitySelected('UserTask_1')).to.eventually.be.true;
 
       // when
