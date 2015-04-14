@@ -306,5 +306,21 @@ public class ErrorEventSubProcessTest extends PluggableProcessEngineTestCase {
     Object errorCode = "error";
     assertThat(errorVariable.getValue(), is(errorCode));
   }
+  
+  @Deployment(resources={
+      "org/camunda/bpm/engine/test/bpmn/event/error/ErrorEventSubProcessTest.testCatchBpmnErrorFromJavaDelegateInsideCallActivitySetsErrorVariable.bpmn",
+      "org/camunda/bpm/engine/test/bpmn/callActivity/subProcessWithThrownError.bpmn"
+    })
+  public void testCatchBpmnErrorFromJavaDelegateInsideCallActivitySetsErrorVariable(){
+    runtimeService.startProcessInstanceByKey("Process_1");
+    Task task = taskService.createTaskQuery().singleResult();
+    taskService.complete(task.getId());
+    //the name used in "camunda:errorCodeVariable" in the BPMN
+    String variableName = "errorCode";
+    //the code we gave the thrown error
+    Object errorCode = "errorCode";
+    VariableInstance errorVariable = runtimeService.createVariableInstanceQuery().variableName(variableName).singleResult();
+    assertThat(errorVariable.getValue(), is(errorCode));
+  }
 
 }

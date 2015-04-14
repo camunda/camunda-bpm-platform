@@ -853,4 +853,19 @@ public class BoundaryErrorEventTest extends PluggableProcessEngineTestCase {
     assertThat(errorVariable, is(notNullValue()));
     assertThat(errorVariable.getValue(), is(expectedValue));
   }
+  
+  @Deployment(resources={
+    "org/camunda/bpm/engine/test/bpmn/event/error/BoundaryErrorEventTest.testCatchBpmnErrorThrownByJavaDelegateInCallActivityOnSubprocessSetsErrorCodeVariable.bpmn",
+    "org/camunda/bpm/engine/test/bpmn/callActivity/subProcessWithThrownError.bpmn"
+  })
+  public void testCatchBpmnErrorThrownByJavaDelegateInCallActivityOnSubprocessSetsErrorCodeVariable(){
+    runtimeService.startProcessInstanceByKey("Process_1");
+    Task task = taskService.createTaskQuery().singleResult();
+    taskService.complete(task.getId());
+    //the name used in "camunda:errorCodeVariable" in the BPMN
+    String variableName = "errorCode";
+    //the code we gave the thrown error
+    Object errorCode = "errorCode";
+    checkErrorCodeVariable(variableName, errorCode);
+  }
 }
