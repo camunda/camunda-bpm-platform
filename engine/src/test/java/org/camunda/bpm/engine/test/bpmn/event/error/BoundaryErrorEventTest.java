@@ -856,7 +856,7 @@ public class BoundaryErrorEventTest extends PluggableProcessEngineTestCase {
   
   @Deployment(resources={
     "org/camunda/bpm/engine/test/bpmn/event/error/BoundaryErrorEventTest.testCatchBpmnErrorThrownByJavaDelegateInCallActivityOnSubprocessSetsErrorCodeVariable.bpmn",
-    "org/camunda/bpm/engine/test/bpmn/callActivity/subProcessWithThrownError.bpmn"
+    "org/camunda/bpm/engine/test/bpmn/callactivity/subProcessWithThrownError.bpmn"
   })
   public void testCatchBpmnErrorThrownByJavaDelegateInCallActivityOnSubprocessSetsErrorCodeVariable(){
     runtimeService.startProcessInstanceByKey("Process_1");

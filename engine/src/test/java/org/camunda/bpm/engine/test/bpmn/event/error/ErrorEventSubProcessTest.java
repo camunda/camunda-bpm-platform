@@ -309,7 +309,7 @@ public class ErrorEventSubProcessTest extends PluggableProcessEngineTestCase {
   
   @Deployment(resources={
       "org/camunda/bpm/engine/test/bpmn/event/error/ErrorEventSubProcessTest.testCatchBpmnErrorFromJavaDelegateInsideCallActivitySetsErrorVariable.bpmn",
-      "org/camunda/bpm/engine/test/bpmn/callActivity/subProcessWithThrownError.bpmn"
+      "org/camunda/bpm/engine/test/bpmn/callactivity/subProcessWithThrownError.bpmn"
     })
   public void testCatchBpmnErrorFromJavaDelegateInsideCallActivitySetsErrorVariable(){
     runtimeService.startProcessInstanceByKey("Process_1");
