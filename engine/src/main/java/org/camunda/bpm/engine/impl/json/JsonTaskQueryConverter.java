@@ -58,7 +58,7 @@ public class JsonTaskQueryConverter extends JsonObjectConverter<TaskQuery> {
   public static final String CANDIDATE_USER = "candidateUser";
   public static final String CANDIDATE_GROUP = "candidateGroup";
   public static final String CANDIDATE_GROUPS = "candidateGroups";
-  public static final String CANDIDATE_ASSIGNED_AND_NOT_ASSIGNED = "candidateAssignedAndNotAssigned";
+  public static final String INCLUDE_ASSIGNED_TASKS = "includeAssignedTasks";
   public static final String INSTANCE_ID = "instanceId";
   public static final String PROCESS_INSTANCE_ID = "processInstanceId";
   public static final String EXECUTION_ID = "executionId";
@@ -265,8 +265,8 @@ public class JsonTaskQueryConverter extends JsonObjectConverter<TaskQuery> {
     if (json.has(CANDIDATE_GROUP)) {
       query.taskCandidateGroup(json.getString(CANDIDATE_GROUP));
     }
-    if (json.has(CANDIDATE_ASSIGNED_AND_NOT_ASSIGNED) && json.getBoolean(CANDIDATE_ASSIGNED_AND_NOT_ASSIGNED)){
-      query.taskCandidateAssignedAndNotAssigned();
+    if (json.has(INCLUDE_ASSIGNED_TASKS) && json.getBoolean(INCLUDE_ASSIGNED_TASKS)){
+      query.includeAssignedTasks();
     }
     if (json.has(CANDIDATE_GROUPS) && !json.has(CANDIDATE_USER) && !json.has(CANDIDATE_GROUP)) {
       query.taskCandidateGroupIn(getList(json.getJSONArray(CANDIDATE_GROUPS)));

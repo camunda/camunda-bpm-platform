@@ -104,7 +104,7 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
   private String candidateGroupExpression;
   private String candidateUser;
   private String candidateUserExpression;
-  private Boolean candidateAssignedAndNotAssigned;
+  private Boolean includeAssignedTasks;
   private String taskDefinitionKey;
   private String[] taskDefinitionKeyIn;
   private String taskDefinitionKeyLike;
@@ -255,9 +255,9 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     this.candidateUserExpression = candidateUserExpression;
   }
   
-  @CamundaQueryParam("candidateAssignedAndNotAssigned")
-  public void setCandidateAssignedAndNotAssigned(Boolean candidateAssignedAndNotAssigned){
-    this.candidateAssignedAndNotAssigned = candidateAssignedAndNotAssigned;
+  @CamundaQueryParam("includeAssignedTasks")
+  public void setIncludeAssignedTasks(Boolean includeAssignedTasks){
+    this.includeAssignedTasks = includeAssignedTasks;
   }
 
   @CamundaQueryParam("taskDefinitionKey")
@@ -593,8 +593,8 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     return candidateUserExpression;
   }
   
-  public Boolean getCandidateAssignedAndNotAssigned(){
-    return candidateAssignedAndNotAssigned;
+  public Boolean getIncludeAssignedTasks(){
+    return includeAssignedTasks;
   }
 
   public String[] getTaskDefinitionKeyIn() {
@@ -1082,8 +1082,8 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
       }
     }
     
-    if(candidateAssignedAndNotAssigned != null && candidateAssignedAndNotAssigned == true){
-      query.taskCandidateAssignedAndNotAssigned();
+    if(includeAssignedTasks != null && includeAssignedTasks == true){
+      query.includeAssignedTasks();
     }
   }
 
@@ -1190,7 +1190,7 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     dto.candidateUser = taskQuery.getCandidateUser();
     dto.candidateGroup = taskQuery.getCandidateGroup();
     dto.candidateGroups = taskQuery.getCandidateGroupsInternal();
-    dto.candidateAssignedAndNotAssigned = taskQuery.isCandidateAssignedAndNotAssigned();
+    dto.includeAssignedTasks = taskQuery.isIncludeAssignedTasks();
 
     dto.processInstanceBusinessKey = taskQuery.getProcessInstanceBusinessKey();
     dto.processInstanceBusinessKeyLike = taskQuery.getProcessInstanceBusinessKeyLike();

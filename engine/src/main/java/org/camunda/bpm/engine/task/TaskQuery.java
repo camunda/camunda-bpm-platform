@@ -132,7 +132,7 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
    * @throws ProcessEngineException
    *    When the group or user for the candidate is not provided
    * */
-  TaskQuery taskCandidateAssignedAndNotAssigned();
+  TaskQuery includeAssignedTasks();
 
   /** Only select tasks for the given process instance id. */
   TaskQuery processInstanceId(String processInstanceId);

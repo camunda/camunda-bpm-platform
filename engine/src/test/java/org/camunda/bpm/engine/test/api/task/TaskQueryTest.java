@@ -340,17 +340,17 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     } catch(ProcessEngineException e) {}
   }
   
-  public void testQueryByAssignedAndNotAssigned() {
+  public void testQueryByIncludeAssignedTasks() {
     try {
-      TaskQuery query = taskService.createTaskQuery().taskCandidateAssignedAndNotAssigned();
+      taskService.createTaskQuery().includeAssignedTasks();
       fail("expected exception");
     } catch (ProcessEngineException e) {
       // OK
     }
   }
   
-  public void testQueryByCandidateUserAssignedAndNotAssigned() {
-    TaskQuery query = taskService.createTaskQuery().taskCandidateUser("fozzie").taskCandidateAssignedAndNotAssigned();
+  public void testQueryByCandidateUserIncludeAssignedTasks() {
+    TaskQuery query = taskService.createTaskQuery().taskCandidateUser("fozzie").includeAssignedTasks();
     assertEquals(4, query.count());
     assertEquals(4, query.list().size());
     try {
@@ -360,7 +360,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
       // OK
     }
     
-    query = taskService.createTaskQuery().taskCandidateUser("gonzo").taskCandidateAssignedAndNotAssigned();
+    query = taskService.createTaskQuery().taskCandidateUser("gonzo").includeAssignedTasks();
     assertEquals(0, query.count());
     assertEquals(0, query.list().size());
   }
@@ -390,8 +390,8 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     }
   }
   
-  public void testQueryByCandidateGroupAssignedAndNotAssigned() {
-    TaskQuery query = taskService.createTaskQuery().taskCandidateGroup("management").taskCandidateAssignedAndNotAssigned();
+  public void testQueryByCandidateGroupIncludeAssignedTasks() {
+    TaskQuery query = taskService.createTaskQuery().taskCandidateGroup("management").includeAssignedTasks();
     assertEquals(4, query.count());
     assertEquals(4, query.list().size());
     try {
@@ -401,7 +401,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
       // OK
     }
 
-    query = taskService.createTaskQuery().taskCandidateGroup("sales").taskCandidateAssignedAndNotAssigned();
+    query = taskService.createTaskQuery().taskCandidateGroup("sales").includeAssignedTasks();
     assertEquals(0, query.count());
     assertEquals(0, query.list().size());
   }
@@ -440,9 +440,9 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     }
   }
   
-  public void testQueryByCandidateGroupInAssignedAndNotAssigned() {
+  public void testQueryByCandidateGroupInIncludeAssignedTasks() {
     List<String> groups = Arrays.asList("management", "accountancy");
-    TaskQuery query = taskService.createTaskQuery().taskCandidateGroupIn(groups).taskCandidateAssignedAndNotAssigned();
+    TaskQuery query = taskService.createTaskQuery().taskCandidateGroupIn(groups).includeAssignedTasks();
     assertEquals(6, query.count());
     assertEquals(6, query.list().size());
     try {
@@ -454,7 +454,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
 
     // Unexisting groups or groups that don't have candidate tasks shouldn't influence other results
     groups = Arrays.asList("management", "accountancy", "sales", "unexising");
-    query = taskService.createTaskQuery().taskCandidateGroupIn(groups).taskCandidateAssignedAndNotAssigned();
+    query = taskService.createTaskQuery().taskCandidateGroupIn(groups).includeAssignedTasks();
     assertEquals(6, query.count());
     assertEquals(6, query.list().size());
   }
