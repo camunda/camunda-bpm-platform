@@ -68,7 +68,7 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
 
   // process instance query //////////////////////////////////////////////////////////
 
-  public void testQueryWithoutAuthorization() {
+  public void testSimpleQueryWithoutAuthorization() {
     // given
     startProcessInstanceByKey(PROCESS_KEY);
 
@@ -79,7 +79,7 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     verifyQueryResults(query, 0);
   }
 
-  public void testQueryWithReadPermissionOnProcessInstance() {
+  public void testSimpleQueryWithReadPermissionOnProcessInstance() {
     // given
     String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
     createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, READ);
@@ -95,7 +95,23 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     assertEquals(processInstanceId, instance.getId());
   }
 
-  public void testQueryWithReadInstancesPermissionOnOneTaskProcess() {
+  public void testSimpleQueryWithReadPermissionOnAnyProcessInstance() {
+    // given
+    String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
+    createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, READ);
+
+    // when
+    ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery();
+
+    // then
+    verifyQueryResults(query, 1);
+
+    ProcessInstance instance = query.singleResult();
+    assertNotNull(instance);
+    assertEquals(processInstanceId, instance.getId());
+  }
+
+  public void testSimpleQueryWithReadInstancesPermissionOnOneTaskProcess() {
     // given
     String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
     createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, READ_INSTANCE);
@@ -109,6 +125,126 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     ProcessInstance instance = query.singleResult();
     assertNotNull(instance);
     assertEquals(processInstanceId, instance.getId());
+  }
+
+  public void testSimpleQueryWithReadInstancesPermissionOnAnyProcessDefinition() {
+    // given
+    String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
+    createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ_INSTANCE);
+
+    // when
+    ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery();
+
+    // then
+    verifyQueryResults(query, 1);
+
+    ProcessInstance instance = query.singleResult();
+    assertNotNull(instance);
+    assertEquals(processInstanceId, instance.getId());
+  }
+
+  // process instance query (multiple process instances) ////////////////////////
+
+  public void testQueryWithoutAuthorization() {
+    // given
+    startProcessInstanceByKey(PROCESS_KEY);
+    startProcessInstanceByKey(PROCESS_KEY);
+    startProcessInstanceByKey(PROCESS_KEY);
+
+    startProcessInstanceByKey(MESSAGE_START_PROCESS_KEY);
+    startProcessInstanceByKey(MESSAGE_START_PROCESS_KEY);
+    startProcessInstanceByKey(MESSAGE_START_PROCESS_KEY);
+    startProcessInstanceByKey(MESSAGE_START_PROCESS_KEY);
+
+    // when
+    ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery();
+
+    // then
+    verifyQueryResults(query, 0);
+  }
+
+  public void testQueryWithReadPermissionOnProcessInstance() {
+    // given
+    startProcessInstanceByKey(PROCESS_KEY);
+    startProcessInstanceByKey(PROCESS_KEY);
+    String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
+
+    startProcessInstanceByKey(MESSAGE_START_PROCESS_KEY);
+    startProcessInstanceByKey(MESSAGE_START_PROCESS_KEY);
+    startProcessInstanceByKey(MESSAGE_START_PROCESS_KEY);
+    startProcessInstanceByKey(MESSAGE_START_PROCESS_KEY);
+
+    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, READ);
+
+    // when
+    ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery();
+
+    // then
+    verifyQueryResults(query, 1);
+
+    ProcessInstance instance = query.singleResult();
+    assertNotNull(instance);
+    assertEquals(processInstanceId, instance.getId());
+  }
+
+  public void testQueryWithReadPermissionOnAnyProcessInstance() {
+    // given
+    startProcessInstanceByKey(PROCESS_KEY);
+    startProcessInstanceByKey(PROCESS_KEY);
+    startProcessInstanceByKey(PROCESS_KEY);
+
+    startProcessInstanceByKey(MESSAGE_START_PROCESS_KEY);
+    startProcessInstanceByKey(MESSAGE_START_PROCESS_KEY);
+    startProcessInstanceByKey(MESSAGE_START_PROCESS_KEY);
+    startProcessInstanceByKey(MESSAGE_START_PROCESS_KEY);
+
+    createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, READ);
+
+    // when
+    ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery();
+
+    // then
+    verifyQueryResults(query, 7);
+  }
+
+  public void testQueryWithReadInstancesPermissionOnOneTaskProcess() {
+    // given
+    startProcessInstanceByKey(PROCESS_KEY);
+    startProcessInstanceByKey(PROCESS_KEY);
+    startProcessInstanceByKey(PROCESS_KEY);
+
+    startProcessInstanceByKey(MESSAGE_START_PROCESS_KEY);
+    startProcessInstanceByKey(MESSAGE_START_PROCESS_KEY);
+    startProcessInstanceByKey(MESSAGE_START_PROCESS_KEY);
+    startProcessInstanceByKey(MESSAGE_START_PROCESS_KEY);
+
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, READ_INSTANCE);
+
+    // when
+    ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery();
+
+    // then
+    verifyQueryResults(query, 3);
+  }
+
+  public void testQueryWithReadInstancesPermissionOnAnyProcessDefinition() {
+    // given
+    startProcessInstanceByKey(PROCESS_KEY);
+    startProcessInstanceByKey(PROCESS_KEY);
+    startProcessInstanceByKey(PROCESS_KEY);
+
+    startProcessInstanceByKey(MESSAGE_START_PROCESS_KEY);
+    startProcessInstanceByKey(MESSAGE_START_PROCESS_KEY);
+    startProcessInstanceByKey(MESSAGE_START_PROCESS_KEY);
+    startProcessInstanceByKey(MESSAGE_START_PROCESS_KEY);
+
+    createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ_INSTANCE);
+
+    // when
+    ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery();
+
+    // then
+    verifyQueryResults(query, 7);
   }
 
   // start process instance by key //////////////////////////////////////////////

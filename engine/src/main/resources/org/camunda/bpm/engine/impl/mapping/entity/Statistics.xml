@@ -101,7 +101,7 @@
                 </if>
 
                 where
-                    E.ID_ = E.PROC_INST_ID_
+                    E.PARENT_ID_ IS NULL
 
                     <if test="isAuthorizationCheckEnabled &amp;&amp; authUserId != null">
                     and
@@ -362,11 +362,13 @@
                       select
                           distinct JOBDEF.ACT_ID_
                       from
-                          ${prefix}ACT_RU_JOB JOB,
+                          ${prefix}ACT_RU_JOB JOB
+                      inner join
                           ${prefix}ACT_RU_JOBDEF JOBDEF
+                      on
+                          JOB.JOB_DEF_ID_ = JOBDEF.ID_
                       where
                           JOB.PROCESS_DEF_ID_ = #{processDefinitionId}
-                          and JOB.JOB_DEF_ID_ = JOBDEF.ID_
                           and JOB.RETRIES_ = 0
                           <if test="isAuthorizationCheckEnabled &amp;&amp; authUserId != null">
                           and
@@ -454,11 +456,13 @@
                     JOBDEF.ACT_ID_
                   , count(JOB.ID_) as FAILED_JOBS_COUNT_
                 from
-                    ${prefix}ACT_RU_JOB JOB,
+                    ${prefix}ACT_RU_JOB JOB
+                inner join
                     ${prefix}ACT_RU_JOBDEF JOBDEF
+                on
+                    JOB.JOB_DEF_ID_ = JOBDEF.ID_
                 where
                     JOB.PROCESS_DEF_ID_ = #{processDefinitionId}
-                    and JOB.JOB_DEF_ID_ = JOBDEF.ID_
                     and JOB.RETRIES_ = 0
                     <if test="isAuthorizationCheckEnabled &amp;&amp; authUserId != null">
                     and

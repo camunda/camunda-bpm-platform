@@ -69,9 +69,76 @@ public class TaskAuthorizationTest extends AuthorizationTest {
 
   // task query ///////////////////////////////////////////////////////
 
+  public void testSimpleQueryWithTaskInsideProcessWithoutAuthorization() {
+    // given
+    startProcessInstanceByKey(PROCESS_KEY);
+
+    // when
+    TaskQuery query = taskService.createTaskQuery();
+
+    // then
+    verifyQueryResults(query, 0);
+  }
+
+  public void testSimpleQueryWithTaskInsideProcessWithReadPermissionOnTask() {
+    // given
+    startProcessInstanceByKey(PROCESS_KEY);
+    String taskId = selectSingleTask().getId();
+    createGrantAuthorization(TASK, taskId, userId, READ);
+
+    // when
+    TaskQuery query = taskService.createTaskQuery();
+
+    // then
+    verifyQueryResults(query, 1);
+  }
+
+  public void testSimpleQueryWithTaskInsideProcessWithReadPermissionOnAnyTask() {
+    // given
+    startProcessInstanceByKey(PROCESS_KEY);
+    createGrantAuthorization(TASK, ANY, userId, READ);
+
+    // when
+    TaskQuery query = taskService.createTaskQuery();
+
+    // then
+    verifyQueryResults(query, 1);
+  }
+
+  public void testSimpleQueryWithTaskInsideProcessWithReadPermissionOnOneTaskProcess() {
+    // given
+    startProcessInstanceByKey(PROCESS_KEY);
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, READ_TASK);
+
+    // when
+    TaskQuery query = taskService.createTaskQuery();
+
+    // then
+    verifyQueryResults(query, 1);
+  }
+
+  public void testSimpleQueryWithTaskInsideProcessWithReadPermissionOnAnyProcessDefinition() {
+    // given
+    startProcessInstanceByKey(PROCESS_KEY);
+    createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ_TASK);
+
+    // when
+    TaskQuery query = taskService.createTaskQuery();
+
+    // then
+    verifyQueryResults(query, 1);
+  }
+
   public void testQueryWithTaskInsideProcessWithoutAuthorization() {
     // given
     startProcessInstanceByKey(PROCESS_KEY);
+    startProcessInstanceByKey(PROCESS_KEY);
+    startProcessInstanceByKey(PROCESS_KEY);
+
+    startProcessInstanceByKey(DEMO_ASSIGNEE_PROCESS_KEY);
+    startProcessInstanceByKey(DEMO_ASSIGNEE_PROCESS_KEY);
+    startProcessInstanceByKey(DEMO_ASSIGNEE_PROCESS_KEY);
+    startProcessInstanceByKey(DEMO_ASSIGNEE_PROCESS_KEY);
 
     // when
     TaskQuery query = taskService.createTaskQuery();
@@ -83,12 +150,19 @@ public class TaskAuthorizationTest extends AuthorizationTest {
   public void testQueryWithTaskInsideProcessWithReadPermissionOnTask() {
     // given
     startProcessInstanceByKey(PROCESS_KEY);
-    String taskId = selectSingleTask().getId();
+    startProcessInstanceByKey(PROCESS_KEY);
+    startProcessInstanceByKey(PROCESS_KEY);
 
-    Authorization authorization = createGrantAuthorization(TASK, taskId);
-    authorization.setUserId(userId);
-    authorization.addPermission(READ);
-    saveAuthorization(authorization);
+    startProcessInstanceByKey(DEMO_ASSIGNEE_PROCESS_KEY);
+    startProcessInstanceByKey(DEMO_ASSIGNEE_PROCESS_KEY);
+    startProcessInstanceByKey(DEMO_ASSIGNEE_PROCESS_KEY);
+    startProcessInstanceByKey(DEMO_ASSIGNEE_PROCESS_KEY);
+
+    disableAuthorization();
+    String taskId = taskService.createTaskQuery().processDefinitionKey(PROCESS_KEY).listPage(0, 1).get(0).getId();
+    enableAuthorization();
+
+    createGrantAuthorization(TASK, taskId, userId, READ);
 
     // when
     TaskQuery query = taskService.createTaskQuery();
@@ -97,20 +171,64 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     verifyQueryResults(query, 1);
   }
 
-  public void testQueryWithTaskInsideProcessWithReadPermissionOnOneTaskProcess() {
+  public void testQueryWithTaskInsideProcessWithReadPermissionOnAnyTask() {
     // given
     startProcessInstanceByKey(PROCESS_KEY);
+    startProcessInstanceByKey(PROCESS_KEY);
+    startProcessInstanceByKey(PROCESS_KEY);
 
-    Authorization authorization = createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY);
-    authorization.setUserId(userId);
-    authorization.addPermission(READ_TASK);
-    saveAuthorization(authorization);
+    startProcessInstanceByKey(DEMO_ASSIGNEE_PROCESS_KEY);
+    startProcessInstanceByKey(DEMO_ASSIGNEE_PROCESS_KEY);
+    startProcessInstanceByKey(DEMO_ASSIGNEE_PROCESS_KEY);
+    startProcessInstanceByKey(DEMO_ASSIGNEE_PROCESS_KEY);
+
+    createGrantAuthorization(TASK, ANY, userId, READ);
 
     // when
     TaskQuery query = taskService.createTaskQuery();
 
     // then
-    verifyQueryResults(query, 1);
+    verifyQueryResults(query, 7);
+  }
+
+  public void testQueryWithTaskInsideProcessWithReadPermissionOnOneTaskProcess() {
+    // given
+    startProcessInstanceByKey(PROCESS_KEY);
+    startProcessInstanceByKey(PROCESS_KEY);
+    startProcessInstanceByKey(PROCESS_KEY);
+
+    startProcessInstanceByKey(DEMO_ASSIGNEE_PROCESS_KEY);
+    startProcessInstanceByKey(DEMO_ASSIGNEE_PROCESS_KEY);
+    startProcessInstanceByKey(DEMO_ASSIGNEE_PROCESS_KEY);
+    startProcessInstanceByKey(DEMO_ASSIGNEE_PROCESS_KEY);
+
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, READ_TASK);
+
+    // when
+    TaskQuery query = taskService.createTaskQuery();
+
+    // then
+    verifyQueryResults(query, 3);
+  }
+
+  public void testQueryWithTaskInsideProcessWithReadPermissionOnAnyProcessDefinition() {
+    // given
+    startProcessInstanceByKey(PROCESS_KEY);
+    startProcessInstanceByKey(PROCESS_KEY);
+    startProcessInstanceByKey(PROCESS_KEY);
+
+    startProcessInstanceByKey(DEMO_ASSIGNEE_PROCESS_KEY);
+    startProcessInstanceByKey(DEMO_ASSIGNEE_PROCESS_KEY);
+    startProcessInstanceByKey(DEMO_ASSIGNEE_PROCESS_KEY);
+    startProcessInstanceByKey(DEMO_ASSIGNEE_PROCESS_KEY);
+
+    createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ_TASK);
+
+    // when
+    TaskQuery query = taskService.createTaskQuery();
+
+    // then
+    verifyQueryResults(query, 7);
   }
 
   public void testQueryWithTaskInsideCaseWithoutAuthorization() {
@@ -129,16 +247,11 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     String taskId = "newTask";
     createTask(taskId);
 
-    Authorization authorization = createGrantAuthorization(TASK, taskId);
-    authorization.setUserId(userId);
-    authorization.addPermission(READ);
-    saveAuthorization(authorization);
-
     // when
     TaskQuery query = taskService.createTaskQuery();
 
     // then
-    verifyQueryResults(query, 1);
+    verifyQueryResults(query, 0);
 
     deleteTask(taskId, true);
   }
@@ -147,12 +260,13 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     // given
     String taskId = "newTask";
     createTask(taskId);
+    createGrantAuthorization(TASK, taskId, userId, READ);
 
     // when
     TaskQuery query = taskService.createTaskQuery();
 
     // then
-    verifyQueryResults(query, 0);
+    verifyQueryResults(query, 1);
 
     deleteTask(taskId, true);
   }

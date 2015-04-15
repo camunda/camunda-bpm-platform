@@ -18,7 +18,6 @@ import static org.camunda.bpm.engine.authorization.Resources.PROCESS_DEFINITION;
 import static org.camunda.bpm.engine.authorization.Resources.PROCESS_INSTANCE;
 import static org.camunda.bpm.engine.authorization.Resources.TASK;
 
-import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.impl.AbstractQuery;
 import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.runtime.VariableInstanceQuery;
@@ -118,11 +117,7 @@ public class VariableInstanceAuthorizationTest extends AuthorizationTest {
   public void testProcessVariableQueryWithReadPermissionOnProcessInstance() {
     // given
     String processInstanceId = startProcessInstanceByKey(PROCESS_KEY, getVariables()).getId();
-
-    Authorization authorization = createGrantAuthorization(PROCESS_INSTANCE, processInstanceId);
-    authorization.setUserId(userId);
-    authorization.addPermission(READ);
-    saveAuthorization(authorization);
+    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, READ);
 
     // when
     VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
@@ -138,11 +133,7 @@ public class VariableInstanceAuthorizationTest extends AuthorizationTest {
   public void testProcessVariableQueryWithReadInstancesPermissionOnOneTaskProcess() {
     // given
     String processInstanceId = startProcessInstanceByKey(PROCESS_KEY, getVariables()).getId();
-
-    Authorization authorization = createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY);
-    authorization.setUserId(userId);
-    authorization.addPermission(READ_INSTANCE);
-    saveAuthorization(authorization);
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, READ_INSTANCE);
 
     // when
     VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
@@ -160,11 +151,7 @@ public class VariableInstanceAuthorizationTest extends AuthorizationTest {
     startProcessInstanceByKey(PROCESS_KEY);
     String taskId = selectSingleTask().getId();
     setTaskVariableLocal(taskId, VARIABLE_NAME, VARIABLE_VALUE);
-
-    Authorization authorization = createGrantAuthorization(TASK, taskId);
-    authorization.setUserId(userId);
-    authorization.addPermission(READ);
-    saveAuthorization(authorization);
+    createGrantAuthorization(TASK, taskId, userId, READ);
 
     // when
     VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
@@ -178,11 +165,7 @@ public class VariableInstanceAuthorizationTest extends AuthorizationTest {
     String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
     String taskId = selectSingleTask().getId();
     setTaskVariableLocal(taskId, VARIABLE_NAME, VARIABLE_VALUE);
-
-    Authorization authorization = createGrantAuthorization(PROCESS_INSTANCE, processInstanceId);
-    authorization.setUserId(userId);
-    authorization.addPermission(READ);
-    saveAuthorization(authorization);
+    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, READ);
 
     // when
     VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
@@ -200,11 +183,7 @@ public class VariableInstanceAuthorizationTest extends AuthorizationTest {
     String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
     String taskId = selectSingleTask().getId();
     setTaskVariableLocal(taskId, VARIABLE_NAME, VARIABLE_VALUE);
-
-    Authorization authorization = createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY);
-    authorization.setUserId(userId);
-    authorization.addPermission(READ_INSTANCE);
-    saveAuthorization(authorization);
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, READ_INSTANCE);
 
     // when
     VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
@@ -222,11 +201,7 @@ public class VariableInstanceAuthorizationTest extends AuthorizationTest {
     String taskId = "myTask";
     createTask(taskId);
     setTaskVariable(taskId, VARIABLE_NAME, VARIABLE_VALUE);
-
-    Authorization authorization = createGrantAuthorization(TASK, taskId);
-    authorization.setUserId(userId);
-    authorization.addPermission(READ);
-    saveAuthorization(authorization);
+    createGrantAuthorization(TASK, taskId, userId, READ);
 
     // when
     VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();

@@ -12,12 +12,12 @@
  */
 package org.camunda.bpm.engine.test.authorization;
 
+import static org.camunda.bpm.engine.authorization.Authorization.ANY;
 import static org.camunda.bpm.engine.authorization.Permissions.READ;
 import static org.camunda.bpm.engine.authorization.Permissions.READ_INSTANCE;
 import static org.camunda.bpm.engine.authorization.Resources.PROCESS_DEFINITION;
 import static org.camunda.bpm.engine.authorization.Resources.PROCESS_INSTANCE;
 
-import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.impl.AbstractQuery;
 import org.camunda.bpm.engine.runtime.EventSubscription;
 import org.camunda.bpm.engine.runtime.EventSubscriptionQuery;
@@ -29,6 +29,7 @@ import org.camunda.bpm.engine.runtime.EventSubscriptionQuery;
 public class EventSubscriptionAuthorizationTest extends AuthorizationTest {
 
   protected static final String ONE_TASK_PROCESS_KEY = "oneTaskProcess";
+  protected static final String SIGNAL_BOUNDARY_PROCESS_KEY = "signalBoundaryProcess";
 
   protected String deploymentId;
 
@@ -36,6 +37,7 @@ public class EventSubscriptionAuthorizationTest extends AuthorizationTest {
     deploymentId = repositoryService
       .createDeployment()
       .addClasspathResource("org/camunda/bpm/engine/test/api/oneMessageBoundaryEventProcess.bpmn20.xml")
+      .addClasspathResource("org/camunda/bpm/engine/test/authorization/signalBoundaryEventProcess.bpmn20.xml")
       .deploy()
       .getId();
   }
@@ -45,7 +47,7 @@ public class EventSubscriptionAuthorizationTest extends AuthorizationTest {
     repositoryService.deleteDeployment(deploymentId, true);
   }
 
-  public void testQueryWithoutAuthorization() {
+  public void testSimpleQueryWithoutAuthorization() {
     // given
     startProcessInstanceByKey(ONE_TASK_PROCESS_KEY);
 
@@ -56,14 +58,10 @@ public class EventSubscriptionAuthorizationTest extends AuthorizationTest {
     verifyQueryResults(query, 0);
   }
 
-  public void testQueryWithReadPermissionOnProcessInstance() {
+  public void testSimpleQueryWithReadPermissionOnProcessInstance() {
     // given
     String processInstanceId = startProcessInstanceByKey(ONE_TASK_PROCESS_KEY).getId();
-
-    Authorization authorization = createGrantAuthorization(PROCESS_INSTANCE, processInstanceId);
-    authorization.setUserId(userId);
-    authorization.addPermission(READ);
-    saveAuthorization(authorization);
+    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, READ);
 
     // when
     EventSubscriptionQuery query = runtimeService.createEventSubscriptionQuery();
@@ -76,14 +74,10 @@ public class EventSubscriptionAuthorizationTest extends AuthorizationTest {
     assertEquals(processInstanceId, eventSubscription.getProcessInstanceId());
   }
 
-  public void testQueryWithReadInstancesPermissionOnOneTaskProcess() {
+  public void testSimpleQueryWithReadPermissionOnAnyProcessInstance() {
     // given
     String processInstanceId = startProcessInstanceByKey(ONE_TASK_PROCESS_KEY).getId();
-
-    Authorization authorization = createGrantAuthorization(PROCESS_DEFINITION, ONE_TASK_PROCESS_KEY);
-    authorization.setUserId(userId);
-    authorization.addPermission(READ_INSTANCE);
-    saveAuthorization(authorization);
+    createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, READ);
 
     // when
     EventSubscriptionQuery query = runtimeService.createEventSubscriptionQuery();
@@ -94,6 +88,140 @@ public class EventSubscriptionAuthorizationTest extends AuthorizationTest {
     EventSubscription eventSubscription = query.singleResult();
     assertNotNull(eventSubscription);
     assertEquals(processInstanceId, eventSubscription.getProcessInstanceId());
+  }
+
+  public void testSimpleQueryWithReadInstancesPermissionOnOneTaskProcess() {
+    // given
+    String processInstanceId = startProcessInstanceByKey(ONE_TASK_PROCESS_KEY).getId();
+    createGrantAuthorization(PROCESS_DEFINITION, ONE_TASK_PROCESS_KEY, userId, READ_INSTANCE);
+
+    // when
+    EventSubscriptionQuery query = runtimeService.createEventSubscriptionQuery();
+
+    // then
+    verifyQueryResults(query, 1);
+
+    EventSubscription eventSubscription = query.singleResult();
+    assertNotNull(eventSubscription);
+    assertEquals(processInstanceId, eventSubscription.getProcessInstanceId());
+  }
+
+  public void testSimpleQueryWithReadInstancesPermissionOnAnyProcessDefinition() {
+    // given
+    String processInstanceId = startProcessInstanceByKey(ONE_TASK_PROCESS_KEY).getId();
+    createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ_INSTANCE);
+
+    // when
+    EventSubscriptionQuery query = runtimeService.createEventSubscriptionQuery();
+
+    // then
+    verifyQueryResults(query, 1);
+
+    EventSubscription eventSubscription = query.singleResult();
+    assertNotNull(eventSubscription);
+    assertEquals(processInstanceId, eventSubscription.getProcessInstanceId());
+  }
+
+  public void testQueryWithoutAuthorization() {
+    // given
+    startProcessInstanceByKey(ONE_TASK_PROCESS_KEY);
+    startProcessInstanceByKey(ONE_TASK_PROCESS_KEY);
+    startProcessInstanceByKey(ONE_TASK_PROCESS_KEY);
+
+    startProcessInstanceByKey(SIGNAL_BOUNDARY_PROCESS_KEY);
+    startProcessInstanceByKey(SIGNAL_BOUNDARY_PROCESS_KEY);
+    startProcessInstanceByKey(SIGNAL_BOUNDARY_PROCESS_KEY);
+    startProcessInstanceByKey(SIGNAL_BOUNDARY_PROCESS_KEY);
+
+    // when
+    EventSubscriptionQuery query = runtimeService.createEventSubscriptionQuery();
+
+    // then
+    verifyQueryResults(query, 0);
+  }
+
+  public void testQueryWithReadPermissionOnProcessInstance() {
+    // given
+    startProcessInstanceByKey(ONE_TASK_PROCESS_KEY);
+    startProcessInstanceByKey(ONE_TASK_PROCESS_KEY);
+    String processInstanceId = startProcessInstanceByKey(ONE_TASK_PROCESS_KEY).getId();
+
+    startProcessInstanceByKey(SIGNAL_BOUNDARY_PROCESS_KEY);
+    startProcessInstanceByKey(SIGNAL_BOUNDARY_PROCESS_KEY);
+    startProcessInstanceByKey(SIGNAL_BOUNDARY_PROCESS_KEY);
+    startProcessInstanceByKey(SIGNAL_BOUNDARY_PROCESS_KEY);
+
+    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, READ);
+
+    // when
+    EventSubscriptionQuery query = runtimeService.createEventSubscriptionQuery();
+
+    // then
+    verifyQueryResults(query, 1);
+
+    EventSubscription eventSubscription = query.singleResult();
+    assertNotNull(eventSubscription);
+    assertEquals(processInstanceId, eventSubscription.getProcessInstanceId());
+  }
+
+  public void testQueryWithReadPermissionOnAnyProcessInstance() {
+    // given
+    startProcessInstanceByKey(ONE_TASK_PROCESS_KEY);
+    startProcessInstanceByKey(ONE_TASK_PROCESS_KEY);
+    startProcessInstanceByKey(ONE_TASK_PROCESS_KEY);
+
+    startProcessInstanceByKey(SIGNAL_BOUNDARY_PROCESS_KEY);
+    startProcessInstanceByKey(SIGNAL_BOUNDARY_PROCESS_KEY);
+    startProcessInstanceByKey(SIGNAL_BOUNDARY_PROCESS_KEY);
+    startProcessInstanceByKey(SIGNAL_BOUNDARY_PROCESS_KEY);
+
+    createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, READ);
+
+    // when
+    EventSubscriptionQuery query = runtimeService.createEventSubscriptionQuery();
+
+    // then
+    verifyQueryResults(query, 7);
+  }
+
+  public void testQueryWithReadInstancesPermissionOnOneTaskProcess() {
+    // given
+    startProcessInstanceByKey(ONE_TASK_PROCESS_KEY);
+    startProcessInstanceByKey(ONE_TASK_PROCESS_KEY);
+    startProcessInstanceByKey(ONE_TASK_PROCESS_KEY);
+
+    startProcessInstanceByKey(SIGNAL_BOUNDARY_PROCESS_KEY);
+    startProcessInstanceByKey(SIGNAL_BOUNDARY_PROCESS_KEY);
+    startProcessInstanceByKey(SIGNAL_BOUNDARY_PROCESS_KEY);
+    startProcessInstanceByKey(SIGNAL_BOUNDARY_PROCESS_KEY);
+
+    createGrantAuthorization(PROCESS_DEFINITION, ONE_TASK_PROCESS_KEY, userId, READ_INSTANCE);
+
+    // when
+    EventSubscriptionQuery query = runtimeService.createEventSubscriptionQuery();
+
+    // then
+    verifyQueryResults(query, 3);
+  }
+
+  public void testQueryWithReadInstancesPermissionOnAnyProcessDefinition() {
+    // given
+    startProcessInstanceByKey(ONE_TASK_PROCESS_KEY);
+    startProcessInstanceByKey(ONE_TASK_PROCESS_KEY);
+    startProcessInstanceByKey(ONE_TASK_PROCESS_KEY);
+
+    startProcessInstanceByKey(SIGNAL_BOUNDARY_PROCESS_KEY);
+    startProcessInstanceByKey(SIGNAL_BOUNDARY_PROCESS_KEY);
+    startProcessInstanceByKey(SIGNAL_BOUNDARY_PROCESS_KEY);
+    startProcessInstanceByKey(SIGNAL_BOUNDARY_PROCESS_KEY);
+
+    createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ_INSTANCE);
+
+    // when
+    EventSubscriptionQuery query = runtimeService.createEventSubscriptionQuery();
+
+    // then
+    verifyQueryResults(query, 7);
   }
 
   protected void verifyQueryResults(EventSubscriptionQuery query, int countExpected) {

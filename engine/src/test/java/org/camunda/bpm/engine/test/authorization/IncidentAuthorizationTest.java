@@ -12,12 +12,12 @@
  */
 package org.camunda.bpm.engine.test.authorization;
 
+import static org.camunda.bpm.engine.authorization.Authorization.ANY;
 import static org.camunda.bpm.engine.authorization.Permissions.READ;
 import static org.camunda.bpm.engine.authorization.Permissions.READ_INSTANCE;
 import static org.camunda.bpm.engine.authorization.Resources.PROCESS_DEFINITION;
 import static org.camunda.bpm.engine.authorization.Resources.PROCESS_INSTANCE;
 
-import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.impl.AbstractQuery;
 import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.runtime.IncidentQuery;
@@ -30,6 +30,7 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 public class IncidentAuthorizationTest extends AuthorizationTest {
 
   protected static final String PROCESS_KEY = "process";
+  protected static final String ANOTHER_ONE_INCIDENT_PROCESS_KEY = "anotherOneIncidentProcess";
 
   protected String deploymentId;
 
@@ -37,6 +38,7 @@ public class IncidentAuthorizationTest extends AuthorizationTest {
     deploymentId = repositoryService
       .createDeployment()
       .addClasspathResource("org/camunda/bpm/engine/test/authorization/oneIncidentProcess.bpmn20.xml")
+      .addClasspathResource("org/camunda/bpm/engine/test/authorization/anotherOneIncidentProcess.bpmn20.xml")
       .deploy()
       .getId();
   }
@@ -46,9 +48,91 @@ public class IncidentAuthorizationTest extends AuthorizationTest {
     repositoryService.deleteDeployment(deploymentId, true);
   }
 
+  public void testSimpleQueryWithoutAuthorization() {
+    // given
+    startProcessAndExecuteJob(PROCESS_KEY);
+
+    // when
+    IncidentQuery query = runtimeService.createIncidentQuery();
+
+    // then
+    verifyQueryResults(query, 0);
+  }
+
+  public void testSimpleQueryWithReadPermissionOnProcessInstance() {
+    // given
+    String processInstanceId = startProcessAndExecuteJob(PROCESS_KEY).getId();
+    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, READ);
+
+    // when
+    IncidentQuery query = runtimeService.createIncidentQuery();
+
+    // then
+    verifyQueryResults(query, 1);
+
+    Incident incident = query.singleResult();
+    assertNotNull(incident);
+    assertEquals(processInstanceId, incident.getProcessInstanceId());
+  }
+
+  public void testSimpleQueryWithReadPermissionOnAnyProcessInstance() {
+    // given
+    String processInstanceId = startProcessAndExecuteJob(PROCESS_KEY).getId();
+    createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, READ);
+
+    // when
+    IncidentQuery query = runtimeService.createIncidentQuery();
+
+    // then
+    verifyQueryResults(query, 1);
+
+    Incident incident = query.singleResult();
+    assertNotNull(incident);
+    assertEquals(processInstanceId, incident.getProcessInstanceId());
+  }
+
+  public void testSimpleQueryWithReadInstancesPermissionOnOneTaskProcess() {
+    // given
+    String processInstanceId = startProcessAndExecuteJob(PROCESS_KEY).getId();
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, READ_INSTANCE);
+
+    // when
+    IncidentQuery query = runtimeService.createIncidentQuery();
+
+    // then
+    verifyQueryResults(query, 1);
+
+    Incident incident = query.singleResult();
+    assertNotNull(incident);
+    assertEquals(processInstanceId, incident.getProcessInstanceId());
+  }
+
+  public void testSimpleQueryWithReadInstancesPermissionOnAnyProcessDefinition() {
+    // given
+    String processInstanceId = startProcessAndExecuteJob(PROCESS_KEY).getId();
+    createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ_INSTANCE);
+
+    // when
+    IncidentQuery query = runtimeService.createIncidentQuery();
+
+    // then
+    verifyQueryResults(query, 1);
+
+    Incident incident = query.singleResult();
+    assertNotNull(incident);
+    assertEquals(processInstanceId, incident.getProcessInstanceId());
+  }
+
   public void testQueryWithoutAuthorization() {
     // given
-    startProcessAndExecuteJob();
+    startProcessAndExecuteJob(PROCESS_KEY);
+    startProcessAndExecuteJob(PROCESS_KEY);
+    startProcessAndExecuteJob(PROCESS_KEY);
+
+    startProcessAndExecuteJob(ANOTHER_ONE_INCIDENT_PROCESS_KEY);
+    startProcessAndExecuteJob(ANOTHER_ONE_INCIDENT_PROCESS_KEY);
+    startProcessAndExecuteJob(ANOTHER_ONE_INCIDENT_PROCESS_KEY);
+    startProcessAndExecuteJob(ANOTHER_ONE_INCIDENT_PROCESS_KEY);
 
     // when
     IncidentQuery query = runtimeService.createIncidentQuery();
@@ -59,12 +143,16 @@ public class IncidentAuthorizationTest extends AuthorizationTest {
 
   public void testQueryWithReadPermissionOnProcessInstance() {
     // given
-    String processInstanceId = startProcessAndExecuteJob().getId();
+    startProcessAndExecuteJob(PROCESS_KEY);
+    startProcessAndExecuteJob(PROCESS_KEY);
+    String processInstanceId = startProcessAndExecuteJob(PROCESS_KEY).getId();
 
-    Authorization authorization = createGrantAuthorization(PROCESS_INSTANCE, processInstanceId);
-    authorization.setUserId(userId);
-    authorization.addPermission(READ);
-    saveAuthorization(authorization);
+    startProcessAndExecuteJob(ANOTHER_ONE_INCIDENT_PROCESS_KEY);
+    startProcessAndExecuteJob(ANOTHER_ONE_INCIDENT_PROCESS_KEY);
+    startProcessAndExecuteJob(ANOTHER_ONE_INCIDENT_PROCESS_KEY);
+    startProcessAndExecuteJob(ANOTHER_ONE_INCIDENT_PROCESS_KEY);
+
+    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, READ);
 
     // when
     IncidentQuery query = runtimeService.createIncidentQuery();
@@ -75,30 +163,70 @@ public class IncidentAuthorizationTest extends AuthorizationTest {
     Incident incident = query.singleResult();
     assertNotNull(incident);
     assertEquals(processInstanceId, incident.getProcessInstanceId());
+  }
+
+  public void testQueryWithReadPermissionOnAnyProcessInstance() {
+    // given
+    startProcessAndExecuteJob(PROCESS_KEY);
+    startProcessAndExecuteJob(PROCESS_KEY);
+    startProcessAndExecuteJob(PROCESS_KEY);
+
+    startProcessAndExecuteJob(ANOTHER_ONE_INCIDENT_PROCESS_KEY);
+    startProcessAndExecuteJob(ANOTHER_ONE_INCIDENT_PROCESS_KEY);
+    startProcessAndExecuteJob(ANOTHER_ONE_INCIDENT_PROCESS_KEY);
+    startProcessAndExecuteJob(ANOTHER_ONE_INCIDENT_PROCESS_KEY);
+
+    createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, READ);
+
+    // when
+    IncidentQuery query = runtimeService.createIncidentQuery();
+
+    // then
+    verifyQueryResults(query, 7);
   }
 
   public void testQueryWithReadInstancesPermissionOnOneTaskProcess() {
     // given
-    String processInstanceId = startProcessAndExecuteJob().getId();
+    startProcessAndExecuteJob(PROCESS_KEY);
+    startProcessAndExecuteJob(PROCESS_KEY);
+    startProcessAndExecuteJob(PROCESS_KEY);
 
-    Authorization authorization = createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY);
-    authorization.setUserId(userId);
-    authorization.addPermission(READ_INSTANCE);
-    saveAuthorization(authorization);
+    startProcessAndExecuteJob(ANOTHER_ONE_INCIDENT_PROCESS_KEY);
+    startProcessAndExecuteJob(ANOTHER_ONE_INCIDENT_PROCESS_KEY);
+    startProcessAndExecuteJob(ANOTHER_ONE_INCIDENT_PROCESS_KEY);
+    startProcessAndExecuteJob(ANOTHER_ONE_INCIDENT_PROCESS_KEY);
+
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, READ_INSTANCE);
 
     // when
     IncidentQuery query = runtimeService.createIncidentQuery();
 
     // then
-    verifyQueryResults(query, 1);
-
-    Incident incident = query.singleResult();
-    assertNotNull(incident);
-    assertEquals(processInstanceId, incident.getProcessInstanceId());
+    verifyQueryResults(query, 3);
   }
 
-  protected ProcessInstance startProcessAndExecuteJob() {
-    ProcessInstance processInstance = startProcessInstanceByKey(PROCESS_KEY);
+  public void testQueryWithReadInstancesPermissionOnAnyProcessDefinition() {
+    // given
+    startProcessAndExecuteJob(PROCESS_KEY);
+    startProcessAndExecuteJob(PROCESS_KEY);
+    startProcessAndExecuteJob(PROCESS_KEY);
+
+    startProcessAndExecuteJob(ANOTHER_ONE_INCIDENT_PROCESS_KEY);
+    startProcessAndExecuteJob(ANOTHER_ONE_INCIDENT_PROCESS_KEY);
+    startProcessAndExecuteJob(ANOTHER_ONE_INCIDENT_PROCESS_KEY);
+    startProcessAndExecuteJob(ANOTHER_ONE_INCIDENT_PROCESS_KEY);
+
+    createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ_INSTANCE);
+
+    // when
+    IncidentQuery query = runtimeService.createIncidentQuery();
+
+    // then
+    verifyQueryResults(query, 7);
+  }
+
+  protected ProcessInstance startProcessAndExecuteJob(String key) {
+    ProcessInstance processInstance = startProcessInstanceByKey(key);
     executeAvailableJobs();
     return processInstance;
   }
