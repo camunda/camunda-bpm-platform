@@ -84,7 +84,7 @@ describe('Cockpit Process Instance Spec', function() {
   });
 
 
-  describe('work with process variables', function() {
+  describe.only('work with process variables', function() {
 
     before(function() {
       return testHelper(setupFile, function() {
@@ -96,8 +96,9 @@ describe('Cockpit Process Instance Spec', function() {
     });
 
 
-    it('should add process variable', function() {
+    it('should validate the selected instance', function() {
 
+      // when
       instancePage.processName().then(function(headerName) {
         console.info('process name', headerName);
       });
@@ -109,6 +110,13 @@ describe('Cockpit Process Instance Spec', function() {
       instancePage.businessKey().then(function(headerName) {
         console.info('business key', headerName);
       });
+
+      // then
+      expect(instancePage.businessKey()).to.eventually.eql('myBusinessKey');
+    });
+
+
+    it('should add process variable', function() {
 
       // given
       expect(instancePage.variablesTab.table().count()).to.eventually.eql(3);
@@ -125,19 +133,51 @@ describe('Cockpit Process Instance Spec', function() {
     });
 
 
+    it('should validate the variable list', function() {
+
+      // then
+      instancePage.variablesTab.variableName(0).then(function(infoText) {
+        console.info('variable 1', infoText);
+      });
+      instancePage.variablesTab.variableName(1).then(function(infoText) {
+        console.info('variabel 2', infoText);
+      });
+      instancePage.variablesTab.variableName(2).then(function(infoText) {
+        console.info('variabel 3', infoText);
+      });
+      instancePage.variablesTab.variableName(3).then(function(infoText) {
+        console.info('variabel 4', infoText);
+      });
+
+      instancePage.variablesTab.variableValue(0).then(function(infoText) {
+        console.info('variabel value 1', infoText);
+      });
+      instancePage.variablesTab.variableValue(1).then(function(infoText) {
+        console.info('variabel value 2', infoText);
+      });
+      instancePage.variablesTab.variableValue(2).then(function(infoText) {
+        console.info('variabel value 3', infoText);
+      });
+      instancePage.variablesTab.variableValue(3).then(function(infoText) {
+        console.info('variabel value 4', infoText);
+      });
+
+      instancePage.variablesTab.variableType(0).then(function(infoText) {
+        console.info('variabel type 1', infoText);
+      });
+      instancePage.variablesTab.variableType(1).then(function(infoText) {
+        console.info('variabel type 2', infoText);
+      });
+      instancePage.variablesTab.variableType(2).then(function(infoText) {
+        console.info('variabel type 3', infoText);
+      });
+      instancePage.variablesTab.variableType(3).then(function(infoText) {
+        console.info('variabel type 4', infoText);
+      });
+    });
+
+
     it('should change variable', function() {
-
-      instancePage.processName().then(function(headerName) {
-        console.info('process name', headerName);
-      });
-
-      instancePage.instanceId().then(function(headerName) {
-        console.info('instance id', headerName);
-      });
-
-      instancePage.businessKey().then(function(headerName) {
-        console.info('business key', headerName);
-      });
 
       // given
       expect(instancePage.variablesTab.variableType(2)).to.eventually.eql('Double');
@@ -159,18 +199,6 @@ describe('Cockpit Process Instance Spec', function() {
 
 
     it('should select wrong variable type', function() {
-
-      instancePage.processName().then(function(headerName) {
-        console.info('process name', headerName);
-      });
-
-      instancePage.instanceId().then(function(headerName) {
-        console.info('instance id', headerName);
-      });
-
-      instancePage.businessKey().then(function(headerName) {
-        console.info('business key', headerName);
-      });
 
       // given
       expect(instancePage.variablesTab.variableType(1)).to.eventually.eql('Date');
