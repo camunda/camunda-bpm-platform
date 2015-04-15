@@ -125,6 +125,14 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
    *   When passed group list is empty or <code>null</code>.
    */
   TaskQuery taskCandidateGroupInExpression(String candidateGroupsExpression);
+  
+  /** Select both assigned and not assigned tasks for the candidate User or Group.
+   *  By default the candidate User or Group query returns only the not assigned tasks
+   * 
+   * @throws ProcessEngineException
+   *    When the group or user for the candidate is not provided
+   * */
+  TaskQuery includeAssignedTasks();
 
   /** Only select tasks for the given process instance id. */
   TaskQuery processInstanceId(String processInstanceId);

@@ -390,7 +390,9 @@
         </foreach>
       </if>
       <if test="candidateUser != null || candidateGroups != null">
-        and RES.ASSIGNEE_ is null
+      	<if test="!includeAssignedTasks">
+      	  and RES.ASSIGNEE_ is null
+      	</if>
         and I.TYPE_ = 'candidate'
         and
         (
