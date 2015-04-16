@@ -81,5 +81,34 @@ Page.prototype.switchWebapp = function(appName) {
   element(by.css('.navbar [sem-jump-to-'+ appName + ']')).click();
 };
 
+Page.prototype.findElementIndexInRepeater = function(repeaterName, elementSelector, elementName) {
+  var deferred = protractor.promise.defer();
+
+  element.all(by.repeater(repeaterName)).then(function(arr) {
+    var count = arr.length;
+
+    function noElementFound() {
+      count --;
+      if (count === 0) {
+        deferred.reject('element not found');
+      }
+    }
+
+    for (var i = 0; i < arr.length; i++) {
+      (function(boundI) {
+        arr[boundI].element(elementSelector).getText().then(function(nameText) {
+
+          if (nameText === elementName) {
+            deferred.fulfill(boundI);
+          } else {
+            noElementFound();
+          };
+        });
+      })(i);
+    };
+  });
+  return deferred;
+};
+
 
 module.exports = Page;
