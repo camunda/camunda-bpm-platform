@@ -35,8 +35,17 @@
 
   .activity-top-left-position {
     position: absolute;
-    top: -0.85em;
-    left: -0.9em;
+    right: 100%;
+    bottom: 100%;
+    margin-right: -0.8em;
+    margin-bottom: -0.8em;
+    .badge-warning {
+      font-weight: normal;
+      .transition(padding 0.218s ease);
+      &.hovered {
+        padding: 7px 11px;
+      }
+    }
   }
 
   .activity-bottom-right-position {
