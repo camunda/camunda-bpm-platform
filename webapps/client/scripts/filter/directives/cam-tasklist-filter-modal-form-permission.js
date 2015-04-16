@@ -1,12 +1,13 @@
 define([
+  'angular',
   'text!./cam-tasklist-filter-modal-form-permission.html'
 ], function(
+  angular,
   template
 ) {
   'use strict';
 
   var copy = angular.copy;
-  var each = angular.forEach;
 
   var RESOURCE_TYPE = 5;
 
@@ -25,12 +26,28 @@ define([
       scope: {
         filter: '=',
         accesses: '=',
-        filterModalFormData: '='
+        filterModalFormData: '=',
+        isOpen: '='
       },
 
       template: template,
 
       link: function ($scope, $element, attrs, parentCtrl) {
+        // if the fields of a new permission are filled and
+        // the "permission" accordion part is being closed
+        // this will add the permission
+        // (like if the "add" button had been clicked)
+        $scope.$watch('isOpen', function (actual, previous) {
+          if (!$scope.disableAddButton() && !actual && previous) {
+            $scope.addReadPermission();
+          }
+        });
+
+        $scope.$on('pre-submit', function () {
+          if (!$scope.disableAddButton()) {
+            $scope.addReadPermission();
+          }
+        });
 
         // init //////////////////////////////////////////////////////////////////////////////
 
@@ -136,7 +153,7 @@ define([
 
         // handle new permission ////////////////////////////////////////////////////////////
 
-        $scope.switchType = function ($event) {
+        $scope.switchType = function () {
           newPermission.type = newPermission.type === 'user' ? 'group' : 'user';
           validateNewPermission();
         };
@@ -156,10 +173,6 @@ define([
           var id = newPermission.id;
 
           if (id) {
-            // set the form invalid by setting an $error 'authorization'
-            // so that the 'Save' button is disabled
-            control.$setValidity('authorization', false);
-
             var auths = newPermission.type === 'user' ? userAuthorizationMap : groupAuthorizationMap;
             var auth = auths[id];
 
@@ -501,7 +514,6 @@ define([
             }
 
             else if (permissions && permissions.length === 1) {
-              var permission = permissions[0];
               authorization.permissions = authorization.permissions.concat([ 'READ' ]);
             }
 

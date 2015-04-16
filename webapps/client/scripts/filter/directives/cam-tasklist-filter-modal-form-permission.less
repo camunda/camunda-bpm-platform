@@ -16,6 +16,26 @@
     display: inline-block;
     text-align: center;
     width: 39px;
+    padding: @padding-base-vertical @padding-base-horizontal;
+    border: 1px solid transparent;
+  }
+
+  .global-access {
+    margin-bottom: 0;
+  }
+
+  .row-action {
+    padding-top: 0;
+  }
+
+  .btn-remove {
+    > .hidden-sm {
+      padding-right: 0;
+      margin-right: 0;
+    }
+    &:hover {
+      text-decoration: none;
+    }
   }
 
   input.ng-invalid-authorization.ng-valid-duplicate {

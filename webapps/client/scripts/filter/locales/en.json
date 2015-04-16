@@ -61,6 +61,8 @@
   "FILTER_REMOVE_CRITERION":
                         "Remove",
 
+  "ADD_PERMISSION":
+                        "Add perm.",
   "FILTER_FORM_PERMISSIONS":
                         "Permissions",
   "FILTER_FORM_PERMISSIONS_GLOBAL":

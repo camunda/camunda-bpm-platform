@@ -219,6 +219,7 @@ define([
     }
 
     $scope.submit = function() {
+      $scope.$broadcast('pre-submit');
 
       // transform query array into a query object
       var _queryArray = ($scope.filter.query || []).concat(queryVariables);
