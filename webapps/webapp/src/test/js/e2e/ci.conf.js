@@ -25,18 +25,18 @@ exports.config = {
   // Spec patterns are relative to the location of the spec file. They may
   // include glob patterns.
   specs: [
-/*    'admin/specs/admin-user-spec.js',
+    'admin/specs/admin-user-spec.js',
     'admin/specs/users-spec.js',
     'admin/specs/groups-spec.js',
     'admin/specs/system-spec.js',
     'admin/specs/authorizations-spec.js',
     'cockpit/specs/dashboard-spec.js',
-    'cockpit/specs/process-definition-spec.js',*/
-    'cockpit/specs/process-instance-spec.js'
-/*    'cockpit/specs/process-definition-filter-spec.js',
+    'cockpit/specs/process-definition-spec.js',
+    'cockpit/specs/process-instance-spec.js',
+    'cockpit/specs/process-definition-filter-spec.js',
     'tasklist/specs/filter-spec.js',
     'tasklist/specs/tasklist-search-spec.js',
-    'tasklist/specs/tasklist-sorting-spec.js'*/
+    'tasklist/specs/tasklist-sorting-spec.js'
   ],
 
   // A base URL for your application under test. Calls to protractor.get()

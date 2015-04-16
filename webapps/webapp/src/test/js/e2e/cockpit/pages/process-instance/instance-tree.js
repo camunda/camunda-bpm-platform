@@ -34,19 +34,25 @@ module.exports = Base.extend({
   },
 
   deselectInstance: function(activityName) {
-    this.formElement().element(by.cssContainingText('.tree-node-label', activityName)).element(by.css('button')).click();
+    this.formElement().element(by.cssContainingText('.tree-node-label', activityName))
+      .element(by.css('[ng-click="deselect($event)"]'))
+      .click();
   },
 
   isInstanceSelected: function(activityName) {
-    return this.formElement().element(by.cssContainingText('.tree-node-label', activityName)).getAttribute('class').then(function(classes) {
-      return classes.indexOf('selected') !== -1;
-    });
+    return this.formElement().element(by.cssContainingText('.tree-node-label', activityName))
+      .getAttribute('class')
+      .then(function(classes) {
+        return classes.indexOf('selected') !== -1;
+      });
   },
 
   isInstanceNotSelected: function(activityName) {
-    return this.formElement().element(by.cssContainingText('.tree-node-label', activityName)).getAttribute('class').then(function(classes) {
-      return classes.indexOf('selected') === -1;
-    });
+    return this.formElement().element(by.cssContainingText('.tree-node-label', activityName))
+      .getAttribute('class')
+      .then(function(classes) {
+        return classes.indexOf('selected') === -1;
+      });
   }
 
 });

@@ -84,7 +84,7 @@ describe('Cockpit Process Instance Spec', function() {
   });
 
 
-  describe.only('work with process variables', function() {
+  describe('work with process variables', function() {
 
     before(function() {
       return testHelper(setupFile, function() {
@@ -93,26 +93,6 @@ describe('Cockpit Process Instance Spec', function() {
         dashboardPage.deployedProcessesList.selectProcess(0);
         definitionPage.processInstancesTab.selectInstance(0);
       });
-    });
-
-
-    it('should validate the selected instance', function() {
-
-      // when
-      instancePage.processName().then(function(headerName) {
-        console.info('process name', headerName);
-      });
-
-      instancePage.instanceId().then(function(headerName) {
-        console.info('instance id', headerName);
-      });
-
-      instancePage.businessKey().then(function(headerName) {
-        console.info('business key', headerName);
-      });
-
-      // then
-      expect(instancePage.businessKey()).to.eventually.eql('myBusinessKey');
     });
 
 
@@ -126,98 +106,63 @@ describe('Cockpit Process Instance Spec', function() {
 
       // then
       expect(instancePage.variablesTab.table().count()).to.eventually.eql(4);
-      expect(instancePage.variablesTab.variableName(3)).to.eventually.eql('myTestVar');
-      expect(instancePage.variablesTab.variableType(3)).to.eventually.eql('String');
-      expect(instancePage.variablesTab.variableValue(3)).to.eventually.eql('12345');
-      expect(instancePage.variablesTab.variableScopeName(3)).to.eventually.eql('User Tasks');
-    });
 
-
-    it('should validate the variable list', function() {
-
-      // then
-      instancePage.variablesTab.variableName(0).then(function(infoText) {
-        console.info('variable 1', infoText);
-      });
-      instancePage.variablesTab.variableName(1).then(function(infoText) {
-        console.info('variabel 2', infoText);
-      });
-      instancePage.variablesTab.variableName(2).then(function(infoText) {
-        console.info('variabel 3', infoText);
-      });
-      instancePage.variablesTab.variableName(3).then(function(infoText) {
-        console.info('variabel 4', infoText);
-      });
-
-      instancePage.variablesTab.variableValue(0).then(function(infoText) {
-        console.info('variabel value 1', infoText);
-      });
-      instancePage.variablesTab.variableValue(1).then(function(infoText) {
-        console.info('variabel value 2', infoText);
-      });
-      instancePage.variablesTab.variableValue(2).then(function(infoText) {
-        console.info('variabel value 3', infoText);
-      });
-      instancePage.variablesTab.variableValue(3).then(function(infoText) {
-        console.info('variabel value 4', infoText);
-      });
-
-      instancePage.variablesTab.variableType(0).then(function(infoText) {
-        console.info('variabel type 1', infoText);
-      });
-      instancePage.variablesTab.variableType(1).then(function(infoText) {
-        console.info('variabel type 2', infoText);
-      });
-      instancePage.variablesTab.variableType(2).then(function(infoText) {
-        console.info('variabel type 3', infoText);
-      });
-      instancePage.variablesTab.variableType(3).then(function(infoText) {
-        console.info('variabel type 4', infoText);
-      });
+      instancePage.variablesTab.findElementIndexInRepeater('variable in variables', by.binding('variable.name'), 'myTestVar')
+        .then(function(idx) {
+          expect(instancePage.variablesTab.variableName(idx)).to.eventually.eql('myTestVar');
+          expect(instancePage.variablesTab.variableType(idx)).to.eventually.eql('String');
+          expect(instancePage.variablesTab.variableValue(idx)).to.eventually.eql('12345');
+          expect(instancePage.variablesTab.variableScopeName(idx)).to.eventually.eql('User Tasks');
+        });
     });
 
 
     it('should change variable', function() {
 
       // given
-      expect(instancePage.variablesTab.variableType(2)).to.eventually.eql('Double');
-      expect(instancePage.variablesTab.variableValue(2)).to.eventually.eql('1.49');
+      instancePage.variablesTab.findElementIndexInRepeater('variable in variables', by.binding('variable.name'), 'test')
+        .then(function(idx) {
+          expect(instancePage.variablesTab.variableType(idx)).to.eventually.eql('Double');
+          expect(instancePage.variablesTab.variableValue(idx)).to.eventually.eql('1.49');
 
-      // when
-      instancePage.variablesTab.editVariableButton(2).click().then(function() {
-        instancePage.variablesTab.editVariableValue().clear();
-        instancePage.variablesTab.editVariableValue('1.5');
-        instancePage.variablesTab.editVariableType('String');
-        instancePage.variablesTab.editVariableConfirmButton().click();
-      });
+          // when
+          instancePage.variablesTab.editVariableButton(idx).click().then(function() {
+            instancePage.variablesTab.editVariableValue().clear();
+            instancePage.variablesTab.editVariableValue('1.5');
+            instancePage.variablesTab.editVariableType('String');
+            instancePage.variablesTab.editVariableConfirmButton().click();
+          });
 
-      // then
-      expect(instancePage.variablesTab.variableName(2)).to.eventually.eql('test');
-      expect(instancePage.variablesTab.variableValue(2)).to.eventually.eql('1.5');
-      expect(instancePage.variablesTab.variableType(2)).to.eventually.eql('String');
+          // then
+          expect(instancePage.variablesTab.variableName(idx)).to.eventually.eql('test');
+          expect(instancePage.variablesTab.variableValue(idx)).to.eventually.eql('1.5');
+          expect(instancePage.variablesTab.variableType(idx)).to.eventually.eql('String');
+        });
     });
 
 
     it('should select wrong variable type', function() {
 
       // given
-      expect(instancePage.variablesTab.variableType(1)).to.eventually.eql('Date');
-      expect(instancePage.variablesTab.variableValue(1)).to.eventually.eql('2011-11-11T11:11:11');
+      instancePage.variablesTab.findElementIndexInRepeater('variable in variables', by.binding('variable.name'), 'myDate')
+        .then(function(idx) {
+          expect(instancePage.variablesTab.variableType(idx)).to.eventually.eql('Date');
+          expect(instancePage.variablesTab.variableValue(idx)).to.eventually.eql('2011-11-11T11:11:11');
 
-      // when
-      instancePage.variablesTab.editVariableButton(1).click().then(function() {
-        instancePage.variablesTab.editVariableType('Short');
-      });
+          // when
+          instancePage.variablesTab.editVariableButton(idx).click().then(function() {
+            instancePage.variablesTab.editVariableType('Short');
+          });
 
-      // then
-      expect(instancePage.variablesTab.editVariableErrorText()).to.eventually.eql('Invalid value: Only a Short value is allowed.');
-      expect(instancePage.variablesTab.editVariableConfirmButton().isEnabled()).to.eventually.be.false;
+          // then
+          expect(instancePage.variablesTab.editVariableErrorText()).to.eventually.eql('Invalid value: Only a Short value is allowed.');
+          expect(instancePage.variablesTab.editVariableConfirmButton().isEnabled()).to.eventually.be.false;
 
-      // finaly
-      instancePage.variablesTab.editVariableCancelButton().click().then(function() {
-        expect(instancePage.variablesTab.inlineEditRow().isPresent()).to.eventually.be.false;
-      });
-
+          // finaly
+          instancePage.variablesTab.editVariableCancelButton().click().then(function() {
+            expect(instancePage.variablesTab.inlineEditRow().isPresent()).to.eventually.be.false;
+          });
+        });
     });
 
   });
@@ -291,7 +236,7 @@ describe('Cockpit Process Instance Spec', function() {
     it('should reflect the tree view selection in diagram', function() {
 
       // given
-      //instancePage.instanceTree.selectInstance('User Task 1');
+      instancePage.instanceTree.selectInstance('User Task 1');
       expect(instancePage.diagram.isActivitySelected('UserTask_1')).to.eventually.be.true;
 
       // when
