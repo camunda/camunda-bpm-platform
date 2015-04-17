@@ -233,7 +233,7 @@ describe('Cockpit Process Instance Spec', function() {
     });
 
 
-    it('should reflect the tree view selection in diagram', function() {
+    it.skip('should reflect the tree view selection in diagram', function() {
 
       // given
       instancePage.instanceTree.selectInstance('User Task 1');
