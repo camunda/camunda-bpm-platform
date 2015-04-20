@@ -163,13 +163,13 @@ public class HistoricActivityInstanceSequenceCounterTest extends PluggableProces
         .getExecutionId();
 
     query.executionId(taskExecutionId);
-    verifyOrder(query, "theService2$multiInstanceBody", "theService2", "theService2");
+    verifyOrder(query, "theService2#multiInstanceBody", "theService2", "theService2");
 
     query = historyService
         .createHistoricActivityInstanceQuery()
         .orderPartiallyByOccurrence()
         .asc();
-    verifyOrder(query, "theStart", "theService1", "theService2$multiInstanceBody", "theService2", "theService2", "theService3", "theEnd");
+    verifyOrder(query, "theStart", "theService1", "theService2#multiInstanceBody", "theService2", "theService2", "theService3", "theEnd");
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/persistence/ExecutionSequenceCounterTest.testParallelMultiInstance.bpmn20.xml"})
@@ -200,7 +200,7 @@ public class HistoricActivityInstanceSequenceCounterTest extends PluggableProces
         .createHistoricActivityInstanceQuery()
         .orderPartiallyByOccurrence()
         .asc();
-    verifyOrder(query, "theStart", "theService1", "theService2$multiInstanceBody", "theService2", "theService2", "theService3", "theEnd");
+    verifyOrder(query, "theStart", "theService1", "theService2#multiInstanceBody", "theService2", "theService2", "theService3", "theEnd");
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/persistence/ExecutionSequenceCounterTest.testLoop.bpmn20.xml"})

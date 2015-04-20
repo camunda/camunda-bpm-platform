@@ -747,7 +747,7 @@ public class HistoricActivityInstanceTest extends PluggableProcessEngineTestCase
 
     HistoricActivityInstanceQuery query = historyService.createHistoricActivityInstanceQuery();
 
-    HistoricActivityInstance miBodyInstance = query.activityId("userTask$multiInstanceBody").singleResult();
+    HistoricActivityInstance miBodyInstance = query.activityId("userTask#multiInstanceBody").singleResult();
 
     query.activityId("userTask");
     assertEquals(5, query.count());
@@ -772,7 +772,7 @@ public class HistoricActivityInstanceTest extends PluggableProcessEngineTestCase
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("process");
 
     HistoricActivityInstanceQuery query = historyService.createHistoricActivityInstanceQuery();
-    HistoricActivityInstance miBodyInstance = query.activityId("receiveTask$multiInstanceBody").singleResult();
+    HistoricActivityInstance miBodyInstance = query.activityId("receiveTask#multiInstanceBody").singleResult();
 
     query.activityId("receiveTask");
     assertEquals(5, query.count());

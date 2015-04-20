@@ -151,7 +151,7 @@ import org.camunda.bpm.engine.repository.ProcessDefinition;
  */
 public class BpmnParse extends Parse {
 
-  public static final String MULTI_INSTANCE_BODY_ID_SUFFIX = "$multiInstanceBody";
+  public static final String MULTI_INSTANCE_BODY_ID_SUFFIX = "#multiInstanceBody";
 
   protected static final Logger LOGGER = Logger.getLogger(BpmnParse.class.getName());
 

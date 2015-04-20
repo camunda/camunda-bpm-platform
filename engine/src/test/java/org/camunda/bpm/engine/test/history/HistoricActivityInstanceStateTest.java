@@ -162,8 +162,8 @@ public class HistoricActivityInstanceStateTest extends PluggableProcessEngineTes
     assertIsCompletingActivityInstances(allInstances, "subprocessEnd", 3);
     assertNonCanceledActivityInstance(allInstances, "subprocessEnd");
 
-    assertNonCompletingActivityInstance(allInstances, "intermediateSubprocess$multiInstanceBody", 1);
-    assertNonCanceledActivityInstance(allInstances, "intermediateSubprocess$multiInstanceBody");
+    assertNonCompletingActivityInstance(allInstances, "intermediateSubprocess#multiInstanceBody", 1);
+    assertNonCanceledActivityInstance(allInstances, "intermediateSubprocess#multiInstanceBody");
 
     assertIsCompletingActivityInstances(allInstances, "end", 1);
     assertNonCanceledActivityInstance(allInstances, "end");
@@ -185,8 +185,8 @@ public class HistoricActivityInstanceStateTest extends PluggableProcessEngineTes
     assertIsCompletingActivityInstances(allInstances, "subprocessEnd", 3);
     assertNonCanceledActivityInstance(allInstances, "subprocessEnd");
 
-    assertNonCompletingActivityInstance(allInstances, "intermediateSubprocess$multiInstanceBody", 1);
-    assertNonCanceledActivityInstance(allInstances, "intermediateSubprocess$multiInstanceBody");
+    assertNonCompletingActivityInstance(allInstances, "intermediateSubprocess#multiInstanceBody", 1);
+    assertNonCanceledActivityInstance(allInstances, "intermediateSubprocess#multiInstanceBody");
 
     assertIsCompletingActivityInstances(allInstances, "end", 1);
     assertNonCanceledActivityInstance(allInstances, "end");

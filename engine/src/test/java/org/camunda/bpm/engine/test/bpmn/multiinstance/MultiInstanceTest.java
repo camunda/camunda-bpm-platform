@@ -289,7 +289,7 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
       }
 
       HistoricActivityInstance multiInstanceBodyInstance = historyService.createHistoricActivityInstanceQuery()
-          .activityId("miTasks$multiInstanceBody").singleResult();
+          .activityId("miTasks#multiInstanceBody").singleResult();
       assertNotNull(multiInstanceBodyInstance);
       assertEquals(pi.getId(), multiInstanceBodyInstance.getParentActivityInstanceId());
 
@@ -374,7 +374,7 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
           .orderByActivityId()
           .asc().list();
       assertEquals(3, activities.size());
-      assertEquals("miTasks$multiInstanceBody", activities.get(0).getActivityId());
+      assertEquals("miTasks#multiInstanceBody", activities.get(0).getActivityId());
       assertEquals("theEnd", activities.get(1).getActivityId());
       assertEquals("theStart", activities.get(2).getActivityId());
     }

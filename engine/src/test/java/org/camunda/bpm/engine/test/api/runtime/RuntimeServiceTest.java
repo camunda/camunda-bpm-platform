@@ -1301,7 +1301,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
     assertEquals(tree.getId(), processActivityInstances[0].getId());
     assertEquals(definition.getId(), processActivityInstances[0].getActivityId());
 
-    assertActivityInstances(tree.getActivityInstances("subProcess$multiInstanceBody"), 1, "subProcess$multiInstanceBody");
+    assertActivityInstances(tree.getActivityInstances("subProcess#multiInstanceBody"), 1, "subProcess#multiInstanceBody");
     assertActivityInstances(tree.getActivityInstances("subProcess"), 3, "subProcess");
     assertActivityInstances(tree.getActivityInstances("innerTask"), 3, "innerTask");
 

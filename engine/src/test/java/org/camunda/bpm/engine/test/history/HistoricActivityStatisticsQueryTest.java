@@ -105,7 +105,7 @@ public class HistoricActivityStatisticsQueryTest extends PluggableProcessEngineT
     // subprocess multi instance body
     HistoricActivityStatistics subProcessMiBody = statistics.get(2);
 
-    assertEquals("subprocess$multiInstanceBody", subProcessMiBody.getId());
+    assertEquals("subprocess#multiInstanceBody", subProcessMiBody.getId());
     assertEquals(5, subProcessMiBody.getInstances());
 
     // task
@@ -321,7 +321,7 @@ public class HistoricActivityStatisticsQueryTest extends PluggableProcessEngineT
     // subprocess - multi-instance body
     HistoricActivityStatistics subProcessMiBody = statistics.get(7);
 
-    assertEquals("subprocess$multiInstanceBody", subProcessMiBody.getId());
+    assertEquals("subprocess#multiInstanceBody", subProcessMiBody.getId());
     assertEquals(0, subProcessMiBody.getInstances());
     assertEquals(5, subProcessMiBody.getFinished());
 
