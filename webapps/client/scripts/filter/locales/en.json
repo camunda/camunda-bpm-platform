@@ -91,6 +91,10 @@
                         "Given user has already read permissions",
   "FILTER_FORM_PERMISSIONS_DUPLICATE_GROUP":
                         "Given group has already read permissions",
+  "FILTER_FORM_PERMISSION_GROUP_USER":
+                        "Group / User",
+  "FILTER_FORM_PERMISSION_IDENTIFIER":
+                        "Identifier",
 
   "FILTER_FORM_VARIABLES":
                         "Variables",
