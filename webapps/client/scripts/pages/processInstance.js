@@ -230,8 +230,11 @@ define([
                 bpmnElement = bpmnElements[activityId],
                 instances = activityIdToInstancesMap[activityId] || [];
 
-
-            child.name = getActivityName(bpmnElement);
+            if(bpmnElement) {
+              child.name = getActivityName(bpmnElement);
+            } else {
+              child.name = activityId;
+            }
             child.isTransitionInstance = false;
             activityIdToInstancesMap[activityId] = instances;
             if(!instanceIdToInstanceMap[child.id]) {
