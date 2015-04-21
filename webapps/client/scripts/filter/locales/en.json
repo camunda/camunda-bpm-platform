@@ -54,6 +54,10 @@
                         "You can utilize expression with this criterion.",
   "FILTER_CRITERIA_OPERATOR":
                         "Operator",
+  "FILTER_CRITERIA_INCLUDE_ASSIGNED_TASKS":
+                        "Include assigned tasks",
+  "FILTER_CRITERIA_INCLUDE_ASSIGNED_TASKS_HINT":
+                        "Also include tasks that are assigned to users in candidate queries.<br/>Default is to only include tasks that are not assigned to any user if you query by candidate user or group(s).",
   "FILTER_CRITERIA_VALUE":
                         "Value",
   "FILTER_ADD_CRITERION":

@@ -12,9 +12,10 @@ define([
   var each = angular.forEach;
   var copy = angular.copy;
 
-  var criteriaExpressionSupport = {};
-  var criteriaHelp              = {};
-  var criteriaValidator         = {};
+  var includeAssignedTasksSupport = {};
+  var criteriaExpressionSupport   = {};
+  var criteriaHelp                = {};
+  var criteriaValidator           = {};
 
   var defaultValidate = function () {
     return { valid : true };
@@ -22,6 +23,11 @@ define([
 
   each(criteria, function(group) {
     each(group.options, function(criterion) {
+      includeAssignedTasksSupport[criterion.name] = criterion.includeAssignedTasksSupport;
+      if (includeAssignedTasksSupport[criterion.name]) {
+        includeAssignedTasksSupport[criterion.name +'Expression'] = true;
+      }
+
       criteriaExpressionSupport[criterion.name] = criterion.expressionSupport;
       criteriaHelp[criterion.name]              = criterion.help      || group.help;
       criteriaValidator[criterion.name]         = criterion.validate  || group.validate || defaultValidate;
@@ -53,6 +59,28 @@ define([
         $scope.criteriaHelp = criteriaHelp;
 
         $scope.query = $scope.filter.query = $scope.filter.query || [];
+
+
+
+        // a little exception to deal with
+        $scope.includeAssignedTasks = $scope.filter.includeAssignedTasks = false;
+        $scope.query = $scope.filter.query = $scope.query.filter(function (item) {
+          if (item.key === 'includeAssignedTasks') {
+            $scope.includeAssignedTasks = item.value;
+          }
+          return item.key !== 'includeAssignedTasks';
+        });
+
+        $scope.canIncludeAssignedTasks = function () {
+          for (var q = 0; q < $scope.query.length; q++) {
+            if (includeAssignedTasksSupport[$scope.query[q].key]) {
+              return true;
+            }
+          }
+          return false;
+        };
+
+
 
         // register handler to show or hide the accordion hint /////////////////
 

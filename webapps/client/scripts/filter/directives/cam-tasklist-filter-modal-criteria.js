@@ -151,19 +151,22 @@ define(function() {
         {
           name: 'candidateGroup',
           label: 'Candidate Group',
-          expressionSupport: true
+          expressionSupport: true,
+          includeAssignedTasksSupport: true
         },
         {
           name: 'candidateGroups',
           label: 'Candidate Groups',
           expressionSupport: true,
-          help: groupExpLangHelp
+          help: groupExpLangHelp,
+          includeAssignedTasksSupport: true
         },
         {
           name: 'candidateUser',
           label: 'Candidate User',
           expressionSupport: true,
-          help: userExpLangHelp
+          help: userExpLangHelp,
+          includeAssignedTasksSupport: true
         },
         {
           name: 'involvedUser',

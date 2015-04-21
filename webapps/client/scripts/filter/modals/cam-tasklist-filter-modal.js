@@ -8,6 +8,7 @@ define([
   var copy = angular.copy;
   var each = angular.forEach;
   var isArray = angular.isArray;
+  var isObject = angular.isObject;
 
   var RESOURCE_TYPE = 'Task';
   var DEFAULT_COLOR = '#EEEEEE';
@@ -54,10 +55,11 @@ define([
 
   function cleanJson(obj) {
     each(Object.keys(obj), function(key) {
-      if (key[0] === '$') {
+      // property with name starting with "$" or empty arrays are removed
+      if (key[0] === '$' || (isArray(obj[key]) && !obj[key].length)) {
         delete obj[key];
       }
-      else if (angular.isObject(obj[key]) || angular.isArray(obj[key])) {
+      else if (isObject(obj[key]) || isArray(obj[key])) {
         obj[key] = cleanJson(obj[key]);
       }
     });
@@ -262,6 +264,10 @@ define([
         }
 
         _queryObj[key] = value;
+      }
+
+      if ($scope.filter.includeAssignedTasks) {
+        _queryObj.includeAssignedTasks = true;
       }
 
       var toSave = {

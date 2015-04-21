@@ -88,13 +88,16 @@
 
               <div ng-if="this.criteriaFieldForm.queryParamValue.$invalid && this.criteriaFieldForm.queryParamValue.$dirty"
                     class="has-error">
-                <span ng-show="this.criteriaFieldForm.queryParamValue.$error.required" class="help-block">
+                <span ng-show="this.criteriaFieldForm.queryParamValue.$error.required"
+                      class="help-block">
                   {{ 'REQUIRED_FIELD' | translate }}
                 </span>
-                <span ng-show="this.criteriaFieldForm.queryParamValue.$error.number" class="help-block">
+                <span ng-show="this.criteriaFieldForm.queryParamValue.$error.number"
+                      class="help-block">
                   {{ 'REQUIRED_INTEGER_FIELD' | translate }}
                 </span>
-                <span ng-show="this.criteriaFieldForm.queryParamValue.$error.date" class="help-block">
+                <span ng-show="this.criteriaFieldForm.queryParamValue.$error.date"
+                      class="help-block">
                   {{ 'INVALID_DATE' | translate }}
                 </span>
               </div>
@@ -107,5 +110,19 @@
       </div>
     </div>
 
+  </div>
+
+  <div ng-if="canIncludeAssignedTasks()"
+       class="row">
+    <div class="col-xs-10 col-xs-offset-2 checkbox">
+      <label>
+        <input type="checkbox"
+               class="form-control"
+               ng-model="filter.includeAssignedTasks" />
+        {{ 'FILTER_CRITERIA_INCLUDE_ASSIGNED_TASKS' | translate }}
+      </label>
+      <div class="help-block"
+           translate="FILTER_CRITERIA_INCLUDE_ASSIGNED_TASKS_HINT"></div>
+    </div>
   </div>
 </div>
