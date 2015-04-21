@@ -23,12 +23,13 @@ describe('Tasklist Search', function() {
 
     // then
     expect(page.taskList.taskList().count()).to.eventually.eql(3);
+    expect(page.taskList.taskSearch.variableTypeDropdown('Process Variable').isPresent()).to.eventually.be.false;
   });
 
 
   describe('add a search pill', function() {
 
-    it('should use wrong variable type and find nothing', function(done) {
+    it('should use wrong variable type and find nothing', function() {
 
       // when
       page.taskList.taskSearch.createSearch('Process Variable', 'testVar', '=', '48');
@@ -38,7 +39,7 @@ describe('Tasklist Search', function() {
     });
 
 
-    it('should change variable type and find one task', function(done) {
+    it('should change variable type and find one task', function() {
 
       // when
       page.taskList.taskSearch.changeType(0, 'Task Variable');
@@ -49,7 +50,7 @@ describe('Tasklist Search', function() {
     });
 
 
-    it('should change operator and find two tasks', function(done) {
+    it('should change operator and find two tasks', function() {
 
       // when
       page.taskList.taskSearch.changeOperator(0, '<=');
@@ -63,7 +64,7 @@ describe('Tasklist Search', function() {
 
   describe('add more search pills', function() {
 
-    it('should add Date search and find one task', function(done) {
+    it('should add Date search and find one task', function() {
 
       // when
       page.taskList.taskSearch.createSearch('Task Variable', 'testDate', 'before', '2013-11-30T10:03:00');
@@ -74,7 +75,7 @@ describe('Tasklist Search', function() {
     });
 
 
-    it('should change operator and find two task', function(done) {
+    it('should change operator and find two task', function() {
 
       // when
       page.taskList.taskSearch.changeOperator(1, 'after');
@@ -85,7 +86,7 @@ describe('Tasklist Search', function() {
     });
 
 
-    it('should add String search and find Task 2', function(done) {
+    it('should add String search and find Task 2', function() {
 
       // when
       page.taskList.taskSearch.createSearch('Task Variable', 'testString', 'like', 'hans');
@@ -96,18 +97,7 @@ describe('Tasklist Search', function() {
     });
 
 
-    xit('should change String search value and find Task 3', function(done) {
-
-      // when
-      page.taskList.taskSearch.changeValue(2, '4711');
-
-      // then
-      expect(page.taskList.taskList().count()).to.eventually.eql(1);
-      expect(page.taskList.taskName(0)).to.eventually.eql('Task 3');
-    });
-
-
-    it('should keep search pills after page refresh', function(done) {
+    it('should keep search pills after page refresh', function() {
 
       // when
       browser.refresh();
@@ -115,6 +105,17 @@ describe('Tasklist Search', function() {
       // then
       expect(page.taskList.taskList().count()).to.eventually.eql(1);
       expect(page.taskList.taskName(0)).to.eventually.eql('Task 2');
+    });
+
+    // skip related to CAM-3620
+    it.skip('should change String search value and find Task 1', function() {
+
+      // when
+      page.taskList.taskSearch.changeValue(2, '4711');
+
+      // then
+      expect(page.taskList.taskList().count()).to.eventually.eql(1);
+      expect(page.taskList.taskName(0)).to.eventually.eql('Task 1');
     });
   });
 

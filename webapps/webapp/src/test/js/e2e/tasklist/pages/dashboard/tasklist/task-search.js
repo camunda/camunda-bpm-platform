@@ -15,9 +15,13 @@ module.exports = Page.extend({
     return this.formElement().all(by.repeater('search in searches'));
   },
 
+  variableTypeDropdown: function(type) {
+    return this.formElement().element(by.cssContainingText('ul > li', type));
+  },
+
   createSearch: function(type, name, operator, value) {
     this.formElement().element(by.css('.main-field')).click();
-    this.formElement().element(by.cssContainingText('ul > li', type)).click();
+    this.variableTypeDropdown(type).click();
     this.searchList().last().element(by.model('editValue')).sendKeys(name, protractor.Key.ENTER);
     this.searchList().last().element(by.model('editValue')).sendKeys(value, protractor.Key.ENTER);
     this.searchList().last().element(by.css('[value="operator.value"]')).click();

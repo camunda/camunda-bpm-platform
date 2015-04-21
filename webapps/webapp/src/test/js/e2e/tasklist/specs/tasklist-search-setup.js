@@ -97,16 +97,16 @@ ops.task = {
       type: 'Date'
     },
     {
-      id: '2',
-      varId: 'testString',
-      value: 'asdfhans dampf',
-      type: 'String'
-    },
-    {
-      id: '3',
+      id: '1',
       varId: 'testString',
       value: '4711',
       type: 'String'
     },
+    {
+      id: '2',
+      varId: 'testString',
+      value: 'asdfhans dampf',
+      type: 'String'
+    }
   ]
 };
