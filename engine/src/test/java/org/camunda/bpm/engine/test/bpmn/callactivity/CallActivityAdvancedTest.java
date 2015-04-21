@@ -36,6 +36,7 @@ import org.camunda.bpm.engine.task.TaskQuery;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.value.TypedValue;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.builder.CallActivityBuilder;
@@ -341,6 +342,88 @@ public class CallActivityAdvancedTest extends PluggableProcessEngineTestCase {
 
     // and end last task in Super process
     taskService.complete(taskAfterSecondSubProcess.getId());
+
+    assertProcessEnded(processInstance.getId());
+    assertEquals(0, runtimeService.createExecutionQuery().list().size());
+  }
+  
+  /**
+   * Test case for handing over process variables to a sub process via the typed api and passing only certain variables
+   */
+  @Deployment(resources = {
+    "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testSubProcessLimitedDataInputOutputTypedApi.bpmn20.xml",
+    "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml" })
+  public void testSubProcessWithLimitedDataInputOutputTypedApi() {
+    
+    
+    TypedValue superVariable = Variables.stringValue(null);
+    VariableMap vars = Variables.createVariables();
+    vars.putValueTyped("superVariable", superVariable);
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("subProcessDataInputOutput", vars);
+
+    // one task in the subprocess should be active after starting the process instance
+    TaskQuery taskQuery = taskService.createTaskQuery();
+    Task taskInSubProcess = taskQuery.singleResult();
+    assertThat(taskInSubProcess.getName(), is("Task in subprocess"));
+    assertThat(runtimeService.getVariableTyped(taskInSubProcess.getProcessInstanceId(), "subVariable"), is(superVariable));
+    assertThat(taskService.getVariableTyped(taskInSubProcess.getId(), "subVariable"), is(superVariable));
+
+    TypedValue subVariable = Variables.stringValue(null);
+    runtimeService.setVariable(taskInSubProcess.getProcessInstanceId(), "subVariable", subVariable);
+
+    // super variable is unchanged
+    assertThat(runtimeService.getVariableTyped(processInstance.getId(), "superVariable"), is(superVariable));
+
+    // Completing this task ends the subprocess which leads to a task in the super process
+    taskService.complete(taskInSubProcess.getId());
+
+    Task taskAfterSubProcess = taskQuery.singleResult();
+    assertThat(taskAfterSubProcess.getName(), is("Task in super process"));
+    assertThat(runtimeService.getVariableTyped(processInstance.getId(), "superVariable"), is(subVariable));
+    assertThat(taskService.getVariableTyped(taskAfterSubProcess.getId(), "superVariable"), is(subVariable));
+
+    // Completing this task ends the super process which leads to a task in the super process
+    taskService.complete(taskAfterSubProcess.getId());
+
+    assertProcessEnded(processInstance.getId());
+    assertEquals(0, runtimeService.createExecutionQuery().list().size());
+  }
+  
+  /**
+   * Test case for handing over process variables to a sub process via the typed api and passing all variables
+   */
+  @Deployment(resources = {
+    "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testSubProcessAllDataInputOutputTypedApi.bpmn20.xml",
+    "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml" })
+  public void testSubProcessWithAllDataInputOutputTypedApi() {
+    
+    TypedValue superVariable = Variables.stringValue(null);
+    VariableMap vars = Variables.createVariables();
+    vars.putValueTyped("superVariable", superVariable);
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("subProcessDataInputOutput", vars);
+
+    // one task in the subprocess should be active after starting the process instance
+    TaskQuery taskQuery = taskService.createTaskQuery();
+    Task taskInSubProcess = taskQuery.singleResult();
+    assertThat(taskInSubProcess.getName(), is("Task in subprocess"));
+    assertThat(runtimeService.getVariableTyped(taskInSubProcess.getProcessInstanceId(), "superVariable"), is(superVariable));
+    assertThat(taskService.getVariableTyped(taskInSubProcess.getId(), "superVariable"), is(superVariable));
+
+    TypedValue subVariable = Variables.stringValue(null);
+    runtimeService.setVariable(taskInSubProcess.getProcessInstanceId(), "subVariable", subVariable);
+
+    // Completing this task ends the subprocess which leads to a task in the super process
+    taskService.complete(taskInSubProcess.getId());
+
+    Task taskAfterSubProcess = taskQuery.singleResult();
+    assertThat(taskAfterSubProcess.getName(), is("Task in super process"));
+    assertThat(runtimeService.getVariableTyped(processInstance.getId(), "subVariable"), is(subVariable));
+    assertThat(taskService.getVariableTyped(taskAfterSubProcess.getId(), "superVariable"), is(superVariable));
+
+    // Completing this task ends the super process which leads to a task in the super process
+    taskService.complete(taskAfterSubProcess.getId());
 
     assertProcessEnded(processInstance.getId());
     assertEquals(0, runtimeService.createExecutionQuery().list().size());

@@ -18,9 +18,9 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.VariableScope;
-import org.camunda.bpm.engine.impl.core.variable.VariableMapImpl;
 import org.camunda.bpm.engine.impl.core.variable.mapping.value.ParameterValueProvider;
 import org.camunda.bpm.engine.variable.VariableMap;
+import org.camunda.bpm.engine.variable.Variables;
 
 /**
  * @author Roman Smirnov
@@ -193,7 +193,7 @@ public class CallableElement {
   // variables //////////////////////////////////////////////////////////////////
 
   protected VariableMap getVariables(List<CallableElementParameter> params, VariableScope variableScope) {
-    VariableMap result = new VariableMapImpl();
+    VariableMap result = Variables.createVariables();
 
     for (CallableElementParameter param : params) {
 
