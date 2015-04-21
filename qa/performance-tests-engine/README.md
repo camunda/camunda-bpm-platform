@@ -10,7 +10,7 @@ This testsuite allows running different kinds of performance tests against the p
    1. [Database](#configuration-database)
    2. [History](#configuration-history)
 
-> **Design Rationale**: This testsuite does not try to produce absolute numbers. The goal is not to produce numbers that show "how fast the process engine is". On the contrary, the idea is to produce relative numbers that can be compared over time. The benchmarks allow us to get a sense of whether a certain change to the codebase made the process engine faster or slower compared to the numbers we were getting before. Other performance tests like the Sql Statement Log are meant to serve as a tool for gaining insight into the inner workings of the perocess engine and may be used for tracking down the source of performance degradations or for finding potential for optimization.
+> **Design Rationale**: This testsuite does not try to produce absolute numbers. The goal is not to produce numbers that show "how fast the process engine is". On the contrary, the idea is to produce relative numbers that can be compared over time. The benchmarks allow us to get a sense of whether a certain change to the codebase made the process engine faster or slower compared to the numbers we were getting before. Other performance tests like the Sql Statement Log are meant to serve as a tool for gaining insight into the inner workings of the process engine and may be used for tracking down the source of performance degradations or for finding potential for optimization.
 
 <a name="benchmark"></a>
 ## The Benchmark
