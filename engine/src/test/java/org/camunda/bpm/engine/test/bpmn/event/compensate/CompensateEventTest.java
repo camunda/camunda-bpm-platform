@@ -13,6 +13,9 @@
 
 package org.camunda.bpm.engine.test.bpmn.event.compensate;
 
+import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.assertThat;
+import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.describeActivityInstanceTree;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -69,6 +72,20 @@ public class CompensateEventTest extends PluggableProcessEngineTestCase {
 
     List<Task> compensationHandlerTasks = taskService.createTaskQuery().taskDefinitionKey("undoBookHotel").list();
     assertEquals(5, compensationHandlerTasks.size());
+
+    assertThat(
+      describeActivityInstanceTree(processInstance.getId())
+        .activity("parallelTask")
+        .beginScope("throwCompensate")
+          .beginScope("scope")
+            .activity("undoBookHotel")
+            .activity("undoBookHotel")
+            .activity("undoBookHotel")
+            .activity("undoBookHotel")
+            .activity("undoBookHotel")
+        .done()
+        );
+
 
     ActivityInstance rootActivityInstance = runtimeService.getActivityInstance(processInstance.getId());
     List<ActivityInstance> compensationHandlerInstances = getInstancesForActivityId(rootActivityInstance, "undoBookHotel");

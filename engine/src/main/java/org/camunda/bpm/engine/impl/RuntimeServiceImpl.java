@@ -27,6 +27,7 @@ import org.camunda.bpm.engine.impl.cmd.CorrelateMessageCmd;
 import org.camunda.bpm.engine.impl.cmd.DeleteProcessInstanceCmd;
 import org.camunda.bpm.engine.impl.cmd.FindActiveActivityIdsCmd;
 import org.camunda.bpm.engine.impl.cmd.GetActivityInstanceCmd;
+import org.camunda.bpm.engine.impl.cmd.GetActivityInstanceCmd;
 import org.camunda.bpm.engine.impl.cmd.GetExecutionVariableCmd;
 import org.camunda.bpm.engine.impl.cmd.GetExecutionVariableTypedCmd;
 import org.camunda.bpm.engine.impl.cmd.GetExecutionVariablesCmd;
@@ -328,19 +329,19 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
   public ProcessInstance startProcessInstanceByMessageAndProcessDefinitionId(String messageName, String processDefinitionId) {
 	return commandExecutor.execute(new StartProcessInstanceByMessageAndProcessDefinitionIdCmd(messageName,processDefinitionId, null, null));
   }
-  
+
   public ProcessInstance startProcessInstanceByMessageAndProcessDefinitionId(String messageName, String processDefinitionId, String businessKey) {
 	return commandExecutor.execute(new StartProcessInstanceByMessageAndProcessDefinitionIdCmd(messageName,processDefinitionId, businessKey, null));
   }
-  
+
   public ProcessInstance startProcessInstanceByMessageAndProcessDefinitionId(String messageName, String processDefinitionId, Map<String, Object> processVariables) {
 	return commandExecutor.execute(new StartProcessInstanceByMessageAndProcessDefinitionIdCmd(messageName,processDefinitionId, null, processVariables));
   }
-  
+
   public ProcessInstance startProcessInstanceByMessageAndProcessDefinitionId(String messageName, String processDefinitionId, String businessKey, Map<String, Object> processVariables) {
 	return commandExecutor.execute(new StartProcessInstanceByMessageAndProcessDefinitionIdCmd(messageName,processDefinitionId, businessKey, processVariables));
   }
-  
+
   public void signalEventReceived(String signalName) {
     commandExecutor.execute(new SignalEventReceivedCmd(signalName, null, null));
   }

@@ -22,6 +22,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
 import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
@@ -546,6 +547,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     }
 
     PvmActivity activityImpl = (PvmActivity) activity;
+    setActive(true);
     switch (activityStartBehavior) {
     case CONCURRENT_IN_FLOW_SCOPE:
       this.nextActivity = activityImpl;
@@ -681,6 +683,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
 
     this.skipCustomListeners = skipCustomListeners;
     this.skipIoMapping = skipIoMappings;
+    this.activityInstanceId = null;
 
     if (!activityStack.isEmpty()) {
       ExecutionStartContext executionStartContext = new ExecutionStartContext(false);
@@ -1020,14 +1023,15 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
       return getId();
 
     } else {
-      ActivityImpl currentActivity = getActivity();
-      if (activityInstanceId == null || (currentActivity != null && !currentActivity.isScope())) {
-        PvmExecutionImpl parent = getParent();
-        return parent.getActivityInstanceId();
+      PvmExecutionImpl parent = getParent();
+      // with compensation, the execution tree is misaligned to the activity
+      // (and therefore activity instance tree): the parent of a compensating execution is the compensation throwing execution,
+      // although the actual parent execution *should* the parent's parent
+      if (parent.isCompensationThrowing()) {
+        return parent.getParentActivityInstanceId();
       }
       else {
-        PvmExecutionImpl parentScopeExecution = getParentScopeExecution(false);
-        return parentScopeExecution.getActivityInstanceId();
+        return parent.getActivityInstanceId();
       }
     }
   }
@@ -1147,13 +1151,51 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     ScopeImpl currentActivity = getActivity();
     EnsureUtil.ensureNotNull("activity of current execution", currentActivity);
 
-    // if this is a scope execution currently executing a non scope activity
-    currentActivity = currentActivity.isScope() ? currentActivity : currentActivity.getFlowScope();
+    // if
+    // - this is a scope execution currently executing a non scope activity
+    // - or it is asyncBefore/asyncAfter
+    if (!currentActivity.isScope() || activityInstanceId == null) {
+      currentActivity = currentActivity.getFlowScope();
+    }
     currentActivity = LegacyBehavior.get().normalizeSecondNonScope(currentActivity);
 
-    PvmExecutionImpl scopeExecution = isScope() ? this : getParent();
+    PvmExecutionImpl scopeExecution = getFlowScopeExecution();
 
     return scopeExecution.createActivityExecutionMapping(currentActivity);
+  }
+
+  protected PvmExecutionImpl getFlowScopeExecution() {
+    ActivityImpl currentActivity = getActivity();
+    if (!isScope || (currentActivity != null && isCompensationHandler(currentActivity) && !currentActivity.isScope())) {
+      // recursion is necessary since there may be more than one concurrent execution in the presence of compensating executions
+      // that compensate non-scope activities contained in the same flow scope as the throwing compensation event
+      return getParent().getFlowScopeExecution();
+    }
+    else {
+      return this;
+    }
+  }
+
+  protected boolean isCompensationHandler(ScopeImpl activity) {
+    Boolean isForCompensation = (Boolean) activity.getProperty(BpmnParse.PROPERTYNAME_IS_FOR_COMPENSATION);
+    if (isForCompensation != null && isForCompensation) {
+      return true;
+    }
+    else {
+      return false;
+    }
+  }
+
+  public boolean isCompensationThrowing() {
+    ActivityImpl currentActivity = getActivity();
+    if (currentActivity != null) {
+      Boolean isCompensationThrowing = (Boolean) currentActivity.getProperty(BpmnParse.PROPERTYNAME_THROWS_COMPENSATION);
+      if (isCompensationThrowing != null && isCompensationThrowing) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   public Map<ScopeImpl, PvmExecutionImpl> createActivityExecutionMapping(ScopeImpl currentScope) {

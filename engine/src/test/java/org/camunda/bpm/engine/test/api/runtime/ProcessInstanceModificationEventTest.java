@@ -342,8 +342,6 @@ public class ProcessInstanceModificationEventTest extends PluggableProcessEngine
 
     assertThat(updatedTree).hasStructure(
       describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-      // TODO: fix activity instance tree first, then remove next instruction
-        .activity("tx")
         .activity("afterCancellation")
         .activity("afterSuccess")
       .done());

@@ -30,13 +30,6 @@ public class PvmAtomicOperationTransitionCreateScope extends PvmAtomicOperationC
     return "transition-create-scope";
   }
 
-  public void execute(PvmExecutionImpl execution) {
-
-    // reset activity instance id before creating the scope
-    execution.setActivityInstanceId(execution.getParentActivityInstanceId());
-    super.execute(execution);
-  }
-
   protected void scopeCreated(PvmExecutionImpl execution) {
     execution.performOperation(TRANSITION_NOTIFY_LISTENER_START);
 

@@ -15,7 +15,9 @@ package org.camunda.bpm.engine.impl.bpmn.behavior;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
+import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 
 /**
@@ -30,6 +32,8 @@ public class ParallelMultiInstanceActivityBehavior extends MultiInstanceActivity
     setLoopVariable(execution, NUMBER_OF_INSTANCES, nrOfInstances);
     setLoopVariable(execution, NUMBER_OF_COMPLETED_INSTANCES, 0);
     setLoopVariable(execution, NUMBER_OF_ACTIVE_INSTANCES, nrOfInstances);
+    PvmActivity nestedActivity = execution.getActivity().getActivities().get(0);
+    execution.setActivity(null);
 
     // create the concurrent child executions
     List<ActivityExecution> concurrentExecutions = new ArrayList<ActivityExecution>();
@@ -45,7 +49,7 @@ public class ParallelMultiInstanceActivityBehavior extends MultiInstanceActivity
       ActivityExecution activityExecution = concurrentExecutions.get(i);
       // check for active execution: the completion condition may be satisfied before all executions are started
       if(activityExecution.isActive()) {
-        performInstance(activityExecution, i);
+        performInstance(activityExecution, nestedActivity, i);
       }
     }
 
@@ -65,6 +69,7 @@ public class ParallelMultiInstanceActivityBehavior extends MultiInstanceActivity
 
     // inactivate the concurrent execution
     endedExecution.inactivate();
+    endedExecution.setActivityInstanceId(null);
 
     // join
     scopeExecution.forceUpdate();
@@ -74,9 +79,16 @@ public class ParallelMultiInstanceActivityBehavior extends MultiInstanceActivity
 
       ArrayList<ActivityExecution> childExecutions = new ArrayList<ActivityExecution>(scopeExecution.getExecutions());
       for (ActivityExecution childExecution : childExecutions) {
-        ((PvmExecutionImpl)childExecution).deleteCascade("Multi instance completion condition satisfied.");
+        // delete all not-ended instances; these are either active (for non-scope tasks) or inactive but have no activity id (for subprocesses, etc.)
+        if (childExecution.isActive() || childExecution.getActivity() == null) {
+          ((PvmExecutionImpl)childExecution).deleteCascade("Multi instance completion condition satisfied.");
+        }
+        else {
+          childExecution.remove();
+        }
       }
 
+      scopeExecution.setActivity((PvmActivity) endedExecution.getActivity().getFlowScope());
       scopeExecution.setActive(true);
       leave(scopeExecution);
     }

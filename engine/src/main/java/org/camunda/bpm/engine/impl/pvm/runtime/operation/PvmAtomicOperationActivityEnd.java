@@ -77,7 +77,6 @@ public class PvmAtomicOperationActivityEnd implements PvmAtomicOperation {
     else {
       // 2. flowScope != process definition
       PvmActivity flowScopeActivity = (PvmActivity) flowScope;
-      propagatingExecution.setActivity(flowScopeActivity);
 
       ActivityBehavior activityBehavior = flowScopeActivity.getActivityBehavior();
       if (activityBehavior instanceof CompositeActivityBehavior) {
@@ -88,6 +87,7 @@ public class PvmAtomicOperationActivityEnd implements PvmAtomicOperation {
         }
         else {
           // 2.2 Scope Execution => composite behavior.complete()
+          propagatingExecution.setActivity(flowScopeActivity);
           compositeActivityBehavior.complete(propagatingExecution);
         }
 

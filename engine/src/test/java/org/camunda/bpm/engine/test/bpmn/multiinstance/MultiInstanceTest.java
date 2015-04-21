@@ -44,6 +44,7 @@ import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.bpmn.event.error.ThrowErrorDelegate;
+import org.camunda.bpm.engine.test.util.ActivityInstanceAssert;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 
@@ -1170,6 +1171,8 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("miNestedMultiInstanceTasks", variableMap);
 
+    ActivityInstance activityInstance = runtimeService.getActivityInstance(processInstance.getId());
+
     List<Task> tasks = taskService.createTaskQuery().list();
     assertEquals(processes.size() * assignees.size(), tasks.size());
 
@@ -1180,6 +1183,38 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
     List<ProcessInstance> processInstances = runtimeService.createProcessInstanceQuery().processDefinitionKey("miNestedMultiInstanceTasks").list();
     assertEquals(0, processInstances.size());
     assertProcessEnded(processInstance.getId());
+  }
+
+  @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testNestedMultiInstanceTasks.bpmn20.xml"})
+  public void testNestedMultiInstanceTasksActivityInstance() {
+    List<String> processes = Arrays.asList("process A", "process B");
+    List<String> assignees = Arrays.asList("kermit", "gonzo");
+    Map<String, Object> variableMap = new HashMap<String, Object>();
+    variableMap.put("subProcesses", processes);
+    variableMap.put("assignees", assignees);
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("miNestedMultiInstanceTasks", variableMap);
+
+    ActivityInstance activityInstance = runtimeService.getActivityInstance(processInstance.getId());
+    ActivityInstanceAssert.assertThat(activityInstance)
+    .hasStructure(
+        ActivityInstanceAssert
+        .describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+        .beginMiBody("subprocess1")
+          .beginScope("subprocess1")
+            .beginMiBody("miTasks")
+              .activity("miTasks")
+              .activity("miTasks")
+            .endScope()
+          .endScope()
+          .beginScope("subprocess1")
+            .beginMiBody("miTasks")
+              .activity("miTasks")
+              .activity("miTasks")
+            .endScope()
+          .endScope()
+        .done());
+
   }
 
 

@@ -13,6 +13,9 @@
 
 package org.camunda.bpm.engine.test.bpmn.subprocess.transaction;
 
+import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.assertThat;
+import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.describeActivityInstanceTree;
+
 import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
@@ -135,15 +138,18 @@ public class TransactionSubProcessTest extends PluggableProcessEngineTestCase {
     assertEquals(5, undoBookHotelInstances.size());
     assertEquals(1, undoBookFlightInstances.size());
 
-    ActivityInstance txActivityInstance = rootActivityInstance.getChildActivityInstances()[0];
-    assertEquals("tx", txActivityInstance.getActivityId());
-
-    // failure end event instance
-    assertEquals(1, txActivityInstance.getChildActivityInstances().length);
-    ActivityInstance failureEndEventInstance = txActivityInstance.getChildActivityInstances()[0];
-
-    // compensation task instances
-    assertEquals(6, failureEndEventInstance.getChildActivityInstances().length);
+    assertThat(
+        describeActivityInstanceTree(processInstance.getId())
+          .beginScope("tx")
+            .activity("failure")
+            .activity("undoBookHotel")
+            .activity("undoBookHotel")
+            .activity("undoBookHotel")
+            .activity("undoBookHotel")
+            .activity("undoBookHotel")
+            .activity("undoBookFlight")
+          .done()
+          );
 
     for (Task t : undoBookHotel) {
       taskService.complete(t.getId());

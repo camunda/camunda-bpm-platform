@@ -27,6 +27,7 @@ import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.bpmn.subprocess.util.GetActInstanceDelegate;
+import org.camunda.bpm.engine.test.util.ActivityInstanceAssert;
 
 
 /**
@@ -389,17 +390,17 @@ public class SubProcessTest extends PluggableProcessEngineTestCase {
 
     // validate activity instance tree
     ActivityInstance rootActivityInstance = runtimeService.getActivityInstance(pi.getProcessInstanceId());
-    assertEquals(pi.getProcessDefinitionId(), rootActivityInstance.getActivityId());
-    assertEquals(1, rootActivityInstance.getChildActivityInstances().length);
-    ActivityInstance outerSubProcessInstance = rootActivityInstance.getChildActivityInstances()[0];
-    assertEquals("outerSubProcess", outerSubProcessInstance.getActivityId());
-    ActivityInstance[] childActivityInstances = outerSubProcessInstance.getChildActivityInstances();
-    for (ActivityInstance activityInstance : childActivityInstances) {
-      assertTrue(Arrays.asList(new String[]{"subProcessA", "subProcessB"}).contains(activityInstance.getActivityId()));
-      ActivityInstance[] subProcessChildren = activityInstance.getChildActivityInstances();
-      assertEquals(1, subProcessChildren.length);
-      assertTrue(Arrays.asList(new String[]{"subProcessATask", "subProcessBTask"}).contains(subProcessChildren[0].getActivityId()));
-    }
+    ActivityInstanceAssert.assertThat(rootActivityInstance)
+    .hasStructure(
+        ActivityInstanceAssert
+        .describeActivityInstanceTree(pi.getProcessDefinitionId())
+          .beginScope("outerSubProcess")
+            .beginScope("subProcessA")
+              .activity("subProcessATask")
+            .endScope()
+            .beginScope("subProcessB")
+              .activity("subProcessBTask")
+        .done());
 
     // Completing both tasks should active the tasks outside the subprocesses
     taskService.complete(taskA.getId());

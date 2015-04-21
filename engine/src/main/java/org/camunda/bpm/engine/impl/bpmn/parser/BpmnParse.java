@@ -169,7 +169,7 @@ public class BpmnParse extends Parse {
   public static final String PROPERTYNAME_EVENT_SUBSCRIPTION_DECLARATION = "eventDefinitions";
   public static final String PROPERTYNAME_TRIGGERED_BY_EVENT = "triggeredByEvent";
   public static final String PROPERTYNAME_TYPE = "type";
-  public static final String PROPERTYNAME_ERRORCODE_VARIABLE = "errorCodeVariable";
+  public static final String PROPERTYNAME_THROWS_COMPENSATION = "throwsCompensation";
   public static final String PROPERTYNAME_CONSUMES_COMPENSATION = "consumesCompensation";
 
   /* process start authorization specific finals */
@@ -917,7 +917,7 @@ public class BpmnParse extends Parse {
    * @param definition the errorEventDefintion that can get the errorCodeVariable value
    */
   protected void setErrorCodeVariableOnErrorEventDefinition(Element errorEventDefinition, ErrorEventDefinition definition) {
-    String errorCodeVar = errorEventDefinition.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, PROPERTYNAME_ERRORCODE_VARIABLE);
+    String errorCodeVar = errorEventDefinition.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "errorCodeVariable");
     if(errorCodeVar != null){
       definition.setErrorCodeVariable(errorCodeVar);
     }
@@ -1230,6 +1230,7 @@ public class BpmnParse extends Parse {
       nestedActivityImpl.setProperty("type", "intermediateCompensationThrowEvent");
       CompensateEventDefinition compensateEventDefinition = parseCompensateEventDefinition(compensateEventDefinitionElement, scopeElement);
       activityBehavior = new IntermediateThrowCompensationEventActivityBehavior(compensateEventDefinition);
+      nestedActivityImpl.setProperty(PROPERTYNAME_THROWS_COMPENSATION, true);
     } else if (messageEventDefinitionElement != null) {
       if (isServiceTaskLike(messageEventDefinitionElement)) {
 
@@ -2343,6 +2344,7 @@ public class BpmnParse extends Parse {
           activity.setProperty("type", "cancelEndEvent");
           activity.setActivityBehavior(new CancelEndEventActivityBehavior());
           activity.setActivityStartBehavior(ActivityStartBehavior.INTERRUPT_FLOW_SCOPE);
+          activity.setProperty(PROPERTYNAME_THROWS_COMPENSATION, true);
         }
       } else if (terminateEventDefinition != null) {
         activity.setProperty("type", "terminateEndEvent");

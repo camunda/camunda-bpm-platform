@@ -57,23 +57,23 @@ public class ProcessInstanceModificationHistoryTest extends PluggableProcessEngi
     HistoricDetail procInstanceVarDetail = historyService.createHistoricDetailQuery()
         .variableInstanceId(procInstVariable.getId()).singleResult();
     assertNotNull(procInstanceVarDetail);
-    // current limitation: the variables do not appear in the history as if they
-    // were set from within the activity to be started
-    assertEquals(updatedTree.getId(), procInstanceVarDetail.getActivityInstanceId());
+    // when starting before/after an activity instance, the activity instance id of the
+    // execution is null and so is the activity instance id of the historic detail
+    assertNull(procInstanceVarDetail.getActivityInstanceId());
 
     HistoricVariableInstance localVariable = historyService.createHistoricVariableInstanceQuery()
       .variableName("localVar")
       .singleResult();
 
     assertNotNull(localVariable);
-    assertEquals(updatedTree.getId(), localVariable.getActivityInstanceId());
+    assertNull(localVariable.getActivityInstanceId());
     assertEquals("localVar", localVariable.getName());
     assertEquals("localValue", localVariable.getValue());
 
     HistoricDetail localInstanceVarDetail = historyService.createHistoricDetailQuery()
         .variableInstanceId(localVariable.getId()).singleResult();
     assertNotNull(localInstanceVarDetail);
-    assertEquals(updatedTree.getId(), localInstanceVarDetail.getActivityInstanceId());
+    assertNull(localInstanceVarDetail.getActivityInstanceId());
 
     completeTasksInOrder("task1", "task2");
     assertProcessEnded(processInstance.getId());
@@ -105,23 +105,23 @@ public class ProcessInstanceModificationHistoryTest extends PluggableProcessEngi
     HistoricDetail procInstanceVarDetail = historyService.createHistoricDetailQuery()
         .variableInstanceId(procInstVariable.getId()).singleResult();
     assertNotNull(procInstanceVarDetail);
-    // current limitation: the variables do not appear in the history as if they
-    // were set from within the activity to be started
-    assertEquals(updatedTree.getId(), procInstanceVarDetail.getActivityInstanceId());
+    // when starting before/after an activity instance, the activity instance id of the
+    // execution is null and so is the activity instance id of the historic detail
+    assertNull(procInstanceVarDetail.getActivityInstanceId());
 
     HistoricVariableInstance localVariable = historyService.createHistoricVariableInstanceQuery()
       .variableName("localVar")
       .singleResult();
 
     assertNotNull(localVariable);
-    assertEquals(updatedTree.getId(), localVariable.getActivityInstanceId());
+    assertNull(localVariable.getActivityInstanceId());
     assertEquals("localVar", localVariable.getName());
     assertEquals("localValue", localVariable.getValue());
 
     HistoricDetail localInstanceVarDetail = historyService.createHistoricDetailQuery()
         .variableInstanceId(localVariable.getId()).singleResult();
     assertNotNull(localInstanceVarDetail);
-    assertEquals(updatedTree.getId(), localInstanceVarDetail.getActivityInstanceId());
+    assertNull(localInstanceVarDetail.getActivityInstanceId());
 
     // end process instance
     completeTasksInOrder("task1");
@@ -173,7 +173,9 @@ public class ProcessInstanceModificationHistoryTest extends PluggableProcessEngi
     HistoricDetail localInstanceVarDetail = historyService.createHistoricDetailQuery()
         .variableInstanceId(localVariable.getId()).singleResult();
     assertNotNull(localInstanceVarDetail);
-    assertEquals(updatedTree.getId(), localInstanceVarDetail.getActivityInstanceId());
+    // when starting before/after an activity instance, the activity instance id of the
+    // execution is null and so is the activity instance id of the historic detail
+    assertNull(localInstanceVarDetail.getActivityInstanceId());
 
     completeTasksInOrder("task1", "task1");
     assertProcessEnded(processInstance.getId());

@@ -22,6 +22,7 @@ import java.util.logging.Logger;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.Expression;
+import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.engine.impl.pvm.delegate.CompositeActivityBehavior;
 import org.camunda.bpm.engine.variable.value.IntegerValue;
@@ -66,10 +67,10 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
     }
   }
 
-  protected void performInstance(ActivityExecution execution, int loopCounter) {
+  protected void performInstance(ActivityExecution execution, PvmActivity activity, int loopCounter) {
     setLoopVariable(execution, LOOP_COUNTER, loopCounter);
     evaluateCollectionVariable(execution, loopCounter);
-    execution.executeActivity(execution.getActivity().getActivities().get(0));
+    execution.executeActivity(activity);
   }
 
   protected void evaluateCollectionVariable(ActivityExecution execution, int loopCounter) {

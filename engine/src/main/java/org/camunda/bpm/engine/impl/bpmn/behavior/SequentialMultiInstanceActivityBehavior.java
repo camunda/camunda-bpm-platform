@@ -27,7 +27,7 @@ public class SequentialMultiInstanceActivityBehavior extends MultiInstanceActivi
     setLoopVariable(execution, NUMBER_OF_COMPLETED_INSTANCES, 0);
     setLoopVariable(execution, NUMBER_OF_ACTIVE_INSTANCES, 1);
 
-    performInstance(execution, 0);
+    performInstance(execution, execution.getActivity().getActivities().get(0), 0);
   }
 
   public void complete(ActivityExecution scopeExecution) {
@@ -41,7 +41,7 @@ public class SequentialMultiInstanceActivityBehavior extends MultiInstanceActivi
       leave(scopeExecution);
     }
     else {
-      performInstance(scopeExecution, loopCounter);
+      performInstance(scopeExecution, scopeExecution.getActivity().getActivities().get(0), loopCounter);
     }
   }
 
