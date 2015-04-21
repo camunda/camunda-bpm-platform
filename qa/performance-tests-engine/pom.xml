@@ -64,9 +64,8 @@
       </build>
     </profile>
 
+    <!-- the benchmark performs multiple runs of the same process on multiple threads. -->
     <profile>
-
-      <!-- the benchmark performs multiple runs of the same process on multiple threads. -->
       <id>benchmark</id>
 
       <properties>
@@ -126,9 +125,8 @@
 
     </profile>
 
-     <profile>
-
-      <!-- Allows to log the process engine's interaction with the database -->
+    <!-- Allows to log the process engine's interaction with the database -->
+    <profile>
       <id>sql-statementlog</id>
 
       <properties>
