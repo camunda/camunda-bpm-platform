@@ -62,7 +62,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   protected String candidateUser;
   protected String candidateGroup;
   protected List<String> candidateGroups;
-  protected boolean includeAssignedTasks = false;
+  protected Boolean includeAssignedTasks;
   protected String processInstanceId;
   protected String executionId;
   protected String[] activityInstanceIdIn;
@@ -959,7 +959,11 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
     return candidateGroup;
   }
 
-  public boolean isIncludeAssignedTasks(){
+  public boolean isIncludeAssignedTasks() {
+    return includeAssignedTasks != null ? includeAssignedTasks : false;
+  }
+
+  public Boolean isIncludeAssignedTasksInternal() {
     return includeAssignedTasks;
   }
 

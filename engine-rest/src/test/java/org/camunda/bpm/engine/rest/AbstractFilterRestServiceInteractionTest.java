@@ -334,7 +334,7 @@ public abstract class AbstractFilterRestServiceInteractionTest extends AbstractR
       .statusCode(Status.OK.getStatusCode())
       .body("query.candidateGroup", equalTo("abc"))
       .body("query.containsKey('candidateGroups')", is(false))
-      .body("query.includeAssignedTasks", is(false))
+      .body("query.containsKey('includeAssignedTasks')", is(false))
     .when()
       .get(SINGLE_FILTER_URL);
   }
@@ -352,7 +352,7 @@ public abstract class AbstractFilterRestServiceInteractionTest extends AbstractR
       .statusCode(Status.OK.getStatusCode())
       .body("query.candidateUser", equalTo("abc"))
       .body("query.containsKey('candidateGroups')", is(false))
-      .body("query.includeAssignedTasks", is(false))
+      .body("query.containsKey('includeAssignedTasks')", is(false))
   .when()
       .get(SINGLE_FILTER_URL);
   }

@@ -1235,7 +1235,7 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     dto.candidateUser = taskQuery.getCandidateUser();
     dto.candidateGroup = taskQuery.getCandidateGroup();
     dto.candidateGroups = taskQuery.getCandidateGroupsInternal();
-    dto.includeAssignedTasks = taskQuery.isIncludeAssignedTasks();
+    dto.includeAssignedTasks = taskQuery.isIncludeAssignedTasksInternal();
 
     dto.processInstanceBusinessKey = taskQuery.getProcessInstanceBusinessKey();
     dto.processInstanceBusinessKeyLike = taskQuery.getProcessInstanceBusinessKeyLike();

@@ -132,6 +132,7 @@ public class JsonTaskQueryConverter extends JsonObjectConverter<TaskQuery> {
     addField(json, CANDIDATE_USER, query.getCandidateUser());
     addField(json, CANDIDATE_GROUP, query.getCandidateGroup());
     addListField(json, CANDIDATE_GROUPS, query.getCandidateGroupsInternal());
+    addField(json, INCLUDE_ASSIGNED_TASKS, query.isIncludeAssignedTasksInternal());
     addField(json, PROCESS_INSTANCE_ID, query.getProcessInstanceId());
     addField(json, EXECUTION_ID, query.getExecutionId());
     addArrayField(json, ACTIVITY_INSTANCE_ID_IN, query.getActivityInstanceIdIn());

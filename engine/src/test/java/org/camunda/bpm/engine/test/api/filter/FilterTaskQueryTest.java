@@ -467,8 +467,8 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
     query.taskCandidateUser(testUser.getId());
     query.includeAssignedTasks();
 
-    filter.setQuery(query);
-    query = filter.getQuery();
+    saveQuery(query);
+    query = filterService.getFilter(filter.getId()).getQuery();
 
     assertEquals(testUser.getId(), query.getCandidateUser());
     assertTrue(query.isIncludeAssignedTasks());
