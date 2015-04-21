@@ -41,6 +41,16 @@ public interface ProcessApplicationDeploymentBuilder extends DeploymentBuilder {
    * previous versions of the deployment.</p>
    */
   ProcessApplicationDeploymentBuilder resumePreviousVersions();
+  
+  /**
+   * This method defines on what additional registrations will be based.
+   * The value will only be recognized if {@link #resumePreviousVersions()} is set.
+   * <p>
+   * @see ResumePreviousBy
+   * @see #resumePreviousVersions()
+   * @param resumeByProcessDefinitionKey one of the constants from {@link ResumePreviousBy}
+   */
+  ProcessApplicationDeploymentBuilder resumePreviousVersionsBy(String resumePreviousVersionsBy);
 
   /* {@inheritDoc} */
   ProcessApplicationDeployment deploy();

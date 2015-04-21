@@ -19,6 +19,7 @@ import java.util.Map;
  * <p>Java API representation of a ProcessArchive definition inside a processes.xml file</p>
  *
  * @author Daniel Meyer
+ * @author Ronny Bräunlich
  *
  */
 public interface ProcessArchiveXml {
@@ -88,6 +89,8 @@ public interface ProcessArchiveXml {
    */
   public static final String PROP_ADDITIONAL_RESOURCE_SUFFIXES = "additionalResourceSuffixes";
   public static final String PROP_ADDITIONAL_RESOURCE_SUFFIXES_SEPARATOR = ",";
+
+  public static final String PROP_RESUME_PREVIOUS_BY = "resumePreviousBy";
 
   /**
    * @return the name of the process archive. Must not be null.

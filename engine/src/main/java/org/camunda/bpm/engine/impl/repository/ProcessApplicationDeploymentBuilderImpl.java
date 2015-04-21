@@ -18,9 +18,9 @@ import java.util.zip.ZipInputStream;
 
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.engine.impl.RepositoryServiceImpl;
-import org.camunda.bpm.engine.repository.DeploymentBuilder;
 import org.camunda.bpm.engine.repository.ProcessApplicationDeployment;
 import org.camunda.bpm.engine.repository.ProcessApplicationDeploymentBuilder;
+import org.camunda.bpm.engine.repository.ResumePreviousBy;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 
 /**
@@ -33,6 +33,7 @@ public class ProcessApplicationDeploymentBuilderImpl extends DeploymentBuilderIm
 
   protected final ProcessApplicationReference processApplicationReference;
   protected boolean isResumePreviousVersions = false;
+  protected String resumePreviousVersionsBy = ResumePreviousBy.RESUME_BY_PROCESS_DEFINITION_KEY;
 
   public ProcessApplicationDeploymentBuilderImpl(RepositoryServiceImpl repositoryService, ProcessApplicationReference reference) {
     super(repositoryService);
@@ -44,6 +45,11 @@ public class ProcessApplicationDeploymentBuilderImpl extends DeploymentBuilderIm
     return this;
   }
 
+  @Override
+  public ProcessApplicationDeploymentBuilder resumePreviousVersionsBy(String resumePreviousVersionsBy) {
+    this.resumePreviousVersionsBy = resumePreviousVersionsBy;
+    return this;
+  }
   // overrides from parent ////////////////////////////////////////////////
 
   @Override
@@ -104,6 +110,10 @@ public class ProcessApplicationDeploymentBuilderImpl extends DeploymentBuilderIm
 
   public ProcessApplicationReference getProcessApplicationReference() {
     return processApplicationReference;
+  }
+  
+  public String getResumePreviousVersionsBy(){
+    return resumePreviousVersionsBy;
   }
 
 }

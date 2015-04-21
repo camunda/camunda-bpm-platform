@@ -12,10 +12,15 @@
  */
 package org.camunda.bpm.application.impl.deployment;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.junit.Assert.assertThat;
+
 import java.util.Map;
 
 import org.camunda.bpm.application.impl.metadata.spi.ProcessArchiveXml;
 import org.camunda.bpm.application.impl.metadata.spi.ProcessesXml;
+import org.camunda.bpm.engine.repository.ResumePreviousBy;
 
 import junit.framework.TestCase;
 
@@ -49,7 +54,7 @@ public class EmptyProcessesXmlTest extends TestCase {
     Map<String, String> properties = processArchiveXml.getProperties();
 
     assertNotNull(properties);
-    assertEquals(3, properties.size());
+    assertEquals(4, properties.size());
 
     String isDeleteUponUndeploy = properties.get(ProcessArchiveXml.PROP_IS_DELETE_UPON_UNDEPLOY);
     assertNotNull(isDeleteUponUndeploy);
@@ -62,6 +67,10 @@ public class EmptyProcessesXmlTest extends TestCase {
     String isDeployChangedOnly = properties.get(ProcessArchiveXml.PROP_IS_DEPLOY_CHANGED_ONLY);
     assertNotNull(isDeployChangedOnly);
     assertEquals(Boolean.FALSE.toString(), isDeployChangedOnly);
+    
+    String resumePreviousBy = properties.get(ProcessArchiveXml.PROP_RESUME_PREVIOUS_BY);
+    assertThat(resumePreviousBy, is(notNullValue()));
+    assertThat(resumePreviousBy, is(ResumePreviousBy.RESUME_BY_PROCESS_DEFINITION_KEY));
   }
 
 }
