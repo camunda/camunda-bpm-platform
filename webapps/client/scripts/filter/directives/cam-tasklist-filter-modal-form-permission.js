@@ -33,6 +33,9 @@ define([
       template: template,
 
       link: function ($scope, $element, attrs, parentCtrl) {
+        // by default, the fields for new permission are not shown
+        $scope.showNewPermissionFields = false;
+
         // if the fields of a new permission are filled and
         // the "permission" accordion part is being closed
         // this will add the permission
@@ -41,12 +44,16 @@ define([
           if (!$scope.disableAddButton() && !actual && previous) {
             $scope.addReadPermission();
           }
+          // hides the new permission fields again
+          $scope.showNewPermissionFields = false;
         });
 
         $scope.$on('pre-submit', function () {
           if (!$scope.disableAddButton()) {
             $scope.addReadPermission();
           }
+          // hides the new permission fields again
+          $scope.showNewPermissionFields = false;
         });
 
         // init //////////////////////////////////////////////////////////////////////////////
@@ -166,6 +173,8 @@ define([
 
         var validateNewPermission = $scope.validateNewPermission = function () {
           var control = getNewPermissionField();
+          // new permission fields might not be present when this function is called
+          if (!control) { return; }
 
           control.$setValidity('authorization', true);
           control.$setValidity('duplicate', true);
@@ -183,24 +192,22 @@ define([
           }
         };
 
-        // by default, the fields for new permission are not shown
-        var showNewPermissionFields;
-
         $scope.disableAddButton = function () {
+          // when the new permission fields are not yet present,
+          // the "Add permis." is aimed to make them visible
+          // (see addReadPermission below)
+          if (!$scope.showNewPermissionFields) { return false; }
+
           var control = getNewPermissionField();
-          if (!showNewPermissionFields) { return false; }
 
           return $scope.isGlobalReadAuthorization || !newPermission.id || (control && control.$error && control.$error.duplicate);
         };
 
-        $scope.showNewPermissionFields = function () {
-          return showNewPermissionFields;
-        };
 
         var addReadPermission = $scope.addReadPermission = function () {
           // the first click only adds the fields
-          if (!showNewPermissionFields) {
-            showNewPermissionFields = true;
+          if (!$scope.showNewPermissionFields) {
+            $scope.showNewPermissionFields = true;
             return;
           }
 
