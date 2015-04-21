@@ -183,13 +183,27 @@ define([
           }
         };
 
+        // by default, the fields for new permission are not shown
+        var showNewPermissionFields;
+
         $scope.disableAddButton = function () {
           var control = getNewPermissionField();
+          if (!showNewPermissionFields) { return false; }
 
           return $scope.isGlobalReadAuthorization || !newPermission.id || (control && control.$error && control.$error.duplicate);
         };
 
+        $scope.showNewPermissionFields = function () {
+          return showNewPermissionFields;
+        };
+
         var addReadPermission = $scope.addReadPermission = function () {
+          // the first click only adds the fields
+          if (!showNewPermissionFields) {
+            showNewPermissionFields = true;
+            return;
+          }
+
           var control = getNewPermissionField();
 
           var id = newPermission.id;
