@@ -57,31 +57,36 @@ public class TaskQueryExpressionTest extends PluggableProcessEngineTestCase {
     // shift time to force distinguishable create times
     adjustTime(2 * 60);
     Task anotherTask = createTestTask("anotherTask");
+    Task assignedCandidateTask = createTestTask("assignedCandidateTask");
 
     taskService.setOwner(task.getId(), user.getId());
     taskService.setAssignee(task.getId(), user.getId());
 
     taskService.addCandidateUser(anotherTask.getId(), user.getId());
     taskService.addCandidateGroup(anotherTask.getId(), group1.getId());
+
+    taskService.setAssignee(assignedCandidateTask.getId(), user.getId());
+    taskService.addCandidateUser(assignedCandidateTask.getId(), user.getId());
+    taskService.addCandidateGroup(assignedCandidateTask.getId(), group1.getId());
   }
 
   public void testQueryByAssigneeExpression() {
-    assertCount(taskQuery().taskAssigneeExpression("${'" + user.getId() + "'}"), 1);
+    assertCount(taskQuery().taskAssigneeExpression("${'" + user.getId() + "'}"), 2);
     assertCount(taskQuery().taskAssigneeExpression("${'" + anotherUser.getId() + "'}"), 0);
 
     setCurrentUser(user);
-    assertCount(taskQuery().taskAssigneeExpression("${currentUser()}"), 1);
+    assertCount(taskQuery().taskAssigneeExpression("${currentUser()}"), 2);
 
     setCurrentUser(anotherUser);
     assertCount(taskQuery().taskAssigneeExpression("${currentUser()}"), 0);
   }
 
   public void testQueryByAssigneeLikeExpression() {
-    assertCount(taskQuery().taskAssigneeLikeExpression("${'%" + user.getId().substring(2) + "'}"), 1);
+    assertCount(taskQuery().taskAssigneeLikeExpression("${'%" + user.getId().substring(2) + "'}"), 2);
     assertCount(taskQuery().taskAssigneeLikeExpression("${'%" + anotherUser.getId().substring(2) + "'}"), 0);
 
     setCurrentUser(user);
-    assertCount(taskQuery().taskAssigneeLikeExpression("${'%'.concat(currentUser())}"), 1);
+    assertCount(taskQuery().taskAssigneeLikeExpression("${'%'.concat(currentUser())}"), 2);
 
     setCurrentUser(anotherUser);
     assertCount(taskQuery().taskAssigneeLikeExpression("${'%'.concat(currentUser())}"), 0);
@@ -99,11 +104,11 @@ public class TaskQueryExpressionTest extends PluggableProcessEngineTestCase {
   }
 
   public void testQueryByInvolvedUserExpression() {
-    assertCount(taskQuery().taskInvolvedUserExpression("${'" + user.getId() + "'}"), 1);
+    assertCount(taskQuery().taskInvolvedUserExpression("${'" + user.getId() + "'}"), 2);
     assertCount(taskQuery().taskInvolvedUserExpression("${'" + anotherUser.getId() + "'}"), 0);
 
     setCurrentUser(user);
-    assertCount(taskQuery().taskInvolvedUserExpression("${currentUser()}"), 1);
+    assertCount(taskQuery().taskInvolvedUserExpression("${currentUser()}"), 2);
 
     setCurrentUser(anotherUser);
     assertCount(taskQuery().taskInvolvedUserExpression("${currentUser()}"), 0);
@@ -111,10 +116,12 @@ public class TaskQueryExpressionTest extends PluggableProcessEngineTestCase {
 
   public void testQueryByCandidateUserExpression() {
     assertCount(taskQuery().taskCandidateUserExpression("${'" + user.getId() + "'}"), 1);
+    assertCount(taskQuery().taskCandidateUserExpression("${'" + user.getId() + "'}").includeAssignedTasks(), 2);
     assertCount(taskQuery().taskCandidateUserExpression("${'" + anotherUser.getId() + "'}"), 0);
 
     setCurrentUser(user);
     assertCount(taskQuery().taskCandidateUserExpression("${currentUser()}"), 1);
+    assertCount(taskQuery().taskCandidateUserExpression("${currentUser()}").includeAssignedTasks(), 2);
 
     setCurrentUser(anotherUser);
     assertCount(taskQuery().taskCandidateUserExpression("${currentUser()}"), 0);
@@ -126,6 +133,7 @@ public class TaskQueryExpressionTest extends PluggableProcessEngineTestCase {
 
     setCurrentUser(user);
     assertCount(taskQuery().taskCandidateGroupExpression("${currentUserGroups()[0]}"), 1);
+    assertCount(taskQuery().taskCandidateGroupExpression("${currentUserGroups()[0]}").includeAssignedTasks(), 2);
 
     setCurrentUser(anotherUser);
     assertCount(taskQuery().taskCandidateGroupExpression("${currentUserGroups()[0]}"), 0);
@@ -134,6 +142,7 @@ public class TaskQueryExpressionTest extends PluggableProcessEngineTestCase {
   public void testQueryByCandidateGroupsExpression() {
     setCurrentUser(user);
     assertCount(taskQuery().taskCandidateGroupInExpression("${currentUserGroups()}"), 1);
+    assertCount(taskQuery().taskCandidateGroupInExpression("${currentUserGroups()}").includeAssignedTasks(), 2);
 
     setCurrentUser(anotherUser);
 
@@ -152,7 +161,7 @@ public class TaskQueryExpressionTest extends PluggableProcessEngineTestCase {
   public void testQueryByTaskCreatedBeforeExpression() {
     adjustTime(1);
 
-    assertCount(taskQuery().taskCreatedBeforeExpression("${now()}"), 2);
+    assertCount(taskQuery().taskCreatedBeforeExpression("${now()}"), 3);
 
     adjustTime(-5 * 60);
 
@@ -160,7 +169,7 @@ public class TaskQueryExpressionTest extends PluggableProcessEngineTestCase {
 
     setTime(task.getCreateTime());
 
-    assertCount(taskQuery().taskCreatedBeforeExpression("${dateTime().plusMonths(2)}"), 2);
+    assertCount(taskQuery().taskCreatedBeforeExpression("${dateTime().plusMonths(2)}"), 3);
 
     assertCount(taskQuery().taskCreatedBeforeExpression("${dateTime().minusYears(1)}"), 0);
   }
@@ -183,19 +192,19 @@ public class TaskQueryExpressionTest extends PluggableProcessEngineTestCase {
 
     adjustTime(-5 * 60);
 
-    assertCount(taskQuery().taskCreatedAfterExpression("${now()}"), 2);
+    assertCount(taskQuery().taskCreatedAfterExpression("${now()}"), 3);
 
     setTime(task.getCreateTime());
 
     assertCount(taskQuery().taskCreatedAfterExpression("${dateTime().plusMonths(2)}"), 0);
 
-    assertCount(taskQuery().taskCreatedAfterExpression("${dateTime().minusYears(1)}"), 2);
+    assertCount(taskQuery().taskCreatedAfterExpression("${dateTime().minusYears(1)}"), 3);
   }
 
   public void testQueryByDueBeforeExpression() {
     adjustTime(1);
 
-    assertCount(taskQuery().dueBeforeExpression("${now()}"), 2);
+    assertCount(taskQuery().dueBeforeExpression("${now()}"), 3);
 
     adjustTime(-5 * 60);
 
@@ -203,7 +212,7 @@ public class TaskQueryExpressionTest extends PluggableProcessEngineTestCase {
 
     setTime(task.getCreateTime());
 
-    assertCount(taskQuery().dueBeforeExpression("${dateTime().plusMonths(2)}"), 2);
+    assertCount(taskQuery().dueBeforeExpression("${dateTime().plusMonths(2)}"), 3);
 
     assertCount(taskQuery().dueBeforeExpression("${dateTime().minusYears(1)}"), 0);
   }
@@ -226,19 +235,19 @@ public class TaskQueryExpressionTest extends PluggableProcessEngineTestCase {
 
     adjustTime(-5 * 60);
 
-    assertCount(taskQuery().dueAfterExpression("${now()}"), 2);
+    assertCount(taskQuery().dueAfterExpression("${now()}"), 3);
 
     setTime(task.getCreateTime());
 
     assertCount(taskQuery().dueAfterExpression("${dateTime().plusMonths(2)}"), 0);
 
-    assertCount(taskQuery().dueAfterExpression("${dateTime().minusYears(1)}"), 2);
+    assertCount(taskQuery().dueAfterExpression("${dateTime().minusYears(1)}"), 3);
   }
 
   public void testQueryByFollowUpBeforeExpression() {
     adjustTime(1);
 
-    assertCount(taskQuery().followUpBeforeExpression("${now()}"), 2);
+    assertCount(taskQuery().followUpBeforeExpression("${now()}"), 3);
 
     adjustTime(-5 * 60);
 
@@ -246,7 +255,7 @@ public class TaskQueryExpressionTest extends PluggableProcessEngineTestCase {
 
     setTime(task.getCreateTime());
 
-    assertCount(taskQuery().followUpBeforeExpression("${dateTime().plusMonths(2)}"), 2);
+    assertCount(taskQuery().followUpBeforeExpression("${dateTime().plusMonths(2)}"), 3);
 
     assertCount(taskQuery().followUpBeforeExpression("${dateTime().minusYears(1)}"), 0);
   }
@@ -269,13 +278,13 @@ public class TaskQueryExpressionTest extends PluggableProcessEngineTestCase {
 
     adjustTime(-5 * 60);
 
-    assertCount(taskQuery().followUpAfterExpression("${now()}"), 2);
+    assertCount(taskQuery().followUpAfterExpression("${now()}"), 3);
 
     setTime(task.getCreateTime());
 
     assertCount(taskQuery().followUpAfterExpression("${dateTime().plusMonths(2)}"), 0);
 
-    assertCount(taskQuery().followUpAfterExpression("${dateTime().minusYears(1)}"), 2);
+    assertCount(taskQuery().followUpAfterExpression("${dateTime().minusYears(1)}"), 3);
   }
 
   public void testExpressionOverrideQuery() {
