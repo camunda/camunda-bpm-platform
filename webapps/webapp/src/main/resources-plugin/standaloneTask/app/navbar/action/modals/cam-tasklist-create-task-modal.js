@@ -58,7 +58,7 @@ define([
               scope: $scope
             });
           });
-        } 
+        }
         else {
           $scope.$close();
         }

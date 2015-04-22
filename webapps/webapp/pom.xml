@@ -23,7 +23,6 @@
 
     <frontend.development.cockpit.path>${frontend.app.path}</frontend.development.cockpit.path>
     <frontend.development.tasklist.path>${frontend.app.path}</frontend.development.tasklist.path>
-    <frontend.development.admin.path>${frontend.app.path}</frontend.development.admin.path>
 
     <exec.shell>bash</exec.shell>
     <exec.arg>-c</exec.arg>
@@ -37,33 +36,6 @@
     <dependency>
       <groupId>org.camunda.bpm.webapp</groupId>
       <artifactId>camunda-webapp-core</artifactId>
-    </dependency>
-
-    <!-- the tasklist UI -->
-    <dependency>
-      <groupId>org.camunda.bpm.webapp</groupId>
-      <artifactId>camunda-tasklist-ui</artifactId>
-      <version>${project.version}</version>
-      <type>zip</type>
-      <scope>provided</scope>
-    </dependency>
-
-    <!-- the cockpit UI -->
-    <dependency>
-      <groupId>org.camunda.bpm.webapp</groupId>
-      <artifactId>camunda-cockpit-ui</artifactId>
-      <version>${project.version}</version>
-      <type>zip</type>
-      <scope>provided</scope>
-    </dependency>
-
-    <!-- the admin UI -->
-    <dependency>
-      <groupId>org.camunda.bpm.webapp</groupId>
-      <artifactId>camunda-admin-ui</artifactId>
-      <version>${project.version}</version>
-      <type>zip</type>
-      <scope>provided</scope>
     </dependency>
 
     <!-- jee spec -->
@@ -217,45 +189,6 @@
           </execution>
         </executions>
       </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-dependency-plugin</artifactId>
-        <version>2.10</version>
-        <executions>
-          <execution>
-            <id>unpack</id>
-            <phase>generate-resources</phase>
-            <goals>
-              <goal>unpack</goal>
-            </goals>
-            <configuration>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>org.camunda.bpm.webapp</groupId>
-                  <artifactId>camunda-tasklist-ui</artifactId>
-                  <type>zip</type>
-                  <overWrite>true</overWrite>
-                  <outputDirectory>${project.build.directory}/webapp/app/tasklist</outputDirectory>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.camunda.bpm.webapp</groupId>
-                  <artifactId>camunda-cockpit-ui</artifactId>
-                  <type>zip</type>
-                  <overWrite>true</overWrite>
-                  <outputDirectory>${project.build.directory}/webapp/app/cockpit</outputDirectory>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.camunda.bpm.webapp</groupId>
-                  <artifactId>camunda-admin-ui</artifactId>
-                  <type>zip</type>
-                  <overWrite>true</overWrite>
-                  <outputDirectory>${project.build.directory}/webapp/app/admin</outputDirectory>
-                </artifactItem>
-              </artifactItems>
-            </configuration>
-           </execution>
-        </executions>
-      </plugin>
     </plugins>
   </build>
 
@@ -323,15 +256,6 @@
           </plugin>
         </plugins>
       </build>
-    </profile>
-
-    <profile>
-      <id>livereload</id>
-      <properties>
-        <frontend.development.tasklist.path>../../camunda-tasklist-ui/dist</frontend.development.tasklist.path>
-        <frontend.development.admin.path>../../camunda-admin-ui/dist</frontend.development.admin.path>
-        <frontend.development.cockpit.path>../../camunda-cockpit-ui/dist</frontend.development.cockpit.path>
-      </properties>
     </profile>
 
     <profile>
@@ -411,9 +335,6 @@
                 <contextPath>/camunda</contextPath>
                 <defaultsDescriptor>${project.basedir}/src/main/runtime/develop/jetty/webdefault.xml</defaultsDescriptor>
                 <resourceBases>
-                  <resourceBase>${frontend.development.cockpit.path}</resourceBase>
-                  <resourceBase>${frontend.development.tasklist.path}</resourceBase>
-                  <resourceBase>${frontend.development.admin.path}</resourceBase>
                   <resourceBase>${project.basedir}/target/webapp</resourceBase>
                   <resourceBase>${project.basedir}/src/main/webapp</resourceBase>
                 </resourceBases>
@@ -454,6 +375,13 @@
       </build>
       <properties>
         <java.resources.override>src/main/runtime/develop/resources</java.resources.override>
+      </properties>
+    </profile>
+
+    <profile>
+      <id>skipFrontendBuild</id>
+      <properties>
+        <skip.frontend.build>true</skip.frontend.build>
       </properties>
     </profile>
 

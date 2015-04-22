@@ -6,6 +6,11 @@ module.exports = function() {
       src: [
         'target/webapp/plugin'
       ]
+    },
+    apps: {
+      src: [
+        'target/webapp/app'
+      ]
     }
   };
 };

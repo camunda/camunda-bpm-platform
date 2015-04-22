@@ -12,29 +12,169 @@ module.exports = function(grunt) {
   config.pkg = pkg;
   config.protractorConfig = protractorConfig;
 
+  var requireJsConf = {
+    options: {
+      optimize: '<%= (buildMode === "prod" ? "uglify2" : "none") %>',
+    }
+  };
+
+  require('./grunt/config/requirejs')(config, requireJsConf);
+  require('camunda-admin-ui/grunt/config/requirejs')(config, requireJsConf);
+  require('camunda-cockpit-ui/grunt/config/requirejs')(config, requireJsConf);
+  require('camunda-tasklist-ui/grunt/config/requirejs')(config, requireJsConf);
+
+  var copyConf = { };
+  require('camunda-admin-ui/grunt/config/copy')(config, copyConf);
+  require('camunda-cockpit-ui/grunt/config/copy')(config, copyConf);
+  require('camunda-tasklist-ui/grunt/config/copy')(config, copyConf);
+
+  var lessConf = { };
+  require('camunda-admin-ui/node_modules/camunda-commons-ui/grunt/config/less')(config, lessConf, {
+    appName: 'admin',
+    sourceDir: pkg.gruntConfig.adminSourceDir,
+    buildTarget: pkg.gruntConfig.adminBuildTarget,
+  });
+  require('camunda-cockpit-ui/node_modules/camunda-commons-ui/grunt/config/less')(config, lessConf, {
+    appName: 'cockpit',
+    sourceDir: pkg.gruntConfig.cockpitSourceDir,
+    buildTarget: pkg.gruntConfig.cockpitBuildTarget,
+  });
+  require('camunda-tasklist-ui/node_modules/camunda-commons-ui/grunt/config/less')(config, lessConf, {
+    appName: 'tasklist',
+    sourceDir: pkg.gruntConfig.tasklistSourceDir,
+    buildTarget: pkg.gruntConfig.tasklistBuildTarget,
+  });
+
+  var localesConf = { };
+  require('camunda-tasklist-ui/node_modules/camunda-commons-ui/grunt/config/localescompile')(config, localesConf, {
+    appName: 'tasklist',
+    sourceDir: pkg.gruntConfig.tasklistSourceDir,
+    buildTarget: pkg.gruntConfig.tasklistBuildTarget,
+  });
+
+  var watchConf = { };
+  require('./grunt/config/watch')(config, watchConf);
+  require('camunda-tasklist-ui/grunt/config/watch')(config, watchConf);
+  require('camunda-cockpit-ui/grunt/config/watch')(config, watchConf);
+  require('camunda-admin-ui/grunt/config/watch')(config, watchConf);
+
+  // watch the SDK
+  watchConf.tasklist_sdk = {
+    options: {
+      livereload: false
+    },
+    files: ['node_modules/camunda-tasklist-ui/node_modules/camunda-commons-ui/node_modules/camunda-bpm-sdk-js/lib/**/*.js'],
+    tasks: ['grunt:buildSdkTasklist']
+  };
+  watchConf.cockpit_sdk = {
+    options: {
+      livereload: false
+    },
+    files: ['node_modules/camunda-cockpit-ui/node_modules/camunda-commons-ui/node_modules/camunda-bpm-sdk-js/lib/**/*.js'],
+    tasks: ['grunt:buildSdkCockpit']
+  };
+  watchConf.tasklist_sdk = {
+    options: {
+      livereload: false
+    },
+    files: ['node_modules/camunda-admin-ui/node_modules/camunda-commons-ui/node_modules/camunda-bpm-sdk-js/lib/**/*.js'],
+    tasks: ['grunt:buildSdkAdmin']
+  };
+
+
+  var gruntConf = {
+    buildSdkTasklist: {
+      gruntfile: 'node_modules/camunda-tasklist-ui/node_modules/camunda-commons-ui/node_modules/camunda-bpm-sdk-js/Gruntfile.js',
+      tasks: ['browserify:distAngular', 'browserify:distTypeUtils']
+    },
+    buildSdkCockpit: {
+      gruntfile: 'node_modules/camunda-cockpit-ui/node_modules/camunda-commons-ui/node_modules/camunda-bpm-sdk-js/Gruntfile.js',
+      tasks: ['browserify:distAngular', 'browserify:distTypeUtils']
+    },
+    buildSdkAdmin: {
+      gruntfile: 'node_modules/camunda-admin-ui/node_modules/camunda-commons-ui/node_modules/camunda-bpm-sdk-js/Gruntfile.js',
+      tasks: ['browserify:distAngular', 'browserify:distTypeUtils']
+    },
+  };
+
+
   grunt.initConfig({
+    buildMode:        'dev',
+
     pkg:              pkg,
 
-    requirejs:        require('./grunt/config/requirejs')(config),
+    requirejs:        requireJsConf,
+
+    copy:             copyConf,
+
+    less:             lessConf,
+
+    localescompile:   localesConf,
 
     clean:            require('./grunt/config/clean')(config),
 
-    watch:            require('./grunt/config/watch')(config),
+    watch:            watchConf,
 
-    protractor:       require('./grunt/config/protractor')(config)
+    protractor:       require('./grunt/config/protractor')(config),
+
+    grunt:            gruntConf
   });
 
-  grunt.registerTask('build', function(mode) {
+  require('camunda-tasklist-ui/node_modules/camunda-commons-ui/grunt/tasks/localescompile')(grunt);
 
-    grunt.config.data.mode = mode || 'prod';
+  grunt.registerTask('build', function(mode, app) {
 
-    grunt.task.run(['clean', 'requirejs']);
+
+    if(typeof app !== 'undefined') {
+      console.log(' ------------  will build ' + app + ' -------------');
+      var objs = [requireJsConf, copyConf, lessConf, localesConf, watchConf, gruntConf];
+      for(var i = 0; i < objs.length; i++) {
+        var obj = objs[i];
+        for (var key in obj) {
+          if (obj.hasOwnProperty(key) && key.toLowerCase().indexOf(app) === -1 && key !== 'options' &&
+                                         key.toLowerCase().indexOf('webapp') === -1) {
+              delete obj[key];
+          }
+        }
+      }
+    }
+
+    grunt.config.data.buildMode = mode || 'prod';
+
+    if(typeof app !== 'undefined' && app !== 'tasklist') {
+      grunt.task.run([
+        'clean',
+        'grunt',
+        'requirejs',
+        'copy',
+        'less'
+      ]);
+    } else {
+      grunt.task.run([
+        'clean',
+        'grunt',
+        'requirejs',
+        'copy',
+        'localescompile',
+        'less'
+      ]);
+    }
+
   });
 
-  grunt.registerTask('auto-build', [
-    'build:dev',
-    'watch'
-  ]);
+  grunt.registerTask('auto-build', function(app) {
+    if(app) {
+      grunt.task.run([
+        'build:dev:' + app,
+        'watch'
+      ]);
+    } else {
+      grunt.task.run([
+        'build:dev',
+        'watch'
+      ]);
+    }
+  });
 
   grunt.registerTask('default', ['build']);
 

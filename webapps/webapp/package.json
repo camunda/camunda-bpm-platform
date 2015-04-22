@@ -1,23 +1,43 @@
 {
+  "name": "camunda-bpm-webapp",
+  "private": true,
+  "version": "7.4.0-SNAPSHOT",
   "gruntConfig": {
-    "buildTarget": "target/webapp/plugin",
-    "pluginDir": "src/main/resources-plugin"
+    "connectPort": 8020,
+    "livereloadPort": 8021,
+    "adminBuildTarget": "target/webapp/app/admin",
+    "adminSourceDir": "node_modules/camunda-admin-ui/client",
+    "cockpitBuildTarget": "target/webapp/app/cockpit",
+    "cockpitSourceDir": "node_modules/camunda-cockpit-ui/client",
+    "tasklistBuildTarget": "target/webapp/app/tasklist",
+    "tasklistSourceDir": "node_modules/camunda-tasklist-ui/client",
+    "pluginBuildTarget": "target/webapp/plugin",
+    "pluginSourceDir": "src/main/resources-plugin"
+  },
+  "dependencies": {
+    "camunda-tasklist-ui": "git://github.com/camunda/camunda-tasklist-ui#master",
+    "camunda-admin-ui": "git://github.com/camunda/camunda-admin-ui#master",
+    "camunda-cockpit-ui": "git://github.com/camunda/camunda-cockpit-ui#master"
   },
   "devDependencies": {
     "grunt": "0.4.5",
     "grunt-cli": "0.1.13",
+    "grunt-grunt": "0.2.4",
     "grunt-contrib-clean": "0.5.0",
+    "grunt-contrib-copy": "0.5.0",
     "grunt-contrib-requirejs": "0.4.4",
     "grunt-contrib-watch": "0.5.0",
+    "grunt-contrib-less": "0.9.0",
     "grunt-protractor-runner": "2.0.0",
     "load-grunt-tasks": "0.4.0",
-    "requirejs-angular-define": "git://github.com/camunda/requirejs-angular-define.git",
+    "requirejs-angular-define": "git://github.com/camunda/requirejs-angular-define#master",
     "requirejs-text": "2.0.12",
     "camunda-bpm-sdk-js": "git://github.com/camunda/camunda-bpm-sdk-js#master",
     "request": "2.53.0",
     "chai": "2.0.0",
     "chai-as-promised": "4.2.0",
     "mocha": "2.1.0",
-    "xunit-file": "0.0.6"
+    "xunit-file": "0.0.6",
+    "lodash": "2.4.1"
   }
 }

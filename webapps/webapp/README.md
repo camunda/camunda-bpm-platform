@@ -199,18 +199,29 @@ There are a few [grunt tasks](http://gruntjs.com/) that aid you when developing 
 
     Configure the port used by live reload in the environment variable `LIVERELOAD_PORT=LIVE_RELOAD_PORT`.
 
--   Execute a single development build of the web resources and provide them to maven build / embedded [Jetty](http://www.eclipse.org/jetty/):
+-   Only build a single webapp continuously to speed up compile times:
+
+    ```
+    grunt auto-build:cockpit
+    ```
+
+-   Execute a single production build of the web resources and provide them to maven build / embedded [Jetty](http://www.eclipse.org/jetty/):
 
     ```
     grunt build
     ```
 
--   Execute a single production build of the web resources and provide them to the maven build / embedded server:
+-   Execute a single development build of the web resources and provide them to the maven build / embedded server:
 
     ```
-    grunt build:dist
+    grunt build:dev
     ```
 
+-   Execute a single development build of a single web application and provide it to the maven build / embedded server:
+
+    ```
+    grunt build:dev:cockpit
+    ```
 
 ## Additional Resources
 
