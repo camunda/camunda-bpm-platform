@@ -249,7 +249,8 @@ define([
             }
           }
 
-          if ((key === 'candidateGroups' || key === 'activityInstanceIdIn')) {
+          // for "in" criterion, the values are passed as coma separated list
+          if ((key === 'candidateGroups' || key.slice(-2) === 'In')) {
             if( typeof value === 'string') {
               value = value.split(',');
               for (var v = 0; v < value.length; v++) {

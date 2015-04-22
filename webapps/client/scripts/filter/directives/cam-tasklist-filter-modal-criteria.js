@@ -63,6 +63,10 @@ define(function() {
           label: 'Key'
         },
         {
+          name: 'processDefinitionKeyIn',
+          label: 'Key In'
+        },
+        {
           name: 'processDefinitionName',
           label: 'Name'
         },
@@ -190,6 +194,10 @@ define(function() {
         {
           name: 'taskDefinitionKey',
           label: 'Definition Key'
+        },
+        {
+          name: 'taskDefinitionKeyIn',
+          label: 'Definition Key In'
         },
         {
           name: 'taskDefinitionKeyLike',
