@@ -20,7 +20,9 @@ import java.util.concurrent.Callable;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.ActivityExecutionMapping;
+import org.camunda.bpm.engine.impl.bpmn.behavior.SequentialMultiInstanceActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
+import org.camunda.bpm.engine.impl.core.delegate.CoreActivityBehavior;
 import org.camunda.bpm.engine.impl.core.model.CoreModelElement;
 import org.camunda.bpm.engine.impl.core.variable.VariableMapImpl;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -32,6 +34,7 @@ import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityStartBehavior;
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
+import org.camunda.bpm.engine.impl.pvm.process.TransitionImpl;
 import org.camunda.bpm.engine.impl.tree.ActivityStackCollector;
 import org.camunda.bpm.engine.impl.tree.FlowScopeWalker;
 import org.camunda.bpm.engine.impl.tree.TreeWalker.WalkCondition;
@@ -107,11 +110,11 @@ public abstract class AbstractInstantiationCmd extends AbstractProcessInstanceMo
     //   - this is the execution of the first parent/ancestor flow scope that has an execution
     //   - throws an exception if there is more than one such execution
 
-    ScopeImpl flowScope = getTargetFlowScope(processDefinition);
+    ScopeImpl targetFlowScope = getTargetFlowScope(processDefinition);
 
     // prepare to walk up the flow scope hierarchy and collect the flow scope activities
     ActivityStackCollector stackCollector = new ActivityStackCollector();
-    FlowScopeWalker walker = new FlowScopeWalker(flowScope);
+    FlowScopeWalker walker = new FlowScopeWalker(targetFlowScope);
     walker.addPreCollector(stackCollector);
 
     ExecutionEntity scopeExecution = null;
@@ -128,7 +131,7 @@ public abstract class AbstractInstantiationCmd extends AbstractProcessInstanceMo
       Set<ExecutionEntity> flowScopeExecutions = mapping.getExecutions(walker.getCurrentElement());
 
       if (flowScopeExecutions.size() > 1) {
-        throw new ProcessEngineException("Ancestor activity execution is ambiguous for activity " + flowScope);
+        throw new ProcessEngineException("Ancestor activity execution is ambiguous for activity " + targetFlowScope);
       }
 
       scopeExecution = flowScopeExecutions.iterator().next();
@@ -176,11 +179,22 @@ public abstract class AbstractInstantiationCmd extends AbstractProcessInstanceMo
     // - interrupting or cancelling activities for which we have to ensure that
     //   the interruption and cancellation takes place before we instantiate the activity stack
     ActivityImpl topMostActivity = null;
+    ScopeImpl flowScope = null;
     if (!activitiesToInstantiate.isEmpty()) {
       topMostActivity = (ActivityImpl) activitiesToInstantiate.get(0);
+      flowScope = topMostActivity.getFlowScope();
     }
     else if (ActivityImpl.class.isAssignableFrom(elementToInstantiate.getClass())) {
       topMostActivity = (ActivityImpl) elementToInstantiate;
+      flowScope = topMostActivity.getFlowScope();
+    } else if (TransitionImpl.class.isAssignableFrom(elementToInstantiate.getClass())) {
+      TransitionImpl transitionToInstantiate = (TransitionImpl) elementToInstantiate;
+      flowScope = transitionToInstantiate.getSource().getFlowScope();
+    }
+
+    if (!supportsConcurrentChildInstantiation(flowScope)) {
+      throw new ProcessEngineException("Concurrent instantiation not possible for "
+          + "activities in scope " + flowScope.getId());
     }
 
     ActivityStartBehavior startBehavior = ActivityStartBehavior.CONCURRENT_IN_FLOW_SCOPE;
@@ -257,6 +271,19 @@ public abstract class AbstractInstantiationCmd extends AbstractProcessInstanceMo
     }
 
     return null;
+  }
+
+  /**
+   * Cannot create more than inner instance in a sequential MI construct
+   */
+  protected boolean supportsConcurrentChildInstantiation(ScopeImpl flowScope) {
+    CoreActivityBehavior<?> behavior = flowScope.getActivityBehavior();
+    if (behavior != null) {
+      return !(behavior instanceof SequentialMultiInstanceActivityBehavior);
+    }
+    else {
+      return true;
+    }
   }
 
   protected ExecutionEntity getSingleExecutionForScope(ActivityExecutionMapping mapping, ScopeImpl scope) {

@@ -13,8 +13,10 @@
 
 package org.camunda.bpm.engine.impl.pvm.runtime.operation;
 
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
+import org.camunda.bpm.engine.impl.pvm.delegate.ModificationObserverBehavior;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
@@ -61,6 +63,7 @@ public class PvmAtomicOperationDeleteCascadeFireActivityEnd extends PvmAtomicOpe
     super.eventNotificationsCompleted(execution);
 
     PvmActivity activity = execution.getActivity();
+
     if ( (execution.isScope())
             && (activity!=null)
             && (!activity.isScope())
@@ -74,16 +77,28 @@ public class PvmAtomicOperationDeleteCascadeFireActivityEnd extends PvmAtomicOpe
         execution.destroy();
       }
 
+      // remove this execution and its concurrent parent (if exists)
       execution.remove();
 
-      if (!execution.isDeleteRoot()) {
-        PvmExecutionImpl parent = execution.getParent();
-        if (parent!=null) {
-          // set activity on parent in case the parent is an inactive scope execution and activity has been set to 'null'.
-          if(parent.getActivity() == null && activity != null && activity.getFlowScope() != null) {
-            parent.setActivity(getFlowScopeActivity(activity));
+      boolean continueRemoval = !execution.isDeleteRoot();
+
+      if (continueRemoval) {
+        PvmExecutionImpl propagatingExecution = execution.getParent();
+        if (propagatingExecution != null && !propagatingExecution.isScope()) {
+          propagatingExecution.remove();
+          continueRemoval = !propagatingExecution.isDeleteRoot();
+          propagatingExecution = propagatingExecution.getParent();
+        }
+
+        if (continueRemoval) {
+          if (propagatingExecution != null) {
+            // continue deletion with the next scope execution
+            // set activity on parent in case the parent is an inactive scope execution and activity has been set to 'null'.
+            if(propagatingExecution.getActivity() == null && activity != null && activity.getFlowScope() != null) {
+              propagatingExecution.setActivity(getFlowScopeActivity(activity));
+            }
+            propagatingExecution.performOperation(DELETE_CASCADE);
           }
-          parent.performOperation(DELETE_CASCADE);
         }
       }
     }

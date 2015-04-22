@@ -12,11 +12,12 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.pvm.delegate.ModificationObserverBehavior;
+import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
+import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
+import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 
 /**
  * @author Thorben Lindhauer
@@ -39,40 +40,65 @@ public abstract class AbstractInstanceCancellationCmd extends AbstractProcessIns
     // 4. remove topmost execution (and concurrent parent) if topmostExecution is not the process instance
 
     ExecutionEntity topmostCancellableExecution = sourceInstanceExecution;
-    ExecutionEntity parentScopeExecution = getParentScopeExecution(topmostCancellableExecution);
+    ExecutionEntity parentScopeExecution = (ExecutionEntity) topmostCancellableExecution.getParentScopeExecution(false);
 
     // if topmostCancellabelExecution's parent is concurrent, we have reached the target execution
     while (parentScopeExecution != null && !topmostCancellableExecution.isConcurrent() && !topmostCancellableExecution.getParent().isConcurrent()) {
       topmostCancellableExecution = parentScopeExecution;
-      parentScopeExecution = getParentScopeExecution(topmostCancellableExecution);
+      parentScopeExecution = (ExecutionEntity) topmostCancellableExecution.getParentScopeExecution(false);
     }
 
-    if (topmostCancellableExecution.isProcessInstanceExecution()) {
+    if (topmostCancellableExecution.isPreserveScope()) {
       topmostCancellableExecution.interrupt("Cancelled due to process instance modification", skipCustomListeners, skipIoMappings);
       topmostCancellableExecution.leaveActivityInstance();
       topmostCancellableExecution.setActivity(null);
     } else {
       topmostCancellableExecution.deleteCascade("Cancelled due to process instance modification", skipCustomListeners, skipIoMappings);
-      topmostCancellableExecution.removeFromParentScope();
+      handleChildRemovalInScope(topmostCancellableExecution);
 
     }
 
     return null;
   }
 
-  protected abstract ExecutionEntity determineSourceInstanceExecution(CommandContext commandContext);
+  protected void handleChildRemovalInScope(ExecutionEntity removedExecution) {
+    // TODO: the following should be closer to PvmAtomicOperationDeleteCascadeFireActivityEnd
+    // once CAM-3604 is fixed (note though that e.g. boundary events expect concurrent executions to be preserved)
+    //
+    // Idea: attempting to prune and synchronize on the parent is the default behavior when
+    // a concurrent child is removed, but scope activities implementing ModificationObserverBehavior
+    // override this default (and therefore *must* take care of reorganization themselves)
 
-  protected ExecutionEntity getParentScopeExecution(ExecutionEntity execution) {
-    ExecutionEntity parent = execution.getParent();
-    if (parent == null) {
-      return null;
+    // notify the behavior that a concurrent execution has been removed
+
+    // must be set due to deleteCascade behavior
+    ActivityImpl activity = removedExecution.getActivity();
+    ScopeImpl flowScope = activity.getFlowScope();
+
+    PvmExecutionImpl scopeExecution = removedExecution.getParentScopeExecution(false);
+    PvmExecutionImpl scopeExecutionChild = removedExecution;
+    PvmExecutionImpl parent = scopeExecutionChild.getParent();
+    if (parent.isConcurrent()) {
+      parent.remove();
+      scopeExecutionChild = parent;
     }
 
-    if (!parent.isScope()) {
-      parent = parent.getParent();
+    if (scopeExecutionChild.isConcurrent()) {
+      if (flowScope.getActivityBehavior() != null
+          && flowScope.getActivityBehavior() instanceof ModificationObserverBehavior) {
+        // let child removal be handled by the scope itself
+        ModificationObserverBehavior behavior = (ModificationObserverBehavior) flowScope.getActivityBehavior();
+        behavior.concurrentExecutionDeleted(scopeExecution, scopeExecutionChild);
+      }
+      else {
+        // default: pruning
+        scopeExecution.tryPruneLastConcurrentChild();
+        scopeExecution.forceUpdate();
+      }
     }
-    return parent;
   }
+
+  protected abstract ExecutionEntity determineSourceInstanceExecution(CommandContext commandContext);
 
 
 }

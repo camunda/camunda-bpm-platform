@@ -12,7 +12,7 @@
  */
 package org.camunda.bpm.engine.impl.bpmn.behavior;
 
-import org.camunda.bpm.engine.impl.pvm.PvmActivity;
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 
 /**
@@ -47,6 +47,25 @@ public class SequentialMultiInstanceActivityBehavior extends MultiInstanceActivi
 
   public void concurrentChildExecutionEnded(ActivityExecution scopeExecution, ActivityExecution endedExecution) {
     // cannot happen
+  }
+
+  public ActivityExecution initializeScope(ActivityExecution scopeExecution) {
+    setLoopVariable(scopeExecution, NUMBER_OF_INSTANCES, 1);
+    setLoopVariable(scopeExecution, NUMBER_OF_COMPLETED_INSTANCES, 0);
+    setLoopVariable(scopeExecution, NUMBER_OF_ACTIVE_INSTANCES, 1);
+    setLoopVariable(scopeExecution, LOOP_COUNTER, 0);
+
+    return scopeExecution;
+  }
+
+  public void concurrentExecutionCreated(ActivityExecution scopeExecution, ActivityExecution concurrentExecution) {
+    throw new ProcessEngineException(scopeExecution.toString() + " executing behavior " + this.getClass().getSimpleName()
+        + " cannot have concurrency");
+  }
+
+  public void concurrentExecutionDeleted(ActivityExecution scopeExecution, ActivityExecution concurrentExecution) {
+    throw new ProcessEngineException(scopeExecution.toString() + " executing behavior " + this.getClass().getSimpleName()
+        + " cannot have concurrency");
   }
 
 }

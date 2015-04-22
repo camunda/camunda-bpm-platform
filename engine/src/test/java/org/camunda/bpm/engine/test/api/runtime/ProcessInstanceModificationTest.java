@@ -483,7 +483,6 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("doubleNestedSubprocess");
     String processInstanceId = processInstance.getId();
 
-
     try {
       runtimeService
         .createProcessInstanceModification(processInstance.getId())

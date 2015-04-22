@@ -35,6 +35,7 @@ import org.camunda.bpm.engine.impl.pvm.PvmProcessInstance;
 import org.camunda.bpm.engine.impl.pvm.PvmScope;
 import org.camunda.bpm.engine.impl.pvm.PvmTransition;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
+import org.camunda.bpm.engine.impl.pvm.delegate.ModificationObserverBehavior;
 import org.camunda.bpm.engine.impl.pvm.delegate.SignallableActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityStartBehavior;
@@ -581,16 +582,29 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
    *
    * @param activityStack The most deeply nested activity is the last element in the list
    */
-  @SuppressWarnings("unchecked")
   public void executeActivitiesConcurrent(List<PvmActivity> activityStack, PvmActivity targetActivity,
       PvmTransition targetTransition, Map<String, Object> variables, Map<String, Object> localVariables,
       boolean skipCustomListeners, boolean skipIoMappings) {
 
 
     PvmExecutionImpl propagatingExecution = createConcurrentExecution();
+
+    ScopeImpl flowScope = null;
+    if (!activityStack.isEmpty()) {
+      flowScope = activityStack.get(0).getFlowScope();
+    } else if (targetActivity != null) {
+      flowScope = targetActivity.getFlowScope();
+    } else if (targetTransition != null) {
+      flowScope = targetTransition.getSource().getFlowScope();
+    }
+
+    if (flowScope.getActivityBehavior() instanceof ModificationObserverBehavior) {
+      ModificationObserverBehavior flowScopeBehavior = (ModificationObserverBehavior) flowScope.getActivityBehavior();
+      flowScopeBehavior.concurrentExecutionCreated(propagatingExecution.getParent(), propagatingExecution);
+    }
+
     propagatingExecution.executeActivities(activityStack, targetActivity, targetTransition, variables, localVariables,
         skipCustomListeners, skipIoMappings);
-
   }
 
   /**
@@ -635,38 +649,6 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
       setActivity(targetTransition.getSource());
       setTransition((TransitionImpl) targetTransition);
       performOperation(PvmAtomicOperation.TRANSITION_START_NOTIFY_LISTENER_TAKE);
-    }
-  }
-
-  @SuppressWarnings("unchecked")
-  public void removeFromParentScope() {
-    PvmExecutionImpl parent = getParent();
-
-    if (isScope()) {
-      destroy();
-    }
-    remove();
-
-    if (parent.isConcurrent()) {
-      parent.remove();
-      parent = parent.getParent();
-    }
-
-    // consolidate the parent scope's execution tree
-    if (parent.getExecutions().size() == 1) {
-      PvmExecutionImpl concurrentChild = parent.getExecutions().get(0);
-      parent.replace(concurrentChild);
-      parent.setActivity(concurrentChild.getActivity());
-      parent.setActive(concurrentChild.isActive());
-
-      if (!concurrentChild.getExecutions().isEmpty()) {
-        // a concurrent execution has exactly one child
-        PvmExecutionImpl childScopeExecution = concurrentChild.getExecutions().get(0);
-        childScopeExecution.setParent(parent);
-        ((List<PvmExecutionImpl>) parent.getExecutions()).add(childScopeExecution);
-      }
-
-      concurrentChild.remove();
     }
   }
 

@@ -50,6 +50,8 @@ import org.camunda.bpm.engine.runtime.TransitionInstance;
 import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.examples.bpmn.executionlistener.RecorderExecutionListener;
+import org.camunda.bpm.engine.test.examples.bpmn.executionlistener.RecorderExecutionListener.RecordedEvent;
 import org.camunda.bpm.engine.test.util.TestExecutionListener;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
@@ -154,6 +156,33 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
 
       assertEquals(deleteReason, historicTaskInstance.getDeleteReason());
     }
+  }
+
+  @Deployment
+  public void testDeleteProcessInstanceWithListeners() {
+    RecorderExecutionListener.clear();
+
+    // given
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("nestedParallelGatewayScopeTasks");
+
+    // when
+    runtimeService.deleteProcessInstance(processInstance.getId(), "");
+
+    // then
+    List<RecordedEvent> recordedEvents = RecorderExecutionListener.getRecordedEvents();
+    assertEquals(4, recordedEvents.size());
+
+    Set<String> endActivityIds = new HashSet<String>();
+    for (RecordedEvent event : recordedEvents) {
+      endActivityIds.add(event.getActivityId());
+    }
+
+    assertEquals(4, endActivityIds.size());
+    assertTrue(endActivityIds.contains("innerTask1"));
+    assertTrue(endActivityIds.contains("innerTask2"));
+    assertTrue(endActivityIds.contains("outerTask"));
+    assertTrue(endActivityIds.contains("subProcess"));
+
   }
 
   @Deployment(resources={

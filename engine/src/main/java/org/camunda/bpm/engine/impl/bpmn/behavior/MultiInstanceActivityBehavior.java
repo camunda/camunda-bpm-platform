@@ -25,6 +25,7 @@ import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.engine.impl.pvm.delegate.CompositeActivityBehavior;
+import org.camunda.bpm.engine.impl.pvm.delegate.ModificationObserverBehavior;
 import org.camunda.bpm.engine.variable.value.IntegerValue;
 
 
@@ -35,7 +36,7 @@ import org.camunda.bpm.engine.variable.value.IntegerValue;
  * @author Daniel Meyer
  * @author Thorben Lindhauer
  */
-public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBehavior implements CompositeActivityBehavior {
+public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBehavior implements CompositeActivityBehavior, ModificationObserverBehavior {
 
   protected static final Logger LOGGER = Logger.getLogger(MultiInstanceActivityBehavior.class.getName());
 

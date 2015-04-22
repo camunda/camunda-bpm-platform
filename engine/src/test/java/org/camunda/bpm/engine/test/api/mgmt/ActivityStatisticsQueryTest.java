@@ -364,11 +364,6 @@ public class ActivityStatisticsQueryTest extends PluggableProcessEngineTestCase 
     }
   }
 
-  static {
-    LogFactory.useJdkLogging();
-    LogUtil.readJavaUtilLoggingConfigFromClasspath();
-  }
-
   @Test
   @Deployment(resources = "org/camunda/bpm/engine/test/api/mgmt/StatisticsTest.testParallelGatewayStatisticsQuery.bpmn20.xml")
   public void testActivityStatisticsQueryPagination() {

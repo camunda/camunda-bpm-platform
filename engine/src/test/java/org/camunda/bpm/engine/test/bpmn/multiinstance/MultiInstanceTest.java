@@ -747,6 +747,7 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
       .getActivityInstances("miSubProcess")[0]
       .getChildActivityInstances();
 
+    // TODO: problem: inconsistent flush ordering CAM-3604
     for (ActivityInstance taskActivity : taskActivities) {
       Task task = taskService.createTaskQuery().activityInstanceIdIn(taskActivity.getId()).singleResult();
       taskService.complete(task.getId());

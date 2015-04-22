@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.impl.bpmn.behavior;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
@@ -100,6 +101,37 @@ public class ParallelMultiInstanceActivityBehavior extends MultiInstanceActivity
 
   public void complete(ActivityExecution scopeExecution) {
     // can't happen
+  }
+
+  public ActivityExecution initializeScope(ActivityExecution scopeExecution) {
+
+    setLoopVariable(scopeExecution, NUMBER_OF_INSTANCES, 1);
+    setLoopVariable(scopeExecution, NUMBER_OF_COMPLETED_INSTANCES, 0);
+    setLoopVariable(scopeExecution, NUMBER_OF_ACTIVE_INSTANCES, 1);
+
+    // even though there is only one instance, there is always a concurrent child
+    ActivityExecution concurrentChild = scopeExecution.createExecution();
+    concurrentChild.setConcurrent(true);
+    concurrentChild.setScope(false);
+    scopeExecution.setActivity(null);
+
+    setLoopVariable(concurrentChild, LOOP_COUNTER, 0);
+
+    return concurrentChild;
+  }
+
+  public void concurrentExecutionCreated(ActivityExecution scopeExecution, ActivityExecution concurrentExecution) {
+    int nrOfInstances = getLoopVariable(scopeExecution, NUMBER_OF_INSTANCES);
+    setLoopVariable(scopeExecution, NUMBER_OF_INSTANCES, nrOfInstances + 1);
+    int nrOfActiveInstances = getLoopVariable(scopeExecution, NUMBER_OF_ACTIVE_INSTANCES);
+    setLoopVariable(scopeExecution, NUMBER_OF_ACTIVE_INSTANCES, nrOfActiveInstances + 1);
+
+    setLoopVariable(concurrentExecution, LOOP_COUNTER, nrOfInstances);
+  }
+
+  public void concurrentExecutionDeleted(ActivityExecution scopeExecution, ActivityExecution concurrentExecution) {
+    int nrOfActiveInstances = getLoopVariable(scopeExecution, NUMBER_OF_ACTIVE_INSTANCES);
+    setLoopVariable(scopeExecution, NUMBER_OF_ACTIVE_INSTANCES, nrOfActiveInstances - 1);
   }
 
 }

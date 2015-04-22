@@ -15,6 +15,9 @@ package org.camunda.bpm.engine.impl.pvm.runtime.operation;
 import java.util.List;
 
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
+import org.camunda.bpm.engine.impl.pvm.delegate.ActivityBehavior;
+import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
+import org.camunda.bpm.engine.impl.pvm.delegate.ModificationObserverBehavior;
 import org.camunda.bpm.engine.impl.pvm.runtime.ExecutionStartContext;
 import org.camunda.bpm.engine.impl.pvm.runtime.InstantiationStack;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
@@ -43,7 +46,6 @@ public class PvmAtomicOperationActivityInitStack implements PvmAtomicOperation {
       execution.setActive(false);
       propagatingExecution.setActivity(currentActivity);
       propagatingExecution.initialize();
-
     }
     else {
       propagatingExecution.setActivity(currentActivity);
