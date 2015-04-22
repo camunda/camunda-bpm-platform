@@ -1012,8 +1012,8 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
         log.fine("[LEAVE] "+ this + ": "+activityInstanceId );
       }
 
-      activityInstanceId = getParentActivityInstanceId();
     }
+    activityInstanceId = getParentActivityInstanceId();
 
     activityInstanceState = ActivityInstanceState.DEFAULT.getStateCode();
   }

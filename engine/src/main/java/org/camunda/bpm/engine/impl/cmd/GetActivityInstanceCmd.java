@@ -22,21 +22,35 @@ import java.util.concurrent.Callable;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.ExecutionQueryImpl;
-import org.camunda.bpm.engine.impl.bpmn.behavior.CancelEndEventActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.IntermediateThrowCompensationEventActivityBehavior;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ActivityInstanceImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TransitionInstanceImpl;
-import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 
 /**
- * @author Daniel Meyer
+ * <p>Creates an activity instance tree according to the following strategy:
+ *
+ * <ul>
+ *   <li> Event scope executions are not considered at all
+ *   <li> For every leaf execution, generate an activity/transition instance;
+ *   the activity instance id is set in the leaf execution and the parent instance id is set in the parent execution
+ *   <li> For every non-leaf scope execution, generate an activity instance;
+ *   the activity instance id is always set in the parent execution and the parent activity
+ *   instance id is always set in the parent's parent (because of tree compactation, we ensure
+ *   that an activity instance id for a scope activity is always stored in the corresponding scope execution's parent,
+ *   unless the execution is a leaf)
+ *   <li> Compensation is an exception to the above procedure: A compensation throw event is not a scope, however the compensating executions
+ *   are added as child executions of the (probably non-scope) execution executing the throw event. Logically, the compensating executions
+ *   are children of the scope execution the throwing event is executed in. Due to this oddity, the activity instance id are stored on different
+ *   executions
+ * </ul>
+ *
+ * @author Thorben Lindhauer
  *
  */
 public class GetActivityInstanceCmd implements Command<ActivityInstance> {
@@ -195,6 +209,9 @@ public class GetActivityInstanceCmd implements Command<ActivityInstance> {
     for (ActivityInstanceImpl instance : activityInstances.values()) {
       if (instance.getParentActivityInstanceId() != null) {
         ActivityInstanceImpl parentInstance = activityInstances.get(instance.getParentActivityInstanceId());
+        if (parentInstance == null) {
+          throw new ProcessEngineException("No parent activity instance with id " + instance.getParentActivityInstanceId() + " generated");
+        }
         putListElement(childActivityInstances, parentInstance, instance);
       }
     }
@@ -202,6 +219,9 @@ public class GetActivityInstanceCmd implements Command<ActivityInstance> {
     for (TransitionInstanceImpl instance : transitionInstances.values()) {
       if (instance.getParentActivityInstanceId() != null) {
         ActivityInstanceImpl parentInstance = activityInstances.get(instance.getParentActivityInstanceId());
+        if (parentInstance == null) {
+          throw new ProcessEngineException("No parent activity instance with id " + instance.getParentActivityInstanceId() + " generated");
+        }
         putListElement(childTransitionInstances, parentInstance, instance);
       }
     }

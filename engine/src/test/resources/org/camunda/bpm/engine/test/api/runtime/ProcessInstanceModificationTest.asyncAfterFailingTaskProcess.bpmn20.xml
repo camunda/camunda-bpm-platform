@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:camunda="http://activiti.org/bpmn"
+  targetNamespace="org.camunda.bpm.engine.test.enginge.test.api.runtime">
+
+  <process id="failingAfterAsyncTask">
+
+    <startEvent id="theStart" />
+    <sequenceFlow id="flow1" sourceRef="theStart" targetRef="task1" />
+    <serviceTask id="task1" name="my task" camunda:asyncAfter="true" camunda:expression="true"/>    
+    <sequenceFlow id="flow2" sourceRef="task1" targetRef="task2" />
+    <serviceTask id="task2" name="my task" camunda:asyncAfter="true" 
+      camunda:class="org.camunda.bpm.engine.test.api.runtime.FailingDelegate"/>    
+    <sequenceFlow id="flow3" sourceRef="task2" targetRef="theEnd" />
+    <endEvent id="theEnd" />
+    
+  </process>
+
+</definitions>

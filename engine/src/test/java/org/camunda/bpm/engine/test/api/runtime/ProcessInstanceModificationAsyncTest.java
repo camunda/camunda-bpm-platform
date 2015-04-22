@@ -21,6 +21,7 @@ import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.management.ActivityStatistics;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.Job;
@@ -53,6 +54,8 @@ public class ProcessInstanceModificationAsyncTest extends PluggableProcessEngine
 
   protected static final String NESTED_ASYNC_AFTER_TASK_PROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationTest.nestedParallelAsyncAfterOneTaskProcess.bpmn20.xml";
   protected static final String NESTED_ASYNC_AFTER_END_EVENT_PROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationTest.nestedParallelAsyncAfterEndEventProcess.bpmn20.xml";
+
+  protected static final String ASYNC_AFTER_FAILING_TASK_PROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationTest.asyncAfterFailingTaskProcess.bpmn20.xml";
 
   @Deployment(resources = EXCLUSIVE_GATEWAY_ASYNC_BEFORE_TASK_PROCESS)
   public void testStartBeforeAsync() {
@@ -635,6 +638,40 @@ public class ProcessInstanceModificationAsyncTest extends PluggableProcessEngine
     completeTasksInOrder("outerTask");
     assertProcessEnded(processInstance.getId());
   }
+
+  @Deployment(resources = ASYNC_AFTER_FAILING_TASK_PROCESS)
+  public void testStartBeforeAsyncAfterTask() {
+    // given a process instance with an async task in a subprocess
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("failingAfterAsyncTask");
+
+    Job job = managementService.createJobQuery().singleResult();
+    assertNotNull(job);
+
+    // when
+    runtimeService.createProcessInstanceModification(processInstance.getId())
+      .startBeforeActivity("task1")
+      .execute();
+
+    // then there are two transition instances of task1
+    ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
+    assertThat(tree).hasStructure(
+      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+        .transition("task1")
+        .transition("task1")
+      .done());
+
+    // when all jobs are executed
+    executeAvailableJobs();
+
+    // then the tree is still the same, since the jobs failed
+    tree = runtimeService.getActivityInstance(processInstance.getId());
+    assertThat(tree).hasStructure(
+      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+        .transition("task1")
+        .transition("task1")
+      .done());
+  }
+
 
   protected String getInstanceIdForActivity(ActivityInstance activityInstance, String activityId) {
     ActivityInstance instance = getChildInstanceForActivity(activityInstance, activityId);
