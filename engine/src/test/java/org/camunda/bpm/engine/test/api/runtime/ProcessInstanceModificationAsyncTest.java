@@ -19,8 +19,10 @@ import static org.camunda.bpm.engine.test.util.ExecutionAssert.describeExecution
 
 import java.util.List;
 
+import org.apache.ibatis.logging.LogFactory;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.impl.util.LogUtil;
 import org.camunda.bpm.engine.management.ActivityStatistics;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.Execution;
@@ -670,6 +672,56 @@ public class ProcessInstanceModificationAsyncTest extends PluggableProcessEngine
         .transition("task1")
         .transition("task1")
       .done());
+  }
+
+  static {
+    LogFactory.useJdkLogging();
+    LogUtil.readJavaUtilLoggingConfigFromClasspath();
+  }
+
+  @Deployment(resources = ASYNC_AFTER_FAILING_TASK_PROCESS)
+  public void testStartBeforeAsyncAfterTaskActivityStatistics() {
+    // given a process instance with an async task in a subprocess
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("failingAfterAsyncTask");
+
+    Job job = managementService.createJobQuery().singleResult();
+    assertNotNull(job);
+
+    // there is one statistics instance
+    List<ActivityStatistics> statistics = managementService
+        .createActivityStatisticsQuery(processInstance.getProcessDefinitionId())
+        .includeFailedJobs()
+        .includeIncidents()
+        .list();
+
+    assertEquals(1, statistics.size());
+    assertEquals("task1", statistics.get(0).getId());
+    assertEquals(0, statistics.get(0).getFailedJobs());
+    assertEquals(0, statistics.get(0).getIncidentStatistics().size());
+    assertEquals(1, statistics.get(0).getInstances());
+
+    // when
+    runtimeService.createProcessInstanceModification(processInstance.getId())
+      .startBeforeActivity("task1")
+      .execute();
+
+    // then there are statistics instances of task1
+    statistics = managementService
+      .createActivityStatisticsQuery(processInstance.getProcessDefinitionId())
+      .includeFailedJobs()
+      .includeIncidents()
+      .list();
+
+    assertEquals(1, statistics.size());
+    assertEquals("task1", statistics.get(0).getId());
+    assertEquals(0, statistics.get(0).getFailedJobs());
+    assertEquals(0, statistics.get(0).getIncidentStatistics().size());
+    assertEquals(2, statistics.get(0).getInstances());
+
+
+    // when all jobs are executed
+    executeAvailableJobs();
+
   }
 
 

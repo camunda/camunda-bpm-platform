@@ -357,6 +357,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
       replacingExecution.setConcurrent(true);
       replacingExecution.setScope(false);
       replacingExecution.replace(this);
+      this.inactivate();
       this.setActivity(null);
 
     }
@@ -374,6 +375,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
         child.setParent(concurrentReplacingExecution);
         ((List<PvmExecutionImpl>) concurrentReplacingExecution.getExecutions()).add(child);
         this.getExecutions().remove(child);
+        this.leaveActivityInstance();
       }
     }
 
@@ -481,6 +483,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
   public void replace(PvmExecutionImpl execution) {
     // activity instance id handling
     this.activityInstanceId = execution.getActivityInstanceId();
+    this.isActive = execution.isActive;
 
     execution.leaveActivityInstance();
   }
@@ -583,86 +586,8 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
       PvmTransition targetTransition, Map<String, Object> variables, Map<String, Object> localVariables,
       boolean skipCustomListeners, boolean skipIoMappings) {
 
-    // The following covers the three cases in which a concurrent execution may be created
-    // (this execution is the root in each scenario).
-    //
-    // Note: this should only consider non-event-scope executions. Event-scope executions
-    // are not relevant for the tree structure and should remain under their original parent.
-    //
-    //
-    // (1) A compacted tree:
-    //
-    // Before:               After:
-    //       -------               -------
-    //       |  e1  |              |  e1 |
-    //       -------               -------
-    //                             /     \
-    //                         -------  -------
-    //                         |  e2 |  |  e3 |
-    //                         -------  -------
-    //
-    // e2 replaces e1; e3 is the new root for the activity stack to instantiate
-    //
-    //
-    // (2) A single child that is a scope execution
-    // Before:               After:
-    //       -------               -------
-    //       |  e1 |               |  e1 |
-    //       -------               -------
-    //          |                  /     \
-    //       -------           -------  -------
-    //       |  e2 |           |  e3 |  |  e4 |
-    //       -------           -------  -------
-    //                            |
-    //                         -------
-    //                         |  e2 |
-    //                         -------
-    //
-    //
-    // e3 is created and is concurrent;
-    // e4 is the new root for the activity stack to instantiate
-    //
-    //
-    // (3) A single child that is a scope execution
-    // Before:               After:
-    //       -------                    ---------
-    //       |  e1 |                    |   e1  |
-    //       -------                    ---------
-    //       /     \                   /    |    \
-    //  -------    -------      -------  -------  -------
-    //  |  e2 | .. |  eX |      |  e2 |..|  eX |  | eX+1|
-    //  -------    -------      -------  -------  -------
-    //
-    // eX+1 is concurrent and the new root for the activity stack to instantiate
-    List<? extends PvmExecutionImpl> children = getNonEventScopeExecutions();
 
-    if (children.isEmpty()) {
-      // (1)
-      PvmExecutionImpl replacingExecution = createExecution();
-      replacingExecution.setConcurrent(true);
-      replacingExecution.setScope(false);
-      replacingExecution.replace(this);
-      setActivity(null);
-
-    }
-    else if (children.size() == 1) {
-      // (2)
-      PvmExecutionImpl child = children.get(0);
-
-      PvmExecutionImpl concurrentReplacingExecution = createExecution();
-      concurrentReplacingExecution.setConcurrent(true);
-      concurrentReplacingExecution.setScope(false);
-      child.setParent(concurrentReplacingExecution);
-      ((List<PvmExecutionImpl>) concurrentReplacingExecution.getExecutions()).add(child);
-      getExecutions().remove(child);
-      leaveActivityInstance();
-    }
-
-    // (1), (2), and (3)
-    PvmExecutionImpl propagatingExecution = createExecution();
-    propagatingExecution.setConcurrent(true);
-    propagatingExecution.setScope(false);
-
+    PvmExecutionImpl propagatingExecution = createConcurrentExecution();
     propagatingExecution.executeActivities(activityStack, targetActivity, targetTransition, variables, localVariables,
         skipCustomListeners, skipIoMappings);
 
