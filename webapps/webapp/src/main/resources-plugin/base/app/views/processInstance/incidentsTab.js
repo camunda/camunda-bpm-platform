@@ -75,7 +75,7 @@ define(['angular', 'text!./incidents-tab.html', 'text!./job-retry-dialog.html'],
             angular.forEach(data, function (incident) {
               var activityId = incident.activityId;
               var bpmnElement = bpmnElements[activityId];
-              incident.activityName = bpmnElement.name || bpmnElement.id;
+              incident.activityName = (bpmnElement && (bpmnElement.name || bpmnElement.id)) || activityId;
               incident.linkable = bpmnElements[activityId] && activityIdToInstancesMap[activityId] && activityIdToInstancesMap[activityId].length > 0;
             });
 

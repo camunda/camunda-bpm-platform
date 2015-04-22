@@ -17,7 +17,7 @@ define(['angular'], function(angular) {
             var activityId = jobDefinition.activityId,
                 bpmnElement = bpmnElements[activityId];
 
-            jobDefinition.activityName = bpmnElement.name || bpmnElement.id;
+            jobDefinition.activityName = (bpmnElement && (bpmnElement.name || bpmnElement.id)) || activityId;
 
           });
 

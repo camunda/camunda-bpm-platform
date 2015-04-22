@@ -53,7 +53,8 @@ define(['angular', 'text!./called-process-definition-table.html'], function(angu
 
             angular.forEach(calledFromActivityIds, function(activityId) {
               var bpmnElement = bpmnElements[activityId];
-              var activity = { id: activityId, name: bpmnElement.name || activityId };
+
+              var activity = { id: activityId, name: (bpmnElement && bpmnElement.name) || activityId };
 
               calledFromActivities.push(activity);
             });
