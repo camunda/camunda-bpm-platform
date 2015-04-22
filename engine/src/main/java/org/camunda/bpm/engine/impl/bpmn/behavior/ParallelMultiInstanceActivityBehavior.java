@@ -26,6 +26,11 @@ public class ParallelMultiInstanceActivityBehavior extends MultiInstanceActivity
 
   protected void createInstances(ActivityExecution execution, int nrOfInstances) throws Exception {
 
+    // set the MI-body scoped variables
+    setLoopVariable(execution, NUMBER_OF_INSTANCES, nrOfInstances);
+    setLoopVariable(execution, NUMBER_OF_COMPLETED_INSTANCES, 0);
+    setLoopVariable(execution, NUMBER_OF_ACTIVE_INSTANCES, nrOfInstances);
+
     // create the concurrent child executions
     List<ActivityExecution> concurrentExecutions = new ArrayList<ActivityExecution>();
     for (int i = 0; i < nrOfInstances; i++) {
@@ -35,13 +40,8 @@ public class ParallelMultiInstanceActivityBehavior extends MultiInstanceActivity
       concurrentExecutions.add(concurrentChild);
     }
 
-    // set the MI variables
-    setLoopVariable(execution, NUMBER_OF_INSTANCES, nrOfInstances);
-    setLoopVariable(execution, NUMBER_OF_COMPLETED_INSTANCES, 0);
-    setLoopVariable(execution, NUMBER_OF_ACTIVE_INSTANCES, nrOfInstances);
-
     // start the concurrent child executions
-    for (int i = 0; i< nrOfInstances; i++) {
+    for (int i = 0; i < nrOfInstances; i++) {
       ActivityExecution activityExecution = concurrentExecutions.get(i);
       // check for active execution: the completion condition may be satisfied before all executions are started
       if(activityExecution.isActive()) {
@@ -49,6 +49,7 @@ public class ParallelMultiInstanceActivityBehavior extends MultiInstanceActivity
       }
     }
 
+    // inactivate this execution unless all child executions are already joined
     if(!execution.getExecutions().isEmpty()) {
       execution.inactivate();
     }

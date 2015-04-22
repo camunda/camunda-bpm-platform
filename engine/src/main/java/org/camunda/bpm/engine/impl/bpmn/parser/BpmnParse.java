@@ -104,8 +104,6 @@ import org.camunda.bpm.engine.impl.jobexecutor.TimerStartEventSubprocessJobHandl
 import org.camunda.bpm.engine.impl.persistence.entity.DeploymentEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
-import org.camunda.bpm.engine.impl.pvm.PvmActivity;
-import org.camunda.bpm.engine.impl.pvm.PvmScope;
 import org.camunda.bpm.engine.impl.pvm.PvmTransition;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
@@ -757,7 +755,7 @@ public class BpmnParse extends Parse {
     processDefinition.setInitial(initial);
   }
 
-  protected void parseProcessDefinitionStartEvent(ActivityImpl startEventActivity, Element startEventElement, Element parentElement, PvmScope scope) {
+  protected void parseProcessDefinitionStartEvent(ActivityImpl startEventActivity, Element startEventElement, Element parentElement, ScopeImpl scope) {
     ProcessDefinitionEntity processDefinition = (ProcessDefinitionEntity) scope;
 
     String initiatorVariableName = startEventElement.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "initiator");
@@ -1321,7 +1319,7 @@ public class BpmnParse extends Parse {
     }
 
     // find all cancel end events
-    for (PvmActivity childActivity : transaction.getActivities()) {
+    for (ActivityImpl childActivity : transaction.getActivities()) {
       ActivityBehavior activityBehavior = childActivity.getActivityBehavior();
       if(activityBehavior != null && activityBehavior instanceof CancelEndEventActivityBehavior) {
         ((CancelEndEventActivityBehavior)activityBehavior).setCancelBoundaryEvent(activity);
@@ -2886,7 +2884,7 @@ public class BpmnParse extends Parse {
     return activity;
   }
 
-  protected void parseBinding(Element callActivityElement, PvmActivity activity, CallableElement callableElement, boolean isProcess) {
+  protected void parseBinding(Element callActivityElement, ActivityImpl activity, CallableElement callableElement, boolean isProcess) {
     String binding = null;
 
     if (isProcess) {
@@ -2904,7 +2902,7 @@ public class BpmnParse extends Parse {
     }
   }
 
-  protected void parseVersion(Element callActivityElement, PvmActivity activity, CallableElement callableElement, boolean isProcess) {
+  protected void parseVersion(Element callActivityElement, ActivityImpl activity, CallableElement callableElement, boolean isProcess) {
     String version = null;
 
     CallableElementBinding binding = callableElement.getBinding();
@@ -2929,7 +2927,7 @@ public class BpmnParse extends Parse {
     callableElement.setVersionValueProvider(versionProvider);
   }
 
-  protected void parseInputParameter(Element callActivityElement, PvmActivity activity, CallableElement callableElement, boolean isProcess) {
+  protected void parseInputParameter(Element callActivityElement, ActivityImpl activity, CallableElement callableElement, boolean isProcess) {
     Element extensionsElement = callActivityElement.element("extensionElements");
 
     if (extensionsElement != null) {
@@ -2979,7 +2977,7 @@ public class BpmnParse extends Parse {
     }
   }
 
-  protected void parseOutputParameter(Element callActivityElement, PvmActivity activity, CallableElement callableElement, boolean isProcess) {
+  protected void parseOutputParameter(Element callActivityElement, ActivityImpl activity, CallableElement callableElement, boolean isProcess) {
     Element extensionsElement = callActivityElement.element("extensionElements");
 
     if (extensionsElement != null) {

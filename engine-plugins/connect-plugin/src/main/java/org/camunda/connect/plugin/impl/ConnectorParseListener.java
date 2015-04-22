@@ -19,7 +19,6 @@ import static org.camunda.bpm.engine.impl.util.BpmnParseUtil.parseInputOutput;
 import org.camunda.bpm.engine.BpmnParseException;
 import org.camunda.bpm.engine.impl.bpmn.parser.AbstractBpmnParseListener;
 import org.camunda.bpm.engine.impl.core.variable.mapping.IoMapping;
-import org.camunda.bpm.engine.impl.pvm.PvmScope;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 import org.camunda.bpm.engine.impl.util.xml.Element;
@@ -27,7 +26,7 @@ import org.camunda.bpm.engine.impl.util.xml.Element;
 public class ConnectorParseListener extends AbstractBpmnParseListener {
 
   @Override
-  public void parseServiceTask(Element serviceTaskElement, PvmScope scope, ActivityImpl activity) {
+  public void parseServiceTask(Element serviceTaskElement, ScopeImpl scope, ActivityImpl activity) {
     Element connectorDefinition = findCamundaExtensionElement(serviceTaskElement, "connector");
     if (connectorDefinition != null) {
       Element connectorIdElement = connectorDefinition.element("connectorId");

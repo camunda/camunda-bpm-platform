@@ -18,7 +18,7 @@ import org.camunda.bpm.engine.impl.pvm.process.ActivityStartBehavior;
 /**
  * <p>The BPMN terminate End Event.</p>
  *
- * <p>The start behavior of the event based gateway is {@link ActivityStartBehavior#INTERRUPT_FLOW_SCOPE}.
+ * <p>The start behavior of the terminate end event is {@link ActivityStartBehavior#INTERRUPT_FLOW_SCOPE}.
  * as a result, the current scope will be interrupted (all concurrent executions cancelled) and this
  * behavior is entered with the scope execution.</p>
  *

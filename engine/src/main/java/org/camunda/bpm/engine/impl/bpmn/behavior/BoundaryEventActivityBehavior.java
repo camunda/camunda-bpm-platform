@@ -12,22 +12,17 @@
  */
 package org.camunda.bpm.engine.impl.bpmn.behavior;
 
-import org.camunda.bpm.engine.impl.pvm.PvmActivity;
+import org.camunda.bpm.engine.impl.pvm.process.ActivityStartBehavior;
 
 
 /**
  * <p>The BPMN Boundary Event.</p>
  *
- * <p>The corresponding activity must either be
- * <ul>
- *  <li>{@link PvmActivity#isCancelActivity()} in case of an interrupting boundary event. In this case
- *  the scope to which the boundary event is attached will already be cancelled when this behavior is executed.</li>
- *  <li>{@link PvmActivity#isConcurrent()} in case of a non-interrupting boundary event. In this case
- *  the new concurrent execution will already have been created when this behavior is executed.</li>
- * </ul>
- * </p>
- * <p>As a result, the boundary event does noting "special". It will be left by all outgoing sequence flows
- * just like any other activity.</p>
+ * <p>The behavior of the boundary event is defined via it's {@link ActivityStartBehavior}. It must be either
+ * {@value ActivityStartBehavior#CANCEL_EVENT_SCOPE} or {@value ActivityStartBehavior#CONCURRENT_IN_FLOW_SCOPE} meaning
+ * that it will either cancel the scope execution for the activity it is attached to (it's event scope) or will be executed concurrently
+ * in it's flow scope.</p>
+ * <p>The boundary event does noting "special" in its inner behavior.</p>
  *
  * @author Daniel Meyer
  * @author Roman Smirnov

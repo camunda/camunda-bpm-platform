@@ -12,19 +12,15 @@
  */
 package org.camunda.bpm.engine.impl.bpmn.behavior;
 
-import org.camunda.bpm.engine.impl.pvm.PvmActivity;
+import org.camunda.bpm.engine.impl.pvm.process.ActivityStartBehavior;
 
 
 /**
  * <p>Specialization of the Start Event for Event Sub-Processes.</p>
  *
- * The corresponding activity must either be
- * <ul>
- *  <li>{@link PvmActivity#isInterrupting()} in case of an interrupting event subprocess. In this case
- *  the scope will already be interrupted when this behavior is executed.</li>
- *  <li>{@link PvmActivity#isConcurrent()} in case of a non-interrupting event subprocess. In this case
- *  the new concurrent execution will already be created when this behavior is executed.</li>
- * </ul>
+ * <p>The start event's behavior is realized by the start behavior of the event subprocess it is embedded in.
+ * The start behavior of the event subprocess must be either either {@link ActivityStartBehavior#INTERRUPT_EVENT_SCOPE} or
+ * {@link ActivityStartBehavior#CONCURRENT_IN_FLOW_SCOPE}</p>
  *
  * @author Daniel Meyer
  * @author Roman Smirnov

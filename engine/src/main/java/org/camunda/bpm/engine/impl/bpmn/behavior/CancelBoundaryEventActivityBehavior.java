@@ -18,7 +18,7 @@ package org.camunda.bpm.engine.impl.bpmn.behavior;
  *
  * @author Daniel Meyer
  */
-public class CancelBoundaryEventActivityBehavior extends AbstractBpmnActivityBehavior {
+public class CancelBoundaryEventActivityBehavior extends BoundaryEventActivityBehavior {
 
 
 }

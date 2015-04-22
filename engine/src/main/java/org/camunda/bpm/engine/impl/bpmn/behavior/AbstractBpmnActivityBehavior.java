@@ -82,8 +82,7 @@ public class AbstractBpmnActivityBehavior extends FlowNodeActivityBehavior {
     // the compensate event subscription is created "at the level of subprocess" of the the current activity.
     ActivityExecution levelOfSubprocessScopeExecution = execution.findExecutionForFlowScope(levelOfSubprocessScope);
 
-    CompensateEventSubscriptionEntity compensateEventSubscriptionEntity = CompensateEventSubscriptionEntity.createAndInsert((ExecutionEntity) levelOfSubprocessScopeExecution);
-    compensateEventSubscriptionEntity.setActivity(compensationHandler);
+    CompensateEventSubscriptionEntity.createAndInsert((ExecutionEntity) levelOfSubprocessScopeExecution, compensationHandler);
   }
 
   protected void propagateExceptionAsError(Exception exception, ActivityExecution execution) throws Exception {

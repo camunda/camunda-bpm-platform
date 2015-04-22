@@ -111,8 +111,7 @@ public class CompensationUtil {
         eventSubscriptionEntity = eventSubscriptionEntity.moveUnder(eventScopeExecution);
       }
 
-      CompensateEventSubscriptionEntity eventSubscription = CompensateEventSubscriptionEntity.createAndInsert(levelOfSubprocessScopeExecution);
-      eventSubscription.setActivity(execution.getActivity());
+      CompensateEventSubscriptionEntity eventSubscription = CompensateEventSubscriptionEntity.createAndInsert(levelOfSubprocessScopeExecution, execution.getActivity());
       eventSubscription.setConfiguration(eventScopeExecution.getId());
 
     }

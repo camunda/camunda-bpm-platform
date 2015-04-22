@@ -38,15 +38,14 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
 
   protected static final Logger LOGGER = Logger.getLogger(MultiInstanceActivityBehavior.class.getName());
 
-  // Variable names for outer instance(as described in spec)
+  // Variable names for mi-body scoped variables (as described in spec)
   protected final String NUMBER_OF_INSTANCES = "nrOfInstances";
   protected final String NUMBER_OF_ACTIVE_INSTANCES = "nrOfActiveInstances";
   protected final String NUMBER_OF_COMPLETED_INSTANCES = "nrOfCompletedInstances";
 
-  // Variable names for inner instances (as described in the spec)
+  // Variable names for mi-instance scoped variables (as described in the spec)
   protected final String LOOP_COUNTER = "loopCounter";
 
-  // Instance members
   protected Expression loopCardinalityExpression;
   protected Expression completionConditionExpression;
   protected Expression collectionExpression;
@@ -75,11 +74,11 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
 
   protected void evaluateCollectionVariable(ActivityExecution execution, int loopCounter) {
     if (usesCollection() && collectionElementVariable != null) {
-      Collection collection = null;
+      Collection<?> collection = null;
       if (collectionExpression != null) {
-        collection = (Collection) collectionExpression.getValue(execution);
+        collection = (Collection<?>) collectionExpression.getValue(execution);
       } else if (collectionVariable != null) {
-        collection = (Collection) execution.getVariable(collectionVariable);
+        collection = (Collection<?>) execution.getVariable(collectionVariable);
       }
 
       Object value = getElementAtIndex(loopCounter, collection);
@@ -91,7 +90,6 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
 
   // Helpers //////////////////////////////////////////////////////////////////////
 
-  @SuppressWarnings("rawtypes")
   protected int resolveNrOfInstances(ActivityExecution execution) {
     int nrOfInstances = -1;
     if (loopCardinalityExpression != null) {
@@ -101,13 +99,13 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
       if (!(obj instanceof Collection)) {
         throw new ProcessEngineException(collectionExpression.getExpressionText()+"' didn't resolve to a Collection");
       }
-      nrOfInstances = ((Collection) obj).size();
+      nrOfInstances = ((Collection<?>) obj).size();
     } else if (collectionVariable != null) {
       Object obj = execution.getVariable(collectionVariable);
       if (!(obj instanceof Collection)) {
         throw new ProcessEngineException("Variable " + collectionVariable+"' is not a Collection");
       }
-      nrOfInstances = ((Collection) obj).size();
+      nrOfInstances = ((Collection<?>) obj).size();
     } else {
       throw new ProcessEngineException("Couldn't resolve collection expression nor variable reference");
     }

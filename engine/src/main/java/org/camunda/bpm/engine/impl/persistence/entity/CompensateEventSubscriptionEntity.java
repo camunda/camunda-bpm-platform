@@ -14,6 +14,7 @@
 package org.camunda.bpm.engine.impl.persistence.entity;
 
 import org.camunda.bpm.engine.impl.event.CompensationEventHandler;
+import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 
 
 
@@ -32,8 +33,9 @@ public class CompensateEventSubscriptionEntity extends EventSubscriptionEntity {
     eventType=CompensationEventHandler.EVENT_HANDLER_TYPE;
   }
 
-  public static CompensateEventSubscriptionEntity createAndInsert(ExecutionEntity executionEntity) {
+  public static CompensateEventSubscriptionEntity createAndInsert(ExecutionEntity executionEntity, ActivityImpl activity) {
     CompensateEventSubscriptionEntity eventSubscription = new CompensateEventSubscriptionEntity(executionEntity);
+    eventSubscription.setActivity(activity);
     eventSubscription.insert();
     return eventSubscription;
   }
@@ -50,8 +52,7 @@ public class CompensateEventSubscriptionEntity extends EventSubscriptionEntity {
 
     delete();
 
-    CompensateEventSubscriptionEntity newSubscription = createAndInsert(newExecution);
-    newSubscription.setActivity(getActivity());
+    CompensateEventSubscriptionEntity newSubscription = createAndInsert(newExecution, getActivity());
     newSubscription.setConfiguration(configuration);
     // use the original date
     newSubscription.setCreated(created);
