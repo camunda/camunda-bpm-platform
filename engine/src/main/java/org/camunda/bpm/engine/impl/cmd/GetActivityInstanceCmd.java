@@ -172,7 +172,7 @@ public class GetActivityInstanceCmd implements Command<ActivityInstance> {
 
     List<String> executionIds = new ArrayList<String>();
     executionIds.add(scopeExecution.getId());
-    // TODO: ensure this does not make a db query
+
     for (PvmExecutionImpl childExecution : scopeExecution.getNonEventScopeExecutions()) {
       // add all concurrent children that are not in an activity or inactive
       if (childExecution.isConcurrent() && (childExecution.getActivityId() == null || !childExecution.isActive())) {
@@ -316,13 +316,31 @@ public class GetActivityInstanceCmd implements Command<ActivityInstance> {
 
   @SuppressWarnings({ "unchecked", "rawtypes" })
   protected List<ExecutionEntity> loadFromDb(final String processInstanceId, final CommandContext commandContext) {
-    return commandContext.runWithoutAuthentication(new Callable<List<ExecutionEntity>>() {
+    List<ExecutionEntity> executions = commandContext.runWithoutAuthentication(new Callable<List<ExecutionEntity>>() {
       public List<ExecutionEntity> call() throws Exception {
         return (List) new ExecutionQueryImpl(commandContext)
           .processInstanceId(processInstanceId)
           .list();
       }
     });
+
+    // initialize parent/child sets
+    Map<String, List<ExecutionEntity>> executionsByParent = new HashMap<String, List<ExecutionEntity>>();
+    for (ExecutionEntity execution : executions) {
+      putListElement(executionsByParent, execution.getParentId(), execution);
+    }
+
+    for (ExecutionEntity execution : executions) {
+      List<ExecutionEntity> children = executionsByParent.get(execution.getId());
+      if (children != null) {
+        execution.setExecutions(children);
+      }
+      else {
+        execution.setExecutions(new ArrayList<ExecutionEntity>());
+      }
+    }
+
+    return executions;
   }
 
   /**

@@ -22,6 +22,7 @@ import java.util.Set;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
+import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 import org.camunda.bpm.engine.impl.util.EnsureUtil;
 
 /**
@@ -77,51 +78,29 @@ public class ActivityExecutionMapping {
 
       if (activity != null) {
         if (leaf.getActivityInstanceId() != null) {
-          assignToActivity(leaf, activity);
+          EnsureUtil.ensureNotNull("activity", activity);
+          submitExecution(leaf, activity);
         }
-        else {
-          // if current execution has no activity instance id, it is not actually executing its assigned activity
-          // but for example async before
-          ExecutionEntity scopeExecution = leaf;
-          if (!leaf.isScope()) {
-            scopeExecution = scopeExecution.getParent();
-          }
-
-          assignToActivity(scopeExecution, activity.getFlowScope());
-        }
+        mergeScopeExecutions(leaf);
 
 
       }
       else if (leaf.isProcessInstanceExecution()) {
-        assignToActivity(leaf, leaf.getProcessDefinition());
-
+        submitExecution(leaf, leaf.getProcessDefinition());
       }
-
     }
   }
 
-  protected void assignToActivity(ExecutionEntity execution, ScopeImpl activity) {
-    EnsureUtil.ensureNotNull("activity", activity);
-    submitExecution(execution, activity);
+  protected void mergeScopeExecutions(ExecutionEntity leaf) {
+    Map<ScopeImpl, PvmExecutionImpl> mapping = leaf.createActivityExecutionMapping();
 
-    if (execution.isProcessInstanceExecution()) {
-      submitExecution(execution, activity.getProcessDefinition());
+    for (Map.Entry<ScopeImpl, PvmExecutionImpl> mappingEntry : mapping.entrySet()) {
+      ScopeImpl scope = mappingEntry.getKey();
+      ExecutionEntity scopeExecution = (ExecutionEntity) mappingEntry.getValue();
 
+      submitExecution(scopeExecution, scope);
     }
-    else {
 
-      if(!activity.isScope() && execution.isScope()) {
-        assignToActivity(execution, activity.getFlowScope());
-      }
-      else {
-        ExecutionEntity parent = execution.getParent();
-
-        if (!parent.isScope()) {
-          parent = parent.getParent();
-        }
-        assignToActivity(parent, activity.getFlowScope());
-      }
-    }
 
   }
 
@@ -151,12 +130,11 @@ public class ActivityExecutionMapping {
    * event-scope executions are not considered in this mapping and must be ignored
    */
   protected boolean isLeaf(ExecutionEntity execution) {
-    for (ExecutionEntity child : execution.getExecutions()) {
-      if (!child.isEventScope()) {
-        return false;
-      }
+    if (execution.isCompensationThrowing()) {
+      return true;
     }
-
-    return !execution.isEventScope();
+    else {
+      return !execution.isEventScope() && execution.getNonEventScopeExecutions().isEmpty();
+    }
   }
 }

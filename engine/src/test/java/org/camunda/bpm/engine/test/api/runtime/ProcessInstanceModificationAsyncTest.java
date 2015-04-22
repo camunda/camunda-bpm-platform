@@ -674,11 +674,6 @@ public class ProcessInstanceModificationAsyncTest extends PluggableProcessEngine
       .done());
   }
 
-  static {
-    LogFactory.useJdkLogging();
-    LogUtil.readJavaUtilLoggingConfigFromClasspath();
-  }
-
   @Deployment(resources = ASYNC_AFTER_FAILING_TASK_PROCESS)
   public void testStartBeforeAsyncAfterTaskActivityStatistics() {
     // given a process instance with an async task in a subprocess
