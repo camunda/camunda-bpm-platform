@@ -68,6 +68,7 @@ public class PvmAtomicOperationActivityEnd implements PvmAtomicOperation {
       if(propagatingExecution.isConcurrent()) {
         propagatingExecution.remove();
         propagatingExecution.getParent().tryPruneLastConcurrentChild();
+        propagatingExecution.getParent().forceUpdate();
       }
       else {
         // 1.2 Process End

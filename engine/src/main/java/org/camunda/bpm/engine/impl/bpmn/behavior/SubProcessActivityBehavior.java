@@ -44,6 +44,7 @@ public class SubProcessActivityBehavior extends AbstractBpmnActivityBehavior imp
     // join
     endedExecution.remove();
     scopeExecution.tryPruneLastConcurrentChild();
+    scopeExecution.forceUpdate();
   }
 
   public void complete(ActivityExecution scopeExecution) {
