@@ -34,29 +34,28 @@ function devFileProcessing(content, srcpath) {
   return content;
 }
 
-module.exports = function(config) {
+module.exports = function(config, copyConf) {
   var grunt = config.grunt;
 
-  return {
-    development: {
-      options: {
-        process: function() {
-          return devFileProcessing.apply(grunt, arguments);
-        }
-      },
-      files: [
-        {
-          expand: true,
-          cwd: '<%= pkg.gruntConfig.clientDir %>/scripts/',
-          src: [
-            'index.html'
-          ],
-          dest: '<%= buildTarget %>/'
-        }
-      ]
+  copyConf.admin_index = {
+    options: {
+      process: function() {
+        return devFileProcessing.apply(grunt, arguments);
+      }
     },
+    files: [
+      {
+        expand: true,
+        cwd: '<%= pkg.gruntConfig.adminSourceDir %>/scripts/',
+        src: [
+          'index.html'
+        ],
+        dest: '<%= pkg.gruntConfig.adminBuildTarget %>/'
+      }
+    ]
+  };
 
-    dist: {
+  copyConf.admin_dist = {
       options: {
         process: function() {
           return distFileProcessing.apply(grunt, arguments);
@@ -65,49 +64,49 @@ module.exports = function(config) {
       files: [
         {
           expand: true,
-          cwd: '<%= pkg.gruntConfig.clientDir %>/scripts/WEB-INF',
+          cwd: '<%= pkg.gruntConfig.adminSourceDir %>/scripts/WEB-INF',
           src: ['*'],
-          dest: '<%= buildTarget %>/WEB-INF'
+          dest: '<%= pkg.gruntConfig.adminBuildTarget %>/WEB-INF'
         },
         {
           expand: true,
-          cwd: '<%= pkg.gruntConfig.clientDir %>/scripts/',
+          cwd: '<%= pkg.gruntConfig.adminSourceDir %>/scripts/',
           src: [
             'index.html'
           ],
-          dest: '<%= buildTarget %>/'
+          dest: '<%= pkg.gruntConfig.adminBuildTarget %>/'
         }
       ]
-    },
+    };
 
-    assets: {
+    copyConf.admin_assets = {
       files: [
         // custom styles and/or other css files
         {
           expand: true,
-          cwd: '<%= pkg.gruntConfig.clientDir %>/styles',
+          cwd: '<%= pkg.gruntConfig.adminSourceDir %>/styles',
           src: ['*.css'],
-          dest: '<%= buildTarget %>/styles/'
+          dest: '<%= pkg.gruntConfig.adminBuildTarget %>/styles/'
         },
 
         // images, fonts & stuff
         {
           expand: true,
-          cwd: '<%= pkg.gruntConfig.clientDir %>/',
+          cwd: '<%= pkg.gruntConfig.adminSourceDir %>/',
           src:  [
             '{fonts,images}/**/*.*'
           ],
-          dest: '<%= buildTarget %>/assets'
+          dest: '<%= pkg.gruntConfig.adminBuildTarget %>/assets'
         },
 
         // bootstrap fonts
         {
           expand: true,
-          cwd: 'node_modules/camunda-commons-ui/node_modules/bootstrap/fonts',
+          cwd: '<%= pkg.gruntConfig.adminSourceDir %>/../node_modules/camunda-commons-ui/node_modules/bootstrap/fonts',
           src: [
             '*.{eot,ttf,svg,woff}'
           ],
-          dest: '<%= buildTarget %>/fonts/'
+          dest: '<%= pkg.gruntConfig.adminBuildTarget %>/fonts/'
         },
         // open sans fonts
         {
@@ -120,11 +119,10 @@ module.exports = function(config) {
         // placeholder shims
         {
           expand: true,
-          cwd: 'node_modules/camunda-commons-ui/vendor',
+          cwd: '<%= pkg.gruntConfig.adminSourceDir %>/../node_modules/camunda-commons-ui/vendor',
           src: ['placeholders.*'],
-          dest: '<%= buildTarget %>/scripts/'
+          dest: '<%= pkg.gruntConfig.adminBuildTarget %>/scripts/'
         }
       ]
-    }
-  };
+    };
 };

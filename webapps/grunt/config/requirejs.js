@@ -1,4 +1,4 @@
-module.exports = function(config) {
+module.exports = function(config, requireJsConfig) {
   'use strict';
   var grunt = config.grunt;
   var commons = require('camunda-commons-ui');
@@ -15,74 +15,70 @@ module.exports = function(config) {
     'domReady'
   ];
 
-  var rConf = {
-    options: {
-      stubModules: ['text'],
+  var options = {
+    stubModules: ['text'],
 
-      optimize: '<%= (buildTarget === "dist" ? "uglify2" : "none") %>',
-      preserveLicenseComments: false,
-      generateSourceMaps: true,
+    preserveLicenseComments: false,
+    generateSourceMaps: true,
 
-      baseUrl: './<%= pkg.gruntConfig.clientDir %>',
+    baseUrl: './<%= pkg.gruntConfig.adminSourceDir %>',
 
-      paths: _.extend(rjsConf.paths, {
-        'admin':            'scripts',
-        'camunda-admin-ui': 'scripts/camunda-admin-ui'
-      }),
+    paths: _.extend(rjsConf.paths, {
+      'admin':            'scripts',
+      'camunda-admin-ui': 'scripts/camunda-admin-ui'
+    }),
 
-      shim: _.extend(rjsConf.shim, {
-      }),
+    shim: _.extend(rjsConf.shim, {
+    }),
 
-      packages: rjsConf.packages.concat([
-        {
-          name: 'services',
-          location: './scripts/services',
-        },
-        {
-          name: 'pages',
-          location: './scripts/pages',
-        },
-        {
-          name: 'directives',
-          location: './scripts/directives',
-        },
-        {
-          name: 'filters',
-          location: './scripts/filters',
-        },
-        {
-          name: 'resources',
-          location: './scripts/resources',
-        },
-        {
-          name: 'util',
-          location: './scripts/util',
-          main: 'routeUtil'
-        }
-      ])
-    },
-
-
-    dependencies: {
-      options: {
-        create: true,
-        name: '<%= pkg.name %>-deps',
-        out: '<%= buildTarget %>/scripts/deps.js',
-        include: deps
+    packages: rjsConf.packages.concat([
+      {
+        name: 'services',
+        location: './scripts/services',
+      },
+      {
+        name: 'pages',
+        location: './scripts/pages',
+      },
+      {
+        name: 'directives',
+        location: './scripts/directives',
+      },
+      {
+        name: 'filters',
+        location: './scripts/filters',
+      },
+      {
+        name: 'resources',
+        location: './scripts/resources',
+      },
+      {
+        name: 'util',
+        location: './scripts/util',
+        main: 'routeUtil'
       }
-    },
-
-    scripts: {
-      options: {
-        name: '<%= pkg.name %>',
-        out: '<%= buildTarget %>/scripts/<%= pkg.name %>.js',
-        exclude: deps,
-        include: [],
-
-        onModuleBundleComplete: commons.livereloadSnippet(grunt)
-      }
-    }
+    ])
   };
 
-  return rConf;
+
+  requireJsConfig.admin_dependencies = {
+    options: _.merge({}, options, {
+      create: true,
+      name: 'camunda-admin-ui-deps',
+      out: '<%= pkg.gruntConfig.adminBuildTarget %>/scripts/deps.js',
+      include: deps
+    })
+  };
+
+  requireJsConfig.admin_scripts = {
+    options: _.merge({}, options, {
+      name: 'camunda-admin-ui',
+      out: '<%= pkg.gruntConfig.adminBuildTarget %>/scripts/camunda-admin-ui.js',
+      exclude: deps,
+      include: [],
+
+      onModuleBundleComplete: commons.livereloadSnippet(grunt)
+    })
+  };
+
 };

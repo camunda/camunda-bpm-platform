@@ -1,63 +1,65 @@
-module.exports = function(config) {
+module.exports = function(config, watchConf) {
   'use strict';
-  return {
-    options: {
+
+  var options = {
       livereload: false
-    },
-
-    assets: {
-      files: [
-        '<%= pkg.gruntConfig.clientDir %>/{fonts,images}/**/*',
-        '<%= pkg.gruntConfig.clientDir %>/index.html',
-        '<%= pkg.gruntConfig.clientDir %>/favicon.ico'
-      ],
-      tasks: [
-        'newer:copy:assets'
-      ]
-    },
-
-    styles: {
-      files: [
-        'node_modules/camunda-commons-ui/lib/widgets/**/*.less',
-        'node_modules/camunda-commons-ui/resources/less/**/*.less',
-        'node_modules/camunda-commons-ui/lib/**/*.less',
-        'node_modules/camunda-*/client/styles/**/*.{css,less}',
-        '<%= pkg.gruntConfig.clientDir %>/styles/**/*.{css,less}',
-        '<%= pkg.gruntConfig.clientDir %>/scripts/*/*.{css,less}'
-      ],
-      tasks: [
-        'less'
-      ]
-    },
-
-    scripts: {
-      files: [
-        '../camunda-bpm-webapp/webapp/target/webapp/plugin/**/*.{js,html}',
-        '../camunda-bpm-platform-ee/webapps/camunda-webapp/plugins/target/classes/plugin-webapp/**/*.{js,html}',
-        'node_modules/camunda-commons-ui/**/*.{js,html}',
-        'grunt/config/requirejs.js',
-        '<%= pkg.gruntConfig.clientDir %>/scripts/**/*.{js,html}'
-      ],
-      tasks: [
-        'requirejs:scripts'
-      ]
-    },
-
-    dependencies: {
-      files: [
-        'grunt/config/requirejs.js'
-      ],
-      tasks: [
-        'requirejs:dependencies'
-      ]
-    },
-
-    served: {
-      options: {
-        cwd: '<%= buildTarget %>/',
-        livereload: config.livereloadPort || false
-      },
-      files: '**/*.{css,html,js}'
-    }
   };
+
+  watchConf.admin_assets = {
+      options: options,
+      files: [
+        '<%= pkg.gruntConfig.adminSourceDir %>/{fonts,images}/**/*',
+        '<%= pkg.gruntConfig.adminSourceDir %>/scripts/index.html',
+        '<%= pkg.gruntConfig.adminSourceDir %>/scripts/favicon.ico'
+      ],
+      tasks: [
+        'copy:admin_assets',
+        'copy:admin_index'
+      ]
+  };
+
+  watchConf.admin_styles = {
+      options: options,
+      files: [
+        '<%= pkg.gruntConfig.adminSourceDir %>/../node_modules/camunda-commons-ui/lib/**/*.less',
+        '<%= pkg.gruntConfig.adminSourceDir %>/../node_modules/camunda-commons-ui/resources/less/**/*.less',
+        '<%= pkg.gruntConfig.adminSourceDir %>/styles/**/*.{css,less}',
+        '<%= pkg.gruntConfig.adminSourceDir %>/scripts/**/*.{css,less}'
+      ],
+      tasks: [
+        'less:admin_styles'
+      ]
+  };
+
+  watchConf.admin_scripts = {
+      options: options,
+      files: [
+        '<%= pkg.gruntConfig.adminSourceDir %>/scripts/**/*.{js,html,json}'
+      ],
+      tasks: [
+        'requirejs:admin_scripts'
+      ]
+  };
+
+  watchConf.admin_dependencies = {
+      options: options,
+      files: [
+        '<%= pkg.gruntConfig.adminSourceDir %>/../node_modules/camunda-commons-ui/lib/**/*.{js,html}',
+        '<%= pkg.gruntConfig.adminSourceDir %>/../node_modules/camunda-commons-ui/{resources,lib/*}/locales/**/*.json',
+        '<%= pkg.gruntConfig.adminSourceDir %>/../node_modules/camunda-commons-ui/node_modules/camunda-bpm-sdk-js/dist/**/*.js',
+      ],
+      tasks: [
+        'requirejs:admin_dependencies',
+        'requirejs:admin_scripts'
+      ]
+  };
+
+  watchConf.admin_dist = {
+    options: {
+      cwd: '<%= pkg.gruntConfig.adminBuildTarget %>/',
+      livereload: config.livereloadPort || false
+    },
+    files: '**/*.{css,html,js}'
+  };
+
 };
