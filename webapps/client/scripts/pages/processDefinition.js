@@ -281,7 +281,6 @@ define([
     processData.observe('filter', autoCompleteFilter);
 
     $scope.handleBpmnElementSelection = function(activityId, event) {
-      console.info('handleBpmnElementSelection', activityId, event);
       var newFilter = angular.copy(currentFilter),
           ctrl = event.ctrlKey,
           activityIds = angular.copy(newFilter.activityIds) || [],
