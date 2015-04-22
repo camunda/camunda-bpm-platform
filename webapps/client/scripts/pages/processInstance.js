@@ -254,7 +254,11 @@ define([
                 transitionBpmnElement = bpmnElements[targetActivityId],
                 transitionInstances = activityIdToInstancesMap[targetActivityId] || [];
 
-            transition.name = getActivityName(transitionBpmnElement);
+            if(transitionBpmnElement) {
+              transition.name = getActivityName(transitionBpmnElement);
+            } else {
+              transition.name = targetActivityId;
+            }
             transition.isTransitionInstance = true;
             activityIdToInstancesMap[targetActivityId] = transitionInstances;
             if(!instanceIdToInstanceMap[transition.id]) {
