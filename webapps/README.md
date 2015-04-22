@@ -67,31 +67,19 @@ See https://github.com/camunda/camunda-bpm-platform#building-camunda-bpm-platfor
 
 #### Using grunt
 
-They are some grunt tasks aimed to ease the development setup process, __but they can not be considered as stable__ and might do some mess with your NPM linking (at least with the camunda related packages).
+Installing the webapps is done by grunt:
 
-To give it a try:
-
-##### Setup step:
 ```sh
 # cd <path to your workspace>
 git clone git@github.com:camunda/camunda-bpm-webapp.git
 cd camunda-bpm-webapp/webapp
 npm install
-grunt setup
-```
-
-##### Working:
-```sh
-# cd <path to your workspace>/camunda-bpm-webapp
 grunt
 ```
 
-You can additionally use the --update option (who will refresh the maven dependencies).
+#### Development Setup
 
-
-#### By hands
-
-Depending on your needs, you might want to clone the following repositories:
+In order to make changes to the webapps, you have to clone the repositories you need:
 
 ```sh
 # cd <path to your workspace>
@@ -102,67 +90,37 @@ git clone git@github.com:camunda/camunda-bpm-sdk-js.git
 git clone git@github.com:camunda/camunda-tasklist-ui.git
 git clone git@github.com:camunda/camunda-admin-ui.git
 git clone git@github.com:camunda/camunda-cockpit-ui.git
-git clone git@github.com:camunda/camunda-cockpit-plugin-base.git
 ```
 
-To ease development and provide live-reloading, you can link the projects as follow:
+You can then link the projects so that changes are automatically picked up by the server. This example shows how to link the cockpit webapp:
 
 ```sh
 # cd <path to your workspace>
 
-cd camunda-bpm-sdk-js
-npm link
-cd ..
-
-cd camunda-commons-ui
-npm link
-cd ..
-
 cd camunda-cockpit-ui
 npm link
-npm link camunda-commons-ui
-npm link camunda-bpm-sdk-js
-cd ..
 
-cd camunda-tasklist-ui
-npm link
-npm link camunda-commons-ui
-npm link camunda-bpm-sdk-js
-cd ..
-
-cd camunda-admin-ui
-npm link
-npm link camunda-commons-ui
-npm link camunda-bpm-sdk-js
-cd ..
+cd ../camunda-bpm-webapp/webapp
+npm link camunda-cockpit-ui
 ```
 
-__Note__: if you do not link the projects, you will have to run `npm install` in each of them.
+If you want to make changes in the camunda-commons-ui project or the camunda-bpm-sdk-js, you have to link the projects to the webapps itself (i.e. camunda-cockpit-ui --> camunda-commons-ui --> camunda-bpm-sdk-js).
 
-
-From the `camunda-bpm-webapp` directory:
-```sh
-# might (or not) be needed
-cd ../camunda-cockpit-plugin-base
-mvn clean install
-cd ../camunda-bpm-webapp
-```
+To start the server in development mode, call
 
 ```sh
-cd webapp
-mvn clean install jetty:run -Pdevelop,livereload
+cd camunda-bpm-webapp/webapp
+mvn clean jetty:run -Pdevelop
 ```
 The webapps are then available pointing a browser at [http://localhost:8080](http://localhost:8080)
 
-You can now start developing using the `./node_modules/grunt-cli/bin/grunt auto-build` command in the directories (you need a separate terminal/process for each of them)
+You can now start developing using the `grunt auto-build` command in the webapp directory. To shorten compile times, you can specify the project you are going to make changes to by calling `grunt auto-build:cockpit`
 
-* `camunda-cockpit-ui`
-* `camunda-tasklist-ui`
-* `camunda-admin-ui`
-* `camunda-bpm-sdk-js`
+If you do not want the server to perform a frontend build on startup, because you are running your own grunt build during development, you can start the server with
 
-If you made the linking, the pages in your browser should reload when a change is made to the scripts of those projects.
-
+```sh
+mvn jetty:run -Pdevelop,skipFrontendBuild
+```
 
 
 ## Browsers support
