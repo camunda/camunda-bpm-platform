@@ -50,7 +50,7 @@ public abstract class TabularResultAggregator {
   }
 
   public TabularResultSet execute() {
-    TabularResultSet tabularResultSet = createAggrgatedResultsInstance();
+    TabularResultSet tabularResultSet = createAggregatedResultsInstance();
 
     File[] resultFiles = resultDirectory.listFiles();
     for (File resultFile : resultFiles) {
@@ -83,7 +83,7 @@ public abstract class TabularResultAggregator {
 
   }
 
-  protected abstract TabularResultSet createAggrgatedResultsInstance();
+  protected abstract TabularResultSet createAggregatedResultsInstance();
 
   protected abstract void processResults(PerfTestResults results, TabularResultSet tabularResultSet);
 

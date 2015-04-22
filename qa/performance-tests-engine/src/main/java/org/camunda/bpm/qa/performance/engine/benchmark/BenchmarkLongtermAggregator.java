@@ -32,7 +32,7 @@ public class BenchmarkLongtermAggregator extends TabularResultAggregator {
   }
 
   @Override
-  protected TabularResultSet createAggrgatedResultsInstance() {
+  protected TabularResultSet createAggregatedResultsInstance() {
     return new TabularResultSet();
   }
 

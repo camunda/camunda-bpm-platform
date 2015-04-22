@@ -41,7 +41,7 @@ public class SqlStatementCountAggregator extends TabularResultAggregator {
     super(resultsFolderPath);
   }
 
-  protected TabularResultSet createAggrgatedResultsInstance() {
+  protected TabularResultSet createAggregatedResultsInstance() {
     TabularResultSet tabularResultSet = new TabularResultSet();
 
     List<String> resultColumnNames = tabularResultSet.getResultColumnNames();

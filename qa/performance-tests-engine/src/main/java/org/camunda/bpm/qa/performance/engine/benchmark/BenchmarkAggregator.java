@@ -35,7 +35,7 @@ public class BenchmarkAggregator extends TabularResultAggregator {
     super(resultsFolderPath);
   }
 
-  protected TabularResultSet createAggrgatedResultsInstance() {
+  protected TabularResultSet createAggregatedResultsInstance() {
     return new TabularResultSet();
   }
 
