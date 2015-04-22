@@ -462,7 +462,7 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(testGroup.getId(), query.getExpressions().get("taskCandidateGroup"));
   }
 
-  public void testTaskQueryCandidateIncludeAssignedTasks() {
+  public void testTaskQueryCandidateUserIncludeAssignedTasks() {
     TaskQueryImpl query = new TaskQueryImpl();
     query.taskCandidateUser(testUser.getId());
     query.includeAssignedTasks();
@@ -471,6 +471,66 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
     query = filterService.getFilter(filter.getId()).getQuery();
 
     assertEquals(testUser.getId(), query.getCandidateUser());
+    assertTrue(query.isIncludeAssignedTasks());
+  }
+
+  public void testTaskQueryCandidateUserExpressionIncludeAssignedTasks() {
+    TaskQueryImpl query = new TaskQueryImpl();
+    query.taskCandidateUserExpression(testString);
+    query.includeAssignedTasks();
+
+    saveQuery(query);
+    query = filterService.getFilter(filter.getId()).getQuery();
+
+    assertEquals(testString, query.getExpressions().get("taskCandidateUser"));
+    assertTrue(query.isIncludeAssignedTasks());
+  }
+
+  public void testTaskQueryCandidateGroupIncludeAssignedTasks() {
+    TaskQueryImpl query = new TaskQueryImpl();
+    query.taskCandidateGroup(testGroup.getId());
+    query.includeAssignedTasks();
+
+    saveQuery(query);
+    query = filterService.getFilter(filter.getId()).getQuery();
+
+    assertEquals(testGroup.getId(), query.getCandidateGroup());
+    assertTrue(query.isIncludeAssignedTasks());
+  }
+
+  public void testTaskQueryCandidateGroupExpressionIncludeAssignedTasks() {
+    TaskQueryImpl query = new TaskQueryImpl();
+    query.taskCandidateGroupExpression(testString);
+    query.includeAssignedTasks();
+
+    saveQuery(query);
+    query = filterService.getFilter(filter.getId()).getQuery();
+
+    assertEquals(testString, query.getExpressions().get("taskCandidateGroup"));
+    assertTrue(query.isIncludeAssignedTasks());
+  }
+
+  public void testTaskQueryCandidateGroupsIncludeAssignedTasks() {
+    TaskQueryImpl query = new TaskQueryImpl();
+    query.taskCandidateGroupIn(testCandidateGroups);
+    query.includeAssignedTasks();
+
+    saveQuery(query);
+    query = filterService.getFilter(filter.getId()).getQuery();
+
+    assertEquals(testCandidateGroups, query.getCandidateGroupsInternal());
+    assertTrue(query.isIncludeAssignedTasks());
+  }
+
+  public void testTaskQueryCandidateGroupsExpressionIncludeAssignedTasks() {
+    TaskQueryImpl query = new TaskQueryImpl();
+    query.taskCandidateGroupInExpression(testString);
+    query.includeAssignedTasks();
+
+    saveQuery(query);
+    query = filterService.getFilter(filter.getId()).getQuery();
+
+    assertEquals(testString, query.getExpressions().get("taskCandidateGroupIn"));
     assertTrue(query.isIncludeAssignedTasks());
   }
 

@@ -272,11 +272,11 @@ public class JsonTaskQueryConverter extends JsonObjectConverter<TaskQuery> {
     if (json.has(CANDIDATE_GROUP)) {
       query.taskCandidateGroup(json.getString(CANDIDATE_GROUP));
     }
-    if (json.has(INCLUDE_ASSIGNED_TASKS) && json.getBoolean(INCLUDE_ASSIGNED_TASKS)){
-      query.includeAssignedTasks();
-    }
     if (json.has(CANDIDATE_GROUPS) && !json.has(CANDIDATE_USER) && !json.has(CANDIDATE_GROUP)) {
       query.taskCandidateGroupIn(getList(json.getJSONArray(CANDIDATE_GROUPS)));
+    }
+    if (json.has(INCLUDE_ASSIGNED_TASKS) && json.getBoolean(INCLUDE_ASSIGNED_TASKS)) {
+      query.includeAssignedTasksInternal();
     }
     if (json.has(PROCESS_INSTANCE_ID)) {
       query.processInstanceId(json.getString(PROCESS_INSTANCE_ID));

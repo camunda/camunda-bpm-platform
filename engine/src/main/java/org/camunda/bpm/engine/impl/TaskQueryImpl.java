@@ -333,6 +333,11 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
     return this;
   }
 
+  public TaskQuery includeAssignedTasksInternal() {
+    includeAssignedTasks = true;
+    return this;
+  }
+
   public TaskQueryImpl processInstanceId(String processInstanceId) {
     this.processInstanceId = processInstanceId;
     return this;
