@@ -343,6 +343,7 @@ alter table ACT_RU_VARIABLE
     unique (VAR_SCOPE_, NAME_);
 
 -- indexes for deadlock problems - https://app.camunda.com/jira/browse/CAM-2567 --
+create index ACT_IDX_EXECUTION_PROCINST on ACT_RU_EXECUTION(PROC_INST_ID_);
 create index ACT_IDX_INC_CAUSEINCID on ACT_RU_INCIDENT(CAUSE_INCIDENT_ID_);
 create index ACT_IDX_INC_EXID on ACT_RU_INCIDENT(EXECUTION_ID_);
 create index ACT_IDX_INC_PROCDEFID on ACT_RU_INCIDENT(PROC_DEF_ID_);
