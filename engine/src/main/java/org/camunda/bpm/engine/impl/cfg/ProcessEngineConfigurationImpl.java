@@ -904,6 +904,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   }
 
   protected void initPersistenceProviders() {
+    ensurePrefixAndSchemaFitToegether(databaseTablePrefix, databaseSchema);
     dbSqlSessionFactory = new DbSqlSessionFactory();
     dbSqlSessionFactory.setDatabaseType(databaseType);
     dbSqlSessionFactory.setIdGenerator(idGenerator);
@@ -915,6 +916,17 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     dbSqlSessionFactory.setDatabaseSchema(databaseSchema);
     addSessionFactory(dbSqlSessionFactory);
     addSessionFactory(new DbSqlPersistenceProviderFactory());
+  }
+
+  /**
+   * When providing a schema and a prefix  the prefix has to be the schema ending with a dot.
+   */
+  protected void ensurePrefixAndSchemaFitToegether(String prefix, String schema) {
+    if(schema == null) {
+      return;
+    } else if(!prefix.equals(schema + ".")){
+      throw new ProcessEngineException("When setting a schema the prefix has to be schema + \'.\'. Received schema: " + schema + " prefix: " + prefix);
+    }
   }
 
   protected void addSessionFactory(SessionFactory sessionFactory) {

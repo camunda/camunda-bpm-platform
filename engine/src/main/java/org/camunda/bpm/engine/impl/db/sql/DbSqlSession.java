@@ -397,7 +397,10 @@ public class DbSqlSession extends AbstractPersistenceSession {
   }
 
   public boolean isTablePresent(String tableName) {
-    tableName = prependDatabaseTablePrefix(tableName);
+    //if we use a schema we must not prepend the prefix
+    if(dbSqlSessionFactory.getDatabaseSchema()==null){
+      tableName = prependDatabaseTablePrefix(tableName);
+    }
     Connection connection = null;
     try {
       connection = sqlSession.getConnection();
