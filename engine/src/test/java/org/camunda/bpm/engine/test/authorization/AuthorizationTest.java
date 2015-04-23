@@ -37,6 +37,8 @@ import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
+import org.camunda.bpm.engine.variable.VariableMap;
+import org.camunda.bpm.engine.variable.Variables;
 
 /**
  * @author Roman Smirnov
@@ -48,6 +50,9 @@ public abstract class AuthorizationTest extends PluggableProcessEngineTestCase {
   protected String groupId = "accounting";
   protected User user;
   protected Group group;
+
+  protected static final String VARIABLE_NAME = "aVariableName";
+  protected static final String VARIABLE_VALUE = "aVariableValue";
 
   protected void initializeProcessEngine() {
     super.initializeProcessEngine();
@@ -324,6 +329,12 @@ public abstract class AuthorizationTest extends PluggableProcessEngineTestCase {
       query.singleResult();
       fail();
     } catch (ProcessEngineException e) {}
+  }
+
+  // helper ////////////////////////////////////////////////////////////////////
+
+  protected VariableMap getVariables() {
+    return Variables.createVariables().putValue(VARIABLE_NAME, VARIABLE_VALUE);
   }
 
 }

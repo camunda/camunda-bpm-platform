@@ -21,8 +21,6 @@ import static org.camunda.bpm.engine.authorization.Resources.TASK;
 import org.camunda.bpm.engine.impl.AbstractQuery;
 import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.runtime.VariableInstanceQuery;
-import org.camunda.bpm.engine.variable.VariableMap;
-import org.camunda.bpm.engine.variable.Variables;
 
 /**
  * @author Roman Smirnov
@@ -32,8 +30,6 @@ public class VariableInstanceAuthorizationTest extends AuthorizationTest {
 
   protected static final String PROCESS_KEY = "oneTaskProcess";
   protected static final String CASE_KEY = "oneTaskCase";
-  protected static final String VARIABLE_NAME = "aVariableName";
-  protected static final String VARIABLE_VALUE = "aVariableValue";
 
   protected String deploymentId;
 
@@ -212,9 +208,38 @@ public class VariableInstanceAuthorizationTest extends AuthorizationTest {
     deleteTask(taskId, true);
   }
 
-  protected VariableMap getVariables() {
-    return Variables.createVariables().putValue(VARIABLE_NAME, VARIABLE_VALUE);
+  public void testMixedVariables() {
+    // given
+    String taskId = "myTask";
+    createTask(taskId);
+    setTaskVariable(taskId, VARIABLE_NAME, VARIABLE_VALUE);
+
+    String processInstanceId = startProcessInstanceByKey(PROCESS_KEY, getVariables()).getProcessInstanceId();
+
+    createCaseInstanceByKey(CASE_KEY, getVariables());
+
+    // when (1)
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
+
+    // then (1)
+    verifyQueryResults(query, 1);
+
+    // when (2)
+    createGrantAuthorization(TASK, taskId, userId, READ);
+
+    // then (2)
+    verifyQueryResults(query, 2);
+
+    // when (3)
+    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, READ);
+
+    // then (3)
+    verifyQueryResults(query, 3);
+
+    deleteTask(taskId, true);
   }
+
+  // helper ////////////////////////////////////////////////////////////////
 
   protected void verifyQueryResults(VariableInstanceQuery query, int countExpected) {
     verifyQueryResults((AbstractQuery<?, ?>) query, countExpected);

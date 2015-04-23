@@ -18,6 +18,7 @@ import java.io.Serializable;
 
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
@@ -49,6 +50,9 @@ public class GetExecutionVariableTypedCmd<T extends TypedValue> implements Comma
       .findExecutionById(executionId);
 
     ensureNotNull("execution " + executionId + " doesn't exist", "execution", execution);
+
+    AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
+    authorizationManager.checkReadProcessInstance(execution);
 
     T value;
 

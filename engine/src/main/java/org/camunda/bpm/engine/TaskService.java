@@ -485,41 +485,95 @@ public interface TaskService {
    */
   NativeTaskQuery createNativeTaskQuery();
 
-  /** set variable on a task.  If the variable is not already existing, it will be created in the
+  /**
+   * Set variable on a task. If the variable is not already existing, it will be created in the
    * most outer scope.  This means the process instance in case this task is related to an
-   * execution. */
+   * execution.
+   *
+   * @throws ProcessEngineException
+   *          when the task doesn't exist.
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#TASK}
+   *          or no {@link Permissions#UPDATE_TASK} permission on {@link Resources#PROCESS_DEFINITION}
+   *          (if the task is part of a running process instance).
+   */
   void setVariable(String taskId, String variableName, Object value);
 
-  /** set variables on a task.  If the variable is not already existing, it will be created in the
+  /**
+   * Set variables on a task. If the variable is not already existing, it will be created in the
    * most outer scope.  This means the process instance in case this task is related to an
-   * execution. */
+   * execution.
+   *
+   * @throws ProcessEngineException
+   *          when the task doesn't exist.
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#TASK}
+   *          or no {@link Permissions#UPDATE_TASK} permission on {@link Resources#PROCESS_DEFINITION}
+   *          (if the task is part of a running process instance).
+   */
   void setVariables(String taskId, Map<String, ? extends Object> variables);
 
-  /** set variable on a task.  If the variable is not already existing, it will be created in the
-   * task.  */
+  /**
+   * Set variable on a task. If the variable is not already existing, it will be created in the
+   * task.
+   *
+   * @throws ProcessEngineException
+   *          when the task doesn't exist.
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#TASK}
+   *          or no {@link Permissions#UPDATE_TASK} permission on {@link Resources#PROCESS_DEFINITION}
+   *          (if the task is part of a running process instance).
+   */
   void setVariableLocal(String taskId, String variableName, Object value);
 
-  /** set variables on a task.  If the variable is not already existing, it will be created in the
-   * task.  */
+  /**
+   * Set variables on a task. If the variable is not already existing, it will be created in the
+   * task.
+   *
+   * @throws ProcessEngineException
+   *          when the task doesn't exist.
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#TASK}
+   *          or no {@link Permissions#UPDATE_TASK} permission on {@link Resources#PROCESS_DEFINITION}
+   *          (if the task is part of a running process instance).
+   */
   void setVariablesLocal(String taskId, Map<String, ? extends Object> variables);
 
-  /** get a variables and search in the task scope and if available also the execution scopes. */
+  /**
+   * Get a variables and search in the task scope and if available also the execution scopes.
+   *
+   * @throws ProcessEngineException
+   *          when the task doesn't exist.
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#READ} permission on {@link Resources#TASK}
+   *          or no {@link Permissions#READ_TASK} permission on {@link Resources#PROCESS_DEFINITION}
+   *          (if the task is part of a running process instance).
+   */
   Object getVariable(String taskId, String variableName);
 
-  /** get a variables and search in the task scope and if available also the execution scopes.
+  /**
+   * Get a variables and search in the task scope and if available also the execution scopes.
    *
    * @param taskId the id of the task
    * @param variableName the name of the variable to fetch
    *
    * @return the TypedValue for the variable or 'null' in case no such variable exists.
    *
-   * @throws ClassCastException in case the value is not of the requested type
+   * @throws ClassCastException
+   *          in case the value is not of the requested type
+   * @throws ProcessEngineException
+   *          when the task doesn't exist.
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#READ} permission on {@link Resources#TASK}
+   *          or no {@link Permissions#READ_TASK} permission on {@link Resources#PROCESS_DEFINITION}
+   *          (if the task is part of a running process instance).
    *
    * @since 7.2
    */
   <T extends TypedValue> T getVariableTyped(String taskId, String variableName);
 
-  /** get a variables and search in the task scope and if available also the execution scopes.
+  /**
+   * Get a variables and search in the task scope and if available also the execution scopes.
    *
    * @param taskId the id of the task
    * @param variableName the name of the variable to fetch
@@ -527,29 +581,54 @@ public interface TaskService {
    *
    * @return the TypedValue for the variable or 'null' in case no such variable exists.
    *
-   * @throws ClassCastException in case the value is not of the requested type
+   * @throws ClassCastException
+   *          in case the value is not of the requested type
+   * @throws ProcessEngineException
+   *          when the task doesn't exist.
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#READ} permission on {@link Resources#TASK}
+   *          or no {@link Permissions#READ_TASK} permission on {@link Resources#PROCESS_DEFINITION}
+   *          (if the task is part of a running process instance).
    *
    * @since 7.2
    */
   <T extends TypedValue> T getVariableTyped(String taskId, String variableName, boolean deserializeValue);
 
-  /** get a variables and only search in the task scope.  */
+  /**
+   * Get a variables and only search in the task scope.
+   *
+   * @throws ProcessEngineException
+   *          when the task doesn't exist.
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#READ} permission on {@link Resources#TASK}
+   *          or no {@link Permissions#READ_TASK} permission on {@link Resources#PROCESS_DEFINITION}
+   *          (if the task is part of a running process instance).
+   */
   Object getVariableLocal(String taskId, String variableName);
 
-  /** get a variables and only search in the task scope.
-  *
-  * @param taskId the id of the task
-  * @param variableName the name of the variable to fetch
-  *
-  * @return the TypedValue for the variable or 'null' in case no such variable exists.
-  *
-  * @throws ClassCastException in case the value is not of the requested type
-  *
-  * @since 7.2
-  */
+  /**
+   * Get a variables and only search in the task scope.
+   *
+   * @param taskId the id of the task
+   * @param variableName the name of the variable to fetch
+   *
+   * @return the TypedValue for the variable or 'null' in case no such variable exists.
+   *
+   * @throws ClassCastException
+   *          in case the value is not of the requested type
+   * @throws ProcessEngineException
+   *          when the task doesn't exist.
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#READ} permission on {@link Resources#TASK}
+   *          or no {@link Permissions#READ_TASK} permission on {@link Resources#PROCESS_DEFINITION}
+   *          (if the task is part of a running process instance).
+   *
+   * @since 7.2
+   */
   <T extends TypedValue> T getVariableLocalTyped(String taskId, String variableName);
 
-  /** get a variables and only search in the task scope.
+  /**
+   * Get a variables and only search in the task scope.
    *
    * @param taskId the id of the task
    * @param variableName the name of the variable to fetch
@@ -557,112 +636,233 @@ public interface TaskService {
    *
    * @return the TypedValue for the variable or 'null' in case no such variable exists.
    *
-   * @throws ClassCastException in case the value is not of the requested type
+   * @throws ClassCastException
+   *          in case the value is not of the requested type
+   * @throws ProcessEngineException
+   *          when the task doesn't exist.
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#READ} permission on {@link Resources#TASK}
+   *          or no {@link Permissions#READ_TASK} permission on {@link Resources#PROCESS_DEFINITION}
+   *          (if the task is part of a running process instance).
    *
    * @since 7.2
    */
   <T extends TypedValue> T getVariableLocalTyped(String taskId, String variableName, boolean deserializeValue);
 
-  /** get all variables and search in the task scope and if available also the execution scopes.
+  /**
+   * Get all variables and search in the task scope and if available also the execution scopes.
    * If you have many variables and you only need a few, consider using {@link #getVariables(String, Collection)}
-   * for better performance.*/
+   * for better performance.
+   *
+   * @throws ProcessEngineException
+   *          when the task doesn't exist.
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#READ} permission on {@link Resources#TASK}
+   *          or no {@link Permissions#READ_TASK} permission on {@link Resources#PROCESS_DEFINITION}
+   *          (if the task is part of a running process instance).
+   */
   Map<String, Object> getVariables(String taskId);
 
-  /** get all variables and search in the task scope and if available also the execution scopes.
+  /**
+   * Get all variables and search in the task scope and if available also the execution scopes.
    * If you have many variables and you only need a few, consider using {@link #getVariables(String, Collection)}
    * for better performance.
    *
    * @param taskId the id of the task
    *
+   * @throws ProcessEngineException
+   *          when the task doesn't exist.
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#READ} permission on {@link Resources#TASK}
+   *          or no {@link Permissions#READ_TASK} permission on {@link Resources#PROCESS_DEFINITION}
+   *          (if the task is part of a running process instance).
+   *
    * @since 7.2
-   * */
+   */
   VariableMap getVariablesTyped(String taskId);
 
-  /** get all variables and search in the task scope and if available also the execution scopes.
+  /**
+   * Get all variables and search in the task scope and if available also the execution scopes.
    * If you have many variables and you only need a few, consider using {@link #getVariables(String, Collection)}
    * for better performance.
    *
    * @param taskId the id of the task
    * @param deserializeValues if false, {@link SerializableValue SerializableValues} will not be deserialized.
    *
+   * @throws ProcessEngineException
+   *          when the task doesn't exist.
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#READ} permission on {@link Resources#TASK}
+   *          or no {@link Permissions#READ_TASK} permission on {@link Resources#PROCESS_DEFINITION}
+   *          (if the task is part of a running process instance).
+   *
    * @since 7.2
-   * */
+   */
   VariableMap getVariablesTyped(String taskId, boolean deserializeValues);
 
-  /** get all variables and search only in the task scope.
-  * If you have many task local variables and you only need a few, consider using {@link #getVariablesLocal(String, Collection)}
-  * for better performance.*/
+  /**
+   * Get all variables and search only in the task scope.
+   * If you have many task local variables and you only need a few, consider using {@link #getVariablesLocal(String, Collection)}
+   * for better performance.
+   *
+   * @throws ProcessEngineException
+   *          when the task doesn't exist.
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#READ} permission on {@link Resources#TASK}
+   *          or no {@link Permissions#READ_TASK} permission on {@link Resources#PROCESS_DEFINITION}
+   *          (if the task is part of a running process instance).
+   */
   Map<String, Object> getVariablesLocal(String taskId);
 
-  /** get all variables and search only in the task scope.
-  * If you have many task local variables and you only need a few, consider using {@link #getVariablesLocal(String, Collection)}
-  * for better performance.
-  *
-  * @param taskId the id of the task
-  * @param deserializeValues if false, {@link SerializableValue SerializableValues} will not be deserialized.
-  *
-  * @since 7.2
-  * */
+  /**
+   * Get all variables and search only in the task scope.
+   * If you have many task local variables and you only need a few, consider using {@link #getVariablesLocal(String, Collection)}
+   * for better performance.
+   *
+   * @param taskId the id of the task
+   * @param deserializeValues if false, {@link SerializableValue SerializableValues} will not be deserialized.
+   *
+   * @throws ProcessEngineException
+   *          when the task doesn't exist.
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#READ} permission on {@link Resources#TASK}
+   *          or no {@link Permissions#READ_TASK} permission on {@link Resources#PROCESS_DEFINITION}
+   *          (if the task is part of a running process instance).
+   *
+   * @since 7.2
+   */
   VariableMap getVariablesLocalTyped(String taskId);
 
-  /** get all variables and search only in the task scope.
-  * If you have many task local variables and you only need a few, consider using {@link #getVariablesLocal(String, Collection)}
-  * for better performance.
-  *
-  * @param taskId the id of the task
-  * @param deserializeValues if false, {@link SerializableValue SerializableValues} will not be deserialized.
-  *
-  * @since 7.2
-  * */
+  /**
+   * Get all variables and search only in the task scope.
+   * If you have many task local variables and you only need a few, consider using {@link #getVariablesLocal(String, Collection)}
+   * for better performance.
+   *
+   * @param taskId the id of the task
+   * @param deserializeValues if false, {@link SerializableValue SerializableValues} will not be deserialized.
+   *
+   * @throws ProcessEngineException
+   *          when the task doesn't exist.
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#READ} permission on {@link Resources#TASK}
+   *          or no {@link Permissions#READ_TASK} permission on {@link Resources#PROCESS_DEFINITION}
+   *          (if the task is part of a running process instance).
+   *
+   * @since 7.2
+   */
   VariableMap getVariablesLocalTyped(String taskId, boolean deserializeValues);
 
-  /** get values for all given variableNames */
+  /**
+   * Get values for all given variableNames
+   *
+   * @throws ProcessEngineException
+   *          when the task doesn't exist.
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#READ} permission on {@link Resources#TASK}
+   *          or no {@link Permissions#READ_TASK} permission on {@link Resources#PROCESS_DEFINITION}
+   *          (if the task is part of a running process instance).
+   *
+   */
   Map<String, Object> getVariables(String taskId, Collection<String> variableNames);
 
-  /** get values for all given variableName
+  /**
+   * Get values for all given variableName
    *
    * @param taskId the id of the task
    * @param variableNames only fetch variables whose names are in the collection.
    * @param deserializeValues if false, {@link SerializableValue SerializableValues} will not be deserialized.
    *
+   * @throws ProcessEngineException
+   *          when the task doesn't exist.
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#READ} permission on {@link Resources#TASK}
+   *          or no {@link Permissions#READ_TASK} permission on {@link Resources#PROCESS_DEFINITION}
+   *          (if the task is part of a running process instance).
+   *
    * @since 7.2
    * */
   VariableMap getVariablesTyped(String taskId, Collection<String> variableNames, boolean deserializeValues);
 
-  /** get a variable on a task */
+  /**
+   * Get a variable on a task
+   *
+   * @throws ProcessEngineException
+   *          when the task doesn't exist.
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#READ} permission on {@link Resources#TASK}
+   *          or no {@link Permissions#READ_TASK} permission on {@link Resources#PROCESS_DEFINITION}
+   *          (if the task is part of a running process instance).
+   *
+   */
   Map<String,Object> getVariablesLocal(String taskId, Collection<String> variableNames);
 
-  /** get values for all given variableName. Only search in the local task scope.
-  *
-  * @param taskId the id of the task
-  * @param variableNames only fetch variables whose names are in the collection.
-  * @param deserializeValues if false, {@link SerializableValue SerializableValues} will not be deserialized.
-  *
-  * @since 7.2
-  * */
+  /**
+   * Get values for all given variableName. Only search in the local task scope.
+   *
+   * @param taskId the id of the task
+   * @param variableNames only fetch variables whose names are in the collection.
+   * @param deserializeValues if false, {@link SerializableValue SerializableValues} will not be deserialized.
+   *
+   * @throws ProcessEngineException
+   *          when the task doesn't exist.
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#READ} permission on {@link Resources#TASK}
+   *          or no {@link Permissions#READ_TASK} permission on {@link Resources#PROCESS_DEFINITION}
+   *          (if the task is part of a running process instance).
+   *
+   * @since 7.2
+   */
   VariableMap getVariablesLocalTyped(String taskId, Collection<String> variableNames, boolean deserializeValues);
 
   /**
    * Removes the variable from the task.
    * When the variable does not exist, nothing happens.
+   *
+   * @throws ProcessEngineException
+   *          when the task doesn't exist.
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#TASK}
+   *          or no {@link Permissions#UPDATE_TASK} permission on {@link Resources#PROCESS_DEFINITION}
+   *          (if the task is part of a running process instance).
    */
   void removeVariable(String taskId, String variableName);
 
   /**
    * Removes the variable from the task (not considering parent scopes).
    * When the variable does not exist, nothing happens.
+   *
+   * @throws ProcessEngineException
+   *          when the task doesn't exist.
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#TASK}
+   *          or no {@link Permissions#UPDATE_TASK} permission on {@link Resources#PROCESS_DEFINITION}
+   *          (if the task is part of a running process instance).
    */
   void removeVariableLocal(String taskId, String variableName);
 
   /**
    * Removes all variables in the given collection from the task.
    * Non existing variable names are simply ignored.
+   *
+   * @throws ProcessEngineException
+   *          when the task doesn't exist.
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#TASK}
+   *          or no {@link Permissions#UPDATE_TASK} permission on {@link Resources#PROCESS_DEFINITION}
+   *          (if the task is part of a running process instance).
    */
   void removeVariables(String taskId, Collection<String> variableNames);
 
   /**
    * Removes all variables in the given collection from the task (not considering parent scopes).
    * Non existing variable names are simply ignored.
+   *
+   * @throws ProcessEngineException
+   *          when the task doesn't exist.
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#TASK}
+   *          or no {@link Permissions#UPDATE_TASK} permission on {@link Resources#PROCESS_DEFINITION}
+   *          (if the task is part of a running process instance).
    */
   void removeVariablesLocal(String taskId, Collection<String> variableNames);
 

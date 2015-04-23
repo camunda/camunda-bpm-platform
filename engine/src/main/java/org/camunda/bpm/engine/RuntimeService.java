@@ -723,6 +723,9 @@ public interface RuntimeService {
    *
    * @throws ProcessEngineException
    *          when no execution is found for the given executionId.
+   * @throws AuthorizationException
+   *          if the user has no {@link Permissions#READ} permission on {@link Resources#PROCESS_INSTANCE}
+   *          or no {@link Permissions#READ_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   Map<String, Object> getVariables(String executionId);
 
@@ -735,6 +738,9 @@ public interface RuntimeService {
    *
    * @throws ProcessEngineException
    *          when no execution is found for the given executionId.
+   * @throws AuthorizationException
+   *          if the user has no {@link Permissions#READ} permission on {@link Resources#PROCESS_INSTANCE}
+   *          or no {@link Permissions#READ_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
    *
    * @since 7.2
    *
@@ -751,6 +757,9 @@ public interface RuntimeService {
    *
    * @throws ProcessEngineException
    *          when no execution is found for the given executionId.
+   * @throws AuthorizationException
+   *          if the user has no {@link Permissions#READ} permission on {@link Resources#PROCESS_INSTANCE}
+   *          or no {@link Permissions#READ_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
    *
    * @since 7.2
    *
@@ -767,6 +776,9 @@ public interface RuntimeService {
    *
    * @throws ProcessEngineException
    *          when no execution is found for the given executionId.
+   * @throws AuthorizationException
+   *          if the user has no {@link Permissions#READ} permission on {@link Resources#PROCESS_INSTANCE}
+   *          or no {@link Permissions#READ_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   Map<String, Object> getVariablesLocal(String executionId);
 
@@ -781,6 +793,9 @@ public interface RuntimeService {
    *
    * @throws ProcessEngineException
    *          when no execution is found for the given executionId.
+   * @throws AuthorizationException
+   *          if the user has no {@link Permissions#READ} permission on {@link Resources#PROCESS_INSTANCE}
+   *          or no {@link Permissions#READ_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   VariableMap getVariablesLocalTyped(String executionId);
 
@@ -796,6 +811,9 @@ public interface RuntimeService {
    *
    * @throws ProcessEngineException
    *          when no execution is found for the given executionId.
+   * @throws AuthorizationException
+   *          if the user has no {@link Permissions#READ} permission on {@link Resources#PROCESS_INSTANCE}
+   *          or no {@link Permissions#READ_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
    *
    * @since 7.2
    */
@@ -811,6 +829,9 @@ public interface RuntimeService {
    *
    * @throws ProcessEngineException
    *          when no execution is found for the given executionId.
+   * @throws AuthorizationException
+   *          if the user has no {@link Permissions#READ} permission on {@link Resources#PROCESS_INSTANCE}
+   *          or no {@link Permissions#READ_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   Map<String,Object> getVariables(String executionId, Collection<String> variableNames);
 
@@ -824,6 +845,9 @@ public interface RuntimeService {
    *
    * @throws ProcessEngineException
    *          when no execution is found for the given executionId.
+   * @throws AuthorizationException
+   *          if the user has no {@link Permissions#READ} permission on {@link Resources#PROCESS_INSTANCE}
+   *          or no {@link Permissions#READ_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
    *
    * @since 7.2
    *
@@ -840,6 +864,9 @@ public interface RuntimeService {
    *
    * @throws ProcessEngineException
    *          when no execution is found for the given executionId.
+   * @throws AuthorizationException
+   *          if the user has no {@link Permissions#READ} permission on {@link Resources#PROCESS_INSTANCE}
+   *          or no {@link Permissions#READ_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   Map<String,Object> getVariablesLocal(String executionId, Collection<String> variableNames);
 
@@ -853,6 +880,9 @@ public interface RuntimeService {
    *
    * @throws ProcessEngineException
    *          when no execution is found for the given executionId.
+   * @throws AuthorizationException
+   *          if the user has no {@link Permissions#READ} permission on {@link Resources#PROCESS_INSTANCE}
+   *          or no {@link Permissions#READ_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
    *
    * @since 7.2
    *
@@ -870,6 +900,9 @@ public interface RuntimeService {
    *
    * @throws ProcessEngineException
    *          when no execution is found for the given executionId.
+   * @throws AuthorizationException
+   *          if the user has no {@link Permissions#READ} permission on {@link Resources#PROCESS_INSTANCE}
+   *          or no {@link Permissions#READ_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   Object getVariable(String executionId, String variableName);
 
@@ -884,6 +917,10 @@ public interface RuntimeService {
    *
    * @throws ProcessEngineException
    *          when no execution is found for the given executionId.
+   * @throws AuthorizationException
+   *          if the user has no {@link Permissions#READ} permission on {@link Resources#PROCESS_INSTANCE}
+   *          or no {@link Permissions#READ_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
+   *
    * @since 7.2
    *
    */
@@ -901,6 +938,9 @@ public interface RuntimeService {
    *
    * @throws ProcessEngineException
    *          when no execution is found for the given executionId.
+   * @throws AuthorizationException
+   *          if the user has no {@link Permissions#READ} permission on {@link Resources#PROCESS_INSTANCE}
+   *          or no {@link Permissions#READ_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
    *
    * @since 7.2
    *
@@ -918,6 +958,9 @@ public interface RuntimeService {
    *
    * @throws ProcessEngineException
    *          when no execution is found for the given executionId.
+   * @throws AuthorizationException
+   *          if the user has no {@link Permissions#READ} permission on {@link Resources#PROCESS_INSTANCE}
+   *          or no {@link Permissions#READ_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   Object getVariableLocal(String executionId, String variableName);
 
@@ -932,6 +975,9 @@ public interface RuntimeService {
    *
    * @throws ProcessEngineException
    *          when no execution is found for the given executionId.
+   * @throws AuthorizationException
+   *          if the user has no {@link Permissions#READ} permission on {@link Resources#PROCESS_INSTANCE}
+   *          or no {@link Permissions#READ_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
    *
    * @since 7.2
    *
@@ -950,6 +996,9 @@ public interface RuntimeService {
    *
    * @throws ProcessEngineException
    *          when no execution is found for the given executionId.
+   * @throws AuthorizationException
+   *          if the user has no {@link Permissions#READ} permission on {@link Resources#PROCESS_INSTANCE}
+   *          or no {@link Permissions#READ_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
    *
    * @since 7.2
    *
@@ -968,6 +1017,9 @@ public interface RuntimeService {
    *
    * @throws ProcessEngineException
    *          when no execution is found for the given executionId.
+   * @throws AuthorizationException
+   *          if the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
+   *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   void setVariable(String executionId, String variableName, Object value);
 
@@ -982,6 +1034,9 @@ public interface RuntimeService {
    *
    * @throws ProcessEngineException
    *          when no execution is found for the given executionId.
+   * @throws AuthorizationException
+   *          if the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
+   *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   void setVariableLocal(String executionId, String variableName, Object value);
 
@@ -994,6 +1049,9 @@ public interface RuntimeService {
    *
    * @throws ProcessEngineException
    *          when no execution is found for the given executionId.
+   * @throws AuthorizationException
+   *          if the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
+   *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   void setVariables(String executionId, Map<String, ? extends Object> variables);
 
@@ -1005,6 +1063,9 @@ public interface RuntimeService {
    *
    * @throws ProcessEngineException
    *          when no execution is found for the given executionId.
+   * @throws AuthorizationException
+   *          if the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
+   *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   void setVariablesLocal(String executionId, Map<String, ? extends Object> variables);
 
@@ -1016,6 +1077,9 @@ public interface RuntimeService {
    *
    * @throws ProcessEngineException
    *          when no execution is found for the given executionId.
+   * @throws AuthorizationException
+   *          if the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
+   *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   void removeVariable(String executionId, String variableName);
 
@@ -1027,6 +1091,9 @@ public interface RuntimeService {
    *
    * @throws ProcessEngineException
    *          when no execution is found for the given executionId.
+   * @throws AuthorizationException
+   *          if the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
+   *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   void removeVariableLocal(String executionId, String variableName);
 
@@ -1038,6 +1105,9 @@ public interface RuntimeService {
    *
    * @throws ProcessEngineException
    *          when no execution is found for the given executionId.
+   * @throws AuthorizationException
+   *          if the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
+   *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   void removeVariables(String executionId, Collection<String> variableNames);
 
@@ -1049,6 +1119,9 @@ public interface RuntimeService {
    *
    * @throws ProcessEngineException
    *          when no execution is found for the given executionId.
+   * @throws AuthorizationException
+   *          if the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
+   *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   void removeVariablesLocal(String executionId, Collection<String> variableNames);
 

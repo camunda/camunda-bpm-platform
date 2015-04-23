@@ -18,6 +18,7 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 import java.util.Map;
 
 import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
+import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 
@@ -42,6 +43,10 @@ public class SetTaskVariablesCmd extends AbstractSetVariableCmd {
       .findTaskById(entityId);
 
     ensureNotNull("task " + entityId + " doesn't exist", "task", task);
+
+    AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
+    authorizationManager.checkUpdateTask(task);
+
     return task;
   }
 

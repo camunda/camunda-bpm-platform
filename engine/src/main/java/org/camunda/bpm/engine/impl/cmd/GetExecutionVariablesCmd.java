@@ -16,9 +16,11 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.io.Serializable;
 import java.util.Collection;
+
 import org.camunda.bpm.engine.impl.core.variable.VariableMapImpl;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.variable.VariableMap;
 
@@ -50,6 +52,9 @@ public class GetExecutionVariablesCmd implements Command<VariableMap>, Serializa
       .findExecutionById(executionId);
 
     ensureNotNull("execution " + executionId + " doesn't exist", "execution", execution);
+
+    AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
+    authorizationManager.checkReadProcessInstance(execution);
 
     VariableMapImpl executionVariables = new VariableMapImpl();
 
